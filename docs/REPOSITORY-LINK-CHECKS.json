@@ -1,0 +1,206 @@
+{
+  "pages": [
+    {
+      "page": "https://augmentoragent.com/desktop.html",
+      "status": 200,
+      "sha256": "7e41731f1178c53b5172e145de959a5c6aba2a1915b354a75e40b410c3dd2d23"
+    },
+    {
+      "page": "https://augmentoragent.com/docs.html",
+      "status": 200,
+      "sha256": "c9dcdcca55c249dad45f1ab7a9e6571cced22134af01680312870e6953e8c3aa"
+    },
+    {
+      "page": "https://augmentoragent.com/index.html",
+      "status": 200,
+      "sha256": "f5c31b4b1f09e58beed617da97cf39f5cd2f90ce91a19c9248e8914a33dcfd3b"
+    },
+    {
+      "page": "https://augmentoragent.com/licensing.html",
+      "status": 200,
+      "sha256": "d37af4cb443cdeb642f9a135c1abea64d5a8596f80ad36b2d25f1a36f0e552ce"
+    },
+    {
+      "page": "https://augmentoragent.com/plugins.html",
+      "status": 200,
+      "sha256": "0b5a2ed55f5ef2841a4a624046a7d04eeb610359f006a13a219c4e6596e858f0"
+    },
+    {
+      "page": "https://augmentoragent.com/skins.html",
+      "status": 200,
+      "sha256": "377688d2b9d3146d4c0356d710eb0151ed4ae6a6dfd46cc989f760dd396fef81"
+    }
+  ],
+  "links": [
+    {
+      "url": "https://github.com/ManoloRemiddi/DSH-Metafolder-Plugin",
+      "status": 200,
+      "finalHost": "github.com",
+      "finalPath": "/ManoloRemiddi/DSH-Metafolder-Plugin"
+    },
+    {
+      "url": "https://github.com/ManoloRemiddi/DSH-Metafolder-Plugin/releases/download/v1.2.1/dsh-metafolder-plugin-1.2.1.tgz",
+      "status": 200,
+      "finalHost": "release-assets.githubusercontent.com",
+      "finalPath": "/github-production-release-asset/1364203196/9c562465-31b3-4038-b9cb-b7f66449ac90"
+    },
+    {
+      "url": "https://github.com/ManoloRemiddi/augmentor-agent",
+      "status": 200,
+      "finalHost": "github.com",
+      "finalPath": "/ManoloRemiddi/augmentor-agent"
+    },
+    {
+      "url": "https://github.com/ManoloRemiddi/augmentor-agent-app/blob/main/docs/FEDORA.md",
+      "status": 200,
+      "finalHost": "github.com",
+      "finalPath": "/ManoloRemiddi/augmentor-agent-app/blob/main/docs/FEDORA.md"
+    },
+    {
+      "url": "https://github.com/ManoloRemiddi/augmentor-agent-app/releases/download/v0.2.10-complete-preview.1/SHA256SUMS",
+      "status": 200,
+      "finalHost": "release-assets.githubusercontent.com",
+      "finalPath": "/github-production-release-asset/1371573697/99b80fff-117f-4405-8af7-9631600e9b1c"
+    },
+    {
+      "url": "https://github.com/ManoloRemiddi/augmentor-agent-app/releases/download/v0.2.10-complete-preview.1/augmentor-0.2.10-complete-preview.1.tar.gz",
+      "status": 200,
+      "finalHost": "release-assets.githubusercontent.com",
+      "finalPath": "/github-production-release-asset/1371573697/a79afd5e-50f5-4daf-84a6-88669e51669e"
+    },
+    {
+      "url": "https://github.com/ManoloRemiddi/augmentor-agent-source",
+      "status": 200,
+      "finalHost": "github.com",
+      "finalPath": "/ManoloRemiddi/augmentor-agent"
+    },
+    {
+      "url": "https://github.com/ManoloRemiddi/augmentor-agent/blob/main/docs/COMPLETE-INSTALL.md",
+      "status": 200,
+      "finalHost": "github.com",
+      "finalPath": "/ManoloRemiddi/augmentor-agent/blob/main/docs/COMPLETE-INSTALL.md"
+    },
+    {
+      "url": "https://github.com/ManoloRemiddi/augmentor-agent/blob/main/docs/LINUX-RELEASE-0.2.10.md",
+      "status": 200,
+      "finalHost": "github.com",
+      "finalPath": "/ManoloRemiddi/augmentor-agent/blob/main/docs/LINUX-RELEASE-0.2.10.md"
+    },
+    {
+      "url": "https://github.com/ManoloRemiddi/augmentor-agent/issues/new?title=Augmentor%20resale%20permission%20request",
+      "status": 200,
+      "finalHost": "github.com",
+      "finalPath": "/login"
+    },
+    {
+      "url": "https://github.com/ManoloRemiddi/augmentor-dsh-extension-plugin",
+      "status": 200,
+      "finalHost": "github.com",
+      "finalPath": "/ManoloRemiddi/augmentor-dsh-extension-plugin"
+    },
+    {
+      "url": "https://github.com/ManoloRemiddi/augmentor-dsh-extension-plugin/releases/download/v0.1.32/augmentor-0.1.32-dist.zip",
+      "status": 200,
+      "finalHost": "release-assets.githubusercontent.com",
+      "finalPath": "/github-production-release-asset/1344900437/792e4044-1bf6-47e8-85ee-85382ec2f6e6"
+    },
+    {
+      "url": "https://github.com/ManoloRemiddi/augmentor-dsh-extension-plugin/releases/tag/v0.1.32",
+      "status": 200,
+      "finalHost": "github.com",
+      "finalPath": "/ManoloRemiddi/augmentor-dsh-extension-plugin/releases/tag/v0.1.32"
+    },
+    {
+      "url": "https://github.com/ManoloRemiddi/deepseek-harness-plugins",
+      "status": 200,
+      "finalHost": "github.com",
+      "finalPath": "/ManoloRemiddi/deepseek-harness-plugins"
+    },
+    {
+      "url": "https://github.com/ManoloRemiddi/deepseek-harness-plugins/blob/main/docs/COLLECTION-INSTALL.md",
+      "status": 200,
+      "finalHost": "github.com",
+      "finalPath": "/ManoloRemiddi/deepseek-harness-plugins/blob/main/docs/COLLECTION-INSTALL.md"
+    },
+    {
+      "url": "https://github.com/ManoloRemiddi/deepseek-harness-plugins/releases/download/collection-2026.09.13/augmentor-plugins-2026.09.13.zip",
+      "status": 200,
+      "finalHost": "release-assets.githubusercontent.com",
+      "finalPath": "/github-production-release-asset/1368489453/20018c91-f601-44f3-a2c4-7d770f1ac8e3"
+    },
+    {
+      "url": "https://github.com/ManoloRemiddi/dsh-adaptive-reasoning",
+      "status": 200,
+      "finalHost": "github.com",
+      "finalPath": "/ManoloRemiddi/dsh-adaptive-reasoning"
+    },
+    {
+      "url": "https://github.com/ManoloRemiddi/dsh-adaptive-reasoning/releases/download/v0.2.3/dsh-adaptive-reasoning-0.2.3.tgz",
+      "status": 200,
+      "finalHost": "release-assets.githubusercontent.com",
+      "finalPath": "/github-production-release-asset/1368455735/79b29f5c-3fe8-4e19-95e2-7e4f53b7adac"
+    },
+    {
+      "url": "https://github.com/ManoloRemiddi/dsh-adaptive-reasoning/releases/tag/v0.2.3",
+      "status": 200,
+      "finalHost": "github.com",
+      "finalPath": "/ManoloRemiddi/dsh-adaptive-reasoning/releases/tag/v0.2.3"
+    },
+    {
+      "url": "https://github.com/ManoloRemiddi/dsh-model-picker-augmented",
+      "status": 200,
+      "finalHost": "github.com",
+      "finalPath": "/ManoloRemiddi/dsh-model-picker-augmented"
+    },
+    {
+      "url": "https://github.com/ManoloRemiddi/dsh-model-picker-augmented/releases/download/v1.1.2/dsh-model-picker-augmented-1.1.2.tgz",
+      "status": 200,
+      "finalHost": "release-assets.githubusercontent.com",
+      "finalPath": "/github-production-release-asset/1351186337/1f997f47-ecc8-4b75-9e99-f4525cc459aa"
+    },
+    {
+      "url": "https://github.com/ManoloRemiddi/dsh-model-picker-augmented/releases/tag/v1.1.2",
+      "status": 200,
+      "finalHost": "github.com",
+      "finalPath": "/ManoloRemiddi/dsh-model-picker-augmented/releases/tag/v1.1.2"
+    },
+    {
+      "url": "https://github.com/ManoloRemiddi/dsh-prompt-library",
+      "status": 200,
+      "finalHost": "github.com",
+      "finalPath": "/ManoloRemiddi/dsh-prompt-library"
+    },
+    {
+      "url": "https://github.com/ManoloRemiddi/dsh-prompt-library/releases/download/v0.2.1/dsh-prompt-library-0.2.1.tgz",
+      "status": 200,
+      "finalHost": "release-assets.githubusercontent.com",
+      "finalPath": "/github-production-release-asset/1358471700/7f71e607-1b9c-4038-bfc4-bff90baad3f4"
+    }
+  ],
+  "download": {
+    "url": "https://github.com/ManoloRemiddi/augmentor-agent-app/releases/download/v0.2.10-complete-preview.1/augmentor-0.2.10-complete-preview.1.tar.gz",
+    "bytes": 67481947,
+    "sha256": "8e670c140a526f32a9fc0b1ac81121bd539ff2645e3db6be6d7f8435e14a82c4",
+    "publishedChecksumMatches": true
+  },
+  "checkedAt": "2026-09-23T12:11:24.548750+00:00",
+  "websiteCommit": "d02a127c9e8db1508a230138bb3a36c3427e714b",
+  "applicationImplementationCommit": "64a20a358294ffb1fdcebb372595f2a106dda74f",
+  "licenseSha256": "957e710bdd438f5e9c825fc610b8efc4f10e173f05a2c8ae99aae46b78e22cfe",
+  "baselineDownload": {
+    "version": "0.2.9",
+    "sha256": "8149ac66866d79422cdcd84f672b228c4b6ac7db162e07eef846454e20035da4",
+    "bytes": 67317532
+  },
+  "applicationCI": {
+    "url": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/35858808139",
+    "headSha": "64a20a358294ffb1fdcebb372595f2a106dda74f",
+    "conclusion": "success",
+    "jobs": {
+      "debian": "success",
+      "browser-package": "success",
+      "installed-packages": "success"
+    },
+    "verifiedAt": "2026-09-23T12:20:59.013229+00:00"
+  }
+}
