@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:augmentor:pi:protocol:1",
+  "title": "Augmentor Pi request",
+  "type": "object",
+  "required": ["id", "method"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-zA-Z0-9_.-]+$", "maxLength": 128},
+    "method": {"type": "string", "pattern": "^[a-zA-Z]+\\.[a-zA-Z]+$"},
+    "params": {"type": "object"}
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,135 @@
+{
+  "sources": {
+    "pi": {
+      "file": "upstream/pi.txt",
+      "url": "https://raw.githubusercontent.com/earendil-works/pi/d981de1229ef899957bbe968bc8dcda02a21f477/LICENSE",
+      "sha256": "0457f5bcec3b3b211605dfb5d1a49042fd638f3686a410fe099c24a25af13c48"
+    },
+    "nodable-entities": {
+      "file": "upstream/nodable-entities.txt",
+      "url": "https://raw.githubusercontent.com/nodable/val-parsers/f1c61a65e7b967c17b13822ef71e91bd25f17ce2/LICENSE",
+      "sha256": "750cb3fb6362804957ef52caaf9b5c824015be44d494637330d7cd8834d31d40"
+    },
+    "standardwebhooks": {
+      "file": "upstream/standardwebhooks.txt",
+      "url": "https://raw.githubusercontent.com/standard-webhooks/standard-webhooks/b4d2c14fc5b4ccff3ff271e3b087dff812254c59/libraries/LICENSE",
+      "sha256": "5ec8c7b26b64d881a6706617bed25c049f97f2f35de034c756de8546fd6dbe27"
+    },
+    "esbuild": {
+      "file": "upstream/esbuild.txt",
+      "url": "https://raw.githubusercontent.com/evanw/esbuild/bb9db84c02433fbe37b3509f53f9f3e3cc48725e/LICENSE.md",
+      "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681"
+    },
+    "xml-naming": {
+      "file": "upstream/xml-naming.txt",
+      "url": "https://raw.githubusercontent.com/NaturalIntelligence/xml-naming/c0afc395948730bed124859d7fc7cccabe0aac8a/LICENSE",
+      "sha256": "8e75fc0e776c62ccadb8178ece8d3daa9ba7601fb0a49b2dfb0ea9a7a5c0aa07"
+    },
+    "aws-sdk": {
+      "file": "upstream/aws-sdk.txt",
+      "url": "https://www.npmjs.com/package/@aws-sdk/core/v/3.977.9",
+      "sha256": "edea91454b811f127fbdea3d86f378f6719bd372ed440abf82b232f6fca06c3d",
+      "note": "Apache-2.0 text from the installed AWS SDK core. Missing sibling package texts use this license; original package contents and notices remain intact."
+    },
+    "go": {
+      "file": "upstream/go.txt",
+      "url": "https://raw.githubusercontent.com/golang/go/go1.26.4/LICENSE",
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    "esbuild-xxhash": {
+      "file": "upstream/esbuild-xxhash.txt",
+      "url": "https://raw.githubusercontent.com/evanw/esbuild/bb9db84c02433fbe37b3509f53f9f3e3cc48725e/internal/xxhash/LICENSE.txt",
+      "sha256": "f566a9f97bacdaf00d9f21dd991e81dc11201c4e016c86b470799429a1c9a79c"
+    },
+    "marked-12.0.2": {
+      "file": "upstream/marked-12.0.2.txt",
+      "url": "https://raw.githubusercontent.com/markedjs/marked/v12.0.2/LICENSE.md",
+      "sha256": "8e3a3f82f59a60958f56ca08f445647c32a4733dc7ca6c2c46f6eb898471ab9c"
+    },
+    "opencode-1.18.29": {
+      "file": "upstream/opencode-1.18.29.txt",
+      "url": "https://raw.githubusercontent.com/anomalyco/opencode/v1.18.29/LICENSE",
+      "sha256": "625f0f619133f89bbbb2abe37369613dfa1885eba1e50d02170deb62bb42cb6b"
+    },
+    "msgpackr-extract-3.0.4": {
+      "file": "upstream/msgpackr-extract-3.0.4.txt",
+      "url": "https://raw.githubusercontent.com/kriszyp/msgpackr-extract/71def7bd969e5c88d2c918e0d81ee2ba3155d19c/LICENSE",
+      "sha256": "d00470775464c789c7ac04cfba3bf1b79ef149790eb72556d1c51d8f50c8e7f3"
+    },
+    "kubernetes-types-1.30.0": {
+      "file": "upstream/kubernetes-types-1.30.0.txt",
+      "url": "https://raw.githubusercontent.com/kubernetes/kubernetes/v1.30.0/LICENSE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "note": "kubernetes-types 1.30.0 declares Apache-2.0 in package metadata and generates definitions from Kubernetes 1.30 OpenAPI. Its npm archive and source commit a46eb94629404af98a6758cd843b31816237d7d0 omit a license file. Supply the Apache-2.0 text from the matching Kubernetes release; retain original package metadata and source notices."
+    },
+    "highlight.js-11.11.1": {
+      "file": "upstream/highlight.js-11.11.1.txt",
+      "url": "https://registry.npmjs.org/@highlightjs/cdn-assets/-/cdn-assets-11.11.1.tgz",
+      "sha256": "6c081431591d9df696c82dc598fe1423765b8a299b200ed00b281afd0f64c490"
+    },
+    "pygments-2.18.0": {
+      "file": "upstream/pygments-2.18.0.txt",
+      "url": "https://raw.githubusercontent.com/pygments/pygments/2.18.0/LICENSE",
+      "sha256": "a9d66f1d526df02e29dce73436d34e56e8632f46c275bbdffc70569e882f9f17"
+    },
+    "numpy-2.5.1": {
+      "file": "upstream/numpy-2.5.1.txt",
+      "url": "https://numpy.org/doc/stable/license.html",
+      "sha256": "4860083caa0de2ac3292ca98bd074bd8f45d8b32624e37b1e70a240bff61e488"
+    }
+  },
+  "overrides": {
+    "@aws-sdk/credential-provider-http@3.972.39": "aws-sdk",
+    "@aws-sdk/credential-provider-http@3.972.72": "aws-sdk",
+    "@aws-sdk/credential-provider-login@3.972.41": "aws-sdk",
+    "@aws-sdk/credential-provider-login@3.972.77": "aws-sdk",
+    "@aws-sdk/nested-clients@3.997.44": "aws-sdk",
+    "@aws-sdk/nested-clients@3.997.9": "aws-sdk",
+    "@earendil-works/chord@0.85.1": "pi",
+    "@earendil-works/pi-agent-core@0.85.1": "pi",
+    "@earendil-works/pi-ai@0.85.1": "pi",
+    "@earendil-works/pi-coding-agent@0.85.1": "pi",
+    "@earendil-works/pi-telemetry@0.85.1": "pi",
+    "@earendil-works/pi-tui@0.85.1": "pi",
+    "@esbuild/aix-ppc64@0.28.1": "esbuild",
+    "@esbuild/android-arm64@0.28.1": "esbuild",
+    "@esbuild/android-arm@0.28.1": "esbuild",
+    "@esbuild/android-x64@0.28.1": "esbuild",
+    "@esbuild/darwin-arm64@0.28.1": "esbuild",
+    "@esbuild/darwin-x64@0.28.1": "esbuild",
+    "@esbuild/freebsd-arm64@0.28.1": "esbuild",
+    "@esbuild/freebsd-x64@0.28.1": "esbuild",
+    "@esbuild/linux-arm64@0.28.1": "esbuild",
+    "@esbuild/linux-arm@0.28.1": "esbuild",
+    "@esbuild/linux-ia32@0.28.1": "esbuild",
+    "@esbuild/linux-loong64@0.28.1": "esbuild",
+    "@esbuild/linux-mips64el@0.28.1": "esbuild",
+    "@esbuild/linux-ppc64@0.28.1": "esbuild",
+    "@esbuild/linux-riscv64@0.28.1": "esbuild",
+    "@esbuild/linux-s390x@0.28.1": "esbuild",
+    "@esbuild/linux-x64@0.28.1": "esbuild",
+    "@esbuild/netbsd-arm64@0.28.1": "esbuild",
+    "@esbuild/netbsd-x64@0.28.1": "esbuild",
+    "@esbuild/openbsd-arm64@0.28.1": "esbuild",
+    "@esbuild/openbsd-x64@0.28.1": "esbuild",
+    "@esbuild/openharmony-arm64@0.28.1": "esbuild",
+    "@esbuild/sunos-x64@0.28.1": "esbuild",
+    "@esbuild/win32-arm64@0.28.1": "esbuild",
+    "@esbuild/win32-ia32@0.28.1": "esbuild",
+    "@esbuild/win32-x64@0.28.1": "esbuild",
+    "@nodable/entities@2.1.0": "nodable-entities",
+    "standardwebhooks@1.1.1": "standardwebhooks",
+    "xml-naming@0.1.0": "xml-naming",
+    "@opencode-ai/plugin@1.18.29": "opencode-1.18.29",
+    "@opencode-ai/sdk@1.18.29": "opencode-1.18.29",
+    "@msgpackr-extract/msgpackr-extract-linux-x64@3.0.4": "msgpackr-extract-3.0.4",
+    "kubernetes-types@1.30.0": "kubernetes-types-1.30.0"
+  },
+  "choices": {
+    "json-schema@0.4.0": {
+      "expression": "(AFL-2.1 OR BSD-3-Clause)",
+      "selected": "BSD-3-Clause",
+      "note": "The package LICENSE expressly offers either license; distribution selects BSD-3-Clause and retains the full original notice."
+    }
+  }
+}

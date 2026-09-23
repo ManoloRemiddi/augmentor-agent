@@ -1,0 +1,10 @@
+<!doctype html>
+<!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content"><meta name="theme-color" content="#162325"><link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/style.css"><title>Augmentor Agent</title></head><body>
+<form id="pair"><h1>Augmentor Agent</h1><p>Connect to your Desktop interface.</p><label for="key">Pairing key</label><input id="key" type="password" autocomplete="off" required><button>Connect</button><a href="/third-party.txt" target="_blank" rel="noopener">Third-party notices</a></form>
+<div id="screen" aria-label="Live Augmentor Desktop" tabindex="0" hidden></div>
+<footer id="remote" hidden><button id="keyboard" aria-label="Show phone keyboard">Keyboard</button><button id="show">Show app</button><button id="clipboard">Copy</button><button id="disconnect">Disconnect</button></footer>
+<div id="keyboard-tools" hidden><button id="select-all">Select all</button><button id="backspace">Backspace</button><button id="enter">Enter</button><button id="hide-keyboard">Hide keyboard</button></div>
+<textarea id="keyboard-input" aria-label="Remote keyboard" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+<button id="reconnect" hidden>Reconnect</button>
+<p id="status" role="status">Connecting…</p><script type="module" src="/app.js"></script></body></html>

@@ -1,0 +1,19 @@
+{
+  "name": "augmentor-desktop-remote",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "SEE LICENSE IN LICENSE",
+  "scripts": {
+    "start": "python3 start.py",
+    "test": "node --test ../../tests/mobile-desktop-server.test.mjs ../../tests/mobile-keyboard.test.mjs",
+    "build": "node build.mjs"
+  },
+  "dependencies": {
+    "@novnc/novnc": "https://codeload.github.com/novnc/noVNC/tar.gz/refs/tags/v1.6.0",
+    "ws": "8.21.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12"
+  }
+}

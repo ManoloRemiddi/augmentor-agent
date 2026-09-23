@@ -1,0 +1,8 @@
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+# Development/interaction tests only. Debian releases use replaceable system Qt.
+PySide6-Essentials==6.8.2.1
+shiboken6==6.8.2.1
+Pygments==2.18.0
+numpy==2.5.1
+PyYAML==6.0.2
+websocket-client==1.8.0

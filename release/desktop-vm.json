@@ -1,0 +1,12 @@
+{
+  "image": "https://cloud.debian.org/images/cloud/trixie/20260831-2587/debian-13-generic-amd64-20260831-2587.qcow2",
+  "sha512": "5a069019420fb9441ad4f8004c661fadb747edd5662ca54a17c8f923dee7d717e21dbdaa4ba72d6fce7f920e0217f0a9af382298a7d46ed4bc9dc33ac19181b6",
+  "imageBuild": "20260831-2587",
+  "architecture": "amd64",
+  "desktopSession": "plasma.desktop",
+  "acceleration": "tcg",
+  "cpuModel": "Nehalem",
+  "memoryMiB": 4096,
+  "cpus": 4,
+  "diskGiB": 24
+}

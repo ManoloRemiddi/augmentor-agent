@@ -1,0 +1,7 @@
+{
+  "hello": {"id":"hello-1","method":"host.hello","params":{"protocol":"augmentor-pi/1"}},
+  "helloResponse": {"id":"hello-1","result":{"protocol":"augmentor-pi/1"}},
+  "subscribe": {"id":"events-1","method":"events.subscribe","params":{"sessionId":"example"}},
+  "displayEvent": {"event":{"method":"session/event","payload":{"sessionId":"example","event":{"seq":1,"type":"assistant/chunk","turnId":"turn-1","data":{"chunk":{"type":"text-delta","text":"Hello"}}}}}},
+  "error": {"id":"bad-1","error":{"message":"Conversation not found"}}
+}

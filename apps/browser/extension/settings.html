@@ -1,0 +1,31 @@
+<!doctype html>
+<!-- Augmentor — dsh-augmentor plugin, pipe, and Chromium extension
+     Copyright © 2026 Manolo Remiddi
+     SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+     License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Settings · Augmentor</title>
+  <link rel="icon" href="icons/icon32.png">
+  <script src="theme-tokens.js"></script>
+  <script src="theme-boot.js"></script>
+  <link rel="stylesheet" href="theme-base.css">
+  <link rel="stylesheet" href="prompt-library.css">
+  <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+  <aside>
+    <div class="identity"><img src="icons/icon48.png" alt="" width="32" height="32"><div><strong>Augmentor</strong><span>Settings</span></div></div>
+    <nav aria-label="Settings sections"></nav>
+    <div class="sidebar-foot"><span id="version"></span><span>Browser companion</span></div>
+  </aside>
+  <main>
+    <header class="page-header"><span>YOUR AUGMENTOR</span><span id="connection" role="status">Connecting…</span></header>
+    <p id="page-error" role="alert" hidden></p>
+    <div id="sections"></div>
+  </main>
+  <script type="module" src="settings.mjs"></script>
+</body>
+</html>

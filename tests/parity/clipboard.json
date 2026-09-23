@@ -1,0 +1,8 @@
+[
+ {"template":"Plain prompt","snapshot":null,"expected":"Plain prompt"},
+ {"template":"\"[clipboard]\"","snapshot":"Café 😀\nSecond line","expected":"\"Café 😀\nSecond line\""},
+ {"template":"[clipboard] / [clipboard]","snapshot":"Literal [clipboard]","expected":"Literal [clipboard] / Literal [clipboard]"},
+ {"template":"[clipboard]","snapshot":"  ","error":true},
+ {"template":"[clipboard]","snapshot":null,"error":true},
+ {"template":"[Clipboard]","snapshot":null,"expected":"[Clipboard]"}
+]

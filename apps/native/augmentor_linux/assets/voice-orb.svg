@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+<!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+Static vector adaptation of augmentoragent.com masthead .brand-orb, 2026-09-18. -->
+<defs><radialGradient id="orb"><stop stop-color="#9675ce" stop-opacity=".25"/><stop offset="1" stop-color="#ae86ff" stop-opacity=".5"/></radialGradient></defs>
+<path d="M19 7C28 6 34 11 33 20S28 34 18 33 6 28 7 18 11 7 19 7Z" fill="none" stroke="#a78dfc" stroke-width="9" opacity=".06"/>
+<path d="M19 7C28 6 34 11 33 20S28 34 18 33 6 28 7 18 11 7 19 7Z" fill="none" stroke="#a78dfc" stroke-width="5" opacity=".13"/>
+<path d="M19 7C28 6 34 11 33 20S28 34 18 33 6 28 7 18 11 7 19 7Z" fill="url(#orb)" stroke="#c1a0ff" stroke-width="1.4"/>
+</svg>

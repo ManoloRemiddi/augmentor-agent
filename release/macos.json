@@ -1,0 +1,23 @@
+{
+  "target": "macos-arm64",
+  "minimumMacOS": "14.0",
+  "qualificationStatus": "development-only",
+  "node": {
+    "version": "24.19.0",
+    "url": "https://nodejs.org/dist/v24.19.0/node-v24.19.0-darwin-arm64.tar.gz",
+    "sha256": "8294b7aa9b03997481c06babf1e8b270c859358f27da57a11509afe537ac381d"
+  },
+  "python": "3.12.13",
+  "pythonBindings": "6.8.2.1",
+  "qt": "6.8.2",
+  "pythonPackages": {
+    "PySide6_Essentials": "6.8.2.1",
+    "shiboken6": "6.8.2.1",
+    "PyYAML": "6.0.2",
+    "Pygments": "2.18.0",
+    "numpy": "2.5.1",
+    "websocket-client": "1.8.0",
+    "pip": "26.1.1"
+  },
+  "pi": "0.85.1"
+}

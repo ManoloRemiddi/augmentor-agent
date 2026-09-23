@@ -1,0 +1,15 @@
+{
+  "version": "0.2.10",
+  "channel": "preview",
+  "protocols": {
+    "product": "augmentor/1",
+    "pi": "augmentor-pi/1",
+    "prompts": "augmentor-prompts/1",
+    "memory": "augmentor-memory/1",
+    "desktop": "augmentor-desktop/1"
+  },
+  "dataSchema": 1,
+  "readableDataSchemas": [
+    1
+  ]
+}

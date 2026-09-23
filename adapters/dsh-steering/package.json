@@ -1,0 +1,13 @@
+{
+  "name": "dsh-steering",
+  "version": "0.1.0",
+  "description": "Responsive DSH steering: supersede unfinished model output while preserving queued prompts and active tools.",
+  "author": "Manolo Remiddi",
+  "license": "SEE LICENSE IN LICENSE",
+  "type": "module",
+  "main": "index.mjs",
+  "exports": {".": "./index.mjs", "./steering": "./steering.mjs"},
+  "files": ["index.mjs", "steering.mjs", "cordis.patch.yml", "README.md", "LICENSE"],
+  "engines": {"node": ">=22.19.0"},
+  "dsh": {"engines": {"dsh": "0.1.5-rc.1"}, "bundle": {"patch": "./cordis.patch.yml"}}
+}

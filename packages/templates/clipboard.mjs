@@ -1,0 +1,7 @@
+// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+// Clipboard I/O belongs to the initiating surface; this rule is pure.
+export function expandClipboard(template,snapshot){
+  if(!template.includes('[clipboard]'))return template;
+  if(typeof snapshot!=='string'||!snapshot.trim())throw new Error('Clipboard has no text. Copy text and choose the prompt again.');
+  return template.split('[clipboard]').join(snapshot);
+}

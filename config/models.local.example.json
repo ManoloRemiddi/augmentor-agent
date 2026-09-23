@@ -1,0 +1,19 @@
+{
+  "providers": {
+    "mx-qwen": {
+      "baseUrl": "http://127.0.0.1:8080/v1",
+      "api": "openai-completions",
+      "apiKey": "local-no-key",
+      "compat": { "supportsDeveloperRole": false, "supportsReasoningEffort": false },
+      "models": [{
+        "id": "Qwen3.8-27B-UD-Q6_K_XL",
+        "name": "Qwen3.8-27B (local)",
+        "reasoning": false,
+        "input": ["text"],
+        "contextWindow": 131072,
+        "maxTokens": 4096,
+        "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 }
+      }]
+    }
+  }
+}

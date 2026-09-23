@@ -1,0 +1,143 @@
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+name: Validate Augmentor
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: validation-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  debian:
+    runs-on: ubuntu-24.04
+    container: debian@sha256:abc9cb88a5587630d7f915f47b23b0668fe250fbfc6457aa4d52b534c1bbf73f
+    timeout-minutes: 30
+    steps:
+      - name: Install declared build and test dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends ca-certificates git python3 python3-pygments python3-yaml python3-numpy python3-websocket python3-gi gir1.2-atspi-2.0 gir1.2-gstreamer-1.0 gstreamer1.0-plugins-base python3-pyside6.qtcore python3-pyside6.qtgui python3-pyside6.qtwidgets python3-pyside6.qtnetwork python3-pyside6.qtdbus python3-pyside6.qttest libqt6svg6 qt6-svg-plugins fonts-dejavu-core chromium xvfb xauth xclip xdotool x11-utils kwin-x11 dbus-x11
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.19.0'
+      - name: Install locked DSH qualification host
+        run: npm ci --prefix release/dsh --ignore-scripts
+      - name: Build and verify SDK contracts
+        run: |
+          npm ci --ignore-scripts
+          python3 scripts/sync-version.py --check
+          npm run check
+          npm run build
+          export DSH_INSTALL_ROOT="$PWD/release/dsh/node_modules/@deepseek-ai/dsh"
+          npm test
+      - name: Verify DSH setup, approvals, questions and exact branching
+        env:
+          AUGMENTOR_PROOF_APPROVALS: '1'
+          AUGMENTOR_PROOF_INTERACTIONS: '1'
+          AUGMENTOR_PROOF_EXACT_FORK: '1'
+          AUGMENTOR_PROOF_EXISTING_PROMPTS: '1'
+        run: |
+          export PATH="$PWD/release/dsh/node_modules/.bin:$PATH"
+          export DSH_TEST_MODULES="$PWD/release/dsh/node_modules"
+          python3 scripts/dsh-setup-proof.py
+          DSH_INSTALL_ROOT="$PWD/release/dsh/node_modules/@deepseek-ai/dsh" node --test tests/dual-memory-integration.test.mjs
+      - name: Verify stopped-runtime recovery without model requests
+        run: |
+          export PATH="$PWD/release/dsh/node_modules/.bin:$PATH"
+          python3 scripts/proof-recovery.py
+      - name: Verify Qt interactions and licensing failures
+        run: npm run test:native
+      - name: Verify prompt editor against the real shared service
+        run: python3 scripts/prompt-editor-proof.py
+      - name: Verify real mouse events and external clipboard
+        run: bash scripts/native-x11-proof.sh
+      - name: Verify first run through the actual Qt form and Pi
+        env:
+          AUGMENTOR_UI_PROOF: scripts/first-run-proof.py
+        run: bash scripts/native-x11-proof.sh
+      - name: Inventory locked production dependencies
+        run: python3 scripts/stage-production.py --out outputs/production
+      - name: Package extension and validate included notices
+        run: python3 scripts/package-browser.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: browser-extension
+          path: outputs/browser/*
+          retention-days: 14
+          if-no-files-found: error
+      - name: Build Debian packages with binary notices
+        run: python3 scripts/package-debian.py
+      - name: Review final package and extension identity, contents and notices
+        run: python3 scripts/review-artifacts.py --debian outputs/debian --browser outputs/browser --output outputs/debian/review.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: debian-packages
+          path: |
+            outputs/debian/*.deb
+            outputs/debian/artifacts.json
+            outputs/debian/review.json
+          retention-days: 14
+          if-no-files-found: error
+  installed-packages:
+    needs: debian
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: debian-packages
+          path: outputs/debian
+      - name: Install and exercise packages in clean Debian as a separate user
+        env:
+          AUGMENTOR_CONTAINER_ENGINE: docker
+        run: bash scripts/debian-package-proof.sh
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: 295dbc0f270344c4eab38ce5ade908622a0cd8af
+          path: outputs/baseline-source
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.19.0'
+      - name: Build the frozen previous release for upgrade and rollback checks
+        working-directory: outputs/baseline-source
+        run: |
+          npm ci --ignore-scripts
+          npm run build
+          python3 scripts/package-debian.py --out ../baseline
+      - name: Prove active-task refusal, upgrade, interrupted configuration, rollback and removal
+        env:
+          AUGMENTOR_CONTAINER_ENGINE: docker
+        run: bash scripts/lifecycle-proof.sh
+
+  browser-package:
+    needs: debian
+    runs-on: ubuntu-24.04
+    container: debian@sha256:abc9cb88a5587630d7f915f47b23b0668fe250fbfc6457aa4d52b534c1bbf73f
+    timeout-minutes: 20
+    steps:
+      - name: Prepare fixture directory
+        run: mkdir -p /proof/scripts
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: debian-packages
+          path: /artifacts/debian
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: browser-extension
+          path: /artifacts/browser
+      - name: Exercise packaged companion and ZIP as an ordinary user
+        run: |
+          cp scripts/browser-composable-proof.py /proof/scripts/
+          bash release/prove-browser-package.sh
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: browser-acceptance
+          path: /proof/outputs/*
+          retention-days: 14

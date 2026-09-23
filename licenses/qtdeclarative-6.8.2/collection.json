@@ -1,0 +1,255 @@
+{
+  "commit": "75534f3e7fff24ed7ccb364e2ed9950a73da879f",
+  "records": [
+    {
+      "attributionFile": "examples/quick/advancedtext/qt_attribution.json",
+      "Id": "georama-font",
+      "Name": "Georama",
+      "QDocModule": "qtquick",
+      "QtUsage": "Used in the Advanced Text example",
+      "QtParts": [
+        "examples"
+      ],
+      "Files": "fonts/Georama-VariableFont_wdth,wght.ttf",
+      "LicenseId": "OFL-1.1",
+      "License": "SIL Open Font License 1.1",
+      "Homepage": "https://github.com/productiontype/Georama",
+      "Copyright": "Copyright 2020 The Georama Project Authors"
+    },
+    {
+      "attributionFile": "examples/quick/quickshapes/weatherforecast/qt_attribution.json",
+      "Id": "weather-icons",
+      "Name": "Weather icons from the Noto Emoji collection",
+      "QDocModule": "qtquick",
+      "QtUsage": "Used in the Weather Forecast Example",
+      "QtParts": [
+        "examples"
+      ],
+      "Files": [
+        "assets/cloud-with-snow-svgrepo-com.svg",
+        "CloudWithSnow_generated.qml",
+        "assets/cloud-svgrepo-com.svg",
+        "Cloud_generated.qml",
+        "assets/cloud-with-lightning-and-rain-svgrepo-com.svg",
+        "CloudWithLightningAndRain_generated.qml",
+        "assets/cloud-with-lightning-svgrepo-com.svg",
+        "CloudWithLightning_generated.qml",
+        "assets/cloud-with-rain-svgrepo-com.svg",
+        "CloudWithRain_generated.qml",
+        "assets/sun-svgrepo-com.svg",
+        "Sun_generated.qml",
+        "assets/sun-behind-cloud-svgrepo-com.svg",
+        "SunBehindCloud_generated.qml",
+        "assets/sun-behind-large-cloud-svgrepo-com.svg",
+        "SunBehindLargeCloud_generated.qml",
+        "assets/sun-behind-rain-cloud-svgrepo-com.svg",
+        "SunBehindRainCloud_generated.qml",
+        "assets/sun-behind-small-cloud-svgrepo-com.svg",
+        "SunBehindSmallCloud_generated.qml"
+      ],
+      "LicenseId": "Apache-2.0",
+      "License": "Apache License 2.0",
+      "Copyright": "Copyright (C) 2023 Googlefonts"
+    },
+    {
+      "attributionFile": "examples/quick/quickshapes/weatherforecast/qt_attribution.json",
+      "Id": "map-of-europe",
+      "Name": "Map of Europe from Wikipedia",
+      "QDocModule": "qtquick",
+      "QtUsage": "Used in the Weather Forecast Example",
+      "QtParts": [
+        "examples"
+      ],
+      "Files": [
+        "assets/Europe.svg",
+        "Europe_generated.qml"
+      ],
+      "LicenseId": "CC-BY-3.0",
+      "License": "Creative Commons Attribution 3.0 Unported",
+      "Copyright": "Copyright (C) 2010 Kolja21"
+    },
+    {
+      "attributionFile": "examples/quick/quickshapes/weatherforecast/qt_attribution.json",
+      "Id": "work-sans-font",
+      "Name": "Work Sans font by Wei Huang",
+      "QDocModule": "qtquick",
+      "QtUsage": "Used in the Weather Forecast Example",
+      "QtParts": [
+        "examples"
+      ],
+      "Files": "assets/WorkSans-Regular.ttf",
+      "LicenseId": "OFL-1.1",
+      "License": "SIL Open Font License 1.1",
+      "Copyright": "Copyright (C) 2020 Wei Huang"
+    },
+    {
+      "attributionFile": "examples/quick/quickshapes/weatherforecast/qt_attribution.json",
+      "Id": "gear-icon",
+      "Name": "Gear Icon",
+      "QDocModule": "qtquick",
+      "QtUsage": "Used in the Weather Forecast Example",
+      "QtParts": [
+        "examples"
+      ],
+      "Files": [
+        "assets/gear-alt-stroke.svg",
+        "Gear_generated.qml"
+      ],
+      "LicenseId": "MIT",
+      "License": "MIT License",
+      "Copyright": "Copyright (C) 2023 Framework7"
+    },
+    {
+      "attributionFile": "src/3rdparty/masm/qt_attribution.json",
+      "Id": "masm",
+      "Name": "JavaScriptCore Macro Assembler",
+      "QDocModule": "qtqml",
+      "QtUsage": "Used in Qt QML.",
+      "Homepage": "https://trac.webkit.org/wiki/JavaScriptCore",
+      "License": "BSD 2-clause \"Simplified\" License",
+      "LicenseId": "BSD-2-Clause",
+      "LicenseFile": "LICENSE",
+      "Copyright": [
+        "Copyright (C) 2003-2018 Apple Inc. All rights reserved.",
+        "Copyright (C) 2007 Justin Haygood (jhaygood@reaktix.com)",
+        "Copyright (C) 2007-2009 Torch Mobile, Inc. All rights reserved. (http://www.torchmobile.com/)",
+        "Copyright (C) 2009, 2010 University of Szeged",
+        "Copyright (C) 2009-2011 STMicroelectronics. All rights reserved.",
+        "Copyright (C) 2010 MIPS Technologies, Inc. All rights reserved.",
+        "Copyright (C) 2010 Peter Varga (pvarga@inf.u-szeged.hu), University of Szeged",
+        "Copyright (C) 2010 MIPS Technologies, Inc. All rights reserved.",
+        "Copyright (C) 2010, 2011 Research In Motion Limited. All rights reserved.",
+        "Copyright (C) 2011 Google Inc. All rights reserved.",
+        "Copyright (C) 2013 Samsung Electronics. All rights reserved.",
+        "Copyright (C) 2015 Cisco Systems, Inc. All rights reserved.",
+        "Copyright (c) 2002-2009 Vivek Thampi"
+      ]
+    },
+    {
+      "attributionFile": "src/quickcontrols/material/qt_attribution.json",
+      "Id": "shadow_angular_material",
+      "Name": "Shadow values from Angular Material",
+      "QDocModule": "qtquickcontrols",
+      "QtUsage": "Used in the Material Style of Qt Quick Controls.",
+      "Files": "impl/ElevationEffect.qml",
+      "Description": "Shadow values for the elevation effect.",
+      "Homepage": "https://angularjs.org/",
+      "License": "MIT License",
+      "LicenseId": "MIT",
+      "LicenseFile": "LICENSE_ANGULARJS.txt",
+      "Copyright": "Copyright (c) 2014-2016 Google, Inc"
+    }
+  ],
+  "files": [
+    {
+      "path": "LICENSES/Apache-2.0.txt",
+      "sha256": "e3ba223bb1423f0aad8c3dfce0fe3148db48926d41e6fbc3afbbf5ff9e1c89cb"
+    },
+    {
+      "path": "LICENSES/BSD-2-Clause.txt",
+      "sha256": "8fda146749ca071ac9cdce2e24d25444676ea48d1f9dccc2b7c15c054b717db8"
+    },
+    {
+      "path": "LICENSES/BSD-3-Clause.txt",
+      "sha256": "9f0490f18656c6f2435bd14f603ef0c96434d1825615363dce43abb42ed1dcce"
+    },
+    {
+      "path": "LICENSES/CC-BY-3.0.txt",
+      "sha256": "e6bc9e9c474700b708f568bac9e5a8a9bcb2b1dad53442f5ba449fcb848b8e76"
+    },
+    {
+      "path": "LICENSES/CC0-1.0.txt",
+      "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+    },
+    {
+      "path": "LICENSES/GFDL-1.3-no-invariants-only.txt",
+      "sha256": "110535522396708cea37c72a802c5e7e81391139f5f7985631c93ef242b206a4"
+    },
+    {
+      "path": "LICENSES/GPL-2.0-only.txt",
+      "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643"
+    },
+    {
+      "path": "LICENSES/GPL-3.0-only.txt",
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
+    },
+    {
+      "path": "LICENSES/LGPL-3.0-only.txt",
+      "sha256": "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768"
+    },
+    {
+      "path": "LICENSES/LicenseRef-Qt-Commercial.txt",
+      "sha256": "9b1f50aae6267f9d5e0ceb6775ee86450262c25ec7c0573e151fe5d3f18a4700"
+    },
+    {
+      "path": "LICENSES/MIT.txt",
+      "sha256": "d040359701c01996a017d5c515678929cd1b0625e64cb86db44025fbb6cdf1fc"
+    },
+    {
+      "path": "LICENSES/OFL-1.1.txt",
+      "sha256": "1d361a8f8e8ce6e68457dcd93fb56e162e6baa3bbb7e7573a290d44399f6b57e"
+    },
+    {
+      "path": "LICENSES/Qt-GPL-exception-1.0.txt",
+      "sha256": "40678d338ce53cd93f8b22b281a2ecbcaa3ee65ce60b25ffb0c462b0530846b2"
+    },
+    {
+      "path": "LICENSES/Unlicense.txt",
+      "sha256": "ffc5ee3c1dca43a6aa11ec05d67358dadc66bcf47e0196823ea754c8dfdb1229"
+    },
+    {
+      "path": "examples/quick/advancedtext/qt_attribution.json",
+      "sha256": "cdce174a9db045fd85de0c3e44f6efb5a0f3c2fb50afe7f9cb5011d6fd3d19da"
+    },
+    {
+      "path": "examples/quick/quickshapes/weatherforecast/qt_attribution.json",
+      "sha256": "69a7e0608722f955c0c5cb54b4bf4feaf93fd172b162606017c9e2d96e9a6a4c"
+    },
+    {
+      "path": "src/3rdparty/masm/LICENSE",
+      "sha256": "9ba0c20a2972274f27e975d79ed3582e322d6891338266a52e2d3a9417fc0a72"
+    },
+    {
+      "path": "src/3rdparty/masm/qt_attribution.json",
+      "sha256": "41f6415212dc5a4b54ccd7cc686aeec520e0e03fc2a8e20b1328d342aa24e4e0"
+    },
+    {
+      "path": "src/quickcontrols/material/LICENSE_ANGULARJS.txt",
+      "sha256": "a1c1daa9eec4db907907c0ccc42a4843bb996410f888b972a39fe152e829bc3d"
+    },
+    {
+      "path": "src/quickcontrols/material/qt_attribution.json",
+      "sha256": "6bc25b43c4c08c2bd82815b5070fb82ab629a6de133b4efcca2b1b1f3e8a32e6"
+    }
+  ],
+  "unresolved": [],
+  "parsingNotes": [],
+  "licenseIdResolutions": [
+    {
+      "record": "georama-font",
+      "licenseId": "OFL-1.1",
+      "file": "LICENSES/OFL-1.1.txt"
+    },
+    {
+      "record": "weather-icons",
+      "licenseId": "Apache-2.0",
+      "file": "LICENSES/Apache-2.0.txt"
+    },
+    {
+      "record": "map-of-europe",
+      "licenseId": "CC-BY-3.0",
+      "file": "LICENSES/CC-BY-3.0.txt"
+    },
+    {
+      "record": "work-sans-font",
+      "licenseId": "OFL-1.1",
+      "file": "LICENSES/OFL-1.1.txt"
+    },
+    {
+      "record": "gear-icon",
+      "licenseId": "MIT",
+      "file": "LICENSES/MIT.txt"
+    }
+  ],
+  "binaryCoverageVerified": false
+}

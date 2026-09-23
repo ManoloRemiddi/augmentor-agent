@@ -1,0 +1,95 @@
+{
+  "commit": "2992a310640697325791a5494ca8f4d4552de368",
+  "records": [
+    {
+      "attributionFile": "src/3rdparty/qt_attribution.json",
+      "Id": "litehtml-gumbo",
+      "Name": "Gumbo",
+      "QDocModule": "qtassistant",
+      "QtParts": [
+        "tools"
+      ],
+      "QtUsage": "Used in Qt Assistant.",
+      "Path": "litehtml/src/gumbo",
+      "Description": "Gumbo is an implementation of the HTML5 parsing algorithm implemented as a pure C99 library with no outside dependencies.",
+      "Homepage": "https://github.com/google/gumbo-parser",
+      "Version": "0.10.1",
+      "LicenseId": "Apache-2.0 AND MIT",
+      "License": "Apache License 2.0 AND MIT",
+      "CopyrightFile": "GUMBO-AUTHORS.txt"
+    },
+    {
+      "attributionFile": "src/3rdparty/qt_attribution.json",
+      "Id": "litehtml",
+      "Name": "litehtml",
+      "QDocModule": "qtassistant",
+      "QtParts": [
+        "tools"
+      ],
+      "QtUsage": "Used in Qt Assistant.",
+      "Path": "litehtml",
+      "Description": "litehtml is the lightweight HTML rendering engine with CSS2/CSS3 support.",
+      "Homepage": "https://github.com/litehtml/litehtml",
+      "Version": "v0.9",
+      "LicenseId": "BSD-3-Clause",
+      "License": "BSD 3-Clause \"New\" or \"Revised\" License",
+      "LicenseFile": "litehtml/LICENSE",
+      "Copyright": "Copyright (c) 2013, Yuri Kobets (tordex)"
+    }
+  ],
+  "files": [
+    {
+      "path": "LICENSES/Apache-2.0.txt",
+      "sha256": "074e6e32c86a4c0ef8b3ed25b721ca23aca83df277cd88106ef7177c354615ff"
+    },
+    {
+      "path": "LICENSES/BSD-3-Clause.txt",
+      "sha256": "9f0490f18656c6f2435bd14f603ef0c96434d1825615363dce43abb42ed1dcce"
+    },
+    {
+      "path": "LICENSES/GPL-3.0-only.txt",
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
+    },
+    {
+      "path": "LICENSES/LicenseRef-Qt-Commercial.txt",
+      "sha256": "9b1f50aae6267f9d5e0ceb6775ee86450262c25ec7c0573e151fe5d3f18a4700"
+    },
+    {
+      "path": "LICENSES/MIT.txt",
+      "sha256": "b85dcd3e453d05982552c52b5fc9e0bdd6d23c6f8e844b984a88af32570b0cc0"
+    },
+    {
+      "path": "LICENSES/Qt-GPL-exception-1.0.txt",
+      "sha256": "40678d338ce53cd93f8b22b281a2ecbcaa3ee65ce60b25ffb0c462b0530846b2"
+    },
+    {
+      "path": "src/3rdparty/GUMBO-AUTHORS.txt",
+      "sha256": "01728bacf4137aeb434d81a19d9542928d0937976c8f6b54ae0475b5376aa0ee"
+    },
+    {
+      "path": "src/3rdparty/litehtml/LICENSE",
+      "sha256": "71bd488e77ee821bf38d89e2b8a9c5ebe687553fcae9cefa00a96499792a3e23"
+    },
+    {
+      "path": "src/3rdparty/qt_attribution.json",
+      "sha256": "079f60f06655a9e762b3a688d106c14cf004163a1edd41dc2d25548d8a853cb9"
+    }
+  ],
+  "unresolved": [],
+  "parsingNotes": [],
+  "licenseIdResolutions": [
+    {
+      "record": "litehtml-gumbo",
+      "licenseId": "Apache-2.0",
+      "expression": "Apache-2.0 AND MIT",
+      "file": "LICENSES/Apache-2.0.txt"
+    },
+    {
+      "record": "litehtml-gumbo",
+      "licenseId": "MIT",
+      "expression": "Apache-2.0 AND MIT",
+      "file": "LICENSES/MIT.txt"
+    }
+  ],
+  "binaryCoverageVerified": false
+}

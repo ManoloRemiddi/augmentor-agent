@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "sources": [
+    {
+      "name": "pyside-setup",
+      "version": "6.8.2.1",
+      "repository": "https://code.qt.io/pyside/pyside-setup.git",
+      "commit": "f62088b4cd516a3080a6b2e68bc79903da8b67ce",
+      "artifact": "pyside-setup-6.8.2.1-source.tar.gz",
+      "coverage": [
+        "PySide6_Essentials",
+        "shiboken6"
+      ],
+      "binaryBuildProvenanceVerified": false
+    },
+    {
+      "name": "qtbase",
+      "version": "6.8.2",
+      "repository": "https://code.qt.io/qt/qtbase.git",
+      "commit": "f1136de66638060b8a1ab9bc0cdf1a91dcb5ec01",
+      "artifact": "qtbase-6.8.2-source.tar.gz",
+      "coverage": [
+        "QtCore",
+        "QtGui",
+        "QtWidgets",
+        "QtNetwork",
+        "QtDBus",
+        "QtConcurrent",
+        "QtOpenGL",
+        "QtOpenGLWidgets",
+        "QtPrintSupport",
+        "QtSql",
+        "QtTest",
+        "QtXml"
+      ],
+      "binaryBuildProvenanceVerified": false
+    },
+    {
+      "name": "qtsvg",
+      "version": "6.8.2",
+      "repository": "https://code.qt.io/qt/qtsvg.git",
+      "commit": "e59eaa7dbc09fbf885b1c5a69d93b7e2fb1c7ce3",
+      "artifact": "qtsvg-6.8.2-source.tar.gz",
+      "coverage": [
+        "QtSvg",
+        "QtSvgWidgets",
+        "SVG image and icon plugins"
+      ],
+      "binaryBuildProvenanceVerified": false
+    },
+    {
+      "name": "qtimageformats",
+      "version": "6.8.2",
+      "repository": "https://code.qt.io/qt/qtimageformats.git",
+      "commit": "20d46d1fa669191d8f855ba8ac1c35719bace83a",
+      "artifact": "qtimageformats-6.8.2-source.tar.gz",
+      "coverage": [
+        "Additional Qt image format plugins"
+      ],
+      "binaryBuildProvenanceVerified": false
+    },
+    {
+      "name": "qtdeclarative",
+      "version": "6.8.2",
+      "repository": "https://code.qt.io/qt/qtdeclarative.git",
+      "commit": "75534f3e7fff24ed7ccb364e2ed9950a73da879f",
+      "artifact": "qtdeclarative-6.8.2-source.tar.gz",
+      "coverage": [
+        "QtQml and QtQuick frameworks and plugins"
+      ],
+      "binaryBuildProvenanceVerified": false
+    },
+    {
+      "name": "qttools",
+      "version": "6.8.2",
+      "repository": "https://code.qt.io/qt/qttools.git",
+      "commit": "8aa2456d4461516f54c98916fcd699557afb41ad",
+      "artifact": "qttools-6.8.2-source.tar.gz",
+      "coverage": [
+        "QtDesigner",
+        "QtDesignerComponents",
+        "QtHelp",
+        "QtUiTools"
+      ],
+      "binaryBuildProvenanceVerified": false
+    },
+    {
+      "name": "qtquicktimeline",
+      "version": "6.8.2",
+      "repository": "https://code.qt.io/qt/qtquicktimeline.git",
+      "commit": "b26772602cc02e5a5caeb623b493c5922727b80b",
+      "artifact": "qtquicktimeline-6.8.2-source.tar.gz",
+      "coverage": [
+        "QtQuickTimeline",
+        "QtQuickTimelineBlendTrees"
+      ],
+      "binaryBuildProvenanceVerified": false
+    }
+  ],
+  "complete": false,
+  "remaining": [
+    "Qt modules and embedded third-party sources",
+    "wheel build provenance and configuration",
+    "replacement/relinking instructions",
+    "public source artifact hosting"
+  ]
+}

@@ -1,0 +1,15 @@
+<!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
+
+# Saved prompts and DSH commands
+
+Type `/news` and press **Tab**, or click the completion, to insert the saved prompt. Review the expanded draft and press Enter to send it. **Enter** or the Send button submits the current draft; in DSH, `/goal`, `/goal pause`, and other registered slash commands execute through `commands/execute`. A prompt and a command may share a name: Tab chooses the prompt, Enter chooses the command. The picker must never consume Enter, even when its catalog is empty or offline.
+
+Command results appear as DSH messages in the transcript, including when reopening history. Unknown commands and command errors keep the draft and never fall through to a model prompt. Network failures are not replayed. Ordinary text and absolute paths such as `/home/example/file.txt` retain normal prompt routing. Completed commands do not remain in the desktop prompt queue or latch the browser turn indicator.
+
+DSH 0.1.5-rc.1 disables the host `command-goal` row because its shipped session presets register that command. Older custom presets can omit it. Augmentor setup now registers `command-goal` in both product presets, and the browser preset gets `tool-goal` so the model can manage goal completion; the desktop already includes that tool.
+
+On this machine, `~/.dsh/cordis.patch.yml` now overrides `command-goal` with `disabled: false`, providing a host fallback for existing custom presets. The pre-change file is preserved as `cordis.patch.yml.before-goal-20260916`. The installed harness reloaded this change without restarting: the PID stayed unchanged and the active task remained running. Live command catalogs for standard-codex, augmentor-linux-product, and augmentor-browser-product now include goal. Fresh test sessions in all three presets successfully executed `/goal`, returning its usage. Desktop/browser proof histories contained `command/run` and `command/done`, with no model turn. The browser preset also received tool-goal while preserving its customized text; its existing ownership manifest was already out of sync, so it was not rewritten to claim ownership of those customizations.
+
+Validation on 2026-09-16: 17 Node tests (browser picker, renderer, command transport), 12 Qt prompt/history tests, 7 Python transport tests, 6 queue tests, and 4 setup tests passed. Live verification exercised goal inspection, not autonomous model-driven goal completion.
+
+The installed application hotfix is staged under `outputs/goal-hotfix-20260916`. Its installer verifies the original hashes of all ten files, preserves a rollback copy at `/usr/lib/augmentor.before-goal-20260916`, and applies only this fix. It does not deploy unrelated working-tree UI changes. The loaded Chromium extension uses the legacy checkout under `~/Desktop/Deepseek harnes test/augmentor/extension`; its three affected files were patched in place with a backup at `extension.before-goal-20260916`, preserving other local changes. Reload that extension after installing the host update, and reopen Augmentor Desktop to load updated Python modules.

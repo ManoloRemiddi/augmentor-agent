@@ -1,0 +1,59 @@
+MIT with Augmentor Resale Restriction
+Version 1.0 — 23 September 2026
+SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+
+Copyright (c) 2026 Manolo Remiddi
+
+This is one combined license: the MIT terms below are subject to the mandatory
+Augmentor Resale Restriction. They are not alternative licenses.
+
+AUGMENTOR RESALE RESTRICTION
+
+Notwithstanding the permission to sell granted in the MIT terms below, selling
+or reselling the Software, in source or executable form, including modified
+versions, requires prior written permission from Manolo Remiddi.
+
+All other MIT permissions remain available, including reading, inspecting,
+copying, using, modifying and sharing the Software. Personal and business use
+are permitted without a fee, including use in production and paid work. Using
+the Software as a tool in paid work does not by itself constitute selling the
+Software. Outputs are not subject to this restriction merely because they were
+created using the Software; copies of the Software contained in an output
+remain subject to this license.
+
+This condition must accompany all copies or substantial portions of the
+Software, including modified versions. Redistribution or sublicensing must
+preserve this condition and cannot grant permission to sell or resell the
+Software without Manolo Remiddi's prior written permission. In any conflict
+with the MIT terms below, this condition takes precedence.
+
+For resale permission, contact Manolo Remiddi through the licensing contact at:
+https://augmentoragent.com/licensing.html#permission
+
+This license covers Augmentor-authored code carrying this license. Separately
+identified third-party components retain their own licenses. It does not
+revoke permissions already granted for copies under earlier licenses.
+
+MIT TERMS (SUBJECT TO THE AUGMENTOR RESALE RESTRICTION ABOVE)
+
+MIT License
+
+Copyright (c) 2026 Manolo Remiddi
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "rootDir": "packages",
+    "outDir": "dist",
+    "sourceMap": true,
+    "declaration": true
+  },
+  "include": [
+    "packages/**/*.ts"
+  ]
+}

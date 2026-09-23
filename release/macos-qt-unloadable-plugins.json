@@ -1,0 +1,112 @@
+{
+  "qtVersion": "6.8.2",
+  "pysideVersion": "6.8.2.1",
+  "reason": "These optional wheel plugins cannot load because their Qt frameworks are absent; Augmentor uses Qt Widgets and external Chromium, not these optional engines.",
+  "plugins": [
+    {
+      "path": "Qt/plugins/designer/libqwebengineview.dylib",
+      "missingQtFrameworks": [
+        "@rpath/QtPositioning.framework/Versions/A/QtPositioning",
+        "@rpath/QtWebChannel.framework/Versions/A/QtWebChannel",
+        "@rpath/QtWebEngineCore.framework/Versions/A/QtWebEngineCore",
+        "@rpath/QtWebEngineWidgets.framework/Versions/A/QtWebEngineWidgets"
+      ]
+    },
+    {
+      "path": "Qt/plugins/imageformats/libqpdf.dylib",
+      "missingQtFrameworks": [
+        "@rpath/QtPdf.framework/Versions/A/QtPdf"
+      ]
+    },
+    {
+      "path": "Qt/plugins/platforminputcontexts/libqtvirtualkeyboardplugin.dylib",
+      "missingQtFrameworks": [
+        "@rpath/QtVirtualKeyboard.framework/Versions/A/QtVirtualKeyboard"
+      ]
+    },
+    {
+      "path": "Qt/plugins/qmltooling/libqmldbg_quick3dprofiler.dylib",
+      "missingQtFrameworks": [
+        "@rpath/QtQuick3DUtils.framework/Versions/A/QtQuick3DUtils"
+      ]
+    },
+    {
+      "path": "Qt/qml/QtQml/StateMachine/libqtqmlstatemachineplugin.dylib",
+      "missingQtFrameworks": [
+        "@rpath/QtStateMachine.framework/Versions/A/QtStateMachine",
+        "@rpath/QtStateMachineQml.framework/Versions/A/QtStateMachineQml"
+      ]
+    },
+    {
+      "path": "Qt/qml/QtQuick/Pdf/libpdfquickplugin.dylib",
+      "missingQtFrameworks": [
+        "@rpath/QtPdf.framework/Versions/A/QtPdf",
+        "@rpath/QtPdfQuick.framework/Versions/A/QtPdfQuick"
+      ]
+    },
+    {
+      "path": "Qt/qml/QtQuick/Scene2D/libqtquickscene2dplugin.dylib",
+      "missingQtFrameworks": [
+        "@rpath/Qt3DCore.framework/Versions/A/Qt3DCore",
+        "@rpath/Qt3DQuick.framework/Versions/A/Qt3DQuick",
+        "@rpath/Qt3DQuickScene2D.framework/Versions/A/Qt3DQuickScene2D",
+        "@rpath/Qt3DRender.framework/Versions/A/Qt3DRender"
+      ]
+    },
+    {
+      "path": "Qt/qml/QtQuick/Scene3D/libqtquickscene3dplugin.dylib",
+      "missingQtFrameworks": [
+        "@rpath/Qt3DQuickScene3D.framework/Versions/A/Qt3DQuickScene3D"
+      ]
+    },
+    {
+      "path": "Qt/qml/QtQuick/VirtualKeyboard/Components/libqtvkbcomponentsplugin.dylib",
+      "missingQtFrameworks": [
+        "@rpath/QtVirtualKeyboard.framework/Versions/A/QtVirtualKeyboard",
+        "@rpath/QtVirtualKeyboardSettings.framework/Versions/A/QtVirtualKeyboardSettings"
+      ]
+    },
+    {
+      "path": "Qt/qml/QtQuick/VirtualKeyboard/Plugins/Hangul/libqtvkbhangulplugin.dylib",
+      "missingQtFrameworks": [
+        "@rpath/QtVirtualKeyboard.framework/Versions/A/QtVirtualKeyboard"
+      ]
+    },
+    {
+      "path": "Qt/qml/QtQuick/VirtualKeyboard/Plugins/OpenWNN/libqtvkbopenwnnplugin.dylib",
+      "missingQtFrameworks": [
+        "@rpath/QtVirtualKeyboard.framework/Versions/A/QtVirtualKeyboard"
+      ]
+    },
+    {
+      "path": "Qt/qml/QtQuick/VirtualKeyboard/Plugins/Pinyin/libqtvkbpinyinplugin.dylib",
+      "missingQtFrameworks": [
+        "@rpath/QtVirtualKeyboard.framework/Versions/A/QtVirtualKeyboard"
+      ]
+    },
+    {
+      "path": "Qt/qml/QtQuick/VirtualKeyboard/Plugins/TCIme/libqtvkbtcimeplugin.dylib",
+      "missingQtFrameworks": [
+        "@rpath/QtVirtualKeyboard.framework/Versions/A/QtVirtualKeyboard"
+      ]
+    },
+    {
+      "path": "Qt/qml/QtQuick/VirtualKeyboard/Plugins/Thai/libqtvkbthaiplugin.dylib",
+      "missingQtFrameworks": [
+        "@rpath/QtVirtualKeyboard.framework/Versions/A/QtVirtualKeyboard"
+      ]
+    },
+    {
+      "path": "Qt/qml/QtQuick/VirtualKeyboard/Settings/libqtvkbsettingsplugin.dylib",
+      "missingQtFrameworks": [
+        "@rpath/QtVirtualKeyboardSettings.framework/Versions/A/QtVirtualKeyboardSettings"
+      ]
+    },
+    {
+      "path": "Qt/qml/QtQuick/VirtualKeyboard/libqtvkbplugin.dylib",
+      "missingQtFrameworks": [
+        "@rpath/QtVirtualKeyboard.framework/Versions/A/QtVirtualKeyboard"
+      ]
+    }
+  ]
+}

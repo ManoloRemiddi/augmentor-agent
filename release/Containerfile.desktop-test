@@ -1,0 +1,3 @@
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+FROM docker.io/library/debian@sha256:abc9cb88a5587630d7f915f47b23b0668fe250fbfc6457aa4d52b534c1bbf73f
+RUN apt-get update && apt-get install -y --no-install-recommends python3 python3-yaml python3-gi gir1.2-atspi-2.0 python3-pyside6.qtcore python3-pyside6.qtgui python3-pyside6.qtwidgets python3-pyside6.qtnetwork python3-pyside6.qtdbus python3-pyside6.qttest libqt6svg6 fonts-dejavu-core xvfb xauth xclip xdotool x11-utils kwin-x11 dbus-x11 && rm -rf /var/lib/apt/lists/*

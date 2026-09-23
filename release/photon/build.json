@@ -1,0 +1,15 @@
+{
+  "source": {
+    "revision": "685f5b155b36c5611c08ca678bb78ddbab3edbac",
+    "url": "https://codeload.github.com/silvia-odwyer/photon/tar.gz/685f5b155b36c5611c08ca678bb78ddbab3edbac",
+    "sha256": "546fce39a326098e2b2c6e0487073bfd9d65e97aeeb2d13367d8d577bd7127ca"
+  },
+  "rust": "1.97.1",
+  "wasmBindgen": {
+    "version": "0.2.100",
+    "url": "https://github.com/wasm-bindgen/wasm-bindgen/releases/download/0.2.100/wasm-bindgen-0.2.100-x86_64-unknown-linux-musl.tar.gz",
+    "sha256": "63d6a38deb65bd7023c02bdf382ab66b0d2c0241c8582fd3413b5a808b8aeb5b"
+  },
+  "npmVersion": "0.3.4",
+  "crateVersion": "0.3.3"
+}

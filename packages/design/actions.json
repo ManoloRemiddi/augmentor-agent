@@ -1,0 +1,9 @@
+{
+  "iconSize": 14,
+  "copyFeedbackMs": 1500,
+  "labels": {
+    "copy": "Copy",
+    "edit": "Edit",
+    "branch": "Branch in a new chat"
+  }
+}
