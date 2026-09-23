@@ -130,12 +130,28 @@ reinstallation. It compares actual persisted prompts and history and counts
 provider requests to reject replay. `scripts/shortcut-launch-proof.py` additionally
 checks real key activation and removal across a KDE shortcut-service restart.
 
-Root CI rebuilds the baseline from frozen commit
+Historical private CI rebuilt the baseline from frozen commit
 `295dbc0f270344c4eab38ce5ade908622a0cd8af`; local upgrade evidence also uses that
 commit's checksum-verified CI packages. These deterministic checks use a local
 model fixture. They do not establish live-provider, native Wayland computer-use,
 or independent-tester acceptance.
 
+
+### Public CI baseline after repository consolidation
+
+The current public workflow uses the original, checksum-verified **0.2.9** Debian
+packages from the archived `v0.2.9-complete-preview.1` public download. It tests
+upgrade to the current candidate, rollback, refusal while active, interrupted
+configuration, removal and data preservation. It no longer fetches a private
+commit or rebuilds private history. The older 0.2.0 evidence above remains historical.
+
+[`scripts/stage-lifecycle-baseline.py`](../scripts/stage-lifecycle-baseline.py)
+pins the complete archive SHA-256 and each Debian package hash, reads only the
+expected regular-file members, and writes the manifest consumed by the existing
+lifecycle proof. It preserves the original package bytes and source identity.
+Run it before `bash scripts/lifecycle-proof.sh`; `--archive` accepts a local copy
+only if it matches the same pinned checksum. Do not replace this baseline with
+the candidate itself or give public CI credentials for private history.
 
 ## User-local supervised desktop
 

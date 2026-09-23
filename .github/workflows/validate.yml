@@ -96,19 +96,8 @@ jobs:
         env:
           AUGMENTOR_CONTAINER_ENGINE: docker
         run: bash scripts/debian-package-proof.sh
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with:
-          ref: 295dbc0f270344c4eab38ce5ade908622a0cd8af
-          path: outputs/baseline-source
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
-        with:
-          node-version: '24.19.0'
-      - name: Build the frozen previous release for upgrade and rollback checks
-        working-directory: outputs/baseline-source
-        run: |
-          npm ci --ignore-scripts
-          npm run build
-          python3 scripts/package-debian.py --out ../baseline
+      - name: Stage checksum-verified public 0.2.9 baseline for upgrade and rollback checks
+        run: python3 scripts/stage-lifecycle-baseline.py
       - name: Prove active-task refusal, upgrade, interrupted configuration, rollback and removal
         env:
           AUGMENTOR_CONTAINER_ENGINE: docker
