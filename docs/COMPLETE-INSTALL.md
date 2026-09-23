@@ -6,8 +6,14 @@ This complete preview targets **Debian 13, x86-64**. Desktop-control acceptance
 is scoped to KDE Plasma Wayland. macOS is the next compatibility phase; this
 Linux installer does not establish macOS or Fedora feature parity.
 
-Download the complete archive from the public Augmentor Agent App release,
-extract it, and open a terminal in its folder:
+The active project is [augmentor-agent](https://github.com/ManoloRemiddi/augmentor-agent).
+The current downloadable preview is the previously published **0.2.10 complete preview**:
+[download the archive](https://github.com/ManoloRemiddi/augmentor-agent-app/releases/download/v0.2.10-complete-preview.1/augmentor-0.2.10-complete-preview.1.tar.gz),
+[verify SHA256SUMS](https://github.com/ManoloRemiddi/augmentor-agent-app/releases/download/v0.2.10-complete-preview.1/SHA256SUMS),
+and read its [release record](https://github.com/ManoloRemiddi/augmentor-agent-app/releases/tag/v0.2.10-complete-preview.1).
+These immutable downloads remain in the archived distribution repository and keep
+their shipped licenses. Future releases belong in the active repository.
+Extract the verified archive and open a terminal in its folder:
 
 ```sh
 ./install.sh

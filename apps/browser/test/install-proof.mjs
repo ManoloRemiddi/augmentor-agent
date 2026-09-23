@@ -52,7 +52,7 @@ import { tmpdir, homedir } from 'node:os'
 import path from 'node:path'
 
 // ------------------------------------------------------------ config
-const REPO = process.env.PROOF_REPO ?? 'https://github.com/ManoloRemiddi/augmentor-dsh-extension-plugin'
+const REPO = process.env.PROOF_REPO ?? 'https://github.com/ManoloRemiddi/augmentor-agent'
 const SOURCE = process.env.PROOF_SOURCE === 'npm' ? 'npm' : 'local'
 const CHROME_BIN = process.env.CHROME_BIN ?? '/usr/lib/chromium/chromium'
 const WANT_LLM = process.env.PROOF_LLM === '1'
@@ -60,7 +60,8 @@ const KEEP = process.env.PROOF_KEEP === '1'
 const REAL_HOME = homedir()
 const ISOLATED_HOME = path.join(tmpdir(), `augmentor-proof-${process.pid}-home`)
 const WORK = path.join(tmpdir(), `augmentor-proof-${process.pid}`)
-const REPO_DIR = path.join(WORK, 'repo')
+const CLONE_DIR = path.join(WORK, 'repo')
+const REPO_DIR = path.join(CLONE_DIR, 'apps', 'browser')
 const CHROME_DIR = path.join(WORK, 'chrome')
 const NODE = process.execPath
 const DSH_BIN = execFileSync('sh', ['-c', 'command -v dsh || true'], { encoding: 'utf8' }).trim() || 'dsh'
@@ -133,8 +134,8 @@ ok('free port', `app :${PORT}, cdp :${CDP_PORT}`)
 rmSync(WORK, { recursive: true, force: true })
 rmSync(ISOLATED_HOME, { recursive: true, force: true })
 mkdirSync(ISOLATED_HOME, { recursive: true })
-execFileSync('git', ['clone', '--quiet', '--depth', '1', REPO, REPO_DIR], { stdio: 'pipe' })
-const HEAD = execFileSync('git', ['-C', REPO_DIR, 'log', '--oneline', '-1'], { encoding: 'utf8' }).trim()
+execFileSync('git', ['clone', '--quiet', '--depth', '1', REPO, CLONE_DIR], { stdio: 'pipe' })
+const HEAD = execFileSync('git', ['-C', CLONE_DIR, 'log', '--oneline', '-1'], { encoding: 'utf8' }).trim()
 ok('git clone (fresh user copy)', HEAD.slice(0, 40))
 
 // ============================================================ 3. isolated home

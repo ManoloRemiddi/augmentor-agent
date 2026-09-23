@@ -2,15 +2,19 @@
 
 # Start here: agent handoff
 
-## September 23 license and public source
+## September 23 canonical repository and license
 
-Augmentor-authored code now carries [MIT with Augmentor Resale Restriction](../LICENSE).
+Current development is [ManoloRemiddi/augmentor-agent](https://github.com/ManoloRemiddi/augmentor-agent),
+branch `main`, for both Desktop and Browser. The clean public repository was
+renamed from `augmentor-agent-source`; its public history is retained.
+The old private repository is now `augmentor-agent-history` and is an archive.
+Read [repository roles and preserved work](REPOSITORIES.md) before resuming old tasks.
+
+Augmentor-authored code carries [MIT with Augmentor Resale Restriction](../LICENSE).
 Personal/business use and modification remain free; resale needs Manolo Remiddi's
-written permission. Public source publication uses a clean, privacy-reviewed
-[separate repository](https://github.com/ManoloRemiddi/augmentor-agent-source),
-with this development history kept private. See [publication scope](PUBLIC-SOURCE.md).
-This source/website change does not redeploy the installed desktop or relicense
-earlier binary releases.
+written permission. See [publication scope](PUBLIC-SOURCE.md).
+Earlier binary releases retain their shipped licenses. Source or documentation
+publication does not redeploy the installed application.
 
 ## September 22 native opening-notice visibility
 
@@ -106,14 +110,16 @@ an individual machine's installed state are not a substitute for this record.
 Never publish private transcripts, credentials, tokens, model weights or user
 configuration to satisfy documentation completeness.
 
-As of the 19 September 2026 handoff:
+### Historical September 19 qualification (superseded repository location)
 
-- Product repository: [augmentor-agent](https://github.com/ManoloRemiddi/augmentor-agent).
-- Current development: branch `productization/shared-memory-and-desktop`,
-  [draft PR #3](https://github.com/ManoloRemiddi/augmentor-agent/pull/3).
-  It is not merged into `main`; cloning only the default branch misses this work.
+The following records the old private development state, not today’s checkout instructions:
+
+- Historical private repository: [augmentor-agent-history](https://github.com/ManoloRemiddi/augmentor-agent-history).
+- Historical development: branch `productization/shared-memory-and-desktop`,
+  [draft PR #3](https://github.com/ManoloRemiddi/augmentor-agent-history/pull/3).
+  Its source was exported into the clean public repository; use public `main` now.
 - Last fully qualified implementation: commit
-  [`29231fdf367fdade2aee74530785d29af2bee95e`](https://github.com/ManoloRemiddi/augmentor-agent/commit/29231fdf367fdade2aee74530785d29af2bee95e).
+  [`29231fdf367fdade2aee74530785d29af2bee95e`](https://github.com/ManoloRemiddi/augmentor-agent-history/commit/29231fdf367fdade2aee74530785d29af2bee95e).
   Subsequent documentation commits do not expand its runtime evidence.
 - Subsequent native voice correction: [buffered activation, echo guard and drag feedback](HANDS-FREE-IMPLEMENTATION.md#buffered-activation-and-playback-echo-protection--19-september-2026),
   based on `cc8845c`. Its own validation/deployment scope is recorded separately
@@ -134,17 +140,16 @@ alongside the fix instead of silently treating a plan as implemented behavior.
 For a fresh clone:
 
 ```sh
-git clone --branch productization/shared-memory-and-desktop https://github.com/ManoloRemiddi/augmentor-agent.git
+git clone https://github.com/ManoloRemiddi/augmentor-agent.git
 cd augmentor-agent
 git status --short
 git log -1 --oneline
 ```
 
-For an existing working copy, inspect its branch and changes first. Do not discard
-or publish concurrent work merely to match this handoff. Mobile remote work was
-present as uncommitted concurrent work during this documentation audit; it is not
-part of the qualified desktop snapshot. Treat it as published only when its own
-source, documentation and validation have been committed to GitHub.
+For an existing working copy, inspect its origin, branch and changes first. Old
+private-history checkouts stay pointed at the private archive. Preserve local
+changes and port only selected, reviewed changes to a fresh canonical branch;
+never merge private history or repoint an old checkout at the public origin.
 
 ## Reproduce development checks
 
@@ -172,7 +177,7 @@ must not be confused with fixtures.
 
 ## Verified state
 
-[CI run 35441917540](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/35441917540)
+[CI run 35441917540](https://github.com/ManoloRemiddi/augmentor-agent-history/actions/runs/35441917540)
 passed all three jobs for `29231fd`: Debian/source/native checks; installed
 packages; packaged browser. It covered first run, actual pointer/clipboard,
 DSH approvals/questions/exact forks, memory lifecycle fixtures, installation,

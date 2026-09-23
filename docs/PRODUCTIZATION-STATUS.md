@@ -22,7 +22,7 @@ CI run `34050997830` passes the Debian build, installed package/lifecycle and
 packaged browser jobs. Its browser regression waits for the visible save form
 to finish before selecting a prompt, then verifies a real concurrent-edit
 conflict preserves the draft. Subsequent final artifact identities and acceptance
-results are attached to private [PR 3](https://github.com/ManoloRemiddi/augmentor-agent/pull/3).
+results are attached to private [PR 3](https://github.com/ManoloRemiddi/augmentor-agent-history/pull/3).
 
 The final code checkpoint at `7a36c74` also passes all three jobs in run
 `34051829514`, including the new final artifact review. Downloaded packages and

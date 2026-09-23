@@ -23,7 +23,7 @@ layer mounts the plugin automatically.
 
 ## Install
 
-**From npm (recommended):**
+**Published npm package (check its version and shipped license):**
 
 ```sh
 dsh plugin --profile web add dsh-augmentor
@@ -32,8 +32,8 @@ dsh plugin --profile web add dsh-augmentor
 **From git (no npm needed):**
 
 ```sh
-git clone https://github.com/ManoloRemiddi/augmentor-dsh-extension-plugin.git
-dsh plugin --profile web add /path/to/augmentor-dsh-extension-plugin/plugin
+git clone https://github.com/ManoloRemiddi/augmentor-agent.git
+dsh plugin --profile web add /path/to/augmentor-agent/apps/browser/plugin
 ```
 
 `dsh plugin` is a thin pnpm forwarder: it installs the package into the

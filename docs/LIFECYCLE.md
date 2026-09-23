@@ -103,7 +103,7 @@ execute user-controlled code or rewrite arbitrary home directories.
 
 ## Current memory and lifecycle evidence
 
-[CI at 29231fd](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/35441917540)
+[CI at 29231fd](https://github.com/ManoloRemiddi/augmentor-agent-history/actions/runs/35441917540)
 passes installed 0.2.9 maintenance, upgrade/rollback, interrupted configuration and
 removal. The installed checks assert the automatic-memory socket closes and its
 SQLite journal is included in the backup. This does not back up Hindsight's

@@ -1,7 +1,7 @@
 {
   "name": "dsh-augmentor",
   "version": "0.2.10",
-  "description": "Augmentor for DeepSeek Harness: DSH plugin + Chrome extension that drives the user's real browser from any DSH session — live page snapshot, click, type, tabs — with save-to-workspace chat sessions.",
+  "description": "Augmentor for DeepSeek Harness: DSH plugin + Chrome extension that drives the user's real browser from any DSH session \u2014 live page snapshot, click, type, tabs \u2014 with save-to-workspace chat sessions.",
   "type": "module",
   "main": "dist/index.js",
   "license": "SEE LICENSE IN LICENSE",
@@ -11,8 +11,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ManoloRemiddi/augmentor-dsh-extension-plugin.git",
-    "directory": "plugin"
+    "url": "git+https://github.com/ManoloRemiddi/augmentor-agent.git",
+    "directory": "apps/browser/plugin"
   },
   "keywords": [
     "dsh",

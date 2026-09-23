@@ -152,7 +152,7 @@ microphone/speaker acceptance remains separate from voice ticket/transport check
 ## Exact implementation references
 
 - Augmentor startup/recovery implementation and local qualification:
-  [`2dca65f1041de9a5cabe866fb34610944c6bef77`](https://github.com/ManoloRemiddi/augmentor-agent/commit/2dca65f1041de9a5cabe866fb34610944c6bef77).
+  [`2dca65f1041de9a5cabe866fb34610944c6bef77`](https://github.com/ManoloRemiddi/augmentor-agent-history/commit/2dca65f1041de9a5cabe866fb34610944c6bef77).
 - Adaptive Reasoning code, tests and maintained documentation:
   [`15d998168825cea9f5ff477758317f163a6c75f0`](https://github.com/ManoloRemiddi/dsh-adaptive-reasoning/commit/15d998168825cea9f5ff477758317f163a6c75f0).
 - Installed 0.2.2 tarball SHA-256:

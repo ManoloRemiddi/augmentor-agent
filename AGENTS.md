@@ -2,7 +2,21 @@
 
 # Development conventions
 
-- GitHub is the durable source of truth. Start with [agent handoff](docs/AGENT-HANDOFF.md), [current architecture](docs/ARCHITECTURE.md) and the [documentation index](docs/README.md). Check the current development ref; the default branch may precede an open PR.
+## Canonical repository
+
+- The only active Augmentor Desktop + Browser repository is
+  [ManoloRemiddi/augmentor-agent](https://github.com/ManoloRemiddi/augmentor-agent), default branch `main`.
+- “Save/push to the repo” means this repository. Work on branches here as needed.
+  Confirm `git remote -v`, branch and changes before committing or pushing.
+- The website is maintained separately in `ManoloRemiddi/augmentoragent.com`.
+- Old product repositories are historical archives. Never merge their Git history
+  into this public repository or point an old private checkout at this remote.
+  Port only explicitly selected, privacy-reviewed changes onto a current branch.
+- Read [repository consolidation](docs/REPOSITORIES.md) for preserved work and
+  historical downloads. Current `main` supersedes the former private development branch.
+
+
+- GitHub is the durable source of truth. Start with [agent handoff](docs/AGENT-HANDOFF.md), [current architecture](docs/ARCHITECTURE.md) and the [documentation index](docs/README.md). Use the canonical repository and current branch; dated private branch references are historical evidence.
 - Update the owning documentation with every behavior, setup, data, contract or lifecycle change. Record tested ref, deployment scope, fixture/live evidence and remaining work. Link new guides from the index and publish the documentation with the implementation; private local logs are not a handoff.
 - Preserve dated historical evidence, but label it historical and link its current replacement. Keep credentials, private conversations and machine-specific state out of GitHub.
 - Installed Linux desktop updates must follow [desktop deployments](docs/DESKTOP-DEPLOYMENTS.md): stage a separate tested artifact, activate it through `augmentor-update`, and report selected versus running build. Never patch a selected release in place or write a launcher to a version-specific preview/source folder. A source commit alone is not an installed update. Preserve matching DSH integration and speech dependencies; a product-version mismatch blocks promotion.

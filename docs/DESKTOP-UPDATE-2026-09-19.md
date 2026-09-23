@@ -79,7 +79,7 @@ this memory-only cutover; their updated source is included here.
 
 ## Published CI evidence
 
-[Run 35441917540](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/35441917540)
+[Run 35441917540](https://github.com/ManoloRemiddi/augmentor-agent-history/actions/runs/35441917540)
 passed all three jobs for implementation commit `29231fdf367fdade2aee74530785d29af2bee95e`:
 Debian/source/native checks, installed-package lifecycle and packaged browser.
 The final fix makes the persistent memory companion participate in lifetime
@@ -94,7 +94,7 @@ and contradiction evaluation; real Fedora
 UI/browser acceptance; and existing platform/distribution gates. This snapshot
 publishes the implementation and evidence without declaring a public release.
 
-Publication links: [desktop pull request #3](https://github.com/ManoloRemiddi/augmentor-agent/pull/3)
+Publication links: [desktop pull request #3](https://github.com/ManoloRemiddi/augmentor-agent-history/pull/3)
 and [Resonant Voice initial snapshot](https://github.com/ManoloRemiddi/resonant-voice/commit/cac49f6).
 The voice snapshot includes only catalogued synthetic audition clips; human
 microphone recordings remain excluded.

@@ -3,7 +3,8 @@
 # Documentation index
 
 Licensing and publication: [combined Augmentor license](LICENSING.md),
-[public source and privacy review](PUBLIC-SOURCE.md).
+[public source and privacy review](PUBLIC-SOURCE.md),
+[canonical repository, archives and preserved work](REPOSITORIES.md).
 
 GitHub is the maintained source of truth. A new agent should begin with
 [Start here: agent handoff](AGENT-HANDOFF.md), which identifies the development

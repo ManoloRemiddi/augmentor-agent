@@ -60,7 +60,7 @@ Version: {version}
 Release: 1.fc44
 Summary: Augmentor Agent Desktop and browser companion (Fedora preview)
 License: LicenseRef-Augmentor-MIT-Resale-1.0 AND MIT AND BSD-3-Clause AND Apache-2.0
-URL: https://github.com/ManoloRemiddi/augmentor-agent-app
+URL: https://github.com/ManoloRemiddi/augmentor-agent
 BuildArch: x86_64
 AutoReqProv: no
 Requires: rpm

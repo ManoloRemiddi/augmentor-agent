@@ -16,10 +16,17 @@ Augmentor is currently a **development preview**. The release manifest is
 Pi runtime; users connect their own model endpoint and credentials. DSH integration
 is optional and retains the limitations in the [feature matrix](docs/FEATURE-MATRIX.md).
 
+## One active application repository
+
+This is the maintained repository for **Desktop and Browser code, issues, pull
+requests and future releases**. Development starts from `main`. The former source
+URL redirects here. See [repository roles and preserved work](docs/REPOSITORIES.md).
+The website has its own repository; old application repositories are archives.
+
 ## Documentation and agent handoff
 
 The public Desktop + Browser source is published at
-[augmentor-agent-source](https://github.com/ManoloRemiddi/augmentor-agent-source)
+[augmentor-agent](https://github.com/ManoloRemiddi/augmentor-agent)
 under [MIT with Augmentor Resale Restriction](LICENSE). See the
 [publication scope and privacy audit](docs/PUBLIC-SOURCE.md). Earlier binary
 downloads retain their shipped licenses.
@@ -33,8 +40,8 @@ and artifacts are provenance references, not public downloads.
 To inspect the public source:
 
 ```sh
-git clone https://github.com/ManoloRemiddi/augmentor-agent-source.git
-cd augmentor-agent-source
+git clone https://github.com/ManoloRemiddi/augmentor-agent.git
+cd augmentor-agent
 ```
 
 ## Install and use
