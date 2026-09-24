@@ -1,4 +1,5 @@
 import {SURFACE} from './surface-design.mjs'
+import {startLetterRoll} from './prompt-animation.mjs'
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // Window controls and the composer use the floating window's positions and glyphs.
 export function attachSurface({send,openSettings,onError,approval,state}){
@@ -10,7 +11,8 @@ export function attachSurface({send,openSettings,onError,approval,state}){
     for(const [key,value] of Object.entries({width:'16',height:'16',viewBox:'0 0 16 16',fill:'none',stroke:'currentColor','stroke-width':'1.2','aria-hidden':'true'}))svg.setAttribute(key,value)
     shape.setAttribute('d',path);svg.append(shape);$(id).replaceChildren(svg)
   }
-  let improving=false,epoch=0,undo=null
+  let improving=false,epoch=0,undo=null,roll=null
+  const cancelImprovement=()=>{epoch++;improving=false;roll?.stop();roll=null}
   const announce=text=>{$('surface-status').textContent=text}
   const fail=error=>{announce(error.message);onError(error.message)}
   const closeMenu=()=>{menu.hidden=true;more.setAttribute('aria-expanded','false')}
@@ -23,7 +25,7 @@ export function attachSurface({send,openSettings,onError,approval,state}){
   let sessionId=null,restored=false
   const remember=()=>chrome.storage.session.set({[draftKey]:{sessionId,text:input.value}}).catch(()=>{})
   input.addEventListener('input',remember)
-  const hide=()=>{closeMenu();void remember().finally(()=>window.close())}
+  const hide=()=>{cancelImprovement();closeMenu();void remember().finally(()=>window.close())}
   $('hide').onclick=hide;$('hide-menu-item').onclick=hide
   const fit=()=>{
     // Reset before measuring so deleting text also shrinks the composer.
@@ -41,19 +43,32 @@ export function attachSurface({send,openSettings,onError,approval,state}){
       if(entry.contentRect.width!==width){width=entry.contentRect.width;fit()}
     }).observe($('composer-field'))
   }
-  const controls=()=>{improve.disabled=!input.value.trim()||state().phase!=='ready'||state().running;improve.textContent=improving?'×':undo?'↶':'✦';improve.title=improving?'Cancel prompt improvement':undo?'Undo prompt improvement':'Improve prompt';improve.setAttribute('aria-label',improve.title)}
-  input.addEventListener('input',()=>{epoch++;improving=false;undo=null;fit();controls()})
+  const controls=()=>{improve.disabled=!improving&&(!input.value.trim()||state().phase!=='ready'||state().running);improve.textContent=improving?'×':undo?'↶':'✦';improve.title=improving?'Cancel prompt improvement':undo?'Undo prompt improvement':'Improve prompt';improve.setAttribute('aria-label',improve.title)}
+  input.addEventListener('input',()=>{cancelImprovement();undo=null;fit();controls()})
   new MutationObserver(fit).observe(input,{attributes:true,attributeFilter:['disabled']})
   improve.onclick=async()=>{
-    if(improving){epoch++;improving=false;controls();return}
-    if(undo!==null){input.value=undo;undo=null;fit();controls();return}
-    const original=input.value,id=++epoch;improving=true;controls()
-    try{const r=await send('prompt/improve',{text:original});if(id!==epoch||input.value!==original)return;if(!r?.ok||r.result?.kind!=='rewrite'||typeof r.result.text!=='string')throw Error(r?.error||'Could not improve the prompt');input.value=r.result.text;undo=original;fit()}
-    catch(error){if(id===epoch)fail(error)}finally{if(id===epoch){improving=false;controls()}}
+    if(improving){cancelImprovement();controls();return}
+    if(undo!==null){input.value=undo;undo=null;void remember();fit();controls();return}
+    const original=input.value,id=++epoch;improving=true;roll=startLetterRoll(input);controls();announce('Improving prompt…')
+    const animation=roll
+    try{
+      const r=await send('prompt/improve',{text:original})
+      if(id!==epoch||input.value!==original)return
+      if(!r?.ok||r.result?.kind!=='rewrite'||typeof r.result.text!=='string'||!r.result.text.trim())throw Error(r?.error||'Could not improve the prompt')
+      if(!await animation.settle(r.result.text)||id!==epoch||input.value!==original)return
+      input.value=r.result.text;undo=original;void remember();fit();announce('Prompt improved. Undo is available.')
+    }catch(error){if(id===epoch)fail(error)}finally{if(id===epoch){cancelImprovement();controls()}}
   }
+  input.addEventListener('keydown',e=>{
+    if(!improving)return
+    if(e.key==='Enter'){e.preventDefault();e.stopPropagation()}
+    else if(e.key==='Escape'){e.preventDefault();e.stopPropagation();cancelImprovement();controls()}
+  },true)
+  window.addEventListener('pagehide',cancelImprovement)
+
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!menu.hidden){e.preventDefault();closeMenu();more.focus()}else if(e.ctrlKey&&e.key==='End'){$('log').scrollTo({top:$('log').scrollHeight,behavior:'smooth'})}else if(e.ctrlKey&&e.key==='Home'){$('log').scrollTo({top:0,behavior:'smooth'})}})
   fit();controls()
-  return {update(value){
-    if(value.sessionId){if(sessionId&&value.sessionId!==sessionId){epoch++;improving=false;undo=null;void chrome.storage.session.remove(draftKey)}sessionId=value.sessionId;if(!restored){restored=true;void chrome.storage.session.get(draftKey).then(saved=>{const draft=saved[draftKey];if(draft?.sessionId===sessionId&&!input.value){input.value=draft.text;fit();controls()}})}}
+  return {get improving(){return improving},update(value){
+    if(value.sessionId){if(sessionId&&value.sessionId!==sessionId){cancelImprovement();undo=null;void chrome.storage.session.remove(draftKey)}sessionId=value.sessionId;if(!restored){restored=true;void chrome.storage.session.get(draftKey).then(saved=>{const draft=saved[draftKey];if(draft?.sessionId===sessionId&&!input.value){input.value=draft.text;fit();controls()}})}}
     const current={...state(),...value};const dot=$('connection-dot');dot.dataset.phase=current.phase;dot.title=current.phase==='ready'?'Connected':current.error||'Connecting…';dot.setAttribute('aria-label',dot.title);controls()}}
 }

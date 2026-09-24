@@ -4,6 +4,7 @@ import assert from 'node:assert/strict'
 import {readFileSync} from 'node:fs'
 import {JSDOM} from 'jsdom'
 import {attachSurface} from '../extension/surface.mjs'
+import {setTimeout as delay} from 'node:timers/promises'
 const html=readFileSync(new URL('../extension/sidepanel.html',import.meta.url),'utf8')
 function setup(t){
  const dom=new JSDOM(html),saved=new Map(),listeners=[],sent=[],opened=[],errors=[],originals=new Map()
@@ -35,5 +36,49 @@ test('improvement edits only the draft and supports undo; late replies cannot ov
  let resolve;setReply(()=>new Promise(r=>resolve=r));const pending=$('improve').onclick();input('New typing');resolve({ok:true,result:{kind:'rewrite',text:'Stale'}});await pending;assert.equal($('input').value,'New typing');assert.equal(sent.some(x=>x.type==='prompt'),false)
 })
 test('failed improvement preserves text',async t=>{
- const {$,input,setReply,errors}=setup(t);input('Keep');setReply(async()=>({ok:false,error:'Unavailable'}));await $('improve').onclick();assert.equal($('input').value,'Keep');assert.deepEqual(errors,['Unavailable'])
+ const {$,input,setReply,errors}=setup(t);input('Keep');setReply(async()=>({ok:false,error:'Unavailable'}));await $('improve').onclick();assert.equal($('input').value,'Keep');assert.deepEqual(errors,['Unavailable']);assert.equal($('input').classList.contains('prompt-improving'),false)
+})
+
+test('rolling preview preserves the actual draft and settles before committing with Undo',async t=>{
+ const {$,dom,input,sent}=setup(t);input('Original café 👩🏽‍💻 <draft> 123')
+ const pending=$('improve').onclick()
+ const preview=dom.window.document.querySelector('.prompt-letter-preview')
+ assert.ok(preview);assert.equal(preview.getAttribute('aria-hidden'),'true')
+ assert.equal($('input').getAttribute('aria-busy'),'true')
+ assert.equal($('input').value,'Original café 👩🏽‍💻 <draft> 123')
+ assert.equal(preview.querySelector('draft'),null)
+ assert.ok(preview.querySelector('.prompt-letter-wheel'))
+ assert.equal(sent.at(-1).text,$('input').value)
+ await delay(0)
+ assert.equal(preview.classList.contains('settling'),true)
+ assert.equal($('input').value,'Original café 👩🏽‍💻 <draft> 123')
+ await pending
+ assert.equal(dom.window.document.querySelector('.prompt-letter-preview'),null)
+ assert.equal($('input').hasAttribute('aria-busy'),false)
+ assert.equal($('input').value,'Improved draft')
+ assert.equal($('improve').getAttribute('aria-label'),'Undo prompt improvement')
+ await $('improve').onclick();assert.equal($('input').value,'Original café 👩🏽‍💻 <draft> 123')
+})
+test('Escape cancels rolling, Enter cannot submit, and late replies cannot restore the preview',async t=>{
+ const {$,dom,input,setReply,surface}=setup(t);input('Keep this draft')
+ let resolve;setReply(()=>new Promise(r=>resolve=r));const pending=$('improve').onclick()
+ const enter=new dom.window.KeyboardEvent('keydown',{key:'Enter',bubbles:true,cancelable:true})
+ $('input').dispatchEvent(enter);assert.equal(enter.defaultPrevented,true);assert.equal(surface.improving,true)
+ $('input').dispatchEvent(new dom.window.KeyboardEvent('keydown',{key:'Escape',bubbles:true,cancelable:true}))
+ assert.equal(surface.improving,false);assert.equal(dom.window.document.querySelector('.prompt-letter-preview'),null)
+ resolve({ok:true,result:{kind:'rewrite',text:'Late result'}});await pending
+ assert.equal($('input').value,'Keep this draft');assert.equal($('improve').textContent,'✦')
+})
+for(const action of ['cancel','type','switch','close'])test(`cancel settling on ${action} without applying its result`,async t=>{
+ const {$,dom,input,setState}=setup(t);input('Original')
+ const pending=$('improve').onclick();await delay(0)
+ assert.ok(dom.window.document.querySelector('.prompt-letter-preview.settling'))
+ if(action==='cancel')await $('improve').onclick()
+ if(action==='type')input('Newer draft')
+ if(action==='switch')setState({sessionId:'another-session'})
+ if(action==='close')dom.window.dispatchEvent(new dom.window.Event('pagehide'))
+ await pending
+ assert.equal($('input').value,action==='type'?'Newer draft':'Original')
+ assert.equal(dom.window.document.querySelector('.prompt-letter-preview'),null)
+ assert.equal($('input').classList.contains('prompt-improving'),false)
 })

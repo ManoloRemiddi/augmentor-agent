@@ -863,7 +863,7 @@ async function pickAccess(value) {
 }
 
 async function doSend() {
-  if (viewSessionId) return // DSH view is read-only in M1
+  if (viewSessionId || surface.improving) return // Keep an in-progress rewrite as a draft
   const input = document.getElementById('input')
   const text = input.value.trim()
   if (!text) return

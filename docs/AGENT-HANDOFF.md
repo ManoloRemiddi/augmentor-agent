@@ -2,6 +2,13 @@
 
 # Start here: agent handoff
 
+## September 24 sidebar animation and product name
+
+The Browser prompt-improvement preview now rolls letters and settles before
+committing, with cancellation and late-response guards. Chromium display metadata
+uses **Augmentor Agent**. See the [latest shared-surface entry](SHARED-SURFACES-2026-09-24.md#restore-sidebar-improvement-animation-and-product-name)
+for validation and installed adoption; the prepared extension requires Reload.
+
 ## September 24 sidebar presentation refinement
 
 The user confirmed the corrected sidebar is working and requested a simpler

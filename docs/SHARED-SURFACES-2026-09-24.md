@@ -244,3 +244,18 @@ preserved. The previous extension folder is backed up privately. Chromium Reload
 and reopening the sidebar are the remaining adoption steps for this revision.
 Native windows and DSH were not restarted; unsent drafts remain undisturbed.
 This is a compatible local preview and PR source, not a new public release.
+
+
+### Restore sidebar improvement animation and product name
+
+The sidebar presentation had connected prompt improvement without the native
+rolling-letter preview. The Browser now renders that pending/settling animation
+over the intact draft, cancels cleanly, and blocks submission until improvement
+finishes or is dismissed. See [prompt improvement](PROMPT-IMPROVEMENT.md#browser-sidebar).
+Chromium's sidebar heading and extension action now read **Augmentor Agent**;
+only display metadata changes, preserving the manifest key and extension ID.
+
+All 37 Browser DOM/entrypoint checks pass, including six additional animation
+lifecycle cases. Direct Chromium visual inspection is unavailable because the
+browser-control connection is not present. Local staging/reload evidence is
+recorded below; there is no claim of visual acceptance for this revision yet.
