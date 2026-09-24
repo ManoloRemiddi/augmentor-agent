@@ -34,6 +34,13 @@ Home can control, test one device. The Home page now provides pairing, device
 selection and model configuration. Guided initial HA authorization and fresh-hub
 setup remain operator-assisted through HA's existing interfaces.
 
+## Desktop dashboard launcher
+
+[Home launcher](HOME-LAUNCHER.md) adds an optional Qt tray icon that opens the
+existing NAS dashboard in an installed browser's app window. The dashboard URL
+is remembered per user; no copied API key or agent session is required. Home's
+NAS-owned service and conversation capability remain independent of this launcher.
+
 ## Product direction and current scope
 
 The main Home service belongs on the always-on NAS. Any connected Augmentor

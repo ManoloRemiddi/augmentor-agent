@@ -2,6 +2,15 @@
 
 # Start here: agent handoff
 
+## September 24 Home tray launcher
+
+[Home launcher](HOME-LAUNCHER.md) implements a lightweight Qt tray process for
+opening an existing NAS dashboard through the installed browser. It remembers
+only the dashboard address, requires no copied API key and starts no model/agent.
+A stable entrypoint follows desktop.json; install after managed artifact promotion.
+Native tests and a two-process singleton check pass. See desktop deployment records
+for selected/running evidence; source alone is not an installed launcher.
+
 ## September 24 Home runtime preview
 
 [Home](HOME.md) now has a headless DSH host in `apps/home` and a constrained

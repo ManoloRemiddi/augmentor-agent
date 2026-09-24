@@ -123,3 +123,5 @@ when their implementation and validation are published, rather than linking
 files available only in a developer's working directory.
 
 - [Controlled memory and selected context](CONTROLLED-MEMORY.md): current bounded inference, provenance, tests and operating limits.
+
+- [Home desktop tray launcher](HOME-LAUNCHER.md): shared NAS dashboard access, remembered address and login startup.
