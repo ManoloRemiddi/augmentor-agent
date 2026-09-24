@@ -25,13 +25,19 @@ def main():
     for name in ('package.json', 'package-lock.json'):
         shutil.copy2(ROOT / name, target / name)
     subprocess.run(['npm', 'ci', '--ignore-scripts', '--omit=dev', '--no-audit', '--no-fund'], cwd=target, check=True)
+    subprocess.run(['node', str(ROOT / 'scripts/prepare-ws.mjs'), str(target)], check=True)
     sdk = target / 'node_modules/@earendil-works/pi-coding-agent'
     metadata = json.loads((sdk / 'package.json').read_text())
     if metadata.get('optionalDependencies', {}).get('@mariozechner/clipboard') != '0.3.9':
         raise SystemExit('Pi optional clipboard dependency changed; review the distribution exclusion.')
     # Pi's public loader handles absence. Augmentor uses its own Qt/browser
     # clipboard bindings; do not ship unused native terminal clipboard binaries.
-    excluded = []
+    excluded = [{'name': 'ws', 'version': '8.21.0',
+                 'path': 'node_modules/@earendil-works/pi-coding-agent/node_modules/ws',
+                 'reason': 'CVE-2026-62389; Pi resolves the locked root ws 8.21.3 instead'},
+                {'name': '@earendil-works/pi-coding-agent', 'version': '0.85.1',
+                 'path': 'dist/bundle',
+                 'reason': 'unused standalone CLI/RPC bundles embed ws 8.21.0; Augmentor uses the unbundled SDK'}]
     # msgpackr's optional string accelerator is not required: its public Node
     # loader catches absence and retains the JavaScript implementation. Ship
     # that portable path instead of ABI-specific prebuilt native addons.

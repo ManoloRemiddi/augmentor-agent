@@ -46,6 +46,8 @@ cd augmentor-agent
 
 ## Install and use
 
+[0.2.11 security release and upgrade guidance](docs/RELEASE-0.2.11.md).
+
 For a fresh Debian 13 amd64 installation, start with the
 [complete Desktop + Browser setup](docs/COMPLETE-INSTALL.md), including pinned DSH,
 plugins and optional local voice/dual-memory provisioning. Existing installations

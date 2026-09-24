@@ -2,6 +2,14 @@
 
 # Source baselines and migration inventory
 
+## WebSocket correction — 24 September 2026
+
+Current runtime, Browser companion/plugin and mobile pins are `ws 8.21.3`.
+Pi 0.85.1 remains the tested SDK; its obsolete nested ws and unused standalone
+CLI/RPC bundles are excluded during dependency preparation. See the
+[security correction, exact baseline and test evidence](WS-SECURITY-2026-09-24.md).
+Dated records below retain the versions used in those historical checks.
+
 Inspected 2026-09-05. These are provenance records, not claims that Pi integration has passed tests.
 
 | Source | Recorded revision / status |

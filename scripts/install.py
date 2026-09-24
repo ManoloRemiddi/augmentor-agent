@@ -39,6 +39,7 @@ try:
     # Reuse the exact tested dependency tree when installing from a built checkout.
     if (source/'node_modules').exists():subprocess.run(['cp','-a','--reflink=auto',str(source/'node_modules'),str(staging/'node_modules')],check=True)
     else:subprocess.run([npm,'ci','--ignore-scripts','--omit=dev'],cwd=staging,check=True)
+    subprocess.run([node,str(staging/'scripts/prepare-ws.mjs'),str(staging)],check=True)
     if running:client.call('host.shutdown')
     # One previous release is retained for rollback; application state is elsewhere.
     backup=target.with_name(target.name+'.previous')
