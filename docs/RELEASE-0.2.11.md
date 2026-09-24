@@ -75,7 +75,10 @@ Additional final-artifact checks:
 The website's download links, copied installation prompt and manual now point to
 0.2.11 in the canonical application repository. The legacy 0.1.32 install recipe
 was retired and historical collection downloads carry an explicit warning.
-Website source: `8602c0964bc6f284235f7dbbd2b934bd8da879fa`; 15 website checks passed.
+Initial website release update: `8602c0964bc6f284235f7dbbd2b934bd8da879fa`;
+collection warning clarified in `dfa67b9`. All 15 website checks passed. Live Pages
+served the new download/checksum links and matching installation prompt. The copy
+button reported success in the in-app browser; clipboard readback was unavailable.
 
 ## Installed workstation, September 24
 
