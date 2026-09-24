@@ -94,14 +94,14 @@ by this security-specific validation.
 
 ## Release boundary and remaining work
 
-This is a source fix and review candidate. Product/extension/plugin versions
-remain in lockstep at `0.2.10`; this work does not relabel current code as the old
-plugin's `0.1.33`. Do not overwrite historical release artifacts or publish a
-version without a separate release decision and compatibility qualification.
+The initial source-only candidate retained product version `0.2.10`. The
+subsequently authorised release advances all matching product components to
+**0.2.11**; see [release qualification, downloads and upgrade guidance](RELEASE-0.2.11.md).
+The npm plugin's Cordis peer/development pin now matches the supported DSH host's
+`4.0.2`, and its build preserves the license banner when packing for npm.
 
-No npm publication, release promotion, installed desktop activation or change
-to npm ownership/2FA or organisation permissions is performed here. Existing
-`dsh-augmentor 0.1.32` installations and historical downloadable packages retain
-their original dependencies until explicitly upgraded. A future release must
-choose the maintained-product upgrade or an explicitly scoped legacy backport,
-test that exact artifact, and communicate the upgrade to existing users.
+Existing `dsh-augmentor 0.1.32` installations and historical downloadable
+packages retain their original dependencies until explicitly upgraded. Do not
+overwrite old release artifacts. Publishing the new package/download does not
+reload old running processes. npm ownership/2FA settings and organisation
+permissions remain separate from publishing this security update.

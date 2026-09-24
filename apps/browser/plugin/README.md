@@ -15,6 +15,10 @@ The package is a [cordis](https://www.npmjs.com/package/@deepseek-ai/cordis)
 bundle: `dsh plugin add` installs it into a profile and its `dsh.bundle.patch`
 layer mounts the plugin automatically.
 
+Version 0.2.11 pins the security-fixed `ws 8.21.3`. Use the matching Browser
+and companion from the [complete release](https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/v0.2.11-complete-preview.1).
+Updating this npm plugin alone does not update an older companion or extension.
+
 ## Requirements
 
 - Node.js ≥ 22.18 (the DSH host requirement)
@@ -26,7 +30,7 @@ layer mounts the plugin automatically.
 **Published npm package (check its version and shipped license):**
 
 ```sh
-dsh plugin --profile web add dsh-augmentor
+dsh plugin --profile web add dsh-augmentor@0.2.11
 ```
 
 **From git (no npm needed):**

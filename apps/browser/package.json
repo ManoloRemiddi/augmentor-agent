@@ -1,6 +1,6 @@
 {
   "name": "augmentor",
-  "version": "0.2.10",
+  "version": "0.2.11",
   "private": true,
   "license": "SEE LICENSE IN LICENSE",
   "description": "Augmentor root: native-messaging pipe (pipe.mjs) speaking to the running DSH app's /api surface. The plugin/ subdirectory is its own package (the dsh-augmentor bundle).",
