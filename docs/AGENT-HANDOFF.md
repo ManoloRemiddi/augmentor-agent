@@ -9,6 +9,10 @@ pins, Pi shrinkwrap/bundled-CLI exclusions, regression evidence and publication
 boundary. The build/test/start preparation step is required after installing
 with lifecycle scripts disabled. The [0.2.11 release record](RELEASE-0.2.11.md) tracks final qualification,
 publication and installed selection separately from the original source candidate.
+PR #5 is merged; 0.2.11 is live on GitHub and npm. Desktop and mobile are running
+the recorded user-local artifact, online with voice available. Chromium extension
+loading remains a separate user action; see the release record before claiming
+Browser activation.
 
 ## September 23 canonical repository and license
 

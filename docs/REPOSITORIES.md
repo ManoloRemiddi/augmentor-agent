@@ -30,13 +30,16 @@ Those provenance references still require owner access. They are not public setu
 
 ## Existing downloads
 
-The [0.2.10 complete preview](https://github.com/ManoloRemiddi/augmentor-agent-app/releases/tag/v0.2.10-complete-preview.1),
-older Fedora packages and Browser 0.1.32 assets remain at their original archived
-URLs. Their bytes, checksums and licenses are unchanged. The website and its copied
-installation prompt link the current guide here and the exact historical assets.
-Do not invent a corresponding tag in this repository or treat its current source
-as the exact source used to build an older artifact. Future reviewed releases are
-published here with their own source revision and artifact checksums.
+The current [0.2.11 security release](https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/v0.2.11-complete-preview.1)
+is published in this canonical repository. The website and copied installation
+prompt point here. See [release evidence and upgrade guidance](RELEASE-0.2.11.md).
+
+The archived 0.2.10 complete preview, older Fedora packages and Browser 0.1.32
+remain at their original URLs with unchanged bytes, checksums and licenses. They
+do not receive the new WebSocket fix automatically. Do not install the historical
+0.1.32 package or mix its companion with the current product. New artifacts have
+their own exact source revision and checksums; current source is not retroactively
+the source of an older download.
 
 ## Preserved contributions and reports
 

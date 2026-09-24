@@ -66,7 +66,7 @@ requires reviewing this temporary workaround and rerunning the tests.
 
 ## Validation
 
-The correction is prepared on `fix/ws-memory-exhaustion` from the base above.
+The initial correction was prepared on `fix/ws-memory-exhaustion` from the base above.
 Node is 24.19.0, npm 11.17.0, and pnpm 11.23.0. Local checks:
 
 - Locked installs for root, Browser, Browser tests, mobile, plugin and DSH;
@@ -92,7 +92,7 @@ The pull request records native test results and the exact CI-tested revision.
 No real model, microphone, installed desktop or user conversation was exercised
 by this security-specific validation.
 
-## Release boundary and remaining work
+## Release boundary and publication
 
 The initial source-only candidate retained product version `0.2.10`. The
 subsequently authorised release advances all matching product components to
