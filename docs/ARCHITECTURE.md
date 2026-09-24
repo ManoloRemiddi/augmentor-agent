@@ -42,6 +42,11 @@ The diagram shows logical ownership, not every transport call. Voice uses the
 existing authenticated DSH session and generation protocol. Desktop authority
 is not granted to a browser session by sharing a host or memory bank.
 
+The [Home development preview](HOME.md) adds a headless host of the same DSH
+session/tool lifecycle. Home Assistant owns device integrations through official
+Assist MCP; Home grants neither desktop tools nor personal memory. Its application
+code is in this repository and its deployment companion holds private home state.
+
 ## Source map
 
 | Owner | Source | Contract and detail |

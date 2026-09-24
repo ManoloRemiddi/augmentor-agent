@@ -1,0 +1,27 @@
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+**
+!package.json
+!package-lock.json
+!tsconfig.json
+!LICENSE
+!scripts/
+!scripts/prepare-ws.mjs
+!packages/
+!packages/**
+!services/
+!services/**
+!release/
+!release/product.json
+!adapters/
+!adapters/dsh-home/
+!adapters/dsh-home/**
+!adapters/dsh-execution/
+!adapters/dsh-execution/**
+!apps/
+!apps/home/
+!apps/home/*.mjs
+!apps/home/package*.json
+!apps/home/Dockerfile
+**/node_modules
+**/__pycache__
+**/*.pyc

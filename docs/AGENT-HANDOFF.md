@@ -2,6 +2,14 @@
 
 # Start here: agent handoff
 
+## September 24 Home runtime preview
+
+[Home](HOME.md) now has a headless DSH host in `apps/home` and a constrained
+Assist MCP policy in `adapters/dsh-home`. Canonical application code stays here;
+private household deployment and operational records belong in the Home companion.
+Read the guide for exact fixture/live evidence and limits before expanding device
+access. This preview does not change the installed Desktop or Browser release.
+
 ## September 24 WebSocket security release
 
 See [the ws security correction](WS-SECURITY-2026-09-24.md) for the `ws 8.21.3`
