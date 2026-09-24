@@ -4,6 +4,13 @@ import {SURFACE} from './surface-design.mjs'
 export function attachSurface({send,openSettings,onError,approval,state}){
   const $=id=>document.getElementById(id),input=$('input'),improve=$('improve'),menu=$('more-menu'),more=$('more')
   for(const [key,glyph] of Object.entries(SURFACE.glyphs)){const id=key==='latest'?'top':key;if($(id))$(id).textContent=glyph}
+  // These native glyphs depend on OS font fallback. Vectors preserve the same
+  // plus/target shapes on Chromium installations without that fallback font.
+  for(const [id,path] of [['newchat','M8 3v10M3 8h10'],['pin','M8 1v14M1 8h14M12 8a4 4 0 1 1-8 0 4 4 0 0 1 8 0']]){
+    const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg'),shape=document.createElementNS(ns,'path')
+    for(const [key,value] of Object.entries({width:'16',height:'16',viewBox:'0 0 16 16',fill:'none',stroke:'currentColor','stroke-width':'1.2','aria-hidden':'true'}))svg.setAttribute(key,value)
+    shape.setAttribute('d',path);svg.append(shape);$(id).replaceChildren(svg)
+  }
   let compact=false,improving=false,epoch=0,undo=null
   const announce=text=>{$('surface-status').textContent=text}
   const fail=error=>{announce(error.message);onError(error.message)}
