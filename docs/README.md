@@ -55,6 +55,7 @@ of this repository; include reproducible commands and sanitized evidence summari
 
 ## Setup, operations and distribution
 
+[0.2.12 desktop flare correction](RELEASE-0.2.12.md).
 [0.2.11 security release and upgrade guidance](RELEASE-0.2.11.md).
 
 - [WebSocket security correction and release boundary — 24 September 2026](WS-SECURITY-2026-09-24.md)

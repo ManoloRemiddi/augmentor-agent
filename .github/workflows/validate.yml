@@ -19,7 +19,7 @@ jobs:
       - name: Install declared build and test dependencies
         run: |
           apt-get update
-          apt-get install -y --no-install-recommends ca-certificates git python3 python3-pygments python3-yaml python3-numpy python3-websocket python3-gi gir1.2-atspi-2.0 gir1.2-gstreamer-1.0 gstreamer1.0-plugins-base python3-pyside6.qtcore python3-pyside6.qtgui python3-pyside6.qtwidgets python3-pyside6.qtnetwork python3-pyside6.qtdbus python3-pyside6.qttest libqt6svg6 qt6-svg-plugins fonts-dejavu-core chromium xvfb xauth xclip xdotool x11-utils kwin-x11 dbus-x11
+          apt-get install -y --no-install-recommends ca-certificates git python3 python3-pygments python3-yaml python3-numpy python3-websocket python3-gi gir1.2-atspi-2.0 gir1.2-gstreamer-1.0 gstreamer1.0-plugins-base python3-pyside6.qtcore python3-pyside6.qtgui python3-pyside6.qtwidgets python3-pyside6.qtnetwork python3-pyside6.qtdbus python3-pyside6.qttest libqt6svg6 qt6-svg-plugins fonts-dejavu-core chromium xvfb xauth xclip xdotool wmctrl x11-utils kwin-x11 dbus-x11
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
@@ -60,6 +60,10 @@ jobs:
       - name: Verify prompt editor against the real shared service
         run: python3 scripts/prompt-editor-proof.py
       - name: Verify real mouse events and external clipboard
+        run: bash scripts/native-x11-proof.sh
+      - name: Verify flare workspace ownership and two-process stacking
+        env:
+          AUGMENTOR_UI_PROOF: scripts/flare-workspace-proof.py
         run: bash scripts/native-x11-proof.sh
       - name: Verify first run through the actual Qt form and Pi
         env:

@@ -7,12 +7,12 @@ is scoped to KDE Plasma Wayland. macOS is the next compatibility phase; this
 Linux installer does not establish macOS or Fedora feature parity.
 
 The active project is [augmentor-agent](https://github.com/ManoloRemiddi/augmentor-agent).
-The current downloadable preview is the **0.2.11 security preview**:
-[download the archive](https://github.com/ManoloRemiddi/augmentor-agent/releases/download/v0.2.11-complete-preview.1/augmentor-0.2.11-complete-preview.1.tar.gz),
-[verify SHA256SUMS](https://github.com/ManoloRemiddi/augmentor-agent/releases/download/v0.2.11-complete-preview.1/SHA256SUMS),
-and read its [release record](https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/v0.2.11-complete-preview.1).
+The current downloadable preview is the **0.2.12 desktop flare preview**:
+[download the archive](https://github.com/ManoloRemiddi/augmentor-agent/releases/download/v0.2.12-complete-preview.1/augmentor-0.2.12-complete-preview.1.tar.gz),
+[verify SHA256SUMS](https://github.com/ManoloRemiddi/augmentor-agent/releases/download/v0.2.12-complete-preview.1/SHA256SUMS),
+and read its [release record](https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/v0.2.12-complete-preview.1).
 This release fixes the WebSocket receiver vulnerability. See the
-[security release and upgrade guidance](RELEASE-0.2.11.md).
+[flare correction and upgrade guidance](RELEASE-0.2.12.md).
 Extract the verified archive and open a terminal in its folder:
 
 ```sh
@@ -34,7 +34,7 @@ and Python packages. Do not run the whole script as root.
 
 ## Included and configured
 
-- Matching Augmentor Desktop and Chromium Browser 0.2.11 surfaces and companion.
+- Matching Augmentor Desktop and Chromium Browser 0.2.12 surfaces and companion.
 - Pinned DSH 0.1.5-rc.1, with its own fresh data directory and a managed user service.
 - Product, desktop-tools, browser-tools, prompt-library, dual-memory and execution-recovery adapters.
   Execution recovery is enabled once in both Augmentor presets; no separate plugin installation is needed.
