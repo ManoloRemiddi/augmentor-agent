@@ -11,7 +11,7 @@ async function fixture(t){
  const dir=mkdtempSync(join(tmpdir(),'home-auth-')),ledger=new Ledger(join(dir,'db'));
  const calls=[];let unblock;
  const runtime={async ask(...args){calls.push(args);if(args[2]==='hold')await new Promise(r=>unblock=r);return {status:'completed',reply:'ok'};},cancel(){unblock?.();},async close(){unblock?.();}};
- const app=httpService({token:'operator-secret-long-enough',model:'fixture'},ledger,runtime,{readiness:async()=>true});
+ const app=httpService({token:'operator-secret-long-enough',model:'fixture',modelUrl:'http://127.0.0.1:1/v1',mcpUrl:'http://127.0.0.1:1/api/mcp/assist',haToken:'fixture',deviceMode:'selected',stateDir:dir},ledger,runtime,{readiness:async()=>true});
  app.server.listen(0,'127.0.0.1');await once(app.server,'listening');const url=`http://127.0.0.1:${app.server.address().port}`;
  t.after(async()=>{runtime.cancel();await app.close();ledger.close();rmSync(dir,{recursive:true,force:true});});
  const request=async(path,{body,token,cookie,csrf,origin}={})=>{
@@ -63,4 +63,15 @@ test('direct actions enforce roles, persist results and avoid a second model cal
  assert.equal((await h.request('/device-actions',{token:member.body.token,body})).body.status,'completed');
  assert.equal((await h.request('/device-actions',{token:member.body.token,body})).body.replayed_response,true);
  assert.equal(writes,1);assert.equal(h.calls.length,0);assert.equal(h.ledger.pending().length,0);
+});
+
+test('only idle owner can change model; credential remains private across replacement',async t=>{
+ const h=await fixture(t),owner=await h.pair('owner'),member=await h.pair();
+ const body={model:'another-fixture',modelUrl:'http://127.0.0.1:1/v1',contextWindow:16384,key:'private-fixture-key'};
+ assert.equal((await h.request('/model/save',{token:member.body.token,body})).status,403);
+ await h.request('/ask',{token:member.body.token,body:{request_id:'held',session_id:'home',prompt:'hold',async:true}});
+ assert.equal((await h.request('/model/save',{token:owner.body.token,body})).status,409);
+ await h.request('/cancel',{token:member.body.token,body:{}});
+ const saved=await h.request('/model/save',{token:owner.body.token,body});assert.equal(saved.status,200);assert.equal(saved.body.model,'another-fixture');assert.ok(!JSON.stringify(saved.body).includes(body.key));
+ const visible=await h.request('/model',{token:owner.body.token});assert.equal(visible.body.model,'another-fixture');assert.ok(!JSON.stringify(visible.body).includes(body.key));
 });

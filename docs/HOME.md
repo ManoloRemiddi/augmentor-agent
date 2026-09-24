@@ -265,3 +265,26 @@ registry replacement, excluded targets, forged arguments, viewer denial and dire
 request deduplication. The shared DSH suite's 36 tests include real client delegation.
 Non-admin registry reads were verified against HA 2026.9.3 on the NAS. Selected-mode
 real service control and installed-client qualification remain separate gates.
+
+## Model configuration candidate
+
+The owner's NAS page now discovers OpenAI-compatible model IDs and saves the
+selected API base URL, model and context limit. Cloud, loopback and explicitly
+confirmed private-LAN endpoints use the same configuration contract. Credentials
+stay in a mode-0600 NAS state file and are never returned by the settings API.
+Changing endpoint requires an explicit credential choice so an old provider's key
+cannot silently travel to a new host. Empty credentials support local endpoints.
+Discovery lists provider inventory; it does not certify text/tool capabilities.
+
+Model changes require an idle service with no unknown actions. A replacement DSH
+context is constructed before selection, settings are atomically replaced, and
+subsequent requests use the new configuration. Startup reloads the saved choice.
+Automatic fallback remains disabled. This is an OpenAI-compatible setup flow;
+subscription portability, other provider protocols, usage budgets and integration
+with the full family provider picker still require qualification.
+
+The 24-test Home suite includes owner-only idle configuration, credential privacy,
+endpoint-change isolation and persisted selection. The earlier selected-device
+image `18cc707` passed real NAS helper off/on, duplicate-result retrieval and a
+DeepSeek read using `home_devices`; no physical equipment was controlled. Pending
+unknown actions were zero, and the helper was restored to on.

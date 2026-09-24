@@ -6,6 +6,7 @@ import {join} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {Ledger,Conflict} from './ledger.mjs';
 import {createRuntime} from './runtime.mjs';
+import {loadModelSettings,saveModelSettings,modelSettings,publicModelSettings,discoverModels} from './settings.mjs';
 import {Identity,digest,safeEqual} from './identity.mjs';
 
 const identity=x=>typeof x==='string'&&/^[a-zA-Z0-9_-]{1,100}$/.test(x);
@@ -23,6 +24,7 @@ export function readConfig(env=process.env) {
   if(!config.model)throw Error('MODEL_ID is required');
   if(!new URL(config.mcpUrl).pathname.endsWith('/api/mcp/assist'))throw Error('Use the restricted /api/mcp/assist endpoint');
   process.env.HOME_MODEL_KEY=secret('MODEL_API_KEY');
+  const saved=loadModelSettings(config);if(saved){const {key,...settings}=saved;Object.assign(config,settings);process.env.HOME_MODEL_KEY=key||'local-no-key';}
   return config;
 }
 
@@ -93,6 +95,25 @@ export function httpService(config,ledger,runtime,{readiness=async()=>{
         if(admitted||!runtime.devices){reply(409,{error:'Wait until Home is idle in selected-device mode'});return;}
         const body=await json(req);if(body.control===true&&body.effects_reviewed!==true)throw Error('Review what this device and its existing automations can do');
         admitted=true;try{await runtime.devices.select(body.entity_id,body.enabled,body.control);reply(200,{status:'saved'});}finally{admitted=false;}return;
+      }
+      if(req.method==='GET'&&req.url==='/model'){
+        if(client.role!=='owner'){reply(403,{error:'Owner access required'});return;}
+        reply(200,publicModelSettings(config));return;
+      }
+      if(req.method==='POST'&&['/model/discover','/model/save'].includes(req.url)){
+        if(client.role!=='owner'){reply(403,{error:'Owner access required'});return;}
+        if(admitted||ledger.pending().length){reply(409,{error:'Wait until Home is idle and uncertain actions have been reviewed'});return;}
+        const body=await json(req),previous={...config,key:process.env.HOME_MODEL_KEY??''},selected=modelSettings(body,previous);
+        admitted=true;
+        try{
+          if(req.url==='/model/discover'){reply(200,await discoverModels(selected));return;}
+          const {key,...settings}=selected,nextConfig={...config,...settings};let nextRuntime;
+          process.env.HOME_MODEL_KEY=key||'local-no-key';
+          try{nextRuntime=await createRuntime(nextConfig,ledger);saveModelSettings(config,selected);}
+          catch(error){await nextRuntime?.close();process.env.HOME_MODEL_KEY=previous.key;throw error;}
+          await runtime.close();runtime=nextRuntime;Object.assign(config,settings);reply(200,publicModelSettings(config));
+        }finally{admitted=false;}
+        return;
       }
       if(req.method==='GET'&&req.url==='/health'){reply(200,{status:draining?'draining':'ok',runtime:'dsh',model:config.model,busy:admitted,memory:'household session history; long-term memory disabled'});return;}
       if(req.method==='GET'&&req.url==='/ready'){

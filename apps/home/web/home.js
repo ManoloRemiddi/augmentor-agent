@@ -25,3 +25,8 @@ $('load-devices').onclick=async()=>{try{
   const save=button('Save access',async()=>{await api('/devices/select',{entity_id:device.entity_id,enabled:choice.value!=='off',control:choice.value==='control',effects_reviewed:choice.value==='control'});display('error','Device access saved.');});save.disabled=!device.selectable;row.append(save);$('devices').append(row);
  }
 }catch(error){notice(error);}};
+
+function modelInput(){const f=$('model-form').elements;return {model:f.model.value.trim(),modelUrl:f.modelUrl.value.trim(),contextWindow:Number(f.contextWindow.value),allowLanHttp:f.allowLanHttp.checked,...f.replaceKey.checked?{key:f.key.value}:{}};}
+$('load-model').onclick=async()=>{try{const m=await api('/model'),f=$('model-form').elements;f.model.value=m.model;f.modelUrl.value=m.modelUrl;f.contextWindow.value=m.contextWindow;$('model-form').hidden=false;display('model-result','Credential stays on the NAS. Automatic fallback is disabled.');}catch(error){notice(error);}};
+$('discover-models').onclick=async()=>{try{const m=await api('/model/discover',modelInput());$('models').replaceChildren();for(const id of m.models){const option=document.createElement('option');option.value=id;$('models').append(option);}display('model-result',m.models.length+' model IDs found. Choose an ID; '+m.qualification);}catch(error){notice(error);}};
+$('model-form').onsubmit=async e=>{e.preventDefault();try{await api('/model/save',modelInput());e.target.elements.key.value='';e.target.elements.replaceKey.checked=false;display('model-result','Saved. Use a read-only request to verify text and tool support.');await refresh();}catch(error){notice(error);}};
