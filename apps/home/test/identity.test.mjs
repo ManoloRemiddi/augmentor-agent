@@ -83,3 +83,10 @@ test('revoking the active client aborts its admitted request signal',async t=>{
  await h.request('/clients/revoke',{token:owner.body.token,body:{id:member.body.id}});
  assert.equal(signal.aborted,true);assert.equal((await h.request('/health',{token:member.body.token})).status,401);
 });
+
+test('unlinked device discovery is owner-only, never available to members or anonymous clients',async t=>{
+ const h=await fixture(t),owner=await h.pair('owner'),member=await h.pair('member');
+ assert.equal((await h.request('/devices/discovered')).status,401);
+ assert.equal((await h.request('/devices/discovered',{token:member.body.token})).status,403);
+ assert.deepEqual((await h.request('/devices/discovered',{token:owner.body.token})).body,{devices:[],scanned_at:null});
+});

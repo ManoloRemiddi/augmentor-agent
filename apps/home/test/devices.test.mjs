@@ -40,3 +40,10 @@ test('selected-device runtime dispatches through DSH policy and cannot use Assis
  assert.deepEqual(requests[0].tools.map(t=>t.function.name).sort(),['home_devices','home_set']);
  await runtime.ask('two','home','Try an Assist intent');assert.equal(h.writes.length,1);
 });
+
+test('inventory never offers controls for a replaced selected entity',async t=>{
+ const h=await fixture(t);await h.devices.select('light.fixture',true,true);
+ assert.equal((await h.devices.inventory())[0].control,true);
+ h.replace();const device=(await h.devices.inventory())[0];
+ assert.equal(device.selected,true);assert.equal(device.identity_changed,true);assert.equal(device.control,false);
+});

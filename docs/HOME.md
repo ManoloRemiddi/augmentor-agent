@@ -347,3 +347,25 @@ seven days of health/readiness evidence on the NAS; no model/device calls are ma
 and this is not yet completed M7 workload qualification.
 
 Runtime source `a6630b4` subsequently passed all jobs in [CI 35991631351](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/35991631351), including installed packages and packaged Browser checks. Later handoff documentation does not change that deployed source.
+
+## Direct device panel — 24 September 2026
+
+The NAS page now loads device cards immediately after pairing. Each controllable
+entity has On/Off buttons with its reported state; unavailable, unselected, replaced
+or read-only devices cannot dispatch from the card. Owners can enable reviewed
+controls; other readings are grouped separately. Controls use the existing scoped,
+durable `/device-actions` contract without an LLM. The pending request ID is saved
+before sending; reconnect/refresh retrieves that request and never resubmits it.
+Feedback reports integration state, not physical verification.
+
+An optional private `discovered-devices.json` in the state directory provides a
+bounded, owner-only inventory of devices needing setup. Its timestamp is shown
+explicitly as a discovery snapshot; it grants no authority and never provides a
+control target. The companion's `scripts/home-discover.py` reuses HA's installed
+python-kasa to populate this file. Devices already connected through HA are omitted
+from that snapshot. The page itself does not scan networks or require new packages.
+
+Validation: 29 Home tests, including replaced-identity controls, discovery field
+filtering/size limits and owner-only inventory. In-app browser fixture verified
+On/Off, disabled offline/setup devices and reload without duplicate dispatch: exactly
+two actions for one On and one Off. Deployment identity is recorded separately.

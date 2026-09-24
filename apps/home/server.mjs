@@ -7,6 +7,7 @@ import {pathToFileURL} from 'node:url';
 import {Ledger,Conflict} from './ledger.mjs';
 import {createRuntime} from './runtime.mjs';
 import {loadModelSettings,saveModelSettings,modelSettings,publicModelSettings,discoverModels} from './settings.mjs';
+import {readDiscovery} from './discovery.mjs';
 import {Identity,digest,safeEqual} from './identity.mjs';
 
 const identity=x=>typeof x==='string'&&/^[a-zA-Z0-9_-]{1,100}$/.test(x);
@@ -86,6 +87,7 @@ export function httpService(config,ledger,runtime,{readiness=async()=>{
         if(req.url==='/clients/invite')reply(200,identities.invite(body.role));
         else{if(typeof body.id!=='string')throw Error('Invalid client');identities.revoke(body.id);if(activeClient===body.id){directAbort?.abort();runtime.cancel();}reply(200,{status:'revoked'});}return;
       }
+      if(req.method==='GET'&&req.url==='/devices/discovered'){if(client.role!=='owner'){reply(403,{error:'Owner access required'});return;}reply(200,readDiscovery(config.stateDir));return;}
       if(req.method==='GET'&&['/devices','/devices/selected'].includes(req.url)){
         if(!runtime.devices){reply(409,{error:'Selected-device mode is not enabled'});return;}
         reply(200,client.role==='owner'&&req.url==='/devices'?{devices:await runtime.devices.inventory()}:await runtime.devices.list());return;

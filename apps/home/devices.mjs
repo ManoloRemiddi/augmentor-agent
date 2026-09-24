@@ -29,7 +29,7 @@ export class Devices {
   const [states,registry]=await Promise.all([this.rest('/api/states'),this.registry()]);
   if(!Array.isArray(states)||!Array.isArray(registry)||states.length>5000)throw Error('Unsupported Home inventory');
   const entries=new Map(registry.map(e=>[e.entity_id,e]));
-  return states.filter(s=>valid(s.entity_id)).map(s=>{const e=entries.get(s.entity_id),selected=this.db.prepare('SELECT control FROM home_devices WHERE entity=?').get(s.entity_id);return {...summary(s),selectable:!!e?.id,selected:!!selected,control:!!selected?.control,can_control:/^(light|switch|input_boolean)\./.test(s.entity_id)};});
+  return states.filter(s=>valid(s.entity_id)).map(s=>{const e=entries.get(s.entity_id),selected=this.db.prepare('SELECT control,fingerprint FROM home_devices WHERE entity=?').get(s.entity_id);return {...summary(s),selectable:!!e?.id&&!!e?.unique_id,selected:!!selected,identity_changed:!!selected&&(!e||fingerprint(e)!==selected.fingerprint),control:!!selected?.control&&!!e&&fingerprint(e)===selected.fingerprint,can_control:/^(light|switch|input_boolean)\./.test(s.entity_id)};});
  }
  async select(entity,enabled,control){
   if(!valid(entity)||typeof enabled!=='boolean'||typeof control!=='boolean')throw Error('Invalid device selection');
