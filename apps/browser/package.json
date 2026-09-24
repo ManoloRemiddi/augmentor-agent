@@ -7,6 +7,6 @@
   "type": "module",
   "dependencies": {
     "fflate": "0.8.3",
-    "ws": "8.21.0"
+    "ws": "8.21.3"
   }
 }

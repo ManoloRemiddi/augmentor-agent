@@ -29,11 +29,17 @@ jobs:
       - name: Build and verify SDK contracts
         run: |
           npm ci --ignore-scripts
+          npm ci --prefix apps/browser --ignore-scripts
+          npm ci --prefix apps/browser/test --ignore-scripts
+          npm ci --prefix apps/mobile --ignore-scripts
+          release/dsh/node_modules/.bin/pnpm --dir apps/browser/plugin install --frozen-lockfile --ignore-scripts
           python3 scripts/sync-version.py --check
           npm run check
           npm run build
           export DSH_INSTALL_ROOT="$PWD/release/dsh/node_modules/@deepseek-ai/dsh"
           npm test
+          node --test apps/browser/test/*.test.mjs
+          npm --prefix apps/mobile run build
       - name: Verify DSH setup, approvals, questions and exact branching
         env:
           AUGMENTOR_PROOF_APPROVALS: '1'
@@ -60,7 +66,9 @@ jobs:
           AUGMENTOR_UI_PROOF: scripts/first-run-proof.py
         run: bash scripts/native-x11-proof.sh
       - name: Inventory locked production dependencies
-        run: python3 scripts/stage-production.py --out outputs/production
+        run: |
+          python3 scripts/stage-production.py --out outputs/production
+          AUGMENTOR_WS_TEST_ROOT="$PWD/outputs/production" node --test tests/ws-security.test.mjs
       - name: Package extension and validate included notices
         run: python3 scripts/package-browser.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

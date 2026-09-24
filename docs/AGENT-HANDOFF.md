@@ -2,6 +2,14 @@
 
 # Start here: agent handoff
 
+## September 24 WebSocket security candidate
+
+See [the ws security correction](WS-SECURITY-2026-09-24.md) for the `ws 8.21.3`
+pins, Pi shrinkwrap/bundled-CLI exclusions, regression evidence and publication
+boundary. The build/test/start preparation step is required after installing
+with lifecycle scripts disabled. This source candidate does not update the
+published npm plugin, old downloads or installed desktop selections.
+
 ## September 23 canonical repository and license
 
 Current development is [ManoloRemiddi/augmentor-agent](https://github.com/ManoloRemiddi/augmentor-agent),

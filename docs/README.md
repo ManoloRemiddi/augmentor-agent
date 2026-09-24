@@ -55,6 +55,7 @@ of this repository; include reproducible commands and sanitized evidence summari
 
 ## Setup, operations and distribution
 
+- [WebSocket security correction and release boundary — 24 September 2026](WS-SECURITY-2026-09-24.md)
 - [Complete Linux 0.2.10 release and included plugins](LINUX-RELEASE-0.2.10.md)
 - [0.2.10 artifact identity and completed qualification](RELEASE-QUALIFICATION-0.2.10.md)
 
