@@ -42,13 +42,15 @@ export async function createRuntime(config,ledger) {
     return {
       ctx,devices,
       get busy(){return !!active;},
-      cancel(){if(active)handles.get(active.session)?.agent.cancel({kind:'user'});},
-      async ask(id,session,prompt,{readOnly=false}={}){
+      cancel(){if(active){active.cancelled=true;handles.get(active.session)?.agent.cancel({kind:'user'});}},
+      async ask(id,session,prompt,{readOnly=false,signal}={}){
         if(active)throw new Error('Home is busy');
-        const turn={id,session,readOnly,steps:0,tools:0,trace:[]};active=turn;
+        const turn={id,session,readOnly,cancelled:signal?.aborted===true,steps:0,tools:0,trace:[]};active=turn;
+        const abort=()=>this.cancel();signal?.addEventListener('abort',abort,{once:true});
         let timer;
         try {
           const h=await handle(session),before=h.agent.session.snapshotEvents().length;
+          if(turn.cancelled)return {request_id:id,session_id:session,status:'incomplete',reply:'Request cancelled before model dispatch.',tool_calls:[],model:config.model};
           timer=setTimeout(()=>{turn.incomplete='Request deadline exceeded';h.agent.cancel({kind:'user'});},config.requestTimeoutMs??90000);
           h.agent.followup(createUserMessage({content:[{type:'text',text:prompt}],source:{kind:'user'}}));
           await h.agent.whenIdle();
@@ -58,7 +60,7 @@ export async function createRuntime(config,ledger) {
           const reason=events.filter(e=>e.type==='turn/end').at(-1)?.data.reason?.kind;
           const incomplete=turn.incomplete||reason!=='completed'||!reply||ledger.pending().length>0;
           return {request_id:id,session_id:session,status:incomplete?'incomplete':'completed',reply:reply||'The request did not produce a complete answer.',tool_calls:turn.trace,model:config.model,...turn.incomplete?{reason:turn.incomplete}:{}};
-        } finally {clearTimeout(timer);policy.settle();active=null;}
+        } finally {signal?.removeEventListener('abort',abort);clearTimeout(timer);policy.settle();active=null;}
       },
       async close(){this.cancel();for(const h of handles.values()){await h.agent.whenIdle();await h.dispose();}await ctx.fiber.dispose();},
     };

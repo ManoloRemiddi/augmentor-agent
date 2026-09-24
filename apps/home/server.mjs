@@ -81,7 +81,7 @@ export function httpService(config,ledger,runtime,{readiness=async()=>{
       if(req.method==='GET'&&req.url==='/clients'){if(client.role!=='owner'){reply(403,{error:'Owner access required'});return;}reply(200,{clients:identities.list()});return;}
       if(req.method==='POST'&&['/clients/invite','/clients/revoke','/logout'].includes(req.url)){
         const body=await json(req);
-        if(req.url==='/logout'){identities.revoke(client.id);reply(200,{status:'disconnected'},{'Set-Cookie':'augmentor_home=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0'});return;}
+        if(req.url==='/logout'){identities.revoke(client.id);if(activeClient===client.id){directAbort?.abort();runtime.cancel();}reply(200,{status:'disconnected'},{'Set-Cookie':'augmentor_home=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0'});return;}
         if(client.role!=='owner'){reply(403,{error:'Owner access required'});return;}
         if(req.url==='/clients/invite')reply(200,identities.invite(body.role));
         else{if(typeof body.id!=='string')throw Error('Invalid client');identities.revoke(body.id);if(activeClient===body.id){directAbort?.abort();runtime.cancel();}reply(200,{status:'revoked'});}return;
@@ -154,7 +154,7 @@ export function httpService(config,ledger,runtime,{readiness=async()=>{
       }
       if(!identity(body.request_id)||!identity(body.session_id)||typeof body.prompt!=='string'||!body.prompt.trim()||body.prompt.length>4000){reply(400,{error:'Supply request_id, session_id and a non-empty prompt up to 4000 characters'});return;}
       if(draining||admitted){reply(409,{error:'Home is busy; do not submit a new ID to repeat an uncertain request'});return;}
-      admitted=true;activeClient=client.id;
+      admitted=true;activeClient=client.id;directAbort=new AbortController();
       try {
         let prompt=body.prompt;
         if(body.prompt_id!==undefined){
@@ -165,6 +165,7 @@ export function httpService(config,ledger,runtime,{readiness=async()=>{
           if(!selected)throw Error('Unknown saved prompt');
           prompt=selected.content+'\n\n'+prompt;
         }
+        if(directAbort.signal.aborted)throw Error('Request cancelled before admission');
         const requestId=scoped(client,body.request_id),sessionId=scoped(client,body.session_id);
         const cached=ledger.begin(requestId,sessionId,prompt,client.id);
         if(cached){reply(200,{...cached,replayed_response:true});return;}
@@ -173,12 +174,11 @@ export function httpService(config,ledger,runtime,{readiness=async()=>{
         let result;
         try{
           if(direct){
-            directAbort=new AbortController();
             await runtime.devices.validate(body.action,directAbort.signal);
             const actionId=ledger.reserve(requestId,'home_set',body.action);
             try{const outcome=await runtime.devices.execute(body.action,directAbort.signal);ledger.outcome(actionId,outcome.status);result={...outcome,reply:outcome.evidence,action_id:actionId};}
             catch{ledger.outcome(actionId,'unknown');result={status:'unknown',reply:'Device action outcome is unknown. Inspect it before another change.',action_id:actionId};}
-          }else result=await runtime.ask(requestId,sessionId,prompt,{readOnly:client.role==='viewer'||body.read_only===true});
+          }else result=await runtime.ask(requestId,sessionId,prompt,{readOnly:client.role==='viewer'||body.read_only===true,signal:directAbort.signal});
         }catch{result={request_id:body.request_id,session_id:body.session_id,status:'incomplete',reply:'Request interrupted. Inspect saved session and action outcomes before another action.'};}
         result={...result,request_id:body.request_id,session_id:body.session_id};
         ledger.finish(requestId,result);if(!asynchronous)reply(200,result);

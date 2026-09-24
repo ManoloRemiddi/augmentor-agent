@@ -99,3 +99,9 @@ test('unadvertised administrative tools and unsafe domains are denied before MCP
   await h.runtime.ask('readonly','viewer','Turn on test',{readOnly:true});
   assert.equal(h.writes(),0);assert.equal(h.ledger.pending().length,0);
  });
+
+ test('cancelling while the session is being created prevents the first model and device call',async t=>{
+  const h=await fixture(t,n=>n===1?tool(turnOn,args,'must-not-run'):answer('Done'));
+  const pending=h.runtime.ask('startup','home','Turn on test');h.runtime.cancel();
+  const result=await pending;assert.equal(result.status,'incomplete');assert.equal(h.requests.length,0);assert.equal(h.writes(),0);
+ });

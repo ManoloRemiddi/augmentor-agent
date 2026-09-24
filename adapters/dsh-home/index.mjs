@@ -34,7 +34,7 @@ export function installHomePolicy(ctx,ledger,current,{maxTools=12,maxSteps=10,de
   const reservations=new Map(),denied=new Set();
   ctx.on('agent/pre-step',async(exec,next)=>{
     const result=await next(),turn=current();
-    if(!turn)return {kind:'reject'};
+    if(!turn||turn.cancelled)return {kind:'reject'};
     if(++turn.steps>maxSteps){turn.incomplete='Step budget exhausted';return {kind:'reject'};}
     return result;
   },{prepend:true});
@@ -42,7 +42,7 @@ export function installHomePolicy(ctx,ledger,current,{maxTools=12,maxSteps=10,de
     const decision=await next(),turn=current();
     if(decision.kind!=='allow')return decision;
     try {
-      if(!turn||exec.signal.aborted)throw new Error('No active Home request.');
+      if(!turn||turn.cancelled||exec.signal.aborted)throw new Error('No active Home request.');
       if(++turn.tools>maxTools)throw new Error('Home tool budget exhausted.');
       let effect;
       if(devices){

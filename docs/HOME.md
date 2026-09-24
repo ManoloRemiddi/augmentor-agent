@@ -327,3 +327,10 @@ field. Desktop integration is coordinating with a simultaneous shared-surfaces
 release; follow its final deployment record rather than assuming selection equals
 running adoption. Guided hub authorization, broader provider access, physical
 qualification, routines, independent voice, retention and long soak remain open.
+
+
+A subsequent NAS-only cancellation correction latches cancellation during async
+session creation and threads revocation/Stop through admission and direct-device
+validation. Cancellation before the first model request produces no provider or
+device call. The 26-test Home suite covers that startup race and revocation of an
+active client. This does not change the separately coordinated Desktop artifact.

@@ -75,3 +75,11 @@ test('only idle owner can change model; credential remains private across replac
  const saved=await h.request('/model/save',{token:owner.body.token,body});assert.equal(saved.status,200);assert.equal(saved.body.model,'another-fixture');assert.ok(!JSON.stringify(saved.body).includes(body.key));
  const visible=await h.request('/model',{token:owner.body.token});assert.equal(visible.body.model,'another-fixture');assert.ok(!JSON.stringify(visible.body).includes(body.key));
 });
+
+test('revoking the active client aborts its admitted request signal',async t=>{
+ const h=await fixture(t),owner=await h.pair('owner'),member=await h.pair();
+ await h.request('/ask',{token:member.body.token,body:{request_id:'revoke',session_id:'home',prompt:'hold',async:true}});
+ const signal=h.calls[0][3].signal;assert.equal(signal.aborted,false);
+ await h.request('/clients/revoke',{token:owner.body.token,body:{id:member.body.id}});
+ assert.equal(signal.aborted,true);assert.equal((await h.request('/health',{token:member.body.token})).status,401);
+});
