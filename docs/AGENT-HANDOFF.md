@@ -4,6 +4,11 @@
 
 ## September 24 Home tray launcher
 
+The owner confirmed the installed launcher works and requested click-to-open,
+click-again-to-close. The KDE adapter now resolves the actual Chromium dashboard
+window on each click; explicit Open raises it. See the launcher guide for platform
+limits and the latest installed toggle evidence.
+
 [Home launcher](HOME-LAUNCHER.md) implements a lightweight Qt tray process for
 opening an existing NAS dashboard through the installed browser. It remembers
 only the dashboard address, requires no copied API key and starts no model/agent.

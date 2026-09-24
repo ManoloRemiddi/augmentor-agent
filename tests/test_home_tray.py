@@ -12,7 +12,7 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'apps/native'))
 os.environ.setdefault('QT_QPA_PLATFORM', 'offscreen')
-from PySide6.QtWidgets import QApplication, QLineEdit, QPushButton
+from PySide6.QtWidgets import QApplication, QLineEdit, QPushButton, QSystemTrayIcon
 from augmentor_linux import home_tray
 
 
@@ -77,6 +77,43 @@ class HomeTrayTests(unittest.TestCase):
             (release/'apps/native/augmentor_linux/home_tray.py').unlink()
             with self.assertRaisesRegex(RuntimeError, 'no Home launcher'):
                 launch.main([])
+
+    def test_click_closes_existing_window_and_manual_close_does_not_stale_state(self):
+        home_tray.save_url('http://nas.local:8123/home-lighting/lights')
+        opened = []
+        existing = [False]
+        def manage(url, action):
+            found = existing[0]
+            if action == 'toggle':
+                existing[0] = False
+            return found
+        def launch(url):
+            opened.append(url); existing[0] = True
+        tray = home_tray.HomeTray(self.app, launch, manage)
+        self.addCleanup(tray.tray.hide)
+        click = QSystemTrayIcon.ActivationReason.Trigger
+        tray.activated(click)
+        self.assertTrue(existing[0]); self.assertEqual(len(opened), 1)
+        tray.next_click = 0; tray.activated(click)
+        self.assertFalse(existing[0]); self.assertEqual(len(opened), 1)
+        tray.next_click = 0; tray.activated(click)
+        self.assertTrue(existing[0]); self.assertEqual(len(opened), 2)
+        tray.open_action.trigger()  # Explicit Open raises instead of closing.
+        self.assertTrue(existing[0]); self.assertEqual(len(opened), 2)
+        existing[0] = False  # User closed with the window's X button.
+        tray.next_click = 0; tray.activated(click)
+        self.assertTrue(existing[0]); self.assertEqual(len(opened), 3)
+
+    def test_window_lookup_failure_never_launches_duplicate(self):
+        home_tray.save_url('http://nas.local:8123/home-lighting/lights')
+        opened = []
+        def fail(*_):
+            raise RuntimeError('Window lookup failed')
+        tray = home_tray.HomeTray(self.app, opened.append, fail)
+        self.addCleanup(tray.tray.hide)
+        with patch.object(home_tray.QMessageBox, 'warning'), patch.object(tray, 'show_settings'):
+            tray.open_home(toggle=True)
+        self.assertEqual(opened, [])
 
 
 if __name__ == '__main__':

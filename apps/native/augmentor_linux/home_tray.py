@@ -8,6 +8,8 @@ from pathlib import Path
 import shutil
 import sys
 import tempfile
+import subprocess
+import time
 from urllib.parse import urlsplit
 
 from PySide6.QtCore import QLockFile, QProcess, QTimer, QUrl
@@ -66,16 +68,29 @@ def browser_command(url, finder=shutil.which):
     return None
 
 
+def manage_window(url, action):
+    if 'KDE' not in os.environ.get('XDG_CURRENT_DESKTOP', '').split(':'):
+        return False
+    helper = Path(__file__).resolve().parents[3]/'services/desktop/home_window.py'
+    result = subprocess.run(['/usr/bin/python3', str(helper), url, action],
+                            capture_output=True, text=True, timeout=8)
+    if result.returncode:
+        raise RuntimeError('Could not check the Home window. Please try again.')
+    return json.loads(result.stdout)['found'] > 0
+
+
 class HomeTray:
-    def __init__(self, app, opener=None):
+    def __init__(self, app, opener=None, window_manager=None):
         self.app = app
         self.opener = opener or self.launch_dashboard
+        self.window_manager = window_manager or (manage_window if opener is None else lambda *_: False)
+        self.next_click = 0
         self.dialog = None
         icon = QIcon.fromTheme('go-home')
         if icon.isNull():
             icon = app.style().standardIcon(QStyle.StandardPixmap.SP_DirHomeIcon)
         self.tray = QSystemTrayIcon(icon, app)
-        self.tray.setToolTip('Augmentor Home — open your home dashboard')
+        self.tray.setToolTip('Augmentor Home — click to open or close')
         self.menu = QMenu()
         self.open_action = QAction('Open Home', self.menu)
         self.open_action.triggered.connect(self.open_home)
@@ -93,7 +108,10 @@ class HomeTray:
 
     def activated(self, reason):
         if reason == QSystemTrayIcon.ActivationReason.Trigger:
-            self.open_home()
+            if time.monotonic() < self.next_click:
+                return
+            self.open_home(toggle=True)
+            self.next_click = time.monotonic()+0.5
 
     def launch_dashboard(self, url):
         command = browser_command(url)
@@ -104,12 +122,13 @@ class HomeTray:
         if not ok:
             raise RuntimeError('Could not open your browser. Check that a browser is installed.')
 
-    def open_home(self):
+    def open_home(self, checked=False, *, toggle=False):
         try:
             url = load_url()
             if not url:
                 self.show_settings(); return
-            self.opener(url)
+            if not self.window_manager(url, 'toggle' if toggle else 'open'):
+                self.opener(url)
         except Exception as error:
             QMessageBox.warning(self.dialog, 'Augmentor Home', str(error))
             self.show_settings()

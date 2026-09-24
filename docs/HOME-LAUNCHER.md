@@ -10,7 +10,9 @@ once; computers view the same dashboard.
 ## User experience
 
 - Start **Augmentor Home** from the desktop application menu.
-- Click the home tray icon, or its **Open Home** menu item, to open the dashboard.
+- On KDE, click the home tray icon to open the dashboard; click again to close
+  its app window. A fresh compositor lookup handles manual window closing too.
+- **Open Home** opens or raises the dashboard without toggling it closed.
 - **Connection settings…** remembers the dashboard address.
 - Startup at login launches the tray quietly; it does not open a window.
 - **Quit launcher** stops only the local tray process.
@@ -44,6 +46,15 @@ an explicit error. A per-user lock/socket forwards subsequent launches to the
 same tray instance. If the desktop has no system tray, a connection window is
 shown as a fallback.
 
+The KDE toggle uses the existing desktop KWin helper and system Python/GObject
+bindings, with a bounded compositor-authenticated reply. It matches Chromium's
+URL app identity instead of the page title; normal browser windows are excluded.
+Repeated explicit Open raises an existing app window. Lookup failure reports an
+error rather than opening a duplicate. A brief click cooldown absorbs duplicate
+activation events. Other desktops retain the original open-only behavior pending
+a supported window-control adapter. Chromium's app identity omits scheme/port;
+two app windows with the same host/path share this identity even across ports.
+
 Configuration: `$XDG_CONFIG_HOME/augmentor/home-launcher.json` (default
 `~/.config/augmentor/home-launcher.json`), atomically written mode 0600. Only a
 dashboard URL is stored. Embedded credentials, query strings and fragments are
@@ -52,8 +63,9 @@ not hard-coded public source defaults.
 
 ## Verification
 
-Four native tests cover URL validation/private persistence, browser dispatch,
-settings/open actions and selected-release resolution. A two-process check proves
+Six native tests cover URL validation/private persistence, browser dispatch,
+settings/open actions, fresh-state toggle/manual closing, lookup failure and
+selected-release resolution. A two-process check proves
 the second settings invocation hands off to the primary and exits. These are
 launcher tests, not physical device operations or cross-platform certification.
 
