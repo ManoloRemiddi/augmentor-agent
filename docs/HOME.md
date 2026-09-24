@@ -29,6 +29,28 @@ The onboarding target is: connect hub, review discovered devices, choose what
 Home can control, test one device. The guided Augmentor UI is not implemented
 in this preview; operators currently use HA's UI and the local API.
 
+## Confirmed product direction — pending implementation
+
+The main Home service belongs on the always-on NAS. Any connected Augmentor
+client should be able to request Home work in its existing conversation through
+a shared authenticated capability adapter, with results returned there. The NAS
+owns permissions, durable execution and recovery; clients do not bypass it with
+independent HA credentials or device loops. Cross-client integration is not yet
+implemented in this preview.
+
+Each household supplies its own devices, model endpoints, subscriptions and API
+access. Developer hardware and the tested DeepSeek configuration are examples,
+not required product defaults. Model weights need not run on the NAS; inference
+can use an explicitly configured cloud or other local endpoint.
+
+The base runtime must be small and CPU-only. Its optional setup/status/basic-chat
+web page renders on the viewing phone/computer and must require no NAS GPU,
+graphical desktop, Qt/Xvfb or server-side browser. Reuse existing Augmentor clients
+for the rich experience. Voice, video, local models and other heavy services are
+optional modules. Planned qualification measures CPU, memory, image/dependency
+size and client assets on limited-resource profiles and actual modest hardware;
+current NAS evidence does not establish a universal minimum specification.
+
 ## Authority and uncertainty
 
 Use `/api/mcp/assist` with a dedicated non-administrator HA user. Never mount
