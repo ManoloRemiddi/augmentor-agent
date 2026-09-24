@@ -6,7 +6,10 @@
 
 The [0.2.12 release record](RELEASE-0.2.12.md) tracks the managed transient
 activity canvas correction, workspace/stacking proof and public download status.
+PR #8 is merged and 0.2.12 is published. Website downloads select the new bundle.
 Home/shared-surface previews remain separate; this release is based on public main.
+The compatible local flare patch is selected in `20260924-140435-fa4c42f4`;
+open windows still need reopening. Preserve unsent drafts and active work.
 
 ## September 24 WebSocket security release
 
