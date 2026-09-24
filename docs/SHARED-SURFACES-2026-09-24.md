@@ -282,3 +282,11 @@ accounting for the CSS wheel traveling two letters per cycle. This replaces the
 previous 3.4–7.1 advances per second. The 700 ms settling interval remains the
 same as Desktop. The existing animation lifecycle tests cover cancellation and
 draft integrity; this timing-only adjustment needs no new behavioral test.
+
+Source `8b645d5` passed all 10 focused sidebar checks and module syntax validation.
+Selected local release: `20260924-150828-633564d3`, SHA-256
+`6f7d5ff0f9eaaeaf43fbeba18117c9099e0f69d0c069406657769db2ecc80847`. Activation passed inventory/dependency and
+authenticated product/model preflight. All 54 prepared extension files match the
+selected artifact, with unchanged identity/version. Reload Augmentor Agent in
+Chromium and reopen the sidebar to adopt the faster timing. Native windows and
+backend services were not restarted. This remains a compatible local preview.
