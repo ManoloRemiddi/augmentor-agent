@@ -258,3 +258,14 @@ backing up checksummed originals. Existing windows were not restarted and still
 run20260921-011742-0b89b31a. Fresh visible tasks load the new preset adapter; no
 claim is made about old instantiated agents reloading it. See
 [contract, evidence, limitations and rollback](BOUNDED-EXECUTION-RECOVERY.md#installed-selection-for-response-validity).
+
+
+## September 24 flare workspace and stacking correction
+
+[0.2.12 release and local selection](RELEASE-0.2.12.md#installed-local-preview)
+records the public fix and separately staged compatible Home/shared-surface
+preview. Selected release `20260924-140435-fa4c42f4` contains only the reviewed
+native canvas correction over the prior selected build. Running main/mobile and
+secondary windows remain on their earlier artifacts until reopened; active work
+and drafts were preserved. The staged candidate passed isolated two-process
+X11/KWin workspace and stacking checks plus authenticated activation preflight.

@@ -180,5 +180,11 @@ acceptance. An isolated actual-HTML/CSS preview is prepared at 340, 420 and 520 
 pixels. Visual browser access is pending the user's choice of an in-app preview
 or a connected Chromium session. This presentation candidate is not yet selected
 or copied into the user's prepared extension; the recorded `125950` deployment
-above remains the installed state. Do not label this visual correction accepted
+above is historical: the later compatible flare patch selected
+`20260924-140435-fa4c42f4` while preserving these shared features. The sidebar
+correction must be layered onto that latest selection. Do not label it accepted
 until screenshots and overflow/interaction checks are performed.
+
+The source branch incorporates public `main` at `1eb8136` (0.2.12 flare release).
+Local staging remains compatible with the installed 0.2.11 preview integration;
+public release version and local preview artifact identity are separate.

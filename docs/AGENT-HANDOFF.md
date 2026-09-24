@@ -17,7 +17,7 @@ The user requests one personal agent in the floating window and browser sidebar.
 voice engine, approval bridge and stopped-task status correction. Earlier
 browser-only tool-policy statements are superseded for DSH personal sessions.
 Read its deployment evidence before assuming a running extension has reloaded.
-Combined Home/shared source `d24e2ff` is selected locally and runs in the secondary
+Combined Home/shared source `d24e2ff` runs in the secondary
 window. Primary/mobile adoption and Chromium reload remain pending; preserve the
 primary draft. This is a compatible development artifact, not a public release.
 
@@ -35,6 +35,15 @@ New configuration defaults to owner-selected registered entities; the earlier
 Assist MCP mode remains an explicit compatibility preview. Read the guide for
 exact fixture/live evidence and limits before expanding device
 access. This preview does not change the installed Desktop or Browser release.
+
+## September 24 desktop flare ownership
+
+The [0.2.12 release record](RELEASE-0.2.12.md) tracks the managed transient
+activity canvas correction, workspace/stacking proof and public download status.
+PR #8 is merged and 0.2.12 is published. Website downloads select the new bundle.
+Home/shared-surface previews remain separate; this release is based on public main.
+The compatible local flare patch is selected in `20260924-140435-fa4c42f4`;
+open windows still need reopening. Preserve unsent drafts and active work.
 
 ## September 24 WebSocket security release
 
