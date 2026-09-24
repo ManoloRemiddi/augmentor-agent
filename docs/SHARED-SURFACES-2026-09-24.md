@@ -106,3 +106,42 @@ local update that removes the other. The NAS runtime remains separately deployed
 this merge does not restart or modify it. Existing per-preset model/compaction
 settings are preserved during the reviewed local migration. They are user
 configuration, not separate maintained agent implementations.
+
+### September 24 local adoption evidence
+
+Tested combined source: `d24e2ff` (includes `6b2fe74` and Home client `a983491`).
+TypeScript check/build, 182 Node tests, 26 Browser DOM tests, 425 native tests,
+and the real isolated DSH integration proof (16 synthetic model requests) pass.
+
+Selected local compatible 0.2.11 release: `20260924-125950-12694ac7`, SHA-256
+`615b8837791ac5cbea85cfb9eb89b5c982e9b0ddc03a71f60cd9d2c9a932133c`.
+The updater's full inventory verification passes after runtime checks. This
+artifact combines the tested source with the installed complete runtime; it is
+not a new public npm or GitHub binary release. PR #7 remains a source candidate.
+
+The reviewed local preset migration retained private backups, model selection,
+per-preset compaction configuration and custom skill directories. Both aliases
+now share the maintained persona, tools, response metrics and Home client. DSH
+was restarted only after tasks and speech were idle; its product handshake and
+seven model groups were available afterward. The original stopped conversation
+was reopened in the secondary window with its session identity/history intact,
+`online: true`, `modelReady: true`, `running: false`, and no restore error.
+
+The secondary window runs the combined artifact. Primary and mobile windows
+remain on the preceding Home artifact `20260924-125423-63307454`; a visible unsent
+primary draft was preserved. They adopt the selected build when safely reopened.
+Do not report them as already updated solely because the descriptor changed.
+
+The stable prepared 0.2.11 extension folder contains both Voice and Home controls,
+with its manifest identity unchanged. Actual Chromium reload and physical speech
+acceptance are still pending user confirmation. Existing explicit Pi selection
+is retained; choose DSH in Harnesses for shared personal-agent/voice functionality.
+
+A read-only live integration check used the installed Browser native-messaging
+host, selected DSH, read ten voice choices, acquired a speech lease for an idle
+personal Browser session and reached Ready through the shared native worker.
+Recording remained off; closing released the connection. No prompt was submitted
+or replayed. This verifies the installed transport and service readiness, not a
+microphone, speaker, echo or recognition-quality trial. The existing speech
+service 0.1.16 runs with the installed DSH speech plugin 0.1.14; the plugin itself
+was not upgraded during this change.

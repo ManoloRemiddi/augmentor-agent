@@ -9,6 +9,9 @@ The user requests one personal agent in the floating window and browser sidebar.
 voice engine, approval bridge and stopped-task status correction. Earlier
 browser-only tool-policy statements are superseded for DSH personal sessions.
 Read its deployment evidence before assuming a running extension has reloaded.
+Combined Home/shared source `d24e2ff` is selected locally and runs in the secondary
+window. Primary/mobile adoption and Chromium reload remain pending; preserve the
+primary draft. This is a compatible development artifact, not a public release.
 
 ## September 24 Home runtime preview
 
