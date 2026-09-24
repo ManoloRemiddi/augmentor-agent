@@ -136,6 +136,7 @@ try:
     def open_settings(section):
         global panel,settings_target
         panel=chat_panel
+        click('#more')
         click('#settings')
         def find_settings():
             return next((t for t in cdp('Target.getTargets')['targetInfos'] if '/settings.html' in t['url']),None)

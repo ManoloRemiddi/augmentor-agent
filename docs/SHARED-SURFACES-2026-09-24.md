@@ -145,3 +145,40 @@ or replayed. This verifies the installed transport and service readiness, not a
 microphone, speaker, echo or recognition-quality trial. The existing speech
 service 0.1.16 runs with the installed DSH speech plugin 0.1.14; the plugin itself
 was not upgraded during this change.
+
+## Sidebar presentation correction — source candidate
+
+The earlier shared-engine update did not match the floating window's interface.
+Its inline voice instructions compressed the composer and its header/footer
+retained a different layout. The September 24 correction uses the running native
+window as the visual reference: brand/title at left; New, Save, History, Follow,
+Compact, More and Hide at right; full-width composer with prompt improvement;
+model, connection dot, voice, latest and Send/Stop in the lower row. Persistent
+statistics, website promotion and voice-help text are removed from the chat dock.
+Voice guidance remains accessible through its tooltip and live region.
+
+`packages/design/surface.json` owns icon glyphs, order and dimensions, generated
+into native and Browser assets by `scripts/sync-design.py`. Browser's voice SVG
+uses the native button's contour and state markers. Its More menu and compact
+view preserve the draft. Follow means following browser tabs in the sidebar;
+unpinning hides it when leaving the anchored tab. This cannot make the parent
+browser window follow operating-system desktops.
+
+Browser appearance now reads/writes the primary native profile through the local
+companion, preserving per-window placement and model/speech settings. Native
+windows on this source poll shared appearance changes while their own appearance
+dialog is closed. Prompt improvement calls the same native adapter and saved
+improvement template, modifies only the draft, supports undo, and discards late
+responses after typing or cancellation. Session-scoped unsent drafts survive
+sidebar hiding; successful sends clear that saved draft.
+
+Qualification so far: TypeScript check/build; 182 Node, 31 Browser DOM/entrypoint
+and 427 native tests, plus 26 focused native checks after shared geometry wiring.
+The complete sidebar module boots with a fixture runtime and populates its model
+and voice controls. These are behavior/DOM checks, not visual or physical-browser
+acceptance. An isolated actual-HTML/CSS preview is prepared at 340, 420 and 520 CSS
+pixels. Visual browser access is pending the user's choice of an in-app preview
+or a connected Chromium session. This presentation candidate is not yet selected
+or copied into the user's prepared extension; the recorded `125950` deployment
+above remains the installed state. Do not label this visual correction accepted
+until screenshots and overflow/interaction checks are performed.

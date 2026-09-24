@@ -1,3 +1,4 @@
+import {surfaceState,pinSurface} from './surface-host.mjs'
 // Augmentor — dsh-augmentor plugin, pipe, and Chromium extension
 // Copyright © 2026 Manolo Remiddi
 // SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
@@ -47,6 +48,14 @@ export function handlePanelMessage(msg, sender, sendResponse) {
   // the sender is one of our own chrome-extension:// pages.
   if (!sender || sender.id !== chrome.runtime.id) return
   if (!sender.url || !sender.url.startsWith('chrome-extension://' + chrome.runtime.id)) return
+  if(msg?.type==='surface/state'||msg?.type==='surface/pin'){
+    (msg.type==='surface/pin'?pinSurface(msg.pinned):surfaceState()).then(sendResponse,error=>sendResponse({ok:false,error:error.message}));return true
+  }
+  if(msg?.type==='surface/appearance'||msg?.type==='prompt/improve'){
+    if(msg.type==='prompt/improve'&&(state.harness!=='dsh'||state.phase!=='ready'||state.running||state.panelViewSession)){sendResponse({ok:false,error:'Open an idle DSH conversation first.'});return}
+    request('augmentor/surface',msg.type==='surface/appearance'?{action:'appearance',settings:msg.settings}:{action:'improve',text:msg.text,selection:state.selection})
+      .then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}));return true
+  }
   if(msg?.type==='voice/preferences'){
     if(state.harness!=='dsh'){sendResponse({ok:false,error:'Voice uses the shared DSH harness.'});return}
     request('augmentor/voice/preferences',{action:msg.action??'get',settings:msg.settings})

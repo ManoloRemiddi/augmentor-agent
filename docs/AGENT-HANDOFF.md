@@ -2,6 +2,14 @@
 
 # Start here: agent handoff
 
+## September 24 sidebar presentation correction
+
+The user rejected the differing sidebar layout. The new source follows the native
+window header/composer/footer and shares icon/spacing definitions. See the latest
+[shared surfaces qualification](SHARED-SURFACES-2026-09-24.md#sidebar-presentation-correction--source-candidate).
+Browser visual acceptance is pending access; this correction is not installed yet.
+Do not overwrite a working window or claim a screenshot comparison has passed.
+
 ## September 24 shared personal agent and voice
 
 The user requests one personal agent in the floating window and browser sidebar.

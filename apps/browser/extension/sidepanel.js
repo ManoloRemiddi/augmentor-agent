@@ -23,7 +23,7 @@ const ui = createChatUI({
   log: document.getElementById('log'),
   title: document.getElementById('title'),
   model: document.getElementById('model-label'), // inner span: the chip is now a button
-  stats: document.getElementById('stats'),
+  dot: document.getElementById('connection-dot'),
   input: document.getElementById('input'),
   send: document.getElementById('send'),
   top: document.getElementById('top'),
@@ -46,20 +46,25 @@ function send(type, payload) {
 
 const voice=attachVoice({send,onError:message=>ui.sendFail(message),isHistory:()=>!!viewSessionId})
 attachPromptLibrary({input:document.getElementById('input'),send})
-import {watchAppearance} from './appearance.mjs'
+import {watchAppearance,refreshDesktopAppearance} from './appearance.mjs'
 watchAppearance()
+void refreshDesktopAppearance().catch(()=>{})
+const appearanceTimer=setInterval(()=>{void refreshDesktopAppearance().catch(()=>{})},15000)
+window.addEventListener('pagehide',()=>clearInterval(appearanceTimer),{once:true})
 const openSettings=async(section)=>{
   try { const r=await send('settings/open',{section});if(!r?.ok)throw Error(r?.error||'Could not open Settings') }
   catch(error){ui.sendFail(error.message)}
 }
-document.getElementById('settings').onclick=()=>openSettings()
+// The same More menu entry point as the floating window.
+import {attachSurface} from './surface.mjs'
+const surface=attachSurface({send,openSettings,onError:message=>ui.sendFail(message),approval:()=>openAccessMenu(),state:()=>ui.state})
 let refreshSerial=0
 const setupNotice=document.createElement('button');setupNotice.id='setup-notice';setupNotice.hidden=true
 setupNotice.textContent='Connect a model in Settings';setupNotice.onclick=()=>openSettings('models')
 document.querySelector('header').after(setupNotice)
 const editBar=document.createElement('div');editBar.hidden=true;editBar.className='edit-message-bar'
 const editLabel=document.createElement('span');editLabel.textContent='Editing latest message';const cancelEdit=document.createElement('button');cancelEdit.textContent='Cancel';cancelEdit.type='button';editBar.append(editLabel,cancelEdit)
-document.getElementById('input').before(editBar)
+document.getElementById('composer-field').before(editBar)
 cancelEdit.onclick=()=>{if(editingMessage)document.getElementById('input').value=editingMessage.draft;editingMessage=null;editBar.hidden=true}
 async function messageAction(action,seq,text){
   if(ui.state.running||editingMessage&&action!=='edit')return
@@ -414,6 +419,7 @@ async function refresh() {
     const res = await send('log', { sinceSeq: ui.lastSeq })
     if(!res||serial!==refreshSerial)return
     voice.update(res,!!viewSessionId)
+    surface.update(res)
     surfaceCapabilities=res.capabilities??surfaceCapabilities
     setupNotice.hidden=res.phase!=='needs-setup';setupNotice.textContent=res.harness==='dsh'?'Connect DSH in Settings':'Connect a model in Settings'
 
@@ -439,6 +445,7 @@ if (globalThis.chrome?.runtime?.onMessage) {
   chrome.runtime.onMessage.addListener((msg) => {
     if (msg?.type !== 'evt') return
     voice.update(msg,!!viewSessionId)
+    surface.update(msg)
     surfaceCapabilities=msg.capabilities??surfaceCapabilities
     if(msg.sessionId&&!viewSessionId)m3SessionId=msg.sessionId
     ui.setState({ phase: msg.phase, error: msg.error, running: msg.running })
@@ -604,6 +611,7 @@ const _setState = ui.setState
 ui.setState = (s) => {
   _setState(s)
   const running = ui.state.running
+  surface.update(ui.state)
   document.getElementById('send').hidden = running
   document.getElementById('stop').hidden = !running
   modelBtn.disabled = running
@@ -635,6 +643,7 @@ function updateSaveBadge(res) {
   // Icon-only button: state rides the .saved class (the star FILLS in the
   // accent) — never textContent, which would destroy the SVG child.
   saveBtn.classList.toggle('saved', saved)
+  saveBtn.textContent=saved?'★':'☆'
   saveBtn.title = saved ? 'Unsave chat' : 'Save chat'
 }
 saveBtn.addEventListener('click', async () => {
@@ -864,7 +873,7 @@ async function doSend() {
   }
   const res = await send('prompt', { text })
   if(!res?.accepted){ui.sendFail(res?.error??'Message was not accepted. Your draft is preserved.');return}
-  input.value=editingMessage?.draft??'';editingMessage=null;editBar.hidden=true
+  input.value=editingMessage?.draft??'';input.dispatchEvent(new Event('input'));editingMessage=null;editBar.hidden=true
   refresh()
 }
 

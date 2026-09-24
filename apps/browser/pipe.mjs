@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import {surfaceRequest} from './shared/surface.mjs'
 
 // Augmentor — dsh-augmentor plugin, pipe, and Chromium extension
 // Copyright © 2026 Manolo Remiddi
@@ -537,6 +538,7 @@ const voice=new BrowserVoice({
   notify:sendToExt,
 })
 const localMethods = {
+  'augmentor/surface':params=>surfaceRequest(params),
   'augmentor/voice/preferences':async params=>{if(params.action==='save')voice.close();return voicePreferences(params)},
   'augmentor/voice/start':async params=>{await interactions.claim(params.sessionId);return voice.start(params)},
   'augmentor/interaction':params=>interactions.answer(params.id,params.value),

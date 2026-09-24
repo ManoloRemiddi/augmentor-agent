@@ -1,3 +1,4 @@
+import {surfaceRequest} from './shared/surface.mjs'
 // Augmentor — dsh-augmentor plugin, pipe, and Chromium extension
 // Copyright © 2026 Manolo Remiddi
 // SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
@@ -28,6 +29,7 @@ async function request(method,p={},id){
   if(method==='augmentor/dsh')return dshSetup(p)
   if(method==='augmentor/diagnostics')return supportReport()
   if(method==='augmentor/onboarding')return startOnboarding(p)
+  if(method==='augmentor/surface'){if(p.action!=='appearance')throw Error('Prompt improvement requires DSH');return surfaceRequest(p)}
   if(method==='augmentor/home')return homeConnection(p)
   if(method==='augmentor/memory')return memoryRequest(p)
   if(method==='augmentor/prompts')return promptLibrary(p)

@@ -1,12 +1,14 @@
+import {attachVoiceIcon} from './voice-icon.mjs'
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // The sidebar presents the native VoiceSession; it has no separate ASR/audio loop.
 export function attachVoice({send,onError,isHistory}){
-  const button=document.createElement('button'),icon=document.createElement('img'),status=document.createElement('span')
-  icon.src=chrome.runtime.getURL('voice-orb.svg');icon.alt='';icon.width=28;icon.height=28
+  const button=document.createElement('button'),icon=document.createElement('span'),status=document.createElement('span')
+  icon.className='voice-shape';icon.setAttribute('aria-hidden','true')
   button.type='button';button.className='voice-orb';button.append(icon)
   button.setAttribute('aria-label','Voice: hold to talk, slide left to lock, slide right for hands-free')
-  status.className='voice-status';status.setAttribute('role','status');status.setAttribute('aria-live','polite')
-  document.getElementById('send').before(button,status)
+  status.className='voice-status sr-only';status.setAttribute('role','status');status.setAttribute('aria-live','polite')
+  const seat=document.getElementById('voice-seat');if(seat)seat.append(button,status);else document.getElementById('send').before(button,status)
+  const drawing=typeof MutationObserver==='function'?attachVoiceIcon(button):null
   let lease=null,opening=null,epoch=0,held=false,locked=false,handsFree=false,timer=null,startX=0,heartbeat=null,voiceState='closed'
   let maxSeconds=600,elapsed=0,defaultHandsFree=false,voiceEnabled=true,nextPreferences=0
   const label=text=>{status.textContent=text;button.title=text;button.setAttribute('aria-description',text)}
@@ -90,6 +92,7 @@ export function attachVoice({send,onError,isHistory}){
       label(locked&&event.recording?'Recording locked · Tap to send':event.status)
     }else if(event.type==='progress'){
       elapsed=event.elapsed;maxSeconds=event.maximum
+      drawing?.levels(event.levels)
       button.style.setProperty('--voice-level',String(Math.max(0,...event.levels)))
       button.dataset.limit=elapsed>=maxSeconds*.9?'red':elapsed>=maxSeconds*.8?'orange':''
       if(event.elapsed>0)status.textContent=`${locked?'Recording locked':handsFree?'Listening':'Release to send'} · ${Math.floor(elapsed/60)}:${String(Math.floor(elapsed%60)).padStart(2,'0')}`

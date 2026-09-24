@@ -1,3 +1,4 @@
+import {refreshDesktopAppearance} from './appearance.mjs'
 // Augmentor — dsh-augmentor plugin, pipe, and Chromium extension
 // Copyright © 2026 Manolo Remiddi
 // SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
@@ -38,7 +39,8 @@ for(const [id,label,description,path] of definitions){
   sections.set(id,{section,body,link,mounted:false})
 }
 document.querySelector('#version').textContent='Version '+chrome.runtime.getManifest().version
-function appearance(container){
+async function appearance(container){
+  await refreshDesktopAppearance()
   const theme=make('div');theme.className='card';theme.append(make('h2','Theme'));const choices=make('div');choices.className='theme-choices';theme.append(choices)
   const themeButtons={};for(const id of ['dark','light'])themeButtons[id]=button(choices,id==='dark'?'Dark':'Light',async()=>{await saveAppearance({...readAppearance(),theme:id});sync()})
   const colours=make('div');colours.className='card';colours.append(make('h2','Colours'));const grid=make('div');grid.className='colour-grid';colours.append(grid)
@@ -57,7 +59,7 @@ function appearance(container){
   }
   const preview=make('div');preview.className='card';preview.append(make('h2','Preview'));const sample=make('div');sample.className='preview'
   const user=make('p','Help me make this clearer.');user.className='sample-user';const reply=make('div');reply.className='sample-agent';reply.append(make('strong','Augmentor'),make('p','A little less clutter. More room for your ideas.'));sample.append(user,reply);preview.append(sample)
-  const note=make('p','The accent also colours the overlay while Augmentor uses the browser.');note.className='help';colours.append(note)
+  const note=make('p','Shared with the floating window. The accent also colours browser actions.');note.className='help';colours.append(note)
   container.append(theme,colours,format,preview);button(container,'Reset colours',async()=>{await saveAppearance(resetAppearance());sync()})
   function sync(){const values=readAppearance();for(const [key,input] of formatControls)input.value=values.formatColours[key]||formattingDefaults(values.theme)[key];for(const [key,{input,out}] of controls){input.value=values[key];out.value=String(values[key])}for(const [id,b] of Object.entries(themeButtons))b.setAttribute('aria-pressed',String(values.theme===id))}
   watchAppearance(sync)
@@ -124,7 +126,7 @@ function mount(id){
     return
   }
   row.body.replaceChildren();row.mounted=true
-  if(id==='appearance')appearance(row.body)
+  if(id==='appearance')void appearance(row.body).catch(fail)
   if(id==='models')showModels(row.body)
   if(id==='harnesses')showHarnesses(row.body)
   if(id==='prompts')promptEditor(document,async request=>{const r=await send('prompts',{request});if(!r?.ok)throw Error(r?.error||'Prompt library unavailable');return r.library},()=>{},row.body)
