@@ -2,6 +2,16 @@
 
 # Consistent installed desktop releases
 
+## September 24: optional Home dashboard tray
+
+[Home launcher evidence](HOME-LAUNCHER.md#installed-linux-evidence--24-september-2026)
+records selected release `20260924-202032-d5e07a94`, based on the previously
+selected sidebar-speed artifact with implementation `76cb697` added. Stage and
+activation passed; the installed Home tray runs this release and opened the
+existing NAS dashboard. Main/mobile and secondary still run their earlier
+artifacts, online with voice available. No conversation windows were restarted.
+Keep Home launcher support when constructing subsequent mixed desktop artifacts.
+
 ## September 22: hide the routine opening reasoning notice
 
 Source `ee5d8f1` adds an exact native transcript filter for the successful

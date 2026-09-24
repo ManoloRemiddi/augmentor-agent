@@ -8,8 +8,11 @@
 opening an existing NAS dashboard through the installed browser. It remembers
 only the dashboard address, requires no copied API key and starts no model/agent.
 A stable entrypoint follows desktop.json; install after managed artifact promotion.
-Native tests and a two-process singleton check pass. See desktop deployment records
-for selected/running evidence; source alone is not an installed launcher.
+Native tests and a two-process singleton check pass. Managed release
+`20260924-202032-d5e07a94` is selected; its Home tray is installed and running,
+with live KDE registration and dashboard app-window evidence. Main/mobile and
+secondary retain their earlier running builds; their drafts/work were preserved.
+See [installation evidence](HOME-LAUNCHER.md#installed-linux-evidence--24-september-2026).
 
 ## September 24 Home runtime preview
 

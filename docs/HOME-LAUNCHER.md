@@ -56,3 +56,26 @@ Four native tests cover URL validation/private persistence, browser dispatch,
 settings/open actions and selected-release resolution. A two-process check proves
 the second settings invocation hands off to the primary and exits. These are
 launcher tests, not physical device operations or cross-platform certification.
+
+### Installed Linux evidence — 24 September 2026
+
+Implementation `76cb697` was applied to a separate copy of the selected compatible
+0.2.11 desktop artifact, preserving its other native/runtime patches. Managed
+stage/import/inventory and authenticated activation preflight passed. Selected
+release: `20260924-202032-d5e07a94`; artifact SHA-256:
+`6540847733b8c49e9d7aa60b74cdc024639447993b0edd9f6018fc2a1fac5928`.
+
+The stable menu and login entries were installed. On KDE/Wayland the running
+tray registered as **Augmentor Home**, with StatusNotifier status `Active`.
+The installed command opened a normal Chromium app window; KWin independently
+reported its Home Assistant title and the configured dashboard path in its app
+identity. Repeating the background command left one tray process. One idle sample
+measured about 49 MiB proportional memory for the launcher, excluding the browser;
+this is not a cross-hardware resource qualification. Login registration is checked,
+but a physical logout/reboot has not been tested.
+
+The tray runs the selected release. Main/mobile retain `20260924-125423-63307454`,
+and secondary retains `20260924-125950-12694ac7`; all reported online with voice
+available. They were not restarted. This deployment did not change NAS services,
+device state, agent authorization or browser credentials. The owner may need the
+normal Home Assistant login on first use in the external browser.
