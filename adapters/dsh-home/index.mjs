@@ -13,6 +13,21 @@ export function authority(name,args) {
   return 'change';
 }
 
+// HA can report partial intent failures inside a successful MCP envelope.
+// Accept only the observed HA intent acknowledgement contract, not arbitrary
+// model-visible prose or MCP transport success. Unknown schemas fail closed.
+const intentOutcome={augmentorExecution:{outcome(_args,value){
+  let response=value?.structuredContent;
+  if(!response){
+    const blocks=value?.content;
+    if(!Array.isArray(blocks)||blocks.length!==1||blocks[0].type!=='text')return {status:'unknown'};
+    response=JSON.parse(blocks[0].text);
+  }
+  return {status:response?.response_type==='action_done'&&
+    Array.isArray(response.data?.success)&&response.data.success.length>0&&
+    Array.isArray(response.data?.failed)&&response.data.failed.length===0?'completed':'unknown'};
+}}};
+
 // This is policy around the existing DSH and upstream MCP bridge, not an agent
 // loop or a device driver. HA Assist owns entity exposure and intent execution.
 export function installHomePolicy(ctx,ledger,current,{maxTools=12,maxSteps=10}={}) {
@@ -46,7 +61,7 @@ export function installHomePolicy(ctx,ledger,current,{maxTools=12,maxSteps=10}={
     const reservation=reservations.get(exec.token),turn=reservation?.turn??current();
     if(!turn)return;
     const effect=exec.name===READ_TOOL?'read':'change';
-    const outcome=actionOutcome(exec,result,undefined,effect);
+    const outcome=actionOutcome(exec,result,effect==='change'?intentOutcome:undefined,effect);
     if(reservation){ledger.outcome(reservation.id,outcome.status);reservations.delete(exec.token);}
     turn.trace.push({tool:exec.name,status:outcome.status,...reservation?{action_id:reservation.id}:{}});
   });

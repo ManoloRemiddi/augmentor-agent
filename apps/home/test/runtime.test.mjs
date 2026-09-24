@@ -17,7 +17,7 @@ const turnOn='mcp__homeassistant__intent__HassTurnOn';
 const args={name:'Test Lamp',domain:['input_boolean']};
 const tool=(name,arguments_,id)=>({role:'assistant',tool_calls:[{index:0,id,type:'function',function:{name,arguments:JSON.stringify(arguments_)}}]});
 const answer=text=>({role:'assistant',content:text});
-async function fixture(t,replies,{failWrite=false,writeDelayMs=0,requestTimeoutMs=10000}={}) {
+async function fixture(t,replies,{failWrite=false,writeResult,writeDelayMs=0,requestTimeoutMs=10000}={}) {
   const stateDir=mkdtempSync(join(tmpdir(),'home-runtime-')),ledger=new Ledger(join(stateDir,'actions.sqlite3'));
   let writes=0,requests=[];const peers=new Set();
   const mcp=createServer(async(req,res)=>{
@@ -25,7 +25,7 @@ async function fixture(t,replies,{failWrite=false,writeDelayMs=0,requestTimeoutM
     server.setRequestHandler(ListToolsRequestSchema,async()=>({tools:['homeassistant__GetLiveContext','intent__HassTurnOn','intent__HassTurnOff','intent__HassLightSet','intent__HassUnlock'].map(name=>({name,description:name,inputSchema:{type:'object',properties:{name:{type:'string'},domain:{type:'array',items:{type:'string'}}}}}))}));
     server.setRequestHandler(CallToolRequestSchema,async r=>{
       if(r.params.name!=='homeassistant__GetLiveContext'){writes++;if(writeDelayMs)await new Promise(r=>setTimeout(r,writeDelayMs));if(failWrite)return {isError:true,content:[{type:'text',text:'Connection lost after dispatch'}]};}
-      return {content:[{type:'text',text:JSON.stringify({success:true,result:writes?'Test Lamp on':'Test Lamp off'})}]};
+      return {content:[{type:'text',text:JSON.stringify(r.params.name==='homeassistant__GetLiveContext'?{success:true,result:writes?'Test Lamp on':'Test Lamp off'}:writeResult??{response_type:'action_done',data:{success:[{name:'Test Lamp',type:'entity',id:'input_boolean.test_lamp'}],failed:[]}})}]};
     });
     const transport=new StreamableHTTPServerTransport({sessionIdGenerator:undefined});peers.add(server);
     res.on('close',()=>{void server.close();peers.delete(server);});
@@ -84,3 +84,12 @@ test('unadvertised administrative tools and unsafe domains are denied before MCP
   const result=await h.runtime.ask('failure','home','Read test lamp');
   assert.equal(result.status,'incomplete');assert.equal(h.writes(),0);
 });
+
+ test('partial HA intent failure inside successful MCP envelope blocks further changes',async t=>{
+  const h=await fixture(t,n=>n===1?tool(turnOn,args,'partial'):n===2?tool(turnOn,{name:'Another Lamp',domain:['light']},'different'):answer('Partial failure; inspect state.'),{
+    writeResult:{response_type:'action_done',data:{success:[{id:'light.one'}],failed:[{id:'light.two'}]}}
+  });
+  const result=await h.runtime.ask('partial','home','Turn on lights');
+  assert.equal(result.status,'incomplete');assert.equal(h.writes(),1);
+  assert.equal(h.ledger.pending()[0].status,'unknown');
+ });

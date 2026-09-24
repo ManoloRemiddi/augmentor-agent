@@ -125,10 +125,11 @@ runs through DSH; subscription access is not assumed to be a transferable API ke
 
 24 September 2026 development qualification:
 
-- Eleven tests exercise the actual DSH+MCP bridge with deterministic model/MCP
+- Twelve tests exercise the actual DSH+MCP bridge with deterministic model/MCP
   fixtures and the HTTP/SQLite contracts: resume, authority denial, unknown writes,
   deadlines, incomplete provider output, auth, validation, deduplication,
-  concurrency, crash recovery and disconnected-client completion.
+  concurrency, crash recovery, disconnected-client completion and partial HA
+  intent errors inside successful MCP envelopes.
 - Root TypeScript check and seven shared action-outcome regressions pass.
 - The isolated image builds on a Linux amd64 NAS. Packaged shared prompt-library
   startup is exercised separately; CI builds and checks that path too.
