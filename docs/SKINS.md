@@ -37,6 +37,16 @@ larger wings. They wander near the perimeter, scatter in the mouse wake, then dr
 back. Disabling animation leaves a static busy indicator. Disabling activity effects
 hides the indicator; the background remains. Futuristic retains plasma and flares.
 
+The exterior activity effect belongs to its agent window: with **Follow all
+workspaces** disabled it stays on that workspace, and raising another agent
+covers the lower agent’s effect. It remains transparent to pointer input.
+The canvas is a managed Qt tool window, transient to its owner, without a global
+keep-above or window-manager-bypass flag. See [Qt window flags](https://doc.qt.io/qt-6/qt.html#WindowType-enum).
+Regression coverage: `scripts/flare-workspace-proof.py` exercises two native
+processes on isolated X11/KWin, including pin/unpin, stacking in both directions,
+edge placement, effect reappearance, minimize/restore and compact transitions.
+This is Linux X11/KWin evidence; macOS and native Wayland remain unqualified.
+
 **Reset** restores Futuristic, retaining the saved library and runtime settings.
 
 ## Sharing contract

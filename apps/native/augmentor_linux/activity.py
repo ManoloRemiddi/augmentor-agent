@@ -357,10 +357,11 @@ class FlowNoise:
 class HaloCanvas(QWidget):
     """A transient, input-transparent effect surface outside the app geometry."""
     def __init__(self, activity):
+        # Keep the exterior surface managed and transient to its own agent.
+        # Bypassing the WM makes it visible on other workspaces and above
+        # unrelated windows; an independent keep-above hint breaks stacking.
         super().__init__(activity.window, Qt.WindowType.Tool |
                          Qt.WindowType.FramelessWindowHint |
-                         Qt.WindowType.X11BypassWindowManagerHint |
-                         Qt.WindowType.WindowStaysOnTopHint |
                          Qt.WindowType.WindowTransparentForInput |
                          Qt.WindowType.WindowDoesNotAcceptFocus)
         self.activity=activity

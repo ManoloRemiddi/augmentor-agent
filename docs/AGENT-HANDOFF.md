@@ -2,6 +2,12 @@
 
 # Start here: agent handoff
 
+## September 24 desktop flare ownership
+
+The [0.2.12 release record](RELEASE-0.2.12.md) tracks the managed transient
+activity canvas correction, workspace/stacking proof and public download status.
+Home/shared-surface previews remain separate; this release is based on public main.
+
 ## September 24 WebSocket security release
 
 See [the ws security correction](WS-SECURITY-2026-09-24.md) for the `ws 8.21.3`

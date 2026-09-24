@@ -164,7 +164,9 @@ class MarkdownTests(unittest.TestCase):
             w.move(point);self.app.processEvents();w.activity.tick();self.app.processEvents()
             extra=w.activity.extent-w.activity.margin
             self.assertEqual(w.activity.canvas.geometry(),QRect(w.mapToGlobal(QPoint(0,0)),w.size()).adjusted(-extra,-extra,extra,extra))
-        self.assertTrue(w.activity.canvas.windowFlags() & Qt.WindowType.X11BypassWindowManagerHint)
+        self.assertFalse(w.activity.canvas.windowFlags() & Qt.WindowType.X11BypassWindowManagerHint)
+        self.assertFalse(w.activity.canvas.windowFlags() & Qt.WindowType.WindowStaysOnTopHint)
+        self.assertEqual(w.activity.canvas.windowHandle().transientParent(), w.windowHandle())
         w.close()
 
 
