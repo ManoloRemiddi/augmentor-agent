@@ -29,6 +29,7 @@ def personal_agent_entries():
     return [
         {'id':'persona','name':'@deepseek-ai/dsh-persona','config':{'prefix':persona,'complete':True,'includeRuntimeContext':False}},
         {'id':'augmentor-memory','name':str(ROOT/'adapters/dsh-memory/index.mjs')},
+        {'id':'augmentor-home-client','name':str(ROOT/'adapters/dsh-home-client/index.mjs')},
         {'id':'augmentor-execution','name':str(ROOT/'adapters/dsh-execution/index.mjs')},
         {'id':'augmentor-response-metrics','name':str(ROOT/'adapters/dsh-response-metrics/index.mjs')},
         {'id':'command-goal','name':'@deepseek-ai/dsh-command-goal'},

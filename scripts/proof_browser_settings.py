@@ -11,7 +11,7 @@ def prove(root,temp,cdp,evaluate,click,fill,until,send,open_settings,back_to_cha
     fill('#input','Keep my unfinished chat draft')
     before=send('log')['sessionId']
     panel=open_settings('appearance')
-    assert evaluate('document.querySelectorAll("nav a").length',panel)==7
+    assert evaluate('document.querySelectorAll("nav a").length',panel)==8
     assert evaluate('document.querySelectorAll("header button").length',chat)==4
     assert not evaluate('!!document.querySelector("#harness-picker")',chat)
     assert 'linear-gradient' in evaluate('getComputedStyle(document.querySelector("#accentHue")).backgroundImage',panel)

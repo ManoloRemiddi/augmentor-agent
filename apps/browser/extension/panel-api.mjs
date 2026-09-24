@@ -127,6 +127,7 @@ export function handlePanelMessage(msg, sender, sendResponse) {
     request('augmentor/dsh',msg.request??{}).then(result=>{sendResponse({ok:true,result});if(result.reconnect)setTimeout(()=>resetHarnessPort(),100)}).catch(error=>sendResponse({ok:false,error:error.message}));return true
   }
   if(msg?.type==='diagnostics'){ensurePort();request('augmentor/diagnostics',{}).then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}));return true}
+  if(msg?.type==='homeConnection'){ensurePort();request('augmentor/home',msg.request??{action:'state'}).then(sendResponse).catch(error=>sendResponse({ok:false,error:error.message}));return true}
   if(msg?.type==='memory'){
     ensurePort()
     request('augmentor/memory',msg.request??{action:'describe'}).then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}));return true

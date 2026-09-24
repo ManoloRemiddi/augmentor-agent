@@ -96,3 +96,13 @@ closed normally. This readiness check did not record speech or exercise acoustic
 quality. The stopped local voice service was started with its existing GPU/CPU
 configuration and enabled for login. Physical microphone/echo and reloaded
 Chromium acceptance remain separate from these checks.
+
+## Combined Home client integration
+
+The Home client source `a983491` is integrated with the shared-surfaces change
+`6b2fe74`. Both personal aliases include the paired Home capability and both
+Voice and Home settings are available in Browser. This avoids selecting one
+local update that removes the other. The NAS runtime remains separately deployed;
+this merge does not restart or modify it. Existing per-preset model/compaction
+settings are preserved during the reviewed local migration. They are user
+configuration, not separate maintained agent implementations.

@@ -73,6 +73,7 @@ import { decode as wireDecode, encode as wireEncode, Pending } from './wire.mjs'
 import { unzipSync } from 'fflate'
 import { promptLibrary } from './shared/prompts.mjs'
 import {dshSetup,dshConfiguration} from './shared/dsh-setup.mjs'
+import {homeConnection} from './shared/home.mjs'
 import {supportReport} from './shared/support.mjs'
 import {startOnboarding} from './shared/onboarding.mjs'
 import {memoryRequest} from './shared/memory.mjs'
@@ -554,6 +555,7 @@ const localMethods = {
   'augmentor/dsh':dshSetup,
   'augmentor/diagnostics'(){return supportReport()},
   'augmentor/onboarding': startOnboarding,
+  'augmentor/home': homeConnection,
   'augmentor/memory': memoryRequest,
   'session.branch': dshBranch,
   'augmentor/prompts': (request) => promptLibrary(request),

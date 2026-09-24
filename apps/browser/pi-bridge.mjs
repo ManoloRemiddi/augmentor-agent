@@ -2,6 +2,7 @@
 // Copyright © 2026 Manolo Remiddi
 // SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
+import {homeConnection} from './shared/home.mjs'
 import {PiConnection} from '../../dist/client/src/socket.js'
 import {promptLibrary} from './shared/prompts.mjs'
 import {dshSetup,dshConfiguration} from './shared/dsh-setup.mjs'
@@ -27,6 +28,7 @@ async function request(method,p={},id){
   if(method==='augmentor/dsh')return dshSetup(p)
   if(method==='augmentor/diagnostics')return supportReport()
   if(method==='augmentor/onboarding')return startOnboarding(p)
+  if(method==='augmentor/home')return homeConnection(p)
   if(method==='augmentor/memory')return memoryRequest(p)
   if(method==='augmentor/prompts')return promptLibrary(p)
   const c=await client()

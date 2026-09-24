@@ -7,7 +7,7 @@ import {homedir} from 'node:os';
 import {join} from 'node:path';
 import {createServer} from 'node:http';
 import {once} from 'node:events';
-import {mkdtempSync,rmSync} from 'node:fs';
+import {mkdtempSync,rmSync,writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {spawnSync} from 'node:child_process';
 const {install,policy}=await import(process.env.AUGMENTOR_EXECUTION_ADAPTER || '../adapters/dsh-execution/index.mjs');
@@ -294,4 +294,23 @@ test('parallel recovery siblings cannot dispatch duplicate changes',async t=>{
   const pair={delta:{role:'assistant',tool_calls:[calls[0],{...calls[0],index:1,id:'second-send'}]},finish:'tool_calls'};
   const h=await harness(t,n=>[cut,pair,done][n-1],{parallel:true,toolBody:async()=>{await new Promise(r=>setTimeout(r,20));return 'receipt';}});
   await h.say();assert.deepEqual(h.executed,['send']);assert.equal(h.requests.length,3);
+});
+
+
+test('real DSH delegates a paired Home request and receives its durable result',async t=>{
+  const {apply}=await import('../adapters/dsh-home-client/index.mjs');
+  const directory=mkdtempSync(join(tmpdir(),'dsh-home-client-'));let dispatches=0;
+  const saved=[process.env.AUGMENTOR_HOME_CONNECTION,process.env.AUGMENTOR_HOME_CLIENT_STATE];
+  const nas=createServer(async(req,res)=>{
+    res.setHeader('Content-Type','application/json');
+    if(req.url==='/ask'){dispatches++;let raw='';for await(const part of req)raw+=part;assert.equal(JSON.parse(raw).prompt,'Read the fixture lamp');res.writeHead(202);res.end(JSON.stringify({status:'accepted'}));}
+    else res.end(JSON.stringify({status:'finished',response:{status:'completed',reply:'Fixture lamp is off.'}}));
+  });nas.listen(0,'127.0.0.1');await once(nas,'listening');
+  process.env.AUGMENTOR_HOME_CONNECTION=join(directory,'connection.json');process.env.AUGMENTOR_HOME_CLIENT_STATE=join(directory,'receipts.db');
+  writeFileSync(process.env.AUGMENTOR_HOME_CONNECTION,JSON.stringify({url:`http://127.0.0.1:${nas.address().port}`,token:'fixture-token-long-enough-only'}));
+  t.after(()=>{nas.closeAllConnections();nas.close();rmSync(directory,{recursive:true,force:true});for(const [key,value] of [['AUGMENTOR_HOME_CONNECTION',saved[0]],['AUGMENTOR_HOME_CLIENT_STATE',saved[1]]]){if(value===undefined)delete process.env[key];else process.env[key]=value;}});
+  const h=await harness(t,n=>n===1?{delta:{role:'assistant',tool_calls:[{index:0,id:'home-one',type:'function',function:{name:'home_read',arguments:JSON.stringify({prompt:'Read the fixture lamp'})}}]},finish:'tool_calls'}:done,{extraTools:apply});
+  await h.say('Read the fixture lamp through Home.');
+  assert.deepEqual(h.errors,[]);assert.equal(dispatches,1);
+  assert.match(JSON.stringify(h.requests.at(-1).messages),/Fixture lamp is off/);
 });

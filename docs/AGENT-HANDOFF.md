@@ -10,6 +10,21 @@ voice engine, approval bridge and stopped-task status correction. Earlier
 browser-only tool-policy statements are superseded for DSH personal sessions.
 Read its deployment evidence before assuming a running extension has reloaded.
 
+## September 24 Home runtime preview
+
+[Home](HOME.md) now has a headless DSH host in `apps/home` and a constrained
+Assist MCP policy in `adapters/dsh-home`. Canonical application code stays here;
+private household deployment and operational records belong in the Home companion.
+The user clarified that Home must be a lightweight NAS-owned capability available
+inside existing Augmentor clients, with independent household hardware/models/API
+configuration. A shared client adapter, pairing/settings and lightweight NAS page are now a
+source candidate; see Home for test evidence. Installed clients and NAS promotion
+remain separate, and full resource qualification is still pending.
+New configuration defaults to owner-selected registered entities; the earlier
+Assist MCP mode remains an explicit compatibility preview. Read the guide for
+exact fixture/live evidence and limits before expanding device
+access. This preview does not change the installed Desktop or Browser release.
+
 ## September 24 WebSocket security release
 
 See [the ws security correction](WS-SECURITY-2026-09-24.md) for the `ws 8.21.3`

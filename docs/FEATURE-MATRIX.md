@@ -46,6 +46,15 @@ quality and memory quality remain separate from installer success.
 
 DSH uses `services/dsh/branch.py` from both surfaces. Branch selects a final reply in a closed turn; Edit retains preceding turns, and editing the first input starts a clean child. Mid-turn replies and steered inputs that cannot be isolated are refused. Durable operation records prevent unknown fork outcomes from being replayed. Original chats and model selection are preserved.
 
+## Home development preview
+
+[Home](HOME.md) uses the shared DSH lifecycle, model layer, prompt service and
+action-outcome helpers. Its loopback API supports persistent household sessions,
+Stop, durable request recovery and scoped HA Assist MCP tools. The configured
+provider is fixed at process startup. The family model picker, existing UI
+connection flow, voice and person-scoped long-term memory are not enabled on
+Home. Device discovery/protocols remain Home Assistant responsibilities.
+
 ## DSH 0.1.5 compatibility update
 
 The 0.2.8 adapter targets DSH 0.1.5-rc.1 and Model Picker Augmented 1.1.2.
