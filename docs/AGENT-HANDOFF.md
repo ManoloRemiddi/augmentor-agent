@@ -10,19 +10,33 @@ private household deployment and operational records belong in the Home companio
 The user clarified that Home must be a lightweight NAS-owned capability available
 inside existing Augmentor clients, with independent household hardware/models/API
 configuration. A shared client adapter, pairing/settings and lightweight NAS page are implemented.
-NAS runtime source a6630b4 is promoted with selected-device policy, model settings,
-cancellation propagation and verified clean Docker shutdown. See Home for evidence.
-Desktop deployment was coordinated with the shared-surfaces task: combined source
-d24e2ff is selected in release 20260924-125950-12694ac7; secondary adopted it.
-Main/mobile retain Home-enabled release 20260924-125423-63307454 to preserve the
-main window's unsent draft. Do not restart them or overwrite an immutable release.
-The prepared Browser extension combines Home and Voice; user reload remains pending.
-PRs #6 and #7 remain separate until combined review/CI; do not assume either merged.
+NAS runtime source e5e5764 is promoted with direct On/Off device cards and an
+owner-only discovery snapshot, building on selected-device policy, model settings,
+cancellation propagation and clean shutdown. The KP303 uses HA’s existing TP-Link
+integration; its three lighting outlets and the Elgato light have controls enabled.
+Four unlinked Tapo devices remain listed with setup status. See Home for evidence.
+Earlier Desktop deployment was coordinated with the shared-surfaces task: combined
+source d24e2ff / release 20260924-125950-12694ac7 was selected and secondary adopted it.
+At that checkpoint main/mobile retained the preceding Home-enabled release to
+preserve a draft. The later flare selection below supersedes that selected identity;
+consult current installed status before any changes. Preserve drafts and active work.
+The prepared Browser extension combines Home and Voice; reload/adoption is separate.
+Home PR #6 remains unmerged. Source synchronization with public main does not
+redeploy Desktop or alter the separately coordinated shared-surfaces PR #7.
 Full resource/release qualification is pending. A finite NAS availability pilot is
 running; it is not a completed seven-day workload/physical-device qualification.
 New configuration defaults to owner-selected registered entities; the earlier
 Assist MCP mode remains an explicit compatibility preview. Read the guide for
 exact fixture/live evidence and limits before expanding device access.
+
+## September 24 desktop flare ownership
+
+The [0.2.12 release record](RELEASE-0.2.12.md) tracks the managed transient
+activity canvas correction, workspace/stacking proof and public download status.
+PR #8 is merged and 0.2.12 is published. Website downloads select the new bundle.
+Home/shared-surface previews remain separate; this release is based on public main.
+The compatible local flare patch is selected in `20260924-140435-fa4c42f4`;
+open windows still need reopening. Preserve unsent drafts and active work.
 
 ## September 24 WebSocket security release
 
