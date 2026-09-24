@@ -10,14 +10,19 @@ private household deployment and operational records belong in the Home companio
 The user clarified that Home must be a lightweight NAS-owned capability available
 inside existing Augmentor clients, with independent household hardware/models/API
 configuration. A shared client adapter, pairing/settings and lightweight NAS page are implemented.
-NAS build b2006ff is promoted with selected-device policy and model settings; see
-Home for test evidence. Desktop adoption is being combined with a concurrent
-shared-surfaces update; do not mutate Desktop/DSH deployment until that task
-records its combined artifact. Full resource/release qualification is pending.
+NAS runtime source a6630b4 is promoted with selected-device policy, model settings,
+cancellation propagation and verified clean Docker shutdown. See Home for evidence.
+Desktop deployment was coordinated with the shared-surfaces task: combined source
+d24e2ff is selected in release 20260924-125950-12694ac7; secondary adopted it.
+Main/mobile retain Home-enabled release 20260924-125423-63307454 to preserve the
+main window's unsent draft. Do not restart them or overwrite an immutable release.
+The prepared Browser extension combines Home and Voice; user reload remains pending.
+PRs #6 and #7 remain separate until combined review/CI; do not assume either merged.
+Full resource/release qualification is pending. A finite NAS availability pilot is
+running; it is not a completed seven-day workload/physical-device qualification.
 New configuration defaults to owner-selected registered entities; the earlier
 Assist MCP mode remains an explicit compatibility preview. Read the guide for
-exact fixture/live evidence and limits before expanding device
-access. This preview does not change the installed Desktop or Browser release.
+exact fixture/live evidence and limits before expanding device access.
 
 ## September 24 WebSocket security release
 

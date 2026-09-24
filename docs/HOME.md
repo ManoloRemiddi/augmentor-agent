@@ -311,7 +311,7 @@ font download, GPU or renderer is required on the NAS.
 
 ## Selected NAS build and current implementation checks
 
-NAS runtime source `b2006ff` is promoted with the prior image and a consistent
+NAS runtime source `a6630b4` is promoted with the prior image and a consistent
 pre-promotion backup retained. Main readiness, selected virtual helper and a clear
 unknown-action ledger were verified. The container runs under one CPU/256 MiB;
 a fresh idle spot sample was 50.78 MiB / 0.00% CPU. Thirty private HTTPS selected-
@@ -323,9 +323,10 @@ Implementation `a983491` passed every job in
 Debian/source/native checks, Home image/tests, installed packages, packaged Browser
 and credential checks. Native and Browser pairing form regressions were added;
 the NAS fixture page also demonstrated populated model settings with an empty key
-field. Desktop integration is coordinating with a simultaneous shared-surfaces
-release; follow its final deployment record rather than assuming selection equals
-running adoption. Guided hub authorization, broader provider access, physical
+field. The combined Desktop release `20260924-125950-12694ac7` is selected and
+running in secondary; main/mobile retain the prior Home-enabled release to preserve
+the main draft. Browser extension reload is pending. See the handoff before any
+deployment change; selection alone does not imply running adoption. Guided hub authorization, broader provider access, physical
 qualification, routines, independent voice, retention and long soak remain open.
 
 
@@ -337,6 +338,12 @@ active client. This does not change the separately coordinated Desktop artifact.
 
 Shutdown follow-up: after closing the HTTP/runtime services and SQLite ledger, the
 container process now explicitly exits. Docker stop had otherwise reached its
-forced-stop deadline despite an idle service. The correction is qualified in an
-isolated container before main promotion; this paragraph does not imply a host
-power-loss test.
+forced-stop deadline despite an idle service. The correction passed isolated
+Docker stop tests at 0.09 seconds idle and 0.2 seconds during an admitted read,
+both exit 0; restart preserved the request outcome. It is now promoted, with main
+authenticated health/readiness and zero unknown actions verified. This does not
+imply a host power-loss test. A finite read-only availability sampler is collecting
+seven days of health/readiness evidence on the NAS; no model/device calls are made
+and this is not yet completed M7 workload qualification.
+
+Runtime source `a6630b4` subsequently passed all jobs in [CI 35991631351](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/35991631351), including installed packages and packaged Browser checks. Later handoff documentation does not change that deployed source.
