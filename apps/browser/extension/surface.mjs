@@ -4,14 +4,13 @@ import {SURFACE} from './surface-design.mjs'
 export function attachSurface({send,openSettings,onError,approval,state}){
   const $=id=>document.getElementById(id),input=$('input'),improve=$('improve'),menu=$('more-menu'),more=$('more')
   for(const [key,glyph] of Object.entries(SURFACE.glyphs)){const id=key==='latest'?'top':key;if($(id))$(id).textContent=glyph}
-  // These native glyphs depend on OS font fallback. Vectors preserve the same
-  // plus/target shapes on Chromium installations without that fallback font.
-  for(const [id,path] of [['newchat','M8 3v10M3 8h10'],['pin','M8 1v14M1 8h14M12 8a4 4 0 1 1-8 0 4 4 0 0 1 8 0']]){
+  // The native plus glyph depends on OS font fallback; use a matching vector.
+  for(const [id,path] of [['newchat','M8 3v10M3 8h10']]){
     const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg'),shape=document.createElementNS(ns,'path')
     for(const [key,value] of Object.entries({width:'16',height:'16',viewBox:'0 0 16 16',fill:'none',stroke:'currentColor','stroke-width':'1.2','aria-hidden':'true'}))svg.setAttribute(key,value)
     shape.setAttribute('d',path);svg.append(shape);$(id).replaceChildren(svg)
   }
-  let compact=false,improving=false,epoch=0,undo=null
+  let improving=false,epoch=0,undo=null
   const announce=text=>{$('surface-status').textContent=text}
   const fail=error=>{announce(error.message);onError(error.message)}
   const closeMenu=()=>{menu.hidden=true;more.setAttribute('aria-expanded','false')}
@@ -25,17 +24,23 @@ export function attachSurface({send,openSettings,onError,approval,state}){
   const remember=()=>chrome.storage.session.set({[draftKey]:{sessionId,text:input.value}}).catch(()=>{})
   input.addEventListener('input',remember)
   const hide=()=>{closeMenu();void remember().finally(()=>window.close())}
-  chrome.runtime.onMessage.addListener(message=>{if(message.type==='surface/hide')void chrome.windows.getCurrent().then(w=>{if(w.id===message.windowId)hide()})})
   $('hide').onclick=hide;$('hide-menu-item').onclick=hide
-  const setCompact=value=>{compact=value;$('app').classList.toggle('compact',value);$('activity-orb').hidden=!value;if(value)$('activity-orb').focus();else $('compact').focus()}
-  $('compact').onclick=()=>setCompact(true);$('activity-orb').onclick=()=>setCompact(false)
-  $('activity-orb').oncontextmenu=e=>{e.preventDefault();if(state().running)void send('stop').then(r=>{if(r?.ok===false)throw Error(r.error)}).catch(fail)}
-  $('pin').onclick=async()=>{
-    const button=$('pin'),pinned=button.getAttribute('aria-pressed')!=='true';button.disabled=true
-    try{const result=await send('surface/pin',{pinned});if(!result?.ok)throw Error(result?.error||'Could not change sidebar pin');button.setAttribute('aria-pressed',String(pinned))}catch(error){fail(error)}finally{button.disabled=false}
+  const fit=()=>{
+    // Reset before measuring so deleting text also shrinks the composer.
+    // scrollHeight includes padding but excludes the two border pixels.
+    input.style.height='29px'
+    input.style.overflowY='hidden'
+    const height=input.value ? Math.max(29,input.scrollHeight+2) : 29
+    input.style.height=Math.min(125,height)+'px'
+    input.style.overflowY=height>125?'auto':'hidden'
   }
-  void send('surface/state').then(r=>{if(r?.ok)$('pin').setAttribute('aria-pressed',String(r.pinned))}).catch(()=>{})
-  const fit=()=>{input.style.height='0px';input.style.height=Math.min(125,Math.max(35,input.scrollHeight))+'px'}
+  window.addEventListener('resize',fit)
+  if(window.ResizeObserver){
+    let width=0
+    new window.ResizeObserver(([entry])=>{
+      if(entry.contentRect.width!==width){width=entry.contentRect.width;fit()}
+    }).observe($('composer-field'))
+  }
   const controls=()=>{improve.disabled=!input.value.trim()||state().phase!=='ready'||state().running;improve.textContent=improving?'×':undo?'↶':'✦';improve.title=improving?'Cancel prompt improvement':undo?'Undo prompt improvement':'Improve prompt';improve.setAttribute('aria-label',improve.title)}
   input.addEventListener('input',()=>{epoch++;improving=false;undo=null;fit();controls()})
   new MutationObserver(fit).observe(input,{attributes:true,attributeFilter:['disabled']})
@@ -46,9 +51,9 @@ export function attachSurface({send,openSettings,onError,approval,state}){
     try{const r=await send('prompt/improve',{text:original});if(id!==epoch||input.value!==original)return;if(!r?.ok||r.result?.kind!=='rewrite'||typeof r.result.text!=='string')throw Error(r?.error||'Could not improve the prompt');input.value=r.result.text;undo=original;fit()}
     catch(error){if(id===epoch)fail(error)}finally{if(id===epoch){improving=false;controls()}}
   }
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!menu.hidden){e.preventDefault();closeMenu();more.focus()}else if(e.ctrlKey&&e.shiftKey&&e.code==='Space'){e.preventDefault();setCompact(!compact)}else if(e.ctrlKey&&e.key==='End'){$('log').scrollTo({top:$('log').scrollHeight,behavior:'smooth'})}else if(e.ctrlKey&&e.key==='Home'){$('log').scrollTo({top:0,behavior:'smooth'})}})
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!menu.hidden){e.preventDefault();closeMenu();more.focus()}else if(e.ctrlKey&&e.key==='End'){$('log').scrollTo({top:$('log').scrollHeight,behavior:'smooth'})}else if(e.ctrlKey&&e.key==='Home'){$('log').scrollTo({top:0,behavior:'smooth'})}})
   fit();controls()
   return {update(value){
     if(value.sessionId){if(sessionId&&value.sessionId!==sessionId){epoch++;improving=false;undo=null;void chrome.storage.session.remove(draftKey)}sessionId=value.sessionId;if(!restored){restored=true;void chrome.storage.session.get(draftKey).then(saved=>{const draft=saved[draftKey];if(draft?.sessionId===sessionId&&!input.value){input.value=draft.text;fit();controls()}})}}
-    const current={...state(),...value};const dot=$('connection-dot');dot.dataset.phase=current.phase;dot.title=current.phase==='ready'?'Connected':current.error||'Connecting…';dot.setAttribute('aria-label',dot.title);$('activity-orb').dataset.running=String(!!value.running);controls()}}
+    const current={...state(),...value};const dot=$('connection-dot');dot.dataset.phase=current.phase;dot.title=current.phase==='ready'?'Connected':current.error||'Connecting…';dot.setAttribute('aria-label',dot.title);controls()}}
 }

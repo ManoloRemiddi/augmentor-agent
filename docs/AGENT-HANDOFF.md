@@ -2,15 +2,15 @@
 
 # Start here: agent handoff
 
-## September 24 sidebar presentation correction
+## September 24 sidebar presentation refinement
 
-The user rejected the differing sidebar layout. The new source follows the native
-window header/composer/footer and shares icon/spacing definitions. See the latest
-[shared surfaces qualification](SHARED-SURFACES-2026-09-24.md#sidebar-presentation-correction--source-candidate).
-The correction is now selected locally and copied to the existing prepared
-extension folder. Chromium still needs Reload; do not remove/reinstall it.
-Packaged-browser CI and its screenshot were reviewed; user-profile acceptance
-remains unconfirmed. See the latest adoption entry for the exact artifact.
+The user confirmed the corrected sidebar is working and requested a simpler
+Browser presentation: always follow tabs, remove Follow and circular activity
+controls/functionality, remove the outer border and brand label, and keep the
+empty composer one line tall. Conversation title and shared control order remain.
+See [shared surfaces qualification](SHARED-SURFACES-2026-09-24.md#sidebar-refinement-after-user-acceptance)
+for source checks and local adoption. Chromium needs Reload after updating the
+prepared extension folder; do not remove/reinstall it or interrupt native drafts.
 
 ## September 24 shared personal agent and voice
 

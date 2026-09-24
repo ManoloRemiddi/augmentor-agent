@@ -65,11 +65,11 @@ document.querySelector('header').after(setupNotice)
 const editBar=document.createElement('div');editBar.hidden=true;editBar.className='edit-message-bar'
 const editLabel=document.createElement('span');editLabel.textContent='Editing latest message';const cancelEdit=document.createElement('button');cancelEdit.textContent='Cancel';cancelEdit.type='button';editBar.append(editLabel,cancelEdit)
 document.getElementById('composer-field').before(editBar)
-cancelEdit.onclick=()=>{if(editingMessage)document.getElementById('input').value=editingMessage.draft;editingMessage=null;editBar.hidden=true}
+cancelEdit.onclick=()=>{if(editingMessage)document.getElementById('input').value=editingMessage.draft;editingMessage=null;editBar.hidden=true;document.getElementById('input').dispatchEvent(new Event('input'))}
 async function messageAction(action,seq,text){
   if(ui.state.running||editingMessage&&action!=='edit')return
   const input=document.getElementById('input')
-  if(action==='edit'){if(!editingMessage)editingMessage={seq,sourceSession:m3SessionId,draft:input.value,prepared:false};input.value=text;input.focus();editBar.hidden=false;return}
+  if(action==='edit'){if(!editingMessage)editingMessage={seq,sourceSession:m3SessionId,draft:input.value,prepared:false};input.value=text;input.dispatchEvent(new Event('input'));input.focus();editBar.hidden=false;return}
   const result=await send('message/branch',{seq,sourceSession:m3SessionId,mode:'reply'})
   if(!result.ok){ui.sendFail(result.error);return}ui.clear();await refresh()
 }

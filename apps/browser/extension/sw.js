@@ -1,4 +1,3 @@
-import {watchSurface} from './surface-host.mjs'
 // Augmentor — dsh-augmentor plugin, pipe, and Chromium extension
 // Copyright © 2026 Manolo Remiddi
 // SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
@@ -46,5 +45,3 @@ chrome.runtime.onMessage.addListener(handlePanelMessage)
 // 'connecting') makes this idempotent with the backoff retries and any
 // explicit 'connect' message.
 ensurePort()
-
-watchSurface()

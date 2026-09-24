@@ -211,3 +211,27 @@ font fallback for two toolbar glyphs. The follow-up renders those as vectors;
 focused controls and complete DOM-entrypoint checks pass. The selected local
 native host passed its handshake, DSH initialization and shared appearance read.
 The user's reloaded sidebar and physical voice acceptance remain unconfirmed.
+
+
+### Sidebar refinement after user acceptance
+
+The user confirmed the preceding correction works and requested these Browser
+refinements. This supersedes the earlier sidebar Follow/Compact description:
+the sidebar always remains available across tabs; there is no follow toggle,
+tab-change hiding listener, circular activity view, or compact keyboard shortcut.
+The voice control remains in the footer. The outer accent border and top-left
+brand label are removed, retaining the conversation title and the shared order
+of New, Save, History, More and Hide. These are sidebar presentation choices;
+the shared agent, voice engine and native floating window are unchanged.
+
+The composer is 29 CSS pixels tall when empty or holding one line. It expands
+for line breaks or wrapped text, reflows on sidebar width changes, and shrinks
+after deletion or sending. Very long drafts scroll after reaching 125 pixels.
+Editing a prior message and restoring its draft also trigger resizing.
+
+Validation: all 31 Browser DOM/entrypoint checks pass, including complete sidebar
+startup, model/voice controls, prompt improvement and draft preservation.
+The existing packaged-browser proof expects five header controls. DOM evidence
+does not establish pixel geometry or acceptance of this latest refinement in the
+user's Chromium; extension reload and visual confirmation remain separate.
+Local adoption is recorded below after staging the compatible 0.2.11 patch.

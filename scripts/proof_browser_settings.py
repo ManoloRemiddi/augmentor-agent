@@ -12,7 +12,7 @@ def prove(root,temp,cdp,evaluate,click,fill,until,send,open_settings,back_to_cha
     before=send('log')['sessionId']
     panel=open_settings('appearance')
     assert evaluate('document.querySelectorAll("nav a").length',panel)==8
-    assert evaluate('document.querySelectorAll("header button").length',chat)==7
+    assert evaluate('document.querySelectorAll("header button").length',chat)==5
     assert not evaluate('!!document.querySelector("#harness-picker")',chat)
     assert 'linear-gradient' in evaluate('getComputedStyle(document.querySelector("#accentHue")).backgroundImage',panel)
     assert not evaluate('!!document.querySelector("dialog[open]")',chat)
@@ -93,4 +93,4 @@ def prove(root,temp,cdp,evaluate,click,fill,until,send,open_settings,back_to_cha
     assert evaluate('document.documentElement.scrollWidth<=innerWidth',chat)
     (root/'outputs/browser-toolbar-settings.png').write_bytes(base64.b64decode(cdp('Page.captureScreenshot',{},chat)['data']))
     assert evaluate('document.querySelector("#input").value',chat)=='Keep my unfinished chat draft'
-    return {'isolatedState':str(temp),'toolbarButtons':7,'settingsSections':8,'singleSettingsTab':True,'concurrentOpenReusesTab':True,'chatDraftPreserved':True,'appearanceLiveAndPersistent':True,'formsNonmodal':True,'sectionDraftsPreserved':True,'bothHarnessViews':True,'narrowLayout':True,'harnessOnlyInSettings':True,'colourGradients':True,'guidedMemoryLinuxSession':bool(os.environ.get('AUGMENTOR_PROOF_ONBOARDING'))}
+    return {'isolatedState':str(temp),'toolbarButtons':5,'settingsSections':8,'singleSettingsTab':True,'concurrentOpenReusesTab':True,'chatDraftPreserved':True,'appearanceLiveAndPersistent':True,'formsNonmodal':True,'sectionDraftsPreserved':True,'bothHarnessViews':True,'narrowLayout':True,'harnessOnlyInSettings':True,'colourGradients':True,'guidedMemoryLinuxSession':bool(os.environ.get('AUGMENTOR_PROOF_ONBOARDING'))}
