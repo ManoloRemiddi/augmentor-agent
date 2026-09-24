@@ -112,10 +112,17 @@ export function ensurePort() {
       state.interactions=state.interactions.filter(row=>row.id!==msg.id);state.interactions.push(msg);broadcast();return
     }
     if(msg.method==='interaction.resolved'){state.interactions=state.interactions.filter(row=>row.id!==msg.params.rpcId);broadcast();return}
+    if(msg.method==='voice.event'){
+      chrome.runtime.sendMessage({type:'voice/event',event:msg.params}).catch(()=>{});return
+    }
     // Notifications: session.event / session.status / subagent.*
     if (msg.method === 'session.event') {
       onSessionEvent(msg.params)
       return
+    }
+    if (msg.method === 'session.error') {
+      if(msg.params?.sessionId!==state.sessionId)return
+      state.running=false;state.error=msg.params.message;broadcast(log('error',{message:msg.params.message}));return
     }
     if (msg.method === 'session.status') {
       if (msg.params?.sessionId !== state.sessionId) return

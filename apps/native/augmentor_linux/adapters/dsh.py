@@ -21,10 +21,18 @@ class DshAdapter(DshClient):
         self.native_interactions=False
         saved=current();self.product=saved.get('endpoint')==self.base and saved.get('home')==str(self.home)
         if self.product:self.preset='augmentor-linux-product'
+    def owns_preset(self, preset):
+        return preset in ('augmentor-linux-product','augmentor-browser-product') if self.product else preset==self.preset
+    def running_state(self, session):
+        row=next((row for row in self.call('session.list')['items'] if row['sessionId']==session),None)
+        return bool(row.get('running')) if row is not None else None
     def voice_ticket(self, session):
         if not self.product:raise ContractError('Connect the Augmentor DSH integration first.')
         token=(self.home/'augmentor-product-token').read_text().strip()
-        result=http(self.base,'/api/resonant-voice',{'surface':'linux','sessionId':session},
+        row=next((row for row in self.call('session.list')['items'] if row['sessionId']==session),{})
+        if not self.owns_preset(row.get('agentPreset')):raise ContractError('This conversation belongs to another role.')
+        surface='browser' if row.get('agentPreset')=='augmentor-browser-product' else 'linux'
+        result=http(self.base,'/api/resonant-voice',{'surface':surface,'sessionId':session},
                     {'x-augmentor-product-token':token})
         if not result.get('ok'):raise ContractError(result.get('error','Resonant Voice is unavailable.'))
         if result.get('protocol')!='resonant-voice/1':raise ContractError('Incompatible voice service.')

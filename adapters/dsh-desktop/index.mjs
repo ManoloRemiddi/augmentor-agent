@@ -1,5 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-// Mount only in Augmentor's Linux preset. Use the same executor as Pi.
+// Shared personal-agent tools in both Augmentor surfaces. Use the same executor as Pi.
 import {definitions,control} from '../../dist/desktop/src/index.js'
 import {applyBrowserPolicy} from './browser-policy.mjs'
 import {applyResponsiveSteering} from './steering.mjs'
@@ -14,7 +14,7 @@ export function apply(ctx){
   for(const d of definitions)ctx.tools.register({name:d.name,description:d.description,parameters:d.parameters,
     output:{schema:{type:'object'},render:(_args,value)=>value.content},
     execute:async(args,exec)=>{
-      const id=exec.agent?.id;if(!id)throw Error('Desktop control requires an active Augmentor desktop conversation.')
+      const id=exec.agent?.id;if(!id)throw Error('Desktop control requires an active Augmentor conversation.')
       const owner='dsh:'+id;owners.add(owner)
       if(d.method==='capture'){
         const routed=exec.agent.session.requestHeader()?.config

@@ -2,6 +2,14 @@
 
 # Start here: agent handoff
 
+## September 24 shared personal agent and voice
+
+The user requests one personal agent in the floating window and browser sidebar.
+[Shared surfaces](SHARED-SURFACES-2026-09-24.md) owns the new shared preset, host
+voice engine, approval bridge and stopped-task status correction. Earlier
+browser-only tool-policy statements are superseded for DSH personal sessions.
+Read its deployment evidence before assuming a running extension has reloaded.
+
 ## September 24 WebSocket security release
 
 See [the ws security correction](WS-SECURITY-2026-09-24.md) for the `ws 8.21.3`

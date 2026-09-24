@@ -421,8 +421,9 @@ async function refresh() {
       if(answeredInteractions.has(row.id))continue;answeredInteractions.add(row.id)
       const p=row.params;let value
       if(row.method==='approval.requested')value={outcome:window.confirm((p.toolName??'Action')+'\n'+(p.reason??'Allow this action?'))?'allowed-once':'denied'}
-      else {const answers=[];for(const q of p.questions??[]){const answer=window.prompt(q.question+(q.options?.length?'\n'+q.options.map(o=>o.label).join(' / '):''),q.prefill??'');if(answer!==null)answers.push({id:q.id,custom:answer})}value={answer:{answers}}}
-      await send('interaction/respond',{id:row.id,value})
+      else {const answers=[];for(const q of p.questions??[]){const answer=window.prompt(q.question+(q.options?.length?'\n'+q.options.map(o=>o.label).join(' / '):''),q.prefill??'');if(answer!==null)answers.push({id:q.id,selected:[],custom:answer})}value={answer:{answers}}}
+      const outcome=await send('interaction/respond',{id:row.id,value})
+      if(!outcome?.ok)ui.sendFail(outcome?.error??'The decision was not confirmed.')
     }
     ui.setState({ phase: res.phase, error: res.error, running: viewSessionId ? false : res.running })
     if (!viewSessionId) updateSaveBadge(res)

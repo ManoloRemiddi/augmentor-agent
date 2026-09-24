@@ -78,10 +78,12 @@ import {startOnboarding} from './shared/onboarding.mjs'
 import {memoryRequest} from './shared/memory.mjs'
 import {MetadataLog,diagnosticCategory} from './shared/diagnostics.mjs'
 import { dshBranch } from './shared/branch.mjs'
-import {DshBoundary,BROWSER_PRESET,loopbackEndpoint,boundedJson} from './shared/dsh-boundary.mjs'
+import {DshBoundary,BROWSER_PRESET,PERSONAL_PRESETS,loopbackEndpoint,boundedJson} from './shared/dsh-boundary.mjs'
 import {createHash} from 'node:crypto'
 import {createDshClient} from './shared/dsh-auth.mjs'
 import {createRemoteAdapter} from './shared/dsh-remote.mjs'
+import {BrowserVoice,voicePreferences} from './shared/voice-client.mjs'
+import {BrowserInteractions} from './shared/interactions.mjs'
 
 const AUGMENTOR_DIR = path.dirname(fileURLToPath(import.meta.url))
 
@@ -191,6 +193,7 @@ const log = (...parts) => {
 const WS_TOKEN = resolveToken()
 const authenticatedDsh=createDshClient(DSH_BASE,WS_TOKEN.token)
 const remoteDsh=createRemoteAdapter(DSH_BASE,authenticatedDsh,frame=>{
+  if(frame.method==='session.event')voice.observe(frame.params?.sessionId,frame.params?.event)
   downlinkQueue=downlinkQueue.then(async()=>{
     if(!UNIFIED||frame.params?.sessionId&&await boundary.owns(frame.params.sessionId))sendToExt(frame)
   }).catch(error=>log(error.message))
@@ -515,13 +518,36 @@ async function fetchJson(url, timeoutMs) {
   return res.json()
 }
 
+const interactions=new BrowserInteractions(async payload=>{
+  const configured=dshConfiguration()
+  const token=readFileSync(path.join(configured.home,'augmentor-product-token'),'utf8').trim()
+  const result=await boundedJson(`${DSH_BASE}/api/augmentor-product`,{method:'POST',headers:{'content-type':'application/json','x-augmentor-product-token':token},body:JSON.stringify(payload)})
+  if(!result.ok)throw Error(result.error??'Interaction failed')
+  return result
+},sendToExt)
+const voice=new BrowserVoice({
+  ticket:sessionId=>localMethods['augmentor/voice']({sessionId}),
+  submit:async(sessionId,requestId,text)=>{
+    await boundary.guard('session.prompt',{sessionId})
+    await interactions.claim(sessionId)
+    const row=(await dsh('session.list')).items.find(r=>r.sessionId===sessionId)
+    return dsh('session.prompt',{sessionId,requestId,mode:row?.running?'steer':'queue',content:[{type:'text',text}]})
+  },
+  notify:sendToExt,
+})
 const localMethods = {
+  'augmentor/voice/preferences':async params=>{if(params.action==='save')voice.close();return voicePreferences(params)},
+  'augmentor/voice/start':async params=>{await interactions.claim(params.sessionId);return voice.start(params)},
+  'augmentor/interaction':params=>interactions.answer(params.id,params.value),
+  'augmentor/voice/control':params=>voice.control(params),
   async 'augmentor/voice'(params){
     if(!UNIFIED)throw Error('Voice requires the unified Augmentor DSH integration.')
     await productHandshake()
     const configured=dshConfiguration()
     const token=readFileSync(path.join(configured.home,'augmentor-product-token'),'utf8').trim()
-    const result=await boundedJson(`${DSH_BASE}/api/resonant-voice`,{method:'POST',headers:{'content-type':'application/json','x-augmentor-product-token':token},body:JSON.stringify({surface:'browser',sessionId:params.sessionId}),signal:AbortSignal.timeout(5000)})
+    const row=(await dsh('session.list')).items.find(row=>row.sessionId===params.sessionId)
+    const surface=row?.agentPreset==='augmentor-linux-product'?'linux':'browser'
+    const result=await boundedJson(`${DSH_BASE}/api/resonant-voice`,{method:'POST',headers:{'content-type':'application/json','x-augmentor-product-token':token},body:JSON.stringify({surface,sessionId:params.sessionId}),signal:AbortSignal.timeout(5000)})
     if(!result.ok||result.protocol!=='resonant-voice/1')throw Error(result.error||'Incompatible voice service')
     return result
   },
@@ -840,6 +866,7 @@ async function handleExtMessage(msg) {
   try {
     let value
     if(UNIFIED)msg.params=await boundary.guard(msg.method,msg.params??{})
+    if(UNIFIED&&msg.method==='session.prompt')await interactions.claim(msg.params.sessionId)
     if (PLUGIN_METHODS.has(msg.method)) {
       if (!pluginWs || pluginWs.readyState !== WebSocket.OPEN) {
         throw new Error('plugin channel not connected — the DSH app or the Augmentor plugin is not up')
@@ -861,7 +888,7 @@ async function handleExtMessage(msg) {
       if (value.truncatedEarlier) log('history shaped', { truncatedEarlier: value.truncatedEarlier })
     }
     if (msg.method === 'session.list') {
-      if(UNIFIED){value={...value,items:value.items.filter(row=>row.agentPreset===BROWSER_PRESET)};boundary.known=new Set(value.items.map(row=>row.sessionId))}
+      if(UNIFIED){value={...value,items:value.items.filter(row=>PERSONAL_PRESETS.has(row.agentPreset) && row.origin!=='subagent')};boundary.known=new Set(value.items.map(row=>row.sessionId))}
       value = shapeSessionList(value)
       if (value.truncatedEarlier) log('list shaped', { truncatedEarlier: value.truncatedEarlier })
     }
@@ -907,6 +934,8 @@ process.stdin.on('data', (chunk) => {
 function cleanup(code) {
   if (shuttingDown) return
   shuttingDown = true
+  voice.close()
+  interactions.close()
   remoteDsh.close()
   for (const d of downlinks.values()) {
     try { d.ws.terminate() } catch { /* already dead */ }

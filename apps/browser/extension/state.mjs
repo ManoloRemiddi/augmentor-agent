@@ -25,7 +25,7 @@ export function storedHarness(saved){
   // Never interpret an old engine's session/model keys as another engine's data.
   if(saved['augmentor-harness']&&!['pi','dsh'].includes(saved['augmentor-harness']))return null
   if(saved['augmentor-harness']==='pi')return 'pi'
-  return saved['augmentor-harness']==='dsh'||saved['augmentor-session-id']||saved['augmentor-model-selection']?'dsh':'pi'
+  return 'dsh'
 }
 
 // The model the sidecar runs on: a {provider, model} pair from the DSH app's

@@ -14,13 +14,13 @@ recovery and mobile. Working source trees are not the installed release.
 ## Product and runtime ownership
 
 Augmentor is one product with native PySide6/Qt and Chromium surfaces in this
-repository. DSH is the full-featured conversational harness; Pi is a supported
+repository. Both DSH presentations use [one personal-agent composition and voice engine](SHARED-SURFACES-2026-09-24.md); preset IDs are historical aliases. DSH is the full-featured conversational harness; Pi is a supported
 subset. Each chat stays owned by its selected harness. Neither memory nor voice
 starts another conversational agent. OpenCode is retired; its old data remains.
 
 ```mermaid
 flowchart TD
-    Native[Native PySide6 / Qt] --> Adapters[Surface adapters and scoped capabilities]
+    Native[Native PySide6 / Qt] --> Adapters[Surface adapters and shared personal capabilities]
     Browser[Chromium extension] --> Bridge[Native messaging bridge]
     Bridge --> Adapters
     Adapters --> DSH[DSH sessions / tools / model execution]
@@ -55,7 +55,7 @@ is not granted to a browser session by sharing a host or memory bank.
 | Automatic memory | `services/memory/{service,hindsight,dual}.py`, `packages/memory/src/dual.ts`, `adapters/dsh-memory/automatic.mjs` | [Architecture](DUAL-MEMORY.md), [operations and RPC](MEMORY-OPERATIONS.md) |
 | Optional manual memory | `services/memory/provider.py`, prompt-service routing, `packages/memory/src/index.ts` | [Manual memory](MEMORY.md); separate 0.9.2 connection |
 | Speech engine and plugin | Separate [Resonant Voice repository](https://github.com/ManoloRemiddi/resonant-voice) | [Voice handoff](https://github.com/ManoloRemiddi/resonant-voice/blob/main/docs/AGENT-HANDOFF.md); protocol `resonant-voice/1` |
-| Audio controls and capture | Native `voice*.py`, browser `voice.mjs` / `voice-worklet.js` | [Controls](VOICE-SINGLE-BUTTON.md), [hands-free](HANDS-FREE-IMPLEMENTATION.md) |
+| Audio controls and capture | Shared native `VoiceSession`; browser `voice.mjs` via private stdio worker | [Controls](VOICE-SINGLE-BUTTON.md), [hands-free](HANDS-FREE-IMPLEMENTATION.md) |
 | Desktop tools / specialist | `services/desktop`, `packages/desktop`, `packages/computer-use`, `adapters/dsh-desktop` | [Desktop control](DESKTOP-CONTROL.md), [specialist](DESKTOP-SPECIALIST.md) |
 | Recovery, maintenance and support | `services/recovery`, `services/lifecycle`, `services/support`, `scripts/maintenance.py` | [Recovery](DESKTOP-OFFLINE-RECOVERY.md), [lifecycle](LIFECYCLE.md), [data](DATA-AND-SUPPORT.md) |
 | Packaging and compatibility | `release`, `scripts/package-*`, `.github/workflows/validate.yml` | [Sources](SOURCES.md), [release status](CROSS-PLATFORM-RELEASE-STATUS.md) |

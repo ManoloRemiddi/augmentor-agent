@@ -113,7 +113,7 @@ def branch(call, params, *, surface, endpoint, state=None, exact_fork=None):
                 raise BranchError('The earlier branch outcome is unknown. Check DSH chats before starting another branch; no request was replayed.')
         else:
             row = next((r for r in call('session.list', {})['items'] if r['sessionId'] == source), None)
-            allowed = ('augmentor-linux','augmentor-linux-product') if surface == 'linux' else ('augmentor','augmentor-browser-product')
+            allowed = ('augmentor-linux-product','augmentor-browser-product', 'augmentor-linux' if surface == 'linux' else 'augmentor')
             if row is None or row.get('agentPreset') not in allowed:
                 raise BranchError('This chat belongs to another Augmentor role.')
             preset=row['agentPreset']

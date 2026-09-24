@@ -299,7 +299,15 @@ class Window(QWidget):
                 self.close_voice_panel();self.voice_button.set_state('error',message);self.set_status(message)
         capture.changed.connect(changed);capture.failed.connect(failed)
 
+    def refresh_voice_preferences(self):
+        if not self.voice_dialog and not self.voice_opening and getattr(self.preferences,'persistent',False):
+            latest=Preferences()
+            for key in ('resonant_voice','voice_mode','voice_pause_ms'):
+                self.preferences.values[key]=latest.values[key]
+            self.voice_button.hands_free=self.voice_is_hands_free()
+
     def voice_pressed(self):
+        self.refresh_voice_preferences()
         voice=self.voice_dialog
         if self.voice_is_hands_free():
             if voice or self.voice_opening:self.close_voice_panel()
@@ -355,6 +363,7 @@ class Window(QWidget):
         self.update_controls()
 
     def open_voice(self):
+        if getattr(getattr(self,'preferences',None),'persistent',False):self.refresh_voice_preferences()
         if not self.preferences.values.get('resonant_voice',True):
             self.set_status('Enable Resonant Voice in Settings to use the microphone.');return
         if self.editing:

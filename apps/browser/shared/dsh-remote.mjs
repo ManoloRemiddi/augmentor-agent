@@ -56,6 +56,12 @@ export function createRemoteAdapter(base, client, notify, log = () => {}) {
     return owner
   }
 
+  async function refreshStatus(sessionId) {
+    const result=await invoke('session/list',{_request:{}})
+    const row=result.items.find(row=>row.sessionId===sessionId)
+    if(row)notify({method:'session.status',params:{sessionId,status:row.running?'running':'idle'}})
+    return row?.running
+  }
   const emitEvent = (sessionId, event) => {
     notify({ method: 'session.event', params: { sessionId, event } })
     if (event.type === 'turn/start' || event.type === 'turn/end') {
@@ -116,6 +122,9 @@ export function createRemoteAdapter(base, client, notify, log = () => {}) {
         if (frame.type === 'emit' && frame.event === 'api-session/status') {
           notify({ method: 'session.status', params: { sessionId: frame.args[0], status: frame.args[1] ? 'running' : 'idle' } })
         }
+        if (frame.type === 'emit' && frame.event === 'api-session/error') {
+          notify({ method:'session.error', params:{sessionId:frame.args[0],message:frame.args[1]} })
+        }
         // This client does not own DSH's approval/question UI. Pass scoped
         // waterfalls to the next handler so opening Augmentor never blocks
         // another DSH client's approval or silently grants it.
@@ -150,7 +159,8 @@ export function createRemoteAdapter(base, client, notify, log = () => {}) {
           maxMessages: Math.min(payload.maxMessages ?? 200, 200),
           ...(payload.beforeSeq===undefined?{}:{beforeSeq:payload.beforeSeq}),
         } })
-        return { sessionId: payload.sessionId, header: state.snapshot.header, events: page.records, hasMore: page.hasMore }
+        const running=await refreshStatus(payload.sessionId)
+        return { sessionId: payload.sessionId, header: state.snapshot.header, events: page.records, hasMore: page.hasMore, running }
       }
       if (method === 'session.prompt') {
         await follow(payload.sessionId)
@@ -165,7 +175,9 @@ export function createRemoteAdapter(base, client, notify, log = () => {}) {
         return invoke('session/prompt', { request: { ...payload, requestId: payload.requestId ?? randomUUID() } })
       }
       if (['session.create', 'session.cancel', 'session.rename', 'session.selectModel', 'session.fork'].includes(method)) {
-        return invoke(method.replace('.', '/'), { request: payload })
+        const result=await invoke(method.replace('.', '/'), { request: payload })
+        if(method==='session.cancel')await refreshStatus(payload.sessionId)
+        return result
       }
       throw new Error(`Unsupported DSH method: ${method}`)
     },

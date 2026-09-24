@@ -18,6 +18,7 @@ const button=(parent,label,fn)=>{const b=make('button',label);b.type='button';b.
 let state={},checking=false,closed=false
 const sections=new Map()
 const definitions=[
+  ['voice','Voice','Shared with the floating Augmentor window.','M9 3h6v10H9zM5 10v3a7 7 0 0 0 14 0v-3M12 20v3'],
   ['appearance','Colours','Changes apply immediately.','M12 3a9 9 0 1 0 0 18h1a2 2 0 0 0 1-4 2 2 0 0 1 1-4h2a4 4 0 0 0 4-4c0-3-4-6-9-6ZM7 10h.01M10 6h.01M15 6h.01'],
   ['models','Models','Choose the model Augmentor uses.','M9 3v6m6-6v6M6 9h12v2a6 6 0 0 1-12 0ZM12 17v4'],
   ['harnesses','Harnesses','Choose what powers your browser agent.','M4 7h16M4 17h16M8 4v6m8 4v6'],
@@ -95,6 +96,25 @@ function showMemory(container){
   // Mount on demand: opening Memories should not ask for technical inputs.
   manual.parentElement.addEventListener('toggle',()=>{if(manual.parentElement.open&&!manual.querySelector('dialog'))memoryDialog(document,send,()=>({surface:'browser',harness:state.harness,...(state.sessionId?{sessionId:state.sessionId}:{})}),manual)})
 }
+async function showVoice(container){
+  const response=await send('voice/preferences');if(!response?.ok)throw Error(response?.error||'Voice is unavailable')
+  const data=response.result,fields={}
+  const add=(key,label,input)=>{const row=make('label',label);row.append(input);container.append(row);fields[key]=input;return input}
+  const enabled=add('enabled','Enable Voice',make('input'));enabled.type='checkbox';enabled.checked=data.enabled
+  const voices=add('voiceId','Speaking voice',make('select'))
+  for(const row of data.voices){const option=make('option',row.name);option.value=row.id;voices.append(option)}voices.value=data.values.voiceId
+  for(const [key,label,min,max,step,value] of [['speed','Speaking speed',.75,1.5,.05,data.values.speed],['volume','Output volume',0,1,.05,data.values.volume],['pauseMs','Pause before sending (milliseconds)',400,2000,50,data.pauseMs]]){
+    const input=add(key,label,make('input'));input.type='number';input.min=min;input.max=max;input.step=step;input.value=value
+  }
+  const mode=add('mode','Conversation mode',make('select'))
+  for(const [value,label] of [['manual','Hold or slide to lock'],['hands-free','Hands-free conversation']]){const option=make('option',label);option.value=value;mode.append(option)}mode.value=data.mode
+  const note=make('p','Hold to record · Slide left to lock · Slide right for hands-free · Escape cancels. Changes apply when Voice next opens.');container.append(note)
+  button(container,'Save',async()=>{
+    const settings={voiceId:voices.value,enabled:enabled.checked,mode:mode.value,speed:Number(fields.speed.value),volume:Number(fields.volume.value),pauseMs:Number(fields.pauseMs.value)}
+    const reply=await send('voice/preferences',{action:'save',settings});if(!reply?.ok)throw Error(reply?.error||'Could not save voice settings')
+    note.textContent='Saved for both interfaces. Changes apply when Voice next opens.'
+  })
+}
 function mount(id){
   const row=sections.get(id);if(row.mounted)return
   if(id!=='appearance'&&!['ready','needs-setup'].includes(state.phase)){
@@ -107,6 +127,7 @@ function mount(id){
   if(id==='harnesses')showHarnesses(row.body)
   if(id==='prompts')promptEditor(document,async request=>{const r=await send('prompts',{request});if(!r?.ok)throw Error(r?.error||'Prompt library unavailable');return r.library},()=>{},row.body)
   if(id==='memory')showMemory(row.body)
+  if(id==='voice')void showVoice(row.body).catch(fail)
   if(id==='support'){
     const version=make('div');version.className='card';version.append(make('h2','Augmentor '+chrome.runtime.getManifest().version),make('p','This preview is updated with the Augmentor installer. The companion and extension must use matching versions.'));row.body.append(version)
     void supportDialog(document,send,row.body).catch(fail)

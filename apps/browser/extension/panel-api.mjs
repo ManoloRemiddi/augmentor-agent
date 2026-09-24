@@ -47,7 +47,13 @@ export function handlePanelMessage(msg, sender, sendResponse) {
   // the sender is one of our own chrome-extension:// pages.
   if (!sender || sender.id !== chrome.runtime.id) return
   if (!sender.url || !sender.url.startsWith('chrome-extension://' + chrome.runtime.id)) return
-  if(msg?.type==='voice/connect'){
+  if(msg?.type==='voice/preferences'){
+    if(state.harness!=='dsh'){sendResponse({ok:false,error:'Voice uses the shared DSH harness.'});return}
+    request('augmentor/voice/preferences',{action:msg.action??'get',settings:msg.settings})
+      .then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}))
+    return true
+  }
+  if(msg?.type==='voice/start'){
     if(state.harness!=='dsh'||state.phase!=='ready'||state.running||state.mutating||state.panelViewSession){sendResponse({ok:false,error:'Open an idle DSH conversation first.'});return}
     state.mutating=true
     ;(async()=>{
@@ -63,14 +69,14 @@ export function handlePanelMessage(msg, sender, sendResponse) {
         state.sessionReady=true
         broadcast()
       }
-      return request('augmentor/voice',{sessionId:state.sessionId})
-    })().then(ticket=>sendResponse({ok:true,ticket})).catch(error=>sendResponse({ok:false,error:error.message})).finally(()=>state.mutating=false)
+      return request('augmentor/voice/start',{sessionId:state.sessionId,id:msg.id,handsFree:msg.handsFree===true})
+    })().then(voice=>sendResponse({ok:true,voice})).catch(error=>sendResponse({ok:false,error:error.message})).finally(()=>state.mutating=false)
     return true
   }
-  if(msg?.type==='voice/prompt'){
-    if(state.harness!=='dsh'||state.phase!=='ready'||!state.sessionReady||state.mutating||state.panelViewSession||msg.sessionId!==state.sessionId||!/^[-a-f0-9]{36}$/.test(msg.requestId)||typeof msg.text!=='string'||!msg.text.trim()||msg.text.length>8192){sendResponse({ok:false,error:'Voice message was not submitted: conversation changed or is unavailable.'});return}
-    state.mutating=true
-    request('session.prompt',{sessionId:state.sessionId,requestId:'resonant-voice:'+msg.requestId,mode:state.running?'steer':'queue',content:[{type:'text',text:msg.text}]}).then(result=>{sendResponse({ok:result?.accepted===true});broadcast()}).catch(error=>sendResponse({ok:false,error:'Submission outcome is unknown. Check chat before trying again. '+error.message})).finally(()=>state.mutating=false)
+  if(msg?.type==='voice/control'){
+    if(state.harness!=='dsh'||msg.action!=='close'&&msg.sessionId!==state.sessionId){sendResponse({ok:false,error:'Voice conversation changed.'});return}
+    request('augmentor/voice/control',{sessionId:msg.sessionId,id:msg.id,action:msg.action})
+      .then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}))
     return true
   }
   if(msg?.type==='onboarding/start'){
@@ -87,6 +93,14 @@ export function handlePanelMessage(msg, sender, sendResponse) {
   if(msg?.type==='interaction/respond'){
     const row=state.interactions.find(row=>row.id===msg.id)
     if(!row){sendResponse({ok:false,error:'This request has expired.'});return}
+    if(state.harness==='dsh'){
+      const value=msg.value
+      if(value?.outcome==='denied')value.outcome='rejected'
+      request('augmentor/interaction',{sessionId:row.params.sessionId,id:msg.id,value}).then(()=>{
+        state.interactions=state.interactions.filter(row=>row.id!==msg.id);sendResponse({ok:true});broadcast()
+      }).catch(error=>sendResponse({ok:false,error:'Decision outcome is unknown. Check the conversation before trying again. '+error.message}))
+      return true
+    }
     state.port?.postMessage({id:msg.id,result:msg.value});state.interactions=state.interactions.filter(row=>row.id!==msg.id);sendResponse({ok:true});return
   }
   if(msg?.type==='message/branch'){
