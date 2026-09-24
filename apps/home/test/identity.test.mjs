@@ -19,7 +19,7 @@ async function fixture(t){
   return {status:r.status,body:await r.json(),cookie:r.headers.get('set-cookie')?.split(';')[0]};
  };
  const pair=async(role='member',kind='api')=>{const {code}=app.identities.invite(role);return request('/pair',{body:{code,kind,name:role},origin:kind==='browser'?url:undefined});};
- return {app,ledger,url,calls,request,pair};
+ return {app,ledger,url,calls,request,pair,runtime};
 }
 test('one-use expiring pairing, stored credentials hashed, browser bearer cannot authenticate',async t=>{
  const h=await fixture(t),invite=h.app.identities.invite('owner');
@@ -52,4 +52,15 @@ test('asynchronous acceptance persists status and another client cannot cancel i
  assert.equal((await h.request('/requests/one',{token:a.body.token})).body.status,'running');
  assert.equal((await h.request('/cancel',{token:b.body.token,body:{}})).status,403);
  assert.equal((await h.request('/cancel',{token:a.body.token,body:{}})).status,200);
+});
+
+test('direct actions enforce roles, persist results and avoid a second model call or duplicate dispatch',async t=>{
+ const h=await fixture(t);let writes=0;
+ h.runtime.devices={async validate(args){assert.equal(args.entity_id,'light.fixture');},async execute(){writes++;return {status:'completed',evidence:'integration-state-observed'};}};
+ const member=await h.pair(),viewer=await h.pair('viewer');
+ const body={request_id:'direct',session_id:'home',action:{entity_id:'light.fixture',action:'on'}};
+ assert.equal((await h.request('/device-actions',{token:viewer.body.token,body})).status,403);
+ assert.equal((await h.request('/device-actions',{token:member.body.token,body})).body.status,'completed');
+ assert.equal((await h.request('/device-actions',{token:member.body.token,body})).body.replayed_response,true);
+ assert.equal(writes,1);assert.equal(h.calls.length,0);assert.equal(h.ledger.pending().length,0);
 });

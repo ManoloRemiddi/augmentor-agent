@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import tempfile
 import urllib.request
+import urllib.error
 from urllib.parse import urlsplit
 
 
@@ -44,7 +45,11 @@ def _call_locked(method,params,path):
         if saved:
             # Revoke remotely first. A failed revocation must not be reported as success.
             request=urllib.request.Request(endpoint(saved['url'])+'/logout',data=b'{}',headers={'Authorization':'Bearer '+saved['token'],'Content-Type':'application/json'})
-            with urllib.request.build_opener(NoRedirect()).open(request,timeout=10) as response:response.read(8192)
+            try:
+                with urllib.request.build_opener(NoRedirect()).open(request,timeout=10) as response:response.read(8192)
+            except urllib.error.HTTPError as error:
+                if error.code!=401:raise
+                # The credential is already revoked/expired; local removal is safe.
         path.unlink(missing_ok=True)
         return {'connected':False}
     if method!='home.connection.pair':raise ValueError('Unknown Home configuration operation')

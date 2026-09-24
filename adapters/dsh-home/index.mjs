@@ -30,7 +30,7 @@ const intentOutcome={augmentorExecution:{outcome(_args,value){
 
 // This is policy around the existing DSH and upstream MCP bridge, not an agent
 // loop or a device driver. HA Assist owns entity exposure and intent execution.
-export function installHomePolicy(ctx,ledger,current,{maxTools=12,maxSteps=10}={}) {
+export function installHomePolicy(ctx,ledger,current,{maxTools=12,maxSteps=10,devices=null}={}) {
   const reservations=new Map(),denied=new Set();
   ctx.on('agent/pre-step',async(exec,next)=>{
     const result=await next(),turn=current();
@@ -44,7 +44,15 @@ export function installHomePolicy(ctx,ledger,current,{maxTools=12,maxSteps=10}={
     try {
       if(!turn||exec.signal.aborted)throw new Error('No active Home request.');
       if(++turn.tools>maxTools)throw new Error('Home tool budget exhausted.');
-      const effect=authority(exec.name,exec.arguments);
+      let effect;
+      if(devices){
+        if(!['home_devices','home_set'].includes(exec.name))throw new Error('This Home capability is not enabled.');
+        effect=exec.name==='home_devices'?'read':'change';
+        if(effect==='change'){
+          if(turn.readOnly)throw new Error('This client has read-only Home access.');
+          await devices.validate(exec.arguments,exec.signal);
+        }
+      }else effect=authority(exec.name,exec.arguments);
       if(effect!=='read') {
         if(turn.readOnly)throw new Error('This client has read-only Home access.');
         const id=ledger.reserve(turn.id,exec.name,exec.arguments);
@@ -61,8 +69,8 @@ export function installHomePolicy(ctx,ledger,current,{maxTools=12,maxSteps=10}={
     if(denied.delete(exec.token))return;
     const reservation=reservations.get(exec.token),turn=reservation?.turn??current();
     if(!turn)return;
-    const effect=exec.name===READ_TOOL?'read':'change';
-    const outcome=actionOutcome(exec,result,effect==='change'?intentOutcome:undefined,effect);
+    const effect=[READ_TOOL,'home_devices'].includes(exec.name)?'read':'change';
+    const outcome=actionOutcome(exec,result,effect==='change'?(devices?{augmentorExecution:{outcome:(_a,value)=>({status:value?.status==='completed'?'completed':'unknown'})}}:intentOutcome):undefined,effect);
     if(reservation){ledger.outcome(reservation.id,outcome.status);reservations.delete(exec.token);}
     turn.trace.push({tool:exec.name,status:outcome.status,...reservation?{action_id:reservation.id}:{}});
   });

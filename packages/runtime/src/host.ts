@@ -71,13 +71,13 @@ export class Host {
   getMeta(id:unknown){const m=this.metadata.get(identifier(id));if(!m)throw new Error('Conversation not found');return m;}
   policy(m:Meta){return (pi:ExtensionAPI)=>{pi.on('tool_call',async e=>{
     if(e.toolName==='linux_desktop_stop')this.desktopSpecialist.cancel('pi:'+m.id);
-    if(m.surface==='browser'&&!['browser_tabs_list','browser_screenshot','browser_snapshot','browser_navigate','browser_click','browser_type','memory_recall','memory_source','home_read','home_status','home_request','home_result','home_cancel'].includes(e.toolName))
+    if(m.surface==='browser'&&!['browser_tabs_list','browser_screenshot','browser_snapshot','browser_navigate','browser_click','browser_type','memory_recall','memory_source','home_devices','home_set','home_read','home_status','home_request','home_result','home_cancel'].includes(e.toolName))
       return {block:true,reason:'This browser chat can only use its browser tools.'};
     if(this.desktopSpecialist.busy()&&['linux_desktop_connect','linux_desktop_snapshot','linux_desktop_action'].includes(e.toolName))return {block:true,reason:'A desktop specialist owns the desktop. Wait for it or Stop it before using direct desktop tools.'};
-    if(['home_read','home_status','home_result','home_cancel','desktop_delegate','desktop_evidence','memory_recall','memory_source','read','ls','find','grep','linux_system_profile','linux_desktop_observe','linux_desktop_connect','linux_desktop_snapshot','linux_desktop_stop','ask_user','browser_tabs_list','browser_screenshot','browser_snapshot'].includes(e.toolName))return;
+    if(['home_devices','home_read','home_status','home_result','home_cancel','desktop_delegate','desktop_evidence','memory_recall','memory_source','read','ls','find','grep','linux_system_profile','linux_desktop_observe','linux_desktop_connect','linux_desktop_snapshot','linux_desktop_stop','ask_user','browser_tabs_list','browser_screenshot','browser_snapshot'].includes(e.toolName))return;
     if(e.toolName==='bash'&&isRoutineQuery(e.input.command))return;
     if(m.policy==='read-only')return {block:true,reason:'Read-only chat: actions that can change state are disabled.'};
-    if(e.toolName==='home_request')return; // Persistent NAS pairing grants the scoped Home capability.
+    if(['home_request','home_set'].includes(e.toolName))return; // Persistent NAS pairing grants the scoped Home capability.
     if(m.policy!=='danger-full-access'&&!await this.interactions.approve(m.id,e.toolName,e.input))return {block:true,reason:'Action not approved, cancelled or no user interface connected.'};
   });};}
   async load(m:Meta,branchManager?:SessionManager){let record=this.loaded.get(m.id);if(record)return record;

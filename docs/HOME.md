@@ -205,7 +205,7 @@ Owner action acknowledgement never replays the action.
 Validation of this candidate: 17 Home tests use actual DSH/MCP with fixture model
 and device endpoints; five shared-client tests cover interrupted access,
 pre-admission refusal, duplicate tool calls and bounded responses. Shared suite
-185/185, Browser 21/21, and native 403/403 passed; native ran with the pinned
+185/185, Browser 21/21, and native 402 passed with one environment-dependent skip; native ran with the pinned
 requirements in an isolated Qt environment because system Qt lacks QtTest.
 Two additional Python pairing tests pass. The in-app browser exercised disposable
 pairing and request/reply and inspected a 390px layout without horizontal overflow.
@@ -215,3 +215,53 @@ Still required: candidate NAS deployment and client-harness qualification,
 Home-specific stable entity selection, guided HA/model setup, routines, voice,
 retention/backup/update flows and continuous-operation qualification. Existing
 installed clients and the recorded NAS image remain unchanged at this checkpoint.
+
+
+Candidate deployment evidence: `005b3e7` image was built on the NAS and run in
+separate state with a one-CPU/256 MiB limit. Private HTTPS pairing and the shared
+client successfully called the real DeepSeek provider to read the existing virtual
+helper. The candidate was healthy at 89.25 MiB and 0.00% CPU in one idle sample;
+this is a spot measurement, not an unattended-operation qualification. Existing
+NAS preview and Desktop remain selected. Exact private origin/image are recorded
+in the companion. A real DSH client test also caught and corrected the adapter's
+content-block rendering contract before client promotion.
+
+Owner recovery: run `docker exec <container> node manage.mjs invite owner`, then
+open the state directory's private `pairing-code` locally. This uses the installed
+operator credential without printing it or placing it in command arguments. The
+code expires in ten minutes. No restart or conversation replay is required.
+
+## Selected-device adapter and direct controls
+
+New configurations default to `HOME_DEVICE_MODE=selected`. No entities are enabled
+initially. The owner's Home page loads existing HA inventory and explicitly enables
+read-only or reviewed control access (up to 64 registered entities in this profile).
+The adapter reuses [HA REST services](https://developers.home-assistant.io/docs/api/rest/)
+and the [HA entity registry](https://github.com/home-assistant/core/blob/2026.9.3/homeassistant/components/config/entity_registry.py).
+It implements no device protocol. Registration identity, integration and unique ID
+are checked against the saved selection before dispatch. Replacement or rename
+fails closed for owner review. It leaves HA's shared Assist exposure unchanged.
+HA configuration is trusted administration; registry validation and service execution
+are separate upstream operations, not an atomic compare-and-execute guarantee.
+
+The selected mode registers only `home_devices` and `home_set` inside the NAS
+harness. The generic Assist bridge is absent, preventing intent names from bypassing
+the selection. Lights, reviewed switches/helpers and read-only sensors are the
+initial supported categories. Device names are data, never authorization. A helper
+or switch may trigger existing automations; the owner must review those effects.
+Unregistered devices, locks and arbitrary services are unavailable.
+
+Clients can call `home_devices` and then `home_set` for an exact, unambiguous entity.
+`POST /device-actions` uses the same admission, role checks, durable requests and
+action ledger, without a second LLM call. Status distinguishes observed integration
+state from an uncertain result and never claims physical verification. Missing,
+replaced, unselected and read-only devices are rejected before dispatch. HTTP or
+state-verification failure after dispatch remains unknown; no automatic retry.
+`HOME_DEVICE_MODE=assist-preview` explicitly retains the earlier MCP prototype for
+compatibility and its earlier evidence only; it does not enforce Home selections.
+
+Qualification: 21 Home tests now include the actual selected-device DSH path,
+registry replacement, excluded targets, forged arguments, viewer denial and direct
+request deduplication. The shared DSH suite's 36 tests include real client delegation.
+Non-admin registry reads were verified against HA 2026.9.3 on the NAS. Selected-mode
+real service control and installed-client qualification remain separate gates.

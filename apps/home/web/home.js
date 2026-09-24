@@ -14,3 +14,14 @@ $('refresh').onclick=()=>start().catch(notice);$('stop').onclick=()=>api('/cance
 $('logout').onclick=()=>api('/logout',{}).then(()=>{sessionStorage.clear();$('messages').replaceChildren();return start();}).catch(notice);
 $('invite').onsubmit=async e=>{e.preventDefault();try{const result=await api('/clients/invite',Object.fromEntries(new FormData(e.target)));display('code',result.code+' — expires in 10 minutes; share only with the intended person.');}catch(error){notice(error);}};
 start();
+
+$('load-devices').onclick=async()=>{try{
+ const {devices}=await api('/devices');$('devices').replaceChildren();
+ for(const device of devices){
+  const row=document.createElement('article');row.textContent=`${device.name} (${device.entity_id}) — ${device.state}`;
+  const choice=document.createElement('select');choice.setAttribute('aria-label','Access for '+device.entity_id);
+  for(const [value,text] of [['off','Not connected'],['read','Read only'],...(device.can_control?[['control','Control — effects reviewed']]:[])]){const option=document.createElement('option');option.value=value;option.textContent=text;choice.append(option);}
+  choice.value=device.selected?(device.control?'control':'read'):'off';choice.disabled=!device.selectable;row.append(choice);
+  const save=button('Save access',async()=>{await api('/devices/select',{entity_id:device.entity_id,enabled:choice.value!=='off',control:choice.value==='control',effects_reviewed:choice.value==='control'});display('error','Device access saved.');});save.disabled=!device.selectable;row.append(save);$('devices').append(row);
+ }
+}catch(error){notice(error);}};

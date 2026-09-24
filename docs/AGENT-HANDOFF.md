@@ -12,7 +12,9 @@ inside existing Augmentor clients, with independent household hardware/models/AP
 configuration. A shared client adapter, pairing/settings and lightweight NAS page are now a
 source candidate; see Home for test evidence. Installed clients and NAS promotion
 remain separate, and full resource qualification is still pending.
-Read the guide for exact fixture/live evidence and limits before expanding device
+New configuration defaults to owner-selected registered entities; the earlier
+Assist MCP mode remains an explicit compatibility preview. Read the guide for
+exact fixture/live evidence and limits before expanding device
 access. This preview does not change the installed Desktop or Browser release.
 
 ## September 24 WebSocket security release
