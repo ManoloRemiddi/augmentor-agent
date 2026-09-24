@@ -6,8 +6,10 @@
 
 The owner confirmed the installed launcher works and requested click-to-open,
 click-again-to-close. The KDE adapter now resolves the actual Chromium dashboard
-window on each click; explicit Open raises it. See the launcher guide for platform
-limits and the latest installed toggle evidence.
+window on each click; explicit Open raises it. Release `20260924-205229-78c3c113`
+is selected and its tray is running. Actual tray activation passed open/close/open
+with one Home window and unrelated window IDs preserved. See the launcher guide
+for platform limits and evidence. This supersedes the initial selection below.
 
 [Home launcher](HOME-LAUNCHER.md) implements a lightweight Qt tray process for
 opening an existing NAS dashboard through the installed browser. It remembers

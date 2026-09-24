@@ -71,6 +71,19 @@ launcher tests, not physical device operations or cross-platform certification.
 
 ### Installed Linux evidence — 24 September 2026
 
+**Latest selection:** toggle implementation `09a7dfb`, release
+`20260924-205229-78c3c113`, artifact SHA-256
+`6466feffb8661e73e9b8dba84565c18a420365e62f9930f9d61159fdd2ac3090`.
+The tray was restarted onto this release; conversation windows retain the builds
+listed below. Six native checks and an isolated window-identity script passed.
+Live KDE StatusNotifier Activate calls opened one window, closed it on the second
+click, and reopened one on the third. Explicit Open retained one window. The
+compositor's unrelated window IDs were preserved. The shared KWin read-only
+observation path was also exercised after extracting its script executor.
+Managed staging/inventory/import and authenticated activation passed.
+
+The following records the preceding initial installation:
+
 Implementation `76cb697` was applied to a separate copy of the selected compatible
 0.2.11 desktop artifact, preserving its other native/runtime patches. Managed
 stage/import/inventory and authenticated activation preflight passed. Selected

@@ -4,6 +4,11 @@
 
 ## September 24: optional Home dashboard tray
 
+The follow-up click-toggle fix `09a7dfb` is selected in
+`20260924-205229-78c3c113`; only the Home tray was restarted. Actual tray
+open/close/open and explicit-Open reuse passed with unrelated windows preserved.
+This supersedes the initial selection recorded next.
+
 [Home launcher evidence](HOME-LAUNCHER.md#installed-linux-evidence--24-september-2026)
 records selected release `20260924-202032-d5e07a94`, based on the previously
 selected sidebar-speed artifact with implementation `76cb697` added. Stage and
