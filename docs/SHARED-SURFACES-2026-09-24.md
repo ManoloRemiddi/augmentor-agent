@@ -234,4 +234,13 @@ startup, model/voice controls, prompt improvement and draft preservation.
 The existing packaged-browser proof expects five header controls. DOM evidence
 does not establish pixel geometry or acceptance of this latest refinement in the
 user's Chromium; extension reload and visual confirmation remain separate.
-Local adoption is recorded below after staging the compatible 0.2.11 patch.
+Source `87a79c9` was layered onto the preceding compatible 0.2.11 artifact,
+staged and activated as `20260924-145559-9b335914`, SHA-256
+`9f9919c0fc4fc1aab40038886aa1331d5f991f216cdb92b03ab43fe96afdc065`.
+Activation passed inventory/dependency and authenticated product/model preflight.
+All 53 prepared extension files match this artifact; the removed surface-host
+module is absent, and manifest identity/version and the existing load path are
+preserved. The previous extension folder is backed up privately. Chromium Reload
+and reopening the sidebar are the remaining adoption steps for this revision.
+Native windows and DSH were not restarted; unsent drafts remain undisturbed.
+This is a compatible local preview and PR source, not a new public release.
