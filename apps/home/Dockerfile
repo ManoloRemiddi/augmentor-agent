@@ -14,6 +14,7 @@ WORKDIR /app/apps/home
 COPY apps/home/package.json apps/home/package-lock.json ./
 RUN npm ci --ignore-scripts --omit=dev --no-audit --no-fund && npm cache clean --force
 COPY apps/home/*.mjs ./
+COPY apps/home/web ./web
 COPY adapters/dsh-home /app/adapters/dsh-home
 COPY adapters/dsh-execution /app/adapters/dsh-execution
 COPY services /app/services

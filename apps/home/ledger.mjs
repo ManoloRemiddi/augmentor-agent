@@ -14,9 +14,10 @@ export class Ledger {
       CREATE TABLE IF NOT EXISTS requests(id TEXT PRIMARY KEY, digest TEXT NOT NULL, session TEXT NOT NULL, status TEXT NOT NULL, response TEXT);
       CREATE TABLE IF NOT EXISTS actions(id INTEGER PRIMARY KEY, request TEXT NOT NULL, key TEXT NOT NULL, tool TEXT NOT NULL, status TEXT NOT NULL, arguments TEXT, UNIQUE(request,key));`);
     if(!this.db.prepare('PRAGMA table_info(actions)').all().some(c=>c.name==='arguments'))this.db.exec('ALTER TABLE actions ADD COLUMN arguments TEXT');
+    if(!this.db.prepare('PRAGMA table_info(requests)').all().some(c=>c.name==='owner'))this.db.exec("ALTER TABLE requests ADD COLUMN owner TEXT NOT NULL DEFAULT 'operator'");
     this.db.exec("UPDATE requests SET status='interrupted' WHERE status='running'; UPDATE actions SET status='unknown' WHERE status='running'");
   }
-  begin(id,session,prompt) {
+  begin(id,session,prompt,owner='operator') {
     const digest=createHash('sha256').update(JSON.stringify([session,prompt])).digest('hex');
     const old=this.db.prepare('SELECT * FROM requests WHERE id=?').get(id);
     if(old) {
@@ -24,7 +25,7 @@ export class Ledger {
       if(old.response)return JSON.parse(old.response);
       throw new Conflict('Earlier request is running or interrupted. Inspect its history and action outcomes; it will not be replayed.');
     }
-    this.db.prepare("INSERT INTO requests VALUES(?,?,?,'running',NULL)").run(id,digest,session);
+    this.db.prepare("INSERT INTO requests(id,digest,session,status,response,owner) VALUES(?,?,?,'running',NULL,?)").run(id,digest,session,owner);
     return null;
   }
   finish(id,response) { this.db.prepare("UPDATE requests SET status='finished',response=? WHERE id=?").run(JSON.stringify(response),id); }
@@ -37,7 +38,7 @@ export class Ledger {
   outcome(id,status) { this.db.prepare('UPDATE actions SET status=? WHERE id=?').run(status,id); }
   pending() { return this.db.prepare("SELECT id,request,tool,status,arguments FROM actions WHERE status IN ('running','unknown')").all(); }
   request(id) {
-    const row=this.db.prepare('SELECT id,session,status,response FROM requests WHERE id=?').get(id);
+    const row=this.db.prepare('SELECT id,session,status,response,owner FROM requests WHERE id=?').get(id);
     return row?{...row,response:row.response?JSON.parse(row.response):null}:null;
   }
   acknowledge(id) {

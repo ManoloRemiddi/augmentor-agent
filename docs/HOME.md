@@ -173,3 +173,45 @@ backup/restore testing, storage retention/quotas and update UX. Persistent histo
 currently grows; operators must monitor storage. Docker restart policy covers
 process/host startup; an unhealthy dependency does not itself restart a container.
 HA automations remain independent of cloud model availability.
+
+## Shared client and lightweight access candidate — 24 September
+
+The approved development plan is being implemented. This candidate adds a shared
+Home connection for DSH and Pi, native and Browser settings, and a small static NAS
+page. Pairing issues independent, revocable owner/member/viewer clients. Browser
+credentials use HttpOnly SameSite cookies with origin/CSRF checks; API credentials
+stay in the local private configuration file and never enter tool arguments.
+Invites last ten minutes, browser sessions seven days and API clients ninety days.
+The operator credential remains a local recovery path. Initial startup writes an
+owner invitation to the private state directory's `pairing-code`; an owner can
+issue additional invitations through the page or authenticated `/clients/invite`.
+
+Set `HOME_PUBLIC_ORIGIN` to the exact private HTTPS origin used by an existing
+reverse proxy. The process still binds loopback. With no public origin, browser
+access is restricted to loopback (including an SSH tunnel). Do not enable public
+Funnel, wildcard origins or cleartext LAN access to the Home gateway.
+
+Desktop and Browser settings connect through the shared local prompt service.
+They save `augmentor/home.json` under the user's platform configuration directory
+(mode 0600). `AUGMENTOR_HOME_CONNECTION` overrides that path for qualification.
+`packages/home-client` provides `home_status`, `home_read`, `home_request`,
+`home_result` and `home_cancel` to both harnesses. Home requests include only the
+relevant user request, with client-scoped request/session IDs. The NAS retains
+accepted work after client disconnect. Local receipts prevent an uncertain
+submission from becoming a fresh device action. Viewer and read-only request
+constraints are enforced before a device tool dispatch, independent of model text.
+Owner action acknowledgement never replays the action.
+
+Validation of this candidate: 17 Home tests use actual DSH/MCP with fixture model
+and device endpoints; five shared-client tests cover interrupted access,
+pre-admission refusal, duplicate tool calls and bounded responses. Shared suite
+185/185, Browser 21/21, and native 403/403 passed; native ran with the pinned
+requirements in an isolated Qt environment because system Qt lacks QtTest.
+Two additional Python pairing tests pass. The in-app browser exercised disposable
+pairing and request/reply and inspected a 390px layout without horizontal overflow.
+These checks do not establish real phone voice or installed Desktop integration.
+
+Still required: candidate NAS deployment and client-harness qualification,
+Home-specific stable entity selection, guided HA/model setup, routines, voice,
+retention/backup/update flows and continuous-operation qualification. Existing
+installed clients and the recorded NAS image remain unchanged at this checkpoint.

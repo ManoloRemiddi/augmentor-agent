@@ -16,7 +16,7 @@ export async function boundedJson(url,options={},limit=16*1024*1024){
   for await(const chunk of response.body){bytes+=chunk.length;if(bytes>limit)throw Error('DSH response exceeds the preview size limit.');chunks.push(chunk)}
   return JSON.parse(Buffer.concat(chunks).toString())
 }
-const independent=new Set(['augmentor/dsh','augmentor/prompts','augmentor/memory','augmentor/diagnostics','updates/check','shutdown'])
+const independent=new Set(['augmentor/home','augmentor/dsh','augmentor/prompts','augmentor/memory','augmentor/diagnostics','updates/check','shutdown'])
 const methods=new Set(['augmentor/models','initialize','augmentor/state','augmentor/save','augmentor/unsave','session.list','session.create','session.selectModel','session.models','session.history','session.prompt','session.cancel','session.rename','session.branch','settings.describe','settings.mutate'])
 const settings=new Set(['permission','model-picker-augmented'])
 export class DshBoundary{

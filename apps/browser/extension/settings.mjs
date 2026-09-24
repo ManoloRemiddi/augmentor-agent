@@ -1,3 +1,4 @@
+import {homeSettings} from './home.mjs'
 // Augmentor — dsh-augmentor plugin, pipe, and Chromium extension
 // Copyright © 2026 Manolo Remiddi
 // SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
@@ -22,6 +23,7 @@ const definitions=[
   ['models','Models','Choose the model Augmentor uses.','M9 3v6m6-6v6M6 9h12v2a6 6 0 0 1-12 0ZM12 17v4'],
   ['harnesses','Harnesses','Choose what powers your browser agent.','M4 7h16M4 17h16M8 4v6m8 4v6'],
   ['prompts','Prompt library','Reusable prompts, shared with Augmentor Agent and both harnesses. Type / in chat to use one.','M5 3h14v18H5zM8 8h8M8 12h8M8 16h4'],
+  ['home','Home','Connect your NAS and use Home in your Augmentor conversations.','M3 10l9-7 9 7v11H3z'],
   ['memory','Memories','Shared across your browser and Linux agents.','M4 5c0-4 16-4 16 0s-16 4-16 0v14c0 4 16 4 16 0V5M4 12c0 4 16 4 16 0'],
   ['support','Support','Version information and a report you can review before sharing.','M12 11v6m0-10v1M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0'],
 ]
@@ -106,6 +108,7 @@ function mount(id){
   if(id==='models')showModels(row.body)
   if(id==='harnesses')showHarnesses(row.body)
   if(id==='prompts')promptEditor(document,async request=>{const r=await send('prompts',{request});if(!r?.ok)throw Error(r?.error||'Prompt library unavailable');return r.library},()=>{},row.body)
+  if(id==='home')homeSettings(document,send,row.body)
   if(id==='memory')showMemory(row.body)
   if(id==='support'){
     const version=make('div');version.className='card';version.append(make('h2','Augmentor '+chrome.runtime.getManifest().version),make('p','This preview is updated with the Augmentor installer. The companion and extension must use matching versions.'));row.body.append(version)

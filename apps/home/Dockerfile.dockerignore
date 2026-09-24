@@ -20,6 +20,8 @@
 !apps/
 !apps/home/
 !apps/home/*.mjs
+!apps/home/web/
+!apps/home/web/**
 !apps/home/package*.json
 !apps/home/Dockerfile
 **/node_modules

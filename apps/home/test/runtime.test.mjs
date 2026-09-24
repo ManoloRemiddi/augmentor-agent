@@ -93,3 +93,9 @@ test('unadvertised administrative tools and unsafe domains are denied before MCP
   assert.equal(result.status,'incomplete');assert.equal(h.writes(),1);
   assert.equal(h.ledger.pending()[0].status,'unknown');
  });
+
+ test('read-only authority denies a model-requested write before MCP dispatch',async t=>{
+  const h=await fixture(t,n=>n===1?tool(turnOn,args,'forbidden'):answer('Read-only access.'));
+  await h.runtime.ask('readonly','viewer','Turn on test',{readOnly:true});
+  assert.equal(h.writes(),0);assert.equal(h.ledger.pending().length,0);
+ });

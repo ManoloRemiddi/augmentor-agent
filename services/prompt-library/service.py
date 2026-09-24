@@ -20,6 +20,7 @@ from memory.provider import Memory
 from support.report import report as support_report
 from dsh.setup import Setup as DshSetup
 from platform_support import require_same_user
+from home.client import call as home_connection_call
 
 PROTOCOL='augmentor-prompts/1'
 LIMIT=1024*1024
@@ -112,6 +113,7 @@ class Library:
         else:raise ValueError('Unsupported prompt operation')
         return self.snapshot(db)
     def call(self,method,p,request_id):
+        if isinstance(method,str) and method.startswith('home.connection.'):return home_connection_call(method,p)
         if method=='support.report':return support_report()
         if isinstance(method,str) and method.startswith('dsh.'):return self.dsh.call(method,p)
         if isinstance(method,str) and method.startswith('memory.'):

@@ -46,6 +46,7 @@ export function installHomePolicy(ctx,ledger,current,{maxTools=12,maxSteps=10}={
       if(++turn.tools>maxTools)throw new Error('Home tool budget exhausted.');
       const effect=authority(exec.name,exec.arguments);
       if(effect!=='read') {
+        if(turn.readOnly)throw new Error('This client has read-only Home access.');
         const id=ledger.reserve(turn.id,exec.name,exec.arguments);
         reservations.set(exec.token,{id,turn});
       }

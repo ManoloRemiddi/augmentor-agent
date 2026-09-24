@@ -38,9 +38,9 @@ export async function createRuntime(config,ledger) {
       ctx,
       get busy(){return !!active;},
       cancel(){if(active)handles.get(active.session)?.agent.cancel({kind:'user'});},
-      async ask(id,session,prompt){
+      async ask(id,session,prompt,{readOnly=false}={}){
         if(active)throw new Error('Home is busy');
-        const turn={id,session,steps:0,tools:0,trace:[]};active=turn;
+        const turn={id,session,readOnly,steps:0,tools:0,trace:[]};active=turn;
         let timer;
         try {
           const h=await handle(session),before=h.agent.session.snapshotEvents().length;
