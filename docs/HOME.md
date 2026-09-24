@@ -334,3 +334,9 @@ session creation and threads revocation/Stop through admission and direct-device
 validation. Cancellation before the first model request produces no provider or
 device call. The 26-test Home suite covers that startup race and revocation of an
 active client. This does not change the separately coordinated Desktop artifact.
+
+Shutdown follow-up: after closing the HTTP/runtime services and SQLite ledger, the
+container process now explicitly exits. Docker stop had otherwise reached its
+forced-stop deadline despite an idle service. The correction is qualified in an
+isolated container before main promotion; this paragraph does not imply a host
+power-loss test.

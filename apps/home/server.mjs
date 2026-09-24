@@ -199,7 +199,7 @@ export async function main(){
   if(!app.identities.hasOwner()){const invite=app.identities.invite('owner');writeFileSync(join(config.stateDir,'pairing-code'),invite.code+'\n',{mode:0o600});}
   app.server.listen(Number(process.env.PORT??8181),'127.0.0.1',()=>console.log('Augmentor Home ready on loopback; shared DSH runtime, HA Assist MCP'));
   let closing=false;
-  const stop=async()=>{if(closing)return;closing=true;await app.close();ledger.close();};
+  const stop=async()=>{if(closing)return;closing=true;await app.close();ledger.close();process.exit(0);};
   process.on('SIGTERM',()=>void stop());process.on('SIGINT',()=>void stop());
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)main().catch(()=>{console.error('Home startup failed; check configured endpoints, credentials and dependencies.');process.exitCode=1;});
