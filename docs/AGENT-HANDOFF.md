@@ -7,8 +7,10 @@
 The user rejected the differing sidebar layout. The new source follows the native
 window header/composer/footer and shares icon/spacing definitions. See the latest
 [shared surfaces qualification](SHARED-SURFACES-2026-09-24.md#sidebar-presentation-correction--source-candidate).
-Browser visual acceptance is pending access; this correction is not installed yet.
-Do not overwrite a working window or claim a screenshot comparison has passed.
+The correction is now selected locally and copied to the existing prepared
+extension folder. Chromium still needs Reload; do not remove/reinstall it.
+Packaged-browser CI and its screenshot were reviewed; user-profile acceptance
+remains unconfirmed. See the latest adoption entry for the exact artifact.
 
 ## September 24 shared personal agent and voice
 

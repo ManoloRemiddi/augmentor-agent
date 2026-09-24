@@ -188,3 +188,26 @@ until screenshots and overflow/interaction checks are performed.
 The source branch incorporates public `main` at `1eb8136` (0.2.12 flare release).
 Local staging remains compatible with the installed 0.2.11 preview integration;
 public release version and local preview artifact identity are separate.
+
+### Sidebar correction activated after user follow-up
+
+The earlier staging-only state above is superseded. The user reported still
+seeing the old interface and requested the missing installation steps. The
+compatible local update was activated and all 54 prepared extension files were
+verified against the selected immutable artifact, preserving the extension key
+and its existing load path. Reloading that extension in Chromium is now the only
+Browser adoption step; removing/reinstalling it is unnecessary. Existing native
+windows retain their running build until safely reopened.
+
+Selected release: `20260924-143941-5fb1aea5`; SHA-256
+`63f93a85a6bebee8b07fb06b2a96c8a1094563c1770a8d8db8db97a54afdc2cc`. Presentation source `c91cf66`,
+with font-independent plus/follow icons from `4250f02`; Home and flare corrections
+remain included. Product compatibility remains 0.2.11 for the local preview.
+
+Public CI run 35999257919 passed Debian, Home, installed-package and packaged
+Browser checks for source `ccf8014`. Its actual packaged-browser screenshot was
+inspected; it showed the new composer/footer arrangement and revealed missing
+font fallback for two toolbar glyphs. The follow-up renders those as vectors;
+focused controls and complete DOM-entrypoint checks pass. The selected local
+native host passed its handshake, DSH initialization and shared appearance read.
+The user's reloaded sidebar and physical voice acceptance remain unconfirmed.
