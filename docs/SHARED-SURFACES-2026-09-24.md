@@ -272,3 +272,13 @@ The source extension package also builds successfully with unchanged extension
 ID. Chromium Reload followed by reopening the sidebar adopts both changes.
 No native windows or DSH services were restarted. This is local preview adoption
 and PR source, not a replacement of published release artifacts.
+
+
+### Match Desktop rolling-letter speed
+
+The user accepted the restored animation but found it too slow. The sidebar now
+uses Desktop's 7–9.6 letter advances per second and starting phase formula,
+accounting for the CSS wheel traveling two letters per cycle. This replaces the
+previous 3.4–7.1 advances per second. The 700 ms settling interval remains the
+same as Desktop. The existing animation lifecycle tests cover cancellation and
+draft integrity; this timing-only adjustment needs no new behavioral test.

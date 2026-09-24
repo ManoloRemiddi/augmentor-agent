@@ -22,8 +22,11 @@ export function startLetterRoll(input){
         if(!/[a-z0-9]/i.test(char)){word.append(doc.createTextNode(char));continue}
         const cell=doc.createElement('span'),original=doc.createElement('span'),wheel=doc.createElement('span')
         cell.className='prompt-letter-cell';original.className='prompt-letter-original';wheel.className='prompt-letter-wheel'
-        cell.style.setProperty('--roll-speed',`${.28+(i%7)*.05}s`)
-        cell.style.setProperty('--roll-delay',`${-i*.071}s`)
+        // Desktop advances 7–9.6 letters/second. This CSS loop travels two
+        // letter heights, so its duration is two divided by that same rate.
+        const rate=7+(i%5)*.65
+        cell.style.setProperty('--roll-speed',`${2/rate}s`)
+        cell.style.setProperty('--roll-delay',`${-i*.71/rate}s`)
         cell.style.setProperty('--settle-delay',`${(.12+.78*(i*37%101)/100)*680}ms`)
         original.textContent=char
         const alphabet=/[0-9]/.test(char)?'0123456789':'abcdefghijklmnopqrstuvwxyz'

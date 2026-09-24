@@ -24,7 +24,9 @@ instructions as Desktop. Its input now also shows a paint-only rolling-letter
 preview while waiting, with the same 700 ms settling interval before committing
 the rewritten draft. The actual textarea keeps the original text during both
 phases. Unicode and punctuation remain readable. The preview follows the input's
-size and scroll position, and honors reduced-motion preferences.
+size and scroll position, and honors reduced-motion preferences. Rolling speed
+matches Desktop at 7–9.6 letter advances per second; the two-letter CSS loop uses
+`2 / (7 + (index % 5) * 0.65)` seconds, with the same staggered starting phase.
 
 Cancel (× or Escape), typing, switching sessions and closing the sidebar remove
 the preview and discard late results. Enter and Send cannot submit a draft while
