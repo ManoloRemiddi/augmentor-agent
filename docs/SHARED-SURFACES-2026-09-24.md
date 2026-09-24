@@ -259,3 +259,16 @@ All 37 Browser DOM/entrypoint checks pass, including six additional animation
 lifecycle cases. Direct Chromium visual inspection is unavailable because the
 browser-control connection is not present. Local staging/reload evidence is
 recorded below; there is no claim of visual acceptance for this revision yet.
+
+
+Source `87fac36` was staged over the preceding selected artifact and activated
+as `20260924-150252-94bb7915`, SHA-256
+`2c9086cf87a3954f660e22cbb75a9db79d2c6d53036098430a9e485fc4010a46`.
+Inventory/dependency and authenticated product/model preflight passed. All 54
+prepared extension files match the selected artifact, including the new animation
+module and renamed manifest. The local compatible version remains 0.2.11;
+manifest identity, prepared load path and private rollback backup are preserved.
+The source extension package also builds successfully with unchanged extension
+ID. Chromium Reload followed by reopening the sidebar adopts both changes.
+No native windows or DSH services were restarted. This is local preview adoption
+and PR source, not a replacement of published release artifacts.
