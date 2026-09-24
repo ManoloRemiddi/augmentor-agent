@@ -34,7 +34,7 @@ def settle():
     QTest.qWait(350)
 
 def command(*args):
-    result = subprocess.check_output(args, text=True)
+    result = subprocess.check_output(args, text=True, timeout=10)
     settle()
     return result
 

@@ -46,7 +46,7 @@ cd augmentor-agent
 
 ## Install and use
 
-[0.2.11 security release and upgrade guidance](docs/RELEASE-0.2.11.md).
+[0.2.12 desktop flare correction and upgrade guidance](docs/RELEASE-0.2.12.md).
 
 For a fresh Debian 13 amd64 installation, start with the
 [complete Desktop + Browser setup](docs/COMPLETE-INSTALL.md), including pinned DSH,
