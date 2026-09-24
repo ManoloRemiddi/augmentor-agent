@@ -46,7 +46,10 @@ Additional qualification:
   The Desktop fix is delivered by the complete bundle and native packages.
 
 The website’s visible versions, download links and copied installation prompts
-were updated together in website commit `fc427ce`.
+were updated together in website commit `fc427ce`. Pages deployment and all 15
+website tests passed. Live browser verification confirmed the 0.2.12 archive URL
+and installation prompt; clicking Copy succeeded and clipboard contents matched
+the full visible prompt exactly.
 Existing installations follow [matched upgrade guidance](RELEASE-0.2.11.md#existing-installations)
 with version 0.2.12. Source publication does not reload open windows. Preserve
 active tasks and unsent drafts; managed local previews must retain their extra
