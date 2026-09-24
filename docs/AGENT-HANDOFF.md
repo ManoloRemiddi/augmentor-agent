@@ -9,9 +9,11 @@ Assist MCP policy in `adapters/dsh-home`. Canonical application code stays here;
 private household deployment and operational records belong in the Home companion.
 The user clarified that Home must be a lightweight NAS-owned capability available
 inside existing Augmentor clients, with independent household hardware/models/API
-configuration. A shared client adapter, pairing/settings and lightweight NAS page are now a
-source candidate; see Home for test evidence. Installed clients and NAS promotion
-remain separate, and full resource qualification is still pending.
+configuration. A shared client adapter, pairing/settings and lightweight NAS page are implemented.
+NAS build b2006ff is promoted with selected-device policy and model settings; see
+Home for test evidence. Desktop adoption is being combined with a concurrent
+shared-surfaces update; do not mutate Desktop/DSH deployment until that task
+records its combined artifact. Full resource/release qualification is pending.
 New configuration defaults to owner-selected registered entities; the earlier
 Assist MCP mode remains an explicit compatibility preview. Read the guide for
 exact fixture/live evidence and limits before expanding device

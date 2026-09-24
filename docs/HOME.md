@@ -6,14 +6,18 @@ Home reuses the family's DSH sessions, model provider, tool lifecycle, prompt
 service and action-outcome helpers. Application code lives here in `apps/home`
 and `adapters/dsh-home`. The private `local-ai-smart-home` companion owns hub
 packaging, operational evidence and household-specific configuration. It does
-not own a second conversation engine. Desktop and Browser remain unchanged.
+not own a second conversation engine. Existing Desktop and Browser clients now
+have a shared Home adapter and pairing settings; installed artifact identity is
+tracked separately from source. The NAS access preview is deployed; full V1
+qualification remains open.
 
 ## Integrate existing homes
 
 Home Assistant owns discovery, device drivers, vendor account linking, areas,
-entity names and exposure. Augmentor uses its official
-[Assist MCP integration](https://www.home-assistant.io/integrations/mcp_server/),
-through the upstream DSH MCP client and MCP SDK. No custom WebSocket frames,
+entity names and integrations. Selected-device mode reuses its official REST
+services and entity-registry APIs, with a Home-specific owner selection boundary.
+The earlier [Assist MCP integration](https://www.home-assistant.io/integrations/mcp_server/)
+is retained as an explicit compatibility preview. No custom WebSocket frames,
 Zigbee stack, Matter controller, vendor drivers or model tool loop are added.
 
 Prefer attaching an existing Home Assistant installation. A new installation
@@ -26,17 +30,19 @@ must be checked for the selected host; standalone Docker is not equivalent to
 HA OS with managed apps. Do not promise universal import or zero pairing.
 
 The onboarding target is: connect hub, review discovered devices, choose what
-Home can control, test one device. The guided Augmentor UI is not implemented
-in this preview; operators currently use HA's UI and the local API.
+Home can control, test one device. The Home page now provides pairing, device
+selection and model configuration. Guided initial HA authorization and fresh-hub
+setup remain operator-assisted through HA's existing interfaces.
 
-## Confirmed product direction — pending implementation
+## Product direction and current scope
 
 The main Home service belongs on the always-on NAS. Any connected Augmentor
 client should be able to request Home work in its existing conversation through
 a shared authenticated capability adapter, with results returned there. The NAS
 owns permissions, durable execution and recovery; clients do not bypass it with
-independent HA credentials or device loops. Cross-client integration is not yet
-implemented in this preview.
+independent HA credentials or device loops. DSH/Pi adapters and native/Browser
+settings implement the first clients; every installed surface still needs its
+recorded deployment and acceptance evidence.
 
 Each household supplies its own devices, model endpoints, subscriptions and API
 access. Developer hardware and the tested DeepSeek configuration are examples,
@@ -53,21 +59,17 @@ current NAS evidence does not establish a universal minimum specification.
 
 ## Authority and uncertainty
 
-Use `/api/mcp/assist` with a dedicated non-administrator HA user. Never mount
-an owner token into this runtime. HA Assist exposure controls which entities
-are available. Exposure belongs to the shared HA conversation assistant, not a
-private per-client list; preserve existing settings when attaching a household.
-The HA token itself is not an entity-scoped credential: confinement also depends
-on the Assist endpoint, this adapter and protecting the credential/container.
+Use a dedicated non-administrator HA user; never mount its owner token into the
+runtime. The HA credential itself is broader than Home's selected entities, so
+confinement depends on this adapter and protecting the credential/container.
+Selected mode exposes only constrained reads and on/off/brightness actions for
+owner-approved registered devices. Identity changes, unsupported domains and
+arbitrary services fail closed. Existing HA exposure is preserved. Review a
+switch/helper's connected equipment and existing automations before enabling it.
 
-Only live context and `intent__HassTurnOn`, `intent__HassTurnOff` and
-`intent__HassLightSet` are advertised. The policy checks every invocation,
-including unadvertised calls. Changes require a name and explicit domains limited
-to `light`, `switch` and `input_boolean`; administrative, lock, cover, climate,
-script and arbitrary service tools are unavailable. Exposed switches may control
-consequential equipment: review real devices before enabling them. Multiple devices
-can share a friendly name; unique names/areas and explicit exposure are necessary.
-The current contract does not certify semantic intent or physical safety.
+The legacy `assist-preview` mode advertises HA live context and named on/off/light
+intents, using HA Assist exposure rather than Home's exact selection. It retains
+the earlier prototype limitations and is not the default for new configurations.
 
 SQLite records each request before execution and each mutation before dispatch.
 The same request ID and input returns the stored response. Reusing an ID with
@@ -105,24 +107,34 @@ Credentials are mounted read-only files; the model key is never a command-line
 argument. `HOME_STATE_DIR` defaults to `/state`; `PORT` defaults to 8181 and the
 server always binds loopback. HTTP off loopback requires explicit
 `HOME_ALLOW_LAN_HTTP=1`; prefer HTTPS for remote connections. Use a private
-transport to reach the service; no browser-origin API access or WAN bind exists.
+HTTPS gateway to reach the service; set its exact `HOME_PUBLIC_ORIGIN` for
+browser sessions. No WAN bind or wildcard CORS is enabled.
 
 Run as the host's ordinary UID with a writable private state mount, read-only
 root, tmpfs `/tmp`, dropped capabilities and no-new-privileges. Set
 `AUGMENTOR_SHARED_STATE=/state/shared-run` and
 `AUGMENTOR_SHARED_DATA=/state/shared-data`. The companion provides Compose and
-a Docker CLI fallback. Restart/recreate after credential or model changes so
-the process loads them; writing an environment file alone is insufficient.
+a Docker CLI fallback. Owner model settings apply at an idle turn boundary and
+persist privately; changes to deployment environment/mounted files still require
+a controlled recreation. A saved model choice overrides its initial environment.
 
 ## Local API
 
-All endpoints require `Authorization: Bearer <service-token>`; JSON POSTs need
-Content-Length and are limited to 16 KiB. Browser Origin requests are refused.
+APIs require a paired bearer, protected browser session or local operator token;
+static assets and one-time pairing are the exceptions. JSON POSTs need
+Content-Length and are limited to 16 KiB. Browser writes require matching Origin
+and session CSRF; browser-origin bearer requests are refused.
 
 | Endpoint | Contract |
 | --- | --- |
+| `POST /pair` | Exchange a one-use invitation for a scoped API/browser client |
+| `GET /capabilities` | Protocol, permissions and enabled mode |
+| `GET /devices/selected` | Read only enabled entities |
+| `GET /devices`, `POST /devices/select` | Owner inventory and explicit access selection |
+| `POST /device-actions` | Durable exact device control without another LLM call |
+| `GET /model`, `POST /model/discover`, `POST /model/save` | Owner model configuration; credentials never returned |
 | `GET /health` | Process/model identity and busy state; not provider readiness |
-| `GET /ready` | Bounded HA MCP initialization probe; 503 if unavailable; no billable model probe |
+| `GET /ready` | Bounded HA dependency probe; 503 if unavailable; no billable model probe |
 | `GET /prompts` | Existing family prompt-library snapshot, local to this host |
 | `POST /ask` | `request_id`, `session_id`, `prompt`; optional saved `prompt_id` |
 | `GET /requests/<id>` | Durable request status and saved response after disconnect/restart |
@@ -140,12 +152,14 @@ Conversation JSONL, request replies, action arguments and prompt SQLite are
 private household data under `/state`. Session IDs do not identify a speaker.
 Personal/relationship/project memory inference is disabled. The shared prompt
 service implementation and schema are reused, but there is no cross-host prompt
-sync or model-picker UI yet. One explicitly configured OpenAI-compatible provider
+sync yet. The Home page configures one OpenAI-compatible provider; full family
+provider-picker/subscription integration remains pending. The selected provider
 runs through DSH; subscription access is not assumed to be a transferable API key.
 
 ## Qualification and remaining work
 
-24 September 2026 development qualification:
+Historical initial MCP qualification (superseded by the selected-device and access
+checkpoints below):
 
 - Twelve tests exercise the actual DSH+MCP bridge with deterministic model/MCP
   fixtures and the HTTP/SQLite contracts: resume, authority denial, unknown writes,
@@ -294,3 +308,22 @@ A second supported container cannot open the same Home state concurrently. Direc
 `node server.mjs` development launches remain the operator's responsibility.
 The static page totals 12,044 uncompressed bytes at this checkpoint; no framework,
 font download, GPU or renderer is required on the NAS.
+
+## Selected NAS build and current implementation checks
+
+NAS runtime source `b2006ff` is promoted with the prior image and a consistent
+pre-promotion backup retained. Main readiness, selected virtual helper and a clear
+unknown-action ledger were verified. The container runs under one CPU/256 MiB;
+a fresh idle spot sample was 50.78 MiB / 0.00% CPU. Thirty private HTTPS selected-
+device reads had median 11 ms and p95 26 ms in this installation, with no model
+calls or device changes. These are short measurements, not seven-day evidence.
+
+Implementation `a983491` passed every job in
+[CI 35989685407](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/35989685407):
+Debian/source/native checks, Home image/tests, installed packages, packaged Browser
+and credential checks. Native and Browser pairing form regressions were added;
+the NAS fixture page also demonstrated populated model settings with an empty key
+field. Desktop integration is coordinating with a simultaneous shared-surfaces
+release; follow its final deployment record rather than assuming selection equals
+running adoption. Guided hub authorization, broader provider access, physical
+qualification, routines, independent voice, retention and long soak remain open.
