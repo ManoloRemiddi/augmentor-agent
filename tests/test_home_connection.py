@@ -33,3 +33,20 @@ class HomeConnectionTests(unittest.TestCase):
         for value in ['http://nas.local','https://name:secret@home.example.com','https://home.example.com/api','https://home.example.com?token=x']:
             with self.assertRaises(ValueError):client.endpoint(value)
         self.assertEqual(client.endpoint('http://127.0.0.1:8181/'),'http://127.0.0.1:8181')
+
+class HomeDialogTests(unittest.TestCase):
+    def test_pairing_uses_shared_service_and_clears_code(self):
+        from PySide6.QtWidgets import QApplication,QWidget
+        from augmentor_linux.home_settings import HomeDialog
+        app=QApplication.instance() or QApplication([])
+        class Window(QWidget):
+            def call_in_background(self,work,done):done(work())
+        window=Window();calls=[]
+        def request(_self,method,data):
+            calls.append((method,data))
+            return {'connected':method=='home.connection.pair','url':'https://home.example.com'}
+        with patch('augmentor_linux.home_settings.PromptClient.call',request):
+            dialog=HomeDialog(window);dialog.url.setText('https://home.example.com');dialog.code.setText('fixture');dialog.pair()
+            self.assertEqual(calls[-1][0],'home.connection.pair');self.assertEqual(dialog.code.text(),'')
+            self.assertFalse(dialog.connect.isEnabled());self.assertTrue(dialog.disconnect.isEnabled())
+            dialog.close();window.close()

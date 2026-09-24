@@ -1,8 +1,8 @@
-import {homeConnection} from './shared/home.mjs'
 // Augmentor — dsh-augmentor plugin, pipe, and Chromium extension
 // Copyright © 2026 Manolo Remiddi
 // SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
+import {homeConnection} from './shared/home.mjs'
 import {PiConnection} from '../../dist/client/src/socket.js'
 import {promptLibrary} from './shared/prompts.mjs'
 import {dshSetup,dshConfiguration} from './shared/dsh-setup.mjs'
