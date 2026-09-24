@@ -288,3 +288,9 @@ endpoint-change isolation and persisted selection. The earlier selected-device
 image `18cc707` passed real NAS helper off/on, duplicate-result retrieval and a
 DeepSeek read using `home_devices`; no physical equipment was controlled. Pending
 unknown actions were zero, and the helper was restored to on.
+
+The container entrypoint holds an exclusive state-directory lock for its lifetime.
+A second supported container cannot open the same Home state concurrently. Direct
+`node server.mjs` development launches remain the operator's responsibility.
+The static page totals 12,044 uncompressed bytes at this checkpoint; no framework,
+font download, GPU or renderer is required on the NAS.

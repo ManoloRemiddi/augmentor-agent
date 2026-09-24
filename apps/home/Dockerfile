@@ -21,7 +21,7 @@ COPY services /app/services
 COPY release/product.json /app/release/product.json
 COPY --from=build /app/dist /app/dist
 COPY LICENSE /app/LICENSE
-ENV NODE_ENV=production PYTHONDONTWRITEBYTECODE=1
+ENV NODE_ENV=production PYTHONDONTWRITEBYTECODE=1 HOME_STATE_DIR=/state
 USER node
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 CMD ["node", "healthcheck.mjs"]
-CMD ["node", "server.mjs"]
+CMD ["sh", "-c", "exec flock --nonblock --no-fork \"$HOME_STATE_DIR/runtime.lock\" node server.mjs"]
