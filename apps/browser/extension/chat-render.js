@@ -255,6 +255,11 @@ export function createChatUI(els) {
   let reasoningRaw = ''
   let reasoningTimer = null // frameOr() handle
   let maxSeq = -1
+  const pendingPrompts = new Set()
+  function confirmPrompt(text) {
+    const pending = [...pendingPrompts].find(item => item.text === text)
+    if (pending) {pending.confirmed = true; pending.node.remove(); pendingPrompts.delete(pending)}
+  }
   const liveEntries = new Set()
   // true until the first log replay after a page load or clear() — that replay
   // is history we want to land at the tail of; every later call is either a
@@ -464,6 +469,7 @@ export function createChatUI(els) {
       case 'command/done': {
         const text=ev.type==='command/run'?'/'+data.name+(data.args??''):
           (data.text??(data.kind==='success'?'Command completed.':'Command failed.'))
+        if(ev.type==='command/run')confirmPrompt(text)
         const message=el('div','msg '+(ev.type==='command/run'?'user':'assistant'))
         message.append(el('span','who',ev.type==='command/run'?'You':'DSH'))
         const body=el('div','md');body.innerHTML=md(text);message.append(body);$log.append(message)
@@ -502,6 +508,7 @@ export function createChatUI(els) {
         if (data.source?.kind && data.source.kind !== 'user') break
         flushAssistant()
         const text = blockText(data.content)
+        confirmPrompt(text)
         const m = el('div', 'msg user')
         m.append(el('span', 'who', 'You'))
         const stack = el('div', 'userbody')
@@ -695,7 +702,7 @@ export function createChatUI(els) {
                 ? 'working…'
                 : 'disconnected'
     }
-    if ($send) $send.disabled = phase !== 'ready' || running
+    if ($send) $send.disabled = phase !== 'ready' || running || !!ui.state.submitting
   }
 
   function applyLog(log) {
@@ -737,12 +744,25 @@ export function createChatUI(els) {
       updateChrome()
     },
     applyLog,
+    pendingPrompt(text) {
+      const node = el('div', 'msg user pending')
+      node.append(el('span', 'who', 'You · Sending…'), el('div', 'userbody', text))
+      node.style.whiteSpace = 'pre-wrap'
+      const pending = {text, node, confirmed:false}
+      pendingPrompts.add(pending); $log.append(node); scroll(true)
+      return pending
+    },
+    removePending(pending) {
+      pending.node.remove(); pendingPrompts.delete(pending)
+    },
     sendFail(text) {
       $log.appendChild(el('div', 'toolresult err', `send failed: ${text}`))
       scroll(true)
     },
-    clear() {
+    clear({preservePending = false} = {}) {
       $log.innerHTML = ''
+      if (preservePending) for (const pending of pendingPrompts) $log.append(pending.node)
+      else pendingPrompts.clear()
       flushAssistant()
       textEl = null
       maxSeq = -1

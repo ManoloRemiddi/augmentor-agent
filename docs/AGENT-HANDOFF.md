@@ -2,6 +2,13 @@
 
 # Start here: agent handoff
 
+## September 25 composer submission correction
+
+[Immediate composer feedback](COMPOSER-SEND-FEEDBACK.md) records the Desktop
+idle-baseline race and Browser acknowledgment delay. Send failures now own draft
+restoration; status notifications do not. Consult that guide for tests and installed
+adoption rather than assuming a source update has reloaded open windows.
+
 ## September 24 Home tray launcher
 
 The owner confirmed the installed launcher works and requested click-to-open,

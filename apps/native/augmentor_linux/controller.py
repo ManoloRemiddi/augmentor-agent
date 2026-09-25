@@ -29,6 +29,7 @@ class Controller(QObject):
     problem = Signal(str)
     interaction = Signal(dict)
     sent = Signal(str)
+    submission_failed = Signal(str)
     history = Signal(list)
     recovered = Signal(list, bool)
     connection = Signal(bool)
@@ -446,6 +447,7 @@ class Controller(QObject):
         self.cancel_requested = cancelled
         self.busy.emit(True)
         def work():
+            accepted = False
             try:
                 self.client.validate_model(selection)
                 if cancelled.is_set():
@@ -473,6 +475,7 @@ class Controller(QObject):
                 response = self.client.call('session.prompt', {'sessionId': self.session, 'mode': 'queue', 'requestId': request_id or str(uuid.uuid4()), 'content': [{'type': 'text', 'text': text}]})
                 if response.get('accepted') is not True:
                     raise ContractError('The harness did not accept the message.')
+                accepted = True
                 self.sent.emit(text)
                 if response.get('command'):
                     with self.events_lock:
@@ -483,6 +486,8 @@ class Controller(QObject):
                 self.set_idle(generation)
                 raise
             finally:
+                if not accepted and not self.closed:
+                    self.submission_failed.emit(text)
                 if self.generation is generation:
                     self.preparing = False
                 if cancelled.is_set():
@@ -546,7 +551,21 @@ class Controller(QObject):
             if self.recover_buffer is not None:
                 self.recover_buffer.append(frame);return
             method, payload = frame.get('method'), frame.get('payload', {})
-            if method == 'session/queue':
+            if method in ('host/session-status','host/session-error'):
+                if payload.get('sessionId')!=self.session:return
+                if method=='host/session-error':
+                    self.problem.emit(payload.get('message','The DSH task stopped. Check the conversation before retrying.'))
+                    self.set_idle()
+                elif type(payload.get('running')) is bool:
+                    was_running=self.running
+                    # A new subscription reports the idle baseline before prompt
+                    # submission. Keep our locally reserved turn busy until then.
+                    self.running=(payload['running'] or self.preparing) and not self.read_only
+                    self.busy.emit(self.running)
+                    if was_running and not self.running and self.online and self.session:
+                        sid,generation=self.session,self.stream_generation
+                        self.task(lambda:self.reconcile_turn(sid,generation))
+            elif method == 'session/queue':
                 if payload.get('sessionId')==self.session:self.queue_changed.emit(payload.get('items',[]))
             elif method == 'session/event':
                 event = payload.get('event', {})

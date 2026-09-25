@@ -194,6 +194,7 @@ class Window(QWidget):
         self.controller.busy.connect(self.set_busy);self.controller.event.connect(self.on_event)
         self.controller.problem.connect(self.on_problem);self.controller.interaction.connect(self.on_interaction)
         self.controller.sent.connect(self.message_sent)
+        self.controller.submission_failed.connect(self.message_not_sent)
         self.controller.queue_changed.connect(self.queue_panel.replace)
         self.controller.queue_result.connect(self.queue_panel.submission_result)
         self.controller.queue_action_result.connect(self.queue_panel.action_result)
@@ -447,9 +448,6 @@ class Window(QWidget):
         self.update_controls();self.set_status('Working…' if busy else ('History view' if self.read_only else 'Ready'))
         self.cancel_edit_button.setEnabled(not busy)
         self.rendered_messages=None;self.render_timer.start()
-        if not busy:self.restore_unaccepted_prompt()
-        if not busy and self.pending_prompt:
-            self.pending_prompt=None;self.rendered_messages=None;self.render_timer.start()
         if not busy and self.close_pending:QTimer.singleShot(0,self.close)
 
     def new_chat(self):
@@ -498,6 +496,13 @@ class Window(QWidget):
         draft=self.submitted_draft;self.submitted_draft=None
         if not self.composer.toPlainText():self.composer.setPlainText(draft)
         else:self.messages.append(('Status','Prompt not confirmed as sent (your newer draft is preserved):\n'+draft))
+
+    def message_not_sent(self,text):
+        # Idle/history/errors are independent of this particular submission.
+        # Only its own failed/cancelled result can restore the submitted draft.
+        if self.pending_prompt!=text:return
+        self.restore_unaccepted_prompt()
+        self.pending_prompt=None;self.render_timer.start()
 
     def message_sent(self,text):
         self.submitted_draft=None
@@ -763,8 +768,7 @@ class Window(QWidget):
 
     def on_problem(self,message):
         self.update_controls()
-        self.restore_unaccepted_prompt()
-        self.pending_prompt=None;self.rendered_messages=None
+        self.rendered_messages=None
         self.set_status('Needs attention');self.messages.append(('Status',message));self.render_messages()
 
     def toggle_save(self):

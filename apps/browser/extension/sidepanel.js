@@ -12,6 +12,7 @@
  */
 
 import { createChatUI } from './chat-render.js'
+import { submitDraft } from './prompt-send.mjs'
 import { attachVoice } from './voice.mjs'
 import { attachPromptLibrary } from './prompt-library.mjs'
 
@@ -62,7 +63,7 @@ const editLabel=document.createElement('span');editLabel.textContent='Editing la
 document.getElementById('input').before(editBar)
 cancelEdit.onclick=()=>{if(editingMessage)document.getElementById('input').value=editingMessage.draft;editingMessage=null;editBar.hidden=true}
 async function messageAction(action,seq,text){
-  if(ui.state.running||editingMessage&&action!=='edit')return
+  if(ui.state.submitting||ui.state.running||editingMessage&&action!=='edit')return
   const input=document.getElementById('input')
   if(action==='edit'){if(!editingMessage)editingMessage={seq,sourceSession:m3SessionId,draft:input.value,prepared:false};input.value=text;input.focus();editBar.hidden=false;return}
   const result=await send('message/branch',{seq,sourceSession:m3SessionId,mode:'reply'})
@@ -386,7 +387,7 @@ const modelPopCtl = popover({
   btn: modelBtn,
   el: modelPop,
   above: true,
-  canOpen: () => !ui.state.running,
+  canOpen: () => !ui.state.running && !ui.state.submitting,
   onOpen: () => {
     // A fresh open shows the full list (the previous open's query is not
     // sticky — the input is cleared before the first render).
@@ -544,6 +545,7 @@ function renderSessionsList(items) {
 
 async function openDshSession(item, title) {
   closeSessionsPop()
+  if(ui.state.submitting)return
   const res = await send('session/history', { sessionId: item.sessionId })
   if (!res?.ok) {
     ui.sendFail(res?.error ?? 'could not load the session history')
@@ -605,7 +607,8 @@ ui.setState = (s) => {
   const running = ui.state.running
   document.getElementById('send').hidden = running
   document.getElementById('stop').hidden = !running
-  modelBtn.disabled = running
+  modelBtn.disabled = running || !!ui.state.submitting
+  cancelEdit.disabled = !!ui.state.submitting
   modelBtn.title = running ? 'Finish the current turn to switch models' : 'Switch model'
   if (running && !modelPop.hidden) closeModelPop()
 }
@@ -712,6 +715,7 @@ for (const t of ['pointerup', 'pointercancel', 'pointerleave']) {
   $newchat.addEventListener(t, () => { clearTimeout(lpTimer); lpTimer = null })
 }
 $newchat.addEventListener('click', async (e) => {
+  if(ui.state.submitting)return
   if (suppressClick) {
     // The click that released a long press: the menu just opened — swallow
     // it (stopPropagation so the document-level closer doesn't eat the menu).
@@ -853,17 +857,22 @@ async function pickAccess(value) {
 }
 
 async function doSend() {
-  if (viewSessionId) return // DSH view is read-only in M1
+  if (viewSessionId) return
   const input = document.getElementById('input')
-  const text = input.value.trim()
-  if (!text) return
-  if(editingMessage&&!editingMessage.prepared){
-    const branch=await send('message/branch',{seq:editingMessage.seq,sourceSession:editingMessage.sourceSession,mode:'edit'})
-    if(!branch.ok){ui.sendFail(branch.error);return}editingMessage.prepared=true;ui.clear();await refresh()
-  }
-  const res = await send('prompt', { text })
-  if(!res?.accepted){ui.sendFail(res?.error??'Message was not accepted. Your draft is preserved.');return}
-  input.value=editingMessage?.draft??'';editingMessage=null;editBar.hidden=true
+  await submitDraft({input, ui, send,
+    prepare: async () => {
+      if(editingMessage&&!editingMessage.prepared){
+        const branch=await send('message/branch',{seq:editingMessage.seq,sourceSession:editingMessage.sourceSession,mode:'edit'})
+        if(!branch.ok)throw Error(branch.error)
+        editingMessage.prepared=true;ui.clear({preservePending:true});await refresh()
+      }
+    },
+    onAccepted: () => {
+      if(!input.value)input.value=editingMessage?.draft??''
+      editingMessage=null;editBar.hidden=true
+      input.dispatchEvent(new Event('input', {bubbles:true}))
+    },
+  })
   refresh()
 }
 
