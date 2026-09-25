@@ -18,10 +18,44 @@ import subprocess
 import sys
 import sysconfig
 import tarfile
+import tempfile
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
 HEADER = '# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0\n'
+
+
+def build_launcher(destination, component, minimum_macos):
+    """Embed the pinned Python without changing the native desktop process identity."""
+    if component not in ('desktop', 'browser', 'runtime'):
+        raise ValueError('Unknown bundled component')
+    library = Path(sys.base_prefix)/'lib'/sysconfig.get_config_var('LDLIBRARY')
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    subprocess.run(['xcrun', 'clang', '-O2', '-Wall', '-Wextra', '-Werror',
+        '-target', 'arm64-apple-macos'+minimum_macos,
+        '-I'+sysconfig.get_path('include'), '-DAUGMENTOR_COMPONENT="'+component+'"',
+        str(ROOT/'services/platform/macos-launcher.c'), str(library),
+        '-Wl,-headerpad_max_install_names',
+        '-Wl,-rpath,@executable_path/../Resources/app/python/lib',
+        '-o', str(destination)], check=True)
+    # Standalone distributions may use the builder's absolute dylib install ID.
+    # Rewrite that reference before signing; never depend on the build machine.
+    install_id = subprocess.check_output(['otool', '-D', str(library)], text=True).splitlines()[1].strip()
+    subprocess.run(['install_name_tool', '-change', install_id,
+        '@rpath/'+library.name, str(destination)], check=True)
+
+
+def disk_image(app, destination):
+    """Read-only drag-install image; development status is explicit in its name."""
+    with tempfile.TemporaryDirectory(prefix='augmentor-dmg-', dir=destination.parent) as temporary:
+        stage = Path(temporary)
+        subprocess.run(['ditto', str(app), str(stage/app.name)], check=True)
+        (stage/'Applications').symlink_to('/Applications', target_is_directory=True)
+        subprocess.run(['hdiutil', 'create', '-quiet', '-volname', 'Augmentor Agent Preview',
+            '-srcfolder', str(stage), '-format', 'UDZO', str(destination)], check=True)
+    subprocess.run(['hdiutil', 'verify', '-quiet', str(destination)], check=True)
+    return {'artifact':destination.name, 'sha256':hashlib.sha256(destination.read_bytes()).hexdigest(),
+        'bytes':destination.stat().st_size, 'signedForDistribution':False, 'notarized':False}
 
 
 def copy(source, destination):
@@ -53,6 +87,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--out', type=Path, required=True, help='New, empty output directory')
     parser.add_argument('--component', choices=('desktop','companion'), default='desktop')
+    parser.add_argument('--dmg', action='store_true', help='Also create a development drag-install disk image')
     args = parser.parse_args()
     desktop = args.component == 'desktop'
     if sys.platform!='darwin' or platform.machine()!='arm64':
@@ -82,13 +117,16 @@ def main():
     # Stage production JS with platform-specific dependencies and notices.
     subprocess.run([sys.executable,str(ROOT/'scripts/stage-production.py'),'--out',str(resources/'app')],check=True)
     project = resources/'app'
-    for name in ('dist','apps/native','apps/browser','scripts','services','adapters','config','docs','licenses','LICENSE','README.md','release/product.json','release/macos.json'):
+    for name in ('dist','apps/native','apps/browser','scripts','services','adapters','config','docs','licenses','LICENSE','README.md','release/product.json','release/macos.json','release/macos-requirements.txt','release/dsh'):
         copy(ROOT/name, project/name)
     # python-build-standalone (used by uv) supplies a relocatable interpreter.
     # Copy its stdlib as well as this build environment's locked GUI dependencies.
     python = project/'python'
     copy(Path(sys.base_prefix), python)
     site = python/'lib'/f'python{sys.version_info.major}.{sys.version_info.minor}'/'site-packages'
+    # Do not merge a standalone interpreter's old pip metadata with the locked
+    # environment. Every shipped third-party package comes from this environment.
+    if site.exists():shutil.rmtree(site)
     copy(Path(sysconfig.get_path('purelib')), site)
     if desktop:
         subprocess.run([sys.executable,str(ROOT/'scripts/stage-macos-qt.py'),str(site/'PySide6'),
@@ -118,7 +156,7 @@ def main():
         if path.is_symlink() and os.path.isabs(os.readlink(path)):
             raise RuntimeError('The Python distribution contains a non-relocatable symlink: '+str(path.relative_to(python)))
     subprocess.run([str(python/'bin/python3'),'-I','-c',
-        ('import sys,PySide6,numpy,websocket,yaml; from PySide6.QtWidgets import QApplication; print(sys.prefix)' if desktop else
+        ('import sys,PySide6,numpy,websocket,yaml,sounddevice,onnxruntime; from PySide6.QtWidgets import QApplication; print(sys.prefix)' if desktop else
          'import sys,websocket,yaml,importlib.util; assert importlib.util.find_spec("PySide6") is None; print(sys.prefix)')],check=True)
     subprocess.run([str(python/'bin/python3'),'-I','-B',str(ROOT/'scripts/python-license-inventory.py'),
         '--out',str(project/'licenses/python-inventory.json')],check=True)
@@ -138,8 +176,15 @@ def main():
             target.chmod(0o755 if member=='bin/node' else 0o644)
     archive.unlink()
     subprocess.run([str(project/'node/bin/node'),'--version'],check=True)
+    subprocess.run([sys.executable, str(ROOT/'scripts/stage-dsh.py'),
+        '--out', str(project/'dsh'), '--node', str(project/'node/bin/node')], check=True)
     product = json.loads((ROOT/'release/product.json').read_text())
     packaged_config=dict(config)
+    dsh_payload = json.loads((project/'dsh/payload.json').read_text())
+    packaged_config['dsh'] = {
+        'version':json.loads((ROOT/'release/dsh/package.json').read_text())['dependencies']['@deepseek-ai/dsh'],
+        'lockSha256':dsh_payload['lockSha256'], 'packages':len(dsh_payload['packages']),
+        'licenseReviewComplete':dsh_payload['licenseReviewComplete']}
     if not desktop:
         packaged_config.pop('qt',None);packaged_config.pop('pythonBindings',None)
         packaged_config['pythonPackages']={name:config['pythonPackages'][name] for name in ('PyYAML','websocket-client')}
@@ -161,10 +206,7 @@ def main():
     if desktop:launchers.insert(0,(app_name,'desktop'))
     for name, component in launchers:
         launcher = contents/'MacOS'/name
-        launcher.write_text('#!/bin/sh\n'+HEADER+
-            'app_root="$(CDPATH= cd -- "$(dirname -- "$0")/../Resources/app" && pwd)"\n'+
-            'exec "$app_root/python/bin/python3" -I -B "$app_root/scripts/launch-component.py" '+component+' "$@"\n')
-        launcher.chmod(0o755)
+        build_launcher(launcher, component, config['minimumMacOS'])
     info = {
         'CFBundleName':'Augmentor Agent' if desktop else app_name,'CFBundleDisplayName':'Augmentor Agent' if desktop else app_name,
         'CFBundleIdentifier':'com.augmentor.Agent' if desktop else 'com.augmentor.Agent.Companion',
@@ -172,6 +214,7 @@ def main():
         'CFBundlePackageType':'APPL','CFBundleShortVersionString':product['version'],
         'CFBundleVersion':product['version'],'LSMinimumSystemVersion':config['minimumMacOS'],
         'NSHighResolutionCapable':True,
+        'NSMicrophoneUsageDescription':'Augmentor uses the microphone when you enable voice input.',
         'NSScreenCaptureUsageDescription':'Augmentor observes the desktop when you request computer control.',
         'NSAppleEventsUsageDescription':'Augmentor interacts with applications when you request computer control.'}
     (contents/'Info.plist').write_bytes(plistlib.dumps(info))
@@ -192,7 +235,13 @@ def main():
         'artifact':artifact.name,'sha256':hashlib.sha256(artifact.read_bytes()).hexdigest(),
         'bytes':artifact.stat().st_size,'signature':'ad-hoc','notarized':False,
         'publicReleaseReady':False,'applicationInventorySha256':inventory_hash,'python':config['python'],'node':item['version'],
-        'openGates':['installed acceptance','DSH feature qualification',*(['desktop control'] if desktop else []),'license review','Developer ID signing and notarization']}
+        'dsh':packaged_config['dsh'],
+        'openGates':['guided managed setup','required plugin provisioning','store migration',
+            'coordinated auto-update','installed acceptance','DSH feature qualification',
+            *(['desktop control','permission attribution'] if desktop else []),
+            'license review','Developer ID signing and notarization']}
+    if args.dmg:
+        report['diskImage'] = disk_image(app, artifact.with_suffix('.dmg'))
     (out/'artifacts.json').write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(report))
 

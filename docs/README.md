@@ -78,6 +78,7 @@ of this repository; include reproducible commands and sanitized evidence summari
 - [Data, permissions and support](DATA-AND-SUPPORT.md)
 - [Browser private-preview distribution](BROWSER-DISTRIBUTION.md)
 - [macOS development installation](MACOS-INSTALLATION.md)
+- [macOS distribution implementation and current qualification](MACOS-DISTRIBUTION.md)
 - [Fedora 44 installation preview](FEDORA-PREVIEW.md)
 - [Licensing and distribution decision](LICENSING.md)
 - [Cross-platform implementation status](CROSS-PLATFORM-RELEASE-STATUS.md)

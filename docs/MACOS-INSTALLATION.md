@@ -2,6 +2,12 @@
 
 # macOS development installation
 
+The September 25 [distribution implementation](MACOS-DISTRIBUTION.md) adds native
+embedded-Python entrypoints, a prepared bundled DSH runtime and development DMG
+output. It records current evidence and the remaining first-run/update/signing
+gates. The commands below describe the earlier development installer and remain
+an advanced preview workflow, not the intended public drag-install experience.
+
 The ARM64 app is a development candidate. Public signing, notarization and the
 remaining acceptance gates are tracked in [release status](CROSS-PLATFORM-RELEASE-STATUS.md).
 

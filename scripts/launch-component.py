@@ -19,6 +19,8 @@ def configure():
     if node.exists():os.environ.setdefault('AUGMENTOR_PI_NODE', str(node))
     bins = [str(Path(os.environ['AUGMENTOR_PYTHON']).parent)]
     if node.exists():bins.insert(0, str(node.parent))
+    dsh = ROOT/'dsh/node_modules/.bin'
+    if (dsh/'dsh').exists():bins.append(str(dsh))
     os.environ['PATH'] = os.pathsep.join([*bins, os.environ.get('PATH', os.defpath)])
     os.environ.setdefault('PI_TELEMETRY', '0')
     os.environ.setdefault('PI_SKIP_VERSION_CHECK', '1')

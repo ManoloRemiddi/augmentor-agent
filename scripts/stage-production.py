@@ -71,6 +71,8 @@ def main():
     for modules in (target / 'node_modules', sdk / 'node_modules'):
         tui = modules / '@earendil-works/pi-tui'
         for platform in ('darwin', 'win32'):
+            if platform == node_target['os']:
+                continue
             helper = tui / 'native' / platform
             if helper.exists():
                 excluded.append({'name': '@earendil-works/pi-tui', 'version': metadata['version'],

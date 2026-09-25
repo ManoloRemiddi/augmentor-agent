@@ -1,0 +1,88 @@
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+name: macOS feasibility
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/macos-feasibility.yml'
+      - 'apps/native/**'
+      - 'apps/browser/**'
+      - 'services/**'
+      - 'adapters/**'
+      - 'packages/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'release/**'
+      - 'package*.json'
+      - 'vendor/**'
+permissions:
+  contents: read
+concurrency:
+  group: macos-feasibility-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  bundled-runtime:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, macos-26]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.19.0'
+      - uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9
+        with:
+          version: '0.11.16'
+          enable-cache: false
+      - name: Prepare pinned standalone Python and hashed wheels
+        run: |
+          test "$(uname -m)" = arm64
+          uv python install 3.12.13
+          uv venv --python 3.12.13 .macos-build-env
+          uv pip install --python .macos-build-env/bin/python3 --require-hashes --only-binary :all: --no-deps -r release/macos-requirements.txt
+      - name: Build shared application and native contracts
+        env:
+          QT_QPA_PLATFORM: offscreen
+          PYTHONPATH: apps/native
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run check
+          npm run build
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p 'test_macos*.py' -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_dsh_payload_staging.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_prompt_client_startup.py -v
+      - name: Package and verify development bundle
+        run: |
+          .macos-build-env/bin/python3 scripts/package-macos.py --out outputs/macos
+          .macos-build-env/bin/python3 scripts/verify-macos-application-inventory.py outputs/macos
+          app="$PWD/outputs/macos/Augmentor Agent Desktop.app"
+          project="$app/Contents/Resources/app"
+          "$project/node/bin/node" scripts/dsh-payload-proof.mjs "$project/dsh"
+          codesign --verify --deep --strict "$app"
+      - name: Exercise bundled DSH and Qt with an isolated model fixture
+        env:
+          AUGMENTOR_PROOF_QT_PLATFORM: offscreen
+          AUGMENTOR_PROOF_APPROVALS: '1'
+          AUGMENTOR_PROOF_INTERACTIONS: '1'
+          AUGMENTOR_PROOF_EXACT_FORK: '1'
+          AUGMENTOR_PROOF_EXISTING_PROMPTS: '1'
+        run: |
+          app="$PWD/outputs/macos/Augmentor Agent Desktop.app"
+          project="$app/Contents/Resources/app"
+          export AUGMENTOR_PROOF_APP_ROOT="$project"
+          export AUGMENTOR_PYTHON="$project/python/bin/python3"
+          export AUGMENTOR_PI_NODE="$project/node/bin/node"
+          export DSH_TEST_MODULES="$project/dsh/node_modules"
+          export PATH="$project/dsh/node_modules/.bin:$project/node/bin:$PATH"
+          "$project/python/bin/python3" -I -B scripts/dsh-setup-proof.py
+          codesign --verify --deep --strict "$app"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: macos-feasibility-${{ matrix.os }}
+          path: |
+            outputs/macos/*.json
+          retention-days: 7
+          if-no-files-found: error

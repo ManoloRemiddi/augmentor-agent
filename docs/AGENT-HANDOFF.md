@@ -2,6 +2,18 @@
 
 # Start here: agent handoff
 
+## September 25 macOS distribution implementation
+
+The owner authorized implementation and isolated network-Mac testing. See
+[macOS distribution](MACOS-DISTRIBUTION.md) for the native launcher, complete
+prepared DSH payload, hashed Python wheels, build/test workflow and exact evidence.
+Native launcher and real packaged DSH/Qt proofs pass on ARM64 macOS 26.5.1.
+This is development qualification; managed first-run, required plugin provisioning,
+store migration, coordinated updating, production signing and permission acceptance
+remain open. The build Mac has no valid Developer ID signing identity.
+Linux installed selections, live model/speech settings and Mac registrations were
+not changed. Do not present this source branch as a published Mac release.
+
 ## September 25 source integration
 
 The user requested merging the composer correction and other ready changes.
