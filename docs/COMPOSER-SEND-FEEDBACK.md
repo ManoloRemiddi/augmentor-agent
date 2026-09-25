@@ -55,3 +55,32 @@ Validation: full native suite **415 tests, one skipped**; all **30 Browser unit
 tests** passed. The mixed installed candidate passed **68 focused native tests**
 and its Browser files passed **19 sender/renderer tests**. Tests used Qt 6.8.2.1
 in an isolated test environment; the installed Python interpreter is unchanged.
+
+## Installed acceptance
+
+Implementation `ba2fecf` is selected in managed release
+`20260925-095859-da27e123`, artifact SHA-256
+`638709fa8653d5a32dbda61009c4f4da0d6e9f2d87c6f7e6ea00affe4849dc1a`.
+Stage/import/inventory and authenticated product-compatibility activation passed.
+The secondary instance was idle, then closed through its guarded maintenance
+endpoint and reopened with the canonical launcher. It reports the new root,
+online and voice available, with `updatePending:false`. Its existing nonempty
+draft was backed up privately and restored through accessibility; exact text and
+saved conversation/model metadata were verified unchanged. No model prompt was
+submitted to the user's conversation during this check.
+
+The owner's Fn + Option + Space shortcut targets this secondary instance. Its
+previous `20260924-125950-12694ac7` build includes the initial host-status baseline
+and the controller handler that triggered draft restoration. Main and mobile
+still run `20260924-125423-63307454`, which lacks that handler/initial baseline.
+Two normal-send/one-bubble checks pass against the primary's actual artifact.
+Those processes were left running; they adopt the selected correction on their
+next normal restart. The secondary is the only conversation window restarted.
+
+The three tested Browser UI files were installed into the existing compatible
+0.2.11 extension, with prior files backed up privately. No service-worker or
+backend restart was required. An already open sidebar retains its old modules;
+close/reopen the sidebar (or reload the extension) to adopt the fix. The connected
+browser tool only exposed Codex's in-app browser, so live adoption in the user's
+Chromium profile was not verified. Source and installed-copy DOM tests passed.
+This is a local update, not a new public binary release.

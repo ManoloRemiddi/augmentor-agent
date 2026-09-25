@@ -2,6 +2,15 @@
 
 # Consistent installed desktop releases
 
+## September 25: immediate composer feedback
+
+[Composer correction and installed evidence](COMPOSER-SEND-FEEDBACK.md) records
+implementation `ba2fecf` over the prior immutable selection. Managed release
+`20260925-095859-da27e123` is selected; the secondary instance has adopted it and
+is online with voice available. Its draft and conversation/model were preserved.
+Main/mobile continue their earlier running build. The secondary-only baseline
+race and separate Browser acknowledgment delay are documented in that guide.
+
 ## September 24: optional Home dashboard tray
 
 The follow-up click-toggle fix `09a7dfb` is selected in
