@@ -63,3 +63,13 @@ class SetupHistoryTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+class SharedPersonalAgentTests(unittest.TestCase):
+    def test_single_composition_has_full_tools_and_one_prompt(self):
+        entries=setup.personal_agent_entries()
+        ids={row['id'] for row in entries}
+        self.assertTrue({'tool-bash','tool-fs','tool-ask-user','augmentor-desktop','augmentor-memory','augmentor-execution','augmentor-response-metrics'} <= ids)
+        self.assertNotIn('augmentor-browser-policy',ids)
+        persona=next(row for row in entries if row['id']=='persona')['config']['prefix']
+        self.assertIn('one personal assistant',persona)
+        self.assertNotIn('Operate only',persona)

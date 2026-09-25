@@ -1,6 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 # Feature ownership and compatibility · Augmentor 0.2.9 development
 
+DSH personal surfaces now share the agent, tools and speech engine; see [shared surfaces and evidence](SHARED-SURFACES-2026-09-24.md).
+
 Current source/ref and qualification: [agent handoff](AGENT-HANDOFF.md).
 Dated candidate sections below retain their original version-specific evidence.
 
@@ -20,8 +22,8 @@ This maintained checkout is the development source for both surfaces. The legacy
 | Edit latest input and resubmit on a child branch | Shared DSH boundary / Pi SDK adapter | Yes | Yes, closed turn | Yes | Yes, closed turn |
 | Model selection, streaming, Stop, history | Common surface controller, engine adapter | Yes | Yes | Yes | Yes |
 | Guided endpoint check, explicit save and approval mode | Pi setup / shared DSH integration; surface forms | OpenAI-compatible text/image check | Checked DSH integration; models configured in DSH | Same Pi check | Same DSH integration |
-| Browser navigate/snapshot/type/click | Browser executor + harness tool bindings | — | — | Yes | Yes |
-| Consented desktop capture, click, keys and ASCII text | `services/desktop`; shared Pi/DSH tools | KDE Wayland preview | KDE Wayland preview | — | — |
+| Browser navigate/snapshot/type/click | Browser executor + harness tool bindings | — | Yes, connected extension | Yes | Yes |
+| Consented desktop capture, click, keys and ASCII text | `services/desktop`; shared Pi/DSH tools | KDE Wayland preview | KDE Wayland preview | — | Same consented executor |
 | Bounded desktop specialist with isolated context and evidence | `packages/computer-use`; Pi lifecycle adapter | Development preview; same selected image model | Unavailable | — | — |
 | Optional manual memory library and data controls | Separate Hindsight 0.9.2 provider and tool binding | Yes | Yes | Yes | Yes |
 | Automatic relationship/project memory | Hindsight 0.10.0 and transcript companion | Lifecycle fixture | Local adapter active | Lifecycle fixture | Shared adapter active; controls in source |
@@ -31,7 +33,7 @@ Additional current native/browser capabilities:
 
 | Capability | Desktop | Browser |
 | --- | --- | --- |
-| Resonant Voice on DSH | Hold/release, slide-lock, voice selection; optional hands-free preview | Push-to-talk preview; browser microphone permission required |
+| Resonant Voice on DSH | Hold/release, slide-lock, voice selection; optional hands-free preview | Same shared engine: hold/release, lock, hands-free and primary voice settings |
 | Independent second conversation | Named second window, separate chat/settings/voice profile; KDE shortcut | Separate sidebar/session workflow |
 | Skins and activity animation | Futuristic plasma; Blossom lake/butterflies; validated import/export | Native skins are not applied to Chromium |
 | Startup and recovery | Shared selected release, supervised login, guarded recovery | Matching companion and explicit extension load/reload |
@@ -110,9 +112,9 @@ See [operations](MEMORY-OPERATIONS.md) for binding, pause and retention limits.
 
 ## Product requirement clarified by the user
 
-Augmentor Agent is one product with a Linux application and a Chromium extension. Each surface independently selects an available harness. Linux's role covers the OS and desktop applications; the browser role covers browser interactions. Role instructions and tools differ, while common chat and Prompt Library behavior must stay consistent. Desktop input is a limited KDE Wayland preview; see DESKTOP-CONTROL.md for its actual scope.
+Augmentor Agent is one product with a Linux application and a Chromium extension. Each surface independently selects an available harness. Both DSH presentations use the same personal-agent instructions and tools; floating/sidebar presentation does not restrict task capabilities. Desktop input is a limited KDE Wayland preview; see DESKTOP-CONTROL.md for its actual scope.
 
-Use shared Augmentor instructions plus role-specific instructions and tools. Common UI features such as Copy/check, Edit and Branch should be delivered and tested across both renderers, subject to explicitly recorded harness capability gaps. A change to one renderer alone does not automatically update the other. Shared long-term memory also does not convert a harness-native conversation into another harness's session.
+Use the single shared personal-agent definition. Common UI features such as Copy/check, Edit and Branch should be delivered and tested across both renderers, subject to explicitly recorded harness capability gaps. A change to one renderer alone does not automatically update the other. Shared long-term memory also does not convert a harness-native conversation into another harness's session.
 
 The neutral API is introduced at the adapter boundary; existing Pi and DSH wire envelopes remain explicit. Further normalization can proceed incrementally behind these adapters. No replacement agent loop or speculative plugin marketplace was introduced.
 

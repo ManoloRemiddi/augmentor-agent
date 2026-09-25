@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import {surfaceRequest} from './shared/surface.mjs'
 // Augmentor — dsh-augmentor plugin, pipe, and Chromium extension
 // Copyright © 2026 Manolo Remiddi
 // SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
@@ -26,6 +27,7 @@ process.stdin.on('data',chunk=>{
     }
     if(!compatible){reply({id:first.id,error:{message:'Check Augmentor component compatibility before connecting.'}});continue}
     // Shared prompts work even while harness discovery/connection is unavailable.
+    if(first.method==='augmentor/surface'){surfaceRequest(first.params??{}).then(result=>reply({id:first.id,result}),error=>reply({id:first.id,error:{message:error.message}}));continue}
     if(first.method==='augmentor/dsh'){dshSetup(first.params??{}).then(result=>reply({id:first.id,result}),error=>reply({id:first.id,error:{message:error.message}}));continue}
     if(first.method==='augmentor/diagnostics'){supportReport().then(result=>reply({id:first.id,result}),error=>reply({id:first.id,error:{message:error.message}}));continue}
     if(first.method==='augmentor/onboarding'){startOnboarding(first.params).then(result=>reply({id:first.id,result}),error=>reply({id:first.id,error:{message:error.message}}));continue}

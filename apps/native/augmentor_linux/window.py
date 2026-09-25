@@ -1,3 +1,4 @@
+from .surface_design import SURFACE
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Native Augmentor surface with independent conversation and circular activity layouts."""
 import argparse
@@ -73,8 +74,8 @@ class Window(QWidget):
         self.outer.setSizeConstraint(QLayout.SizeConstraint.SetNoConstraint)
         self.stack.setSizeConstraint(QLayout.SizeConstraint.SetNoConstraint)
         self.expanded=QFrame();self.stack.addWidget(self.expanded)
-        layout=QVBoxLayout(self.expanded);layout.setContentsMargins(12,12,12,12);layout.setSpacing(5)
-        header=QHBoxLayout();header.setSpacing(3)
+        layout=QVBoxLayout(self.expanded);layout.setContentsMargins(*([SURFACE['inset']]*4));layout.setSpacing(SURFACE['gap'])
+        header=QHBoxLayout();header.setSpacing(SURFACE['headerGap'])
         self.title=QLabel('New conversation');self.title.setTextFormat(Qt.TextFormat.PlainText)
         self.title.setSizePolicy(QSizePolicy.Policy.Ignored,QSizePolicy.Policy.Preferred)
         self.title.setStyleSheet('font-size:11px;font-weight:400;padding-left:8px;')
@@ -92,16 +93,16 @@ class Window(QWidget):
         self.title_editor.cancelled.connect(self.cancel_inline_title)
         self.title_stack.addWidget(self.title_editor);self.title_stack.setCurrentWidget(self.title)
         self.rename_session=None;identity.addLayout(self.title_stack);header.addLayout(identity,1)
-        self.new_button=self.icon_button('＋','New chat · right-click for approval mode',self.new_chat)
+        self.new_button=self.icon_button(SURFACE['glyphs']['newchat'],'New chat · right-click for approval mode',self.new_chat)
         self.new_button.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.new_button.customContextMenuRequested.connect(lambda _:self.open_access())
-        self.save_button=self.icon_button('☆','Save this chat',self.toggle_save)
-        self.history_button=self.icon_button('☰','Conversation history',self.open_history)
-        self.pin_button=self.icon_button('⌖','Follow me across all desktops',self.toggle_pin,checkable=True)
+        self.save_button=self.icon_button(SURFACE['glyphs']['save'],'Save this chat',self.toggle_save)
+        self.history_button=self.icon_button(SURFACE['glyphs']['sessions'],'Conversation history',self.open_history)
+        self.pin_button=self.icon_button(SURFACE['glyphs']['pin'],'Follow me across all desktops',self.toggle_pin,checkable=True)
         self.pin_button.setChecked(self.preferences.values['pinned'])
-        self.compact_button=self.icon_button('◌','Circular activity view',self.toggle_compact)
-        self.more_button=self.icon_button('⋯','More options',self.open_menu)
-        self.hide_button=self.icon_button('×','Hide Augmentor',self.hide)
+        self.compact_button=self.icon_button(SURFACE['glyphs']['compact'],'Circular activity view',self.toggle_compact)
+        self.more_button=self.icon_button(SURFACE['glyphs']['more'],'More options',self.open_menu)
+        self.hide_button=self.icon_button(SURFACE['glyphs']['hide'],'Hide Augmentor',self.hide)
         for button in (self.new_button,self.save_button,self.history_button,self.pin_button,self.compact_button,self.more_button,self.hide_button):header.addWidget(button,0,Qt.AlignmentFlag.AlignVCenter)
         layout.addLayout(header)
         self.status=QLabel('UI preview' if preview else 'Connecting…');self.status.hide()
@@ -132,7 +133,7 @@ class Window(QWidget):
         self.edit_bar.hide();input_layout.addWidget(self.edit_bar)
         self.composer.submit_requested.connect(self.send);input_layout.addWidget(self.composer)
         self.voice_opening=False;self.voice_epoch=0;self.voice_gesture_mode=None;self.voice_input=None
-        footer=QHBoxLayout();footer.setSpacing(4);footer.addWidget(self.model_picker,1)
+        footer=QHBoxLayout();footer.setSpacing(SURFACE['footerGap']);footer.addWidget(self.model_picker,1)
         self.connection_dot=QLabel('●');self.connection_dot.setToolTip('Connecting to the harness');self.connection_dot.setFixedWidth(12);footer.addWidget(self.connection_dot)
         self.voice_dialog=None
         self.voice_button=VoiceButton(self)
@@ -142,13 +143,17 @@ class Window(QWidget):
         self.voice_button.released.connect(self.end_voice)
         self.voice_button.cancelled.connect(self.cancel_voice_recording)
         footer.addWidget(self.voice_button)
-        self.latest_button=self.icon_button('↓','Return to latest message',self.jump_latest);self.latest_button.hide();footer.addWidget(self.latest_button)
-        self.send_button=self.icon_button('↑','Send · Enter (Shift+Enter for a new line)',self.send);self.send_button.setEnabled(False);footer.addWidget(self.send_button)
-        self.stop_button=self.icon_button('■','Stop current turn',self.stop);self.stop_button.hide();footer.addWidget(self.stop_button)
+        self.latest_button=self.icon_button(SURFACE['glyphs']['latest'],'Return to latest message',self.jump_latest);self.latest_button.hide();footer.addWidget(self.latest_button)
+        self.send_button=self.icon_button(SURFACE['glyphs']['send'],'Send · Enter (Shift+Enter for a new line)',self.send);self.send_button.setEnabled(False);footer.addWidget(self.send_button)
+        self.stop_button=self.icon_button(SURFACE['glyphs']['stop'],'Stop current turn',self.stop);self.stop_button.hide();footer.addWidget(self.stop_button)
         layout.addLayout(footer)
         self.orb=Orb();self.stack.addWidget(self.orb);self.orb.expand_requested.connect(self.toggle_compact);self.orb.stop_requested.connect(self.stop)
         self.orb.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu);self.orb.customContextMenuRequested.connect(self.orb_menu)
         self.apply_appearance(self.preferences.values)
+        self.shared_appearance_timer=QTimer(self)
+        self.shared_appearance_timer.setInterval(1500)
+        self.shared_appearance_timer.timeout.connect(self.refresh_shared_appearance)
+        if not preview and getattr(self.preferences,'persistent',False):self.shared_appearance_timer.start()
         self.transcript.setHtml('<p>How can I help?</p>')
         self.save_button.setEnabled(False)
         for button in (self.new_button,self.history_button):button.setEnabled(not preview)
@@ -222,7 +227,7 @@ class Window(QWidget):
         from .dsh_setup import DshSetupDialog
         self.setup_dialog=(SetupDialog if self.controller.harness=='pi' else DshSetupDialog)(self);self.setup_dialog.show()
     def icon_button(self,text,tooltip,callback,checkable=False):
-        button=QPushButton(text);button.setFixedSize(24,24);button.setStyleSheet('QPushButton {padding:0;font-size:15px;border:0;background:transparent;} QPushButton:hover {background:rgba(127,150,150,55);color:palette(window-text);}')
+        button=QPushButton(text);button.setFixedSize(SURFACE['iconSize'],SURFACE['iconSize']);button.setStyleSheet('QPushButton {padding:0;font-size:15px;border:0;background:transparent;} QPushButton:hover {background:rgba(127,150,150,55);color:palette(window-text);}')
         button.setToolTip(tooltip);button.setAccessibleName(tooltip);button.setCheckable(checkable);button.clicked.connect(callback);return button
 
     def call_in_background(self,fn,callback):
@@ -300,7 +305,15 @@ class Window(QWidget):
                 self.close_voice_panel();self.voice_button.set_state('error',message);self.set_status(message)
         capture.changed.connect(changed);capture.failed.connect(failed)
 
+    def refresh_voice_preferences(self):
+        if not self.voice_dialog and not self.voice_opening and getattr(self.preferences,'persistent',False):
+            latest=Preferences()
+            for key in ('resonant_voice','voice_mode','voice_pause_ms'):
+                self.preferences.values[key]=latest.values[key]
+            self.voice_button.hands_free=self.voice_is_hands_free()
+
     def voice_pressed(self):
+        self.refresh_voice_preferences()
         voice=self.voice_dialog
         if self.voice_is_hands_free():
             if voice or self.voice_opening:self.close_voice_panel()
@@ -356,6 +369,7 @@ class Window(QWidget):
         self.update_controls()
 
     def open_voice(self):
+        if getattr(getattr(self,'preferences',None),'persistent',False):self.refresh_voice_preferences()
         if not self.preferences.values.get('resonant_voice',True):
             self.set_status('Enable Resonant Voice in Settings to use the microphone.');return
         if self.editing:
@@ -838,6 +852,14 @@ class Window(QWidget):
 
     def open_prompt_library(self):
         if self.controller:PromptLibraryDialog(self).exec()
+
+    def refresh_shared_appearance(self):
+        # Shared colour changes never replace per-window placement, model or draft.
+        if self.preferences_timer.isActive() or (self.appearance_dialog and self.appearance_dialog.isVisible()):return
+        latest=Preferences().values
+        keys=('theme','hue','brightness','accent_hue','accent_brightness','format_colours')
+        changed={key:latest[key] for key in keys if latest[key]!=self.preferences.values[key]}
+        if changed:self.apply_appearance(changed)
 
     def apply_appearance(self,values):
         self.preferences.values.update(values);v=self.preferences.values

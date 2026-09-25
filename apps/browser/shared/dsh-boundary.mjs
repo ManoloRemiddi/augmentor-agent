@@ -4,6 +4,7 @@
 // License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
 import {isIP} from 'node:net'
 export const BROWSER_PRESET='augmentor-browser-product'
+export const PERSONAL_PRESETS=new Set([BROWSER_PRESET,'augmentor-linux-product'])
 export function loopbackEndpoint(value){
   const u=new URL(value),host=u.hostname.replace(/^\[|\]$/g,'')
   if(u.protocol!=='http:'||!isIP(host)||!(host==='::1'||host.startsWith('127.'))||u.username||u.password||u.search||u.hash||u.pathname!=='/')throw Error('Connect DSH at a numeric loopback HTTP URL.')
@@ -16,12 +17,14 @@ export async function boundedJson(url,options={},limit=16*1024*1024){
   for await(const chunk of response.body){bytes+=chunk.length;if(bytes>limit)throw Error('DSH response exceeds the preview size limit.');chunks.push(chunk)}
   return JSON.parse(Buffer.concat(chunks).toString())
 }
-const independent=new Set(['augmentor/home','augmentor/dsh','augmentor/prompts','augmentor/memory','augmentor/diagnostics','updates/check','shutdown'])
-const methods=new Set(['augmentor/models','initialize','augmentor/state','augmentor/save','augmentor/unsave','session.list','session.create','session.selectModel','session.models','session.history','session.prompt','session.cancel','session.rename','session.branch','settings.describe','settings.mutate'])
+// Voice controls can only address the bridge's existing nonce-bound lease; they
+// do not acquire a session or submit text. Avoid fetching all histories per heartbeat.
+const independent=new Set(['augmentor/surface','augmentor/home','augmentor/voice/control','augmentor/dsh','augmentor/prompts','augmentor/memory','augmentor/diagnostics','updates/check','shutdown'])
+const methods=new Set(['augmentor/voice/preferences','augmentor/interaction','augmentor/voice','augmentor/voice/start','augmentor/voice/control','augmentor/models','initialize','augmentor/state','augmentor/save','augmentor/unsave','session.list','session.create','session.selectModel','session.models','session.history','session.prompt','session.cancel','session.rename','session.branch','settings.describe','settings.mutate'])
 const settings=new Set(['permission','model-picker-augmented'])
 export class DshBoundary{
   constructor(call,handshake){this.call=call;this.handshake=handshake;this.known=new Set()}
-  async sessions(){const result=await this.call('session.list',{});const rows=result.items.filter(row=>row.agentPreset===BROWSER_PRESET);this.known=new Set(rows.map(r=>r.sessionId));return {...result,items:rows}}
+  async sessions(){const result=await this.call('session.list',{});this.existing=new Set(result.items.map(row=>row.sessionId));const rows=result.items.filter(row=>PERSONAL_PRESETS.has(row.agentPreset) && row.origin!=='subagent');this.known=new Set(rows.map(r=>r.sessionId));return {...result,items:rows}}
   async owns(sessionId){if(typeof sessionId!=='string')return false;if(this.known.has(sessionId))return true;await this.sessions();return this.known.has(sessionId)}
   async guard(method,p={}){
     if(independent.has(method))return p
@@ -32,11 +35,11 @@ export class DshBoundary{
       if((await this.call('session.list',{})).items.some(row=>row.sessionId===p.sessionId))throw Error('That chat already exists. Reload before continuing.')
       return {sessionId:p.sessionId,cwd:info.chatCwd,agentPreset:BROWSER_PRESET}
     }
-    if((method.startsWith('session.')&&method!=='session.list')||['augmentor/save','augmentor/unsave'].includes(method)){
+    if((method.startsWith('session.')&&method!=='session.list')||['augmentor/interaction','augmentor/save','augmentor/unsave','augmentor/voice','augmentor/voice/start','augmentor/voice/control'].includes(method)){
       // Refresh on every explicit operation; a removed/replaced session must
       // not inherit a cached permission from its previous identity.
       await this.sessions()
-      if(!this.known.has(p.sessionId))throw Error('This chat belongs to another Augmentor role or is no longer available.')
+      if(!this.known.has(p.sessionId))throw Error(this.existing.has(p.sessionId)?'This chat belongs to another Augmentor role.':'Chat not found.')
     }
     if(method.startsWith('settings.')){
       if(!settings.has(p.ns))throw Error('Only Augmentor approval and model-picker settings are available here.')

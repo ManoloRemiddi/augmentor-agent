@@ -112,10 +112,17 @@ export function ensurePort() {
       state.interactions=state.interactions.filter(row=>row.id!==msg.id);state.interactions.push(msg);broadcast();return
     }
     if(msg.method==='interaction.resolved'){state.interactions=state.interactions.filter(row=>row.id!==msg.params.rpcId);broadcast();return}
+    if(msg.method==='voice.event'){
+      chrome.runtime.sendMessage({type:'voice/event',event:msg.params}).catch(()=>{});return
+    }
     // Notifications: session.event / session.status / subagent.*
     if (msg.method === 'session.event') {
       onSessionEvent(msg.params)
       return
+    }
+    if (msg.method === 'session.error') {
+      if(msg.params?.sessionId!==state.sessionId)return
+      state.running=false;state.error=msg.params.message;broadcast(log('error',{message:msg.params.message}));return
     }
     if (msg.method === 'session.status') {
       if (msg.params?.sessionId !== state.sessionId) return
@@ -266,7 +273,7 @@ export function request(method, params) {
   // 0.1.18: 20s, not 60s — a lost response (dead port, dropped frame)
   // should fail the UI fast enough that the panel's retry can recover it.
   // F5: the timeout now lives in the canonical Pending table.
-  return state.pending.add(id, { timeoutMs: method==='augmentor/onboarding'?40000:20000 })
+  return state.pending.add(id, { timeoutMs: method==='augmentor/surface'&&params?.action==='improve'?80000:method==='augmentor/onboarding'?40000:20000 })
 }
 
 // 0.1.18: self-heal for user-initiated reads. The old path returned a stale

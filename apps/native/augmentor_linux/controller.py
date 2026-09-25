@@ -152,10 +152,10 @@ class Controller(QObject):
             if self.stream:self.stream.close()
             self.stream=None;self.connected=False
             self.session=row['sessionId']
-            self.read_only=row.get('agentPreset') != self.preset
+            self.read_only=not getattr(self.client,'owns_preset',lambda preset:preset==self.preset)(row.get('agentPreset'))
             if row.get('saved'):self.saved_ids.add(self.session)
             else:self.saved_ids.discard(self.session)
-            if not self.read_only:self.client.call('session.create',{'sessionId':self.session,'cwd':row['cwd'],'agentPreset':self.preset})
+            if not self.read_only:self.client.call('session.create',{'sessionId':self.session,'cwd':row['cwd'],'agentPreset':row['agentPreset']})
             self.session_info.emit(dict(row, readOnly=self.read_only))
             self.load_page()
             if not self.read_only:
@@ -164,7 +164,8 @@ class Controller(QObject):
                 self.save_session()
                 sid=self.session
                 self.subscribe(sid)
-            self.running=self.history_running(bool(row.get('running'))) and not self.read_only
+            live=getattr(self.stream,'running',None)
+            self.running=(live if type(live) is bool else self.history_running(bool(row.get('running')))) and not self.read_only
             self.busy.emit(self.running)
         self.navigate(work)
 
@@ -368,8 +369,8 @@ class Controller(QObject):
                     self.problem.emit('The previous chat is unavailable. Choose a conversation from History or start a new one.')
                     sid=None
                 else:
-                    self.read_only=row.get('agentPreset')!=self.preset
-                    if not self.read_only:self.client.call('session.create',{'sessionId':sid,'cwd':row['cwd'],'agentPreset':self.preset})
+                    self.read_only=not getattr(self.client,'owns_preset',lambda preset:preset==self.preset)(row.get('agentPreset'))
+                    if not self.read_only:self.client.call('session.create',{'sessionId':sid,'cwd':row['cwd'],'agentPreset':row['agentPreset']})
             with self.events_lock:self.recover_buffer=[]
             self.subscribe(sid)
             if sid:
@@ -594,7 +595,8 @@ class Controller(QObject):
             def work():
                 response = self.client.call('session.cancel', {'sessionId': self.session})
                 self.status.emit('Cancellation requested')
-                if not self.preparing and response.get('accepted') is not True:
+                live=getattr(self.client,'running_state',lambda _session:None)(self.session)
+                if not self.preparing and (live is False or response.get('accepted') is not True):
                     self.set_idle()
             self.task(work)
         else:

@@ -7,12 +7,12 @@ import time
 
 
 def prove(root,temp,cdp,evaluate,click,fill,until,send,open_settings,back_to_chat,chat):
-    # Use the actual gear and OS pointer events; no fake chrome runtime.
+    # Use the actual More menu and OS pointer events; no fake chrome runtime.
     fill('#input','Keep my unfinished chat draft')
     before=send('log')['sessionId']
     panel=open_settings('appearance')
-    assert evaluate('document.querySelectorAll("nav a").length',panel)==6
-    assert evaluate('document.querySelectorAll("header button").length',chat)==4
+    assert evaluate('document.querySelectorAll("nav a").length',panel)==8
+    assert evaluate('document.querySelectorAll("header button").length',chat)==5
     assert not evaluate('!!document.querySelector("#harness-picker")',chat)
     assert 'linear-gradient' in evaluate('getComputedStyle(document.querySelector("#accentHue")).backgroundImage',panel)
     assert not evaluate('!!document.querySelector("dialog[open]")',chat)
@@ -33,7 +33,7 @@ def prove(root,temp,cdp,evaluate,click,fill,until,send,open_settings,back_to_cha
     cdp('Page.reload',{},panel)
     until(lambda:evaluate('document.querySelector("#accentHue")?.value',panel)=='0')
     assert evaluate('document.documentElement.dataset.theme',panel)=='light'
-    assert evaluate('getComputedStyle(document.documentElement).getPropertyValue("--text").trim()',panel)=='rgb(15, 17, 21)'
+    assert evaluate('getComputedStyle(document.documentElement).getPropertyValue("--text").trim()',panel)=='rgb(21, 43, 44)'
     # A form remains in normal page flow and retains its input across sections.
     panel=open_settings('models');click('.model-setup details summary');fill('input[aria-label="Connection name"]','Unfinished connection')
     assert not evaluate('!!document.querySelector(":modal")',panel)
@@ -93,4 +93,4 @@ def prove(root,temp,cdp,evaluate,click,fill,until,send,open_settings,back_to_cha
     assert evaluate('document.documentElement.scrollWidth<=innerWidth',chat)
     (root/'outputs/browser-toolbar-settings.png').write_bytes(base64.b64decode(cdp('Page.captureScreenshot',{},chat)['data']))
     assert evaluate('document.querySelector("#input").value',chat)=='Keep my unfinished chat draft'
-    return {'isolatedState':str(temp),'toolbarButtons':4,'settingsSections':6,'singleSettingsTab':True,'concurrentOpenReusesTab':True,'chatDraftPreserved':True,'appearanceLiveAndPersistent':True,'formsNonmodal':True,'sectionDraftsPreserved':True,'bothHarnessViews':True,'narrowLayout':True,'harnessOnlyInSettings':True,'colourGradients':True,'guidedMemoryLinuxSession':bool(os.environ.get('AUGMENTOR_PROOF_ONBOARDING'))}
+    return {'isolatedState':str(temp),'toolbarButtons':5,'settingsSections':8,'singleSettingsTab':True,'concurrentOpenReusesTab':True,'chatDraftPreserved':True,'appearanceLiveAndPersistent':True,'formsNonmodal':True,'sectionDraftsPreserved':True,'bothHarnessViews':True,'narrowLayout':True,'harnessOnlyInSettings':True,'colourGradients':True,'guidedMemoryLinuxSession':bool(os.environ.get('AUGMENTOR_PROOF_ONBOARDING'))}

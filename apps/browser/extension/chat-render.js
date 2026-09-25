@@ -321,7 +321,7 @@ export function createChatUI(els) {
     pinned = atBottom()
     syncTopBtn()
   })
-  $top?.addEventListener('click', () => $log.scrollTo({ top: 0, behavior: 'smooth' }))
+  $top?.addEventListener('click', () => $log.scrollTo({ top: $log.scrollHeight, behavior: 'smooth' }))
   function scroll(force = false) {
     if (force) pinned = true
     if (force || pinned) $log.scrollTop = $log.scrollHeight
@@ -775,7 +775,7 @@ export function createChatUI(els) {
       stats.inTok = stats.outTok = stats.cacheTok = 0
       stepStart.clear()
       callStart.clear()
-      if ($title) $title.textContent = 'Augmentor'
+      if ($title) $title.textContent = 'New conversation'
       updateStats()
       updateChrome()
     },

@@ -27,9 +27,9 @@ def prove(root,temp,panel,cdp,evaluate,click,fill,button,until,send,port,open_se
     # Resolve the chat target again; Settings remains open in its own tab.
     chat=next(t for t in cdp('Target.getTargets')['targetInfos'] if t['url'].endswith('/sidepanel.html'))
     panel=cdp('Target.attachToTarget',{'targetId':chat['targetId'],'flatten':True})['sessionId']
-    # The browser exposes only its role; a direct history request is refused too.
+    # The browser shares both personal aliases; internal update methods remain blocked.
     listed=send('session/list');assert listed['ok'],listed
-    assert 'setup-linux' not in json.dumps(listed),listed
+    assert 'setup-linux' in json.dumps(listed),listed
     # Use the native pipe directly for unsupported/internal operations so the
     # test cannot pass merely because the panel lacks a matching message type.
     evaluate("window.boundaryPort=chrome.runtime.connectNative('com.augmentor.agent');window.boundaryReplies={};window.boundaryPort.onMessage.addListener(m=>window.boundaryReplies[m.id]=m)",panel)
@@ -46,7 +46,8 @@ def prove(root,temp,panel,cdp,evaluate,click,fill,button,until,send,port,open_se
     if os.environ.get('AUGMENTOR_PROOF_MODEL_PICKER'):
         curated=direct('augmentor/models');assert curated['ok'],curated
         assert 'fixture/fixture' in curated['value']['pinned'] and 'fixture/hidden-fixture' in curated['value']['hidden'],curated
-    for method,p in [('session.history',{'sessionId':'setup-linux'}),('session.cancel',{'sessionId':'setup-linux'}),('augmentor/save',{'sessionId':'setup-linux'}),('settings.describe',{'ns':'llm-pi-ai'}),('augmentor/update-plugin',{'version':'9.9.9'}),('trace/fence-probe',{'secret':'private'})]:
+    assert direct('session.history',{'sessionId':'setup-linux'})['ok']
+    for method,p in [('session.history',{'sessionId':'not-a-personal-chat'}),('settings.describe',{'ns':'llm-pi-ai'}),('augmentor/update-plugin',{'version':'9.9.9'}),('trace/fence-probe',{'secret':'private'})]:
         result=direct(method,p);assert not result['ok'],(method,result)
     evaluate('window.boundaryPort.disconnect()',panel)
     send('model',{'provider':'fixture','model':'fixture'})
@@ -89,4 +90,4 @@ def prove(root,temp,panel,cdp,evaluate,click,fill,button,until,send,port,open_se
     inputs=[str(e['data']) for e in edited_events if e['type']=='user/message']
     assert any('DSH EDIT VERIFIED' in value for value in inputs)
     assert not any('DSH BRANCH CONTINUED' in value for value in inputs)
-    return {'modelPickerUi':bool(os.environ.get('AUGMENTOR_PROOF_MODEL_PICKER')),'checkedBrowserSetup':True,'roleIsolation':True,'legacyUpdateBlocked':True,'actualPageResult':True,'branchPreservesTools':True,'exactEditReplacesInput':True,'parentUnchanged':True}
+    return {'modelPickerUi':bool(os.environ.get('AUGMENTOR_PROOF_MODEL_PICKER')),'checkedBrowserSetup':True,'sharedPersonalChats':True,'legacyUpdateBlocked':True,'actualPageResult':True,'branchPreservesTools':True,'exactEditReplacesInput':True,'parentUnchanged':True}

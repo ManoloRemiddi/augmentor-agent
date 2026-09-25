@@ -2,6 +2,21 @@
 
 # Start here: agent handoff
 
+## September 25 source integration
+
+The user requested merging the composer correction and other ready changes.
+The integration combines Home/tray PR #6, shared Desktop/Browser/voice PR #7,
+and composer PR #9, preserving their original commits. The host idle-baseline
+reservation and Browser prompt-improvement send guard both survive conflict
+resolution. The full sidebar entrypoint now verifies immediate transfer, duplicate
+Enter suppression and preservation of a newer draft.
+
+Combined source checks pass: TypeScript check/build, 194 Node, 44 Browser,
+29 Home and 427 native tests (one native environment skip). GitHub package checks
+remain the final merge gate. Installed selections and running windows are unchanged
+by source integration; public download bytes require a separate release. Home's
+remaining qualification work stays documented in [Home](HOME.md).
+
 ## September 25 composer submission correction
 
 [Immediate composer feedback](COMPOSER-SEND-FEEDBACK.md) records the Desktop
@@ -27,6 +42,34 @@ Native tests and a two-process singleton check pass. Managed release
 with live KDE registration and dashboard app-window evidence. Main/mobile and
 secondary retain their earlier running builds; their drafts/work were preserved.
 See [installation evidence](HOME-LAUNCHER.md#installed-linux-evidence--24-september-2026).
+
+## September 24 sidebar animation and product name
+
+The Browser prompt-improvement preview now rolls letters and settles before
+committing, with cancellation and late-response guards. Chromium display metadata
+uses **Augmentor Agent**. See the [latest shared-surface entry](SHARED-SURFACES-2026-09-24.md#restore-sidebar-improvement-animation-and-product-name)
+for validation and installed adoption; the prepared extension requires Reload.
+
+## September 24 sidebar presentation refinement
+
+The user confirmed the corrected sidebar is working and requested a simpler
+Browser presentation: always follow tabs, remove Follow and circular activity
+controls/functionality, remove the outer border and brand label, and keep the
+empty composer one line tall. Conversation title and shared control order remain.
+See [shared surfaces qualification](SHARED-SURFACES-2026-09-24.md#sidebar-refinement-after-user-acceptance)
+for source checks and local adoption. Chromium needs Reload after updating the
+prepared extension folder; do not remove/reinstall it or interrupt native drafts.
+
+## September 24 shared personal agent and voice
+
+The user requests one personal agent in the floating window and browser sidebar.
+[Shared surfaces](SHARED-SURFACES-2026-09-24.md) owns the new shared preset, host
+voice engine, approval bridge and stopped-task status correction. Earlier
+browser-only tool-policy statements are superseded for DSH personal sessions.
+Read its deployment evidence before assuming a running extension has reloaded.
+Combined Home/shared source `d24e2ff` runs in the secondary
+window. Primary/mobile adoption and Chromium reload remain pending; preserve the
+primary draft. This is a compatible development artifact, not a public release.
 
 ## September 24 Home runtime preview
 
@@ -54,6 +97,9 @@ running; it is not a completed seven-day workload/physical-device qualification.
 New configuration defaults to owner-selected registered entities; the earlier
 Assist MCP mode remains an explicit compatibility preview. Read the guide for
 exact fixture/live evidence and limits before expanding device access.
+
+exact fixture/live evidence and limits before expanding device
+access. This preview does not change the installed Desktop or Browser release.
 
 ## September 24 desktop flare ownership
 

@@ -1,14 +1,15 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import test from 'node:test';import assert from 'node:assert/strict';import http from 'node:http';
 import {DshBoundary,loopbackEndpoint,boundedJson} from '../apps/browser/shared/dsh-boundary.mjs';
-test('DSH browser boundary fixes the role and cwd, hides other chats and rejects broad methods',async()=>{
- const rows=[{sessionId:'os',agentPreset:'augmentor-linux-product'},{sessionId:'web',agentPreset:'augmentor-browser-product'}];
+test('DSH browser boundary fixes the role and cwd, shares personal chats, hides other roles and rejects broad methods',async()=>{
+ const rows=[{sessionId:'os',agentPreset:'augmentor-linux-product'},{sessionId:'web',agentPreset:'augmentor-browser-product'},{sessionId:'home',agentPreset:'augmentor-home'},{sessionId:'child',agentPreset:'augmentor-browser-product',origin:'subagent'}];
  const b=new DshBoundary(async()=>({items:rows}),async()=>({chatCwd:'/browser'}));
  assert.deepEqual(await b.guard('session.create',{sessionId:'new',cwd:'/private',agentPreset:'default'}),{sessionId:'new',cwd:'/browser',agentPreset:'augmentor-browser-product'});
- assert.deepEqual((await b.sessions()).items,[rows[1]]);
- for(const method of ['session.prompt','session.cancel','session.branch','session.history','session.rename','augmentor/save'])await assert.rejects(b.guard(method,{sessionId:'os'}),/another Augmentor role/);
+ assert.deepEqual((await b.sessions()).items,rows.slice(0,2));
+ for(const method of ['session.prompt','session.cancel','session.branch','session.history','session.rename','augmentor/save'])await assert.rejects(b.guard(method,{sessionId:'home'}),/another Augmentor role/);
  for(const method of ['workspace.create','session.delete','host.shutdown','updates/download','augmentor/update-plugin','augmentor/update-status','trace/fence-probe'])await assert.rejects(b.guard(method,{}),/unavailable/);
- assert.deepEqual(await b.guard('session.prompt',{sessionId:'web'}),{sessionId:'web'});
+ for(const sessionId of ['web','os'])for(const method of ['session.prompt','augmentor/voice','augmentor/voice/start','augmentor/voice/control','augmentor/interaction'])assert.deepEqual(await b.guard(method,{sessionId}),{sessionId});
+ await assert.rejects(b.guard('augmentor/voice',{sessionId:'child'}),/another Augmentor role/);
  rows[1].agentPreset='default';await assert.rejects(b.guard('session.prompt',{sessionId:'web'}),/another Augmentor role/);
  await assert.rejects(b.guard('settings.describe',{}),/Only Augmentor/);
  await assert.rejects(b.guard('settings.mutate',{ns:'permission',ops:[{op:'set',path:['overrides'],value:[]}]}),/Unsupported/);

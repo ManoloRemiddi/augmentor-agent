@@ -2,6 +2,10 @@
 
 # Resonant Voice single-button desktop interaction
 
+September 24: Browser now presents the same native VoiceSession through a private
+host worker, with matching hold/lock/hands-free controls. See [shared surfaces](SHARED-SURFACES-2026-09-24.md) for scope, settings, tests and actual deployment.
+
+
 Implemented 2026-09-19 for the native desktop. This replaces the expandable voice panel; the browser extension is unchanged.
 
 - First click prepares the voice connection. No recording starts on a short click.

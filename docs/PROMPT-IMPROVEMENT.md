@@ -15,3 +15,26 @@ Regression checks: `tests/improve-prompt.test.mjs` and `tests/test_prompt_improv
 The DSH web UI also exposes ✦ at the top-right of its composer through the public `conversation.input.overlay` slot. It uses DSH’s selected model and the same shared instructions, with rolling letters, Cancel, and an Undo arrow in the same icon position. Refresh the DSH page after updating the plugin. Draft revisions guard late results; attachments remain intact. Improve plain text before adding structured reference chips, which are deliberately not flattened by a rewrite.
 
 Build the client with `node scripts/build-prompt-library-client.mjs`. Composer behavior is tested in `apps/browser/test/dsh-improve-composer.test.mjs`; the model request uses the same tested helper as the Linux app.
+
+
+## Browser sidebar
+
+The extension's sidebar uses the same model operation and saved improvement
+instructions as Desktop. Its input now also shows a paint-only rolling-letter
+preview while waiting, with the same 700 ms settling interval before committing
+the rewritten draft. The actual textarea keeps the original text during both
+phases. Unicode and punctuation remain readable. The preview follows the input's
+size and scroll position, and honors reduced-motion preferences. Rolling speed
+matches Desktop at 7–9.6 letter advances per second; the two-letter CSS loop uses
+`2 / (7 + (index % 5) * 0.65)` seconds, with the same staggered starting phase.
+
+Cancel (× or Escape), typing, switching sessions and closing the sidebar remove
+the preview and discard late results. Enter and Send cannot submit a draft while
+improvement is pending or settling. Failed requests restore the ordinary input;
+success offers Undo in the same button position. Rewrites and Undo also update
+the saved draft used when reopening the sidebar.
+
+Browser regression coverage in `apps/browser/test/surface.test.mjs` includes
+pending/settling draft protection, completion and Undo, Escape/Enter, failure,
+typing, session changes and page closure. These DOM tests establish behavior;
+they do not substitute for a visual acceptance check in the user's Chromium.
