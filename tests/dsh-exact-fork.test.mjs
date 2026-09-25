@@ -26,7 +26,7 @@ test('exact fork keeps the completed tool history and excludes the queued suffix
  assert.deepEqual(f.attached,[result.sessionId]);assert.equal(f.disposed(),2)
 })
 test('wrong role, changed cursor, running source and non-boundaries refuse before mutation',async()=>{
- for(const change of [f=>f.request.surface='browser',f=>f.request.expectedCursor=6,
+ for(const change of [f=>f.observation.header.agentPreset='augmentor-home',f=>f.request.expectedCursor=6,
   f=>f.ctx.agents.get=()=>({status:'running'}),f=>f.request.atSeq=4]){
   const f=fixture();change(f)
   await assert.rejects(exactFork(f.ctx,f.request));assert.equal(f.created.length,0)
@@ -36,4 +36,10 @@ test('source changing during preset composition is refused',async()=>{
  const f=fixture();let reads=0
  f.ctx.sessionQuery.observeSession=async()=>({...f.observation,cursor:reads++?8:7})
  await assert.rejects(exactFork(f.ctx,f.request));assert.equal(f.created.length,0)
+})
+
+test('sidebar branches a desktop conversation preserving its preset and tool history',async()=>{
+ const f=fixture();f.request.surface='browser';await exactFork(f.ctx,f.request)
+ assert.equal(f.created[0].meta.agentPreset,'augmentor-linux-product')
+ assert.deepEqual(f.created[0].seed,f.observation.events.slice(0,6))
 })

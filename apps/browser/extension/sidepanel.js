@@ -12,6 +12,7 @@
  */
 
 import { createChatUI } from './chat-render.js'
+import { submitDraft } from './prompt-send.mjs'
 import { attachVoice } from './voice.mjs'
 import { attachPromptLibrary } from './prompt-library.mjs'
 
@@ -23,7 +24,7 @@ const ui = createChatUI({
   log: document.getElementById('log'),
   title: document.getElementById('title'),
   model: document.getElementById('model-label'), // inner span: the chip is now a button
-  stats: document.getElementById('stats'),
+  dot: document.getElementById('connection-dot'),
   input: document.getElementById('input'),
   send: document.getElementById('send'),
   top: document.getElementById('top'),
@@ -46,25 +47,30 @@ function send(type, payload) {
 
 const voice=attachVoice({send,onError:message=>ui.sendFail(message),isHistory:()=>!!viewSessionId})
 attachPromptLibrary({input:document.getElementById('input'),send})
-import {watchAppearance} from './appearance.mjs'
+import {watchAppearance,refreshDesktopAppearance} from './appearance.mjs'
 watchAppearance()
+void refreshDesktopAppearance().catch(()=>{})
+const appearanceTimer=setInterval(()=>{void refreshDesktopAppearance().catch(()=>{})},15000)
+window.addEventListener('pagehide',()=>clearInterval(appearanceTimer),{once:true})
 const openSettings=async(section)=>{
   try { const r=await send('settings/open',{section});if(!r?.ok)throw Error(r?.error||'Could not open Settings') }
   catch(error){ui.sendFail(error.message)}
 }
-document.getElementById('settings').onclick=()=>openSettings()
+// The same More menu entry point as the floating window.
+import {attachSurface} from './surface.mjs'
+const surface=attachSurface({send,openSettings,onError:message=>ui.sendFail(message),approval:()=>openAccessMenu(),state:()=>ui.state})
 let refreshSerial=0
 const setupNotice=document.createElement('button');setupNotice.id='setup-notice';setupNotice.hidden=true
 setupNotice.textContent='Connect a model in Settings';setupNotice.onclick=()=>openSettings('models')
 document.querySelector('header').after(setupNotice)
 const editBar=document.createElement('div');editBar.hidden=true;editBar.className='edit-message-bar'
 const editLabel=document.createElement('span');editLabel.textContent='Editing latest message';const cancelEdit=document.createElement('button');cancelEdit.textContent='Cancel';cancelEdit.type='button';editBar.append(editLabel,cancelEdit)
-document.getElementById('input').before(editBar)
-cancelEdit.onclick=()=>{if(editingMessage)document.getElementById('input').value=editingMessage.draft;editingMessage=null;editBar.hidden=true}
+document.getElementById('composer-field').before(editBar)
+cancelEdit.onclick=()=>{if(editingMessage)document.getElementById('input').value=editingMessage.draft;editingMessage=null;editBar.hidden=true;document.getElementById('input').dispatchEvent(new Event('input'))}
 async function messageAction(action,seq,text){
-  if(ui.state.running||editingMessage&&action!=='edit')return
+  if(ui.state.submitting||ui.state.running||editingMessage&&action!=='edit')return
   const input=document.getElementById('input')
-  if(action==='edit'){if(!editingMessage)editingMessage={seq,sourceSession:m3SessionId,draft:input.value,prepared:false};input.value=text;input.focus();editBar.hidden=false;return}
+  if(action==='edit'){if(!editingMessage)editingMessage={seq,sourceSession:m3SessionId,draft:input.value,prepared:false};input.value=text;input.dispatchEvent(new Event('input'));input.focus();editBar.hidden=false;return}
   const result=await send('message/branch',{seq,sourceSession:m3SessionId,mode:'reply'})
   if(!result.ok){ui.sendFail(result.error);return}ui.clear();await refresh()
 }
@@ -386,7 +392,7 @@ const modelPopCtl = popover({
   btn: modelBtn,
   el: modelPop,
   above: true,
-  canOpen: () => !ui.state.running,
+  canOpen: () => !ui.state.running && !ui.state.submitting,
   onOpen: () => {
     // A fresh open shows the full list (the previous open's query is not
     // sticky — the input is cleared before the first render).
@@ -414,6 +420,7 @@ async function refresh() {
     const res = await send('log', { sinceSeq: ui.lastSeq })
     if(!res||serial!==refreshSerial)return
     voice.update(res,!!viewSessionId)
+    surface.update(res)
     surfaceCapabilities=res.capabilities??surfaceCapabilities
     setupNotice.hidden=res.phase!=='needs-setup';setupNotice.textContent=res.harness==='dsh'?'Connect DSH in Settings':'Connect a model in Settings'
 
@@ -421,8 +428,9 @@ async function refresh() {
       if(answeredInteractions.has(row.id))continue;answeredInteractions.add(row.id)
       const p=row.params;let value
       if(row.method==='approval.requested')value={outcome:window.confirm((p.toolName??'Action')+'\n'+(p.reason??'Allow this action?'))?'allowed-once':'denied'}
-      else {const answers=[];for(const q of p.questions??[]){const answer=window.prompt(q.question+(q.options?.length?'\n'+q.options.map(o=>o.label).join(' / '):''),q.prefill??'');if(answer!==null)answers.push({id:q.id,custom:answer})}value={answer:{answers}}}
-      await send('interaction/respond',{id:row.id,value})
+      else {const answers=[];for(const q of p.questions??[]){const answer=window.prompt(q.question+(q.options?.length?'\n'+q.options.map(o=>o.label).join(' / '):''),q.prefill??'');if(answer!==null)answers.push({id:q.id,selected:[],custom:answer})}value={answer:{answers}}}
+      const outcome=await send('interaction/respond',{id:row.id,value})
+      if(!outcome?.ok)ui.sendFail(outcome?.error??'The decision was not confirmed.')
     }
     ui.setState({ phase: res.phase, error: res.error, running: viewSessionId ? false : res.running })
     if (!viewSessionId) updateSaveBadge(res)
@@ -438,6 +446,7 @@ if (globalThis.chrome?.runtime?.onMessage) {
   chrome.runtime.onMessage.addListener((msg) => {
     if (msg?.type !== 'evt') return
     voice.update(msg,!!viewSessionId)
+    surface.update(msg)
     surfaceCapabilities=msg.capabilities??surfaceCapabilities
     if(msg.sessionId&&!viewSessionId)m3SessionId=msg.sessionId
     ui.setState({ phase: msg.phase, error: msg.error, running: msg.running })
@@ -544,6 +553,7 @@ function renderSessionsList(items) {
 
 async function openDshSession(item, title) {
   closeSessionsPop()
+  if(ui.state.submitting)return
   const res = await send('session/history', { sessionId: item.sessionId })
   if (!res?.ok) {
     ui.sendFail(res?.error ?? 'could not load the session history')
@@ -603,9 +613,11 @@ const _setState = ui.setState
 ui.setState = (s) => {
   _setState(s)
   const running = ui.state.running
+  surface.update(ui.state)
   document.getElementById('send').hidden = running
   document.getElementById('stop').hidden = !running
-  modelBtn.disabled = running
+  modelBtn.disabled = running || !!ui.state.submitting
+  cancelEdit.disabled = !!ui.state.submitting
   modelBtn.title = running ? 'Finish the current turn to switch models' : 'Switch model'
   if (running && !modelPop.hidden) closeModelPop()
 }
@@ -634,6 +646,7 @@ function updateSaveBadge(res) {
   // Icon-only button: state rides the .saved class (the star FILLS in the
   // accent) — never textContent, which would destroy the SVG child.
   saveBtn.classList.toggle('saved', saved)
+  saveBtn.textContent=saved?'★':'☆'
   saveBtn.title = saved ? 'Unsave chat' : 'Save chat'
 }
 saveBtn.addEventListener('click', async () => {
@@ -712,6 +725,7 @@ for (const t of ['pointerup', 'pointercancel', 'pointerleave']) {
   $newchat.addEventListener(t, () => { clearTimeout(lpTimer); lpTimer = null })
 }
 $newchat.addEventListener('click', async (e) => {
+  if(ui.state.submitting)return
   if (suppressClick) {
     // The click that released a long press: the menu just opened — swallow
     // it (stopPropagation so the document-level closer doesn't eat the menu).
@@ -853,17 +867,22 @@ async function pickAccess(value) {
 }
 
 async function doSend() {
-  if (viewSessionId) return // DSH view is read-only in M1
+  if (viewSessionId || surface.improving) return
   const input = document.getElementById('input')
-  const text = input.value.trim()
-  if (!text) return
-  if(editingMessage&&!editingMessage.prepared){
-    const branch=await send('message/branch',{seq:editingMessage.seq,sourceSession:editingMessage.sourceSession,mode:'edit'})
-    if(!branch.ok){ui.sendFail(branch.error);return}editingMessage.prepared=true;ui.clear();await refresh()
-  }
-  const res = await send('prompt', { text })
-  if(!res?.accepted){ui.sendFail(res?.error??'Message was not accepted. Your draft is preserved.');return}
-  input.value=editingMessage?.draft??'';editingMessage=null;editBar.hidden=true
+  await submitDraft({input, ui, send,
+    prepare: async () => {
+      if(editingMessage&&!editingMessage.prepared){
+        const branch=await send('message/branch',{seq:editingMessage.seq,sourceSession:editingMessage.sourceSession,mode:'edit'})
+        if(!branch.ok)throw Error(branch.error)
+        editingMessage.prepared=true;ui.clear({preservePending:true});await refresh()
+      }
+    },
+    onAccepted: () => {
+      if(!input.value)input.value=editingMessage?.draft??''
+      editingMessage=null;editBar.hidden=true
+      input.dispatchEvent(new Event('input', {bubbles:true}))
+    },
+  })
   refresh()
 }
 

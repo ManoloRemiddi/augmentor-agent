@@ -29,6 +29,7 @@ class Controller(QObject):
     problem = Signal(str)
     interaction = Signal(dict)
     sent = Signal(str)
+    submission_failed = Signal(str)
     history = Signal(list)
     recovered = Signal(list, bool)
     connection = Signal(bool)
@@ -151,10 +152,10 @@ class Controller(QObject):
             if self.stream:self.stream.close()
             self.stream=None;self.connected=False
             self.session=row['sessionId']
-            self.read_only=row.get('agentPreset') != self.preset
+            self.read_only=not getattr(self.client,'owns_preset',lambda preset:preset==self.preset)(row.get('agentPreset'))
             if row.get('saved'):self.saved_ids.add(self.session)
             else:self.saved_ids.discard(self.session)
-            if not self.read_only:self.client.call('session.create',{'sessionId':self.session,'cwd':row['cwd'],'agentPreset':self.preset})
+            if not self.read_only:self.client.call('session.create',{'sessionId':self.session,'cwd':row['cwd'],'agentPreset':row['agentPreset']})
             self.session_info.emit(dict(row, readOnly=self.read_only))
             self.load_page()
             if not self.read_only:
@@ -163,7 +164,8 @@ class Controller(QObject):
                 self.save_session()
                 sid=self.session
                 self.subscribe(sid)
-            self.running=self.history_running(bool(row.get('running'))) and not self.read_only
+            live=getattr(self.stream,'running',None)
+            self.running=(live if type(live) is bool else self.history_running(bool(row.get('running')))) and not self.read_only
             self.busy.emit(self.running)
         self.navigate(work)
 
@@ -367,8 +369,8 @@ class Controller(QObject):
                     self.problem.emit('The previous chat is unavailable. Choose a conversation from History or start a new one.')
                     sid=None
                 else:
-                    self.read_only=row.get('agentPreset')!=self.preset
-                    if not self.read_only:self.client.call('session.create',{'sessionId':sid,'cwd':row['cwd'],'agentPreset':self.preset})
+                    self.read_only=not getattr(self.client,'owns_preset',lambda preset:preset==self.preset)(row.get('agentPreset'))
+                    if not self.read_only:self.client.call('session.create',{'sessionId':sid,'cwd':row['cwd'],'agentPreset':row['agentPreset']})
             with self.events_lock:self.recover_buffer=[]
             self.subscribe(sid)
             if sid:
@@ -446,6 +448,7 @@ class Controller(QObject):
         self.cancel_requested = cancelled
         self.busy.emit(True)
         def work():
+            accepted = False
             try:
                 self.client.validate_model(selection)
                 if cancelled.is_set():
@@ -473,6 +476,7 @@ class Controller(QObject):
                 response = self.client.call('session.prompt', {'sessionId': self.session, 'mode': 'queue', 'requestId': request_id or str(uuid.uuid4()), 'content': [{'type': 'text', 'text': text}]})
                 if response.get('accepted') is not True:
                     raise ContractError('The harness did not accept the message.')
+                accepted = True
                 self.sent.emit(text)
                 if response.get('command'):
                     with self.events_lock:
@@ -483,6 +487,8 @@ class Controller(QObject):
                 self.set_idle(generation)
                 raise
             finally:
+                if not accepted and not self.closed:
+                    self.submission_failed.emit(text)
                 if self.generation is generation:
                     self.preparing = False
                 if cancelled.is_set():
@@ -546,7 +552,21 @@ class Controller(QObject):
             if self.recover_buffer is not None:
                 self.recover_buffer.append(frame);return
             method, payload = frame.get('method'), frame.get('payload', {})
-            if method == 'session/queue':
+            if method in ('host/session-status','host/session-error'):
+                if payload.get('sessionId')!=self.session:return
+                if method=='host/session-error':
+                    self.problem.emit(payload.get('message','The DSH task stopped. Check the conversation before retrying.'))
+                    self.set_idle()
+                elif type(payload.get('running')) is bool:
+                    was_running=self.running
+                    # A new subscription reports the idle baseline before prompt
+                    # submission. Keep our locally reserved turn busy until then.
+                    self.running=(payload['running'] or self.preparing) and not self.read_only
+                    self.busy.emit(self.running)
+                    if was_running and not self.running and self.online and self.session:
+                        sid,generation=self.session,self.stream_generation
+                        self.task(lambda:self.reconcile_turn(sid,generation))
+            elif method == 'session/queue':
                 if payload.get('sessionId')==self.session:self.queue_changed.emit(payload.get('items',[]))
             elif method == 'session/event':
                 event = payload.get('event', {})
@@ -575,7 +595,8 @@ class Controller(QObject):
             def work():
                 response = self.client.call('session.cancel', {'sessionId': self.session})
                 self.status.emit('Cancellation requested')
-                if not self.preparing and response.get('accepted') is not True:
+                live=getattr(self.client,'running_state',lambda _session:None)(self.session)
+                if not self.preparing and (live is False or response.get('accepted') is not True):
                     self.set_idle()
             self.task(work)
         else:

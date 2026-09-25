@@ -66,8 +66,7 @@ export async function apply(ctx){
     return
    }
    if(!surface||!['state','save','unsave'].includes(p.action))throw Error('Unsupported product operation')
-   const preset='augmentor-'+surface+'-product'
-   const sessions=(await ctx.sessionPersistence.list()).map(row=>row.header).filter(row=>row.agentPreset===preset)
+   const sessions=(await ctx.sessionPersistence.list()).map(row=>row.header).filter(row=>['augmentor-linux-product','augmentor-browser-product'].includes(row.agentPreset)&&row.origin!=='subagent')
    if(p.action!=='state'){
     const row=sessions.find(row=>row.id===p.sessionId);if(!row?.cwd)throw Error('This conversation belongs to another role')
     const workspace=await ctx.workspaceRegistry.create(row.cwd)

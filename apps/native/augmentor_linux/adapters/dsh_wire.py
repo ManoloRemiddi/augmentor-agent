@@ -159,6 +159,8 @@ class EventStream:
         self.on_frame, self.on_disconnect = on_frame, on_disconnect
         self.socket = None
         self.control_socket = None
+        self.status_socket = None
+        self.running = None
         self.closed = threading.Event()
         self.ready = threading.Event()
         self.failure = None
@@ -176,6 +178,15 @@ class EventStream:
         try:
             if self.session is None:
                 self.client.remote.authorize();self.ready.set();self.closed.wait();return
+            self.status_socket = self.client.remote.stream('$events',{})
+            status_ready=self.client.remote.item(self.status_socket)
+            if status_ready.get('type')!='ready':raise ContractError('DSH status stream did not open.')
+            self.status_client=status_ready['clientId']
+            self.status_socket.settimeout(1)
+            rows=self.client.call('session.list')['items']
+            row=next((r for r in rows if r['sessionId']==self.session),None)
+            if row is not None:self.status_frame({'type':'emit','event':'api-session/status','args':[self.session,bool(row.get('running'))]})
+            threading.Thread(target=self.status_loop,daemon=True,name='augmentor-status').start()
             self.socket = self.client.remote.stream('session/follow',{'request':{'address':{'kind':'session','sessionId':self.session},'maxMessages':1,'assistantStream':True}})
             opening=self.client.remote.item(self.socket)
             if opening.get('type')!='snapshot':raise ContractError('DSH session stream did not open.')
@@ -216,6 +227,27 @@ class EventStream:
             if self.socket:
                 self.socket.close()
 
+    def status_frame(self, frame):
+        if frame.get('type')=='waterfall':
+            self.client.remote.invoke('$events/result',{'clientId':self.status_client,'eventId':frame['eventId'],'outcome':{'kind':'next'}})
+            return
+        args=frame.get('args',[])
+        if frame.get('type')!='emit' or len(args)!=2 or args[0]!=self.session:return
+        if frame.get('event')=='api-session/status' and type(args[1]) is bool:
+            self.running=args[1]
+            self.on_frame({'method':'host/session-status','payload':{'sessionId':self.session,'running':args[1]}})
+        elif frame.get('event')=='api-session/error' and isinstance(args[1],str):
+            self.on_frame({'method':'host/session-error','payload':{'sessionId':self.session,'message':args[1]}})
+
+    def status_loop(self):
+        try:
+            while not self.closed.is_set():
+                try:frame=self.client.remote.item(self.status_socket)
+                except websocket.WebSocketTimeoutException:continue
+                self.status_frame(frame)
+        except Exception as exc:
+            if not self.closed.is_set():self.on_disconnect(str(exc));self.close()
+
     def queue_frame(self, items):
         self.on_frame({'method':'session/queue','payload':{'sessionId':self.session,'items':items}})
 
@@ -244,5 +276,6 @@ class EventStream:
             try:interactions.close()
             except Exception:pass  # The host lease expires even when release cannot arrive.
         if self.control_socket:self.control_socket.close()
+        if self.status_socket:self.status_socket.close()
         if self.socket:
             self.socket.close()

@@ -1,0 +1,17 @@
+{
+  "fontFamily": "DejaVu Sans",
+  "bodyFontSize": 13,
+  "brandFontSize": 13,
+  "titleFontSize": 11,
+  "modelFontSize": 11,
+  "iconFontSize": 15,
+  "iconSize": 24,
+  "voiceSize": 28,
+  "inset": 12,
+  "gap": 5,
+  "headerGap": 3,
+  "footerGap": 4,
+  "header": ["newchat", "save", "sessions", "pin", "compact", "more", "hide"],
+  "footer": ["model", "connection", "voice", "latest", "send", "stop"],
+  "glyphs": {"newchat": "＋", "save": "☆", "saved": "★", "sessions": "☰", "pin": "⌖", "compact": "◌", "more": "⋯", "hide": "×", "latest": "↓", "send": "↑", "stop": "■", "improve": "✦"}
+}

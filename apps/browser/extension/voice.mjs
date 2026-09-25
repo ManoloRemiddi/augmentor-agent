@@ -1,85 +1,114 @@
-// Augmentor — dsh-augmentor plugin, pipe, and Chromium extension
-// Copyright © 2026 Manolo Remiddi
-// SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-// License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
-
+import {attachVoiceIcon} from './voice-icon.mjs'
+// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+// The sidebar presents the native VoiceSession; it has no separate ASR/audio loop.
 export function attachVoice({send,onError,isHistory}){
-  const button=document.createElement('button');const icon=document.createElement('img');icon.src=chrome.runtime.getURL('voice-orb.svg');icon.alt='';icon.width=24;icon.height=24;button.append(icon);button.title='Resonant Voice';button.setAttribute('aria-label','Resonant Voice');button.type='button';
-  document.getElementById('send').before(button);
-  const dialog=document.createElement('section'),status=document.createElement('p'),talk=document.createElement('button'),mute=document.createElement('button'),close=document.createElement('button');
-  const title=document.createElement('h3');title.textContent='Resonant Voice';
-  talk.textContent='Hold to talk';mute.textContent='Mute';close.textContent='Close';talk.type=mute.type=close.type='button';
-  const help=document.createElement('p');help.textContent='English · Use headphones · Spoken messages use this conversation’s tools and approvals.';
-  dialog.id='resonant-voice-controls';dialog.hidden=true;dialog.setAttribute('aria-label','Resonant Voice controls');
-  button.setAttribute('aria-expanded','false');button.setAttribute('aria-controls',dialog.id);status.setAttribute('role','status');
-  dialog.style.cssText='padding:10px 14px;border-top:1px solid var(--border);flex-shrink:0';
-  dialog.append(title,status,help,talk,mute,close);
-  const footer=document.getElementById('send').closest('footer');if(footer)footer.after(dialog);else document.body.append(dialog);
-  function reveal(){dialog.hidden=false;button.setAttribute('aria-expanded','true');}
-  function collapse(){shutdown();dialog.hidden=true;button.setAttribute('aria-expanded','false');button.focus();}
-  let ws=null,context=null,stream=null,capture=null,session=null,generation=-1,nextPlay=0,muted=false,recording=false,closed=true,connecting=false;
-  const playing=new Set(),submitted=new Set();
-  function clear(){for(const source of playing){try{source.stop();}catch{}}playing.clear();nextPlay=0;generation=-1;}
-  function control(value){if(ws?.readyState===WebSocket.OPEN)ws.send(JSON.stringify(value));}
-  function shutdown(){closed=true;connecting=false;recording=false;clear();ws?.close();ws=null;stream?.getTracks().forEach(track=>track.stop());stream=null;capture?.disconnect();capture=null;void context?.close();context=null;session=null;talk.disabled=true;}
-  function error(message){status.textContent=message;shutdown();onError(message);}
-  async function open(){
-    if(isHistory()){onError('Open the current conversation to use Voice.');return;}
-    if(connecting)return;
-    if(!closed){reveal();return;}
-    connecting=true;closed=false;muted=false;mute.textContent='Mute';submitted.clear();status.textContent='Preparing microphone and speech models…';talk.disabled=true;reveal();
-    try{
-      // User click creates/resumes the context before waiting on network activity.
-      context=new AudioContext({sampleRate:16000,latencyHint:'interactive'});await context.resume();
-      stream=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
-      if(closed){stream.getTracks().forEach(track=>track.stop());return;}
-      await context.audioWorklet.addModule(chrome.runtime.getURL('voice-worklet.js'));
-      capture=new AudioWorkletNode(context,'resonant-capture');context.createMediaStreamSource(stream).connect(capture);
-      const silent=context.createGain();silent.gain.value=0;capture.connect(silent).connect(context.destination);
-      capture.port.onmessage=({data})=>{
-        if(data instanceof ArrayBuffer){if(ws?.readyState===1){if(ws.bufferedAmount>64000){error('Microphone connection fell behind.');return;}ws.send(data);}}
-        else if(data.type==='ended'){control({type:'end'});status.textContent='Recognizing…';talk.disabled=true;}
-        else if(data.type==='error')error(data.message);
-      };
-      const response=await send('voice/connect');if(closed)return;if(!response?.ok)throw Error(response?.error||'Voice connection failed');
-      const ticket=response.ticket;if(ticket.protocol!=='resonant-voice/1'||!/^ws:\/\/127\.0\.0\.1:\d+\/voice$/.test(ticket.url))throw Error('Invalid voice endpoint');
-      session=ticket.sessionId;ws=new WebSocket(ticket.url);ws.binaryType='arraybuffer';
-      ws.onopen=()=>control({type:'auth',ticket:ticket.ticket});
-      ws.onmessage=async({data})=>{
-        if(closed)return;
-        if(data instanceof ArrayBuffer){
-          if(data.byteLength<8||data.byteLength%2){error('Invalid speech packet');return;}
-          const view=new DataView(data);if(view.getUint32(0,true)!==generation)return;
-          if(nextPlay-context.currentTime>8){error('Speech playback fell behind. Read the remaining answer in chat.');return;}
-          const count=(data.byteLength-8)/2,buffer=context.createBuffer(1,count,24000),channel=buffer.getChannelData(0);
-          for(let i=0;i<count;i++)channel[i]=view.getInt16(8+i*2,true)/32768;
-          const source=context.createBufferSource();source.buffer=buffer;source.connect(context.destination);playing.add(source);source.onended=()=>playing.delete(source);
-          nextPlay=Math.max(nextPlay,context.currentTime+.02);source.start(nextPlay);nextPlay+=buffer.duration;return;
-        }
-        let event;try{event=JSON.parse(data);}catch{error('Invalid voice control');return;}
-        if(event.type==='clear'){clear();generation=event.generation;}
-        else if(event.type==='ready'){connecting=false;status.textContent='Ready';talk.disabled=false;}
-        else if(event.type==='transcript'){
-          if(event.sessionId!==session||submitted.has(event.requestId))return;submitted.add(event.requestId);
-          status.textContent='Thinking…';talk.disabled=false;
-          const result=await send('voice/prompt',{text:event.text,sessionId:session,requestId:event.requestId});
-          if(!result?.ok)error(result?.error||'Message was not accepted. Check chat before trying again.');
-        }else if(event.type==='empty-transcript'){status.textContent='No speech recognized. Try again.';talk.disabled=false;}
-        else if(event.type==='speaking')status.textContent='Speaking…';
-        else if(event.type==='error'){if(event.recoverable){status.textContent=event.message;talk.disabled=false;}else error(event.message);}
-      };
-      ws.onerror=()=>error('Voice connection failed. Text chat remains available.');
-      ws.onclose=()=>{if(!closed){status.textContent='Voice disconnected. Reopen to connect again.';shutdown();}};
-    }catch(e){error(e.message);}
+  const button=document.createElement('button'),icon=document.createElement('span'),status=document.createElement('span')
+  icon.className='voice-shape';icon.setAttribute('aria-hidden','true')
+  button.type='button';button.className='voice-orb';button.append(icon)
+  button.setAttribute('aria-label','Voice: hold to talk, slide left to lock, slide right for hands-free')
+  status.className='voice-status sr-only';status.setAttribute('role','status');status.setAttribute('aria-live','polite')
+  const seat=document.getElementById('voice-seat');if(seat)seat.append(button,status);else document.getElementById('send').before(button,status)
+  const drawing=typeof MutationObserver==='function'?attachVoiceIcon(button):null
+  let lease=null,opening=null,epoch=0,held=false,locked=false,handsFree=false,timer=null,startX=0,heartbeat=null,voiceState='closed'
+  let maxSeconds=600,elapsed=0,defaultHandsFree=false,voiceEnabled=true,nextPreferences=0
+  const label=text=>{status.textContent=text;button.title=text;button.setAttribute('aria-description',text)}
+  label('Hold to talk · Slide left to lock · Slide right for hands-free')
+  async function control(action,current=lease){
+    if(!current)return
+    const result=await send('voice/control',{...current,action})
+    if(!result?.ok&&action!=='close'){onError(result?.error??'Voice disconnected');close()}
   }
-  function begin(){if(talk.disabled||recording||closed)return;recording=true;clear();control({type:'begin'});capture.port.postMessage('start');status.textContent='Listening…';}
-  function end(){if(!recording)return;recording=false;capture?.port.postMessage('stop');}
-  button.onclick=()=>{if(!dialog.hidden)collapse();else void open();};
-  talk.onpointerdown=e=>{talk.setPointerCapture(e.pointerId);begin();};talk.onpointerup=end;talk.onpointercancel=end;
-  talk.onkeydown=e=>{if([' ','Enter'].includes(e.key)){e.preventDefault();if(!e.repeat)begin();}};
-  talk.onkeyup=e=>{if([' ','Enter'].includes(e.key)){e.preventDefault();end();}};
-  mute.onclick=()=>{muted=!muted;mute.textContent=muted?'Unmute':'Mute';control({type:'mute',value:muted});if(muted)clear();};
-  close.onclick=()=>collapse();window.addEventListener('pagehide',shutdown);window.addEventListener('blur',end);
-  document.getElementById('stop')?.addEventListener('click',()=>{collapse();shutdown();});
-  return {update(state,history){button.disabled=state.harness!=='dsh'||state.phase!=='ready'||history;if(!closed&&(history||state.harness&&state.harness!=='dsh'||session&&state.sessionId&&session!==state.sessionId)){collapse();shutdown();}}};
+  function close(){
+    ++epoch;clearTimeout(timer);clearInterval(heartbeat);heartbeat=null
+    held=false;locked=false;handsFree=false;voiceState='closed';opening=null
+    const old=lease;lease=null;const closing=control('close',old)
+    button.dataset.state='closed';button.dataset.mode='';button.style.removeProperty('--voice-level')
+    label('Voice off · Hold to talk · Slide right for hands-free')
+    return closing
+  }
+  async function open(free=false){
+    if(isHistory())throw Error('Open the current conversation to use Voice.')
+    if(lease)return lease
+    if(opening)return opening
+    const ownEpoch=epoch,id=crypto.randomUUID();handsFree=free;label('Preparing speech models…')
+    opening=(async()=>{
+      const result=await send('voice/start',{id,handsFree:free})
+      if(!result?.ok)throw Error(result?.error??'Voice could not start')
+      const current=result.voice
+      if(epoch!==ownEpoch){await control('close',current);return null}
+      lease=current;heartbeat=setInterval(()=>void control('heartbeat'),2000)
+      return current
+    })()
+    try{return await opening}
+    catch(error){if(epoch===ownEpoch){onError(error.message);close();label(error.message)}return null}
+    finally{if(epoch===ownEpoch)opening=null}
+  }
+  async function begin(){const current=await open();if(current&&(held||locked))await control('begin',current)}
+  function down(event){
+    if(button.disabled||event.button>0)return
+    event.preventDefault()
+    if(handsFree){close();return}
+    if(defaultHandsFree&&!lease){void open(true);return}
+    if(locked){locked=false;void control('end');return}
+    held=true;startX=event.clientX??0
+    if(event.pointerId!==undefined)button.setPointerCapture(event.pointerId)
+    timer=setTimeout(()=>{timer=null;if(held)void begin()},230)
+  }
+  function release(){
+    if(!held)return
+    held=false
+    if(timer){clearTimeout(timer);timer=null;void open().then(current=>{if(current)void control('interrupt',current)})}
+    else if(!locked&&!handsFree)void control('end')
+    button.style.transform=''
+  }
+  button.onpointerdown=down
+  button.onpointermove=event=>{
+    if(!held||locked||handsFree)return
+    const delta=event.clientX-startX
+    button.style.transform=`translateX(${Math.max(-12,Math.min(12,delta))}px)`
+    if(delta<=-24){clearTimeout(timer);timer=null;locked=true;button.dataset.mode='locked';label('Recording locked · Tap to send');void begin()}
+    else if(delta>=24){const closing=close(),ownEpoch=epoch;handsFree=true;button.dataset.mode='hands-free';void closing.then(()=>{if(epoch===ownEpoch)return open(true)})}
+  }
+  button.oncontextmenu=event=>{event.preventDefault();void send('settings/open',{section:'voice'})}
+  button.onclick=event=>{if(event.detail===0&&!button.disabled){if(handsFree)close();else if(locked){locked=false;void control('end')}else if(lease)void control('interrupt');else void open(defaultHandsFree)}}
+  button.onpointerup=release
+  button.onpointercancel=()=>{if(!locked&&!handsFree)close()}
+  button.onkeydown=event=>{
+    if(event.key==='Escape'){event.preventDefault();close()}
+    else if(event.key===' '&&!event.repeat)down(event)
+    else if(event.key==='Enter'&&!event.repeat){event.preventDefault();if(handsFree)close();else if(locked){locked=false;void control('end')}else if(defaultHandsFree)void open(true);else void open().then(current=>control('interrupt',current))}
+    else if(event.key.toLowerCase()==='l'&&held){clearTimeout(timer);timer=null;locked=true;button.dataset.mode='locked';void begin()}
+  }
+  button.onkeyup=event=>{if(event.key===' '){event.preventDefault();release()}}
+  chrome.runtime.onMessage.addListener(message=>{
+    if(message.type!=='voice/event')return
+    const event=message.event
+    if(!lease||event.id!==lease.id||event.sessionId!==lease.sessionId)return
+    if(event.type==='error'){onError(event.message);close();label(event.message);return}
+    if(event.type==='state'){
+      voiceState=event.state;button.dataset.state=voiceState
+      if(event.closed){close();return}
+      button.dataset.recording=String(event.recordingAvailable)
+      label(locked&&event.recording?'Recording locked · Tap to send':event.status)
+    }else if(event.type==='progress'){
+      elapsed=event.elapsed;maxSeconds=event.maximum
+      drawing?.levels(event.levels)
+      button.style.setProperty('--voice-level',String(Math.max(0,...event.levels)))
+      button.dataset.limit=elapsed>=maxSeconds*.9?'red':elapsed>=maxSeconds*.8?'orange':''
+      if(event.elapsed>0)status.textContent=`${locked?'Recording locked':handsFree?'Listening':'Release to send'} · ${Math.floor(elapsed/60)}:${String(Math.floor(elapsed%60)).padStart(2,'0')}`
+    }
+  })
+  window.addEventListener('pagehide',close)
+  window.addEventListener('blur',()=>{if(held&&!locked&&!handsFree)close()})
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)close()})
+  document.getElementById('stop')?.addEventListener('click',close)
+  return {update(state,history){
+    if(state.harness==='dsh'&&state.phase==='ready'&&!lease&&!opening&&Date.now()>nextPreferences){
+      nextPreferences=Date.now()+15000
+      void send('voice/preferences').then(result=>{if(result?.ok&&result.result){defaultHandsFree=result.result.mode==='hands-free';voiceEnabled=result.result.enabled;button.hidden=!voiceEnabled;status.hidden=!voiceEnabled}}).catch(()=>{})
+    }
+    button.disabled=state.harness!=='dsh'||state.phase!=='ready'||history||!voiceEnabled
+    if((lease||opening)&&(button.disabled||lease&&state.sessionId&&lease.sessionId!==state.sessionId))close()
+    if(button.disabled&&state.harness==='pi')button.title='Voice uses the shared DSH harness. Select DSH in Settings → Harnesses.'
+  }}
 }

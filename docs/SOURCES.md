@@ -2,6 +2,16 @@
 
 # Source baselines and migration inventory
 
+## Home preview — 24 September 2026
+
+`apps/home/package-lock.json` pins the exercised DSH 0.1.5-rc.1 packages,
+Cordis 4.0.2, MCP SDK 1.30.0 and ws 8.21.3. Node 24.19.0 is pinned by image
+digest in its Dockerfile. Live protocol qualification used HA 2026.9.3 and its
+official Assist MCP endpoint; see [Home evidence and limits](HOME.md). Upstream
+npm package licenses remain in the installed dependencies; Debian copyright
+notices remain in the image. This preview does not redistribute private harness
+settings, credentials or session data.
+
 ## WebSocket correction — 24 September 2026
 
 Current runtime, Browser companion/plugin and mobile pins are `ws 8.21.3`.

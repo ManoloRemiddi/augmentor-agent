@@ -56,3 +56,14 @@ Controlled admission/context: `python3 -m unittest discover -s tests -p test_mem
 - Bounded execution and terminal response validity (24 focused cases, including real DSH lifecycle and one isolated hook fixture): `node --test tests/dsh-execution.test.mjs` uses real pinned DSH with fixture HTTP; see [contract](../docs/BOUNDED-EXECUTION-RECOVERY.md).
 
 Action-outcome contracts: `node --test tests/dsh-action-outcomes.test.mjs tests/dsh-execution.test.mjs`. Real DSH fixture coverage includes duplicate mutations, lost acknowledgments, background collection and concluding handoffs after truncation. The complete-container proof verifies the execution adapter is installed once in each preset and its dependent module is shipped.
+
+## Shared personal surfaces · September 24
+
+`test_dsh_status.py` covers stopped runtimes without terminal history and Stop
+acknowledgements. `test_browser_voice.py`, `browser-shared-voice.test.mjs` and
+`apps/browser/test/voice.test.mjs` cover the common voice transport, cancellation,
+deduplication and sidebar gestures. `dsh-boundary`, `dsh-interactions` and
+`dsh-exact-fork` verify shared personal aliases while excluding unrelated roles.
+`scripts/dsh-setup-proof.py` with the approval/interaction/exact-fork flags runs
+real isolated DSH and both presentation transports, using a fixture model.
+This does not replace a physical microphone/speaker and loaded-extension trial.

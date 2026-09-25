@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+
+- [Immediate composer feedback and regression evidence](COMPOSER-SEND-FEEDBACK.md)
 # Documentation index
 
 Licensing and publication: [combined Augmentor license](LICENSING.md),
@@ -21,6 +23,9 @@ of this repository; include reproducible commands and sanitized evidence summari
 
 - [Start here: agent handoff](AGENT-HANDOFF.md)
 - [Current architecture](ARCHITECTURE.md)
+- [One personal agent, two presentations](SHARED-SURFACES-2026-09-24.md)
+
+- [Home runtime, existing-device integration and qualification](HOME.md)
 - [Feature ownership and compatibility · Augmentor 0.2.9 development](FEATURE-MATRIX.md)
 - [Desktop development snapshot · 19 September 2026](DESKTOP-UPDATE-2026-09-19.md)
 - [Source baselines and migration inventory](SOURCES.md)
@@ -122,3 +127,5 @@ when their implementation and validation are published, rather than linking
 files available only in a developer's working directory.
 
 - [Controlled memory and selected context](CONTROLLED-MEMORY.md): current bounded inference, provenance, tests and operating limits.
+
+- [Home desktop tray launcher](HOME-LAUNCHER.md): shared NAS dashboard access, remembered address and login startup.

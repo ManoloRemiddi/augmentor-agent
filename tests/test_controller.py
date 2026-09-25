@@ -47,6 +47,39 @@ class ControllerTests(unittest.TestCase):
         self.assertFalse(controller.running)
         self.assertNotIn('session.prompt', client.calls)
 
+    def test_submission_result_is_explicit_for_rejection_and_pre_send_cancel(self):
+        for outcome in ('reject','cancel','accept'):
+            class Client:
+                def validate_model(self, selection):
+                    if outcome=='cancel':controller.cancel_requested.set()
+                def call(self, method, payload):return {'accepted':outcome=='accept'}
+            controller=Controller(client=Client());controller.session='fixture'
+            controller.connected=True;controller.stream=type('Stream',(),{'session':'fixture'})()
+            controller.save_session=lambda:None;controller.task=lambda fn:fn()
+            failed=[];sent=[]
+            controller.submission_failed.connect(failed.append);controller.sent.connect(sent.append)
+            if outcome=='reject':
+                with self.assertRaisesRegex(Exception,'did not accept'):controller.send('Fixture prompt',{'provider':'test','model':'test'})
+            else:controller.send('Fixture prompt',{'provider':'test','model':'test'})
+            self.assertEqual(failed,[] if outcome=='accept' else ['Fixture prompt'])
+            self.assertEqual(sent,['Fixture prompt'] if outcome=='accept' else [])
+
+    def test_idle_subscription_baseline_cannot_release_a_preparing_send(self):
+        class Client:
+            def validate_model(self,_):pass
+            def call(self,method,payload):return {'accepted':True}
+        controller=Controller(client=Client());controller.session='fixture'
+        controller.save_session=lambda:None;controller.task=lambda fn:fn()
+        def subscribe(sid):
+            controller.frame({'method':'host/session-status','payload':{'sessionId':sid,'running':False}})
+            self.assertTrue(controller.running)
+            self.assertFalse(controller.send('Duplicate',{}))
+        controller.subscribe=subscribe
+        controller.send('First',{'provider':'test','model':'test'})
+        self.assertTrue(controller.running)
+        controller.frame({'method':'host/session-status','payload':{'sessionId':'fixture','running':False}})
+        self.assertFalse(controller.running)
+
     def test_reconnect_recovers_history_without_cancel_or_prompt_replay(self):
         class Client:
             calls=[]

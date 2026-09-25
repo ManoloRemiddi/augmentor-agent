@@ -79,8 +79,8 @@ class Model(http.server.BaseHTTPRequestHandler):
             delta={'role':'assistant','tool_calls':[{'index':0,'id':'native-approval','type':'function','function':{'name':'fixture_approval','arguments':'{}'}}]};reason='tool_calls'
         elif 'native question fixture' in user and body['messages'][-1]['role']!='tool':
             delta={'role':'assistant','tool_calls':[{'index':0,'id':'native-question','type':'function','function':{'name':'ask_user_question','arguments':json.dumps({'questions':[{'id':'choice','question':'Choose a fixture value','options':[{'label':'Alpha'},{'label':'Beta'}]}]})}}]};reason='tool_calls'
-        elif 'guard fixture' in user and body['messages'][-1]['role']!='tool':
-            delta={'role':'assistant','tool_calls':[{'index':0,'id':'forbidden','type':'function','function':{'name':'bash','arguments':json.dumps({'command':'touch '+str(work/'forbidden-browser-file')})}}]};reason='tool_calls'
+        elif 'shared capabilities fixture' in user and body['messages'][-1]['role']!='tool':
+            delta={'role':'assistant','tool_calls':[{'index':0,'id':'shared-read','type':'function','function':{'name':'read','arguments':json.dumps({'file_path':str(work/'shared-capabilities.txt')})}}]};reason='tool_calls'
         else:delta={'role':'assistant','content':'DSH EDIT VERIFIED' if 'DSH EDIT VERIFIED' in user else 'DSH BRANCH CONTINUED' if 'DSH BRANCH CONTINUED' in user else 'Fixture reply.'};reason='stop'
         chunks=[(delta,None),({},reason)]
         streaming='Display regression test:' in user
@@ -321,14 +321,17 @@ try:
             assert 'wiki_write: created' in str(replies[2]['content'])
             assert 'wiki_rename:' in str(replies[4]['content']) and 'wiki_archive:' in str(replies[5]['content'])
             print('Wiki write, inbound-link rename and raw-source archive verified independently on disk',flush=True)
+    (work/'shared-capabilities.txt').write_text('SHARED SURFACE VERIFIED')
+    desktop_tools=None
     for surface in ('linux','browser'):
         sid='setup-'+surface;before=len(received)
         adapter.call('session.create',{'sessionId':sid,'agentPreset':'augmentor-'+surface+'-product','cwd':str(work)})
         adapter.call('session.selectModel',{'sessionId':sid,'provider':'fixture','model':'fixture'})
-        adapter.call('session.prompt',{'sessionId':sid,'mode':'queue','content':[{'type':'text','text':'guard fixture' if surface=='browser' else 'Reply to this setup fixture.'}]})
+        adapter.call('session.prompt',{'sessionId':sid,'mode':'queue','content':[{'type':'text','text':'shared capabilities fixture' if surface=='browser' else 'Reply to this setup fixture.'}]})
         until(lambda:len(received)>before and not next(r for r in adapter.call('session.list')['items'] if r['sessionId']==sid)['running'])
         tools={t['function']['name'] for t in received[before]['tools']};assert 'memory_recall' in tools,tools
         if surface=='linux':
+            desktop_tools=tools
             assert 'linux_desktop_snapshot' in tools,tools
             required={'glob','grep','job_list','job_output','job_kill','skill','create_goal','get_goal','update_goal','exit_plan_mode','list_agents','subagent','subagent_fork','interrupt_agent','send_message','workflow','ralph','todo_write','web_search'}
             assert required <= tools, 'Missing desktop capabilities: '+str(sorted(required-tools))
@@ -353,7 +356,7 @@ try:
 
             assert sid in adapter.saved_chats('save',sid)
             assert sid not in adapter.saved_chats('unsave',sid)
-            try:adapter.saved_chats('save','setup-browser');raise AssertionError('Wrong role accepted')
+            try:adapter.saved_chats('save','not-a-personal-chat');raise AssertionError('Wrong role accepted')
             except Exception as e:assert not isinstance(e,AssertionError)
             print('Actual desktop preset and saved-chat operations verified',flush=True)
             assert adapter.native_interactions,'Current product descriptor must advertise native interactions'
@@ -415,10 +418,15 @@ try:
                     print('Actual DSH question answered through Qt dialog and returned to model',flush=True)
                 finally:stream.close()
         else:
-            assert not (work/'forbidden-browser-file').exists()
+            assert tools==desktop_tools, 'Personal surfaces must have identical tools'
             assert len(received)>before+1
-            assert any('only use browser tools' in str(m) for m in received[-1]['messages'] if m['role']=='tool'),received[-1]
-            print('Actual DSH browser tool guard prevented OS command',flush=True)
+            assert any('SHARED SURFACE VERIFIED' in str(m) for m in received[-1]['messages'] if m['role']=='tool'),received[-1]
+            assert adapter.saved_chats('save',sid) and sid in adapter.saved_chats()
+            adapter.saved_chats('unsave',sid)
+            assert (home/'.agent-presets/augmentor-linux-product/agent.cordis.yml').read_text()==(home/'.agent-presets/augmentor-browser-product/agent.cordis.yml').read_text()
+            print('Both surfaces share the exact preset composition, model-facing tools and saved chats; Browser read a workspace file',flush=True)
+    if os.environ.get('AUGMENTOR_PROOF_APPROVALS'):
+        subprocess.run(['node',str(ROOT/'tests/fixtures/shared-browser-client.mjs')],env={**os.environ,'DSH_AUGMENTOR_URL':base},check=True,timeout=90)
     if os.environ.get('AUGMENTOR_PROOF_EXACT_FORK'):
         from dsh.branch import history
         from dsh.setup import http
@@ -468,7 +476,7 @@ try:
         with (ROOT/'outputs/dsh-native-reply-proof.log').open('w') as reply_log:
             subprocess.run([sys.executable,str(ROOT/'scripts/dsh-reply-proof.py')],env=reply_env,stdout=reply_log,stderr=reply_log,check=True,timeout=200)
         print('Native Qt saved/final reply recovery verified without a login URL; inspect streamObserved separately',flush=True)
-    evidence={'fixture':str(work),'appRoot':str(APP),'adapterFile':loaded_adapter.__file__,'platform':sys.platform,'model':'deterministic local fixture','qtInstall':True,'modelPickerAdapter':bool(picker),'modelPickerUi':bool(picker and os.environ.get('AUGMENTOR_PROOF_PICKER_UI')),'checkedSave':True,'profilePreserved':True,'linuxSavedChats':True,'browserOsToolBlocked':True,'modelRequests':len(received),'wikiToolAndSkillWorkflow':bool(wiki_modules),'contextAndAdaptiveWorkflow':bool(host_plugins),'freeWebSearchWorkflow':bool(web_provider)}
+    evidence={'fixture':str(work),'appRoot':str(APP),'adapterFile':loaded_adapter.__file__,'platform':sys.platform,'model':'deterministic local fixture','qtInstall':True,'modelPickerAdapter':bool(picker),'modelPickerUi':bool(picker and os.environ.get('AUGMENTOR_PROOF_PICKER_UI')),'checkedSave':True,'profilePreserved':True,'linuxSavedChats':True,'sharedPersonalAgent':True,'modelRequests':len(received),'wikiToolAndSkillWorkflow':bool(wiki_modules),'contextAndAdaptiveWorkflow':bool(host_plugins),'freeWebSearchWorkflow':bool(web_provider)}
     (ROOT/'outputs/dsh-setup-proof.json').write_text(json.dumps(evidence,indent=2)+'\n');print(json.dumps(evidence),flush=True)
 finally:
     stop();log.close();server.shutdown();server.server_close()

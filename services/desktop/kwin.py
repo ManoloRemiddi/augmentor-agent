@@ -23,12 +23,16 @@ class KWin:
         if sender!=owner or token not in self.pending:invocation.return_dbus_error('com.augmentor.Invalid','Unknown observation');return
         self.pending[token].append(json.loads(value));invocation.return_value(None)
     def read(self,cancel=None,windows=False):
-        token=uuid.uuid4().hex;result=[];self.pending[token]=result;leases=[]
         source='''function rect(r){return {x:r.x,y:r.y,width:r.width,height:r.height}};
 var w=workspace.activeWindow; var order=workspace.stackingOrder; var above=w?order.slice(order.indexOf(w)+1).filter(a=>!a.minimized&&!a.hidden&&!a.deleted&&(!a.desktops.length||a.desktops.indexOf(workspace.currentDesktop)>=0)&&(!a.activities.length||a.activities.indexOf(workspace.currentActivity)>=0)):[];
 callDBus(SERVICE,'/com/augmentor/Desktop','com.augmentor.Desktop','Report',TOKEN,JSON.stringify({window:w?{id:String(w.internalId),pid:w.pid,application:w.resourceClass,title:w.caption,geometry:rect(w.frameGeometry)}:null,above:above.map(a=>({id:String(a.internalId),pid:a.pid,geometry:rect(a.frameGeometry)})),screens:workspace.screens.map(s=>({name:s.name,geometry:rect(s.geometry)}))}));
-'''.replace('SERVICE',json.dumps(self.bus.get_unique_name())).replace('TOKEN',json.dumps(token))
+'''
         if windows:source=source.replace('JSON.stringify({window:', 'JSON.stringify({windows:order.map(a=>({id:String(a.internalId),title:a.caption,geometry:rect(a.frameGeometry)})),window:')
+        return self.execute(source,cancel)
+    def execute(self,source,cancel=None):
+        """Run an internal script with a bounded, compositor-authenticated reply."""
+        token=uuid.uuid4().hex;result=[];self.pending[token]=result;leases=[]
+        source=source.replace('SERVICE',json.dumps(self.bus.get_unique_name())).replace('TOKEN',json.dumps(token))
         try:
             for _ in range(32):
                 xml=self.call('/Scripting','org.freedesktop.DBus.Introspectable','Introspect')[0]

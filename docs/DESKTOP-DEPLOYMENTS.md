@@ -2,6 +2,30 @@
 
 # Consistent installed desktop releases
 
+## September 25: immediate composer feedback
+
+[Composer correction and installed evidence](COMPOSER-SEND-FEEDBACK.md) records
+implementation `ba2fecf` over the prior immutable selection. Managed release
+`20260925-095859-da27e123` is selected; the secondary instance has adopted it and
+is online with voice available. Its draft and conversation/model were preserved.
+Main/mobile continue their earlier running build. The secondary-only baseline
+race and separate Browser acknowledgment delay are documented in that guide.
+
+## September 24: optional Home dashboard tray
+
+The follow-up click-toggle fix `09a7dfb` is selected in
+`20260924-205229-78c3c113`; only the Home tray was restarted. Actual tray
+open/close/open and explicit-Open reuse passed with unrelated windows preserved.
+This supersedes the initial selection recorded next.
+
+[Home launcher evidence](HOME-LAUNCHER.md#installed-linux-evidence--24-september-2026)
+records selected release `20260924-202032-d5e07a94`, based on the previously
+selected sidebar-speed artifact with implementation `76cb697` added. Stage and
+activation passed; the installed Home tray runs this release and opened the
+existing NAS dashboard. Main/mobile and secondary still run their earlier
+artifacts, online with voice available. No conversation windows were restarted.
+Keep Home launcher support when constructing subsequent mixed desktop artifacts.
+
 ## September 22: hide the routine opening reasoning notice
 
 Source `ee5d8f1` adds an exact native transcript filter for the successful

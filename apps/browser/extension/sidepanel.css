@@ -1,0 +1,10 @@
+
+/* Voice is one control in either surface; audio is owned by the shared engine. */
+.voice-orb { touch-action: none; flex-shrink: 0; transition: transform 150ms ease, box-shadow 150ms ease; }
+.voice-orb[data-recording="true"] { box-shadow: 0 0 calc(5px + 14px * var(--voice-level,0)) var(--accent,#8467ff); }
+.voice-orb[data-mode="locked"] { outline: 2px solid var(--accent,#8467ff); }
+.voice-orb[data-mode="hands-free"] { outline: 2px solid #55bc91; }
+.voice-orb[data-limit="orange"] { outline-color: orange; }
+.voice-orb[data-limit="red"] { outline-color: #ee6666; }
+.voice-status { font-size: 11px; max-width: 130px; align-self: center; color: var(--muted,#aaa); }
+@media (prefers-reduced-motion: reduce) { .voice-orb { transition: none; } }

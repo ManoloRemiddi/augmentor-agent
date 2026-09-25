@@ -4,7 +4,7 @@
 // License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
 
 let opening = Promise.resolve()
-const sections = new Set(['appearance','models','harnesses','prompts','memory','support'])
+const sections = new Set(['voice','appearance','models','harnesses','prompts','memory','home','support'])
 export function openSettingsTab(section) {
   // Serialize clicks from different panels so they cannot create duplicate tabs.
   const next = opening.catch(() => {}).then(async () => {

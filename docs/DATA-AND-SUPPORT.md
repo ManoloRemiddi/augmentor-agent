@@ -45,6 +45,15 @@ HTTP supports local services. There are two distinct memory integrations:
   bindings. Manual deletion follows that provider's semantics and does not
   delete automatic-memory banks, earlier model context, backups or provider logs.
 
+Browser speech now uses the same native microphone/playback engine as Desktop,
+activated by the sidebar's voice gestures. Closing the panel cancels capture; a
+lost UI heartbeat expires within six seconds. The private stdio control bridge
+passes final transcripts to the existing session without storing audio. Primary
+Desktop and Browser voice settings share one profile; secondary windows retain
+independent profiles. The shared response_metrics tool retains up to 20 timing
+records per conversation locally, including a short identifying response excerpt;
+see [shared surfaces](SHARED-SURFACES-2026-09-24.md).
+
 The speech companion processes microphone audio through configured ASR and sends
 reply text to configured TTS. The automatic memory journal stores the resulting
 text, not the microphone stream. Speech-engine configuration, transient buffering

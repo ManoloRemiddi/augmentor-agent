@@ -8,7 +8,7 @@ export function registerInteractions(ctx,broker){
  for(const [event,kind] of [['approval/request','approval'],['user-questions/request','question']]){
   ctx.on(event,(request,next)=>{
    const session=request.agent?.session,header=session?.header
-   if(!session?.id||header?.agentPreset!=='augmentor-linux-product'||header.origin==='subagent')return next()
+   if(!session?.id||!['augmentor-linux-product','augmentor-browser-product'].includes(header?.agentPreset)||header.origin==='subagent')return next()
    return broker.present(session.id,kind,request,next)
   },{prepend:true})
  }
@@ -17,13 +17,13 @@ export function registerInteractions(ctx,broker){
 // Called only after the product HTTP handler authenticates the request.
 // Recheck the persisted role for every operation, including answers.
 export async function interactionOperation(ctx,broker,p){
- if(p.surface!=='linux'||typeof p.sessionId!=='string'||!p.sessionId||p.sessionId.length>256||
+ if(!['linux','browser'].includes(p.surface)||typeof p.sessionId!=='string'||!p.sessionId||p.sessionId.length>256||
     typeof p.owner!=='string'||! /^[a-f0-9-]{36}$/.test(p.owner)||
     !['claim','poll','release','answer'].includes(p.operation))throw Error('Invalid native interaction operation')
  if(p.operation==='answer'&&(typeof p.id!=='string'||! /^[a-f0-9-]{36}$/.test(p.id)))throw Error('Invalid interaction identifier')
  const observation=await ctx.sessionQuery.observeSession(p.sessionId)
  try{
-  if(observation.header.agentPreset!=='augmentor-linux-product'||observation.header.origin==='subagent')throw Error('This conversation belongs to another role')
+  if(!['augmentor-linux-product','augmentor-browser-product'].includes(observation.header.agentPreset)||observation.header.origin==='subagent')throw Error('This conversation belongs to another role')
   if(p.operation==='claim')broker.claim(p.sessionId,p.owner)
   else if(p.operation==='release')broker.release(p.sessionId,p.owner)
   else if(p.operation==='answer')broker.answer(p.sessionId,p.owner,p.id,p.value)
@@ -48,7 +48,7 @@ export class InteractionBroker {
   if(this.closed)throw Error('Interaction broker is closed')
   this.expire()
   const prior=this.owners.get(sessionId)
-  if(prior&&prior.owner!==owner)throw Error('Another native client owns these interactions')
+  if(prior&&prior.owner!==owner)throw Error('Another Augmentor window owns these interactions')
   if(prior){prior.expires=this.now()+this.ttl;this.schedule();return}
   this.owners.set(sessionId,{owner,expires:this.now()+this.ttl,pending:new Map()})
   this.schedule()

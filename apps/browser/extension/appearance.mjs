@@ -3,6 +3,18 @@
 // SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
 
+let desktopAppearance=null
+export function applyDesktopAppearance(result){
+  if(!result?.tokens)return
+  desktopAppearance=result
+  document.documentElement.dataset.theme=result.theme
+  document.documentElement.dataset.animation=String(result.animation)
+  for(const [key,value] of Object.entries(result.tokens))document.documentElement.style.setProperty(key,value)
+}
+export async function refreshDesktopAppearance(){
+  const reply=await chrome.runtime.sendMessage({type:'surface/appearance'})
+  if(reply?.ok){applyDesktopAppearance(reply.result);return reply.result}
+}
 const T = globalThis.__dshAugTheme
 export const appearanceFields = [
   ['neutHue','augmentor-neut-hue','Surface colour',0,360],
@@ -23,7 +35,7 @@ export function readAppearance() {
   }
   try {values.formatColours=JSON.parse(localStorage.getItem('augmentor-format-colours')||'{}')} catch {values.formatColours={}}
   if(!values.formatColours||typeof values.formatColours!=='object')values.formatColours={}
-  return values
+  return desktopAppearance?.values?{...values,...desktopAppearance.values}:values
 }
 export function applyAppearance() {
   const value=readAppearance(),root=document.documentElement
@@ -34,9 +46,13 @@ export function applyAppearance() {
     if(/^#[0-9a-f]{6}$/i.test(colour||''))root.style.setProperty(property,colour)
     else root.style.removeProperty(property)
   }
+  if(desktopAppearance)applyDesktopAppearance(desktopAppearance)
   return value
 }
-export function saveAppearance(value) {
+export async function saveAppearance(value) {
+  const reply=await chrome.runtime.sendMessage({type:'surface/appearance',settings:value})
+  if(!reply?.ok)throw Error(reply?.error||'Could not save shared appearance')
+  desktopAppearance=reply.result
   const stored={'augmentor-theme':value.theme,'augmentor-format-colours':JSON.stringify(value.formatColours||{})}
   for(const [key,storage] of appearanceFields)stored[storage]=value[key]
   for(const [key,v] of Object.entries(stored))localStorage.setItem(key,String(v))
@@ -46,7 +62,7 @@ export function saveAppearance(value) {
 }
 export function watchAppearance(onChange=()=>{}) {
   const refresh=()=>onChange(applyAppearance())
-  const listener=event=>{if(event.key===null||event.key.startsWith('augmentor-'))refresh()}
+  const listener=event=>{if(event.key===null||event.key.startsWith('augmentor-'))void refreshDesktopAppearance().then(refresh).catch(()=>refresh())}
   window.addEventListener('storage',listener);refresh()
   window.addEventListener('pagehide',()=>window.removeEventListener('storage',listener),{once:true})
 }

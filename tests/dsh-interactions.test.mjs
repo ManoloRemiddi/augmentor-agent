@@ -4,7 +4,7 @@ import assert from 'node:assert/strict'
 import {setTimeout as delay} from 'node:timers/promises'
 import {InteractionBroker,interactionOperation,registerInteractions} from '../adapters/dsh-product/interactions.mjs'
 
-test('request listeners claim only a leased desktop session and preserve delegation',async()=>{
+test('request listeners claim only a leased personal session and preserve delegation',async()=>{
  const handlers=new Map(),broker=new InteractionBroker()
  registerInteractions({on:(event,handler,options)=>{assert.equal(options.prepend,true);handlers.set(event,handler)}},broker)
  const agent={session:{id:'s',header:{agentPreset:'augmentor-linux-product'}}}
@@ -12,7 +12,7 @@ test('request listeners claim only a leased desktop session and preserve delegat
  const approval=handlers.get('approval/request')
  assert.equal(await approval({agent},next),'fallback')
  broker.claim('s','owner')
- for(const header of [{agentPreset:'augmentor-browser-product'},{agentPreset:'augmentor-linux-product',origin:'subagent'}]){
+ for(const header of [{agentPreset:'augmentor-home'},{agentPreset:'augmentor-linux-product',origin:'subagent'}]){
   assert.equal(await approval({agent:{session:{id:'s',header}}},next),'fallback')
  }
  assert.equal(await approval({},next),'fallback')
@@ -30,7 +30,7 @@ test('request listeners claim only a leased desktop session and preserve delegat
 
 test('native interaction operations enforce persisted role before claiming or answering',async()=>{
  const broker=new InteractionBroker(),owner='11111111-1111-4111-8111-111111111111'
- let disposed=0,header={agentPreset:'augmentor-browser-product'}
+ let disposed=0,header={agentPreset:'augmentor-home'}
  const ctx={sessionQuery:{observeSession:async()=>({header,[Symbol.dispose](){disposed++}})}}
  const p={surface:'linux',sessionId:'s',owner,operation:'claim'}
  await assert.rejects(interactionOperation(ctx,broker,p),/another role/)
@@ -41,7 +41,7 @@ test('native interaction operations enforce persisted role before claiming or an
  await interactionOperation(ctx,broker,p)
  const pending=broker.present('s','approval',{},()=> 'unavailable')
  const {pending:[item]}=await interactionOperation(ctx,broker,{...p,operation:'poll'})
- header={agentPreset:'augmentor-browser-product'}
+ header={agentPreset:'augmentor-home'}
  await assert.rejects(interactionOperation(ctx,broker,{...p,operation:'answer',id:item.id,value:'allowed-once'}),/another role/)
  assert.equal(broker.poll('s',owner).length,1)
  header={agentPreset:'augmentor-linux-product'}
@@ -97,4 +97,17 @@ test('question answers retain caller ids and validate options before settlement'
  for(const value of [{answers:[]},{answers:[{id:'q',selected:['C']}]},{answers:[{id:'q',selected:['A','B']}]}])assert.throws(()=>broker.answer('s','owner',item.id,value))
  const value={answers:[{id:'q',selected:['A']}]};broker.answer('s','owner',item.id,value)
  assert.deepEqual(await pending,value)
+})
+
+test('browser and floating UI share approvals for both personal aliases',async()=>{
+ for(const preset of ['augmentor-browser-product','augmentor-linux-product']){
+  const broker=new InteractionBroker(),owner='11111111-1111-4111-8111-111111111111'
+  const ctx={sessionQuery:{observeSession:async()=>({header:{agentPreset:preset},[Symbol.dispose](){}})}}
+  const p={surface:'browser',sessionId:'s',owner}
+  await interactionOperation(ctx,broker,{...p,operation:'claim'})
+  const pending=broker.present('s','approval',{toolName:'bash'},()=>{throw Error('delegated')})
+  const {pending:[item]}=await interactionOperation(ctx,broker,{...p,operation:'poll'})
+  await interactionOperation(ctx,broker,{...p,operation:'answer',id:item.id,value:'allowed-once'})
+  assert.equal(await pending,'allowed-once');broker.close()
+ }
 })

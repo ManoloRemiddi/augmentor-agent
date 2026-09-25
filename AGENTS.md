@@ -8,6 +8,7 @@
   [ManoloRemiddi/augmentor-agent](https://github.com/ManoloRemiddi/augmentor-agent), default branch `main`.
 - “Save/push to the repo” means this repository. Work on branches here as needed.
   Confirm `git remote -v`, branch and changes before committing or pushing.
+- Home application code belongs in `apps/home` and `adapters/dsh-home`; read [Home](docs/HOME.md). The private `local-ai-smart-home` companion owns deployment, not another agent core.
 - The website is maintained separately in `ManoloRemiddi/augmentoragent.com`.
 - Old product repositories are historical archives. Never merge their Git history
   into this public repository or point an old private checkout at this remote.

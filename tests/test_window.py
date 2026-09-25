@@ -91,10 +91,27 @@ class WindowTests(unittest.TestCase):
             window.controller=SimpleNamespace(running=False,session=None,online=True,send=lambda *a:True,close=lambda:None)
             window.set_models([{'provider':'local','model':'test','name':'Test'}])
             window.composer.setPlainText('Original prompt');window.send()
-            window.composer.setPlainText(newer);window.on_problem('Connection failed')
+            window.composer.setPlainText(newer);window.message_not_sent('Original prompt');window.on_problem('Connection failed')
             self.assertEqual(window.composer.toPlainText(),newer or 'Original prompt')
             if newer:self.assertIn('Original prompt',window.transcript.toPlainText())
             window.close()
+
+    def test_idle_and_unrelated_error_do_not_restore_pending_submission(self):
+        window=Window()
+        window.controller=SimpleNamespace(running=False,session=None,online=True,send=lambda *a:True,close=lambda:None)
+        window.set_models([{'provider':'local','model':'test','name':'Test'}])
+        window.composer.setPlainText('Delayed submission');window.send()
+        window.set_busy(False)
+        window.on_problem('A separate history request failed')
+        self.assertEqual(window.composer.toPlainText(),'')
+        self.assertEqual(window.pending_prompt,'Delayed submission')
+        self.assertIn('Delayed submission',window.transcript.toPlainText())
+        window.fold_event({'seq':1,'type':'user/message','data':{'source':{'kind':'user'},'content':[{'type':'text','text':'Delayed submission'}]}})
+        window.message_not_sent('Delayed submission') # lost acknowledgment after durable delivery
+        window.set_busy(False);window.render_messages()
+        self.assertEqual(window.composer.toPlainText(),'')
+        self.assertEqual(window.transcript.toPlainText().count('Delayed submission'),1)
+        window.close()
 
     def test_background_opacity_preserves_text_opacity(self):
         window = Window()

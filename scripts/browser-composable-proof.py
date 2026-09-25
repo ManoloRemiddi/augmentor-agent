@@ -105,6 +105,9 @@ try:
         time.sleep(.05)
     assert evaluate("typeof chrome !== 'undefined' && !!chrome.runtime",panel),evaluate("({url:location.href,title:document.title,text:document.body?.innerText})",panel)
     def send(kind,payload={}):return evaluate('chrome.runtime.sendMessage('+json.dumps({'type':kind,**payload})+')',panel)
+    # Fresh profiles now default to the shared DSH agent. This fixture explicitly
+    # qualifies Pi before its later DSH setup/switch assertions.
+    assert send('harness/select',{'harness':harness})['ok']
     end=time.monotonic()+60
     while time.monotonic()<end:
         status=send('log')
@@ -133,6 +136,7 @@ try:
     def open_settings(section):
         global panel,settings_target
         panel=chat_panel
+        click('#more')
         click('#settings')
         def find_settings():
             return next((t for t in cdp('Target.getTargets')['targetInfos'] if '/settings.html' in t['url']),None)

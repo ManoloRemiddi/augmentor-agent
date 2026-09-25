@@ -11,6 +11,7 @@ import {fileURLToPath} from 'node:url';
 import {randomUUID,createHash} from 'node:crypto';
 import {createAgentSession,ModelRuntime,SessionManager,SettingsManager,DefaultResourceLoader,type AgentSession,type ExtensionAPI} from '@earendil-works/pi-coding-agent';
 import {BrowserBroker} from '../../pi-browser/src/index.js';
+import {homePackage} from '../../home-client/src/pi.js';
 import {linuxPackage} from '../../pi-linux/src/index.js';
 import {type Data,type DisplayEvent,PROTOCOL,identifier,text} from '../../protocol/src/index.js';
 import {atomicJson,readJson,privateDir,paths} from './storage.js';
@@ -70,12 +71,13 @@ export class Host {
   getMeta(id:unknown){const m=this.metadata.get(identifier(id));if(!m)throw new Error('Conversation not found');return m;}
   policy(m:Meta){return (pi:ExtensionAPI)=>{pi.on('tool_call',async e=>{
     if(e.toolName==='linux_desktop_stop')this.desktopSpecialist.cancel('pi:'+m.id);
-    if(m.surface==='browser'&&!['browser_tabs_list','browser_screenshot','browser_snapshot','browser_navigate','browser_click','browser_type','memory_recall','memory_source'].includes(e.toolName))
+    if(m.surface==='browser'&&!['browser_tabs_list','browser_screenshot','browser_snapshot','browser_navigate','browser_click','browser_type','memory_recall','memory_source','home_devices','home_set','home_read','home_status','home_request','home_result','home_cancel'].includes(e.toolName))
       return {block:true,reason:'This browser chat can only use its browser tools.'};
     if(this.desktopSpecialist.busy()&&['linux_desktop_connect','linux_desktop_snapshot','linux_desktop_action'].includes(e.toolName))return {block:true,reason:'A desktop specialist owns the desktop. Wait for it or Stop it before using direct desktop tools.'};
-    if(['desktop_delegate','desktop_evidence','memory_recall','memory_source','read','ls','find','grep','linux_system_profile','linux_desktop_observe','linux_desktop_connect','linux_desktop_snapshot','linux_desktop_stop','ask_user','browser_tabs_list','browser_screenshot','browser_snapshot'].includes(e.toolName))return;
+    if(['home_devices','home_read','home_status','home_result','home_cancel','desktop_delegate','desktop_evidence','memory_recall','memory_source','read','ls','find','grep','linux_system_profile','linux_desktop_observe','linux_desktop_connect','linux_desktop_snapshot','linux_desktop_stop','ask_user','browser_tabs_list','browser_screenshot','browser_snapshot'].includes(e.toolName))return;
     if(e.toolName==='bash'&&isRoutineQuery(e.input.command))return;
     if(m.policy==='read-only')return {block:true,reason:'Read-only chat: actions that can change state are disabled.'};
+    if(['home_request','home_set'].includes(e.toolName))return; // Persistent NAS pairing grants the scoped Home capability.
     if(m.policy!=='danger-full-access'&&!await this.interactions.approve(m.id,e.toolName,e.input))return {block:true,reason:'Action not approved, cancelled or no user interface connected.'};
   });};}
   async load(m:Meta,branchManager?:SessionManager){let record=this.loaded.get(m.id);if(record)return record;
@@ -87,7 +89,7 @@ export class Host {
     if(!Array.isArray(resources.sources)||!Array.isArray(resources.skills))throw new Error('Invalid Pi resource configuration');
     const resourceLoader=new DefaultResourceLoader({cwd:m.cwd,agentDir:this.dirs.agent,settingsManager,noExtensions:true,noSkills:true,noContextFiles:true,noThemes:true,
       additionalExtensionPaths:m.surface==='browser'?[]:resources.sources,additionalSkillPaths:m.surface==='browser'?[]:resources.skills,additionalPromptTemplatePaths:[privateDir(join(this.dirs.agent,'prompts'))],
-      extensionFactories:[this.policy(m),pi=>memoryPackage(pi,m.fork?undefined:'pi:'+m.id),piMemoryContext(memory,!m.fork),...(m.surface==='browser'?[this.browser.package(m.id)]:process.env.AUGMENTOR_PI_LINUX_TOOLS==='0'?[]:[linuxPackage(this.backend),desktopPackage('pi:'+m.id),this.desktopSpecialist.package({owner:'pi:'+m.id,cwd:m.cwd,agentDir:this.dirs.agent,modelRuntime:this.modelRuntime,policy:m.policy,approve:(name,args)=>this.interactions.approve(m.id,name,args),cancelInteractions:()=>this.interactions.cancel(m.id),progress:info=>this.append(m,'desktop/progress',info)})])],
+      extensionFactories:[this.policy(m),homePackage('pi:'+m.id),pi=>memoryPackage(pi,m.fork?undefined:'pi:'+m.id),piMemoryContext(memory,!m.fork),...(m.surface==='browser'?[this.browser.package(m.id)]:process.env.AUGMENTOR_PI_LINUX_TOOLS==='0'?[]:[linuxPackage(this.backend),desktopPackage('pi:'+m.id),this.desktopSpecialist.package({owner:'pi:'+m.id,cwd:m.cwd,agentDir:this.dirs.agent,modelRuntime:this.modelRuntime,policy:m.policy,approve:(name,args)=>this.interactions.approve(m.id,name,args),cancelInteractions:()=>this.interactions.cancel(m.id),progress:info=>this.append(m,'desktop/progress',info)})])],
       appendSystemPrompt:[browserRecovery,m.surface==='browser'?'You are Augmentor Agent for Browser, powered by Pi. Use the browser tools to inspect and act in the connected visible browser. Read a fresh snapshot before actions. Stop on stale targets or denied actions. Report unknown outcomes honestly; do not replay actions.': `You are Augmentor Agent Desktop, powered by Pi. The operating system is ${process.platform}. Use tools to check actual facts. Keep the user informed. Use linux_browser_open for visible Chromium; never claim dispatch proves a page loaded. Use the platform accessibility observations for desktop structure. Stop on stale targets or denied actions. Use linux_desktop_connect and the user’s OS consent for desktop control. Use fresh screenshots before each action, then verify the result. A model must support image input. Stop on focus changes; never replay an unknown input outcome. Ask the user only when required information is missing.`,...(m.surface!=='browser'&&process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0'?[DESKTOP_DELEGATION_GUIDANCE]:[])],
     });await resourceLoader.reload();
     const errors=resourceLoader.getExtensions().errors;if(errors.length)throw new Error('Pi extension loading failed: '+errors.map(e=>e.error).join('; '));

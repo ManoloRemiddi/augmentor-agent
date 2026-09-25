@@ -7,20 +7,22 @@
 
 The maintained Chromium MV3 surface supports DSH and Pi through a shared native
 messaging entrypoint. It shares prompt records and memory services with the
-native desktop, while keeping browser sessions and tool authority separate.
+native desktop. Both DSH surfaces now use one personal agent with the same tools,
+approvals, saved conversations and speech engine.
 [Feature matrix](../../docs/FEATURE-MATRIX.md) records actual harness support;
 [distribution](../../docs/BROWSER-DISTRIBUTION.md) is the current install guide.
 
 | Component | Responsibility |
 | --- | --- |
-| `extension/` | Side panel, settings, service worker, page executor, overlays, microphone/playback bindings |
+| `extension/` | Side panel, settings, service worker, page executor, overlays and thin voice controls |
 | `native-host.mjs` | Product handshake, harness selection and shared-service access |
 | `pi-bridge.mjs` | Pi host bridge and browser lifecycle |
 | `pipe.mjs`, `plugin/`, `wire.mjs` | DSH browser transport/plugin and wire primitives |
 | `test/` | Current DOM and bridge regressions; imported old suites may require their original fixtures |
 
 Browser audio controls are source-integrated with [Resonant Voice](https://github.com/ManoloRemiddi/resonant-voice).
-Native hands-free support does not imply browser hands-free support. Installing
+Browser capture/playback and hands-free directly reuse the native engine through
+a private host worker. See [shared surfaces](../../docs/SHARED-SURFACES-2026-09-24.md). Installing
 a speech tarball or activating the shared memory adapter does not update an
 already loaded extension; build/install/reload the matching reviewed artifact.
 

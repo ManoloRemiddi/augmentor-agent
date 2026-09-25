@@ -3,11 +3,12 @@
 import {randomUUID} from 'node:crypto'
 
 export async function exactFork(ctx,p){
- const preset=p.surface==='browser'?'augmentor-browser-product':p.surface==='linux'?'augmentor-linux-product':null
+ let preset=['browser','linux'].includes(p.surface)
  if(!preset||typeof p.sessionId!=='string'||!Number.isSafeInteger(p.atSeq)||p.atSeq<0||!Number.isSafeInteger(p.expectedCursor))throw Error('Invalid exact branch request')
  const observation=await ctx.sessionQuery.observeSession(p.sessionId)
  try{
-  if(observation.header.agentPreset!==preset||observation.header.origin==='subagent')throw Error('This conversation belongs to another role')
+  preset=observation.header.agentPreset
+  if(!['augmentor-linux-product','augmentor-browser-product'].includes(preset)||observation.header.origin==='subagent')throw Error('This conversation belongs to another role')
   if(observation.cursor!==p.expectedCursor)throw Error('Source conversation changed')
   const events=observation.events
   const boundary=events.findIndex(event=>event.seq===p.atSeq&&event.type==='turn/end')

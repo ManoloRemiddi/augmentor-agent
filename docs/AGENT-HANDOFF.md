@@ -2,6 +2,105 @@
 
 # Start here: agent handoff
 
+## September 25 source integration
+
+The user requested merging the composer correction and other ready changes.
+The integration combines Home/tray PR #6, shared Desktop/Browser/voice PR #7,
+and composer PR #9, preserving their original commits. The host idle-baseline
+reservation and Browser prompt-improvement send guard both survive conflict
+resolution. The full sidebar entrypoint now verifies immediate transfer, duplicate
+Enter suppression and preservation of a newer draft.
+
+Combined source checks pass: TypeScript check/build, 194 Node, 44 Browser,
+29 Home and 427 native tests (one native environment skip). GitHub package checks
+remain the final merge gate. Installed selections and running windows are unchanged
+by source integration; public download bytes require a separate release. Home's
+remaining qualification work stays documented in [Home](HOME.md).
+
+## September 25 composer submission correction
+
+[Immediate composer feedback](COMPOSER-SEND-FEEDBACK.md) records the Desktop
+idle-baseline race and Browser acknowledgment delay. Send failures now own draft
+restoration; status notifications do not. Consult that guide for tests and installed
+adoption rather than assuming a source update has reloaded open windows.
+
+## September 24 Home tray launcher
+
+The owner confirmed the installed launcher works and requested click-to-open,
+click-again-to-close. The KDE adapter now resolves the actual Chromium dashboard
+window on each click; explicit Open raises it. Release `20260924-205229-78c3c113`
+is selected and its tray is running. Actual tray activation passed open/close/open
+with one Home window and unrelated window IDs preserved. See the launcher guide
+for platform limits and evidence. This supersedes the initial selection below.
+
+[Home launcher](HOME-LAUNCHER.md) implements a lightweight Qt tray process for
+opening an existing NAS dashboard through the installed browser. It remembers
+only the dashboard address, requires no copied API key and starts no model/agent.
+A stable entrypoint follows desktop.json; install after managed artifact promotion.
+Native tests and a two-process singleton check pass. Managed release
+`20260924-202032-d5e07a94` is selected; its Home tray is installed and running,
+with live KDE registration and dashboard app-window evidence. Main/mobile and
+secondary retain their earlier running builds; their drafts/work were preserved.
+See [installation evidence](HOME-LAUNCHER.md#installed-linux-evidence--24-september-2026).
+
+## September 24 sidebar animation and product name
+
+The Browser prompt-improvement preview now rolls letters and settles before
+committing, with cancellation and late-response guards. Chromium display metadata
+uses **Augmentor Agent**. See the [latest shared-surface entry](SHARED-SURFACES-2026-09-24.md#restore-sidebar-improvement-animation-and-product-name)
+for validation and installed adoption; the prepared extension requires Reload.
+
+## September 24 sidebar presentation refinement
+
+The user confirmed the corrected sidebar is working and requested a simpler
+Browser presentation: always follow tabs, remove Follow and circular activity
+controls/functionality, remove the outer border and brand label, and keep the
+empty composer one line tall. Conversation title and shared control order remain.
+See [shared surfaces qualification](SHARED-SURFACES-2026-09-24.md#sidebar-refinement-after-user-acceptance)
+for source checks and local adoption. Chromium needs Reload after updating the
+prepared extension folder; do not remove/reinstall it or interrupt native drafts.
+
+## September 24 shared personal agent and voice
+
+The user requests one personal agent in the floating window and browser sidebar.
+[Shared surfaces](SHARED-SURFACES-2026-09-24.md) owns the new shared preset, host
+voice engine, approval bridge and stopped-task status correction. Earlier
+browser-only tool-policy statements are superseded for DSH personal sessions.
+Read its deployment evidence before assuming a running extension has reloaded.
+Combined Home/shared source `d24e2ff` runs in the secondary
+window. Primary/mobile adoption and Chromium reload remain pending; preserve the
+primary draft. This is a compatible development artifact, not a public release.
+
+## September 24 Home runtime preview
+
+[Home](HOME.md) now has a headless DSH host in `apps/home` and a constrained
+Assist MCP policy in `adapters/dsh-home`. Canonical application code stays here;
+private household deployment and operational records belong in the Home companion.
+The user clarified that Home must be a lightweight NAS-owned capability available
+inside existing Augmentor clients, with independent household hardware/models/API
+configuration. A shared client adapter, pairing/settings and lightweight NAS page are implemented.
+NAS runtime source e5e5764 is promoted with direct On/Off device cards and an
+owner-only discovery snapshot, building on selected-device policy, model settings,
+cancellation propagation and clean shutdown. The KP303 uses HA’s existing TP-Link
+integration; its three lighting outlets and the Elgato light have controls enabled.
+Four unlinked Tapo devices remain listed with setup status. See Home for evidence.
+Earlier Desktop deployment was coordinated with the shared-surfaces task: combined
+source d24e2ff / release 20260924-125950-12694ac7 was selected and secondary adopted it.
+At that checkpoint main/mobile retained the preceding Home-enabled release to
+preserve a draft. The later flare selection below supersedes that selected identity;
+consult current installed status before any changes. Preserve drafts and active work.
+The prepared Browser extension combines Home and Voice; reload/adoption is separate.
+Home PR #6 remains unmerged. Source synchronization with public main does not
+redeploy Desktop or alter the separately coordinated shared-surfaces PR #7.
+Full resource/release qualification is pending. A finite NAS availability pilot is
+running; it is not a completed seven-day workload/physical-device qualification.
+New configuration defaults to owner-selected registered entities; the earlier
+Assist MCP mode remains an explicit compatibility preview. Read the guide for
+exact fixture/live evidence and limits before expanding device access.
+
+exact fixture/live evidence and limits before expanding device
+access. This preview does not change the installed Desktop or Browser release.
+
 ## September 24 desktop flare ownership
 
 The [0.2.12 release record](RELEASE-0.2.12.md) tracks the managed transient

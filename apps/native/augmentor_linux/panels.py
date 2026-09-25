@@ -157,6 +157,8 @@ class SettingsDialog(QDialog):
         layout.addWidget(engine)
         from .dsh_setup import DshSetupDialog
         dsh=QPushButton('Connect DSH');dsh.clicked.connect(lambda:DshSetupDialog(window).exec());layout.addWidget(dsh)
+        from .home_settings import HomeDialog
+        home=QPushButton('Connect Home');home.clicked.connect(lambda:HomeDialog(window).exec());layout.addWidget(home)
         from .recovery import RecoveryDialog
         recovery=QPushButton('Recover connection');recovery.clicked.connect(lambda:RecoveryDialog(window).exec());layout.addWidget(recovery)
         from .shortcut_settings import ShortcutSettings
