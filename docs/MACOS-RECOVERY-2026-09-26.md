@@ -125,7 +125,8 @@ seven orphan helpers launched from those bundles, four earlier candidate apps,
 old rollback folders, and disposable test apps in the Trash. Merely hiding build
 folders had not removed their LaunchServices registrations.
 
-Cleanup stopped those seven verified legacy helpers, migrated the two existing
+Cleanup stopped those seven verified legacy helpers and the old development
+prompt-library helper, migrated the two existing
 browser native-host manifests to the canonical desktop (same extension ID), removed
 32 obsolete bundles/backups/candidates plus nine disposable uninstall-test bundles,
 unregistered stale paths, and ejected the old mounted installer. One verified
@@ -134,7 +135,7 @@ The extension migration is host registration evidence, not a new end-to-end brow
 qualification. Temporary build apps created on the other Mac are also retired;
 its working personal installation is unchanged.
 
-Final LaunchServices read-back contains **only the canonical Augmentor app**;
+Final LaunchServices and Spotlight read-back contain **only the canonical Augmentor app**;
 there is **one Dock tile** and one app in the system/user Applications directories.
 Launching by bundle identifier reopens the existing canonical process rather than
 an old preview. The process remains online/model-ready, with no connection or
@@ -147,7 +148,13 @@ and installed-package lifecycle CI passed. The browser package job exposed an
 unrelated verification race: Chromium creates `DevToolsActivePort` before writing
 it. The proof now waits for complete port/path contents and detects early browser
 exit. This is a test-driver correction, not a browser product change; the final
-validation run determines its result.
+validation at `ba09317` passed after this correction:
+[Mac 14/26](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36273381199)
+and [Debian, Browser, Home and installed-package lifecycle](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36273381242).
+The local Chromium/native-host/Pi proof also passed navigation, snapshot, typing,
+clicking, clipboard, reconnect without replay, branch/edit behavior, shared prompts
+and private support export. Documentation-only follow-ups do not change the tested
+application or installed artifact.
 
 Whole-desktop capture and physical keyboard/microphone acceptance remain outside
 this qualification; macOS permissions were not changed. The fine-resolution Metal
@@ -155,7 +162,7 @@ implementation is verified, but subjective flare appearance remains the owner's
 assessment. Startup focus races should be qualified separately from steady-state
 shortcut toggling before broad release.
 
-The public website still serves `v0.2.12-macos-preview.1`; its immutable bytes were
+The public website still serves `v0.2.12-macos-preview.1`; its published bytes were
 not replaced. A new numbered preview, corresponding sources/notices and website
 guide update are a separate publication step. Automatic updates, full removal and
 Apple distribution signing/notarization remain preview limitations. Linux's
