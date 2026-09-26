@@ -57,6 +57,14 @@ release** and does not claim the other gates have passed.
 
 ## Implemented foundation
 
+- September 26: [managed Mac first run](MACOS-MANAGED-SETUP.md) adds a model
+  connection form, private bundled DSH provisioning, an owned login service and
+  recovery through that service. Source/real-runtime fixture evidence is distinct
+  from the earlier installed personal app and signed consumer acceptance.
+- [Candidate signing and notarization](MACOS-RELEASE.md) now has a separate
+  signing tool, Qt framework normalization and Apple evidence capture. Actual
+  Developer ID execution is waiting on active membership/credentials.
+
 - The desktop and helper entrypoints are compiled Mach-O binaries. The launcher
   embeds the pinned Python through `PyConfig` instead of replacing the desktop
   process with a shell/interpreter. `sys.executable` still selects the bundled

@@ -225,7 +225,9 @@ class Window(QWidget):
         if self.setup_dialog and self.setup_dialog.isVisible():self.setup_dialog.raise_();return
         from .setup import SetupDialog
         from .dsh_setup import DshSetupDialog
-        self.setup_dialog=(SetupDialog if self.controller.harness=='pi' else DshSetupDialog)(self);self.setup_dialog.show()
+        from .macos_setup import MacSetupDialog, available as mac_setup_available
+        dialog=SetupDialog if self.controller.harness=='pi' else MacSetupDialog if mac_setup_available() else DshSetupDialog
+        self.setup_dialog=dialog(self);self.setup_dialog.show()
     def icon_button(self,text,tooltip,callback,checkable=False):
         button=QPushButton(text);button.setFixedSize(SURFACE['iconSize'],SURFACE['iconSize']);button.setStyleSheet('QPushButton {padding:0;font-size:15px;border:0;background:transparent;} QPushButton:hover {background:rgba(127,150,150,55);color:palette(window-text);}')
         button.setToolTip(tooltip);button.setAccessibleName(tooltip);button.setCheckable(checkable);button.clicked.connect(callback);return button

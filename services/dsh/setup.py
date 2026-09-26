@@ -219,11 +219,15 @@ class Setup:
                 for path,value in old_presets.items():atomic(path,value)
             if stage.exists():shutil.rmtree(stage)
             raise
-    def save(self,token):
+    def save(self,token,managed=None):
         p=self.checked(token)
         if not p['installed']:raise ValueError('Install the integration and check the running DSH host before saving.')
         saved=json.loads(configuration().read_text()) if configuration().exists() else {}
+        previous=saved.get('dsh',{})
+        if managed is None and all(previous.get(key)==p[key] for key in ('endpoint','home')):
+            managed=previous.get('managed')
         saved['dsh']={k:p[k] for k in ('endpoint','home')};saved['dsh']['version']=VERSION
+        if managed is not None:saved['dsh']['managed']=managed
         atomic(configuration(),json.dumps(saved,indent=2)+'\n');self.pending=None
         return {'saved':True,'reconnect':True}
     def call(self,method,p):

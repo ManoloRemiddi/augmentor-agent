@@ -98,8 +98,10 @@ approval, GitHub upload or website publication.
 
 1. **Clean first run:** a fresh ordinary account with no DSH, Node, Python or
    copied owner configuration must install, configure its own model, send a
-   real request, close/reopen and recover its conversation. Managed setup and
-   required plugin provisioning are still implementation work. Keep advanced
+   real request, close/reopen and recover its conversation. Basic
+   [managed runtime/model setup](MACOS-MANAGED-SETUP.md) now exists in source and
+   passes an isolated Mac fixture; signed installed acceptance and required
+   extra-plugin provisioning remain open. Keep advanced
    existing-DSH setup separate and preserve its data.
 2. **Signed runtime:** repeat the packaged DSH/Qt/native-tool proofs with the
    actual Developer ID build. Test a quarantined browser download on macOS 14

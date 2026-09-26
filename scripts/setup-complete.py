@@ -72,7 +72,7 @@ def service(command, home, credentials):
             '\nRestart=on-failure\nRestartSec=5\nUMask=0077\n\n[Install]\nWantedBy=default.target\n')
 
 
-def configure_product(app, cli, home, endpoint, env, state):
+def configure_product(app, cli, home, endpoint, env, state, *, save=True):
     """Compose the product against a temporary owned host; never touch another DSH."""
     sys.path.insert(0,str(app/'services'))
     from dsh.setup import Setup
@@ -110,7 +110,7 @@ def configure_product(app, cli, home, endpoint, env, state):
         if not checked['installed']:
             setup.install(checked['token']);stop();token=start()
             checked=setup.check({'endpoint':endpoint+'/?token='+token,'home':str(home)})
-        setup.save(checked['token'])
+        if save:setup.save(checked['token'])
     finally:stop()
 
 

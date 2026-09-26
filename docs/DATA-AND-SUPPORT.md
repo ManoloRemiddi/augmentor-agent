@@ -16,6 +16,12 @@ harness may preserve returned images in its conversation history. Clipboard copy
 writes the selected message to the system clipboard. Other applications can read
 that clipboard under the desktop's normal rules.
 
+The [managed Mac setup](MACOS-MANAGED-SETUP.md) source feature stores its key in
+mode-0600 `runtime.json` under a private managed-DSH directory. Setup uses stdin
+and the runtime uses its owned service's environment; the key is absent from
+command-line arguments and the login-service plist. Connect sends a short test
+message to the configured provider. Keep its profile and diagnostic logs private.
+
 Model keys are stored in private user configuration without encryption. Remote
 model and Hindsight endpoints require HTTPS and authentication; numeric loopback
 HTTP supports local services. There are two distinct memory integrations:

@@ -15,6 +15,13 @@ No Mac binary was published, no website download changed and the working Mac
 installation was not modified by this audit. Never package the owner's private
 model profile as a public-install shortcut.
 
+Follow-up source work adds [managed Mac runtime/model setup](MACOS-MANAGED-SETUP.md).
+It passed real isolated launchd/DSH chat, service restart and conversation
+restoration with a fixture provider, plus private-state and Qt form tests.
+This supersedes the basic provisioning implementation gap above; full plugin,
+signed installed, licensing, browser and update gates remain. The source feature
+has not replaced the owner's working app, and no public Mac download is live.
+
 ## September 26 clean Mac installation and default shortcut
 
 The duplicate development apps were removed and their application registrations

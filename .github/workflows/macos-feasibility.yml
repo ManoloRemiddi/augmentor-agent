@@ -79,10 +79,17 @@ jobs:
           export PATH="$project/dsh/node_modules/.bin:$project/node/bin:$PATH"
           "$project/python/bin/python3" -I -B scripts/dsh-setup-proof.py
           codesign --verify --deep --strict "$app"
+      - name: Verify managed first run and service restart with an isolated model
+        run: |
+          app="$PWD/outputs/macos/Augmentor Agent Desktop.app"
+          project="$app/Contents/Resources/app"
+          "$project/python/bin/python3" -I -B scripts/macos-managed-setup-proof.py --app-root "$project" --out outputs/macos-managed
+          codesign --verify --deep --strict "$app"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: macos-feasibility-${{ matrix.os }}
           path: |
             outputs/macos/*.json
+            outputs/macos-managed/report.json
           retention-days: 7
           if-no-files-found: error

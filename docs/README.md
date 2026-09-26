@@ -61,6 +61,7 @@ of this repository; include reproducible commands and sanitized evidence summari
 ## Setup, operations and distribution
 
 - [macOS signing, publication gates and website cutover](MACOS-RELEASE.md)
+- [Managed Mac first-run model and runtime setup](MACOS-MANAGED-SETUP.md)
 
 [0.2.12 desktop flare correction](RELEASE-0.2.12.md).
 [0.2.11 security release and upgrade guidance](RELEASE-0.2.11.md).

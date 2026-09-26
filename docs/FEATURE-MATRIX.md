@@ -1,4 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
+
+Mac setup update (26 September): current source has a separate
+[managed runtime/model form](MACOS-MANAGED-SETUP.md) for fresh bundled desktops.
+External DSH setup below remains available. Basic setup, chat and restart passed
+an isolated real Mac/DSH fixture; the public signed app, additional plugins and
+complete feature parity are not yet qualified.
 # Feature ownership and compatibility · Augmentor 0.2.9 development
 
 DSH personal surfaces now share the agent, tools and speech engine; see [shared surfaces and evidence](SHARED-SURFACES-2026-09-24.md).
