@@ -94,10 +94,10 @@ source tests alone do not claim an installed update or a physical sleep trial.
 The private Linux/NAS application now consumes this product service instead of
 its former copied host and polling connector. Source implementation starts at
 `938d027`, with managed-directory asset correction `57b35c3` and internal
-settings-navigation correction `f65cd2c`. A compatible 0.2.11 candidate was
+settings-navigation correction `f65cd2c` and dedicated-memory settings `958e17d`. A compatible 0.2.11 candidate was
 built from the previous selected immutable release; this is not represented as
 a complete source 0.2.12 upgrade. Final selection is
-`20260926-093632-bb4001cb`. The embedding service runs the selected artifact;
+`20260926-093948-e7519be6`. The embedding service runs the selected artifact;
 existing native windows were left on their earlier compatible releases.
 
 Read-only live DSH verification used direct application tools, recognized the
@@ -128,3 +128,5 @@ the harness was restored, the interruption was verified, and that work was not
 replayed. Follow-up commands fail immediately on errors. This deployment
 incident is not described as safe idle restart evidence. Product/tunnel fault
 tests did not restart the shared DSH harness.
+
+Final selected artifact SHA-256: `6793a03789109c9b0834cd0158c0b108f78a39e885e92c68d40576712f1adbbe`.
