@@ -21,6 +21,13 @@ connection keeps using that form; managed setup refuses to adopt or replace it.
 The initial form supports OpenAI-compatible chat APIs. Other protocols, OAuth,
 provider editing and required extra-plugin provisioning remain separate work.
 
+Opening an app from a disk image or temporary build folder must not register a
+login shortcut pointing at that temporary path. Automatic shortcut bootstrap now
+requires an Applications location before creating a new login registration;
+an already-running shortcut owner remains available. The focused regression
+verifies refusal before the registrar can run. Signed mounted-image user-flow
+acceptance is still required.
+
 The form blocks duplicate submissions and dismissal during setup, refuses an
 active conversation action, preserves fields on failure and clears the key on
 success. The desktop reconnects only after the service and product presets pass

@@ -54,6 +54,16 @@ class ManagedShortcutSettingsTests(unittest.TestCase):
             manager.restore();restore.assert_called_once();ensure.assert_not_called()
         manager.close()
 
+    def test_opening_from_a_disk_image_cannot_register_a_temporary_login_path(self):
+        manager=ManagedShortcutManager()
+        root=Path('/Volumes/Augmentor/Augmentor Agent Desktop.app/Contents/Resources/app')
+        missing=FileNotFoundError(errno.ENOENT,'missing')
+        try:
+            with patch('augmentor_linux.macos_shortcuts.ROOT',root),patch('augmentor_linux.macos_shortcut_service.request',side_effect=missing),patch('augmentor_linux.macos_shortcuts.subprocess.run') as run:
+                with self.assertRaisesRegex(RuntimeError,'Applications'):manager.ensure_service()
+                run.assert_not_called()
+        finally:manager.close()
+
     def test_first_launch_registers_default_with_login_service(self):
         manager=ManagedShortcutManager()
         with tempfile.TemporaryDirectory() as directory,patch.object(Path,'home',return_value=Path(directory)),patch.dict(os.environ,{'XDG_CONFIG_HOME':directory}),patch.object(manager.local,'restore') as local,patch.object(manager,'ensure_service') as ensure,patch('augmentor_linux.macos_shortcut_service.request',return_value={'active':True,'key':'Fn+Space'}) as request:

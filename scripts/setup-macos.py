@@ -270,16 +270,18 @@ def provision(root, state, request, *, agent=None, probe=probe_model):
             record['status'] = 'starting'; atomic_json(marker, record)
             agent.start()
             deadline = time.monotonic()+60
-            setup = Setup(); checked = None
+            setup = Setup(); checked = None; last_check_error = None
             while time.monotonic() < deadline:
                 try:
                     checked = setup.check({'endpoint': record['endpoint'], 'home': str(home)})
                     if checked['installed']:
                         break
-                except (OSError, ValueError):
-                    pass
+                except (OSError, ValueError) as error:
+                    last_check_error = str(error).replace(secret, '[redacted]')[:2000]
                 time.sleep(.25)
             if not checked or not checked['installed']:
+                atomic_json(state/'startup-check.json', {'lastError': last_check_error,
+                    'integrationInstalled': bool(checked and checked.get('installed'))})
                 raise ValueError('The managed agent did not become ready. Setup can be retried without changing other DSH profiles.')
             observed = configuration().read_bytes() if configuration().exists() else None
             if observed != previous_config:

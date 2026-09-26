@@ -11,6 +11,7 @@ import http.server
 import importlib.util
 import json
 import os
+import re
 from pathlib import Path
 import signal
 import socket
@@ -102,6 +103,17 @@ def main():
         assert 'Managed setup verified.' in json.dumps(restored)
         report.update(passed=True, providerRequests=len(calls), modelAvailable=True,
                       chatCompleted=True, conversationRestored=True, repeatedSetupPreserved=True)
+    except BaseException:
+        # Only this isolated synthetic fixture is eligible for report excerpts.
+        # Never copy runtime.json, auth stores or an installed user's logs.
+        report['fixtureDiagnostics'] = {}
+        for name in ('setup-dsh.log', 'runtime.log', 'startup-check.json'):
+            file = state/name
+            if file.is_file():
+                excerpt = file.read_text(errors='replace')[-10000:]
+                excerpt = re.sub(r'token=[A-Za-z0-9_-]+', 'token=[redacted]', excerpt)
+                report['fixtureDiagnostics'][name] = excerpt.replace('fixture-only-key', '[redacted]')
+        raise
     finally:
         try:
             agent.stop_failed_setup()

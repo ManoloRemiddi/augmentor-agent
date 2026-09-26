@@ -160,6 +160,8 @@ class ManagedShortcutManager(RemoteShortcutManager):
             if status.get('protocol')!=1:raise RuntimeError('Unsupported shortcut service version.')
             return
         application=ROOT.parents[2]
+        if application.parent not in (Path('/Applications'),Path.home()/'Applications'):
+            raise RuntimeError('Drag Augmentor into Applications before enabling its login shortcut.')
         result=subprocess.run([sys.executable,'-I','-B',str(ROOT/'scripts/register-macos-shortcut.py'),
                                str(application),'install'],capture_output=True,text=True,timeout=45)
         if result.returncode:
