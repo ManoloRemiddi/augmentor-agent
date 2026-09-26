@@ -53,5 +53,34 @@ mode. Mac CI now runs the activity, fluid and window suites explicitly; Linux
 already discovers them. The checked Mac/Linux runs above are local evidence,
 not an assertion that remote CI has completed.
 
-Installed artifact identities and activation evidence are recorded below after
-qualification. Source, selected release and running process are distinct.
+## Installed artifacts (September 26)
+
+Implementation: `e1d245e` on `fix/shared-flare-fidelity`, PR #15. Documentation-only
+follow-ups do not alter the tested renderer.
+
+**Mac candidate, activation pending:** a separately copied and ad-hoc sealed
+application retains the installed `252215b` setup/menu/resize changes over the
+public `ea128d6` binary/dependency baseline. Only `activity.py`, this guide and
+the fixture proof are overlaid. Its inventory SHA-256 is
+`3c5d6ffee13352c52c0b20ff0eee034f7ad8227ef4e94abc503d12e6da93aff9`.
+The actual candidate passes 37 activity/fluid/window checks (including the two
+resize regressions from PR #13), native Cocoa captures, eight-edge/corner
+synthetic resize and menu checks, and strict signature verification after use.
+The owner's app remains running from `252215b` until normal exit: that version's
+maintenance status cannot inspect an unsent composer draft and its close action
+does not persist it. Do not force-close it merely because it reports idle.
+Private installation helpers validate exact source/inventory, owned services
+and idle DSH, preserve settings/session metadata, and retain a rollback bundle.
+No automatic future activation has been scheduled.
+
+**Linux selected, existing windows retained:** the compatible 0.2.11 candidate
+copies selection `20260926-094732-3b3861db`, preserving its embedding, Home,
+DSH and speech contracts. Its 35 subsystem tests pass. `augmentor-update` staged
+and activated `20260926-204300-30f1286f`, artifact SHA-256
+`ed11a3bb8c73a2d1eda10e347aa145378aa37e182fb93787dd7aa3104d5ef69d`.
+Main/mobile still run `20260924-125423-63307454`; secondary still runs
+`20260926-083736-5d6b65f6`. All report online and voice available, with update
+pending until normal reopen. No live conversation window or backend restarted.
+
+These are documented compatible overlays, not a claim that the wider release
+convergence or Mac second-shortcut work in the platform audit is complete.
