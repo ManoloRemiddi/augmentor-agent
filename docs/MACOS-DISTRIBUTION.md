@@ -175,6 +175,50 @@ GitHub's new OS matrix is an additional pending check, not evidence already clai
 by these local results. This checkpoint is still product version 0.2.12 development,
 not a new published product release or a consumer-ready installation.
 
+## September 26 personal Mac model connection
+
+The owner requested that the test Mac use the same model access as their MX
+workstation. This is a private development deployment of source `c03c32e`, not a
+new binary release or implementation of the public first-run wizard.
+
+A verified copy of the existing development app is in the Mac user's
+`~/Applications`. A separate, private `~/.dsh` profile uses that app's bundled
+Node/DSH runtime. Supported setup installed and checked the matching Augmentor
+integration and saved the connection in the Mac's Application Support directory.
+Per-user development LaunchAgents start DSH on numeric loopback and maintain a
+dedicated SSH tunnel to the workstation's two model ports. The tunnel has its own
+key, destination restrictions and a pinned workstation host key. Existing
+workstation DSH services and unrelated Mac tunnels were left running.
+
+Only provider settings, required model credentials, the default selection and
+model-picker preferences were transferred. Source conversations, browser login
+credentials and machine-specific plugin composition were not copied. Model Picker
+Augmented 1.1.2 and its JavaScript dependencies were installed outside the sealed
+app. Credentials use DSH's existing owner-only local file storage; this does not
+qualify the planned Keychain integration. Private settings, secrets and machine
+addresses are intentionally absent from this repository and public artifacts.
+
+Observed acceptance:
+
+- Exact provider/model identifier comparison: **365 models across seven providers**,
+  identical to the workstation, with matching default selection and no catalog
+  failures. Catalog membership is not a successful inference test of every model.
+- A fresh Mac DSH conversation using the Augmentor preset and DeepSeek Flash
+  returned `Mac DSH connection works.` from a real provider request.
+- The existing desktop reported `online: true`, `modelReady: true`, no connection
+  error and no restored-session error. Its open process remains on its prior
+  qualification copy; the staged user Applications copy is for subsequent launches.
+- The Mac tunnel reaches the active workstation Qwen model endpoint. The secondary
+  GPU endpoint refused connections on the workstation itself; its catalog remains
+  available but inference there requires that workstation service to be started.
+- The staged app still passes strict recursive signature verification. This is
+  its original ad-hoc development signature, not Developer ID qualification.
+
+A short start guide was placed on the Mac desktop. DSH and tunnel startup were
+verified through launchd; a physical reboot/login acceptance test remains open.
+Voice, browser extension installation and the other public release gates below
+are not established by this model-connection check.
+
 ## Remaining gates and next work
 
 The accessible build Mac has no valid code-signing identity. Developer ID

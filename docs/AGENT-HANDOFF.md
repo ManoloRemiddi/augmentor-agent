@@ -2,6 +2,18 @@
 
 # Start here: agent handoff
 
+## September 26 personal Mac model access
+
+The owner requested their MX model access on the test Mac. The existing
+`c03c32e` development bundle now has a private per-user DSH profile, matching
+Augmentor integration, Model Picker 1.1.2 and launchd-managed runtime/model tunnel.
+Exact catalog comparison passed (365 models, seven providers), a real DeepSeek
+Flash reply succeeded, and the open desktop reported online/model-ready. The
+secondary GPU endpoint is offline on the workstation too; no GPU settings changed.
+See [Mac connection evidence](MACOS-DISTRIBUTION.md#september-26-personal-mac-model-connection)
+for deployment boundaries. Keep personal credentials/configuration out of GitHub.
+This does not complete the public installer, signing, voice or browser rollout.
+
 ## September 25 macOS distribution implementation
 
 The owner authorized implementation and isolated network-Mac testing. See
