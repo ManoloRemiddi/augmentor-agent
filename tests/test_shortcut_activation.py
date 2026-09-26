@@ -10,6 +10,13 @@ from augmentor_linux.shortcut_activation import DesktopActivation
 
 
 class ShortcutActivationTests(unittest.TestCase):
+    def test_macos_cold_launch_uses_the_installed_native_application(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)/'Desktop.app/Contents/Resources/app'
+            native=root.parents[1]/'MacOS/Augmentor Agent Desktop';native.parent.mkdir(parents=True);native.touch()
+            with patch('augmentor_linux.shortcut_activation.ROOT',root),patch('augmentor_linux.shortcut_activation.sys.platform','darwin'):
+                self.assertEqual(DesktopActivation(directory).command,[str(native)])
+
     def test_running_app_receives_one_toggle_without_launch(self):
         with tempfile.TemporaryDirectory() as directory:
             with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as server:

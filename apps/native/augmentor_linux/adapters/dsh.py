@@ -60,6 +60,10 @@ class DshAdapter(DshClient):
             status=http(self.base,'/api/augmentor-product');token=(self.home/'augmentor-product-token').read_text().strip()
             if status.get('version')!=VERSION or status.get('homeId')!=hashlib.sha256(token.encode()).hexdigest():raise ContractError('Reconnect the matching DSH integration from Settings.')
             self.native_interactions=status.get('nativeInteractions')==1
+        if method=='host.describe':
+            presets=super().call('agentPresets.list').get('presets',[])
+            if not any(row.get('id')==self.preset and not row.get('broken') for row in presets):
+                raise ContractError('The Augmentor agent preset is unavailable. Open Settings → Connect DSH, check the connection, then Save and use DSH.')
         if method=='session.branch':return branch(super().call,p,surface='linux',endpoint=self.base,exact_fork=product_exact_fork(self.base,self.home) if self.product else None)
         if method=='session.create':p={k:v for k,v in p.items() if k!='selection'}
         if method=='models.pin':

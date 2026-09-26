@@ -225,7 +225,9 @@ class Window(QWidget):
         if self.setup_dialog and self.setup_dialog.isVisible():self.setup_dialog.raise_();return
         from .setup import SetupDialog
         from .dsh_setup import DshSetupDialog
-        self.setup_dialog=(SetupDialog if self.controller.harness=='pi' else DshSetupDialog)(self);self.setup_dialog.show()
+        from .macos_setup import MacSetupDialog, available as mac_setup_available
+        dialog=SetupDialog if self.controller.harness=='pi' else MacSetupDialog if mac_setup_available() else DshSetupDialog
+        self.setup_dialog=dialog(self);self.setup_dialog.show()
     def icon_button(self,text,tooltip,callback,checkable=False):
         button=QPushButton(text);button.setFixedSize(SURFACE['iconSize'],SURFACE['iconSize']);button.setStyleSheet('QPushButton {padding:0;font-size:15px;border:0;background:transparent;} QPushButton:hover {background:rgba(127,150,150,55);color:palette(window-text);}')
         button.setToolTip(tooltip);button.setAccessibleName(tooltip);button.setCheckable(checkable);button.clicked.connect(callback);return button
@@ -828,6 +830,9 @@ class Window(QWidget):
         menu.addAction('Prompt library',self.open_prompt_library).setEnabled(bool(self.controller))
         menu.addAction('Connect a model',self.open_setup).setEnabled(bool(self.controller))
         menu.addAction('Models & providers',self.open_pi).setEnabled(bool(self.controller))
+        from .macos_browser_setup import available, MacBrowserSetupDialog
+        if available():
+            menu.addAction('Set up browser extension',lambda:MacBrowserSetupDialog(self).exec())
         menu.addAction('Versions & updates',self.open_updates).setEnabled(bool(self.controller))
         menu.addAction('Approval mode',self.open_access).setEnabled(bool(self.controller))
         menu.addAction('About & licenses',lambda:LicensesDialog(self).exec())
@@ -1190,6 +1195,7 @@ def main():
     parser.add_argument('--compact', action='store_true', help='Open the circular activity view.')
     parser.add_argument('--preview', action='store_true', help='Open without connecting to a harness.')
     parser.add_argument('--onboarding-host', action='store_true', help=argparse.SUPPRESS)
+    parser.add_argument('--ui-test-control', action='store_true', help=argparse.SUPPRESS)
     parser.add_argument('--harness', choices=['pi','dsh'], help='Open the shared UI with this harness.')
     parser.add_argument('--instance', type=validate_name, default=current_name(), help='Named independent window (for example secondary); repeated launches toggle that window.')
     args = parser.parse_args()
@@ -1209,7 +1215,7 @@ def main():
         client = QLocalSocket()
         client.connectToServer(socket_name)
         if client.waitForConnected(300):
-            client.write(b'maintenance.status' if args.onboarding_host or args.ensure_running else b'voice' if args.voice else ('harness:'+args.harness).encode() if args.harness else b'toggle')
+            client.write(b'maintenance.status' if args.onboarding_host or args.ensure_running else b'voice' if args.voice else ('harness:'+args.harness).encode() if args.harness else b'show' if sys.platform=='darwin' else b'toggle')
             client.waitForBytesWritten(500)
             return 0
         app.instance_lock = QLockFile(str(runtime / (ipc_basename()+'.lock')))
@@ -1227,7 +1233,14 @@ def main():
             if client:
                 if not client.bytesAvailable():client.waitForReadyRead(200)
                 command=bytes(client.readAll()).decode()
-                if command in ('maintenance.status','maintenance.close','maintenance.recover'):
+                if command.startswith('ui-test:'):
+                    try:
+                        from .ui_testing import dispatch
+                        result=dispatch(window,json.loads(command[len('ui-test:'):]),enabled=args.ui_test_control)
+                        response={'ok':True,'result':result}
+                    except Exception as error:response={'ok':False,'error':str(error)}
+                    client.write(json.dumps(response).encode()+b'\n');client.waitForBytesWritten(500)
+                elif command in ('maintenance.status','maintenance.close','maintenance.recover'):
                     running=bool(window.controller and window.controller.running)
                     busy=running or window.composer.improving or window.voice_opening or window.voice_input is not None or bool(window.voice_dialog and window.voice_dialog.capture) or any(dialog.isVisible() for dialog in window.findChildren(QDialog))
                     controller = window.controller
@@ -1253,6 +1266,7 @@ def main():
                         response={'ok':True,'result':result}
                     except Exception as error:response={'ok':False,'error':str(error)}
                     client.write(json.dumps(response).encode()+b'\n');client.waitForBytesWritten(500)
+                elif command=='show':window.bring_forward()
                 elif command=='voice':window.request_voice()
                 elif command.startswith('harness:'):
                     window.switch_harness(command.split(':',1)[1])
@@ -1263,6 +1277,9 @@ def main():
                 client.deleteLater()
         app.instance_server.newConnection.connect(activate)
     window.bring_forward()
+    if sys.platform=='darwin':
+        # Finder/Dock reopen an existing application without another main().
+        app.applicationStateChanged.connect(lambda state:window.bring_forward() if state==Qt.ApplicationState.ApplicationActive and not window.isVisible() else None)
     if args.voice:QTimer.singleShot(0,window.request_voice)
     if sys.platform=='darwin' and not args.preview and not args.screenshot:
         from .macos_shortcuts import initialize

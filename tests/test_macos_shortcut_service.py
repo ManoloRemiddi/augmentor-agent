@@ -62,6 +62,22 @@ class MacShortcutServiceTests(unittest.TestCase):
         finally:
             replacement.close()
 
+    def test_fn_space_is_persisted_on_first_launch_and_restored(self):
+        self.service.start()
+        self.assertEqual(request({'operation':'status'})['key'],'Fn+Space')
+        self.assertEqual(self.service.manager.binding[-2:],['49','131072'])
+        self.assertIn('Fn+Space',(self.root/'config/augmentor/shortcut.json').read_text())
+        child=self.service.manager.process
+        self.assertEqual(RemoteShortcutManager().save('Fn+Space'),'Fn+Space')
+        self.assertIs(child,self.service.manager.process)
+        self.service.close()
+        replacement=ShortcutService()
+        try:
+            replacement.start()
+            self.assertEqual(request({'operation':'status'})['key'],'Fn+Space')
+            self.assertTrue(request({'operation':'status'})['active'])
+        finally:replacement.close()
+
     def test_second_owner_cannot_remove_first_owners_socket(self):
         self.service.start()
         other = ShortcutService()

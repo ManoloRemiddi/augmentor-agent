@@ -18,8 +18,9 @@ class DesktopActivation:
     def __init__(self, runtime=None, command=None):
         self.runtime = Path(runtime or os.environ.get(
             'XDG_RUNTIME_DIR', f'/tmp/augmentor-{os.getuid()}'))
-        self.command = command or [sys.executable, '-B',
-                                  str(ROOT/'scripts/launch-component.py'), 'desktop']
+        native=ROOT.parents[1]/'MacOS/Augmentor Agent Desktop'
+        self.command = command or ([str(native)] if sys.platform=='darwin' and native.is_file() else
+                                  [sys.executable, '-B', str(ROOT/'scripts/launch-component.py'), 'desktop'])
         self.child = None
         self.lock = threading.Lock()
 

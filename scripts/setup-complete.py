@@ -72,7 +72,7 @@ def service(command, home, credentials):
             '\nRestart=on-failure\nRestartSec=5\nUMask=0077\n\n[Install]\nWantedBy=default.target\n')
 
 
-def configure_product(app, cli, home, endpoint, env, state):
+def configure_product(app, cli, home, endpoint, env, state, *, save=True):
     """Compose the product against a temporary owned host; never touch another DSH."""
     sys.path.insert(0,str(app/'services'))
     from dsh.setup import Setup
@@ -110,7 +110,7 @@ def configure_product(app, cli, home, endpoint, env, state):
         if not checked['installed']:
             setup.install(checked['token']);stop();token=start()
             checked=setup.check({'endpoint':endpoint+'/?token='+token,'home':str(home)})
-        setup.save(checked['token'])
+        if save:setup.save(checked['token'])
     finally:stop()
 
 
@@ -164,6 +164,10 @@ def install(args):
     runtime=data/'dsh-runtime';runtime.mkdir(parents=True,exist_ok=True)
     env={**os.environ,'PATH':str(node.parent)+':'+os.environ.get('PATH','')}
     for name in ('package.json','package-lock.json'):shutil.copy2(bundle/'dsh'/name,runtime/name)
+    # New bundles carry the exact unpublished plugin tarballs referenced by the
+    # shared lock. Older published bundles retain their registry-only graph.
+    if (bundle/'dsh/plugins').is_dir():
+        shutil.copytree(bundle/'dsh/plugins',runtime/'plugins',dirs_exist_ok=True)
     run('npm','ci','--prefix',runtime,'--ignore-scripts','--omit=dev','--no-audit','--no-fund',env=env)
     cli=runtime/'node_modules/.bin/dsh';home=data/'dsh-home';home.mkdir(parents=True,exist_ok=True,mode=0o700)
     env.update(DSH_HOME=str(home),DSH_TELEMETRY_MODE='DISABLED',AUGMENTOR_MODEL_API_KEY=secret)

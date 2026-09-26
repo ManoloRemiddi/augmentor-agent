@@ -12,7 +12,7 @@ import threading
 from PySide6.QtCore import QCoreApplication, QTimer
 from PySide6.QtGui import QKeySequence
 
-from .macos_shortcuts import ShortcutManager
+from .macos_shortcuts import ShortcutManager,FN_SPACE
 from .shortcut_activation import DesktopActivation
 
 
@@ -126,7 +126,7 @@ class ShortcutService:
             sequence = message['sequence']
             if not isinstance(sequence, str) or len(sequence) > 256:
                 raise ValueError('Invalid shortcut sequence.')
-            key = self.manager.save(QKeySequence(sequence, QKeySequence.SequenceFormat.PortableText))
+            key = self.manager.save(FN_SPACE if sequence==FN_SPACE else QKeySequence(sequence, QKeySequence.SequenceFormat.PortableText))
             self.error = None
             return {'ok': True, 'key': key}
         raise ValueError('Unsupported shortcut request.')

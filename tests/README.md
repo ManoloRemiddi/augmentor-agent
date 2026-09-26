@@ -12,6 +12,9 @@ DSH installation/environment and package acceptance steps.
 | TypeScript / SDK contracts | `npm run check`, `npm run build`, `npm test` | Real Pi SDK with deterministic model fixtures; inspect skipped integrations |
 | WebSocket security | `tests/prepare-ws.test.mjs`, `tests/ws-security.test.mjs` (included in `npm test`) | Bounded loopback fragments in both directions; isolated vulnerable-version control and prepared production tree. See [preparation and evidence](../docs/WS-SECURITY-2026-09-24.md) |
 | Native UI / service logic | `npm run test:native` | Python and real Qt widgets, usually offscreen; matching QtTest required |
+| Mac packaging/runtime | `test_macos*.py`, `test_dsh_payload_staging.py`, `scripts/dsh-payload-proof.mjs <staged-dsh-root>` | Real compiled launcher test requires ARM64 Mac; payload proof uses actual FFI/search/shell/PTY. See [Mac evidence](../docs/MACOS-DISTRIBUTION.md); not signing/TCC acceptance. |
+| Mac signing policy | `test_macos_signing.py`; `scripts/macos-signing.py <app> --plan` | Policy rejection tests and a real Mac framework seal fixture. [Candidate preparation](../docs/MACOS-RELEASE.md) still requires Developer ID credentials and signed-runtime/public-install acceptance. |
+| Mac managed first run | `test_macos_managed_setup.py`, `test_macos_setup_ui.py`, `scripts/macos-managed-setup-proof.py` | Ownership/retry/secret handling, real Qt form with fixture worker, and private real launchd/DSH/model fixture. [Acceptance boundary](../docs/MACOS-MANAGED-SETUP.md) excludes signed end-user install and extra plugins. |
 | Browser DOM | `node --test apps/browser/test/*.test.mjs` | DOM/bridge fixtures, not installed Chrome acceptance |
 | Automatic memory | `python3 -m unittest discover -s tests -p test_hindsight_memory.py`; `node --test tests/dual-memory-integration.test.mjs` | Fake HTTP engine plus actual DSH/Pi lifecycle; follow workflow's locked DSH setup |
 | Actual memory engine / model | `python3 scripts/proof-controlled-memory.py --help` | Disposable pinned engine, explicit fixture/live modes, archive isolation and bounded real-model completion |
@@ -67,3 +70,21 @@ deduplication and sidebar gestures. `dsh-boundary`, `dsh-interactions` and
 `scripts/dsh-setup-proof.py` with the approval/interaction/exact-fork flags runs
 real isolated DSH and both presentation transports, using a fixture model.
 This does not replace a physical microphone/speaker and loaded-extension trial.
+
+### Mac live desktop chat
+
+`scripts/macos-live-chat-proof.py` is an explicit `--live` check with real provider
+usage. Run it with the packaged Mac Python and `--app-root`, a fresh `--out`,
+`--instance` and `--marker`. It drives the packaged Qt composer and verifies the
+rendered reply. Repeat with the same instance, a new output/marker,
+`--previous-marker` and `--submit enter` to verify restoration and Enter submission.
+It does not control an existing user's window. See
+[Mac readiness evidence](../docs/MACOS-DISTRIBUTION.md#september-26-correction-verify-chat-readiness-and-the-actual-composer).
+
+For the actual native executable, explicitly launch the chosen test instance with
+`--ui-test-control`, then pass its owner-only `--native-socket` to the same driver.
+The driver verifies the running app root, types into that process's composer and
+checks its rendered reply. Normal app launches reject the test operations.
+`test_ui_testing.py` verifies default denial, draft/dialog protection and
+non-overwriting screenshot output. See the
+[installed native acceptance](../docs/MACOS-DISTRIBUTION.md#september-26-follow-up-corrected-primary-mac-app-activated).

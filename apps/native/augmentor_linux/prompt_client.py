@@ -26,7 +26,9 @@ class PromptClient:
             except (FileNotFoundError,ConnectionRefusedError):
                 service=Path(__file__).resolve().parents[3]/('services/memory/service.py' if automatic else 'services/prompt-library/service.py')
                 if not service.is_file():raise ContractError('Shared prompt service is not installed.')
-                child=subprocess.Popen([sys.executable,str(service)],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
+                # This client is also used outside the app launcher. Never rely
+                # on inherited environment flags to preserve a sealed bundle.
+                child=subprocess.Popen([sys.executable,'-B',str(service)],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
                 threading.Thread(target=child.wait,daemon=True).start()
                 deadline=time.monotonic()+5
                 while True:

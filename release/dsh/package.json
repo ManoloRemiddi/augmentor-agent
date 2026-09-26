@@ -5,7 +5,10 @@
   "description": "Pinned DSH qualification environment for Augmentor Agent Desktop",
   "dependencies": {
     "@deepseek-ai/dsh": "0.1.5-rc.1",
-    "pnpm": "11.23.0"
+    "pnpm": "11.23.0",
+    "dsh-resonant-voice": "file:plugins/dsh-resonant-voice-0.1.16.tgz",
+    "dsh-adaptive-reasoning": "file:plugins/dsh-adaptive-reasoning-0.2.3.tgz",
+    "dsh-model-picker-augmented": "file:plugins/dsh-model-picker-augmented-1.1.2.tgz"
   },
   "overrides": {
     "@deepseek-ai/dsh-acp": "0.1.5-rc.1",

@@ -11,6 +11,7 @@ import shutil
 import socket
 import stat
 import subprocess
+import sys
 import tempfile
 import time
 from urllib.parse import urlsplit
@@ -222,6 +223,18 @@ def _start_dsh(client, emit):
         try: client.call('host.describe'); return
         except Exception as error:
             raise RecoveryError('The local port is occupied but DSH did not pass its health check. Recovery will not stop an unidentified or busy server. '+str(error)) from error
+    if sys.platform == 'darwin' and configured.get('managed', {}).get('type') == 'launchd':
+        import importlib.util
+        script = Path(__file__).resolve().parents[2]/'scripts/setup-macos.py'
+        spec = importlib.util.spec_from_file_location('managed_macos_recovery', script)
+        managed = importlib.util.module_from_spec(spec); spec.loader.exec_module(managed)
+        emit('Starting the managed Augmentor runtime…')
+        managed.start_saved(configured)
+        deadline = time.monotonic()+45
+        while time.monotonic() < deadline:
+            if port_open(address.hostname, port): return
+            time.sleep(.25)
+        raise RecoveryError('The managed DSH service did not become ready within 45 seconds.')
     # A configured service must retain ownership. Spawning a detached duplicate
     # here races its Restart policy and loses its provider environment.
     service = os.environ.get('AUGMENTOR_DSH_SERVICE')

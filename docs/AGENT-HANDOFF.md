@@ -2,6 +2,121 @@
 
 # Start here: agent handoff
 
+## September 26 Apple-independent preview preparation
+
+The owner approved publishing a clearly labelled macOS preview without Developer
+ID or notarization after Apple enrollment failed. Continue the release; do not
+ask again for that choice. [Preview release](MACOS-PREVIEW-RELEASE.md) owns the
+updated scope, source archives, browser setup and remaining qualification.
+The plugin-enabled candidate passed actual isolated managed DSH startup, all
+three plugins active, chat and conversation restoration on the 16 GB Mac. The
+plugin/browser/Widgets candidate passed real native Send/reopen and Chrome chat,
+DMG copy/launch/seal and library replacement checks; see the release record. No public Mac asset or
+website download has been published at this checkpoint. The personal installed
+Mac app remains separate and unchanged.
+
+## September 26 public Mac download audit and signing preparation
+
+The owner requested a macOS download on augmentoragent.com. The fresh audit
+found that the working personal install remains an ad-hoc development build;
+Gatekeeper rejects it and clean-user DSH provisioning is not implemented. The
+authenticated Apple account shows enrollment rather than certificate access.
+See [the release operator guide](MACOS-RELEASE.md) for the candidate-signing
+tool, actual tests, Apple prerequisite and remaining product/release gates.
+The corrected recovery proof (`a4317cd`) passes the complete GitHub workflows.
+No Mac binary was published, no website download changed and the working Mac
+installation was not modified by this audit. Never package the owner's private
+model profile as a public-install shortcut.
+
+Follow-up source work adds [managed Mac runtime/model setup](MACOS-MANAGED-SETUP.md).
+It passed real isolated launchd/DSH chat, service restart and conversation
+restoration with a fixture provider, plus private-state and Qt form tests.
+This supersedes the basic provisioning implementation gap above; full plugin,
+signed installed, licensing, browser and update gates remain. The source feature
+has not replaced the owner's working app, and no public Mac download is live.
+
+At `4fdd8a4`, full validation and the managed first-run Mac 14/26 matrix passed.
+The preceding Mac 26 run had an unexplained startup timeout; a passing rerun
+does not establish its cause. The follow-up source corrects the service's
+launchd scheduling class for interactive chat, adds private startup timings,
+and retains failing fixture reports. See the managed-setup evidence before
+calling this intermittent issue resolved. Apple enrollment remains pending.
+
+The scheduling/timing correction at `81f3726` passed its own Mac 14/26 build,
+managed chat/restart/history and post-use signature checks. The 16 GB working
+installation remains unmodified and online/model-ready, with strict signature
+verification passing. Five completed synthetic proof profiles were removed after
+verifying their exact login jobs and shared socket peers were stopped; reports
+remain in the non-indexed staging cache. The release guide now identifies the
+published, checksummed extra-plugin artifacts and their missing dependency graph;
+do not assume their exact package versions are available from npm.
+Full Linux, installed-package lifecycle, Browser and Home validation also passed
+at `81f3726`. Later documentation-only commits do not change those tested bytes.
+
+## September 26 clean Mac installation and default shortcut
+
+The duplicate development apps were removed and their application registrations
+cleared. The canonical installation is now `/Applications/Augmentor Agent Desktop.app`
+with one repaired Dock tile and a native icon. Its DSH runtime and owned integration
+references follow that location; private model settings and conversations are retained.
+Fn+Space is the default persistent shortcut, and clicking the icon opens rather
+than toggles the window. See [clean installation evidence and remaining boundaries](MACOS-DISTRIBUTION.md#september-26-clean-installation-and-default-shortcut).
+The old suspended qualification process no longer exists. Do not resurrect the
+historical paused-process workaround described below. Public distribution still
+requires the release gates, including signing/notarization.
+
+## September 26 corrected Mac primary app activated — historical location
+
+Autonomous activation is complete for desktop chat. The installed user
+Applications copy passed Send-button and Enter requests in the **actual native
+primary process**, including same-conversation restoration after reopening. It
+was then reopened normally with test control disabled and left online/model-ready.
+The desktop shortcut points to this copy. See
+[installed native evidence and recovery details](MACOS-DISTRIBUTION.md#september-26-follow-up-corrected-primary-mac-app-activated).
+The obsolete qualification window is hidden and paused to retain any draft in
+memory; its private checkpoint records the displaced socket/lock. Do not resume
+it alongside the replacement. That volatile preservation is not a durable draft
+backup. Configuration and DSH data have separate private backups.
+The earlier activation-pending report below is superseded. Public distribution,
+voice and browser-extension qualification remain incomplete.
+
+## September 26 desktop readiness correction — historical activation-pending checkpoint
+
+The owner reported that the Mac still could not chat. The failure was reproduced:
+an already-open pre-setup controller retained the missing legacy preset while
+reporting online. The desktop adapter now verifies its preset before readiness.
+The corrected packaged Qt window passed actual composer/Send and Enter tests
+against DeepSeek, including same-conversation restoration after reopening;
+445 native tests (one skip) and the full packaged DSH/Qt fixture passed.
+See [the correction and activation boundary](MACOS-DISTRIBUTION.md#september-26-correction-verify-chat-readiness-and-the-actual-composer).
+The corrected candidate is staged. The owner's old window still has a dialog
+open; preserve its draft and finish activation after it closes. Do not repeat
+the earlier claim that an online status alone proves desktop chat works.
+
+## September 26 personal Mac model access
+
+The owner requested their MX model access on the test Mac. The existing
+`c03c32e` development bundle now has a private per-user DSH profile, matching
+Augmentor integration, Model Picker 1.1.2 and launchd-managed runtime/model tunnel.
+Exact catalog comparison passed (365 models, seven providers), a real DeepSeek
+Flash reply succeeded, and the open desktop reported online/model-ready. The
+secondary GPU endpoint is offline on the workstation too; no GPU settings changed.
+See [Mac connection evidence](MACOS-DISTRIBUTION.md#september-26-personal-mac-model-connection)
+for deployment boundaries. Keep personal credentials/configuration out of GitHub.
+This does not complete the public installer, signing, voice or browser rollout.
+
+## September 25 macOS distribution implementation
+
+The owner authorized implementation and isolated network-Mac testing. See
+[macOS distribution](MACOS-DISTRIBUTION.md) for the native launcher, complete
+prepared DSH payload, hashed Python wheels, build/test workflow and exact evidence.
+Native launcher and real packaged DSH/Qt proofs pass on ARM64 macOS 26.5.1.
+This is development qualification; managed first-run, required plugin provisioning,
+store migration, coordinated updating, production signing and permission acceptance
+remain open. The build Mac has no valid Developer ID signing identity.
+Linux installed selections, live model/speech settings and Mac registrations were
+not changed. Do not present this source branch as a published Mac release.
+
 ## September 25 source integration
 
 The user requested merging the composer correction and other ready changes.

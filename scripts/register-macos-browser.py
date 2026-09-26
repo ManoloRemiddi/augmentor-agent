@@ -18,6 +18,38 @@ BROWSERS = {'chromium': 'Chromium', 'chrome': 'Google/Chrome',
             'chrome-for-testing': 'Google/ChromeForTesting'}
 
 
+def prepare_extension(app, browser, support_root):
+    """Prepare a stable unpacked preview without writing inside the application."""
+    value = manifest(app)
+    source = app/'Contents/Resources/app/apps/browser/extension'
+    files = {}
+    for file in sorted(source.rglob('*')):
+        if file.is_symlink(): raise ValueError('The bundled extension contains an unexpected link.')
+        if file.is_file(): files[file.relative_to(source).as_posix()] = hashlib.sha256(file.read_bytes()).hexdigest()
+    identity = hashlib.sha256(json.dumps(files, sort_keys=True).encode()).hexdigest()[:16]
+    parent = support_root/'Augmentor/browser-extensions'
+    parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    if parent.is_symlink(): raise ValueError('The extension data directory is linked. It was preserved.')
+    destination = parent/identity
+    if destination.exists() or destination.is_symlink():
+        if destination.is_symlink() or not destination.is_dir():
+            raise ValueError('The prepared extension path changed. It was preserved.')
+        observed = {}
+        for file in destination.rglob('*'):
+            if file.is_symlink(): raise ValueError('The prepared extension was edited. It was preserved.')
+            if file.is_file(): observed[file.relative_to(destination).as_posix()] = hashlib.sha256(file.read_bytes()).hexdigest()
+        if observed != files: raise ValueError('The prepared extension was edited. It was preserved.')
+    else:
+        temporary = Path(tempfile.mkdtemp(prefix='.prepare-', dir=parent))
+        try:
+            shutil.copytree(source, temporary, dirs_exist_ok=True)
+            temporary.rename(destination)
+        finally:
+            if temporary.exists(): shutil.rmtree(temporary)
+    result = register(value, support_root/BROWSERS[browser]/'NativeMessagingHosts')
+    return {**result, 'extensionDirectory': str(destination), 'extensionId': value['allowed_origins'][0].split('/')[2]}
+
+
 def manifest(app):
     app = app.resolve(strict=True)
     info = plistlib.loads((app/'Contents/Info.plist').read_bytes())

@@ -60,6 +60,9 @@ of this repository; include reproducible commands and sanitized evidence summari
 
 ## Setup, operations and distribution
 
+- [macOS signing, publication gates and website cutover](MACOS-RELEASE.md)
+- [Managed Mac first-run model and runtime setup](MACOS-MANAGED-SETUP.md)
+
 [0.2.12 desktop flare correction](RELEASE-0.2.12.md).
 [0.2.11 security release and upgrade guidance](RELEASE-0.2.11.md).
 
@@ -78,6 +81,7 @@ of this repository; include reproducible commands and sanitized evidence summari
 - [Data, permissions and support](DATA-AND-SUPPORT.md)
 - [Browser private-preview distribution](BROWSER-DISTRIBUTION.md)
 - [macOS development installation](MACOS-INSTALLATION.md)
+- [macOS distribution implementation and current qualification](MACOS-DISTRIBUTION.md)
 - [Fedora 44 installation preview](FEDORA-PREVIEW.md)
 - [Licensing and distribution decision](LICENSING.md)
 - [Cross-platform implementation status](CROSS-PLATFORM-RELEASE-STATUS.md)
@@ -129,3 +133,7 @@ files available only in a developer's working directory.
 - [Controlled memory and selected context](CONTROLLED-MEMORY.md): current bounded inference, provenance, tests and operating limits.
 
 - [Home desktop tray launcher](HOME-LAUNCHER.md): shared NAS dashboard access, remembered address and login startup.
+
+- [macOS preview release](MACOS-PREVIEW-RELEASE.md) — Apple-independent preview, source artifacts and qualification.
+- [Mac customer guide](MACOS-PREVIEW.html) — install, model connection and browser extension.
+- [Mac library replacement](MACOS-LIBRARY-REPLACEMENT.md) — LGPL source and installation material.

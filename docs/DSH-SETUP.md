@@ -2,6 +2,11 @@
 
 # Optional DSH connection
 
+This guide describes an **external** DSH connection. Fresh bundled Mac desktops
+have a separate [managed first-run path](MACOS-MANAGED-SETUP.md) in current
+source; it provisions the bundled runtime automatically. Public signed-install
+qualification remains open.
+
 Install and start the supported Node DSH CLI **0.1.5-rc.1** separately. Its `dsh`
 command must be on the application's PATH. Configure your model in DSH. Augmentor
 checks the CLI's first-party packages, the host API, its integration version, and

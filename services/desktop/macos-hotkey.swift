@@ -54,11 +54,11 @@ func resolveKey(_ text: String) -> [String: Any] {
             let result = resolveKey(args[2]); emit(result)
             exit(result["error"] == nil ? 0 : 2)
         }
-        let allowed = UInt32(cmdKey | shiftKey | optionKey | controlKey)
+        let allowed = UInt32(cmdKey | shiftKey | optionKey | controlKey | kEventKeyModifierFnMask)
         guard args.count == 3, let key = UInt32(args[1]), key <= 127,
               let modifiers = UInt32(args[2]), modifiers != 0,
               modifiers & ~allowed == 0 else {
-            emit(["error": "Supply a key code and Command, Control, Option or Shift modifiers."])
+            emit(["error": "Supply a key code and Command, Control, Option, Shift or Fn modifiers."])
             exit(2)
         }
         let application = NSApplication.shared

@@ -1,6 +1,7 @@
 {
   "qtVersion": "6.8.2",
   "pysideVersion": "6.8.2.1",
+  "widgetsOnly": true,
   "reason": "These optional wheel plugins cannot load because their Qt frameworks are absent; Augmentor uses Qt Widgets and external Chromium, not these optional engines.",
   "plugins": [
     {

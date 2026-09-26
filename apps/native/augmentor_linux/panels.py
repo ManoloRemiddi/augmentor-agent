@@ -2,6 +2,7 @@
 from datetime import datetime
 import json
 from pathlib import Path
+import sys
 from PySide6.QtCore import Qt,QTimer
 from PySide6.QtWidgets import (QDialog,QVBoxLayout,QHBoxLayout,QLabel,QLineEdit,
     QListWidget,QListWidgetItem,QPushButton,QCheckBox,QComboBox,QMessageBox,QTextEdit,QWidget,QTabWidget,QTextBrowser,QScrollArea)
@@ -92,6 +93,9 @@ class UpdatesDialog(QDialog):
         close=QPushButton('Done');close.clicked.connect(self.accept);layout.addWidget(close);self.check()
 
     def check(self):
+        if sys.platform == 'darwin':
+            self.info.setText(f'Augmentor Agent {__version__} · macOS preview\n\nAutomatic updates are not available yet. Do not replace the app while Augmentor or its browser companion is working. Read the Mac guide at https://augmentoragent.com/macos.html for the current release and update instructions.')
+            return
         self.info.setText('Checking the selected harness…')
         def read():
             client=self.owner.controller.client
@@ -116,6 +120,7 @@ class LicensesDialog(QDialog):
         text = QTextEdit(); text.setReadOnly(True); layout.addWidget(text)
         documents = [('Augmentor · MIT with Augmentor Resale Restriction', root / 'LICENSE'),
                      ('Distribution and library replacement', root / 'docs/LICENSING.md'),
+                     ('Mac library sources and replacement', root / 'docs/MACOS-LIBRARY-REPLACEMENT.md'),
                      ('LGPL version 3', root / 'licenses/LGPL-3.0.txt'),
                      ('GPL version 3 (incorporated by LGPL)', root / 'licenses/GPL-3.0.txt')]
         for file in sorted((root / 'licenses/upstream').glob('*.txt')):
