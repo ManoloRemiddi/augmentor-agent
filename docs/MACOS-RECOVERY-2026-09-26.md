@@ -73,11 +73,90 @@ implementation: [physical image density](https://doc.qt.io/qt-6.8/highdpi.html),
   no privacy permissions were changed. Subjective appearance acceptance, physical
   keyboard/pointer actions and long-duration power measurements are distinct.
 
-## Deployment gate
+## Installed and verified
 
-At this document's creation, no new candidate is installed. Required follow-up:
-clean packaged build/inventory/signature checks, packaged native shortcut and chat
-qualification, safe activation, exact installed read-back, then removal of obsolete
-0.2.8 preview apps and stale native-host references. Preserve personal state and
-one rollback archive outside application discovery. Report installed evidence here;
-source tests alone must not be described as an installed fix.
+The clean candidate built from `c3a7fabf4466b41940548a30d059f308af9819c1` is
+installed at `/Applications/Augmentor Agent Desktop.app` on the 32 GB M4 Mac.
+It contains all integrated source, with no source overlays. Product version is
+0.2.12; this is a private qualification candidate, not a replacement public release.
+
+- ZIP SHA-256: `89655e2f4afbbdebacbdca73cb6c42ccd546ab4fcfcbdba4851f1c40fc26a2dd`.
+- Application inventory SHA-256:
+  `b439032fb23fafce118ceea4f18651ac0751875721d4f1f5fad1ad004cd628b7`.
+- The archive's 585 application entries, retained Qt framework dependencies,
+  native launchers and strict ad-hoc signature passed verification. Signature
+  verification also passed after graphical qualification and installation.
+- 519 native tests (three environment skips) pass on Linux. The real X11/KWin
+  two-process test passes with OpenGL, including pinning/workspaces, stacking,
+  desktop edges, compact mode, hide/show and minimize/restore.
+- The final packaged Metal framebuffer, synthetic pointer transport, composer
+  input, eight resize handles, compact restoration and exact menu placement pass
+  on the 32 GB Mac. CPU field preparation is about 10.2 ms. Only isolated runs
+  are suitable for frame-rate comparisons; simultaneous GUI fixtures interfere
+  with scheduling/focus and do not establish a performance result.
+- Real Carbon registrations, both independent native processes, targeted hide/show,
+  conflict refusal, unsent-draft preservation and service restart/restoration pass.
+  The test driver now allows Cocoa startup focus to settle and explicitly ends
+  preview processes after their accepted close; preview windows intentionally
+  lack the live controller's application-exit behavior. Normal native quitting
+  and reopening were separately verified by the live chat test. The driver
+  correction follows the binary ref above; no installed source was patched.
+- The final artifact passes managed engine-first setup, plugin provisioning,
+  authenticated browser handoff, deterministic chat and conversation restoration
+  after owned launchd/DSH restart. These are isolated model fixtures.
+- **Actual native-process live evidence:** Send completed a real DeepSeek-V41-Flash
+  reply; reopening restored that same test conversation and Enter completed another.
+  After installation, the canonical native launcher restored it and completed a
+  third real reply. The owner's primary conversation was not used for these tests.
+  Each qualification window then closed normally; the primary reopened normally
+  with test control disabled, online/model-ready and without connection errors.
+
+The installer paused the exact owned shortcut service, gracefully closed idle
+windows, drained the owned DSH/shared helpers, and restored both login services.
+Private DSH settings/connection digests and all three conversation metadata records
+matched before/after installation (two existing conversations plus our named test).
+The primary Fn+Space binding is unchanged and active under shortcut protocol 2.
+Secondary remains unassigned until saved in Settings, as required by the audit.
+
+## Clean application discovery
+
+The target Mac contained the old 0.2.8 Desktop and Browser Companion previews,
+seven orphan helpers launched from those bundles, four earlier candidate apps,
+old rollback folders, and disposable test apps in the Trash. Merely hiding build
+folders had not removed their LaunchServices registrations.
+
+Cleanup stopped those seven verified legacy helpers, migrated the two existing
+browser native-host manifests to the canonical desktop (same extension ID), removed
+32 obsolete bundles/backups/candidates plus nine disposable uninstall-test bundles,
+unregistered stale paths, and ejected the old mounted installer. One verified
+rollback ZIP is retained in the private non-indexed cache; user data was not removed.
+The extension migration is host registration evidence, not a new end-to-end browser
+qualification. Temporary build apps created on the other Mac are also retired;
+its working personal installation is unchanged.
+
+Final LaunchServices read-back contains **only the canonical Augmentor app**;
+there is **one Dock tile** and one app in the system/user Applications directories.
+Launching by bundle identifier reopens the existing canonical process rather than
+an old preview. The process remains online/model-ready, with no connection or
+conversation-restoration error.
+
+## CI and remaining boundaries
+
+At binary source `c3a7fab`, Mac 14/26, Debian (including GPU workspace checks), Home,
+and installed-package lifecycle CI passed. The browser package job exposed an
+unrelated verification race: Chromium creates `DevToolsActivePort` before writing
+it. The proof now waits for complete port/path contents and detects early browser
+exit. This is a test-driver correction, not a browser product change; the final
+validation run determines its result.
+
+Whole-desktop capture and physical keyboard/microphone acceptance remain outside
+this qualification; macOS permissions were not changed. The fine-resolution Metal
+implementation is verified, but subjective flare appearance remains the owner's
+assessment. Startup focus races should be qualified separately from steady-state
+shortcut toggling before broad release.
+
+The public website still serves `v0.2.12-macos-preview.1`; its immutable bytes were
+not replaced. A new numbered preview, corresponding sources/notices and website
+guide update are a separate publication step. Automatic updates, full removal and
+Apple distribution signing/notarization remain preview limitations. Linux's
+installed selection and Sponsor/workspace-embedding PR #12 were not changed.

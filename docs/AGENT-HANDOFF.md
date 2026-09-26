@@ -7,8 +7,11 @@
 The [recovery record](MACOS-RECOVERY-2026-09-26.md) supersedes the source gap status
 below: guided setup/resize and shared rendering are integrated, the Mac second
 shortcut is implemented, and Metal/OpenGL fixtures pass. Read its deployment gate:
-qualification and installation are separate from source completion. Preserve the
-approved UI and the owner's private data; do not resume the old overlay workflow.
+the clean `c3a7fab` artifact is now installed and live-tested on the 32 GB Mac.
+One canonical application/registration and one Dock tile remain; legacy previews
+and helpers are retired. The record owns exact hashes, real/native versus fixture
+evidence, the browser CI race correction and remaining publication boundaries.
+Preserve the approved UI and private data; do not resume the old overlay workflow.
 
 ## September 26 shared flare rendering correction
 

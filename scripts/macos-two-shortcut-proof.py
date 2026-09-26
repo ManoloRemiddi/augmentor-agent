@@ -78,6 +78,9 @@ def main():
             for name in ('main','secondary'):
                 service.activate(name);children.append(service.activations[name].child)
                 states[name]=until(name,lambda value:value['visible'])
+                # Cocoa focus/activation arrives after the first visible frame.
+                # Exercise a settled window, not a still-launching preview.
+                time.sleep(1.)
                 ui(name,'draft',expected='',text='Unsent '+name+' fixture')
             assert states['main']['pid']!=states['secondary']['pid']
             for name,other in (('secondary','main'),('main','secondary')):
@@ -93,10 +96,11 @@ def main():
                 ui(name,'capture',path=str(args.out.resolve()/(name+'.png')))
                 ui(name,'draft',expected='Unsent '+name+' fixture',text='')
                 assert exchange(name,'maintenance.close')['accepted']
-                until(name,lambda value:not value['visible'])
-                # Preview windows intentionally keep QApplication alive. After
-                # the accepted close saved their fixture state, stop only that
-                # isolated process; live-app quit is qualified by the chat proof.
+                # Preview QApplication stays alive, and Cocoa may reopen its
+                # window when focus returns. Allow the accepted close handler
+                # to finish, then stop only this fixture. Live-app quit is
+                # qualified separately with a real controller and conversation.
+                time.sleep(.2)
                 service.activations[name].child.terminate()
                 service.activations[name].child.wait(timeout=15)
             service.close();service=create()
@@ -106,10 +110,11 @@ def main():
                 reopened=until(name,lambda value:value['visible'])
                 assert reopened['pid']!=states[name]['pid']
                 assert exchange(name,'maintenance.close')['accepted']
-                until(name,lambda value:not value['visible'])
-                # Preview windows intentionally keep QApplication alive. After
-                # the accepted close saved their fixture state, stop only that
-                # isolated process; live-app quit is qualified by the chat proof.
+                # Preview QApplication stays alive, and Cocoa may reopen its
+                # window when focus returns. Allow the accepted close handler
+                # to finish, then stop only this fixture. Live-app quit is
+                # qualified separately with a real controller and conversation.
+                time.sleep(.2)
                 service.activations[name].child.terminate()
                 service.activations[name].child.wait(timeout=15)
             report={'passed':True,'nativeCarbonRegistration':True,'bothBindingsRestoredAfterServiceRestart':True,

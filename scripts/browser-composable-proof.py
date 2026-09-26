@@ -68,9 +68,15 @@ ws=None;seq=0
 try:
     portfile=temp/'profile/DevToolsActivePort'
     for _ in range(100):
-        if portfile.exists():break
+        try:port_lines=portfile.read_text().splitlines()
+        except FileNotFoundError:port_lines=[]
+        # Chromium creates this file before writing its contents. Existence
+        # alone is not readiness, particularly on a busy package-test runner.
+        if len(port_lines)>=2 and port_lines[0].isdigit() and port_lines[1].startswith('/devtools/browser/'):break
+        if chrome.poll() is not None:raise RuntimeError('Chromium exited before its debugging endpoint became ready.')
         time.sleep(.05)
-    port=portfile.read_text().splitlines()[0]
+    else:raise TimeoutError('Chromium did not publish a complete debugging endpoint.')
+    port=port_lines[0]
     info=json.load(urllib.request.urlopen(f'http://127.0.0.1:{port}/json/version'));ws=websocket.create_connection(info['webSocketDebuggerUrl'],suppress_origin=True,timeout=20)
     def cdp(method,params={},session=None):
         global seq

@@ -2,7 +2,9 @@
 
 Current OS parity direction and verified gaps: [one-product architecture audit](PLATFORM-PARITY-AUDIT.md).
 The tables below compare harnesses and presentation surfaces; they do not establish
-Linux/macOS parity. Mac's second-instance shortcut remains an implementation gap.
+Linux/macOS parity. The [Mac recovery record](MACOS-RECOVERY-2026-09-26.md) now
+qualifies both Mac shortcuts and the shared Metal/OpenGL renderer, with explicit
+installed and public-release boundaries.
 
 Mac setup correction (26 September, current source): install/start DSH before
 model setup, Agent setup/Open DSH actions in the three-dot menu, authenticated browser
@@ -51,7 +53,7 @@ Additional current native/browser capabilities:
 | Capability | Desktop | Browser |
 | --- | --- | --- |
 | Resonant Voice on DSH | Hold/release, slide-lock, voice selection; optional hands-free preview | Same shared engine: hold/release, lock, hands-free and primary voice settings |
-| Independent second conversation | Named second window, separate chat/settings/voice profile; KDE shortcut | Separate sidebar/session workflow |
+| Independent second conversation | Named second window, separate chat/settings/voice profile; KDE and Mac shortcuts | Separate sidebar/session workflow |
 | Skins and activity animation | Futuristic plasma; Blossom lake/butterflies; validated import/export | Native skins are not applied to Chromium |
 | Startup and recovery | Shared selected release, supervised login, guarded recovery | Matching companion and explicit extension load/reload |
 | Complete fresh-user installation | Guided Debian 13 amd64 bundle with pinned DSH/plugins | Matching extension and native host in the same bundle |
