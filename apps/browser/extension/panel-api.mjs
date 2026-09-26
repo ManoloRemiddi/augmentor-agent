@@ -235,8 +235,9 @@ export function handlePanelMessage(msg, sender, sendResponse) {
           // Verify the remembered session once per SW instance; on the first
           // prompt (or after a "new chat") create the real DSH session.
           const exists = await sessionHistoryOk(state.sessionId)
-          if (exists !== true) {
-            if (exists === false) clearStoredSessionId()
+          if(exists===null)throw Error('Conversation status is unknown. Reconnect before sending; your original chat is kept.')
+          if (exists === false) {
+            clearStoredSessionId()
             state.sessionId = `augmentor-${crypto.randomUUID().slice(0, 8)}`
             saveSessionId(state.sessionId)
             // M3: create the session IN the plugin's dedicated chat dir —

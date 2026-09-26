@@ -2,6 +2,8 @@
 
 # Start here: agent handoff
 
+See [embedded Browser and specialist workspaces](WORKSPACE-EMBEDDING.md) for product-owned embedding, scoped tools and memory.
+
 ## September 27 installed Chromium browser choice
 
 [Browser choice qualification](MACOS-BROWSER-CHOICE.md) records the generic Mac
