@@ -2,6 +2,19 @@
 
 # Start here: agent handoff
 
+## September 26 public Mac download audit and signing preparation
+
+The owner requested a macOS download on augmentoragent.com. The fresh audit
+found that the working personal install remains an ad-hoc development build;
+Gatekeeper rejects it and clean-user DSH provisioning is not implemented. The
+authenticated Apple account shows enrollment rather than certificate access.
+See [the release operator guide](MACOS-RELEASE.md) for the candidate-signing
+tool, actual tests, Apple prerequisite and remaining product/release gates.
+The corrected recovery proof (`a4317cd`) passes the complete GitHub workflows.
+No Mac binary was published, no website download changed and the working Mac
+installation was not modified by this audit. Never package the owner's private
+model profile as a public-install shortcut.
+
 ## September 26 clean Mac installation and default shortcut
 
 The duplicate development apps were removed and their application registrations
