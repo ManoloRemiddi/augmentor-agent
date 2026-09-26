@@ -48,6 +48,39 @@ without a model, and persistent chat navigation were visually inspected.
 The next deployment record must identify the exact source and qualified artifact.
 The following sections are historical evidence for the earlier installed form.
 
+## Qualified replacement, awaiting closure of the installed desktop
+
+Application source is `60413de`. A separate candidate overlays eleven recorded
+application/document files on the earlier public `ea128d6` binary; its exact
+application inventory SHA-256 is
+`d0461531a8dbb80595b4374e73a39f7bee4b77c5b6ce9727b0e69cc3a1131a0f`.
+The final sealed candidate passed engine-first provisioning in 11.786 seconds,
+chat with a DSH-stored synthetic credential, repeated setup, restart/history,
+and browser login before/after restart. Its integrity still passed after use.
+The currently installed older application also retains a valid integrity seal.
+The 112 Mac tests were rerun at this source and passed. The 27 native-window
+and 11 transport tests passed; the setup tests are included in the Mac suite.
+
+The [Mac 14/26 workflow](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36254337861)
+and [full validation workflow](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36254337856)
+are additional clean-build checks at `60413de`; their status must be read before
+claiming completion. Native Qt screenshots verified setup before installation,
+running without a model, and visible chat navigation. Browser UI checks used
+the Browser skill and a temporary tunnel; the test tab and tunnel were closed.
+All owned fixture jobs and shared helpers were drained. No private model key was
+copied from another machine or used in these tests.
+
+The older installed application is still open with a setup dialog. The owner
+has been asked to quit it before replacement because it cannot preserve unsent
+form/message input. No new candidate has been activated and no owner DSH
+profile has been created. Do not close that window based only on an idle flag.
+A private installation helper stages the existing installer's atomic replacement,
+checks the candidate inventory and exact source, refuses a live desktop or a
+newly created DSH configuration, and drains only same-user helpers belonging to
+that exact old bundle. It uses the previously approved ad-hoc preview mode,
+then applies the official launcher environment before runtime-only provisioning
+and browser opening. Live owner-model chat remains unqualified.
+
 ## Earlier form and deployment (superseded UX)
 
 The 32 GB Mac had the public 0.2.12 preview from `ea128d6`, including DSH,
