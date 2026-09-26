@@ -133,6 +133,20 @@ The scheduling correction is independently appropriate; do not attribute the
 earlier timeout to it without supporting evidence. These runs precede that
 correction and are not its qualification.
 
+The correction at `81f3726` subsequently passed its own
+[macOS 14/26 matrix](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36235276970).
+Provisioning took 25.899 seconds on macOS 14 and 28.897 seconds on macOS 26;
+persistent readiness took 8.036 and 9.577 seconds respectively. Both completed
+chat, repeat setup, service restart and conversation restoration, removed the
+temporary services and passed the post-use signature check. The additional
+pre-correction [repeat matrix](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36235021154)
+also passed, so the original isolated timeout remains an unresolved reliability
+observation, not a demonstrated scheduling diagnosis.
+
+The same `81f3726` source passed
+[full validation](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36235276975),
+including the Linux, installed-package lifecycle, Browser and Home jobs.
+
 The owner's canonical app remains the earlier development artifact. See the
 [release guide](MACOS-RELEASE.md) for Developer ID/notarization, signed installed
 acceptance, extra plugins, browser, voice/memory, licensing and update gates.

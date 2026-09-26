@@ -29,6 +29,17 @@ launchd scheduling class for interactive chat, adds private startup timings,
 and retains failing fixture reports. See the managed-setup evidence before
 calling this intermittent issue resolved. Apple enrollment remains pending.
 
+The scheduling/timing correction at `81f3726` passed its own Mac 14/26 build,
+managed chat/restart/history and post-use signature checks. The 16 GB working
+installation remains unmodified and online/model-ready, with strict signature
+verification passing. Five completed synthetic proof profiles were removed after
+verifying their exact login jobs and shared socket peers were stopped; reports
+remain in the non-indexed staging cache. The release guide now identifies the
+published, checksummed extra-plugin artifacts and their missing dependency graph;
+do not assume their exact package versions are available from npm.
+Full Linux, installed-package lifecycle, Browser and Home validation also passed
+at `81f3726`. Later documentation-only commits do not change those tested bytes.
+
 ## September 26 clean Mac installation and default shortcut
 
 The duplicate development apps were removed and their application registrations

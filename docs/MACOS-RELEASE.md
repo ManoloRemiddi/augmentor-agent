@@ -122,6 +122,31 @@ approval, GitHub upload or website publication.
 These are known gaps, not tasks delegated to the end user. Account enrollment is
 the owner action; implementation, packaging and testing remain release work.
 
+### Required plugin artifact provenance
+
+The September 26 registry check found that the exact Model Picker 1.1.2,
+Adaptive Reasoning 0.2.3 and Resonant Voice 0.1.16 packages are not all available
+from npm. A customer setup based on installing those names would fail. The
+[published Linux complete release](https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/v0.2.12-complete-preview.1)
+already carries reviewed tarballs and a checksum manifest. Their checksums match
+the locally retained release artifacts:
+
+| Package | SHA-256 |
+| --- | --- |
+| `dsh-model-picker-augmented-1.1.2.tgz` | `9a2c2e17c128da3565520b5f39cb85606823440ee0e1e4c2316f806fc58914fc` |
+| `dsh-adaptive-reasoning-0.2.3.tgz` | `5c142213e4f7935cf7e8f0ba839e17d274451c689c04637001dd1d89b6da967e` |
+| `dsh-resonant-voice-0.1.16.tgz` | `31b1d088cc66ed8eb19f235445407f17d037cc7de938b9cea5049899c5b79cf5` |
+
+The Mac build must incorporate a locked graph for those exact artifacts, retaining
+their notices and source provenance, before signing. Model Picker also needs
+React and the unscoped `schemastery` package, which are absent from the current
+base DSH graph. Do not copy plugin files alone, resolve new dependencies on the
+customer's Mac, or ship the older collection's unrelated vulnerable packages.
+The current managed profile enables only the prepared first-party web bundles
+and shared product integration; it does not yet provision these three extras.
+Voice plugin availability does not establish a working speech engine or consented
+microphone path. Keep those acceptance checks separate.
+
 ## Website cutover
 
 Only after those gates pass:
