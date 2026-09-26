@@ -32,6 +32,7 @@ process.stdin.on('data',chunk=>{
     if(first.method==='augmentor/surface'){surfaceRequest(first.params??{}).then(result=>reply({id:first.id,result}),error=>reply({id:first.id,error:{message:error.message}}));continue}
     if(first.method==='augmentor/dsh'){dshSetup(first.params??{}).then(result=>reply({id:first.id,result}),error=>reply({id:first.id,error:{message:error.message}}));continue}
     if(first.method==='augmentor/diagnostics'){supportReport().then(result=>reply({id:first.id,result}),error=>reply({id:first.id,error:{message:error.message}}));continue}
+    if(workspaceProfile&&first.method==='augmentor/onboarding'){reply({id:first.id,error:{message:'This workspace is already configured. Use standalone Augmentor for personal setup.'}});continue}
     if(first.method==='augmentor/onboarding'){startOnboarding(first.params).then(result=>reply({id:first.id,result}),error=>reply({id:first.id,error:{message:error.message}}));continue}
     if(first.method==='augmentor/memory'){
       if(workspaceProfile&&first.params?.action==='dual.recall'){reply({id:first.id,error:{message:'Connect the workspace harness before recalling memory.'}});continue}
