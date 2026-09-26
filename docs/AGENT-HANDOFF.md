@@ -2,7 +2,19 @@
 
 # Start here: agent handoff
 
-## September 26 corrected Mac primary app activated
+## September 26 clean Mac installation and default shortcut
+
+The duplicate development apps were removed and their application registrations
+cleared. The canonical installation is now `/Applications/Augmentor Agent Desktop.app`
+with one repaired Dock tile and a native icon. Its DSH runtime and owned integration
+references follow that location; private model settings and conversations are retained.
+Fn+Space is the default persistent shortcut, and clicking the icon opens rather
+than toggles the window. See [clean installation evidence and remaining boundaries](MACOS-DISTRIBUTION.md#september-26-clean-installation-and-default-shortcut).
+The old suspended qualification process no longer exists. Do not resurrect the
+historical paused-process workaround described below. Public distribution still
+requires the release gates, including signing/notarization.
+
+## September 26 corrected Mac primary app activated — historical location
 
 Autonomous activation is complete for desktop chat. The installed user
 Applications copy passed Send-button and Enter requests in the **actual native

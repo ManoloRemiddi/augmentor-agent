@@ -2,6 +2,10 @@
 
 # Cross-platform implementation status
 
+For current Mac installation evidence, use the
+[September 26 clean installation checkpoint](MACOS-DISTRIBUTION.md#september-26-clean-installation-and-default-shortcut).
+The earlier candidates below retain their original qualification boundaries.
+
 Updated 2026-09-20. **The complete Debian preview is separately qualified; current macOS parity remains unfinished.**
 See [the September 20 distribution audit](DISTRIBUTION-AUDIT-2026-09-20.md) for the current Linux release and next macOS gates. The evidence below records the earlier cross-platform candidates.
 The approved scope remains [the release plan](CROSS-PLATFORM-RELEASE-PLAN.md):

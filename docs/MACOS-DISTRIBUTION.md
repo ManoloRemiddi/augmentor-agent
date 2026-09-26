@@ -175,7 +175,89 @@ GitHub's new OS matrix is an additional pending check, not evidence already clai
 by these local results. This checkpoint is still product version 0.2.12 development,
 not a new published product release or a consumer-ready installation.
 
-## September 26 follow-up: corrected primary Mac app activated
+## September 26 clean installation and default shortcut
+
+The owner reported multiple Finder application entries and unreliable opening.
+The audit found development candidates, installed qualification copies and a
+backup still registered as applications. The Mac also had no assigned default
+shortcut; the native helper did not accept Fn. The previous chat-only checkpoint
+therefore did not establish a clean, usable installation.
+
+Implementation `6ecda87` changes the following:
+
+- New installs prefer writable `/Applications`; updates retain an existing app
+  in `/Applications` or `~/Applications` and refuse an ambiguous default when
+  both exist. Moving an app still requires migrating its integration references.
+- Update staging and rollback directories are hidden and end in `.noindex`.
+  New backups have a `.backup.noindex` suffix rather than `.app`; interrupted
+  transactions using the older naming convention remain recoverable.
+- The shared SVG supplies a complete native `.icns` and `CFBundleIconFile`.
+  Finder/Dock activation shows the window; repeated native launches also show it.
+  Explicit shortcut activation toggles visibility without creating another UI.
+- A fresh packaged launch automatically registers the per-user login service
+  with Fn+Space. Carbon registers Space (49) with `kEventKeyModifierFnMask`
+  (131072); it does not require an Accessibility event tap. Settings exposes
+  one Mac shortcut and a dedicated button to restore Fn+Space. Existing custom
+  choices and deliberate removal of a saved choice's login registration remain
+  respected. Cold shortcut activation uses the installed native executable.
+
+On the 16 GB ARM64 Mac mini, the only installed application is now
+`/Applications/Augmentor Agent Desktop.app`. Thirteen redundant application
+bundles and their stale registrations were removed during consolidation. The
+desktop app symlink was removed, and the existing Dock tile was repaired to
+point to the canonical app with its product icon. DSH's owned LaunchAgent,
+profile dependency link, presets and product plugins were migrated through
+the ownership-checking setup path. Personal model configuration, credentials,
+conversations and unrelated applications/services were preserved. Private data
+backups and a compressed recovery application remain outside the installed app.
+Time Machine backups were not altered.
+
+Installed acceptance uses actual native processes and real DeepSeek requests:
+
+- Icon activation while visible, while hidden, and from Finder raised the same
+  primary process. The shortcut activation path hid and showed it without
+  changing its conversation or composer. No test prompt was sent in the owner's
+  existing primary conversation.
+- A separate named native test window passed Send, restart/restoration, and Enter.
+  After the final bundle update it restored that same test conversation and
+  produced another real model response through its installed proof driver.
+- A real in-place update chose the existing canonical destination, retained a
+  hidden rollback bundle, and resumed the previously running Fn+Space service.
+  Explicit service stop/start also restored the binding.
+- Cold launch through the shortcut activation code reopened the native app,
+  connected to its saved model and displayed one window. AppKit identified the
+  canonical bundle. Normal launch rejected UI test control. Strict recursive
+  signature verification passed after use.
+- Finder's Spotlight query returned one app, and Dock preferences contained one
+  Augmentor tile. No browser native-host manifest or loaded unpacked extension
+  referenced the removed development directory.
+- Linux native regression ran 451 tests with one environment skip, followed by
+  20 passing focused installer/settings tests covering the final destination
+  selection and Mac Fn settings. All 61 Mac contract tests passed on the Mac.
+  Shipped native/services/scripts/adapters file
+  hashes match the committed implementation.
+
+Final development ZIP SHA-256:
+`edd55f4548702c428d8f8ac8714d62436ffc2d931460ab7745ca4ef832bdc0dc`.
+Application inventory SHA-256:
+`c3444a7cc3df3c5dcaa19665b3ff26f80c2f5dcbd59d154f9009239608032751`.
+The final app is left running normally, with test control disabled. The simple
+desktop instruction file identifies the sole app and Fn+Space.
+The completed development workspace and expanded update backup were removed
+after preserving private recovery data and the compressed prior application.
+Do not recreate loose qualification `.app` copies in indexed user folders;
+build into `.noindex` staging, qualify the canonical installation, unregister
+temporary app records and remove task-owned scratch files after acceptance.
+
+**Evidence boundary:** macOS accepted the real global Fn+Space registration and
+the activation/cold-launch paths passed, but no physical Fn+Space keypress or
+logout/login was performed remotely. Accessibility and screen-recording grants
+remain absent; they were not bypassed. This is a corrected personal development
+installation, not acceptance of a mass-market release. Developer ID/notarization,
+guided fresh-user setup, coordinated weekly updates, browser/voice qualification
+and the other release gates remain open.
+
+## September 26 follow-up: corrected primary Mac app activated — historical location
 
 The owner requested autonomous completion. The corrected app is now installed in
 `~/Applications/Augmentor Agent Desktop.app`, with a desktop shortcut to that
