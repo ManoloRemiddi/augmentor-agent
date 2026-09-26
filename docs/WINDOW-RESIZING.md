@@ -39,7 +39,7 @@ on Linux and macOS; the Mac's full 117 Mac tests and 27 native-window tests also
 passed. Linux's locally installed Qt lacks QtTest, so its full window suite could
 not complete locally; the focused resize tests require no QtTest. The actual
 Cocoa proof and screenshots passed on the 32 GB Mac. Artifact qualification and
-installed scope are recorded below after activation; source checks alone do not
+installed scope are recorded below; source checks alone do not
 establish an installed update.
 
 ## Qualified candidate and activation boundary
@@ -55,23 +55,49 @@ inspected. No owner model request, conversation, database or configuration chang
 was part of qualification.
 
 The [Mac 14/26 workflow at `252215b`](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36259216754)
-passed. The [full validation run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36259216763)
-also passed its Debian, Home and Browser jobs at the recorded checkpoint; installed
-package lifecycle qualification was still running. Do not report that whole run
-as successful from those individual jobs. The preceding documentation-only
-`f0bc3c8` run had a Chromium fixture cleanup `ENOTEMPTY` failure; it is not a passing
+passed. Both the [Mac 14/26 workflow](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36259678594)
+and [full validation workflow](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36259678600)
+passed at documentation ref `166e1ae`, with unchanged application code. Full
+validation includes Debian, Home, Browser packaging and installed-package
+lifecycle checks. The earlier full run at `252215b` was cancelled by that
+follow-up; do not count it as a pass. The preceding documentation-only `f0bc3c8`
+run had a Chromium fixture cleanup `ENOTEMPTY` failure and is also not a passing
 full-suite checkpoint.
 
-Activation is pending the owner closing the 32 GB Mac's desktop. The current
-normal app does not expose unsent draft state, so an idle status is insufficient
-permission to discard input. The owner was asked to finish any draft and quit.
-The existing installer refuses live component leases; no forced closure or
-in-place patch was attempted. At this checkpoint the installed desktop remains
-`60413de`, online with one configured provider and one session. Only the staged
-candidate has the menu/resize fix. A private activation helper is prepared to
-verify an idle DSH, preserve its saved profile/session metadata, drain only its
-verified owned runtime/helpers, atomically install with a retained backup, and
-resume the same service. Recheck current state before using it.
+### Installed on the 32 GB Mac, September 26
+
+After the draft-preservation explanation, the owner explicitly requested
+installation. The desktop and DSH sessions reported no active work. The old
+window accepted graceful closure, but the shortcut service launched another
+window before the installer preflight. The installer correctly refused without
+changing the app or DSH. The next attempt paused the verified owned shortcut
+through its existing registrar and durable resume record, then gracefully closed
+the idle window. No forced process termination or active-turn interruption was
+used for the desktop.
+
+The guarded activation checked the exact DSH ownership journal and login plist,
+recorded private profile/session metadata, stopped the idle owned runtime and
+drained its authenticated shared helpers. The existing installer atomically
+replaced `/Applications/Augmentor Agent Desktop.app`, retained the prior bundle
+as a hidden backup, and restored the shortcut. It used the previously approved
+ad-hoc preview mode with strict signature checks; Gatekeeper and quarantine
+policy were unchanged.
+
+Installed application source is **`252215b`**, product version **`0.2.12`**, with
+the exact inventory hash recorded above. All nine overlay files matched the
+qualified candidate. The saved DSH connection, settings, configured-provider
+availability, session identities and projection cursors matched before/after;
+one configured provider and one existing session were retained. The same owned
+DSH service was resumed without provisioning or rewriting model configuration.
+
+Augmentor was reopened normally through LaunchServices, with test control
+absent. The native process runs the installed app, reports online/model-ready,
+and has no connection or session-restoration error. Both DSH and shortcut login
+services are loaded. Strict installed integrity passed after use. Resize/menu
+interaction evidence is the sealed candidate's real Cocoa synthetic-pointer
+proof plus exact installed byte verification, not a physical-pointer test of
+the owner's live conversation. No live model request was sent for this patch.
+Linux, the NAS, the other Mac and public preview downloads remain unchanged.
 
 ## Earlier Linux 0.2.5 evidence — historical
 

@@ -8,8 +8,10 @@ At the owner's request, **Agent setup** and **Open DSH in browser** now live onl
 in the existing three-dot menu. The temporary main-window row is removed. Setup
 still opens on a fresh install, and model configuration remains in DSH's browser
 interface. [Desktop resizing](WINDOW-RESIZING.md) owns the accompanying macOS
-resize fix and its qualification/installation record. No other UI redesign was
-requested or authorized.
+resize fix and its qualification/installation record. Application source `252215b`
+is now installed on the 32 GB Mac; the running desktop is online/model-ready and
+its existing settings and session metadata were preserved. No other UI redesign
+was requested or authorized.
 
 ## Runtime-first setup
 
