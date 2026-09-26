@@ -9,8 +9,9 @@ intended stable distribution path. Never disable Gatekeeper globally, remove
 quarantine as an installation instruction, or label an ad-hoc build notarized.
 
 Target: Apple silicon, macOS 14+. Release tag: `v0.2.12-macos-preview.1`.
-Publication is pending final artifact transfer and website deployment. See the bundled
-[customer guide](MACOS-PREVIEW.html); the deployed website has a separate Mac guide.
+The [versioned release](https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/v0.2.12-macos-preview.1)
+was published on September 26, 2026. See the bundled [customer guide](MACOS-PREVIEW.html)
+and [website installation guide](https://augmentoragent.com/macos.html).
 The existing Debian release is unchanged.
 
 ## Included and deliberately limited
@@ -77,7 +78,57 @@ build; it is not evidence of a successful user Open Anyway interaction. The
 builder deliberately leaves `publicReleaseReady: false`; the operator's release
 record must state the tests and preview limitations before publication.
 
-## Release candidate evidence
+## Final artifact qualification
+
+The final binary source is `ea128d6f75bca49aae6cc80bf11251a1218fbf02`, merged
+through [PR #10](https://github.com/ManoloRemiddi/augmentor-agent/pull/10).
+The DMG is `augmentor-desktop-0.2.12-macos-arm64-preview.dmg`, 508,240,784 bytes,
+SHA-256 `058a0920e4da753593372a7d499d980b7672590e8499cf929371460b459db8e4`.
+The application inventory SHA-256 is
+`360bec0babc8fe6b18ec29fb8e51874407ccd6aa6252b8b80397e6a3d1a4377b`.
+
+Both final-source workflows passed: [macOS 14/26 build and managed setup](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36244110988)
+and [Linux, Home, Browser and installed-package lifecycle](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36244111028).
+On the 16 GB ARM64 Mac Mini running macOS 26.5.1, the final bundle also passed
+fresh managed setup, all three extra plugins active, actual native Send/Enter
+submissions across reopening, conversation restoration and Chrome 153 chat through
+the compiled native host. These checks used a deterministic local provider and
+an isolated private profile. Native sharp/libvips PNG creation/readback passed.
+
+The final DMG passed mount/copy into a Unicode path, actual LaunchServices launch,
+Qt/DSH approval allow/reject/cancel, question and conversation checks, and an
+intact app signature after use. The Qt library-replacement proof below used the
+preceding candidate with identical Qt inputs and staging policy. Published
+`BUILD-AND-TESTS.json` preserves that distinction. Open Anyway consent, manual
+browser folder selection, physical speech and complete privacy-permission flows
+are not claimed as tested.
+
+Temporary test applications, their application registrations and completed
+fixture login jobs were removed after verifying their processes had stopped.
+The owner's one installed application remained unchanged and online/model-ready;
+its private model profile is not part of the release.
+
+## Publication verification
+
+The release was published at 13:24 UTC on September 26, 2026 as a prerelease,
+without replacing the existing Linux release. All eight release asset names,
+sizes and server-side SHA-256 digests matched the prepared publication files.
+An anonymous download of the complete 508,240,784-byte DMG and `SHA256SUMS`
+finished at 13:28 UTC; the downloaded DMG matched the final checksum above.
+Public Mac and Linux download destinations returned HTTP 200.
+
+Website commit `bd205bb` deployed successfully through
+[GitHub Pages](https://github.com/ManoloRemiddi/augmentoragent.com/actions/runs/36245144362);
+its [website checks](https://github.com/ManoloRemiddi/augmentoragent.com/actions/runs/36245144697)
+also passed. The live homepage and Mac guide showed the correct versioned DMG,
+Apple-silicon/macOS requirements, Open Anyway instructions and preview limits.
+Guide navigation and its rendered layout were checked in the browser. The existing
+Linux prompt retained its matching URLs; its live copy button reported success.
+Clipboard-content readback is not claimed for this verification.
+Subsequent documentation-only commits record this outcome; they do not change
+the published binary or the tested website interface.
+
+## Earlier candidate evidence
 
 The `6c7735e` candidate passed macOS 14 and 26 CI build/managed setup matrices
 ([run 36243551473](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36243551473)).
@@ -99,6 +150,7 @@ locked Rust notices, plus accurate Mac update-panel text, before final packaging
 Gatekeeper correctly rejects this ad-hoc build by default. A user must approve
 Open Anyway; the actual consent dialog and browser folder chooser are not claimed
 as automated acceptance. Full production permission and updater gates remain.
-The shared Home CI had a timing-sensitive 100 ms deadline fixture fail before
+The earlier shared Home CI had a timing-sensitive 100 ms deadline fixture fail before
 its expected device dispatch; this is separate from the successful Mac and
-Browser checks, and must be recorded when assessing whole-project CI.
+Browser checks. The final-source full workflow passed as recorded above; no Home
+code was changed and the earlier timing sensitivity is not claimed resolved.

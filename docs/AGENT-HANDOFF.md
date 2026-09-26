@@ -2,20 +2,31 @@
 
 # Start here: agent handoff
 
-## September 26 Apple-independent preview preparation
+## September 26 public Apple-independent macOS preview
 
 The owner approved publishing a clearly labelled macOS preview without Developer
-ID or notarization after Apple enrollment failed. Continue the release; do not
-ask again for that choice. [Preview release](MACOS-PREVIEW-RELEASE.md) owns the
-updated scope, source archives, browser setup and remaining qualification.
-The plugin-enabled candidate passed actual isolated managed DSH startup, all
-three plugins active, chat and conversation restoration on the 16 GB Mac. The
-plugin/browser/Widgets candidate passed real native Send/reopen and Chrome chat,
-DMG copy/launch/seal and library replacement checks; see the release record. No public Mac asset or
-website download has been published at this checkpoint. The personal installed
-Mac app remains separate and unchanged.
+ID or notarization after Apple enrollment failed; do not ask again for that
+choice. [Release v0.2.12-macos-preview.1](https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/v0.2.12-macos-preview.1)
+is public for Apple silicon, macOS 14+. [The preview record](MACOS-PREVIEW-RELEASE.md)
+owns exact binary provenance, checksums, source archives, test scope and limits.
+PR #10 is merged; the binary was built from `ea128d6`, before documentation-only
+publication records. Final-source Mac 14/26 and full Linux/Home/Browser/lifecycle
+CI passed. Real native Send/reopen, Chrome native-host chat, managed DSH/plugin
+setup and DMG copy/launch/seal checks passed on the 16 GB Mac with a deterministic
+model. The earlier Qt library-replacement proof is identified separately.
 
-## September 26 public Mac download audit and signing preparation
+[augmentoragent.com](https://augmentoragent.com/#installation) and its
+[Mac guide](https://augmentoragent.com/macos.html) are deployed and verified.
+The complete anonymous DMG download matched its published SHA-256; live platform
+links, guide navigation and the Linux copy-button success state were checked.
+The working personal Mac application and private models remain unchanged; temporary
+proof apps and their registrations were removed. The normal user Open Anyway
+dialog, manual browser folder chooser, physical speech and full privacy-permission
+flows remain unqualified. Automatic updates and complete removal are not available
+in this preview. The following dated checkpoints retain earlier evidence and are
+superseded by this publication record where their status differs.
+
+## September 26 public Mac download audit and signing preparation — historical
 
 The owner requested a macOS download on augmentoragent.com. The fresh audit
 found that the working personal install remains an ad-hoc development build;
