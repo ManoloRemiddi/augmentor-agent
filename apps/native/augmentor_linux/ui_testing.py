@@ -34,6 +34,18 @@ def dispatch(window, request, *, enabled=False):
         if not window.grab().save(str(path),'PNG'):
             path.unlink();raise ValueError('Could not capture the app window.')
         return {'captured':True}
+    if action=='draft':
+        expected=request.get('expected');text=request.get('text')
+        if (not isinstance(expected,str) or not isinstance(text,str) or len(text)>2000
+                or not text.isascii() or window.composer.toPlainText()!=expected
+                or bool(controller and (controller.running or controller.navigating or controller.repairing))
+                or window.editing or window.composer.improving or any(d.isVisible() for d in window.findChildren(QDialog))):
+            raise ValueError('Draft proof requires an idle window and the exact expected draft.')
+        from PySide6.QtTest import QTest
+        window.composer.setFocus();window.composer.selectAll()
+        QTest.keyClick(window.composer,Qt.Key.Key_Backspace)
+        QTest.keyClicks(window.composer,text)
+        return {'draft':window.composer.toPlainText()}
     if action=='send':
         text=request.get('text');via=request.get('via','button')
         if not isinstance(text,str) or not text or len(text)>2000 or not text.isascii():

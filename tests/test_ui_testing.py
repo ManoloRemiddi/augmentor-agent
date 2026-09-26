@@ -14,9 +14,20 @@ class UiTestingTests(unittest.TestCase):
     def setUpClass(cls):cls.app=QApplication.instance() or QApplication([])
 
     def test_disabled_launch_rejects_every_operation_without_touching_window(self):
-        for action in ['inspect','send','capture']:
+        for action in ['inspect','send','capture','draft']:
             with self.assertRaisesRegex(ValueError,'disabled'):
                 dispatch(None,{'action':action})
+
+    def test_draft_control_requires_exact_expected_input(self):
+        window=Window(preview=True)
+        try:
+            window.composer.setPlainText('preserve')
+            with self.assertRaisesRegex(ValueError,'exact expected'):
+                dispatch(window,{'action':'draft','expected':'','text':'new'},enabled=True)
+            self.assertEqual(window.composer.toPlainText(),'preserve')
+            result=dispatch(window,{'action':'draft','expected':'preserve','text':'fixture'},enabled=True)
+            self.assertEqual(result,{'draft':'fixture'})
+        finally:window.close()
 
     def test_submission_never_replaces_a_draft_or_operates_behind_a_dialog(self):
         window=Window(preview=True);window.show()
