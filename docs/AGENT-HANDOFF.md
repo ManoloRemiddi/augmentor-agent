@@ -10,8 +10,8 @@ ask again for that choice. [Preview release](MACOS-PREVIEW-RELEASE.md) owns the
 updated scope, source archives, browser setup and remaining qualification.
 The plugin-enabled candidate passed actual isolated managed DSH startup, all
 three plugins active, chat and conversation restoration on the 16 GB Mac. The
-latest source adds the browser setup dialog and trims unused Qt frameworks;
-these changes still need final candidate qualification. No public Mac asset or
+plugin/browser/Widgets candidate passed real native Send/reopen and Chrome chat,
+DMG copy/launch/seal and library replacement checks; see the release record. No public Mac asset or
 website download has been published at this checkpoint. The personal installed
 Mac app remains separate and unchanged.
 

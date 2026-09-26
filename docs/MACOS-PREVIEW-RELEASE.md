@@ -9,7 +9,7 @@ intended stable distribution path. Never disable Gatekeeper globally, remove
 quarantine as an installation instruction, or label an ad-hoc build notarized.
 
 Target: Apple silicon, macOS 14+. Release tag: `v0.2.12-macos-preview.1`.
-Publication is pending final artifact checks. See the bundled
+Publication is pending final artifact transfer and website deployment. See the bundled
 [customer guide](MACOS-PREVIEW.html); the deployed website has a separate Mac guide.
 The existing Debian release is unchanged.
 
@@ -76,3 +76,29 @@ separate. Record a failed Gatekeeper assessment as expected for an unnotarized
 build; it is not evidence of a successful user Open Anyway interaction. The
 builder deliberately leaves `publicReleaseReady: false`; the operator's release
 record must state the tests and preview limitations before publication.
+
+## Release candidate evidence
+
+The `6c7735e` candidate passed macOS 14 and 26 CI build/managed setup matrices
+([run 36243551473](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36243551473)).
+On the 16 GB ARM64 Mac, 89 Mac unit cases passed. Real native processes completed
+Send-button and Enter requests across a reopen, retaining the same conversation;
+a fresh Chrome 153 profile loaded the exact extension ID
+`dgfpmlnbofacjafljfohgmfacobgfjbh` and completed managed DSH chat. All used an isolated
+deterministic model, not private owner configuration. The first combined fixture
+incorrectly reused the identical prompt while asserting it appeared once; unique
+reopen markers corrected the test without changing product chat behavior.
+
+Its DMG passed mount/copy/relocation, actual LaunchServices launch, Qt/DSH approval
+and conversation tests, plus intact signatures after use. Native sharp/libvips
+completed PNG creation/readback. Replacing QtCore from its original wheel, modifying
+framework metadata, renewing an ad-hoc signature and launching Qt Widgets also
+passed in a disposable copy. The release adds ripgrep 15.0.0 / PCRE2 10.45 and
+locked Rust notices, plus accurate Mac update-panel text, before final packaging.
+
+Gatekeeper correctly rejects this ad-hoc build by default. A user must approve
+Open Anyway; the actual consent dialog and browser folder chooser are not claimed
+as automated acceptance. Full production permission and updater gates remain.
+The shared Home CI had a timing-sensitive 100 ms deadline fixture fail before
+its expected device dispatch; this is separate from the successful Mac and
+Browser checks, and must be recorded when assessing whole-project CI.

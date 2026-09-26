@@ -44,7 +44,9 @@ def main():
             self.send_header('Content-Type', 'text/event-stream' if body.get('stream') else 'application/json')
             self.end_headers()
             if body.get('stream'):
-                for delta, finish in [({'role': 'assistant', 'content': 'Managed setup verified.'}, None), ({}, 'stop')]:
+                latest = next((m for m in reversed(body.get('messages', [])) if m.get('role') == 'user'), {})
+                answer = 'Managed setup reopened.' if 'Managed setup reopened' in json.dumps(latest) else 'Managed setup verified.'
+                for delta, finish in [({'role': 'assistant', 'content': answer}, None), ({}, 'stop')]:
                     event = {'id': 'fixture', 'object': 'chat.completion.chunk', 'created': 1, 'model': 'fixture',
                              'choices': [{'index': 0, 'delta': delta, 'finish_reason': finish}]}
                     self.wfile.write(('data: '+json.dumps(event)+'\n\n').encode()); self.wfile.flush()

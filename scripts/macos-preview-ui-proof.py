@@ -48,7 +48,7 @@ def verify(root, work, out):
             wait(lambda:ipc.exists())
             args=[str(root/'python/bin/python3'),'-I','-B',str(root/'scripts/macos-live-chat-proof.py'),
                 '--app-root',str(root),'--out',str(out/('desktop-reopened' if previous else 'desktop-first')),
-                '--instance','release-proof','--marker','Managed setup verified','--submit','enter' if previous else 'button',
+                '--instance','release-proof','--marker','Managed setup reopened' if previous else 'Managed setup verified','--submit','enter' if previous else 'button',
                 '--native-socket',str(ipc),'--live']
             if previous:args += ['--previous-marker','Managed setup verified']
             subprocess.run(args,env=environment,check=True,timeout=180)
