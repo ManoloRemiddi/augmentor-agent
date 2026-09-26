@@ -88,3 +88,43 @@ host, interaction, branching, execution recovery and memory lifecycle tests are
 retained. Tests use fixture models unless explicitly identified as live.
 Deployment and actual conversation evidence is recorded below after cutover;
 source tests alone do not claim an installed update or a physical sleep trial.
+
+## Installed qualification — 26 September 2026
+
+The private Linux/NAS application now consumes this product service instead of
+its former copied host and polling connector. Source implementation starts at
+`938d027`, with managed-directory asset correction `57b35c3` and internal
+settings-navigation correction `f65cd2c`. A compatible 0.2.11 candidate was
+built from the previous selected immutable release; this is not represented as
+a complete source 0.2.12 upgrade. Final selection is
+`20260926-093632-bb4001cb`. The embedding service runs the selected artifact;
+existing native windows were left on their earlier compatible releases.
+
+Read-only live DSH verification used direct application tools, recognized the
+assigned job and selected dashboard page, and reported actual connected and
+unconnected data sources. No shell discovery was used. The owner's unfinished
+conversation kept every original persisted record and its ID; one DSH lifecycle
+record was appended on reopen. A native branch kept the profile and memory
+identity. The Stop control produced a user-aborted turn. Original settings were
+opened through the host UI. A compatible Resonant Voice 0.1.17 specialist ticket
+handshake passed without changing the running speech companion or placement.
+
+Forced embedding-service and SSH-tunnel termination recovered automatically
+with the original chat selection and a visually verified unsent draft. No
+unknown model action was replayed. These are process/connection fault tests,
+not a physical suspend/resume or microphone/playback trial.
+
+Source qualification: 56 relevant existing Node tests, three new workspace
+embedding tests, 11 Python branch tests, and 35 voice-package tests. The host
+application's 62 regression tests also passed. The first voice run lacked its
+worktree dependency link; after provisioning the pinned dependencies all 35
+passed. An installed-only asset-root failure and settings-anchor routing defect
+were corrected in source and promoted through new staged artifacts, never by
+editing selected files.
+
+Deployment incident: an orchestration shell continued after an active-work
+check failed, interrupting an unrelated DSH turn. It was reported to the owner;
+the harness was restored, the interruption was verified, and that work was not
+replayed. Follow-up commands fail immediately on errors. This deployment
+incident is not described as safe idle restart evidence. Product/tunnel fault
+tests did not restart the shared DSH harness.
