@@ -39,16 +39,16 @@ and configured credentials. A fixture without a key also exposed the pinned
 pi-ai adapter's key requirement; the fixture now saves its synthetic credential
 through DSH's own credentials API before testing chat.
 
-This section describes the new source/candidate, not an installed update yet.
+The following evidence qualified the source/candidate before activation.
 The real engine-first proof passed in 11.171 seconds with a credential saved
 through the DSH API, completed chat, unchanged repeat setup, service restart,
 restored history and fresh browser login after restart. Its temporary LaunchAgent
 and shared helpers were stopped. Native Qt renders of initial setup, running DSH
 without a model, and persistent chat navigation were visually inspected.
-The next deployment record must identify the exact source and qualified artifact.
-The following sections are historical evidence for the earlier installed form.
+The qualification and activation record below identifies the installed artifact.
+The later sections retain historical evidence for the earlier form.
 
-## Qualified replacement, awaiting closure of the installed desktop
+## Qualified replacement and activation
 
 Application source is `60413de`. A separate candidate overlays eleven recorded
 application/document files on the earlier public `ea128d6` binary; its exact
@@ -61,25 +61,47 @@ The currently installed older application also retains a valid integrity seal.
 The 112 Mac tests were rerun at this source and passed. The 27 native-window
 and 11 transport tests passed; the setup tests are included in the Mac suite.
 
-The [Mac 14/26 workflow](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36254337861)
-and [full validation workflow](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36254337856)
-are additional clean-build checks at `60413de`; their status must be read before
-claiming completion. Native Qt screenshots verified setup before installation,
-running without a model, and visible chat navigation. Browser UI checks used
-the Browser skill and a temporary tunnel; the test tab and tunnel were closed.
-All owned fixture jobs and shared helpers were drained. No private model key was
-copied from another machine or used in these tests.
+The [Mac 14/26 workflow at `33b58ff`](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36254590085)
+and [full validation workflow at `33b58ff`](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36254590084)
+both passed. That follow-up changes documentation only; application code remains
+`60413de`. The earlier `60413de` runs were cancelled by the follow-up push before
+completion. Native Qt screenshots verified setup before installation, running
+without a model, and visible chat navigation. Browser UI checks used the Browser
+skill and a temporary tunnel; the test tab and tunnel were closed. All owned
+fixture jobs and shared helpers were drained. No private model key was copied
+from another machine or used in these tests.
 
-The older installed application is still open with a setup dialog. The owner
-has been asked to quit it before replacement because it cannot preserve unsent
-form/message input. No new candidate has been activated and no owner DSH
-profile has been created. Do not close that window based only on an idle flag.
-A private installation helper stages the existing installer's atomic replacement,
-checks the candidate inventory and exact source, refuses a live desktop or a
-newly created DSH configuration, and drains only same-user helpers belonging to
-that exact old bundle. It uses the previously approved ad-hoc preview mode,
-then applies the official launcher environment before runtime-only provisioning
-and browser opening. Live owner-model chat remains unqualified.
+### Installed on the 32 GB Mac, September 26
+
+After being told replacement requires closing the old version to avoid losing
+unfinished input, the owner explicitly requested installation. The old window
+was idle with no open dialog and accepted graceful maintenance closure. The first
+installer attempt correctly refused an outstanding application read lease and
+preserved the old app. Its holder was an idle Pi runtime from the exact installed
+bundle, not another preview. The peer PID, executable and zero active turns were
+verified, then its own `host.shutdown` maintenance API drained it. No running
+conversation was stopped and other installations were not touched.
+
+The existing installer then atomically activated the candidate at
+`/Applications/Augmentor Agent Desktop.app`, retaining the previous bundle in a
+hidden backup. It used the previously approved explicit ad-hoc preview mode;
+strict integrity checks remained enabled. Neither Gatekeeper policy nor quarantine
+attributes were changed. The installed inventory and all eleven source overlays
+matched the qualified candidate. Product version remains `0.2.12`, application
+source `60413de`, with the inventory hash recorded above.
+
+Using the official launcher's environment, runtime-only setup provisioned the
+owner's private DSH profile and registered `com.augmentor.Agent.DSH`. The reopened
+native desktop selected DSH, reported online with no connection or restoration
+error, and both DSH and shortcut login services were loaded. Installed integrity
+passed again after use. The authenticated browser handoff was accepted by macOS's
+default browser. This is actual installed service/connection evidence, not a claim
+of visual inspection of the owner's browser window.
+
+The owner has **zero configured models** at this checkpoint. They can choose one
+in DSH's Settings → Models and then test chat; no live owner-model inference is
+claimed. The new visible Agent setup/Open DSH controls are installed. The public
+preview DMG remains unchanged, and PR #13 remains a draft.
 
 ## Earlier form and deployment (superseded UX)
 

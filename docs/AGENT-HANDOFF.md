@@ -2,14 +2,19 @@
 
 # Start here: agent handoff
 
-## September 26 runtime-first Mac setup (current source)
+## September 26 runtime-first Mac setup (installed on the 32 GB Mac)
 
 The owner reported the earlier installed form remained unusable. Fresh diagnosis
 confirmed DSH was bundled but still unprovisioned, and the browser menu omitted
 DSH authentication. Current source separates engine installation from model setup,
 adds persistent Agent setup/Open DSH buttons, and uses DSH's native provider UI.
-Read [current qualification and installed scope](MACOS-GUIDED-DSH-SETUP.md) before
-claiming this candidate is deployed or the owner's model can chat.
+The owner requested activation: application code `60413de` is now installed,
+DSH is provisioned and online, both login services are loaded, and the default
+browser accepted the authenticated DSH opening. Integrity and installed file
+hashes passed. No model is configured yet; live owner-model chat remains
+unqualified. Both clean-build workflows passed at documentation ref `33b58ff`.
+Read [qualification, the drained idle runtime, and installed scope](MACOS-GUIDED-DSH-SETUP.md).
+The public preview DMG is unchanged.
 
 ## September 26 guided Mac DSH installation
 
