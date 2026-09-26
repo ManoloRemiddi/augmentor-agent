@@ -134,43 +134,42 @@ class ActivityHalo(QObject):
                           'travel':travel}
 
     def prepare_geometry(self, rect):
-        key = (self.canvas.width(), self.canvas.height(), *rect.getRect())
+        dpr = self.canvas.devicePixelRatioF()
+        key = (self.canvas.width(), self.canvas.height(), dpr, *rect.getRect())
         if key == self.geometry_key:
             return
         self.geometry_key = key
-        # Only sample the narrow exterior band. Bound the CPU work for large
-        # windows; Qt smoothly upsamples the texture, just like the web veil.
-        scale = max(4., (rect.width() + rect.height()) / 360)
+        # Resolve thin strands independently of the coarser transport grid.
+        # Modest supersampling on high-DPI screens improves their coverage;
+        # cap it and the total area so animation cannot starve the GUI thread.
+        scale = max(1. / min(dpr, 1.25), math.sqrt(self.canvas.width()*self.canvas.height()/1_000_000))
         self.image_width = math.ceil(self.canvas.width() / scale)
         self.image_height = math.ceil(self.canvas.height() / scale)
-        sx = self.canvas.width() / self.image_width
-        sy = self.canvas.height() / self.image_height
+        self.flow_scale = max(4., (rect.width() + rect.height()) / 360)
+        self.flow_width = math.ceil(self.canvas.width() / self.flow_scale)
+        self.flow_height = math.ceil(self.canvas.height() / self.flow_scale)
         cx, cy = rect.center().x(), rect.center().y()
-        radius=min(rect.width(),rect.height())/2 if self.window.compact else 20
-        bx, by = rect.width() / 2 - radius, rect.height() / 2 - radius
+        radius = min(rect.width(), rect.height())/2 if self.window.compact else 20
+        bx, by = rect.width()/2-radius, rect.height()/2-radius
 
         def distance(x, y):
-            qx, qy = abs(x - cx) - bx, abs(y - cy) - by
-            return math.hypot(max(qx, 0), max(qy, 0)) + min(max(qx, qy), 0) - radius
+            qx, qy = np.abs(x-cx)-bx, np.abs(y-cy)-by
+            return np.hypot(np.maximum(qx, 0), np.maximum(qy, 0)) + np.minimum(np.maximum(qx, qy), 0) - radius
 
-        self.samples = [];self.outer_samples = [[],[],[],[]]
-        self.distance_grid=np.zeros((self.image_height,self.image_width),np.float32)
-        for row in range(self.image_height):
-            y = (row + .5) * sy
-            for col in range(self.image_width):
-                x = (col + .5) * sx
-                d = distance(x, y)
-                self.distance_grid[row,col]=max(0.,d)
-                if -scale <= d < self.extent:
-                    # Fade at the outer window boundary as well as from the
-                    # rounded panel, so no rectangular clipping edge appears.
-                    fade = min(1., max(0., min(x, y, self.canvas.width()-x,
-                                              self.canvas.height()-y) / 20))
-                    pixel=((row*self.image_width+col)*4,x,y,max(0.,d),fade)
-                    if d<self.near_extent:self.samples.append(pixel)
-                    else:
-                        for side,normal in enumerate((rect.top()-y,x-rect.right(),y-rect.bottom(),rect.left()-x)):
-                            if normal>0:self.outer_samples[side].append(pixel)
+        y, x = np.mgrid[:self.image_height, :self.image_width].astype(np.float32)
+        x = (x+.5)*(self.canvas.width()/self.image_width)
+        y = (y+.5)*(self.canvas.height()/self.image_height)
+        d = distance(x, y)
+        indices = np.flatnonzero((d >= -scale) & (d < self.extent))
+        x, y, d = x.ravel()[indices], y.ravel()[indices], d.ravel()[indices]
+        fade = np.clip(np.minimum.reduce((x, y, self.canvas.width()-x, self.canvas.height()-y))/20, 0, 1)
+        self.samples = (indices, x, y, np.maximum(0, d), fade)
+        self.near_samples = np.flatnonzero(d < self.near_extent)
+        self.outer_samples = [np.flatnonzero((d >= self.near_extent) & (normal > 0))
+                              for normal in (rect.top()-y, x-rect.right(), y-rect.bottom(), rect.left()-x)]
+        fy, fx = np.mgrid[:self.flow_height, :self.flow_width].astype(np.float32)
+        self.distance_grid = np.maximum(0, distance((fx+.5)*self.canvas.width()/self.flow_width,
+                                                  (fy+.5)*self.canvas.height()/self.flow_height))
         self.glyphs = []
         symbols = '0123456789ABCDEF+-*/<>=&|#%$!:.,'
         for y in range(3, self.canvas.height(), 8):
@@ -185,13 +184,13 @@ class ActivityHalo(QObject):
         self.prepare_geometry(rect)
         t = self.phase if self.animated else 0.
         key = (self.geometry_key, t, self.breath_phase, accent.rgba(),
-               self.canvas.x(),self.canvas.y(),self.pointer.x(),self.pointer.y(),
+               self.canvas.x(), self.canvas.y(), self.pointer.x(), self.pointer.y(),
                tuple(self.flare.values()) if self.flare else None)
         if key == self.frame_key:
             return
         self.frame_key = key
-        data = bytearray(self.image_width*self.image_height*4)
-        sample = self.noise.sample
+        data = np.zeros((self.image_height*self.image_width, 4), np.uint8)
+        sample = self.noise.sample_array
         breath = .5-.5*math.cos(self.breath_phase) if self.animated else .5
         hue, saturation, value, _ = accent.getHsvF()
         tint = QColor.fromHsvF(max(0., hue), min(1., saturation*(.8+.7*breath)),
@@ -203,77 +202,80 @@ class ActivityHalo(QObject):
             flare = self.flare
             progress = (t-flare['start'])/flare['duration']
             if 0 <= progress < 1:
-                # Tangentially broad, with a crest travelling out of the band.
                 side = flare['side']
                 along = (rect.left()+rect.width()*flare['position'] if side in (0, 2)
                          else rect.top()+rect.height()*flare['position'])
                 eruption = (side, along, flare['width'], 2+flare.get('travel',43)*math.sin(progress*math.pi)**.8,
                             math.sin(math.pi*progress)**1.3)
-        # Independent evolving fields bend the broad texture in
-        # different directions. There is no perimeter coordinate or orbit.
-        pixels=self.samples
+        pixels = self.near_samples
         if eruption:
-            side,along,width,crest,intensity=eruption
-            far=[pixel for pixel in self.outer_samples[side]
-                 if abs((pixel[1] if side in (0,2) else pixel[2])-along)<width*2.5]
-            pixels=self.samples+far
-        for index, x, y, distance, fade in pixels:
-            alpha=0.;fine=.4;ridge=0.
-            if distance < self.near_extent:
-                px, py = x*.075, y*.075
-                q = sample(px*.43 + t*1.65, py*.43 - t*.95)
-                r = sample(px*.39 - t*1.1 + 37, py*.39 + t*1.45 + 71)
-                u, v = px + 16*q, py + 16*r
-                cloud = sample(u + t*1.7, v - t*2.1)
-                fine = sample(u*1.6 - t*2.2 + 19, v*1.6 + t*.85)
-                # Filament crests echo the browser's refracting frost veins.
-                ridge = max(0., 1-abs(cloud + .16*fine - .58)*6)**2
-                local_breath = .7+.6*sample(px*.6 + t*.8 + 81, py*.6-t*.5)
-                reach = 5 + 29*q*local_breath
-                envelope = math.exp(-(distance/reach)**2*1.9)*fade
-                alpha = envelope * (.025 + .19*cloud + .55*ridge) * breathing_alpha * local_breath
-            flare_light = 0.
-            if eruption:
-                side, along, width, crest, intensity = eruption
-                tangent = (x if side in (0, 2) else y)-along
-                normal = (rect.top()-y, x-rect.right(), y-rect.bottom(), rect.left()-x)[side]
-                if normal >= -2 and abs(tangent) < width*2.5:
-                    # Two rooted, uneven strands form a solar arch, not a
-                    # detached blob. Width and density fall with distance.
-                    height=max(1.,crest)
-                    fraction=max(0.,min(1.,normal/height))
-                    bend=height*.13*math.sin(math.pi*fraction)*(math.sin(fraction*4.7+t*1.4)+.35*math.sin(fraction*9.1-t*2.1))
-                    radius=width*.65*math.sqrt(max(0.,1-fraction))
-                    strand_width=1.6+4.8*(1-fraction)**1.5
-                    left=(tangent-bend-radius)/strand_width
-                    right=(tangent-bend+radius*.82)/strand_width
-                    strands=math.exp(-left*left)+.8*math.exp(-right*right)
-                    cap=math.exp(-(max(0.,normal-height)/strand_width)**2)
-                    detail=.65+.35*sample(normal*.18+t*1.7,tangent*.08-t*1.1+23)
-                    density=(1-.72*fraction)*math.exp(-max(0.,normal)/160)
-                    root=math.exp(-(tangent/(width*.7))**2-(normal/12)**2)*.35
-                    flare_light=(strands*cap*density*detail+root)*intensity*fade
-                    alpha += flare_light*.75
-            if alpha<.002:continue
-            light = .66 + .28*fine + .35*ridge + .4*flare_light
-            # Distant plasma loses saturation as it becomes tenuous.
-            desaturate=min(.78,max(0.,distance-16)/self.extent) if flare_light else 0.
-            grey=(red+green+blue)/3
-            data[index] = min(255,int((red+(grey-red)*desaturate)*light))
-            data[index+1] = min(255,int((green+(grey-green)*desaturate)*light))
-            data[index+2] = min(255,int((blue+(grey-blue)*desaturate)*light))
-            data[index+3] = min(200, int(255*alpha))
+            side, along, width, crest, intensity = eruption
+            far = self.outer_samples[side]
+            tangent = self.samples[1 if side in (0, 2) else 2][far]-along
+            pixels = np.concatenate((pixels, far[np.abs(tangent) < width*2.5]))
+        indices, x, y, distance, fade = (column[pixels] for column in self.samples)
+        alpha = np.zeros(len(pixels), np.float32)
+        fine = np.full(len(pixels), .4, np.float32)
+        ridge = np.zeros(len(pixels), np.float32)
+        near = distance < self.near_extent
+        # Vectorized evaluation retains the original field, colours and timing;
+        # Python no longer runs the noise function six times for every pixel.
+        px, py = x[near]*.075, y[near]*.075
+        q = sample(px*.43+t*1.65, py*.43-t*.95)
+        r = sample(px*.39-t*1.1+37, py*.39+t*1.45+71)
+        u, v = px+16*q, py+16*r
+        cloud = sample(u+t*1.7, v-t*2.1)
+        fine[near] = sample(u*1.6-t*2.2+19, v*1.6+t*.85)
+        ridge[near] = np.maximum(0, 1-np.abs(cloud+.16*fine[near]-.58)*6)**2
+        local_breath = .7+.6*sample(px*.6+t*.8+81, py*.6-t*.5)
+        reach = 5+29*q*local_breath
+        envelope = np.exp(-(distance[near]/reach)**2*1.9)*fade[near]
+        alpha[near] = envelope*(.025+.19*cloud+.55*ridge[near])*breathing_alpha*local_breath
+        flare_light = np.zeros(len(pixels), np.float32)
+        if eruption:
+            side, along, width, crest, intensity = eruption
+            tangent = (x if side in (0, 2) else y)-along
+            normal = (rect.top()-y, x-rect.right(), y-rect.bottom(), rect.left()-x)[side]
+            mask = (normal >= -2) & (np.abs(tangent) < width*2.5)
+            n, tang = normal[mask], tangent[mask]
+            height = max(1., crest)
+            fraction = np.clip(n/height, 0, 1)
+            bend = height*.13*np.sin(math.pi*fraction)*(np.sin(fraction*4.7+t*1.4)+.35*np.sin(fraction*9.1-t*2.1))
+            radius = width*.65*np.sqrt(np.maximum(0, 1-fraction))
+            strand_width = 1.6+4.8*(1-fraction)**1.5
+            left, right = (tang-bend-radius)/strand_width, (tang-bend+radius*.82)/strand_width
+            strands = np.exp(-left*left)+.8*np.exp(-right*right)
+            cap = np.exp(-(np.maximum(0, n-height)/strand_width)**2)
+            detail = .65+.35*sample(n*.18+t*1.7, tang*.08-t*1.1+23)
+            density = (1-.72*fraction)*np.exp(-np.maximum(0, n)/160)
+            root = np.exp(-(tang/(width*.7))**2-(n/12)**2)*.35
+            flare_light[mask] = (strands*cap*density*detail+root)*intensity*fade[mask]
+            alpha += flare_light*.75
+        light = .66+.28*fine+.35*ridge+.4*flare_light
+        desaturate = np.where(flare_light > 0, np.clip((distance-16)/self.extent, 0, .78), 0)
+        grey = (red+green+blue)/3
+        for channel, colour in enumerate((red, green, blue)):
+            data[indices, channel] = np.clip((colour+(grey-colour)*desaturate)*light, 0, 255).astype(np.uint8)
+        data[indices, 3] = np.minimum(200, 255*alpha).astype(np.uint8)
+        data = data.reshape(self.image_height, self.image_width, 4)
+        source = QImage(data.data, self.image_width, self.image_height, self.image_width*4,
+                        QImage.Format.Format_RGBA8888)
         if self.animated:
-            rgba=np.frombuffer(data,dtype=np.uint8).reshape(self.image_height,self.image_width,4)
-            origin=(self.canvas.x(),self.canvas.y());cell=(self.canvas.width()/self.image_width,self.canvas.height()/self.image_height)
-            pointer=(self.pointer.x()+origin[0],self.pointer.y()+origin[1])
-            dt=self.phase-self.fluid_phase if self.fluid_phase is not None else .04
-            self.fluid_phase=self.phase
-            rendered=self.fluid.step(rgba,origin,cell,dt,pointer,self.distance_grid)
-            self.frame=QImage(rendered.data,self.image_width,self.image_height,self.image_width*4,QImage.Format.Format_RGBA8888_Premultiplied).copy()
+            coarse = source.scaled(self.flow_width, self.flow_height, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                   Qt.TransformationMode.SmoothTransformation)
+            rgba = image_array(coarse)
+            origin = (self.canvas.x(), self.canvas.y())
+            cell = (self.canvas.width()/self.flow_width, self.canvas.height()/self.flow_height)
+            pointer = (self.pointer.x()+origin[0], self.pointer.y()+origin[1])
+            dt = self.phase-self.fluid_phase if self.fluid_phase is not None else .04
+            self.fluid_phase = self.phase
+            rendered = self.fluid.step(rgba, origin, cell, dt, pointer, self.distance_grid)
+            transported = QImage(rendered.data, self.flow_width, self.flow_height, self.flow_width*4,
+                                 QImage.Format.Format_RGBA8888_Premultiplied)
+            self.frame = restore_emission_detail(source, coarse, transported)
         else:
-            self.fluid=FluidField();self.fluid_phase=None
-            self.frame=QImage(bytes(data),self.image_width,self.image_height,self.image_width*4,QImage.Format.Format_RGBA8888).copy()
+            self.fluid = FluidField(); self.fluid_phase = None
+            self.frame = source.copy()
 
     def paint_backdrop(self,painter,rect,accent):
         if self.effect in ("butterflies", "butterflies-large"):return
@@ -320,6 +322,32 @@ class ActivityHalo(QObject):
         painter.restore()
 
 
+def image_array(image):
+    """A borrowed RGBA view; callers retain the owning QImage."""
+    return np.frombuffer(image.constBits(), np.uint8).reshape(image.height(), image.bytesPerLine()//4, 4)[:, :image.width()]
+
+
+def restore_emission_detail(source, coarse, transported):
+    """Keep coarse smoke transport, restore the emission lost to its grid.
+
+    This is a visual multiresolution field: the fluid transports broad wakes;
+    the current analytic emission supplies fine strands. Work in premultiplied
+    colour throughout so faint edges cannot acquire dark or coloured fringes.
+    """
+    fmt = QImage.Format.Format_RGBA8888_Premultiplied
+    size = source.size()
+    upsample = lambda image: image.scaled(size, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                         Qt.TransformationMode.SmoothTransformation)
+    fine = source.convertToFormat(fmt)
+    base = upsample(transported)
+    low = upsample(coarse.convertToFormat(fmt))
+    result = image_array(base).astype(np.int16) + image_array(fine).astype(np.int16) - image_array(low).astype(np.int16)
+    result = np.clip(result, 0, 255).astype(np.uint8)
+    result[..., :3] = np.minimum(result[..., :3], result[..., 3, None])
+    result[[0, -1], :] = 0; result[:, [0, -1]] = 0
+    return QImage(result.data, size.width(), size.height(), size.width()*4, fmt).copy()
+
+
 class FlowNoise:
     """Smooth, seeded multiscale field, generated once without extra libraries.
 
@@ -342,6 +370,17 @@ class FlowNoise:
                     a, b = grid[iy*cells+ix], grid[iy*cells+(ix+1)%cells]
                     c, d = grid[((iy+1)%cells)*cells+ix], grid[((iy+1)%cells)*cells+(ix+1)%cells]
                     self.values[y*self.size+x] += weight*((a+(b-a)*fx)*(1-fy)+(c+(d-c)*fx)*fy)
+
+        self.array = np.asarray(self.values, np.float32)
+
+    def sample_array(self, x, y):
+        ix, iy = np.floor(x).astype(np.int32), np.floor(y).astype(np.int32)
+        fx, fy = x-ix.astype(np.float32), y-iy.astype(np.float32)
+        ix, iy = ix & 127, iy & 127
+        nx, ny = (ix+1) & 127, (iy+1) & 127
+        a, b = self.array[iy*128+ix], self.array[iy*128+nx]
+        c, d = self.array[ny*128+ix], self.array[ny*128+nx]
+        return (a+(b-a)*fx)*(1-fy)+(c+(d-c)*fx)*fy
 
     def sample(self, x, y):
         ix, iy = math.floor(x), math.floor(y)

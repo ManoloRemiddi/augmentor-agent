@@ -139,3 +139,5 @@ files available only in a developer's working directory.
 - [macOS preview release](MACOS-PREVIEW-RELEASE.md) — Apple-independent preview, source artifacts and qualification.
 - [Mac customer guide](MACOS-PREVIEW.html) — install, model connection and browser extension.
 - [Mac library replacement](MACOS-LIBRARY-REPLACEMENT.md) — LGPL source and installation material.
+
+- [Shared desktop flare fidelity](FLARE-FIDELITY.md): sampling correction, bounded fluid transport and Mac/Linux validation.

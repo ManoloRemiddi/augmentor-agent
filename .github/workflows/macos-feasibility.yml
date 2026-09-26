@@ -54,6 +54,9 @@ jobs:
           .macos-build-env/bin/python3 -m unittest discover -s tests -p 'test_macos*.py' -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_dsh_payload_staging.py -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_prompt_client_startup.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_activity.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_fluid.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_window.py -v
       - name: Package and verify development bundle
         run: |
           .macos-build-env/bin/python3 scripts/package-macos.py --out outputs/macos

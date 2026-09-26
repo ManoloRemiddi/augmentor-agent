@@ -2,6 +2,14 @@
 
 # Start here: agent handoff
 
+## September 26 shared flare rendering correction
+
+[Flare fidelity](FLARE-FIDELITY.md) records the coarse-texture root cause and the
+shared detailed-emission/bounded-fluid correction. Both platforms use the same
+renderer; no UI layout changed. Read its installed-artifact section before
+assuming source changes have reached an open app. The earlier one-product audit
+remains an analysis of the still-pending shortcut and release convergence gaps.
+
 ## September 26 one-product architecture direction and parity audit
 
 The owner requires one Augmentor product across OSs, with common features and UI
