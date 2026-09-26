@@ -4,8 +4,14 @@ Current OS parity direction and verified gaps: [one-product architecture audit](
 The tables below compare harnesses and presentation surfaces; they do not establish
 Linux/macOS parity. Mac's second-instance shortcut remains an implementation gap.
 
+Mac setup correction (26 September, current source): install/start DSH before
+model setup, Agent setup/Open DSH actions in the three-dot menu, authenticated browser
+handoff, native DSH provider settings. See [qualification and deployment](MACOS-GUIDED-DSH-SETUP.md).
 
-Mac setup update (26 September): current source has a separate
+Mac frameless-window resizing now falls back to pointer geometry when Cocoa
+declines native resize; see [behavior and evidence](WINDOW-RESIZING.md).
+
+Earlier Mac setup update (26 September): source added a separate
 [managed runtime/model form](MACOS-MANAGED-SETUP.md) for fresh bundled desktops.
 External DSH setup below remains available. Basic setup, chat and restart passed
 an isolated real Mac/DSH fixture; the public signed app, additional plugins and

@@ -2,24 +2,27 @@
 
 # Managed Mac first run
 
-This is source implementation and isolated fixture qualification, not a public
-release or a change to the owner's working Mac. It addresses the basic
-runtime/model bootstrap gap found in the [publication audit](MACOS-DISTRIBUTION.md#september-26-publication-audit).
+The managed runtime ships in the [0.2.12 Mac preview](MACOS-PREVIEW-RELEASE.md).
+The guided first-run correction below is newer source; its deployment and test
+record is in [guided DSH setup](MACOS-GUIDED-DSH-SETUP.md). Earlier dated fixture
+evidence remains below.
 
 ## User flow
 
-A fresh bundled Mac desktop with no saved DSH connection offers **Set up
-Augmentor**. The user supplies an OpenAI-compatible API address, model name,
-API key and context window. **Connect** sends a short model test, creates a
-private runtime profile, installs the checked product integration, starts a
-login service and reconnects the desktop. This path needs no separate DSH,
-Python or Node install, terminal command or manual DSH restart.
+A fresh bundled Mac desktop immediately opens **Agent setup**. First click
+**Install and start DSH**; no model credentials or server URL are required.
+The existing installer prepares the private profile, adds Augmentor integration,
+starts the login service and verifies the saved connection. Then use **Open DSH
+in browser** to choose a provider in DSH's own **Settings → Models**. If its initial
+DeepSeek key prompt appears, **Configure later** allows other providers.
+Return to Augmentor and **Check connection**, then send a short message to verify
+the selected model. A configured key is not proof that an inference will succeed.
 
-The app must first be copied into `/Applications` or the user's `Applications`
-directory. **Use existing DSH** retains the external connection form. A saved
-connection keeps using that form; managed setup refuses to adopt or replace it.
-The initial form supports OpenAI-compatible chat APIs. Other protocols, OAuth,
-provider editing and required extra-plugin provisioning remain separate work.
+**Agent setup** and **Open DSH in browser** are in the chat window’s three-dot
+menu. Browser opening handles DSH's local authentication and resumes an owned stopped service.
+The app must be copied into `/Applications` or the user's `Applications` directory.
+**Advanced: connect an existing DSH** retains the external editor. An existing
+external profile is never adopted or overwritten by managed installation.
 
 Opening an app from a disk image or temporary build folder must not register a
 login shortcut pointing at that temporary path. Automatic shortcut bootstrap now
@@ -28,11 +31,13 @@ an already-running shortcut owner remains available. The focused regression
 verifies refusal before the registrar can run. Signed mounted-image user-flow
 acceptance is still required.
 
-The form blocks duplicate submissions and dismissal during setup, refuses an
-active conversation action, preserves fields on failure and clears the key on
-success. The desktop reconnects only after the service and product presets pass
-their checks. The GUI sends configuration through private subprocess stdin;
-an unknown worker result is not automatically replayed.
+Setup blocks duplicate submissions and dismissal during provisioning, refuses
+configuration changes during an active conversation, and keeps retry available
+on failure. The desktop reconnects only after the service and product presets
+pass their checks. The worker accepts an explicit runtime-only request through
+stdin; the older model/probe request remains supported for existing automation.
+An unknown worker result is not automatically replayed. Runtime-only retries
+preserve model edits and previously supplied private keys.
 
 ## Ownership and lifecycle
 

@@ -32,6 +32,38 @@ class Remote:
         request=urllib.request.Request(self.base+path,data=data,headers={'Content-Type':'application/json',**(headers or {})})
         try:return self.opener.open(request,timeout=20)
         except urllib.error.HTTPError as e:return e
+    def browser_url(self):
+        """A fresh native-to-browser login handoff, never a cached launch token.
+
+        The browser exchanges DSH's process token for its own HttpOnly cookie.
+        Callers must not persist, log or display this credential-bearing URL.
+        """
+        try:secret=(self.home/'augmentor-ws-token').read_text().strip()
+        except OSError:secret=''
+        with self.request('/api/augmentor/auth',{}, {'x-augmentor-token':secret}) as r:
+            if r.status!=200:raise ValueError('DSH could not open its browser session. Check the Augmentor connection in Agent setup.')
+            token=json.loads(r.read(8192)).get('token')
+        if not isinstance(token,str) or not re.fullmatch('[A-Za-z0-9_-]+',token):raise ValueError('Invalid DSH launch token.')
+        return self.base+'/?token='+quote(token,safe='')
+    def configured_providers(self):
+        """Use DSH's Models page contract, not catalog presence, for setup status.
+
+        Credential describe returns availability only, never a stored key. This
+        checks configuration, not whether a provider accepts an inference call.
+        """
+        active={row['id'] for row in self.invoke('llm/listProviders')}
+        directory=self.invoke('llm/listConfigurableProviders')
+        namespaces={row['ns']:row['value'] for row in self.invoke('settings/describe').get('namespaces',[])}
+        references={}
+        for row in directory:
+            if row['provider'] not in active:continue
+            value=namespaces.get(row['settingsNs'],{})
+            for key in row.get('settingsPath',[]):
+                value=value.get(key,{}) if isinstance(value,dict) else {}
+            ref=value.get('apiKeyEnv') if isinstance(value,dict) else None
+            if ref:references[row['provider']]=ref
+        credentials=self.invoke('credentials/describe',{'refs':list(set(references.values()))}) if references else {}
+        return sorted(provider for provider in active if provider not in references or credentials.get(references[provider],{}).get('configured') is True)
     def authorize(self):
         with self.lock:
             with self.request('/',headers={'Cookie':self.cookie}) as r:
@@ -65,7 +97,7 @@ class Remote:
                 value=json.loads(raw)
                 if value.get('type')!='server-response' or value.get('rpcId')!=identity:raise ValueError('Unexpected DSH response envelope.')
                 if not value.get('result',{}).get('ok'):raise ValueError(value.get('result',{}).get('error',{}).get('message','DSH request failed.'))
-                return value['result']['value']
+                return value['result'].get('value')  # Void RPCs omit value on the wire.
     def stream(self, endpoint, args=None):
         self.authorize()
         sock=websocket.create_connection(self.base.replace('http://','ws://',1)+'/api/remote.mux',timeout=8,suppress_origin=True,header={'Cookie':self.cookie},http_no_proxy=['127.0.0.1','::1'])
