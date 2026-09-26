@@ -33,7 +33,7 @@ def load(name, relative):
 
 
 install = load('mac_install_preflight', 'scripts/install-macos.py')
-first_run = load('mac_first_run', 'apps/native/augmentor_linux/macos_setup.py')
+from augmentor_linux import macos_setup as first_run
 
 
 def incomplete_bundle(directory, version='0.2.8'):
@@ -223,8 +223,9 @@ class IncompleteDialogTests(unittest.TestCase):
         return owner
 
     def test_dialog_explains_the_gap_and_offers_the_download_page(self):
+        owner = self._owner()
         dialog = first_run.MacRuntimeIncompleteDialog(
-            self._owner(),
+            owner,
             'This copy of Augmentor is missing its own built-in runtime: '
             'the bundled DSH runtime.')
         try:
@@ -233,17 +234,25 @@ class IncompleteDialogTests(unittest.TestCase):
             self.assertIn('Open download page', self._buttons(dialog))
             self.assertIn('Use existing DSH instead', self._buttons(dialog))
         finally:
-            dialog.deleteLater()
+            self._dispose(owner)
 
     def test_open_guide_uses_the_documented_page(self):
-        dialog = first_run.MacRuntimeIncompleteDialog(self._owner(), 'incomplete.')
+        owner = self._owner()
+        dialog = first_run.MacRuntimeIncompleteDialog(owner, 'incomplete.')
         try:
             with patch.object(first_run.QDesktopServices, 'openUrl') as opened:
                 dialog.open_guide()
             self.assertEqual(opened.call_args.args[0].toString(),
                              first_run.GUIDE_URL)
         finally:
-            dialog.deleteLater()
+            self._dispose(owner)
+
+    def _dispose(self, owner):
+        # No main event loop runs in this fixture. Drain deferred destruction
+        # before Python/Qt tear down their globals at process exit on macOS.
+        from PySide6.QtCore import QCoreApplication, QEvent
+        owner.close(); owner.deleteLater()
+        QCoreApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
 
     @staticmethod
     def _buttons(dialog):

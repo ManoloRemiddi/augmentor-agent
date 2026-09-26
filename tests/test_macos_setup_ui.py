@@ -22,6 +22,11 @@ class MacSetupUiTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls): cls.app = QApplication.instance() or QApplication([])
 
+    def dispose(self, dialog, owner):
+        from PySide6.QtCore import QCoreApplication, QEvent
+        dialog.close(); owner.close(); owner.deleteLater()
+        QCoreApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
+
     def wait_for(self, check):
         deadline = time.monotonic()+5
         while time.monotonic() < deadline:
@@ -42,7 +47,7 @@ class MacSetupUiTests(unittest.TestCase):
                 self.assertEqual(owner.selected, ('dsh', True))
                 self.assertEqual(worker.call_args.args[0]['apiKey'], 'private-key')
                 self.assertFalse(dialog.key.text())
-        finally: dialog.close(); owner.close()
+        finally: self.dispose(dialog, owner)
 
     def test_active_setup_cannot_dispatch_twice_or_be_dismissed(self):
         owner = Owner(); dialog = MacSetupDialog(owner); released = threading.Event()
@@ -64,7 +69,7 @@ class MacSetupUiTests(unittest.TestCase):
                 self.assertTrue(dialog.connect_button.isEnabled()); self.assertIsNone(owner.selected)
                 self.assertEqual(dialog.connect_button.text(), 'Retry setup')
                 self.assertEqual(dialog.url.text(), 'https://example.test/v1')
-        finally: released.set(); dialog.close(); owner.close()
+        finally: released.set(); self.dispose(dialog, owner)
 
     def test_active_conversation_prevents_configuration_change(self):
         owner = Owner(); owner.controller = SimpleNamespace(running=True, navigating=False)
@@ -74,7 +79,7 @@ class MacSetupUiTests(unittest.TestCase):
             with patch('augmentor_linux.macos_setup.run_setup') as worker:
                 dialog.connect_model(); worker.assert_not_called()
                 self.assertIn('Finish the current action', dialog.note.text())
-        finally: dialog.close(); owner.close()
+        finally: self.dispose(dialog, owner)
 
 
 class SetupWorkerTests(unittest.TestCase):
