@@ -97,7 +97,7 @@ class PromptMenu(QListWidget):
         if not self.catalog.error:
             self.items=matching_prompts(self.catalog.prompts,query)
             for item in self.items:
-                row=QListWidgetItem('/'+item['name']+'  ·  Tab to insert\n'+' '.join(item['content'].split())[:75])
+                row=QListWidgetItem('/'+item['name']+'  ·  Enter or Tab to insert\n'+' '.join(item['content'].split())[:75])
                 row.setToolTip(item['content']);row.setData(Qt.ItemDataRole.UserRole,item['id']);self.addItem(row)
         if not self.items:
             self.addItem(self.catalog.error or ('No matching prompts' if self.catalog.prompts else 'Add prompts in More → Prompt library' if self.catalog.loaded else 'Loading prompts…'))
@@ -130,9 +130,12 @@ class PromptMenu(QListWidget):
         if event.key() in (Qt.Key.Key_Up,Qt.Key.Key_Down):
             delta=1 if event.key()==Qt.Key.Key_Down else -1
             self.setCurrentRow((self.currentRow()+delta)%self.count());return True
-        # Enter always submits the draft; Tab/click explicitly expands a prompt.
-        # This keeps same-named harness commands reachable without renaming prompts.
+        # Expand the selected saved prompt first; a second Enter submits the draft.
         if event.key() in (Qt.Key.Key_Return,Qt.Key.Key_Enter):
+            if self.catalog.pending and not self.catalog.loaded:return True
+            if self.items:
+                if not event.isAutoRepeat():self.choose()
+                return True
             self.hide();return False
         if event.key()==Qt.Key.Key_Tab:
             if not event.isAutoRepeat():self.choose()

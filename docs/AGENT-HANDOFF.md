@@ -2,6 +2,14 @@
 
 # Start here: agent handoff
 
+## September 26 saved-prompt Enter restoration
+
+[Saved prompts](SLASH-COMMANDS.md) again expand into the draft on the first Enter;
+the second Enter sends. Desktop and Browser have separate keyboard handlers and
+both are corrected. Tab/click still expand; Escape followed by Enter preserves
+literal DSH command access when names overlap. See the guide for qualification
+and installed adoption, which is distinct from source publication.
+
 ## September 25 source integration
 
 The user requested merging the composer correction and other ready changes.

@@ -95,19 +95,55 @@ test('an unchanged refresh preserves the pressed completion target',async t=>{
 })
 
 
-test('Enter submits harness commands while Tab selects a same-named prompt',async t=>{
+test('Enter expands saved prompts and the next Enter sends; Escape preserves command access',async t=>{
   const dom=new JSDOM('<textarea></textarea>',{pretendToBeVisual:true});t.after(()=>dom.window.close())
   const win=dom.window,input=win.document.querySelector('textarea'),sent=[]
-  const view=attachPromptLibrary({input,send:async()=>({ok:true,library:{prompts:[{id:'g',name:'goal',content:'Saved goal prompt'}]}})})
+  attachPromptLibrary({input,send:async()=>({ok:true,library:{prompts:['news','crit','goal'].map(name=>({id:name,name,content:'Expanded '+name+' prompt'}))}})})
   input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.defaultPrevented)sent.push(input.value)})
-  for(const line of ['/goal','/unknown']){
-    input.focus();input.value=line;input.setSelectionRange(line.length,line.length);input.dispatchEvent(new win.Event('input'))
+  const key=(key,extra={})=>input.dispatchEvent(new win.KeyboardEvent('keydown',{key,bubbles:true,cancelable:true,...extra}))
+  const draft=async value=>{
+    input.focus();input.value=value;input.setSelectionRange(value.length,value.length);input.dispatchEvent(new win.Event('input'))
     await new Promise(r=>setTimeout(r,10))
-    input.dispatchEvent(new win.KeyboardEvent('keydown',{key:'Enter',bubbles:true,cancelable:true}))
-    assert.equal(input.value,line)
   }
+  for(const name of ['news','crit','goal']){
+    sent.length=0;await draft('/'+name);key('Enter')
+    assert.equal(input.value,'Expanded '+name+' prompt');assert.deepEqual(sent,[])
+    key('Enter',{repeat:true});assert.deepEqual(sent,[])
+    key('Enter');assert.deepEqual(sent,['Expanded '+name+' prompt'])
+  }
+  sent.length=0;await draft('/goal');key('Escape');key('Enter')
+  await draft('/unknown');key('Enter')
   assert.deepEqual(sent,['/goal','/unknown'])
-  input.value='/goal';input.setSelectionRange(5,5);view.refresh()
-  input.dispatchEvent(new win.KeyboardEvent('keydown',{key:'Tab',bubbles:true,cancelable:true}))
-  assert.equal(input.value,'Saved goal prompt')
+  await draft('/');key('ArrowDown');key('Enter');assert.equal(input.value,'Expanded goal prompt')
+})
+
+test('Enter waits for clipboard expansion and never sends the alias while pending',async t=>{
+  const dom=new JSDOM('<textarea></textarea>',{pretendToBeVisual:true});t.after(()=>dom.window.close())
+  const win=dom.window,input=win.document.querySelector('textarea'),sent=[]
+  let resolve,reads=0
+  Object.defineProperty(win.navigator,'clipboard',{value:{readText:()=>{reads++;return new Promise(r=>resolve=r)}}})
+  attachPromptLibrary({input,send:async()=>({ok:true,library:{prompts:[{id:'news',name:'news',content:'Read: [clipboard]'}]}})})
+  input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.defaultPrevented)sent.push(input.value)})
+  const enter=()=>input.dispatchEvent(new win.KeyboardEvent('keydown',{key:'Enter',bubbles:true,cancelable:true}))
+  input.focus();input.value='/news';input.setSelectionRange(5,5);input.dispatchEvent(new win.Event('input'))
+  await new Promise(r=>setTimeout(r,10))
+  enter();enter();assert.equal(reads,1);assert.deepEqual(sent,[]);assert.equal(input.value,'/news')
+  resolve('A story');await new Promise(r=>setTimeout(r,0))
+  assert.equal(input.value,'Read: A story');assert.deepEqual(sent,[])
+  enter();assert.deepEqual(sent,['Read: A story'])
+})
+
+
+test('Enter does not submit a slash alias before its catalog finishes loading',async t=>{
+  const dom=new JSDOM('<textarea></textarea>',{pretendToBeVisual:true});t.after(()=>dom.window.close())
+  const win=dom.window,input=win.document.querySelector('textarea'),sent=[]
+  let resolve
+  attachPromptLibrary({input,send:()=>new Promise(r=>resolve=r)})
+  input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.defaultPrevented)sent.push(input.value)})
+  const enter=()=>input.dispatchEvent(new win.KeyboardEvent('keydown',{key:'Enter',bubbles:true,cancelable:true}))
+  input.focus();input.value='/news';input.setSelectionRange(5,5);input.dispatchEvent(new win.Event('input'))
+  enter();assert.deepEqual(sent,[]);assert.equal(input.value,'/news')
+  resolve({ok:true,library:{prompts:[{id:'news',name:'news',content:'Expanded news'}]}})
+  await new Promise(r=>setTimeout(r,0));enter()
+  assert.equal(input.value,'Expanded news');assert.deepEqual(sent,[])
 })
