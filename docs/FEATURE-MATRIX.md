@@ -1,6 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-Mac setup update (26 September): current source has a separate
+Mac first-run correction (26 September): the desktop immediately detects a missing
+connection and offers **Install DSH** with progress and retry, before starting
+connection recovery. See [qualification and deployment](MACOS-GUIDED-DSH-SETUP.md).
+
+Earlier Mac setup update (26 September): current source has a separate
 [managed runtime/model form](MACOS-MANAGED-SETUP.md) for fresh bundled desktops.
 External DSH setup below remains available. Basic setup, chat and restart passed
 an isolated real Mac/DSH fixture; the public signed app, additional plugins and

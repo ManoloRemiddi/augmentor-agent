@@ -63,6 +63,7 @@ class ManagedMacSetupTests(unittest.TestCase):
     def test_private_credentials_managed_owner_and_repeat_without_reconfiguration(self):
         self.assertTrue(self.provision()['saved'])
         self.bootstrap.assert_called_once()
+
         self.voice.assert_called_once()
         profile = json.loads((self.state/'home/profiles/web/package.json').read_text())
         self.assertEqual(profile['dsh']['profile']['bundles'], managed.BUNDLES)
@@ -82,6 +83,19 @@ class ManagedMacSetupTests(unittest.TestCase):
         self.assertTrue(self.agent.active)
         self.assertTrue(self.provision()['saved'])
         self.bootstrap.assert_called_once()
+
+    def test_progress_identifies_real_setup_boundaries_without_credentials(self):
+        phases=[]
+        managed.provision(self.root,self.state,self.request,agent=self.agent,probe=lambda *_:None,progress=phases.append)
+        self.assertEqual(phases,['model','runtime','integration','service','ready'])
+        self.assertNotIn(self.request['apiKey'],json.dumps(phases))
+
+    def test_model_failure_stops_progress_before_installation(self):
+        phases=[]
+        def reject(*_):raise ValueError('HTTP 401')
+        with self.assertRaisesRegex(ValueError,'401'):
+            managed.provision(self.root,self.state,self.request,agent=self.agent,probe=reject,progress=phases.append)
+        self.assertEqual(phases,['model']); self.bootstrap.assert_not_called()
 
     def test_bad_key_can_be_corrected_without_an_unrecognized_partial_folder(self):
         def fail(*_): raise ValueError('HTTP 401')

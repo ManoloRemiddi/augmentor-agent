@@ -2,6 +2,15 @@
 
 # Start here: agent handoff
 
+## September 26 guided Mac DSH installation
+
+The 32 GB Mac's public preview contains DSH but had no saved connection. The
+native first run now offers **Install DSH** before connection recovery, streams
+the managed installer's five stages, and retains failed settings for retry.
+An incomplete bundle is diagnosed before offering an existing-DSH form.
+See [the scoped evidence and deployment record](MACOS-GUIDED-DSH-SETUP.md).
+This source change does not change the published preview DMG.
+
 ## September 26 public Apple-independent macOS preview
 
 The owner approved publishing a clearly labelled macOS preview without Developer

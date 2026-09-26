@@ -177,7 +177,7 @@ class LaunchAgent:
             raise ValueError('The setup service is still active. Its files were preserved.')
 
 
-def provision(root, state, request, *, agent=None, probe=probe_model):
+def provision(root, state, request, *, agent=None, probe=probe_model, progress=lambda phase: None):
     """A resumable first-run transaction; callers supply only their private roots."""
     complete = load_complete(root)
     settings, secret = model_configuration(root, request)
@@ -226,6 +226,7 @@ def provision(root, state, request, *, agent=None, probe=probe_model):
                       'status': 'preparing', 'label': agent.label}
             atomic_json(marker, record)
         if agent.loaded():
+            progress('ready')
             # A worker can disappear after launchd starts but before the final
             # acknowledgement. Recheck and finish that exact configuration;
             # never stop a live host or rewrite its model settings to retry.
@@ -242,7 +243,9 @@ def provision(root, state, request, *, agent=None, probe=probe_model):
                 setup.save(checked['token'], managed=manager)
             record['status'] = 'ready'; atomic_json(marker, record)
             return {'saved': True, 'endpoint': record['endpoint'], 'home': str(home)}
+        progress('model')
         probe(settings, secret)
+        progress('runtime')
         record['status'] = 'preparing'
         # A concurrent external connection cannot be overwritten by setup.
         previous_config = configuration().read_bytes() if configuration().exists() else None
@@ -278,10 +281,13 @@ def provision(root, state, request, *, agent=None, probe=probe_model):
         env.pop('NODE_OPTIONS', None); env.pop('NODE_PATH', None)
         os.environ['PATH'] = env['PATH']  # The GUI runs setup in a separate process.
         try:
+            progress('integration')
             initialize_voice(root, env)
             complete.configure_product(root, cli, home, record['endpoint'], env, state, save=False)
             record['status'] = 'starting'; atomic_json(marker, record)
+            progress('service')
             agent.start()
+            progress('ready')
             started = time.monotonic(); deadline = started+60
             setup = Setup(); checked = None; last_check_error = None; attempts = 0
             while time.monotonic() < deadline:
@@ -360,6 +366,7 @@ def start_saved(saved):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--run-service', type=Path)
+    parser.add_argument('--progress', action='store_true', help='Emit fixed setup phases as JSON lines for the app')
     args = parser.parse_args()
     if sys.platform != 'darwin':
         parser.error('This setup is for macOS.')
@@ -373,7 +380,9 @@ def main():
             raise ValueError('Setup request exceeds its size limit.')
         request = json.loads(raw)
         base = Path(os.environ.get('XDG_DATA_HOME', Path.home()/'Library/Application Support/Augmentor/data'))
-        result = provision(ROOT, base/'augmentor/managed-dsh', request)
+        def progress(phase):
+            if args.progress: print(json.dumps({'phase': phase}), flush=True)
+        result = provision(ROOT, base/'augmentor/managed-dsh', request, progress=progress)
         print(json.dumps({'ok': True, **result}))
     except Exception as error:
         # Never include provider response bodies or the input request here.

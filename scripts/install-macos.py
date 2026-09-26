@@ -42,6 +42,43 @@ def validate(app, development=False, verify=True):
     return release
 
 
+# The runtime a candidate must carry inside its own bundle. A build that
+# predates the bundled runtime (the 0.2.8 Mac previews) passes identity and
+# signature checks, installs cleanly, and then fails at first run with nothing
+# to tell the user why. Refusing it here — while the download is still in front
+# of them — is the difference between a dead end and an instruction.
+#
+# Kept deliberately separate from macos_setup.py's RUNTIME_PAYLOAD so
+# this check still works when the file it would import is itself the missing
+# one. A test asserts the two lists stay identical.
+RUNTIME_PAYLOAD = (
+    ('node/bin/node', 'the bundled Node runtime'),
+    ('python/bin/python3', 'the bundled Python runtime'),
+    ('dsh/node_modules/@deepseek-ai/dsh/lib/bin.js', 'the bundled DSH runtime'),
+    ('dsh/node_modules/.bin/dsh', 'the DSH launcher'),
+    ('dsh/node_modules/dsh-resonant-voice/bin/resonant-voice.js', 'the bundled voice plugin'),
+    ('scripts/setup-macos.py', 'the macOS first-run setup'),
+)
+GUIDE_URL = 'https://augmentoragent.com/macos.html'
+
+
+def validate_runtime(app):
+    """Refuse a candidate that cannot run its own agent.
+
+    Applied only to the candidate and its staged copy. An existing installation
+    is allowed to be an older, incomplete build — otherwise the upgrade that
+    fixes it could never run.
+    """
+    resources = app/'Contents/Resources/app'
+    missing = [label for path, label in RUNTIME_PAYLOAD
+               if not (resources/path).is_file()]
+    if missing:
+        raise ValueError(
+            'This Augmentor build is incomplete: it does not contain its own '
+            'runtime — ' + ', '.join(missing) + '. Nothing was installed. '
+            'Download and install the current Augmentor build instead: ' + GUIDE_URL)
+
+
 def installation_lock(name='installation.lock'):
     runtime = Path(os.environ.get('XDG_RUNTIME_DIR', f'/tmp/augmentor-{os.getuid()}'))
     runtime.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -258,6 +295,10 @@ def main():
         parser.error('Run as the ordinary logged-in macOS user.')
     source = args.candidate.expanduser()
     source_release=validate(source, args.development)
+    # Fail before touching anything: an incomplete candidate must never reach
+    # the staging directory, and must never replace a working installation.
+    try:validate_runtime(source)
+    except ValueError as error:parser.error(str(error))
     name='Augmentor Agent Browser Companion.app' if source_release.get('component')=='companion' else 'Augmentor Agent Desktop.app'
     try:destination = (args.destination or default_destination(name)).expanduser().absolute()
     except ValueError as error:parser.error(str(error))
@@ -274,6 +315,8 @@ def main():
         staged = stage/'Augmentor Agent Desktop.app'
         subprocess.run(['ditto', str(source), str(staged)], check=True)
         release = validate(staged, args.development)
+        try:validate_runtime(staged)
+        except ValueError as error:parser.error(str(error))
         try:
             with installation_transaction(destination, staged):
                 recovered = recover(destination)

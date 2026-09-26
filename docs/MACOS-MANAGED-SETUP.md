@@ -2,17 +2,22 @@
 
 # Managed Mac first run
 
-This is source implementation and isolated fixture qualification, not a public
-release or a change to the owner's working Mac. It addresses the basic
-runtime/model bootstrap gap found in the [publication audit](MACOS-DISTRIBUTION.md#september-26-publication-audit).
+The managed runtime ships in the [0.2.12 Mac preview](MACOS-PREVIEW-RELEASE.md).
+The guided first-run correction below is newer source; its deployment and test
+record is in [guided DSH setup](MACOS-GUIDED-DSH-SETUP.md). Earlier dated fixture
+evidence remains below.
 
 ## User flow
 
-A fresh bundled Mac desktop with no saved DSH connection offers **Set up
-Augmentor**. The user supplies an OpenAI-compatible API address, model name,
-API key and context window. **Connect** sends a short model test, creates a
+A fresh bundled Mac desktop with no saved DSH connection immediately offers
+**Install DSH**, with **DSH · Setup required**. It does not start the ordinary
+connection recovery loop until setup is complete. The user supplies an
+OpenAI-compatible API address, model name and API key; context size is under
+**Advanced model settings**. **Install DSH** sends a short model test, creates a
 private runtime profile, installs the checked product integration, starts a
-login service and reconnects the desktop. This path needs no separate DSH,
+login service and reconnects the desktop. Five visible phases identify model
+validation, DSH preparation, Augmentor integration, background startup and
+readiness. Errors retain the form and offer **Retry setup**. This path needs no separate DSH,
 Python or Node install, terminal command or manual DSH restart.
 
 The app must first be copied into `/Applications` or the user's `Applications`
