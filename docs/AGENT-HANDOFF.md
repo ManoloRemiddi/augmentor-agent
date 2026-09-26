@@ -2,6 +2,21 @@
 
 # Start here: agent handoff
 
+## September 26 one-product architecture direction and parity audit
+
+The owner requires one Augmentor product across OSs, with common features and UI
+behavior and platform adapters underneath. The [audit](PLATFORM-PARITY-AUDIT.md)
+identifies the Mac second-shortcut gap in UI, storage, service protocol and
+activation; the three shared instance tests pass on Linux and installed Mac
+modules. It also records release drift between open embedding PR #12 and Mac
+correction PR #13, and Mac CI's omission of several shared suites. Engineering
+rules and the PR review template now require both-platform impact assessment.
+The document includes the correction sequence and acceptance criteria. This is
+an analysis/documentation change: no shortcut implementation, branch integration,
+CI expansion, active-app restart or deployment was performed. Mac installed
+application source remains `252215b` from PR #13; older entries below are dated
+checkpoints. Begin implementation with the shared instance/shortcut contract.
+
 ## September 26 public Apple-independent macOS preview
 
 The owner approved publishing a clearly labelled macOS preview without Developer
