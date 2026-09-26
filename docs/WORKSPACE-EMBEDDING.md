@@ -97,7 +97,7 @@ its former copied host and polling connector. Source implementation starts at
 settings-navigation correction `f65cd2c` and dedicated-memory settings `958e17d`. A compatible 0.2.11 candidate was
 built from the previous selected immutable release; this is not represented as
 a complete source 0.2.12 upgrade. Final selection is
-`20260926-094358-23419e74`. The embedding service runs the selected artifact;
+`20260926-094732-3b3861db`. The embedding service runs the selected artifact;
 existing native windows were left on their earlier compatible releases.
 
 Read-only live DSH verification used direct application tools, recognized the
@@ -129,7 +129,7 @@ replayed. Follow-up commands fail immediately on errors. This deployment
 incident is not described as safe idle restart evidence. Product/tunnel fault
 tests did not restart the shared DSH harness.
 
-Final selected artifact SHA-256: `b2b58981433633a63d0ca67d4431962c9589f5c7d8db1858f14fbc609806255c`.
+Final selected artifact SHA-256: `62d488cb18c605ce14705fef74b530b9c2a6feb3f306c35db81650c841fb5346`.
 
 ### Resuming history
 
@@ -139,3 +139,11 @@ it for owned conversations: history selection preserves the persisted session
 ID, model and role, reloads its events, and enables the composer. Registered
 legacy roles remain read-only. Out-of-workspace and legacy resume attempts are
 covered by the boundary tests. Opening history never submits a new prompt.
+
+The installed 0.2.11 candidate applies the resume delta to its original
+sidepanel module. Copying the complete newer source module initially omitted
+its separate submit-feedback dependency; the actual Browser caught this and
+the candidate was corrected before final acceptance. The added
+`scripts/check-browser-assets.mjs` verifies all relative UI imports in both the
+source and the compatible candidate (21 and 20 modules respectively). No
+selected artifact was edited.
