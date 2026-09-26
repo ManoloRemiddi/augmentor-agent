@@ -18,10 +18,12 @@ test('workspace profile forces role/cwd and rejects outside history, mutation an
  const b=new DshBoundary(async()=>({items:rows}),async()=>({chatCwd:'/wrong'}))
  assert.deepEqual((await b.sessions()).items.map(r=>r.sessionId),['inside','legacy'])
  assert.deepEqual(await b.guard('session.create',{sessionId:'new',cwd:'/wrong',agentPreset:'wrong'}),{sessionId:'new',cwd:dir,agentPreset:profile.preset})
- for(const method of ['session.history','session.prompt','session.branch'])await assert.rejects(b.guard(method,{sessionId:'outside'}),/another/)
+ for(const method of ['session.history','session.prompt','session.branch','session.resume'])await assert.rejects(b.guard(method,{sessionId:'outside'}),/another/)
  await assert.rejects(b.guard('augmentor/memory',{action:'dual.recall',session:'dsh:personal'}),/another/)
  await assert.rejects(b.guard('session.prompt',{sessionId:'legacy'}),/earlier role/)
  await b.guard('session.history',{sessionId:'legacy'})
+ await b.guard('session.resume',{sessionId:'inside'})
+ await assert.rejects(b.guard('session.resume',{sessionId:'legacy'}),/earlier role/)
 })
 test('memory binding supplies dedicated identity and fails closed on a prior personal binding',async()=>{
  let sent;await bindProfileMemory(profile,'dsh:new',undefined,async(method,p)=>{sent=p;return {person:p.person,project:p.project}});assert.equal(sent.person,'fixture-owner');assert.equal(sent.project,dir)
