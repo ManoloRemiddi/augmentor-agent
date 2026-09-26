@@ -26,7 +26,7 @@ const definitions=[
   ['harnesses','Harnesses','Choose what powers your browser agent.','M4 7h16M4 17h16M8 4v6m8 4v6'],
   ['prompts','Prompt library','Reusable prompts, shared with Augmentor Agent and both harnesses. Type / in chat to use one.','M5 3h14v18H5zM8 8h8M8 12h8M8 16h4'],
   ['home','Home','Connect your NAS and use Home in your Augmentor conversations.','M3 10l9-7 9 7v11H3z'],
-  ['memory','Memories','Shared across your browser and Linux agents.','M4 5c0-4 16-4 16 0s-16 4-16 0v14c0 4 16 4 16 0V5M4 12c0 4 16 4 16 0'],
+  ['memory','Memories',chrome.runtime.getManifest().augmentorWorkspace?'Dedicated to '+chrome.runtime.getManifest().augmentorWorkspace.name+'.':'Shared across your browser and Linux agents.','M4 5c0-4 16-4 16 0s-16 4-16 0v14c0 4 16 4 16 0V5M4 12c0 4 16 4 16 0'],
   ['support','Support','Version information and a report you can review before sharing.','M12 11v6m0-10v1M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0'],
 ]
 for(const [id,label,description,path] of definitions){
@@ -87,6 +87,8 @@ function showHarnesses(container){
   container.update=()=>{select.value=state.harness||'';select.disabled=!!state.running};container.update()
 }
 function showMemory(container){
+  if(chrome.runtime.getManifest().augmentorWorkspace){memoryDialog(document,send,()=>({surface:'browser',harness:state.harness,...(state.sessionId?{sessionId:state.sessionId}:{})}),container);return}
+
   const card=make('div');card.className='card onboarding-card';card.append(make('h2','Let Augmentor set up memory'),make('p','Start a guided conversation. Augmentor checks your computer and handles the setup, asking only for missing choices or credentials.'))
   const status=make('p');status.className='help';status.setAttribute('role','status')
   const start=button(card,'Set up with Augmentor',async()=>{
