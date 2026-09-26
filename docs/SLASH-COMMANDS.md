@@ -31,6 +31,35 @@ Source qualification: build, 46 Browser tests, 17 native prompt/improvement test
 use deterministic Qt/DOM/transport fixtures; no prompt was sent to a live model.
 
 
+## Installed adoption — September 26
+
+Implementation `206c594` was applied to a separate copy of selected release
+`20260925-095859-da27e123` (artifact SHA-256
+`638709fa8653d5a32dbda61009c4f4da0d6e9f2d87c6f7e6ea00affe4849dc1a`). Both
+changed production modules matched that baseline before patching. Only native
+`prompts.py` and Browser `prompt-library.mjs` changed in the candidate, preserving
+its 0.2.11 product/DSH identity and existing voice, Home and model configuration.
+
+The candidate passed the 17 native prompt/improvement tests. Managed stage,
+inventory/import validation and authenticated compatibility activation passed.
+Selected release: `20260926-083736-5d6b65f6`, artifact SHA-256
+`b3d6df34d3d341526271118e4bd2ecaf2d108b1448e6868d190aa14103e60484`.
+The idle secondary window was closed through its guarded maintenance endpoint
+and reopened with the canonical launcher. Its draft and conversation/model state
+were backed up privately and verified unchanged after restoration. It reports
+the selected build, online and voice available, with `updatePending:false`.
+Main/mobile remain online on `20260924-125423-63307454` and adopt the selected
+build on reopening; their running processes were preserved.
+
+The prepared compatible Browser extension received the identical module after a
+baseline comparison and private backup. All 8 prompt-library checks passed
+against that installed file. An existing sidebar must close/reopen (or the
+extension reload) to load it. Adoption in the owner's Chromium profile was not
+verified. This is a local compatible update and published source correction,
+not a new public binary release.
+
+## Command transport
+
 Command results appear as DSH messages in the transcript, including when reopening history. Unknown commands and command errors keep the draft and never fall through to a model prompt. Network failures are not replayed. Ordinary text and absolute paths such as `/home/example/file.txt` retain normal prompt routing. Completed commands do not remain in the desktop prompt queue or latch the browser turn indicator.
 
 DSH 0.1.5-rc.1 disables the host `command-goal` row because its shipped session presets register that command. Older custom presets can omit it. Augmentor setup now registers `command-goal` in both product presets, and the browser preset gets `tool-goal` so the model can manage goal completion; the desktop already includes that tool.
