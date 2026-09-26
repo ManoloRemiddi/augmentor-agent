@@ -12,7 +12,7 @@ import sys
 import time
 from PySide6.QtCore import QObject,Signal,Qt
 from PySide6.QtGui import QKeySequence
-from .instances import current_name, validate_name
+from .instances import current_name, validate_name, SHORTCUT_INSTANCES
 
 ROOT=Path(__file__).resolve().parents[3]
 manager=None
@@ -216,7 +216,8 @@ class ManagedShortcutManager(RemoteShortcutManager):
 
 
 def select_manager(parent=None):
-    if (ROOT/'release.json').is_file():return ManagedShortcutManager(parent,current_name())
+    instance=current_name() if current_name() in dict(SHORTCUT_INSTANCES) else 'main'
+    if (ROOT/'release.json').is_file():return ManagedShortcutManager(parent,instance)
     from .macos_shortcut_service import request
     try:
         status=request({'operation':'status'})
@@ -225,9 +226,9 @@ def select_manager(parent=None):
         registration=Path.home()/'Library/LaunchAgents/com.augmentor.Agent.shortcut.plist'
         if registration.exists() or registration.is_symlink():
             raise RuntimeError('The login shortcut service is not ready. Start it before saving a shortcut.')
-        return ShortcutManager(parent,current_name())
+        return ShortcutManager(parent,instance)
     if status.get('protocol') not in (1,2):raise RuntimeError('Unsupported shortcut service version.')
-    return RemoteShortcutManager(parent,current_name())
+    return RemoteShortcutManager(parent,instance)
 
 
 def initialize(window):
@@ -240,6 +241,9 @@ def initialize(window):
     manager.problem.connect(window.set_status)
     from PySide6.QtWidgets import QApplication
     QApplication.instance().aboutToQuit.connect(manager.close)
+    # Additional named windows may edit the two global shortcuts but do not
+    # register another copy or claim that they own either shortcut themselves.
+    if current_name() not in dict(SHORTCUT_INSTANCES):return
     def restore():
         try:manager.restore()
         except Exception as error:manager.problem.emit(str(error))

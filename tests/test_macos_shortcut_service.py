@@ -62,6 +62,15 @@ class MacShortcutServiceTests(unittest.TestCase):
         finally:
             replacement.close()
 
+    def test_other_named_windows_can_edit_the_global_shortcuts(self):
+        self.service.start()
+        with patch.dict(os.environ,{'AUGMENTOR_WINDOW_ID':'qualification'}):
+            client=select_manager()
+            self.assertEqual(client.instance,'main')
+            client.save(QKeySequence('Ctrl+Alt+K'),'secondary')
+        self.assertEqual(request({'operation':'status'})['key'],'Fn+Space')
+        self.assertTrue(request({'operation':'status','instance':'secondary'})['active'])
+
     def test_fn_space_is_persisted_on_first_launch_and_restored(self):
         self.service.start()
         self.assertEqual(request({'operation':'status'})['key'],'Fn+Space')

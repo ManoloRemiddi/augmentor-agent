@@ -93,6 +93,11 @@ def main():
                 ui(name,'capture',path=str(args.out.resolve()/(name+'.png')))
                 ui(name,'draft',expected='Unsent '+name+' fixture',text='')
                 assert exchange(name,'maintenance.close')['accepted']
+                until(name,lambda value:not value['visible'])
+                # Preview windows intentionally keep QApplication alive. After
+                # the accepted close saved their fixture state, stop only that
+                # isolated process; live-app quit is qualified by the chat proof.
+                service.activations[name].child.terminate()
                 service.activations[name].child.wait(timeout=15)
             service.close();service=create()
             for name in states:
@@ -101,11 +106,16 @@ def main():
                 reopened=until(name,lambda value:value['visible'])
                 assert reopened['pid']!=states[name]['pid']
                 assert exchange(name,'maintenance.close')['accepted']
+                until(name,lambda value:not value['visible'])
+                # Preview windows intentionally keep QApplication alive. After
+                # the accepted close saved their fixture state, stop only that
+                # isolated process; live-app quit is qualified by the chat proof.
+                service.activations[name].child.terminate()
                 service.activations[name].child.wait(timeout=15)
             report={'passed':True,'nativeCarbonRegistration':True,'bothBindingsRestoredAfterServiceRestart':True,
                     'targetedNativeHideShow':True,'coldLaunchAndReopen':True,'otherWindowDraftPreserved':True,
                     'maintenanceRefusedUnsentDraft':True,'conflictPreservedBothBindings':True,
-                    'physicalKeyboardTested':False,'provider':'isolated preview fixtures','appRoot':str(root)}
+                    'physicalKeyboardTested':False,'previewProcessStoppedAfterClose':True,'provider':'isolated preview fixtures','appRoot':str(root)}
             (args.out/'report.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report),flush=True)
         finally:
             service.close()
