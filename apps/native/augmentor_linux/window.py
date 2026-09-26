@@ -1255,7 +1255,7 @@ def main():
     app.setWindowIcon(QIcon(str(Path(__file__).parent/'assets/augmentor.svg')))
     from .shortcuts import COMPONENT
     app.setDesktopFileName(COMPONENT.removesuffix('.desktop'))
-    if not args.preview and not args.screenshot:
+    if (not args.preview or args.ui_test_control) and not args.screenshot:
         runtime = Path(os.environ.get('XDG_RUNTIME_DIR', f'/tmp/augmentor-linux-pi-{os.getuid()}'))
         runtime.mkdir(mode=0o700, exist_ok=True)
         socket_name = str(runtime / (ipc_basename()+'.sock'))
