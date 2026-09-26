@@ -2,7 +2,22 @@
 
 # Start here: agent handoff
 
-## September 26 desktop readiness correction — activation pending
+## September 26 corrected Mac primary app activated
+
+Autonomous activation is complete for desktop chat. The installed user
+Applications copy passed Send-button and Enter requests in the **actual native
+primary process**, including same-conversation restoration after reopening. It
+was then reopened normally with test control disabled and left online/model-ready.
+The desktop shortcut points to this copy. See
+[installed native evidence and recovery details](MACOS-DISTRIBUTION.md#september-26-follow-up-corrected-primary-mac-app-activated).
+The obsolete qualification window is hidden and paused to retain any draft in
+memory; its private checkpoint records the displaced socket/lock. Do not resume
+it alongside the replacement. That volatile preservation is not a durable draft
+backup. Configuration and DSH data have separate private backups.
+The earlier activation-pending report below is superseded. Public distribution,
+voice and browser-extension qualification remain incomplete.
+
+## September 26 desktop readiness correction — historical activation-pending checkpoint
 
 The owner reported that the Mac still could not chat. The failure was reproduced:
 an already-open pre-setup controller retained the missing legacy preset while

@@ -15,6 +15,56 @@ import sys
 import time
 
 
+def native_proof(args):
+    """Drive the already-running native process, not an imported second window."""
+    import socket
+    def exchange(command):
+        with socket.socket(socket.AF_UNIX) as connection:
+            connection.settimeout(8);connection.connect(str(args.native_socket))
+            connection.sendall(command.encode());data=b''
+            while not data.endswith(b'\n'):
+                chunk=connection.recv(65536)
+                if not chunk:raise RuntimeError('UI acknowledgment lost; no command was replayed.')
+                data+=chunk
+                if len(data)>2*1024*1024:raise RuntimeError('UI response exceeded the proof limit.')
+            return json.loads(data)
+    def ui(action,**values):
+        response=exchange('ui-test:'+json.dumps({'action':action,**values}))
+        if not response.get('ok'):raise RuntimeError(response.get('error','UI command failed'))
+        return response['result']
+    def ready(state):
+        return state['online'] and state['visible'] and state['model'] and not state['dialogs']
+    def until(check,seconds):
+        end=time.monotonic()+seconds
+        while time.monotonic()<end:
+            state=ui('inspect')
+            if check(state):return state
+            time.sleep(.2)
+        raise AssertionError('Native desktop proof timed out.')
+    status=exchange('maintenance.status')
+    assert status['buildRoot']==str(args.app_root.resolve()), 'A different application intercepted this launch'
+    before=until(ready,30)
+    assert before['preset']=='augmentor-linux-product'
+    assert not before['running'] and not before['draft']
+    if args.previous_marker:assert args.previous_marker in before['transcript']
+    else:assert not before['session'], 'Do not put test messages in an existing user conversation'
+    args.out.mkdir(parents=True,exist_ok=False)
+    ui('capture',path=str(args.out.resolve()/'before.png'))
+    prompt='Reply with exactly: '+args.marker+'. Do not use any tools.'
+    ui('send',text=prompt,via=args.submit)
+    after=until(lambda state:not state['running'] and state['transcript'].count(args.marker)>=2
+                and args.marker in state['transcript'].split('Augmentor',1)[-1],120)
+    assert ready(after) and not after['draft']
+    assert after['transcript'].count(prompt)==1
+    if args.previous_marker:assert before['session']==after['session']
+    ui('capture',path=str(args.out.resolve()/'after.png'))
+    report={**after,'passed':True,'scope':'Actual native desktop process through opt-in same-user UI control',
+            'appRoot':status['buildRoot'],'submit':args.submit}
+    (args.out/'report.json').write_text(json.dumps(report,indent=2)+'\n')
+    print(json.dumps({k:report[k] for k in ['passed','pid','session','scope','submit']}),flush=True)
+    return 0
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--app-root',type=Path,required=True)
@@ -23,12 +73,14 @@ def main():
     parser.add_argument('--marker',required=True)
     parser.add_argument('--previous-marker',help='Require this earlier reply after reopening the window')
     parser.add_argument('--submit',choices=('button','enter'),default='button')
+    parser.add_argument('--native-socket',type=Path,help='Test an actual native app launched with --ui-test-control')
     parser.add_argument('--live',action='store_true',help='Authorize one real provider request')
     args=parser.parse_args()
     if not args.live:parser.error('This proof sends a real model request; use --live explicitly.')
     if sys.platform!='darwin':parser.error('Use the graphical macOS login session.')
     if not args.marker.isascii() or not args.marker or len(args.marker)>80:
         parser.error('Use a short ASCII response marker.')
+    if args.native_socket:return native_proof(args)
     root=args.app_root.resolve()
     spec=importlib.util.spec_from_file_location('bundle_launcher',root/'scripts/launch-component.py')
     launcher=importlib.util.module_from_spec(spec);spec.loader.exec_module(launcher);launcher.configure()

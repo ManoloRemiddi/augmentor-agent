@@ -78,3 +78,11 @@ rendered reply. Repeat with the same instance, a new output/marker,
 `--previous-marker` and `--submit enter` to verify restoration and Enter submission.
 It does not control an existing user's window. See
 [Mac readiness evidence](../docs/MACOS-DISTRIBUTION.md#september-26-correction-verify-chat-readiness-and-the-actual-composer).
+
+For the actual native executable, explicitly launch the chosen test instance with
+`--ui-test-control`, then pass its owner-only `--native-socket` to the same driver.
+The driver verifies the running app root, types into that process's composer and
+checks its rendered reply. Normal app launches reject the test operations.
+`test_ui_testing.py` verifies default denial, draft/dialog protection and
+non-overwriting screenshot output. See the
+[installed native acceptance](../docs/MACOS-DISTRIBUTION.md#september-26-follow-up-corrected-primary-mac-app-activated).

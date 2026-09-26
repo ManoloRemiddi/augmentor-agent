@@ -175,6 +175,58 @@ GitHub's new OS matrix is an additional pending check, not evidence already clai
 by these local results. This checkpoint is still product version 0.2.12 development,
 not a new published product release or a consumer-ready installation.
 
+## September 26 follow-up: corrected primary Mac app activated
+
+The owner requested autonomous completion. The corrected app is now installed in
+`~/Applications/Augmentor Agent Desktop.app`, with a desktop shortcut to that
+exact copy. DSH was checked for active sessions, stopped through its owned
+LaunchAgent during replacement, then restarted. Its private profile, model
+credentials, default selection, catalog and conversations were preserved.
+
+The old qualification process had intercepted launches because it held the
+primary instance socket. To preserve any unsent draft without requiring the owner
+to dismiss its dialog, its own IPC hid the window; the idle process was then
+paused and its socket/lock moved aside. Configuration and DSH data were backed up
+privately. This obsolete process retains its draft **only in memory until reboot**;
+its private recovery checkpoint records how to restore the old socket/lock after
+closing the replacement. Do not resume it while the replacement primary is active.
+This is a one-time development recovery, not the production update design.
+
+The native launcher now supports an explicit `--ui-test-control` qualification
+flag. Its existing owner-only Unix socket can inspect that window, capture only
+its pixels, and type/click Send or press Enter through Qt. Submission refuses
+existing drafts, active work, hidden windows and open dialogs. Normal launches
+reject these test commands. It cannot run arbitrary code or control other apps.
+The [live proof driver](../scripts/macos-live-chat-proof.py) accepts
+`--native-socket` to use this mode and checks the running application's root to
+detect an older process intercepting the launch. It never retries a submission
+whose acknowledgment was lost.
+
+Actual installed primary-window evidence, not a separately imported Qt window:
+
+- The native executable opened the installed copy through LaunchServices.
+- Typing and clicking Send displayed the real DeepSeek reply
+  `The installed Mac app works.` with no setup dialog.
+- Closing and reopening the native app, without an explicit harness argument,
+  restored the same conversation. Enter submission displayed
+  `The reopened Mac app works.` in that same session.
+- A subsequent **normal launch without test control** reconnected, restored the
+  same session and reported online/model-ready with no connection/restore error
+  or blocking dialog. A test-control request was explicitly rejected.
+- A named native-window check also exercised the checked-in socket proof driver.
+- Strict recursive signature verification passed after actual use. Native
+  regression passed 448 tests with one environment skip.
+
+Activated development ZIP SHA-256:
+`0e76a1240a1f921b45ffe754d6745819a6e2705d05e37485adca9db5c45b5686`.
+Application inventory SHA-256:
+`8619a3db827adbe01d2b70c6015848fa17c3fb8fe7f64493024d703e40fad000`.
+The primary app is left open under its normal launch mode. Apple notarization,
+voice/browser setup, other provider inference and physical reboot acceptance are
+still separate gates; this evidence establishes installed Mac desktop chat with
+the configured DeepSeek provider. The earlier activation-pending checkpoint below
+is historical and superseded by this entry.
+
 ## September 26 correction: verify chat readiness and the actual composer
 
 The initial personal-connection checks below were insufficient. A successful
