@@ -21,6 +21,21 @@ class WindowTests(unittest.TestCase):
         self.assertTrue(owner.setup_offered)
         self.assertIn('Agent setup',owner.set_status.call_args.args[0])
 
+    def test_maintenance_preserves_unsent_and_unacknowledged_drafts(self):
+        window = Window(preview=True)
+        try:
+            self.assertTrue(window.maintenance_state()['accepted'])
+            window.composer.setPlainText('unsent work')
+            state = window.maintenance_state()
+            self.assertTrue(state['draftPresent']); self.assertTrue(state['busy'])
+            self.assertFalse(state['accepted']); self.assertNotIn('unsent work', str(state))
+            window.composer.clear(); window.submitted_draft = 'pending acknowledgement'
+            self.assertFalse(window.maintenance_state()['accepted'])
+            window.submitted_draft = None
+            self.assertTrue(window.maintenance_state()['accepted'])
+        finally:
+            window.close()
+
     def test_existing_connections_and_saved_chats_keep_their_recovery(self):
         from unittest.mock import Mock, patch
         for harness,session,needed in [('dsh',None,False),('dsh','saved',True),('pi',None,True)]:

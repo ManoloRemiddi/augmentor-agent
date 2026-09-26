@@ -142,7 +142,10 @@ evidence and review for private configuration.
 
 See [the Mac preview distribution record](MACOS-PREVIEW-RELEASE.md) and
 [LGPL library replacement instructions](MACOS-LIBRARY-REPLACEMENT.md).
-The Mac payload is limited to the Widgets framework closure; unused QML/Quick
-and development tools are removed before signing. DSH adds reviewed BSD-2-Clause
+The published preview used the Widgets framework closure. The current renderer
+adds the base Qt Qml/Quick/QuickWidgets/OpenGL LGPL runtime closure and uses the
+existing Qt declarative source notices. Optional QML modules and development tools,
+including the shader compiler, are removed before signing. See [current packaging
+and qualification](MACOS-RECOVERY-2026-09-26.md). DSH adds reviewed BSD-2-Clause
 and Python-2.0 dependencies and a version-bound LGPL libvips exception to the
 npm notice collector. Native source/notices are reviewed separately.

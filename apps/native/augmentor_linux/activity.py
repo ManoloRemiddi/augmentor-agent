@@ -135,7 +135,8 @@ class ActivityHalo(QObject):
 
     def prepare_geometry(self, rect):
         dpr = self.canvas.devicePixelRatioF()
-        key = (self.canvas.width(), self.canvas.height(), dpr, *rect.getRect())
+        gpu = bool(self.canvas.gpu and self.canvas.gpu.available)
+        key = (self.canvas.width(), self.canvas.height(), dpr, gpu, *rect.getRect())
         if key == self.geometry_key:
             return
         self.geometry_key = key
@@ -143,9 +144,10 @@ class ActivityHalo(QObject):
         # Modest supersampling on high-DPI screens improves their coverage;
         # cap it and the total area so animation cannot starve the GUI thread.
         scale = max(1. / min(dpr, 1.25), math.sqrt(self.canvas.width()*self.canvas.height()/1_000_000))
+        self.flow_scale = max(4., (rect.width() + rect.height()) / 360)
+        if gpu:scale = self.flow_scale
         self.image_width = math.ceil(self.canvas.width() / scale)
         self.image_height = math.ceil(self.canvas.height() / scale)
-        self.flow_scale = max(4., (rect.width() + rect.height()) / 360)
         self.flow_width = math.ceil(self.canvas.width() / self.flow_scale)
         self.flow_height = math.ceil(self.canvas.height() / self.flow_scale)
         cx, cy = rect.center().x(), rect.center().y()
@@ -272,10 +274,12 @@ class ActivityHalo(QObject):
             rendered = self.fluid.step(rgba, origin, cell, dt, pointer, self.distance_grid)
             transported = QImage(rendered.data, self.flow_width, self.flow_height, self.flow_width*4,
                                  QImage.Format.Format_RGBA8888_Premultiplied)
-            self.frame = restore_emission_detail(source, coarse, transported)
+            self.coarse_source = coarse.copy()
+            self.frame = transported.copy() if self.canvas.gpu and self.canvas.gpu.available else restore_emission_detail(source, coarse, transported)
         else:
             self.fluid = FluidField(); self.fluid_phase = None
-            self.frame = source.copy()
+            self.coarse_source = source.copy()
+            self.frame = source.convertToFormat(QImage.Format.Format_RGBA8888_Premultiplied)
 
     def paint_backdrop(self,painter,rect,accent):
         if self.effect in ("butterflies", "butterflies-large"):return
@@ -287,6 +291,7 @@ class ActivityHalo(QObject):
             return
         rect = QRectF(rect)
         if self.effect in ("butterflies", "butterflies-large"):
+            if self.canvas.gpu:self.canvas.gpu.hide()
             self.butterflies.paint(painter,rect,self.strength,self.animated,self.window.compact,
                                    size_multiplier=3. if self.effect == "butterflies-large" else 1.)
             return
@@ -300,7 +305,10 @@ class ActivityHalo(QObject):
         painter.setOpacity(self.strength)
         painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
         self.render_field(rect, accent)
-        painter.drawImage(QRectF(self.canvas.rect()), self.frame)
+        if self.canvas.gpu and self.canvas.gpu.available:
+            self.canvas.gpu.refresh(rect, accent)
+        else:
+            painter.drawImage(QRectF(self.canvas.rect()), self.frame)
         # Small fragments of the browser's glyph field emerge within the mist.
         # Keep each symbol stable; local noise controls its gradual appearance.
         font = QFont('DejaVu Sans Mono')
@@ -409,6 +417,9 @@ class HaloCanvas(QWidget):
         self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating)
         self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        from .plasma_gpu import create
+        self.gpu = create(self)
+        if self.gpu and self.gpu.available:self.activity.timer.setInterval(16)
 
     def paintEvent(self,event):
         extra=self.activity.extent-self.activity.margin

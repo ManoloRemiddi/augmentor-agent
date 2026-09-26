@@ -1202,6 +1202,14 @@ class Window(QWidget):
         if self.isVisible() and not self.isMinimized():self.hide()
         else:self.bring_forward()
 
+    def maintenance_state(self):
+        running = bool(self.controller and self.controller.running)
+        draft = bool(self.composer.toPlainText() or self.submitted_draft or self.editing)
+        busy = (running or draft or self.composer.improving or self.voice_opening
+                or self.voice_input is not None or bool(self.voice_dialog and self.voice_dialog.capture)
+                or any(dialog.isVisible() for dialog in self.findChildren(QDialog)))
+        return {'running': running, 'busy': busy, 'draftPresent': draft, 'accepted': not busy}
+
     def focus_composer(self):
         if not self.isVisible() or self.compact:return
         if QApplication.activeModalWidget() or QApplication.activePopupWidget():return
@@ -1280,13 +1288,12 @@ def main():
                     except Exception as error:response={'ok':False,'error':str(error)}
                     client.write(json.dumps(response).encode()+b'\n');client.waitForBytesWritten(500)
                 elif command in ('maintenance.status','maintenance.close','maintenance.recover'):
-                    running=bool(window.controller and window.controller.running)
-                    busy=running or window.composer.improving or window.voice_opening or window.voice_input is not None or bool(window.voice_dialog and window.voice_dialog.capture) or any(dialog.isVisible() for dialog in window.findChildren(QDialog))
+                    state=window.maintenance_state()
+                    busy=state['busy']
                     controller = window.controller
-                    accepted = not busy
                     if command == 'maintenance.recover':
-                        accepted = bool(controller and controller.repair_connection())
-                    client.write(json.dumps({'pid':os.getpid(),'running':running,'busy':busy,'accepted':accepted,'onboardingProtocol':1,'modelReady':bool(window.model_picker.currentData()),
+                        state['accepted'] = bool(controller and controller.repair_connection())
+                    client.write(json.dumps({'pid':os.getpid(),**state,'onboardingProtocol':1,'modelReady':bool(window.model_picker.currentData()),
                         'online':bool(controller and controller.online), 'repairing':bool(controller and controller.repairing),
                         'lastError':controller.last_connection_error if controller else '',
                         'sessionRestoreError':controller.session_restore_error if controller else '',

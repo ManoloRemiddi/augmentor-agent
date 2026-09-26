@@ -183,6 +183,9 @@ One source/version for a release still produces different OS binaries and hashes
 
 ## Correction sequence and acceptance
 
+Implementation follow-up: [current recovery status](MACOS-RECOVERY-2026-09-26.md).
+The audit below retains the original findings and acceptance requirements.
+
 1. **Close the two-instance shortcut gap as the first implementation slice.**
    Use one shared instance list in Settings. Carry the instance ID through Mac
    save/status requests, registrations and activation. Extend the current Mac

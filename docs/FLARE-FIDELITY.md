@@ -2,6 +2,9 @@
 
 # Shared desktop flare fidelity
 
+Current implementation: [Mac recovery and the shared Metal/OpenGL renderer](MACOS-RECOVERY-2026-09-26.md). The CPU renderer below remains the fallback.
+The following records describe the earlier correction and its historical installation.
+
 The September 26 macOS report exposed a shared renderer defect: a 744 × 804
 logical-pixel canvas used a 186 × 201 emission texture. The finest arch strands
 are about 1.6 logical pixels wide, smaller than its four-pixel sampling interval.

@@ -109,5 +109,6 @@
         "@rpath/QtVirtualKeyboard.framework/Versions/A/QtVirtualKeyboard"
       ]
     }
-  ]
+  ],
+  "quickPlasma": true
 }

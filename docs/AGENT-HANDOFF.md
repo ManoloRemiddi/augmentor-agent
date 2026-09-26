@@ -2,6 +2,14 @@
 
 # Start here: agent handoff
 
+## September 26 continued Mac recovery
+
+The [recovery record](MACOS-RECOVERY-2026-09-26.md) supersedes the source gap status
+below: guided setup/resize and shared rendering are integrated, the Mac second
+shortcut is implemented, and Metal/OpenGL fixtures pass. Read its deployment gate:
+qualification and installation are separate from source completion. Preserve the
+approved UI and the owner's private data; do not resume the old overlay workflow.
+
 ## September 26 shared flare rendering correction
 
 [Flare fidelity](FLARE-FIDELITY.md) records the coarse-texture root cause and the

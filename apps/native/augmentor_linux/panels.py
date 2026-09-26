@@ -160,8 +160,11 @@ class SettingsDialog(QDialog):
         engine.setAccessibleName('Harness')
         engine.activated.connect(lambda _:window.switch_harness(engine.currentData()))
         layout.addWidget(engine)
-        from .dsh_setup import DshSetupDialog
-        dsh=QPushButton('Connect DSH');dsh.clicked.connect(lambda:DshSetupDialog(window).exec());layout.addWidget(dsh)
+        dsh=QPushButton('Connect DSH')
+        def connect_dsh():
+            self.accept()
+            window.open_setup()
+        dsh.clicked.connect(connect_dsh);layout.addWidget(dsh)
         from .home_settings import HomeDialog
         home=QPushButton('Connect Home');home.clicked.connect(lambda:HomeDialog(window).exec());layout.addWidget(home)
         from .recovery import RecoveryDialog

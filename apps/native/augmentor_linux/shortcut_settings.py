@@ -4,7 +4,7 @@ import sys
 from PySide6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QLabel,QPushButton,QKeySequenceEdit
 from PySide6.QtGui import QKeySequence
 from .shortcuts import current_keys,save_shortcut,display_key
-from .instances import current_name
+from .instances import current_name, SHORTCUT_INSTANCES
 from .settings_icons import settings_icon
 
 
@@ -12,7 +12,7 @@ class ShortcutSettings(QWidget):
     def __init__(self,window):
         super().__init__(window);self.owner=window;self.rows={}
         layout=QVBoxLayout(self);layout.setContentsMargins(0,0,0,0)
-        for name,label in ([('main','Augmentor')] if sys.platform=='darwin' else [('main','First agent'),('secondary','Second agent')]):
+        for name,label in SHORTCUT_INSTANCES:
             heading=QLabel(label+' — open / hide');layout.addWidget(heading)
             current=QLabel('Reading shortcut…');layout.addWidget(current)
             row=QHBoxLayout();editor=QKeySequenceEdit();editor.setMaximumSequenceLength(1);editor.setClearButtonEnabled(True)
@@ -25,7 +25,7 @@ class ShortcutSettings(QWidget):
             button.clicked.connect(lambda _,n=name:self.save(n))
         if sys.platform=='darwin':
             default=QPushButton('Use Fn+Space');default.clicked.connect(lambda:self.save('main','Fn+Space'));layout.addWidget(default)
-        note=QLabel('Fn+Space opens or hides Augmentor, including when it is closed. To choose another shortcut, click the field, press the combination and Save.' if sys.platform=='darwin' else 'Click a field and press the combination you want, then Save. Fn is handled by your keyboard: the detected key may have another name. Each shortcut opens or hides its own window.');note.setWordWrap(True);layout.addWidget(note)
+        note=QLabel('Fn+Space is the default for the first agent. Choose a shortcut for each agent above, then Save. Each shortcut opens or hides its own window, including when it is closed.' if sys.platform=='darwin' else 'Click a field and press the combination you want, then Save. Fn is handled by your keyboard: the detected key may have another name. Each shortcut opens or hides its own window.');note.setWordWrap(True);layout.addWidget(note)
         self.refresh()
 
     def refresh(self):

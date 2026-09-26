@@ -1,0 +1,8 @@
+{
+  "compiler": "qsb 6.8.2",
+  "command": "qsb --glsl '300 es,150' --hlsl 50 --msl 12 -o plasma.frag.qsb plasma.frag",
+  "sha256": {
+    "plasma.frag": "192857329934b69609bc8e5c5c974a1e76c25917ada7c5c2367f5df432dbd8d9",
+    "plasma.frag.qsb": "f18b75872b575cfb84bcd43533af2ce59bc4aed2a7e47b471ef5a05fe28c1aa4"
+  }
+}

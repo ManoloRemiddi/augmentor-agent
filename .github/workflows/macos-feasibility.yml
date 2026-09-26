@@ -52,6 +52,8 @@ jobs:
           npm run check
           npm run build
           .macos-build-env/bin/python3 -m unittest discover -s tests -p 'test_macos*.py' -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p '*shortcut*.py' -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_instances.py -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_dsh_payload_staging.py -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_prompt_client_startup.py -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_activity.py -v

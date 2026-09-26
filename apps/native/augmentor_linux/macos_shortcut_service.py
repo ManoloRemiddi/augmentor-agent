@@ -14,6 +14,7 @@ from PySide6.QtGui import QKeySequence
 
 from .macos_shortcuts import ShortcutManager,FN_SPACE
 from .shortcut_activation import DesktopActivation
+from .instances import SHORTCUT_INSTANCES
 
 
 LIMIT = 4096
@@ -60,24 +61,27 @@ def request(message):
 
 class ShortcutService:
     def __init__(self):
-        self.manager = ShortcutManager()
-        self.activation = DesktopActivation()
-        self.error = None
+        self.managers = {name: ShortcutManager(instance=name) for name, _ in SHORTCUT_INSTANCES}
+        self.activations = {name: DesktopActivation(instance=name) for name in self.managers}
+        self.errors = {name: None for name in self.managers}
+        self.manager = self.managers['main']  # Compatibility for main-only clients.
+        self.activation = self.activations['main']
         self.stopping = threading.Event()
-        self.manager.problem.connect(self.report_problem)
-        self.manager.pressed.connect(self.activate)
+        for name, manager in self.managers.items():
+            manager.problem.connect(lambda message, n=name: self.report_problem(message, n))
+            manager.pressed.connect(lambda n=name: self.activate(n))
         self.listener = None
         self.lock_fd = None
         self.thread = None
 
-    def report_problem(self, message):
-        self.error = str(message)
+    def report_problem(self, message, instance='main'):
+        self.errors[instance] = str(message)
 
-    def activate(self):
+    def activate(self, instance='main'):
         try:
-            self.activation.activate()
+            self.activations[instance].activate()
         except Exception as error:
-            self.report_problem(error)
+            self.report_problem(error, instance)
 
     def start(self):
         runtime = runtime_directory()
@@ -105,10 +109,11 @@ class ShortcutService:
             self.path.chmod(0o600)
             self.listener.listen(4)
             self.listener.settimeout(0.2)
-            try:
-                self.manager.restore()
-            except Exception as error:
-                self.report_problem(error)
+            for name, manager in self.managers.items():
+                try:
+                    manager.restore()
+                except Exception as error:
+                    self.report_problem(error, name)
             self.thread = threading.Thread(target=self.serve, daemon=True)
             self.thread.start()
         except BaseException:
@@ -117,18 +122,30 @@ class ShortcutService:
 
     def dispatch(self, message):
         operation = message.get('operation')
-        if operation == 'status' and set(message) == {'operation'}:
-            with self.manager.lock:
-                active = self.manager.process is not None and self.manager.process.poll() is None
-                return {'ok': True, 'protocol': 1, 'pid': os.getpid(),
-                        'active': active, 'key': self.manager.key, 'error': self.error}
-        if operation == 'save' and set(message) == {'operation', 'sequence'}:
+        instance = message.get('instance', 'main')
+        if not isinstance(instance, str) or instance not in self.managers:
+            raise ValueError('Unknown shortcut window.')
+        manager = self.managers[instance]
+        fields = set(message) - {'instance'}
+        if operation == 'status' and fields == {'operation'}:
+            with manager.lock:
+                active = manager.process is not None and manager.process.poll() is None
+                return {'ok': True, 'protocol': 2, 'pid': os.getpid(), 'instance': instance,
+                        'active': active, 'key': manager.key, 'error': self.errors[instance]}
+        if operation == 'save' and fields == {'operation', 'sequence'}:
             sequence = message['sequence']
             if not isinstance(sequence, str) or len(sequence) > 256:
                 raise ValueError('Invalid shortcut sequence.')
-            key = self.manager.save(FN_SPACE if sequence==FN_SPACE else QKeySequence(sequence, QKeySequence.SequenceFormat.PortableText))
-            self.error = None
-            return {'ok': True, 'key': key}
+            parsed = FN_SPACE if sequence == FN_SPACE else QKeySequence(sequence, QKeySequence.SequenceFormat.PortableText)
+            binding = manager.command(parsed)
+            # Refuse a collision even if a test or unusual backend permits duplicate
+            # registration. Keep both existing bindings and saved files intact.
+            for name, other in self.managers.items():
+                if name != instance and other.binding == binding:
+                    raise ValueError('That shortcut is already assigned to the other agent.')
+            key = manager.save(parsed)
+            self.errors[instance] = None
+            return {'ok': True, 'key': key, 'instance': instance}
         raise ValueError('Unsupported shortcut request.')
 
     def serve(self):
@@ -156,7 +173,7 @@ class ShortcutService:
             self.listener.close()
         if self.thread is not None:
             self.thread.join()
-        self.manager.close()
+        for manager in self.managers.values():manager.close()
         if hasattr(self, 'socket_identity'):
             try:
                 if self.path.lstat().st_ino == self.socket_identity:
