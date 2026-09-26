@@ -78,10 +78,12 @@ import {homeConnection} from './shared/home.mjs'
 import {supportReport} from './shared/support.mjs'
 import {startOnboarding} from './shared/onboarding.mjs'
 import {memoryRequest} from './shared/memory.mjs'
+import {bindProfileMemory} from '../../services/workspaces/memory.mjs'
+import {preferences} from '../../services/workspaces/profiles.mjs'
 import {MetadataLog,diagnosticCategory} from './shared/diagnostics.mjs'
 import { dshBranch } from './shared/branch.mjs'
-import {DshBoundary,BROWSER_PRESET,PERSONAL_PRESETS,loopbackEndpoint,boundedJson} from './shared/dsh-boundary.mjs'
-import {createHash} from 'node:crypto'
+import {DshBoundary,BROWSER_PRESET,PERSONAL_PRESETS,loopbackEndpoint,boundedJson,workspaceProfile,visibleSession} from './shared/dsh-boundary.mjs'
+import {createHash,randomUUID} from 'node:crypto'
 import {createDshClient} from './shared/dsh-auth.mjs'
 import {createRemoteAdapter} from './shared/dsh-remote.mjs'
 import {BrowserVoice,voicePreferences} from './shared/voice-client.mjs'
@@ -306,7 +308,7 @@ async function productHandshake(){
     if(product.protocol!=='augmentor-dsh/1'||product.version!==VERSION||product.homeId!==createHash('sha256').update(token).digest('hex'))throw Error('Reconnect the matching DSH integration from Settings.')
     const info=await boundedJson(`${DSH_BASE}/api/augmentor`,{signal:AbortSignal.timeout(3000)})
     if(info.protocol!==PROTOCOL_EXPECTED||info.version!==VERSION||info.agentPreset!==BROWSER_PRESET||typeof info.chatCwd!=='string'||!path.isAbsolute(info.chatCwd)||typeof info.wsPath!=='string'||!/^\/api\/[a-zA-Z0-9/_-]+$/.test(info.wsPath))throw Error('DSH browser integration is incompatible. Check it in Settings.')
-    return info
+    return workspaceProfile?{...info,chatCwd:workspaceProfile.cwd,agentPreset:workspaceProfile.preset,saved:preferences(workspaceProfile)['saved-sessions']||[]}:info
   })()
   try{return await integrationCheck}finally{integrationCheck=null}
 }
@@ -559,7 +561,7 @@ const localMethods = {
   'augmentor/onboarding': startOnboarding,
   'augmentor/home': homeConnection,
   'augmentor/memory': memoryRequest,
-  'session.branch': dshBranch,
+  'session.branch':async params=>{const result=await dshBranch(params);if(workspaceProfile)await bindProfileMemory(workspaceProfile,'dsh:'+result.sessionId);return result},
   'augmentor/prompts': (request) => promptLibrary(request),
   // Check npm (plugin) + GitHub releases (pipe/extension artifact) + the
   // live plugin handshake (installed plugin version) in parallel; each
@@ -871,7 +873,16 @@ async function handleExtMessage(msg) {
     let value
     if(UNIFIED)msg.params=await boundary.guard(msg.method,msg.params??{})
     if(UNIFIED&&msg.method==='session.prompt')await interactions.claim(msg.params.sessionId)
-    if (PLUGIN_METHODS.has(msg.method)) {
+    if(workspaceProfile&&msg.method==='session.prompt'){
+      const context=msg.params.workspaceContext;delete msg.params.workspaceContext
+      if(context&&typeof context==='object'&&JSON.stringify(context).length<=16000)preferences(workspaceProfile,{set:{['context:'+msg.params.sessionId]:{id:randomUUID(),at:Date.now(),value:context}}})
+    }
+    if(workspaceProfile&&['session.create','session.prompt'].includes(msg.method))await bindProfileMemory(workspaceProfile,'dsh:'+msg.params.sessionId)
+    if(workspaceProfile&&['augmentor/save','augmentor/unsave','augmentor/state'].includes(msg.method)){
+      const saved=new Set(preferences(workspaceProfile)['saved-sessions']||[])
+      if(msg.method!=='augmentor/state'){msg.method==='augmentor/save'?saved.add(msg.params.sessionId):saved.delete(msg.params.sessionId);preferences(workspaceProfile,{set:{'saved-sessions':[...saved]}})}
+      value={...await productHandshake(),saved:[...saved]}
+    } else if (PLUGIN_METHODS.has(msg.method)) {
       if (!pluginWs || pluginWs.readyState !== WebSocket.OPEN) {
         throw new Error('plugin channel not connected — the DSH app or the Augmentor plugin is not up')
       }
@@ -892,7 +903,7 @@ async function handleExtMessage(msg) {
       if (value.truncatedEarlier) log('history shaped', { truncatedEarlier: value.truncatedEarlier })
     }
     if (msg.method === 'session.list') {
-      if(UNIFIED){value={...value,items:value.items.filter(row=>PERSONAL_PRESETS.has(row.agentPreset) && row.origin!=='subagent')};boundary.known=new Set(value.items.map(row=>row.sessionId))}
+      if(UNIFIED){value={...value,items:value.items.filter(row=>visibleSession(row))};boundary.known=new Set(value.items.map(row=>row.sessionId))}
       value = shapeSessionList(value)
       if (value.truncatedEarlier) log('list shaped', { truncatedEarlier: value.truncatedEarlier })
     }
@@ -915,7 +926,7 @@ async function boot() {
   }
   remoteDsh.start()
   log('action-channel token source:', WS_TOKEN.source)
-  void openPluginWs()
+  if(!workspaceProfile)void openPluginWs() // Embedded panels do not take the extension browser executor.
 }
 
 // --------------------------------------------------------------- lifecycle

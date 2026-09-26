@@ -217,8 +217,8 @@ export function ensurePort() {
       state.phase = 'ready'
       broadcast(log('handshake', { serverInfo: result.serverInfo, provider: sel.provider, model: sel.model }))
     } catch (e) {
-      if(state.harness==='dsh'){
-        state.phase='needs-setup';state.error='Connect DSH to continue. '+e.message;broadcast();return
+      if(state.harness==='dsh'&&/Connect DSH from|integration is incompatible|Reconnect the matching/.test(e.message)){
+        state.phase='needs-setup';state.error=e.message;broadcast();return
       }
       fail(`initialize failed: ${e.message}`)
     }

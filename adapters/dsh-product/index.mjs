@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {ownsProductSession,profileForSession,profiles} from '../../services/workspaces/profiles.mjs'
 // Shared product integration, mounted on DSH's host plane by guided setup.
 import {readFileSync} from 'node:fs'
 import {createHash,timingSafeEqual} from 'node:crypto'
@@ -41,7 +42,7 @@ export async function apply(ctx){
  ctx.on('dispose',()=>interactions.close())
  const hash=value=>createHash('sha256').update(value).digest()
  const homeId=hash(token).toString('hex')
- const allowed=new Set(['augmentor-linux-product','augmentor-browser-product'])
+ const allowed=new Set(['augmentor-linux-product','augmentor-browser-product',...profiles().map(p=>p.preset)])
  ctx.effect(()=>ctx.webServer.register({kind:'exact',path:'/api/augmentor-product',handler:async(req,res)=>{
   const answer=(code,data)=>{res.writeHead(code,{'content-type':'application/json','cache-control':'no-store'});res.end(JSON.stringify(data))}
   let url
@@ -66,7 +67,7 @@ export async function apply(ctx){
     return
    }
    if(!surface||!['state','save','unsave'].includes(p.action))throw Error('Unsupported product operation')
-   const sessions=(await ctx.sessionPersistence.list()).map(row=>row.header).filter(row=>['augmentor-linux-product','augmentor-browser-product'].includes(row.agentPreset)&&row.origin!=='subagent')
+   const sessions=(await ctx.sessionPersistence.list()).map(row=>row.header).filter(row=>ownsProductSession(row))
    if(p.action!=='state'){
     const row=sessions.find(row=>row.id===p.sessionId);if(!row?.cwd)throw Error('This conversation belongs to another role')
     const workspace=await ctx.workspaceRegistry.create(row.cwd)

@@ -4,6 +4,8 @@
 - [Immediate composer feedback and regression evidence](COMPOSER-SEND-FEEDBACK.md)
 # Documentation index
 
+See [embedded Browser and specialist workspaces](WORKSPACE-EMBEDDING.md) for the product-owned iframe host, dedicated role/tool composition, scoped memory and release lifecycle.
+
 Licensing and publication: [combined Augmentor license](LICENSING.md),
 [public source and privacy review](PUBLIC-SOURCE.md),
 [canonical repository, archives and preserved work](REPOSITORIES.md).
