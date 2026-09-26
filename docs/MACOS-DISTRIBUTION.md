@@ -9,6 +9,28 @@ files it changes; historical acceptance records remain evidence of their own bui
 
 ## Delivery contract and sequencing
 
+### September 26 publication audit
+
+The request to publish a macOS download prompted a fresh check of release
+requirements. Both network Mac minis have **zero valid code-signing identities**;
+Gatekeeper rejects the current canonical development app. An Apple Developer
+web login alone does not install a Developer ID certificate or authorize
+notarization. No signing secrets are configured in this repository's GitHub
+Actions settings. A certificate request and its private key have been prepared
+privately on the 16 GB Mac; neither belongs in this repository.
+
+The macOS 14/26 bundled-runtime CI checks for `ea7b116` passed, but the Debian
+recovery proof failed because its isolated legacy profile omitted the preset
+that readiness now verifies. The proof now supplies that preset and explicitly
+selects it. The real local proof passes stopped-host startup, unexpected-host
+recovery and legacy-history repair; production readiness checks were not weakened.
+
+The personal Mac installation is not a fresh-user installer. Guided managed DSH
+provisioning, provider setup, required plugins, release licensing, browser and
+update qualification remain separate release work. Do not publish the personal
+profile, credentials, development ZIP or a Gatekeeper-bypass guide as a consumer
+download. The website still serves its existing Linux preview.
+
 The intended public experience is a Developer ID signed, notarized DMG: drag the
 application into Applications, open guided setup, connect a model and approve the
 browser extension in its store. Required Python, Qt, Node, DSH and plugin code
