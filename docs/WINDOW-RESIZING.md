@@ -42,6 +42,37 @@ Cocoa proof and screenshots passed on the 32 GB Mac. Artifact qualification and
 installed scope are recorded below after activation; source checks alone do not
 establish an installed update.
 
+## Qualified candidate and activation boundary
+
+Application source `252215b` is published on PR #13. A separate ad-hoc-sealed
+candidate applies nine application/document files over the installed runtime-first
+candidate from `60413de`, retaining the public `ea128d6` binary and dependencies.
+Its exact application-inventory SHA-256 is
+`957fba0a08a82a063c3957c3057bbf34b5924ff664a9bf7f522b8415fc04d0f1`.
+The sealed candidate passed the complete Cocoa resize/menu proof and strict
+signature verification after use. Synthetic window/menu screenshots were visually
+inspected. No owner model request, conversation, database or configuration change
+was part of qualification.
+
+The [Mac 14/26 workflow at `252215b`](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36259216754)
+passed. The [full validation run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36259216763)
+also passed its Debian, Home and Browser jobs at the recorded checkpoint; installed
+package lifecycle qualification was still running. Do not report that whole run
+as successful from those individual jobs. The preceding documentation-only
+`f0bc3c8` run had a Chromium fixture cleanup `ENOTEMPTY` failure; it is not a passing
+full-suite checkpoint.
+
+Activation is pending the owner closing the 32 GB Mac's desktop. The current
+normal app does not expose unsent draft state, so an idle status is insufficient
+permission to discard input. The owner was asked to finish any draft and quit.
+The existing installer refuses live component leases; no forced closure or
+in-place patch was attempted. At this checkpoint the installed desktop remains
+`60413de`, online with one configured provider and one session. Only the staged
+candidate has the menu/resize fix. A private activation helper is prepared to
+verify an idle DSH, preserve its saved profile/session metadata, drain only its
+verified owned runtime/helpers, atomically install with a retained backup, and
+resume the same service. Recheck current state before using it.
+
 ## Earlier Linux 0.2.5 evidence — historical
 
 The original implementation replaced the tiny footer corner grip with invisible

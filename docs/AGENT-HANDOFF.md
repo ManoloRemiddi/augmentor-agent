@@ -11,9 +11,12 @@ code ignored. The existing eight handles now have a logical-coordinate fallback
 while supported Linux compositor resizing is retained. Five resize regressions,
 117 Mac tests, 27 window tests, and eight synthetic pointer drags on the real
 32 GB Mac's Cocoa window passed. See [resize behavior and installed scope](WINDOW-RESIZING.md).
-The candidate must be separately sealed and installed; do not patch a selected
-bundle or infer deployment from source tests. Preserve the now-owned DSH service,
-model configuration, history and any active work during activation.
+Application source `252215b` has a separately sealed candidate; its own Cocoa
+proof and post-use integrity passed. Activation awaits the owner closing the
+32 GB Mac's desktop to preserve unsent input. Installed source is still `60413de`,
+online with one configured provider and one session. Do not infer deployment
+from candidate tests. Preserve the owned DSH service, model configuration,
+history and active work during activation; a private guarded helper is ready.
 
 ## September 26 runtime-first Mac setup — earlier installed checkpoint
 
