@@ -561,6 +561,7 @@ const localMethods = {
   'augmentor/onboarding': startOnboarding,
   'augmentor/home': homeConnection,
   'augmentor/memory': memoryRequest,
+  'session.resume':async()=>({ok:true}), // Boundary checks persisted role/cwd; no model action.
   'session.branch':async params=>{const result=await dshBranch(params);if(workspaceProfile)await bindProfileMemory(workspaceProfile,'dsh:'+result.sessionId);return result},
   'augmentor/prompts': (request) => promptLibrary(request),
   // Check npm (plugin) + GitHub releases (pipe/extension artifact) + the
@@ -830,6 +831,7 @@ function shapeSessionList(value) {
     sessionId: i.sessionId,
     cwd: i.cwd ?? null,
     running: !!i.running,
+    resumable:UNIFIED&&(!workspaceProfile||i.agentPreset===workspaceProfile.preset),
     updatedAt: i.updatedAt ?? null,
     ...(i.projections?.values?.title ? { projections: { values: { title: i.projections.values.title } } } : {}),
   })

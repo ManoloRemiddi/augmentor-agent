@@ -482,6 +482,23 @@ export function handlePanelMessage(msg, sender, sendResponse) {
     })
     return true // async
   }
+  if(msg?.type==='session/resume'){
+    if(state.running||state.mutating){sendResponse({ok:false,error:'Finish or stop the current action before changing conversations.'});return}
+    state.mutating=true
+    ;(async()=>{
+      if(!await requireReady())throw Error('Reconnect before choosing a conversation.')
+      const sessionId=String(msg.sessionId??'')
+      await request('session.resume',{sessionId})
+      const history=await request('session.history',{sessionId,maxMessages:200})
+      const catalog=await request('session.models',{sessionId})
+      state.sessionId=sessionId;state.sessionReady=true;state.panelViewSession=null;state.running=!!history.running
+      state.log=[];state.interactions=[];saveSessionId(sessionId)
+      if(catalog.current){state.selection=catalog.current;saveSelection(catalog.current)}
+      for(const row of history.events??[])log('event',{sessionId,event:row.event})
+      broadcast();sendResponse({ok:true,sessionId})
+    })().catch(error=>sendResponse({ok:false,error:error.message})).finally(()=>state.mutating=false)
+    return true
+  }
   if (msg?.type === 'session/history') {
     // M1: one DSH session's event history for the panel's live-event
     // renderer (the vocabularies match: user/message, assistant/message,
