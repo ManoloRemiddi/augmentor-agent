@@ -8,6 +8,14 @@ Repeated launches toggle that same named window. The default invocation retains
 its original socket and files. Both windows share the existing harness services,
 prompt library and model catalog.
 
+## Cross-platform requirement
+
+Two independent instances are a product feature on both Linux and macOS. The
+current Mac shortcut integration exposes only main; that is an unfinished port,
+not the intended product difference. The [parity audit](PLATFORM-PARITY-AUDIT.md)
+traces the missing service/activation work and records the shared instance tests
+passing on both OSs. No second Mac shortcut is implemented by this documentation.
+
 ## Settings
 
 Either window's Settings → Window shortcuts has separate capture fields and Save

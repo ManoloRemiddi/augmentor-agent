@@ -19,6 +19,8 @@ matrix and relevant setup/data/test instructions together. Source and installed
 state must remain distinct. Private logs, credentials and conversations stay out
 of this repository; include reproducible commands and sanitized evidence summaries.
 
+Current cross-platform direction: [one product, Linux/Mac parity audit and correction sequence](PLATFORM-PARITY-AUDIT.md).
+
 ## Start and understand the product
 
 - [Start here: agent handoff](AGENT-HANDOFF.md)
