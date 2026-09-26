@@ -2,6 +2,8 @@
 
 # Start here: agent handoff
 
+See [embedded Browser and specialist workspaces](WORKSPACE-EMBEDDING.md) for the product-owned iframe host, dedicated role/tool composition, scoped memory and release lifecycle.
+
 ## September 26 corrected Mac primary app activated
 
 Autonomous activation is complete for desktop chat. The installed user

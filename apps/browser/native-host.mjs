@@ -12,6 +12,8 @@ import {supportReport} from './shared/support.mjs'
 import {startOnboarding} from './shared/onboarding.mjs'
 import {memoryRequest} from './shared/memory.mjs'
 import {spawn} from 'node:child_process'
+import {loadProfile} from '../../services/workspaces/profiles.mjs'
+const workspaceProfile=loadProfile()
 import {fileURLToPath} from 'node:url'
 let child,compatible=false,buffer=Buffer.alloc(0)
 const reply=value=>{const b=Buffer.from(JSON.stringify(value)),h=Buffer.alloc(4);h.writeUInt32LE(b.length);process.stdout.write(Buffer.concat([h,b]))}
@@ -30,13 +32,16 @@ process.stdin.on('data',chunk=>{
     if(first.method==='augmentor/surface'){surfaceRequest(first.params??{}).then(result=>reply({id:first.id,result}),error=>reply({id:first.id,error:{message:error.message}}));continue}
     if(first.method==='augmentor/dsh'){dshSetup(first.params??{}).then(result=>reply({id:first.id,result}),error=>reply({id:first.id,error:{message:error.message}}));continue}
     if(first.method==='augmentor/diagnostics'){supportReport().then(result=>reply({id:first.id,result}),error=>reply({id:first.id,error:{message:error.message}}));continue}
+    if(workspaceProfile&&first.method==='augmentor/onboarding'){reply({id:first.id,error:{message:'This workspace is already configured. Use standalone Augmentor for personal setup.'}});continue}
     if(first.method==='augmentor/onboarding'){startOnboarding(first.params).then(result=>reply({id:first.id,result}),error=>reply({id:first.id,error:{message:error.message}}));continue}
     if(first.method==='augmentor/memory'){
+      if(workspaceProfile&&first.params?.action==='dual.recall'){reply({id:first.id,error:{message:'Connect the workspace harness before recalling memory.'}});continue}
       memoryRequest(first.params??{}).then(result=>reply({id:first.id,result}),error=>reply({id:first.id,error:{message:error.message}}));continue
     }
     if(first.method==='augmentor/prompts'){
       promptLibrary(first.params??{}).then(result=>reply({id:first.id,result}),error=>reply({id:first.id,error:{message:error.message}}));continue
     }
+    if(workspaceProfile&&first.method==='harness.select'&&first.params?.harness!=='dsh'){reply({id:first.id,error:{message:'This workspace uses its configured DSH specialist.'}});continue}
     if(first.method!=='harness.select'||!['pi','dsh'].includes(first.params?.harness)){reply({id:first.id,error:{message:'Choose DSH or Pi. Other harnesses are no longer supported; saved data is retained.'}});continue}
     child=spawn(process.execPath,[fileURLToPath(new URL(first.params.harness==='dsh'?'./pipe.mjs':'./pi-bridge.mjs',import.meta.url))],{stdio:['pipe','pipe','inherit'],env:{...process.env,AUGMENTOR_UNIFIED:'1',AUGMENTOR_BROWSER_HARNESS:first.params.harness}})
     child.stdout.pipe(process.stdout);child.on('error',()=>process.exit(1));child.on('exit',()=>process.exit(0));child.stdin.on('error',()=>process.exit(1))

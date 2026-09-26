@@ -1,19 +1,21 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {ownsProductSession,profileForSession,profiles} from '../../services/workspaces/profiles.mjs'
+import {profileMemoryCall} from '../../services/workspaces/memory.mjs';
 import {randomUUID} from 'node:crypto';
 import {DualMemoryClient} from '../../dist/memory/src/dual.js';
-const allowed=new Set(['augmentor-linux-product','augmentor-browser-product']);
+const allowed=new Set(['augmentor-linux-product','augmentor-browser-product',...profiles().map(p=>p.preset)]);
 const text=content=>typeof content==='string'?content:(content||[]).filter(p=>p.type==='text').map(p=>p.text).join('\n');
-const owned=session=>allowed.has(session.header.agentPreset)&&session.header.origin!=='subagent';
+const owned=session=>ownsProductSession(session.header);
 // Delegated agents and speech can use the GPU inside a tool call. Only known
 // ordinary I/O tools open a spare-compute window; unknown tools stay foreground.
 const spare=name=>['bash','read','write','edit','glob','grep','web_fetch','web_search'].includes(name)||String(name).startsWith('browser_');
 
-export function applyAutomaticMemory(ctx,{createClient=(session,cwd)=>new DualMemoryClient(session,cwd,undefined,message=>console.warn('[augmentor-memory]',message))}={}){
+export function applyAutomaticMemory(ctx,{createClient=(session,cwd,profile)=>new DualMemoryClient(session,cwd,profile?profileMemoryCall(profile):undefined,message=>console.warn('[augmentor-memory]',message))}={}){
   const states=new Map();
   function state(session){
     if(!owned(session))return;
     let value=states.get(session.id);
-    if(!value){value={client:createClient('dsh:'+session.id,session.header.cwd||''),mode:'text',cursor:session.inheritedEventCount||0,voiceCalls:new Set()};states.set(session.id,value);}
+    if(!value){value={client:createClient('dsh:'+session.id,session.header.cwd||'',profileForSession(session.header)),mode:'text',cursor:session.inheritedEventCount||0,voiceCalls:new Set()};states.set(session.id,value);}
     return value;
   }
   function capture(session,liveSeq){

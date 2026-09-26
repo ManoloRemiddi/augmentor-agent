@@ -29,6 +29,7 @@ export function memoryDialog(doc,send,provenance,container){
   let autoEnabled=true
   const loadAutomatic=async()=>{
     const value=await request('dual.describe');autoEnabled=!!value.enabled;autoToggle.textContent=autoEnabled?'Pause automatic memory':'Resume automatic memory';autoNote.textContent=(autoEnabled?'Automatic memory is on. ':'Automatic memory is paused. ')+`${value.events} transcript records; ${value.pending} memory scopes pending. ${value.message||''}`
+    if(value.scoped){autoToggle.hidden=true;connection.hidden=true;data.hidden=true;autoNote.textContent='Automatic continuity is scoped to '+value.workspace+'. Personal memory and other workspaces are excluded.'}
     const source=provenance();if(source.sessionId){try{const context=await request('dual.recall',{session:source.harness+':'+source.sessionId});autoContext.textContent=['relationship','work'].map(kind=>kind+': '+(context[kind]?.summary||'No distilled picture yet.')).join('\n\n')}catch{autoContext.textContent='Remembered context appears after this conversation uses automatic memory.'}}
   }
   const autoToggle=button(automatic,'Pause automatic memory',async()=>{autoToggle.disabled=true;try{await request('dual.configure',{enabled:!autoEnabled});await loadAutomatic()}catch(e){autoNote.textContent=e.message}finally{autoToggle.disabled=false}})
@@ -39,6 +40,7 @@ export function memoryDialog(doc,send,provenance,container){
   const invalidate=()=>{token=null;controls()};for(const e of [...Object.values(fields),scope])e.addEventListener('input',invalidate)
   const loadConfig=async()=>{
     config=await request('describe');token=null
+    if(config.scoped){connection.hidden=true;data.hidden=true;note.textContent='This workspace uses its own memory identity.';return}
     for(const id of ['endpoint','projectBank'])fields[id].value=config[id]??''
     fields.userBank.value=config.userBank??'augmentor-user-'+crypto.randomUUID().slice(0,12)
     fields.apiKey.value='';fields.apiKey.placeholder=config.apiKeySet?'Stored key kept if left blank':'Required for a remote service'

@@ -2,6 +2,8 @@
 
 # Current architecture
 
+See [embedded Browser and specialist workspaces](WORKSPACE-EMBEDDING.md) for the product-owned iframe host, dedicated role/tool composition, scoped memory and release lifecycle.
+
 Current development source: Augmentor 0.2.9 preview. Start with the
 [agent handoff](AGENT-HANDOFF.md) for the authoritative Git ref and evidence.
 The [documentation index](README.md) maps every subsystem to its detailed guide.
