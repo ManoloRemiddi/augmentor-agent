@@ -70,6 +70,12 @@ def main():
     shutil.copytree(ROOT/'release/dsh/plugins', target/'plugins')
     subprocess.run(['npm', 'ci', '--ignore-scripts', '--omit=dev', '--no-audit', '--no-fund'],
         cwd=target, check=True)
+    # The ARM64 Mac uses the native sharp/libvips pair qualified below. npm also
+    # installs the optional wasm fallback there; it contains a separate native
+    # source graph and is not a dependency of this target's working image path.
+    if sys.platform == 'darwin':
+        fallback = target/'node_modules/@img/sharp-wasm32'
+        if fallback.exists():shutil.rmtree(fallback)
     report = prepare(target, args.node)
     subprocess.run([sys.executable, str(ROOT/'scripts/third-party-notices.py'),
         '--tree', str(target), '--out', str(target/'licenses')], check=True)

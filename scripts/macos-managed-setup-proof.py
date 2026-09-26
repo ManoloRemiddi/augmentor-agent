@@ -28,6 +28,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--app-root', type=Path, required=True)
     parser.add_argument('--out', type=Path, required=True)
+    parser.add_argument('--interfaces', action='store_true', help='Also drive the native composer and a fresh Chrome profile')
     args = parser.parse_args()
     if sys.platform != 'darwin': parser.error('Requires macOS launchd.')
     root = args.app_root.resolve(); args.out.mkdir(parents=True, exist_ok=False)
@@ -110,6 +111,10 @@ def main():
         agent.start(); wait_for(lambda: adapter.call('host.describe'))
         restored = adapter.call('session.history', {'sessionId': session})
         assert 'Managed setup verified.' in json.dumps(restored)
+        if args.interfaces:
+            spec = importlib.util.spec_from_file_location('preview_ui', Path(__file__).with_name('macos-preview-ui-proof.py'))
+            ui = importlib.util.module_from_spec(spec); spec.loader.exec_module(ui)
+            report['interfaces'] = ui.verify(root, work, args.out)
         report.update(passed=True, providerRequests=len(calls), modelAvailable=True,
                       chatCompleted=True, conversationRestored=True, repeatedSetupPreserved=True)
     except BaseException:
