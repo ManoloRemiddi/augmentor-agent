@@ -15,6 +15,7 @@ from PySide6.QtGui import QKeySequence
 
 ROOT=Path(__file__).resolve().parents[3]
 manager=None
+FN_SPACE='Fn+Space'
 
 def configuration():
     base=Path(os.environ.get('XDG_CONFIG_HOME',Path.home()/'Library/Application Support/Augmentor/config'))
@@ -22,8 +23,10 @@ def configuration():
 
 def current_keys():
     path=configuration()
-    if not path.exists():return []
-    sequence=QKeySequence(json.loads(path.read_text())['sequence'],QKeySequence.SequenceFormat.PortableText)
+    if not path.exists():return [FN_SPACE]
+    saved=json.loads(path.read_text())['sequence']
+    if saved==FN_SPACE:return [FN_SPACE]
+    sequence=QKeySequence(saved,QKeySequence.SequenceFormat.PortableText)
     if sequence.isEmpty() or sequence.count()!=1:raise ValueError('The saved shortcut is invalid.')
     return [sequence[0].toCombined()]
 
@@ -35,6 +38,7 @@ class ShortcutManager(QObject):
         self.helper=Path(os.environ.get('AUGMENTOR_MACOS_HOTKEY',str(ROOT/'native/augmentor-hotkey')))
 
     def command(self,sequence):
+        if sequence==FN_SPACE:return [str(self.helper),'49','131072']
         if sequence.isEmpty() or sequence.count()!=1:raise ValueError('Choose one key combination.')
         combination=sequence[0];key=int(combination.key());modifiers=combination.keyboardModifiers()
         # Qt intentionally maps ControlModifier to Command and MetaModifier to
@@ -65,7 +69,7 @@ class ShortcutManager(QObject):
     def save(self,sequence,persist=True):
         with self.lock:
             if self.closed:raise RuntimeError('The shortcut owner has closed.')
-            command=self.command(sequence);key=sequence[0].toCombined()
+            command=self.command(sequence);key=FN_SPACE if sequence==FN_SPACE else sequence[0].toCombined()
             if self.key==key and self.binding==command and self.process and self.process.poll() is None:return key
             child=subprocess.Popen(command,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
             try:
@@ -79,7 +83,7 @@ class ShortcutManager(QObject):
                     fd,temporary=tempfile.mkstemp(prefix='.shortcut-',dir=path.parent)
                     try:
                         with os.fdopen(fd,'w') as stream:
-                            json.dump({'sequence':sequence.toString(QKeySequence.SequenceFormat.PortableText)},stream)
+                            json.dump({'sequence':FN_SPACE if sequence==FN_SPACE else sequence.toString(QKeySequence.SequenceFormat.PortableText)},stream)
                             stream.flush();os.fsync(stream.fileno())
                         os.replace(temporary,path)
                     finally:Path(temporary).unlink(missing_ok=True)
@@ -96,7 +100,7 @@ class ShortcutManager(QObject):
             except ValueError:continue
             if child is self.process and event.get('event')=='pressed':self.pressed.emit()
             if child is self.process and event.get('event')=='layoutChanged':
-                try:self.save(QKeySequence(self.key),persist=False)
+                try:self.save(FN_SPACE if self.key==FN_SPACE else QKeySequence(self.key),persist=False)
                 except Exception as error:
                     # A stale physical binding could activate on the wrong key.
                     # Release it if the new layout cannot resolve/register it.
@@ -109,7 +113,7 @@ class ShortcutManager(QObject):
 
     def restore(self):
         keys=current_keys()
-        if keys:self.save(QKeySequence(keys[0]),persist=False)
+        if keys:self.save(FN_SPACE if keys[0]==FN_SPACE else QKeySequence(keys[0]),persist=not configuration().exists())
 
     def close(self):
         with self.lock:
@@ -126,7 +130,7 @@ class RemoteShortcutManager(QObject):
 
     def save(self,sequence):
         from .macos_shortcut_service import request
-        return request({'operation':'save','sequence':sequence.toString(QKeySequence.SequenceFormat.PortableText)})['key']
+        return request({'operation':'save','sequence':FN_SPACE if sequence==FN_SPACE else sequence.toString(QKeySequence.SequenceFormat.PortableText)})['key']
 
     def restore(self):
         from .macos_shortcut_service import request
@@ -185,6 +189,9 @@ class ManagedShortcutManager(RemoteShortcutManager):
         with self.lock:
             registration=Path.home()/'Library/LaunchAgents/com.augmentor.Agent.shortcut.plist'
             if registration.exists() or registration.is_symlink():
+                return super().restore()
+            if not configuration().exists():
+                self.ensure_service()
                 return super().restore()
             # Preserve existing in-app shortcuts until the user saves settings.
             # Removing login registration must not silently re-enable it.

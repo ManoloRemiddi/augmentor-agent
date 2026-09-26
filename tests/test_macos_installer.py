@@ -17,6 +17,27 @@ spec.loader.exec_module(installer)
 
 
 class MacInstallerTests(unittest.TestCase):
+    def test_default_prefers_existing_installation_and_refuses_ambiguous_duplicates(self):
+        name='Augmentor Agent Desktop.app';home=Path('/fixture-user')
+        with patch.object(Path,'home',return_value=home),patch.object(Path,'is_symlink',return_value=False),patch.object(installer.os,'access',return_value=True):
+            for existing in (Path('/Applications')/name,home/'Applications'/name):
+                with patch.object(Path,'exists',lambda p:p==existing):
+                    self.assertEqual(installer.default_destination(name),existing)
+            with patch.object(Path,'exists',return_value=True),self.assertRaisesRegex(ValueError,'More than one'):
+                installer.default_destination(name)
+            with patch.object(Path,'exists',return_value=False):
+                self.assertEqual(installer.default_destination(name),Path('/Applications')/name)
+                with patch.object(installer.os,'access',return_value=False):
+                    self.assertEqual(installer.default_destination(name),home/'Applications'/name)
+
+    def test_destination_parent_rejects_symlinks_and_public_write_access(self):
+        with tempfile.TemporaryDirectory() as directory:
+            parent=Path(directory);installer.validate_parent(parent)
+            link=parent/'link';link.symlink_to(parent,target_is_directory=True)
+            with self.assertRaises(ValueError):installer.validate_parent(link)
+            parent.chmod(0o777)
+            with self.assertRaises(ValueError):installer.validate_parent(parent)
+
     def test_companion_identity_requires_matching_release_component(self):
         with tempfile.TemporaryDirectory() as directory:
             app=Path(directory)/'Companion.app';root=app/'Contents/Resources/app';root.mkdir(parents=True)
@@ -184,6 +205,9 @@ m.replace(Path(sys.argv[2]),Path(sys.argv[3]))
             old.mkdir(); new.mkdir()
             (old/'version').write_text('old'); (new/'version').write_text('new')
             backup = installer.replace(new, old)
+            self.assertTrue(backup.name.startswith('.'))
+            self.assertTrue(backup.name.endswith('.noindex'))
+            self.assertEqual(list(root.glob('*.app')),[old])
             self.assertEqual((backup/'version').read_text(), 'old')
             self.assertEqual((old/'version').read_text(), 'new')
             newer = installer.replace(backup, old)

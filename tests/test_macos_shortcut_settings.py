@@ -1,5 +1,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import errno
+import os
+import json
 from pathlib import Path
 import subprocess
 import tempfile
@@ -47,8 +49,16 @@ class ManagedShortcutSettingsTests(unittest.TestCase):
 
     def test_opening_without_login_registration_preserves_local_choice(self):
         manager=ManagedShortcutManager()
-        with tempfile.TemporaryDirectory() as directory,patch.object(Path,'home',return_value=Path(directory)),patch.object(manager.local,'restore') as restore,patch.object(manager,'ensure_service') as ensure:
+        with tempfile.TemporaryDirectory() as directory,patch.object(Path,'home',return_value=Path(directory)),patch.dict(os.environ,{'XDG_CONFIG_HOME':directory}),patch.object(manager.local,'restore') as restore,patch.object(manager,'ensure_service') as ensure:
+            config=Path(directory)/'augmentor/shortcut.json';config.parent.mkdir();config.write_text(json.dumps({'sequence':'Ctrl+Alt+J'}))
             manager.restore();restore.assert_called_once();ensure.assert_not_called()
+        manager.close()
+
+    def test_first_launch_registers_default_with_login_service(self):
+        manager=ManagedShortcutManager()
+        with tempfile.TemporaryDirectory() as directory,patch.object(Path,'home',return_value=Path(directory)),patch.dict(os.environ,{'XDG_CONFIG_HOME':directory}),patch.object(manager.local,'restore') as local,patch.object(manager,'ensure_service') as ensure,patch('augmentor_linux.macos_shortcut_service.request',return_value={'active':True,'key':'Fn+Space'}) as request:
+            manager.restore();ensure.assert_called_once();local.assert_not_called()
+            request.assert_called_once_with({'operation':'status'})
         manager.close()
 
 

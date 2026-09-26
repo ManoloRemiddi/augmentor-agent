@@ -1210,7 +1210,7 @@ def main():
         client = QLocalSocket()
         client.connectToServer(socket_name)
         if client.waitForConnected(300):
-            client.write(b'maintenance.status' if args.onboarding_host or args.ensure_running else b'voice' if args.voice else ('harness:'+args.harness).encode() if args.harness else b'toggle')
+            client.write(b'maintenance.status' if args.onboarding_host or args.ensure_running else b'voice' if args.voice else ('harness:'+args.harness).encode() if args.harness else b'show' if sys.platform=='darwin' else b'toggle')
             client.waitForBytesWritten(500)
             return 0
         app.instance_lock = QLockFile(str(runtime / (ipc_basename()+'.lock')))
@@ -1261,6 +1261,7 @@ def main():
                         response={'ok':True,'result':result}
                     except Exception as error:response={'ok':False,'error':str(error)}
                     client.write(json.dumps(response).encode()+b'\n');client.waitForBytesWritten(500)
+                elif command=='show':window.bring_forward()
                 elif command=='voice':window.request_voice()
                 elif command.startswith('harness:'):
                     window.switch_harness(command.split(':',1)[1])
@@ -1271,6 +1272,9 @@ def main():
                 client.deleteLater()
         app.instance_server.newConnection.connect(activate)
     window.bring_forward()
+    if sys.platform=='darwin':
+        # Finder/Dock reopen an existing application without another main().
+        app.applicationStateChanged.connect(lambda state:window.bring_forward() if state==Qt.ApplicationState.ApplicationActive and not window.isVisible() else None)
     if args.voice:QTimer.singleShot(0,window.request_voice)
     if sys.platform=='darwin' and not args.preview and not args.screenshot:
         from .macos_shortcuts import initialize

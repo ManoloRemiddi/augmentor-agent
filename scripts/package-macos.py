@@ -66,6 +66,25 @@ def copy(source, destination):
     else:shutil.copy2(source, destination)
 
 
+def build_icon(resources):
+    """Render the shared product artwork at every standard macOS icon scale."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QGuiApplication,QImage,QPainter
+    from PySide6.QtSvg import QSvgRenderer
+    application=QGuiApplication.instance() or QGuiApplication([])
+    renderer=QSvgRenderer(str(ROOT/'apps/native/augmentor_linux/assets/augmentor.svg'))
+    if not renderer.isValid():raise ValueError('Invalid application icon artwork.')
+    with tempfile.TemporaryDirectory(suffix='.iconset') as temporary:
+        for size in (16,32,128,256,512):
+            for scale in (1,2):
+                image=QImage(size*scale,size*scale,QImage.Format.Format_ARGB32)
+                image.fill(Qt.GlobalColor.transparent)
+                painter=QPainter(image);renderer.render(painter);painter.end()
+                name=f'icon_{size}x{size}'+('@2x' if scale==2 else '')+'.png'
+                if not image.save(str(Path(temporary)/name)):raise RuntimeError('Could not render app icon.')
+        subprocess.run(['iconutil','-c','icns',temporary,'-o',str(resources/'Augmentor.icns')],check=True)
+
+
 def application_inventory(project):
     """Identify shipped application files, separately from third-party runtimes."""
     files={}
@@ -207,13 +226,14 @@ def main():
     for name, component in launchers:
         launcher = contents/'MacOS'/name
         build_launcher(launcher, component, config['minimumMacOS'])
+    build_icon(resources)
     info = {
         'CFBundleName':'Augmentor Agent' if desktop else app_name,'CFBundleDisplayName':'Augmentor Agent' if desktop else app_name,
         'CFBundleIdentifier':'com.augmentor.Agent' if desktop else 'com.augmentor.Agent.Companion',
         'CFBundleExecutable':app_name if desktop else 'augmentor-runtime',
         'CFBundlePackageType':'APPL','CFBundleShortVersionString':product['version'],
         'CFBundleVersion':product['version'],'LSMinimumSystemVersion':config['minimumMacOS'],
-        'NSHighResolutionCapable':True,
+        'NSHighResolutionCapable':True,'CFBundleIconFile':'Augmentor.icns',
         'NSMicrophoneUsageDescription':'Augmentor uses the microphone when you enable voice input.',
         'NSScreenCaptureUsageDescription':'Augmentor observes the desktop when you request computer control.',
         'NSAppleEventsUsageDescription':'Augmentor interacts with applications when you request computer control.'}

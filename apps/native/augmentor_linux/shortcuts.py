@@ -44,7 +44,7 @@ def current_keys(instance=None):
 
 def display_key(key):
     # Verified by a focused key test on this machine's MX Keys Mini.
-    return 'Fn+Space' if key==int(Qt.Key.Key_Hangul) else QKeySequence(key).toString(QKeySequence.SequenceFormat.NativeText)
+    return 'Fn+Space' if key=='Fn+Space' or key==int(Qt.Key.Key_Hangul) else QKeySequence(key).toString(QKeySequence.SequenceFormat.NativeText)
 
 
 def shortcut_key(sequence):

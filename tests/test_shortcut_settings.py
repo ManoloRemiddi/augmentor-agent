@@ -19,6 +19,16 @@ class ShortcutSettingsTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):cls.app=QApplication.instance() or QApplication([])
 
+    def test_macos_shows_one_shortcut_and_saves_fn_without_qt_parsing(self):
+        from PySide6.QtWidgets import QPushButton
+        with patch('augmentor_linux.shortcut_settings.sys.platform','darwin'),patch('augmentor_linux.shortcut_settings.current_keys',return_value=['Fn+Space']),patch('augmentor_linux.shortcut_settings.save_shortcut',return_value='Fn+Space') as save:
+            owner=Owner();settings=ShortcutSettings(owner)
+            self.assertEqual(list(settings.rows),['main'])
+            self.assertEqual(settings.rows['main']['current'].text(),'Current: Fn+Space')
+            next(b for b in settings.findChildren(QPushButton) if b.text()=='Use Fn+Space').click()
+            save.assert_called_once_with('Fn+Space','main')
+            self.assertEqual(settings.rows['main']['current'].text(),'Current: Fn+Space');owner.close()
+
     def test_keyboard_capture_and_save_target_each_window(self):
         with patch('augmentor_linux.shortcut_settings.current_keys',return_value=[]),patch('augmentor_linux.shortcut_settings.save_shortcut',side_effect=lambda seq,name:seq[0].toCombined()) as save:
             owner=Owner();settings=ShortcutSettings(owner);settings.show();owner.show()
