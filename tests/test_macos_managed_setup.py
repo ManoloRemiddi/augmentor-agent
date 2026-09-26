@@ -1,6 +1,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import importlib.util
 import io
+import itertools
 import json
 import os
 from pathlib import Path
@@ -68,7 +69,10 @@ class ManagedMacSetupTests(unittest.TestCase):
         self.assertEqual((self.state/'runtime.json').stat().st_mode & 0o777, 0o600)
         descriptor = managed.service_plist(self.root, self.state)
         self.assertNotIn(self.request['apiKey'].encode(), descriptor)
-        self.assertTrue(plistlib.loads(descriptor)['KeepAlive'])
+        service = plistlib.loads(descriptor)
+        self.assertTrue(service['KeepAlive'])
+        self.assertEqual(service['ProcessType'], 'Interactive')
+        self.assertTrue(managed.private_json(self.state/'startup-check.json')['integrationInstalled'])
         self.assertEqual(dsh.current()['managed']['type'], 'launchd')
         self.assertTrue(self.agent.active)
         self.assertTrue(self.provision()['saved'])
@@ -94,6 +98,19 @@ class ManagedMacSetupTests(unittest.TestCase):
         self.assertEqual(managed.private_json(self.state/'setup.json')['status'], 'failed')
         self.assertFalse(dsh.current()); self.assertTrue(self.agent.stopped)
         self.bootstrap.side_effect = None
+        self.assertTrue(self.provision()['saved'])
+
+    def test_readiness_timeout_preserves_retry_and_private_redacted_diagnostics(self):
+        ticks = itertools.count(0, 20)
+        with patch.object(SetupFixture, 'check', side_effect=ValueError('rejected private-test-key')), \
+             patch.object(managed.time, 'monotonic', side_effect=lambda: next(ticks)), \
+             patch.object(managed.time, 'sleep'):
+            with self.assertRaisesRegex(ValueError, 'did not become ready'): self.provision()
+        self.assertFalse(dsh.current()); self.assertTrue(self.agent.stopped)
+        diagnostic = managed.private_json(self.state/'startup-check.json')
+        self.assertFalse(diagnostic['integrationInstalled'])
+        self.assertGreater(diagnostic['attempts'], 0)
+        self.assertNotIn(self.request['apiKey'], json.dumps(diagnostic))
         self.assertTrue(self.provision()['saved'])
 
     def test_foreign_service_is_not_stopped_or_overwritten(self):

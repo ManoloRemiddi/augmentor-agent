@@ -113,7 +113,9 @@ def service_plist(root, state, label=LABEL):
         'ProgramArguments': [str(root/'python/bin/python3'), '-I', '-B', str(root/'scripts/setup-macos.py'),
                              '--run-service', str(state)],
         'RunAtLoad': True, 'KeepAlive': True, 'ThrottleInterval': 10, 'Umask': 0o077,
-        'ProcessType': 'Background', 'WorkingDirectory': str(state/'home'),
+        # This host serves foreground chat and tools. Background applies
+        # launchd's restrictive CPU/I/O limits to work the user is waiting for.
+        'ProcessType': 'Interactive', 'WorkingDirectory': str(state/'home'),
         'StandardOutPath': str(state/'runtime.log'), 'StandardErrorPath': str(state/'runtime.log')})
 
 
@@ -269,9 +271,10 @@ def provision(root, state, request, *, agent=None, probe=probe_model):
             complete.configure_product(root, cli, home, record['endpoint'], env, state, save=False)
             record['status'] = 'starting'; atomic_json(marker, record)
             agent.start()
-            deadline = time.monotonic()+60
-            setup = Setup(); checked = None; last_check_error = None
+            started = time.monotonic(); deadline = started+60
+            setup = Setup(); checked = None; last_check_error = None; attempts = 0
             while time.monotonic() < deadline:
+                attempts += 1
                 try:
                     checked = setup.check({'endpoint': record['endpoint'], 'home': str(home)})
                     if checked['installed']:
@@ -279,9 +282,12 @@ def provision(root, state, request, *, agent=None, probe=probe_model):
                 except (OSError, ValueError) as error:
                     last_check_error = str(error).replace(secret, '[redacted]')[:2000]
                 time.sleep(.25)
+            # Private diagnostics on both outcomes expose intermittent startup
+            # delays without exporting credentials or broad process state.
+            atomic_json(state/'startup-check.json', {'lastError': last_check_error,
+                'integrationInstalled': bool(checked and checked.get('installed')),
+                'attempts': attempts, 'elapsedSeconds': round(time.monotonic()-started, 3)})
             if not checked or not checked['installed']:
-                atomic_json(state/'startup-check.json', {'lastError': last_check_error,
-                    'integrationInstalled': bool(checked and checked.get('installed'))})
                 raise ValueError('The managed agent did not become ready. Setup can be retried without changing other DSH profiles.')
             observed = configuration().read_bytes() if configuration().exists() else None
             if observed != previous_config:

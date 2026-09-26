@@ -65,6 +65,13 @@ recognizes the saved `managed` owner and restarts that job instead of spawning a
 detached runtime without credentials. Advanced reconnection to the same profile
 retains the ownership descriptor.
 
+The host uses launchd's **Interactive** process type because it handles chat and
+tools that the user is waiting for. Apple's [launchd policy documentation](https://github.com/apple-oss-distributions/launchd/blob/main/man/launchd.plist.5)
+applies restrictive resource limits to Background jobs. The earlier source
+descriptor used Background; this correction does not modify the owner's separate
+development service. A private `startup-check.json` records elapsed time, attempts,
+integration readiness and the last redacted check error on success or failure.
+
 Bootstrap starts a temporary owned host, installs product integration, restarts
 to validate it, then stops that host. The persistent service must become healthy
 before shared connection settings are saved. Failed setup stops only its own
@@ -85,6 +92,13 @@ Local Linux regression passed **475 tests, two Mac-only skips**, before the fina
 three focused recovery/provider-error tests were added. The final managed backend
 suite has twelve cases; the actual Qt form has three. Fourteen of those passed
 on the 16 GB ARM64 Mac before the last provider-error test was added.
+
+The subsequent timeout/retry test brings the backend suite to **thirteen**, all
+passing on Linux and the 16 GB ARM64 Mac. It verifies that readiness failure
+does not select a broken connection, stops the unpublished job, redacts the key
+from private diagnostics and permits a successful retry. The Interactive-service
+proof completed provisioning in 10.62 seconds, including 3.394 seconds of
+persistent-service readiness checks, then passed chat, restart and restoration.
 
 The real Mac proof used an isolated profile, prepared bundled DSH/Node/Python,
 a uniquely named real LaunchAgent and a deterministic HTTP model. It verified
@@ -108,6 +122,16 @@ Qt tests exercise real widgets with a fixture worker. This does not establish
 an end-user click-through from a quarantined, signed DMG. The Mac CI matrix now
 runs the real managed-service proof against each newly built bundle and verifies
 its signature afterward; pending CI must not be described as passed.
+
+At source `4fdd8a4`, [both Mac runners](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36234652550)
+and [full validation](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36234652564)
+passed. The preceding `7f03e17` run passed macOS 14 but timed out waiting for the
+managed service on macOS 26. Its logs did not establish the cause. A later pass
+does not prove that intermittent failure resolved. Failure excerpts now contain
+only synthetic fixture logs, and CI retains the report even when a step fails.
+The scheduling correction is independently appropriate; do not attribute the
+earlier timeout to it without supporting evidence. These runs precede that
+correction and are not its qualification.
 
 The owner's canonical app remains the earlier development artifact. See the
 [release guide](MACOS-RELEASE.md) for Developer ID/notarization, signed installed

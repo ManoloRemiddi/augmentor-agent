@@ -76,7 +76,10 @@ def main():
             time.sleep(.2)
         raise AssertionError('Managed setup proof timed out.')
     try:
+        started = time.monotonic()
         result = managed.provision(root, state, request, agent=agent)
+        report['provisionSeconds'] = round(time.monotonic()-started, 3)
+        report['startupCheck'] = managed.private_json(state/'startup-check.json')
         assert result['saved'] and agent.loaded()
         sys.path[:0] = [str(root/'apps/native'), str(root/'services')]
         from augmentor_linux.adapters.dsh import DshAdapter

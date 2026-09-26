@@ -22,6 +22,13 @@ This supersedes the basic provisioning implementation gap above; full plugin,
 signed installed, licensing, browser and update gates remain. The source feature
 has not replaced the owner's working app, and no public Mac download is live.
 
+At `4fdd8a4`, full validation and the managed first-run Mac 14/26 matrix passed.
+The preceding Mac 26 run had an unexplained startup timeout; a passing rerun
+does not establish its cause. The follow-up source corrects the service's
+launchd scheduling class for interactive chat, adds private startup timings,
+and retains failing fixture reports. See the managed-setup evidence before
+calling this intermittent issue resolved. Apple enrollment remains pending.
+
 ## September 26 clean Mac installation and default shortcut
 
 The duplicate development apps were removed and their application registrations
