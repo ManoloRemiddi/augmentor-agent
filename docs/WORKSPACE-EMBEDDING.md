@@ -97,7 +97,7 @@ its former copied host and polling connector. Source implementation starts at
 settings-navigation correction `f65cd2c` and dedicated-memory settings `958e17d`. A compatible 0.2.11 candidate was
 built from the previous selected immutable release; this is not represented as
 a complete source 0.2.12 upgrade. Final selection is
-`20260926-093948-e7519be6`. The embedding service runs the selected artifact;
+`20260926-094358-23419e74`. The embedding service runs the selected artifact;
 existing native windows were left on their earlier compatible releases.
 
 Read-only live DSH verification used direct application tools, recognized the
@@ -129,4 +129,13 @@ replayed. Follow-up commands fail immediately on errors. This deployment
 incident is not described as safe idle restart evidence. Product/tunnel fault
 tests did not restart the shared DSH harness.
 
-Final selected artifact SHA-256: `6793a03789109c9b0834cd0158c0b108f78a39e885e92c68d40576712f1adbbe`.
+Final selected artifact SHA-256: `b2b58981433633a63d0ca67d4431962c9589f5c7d8db1858f14fbc609806255c`.
+
+### Resuming history
+
+The inherited Browser history picker previously opened chats as read-only
+previews. `dc1e2b2` adds an authorized resume operation in the product and uses
+it for owned conversations: history selection preserves the persisted session
+ID, model and role, reloads its events, and enables the composer. Registered
+legacy roles remain read-only. Out-of-workspace and legacy resume attempts are
+covered by the boundary tests. Opening history never submits a new prompt.
