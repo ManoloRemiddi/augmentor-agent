@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Current OS parity direction and verified gaps: [one-product architecture audit](PLATFORM-PARITY-AUDIT.md).
+The tables below compare harnesses and presentation surfaces; they do not establish
+Linux/macOS parity. Mac's second-instance shortcut remains an implementation gap.
+
+
 Mac setup update (26 September): current source has a separate
 [managed runtime/model form](MACOS-MANAGED-SETUP.md) for fresh bundled desktops.
 External DSH setup below remains available. Basic setup, chat and restart passed
