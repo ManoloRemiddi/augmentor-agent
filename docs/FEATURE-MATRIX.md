@@ -1,8 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-Mac first-run correction (26 September): the desktop immediately detects a missing
-connection and offers **Install DSH** with progress and retry, before starting
-connection recovery. See [qualification and deployment](MACOS-GUIDED-DSH-SETUP.md).
+Mac setup correction (26 September, current source): install/start DSH before
+model setup, persistent Agent setup/Open DSH buttons, authenticated browser
+handoff, native DSH provider settings. See [qualification and deployment](MACOS-GUIDED-DSH-SETUP.md).
 
 Earlier Mac setup update (26 September): current source has a separate
 [managed runtime/model form](MACOS-MANAGED-SETUP.md) for fresh bundled desktops.

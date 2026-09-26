@@ -2,6 +2,54 @@
 
 # Guided DSH installation on Mac
 
+## Current correction: runtime first, visible browser access
+
+The earlier technical form below did not solve the owner's usability problem.
+On reinspection the installed desktop was still unconfigured: the DSH payload
+was bundled, but the managed profile and login service did not exist. Model
+validation prevented installation from starting, and Models & providers opened
+a bare origin without DSH's browser authentication.
+
+Current source opens **Agent setup** with two separate steps. **Install and
+start DSH** needs no provider fields and uses the same managed installer and
+ownership journal. It saves the connection only after the service and product
+integration are healthy. Model configuration remains in DSH's own
+**Settings → Models** interface. The setup explains the first-run DeepSeek
+prompt and **Configure later** for other providers. **Check connection** reads
+the saved provider/credential availability, not just the built-in catalog.
+It does not claim a successful inference request from configuration alone.
+
+The Mac chat window keeps **Agent setup** and **Open DSH** visible. Setup remains
+available for a managed installation after first run. Start/Open resume the
+recorded launchd owner if needed, without rewriting models or restarting a
+running host. Browser opening obtains DSH's current process login token using
+the existing authenticated local integration; DSH exchanges it for its own
+browser cookie. Tokens are never displayed, copied to the clipboard, or stored
+in a new launcher. Every opening requests a fresh token, including after restart.
+External connections keep the existing connection editor, with the same corrected
+browser handoff. Linux and Pi setup are unchanged.
+
+Verification: focused setup/transport tests, 112 Mac tests and
+27 native-window tests have passed on the 32 GB Mac. An isolated real launchd
+profile started without a provider in 10.886 seconds. The Browser skill checked
+its actual initial screen, preview notice, Models section and provider chooser
+through a private SSH tunnel; this was synthetic state, not the owner's account.
+A catalog-only assertion initially exposed the distinction between listed models
+and configured credentials. A fixture without a key also exposed the pinned
+pi-ai adapter's key requirement; the fixture now saves its synthetic credential
+through DSH's own credentials API before testing chat.
+
+This section describes the new source/candidate, not an installed update yet.
+The real engine-first proof passed in 11.171 seconds with a credential saved
+through the DSH API, completed chat, unchanged repeat setup, service restart,
+restored history and fresh browser login after restart. Its temporary LaunchAgent
+and shared helpers were stopped. Native Qt renders of initial setup, running DSH
+without a model, and persistent chat navigation were visually inspected.
+The next deployment record must identify the exact source and qualified artifact.
+The following sections are historical evidence for the earlier installed form.
+
+## Earlier form and deployment (superseded UX)
+
 The 32 GB Mac had the public 0.2.12 preview from `ea128d6`, including DSH,
 Node and Python, but no saved DSH connection. The running desktop was offline
 with “Use Connect DSH to save the matching local connection before automatic

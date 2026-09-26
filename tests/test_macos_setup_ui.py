@@ -35,49 +35,62 @@ class MacSetupUiTests(unittest.TestCase):
             time.sleep(.01)
         self.fail('Setup UI fixture timed out.')
 
-    def test_install_button_clears_key_and_reconnects_only_after_readiness(self):
+    def setUp(self):
+        self.needed = patch('augmentor_linux.macos_setup.needed', return_value=True)
+        self.needed.start(); self.addCleanup(self.needed.stop)
+
+    def test_install_needs_no_model_and_keeps_browser_action_visible(self):
         owner = Owner(); dialog = MacSetupDialog(owner)
-        dialog.url.setText('https://example.test/v1'); dialog.model.setText('model'); dialog.key.setText('private-key')
         try:
-            self.assertEqual(dialog.connect_button.text(), 'Install DSH')
-            self.assertIn('Setup required', dialog.runtime_status.text())
-            with patch('augmentor_linux.macos_setup.run_setup', return_value={'ok': True, 'saved': True}) as worker:
+            self.assertEqual(dialog.connect_button.text(), 'Install and start DSH')
+            self.assertFalse(dialog.browser_button.isEnabled())
+            with patch('augmentor_linux.macos_setup.run_setup', return_value={'ok': True, 'saved': True}) as worker, \
+                 patch('augmentor_linux.macos_setup.runtime_state', return_value={'ok':True,'installed':True,'online':True,'modelCount':0}):
                 dialog.show(); QTest.mouseClick(dialog.connect_button, Qt.MouseButton.LeftButton)
                 self.wait_for(lambda: owner.selected)
                 self.assertEqual(owner.selected, ('dsh', True))
-                self.assertEqual(worker.call_args.args[0]['apiKey'], 'private-key')
-                self.assertFalse(dialog.key.text())
+                self.assertEqual(worker.call_args.args[0], {'action':'install-runtime'})
+                self.assertTrue(dialog.isVisible()); self.assertTrue(dialog.browser_button.isEnabled())
+                self.assertFalse(dialog.chat_button.isEnabled()); self.assertIn('Running',dialog.runtime_status.text())
+                self.assertIn('Add a model',dialog.model_status.text())
         finally: self.dispose(dialog, owner)
+
+    def test_browser_handoff_and_refresh_do_not_install_or_change_models(self):
+        owner = Owner(); dialog = MacSetupDialog(owner)
+        result={'ok':True,'installed':True,'online':True,'modelCount':1,'browserUrl':'http://127.0.0.1:1234/?token=private'}
+        try:
+            with patch('augmentor_linux.macos_setup.runtime_state',return_value=result) as state, \
+                 patch('augmentor_linux.macos_setup.QDesktopServices.openUrl',return_value=True) as browser, \
+                 patch('augmentor_linux.macos_setup.run_setup') as installer:
+                dialog.open_browser();self.wait_for(lambda:not dialog.busy)
+                state.assert_called_once_with(start=True,browser=True)
+                browser.assert_called_once();installer.assert_not_called()
+                self.assertTrue(dialog.chat_button.isEnabled());self.assertNotIn('private',dialog.note.text())
+        finally:self.dispose(dialog,owner)
 
     def test_active_setup_cannot_dispatch_twice_or_be_dismissed(self):
         owner = Owner(); dialog = MacSetupDialog(owner); released = threading.Event()
-        dialog.url.setText('https://example.test/v1'); dialog.model.setText('model')
         def pending(request, progress):
-            progress('integration')
-            released.wait(5)
-            return {'ok': False, 'error': 'Check the model key.'}
+            progress('integration'); released.wait(5)
+            return {'ok': False, 'error': 'Service could not start.'}
         try:
             with patch('augmentor_linux.macos_setup.run_setup', side_effect=pending) as worker:
-                dialog.show(); dialog.connect_model(); dialog.connect_model(); dialog.reject()
+                dialog.show(); dialog.install_or_start(); dialog.install_or_start(); dialog.reject()
                 self.assertTrue(dialog.busy); self.assertFalse(dialog.dismissed)
                 self.assertFalse(dialog.connect_button.isEnabled())
                 self.wait_for(lambda: 'capabilities' in dialog.note.text())
-                self.assertTrue(dialog.progress_bar.isVisible())
                 released.set(); self.wait_for(lambda: not dialog.busy)
                 self.assertEqual(worker.call_count, 1)
-                self.assertEqual(dialog.note.text(), 'Check the model key.')
+                self.assertEqual(dialog.note.text(), 'Service could not start.')
                 self.assertTrue(dialog.connect_button.isEnabled()); self.assertIsNone(owner.selected)
-                self.assertEqual(dialog.connect_button.text(), 'Retry setup')
-                self.assertEqual(dialog.url.text(), 'https://example.test/v1')
         finally: released.set(); self.dispose(dialog, owner)
 
     def test_active_conversation_prevents_configuration_change(self):
         owner = Owner(); owner.controller = SimpleNamespace(running=True, navigating=False)
         dialog = MacSetupDialog(owner)
-        dialog.url.setText('https://example.test/v1'); dialog.model.setText('model')
         try:
             with patch('augmentor_linux.macos_setup.run_setup') as worker:
-                dialog.connect_model(); worker.assert_not_called()
+                dialog.install_or_start(); worker.assert_not_called()
                 self.assertIn('Finish the current action', dialog.note.text())
         finally: self.dispose(dialog, owner)
 

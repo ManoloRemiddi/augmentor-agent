@@ -90,6 +90,26 @@ class ManagedMacSetupTests(unittest.TestCase):
         self.assertEqual(phases,['model','runtime','integration','service','ready'])
         self.assertNotIn(self.request['apiKey'],json.dumps(phases))
 
+    def test_runtime_installs_without_provider_or_model_request(self):
+        phases=[]; probe=Mock(side_effect=AssertionError('No model is configured'))
+        result=managed.provision(self.root,self.state,{'action':'install-runtime'},agent=self.agent,probe=probe,progress=phases.append)
+        self.assertTrue(result['saved']); self.assertTrue(self.agent.active)
+        probe.assert_not_called()
+        self.assertEqual(phases,['runtime','integration','service','ready'])
+        self.assertEqual(json.loads((self.state/'home/settings.yaml').read_text()),{})
+        self.assertEqual(managed.private_json(self.state/'runtime.json')['apiKey'],'')
+
+    def test_runtime_retry_preserves_model_edits_and_finishes_lost_ack(self):
+        self.provision()
+        marker=managed.private_json(self.state/'setup.json');marker['status']='starting'
+        managed.atomic_json(self.state/'setup.json',marker)
+        settings=self.state/'home/settings.yaml';settings.write_text('{"owner-edited":true}')
+        dsh.configuration().unlink()
+        managed.provision(self.root,self.state,{'action':'install-runtime'},agent=self.agent,probe=Mock())
+        self.assertEqual(settings.read_text(),'{"owner-edited":true}')
+        self.assertEqual(managed.private_json(self.state/'runtime.json')['apiKey'],self.request['apiKey'])
+        self.bootstrap.assert_called_once();self.assertFalse(self.agent.stopped)
+
     def test_model_failure_stops_progress_before_installation(self):
         phases=[]
         def reject(*_):raise ValueError('HTTP 401')

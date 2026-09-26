@@ -2,6 +2,15 @@
 
 # Start here: agent handoff
 
+## September 26 runtime-first Mac setup (current source)
+
+The owner reported the earlier installed form remained unusable. Fresh diagnosis
+confirmed DSH was bundled but still unprovisioned, and the browser menu omitted
+DSH authentication. Current source separates engine installation from model setup,
+adds persistent Agent setup/Open DSH buttons, and uses DSH's native provider UI.
+Read [current qualification and installed scope](MACOS-GUIDED-DSH-SETUP.md) before
+claiming this candidate is deployed or the owner's model can chat.
+
 ## September 26 guided Mac DSH installation
 
 The 32 GB Mac's public preview contains DSH but had no saved connection. The

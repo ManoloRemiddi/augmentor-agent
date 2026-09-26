@@ -84,6 +84,7 @@ jobs:
           app="$PWD/outputs/macos/Augmentor Agent Desktop.app"
           project="$app/Contents/Resources/app"
           "$project/python/bin/python3" -I -B scripts/macos-managed-setup-proof.py --app-root "$project" --out outputs/macos-managed
+          "$project/python/bin/python3" -I -B scripts/macos-managed-setup-proof.py --app-root "$project" --out outputs/macos-engine-first --engine-first
           codesign --verify --deep --strict "$app"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
@@ -92,5 +93,6 @@ jobs:
           path: |
             outputs/macos/*.json
             outputs/macos-managed/report.json
+            outputs/macos-engine-first/report.json
           retention-days: 7
           if-no-files-found: warn

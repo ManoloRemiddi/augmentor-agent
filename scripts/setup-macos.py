@@ -2,7 +2,8 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Provision a private, bundled DSH runtime for a fresh macOS desktop user.
 
-The GUI sends model configuration through stdin. Secrets never appear in process
+The GUI can install the engine before a model is configured. Optional model
+configuration arrives through stdin. Secrets never appear in process
 arguments, launchd plists or progress output. Existing external DSH connections
 are never adopted or modified by this first-run path.
 """
@@ -180,7 +181,8 @@ class LaunchAgent:
 def provision(root, state, request, *, agent=None, probe=probe_model, progress=lambda phase: None):
     """A resumable first-run transaction; callers supply only their private roots."""
     complete = load_complete(root)
-    settings, secret = model_configuration(root, request)
+    engine_only = request.get('action') == 'install-runtime'
+    settings, secret = ({}, '') if engine_only else model_configuration(root, request)
     state.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
     fresh = not state.exists() and not state.is_symlink()
     if fresh:
@@ -231,7 +233,7 @@ def provision(root, state, request, *, agent=None, probe=probe_model, progress=l
             # acknowledgement. Recheck and finish that exact configuration;
             # never stop a live host or rewrite its model settings to retry.
             runtime = private_json(state/'runtime.json')
-            if runtime.get('apiKey') != secret or json.loads((home/'settings.yaml').read_text()) != settings:
+            if not engine_only and (runtime.get('apiKey') != secret or json.loads((home/'settings.yaml').read_text()) != settings):
                 raise ValueError('The previous setup is already running with different model settings. Finish it with those settings before changing models.')
             setup = Setup(); checked = setup.check({'endpoint': record['endpoint'], 'home': str(home)})
             if not checked['installed']:
@@ -243,8 +245,9 @@ def provision(root, state, request, *, agent=None, probe=probe_model, progress=l
                 setup.save(checked['token'], managed=manager)
             record['status'] = 'ready'; atomic_json(marker, record)
             return {'saved': True, 'endpoint': record['endpoint'], 'home': str(home)}
-        progress('model')
-        probe(settings, secret)
+        if not engine_only:
+            progress('model')
+            probe(settings, secret)
         progress('runtime')
         record['status'] = 'preparing'
         # A concurrent external connection cannot be overwritten by setup.
@@ -252,7 +255,8 @@ def provision(root, state, request, *, agent=None, probe=probe_model, progress=l
         record['configurationHash'] = hashlib.sha256(previous_config).hexdigest() if previous_config is not None else None
         atomic_json(marker, record)
         home.mkdir(parents=True, exist_ok=True, mode=0o700); private_directory(home)
-        atomic_json(home/'settings.yaml', settings)  # JSON is a YAML subset.
+        if not engine_only or not (home/'settings.yaml').exists():
+            atomic_json(home/'settings.yaml', settings)  # JSON is a YAML subset.
         profile = home/'profiles/web'; profile.mkdir(parents=True, exist_ok=True, mode=0o700)
         private_directory(profile)
         modules = profile/'node_modules'; expected_modules = root/'dsh/node_modules'
@@ -273,6 +277,9 @@ def provision(root, state, request, *, agent=None, probe=probe_model, progress=l
                 atomic_json(profile/name, [])
         environment = {key: value for key, value in os.environ.items()
                        if key.startswith('XDG_') or key in ('AUGMENTOR_SHARED_CONFIG', 'AUGMENTOR_SHARED_DATA', 'AUGMENTOR_SHARED_STATE', 'RESONANT_VOICE_HOME')}
+        # Resuming runtime installation must preserve a previously supplied key.
+        if engine_only and (state/'runtime.json').exists():
+            secret = private_json(state/'runtime.json').get('apiKey', '')
         atomic_json(state/'runtime.json', {'schema': SCHEMA, 'appRoot': str(root), 'home': str(home),
             'port': record['port'], 'apiKey': secret, 'environment': environment})
         env = {**os.environ, **environment, 'DSH_HOME': str(home), 'DSH_TELEMETRY_MODE': 'DISABLED',
@@ -297,7 +304,7 @@ def provision(root, state, request, *, agent=None, probe=probe_model, progress=l
                     if checked['installed']:
                         break
                 except (OSError, ValueError) as error:
-                    last_check_error = str(error).replace(secret, '[redacted]')[:2000]
+                    last_check_error = (str(error).replace(secret, '[redacted]') if secret else str(error))[:2000]
                 time.sleep(.25)
             # Private diagnostics on both outcomes expose intermittent startup
             # delays without exporting credentials or broad process state.

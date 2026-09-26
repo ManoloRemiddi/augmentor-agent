@@ -1,13 +1,15 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-"""First-run model connection for the bundled, per-user Mac runtime."""
+"""Visible lifecycle and browser access for the bundled, per-user Mac runtime."""
 import json
+import importlib.util
+import time
 from pathlib import Path
 import subprocess
 import sys
 import threading
 from PySide6.QtCore import QTimer, Signal, QUrl
 from PySide6.QtGui import QDesktopServices
-from PySide6.QtWidgets import QDialog, QFormLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QSpinBox, QVBoxLayout, QWidget, QProgressBar
+from PySide6.QtWidgets import QDialog, QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QProgressBar
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -57,7 +59,9 @@ def needed():
 
 
 def available():
-    return not missing_runtime() and needed()
+    from .adapters.dsh import current
+    saved = current()
+    return sys.platform == 'darwin' and not missing_runtime() and (not saved or saved.get('managed', {}).get('type') == 'launchd')
 
 
 STEPS = {
@@ -120,6 +124,39 @@ class MacRuntimeIncompleteDialog(QDialog):
         self.owner.setup_dialog = DshSetupDialog(self.owner); self.owner.setup_dialog.show()
 
 
+def runtime_state(*, start=False, browser=False):
+    """Inspect the saved profile; only an explicit Start/Open resumes its owner."""
+    from .adapters.dsh import DshAdapter, current
+    saved = current()
+    if not saved:
+        return {'ok': True, 'installed': False, 'online': False, 'modelCount': 0}
+    try:
+        if start and saved.get('managed', {}).get('type') == 'launchd':
+            spec = importlib.util.spec_from_file_location('mac_runtime_owner', ROOT/'scripts/setup-macos.py')
+            module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+            module.start_saved(saved)
+        adapter = DshAdapter(base=saved['endpoint'], home=saved['home'])
+        deadline = time.monotonic() + (30 if start else 0)
+        while True:
+            try:
+                adapter.call('host.describe')
+                break
+            except Exception:
+                if time.monotonic() >= deadline: raise
+                time.sleep(.3)
+        catalog = adapter.model_catalog()
+        configured = adapter.remote.configured_providers()
+        result = {'ok': True, 'installed': True, 'online': True,
+                  'modelCount': sum(len(g.get('models', [])) for g in catalog.get('groups', []) if g.get('provider') in configured)}
+        if browser: result['browserUrl'] = adapter.remote.browser_url()
+        return result
+    except Exception:
+        # Exception text may contain a credential-bearing request URL. Keep it
+        # private; present the recovery action instead of echoing HTTP errors.
+        return {'ok': False, 'installed': True, 'online': False,
+                'error': 'DSH is not responding. Click Start DSH to reconnect its background service. Your conversations and settings are preserved.'}
+
+
 class MacSetupDialog(QDialog):
     completed = Signal(object)
     progress = Signal(str)
@@ -127,85 +164,113 @@ class MacSetupDialog(QDialog):
     def __init__(self, owner):
         super().__init__(owner)
         self.owner = owner; self.busy = False; self.dismissed = False
-        self.completed.connect(self.finished_setup)
+        self.installed = not needed(); self.online = False; self.operation = None
+        self.completed.connect(self.finished_operation)
         self.progress.connect(self.show_progress)
-        self.setWindowTitle('Install DSH'); self.setModal(True); self.setMinimumWidth(480)
-        layout = QVBoxLayout(self)
-        self.runtime_status = QLabel('DSH · Setup required')
-        self.runtime_status.setStyleSheet('font-weight:600;font-size:17px;'); layout.addWidget(self.runtime_status)
-        intro = QLabel('DSH runs your Augmentor agent. It is included in this app. Augmentor will install it, connect it and keep it running for you. No Terminal or separate download is needed.')
+        self.setWindowTitle('Agent setup'); self.setModal(False); self.setMinimumWidth(460)
+        layout = QVBoxLayout(self); layout.setSpacing(14)
+        title = QLabel('Your Augmentor agent'); title.setStyleSheet('font-size:20px;font-weight:600;')
+        layout.addWidget(title)
+        intro = QLabel('Two steps: start DSH, then choose the model your agent will use. DSH is included with Augmentor.')
         intro.setWordWrap(True); layout.addWidget(intro)
-        model_note = QLabel('Choose the AI model your agent will use. Enter an OpenAI-compatible provider or a local model server. Installing DSH does not download a model.')
+        self.runtime_status = QLabel('1  DSH · Checking…' if self.installed else '1  DSH · Not set up yet')
+        self.runtime_status.setStyleSheet('font-size:15px;font-weight:600;'); layout.addWidget(self.runtime_status)
+        runtime_note = QLabel('Runs in the background and starts when you sign in to this Mac. You can open its browser interface here at any time.')
+        runtime_note.setWordWrap(True); layout.addWidget(runtime_note)
+        runtime_actions = QHBoxLayout(); layout.addLayout(runtime_actions)
+        self.connect_button = QPushButton('Start DSH' if self.installed else 'Install and start DSH')
+        self.connect_button.setDefault(True); self.connect_button.clicked.connect(self.install_or_start)
+        runtime_actions.addWidget(self.connect_button)
+        self.browser_button = QPushButton('Open DSH in browser'); self.browser_button.setEnabled(self.installed)
+        self.browser_button.clicked.connect(self.open_browser); runtime_actions.addWidget(self.browser_button)
+        self.model_status = QLabel('2  Model · Choose after DSH starts')
+        self.model_status.setStyleSheet('font-size:15px;font-weight:600;'); layout.addWidget(self.model_status)
+        model_note = QLabel('In DSH, open Settings → Models and choose your provider or local model. If DSH first asks for a DeepSeek key, choose Configure later to see other providers. Save your model, then click Check connection here.')
         model_note.setWordWrap(True); layout.addWidget(model_note)
-        form = QFormLayout(); layout.addLayout(form)
-        self.url = QLineEdit(); self.url.setPlaceholderText('https://your-provider.example/v1')
-        self.model = QLineEdit(); self.model.setPlaceholderText('The model name from your provider')
-        self.key = QLineEdit(); self.key.setEchoMode(QLineEdit.EchoMode.Password)
-        self.key.setPlaceholderText('Leave blank for a local model without a key')
-        self.context = QSpinBox(); self.context.setRange(4096, 2000000); self.context.setValue(32768)
-        self.fields = (self.url, self.model, self.key, self.context)
-        for label, field in zip(('Model API address', 'Model name', 'API key'), self.fields):
-            field.setAccessibleName(label); form.addRow(label, field)
-        self.advanced = QPushButton('Advanced model settings'); self.advanced.setCheckable(True)
-        layout.addWidget(self.advanced)
-        self.advanced_fields = QWidget(); advanced_form = QFormLayout(self.advanced_fields)
-        self.context.setAccessibleName('Context window'); advanced_form.addRow('Context window', self.context)
-        self.advanced_fields.hide(); layout.addWidget(self.advanced_fields)
-        self.advanced.toggled.connect(self.advanced_fields.setVisible)
-        self.note = QLabel('Install DSH sends a short test message to your model. Your key is saved in your private Augmentor data folder on this Mac.')
+        self.note = QLabel('No Terminal, server address or login key is needed to start DSH.')
         self.note.setWordWrap(True); layout.addWidget(self.note)
         self.progress_bar = QProgressBar(); self.progress_bar.setRange(0, 0); self.progress_bar.hide()
         layout.addWidget(self.progress_bar)
         actions = QHBoxLayout(); layout.addLayout(actions)
-        self.later = QPushButton('Later'); self.later.clicked.connect(self.reject); actions.addWidget(self.later)
-        self.external = QPushButton('Use existing DSH'); self.external.clicked.connect(self.use_external); actions.addWidget(self.external)
-        self.connect_button = QPushButton('Install DSH'); self.connect_button.setDefault(True)
-        self.connect_button.clicked.connect(self.connect_model); actions.addWidget(self.connect_button)
+        self.later = QPushButton('Close'); self.later.clicked.connect(self.reject); actions.addWidget(self.later)
+        self.refresh_button = QPushButton('Check connection'); self.refresh_button.clicked.connect(self.refresh)
+        self.refresh_button.setEnabled(self.installed); actions.addWidget(self.refresh_button)
+        self.chat_button = QPushButton('Return to chat'); self.chat_button.setEnabled(False)
+        self.chat_button.clicked.connect(self.return_to_chat); actions.addWidget(self.chat_button)
+        self.external = QPushButton('Advanced: connect an existing DSH')
+        self.external.clicked.connect(self.use_external); layout.addWidget(self.external)
+        if self.installed: QTimer.singleShot(0, self.refresh)
 
     def show_progress(self, phase):
-        if self.busy and phase in STEPS:
-            self.note.setText(STEPS[phase] + '…')
-            self.runtime_status.setText(f'Step {list(STEPS).index(phase)+1} of {len(STEPS)}')
+        if self.busy and phase in STEPS: self.note.setText(STEPS[phase] + '…')
 
-    def connect_model(self):
-        if self.busy: return
-        if not self.url.text().strip() or not self.model.text().strip():
-            self.note.setText('Enter your model API address and model name.'); return
-        controller = self.owner.controller
-        if controller and (controller.running or controller.navigating or self.owner.editing):
-            self.note.setText('Finish the current action before configuring a model.'); return
-        request = {'url': self.url.text().strip(), 'model': self.model.text().strip(),
-                   'apiKey': self.key.text(), 'context': self.context.value()}
-        self.busy = True
-        for field in (*self.fields, self.advanced, self.later, self.external, self.connect_button): field.setEnabled(False)
-        self.connect_button.setText('Installing…'); self.progress_bar.show()
-        self.show_progress('model')
-        def work():
-            try:
-                result = run_setup(request, self.progress.emit)
-            except Exception:
-                result = {'ok': False, 'error': 'Setup could not finish. Its private data has been retained for diagnosis.'}
+    def dispatch(self, operation, work):
+        if self.busy or self.dismissed: return
+        self.busy = True; self.operation = operation
+        for button in (self.connect_button, self.browser_button, self.refresh_button, self.chat_button, self.external, self.later):
+            button.setEnabled(False)
+        self.progress_bar.show()
+        self.note.setText('Checking DSH…' if operation == 'check' else 'Starting DSH…')
+        def worker():
+            try: result = work()
+            except Exception: result = {'ok': False, 'error': 'DSH could not finish setup. Your data is preserved. Retry setup to continue.'}
             try: self.completed.emit(result)
             except RuntimeError: pass
-        threading.Thread(target=work, daemon=True).start()
+        threading.Thread(target=worker, daemon=True).start()
 
-    def finished_setup(self, result):
+    def install_or_start(self):
+        controller = self.owner.controller
+        if controller and (controller.running or controller.navigating or self.owner.editing):
+            self.note.setText('Finish the current action before starting setup.'); return
+        if self.installed:
+            self.dispatch('start', lambda: runtime_state(start=True)); return
+        def install():
+            result = run_setup({'action': 'install-runtime'}, self.progress.emit)
+            return runtime_state(start=True) if result.get('ok') else result
+        self.dispatch('install', install)
+
+    def open_browser(self):
+        self.dispatch('browser', lambda: runtime_state(start=True, browser=True))
+
+    def refresh(self):
+        self.dispatch('check', runtime_state)
+
+    def finished_operation(self, result):
         self.busy = False
         if self.dismissed: return
         self.progress_bar.hide()
-        for field in (*self.fields, self.advanced, self.later, self.external, self.connect_button): field.setEnabled(True)
+        self.installed = result.get('installed', self.installed); self.online = result.get('online', False)
+        self.later.setEnabled(True); self.external.setEnabled(True)
+        self.connect_button.setEnabled(not self.online)
+        self.connect_button.setText('DSH is running' if self.online else ('Start DSH' if self.installed else 'Retry installation'))
+        self.browser_button.setEnabled(self.installed); self.refresh_button.setEnabled(self.installed)
+        self.runtime_status.setText('1  DSH · Running' if self.online else ('1  DSH · Needs attention' if self.installed else '1  DSH · Not set up yet'))
+        count = result.get('modelCount', 0)
+        self.model_status.setText(f'2  Model · {count} configured in DSH' if count else '2  Model · Add a model in DSH')
+        self.chat_button.setEnabled(self.online and count > 0)
         if not result.get('ok'):
-            self.runtime_status.setText('Setup needs attention'); self.connect_button.setText('Retry setup')
-            self.note.setText(result.get('error', 'Setup could not finish.')); return
-        self.key.clear(); self.accept()
-        QTimer.singleShot(0, lambda: self.owner.switch_harness('dsh', reconnect=True))
+            self.note.setText(result.get('error', 'DSH could not connect.')); return
+        self.note.setText('DSH is running. Open its browser interface to choose a model.' if not count else
+                          'Your model settings are saved. Return to chat and send a message to test the model.')
+        if result.get('browserUrl'):
+            if not QDesktopServices.openUrl(QUrl(result['browserUrl'])):
+                self.note.setText('The default browser could not open. Set a default browser in macOS Settings and try again.')
+        if self.operation == 'install':
+            # The connection is saved only after the managed host is healthy.
+            QTimer.singleShot(0, lambda: self.owner.switch_harness('dsh', reconnect=True))
+        elif self.online and self.owner.controller:
+            self.owner.controller.refresh_models()
+
+    def return_to_chat(self):
+        if self.busy: return
+        self.accept(); self.owner.show(); self.owner.raise_(); self.owner.activateWindow()
 
     def use_external(self):
         if self.busy: return
         from .dsh_setup import DshSetupDialog
-        self.key.clear(); self.accept()
+        self.accept()
         self.owner.setup_dialog = DshSetupDialog(self.owner); self.owner.setup_dialog.show()
 
     def reject(self):
         if self.busy: return
-        self.dismissed = True; self.key.clear(); super().reject()
+        self.dismissed = True; super().reject()
