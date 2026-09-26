@@ -6,8 +6,9 @@
 
 [Flare fidelity](FLARE-FIDELITY.md) records the coarse-texture root cause and the
 shared detailed-emission/bounded-fluid correction. Both platforms use the same
-renderer; no UI layout changed. Read its installed-artifact section before
-assuming source changes have reached an open app. The earlier one-product audit
+renderer; no UI layout changed. The 32 GB Mac now runs the verified replacement;
+Linux has it selected while earlier open windows retain their builds. Read the
+guide for exact identities, captures, CI and activation evidence. The earlier one-product audit
 remains an analysis of the still-pending shortcut and release convergence gaps.
 
 ## September 26 one-product architecture direction and parity audit

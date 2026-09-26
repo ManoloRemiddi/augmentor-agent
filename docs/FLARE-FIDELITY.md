@@ -58,20 +58,38 @@ not an assertion that remote CI has completed.
 Implementation: `e1d245e` on `fix/shared-flare-fidelity`, PR #15. Documentation-only
 follow-ups do not alter the tested renderer.
 
-**Mac candidate, activation pending:** a separately copied and ad-hoc sealed
-application retains the installed `252215b` setup/menu/resize changes over the
-public `ea128d6` binary/dependency baseline. Only `activity.py`, this guide and
-the fixture proof are overlaid. Its inventory SHA-256 is
+**Mac installed and running:** the owner reported quitting and reopening; read-back
+showed that the previous `252215b` application was still installed. Reopening
+alone had not applied the candidate. The authorized replacement then paused the
+owned shortcut, gracefully closed the idle desktop, verified idle DSH sessions,
+replaced the app through the existing installer, and resumed the same owned DSH
+and shortcut registrations. Saved profile/settings and both conversation metadata
+records were identical before and after.
+
+The separately copied and ad-hoc sealed application retains `252215b`'s
+setup/menu/resize changes over the public `ea128d6` binary/dependency baseline.
+Only `activity.py`, this guide at candidate construction, and the fixture proof
+are overlaid. Its inventory SHA-256 is
 `3c5d6ffee13352c52c0b20ff0eee034f7ad8227ef4e94abc503d12e6da93aff9`.
-The actual candidate passes 37 activity/fluid/window checks (including the two
+The actual candidate passed 37 activity/fluid/window checks (including the two
 resize regressions from PR #13), native Cocoa captures, eight-edge/corner
 synthetic resize and menu checks, and strict signature verification after use.
-The owner's app remains running from `252215b` until normal exit: that version's
-maintenance status cannot inspect an unsent composer draft and its close action
-does not persist it. Do not force-close it merely because it reports idle.
-Private installation helpers validate exact source/inventory, owned services
-and idle DSH, preserve settings/session metadata, and retain a rollback bundle.
-No automatic future activation has been scheduled.
+
+Installed read-back confirms `e1d245e`, the matching inventory, the normal native
+app process, online/model-ready state, no connection or session-restore errors,
+and both owned login services loaded. A rollback bundle is retained. The installed
+renderer also passed a Cocoa widget capture with the owner's saved appearance
+and 457 × 578 window size: its 777 × 898 effect canvas uses a 777 × 898 field,
+with approximately 29 ms median warmed field time. macOS denied whole-display
+capture over this connection; the capture is an isolated preview of the installed
+renderer, not a screenshot of a live conversation. Screen-recording permissions
+were not changed. Physical-motion/subjective visual acceptance remains the owner's.
+
+At documentation commit `3a94d92`, GitHub Mac 14/26, Debian, installed-package,
+Browser and Home workflows all passed. Subsequent documentation changes do not
+change the tested renderer. The maintenance endpoint still does not expose or
+persist an unsent draft; do not infer draft preservation from an idle status or
+from the profile/session metadata checks.
 
 **Linux selected, existing windows retained:** the compatible 0.2.11 candidate
 copies selection `20260926-094732-3b3861db`, preserving its embedding, Home,
