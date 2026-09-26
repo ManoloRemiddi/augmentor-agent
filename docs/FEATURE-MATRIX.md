@@ -15,6 +15,7 @@ This maintained checkout is the development source for both surfaces. The legacy
 | Feature | Shared owner | Linux Pi | Linux DSH | Browser Pi | Browser DSH |
 | --- | --- | --- | --- | --- | --- |
 | Prompt records, stable IDs, rename/delete, revisions | `services/prompt-library` | Yes | Yes | Yes | Yes |
+| Saved prompt Enter expansion, then Enter to send | Shared catalog; Qt and DOM handlers | Yes | Yes | Yes | Yes |
 | Prompt editing inside Augmentor | Shared service; one editor per surface | Yes | Yes | Yes | Yes |
 | Literal `[clipboard]`, one snapshot, no automatic send | `packages/templates`, parity fixtures | Yes | Yes | Yes | Yes |
 | Copy/check, labels, SVGs, 14px icons, 1500ms feedback | `packages/design`; generated bindings | Yes | Yes | Yes | Yes |
