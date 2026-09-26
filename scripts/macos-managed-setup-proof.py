@@ -22,6 +22,7 @@ import tempfile
 import threading
 import time
 import uuid
+import urllib.request
 
 
 def main():
@@ -29,6 +30,8 @@ def main():
     parser.add_argument('--app-root', type=Path, required=True)
     parser.add_argument('--out', type=Path, required=True)
     parser.add_argument('--interfaces', action='store_true', help='Also drive the native composer and a fresh Chrome profile')
+    parser.add_argument('--engine-first', action='store_true', help='Install with no model, then configure through DSH settings')
+    parser.add_argument('--browser-checkpoint', type=Path, help='Private manual UI checkpoint; resume by creating <path>.continue')
     args = parser.parse_args()
     if sys.platform != 'darwin': parser.error('Requires macOS launchd.')
     root = args.app_root.resolve(); args.out.mkdir(parents=True, exist_ok=False)
@@ -80,7 +83,8 @@ def main():
         raise AssertionError('Managed setup proof timed out.')
     try:
         started = time.monotonic()
-        result = managed.provision(root, state, request, agent=agent)
+        install_request = {'action': 'install-runtime'} if args.engine_first else request
+        result = managed.provision(root, state, install_request, agent=agent)
         report['provisionSeconds'] = round(time.monotonic()-started, 3)
         report['startupCheck'] = managed.private_json(state/'startup-check.json')
         assert result['saved'] and agent.loaded()
@@ -89,6 +93,33 @@ def main():
         adapter = DshAdapter(); adapter.call('host.describe')
         assert adapter.product
         from dsh.remote import client as remote_client
+        remote = remote_client(result['endpoint'], result['home'])
+        def check_browser_login():
+            # Use a new cookie jar each time, like a browser without a DSH login.
+            import http.cookiejar
+            jar = http.cookiejar.CookieJar()
+            opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), urllib.request.HTTPCookieProcessor(jar))
+            with opener.open(remote.browser_url(), timeout=15) as page:
+                assert page.status == 200 and b'<html' in page.read(65536).lower()
+                assert 'token=' not in page.url
+            assert any(cookie.name.startswith('dsh-auth-') for cookie in jar)
+        check_browser_login(); report['browserLoginWithoutManualKey'] = True
+        if args.engine_first:
+            assert not calls, 'Engine installation contacted a model'
+            assert not remote.configured_providers()
+            report['runtimeStartedWithoutModel'] = True
+            if args.browser_checkpoint:
+                managed.atomic_json(args.browser_checkpoint, {'endpoint':result['endpoint'], 'url':remote.browser_url()})
+                print('Runtime is ready for the browser UI check.',flush=True)
+                wait_for(lambda: Path(str(args.browser_checkpoint)+'.continue').exists(), 600)
+            settings = managed.load_complete(root).model_settings(request['url'], request['model'], request['context'])
+            settings['llm-pi-ai']['providers']['augmentor-model']['apiKeyEnv'] = 'FIXTURE_MODEL_API_KEY'
+            remote.invoke('credentials/set', {'ref':'FIXTURE_MODEL_API_KEY', 'value':'fixture-only-key'})
+            for ns, value in settings.items():
+                section = adapter.setting(ns)
+                adapter.call('settings.mutate', {'ns': ns, 'expectedRevision': section['revision'],
+                    'ops': [{'op': 'set', 'path': [key], 'value': item} for key, item in value.items()]})
+            wait_for(lambda: any(g.get('models') for g in adapter.model_catalog()['groups']))
         inventory = remote_client(result['endpoint'], result['home']).invoke('pluginInventory/list')['entries']
         active = {row['moduleName'] for row in inventory if row.get('enabled') and row.get('fiberPhase') == 'active'}
         required = set(managed.BUNDLES[2:])
@@ -105,12 +136,13 @@ def main():
         wait_for(lambda: len(calls) > before and not next(r for r in adapter.call('session.list')['items'] if r['sessionId'] == session)['running'])
         history = adapter.call('session.history', {'sessionId': session})
         assert 'Managed setup verified.' in json.dumps(history)
-        repeated = managed.provision(root, state, request, agent=agent)
+        repeated = managed.provision(root, state, install_request, agent=agent)
         assert repeated == result
         # Stop/start the precise owned job: saved provider credentials and
         # conversation must survive, with no detached replacement process.
         agent.stop_failed_setup(); assert not agent.loaded()
         agent.start(); wait_for(lambda: adapter.call('host.describe'))
+        check_browser_login(); report['browserLoginAfterRestart'] = True
         restored = adapter.call('session.history', {'sessionId': session})
         assert 'Managed setup verified.' in json.dumps(restored)
         if args.interfaces:

@@ -105,6 +105,7 @@ class Window(QWidget):
         self.hide_button=self.icon_button(SURFACE['glyphs']['hide'],'Hide Augmentor',self.hide)
         for button in (self.new_button,self.save_button,self.history_button,self.pin_button,self.compact_button,self.more_button,self.hide_button):header.addWidget(button,0,Qt.AlignmentFlag.AlignVCenter)
         layout.addLayout(header)
+        self.opening_dsh=False
         self.status=QLabel('UI preview' if preview else 'Connecting…');self.status.hide()
         self.model_picker=ModelPicker();self.model_picker.selected.connect(self.model_selected)
         self.model_picker.pin_requested.connect(self.pin_model)
@@ -206,7 +207,15 @@ class Window(QWidget):
         self.controller.page.connect(self.restore_page)
         self.controller.recovered.connect(self.restore_recovery)
         self.controller.connection.connect(self.connection_changed)
-        self.controller.start_monitor()
+        self.start_connection()
+
+    def start_connection(self):
+        from .macos_setup import needed as mac_setup_needed
+        if self.controller.harness=='dsh' and not self.controller.session and mac_setup_needed():
+            self.setup_offered=True
+            self.set_status('Set up DSH from the three-dot menu → Agent setup')
+            QTimer.singleShot(0,self.open_setup)
+        else:self.controller.start_monitor()
 
     def connection_changed(self,online):
         self.update_controls()
@@ -225,9 +234,20 @@ class Window(QWidget):
         if self.setup_dialog and self.setup_dialog.isVisible():self.setup_dialog.raise_();return
         from .setup import SetupDialog
         from .dsh_setup import DshSetupDialog
-        from .macos_setup import MacSetupDialog, available as mac_setup_available
-        dialog=SetupDialog if self.controller.harness=='pi' else MacSetupDialog if mac_setup_available() else DshSetupDialog
-        self.setup_dialog=dialog(self);self.setup_dialog.show()
+        from .macos_setup import (MacRuntimeIncompleteDialog, MacSetupDialog,
+                                  needed as mac_setup_needed,
+                                  available as mac_setup_available,
+                                  runtime_problem)
+        # Order matters. An incomplete app copy is told about itself; otherwise
+        # it would silently fall through to the external-DSH form and read as a
+        # demand for a DSH the user does not have.
+        problem=runtime_problem() if mac_setup_needed() else ''
+        if self.controller.harness=='pi':self.setup_dialog=SetupDialog(self)
+        elif problem:self.setup_dialog=MacRuntimeIncompleteDialog(self,problem)
+        elif mac_setup_available():self.setup_dialog=MacSetupDialog(self)
+        else:self.setup_dialog=DshSetupDialog(self)
+        self.setup_dialog.show()
+
     def icon_button(self,text,tooltip,callback,checkable=False):
         button=QPushButton(text);button.setFixedSize(SURFACE['iconSize'],SURFACE['iconSize']);button.setStyleSheet('QPushButton {padding:0;font-size:15px;border:0;background:transparent;} QPushButton:hover {background:rgba(127,150,150,55);color:palette(window-text);}')
         button.setToolTip(tooltip);button.setAccessibleName(tooltip);button.setCheckable(checkable);button.clicked.connect(callback);return button
@@ -795,7 +815,25 @@ class Window(QWidget):
 
     def open_pi(self):
         if self.controller and getattr(self.controller,'harness','pi')=='dsh':
-            QDesktopServices.openUrl(QUrl(self.controller.client.base));return
+            from .macos_setup import needed, available, runtime_state
+            if needed():self.open_setup();return
+            if self.opening_dsh:return
+            self.opening_dsh=True
+            client=self.controller.client
+            managed=available()
+            def launch_url():
+                if managed:return runtime_state(start=True,browser=True)
+                try:return {'ok':True,'browserUrl':client.remote.browser_url()}
+                except Exception:return {'ok':False}
+            def opened(result):
+                self.opening_dsh=False
+                if result.get('ok') and result.get('browserUrl'):
+                    if not QDesktopServices.openUrl(QUrl(result['browserUrl'])):
+                        self.set_status('The default browser could not open. Check macOS browser settings.')
+                else:
+                    self.set_status('DSH could not connect. Open Agent setup to start it.')
+                    self.open_setup()
+            self.call_in_background(launch_url,opened);return
         if self.controller:ModelsDialog(self).exec()
 
     def rename_chat(self):
@@ -828,8 +866,9 @@ class Window(QWidget):
         menu.addAction('Settings',self.open_settings).setEnabled(bool(self.controller))
         menu.addAction('Colors & skins',self.open_appearance)
         menu.addAction('Prompt library',self.open_prompt_library).setEnabled(bool(self.controller))
-        menu.addAction('Connect a model',self.open_setup).setEnabled(bool(self.controller))
-        menu.addAction('Models & providers',self.open_pi).setEnabled(bool(self.controller))
+        is_dsh=bool(self.controller and self.controller.harness=='dsh')
+        menu.addAction('Agent setup' if is_dsh else 'Connect a model',self.open_setup).setEnabled(bool(self.controller))
+        menu.addAction('Open DSH in browser' if is_dsh else 'Models & providers',self.open_pi).setEnabled(bool(self.controller))
         from .macos_browser_setup import available, MacBrowserSetupDialog
         if available():
             menu.addAction('Set up browser extension',lambda:MacBrowserSetupDialog(self).exec())

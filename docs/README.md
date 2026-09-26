@@ -50,7 +50,7 @@ of this repository; include reproducible commands and sanitized evidence summari
 - [Hands-free native implementation](HANDS-FREE-IMPLEMENTATION.md)
 - [Desktop colors and skins](SKINS.md)
 - [Independent second window](SECOND-WINDOW.md)
-- [Linux window resizing](WINDOW-RESIZING.md)
+- [Desktop window resizing (Linux and macOS)](WINDOW-RESIZING.md)
 - [Linux desktop control preview](DESKTOP-CONTROL.md)
 - [Bounded desktop specialist](DESKTOP-SPECIALIST.md)
 - [Browser Settings](BROWSER-SETTINGS.md)
@@ -62,6 +62,7 @@ of this repository; include reproducible commands and sanitized evidence summari
 
 - [macOS signing, publication gates and website cutover](MACOS-RELEASE.md)
 - [Managed Mac first-run model and runtime setup](MACOS-MANAGED-SETUP.md)
+- [Guided DSH installation and first-run correction](MACOS-GUIDED-DSH-SETUP.md)
 
 [0.2.12 desktop flare correction](RELEASE-0.2.12.md).
 [0.2.11 security release and upgrade guidance](RELEASE-0.2.11.md).

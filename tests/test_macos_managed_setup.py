@@ -63,6 +63,7 @@ class ManagedMacSetupTests(unittest.TestCase):
     def test_private_credentials_managed_owner_and_repeat_without_reconfiguration(self):
         self.assertTrue(self.provision()['saved'])
         self.bootstrap.assert_called_once()
+
         self.voice.assert_called_once()
         profile = json.loads((self.state/'home/profiles/web/package.json').read_text())
         self.assertEqual(profile['dsh']['profile']['bundles'], managed.BUNDLES)
@@ -82,6 +83,39 @@ class ManagedMacSetupTests(unittest.TestCase):
         self.assertTrue(self.agent.active)
         self.assertTrue(self.provision()['saved'])
         self.bootstrap.assert_called_once()
+
+    def test_progress_identifies_real_setup_boundaries_without_credentials(self):
+        phases=[]
+        managed.provision(self.root,self.state,self.request,agent=self.agent,probe=lambda *_:None,progress=phases.append)
+        self.assertEqual(phases,['model','runtime','integration','service','ready'])
+        self.assertNotIn(self.request['apiKey'],json.dumps(phases))
+
+    def test_runtime_installs_without_provider_or_model_request(self):
+        phases=[]; probe=Mock(side_effect=AssertionError('No model is configured'))
+        result=managed.provision(self.root,self.state,{'action':'install-runtime'},agent=self.agent,probe=probe,progress=phases.append)
+        self.assertTrue(result['saved']); self.assertTrue(self.agent.active)
+        probe.assert_not_called()
+        self.assertEqual(phases,['runtime','integration','service','ready'])
+        self.assertEqual(json.loads((self.state/'home/settings.yaml').read_text()),{})
+        self.assertEqual(managed.private_json(self.state/'runtime.json')['apiKey'],'')
+
+    def test_runtime_retry_preserves_model_edits_and_finishes_lost_ack(self):
+        self.provision()
+        marker=managed.private_json(self.state/'setup.json');marker['status']='starting'
+        managed.atomic_json(self.state/'setup.json',marker)
+        settings=self.state/'home/settings.yaml';settings.write_text('{"owner-edited":true}')
+        dsh.configuration().unlink()
+        managed.provision(self.root,self.state,{'action':'install-runtime'},agent=self.agent,probe=Mock())
+        self.assertEqual(settings.read_text(),'{"owner-edited":true}')
+        self.assertEqual(managed.private_json(self.state/'runtime.json')['apiKey'],self.request['apiKey'])
+        self.bootstrap.assert_called_once();self.assertFalse(self.agent.stopped)
+
+    def test_model_failure_stops_progress_before_installation(self):
+        phases=[]
+        def reject(*_):raise ValueError('HTTP 401')
+        with self.assertRaisesRegex(ValueError,'401'):
+            managed.provision(self.root,self.state,self.request,agent=self.agent,probe=reject,progress=phases.append)
+        self.assertEqual(phases,['model']); self.bootstrap.assert_not_called()
 
     def test_bad_key_can_be_corrected_without_an_unrecognized_partial_folder(self):
         def fail(*_): raise ValueError('HTTP 401')
