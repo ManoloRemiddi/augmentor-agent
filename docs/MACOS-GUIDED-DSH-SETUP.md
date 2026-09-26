@@ -2,7 +2,16 @@
 
 # Guided DSH installation on Mac
 
-## Current correction: runtime first, visible browser access
+## Current navigation: three-dot menu
+
+At the owner's request, **Agent setup** and **Open DSH in browser** now live only
+in the existing three-dot menu. The temporary main-window row is removed. Setup
+still opens on a fresh install, and model configuration remains in DSH's browser
+interface. [Desktop resizing](WINDOW-RESIZING.md) owns the accompanying macOS
+resize fix and its qualification/installation record. No other UI redesign was
+requested or authorized.
+
+## Runtime-first setup
 
 The earlier technical form below did not solve the owner's usability problem.
 On reinspection the installed desktop was still unconfigured: the DSH payload
@@ -19,8 +28,8 @@ prompt and **Configure later** for other providers. **Check connection** reads
 the saved provider/credential availability, not just the built-in catalog.
 It does not claim a successful inference request from configuration alone.
 
-The Mac chat window keeps **Agent setup** and **Open DSH** visible. Setup remains
-available for a managed installation after first run. Start/Open resume the
+The Mac chat window exposes **Agent setup** and **Open DSH in browser** in the
+three-dot menu. Setup remains available for a managed installation after first run. Start/Open resume the
 recorded launchd owner if needed, without rewriting models or restarting a
 running host. Browser opening obtains DSH's current process login token using
 the existing authenticated local integration; DSH exchanges it for its own
@@ -48,7 +57,7 @@ without a model, and persistent chat navigation were visually inspected.
 The qualification and activation record below identifies the installed artifact.
 The later sections retain historical evidence for the earlier form.
 
-## Qualified replacement and activation
+## Earlier runtime-first replacement and activation — historical
 
 Application source is `60413de`. A separate candidate overlays eleven recorded
 application/document files on the earlier public `ea128d6` binary; its exact
@@ -100,7 +109,8 @@ of visual inspection of the owner's browser window.
 
 The owner has **zero configured models** at this checkpoint. They can choose one
 in DSH's Settings → Models and then test chat; no live owner-model inference is
-claimed. The new visible Agent setup/Open DSH controls are installed. The public
+claimed. The main-row controls were installed at this historical checkpoint; the menu-only
+correction above supersedes that placement. The public
 preview DMG remains unchanged, and PR #13 remains a draft.
 
 ## Earlier form and deployment (superseded UX)

@@ -2,7 +2,20 @@
 
 # Start here: agent handoff
 
-## September 26 runtime-first Mac setup (installed on the 32 GB Mac)
+## September 26 owner-requested Mac menu placement and resizing
+
+Preserve the owner's approved UI: additional visible changes require permission.
+Current source removes the recent DSH main-window row; Agent setup/Open DSH stay
+in the three-dot menu. Cocoa rejected the native resize request, which the old
+code ignored. The existing eight handles now have a logical-coordinate fallback
+while supported Linux compositor resizing is retained. Five resize regressions,
+117 Mac tests, 27 window tests, and eight synthetic pointer drags on the real
+32 GB Mac's Cocoa window passed. See [resize behavior and installed scope](WINDOW-RESIZING.md).
+The candidate must be separately sealed and installed; do not patch a selected
+bundle or infer deployment from source tests. Preserve the now-owned DSH service,
+model configuration, history and any active work during activation.
+
+## September 26 runtime-first Mac setup — earlier installed checkpoint
 
 The owner reported the earlier installed form remained unusable. Fresh diagnosis
 confirmed DSH was bundled but still unprovisioned, and the browser menu omitted

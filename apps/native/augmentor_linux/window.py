@@ -105,12 +105,6 @@ class Window(QWidget):
         self.hide_button=self.icon_button(SURFACE['glyphs']['hide'],'Hide Augmentor',self.hide)
         for button in (self.new_button,self.save_button,self.history_button,self.pin_button,self.compact_button,self.more_button,self.hide_button):header.addWidget(button,0,Qt.AlignmentFlag.AlignVCenter)
         layout.addLayout(header)
-        self.agent_bar=QFrame();agent_bar=QHBoxLayout(self.agent_bar);agent_bar.setContentsMargins(0,0,0,0)
-        self.agent_setup_button=QPushButton('Agent setup');self.agent_setup_button.clicked.connect(self.open_setup)
-        self.dsh_browser_button=QPushButton('Open DSH ↗');self.dsh_browser_button.clicked.connect(self.open_pi)
-        self.dsh_browser_button.setToolTip('Open the DSH browser interface, already signed in')
-        agent_bar.addWidget(self.agent_setup_button,1);agent_bar.addWidget(self.dsh_browser_button)
-        self.agent_bar.hide();layout.addWidget(self.agent_bar)
         self.opening_dsh=False
         self.status=QLabel('UI preview' if preview else 'Connecting…');self.status.hide()
         self.model_picker=ModelPicker();self.model_picker.selected.connect(self.model_selected)
@@ -217,16 +211,14 @@ class Window(QWidget):
 
     def start_connection(self):
         from .macos_setup import needed as mac_setup_needed
-        self.update_agent_bar()
         if self.controller.harness=='dsh' and not self.controller.session and mac_setup_needed():
             self.setup_offered=True
-            self.set_status('Start with Agent setup above')
+            self.set_status('Set up DSH from the three-dot menu → Agent setup')
             QTimer.singleShot(0,self.open_setup)
         else:self.controller.start_monitor()
 
     def connection_changed(self,online):
         self.update_controls()
-        self.update_agent_bar()
         if not self.setup_offered and self.controller and self.controller.harness=='dsh' and not self.controller.session and not getattr(self.controller.client,'product',False):
             self.setup_offered=True
             QTimer.singleShot(0,self.open_setup)
@@ -256,14 +248,6 @@ class Window(QWidget):
         else:self.setup_dialog=DshSetupDialog(self)
         self.setup_dialog.show()
 
-    def update_agent_bar(self):
-        from .macos_setup import needed as mac_setup_needed
-        visible=sys.platform=='darwin' and bool(self.controller and getattr(self.controller,'harness','pi')=='dsh')
-        self.agent_bar.setVisible(visible)
-        if not visible:return
-        online=getattr(self.controller,'online',False)
-        label='DSH · Set up' if mac_setup_needed() else ('DSH · Running' if online else 'DSH · Connecting')
-        self.agent_setup_button.setText(label+' · Agent setup')
     def icon_button(self,text,tooltip,callback,checkable=False):
         button=QPushButton(text);button.setFixedSize(SURFACE['iconSize'],SURFACE['iconSize']);button.setStyleSheet('QPushButton {padding:0;font-size:15px;border:0;background:transparent;} QPushButton:hover {background:rgba(127,150,150,55);color:palette(window-text);}')
         button.setToolTip(tooltip);button.setAccessibleName(tooltip);button.setCheckable(checkable);button.clicked.connect(callback);return button
@@ -287,7 +271,6 @@ class Window(QWidget):
         self.model_picker.set_catalog(catalog)
         self.model_selected(self.model_picker.currentData(),persist=False)
         self.update_controls()
-        self.update_agent_bar()
 
     def set_selection(self,selection):
         self.model_picker.set_catalog(self.model_picker.catalog,preferred=selection);self.model_selected(self.model_picker.currentData(),persist=False)
@@ -835,7 +818,7 @@ class Window(QWidget):
             from .macos_setup import needed, available, runtime_state
             if needed():self.open_setup();return
             if self.opening_dsh:return
-            self.opening_dsh=True;self.dsh_browser_button.setEnabled(False)
+            self.opening_dsh=True
             client=self.controller.client
             managed=available()
             def launch_url():
@@ -843,7 +826,7 @@ class Window(QWidget):
                 try:return {'ok':True,'browserUrl':client.remote.browser_url()}
                 except Exception:return {'ok':False}
             def opened(result):
-                self.opening_dsh=False;self.dsh_browser_button.setEnabled(True)
+                self.opening_dsh=False
                 if result.get('ok') and result.get('browserUrl'):
                     if not QDesktopServices.openUrl(QUrl(result['browserUrl'])):
                         self.set_status('The default browser could not open. Check macOS browser settings.')

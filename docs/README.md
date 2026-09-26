@@ -50,7 +50,7 @@ of this repository; include reproducible commands and sanitized evidence summari
 - [Hands-free native implementation](HANDS-FREE-IMPLEMENTATION.md)
 - [Desktop colors and skins](SKINS.md)
 - [Independent second window](SECOND-WINDOW.md)
-- [Linux window resizing](WINDOW-RESIZING.md)
+- [Desktop window resizing (Linux and macOS)](WINDOW-RESIZING.md)
 - [Linux desktop control preview](DESKTOP-CONTROL.md)
 - [Bounded desktop specialist](DESKTOP-SPECIALIST.md)
 - [Browser Settings](BROWSER-SETTINGS.md)

@@ -18,8 +18,8 @@ DeepSeek key prompt appears, **Configure later** allows other providers.
 Return to Augmentor and **Check connection**, then send a short message to verify
 the selected model. A configured key is not proof that an inference will succeed.
 
-**Agent setup** and **Open DSH** remain visible in the Mac chat window. Browser
-opening handles DSH's local authentication and resumes an owned stopped service.
+**Agent setup** and **Open DSH in browser** are in the chat window’s three-dot
+menu. Browser opening handles DSH's local authentication and resumes an owned stopped service.
 The app must be copied into `/Applications` or the user's `Applications` directory.
 **Advanced: connect an existing DSH** retains the external editor. An existing
 external profile is never adopted or overwritten by managed installation.

@@ -14,7 +14,7 @@ class WindowTests(unittest.TestCase):
     def test_mac_first_run_offers_installation_without_starting_recovery(self):
         from unittest.mock import Mock, patch
         owner=SimpleNamespace(controller=SimpleNamespace(harness='dsh',session=None,start_monitor=Mock()),
-            open_setup=Mock(),update_agent_bar=Mock(),setup_offered=False,set_status=Mock())
+            open_setup=Mock(),setup_offered=False,set_status=Mock())
         with patch('augmentor_linux.macos_setup.needed',return_value=True):
             Window.start_connection(owner); self.app.processEvents()
         owner.open_setup.assert_called_once(); owner.controller.start_monitor.assert_not_called()
@@ -25,14 +25,14 @@ class WindowTests(unittest.TestCase):
         from unittest.mock import Mock, patch
         for harness,session,needed in [('dsh',None,False),('dsh','saved',True),('pi',None,True)]:
             owner=SimpleNamespace(controller=SimpleNamespace(harness=harness,session=session,start_monitor=Mock()),
-                open_setup=Mock(),update_agent_bar=Mock(),setup_offered=False,set_status=Mock())
+                open_setup=Mock(),setup_offered=False,set_status=Mock())
             with patch('augmentor_linux.macos_setup.needed',return_value=needed):
                 Window.start_connection(owner); self.app.processEvents()
             owner.controller.start_monitor.assert_called_once(); owner.open_setup.assert_not_called()
 
     def test_unconfigured_dsh_offers_setup_once_without_waiting_for_connection(self):
         from unittest.mock import Mock
-        owner=SimpleNamespace(update_controls=Mock(),open_setup=Mock(),update_agent_bar=Mock(),setup_offered=False,
+        owner=SimpleNamespace(update_controls=Mock(),open_setup=Mock(),setup_offered=False,
             controller=SimpleNamespace(harness='dsh',session=None,client=SimpleNamespace(product=False)))
         Window.connection_changed(owner,False)
         self.app.processEvents()
@@ -45,7 +45,7 @@ class WindowTests(unittest.TestCase):
     def test_configured_or_resuming_dsh_does_not_reopen_setup_on_disconnect(self):
         from unittest.mock import Mock
         for configured,session in ((True,None),(False,'saved-chat')):
-            owner=SimpleNamespace(update_controls=Mock(),open_setup=Mock(),update_agent_bar=Mock(),setup_offered=False,
+            owner=SimpleNamespace(update_controls=Mock(),open_setup=Mock(),setup_offered=False,
                 controller=SimpleNamespace(harness='dsh',session=session,client=SimpleNamespace(product=configured)))
             Window.connection_changed(owner,False)
             self.app.processEvents()
