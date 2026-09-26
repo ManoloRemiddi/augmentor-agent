@@ -54,6 +54,8 @@ class ManagedMacSetupTests(unittest.TestCase):
         setup = patch.object(dsh, 'Setup', SetupFixture)
         setup.start(); self.addCleanup(setup.stop)
         self.agent = Agent()
+        voice = patch.object(managed, 'initialize_voice')
+        self.voice = voice.start(); self.addCleanup(voice.stop)
 
     def provision(self, probe=lambda *_: None):
         return managed.provision(self.root, self.state, self.request, agent=self.agent, probe=probe)
@@ -61,6 +63,9 @@ class ManagedMacSetupTests(unittest.TestCase):
     def test_private_credentials_managed_owner_and_repeat_without_reconfiguration(self):
         self.assertTrue(self.provision()['saved'])
         self.bootstrap.assert_called_once()
+        self.voice.assert_called_once()
+        profile = json.loads((self.state/'home/profiles/web/package.json').read_text())
+        self.assertEqual(profile['dsh']['profile']['bundles'], managed.BUNDLES)
         self.assertFalse(self.bootstrap.call_args.kwargs['save'])
         settings = json.loads((self.state/'home/settings.yaml').read_text())
         self.assertNotIn(self.request['apiKey'], json.dumps(settings))

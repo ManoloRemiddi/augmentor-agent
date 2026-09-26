@@ -116,6 +116,7 @@ class LicensesDialog(QDialog):
         text = QTextEdit(); text.setReadOnly(True); layout.addWidget(text)
         documents = [('Augmentor · MIT with Augmentor Resale Restriction', root / 'LICENSE'),
                      ('Distribution and library replacement', root / 'docs/LICENSING.md'),
+                     ('Mac library sources and replacement', root / 'docs/MACOS-LIBRARY-REPLACEMENT.md'),
                      ('LGPL version 3', root / 'licenses/LGPL-3.0.txt'),
                      ('GPL version 3 (incorporated by LGPL)', root / 'licenses/GPL-3.0.txt')]
         for file in sorted((root / 'licenses/upstream').glob('*.txt')):

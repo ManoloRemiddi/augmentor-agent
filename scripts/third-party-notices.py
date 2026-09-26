@@ -12,7 +12,7 @@ from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
-PERMISSIVE = {'MIT', 'Apache-2.0', 'BSD-3-Clause', 'ISC', '0BSD', 'BlueOak-1.0.0', 'Unlicense'}
+PERMISSIVE = {'MIT', 'Apache-2.0', 'BSD-2-Clause', 'BSD-3-Clause', 'ISC', '0BSD', 'BlueOak-1.0.0', 'Unlicense', 'Python-2.0'}
 LICENSE_NAME = re.compile(r'^(licen[sc]e|copying)(\.|$|-)', re.I)
 NOTICE_NAME = re.compile(r'^(notice|copyright)(\.|$|-)', re.I)
 
@@ -55,7 +55,7 @@ def inventory(tree, catalog_root):
         effective_license=meta.get('license')
         choice=catalog.get('choices',{}).get(key)
         if choice and choice.get('expression')==effective_license:effective_license=choice.get('selected')
-        if effective_license not in PERMISSIVE:
+        if effective_license not in PERMISSIVE and catalog.get('additionalLicenses',{}).get(key) != effective_license:
             errors.append(f'{key}: unreviewed license {meta.get("license")}'); continue
         files = [p for p in sorted(package.iterdir()) if p.is_file() and LICENSE_NAME.match(p.name)]
         sources = []

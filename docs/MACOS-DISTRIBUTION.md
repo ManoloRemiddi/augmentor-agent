@@ -2,6 +2,13 @@
 
 # macOS distribution implementation
 
+**Current preview direction:** The owner approved distribution without Apple
+Developer ID after enrollment failed. See [the preview release record](MACOS-PREVIEW-RELEASE.md)
+and [customer guide](MACOS-PREVIEW.html). Earlier Apple gates below describe the
+intended stable release and historical audits. They do not block the explicitly
+approved ad-hoc preview.
+
+
 The owner authorized implementation and isolated testing on the network Macs on
 25 September 2026. The shared Qt application and canonical repository remain the
 product foundation. This work supersedes the old Mac packaging baseline for the

@@ -137,3 +137,12 @@ evidence and review for private configuration.
 - [Pi license at the npm release's recorded git head](https://github.com/earendil-works/pi/blob/d981de1229ef899957bbe968bc8dcda02a21f477/LICENSE)
 - [DSH license](https://github.com/ManoloRemiddi/deepseek-harness/blob/master/LICENSE)
 - [Hindsight license](https://github.com/vectorize-io/hindsight/blob/main/LICENSE)
+
+## macOS preview sources
+
+See [the Mac preview distribution record](MACOS-PREVIEW-RELEASE.md) and
+[LGPL library replacement instructions](MACOS-LIBRARY-REPLACEMENT.md).
+The Mac payload is limited to the Widgets framework closure; unused QML/Quick
+and development tools are removed before signing. DSH adds reviewed BSD-2-Clause
+and Python-2.0 dependencies and a version-bound LGPL libvips exception to the
+npm notice collector. Native source/notices are reviewed separately.

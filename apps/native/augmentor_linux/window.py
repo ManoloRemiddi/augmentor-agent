@@ -830,6 +830,9 @@ class Window(QWidget):
         menu.addAction('Prompt library',self.open_prompt_library).setEnabled(bool(self.controller))
         menu.addAction('Connect a model',self.open_setup).setEnabled(bool(self.controller))
         menu.addAction('Models & providers',self.open_pi).setEnabled(bool(self.controller))
+        from .macos_browser_setup import available, MacBrowserSetupDialog
+        if available():
+            menu.addAction('Set up browser extension',lambda:MacBrowserSetupDialog(self).exec())
         menu.addAction('Versions & updates',self.open_updates).setEnabled(bool(self.controller))
         menu.addAction('Approval mode',self.open_access).setEnabled(bool(self.controller))
         menu.addAction('About & licenses',lambda:LicensesDialog(self).exec())

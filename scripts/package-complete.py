@@ -60,6 +60,7 @@ def main():
         shutil.copy2(source,target);plugins.append(str(target.relative_to(out)))
     (out/'dsh').mkdir()
     for name in ('package.json','package-lock.json'):shutil.copy2(ROOT/'release/dsh'/name,out/'dsh'/name)
+    shutil.copytree(ROOT/'release/dsh/plugins',out/'dsh/plugins')
     shutil.copy2(ROOT/'scripts/setup-complete.py',out/'setup.py')
     shutil.copy2(ROOT/'docs/COMPLETE-INSTALL.md',out/'INSTALL.md')
     shutil.copy2(ROOT/'LICENSE',out/'LICENSE')

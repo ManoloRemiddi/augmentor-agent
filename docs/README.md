@@ -133,3 +133,7 @@ files available only in a developer's working directory.
 - [Controlled memory and selected context](CONTROLLED-MEMORY.md): current bounded inference, provenance, tests and operating limits.
 
 - [Home desktop tray launcher](HOME-LAUNCHER.md): shared NAS dashboard access, remembered address and login startup.
+
+- [macOS preview release](MACOS-PREVIEW-RELEASE.md) — Apple-independent preview, source artifacts and qualification.
+- [Mac customer guide](MACOS-PREVIEW.html) — install, model connection and browser extension.
+- [Mac library replacement](MACOS-LIBRARY-REPLACEMENT.md) — LGPL source and installation material.

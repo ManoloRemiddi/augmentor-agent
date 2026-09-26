@@ -2,6 +2,19 @@
 
 # Start here: agent handoff
 
+## September 26 Apple-independent preview preparation
+
+The owner approved publishing a clearly labelled macOS preview without Developer
+ID or notarization after Apple enrollment failed. Continue the release; do not
+ask again for that choice. [Preview release](MACOS-PREVIEW-RELEASE.md) owns the
+updated scope, source archives, browser setup and remaining qualification.
+The plugin-enabled candidate passed actual isolated managed DSH startup, all
+three plugins active, chat and conversation restoration on the 16 GB Mac. The
+latest source adds the browser setup dialog and trims unused Qt frameworks;
+these changes still need final candidate qualification. No public Mac asset or
+website download has been published at this checkpoint. The personal installed
+Mac app remains separate and unchanged.
+
 ## September 26 public Mac download audit and signing preparation
 
 The owner requested a macOS download on augmentoragent.com. The fresh audit

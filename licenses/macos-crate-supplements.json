@@ -1,0 +1,60 @@
+[
+  {
+    "package": "anes-0.1.6",
+    "url": "https://raw.githubusercontent.com/zrzka/anes-rs/378ac7461ecac29fde9e10df7b08359d1315a9ad/LICENSE-MIT",
+    "file": "licenses/upstream/anes-0.1.6.txt",
+    "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "package": "defmt-parser-1.0.0",
+    "url": "https://raw.githubusercontent.com/knurling-rs/defmt/4a8cdb44891ed57b8ff5a023b6bec7137c48708f/LICENSE-MIT",
+    "file": "licenses/upstream/defmt-parser-1.0.0.txt",
+    "sha256": "2710a622a896bba67356913d4d0492cab5465f61b2ecce6d880aeb483834fb50"
+  },
+  {
+    "package": "mutants-0.0.4",
+    "url": "https://raw.githubusercontent.com/sourcefrog/cargo-mutants/14011d08c42a7cd368698fe28f77eb4cd0b65bf0/LICENSE",
+    "file": "licenses/upstream/mutants-0.0.4.txt",
+    "sha256": "479cbeb2506157776cf80abe31df18065d0fe50b5816ff77bfd75d5deb04ab5c"
+  },
+  {
+    "package": "block-0.1.6",
+    "url": "https://github.com/SSheldon/rust-block/blob/47178790cfc9d4a8b092051d8b413b78bd31254a/Cargo.toml",
+    "file": "licenses/upstream/block-0.1.6.txt",
+    "sha256": "62fe520551373609c9d92a8edbe0b45cd986c476d44e67a2e6f3077f3a09b844",
+    "note": "Upstream package omits a standalone license. Preserve its exact MIT declaration and author metadata with the standard MIT text; no upstream year or additional copyright notice invented."
+  },
+  {
+    "package": "malloc_buf-0.0.6",
+    "url": "https://github.com/SSheldon/malloc_buf/blob/a7811e5f4c6f9685dd57ad9bfe34e9bf6b0ba4f9/Cargo.toml",
+    "file": "licenses/upstream/malloc_buf-0.0.6.txt",
+    "sha256": "0c53f06743edfeb872ee5cc4760e021326fe82b4045d21f7b017d01ff0a38094",
+    "note": "Upstream package omits a standalone license. Preserve its exact MIT declaration and author metadata with the standard MIT text; no upstream year or additional copyright notice invented."
+  },
+  {
+    "package": "objc-foundation-0.1.1",
+    "url": "https://github.com/SSheldon/rust-objc-foundation/blob/0c157a59b7931430ed5ac7839381470b0c516d3c/Cargo.toml",
+    "file": "licenses/upstream/objc-foundation-0.1.1.txt",
+    "sha256": "74d10f582b4af9e1e71bc2f03119f007d9922601c3b3d2c7f861d00edc5b2c54",
+    "note": "Upstream package omits a standalone license. Preserve its exact MIT declaration and author metadata with the standard MIT text; no upstream year or additional copyright notice invented."
+  },
+  {
+    "package": "objc_id-0.1.1",
+    "url": "https://github.com/SSheldon/rust-objc-id/blob/6527cdf28fef2b155c67c1681f548ecfd794003c/Cargo.toml",
+    "file": "licenses/upstream/objc_id-0.1.1.txt",
+    "sha256": "de344cabbcb145ce9f16746dea6d992ae29a895e171a1812bff53ac4777f5edd",
+    "note": "Upstream package omits a standalone license. Preserve its exact MIT declaration and author metadata with the standard MIT text; no upstream year or additional copyright notice invented."
+  },
+  {
+    "package": "difflib-0.4.0",
+    "url": "https://raw.githubusercontent.com/DimaKudosh/difflib/f035fb8e656f27119e23eca9d5b996df14f3885e/LICENSE",
+    "file": "licenses/upstream/difflib-0.4.0.txt",
+    "sha256": "6725d1437fc6c77301f2ff0e7d52914cf4f9509213e1078dc77d9356dbe6eac5"
+  },
+  {
+    "package": "selectors-0.40.0",
+    "url": "https://www.mozilla.org/media/MPL/2.0/index.815ca599c9df.txt",
+    "file": "licenses/upstream/selectors-0.40.0.txt",
+    "sha256": "fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85"
+  }
+]

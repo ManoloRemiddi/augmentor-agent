@@ -150,3 +150,12 @@ including the Linux, installed-package lifecycle, Browser and Home jobs.
 The owner's canonical app remains the earlier development artifact. See the
 [release guide](MACOS-RELEASE.md) for Developer ID/notarization, signed installed
 acceptance, extra plugins, browser, voice/memory, licensing and update gates.
+
+## Preview plugin and browser follow-up
+
+The managed profile now enables the locked Model Picker, Adaptive Reasoning and
+Resonant Voice packages alongside DSH’s web bundles. Voice initialization creates
+only missing private configuration; speech models are separate. The browser setup
+menu prepares a stable external extension folder and native-host registration,
+then leaves final Load unpacked approval to Chrome/Chromium. See the
+[preview release record](MACOS-PREVIEW-RELEASE.md) for distribution scope.

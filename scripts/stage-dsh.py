@@ -67,9 +67,12 @@ def main():
     target.mkdir(parents=True, exist_ok=True)
     for name in ('package.json', 'package-lock.json'):
         shutil.copy2(ROOT/'release/dsh'/name, target/name)
+    shutil.copytree(ROOT/'release/dsh/plugins', target/'plugins')
     subprocess.run(['npm', 'ci', '--ignore-scripts', '--omit=dev', '--no-audit', '--no-fund'],
         cwd=target, check=True)
     report = prepare(target, args.node)
+    subprocess.run([sys.executable, str(ROOT/'scripts/third-party-notices.py'),
+        '--tree', str(target), '--out', str(target/'licenses')], check=True)
     subprocess.run([args.node, str(ROOT/'scripts/dsh-payload-proof.mjs'), str(target)], check=True, timeout=90)
     print(json.dumps({'staged':str(target), 'packages':len(report['packages']), 'licenseReviewComplete':False}))
 

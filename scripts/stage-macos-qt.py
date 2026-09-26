@@ -6,6 +6,34 @@ import hashlib
 import json
 from pathlib import Path
 import subprocess
+import shutil
+
+WIDGET_MODULES = {'QtCore', 'QtGui', 'QtWidgets', 'QtNetwork', 'QtDBus', 'QtSvg', 'QtTest'}
+WIDGET_PLUGINS = {'platforms', 'styles', 'imageformats', 'iconengines', 'tls', 'networkinformation'}
+
+
+def widgets_only(root):
+    """Exclude unused QML/Designer/GPL-only modules from the Widgets product."""
+    required = [root/(name+'.abi3.so') for name in WIDGET_MODULES]
+    required += [root/'Qt/lib'/(name+'.framework') for name in WIDGET_MODULES]
+    if any(not path.exists() for path in required):
+        raise ValueError('Pinned Widgets module is missing; no modules removed')
+    remove = [p for p in (root/'Qt/lib').glob('*.framework') if p.stem not in WIDGET_MODULES]
+    remove += [p for p in root.glob('Qt*') if p.is_file() and p.name.split('.')[0] not in WIDGET_MODULES]
+    remove += [p for p in (root/'Qt/plugins').iterdir() if p.name not in WIDGET_PLUGINS]
+    remove += [root/p for p in ('Qt/qml','Qt/libexec','Qt/bin','Assistant.app','Designer.app','Linguist.app',
+        'libpyside6qml.abi3.6.8.dylib','lrelease','lupdate','qmlformat','qmllint','qmlls','svgtoqml') if (root/p).exists()]
+    for path in remove:
+        if path.is_symlink():raise ValueError('Unexpected link in Qt staging')
+    for path in remove:
+        if path.is_dir():shutil.rmtree(path)
+        else:path.unlink()
+    # Fail the build if a retained component links a removed framework.
+    binaries = [*root.glob('*.so'), *root.rglob('*.dylib')]
+    binaries += [root/'Qt/lib'/(name+'.framework')/'Versions/A'/name for name in WIDGET_MODULES]
+    missing = {str(p.relative_to(root)): missing_frameworks(root,p) for p in binaries}
+    if any(missing.values()):raise ValueError('Widgets dependency closure is incomplete: '+str(missing))
+    return {'frameworks':sorted(WIDGET_MODULES), 'removed':[str(p.relative_to(root)) for p in remove]}
 
 def missing_frameworks(root,file):
     result=set()
@@ -28,7 +56,9 @@ def stage(root,policy):
         if file.is_symlink() or not file.resolve().is_relative_to(root.resolve()):raise ValueError('Unexpected plugin path')
         removed.append({'path':path,'sha256':hashlib.sha256(file.read_bytes()).hexdigest(),'missingQtFrameworks':observed[path]})
     for row in removed:(root/row['path']).unlink()
-    return {'reason':policy['reason'],'removed':removed,'remainingMissingQtFrameworks':[]}
+    report = {'reason':policy['reason'],'removed':removed,'remainingMissingQtFrameworks':[]}
+    if policy.get('widgetsOnly'):report['widgetsOnly'] = widgets_only(root)
+    return report
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)

@@ -2,6 +2,13 @@
 
 # macOS development installation
 
+**Current preview direction:** The owner approved distribution without Apple
+Developer ID after enrollment failed. See [the preview release record](MACOS-PREVIEW-RELEASE.md)
+and [customer guide](MACOS-PREVIEW.html). Earlier Apple gates below describe the
+intended stable release and historical audits. They do not block the explicitly
+approved ad-hoc preview.
+
+
 The September 25 [distribution implementation](MACOS-DISTRIBUTION.md) adds native
 embedded-Python entrypoints, a prepared bundled DSH runtime and development DMG
 output. It records current evidence and the remaining first-run/update/signing

@@ -85,6 +85,12 @@ def main():
         from augmentor_linux.adapters.dsh import DshAdapter
         adapter = DshAdapter(); adapter.call('host.describe')
         assert adapter.product
+        from dsh.remote import client as remote_client
+        inventory = remote_client(result['endpoint'], result['home']).invoke('pluginInventory/list')['entries']
+        active = {row['moduleName'] for row in inventory if row.get('enabled') and row.get('fiberPhase') == 'active'}
+        required = set(managed.BUNDLES[2:])
+        assert required <= active, {'missingPlugins': sorted(required-active)}
+        report['requiredPluginsActive'] = sorted(required)
         catalog = adapter.model_catalog()
         assert any(m.get('id', m.get('model')) == 'fixture' for group in catalog['groups'] for m in group['models']), catalog
         session = 'managed-setup-'+uuid.uuid4().hex

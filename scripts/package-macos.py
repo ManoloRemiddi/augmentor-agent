@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 import platform
 import plistlib
+import re
 import shutil
 import subprocess
 import sys
@@ -51,6 +52,7 @@ def disk_image(app, destination):
         stage = Path(temporary)
         subprocess.run(['ditto', str(app), str(stage/app.name)], check=True)
         (stage/'Applications').symlink_to('/Applications', target_is_directory=True)
+        shutil.copy2(ROOT/'docs/MACOS-PREVIEW.html', stage/'Start here.html')
         subprocess.run(['hdiutil', 'create', '-quiet', '-volname', 'Augmentor Agent Preview',
             '-srcfolder', str(stage), '-format', 'UDZO', str(destination)], check=True)
     subprocess.run(['hdiutil', 'verify', '-quiet', str(destination)], check=True)
@@ -107,7 +109,13 @@ def main():
     parser.add_argument('--out', type=Path, required=True, help='New, empty output directory')
     parser.add_argument('--component', choices=('desktop','companion'), default='desktop')
     parser.add_argument('--dmg', action='store_true', help='Also create a development drag-install disk image')
+    parser.add_argument('--preview', action='store_true', help='Label an ad-hoc public preview candidate accurately')
+    parser.add_argument('--source-commit', help='Exact canonical source commit used for this candidate')
+    parser.add_argument('--source-notices', type=Path, help='Verified output of prepare-macos-sources.py')
     args = parser.parse_args()
+    if args.preview and (not args.source_commit or not re.fullmatch('[0-9a-f]{40}', args.source_commit) or not args.source_notices):
+        parser.error('A preview requires an exact source commit and prepared source notices.')
+    channel = 'preview' if args.preview else 'development'
     desktop = args.component == 'desktop'
     if sys.platform!='darwin' or platform.machine()!='arm64':
         parser.error('Build this target on an ARM64 Mac.')
@@ -138,6 +146,13 @@ def main():
     project = resources/'app'
     for name in ('dist','apps/native','apps/browser','scripts','services','adapters','config','docs','licenses','LICENSE','README.md','release/product.json','release/macos.json','release/macos-requirements.txt','release/dsh'):
         copy(ROOT/name, project/name)
+    if args.source_notices:
+        source_report = json.loads((args.source_notices/'manifest.json').read_text())
+        for name, sha in source_report['notices'].items():
+            path = args.source_notices/name
+            if path.is_symlink() or not path.resolve().is_relative_to(args.source_notices.resolve()) or hashlib.sha256(path.read_bytes()).hexdigest()!=sha:
+                raise ValueError('Source notice differs from its inventory: '+name)
+        copy(args.source_notices, project/'licenses/macos-sources')
     # python-build-standalone (used by uv) supplies a relocatable interpreter.
     # Copy its stdlib as well as this build environment's locked GUI dependencies.
     python = project/'python'
@@ -207,7 +222,7 @@ def main():
     if not desktop:
         packaged_config.pop('qt',None);packaged_config.pop('pythonBindings',None)
         packaged_config['pythonPackages']={name:config['pythonPackages'][name] for name in ('PyYAML','websocket-client')}
-    (project/'release.json').write_text(json.dumps({**product,**packaged_config,'channel':'development','component':args.component,'signedForDistribution':False},indent=2)+'\n')
+    (project/'release.json').write_text(json.dumps({**product,**packaged_config,'channel':channel,'component':args.component,'sourceCommit':args.source_commit,'signedForDistribution':False,'notarized':False},indent=2)+'\n')
     if desktop:
         native=project/'native';native.mkdir(exist_ok=True)
         helper_info=native/'helper-info.plist'
@@ -241,25 +256,24 @@ def main():
     inventory=json.dumps(application_inventory(project),sort_keys=True,indent=2)+'\n'
     (project/'application-inventory.json').write_text(inventory)
     inventory_hash=hashlib.sha256(inventory.encode()).hexdigest()
-    # Development signature only. A Developer ID signature and notarization are
-    # required before this target can be marked ready for public distribution.
+    # Ad-hoc integrity signature. Preview users must explicitly approve this app
+    # in macOS; no Apple distribution identity or notarization is claimed.
     subprocess.run(['codesign','--force','--deep','--sign','-',str(app)],check=True)
     subprocess.run(['codesign','--verify','--deep','--strict',str(app)],check=True)
     # Keep binary hashes outside the sealed bundle: code signing changes Mach-O bytes.
     if desktop:
         subprocess.run([str(python/'bin/python3'),'-I','-B',str(ROOT/'scripts/qt-library-inventory.py'),
             '--qt-version',config['qt'],'--out',str(out/'qt-library-inventory.json')],check=True)
-    artifact = out/f'augmentor-{args.component}-{product["version"]}-macos-arm64-development.zip'
+    artifact = out/f'augmentor-{args.component}-{product["version"]}-macos-arm64-{channel}.zip'
     subprocess.run(['ditto','-c','-k','--sequesterRsrc','--keepParent',str(app),str(artifact)],check=True)
-    report = {'component':args.component,'version':product['version'],'target':config['target'],'channel':'development',
+    report = {'component':args.component,'version':product['version'],'target':config['target'],'channel':channel,'sourceCommit':args.source_commit,
         'artifact':artifact.name,'sha256':hashlib.sha256(artifact.read_bytes()).hexdigest(),
         'bytes':artifact.stat().st_size,'signature':'ad-hoc','notarized':False,
         'publicReleaseReady':False,'applicationInventorySha256':inventory_hash,'python':config['python'],'node':item['version'],
         'dsh':packaged_config['dsh'],
-        'openGates':['guided managed setup','required plugin provisioning','store migration',
-            'coordinated auto-update','installed acceptance','DSH feature qualification',
+        'openGates':['store migration','coordinated auto-update','final candidate acceptance','DSH feature qualification',
             *(['desktop control','permission attribution'] if desktop else []),
-            'license review','Developer ID signing and notarization']}
+            'release source/notice verification','Developer ID signing and notarization (stable release)']}
     if args.dmg:
         report['diskImage'] = disk_image(app, artifact.with_suffix('.dmg'))
     (out/'artifacts.json').write_text(json.dumps(report,indent=2)+'\n')

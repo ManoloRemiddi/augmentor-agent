@@ -25,6 +25,16 @@ import urllib.request
 ROOT = Path(__file__).resolve().parents[1]
 LABEL = 'com.augmentor.Agent.DSH'
 SCHEMA = 'augmentor-managed-dsh/1'
+BUNDLES = ['@deepseek-ai/dsh-base', '@deepseek-ai/dsh-web-app',
+           'dsh-model-picker-augmented', 'dsh-adaptive-reasoning', 'dsh-resonant-voice']
+
+
+def initialize_voice(root, env):
+    script = root/'dsh/node_modules/dsh-resonant-voice/bin/resonant-voice.js'
+    if not script.is_file():
+        raise ValueError('The bundled voice plugin is missing. Reinstall Augmentor before setup.')
+    subprocess.run([str(root/'node/bin/node'), str(script), 'init'], env=env,
+                   capture_output=True, check=True, timeout=30)
 
 
 def load_complete(root):
@@ -254,12 +264,12 @@ def provision(root, state, request, *, agent=None, probe=probe_model):
         # invoke npm or download a second DSH during customer installation.
         if not (profile/'package.json').exists():
             atomic_json(profile/'package.json', {'name': 'augmentor-managed-web', 'private': True, 'type': 'module',
-                'dsh': {'profile': {'bundles': ['@deepseek-ai/dsh-base', '@deepseek-ai/dsh-web-app']}}})
+                'dsh': {'profile': {'bundles': BUNDLES}}})
         for name in ('cordis.yml', 'cordis.patch.yml'):
             if not (profile/name).exists():
                 atomic_json(profile/name, [])
         environment = {key: value for key, value in os.environ.items()
-                       if key.startswith('XDG_') or key in ('AUGMENTOR_SHARED_CONFIG', 'AUGMENTOR_SHARED_DATA', 'AUGMENTOR_SHARED_STATE')}
+                       if key.startswith('XDG_') or key in ('AUGMENTOR_SHARED_CONFIG', 'AUGMENTOR_SHARED_DATA', 'AUGMENTOR_SHARED_STATE', 'RESONANT_VOICE_HOME')}
         atomic_json(state/'runtime.json', {'schema': SCHEMA, 'appRoot': str(root), 'home': str(home),
             'port': record['port'], 'apiKey': secret, 'environment': environment})
         env = {**os.environ, **environment, 'DSH_HOME': str(home), 'DSH_TELEMETRY_MODE': 'DISABLED',
@@ -268,6 +278,7 @@ def provision(root, state, request, *, agent=None, probe=probe_model):
         env.pop('NODE_OPTIONS', None); env.pop('NODE_PATH', None)
         os.environ['PATH'] = env['PATH']  # The GUI runs setup in a separate process.
         try:
+            initialize_voice(root, env)
             complete.configure_product(root, cli, home, record['endpoint'], env, state, save=False)
             record['status'] = 'starting'; atomic_json(marker, record)
             agent.start()

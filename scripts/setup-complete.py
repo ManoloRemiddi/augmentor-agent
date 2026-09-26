@@ -164,6 +164,10 @@ def install(args):
     runtime=data/'dsh-runtime';runtime.mkdir(parents=True,exist_ok=True)
     env={**os.environ,'PATH':str(node.parent)+':'+os.environ.get('PATH','')}
     for name in ('package.json','package-lock.json'):shutil.copy2(bundle/'dsh'/name,runtime/name)
+    # New bundles carry the exact unpublished plugin tarballs referenced by the
+    # shared lock. Older published bundles retain their registry-only graph.
+    if (bundle/'dsh/plugins').is_dir():
+        shutil.copytree(bundle/'dsh/plugins',runtime/'plugins',dirs_exist_ok=True)
     run('npm','ci','--prefix',runtime,'--ignore-scripts','--omit=dev','--no-audit','--no-fund',env=env)
     cli=runtime/'node_modules/.bin/dsh';home=data/'dsh-home';home.mkdir(parents=True,exist_ok=True,mode=0o700)
     env.update(DSH_HOME=str(home),DSH_TELEMETRY_MODE='DISABLED',AUGMENTOR_MODEL_API_KEY=secret)

@@ -2,6 +2,13 @@
 
 # macOS release operator guide
 
+**Current preview direction:** The owner approved distribution without Apple
+Developer ID after enrollment failed. See [the preview release record](MACOS-PREVIEW-RELEASE.md)
+and [customer guide](MACOS-PREVIEW.html). Earlier Apple gates below describe the
+intended stable release and historical audits. They do not block the explicitly
+approved ad-hoc preview.
+
+
 **Status: candidate tooling, not a published Mac download.** The personal test
 Mac works with its privately configured DSH/model profile. The public product
 must work without that profile or any of its credentials. See the

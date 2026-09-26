@@ -76,6 +76,27 @@
       "file": "upstream/numpy-2.5.1.txt",
       "url": "https://numpy.org/doc/stable/license.html",
       "sha256": "4860083caa0de2ac3292ca98bd074bd8f45d8b32624e37b1e70a240bff61e488"
+    },
+    "xterm-6.0.0": {
+      "file": "upstream/xterm-6.0.0.txt",
+      "url": "https://raw.githubusercontent.com/xtermjs/xterm.js/f447274f430fd22513f6adbf9862d19524471c04/LICENSE",
+      "sha256": "b569f629d00f2626a8100df2a1798210535621e42164dfd426a6fe5aac7b0ccd"
+    },
+    "schemastery-3.18.0": {
+      "file": "upstream/schemastery-3.18.0.txt",
+      "url": "https://raw.githubusercontent.com/shigma/schemastery/9e1f54f8ff785a4e51a022922999634205b61e1f/LICENSE",
+      "sha256": "034fb52b1d57360ecbae6cb1632a88f86fd7c3d3f5631a5f082710203dda0be7"
+    },
+    "koffi-3.2.1": {
+      "file": "upstream/koffi-3.2.1.txt",
+      "url": "https://www.npmjs.com/package/koffi/v/3.2.1",
+      "sha256": "22bcbbbacd739b026a8dc484f62a31484ce4c4e31f3408b60b29b4e41d62b290",
+      "note": "MIT text from the matching Koffi package; its platform binaries come from the same 3.2.1 distribution."
+    },
+    "lgpl-3.0": {
+      "file": "LGPL-3.0.txt",
+      "url": "https://www.gnu.org/licenses/lgpl-3.0.txt",
+      "sha256": "e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118"
     }
   },
   "overrides": {
@@ -123,7 +144,20 @@
     "@opencode-ai/plugin@1.18.29": "opencode-1.18.29",
     "@opencode-ai/sdk@1.18.29": "opencode-1.18.29",
     "@msgpackr-extract/msgpackr-extract-linux-x64@3.0.4": "msgpackr-extract-3.0.4",
-    "kubernetes-types@1.30.0": "kubernetes-types-1.30.0"
+    "kubernetes-types@1.30.0": "kubernetes-types-1.30.0",
+    "@xterm/headless@6.0.0": "xterm-6.0.0",
+    "schemastery@3.18.0": "schemastery-3.18.0",
+    "@aws-sdk/credential-provider-http@3.972.73": "aws-sdk",
+    "@aws-sdk/credential-provider-login@3.972.78": "aws-sdk",
+    "@aws-sdk/nested-clients@3.997.45": "aws-sdk",
+    "@koromix/koffi-darwin-arm64@3.2.1": "koffi-3.2.1",
+    "@koromix/koffi-darwin-x64@3.2.1": "koffi-3.2.1",
+    "@koromix/koffi-linux-x64@3.2.1": "koffi-3.2.1",
+    "@koromix/koffi-linux-arm64@3.2.1": "koffi-3.2.1",
+    "@img/sharp-libvips-darwin-arm64@1.3.3": "lgpl-3.0",
+    "@img/sharp-libvips-darwin-x64@1.3.3": "lgpl-3.0",
+    "@img/sharp-libvips-linux-x64@1.3.3": "lgpl-3.0",
+    "@img/sharp-libvips-linux-arm64@1.3.3": "lgpl-3.0"
   },
   "choices": {
     "json-schema@0.4.0": {
@@ -131,5 +165,11 @@
       "selected": "BSD-3-Clause",
       "note": "The package LICENSE expressly offers either license; distribution selects BSD-3-Clause and retains the full original notice."
     }
+  },
+  "additionalLicenses": {
+    "@img/sharp-libvips-darwin-arm64@1.3.3": "LGPL-3.0-or-later",
+    "@img/sharp-libvips-darwin-x64@1.3.3": "LGPL-3.0-or-later",
+    "@img/sharp-libvips-linux-x64@1.3.3": "LGPL-3.0-or-later",
+    "@img/sharp-libvips-linux-arm64@1.3.3": "LGPL-3.0-or-later"
   }
 }

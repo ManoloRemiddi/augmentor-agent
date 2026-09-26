@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 spec = importlib.util.spec_from_file_location('mac_browser', Path(__file__).resolve().parents[1]/'scripts/register-macos-browser.py')
 module = importlib.util.module_from_spec(spec)
@@ -11,6 +12,33 @@ spec.loader.exec_module(module)
 
 
 class MacBrowserRegistrationTests(unittest.TestCase):
+    def test_prepared_extension_is_stable_and_edits_are_preserved(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); app = root/'Augmentor.app'
+            source = app/'Contents/Resources/app/apps/browser/extension'; source.mkdir(parents=True)
+            (source/'manifest.json').write_text('{"version":"1.0"}')
+            value = {'path': str(app/'Contents/MacOS/host'), 'allowed_origins': ['chrome-extension://fixture/']}
+            with patch.object(module, 'manifest', return_value=value):
+                first = module.prepare_extension(app, 'chrome', root/'support')
+                second = module.prepare_extension(app, 'chrome', root/'support')
+                self.assertEqual(first['extensionDirectory'], second['extensionDirectory'])
+                self.assertFalse(second['changed'])
+                target = Path(first['extensionDirectory'])/'manifest.json'; target.write_text('user edits')
+                with self.assertRaisesRegex(ValueError, 'edited'):
+                    module.prepare_extension(app, 'chrome', root/'support')
+                self.assertEqual(target.read_text(), 'user edits')
+                self.assertEqual((source/'manifest.json').read_text(), '{"version":"1.0"}')
+
+    def test_prepared_extension_refuses_links_before_browser_registration(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); app = root/'Augmentor.app'
+            source = app/'Contents/Resources/app/apps/browser/extension'; source.mkdir(parents=True)
+            (source/'linked').symlink_to(root/'private-data')
+            with patch.object(module, 'manifest', return_value={}), patch.object(module, 'register') as register:
+                with self.assertRaisesRegex(ValueError, 'link'):
+                    module.prepare_extension(app, 'chrome', root/'support')
+                register.assert_not_called()
+
     def test_removal_retains_exact_manifest_and_other_files(self):
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory);value={'path':'/Applications/Preview.app/Contents/MacOS/host','allowed_origins':['chrome-extension://fixture/']}
