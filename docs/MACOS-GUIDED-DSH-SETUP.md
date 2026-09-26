@@ -73,7 +73,32 @@ its temporary profile cleanup raised `ENOTEMPTY`. The Mac workflow is independen
 and passed. The Linux workflow was retried; that intermittent browser cleanup
 failure is not claimed fixed by the Mac setup changes.
 
-Installation is staged pending the owner closing the desktop. The earlier
-desktop does not include unsent text in its maintenance status and does not
-persist that draft when closed, so its idle flag alone is not sufficient to
-approve an automated close. The public `v0.2.12-macos-preview.1` DMG is unchanged.
+At documentation ref `6bead5a`, both the
+[full validation workflow](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36247948239)
+and [Mac 14/26 workflow](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36247948301)
+passed, including Debian, Browser, installed-package lifecycle and Home checks.
+
+## Installed on the 32 GB Mac
+
+After the owner confirmed closing the desktop, the qualified candidate was
+installed at `/Applications/Augmentor Agent Desktop.app`. The earlier desktop
+does not report or preserve an unsent draft, so its idle flag alone was not
+used to close it. An authenticated, same-user prompt-library helper belonging
+to that exact installed application was stopped with its graceful shutdown
+handler. The installer paused and restored the owned shortcut service and kept
+the previous application in a hidden backup. Other preview runtimes were not
+stopped.
+
+The candidate uses the previously approved Apple-independent preview policy.
+The installer's explicit development mode was required for its ad-hoc signature;
+strict code integrity checks remained enabled. No Gatekeeper setting or
+quarantine attribute was changed.
+
+Installation and post-install integrity checks passed. All ten changed files
+matched the application inventory, whose SHA-256 is
+`f36b1ef73e00054adf19982bf515b72c2c1b50b25d0f600be512f21c1af2db76`.
+LaunchServices opened the installed native process, the owned shortcut service
+was running, and the desktop maintenance endpoint responded with an empty
+connection error. The installed application code remains `2fb9a5b` as described
+above. The model connection is still unconfigured; live chat on the owner's
+account is not claimed. The public `v0.2.12-macos-preview.1` DMG is unchanged.

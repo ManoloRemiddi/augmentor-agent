@@ -9,7 +9,10 @@ native first run now offers **Install DSH** before connection recovery, streams
 the managed installer's five stages, and retains failed settings for retry.
 An incomplete bundle is diagnosed before offering an existing-DSH form.
 See [the scoped evidence and deployment record](MACOS-GUIDED-DSH-SETUP.md).
-This source change does not change the published preview DMG.
+The qualified candidate is now installed and reopened on the 32 GB Mac after
+the owner closed its earlier window. Integrity, the native process and shortcut
+service were checked; model setup remains unfinished. Both full validation and
+the Mac 14/26 workflow passed at `6bead5a`. The published preview DMG is unchanged.
 
 ## September 26 public Apple-independent macOS preview
 
