@@ -39,6 +39,41 @@ The 32 GB Apple-silicon Mac (macOS 26.6.2) passed all 109 Mac tests and 27 nativ
 window tests. The installation form was rendered and visually inspected using
 the bundled Qt runtime. These tests exercise the actual Qt widgets, missing payloads, preserved external
 connections, progress, failure/retry, private credentials and managed-service
-ownership. A deterministic model fixture is not live provider evidence. Candidate
-and deployment evidence will follow qualification. The public
-`v0.2.12-macos-preview.1` DMG is unchanged by this source correction.
+ownership. A deterministic model fixture is not live provider evidence.
+
+A separate candidate was staged from the sealed `ea128d6` public preview with
+only the ten implementation/document files recorded in its `release.json`
+changed. Its application inventory was regenerated and the candidate resealed
+with an ad-hoc integrity signature. Application code is from `2fb9a5b`; later
+commit `3e88750` changes test cleanup only. This is a scoped candidate based on
+the published binary, not a claim of a new clean-build public release.
+
+On that candidate, the real managed-service proof passed in 11.879 seconds,
+including all three required plugins, a completed chat, repeated setup without
+another installation, service restart and restored conversation. Its temporary
+LaunchAgent and prompt/memory services were removed. The real native Window
+in an isolated Qt profile opened Install DSH automatically, did not start
+recovery, and allowed Later followed by reopening setup. These checks did not
+use the owner's credentials, conversation or model service.
+
+The first Mac CI attempt passed its assertions but crashed during interpreter
+shutdown with retained test widgets. The test-only follow-up explicitly drains
+deferred Qt destruction and uses the canonical module import. This follows
+[Qt's event-loop lifetime contract](https://doc.qt.io/qt-6.8/qobject.html#deleteLater).
+The [macOS 14/26 workflow at `3e88750`](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36247499831)
+then passed completely, including clean packaging, bundled DSH/Qt contracts,
+managed chat/restart/history and post-use signature checks. Run bundled Python
+diagnostics with `-B` and `PYTHONDONTWRITEBYTECODE=1` (including subprocesses) so
+test imports cannot add bytecode caches to sealed apps.
+The original app's integrity was restored and checked after archiving such
+test-generated caches; no source file or user data was removed.
+
+The broader Linux workflow initially stopped in an unchanged Chromium fixture:
+its temporary profile cleanup raised `ENOTEMPTY`. The Mac workflow is independent
+and passed. The Linux workflow was retried; that intermittent browser cleanup
+failure is not claimed fixed by the Mac setup changes.
+
+Installation is staged pending the owner closing the desktop. The earlier
+desktop does not include unsent text in its maintenance status and does not
+persist that draft when closed, so its idle flag alone is not sufficient to
+approve an automated close. The public `v0.2.12-macos-preview.1` DMG is unchanged.
