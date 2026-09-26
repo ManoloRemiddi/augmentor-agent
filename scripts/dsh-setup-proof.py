@@ -172,7 +172,10 @@ def start():
         hits=re.findall(r'token=([A-Za-z0-9_-]+)',current_log)
         if not hits:return False
         os.environ['AUGMENTOR_DSH_AUTH_TOKEN']=hits[-1]
-        return DshAdapter(base=base,home=home).call('host.describe')
+        # This phase precedes preset installation: test host availability, not
+        # the desktop adapter's stronger agent-readiness contract.
+        from dsh.remote import client
+        return client(base,home).call('host.describe')
     until(authenticated)
 def stop():
     global process

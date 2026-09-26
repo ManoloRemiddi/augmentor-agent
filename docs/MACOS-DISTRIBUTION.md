@@ -175,6 +175,54 @@ GitHub's new OS matrix is an additional pending check, not evidence already clai
 by these local results. This checkpoint is still product version 0.2.12 development,
 not a new published product release or a consumer-ready installation.
 
+## September 26 correction: verify chat readiness and the actual composer
+
+The initial personal-connection checks below were insufficient. A successful
+backend request and `online`/`modelReady` flags did **not** prove that the already
+open desktop could send. The owner reported failure, and it was reproduced with
+the packaged Qt window: a controller created before setup retained the legacy
+`augmentor-linux` preset after external setup installed only
+`augmentor-linux-product`. The window displayed Ready and a model, but Send
+returned `agent-presets: preset "augmentor-linux" not found`. Its Connect DSH
+dialog also remained open. A fresh controller used the correct product binding.
+
+Desktop host readiness now checks that its selected agent preset exists and is
+not broken before reporting online. Missing presets direct the user to Connect
+DSH and Save and use DSH, which reconstructs the controller. The check does not
+silently switch an existing conversation's role or replay a failed prompt. The
+setup fixture uses raw host availability before installation and checks full
+desktop readiness afterwards; these are distinct contracts.
+
+The opt-in [live Mac chat proof](../scripts/macos-live-chat-proof.py) drives the
+packaged production Qt window through the composer and Send button or Enter,
+using a named test window and a real configured provider. It checks that no dialog
+blocks the composer, verifies the product binding, waits for the rendered reply,
+and captures only that window. It can require the earlier reply after reopening.
+This is a separate widget-driver process using bundled application code; it does
+not automate a different, already-running window or certify OS input permissions.
+Use `--live` only when a real provider request is intended.
+
+Candidate qualification (product 0.2.12 development):
+
+- Linux native regression: 445 tests, one environment skip; missing/broken preset
+  and supported legacy preset cases are covered.
+- Mac live Send-button proof displayed `Mac desktop button verified`.
+- Reopening the same named window restored that conversation; Enter submission
+  displayed `Mac desktop Enter verified` in the same session.
+- Full packaged DSH/Qt fixture passed 16 deterministic requests, including setup,
+  approvals, exact forks and unknown-acknowledgment non-replay.
+- Strict recursive development-signature verification passed after use.
+- Candidate ZIP SHA-256:
+  `bbe4f5f7d8f14046ed4858ad05da1c289bdcb64c6b9866137234350aad079288`.
+
+At this checkpoint the corrected candidate is staged and tested, **not activated
+in the owner's already-open window**. That older process still has a dialog open.
+Remote Accessibility and screen capture are not authorized on this Mac; the owner
+was asked to close the old window while preserving any unsent draft. Do not claim
+the user's open window is repaired until the corrected app is actually activated
+and its conversation path checked. This supersedes the earlier chat-readiness
+claim, not the verified provider catalog and backend-response evidence below.
+
 ## September 26 personal Mac model connection
 
 The owner requested that the test Mac use the same model access as their MX

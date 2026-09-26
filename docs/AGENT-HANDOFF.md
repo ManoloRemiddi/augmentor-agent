@@ -2,6 +2,19 @@
 
 # Start here: agent handoff
 
+## September 26 desktop readiness correction — activation pending
+
+The owner reported that the Mac still could not chat. The failure was reproduced:
+an already-open pre-setup controller retained the missing legacy preset while
+reporting online. The desktop adapter now verifies its preset before readiness.
+The corrected packaged Qt window passed actual composer/Send and Enter tests
+against DeepSeek, including same-conversation restoration after reopening;
+445 native tests (one skip) and the full packaged DSH/Qt fixture passed.
+See [the correction and activation boundary](MACOS-DISTRIBUTION.md#september-26-correction-verify-chat-readiness-and-the-actual-composer).
+The corrected candidate is staged. The owner's old window still has a dialog
+open; preserve its draft and finish activation after it closes. Do not repeat
+the earlier claim that an online status alone proves desktop chat works.
+
 ## September 26 personal Mac model access
 
 The owner requested their MX model access on the test Mac. The existing

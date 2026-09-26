@@ -68,3 +68,13 @@ deduplication and sidebar gestures. `dsh-boundary`, `dsh-interactions` and
 `scripts/dsh-setup-proof.py` with the approval/interaction/exact-fork flags runs
 real isolated DSH and both presentation transports, using a fixture model.
 This does not replace a physical microphone/speaker and loaded-extension trial.
+
+### Mac live desktop chat
+
+`scripts/macos-live-chat-proof.py` is an explicit `--live` check with real provider
+usage. Run it with the packaged Mac Python and `--app-root`, a fresh `--out`,
+`--instance` and `--marker`. It drives the packaged Qt composer and verifies the
+rendered reply. Repeat with the same instance, a new output/marker,
+`--previous-marker` and `--submit enter` to verify restoration and Enter submission.
+It does not control an existing user's window. See
+[Mac readiness evidence](../docs/MACOS-DISTRIBUTION.md#september-26-correction-verify-chat-readiness-and-the-actual-composer).
