@@ -1,7 +1,7 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {test} from 'node:test'
 import assert from 'node:assert/strict'
-import {mkdtempSync,writeFileSync,rmSync} from 'node:fs'
+import {mkdtempSync,writeFileSync,rmSync,mkdirSync,copyFileSync} from 'node:fs'
 import {tmpdir} from 'node:os'
 import {join} from 'node:path'
 import {once} from 'node:events'
@@ -29,7 +29,8 @@ test('memory binding supplies dedicated identity and fails closed on a prior per
 })
 test('official service authenticates proxies, serves the same UI and handles >1MiB history without queues',async()=>{
  const fixture=join(dir,'native.mjs');writeFileSync(fixture,`let b=Buffer.alloc(0);process.stdin.on('data',c=>{b=Buffer.concat([b,c]);while(b.length>=4){const n=b.readUInt32LE();if(b.length<n+4)return;const m=JSON.parse(b.subarray(4,n+4));b=b.subarray(n+4);const out=Buffer.from(JSON.stringify({id:m.id,result:'a'.repeat(1200000)}));const h=Buffer.alloc(4);h.writeUInt32LE(out.length);process.stdout.write(Buffer.concat([h,out]));}});`)
- let starts=0;const server=createEmbedServer({startNative:(ws,p)=>{starts++;nativeConnection(ws,p,{start:()=>spawn(process.execPath,[fixture],{stdio:['pipe','pipe','ignore']})})}})
+ const assetRoot=join(dir,'.managed-release','extension');mkdirSync(assetRoot,{recursive:true});copyFileSync(new URL('../apps/browser/extension/sidepanel.html',import.meta.url),join(assetRoot,'sidepanel.html'))
+ let starts=0;const server=createEmbedServer({assetRoot,startNative:(ws,p)=>{starts++;nativeConnection(ws,p,{start:()=>spawn(process.execPath,[fixture],{stdio:['pipe','pipe','ignore']})})}})
  server.listen(0,'127.0.0.1');await once(server,'listening');const base='http://127.0.0.1:'+server.address().port+'/embed/fixture/',headers={authorization:'Bearer '+'x'.repeat(48),origin:profile.parentOrigin}
  try{
  assert.equal((await fetch(base+'sidepanel.html')).status,403)

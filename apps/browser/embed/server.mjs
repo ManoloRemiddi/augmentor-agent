@@ -34,7 +34,7 @@ export function nativeConnection(ws,profile,{start=spawn}={}){
  ws.on('close',end);ws.on('error',end);child.on('error',end);child.on('exit',end);child.stdin.on('error',end)
  return end
 }
-export function createEmbedServer({profileLoader=loadProfile,startNative=nativeConnection}={}){
+export function createEmbedServer({profileLoader=loadProfile,startNative=nativeConnection,assetRoot=root}={}){
  const wss=new WebSocketServer({noServer:true,maxPayload:1024*1024,perMessageDeflate:false})
  async function authorize(req){
   const url=new URL(req.url,'http://127.0.0.1'),match=/^\/embed\/([a-z][a-z0-9-]*)\/(.*)$/.exec(url.pathname)
@@ -59,8 +59,8 @@ export function createEmbedServer({profileLoader=loadProfile,startNative=nativeC
     return json(200,preferences(p,JSON.parse(body)))
    }
    if(!['GET','HEAD'].includes(req.method))return json(405,{error:'Unsupported method'})
-   const name=file||'sidepanel.html',path=resolve(root,name)
-   if(!path.startsWith(root)||path.includes(sep+'.')||!types[extname(path)])return json(404,{error:'File unavailable'})
+   const name=file||'sidepanel.html',path=resolve(assetRoot,name)
+   if(!path.startsWith(resolve(assetRoot)+sep)||name.split('/').some(part=>part.startsWith('.'))||!types[extname(path)])return json(404,{error:'File unavailable'})
    let content=await readFile(name==='embedded-entry.mjs'?fileURLToPath(new URL('./entry.mjs',import.meta.url)):path)
    if(['sidepanel.html','settings.html'].includes(name))content=Buffer.from(content.toString().replace(/src="(?:sidepanel.js|settings.mjs)"/,'src="embedded-entry.mjs"'))
    res.writeHead(200,{'Content-Type':types[extname(path)]});res.end(req.method==='HEAD'?undefined:content)
