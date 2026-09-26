@@ -43,6 +43,6 @@ setInterval(()=>{const now=Date.now();if(now-lastAwake>15000){fail('Reconnecting
 window.addEventListener('online',()=>void recover());window.addEventListener('focus',()=>void recover());document.addEventListener('visibilitychange',()=>{if(!document.hidden)void recover()});window.addEventListener('pagehide',()=>{closed=true})
 // App navigation is an explicit parent contract; browser-control ownership stays
 // with the installed extension, never with a fabricated active tab.
-document.addEventListener('click',event=>{const a=event.target.closest('a');if(!a)return;const url=new URL(a.href,location.href);if(url.origin===profile.parentOrigin&&url.hash){event.preventDefault();tell({type:'augmentor-link',hash:url.hash})}},true)
+document.addEventListener('click',event=>{const a=event.target.closest('a');if(!a)return;const url=new URL(a.href,location.href);if(url.origin===profile.parentOrigin&&url.hash&&!url.pathname.startsWith(profile.publicPath)){event.preventDefault();tell({type:'augmentor-link',hash:url.hash})}},true)
 tell({type:'augmentor-ready',profile:profile.id})
 await import(location.pathname.endsWith('settings.html')?'./settings.mjs':'./sidepanel.js')
