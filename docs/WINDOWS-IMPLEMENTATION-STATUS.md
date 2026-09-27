@@ -206,3 +206,23 @@ native Windows execution of these adopted services is queued next. Shared
 TypeScript checks/build and all 182 Node tests pass. The preceding complete
 Linux native suite passes 550 tests (11 platform/environment skips); later new
 private-lease and integrated-service tests retain their own execution boundary.
+
+The adopted transport revision `4c8717e` passes all 182 Node and 552 native Linux
+tests (12 platform/environment skips), including real Python/Node service saves
+and restart. Native Windows service execution remains pending.
+
+The `74c7db5` x64 DSH log narrows its failure: FFI, ripgrep, PowerShell pipeline,
+ordinary process termination and ConPTY round-trip all finish, but Node does not
+exit after disposal and the outer 90-second deadline expires. The probe now
+requires natural shutdown and reports remaining resource types on failure.
+Upstream node-pty issues [887](https://github.com/microsoft/node-pty/issues/887),
+[947](https://github.com/microsoft/node-pty/issues/947) and
+[965](https://github.com/microsoft/node-pty/issues/965) describe relevant worker,
+pipe and pseudoconsole leaks; the locked 1.2.0-beta.15 source is being inspected.
+Do not paper over this with a successful forced process exit.
+
+Visual inspection of the hosted offscreen screenshot also finds missing-font
+boxes despite passing widget interaction assertions. That screenshot is not
+visual acceptance. A separate probe now uses the actual Windows Qt platform
+plugin, verifies font/glyph availability and captures the shared preview. Real
+Windows-QPA output and physical display/DPI acceptance remain distinct gates.

@@ -18,6 +18,7 @@ const {default: LocalSubprocessRuntime} = await load('@deepseek-ai/dsh-subproces
 const ctx = new Context();
 const handles = [];
 let terminal;
+let report;
 const windows = process.platform === 'win32';
 const pwsh = process.env.AUGMENTOR_PWSH || 'pwsh.exe';
 const deadline = setTimeout(() => { console.error('DSH payload proof timed out'); process.exit(1); }, 60000);
@@ -57,9 +58,10 @@ try {
   await terminal.terminate();
   assert.match(output, /terminal-ok/);
   assert.match(output, /reply:payload-input/);
-  console.log(JSON.stringify({platform:process.platform, arch:process.arch, nativeFFI:true,
+  report = {platform:process.platform, arch:process.arch, nativeFFI:true,
     ripgrep:true, shellPipeline:true, ordinaryTermination:true, terminalRoundTrip:true,
-    arbitraryDetachedDescendantContainment:'not established'}));
+    arbitraryDetachedDescendantContainment:'not established'};
+  console.log(JSON.stringify({phase:'tool-checks-complete', ...report}));
 } finally {
   for (const handle of handles) handle.terminate();
   if (terminal) await terminal.terminate();
@@ -67,3 +69,13 @@ try {
   clearTimeout(deadline);
   await rm(work, {recursive:true, force:true});
 }
+// A resolved terminal API is insufficient if its worker/pipe keeps the host
+// alive. Require natural exit after disposal and keep only bounded, non-content
+// diagnostics if an upstream native resource remains referenced.
+setTimeout(() => {
+  console.error(JSON.stringify({phase:'shutdown-failed', resources:process.getActiveResourcesInfo(),
+    handles:process._getActiveHandles().map(handle=>({kind:handle.constructor.name,
+      ...(Number.isInteger(handle.pid)?{pid:handle.pid,connected:handle.connected}: {})}))}));
+  process.exit(1);
+}, 10000).unref();
+process.once('beforeExit', () => console.log(JSON.stringify({...report, naturalShutdown:true})));

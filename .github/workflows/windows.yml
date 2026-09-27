@@ -74,6 +74,13 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B -m augmentor_linux --preview --screenshot outputs/evidence/desktop.png
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Verify actual Windows Qt fonts and preview rendering
+        if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
+        env:
+          QT_QPA_PLATFORM: windows
+          QSG_RHI_PREFER_SOFTWARE_RENDERER: '1'
+        run: |
+          & outputs/payload/python/python.exe -Xutf8 -B scripts/windows-desktop-proof.py --out outputs/evidence
       - name: Build the shared TypeScript application
         id: build
         if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
