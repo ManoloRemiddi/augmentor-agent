@@ -2,6 +2,18 @@
 
 # Start here: agent handoff
 
+## September 28 settings organization and thinking preference
+
+[Settings](SETTINGS.md) now groups native controls into six categories and exposes
+Open/Collapsed while thinking, defaulting to the currently working Open behavior.
+The preference persists per native window; Browser source shares the primary
+choice through the existing preference service. Implementation `d4ab5fd` is
+selected in release `20260928-000201-bcc8c6e5`. Primary/mobile have restarted and
+are online/model-ready on that build; secondary was working. The one-shot
+`augmentor-settings-secondary-adoption.service` is waiting for idle and will
+gracefully restart it through the canonical launcher, then verify readiness. The guide records exact hashes, tests and visual checks. Browser/Mac
+installed rollout remains separate.
+
 ## September 27 observed progress before thinking
 
 Implementation `d943ad2` adds transient, event-backed submission/request labels

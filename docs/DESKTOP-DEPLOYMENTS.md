@@ -2,6 +2,16 @@
 
 # Consistent installed desktop releases
 
+## September 28: organized Settings and thinking choice
+
+Settings implementation `d4ab5fd` over `20260927-234746-0c414bcb` passed 62
+candidate checks and authenticated promotion. Release `20260928-000201-bcc8c6e5`
+is selected, with primary/mobile restarted and online/model-ready. Secondary was
+running a task; a one-shot guarded restart operation is waiting for its idle
+state (`augmentor-settings-secondary-adoption.service`). [Settings evidence](SETTINGS.md)
+records exact hashes, preference scope and visual checks. Existing connection,
+model, voice and named-window preferences are retained.
+
 ## September 27: observed request progress
 
 Native patch `d943ad2` over `20260927-231730-d033f759` is staged, selected and
