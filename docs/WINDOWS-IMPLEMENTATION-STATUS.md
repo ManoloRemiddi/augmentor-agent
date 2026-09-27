@@ -244,3 +244,20 @@ patched. Four sequential terminal dialogues now check native resource counts,
 absence of child console hosts and natural process exit. This remains a candidate
 fix until those native tests pass; public packaging and full source/license
 review remain open.
+
+The retained `d9e4c3a` x64 screenshot was visually inspected: actual Windows QPA
+renders readable labels and controls using the platform's Tahoma fallback. Its
+font report and screenshot are in `windows-evidence-x64`; offscreen output is
+not substituted for that evidence. The uncorrected terminal's shutdown report
+shows an extra `MessagePort` and pipe after disposal, consistent with the source
+worker/input lifecycle defect. The prepared correction still awaits execution.
+
+An isolated W2 process-owner adapter now creates an unnamed Windows Job with
+kill-on-close semantics. A small isolated Python worker enters that Job before
+starting any workload; only the supervisor retains its handle. This prevents a
+fast target from escaping containment before assignment, and supports cleanup
+after a supervisor crash. The native fixture starts a detached grandchild,
+captures its actual process handle, crashes only its disposable owner and checks
+kernel-signaled exit of both descendants. Execution and adoption into managed
+DSH remain pending. This mechanism never replaces busy-work checks before normal
+updates or user-directed shutdown.

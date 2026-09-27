@@ -40,6 +40,10 @@ jobs:
         with:
           node-version: '24.19.0'
           architecture: ${{ matrix.arch }}
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            release/dsh/package-lock.json
       - name: Stage private hash-locked Python, Node and PowerShell
         id: bootstrap
         run: python -Xutf8 scripts/bootstrap-windows.py --arch ${{ matrix.arch }} --out outputs/payload
@@ -56,6 +60,10 @@ jobs:
         if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
         run: |
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_identity.py -v
+      - name: Verify supervisor crash cannot orphan detached child processes
+        if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
+        run: |
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_processes.py -v
       - name: Verify private named-pipe framing, peers and cancellation
         if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
         run: |
