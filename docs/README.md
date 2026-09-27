@@ -46,6 +46,8 @@ of this repository; include reproducible commands and sanitized evidence summari
 
 ## Voice and desktop experience
 
+- [Settings organization and thinking display](SETTINGS.md)
+
 - [Resonant Voice single-button desktop interaction](VOICE-SINGLE-BUTTON.md)
 - [Hands-free native implementation](HANDS-FREE-IMPLEMENTATION.md)
 - [Desktop colors and skins](SKINS.md)

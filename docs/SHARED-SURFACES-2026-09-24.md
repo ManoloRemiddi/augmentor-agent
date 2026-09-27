@@ -26,7 +26,10 @@ expires the lease without granting permission.
 
 ## Live thinking visibility · September 27
 
-Desktop and Browser automatically expand the current thinking box when reasoning
+[Settings](SETTINGS.md) now exposes Open/Collapsed while thinking, with Open as
+the default. The completion/manual-control behavior below is retained.
+
+Desktop and Browser default to expanding the current thinking box when reasoning
 text starts streaming. It collapses when answer text starts, reasoning explicitly
 ends, a tool call starts, the assistant message completes, or the turn stops.
 The native error/idle path and Browser idle state also collapse active thinking.

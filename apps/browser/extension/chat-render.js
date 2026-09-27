@@ -254,6 +254,7 @@ export function createChatUI(els) {
   let reasoningEl = null
   let reasoningRaw = ''
   let reasoningActive = false
+  let expandThinking = true
   let reasoningTimer = null // frameOr() handle
   let progressEl = null
   let progressRank = 0
@@ -573,7 +574,7 @@ export function createChatUI(els) {
           renderAssistant()
         } else if (c.type === 'reasoning-delta') {
           makeThinkBlock()
-          if (!reasoningActive) reasoningEl.open = true
+          if (!reasoningActive) reasoningEl.open = expandThinking
           reasoningActive = true
           reasoningRaw += c.text
           renderReasoning()
@@ -796,6 +797,11 @@ export function createChatUI(els) {
       showProgress('Submitting message…')
       scroll(true)
       return pending
+    },
+    setThinkingPreference(expanded) {
+      const next = expanded !== false
+      if (next !== expandThinking && reasoningActive && reasoningEl) reasoningEl.open = next
+      expandThinking = next
     },
     promptAccepted() {
       if (progressEl && progressRank < 7) showProgress('Message accepted; waiting for agent…', 6)

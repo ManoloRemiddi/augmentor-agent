@@ -727,8 +727,16 @@ class Window(QWidget):
 
         if not replace and self.active_thinking!=self.reasoning_index:
             self.active_thinking=self.reasoning_index
-            self.expanded_thinking.add(self.reasoning_index)
+            if self.preferences.values.get('expand_thinking',True):self.expanded_thinking.add(self.reasoning_index)
             self.rendered_messages=None
+
+    def set_thinking_visibility(self,expanded):
+        self.preferences.values['expand_thinking']=bool(expanded)
+        self.preferences.save()
+        if self.active_thinking is not None:
+            if expanded:self.expanded_thinking.add(self.active_thinking)
+            else:self.expanded_thinking.discard(self.active_thinking)
+            self.rendered_messages=None;self.render_messages()
 
     def finish_thinking(self):
         if self.active_thinking is None:return False
@@ -937,6 +945,8 @@ class Window(QWidget):
         # Shared colour changes never replace per-window placement, model or draft.
         if self.preferences_timer.isActive() or (self.appearance_dialog and self.appearance_dialog.isVisible()):return
         latest=Preferences().values
+        if latest['expand_thinking']!=self.preferences.values['expand_thinking']:
+            self.set_thinking_visibility(latest['expand_thinking'])
         keys=('theme','hue','brightness','accent_hue','accent_brightness','format_colours')
         changed={key:latest[key] for key in keys if latest[key]!=self.preferences.values[key]}
         if changed:self.apply_appearance(changed)
@@ -962,7 +972,7 @@ class Window(QWidget):
 
         self.setStyleSheet(f"""
           QWidget {{ color:{text};font-family:'DejaVu Sans';font-size:13px; }}
-          QDialog,QMenu,QScrollArea,QWidget#appearanceControls {{ background:{solid.name()}; }}
+          QDialog,QMenu,QScrollArea,QWidget#appearanceControls,QWidget#settingsPage {{ background:{solid.name()}; }}
           QLabel,QFrame {{ background:transparent; }}
           QPushButton {{ background:rgba(127,150,150,24);border:1px solid rgba(127,160,155,70);border-radius:8px;padding:7px 10px; }}
           QPushButton:hover,QPushButton:checked {{ background:{self.accent.name()};color:{solid.name()}; }}
@@ -974,6 +984,7 @@ class Window(QWidget):
           QTabBar::tab:selected {{ background:{self.accent.name()};color:{solid.name()}; }}
           QListWidget::item {{ padding:8px 5px; }}
           QListWidget::item:selected {{ background:{self.accent.name()};color:{solid.name()};border-radius:6px; }}
+          QListWidget#settingsNavigation::item:selected {{ background:rgba(127,160,155,35);color:{text};border-left:2px solid {self.accent.name()}; }}
           QSlider::groove:horizontal {{ height:4px;background:{field.name()};border-radius:2px; }}
           QSlider::handle:horizontal {{ width:14px;margin:-5px 0;background:{self.accent.name()};border-radius:7px; }}
           QScrollBar:vertical {{ background:transparent;width:10px; }}

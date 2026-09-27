@@ -3,8 +3,9 @@
 # Browser Settings
 
 The browser toolbar keeps New chat, Save, History and Settings, with harness selection available only in Settings. The quick model picker remains below the composer. Colour sliders show their full hue or brightness gradients.
-Settings opens an extension-owned browser tab with Colours, Models, Harnesses,
-Prompt library, Memories and Support. Repeated and concurrent requests reuse
+Settings opens an extension-owned browser tab with Conversation, Voice, Appearance,
+Models, Connections, Prompt library, Home, Memories and Support. Conversation is
+the default section and includes the shared [thinking display choice](SETTINGS.md). Repeated and concurrent requests reuse
 that tab. Chromium's extension Options command opens the same Settings page.
 
 Settings reuses the existing forms and native message API. Forms appear in

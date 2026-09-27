@@ -47,10 +47,12 @@ function send(type, payload) {
 
 const voice=attachVoice({send,onError:message=>ui.sendFail(message),isHistory:()=>!!viewSessionId})
 attachPromptLibrary({input:document.getElementById('input'),send})
-import {watchAppearance,refreshDesktopAppearance} from './appearance.mjs'
-watchAppearance()
-void refreshDesktopAppearance().catch(()=>{})
-const appearanceTimer=setInterval(()=>{void refreshDesktopAppearance().catch(()=>{})},15000)
+import {watchAppearance,refreshDesktopAppearance,readAppearance} from './appearance.mjs'
+const syncThinkingPreference=()=>ui.setThinkingPreference(readAppearance().expandThinking)
+watchAppearance(syncThinkingPreference)
+const refreshPreferences=()=>refreshDesktopAppearance().then(syncThinkingPreference).catch(()=>{})
+void refreshPreferences()
+const appearanceTimer=setInterval(()=>{void refreshPreferences()},15000)
 window.addEventListener('pagehide',()=>clearInterval(appearanceTimer),{once:true})
 const openSettings=async(section)=>{
   try { const r=await send('settings/open',{section});if(!r?.ok)throw Error(r?.error||'Could not open Settings') }

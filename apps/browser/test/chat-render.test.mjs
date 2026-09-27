@@ -261,3 +261,23 @@ test('observed request stages replace waiting with thinking and ignore late acce
   ui.clear();event('step/start');event('assistant/message',{message:{content:[{type:'text',text:'History answer'}]}})
   assert.equal(log.querySelector('.response-progress'),null)
 })
+
+test('thinking preference controls live expansion while manual controls and final collapse remain',t=>{
+ const dom=new JSDOM('<div id="log"></div>',{pretendToBeVisual:true})
+ globalThis.window=dom.window;globalThis.document=dom.window.document
+ globalThis.requestAnimationFrame=window.requestAnimationFrame.bind(window)
+ globalThis.cancelAnimationFrame=window.cancelAnimationFrame.bind(window);window.marked=marked
+ const log=document.querySelector('#log'),ui=createChatUI({log});t.after(()=>{ui.clear();dom.window.close()})
+ let seq=0
+ const event=(type,data={})=>ui.applyLog([{kind:'event',event:{seq:seq++,type,data}}])
+ const think=()=>event('assistant/chunk',{chunk:{type:'reasoning-delta',text:'Thought'}})
+ ui.setThinkingPreference(false);think()
+ const first=log.querySelector('.think');assert.equal(first.open,false)
+ first.open=true;ui.setThinkingPreference(false);think();assert.equal(first.open,true,'unchanged preference must preserve manual expansion')
+ event('assistant/message',{message:{content:[{type:'reasoning',text:'ThoughtThought'},{type:'text',text:'Answer'}]}})
+ assert.equal(first.open,false)
+ think();const second=log.querySelectorAll('.think')[1];assert.equal(second.open,false)
+ ui.setThinkingPreference(true);assert.equal(second.open,true)
+ ui.setThinkingPreference(false);assert.equal(second.open,false)
+ second.open=true;event('assistant/chunk',{chunk:{type:'text-delta',text:'Next answer'}});assert.equal(second.open,false)
+})

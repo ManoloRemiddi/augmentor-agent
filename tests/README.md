@@ -94,3 +94,8 @@ late acknowledgements, thinking replacement and history/terminal cleanup. Browse
 coverage is in `chat-render.test.mjs`, `prompt-send.test.mjs` and
 `tests/dsh-status.test.mjs` (loopback WebSocket). See the
 [progress-label contract](../docs/SHARED-SURFACES-2026-09-24.md#request-progress-before-thinking--september-27).
+
+Settings organization and thinking preference: `test_settings_navigation.py`,
+`test_surface_preferences.py`, `test_voice_settings.py`, Browser
+`settings-conversation.test.mjs` and `chat-render.test.mjs`. See
+[scope and visual qualification](../docs/SETTINGS.md).
