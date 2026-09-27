@@ -37,7 +37,12 @@ def wait_exit(pid, start, timeout=20):
     deadline=time.monotonic()+timeout
     while start is not None and identity(pid)==start:
         # An unreaped child is already stopped and holds no files/leases.
-        if (Path('/proc')/str(pid)/'stat').read_text().rsplit(')',1)[1].split()[0]=='Z':
+        try:
+            state=(Path('/proc')/str(pid)/'stat').read_text().rsplit(')',1)[1].split()[0]
+        except FileNotFoundError:
+            # The process can finish between identity() and this second read.
+            return
+        if state=='Z':
             return
         if time.monotonic()>deadline:
             raise RuntimeError('A component did not close. Finish closing Augmentor before retrying.')

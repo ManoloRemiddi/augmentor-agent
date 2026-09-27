@@ -59,7 +59,39 @@ was inferred from that fixture mistake.
 
 ## Deployment state
 
-Source qualification is in progress. This document does not yet certify a new
-installed artifact. The 32 GB Mac still runs `c3a7fab` until the sealed candidate
-passes checks and is activated. Linux selection, the other Mac's working app,
-and the public website download are unchanged.
+The clean preview built from **`7ff67122d77f5d7007741694e4e5b9d1639a1062`** is
+installed at `/Applications/Augmentor Agent Desktop.app` on the 32 GB M4 Mac.
+It replaces `c3a7fab`; no source overlay was applied to an installed bundle.
+
+- ZIP: `augmentor-desktop-0.2.12-macos-arm64-preview.zip`, 339,759,999 bytes.
+- ZIP SHA-256: `7b38a698254a87037f83867f7419781622a10316162dbe4af9a06deb0a407aa7`.
+- Application inventory: 589 entries, SHA-256 `e4b3c8fe3b464bf901e8a1b78b2aa9aaa94e2ec63c63d8f4847d7508d90cb995`.
+- Running primary read-back: **110%**, **1.1 DPR**, online, model-ready, and the
+  canonical installed build root. Full inventory and strict ad-hoc signature pass.
+- Packaged Metal transparency, Appearance keyboard/persistence/draft checks and
+  all eight Cocoa resize handles passed at 110%. The native effect shadow is false;
+  all four outer eight-pixel strips are transparent, including the actual flare.
+- The installed native app restored its dedicated qualification conversation and
+  received a real provider reply via the composer/Send button. It closed idle;
+  the owner's primary window remains open with test control disabled.
+- Saved DSH settings, connection and all four conversation metadata records matched
+  before/after replacement. The only intended primary appearance change was 110%.
+- The owned shortcut service reports protocol 2, **Fn+Space active**, no error.
+  Physical keypress and whole-display compositor capture remain unqualified.
+- The temporary candidate, rollback bundle and source staging were removed after
+  retaining the verified rollback ZIP in a non-indexed cache. The build Mac's own
+  temporary bundle/source were also removed. Finder/Spotlight returns one app,
+  LaunchServices has one application registration, and the Dock has one tile.
+
+At the binary source revision, both [Mac 14/26 jobs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36308457163),
+Debian validation, Browser and Home passed. The installed Linux package job caught
+a pre-existing maintenance race: the desktop exited after `identity()` but before
+the second `/proc/PID/stat` read. The Linux maintenance helper now treats only
+that missing-file race as successful exit, preserving permission errors.
+Its six lifecycle tests pass, including two new regressions. That Linux-only
+correction is later than the Mac artifact above and is not an installed Mac patch.
+The complete corrected workflow is pending at this checkpoint.
+
+Linux selection, the other Mac's working app and the public website download
+remain unchanged. This is an installed private preview update, not a new public
+release, Apple signing, or automatic-update qualification.

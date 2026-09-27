@@ -6,6 +6,10 @@ Linux/macOS parity. The [Mac recovery record](MACOS-RECOVERY-2026-09-26.md) now
 qualifies both Mac shortcuts and the shared Metal/OpenGL renderer, with explicit
 installed and public-release boundaries.
 
+Shared desktop Appearance now includes [75–150% proportional app sizing](SKINS.md#app-size),
+applied on the next window process start. The [Mac transparency correction](MACOS-APPEARANCE-2026-09-27.md)
+disables native shadows on the animated effect layer; Linux uses the same flag.
+
 Mac setup correction (26 September, current source): install/start DSH before
 model setup, Agent setup/Open DSH actions in the three-dot menu, authenticated browser
 handoff, native DSH provider settings. See [qualification and deployment](MACOS-GUIDED-DSH-SETUP.md).

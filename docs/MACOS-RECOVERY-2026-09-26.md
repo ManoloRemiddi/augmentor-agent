@@ -2,6 +2,10 @@
 
 # Mac recovery and shared rendering qualification
 
+The newer [September 27 appearance correction](MACOS-APPEARANCE-2026-09-27.md)
+supersedes this record's installed build: `7ff6712` runs at 110% on the 32 GB Mac.
+It removes the native effect-window shadow and adds the shared App size slider.
+
 This work continues the Mac feedback from the Sponsor management task. The target
 is the owner's 32 GB M4 Mac Mini; the 16 GB Mac remains a separate working install.
 Preserve the approved UI, runtime-first DSH setup in the three-dot menu, eight-edge

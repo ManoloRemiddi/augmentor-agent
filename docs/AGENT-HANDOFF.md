@@ -10,6 +10,9 @@ The earlier performance fixture did not reliably trigger a flare and is correcte
 The shared Appearance slider adds uniform 75–150% sizing on the next window process
 start, without interrupting active work. Read the record for qualification and
 the actual installed build; do not treat source tests as an installed update.
+The clean `7ff6712` artifact is now installed and live-chat tested on the 32 GB
+Mac at 110%. One app/registration/Dock tile remains. Mac 14/26 validation passed;
+a Linux maintenance exit race caught by package CI is corrected separately.
 
 ## September 26 continued Mac recovery
 

@@ -5,6 +5,12 @@
 For the selected user-local desktop, use [desktop deployments](DESKTOP-DEPLOYMENTS.md).
 Package replacement alone does not promote a different user-local desktop build.
 
+September 27 maintenance correction: if a process exits between its identity
+check and the following `/proc/PID/stat` read, preparation now treats the missing
+file as successful shutdown. Permission errors are not suppressed. Installed
+package CI exposed this race while removing an idle shortcut-launched desktop;
+the regression and existing lifecycle tests pass. See the [qualification record](MACOS-APPEARANCE-2026-09-27.md).
+
 The packaged application uses `augmentor-runtime` and optional
 `augmentor-desktop`. Both versions come from `release/product.json`. Install the
 matching pair when using the desktop. The current preview version is 0.2.10, with Linux
