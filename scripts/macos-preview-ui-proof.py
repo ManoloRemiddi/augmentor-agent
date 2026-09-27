@@ -123,5 +123,14 @@ def verify(root, work, out):
                     'browserApplication':browser['name'],'browserBundleId':browser['bundleId'],'sidePanelApi':True,
                     'extensionId':loaded['id'],'browserManualApprovalTested':False,'gatekeeperOpenAnywayTested':False}
         finally:
-            if ws:ws.close()
-            chrome.terminate();chrome.wait(timeout=15)
+            if ws:
+                try: cdp('Browser.close')
+                except (OSError, websocket.WebSocketException): pass
+                finally: ws.close()
+            if chrome.poll() is None:
+                chrome.terminate()
+                try: chrome.wait(timeout=15)
+                except subprocess.TimeoutExpired:
+                    # Only the Popen-owned disposable browser. Never mask the
+                    # original proof result with a hung fixture shutdown.
+                    chrome.kill(); chrome.wait(timeout=10)
