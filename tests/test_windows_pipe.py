@@ -3,9 +3,11 @@
 import json
 from pathlib import Path
 import socketserver
+import subprocess
 import sys
 import tempfile
 import threading
+import time
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'services'))
@@ -13,6 +15,40 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'services'))
 
 @unittest.skipUnless(sys.platform == 'win32', 'requires native Windows named pipes')
 class WindowsPipeTests(unittest.TestCase):
+    def test_separate_process_peer_identity_and_close_wakes_reader(self):
+        from platform_adapters.windows_pipe import PipeSocket, PipeListener
+        with tempfile.TemporaryDirectory() as temporary:
+            endpoint = Path(temporary)/'companion.sock'
+            listener = PipeListener(endpoint)
+            child = subprocess.Popen([sys.executable, '-Xutf8', '-c',
+                'import sys;sys.path.insert(0,sys.argv[1]);'
+                'from platform_adapters.windows_pipe import PipeSocket;'
+                'c=PipeSocket();c.settimeout(10);c.connect(sys.argv[2]);'
+                'c.sendall(b"child");assert c.recv(16)==b"parent";c.close()',
+                str(Path(__file__).resolve().parents[1]/'services'), str(endpoint)])
+            try:
+                server, _ = listener.accept(10)
+                with server:
+                    server.settimeout(10)
+                    self.assertEqual(server.recv(16), b'child')
+                    server.sendall(b'parent')
+                self.assertEqual(child.wait(timeout=10), 0)
+                with PipeSocket() as client:
+                    client.settimeout(5); client.connect(endpoint)
+                    server, _ = listener.accept(5)
+                    result = []
+                    reader = threading.Thread(target=lambda: result.append(server.recv(16)))
+                    reader.start()
+                    time.sleep(.1)
+                    server.close()
+                    reader.join(timeout=3)
+                    self.assertFalse(reader.is_alive())
+                    self.assertEqual(result, [b''])
+            finally:
+                if child.poll() is None:
+                    child.kill(); child.wait(timeout=5)
+                listener.close()
+
     def test_framing_large_unicode_response_and_repeated_connections(self):
         from platform_adapters.windows_pipe import PipeSocket, ThreadingPipeServer
         class Handler(socketserver.StreamRequestHandler):

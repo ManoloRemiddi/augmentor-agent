@@ -86,6 +86,25 @@ class LicenseInventoryTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'hash changed'):
             licensing.inventory(self.root, self.catalog)
 
+    def test_combined_platform_license_preserves_supplement_and_attribution(self):
+        self.meta['license'] = 'Apache-2.0 AND LGPL-3.0-or-later'; self.write()
+        content = b'Additional reviewed license\n'
+        (self.catalog / 'reviewed.txt').write_bytes(content)
+        (self.package / 'README.md').write_bytes(b'Native library attribution table\n')
+        catalog = {'sources': {'fixture': {'file': 'reviewed.txt', 'url': 'https://example.invalid/license',
+                                          'sha256': hashlib.sha256(content).hexdigest()}},
+                   'overrides': {}, 'additionalLicenses': {'example@1.0.0': self.meta['license']},
+                   'additionalNotices': {'example@1.0.0': ['fixture']},
+                   'packageNotices': {'example@1.0.0': ['README.md']}}
+        (self.catalog / 'catalog.json').write_text(json.dumps(catalog))
+        report, texts = licensing.inventory(self.root, self.catalog)
+        self.assertEqual(report['components'][0]['license'], self.meta['license'])
+        self.assertEqual(len(report['components'][0]['notices']), 3)
+        self.assertIn(content, texts.values())
+        (self.package / 'README.md').unlink()
+        with self.assertRaisesRegex(ValueError, 'missing reviewed package notice'):
+            licensing.inventory(self.root, self.catalog)
+
 
 if __name__ == '__main__':
     unittest.main()

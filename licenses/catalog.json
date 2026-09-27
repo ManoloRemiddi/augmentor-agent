@@ -154,6 +154,8 @@
     "@koromix/koffi-darwin-x64@3.2.1": "koffi-3.2.1",
     "@koromix/koffi-linux-x64@3.2.1": "koffi-3.2.1",
     "@koromix/koffi-linux-arm64@3.2.1": "koffi-3.2.1",
+    "@koromix/koffi-win32-x64@3.2.1": "koffi-3.2.1",
+    "@koromix/koffi-win32-arm64@3.2.1": "koffi-3.2.1",
     "@img/sharp-libvips-darwin-arm64@1.3.3": "lgpl-3.0",
     "@img/sharp-libvips-darwin-x64@1.3.3": "lgpl-3.0",
     "@img/sharp-libvips-linux-x64@1.3.3": "lgpl-3.0",
@@ -167,9 +169,19 @@
     }
   },
   "additionalLicenses": {
+    "@img/sharp-win32-x64@0.35.4": "Apache-2.0 AND LGPL-3.0-or-later",
+    "@img/sharp-win32-arm64@0.35.4": "Apache-2.0 AND LGPL-3.0-or-later",
     "@img/sharp-libvips-darwin-arm64@1.3.3": "LGPL-3.0-or-later",
     "@img/sharp-libvips-darwin-x64@1.3.3": "LGPL-3.0-or-later",
     "@img/sharp-libvips-linux-x64@1.3.3": "LGPL-3.0-or-later",
     "@img/sharp-libvips-linux-arm64@1.3.3": "LGPL-3.0-or-later"
+  },
+  "additionalNotices": {
+    "@img/sharp-win32-x64@0.35.4": ["lgpl-3.0"],
+    "@img/sharp-win32-arm64@0.35.4": ["lgpl-3.0"]
+  },
+  "packageNotices": {
+    "@img/sharp-win32-x64@0.35.4": ["README.md"],
+    "@img/sharp-win32-arm64@0.35.4": ["README.md"]
   }
 }

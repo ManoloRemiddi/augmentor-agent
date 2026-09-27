@@ -164,3 +164,22 @@ Unicode responses, occupied-name refusal, reuse after close and read cancellatio
 The adapter is not yet wired into application services. Native execution,
 different-user rejection and authenticated Node interoperability remain pending;
 do not infer these from the source or from Linux-skipped tests.
+
+At `d13f504`, actual Windows x64 shared zoom/flare/window interaction tests and
+desktop preview rendering pass. Native pipe probes expose three incorrect API
+binding assumptions: file access constants belong to `ntsecuritycon`, the pipe
+identification flag belongs to `win32file`, and pywin32 312 does not export
+`CancelIoEx`. The correction uses the published bindings and an explicit kernel
+binding for cross-thread cancellation, waiting for pending reads/writes before
+freeing their handles. Separate-process framing and close-during-read tests are
+added; their native execution remains pending.
+
+DSH staging reaches its license inventory and correctly rejects missing Windows
+entries. The four locked x64/ARM64 Sharp/Koffi npm archives were fetched and
+verified against lockfile integrity. Exact Windows Koffi 3.2.1 binaries use the
+existing matching MIT notice. Sharp 0.35.4 declares **Apache-2.0 AND
+LGPL-3.0-or-later**; the inventory now retains that combined expression, the
+Apache text, the LGPL supplement and the upstream native-library attribution
+table. It does not select away LGPL obligations or mark the distribution review
+complete. Corresponding source/replacement evidence remains a W7 release gate.
+Six license-inventory tests pass, including missing supplemental-notice refusal.

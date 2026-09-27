@@ -12,6 +12,7 @@ on:
       - 'scripts/**'
       - 'tests/**'
       - 'release/**'
+      - 'licenses/**'
       - 'package*.json'
 permissions:
   contents: read

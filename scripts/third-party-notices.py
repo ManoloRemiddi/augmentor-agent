@@ -84,6 +84,20 @@ def inventory(tree, catalog_root):
             if file.is_file() and NOTICE_NAME.match(file.name):
                 content = file.read_bytes(); sha = digest(content); texts[sha] = content
                 sources.append({'path': file.relative_to(tree).as_posix(), 'sha256': sha})
+        # Some platform archives contain an Apache wrapper and LGPL libraries
+        # together, but ship only the wrapper's LICENSE. Preserve both terms and
+        # their exact upstream attribution table; never reinterpret AND as OR.
+        for name in catalog.get('additionalNotices', {}).get(key, []):
+            entry = catalog['sources'][name]
+            content = (catalog_root / entry['file']).read_bytes(); sha = digest(content)
+            texts[sha] = content
+            sources.append({'path': 'licenses/' + entry['file'], 'url': entry['url'], 'sha256': sha})
+        for name in catalog.get('packageNotices', {}).get(key, []):
+            file = package / name
+            if Path(name).name != name or not file.is_file():
+                errors.append(f'{key}: missing reviewed package notice {name}'); continue
+            content = file.read_bytes(); sha = digest(content); texts[sha] = content
+            sources.append({'path': file.relative_to(tree).as_posix(), 'sha256': sha})
         components.append({'name': meta['name'], 'version': meta['version'], 'path': relative,
                            'license': effective_license, 'declaredLicense':meta['license'], 'integrity': locked.get('integrity'), 'notices': sources})
     if errors:

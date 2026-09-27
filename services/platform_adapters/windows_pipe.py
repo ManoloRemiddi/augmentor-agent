@@ -6,6 +6,8 @@ and clients verify the server's process token before sending application data.
 The first-instance flag rejects pre-created endpoints rather than taking them over.
 The wire payload remains the existing newline-delimited Augmentor protocol.
 """
+import ctypes
+from ctypes import wintypes
 import hashlib
 import io
 import math
@@ -27,6 +29,20 @@ ERROR_IO_PENDING = 997
 ERROR_PIPE_CONNECTED = 535
 PIPE_REJECT_REMOTE_CLIENTS = 8
 FILE_FLAG_FIRST_PIPE_INSTANCE = 0x00080000
+
+# pywin32 312 exposes CancelIo (calling thread only), not CancelIoEx. Close must
+# also wake operations issued by another thread. Keep this binding explicit and
+# wait for their completion before releasing the handle or overlapped buffers.
+_cancel_io = ctypes.WinDLL('kernel32', use_last_error=True).CancelIoEx
+_cancel_io.argtypes = [wintypes.HANDLE, ctypes.c_void_p]
+_cancel_io.restype = wintypes.BOOL
+
+
+def cancel_all(handle):
+    if not _cancel_io(int(handle), None):
+        error = ctypes.get_last_error()
+        if error != 1168:  # ERROR_NOT_FOUND: no outstanding operation.
+            raise ctypes.WinError(error)
 
 
 def pipe_name(endpoint):
@@ -51,6 +67,8 @@ class PipeSocket:
         self.server = server
         self.timeout = None
         self._closed = False
+        self._operations = 0
+        self._condition = threading.Condition()
 
     def verify_peer(self):
         if self.handle is None or self._closed:
@@ -73,7 +91,7 @@ class PipeSocket:
             try:
                 self.handle = win32file.CreateFile(name, win32con.GENERIC_READ | win32con.GENERIC_WRITE,
                     0, None, win32con.OPEN_EXISTING,
-                    win32con.FILE_FLAG_OVERLAPPED | win32con.SECURITY_SQOS_PRESENT | win32con.SECURITY_IDENTIFICATION,
+                    win32con.FILE_FLAG_OVERLAPPED | win32con.SECURITY_SQOS_PRESENT | win32file.SECURITY_IDENTIFICATION,
                     None)
                 break
             except pywintypes.error as error:
@@ -97,7 +115,9 @@ class PipeSocket:
                 # Keep the overlapped object/buffer alive until cancellation is
                 # acknowledged; returning early could free memory still in use.
                 try:
-                    win32file.CancelIoEx(self.handle, operation)
+                    # This runs in the thread that issued this operation; a
+                    # concurrent reader/writer in another thread stays intact.
+                    win32file.CancelIo(self.handle)
                 except pywintypes.error as error:
                     if error.winerror != 1168:
                         raise
@@ -112,11 +132,17 @@ class PipeSocket:
         return win32file.GetOverlappedResult(self.handle, operation, False)
 
     def recv(self, count):
-        if self._closed:
+        if self._closed or count == 0:
             return b''
         operation = overlap()
+        active = False
         try:
-            status, buffer = win32file.ReadFile(self.handle, min(count, 1024*1024), operation)
+            with self._condition:
+                if self._closed:
+                    return b''
+                status, buffer = win32file.ReadFile(self.handle, min(count, 1024*1024), operation)
+                self._operations += 1
+                active = True
             size = self._complete(operation, status)
             return bytes(buffer[:size])
         except pywintypes.error as error:
@@ -125,6 +151,10 @@ class PipeSocket:
             raise OSError(error.winerror, 'Private pipe read failed.') from error
         finally:
             win32api.CloseHandle(operation.hEvent)
+            if active:
+                with self._condition:
+                    self._operations -= 1
+                    self._condition.notify_all()
 
     def sendall(self, data):
         if self._closed:
@@ -133,8 +163,14 @@ class PipeSocket:
         while offset < len(data):
             operation = overlap()
             chunk = bytes(data[offset:offset+65536])
+            active = False
             try:
-                status, _written = win32file.WriteFile(self.handle, chunk, operation)
+                with self._condition:
+                    if self._closed:
+                        raise BrokenPipeError('The private pipe is closed.')
+                    status, _written = win32file.WriteFile(self.handle, chunk, operation)
+                    self._operations += 1
+                    active = True
                 count = self._complete(operation, status)
                 if count <= 0:
                     raise BrokenPipeError('Private pipe write made no progress.')
@@ -143,6 +179,10 @@ class PipeSocket:
                 raise OSError(error.winerror, 'Private pipe write failed.') from error
             finally:
                 win32api.CloseHandle(operation.hEvent)
+                if active:
+                    with self._condition:
+                        self._operations -= 1
+                        self._condition.notify_all()
 
     def makefile(self, mode='rb', buffering=-1):
         if mode not in ('rb', 'wb'):
@@ -160,16 +200,14 @@ class PipeSocket:
         self.close()
 
     def close(self):
-        if self._closed:
-            return
-        self._closed = True
-        if self.handle is not None:
-            try:
-                win32file.CancelIoEx(self.handle, None)
-            except pywintypes.error as error:
-                if error.winerror not in (6, 1168):
-                    raise
-            finally:
+        with self._condition:
+            if self._closed:
+                return
+            self._closed = True
+            if self.handle is not None:
+                cancel_all(self.handle)
+                while self._operations:
+                    self._condition.wait()
                 self.handle.Close()
 
     def __enter__(self):
@@ -250,7 +288,7 @@ class PipeListener:
         try:
             if self.status == ERROR_IO_PENDING:
                 try:
-                    win32file.CancelIoEx(self.handle, self.pending)
+                    cancel_all(self.handle)
                     win32file.GetOverlappedResult(self.handle, self.pending, True)
                 except pywintypes.error as error:
                     if error.winerror not in (995, 1168, 109):

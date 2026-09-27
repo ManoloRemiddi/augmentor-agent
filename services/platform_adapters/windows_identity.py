@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import stat
 
+import ntsecuritycon
 import pywintypes
 import win32api
 import win32con
@@ -85,7 +86,7 @@ def require_private_directory(path):
         identity = win32security.ConvertSidToStringSid(sid)
         if kind != win32security.ACCESS_ALLOWED_ACE_TYPE or identity not in allowed:
             raise PermissionError('The Augmentor directory grants an unexpected identity access.')
-        if identity == sid_string() and mask & win32con.FILE_ALL_ACCESS == win32con.FILE_ALL_ACCESS:
+        if identity == sid_string() and mask & ntsecuritycon.FILE_ALL_ACCESS == ntsecuritycon.FILE_ALL_ACCESS:
             user_access = True
     if not user_access:
         raise PermissionError('The current user cannot maintain this Augmentor directory.')
