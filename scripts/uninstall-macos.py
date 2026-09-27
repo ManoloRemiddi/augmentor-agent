@@ -52,8 +52,8 @@ def uninstall(app, trash=None, support=None):
         if pending.exists() or pending.is_symlink():raise ValueError('Recover the interrupted installation before uninstalling.')
     expected=browser.manifest(app)
     registrations=[];retained=[]
-    for place in browser.BROWSERS.values():
-        path=support/place/'NativeMessagingHosts/com.augmentor.agent.json'
+    for directory in browser.registration_directories(support):
+        path=directory/'com.augmentor.agent.json'
         if not path.exists() and not path.is_symlink():continue
         try:
             identity=fingerprint(path)
@@ -131,7 +131,7 @@ def restore(receipt_path, support=None):
     if not app.is_absolute() or app.suffix!='.app':raise ValueError('Invalid original application path.')
     support=support or Path.home()/'Library/Application Support'
     login=Path.home()/'Library/LaunchAgents'/f'{shortcut.LABEL}.plist'
-    allowed={app,login,*[support/place/'NativeMessagingHosts/com.augmentor.agent.json' for place in browser.BROWSERS.values()]}
+    allowed={app,login,*[directory/'com.augmentor.agent.json' for directory in browser.registration_directories(support)]}
     plan=record.get('moves')
     if not isinstance(plan,list) or not plan or len(plan)>len(allowed):raise ValueError('Invalid uninstall move list.')
     originals=set();retained_paths=set()

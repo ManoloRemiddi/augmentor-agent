@@ -85,12 +85,23 @@ installed Pi and DSH browser workflows, manual memory controls against Hindsight
 do not establish public release readiness.
 
 Run `scripts/register-macos-browser.py` with the installed `.app` path and
-`--browser chromium` (the default), `chrome`, or `chrome-for-testing`. Use the
+`--browser "/Applications/Your Browser.app"`. The desktop setup discovers
+installed Chromium browsers and offers **Choose another browser app…**; it no
+longer restricts the user to two brands. Legacy CLI aliases `chromium` (default),
+`chrome`, and `chrome-for-testing` remain accepted. Use the
 bundled Python with `-I -B`. The registrar creates the per-user native messaging
 manifest outside the signed bundle and points it at `Contents/MacOS/augmentor-browser-host`.
 It derives the exact allowed extension ID from the bundled extension key.
 Existing manifests are backed up before replacement; identical registration is
-unchanged. Symlink manifests are refused.
+unchanged. Symlink manifests and linked browser data directories are refused.
+The app's declared Chromium product directory takes precedence. For forks such
+as Comet that omit it, an existing data root matching the bundle name is used
+only when it contains `Local State`; contents of that file are never read.
+Unknown locations require opening the browser once or explicitly choosing its
+data root (`--browser-data` in the CLI). Supported data roots are ordinary
+directories up to three levels below the user's Application Support. Browser
+removal/recovery discovers these registrations without a browser-brand list.
+See [browser choice qualification](MACOS-BROWSER-CHOICE.md).
 
 Paths follow Chrome's [native messaging documentation](https://developer.chrome.com/docs/extensions/develop/concepts/native-messaging).
 Registration alone does not install a browser or prove its extension tools work.
