@@ -90,7 +90,7 @@ the second `/proc/PID/stat` read. The Linux maintenance helper now treats only
 that missing-file race as successful exit, preserving permission errors.
 Its six lifecycle tests pass, including two new regressions. That Linux-only
 correction is later than the Mac artifact above and is not an installed Mac patch.
-The complete corrected workflow is pending at this checkpoint.
+At `fa77135`, the [complete validation workflow](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36309091775) passed, including Debian, Browser, Home and installed-package installation/upgrade/interruption/rollback/removal. The [Mac 14/26 workflow](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36309091817) also passed at that revision. Later documentation records do not change the installed Mac bytes.
 
 Linux selection, the other Mac's working app and the public website download
 remain unchanged. This is an installed private preview update, not a new public

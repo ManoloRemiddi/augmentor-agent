@@ -13,6 +13,8 @@ the actual installed build; do not treat source tests as an installed update.
 The clean `7ff6712` artifact is now installed and live-chat tested on the 32 GB
 Mac at 110%. One app/registration/Dock tile remains. Mac 14/26 validation passed;
 a Linux maintenance exit race caught by package CI is corrected separately.
+At `fa77135`, both complete workflows passed, including installed Linux lifecycle
+checks and Mac 14/26. The installed Mac artifact remains the sealed `7ff6712` build.
 
 ## September 26 continued Mac recovery
 
