@@ -2,7 +2,17 @@
 
 # Start here: agent handoff
 
-## September 27 Windows implementation plan — not started
+## September 27 Windows implementation — active
+
+The owner now authorizes autonomous implementation through the complete Windows
+app; physical testing will follow when a Windows machine is connected. Work on
+`feat/windows` in the canonical repository. Read the
+[implementation evidence and remaining gates](WINDOWS-IMPLEMENTATION-STATUS.md).
+W0/W1 have started with isolated baseline checks, hash-locked native x64/ARM64
+runtime candidates and hosted qualification jobs. No Windows app or customer
+release is complete. Preserve existing installations and unrelated open work.
+
+## September 27 Windows implementation plan — historical planning checkpoint
 
 The owner requested a detailed plan before coding. Read the
 [Windows implementation plan](WINDOWS-IMPLEMENTATION-PLAN.md) and its

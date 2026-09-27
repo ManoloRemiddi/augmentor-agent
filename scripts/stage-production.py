@@ -10,6 +10,8 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT/'services'))
+from build_support import npm_command
 
 
 def main():
@@ -24,7 +26,7 @@ def main():
         'JSON.stringify({os:process.platform,cpu:process.arch})'],text=True))
     for name in ('package.json', 'package-lock.json'):
         shutil.copy2(ROOT / name, target / name)
-    subprocess.run(['npm', 'ci', '--ignore-scripts', '--omit=dev', '--no-audit', '--no-fund'], cwd=target, check=True)
+    subprocess.run([*npm_command(), 'ci', '--ignore-scripts', '--omit=dev', '--no-audit', '--no-fund'], cwd=target, check=True)
     subprocess.run(['node', str(ROOT / 'scripts/prepare-ws.mjs'), str(target)], check=True)
     sdk = target / 'node_modules/@earendil-works/pi-coding-agent'
     metadata = json.loads((sdk / 'package.json').read_text())

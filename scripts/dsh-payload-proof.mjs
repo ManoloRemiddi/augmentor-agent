@@ -18,32 +18,40 @@ const {default: LocalSubprocessRuntime} = await load('@deepseek-ai/dsh-subproces
 const ctx = new Context();
 const handles = [];
 let terminal;
+const windows = process.platform === 'win32';
+const pwsh = process.env.AUGMENTOR_PWSH || 'pwsh.exe';
 const deadline = setTimeout(() => { console.error('DSH payload proof timed out'); process.exit(1); }, 60000);
 try {
   const koffi = require('koffi');
-  const libc = koffi.load(process.platform === 'darwin' ? '/usr/lib/libSystem.B.dylib' : 'libc.so.6');
-  assert.equal(libc.func('int getpid()')(), process.pid);
+  const libc = koffi.load(windows ? 'kernel32.dll' : process.platform === 'darwin' ? '/usr/lib/libSystem.B.dylib' : 'libc.so.6');
+  assert.equal(libc.func(windows ? 'uint32_t __stdcall GetCurrentProcessId()' : 'int getpid()')(), process.pid);
   const {rgPath} = await load('@vscode/ripgrep');
   await writeFile(join(work, 'search.txt'), 'augmentor-payload-needle\n');
   assert.match(execFileSync(rgPath, ['--fixed-strings', 'augmentor-payload-needle', work], {encoding:'utf8'}), /search.txt/);
   await ctx.plugin(LocalSubprocessRuntime).await();
   const spec = {cwd:work, graceMs:200, stdio:{stdin:'ignore', stdout:{maxBytes:8192}, stderr:{maxBytes:8192}}};
-  const shell = ctx.subprocess.spawn({...spec, argv:['/bin/sh', '-c', 'printf shell-ok | cat']});
+  const shell = ctx.subprocess.spawn({...spec, argv:windows
+    ? [pwsh, '-NoLogo', '-NoProfile', '-NonInteractive', '-Command', "Write-Output 'shell-ok' | ForEach-Object { $_ }"]
+    : ['/bin/sh', '-c', 'printf shell-ok | cat']});
   handles.push(shell);
   assert.equal((await shell.done).exitCode, 0);
-  assert.equal(shell.collected.stdout.readFrom(0).text, 'shell-ok');
+  assert.equal(shell.collected.stdout.readFrom(0).text.trim(), 'shell-ok');
   assert.equal(await shell.waitForExit(AbortSignal.timeout(5000)), true);
-  const slow = ctx.subprocess.spawn({...spec, argv:['/bin/sh', '-c', 'sleep 30 & wait']});
+  const slow = ctx.subprocess.spawn({...spec, argv:windows
+    ? [pwsh, '-NoLogo', '-NoProfile', '-NonInteractive', '-Command', 'Start-Sleep -Seconds 30']
+    : ['/bin/sh', '-c', 'sleep 30 & wait']});
   handles.push(slow);
   await new Promise(resolve => setTimeout(resolve, 150));
   slow.terminate();
   assert.equal(await slow.waitForExit(AbortSignal.timeout(5000)), true);
   await slow.done;
-  terminal = await ctx.subprocess.spawnTerminal({argv:['/bin/sh', '-c', 'printf terminal-ok; read answer; printf "reply:%s" "$answer"'],
+  terminal = await ctx.subprocess.spawnTerminal({argv:windows
+    ? [pwsh, '-NoLogo', '-NoProfile', '-Command', "Write-Output 'terminal-ok'; $answer=[Console]::ReadLine(); Write-Output ('reply:'+$answer)"]
+    : ['/bin/sh', '-c', 'printf terminal-ok; read answer; printf "reply:%s" "$answer"'],
     cwd:work, env:{TERM:'xterm-256color'}, rows:24, cols:80, graceMs:200});
   let output = '';
   terminal.output.on('data', data => { output += data.toString(); });
-  await terminal.write('payload-input\n');
+  await terminal.write(windows ? 'payload-input\r' : 'payload-input\n');
   assert.equal((await terminal.done).exitCode, 0);
   await finished(terminal.output);
   await terminal.terminate();

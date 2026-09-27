@@ -15,6 +15,8 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT/'services'))
+from build_support import npm_command
 PREPARE_SCRIPT = 'node_modules/@deepseek-ai/dsh-subprocess-local/scripts/ensure-spawn-helper.mjs'
 PREPARE_SHA256 = 'ca5509febf1e6ec1356df121835ebe5ed2f9cace4bdc2ba6d83d41c7e45e0f1b'
 
@@ -68,7 +70,7 @@ def main():
     for name in ('package.json', 'package-lock.json'):
         shutil.copy2(ROOT/'release/dsh'/name, target/name)
     shutil.copytree(ROOT/'release/dsh/plugins', target/'plugins')
-    subprocess.run(['npm', 'ci', '--ignore-scripts', '--omit=dev', '--no-audit', '--no-fund'],
+    subprocess.run([*npm_command(), 'ci', '--ignore-scripts', '--omit=dev', '--no-audit', '--no-fund'],
         cwd=target, check=True)
     # The ARM64 Mac uses the native sharp/libvips pair qualified below. npm also
     # installs the optional wasm fallback there; it contains a separate native

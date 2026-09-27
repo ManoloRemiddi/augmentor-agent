@@ -1,0 +1,71 @@
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+name: Windows qualification
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/windows]
+  pull_request:
+    paths:
+      - '.github/workflows/windows.yml'
+      - 'apps/**'
+      - 'services/**'
+      - 'adapters/**'
+      - 'packages/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'release/**'
+      - 'package*.json'
+permissions:
+  contents: read
+concurrency:
+  group: windows-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  native-runtime:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2025
+            arch: x64
+          - os: windows-11-arm
+            arch: arm64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.19.0'
+          architecture: ${{ matrix.arch }}
+      - name: Stage private hash-locked Python, Node and PowerShell
+        run: python scripts/bootstrap-windows.py --arch ${{ matrix.arch }} --out outputs/payload
+      - name: Exercise native wheels, Qt, PortAudio, Node and PowerShell
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          & outputs/payload/python/python.exe -I -B scripts/windows-runtime-proof.py --root outputs/payload --arch ${{ matrix.arch }} --out outputs/evidence/runtime.json
+      - name: Build the shared TypeScript application
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          npm run check
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          npm run build
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Stage and exercise actual pinned DSH native dependencies
+        run: |
+          $env:AUGMENTOR_PWSH = "$PWD/outputs/payload/powershell/pwsh.exe"
+          & outputs/payload/python/python.exe -I -B scripts/stage-dsh.py --out outputs/payload/dsh --node "$PWD/outputs/payload/node/node.exe"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: windows-evidence-${{ matrix.arch }}
+          path: |
+            outputs/evidence/**
+            outputs/payload/dsh/payload.json
+          retention-days: 14
+          if-no-files-found: warn

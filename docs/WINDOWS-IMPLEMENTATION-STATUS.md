@@ -1,0 +1,82 @@
+<!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
+
+# Windows implementation evidence
+
+September 27, 2026. The owner authorized autonomous implementation and will
+connect a Windows machine for joint physical testing afterward. Follow the full
+[implementation plan](WINDOWS-IMPLEMENTATION-PLAN.md); this ledger does not narrow
+its outcome. No Windows customer release or installed-product claim exists yet.
+
+## Baseline and environments (W0)
+
+Implementation branch `feat/windows` starts from reviewed `main` `b8e36a4` plus
+the planning commit `8565172`. Product 0.2.12, DSH 0.1.5-rc.1, Pi 0.85.1,
+schema 1 and the current protocol versions remain unchanged. Unrelated open
+source work and existing Linux/Mac installations are preserved. Reconcile new
+reviewed changes before release; do not copy unreviewed local overlays.
+
+The unchanged baseline passes TypeScript check/build, 182 Node tests and 538
+native tests (three skips) in isolated Python 3.12.13 / PySide 6.8.2.1.
+The initial system-Python attempt lacked QtTest; that was an environment failure,
+not waived tests or a product regression.
+
+| Environment | Availability/evidence | Boundary |
+| --- | --- | --- |
+| Linux x64 development | Available; baseline suites pass | Existing personal processes untouched |
+| macOS ARM64 | Existing Mac 14/26 CI and authorized network Macs | Candidate dependency upgrade still needs testing |
+| Windows x64 | `windows-2025` hosted job added; execution pending | Server runner is build/runtime evidence, not Windows 11 client acceptance |
+| Windows ARM64 | `windows-11-arm` hosted job added; execution pending | Require native-process readback; no RTX hardware claim |
+| Physical Windows | Owner will connect a machine later | DPI, graphics, input, microphone and client installer tests remain pending |
+| RTX Spark N1X | No accessible hardware verified | Hardware qualification remains required |
+| Signing/publisher | No repository signing secrets or self-hosted runners found | Certificate/identity and browser-store publication remain external gates |
+
+No account credential values were read or copied. Hosted qualification runs have
+read-only repository permission and receive no signing or personal-model secrets.
+
+## Runtime candidates (W1)
+
+`release/windows/runtime.json` and architecture-specific hashed requirements lock
+the candidates. They are explicitly **unqualified until execution passes**.
+Python 3.13.15 is selected for both Windows targets because the inspected standalone
+Python 3.12.13 distribution lacks Windows ARM64. Qt/PySide 6.11.2, sounddevice
+0.5.6 and PyYAML 6.0.3 supply native ARM wheels missing from the previous pins.
+Keep the other pinned native/voice dependencies unless a concrete failure requires
+a change. No current Linux/Mac runtime pin is silently upgraded.
+
+The staging tool downloads and verifies exact Python, Node 24.19.0 and PowerShell
+7.6.6 archives, installs only hashed binary Python packages and checks dependencies.
+The runtime probe requires native execution, imports actual Qt/NumPy/ONNX/PortAudio,
+renders a Qt widget, launches private Node/PowerShell and inspects Python PE machine
+types. DSH staging uses its existing lock and reviewed preparation script, with
+real FFI, search, shell, termination and terminal tests. This does not prove an
+installed Augmentor conversation or physical device behavior.
+
+Velopack 1.2.158 is the candidate installer library. The native launcher embeds
+private Python without PATH-based DLL resolution. Compilation, two-version
+installation/update/removal, busy-work coordination, independent recovery and
+publisher trust still require their own proofs; runtime imports cannot select
+the installer on their behalf.
+
+## Feature and gate ledger
+
+Each row retains the shared product requirements. Fixture evidence, actual
+providers, installed artifacts and physical hardware must remain distinguishable.
+
+| Work | Current state | Required next evidence |
+| --- | --- | --- |
+| W0 baseline | Local baseline recorded; hosted jobs prepared | Windows job execution and current-source reconciliation |
+| W1 native runtime and installer | Candidate locks and runtime probe implemented | Native x64/ARM execution; two installed versions; failure/recovery proof |
+| W2 paths, ownership, IPC, locks | Pending | Same-user secure transport and lifecycle, existing-OS regressions |
+| W3 managed DSH/model setup | Pending | Clean-user real harness Send, Stop and restored chat; separate live provider |
+| W4 desktop, two windows, shortcuts, tray | Pending | Shared interaction suite, actual Windows shell and approved appearance |
+| W5 chosen Chromium/Comet companion | Pending | Native host registration and real selected-browser conversation |
+| W6 computer control | Pending | Consented capture/input, Stop and Windows privilege boundaries |
+| W6 voice/memory/Home/Pi | Pending | Existing feature contracts and configured-engine connectivity |
+| W6 RTX inference | Pending hardware | Native compatible backend, measured shared-memory behavior |
+| W7 signed install/repair/removal | Pending | Clean ordinary user, one identity, preserved persistent data |
+| W8 coordinated weekly updates | Pending | Real N→N+1, busy/draft/settings protection, recovery across OS backends |
+| W9 full artifact qualification | Pending | Exact candidate plus physical Windows and separately RTX evidence |
+| W10 publication and guides | Pending | Signed public artifacts, anonymous website download, installed update |
+
+G1–G5 remain open. Continue work while physical hardware is unavailable; do not
+mark the overall implementation complete based on build or fixture success.
