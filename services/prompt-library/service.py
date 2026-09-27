@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Harness-independent, per-user prompt service. Single daemon, transactional SQLite."""
-import fcntl
 import hashlib
 from contextlib import contextmanager
 import json
@@ -21,6 +20,9 @@ from support.report import report as support_report
 from dsh.setup import Setup as DshSetup
 from platform_support import require_same_user
 from home.client import call as home_connection_call
+from platform_adapters import locks as fcntl
+from platform_adapters.paths import private_directory
+from platform_adapters.transport import ThreadingLocalServer, prepare_endpoint, cleanup_endpoint
 
 PROTOCOL='augmentor-prompts/1'
 LIMIT=1024*1024
@@ -165,7 +167,7 @@ class Handler(socketserver.StreamRequestHandler):
         try:self.wfile.write(raw)
         except (BrokenPipeError,ConnectionResetError):pass
 
-class Server(socketserver.ThreadingUnixStreamServer):
+class Server(ThreadingLocalServer):
     daemon_threads=False  # Graceful shutdown finishes accepted requests.
 
 if __name__=='__main__':
@@ -173,14 +175,14 @@ if __name__=='__main__':
     from lease import hold
     hold('runtime')
     os.umask(0o077);state,data=paths()
-    for directory in (state,data):directory.mkdir(parents=True,exist_ok=True,mode=0o700)
+    for directory in (state,data):private_directory(directory)
     lock=(state/'prompts.lock').open('a')
     try:fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
     except BlockingIOError:raise SystemExit(0)
     endpoint=state/'prompts.sock'
-    if endpoint.exists():endpoint.unlink()
+    prepare_endpoint(endpoint)
     server=Server(str(endpoint),Handler);server.library=Library(data/'prompts.sqlite3')
     def stop(*_):threading.Thread(target=server.shutdown,daemon=True).start()
     signal.signal(signal.SIGTERM,stop);signal.signal(signal.SIGINT,stop)
     try:server.serve_forever(poll_interval=.2)
-    finally:server.server_close();endpoint.unlink(missing_ok=True)
+    finally:server.server_close();cleanup_endpoint(endpoint)

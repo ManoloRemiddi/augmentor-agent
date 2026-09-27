@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]/'services'))
 from platform_adapters import locks as fcntl
+from .platform_runtime import LocalSocket, private_directory
 
 
 def ensure_running(harness='pi'):
@@ -16,10 +17,10 @@ def ensure_running(harness='pi'):
     prefix='AUGMENTOR_'+harness.upper()
     project=Path(__file__).resolve().parents[3]
     state=Path(os.environ.get(prefix+'_STATE',Path(os.environ.get('XDG_STATE_HOME',Path.home()/'.local/state'))/('augmentor-'+harness)))
-    state.mkdir(mode=0o700,parents=True,exist_ok=True)
+    private_directory(state)
     endpoint=os.environ.get(prefix+'_SOCKET',str(state/'runtime.sock'))
     def alive():
-        with socket.socket(socket.AF_UNIX,socket.SOCK_STREAM) as probe:
+        with LocalSocket() as probe:
             probe.settimeout(1)
             try:probe.connect(endpoint);return True
             except (FileNotFoundError,ConnectionRefusedError):return False

@@ -1,5 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-import {connect} from 'node:net';
+import {localConnect as connect} from '../../platform/src/transport.js';
 import {spawn} from 'node:child_process';
 import {homedir} from 'node:os';
 import {join} from 'node:path';
@@ -25,7 +25,7 @@ export async function promptCall(method:string,params:Record<string,unknown>={},
   try{return await request(method,params,id,signal);}catch(error:any){
     // Only connection failures before a request was sent can be retried.
     if(!['ENOENT','ECONNREFUSED'].includes(error.code))throw error;
-    const child=spawn(pythonExecutable(),[fileURLToPath(new URL(method.startsWith('memory.dual.')?'../../../services/memory/service.py':'../../../services/prompt-library/service.py',import.meta.url))],{stdio:'ignore',detached:true,env:componentEnvironment()});child.on('error',()=>{});child.unref();
+    const child=spawn(pythonExecutable(),['-Xutf8','-B',fileURLToPath(new URL(method.startsWith('memory.dual.')?'../../../services/memory/service.py':'../../../services/prompt-library/service.py',import.meta.url))],{stdio:'ignore',detached:true,windowsHide:true,env:componentEnvironment()});child.on('error',()=>{});child.unref();
     for(let n=0;n<100;n++){
       signal?.throwIfAborted();
       await new Promise(r=>setTimeout(r,50));

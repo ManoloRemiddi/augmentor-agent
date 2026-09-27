@@ -30,6 +30,22 @@ def hold(component):
     if not (ROOT / 'release.json').is_file():
         return  # Source/developer installations have their own lifecycle.
     release = json.loads((ROOT/'release.json').read_text())
+    if sys.platform == 'win32' and release.get('target','').startswith('windows-'):
+        from platform_adapters.paths import runtime_directory
+        from platform_adapters.windows_identity import private_lock_descriptor
+        runtime = runtime_directory()
+        descriptor = private_lock_descriptor(runtime/'installation.lock')
+        try:
+            fcntl.flock(descriptor, fcntl.LOCK_SH | fcntl.LOCK_NB)
+            if (runtime/'maintenance.json').exists():
+                raise RuntimeError('Augmentor is being updated. Finish the update before reopening it.')
+        except (OSError, RuntimeError) as error:
+            os.close(descriptor)
+            raise RuntimeError('Augmentor cannot start during installation maintenance.') from error
+        # Windows does not inherit POSIX flock leases through exec. Each Python
+        # component holds its own descriptor; native child supervision is separate.
+        _leases.append(descriptor)
+        return
     if sys.platform == 'darwin' and release.get('target','').startswith('macos-'):
         runtime = Path(os.environ.get('XDG_RUNTIME_DIR', f'/tmp/augmentor-{os.getuid()}'))
         runtime.mkdir(parents=True, exist_ok=True, mode=0o700)

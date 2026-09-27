@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Private automatic-memory companion, independently startable by either harness."""
-import fcntl
 import json
 import os
 from pathlib import Path
@@ -12,6 +11,9 @@ import threading
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from memory.hindsight import HindsightMemory
 from platform_support import require_same_user
+from platform_adapters import locks as fcntl
+from platform_adapters.paths import private_directory
+from platform_adapters.transport import ThreadingLocalServer, prepare_endpoint, cleanup_endpoint
 
 
 class Handler(socketserver.StreamRequestHandler):
@@ -42,7 +44,7 @@ class Handler(socketserver.StreamRequestHandler):
             pass
 
 
-class Server(socketserver.ThreadingUnixStreamServer):
+class Server(ThreadingLocalServer):
     daemon_threads = False
 
 
@@ -54,14 +56,14 @@ if __name__ == '__main__':
     state = Path(os.environ.get('AUGMENTOR_SHARED_STATE', Path(os.environ.get('XDG_STATE_HOME', Path.home() / '.local/state')) / 'augmentor'))
     data = Path(os.environ.get('AUGMENTOR_SHARED_DATA', Path(os.environ.get('XDG_DATA_HOME', Path.home() / '.local/share')) / 'augmentor'))
     for directory in (state, data):
-        directory.mkdir(parents=True, exist_ok=True, mode=0o700)
+        private_directory(directory)
     lock = (state / 'dual-memory.lock').open('a')
     try:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
     except BlockingIOError:
         raise SystemExit(0)
     endpoint = state / 'dual-memory.sock'
-    endpoint.unlink(missing_ok=True)
+    prepare_endpoint(endpoint)
     server = Server(str(endpoint), Handler)
     server.memory = HindsightMemory(data / 'dual-memory.sqlite3')
     gateway = None
@@ -93,4 +95,4 @@ if __name__ == '__main__':
             gateway.shutdown()
             gateway.server_close()
         server.server_close()
-        endpoint.unlink(missing_ok=True)
+        cleanup_endpoint(endpoint)

@@ -15,6 +15,21 @@ class WindowsIdentityTests(unittest.TestCase):
         from platform_adapters.windows_identity import current_sid, process_sid
         self.assertEqual(process_sid(os.getpid()), current_sid())
 
+    def test_private_lease_refuses_hard_link_and_reopens_without_truncating(self):
+        from platform_adapters.windows_identity import private_directory, private_lock_descriptor
+        with tempfile.TemporaryDirectory() as temporary:
+            root = private_directory(Path(temporary)/'private')
+            path = root/'installation.lock'
+            descriptor = private_lock_descriptor(path)
+            os.write(descriptor, b'kept')
+            os.close(descriptor)
+            descriptor = private_lock_descriptor(path)
+            self.assertEqual(os.read(descriptor, 4), b'kept')
+            os.close(descriptor)
+            os.link(path, root/'other.lock')
+            with self.assertRaises(PermissionError):
+                private_lock_descriptor(path)
+
     def test_private_path_owner_permissions_and_reopen(self):
         from platform_adapters.windows_identity import private_directory, require_private_directory, current_sid
         import win32security

@@ -1,5 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-import {connect,Socket} from 'node:net';
+import {localConnect as connect,type LocalConnection} from '../../platform/src/transport.js';
 import {randomUUID} from 'node:crypto';
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
@@ -9,7 +9,7 @@ import {pythonExecutable,componentEnvironment} from '../../platform/src/index.js
 export class PiConnection {
   pending=new Map<string,{resolve:(value:any)=>void;reject:(error:Error)=>void;timer:NodeJS.Timeout}>();
   buffer=Buffer.alloc(0);closed=false;
-  constructor(readonly socket:Socket,readonly event:(frame:any)=>void=()=>{},readonly disconnected:(error:Error)=>void=()=>{}){
+  constructor(readonly socket:LocalConnection,readonly event:(frame:any)=>void=()=>{},readonly disconnected:(error:Error)=>void=()=>{}){
     socket.on('error',error=>this.fail(error));socket.on('close',()=>this.fail(new Error('Harness disconnected; the previous action was not replayed.')));
     socket.on('data',data=>{this.buffer=Buffer.concat([this.buffer,data]);if(this.buffer.length>1024*1024){socket.destroy();return;}let end;
       while((end=this.buffer.indexOf(10))>=0){let frame:any;try{frame=JSON.parse(this.buffer.subarray(0,end).toString());}catch{socket.destroy();return;}this.buffer=this.buffer.subarray(end+1);
@@ -27,8 +27,8 @@ export class PiConnection {
     const prefix='AUGMENTOR_PI';
     const env=componentEnvironment();
     const state=env[prefix+'_STATE']??join(env.XDG_STATE_HOME??join(homedir(),'.local/state'),'augmentor-'+harness);const path=env[prefix+'_SOCKET']??join(state,'runtime.sock');
-    const dial=()=>new Promise<Socket>((resolve,reject)=>{const s=connect(path);s.once('connect',()=>resolve(s));s.once('error',reject);});
-    let socket:Socket;
+    const dial=()=>new Promise<LocalConnection>((resolve,reject)=>{const s=connect(path);s.once('connect',()=>resolve(s));s.once('error',reject);});
+    let socket:LocalConnection;
     try{socket=await dial();}catch(error:any){
       if(!['ENOENT','ECONNREFUSED'].includes(error.code))throw error;
       // Both surfaces share the same startup lock and cold-start allowance.

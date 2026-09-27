@@ -68,6 +68,11 @@ def require_private_directory(path):
         raise PermissionError('Augmentor needs an ordinary private directory.')
     descriptor = win32security.GetFileSecurity(str(path), win32security.OWNER_SECURITY_INFORMATION |
                                               win32security.DACL_SECURITY_INFORMATION)
+    require_private_descriptor(descriptor)
+    return path
+
+
+def require_private_descriptor(descriptor):
     if descriptor.GetSecurityDescriptorOwner() != current_sid():
         raise PermissionError('The Augmentor directory belongs to another Windows identity.')
     acl = descriptor.GetSecurityDescriptorDacl()
@@ -90,7 +95,26 @@ def require_private_directory(path):
             user_access = True
     if not user_access:
         raise PermissionError('The current user cannot maintain this Augmentor directory.')
-    return path
+
+
+def private_lock_descriptor(path):
+    """Open a private, regular, single-link lease file without following a reparse."""
+    import msvcrt
+    path = reject_reparse_ancestors(path)
+    private_directory(path.parent)
+    handle = win32file.CreateFile(str(path), win32con.GENERIC_READ | win32con.GENERIC_WRITE,
+        win32con.FILE_SHARE_READ | win32con.FILE_SHARE_WRITE, security_attributes(),
+        win32con.OPEN_ALWAYS, win32file.FILE_FLAG_OPEN_REPARSE_POINT, None)
+    try:
+        info = win32file.GetFileInformationByHandle(handle)
+        if info[0] & (stat.FILE_ATTRIBUTE_REPARSE_POINT | stat.FILE_ATTRIBUTE_DIRECTORY) or info[7] != 1:
+            raise PermissionError('The installation lease must be an ordinary single-link file.')
+        descriptor = win32security.GetSecurityInfo(handle, win32security.SE_FILE_OBJECT,
+            win32security.OWNER_SECURITY_INFORMATION | win32security.DACL_SECURITY_INFORMATION)
+        require_private_descriptor(descriptor)
+        return msvcrt.open_osfhandle(handle.Detach(), os.O_RDWR | os.O_BINARY)
+    finally:
+        handle.Close()
 
 
 def private_directory(path):

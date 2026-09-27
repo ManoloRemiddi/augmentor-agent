@@ -84,6 +84,10 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           npm run build
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Exercise Python and Node shared prompt clients and durable restart
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_local_services.py -v
       - name: Stage and exercise actual pinned DSH native dependencies
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: |

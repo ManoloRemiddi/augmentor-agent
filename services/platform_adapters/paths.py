@@ -5,6 +5,15 @@ from pathlib import Path
 import sys
 
 
+def private_directory(path):
+    if sys.platform == 'win32':
+        from .windows_identity import private_directory as create
+        return create(path)
+    path = Path(path)
+    path.mkdir(mode=0o700, parents=True, exist_ok=True)
+    return path
+
+
 def windows_environment():
     if sys.platform != 'win32':
         raise RuntimeError('Windows paths require Windows identity verification.')

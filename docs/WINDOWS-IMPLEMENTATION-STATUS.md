@@ -24,8 +24,8 @@ not waived tests or a product regression.
 | --- | --- | --- |
 | Linux x64 development | Available; baseline suites pass | Existing personal processes untouched |
 | macOS ARM64 | Existing Mac 14/26 CI and authorized network Macs | Candidate dependency upgrade still needs testing |
-| Windows x64 | `windows-2025` hosted job added; execution pending | Server runner is build/runtime evidence, not Windows 11 client acceptance |
-| Windows ARM64 | `windows-11-arm` hosted job added; execution pending | Require native-process readback; no RTX hardware claim |
+| Windows x64 | `windows-2025` runtime, installer fixture and kernel probes executed | Server runner is build/runtime evidence, not Windows 11 client acceptance |
+| Windows ARM64 | Native `windows-11-arm` runtime, installer fixture and kernel probes executed | Native-process readback passes; no RTX hardware claim |
 | Physical Windows | Owner will connect a machine later | DPI, graphics, input, microphone and client installer tests remain pending |
 | RTX Spark N1X | No accessible hardware verified | Hardware qualification remains required |
 | Signing/publisher | No repository signing secrets or self-hosted runners found | Certificate/identity and browser-store publication remain external gates |
@@ -65,8 +65,8 @@ providers, installed artifacts and physical hardware must remain distinguishable
 | Work | Current state | Required next evidence |
 | --- | --- | --- |
 | W0 baseline | Local baseline recorded; hosted jobs prepared | Windows job execution and current-source reconciliation |
-| W1 native runtime and installer | Candidate locks and runtime probe implemented | Native x64/ARM execution; two installed versions; failure/recovery proof |
-| W2 paths, ownership, IPC, locks | Pending | Same-user secure transport and lifecycle, existing-OS regressions |
+| W1 native runtime and installer | Native x64/ARM64 runtime and two-version installer fixture pass | Complete DSH tool payload; clean-machine and trust qualification |
+| W2 paths, ownership, IPC, locks | Kernel adapters pass; shared-service adoption in progress | Node/Python service proof, different-user rejection, complete lifecycle integration |
 | W3 managed DSH/model setup | Pending | Clean-user real harness Send, Stop and restored chat; separate live provider |
 | W4 desktop, two windows, shortcuts, tray | Pending | Shared interaction suite, actual Windows shell and approved appearance |
 | W5 chosen Chromium/Comet companion | Pending | Native host registration and real selected-browser conversation |
@@ -183,3 +183,26 @@ Apache text, the LGPL supplement and the upstream native-library attribution
 table. It does not select away LGPL obligations or mark the distribution review
 complete. Corresponding source/replacement evidence remains a W7 release gate.
 Six license-inventory tests pass, including missing supplemental-notice refusal.
+
+At `74c7db5`, both real Windows architectures pass the private-directory and
+named-pipe kernel probes, including a separate-process peer, large Unicode
+responses, read timeout recovery and close waking a blocked reader. DSH payload
+qualification still fails on x64 and is being investigated; no full green Windows
+job or working installed application is claimed.
+
+Shared prompt/memory servers and native clients now use the OS transport adapter.
+Unix retains sockets; Windows uses the authenticated named pipe. Node clients
+use the same Python pipe implementation through private inherited binary stdio,
+avoiding undocumented Node handle access or an unauthenticated network listener.
+Only a connection failure proven to precede sending may trigger service startup;
+later failures never replay an action. Windows installed components also gain
+private per-user lifetime leases and known-folder runtime paths. Pi's Node server
+and the full Windows supervisor remain pending.
+
+The real shared prompt integration test starts two competing daemon processes,
+proves one owner, saves Unicode from native Python and Node, checks idempotent
+acknowledgments, and verifies persistence after restart. It passes on Linux;
+native Windows execution of these adopted services is queued next. Shared
+TypeScript checks/build and all 182 Node tests pass. The preceding complete
+Linux native suite passes 550 tests (11 platform/environment skips); later new
+private-lease and integrated-service tests retain their own execution boundary.

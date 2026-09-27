@@ -8,11 +8,14 @@ import socket
 import subprocess
 import sys
 import time
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from platform_adapters.paths import runtime_directory
+from platform_adapters.transport import LocalSocket
 
 
 def call(request,start=True):
-    path=Path(os.environ.get('XDG_RUNTIME_DIR',f'/tmp/augmentor-{os.getuid()}' if sys.platform=='darwin' else f'/run/user/{os.getuid()}'))/'augmentor-desktop.sock'
-    client=socket.socket(socket.AF_UNIX);client.settimeout(115)
+    path=runtime_directory()/'augmentor-desktop.sock'
+    client=LocalSocket();client.settimeout(115)
     try:
         try:client.connect(str(path))
         except (FileNotFoundError,ConnectionRefusedError):
