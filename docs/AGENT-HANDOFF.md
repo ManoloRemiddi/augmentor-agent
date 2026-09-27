@@ -7,12 +7,15 @@
 [Browser choice qualification](MACOS-BROWSER-CHOICE.md) records the generic Mac
 app chooser and Comet compatibility fix. The clean `3627dae` package passes actual
 Comet/Chrome native-host chat, 130 Mac tests, Mac 14/26 and DMG launch/integrity
-checks. A Linux fixture cleanup race is corrected; complete CI must pass before
-merge. Publication and owner activation are still pending at this checkpoint.
-The owner must close the open dialog before the safe updater can proceed; remote
-Accessibility control is denied. Preserve the working installed `b8dac9d` app.
+checks. Full Linux/Home/Browser/installed lifecycle and Mac 14/26 CI passed at
+reviewed head `114a879`; PR #17 is merged as `9451682`. [Mac preview 3](MACOS-PREVIEW-3-RELEASE.md)
+is published and the complete anonymous DMG download matches its checksum.
+The website serves the new download and Comet/browser-choice guide. Owner
+activation remains pending: the open dialog must close before safe maintenance,
+and remote Accessibility control is denied. Preserve the working installed
+`b8dac9d` app; do not confuse the published release with the running installation.
 
-## September 27 Mac preview 2 publication
+## September 27 Mac preview 2 publication — historical
 
 The owner accepted the installed fix and requested public release. PR #16 is
 merged at `482a63a`; the release carries the exact accepted `b8dac9d` app, not a

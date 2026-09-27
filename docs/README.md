@@ -140,7 +140,8 @@ files available only in a developer's working directory.
 
 - [Home desktop tray launcher](HOME-LAUNCHER.md): shared NAS dashboard access, remembered address and login startup.
 
-- [Current Mac preview 2](MACOS-PREVIEW-2-RELEASE.md) — accepted live zoom/flare build, packaging and publication.
+- [Current Mac preview 3](MACOS-PREVIEW-3-RELEASE.md) — installed browser choice and Comet qualification.
+- [Historical Mac preview 2](MACOS-PREVIEW-2-RELEASE.md) — accepted live zoom/flare build, packaging and publication.
 - [Historical macOS preview 1](MACOS-PREVIEW-RELEASE.md) — original Apple-independent preview qualification.
 - [Mac customer guide](MACOS-PREVIEW.html) — install, model connection and browser extension.
 - [Mac browser choice](MACOS-BROWSER-CHOICE.md) — installed Chromium apps, Comet, native registration and qualification.

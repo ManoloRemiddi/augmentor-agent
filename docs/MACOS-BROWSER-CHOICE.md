@@ -76,14 +76,17 @@ Fresh archive extractions and all final proofs pass strict signature checks.
 The Linux workflow at the binary source encountered an unrelated `ENOTEMPTY`
 race while removing the observation fixture's Chromium profile. The test now
 retries transient directory removal after the parent exits; three local real
-Chromium runs pass. The full workflow must pass this correction before merge.
+Chromium runs pass. The full Linux/Home/Browser/installed lifecycle and Mac 14/26
+workflows passed at reviewed head `114a879` before merge.
 No Linux production behavior changed.
 
 ## Deployment checkpoint
 
-PR #17 carries the implementation and qualification. Preview 3 is being prepared;
-public preview 2 remains current until publication is verified. The owner's
-installed app is still `b8dac9d`: its open dialog makes maintenance busy, and
+[PR #17](https://github.com/ManoloRemiddi/augmentor-agent/pull/17) is merged as
+`9451682`. [Preview 3](MACOS-PREVIEW-3-RELEASE.md) is published, its complete
+anonymous DMG download matches its checksum, and the website serves the new
+installer and browser-choice guide. The owner's installed app is still `b8dac9d`:
+its open dialog makes maintenance busy, and
 macOS refuses remote Accessibility control. A request to close that dialog is
 pending. Do not force-quit or claim the installed update is complete. The sealed
 replacement is staged separately, with test application registrations removed
