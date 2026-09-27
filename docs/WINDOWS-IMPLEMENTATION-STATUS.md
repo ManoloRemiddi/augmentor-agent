@@ -354,3 +354,23 @@ The resulting local regression run passes all 570 native tests (14 explicit
 platform/environment skips). Supervisor, staged application and managed-chat
 native probes still await the next Windows run. The existing Mac/Linux installed
 applications remain untouched.
+
+The pinned DSH JSONL backend uses `Local\\dsh-session-lock-<SHA256>` count-one
+semaphores on Windows, derived from its lexically resolved lower-case lock path;
+it does not use a Windows file lock. The reviewed published module hash is
+`7d0640c9fc4be6c703b77605fdee6af519c542fae28a6cd4489353309812f062`.
+The separate `dsh/session_lease.py` adapter matches that protocol and retains
+Unix `flock`; application lifetime locks remain separate. Recovery imports and
+private startup records are portable, and managed Windows restart routes to the
+credential-preserving supervisor. External Windows DSH remains externally owned;
+automatic spawning of that external service is not implemented.
+
+The staged native conversation proof now adds an actual pending model turn,
+requires our repair lease to be refused while DSH owns the history, tests Stop,
+and checks lease release before restoring the conversation after owner exit.
+This check is newly added and pending native execution. Local common tests pass
+572 cases (14 platform/environment skips), including existing repair/backup
+regressions and a separate-process lease/crash test. Mac CI now explicitly adds
+these shared setup, private-file, voice and recovery suites. Both complete Mac
+14/26 artifact workflows pass at the preceding `ae17cc3`; current additions still
+require their own native runs.

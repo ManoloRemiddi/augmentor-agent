@@ -44,6 +44,7 @@ def main():
         AUGMENTOR_PWSH=str(root/'powershell/pwsh.exe'), PYTHONUTF8='1', PYTHONDONTWRITEBYTECODE='1')
     os.environ['PATH'] = os.pathsep.join([str(root/'node'), str(root/'python'), str(root/'powershell'), os.environ.get('PATH', os.defpath)])
     calls = []
+    model_waiting, release_model = threading.Event(), threading.Event()
     class Model(http.server.BaseHTTPRequestHandler):
         def log_message(self, *_): pass
         def do_POST(self):
@@ -54,6 +55,12 @@ def main():
             self.send_header('Content-Type', 'text/event-stream' if body.get('stream') else 'application/json')
             self.end_headers()
             if body.get('stream'):
+                latest = next((item for item in reversed(body.get('messages', [])) if item.get('role') == 'user'), {})
+                if 'LEASE_HOLD_FIXTURE' in json.dumps(latest):
+                    self.wfile.write(b'data: {"choices":[{"index":0,"delta":{"role":"assistant","content":"Waiting"},"finish_reason":null}]}\n\n')
+                    self.wfile.flush(); model_waiting.set()
+                    release_model.wait(30)
+                    return
                 for delta, finish in [({'role': 'assistant', 'content': 'Windows managed setup verified.'}, None), ({}, 'stop')]:
                     event = {'id': 'fixture', 'object': 'chat.completion.chunk', 'created': 1, 'model': 'fixture',
                              'choices': [{'index': 0, 'delta': delta, 'finish_reason': finish}]}
@@ -96,12 +103,33 @@ def main():
             'content': [{'type': 'text', 'text': 'Reply to the isolated Windows setup fixture.'}]})
         wait_for(lambda: len(calls)>before and not next(row for row in adapter.call('session.list')['items'] if row['sessionId']==session)['running'])
         assert 'Windows managed setup verified.' in json.dumps(adapter.call('session.history', {'sessionId': session}))
+        # This is the actual DSH writer, not two copies of our adapter. While
+        # its model request is active, repair must fail to acquire its lease.
+        from dsh.session_lease import session_write_lease
+        directories = {path.parent for path in (state/'home/sessions').glob('*/'+session+'/session*.jsonl*')}
+        assert len(directories) == 1, 'The actual session artifact directory is ambiguous.'
+        lock_path = directories.pop()/'session.lock'
+        adapter.call('session.prompt', {'sessionId': session, 'mode': 'queue',
+            'content': [{'type': 'text', 'text': 'LEASE_HOLD_FIXTURE'}]})
+        assert model_waiting.wait(20), 'The deterministic model did not receive the cancellable turn.'
+        contended = False
+        try:
+            with session_write_lease(lock_path): pass
+        except BlockingIOError: contended = True
+        assert contended, 'Recovery lease failed to exclude the actual DSH history writer.'
+        adapter.call('session.cancel', {'sessionId': session})
+        wait_for(lambda: not next(row for row in adapter.call('session.list')['items'] if row['sessionId']==session)['running'])
+        release_model.set()
+        report.update(actualHarnessLeaseContention=True, stopCancelledTurn=True)
         with_error = False
         try: agent.stop_failed_setup()
         except ValueError: with_error = True
         assert with_error and agent.loaded(), 'Published runtime must refuse failed-setup cleanup'
         supervisor.kill(); supervisor.wait(timeout=10)
         wait_for(lambda: not agent.loaded())
+        def released_history():
+            with session_write_lease(lock_path): return True
+        wait_for(released_history)
         agent.start(); wait_for(lambda: adapter.call('host.describe'))
         assert 'Windows managed setup verified.' in json.dumps(adapter.call('session.history', {'sessionId': session}))
         report.update(passed=True, setup=True, conversation=True, crashRestartPreservedHistory=True,
@@ -124,6 +152,7 @@ def main():
         finally:
             if supervisor.poll() is None: supervisor.kill()
             supervisor.wait(timeout=10)
+            release_model.set()
             server.shutdown(); server.server_close()
             report['privateFixtureDirectory'] = str(work)
             (args.out/'managed-setup.json').write_text(json.dumps(report, indent=2)+'\n', encoding='utf-8')

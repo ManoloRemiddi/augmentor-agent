@@ -1,5 +1,4 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-import fcntl
 import json
 import os
 from pathlib import Path
@@ -10,6 +9,7 @@ import unittest
 from unittest.mock import Mock, patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'services'))
 from recovery import RecoveryError, recover, repair_history, start_dsh, repair_adaptive_history, recover_saved_session
+from dsh.session_lease import session_write_lease
 
 class HistoryRecoveryTests(unittest.TestCase):
     def setUp(self):
@@ -29,7 +29,15 @@ class HistoryRecoveryTests(unittest.TestCase):
         self.assertFalse(self.plain.exists()); self.assertEqual(self.compressed.read_bytes(), compressed)
         row = json.loads((backup/'manifest.jsonl').read_text())
         self.assertEqual(Path(row['backup']).read_bytes(), b'old\n')
-        self.assertEqual(Path(row['backup']).stat().st_mode & 0o777, 0o600)
+        if sys.platform == 'win32':
+            import win32security
+            from platform_adapters.windows_identity import current_sid, sid_string
+            security = win32security.GetFileSecurity(row['backup'], win32security.OWNER_SECURITY_INFORMATION | win32security.DACL_SECURITY_INFORMATION)
+            self.assertEqual(security.GetSecurityDescriptorOwner(), current_sid())
+            acl = security.GetSecurityDescriptorDacl()
+            for i in range(acl.GetAceCount()):
+                self.assertIn(win32security.ConvertSidToStringSid(acl.GetAce(i)[2]), {sid_string(), 'S-1-5-18'})
+        else: self.assertEqual(Path(row['backup']).stat().st_mode & 0o777, 0o600)
     def test_divergence_preserves_both(self):
         self.pair(b'other\n')
         with self.assertRaisesRegex(RecoveryError, 'differ'): repair_history(self.home, Mock())
@@ -40,13 +48,16 @@ class HistoryRecoveryTests(unittest.TestCase):
         self.assertTrue(self.plain.exists())
     def test_active_session_is_not_modified(self):
         self.pair()
-        with (self.session/'session.lock').open('w') as lock:
-            fcntl.flock(lock, fcntl.LOCK_EX|fcntl.LOCK_NB)
+        with session_write_lease(self.session/'session.lock'):
             with self.assertRaisesRegex(RecoveryError, 'using'): repair_history(self.home, Mock())
         self.assertTrue(self.plain.exists())
     def test_symlink_is_not_followed(self):
         self.pair(); self.plain.unlink()
-        external = Path(self.tmp.name)/'outside'; external.write_bytes(b'old\n'); self.plain.symlink_to(external)
+        external = Path(self.tmp.name)/'outside'; external.write_bytes(b'old\n')
+        try: self.plain.symlink_to(external)
+        except OSError:
+            if sys.platform == 'win32': self.skipTest('This Windows runner cannot create file symlinks.')
+            raise
         with self.assertRaisesRegex(RecoveryError, 'ordinary'): repair_history(self.home, Mock())
         self.assertEqual(external.read_bytes(), b'old\n')
     def test_corrupt_compressed_file_is_not_a_success(self):
@@ -81,6 +92,7 @@ class HistoryRecoveryTests(unittest.TestCase):
             with self.assertRaisesRegex(RecoveryError, 'integration version mismatch'): recover(client, 'dsh', Mock())
         start.assert_not_called()
 
+    @unittest.skipIf(sys.platform == 'win32', 'systemd ownership applies to Linux services')
     def test_managed_server_uses_service_and_never_detaches_duplicate(self):
         client = Mock(base='http://127.0.0.1:3080', home=self.home)
         with patch.dict(os.environ, {'AUGMENTOR_DSH_SERVICE':'dsh-web.service'}), patch('dsh.setup.current', return_value={'endpoint':client.base,'home':str(self.home)}), patch('recovery.port_open', side_effect=[False,False,True]), patch('recovery.subprocess.run', return_value=Mock(returncode=0)) as run, patch('recovery.subprocess.Popen') as spawn:
@@ -112,8 +124,7 @@ class AdaptiveHistoryRecoveryTests(unittest.TestCase):
 
     def test_busy_legacy_chat_is_never_rewritten(self):
         self.legacy(); before = self.compressed.read_bytes()
-        with (self.session/'session.lock').open('w') as lock:
-            fcntl.flock(lock, fcntl.LOCK_EX|fcntl.LOCK_NB)
+        with session_write_lease(self.session/'session.lock'):
             with self.assertRaisesRegex(RecoveryError, 'still open'): repair_adaptive_history(self.home,'chat',Mock())
         self.assertEqual(self.compressed.read_bytes(), before)
 

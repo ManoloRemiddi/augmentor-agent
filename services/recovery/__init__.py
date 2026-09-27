@@ -1,7 +1,6 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Local runtime diagnosis and reversible storage repair; no prompt replay."""
 import contextlib
-import fcntl
 import hashlib
 import json
 import os
@@ -15,6 +14,10 @@ import sys
 import tempfile
 import time
 from urllib.parse import urlsplit
+from platform_adapters import locks as fcntl
+from platform_adapters.paths import private_directory
+from platform_adapters.private_files import descriptor as private_descriptor, replace_file
+from dsh.session_lease import session_write_lease
 
 
 class RecoveryError(RuntimeError):
@@ -23,6 +26,7 @@ class RecoveryError(RuntimeError):
 
 def state_directory():
     path = Path(os.environ.get('XDG_STATE_HOME', Path.home()/'.local/state'))/'augmentor-recovery'
+    if sys.platform == 'win32': return private_directory(path)
     path.mkdir(parents=True, exist_ok=True, mode=0o700)
     if path.is_symlink() or path.stat().st_uid != os.getuid():
         raise RecoveryError('The recovery folder must belong to the current user.')
@@ -30,6 +34,15 @@ def state_directory():
 
 
 def regular(path):
+    if sys.platform == 'win32':
+        from platform_adapters.windows_identity import reject_reparse_ancestors, current_sid
+        import win32security
+        reject_reparse_ancestors(path)
+        owner = win32security.GetFileSecurity(str(path), win32security.OWNER_SECURITY_INFORMATION).GetSecurityDescriptorOwner()
+        info = path.lstat()
+        valid = stat.S_ISREG(info.st_mode) and info.st_nlink == 1 and owner == current_sid()
+        if not valid: raise RecoveryError('Recovery needs an ordinary, user-owned file: '+str(path))
+        return info
     info = path.lstat()
     if not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid() or info.st_nlink != 1:
         raise RecoveryError('Recovery needs an ordinary, user-owned file: '+str(path))
@@ -43,7 +56,7 @@ def fingerprint(path):
 
 def verified_prefix(plain, compressed):
     """Bounded disk/memory use; validate the entire compressed stream, not just its prefix."""
-    bundled = Path(__file__).resolve().parents[2]/'node/bin/node'
+    bundled = Path(__file__).resolve().parents[2]/('node/node.exe' if sys.platform == 'win32' else 'node/bin/node')
     node = os.environ.get('AUGMENTOR_PI_NODE') or (str(bundled) if bundled.is_file() else shutil.which('node'))
     if not node:
         raise RecoveryError('The bundled runtime is missing. Repair the Augmentor installation and retry.')
@@ -68,12 +81,15 @@ def verified_prefix(plain, compressed):
 
 def repair_history(home, emit):
     root = Path(home)/'sessions'
+    if sys.platform == 'win32':
+        from platform_adapters.windows_identity import reject_reparse_ancestors
+        reject_reparse_ancestors(root)
     if root.is_symlink() or not root.is_dir():
         raise RecoveryError('The configured history folder is missing or is a symbolic link.')
     paths = []
     # Do not traverse symlink directories or collect arbitrary exported JSONL files.
     for directory, dirs, files in os.walk(root, followlinks=False):
-        if any((Path(directory)/name).is_symlink() for name in dirs):
+        if any((Path(directory)/name).is_symlink() or (hasattr(Path, 'is_junction') and (Path(directory)/name).is_junction()) for name in dirs):
             raise RecoveryError('History contains a symbolic-link directory; automatic repair stopped.')
         for name in files:
             if re.fullmatch(r'session(?:\.v[1-9][0-9]*)?\.jsonl', name):
@@ -83,22 +99,16 @@ def repair_history(home, emit):
     backup = Path(tempfile.mkdtemp(prefix='history-', dir=state_directory()))
     count = 0
     emit('Checking history copies; originals will be backed up to '+str(backup))
-    # Each session lock is the same POSIX lease used by DSH. Never unlink it.
+    # Use the actual harness protocol: POSIX flock or its Windows semaphore.
     for plain in sorted(paths):
         compressed = Path(str(plain)+'.zstd')
         if not compressed.exists():
             raise RecoveryError('A history has no compressed counterpart; it was preserved: '+str(plain))
         lock_path = plain.parent/'session.lock'
         with contextlib.ExitStack() as stack:
-            descriptor = os.open(lock_path, os.O_RDWR|os.O_CREAT|os.O_NOFOLLOW, 0o600)
-            stack.callback(os.close, descriptor)
-            if not stat.S_ISREG(os.fstat(descriptor).st_mode):
-                raise RecoveryError('Invalid chat lock: '+str(lock_path))
-            try: fcntl.flock(descriptor, fcntl.LOCK_EX|fcntl.LOCK_NB)
+            try: stack.enter_context(session_write_lease(lock_path))
             except BlockingIOError:
                 raise RecoveryError('A chat is using a conflicting history file. Finish that task and retry recovery.')
-            if os.fstat(descriptor).st_ino != lock_path.stat().st_ino:
-                raise RecoveryError('The chat lock changed. Retry recovery.')
             digest, before = verified_prefix(plain, compressed)
             relative = plain.relative_to(root)
             target = backup/relative
@@ -107,7 +117,7 @@ def repair_history(home, emit):
             # the redundant source. Write the manifest before changing live history.
             shutil.copy2(plain, target)
             target.chmod(0o600)
-            with target.open('rb') as saved:
+            with target.open('r+b') as saved:
                 os.fsync(saved.fileno())
                 if hashlib.file_digest(saved, 'sha256').hexdigest() != digest:
                     raise RecoveryError('History backup verification failed; the original was preserved.')
@@ -145,14 +155,10 @@ def repair_adaptive_history(home, session, emit):
     before = fingerprint(path)
     lock_path = path.parent/'session.lock'
     with contextlib.ExitStack() as stack:
-        fd = os.open(lock_path, os.O_RDWR|os.O_CREAT|os.O_NOFOLLOW, 0o600)
-        stack.callback(os.close, fd)
-        try: fcntl.flock(fd, fcntl.LOCK_EX|fcntl.LOCK_NB)
+        try: stack.enter_context(session_write_lease(lock_path))
         except BlockingIOError:
             raise RecoveryError('The affected chat is still open in DSH. Finish its work and restart DSH before repair.') from None
-        if not stat.S_ISREG(os.fstat(fd).st_mode) or os.fstat(fd).st_ino != lock_path.stat().st_ino:
-            raise RecoveryError('The chat lock changed; retry recovery.')
-        bundled = Path(__file__).resolve().parents[2]/'node/bin/node'
+        bundled = Path(__file__).resolve().parents[2]/('node/node.exe' if sys.platform == 'win32' else 'node/bin/node')
         node = os.environ.get('AUGMENTOR_PI_NODE') or (str(bundled) if bundled.exists() else shutil.which('node'))
         with tempfile.NamedTemporaryFile(dir=path.parent, prefix='.telemetry-repair-', delete=False) as output:
             temporary = Path(output.name)
@@ -167,19 +173,16 @@ def repair_adaptive_history(home, session, emit):
         backup = Path(tempfile.mkdtemp(prefix='adaptive-history-', dir=state_directory()))
         saved = backup/path.name
         shutil.copy2(path, saved); saved.chmod(0o600)
-        with path.open('rb') as source, saved.open('rb') as copy:
+        with path.open('rb') as source, saved.open('r+b') as copy:
             digest = hashlib.file_digest(source, 'sha256').hexdigest()
             if hashlib.file_digest(copy, 'sha256').hexdigest() != digest:
                 raise RecoveryError('History backup verification failed; original preserved.')
             os.fsync(copy.fileno())
         manifest = backup/'manifest.json'
         manifest.write_text(json.dumps({'source':str(path), 'sha256':digest, **summary})+'\n'); manifest.chmod(0o600)
-        with manifest.open('rb') as record: os.fsync(record.fileno())
+        with manifest.open('r+b') as record: os.fsync(record.fileno())
         if before != fingerprint(path): raise RecoveryError('History changed before replacement; original preserved.')
-        os.replace(temporary, path)
-        directory_fd = os.open(path.parent, os.O_RDONLY|os.O_DIRECTORY)
-        try: os.fsync(directory_fd)
-        finally: os.close(directory_fd)
+        replace_file(temporary, path)
         emit(f'Repaired {summary["changed"]} legacy diagnostic markers; every event retained. Backup: {backup}')
         return backup
 
@@ -200,7 +203,7 @@ def recover_saved_session(client, session, emit):
 def start_dsh(client, emit):
     # Native, mobile and manual recovery may notice the same stopped server.
     # Serialize startup across processes, then recheck readiness under the lock.
-    fd = os.open(state_directory()/'dsh-start.lock', os.O_RDWR|os.O_CREAT|os.O_NOFOLLOW, 0o600)
+    fd = private_descriptor(state_directory()/'dsh-start.lock', writable=True, create=True)
     try:
         deadline = time.monotonic()+50
         while True:
@@ -223,10 +226,11 @@ def _start_dsh(client, emit):
         try: client.call('host.describe'); return
         except Exception as error:
             raise RecoveryError('The local port is occupied but DSH did not pass its health check. Recovery will not stop an unidentified or busy server. '+str(error)) from error
-    if sys.platform == 'darwin' and configured.get('managed', {}).get('type') == 'launchd':
+    owner = configured.get('managed', {}).get('type')
+    if (sys.platform == 'darwin' and owner == 'launchd') or (sys.platform == 'win32' and owner == 'windows-supervisor'):
         import importlib.util
-        script = Path(__file__).resolve().parents[2]/'scripts/setup-macos.py'
-        spec = importlib.util.spec_from_file_location('managed_macos_recovery', script)
+        script = Path(__file__).resolve().parents[2]/('scripts/setup-windows.py' if sys.platform == 'win32' else 'scripts/setup-macos.py')
+        spec = importlib.util.spec_from_file_location('managed_runtime_recovery', script)
         managed = importlib.util.module_from_spec(spec); spec.loader.exec_module(managed)
         emit('Starting the managed Augmentor runtime…')
         managed.start_saved(configured)
@@ -235,6 +239,8 @@ def _start_dsh(client, emit):
             if port_open(address.hostname, port): return
             time.sleep(.25)
         raise RecoveryError('The managed DSH service did not become ready within 45 seconds.')
+    if sys.platform == 'win32':
+        raise RecoveryError('Start the external DSH runtime with its own launcher, then retry. Its service and provider settings were preserved.')
     # A configured service must retain ownership. Spawning a detached duplicate
     # here races its Restart policy and loses its provider environment.
     service = os.environ.get('AUGMENTOR_DSH_SERVICE')
@@ -288,7 +294,7 @@ def _start_dsh(client, emit):
 def recover(client, harness, emit):
     """Called by the desktop's serialized recovery worker, never its UI thread."""
     directory = state_directory()
-    fd = os.open(directory/'recovery.lock', os.O_RDWR|os.O_CREAT|os.O_NOFOLLOW, 0o600)
+    fd = private_descriptor(directory/'recovery.lock', writable=True, create=True)
     try:
         try: fcntl.flock(fd, fcntl.LOCK_EX|fcntl.LOCK_NB)
         except BlockingIOError: raise RecoveryError('Recovery is already running in another window.')

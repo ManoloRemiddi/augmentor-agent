@@ -56,6 +56,11 @@ jobs:
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_instances.py -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_dsh_payload_staging.py -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_prompt_client_startup.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_managed_dsh.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_private_files.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_dsh_session_lease.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_browser_voice.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_recovery.py -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_activity.py -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_ui_scale.py -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_fluid.py -v

@@ -57,6 +57,24 @@ def atomic_json(path, value):
             stream.flush(); os.fsync(stream.fileno())
         if path.exists() or path.is_symlink():
             os.close(descriptor(path))
-        temporary.replace(path)
+        replace_file(temporary, path)
     finally:
         temporary.unlink(missing_ok=True)
+
+
+def replace_file(source, target):
+    """Publish a flushed same-volume file and make its namespace update durable."""
+    if sys.platform == 'win32':
+        import ctypes
+        from ctypes import wintypes
+        move = ctypes.WinDLL('kernel32', use_last_error=True).MoveFileExW
+        move.argtypes = [wintypes.LPCWSTR, wintypes.LPCWSTR, wintypes.DWORD]
+        move.restype = wintypes.BOOL
+        MOVEFILE_REPLACE_EXISTING, MOVEFILE_WRITE_THROUGH = 1, 8
+        if not move(str(source), str(target), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH):
+            raise ctypes.WinError(ctypes.get_last_error())
+    else:
+        os.replace(source, target)
+        fd = os.open(Path(target).parent, os.O_RDONLY | os.O_DIRECTORY)
+        try: os.fsync(fd)
+        finally: os.close(fd)

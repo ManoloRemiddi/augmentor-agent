@@ -117,7 +117,11 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_managed_dsh.py -v
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_dsh_session_lease.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_browser_voice.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_recovery.py -v
       - name: Stage and exercise actual pinned DSH native dependencies
         id: dsh
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
