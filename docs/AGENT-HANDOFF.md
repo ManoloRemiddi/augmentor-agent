@@ -2,6 +2,16 @@
 
 # Start here: agent handoff
 
+## September 27 installed Chromium browser choice
+
+[Browser choice qualification](MACOS-BROWSER-CHOICE.md) records the generic Mac
+app chooser and Comet compatibility fix. The clean `3627dae` package passes actual
+Comet/Chrome native-host chat, 130 Mac tests, Mac 14/26 and DMG launch/integrity
+checks. A Linux fixture cleanup race is corrected; complete CI must pass before
+merge. Publication and owner activation are still pending at this checkpoint.
+The owner must close the open dialog before the safe updater can proceed; remote
+Accessibility control is denied. Preserve the working installed `b8dac9d` app.
+
 ## September 27 Mac preview 2 publication
 
 The owner accepted the installed fix and requested public release. PR #16 is

@@ -34,6 +34,8 @@ test('real Chromium: delayed SPA, shadow/frame text, selectors, empty page and o
   const empty=await observe();assert.equal(empty.observation,'empty');assert.equal(empty.attempts,3);assert.doesNotMatch(JSON.stringify(empty),/TEST_SECRET|HIDDEN_SECRET/)
   assert.match(empty.text,/inconclusive/)
  } finally {
-  ws?.close();if(child.pid){child.kill();await new Promise(r=>child.exitCode!==null?r():child.once('exit',r));}await rm(dir,{recursive:true,force:true})
+  ws?.close();if(child.pid){child.kill();await new Promise(r=>child.exitCode!==null?r():child.once('exit',r));}
+  // Chromium helpers can finish profile writes just after the parent exits.
+  await rm(dir,{recursive:true,force:true,maxRetries:5,retryDelay:100})
  }
 })
