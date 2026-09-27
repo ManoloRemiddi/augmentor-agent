@@ -392,3 +392,20 @@ the branch head. These are CI development payloads, not promoted release sources
 Both complete Mac artifact workflows and Linux/Home/Browser/installed-package
 validation pass for `ae17cc3`; subsequent recovery/stdio changes need their own
 results. The source remains on draft PR #20 and no installed user app changed.
+
+Windows window activation now uses the existing Qt instance-command handler
+through a small authenticated-pipe adapter. Its owner lock is a protected
+Windows file lease, and commands are delivered to Qt's main thread. Other OSs
+retain their current Qt transport. Repeat Windows application launches request
+Show, and independent named windows retain separate endpoints. Shutdown closes
+the listener and owner lease; update busy/draft decisions remain shared.
+
+The new native probes test thread affinity, binary framing/Unicode, immediate
+client close, exclusive ownership, two actual Windows-QPA preview windows,
+duplicate launch, per-window drafts, busy maintenance refusal and live zoom.
+They are awaiting execution and do not claim normal product Quit, installed
+launchers, global shortcuts, hardware rendering or live chat. Local regressions
+pass 574 tests (16 explicit platform/environment skips). ARM64 completes the
+preceding `ae17cc3` primitive/terminal/supervisor checks, but its real DSH setup
+fails with the same empty startup log as x64; the stdio correction has its own
+ongoing run.

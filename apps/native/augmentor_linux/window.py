@@ -1308,23 +1308,33 @@ def main():
     from .shortcuts import COMPONENT
     app.setDesktopFileName(COMPONENT.removesuffix('.desktop'))
     if (not args.preview or args.ui_test_control) and not args.screenshot:
-        runtime = Path(os.environ.get('XDG_RUNTIME_DIR', f'/tmp/augmentor-linux-pi-{os.getuid()}'))
+        if sys.platform == 'win32':
+            from .windows_instance import Client, Lock, Server
+            from .platform_runtime import runtime_directory
+            runtime = runtime_directory()
+        else:
+            Client, Lock, Server = QLocalSocket, QLockFile, QLocalServer
+            runtime = Path(os.environ.get('XDG_RUNTIME_DIR', f'/tmp/augmentor-linux-pi-{os.getuid()}'))
         runtime.mkdir(mode=0o700, exist_ok=True)
         socket_name = str(runtime / (ipc_basename()+'.sock'))
-        client = QLocalSocket()
+        client = Client()
         client.connectToServer(socket_name)
         if client.waitForConnected(300):
-            client.write(b'maintenance.status' if args.onboarding_host or args.ensure_running else b'voice' if args.voice else ('harness:'+args.harness).encode() if args.harness else b'show' if sys.platform=='darwin' else b'toggle')
+            client.write(b'maintenance.status' if args.onboarding_host or args.ensure_running else b'voice' if args.voice else ('harness:'+args.harness).encode() if args.harness else b'show' if sys.platform in ('darwin','win32') else b'toggle')
             client.waitForBytesWritten(500)
+            if sys.platform == 'win32': client.close()
             return 0
-        app.instance_lock = QLockFile(str(runtime / (ipc_basename()+'.lock')))
+        app.instance_lock = Lock(str(runtime / (ipc_basename()+'.lock')))
         if not app.instance_lock.tryLock(200):
             return 1
-        QLocalServer.removeServer(socket_name)
-        app.instance_server = QLocalServer()
-        app.instance_server.setSocketOptions(QLocalServer.SocketOption.UserAccessOption)
+        if sys.platform != 'win32': QLocalServer.removeServer(socket_name)
+        app.instance_server = Server()
+        if sys.platform != 'win32': app.instance_server.setSocketOptions(QLocalServer.SocketOption.UserAccessOption)
         if not app.instance_server.listen(socket_name):
             return 1
+        if sys.platform == 'win32':
+            app.aboutToQuit.connect(app.instance_server.close)
+            app.aboutToQuit.connect(app.instance_lock.close)
     window = Window(preview=args.preview or bool(args.screenshot),harness=args.harness)
     if hasattr(app, 'instance_server'):
         def activate():
