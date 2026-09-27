@@ -2,6 +2,20 @@
 
 # Start here: agent handoff
 
+## September 27 Windows implementation plan — not started
+
+The owner requested a detailed plan before coding. Read the
+[Windows implementation plan](WINDOWS-IMPLEMENTATION-PLAN.md) and its
+[corrected research](WINDOWS-RTX-SPARK-RESEARCH.md). The targets are Windows x64
+and native ARM64, explicitly including **NVIDIA RTX Spark N1X on Windows**.
+Retain one shared Augmentor product across Linux, macOS and Windows. The plan
+specifies work packages W0–W10, installer/runtime proof, platform adapters,
+browser setup, safe coordinated updates and evidence gates. No product code,
+Windows build, CI configuration, installation or release changed in this planning
+work. Implementation awaits the next instruction to build; start with W0 and W1,
+then follow their exit criteria. The existing Mac activation checkpoint below
+remains separate and unchanged.
+
 ## September 27 installed Chromium browser choice
 
 [Browser choice qualification](MACOS-BROWSER-CHOICE.md) records the generic Mac

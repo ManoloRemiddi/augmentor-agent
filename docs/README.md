@@ -21,6 +21,8 @@ of this repository; include reproducible commands and sanitized evidence summari
 
 Current cross-platform direction: [one product, Linux/Mac parity audit and correction sequence](PLATFORM-PARITY-AUDIT.md).
 
+Windows planning: [detailed Windows x64/ARM64 implementation plan, including RTX Spark](WINDOWS-IMPLEMENTATION-PLAN.md) and [corrected research](WINDOWS-RTX-SPARK-RESEARCH.md). Planning only; no Windows implementation or compatibility claim.
+
 ## Start and understand the product
 
 - [Start here: agent handoff](AGENT-HANDOFF.md)
