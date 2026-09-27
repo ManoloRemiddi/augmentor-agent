@@ -59,6 +59,10 @@ jobs:
         if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
         run: |
           & outputs/payload/python/python.exe -B -m unittest discover -s tests -p test_platform_locks.py -v
+      - name: Verify private paths, ACLs and junction refusal
+        if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
+        run: |
+          & outputs/payload/python/python.exe -B -m unittest discover -s tests -p test_windows_identity.py -v
       - name: Stage and exercise actual pinned DSH native dependencies
         run: |
           $env:AUGMENTOR_PWSH = "$PWD/outputs/payload/powershell/pwsh.exe"

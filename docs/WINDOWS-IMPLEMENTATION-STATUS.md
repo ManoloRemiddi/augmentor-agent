@@ -109,3 +109,12 @@ separate-process Linux tests prove shared readers, exclusive maintenance and
 kernel release on abnormal process exit. Windows runs the same tests next.
 It is not yet wired into product services and does not claim compatibility with
 DSH's separate file-lock protocol. Secure paths and transport remain pending.
+
+The next isolated W2 adapter uses pinned pywin32 312 native wheels for Windows
+token identity and ACLs. It creates persistent folders under the OS Local AppData
+known folder with a protected current-user/SYSTEM allow-list, refuses permissive
+existing directories without changing their permissions, and rejects junctions
+and other reparse ancestors. Windows tests exercise owner/ACL readback, reopen,
+permissive-path refusal and junction redirection. It is not yet adopted by the
+application launcher; execution evidence is pending. This adds no global Python
+installation and makes no changes to the owner's machine.
