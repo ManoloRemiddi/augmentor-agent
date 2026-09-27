@@ -8,8 +8,9 @@ Desktop and Browser now open the current thinking box as reasoning streams and
 collapse it when thinking finishes. Answer streaming and manual history controls
 are preserved. See [behavior, tests and deployment boundary](SHARED-SURFACES-2026-09-24.md#live-thinking-visibility--september-27).
 Implementation `6934677` is selected in desktop release
-`20260927-231730-d033f759`. Open windows retain their earlier builds until
-closed/reopened; Browser extension adoption remains pending.
+`20260927-231730-d033f759`. The owner-requested graceful restart is complete: primary, secondary and mobile
+report that build, online/model-ready with voice available and no restoration
+error. Browser extension adoption remains pending.
 
 ## September 26 public Apple-independent macOS preview
 

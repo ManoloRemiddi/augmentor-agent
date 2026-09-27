@@ -62,6 +62,15 @@ login adopts the selected build. The loaded Browser extension is unchanged;
 Browser source adoption requires a separate extension update/reload. No public
 release or Mac installed update is claimed.
 
+The owner then explicitly requested quitting/restarting Augmentor to finish
+adoption. All three idle windows accepted `maintenance.close`; the desktop and
+mobile supervisors and canonical secondary launcher reopened them. Primary,
+secondary and mobile now report `20260927-231730-d033f759`, online/model-ready,
+voice available and no session-restore error. The main window was raised for use.
+This verifies installed build adoption/readiness; thinking behavior was qualified
+by the Qt/DOM fixtures above. Browser extension and Mac rollout remain separate.
+
+
 ## Speech
 
 The sidebar's `voice.mjs` is a presentation/controller binding. The native host

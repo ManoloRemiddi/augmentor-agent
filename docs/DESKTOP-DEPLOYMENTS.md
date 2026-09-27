@@ -7,9 +7,10 @@
 Native implementation `6934677` is selected in `20260927-231730-d033f759`.
 [Shared-surface evidence](SHARED-SURFACES-2026-09-24.md#live-thinking-visibility--september-27)
 records the original artifact, patch, resulting SHA-256 and Qt/activation checks.
-Primary/mobile and secondary remain on their earlier running builds, online with
-voice available and `updatePending: true`; no windows were restarted. Close/reopen
-or the next login adopts the change. Browser source is implemented/tested but the
+After the owner explicitly requested restarting, all three windows accepted
+graceful close and reopened through their canonical launchers/supervisors.
+Primary, secondary and mobile now run the selected build, online/model-ready
+with voice available and no session-restore error. The main window was raised. Browser source is implemented/tested but the
 loaded extension has not been updated.
 
 ## September 25: immediate composer feedback
