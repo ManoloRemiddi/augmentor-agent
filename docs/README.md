@@ -140,7 +140,8 @@ files available only in a developer's working directory.
 
 - [Home desktop tray launcher](HOME-LAUNCHER.md): shared NAS dashboard access, remembered address and login startup.
 
-- [macOS preview release](MACOS-PREVIEW-RELEASE.md) — Apple-independent preview, source artifacts and qualification.
+- [Current Mac preview 2](MACOS-PREVIEW-2-RELEASE.md) — accepted live zoom/flare build, packaging and publication.
+- [Historical macOS preview 1](MACOS-PREVIEW-RELEASE.md) — original Apple-independent preview qualification.
 - [Mac customer guide](MACOS-PREVIEW.html) — install, model connection and browser extension.
 - [Mac library replacement](MACOS-LIBRARY-REPLACEMENT.md) — LGPL source and installation material.
 

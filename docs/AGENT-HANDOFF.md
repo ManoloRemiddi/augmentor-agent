@@ -2,6 +2,15 @@
 
 # Start here: agent handoff
 
+## September 27 Mac preview 2 publication
+
+The owner accepted the installed fix and requested public release. PR #16 is
+merged at `482a63a`; the release carries the exact accepted `b8dac9d` app, not a
+new runtime build. Read [Mac preview 2](MACOS-PREVIEW-2-RELEASE.md) for the DMG,
+source provenance, release verification and fresh-install qualification. Keep
+public preview limits visible. Linux downloads and the owner's installed Mac
+are unchanged by publication. Historical checkpoints below retain earlier scope.
+
 ## September 27 live zoom correction
 
 The owner accepts the flare fix. The earlier size slider only affected startup;

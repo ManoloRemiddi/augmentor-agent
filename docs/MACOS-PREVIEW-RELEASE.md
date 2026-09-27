@@ -1,6 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-# macOS 0.2.12 preview release
+# macOS 0.2.12 preview releases
+
+**Current: [Mac preview 2](MACOS-PREVIEW-2-RELEASE.md)**, the user-accepted live zoom,
+flare transparency and managed setup correction. The record below is historical
+preview 1 evidence; its binary, setup form and Qt trimming policy are not the
+current release. Preview 2 retains the required Qt Quick/Declarative closure and
+uses the full matching source archive.
+
+## Historical preview 1 release
 
 The owner explicitly approved direct distribution without Apple Developer ID or
 notarization after Apple enrollment failed. This supersedes the Apple prerequisite

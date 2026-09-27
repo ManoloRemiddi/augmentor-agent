@@ -27,8 +27,11 @@ The clean artifact from **`b8dac9d36ab3e2d91c2d532e05638e89fa7910e5`** is instal
 at `/Applications/Augmentor Agent Desktop.app` on the 32 GB Mac, replacing `7ff6712`.
 The user's saved **120%** was preserved; the primary process reports 1.2 DPR and
 metric factor 1, online and model-ready with no connection/restoration error.
-The branch is `fix/macos-recovery-parity`, [PR #16](https://github.com/ManoloRemiddi/augmentor-agent/pull/16).
-The public website download and selected Linux installation are unchanged.
+[PR #16](https://github.com/ManoloRemiddi/augmentor-agent/pull/16) merged into `main`
+at `482a63a4503b8b0dfc151e65ef706ff8df919a60`. The difference from the sealed
+`b8dac9d` binary source is documentation only. The owner accepted the installed fix.
+[Mac preview 2](MACOS-PREVIEW-2-RELEASE.md) records its public packaging and
+publication; the selected Linux installation is unchanged.
 
 - ZIP SHA-256: `9445e86466fe917abde886ac829ba5199cd58fa385ef23fd0debf5a61d16b02e`,
   339,767,464 bytes, `augmentor-desktop-0.2.12-macos-arm64-preview.zip`.
@@ -56,8 +59,10 @@ The public website download and selected Linux installation are unchanged.
   unregistered. Final read-back finds exactly one Spotlight app, one LaunchServices
   application registration and one Dock tile.
 
-Mac 14/26 and full repository CI were dispatched for the exact source revision;
-the final workflow results are recorded below when available.
+Both workflows passed at documentation head `4b24c9c507313bc1d65e07883ec4b124fa21cdcd`:
+[macOS 14/26](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36316148621)
+and [full repository validation](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36316148628).
+Runtime code matches the sealed `b8dac9d` artifact.
 
 The new proof exercises actual pointer drags through 150%, 75%, 130% and back to
 110%, asserting visible window, font and button dimensions, saved settings and an

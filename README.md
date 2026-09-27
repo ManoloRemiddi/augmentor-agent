@@ -8,8 +8,9 @@ deferred. This repository maintains both interfaces and their harness adapters.
 
 DSH is the full-featured release target. Pi supports a declared subset; extensions
 for features that currently require DSH plugins are future work. OpenCode support
-has been retired, with its existing user data retained. macOS is under development;
-successful development tests do not yet establish a public release.
+has been retired, with its existing user data retained. An Apple silicon
+[macOS preview](docs/MACOS-PREVIEW-2-RELEASE.md) is available with explicit
+first-launch approval and manual browser-extension setup.
 
 Augmentor is currently a **development preview**. The release manifest is
 [release/product.json](release/product.json). The Linux packages bundle the tested
@@ -142,3 +143,10 @@ or reselling Augmentor, including modified versions, requires prior written
 permission from Manolo Remiddi. This is public source under a custom license.
 Earlier releases retain their shipped licenses. Redistributed components retain their own licenses;
 see [licensing](docs/LICENSING.md) and the installed **About & licenses** view.
+
+## September 27 Mac preview 2
+
+The Apple silicon [Mac preview](https://augmentoragent.com/macos.html) now includes
+the accepted flare transparency, live App size and guided DSH setup corrections.
+See the [release record](docs/MACOS-PREVIEW-2-RELEASE.md) for exact artifact identity,
+qualification and preview limitations. The Debian download remains unchanged.
