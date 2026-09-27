@@ -30,6 +30,7 @@ class Controller(QObject):
     interaction = Signal(dict)
     sent = Signal(str)
     submission_failed = Signal(str)
+    submission_progress = Signal(object, str, int)
     history = Signal(list)
     recovered = Signal(list, bool)
     connection = Signal(bool)
@@ -450,15 +451,18 @@ class Controller(QObject):
         def work():
             accepted = False
             try:
+                self.submission_progress.emit(generation, "Checking selected model…", 1)
                 self.client.validate_model(selection)
                 if cancelled.is_set():
                     return
                 if edit_from:
                     if edit_from['sessionId']!=self.session:raise ContractError('The conversation changed. Choose Edit again.')
+                    self.submission_progress.emit(generation, 'Creating edited conversation…', 2)
                     row=self.client.call('session.branch',{'sessionId':self.session,'newSessionId':self.preset+'-'+uuid.uuid4().hex,'messageSeq':edit_from['seq'],'mode':'edit'})
                     self.attach_branch(row)
                     if cancelled.is_set():return
                 if not self.session:
+                    self.submission_progress.emit(generation, 'Creating conversation…', 2)
                     session = self.preset+'-' + uuid.uuid4().hex
                     cwd = self.client.workspace() if hasattr(self.client,'workspace') else Path(os.environ.get('AUGMENTOR_PI_WORKSPACE',Path.home() / 'Augmentor Linux Pi'))
                     cwd.mkdir(mode=0o700, exist_ok=True)
@@ -466,17 +470,22 @@ class Controller(QObject):
                     self.session = session
                     self.save_session()
                     self.session_info.emit({'sessionId':session,'saved':False,'readOnly':False})
+                self.submission_progress.emit(generation, 'Applying selected model…', 3)
                 self.client.call('session.selectModel', {'sessionId': self.session, 'provider': selection['provider'], 'model': selection['model']})
                 self.selection=selection
                 if edit_from:self.selection_changed.emit(selection)
                 self.save_session()
-                if not self.connected or not self.stream or self.stream.session!=self.session:self.subscribe(self.session)
+                if not self.connected or not self.stream or self.stream.session!=self.session:
+                    self.submission_progress.emit(generation, 'Connecting to conversation…', 4)
+                    self.subscribe(self.session)
                 if cancelled.is_set():
                     return
+                self.submission_progress.emit(generation, 'Sending message to agent…', 5)
                 response = self.client.call('session.prompt', {'sessionId': self.session, 'mode': 'queue', 'requestId': request_id or str(uuid.uuid4()), 'content': [{'type': 'text', 'text': text}]})
                 if response.get('accepted') is not True:
                     raise ContractError('The harness did not accept the message.')
                 accepted = True
+                self.submission_progress.emit(generation, 'Message accepted; waiting for agent…', 6)
                 self.sent.emit(text)
                 if response.get('command'):
                     with self.events_lock:

@@ -71,6 +71,52 @@ This verifies installed build adoption/readiness; thinking behavior was qualifie
 by the Qt/DOM fixtures above. Browser extension and Mac rollout remain separate.
 
 
+## Request progress before thinking · September 27
+
+The transient line under a submitted prompt reports observed stages, then is
+removed as thinking or answer text arrives. It is not saved as conversation text.
+Native submission operations report checking the selected model, creating a new
+or edited conversation when needed, applying the selection, connecting the event
+stream when needed, sending the prompt, and confirmed acceptance. Generation and
+stage guards prevent a late acknowledgement from replacing current output.
+
+| Signal | Visible label | What it establishes |
+| --- | --- | --- |
+| Local submission | Submitting message… | The UI has started submission; no backend acceptance claimed |
+| Model validation call | Checking selected model… | Validation is in progress |
+| Session creation/branch call | Creating conversation… / Creating edited conversation… | That operation is in progress |
+| Model selection call | Applying selected model… | Session selection is being applied |
+| Event subscription | Connecting to conversation… | The UI is opening its event connection |
+| Prompt RPC | Sending message to agent… | Submission is in progress |
+| Accepted RPC result | Message accepted; waiting for agent… | Agent acceptance is confirmed |
+| Live `turn/start` | Agent started; waiting for next step… | A turn started; pre-step work is not individually reported |
+| Live `step/start` | Building model request… | DSH has entered its request-building step |
+| Assistant stream `start` | Waiting for the model’s first output… | The harness has opened a model attempt; no content has arrived |
+| Tool call chunk | Receiving a tool request from the model… | Tool-request output has arrived |
+
+Both DSH transports now forward the existing process-local assistant stream
+opening as unsequenced `assistant/start`. It does not mutate DSH history or change
+requests, model settings, memory work or reasoning. The provider does **not**
+report queueing versus prompt prefill here, so neither is claimed. No elapsed-time
+heuristics or invented percentages advance the labels. Request/context/header
+records describe configuration and are not treated as proof of provider activity.
+Pi retains its available submission/turn signals; no extra reasoning is exposed.
+
+Browser uses its observed submit/accept, turn, step and stream events. The more
+detailed local native setup labels are not inferred for Browser. Completed history
+has no pending row; output, tool handoff, terminal events, idle/error and navigation
+clear it. Desktop connection loss reports reconnecting while waiting. Existing
+manual thinking controls, scrolling, message text and voice behavior are retained.
+
+Qualification: full native workspace suite, focused real Qt tests, Browser DOM
+fixtures and a loopback WebSocket transport test. The latter verifies that the
+start marker reaches Browser before a reasoning chunk; native transport fixtures
+verify the same ordering. No real-provider queue/prefill telemetry is claimed.
+The full native workspace suite ran 505 tests successfully (two macOS-only
+skips). Final focused native checks passed 41 tests, including window/controller
+regressions; Browser plus transport checks passed 53 tests. Installed adoption is
+recorded below after staging.
+
 ## Speech
 
 The sidebar's `voice.mjs` is a presentation/controller binding. The native host

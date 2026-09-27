@@ -229,3 +229,35 @@ for (const boundary of ['text','end','tool','stop','idle','history']) {
     assert.equal(log.querySelector('.md').textContent.trim(),'Saved answer')
   })
 }
+
+test('observed request stages replace waiting with thinking and ignore late acceptance',async t=>{
+  const dom=new JSDOM('<div id="log"></div>',{pretendToBeVisual:true})
+  globalThis.window=dom.window;globalThis.document=dom.window.document
+  globalThis.requestAnimationFrame=window.requestAnimationFrame.bind(window)
+  globalThis.cancelAnimationFrame=window.cancelAnimationFrame.bind(window);window.marked=marked
+  const log=document.querySelector('#log'),ui=createChatUI({log});t.after(()=>{ui.clear();dom.window.close()})
+  let seq=0
+  const event=(type,data={})=>ui.applyLog([{kind:'event',event:{seq:seq++,type,data}}])
+  ui.pendingPrompt('Fixture prompt');ui.promptAccepted()
+  assert.match(log.querySelector('.response-progress').textContent,/Message accepted/)
+  event('turn/start');event('step/start')
+  assert.equal(log.querySelector('.response-progress').textContent,'Building model request…')
+  event('user/message',{source:{kind:'user'},content:[{type:'text',text:'Fixture prompt'}]})
+  assert.equal(log.lastElementChild.classList.contains('response-progress'),true)
+  event('assistant/start')
+  assert.equal(log.querySelector('.response-progress').textContent,'Waiting for the model’s first output…')
+  ui.promptAccepted()
+  assert.match(log.querySelector('.response-progress').textContent,/first output/)
+  event('assistant/chunk',{chunk:{type:'reasoning-delta',text:'Live thought'}})
+  await new Promise(resolve=>setTimeout(resolve,40))
+  assert.equal(log.querySelector('.response-progress'),null)
+  assert.equal(log.querySelector('.think').open,true)
+  ui.promptAccepted();assert.equal(log.querySelector('.response-progress'),null)
+  event('assistant/chunk',{chunk:{type:'text-delta',text:'Answer'}})
+  assert.equal(log.querySelector('.think').open,false)
+  event('assistant/message',{message:{content:[{type:'text',text:'Answer'}]}})
+  event('step/start');assert.ok(log.querySelector('.response-progress'))
+  event('turn/end');assert.equal(log.querySelector('.response-progress'),null)
+  ui.clear();event('step/start');event('assistant/message',{message:{content:[{type:'text',text:'History answer'}]}})
+  assert.equal(log.querySelector('.response-progress'),null)
+})

@@ -255,6 +255,8 @@ export function createChatUI(els) {
   let reasoningRaw = ''
   let reasoningActive = false
   let reasoningTimer = null // frameOr() handle
+  let progressEl = null
+  let progressRank = 0
   let maxSeq = -1
   const pendingPrompts = new Set()
   function confirmPrompt(text) {
@@ -393,6 +395,22 @@ export function createChatUI(els) {
     })
   }
 
+  function showProgress(text, rank = 0) {
+    progressRank = rank
+    if (!progressEl) {
+      progressEl = el('div', 'msg assistant response-progress')
+      progressEl.setAttribute('role', 'status')
+      $log.appendChild(progressEl)
+    }
+    progressEl.textContent = text
+  }
+
+  function clearProgress() {
+    progressEl?.remove()
+    progressEl = null
+    progressRank = 0
+  }
+
   function finishThinking() {
     if (!reasoningActive) return
     renderReasoningNow()
@@ -473,6 +491,13 @@ export function createChatUI(els) {
     const data = ev.data ?? {}
     const t = entry.t ?? Date.now()
 
+    if (ev.type === 'turn/start') showProgress('Agent started; waiting for next step…', 7)
+    else if (ev.type === 'step/start') showProgress('Building model request…', 8)
+    else if (ev.type === 'assistant/start') showProgress('Waiting for the model’s first output…', 9)
+    else if (ev.type === 'assistant/chunk' && ['text-delta','reasoning-delta'].includes(data.chunk?.type) && data.chunk.text) clearProgress()
+    else if (ev.type === 'assistant/chunk' && ['tool-call-start','tool-call-delta','tool-call'].includes(data.chunk?.type)) showProgress('Receiving a tool request from the model…', 10)
+    else if (['assistant/message','tool/call','step/end','turn/end','runtime/error','error','command/done'].includes(ev.type)) clearProgress()
+
     switch (ev.type) {
       case 'command/run':
       case 'command/done': {
@@ -533,6 +558,7 @@ export function createChatUI(els) {
         stack.appendChild(actions)
         m.appendChild(stack)
         $log.appendChild(m)
+        if (progressEl) $log.appendChild(progressEl)
         // The user just sent a prompt (or history is replaying): land at the
         // tail so the reply is visible.
         scroll(true)
@@ -755,6 +781,7 @@ export function createChatUI(els) {
       return maxSeq
     },
     setState(state) {
+      if (state.phase === 'error' || state.phase === 'disconnected' || (ui.state.running && state.running === false)) clearProgress()
       if (state.running === false) finishThinking()
       ui.state = { ...ui.state, ...state }
       updateChrome()
@@ -765,17 +792,25 @@ export function createChatUI(els) {
       node.append(el('span', 'who', 'You · Sending…'), el('div', 'userbody', text))
       node.style.whiteSpace = 'pre-wrap'
       const pending = {text, node, confirmed:false}
-      pendingPrompts.add(pending); $log.append(node); scroll(true)
+      pendingPrompts.add(pending); $log.append(node)
+      showProgress('Submitting message…')
+      scroll(true)
       return pending
     },
+    promptAccepted() {
+      if (progressEl && progressRank < 7) showProgress('Message accepted; waiting for agent…', 6)
+    },
     removePending(pending) {
+      clearProgress()
       pending.node.remove(); pendingPrompts.delete(pending)
     },
     sendFail(text) {
+      clearProgress()
       $log.appendChild(el('div', 'toolresult err', `send failed: ${text}`))
       scroll(true)
     },
     clear({preservePending = false} = {}) {
+      clearProgress()
       $log.innerHTML = ''
       if (preservePending) for (const pending of pendingPrompts) $log.append(pending.node)
       else pendingPrompts.clear()
