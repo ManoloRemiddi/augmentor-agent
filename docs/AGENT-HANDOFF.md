@@ -129,6 +129,14 @@ The qualified candidate is now installed and reopened on the 32 GB Mac after
 the owner closed its earlier window. Integrity, the native process and shortcut
 service were checked; model setup remains unfinished. Both full validation and
 the Mac 14/26 workflow passed at `6bead5a`. The published preview DMG is unchanged.
+## September 27 tool context correction
+
+[Tool context budget](CONTEXT-BUDGET.md) separates per-result trimming from the
+model-relative compaction trigger. Both personal presets compose the existing
+DSH pruner at step boundaries, retain original evidence with bounded excerpts,
+and expose `/trim-tools` for idle conversations without inference. Repeated
+identical outputs produce one reassessment checkpoint. Consult its qualification
+and installed evidence before assuming a running host has adopted this change.
 
 ## September 26 public Apple-independent macOS preview
 

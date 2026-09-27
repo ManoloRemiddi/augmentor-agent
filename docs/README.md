@@ -150,3 +150,4 @@ files available only in a developer's working directory.
 - [Shared desktop flare fidelity](FLARE-FIDELITY.md): sampling correction, bounded fluid transport and Mac/Linux validation.
 
 - [Live app zoom correction and qualification](MACOS-LIVE-ZOOM-2026-09-27.md)
+- [Tool context budget](CONTEXT-BUDGET.md): early pruning, original-result excerpts and deterministic repair of existing conversations.
