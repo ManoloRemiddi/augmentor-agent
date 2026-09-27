@@ -88,6 +88,16 @@ def main():
         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=subprocess.CREATE_NO_WINDOW)
     try:
         wait_for(lambda: owner.request('status', root=root))
+        from platform_adapters.processes import OwnedProcess
+        version = OwnedProcess([str(root/'node/node.exe'), os.environ['AUGMENTOR_DSH_CLI'], '--version'],
+            stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        try:
+            stdout, stderr = version.process.communicate(timeout=20)
+            assert version.wait(timeout=5) == 0, stderr.decode('utf-8', errors='replace')
+            assert stdout.decode('utf-8').strip() == '0.1.5-rc.1', repr(stdout)
+            report['ownedCliVersion'] = '0.1.5-rc.1'
+        finally:
+            version.terminate(); version.wait(timeout=5)
         result = managed.provision(root, state, {'url': f'http://127.0.0.1:{server.server_port}/v1',
             'model': 'fixture', 'apiKey': 'fixture-only-key', 'context': 32768},
             agent=agent, manager_type='windows-supervisor')

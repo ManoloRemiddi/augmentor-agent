@@ -100,7 +100,7 @@ def configure_product(app, cli, home, endpoint, env, state, *, save=True):
                                  env=env,stdout=log,stderr=log)
         deadline=time.monotonic()+60
         while time.monotonic()<deadline:
-            if process.poll() is not None:raise RuntimeError('The new DSH runtime stopped. Private diagnostic: '+str(log_path))
+            if process.poll() is not None:raise RuntimeError('The new DSH runtime stopped (exit '+str(process.poll())+'). Private diagnostic: '+str(log_path))
             matches=re.findall(r'token=([A-Za-z0-9_-]+)',log_path.read_text(errors='replace'))
             if matches:
                 try:

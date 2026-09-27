@@ -374,3 +374,21 @@ regressions and a separate-process lease/crash test. Mac CI now explicitly adds
 these shared setup, private-file, voice and recovery suites. Both complete Mac
 14/26 artifact workflows pass at the preceding `ae17cc3`; current additions still
 require their own native runs.
+
+At `ae17cc3`, x64 passes all native primitives, real supervisor arbitration,
+private records, common setup fixtures, browser-voice shutdown and terminal
+checks. Production dependencies assemble successfully, but actual DSH web
+bootstrap exits and its log is empty. The process helper forwarded inheritable
+handles without explicitly selecting its child's standard streams. It now
+passes stdin/stdout/stderr explicitly (the Windows STARTF_USESTDHANDLES contract)
+and gains a binary/Unicode round-trip test. The managed proof also checks the
+actual DSH CLI version through that owned helper, and bootstrap failures include
+the numeric exit code. This is a diagnosed logging gap and candidate startup
+correction, not a claim that the full DSH bootstrap now works.
+
+The generated candidate records its actual checked-out commit; PR jobs may use
+GitHub's synthetic merge commit (x64 `ae17cc3` run records `6afaefc...`) rather than
+the branch head. These are CI development payloads, not promoted release sources.
+Both complete Mac artifact workflows and Linux/Home/Browser/installed-package
+validation pass for `ae17cc3`; subsequent recovery/stdio changes need their own
+results. The source remains on draft PR #20 and no installed user app changed.

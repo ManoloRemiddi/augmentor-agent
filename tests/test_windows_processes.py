@@ -15,6 +15,26 @@ sys.path.insert(0, str(ROOT/'services'))
 
 @unittest.skipUnless(sys.platform == 'win32', 'requires Windows Job objects')
 class WindowsProcessTests(unittest.TestCase):
+    def test_binary_stdio_and_unicode_environment_reach_contained_workload(self):
+        from platform_adapters.processes import OwnedProcess
+        code = '''import os,sys
+value=sys.stdin.buffer.read()
+sys.stdout.buffer.write(value+os.environ['AUGMENTOR_STDIO_FIXTURE'].encode('utf-8'))
+sys.stdout.buffer.flush()
+sys.stderr.buffer.write(b'fixture-stderr')
+sys.stderr.buffer.flush()
+'''
+        child = OwnedProcess([sys.executable, '-Xutf8', '-c', code], stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            env={**os.environ, 'AUGMENTOR_STDIO_FIXTURE': 'café 秘密'})
+        try:
+            output, errors = child.process.communicate(b'\x00binary\xff', timeout=10)
+            self.assertEqual(child.wait(timeout=5), 0)
+            self.assertEqual(output, b'\x00binary\xff'+'café 秘密'.encode('utf-8'))
+            self.assertEqual(errors, b'fixture-stderr')
+        finally:
+            child.terminate(); child.wait(timeout=5)
+
     def test_owner_crash_stops_parent_and_detached_grandchild(self):
         import win32api
         import win32con

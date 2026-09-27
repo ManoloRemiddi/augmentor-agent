@@ -22,7 +22,13 @@ def main():
         win32api.CloseHandle(handle)
     # The target inherits existing binary protocol or log handles, never a shell
     # command string. Nested children inherit containment even when detached.
-    child = subprocess.Popen(sys.argv[2:], close_fds=False, creationflags=subprocess.CREATE_NO_WINDOW)
+    # Explicit STARTF_USESTDHANDLES is needed for another console-free child;
+    # merely inheriting handles does not reliably select them as its stdio.
+    # The Job handle is already closed and is never inherited by the workload.
+    child = subprocess.Popen(sys.argv[2:], close_fds=True, creationflags=subprocess.CREATE_NO_WINDOW,
+        stdin=sys.stdin if sys.stdin is not None else subprocess.DEVNULL,
+        stdout=sys.stdout if sys.stdout is not None else subprocess.DEVNULL,
+        stderr=sys.stderr if sys.stderr is not None else subprocess.DEVNULL)
     return child.wait()
 
 
