@@ -7,7 +7,10 @@
 The owner accepts the flare fix. The earlier size slider only affected startup;
 the shared replacement resizes the existing interface immediately and preserves
 active work. Read [live zoom qualification](MACOS-LIVE-ZOOM-2026-09-27.md) for current
-source, package and deployment evidence. The older startup-only record below is
+source, package and deployment evidence. The sealed `b8dac9d` artifact is now
+installed on the 32 GB Mac, retaining the owner's 120% setting. Native pointer
+drags and zoom during a real reply pass; model settings and conversations remain
+intact. The older startup-only record below is
 historical; do not reinstate its restart instruction.
 
 ## September 27 transparency and app size — historical checkpoint
