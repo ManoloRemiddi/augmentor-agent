@@ -6,7 +6,7 @@ import subprocess
 import sys
 from PySide6.QtCore import Qt, QUrl
 from PySide6.QtGui import QDesktopServices
-from PySide6.QtWidgets import QApplication, QComboBox, QDialog, QFileDialog, QLabel, QPushButton, QVBoxLayout
+from PySide6.QtWidgets import QApplication, QComboBox, QDialog, QFileDialog, QLabel, QPushButton, QSizePolicy, QVBoxLayout
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -18,12 +18,13 @@ def available():
 class MacBrowserSetupDialog(QDialog):
     def __init__(self, owner):
         super().__init__(owner)
-        self.setWindowTitle('Add Augmentor to your browser'); self.resize(500, 310)
+        self.setWindowTitle('Add Augmentor to your browser'); self.resize(540, 440)
         self.directory = None; self.data_directory = None
         spec = importlib.util.spec_from_file_location('mac_browser_registrar', ROOT/'scripts/register-macos-browser.py')
         self.registrar = importlib.util.module_from_spec(spec); spec.loader.exec_module(self.registrar)
         layout = QVBoxLayout(self)
         note = QLabel('This preview uses a manually loaded extension. Prepare it here, then open your browser’s Extensions page, enable Developer mode and choose Load unpacked. Your browser controls the final installation.')
+        note.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
         note.setWordWrap(True); layout.addWidget(note)
         self.browser = QComboBox()
         self.browser.setAccessibleName('Installed Chromium browser')
@@ -34,7 +35,8 @@ class MacBrowserSetupDialog(QDialog):
         self.choose_button = QPushButton('Choose another browser app…')
         self.choose_button.clicked.connect(self.choose_browser); layout.addWidget(self.choose_button)
         self.prepare_button = QPushButton('Prepare browser extension'); self.prepare_button.clicked.connect(self.prepare); layout.addWidget(self.prepare_button)
-        self.status = QLabel(''); self.status.setWordWrap(True); layout.addWidget(self.status)
+        self.status = QLabel(''); self.status.setWordWrap(True)
+        self.status.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum); layout.addWidget(self.status)
         self.data_button = QPushButton('Choose browser data folder…'); self.data_button.setVisible(False)
         self.data_button.clicked.connect(self.choose_data_directory); layout.addWidget(self.data_button)
         self.copy_button = QPushButton('Copy extension folder address'); self.copy_button.setEnabled(False)

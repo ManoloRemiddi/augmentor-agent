@@ -26,7 +26,11 @@ def browser_application(app):
     app = Path(app).expanduser().resolve(strict=True)
     if app.suffix != '.app':
         raise ValueError('Choose a Chromium-based browser application (.app).')
-    info = plistlib.loads((app/'Contents/Info.plist').read_bytes())
+    try: info = plistlib.loads((app/'Contents/Info.plist').read_bytes())
+    except (OSError, plistlib.InvalidFileException, ValueError) as error:
+        raise ValueError('The selected app does not have valid application information.') from error
+    if not isinstance(info, dict):
+        raise ValueError('The selected app does not have valid application information.')
     executable = info.get('CFBundleExecutable', '')
     if not executable or Path(executable).name != executable:
         raise ValueError('The selected browser has an invalid executable.')

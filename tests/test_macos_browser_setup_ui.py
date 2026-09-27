@@ -17,6 +17,7 @@ class MacBrowserSetupUiTests(unittest.TestCase):
         self.addCleanup(self.dialog.close)
 
     def test_picker_selects_exact_app_and_open_uses_that_path(self):
+        self.dialog.show(); self.app.processEvents()
         browser={'name':'Comet','app':'/Applications/Comet.app'}
         with patch.object(setup.QFileDialog,'getOpenFileName',return_value=(browser['app'],'')), \
              patch.object(self.dialog.registrar,'browser_application',return_value=browser):
@@ -27,6 +28,8 @@ class MacBrowserSetupUiTests(unittest.TestCase):
             self.dialog.prepare_button.click()
         self.assertEqual(prepare.call_args.args[1],browser['app'])
         self.assertTrue(self.dialog.page_button.isEnabled());self.assertTrue(self.dialog.browser.isEnabled())
+        self.app.processEvents()
+        self.assertGreaterEqual(self.dialog.status.height(),self.dialog.status.heightForWidth(self.dialog.status.width()))
         with patch.object(setup.subprocess,'run',return_value=SimpleNamespace(returncode=0)) as launch:
             self.dialog.page_button.click()
         self.assertEqual(launch.call_args.args[0],['/usr/bin/open','-a',browser['app'],'chrome://extensions'])

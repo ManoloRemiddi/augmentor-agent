@@ -48,6 +48,14 @@ class MacBrowserRegistrationTests(unittest.TestCase):
             self.assertEqual(state.read_text(),'preserved')
             with self.assertRaisesRegex(ValueError,'Local State'):module.browser_data_directory(app,support,custom/'Default')
 
+    def test_malformed_app_is_skipped_and_picker_gets_actionable_error(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary);app=root/'Broken.app';info=app/'Contents/Info.plist';info.parent.mkdir(parents=True)
+            for data in (b'not a plist',plistlib.dumps(['unexpected'])):
+                info.write_bytes(data)
+                self.assertEqual(module.installed_browsers([root]),[])
+                with self.assertRaisesRegex(ValueError,'valid application information'):module.browser_application(app)
+
     def test_data_paths_cannot_escape_or_follow_symlinks(self):
         with tempfile.TemporaryDirectory() as temporary:
             root=Path(temporary);support=root/'support';support.mkdir()
