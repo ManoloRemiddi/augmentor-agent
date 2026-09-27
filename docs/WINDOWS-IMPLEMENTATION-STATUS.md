@@ -289,3 +289,19 @@ those diagnostic streams were incorrectly counted as new terminal resources.
 The probe now initializes both streams before comparison; it still requires
 natural Node exit and independently checks for surviving console hosts. Native
 rerun is required, and the supervisor failure still awaits its retained traceback.
+
+The Mac first-run transaction now lives in `services/dsh/managed.py`, with service
+ownership supplied by the OS entrypoint. Mac preserves LaunchAgent registration
+and its external entrypoint/test seams; Windows will supply the per-user supervisor.
+Both use one model-validation, readiness, retry and connection-save sequence.
+Private JSON records validate opened regular/single-link files; Windows creates
+protected current-user/SYSTEM ACLs, while Unix retains private modes. Atomic
+replacement preserves an existing record if serialization fails.
+
+The extraction passes all 565 local native tests (13 platform/environment skips),
+including all 17 existing managed-Mac regressions and new common private-file and
+setup fixtures. Native Windows and complete Mac artifact checks remain required.
+At `635d0a9`, x64's prepared DSH payload now passes all four terminal dialogues,
+resource release, absence of console hosts, and natural shutdown. The same run
+finds separate directory-link, process-owner and DSH-setup test failures; these
+are not treated as a green Windows job or working installed application.

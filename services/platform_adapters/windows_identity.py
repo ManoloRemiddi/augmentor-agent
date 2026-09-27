@@ -99,20 +99,27 @@ def require_private_descriptor(descriptor):
 
 def private_lock_descriptor(path):
     """Open a private, regular, single-link lease file without following a reparse."""
+    return private_file_descriptor(path, writable=True, create=True)
+
+
+def private_file_descriptor(path, *, writable=False, create=False, exclusive=False):
+    """Read or create a protected ordinary file; validate the opened object."""
     import msvcrt
     path = reject_reparse_ancestors(path)
     private_directory(path.parent)
-    handle = win32file.CreateFile(str(path), win32con.GENERIC_READ | win32con.GENERIC_WRITE,
+    disposition = win32con.CREATE_NEW if exclusive else win32con.OPEN_ALWAYS if create else win32con.OPEN_EXISTING
+    access = win32con.GENERIC_READ | (win32con.GENERIC_WRITE if writable else 0)
+    handle = win32file.CreateFile(str(path), access,
         win32con.FILE_SHARE_READ | win32con.FILE_SHARE_WRITE, security_attributes(),
-        win32con.OPEN_ALWAYS, win32file.FILE_FLAG_OPEN_REPARSE_POINT, None)
+        disposition, win32file.FILE_FLAG_OPEN_REPARSE_POINT, None)
     try:
         info = win32file.GetFileInformationByHandle(handle)
         if info[0] & (stat.FILE_ATTRIBUTE_REPARSE_POINT | stat.FILE_ATTRIBUTE_DIRECTORY) or info[7] != 1:
-            raise PermissionError('The installation lease must be an ordinary single-link file.')
+            raise PermissionError('The private file must be an ordinary single-link file.')
         descriptor = win32security.GetSecurityInfo(handle, win32security.SE_FILE_OBJECT,
             win32security.OWNER_SECURITY_INFORMATION | win32security.DACL_SECURITY_INFORMATION)
         require_private_descriptor(descriptor)
-        return msvcrt.open_osfhandle(handle.Detach(), os.O_RDWR | os.O_BINARY)
+        return msvcrt.open_osfhandle(handle.Detach(), (os.O_RDWR if writable else os.O_RDONLY) | os.O_BINARY)
     finally:
         handle.Close()
 
