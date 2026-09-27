@@ -2,6 +2,17 @@
 
 # Start here: agent handoff
 
+## September 27 observed progress before thinking
+
+Implementation `d943ad2` adds transient, event-backed submission/request labels
+before the first thinking or answer text. The existing DSH stream-opening marker
+is forwarded to both surfaces; queueing and prompt prefill are not inferred.
+See [label meanings, tests and installation evidence](SHARED-SURFACES-2026-09-24.md#request-progress-before-thinking--september-27).
+Release `20260927-234746-0c414bcb` is selected and running in primary, secondary
+and mobile after the owner-authorized graceful restart. All are online/model-ready
+with voice available and no pending update or session-restore error. Browser
+source is tested; its loaded extension and installed Mac remain unchanged.
+
 ## September 27 live thinking visibility
 
 Desktop and Browser now open the current thinking box as reasoning streams and

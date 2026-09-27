@@ -2,6 +2,16 @@
 
 # Consistent installed desktop releases
 
+## September 27: observed request progress
+
+Native patch `d943ad2` over `20260927-231730-d033f759` is staged, selected and
+running as `20260927-234746-0c414bcb`. The candidate passed 64 focused native
+checks and authenticated promotion. All three idle windows were gracefully
+closed and restarted through their canonical launchers/supervisors; all report
+online/model-ready, voice available and no pending update or restoration error.
+The main window was raised. [Progress evidence](SHARED-SURFACES-2026-09-24.md#request-progress-before-thinking--september-27)
+records exact hashes, label semantics and remaining Browser/Mac adoption.
+
 ## September 27: live thinking box
 
 Native implementation `6934677` is selected in `20260927-231730-d033f759`.

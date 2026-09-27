@@ -114,8 +114,22 @@ start marker reaches Browser before a reasoning chunk; native transport fixtures
 verify the same ordering. No real-provider queue/prefill telemetry is claimed.
 The full native workspace suite ran 505 tests successfully (two macOS-only
 skips). Final focused native checks passed 41 tests, including window/controller
-regressions; Browser plus transport checks passed 53 tests. Installed adoption is
-recorded below after staging.
+regressions; Browser plus transport checks passed 53 tests.
+
+Implementation `d943ad2` is applied as a native-only patch over selected artifact
+`20260927-231730-d033f759` (SHA-256
+`70a1ed52e61e414f887089f1fb2a5ae4c31e0135b33d98ae8c182a077e27d2fb`).
+The compatible candidate passed 64 focused Qt/controller/transport tests, stage
+validation and authenticated activation. Managed release
+`20260927-234746-0c414bcb`, artifact SHA-256
+`7f43ebcdbf87f24709a59563583dbb4c97726345ed9313dcd7fa275045bd3a72`,
+is selected. All three idle windows accepted graceful close and were restarted
+through the canonical launchers/supervisors as the owner requested. Primary,
+secondary and mobile now run that release, online/model-ready with voice available,
+no session-restore error and `updatePending: false`. The main window is open.
+This is installed build/readiness evidence plus synthetic progress fixtures;
+no user conversation was submitted for testing. Browser extension adoption and
+Mac installed rollout remain pending.
 
 ## Speech
 
