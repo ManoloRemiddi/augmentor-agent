@@ -17,10 +17,21 @@ class OwnedProcess:
     def __init__(self, argv, **kwargs):
         self.job = None
         if sys.platform == 'win32':
+            import ctypes
+            from ctypes import wintypes
             import win32api
             import win32con
             import win32job
-            self.job = win32job.CreateJobObject(None, None)
+            # pywin32 312 rejects a null name in this binding. Call the Unicode
+            # kernel API explicitly so the Job is truly unnamed, without a
+            # guessable global name or an ambiguous empty-string substitute.
+            create = ctypes.WinDLL('kernel32', use_last_error=True).CreateJobObjectW
+            create.argtypes = [ctypes.c_void_p, wintypes.LPCWSTR]
+            create.restype = wintypes.HANDLE
+            self.job = create(None, None)
+            if not self.job:
+                self.job = None
+                raise ctypes.WinError(ctypes.get_last_error())
             limits = win32job.QueryInformationJobObject(self.job, win32job.JobObjectExtendedLimitInformation)
             limits['BasicLimitInformation']['LimitFlags'] |= win32job.JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
             win32job.SetInformationJobObject(self.job, win32job.JobObjectExtendedLimitInformation, limits)
@@ -32,7 +43,7 @@ class OwnedProcess:
                     str(Path(__file__).with_name('process_worker.py')), str(int(self.job)), *map(os.fspath, argv)],
                     close_fds=True, startupinfo=startup, creationflags=subprocess.CREATE_NO_WINDOW, **kwargs)
             except BaseException:
-                self.job.Close(); self.job = None
+                self.close()
                 raise
             finally:
                 if self.job is not None:
@@ -68,5 +79,6 @@ class OwnedProcess:
 
     def close(self):
         if self.job is not None:
-            self.job.Close()
+            import win32api
+            win32api.CloseHandle(self.job)
             self.job = None

@@ -305,3 +305,12 @@ At `635d0a9`, x64's prepared DSH payload now passes all four terminal dialogues,
 resource release, absence of console hosts, and natural shutdown. The same run
 finds separate directory-link, process-owner and DSH-setup test failures; these
 are not treated as a green Windows job or working installed application.
+
+Retained `635d0a9` x64 diagnostics identify those failures precisely: directory
+linking and CLI discovery work, but two assertions compare a resolved long path
+with Windows' short `RUNNER~1` temporary path. Their expected paths now resolve
+through the filesystem as well. The process-owner failure is a real binding
+problem: pywin32 312 rejects `None` as the Job name. The adapter now uses typed
+`CreateJobObjectW` with a null name for a genuinely unnamed Job, retaining the
+kernel handle directly and closing it explicitly. Containment still requires
+the subsequent native crash test; a source correction alone does not prove it.

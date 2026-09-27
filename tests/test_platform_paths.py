@@ -32,7 +32,7 @@ class DependencyLinkTests(unittest.TestCase):
             link_directory(link, first)
             with self.assertRaisesRegex(ValueError, 'preserved'):
                 link_directory(link, second)
-            self.assertEqual(link.resolve(), first)
+            self.assertEqual(link.resolve(), first.resolve())
 
 
 if __name__ == '__main__':

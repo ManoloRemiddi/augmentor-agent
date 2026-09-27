@@ -22,7 +22,7 @@ class SetupHistoryTests(unittest.TestCase):
             meta = {'name':'@deepseek-ai/dsh','version':'0.1.5-rc.1','bin':{'dsh':'lib/bin.js'}}
             (root/'package.json').write_text(json.dumps(meta))
             with patch.dict(os.environ, {'AUGMENTOR_DSH_CLI':str(root/'lib/bin.js')}):
-                self.assertEqual(setup.cli_directory(), root)
+                self.assertEqual(setup.cli_directory(), root.resolve())
                 (root/'package.json').write_text(json.dumps({**meta,'version':'unreviewed'}))
                 with self.assertRaisesRegex(ValueError, 'supported Node DSH'):
                     setup.cli_directory()
