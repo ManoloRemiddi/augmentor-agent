@@ -95,3 +95,17 @@ imports alone do not establish that the complete candidate passed.
 Separately, candidate Qt/PySide 6.11.2 passes the same 538 Linux native tests
 (three skips), preserving existing behavior under this library upgrade. Mac
 candidate GUI checks and native two-version installer fixtures are added to CI.
+
+At `89ae133`, the complete x64 runtime probe passes. ARM64 also needs the
+individually hashed Shiboken copy of the unused ARM32 runtime excluded. The
+shared Windows build exposed CRLF conversion breaking shader provenance hashes;
+`.gitattributes` now preserves source bytes across checkouts. Installer compilation
+exposed `cmd.exe` quoting in the build harness, corrected without changing client
+execution. Mac candidate UI checks passed, but the job ended on a nonexistent
+test filename; that test selection is corrected, not treated as a passing job.
+
+The first W2 primitive is a shared/exclusive process lease adapter. Three real
+separate-process Linux tests prove shared readers, exclusive maintenance and
+kernel release on abnormal process exit. Windows runs the same tests next.
+It is not yet wired into product services and does not claim compatibility with
+DSH's separate file-lock protocol. Secure paths and transport remain pending.

@@ -2,8 +2,6 @@
 name: Windows qualification
 on:
   workflow_dispatch:
-  push:
-    branches: [feat/windows]
   pull_request:
     paths:
       - '.github/workflows/windows.yml'
@@ -57,6 +55,10 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           npm run build
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Verify process leases on the real Windows kernel
+        if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
+        run: |
+          & outputs/payload/python/python.exe -B -m unittest discover -s tests -p test_platform_locks.py -v
       - name: Stage and exercise actual pinned DSH native dependencies
         run: |
           $env:AUGMENTOR_PWSH = "$PWD/outputs/payload/powershell/pwsh.exe"
@@ -99,4 +101,4 @@ jobs:
           .venv/bin/python -m unittest discover -s tests -p test_ui_scale.py -v
           .venv/bin/python -m unittest discover -s tests -p test_fluid.py -v
           .venv/bin/python -m unittest discover -s tests -p test_window.py -v
-          .venv/bin/python -m unittest discover -s tests -p test_macos_windows.py -v
+          .venv/bin/python -m unittest discover -s tests -p test_macos_desktop.py -v

@@ -41,7 +41,9 @@ def build_launcher(payload, arch):
         f'cl /nologo /O2 /W4 /MT /I"{include}" "{ROOT / "services/platform/windows-launcher.c"}" '
         f'/Fe:"{payload / "AugmentorFixture.exe"}" /Fo:"{payload / "launcher.obj"}" '
         '/link /SUBSYSTEM:WINDOWS user32.lib shell32.lib')
-    subprocess.run(['cmd.exe', '/d', '/s', '/c', command], check=True)
+    # list2cmdline would backslash-escape embedded quotes, which cmd.exe does
+    # not understand. This is an explicitly constructed, validated shell line.
+    subprocess.run('cmd.exe /d /s /c "'+command+'"', check=True)
     (payload/'launcher.obj').unlink(missing_ok=True)
 
 

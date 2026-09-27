@@ -24,6 +24,11 @@
       "sha256": "ec080194f01e4095c7fb43dbd7ed05af922c5b34295056a9ff56782741d65481",
       "machine": "0x8664",
       "reason": "Unused foreign architecture library bundled in the locked wheel; native target imports and PE inventory are required after exclusion."
+    },
+    "shiboken6/vccorlib140.dll": {
+      "sha256": "ddad2f75f26f6b8fa1c8d9bc38c22b1ee775eccae5aaf542bfa6819d1c175dfd",
+      "machine": "0x1c4",
+      "reason": "Unused foreign architecture library bundled in the locked wheel; native target imports and PE inventory are required after exclusion."
     }
   },
   "x64": {
