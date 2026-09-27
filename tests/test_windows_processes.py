@@ -34,8 +34,9 @@ time.sleep(300)
             owner.write_text('''import sys,time
 sys.path.insert(0,sys.argv[1])
 from platform_adapters.processes import OwnedProcess
-child=OwnedProcess([sys.executable,sys.argv[2],sys.argv[3],sys.argv[4]])
-time.sleep(300)
+child=OwnedProcess([sys.executable,sys.argv[2],sys.argv[3],sys.argv[4]],stdout=sys.stdout,stderr=sys.stderr)
+while child.poll() is None:time.sleep(.05)
+sys.exit(child.wait())
 ''', encoding='utf-8')
             record = root/'pids.json'
             process = subprocess.Popen([sys.executable, '-Xutf8', '-B', str(owner), str(ROOT/'services'),
@@ -46,7 +47,10 @@ time.sleep(300)
                 deadline = time.monotonic()+10
                 while not record.exists() and process.poll() is None and time.monotonic()<deadline:
                     time.sleep(.05)
-                self.assertTrue(record.exists(), 'Job helper did not launch its contained workload')
+                if not record.exists():
+                    if process.poll() is None:process.kill()
+                    _output, errors = process.communicate(timeout=5)
+                    self.fail('Job helper did not launch its contained workload: '+errors.decode('utf-8', errors='replace'))
                 for pid in json.loads(record.read_text()):
                     handles.append(win32api.OpenProcess(win32con.SYNCHRONIZE | win32con.PROCESS_TERMINATE, False, pid))
                 process.kill(); process.communicate(timeout=5)

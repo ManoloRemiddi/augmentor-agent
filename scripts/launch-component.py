@@ -33,7 +33,11 @@ def configure():
         os.environ.update(windows_environment())
         os.environ['AUGMENTOR_PI_SOCKET'] = str(Path(os.environ['XDG_RUNTIME_DIR'])/'pi.sock')
         powershell = ROOT/'powershell/pwsh.exe'
-        if powershell.exists():os.environ['AUGMENTOR_PWSH'] = str(powershell)
+        if powershell.exists():
+            os.environ['AUGMENTOR_PWSH'] = str(powershell)
+            os.environ['PATH'] = str(powershell.parent)+os.pathsep+os.environ['PATH']
+        cli = ROOT/'dsh/node_modules/@deepseek-ai/dsh/lib/bin.js'
+        if cli.exists():os.environ['AUGMENTOR_DSH_CLI'] = str(cli)
     if sys.platform == 'darwin':
         base = Path.home()/'Library/Application Support/Augmentor'
         for key, child in [('XDG_CONFIG_HOME','config'),('XDG_DATA_HOME','data'),('XDG_STATE_HOME','state')]:

@@ -20,6 +20,11 @@ const handles = [];
 let terminal;
 let report;
 const windows = process.platform === 'win32';
+// Node creates redirected stdout/stderr lazily. Include the proof's own output
+// pipes before comparing resources; a later console.log must not count as a
+// terminal leak. The independent natural-exit and console-host checks remain.
+void process.stdout;
+void process.stderr;
 const baselineResources = process.getActiveResourcesInfo();
 const pwsh = process.env.AUGMENTOR_PWSH || 'pwsh.exe';
 const deadline = setTimeout(() => { console.error('DSH payload proof timed out'); process.exit(1); }, 60000);
@@ -80,7 +85,7 @@ if (windows) {
   const remaining=process.getActiveResourcesInfo();
   for(const kind of ['PipeWrap','ProcessWrap','MessagePort']){
     assert.ok(remaining.filter(x=>x===kind).length<=baselineResources.filter(x=>x===kind).length,
-      'Windows terminal resources remain after disposal: '+JSON.stringify(remaining));
+      'Windows terminal resources remain after disposal: '+JSON.stringify({baseline:baselineResources,remaining}));
   }
   const filter=`ParentProcessId = ${process.pid} AND (Name = 'OpenConsole.exe' OR Name = 'conhost.exe')`;
   const children=execFileSync(pwsh,['-NoLogo','-NoProfile','-NonInteractive','-Command',

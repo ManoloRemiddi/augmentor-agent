@@ -77,6 +77,7 @@ def configure_product(app, cli, home, endpoint, env, state, *, save=True):
     sys.path.insert(0,str(app/'services'))
     from dsh.setup import Setup
     from dsh.remote import client
+    from platform_adapters.processes import OwnedProcess
     # The voice bundle needs this fresh secret during its first boot. The
     # checked product installer subsequently validates and reuses it.
     if not (home/'augmentor-product-token').exists():
@@ -85,16 +86,18 @@ def configure_product(app, cli, home, endpoint, env, state, *, save=True):
     def stop():
         nonlocal process
         if process and process.poll() is None:
-            os.killpg(process.pid,signal.SIGTERM)
+            process.terminate()
             try:process.wait(timeout=15)
-            except subprocess.TimeoutExpired:os.killpg(process.pid,signal.SIGKILL);process.wait()
+            except subprocess.TimeoutExpired:process.kill();process.wait()
+        if process:process.close()
         process=None
     def start():
         nonlocal process
         # Truncate only this fresh install's temporary bootstrap log.
         with log_path.open('w') as log:
-            process=subprocess.Popen([str(cli),'web','--no-open','--host','127.0.0.1','--port',str(urlsplit(endpoint).port)],
-                                     env=env,stdout=log,stderr=log,start_new_session=True)
+            command=([str(app/'node/node.exe'),str(cli)] if sys.platform=='win32' else [str(cli)])
+            process=OwnedProcess([*command,'web','--no-open','--host','127.0.0.1','--port',str(urlsplit(endpoint).port)],
+                                 env=env,stdout=log,stderr=log)
         deadline=time.monotonic()+60
         while time.monotonic()<deadline:
             if process.poll() is not None:raise RuntimeError('The new DSH runtime stopped. Private diagnostic: '+str(log_path))

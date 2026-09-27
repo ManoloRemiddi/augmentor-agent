@@ -14,6 +14,28 @@ def private_directory(path):
     return path
 
 
+def link_directory(link, target):
+    """Link an explicitly owned dependency directory without Windows admin rights."""
+    link, target = Path(link), Path(target).resolve(strict=True)
+    if not target.is_dir():
+        raise ValueError('The dependency target must be an existing directory.')
+    if link.exists() or link.is_symlink() or (hasattr(link, 'is_junction') and link.is_junction()):
+        if (link.is_symlink() or (hasattr(link, 'is_junction') and link.is_junction())) and link.resolve(strict=True) == target:
+            return
+        raise ValueError('An existing dependency path differs and was preserved.')
+    if sys.platform == 'win32':
+        from .windows_identity import reject_reparse_ancestors
+        reject_reparse_ancestors(link.parent)
+        # The pinned CPython runtime supplies this junction API; unlike a
+        # directory symlink it needs neither elevation nor Developer Mode.
+        import _winapi
+        _winapi.CreateJunction(str(target), str(link))
+    else:
+        link.symlink_to(target, target_is_directory=True)
+    if link.resolve(strict=True) != target:
+        raise ValueError('The dependency link did not resolve to the selected package.')
+
+
 def windows_environment():
     if sys.platform != 'win32':
         raise RuntimeError('Windows paths require Windows identity verification.')

@@ -261,3 +261,31 @@ captures its actual process handle, crashes only its disposable owner and checks
 kernel-signaled exit of both descendants. Execution and adoption into managed
 DSH remain pending. This mechanism never replaces busy-work checks before normal
 updates or user-directed shutdown.
+
+Both architectures complete the `d9e4c3a` shared-service, private-path and actual
+Windows-QPA rendering probes. The unpatched terminal leak is identical on ARM64;
+the complete job fails for that reason. Keep the ongoing prepared-terminal run's
+separate outcome authoritative. The first supervisor-crash fixture at `d3071c1`
+fails and needs diagnosis before process containment can be considered qualified;
+the fixture now retains bounded helper error output instead of only a missing
+PID-file assertion.
+
+First-run preparation now adds shared DSH discovery that understands Windows npm
+shims without executing them, Windows owner checks, native PowerShell tool
+selection, and explicit private-runtime paths. Dependency links use ordinary
+Unix symlinks or Windows junctions without an administrator/Developer Mode
+requirement; cleanup and conflicting-target tests preserve the dependency itself.
+The common temporary-DSH bootstrap uses the owned-process adapter, retaining its
+Unix session behavior and enabling Windows containment once that adapter passes.
+These pieces do not constitute a completed Windows setup wizard/supervisor. The
+29 existing/new setup tests and two actual directory-link tests pass on Linux;
+native link and complete Mac bootstrap regressions are still required.
+
+The complete Linux native suite with first-run preparations passes 558 tests
+(13 platform/environment skips). At `d3071c1`, x64 performs all four terminal
+dialogues and releases its worker, but the resource-count assertion reports two
+pipes. The probe initialized its stdout/stderr after taking the baseline, so
+those diagnostic streams were incorrectly counted as new terminal resources.
+The probe now initializes both streams before comparison; it still requires
+natural Node exit and independently checks for surviving console hosts. Native
+rerun is required, and the supervisor failure still awaits its retained traceback.

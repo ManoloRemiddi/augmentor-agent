@@ -60,6 +60,8 @@ jobs:
         if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
         run: |
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_identity.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_platform_paths.py -v
       - name: Verify supervisor crash cannot orphan detached child processes
         if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
         run: |
@@ -103,6 +105,8 @@ jobs:
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: |
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_local_services.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_dsh_setup.py -v
       - name: Stage and exercise actual pinned DSH native dependencies
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: |

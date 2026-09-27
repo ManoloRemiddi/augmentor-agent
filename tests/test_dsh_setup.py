@@ -2,6 +2,7 @@
 import importlib.util
 import io
 import json
+import os
 import tempfile
 from pathlib import Path
 import unittest
@@ -13,6 +14,19 @@ spec.loader.exec_module(setup)
 
 
 class SetupHistoryTests(unittest.TestCase):
+    def test_explicit_cli_is_located_without_executing_shell_shims(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)/'DSH café'/'node_modules/@deepseek-ai/dsh'
+            (root/'lib').mkdir(parents=True)
+            (root/'lib/bin.js').write_text('fixture')
+            meta = {'name':'@deepseek-ai/dsh','version':'0.1.5-rc.1','bin':{'dsh':'lib/bin.js'}}
+            (root/'package.json').write_text(json.dumps(meta))
+            with patch.dict(os.environ, {'AUGMENTOR_DSH_CLI':str(root/'lib/bin.js')}):
+                self.assertEqual(setup.cli_directory(), root)
+                (root/'package.json').write_text(json.dumps({**meta,'version':'unreviewed'}))
+                with self.assertRaisesRegex(ValueError, 'supported Node DSH'):
+                    setup.cli_directory()
+
     def test_existing_prompt_plugin_is_checked_without_including_our_owned_entry(self):
         from unittest.mock import Mock
         remote=Mock()
@@ -65,10 +79,18 @@ if __name__ == '__main__':
     unittest.main()
 
 class SharedPersonalAgentTests(unittest.TestCase):
+    def test_windows_selects_the_native_powershell_tool(self):
+        with patch.object(setup.sys, 'platform', 'win32'):
+            entries=setup.personal_agent_entries()
+        modules={row['name'] for row in entries}
+        self.assertIn('@deepseek-ai/dsh-tool-pwsh',modules)
+        self.assertNotIn('@deepseek-ai/dsh-tool-bash',modules)
+
     def test_single_composition_has_full_tools_and_one_prompt(self):
         entries=setup.personal_agent_entries()
         ids={row['id'] for row in entries}
-        self.assertTrue({'tool-bash','tool-fs','tool-ask-user','augmentor-desktop','augmentor-memory','augmentor-execution','augmentor-response-metrics'} <= ids)
+        shell='tool-pwsh' if setup.sys.platform=='win32' else 'tool-bash'
+        self.assertTrue({shell,'tool-fs','tool-ask-user','augmentor-desktop','augmentor-memory','augmentor-execution','augmentor-response-metrics'} <= ids)
         self.assertNotIn('augmentor-browser-policy',ids)
         persona=next(row for row in entries if row['id']=='persona')['config']['prefix']
         self.assertIn('one personal assistant',persona)
