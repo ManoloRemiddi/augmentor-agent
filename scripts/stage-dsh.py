@@ -49,10 +49,13 @@ def prepare(target, node):
     if hashlib.sha256(script.read_bytes()).hexdigest() != PREPARE_SHA256:
         raise ValueError('DSH spawn-helper preparation changed; review before executing')
     packages = inventory(target)
+    spec = importlib.util.spec_from_file_location('windows_dsh_preparation', ROOT/'scripts/prepare-windows-dsh.py')
+    windows = importlib.util.module_from_spec(spec); spec.loader.exec_module(windows)
+    patches = windows.prepare(target)
     subprocess.run([node, str(script)], check=True, cwd=target)
     report = {'schema':'augmentor-dsh-payload/1',
         'lockSha256':hashlib.sha256((target/'package-lock.json').read_bytes()).hexdigest(),
-        'preparedScripts':{PREPARE_SCRIPT:PREPARE_SHA256}, 'packages':packages,
+        'preparedScripts':{PREPARE_SCRIPT:PREPARE_SHA256}, 'sourcePatches': patches, 'packages':packages,
         'licenseReviewComplete':False}
     (target/'payload.json').write_text(json.dumps(report, indent=2)+'\n')
     return report

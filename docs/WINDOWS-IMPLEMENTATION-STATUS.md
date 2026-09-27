@@ -226,3 +226,21 @@ boxes despite passing widget interaction assertions. That screenshot is not
 visual acceptance. A separate probe now uses the actual Windows Qt platform
 plugin, verifies font/glyph availability and captures the shared preview. Real
 Windows-QPA output and physical display/DPI acceptance remain distinct gates.
+
+The in-progress `d9e4c3a` x64 job passes private installation-lease tests, the real
+Python/Node shared prompt test and the actual Windows Qt font/render probe.
+ARM64 shared-service execution is still pending its build. The earlier offscreen
+boxes are not observed by the Windows-QPA font assertions; retain and inspect
+the native screenshot before claiming visual acceptance.
+
+The next DSH candidate applies two Windows-only, exact-source-hash preparations:
+the supported node-pty `useConptyDll` option selects its already locked Microsoft
+ConPTY DLL; when terminal output closes, its paired input socket and output worker
+are disposed. The bundled DLL uses Microsoft's release protocol rather than the
+inbox path identified by upstream issue 965. Originals and prepared hashes are
+recorded in `payload.json`, original MIT attribution is retained, and any upstream
+drift fails before either source file changes. No Mac/Linux dependency source is
+patched. Four sequential terminal dialogues now check native resource counts,
+absence of child console hosts and natural process exit. This remains a candidate
+fix until those native tests pass; public packaging and full source/license
+review remain open.

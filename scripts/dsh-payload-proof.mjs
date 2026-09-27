@@ -20,6 +20,7 @@ const handles = [];
 let terminal;
 let report;
 const windows = process.platform === 'win32';
+const baselineResources = process.getActiveResourcesInfo();
 const pwsh = process.env.AUGMENTOR_PWSH || 'pwsh.exe';
 const deadline = setTimeout(() => { console.error('DSH payload proof timed out'); process.exit(1); }, 60000);
 try {
@@ -46,7 +47,8 @@ try {
   slow.terminate();
   assert.equal(await slow.waitForExit(AbortSignal.timeout(5000)), true);
   await slow.done;
-  terminal = await ctx.subprocess.spawnTerminal({argv:windows
+  for (let iteration=0; iteration<(windows?4:1); iteration++) {
+    terminal = await ctx.subprocess.spawnTerminal({argv:windows
     ? [pwsh, '-NoLogo', '-NoProfile', '-Command', "Write-Output 'terminal-ok'; $answer=[Console]::ReadLine(); Write-Output ('reply:'+$answer)"]
     : ['/bin/sh', '-c', 'printf terminal-ok; read answer; printf "reply:%s" "$answer"'],
     cwd:work, env:{TERM:'xterm-256color'}, rows:24, cols:80, graceMs:200});
@@ -58,8 +60,10 @@ try {
   await terminal.terminate();
   assert.match(output, /terminal-ok/);
   assert.match(output, /reply:payload-input/);
+  }
   report = {platform:process.platform, arch:process.arch, nativeFFI:true,
     ripgrep:true, shellPipeline:true, ordinaryTermination:true, terminalRoundTrip:true,
+    terminalRepetitions:windows?4:1,
     arbitraryDetachedDescendantContainment:'not established'};
   console.log(JSON.stringify({phase:'tool-checks-complete', ...report}));
 } finally {
@@ -68,6 +72,21 @@ try {
   await ctx.fiber.dispose();
   clearTimeout(deadline);
   await rm(work, {recursive:true, force:true});
+}
+if (windows) {
+  // node-pty's published drain interval is 1000 ms. Require both worker and
+  // client pipe cleanup to settle while the host is still alive, not at exit.
+  await new Promise(resolve=>setTimeout(resolve,2500));
+  const remaining=process.getActiveResourcesInfo();
+  for(const kind of ['PipeWrap','ProcessWrap','MessagePort']){
+    assert.ok(remaining.filter(x=>x===kind).length<=baselineResources.filter(x=>x===kind).length,
+      'Windows terminal resources remain after disposal: '+JSON.stringify(remaining));
+  }
+  const filter=`ParentProcessId = ${process.pid} AND (Name = 'OpenConsole.exe' OR Name = 'conhost.exe')`;
+  const children=execFileSync(pwsh,['-NoLogo','-NoProfile','-NonInteractive','-Command',
+    `(Get-CimInstance Win32_Process -Filter "${filter}" | Measure-Object).Count`],{encoding:'utf8'}).trim();
+  assert.equal(children,'0','A terminal console host survived natural shell exit');
+  report.terminalResourcesReleased=true;
 }
 // A resolved terminal API is insufficient if its worker/pipe keeps the host
 // alive. Require natural exit after disposal and keep only bounded, non-content
