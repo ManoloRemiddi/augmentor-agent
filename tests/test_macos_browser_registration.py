@@ -32,7 +32,7 @@ class MacBrowserRegistrationTests(unittest.TestCase):
             safari=root/'Safari.app/Contents';safari.mkdir(parents=True)
             (safari/'Info.plist').write_bytes(plistlib.dumps({'CFBundleExecutable':'Safari'}))
             browsers=module.installed_browsers([root])
-            self.assertEqual({row['app'] for row in browsers},{str(comet),str(other)})
+            self.assertEqual({row['app'] for row in browsers},{str(comet.resolve()),str(other.resolve())})
             support=root/'support';(support/'Comet').mkdir(parents=True)
             (support/'Comet/Local State').write_text('private contents are never read')
             self.assertEqual(module.browser_data_directory(comet,support),support/'Comet')
