@@ -3,6 +3,7 @@
 import re
 import threading
 import time
+from .ui_scale import scaled, px
 from PySide6.QtCore import Qt, QPoint, QObject, QTimer, Signal
 from PySide6.QtGui import QTextCursor
 from PySide6.QtWidgets import QApplication, QListWidget, QListWidgetItem
@@ -82,7 +83,7 @@ class PromptMenu(QListWidget):
         self.setTextElideMode(Qt.TextElideMode.ElideRight)
         self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating)
         self.setAccessibleName('Saved prompts')
-        self.setStyleSheet('QListWidget {background:#243537;color:#edf3f3;border:1px solid #607d7d;border-radius:10px;padding:4px;} QListWidget::item {padding:7px;} QListWidget::item:selected {background:#426760;color:#ffffff;border-radius:6px;}')
+        scaled(self).setStyleSheet('QListWidget {background:#243537;color:#edf3f3;border:1px solid #607d7d;border-radius:10px;padding:4px;} QListWidget::item {padding:7px;} QListWidget::item:selected {background:#426760;color:#ffffff;border-radius:6px;}')
         self.itemClicked.connect(lambda _:self.choose())
         self.items=[]; self.dismissed=None
 
@@ -102,8 +103,8 @@ class PromptMenu(QListWidget):
         if not self.items:
             self.addItem(self.catalog.error or ('No matching prompts' if self.catalog.prompts else 'Add prompts in More → Prompt library' if self.catalog.loaded else 'Loading prompts…'))
         self.setCurrentRow(next((i for i,p in enumerate(self.items) if p["id"]==selected),0))
-        self.setFixedWidth(max(260,editor.width()))
-        self.setFixedHeight(min(230,max(70,self.sizeHintForRow(0)*min(5,self.count())+18)))
+        self.setFixedWidth(max(px(self,260),editor.width()))
+        self.setFixedHeight(min(px(self,230),max(px(self,70),self.sizeHintForRow(0)*min(5,self.count())+px(self,18))))
         point=editor.mapToGlobal(QPoint(0,0));area=editor.screen().availableGeometry()
         x=max(area.left(),min(point.x(),area.right()-self.width()+1))
         y=point.y()-self.height()-5

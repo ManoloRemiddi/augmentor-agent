@@ -24,7 +24,21 @@ def dispatch(window, request, *, enabled=False):
                 'draft':window.composer.toPlainText(),
                 'transcript':window.transcript.toPlainText(),
                 'status':window.status.text(),
+                'uiScale':window.ui_scale.percent,'width':window.width(),
+                'fontPixels':window.brand.font().pixelSize(),'buttonWidth':window.send_button.width(),
                 'dialogs':[d.windowTitle() for d in window.findChildren(QDialog) if d.isVisible()]}
+    if action=='zoom':
+        from .ui_scale import MINIMUM,MAXIMUM,STEP
+        percent=request.get('percent')
+        if type(percent) is not int or not MINIMUM<=percent<=MAXIMUM or percent%STEP:
+            raise ValueError('Use a supported app size.')
+        # Operates the actual Appearance control in this explicitly opted-in
+        # window, including while a reply is streaming. No controller mutation.
+        window.open_appearance()
+        window.appearance_dialog.size_slider.setValue(percent)
+        window.appearance_dialog.accept()
+        return {'uiScale':window.ui_scale.percent,'width':window.width(),
+                'fontPixels':window.brand.font().pixelSize(),'buttonWidth':window.send_button.width()}
     if action=='capture':
         path=Path(request['path'])
         if not path.is_absolute():raise ValueError('Use an absolute screenshot path.')

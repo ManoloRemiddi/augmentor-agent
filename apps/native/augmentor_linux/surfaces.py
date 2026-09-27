@@ -1,6 +1,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Native orb, searchable catalog, and appearance surfaces."""
 import math
+from .ui_scale import scaled, px
 from PySide6.QtCore import Qt, QTimer, QRectF, Signal, QSize, QPointF, QEvent
 from PySide6.QtGui import QColor, QPainter, QPainterPath, QPen, QRadialGradient
 from PySide6.QtWidgets import (QWidget, QPushButton, QLabel, QVBoxLayout, QHBoxLayout,
@@ -82,7 +83,7 @@ class ModelPicker(QPushButton):
     def open_picker(self):
         self.popup = QDialog(self.window())
         self.popup.setWindowTitle('Models')
-        self.popup.setMinimumSize(420, 520)
+        scaled(self.popup).setMinimumSize(420, 520)
         layout = QVBoxLayout(self.popup)
         row = QHBoxLayout()
         self.search = QLineEdit()
@@ -122,7 +123,7 @@ class ModelPicker(QPushButton):
         for group, rows in sections:
             heading = QListWidgetItem(group.upper())
             heading.setFlags(Qt.ItemFlag.NoItemFlags)
-            font = heading.font(); font.setBold(True); font.setPointSize(9); heading.setFont(font)
+            font = heading.font(); font.setBold(True); font.setPointSize(9); scaled(heading).setFont(font)
             self.rows.addItem(heading)
             for model in rows:
                 selected = self.selection and all(model[k] == self.selection.get(k) for k in ('provider','model'))
@@ -151,16 +152,16 @@ class Orb(QWidget):
         self.label = QLabel('AUGMENTOR', self)
         self.label.setGeometry(34,46,140,20);self.label.hide()
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.label.setStyleSheet('font-size: 10px; letter-spacing: 2px; background: transparent;')
+        scaled(self.label).setStyleSheet('font-size: 10px; letter-spacing: 2px; background: transparent;')
         self.activity = QLabel('Ready', self)
         self.activity.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.activity.setWordWrap(True)
         self.activity.setGeometry(31,72,146,47)
-        self.activity.setStyleSheet('font-size: 10px; font-weight: bold; background: transparent;')
+        scaled(self.activity).setStyleSheet('font-size: 10px; font-weight: bold; background: transparent;')
         self.model = QLabel('Pi', self)
         self.model.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.model.setGeometry(37,120,134,18);self.model.hide()
-        self.model.setStyleSheet('font-size: 9px; background: transparent;')
+        scaled(self.model).setStyleSheet('font-size: 9px; background: transparent;')
         self.expand = QPushButton('↗',self)
         self.expand.setGeometry(60,146,40,27)
         self.expand.setToolTip('Expand conversation')
@@ -205,9 +206,9 @@ class Orb(QWidget):
 
     def resizeEvent(self,event):
         cx=self.width()//2;cy=self.height()//2
-        self.activity.setGeometry(cx-40,cy-24,80,26)
-        self.expand.setGeometry(cx-28,cy+8,26,24);self.stop.setGeometry(cx+2,cy+8,26,24)
-        for button in (self.expand,self.stop):button.setStyleSheet('QPushButton {padding:0;border:0;border-radius:6px;font-size:12px;}')
+        self.activity.setGeometry(cx-px(self,40),cy-px(self,24),px(self,80),px(self,26))
+        self.expand.setGeometry(cx-px(self,28),cy+px(self,8),px(self,26),px(self,24));self.stop.setGeometry(cx+px(self,2),cy+px(self,8),px(self,26),px(self,24))
+        for button in (self.expand,self.stop):scaled(button).setStyleSheet('QPushButton {padding:0;border:0;border-radius:6px;font-size:12px;}')
         super().resizeEvent(event)
 
     def wave_path(self):
@@ -277,14 +278,14 @@ class AppearanceDialog(QDialog):
     def __init__(self, values, parent=None):
         super().__init__(parent)
         self.setWindowTitle('Colors & skins')
-        self.setMinimumWidth(350)
+        scaled(self).setMinimumWidth(350)
         from copy import deepcopy
         self.values = deepcopy(values)
         outer=QVBoxLayout(self);scroll=QScrollArea();scroll.setWidgetResizable(True)
         scroll.setFrameShape(QScrollArea.Shape.NoFrame)
         content=QWidget();content.setObjectName('appearanceControls');scroll.setWidget(content);outer.addWidget(scroll)
-        layout=QVBoxLayout(content);layout.setSpacing(8);self.controls_layout=layout
-        self.resize(430,740)
+        layout=QVBoxLayout(content);scaled(layout).setSpacing(8);self.controls_layout=layout
+        self.resize(px(self,430),px(self,740))
         from .ui_scale import MINIMUM, MAXIMUM, STEP, normalize
         size_row=QHBoxLayout();self.size_label=QLabel();size_row.addWidget(self.size_label)
         size_row.addStretch();size_reset=QPushButton('100%');size_reset.setAccessibleName('Reset app size')
@@ -293,7 +294,7 @@ class AppearanceDialog(QDialog):
         self.size_slider.setRange(MINIMUM,MAXIMUM);self.size_slider.setSingleStep(STEP);self.size_slider.setPageStep(10)
         self.size_slider.setValue(normalize(values.get('ui_scale',100)))
         self.size_slider.setAccessibleName('App size');layout.addWidget(self.size_slider)
-        self.size_note=QLabel('Quit and reopen Augmentor to apply a new size.')
+        self.size_note=QLabel('Text, icons and spacing resize immediately.')
         self.size_note.setWordWrap(True);layout.addWidget(self.size_note)
         self.size_label.setText(f"App size · {self.size_slider.value()}%")
         self.size_slider.valueChanged.connect(self.change_size)
@@ -321,7 +322,7 @@ class AppearanceDialog(QDialog):
         self.theme_group=QButtonGroup(self);self.theme_buttons={}
         for mode in ('light','dark'):
             button=QPushButton();button.setCheckable(True);button.setChecked(values['theme']==mode)
-            button.setFixedSize(38,30);button.setIconSize(QSize(18,18))
+            scaled(button).setFixedSize(38,30);scaled(button).setIconSize(QSize(18,18))
             button.setToolTip(mode.title()+' mode');button.setAccessibleName(mode.title()+' mode')
             button.clicked.connect(lambda checked,m=mode:self.change('theme',m))
             self.theme_group.addButton(button);self.theme_buttons[mode]=button;theme_row.addWidget(button)
@@ -329,7 +330,7 @@ class AppearanceDialog(QDialog):
         self.sliders={}
         for key,title,lo,hi in [('hue','Panel colour',0,359),('brightness','Panel brightness',-15,15),('accent_hue','Accent colour',0,359),('accent_brightness','Accent brightness',-15,15),('saturation','Theme saturation',0,100),('opacity','Opacity',35,100)]:
             label=QLabel(title);layout.addWidget(label)
-            slider=ColourSlider(Qt.Orientation.Horizontal);slider.setRange(lo,hi);slider.setValue(values[key]);slider.setFixedHeight(24)
+            slider=ColourSlider(Qt.Orientation.Horizontal);slider.setRange(lo,hi);slider.setValue(values[key]);scaled(slider).setFixedHeight(24)
             slider.setAccessibleName(title);layout.addWidget(slider);self.sliders[key]=slider
             slider.valueChanged.connect(lambda v,k=key,l=label,t=title:self.change_slider(k,v,l,t))
             label.setText(f'{title} · {values[key]}' + ('%' if key in ('opacity','saturation') else ''))
@@ -361,7 +362,7 @@ class AppearanceDialog(QDialog):
         self.values['ui_scale']=value
         self.size_label.setText(f'App size · {value}%')
         # Accessibility is personal, not part of an exported or selected skin.
-        self.changed.emit(dict(self.values))
+        self.changed.emit({'ui_scale':value})
 
     def refresh_colours(self):
         v=self.values;dark=v['theme']=='dark'
@@ -370,14 +371,14 @@ class AppearanceDialog(QDialog):
         for mode,button in self.theme_buttons.items():
             selected=mode==v['theme'];button.setChecked(selected)
             button.setIcon(theme_icon(mode,panel.name() if selected else ('#edf3f3' if dark else '#152b2c')))
-            button.setStyleSheet(f'QPushButton {{padding:0;border:1px solid {accent.name()};border-radius:7px;background:{accent.name() if selected else "transparent"};}}')
+            scaled(button).setStyleSheet(f'QPushButton {{padding:0;border:1px solid {accent.name()};border-radius:7px;background:{accent.name() if selected else "transparent"};}}')
         hue_stops=','.join(f'stop:{i/6:.4f} {QColor.fromHslF((i/6)%1,.80,.55).name()}' for i in range(7))
         for key,slider in self.sliders.items():
             if key in ('hue','accent_hue'):stops=hue_stops
             elif key=='saturation':stops=f"stop:0 #999999,stop:1 {QColor.fromHslF(v['accent_hue']/360,1,.5).name()}"
             elif key=='opacity':stops=f'stop:0 rgba(127,150,150,60),stop:1 {accent.name()}'
             else:stops='stop:0 #232326,stop:1 #ffffff'
-            slider.setStyleSheet(f"""
+            scaled(slider).setStyleSheet(f"""
               QSlider::groove:horizontal {{height:10px;border-radius:5px;margin:0 8px;background:qlineargradient(x1:0,y1:0,x2:1,y2:0,{stops});}}
               QSlider::handle:horizontal {{width:14px;margin:-4px -7px;background:#ffffff;border:2px solid #63716f;border-radius:9px;}}
             """)

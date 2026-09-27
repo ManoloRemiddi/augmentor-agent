@@ -2,7 +2,15 @@
 
 # Start here: agent handoff
 
-## September 27 transparency and app size
+## September 27 live zoom correction
+
+The owner accepts the flare fix. The earlier size slider only affected startup;
+the shared replacement resizes the existing interface immediately and preserves
+active work. Read [live zoom qualification](MACOS-LIVE-ZOOM-2026-09-27.md) for current
+source, package and deployment evidence. The older startup-only record below is
+historical; do not reinstate its restart instruction.
+
+## September 27 transparency and app size — historical checkpoint
 
 The owner's remaining outline report is tracked in [the appearance correction](MACOS-APPEARANCE-2026-09-27.md).
 The transparent effect window had an AppKit shadow; its shadow is now disabled.

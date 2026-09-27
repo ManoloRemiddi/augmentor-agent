@@ -29,6 +29,7 @@ def main():
         with startup_scale(Preferences().values['ui_scale']):
             app=QApplication([])
         app.setProperty('augmentorUiScale',args.percent)
+        app.setProperty('augmentorUiBaseScale',args.percent)
         window=Window(preview=True)
         window.preferences.persistent=True;window.preferences.values.update(Preferences().values)
         window.show();QTest.qWait(100)
@@ -40,6 +41,7 @@ def main():
                 'buttonLogical':list(window.send_button.size().toTuple()),'buttonPixels':list(window.send_button.grab().size().toTuple())}
         window.open_appearance();QTest.qWait(1000);dialog=window.appearance_dialog
         assert dialog.size_slider.value()==args.percent
+        before=window.size();font=window.brand.font().pixelSize();button=window.send_button.width()
         dialog.size_slider.setFocus();QTest.keyClick(dialog.size_slider,Qt.Key.Key_Left)
         QTest.qWait(250)
         assert Preferences().values['ui_scale']==max(75,args.percent-5), (dialog.size_slider.value(),window.preferences.values['ui_scale'],Preferences().values['ui_scale'])
@@ -48,6 +50,30 @@ def main():
         assert window.composer.toPlainText()=='Unsent size verification draft'
         assert window.devicePixelRatioF()==dpr
         assert dialog.height()<=window.screen().availableGeometry().height()
+        measurements=[]
+        from PySide6.QtCore import QPoint
+        from PySide6.QtWidgets import QStyle, QStyleOptionSlider
+        # Exercise real pointer dragging, not only preference setters. The
+        # Appearance window remains anchored so input coordinates stay valid.
+        for percent in (150,75,130,args.percent):
+            slider=dialog.size_slider
+            option=QStyleOptionSlider();slider.initStyleOption(option)
+            handle=slider.style().subControlRect(QStyle.ComplexControl.CC_Slider,option,QStyle.SubControl.SC_SliderHandle,slider)
+            span=slider.width()-handle.width()
+            x=QStyle.sliderPositionFromValue(slider.minimum(),slider.maximum(),percent,span)+handle.width()//2
+            QTest.mousePress(slider,Qt.MouseButton.LeftButton,pos=handle.center())
+            QTest.mouseMove(slider,QPoint(x,handle.center().y()),30)
+            QTest.mouseRelease(slider,Qt.MouseButton.LeftButton,pos=QPoint(x,handle.center().y()))
+            QTest.qWait(280)
+            assert slider.value()==percent,(percent,slider.value())
+            ratio=percent/args.percent
+            assert abs(window.width()-round(before.width()*ratio))<=1,(percent,window.width(),before.width())
+            assert window.brand.font().pixelSize()==round(font*ratio)
+            assert window.send_button.width()==round(button*ratio)
+            assert window.composer.toPlainText()=='Unsent size verification draft'
+            measurements.append({'percent':percent,'width':window.width(),'font':window.brand.font().pixelSize(),'button':window.send_button.width()})
+            window.grab().save(str(args.out/f'live-{percent}.png'))
+        report['livePointerDrag']=measurements
         dialog.grab().save(str(args.out/'appearance.png'))
         dialog.accept();window.hide();window.show();QTest.qWait(100)
         assert window.composer.toPlainText()=='Unsent size verification draft'

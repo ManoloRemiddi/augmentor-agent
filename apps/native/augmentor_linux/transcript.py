@@ -3,6 +3,7 @@
 import math
 import re
 from pathlib import Path
+from .ui_scale import scaled, factor, px
 from PySide6.QtCore import Qt, QRectF, QEvent, QBuffer, QIODevice, QSize, QUrl, QTimer, QSignalBlocker
 from PySide6.QtGui import QColor, QFont, QImageReader, QPainter, QTextDocument, QTextTable, QTextFrameFormat, QTextOption
 from PySide6.QtWidgets import QApplication, QTextBrowser, QWidget
@@ -19,7 +20,7 @@ class ActionToolTip(QWidget):
         self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self._text='';self.action=None
-        font=QFont('DejaVu Sans');font.setPixelSize(11);self.setFont(font)
+        font=QFont('DejaVu Sans');font.setPixelSize(11);scaled(self).setFont(font)
         self.expiry=QTimer(self);self.expiry.setSingleShot(True);self.expiry.timeout.connect(self.hide)
 
     def text(self):return self._text
@@ -57,7 +58,7 @@ class Transcript(QTextBrowser):
 
     def createStandardContextMenu(self, position=None):
         menu=super().createStandardContextMenu(position) if position is not None else super().createStandardContextMenu()
-        menu.setStyleSheet(getattr(self,'menu_style','QMenu {background:#202b2c;color:#edf3f3;} QMenu::item:selected {background:#40665e;}'))
+        scaled(menu).setStyleSheet(getattr(self,'menu_style','QMenu {background:#202b2c;color:#edf3f3;} QMenu::item:selected {background:#40665e;}'))
         menu.setWindowOpacity(1.0)
         if position is not None:
             href=self.anchorAt(position)
@@ -127,7 +128,7 @@ class Transcript(QTextBrowser):
             match=re.fullmatch(r'/(copy|branch|edit|check)/([0-9a-fA-F]{6})/([0-9.]+)',url.path())
             if not match:return None
             action,color,scale=match.groups()
-            ratio=max(1,min(4,float(scale)))
+            ratio=max(1,min(8,float(scale)*2))
             svg=(Path(__file__).parent/'assets'/f'{action}.svg').read_bytes().replace(b'currentColor',('#'+color).encode())
             size=math.ceil(ACTION_ICON_SIZE*ratio)
             buffer=QBuffer();buffer.setData(svg);buffer.open(QIODevice.OpenModeFlag.ReadOnly)
@@ -161,17 +162,31 @@ class Transcript(QTextBrowser):
     def bubbles(self):
         return [frame for frame in self.document().rootFrame().childFrames()
                 if isinstance(frame, QTextTable) and frame.format().border()==0
-                and frame.format().cellPadding()==10]
+                and abs(frame.format().cellPadding()-10*factor(self))<.01]
+
+    def scale_html(self, text):
+        ratio=factor(self)
+        if ratio==1:return text
+        # Only generated style attributes and numeric image/table metrics are
+        # resized. Never rewrite visible text, links, code or percentage widths.
+        def style(match):
+            return match[1]+re.sub(r'(-?\d+(?:\.\d+)?)(px|pt)\b',
+                lambda m:f'{float(m[1])*ratio:g}{m[2]}',match[2])+match[3]
+        text=re.sub(r'(style=")(.*?)(")',style,text)
+        return re.sub(r'(<(?:img|table)\b[^>]*>)',
+            lambda tag:re.sub(r'((?:width|height|cellpadding|cellspacing)=")(\d+)(")',
+                lambda m:f'{m[1]}{float(m[2])*ratio:g}{m[3]}',tag[0]),text)
 
     def setHtml(self, text):
+        self.raw_html=text
         self.action_tooltip.hide()
-        super().setHtml(text)
+        super().setHtml(self.scale_html(text))
         for table in self.bubbles():
             fmt = table.format()
             fmt.setPosition(QTextFrameFormat.Position.InFlow)
             fmt.setAlignment(Qt.AlignmentFlag.AlignRight)
-            fmt.setTopMargin(14)
-            fmt.setBottomMargin(14)
+            fmt.setTopMargin(14*factor(self))
+            fmt.setBottomMargin(14*factor(self))
             table.setFormat(fmt)
         # Formatting the bubbles after setHtml can leave Qt's following blocks
         # with zero width/height in long chats. Streaming hides this because it
@@ -208,6 +223,6 @@ class Transcript(QTextBrowser):
         painter.setBrush(self.bubble_color)
         for rect in self.bubble_rects():
             if rect.intersects(QRectF(event.rect())):
-                painter.drawRoundedRect(rect, 13, 13)
+                painter.drawRoundedRect(rect, px(self,13), px(self,13))
         painter.end()
         super().paintEvent(event)

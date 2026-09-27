@@ -7,7 +7,7 @@ qualifies both Mac shortcuts and the shared Metal/OpenGL renderer, with explicit
 installed and public-release boundaries.
 
 Shared desktop Appearance now includes [75–150% proportional app sizing](SKINS.md#app-size),
-applied on the next window process start. The [Mac transparency correction](MACOS-APPEARANCE-2026-09-27.md)
+applied immediately while dragging, with saved per-window preferences. The [Mac transparency correction](MACOS-APPEARANCE-2026-09-27.md)
 disables native shadows on the animated effect layer; Linux uses the same flag.
 
 Mac setup correction (26 September, current source): install/start DSH before

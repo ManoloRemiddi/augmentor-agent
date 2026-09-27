@@ -1,5 +1,6 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Guided Pi connection setup using the shared runtime's test/save boundary."""
+from .ui_scale import scaled
 from PySide6.QtWidgets import (QDialog,QVBoxLayout,QFormLayout,QHBoxLayout,QLabel,
     QLineEdit,QSpinBox,QPushButton,QComboBox,QCheckBox)
 
@@ -9,7 +10,7 @@ class SetupDialog(QDialog):
         super().__init__(window)
         self.owner=window;self.controller=window.controller;self.client=self.controller.client
         self.token=None;self.busy=False;self.saving=False;self.finished_setup=False;self.dismissed=False
-        self.setWindowTitle('Connect a model · Pi');self.setModal(True);self.setMinimumWidth(470)
+        self.setWindowTitle('Connect a model · Pi');self.setModal(True);scaled(self).setMinimumWidth(470)
         layout=QVBoxLayout(self)
         intro=QLabel('Connect your own OpenAI-compatible model endpoint. You can manage other provider formats in Models & providers, or choose DSH in Settings.')
         intro.setWordWrap(True);layout.addWidget(intro)

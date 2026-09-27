@@ -31,7 +31,13 @@ These are own-window fixtures and native property read-backs, not a capture of
 the complete desktop compositor or a claim of subjective owner acceptance.
 Screen Recording and Accessibility permissions remain unchanged.
 
-## Size preference
+The owner subsequently confirmed the flare is working well. Preserve this renderer
+and the disabled native effect-window shadow.
+
+## Size preference — historical startup-only implementation
+
+Superseded by [live zoom](MACOS-LIVE-ZOOM-2026-09-27.md) after the owner reported that
+moving the slider did not visibly change the running window.
 
 The owner requested a uniform 10% enlargement and an Appearance slider. The
 shared [App size control](SKINS.md#app-size) supports 75–150%, with 100% reset,

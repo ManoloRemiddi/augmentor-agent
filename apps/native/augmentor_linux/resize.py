@@ -1,5 +1,6 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Mouse resize borders for the frameless conversation window."""
+from .ui_scale import px
 from PySide6.QtCore import Qt, QRect, QEvent
 from PySide6.QtWidgets import QWidget
 
@@ -83,7 +84,7 @@ class ResizeBorders:
     def update(self):
         surface = self.window.surface_rect()
         width, height = surface.width(), surface.height()
-        corner, border = 12, 6
+        corner, border = px(self.window,12), px(self.window,6)
         rectangles = [
             (corner, 0, width - 2 * corner, border),
             (corner, height - border, width - 2 * corner, border),

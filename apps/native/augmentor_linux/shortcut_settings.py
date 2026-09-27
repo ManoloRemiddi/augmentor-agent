@@ -1,6 +1,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Two independently editable launcher shortcuts, in either window's Settings."""
 import sys
+from .ui_scale import scaled
 from PySide6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QLabel,QPushButton,QKeySequenceEdit
 from PySide6.QtGui import QKeySequence
 from .shortcuts import current_keys,save_shortcut,display_key
@@ -11,7 +12,7 @@ from .settings_icons import settings_icon
 class ShortcutSettings(QWidget):
     def __init__(self,window):
         super().__init__(window);self.owner=window;self.rows={}
-        layout=QVBoxLayout(self);layout.setContentsMargins(0,0,0,0)
+        layout=QVBoxLayout(self);scaled(layout).setContentsMargins(0,0,0,0)
         for name,label in SHORTCUT_INSTANCES:
             heading=QLabel(label+' — open / hide');layout.addWidget(heading)
             current=QLabel('Reading shortcut…');layout.addWidget(current)

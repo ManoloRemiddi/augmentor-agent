@@ -12,6 +12,7 @@ import subprocess
 import uuid
 import threading
 from pathlib import Path
+from .ui_scale import scaled, LiveScale, px, normalize
 from PySide6.QtCore import Qt, QTimer, QLockFile, QUrl, Signal, QSize, QPoint, QRect, QVariantAnimation, QEasingCurve
 from PySide6.QtNetwork import QLocalServer, QLocalSocket
 from PySide6.QtGui import QColor, QPainter, QKeySequence, QShortcut, QRegion, QDesktopServices, QPalette, QIcon
@@ -38,12 +39,14 @@ class Window(QWidget):
 
     def __init__(self, preview=True, harness=None):
         super().__init__()
+        self.ui_scale=LiveScale(self, QApplication.instance().property('augmentorUiBaseScale') or 100)
         self.setWindowTitle(window_label())
         self.setWindowIcon(QIcon(str(Path(__file__).parent/'assets/augmentor.svg')))
         self.setWindowFlags(Qt.WindowType.Window | Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
-        self.setMinimumSize(364,364);self.resize(424,484)
+        scaled(self).setMinimumSize(364,364);self.resize(424,484)
         self.preferences=Preferences(not preview)
+        if preview:self.preferences.values['ui_scale']=self.ui_scale.base
         if not preview and current_name()!='main':
             # Materialize the independent voice profile at first open, not
             # when the user eventually visits Voice settings. No microphone.
@@ -69,26 +72,26 @@ class Window(QWidget):
         self.copy_feedback_timer.timeout.connect(self.clear_copy_feedback)
         self.preferences_timer=QTimer(self);self.preferences_timer.setSingleShot(True);self.preferences_timer.setInterval(200);self.preferences_timer.timeout.connect(self.preferences.save)
         self.activity=ActivityHalo(self)
-        self.outer=QVBoxLayout(self);self.outer.setContentsMargins(*([self.activity.margin]*4));self.outer.setSpacing(0)
+        self.outer=QVBoxLayout(self);scaled(self.outer).setContentsMargins(*([self.activity.margin]*4));scaled(self.outer).setSpacing(0)
         self.stack=QStackedLayout();self.outer.addLayout(self.stack)
         self.outer.setSizeConstraint(QLayout.SizeConstraint.SetNoConstraint)
         self.stack.setSizeConstraint(QLayout.SizeConstraint.SetNoConstraint)
         self.expanded=QFrame();self.stack.addWidget(self.expanded)
-        layout=QVBoxLayout(self.expanded);layout.setContentsMargins(*([SURFACE['inset']]*4));layout.setSpacing(SURFACE['gap'])
-        header=QHBoxLayout();header.setSpacing(SURFACE['headerGap'])
+        layout=QVBoxLayout(self.expanded);scaled(layout).setContentsMargins(*([SURFACE['inset']]*4));scaled(layout).setSpacing(SURFACE['gap'])
+        header=QHBoxLayout();scaled(header).setSpacing(SURFACE['headerGap'])
         self.title=QLabel('New conversation');self.title.setTextFormat(Qt.TextFormat.PlainText)
         self.title.setSizePolicy(QSizePolicy.Policy.Ignored,QSizePolicy.Policy.Preferred)
-        self.title.setStyleSheet('font-size:11px;font-weight:400;padding-left:8px;')
+        scaled(self.title).setStyleSheet('font-size:11px;font-weight:400;padding-left:8px;')
         self.title.setToolTip('Double-click to rename this conversation')
         self.title.mouseDoubleClickEvent=lambda _:self.rename_chat()
-        identity=QVBoxLayout();identity.setSpacing(2);identity.setContentsMargins(0,0,0,0)
-        self.brand=QLabel(window_label());self.brand.setStyleSheet('font-size:13px;font-weight:600;padding-left:8px;')
+        identity=QVBoxLayout();scaled(identity).setSpacing(2);scaled(identity).setContentsMargins(0,0,0,0)
+        self.brand=QLabel(window_label());scaled(self.brand).setStyleSheet('font-size:13px;font-weight:600;padding-left:8px;')
         identity.addWidget(self.brand)
-        self.title_stack=QStackedLayout();self.title_stack.setContentsMargins(0,0,0,0)
+        self.title_stack=QStackedLayout();scaled(self.title_stack).setContentsMargins(0,0,0,0)
         self.title_stack.addWidget(self.title)
         self.title_editor=TitleEditor();self.title_editor.setAccessibleName('Session title')
-        self.title_editor.setFixedHeight(18)
-        self.title_editor.setStyleSheet('QLineEdit {font-size:11px;padding:0 0 0 8px;border:0;border-radius:0;background:transparent;}')
+        scaled(self.title_editor).setFixedHeight(18)
+        scaled(self.title_editor).setStyleSheet('QLineEdit {font-size:11px;padding:0 0 0 8px;border:0;border-radius:0;background:transparent;}')
         self.title_editor.returnPressed.connect(self.save_inline_title)
         self.title_editor.cancelled.connect(self.cancel_inline_title)
         self.title_stack.addWidget(self.title_editor);self.title_stack.setCurrentWidget(self.title)
@@ -111,31 +114,31 @@ class Window(QWidget):
         self.model_picker.pin_requested.connect(self.pin_model)
         self.model_picker.refresh_requested.connect(lambda:self.controller.refresh_models() if self.controller else None)
         self.model_picker.setSizePolicy(QSizePolicy.Policy.Ignored,QSizePolicy.Policy.Fixed)
-        self.model_picker.setMinimumWidth(0);self.model_picker.setFixedHeight(24)
-        self.model_picker.setStyleSheet('text-align:left;border:0;background:transparent;padding:0;font-size:11px;')
-        self.body=QFrame();body=QVBoxLayout(self.body);body.setContentsMargins(0,0,0,0);body.setSpacing(0)
+        scaled(self.model_picker).setMinimumWidth(0);scaled(self.model_picker).setFixedHeight(24)
+        scaled(self.model_picker).setStyleSheet('text-align:left;border:0;background:transparent;padding:0;font-size:11px;')
+        self.body=QFrame();body=QVBoxLayout(self.body);scaled(body).setContentsMargins(0,0,0,0);scaled(body).setSpacing(0)
         self.transcript=Transcript();self.transcript.setOpenExternalLinks(False);self.transcript.setOpenLinks(False)
-        self.transcript.setAccessibleName('Conversation');self.transcript.setStyleSheet('QTextBrowser {background:transparent;border:0;padding:2px;}')
+        self.transcript.setAccessibleName('Conversation');scaled(self.transcript).setStyleSheet('QTextBrowser {background:transparent;border:0;padding:2px;}')
         self.transcript.verticalScrollBar().valueChanged.connect(self.scrolled)
         self.transcript.anchorClicked.connect(self.message_action)
         body.addWidget(self.transcript,1);layout.addWidget(self.body,1)
         self.input_stack=QFrame();input_layout=QVBoxLayout(self.input_stack)
-        input_layout.setContentsMargins(0,0,0,0);input_layout.setSpacing(0);layout.addWidget(self.input_stack)
+        scaled(input_layout).setContentsMargins(0,0,0,0);scaled(input_layout).setSpacing(0);layout.addWidget(self.input_stack)
         self.queue_panel=QueuePanel();input_layout.addWidget(self.queue_panel)
         self.queue_session=None
         self.queue_panel.action_requested.connect(lambda item,action:self.controller.update_queue(item,action) if self.controller else None)
         self.composer=Composer()
         self.composer.improve_requested.connect(self.improve_prompt)
         self.composer.improvement_changed.connect(self.update_controls)
-        self.edit_bar=QFrame();edit_layout=QHBoxLayout(self.edit_bar);edit_layout.setContentsMargins(2,0,2,0)
+        self.edit_bar=QFrame();edit_layout=QHBoxLayout(self.edit_bar);scaled(edit_layout).setContentsMargins(2,0,2,0)
         edit_label=QLabel('Editing latest message');edit_layout.addWidget(edit_label,1)
         self.cancel_edit_button=QPushButton('Cancel');self.cancel_edit_button.clicked.connect(self.cancel_edit);edit_layout.addWidget(self.cancel_edit_button)
         self.edit_bar.setToolTip('Resubmit from before this message. The previous conversation stays in History.')
         self.edit_bar.hide();input_layout.addWidget(self.edit_bar)
         self.composer.submit_requested.connect(self.send);input_layout.addWidget(self.composer)
         self.voice_opening=False;self.voice_epoch=0;self.voice_gesture_mode=None;self.voice_input=None
-        footer=QHBoxLayout();footer.setSpacing(SURFACE['footerGap']);footer.addWidget(self.model_picker,1)
-        self.connection_dot=QLabel('●');self.connection_dot.setToolTip('Connecting to the harness');self.connection_dot.setFixedWidth(12);footer.addWidget(self.connection_dot)
+        footer=QHBoxLayout();scaled(footer).setSpacing(SURFACE['footerGap']);footer.addWidget(self.model_picker,1)
+        self.connection_dot=QLabel('●');self.connection_dot.setToolTip('Connecting to the harness');scaled(self.connection_dot).setFixedWidth(12);footer.addWidget(self.connection_dot)
         self.voice_dialog=None
         self.voice_button=VoiceButton(self)
         self.voice_button.pressed.connect(self.voice_pressed)
@@ -249,7 +252,7 @@ class Window(QWidget):
         self.setup_dialog.show()
 
     def icon_button(self,text,tooltip,callback,checkable=False):
-        button=QPushButton(text);button.setFixedSize(SURFACE['iconSize'],SURFACE['iconSize']);button.setStyleSheet('QPushButton {padding:0;font-size:15px;border:0;background:transparent;} QPushButton:hover {background:rgba(127,150,150,55);color:palette(window-text);}')
+        button=QPushButton(text);scaled(button).setFixedSize(SURFACE['iconSize'],SURFACE['iconSize']);scaled(button).setStyleSheet('QPushButton {padding:0;font-size:15px;border:0;background:transparent;} QPushButton:hover {background:rgba(127,150,150,55);color:palette(window-text);}')
         button.setToolTip(tooltip);button.setAccessibleName(tooltip);button.setCheckable(checkable);button.clicked.connect(callback);return button
 
     def call_in_background(self,fn,callback):
@@ -476,7 +479,7 @@ class Window(QWidget):
         self.stop_button.setVisible(working);self.stop_button.setEnabled(working);self.send_button.setVisible(not working or can_queue)
         self.send_button.setToolTip('Queue prompt · Enter' if working and can_queue else 'Send · Enter (Shift+Enter for a new line)')
         self.queue_panel.online=bool(self.controller and getattr(self.controller,'online',False));self.queue_panel.running=working;self.queue_panel.render()
-        self.connection_dot.setStyleSheet('color:'+('#a6d6c8' if not self.controller or getattr(self.controller,'online',False) else '#d8ae70')+';font-size:8px;')
+        scaled(self.connection_dot).setStyleSheet('color:'+('#a6d6c8' if not self.controller or getattr(self.controller,'online',False) else '#d8ae70')+';font-size:8px;')
         self.sync_orb()
 
     def set_busy(self,busy):
@@ -671,9 +674,9 @@ class Window(QWidget):
             tail.movePosition(QTextCursor.MoveOperation.End,QTextCursor.MoveMode.KeepAnchor)
             tail.removeSelectedText()
         if self.pending_prompt:
-            tail.insertHtml(f'<table width="86%" align="right" border="0" cellspacing="0" cellpadding="10"><tr><td><p align="right" style="color:{accent}"><b>You</b> · Sending…</p><p>'+html.escape(self.pending_prompt).replace('\n','<br>')+'</p></td></tr></table>')
+            tail.insertHtml(self.transcript.scale_html(f'<table width="86%" align="right" border="0" cellspacing="0" cellpadding="10"><tr><td><p align="right" style="color:{accent}"><b>You</b> · Sending…</p><p>'+html.escape(self.pending_prompt).replace('\n','<br>')+'</p></td></tr></table>'))
         if self.partial:
-            tail.insertHtml(f'<p style="color:{accent}"><b>Augmentor</b></p>'+render_markdown(self.partial,self.preferences.values['theme'],accent,tuple(sorted(self.preferences.values.get('format_colours',{}).items())),str(len(self.messages)),self.copied_code[1] if self.copied_code and self.copied_code[0]==self.message_key(len(self.messages)) else None))
+            tail.insertHtml(self.transcript.scale_html(f'<p style="color:{accent}"><b>Augmentor</b></p>'+render_markdown(self.partial,self.preferences.values['theme'],accent,tuple(sorted(self.preferences.values.get('format_colours',{}).items())),str(len(self.messages)),self.copied_code[1] if self.copied_code and self.copied_code[0]==self.message_key(len(self.messages)) else None)))
         self.rendered_messages=list(self.messages);self.rendered_partial=self.partial
         if anchor!=selection:
             from PySide6.QtGui import QTextCursor
@@ -909,6 +912,8 @@ class Window(QWidget):
 
     def apply_appearance(self,values):
         self.preferences.values.update(values);v=self.preferences.values
+        if 'ui_scale' in values:self.apply_ui_scale(values['ui_scale'])
+        if set(values)=={'ui_scale'}:return
         dark=v['theme']=='dark'
         light=(.12 if dark else .92)+v['brightness']/150
         self.background=QColor.fromHslF(v['hue']/360,v.get('saturation',48)/100*.5625,max(.025,min(.99,light)))
@@ -920,13 +925,13 @@ class Window(QWidget):
         scenic=v.get('background') in ('blossom-lake','uploaded')
         text=('#fff0e3' if dark else '#243840') if scenic else ('#edf3f3' if dark else '#152b2c')
         reading=f'rgba({self.background.red()},{self.background.green()},{self.background.blue()},{155 if dark else 205})' if scenic else 'transparent'
-        self.transcript.setStyleSheet(f'QTextBrowser {{background:{reading};border:0;border-radius:12px;padding:8px;}}' if scenic else 'QTextBrowser {background:transparent;border:0;padding:2px;}')
+        scaled(self.transcript).setStyleSheet(f'QTextBrowser {{background:{reading};border:0;border-radius:12px;padding:8px;}}' if scenic else 'QTextBrowser {background:transparent;border:0;padding:2px;}')
         solid=QColor(self.background);solid.setAlpha(255)
         field=solid.lighter(125) if dark else solid.darker(105)
         self.composer.roll_colours=(QColor(field),QColor(text),QColor(self.accent))
         self.transcript.menu_style=f'QMenu {{background:{solid.name()};color:{text};border:1px solid {self.accent.name()};padding:4px;}} QMenu::item {{padding:6px 18px;background:transparent;}} QMenu::item:selected {{background:{self.accent.name()};color:{solid.name()};}} QMenu::item:disabled {{color:#879493;}}'
 
-        self.setStyleSheet(f"""
+        scaled(self).setStyleSheet(f"""
           QWidget {{ color:{text};font-family:'DejaVu Sans';font-size:13px; }}
           QDialog,QMenu,QScrollArea,QWidget#appearanceControls {{ background:{solid.name()}; }}
           QLabel,QFrame {{ background:transparent; }}
@@ -947,14 +952,14 @@ class Window(QWidget):
           QScrollBar::add-line:vertical,QScrollBar::sub-line:vertical {{ height:0; }}
         """)
         for button in (self.new_button,self.save_button,self.history_button,self.compact_button,self.more_button,self.hide_button):
-            button.setStyleSheet(f'QPushButton {{padding:0;font-size:15px;border:0;background:transparent;color:{text};}} QPushButton:hover {{background:rgba(127,150,150,55);color:{text};}} QPushButton:disabled {{color:#879493;}}')
-        self.pin_button.setStyleSheet(f'QPushButton {{padding:0;border:0;font-size:15px;}} QPushButton:checked {{background:{self.accent.name()};color:{solid.name()};border-radius:6px;}}')
-        self.model_picker.setStyleSheet(f'QPushButton {{text-align:left;border:0;background:transparent;padding:0;font-size:11px;color:{text};}} QPushButton:hover,QPushButton:pressed,QPushButton:focus {{background:transparent;color:{text};}} QPushButton:disabled {{color:rgba(127,150,150,150);}}')
-        self.composer.prompt_menu.setStyleSheet(f'QListWidget {{background:{solid.name()};color:{text};border:1px solid {self.accent.name()};border-radius:10px;padding:4px;}} QListWidget::item {{padding:7px;}} QListWidget::item:selected {{background:{self.accent.name()};color:{solid.name()};border-radius:6px;}}')
+            scaled(button).setStyleSheet(f'QPushButton {{padding:0;font-size:15px;border:0;background:transparent;color:{text};}} QPushButton:hover {{background:rgba(127,150,150,55);color:{text};}} QPushButton:disabled {{color:#879493;}}')
+        scaled(self.pin_button).setStyleSheet(f'QPushButton {{padding:0;border:0;font-size:15px;}} QPushButton:checked {{background:{self.accent.name()};color:{solid.name()};border-radius:6px;}}')
+        scaled(self.model_picker).setStyleSheet(f'QPushButton {{text-align:left;border:0;background:transparent;padding:0;font-size:11px;color:{text};}} QPushButton:hover,QPushButton:pressed,QPushButton:focus {{background:transparent;color:{text};}} QPushButton:disabled {{color:rgba(127,150,150,150);}}')
+        scaled(self.composer.prompt_menu).setStyleSheet(f'QListWidget {{background:{solid.name()};color:{text};border:1px solid {self.accent.name()};border-radius:10px;padding:4px;}} QListWidget::item {{padding:7px;}} QListWidget::item:selected {{background:{self.accent.name()};color:{solid.name()};border-radius:6px;}}')
         self.composer.fit()
         self.rendered_messages=None
-        self.brand.setStyleSheet('font-size:13px;font-weight:600;padding-left:8px;color:'+self.accent.name())
-        self.status.setStyleSheet('font-size:11px;color:'+self.accent.name())
+        scaled(self.brand).setStyleSheet('font-size:13px;font-weight:600;padding-left:8px;color:'+self.accent.name())
+        scaled(self.status).setStyleSheet('font-size:11px;color:'+self.accent.name())
         if v.get('background')=='uploaded':
             from .backgrounds import uploaded_butterfly_colours
             butterfly_palette=uploaded_butterfly_colours(v['background_image'])
@@ -970,6 +975,44 @@ class Window(QWidget):
         if getattr(self,'touch_layout',None):self.touch_layout.style()
         self.preferences_timer.start();self.update()
         if self.messages or self.partial:self.render_messages()
+
+    def apply_ui_scale(self, percent):
+        percent=normalize(percent)
+        self.preferences.values['ui_scale']=percent
+        if percent==self.ui_scale.percent:return
+        # Keep live widgets, document cursors, undo, controller and response intact.
+        ratio=percent/self.ui_scale.percent
+        if self.morphing:self.morph_animation.stop();self.morph_animation.finished.emit()
+        size=self.size();expanded=self.expanded_size
+        if size!=getattr(self,'last_scaled_size',None):
+            self.design_size=(size.width()/self.ui_scale.factor,size.height()/self.ui_scale.factor)
+        bar=self.transcript.verticalScrollBar();follow=self.follow_tail
+        reading_cursor=self.transcript.cursorForPosition(QPoint(0,0));reading_y=self.transcript.cursorRect(reading_cursor).top();reading_position=reading_cursor.position()
+        self.rendering=True
+        self.ui_scale.set_percent(percent)
+        self.expanded_size=QSize(round(expanded.width()*ratio),round(expanded.height()*ratio))
+        if hasattr(self,'compact_anchor_offset'):
+            self.compact_anchor_offset=QPoint(round(self.compact_anchor_offset.x()*ratio),round(self.compact_anchor_offset.y()*ratio))
+        area=self.screen().availableGeometry()
+        self.resize(min(round(self.design_size[0]*self.ui_scale.factor),area.width()),min(round(self.design_size[1]*self.ui_scale.factor),area.height()))
+        self.last_scaled_size=self.size()
+        if self.compact:self.setMask(QRegion(px(self,1),px(self,1),px(self,102),px(self,102),QRegion.RegionType.Ellipse))
+        self.composer.fit()
+        if hasattr(self,'resize_borders'):self.resize_borders.update()
+        self.activity.sync();self.update()
+        # Appearance stays anchored while dragging, so the slider never moves
+        # away from the pointer. Its scroll area accommodates the larger controls.
+        self.rendered_messages=None
+        if self.messages or self.partial:self.render_messages()
+        else:self.transcript.setHtml(getattr(self.transcript,'raw_html',''))
+        reading_cursor=self.transcript.textCursor()
+        reading_cursor.setPosition(min(reading_position,self.transcript.document().characterCount()-1))
+        self.follow_tail=follow
+        self.rendering=True
+        bar.setValue(bar.maximum() if follow else bar.value()+self.transcript.cursorRect(reading_cursor).top()-reading_y)
+        self.rendering=False
+        self.hidden_geometry=None
+        self.preferences_timer.start()
 
     def set_background_opacity(self,value):
         self.apply_appearance({'opacity':value})
@@ -1016,29 +1059,29 @@ class Window(QWidget):
         if self.compact:
             anchor=self.compact_button.mapToGlobal(self.compact_button.rect().center())
             self.compact_anchor_offset=anchor-start.topLeft()
-            origin=anchor-QPoint(51,51)
+            origin=anchor-QPoint(px(self,51),px(self,51))
         else:
             origin=start.center()-getattr(self,'compact_anchor_offset',QPoint(self.expanded_size.width()-116,56))
-        target=QRect(origin,QSize(104,104) if self.compact else self.expanded_size)
-        self.clearMask();self.setMinimumSize(0,0);self.setMaximumSize(16777215,16777215)
-        self.outer.setContentsMargins(*([0 if self.compact else self.activity.margin]*4))
+        target=QRect(origin,QSize(px(self,104),px(self,104)) if self.compact else self.expanded_size)
+        self.clearMask();scaled(self).setMinimumSize(0,0);scaled(self).setMaximumSize(16777215,16777215)
+        scaled(self.outer).setContentsMargins(*([0 if self.compact else self.activity.margin]*4))
         self.stack.setCurrentWidget(self.orb if self.compact else self.expanded)
         def finish():
             self.morphing=False;self.setGeometry(target)
             self.stack.currentWidget().show()
             if self.compact:
-                self.setMaximumSize(104,104);self.setMask(QRegion(1,1,102,102,QRegion.RegionType.Ellipse))
-            else:self.setMinimumSize(364,364);QTimer.singleShot(0,self.focus_composer)
+                scaled(self).setMaximumSize(104,104);self.setMask(QRegion(px(self,1),px(self,1),px(self,102),px(self,102),QRegion.RegionType.Ellipse))
+            else:scaled(self).setMinimumSize(364,364);QTimer.singleShot(0,self.focus_composer)
             if getattr(self,'morph_surface',None):self.morph_surface.deleteLater();self.morph_surface=None
             self.resize_borders.update();self.sync_orb();self.activity.sync();self.apply_pin();self.update()
         if snapshot is None:finish();return
         from .surfaces import MorphSurface
         self.morphing=True;self.activity.sync()
-        source_anchor=self.compact_anchor_offset if self.compact else QPoint(51,51)
+        source_anchor=self.compact_anchor_offset if self.compact else QPoint(px(self,51),px(self,51))
         fixed_anchor=anchor if self.compact else start.center()
         orb_snapshot=None
         if self.compact:
-            self.orb.resize(104,104);orb_snapshot=self.orb.grab();self.orb.hide()
+            self.orb.resize(px(self,104),px(self,104));orb_snapshot=self.orb.grab();self.orb.hide()
         self.morph_surface=MorphSurface(self,snapshot,source_anchor,fixed_anchor,orb_snapshot);self.morph_surface.show();self.morph_surface.raise_()
         self.morph_animation=QVariantAnimation(self);self.morph_animation.setDuration(240)
         self.morph_animation.setStartValue(0.);self.morph_animation.setEndValue(1.)
@@ -1056,7 +1099,7 @@ class Window(QWidget):
         menu.exec(self.orb.mapToGlobal(point))
 
     def surface_rect(self):
-        margin=8 if self.compact else self.activity.margin
+        margin=px(self,8 if self.compact else self.activity.margin)
         return self.rect().adjusted(margin,margin,-margin,-margin)
 
     def paintEvent(self,event):
@@ -1064,7 +1107,7 @@ class Window(QWidget):
         painter=QPainter(self);painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         self.activity.paint_backdrop(painter,self.surface_rect().adjusted(1,1,-1,-1),self.accent)
         painter.setBrush(self.background);edge=QColor(self.accent);edge.setAlpha(75);painter.setPen(edge)
-        painter.drawRoundedRect(self.surface_rect().adjusted(1,1,-1,-1),20,20)
+        painter.drawRoundedRect(self.surface_rect().adjusted(1,1,-1,-1),px(self,20),px(self,20))
         if self.preferences.values.get('background') in ('blossom-lake','uploaded'):
             from .scenery import paint_landscape
             paint_landscape(painter,self.surface_rect().adjusted(1,1,-1,-1),
@@ -1156,6 +1199,8 @@ class Window(QWidget):
         rect=self.hidden_geometry
         expanded=self.expanded_size if self.compact else self.size()
         self.preferences.values['placement']={'x':rect.x(),'y':rect.y(),'width':rect.width(),'height':rect.height(),'compact':self.compact,'expanded_width':expanded.width(),'expanded_height':expanded.height(),'screen_layout':self.hidden_layout,'halo_margin':self.activity.margin}
+        for key in ('width','height','expanded_width','expanded_height'):
+            self.preferences.values['placement'][key]=round(self.preferences.values['placement'][key]/self.ui_scale.factor)
         self.preferences.save()
 
     def restore_placement(self):
@@ -1256,6 +1301,7 @@ def main():
     with startup_scale(ui_scale):
         app = QApplication(sys.argv[:1])
     app.setProperty('augmentorUiScale', ui_scale)
+    app.setProperty('augmentorUiBaseScale', ui_scale)
     app.setQuitOnLastWindowClosed(False)
     app.setApplicationName('Augmentor Agent')
     app.setWindowIcon(QIcon(str(Path(__file__).parent/'assets/augmentor.svg')))
@@ -1304,7 +1350,7 @@ def main():
                         'lastError':controller.last_connection_error if controller else '',
                         'sessionRestoreError':controller.session_restore_error if controller else '',
                         'buildRoot':str(Path(__file__).resolve().parents[3]),
-                        'uiScale':app.property('augmentorUiScale'), 'devicePixelRatio':window.devicePixelRatioF(),
+                        'uiScale':window.ui_scale.percent, 'uiMetricFactor':window.ui_scale.factor, 'devicePixelRatio':window.devicePixelRatioF(),
                         'voiceAvailable':hasattr(window, 'voice_button'),
                         'voiceTiming':dict(window.voice_dialog.timings) if window.voice_dialog else None,
                         'voiceBufferStarvations':window.voice_dialog.playback_buffer.starvations if window.voice_dialog else 0,

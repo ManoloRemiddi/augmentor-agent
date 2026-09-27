@@ -145,3 +145,5 @@ files available only in a developer's working directory.
 - [Mac library replacement](MACOS-LIBRARY-REPLACEMENT.md) — LGPL source and installation material.
 
 - [Shared desktop flare fidelity](FLARE-FIDELITY.md): sampling correction, bounded fluid transport and Mac/Linux validation.
+
+- [Live app zoom correction and qualification](MACOS-LIVE-ZOOM-2026-09-27.md)

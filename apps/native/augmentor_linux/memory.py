@@ -6,6 +6,7 @@ from pathlib import Path
 import tempfile
 import threading
 import uuid
+from .ui_scale import scaled, px
 from PySide6.QtCore import QTimer, Signal, QSignalBlocker
 from PySide6.QtWidgets import (QDialog,QVBoxLayout,QFormLayout,QHBoxLayout,QLabel,
     QLineEdit,QPushButton,QComboBox,QPlainTextEdit,QTabWidget,QWidget,QListWidget,
@@ -20,7 +21,7 @@ class MemoryDialog(QDialog):
     def __init__(self,owner):
         super().__init__(owner);self.owner=owner;self.client=PromptClient();self.token=None;self.busy=False;self.dismissed=False;self.config={};self.documents=[];self.offset=0;self.total=0
         self.completed.connect(lambda callback,value:callback(value) if not self.dismissed else None)
-        self.setWindowTitle('Memory');self.resize(600,640)
+        self.setWindowTitle('Memory');self.resize(px(self,600),px(self,640))
         layout=QVBoxLayout(self)
         intro=QLabel('Automatic relationship and work memory is shared across Augmentor conversations. Hindsight maintains relationship pages and searchable project memory.');intro.setWordWrap(True);layout.addWidget(intro)
         tabs=QTabWidget();self.tabs=tabs;layout.addWidget(tabs);connection=QWidget();data=QWidget();tabs.addTab(DualMemoryPanel(owner),'Automatic');tabs.addTab(connection,'Manual library connection');tabs.addTab(data,'Manual library memories')
@@ -39,7 +40,7 @@ class MemoryDialog(QDialog):
         detail=QLabel('Disable stops new recall and retention. Previously submitted operations may finish. Retained data remains available for viewing, export and deletion.');detail.setWordWrap(True);form.addRow(detail)
         body=QVBoxLayout(data);self.data_scope=QComboBox();self.data_scope.addItem('User','user');self.data_scope.addItem('Project','project');self.data_scope.setAccessibleName('Memory data scope');body.addWidget(self.data_scope)
         self.data_scope.currentIndexChanged.connect(self.change_scope)
-        self.text=QPlainTextEdit();self.text.setPlaceholderText('Text to remember. Only this text will be retained.');self.text.setAccessibleName('Memory text');self.text.setMaximumHeight(115);body.addWidget(self.text)
+        self.text=QPlainTextEdit();self.text.setPlaceholderText('Text to remember. Only this text will be retained.');self.text.setAccessibleName('Memory text');scaled(self.text).setMaximumHeight(115);body.addWidget(self.text)
         self.retain=QPushButton('Retain this text');self.retain.clicked.connect(self.remember);body.addWidget(self.retain)
         self.operations=QLabel();self.operations.setWordWrap(True);body.addWidget(self.operations)
         self.list=QListWidget();self.list.setAccessibleName('Retained documents');self.list.currentRowChanged.connect(self.read_document);body.addWidget(self.list)

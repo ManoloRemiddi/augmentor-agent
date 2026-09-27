@@ -11,20 +11,23 @@ Existing user-created skin records remain available.
 
 The **App size** slider scales the entire desktop window from **75% to 150%**
 in 5% steps: text, icons, controls, dialogs and effects. **100%** resets its size.
-Choose **⋯ → Quit Augmentor**, then reopen that window to apply a new size. Hiding
-with the shortcut does not restart it. Changing the slider saves the preference
-without interrupting a reply or discarding an unsent draft; finish or save your
-draft before quitting. The size is independent for each agent window and stays
-unchanged when selecting, importing or resetting a skin. New secondary windows
-inherit the primary preference once, like the other appearance settings.
+Moving the slider applies the size immediately, including to the open conversation.
+Replies continue and unsent drafts, selections and undo remain intact. The setting
+is saved automatically and restored on reopening. Appearance stays anchored while
+dragging, with scrolling for controls that no longer fit. The size is independent
+for each agent window and stays unchanged when selecting, importing or resetting
+a skin. New secondary windows inherit the primary preference once.
 
 The shared startup path multiplies Qt's application scale by the saved percentage,
-preserving the OS per-monitor scale and any caller-provided Qt factor. The temporary
-environment change is restored after QApplication initializes, so launched helpers
-and independent agent windows do not compound the scale. Qt redraws the UI and GPU
-effect at the resulting device pixel ratio; no widget screenshot is enlarged.
-See [Qt's scaling semantics](https://doc.qt.io/qt-6.8/highdpi.html#qt-scale-factor)
-and [qualification](MACOS-APPEARANCE-2026-09-27.md).
+preserving OS per-monitor scale and a caller-provided Qt factor, then restores the
+environment for helpers. Live changes use public widget/layout metrics relative to
+that startup baseline; they do not change private Qt DPI state, restart the process,
+or enlarge widget screenshots. New controls inherit their owning window's scale.
+`ui_scale.scaled(...)` registers original design sizes/styles; `px(...)` handles
+custom geometry. Do not register sizes already measured from a viewport or screen.
+Rich text is reflowed with selection and reading position retained. Persisted
+window dimensions are normalized so restarting does not compound the enlargement.
+See [live zoom qualification](MACOS-LIVE-ZOOM-2026-09-27.md).
 
 ## Create a skin from an image
 

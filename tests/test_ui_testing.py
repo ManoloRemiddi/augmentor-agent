@@ -14,7 +14,7 @@ class UiTestingTests(unittest.TestCase):
     def setUpClass(cls):cls.app=QApplication.instance() or QApplication([])
 
     def test_disabled_launch_rejects_every_operation_without_touching_window(self):
-        for action in ['inspect','send','capture','draft']:
+        for action in ['inspect','send','capture','draft','zoom']:
             with self.assertRaisesRegex(ValueError,'disabled'):
                 dispatch(None,{'action':action})
 

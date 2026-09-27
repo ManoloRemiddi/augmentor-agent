@@ -7,6 +7,7 @@ from pathlib import Path
 import subprocess
 import sys
 import threading
+from .ui_scale import scaled
 from PySide6.QtCore import QTimer, Signal, QUrl
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QDialog, QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QProgressBar
@@ -104,7 +105,7 @@ class MacRuntimeIncompleteDialog(QDialog):
         super().__init__(owner)
         self.owner = owner
         self.setWindowTitle('Reinstall Augmentor')
-        self.setModal(True); self.setMinimumWidth(470)
+        self.setModal(True); scaled(self).setMinimumWidth(470)
         layout = QVBoxLayout(self)
         note = QLabel(problem + ' Augmentor runs its agent from that runtime, so no model can be connected until this copy is replaced.')
         note.setWordWrap(True); layout.addWidget(note)
@@ -167,14 +168,14 @@ class MacSetupDialog(QDialog):
         self.installed = not needed(); self.online = False; self.operation = None
         self.completed.connect(self.finished_operation)
         self.progress.connect(self.show_progress)
-        self.setWindowTitle('Agent setup'); self.setModal(False); self.setMinimumWidth(460)
-        layout = QVBoxLayout(self); layout.setSpacing(14)
-        title = QLabel('Your Augmentor agent'); title.setStyleSheet('font-size:20px;font-weight:600;')
+        self.setWindowTitle('Agent setup'); self.setModal(False); scaled(self).setMinimumWidth(460)
+        layout = QVBoxLayout(self); scaled(layout).setSpacing(14)
+        title = QLabel('Your Augmentor agent'); scaled(title).setStyleSheet('font-size:20px;font-weight:600;')
         layout.addWidget(title)
         intro = QLabel('Two steps: start DSH, then choose the model your agent will use. DSH is included with Augmentor.')
         intro.setWordWrap(True); layout.addWidget(intro)
         self.runtime_status = QLabel('1  DSH · Checking…' if self.installed else '1  DSH · Not set up yet')
-        self.runtime_status.setStyleSheet('font-size:15px;font-weight:600;'); layout.addWidget(self.runtime_status)
+        scaled(self.runtime_status).setStyleSheet('font-size:15px;font-weight:600;'); layout.addWidget(self.runtime_status)
         runtime_note = QLabel('Runs in the background and starts when you sign in to this Mac. You can open its browser interface here at any time.')
         runtime_note.setWordWrap(True); layout.addWidget(runtime_note)
         runtime_actions = QHBoxLayout(); layout.addLayout(runtime_actions)
@@ -184,7 +185,7 @@ class MacSetupDialog(QDialog):
         self.browser_button = QPushButton('Open DSH in browser'); self.browser_button.setEnabled(self.installed)
         self.browser_button.clicked.connect(self.open_browser); runtime_actions.addWidget(self.browser_button)
         self.model_status = QLabel('2  Model · Choose after DSH starts')
-        self.model_status.setStyleSheet('font-size:15px;font-weight:600;'); layout.addWidget(self.model_status)
+        scaled(self.model_status).setStyleSheet('font-size:15px;font-weight:600;'); layout.addWidget(self.model_status)
         model_note = QLabel('In DSH, open Settings → Models and choose your provider or local model. If DSH first asks for a DeepSeek key, choose Configure later to see other providers. Save your model, then click Check connection here.')
         model_note.setWordWrap(True); layout.addWidget(model_note)
         self.note = QLabel('No Terminal, server address or login key is needed to start DSH.')
