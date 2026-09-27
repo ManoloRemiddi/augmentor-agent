@@ -30,6 +30,27 @@ class ShortcutActivationTests(unittest.TestCase):
                         self.assertEqual(connection.recv(100), b'')
                     launch.assert_not_called()
 
+    def test_secondary_toggle_never_reaches_primary_and_cold_launch_names_instance(self):
+        with tempfile.TemporaryDirectory() as directory:
+            servers = []
+            try:
+                for name in ('augmentor-linux-pi.sock', 'augmentor-linux-pi-secondary.sock'):
+                    server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+                    server.bind(str(Path(directory)/name)); server.listen(1); server.settimeout(.05)
+                    servers.append(server)
+                with patch('augmentor_linux.shortcut_activation.subprocess.Popen') as launch:
+                    activation = DesktopActivation(directory, ['/app/launcher'], instance='secondary')
+                    self.assertEqual(activation.activate(), 'delivered')
+                    connection, _ = servers[1].accept()
+                    with connection: self.assertEqual(connection.recv(100), b'toggle')
+                    with self.assertRaises(TimeoutError): servers[0].accept()
+                    launch.assert_not_called()
+                    servers[1].close()
+                    self.assertEqual(activation.activate(), 'launched')
+                    self.assertEqual(launch.call_args.args[0], ['/app/launcher', '--instance', 'secondary'])
+            finally:
+                for server in servers: server.close()
+
     def test_absent_app_launches_once_while_starting_then_can_restart_after_exit(self):
         with tempfile.TemporaryDirectory() as directory:
             child = Mock()

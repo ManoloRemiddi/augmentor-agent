@@ -2,6 +2,10 @@
 
 # Cross-platform implementation status
 
+The [September 26 product parity audit](PLATFORM-PARITY-AUDIT.md) records the
+current architecture direction, installed-artifact differences and pending
+shared-feature work. Historical qualification entries below do not supersede it.
+
 For current Mac installation evidence, use the
 [September 26 clean installation checkpoint](MACOS-DISTRIBUTION.md#september-26-clean-installation-and-default-shortcut).
 The earlier candidates below retain their original qualification boundaries.

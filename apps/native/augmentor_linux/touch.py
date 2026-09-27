@@ -3,6 +3,7 @@
 import json
 import os
 from pathlib import Path
+from .ui_scale import scaled
 from PySide6.QtCore import QObject, QEvent, QTimer, Qt
 from PySide6.QtWidgets import QApplication, QDialog, QHBoxLayout, QLayout, QMenu, QPushButton, QScrollArea, QWidget, QVBoxLayout, QScroller
 
@@ -16,34 +17,34 @@ class TouchLayout(QObject):
         self.command = None
         self.file = Path(os.environ['AUGMENTOR_TOUCH_VIEWPORT']) if os.environ.get('AUGMENTOR_TOUCH_VIEWPORT') else None
         window.activity.margin=8
-        window.outer.setContentsMargins(8, 8, 8, 8)
+        scaled(window.outer).setContentsMargins(8, 8, 8, 8)
         layout = window.expanded.layout()
         header = layout.itemAt(0).layout()
-        controls = QHBoxLayout(); controls.setSpacing(8)
+        controls = QHBoxLayout(); scaled(controls).setSpacing(8)
         for button in (window.new_button, window.save_button, window.history_button, window.pin_button, window.compact_button, window.more_button):
             header.removeWidget(button); controls.addWidget(button)
         controls.addStretch()
         layout.insertLayout(1, controls)
-        layout.setSpacing(8)
-        window.setMinimumSize(340, 300)
+        scaled(layout).setSpacing(8)
+        scaled(window).setMinimumSize(340, 300)
         window.brand.setText('Augmentor Agent')
         self.buttons = (window.new_button, window.save_button, window.history_button, window.pin_button,
                         window.compact_button, window.more_button, window.hide_button, window.voice_button,
                         window.send_button, window.stop_button, window.latest_button)
         for button in self.buttons:
-            button.setFixedSize(TARGET, TARGET)
-        window.model_picker.setFixedHeight(TARGET)
+            scaled(button).setFixedSize(TARGET, TARGET)
+        scaled(window.model_picker).setFixedHeight(TARGET)
         window.voice_button.setToolTip('Voice uses the computer microphone and speakers. Phone audio is not connected yet.')
         window.voice_button.setAccessibleName('Voice using computer audio')
         window.composer.touch_mode=True
         window.composer.fit()
-        window.composer.improve_button.setFixedSize(TARGET, TARGET)
+        scaled(window.composer.improve_button).setFixedSize(TARGET, TARGET)
         window.composer.setViewportMargins(0, 0, 62, 0)
         window.composer.installEventFilter(self)
         window.transcript.touch_targets = True
         window.title.setToolTip('Tap to rename this conversation')
         window.title.mouseReleaseEvent = lambda event: window.rename_chat() if event.button() == Qt.MouseButton.LeftButton else None
-        window.title_editor.setFixedHeight(TARGET)
+        scaled(window.title_editor).setFixedHeight(TARGET)
         QScroller.grabGesture(window.transcript.viewport(), QScroller.ScrollerGestureType.TouchGesture)
         self.style()
         QApplication.instance().installEventFilter(self)
@@ -53,9 +54,9 @@ class TouchLayout(QObject):
     def style(self):
         w = self.window
         # Preserve all original colours and artwork. Only sizing/spacing changes.
-        w.setStyleSheet(w.styleSheet() + '\nQMenu::item {padding:14px 18px;} QDialog QPushButton,QDialog QComboBox,QDialog QLineEdit {min-height:30px;} QDialog QListWidget::item {min-height:30px;padding:8px;} QScrollBar:vertical {width:18px;}')
-        w.composer.setMinimumHeight(58)
-        w.model_picker.setFixedHeight(TARGET)
+        scaled(w).setStyleSheet(w.styleSheet() + '\nQMenu::item {padding:14px 18px;} QDialog QPushButton,QDialog QComboBox,QDialog QLineEdit {min-height:30px;} QDialog QListWidget::item {min-height:30px;padding:8px;} QScrollBar:vertical {width:18px;}')
+        scaled(w.composer).setMinimumHeight(58)
+        scaled(w.model_picker).setFixedHeight(TARGET)
         w.composer.improve_button.move(w.composer.width()-TARGET-12, 6)
 
     def fit_dialog(self, dialog):
@@ -73,7 +74,7 @@ class TouchLayout(QObject):
                     existing_close=None
                 if existing_close:original.removeWidget(existing_close)
                 content = QWidget(); content.setLayout(original)
-                outer = QVBoxLayout(dialog); outer.setContentsMargins(6, 6, 6, 6)
+                outer = QVBoxLayout(dialog); scaled(outer).setContentsMargins(6, 6, 6, 6)
                 scroll = QScrollArea(); scroll.setWidgetResizable(True); scroll.setWidget(content)
                 outer.addWidget(scroll)
                 if existing_close:outer.addWidget(existing_close)
@@ -81,7 +82,7 @@ class TouchLayout(QObject):
                     close = QPushButton('Done'); close.clicked.connect(dialog.reject); outer.addWidget(close)
                 QScroller.grabGesture(scroll.viewport(), QScroller.ScrollerGestureType.TouchGesture)
                 outer.setSizeConstraint(QLayout.SizeConstraint.SetNoConstraint)
-            dialog.setMinimumSize(0, 0)
+            scaled(dialog).setMinimumSize(0, 0)
         dialog.setMaximumSize(width-8, height-8)
         dialog.resize(min(dialog.width(), width-8), min(dialog.height(), height-8))
         dialog.move(max(4, (width-dialog.width())//2), max(4, (height-dialog.height())//2))

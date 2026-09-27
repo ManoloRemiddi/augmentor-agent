@@ -68,8 +68,15 @@ def verify(root, work, out):
             env=environment,stdout=log,stderr=log)
         ws=None
         try:
-            portfile=profile/'DevToolsActivePort';wait(portfile.exists)
-            port=portfile.read_text().splitlines()[0]
+            portfile=profile/'DevToolsActivePort';port_lines=[]
+            def port_ready():
+                nonlocal port_lines
+                try:port_lines=portfile.read_text().splitlines()
+                except FileNotFoundError:port_lines=[]
+                if chrome.poll() is not None:raise RuntimeError('Chrome exited before its debugging endpoint became ready.')
+                return len(port_lines)>=2 and port_lines[0].isdigit() and port_lines[1].startswith('/devtools/browser/')
+            wait(port_ready)
+            port=port_lines[0]
             info=json.load(urllib.request.urlopen('http://127.0.0.1:'+port+'/json/version'))
             ws=websocket.create_connection(info['webSocketDebuggerUrl'],suppress_origin=True,timeout=30)
             sequence=0

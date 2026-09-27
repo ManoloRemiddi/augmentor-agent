@@ -1,10 +1,11 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+from .ui_scale import scaled
 from PySide6.QtWidgets import QDialog,QVBoxLayout,QLabel,QLineEdit,QPushButton
 from .prompt_client import PromptClient
 
 class HomeDialog(QDialog):
     def __init__(self,window):
-        super().__init__(window);self.owner=window;self.setWindowTitle('Connect Home');self.setMinimumWidth(380)
+        super().__init__(window);self.owner=window;self.setWindowTitle('Connect Home');scaled(self).setMinimumWidth(380)
         layout=QVBoxLayout(self)
         note=QLabel('Connect this Augmentor to your NAS once. Then ask about your home in any conversation. Get a one-time pairing code from your Home owner.');note.setWordWrap(True);layout.addWidget(note)
         self.url=QLineEdit();self.url.setPlaceholderText('https://your-home-address');self.url.setAccessibleName('Home URL')

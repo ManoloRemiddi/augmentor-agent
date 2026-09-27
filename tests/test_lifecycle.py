@@ -17,6 +17,16 @@ maintenance=module('maintenance','scripts/maintenance.py')
 lease=module('lease_test','services/lifecycle/lease.py')
 
 
+class ExitRaceTests(unittest.TestCase):
+    def test_exit_between_identity_and_state_is_successful_shutdown(self):
+        with patch.object(maintenance,'identity',return_value='123'), patch.object(Path,'read_text',side_effect=FileNotFoundError):
+            maintenance.wait_exit(999999,'123')
+
+    def test_inaccessible_process_is_not_reported_as_exited(self):
+        with patch.object(maintenance,'identity',return_value='123'), patch.object(Path,'read_text',side_effect=PermissionError):
+            with self.assertRaises(PermissionError):maintenance.wait_exit(999999,'123')
+
+
 class LifecycleTests(unittest.TestCase):
     def test_memory_companion_shutdown_preserves_journal(self):
         with tempfile.TemporaryDirectory() as name:

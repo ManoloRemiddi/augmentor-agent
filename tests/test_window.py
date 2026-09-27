@@ -11,6 +11,40 @@ class WindowTests(unittest.TestCase):
     def setUpClass(cls):
         cls.app = QApplication.instance() or QApplication([])
 
+    def test_mac_first_run_offers_installation_without_starting_recovery(self):
+        from unittest.mock import Mock, patch
+        owner=SimpleNamespace(controller=SimpleNamespace(harness='dsh',session=None,start_monitor=Mock()),
+            open_setup=Mock(),setup_offered=False,set_status=Mock())
+        with patch('augmentor_linux.macos_setup.needed',return_value=True):
+            Window.start_connection(owner); self.app.processEvents()
+        owner.open_setup.assert_called_once(); owner.controller.start_monitor.assert_not_called()
+        self.assertTrue(owner.setup_offered)
+        self.assertIn('Agent setup',owner.set_status.call_args.args[0])
+
+    def test_maintenance_preserves_unsent_and_unacknowledged_drafts(self):
+        window = Window(preview=True)
+        try:
+            self.assertTrue(window.maintenance_state()['accepted'])
+            window.composer.setPlainText('unsent work')
+            state = window.maintenance_state()
+            self.assertTrue(state['draftPresent']); self.assertTrue(state['busy'])
+            self.assertFalse(state['accepted']); self.assertNotIn('unsent work', str(state))
+            window.composer.clear(); window.submitted_draft = 'pending acknowledgement'
+            self.assertFalse(window.maintenance_state()['accepted'])
+            window.submitted_draft = None
+            self.assertTrue(window.maintenance_state()['accepted'])
+        finally:
+            window.close()
+
+    def test_existing_connections_and_saved_chats_keep_their_recovery(self):
+        from unittest.mock import Mock, patch
+        for harness,session,needed in [('dsh',None,False),('dsh','saved',True),('pi',None,True)]:
+            owner=SimpleNamespace(controller=SimpleNamespace(harness=harness,session=session,start_monitor=Mock()),
+                open_setup=Mock(),setup_offered=False,set_status=Mock())
+            with patch('augmentor_linux.macos_setup.needed',return_value=needed):
+                Window.start_connection(owner); self.app.processEvents()
+            owner.controller.start_monitor.assert_called_once(); owner.open_setup.assert_not_called()
+
     def test_unconfigured_dsh_offers_setup_once_without_waiting_for_connection(self):
         from unittest.mock import Mock
         owner=SimpleNamespace(update_controls=Mock(),open_setup=Mock(),setup_offered=False,

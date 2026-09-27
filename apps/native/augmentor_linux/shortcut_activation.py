@@ -7,6 +7,7 @@ import socket
 import subprocess
 import sys
 import threading
+from .instances import validate_name, ipc_basename
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -15,12 +16,15 @@ ROOT = Path(__file__).resolve().parents[3]
 class DesktopActivation:
     """Coalesce startup requests and never retry an uncertain toggle delivery."""
 
-    def __init__(self, runtime=None, command=None):
+    def __init__(self, runtime=None, command=None, instance='main'):
+        self.instance = validate_name(instance)
         self.runtime = Path(runtime or os.environ.get(
             'XDG_RUNTIME_DIR', f'/tmp/augmentor-{os.getuid()}'))
         native=ROOT.parents[1]/'MacOS/Augmentor Agent Desktop'
         self.command = command or ([str(native)] if sys.platform=='darwin' and native.is_file() else
                                   [sys.executable, '-B', str(ROOT/'scripts/launch-component.py'), 'desktop'])
+        if self.instance != 'main':
+            self.command = [*self.command, '--instance', self.instance]
         self.child = None
         self.lock = threading.Lock()
 
@@ -29,7 +33,7 @@ class DesktopActivation:
             with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as connection:
                 connection.settimeout(1)
                 try:
-                    connection.connect(str(self.runtime/'augmentor-linux-pi.sock'))
+                    connection.connect(str(self.runtime/(ipc_basename(self.instance)+'.sock')))
                 except OSError as error:
                     # Only an absent listener proves that launch is appropriate.
                     # Permission errors, timeouts and resource exhaustion do not.

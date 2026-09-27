@@ -28,6 +28,9 @@
 - Use the coding-agent SDK's agent/session lifecycle. Do not start a parallel standalone agent-core loop for the same conversation.
 - Pin and lock the versions actually tested. Record package compatibility in `docs/SOURCES.md`; never present an inspected upstream version as a verified integration.
 - Carry forward useful existing UI and desktop regression tests. Test new runtime contracts and failure paths; keep fake tests distinct from live model and desktop evidence.
+- Augmentor is one product across Linux and macOS. Follow [the platform contract and audit](docs/PLATFORM-PARITY-AUDIT.md): shared features/UI behavior by default, OS-specific adapters for OS mechanisms. For every feature or fix, assess both platforms and run the relevant common and adapter checks. A missing adapter is an explicit parity gap, not a different feature specification. Keep harness, surface and OS support dimensions separate.
+- Qualify Linux and Mac release artifacts from one reviewed source revision and product/dependency contract. Track temporary overlays explicitly and converge them; never infer parity from version numbers or a successful build alone. Source, selected artifacts and running instances are distinct.
+- Preserve the owner's approved UI. Change layout or control placement only within an explicit user request; ask before additional visible changes. Requested bug fixes do not authorize a redesign.
 - Development uses separate Pi state, desktop identity and configuration paths. Preserve explicit model selection, visible Stop, and no replay of unknown-outcome actions.
 - Use Markdown links for supporting sources. Add copyright/SPDX headers to authored source and documentation where the format supports comments; JSON must remain valid JSON.
 

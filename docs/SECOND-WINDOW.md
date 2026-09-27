@@ -8,13 +8,20 @@ Repeated launches toggle that same named window. The default invocation retains
 its original socket and files. Both windows share the existing harness services,
 prompt library and model catalog.
 
+## Cross-platform requirement
+
+Two independent instances are a product feature on both Linux and macOS. The Mac login service now owns both shortcuts with separate persistence and
+instance-targeted activation. Main defaults to Fn+Space; secondary remains unassigned
+until saved. See [implementation and qualification](MACOS-RECOVERY-2026-09-26.md).
+The earlier [parity audit](PLATFORM-PARITY-AUDIT.md) records why this was required.
+
 ## Settings
 
 Either window's Settings → Window shortcuts has separate capture fields and Save
 buttons for the first and second agents. Each field records the combination the
 keyboard actually sends. Conflicting assignments are rejected; failed KDE updates
 restore the previous binding and launcher files. Entries persist for later desktop
-sessions. This two-window launcher integration currently targets KDE.
+sessions. Both KDE and macOS provide this two-window launcher integration.
 
 Colours & visual effects saves to each window's own appearance file, including
 custom skins, formatting colours, backgrounds and visual effects. Resonant Voice

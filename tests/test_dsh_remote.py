@@ -16,10 +16,31 @@ class Response:
 
 class RemoteTests(unittest.TestCase):
     def setUp(self):self.remote=Remote('http://127.0.0.1:1234',Path('/tmp/disposable-dsh'))
+    def test_browser_handoff_requests_fresh_auth_after_service_restart(self):
+        with patch.object(Path,'read_text',return_value='private-action-token'),patch.object(self.remote,'request',side_effect=[Response(200,{'token':'first'}),Response(200,{'token':'restarted'})]) as request:
+            self.assertEqual(self.remote.browser_url(),'http://127.0.0.1:1234/?token=first')
+            self.assertEqual(self.remote.browser_url(),'http://127.0.0.1:1234/?token=restarted')
+            self.assertEqual(request.call_args.args,('/api/augmentor/auth',{}, {'x-augmentor-token':'private-action-token'}))
+    def test_browser_handoff_rejects_missing_or_malformed_auth(self):
+        for response in (Response(403,{}),Response(200,{'token':'bad&next=https://other.test'})):
+            with patch.object(self.remote,'request',return_value=response):
+                with self.assertRaises(ValueError):self.remote.browser_url()
+    def test_provider_setup_checks_credentials_without_reading_keys(self):
+        values={'llm/listProviders':[{'id':'missing'},{'id':'saved'},{'id':'local'}],
+            'llm/listConfigurableProviders':[{'provider':p,'settingsNs':'llm','settingsPath':['providers',p]} for p in ('missing','saved','local')],
+            'settings/describe':{'namespaces':[{'ns':'llm','value':{'providers':{'missing':{'apiKeyEnv':'MISSING'},'saved':{'apiKeyEnv':'SAVED'},'local':{}}}}]},
+            'credentials/describe':{'MISSING':{'configured':False},'SAVED':{'configured':True}}}
+        with patch.object(self.remote,'invoke',side_effect=lambda method,*args:values[method]):
+            self.assertEqual(self.remote.configured_providers(),['local','saved'])
     def test_server_error_never_replays_mutation(self):
         with patch.object(self.remote,'request',return_value=Response(500,{})) as send:
             with self.assertRaisesRegex(ValueError,'not replayed'):self.remote.call('session.prompt',{'sessionId':'test','content':[]})
             self.assertEqual(send.call_count,1)
+    def test_void_rpc_acknowledgment_does_not_retry_saved_credential(self):
+        def send(path,body,headers):return Response(200,{'type':'server-response','rpcId':body['rpcId'],'result':{'ok':True}})
+        with patch.object(self.remote,'request',side_effect=send) as request:
+            self.assertIsNone(self.remote.invoke('credentials/set',{'ref':'FIXTURE','value':'fixture-only'}))
+            self.assertEqual(request.call_count,1)
     def test_only_authentication_refusal_can_retry_and_preserves_identity(self):
         calls=[]
         def send(path,body,headers):

@@ -1,6 +1,23 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-Mac setup update (26 September): current source has a separate
+Current OS parity direction and verified gaps: [one-product architecture audit](PLATFORM-PARITY-AUDIT.md).
+The tables below compare harnesses and presentation surfaces; they do not establish
+Linux/macOS parity. The [Mac recovery record](MACOS-RECOVERY-2026-09-26.md) now
+qualifies both Mac shortcuts and the shared Metal/OpenGL renderer, with explicit
+installed and public-release boundaries.
+
+Shared desktop Appearance now includes [75–150% proportional app sizing](SKINS.md#app-size),
+applied immediately while dragging, with saved per-window preferences. The [Mac transparency correction](MACOS-APPEARANCE-2026-09-27.md)
+disables native shadows on the animated effect layer; Linux uses the same flag.
+
+Mac setup correction (26 September, current source): install/start DSH before
+model setup, Agent setup/Open DSH actions in the three-dot menu, authenticated browser
+handoff, native DSH provider settings. See [qualification and deployment](MACOS-GUIDED-DSH-SETUP.md).
+
+Mac frameless-window resizing now falls back to pointer geometry when Cocoa
+declines native resize; see [behavior and evidence](WINDOW-RESIZING.md).
+
+Earlier Mac setup update (26 September): source added a separate
 [managed runtime/model form](MACOS-MANAGED-SETUP.md) for fresh bundled desktops.
 External DSH setup below remains available. Basic setup, chat and restart passed
 an isolated real Mac/DSH fixture; the public signed app, additional plugins and
@@ -40,7 +57,7 @@ Additional current native/browser capabilities:
 | Capability | Desktop | Browser |
 | --- | --- | --- |
 | Resonant Voice on DSH | Hold/release, slide-lock, voice selection; optional hands-free preview | Same shared engine: hold/release, lock, hands-free and primary voice settings |
-| Independent second conversation | Named second window, separate chat/settings/voice profile; KDE shortcut | Separate sidebar/session workflow |
+| Independent second conversation | Named second window, separate chat/settings/voice profile; KDE and Mac shortcuts | Separate sidebar/session workflow |
 | Skins and activity animation | Futuristic plasma; Blossom lake/butterflies; validated import/export | Native skins are not applied to Chromium |
 | Startup and recovery | Shared selected release, supervised login, guarded recovery | Matching companion and explicit extension load/reload |
 | Complete fresh-user installation | Guided Debian 13 amd64 bundle with pinned DSH/plugins | Matching extension and native host in the same bundle |

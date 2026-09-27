@@ -1,6 +1,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """One voice control: press to silence, hold to record, release to send."""
 import math
+from .ui_scale import scaled, factor
 from PySide6.QtCore import QEvent, QPoint, QPointF, Qt, QTimer, Signal, QVariantAnimation, QEasingCurve
 from PySide6.QtGui import QColor, QPainter, QPainterPath, QPen, QRadialGradient
 from PySide6.QtWidgets import QPushButton
@@ -26,7 +27,7 @@ class VoiceButton(QPushButton):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setFixedSize(28, 28)
+        scaled(self).setFixedSize(28, 28)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setAutoRepeat(False)
         self.accent = QColor('#b79de5')
@@ -255,6 +256,7 @@ class VoiceButton(QPushButton):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         painter.translate(self.width()/2, self.height()/2)
+        painter.scale(factor(self),factor(self))
         accent = self.recording_colour()
         if not self.isEnabled():painter.setOpacity(.35)
         phase = self.phase

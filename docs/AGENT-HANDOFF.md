@@ -2,6 +2,112 @@
 
 # Start here: agent handoff
 
+## September 27 live zoom correction
+
+The owner accepts the flare fix. The earlier size slider only affected startup;
+the shared replacement resizes the existing interface immediately and preserves
+active work. Read [live zoom qualification](MACOS-LIVE-ZOOM-2026-09-27.md) for current
+source, package and deployment evidence. The sealed `b8dac9d` artifact is now
+installed on the 32 GB Mac, retaining the owner's 120% setting. Native pointer
+drags and zoom during a real reply pass; model settings and conversations remain
+intact. The older startup-only record below is
+historical; do not reinstate its restart instruction.
+
+## September 27 transparency and app size — historical checkpoint
+
+The owner's remaining outline report is tracked in [the appearance correction](MACOS-APPEARANCE-2026-09-27.md).
+The transparent effect window had an AppKit shadow; its shadow is now disabled.
+The earlier performance fixture did not reliably trigger a flare and is corrected.
+The shared Appearance slider adds uniform 75–150% sizing on the next window process
+start, without interrupting active work. Read the record for qualification and
+the actual installed build; do not treat source tests as an installed update.
+The clean `7ff6712` artifact is now installed and live-chat tested on the 32 GB
+Mac at 110%. One app/registration/Dock tile remains. Mac 14/26 validation passed;
+a Linux maintenance exit race caught by package CI is corrected separately.
+At `fa77135`, both complete workflows passed, including installed Linux lifecycle
+checks and Mac 14/26. The installed Mac artifact remains the sealed `7ff6712` build.
+
+## September 26 continued Mac recovery
+
+The [recovery record](MACOS-RECOVERY-2026-09-26.md) supersedes the source gap status
+below: guided setup/resize and shared rendering are integrated, the Mac second
+shortcut is implemented, and Metal/OpenGL fixtures pass. Installed state:
+the clean `c3a7fab` artifact is now installed and live-tested on the 32 GB Mac.
+One canonical application/registration and one Dock tile remain; legacy previews
+and helpers are retired. The record owns exact hashes, real/native versus fixture
+evidence, the browser CI race correction and remaining publication boundaries.
+Preserve the approved UI and private data; do not resume the old overlay workflow.
+
+## September 26 shared flare rendering correction
+
+[Flare fidelity](FLARE-FIDELITY.md) records the coarse-texture root cause and the
+shared detailed-emission/bounded-fluid correction. Both platforms use the same
+renderer; no UI layout changed. The 32 GB Mac now runs the verified replacement;
+Linux has it selected while earlier open windows retain their builds. Read the
+guide for exact identities, captures, CI and activation evidence. The earlier one-product audit
+remains an analysis of the still-pending shortcut and release convergence gaps.
+
+## September 26 one-product architecture direction and parity audit
+
+The owner requires one Augmentor product across OSs, with common features and UI
+behavior and platform adapters underneath. The [audit](PLATFORM-PARITY-AUDIT.md)
+identifies the Mac second-shortcut gap in UI, storage, service protocol and
+activation; the three shared instance tests pass on Linux and installed Mac
+modules. It also records release drift between open embedding PR #12 and Mac
+correction PR #13, and Mac CI's omission of several shared suites. Engineering
+rules and the PR review template now require both-platform impact assessment.
+The document includes the correction sequence and acceptance criteria. This is
+an analysis/documentation change: no shortcut implementation, branch integration,
+CI expansion, active-app restart or deployment was performed. Mac installed
+application source remains `252215b` from PR #13; older entries below are dated
+checkpoints. Begin implementation with the shared instance/shortcut contract.
+
+## September 26 owner-requested Mac menu placement and resizing
+
+Preserve the owner's approved UI: additional visible changes require permission.
+Current source removes the recent DSH main-window row; Agent setup/Open DSH stay
+in the three-dot menu. Cocoa rejected the native resize request, which the old
+code ignored. The existing eight handles now have a logical-coordinate fallback
+while supported Linux compositor resizing is retained. Five resize regressions,
+117 Mac tests, 27 window tests, and eight synthetic pointer drags on the real
+32 GB Mac's Cocoa window passed. See [resize behavior and installed scope](WINDOW-RESIZING.md).
+The owner explicitly requested installation after the draft-preservation warning.
+The sealed `252215b` candidate is now installed on the 32 GB Mac and reopened
+normally, online/model-ready without connection or restoration errors. The owned
+shortcut had relaunched the old window during the first attempt; pausing it via
+its registrar and durable resume intent allowed safe activation. DSH settings,
+connection and session metadata matched before/after. Both login services are
+restored, installed integrity and overlay hashes passed, and the previous bundle
+is retained as a backup. Mac 14/26 and full validation passed at documentation ref
+`166e1ae`; see the resize guide for exact artifact and test scope. Public downloads,
+Linux, the NAS and the other Mac were not updated.
+
+## September 26 runtime-first Mac setup — earlier installed checkpoint
+
+The owner reported the earlier installed form remained unusable. Fresh diagnosis
+confirmed DSH was bundled but still unprovisioned, and the browser menu omitted
+DSH authentication. Current source separates engine installation from model setup,
+adds persistent Agent setup/Open DSH buttons, and uses DSH's native provider UI.
+The owner requested activation: application code `60413de` is now installed,
+DSH is provisioned and online, both login services are loaded, and the default
+browser accepted the authenticated DSH opening. Integrity and installed file
+hashes passed. No model is configured yet; live owner-model chat remains
+unqualified. Both clean-build workflows passed at documentation ref `33b58ff`.
+Read [qualification, the drained idle runtime, and installed scope](MACOS-GUIDED-DSH-SETUP.md).
+The public preview DMG is unchanged.
+
+## September 26 guided Mac DSH installation
+
+The 32 GB Mac's public preview contains DSH but had no saved connection. The
+native first run now offers **Install DSH** before connection recovery, streams
+the managed installer's five stages, and retains failed settings for retry.
+An incomplete bundle is diagnosed before offering an existing-DSH form.
+See [the scoped evidence and deployment record](MACOS-GUIDED-DSH-SETUP.md).
+The qualified candidate is now installed and reopened on the 32 GB Mac after
+the owner closed its earlier window. Integrity, the native process and shortcut
+service were checked; model setup remains unfinished. Both full validation and
+the Mac 14/26 workflow passed at `6bead5a`. The published preview DMG is unchanged.
+
 ## September 26 public Apple-independent macOS preview
 
 The owner approved publishing a clearly labelled macOS preview without Developer

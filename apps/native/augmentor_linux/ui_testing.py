@@ -24,7 +24,21 @@ def dispatch(window, request, *, enabled=False):
                 'draft':window.composer.toPlainText(),
                 'transcript':window.transcript.toPlainText(),
                 'status':window.status.text(),
+                'uiScale':window.ui_scale.percent,'width':window.width(),
+                'fontPixels':window.brand.font().pixelSize(),'buttonWidth':window.send_button.width(),
                 'dialogs':[d.windowTitle() for d in window.findChildren(QDialog) if d.isVisible()]}
+    if action=='zoom':
+        from .ui_scale import MINIMUM,MAXIMUM,STEP
+        percent=request.get('percent')
+        if type(percent) is not int or not MINIMUM<=percent<=MAXIMUM or percent%STEP:
+            raise ValueError('Use a supported app size.')
+        # Operates the actual Appearance control in this explicitly opted-in
+        # window, including while a reply is streaming. No controller mutation.
+        window.open_appearance()
+        window.appearance_dialog.size_slider.setValue(percent)
+        window.appearance_dialog.accept()
+        return {'uiScale':window.ui_scale.percent,'width':window.width(),
+                'fontPixels':window.brand.font().pixelSize(),'buttonWidth':window.send_button.width()}
     if action=='capture':
         path=Path(request['path'])
         if not path.is_absolute():raise ValueError('Use an absolute screenshot path.')
@@ -34,6 +48,18 @@ def dispatch(window, request, *, enabled=False):
         if not window.grab().save(str(path),'PNG'):
             path.unlink();raise ValueError('Could not capture the app window.')
         return {'captured':True}
+    if action=='draft':
+        expected=request.get('expected');text=request.get('text')
+        if (not isinstance(expected,str) or not isinstance(text,str) or len(text)>2000
+                or not text.isascii() or window.composer.toPlainText()!=expected
+                or bool(controller and (controller.running or controller.navigating or controller.repairing))
+                or window.editing or window.composer.improving or any(d.isVisible() for d in window.findChildren(QDialog))):
+            raise ValueError('Draft proof requires an idle window and the exact expected draft.')
+        from PySide6.QtTest import QTest
+        window.composer.setFocus();window.composer.selectAll()
+        QTest.keyClick(window.composer,Qt.Key.Key_Backspace)
+        QTest.keyClicks(window.composer,text)
+        return {'draft':window.composer.toPlainText()}
     if action=='send':
         text=request.get('text');via=request.get('via','button')
         if not isinstance(text,str) or not text or len(text)>2000 or not text.isascii():

@@ -62,6 +62,15 @@ class MacShortcutServiceTests(unittest.TestCase):
         finally:
             replacement.close()
 
+    def test_other_named_windows_can_edit_the_global_shortcuts(self):
+        self.service.start()
+        with patch.dict(os.environ,{'AUGMENTOR_WINDOW_ID':'qualification'}):
+            client=select_manager()
+            self.assertEqual(client.instance,'main')
+            client.save(QKeySequence('Ctrl+Alt+K'),'secondary')
+        self.assertEqual(request({'operation':'status'})['key'],'Fn+Space')
+        self.assertTrue(request({'operation':'status','instance':'secondary'})['active'])
+
     def test_fn_space_is_persisted_on_first_launch_and_restored(self):
         self.service.start()
         self.assertEqual(request({'operation':'status'})['key'],'Fn+Space')
@@ -85,6 +94,41 @@ class MacShortcutServiceTests(unittest.TestCase):
             with self.assertRaises(BlockingIOError):other.start()
             self.assertEqual(request({'operation': 'status'})['pid'], os.getpid())
         finally:other.close()
+
+    def test_secondary_is_unassigned_then_persists_without_changing_primary(self):
+        self.service.start()
+        main_file = self.root/'config/augmentor/shortcut.json'
+        original = main_file.read_bytes()
+        primary = self.service.manager.process
+        self.assertFalse(request({'operation': 'status', 'instance': 'secondary'})['active'])
+        key = RemoteShortcutManager().save(QKeySequence('Ctrl+Shift+K'), 'secondary')
+        self.assertEqual(request({'operation': 'status', 'instance': 'secondary'})['key'], key)
+        self.assertEqual(main_file.read_bytes(), original)
+        self.assertIs(self.service.manager.process, primary)
+        self.service.close()
+        replacement = ShortcutService()
+        try:
+            replacement.start()
+            self.assertEqual(request({'operation': 'status'})['key'], 'Fn+Space')
+            self.assertEqual(request({'operation': 'status', 'instance': 'secondary'})['key'], key)
+            self.assertTrue(request({'operation': 'status', 'instance': 'secondary'})['active'])
+        finally:
+            replacement.close()
+
+    def test_cross_window_conflict_and_bad_instance_preserve_both_keys(self):
+        self.service.start()
+        client = RemoteShortcutManager()
+        client.save(QKeySequence('Ctrl+Shift+K'), 'secondary')
+        before = {p.name: p.read_bytes() for p in (self.root/'config/augmentor').glob('shortcut*.json')}
+        processes = {name: manager.process for name, manager in self.service.managers.items()}
+        for message in ({'operation': 'save', 'instance': 'secondary', 'sequence': 'Fn+Space'},
+                        {'operation': 'save', 'instance': '../main', 'sequence': 'Ctrl+J'},
+                        {'operation': 'status', 'instance': []}):
+            with self.assertRaises(RuntimeError): request(message)
+        self.assertEqual(before, {p.name: p.read_bytes() for p in (self.root/'config/augmentor').glob('shortcut*.json')})
+        for name, process in processes.items():
+            self.assertIs(self.service.managers[name].process, process)
+            self.assertIsNone(process.poll())
 
     def test_invalid_request_preserves_binding_and_listener(self):
         self.service.start()

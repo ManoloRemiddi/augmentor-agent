@@ -15,7 +15,13 @@ export AUGMENTOR_SHARED_DATA="$proof_workspace/data/shared" AUGMENTOR_SHARED_STA
 export XDG_RUNTIME_DIR="$proof_workspace/runtime"
 # Xvfb needs window management, not compositing. KWin 6's X11 backend does
 # not support QPainter compositing and exits if KWIN_COMPOSE=Q is forced.
-export QT_QUICK_BACKEND=software KWIN_COMPOSE=N QT_QPA_PLATFORM=xcb LANG=C.UTF-8
+export KWIN_COMPOSE=N QT_QPA_PLATFORM=xcb LANG=C.UTF-8
+if [[ "${AUGMENTOR_PROOF_GPU:-0}" == 1 ]]; then
+  unset QT_QUICK_BACKEND
+  export QSG_RHI_BACKEND=opengl
+else
+  export QT_QUICK_BACKEND=software
+fi
 mkdir -p "$AUGMENTOR_PROOF_OUTPUT" "$XDG_CONFIG_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME"
 mkdir -m 700 "$XDG_RUNTIME_DIR"
 "$AUGMENTOR_PYTHON" "$project_dir/scripts/x11-session.py" dbus-run-session -- bash -euo pipefail -c '

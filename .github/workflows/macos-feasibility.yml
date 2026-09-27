@@ -52,8 +52,14 @@ jobs:
           npm run check
           npm run build
           .macos-build-env/bin/python3 -m unittest discover -s tests -p 'test_macos*.py' -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p '*shortcut*.py' -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_instances.py -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_dsh_payload_staging.py -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_prompt_client_startup.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_activity.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_ui_scale.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_fluid.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_window.py -v
       - name: Package and verify development bundle
         run: |
           .macos-build-env/bin/python3 scripts/package-macos.py --out outputs/macos
@@ -84,6 +90,7 @@ jobs:
           app="$PWD/outputs/macos/Augmentor Agent Desktop.app"
           project="$app/Contents/Resources/app"
           "$project/python/bin/python3" -I -B scripts/macos-managed-setup-proof.py --app-root "$project" --out outputs/macos-managed
+          "$project/python/bin/python3" -I -B scripts/macos-managed-setup-proof.py --app-root "$project" --out outputs/macos-engine-first --engine-first
           codesign --verify --deep --strict "$app"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
@@ -92,5 +99,6 @@ jobs:
           path: |
             outputs/macos/*.json
             outputs/macos-managed/report.json
+            outputs/macos-engine-first/report.json
           retention-days: 7
           if-no-files-found: warn

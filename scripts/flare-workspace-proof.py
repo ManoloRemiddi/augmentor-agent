@@ -62,6 +62,9 @@ try:
     command('wmctrl', '-n', '2')
     command('wmctrl', '-s', '0')
     window.apply_pin(); settle()
+    if os.environ.get('AUGMENTOR_PROOF_GPU') == '1':
+        assert canvas.gpu and canvas.gpu.available, 'GPU effect failed to initialize'
+        assert canvas.gpu.quickWindow().rendererInterface().graphicsApi().name == 'OpenGL'
     ids = [int(window.winId()), int(canvas.winId())]
     assert ids[1] in stack(), 'Halo bypasses window management'
     assert hex(ids[0]) in prop(canvas, 'WM_TRANSIENT_FOR'), 'Halo has no native owner'
@@ -99,7 +102,7 @@ try:
     window.show(); settle(); assert canvas.isVisible(); geometry()
     window.toggle_compact(); QTest.qWait(700); geometry()
     window.toggle_compact(); QTest.qWait(700); geometry()
-    print(json.dumps({'passed': ['managed transient', 'workspace switch', 'pin/unpin', 'effect reappearance', 'two-process stacking both directions', 'desktop edges', 'minimize/restore', 'hide/show', 'compact/expanded'], 'platform': app.platformName()}))
+    print(json.dumps({'passed': ['managed transient', 'workspace switch', 'pin/unpin', 'effect reappearance', 'two-process stacking both directions', 'desktop edges', 'minimize/restore', 'hide/show', 'compact/expanded'], 'platform': app.platformName(), 'renderer': 'GPU' if canvas.gpu and canvas.gpu.available else 'CPU'}))
 finally:
     if peer is not None: peer.terminate(); peer.wait(timeout=5)
     window.close(); release_kwin()

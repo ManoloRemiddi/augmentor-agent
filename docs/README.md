@@ -19,6 +19,8 @@ matrix and relevant setup/data/test instructions together. Source and installed
 state must remain distinct. Private logs, credentials and conversations stay out
 of this repository; include reproducible commands and sanitized evidence summaries.
 
+Current cross-platform direction: [one product, Linux/Mac parity audit and correction sequence](PLATFORM-PARITY-AUDIT.md).
+
 ## Start and understand the product
 
 - [Start here: agent handoff](AGENT-HANDOFF.md)
@@ -50,7 +52,7 @@ of this repository; include reproducible commands and sanitized evidence summari
 - [Hands-free native implementation](HANDS-FREE-IMPLEMENTATION.md)
 - [Desktop colors and skins](SKINS.md)
 - [Independent second window](SECOND-WINDOW.md)
-- [Linux window resizing](WINDOW-RESIZING.md)
+- [Desktop window resizing (Linux and macOS)](WINDOW-RESIZING.md)
 - [Linux desktop control preview](DESKTOP-CONTROL.md)
 - [Bounded desktop specialist](DESKTOP-SPECIALIST.md)
 - [Browser Settings](BROWSER-SETTINGS.md)
@@ -60,8 +62,12 @@ of this repository; include reproducible commands and sanitized evidence summari
 
 ## Setup, operations and distribution
 
+- [Current Mac recovery and shared renderer qualification](MACOS-RECOVERY-2026-09-26.md)
+- [Mac effect transparency and shared App size slider](MACOS-APPEARANCE-2026-09-27.md)
+
 - [macOS signing, publication gates and website cutover](MACOS-RELEASE.md)
 - [Managed Mac first-run model and runtime setup](MACOS-MANAGED-SETUP.md)
+- [Guided DSH installation and first-run correction](MACOS-GUIDED-DSH-SETUP.md)
 
 [0.2.12 desktop flare correction](RELEASE-0.2.12.md).
 [0.2.11 security release and upgrade guidance](RELEASE-0.2.11.md).
@@ -137,3 +143,7 @@ files available only in a developer's working directory.
 - [macOS preview release](MACOS-PREVIEW-RELEASE.md) — Apple-independent preview, source artifacts and qualification.
 - [Mac customer guide](MACOS-PREVIEW.html) — install, model connection and browser extension.
 - [Mac library replacement](MACOS-LIBRARY-REPLACEMENT.md) — LGPL source and installation material.
+
+- [Shared desktop flare fidelity](FLARE-FIDELITY.md): sampling correction, bounded fluid transport and Mac/Linux validation.
+
+- [Live app zoom correction and qualification](MACOS-LIVE-ZOOM-2026-09-27.md)

@@ -2,7 +2,7 @@
 
 # Current architecture
 
-Current development source: Augmentor 0.2.9 preview. Start with the
+Product version is defined by [the shared manifest](../release/product.json). Start with the
 [agent handoff](AGENT-HANDOFF.md) for the authoritative Git ref and evidence.
 The [documentation index](README.md) maps every subsystem to its detailed guide.
 The [original 0.1 design](HISTORICAL-ARCHITECTURE-0.1.md) is historical.
@@ -10,6 +10,20 @@ The [original 0.1 design](HISTORICAL-ARCHITECTURE-0.1.md) is historical.
 Installed Linux desktop selection follows [desktop deployments](DESKTOP-DEPLOYMENTS.md):
 one atomic descriptor selects a separately staged release for login, launchers,
 recovery and mobile. Working source trees are not the installed release.
+
+## One product across operating systems
+
+Linux and macOS must use the same product features, desktop UI and behavioral
+contracts. OS-specific adapters provide shortcuts, window integration, permissions,
+service ownership and packaging. A feature or fix on either OS requires an impact
+assessment and applicable implementation/tests on the other. A missing adapter
+remains a parity gap; it does not authorize a reduced feature specification.
+
+Read the [September 26 architecture audit and correction sequence](PLATFORM-PARITY-AUDIT.md)
+for the verified two-instance shortcut gap, divergent installed artifacts, test
+coverage gaps and shared-interface boundaries. This direction extends the existing
+architecture; the audit itself does not implement the pending changes or update
+installed apps. The owner's approved UI remains the design baseline.
 
 ## Product and runtime ownership
 
