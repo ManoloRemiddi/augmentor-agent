@@ -94,3 +94,33 @@ memory, complete desktop-control privacy attribution and all model/provider
 sign-in flows are not qualified by this release. The Apple approval dialog and
 manual extension folder chooser were not automated acceptance steps. No global
 security bypass or quarantine-removal instruction is supplied.
+
+## Publication verification
+
+The prerelease was published on September 27, 2026 at **12:30:07 UTC**. All seven
+attached files matched their prepared sizes and GitHub server SHA-256 digests.
+The published tag resolves to the accepted `b8dac9d` binary source. The three
+unchanged dependency archives remain at their pinned preview 1 URLs; all return
+HTTP 200, and their server digests match the locally verified originals.
+
+Website commit `e627dcc` passed [website checks](https://github.com/ManoloRemiddi/augmentoragent.com/actions/runs/36319266879)
+and [Pages deployment](https://github.com/ManoloRemiddi/augmentoragent.com/actions/runs/36319266526).
+The live homepage, Mac installation guide and Desktop page were fetched over
+HTTPS and matched their committed HTML byte for byte. Mac links select preview 2;
+the copied Linux installation prompt remains byte-identical, and its download
+and checksum destinations return HTTP 200. All 15 local website tests and five
+JavaScript syntax checks passed.
+
+A local IPv4 connectivity outage delayed transfer. Publication and direct live
+HTTP verification used a temporary IPv6 route with normal TLS verification;
+no host, browser or LAN network settings were changed. The in-app browser still
+could not load the site, so this run does **not** claim a fresh rendered-layout,
+live copy-button or clipboard interaction check. Those limitations do not change
+the successful source tests, live HTML comparison or artifact verification.
+
+At **12:34:28 UTC**, an anonymous full download of the public DMG completed:
+519,286,460 bytes, SHA-256
+`946a546c98f37ca43ac3fd4596ef3c87100520bc7639ae0737fedbde72b52ae4`.
+The public `SHA256SUMS` file also exactly matched the prepared release. This is a
+complete byte-stream check, not only a HEAD request or server metadata comparison.
+Later documentation-only commits retain the same website interface and app binary.
