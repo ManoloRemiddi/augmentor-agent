@@ -143,6 +143,7 @@ files available only in a developer's working directory.
 - [Current Mac preview 2](MACOS-PREVIEW-2-RELEASE.md) — accepted live zoom/flare build, packaging and publication.
 - [Historical macOS preview 1](MACOS-PREVIEW-RELEASE.md) — original Apple-independent preview qualification.
 - [Mac customer guide](MACOS-PREVIEW.html) — install, model connection and browser extension.
+- [Mac browser choice](MACOS-BROWSER-CHOICE.md) — installed Chromium apps, Comet, native registration and qualification.
 - [Mac library replacement](MACOS-LIBRARY-REPLACEMENT.md) — LGPL source and installation material.
 
 - [Shared desktop flare fidelity](FLARE-FIDELITY.md): sampling correction, bounded fluid transport and Mac/Linux validation.

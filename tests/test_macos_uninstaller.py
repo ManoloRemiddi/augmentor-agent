@@ -56,6 +56,16 @@ class MacUninstallerTests(unittest.TestCase):
             self.assertEqual(list(receipts[0].parent.iterdir()),receipts)
         finally:os.close(descriptor)
 
+    def test_selected_browser_manifest_is_removed_and_restored_without_brand_allowlist(self):
+        custom=self.support/'New Vendor/Custom Browser/NativeMessagingHosts/com.augmentor.agent.json'
+        custom.parent.mkdir(parents=True);custom.write_text(json.dumps(self.value))
+        other=custom.with_name('unrelated.json');other.write_text('keep')
+        result=uninstaller.uninstall(self.app,self.trash,self.support)
+        self.assertFalse(custom.exists());self.assertEqual(other.read_text(),'keep')
+        uninstaller.restore(Path(result['receipt']),self.support)
+        self.assertEqual(json.loads(custom.read_text()),self.value)
+        self.assertEqual(other.read_text(),'keep')
+
     def test_failed_app_move_rolls_back_registration(self):
         rename=Path.rename
         def fail(path,destination):

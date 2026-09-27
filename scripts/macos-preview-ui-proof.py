@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-"""Actual native composer and fresh Chrome profile against the managed fixture.
+"""Actual native composer and fresh Chromium browser against the managed fixture.
 
 Called while macos-managed-setup-proof.py owns its temporary DSH job. No personal
 browser profile, model credential or installed application is changed.
@@ -57,15 +57,24 @@ def verify(root, work, out):
     # The registrar and extension content are the ones shipped in the candidate.
     spec=importlib.util.spec_from_file_location('preview_registration',root/'scripts/register-macos-browser.py')
     registrar=importlib.util.module_from_spec(spec);spec.loader.exec_module(registrar)
-    prepared=registrar.prepare_extension(app,'chrome',work/'support')
-    profile=work/'chrome-profile';hosts=profile/'NativeMessagingHosts';hosts.mkdir(parents=True)
-    (hosts/'com.augmentor.agent.json').write_text(Path(prepared['manifest']).read_text())
+    browser_app=Path(os.environ.get('AUGMENTOR_PROOF_BROWSER_APP','/Applications/Google Chrome.app'))
+    browser=registrar.browser_application(browser_app)
+    source_directory=registrar.browser_data_directory(browser_app,Path.home()/'Library/Application Support')
+    # Comet uses its default native-host location independently of --user-data-dir.
+    # Isolate both Cocoa's home lookup and HOME; never register test hosts in the
+    # owner's real browser or let browser background tasks use their home.
+    browser_home=work/'browser-home'
+    support=browser_home/'Library/Application Support'
+    profile=support/source_directory.relative_to(Path.home()/'Library/Application Support')
+    profile.mkdir(parents=True);(profile/'Local State').write_text('{}')
+    prepared=registrar.prepare_extension(app,browser_app,support)
+    assert Path(prepared['manifest']).parent==profile/'NativeMessagingHosts'
     import websocket
     with (out/'chrome.log').open('w') as log:
-        chrome=subprocess.Popen(['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+        chrome=subprocess.Popen([browser['executable'],
             '--headless=new','--no-first-run','--remote-allow-origins=*','--remote-debugging-port=0',
             '--enable-unsafe-extension-debugging','--user-data-dir='+str(profile),'about:blank'],
-            env=environment,stdout=log,stderr=log)
+            env={**environment,'HOME':str(browser_home),'CFFIXED_USER_HOME':str(browser_home)},stdout=log,stderr=log)
         ws=None
         try:
             portfile=profile/'DevToolsActivePort';port_lines=[]
@@ -99,6 +108,7 @@ def verify(root, work, out):
                 assert 'exceptionDetails' not in result,result
                 return result.get('result',{}).get('value')
             wait(lambda:evaluate('typeof chrome!=="undefined" && !!chrome.runtime'))
+            assert evaluate('typeof chrome.sidePanel?.setPanelBehavior === "function"'), 'Browser does not support the extension side panel'
             def status():return evaluate('chrome.runtime.sendMessage({type:"log"})')
             wait(lambda:(value if (value:=status()) and value.get('harness')=='dsh' and value.get('phase')=='ready' else None),90)
             evaluate('document.querySelector("#input").focus()')
@@ -109,8 +119,18 @@ def verify(root, work, out):
             wait(lambda:evaluate('(document.querySelector("#log").textContent.match(/Managed setup verified/g)||[]).length>=2') and not status().get('running'),120)
             shot=cdp('Page.captureScreenshot',{},panel)['data'];(out/'browser.png').write_bytes(base64.b64decode(shot))
             return {'nativeComposerButton':True,'nativeComposerEnterAfterReopen':True,'nativeConversationRestored':True,
-                    'freshChromeNativeHost':True,'browserManagedDshChat':True,'browser':info['Browser'],
+                    'freshChromiumNativeHost':True,'browserManagedDshChat':True,'browser':info['Browser'],
+                    'browserApplication':browser['name'],'browserBundleId':browser['bundleId'],'sidePanelApi':True,
                     'extensionId':loaded['id'],'browserManualApprovalTested':False,'gatekeeperOpenAnywayTested':False}
         finally:
-            if ws:ws.close()
-            chrome.terminate();chrome.wait(timeout=15)
+            if ws:
+                try: cdp('Browser.close')
+                except (OSError, websocket.WebSocketException): pass
+                finally: ws.close()
+            if chrome.poll() is None:
+                chrome.terminate()
+                try: chrome.wait(timeout=15)
+                except subprocess.TimeoutExpired:
+                    # Only the Popen-owned disposable browser. Never mask the
+                    # original proof result with a hung fixture shutdown.
+                    chrome.kill(); chrome.wait(timeout=10)
