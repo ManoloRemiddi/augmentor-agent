@@ -27,6 +27,13 @@ class ActivityTests(unittest.TestCase):
         expected = [noise.sample(float(a), float(b)) for a, b in zip(x, y)]
         np.testing.assert_allclose(noise.sample_array(x, y), expected, atol=2e-7)
 
+    def test_exterior_effect_never_requests_a_native_shadow(self):
+        window=Window(preview=True)
+        try:
+            self.assertTrue(window.activity.canvas.windowFlags() & Qt.WindowType.NoDropShadowWindowHint)
+        finally:
+            window.close()
+
     def test_detail_restores_thin_emission_instead_of_stretching_a_coarse_cell(self):
         data = np.zeros((80, 80, 4), np.uint8)
         data[10:70, 39:41] = (60, 180, 140, 160)

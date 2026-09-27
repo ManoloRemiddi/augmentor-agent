@@ -407,8 +407,11 @@ class HaloCanvas(QWidget):
         # Keep the exterior surface managed and transient to its own agent.
         # Bypassing the WM makes it visible on other workspaces and above
         # unrelated windows; an independent keep-above hint breaks stacking.
+        # This layer is light, not a solid object. AppKit's cached window shadow
+        # can retain a coarse silhouette after the transparent flare has moved.
         super().__init__(activity.window, Qt.WindowType.Tool |
                          Qt.WindowType.FramelessWindowHint |
+                         Qt.WindowType.NoDropShadowWindowHint |
                          Qt.WindowType.WindowTransparentForInput |
                          Qt.WindowType.WindowDoesNotAcceptFocus)
         self.activity=activity

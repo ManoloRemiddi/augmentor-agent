@@ -7,6 +7,25 @@ The picker contains **Custom**, **Futuristic**, **Blossom lake**, and your saved
 skins. Woodland and Moonlit Garden have been retired from the built-in list.
 Existing user-created skin records remain available.
 
+## App size
+
+The **App size** slider scales the entire desktop window from **75% to 150%**
+in 5% steps: text, icons, controls, dialogs and effects. **100%** resets its size.
+Choose **⋯ → Quit Augmentor**, then reopen that window to apply a new size. Hiding
+with the shortcut does not restart it. Changing the slider saves the preference
+without interrupting a reply or discarding an unsent draft; finish or save your
+draft before quitting. The size is independent for each agent window and stays
+unchanged when selecting, importing or resetting a skin. New secondary windows
+inherit the primary preference once, like the other appearance settings.
+
+The shared startup path multiplies Qt's application scale by the saved percentage,
+preserving the OS per-monitor scale and any caller-provided Qt factor. The temporary
+environment change is restored after QApplication initializes, so launched helpers
+and independent agent windows do not compound the scale. Qt redraws the UI and GPU
+effect at the resulting device pixel ratio; no widget screenshot is enlarged.
+See [Qt's scaling semantics](https://doc.qt.io/qt-6.8/highdpi.html#qt-scale-factor)
+and [qualification](MACOS-APPEARANCE-2026-09-27.md).
+
 ## Create a skin from an image
 
 Choose **Upload background…**, then select a PNG, JPEG, or WebP. The image becomes

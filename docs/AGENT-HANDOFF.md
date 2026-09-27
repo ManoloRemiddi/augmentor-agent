@@ -2,6 +2,15 @@
 
 # Start here: agent handoff
 
+## September 27 transparency and app size
+
+The owner's remaining outline report is tracked in [the appearance correction](MACOS-APPEARANCE-2026-09-27.md).
+The transparent effect window had an AppKit shadow; its shadow is now disabled.
+The earlier performance fixture did not reliably trigger a flare and is corrected.
+The shared Appearance slider adds uniform 75–150% sizing on the next window process
+start, without interrupting active work. Read the record for qualification and
+the actual installed build; do not treat source tests as an installed update.
+
 ## September 26 continued Mac recovery
 
 The [recovery record](MACOS-RECOVERY-2026-09-26.md) supersedes the source gap status

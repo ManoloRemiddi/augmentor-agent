@@ -285,6 +285,19 @@ class AppearanceDialog(QDialog):
         content=QWidget();content.setObjectName('appearanceControls');scroll.setWidget(content);outer.addWidget(scroll)
         layout=QVBoxLayout(content);layout.setSpacing(8);self.controls_layout=layout
         self.resize(430,740)
+        from .ui_scale import MINIMUM, MAXIMUM, STEP, normalize
+        size_row=QHBoxLayout();self.size_label=QLabel();size_row.addWidget(self.size_label)
+        size_row.addStretch();size_reset=QPushButton('100%');size_reset.setAccessibleName('Reset app size')
+        size_row.addWidget(size_reset);layout.addLayout(size_row)
+        self.size_slider=QSlider(Qt.Orientation.Horizontal)
+        self.size_slider.setRange(MINIMUM,MAXIMUM);self.size_slider.setSingleStep(STEP);self.size_slider.setPageStep(10)
+        self.size_slider.setValue(normalize(values.get('ui_scale',100)))
+        self.size_slider.setAccessibleName('App size');layout.addWidget(self.size_slider)
+        self.size_note=QLabel('Quit and reopen Augmentor to apply a new size.')
+        self.size_note.setWordWrap(True);layout.addWidget(self.size_note)
+        self.size_label.setText(f"App size · {self.size_slider.value()}%")
+        self.size_slider.valueChanged.connect(self.change_size)
+        size_reset.clicked.connect(lambda:self.size_slider.setValue(100))
         self.skin_picker=QComboBox();self.skin_picker.setAccessibleName('Skin')
         layout.addWidget(QLabel('Skin'));layout.addWidget(self.skin_picker)
         self.reload_skins();self.skin_picker.activated.connect(self.select_skin)
@@ -340,6 +353,15 @@ class AppearanceDialog(QDialog):
         value=saved.get(role,format_defaults(self.values['theme'])[role])
         colour=QColorDialog.getColor(QColor(value),self,'Choose '+self.format_role.currentText().lower())
         if colour.isValid():self.change('format_colours',{**saved,role:colour.name()})
+
+    def change_size(self, value):
+        from .ui_scale import normalize
+        value=normalize(value)
+        self.size_slider.blockSignals(True);self.size_slider.setValue(value);self.size_slider.blockSignals(False)
+        self.values['ui_scale']=value
+        self.size_label.setText(f'App size · {value}%')
+        # Accessibility is personal, not part of an exported or selected skin.
+        self.changed.emit(dict(self.values))
 
     def refresh_colours(self):
         v=self.values;dark=v['theme']=='dark'

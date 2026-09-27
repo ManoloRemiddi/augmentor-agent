@@ -43,9 +43,9 @@ def main():
             activity.noise = FlowNoise()
         activity.rng = random.Random(719)
         activity.breath_phase = 2.; activity.phase = 0.
-        activity.flare = dict(start=0., duration=args.seconds+2, side=0, position=.5, width=55., travel=150.)
         activity.strength = 1.
         activity.configure(busy=True, enabled=True, animated=True, effect='plasma')
+        activity.flare = dict(start=0., duration=args.seconds+2, side=0, position=.5, width=55., travel=150.)
         gpu = activity.canvas.gpu
         if not args.cpu:
             assert gpu and gpu.available, 'GPU surface did not initialize'

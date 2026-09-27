@@ -892,6 +892,8 @@ class Window(QWidget):
         dialog.changed.connect(self.apply_appearance)
         dialog.finished.connect(lambda _:setattr(self,'appearance_dialog',None))
         self.appearance_dialog=dialog
+        area=self.screen().availableGeometry()
+        dialog.resize(min(dialog.width(),area.width()),min(dialog.height(),area.height()))
         dialog.show();dialog.raise_();dialog.activateWindow()
 
     def open_prompt_library(self):
@@ -1249,7 +1251,11 @@ def main():
     configure(args.instance)
     from .browser import refresh_accessibility_bus
     refresh_accessibility_bus()
-    app = QApplication(sys.argv[:1])
+    from .ui_scale import startup_scale
+    ui_scale = Preferences(not args.preview and not args.screenshot).values['ui_scale']
+    with startup_scale(ui_scale):
+        app = QApplication(sys.argv[:1])
+    app.setProperty('augmentorUiScale', ui_scale)
     app.setQuitOnLastWindowClosed(False)
     app.setApplicationName('Augmentor Agent')
     app.setWindowIcon(QIcon(str(Path(__file__).parent/'assets/augmentor.svg')))
@@ -1298,6 +1304,7 @@ def main():
                         'lastError':controller.last_connection_error if controller else '',
                         'sessionRestoreError':controller.session_restore_error if controller else '',
                         'buildRoot':str(Path(__file__).resolve().parents[3]),
+                        'uiScale':app.property('augmentorUiScale'), 'devicePixelRatio':window.devicePixelRatioF(),
                         'voiceAvailable':hasattr(window, 'voice_button'),
                         'voiceTiming':dict(window.voice_dialog.timings) if window.voice_dialog else None,
                         'voiceBufferStarvations':window.voice_dialog.playback_buffer.starvations if window.voice_dialog else 0,

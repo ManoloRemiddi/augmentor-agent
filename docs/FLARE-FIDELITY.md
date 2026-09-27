@@ -2,6 +2,10 @@
 
 # Shared desktop flare fidelity
 
+The owner's subsequent outline report and native shadow correction are recorded
+in [September 27 transparency and app size](MACOS-APPEARANCE-2026-09-27.md).
+The historical throughput checks below did not establish visual acceptance.
+
 Current implementation: [Mac recovery and the shared Metal/OpenGL renderer](MACOS-RECOVERY-2026-09-26.md). The CPU renderer below remains the fallback.
 The following records describe the earlier correction and its historical installation.
 
