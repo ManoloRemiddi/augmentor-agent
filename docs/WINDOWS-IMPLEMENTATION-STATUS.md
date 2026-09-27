@@ -314,3 +314,43 @@ problem: pywin32 312 rejects `None` as the Job name. The adapter now uses typed
 `CreateJobObjectW` with a null name for a genuinely unnamed Job, retaining the
 kernel handle directly and closing it explicitly. Containment still requires
 the subsequent native crash test; a source correction alone does not prove it.
+
+At `89e8a84`, the real supervisor-crash/descendant containment probe passes on
+both x64 and ARM64. A new private-file probe still fails and is being diagnosed;
+do not treat the full Windows job as green.
+
+The Windows managed owner now uses one exclusive per-user supervisor and the
+authenticated local transport. Its fixed component commands can start the
+bundled DSH, report state and clean up an unpublished failed setup. They cannot
+execute an arbitrary command, stop a selected profile through failed-setup
+cleanup, or exit while a component is running. The process owner reaps completed
+Jobs and retains the installation lease. This is initial DSH ownership: normal
+Quit, shared update coordination, startup registration and bounded log rotation
+remain separate unfinished work.
+
+`setup-windows.py` uses the shared first-run transaction with this owner. New
+native CI assembles a development application payload from shared sources and
+locked production dependencies, then provisions actual DSH against an isolated
+deterministic model, sends a conversation and checks history after an owned
+supervisor crash/restart. The proof also rejects failed-setup cleanup once the
+profile is selected. These are newly added checks awaiting execution, not a
+working installed-app claim; real-provider, browser and physical UI tests remain.
+
+The `89e8a84` private-file failures are exception-contract mismatches, not failed
+ACL/content preservation: pywin32 emits its own non-`OSError` type for missing
+and existing files. The adapter now maps kernel errors into Python's standard
+filesystem exception family. The same x64 run passes shared managed-setup
+fixtures, terminal cleanup and the installer mechanism; ARM64 is still running.
+
+A full local rerun also exposed an existing browser-voice shutdown race: its
+daemon stdin reader could emit a second Qt close signal during interpreter
+teardown and abort the process. The shared reader now exits on the explicit
+close frame, avoids Python buffered input locks and stops emitting once Qt quits.
+A real-process regression repeats Close while the parent keeps stdin open;
+all five focused browser-voice tests pass. This fix serves all three OSs and
+does not change audio placement or the voice UI.
+
+The resulting local regression run passes all 570 native tests (14 explicit
+platform/environment skips). Supervisor, staged application and managed-chat
+native probes still await the next Windows run. The existing Mac/Linux installed
+applications remain untouched.

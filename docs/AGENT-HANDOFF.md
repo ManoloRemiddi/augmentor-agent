@@ -24,6 +24,15 @@ public-release work. The owner will connect physical Windows hardware later;
 keep building independently while that is pending. No installed personal app,
 model endpoint, speech placement or website download has been changed.
 
+Later W2/W3 source adopts shared prompt/memory transport, protected file records,
+Windows Job containment and one initial DSH supervisor. Managed first-run setup
+is shared with Mac while LaunchAgent ownership stays in the Mac entrypoint.
+Actual Windows Qt fonts and Python/Node prompt persistence pass on both CPUs;
+the prepared DSH terminal passes natural shutdown at `635d0a9` on x64, and Job
+crash containment passes on both CPUs at `89e8a84`. New staged-application DSH
+conversation/restart checks are being introduced. Keep the detailed ledger and
+latest CI authoritative; no Windows customer installation or release is complete.
+
 ## September 27 Windows implementation plan — historical planning checkpoint
 
 The owner requested a detailed plan before coding. Read the

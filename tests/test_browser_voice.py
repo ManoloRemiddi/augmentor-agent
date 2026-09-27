@@ -49,3 +49,19 @@ class BrowserVoiceTests(unittest.TestCase):
         self.assertEqual(frames[0]['state'],'connecting')
         self.assertEqual(frames[-1]['state'],'closed')
         self.assertNotIn('Traceback',result.stderr)
+
+    def test_close_exits_cleanly_even_when_browser_keeps_input_pipe_open(self):
+        import sys
+        for _ in range(5):
+            process=subprocess.Popen([sys.executable,str(Path(module.__file__))],stdin=subprocess.PIPE,
+                                     stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
+            try:
+                process.stdin.write('{"action":"prepare","handsFree":false}\n{"action":"close"}\n')
+                process.stdin.flush()
+                self.assertEqual(process.wait(timeout=10),0)
+                self.assertNotIn('Traceback',process.stderr.read())
+                frames=[json.loads(line) for line in process.stdout.read().splitlines()]
+                self.assertEqual(frames[-1]['state'],'closed')
+            finally:
+                if process.poll() is None:process.kill()
+                process.communicate(timeout=10)

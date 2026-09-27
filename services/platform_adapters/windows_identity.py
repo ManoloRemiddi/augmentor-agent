@@ -1,6 +1,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Windows token identity and private filesystem objects (pywin32, both CPUs)."""
 import hashlib
+import ctypes
 import os
 from pathlib import Path
 import stat
@@ -109,9 +110,14 @@ def private_file_descriptor(path, *, writable=False, create=False, exclusive=Fal
     private_directory(path.parent)
     disposition = win32con.CREATE_NEW if exclusive else win32con.OPEN_ALWAYS if create else win32con.OPEN_EXISTING
     access = win32con.GENERIC_READ | (win32con.GENERIC_WRITE if writable else 0)
-    handle = win32file.CreateFile(str(path), access,
-        win32con.FILE_SHARE_READ | win32con.FILE_SHARE_WRITE, security_attributes(),
-        disposition, win32file.FILE_FLAG_OPEN_REPARSE_POINT, None)
+    try:
+        handle = win32file.CreateFile(str(path), access,
+            win32con.FILE_SHARE_READ | win32con.FILE_SHARE_WRITE, security_attributes(),
+            disposition, win32file.FILE_FLAG_OPEN_REPARSE_POINT, None)
+    except pywintypes.error as error:
+        # Keep the shared filesystem contract: pywin32's exception type is not
+        # an OSError, so map actual kernel failures to Python's standard family.
+        raise ctypes.WinError(error.winerror) from None
     try:
         info = win32file.GetFileInformationByHandle(handle)
         if info[0] & (stat.FILE_ATTRIBUTE_REPARSE_POINT | stat.FILE_ATTRIBUTE_DIRECTORY) or info[7] != 1:
@@ -120,6 +126,8 @@ def private_file_descriptor(path, *, writable=False, create=False, exclusive=Fal
             win32security.OWNER_SECURITY_INFORMATION | win32security.DACL_SECURITY_INFORMATION)
         require_private_descriptor(descriptor)
         return msvcrt.open_osfhandle(handle.Detach(), (os.O_RDWR if writable else os.O_RDONLY) | os.O_BINARY)
+    except pywintypes.error as error:
+        raise ctypes.WinError(error.winerror) from None
     finally:
         handle.Close()
 

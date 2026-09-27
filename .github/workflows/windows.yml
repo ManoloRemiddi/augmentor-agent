@@ -68,6 +68,8 @@ jobs:
         if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
         run: |
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_processes.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_supervisor.py -v
       - name: Verify private named-pipe framing, peers and cancellation
         if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
         run: |
@@ -105,17 +107,29 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Exercise Python and Node shared prompt clients and durable restart
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PYTHONPATH: apps/native
+          QT_QPA_PLATFORM: offscreen
         run: |
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_local_services.py -v
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_dsh_setup.py -v
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_managed_dsh.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_browser_voice.py -v
       - name: Stage and exercise actual pinned DSH native dependencies
+        id: dsh
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: |
           $env:AUGMENTOR_PWSH = "$PWD/outputs/payload/powershell/pwsh.exe"
           & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-dsh.py --out outputs/payload/dsh --node "$PWD/outputs/payload/node/node.exe"
+      - name: Assemble and exercise shared managed DSH setup on Windows
+        if: ${{ !cancelled() && steps.dsh.outcome == 'success' }}
+        run: |
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-windows-application.py --root outputs/payload --arch ${{ matrix.arch }}
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/windows-managed-setup-proof.py --root outputs/payload --out outputs/evidence
       - name: Install pinned build-time packaging tool
         if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
         id: packaging

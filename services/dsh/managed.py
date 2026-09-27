@@ -31,7 +31,8 @@ def initialize_voice(root, env):
     if not script.is_file():
         raise ValueError('The bundled voice plugin is missing. Reinstall Augmentor before setup.')
     subprocess.run([str(runtime_paths(root)[1]), str(script), 'init'], env=env,
-                   capture_output=True, check=True, timeout=30)
+                   capture_output=True, check=True, timeout=30,
+                   **({'creationflags': subprocess.CREATE_NO_WINDOW} if sys.platform == 'win32' else {}))
 
 
 def load_complete(root):
