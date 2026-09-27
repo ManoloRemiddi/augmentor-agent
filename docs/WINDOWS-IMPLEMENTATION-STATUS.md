@@ -80,3 +80,18 @@ providers, installed artifacts and physical hardware must remain distinguishable
 
 G1–G5 remain open. Continue work while physical hardware is unavailable; do not
 mark the overall implementation complete based on build or fixture success.
+
+## First native execution, September 28
+
+GitHub run `36353583238` at `f3f6de6` executed native x64 and ARM64, loaded the
+actual Qt/NumPy/ONNX/PortAudio/Velopack modules, rendered the widget and launched
+private Node and PowerShell. Both correctly failed the subsequent strict PE
+inventory: sounddevice includes unused x86 audio DLLs in its x64 wheel, and
+PySide6's ARM64 wheel includes an unused ARM32 `vccorlib140.dll`. The staging
+policy now excludes only reviewed, individually hashed foreign DLLs and retains
+the strict inventory check. The corrected run remains pending. Earlier successful
+imports alone do not establish that the complete candidate passed.
+
+Separately, candidate Qt/PySide 6.11.2 passes the same 538 Linux native tests
+(three skips), preserving existing behavior under this library upgrade. Mac
+candidate GUI checks and native two-version installer fixtures are added to CI.

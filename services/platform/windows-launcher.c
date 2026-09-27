@@ -4,6 +4,8 @@
  * PATH DLL lookup, console flash, or extraction on each launch is required.
  */
 #define PY_SSIZE_T_CLEAN
+/* All Python symbols are loaded explicitly below, not linked on process entry. */
+#define MS_NO_COREDLL
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <shellapi.h>

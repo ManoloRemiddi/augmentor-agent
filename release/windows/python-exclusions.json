@@ -1,0 +1,51 @@
+{
+  "arm64": {
+    "PySide6/vccorlib140.dll": {
+      "sha256": "2ec54cccfd3b0b656e5f83935e1195b488ca51b6e4e0f45ac1764095deffd077",
+      "machine": "0x1c4",
+      "reason": "Unused foreign architecture library bundled in the locked wheel; native target imports and PE inventory are required after exclusion."
+    },
+    "_sounddevice_data/portaudio-binaries/libportaudio32bit-asio.dll": {
+      "sha256": "b96d817debe1747d8ca3a5e5b57d1021bf0207ebbd907242331357b97c65e6d7",
+      "machine": "0x14c",
+      "reason": "Unused foreign architecture library bundled in the locked wheel; native target imports and PE inventory are required after exclusion."
+    },
+    "_sounddevice_data/portaudio-binaries/libportaudio32bit.dll": {
+      "sha256": "3d27383a00397dae64b266189791ac20f84a19820778724e05705c2f6012dfd9",
+      "machine": "0x14c",
+      "reason": "Unused foreign architecture library bundled in the locked wheel; native target imports and PE inventory are required after exclusion."
+    },
+    "_sounddevice_data/portaudio-binaries/libportaudio64bit-asio.dll": {
+      "sha256": "e38618a0cb83a0287bee3b8bd68a710ae0d34178217ef4fa21ed56f765111943",
+      "machine": "0x8664",
+      "reason": "Unused foreign architecture library bundled in the locked wheel; native target imports and PE inventory are required after exclusion."
+    },
+    "_sounddevice_data/portaudio-binaries/libportaudio64bit.dll": {
+      "sha256": "ec080194f01e4095c7fb43dbd7ed05af922c5b34295056a9ff56782741d65481",
+      "machine": "0x8664",
+      "reason": "Unused foreign architecture library bundled in the locked wheel; native target imports and PE inventory are required after exclusion."
+    }
+  },
+  "x64": {
+    "_sounddevice_data/portaudio-binaries/libportaudio32bit-asio.dll": {
+      "sha256": "b96d817debe1747d8ca3a5e5b57d1021bf0207ebbd907242331357b97c65e6d7",
+      "machine": "0x14c",
+      "reason": "Unused foreign architecture library bundled in the locked wheel; native target imports and PE inventory are required after exclusion."
+    },
+    "_sounddevice_data/portaudio-binaries/libportaudio32bit.dll": {
+      "sha256": "3d27383a00397dae64b266189791ac20f84a19820778724e05705c2f6012dfd9",
+      "machine": "0x14c",
+      "reason": "Unused foreign architecture library bundled in the locked wheel; native target imports and PE inventory are required after exclusion."
+    },
+    "_sounddevice_data/portaudio-binaries/libportaudioarm64-asio.dll": {
+      "sha256": "57b7826fd3883daabbb8951814655a4ec253acb822c0ff6ce4002da9463064f5",
+      "machine": "0xaa64",
+      "reason": "Unused foreign architecture library bundled in the locked wheel; native target imports and PE inventory are required after exclusion."
+    },
+    "_sounddevice_data/portaudio-binaries/libportaudioarm64.dll": {
+      "sha256": "e39e95e95c0cb262c70ca4e676e440cf34be5643fe5a31cdfe23e8ab6f1422cb",
+      "machine": "0xaa64",
+      "reason": "Unused foreign architecture library bundled in the locked wheel; native target imports and PE inventory are required after exclusion."
+    }
+  }
+}

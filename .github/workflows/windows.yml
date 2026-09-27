@@ -42,6 +42,7 @@ jobs:
           node-version: '24.19.0'
           architecture: ${{ matrix.arch }}
       - name: Stage private hash-locked Python, Node and PowerShell
+        id: bootstrap
         run: python scripts/bootstrap-windows.py --arch ${{ matrix.arch }} --out outputs/payload
       - name: Exercise native wheels, Qt, PortAudio, Node and PowerShell
         env:
@@ -60,6 +61,14 @@ jobs:
         run: |
           $env:AUGMENTOR_PWSH = "$PWD/outputs/payload/powershell/pwsh.exe"
           & outputs/payload/python/python.exe -I -B scripts/stage-dsh.py --out outputs/payload/dsh --node "$PWD/outputs/payload/node/node.exe"
+      - name: Install pinned build-time packaging tool
+        if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
+        id: packaging
+        run: dotnet tool install vpk --version 1.2.158 --tool-path outputs/vpk
+      - name: Qualify embedded launcher and two disposable installer versions
+        if: ${{ !cancelled() && steps.packaging.outcome == 'success' }}
+        run: |
+          & outputs/payload/python/python.exe -I -B scripts/windows-installer-proof.py --runtime outputs/payload --arch ${{ matrix.arch }} --out outputs/installer-proof --vpk outputs/vpk/vpk.exe
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -67,5 +76,27 @@ jobs:
           path: |
             outputs/evidence/**
             outputs/payload/dsh/payload.json
+            outputs/installer-proof/*.json
+            outputs/installer-proof/persistent/hooks.jsonl
           retention-days: 14
           if-no-files-found: warn
+  shared-qt-candidate:
+    runs-on: macos-26
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9
+        with:
+          version: '0.11.16'
+          enable-cache: false
+      - name: Qualify common GUI behavior on the ARM-capable Qt candidate
+        env:
+          QT_QPA_PLATFORM: offscreen
+          PYTHONPATH: apps/native
+        run: |
+          uv venv --python 3.12.13 .venv
+          uv pip install --python .venv/bin/python PySide6-Essentials==6.11.2 shiboken6==6.11.2 Pygments==2.18.0 numpy==2.5.1 PyYAML==6.0.3 websocket-client==1.8.0
+          .venv/bin/python -m unittest discover -s tests -p test_ui_scale.py -v
+          .venv/bin/python -m unittest discover -s tests -p test_fluid.py -v
+          .venv/bin/python -m unittest discover -s tests -p test_window.py -v
+          .venv/bin/python -m unittest discover -s tests -p test_macos_windows.py -v

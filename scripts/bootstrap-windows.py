@@ -4,7 +4,6 @@
 import argparse
 import hashlib
 import json
-import os
 from pathlib import Path
 import platform
 import shutil
@@ -20,8 +19,9 @@ ROOT = Path(__file__).resolve().parents[1]
 def download(item, cache):
     destination = cache / item['sha256']
     if destination.is_file():
-        if hashlib.file_digest(destination.open('rb'), 'sha256').hexdigest() == item['sha256']:
-            return destination
+        with destination.open('rb') as stream:
+            if hashlib.file_digest(stream, 'sha256').hexdigest() == item['sha256']:
+                return destination
         raise ValueError('Cached runtime checksum differs from the lock')
     temporary = destination.with_suffix('.partial')
     try:
@@ -78,6 +78,17 @@ def main():
                     '--disable-pip-version-check', '--require-hashes', '--only-binary=:all:',
                     '--no-deps', '-r', str(ROOT/f'release/windows/requirements-{args.arch}.txt')], check=True)
     subprocess.run([str(python), '-I', '-m', 'pip', 'check'], check=True)
+    exclusions = json.loads((ROOT/'release/windows/python-exclusions.json').read_text())[args.arch]
+    site = out/'python/Lib/site-packages'
+    for name, item in exclusions.items():
+        path = site/name
+        if path.is_symlink() or not path.resolve().is_relative_to(site.resolve()):
+            raise ValueError('Invalid native-library exclusion path')
+        with path.open('rb') as stream:
+            if hashlib.file_digest(stream, 'sha256').hexdigest() != item['sha256']:
+                raise ValueError('Review changed foreign native library before excluding: '+name)
+        path.unlink()
+    (out/'python-exclusions.json').write_text(json.dumps(exclusions, indent=2)+'\n')
     (out/'runtime-lock.json').write_text(json.dumps(config, indent=2)+'\n')
     print(json.dumps({'staged': str(out), 'arch': args.arch, 'qualificationStatus': 'unqualified'}))
 
