@@ -67,3 +67,36 @@ stage a separate compatible artifact, point the owned preset composition to its
 adapter, and load it only when the shared DSH host is idle. Source tests do not
 prove installed adoption. Keep private histories and deployment backups outside
 GitHub.
+
+## September 27 installed evidence
+
+Implementation `f420a22`, with the read-only recovery-contract correction
+`4d20f92`, passed TypeScript check/build, 186 Node tests, six Python setup tests
+and 40 focused context/execution tests after the final correction. The fixture
+and live cases remain distinct: fixtures exercise inference using a deterministic
+provider; live maintenance invoked only the non-inference command.
+
+Compatible managed artifact `20260927-231655-bf3642fa` is selected, based on
+`20260926-204300-30f1286f`, with artifact SHA-256
+`7eb047cf13accc278d55878d6f4d719df61604268de8836cc03d6f9736b35ca8`.
+Existing embedding, Home, speech, product version and other DSH integration paths
+were preserved. The shared DSH host was restarted only after all tasks became
+idle. An existing conversation's 30 oversized results were trimmed without
+inference: 241,512 characters removed; projected message tokens decreased from
+119,419 to 59,036. Its model selection, turn/step counts and original log were
+preserved. This is the message component of the token estimate, not total input.
+
+Both final Desktop and Browser preset generations report the staged adapter
+active, and `/trim-tools` succeeds through each actual host command route. A task
+that began on the preceding generation was preserved while the final, read-only
+excerpt contract was loaded for new agents. Such already-loaded agents acquire
+the final correction on their next natural reload; they already have early
+pruning. Native windows remain on their previous UI artifacts and are online
+with voice available. This correction runs in their shared DSH backend and does
+not require closing their windows. `updatePending` still reflects the separate
+native UI selection. No Mac or public-download rollout is claimed.
+
+Private original-preset/session backups and rollback records remain outside the
+repository. Rollback of this adapter requires restoring the backed-up preset
+composition as well as selecting the prior desktop artifact; changing
+`desktop.json` alone does not change explicit DSH preset module paths.
