@@ -41,10 +41,26 @@ this change does not expose additional model data or alter Pi's reasoning policy
 
 Validation uses real offscreen Qt widgets and Browser DOM fixtures with synthetic
 reasoning/answer, tool, completion, stop and idle events. Source base: `f353c52`;
-the thinking-visibility commit contains the exact patch. The Browser suite passed
-50 tests. The full native suite ran 500 tests successfully (two macOS-only
-checks skipped) using the existing Linux Qt test environment. Installed app builds
-and the loaded Browser extension have not been updated by these source changes.
+implementation `6934677` contains the exact patch. The Browser suite passed
+50 tests. The full native workspace suite ran 500 tests successfully (two macOS-only
+checks skipped) using the existing Linux Qt test environment. The 23 focused Qt Markdown/thinking checks also passed in the isolated source
+checkout and in the compatible installed candidate.
+
+Desktop release `20260927-231730-d033f759` is staged and selected through
+`augmentor-update`, artifact SHA-256
+`70a1ed52e61e414f887089f1fb2a5ae4c31e0135b33d98ae8c182a077e27d2fb`.
+It applies only the native `6934677` patch over selected artifact
+`20260927-230918-6154af34`, SHA-256
+`daf1c9830a660b8b27ea24e181b92ae383a7f4907bf24370d990f1a7cde7c34e`.
+Existing DSH/product, model, speech and Home contracts are retained. Stage/import
+and authenticated activation checks passed without a model request.
+
+The primary/mobile windows still report `20260924-125423-63307454`, and secondary
+reports `20260926-083736-5d6b65f6`; all are online with voice available and
+`updatePending: true`. No windows were restarted. Closing/reopening or the next
+login adopts the selected build. The loaded Browser extension is unchanged;
+Browser source adoption requires a separate extension update/reload. No public
+release or Mac installed update is claimed.
 
 ## Speech
 

@@ -2,6 +2,16 @@
 
 # Consistent installed desktop releases
 
+## September 27: live thinking box
+
+Native implementation `6934677` is selected in `20260927-231730-d033f759`.
+[Shared-surface evidence](SHARED-SURFACES-2026-09-24.md#live-thinking-visibility--september-27)
+records the original artifact, patch, resulting SHA-256 and Qt/activation checks.
+Primary/mobile and secondary remain on their earlier running builds, online with
+voice available and `updatePending: true`; no windows were restarted. Close/reopen
+or the next login adopts the change. Browser source is implemented/tested but the
+loaded extension has not been updated.
+
 ## September 25: immediate composer feedback
 
 [Composer correction and installed evidence](COMPOSER-SEND-FEEDBACK.md) records
