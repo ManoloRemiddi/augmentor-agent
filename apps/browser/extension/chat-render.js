@@ -253,6 +253,7 @@ export function createChatUI(els) {
   let assistantTimer = null // frameOr() handle
   let reasoningEl = null
   let reasoningRaw = ''
+  let reasoningActive = false
   let reasoningTimer = null // frameOr() handle
   let maxSeq = -1
   const pendingPrompts = new Set()
@@ -392,7 +393,15 @@ export function createChatUI(els) {
     })
   }
 
+  function finishThinking() {
+    if (!reasoningActive) return
+    renderReasoningNow()
+    if (reasoningEl) reasoningEl.open = false
+    reasoningActive = false
+  }
+
   function flushAssistant() {
+    finishThinking()
     cancelFrame(assistantTimer)
     cancelFrame(reasoningTimer)
     assistantTimer = null
@@ -532,13 +541,18 @@ export function createChatUI(els) {
       case 'assistant/chunk': {
         const c = data.chunk
         if (c.type === 'text-delta') {
+          finishThinking()
           ensureTextEl()
           assistantRaw += c.text
           renderAssistant()
         } else if (c.type === 'reasoning-delta') {
           makeThinkBlock()
+          if (!reasoningActive) reasoningEl.open = true
+          reasoningActive = true
           reasoningRaw += c.text
           renderReasoning()
+        } else if (['reasoning-end', 'tool-call-start', 'tool-call-delta'].includes(c.type)) {
+          finishThinking()
         } else if (c.type === 'usage' && c.usage) {
           // mid-stream usage (some providers); final assistant/message wins
         }
@@ -650,6 +664,7 @@ export function createChatUI(els) {
         break
       }
       case 'turn/end': {
+        finishThinking()
         break
       }
       default:
@@ -740,6 +755,7 @@ export function createChatUI(els) {
       return maxSeq
     },
     setState(state) {
+      if (state.running === false) finishThinking()
       ui.state = { ...ui.state, ...state }
       updateChrome()
     },

@@ -39,6 +39,7 @@ Additional current native/browser capabilities:
 
 | Capability | Desktop | Browser |
 | --- | --- | --- |
+| Streaming thinking visibility | Automatically opens during thinking and collapses when finished; manual reopening | Same behavior for supplied reasoning text |
 | Resonant Voice on DSH | Hold/release, slide-lock, voice selection; optional hands-free preview | Same shared engine: hold/release, lock, hands-free and primary voice settings |
 | Independent second conversation | Named second window, separate chat/settings/voice profile; KDE shortcut | Separate sidebar/session workflow |
 | Skins and activity animation | Futuristic plasma; Blossom lake/butterflies; validated import/export | Native skins are not applied to Chromium |

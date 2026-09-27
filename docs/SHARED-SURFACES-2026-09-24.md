@@ -24,6 +24,28 @@ pending decisions. Browser claims that lease before submitting a task. A lost
 answer acknowledgement is never retried automatically; disconnect releases or
 expires the lease without granting permission.
 
+## Live thinking visibility · September 27
+
+Desktop and Browser automatically expand the current thinking box when reasoning
+text starts streaming. It collapses when answer text starts, reasoning explicitly
+ends, a tool call starts, the assistant message completes, or the turn stops.
+The native error/idle path and Browser idle state also collapse active thinking.
+Completed history remains collapsed; readers can still expand/collapse it manually.
+A manual collapse during streaming lasts for that thinking phase, and manually
+reopening completed thinking is preserved during subsequent answer chunks.
+
+This is presentation state only. Response streaming, model settings, harness
+execution, speech, saved messages and scroll-follow preferences keep their existing
+behavior. Visibility depends on reasoning text already supplied by the harness;
+this change does not expose additional model data or alter Pi's reasoning policy.
+
+Validation uses real offscreen Qt widgets and Browser DOM fixtures with synthetic
+reasoning/answer, tool, completion, stop and idle events. Source base: `f353c52`;
+the thinking-visibility commit contains the exact patch. The Browser suite passed
+50 tests. The full native suite ran 500 tests successfully (two macOS-only
+checks skipped) using the existing Linux Qt test environment. Installed app builds
+and the loaded Browser extension have not been updated by these source changes.
+
 ## Speech
 
 The sidebar's `voice.mjs` is a presentation/controller binding. The native host

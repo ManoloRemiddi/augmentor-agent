@@ -2,6 +2,14 @@
 
 # Start here: agent handoff
 
+## September 27 live thinking visibility
+
+Desktop and Browser now open the current thinking box as reasoning streams and
+collapse it when thinking finishes. Answer streaming and manual history controls
+are preserved. See [behavior, tests and deployment boundary](SHARED-SURFACES-2026-09-24.md#live-thinking-visibility--september-27).
+This is a source change; installed windows and the loaded extension need a
+separately qualified update before adopting it.
+
 ## September 26 public Apple-independent macOS preview
 
 The owner approved publishing a clearly labelled macOS preview without Developer

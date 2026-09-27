@@ -56,7 +56,7 @@ class Window(QWidget):
             self.preferences.values['harness']=harness;self.preferences.save()
         self.controller=None if preview else Controller(self,harness=self.preferences.values['harness'])
         self.setup_dialog=None;self.appearance_dialog=None;self.setup_offered=False
-        self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.expanded_thinking=set();self.editing=None
+        self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.active_thinking=None;self.expanded_thinking=set();self.editing=None
         self.rendered_messages=None;self.rendered_partial=''
         self.pending_prompt=None;self.submitted_draft=None;self.morphing=False;self.compact=False;self.close_pending=False;self.read_only=False;self.is_saved=False
         self.expanded_size=self.size();self.follow_tail=True;self.rendering=False
@@ -191,6 +191,7 @@ class Window(QWidget):
         self.controller=Controller(self,harness=harness)
         self.messages=[];self.message_events={};self.partial='';self.rendered_messages=None;self.copied_message=None;self.copied_code=None
         self.read_only=False;self.seen_events=set();self.follow_tail=True
+        self.reasoning_index=None;self.active_thinking=None;self.expanded_thinking=set()
         self.render_messages();self.set_models({'groups':[]});self.bind_controller()
 
     def bind_controller(self):
@@ -460,6 +461,7 @@ class Window(QWidget):
         self.sync_orb()
 
     def set_busy(self,busy):
+        if not busy:self.finish_thinking()
         self.activity.configure(busy=busy)
         self.update_controls();self.set_status('Working…' if busy else ('History view' if self.read_only else 'Ready'))
         self.cancel_edit_button.setEnabled(not busy)
@@ -468,7 +470,7 @@ class Window(QWidget):
 
     def new_chat(self):
         if self.controller and not self.controller.running and not self.controller.navigating and not self.controller.recovery_lock.locked():
-            self.cancel_edit();self.controller.new_chat();self.rendered_messages=None;self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.expanded_thinking=set();self.transcript.clear();self.composer.clear();self.follow_tail=True;self.set_status('New conversation')
+            self.cancel_edit();self.controller.new_chat();self.rendered_messages=None;self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.active_thinking=None;self.expanded_thinking=set();self.transcript.clear();self.composer.clear();self.follow_tail=True;self.set_status('New conversation')
 
     def improve_prompt(self):
         if not self.controller or self.composer.improving:return
@@ -665,7 +667,7 @@ class Window(QWidget):
     def restore_recovery(self,events,has_more):
         follow=self.follow_tail
         self.render_timer.stop()
-        self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.expanded_thinking=set()
+        self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.active_thinking=None;self.expanded_thinking=set()
         for event in events:self.fold_event(event)
         self.follow_tail=follow;self.render_messages()
 
@@ -687,7 +689,7 @@ class Window(QWidget):
         anchor=self.transcript.cursorForPosition(QPoint(2,2))
         old_y=self.transcript.cursorRect(anchor).top()
         old_text=self.transcript.toPlainText()
-        self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.expanded_thinking=set()
+        self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.active_thinking=None;self.expanded_thinking=set()
         for event in events:self.fold_event(event)
         self.follow_tail=not older;self.render_messages()
         if older:
@@ -711,6 +713,18 @@ class Window(QWidget):
             previous=self.messages[self.reasoning_index][1]
             self.messages[self.reasoning_index]=('Thinking',text if replace else previous+text)
 
+        if not replace and self.active_thinking!=self.reasoning_index:
+            self.active_thinking=self.reasoning_index
+            self.expanded_thinking.add(self.reasoning_index)
+            self.rendered_messages=None
+
+    def finish_thinking(self):
+        if self.active_thinking is None:return False
+        self.expanded_thinking.discard(self.active_thinking)
+        self.active_thinking=None
+        self.rendered_messages=None
+        return True
+
     def fold_event(self,event):
         seq=event.get('seq')
         if seq is not None:
@@ -722,7 +736,7 @@ class Window(QWidget):
             blocks=data.get('message',{}).get('content',[])
             failed=any(b.get('isError') for b in blocks if isinstance(b,dict))
             if isinstance(reply,dict) and reply.get('version')==1 and isinstance(reply.get('text'),str) and not failed:
-                self.reasoning_index=None;self.partial=''
+                self.finish_thinking();self.reasoning_index=None;self.partial=''
                 self.messages.append(('Augmentor',reply['text']))
                 return True
         if kind=='user/message':
@@ -749,10 +763,14 @@ class Window(QWidget):
             return True
         if kind=='assistant/chunk':
             chunk=data.get('chunk',{})
-            if chunk.get('type')=='text-delta':self.partial+=chunk.get('text','');return True
+            if chunk.get('type')=='text-delta':
+                self.finish_thinking();self.partial+=chunk.get('text','');return True
+            if chunk.get('type') in ('reasoning-end','tool-call-start','tool-call-delta'):
+                return self.finish_thinking()
             if chunk.get('type')=='reasoning-delta':
                 self.add_reasoning(chunk.get('text',''));self.set_status('Thinking…');return True
         elif kind=='assistant/message':
+            self.finish_thinking()
             if any(p.get('type')=='tool-call' and p.get('name') in ('resonant_voice_reply','resonant_voice_demo') for p in data.get('message',{}).get('content',[])):
                 self.partial='';return True
             reasoning='\n'.join(p.get('text','') for p in data.get('message',{}).get('content',[]) if p.get('type')=='reasoning')
@@ -763,8 +781,11 @@ class Window(QWidget):
                 self.message_events[len(self.messages)]=event
                 self.messages.append(('Augmentor',text))
             self.partial='';return True
-        elif kind=='tool/call':self.set_status('Using '+str(data.get('name','a tool'))[:60])
+        elif kind=='tool/call':
+            self.set_status('Using '+str(data.get('name','a tool'))[:60])
+            return self.finish_thinking()
         elif kind=='turn/end':
+            collapsed=self.finish_thinking()
             self.reasoning_index=None
             reason=data.get('reason',{}).get('kind')
             if reason=='max-tokens':
@@ -773,6 +794,7 @@ class Window(QWidget):
                 return True
             self.set_status('Stopped' if reason=='aborted' else 'Interrupted' if reason=='interrupted' else 'Ready')
             if reason=='interrupted':self.messages.append(('Status',data.get('message','Runtime interrupted.')));return True
+            return collapsed
         elif kind=='session/title':
             title=data.get('title')
             if title:self.title_text=title;self.title.setText(title)
@@ -783,6 +805,7 @@ class Window(QWidget):
         if self.fold_event(event) and not self.render_timer.isActive():self.render_timer.start()
 
     def on_problem(self,message):
+        self.finish_thinking()
         self.update_controls()
         self.rendered_messages=None
         self.set_status('Needs attention');self.messages.append(('Status',message));self.render_messages()

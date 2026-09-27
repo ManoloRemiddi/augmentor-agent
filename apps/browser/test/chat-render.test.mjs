@@ -129,10 +129,11 @@ test('thinking remains expandable and each code copy excludes prose',async t=>{
   const log=document.querySelector('#log'),ui=createChatUI({log});t.after(()=>{ui.clear();dom.window.close();if(descriptor)Object.defineProperty(globalThis,'navigator',descriptor);else delete globalThis.navigator})
   ui.applyLog([{kind:'event',event:{seq:1,type:'assistant/chunk',data:{chunk:{type:'reasoning-delta',text:'Checking details.'}}}}])
   await new Promise(resolve=>setTimeout(resolve,40))
-  const thinking=log.querySelector('details.think');assert.ok(thinking);thinking.open=true
+  const thinking=log.querySelector('details.think');assert.ok(thinking);assert.equal(thinking.open,true)
   assert.match(thinking.textContent,/Checking details/)
   ui.applyLog([{kind:'event',event:{seq:2,type:'assistant/message',data:{message:{content:[{type:'reasoning',text:'Checking details.'},{type:'text',text:'Explanation\n\n```python\nprint("🌞")\n```\n\nNext\n\n```sh\necho done\n```'}]}}}}])
-  assert.ok(thinking.open);assert.equal(log.querySelectorAll('details.think').length,1)
+  assert.equal(thinking.open,false);assert.equal(log.querySelectorAll('details.think').length,1)
+  thinking.open=true
   thinking.querySelector('.think-collapse').click();assert.equal(thinking.open,false)
   assert.equal(document.activeElement,thinking.querySelector('summary'))
   const buttons=log.querySelectorAll('.code-actions button');assert.equal(buttons.length,2)
@@ -181,3 +182,50 @@ test('mixed prose and voice call uses the structured result only',async t=>{
   assert.equal(log.querySelectorAll('.assistant .md').length,1)
   assert.equal(log.querySelector('.assistant .md').textContent.trim(),'Here are the five samples.')
 })
+
+for (const boundary of ['text','end','tool','stop','idle','history']) {
+  test(`thinking automatically opens and collapses at ${boundary}`,async t=>{
+    const dom=new JSDOM('<div id="log"></div>',{pretendToBeVisual:true})
+    globalThis.window=dom.window;globalThis.document=dom.window.document
+    globalThis.requestAnimationFrame=dom.window.requestAnimationFrame.bind(dom.window)
+    globalThis.cancelAnimationFrame=dom.window.cancelAnimationFrame.bind(dom.window)
+    window.marked=marked
+    const log=document.querySelector('#log'),ui=createChatUI({log})
+    t.after(()=>{ui.clear();dom.window.close()})
+    let seq=0
+    const event=(type,data)=>ui.applyLog([{kind:'event',event:{seq:seq++,type,data}}])
+    const chunk=(type,text)=>event('assistant/chunk',{chunk:{type,text}})
+    chunk('reasoning-delta','Live thought')
+    await new Promise(resolve=>setTimeout(resolve,40))
+    const thinking=log.querySelector('details.think')
+    assert.equal(thinking.open,true)
+    assert.equal(thinking.querySelector('pre').textContent,'Live thought')
+    // A manual collapse survives later reasoning chunks in the same phase.
+    thinking.querySelector('.think-collapse').click()
+    chunk('reasoning-delta',' continued')
+    assert.equal(thinking.open,false)
+    thinking.open=true
+    if(boundary==='text')chunk('text-delta','Answer')
+    if(boundary==='end')chunk('reasoning-end')
+    if(boundary==='tool')event('tool/call',{name:'fixture',arguments:'{}',callId:'1'})
+    if(boundary==='stop')event('turn/end',{reason:{kind:'aborted'}})
+    if(boundary==='idle')ui.setState({running:false})
+    if(boundary==='history')event('assistant/message',{message:{content:[{type:'reasoning',text:'Live thought continued'},{type:'text',text:'Answer'}]}})
+    assert.equal(thinking.open,false)
+    assert.equal(thinking.querySelector('pre').textContent,'Live thought continued')
+    thinking.open=true
+    if(boundary==='text') {
+      chunk('text-delta',' continues')
+      assert.equal(thinking.open,true)
+      await new Promise(resolve=>setTimeout(resolve,40))
+      assert.equal(log.querySelector('.md').textContent.trim(),'Answer continues')
+    }
+    event('assistant/message',{message:{content:[{type:'text',text:'Answer'}]}})
+    chunk('reasoning-delta','Next thought')
+    assert.equal([...log.querySelectorAll('details.think')].at(-1).open,true)
+    ui.clear()
+    event('assistant/message',{message:{content:[{type:'reasoning',text:'Saved thought'},{type:'text',text:'Saved answer'}]}})
+    assert.equal(log.querySelector('details.think').open,false)
+    assert.equal(log.querySelector('.md').textContent.trim(),'Saved answer')
+  })
+}
