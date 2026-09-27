@@ -69,6 +69,9 @@ def require_private_directory(path):
     acl = descriptor.GetSecurityDescriptorDacl()
     if acl is None:
         raise PermissionError('The Augmentor directory has no access restrictions.')
+    control, _revision = descriptor.GetSecurityDescriptorControl()
+    if not control & win32security.SE_DACL_PROTECTED:
+        raise PermissionError('The Augmentor directory must not inherit broader access from its parent.')
     allowed = {sid_string(), 'S-1-5-18'}
     user_access = False
     for index in range(acl.GetAceCount()):

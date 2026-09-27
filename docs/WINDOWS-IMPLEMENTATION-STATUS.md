@@ -135,3 +135,11 @@ the native launcher sets isolated Python preconfiguration to UTF-8 before startu
 and supplies that mode to ordinary child services. The installer fixture checks
 the actual interpreter flag. ARM64 DSH/installer work from this run is still in
 progress; a new source revision must not erase the outstanding evidence boundary.
+
+W2 import refactoring now routes Augmentor-owned branch journals, Home pairing,
+Pi startup and lifecycle leases through the shared lock adapter. POSIX behavior
+still delegates directly to `flock`; no third-party DSH history lock has been
+substituted. The complete Linux native suite passes after these import changes
+(544 tests, six platform/environment skips). Windows now runs the shared live
+zoom, activity and window interaction tests as well as its platform probes;
+actual Windows rendering/interaction results remain pending for that source.

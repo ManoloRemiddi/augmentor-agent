@@ -1,6 +1,5 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Shared lifetime leases prevent package replacement underneath running code."""
-import fcntl
 import json
 import os
 import stat
@@ -9,6 +8,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT/'services'))
+from platform_adapters import locks as fcntl
 LOCK_ROOT = Path('/run/augmentor')
 _leases = []
 

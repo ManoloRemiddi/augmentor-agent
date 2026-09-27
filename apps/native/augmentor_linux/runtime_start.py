@@ -1,6 +1,5 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Start one detached socket harness host. Only safe health probes trigger recovery."""
-import fcntl
 import os
 import shutil
 import socket
@@ -8,6 +7,8 @@ import subprocess
 import time
 import sys
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]/'services'))
+from platform_adapters import locks as fcntl
 
 
 def ensure_running(harness='pi'):
