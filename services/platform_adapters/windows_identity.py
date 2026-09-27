@@ -14,8 +14,11 @@ from win32com.shell import shell, shellcon
 
 
 def current_sid():
-    with win32security.OpenProcessToken(win32api.GetCurrentProcess(), win32con.TOKEN_QUERY) as token:
+    token = win32security.OpenProcessToken(win32api.GetCurrentProcess(), win32con.TOKEN_QUERY)
+    try:
         return win32security.GetTokenInformation(token, win32security.TokenUser)[0]
+    finally:
+        token.Close()
 
 
 def sid_string():
@@ -104,7 +107,10 @@ def private_directory(path):
 def process_sid(pid):
     process = win32api.OpenProcess(win32con.PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
     try:
-        with win32security.OpenProcessToken(process, win32con.TOKEN_QUERY) as token:
+        token = win32security.OpenProcessToken(process, win32con.TOKEN_QUERY)
+        try:
             return win32security.GetTokenInformation(token, win32security.TokenUser)[0]
+        finally:
+            token.Close()
     finally:
         process.Close()

@@ -11,6 +11,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'services'))
 
 @unittest.skipUnless(sys.platform == 'win32', 'requires the Windows token and ACL APIs')
 class WindowsIdentityTests(unittest.TestCase):
+    def test_current_process_identity_comes_from_the_os_token(self):
+        from platform_adapters.windows_identity import current_sid, process_sid
+        self.assertEqual(process_sid(os.getpid()), current_sid())
+
     def test_private_path_owner_permissions_and_reopen(self):
         from platform_adapters.windows_identity import private_directory, require_private_directory, current_sid
         import win32security

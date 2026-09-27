@@ -143,3 +143,13 @@ substituted. The complete Linux native suite passes after these import changes
 (544 tests, six platform/environment skips). Windows now runs the shared live
 zoom, activity and window interaction tests as well as its platform probes;
 actual Windows rendering/interaction results remain pending for that source.
+
+The ARM64 installer proof at `523fe9a` also completes successfully, including
+all lifecycle assertions above. Both native architectures therefore have evidence
+for the selected installer mechanism; G1 still requires the complete DSH payload
+and remaining clean-machine/trust checks. The first private-path probe at
+`52964ae` finds that pywin32 token handles do not implement Python context
+managers; token ownership now uses explicit `finally: Close()` and tests actual
+process-token identity. The fixture does not mask failed ACL checks. Independent
+DSH and UI probes now continue after an unrelated probe failure to collect useful
+evidence; the overall job still fails if any required probe fails.

@@ -48,6 +48,7 @@ jobs:
         run: |
           & outputs/payload/python/python.exe -I -Xutf8 -B scripts/windows-runtime-proof.py --root outputs/payload --arch ${{ matrix.arch }} --out outputs/evidence/runtime.json
       - name: Build the shared TypeScript application
+        id: build
         run: |
           npm ci --ignore-scripts --no-audit --no-fund
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
@@ -64,6 +65,7 @@ jobs:
         run: |
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_identity.py -v
       - name: Exercise shared native appearance and interaction behavior
+        if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
         env:
           QT_QPA_PLATFORM: offscreen
           PYTHONPATH: apps/native
@@ -75,6 +77,7 @@ jobs:
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_window.py -v
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Stage and exercise actual pinned DSH native dependencies
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: |
           $env:AUGMENTOR_PWSH = "$PWD/outputs/payload/powershell/pwsh.exe"
           & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-dsh.py --out outputs/payload/dsh --node "$PWD/outputs/payload/node/node.exe"
