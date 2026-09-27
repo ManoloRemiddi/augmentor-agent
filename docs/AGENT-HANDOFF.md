@@ -2,6 +2,15 @@
 
 # Start here: agent handoff
 
+## September 27 tool context correction
+
+[Tool context budget](CONTEXT-BUDGET.md) separates per-result trimming from the
+model-relative compaction trigger. Both personal presets compose the existing
+DSH pruner at step boundaries, retain original evidence with bounded excerpts,
+and expose `/trim-tools` for idle conversations without inference. Repeated
+identical outputs produce one reassessment checkpoint. Consult its qualification
+and installed evidence before assuming a running host has adopted this change.
+
 ## September 26 public Apple-independent macOS preview
 
 The owner approved publishing a clearly labelled macOS preview without Developer

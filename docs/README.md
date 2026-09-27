@@ -137,3 +137,5 @@ files available only in a developer's working directory.
 - [macOS preview release](MACOS-PREVIEW-RELEASE.md) — Apple-independent preview, source artifacts and qualification.
 - [Mac customer guide](MACOS-PREVIEW.html) — install, model connection and browser extension.
 - [Mac library replacement](MACOS-LIBRARY-REPLACEMENT.md) — LGPL source and installation material.
+
+- [Tool context budget](CONTEXT-BUDGET.md): early pruning, original-result excerpts and deterministic repair of existing conversations.
