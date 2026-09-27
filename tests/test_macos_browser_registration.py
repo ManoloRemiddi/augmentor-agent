@@ -16,7 +16,7 @@ class MacBrowserRegistrationTests(unittest.TestCase):
     def browser(self, root, name='Comet', product=None):
         app=root/(name+'.app');binary=app/'Contents/MacOS'/name
         binary.parent.mkdir(parents=True);binary.write_text('fixture');binary.chmod(0o755)
-        info={'CFBundleExecutable':name,'CFBundleName':name,'CFBundleIdentifier':'fixture.'+name,
+        info={'CFBundleExecutable':name,'CFBundleName':name,'CFBundleIdentifier':'ai.perplexity.comet' if name=='Comet' else 'fixture.'+name,
               'CFBundleURLTypes':[{'CFBundleURLSchemes':['http','https']}]}
         if product is not None:info['CrProductDirName']=product
         (app/'Contents/Info.plist').write_bytes(plistlib.dumps(info))
@@ -35,7 +35,7 @@ class MacBrowserRegistrationTests(unittest.TestCase):
             self.assertEqual({row['app'] for row in browsers},{str(comet.resolve()),str(other.resolve())})
             support=root/'support';(support/'Comet').mkdir(parents=True)
             (support/'Comet/Local State').write_text('private contents are never read')
-            self.assertEqual(module.browser_data_directory(comet,support),support/'Comet')
+            self.assertEqual(module.browser_data_directory(comet,support),support/'Google/Chrome')
             self.assertEqual(module.browser_data_directory(other,support),support/'Vendor/New Browser')
 
     def test_unknown_data_location_requires_explicit_folder_and_preserves_profiles(self):
@@ -67,10 +67,18 @@ class MacBrowserRegistrationTests(unittest.TestCase):
             value={'path':str(app/'host'),'allowed_origins':['chrome-extension://fixture/']}
             with patch.object(module,'manifest',return_value=value):
                 result=module.prepare_extension(app,comet,support)
-            target=profile/'NativeMessagingHosts/com.augmentor.agent.json'
+            target=support/'Google/Chrome/NativeMessagingHosts/com.augmentor.agent.json'
             self.assertEqual(result['manifest'],str(target));self.assertEqual(json.loads(target.read_text()),value)
             self.assertIn(target.parent,module.registration_directories(support))
-            self.assertFalse((support/'Google').exists())
+            self.assertFalse((profile/'NativeMessagingHosts').exists())
+            self.assertEqual((profile/'Local State').read_text(),'{}')
+
+    def test_unlisted_fork_can_use_existing_app_named_data_root(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary);app=self.browser(root,'Unlisted');support=root/'support'
+            data=support/'Unlisted';data.mkdir(parents=True);(data/'Local State').write_text('private')
+            self.assertEqual(module.browser_data_directory(app,support),data)
+            self.assertEqual((data/'Local State').read_text(),'private')
 
     def test_prepared_extension_is_stable_and_edits_are_preserved(self):
         with tempfile.TemporaryDirectory() as directory:

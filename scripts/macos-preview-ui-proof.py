@@ -60,16 +60,21 @@ def verify(root, work, out):
     browser_app=Path(os.environ.get('AUGMENTOR_PROOF_BROWSER_APP','/Applications/Google Chrome.app'))
     browser=registrar.browser_application(browser_app)
     source_directory=registrar.browser_data_directory(browser_app,Path.home()/'Library/Application Support')
-    profile=work/'support'/source_directory.relative_to(Path.home()/'Library/Application Support')
+    # Comet uses its default native-host location independently of --user-data-dir.
+    # Isolate both Cocoa's home lookup and HOME; never register test hosts in the
+    # owner's real browser or let browser background tasks use their home.
+    browser_home=work/'browser-home'
+    support=browser_home/'Library/Application Support'
+    profile=support/source_directory.relative_to(Path.home()/'Library/Application Support')
     profile.mkdir(parents=True);(profile/'Local State').write_text('{}')
-    prepared=registrar.prepare_extension(app,browser_app,work/'support')
+    prepared=registrar.prepare_extension(app,browser_app,support)
     assert Path(prepared['manifest']).parent==profile/'NativeMessagingHosts'
     import websocket
     with (out/'chrome.log').open('w') as log:
         chrome=subprocess.Popen([browser['executable'],
             '--headless=new','--no-first-run','--remote-allow-origins=*','--remote-debugging-port=0',
             '--enable-unsafe-extension-debugging','--user-data-dir='+str(profile),'about:blank'],
-            env=environment,stdout=log,stderr=log)
+            env={**environment,'HOME':str(browser_home),'CFFIXED_USER_HOME':str(browser_home)},stdout=log,stderr=log)
         ws=None
         try:
             portfile=profile/'DevToolsActivePort';port_lines=[]

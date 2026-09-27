@@ -9,7 +9,10 @@ locations. It validates HTTP/HTTPS browser handlers and Chromium framework
 resources, then opens the exact chosen app's Extensions page. Users can prepare
 another browser without reopening setup. Safari is not a Chromium browser.
 
-Registration uses Chromium's `CrProductDirName` metadata when provided. Otherwise
+Comet 153 uses Chrome's `Google/Chrome/NativeMessagingHosts` compatibility location
+even though its browser data is in `Comet`; an actual native-message exchange
+verified this exception. Registration for other apps uses Chromium's
+`CrProductDirName` metadata when provided. Otherwise
 an existing app-named data directory containing `Local State` is required, with
 an explicit data-folder chooser for ambiguous cases. No profile contents are
 read or modified. Paths outside Application Support, traversal and linked
@@ -36,7 +39,10 @@ Clean candidate, end-to-end Comet chat and installed readback are still pending
 at this checkpoint. Public preview 2 is unchanged.
 
 The interface proof now accepts `AUGMENTOR_PROOF_BROWSER_APP`, uses the selected
-app's metadata and registers directly into its isolated data root before launch.
+app's metadata and registers directly into its isolated native-host root before launch.
+It isolates both `HOME` and Cocoa's `CFFIXED_USER_HOME`: Comet's native-host lookup
+does not follow `--user-data-dir`. The earlier Comet profile-only fixture failed
+with "Specified native messaging host not found" and exposed this difference.
 It verifies side-panel API availability, native messaging, DSH chat and desktop
 Send/reopen against the deterministic local provider, without personal profiles.
 

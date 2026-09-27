@@ -16,6 +16,9 @@ import uuid
 
 BROWSERS = {'chromium': 'Chromium', 'chrome': 'Google/Chrome',
             'chrome-for-testing': 'Google/ChromeForTesting'}
+# Comet 153 uses Chrome's native-host compatibility location even though its
+# browsing profiles live in Comet. Qualified by a real native-message exchange.
+NATIVE_HOST_OVERRIDES = {'ai.perplexity.comet': 'Google/Chrome'}
 
 
 def browser_application(app):
@@ -77,13 +80,15 @@ def browser_data_directory(browser, support_root, data_directory=None):
         if not (directory/'Local State').is_file():
             raise ValueError('Choose the browser data folder containing Local State, not an individual profile folder.')
         return directory
+    if details['bundleId'] in NATIVE_HOST_OVERRIDES:
+        return checked_data_directory(support_root/NATIVE_HOST_OVERRIDES[details['bundleId']], support_root)
     # Chromium's declared product directory is authoritative when present.
     product = details['productDirectory']
     defaults = {'com.google.Chrome': 'Google/Chrome', 'com.google.Chrome.forTesting': 'Google/ChromeForTesting',
                 'org.chromium.Chromium': 'Chromium'}
     if product or details['bundleId'] in defaults:
         return checked_data_directory(support_root/(product or defaults[details['bundleId']]), support_root)
-    # Forks such as Comet omit CrProductDirName. Only accept an existing browser
+    # Some forks omit CrProductDirName. Only accept an existing browser
     # data root matching the app metadata; do not guess and silently misregister.
     for name in dict.fromkeys((details['bundleName'], Path(details['app']).stem)):
         directory = checked_data_directory(support_root/name, support_root)

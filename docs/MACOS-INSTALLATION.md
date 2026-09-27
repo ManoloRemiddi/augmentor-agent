@@ -94,8 +94,9 @@ manifest outside the signed bundle and points it at `Contents/MacOS/augmentor-br
 It derives the exact allowed extension ID from the bundled extension key.
 Existing manifests are backed up before replacement; identical registration is
 unchanged. Symlink manifests and linked browser data directories are refused.
-The app's declared Chromium product directory takes precedence. For forks such
-as Comet that omit it, an existing data root matching the bundle name is used
+Comet uses Chrome's `Google/Chrome/NativeMessagingHosts` compatibility location,
+verified with Comet 153; its browsing profile remains untouched. Other apps use
+their declared Chromium product directory. When it is absent, an existing data root matching the bundle name is used
 only when it contains `Local State`; contents of that file are never read.
 Unknown locations require opening the browser once or explicitly choosing its
 data root (`--browser-data` in the CLI). Supported data roots are ordinary
