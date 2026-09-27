@@ -53,7 +53,7 @@ export function apply(ctx) {
       seq: {type: 'integer', minimum: 0}, offset: {type: 'integer', minimum: 0}, limit: {type: 'integer', minimum: 1, maximum: 2048},
     }},
     isConcurrencySafe: () => true,
-    augmentorExecution: {effect: 'read'},
+    augmentorExecution: {effect: () => 'read'},
     output: {schema: {}, render: (_args, value) => [{type: 'text', text: JSON.stringify(value)}]},
     execute: (args, exec) => excerpt(exec.agent.session, args),
   });
