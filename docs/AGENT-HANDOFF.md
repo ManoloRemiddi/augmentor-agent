@@ -12,6 +12,18 @@ W0/W1 have started with isolated baseline checks, hash-locked native x64/ARM64
 runtime candidates and hosted qualification jobs. No Windows app or customer
 release is complete. Preserve existing installations and unrelated open work.
 
+Current Windows worktree: `feat/windows` in an isolated canonical-repository
+checkout; draft [PR #20](https://github.com/ManoloRemiddi/augmentor-agent/pull/20).
+At `523fe9a`, real hosted x64/ARM64 runtime and disposable two-version installer
+lifecycle probes pass, as do candidate Mac Qt behavior checks. The full Windows
+job still failed DSH metadata decoding; later source corrects UTF-8 handling.
+W2 adds process leases, Windows private paths/token identity and an isolated
+named-pipe adapter, with continuing native CI. Read the status ledger for exact
+ref/evidence boundaries and outstanding service, setup, UI, browser, update and
+public-release work. The owner will connect physical Windows hardware later;
+keep building independently while that is pending. No installed personal app,
+model endpoint, speech placement or website download has been changed.
+
 ## September 27 Windows implementation plan — historical planning checkpoint
 
 The owner requested a detailed plan before coding. Read the

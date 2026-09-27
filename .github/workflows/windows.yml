@@ -47,15 +47,6 @@ jobs:
           QT_QPA_PLATFORM: offscreen
         run: |
           & outputs/payload/python/python.exe -I -Xutf8 -B scripts/windows-runtime-proof.py --root outputs/payload --arch ${{ matrix.arch }} --out outputs/evidence/runtime.json
-      - name: Build the shared TypeScript application
-        id: build
-        run: |
-          npm ci --ignore-scripts --no-audit --no-fund
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          npm run check
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          npm run build
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Verify process leases on the real Windows kernel
         if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
         run: |
@@ -64,6 +55,10 @@ jobs:
         if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
         run: |
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_identity.py -v
+      - name: Verify private named-pipe framing, peers and cancellation
+        if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
+        run: |
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_pipe.py -v
       - name: Exercise shared native appearance and interaction behavior
         if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
         env:
@@ -75,6 +70,18 @@ jobs:
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_fluid.py -v
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_window.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m augmentor_linux --preview --screenshot outputs/evidence/desktop.png
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Build the shared TypeScript application
+        id: build
+        if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          npm run check
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          npm run build
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Stage and exercise actual pinned DSH native dependencies
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}

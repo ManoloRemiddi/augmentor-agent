@@ -153,3 +153,14 @@ managers; token ownership now uses explicit `finally: Close()` and tests actual
 process-token identity. The fixture does not mask failed ACL checks. Independent
 DSH and UI probes now continue after an unrelated probe failure to collect useful
 evidence; the overall job still fails if any required probe fails.
+
+The isolated Python named-pipe adapter is now implemented for W2 qualification.
+It preserves byte-stream framing, restricts the server ACL to user/SYSTEM,
+rejects remote clients and pre-created names, and checks both peers through
+kernel pipe process IDs and process-token SIDs. Overlapped operations have
+timeouts/cancellation; the listening name stays owned between accepts. Tests
+exercise repeated connections, clients disappearing before a request, large
+Unicode responses, occupied-name refusal, reuse after close and read cancellation.
+The adapter is not yet wired into application services. Native execution,
+different-user rejection and authenticated Node interoperability remain pending;
+do not infer these from the source or from Linux-skipped tests.
