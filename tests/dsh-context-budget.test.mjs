@@ -10,6 +10,7 @@ import {once} from 'node:events';
 import {mkdtempSync, rmSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
 import {apply, excerpt} from '../adapters/dsh-context-budget/index.mjs';
+import {actionEffect} from '../adapters/dsh-execution/actions.mjs';
 const root=process.env.DSH_INSTALL_ROOT || join(homedir(), '.local/node/lib/node_modules/@deepseek-ai/dsh');
 const require=createRequire(join(root,'package.json'));
 const load=async name=>import(pathToFileURL(require.resolve('@deepseek-ai/'+name)).href);
@@ -53,6 +54,7 @@ test('large-window DSH prunes before next request, preserves and retrieves origi
     assert.match(JSON.stringify(body.messages.at(-1)),/MIDDLE_EVIDENCE/);return done;
   });
   await h.say();assert.deepEqual(h.errors,[]);assert.equal(h.requests.length,3);
+  assert.equal(actionEffect('tool_result_excerpt',{},h.ctx.tools.get('tool_result_excerpt',h.agent)),'read','omitted evidence remains readable during execution recovery');
   assert.equal(excerpt(h.agent.session,{seq,offset:0,limit:6}).text,'HEAD:x');
   assert.equal(excerpt(h.agent.session).results[0].seq,seq);
   assert.throws(()=>excerpt(h.agent.session,{seq,limit:50000}));
