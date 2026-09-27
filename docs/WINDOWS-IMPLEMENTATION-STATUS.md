@@ -118,3 +118,20 @@ and other reparse ancestors. Windows tests exercise owner/ACL readback, reopen,
 permissive-path refusal and junction redirection. It is not yet adopted by the
 application launcher; execution evidence is pending. This adds no global Python
 installation and makes no changes to the owner's machine.
+
+At `523fe9a`, run `36354229667` proves the native runtime on both architectures,
+the selected Mac Qt behavior tests, and x64 process leases. The **x64 disposable
+installer lifecycle passes**: native embedded launch from a Unicode/space path,
+install hooks, local feed download, reopen with auto-apply disabled, refusal while
+a fixture process is busy, update/reopen, retention of the previous package,
+uninstall hooks/native-host registry cleanup and preserved settings. This remains
+an unsigned installer-mechanism proof, not full-app or authenticated rollback
+qualification. Reports are retained as the run's `windows-evidence-x64` artifact.
+
+The same run finds a Windows ANSI decoding failure while inspecting a DSH npm
+manifest. Package metadata now explicitly uses UTF-8; generated design assets
+use UTF-8/LF on every OS. Windows build Python runs in explicit UTF-8 mode, and
+the native launcher sets isolated Python preconfiguration to UTF-8 before startup
+and supplies that mode to ordinary child services. The installer fixture checks
+the actual interpreter flag. ARM64 DSH/installer work from this run is still in
+progress; a new source revision must not erase the outstanding evidence boundary.

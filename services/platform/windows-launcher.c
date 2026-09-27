@@ -44,6 +44,8 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE previous, PWSTR command, int s
     name##_fn p_##name = (name##_fn)(void *)GetProcAddress(library, #name); \
     if (!p_##name) return failure(L"The private Python runtime is incompatible.")
     LOAD(void, PyConfig_InitIsolatedConfig, (PyConfig *));
+    LOAD(void, PyPreConfig_InitIsolatedConfig, (PyPreConfig *));
+    LOAD(PyStatus, Py_PreInitialize, (const PyPreConfig *));
     LOAD(PyStatus, PyConfig_SetString, (PyConfig *, wchar_t **, const wchar_t *));
     LOAD(PyStatus, PyConfig_SetArgv, (PyConfig *, Py_ssize_t, wchar_t * const *));
     LOAD(PyStatus, Py_InitializeFromConfig, (const PyConfig *));
@@ -64,6 +66,12 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE previous, PWSTR command, int s
     config.parse_argv = 0;
     PyStatus status;
 #define CONFIGURE(call) do { status = (call); if (p_PyStatus_Exception(status)) goto error; } while (0)
+    PyPreConfig preconfig;
+    p_PyPreConfig_InitIsolatedConfig(&preconfig);
+    preconfig.utf8_mode = 1;
+    CONFIGURE(p_Py_PreInitialize(&preconfig));
+    /* Child services share the text contract; isolated children also pass -Xutf8. */
+    SetEnvironmentVariableW(L"PYTHONUTF8", L"1");
     CONFIGURE(p_PyConfig_SetString(&config, &config.home, home));
     CONFIGURE(p_PyConfig_SetString(&config, &config.program_name, python));
     CONFIGURE(p_PyConfig_SetString(&config, &config.executable, python));

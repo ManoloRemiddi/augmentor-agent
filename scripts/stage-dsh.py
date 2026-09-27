@@ -25,11 +25,11 @@ def inventory(target):
     spec = importlib.util.spec_from_file_location('npm_notices', ROOT/'scripts/third-party-notices.py')
     notices = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(notices)
-    lock = json.loads((target/'package-lock.json').read_text())['packages']
+    lock = json.loads((target/'package-lock.json').read_text(encoding="utf-8"))['packages']
     packages = []
     for path in notices.package_dirs(target/'node_modules'):
         relative = path.relative_to(target).as_posix()
-        meta = json.loads((path/'package.json').read_text())
+        meta = json.loads((path/'package.json').read_text(encoding="utf-8"))
         entry = lock.get(relative, {})
         if entry.get('version') != meta.get('version') or entry.get('dev'):
             raise ValueError('DSH dependency differs from production lock: '+relative)
@@ -71,7 +71,7 @@ def main():
         shutil.copy2(ROOT/'release/dsh'/name, target/name)
     shutil.copytree(ROOT/'release/dsh/plugins', target/'plugins')
     subprocess.run([*npm_command(), 'ci', '--ignore-scripts', '--omit=dev', '--no-audit', '--no-fund'],
-        cwd=target, check=True)
+        cwd=target, check=True, timeout=600)
     # The ARM64 Mac uses the native sharp/libvips pair qualified below. npm also
     # installs the optional wasm fallback there; it contains a separate native
     # source graph and is not a dependency of this target's working image path.

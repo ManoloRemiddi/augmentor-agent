@@ -17,7 +17,7 @@ permissions:
   contents: read
 concurrency:
   group: windows-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
   native-runtime:
     strategy:
@@ -41,12 +41,12 @@ jobs:
           architecture: ${{ matrix.arch }}
       - name: Stage private hash-locked Python, Node and PowerShell
         id: bootstrap
-        run: python scripts/bootstrap-windows.py --arch ${{ matrix.arch }} --out outputs/payload
+        run: python -Xutf8 scripts/bootstrap-windows.py --arch ${{ matrix.arch }} --out outputs/payload
       - name: Exercise native wheels, Qt, PortAudio, Node and PowerShell
         env:
           QT_QPA_PLATFORM: offscreen
         run: |
-          & outputs/payload/python/python.exe -I -B scripts/windows-runtime-proof.py --root outputs/payload --arch ${{ matrix.arch }} --out outputs/evidence/runtime.json
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/windows-runtime-proof.py --root outputs/payload --arch ${{ matrix.arch }} --out outputs/evidence/runtime.json
       - name: Build the shared TypeScript application
         run: |
           npm ci --ignore-scripts --no-audit --no-fund
@@ -58,15 +58,15 @@ jobs:
       - name: Verify process leases on the real Windows kernel
         if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
         run: |
-          & outputs/payload/python/python.exe -B -m unittest discover -s tests -p test_platform_locks.py -v
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_platform_locks.py -v
       - name: Verify private paths, ACLs and junction refusal
         if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
         run: |
-          & outputs/payload/python/python.exe -B -m unittest discover -s tests -p test_windows_identity.py -v
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_identity.py -v
       - name: Stage and exercise actual pinned DSH native dependencies
         run: |
           $env:AUGMENTOR_PWSH = "$PWD/outputs/payload/powershell/pwsh.exe"
-          & outputs/payload/python/python.exe -I -B scripts/stage-dsh.py --out outputs/payload/dsh --node "$PWD/outputs/payload/node/node.exe"
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-dsh.py --out outputs/payload/dsh --node "$PWD/outputs/payload/node/node.exe"
       - name: Install pinned build-time packaging tool
         if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
         id: packaging
@@ -74,7 +74,7 @@ jobs:
       - name: Qualify embedded launcher and two disposable installer versions
         if: ${{ !cancelled() && steps.packaging.outcome == 'success' }}
         run: |
-          & outputs/payload/python/python.exe -I -B scripts/windows-installer-proof.py --runtime outputs/payload --arch ${{ matrix.arch }} --out outputs/installer-proof --vpk outputs/vpk/vpk.exe
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/windows-installer-proof.py --runtime outputs/payload --arch ${{ matrix.arch }} --out outputs/installer-proof --vpk outputs/vpk/vpk.exe
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

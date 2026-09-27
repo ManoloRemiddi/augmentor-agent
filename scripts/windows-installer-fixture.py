@@ -56,7 +56,8 @@ def main():
         return
     action, report_file, *rest = args
     report = {'version': CONFIG['version'], 'python': sys.version, 'executable': sys.executable,
-              'argv': args, 'installedRoot': str(ROOT)}
+              'argv': args, 'installedRoot': str(ROOT), 'utf8Mode': sys.flags.utf8_mode}
+    assert sys.flags.utf8_mode == 1
     if action == '--hold':
         busy = DATA/'busy'
         busy.write_text(str(os.getpid()))

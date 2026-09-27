@@ -35,15 +35,15 @@ def package_dirs(modules):
 
 
 def inventory(tree, catalog_root):
-    lock = json.loads((tree / 'package-lock.json').read_text())['packages']
-    catalog = json.loads((catalog_root / 'catalog.json').read_text())
+    lock = json.loads((tree / 'package-lock.json').read_text(encoding="utf-8"))['packages']
+    catalog = json.loads((catalog_root / 'catalog.json').read_text(encoding="utf-8"))
     for name, source in catalog['sources'].items():
         if digest((catalog_root / source['file']).read_bytes()) != source['sha256']:
             raise ValueError(f'{name}: reviewed license hash changed')
     components, texts, errors = [], {}, []
     for package in package_dirs(tree / 'node_modules'):
         relative = package.relative_to(tree).as_posix()
-        meta = json.loads((package / 'package.json').read_text())
+        meta = json.loads((package / 'package.json').read_text(encoding="utf-8"))
         key = meta['name'] + '@' + meta['version']
         locked = lock.get(relative)
         if locked is None:
@@ -106,7 +106,7 @@ def main():
     text_dir = args.out / 'texts'; text_dir.mkdir(exist_ok=True)
     for sha, content in texts.items():
         (text_dir / (sha + '.txt')).write_bytes(content)
-    (args.out / 'npm-components.json').write_text(json.dumps(report, indent=2) + '\n')
+    (args.out / 'npm-components.json').write_text(json.dumps(report, indent=2) + '\n', encoding="utf-8", newline="\n")
     print(f'Collected notices for {len(report["components"])} production package instances.')
 
 
