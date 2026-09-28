@@ -38,7 +38,8 @@ def candidate(root, arch):
                  'node/node.exe', 'powershell/pwsh.exe', 'updater/WinSparkle.dll',
                  'dsh/payload.json', 'scripts/launch-windows.py', 'scripts/windows-local-health.py',
                  'scripts/windows-inspect-payload.py', 'services/lifecycle/payload_integrity.py',
-                 'services/lifecycle/recovery_source.py', 'services/lifecycle/update_journal.py',
+                 'services/lifecycle/recovery_source.py', 'services/lifecycle/health_report.py',
+                 'services/lifecycle/update_journal.py',
                  'services/platform_adapters/private_files.py', 'services/platform_adapters/locks.py'):
         if not (root/name).is_file(): raise ValueError('Incomplete shared application payload: '+name)
     # Includes aliases/redirects and stale build output. Never reseal here: a

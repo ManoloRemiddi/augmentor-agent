@@ -11,6 +11,7 @@ static HANDLE inspection_writer = INVALID_HANDLE_VALUE, inspection_record = INVA
 static wchar_t inspection_path[32768];
 static wchar_t inspection_installer[65];
 static DWORD inspection_stage = 0, inspection_detail = 0;
+static BOOL inspection_health_attempted = FALSE;
 
 __declspec(dllexport) DWORD WINAPI AugmentorInspectionStage(void) { return inspection_stage; }
 __declspec(dllexport) DWORD WINAPI AugmentorInspectionDetail(void) { return inspection_detail; }
@@ -21,6 +22,7 @@ static void augmentor_inspection_close(void) {
     if (inspection_updates != INVALID_HANDLE_VALUE) CloseHandle(inspection_updates);
     inspection_record = inspection_writer = inspection_updates = INVALID_HANDLE_VALUE;
     inspection_installer[0] = 0;
+    inspection_health_attempted = FALSE;
     if (inspection_report != INVALID_HANDLE_VALUE) CloseHandle(inspection_report);
     if (inspection_root != INVALID_HANDLE_VALUE) CloseHandle(inspection_root);
     if (inspection_parent != INVALID_HANDLE_VALUE) CloseHandle(inspection_parent);
@@ -128,8 +130,8 @@ done:
     return ok;
 }
 
-__declspec(dllexport) BOOL WINAPI AugmentorInspectionRun(const wchar_t *installed,
-        const wchar_t *release_digest) {
+static BOOL inspection_worker(const wchar_t *installed, const wchar_t *release_digest,
+        BOOL health, const wchar_t *qualification) {
     HANDLE metadata = INVALID_HANDLE_VALUE, job = NULL;
     PROCESS_INFORMATION process = {0}; STARTUPINFOW startup_info = {sizeof(startup_info)};
     wchar_t executable[32768], script[32768], path[32768], *command = NULL;
@@ -150,9 +152,10 @@ __declspec(dllexport) BOOL WINAPI AugmentorInspectionRun(const wchar_t *installe
             !cache_stream(metadata, INVALID_HANDLE_VALUE, release_digest)) goto done;
     inspection_stage = 3;
     command = malloc(32768 * sizeof(wchar_t));
-    if (!command || swprintf_s(command, 32768, L"\"%ls\" -I -B -X utf8 \"%ls\" \"%ls\" %ls %ls",
+    if (!command || swprintf_s(command, 32768, L"\"%ls\" -I -B -X utf8 \"%ls\" \"%ls\" %ls %ls %ls \"%ls\"",
             executable, script, installed, release_digest,
-            inspection_installer[0] ? inspection_installer : L"-") < 0) goto done;
+            inspection_installer[0] ? inspection_installer : L"-",
+            health ? L"health" : L"inspect", qualification ? qualification : L"-") < 0) goto done;
     inspection_stage = 4;
     job = CreateJobObjectW(NULL, NULL);
     JOBOBJECT_EXTENDED_LIMIT_INFORMATION limits = {0};
@@ -183,7 +186,8 @@ __declspec(dllexport) BOOL WINAPI AugmentorInspectionRun(const wchar_t *installe
         Sleep(10);
     } while (TRUE);
     inspection_stage = 11;
-    if (swprintf_s(path, 32768, L"%ls\\..\\inspection-result.json", inspection_path) < 0) goto done;
+    if (swprintf_s(path, 32768, L"%ls\\..\\%ls", inspection_path,
+            health ? L"health-result.json" : L"inspection-result.json") < 0) goto done;
     inspection_report = CreateFileW(path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
         FILE_FLAG_OPEN_REPARSE_POINT, NULL);
     ok = cache_file(inspection_report, NULL, FALSE, 4096);
@@ -201,4 +205,51 @@ done:
     if (metadata != INVALID_HANDLE_VALUE) CloseHandle(metadata);
     free(command);
     return ok;
+}
+
+__declspec(dllexport) BOOL WINAPI AugmentorInspectionRun(const wchar_t *installed,
+        const wchar_t *release_digest) {
+    if (inspection_health_attempted) return FALSE;
+    return inspection_worker(installed, release_digest, FALSE, NULL);
+}
+
+/* Observe the fixed, isolated source-health action after independent source
+ * assessment. Keep the writer and active-record pins throughout. Exchange the
+ * exclusive installation/startup handles for ordinary read admission so the
+ * native probe can start. An active journal still blocks normal app startup;
+ * held read admission prevents repair/removal. No files or records are changed. */
+__declspec(dllexport) BOOL WINAPI AugmentorInspectionHealth(const wchar_t *installed,
+        const wchar_t *release_digest, const wchar_t *qualification) {
+    wchar_t base[32768], expected[32768]; DWORD count;
+    AugmentorLease reader = {INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE,
+        INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE};
+    inspection_stage = 12; inspection_detail = 0;
+    if (authorized || manual.file == INVALID_HANDLE_VALUE || manual.startup == INVALID_HANDLE_VALUE ||
+            inspection_record == INVALID_HANDLE_VALUE || inspection_writer == INVALID_HANDLE_VALUE ||
+            inspection_report == INVALID_HANDLE_VALUE || !inspection_installer[0] ||
+            inspection_health_attempted) return FALSE;
+    inspection_health_attempted = TRUE;
+    count = GetFinalPathNameByHandleW(manual.base, base, 32768, FILE_NAME_NORMALIZED | VOLUME_NAME_DOS);
+    if (!count || count >= 32768 || wcsncmp(base, L"\\\\?\\", 4)) return FALSE;
+    memmove(base, base + 4, (count - 3) * sizeof(wchar_t));
+    if (qualification && qualification[0]) {
+#ifdef AUGMENTOR_DEVELOPMENT_CANDIDATE
+        count = GetFullPathNameW(qualification, 32768, expected, NULL);
+        if (!count || count >= 32768 || _wcsicmp(expected, base)) return FALSE;
+#else
+        return FALSE;
+#endif
+    } else qualification = NULL;
+    CloseHandle(manual.file); manual.file = INVALID_HANDLE_VALUE;
+    CloseHandle(manual.startup); manual.startup = INVALID_HANDLE_VALUE;
+    /* Retain the original directory handles while reacquiring the same private
+     * namespace. If another maintenance attempt wins the gap, refuse without
+     * waiting, killing it, retrying, or dropping the unresolved record. */
+    if (!augmentor_acquire(&reader, base)) {
+        inspection_detail = GetLastError(); return FALSE;
+    }
+    CloseHandle(manual.run); CloseHandle(manual.base);
+    manual = reader;
+    CloseHandle(inspection_report); inspection_report = INVALID_HANDLE_VALUE;
+    return inspection_worker(installed, release_digest, TRUE, qualification);
 }

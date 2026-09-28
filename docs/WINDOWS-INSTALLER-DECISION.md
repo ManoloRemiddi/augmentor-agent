@@ -900,3 +900,48 @@ inspection test, not a cross-version installation. Six new lookup cases cover
 selection loss/change, absent source without fallback, corruption, CPU/record
 refusal, aliases and native pinning. Local update suite: 49 cases, 48 pass and one
 Windows-only skip; source-assessment suite: six pass. Native execution is pending.
+
+At `68062de`, [native Inno qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36420534854)
+passes both CPUs at merge checkout `dea8a18b3625025aee41fc688dc3232c6f7b1e69`.
+Downloaded reports confirm the changed-selection lookup and independent assessment
+along with earlier refusal/repair checks. Fast Windows passes all 49 update cases
+on both CPUs. Separately, full `4412deb` now passes both CPUs and Mac Qt at
+`82a92eaa3c9598e2dccd329dc853cc839ca7cefb`; both installed inventories and isolated
+UI-health reports are verified. It predates source lookup and the following work.
+
+## Independent source health before restoration completion
+
+The standalone installer now accepts `/augmentorinspect=health` for observation
+only. It first performs exact independent source assessment, then retains the
+journal writer lock and active-record pin while exchanging its exclusive native
+startup/installation handles for shared read admission. It keeps directory handles
+through that exchange. A competing maintenance attempt in the exchange gap causes
+refusal; there is no wait, retry or process termination. The pending journal still
+blocks ordinary native startup, and held read admission excludes installation,
+repair and removal while the probe runs.
+
+The extracted worker rechecks every installed file against the independent source
+inventory under that read admission. An incomplete source refuses before executing
+any installed code. A complete source can run only `Augmentor.exe --local-health`,
+with the compiled private qualification root permitted only for development builds.
+The actual health script renders the shared preview in its disposable profile,
+without conversation or companion startup. Its child has a 30-second deadline
+inside the independent worker's existing 120-second owned Job. The parent observes
+the entire range's exit before accepting a bounded health report.
+
+Both installed and independent observers use `health_report.py` to verify the exact
+metadata digest, source/version/CPU, Windows QPA, rendering/fonts and integer
+dimensions. Duplicate/malformed/oversized or foreign reports refuse. The new health
+result retains `applyAuthorized: false`, the original journal hash and source
+identity; it does not alter selection, archive a record, restore files or reopen
+the desktop. Actual restoration and durable recovery completion remain to build.
+
+Five portable report cases, all 49 update cases (one Windows-only skip locally),
+six source-assessment cases, four package cases and actual Inno script compilation
+pass. Native template qualification now uses a clearly synthetic health response
+through the actual launcher/private Python. It asserts held writer/record/install
+admission, refused ordinary startup, damaged-source refusal before launch, and
+preserved record/data after a failed health child. Synthetic UI fields are not Qt
+qualification. The full app proof separately requires the real independent native
+UI health result while preserving its actual pending record. Both new native
+executions are pending.

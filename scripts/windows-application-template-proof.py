@@ -46,8 +46,10 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         ignore=shutil.ignore_patterns('site-packages', '__pycache__', '*.pyc'))
     (payload/'python/Lib/site-packages').mkdir(parents=True, exist_ok=True)
     shutil.copy2(ROOT/'scripts/windows-finish-launch-fixture.py', payload/'scripts/launch-windows.py')
+    shutil.copy2(ROOT/'scripts/windows-health-fixture.py', payload/'scripts/windows-local-health.py')
     for name in ('scripts/windows-inspect-payload.py','services/lifecycle/payload_integrity.py',
-                 'services/lifecycle/recovery_source.py','services/lifecycle/update_journal.py',
+                 'services/lifecycle/recovery_source.py','services/lifecycle/health_report.py',
+                 'services/lifecycle/update_journal.py',
                  'services/platform_adapters/private_files.py','services/platform_adapters/locks.py'):
         target=payload/name;target.parent.mkdir(parents=True,exist_ok=True)
         shutil.copy2(ROOT/name,target)
@@ -77,12 +79,12 @@ def prove(out, arch, compiler, fixture_executable, runtime):
                 child.kill(); child.wait(timeout=10)  # Failed fixture cleanup only.
         assert (code == 0) == success, (label,code)
         assert not launch_record.exists(), 'Silent maintenance launched the application.'
-    def inspect(executable,label,*,source=False):
+    def inspect(executable,label,*,source=False,health=False):
         # InitializeSetup deliberately refuses installation after inspection.
         # A nonzero Setup exit alone is not an inspection-success assertion.
-        run(executable,label,success=False,arguments=['/augmentorinspect='+('source' if source else '1')])
+        run(executable,label,success=False,arguments=['/augmentorinspect='+('health' if health else 'source' if source else '1')])
         log=(out/('application-template-'+label+'.log')).read_text(encoding='utf-8-sig')
-        marker='Augmentor independent inspection result: '
+        marker='Augmentor independent health result: ' if health else 'Augmentor independent inspection result: '
         rows=[line.split(marker,1)[1] for line in log.splitlines() if marker in line]
         assert len(rows)==1, log[-8192:]
         result=json.loads(rows[0]);assert result['schema']=='augmentor-payload-inspection/1'
@@ -201,6 +203,12 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         assert assessed['recordSHA256']==hashlib.sha256(pending_bytes).hexdigest()
         assert pending.read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
         assert not installed_release.exists() and not (install/'current/Augmentor.exe').exists()
+        run(cached,'damaged-source-health-refusal',success=False,arguments=['/augmentorinspect=health'])
+        damaged_health_log=(out/'application-template-damaged-source-health-refusal.log').read_text(encoding='utf-8-sig')
+        assert 'stage=9, detail=86;' in damaged_health_log
+        assert 'Augmentor independent health result:' not in damaged_health_log
+        assert not (Path(report['qualificationBase'])/'health-admission.json').exists()
+        assert pending.read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
         alias=updates/'record-alias.json';os.link(pending,alias)
         try:
             run(cached,'source-record-alias-refusal',success=False,arguments=['/augmentorinspect=source'])
@@ -243,6 +251,28 @@ def prove(out, arch, compiler, fixture_executable, runtime):
             assert path.read_bytes() == (payload/path.relative_to(install/'current')).read_bytes()
         assert read_private(selection) == selected_bytes and cached.stat().st_mtime_ns == retained_time
         assert sentinel.read_bytes() == sentinel_bytes
+        with UpdateJournal(updates,source_identity,target_identity) as journal:
+            for phase in ('preparing','prepared','drained','installer-ready','apply-intent'):journal.advance(phase)
+        pending_bytes=pending.read_bytes()
+        admission=Path(report['qualificationBase'])/'health-admission.json'
+        refusal=Path(report['qualificationBase'])/'health-fixture-refuse'
+        refusal.write_bytes(b'Fail only the synthetic health response.\n')
+        try:
+            run(cached,'source-health-failure-preserves-record',success=False,arguments=['/augmentorinspect=health'])
+            failed_log=(out/'application-template-source-health-failure-preserves-record.log').read_text(encoding='utf-8-sig')
+            assert 'stage=9, detail=87;' in failed_log and 'Augmentor independent health result:' not in failed_log
+            assert pending.read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
+            assert admission.is_file()
+        finally:refusal.unlink();admission.unlink(missing_ok=True)
+        healthy=inspect(cached,'independent-source-health',health=True)
+        assert healthy['complete'] and healthy['localHealth']['target']=='windows-'+arch
+        assert healthy['recovery']['recordSHA256']==hashlib.sha256(pending_bytes).hexdigest()
+        assert healthy['recovery']['applyAuthorized'] is False
+        assert pending.read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
+        observed=json.loads(admission.read_text())
+        assert all(observed[key] for key in ('writerHeld','recordPinned','installationHeld','ordinaryStartupRefused'))
+        pending.unlink();admission.unlink()  # Only this disposable proof's state.
+        stages.append('independent-synthetic-health-with-live-record-and-installation-admission')
         # Damaged metadata (rather than an absent file) takes the same exact
         # selected-source path. No foreign/version-only match is accepted.
         installed_release.write_bytes(b'Broken fixture metadata.\n')

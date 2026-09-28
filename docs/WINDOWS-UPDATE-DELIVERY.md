@@ -237,3 +237,11 @@ The independent assessment must subsequently match its record and metadata diges
 a receipt alone cannot authorize execution or establish publisher trust. Local
 lookup tests pass; its native changed-selection fixture is pending. Independent
 restoration, cross-version apply/rollback and customer update wiring remain open.
+
+Recorded-source lookup/assessment now passes both native CPUs at `68062de`. New
+source adds an [independent source-health observer](WINDOWS-INSTALLER-DECISION.md#independent-source-health-before-restoration-completion)
+that retains writer/record exclusion, verifies complete installed source bytes
+under read admission, then runs only the fixed isolated health action. It uses the
+same strict report validator as ordinary update completion. Observation never
+clears the journal or grants rollback authority. Portable validation and script
+compilation pass; native admission and actual full-payload health remain pending.

@@ -8,13 +8,14 @@ against that independently identified release. It never starts normal desktop
 work, clears a record, applies an installer or infers publisher trust.
 """
 from contextlib import ExitStack
-import hashlib
 import json
 import os
 from pathlib import Path
 import subprocess
 import sys
 import time
+
+from .health_report import validate_health_report
 
 
 def verify_local_health(root, release_bytes, *, qualification=None, timeout=30):
@@ -52,13 +53,4 @@ def verify_local_health(root, release_bytes, *, qualification=None, timeout=30):
                 child.kill(); child.wait(timeout=10)  # Only this owned health probe range.
         if code or not output or len(output)>4096:
             raise RuntimeError('The installed local-health action failed (exit '+str(code)+').')
-        report = json.loads(output)
-        if (not isinstance(report,dict) or set(report) != {'schema','releaseSHA256','version','sourceCommit','target',
-                'qtPlatform','rendered','width','height','fontCoverage'} or
-                report['schema']!='augmentor-local-health/1' or report['qtPlatform']!='windows' or
-                report['releaseSHA256']!=hashlib.sha256(release_bytes).hexdigest() or
-                any(report[key]!=release.get(key) for key in ('version','sourceCommit','target')) or
-                report['rendered'] is not True or report['fontCoverage'] is not True or
-                any(type(report[key]) is not int or not 1<=report[key]<=32768 for key in ('width','height'))):
-            raise ValueError('The local-health report does not identify the verified installed payload.')
-        return report
+        return validate_health_report(output, release_bytes)

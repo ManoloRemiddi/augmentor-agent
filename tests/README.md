@@ -402,3 +402,19 @@ The actual native template now locates the real cached source with a deliberatel
 changed selection, then verifies the independent inspection's record, transaction
 and metadata hashes. Its new native run is pending; no interrupted restoration,
 N-to-N+1 or rollback is claimed by this lookup fixture.
+
+At `68062de`, both native Inno/fast Windows jobs pass the changed-selection lookup
+and all 49 update cases. Full `4412deb` also finishes successfully on both CPUs
+and Mac Qt; downloaded Windows inventories have no differences and native UI
+health identifies the exact source. This predates the new independent health path.
+
+`test_health_report.py` adds five portable groups covering exact metadata bytes,
+foreign build/CPU/QPA, rendering/fonts/dimension types, protocol/field shape and
+bounded duplicate/malformed input. Both health observers share this validator.
+These five, six source-assessment cases, 49 update cases (one native skip locally)
+and four package cases pass. Python and Inno compilation pass. New native template
+checks use `windows-health-fixture.py`, whose synthetic UI fields qualify only
+kernel admission and failure handling through the actual bootstrap/private Python.
+The separate full-payload proof requires real native UI health from the standalone
+installer, exact identity and an unchanged active record. Native execution of this
+new path is pending; neither fixture proves completed interrupted restoration.

@@ -700,3 +700,12 @@ lookup and the complete restoration executor remain separately required. See the
 [lookup contract](WINDOWS-INSTALLER-DECISION.md#locate-the-recorded-source-after-selection-changes).
 Malformed, foreign and incompatible sources refuse. Six source-assessment tests
 and all 43 existing update cases pass locally; native integration is pending.
+
+The independent inspector now has a source-health mode. It keeps the live writer
+and original record pinned while changing to native read admission, verifies the
+entire exact source payload, then starts only the isolated fixed health action.
+The active record continues blocking ordinary startup; read admission blocks
+replacement/removal. The owned probe's complete exit and shared strict report
+validation are required. No record or selection changes, file restoration or
+reopening follow merely from successful health. See the [contract and separate
+synthetic/full native evidence](WINDOWS-INSTALLER-DECISION.md#independent-source-health-before-restoration-completion).

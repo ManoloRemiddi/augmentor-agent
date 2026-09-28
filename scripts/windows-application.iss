@@ -36,11 +36,12 @@ Source: "{#PayloadDirectory}\payload-integrity.json"; DestDir: "{app}\current"; 
 Source: "{#PayloadDirectory}\scripts\windows-inspect-payload.py"; DestDir: "{app}\current\scripts"; Flags: ignoreversion
 Source: "{#PayloadDirectory}\services\lifecycle\payload_integrity.py"; DestDir: "{app}\current\services\lifecycle"; Flags: ignoreversion
 Source: "{#PayloadDirectory}\services\lifecycle\recovery_source.py"; DestDir: "{app}\current\services\lifecycle"; Flags: ignoreversion
+Source: "{#PayloadDirectory}\services\lifecycle\health_report.py"; DestDir: "{app}\current\services\lifecycle"; Flags: ignoreversion
 Source: "{#PayloadDirectory}\services\lifecycle\update_journal.py"; DestDir: "{app}\current\services\lifecycle"; Flags: ignoreversion
 Source: "{#PayloadDirectory}\services\platform_adapters\private_files.py"; DestDir: "{app}\current\services\platform_adapters"; Flags: ignoreversion
 Source: "{#PayloadDirectory}\services\platform_adapters\locks.py"; DestDir: "{app}\current\services\platform_adapters"; Flags: ignoreversion
 Source: "{#PayloadDirectory}\python\*"; DestDir: "{app}\current\python"; Flags: recursesubdirs createallsubdirs ignoreversion
-Source: "{#PayloadDirectory}\*"; DestDir: "{app}\current"; Excludes: "\release.json,\payload-integrity.json,\scripts\windows-inspect-payload.py,\services\lifecycle\payload_integrity.py,\services\lifecycle\recovery_source.py,\services\lifecycle\update_journal.py,\services\platform_adapters\private_files.py,\services\platform_adapters\locks.py,\python\*"; Flags: recursesubdirs createallsubdirs ignoreversion
+Source: "{#PayloadDirectory}\*"; DestDir: "{app}\current"; Excludes: "\release.json,\payload-integrity.json,\scripts\windows-inspect-payload.py,\services\lifecycle\payload_integrity.py,\services\lifecycle\recovery_source.py,\services\lifecycle\health_report.py,\services\lifecycle\update_journal.py,\services\platform_adapters\private_files.py,\services\platform_adapters\locks.py,\python\*"; Flags: recursesubdirs createallsubdirs ignoreversion
 
 [Icons]
 Name: "{userprograms}\{#ShortcutName}"; Filename: "{app}\current\Augmentor.exe"; Parameters: "{code:LaunchParameters}"; AppUserModelID: "com.augmentor.Agent"
@@ -117,8 +118,10 @@ function InspectionDetail: Cardinal;
   external 'AugmentorInspectionDetail@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
 function SnapshotUpdate(InstallerDigest: String): BOOL;
   external 'AugmentorInspectionSnapshot@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
+function InspectHealth(Installed, ReleaseDigest, Qualification: String): BOOL;
+  external 'AugmentorInspectionHealth@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
 
-procedure InspectIndependentPayload(AssessSource: Boolean);
+procedure InspectIndependentPayload(AssessSource, ObserveHealth: Boolean);
 var Ready: Boolean; ReportText: AnsiString;
 begin
   { A read-only diagnostic action, including when an update is unresolved.
@@ -145,6 +148,7 @@ begin
     ExtractTemporaryFiles('{app}\current\scripts\windows-inspect-payload.py');
     ExtractTemporaryFiles('{app}\current\services\lifecycle\payload_integrity.py');
     ExtractTemporaryFiles('{app}\current\services\lifecycle\recovery_source.py');
+    ExtractTemporaryFiles('{app}\current\services\lifecycle\health_report.py');
     ExtractTemporaryFiles('{app}\current\services\lifecycle\update_journal.py');
     ExtractTemporaryFiles('{app}\current\services\platform_adapters\private_files.py');
     ExtractTemporaryFiles('{app}\current\services\platform_adapters\locks.py');
@@ -157,6 +161,16 @@ begin
     if not LoadStringFromFile(ExpandConstant('{tmp}\') + '{app}\inspection-result.json', ReportText) then
       RaiseException('Augmentor independent inspection result is unavailable.');
     Log('Augmentor independent inspection result: ' + String(ReportText));
+    if ObserveHealth then begin
+      Ready := InspectHealth(ExpandConstant('{#InstallDirectory}\current'), '{#ReleaseDigest}', '{#QualificationBase}');
+      if not Ready then begin
+        Log('Augmentor independent health: worker failed; stage=' + IntToStr(InspectionStage) +
+          ', detail=' + IntToStr(InspectionDetail) + '; update record preserved.'); exit;
+      end;
+      if not LoadStringFromFile(ExpandConstant('{tmp}\') + '{app}\health-result.json', ReportText) then
+        RaiseException('Augmentor independent health result is unavailable.');
+      Log('Augmentor independent health result: ' + String(ReportText));
+    end;
   finally
     CloseSetupMaintenance;
     MaintenanceHeld := False;
@@ -241,8 +255,9 @@ begin
   CoordinatorText := ExpandConstant('{param:augmentorcoordinator|}');
   Inspection := ExpandConstant('{param:augmentorinspect|}');
   if Inspection <> '' then begin
-    if ((Inspection <> '1') and (Inspection <> 'source')) or (Pipe <> '') or (CoordinatorText <> '') then exit;
-    InspectIndependentPayload(Inspection = 'source');
+    if ((Inspection <> '1') and (Inspection <> 'source') and (Inspection <> 'health')) or
+        (Pipe <> '') or (CoordinatorText <> '') then exit;
+    InspectIndependentPayload(Inspection <> '1', Inspection = 'health');
     exit;
   end;
   if (Pipe <> '') or (CoordinatorText <> '') then begin

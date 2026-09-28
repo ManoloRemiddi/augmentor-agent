@@ -14,43 +14,31 @@ qualification is claimed. The app is not complete or ready for customers.
 
 ### Current evidence
 
-- [Full 578556d qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36410018195)
-  passes both CPUs and shared Mac Qt at actual merge checkout
-  `dd9c761f758e207ad9556a9d505a854093fb7114`. Both downloaded installed reports
-  confirm full installation/browser/login identity, live-draft refusal, registered
-  repair without installed Python/launcher/metadata, actual reopening, observed
-  graph drain, coordinated same-build apply and software/registration removal with
-  data retained. The workflow also qualifies bundled DSH chat/history with a
-  deterministic provider. This newest complete baseline predates isolated health,
-  reversible cancellation and payload inventory; it does not establish N-to-N+1,
-  interrupted recovery or physical/live-provider acceptance.
-- [Fast Windows at 3b3f89f](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36418939339)
-  passes x64 and ARM64, including source Windows-QPA UI health, compiled pre-Python
-  unresolved-startup refusal, fixed health routing, all 43 update tests, five
-  preparation tests, six source-assessment tests and all 14 inventory cases.
-  Inventory cases include an absent final root, corruption, aliases, Windows
-  timestamps and file replacement/mutation during inspection.
-- [Inno at 3b3f89f](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36418939338)
-  passes both CPUs at merge checkout `88327d3b9cc52dfa728133b6e7596d5be7e830d8`.
-  Downloaded reports confirm independent damaged-runtime inspection, exact
-  recorded-source matching, busy-writer/linked-record/wrong-source/malformed-record
-  refusal, absent-root inspection then repair, preserved data/startup preference,
-  browser cleanup and interactive Finish. The corrected corruption fixture passes.
-  This exact-template proof uses real private Python but inert other components;
-  it is not full app or actual-browser qualification. Earlier `cca5907` ARM64
-  inspection failed without a report; its exact cause was not recorded.
-- [Full cca5907 qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36415696154)
-  passes x64 and shared Mac Qt at `5cf8e1722c7925175798e17d6028684ef99449ff`.
-  Downloaded x64 reports confirm independent damaged-runtime inspection, exact
-  inventory (65,938 files, no differences), isolated native UI health/identity,
-  unresolved-startup refusal and verified reopening. Both downloaded managed DSH reports confirm
-  cancellation preserved their held turn without shutdown/installer invocation.
-  ARM64 fails at independent inspection without a report, using the older helper
-  before numeric diagnostics/whole-Job waiting. Do not infer its cause. Full
-  `4412deb` qualification now passes x64 at `82a92eaa3c9598e2dccd329dc853cc839ca7cefb`,
-  including busy-draft inspection refusal, with downloaded complete inventory and
-  isolated health reports. Its ARM64 installed-application stage is still running.
-  This full run predates recorded-source assessment and absent-root additions.
+- [Full 4412deb qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36417207466)
+  passes both CPUs and shared Mac Qt at merge checkout
+  `82a92eaa3c9598e2dccd329dc853cc839ca7cefb`. Downloaded installed reports confirm
+  installation/browser/login identity, live-draft and busy-inspection refusal,
+  independent damaged-runtime inspection/registered repair, coordinated same-build
+  apply, complete inventory, isolated Windows UI health, verified reopening and
+  removal with private data retained. Inventory: x64 65,938 files; ARM64 65,922;
+  no differences. Bundled DSH chat/history uses a deterministic provider.
+  This baseline predates source assessment/lookup, absent-root and independent
+  installer health additions; it is not N-to-N+1, restoration or physical acceptance.
+- [Fast Windows at 68062de](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36420534852)
+  passes both CPUs, including native UI health, compiled startup guards, 49 update
+  cases, five preparation cases, six source-assessment cases and all 14 inventory
+  cases. Earlier downloaded `cca5907` managed-DSH reports also confirm held-turn
+  cancellation preserved accepted work without shutdown or installer invocation
+  on both CPUs.
+- [Inno at 68062de](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36420534854)
+  passes both CPUs at merge checkout `dea8a18b3625025aee41fc688dc3232c6f7b1e69`.
+  Both downloaded reports confirm exact journal-source lookup despite a replaced
+  selection, independent source assessment, busy-writer/alias/wrong-source/malformed
+  refusal, absent-root inspection/repair, preserved data/startup preference,
+  browser cleanup and interactive Finish. These exact-template tests use real
+  private Python and inert other components; full app/browser acceptance is separate.
+  The older `cca5907` ARM64 inspection failure lacked diagnostics, so its exact
+  cause remains unclaimed despite later successful qualification.
 
 ### Implemented contracts and current work
 
@@ -82,8 +70,7 @@ compiled release digest and runs a bounded read-only worker under native exclusi
 maintenance admission. It reports counts without clearing a journal, applying,
 selecting or repairing a build. Recovery files are packed first in extraction
 order. The full app proof additionally checks inspection refusal while a real
-window holds an unsent draft; that assertion passes x64 at `4412deb`, with ARM64
-still running.
+window holds an unsent draft; that assertion passes both CPUs at `4412deb`.
 
 New source adds [independent recorded-source assessment](WINDOWS-INSTALLER-DECISION.md#independent-recorded-source-assessment).
 The native helper holds a live journal-writer lock and pins the private active
@@ -92,17 +79,26 @@ to the exact recorded source. It reports identity/remaining observation only,
 never apply authority. Both native CPUs now pass source assessment and absent-root
 inspection/repair at `3b3f89f`; the preceding corruption-fixture failure is corrected.
 
-The next source adds exact recorded-source cache lookup, independent of a missing,
-damaged or newer selection pointer. It pins only the journal's source installer,
-verifies its bytes and reads its bounded private receipt without scanning/fallback.
-Its receipt still requires comparison with independent embedded metadata; this is
-not publisher trust or recovery apply. Local update tests: 49 cases, 48 pass and
-one Windows-only skip; all six source-assessment cases pass. The native template
-now resolves its real retained installer while selection names a synthetic future
-target, then assesses the same pinned record/source. New native execution is pending.
+Exact recorded-source cache lookup now passes both native CPUs at `68062de`,
+including a replaced selection naming a synthetic future target. It pins only the
+journal's previous installer and still requires independent embedded-metadata
+comparison; lookup is neither publisher trust nor recovery apply.
 
-Next: finish both-CPU installed inventory/isolated-health qualification and the new
-source lookup proof, then independent interrupted/cross-version restoration, authenticated recovery
+New source adds `/augmentorinspect=health`: the standalone installer retains the
+journal writer and active-record pin while exchanging exclusive admission for
+read admission. Its independent worker requires a complete source inventory,
+launches only the fixed isolated health action, validates exact metadata/native
+UI evidence and observes the entire owned Job. Normal startup remains blocked
+and no journal is cleared. Five portable health-report cases, 49 update cases
+(one local Windows skip), six source-assessment cases, four package cases and
+Inno script compilation pass. Native template tests now require damaged-source
+refusal, preserved state after failed synthetic health, held kernel admission
+and ordinary-startup refusal. The full app proof requires actual independent
+Windows UI health with its real pending record preserved. New native execution
+is pending; synthetic template health is not GUI qualification.
+
+Next: qualify the independent installer health observer, then implement the
+interrupted/cross-version restoration executor, authenticated recovery
 apply, obsolete-file cleanup, bounded cache pruning, actual N-to-N+1 and customer
 notification/update wiring. Inno still replaces `current` in place: inspection and
 registered exact-build repair do not provide power-loss recovery. Cache artifacts
