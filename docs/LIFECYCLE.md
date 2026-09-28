@@ -358,14 +358,22 @@ expire reservations after 30 seconds using monotonic clocks. Repeated prepare
 does not renew; explicit renewal rechecks all pages. Missing hello, disconnected
 worker or lost coordinator cannot leave the page indefinitely locked.
 
-`commit` deliberately refuses: the native browser participant below still needs
-the global launch fence and shutdown/reconnect handoff. Page reservation cannot
-authorize file replacement or global Quit.
-The installer must not treat a prepared browser worker as an exited native host.
+`commit` now repeats context inventory and page renewal, including late draft
+and accepted-work checks. Only an unchanged idle group returns `closing`; this
+authorizes its native connection to drain, not the browser or its pages to close.
+The worker/pages retain a bounded 30-second fence, then resume input and the
+existing reconnect path. New/lost pages still invalidate the reservation.
+Neither page reservation nor a commit reply authorizes file replacement: the
+coordinator must retain startup exclusion, observe every owned host exit and
+acquire the exclusive installation lease.
 Extension-version compatibility/store delivery remains a separate update gate.
 
 Local proof now uses actual unpacked Chromium, actual page ports/context inventory
-and the private owner/native control around the real Pi bridge. The earlier
+and the private owner/native control around the real Pi bridge. Its extended
+proof now observes the committed wrapper's natural exit using a retained Linux
+pidfd, then verifies the same document/input node, a post-commit draft and the
+selected conversation survive automatic same-build reconnection. This is not
+an installed N-to-N+1 extension update. The earlier
 `f079931` proof used a disposable framing proxy; that helper has been replaced
 by the actual product transport. Two chat documents and Settings prove draft/API-key refusal,
 three-page reservation, cancellation, renewal, new/closed-page invalidation and
@@ -398,14 +406,25 @@ then reserves the worker/pages through native messaging and fences new work.
 Its deadline conservatively includes the whole response round trip. A page
 invalidation releases the matching native reservation; stale notifications and
 late replies do not enter the harness. Lost control never replays a request or
-terminates model/browser work. Normal EOF still drains before natural exit.
+terminates active model/browser work. Normal EOF still drains before natural exit.
 
-Local evidence: all 257 Node/Browser tests, four real private-transport Python
-tests, five launcher policy tests and actual Chromium using the product private
-owner and native host pass. The portable owner verifies the Linux peer/executable;
+After the worker confirms idle commit, native admission stays closed permanently
+for that host. The private owner forwards `closing` to the coordinator and sends
+a receipt bound to that exact RPC id. Only then does the host use its ordinary
+EOF/drain path; missing delivery receipt or owner loss triggers the same drain
+once, within eight seconds. An unknown worker commit outcome never claims native
+shutdown and is not replayed; it gets one cancellation and bounded page expiry.
+The coordinator must reconcile an unknown outcome through its retained process
+observation rather than issue another commit. Browser/window closure, reload,
+forced process termination and automatic model/tool replay are not involved.
+
+Local evidence after commit integration: all 265 Node/Browser tests, seven real
+private-transport Python tests and actual Chromium using the product private
+owner/native host pass. The portable owner verifies the Linux peer/executable;
 it does not claim Windows Job membership. The compiled Windows proof now checks
-real discovery, relay ownership, reservation/refusal/cancel and observed normal
-exit with fixture renderer replies; execution is pending on both CPUs. Real
+real discovery, relay ownership, reservation/refusal/cancel and committed natural
+exit under startup exclusion with fixture renderer replies; execution of the new
+commit assertions is pending on both CPUs. Real
 Chromium document behavior and compiled transport behavior remain separate
 evidence. Global commit/update, Windows Chromium/Comet GUI and customer release
 are still incomplete.
@@ -428,9 +447,9 @@ The Windows context additionally holds the startup writer while discovering
 and reserving its existing owner, desktop windows, native browser hosts, managed
 DSH and prompt/memory companions. Unknown ownership or any busy participant
 unwinds the attempt, preserving accepted work. It currently requires a running
-owned supervisor and excludes external services. Owned voice, browser commit,
-independent authenticated installer handoff and final exclusive installation
-access remain prerequisites for a complete update. This context alone cannot
+owned supervisor and excludes external services. Owned voice, global commit,
+integration with the independently qualified authenticated installer handoff and
+final exclusive installation access remain prerequisites for a complete update. This context alone cannot
 apply files or close an application.
 
 Local failure/expiry/renewal tests pass. Native tests now cover actual companion

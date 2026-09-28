@@ -12,6 +12,19 @@ W0/W1 have started with isolated baseline checks, hash-locked native x64/ARM64
 runtime candidates and hosted qualification jobs. No Windows app or customer
 release is complete. Preserve existing installations and unrelated open work.
 
+Latest source, September 28: browser idle commit now rechecks all documents,
+delivers its reply through the private owner, and drains the native host naturally.
+Actual isolated Chromium proves observed owner exit, same-page reconnection and
+draft/conversation preservation; all 265 Node/Browser and seven private-transport
+tests pass locally. New compiled x64/ARM64 commit assertions await execution.
+At `e63312b`, both fast desktop and authenticated installer fixture jobs pass;
+its full assembled graph qualification is still running. Continue global commit,
+owned voice and remaining parity, installer recovery/rollback and release gates.
+Existing personal installations and public downloads remain unchanged.
+
+The following September 28 checkpoints are historical; later results supersede
+their pending/disabled statuses within the specific tested scope.
+
 Current source, September 28: coordinated reversible Windows preparation now
 holds startup exclusion, reserves the existing owner/surfaces/DSH/companions,
 renews independently and cancels safely on busy or lost replies. Portable checks

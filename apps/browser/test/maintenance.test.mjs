@@ -1,4 +1,7 @@
-// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+// Augmentor — dsh-augmentor plugin, pipe, and Chromium extension
+// Copyright © 2026 Manolo Remiddi
+// SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+// License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {JSDOM} from 'jsdom'
@@ -54,12 +57,44 @@ test('all open sidebars reserve together; cancellation preserves disabled contro
   assert.throws(()=>worker.begin(),/not started/)
   await assert.rejects(a.api.work(()=>assert.fail('must not start')),/not started/)
   let clicked=false;input.addEventListener('click',()=>clicked=true);input.click();assert.equal(clicked,false)
-  await assert.rejects(control('commit'),/handoff/);assert.equal(worker.paused,true)
   await control('cancel');await tick()
   assert.equal(a.dom.window.document.body.inert,false);assert.equal(b.dom.window.document.body.inert,true)
   assert.equal(a.dom.window.document.querySelector('input[disabled]').disabled,true)
   assert.equal(a.dom.window.document.activeElement,input)
   input.click();assert.equal(clicked,true)
+})
+
+test('idle commit leaves every page open and restores input after its bounded fence',async t=>{
+  const {control,page,worker,advance}=setup(t),a=page(),b=page({inert:true});await tick()
+  const input=a.dom.window.document.querySelector('#draft');input.focus()
+  await control('prepare');await advance(20000)
+  const result=await control('commit');assert.equal(result.phase,'closing');assert.equal(result.pages,2)
+  assert.equal(worker.paused,true);assert.equal(a.api.paused,true)
+  assert.throws(()=>worker.begin(),/not started/)
+  await assert.rejects(control('renew'));await assert.rejects(control('commit'))
+  await advance(20000);assert.equal(a.api.paused,true)
+  await advance(10001);assert.equal((await control('status')).phase,'ready')
+  assert.equal(a.dom.window.document.querySelector('#draft'),input)
+  assert.equal(a.dom.window.document.body.inert,false)
+  assert.equal(b.dom.window.document.body.inert,true)
+  assert.equal(a.dom.window.document.activeElement,input)
+})
+
+test('commit rechecks late drafts and cancels all pages without discarding values',async t=>{
+  const {control,page,worker}=setup(t),a=page(),b=page();await tick()
+  await control('prepare');b.dom.window.document.querySelector('#draft').value='Late PRIVATE draft'
+  await assert.rejects(control('commit'),error=>{assert.doesNotMatch(error.message,/PRIVATE/);return true})
+  await tick();assert.equal(worker.paused,false);assert.equal(a.api.paused,false)
+  assert.equal(b.dom.window.document.querySelector('#draft').value,'Late PRIVATE draft')
+})
+
+test('a changed document inventory during commit cannot authorize native shutdown',async t=>{
+  const {control,page,runtime,worker}=setup(t),a=page();await tick();await control('prepare')
+  const original=runtime.getContexts;let resolve
+  runtime.getContexts=()=>new Promise(r=>resolve=r)
+  const committing=control('commit'),rejected=assert.rejects(committing,/cancelled/)
+  const b=page();await tick();runtime.getContexts=original;resolve(await original())
+  await rejected;assert.equal(worker.paused,false);assert.equal(a.api.paused,false);assert.equal(b.api.paused,false)
 })
 
 test('one dirty page refuses and unfreezes other pages without exporting its draft',async t=>{

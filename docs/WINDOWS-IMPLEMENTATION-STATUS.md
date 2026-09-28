@@ -7,7 +7,23 @@ connect a Windows machine for joint physical testing afterward. Follow the full
 [implementation plan](WINDOWS-IMPLEMENTATION-PLAN.md); this ledger does not narrow
 its outcome. No Windows customer release or installed-product claim exists yet.
 
-Current checkpoint: full runtime passes both CPUs at `f079931`, including the
+Latest checkpoint, September 28: idle browser commit rechecks context inventory
+and page state, replies through its private owner, then drains the native host
+naturally. Actual local Chromium verifies retained-process exit, same-page
+reconnection, a post-commit draft and selected conversation preservation. All
+265 Node/Browser and seven private-transport tests pass. New compiled Windows
+commit assertions await execution; this is not an installed-version upgrade.
+At `e63312b`, [fast desktop](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36383783782)
+and [authenticated installer fixture](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36383783743)
+pass both CPUs. Its [full graph qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36383783733)
+is running. Global commit/apply, owned voice, remaining platform features,
+recovery/rollback, physical hardware and customer release gates remain open.
+
+The following checkpoints are chronological history, not the latest capability
+status; subsequent evidence supersedes pending/disabled statements only within
+its stated scope.
+
+Earlier checkpoint: full runtime passes both CPUs at `f079931`, including the
 corrected bootstrap token, actual compiled desktop/DSH maintenance, background
 owner reservation, complete Windows Job drain, kernel-verified window discovery
 and the pre-Python native lifetime lease.

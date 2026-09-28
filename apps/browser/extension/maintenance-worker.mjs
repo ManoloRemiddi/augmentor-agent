@@ -1,10 +1,13 @@
-// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+// Augmentor — dsh-augmentor plugin, pipe, and Chromium extension
+// Copyright © 2026 Manolo Remiddi
+// SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+// License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
 import {state} from './state.mjs'
 import {PAGE_PORT, MAINTENANCE_PROTOCOL} from './maintenance-page.mjs'
 
-// Reversible browser admission only. File replacement additionally needs the
-// native coordinator, launch fence and installation lease. Commit deliberately
-// refuses until that handoff is implemented and qualified.
+// Commit rechecks every page before allowing the native host to drain. Pages
+// stay open and their input fence remains bounded even if the updater is lost.
+// File replacement still requires native startup exclusion and a lifetime lease.
 export class BrowserMaintenance {
   constructor({runtime, busy, clock = () => performance.now(), ttl = 30000,
     timeout = 3000, timers = globalThis} = {}) {
@@ -111,21 +114,22 @@ export class BrowserMaintenance {
       if (this.token !== token) throw Error('The browser reservation expired or does not match. Prepare again.')
       if (action === 'cancel') { this.cancel(); return this.status() }
       if (this.phase !== 'prepared' || this.operation) throw Error('The browser reservation is still being checked.')
-      if (action === 'commit') throw Error('Browser shutdown requires the native update handoff, which is not enabled in this development build.')
     }
     const generation=this.generation, started=this.clock(), operation={}
     this.operation=operation
     try {
       const before=await this.inventory()
       if (this.operation !== operation) throw Error('The browser reservation was cancelled.')
-      await Promise.all([...this.pages.values()].map(page => this.ask(page, action, token)))
+      // Page renewal rechecks drafts and accepted work without closing or
+      // reloading a document. A successful commit only drains the native host.
+      await Promise.all([...this.pages.values()].map(page => this.ask(page, action==='commit'?'renew':action, token)))
       const after=await this.inventory()
       this.expire()
       if (this.operation !== operation || generation !== this.generation || before !== after || this.active || this.busy?.()) throw Error('The browser changed during maintenance. Its work was preserved.')
-      this.phase='prepared'
+      this.phase=action==='commit'?'closing':'prepared'
       // The worker expires before its pages, so its reservation never outlives
       // a page reservation. Repeated prepare does not extend the deadline.
-      if (action === 'renew') this.expires=started+this.ttl
+      if (action === 'renew' || action === 'commit') this.expires=started+this.ttl
       this.arm()
       return this.status()
     } catch (error) { if (this.operation === operation) this.cancel(); throw error }

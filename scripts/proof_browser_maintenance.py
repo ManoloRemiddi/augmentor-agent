@@ -5,6 +5,7 @@ Invoked only by browser-composable-proof.py with a disposable profile, actual Pi
 SDK and actual private owner/native control. No model request is submitted.
 """
 import json
+import select
 import time
 
 
@@ -86,7 +87,6 @@ def prove(runtime,cdp,evaluate,until,send,open_settings,chat_panel,ext_id):
     status=reserve();assert status['pages']==3,status
     assert all(evaluate('document.body.inert',panel) for panel in (chat_panel,second,settings))
     assert 'not started' in send('newchat')['error']
-    assert 'error' in control('commit')
     assert control('renew')['result']['phase']=='prepared'
     assert control('cancel')['result']['phase']=='ready';ready(chat_panel,second,settings)
     reserve()
@@ -105,9 +105,31 @@ def prove(runtime,cdp,evaluate,until,send,open_settings,chat_panel,ext_id):
         time.sleep(.2)
     else:raise AssertionError('Lost update reservation did not restore browser input.')
     assert control('status')['result']['phase']=='ready'
+    before=send('log')
+    native_pid=int(endpoint.stem.removeprefix('augmentor-browser-'))
+    observed=os.pidfd_open(native_pid)
+    try:
+        reserve()
+        assert evaluate('(window.__maintenanceDraftNode=document.querySelector("#input"))!==null',chat_panel)
+        committed=control('commit')
+        assert committed.get('result',{}).get('phase')=='closing',committed
+        until(lambda:bool(select.select([observed],[],[],0)[0]),seconds=15)
+        # No browser/page is closed or reloaded. Even a draft restored after
+        # the idle check remains in the existing document through reconnection.
+        evaluate('document.querySelector("#input").value="PRIVATE post-commit draft"',chat_panel)
+        until(lambda:all(not evaluate('document.body.inert',p) for p in (chat_panel,settings)),seconds=35)
+        replacement=until(discover,seconds=30)
+        assert replacement!=endpoint,'Committed owner must exit; reconnect starts a new native host.'
+        assert evaluate('window.__maintenanceDraftNode===document.querySelector("#input")',chat_panel)
+        assert evaluate('document.querySelector("#input").value',chat_panel)=='PRIVATE post-commit draft'
+        after=until(lambda:(s if (s:=send('log')).get('phase')=='ready' else None),seconds=30)
+        assert after.get('sessionId')==before.get('sessionId'),'Reconnect changed the selected conversation.'
+    finally:os.close(observed)
     return {'realChromiumExtensionDocuments':True,'realRuntimeContextInventory':True,
             'actualPrivateOwnerAndNativeControl':True,
             'nativeMessagingReservation':True,'multiplePageDraftRefusal':True,
             'unsavedApiKeyRefusal':True,'cancelPreservesPages':True,'renewal':True,
             'newAndClosedPageCancel':True,'lostReservationExpires':True,
-            'commitNotEnabled':True,'liveWindowsBrowser':False}
+            'idleCommitNaturalOwnerExit':True,'commitReplyBeforeExit':True,
+            'sameBuildReconnectWithoutPageReload':True,'postCommitDraftPreserved':True,
+            'installedVersionUpgrade':False,'liveWindowsBrowser':False}

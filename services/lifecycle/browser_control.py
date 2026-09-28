@@ -72,7 +72,7 @@ class BridgeLink:
         self.records=records; self.timeout=timeout
         self.lock=threading.RLock(); self.pending={}; self.closed=False
 
-    def exchange(self, method, params):
+    def exchange(self, method, params, deliver=None):
         identity=uuid.uuid4().hex; event=threading.Event(); result={}
         with self.lock:
             if self.closed: raise ConnectionError('The observed browser bridge disconnected.')
@@ -81,6 +81,12 @@ class BridgeLink:
             self.records.write({'protocol':PROTOCOL,'id':identity,'method':method,'params':params})
             if not event.wait(self.timeout): raise TimeoutError('Browser maintenance outcome is unknown. The request was not replayed.')
             if 'error' in result: raise ValueError(result['error'])
+            if deliver is not None:
+                deliver(result['value'])
+                if method=='host.maintenance.commit' and result['value'].get('phase')=='closing':
+                    # The native host drains only after this owner's reply was
+                    # written, or its bounded lost-controller fallback elapses.
+                    self.records.write({'protocol':PROTOCOL,'kind':'commit-delivered','id':identity})
             return result['value']
         finally:
             with self.lock: self.pending.pop(identity,None)
@@ -154,8 +160,8 @@ class BrowserControlServer:
                 raise ValueError('A valid maintenance reservation is required.')
             with self.lock: current=self.bridge
             if current is None: raise ValueError('The browser bridge is not ready. This request was not started.')
-            result=current.exchange(message['method'],params)
-            records.write({**self.identity(),'ok':True,'result':result})
+            current.exchange(message['method'],params,
+                lambda result:records.write({**self.identity(),'ok':True,'result':result}))
         except Exception:
             # Neither form contents nor registration credentials belong in a
             # discovery response. Caller errors do not stop the native bridge.

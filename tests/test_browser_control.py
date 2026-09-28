@@ -148,6 +148,19 @@ class BrowserControlTests(unittest.TestCase):
         self.register();self.assertTrue(self.request('describe')['connected'])
         self.assertEqual(len(result),1)
 
+    def test_commit_delivery_receipt_is_bound_to_the_forwarded_response(self):
+        bridge=self.register();seen=[]
+        def responder():
+            row=bridge.read(time.monotonic()+3);seen.append(row)
+            bridge.write({'protocol':PROTOCOL,'id':row['id'],'result':{
+                'protocol':'augmentor-component-maintenance/1','phase':'closing','active':0}})
+            seen.append(bridge.read(time.monotonic()+3))
+        worker=threading.Thread(target=responder);worker.start()
+        response=self.request('maintenance',method='host.maintenance.commit',params={'token':'a'*32})
+        worker.join(timeout=3);self.assertFalse(worker.is_alive())
+        self.assertEqual(response['result']['phase'],'closing')
+        self.assertEqual(seen[1],{'protocol':PROTOCOL,'kind':'commit-delivered','id':seen[0]['id']})
+
     def test_oversized_and_malformed_records_do_not_close_the_bridge(self):
         self.register()
         malformed=self.connect();malformed.connection.sendall(b'{bad json}\n')

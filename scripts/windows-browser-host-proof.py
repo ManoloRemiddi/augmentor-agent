@@ -49,8 +49,9 @@ def prove(root, work, session):
                     if browser_busy and action=='prepare':send_frame({'id':value['id'],'error':{'message':'Fixture browser has a draft.'}});continue
                     if action=='prepare':browser_phase='prepared'
                     elif action=='cancel':browser_phase='ready'
+                    elif action=='commit':browser_phase='closing'
                     send_frame({'id':value['id'],'result':{'protocol':'augmentor-component-maintenance/1',
-                        'phase':browser_phase,'active':0,'expiresInSeconds':30 if browser_phase=='prepared' else None}})
+                        'phase':browser_phase,'active':0,'expiresInSeconds':30 if browser_phase in ('prepared','closing') else None}})
                 else:frames.put(value)
         except Exception as error: frames.put(error)
     reader = threading.Thread(target=read, daemon=True); reader.start()
@@ -103,16 +104,16 @@ def prove(root, work, session):
         assert participant.control('prepare',token)['phase']=='prepared'
         assert 'not started' in request('augmentor/prompts',{'action':'list'},error=True)['error']['message']
         assert participant.control('renew',token)['phase']=='prepared'
-        try:participant.control('commit',token)
-        except ValueError:pass
-        else:raise AssertionError('Commit is unavailable until the installation handoff exists.')
         assert participant.control('cancel',token)['phase']=='ready'
         assert request('augmentor/prompts',{'action':'list'})['ok']
         before = owner.request('status', root=root)
         assert before['dsh']['running'], before
+        with Startup(runtime_directory(),maintenance=True):
+            assert participant.control('prepare',token)['phase']=='prepared'
+            assert participant.control('commit',token)['phase']=='closing'
+            assert process.wait(timeout=15) == 0, 'The committed native host did not drain naturally.'
+            assert participant.exited(), 'The retained kernel observation must see this exact host exit.'
         process.stdin.close(); process.stdin = None
-        assert process.wait(timeout=15) == 0, 'The native host did not exit on browser disconnect.'
-        assert participant.exited(), 'The retained kernel observation must see this exact host exit.'
         reader.join(timeout=5)
         assert not reader.is_alive(), 'The native protocol output handle leaked.'
         after = owner.request('status', root=root)
@@ -123,6 +124,7 @@ def prove(root, work, session):
             'handshakeRequired': True, 'versionMismatchBlocked': True, 'sharedPrompts': True,
             'realDshHistory': True, 'legacyUpdateBlocked': True, 'disconnectPreservesBackground': True,
             'privateBrowserDiscovery':True,'nativeReservationWithRendererFixture':True,'nativeActionRefusal':True,
+            'committedNaturalDrainWithStartupExclusion':True,'commitReplyBeforeObservedExit':True,
             'scope': 'Actual AugmentorBrowserHost.exe with fixture-provided browser stdio; no real-browser registry/UI claim.'}
     finally:
         for participant in observations:participant.close()

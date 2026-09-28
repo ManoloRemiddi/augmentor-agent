@@ -18,7 +18,7 @@ let child,childClosed=false,closing=false,compatible=false
 const pending=new Set()
 const childRequests=new Set(),childActions=new Set()
 const reply=value=>{if(process.stdout.destroyed||process.stdout.writableEnded)return;const b=Buffer.from(JSON.stringify(value)),h=Buffer.alloc(4);h.writeUInt32LE(b.length);process.stdout.write(Buffer.concat([h,b]))}
-const maintenance=new NativeBrowserMaintenance({send:reply,busy:()=>pending.size+childRequests.size+childActions.size})
+const maintenance=new NativeBrowserMaintenance({send:reply,busy:()=>pending.size+childRequests.size+childActions.size,onCommit:()=>close(0)})
 const owner=process.env.AUGMENTOR_BROWSER_OWNER_ENDPOINT?connectBrowserOwner({
   endpoint:process.env.AUGMENTOR_BROWSER_OWNER_ENDPOINT,nonce:process.env.AUGMENTOR_BROWSER_OWNER_NONCE,
   pid:Number(process.env.AUGMENTOR_BROWSER_OWNER_PID),root:process.env.AUGMENTOR_BROWSER_OWNER_ROOT,maintenance,
