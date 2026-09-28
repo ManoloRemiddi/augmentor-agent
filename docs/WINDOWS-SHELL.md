@@ -90,7 +90,10 @@ to a version directory. Repeated registration performs no write, unfamiliar valu
 are preserved, and removal deletes only the exact owned command. It never changes
 HKLM or Windows `StartupApproved` state. The executable's background mode starts
 the same per-user supervisor without opening a chat window. Source launches do
-not enable login startup; installer hooks still need to call this mechanism.
+not enable login startup. The current Inno installer now implements this same
+owned-value policy through its native helper while installation access is held;
+it cannot load the replaceable Python runtime during file maintenance. New native
+installer integration tests are pending.
 Native tests use a disposable HKCU key, not the actual login key. Real Windows
 startup-disable behavior and logout/login still require installed acceptance.
 
@@ -371,3 +374,35 @@ within its overall deadline. Explicit disposable UI-test launches retain one
 12-second Python stack sample for diagnosis. A sample is not itself a failure;
 no customer launch tracing, user data or action replay is introduced. Native
 requalification and diagnosis remain pending.
+
+## Installer-owned login and browser anchor
+
+The full installer now creates `HKCU\Software\Augmentor\Installation` with
+`AppId=com.augmentor.Agent` and the stable installed `current` Root used by
+`windows_browser.installed_root`. Previously the standalone browser adapter had
+this prerequisite, but the actual installer did not create it. Exact typed values
+are checked before application files change; foreign locations/identities refuse.
+
+Fresh installation offers a default-selected background-login task. It writes
+only the exact owned `Augmentor Agent` HKCU Run command after payload installation.
+Repair/update preserve a matching value without rewriting it, and preserve an
+absent entry (including removal by the user). The startup choice is offered only
+on a fresh installation. `StartupApproved`, HKLM and browser profiles are never
+modified. An actual normal-profile command over the Windows Run length limit
+refuses that optional task before installation.
+
+Removal deletes only matching typed startup and anchor values when removal
+actually begins. Cancellation/busy refusal preserves them. Foreign or unrelated
+values remain; no registry tree is recursively removed. Empty anchor keys may
+remain. Browser native-host registration/manifest cleanup is still separate work.
+
+Qualification uses compiled-in unique registry keys, never a real login entry.
+A new actual Inno/native-helper fixture checks type/content conflicts, repeat
+ownership, exact removal, unrelated-value preservation and refusal without an
+installation gate. The full installer proof checks its browser anchor, actual
+startup command, repair without rewriting, disabled startup across coordinated
+application, and owned removal. Native execution of these new assertions is
+pending; no physical logon/Task Manager acceptance is claimed.
+
+See Inno's [task choices](https://jrsoftware.org/ishelp/topic_taskssection.htm)
+and [setup/removal events](https://jrsoftware.org/ishelp/topic_scriptevents.htm).

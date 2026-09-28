@@ -85,7 +85,7 @@ the [full plan](WINDOWS-IMPLEMENTATION-PLAN.md) for required completion gates.
 | Voice bridge | Shared 0.1.19, private preference saves, owned service, busy-ticket refusal and natural drain pass | Windows ASR/TTS provisioning and physical audio |
 | Prompt/memory services | Shared private clients, service ownership, reservations and observed drain pass | Windows memory engine provisioning and full memory quality/features |
 | Coordinated shutdown | Actual window/DSH/voice/companions/owner graph drain and restart pass at `f950a45` | Product apply/recovery integration and user-facing update flow |
-| Installer | Independent authenticated Inno handoff/final-access fixtures pass; real full-payload installer built in source | New install/repair/removal and same-build coordinator proof executing; signing, N-to-N+1 and rollback open |
+| Installer | Full x64 install, shortcut, native preview and live-draft maintenance refusal pass at `594b56d`; corrected preview exit passes fast native checks | Full repair/apply/removal, new startup/browser-anchor integration, signing, N-to-N+1 and rollback open |
 | Update delivery | Signed manifest/private staging and actual WinSparkle ZIP callbacks pass both CPUs at `594b56d` | Bundled-DLL full qualification, trust provisioning and product UI/apply wiring open |
 | Desktop actions, Home and Pi | Shared interfaces retained | Required Windows adapters and full end-to-end parity remain open |
 | RTX Spark N1X | Native ARM64 dependency preparation | Target hardware/driver/graphics/inference evidence |

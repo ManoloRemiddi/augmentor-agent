@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/windows-installer.yml'
       - 'scripts/windows-inno-*'
+      - 'scripts/windows-registration-fixture.iss'
       - 'scripts/build-windows-launcher.py'
       - 'services/platform/windows-launcher.c'
       - 'services/lifecycle/windows_installer_process.py'

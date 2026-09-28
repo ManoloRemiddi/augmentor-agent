@@ -4,6 +4,14 @@
 
 ## Windows implementation — active, September 28
 
+Current installer source now creates the exact installed-app registry anchor
+required by browser setup and offers background login startup on fresh installation.
+Native maintenance compares typed HKCU values before creating/removing them; foreign
+values and unrelated entries are preserved. Repair/update do not recreate removed
+startup, and no StartupApproved/HKLM value is written. New actual Inno registry
+fixtures and full installed startup/anchor checks await native execution. Browser
+host registration removal remains a separate open gate.
+
 The owner authorizes autonomous implementation through the complete Windows app;
 physical testing follows when a Windows machine is connected. Work on
 `feat/windows` in [draft PR 20](https://github.com/ManoloRemiddi/augmentor-agent/pull/20).
@@ -18,7 +26,10 @@ refusal with its live draft intact. It then exposes a shared preview close defec
 legacy maintenance acknowledges closing, but the controller-free Qt process stays
 alive. Current source explicitly exits after replying and rechecking idle state.
 An actual two-process portable proof fails before the correction and passes after;
-all four desktop maintenance tests pass. New native execution is required before
+all four desktop maintenance and 28 window tests pass. Fast native `ead355c`
+[passes both CPUs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36396146636),
+including observed normal exit from the corrected idle preview. Full installed
+execution is still required before
 claiming installed repair, coordinated apply/health/archive or removal success.
 
 [Signed WinSparkle delivery](WINDOWS-UPDATE-DELIVERY.md) at `594b56d` passes

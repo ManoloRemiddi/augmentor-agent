@@ -94,6 +94,14 @@ def main():
         report['shortcutArguments']=shortcut_arguments
         assert shortcut_arguments=='--qualification-root "'+str(data)+'"', repr(shortcut_arguments)
         del link_object
+        from platform_adapters.windows_browser import installed_root
+        assert installed_root(install/'current',key_path=report['installationKey'])==install/'current'
+        startup_command=subprocess.list2cmdline([str(executable),'--qualification-root',str(data),'--background'])
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER,report['startupKey'],0,winreg.KEY_READ|winreg.KEY_SET_VALUE) as key:
+            assert winreg.QueryValueEx(key,'Augmentor Agent')==(startup_command,winreg.REG_SZ)
+            winreg.SetValueEx(key,'Unrelated',0,winreg.REG_SZ,'preserve this fixture entry')
+            startup_timestamp=winreg.QueryInfoKey(key)[2]
+        report['startupCommand']=startup_command
         stages.append('initial-full-payload-install')
         child = open_preview(); state=ready(); assert state['pid']==child.pid
         command('ui-test:'+json.dumps({'action':'draft','expected':'','text':'Preserve this installed draft'}))
@@ -111,6 +119,12 @@ def main():
         assert owned.read_bytes()==(args.root/'scripts/launch-windows.py').read_bytes()
         child=open_preview(); ready(); close_preview(); child=None
         assert shortcut.is_file() and sentinel.read_bytes()==sentinel_bytes
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER,report['startupKey'],0,winreg.KEY_READ|winreg.KEY_SET_VALUE) as key:
+            assert winreg.QueryValueEx(key,'Augmentor Agent')==(startup_command,winreg.REG_SZ)
+            assert winreg.QueryInfoKey(key)[2]==startup_timestamp, 'Repair rewrote the login key.'
+            # Model a user removing login startup. Coordinated application must
+            # not restore that preference just because a new build is applied.
+            winreg.DeleteValue(key,'Augmentor Agent')
         stages.append('same-build-repair-and-installed-relaunch')
         # Exercise the shared decision coordinator against installed binaries,
         # an actual background owner/window, and the actual packaged Setup.
@@ -120,7 +134,8 @@ def main():
         artifact=cache/'qualified-installer.exe'
         with os.fdopen(descriptor(artifact,writable=True,exclusive=True),'wb') as target, Path(report['installer']).open('rb') as source:
             shutil.copyfileobj(source,target);target.flush();os.fsync(target.fileno())
-        run([executable,'--qualification-root',data,'--background'],timeout=30)
+        # Exercise the exact installer-created command without a command shell.
+        subprocess.run(startup_command,check=True,timeout=30)
         child=open_preview();ready()
         coordinator_log=(out/'coordinator.log').open('w',encoding='utf-8')
         coordinator=subprocess.Popen([str(install/'current/python/python.exe'),'-I','-Xutf8','-B',
@@ -171,6 +186,12 @@ def main():
         archive=UpdateJournal.complete_verified(transaction,identity,identity,local_health)
         assert read_json(archive)['phase']=='complete' and not (transaction/'active.json').exists()
         report['archivedUpdate']=archive.name
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER,report['startupKey'],0,winreg.KEY_READ|winreg.KEY_SET_VALUE) as key:
+            try: winreg.QueryValueEx(key,'Augmentor Agent')
+            except FileNotFoundError: pass
+            else: raise AssertionError('Coordinated apply restored removed login startup.')
+            # Restore only this disposable entry to exercise exact owned removal.
+            winreg.SetValueEx(key,'Augmentor Agent',0,winreg.REG_SZ,startup_command)
         stages.append('installed-graph-drain-durable-apply-setup-exit-and-relaunch')
         # Inno must not follow a requested custom replacement directory.
         other=out/'foreign';other.mkdir();foreign=other/'untouched.txt';foreign.write_text('preserve')
@@ -191,8 +212,17 @@ def main():
         try: key=winreg.OpenKey(winreg.HKEY_CURRENT_USER,registry,0,winreg.KEY_READ|winreg.KEY_WOW64_64KEY)
         except FileNotFoundError: pass
         else: key.Close();raise AssertionError('The application registration survived uninstall.')
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER,report['startupKey']) as key:
+            assert winreg.QueryInfoKey(key)[:2]==(0,1)
+            assert winreg.QueryValueEx(key,'Unrelated')==('preserve this fixture entry',winreg.REG_SZ)
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER,report['installationKey']) as key:
+            assert winreg.QueryInfoKey(key)[:2]==(0,0), 'Owned installation anchor survived removal.'
         assert sentinel.read_bytes()==sentinel_bytes
         stages.append('software-removed-persistent-data-retained')
+        # These two keys are synthetic qualification locations. Never remove a
+        # real Run key, StartupApproved state or another application's values.
+        winreg.DeleteKey(winreg.HKEY_CURRENT_USER,report['startupKey'])
+        winreg.DeleteKey(winreg.HKEY_CURRENT_USER,report['installationKey'])
         report.update(passed=True,stages=stages,scope='Full installed payload and native Qt preview; no model, physical input, signed update or rollback claim.')
     finally:
         # Only this disposable preview may be closed on failure. Never clean a

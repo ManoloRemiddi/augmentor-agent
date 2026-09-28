@@ -91,6 +91,19 @@ def main():
     builder = importlib.util.module_from_spec(spec); spec.loader.exec_module(builder)
     builder.build_launcher(payload, args.arch, name='AugmentorFixture.exe')
     handoff_helper=builder.build_installer_helper(out/'handoff-helper',development=True)
+    registration_key=r'Software\AugmentorQualification'+'\\'+identity+'\\OwnedValues'
+    registration_base=private_directory(out/'registration-private')
+    definitions={'FixtureId':identity+'.reg','QualificationBase':registration_base,
+        'OutputDirectory':out/'registration-installer','HandoffHelper':handoff_helper,'RegistryKey':registration_key}
+    with (out/'registration-compile.log').open('w',encoding='utf-8') as log:
+        run([compiler/'ISCC.exe',*['/D'+key+'='+str(value) for key,value in definitions.items()],
+            ROOT/'scripts/windows-registration-fixture.iss'],stdout=log,stderr=subprocess.STDOUT)
+    run([out/'registration-installer/registration-fixture.exe','/VERYSILENT','/SUPPRESSMSGBOXES',
+         '/NORESTART','/SP-','/LOG='+str(out/'registration.log')])
+    with winreg.OpenKey(winreg.HKEY_CURRENT_USER,registration_key) as registered:
+        assert winreg.QueryInfoKey(registered)[:2]==(0,1)
+        assert winreg.QueryValueEx(registered,'Unrelated')==('preserve',winreg.REG_SZ)
+    winreg.DeleteKey(winreg.HKEY_CURRENT_USER,registration_key)
     installers = []
     for version in ('0.0.1', '0.0.2'):
         (payload/'fixture.json').write_text(json.dumps({'version':version, 'gate':str(gate)}))
@@ -155,6 +168,7 @@ def main():
                   'tools':pins, 'twoSimultaneousHolders':True, 'busyRepairUpdateUninstallRefused':True,
                   'failedMaintenanceReleasesAdmission':True, 'idleRepairUpdateUninstall':True,
                   'persistentDataPreserved':True, 'nativeUpdater':native_update, 'signedBundle':signed_bundle,
+                  'nativeTypedOwnedRegistry':True,
                   'independentSetupHandoff':handoff,
                   'productionInstallerQualified':False,
                   'limits':['Disposable unsigned fixture; no full Augmentor shutdown/migration/rollback or ordinary-user client acceptance.',

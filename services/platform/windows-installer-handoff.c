@@ -247,3 +247,52 @@ __declspec(dllexport) BOOL WINAPI AugmentorMaintenancePath(const wchar_t *direct
     unsigned remaining = 250000;
     return !exists || plain_tree(path, 0, &remaining);
 }
+
+/* Own only exact REG_SZ values under HKCU. Callers supply compiled installer
+ * locations, never command-line registry redirects. No recursive key removal,
+ * foreign replacement, HKLM write or StartupApproved mutation is available.
+ * Results: 0 error, 1 absent, 2 matching/success, 3 foreign. Actions: inspect,
+ * create-if-absent, remove-if-matching. Keep the same installation gate held. */
+__declspec(dllexport) DWORD WINAPI AugmentorOwnedRegistry(const wchar_t *path,
+        const wchar_t *name, const wchar_t *expected, DWORD action) {
+    HKEY key = NULL; wchar_t *value = NULL; DWORD result = 0;
+    if ((installation == INVALID_HANDLE_VALUE && manual.file == INVALID_HANDLE_VALUE) ||
+            !path || !name || !expected || action > 2 ||
+            wcsncmp(path, L"Software\\", 9) || wcslen(path) > 1024 ||
+            wcslen(name) > 256 || wcslen(expected) > 32766) return 0;
+    REGSAM access = KEY_QUERY_VALUE | KEY_WOW64_64KEY | (action ? KEY_SET_VALUE : 0);
+    LSTATUS error = RegOpenKeyExW(HKEY_CURRENT_USER, path, 0, access, &key);
+    if (error == ERROR_FILE_NOT_FOUND && action == 1)
+        error = RegCreateKeyExW(HKEY_CURRENT_USER, path, 0, NULL, 0, access, NULL, &key, NULL);
+    if (error == ERROR_FILE_NOT_FOUND) return 1;
+    if (error != ERROR_SUCCESS) return 0;
+    DWORD kind = 0, length = 0;
+    error = RegQueryValueExW(key, name, NULL, &kind, NULL, &length);
+    if (error == ERROR_FILE_NOT_FOUND) result = 1;
+    else if (error != ERROR_SUCCESS) goto done;
+    else {
+        if (kind != REG_SZ || length < sizeof(wchar_t) || length > 65534 || length % sizeof(wchar_t)) {
+            result = 3; goto done;
+        }
+        value = calloc(1, length + sizeof(wchar_t));
+        if (!value) goto done;
+        error = RegQueryValueExW(key, name, NULL, &kind, (BYTE *)value, &length);
+        if (error != ERROR_SUCCESS) goto done;
+        if (kind != REG_SZ || length < sizeof(wchar_t) || length % sizeof(wchar_t) ||
+                value[length / sizeof(wchar_t) - 1] ||
+                (wcslen(value) + 1) * sizeof(wchar_t) != length || wcscmp(value, expected)) {
+            result = 3; goto done;
+        }
+        result = 2;
+    }
+    if (action == 1 && result == 1) {
+        if (RegSetValueExW(key, name, 0, REG_SZ, (const BYTE *)expected,
+                (DWORD)((wcslen(expected) + 1) * sizeof(wchar_t))) != ERROR_SUCCESS ||
+                RegFlushKey(key) != ERROR_SUCCESS) result = 0;
+        else result = 2;
+    } else if (action == 2 && result == 2) {
+        if (RegDeleteValueW(key, name) != ERROR_SUCCESS || RegFlushKey(key) != ERROR_SUCCESS) result = 0;
+    }
+done:
+    free(value); if (key) RegCloseKey(key); return result;
+}

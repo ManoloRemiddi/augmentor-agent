@@ -385,3 +385,15 @@ The next assertion exposes a shared controller-free preview close timeout, befor
 repair or coordinated apply. It is reproduced and corrected in the shared UI;
 portable real-process checks pass, and native rerun is pending. Failed installed
 proofs now retain bounded logs from only their disposable preview directory.
+
+## Owned installer registrations
+
+The candidate now records the stable browser-setup installation anchor and offers
+background login startup on fresh install. It uses a native, typed exact-value
+HKCU operation under the held installation gate, preserving matching/foreign
+values as appropriate and never loading application Python during replacement.
+Repair/update preserve removed login startup. Removal compares before deleting
+only owned values; unrelated values and StartupApproved are untouched. The
+[Windows shell guide](WINDOWS-SHELL.md#installer-owned-login-and-browser-anchor)
+records paths, behavior and remaining native/physical qualification. New native
+Inno registry fixtures and full installed readback are scheduled, not yet passed.

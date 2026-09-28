@@ -33,8 +33,21 @@ Source: "{#PayloadDirectory}\*"; DestDir: "{app}\current"; Flags: recursesubdirs
 [Icons]
 Name: "{userprograms}\{#ShortcutName}"; Filename: "{app}\current\Augmentor.exe"; Parameters: "{code:LaunchParameters}"; AppUserModelID: "com.augmentor.Agent"
 
+[Tasks]
+Name: startup; Description: "Start Augmentor in the background when I sign in"; Flags: checkedonce; Check: OfferStartupTask
+
 [Code]
-var MaintenanceHeld, AuthenticatedHandoff, RemovalHeld: Boolean;
+var MaintenanceHeld, AuthenticatedHandoff, RemovalHeld, FreshInstallation: Boolean;
+  StartupChoiceKnown, StartupChoice: Boolean;
+
+function OfferStartupTask: Boolean;
+begin
+  if not StartupChoiceKnown then begin
+    StartupChoice := not DirExists(ExpandConstant('{#InstallDirectory}\current'));
+    StartupChoiceKnown := True;
+  end;
+  Result := StartupChoice;
+end;
 
 function LaunchParameters(Param: String): String;
 begin
@@ -61,6 +74,18 @@ procedure CloseRemoval;
   external 'AugmentorHandoffClose@{tmp}\augmentor-removal.dll stdcall delayload uninstallonly';
 function ValidateRemovalPath(Directory: String): BOOL;
   external 'AugmentorMaintenancePath@{tmp}\augmentor-removal.dll stdcall delayload uninstallonly';
+function OwnedRegistry(Key, Name, Expected: String; Action: Cardinal): Cardinal;
+  external 'AugmentorOwnedRegistry@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
+function RemoveOwnedRegistry(Key, Name, Expected: String; Action: Cardinal): Cardinal;
+  external 'AugmentorOwnedRegistry@{tmp}\augmentor-removal.dll stdcall delayload uninstallonly';
+
+function StartupCommand: String;
+var Arguments: String;
+begin
+  Arguments := LaunchParameters('');
+  if Arguments <> '' then Arguments := Arguments + ' ';
+  Result := '"' + ExpandConstant('{app}\current\Augmentor.exe') + '" ' + Arguments + '--background';
+end;
 
 function InitializeSetup: Boolean;
 var Pipe, CoordinatorText: String; Coordinator: Int64;
@@ -79,7 +104,7 @@ begin
 end;
 
 function PrepareToInstall(var NeedsRestart: Boolean): String;
-var CurrentRelease: String; AccessReady: Boolean;
+var CurrentRelease: String; AccessReady: Boolean; Registration: Cardinal;
 begin
   Result := '';
   if CompareText(ExpandFileName(WizardDirValue), ExpandFileName(ExpandConstant('{#InstallDirectory}'))) <> 0 then begin
@@ -106,6 +131,7 @@ begin
     coordinated transaction and retained recovery artifact; never guess from
     a version string or overwrite an unidentified partial/foreign directory. }
   CurrentRelease := ExpandConstant('{app}\current\release.json');
+  FreshInstallation := not DirExists(ExpandConstant('{app}\current'));
   if not AuthenticatedHandoff and DirExists(ExpandConstant('{app}\current')) then begin
     if not FileExists(CurrentRelease) then begin
       Result := 'This application folder cannot be identified. Its files were preserved; recovery is required.';
@@ -114,6 +140,40 @@ begin
     if GetSHA256OfFile(CurrentRelease) <> '{#ReleaseDigest}' then
       Result := 'A different Augmentor build is installed. Use the coordinated update in Augmentor.';
   end;
+  if Result <> '' then exit;
+  Registration := OwnedRegistry('{#InstallationKey}', 'Root', ExpandConstant('{app}\current'), 0);
+  if (Registration <> 1) and (Registration <> 2) then begin
+    Result := 'Another Augmentor installation owns the browser setup registration. Its registration was preserved.';
+    exit;
+  end;
+  Registration := OwnedRegistry('{#InstallationKey}', 'AppId', 'com.augmentor.Agent', 0);
+  if (Registration <> 1) and (Registration <> 2) then begin
+    Result := 'The existing Augmentor application identity is unfamiliar. Its registration was preserved.';
+    exit;
+  end;
+  if FreshInstallation and WizardIsTaskSelected('startup') then begin
+    if ('{#QualificationBase}' = '') and (Length(StartupCommand) > 260) then begin
+      Result := 'This installation path is too long for Windows login startup. Disable the startup task to continue.';
+      exit;
+    end;
+    Registration := OwnedRegistry('{#StartupKey}', 'Augmentor Agent', StartupCommand, 0);
+    if (Registration <> 1) and (Registration <> 2) then
+      Result := 'An existing login entry uses the Augmentor name. Disable the startup task to preserve it and continue.';
+  end;
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+  if CurStep <> ssPostInstall then exit;
+  if OwnedRegistry('{#InstallationKey}', 'Root', ExpandConstant('{app}\current'), 1) <> 2 then
+    RaiseException('Augmentor could not record its installed location. Repair this installation.');
+  if OwnedRegistry('{#InstallationKey}', 'AppId', 'com.augmentor.Agent', 1) <> 2 then
+    RaiseException('Augmentor could not record its application identity. Repair this installation.');
+  { Only initial installation chooses a default. Repair/update do not recreate
+    an entry removed by the user or alter Windows StartupApproved state. }
+  if FreshInstallation and WizardIsTaskSelected('startup') then
+    if OwnedRegistry('{#StartupKey}', 'Augmentor Agent', StartupCommand, 1) <> 2 then
+      RaiseException('Augmentor could not enable login startup. The existing entry was preserved.');
 end;
 
 procedure DeinitializeSetup;
@@ -141,6 +201,23 @@ begin
     Log('Running Augmentor prevented removal; no application files were changed.');
     if not UninstallSilent then
       MsgBox('Augmentor is still running. Finish your work and quit Augmentor before removing it.', mbInformation, MB_OK);
+  end;
+end;
+
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+var Outcome: Cardinal;
+begin
+  if CurUninstallStep <> usUninstall then exit;
+  { Cancellation before the actual removal step must leave startup intact.
+    Delete only exact owned values; never delete keys or unrelated entries. }
+  Outcome := RemoveOwnedRegistry('{#StartupKey}', 'Augmentor Agent', StartupCommand, 2);
+  if Outcome = 0 then RaiseException('Augmentor could not remove its owned login entry.');
+  if (RemoveOwnedRegistry('{#InstallationKey}', 'Root', ExpandConstant('{app}\current'), 0) = 2) and
+      (RemoveOwnedRegistry('{#InstallationKey}', 'AppId', 'com.augmentor.Agent', 0) = 2) then begin
+    if RemoveOwnedRegistry('{#InstallationKey}', 'Root', ExpandConstant('{app}\current'), 2) <> 2 then
+      RaiseException('Augmentor could not remove its owned location registration.');
+    if RemoveOwnedRegistry('{#InstallationKey}', 'AppId', 'com.augmentor.Agent', 2) <> 2 then
+      RaiseException('Augmentor could not remove its owned application identity.');
   end;
 end;
 

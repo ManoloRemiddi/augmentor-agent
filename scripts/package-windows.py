@@ -74,7 +74,9 @@ def build(root, arch, out, *, qualification=None, compiler_path=None):
         'InstallDirectory':r'{localappdata}\Programs\Augmentor Agent',
         'OutputDirectory':str(out), 'HandoffHelper':str(helper), 'PayloadDirectory':str(root),
         'ReleaseDigest':digest(root/'release.json'), 'HelperDigest':digest(helper), 'QualificationBase':'',
-        'HandoffRuntime':'', 'MinimumVersion':'10.0.26200'}
+        'HandoffRuntime':'', 'MinimumVersion':'10.0.26200',
+        'InstallationKey':r'Software\Augmentor\Installation',
+        'StartupKey':r'Software\Microsoft\Windows\CurrentVersion\Run'}
     if qualification:
         # Build-only locations must already be explicit and private. Never
         # modify a personal installation from a qualification command switch.
@@ -87,6 +89,8 @@ def build(root, arch, out, *, qualification=None, compiler_path=None):
         definitions.update(ApplicationId=identity, ShortcutName=identity,
             InstallDirectory=str(base/'installed café'), QualificationBase=str(data),
             HandoffRuntime=str(data/'run'),
+            InstallationKey='Software\\AugmentorQualification\\'+identity+'\\Installation',
+            StartupKey='Software\\AugmentorQualification\\'+identity+'\\Run',
             MinimumVersion='10.0.26100')  # Hosted Server runner only; not an advertised OS target.
     # Compile-time strings are not code. Refuse Inno preprocessor/constants
     # injection in physical paths; only the fixed Known Folder expression above
@@ -104,7 +108,8 @@ def build(root, arch, out, *, qualification=None, compiler_path=None):
     report = {'installer':str(installer), 'sha256':digest(installer), 'release':release,
         'installerBytes':installer.stat().st_size,
         'customerDistribution':False, 'signed':False, 'applicationId':definitions['ApplicationId'],
-        'installationDirectory':definitions['InstallDirectory'], 'qualificationBase':definitions['QualificationBase']}
+        'installationDirectory':definitions['InstallDirectory'], 'qualificationBase':definitions['QualificationBase'],
+        'installationKey':definitions['InstallationKey'], 'startupKey':definitions['StartupKey']}
     (out/'package.json').write_text(json.dumps(report, indent=2)+'\n', encoding='utf-8')
     return report
 
