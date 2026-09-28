@@ -158,6 +158,10 @@ def main():
         child = open_preview(); state=ready(); assert state['pid']==child.pid
         command('ui-test:'+json.dumps({'action':'draft','expected':'','text':'Preserve this installed draft'}))
         setup('busy-repair',success=False)
+        setup('busy-independent-inspection','/augmentorinspect=1',success=False)
+        busy_inspection=(out/'busy-independent-inspection.log').read_text(encoding='utf-8-sig')
+        assert 'Augmentor independent inspection: maintenance unavailable.' in busy_inspection
+        assert 'Augmentor independent inspection result:' not in busy_inspection
         run([removal,*flags,'/LOG='+str(out/'busy-uninstall.log')],success=False)
         assert child.poll() is None and inspect()['draft']=='Preserve this installed draft'
         assert sentinel.read_bytes()==sentinel_bytes

@@ -901,3 +901,173 @@ Read [implementation status](WINDOWS-IMPLEMENTATION-STATUS.md),
 [installer decision](WINDOWS-INSTALLER-DECISION.md), and
 [the implementation plan](WINDOWS-IMPLEMENTATION-PLAN.md). Previous active checkpoints
 are preserved in the [historical archive](WINDOWS-IMPLEMENTATION-CHECKPOINTS-2026-09-28.md).
+
+
+## Superseded checkpoint before independent inspection qualification
+
+The following checkpoint is historical. The active handoff above is replaced by
+the qualified `11c1706` inspection checkpoint in [current status](WINDOWS-IMPLEMENTATION-STATUS.md).
+
+### Earlier active state — superseded
+
+The owner authorizes autonomous implementation through the complete Windows app;
+physical testing follows when a Windows machine is connected. Work on
+`feat/windows` in [draft PR 20](https://github.com/ManoloRemiddi/augmentor-agent/pull/20).
+Do not merge, publish customer downloads or deploy personal installations.
+Keep one shared product, approved UI and existing model/voice settings. Native
+Windows x64 and ARM64 are targets, including NVIDIA RTX Spark N1X; no RTX hardware
+qualification is claimed.
+
+Current evidence:
+
+- [Complete qualification at 6c1e7cf](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36403736092)
+  passes both CPUs and shared Mac Qt. Actual merge checkout:
+  `0053027cbeb1feee4365ebedd589381fbe431fdb`. It includes real bundled DSH with a
+  deterministic provider, native Send/Enter/history, owned voice/companions,
+  initial full-payload install/browser/login identity, live-draft refusal,
+  same-build repair/relaunch, observed installed graph drain and coordinated apply,
+  full payload/local Qt health, journal archival, redirected-path refusal and
+  clean software/registration removal with data retained. This qualifies the
+  journal-before-listener memory startup correction. It precedes the new source
+  cache/selection integration and does not establish N-to-N+1 or rollback.
+- [Inno/WinSparkle at bdba572](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36405973067)
+  passes both CPUs at merge checkout `7fb0927db3e8e75e03a8bae7d31c104649f2a992`.
+  Downloaded reports confirm original-installer retention, corrupt installer/
+  receipt/selection refusal, native selection publication and Python readback,
+  repair/removal, owned browser cleanup, interactive Finish/native startup and
+  silent no-launch. Authenticated handoff/final-access and signed-delivery cases
+  also pass. This exact-template test uses inert component markers and a recording
+  startup script; it does not replace complete app qualification.
+- [Full bdba572 qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36405973046)
+  now passes both CPUs and shared Mac Qt at merge checkout
+  `7fb0927db3e8e75e03a8bae7d31c104649f2a992`. Downloaded installed reports confirm
+  complete retention/selection, actual cached-source application, local Qt health,
+  journal archival and removal. Registered independent repair was added afterward
+  and passes in the full `f61d32f` run below.
+- All 38 local update/receipt/journal/coordinator tests pass. The [bdba572 fast
+  native workflow](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36405973042)
+  passes ARM64; x64 failed during checkout because GitHub could not be reached,
+  before product tests ran. [Fast native tests at documentation-only 3edb570](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36406785057)
+  now pass both CPUs with the same runtime source and all 38 tests. Inno at that
+  head also passes both CPUs. Shared service/restart/lifecycle tests pass locally.
+
+Implemented recovery preparation: the actual installer retains its original EXE
+and payload-metadata digest privately before replacement. Corrupt retained entries
+refuse without changing app files. A successful install records the exact selected
+installer by flushed atomic publication; unchanged repair leaves it untouched.
+`installed_source.py` matches the identified installed metadata and pins those
+exact bytes. These raw receipts are not signed update bundles, publisher trust or
+proof of health. The separate signed-bundle reader can revalidate an exact recorded
+recovery release after its delivery expiry without allowing feed downgrades.
+No customer key/feed or automatic updater is enabled.
+
+New source adds registered independent exact-build repair through the retained
+installer, including restoration without installed Python/Qt, launcher or version
+metadata. It refuses unfinished updates, unknown ownership and another selected
+source. [Native Inno at f61d32f](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36409313595)
+passes both CPU template cases at merge checkout
+`b05a0c9a9747d9e52cdbdb905bc1a992a8ad782c`, including registered repair without
+an installed runtime/metadata, pending-update/foreign-source refusal and preserved
+disabled startup. The [complete installed proof](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36409313612)
+also passes both CPUs and shared Mac Qt at the same merge checkout, including
+actual Qt reopen after registered repair without installed runtime or metadata.
+This is the newest complete installed baseline. Earlier native
+checks caught a Pascal Boolean mismatch and an unquoted ModifyPath; both are
+corrected. The pinned Inno
+compiler passes an isolated compile-only fixture; local 38 update tests, three
+package tests and script compilation pass. See the
+[repair contract](WINDOWS-INSTALLER-DECISION.md#independent-repair-from-windows-installed-app-controls).
+
+Home CI exposed a fixture deadline expiring before dispatch. The corrected test
+waits for actual MCP dispatch before advancing its test clock and checks an explicit
+denied retry. All 29 Home tests pass locally; CI Home also passes at `f61d32f`.
+Production Home behavior is unchanged. Compiler object/import-library byproducts
+now stay in the temporary build directory. [Native Inno at 6f4c291](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36409755006)
+passes both CPUs with clean payload-root assertions at merge checkout
+`cbbaa57cf262d4ceb46536a0566ba126a2943381`; the [full 578556d run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36410018195)
+now passes both CPUs and shared Mac Qt at merge checkout
+`dd9c761f758e207ad9556a9d505a854093fb7114`; both downloaded installed reports confirm
+independent registered repair and same-build coordinated apply/removal. It predates the startup/health, cancellation
+and inventory changes below.
+Fast Windows, Inno, Mac and complete Linux/Home/Browser validation also pass at
+documentation-only `578556d`.
+
+New source blocks normal native desktop/browser startup before loading Python
+whenever the private update journal is unresolved. A fixed native local-health
+action renders the real shared UI in a disposable private profile; it cannot open
+a conversation, run desktop actions or complete a transaction. The independent
+observer checks the identified release and owned process exit. Two local real-Qt
+tests and package intake checks pass. The compiled entry and pending-journal/unsafe
+directory refusal cases pass both CPUs at `3674b4a`. Its Windows GUI job failed
+because the new font-health test incorrectly forced Qt offscreen; the same run
+passes actual Windows-QPA font rendering. The test now runs in the native Windows
+QPA step and no longer forces offscreen. [Corrected fast Windows at 8997b4e](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36412274580)
+passes both CPUs, including source UI health, all update tests and compiled entry
+checks. Full installed health/identity failure cases remain pending. See
+[recovery-aware startup and health](WINDOWS-INSTALLER-DECISION.md#recovery-aware-startup-and-isolated-local-health).
+
+New cancellation source archives only a live, confirmed reversible preparation
+before any shutdown checkpoint. Busy work stays running, and uncertain release,
+write or archive outcomes keep the journal unresolved. Five new journal faults
+and two platform/coordinator cleanup cases pass locally (43 update tests and five
+preparation tests). The actual held-DSH-turn proof now exercises the same path;
+[Fast Windows at b63b188](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36412946593)
+passes both CPUs with those cases. Actual-DSH cancellation remains pending. See
+[cancellation contract](LIFECYCLE.md#confirmed-cancellation-before-shutdown).
+
+Windows staging now seals an exact file/directory inventory, bound by the final
+release metadata. Package intake refuses changed or extra files without resealing.
+The shared inspector can identify a partial installation even when installed
+metadata is missing; the full proof now uses it before UI health. Eight portable
+inventory cases and four package tests pass. The first native run at `8ae02e9`
+fails during scanning because Windows cached `DirEntry.stat` reports zero link
+counts. Full no-follow `os.stat` fixes that scan, but `a6708c8` exposes a second
+Windows difference: path `st_ctime` is creation time while handle `st_ctime` is
+change time in pinned CPython 3.13.15. Cross-API identity now compares explicit
+birth time; handle-to-handle checks still compare change time. Ten portable
+cases pass, including replacement/read mutation; two Windows-specific cases and
+corrected staged/full integration remain pending. See [payload inspection](WINDOWS-UPDATE-DELIVERY.md#exact-installed-payload-inspection).
+
+
+New source adds [independent installer inspection](WINDOWS-INSTALLER-DECISION.md#independent-installer-inspection-before-recovery):
+the retained Setup extracts its own runtime and shared inspector into fresh private
+scratch, verifies its compiled metadata hash and observes a bounded read-only worker.
+It can inspect absent installed Python/launcher/metadata and unresolved updates
+without changing app files, data or journal. Local Inno script compilation and
+package checks pass; exact-template and complete native execution are pending.
+At `84f2e95`, x64 Inno already passes the corrected payload identity; the fast suite
+fails only a missing pywin32 constant in the new timestamp fixture. That fixture
+now uses its supported generic-write access constant. Corrected native rerun is pending.
+
+
+[Fast Windows at cca5907](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36415696138)
+now passes both CPUs, including all 12 payload cases and the corrected timestamp
+fixture. The independent exact-template inspection passes x64, but ARM64 fails
+after extraction without a report in [Inno run 36415696134](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36415696134).
+No ARM64 success or cause is inferred. The helper now reports numeric stage/error
+codes and waits for complete owned-Job exit within the original deadline; the
+worker reports only a numeric phase on error. Recovery files are packed first in
+extraction order to avoid decompressing unrelated runtimes. Script compilation
+passes; corrected native execution and full app integration are pending.
+
+Next: qualify the inventory, full installed isolated health and actual-DSH cancellation; finish
+independent interrupted/cross-version recovery, obsolete-file cleanup, bounded
+cache pruning, actual N-to-N+1 and the customer notification/update action. The current Inno
+backend replaces `current` in place and does not provide atomic version selection
+or power-loss recovery. Cache artifacts currently survive normal removal; connect
+the explicit cache-retention/removal policy before customer delivery. Selection
+must never be mistaken for a known healthy rollback source.
+
+Continue the [feature ledger](FEATURE-MATRIX.md#windows-development-target--september-28):
+Windows desktop control, speech/memory provisioning, Home/Pi parity, real selected
+Chromium/extension compatibility, ordinary-user Windows and physical input/audio/
+graphics/live-provider acceptance remain required. Shared Resonant Voice is 0.1.19
+from qualified source `7d0fd6d`, in separate [draft PR 2](https://github.com/ManoloRemiddi/resonant-voice/pull/2).
+Personal models/voice and installations remain untouched. The app is not complete
+or ready for customer distribution.
+
+Read [implementation status](WINDOWS-IMPLEMENTATION-STATUS.md),
+[installer decision](WINDOWS-INSTALLER-DECISION.md), [delivery](WINDOWS-UPDATE-DELIVERY.md)
+and [the plan](WINDOWS-IMPLEMENTATION-PLAN.md). Earlier working checkpoints,
+including their superseded pending statements, are preserved in the
+[historical archive](WINDOWS-IMPLEMENTATION-CHECKPOINTS-2026-09-28.md).

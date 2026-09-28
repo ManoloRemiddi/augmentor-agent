@@ -804,3 +804,13 @@ copy is maintained. This follows Inno's solid-compression extraction guidance an
 [anchored exclusion syntax](https://jrsoftware.org/ishelp/topic_filessection.htm).
 The exact script compiles locally; corrected native and full-payload execution
 remain required.
+
+
+[The 11c1706 native rerun](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36416227313)
+now passes both CPUs at merge checkout `9e126b38d98961ecc5e9fbaff3b2a30c5d1f891a`.
+Both downloaded reports confirm complete, damaged-runtime and pending-journal
+independent inspection, preserved files/data and subsequent registered repair.
+The exact cause of the preceding uninstrumented ARM64 failure is not claimed.
+All fast desktop checks also pass both CPUs. The full installed proof now adds
+an explicit refusal assertion while a real window holds an unsent draft; complete
+application integration, including that assertion, remains pending.

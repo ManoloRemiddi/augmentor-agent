@@ -353,3 +353,12 @@ extraction without a report. Follow-up diagnostics expose only numeric native
 stage/error and Python phase, and the helper observes whole-Job exit within its
 original deadline. The packed extraction order is also corrected. Native rerun
 and complete installed qualification remain pending.
+
+
+[Inno at 11c1706](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36416227313)
+passes both CPUs at merge checkout `9e126b38d98961ecc5e9fbaff3b2a30c5d1f891a`;
+both reports confirm independent damaged-runtime inspection and preserved pending
+state/data. The prior ARM64 failure's exact cause was not recorded. Full installed
+integration remains pending and now explicitly requires independent inspection
+refusal while a real window retains an unsent draft. Python compilation and
+whitespace checks pass for that additional assertion.
