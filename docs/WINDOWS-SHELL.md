@@ -255,3 +255,24 @@ without releasing the lifetime lease. Full window/browser probes check readiness
 against the actual assembled applications. Sharing and transfer follow
 [Microsoft CreateFileW](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew)
 and [DuplicateHandle](https://learn.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-duplicatehandle).
+
+At `e4593b1`, [both native desktop jobs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36378514808)
+pass startup-reader/writer sharing, inherited-handle retention across parent exit
+and crash, compiled early refusal and readiness release with the lifetime lease
+still held. Full assembled application execution remains a separate gate.
+
+## Background owner and component observations
+
+Current source publishes the owner's PID, build root and maintenance capability
+through its authenticated pipe. `discover_owner` reads the held private owner
+registration, retains the kernel process handle and verifies its executable and
+build without starting a background process. Its maintenance client refuses a
+replacement pipe/process and validates the shared component protocol.
+
+After reserving the owner, `observe-child` can confirm that an already observed
+PID belongs to the exact live Job for DSH, prompts or memory and uses the expected
+private executable. It exposes no launch, termination or arbitrary-command RPC.
+The eventual component client must retain its own process observation and bind
+it to the transport before using this check. A reported PID alone is insufficient.
+New native tests cover valid prompt/memory peers and reject an unrelated process,
+another component's Job and unknown component names; execution is pending.

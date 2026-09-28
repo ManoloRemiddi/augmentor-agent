@@ -208,6 +208,34 @@ class Supervisor:
             except subprocess.TimeoutExpired: self.child.kill(); self.exit_code = self.child.wait(timeout=5)
             self.child = None
 
+    def observe_child(self, name, pid):
+        """Verify a retained caller observation belongs to this exact live Job.
+
+        Read-only; no PID supplied by a caller can start or stop a process.
+        The coordinator must already have reserved owner startup admission.
+        """
+        if name not in ('dsh', *COMPANIONS) or type(pid) is not int or pid <= 0:
+            raise ValueError('Unsupported component observation.')
+        if self.admission.control('host.maintenance.status', {})['phase'] != 'prepared':
+            raise ValueError('Reserve the background owner before observing its components.')
+        self.status()
+        child = self.child if name == 'dsh' else self.companions.get(name)
+        if child is None or child.job is None:
+            raise ValueError('The observed component has no live owned process range.')
+        import win32api, win32con, win32event, win32job, win32process
+        process = win32api.OpenProcess(win32con.SYNCHRONIZE | win32con.PROCESS_QUERY_INFORMATION |
+            win32con.PROCESS_VM_READ, False, pid)
+        try:
+            if (win32event.WaitForSingleObject(process, 0) != win32event.WAIT_TIMEOUT or
+                    not win32job.IsProcessInJob(process, child.job)):
+                raise ValueError('The process does not belong to the observed component.')
+            expected = self.root/'node/node.exe' if name == 'dsh' else Path(runtime_python(self.root))
+            actual = Path(win32process.GetModuleFileNameEx(process, 0)).resolve()
+            if os.path.normcase(str(actual)) != os.path.normcase(str(expected.resolve())):
+                raise ValueError('The observed component executable differs.')
+            return {'component': name, 'observedPid': pid}
+        finally: process.Close()
+
     def dispatch(self, message):
         if message.get('action') in ('shortcut-status', 'shortcut-save'):
             if self.shell is None: raise ValueError('The Windows shortcut owner is unavailable.')
@@ -217,6 +245,9 @@ class Supervisor:
             with self.admission.work():return self.shell.request(message)
         with self.lock:
             action = message.get('action')
+            if action=='observe-child':
+                if set(message)!={'action','component','pid'}:raise ValueError('Unsupported observation fields.')
+                return self.observe_child(message['component'],message['pid'])
             if action=='maintenance':
                 if set(message)!={'action','method','params'}:raise ValueError('Unsupported background request fields.')
                 self.status()
@@ -268,7 +299,8 @@ def _run(root, startup):
                 require_same_user(self.request)
                 self.request.settimeout(15)
                 raw = self.rfile.readline(16385)
-                response = {'schema': SCHEMA, 'appRoot': str(root), 'ok': False}
+                response = {'schema': SCHEMA, 'appRoot': str(root), 'ok': False,
+                    'pid':os.getpid(), 'buildRoot':str(root), 'maintenanceAdmission':1}
                 try:
                     if len(raw) > 16384 or not raw.endswith(b'\n'): raise ValueError('Invalid background request.')
                     message = json.loads(raw)

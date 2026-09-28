@@ -106,7 +106,7 @@ class WindowsSupervisorTests(unittest.TestCase):
             process = subprocess.Popen([sys.executable, '-I', '-Xutf8', '-B',
                 str(ROOT/'services/windows_supervisor.py')], env=env, stdin=subprocess.DEVNULL,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, creationflags=subprocess.CREATE_NO_WINDOW)
-            handles = []
+            handles = []; component_pids = {}; participant = None
             try:
                 endpoint = Path(env['XDG_RUNTIME_DIR'])/'supervisor'
                 ready(lambda: owner.request('status', owner=endpoint))
@@ -118,6 +118,7 @@ class WindowsSupervisorTests(unittest.TestCase):
                     details = ready(lambda: call(Path(env['AUGMENTOR_SHARED_STATE'])/filename, method))
                     self.assertIsInstance(details['pid'], int)
                     self.assertNotEqual(details['pid'], first['ownerProcessPid'])
+                    component_pids[name]=details['pid']
                     handles.append(win32api.OpenProcess(win32con.SYNCHRONIZE, False, details['pid']))
                     repeated = owner.request('start-'+name, owner=endpoint)['companions'][name]
                     self.assertEqual(repeated['ownerProcessPid'], first['ownerProcessPid'])
@@ -125,6 +126,21 @@ class WindowsSupervisorTests(unittest.TestCase):
                     owner.request('exit-if-empty', owner=endpoint)
                 with self.assertRaisesRegex(ValueError, 'Unsupported'):
                     owner.request('start-prompts', owner=endpoint, command='untrusted')
+                from lifecycle.windows_components import discover_owner
+                participant=discover_owner(ROOT,Path(env['XDG_RUNTIME_DIR']))
+                self.assertEqual(participant.pid,process.pid)
+                with self.assertRaisesRegex(ValueError,'Reserve'):
+                    participant.observe_child('prompts',component_pids['prompts'])
+                token='c'*32
+                self.assertEqual(participant.control('prepare',token)['phase'],'prepared')
+                for name,pid in component_pids.items():participant.observe_child(name,pid)
+                with self.assertRaisesRegex(ValueError,'does not belong'):
+                    participant.observe_child('prompts',os.getpid())
+                with self.assertRaisesRegex(ValueError,'does not belong'):
+                    participant.observe_child('prompts',component_pids['memory'])
+                with self.assertRaisesRegex(ValueError,'Unsupported'):
+                    participant.observe_child('unknown',component_pids['prompts'])
+                self.assertEqual(participant.control('cancel',token)['phase'],'ready')
                 process.kill()  # Deliberate fixture fault, not a normal Quit.
                 process.communicate(timeout=10)
                 for handle in handles:
@@ -135,6 +151,7 @@ class WindowsSupervisorTests(unittest.TestCase):
                 for handle in handles:
                     win32event.WaitForSingleObject(handle, 5000)
                     handle.Close()
+                if participant is not None:participant.close()
                 if errors: print(errors.decode('utf-8', errors='replace'))
 
     def test_competing_startups_produce_one_authenticated_owner(self):

@@ -33,6 +33,19 @@ adds real-Windows duplicated-handle transfer tests. Portable browser registratio
 supervisor policy and launcher policy checks pass. These new kernel/compiled
 assertions await native execution. No installer apply or browser commit is enabled.
 
+Subsequently, all workflows pass at `df52b47`, including full x64/ARM64 in
+[36377424868](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36377424868).
+The new startup fence at `e4593b1` passes [both fast Windows jobs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36378514808),
+including actual compiled launchers and inherited-gate preservation across exit
+and crash. Full runtime execution is still running. Its Linux Chromium proof
+exposed a qualification-owner race: initial DSH and replacement Pi native hosts
+shared one test endpoint. Current qualification uses a separate actual private
+owner per native host, matching Windows, and adds simultaneous-host registration
+and normal-exit evidence. The product's Windows owner was already per process.
+Current source also adds retained background-owner discovery and read-only
+component Job verification; its new native assertions await execution. Global
+coordination, component transports and installer apply remain unfinished.
+
 ## Baseline and environments (W0)
 
 Implementation branch `feat/windows` starts from reviewed `main` `b8e36a4` plus

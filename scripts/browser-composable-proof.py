@@ -66,13 +66,12 @@ if os.environ.get('AUGMENTOR_PROOF_MAINTENANCE'):
                AUGMENTOR_DSH_WORKSPACE_ROOT=str(temp/'workspace'))
     if sys.platform!='linux':raise RuntimeError('This private-owner Chromium proof uses the Linux qualification adapter; Windows has a separate compiled owner proof.')
     sys.path.insert(0,str(root/'services'))
-    from lifecycle.browser_control import BrowserControlServer
-    def verify_proof_bridge(pid):
-        if Path(f'/proc/{pid}/exe').resolve()!=Path(native_node).resolve():raise ValueError('The proof bridge executable differs.')
-    proof_control=BrowserControlServer(app_root,temp/'runtime',verify_bridge=verify_proof_bridge)
-    proof_control.__enter__()
-    env.update(AUGMENTOR_BROWSER_OWNER_ENDPOINT=str(proof_control.endpoint),AUGMENTOR_BROWSER_OWNER_NONCE=proof_control.nonce,
-               AUGMENTOR_BROWSER_OWNER_PID=str(os.getpid()),AUGMENTOR_BROWSER_OWNER_ROOT=str(app_root.resolve()))
+    # Each native host has its own real private owner, as on Windows. One shared
+    # endpoint races when Chromium replaces its initial DSH host with Pi while
+    # the former host is still naturally draining.
+    launcher.write_text('#!/bin/sh\nexec '+shlex.join([sys.executable,str(root/'scripts/browser-maintenance-host-proof.py'),
+        str(app_root),native_node])+' "$@"\n')
+    proof_control=temp/'runtime'
 if os.environ.get('AUGMENTOR_PROOF_NATIVE_HOST'):launcher=Path(os.environ['AUGMENTOR_PROOF_NATIVE_HOST'])
 manifest=temp/'profile/NativeMessagingHosts/com.augmentor.agent.json';manifest.parent.mkdir(parents=True)
 # Public manifest key gives a stable extension ID in all test profiles.
@@ -387,7 +386,6 @@ finally:
         except OSError:pass
     if ws:ws.close()
     chrome.terminate();chrome.wait(timeout=10);server.shutdown()
-    if proof_control:proof_control.close()
     # Stop only the isolated runtime, never the user's Pi host.
     import sys
     sys.path.insert(0,str(app_root/'apps/native'));os.environ.update({k:v for k,v in env.items() if k.startswith('AUGMENTOR_')})

@@ -43,6 +43,17 @@ checks pass; new kernel/compiled execution is pending. Continue the complete
 coordinator and independent installer handoff after qualifying this primitive.
 Browser commit and public installer delivery remain disabled.
 
+Latest: full `df52b47` qualification now passes both CPUs. Both fast Windows jobs
+at `e4593b1` pass compiled startup exclusion/readiness and inherited-handle
+preservation across coordinator exit/crash. Its Linux Chromium failure was
+reproduced as a qualification-only shared-owner race during initial harness
+switching. Current proof creates one actual private owner per native host and
+adds explicit simultaneous-host/normal-exit coverage. Source also adds retained
+background-owner discovery and exact component Job/executable checks after owner
+reservation; new native execution is pending. Continue component transport
+identity, global coordinator and independent installer apply. Keep the draft
+unmerged and all public-release, feature-parity and physical test gates open.
+
 Current Windows worktree: `feat/windows` in an isolated canonical-repository
 checkout; draft [PR #20](https://github.com/ManoloRemiddi/augmentor-agent/pull/20).
 At `523fe9a`, real hosted x64/ARM64 runtime and disposable two-version installer

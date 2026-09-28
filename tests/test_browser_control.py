@@ -4,6 +4,8 @@ import json
 import os
 from pathlib import Path
 import sys
+import subprocess
+import shutil
 import tempfile
 import threading
 import time
@@ -81,6 +83,42 @@ class BrowserControlTests(unittest.TestCase):
         while self.request('describe')['connected']:
             if time.monotonic()>end:self.fail('Failed readiness left a live bridge.')
             time.sleep(.001)
+
+    @unittest.skipUnless(sys.platform=='linux','Linux Chromium qualification wrapper; Windows has actual compiled wrapper proof')
+    def test_overlapping_native_hosts_have_independent_owner_registration(self):
+        runtime=private_directory(self.root/'wrappers');children=[]
+        environment={**os.environ,'AUGMENTOR_PROOF_MAINTENANCE':'1','XDG_RUNTIME_DIR':str(runtime),
+            'HOME':str(self.root),'XDG_CONFIG_HOME':str(self.root/'config'),'XDG_STATE_HOME':str(self.root/'state')}
+        def observed(child):
+            with LocalSocket() as peer:
+                peer.settimeout(3);peer.connect(str(runtime/f'augmentor-browser-{child.pid}.sock'))
+                records=Records(peer);records.write({'protocol':PROTOCOL,'kind':'describe'})
+                return records.read(time.monotonic()+3)
+        try:
+            for _ in range(2):
+                children.append(subprocess.Popen([sys.executable,str(ROOT/'scripts/browser-maintenance-host-proof.py'),
+                    str(ROOT),shutil.which('node')],env=environment,stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,stderr=subprocess.PIPE))
+            for child in children:
+                deadline=time.monotonic()+10
+                while True:
+                    try:
+                        result=observed(child)
+                        if result.get('connected'):break
+                    except (FileNotFoundError,ConnectionRefusedError):pass
+                    if child.poll() is not None or time.monotonic()>deadline:self.fail('A per-host native owner did not register.')
+                    time.sleep(.02)
+                self.assertEqual(result['pid'],child.pid)
+            first,second=children
+            first.stdin.close();first.stdin=None
+            _out,errors=first.communicate(timeout=10);self.assertEqual(first.returncode,0,errors.decode())
+            self.assertTrue(observed(second)['connected'])
+            second.stdin.close();second.stdin=None
+            _out,errors=second.communicate(timeout=10);self.assertEqual(second.returncode,0,errors.decode())
+        finally:
+            for child in children:
+                if child.poll() is None:child.kill()
+                child.communicate(timeout=10)
 
     def test_control_round_trip_and_timeout_never_replay(self):
         bridge=self.register();seen=[]

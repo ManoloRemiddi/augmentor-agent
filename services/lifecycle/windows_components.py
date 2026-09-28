@@ -124,6 +124,49 @@ class BrowserParticipant(WindowParticipant):
         return result
 
 
+class OwnerParticipant(WindowParticipant):
+    """Observe the background owner without calling ensure or starting services."""
+    def __init__(self, endpoint, root):
+        from windows_supervisor import SCHEMA
+        super().__init__(endpoint,root,executable='python/python.exe',
+            initial_command=json.dumps({'action':'status'}))
+        if self.initial.get('schema')!=SCHEMA:
+            self.close();raise ValueError('Unsupported background owner.')
+
+    def control(self, action, token=None):
+        if action not in ('status','prepare','renew','cancel','commit'):raise ValueError('Unsupported owner maintenance operation.')
+        result=self.exchange(json.dumps({'action':'maintenance','method':'host.maintenance.'+action,
+            'params':{} if action=='status' else {'token':token}})).get('maintenance')
+        expected={'prepare':'prepared','renew':'prepared','cancel':'ready','commit':'closing'}
+        if (not isinstance(result,dict) or result.get('protocol')!='augmentor-component-maintenance/1'
+                or result.get('phase') not in ('ready','prepared','closing')
+                or type(result.get('active')) is not int or result['active']<0
+                or action in expected and result['phase']!=expected[action]):
+            raise ValueError('Unsupported owner maintenance response. No request was replayed.')
+        return result
+
+    def observe_child(self, name, pid):
+        result=self.exchange(json.dumps({'action':'observe-child','component':name,'pid':pid}))
+        if result.get('component')!=name or result.get('observedPid')!=pid:
+            raise ValueError('The background owner did not confirm this component.')
+
+
+def discover_owner(root, runtime):
+    """Retain the owner of the held private registration; never create one."""
+    runtime=require_directory(runtime)
+    directory=runtime/'supervisor'
+    if not directory.exists():return None
+    require_directory(directory)
+    try:fd=descriptor(directory/'owner.lock',writable=True)
+    except FileNotFoundError:return None
+    try:
+        try:locks.flock(fd,locks.LOCK_EX|locks.LOCK_NB)
+        except BlockingIOError:held=True
+        else:held=False
+    finally:os.close(fd)
+    return OwnerParticipant(directory/'control.sock',root) if held else None
+
+
 def discover_browsers(root, runtime):
     if sys.platform!='win32':raise RuntimeError('Windows browser discovery requires the native kernel.')
     runtime=require_directory(runtime);result=[]

@@ -171,3 +171,18 @@ is launched, no product data changes, and this primitive does not prove rollback
 The compiled launcher probe additionally checks the exported readiness release
 leaves its lifetime lease held; full native window/browser proofs assert the
 actual applications release startup exclusion once discoverable.
+
+The Linux real Chromium maintenance proof now runs
+`browser-maintenance-host-proof.py` once per native host. It uses the product
+private-control server and verifies the exact Node child PID/executable. This
+matches Windows ownership topology, but does not claim Windows Job evidence.
+The prior singleton test owner raced when old/new native hosts overlapped during
+initial DSH-to-Pi switching. `test_browser_control.py` now explicitly registers
+two overlapping actual native hosts and observes that the replacement stays
+registered after the old host exits normally. Failed real-page reservations
+record only form/draft-presence flags and control metadata, never their values.
+
+Native supervisor tests discover the actual background-owner pipe through a
+retained process observation, reserve it, and verify prompt/memory peers against
+its kernel Jobs. They reject cross-component/unrelated PIDs and unknown names.
+This is identity/admission evidence, not a complete coordinated shutdown.
