@@ -635,3 +635,15 @@ checks pass, including origin/argument refusal; syntax checks are not native
 binary evidence. This work does not publish an extension or change any browser
 profile. Client-adoption source `6c2a492` passes both fast Windows desktop jobs;
 its full native Node/Python ownership test is still queued.
+
+At `840127f`, x64 in [run 36364832602](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36364832602)
+now passes the compiled native desktop's actual Send/Enter/reopen/history sequence
+against bundled DSH and the deterministic fixture model. ARM64 is still running.
+This adds actual controller/widget evidence, not physical input or a live provider.
+
+The next W5 backend registers the native host in the ordinary user's standard
+Chromium-compatible HKCU lookup locations. It retains a stable launcher path,
+refuses foreign entries/changed manifests and rolls back partially written values.
+Native tests isolate every write beneath unique fixture registry roots; execution
+of the view/idempotence/conflict/rollback/removal tests is pending. Installer and
+chosen-browser setup integration remain future steps, not implied by this API.

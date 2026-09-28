@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Console-free Windows native host with binary stdio and owned bridge children."""
-import base64
-import hashlib
 import importlib.util
-import json
 import os
 from pathlib import Path
 import re
@@ -15,9 +12,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def origin(root=ROOT):
-    manifest = json.loads((root/'apps/browser/extension/manifest.json').read_text(encoding='utf-8'))
-    digest = hashlib.sha256(base64.b64decode(manifest['key'], validate=True)).hexdigest()[:32]
-    return 'chrome-extension://'+''.join(chr(ord('a')+int(value, 16)) for value in digest)+'/'
+    from platform_adapters.browser_identity import extension_origin
+    return extension_origin(root/'apps/browser/extension/manifest.json')
 
 
 def validate_arguments(args, root=ROOT):

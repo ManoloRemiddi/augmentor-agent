@@ -33,10 +33,21 @@ window. Those are separate W5 gates.
 
 ## Remaining browser work
 
-Implement idempotent per-user host registration pointing at the stable installed
-path, with ownership checks and exact removal. Windows registry views and fork
-lookup locations need actual-browser tests; do not infer them from browser profile
-directories. Preserve the shared chooser/instruction flow and verify an actual
+The source now provides per-user registration in the Chrome, Chromium and Edge
+HKCU native-host lookup locations. This is a host compatibility mechanism, not
+a browser-choice allowlist. The manifest retains the stable installed executable
+path, outside a version-specific selection. Existing foreign registrations or
+edited manifests are refused before writes/removal. Repeating an unchanged setup
+does not rewrite registry values; a failed multi-key setup rolls back only values
+written by that attempt. Removal preserves unrelated registry values. A private
+manifest is removed only after the owned registration values are retired.
+
+Native tests use unique disposable HKCU paths, check both registry views, simulate
+an interrupted registration and validate a stable junction-based launcher path.
+These tests remain pending; no actual browser lookup location has been changed.
+Installer/chooser wiring, registry views and fork lookup locations still need
+actual-browser tests; do not infer them from browser profile directories.
+Preserve the shared chooser/instruction flow and verify an actual
 selected-browser native connection before calling setup complete. Consumer store
 identity/review and independent extension update compatibility remain release
 gates. No browser policy or extension installation is forced by this work.

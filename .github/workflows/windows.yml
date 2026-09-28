@@ -78,6 +78,8 @@ jobs:
         if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
         run: |
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_pipe.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_browser.py -v
       - name: Build the shared TypeScript application
         id: build
         if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
