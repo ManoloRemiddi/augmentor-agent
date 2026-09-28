@@ -37,8 +37,10 @@ passes both CPUs, including the exact application script's repair/removal with n
 browser, edited-manifest refusal and owned browser cleanup. Default-value handling
 is corrected, and fixtures observe the complete copied remover exiting naturally.
 The [full application run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36400951137)
-is executing; its x64 prompt-client step has failed while installed qualification
-continues. Inspect its terminal logs separately; smaller tests do not waive it.
+now passes the complete x64 installed sequence through normal software removal
+and retained persistent data. The separate x64 memory-service startup test times
+out, so the overall workflow is not passing. ARM64 remains in progress; inspect
+its terminal report separately.
 The prior full `6890375` ARM64 artifact confirms the same repair/drain/apply/health
 and archival stages as x64, then the since-corrected normal-removal refusal.
 
@@ -48,14 +50,16 @@ the installed executable. Silent/coordinated application cannot reopen before
 independent health. A new test drives only its own real installer wizard, then
 requires entry through the actual lease-holding native launcher/private Python.
 The test uses a recording script, not the shared UI/DSH; full client acceptance
-remains separate. Native execution of this addition is pending.
+remains separate. At `8ecd4c0` both native wizard tests time out before advancing.
+The driver now retrieves cross-process control captions with bounded WM_GETTEXT
+and records only its owned wizard state for diagnosis; rerun is pending.
 
 Current installer code records one owned browser anchor and optional per-user
 login entry, preserves disabled startup on repair/update, and removes only exact
 owned registry values. Browser setup records a manifest digest before publishing
 pointers; removal retains the private file while checking its bytes. Persistent
 settings, manifests and prepared extensions survive software removal. Complete installed
-browser cleanup evidence remains pending.
+browser cleanup passes x64 at `8a3ff05`; ARM64 remains pending.
 
 The earlier full `ead355c` run fails same-build repair on both CPUs, after successful
 initial launch, live-draft preservation and corrected preview exit. Its native tree

@@ -123,18 +123,32 @@ def prove(out, arch, compiler, fixture_executable, runtime):
 
 def interactive_finish(installer, log):
     """Drive only this disposable installer's actual visible wizard buttons."""
+    import ctypes
+    from ctypes import wintypes
     import win32api, win32con, win32gui, win32job, win32process
     from platform_adapters.processes import OwnedProcess
+    send = ctypes.WinDLL('user32', use_last_error=True).SendMessageTimeoutW
+    send.argtypes = [wintypes.HWND, wintypes.UINT, ctypes.c_size_t, ctypes.c_void_p,
+                    wintypes.UINT, wintypes.UINT, ctypes.POINTER(ctypes.c_size_t)]
+    send.restype = ctypes.c_ssize_t
+    def caption_of(handle):
+        # GetWindowText does not retrieve another process's control text.
+        # WM_GETTEXT is a marshalled system message; bound both buffer and wait.
+        buffer = ctypes.create_unicode_buffer(4096); result = ctypes.c_size_t()
+        if not send(handle, win32con.WM_GETTEXT, len(buffer), buffer,
+                    win32con.SMTO_ABORTIFHUNG | win32con.SMTO_BLOCK, 200, ctypes.byref(result)):
+            return None
+        return buffer.value
     child = OwnedProcess([str(installer), '/SP-', '/NORESTART', '/LANG=english', '/LOG='+str(log)],
         stdin=subprocess.DEVNULL)
     deadline = time.monotonic()+120
     clicked = set(); finished = False
+    observations = []; last_state = None
     try:
         while not child.drained():
             if time.monotonic() >= deadline: raise TimeoutError('The disposable installer wizard did not complete.')
             windows = []
             def owned(window, _context):
-                if not win32gui.IsWindowVisible(window) or win32gui.GetClassName(window) != 'TWizardForm': return
                 _thread, pid = win32process.GetWindowThreadProcessId(window)
                 try: process = win32api.OpenProcess(win32con.PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
                 except win32api.error: return
@@ -142,25 +156,37 @@ def interactive_finish(installer, log):
                     if win32job.IsProcessInJob(process, child.job): windows.append(window)
                 finally: process.Close()
             win32gui.EnumWindows(owned, None)
+            state = []
             for window in windows:
                 controls = []
                 def collect(control, _context):
                     if win32gui.IsWindowVisible(control):
-                        controls.append((control, win32gui.GetClassName(control), win32gui.GetWindowText(control)))
+                        controls.append((control, win32gui.GetClassName(control), caption_of(control)))
                 win32gui.EnumChildWindows(window, collect, None)
+                state.append({'class':win32gui.GetClassName(window), 'caption':caption_of(window),
+                    'visible':bool(win32gui.IsWindowVisible(window)),
+                    'controls':[{'class':kind,'caption':text,'enabled':bool(win32gui.IsWindowEnabled(handle))}
+                                for handle,kind,text in controls]})
+                if not win32gui.IsWindowVisible(window) or win32gui.GetClassName(window) != 'TWizardForm': continue
                 # Different pages can reuse the same Next button. Retain visible
                 # text to avoid clicking twice while the previous event is queued.
                 page = tuple(sorted((kind, text) for _handle, kind, text in controls if text))
                 for caption in ('Finish', 'Install', 'Next >'):
                     buttons = [handle for handle, kind, text in controls
-                        if kind == 'TNewButton' and text.replace('&','') == caption and win32gui.IsWindowEnabled(handle)]
+                        if kind == 'TNewButton' and text and text.replace('&','') == caption and win32gui.IsWindowEnabled(handle)]
                     if len(buttons) != 1 or (page,caption) in clicked: continue
                     clicked.add((page,caption))
                     win32gui.PostMessage(buttons[0], win32con.BM_CLICK, 0, 0)
+                    observations.append({'clicked':caption})
                     if caption == 'Finish': finished = True
                     break
+            if state != last_state:
+                observations.append({'windows':state}); last_state = state
+                observations = observations[-40:]
             time.sleep(.05)
         assert child.wait_graceful(timeout=5) == 0 and finished
     finally:
+        Path(log).with_suffix('.json').write_text(json.dumps({
+            'finished':finished, 'observations':observations}, indent=2)+'\n', encoding='utf-8')
         if child.job is not None:
             child.kill(); child.wait(timeout=10)  # Failed disposable wizard only.

@@ -489,3 +489,12 @@ exit normally. DSH/Node/PowerShell markers remain inert and no shared desktop or
 actual-browser launch is claimed. Silent maintenance must never produce that
 observation. Native execution of this new addition is pending; preceding template
 repair/removal and signed-update qualification [pass both CPUs at 8a3ff05](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36400951199).
+
+At `8ecd4c0`, both native interactive tests time out before wizard advancement;
+this is not a passing Finish check. The driver used GetWindowText on another
+process's controls, which [Windows does not support](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getwindowtextw).
+It now reads captions through bounded WM_GETTEXT, retaining the exact Job ownership
+and button criteria, and writes bounded owned-window diagnostics on failure.
+The 120-second overall bound and required native launch observation remain.
+The full `8a3ff05` x64 installed proof separately passes normal removal and
+persistent-data retention; that workflow still has a memory startup-test failure.
