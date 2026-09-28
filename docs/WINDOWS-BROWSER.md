@@ -60,7 +60,30 @@ execution passes both native CPUs at `13c6c0d` in [run 36366164943](https://gith
 Real installed-browser acceptance remains pending. The executable
 picker must remain available when discovery finds nothing.
 
-Installer/chooser wiring, registry views and fork lookup locations still need
+The chooser now shares the existing Mac Qt form and control flow. Windows uses
+an `.exe` picker, opens the exact selected browser with `chrome://extensions`,
+and gives Windows folder-selection instructions. Cancel/invalid selection
+preserve the current browser; selecting another clears any earlier prepared
+result. It does not choose a default browser or force extension installation.
+
+Windows preparation requires the installer's HKCU
+`Software\Augmentor\Installation` anchor (`AppId=com.augmentor.Agent`, `Root`
+equal to the stable payload path), matching release CPU metadata and both native
+executables. Source/build-tree launches do not create this anchor or expose
+setup. W7 must create/remove it with the other owned registrations; that
+installer integration is still pending. The anchor is ownership metadata within
+the ordinary-user boundary, not publisher authentication or protection against
+hostile same-user software.
+
+Preparation copies the bundled extension to a content-addressed private data
+directory, outside replaceable application files, and registers the native host.
+It checks source links, bounds file sizes, applies user ACLs, refuses edited
+prepared files and keeps previous copies. The native test uses only disposable
+anchors/host keys and a PE/resource browser fixture. Its execution is pending;
+local tests pass all five chooser flows, 16 Mac browser tests and 28 common window
+tests. Actual-browser and clean-installer acceptance remain distinct.
+
+Installer anchor wiring, registry views and fork lookup locations still need
 actual-browser tests; do not infer them from browser profile directories.
 Preserve the shared chooser/instruction flow and verify an actual
 selected-browser native connection before calling setup complete. Consumer store

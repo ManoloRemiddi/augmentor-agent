@@ -5,6 +5,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import sysconfig
 import tempfile
 import unittest
 import uuid
@@ -97,6 +98,40 @@ class WindowsBrowserRegistrationTests(unittest.TestCase):
         self.assertTrue(self.path.exists())
         for path in self.keys: self.assertEqual(self.registration.current(path), str(self.path))
         os.rmdir(link)  # Remove the fixture junction itself, not its target.
+
+    def test_preparation_requires_installer_anchor_and_preserves_edited_extension(self):
+        from platform_adapters.paths import private_directory
+        api = self.registration
+        app = private_directory(self.root/'application')
+        for name in ('Augmentor.exe','AugmentorBrowserHost.exe'): (app/name).write_bytes(b'fixture')
+        target = {'win-amd64':'windows-x64','win-arm64':'windows-arm64'}[sysconfig.get_platform()]
+        (app/'release.json').write_text(json.dumps({'target':target}))
+        source = private_directory(app/'apps/browser/extension')
+        shutil.copy2(ROOT/'apps/browser/extension/manifest.json',source/'manifest.json')
+        (source/'example.js').write_text('const test = "Unicode café";',encoding='utf-8')
+        browser = private_directory(self.root/'unlisted browser')
+        executable = browser/'comet.exe'; shutil.copy2(sys.executable,executable)
+        for name in ('resources.pak','icudtl.dat','fork_100_percent.pak'): (browser/name).write_bytes(b'fixture')
+        data = private_directory(self.root/'data')
+        with patch.dict(os.environ,{'XDG_DATA_HOME':str(data)}):
+            with self.assertRaisesRegex(ValueError,'Install Augmentor'):
+                api.prepare_extension(app,executable,key_path=self.prefix,keys=self.keys)
+            self.assertFalse((data/'browser-extensions').exists())
+            self.write(self.prefix,'com.augmentor.Agent',name='AppId')
+            self.write(self.prefix,str(app),name='Root')
+            prepared = api.prepare_extension(app,executable,key_path=self.prefix,keys=self.keys)
+            destination = Path(prepared['extensionDirectory'])
+            self.assertEqual((destination/'example.js').read_bytes(),(source/'example.js').read_bytes())
+            self.assertTrue(destination.is_relative_to(data))
+            self.assertEqual(api.prepare_extension(app,executable,key_path=self.prefix,keys=self.keys)['extensionDirectory'],str(destination))
+            self.assertEqual(json.loads(Path(prepared['manifest']).read_text())['path'],str(app/'AugmentorBrowserHost.exe'))
+            (destination/'example.js').write_text('user edited')
+            with self.assertRaisesRegex(ValueError,'edited'):
+                api.prepare_extension(app,executable,key_path=self.prefix,keys=self.keys)
+            self.assertEqual((destination/'example.js').read_text(),'user edited')
+            self.write(self.prefix,str(self.root/'other-install'),name='Root')
+            with self.assertRaisesRegex(ValueError,'installed Augmentor'):
+                api.prepare_extension(app,executable,key_path=self.prefix,keys=self.keys)
 
 
 @unittest.skipUnless(sys.platform == 'win32', 'requires Windows registry discovery and PE metadata')

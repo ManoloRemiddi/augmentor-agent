@@ -56,6 +56,8 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_launcher.py -v
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_browser_setup_ui.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_macos_setup_ui.py -v
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B -m augmentor_linux --preview --screenshot outputs/evidence/desktop.png

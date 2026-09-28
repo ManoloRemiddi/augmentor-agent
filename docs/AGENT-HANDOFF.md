@@ -63,6 +63,20 @@ DSH composer/reopen proof, client ownership, browser integration, graceful globa
 Quit and production updating still need their remaining qualification. Consult
 the detailed ledger for exact runs; source progress is not an installed release.
 
+At `13c6c0d`, full Windows runtime qualification passes **both** native CPUs:
+compiled preview zoom/resources, actual desktop Send/Enter/restored DSH history,
+compiled browser host protocol, and Python/Node companion ownership. Shared
+Linux and Mac workflows also pass at that ref. Browser source now shares the Mac
+chooser and adds Windows preparation behind an installer-owned stable anchor;
+native preparation/real-browser acceptance remains pending.
+
+W1 is reopened after identifying stock Velopack's forced busy-uninstall behavior.
+Read the [installer decision and alternative proof](WINDOWS-INSTALLER-DECISION.md):
+Inno/WinSparkle remain candidates until execution establishes the required gates.
+No product installer switch, signed package, safe global Quit/update or customer
+publication is implied by the disposable tests. Keep current CI and the ledger
+authoritative when continuing.
+
 ## September 27 Windows implementation plan — historical planning checkpoint
 
 The owner requested a detailed plan before coding. Read the

@@ -872,9 +872,12 @@ class Window(QWidget):
         is_dsh=bool(self.controller and self.controller.harness=='dsh')
         menu.addAction('Agent setup' if is_dsh else 'Connect a model',self.open_setup).setEnabled(bool(self.controller))
         menu.addAction('Open DSH in browser' if is_dsh else 'Models & providers',self.open_pi).setEnabled(bool(self.controller))
-        from .macos_browser_setup import available, MacBrowserSetupDialog
+        if sys.platform == 'win32':
+            from .windows_browser_setup import available, WindowsBrowserSetupDialog as BrowserSetupDialog
+        else:
+            from .macos_browser_setup import available, MacBrowserSetupDialog as BrowserSetupDialog
         if available():
-            menu.addAction('Set up browser extension',lambda:MacBrowserSetupDialog(self).exec())
+            menu.addAction('Set up browser extension',lambda:BrowserSetupDialog(self).exec())
         menu.addAction('Versions & updates',self.open_updates).setEnabled(bool(self.controller))
         menu.addAction('Approval mode',self.open_access).setEnabled(bool(self.controller))
         menu.addAction('About & licenses',lambda:LicensesDialog(self).exec())

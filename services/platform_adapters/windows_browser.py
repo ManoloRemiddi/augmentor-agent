@@ -1,6 +1,13 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Owned per-user native messaging registration; never edit browser profiles/policy."""
 from pathlib import Path
+import hashlib
+import json
+import os
+import shutil
+import stat
+import sysconfig
+import tempfile
 import winreg
 from .browser_identity import extension_origin
 from .private_files import atomic_json, read_json, require_directory
@@ -9,6 +16,91 @@ HOST = 'com.augmentor.agent'
 KEYS = tuple(path+'\\NativeMessagingHosts\\'+HOST for path in (
     r'Software\Google\Chrome', r'Software\Chromium', r'Software\Microsoft\Edge'))
 VIEW = winreg.KEY_WOW64_64KEY  # HKCU Software is shared; do not invent a WOW6432Node subtree.
+INSTALL_KEY = r'Software\Augmentor\Installation'
+
+
+def installed_root(root, *, key_path=INSTALL_KEY):
+    """Require the installer's stable anchor; never register a source/preview path."""
+    from .windows_identity import reject_reparse_ancestors
+    root = Path(root).absolute()
+    with winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_path, 0, winreg.KEY_READ | VIEW) as key:
+        identity, identity_kind = winreg.QueryValueEx(key, 'AppId')
+        location, location_kind = winreg.QueryValueEx(key, 'Root')
+    if identity_kind != winreg.REG_SZ or identity != 'com.augmentor.Agent' or location_kind != winreg.REG_SZ:
+        raise ValueError('The installed Augmentor identity is unavailable. Repair the installation.')
+    if not isinstance(location, str) or Path(location) != root or not root.is_absolute():
+        raise ValueError('Open the installed Augmentor application before preparing your browser.')
+    reject_reparse_ancestors(root)
+    release = json.loads((root/'release.json').read_text(encoding='utf-8'))
+    target = {'win-amd64':'windows-x64','win-arm64':'windows-arm64'}.get(sysconfig.get_platform())
+    if not target or release.get('target') != target:
+        raise ValueError('The installed companion does not match this Windows runtime.')
+    if not all((root/name).is_file() for name in ('Augmentor.exe','AugmentorBrowserHost.exe')):
+        raise ValueError('The installed browser companion is incomplete. Repair the installation.')
+    return root
+
+
+def extension_files(directory, *, private=False):
+    """Read bounded ordinary files, inspecting directories before descending."""
+    from .private_files import descriptor
+    from .windows_identity import reject_reparse_ancestors
+    root = Path(directory); reject_reparse_ancestors(root)
+    result = {}; pending = [root]; total = 0
+    while pending:
+        folder = pending.pop()
+        if private: require_directory(folder)
+        for file in folder.iterdir():
+            info = file.lstat()
+            if getattr(info, 'st_file_attributes', 0) & stat.FILE_ATTRIBUTE_REPARSE_POINT:
+                raise ValueError('The extension contains an unexpected link. Existing files were preserved.')
+            if stat.S_ISDIR(info.st_mode):
+                pending.append(file); continue
+            if not stat.S_ISREG(info.st_mode) or info.st_size > 16*1024*1024:
+                raise ValueError('The extension contains an unsupported file.')
+            total += info.st_size
+            if total > 64*1024*1024 or len(result) >= 4096:
+                raise ValueError('The extension exceeds its supported size.')
+            if private:
+                with os.fdopen(descriptor(file), 'rb') as stream: content = stream.read(16*1024*1024+1)
+            else: content = file.read_bytes()
+            if len(content) != info.st_size: raise ValueError('The extension changed during preparation.')
+            result[file.relative_to(root).as_posix()] = content
+    if 'manifest.json' not in result: raise ValueError('The browser extension manifest is missing.')
+    return result
+
+
+def prepare_extension(root, browser, *, key_path=INSTALL_KEY, keys=KEYS):
+    from .paths import private_directory
+    from .private_files import descriptor
+    from .windows_browsers import browser_application
+    browser_application(browser)
+    try: root = installed_root(root, key_path=key_path)
+    except FileNotFoundError:
+        raise ValueError('Install Augmentor and open that copy before preparing your browser.') from None
+    source = root/'apps/browser/extension'
+    value = manifest(root/'AugmentorBrowserHost.exe', source/'manifest.json')
+    files = extension_files(source)
+    hashes = {name:hashlib.sha256(content).hexdigest() for name,content in files.items()}
+    identity = hashlib.sha256(json.dumps(hashes,sort_keys=True).encode()).hexdigest()[:16]
+    parent = private_directory(Path(os.environ['XDG_DATA_HOME'])/'browser-extensions')
+    destination = parent/identity
+    if destination.exists() or destination.is_symlink():
+        if extension_files(destination,private=True) != files:
+            raise ValueError('The prepared extension was edited. Its files were preserved.')
+    else:
+        temporary = Path(tempfile.mkdtemp(prefix='.prepare-',dir=parent))
+        try:
+            private_directory(temporary)
+            for name,content in files.items():
+                file = temporary/name; private_directory(file.parent)
+                with os.fdopen(descriptor(file,writable=True,exclusive=True), 'wb') as stream:
+                    stream.write(content); stream.flush(); os.fsync(stream.fileno())
+            temporary.rename(destination)
+        finally:
+            if temporary.exists(): shutil.rmtree(temporary)
+    host = private_directory(Path(os.environ['XDG_DATA_HOME'])/'browser-native-host')/(HOST+'.json')
+    result = register(value,host,keys=keys)
+    return {**result,'extensionDirectory':str(destination),'extensionId':value['allowed_origins'][0].split('/')[2]}
 
 
 def manifest(executable, extension_manifest):

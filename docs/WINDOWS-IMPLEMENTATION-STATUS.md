@@ -689,3 +689,10 @@ and native WinSparkle 0.9.4. It covers repair/update/removal admission with two
 live fixture processes, failed preparation/retry and signed-download refusal
 cases. Source syntax and diff checks pass; native execution is pending. The
 product packaging backend has not switched based on source alone.
+
+W5 now shares the approved Mac chooser/instruction form with a Windows adapter.
+Windows preparation requires an installer-owned stable HKCU anchor, keeps the
+extension in content-addressed private data and refuses source registrations or
+edited prepared files. Installer anchor writing and actual-browser tests remain
+pending. All five local chooser tests, 16 Mac browser checks and 28 common window
+checks pass. The new real-Windows preparation fixture is queued for native CI.
