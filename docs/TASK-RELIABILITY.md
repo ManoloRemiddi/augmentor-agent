@@ -169,3 +169,36 @@ This OS-specific report is shared by the Linux DSH/Pi helpers; macOS discovery i
 unchanged. Three Python checks cover mixed Wayland/X11 discovery, missing utilities,
 private environment exclusion and explicit portal probing. Physical standby/wake
 and general model answer quality remain separate from these capability checks.
+
+
+### Final capability-report adoption
+
+Implementation through `70c5c79` is selected/running as
+`20260928-093018-2d4431f6`, artifact SHA-256
+`43fb2a371dc59054dd7705836fb571ccae56a028bfb6fda6336eb61b507e18c0`.
+This is a staged copy of the preceding compatible installed 0.2.11 artifact,
+with only the Linux doctor implementation changed. Both owned DSH presets now
+also resolve the desktop adapter from this release; that adapter and other Linux
+helper bytes match their previously loaded copies. All three windows adopted it
+while idle and report online/model-ready with preserved settings/conversation
+selections. The source remains 0.2.12; no version check was bypassed.
+
+Final local source regression: 194 Node tests passed; 542 native/Python tests ran
+successfully with three environment-dependent skips. The prior unchanged Browser
+suite passed 44 tests. The earlier TypeScript build/check passed. Linux/Home/
+Browser/installed-package and macOS 14/26 CI passed for the preceding `1aaaa34`
+revision; that does not qualify newer source or a new Mac installation.
+
+
+The full installed personal-preset read-only retest on this final artifact completed
+in 79.3 seconds using six tool calls. It inspected the updated profile, installed
+`kscreen-doctor --help`, output inventory and `--dpms show`, identified
+`kscreen-doctor --dpms off`, and reported physical standby/wake as unverified.
+This qualifies command discovery and public completion for one observed run with
+the actual personal context/tool set. It does not certify every sentence of the
+answer, actual power control, future model reliability or a general performance
+improvement. The final answer's closing reference to only two read-only queries
+under-counted its other inspections; the recorded total is six tool calls.
+No power-changing command was executed. The effective request still used xhigh
+reasoning; 79 seconds remains slow for this task. Model/GPU settings were preserved.
+Private full transcripts and rollback backups remain outside the repository.

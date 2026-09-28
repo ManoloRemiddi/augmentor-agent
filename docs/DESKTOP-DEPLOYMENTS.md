@@ -5,7 +5,7 @@
 ## September 28: task reliability
 
 [Task reliability](TASK-RELIABILITY.md#september-28-installed-linux-adoption) owns
-implementation `5a7b496`, selected/running release `20260928-090939-8349fc33`,
+implementation through `70c5c79`, selected/running release `20260928-093018-2d4431f6`,
 exact artifact identity, candidate checks and shared DSH preset activation. All
 three windows are online/model-ready with voice available and no pending update.
 Settings and saved conversation selections were preserved. Rollback includes the

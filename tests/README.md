@@ -90,6 +90,6 @@ non-overwriting screenshot output. See the
 [installed native acceptance](../docs/MACOS-DISTRIBUTION.md#september-26-follow-up-corrected-primary-mac-app-activated).
 
 Task reliability: `tests/dsh-context-budget.test.mjs`, `tests/dsh-execution.test.mjs`,
-and `tests/test_reply_completion.py` exercise deterministic evidence/recovery and
-UI contracts. The opt-in `scripts/task-reliability-proof.mjs` checks a real local
+`tests/test_reply_completion.py` and `tests/test_desktop_profile.py` exercise
+deterministic evidence/recovery, UI and Linux capability-discovery contracts. The opt-in `scripts/task-reliability-proof.mjs` checks a real local
 model with restricted read-only tools; see [scope and limits](../docs/TASK-RELIABILITY.md).

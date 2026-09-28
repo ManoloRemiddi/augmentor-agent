@@ -8,10 +8,12 @@
 changed-command error checkpoints, bounded recovery reassessment and restored
 effective-reasoning visibility. Model/GPU settings are preserved. Read the guide
 for fixture versus real-model evidence and installed adoption boundaries.
-Implementation `5a7b496` is selected and running in all three Linux windows as
-`20260928-090939-8349fc33`. Both shared DSH presets report the new adapters active;
+Implementation through `70c5c79` is selected and running in all three Linux windows
+as `20260928-093018-2d4431f6`. Both shared DSH presets use the updated adapters;
 model settings and saved conversation selections were preserved. PR #21 is draft;
-Mac/public downloads are unchanged.
+Mac/public downloads are unchanged. After two unsuccessful full-preset checks,
+the final read-only retest identified the correct control in 79 seconds / six calls.
+Physical standby/wake remains untested; xhigh reasoning and task latency remain.
 
 ## September 27 installed Chromium browser choice
 
@@ -626,11 +628,3 @@ Preserve dated evidence rather than relabelling old tests as new qualification.
 Publish a reviewed commit and update the PR with scope and validation. A local-only
 note or an unpublished branch is not a completed handoff. Merge/release status
 must remain explicit; documentation publication does not itself merge a draft PR.
-
-
-September 28 task-reliability follow-up: the first full installed-preset test timed
-out; the next completed but overlooked an installed utility and gave an incorrect
-answer. Do not treat the restricted-tool proof as full-agent qualification. The
-Linux system profile now reports desktop-native utilities and clarifies XWayland
-and portal limitations. See [task reliability](TASK-RELIABILITY.md) for exact
-source/deployment evidence and remaining live checks.
