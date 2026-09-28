@@ -504,3 +504,38 @@ The `5bd0e45` native diagnostics identify the visible enabled control as
 The fixture now accepts that exact caption as well as `Next >`. No application
 or installer admission behavior changes. Finish/native-launch qualification
 remains pending until this corrected driver reaches and verifies it.
+
+## Retain original installer bytes before replacement
+
+Current source preserves the original `{srcexe}` before copying any application
+files. The native maintenance helper derives `recovery/` from its already validated
+private data handle, verifies the source SHA-256 with Windows CNG, streams a private
+copy, flushes it and publishes it by a non-replacing rename. It then pins and hashes
+the retained copy again. The filename is the installer SHA-256; its `.release`
+receipt contains the compiled payload `release.json` SHA-256. Receipts are also
+flushed and published without replacement. Existing matching artifacts are reused;
+corrupt bytes, mismatched receipts, redirected paths or invalid permissions refuse
+installation before application replacement. Disk/copy failures remove only the
+call's unpublished temporary file. Earlier retained installers are preserved.
+
+This cache is byte retention, not Authenticode/publisher verification, selection
+of a known healthy build or authorization to roll back. Artifacts from a failed
+installation can also be present; never choose recovery by newest filename or
+mtime. The separate signed-bundle reader does not interpret these raw first-install
+receipts. Initial source selection, publisher trust, independent recovery execution,
+health decisions and bounded pruning/removal of software caches remain open work.
+Until that retention policy is implemented, normal software removal preserves
+recovery artifacts alongside persistent data. Customer publication stays disabled.
+
+The exact-template proof now checks private source bytes/receipt, refuses a changed
+installer and changed receipt without modifying the application, and verifies that
+repair reuses the retained file. The full installed proof checks complete installer
+retention through coordinated reapplication and removal. Native execution of this
+new cache is pending; Python compile and whitespace checks pass locally.
+
+At `59dbbf4`, [native Inno x64](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36404083419)
+passes the actual interactive Finish/native startup test and all prior cases. ARM64
+reaches Finish and the log records application launch and successful Setup exit,
+then the driver reads the destroyed wizard handle (1400). The driver now observes
+only process exit after Finish and tolerates vanished controls during inspection.
+This is a fixture correction; ARM64 Finish qualification still requires a clean run.

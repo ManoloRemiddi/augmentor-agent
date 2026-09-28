@@ -18,8 +18,10 @@ static HANDLE manifest_file = INVALID_HANDLE_VALUE, manifest_parent = INVALID_HA
 static BOOL authorized = FALSE;
 static AugmentorLease manual = {INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE,
     INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE};
+#include "windows-installer-cache.h"
 
 __declspec(dllexport) void WINAPI AugmentorHandoffClose(void) {
+    augmentor_cache_close();
     if (manifest_file != INVALID_HANDLE_VALUE) CloseHandle(manifest_file);
     if (manifest_parent != INVALID_HANDLE_VALUE) CloseHandle(manifest_parent);
     manifest_file = manifest_parent = INVALID_HANDLE_VALUE;

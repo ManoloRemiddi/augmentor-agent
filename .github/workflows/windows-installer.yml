@@ -20,6 +20,7 @@ on:
       - 'services/lifecycle/verify-release.mjs'
       - 'tests/test_update_journal.py'
       - 'services/platform/windows-installer-handoff.c'
+      - 'services/platform/windows-installer-cache.h'
       - 'services/platform/windows-lease.h'
       - 'release/windows/installer-candidates.json'
 permissions:

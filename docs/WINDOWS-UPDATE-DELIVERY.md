@@ -93,9 +93,12 @@ authorize rollback. No temporary signing key is installed in the product.
 Five additional tests exercise reopening/held-file behavior, expiry separation,
 wrong recorded identities and incompatible installations, modified metadata/signature/
 installer bytes, and hard-linked files. The 32 local update/journal/coordinator
-tests pass; native execution of this addition is pending. Initial installer source
-retention, independently available recovery runtime, interrupted-state inspection,
-actual recovery application, health and obsolete-file cleanup are still required.
+tests pass; native execution of this addition is pending. Native tests pass both CPUs at [59dbbf4](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36404083441).
+Initial installer source retention now has a separate native implementation under
+qualification, described in the [installer decision](WINDOWS-INSTALLER-DECISION.md#retain-original-installer-bytes-before-replacement).
+Its raw receipt is not a signed update bundle. Installed source selection, an
+independently available recovery runtime, interrupted-state inspection, actual
+recovery application, health and obsolete-file cleanup are still required.
 
 ## Evidence and remaining work
 

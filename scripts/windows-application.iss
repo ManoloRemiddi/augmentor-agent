@@ -42,7 +42,7 @@ Filename: "{app}\current\Augmentor.exe"; Parameters: "{code:LaunchParameters}"; 
 [Code]
 var MaintenanceHeld, AuthenticatedHandoff, RemovalHeld, FreshInstallation: Boolean;
   StartupChoiceKnown, StartupChoice: Boolean;
-  BrowserCleanupReady, InstallationComplete: Boolean; BrowserDigest: String;
+  BrowserCleanupReady, InstallationComplete, InstallerRetained: Boolean; BrowserDigest: String;
 
 function OfferStartupTask: Boolean;
 begin
@@ -84,6 +84,8 @@ function RemoveOwnedRegistry(Key, Name, Expected: String; Action: Cardinal): Car
   external 'AugmentorOwnedRegistry@{tmp}\augmentor-removal.dll stdcall delayload uninstallonly';
 function RetainBrowserManifest(Path: String): BOOL;
   external 'AugmentorRetainManifest@{tmp}\augmentor-removal.dll stdcall delayload uninstallonly';
+function RetainInstaller(SourcePath, InstallerDigest, ReleaseDigest: String): BOOL;
+  external 'AugmentorRetainInstaller@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
 
 function BrowserKey(Index: Integer): String;
 begin
@@ -217,6 +219,13 @@ begin
     Registration := OwnedRegistry('{#StartupKey}', 'Augmentor Agent', StartupCommand, 0);
     if (Registration <> 1) and (Registration <> 2) then
       Result := 'An existing login entry uses the Augmentor name. Disable the startup task to preserve it and continue.';
+  end;
+  if Result <> '' then exit;
+  if not InstallerRetained then begin
+    InstallerRetained := RetainInstaller(ExpandConstant('{srcexe}'),
+      Lowercase(GetSHA256OfFile(ExpandConstant('{srcexe}'))), '{#ReleaseDigest}');
+    if not InstallerRetained then
+      Result := 'Augmentor could not preserve its installer for recovery. Check free disk space and repair the private recovery cache before continuing. Application files were not changed.';
   end;
 end;
 

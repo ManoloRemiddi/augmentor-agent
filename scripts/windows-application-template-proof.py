@@ -70,13 +70,35 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         assert not launch_record.exists(), 'Silent maintenance launched the application.'
     try:
         run(report['installer'], 'initial')
+        recovery = Path(report['qualificationBase'])/'recovery'
+        cached = recovery/(report['sha256']+'.exe')
+        receipt = recovery/(report['sha256']+'.release')
+        def read_private(path):
+            with os.fdopen(descriptor(path),'rb') as stream: return stream.read()
+        assert hashlib.sha256(read_private(cached)).hexdigest() == report['sha256']
+        release_digest = hashlib.sha256((payload/'release.json').read_bytes()).hexdigest().encode('ascii')
+        assert read_private(receipt) == release_digest
         key_path = r'Software\Microsoft\Windows\CurrentVersion\Uninstall'+'\\'+report['applicationId']+'_is1'
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_path, 0, winreg.KEY_READ|winreg.KEY_WOW64_64KEY) as key:
             removal = command_executable(winreg.QueryValueEx(key, 'UninstallString')[0])
         assert removal.is_relative_to(install)
+        # Both kinds of damaged retained bytes refuse BEFORE file replacement;
+        # preserve the damaged cache for inspection, then restore this fixture.
+        for path in (cached,receipt):
+            original = read_private(path)
+            changed = b'X'+original[1:]
+            with os.fdopen(descriptor(path,writable=True),'wb') as stream: stream.write(changed)
+            run(report['installer'], 'corrupt-'+path.suffix[1:]+'-refusal', success=False)
+            assert read_private(path) == changed and (install/'current/Augmentor.exe').is_file()
+            with os.fdopen(descriptor(path,writable=True),'wb') as stream: stream.write(original)
+        retained_time = cached.stat().st_mtime_ns
         run(report['installer'], 'repair')
+        assert cached.stat().st_mtime_ns == retained_time
+        stages.append('original-installer-retained-and-corrupt-cache-refused')
         run(removal, 'without-browser')
         assert not (install/'current/Augmentor.exe').exists()
+        assert hashlib.sha256(read_private(cached)).hexdigest() == report['sha256']
+        assert read_private(receipt) == release_digest
         stages.append('actual-template-repair-and-removal-without-browser')
         run(report['installer'], 'reinstall')
         manifest = Path(report['browserManifest'])
@@ -147,9 +169,14 @@ def interactive_finish(installer, log):
     try:
         while not child.drained():
             if time.monotonic() >= deadline: raise TimeoutError('The disposable installer wizard did not complete.')
+            if finished:
+                time.sleep(.05); continue  # Observe natural exit, not destroyed wizard controls.
             windows = []
             def owned(window, _context):
-                _thread, pid = win32process.GetWindowThreadProcessId(window)
+                try: _thread, pid = win32process.GetWindowThreadProcessId(window)
+                except win32gui.error as error:
+                    if error.winerror == 1400: return
+                    raise
                 try: process = win32api.OpenProcess(win32con.PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
                 except win32api.error: return
                 try:
@@ -158,16 +185,23 @@ def interactive_finish(installer, log):
             win32gui.EnumWindows(owned, None)
             state = []
             for window in windows:
+                try: window_class = win32gui.GetClassName(window)
+                except win32gui.error as error:
+                    if error.winerror == 1400: continue
+                    raise
                 controls = []
                 def collect(control, _context):
-                    if win32gui.IsWindowVisible(control):
-                        controls.append((control, win32gui.GetClassName(control), caption_of(control)))
+                    try:
+                        if win32gui.IsWindowVisible(control):
+                            controls.append((control, win32gui.GetClassName(control), caption_of(control)))
+                    except win32gui.error as error:
+                        if error.winerror != 1400: raise
                 win32gui.EnumChildWindows(window, collect, None)
-                state.append({'class':win32gui.GetClassName(window), 'caption':caption_of(window),
+                state.append({'class':window_class, 'caption':caption_of(window),
                     'visible':bool(win32gui.IsWindowVisible(window)),
                     'controls':[{'class':kind,'caption':text,'enabled':bool(win32gui.IsWindowEnabled(handle))}
                                 for handle,kind,text in controls]})
-                if not win32gui.IsWindowVisible(window) or win32gui.GetClassName(window) != 'TWizardForm': continue
+                if not win32gui.IsWindowVisible(window) or window_class != 'TWizardForm': continue
                 # Different pages can reuse the same Next button. Retain visible
                 # text to avoid clicking twice while the previous event is queued.
                 page = tuple(sorted((kind, text) for _handle, kind, text in controls if text))
@@ -181,6 +215,7 @@ def interactive_finish(installer, log):
                     observations.append({'clicked':caption})
                     if caption == 'Finish': finished = True
                     break
+                if finished: break
             if state != last_state:
                 observations.append({'windows':state}); last_state = state
                 observations = observations[-40:]

@@ -85,6 +85,13 @@ def main():
         assert child.wait(timeout=20)==0
     try:
         setup('initial')
+        cached_installer = data/'recovery'/(report['sha256']+'.exe')
+        cached_receipt = data/'recovery'/(report['sha256']+'.release')
+        assert package.digest(cached_installer)==report['sha256']
+        with os.fdopen(descriptor(cached_receipt),'rb') as stream:
+            assert stream.read(65)==package.digest(args.root/'release.json').encode('ascii')
+        cached_time=cached_installer.stat().st_mtime_ns
+        stages.append('original-full-installer-retained')
         assert (install/'current/release.json').read_bytes() == (args.root/'release.json').read_bytes()
         for relative in ('Augmentor.exe','AugmentorBrowserHost.exe','python/python.exe','node/node.exe',
                          'powershell/pwsh.exe','dsh/payload.json'):
@@ -260,6 +267,8 @@ def main():
                 assert winreg.QueryInfoKey(key)[:2]==(0,0), 'An owned browser pointer survived removal.'
         assert browser_manifest.read_bytes()==browser_manifest_bytes
         assert sentinel.read_bytes()==sentinel_bytes
+        assert package.digest(cached_installer)==report['sha256']
+        assert cached_installer.stat().st_mtime_ns==cached_time
         stages.append('software-removed-persistent-data-retained')
         # These two keys are synthetic qualification locations. Never remove a
         # real Run key, StartupApproved state or another application's values.

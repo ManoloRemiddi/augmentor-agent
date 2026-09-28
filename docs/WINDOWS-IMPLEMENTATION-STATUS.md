@@ -47,8 +47,8 @@ and archival stages as x64, then the since-corrected normal-removal refusal.
 The shared memory service now initializes its journal before publishing a
 connectable endpoint. A constructor-gated child-process test reproduces the old
 race and passes with the correction; local prompt/memory restart and lifecycle
-checks pass. Native rerun must still determine whether this resolves the earlier
-x64 startup timeout. Failed fixture runs now preserve stack/log diagnostics.
+checks pass. Both native fast jobs at `59dbbf4` pass the gated initialization and
+memory maintenance checks; complete qualification still needs its terminal result. Failed fixture runs now preserve stack/log diagnostics.
 
 Current source adds the standard checked **Open Augmentor** finish option for
 interactive installation/repair. It releases native maintenance before launching
@@ -58,7 +58,10 @@ requires entry through the actual lease-holding native launcher/private Python.
 The test uses a recording script, not the shared UI/DSH; full client acceptance
 remains separate. At `8ecd4c0` both native wizard tests time out before advancing.
 The driver now retrieves cross-process control captions with bounded WM_GETTEXT
-and records only its owned wizard state for diagnosis; rerun is pending.
+and records only its owned wizard state for diagnosis. The observed modern
+Next caption is handled. At `59dbbf4`, x64 Finish/native startup passes; ARM64
+launches but its driver inspects a destroyed window. That observation race is
+corrected in source and requires native rerun.
 
 Current installer code records one owned browser anchor and optional per-user
 login entry, preserves disabled startup on repair/update, and removes only exact
@@ -94,8 +97,12 @@ pass; later platform checks continue in CI.
 
 Retained signed recovery packages can now be revalidated against an exact recorded
 identity without executing them. This separates expired local recovery from new
-forward delivery. The 32 local update tests pass; native tests are pending. Source
-retention and an independent recovery executor are still missing.
+forward delivery. The 32 local update tests and both native fast jobs at `59dbbf4` pass.
+The actual installer now preserves its source EXE and compiled payload digest in a
+private cache before replacement; corrupted retained bytes refuse repair. Native
+cache qualification is pending. These are raw retention receipts, not signed update
+bundles. Source selection, independent recovery, health and cache pruning/removal
+remain unfinished.
 
 Next: finish interactive-launch and memory startup qualification, then connect
 verified delivery to customer notification/UI and the coordinator. Qualify actual

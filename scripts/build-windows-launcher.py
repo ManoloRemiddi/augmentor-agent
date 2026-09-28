@@ -157,7 +157,7 @@ def build_installer_helper(output,*,development=False):
         command=(f'call "{vcvars}" amd64 && cl /nologo /LD /O2 /W4 /MT '+definition+
             f'"{ROOT/"services/platform/windows-installer-handoff.c"}" /Fe:"{dll}" '+
             f'/Fo:"{Path(temporary)/"helper.obj"}" /link /IMPLIB:"{Path(temporary)/"helper.lib"}" '+
-            'shell32.lib advapi32.lib')
+            'shell32.lib advapi32.lib bcrypt.lib')
         subprocess.run('cmd.exe /d /s /c "'+command+'"',check=True)
     return dll
 
