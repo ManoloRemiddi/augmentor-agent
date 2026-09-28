@@ -7,6 +7,7 @@ import subprocess
 import shutil
 import sys
 import tempfile
+import threading
 import time
 import unittest
 from unittest.mock import patch
@@ -15,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'services'))
 sys.path.insert(0, str(ROOT/'apps/native'))
 from augmentor_linux.prompt_client import PromptClient
+from augmentor_linux.pi_client import ContractError
 from platform_adapters.paths import private_directory
 from platform_adapters.transport import LocalSocket
 
@@ -86,6 +88,34 @@ class LocalServiceTests(unittest.TestCase):
                         next_child = start(); ready()
                         self.assertEqual(client.call('host.describe')['pid'], next_child.pid)
                         self.assertEqual(client.call('prompts.list'), saved)
+                        token = 'a'*32
+                        reservation = {'token':token}
+                        # A real outstanding watch is accepted service work.
+                        # Preparation cannot interrupt it or let a new write in.
+                        watched = []
+                        watcher = threading.Thread(target=lambda:watched.append(client.call('prompts.watch',
+                            {'afterRevision':saved['revision'],'timeout':2})))
+                        watcher.start()
+                        deadline = time.monotonic()+5
+                        while client.call('host.maintenance.status')['active'] == 0:
+                            if time.monotonic()>deadline:self.fail('The watch did not start.')
+                            time.sleep(.01)
+                        with self.assertRaisesRegex(ContractError,'active work'):
+                            client.call('host.maintenance.prepare',reservation)
+                        watcher.join(5);self.assertEqual(watched,[saved])
+                        self.assertEqual(client.call('host.maintenance.prepare',reservation)['phase'],'prepared')
+                        with self.assertRaisesRegex(ContractError,'not started'):
+                            client.call('prompts.save',{'name':'must-not-be-saved','content':'Refused before execution'})
+                        self.assertEqual(client.call('host.maintenance.cancel',reservation)['phase'],'ready')
+                        self.assertEqual(client.call('prompts.list'),saved)
+                        client.call('host.maintenance.prepare',reservation)
+                        self.assertEqual(client.call('host.maintenance.commit',reservation)['phase'],'closing')
+                        self.assertEqual(next_child.wait(timeout=10),0)
+                        # No automatic replay: explicitly start a new fixture and
+                        # read durable state after normal, acknowledged shutdown.
+                        final_child=start();ready()
+                        self.assertEqual(client.call('host.describe')['pid'],final_child.pid)
+                        self.assertEqual(client.call('prompts.list'),saved)
                 finally:
                     for child in children:
                         if child.poll() is None:

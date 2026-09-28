@@ -23,6 +23,7 @@ from home.client import call as home_connection_call
 from platform_adapters import locks as fcntl
 from platform_adapters.paths import private_directory
 from platform_adapters.transport import ThreadingLocalServer, prepare_endpoint, cleanup_endpoint
+from lifecycle.admission import Admission, MaintenanceBusy, METHODS as MAINTENANCE_METHODS
 
 PROTOCOL='augmentor-prompts/1'
 LIMIT=1024*1024
@@ -148,7 +149,7 @@ class Library:
 
 class Handler(socketserver.StreamRequestHandler):
     def handle(self):
-        self.connection.settimeout(20);identity=None
+        self.connection.settimeout(20);identity=None;shutdown=False
         try:
             require_same_user(self.connection)
             raw=self.rfile.readline(LIMIT+1)
@@ -158,17 +159,29 @@ class Handler(socketserver.StreamRequestHandler):
             if not isinstance(identity,str) or not re.fullmatch(r'[a-zA-Z0-9_.-]{1,128}',identity):raise ValueError('Invalid request ID')
             params=request.get('params',{})
             if not isinstance(params,dict):raise ValueError('Invalid parameters')
-            result=self.server.library.call(request.get('method'),params,identity)
+            method=request.get('method')
+            if isinstance(method,str) and method in MAINTENANCE_METHODS:
+                result=self.server.admission.control(method,params)
+                shutdown=result['phase']=='closing'
+            else:
+                with self.server.admission.work():
+                    result=self.server.library.call(method,params,identity)
             response={'id':identity,'result':result}
         except Exception as error:
-            response={'id':identity,'error':{'code':'conflict' if isinstance(error,Conflict) else 'invalid','message':str(error)}}
+            response={'id':identity,'error':{'code':'maintenance' if isinstance(error,MaintenanceBusy) else 'conflict' if isinstance(error,Conflict) else 'invalid','message':str(error)}}
         raw=(json.dumps(response,ensure_ascii=False)+'\n').encode()
         if len(raw)>LIMIT:raw=(json.dumps({'id':identity,'error':{'code':'too-large','message':'This record exceeds the supported response size. View it directly in the configured service.'}})+'\n').encode()
-        try:self.wfile.write(raw)
+        try:self.wfile.write(raw);self.wfile.flush()
         except (BrokenPipeError,ConnectionResetError):pass
+        finally:
+            if shutdown:threading.Thread(target=self.server.shutdown,daemon=True).start()
 
 class Server(ThreadingLocalServer):
     daemon_threads=False  # Graceful shutdown finishes accepted requests.
+
+    def __init__(self,*args,**kwargs):
+        self.admission=Admission()
+        super().__init__(*args,**kwargs)
 
 if __name__=='__main__':
     sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'lifecycle'))

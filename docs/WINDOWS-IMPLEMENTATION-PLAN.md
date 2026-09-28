@@ -4,8 +4,10 @@
 
 Date: September 27, 2026. Status: **implementation authorized; W0/W1 active**.
 Current work and evidence: [implementation status](WINDOWS-IMPLEMENTATION-STATUS.md).
-W1 update: [stock installer busy-uninstall failure and next qualification](WINDOWS-INSTALLER-DECISION.md).
-The successful disposable update fixture does not select Velopack for production.
+W1 update: [stock installer busy-uninstall failure and replacement qualification](WINDOWS-INSTALLER-DECISION.md).
+Native feasibility selects Inno Setup/WinSparkle for implementation; full product
+lifecycle and release gates remain required. Velopack below is the historical
+first candidate, not the current packaging default.
 Source inspected: canonical application repository at `b8e36a44f6fc58c1a1a491040c81a21c17e82bb7`.
 This document defines future work and its acceptance criteria. A checkbox, proposed
 file or architecture decision is not evidence of an implemented feature.
@@ -58,7 +60,7 @@ x64-only architecture has already been chosen.
 | Application | Existing PySide6/Qt desktop, shared controllers and browser extension | Shared behavior suites on all maintained OSs |
 | Product identity | One product version and reviewed source; OS/CPU-specific artifacts | Manifest and installed readback match |
 | Windows package | Signed per-user EXE installer; bundled runtime directory | Clean-user installation without global Python/Node/DSH |
-| Installer/updater | Qualify Velopack first, in W1; record exact tested version | Install, update, cancellation, host registration and uninstall proofs |
+| Installer/updater | Inno Setup 7.1.0 and WinSparkle 0.9.4, after W1 alternative proof | Full product install/update/cancellation, host registration, rollback and uninstall proofs |
 | Runtime payload | Private CPython/PySide, Node, DSH/plugins and small native launchers | Native architecture/ABI and inventory verification |
 | Background ownership | One ordinary-user supervisor; one owned login entry | Reboot, crash recovery, disable-startup and shutdown tests |
 | Local IPC | Shared protocol with Unix transport on existing OSs and secured Windows named pipes | Cross-user rejection, bounded messages and cancellation |

@@ -89,6 +89,11 @@ Preparation now creates its random staging directory with the explicit private
 directory adapter instead. It does not weaken ownership checks or rewrite an
 existing directory's ACL. Native preparation must rerun after this correction.
 
+At `742bfb0`, [desktop run 36367999216](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36367999216)
+passes both native CPUs, including installed-anchor checks, private staging,
+repeated preparation, edited-extension preservation and the Windows chooser.
+Installer-created anchors and an actual browser connection remain open gates.
+
 Installer anchor wiring, registry views and fork lookup locations still need
 actual-browser tests; do not infer them from browser profile directories.
 Preserve the shared chooser/instruction flow and verify an actual

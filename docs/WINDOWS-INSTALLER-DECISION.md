@@ -9,6 +9,16 @@ requirement; no customer installer has been published. The private runtime,
 native launchers, shared application and Windows adapters do not depend on this
 packaging choice.
 
+**Implementation decision after native feasibility:** use Inno Setup 7.1.0 and
+WinSparkle 0.9.4 for the Windows integration. The complete bounded alternative
+probe passes both x64 and ARM64 in [run 36367881230](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36367881230),
+branch head `85cfbd7`, actual GitHub merge checkout
+`c8c01d3a00e2267b342f408ade15d7152cfc0a2e`. This replaces the rejected Velopack
+default. It does not waive full app coordination, rollback/health, signing or
+ordinary-user/interactive installer qualification. Only this selected backend
+will be wired into the customer package; the Velopack fixture is historical
+failure characterization.
+
 ## Observed upstream behavior
 
 The inspected Velopack 1.2.158 source is pinned at
@@ -40,7 +50,7 @@ would introduce a separate maintenance and qualification obligation.
 | Stock Velopack EXE | Stops package processes before non-vetoing uninstall hook | Fails normal busy-uninstall requirement |
 | Stock Velopack MSI | Hook errors do not abort; no product admission guard supplied | Not a proven fix; would need custom packaging work |
 | MSIX / App Installer | Can defer updates while in use; removal normally has force semantics, unless its caller explicitly requests deferred removal | Does not establish safe ordinary Settings removal; also requires external-browser registration and full-trust child qualification |
-| Inno Setup plus WinSparkle | Installer has veto-capable pre-install/uninstall events; updater has native x64/ARM64 binaries and a can-shutdown callback | Next bounded feasibility candidate; not selected or integrated yet |
+| Inno Setup plus WinSparkle | Native proof passes veto, lifetime admission, retry, signed-download rejection and target filtering | Selected for implementation; full product integration and release qualification pending |
 
 Microsoft documents both [deferred updates and forced default removal](https://devblogs.microsoft.com/insidemsix/msix-servicing-while-in-use/).
 The latter is why a format change alone is not the resolution.
@@ -50,6 +60,8 @@ allow preparation failure and uninstall refusal. WinSparkle's
 allows refusing installer launch while busy, and its
 [distribution](https://github.com/vslavik/winsparkle) includes ARM64.
 These are research findings, not executed Augmentor integration.
+The bounded native fixture result above adds execution evidence; it still does
+not establish that Augmentor's actual component graph drains safely.
 
 ## Required proof before selecting a replacement
 
@@ -117,3 +129,12 @@ active-marker assertion on x64, then fails redundant cleanup: `Update.exe`
 survives briefly for self-removal and a second uninstall cannot find the removed
 application. Cleanup now checks the application still exists before retrying.
 The rejected product requirement has not changed.
+
+The corrected alternative run passes all four native updater cases on both
+CPUs: matching signed bytes reach the handling callback; a bad signature does
+not; busy work returns false and never hands off the download; a feed for the
+other CPU reports no applicable update. Both reports record the same merge
+checkout above. The installer refuses while either live holder is present,
+releases admission after injected failure, and completes idle repair/update/
+removal with persistent settings unchanged. Physical installer interaction,
+full-app process coordination and failed-health rollback remain open.

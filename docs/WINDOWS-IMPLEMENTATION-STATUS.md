@@ -65,11 +65,11 @@ providers, installed artifacts and physical hardware must remain distinguishable
 | Work | Current state | Required next evidence |
 | --- | --- | --- |
 | W0 baseline | Shared baseline and native hosted evidence recorded | Current-main reconciliation and client/hardware environments |
-| W1 native runtime and installer | Native runtimes and two-version fixture pass; stock EXE busy-uninstall requirement fails source review | Replacement qualification in [installer decision](WINDOWS-INSTALLER-DECISION.md), clean-client install and publisher trust |
+| W1 native runtime and installer | Native runtimes pass; Inno/WinSparkle selected after both-CPU replacement feasibility | Full product coordination/rollback, clean-client install and publisher trust; [decision](WINDOWS-INSTALLER-DECISION.md) |
 | W2 paths, ownership, IPC, locks | Both CPUs pass kernel adapters, cross-user ACL denial and Python/Node prompt transport | Complete component ownership and lifecycle integration |
 | W3 managed DSH/model setup | Both CPUs pass assembled setup, compiled composer Send/Enter and history restart against deterministic DSH/model | Full first-run UI, ordinary-user/live-provider acceptance |
 | W4 desktop, two windows, shortcuts, tray | Both CPUs pass compiled preview zoom/drafts, native resources and source hotkey persistence | Installer startup hooks, tray/quit and physical interaction |
-| W5 chosen Chromium/Comet companion | Native registration/discovery and compiled host protocol fixtures pass both CPUs | Chooser/installation and real selected-browser conversation |
+| W5 chosen Chromium/Comet companion | Native registration/discovery/preparation/chooser and compiled host protocol fixtures pass both CPUs | Installer anchor and real selected-browser conversation |
 | W6 computer control | Pending | Consented capture/input, Stop and Windows privilege boundaries |
 | W6 voice/memory/Home/Pi | Pending | Existing feature contracts and configured-engine connectivity |
 | W6 RTX inference | Pending hardware | Native compatible backend, measured shared-memory behavior |
@@ -696,3 +696,17 @@ extension in content-addressed private data and refuses source registrations or
 edited prepared files. Installer anchor writing and actual-browser tests remain
 pending. All five local chooser tests, 16 Mac browser checks and 28 common window
 checks pass. The new real-Windows preparation fixture is queued for native CI.
+
+At `742bfb0`, both native desktop jobs pass the private extension staging fix and
+complete preparation fixture. The alternative installer run at `85cfbd7` also
+passes both CPUs, actual merge checkout `c8c01d3a00e2267b342f408ade15d7152cfc0a2e`.
+Inno/WinSparkle are now the selected implementation backend, with full product,
+signing/rollback and client-machine gates retained in the installer decision.
+
+The shared prompt companion now has reversible maintenance admission and normal
+acknowledged shutdown. Accepted requests refuse preparation; prepared components
+reject new requests before execution. Four concurrency/expiry tests, a real
+Linux prompt-service long-poll/refusal/cancel/shutdown/restart proof and 19 shared
+prompt checks pass. Native RPC execution is pending. This does not yet coordinate
+memory processing, DSH, voice, browser, desktops or their automatic restarts;
+those remain required before any global Quit/update can use it.

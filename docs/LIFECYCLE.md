@@ -166,3 +166,37 @@ one user-local build and a managed DSH service. Stop desktop/mobile surfaces
 before intentionally stopping DSH for maintenance, because automatic reconnect
 starts its registered runtime. `install-desktop-startup.py` backs up launchers and
 records the selected deployment; do not independently edit login and menu paths.
+
+## Shared component admission — Windows implementation work
+
+`services/lifecycle/admission.py` provides a reversible, process-local preparation
+gate. The prompt companion now adopts it on all OSs. It serializes the decision
+to accept a request with maintenance preparation: an existing request makes
+preparation refuse; a successful preparation blocks new requests before their
+execution. This replaces neither installation leases nor the global coordinator.
+
+The private authenticated prompt endpoint accepts `host.maintenance.status`,
+`prepare`, `renew`, `cancel` and `commit` using the existing prompt envelope.
+Replies identify `augmentor-component-maintenance/1`. Status takes no fields;
+the other methods require a caller-generated 32–64-character lowercase hex
+`token`. It is an operation reservation within the same-user boundary, not a new
+authentication system. Another token cannot cancel or commit a reservation.
+
+Preparation lasts 30 seconds; repeated prepare does not extend it. Explicit
+renewal extends it, cancellation restores admission, and an abandoned preparation
+expires. Commit keeps admission closed permanently in that process, acknowledges
+the request and requests normal server shutdown. The non-daemon request handlers
+finish and the process exits without `TerminateProcess`. Already committed data
+remains; refused work is not replayed.
+
+Tests cover real concurrent admission/preparation, expiry/renewal, a lost owner,
+wrong tokens and actual prompt RPC. A live long-poll request prevents preparation;
+a prepared service rejects a new save, cancellation reopens it, and committed
+shutdown exits normally before an explicit restart restores prior data. Local
+Linux execution passes. Native execution of the new RPC proof is pending.
+
+The automatic-memory worker/gateway, DSH, voice, browser and desktop still require
+their own participation. The global owner must stop automatic restarts, reserve
+all components, cancel reservations on preparation failure, and acquire the
+exclusive installation lease after they drain. No installer may infer that the
+whole app is idle from this one component's response or terminate active Jobs.
