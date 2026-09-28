@@ -350,3 +350,9 @@ real Setup exit, compares every installed payload file to the known-built fixtur
 and opens/closes installed Qt before completing and archiving the durable update
 record. This is local health for identical-build qualification, not live provider,
 Windows speech engine or production recovery evidence. Native execution is pending.
+
+At `3c6d78b` the actual x64 full-payload installer compiles and installs, then the
+qualification stops because Inno's default AppVerName adds the version to the
+registered display name. The template now explicitly uses `Augmentor Agent`;
+DisplayVersion continues to identify the release separately. Repair, coordinated
+apply and removal still await execution after this correction.

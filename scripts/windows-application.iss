@@ -3,6 +3,7 @@
 [Setup]
 AppId={#ApplicationId}
 AppName=Augmentor Agent
+AppVerName=Augmentor Agent
 AppVersion={#ProductVersion}
 AppPublisher=Augmentor
 AppPublisherURL=https://augmentoragent.com

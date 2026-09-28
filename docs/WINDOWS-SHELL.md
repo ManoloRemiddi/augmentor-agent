@@ -363,3 +363,11 @@ form/Pi checks with exit zero in
 Its actual Chromium reservation proof also passes. This supersedes the earlier
 pending hosted check for the adopted-thread shutdown correction; the surrounding
 package jobs have their own workflow results.
+
+Full `3c6d78b` x64 subsequently times out on the first managed-chat read-only
+inspection after eight seconds; the separate compiled preview/lease checks pass.
+The proof now records readiness timing and may repeat only that read-only inspect
+within its overall deadline. Explicit disposable UI-test launches retain one
+12-second Python stack sample for diagnosis. A sample is not itself a failure;
+no customer launch tracing, user data or action replay is introduced. Native
+requalification and diagnosis remain pending.

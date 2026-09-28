@@ -57,16 +57,25 @@ def desktop_chat(root, work, out):
         if not response.get('ok'): raise ValueError(response.get('error', 'Native UI command failed.'))
         return response['result']
     def until(check, child):
+        started=time.monotonic()
         deadline = time.monotonic()+45
-        last = None
+        last = None;read_timeouts=0
         while time.monotonic()<deadline:
             if child.poll() is not None: raise AssertionError('The native chat process exited early.')
             try:
                 last = ui('inspect')
-                if check(last): return last
+                if check(last):
+                    result.setdefault('readiness',[]).append({'seconds':round(time.monotonic()-started,3),
+                        'readOnlyTimeouts':read_timeouts})
+                    return last
             except FileNotFoundError: pass
+            except TimeoutError:
+                # Only inspect is repeated. A slow first Qt event loop is not
+                # a reason to replay Send/Enter or any model/tool operation.
+                read_timeouts+=1
             time.sleep(.2)
-        raise AssertionError('The native chat window did not become ready: '+json.dumps(last))
+        raise AssertionError('The native chat window did not become ready: '+json.dumps({
+            'last':last,'readOnlyTimeouts':read_timeouts}))
     session = None
     turns = []
     try:

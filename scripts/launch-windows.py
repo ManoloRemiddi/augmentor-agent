@@ -107,6 +107,13 @@ def main():
     stream = os.fdopen(descriptor(log, writable=True, create=True), 'a', encoding='utf-8', buffering=1)
     sys.stdout = sys.stderr = stream
     if sys.stdin is None: sys.stdin = open(os.devnull, encoding='utf-8')
+    if environment is not None and '--ui-test-control' in args:
+        # One bounded sample in explicitly disposable qualification only. It
+        # survives a stuck first Qt response in the existing private fixture
+        # log; it is neither a customer setting nor evidence of a failed start.
+        import faulthandler
+        faulthandler.enable(file=stream)
+        faulthandler.dump_traceback_later(12, file=stream)
     import ctypes
     identity = ctypes.WinDLL('shell32', use_last_error=True).SetCurrentProcessExplicitAppUserModelID
     identity.argtypes = [ctypes.c_wchar_p]; identity.restype = ctypes.c_long
@@ -116,7 +123,11 @@ def main():
         ensure(ROOT)
     if background: return
     sys.argv = ['augmentor-desktop', *args]
-    runpy.run_module('augmentor_linux', run_name='__main__')
+    try:
+        runpy.run_module('augmentor_linux', run_name='__main__')
+    finally:
+        if environment is not None and '--ui-test-control' in args:
+            faulthandler.cancel_dump_traceback_later()
 
 
 if __name__ == '__main__':

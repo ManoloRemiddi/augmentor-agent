@@ -2,6 +2,17 @@
 
 # Windows implementation evidence
 
+Full `3c6d78b` x64 exposes two new qualification issues: the managed chat's
+first read-only UI inspection times out after eight seconds, and the real Inno
+package installs successfully but registers Inno's default versioned display name.
+The installer now sets the stable AppVerName explicitly. Qualification records
+read-only polling timeouts within its existing overall deadline and takes one
+private Python stack sample in disposable UI-test launches; no Send/Enter/model
+operation is retried. These corrections await native execution. Compiled two-window
+preview and the native launcher lease checks passed in that same failed job.
+The full installed repair/drain/removal test has not run past its initial name
+assertion. Do not treat `3c6d78b` Windows qualification as passing.
+
 All `3c6d78b` Linux source/installed-package/browser jobs, macOS feasibility,
 fast native Windows and Inno handoff fixtures pass. The actual full Windows
 application installer integration is still running and is not yet qualified.
