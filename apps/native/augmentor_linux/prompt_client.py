@@ -29,9 +29,13 @@ class PromptClient:
                 if not service.is_file():raise ContractError('Shared prompt service is not installed.')
                 # This client is also used outside the app launcher. Never rely
                 # on inherited environment flags to preserve a sealed bundle.
-                options={'creationflags': subprocess.CREATE_NO_WINDOW} if sys.platform=='win32' else {'start_new_session':True}
-                child=subprocess.Popen([sys.executable,'-Xutf8','-B',str(service)],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,**options)
-                threading.Thread(target=child.wait,daemon=True).start()
+                if sys.platform=='win32':
+                    from windows_supervisor import ensure_companion
+                    ensure_companion('memory' if automatic else 'prompts')
+                else:
+                    child=subprocess.Popen([sys.executable,'-Xutf8','-B',str(service)],stdin=subprocess.DEVNULL,
+                        stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
+                    threading.Thread(target=child.wait,daemon=True).start()
                 deadline=time.monotonic()+5
                 while True:
                     try:connection.connect(endpoint);break

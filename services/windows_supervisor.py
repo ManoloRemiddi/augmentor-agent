@@ -77,6 +77,13 @@ def ensure(root=ROOT):
     raise ValueError('The Augmentor background owner could not start. Private diagnostics were preserved.')
 
 
+def ensure_companion(name, root=ROOT):
+    if sys.platform != 'win32' or name not in COMPANIONS:
+        raise ValueError('Unsupported Windows companion startup.')
+    ensure(root)
+    return request('start-'+name, root=root)
+
+
 class ManagedAgent:
     label = LABEL
     def __init__(self, root, state):
@@ -268,4 +275,8 @@ def run(root=ROOT):
 
 if __name__ == '__main__':
     if sys.platform != 'win32': raise SystemExit('The Windows supervisor requires Windows.')
-    run()
+    if len(sys.argv) == 3 and sys.argv[1] == '--ensure-companion':
+        try: ensure_companion(sys.argv[2])
+        except (OSError, ValueError) as error: raise SystemExit(str(error))
+    elif len(sys.argv) == 1: run()
+    else: raise SystemExit('Unsupported background owner arguments.')

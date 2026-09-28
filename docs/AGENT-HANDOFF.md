@@ -54,6 +54,15 @@ capture now retains the actual zoom response. The next source integrates the
 two native shortcuts into the same supervisor's Qt event loop; see
 [Windows shell ownership](WINDOWS-SHELL.md). Native hotkey/owner tests are pending.
 
+Later native evidence supersedes those pending entries: both CPUs pass native
+shortcut persistence, and at `840127f` the fixed prompt/memory owner contains both
+real services after a deliberate fault. At `0a1d086`, compiled x64 zoom and native
+resources also pass; ARM64 full runtime remains in progress. Current source routes
+Windows Python/Node companion startup through that owner. The compiled actual
+DSH composer/reopen proof, client ownership, browser integration, graceful global
+Quit and production updating still need their remaining qualification. Consult
+the detailed ledger for exact runs; source progress is not an installed release.
+
 ## September 27 Windows implementation plan — historical planning checkpoint
 
 The owner requested a detailed plan before coding. Read the

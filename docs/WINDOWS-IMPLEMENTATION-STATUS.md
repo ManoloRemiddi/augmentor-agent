@@ -611,3 +611,11 @@ Its new native test queries the actual services and verifies containment after
 deliberately killing only its disposable supervisor. Client startup adoption and
 native execution of this addition are pending; graceful Quit/update admission
 control is explicitly not implemented by a Job kill.
+
+At `840127f`, [desktop run 36364832529](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36364832529)
+passes on both CPUs, including real prompt/memory identity, repeat startup and
+kernel-observed process exit after an isolated owner fault. The next source adopts
+that backend in both Python and Node prompt/memory clients. Unix startup behavior
+is retained. Local TypeScript check/build and the real Unix shared-service and
+sealed-bundle startup tests pass; native client-owned save/crash/restart execution
+remains pending. Linux/shared and macOS workflows also pass at `ade5be0`.

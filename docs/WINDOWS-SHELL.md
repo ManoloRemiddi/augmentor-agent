@@ -87,11 +87,17 @@ Status distinguishes the Job helper PID from the service PID. Logs remain in the
 private supervisor directory. A supervisor crash closes its Jobs and contains
 their descendants. This is fault containment, not graceful product Quit.
 
-The new native test queries both actual services, checks repeat-start identity,
+The native test queries both actual services, checks repeat-start identity,
 refuses an empty-owner exit while they run and observes their kernel process
-handles after a deliberate supervisor fault. Execution remains pending for this
-addition. Clients still have their preceding startup path until that ownership
-backend is qualified and adopted. Service quiescence and accepted-request draining
+handles after a deliberate supervisor fault. This passes on both native CPUs at
+`840127f`. Python and Node clients now request fixed startup operations through
+that owner only when their service endpoint is proven absent. Node uses a bounded
+private-Python helper; it never starts the service daemon itself on Windows.
+Timeouts or lost responses after a connection do not replay the original request.
+Already-running service endpoints retain their existing transport behavior.
+The companion-client test adds real Python cold startup, Node memory startup,
+prompt save/restart and continued memory-process identity. Native execution of
+that client adoption remains pending. Service quiescence and accepted-request draining
 remain required for ordinary shutdown and updates.
 
 ## Remaining shell gates
