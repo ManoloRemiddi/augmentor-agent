@@ -332,3 +332,9 @@ new native assertions await execution. Six portable reservation and two graph
 failure tests pass, along with existing admission/owner policy checks. This
 context intentionally exposes no commit/apply operation. See the shared
 [lifecycle contract](LIFECYCLE.md#coordinated-reversible-preparation).
+
+
+Installer processes use a separate [independent process adapter](WINDOWS-INSTALLER-DECISION.md#independent-installer-process-ownership).
+The ordinary service `OwnedProcess` remains kill-on-close for fault containment.
+Its semantics must not be reused for an installer that must outlive Augmentor.
+New installer Job/byte-binding native qualification is pending.

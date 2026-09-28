@@ -97,6 +97,19 @@ assembled desktop/DSH graph assertions are added and await hosted execution.
 This is preparation/cancellation only: no product commit, installer apply,
 voice provisioning, rollback or release gate is waived.
 
+At `f08c4f0`, [full native runtime](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36380441902)
+now passes both CPUs, including managed DSH's observed HTTP participant and
+normal shutdown/history restart. At `2ce8d32`, [both fast Windows jobs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36381768755)
+pass real prompt/memory group preparation, renewal, startup exclusion and
+cancellation. The assembled desktop/DSH graph additions await the full run.
+
+Current source adds a non-killing installer observation Job, suspended assignment
+and read-only artifact binding to the verified digest. The real Inno handoff
+fixture now launches through this adapter and verifies extracted-Setup ownership,
+wrong digest/unrelated PID refusal and retained gate across normal exit/crash.
+Syntax checks pass; native execution is pending. This is not yet authenticated
+installer IPC or a complete update transaction.
+
 ## Baseline and environments (W0)
 
 Implementation branch `feat/windows` starts from reviewed `main` `b8e36a4` plus

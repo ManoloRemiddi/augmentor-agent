@@ -159,3 +159,30 @@ acknowledgment paths are **not a production handoff protocol**. Customer integra
 still requires authenticated coordinator/installer identity, verified artifact
 binding, complete app drain, durable transaction/health recovery and rollback.
 No customer installer or updater callback is enabled by this fixture.
+
+
+## Independent installer process ownership
+
+The extracted-Setup transfer fixture at `0ca8348` passes both CPUs in
+[36380756992](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36380756992).
+The next source step adds `windows_installer_process.py`: it holds a protected
+private artifact open without write/delete sharing, compares its SHA-256 against
+the caller's previously verified digest, creates it suspended and assigns an
+unnamed Job before the first instruction executes. This Job has no kill-on-close
+limit. The installer requests breakaway from any enclosing app Job; refusal
+aborts before execution rather than silently accepting a crash-coupled updater.
+Closing the observation or losing the coordinator cannot terminate the installer.
+
+The retained Job permits same-user live descendant observations, including
+Inno's extracted Setup process, while refusing unrelated PIDs. Production must
+obtain the PID from authenticated IPC and the digest from release verification;
+a file containing a PID and a self-computed download hash are not those trust
+boundaries. The current fixture explicitly uses test-only file acknowledgments.
+It now checks wrong-digest refusal, artifact write exclusion, actual Setup Job
+membership, unrelated-PID refusal and exit/crash survival through the new adapter.
+Native execution of this addition is pending. Authenticated handoff, signing,
+complete graph commit, durable recovery and rollback remain open.
+
+The launch ordering follows Microsoft's [suspended process creation flags](https://learn.microsoft.com/en-us/windows/win32/procthread/process-creation-flags),
+[assignment before running a process in a Job](https://learn.microsoft.com/en-us/windows/win32/api/jobapi2/nf-jobapi2-assignprocesstojobobject)
+and [Job lifetime and breakaway rules](https://learn.microsoft.com/en-us/windows/win32/procthread/job-objects).

@@ -171,15 +171,31 @@ def prove_handoff(installer,state,out):
     """Actual Inno loader + Setup process, not just a Python recipient."""
     import win32api,win32con,win32event,win32process
     from lifecycle.windows_startup import Startup
+    from lifecycle.windows_installer_process import InstallerProcess
+    from platform_adapters.windows_identity import private_file_descriptor
+    # The fixture supplies the digest. Production must obtain it from the
+    # signed release-verification boundary; hashing a download is not trust.
+    staged=state/'installer.exe'
+    content=installer.read_bytes();digest=hashlib.sha256(content).hexdigest()
+    with os.fdopen(private_file_descriptor(staged,writable=True,exclusive=True),'wb') as stream:stream.write(content)
+    try:
+        with InstallerProcess(staged,'0'*64,[]):pass
+    except ValueError as error:assert 'bytes changed' in str(error)
+    else:raise AssertionError('An installer with a mismatched digest was launched.')
     for crash in (False,True):
         for name in ('ready.json','coordinator.json','continue','parent-release'):
             (state/name).unlink(missing_ok=True)
         parent=subprocess.Popen([sys.executable,'-I','-Xutf8','-B',str(ROOT/'scripts/windows-inno-handoff-proof.py'),
-            '--installer',str(installer),'--state',str(state),'--log',str(out/('handoff-crash.log' if crash else 'handoff-exit.log'))],
+            '--installer',str(staged),'--sha256',digest,'--state',str(state),'--log',str(out/('handoff-crash.log' if crash else 'handoff-exit.log'))],
             stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
         setup_process=None;loader=None
         try:
             info=wait_for(state/'coordinator.json');ready=wait_for(state/'ready.json')
+            assert info['actualSetupInInstallerJob'] and info['unrelatedPidRefused'] and info['setupPid']==ready['pid']
+            try:
+                with staged.open('r+b'):pass
+            except OSError as error:assert error.winerror==32,error
+            else:raise AssertionError('Verified installer bytes remained writable during launch.')
             loader=win32api.OpenProcess(win32con.SYNCHRONIZE|win32con.PROCESS_QUERY_LIMITED_INFORMATION,False,info['installerPid'])
             setup_process=win32api.OpenProcess(win32con.SYNCHRONIZE|win32con.PROCESS_QUERY_INFORMATION|
                 win32con.PROCESS_VM_READ,False,ready['pid'])
@@ -209,6 +225,8 @@ def prove_handoff(installer,state,out):
     return {'actualExtractedSetupOwnsGate':True,'parentNormalExit':True,'parentCrash':True,
         'newStartupAndSecondWriterRefused':True,'completedRepairReleasesGate':True,
         'invalidTransferRefusedBeforeVersionChange':True,
+        'verifiedDigestBoundBeforeLaunch':True,'artifactWriteExcludedWhileObserved':True,
+        'actualSetupJobObserved':True,'unrelatedPidRefused':True,'normalCloseDoesNotTerminateInstaller':True,
         'productionHandoffAuthentication':False}
 
 

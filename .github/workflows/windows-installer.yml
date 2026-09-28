@@ -8,6 +8,7 @@ on:
       - 'scripts/windows-inno-*'
       - 'scripts/build-windows-launcher.py'
       - 'services/platform/windows-launcher.c'
+      - 'services/lifecycle/windows_installer_process.py'
       - 'release/windows/installer-candidates.json'
 permissions:
   contents: read

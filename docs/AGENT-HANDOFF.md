@@ -22,6 +22,13 @@ ARM64 is finishing. Continue from the [evidence ledger](WINDOWS-IMPLEMENTATION-S
 with native graph qualification, browser/voice participation and authenticated
 installer commit/apply/recovery. No customer release is complete.
 
+Subsequently, full `f08c4f0` runtime passes both CPUs, and `2ce8d32` passes both
+fast native jobs with actual companion graph renewal/cancellation. Current source
+adds [independent installer process ownership](WINDOWS-INSTALLER-DECISION.md#independent-installer-process-ownership)
+and integrates it into the actual Inno handoff fixture. New native execution and
+assembled desktop/DSH graph qualification remain pending. Continue authenticated
+handoff and global commit/apply while preserving all remaining feature gates.
+
 Earlier checkpoint notes below are historical; later evidence supersedes their
 pending statuses without expanding physical/customer-installation claims.
 

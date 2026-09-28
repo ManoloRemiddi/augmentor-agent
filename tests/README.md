@@ -227,3 +227,12 @@ before restoring still-live services. `windows-managed-setup-proof.py` adds the
 compiled desktop/DSH/companion group, restored transcript, and refusal while an
 actual deterministic-model turn remains active. Those new native assertions
 await hosted execution; they do not qualify voice, browser commit or an update.
+
+
+The Inno handoff fixture now launches through the independent installer adapter.
+Its bytes are copied into an explicit private fixture file; the test's digest is
+not a publisher-signature claim. Wrong-digest launch must refuse. While the real
+extracted Setup waits, the coordinator verifies its Job membership and refuses
+its own unrelated PID; the parent verifies the artifact cannot be opened for
+writing. Both normal close and deliberate coordinator crash must preserve Setup
+and startup exclusion through successful repair. New native execution is pending.
