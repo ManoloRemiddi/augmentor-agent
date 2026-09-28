@@ -3,7 +3,8 @@
 """Actual isolated Windows DSH setup/chat/restart using a deterministic model.
 
 Never selects an installed user's profile, modifies login entries, or uses a real
-provider secret. This does not claim live-provider or interactive desktop proof.
+provider secret. Native composer checks use a deterministic model, not a live
+provider or physical keyboard/mouse.
 """
 import argparse
 import http.server
@@ -18,6 +19,80 @@ import tempfile
 import threading
 import time
 import uuid
+
+
+def desktop_chat(root, work, out):
+    """Actual native GUI, real DSH, Send/Enter and restored rendered history."""
+    from platform_adapters.processes import OwnedProcess
+    from platform_adapters.transport import LocalSocket
+    from augmentor_linux.instances import ipc_basename
+    import win32api, win32con, win32job, win32process
+    result = {'passed': False, 'scope': 'Native Augmentor.exe and widget input against real DSH with a deterministic model; no physical-input or live-provider claim.'}
+    instance = 'windows-chat-proof'
+    endpoint = work/'run'/(ipc_basename(instance)+'.sock')
+    def exchange(command):
+        with LocalSocket() as connection:
+            connection.settimeout(8); connection.connect(str(endpoint)); connection.sendall(command.encode()+b'\n')
+            with connection.makefile('rb') as stream: raw = stream.readline(1024*1024+1)
+        if len(raw)>1024*1024 or not raw.endswith(b'\n'): raise ValueError('The native UI response was lost; no action was replayed.')
+        return json.loads(raw)
+    def ui(action, **values):
+        response = exchange('ui-test:'+json.dumps({'action': action, **values}))
+        if not response.get('ok'): raise ValueError(response.get('error', 'Native UI command failed.'))
+        return response['result']
+    def until(check, child):
+        deadline = time.monotonic()+45
+        last = None
+        while time.monotonic()<deadline:
+            if child.poll() is not None: raise AssertionError('The native chat process exited early.')
+            try:
+                last = ui('inspect')
+                if check(last): return last
+            except FileNotFoundError: pass
+            time.sleep(.2)
+        raise AssertionError('The native chat window did not become ready: '+json.dumps(last))
+    session = None
+    turns = []
+    try:
+        for index, submission in enumerate(('button','enter')):
+            env = {**os.environ, 'QT_QPA_PLATFORM': 'windows', 'QSG_RHI_PREFER_SOFTWARE_RENDERER': '1'}
+            # Keep only this disposable GUI and any fixture-started children in
+            # a test-owned Job. This is not proof of normal product Quit ownership.
+            child = OwnedProcess([str(root/'Augmentor.exe'), '--qualification-root', str(work),
+                '--instance', instance, '--harness', 'dsh', '--ui-test-control'], env=env,
+                stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            try:
+                before = until(lambda value: value['online'] and value['visible'] and value['model'] and not value['dialogs'], child)
+                assert before['preset'] == 'augmentor-linux-product', before
+                assert before['model']['provider'] == 'augmentor-model' and before['model']['model'] == 'fixture', before
+                assert not before['draft'] and not before['running'], before
+                if index:
+                    assert before['session'] == session and 'WINDOWS_UI_BUTTON' in before['transcript'], before
+                else: assert before['session'] is None, 'Do not put proof text into another conversation.'
+                process = win32api.OpenProcess(win32con.PROCESS_QUERY_INFORMATION | win32con.PROCESS_VM_READ, False, before['pid'])
+                try:
+                    assert win32job.IsProcessInJob(process, child.job), 'An unowned process intercepted the native fixture.'
+                    assert Path(win32process.GetModuleFileNameEx(process, 0)).resolve() == root/'Augmentor.exe'
+                finally: process.Close()
+                status = exchange('maintenance.status'); assert status['buildRoot'] == str(root), status
+                marker = 'WINDOWS_UI_BUTTON' if not index else 'WINDOWS_UI_ENTER'
+                prompt = 'Reply to '+marker+'. Do not use tools.'
+                ui('send', text=prompt, via=submission)
+                after = until(lambda value: not value['running'] and value['session'] and
+                    value['transcript'].count('Windows managed setup verified.') >= index+1 and
+                    prompt in value['transcript'], child)
+                assert after['transcript'].count(prompt) == 1 and not after['draft'], after
+                session = after['session']
+                ui('capture', path=str((out/('native-chat-'+submission+'.png')).resolve()))
+                turns.append({'submission': submission, 'pid': after['pid'], 'session': session, 'online': after['online']})
+                closed = exchange('maintenance.close'); assert closed['accepted'], closed
+                assert child.wait(timeout=15) == 0, 'The idle desktop did not close normally.'
+            finally:
+                child.terminate(); child.wait(timeout=10)
+        result.update(passed=True, turns=turns, historyRestored=True, noDuplicateSubmission=True)
+        return result
+    finally:
+        (out/'native-chat.json').write_text(json.dumps(result, indent=2)+'\n', encoding='utf-8')
 
 
 def main():
@@ -113,6 +188,7 @@ def main():
             'content': [{'type': 'text', 'text': 'Reply to the isolated Windows setup fixture.'}]})
         wait_for(lambda: len(calls)>before and not next(row for row in adapter.call('session.list')['items'] if row['sessionId']==session)['running'])
         assert 'Windows managed setup verified.' in json.dumps(adapter.call('session.history', {'sessionId': session}))
+        report['nativeDesktop'] = desktop_chat(root, work, args.out)
         # This is the actual DSH writer, not two copies of our adapter. While
         # its model request is active, repair must fail to acquire its lease.
         from dsh.session_lease import session_write_lease
@@ -146,7 +222,8 @@ def main():
                       selectedRuntimeProtected=True, providerRequests=len(calls))
     except BaseException:
         report['fixtureDiagnostics'] = {}
-        for path in (state/'setup-dsh.log', state/'runtime.log', state/'startup-check.json', owner.owner_directory()/'supervisor.log'):
+        for path in (state/'setup-dsh.log', state/'runtime.log', state/'startup-check.json', owner.owner_directory()/'supervisor.log',
+                     *list((work/'state/logs').glob('desktop.*.log'))):
             if path.is_file():
                 excerpt = path.read_text(encoding='utf-8', errors='replace')[-12000:]
                 excerpt = re.sub(r'token=[A-Za-z0-9_-]+', 'token=[redacted]', excerpt)

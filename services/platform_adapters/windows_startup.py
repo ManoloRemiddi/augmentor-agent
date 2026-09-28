@@ -19,7 +19,7 @@ def command(executable):
     # Keep the installer's stable spelling (possibly current/); resolving a
     # version junction here would leave a login entry pinned to an old version.
     value = subprocess.list2cmdline([str(path), '--background'])
-    if len(value) > 260: raise ValueError('The installation path is too long for Windows login startup.')
+    if len(value.encode('utf-16-le')) // 2 > 260: raise ValueError('The installation path is too long for Windows login startup.')
     return value
 
 

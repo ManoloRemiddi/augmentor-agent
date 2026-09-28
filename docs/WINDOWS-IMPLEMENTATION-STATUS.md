@@ -589,3 +589,12 @@ launches. Tests exercise a disposable HKCU key, not the real startup key; native
 execution, installer wiring and actual login acceptance remain pending. Cold
 Windows shortcut launch also names the target window explicitly so an inherited
 secondary-window environment cannot change the first shortcut's destination.
+
+The local Python regression suite through `0a1d086` passes 587 tests with 20
+platform/environment skips. The next native runtime fixture launches compiled
+`Augmentor.exe` against its already-provisioned isolated DSH/model, types through
+Send, closes/reopens the same named window, submits with Enter and checks rendered
+history and duplicate prevention. It verifies the GUI's process image and test
+Job membership, retains captures and adds private desktop logs to failure reports.
+The Job is fixture cleanup for that GUI and its children; it does not qualify
+normal product-wide Quit. This new native chat sequence is not yet executed.

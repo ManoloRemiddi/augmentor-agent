@@ -99,3 +99,10 @@ The fast Windows desktop workflow runs these on x64 and ARM64. The full runtime
 workflow separately builds `Augmentor.exe` and invokes `windows-window-proof.py
 --launcher ...` to cover embedded Qt plugins and the shared Appearance control.
 Keep source-preview results separate from compiled and installed artifacts.
+
+`windows-managed-setup-proof.py` additionally launches the compiled GUI against
+the actual isolated DSH and deterministic model. It uses the shared opt-in UI
+commands for Send/Enter, verifies the native process image, closes/reopens the
+same named chat and checks rendered history without duplicate submission. Its
+test-owned Job bounds fixture cleanup; this is not normal product-wide Quit,
+physical keyboard, external provider, browser or audio evidence.
