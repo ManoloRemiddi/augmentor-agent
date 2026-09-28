@@ -7,6 +7,7 @@ on:
       - '.github/workflows/windows-desktop.yml'
       - 'apps/native/**'
       - 'services/platform_adapters/**'
+      - 'services/windows_supervisor.py'
       - 'scripts/windows-window-proof.py'
       - 'scripts/windows-desktop-proof.py'
       - 'scripts/bootstrap-windows.py'
@@ -64,7 +65,12 @@ jobs:
         env:
           QT_QPA_PLATFORM: windows
           QSG_RHI_PREFER_SOFTWARE_RENDERER: '1'
+          PYTHONPATH: apps/native
         run: |
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_shortcuts.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_supervisor.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B scripts/windows-desktop-proof.py --out outputs/evidence
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B scripts/windows-window-proof.py --out outputs/evidence

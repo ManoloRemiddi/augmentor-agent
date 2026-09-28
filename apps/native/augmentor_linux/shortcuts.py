@@ -35,6 +35,9 @@ def target(instance=None):
 
 
 def current_keys(instance=None):
+    if sys.platform=='win32':
+        from .windows_shortcuts import current_keys as read
+        return read(instance or current_name())
     if sys.platform=='darwin':
         from .macos_shortcuts import current_keys as read
         return read(instance or current_name())
@@ -67,6 +70,9 @@ def write_atomic(path,text):
 
 
 def save_shortcut(sequence,instance=None):
+    if sys.platform=='win32':
+        from .windows_shortcuts import save_shortcut as save
+        return save(sequence,instance or current_name())
     if sys.platform=='darwin':
         from .macos_shortcuts import save_shortcut as save
         return save(sequence,instance or current_name())

@@ -47,6 +47,13 @@ The detailed ledger distinguishes the GitHub merge checkout from branch heads.
 The next candidate adds the embedded `Augmentor.exe` entrypoint and direct binary
 window tests; it is not yet a complete installer or public Windows build.
 
+The full `e9467ff` runtime run subsequently passed on ARM64 as well. At `6cac5e5`,
+x64 assembly, real DSH and cross-user kernel ACL probes pass, but the compiled
+desktop preview fails its zoom assertion after launching both windows. Diagnostic
+capture now retains the actual zoom response. The next source integrates the
+two native shortcuts into the same supervisor's Qt event loop; see
+[Windows shell ownership](WINDOWS-SHELL.md). Native hotkey/owner tests are pending.
+
 ## September 27 Windows implementation plan — historical planning checkpoint
 
 The owner requested a detailed plan before coding. Read the

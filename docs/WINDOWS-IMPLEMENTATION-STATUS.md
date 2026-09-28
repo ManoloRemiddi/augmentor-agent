@@ -516,3 +516,30 @@ in desktop process; the latter remains a broader multi-user acceptance check.
 Native results are pending. References:
 [LogonUserW](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-logonuserw)
 and [NetUserAdd](https://learn.microsoft.com/en-us/windows/win32/api/lmaccess/nf-lmaccess-netuseradd).
+
+## Windows shortcut owner and compiled-desktop qualification
+
+The complete `e9467ff` [runtime run 36361250959](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36361250959)
+now passes on **both** native CPUs, superseding the ARM64-pending entry above.
+At `6cac5e5`, [run 36362155338](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36362155338)
+passes x64 native compilation, DSH conversation/restart, cross-user file/pipe
+denial and installer fixtures. The compiled `Augmentor.exe` starts both preview
+windows, but its zoom assertion fails; the older proof discarded the actual
+response. The next proof retains initial state and the complete zoom result.
+This is an unresolved packaged-desktop gate, not a successful binary launch proof.
+The independent source desktop, Mac artifact and Linux/shared validation workflows
+pass at `6cac5e5`; ARM64 full-runtime execution remains ongoing at this checkpoint.
+
+The next source adds the [Windows shortcut owner](WINDOWS-SHELL.md). Two native
+registrations live in the existing supervisor's Qt thread, and the shared Settings
+surface routes Windows reads/saves to that owner. Registration and private-file
+save rollback preserve the old choice on failure. The common activation helper
+uses Windows authenticated pipes/native cold launch and retains Linux/Mac behavior.
+The source preview proof also verifies independent hide/show activation. Local
+mapping, Qt dispatch and all 14 shared shortcut checks pass; native hotkey and
+supervisor integration runs remain pending. No installed personal app, Windows
+customer package or public download changed.
+
+The complete local Python suite after this addition passes 584 tests with 19
+explicit platform/environment skips. Windows registration itself remains a native
+CI gate; the skipped cases are not counted as Windows behavior evidence.

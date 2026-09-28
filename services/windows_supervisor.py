@@ -32,12 +32,12 @@ def managed_directory():
     return Path(os.environ['XDG_DATA_HOME'])/'augmentor/managed-dsh'
 
 
-def request(action, *, root=ROOT, owner=None):
+def request(action, *, root=ROOT, owner=None, **fields):
     owner = owner or owner_directory()
     with LocalSocket() as connection:
         connection.settimeout(15)
         connection.connect(str(owner/'control.sock'))
-        connection.sendall((json.dumps({'action': action})+'\n').encode())
+        connection.sendall((json.dumps({**fields, 'action': action})+'\n').encode())
         with connection.makefile('rb') as stream:
             raw = stream.readline(65537)
     if len(raw) > 65536 or not raw.endswith(b'\n'):
@@ -101,8 +101,9 @@ class ManagedAgent:
 
 
 class Supervisor:
-    def __init__(self, root=ROOT):
+    def __init__(self, root=ROOT, shell=None):
         self.root = root
+        self.shell = shell
         self.child = None
         self.exit_code = None
         self.lock = threading.RLock()
@@ -148,6 +149,10 @@ class Supervisor:
             self.child = None
 
     def dispatch(self, message):
+        if message.get('action') in ('shortcut-status', 'shortcut-save'):
+            if self.shell is None: raise ValueError('The Windows shortcut owner is unavailable.')
+            return self.shell.request(message)
+        if set(message) != {'action'}: raise ValueError('Unsupported background request fields.')
         with self.lock:
             action = message.get('action')
             if action == 'start-dsh': self.start_dsh()
@@ -174,7 +179,12 @@ def run(root=ROOT):
         except BlockingIOError: return  # A competing startup already owns it.
         from lifecycle.lease import hold
         hold('runtime')
-        supervisor = Supervisor(root)
+        sys.path.insert(0, str(root/'apps/native'))
+        from PySide6.QtCore import QCoreApplication, QTimer
+        from augmentor_linux.windows_shell import Shell
+        app = QCoreApplication([])
+        shell = Shell(); shell.shortcuts.restore()
+        supervisor = Supervisor(root, shell=shell)
         class Handler(socketserver.StreamRequestHandler):
             def handle(self):
                 require_same_user(self.request)
@@ -195,9 +205,13 @@ def run(root=ROOT):
             server.daemon_threads = True
             worker = threading.Thread(target=server.serve_forever, daemon=True); worker.start()
             try:
-                while not supervisor.shutdown.wait(.5):
+                def tick():
                     with supervisor.lock: supervisor.status()
+                    if supervisor.shutdown.is_set(): app.quit()
+                timer = QTimer(); timer.timeout.connect(tick); timer.start(200)
+                app.exec()
             finally:
+                timer.stop(); shell.close()
                 server.shutdown(); worker.join(timeout=5)
                 with supervisor.lock: supervisor.stop_child()
     finally:

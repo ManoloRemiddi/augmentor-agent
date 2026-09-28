@@ -73,6 +73,7 @@ def main():
             children.append(subprocess.Popen(arguments(name), env=env, stdin=subprocess.DEVNULL,
                 stdout=log, stderr=log, **options))
         initial = {name: wait_for(lambda: inspect(name)) for name in ('main','secondary')}
+        report['initial'] = initial
         assert [initial[name]['pid'] for name in ('main','secondary')] == [child.pid for child in children], 'The desktop left its native launch process.'
         assert initial['main']['pid'] != initial['secondary']['pid']
         assert all(item['visible'] for item in initial.values())
@@ -85,14 +86,26 @@ def main():
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=15, **options)
         assert repeated.returncode == 0, repeated.stderr.decode('utf-8', errors='replace')
         assert inspect('main')['pid'] == initial['main']['pid']
+        from augmentor_linux.shortcut_activation import DesktopActivation
+        activation = DesktopActivation(env['XDG_RUNTIME_DIR'], arguments('main'))
+        if sys.platform == 'win32': assert inspect('main')['visible'], 'Clicking the native app must show the existing window.'
+        elif not inspect('main')['visible']:
+            # The existing Linux launcher toggles on repeat invocation.
+            activation.activate(); wait_for(lambda: inspect('main')['visible'])
+        assert activation.activate() == 'delivered'
+        wait_for(lambda: not inspect('main')['visible'])
+        assert inspect('secondary')['visible']
+        assert activation.activate() == 'delivered'
+        wait_for(lambda: inspect('main')['visible'])
         zoomed = command('main','ui-test:'+json.dumps({'action':'zoom','percent':120}))
-        assert zoomed['ok'] and zoomed['result']['uiScale'] == 120
+        report['zoomResponse'] = zoomed
+        assert zoomed['ok'] and zoomed['result']['uiScale'] == 120, zoomed
         assert zoomed['result']['fontPixels'] > initial['main']['fontPixels']
         assert inspect('main')['draft'] == 'Keep this draft'
         screenshot = (args.out/'windows-two-window-main.png').resolve()
         command('main','ui-test:'+json.dumps({'action':'capture','path':str(screenshot)}))
         report.update(passed=True, distinctWindows=True, repeatedLaunchPreservedOwner=True,
-            draftBlockedMaintenance=True, zoomPreservedDraft=True, initial=initial, zoom=zoomed['result'])
+            draftBlockedMaintenance=True, zoomPreservedDraft=True, shortcutActivationToggle=True, initial=initial, zoom=zoomed['result'])
     except BaseException:
         report['childExitCodes'] = [child.poll() for child in children]
         for log in logs: log.flush()

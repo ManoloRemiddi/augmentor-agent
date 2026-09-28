@@ -46,6 +46,7 @@ class WindowsSupervisorTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = private_directory(Path(temporary)/'private')
             env = {**os.environ, 'XDG_RUNTIME_DIR': str(private_directory(root/'run')),
+                   'XDG_CONFIG_HOME': str(private_directory(root/'config')),
                    'XDG_DATA_HOME': str(private_directory(root/'data'))}
             processes = [subprocess.Popen([sys.executable, '-I', '-Xutf8', '-B',
                 str(ROOT/'services/windows_supervisor.py')], env=env, stdin=subprocess.DEVNULL,
@@ -60,6 +61,14 @@ class WindowsSupervisorTests(unittest.TestCase):
                         if time.monotonic() > deadline: self.fail('No Windows supervisor became ready.')
                         time.sleep(.1)
                 self.assertFalse(status['dsh']['running'])
+                # Save/restore crosses the named-pipe worker into the real owner
+                # event loop. The second window cannot steal the first binding.
+                first = owner.request('shortcut-save', owner=endpoint, instance='main', sequence='Ctrl+Alt+Shift+F9')
+                self.assertTrue(first['active'])
+                second = owner.request('shortcut-save', owner=endpoint, instance='secondary', sequence='Ctrl+Alt+Shift+F10')
+                with self.assertRaisesRegex(ValueError, 'other agent'):
+                    owner.request('shortcut-save', owner=endpoint, instance='secondary', sequence='Ctrl+Alt+Shift+F9')
+                self.assertEqual(owner.request('shortcut-status', owner=endpoint, instance='secondary')['key'], second['key'])
                 while all(p.poll() is None for p in processes) and time.monotonic() < deadline: time.sleep(.1)
                 self.assertEqual(sum(p.poll() is None for p in processes), 1)
                 with self.assertRaisesRegex(ValueError, 'Unsupported'):

@@ -2,6 +2,7 @@
 import errno
 from pathlib import Path
 import socket
+import sys
 import tempfile
 import unittest
 from unittest.mock import Mock, patch
@@ -17,6 +18,7 @@ class ShortcutActivationTests(unittest.TestCase):
             with patch('augmentor_linux.shortcut_activation.ROOT',root),patch('augmentor_linux.shortcut_activation.sys.platform','darwin'):
                 self.assertEqual(DesktopActivation(directory).command,[str(native)])
 
+    @unittest.skipIf(sys.platform == 'win32', 'Unix endpoint fixture; native Windows activation is exercised by the desktop proof')
     def test_running_app_receives_one_toggle_without_launch(self):
         with tempfile.TemporaryDirectory() as directory:
             with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as server:
@@ -30,6 +32,7 @@ class ShortcutActivationTests(unittest.TestCase):
                         self.assertEqual(connection.recv(100), b'')
                     launch.assert_not_called()
 
+    @unittest.skipIf(sys.platform == 'win32', 'Unix endpoint fixture; native Windows activation is exercised by the desktop proof')
     def test_secondary_toggle_never_reaches_primary_and_cold_launch_names_instance(self):
         with tempfile.TemporaryDirectory() as directory:
             servers = []
@@ -66,7 +69,7 @@ class ShortcutActivationTests(unittest.TestCase):
 
     def test_connection_errors_do_not_launch_a_second_app(self):
         for error in (PermissionError(errno.EACCES, 'denied'), TimeoutError('timeout')):
-            with self.subTest(error=error), patch('augmentor_linux.shortcut_activation.socket.socket') as factory:
+            with self.subTest(error=error), patch('augmentor_linux.shortcut_activation.LocalSocket') as factory:
                 connection = factory.return_value.__enter__.return_value
                 connection.connect.side_effect = error
                 with patch('augmentor_linux.shortcut_activation.subprocess.Popen') as launch:
@@ -75,7 +78,7 @@ class ShortcutActivationTests(unittest.TestCase):
                     launch.assert_not_called()
 
     def test_uncertain_send_is_not_replayed_as_a_launch(self):
-        with patch('augmentor_linux.shortcut_activation.socket.socket') as factory:
+        with patch('augmentor_linux.shortcut_activation.LocalSocket') as factory:
             connection = factory.return_value.__enter__.return_value
             connection.sendall.side_effect = BrokenPipeError('delivery unknown')
             with patch('augmentor_linux.shortcut_activation.subprocess.Popen') as launch:
