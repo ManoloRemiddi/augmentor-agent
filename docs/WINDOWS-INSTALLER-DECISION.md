@@ -629,3 +629,10 @@ the DLL result to the existing Boolean variable before the condition compiles
 successfully. No installer was executed under Wine; this is compiler evidence
 only. Package failures now include a bounded compiler diagnostic, and CI retains
 the template compiler log. Corrected native repair execution remains pending.
+
+At `a0d2530`, both native template installs complete, then the exact ModifyPath
+assertion detects that Inno stripped the directive's surrounding quotes. This
+would break an executable path containing spaces. Command quoting now happens
+inside the code-constant function, after directive parsing; the native assertion
+is retained. The older full run at `74ec319` was cancelled because its script had
+the already reproduced compile error, not because it was slow or passed.

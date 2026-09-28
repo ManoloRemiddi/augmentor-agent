@@ -19,7 +19,7 @@ ArchitecturesAllowed={#AllowedArchitecture}
 ArchitecturesInstallIn64BitMode={#AllowedArchitecture}
 MinVersion={#MinimumVersion}
 UninstallDisplayIcon={app}\current\Augmentor.exe
-AppModifyPath="{code:RetainedInstallerPath}"
+AppModifyPath={code:RetainedInstallerCommand}
 CloseApplications=no
 RestartApplications=no
 Compression=lzma2/fast
@@ -97,13 +97,14 @@ function ManualUpdateClear: BOOL;
 function RemovalUpdateClear: BOOL;
   external 'AugmentorManualUpdateClear@{tmp}\augmentor-removal.dll stdcall delayload uninstallonly';
 
-function RetainedInstallerPath(Param: String): String;
+function RetainedInstallerCommand(Param: String): String;
 begin
   { Windows can run repair with the installed Python/Qt/launcher missing.
     Register only the source already retained and pinned by this installation. }
   if not InstallerRetained or (Length(RetainedInstallerDigest) <> 64) then
     RaiseException('Augmentor has no verified repair installer.');
-  Result := ExpandConstant('{#RecoveryDirectory}') + '\' + RetainedInstallerDigest + '.exe';
+  { Quote after directive parsing, which strips a surrounding quote pair. }
+  Result := '"' + ExpandConstant('{#RecoveryDirectory}') + '\' + RetainedInstallerDigest + '.exe"';
 end;
 
 function BrowserKey(Index: Integer): String;
