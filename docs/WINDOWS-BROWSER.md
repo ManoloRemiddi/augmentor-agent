@@ -44,7 +44,20 @@ manifest is removed only after the owned registration values are retired.
 
 Native tests use unique disposable HKCU paths, check both registry views, simulate
 an interrupted registration and validate a stable junction-based launcher path.
-These tests remain pending; no actual browser lookup location has been changed.
+These tests pass on both native CPUs at `8df9049`; no actual browser lookup
+location has been changed by them.
+
+Discovery now reads HTTP/HTTPS capabilities under Windows `RegisteredApplications`
+and resolves their command's executable with the Windows argument parser. It
+does not run registered commands, change the default browser or inspect profiles.
+A separately selected executable is accepted through the same static PE product
+metadata and Chromium resource inspection, without a product-name allowlist.
+Renamed resource packs and version subdirectories are supported. This is a
+candidate browser check, not proof of extension/native-messaging compatibility.
+Native tests use disposable registration and resource fixtures; their discovery
+execution and real installed-browser acceptance remain pending. The executable
+picker must remain available when discovery finds nothing.
+
 Installer/chooser wiring, registry views and fork lookup locations still need
 actual-browser tests; do not infer them from browser profile directories.
 Preserve the shared chooser/instruction flow and verify an actual
@@ -55,3 +68,6 @@ gates. No browser policy or extension installation is forced by this work.
 References: [Chrome native messaging](https://developer.chrome.com/docs/extensions/develop/concepts/native-messaging),
 [Edge host registration and lookup order](https://learn.microsoft.com/en-us/microsoft-edge/extensions/developer-guide/native-messaging),
 and [Chromium Windows launcher source](https://chromium.googlesource.com/chromium/src/+/main/chrome/browser/extensions/api/messaging/launch_context_win.cc).
+Browser inventory follows [Windows application capabilities](https://learn.microsoft.com/en-us/windows/win32/shell/default-programs);
+it does not use the deprecated Start menu Internet default as the user's current
+browser selection.

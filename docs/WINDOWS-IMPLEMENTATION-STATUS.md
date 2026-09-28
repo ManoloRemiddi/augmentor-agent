@@ -647,3 +647,11 @@ refuses foreign entries/changed manifests and rolls back partially written value
 Native tests isolate every write beneath unique fixture registry roots; execution
 of the view/idempotence/conflict/rollback/removal tests is pending. Installer and
 chosen-browser setup integration remain future steps, not implied by this API.
+
+At `8df9049`, [desktop run 36365706210](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36365706210)
+passes on both CPUs, including actual disposable-HKCU view/readback, idempotence,
+foreign-value preservation, partial-write rollback and stable-junction tests.
+The next backend adds read-only registered-browser discovery plus static inspection
+of any user-selected Chromium executable. It uses Windows command parsing and
+product metadata, permits renamed/versioned resources and executes no discovered
+command. Native discovery fixtures and actual-browser acceptance are pending.

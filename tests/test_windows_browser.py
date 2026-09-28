@@ -2,6 +2,8 @@
 import json
 import os
 from pathlib import Path
+import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -95,6 +97,54 @@ class WindowsBrowserRegistrationTests(unittest.TestCase):
         self.assertTrue(self.path.exists())
         for path in self.keys: self.assertEqual(self.registration.current(path), str(self.path))
         os.rmdir(link)  # Remove the fixture junction itself, not its target.
+
+
+@unittest.skipUnless(sys.platform == 'win32', 'requires Windows registry discovery and PE metadata')
+class WindowsBrowserDiscoveryTests(unittest.TestCase):
+    def test_unlisted_browser_resources_unicode_command_and_registry_discovery(self):
+        import winreg
+        from platform_adapters import windows_browsers as browsers
+        prefix = 'Software\\Augmentor.BrowserDiscovery.'+uuid.uuid4().hex
+        registered, capabilities, classes = prefix+'\\Registered', prefix+'\\Capabilities', prefix+'\\Classes'
+        touched = []
+        def set_value(path, name, value):
+            parts = path.split('\\')
+            for count in range(2, len(parts)+1):
+                partial = '\\'.join(parts[:count])
+                if partial not in touched: touched.append(partial)
+            with winreg.CreateKeyEx(winreg.HKEY_CURRENT_USER, path, 0, winreg.KEY_SET_VALUE | winreg.KEY_WOW64_64KEY) as key:
+                winreg.SetValueEx(key, name, 0, winreg.REG_SZ, value)
+        with tempfile.TemporaryDirectory(prefix='browser café ') as temporary:
+            folder = Path(temporary)
+            executable = folder/'Unlisted Chromium browser.exe'
+            shutil.copy2(sys.executable, executable)  # Read actual PE version metadata; never execute this fixture.
+            resources = folder/'123.4.5.6'; resources.mkdir()
+            for filename in ('resources.pak', 'icudtl.dat', 'renamed_100_percent.pak'):
+                (resources/filename).write_bytes(b'fixture')
+            try:
+                command = subprocess.list2cmdline([str(executable), '--profile-directory=Test Profile', '%1'])
+                self.assertEqual(browsers.command_executable(command), executable)
+                details = browsers.browser_application(executable)
+                self.assertEqual(details['app'], str(executable.resolve()))
+                self.assertTrue(details['name'])
+                self.assertEqual(details['engineResources'], str(resources))
+                set_value(registered, 'A browser absent from any brand list', capabilities)
+                for scheme in ('http', 'https'): set_value(capabilities+r'\URLAssociations', scheme, 'UnlistedBrowser.HTML')
+                set_value(classes+r'\UnlistedBrowser.HTML\shell\open\command', '', command)
+                found = browsers.installed_browsers(hives=(winreg.HKEY_CURRENT_USER,),
+                    registered_path=registered, classes_path=classes)
+                self.assertEqual(found, [details])  # Registry-view duplicates collapse.
+                (resources/'icudtl.dat').unlink()
+                with self.assertRaisesRegex(ValueError, 'Chromium'):
+                    browsers.browser_application(executable)
+                self.assertEqual(browsers.installed_browsers(hives=(winreg.HKEY_CURRENT_USER,),
+                    registered_path=registered, classes_path=classes), [])
+                for unsafe in ('relative.exe --arg', 'cmd.exe /c anything', '', '\x00'):
+                    with self.assertRaises(ValueError): browsers.command_executable(unsafe)
+            finally:
+                for path in sorted(touched, key=lambda value: value.count('\\'), reverse=True):
+                    try: winreg.DeleteKeyEx(winreg.HKEY_CURRENT_USER, path, winreg.KEY_WOW64_64KEY)
+                    except FileNotFoundError: pass
 
 
 if __name__ == '__main__': unittest.main()
