@@ -725,3 +725,11 @@ writer exclusion; all 62 update cases pass locally (one Windows-only skip).
 Native full application qualification now composes this shared journal with the
 actual source installer and real UI health. Its execution and the product outer
 observer remain pending. See the [contract and boundaries](WINDOWS-INSTALLER-DECISION.md#distinct-durable-restoration-outcome).
+
+The retained installer now extracts an [independent recovery observer](WINDOWS-INSTALLER-DECISION.md#independent-recovery-observer)
+that composes the shared attempt, independent source installer, observed exit and
+complete source verification. Its native parent releases initial admission only
+after preparing the bounded worker; the worker revalidates the exact original
+under fresh admission before intent. Installer lifetime uses explicit Job breakaway;
+source health retains read admission and a pinned active record. Native observer
+and crash qualification remain pending; customer recovery routing is not enabled.

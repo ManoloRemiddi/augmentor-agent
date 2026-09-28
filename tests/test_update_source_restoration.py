@@ -146,8 +146,8 @@ class SourceRestorationTests(unittest.TestCase):
         def verification(_assessment):
             atomic_json(self.active, changed)
             return True
-        with self.assertRaises(ValueError): attempt.complete(verification)
-        self.assertEqual(read_json(self.active), changed)
+        with self.assertRaises((ValueError, PermissionError)): attempt.complete(verification)
+        self.assertEqual(read_json(self.active), json.loads(self.original) if os.name == 'nt' else changed)
         self.assertFalse(attempt.archive.exists())
 
     def test_lost_archive_acknowledgment_does_not_destroy_history_or_receipt(self):

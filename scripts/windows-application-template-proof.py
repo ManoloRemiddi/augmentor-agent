@@ -47,12 +47,21 @@ def prove(out, arch, compiler, fixture_executable, runtime):
     (payload/'python/Lib/site-packages').mkdir(parents=True, exist_ok=True)
     shutil.copy2(ROOT/'scripts/windows-finish-launch-fixture.py', payload/'scripts/launch-windows.py')
     shutil.copy2(ROOT/'scripts/windows-health-fixture.py', payload/'scripts/windows-local-health.py')
-    for name in ('scripts/windows-inspect-payload.py','services/lifecycle/payload_integrity.py',
-                 'services/lifecycle/recovery_source.py','services/lifecycle/health_report.py',
-                 'services/lifecycle/update_journal.py',
-                 'services/platform_adapters/private_files.py','services/platform_adapters/locks.py'):
+    # Only pywin32 from the full runtime is needed by the independent observer;
+    # Qt and the other component markers remain absent/inert in this template.
+    import importlib.metadata
+    site=Path(runtime)/'python/Lib/site-packages'
+    for entry in importlib.metadata.distribution('pywin32').files:
+        if '..' in Path(entry).parts:continue
+        source=site/entry
+        if source.is_file():
+            target=payload/'python/Lib/site-packages'/entry
+            target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source,target)
+    for name in ('scripts/windows-inspect-payload.py','scripts/windows-recover-source.py'):
         target=payload/name;target.parent.mkdir(parents=True,exist_ok=True)
         shutil.copy2(ROOT/name,target)
+    for folder in ('services/lifecycle','services/platform_adapters'):
+        shutil.copytree(ROOT/folder,payload/folder,ignore=shutil.ignore_patterns('__pycache__','*.pyc'))
     build_spec = importlib.util.spec_from_file_location('template_launcher', ROOT/'scripts/build-windows-launcher.py')
     builder = importlib.util.module_from_spec(build_spec); build_spec.loader.exec_module(builder)
     builder.build_launcher(payload, arch)
@@ -67,13 +76,13 @@ def prove(out, arch, compiler, fixture_executable, runtime):
     flags = ['/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-']
     stages = []; removal = None
     launch_record = Path(report['qualificationBase'])/'finish-launched.json'
-    def run(executable, label, success=True, arguments=()):
+    def run(executable, label, success=True, arguments=(), timeout=60):
         child = OwnedProcess([str(executable), *flags,
             '/LOG='+str(out/('application-template-'+label+'.log')), *arguments], stdin=subprocess.DEVNULL)
         try:
             # Inno's first uninstall process exits before the copied remover
             # finishes. Observe natural exit of the whole disposable range.
-            code = child.wait_graceful(timeout=60)
+            code = child.wait_graceful(timeout=timeout)
         finally:
             if child.job is not None:
                 child.kill(); child.wait(timeout=10)  # Failed fixture cleanup only.
@@ -394,6 +403,32 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         assert pending.read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
         pending.unlink();admission.unlink()  # Disposable fixture only; completion is still unresolved in product.
         stages.append('independent-recorded-source-application-with-original-journal-preserved')
+        # The extracted product observer owns the complete recovery, including
+        # actual independent Setup observation and durable distinct completion.
+        with UpdateJournal(updates,source_identity,target_identity) as journal:
+            for phase in ('preparing','prepared','drained','installer-ready','apply-intent'):journal.advance(phase)
+        original=pending.read_bytes()
+        installed_release.unlink();(install/'current/Augmentor.exe').unlink()
+        for library in (install/'current/python').glob('python3*.dll'):library.unlink()
+        try:
+            run(cached,'independent-recovery-observer',success=False,arguments=['/augmentorrecover=previous'],timeout=180)
+        finally:
+            for inner_log in updates.glob('recovery-*.log'):
+                shutil.copy2(inner_log,out/('application-template-'+inner_log.name))
+        recovery_log=(out/'application-template-independent-recovery-observer.log').read_text(encoding='utf-8-sig')
+        marker='Augmentor recovery result: '
+        results=[json.loads(line.split(marker,1)[1]) for line in recovery_log.splitlines() if marker in line]
+        assert len(results)==1,recovery_log[-8192:]
+        recovered=results[0]
+        assert recovered['schema']=='augmentor-source-recovery/1' and recovered['outcome']=='source-restored'
+        assert recovered['recordSHA256']==hashlib.sha256(original).hexdigest()
+        assert recovered['installerSHA256']==report['sha256'] and recovered['releaseSHA256']==release_digest.decode('ascii')
+        assert (updates/recovered['archive']).read_bytes()==original and not pending.exists()
+        assert json.loads((updates/recovered['receipt']).read_text())['phase']=='source-restored'
+        assert recovered['localHealth']['releaseSHA256']==release_digest.decode('ascii')
+        assert sentinel.read_bytes()==sentinel_bytes and inspect(cached,'completed-recovery-inventory')['complete']
+        admission.unlink()  # Only the synthetic health fixture's observation output.
+        stages.append('independent-observer-source-restoration-and-distinct-completion')
         # Damaged metadata (rather than an absent file) takes the same exact
         # selected-source path. No foreign/version-only match is accepted.
         installed_release.write_bytes(b'Broken fixture metadata.\n')

@@ -118,11 +118,22 @@ class SourceRestoration:
         with self._writer():
             if self.record['phase'] != 'installed':
                 raise ValueError('The source installer has not been independently observed completing.')
-            if verify_source(deepcopy(self.assessment)) is not True:
-                self.uncertain = True
-                raise ValueError('Restored source verification failed. The original update remains unresolved.')
-            if _read(self.active) != self.original:
-                raise ValueError('The original update changed during source verification.')
+            # Windows also excludes non-cooperating writes/deletion during the
+            # health child. Release this pin only after verification, while the
+            # writer and caller's read admission still protect archival.
+            if os.name == 'nt':
+                from platform_adapters.windows_identity import private_file_descriptor
+                pinned = private_file_descriptor(self.active, share_write=False)
+            else:
+                pinned = descriptor(self.active)
+            try:
+                if verify_source(deepcopy(self.assessment)) is not True:
+                    self.uncertain = True
+                    raise ValueError('Restored source verification failed. The original update remains unresolved.')
+                if _read(self.active) != self.original:
+                    raise ValueError('The original update changed during source verification.')
+            finally:
+                os.close(pinned)
             if self.archive.exists() or self.archive.is_symlink():
                 raise ValueError('A restoration archive already exists. Both records were preserved.')
             # Write the distinct outcome first. Removing active.json can only

@@ -274,4 +274,15 @@ and actual N-to-N+1 remain separate. New shared `SourceRestoration` provides a
 [distinct durable outcome](WINDOWS-INSTALLER-DECISION.md#distinct-durable-restoration-outcome)
 after fresh observed installer exit and complete source verification under read
 admission. Thirteen portable fault/storage cases pass; the full proof now uses the
-shared completion path but native execution and the product observer remain pending.
+shared completion path; native execution of completion remains pending.
+
+Full clean placement now passes both CPUs at `e98a142` in
+[36432080543](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36432080543),
+with real displaced payloads, complete inventories and actual Windows UI health.
+The new [independent recovery observer](WINDOWS-INSTALLER-DECISION.md#independent-recovery-observer)
+runs from the retained installer's private runtime, observes a separately owned
+source Setup, verifies source metadata/registrations/inventory and native health,
+then archives the original update unchanged after a distinct restoration receipt.
+Windows pins the original record throughout final health. Template/full proofs
+now invoke this product action directly. Local checks pass; native observer,
+crash/breakaway, cross-version, disk/retention and customer UI qualification remain.

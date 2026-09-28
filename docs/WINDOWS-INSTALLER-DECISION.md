@@ -1087,10 +1087,65 @@ two distinct packages. Native execution of completion is pending. The product's
 independent outer observer and crash-resume inspection of archived-versus-active
 outcomes remain to implement.
 
+## Independent recovery observer
+
+The new fixed `/augmentorrecover=previous` action composes source restoration and
+completion through code extracted from the retained installer. It first acquires
+native maintenance, performs independent source assessment and retains the source
+installer. It then extracts `windows-recover-source.py`, the shared lifecycle and
+platform adapters and private Python. This code runs outside `current`, including
+when installed Python, the launcher and release metadata are missing.
+
+The native helper creates the observer suspended in its own Job, assigns it before
+execution, then releases its maintenance/writer/record and selected-pointer pins.
+It retains source artifact and scratch ownership. The observer obtains fresh
+exclusive startup/lifetime admission, pins and compares the original record under
+the journal writer, resolves only its exact cached source and persists a new
+`SourceRestoration` intent. It releases admission before launching the actual source
+installer, which reacquires native maintenance and independently checks the same
+source again. Recorded PIDs and commands do not supply execution authority.
+
+The observer Job uses kill-on-close for its observer/health range and explicitly
+allows breakaway. `InstallerProcess` always requests breakaway, creates its own
+non-kill-on-close Job before running Setup, and has no qualification fallback here.
+This follows Microsoft's [nested Job breakaway rules](https://learn.microsoft.com/en-us/windows/win32/procthread/nested-jobs).
+The worker observes the same installer Job for up to five minutes without retrying
+launch; the native parent gives the complete worker ten minutes. Failure or timeout
+closes observations without terminating independent Setup. Native crash/breakaway
+qualification is still required before relying on this behavior for customers.
+
+After actual installer completion, the worker retains read admission and requires
+source selection, Root/AppId and repair registration, the exact maintenance-helper
+hash, complete payload inventory and isolated native UI health. The shared journal
+now also pins the original active file against Windows write/delete during that
+health callback. It then writes the distinct restoration receipt and archives the
+original bytes unchanged. A bounded result links those durable records and exact
+source/UI identity. The diagnostic action stops outer Setup before any ordinary
+installation sections, so its nonzero exit is not a success assertion; callers
+must inspect the bound result and durable outcome. It does not reopen the desktop.
+Customer recovery UI/entrypoint routing remains separate work.
+
+Failure diagnostics contain only phase, exception class and numeric code. The
+inner installer log is private and retained with the attempt. Disposable native
+tests copy those logs into their qualification artifacts on failure. Source/cache
+corruption, unavailable admission and unknown installation outcomes remain refused
+or unresolved; no archive is removed or action replayed to bypass them.
+
+The exact-template proof now copies only the pinned pywin32 distribution needed
+by the actual extracted observer; other component markers remain inert and its UI
+health response remains synthetic. It exercises the complete fixed recovery action
+and checks original archival, distinct receipt and complete source inventory.
+The full app proof invokes the same action and requires actual Windows UI health
+and ordinary reopening; it no longer implements recovery orchestration itself.
+Local update/package tests, Python compilation and actual Inno script compilation
+pass. New native observer execution is pending. The proposed target is synthetic;
+two distinct packages, crash-resume inspection, disk/retention policy and customer
+integration are still required.
+
 ### Remaining restoration executor
 
-Source application and shared durable completion are implemented above; complete
-integration still requires native execution. The remaining outer observer must keep the original transaction
+Source application, shared durable completion and the independent outer observer
+are implemented above; their integration still requires native execution. Recovery must keep the original transaction
 unchanged; restoring the previous source must never masquerade as installing its
 different target. The remaining sequence is:
 

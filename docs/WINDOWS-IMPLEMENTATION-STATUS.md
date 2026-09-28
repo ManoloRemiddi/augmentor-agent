@@ -14,32 +14,29 @@ qualification is claimed. The app is not complete or ready for customers.
 
 ### Current evidence
 
-- [Full c530fda qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36423029869)
+- [Full e98a142 qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36432080543)
   passes both CPUs and shared Mac Qt at merge checkout
-  `ad703348d4faa61cff8a11d44c996fd653510995`. Downloaded installed reports confirm
-  independent installer health renders the real Windows UI with the actual pending
-  journal preserved, alongside installation/browser/login identity, live-draft
-  refusal, damaged-runtime inspection/repair, coordinated same-build apply,
-  verified reopening and removal with data retained. Complete inventories have
-  no differences: x64 65,941 files / 1,266,281,389 bytes; ARM64 65,925 files /
-  1,244,983,404 bytes. DSH chat/history uses a deterministic provider. This predates
-  clean payload placement below; it is not N-to-N+1, restoration or physical acceptance.
-- [Fast Windows at b6b2313](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36421972142)
-  passes both CPUs, including native UI health, compiled startup guards, 49 update
-  cases, five preparation cases, six source-assessment cases, five health-report
-  cases and all 14 inventory cases. Earlier downloaded `cca5907` managed-DSH reports also confirm held-turn
-  cancellation preserved accepted work without shutdown or installer invocation
-  on both CPUs.
-- [Inno at b6b2313](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36421972168)
-  passes both CPUs at merge checkout `74bda13605c23702802ac0ab1071a2675069b759`.
-  Downloaded reports confirm journal-source lookup despite replaced selection,
-  independent assessment, record/writer refusal cases, absent-root repair and the
-  new source-health admission/failure path. Synthetic health proves held writer,
-  record and installation admission plus ordinary-startup refusal; it does not
-  render Qt. Browser cleanup and interactive Finish also pass. These exact-template
-  tests use real private Python and inert other components; full app acceptance is separate.
-  The older `cca5907` ARM64 inspection failure lacked diagnostics, so its exact
-  cause remains unclaimed despite later successful qualification.
+  `521151e33204421421981be0f1f35742bb1c688b`. Downloaded installed reports confirm
+  actual full-payload displacement before authenticated replacement, independent
+  installer health rendering the real Windows UI with the pending record preserved,
+  installation/browser/login identity, busy-draft refusal, damaged-runtime repair,
+  coordinated same-build apply, verified reopening and removal with data retained.
+  Inventories have zero differences: x64 65,943 files / 1,266,306,830 bytes; ARM64
+  65,927 files / 1,245,008,845 bytes. DSH chat/history uses a deterministic provider.
+  This predates source restoration/completion and is not N-to-N+1 or physical acceptance.
+- [Fast Windows at 5277087](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36434815432)
+  passes both CPUs, including native UI health, compiled guards and all 62 update
+  cases with thirteen distinct-restoration cases. Current active-record pinning
+  during completion and the independent observer below postdate this evidence.
+- [Inno at 04f3317](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36433486621)
+  passes both CPUs at merge checkout `abf36a2cf01fb7c71b2604ae3e72a53c1d64f617`.
+  Downloaded reports confirm standalone exact-source application without installed
+  launcher/Python/metadata, source lookup despite changed selection, busy/wrong-source
+  refusals, old payload preservation, restored repair metadata and synthetic health
+  with the original update unchanged. These exact-template tests use real private
+  Python/native bootstrap and inert other components; they do not render Qt.
+  [Inno at 5277087](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36434815332)
+  also passes both CPUs. New extracted observer execution remains pending.
 
 ### Implemented contracts and current work
 
@@ -111,9 +108,8 @@ script compilation pass. Both native templates now pass at `e98a142` in
 [36432080462](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36432080462),
 merge checkout `521151e33204421421981be0f1f35742bb1c688b`; downloaded reports
 confirm locked-tree preservation, clean replacement and missing-payload cases.
-Full x64 placement also passes, with its real displaced payload preserved and
-complete inventory/independent UI health verified. ARM64 full placement remains
-running in `36432080543`.
+Full placement now passes both CPUs in `36432080543`, with each real displaced
+payload preserved and complete inventory/independent UI health verified.
 
 New source adds [independent previous-source application](WINDOWS-INSTALLER-DECISION.md#independent-previous-source-application).
 The standalone installer explicitly verifies its exact recorded source under fresh
@@ -136,11 +132,19 @@ unchanged. Thirteen new portable fault/storage tests and all 62 update cases pas
 locally (one Windows-only skip). The full proof now composes this shared journal
 with actual source installation and native health, then reopens; native execution
 is pending. Its proposed target is synthetic, not a second packaged version.
-The product outer recovery observer and crash-resume outcome inspection remain open.
+The new [independent recovery observer](WINDOWS-INSTALLER-DECISION.md#independent-recovery-observer)
+now composes source restoration and completion through the retained installer's
+private runtime, including when installed Python is missing. It creates a fresh
+attempt, launches a separately owned source installer, observes its actual exit,
+then verifies source registrations, selection, helper hash, full inventory and UI
+health before unchanged archival. The active record stays pinned during health.
+The exact-template and full-app proofs now invoke this product action directly;
+template health is synthetic, while the full proof requires actual rendering and
+reopening. Local update/package checks and Inno script compilation pass. Native
+observer/Job breakaway and crash-resume qualification remain pending.
 
-Next: qualify clean placement/source application and finish interrupted/cross-version restoration
-with the independent product observer, qualified durable completion, bounded
-disk/retention policy, actual N-to-N+1
+Next: qualify independent observer/source completion, then finish crash-resume
+outcome inspection, bounded disk/retention policy, actual N-to-N+1
 and customer notification/update wiring. Preserving a displaced tree alone is not
 power-loss recovery. Cache artifacts and displaced payloads still survive ordinary
 removal. Never infer a healthy rollback source from the selection pointer or clear

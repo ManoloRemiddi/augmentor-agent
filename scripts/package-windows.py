@@ -37,7 +37,8 @@ def candidate(root, arch):
     for name in ('Augmentor.exe', 'AugmentorBrowserHost.exe', 'python/python.exe',
                  'node/node.exe', 'powershell/pwsh.exe', 'updater/WinSparkle.dll',
                  'dsh/payload.json', 'scripts/launch-windows.py', 'scripts/windows-local-health.py',
-                 'scripts/windows-inspect-payload.py', 'services/lifecycle/payload_integrity.py',
+                 'scripts/windows-inspect-payload.py', 'scripts/windows-recover-source.py',
+                 'services/lifecycle/source_restoration.py', 'services/lifecycle/payload_integrity.py',
                  'services/lifecycle/recovery_source.py', 'services/lifecycle/health_report.py',
                  'services/lifecycle/update_journal.py',
                  'services/platform_adapters/private_files.py', 'services/platform_adapters/locks.py'):

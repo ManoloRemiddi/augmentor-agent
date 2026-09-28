@@ -355,3 +355,4 @@ done:
 
 #include "windows-installer-inspection.h"
 #include "windows-installer-placement.h"
+#include "windows-installer-recovery.h"

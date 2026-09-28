@@ -462,3 +462,16 @@ inventory and native health under read leases before archival/reopening. This ne
 native completion execution is pending; the original proposed target is synthetic.
 Source application itself passes both native templates at `04f3317`, run
 `36433486621`; template health is synthetic, not full Qt evidence.
+
+Full clean placement passes both CPUs at `e98a142`, run `36432080543`, including
+complete inventory, retained old payload and independent actual Windows UI health.
+All 62 update cases pass fast Windows at `5277087`; the active-record pin added
+during final health postdates that run. The two installer proofs now call the
+actual extracted `/augmentorrecover=previous` observer instead of orchestrating
+restoration/completion in fixture code. The template includes the pinned pywin32
+distribution, a real Python/native bootstrap and synthetic health. The full proof
+requires actual Qt health and reopening. Both require missing installed Python,
+exact original archival, source selection/registration, complete inventory and
+the distinct receipt. Private inner Setup logs are retained as failure artifacts.
+Local update/package checks and script compilation pass; native observer, breakaway
+on observer crash and actual distinct-version execution are still pending.

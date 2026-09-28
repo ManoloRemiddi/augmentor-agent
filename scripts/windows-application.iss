@@ -34,14 +34,11 @@ Source: "{#HandoffHelper}"; DestDir: "{app}\maintenance"; Flags: ignoreversion
 Source: "{#PayloadDirectory}\release.json"; DestDir: "{app}\current"; Flags: ignoreversion
 Source: "{#PayloadDirectory}\payload-integrity.json"; DestDir: "{app}\current"; Flags: ignoreversion
 Source: "{#PayloadDirectory}\scripts\windows-inspect-payload.py"; DestDir: "{app}\current\scripts"; Flags: ignoreversion
-Source: "{#PayloadDirectory}\services\lifecycle\payload_integrity.py"; DestDir: "{app}\current\services\lifecycle"; Flags: ignoreversion
-Source: "{#PayloadDirectory}\services\lifecycle\recovery_source.py"; DestDir: "{app}\current\services\lifecycle"; Flags: ignoreversion
-Source: "{#PayloadDirectory}\services\lifecycle\health_report.py"; DestDir: "{app}\current\services\lifecycle"; Flags: ignoreversion
-Source: "{#PayloadDirectory}\services\lifecycle\update_journal.py"; DestDir: "{app}\current\services\lifecycle"; Flags: ignoreversion
-Source: "{#PayloadDirectory}\services\platform_adapters\private_files.py"; DestDir: "{app}\current\services\platform_adapters"; Flags: ignoreversion
-Source: "{#PayloadDirectory}\services\platform_adapters\locks.py"; DestDir: "{app}\current\services\platform_adapters"; Flags: ignoreversion
+Source: "{#PayloadDirectory}\scripts\windows-recover-source.py"; DestDir: "{app}\current\scripts"; Flags: ignoreversion
+Source: "{#PayloadDirectory}\services\lifecycle\*.py"; DestDir: "{app}\current\services\lifecycle"; Flags: ignoreversion
+Source: "{#PayloadDirectory}\services\platform_adapters\*.py"; DestDir: "{app}\current\services\platform_adapters"; Flags: ignoreversion
 Source: "{#PayloadDirectory}\python\*"; DestDir: "{app}\current\python"; Flags: recursesubdirs createallsubdirs ignoreversion
-Source: "{#PayloadDirectory}\*"; DestDir: "{app}\current"; Excludes: "\release.json,\payload-integrity.json,\scripts\windows-inspect-payload.py,\services\lifecycle\payload_integrity.py,\services\lifecycle\recovery_source.py,\services\lifecycle\health_report.py,\services\lifecycle\update_journal.py,\services\platform_adapters\private_files.py,\services\platform_adapters\locks.py,\python\*"; Flags: recursesubdirs createallsubdirs ignoreversion
+Source: "{#PayloadDirectory}\*"; DestDir: "{app}\current"; Excludes: "\release.json,\payload-integrity.json,\scripts\windows-inspect-payload.py,\scripts\windows-recover-source.py,\services\lifecycle\*.py,\services\platform_adapters\*.py,\python\*"; Flags: recursesubdirs createallsubdirs ignoreversion
 
 [Icons]
 Name: "{userprograms}\{#ShortcutName}"; Filename: "{app}\current\Augmentor.exe"; Parameters: "{code:LaunchParameters}"; AppUserModelID: "com.augmentor.Agent"
@@ -126,6 +123,9 @@ function PrepareReplacement(Application: String): BOOL;
 function PrepareSourceRestoration(Application: String): BOOL;
   external 'AugmentorPrepareSourceRestoration@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
 
+function ObserveSourceRecovery(Installed, ReleaseDigest, HelperDigest, InstallationKey, ApplicationId, Qualification: String): BOOL;
+  external 'AugmentorRecoveryObserve@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
+
 function PrepareIndependentAssessment(AssessSource: Boolean): Boolean;
 var Ready: Boolean; ReportText: AnsiString;
 begin
@@ -150,12 +150,8 @@ begin
   ExtractTemporaryFiles('{app}\current\release.json');
   ExtractTemporaryFiles('{app}\current\payload-integrity.json');
   ExtractTemporaryFiles('{app}\current\scripts\windows-inspect-payload.py');
-  ExtractTemporaryFiles('{app}\current\services\lifecycle\payload_integrity.py');
-  ExtractTemporaryFiles('{app}\current\services\lifecycle\recovery_source.py');
-  ExtractTemporaryFiles('{app}\current\services\lifecycle\health_report.py');
-  ExtractTemporaryFiles('{app}\current\services\lifecycle\update_journal.py');
-  ExtractTemporaryFiles('{app}\current\services\platform_adapters\private_files.py');
-  ExtractTemporaryFiles('{app}\current\services\platform_adapters\locks.py');
+  ExtractTemporaryFiles('{app}\current\services\lifecycle\*.py');
+  ExtractTemporaryFiles('{app}\current\services\platform_adapters\*.py');
   ExtractTemporaryFiles('{app}\current\python\*');
   Ready := RunInspection(ExpandConstant('{#InstallDirectory}\current'), '{#ReleaseDigest}');
   if not Ready then begin
@@ -184,6 +180,33 @@ begin
         RaiseException('Augmentor independent health result is unavailable.');
       Log('Augmentor independent health result: ' + String(ReportText));
     end;
+  finally
+    CloseSetupMaintenance;
+    MaintenanceHeld := False;
+  end;
+end;
+
+procedure RecoverPreviousSource;
+var Ready: Boolean; ReportText: AnsiString; Digest: String;
+begin
+  try
+    if not PrepareIndependentAssessment(True) then exit;
+    Digest := Lowercase(GetSHA256OfFile(ExpandConstant('{srcexe}')));
+    Ready := RetainInstaller(ExpandConstant('{srcexe}'), Digest, '{#ReleaseDigest}');
+    if not Ready then begin Log('Augmentor recovery: exact source retention failed.'); exit; end;
+    ExtractTemporaryFiles('{app}\current\scripts\windows-recover-source.py');
+    Ready := ObserveSourceRecovery(ExpandConstant('{#InstallDirectory}\current'), '{#ReleaseDigest}',
+      '{#HelperDigest}', '{#InstallationKey}', '{#ApplicationId}', '{#QualificationBase}');
+    if not Ready then begin
+      Log('Augmentor recovery: observer failed; stage=' + IntToStr(InspectionStage) +
+        ', detail=' + IntToStr(InspectionDetail) + '; recovery records preserved.');
+      if LoadStringFromFile(ExpandConstant('{tmp}\') + '{app}\recovery-error.json', ReportText) then
+        Log('Augmentor recovery diagnostics: ' + String(ReportText));
+      exit;
+    end;
+    if not LoadStringFromFile(ExpandConstant('{tmp}\') + '{app}\recovery-result.json', ReportText) then
+      RaiseException('Augmentor recovery result is unavailable. Inspect its durable recovery record.');
+    Log('Augmentor recovery result: ' + String(ReportText));
   finally
     CloseSetupMaintenance;
     MaintenanceHeld := False;
@@ -269,7 +292,9 @@ begin
   Inspection := ExpandConstant('{param:augmentorinspect|}');
   Recovery := ExpandConstant('{param:augmentorrecover|}');
   if Recovery <> '' then begin
-    if (Recovery <> 'source') or (Inspection <> '') or (Pipe <> '') or (CoordinatorText <> '') then exit;
+    if (Inspection <> '') or (Pipe <> '') or (CoordinatorText <> '') then exit;
+    if Recovery = 'previous' then begin RecoverPreviousSource; exit; end;
+    if Recovery <> 'source' then exit;
     RestoreSource := True;
     Result := True;
     exit;
