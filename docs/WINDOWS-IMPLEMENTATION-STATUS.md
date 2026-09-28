@@ -505,3 +505,14 @@ remain subsequent gates; the new entrypoint is not a customer release.
 The source suite after the launcher additions passes 580 tests (17 platform skips).
 Three launcher checks cover wrong architecture, missing payload, refusal of
 customer data-path overrides and selection of private bundled tools.
+
+The kernel privacy suite now also includes a real different-user token probe,
+opted in only on the disposable hosted Windows runners. It creates a temporary
+ordinary local identity, authenticates it with a non-cached network logon token,
+impersonates that token for file/pipe open attempts, requires access-denied, then
+reverts and deletes the account. Normal developer/customer test runs skip this
+account-creation fixture. This probes actual ACL denial, not a separately logged
+in desktop process; the latter remains a broader multi-user acceptance check.
+Native results are pending. References:
+[LogonUserW](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-logonuserw)
+and [NetUserAdd](https://learn.microsoft.com/en-us/windows/win32/api/lmaccess/nf-lmaccess-netuseradd).

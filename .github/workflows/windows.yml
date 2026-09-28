@@ -58,12 +58,16 @@ jobs:
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_platform_locks.py -v
       - name: Verify private paths, ACLs and junction refusal
         if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
+        env:
+          AUGMENTOR_EPHEMERAL_WINDOWS_RUNNER: '1'
         run: |
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_identity.py -v
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_platform_paths.py -v
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_private_files.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_cross_user.py -v
       - name: Verify supervisor crash cannot orphan detached child processes
         if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
         run: |
