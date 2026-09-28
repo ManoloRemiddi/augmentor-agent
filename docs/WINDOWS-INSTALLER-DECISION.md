@@ -582,3 +582,41 @@ also passes both CPUs at `0053027cbeb1feee4365ebedd589381fbe431fdb`, through
 installed removal and journal archival. That full run predates source caching;
 [full bdba572](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36405973046)
 is still executing and is the required cached-source integration proof.
+
+## Independent repair from Windows installed-app controls
+
+The candidate registers Inno's [AppModifyPath](https://jrsoftware.org/ishelp/topic_setup_appmodifypath.htm)
+as the quoted, privately retained original installer. Windows' installed-program
+Modify action can therefore invoke repair without loading the installed launcher,
+Python, Qt or application scripts. There is no second Start menu application or
+system-wide runtime. The retained installer contains its own maintenance helper.
+Client Settings/Control Panel presentation remains a physical acceptance check.
+
+Manual repair can restore missing or damaged `current/release.json` only when
+both installed Root/AppId registrations match and the independently held selection
+receipt matches this exact installer's digest and compiled payload digest. The
+native helper also rehashes/pins the retained executable and checks its private
+receipt. Missing/foreign registration, malformed selection or another installer
+refuses before app-file replacement. A rejected attempt can retain verified source
+bytes; bounded cache cleanup remains a separate unfinished requirement. Removing
+the entire payload no longer turns an owned repair into a fresh install or resets
+the user's login-startup choice. This is exact-build repair, not rollback.
+
+Manual install/repair and removal refuse any `updates/active.json` under the
+private Augmentor data base, regardless of its contents. An inaccessible or
+redirected updates directory also refuses. The native check holds the ordinary
+private directory and existing exclusive startup/lifetime gates; it never parses
+a saved PID, replays an operation, clears the journal or guesses which release
+survived. The installed coordinator proof now uses this same canonical `updates`
+directory. Cross-version interrupted-update recovery still requires its separate
+executor, compatibility/health decision and real failure qualification.
+
+The exact-template proof reads the real ModifyPath, removes the installed native
+EXE, Python runtime DLLs and version metadata, checks pending-update/foreign-source/
+missing-registration refusal, then runs registered repair from the cached installer.
+It verifies restored bytes, unchanged persistent data and source-cache reuse, and
+also repairs damaged metadata. The full-payload proof removes the same critical
+files, repairs through ModifyPath and reopens the actual installed Qt application.
+New native execution is pending; local update tests and script compilation do not
+establish these native repair cases passed. Publisher trust, independent rollback,
+obsolete-file cleanup and bounded cache policy remain open.

@@ -40,7 +40,7 @@ def main():
     from lifecycle.windows_apply import WindowsApply
     from lifecycle.windows_preparation import WindowsPreparation
     import windows_supervisor as owner
-    transaction=private_directory(data/'update-proof')
+    transaction=private_directory(data/'updates')
     with ExitStack() as stack:
         lifetime=private_lock_descriptor(data/'run/installation.lock')
         stack.callback(os.close,lifetime)

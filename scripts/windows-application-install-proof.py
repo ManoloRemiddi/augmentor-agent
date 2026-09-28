@@ -104,6 +104,8 @@ def main():
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER,registry,0,winreg.KEY_READ|winreg.KEY_WOW64_64KEY) as key:
             removal = command_executable(winreg.QueryValueEx(key,'UninstallString')[0])
             assert winreg.QueryValueEx(key,'DisplayName')[0]=='Augmentor Agent'
+            repair_command=winreg.QueryValueEx(key,'ModifyPath')[0]
+            assert repair_command=='"'+str(cached_installer)+'"', repair_command
         assert removal.is_relative_to(install)
         from win32com.shell import shell,shellcon
         shortcut=Path(shell.SHGetFolderPath(0,shellcon.CSIDL_PROGRAMS,0,0))/(report['applicationId']+'.lnk')
@@ -151,11 +153,19 @@ def main():
         stages.append('busy-install-and-removal-preserve-live-draft')
         command('ui-test:'+json.dumps({'action':'draft','expected':'Preserve this installed draft','text':''}))
         close_preview(); child=None
-        # Delete one installer-owned file, repair the identical build, then
-        # launch its actual executable again. No source checkout launch.
+        # Break the installed executable, interpreter and identity, then repair
+        # through the standalone installer registered with Windows. This must
+        # work without running any code in the damaged installed application.
         owned=install/'current/scripts/launch-windows.py'; owned.unlink()
-        setup('repair')
+        executable.unlink()
+        (install/'current/release.json').unlink()
+        runtime_libraries=list((install/'current/python').glob('python3*.dll'))
+        assert runtime_libraries
+        for library in runtime_libraries: library.unlink()
+        run([command_executable(repair_command),*flags,'/LOG='+str(out/'repair.log')])
         assert owned.read_bytes()==(args.root/'scripts/launch-windows.py').read_bytes()
+        for relative in ('Augmentor.exe','release.json',*[str(path.relative_to(install/'current')) for path in runtime_libraries]):
+            assert package.digest(install/'current'/relative)==package.digest(args.root/relative)
         child=open_preview(); ready(); close_preview(); child=None
         assert shortcut.is_file() and sentinel.read_bytes()==sentinel_bytes
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER,report['startupKey'],0,winreg.KEY_READ|winreg.KEY_SET_VALUE) as key:
@@ -165,6 +175,7 @@ def main():
             # not restore that preference just because a new build is applied.
             winreg.DeleteValue(key,'Augmentor Agent')
         stages.append('same-build-repair-and-installed-relaunch')
+        stages.append('registered-repair-without-installed-runtime-or-metadata')
         # Exercise the shared decision coordinator against installed binaries,
         # an actual background owner/window, and the actual packaged Setup.
         # Identical artifact repair isolates transport/process integration from
@@ -179,7 +190,7 @@ def main():
             '--data',str(data),'--installer',str(artifact),'--sha256',report['sha256']],
             stdout=subprocess.DEVNULL,stderr=coordinator_log)
         coordinator_log.close()
-        transaction=data/'update-proof';result_path=transaction/'coordinator-result.json'
+        transaction=data/'updates';result_path=transaction/'coordinator-result.json'
         deadline=time.monotonic()+90
         while not result_path.exists():
             assert coordinator.poll() is None, 'The installed coordinator failed; inspect coordinator.log.'

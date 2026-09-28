@@ -19,6 +19,7 @@ ArchitecturesAllowed={#AllowedArchitecture}
 ArchitecturesInstallIn64BitMode={#AllowedArchitecture}
 MinVersion={#MinimumVersion}
 UninstallDisplayIcon={app}\current\Augmentor.exe
+AppModifyPath="{code:RetainedInstallerPath}"
 CloseApplications=no
 RestartApplications=no
 Compression=lzma2/fast
@@ -43,6 +44,7 @@ Filename: "{app}\current\Augmentor.exe"; Parameters: "{code:LaunchParameters}"; 
 var MaintenanceHeld, AuthenticatedHandoff, RemovalHeld, FreshInstallation: Boolean;
   StartupChoiceKnown, StartupChoice: Boolean;
   BrowserCleanupReady, InstallationComplete, InstallerRetained: Boolean; BrowserDigest: String;
+  RetainedInstallerDigest: String;
 
 function OfferStartupTask: Boolean;
 begin
@@ -88,6 +90,21 @@ function RetainInstaller(SourcePath, InstallerDigest, ReleaseDigest: String): BO
   external 'AugmentorRetainInstaller@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
 function SelectInstaller: BOOL;
   external 'AugmentorSelectInstaller@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
+function MatchesSelectedInstaller: BOOL;
+  external 'AugmentorMatchesSelectedInstaller@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
+function ManualUpdateClear: BOOL;
+  external 'AugmentorManualUpdateClear@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
+function RemovalUpdateClear: BOOL;
+  external 'AugmentorManualUpdateClear@{tmp}\augmentor-removal.dll stdcall delayload uninstallonly';
+
+function RetainedInstallerPath(Param: String): String;
+begin
+  { Windows can run repair with the installed Python/Qt/launcher missing.
+    Register only the source already retained and pinned by this installation. }
+  if not InstallerRetained or (Length(RetainedInstallerDigest) <> 64) then
+    RaiseException('Augmentor has no verified repair installer.');
+  Result := ExpandConstant('{#RecoveryDirectory}') + '\' + RetainedInstallerDigest + '.exe';
+end;
 
 function BrowserKey(Index: Integer): String;
 begin
@@ -166,7 +183,8 @@ begin
 end;
 
 function PrepareToInstall(var NeedsRestart: Boolean): String;
-var CurrentRelease: String; AccessReady: Boolean; Registration: Cardinal;
+var CurrentRelease: String; AccessReady, NeedsSelectedRepair, OwnedInstallation: Boolean;
+  RootRegistration, IdentityRegistration, Registration: Cardinal;
 begin
   Result := '';
   if CompareText(ExpandFileName(WizardDirValue), ExpandFileName(ExpandConstant('{#InstallDirectory}'))) <> 0 then begin
@@ -184,34 +202,40 @@ begin
     end;
     MaintenanceHeld := True;
   end;
+  if not AuthenticatedHandoff and not ManualUpdateClear then begin
+    Result := 'An unfinished Augmentor update needs recovery before installation or repair can continue. Its records and your data were preserved.';
+    exit;
+  end;
   AccessReady := ValidateApplicationPath(ExpandConstant('{app}'));
   if not AccessReady then begin
     Result := 'The application folder contains a redirected or unsupported path. It was preserved; recovery is required.';
     exit;
   end;
-  { Same-build manual repair is allowed. Cross-version application needs the
-    coordinated transaction and retained recovery artifact; never guess from
-    a version string or overwrite an unidentified partial/foreign directory. }
+  { The independent selected-source receipt can identify an owned damaged
+    installation even when its replaceable release.json is missing. }
   CurrentRelease := ExpandConstant('{app}\current\release.json');
-  FreshInstallation := not DirExists(ExpandConstant('{app}\current'));
-  if not AuthenticatedHandoff and DirExists(ExpandConstant('{app}\current')) then begin
-    if not FileExists(CurrentRelease) then begin
-      Result := 'This application folder cannot be identified. Its files were preserved; recovery is required.';
-      exit;
-    end;
-    if GetSHA256OfFile(CurrentRelease) <> '{#ReleaseDigest}' then
-      Result := 'A different Augmentor build is installed. Use the coordinated update in Augmentor.';
-  end;
-  if Result <> '' then exit;
-  Registration := OwnedRegistry('{#InstallationKey}', 'Root', ExpandConstant('{app}\current'), 0);
-  if (Registration <> 1) and (Registration <> 2) then begin
+  RootRegistration := OwnedRegistry('{#InstallationKey}', 'Root', ExpandConstant('{app}\current'), 0);
+  if (RootRegistration <> 1) and (RootRegistration <> 2) then begin
     Result := 'Another Augmentor installation owns the browser setup registration. Its registration was preserved.';
     exit;
   end;
-  Registration := OwnedRegistry('{#InstallationKey}', 'AppId', 'com.augmentor.Agent', 0);
-  if (Registration <> 1) and (Registration <> 2) then begin
+  IdentityRegistration := OwnedRegistry('{#InstallationKey}', 'AppId', 'com.augmentor.Agent', 0);
+  if (IdentityRegistration <> 1) and (IdentityRegistration <> 2) then begin
     Result := 'The existing Augmentor application identity is unfamiliar. Its registration was preserved.';
     exit;
+  end;
+  OwnedInstallation := (RootRegistration = 2) and (IdentityRegistration = 2);
+  FreshInstallation := not DirExists(ExpandConstant('{app}\current')) and
+    (RootRegistration = 1) and (IdentityRegistration = 1);
+  NeedsSelectedRepair := False;
+  if not AuthenticatedHandoff and not FreshInstallation then begin
+    NeedsSelectedRepair := True;
+    if FileExists(CurrentRelease) then
+      NeedsSelectedRepair := GetSHA256OfFile(CurrentRelease) <> '{#ReleaseDigest}';
+    if NeedsSelectedRepair and not OwnedInstallation then begin
+      Result := 'This application folder cannot be identified. Its files were preserved; recovery is required.';
+      exit;
+    end;
   end;
   if FreshInstallation and WizardIsTaskSelected('startup') then begin
     if ('{#QualificationBase}' = '') and (Length(StartupCommand) > 260) then begin
@@ -224,11 +248,14 @@ begin
   end;
   if Result <> '' then exit;
   if not InstallerRetained then begin
+    RetainedInstallerDigest := Lowercase(GetSHA256OfFile(ExpandConstant('{srcexe}')));
     InstallerRetained := RetainInstaller(ExpandConstant('{srcexe}'),
-      Lowercase(GetSHA256OfFile(ExpandConstant('{srcexe}'))), '{#ReleaseDigest}');
+      RetainedInstallerDigest, '{#ReleaseDigest}');
     if not InstallerRetained then
       Result := 'Augmentor could not save its recovery copy. Check free disk space and try again. If this continues, contact support. Your installed app was not changed.';
   end;
+  if (Result = '') and NeedsSelectedRepair and not MatchesSelectedInstaller then
+    Result := 'This installer does not match the recorded Augmentor installation. Use its registered repair option or the coordinated update in Augmentor. Your installed app was not changed.';
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
@@ -269,6 +296,15 @@ begin
   RemovalHeld := PrepareRemoval('{#QualificationBase}');
   Result := RemovalHeld;
   if not Result then Log('Removal could not acquire idle maintenance access.');
+  if Result then begin
+    Result := RemovalUpdateClear;
+    if not Result then begin
+      Log('An unresolved update prevented removal.');
+      if not UninstallSilent then
+        MsgBox('An unfinished Augmentor update needs recovery before removal can continue. Its records and your data were preserved.', mbInformation, MB_OK);
+      exit;
+    end;
+  end;
   if Result then begin
     Result := ValidateRemovalPath(ExpandConstant('{app}'));
     if not Result then Log('Removal application-tree validation failed.');

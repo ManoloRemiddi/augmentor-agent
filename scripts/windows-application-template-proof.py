@@ -86,6 +86,9 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         key_path = r'Software\Microsoft\Windows\CurrentVersion\Uninstall'+'\\'+report['applicationId']+'_is1'
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_path, 0, winreg.KEY_READ|winreg.KEY_WOW64_64KEY) as key:
             removal = command_executable(winreg.QueryValueEx(key, 'UninstallString')[0])
+            repair_command = winreg.QueryValueEx(key, 'ModifyPath')[0]
+        assert repair_command == '"'+str(cached)+'"', repair_command
+        repair = command_executable(repair_command)
         assert removal.is_relative_to(install)
         # Both kinds of damaged retained bytes refuse BEFORE file replacement;
         # preserve the damaged cache for inspection, then restore this fixture.
@@ -102,6 +105,68 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         assert cached.stat().st_mtime_ns == retained_time
         assert selection.stat().st_mtime_ns == selected_time
         stages.append('original-installer-retained-and-corrupt-cache-refused')
+        # Registered repair executes the retained standalone installer after
+        # deleting the native app and its interpreter DLLs/version metadata.
+        # It must need no executable code from the broken installed payload.
+        sentinel = Path(report['qualificationBase'])/'preserve-settings.json'
+        atomic_json(sentinel, {'model':'preserve fixture choice','history':['preserve fixture turn']})
+        sentinel_bytes = sentinel.read_bytes()
+        installed_release = install/'current/release.json'
+        installed_release.unlink()
+        (install/'current/Augmentor.exe').unlink()
+        runtime_libraries = list((install/'current/python').glob('python3*.dll'))
+        assert runtime_libraries
+        for library in runtime_libraries: library.unlink()
+        updates = private_directory(Path(report['qualificationBase'])/'updates')
+        pending = updates/'active.json'
+        with os.fdopen(descriptor(pending,writable=True,create=True),'wb') as stream:
+            stream.write(b'Unresolved fixture update: even malformed state blocks manual repair.\n')
+        pending_bytes = pending.read_bytes()
+        run(repair, 'pending-update-repair-refusal', success=False)
+        run(removal, 'pending-update-removal-refusal', success=False)
+        assert pending.read_bytes() == pending_bytes and not installed_release.exists()
+        assert not (install/'current/Augmentor.exe').exists() and sentinel.read_bytes() == sentinel_bytes
+        pending.unlink()  # Dispose only this test's synthetic pending record.
+        selected_bytes = read_private(selection)
+        from lifecycle.installed_source import PREFIX
+        with os.fdopen(descriptor(selection,writable=True),'wb') as stream:
+            stream.write(PREFIX+b'0'*64+b'\n'+release_digest+b'\n')
+        run(repair, 'unselected-source-repair-refusal', success=False)
+        assert not installed_release.exists() and not (install/'current/Augmentor.exe').exists()
+        with os.fdopen(descriptor(selection,writable=True),'wb') as stream: stream.write(selected_bytes)
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, report['installationKey'], 0,
+                            winreg.KEY_READ|winreg.KEY_SET_VALUE|winreg.KEY_WOW64_64KEY) as key:
+            registered_root = winreg.QueryValueEx(key, 'Root')
+            winreg.DeleteValue(key, 'Root'); winreg.FlushKey(key)
+            run(repair, 'unowned-source-repair-refusal', success=False)
+            assert not installed_release.exists()
+            winreg.SetValueEx(key, 'Root', 0, registered_root[1], registered_root[0]); winreg.FlushKey(key)
+        run(repair, 'registered-independent-repair')
+        assert installed_release.read_bytes() == (payload/'release.json').read_bytes()
+        for path in (install/'current/Augmentor.exe', *runtime_libraries):
+            assert path.read_bytes() == (payload/path.relative_to(install/'current')).read_bytes()
+        assert read_private(selection) == selected_bytes and cached.stat().st_mtime_ns == retained_time
+        assert sentinel.read_bytes() == sentinel_bytes
+        # Damaged metadata (rather than an absent file) takes the same exact
+        # selected-source path. No foreign/version-only match is accepted.
+        installed_release.write_bytes(b'Broken fixture metadata.\n')
+        run(repair, 'damaged-metadata-repair')
+        assert installed_release.read_bytes() == (payload/'release.json').read_bytes()
+        # A lost payload is still the registered installation, not a new user.
+        # Preserve a login entry deliberately removed by that user.
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, report['startupKey'], 0,
+                            winreg.KEY_READ|winreg.KEY_SET_VALUE|winreg.KEY_WOW64_64KEY) as key:
+            winreg.DeleteValue(key, 'Augmentor Agent'); winreg.FlushKey(key)
+        shutil.rmtree(install/'current')  # Exact disposable fixture-owned payload.
+        run(repair, 'missing-payload-repair')
+        assert installed_release.read_bytes() == (payload/'release.json').read_bytes()
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, report['startupKey'], 0,
+                            winreg.KEY_READ|winreg.KEY_WOW64_64KEY) as key:
+            try: winreg.QueryValueEx(key, 'Augmentor Agent')
+            except FileNotFoundError: pass
+            else: raise AssertionError('Repair re-enabled the removed login entry.')
+        assert sentinel.read_bytes() == sentinel_bytes
+        stages.append('registered-independent-repair-and-unresolved-update-refusal')
         run(removal, 'without-browser')
         assert not (install/'current/Augmentor.exe').exists()
         assert hashlib.sha256(read_private(cached)).hexdigest() == report['sha256']

@@ -74,6 +74,7 @@ def build(root, arch, out, *, qualification=None, compiler_path=None):
         'InstallDirectory':r'{localappdata}\Programs\Augmentor Agent',
         'OutputDirectory':str(out), 'HandoffHelper':str(helper), 'PayloadDirectory':str(root),
         'ReleaseDigest':digest(root/'release.json'), 'HelperDigest':digest(helper), 'QualificationBase':'',
+        'RecoveryDirectory':r'{localappdata}\Augmentor\recovery',
         'HandoffRuntime':'', 'MinimumVersion':'10.0.26200',
         'InstallationKey':r'Software\Augmentor\Installation',
         'StartupKey':r'Software\Microsoft\Windows\CurrentVersion\Run',
@@ -92,6 +93,7 @@ def build(root, arch, out, *, qualification=None, compiler_path=None):
         identity = 'AugmentorQ.'+hashlib.sha256(str(base).encode()).hexdigest()[:24]
         definitions.update(ApplicationId=identity, ShortcutName=identity,
             InstallDirectory=str(base/'installed café'), QualificationBase=str(data),
+            RecoveryDirectory=str(data/'recovery'),
             HandoffRuntime=str(data/'run'),
             InstallationKey='Software\\AugmentorQualification\\'+identity+'\\Installation',
             StartupKey='Software\\AugmentorQualification\\'+identity+'\\Run',
@@ -106,7 +108,7 @@ def build(root, arch, out, *, qualification=None, compiler_path=None):
     for key, value in definitions.items():
         if any(char in value for char in '\r\n') or '"' in value:
             raise ValueError('Unsupported installer definition: '+key)
-        if key in ('OutputDirectory','HandoffHelper','PayloadDirectory','QualificationBase','HandoffRuntime') or (qualification and key=='InstallDirectory'):
+        if key in ('OutputDirectory','HandoffHelper','PayloadDirectory','QualificationBase','HandoffRuntime') or (qualification and key in ('InstallDirectory','RecoveryDirectory')):
             if any(char in value for char in '{};"'): raise ValueError('Unsupported installer path: '+key)
     tool = Path(compiler_path) if compiler_path else compiler(out)
     with (out/'compile.log').open('w', encoding='utf-8') as log:

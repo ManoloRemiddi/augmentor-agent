@@ -273,6 +273,13 @@ redirect refusal and software-only removal with retained persistent data. Native
 execution is required; this does not establish signed update/rollback or physical
 hardware support. See [installer scope](../docs/WINDOWS-INSTALLER-DECISION.md#actual-application-installer-candidate).
 
+Registered repair additionally deletes the installed launcher, Python runtime
+DLLs, launch script and version metadata, executes Windows' actual ModifyPath
+and reopens the repaired native application. The small exact-template test also
+checks pending-update/removal refusal, another source's receipt and missing
+ownership registration, plus damaged metadata and preserved settings. These new
+cases require native x64/ARM64 execution; local compilation is not repair evidence.
+
 The installed proof also starts the real owner and native preview, invokes
 `scripts/windows-application-update-proof.py` as a separate coordinator, and checks
 actual same-build Inno application after observed graph/coordinator exit. This

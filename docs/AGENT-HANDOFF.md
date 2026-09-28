@@ -33,14 +33,15 @@ Current evidence:
   also pass. This exact-template test uses inert component markers and a recording
   startup script; it does not replace complete app qualification.
 - [Full bdba572 qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36405973046)
-  is executing. It now reapplies the actual retained original installer and obtains
-  the journal source identity from the native selection receipt. Inspect terminal
-  results before claiming this newer full integration passed.
+  passes x64, including application of the actual retained original installer and
+  journal identity from the native selection receipt. ARM64 is executing its
+  installed-app step. Inspect terminal results before claiming both CPUs passed.
 - All 38 local update/receipt/journal/coordinator tests pass. The [bdba572 fast
   native workflow](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36405973042)
-  passes ARM64; x64 remains in checkout at the latest observation. Both fast jobs
-  passed at `59dbbf4`/`ba0b68c` before the six new selection-reader tests. Shared
-  service/restart/lifecycle tests pass locally. Linux/macOS workflows continue.
+  passes ARM64; x64 failed during checkout because GitHub could not be reached,
+  before product tests ran. [Fast native tests at documentation-only 3edb570](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36406785057)
+  now pass both CPUs with the same runtime source and all 38 tests. Inno at that
+  head also passes both CPUs. Shared service/restart/lifecycle tests pass locally.
 
 Implemented recovery preparation: the actual installer retains its original EXE
 and payload-metadata digest privately before replacement. Corrupt retained entries
@@ -52,8 +53,15 @@ proof of health. The separate signed-bundle reader can revalidate an exact recor
 recovery release after its delivery expiry without allowing feed downgrades.
 No customer key/feed or automatic updater is enabled.
 
-Next: finish full cached-source/selection integration qualification; then implement
-independent recovery/rollback, obsolete-file cleanup and bounded cache pruning,
+New source adds registered independent exact-build repair through the retained
+installer, including restoration without installed Python/Qt, launcher or version
+metadata. It refuses unfinished updates, unknown ownership and another selected
+source. Native template/full proof cases are added but not yet qualified; local
+38 update tests, three package tests and script compilation pass. See the
+[repair contract](WINDOWS-INSTALLER-DECISION.md#independent-repair-from-windows-installed-app-controls).
+
+Next: qualify cached-source integration and independent exact-build repair; then
+finish cross-version recovery/rollback, obsolete-file cleanup and bounded cache pruning,
 actual N-to-N+1 and the customer notification/update action. The current Inno
 backend replaces `current` in place and does not provide atomic version selection
 or power-loss recovery. Cache artifacts currently survive normal removal; connect

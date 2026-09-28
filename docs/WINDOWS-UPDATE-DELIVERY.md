@@ -100,6 +100,13 @@ Its raw receipt is not a signed update bundle. Exact installed source selection 
 reader, under qualification. An independently available recovery runtime, interrupted-state inspection, actual
 recovery application, health and obsolete-file cleanup are still required.
 
+The standalone retained installer now supplies a registered exact-build repair
+path without relying on the installed Python/Qt runtime. This uses the separate
+native source receipt and is not signed-bundle rollback. Manual repair/removal
+refuses any unresolved `updates/active.json`; the coordinator's Windows journal
+directory is `<private Augmentor base>/updates`. See [independent repair and its
+pending native evidence](WINDOWS-INSTALLER-DECISION.md#independent-repair-from-windows-installed-app-controls).
+
 ## Evidence and remaining work
 
 Eleven new local tests execute real Node Ed25519 verification and private storage,
