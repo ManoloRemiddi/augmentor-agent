@@ -36,8 +36,8 @@ Current evidence:
   now passes both CPUs and shared Mac Qt at merge checkout
   `7fb0927db3e8e75e03a8bae7d31c104649f2a992`. Downloaded installed reports confirm
   complete retention/selection, actual cached-source application, local Qt health,
-  journal archival and removal. This is the newest complete installed baseline;
-  registered independent repair was added afterward.
+  journal archival and removal. Registered independent repair was added afterward
+  and passes in the full `f61d32f` run below.
 - All 38 local update/receipt/journal/coordinator tests pass. The [bdba572 fast
   native workflow](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36405973042)
   passes ARM64; x64 failed during checkout because GitHub could not be reached,
@@ -62,8 +62,10 @@ source. [Native Inno at f61d32f](https://github.com/ManoloRemiddi/augmentor-agen
 passes both CPU template cases at merge checkout
 `b05a0c9a9747d9e52cdbdb905bc1a992a8ad782c`, including registered repair without
 an installed runtime/metadata, pending-update/foreign-source refusal and preserved
-disabled startup. The complete installed x64 proof also passes, including actual Qt reopen after
-registered repair; ARM64 is still running. Earlier native
+disabled startup. The [complete installed proof](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36409313612)
+also passes both CPUs and shared Mac Qt at the same merge checkout, including
+actual Qt reopen after registered repair without installed runtime or metadata.
+This is the newest complete installed baseline. Earlier native
 checks caught a Pascal Boolean mismatch and an unquoted ModifyPath; both are
 corrected. The pinned Inno
 compiler passes an isolated compile-only fixture; local 38 update tests, three
@@ -85,13 +87,18 @@ whenever the private update journal is unresolved. A fixed native local-health
 action renders the real shared UI in a disposable private profile; it cannot open
 a conversation, run desktop actions or complete a transaction. The independent
 observer checks the identified release and owned process exit. Two local real-Qt
-tests and package intake checks pass; the compiled entry, pending-journal refusal
-and installed health/identity failure cases require fresh native execution. See
+tests and package intake checks pass. The compiled entry and pending-journal/unsafe
+directory refusal cases pass both CPUs at `3674b4a`. Its Windows GUI job failed
+because the new font-health test incorrectly forced Qt offscreen; the same run
+passes actual Windows-QPA font rendering. The test now runs in the native Windows
+QPA step and no longer forces offscreen. Installed health/identity failure cases
+and the corrected GUI step still require fresh native execution. See
 [recovery-aware startup and health](WINDOWS-INSTALLER-DECISION.md#recovery-aware-startup-and-isolated-local-health).
 
-Next: qualify the new startup/health path and complete ARM64 independent repair;
-then finish cross-version recovery/rollback, obsolete-file cleanup, bounded cache
-pruning, actual N-to-N+1 and the customer notification/update action. The current Inno
+Next: qualify the isolated native health path and corrected GUI test; finish safe
+pre-apply cancellation and independent interrupted/cross-version recovery, then
+obsolete-file cleanup, bounded cache pruning, actual N-to-N+1 and the customer
+notification/update action. The current Inno
 backend replaces `current` in place and does not provide atomic version selection
 or power-loss recovery. Cache artifacts currently survive normal removal; connect
 the explicit cache-retention/removal policy before customer delivery. Selection

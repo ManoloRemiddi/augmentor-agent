@@ -706,3 +706,16 @@ Recovery from interrupted apply, actual cross-version rollback, safe cancellatio
 before apply, obsolete payload removal and bounded cache retention remain required
 before enabling customer updates. An unresolved journal must lead to the future
 independent recovery flow, not an instruction to delete its record manually.
+
+The complete `f61d32f` run now passes both CPUs and shared Mac Qt at merge
+checkout `b05a0c9a9747d9e52cdbdb905bc1a992a8ad782c`. Both downloaded reports
+include registered repair without installed runtime/metadata and actual reopening.
+This predates the new isolated health action.
+
+At `3674b4a`, [the fast Windows workflow](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36411857137)
+records passing compiled entry/guard/routing checks on both CPUs. The overall
+workflow fails the new font-health test because it forces offscreen QPA; the
+same run's actual Windows-QPA rendering has valid fonts. The corrected test runs
+in the existing native-QPA step without overriding that backend. The product
+health script already requires Windows QPA, and the font-coverage requirement
+is retained. Corrected GUI execution and full installed health remain pending.

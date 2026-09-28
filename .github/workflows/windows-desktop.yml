@@ -54,8 +54,6 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_window.py -v
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_local_health.py -v
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_instance.py -v
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_managed_setup_ui.py -v
@@ -110,6 +108,8 @@ jobs:
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_browser.py -v
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_browser_control.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_local_health.py -v
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B scripts/windows-desktop-proof.py --out outputs/evidence
           if ($LASTEXITCODE) { exit $LASTEXITCODE }

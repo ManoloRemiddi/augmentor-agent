@@ -2,6 +2,7 @@
 """Shared offline health renders the real UI without starting a conversation."""
 import os
 from pathlib import Path
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -13,9 +14,12 @@ from augmentor_linux.local_health import render_preview
 class LocalHealthTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.app=QApplication.instance() or QApplication(['local-health-test','-platform','offscreen'])
+        cls.app=QApplication.instance() or QApplication(['local-health-test'])
 
     def test_real_render_never_starts_controller_or_process_or_writes_preferences(self):
+        if sys.platform == 'win32':
+            self.assertEqual(self.app.platformName(),'windows',
+                'Windows font health must run with the native QPA font backend.')
         with tempfile.TemporaryDirectory() as temporary:
             root=Path(temporary)
             saved=root/'appearance.json';saved.write_text('{"ui_scale":140,"harness":"pi"}')

@@ -300,3 +300,9 @@ inert. The full installed proof exercises the actual native Windows health scrip
 with disposable profile cleanup, missing-helper and mismatched-metadata refusal,
 preserved journal/data, and ordinary reopening only after archival. These native
 cases require fresh execution; portable rendering alone does not qualify them.
+
+At `3674b4a`, both native launcher guard/routing reports pass. The new Windows
+font-health test fails under offscreen QPA, while the existing Windows-QPA proof
+passes actual font coverage. The test now runs in the Windows-QPA step and no
+longer overrides the selected backend. Font coverage remains mandatory; corrected
+native execution and installed health are still pending.
