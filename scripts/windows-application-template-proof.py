@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def prove(out, arch, compiler, fixture_executable):
+    from platform_adapters.processes import OwnedProcess
     from platform_adapters.private_files import atomic_json, descriptor
     from platform_adapters.windows_identity import private_directory
     from platform_adapters.windows_browsers import command_executable
@@ -45,9 +46,16 @@ def prove(out, arch, compiler, fixture_executable):
     flags = ['/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-']
     stages = []; removal = None
     def run(executable, label, success=True):
-        result = subprocess.run([str(executable), *flags,
-            '/LOG='+str(out/('application-template-'+label+'.log'))], timeout=60)
-        assert (result.returncode == 0) == success, (label,result.returncode)
+        child = OwnedProcess([str(executable), *flags,
+            '/LOG='+str(out/('application-template-'+label+'.log'))], stdin=subprocess.DEVNULL)
+        try:
+            # Inno's first uninstall process exits before the copied remover
+            # finishes. Observe natural exit of the whole disposable range.
+            code = child.wait_graceful(timeout=60)
+        finally:
+            if child.job is not None:
+                child.kill(); child.wait(timeout=10)  # Failed fixture cleanup only.
+        assert (code == 0) == success, (label,code)
     try:
         run(report['installer'], 'initial')
         key_path = r'Software\Microsoft\Windows\CurrentVersion\Uninstall'+'\\'+report['applicationId']+'_is1'

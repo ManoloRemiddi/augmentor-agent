@@ -38,8 +38,13 @@ The native helper rejected a NULL value-name pointer, but Pascal Script marshals
 an empty String that way and Windows defines it as the default registry value.
 Current source normalizes this representation to the empty name while preserving
 exact value/type/ownership checks. Native tests now explicitly cover default-value
-creation, foreign-value refusal and owned removal. Execution of this correction,
-the complete template sequence and full installed uninstall remains pending.
+creation, foreign-value refusal and owned removal. At `df44e1c`, x64 passes these
+checks plus exact-template repair and removal without a browser. The next test
+starts reinstallation while the copied uninstaller still owns maintenance: the
+original EXE has already exited for self-deletion. Both installed proofs now use
+the existing owned-process adapter to observe the entire installer/remover range
+exiting naturally before inspection or reinstallation. Only failed disposable
+test cleanup may terminate that range. The complete sequence remains pending.
 
 Current installer code records one owned browser anchor and optional per-user
 login entry, preserves disabled startup on repair/update, and removes only exact

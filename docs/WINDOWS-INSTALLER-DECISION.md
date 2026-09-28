@@ -458,3 +458,16 @@ exact expected content or foreign preservation. The actual Inno registry fixture
 adds default-value read/create/remove and foreign refusal. Both the small exact
 application-template test and full installed removal must pass before this is
 considered qualified.
+
+At `df44e1c`, the x64 native default-value checks pass and the exact application
+template successfully repairs and removes its inert payload without a browser.
+Immediate reinstall then encounters the still-running copied Uninstall process: the
+original EXE exits first so Inno can delete it. The next test starts before the
+remover releases maintenance (the logs show a 0.5-second overlap). This refusal
+is correct, not permission to weaken the maintenance gate.
+
+Both template and full installed proofs now use the existing `OwnedProcess`
+range and `wait_graceful` to observe all installer/remover descendants exiting
+normally before further actions or inspection. Their existing bounds remain; no
+setup/removal command is replayed. Forced cleanup is restricted to failed disposable
+tests. Native rerun of the complete sequence is pending.

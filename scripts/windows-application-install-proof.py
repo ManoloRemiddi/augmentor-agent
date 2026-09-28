@@ -27,6 +27,7 @@ def main():
     from platform_adapters.windows_browsers import command_executable
     from platform_adapters.private_files import atomic_json, descriptor, read_json
     from platform_adapters.transport import LocalSocket
+    from platform_adapters.processes import OwnedProcess
     from augmentor_linux.instances import ipc_basename
     out = args.out.resolve()
     out.mkdir(parents=True, exist_ok=True)
@@ -42,7 +43,16 @@ def main():
     flags = ['/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-']
     child = None; removal = None; stages = []
     def run(command, *, success=True, timeout=300):
-        result = subprocess.run(list(map(str,command)), timeout=timeout)
+        argv = list(map(str,command))
+        process = OwnedProcess(argv, stdin=subprocess.DEVNULL)
+        try:
+            # The original uninstaller can exit to permit its own deletion
+            # while copied Uninstall still owns maintenance. Wait for the whole
+            # fixture range to exit normally before inspecting or reinstalling.
+            result = subprocess.CompletedProcess(argv, process.wait_graceful(timeout=timeout))
+        finally:
+            if process.job is not None:
+                process.kill(); process.wait(timeout=10)  # Failed fixture cleanup only.
         assert (result.returncode == 0) == success, (str(command[0]), result.returncode, success)
         return result
     def setup(label, *extra, success=True):
