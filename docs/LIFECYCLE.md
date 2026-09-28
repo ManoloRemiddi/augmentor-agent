@@ -594,3 +594,29 @@ The [Windows adapter and installed integration proof](WINDOWS-INSTALLER-DECISION
 connect shared durable decisions to independent Inno ownership. No download,
 publisher verification or recovery is inferred from this adapter; callers retain
 both verified artifacts before admission. Current native integration is pending.
+
+The assembled managed DSH/voice graph at `f950a45` passes on both native CPUs in
+[36389905723](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36389905723),
+including observed global drain, exclusive installation access and retained
+conversation restart. The actual product-installer application added afterward
+remains in qualification; these results do not establish public N-to-N+1 updates.
+
+### Independently verified completion
+
+Update journals now support independent completion after the caller has observed
+installer exit, reverified the release pair/installed selection and passed a local
+health callback. Completed records are durably archived; failed health, an
+unmatched artifact pair or a pre-APPLY record cannot finish the attempt. Four
+new local fault/preservation tests pass (16 combined coordinator/journal checks).
+The installed Windows proof now checks every payload file and a real Qt launch
+before archiving. Native execution of this completion path is pending. This does
+not implement recovery from an unknown installer outcome or rollback.
+
+`UpdateJournal.complete_verified` takes a fresh exclusive journal claim and
+independently revalidated source/target identities. It calls the health observer
+with a copy of the record, advances only the final installed/healthy/complete
+states, then durably renames the record to `completed-<id>.json` in the same
+private directory. A subsequent update can claim a new active record. An archive
+failure retains either the active completed record or its archive; this method
+never retries an uncertain write or infers installer completion from a saved PID.
+A record alone remains insufficient authority to launch, replay or roll back.

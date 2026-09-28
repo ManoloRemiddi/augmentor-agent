@@ -25,11 +25,18 @@ def main():
     for path in ('python/python.exe', 'node/node.exe', 'powershell/pwsh.exe', 'dsh/payload.json'):
         if not (target/path).is_file(): raise ValueError('Stage the pinned Windows runtimes first: '+path)
     if (target/'services').exists(): raise ValueError('Choose a runtime tree without a previous application overlay.')
-    with tempfile.TemporaryDirectory(prefix='augmentor-production-') as temporary:
+    # Keep staging on the destination volume: the large, disjoint node_modules
+    # directory can then be moved once instead of copying every dependency file
+    # again. Existing runtime/license directories still merge as before.
+    with tempfile.TemporaryDirectory(prefix='augmentor-production-', dir=target.parent) as temporary:
         production = Path(temporary)/'app'
         subprocess.run([sys.executable, '-Xutf8', '-B', str(ROOT/'scripts/stage-production.py'),
                         '--out', str(production)], check=True, timeout=900)
-        shutil.copytree(production, target, dirs_exist_ok=True)
+        for source in production.iterdir():
+            destination = target/source.name
+            if not destination.exists(): shutil.move(str(source), str(destination))
+            elif source.is_dir(): shutil.copytree(source, destination, dirs_exist_ok=True)
+            else: shutil.copy2(source, destination)
     for name in ('dist', 'apps/native', 'apps/browser', 'scripts', 'services', 'adapters', 'config',
                  'docs', 'licenses', 'LICENSE', 'README.md', 'release/product.json', 'release/windows', 'release/dsh'):
         source, destination = ROOT/name, target/name

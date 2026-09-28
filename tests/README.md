@@ -277,3 +277,8 @@ The installed proof also starts the real owner and native preview, invokes
 actual same-build Inno application after observed graph/coordinator exit. This
 qualifies the Windows apply adapter when native CI passes; N-to-N+1, signing,
 recovery and rollback remain separate gates.
+
+Journal completion adds fault checks for unknown APPLY followed by independent
+health, failed health/wrong release preservation, pre-APPLY refusal and failed
+archive recovery by fresh inspection. These are storage/decision tests; they do
+not stand in for native installed health or rollback qualification.

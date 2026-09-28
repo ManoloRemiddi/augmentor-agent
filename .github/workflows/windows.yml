@@ -138,14 +138,6 @@ jobs:
         if: ${{ !cancelled() && steps.application.outcome == 'success' }}
         run: |
           & outputs/payload/python/python.exe -I -Xutf8 -B scripts/windows-application-install-proof.py --root outputs/payload --arch ${{ matrix.arch }} --out outputs/installed-application
-      - name: Install pinned build-time packaging tool
-        if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
-        id: packaging
-        run: dotnet tool install vpk --version 1.2.158 --tool-path outputs/vpk
-      - name: Qualify embedded launcher and two disposable installer versions
-        if: ${{ !cancelled() && steps.packaging.outcome == 'success' }}
-        run: |
-          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/windows-installer-proof.py --runtime outputs/payload --arch ${{ matrix.arch }} --out outputs/installer-proof --vpk outputs/vpk/vpk.exe
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -157,8 +149,6 @@ jobs:
             outputs/installed-application/*.log
             outputs/installed-application/package/compile.log
             outputs/installed-application/package/package.json
-            outputs/installer-proof/*.json
-            outputs/installer-proof/persistent/hooks.jsonl
           retention-days: 14
           if-no-files-found: warn
   shared-qt-candidate:

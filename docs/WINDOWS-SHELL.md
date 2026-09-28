@@ -356,3 +356,10 @@ Installer processes use a separate [independent process adapter](WINDOWS-INSTALL
 The ordinary service `OwnedProcess` remains kill-on-close for fault containment.
 Its semantics must not be reused for an installer that must outlive Augmentor.
 New installer Job/byte-binding native qualification is pending.
+
+At `3c6d78b`, the hosted Debian job passes the complete Qt checks and first-run
+form/Pi checks with exit zero in
+[36391189270](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36391189270).
+Its actual Chromium reservation proof also passes. This supersedes the earlier
+pending hosted check for the adopted-thread shutdown correction; the surrounding
+package jobs have their own workflow results.

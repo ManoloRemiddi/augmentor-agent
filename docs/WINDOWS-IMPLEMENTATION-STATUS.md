@@ -2,6 +2,29 @@
 
 # Windows implementation evidence
 
+All `3c6d78b` Linux source/installed-package/browser jobs, macOS feasibility,
+fast native Windows and Inno handoff fixtures pass. The actual full Windows
+application installer integration is still running and is not yet qualified.
+
+Update journals now support independent completion after the caller has observed
+installer exit, reverified the release pair/installed selection and passed a local
+health callback. Completed records are durably archived; failed health, an
+unmatched artifact pair or a pre-APPLY record cannot finish the attempt. Four
+new local fault/preservation tests pass (16 combined coordinator/journal checks).
+The installed Windows proof now checks every payload file and a real Qt launch
+before archiving. Native execution of this completion path is pending. This does
+not implement recovery from an unknown installer outcome or rollback.
+
+Full native runtime at `f950a45` passes on **both x64 and ARM64** in
+[36389905723](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36389905723),
+plus the shared Mac Qt candidate. This qualifies the shared voice 0.1.19 pin with
+actual managed DSH/voice startup, compiled desktop Send/Enter/history, observed
+graph drain, exclusive access after drain, owner/service restart and compiled
+browser commit. The provider is deterministic; physical audio/input and live
+model quality are not claimed. The newer actual full-payload installer and
+`WindowsApply` integration at `3c6d78b` are now running; those installed-package
+checks have not yet passed.
+
 The actual installed-app qualification now composes the shared coordinator with
 `WindowsApply`: an independent Inno process, private authenticated handoff and
 one-shot durable APPLY. The fixture starts an installed window and background

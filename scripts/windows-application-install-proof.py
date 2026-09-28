@@ -86,6 +86,12 @@ def main():
         from win32com.shell import shell,shellcon
         shortcut=Path(shell.SHGetFolderPath(0,shellcon.CSIDL_PROGRAMS,0,0))/(report['applicationId']+'.lnk')
         assert shortcut.is_file()
+        import pythoncom
+        link_object=pythoncom.CoCreateInstance(shell.CLSID_ShellLink,None,pythoncom.CLSCTX_INPROC_SERVER,shell.IID_IShellLink)
+        link_object.QueryInterface(pythoncom.IID_IPersistFile).Load(str(shortcut))
+        assert Path(link_object.GetPath(shell.SLGP_RAWPATH)[0]).resolve()==executable.resolve()
+        assert link_object.GetArguments()=='--qualification-root "'+str(data)+'"'
+        del link_object
         stages.append('initial-full-payload-install')
         child = open_preview(); state=ready(); assert state['pid']==child.pid
         command('ui-test:'+json.dumps({'action':'draft','expected':'','text':'Preserve this installed draft'}))
@@ -144,7 +150,25 @@ def main():
         finally:setup_process.Close()
         assert (install/'current/release.json').read_bytes()==(args.root/'release.json').read_bytes()
         assert sentinel.read_bytes()==sentinel_bytes
-        child=open_preview();ready();close_preview();child=None
+        # Independent local health does not depend on a provider being online.
+        # For this known-built artifact compare every payload file, then launch
+        # and close the actual installed Qt app before completing its journal.
+        from lifecycle.update_journal import UpdateJournal
+        release=report['release']
+        identity={'version':release['version'],'sourceCommit':release['sourceCommit'],'target':release['target'],
+            'channel':'qualification','sha256':report['sha256'],'dataSchema':1,'readableDataSchemas':[1]}
+        def local_health(_record):
+            nonlocal child
+            assert package.digest(artifact)==report['sha256']
+            for directory,_names,files in os.walk(args.root):
+                for filename in files:
+                    source=Path(directory)/filename
+                    assert package.digest(install/'current'/source.relative_to(args.root))==package.digest(source)
+            child=open_preview();ready();close_preview();child=None
+            return True
+        archive=UpdateJournal.complete_verified(transaction,identity,identity,local_health)
+        assert read_json(archive)['phase']=='complete' and not (transaction/'active.json').exists()
+        report['archivedUpdate']=archive.name
         stages.append('installed-graph-drain-durable-apply-setup-exit-and-relaunch')
         # Inno must not follow a requested custom replacement directory.
         other=out/'foreign';other.mkdir();foreign=other/'untouched.txt';foreign.write_text('preserve')

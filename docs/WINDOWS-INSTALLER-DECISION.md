@@ -333,3 +333,20 @@ installer remains independent after coordinator exit; a digest still does not
 establish publisher trust. Its explicit outer-runner Job option is fixture-only.
 The installed integration script is a development proof, not a public updater or
 a production trust boundary. Product update metadata/UI/recovery remain open.
+
+The full Windows workflow now runs the selected Inno application installer instead
+of reinstalling the rejected Velopack feasibility pair on every change. The
+original proof scripts and dated failure evidence remain available for reference;
+removing that redundant CI step does not waive any Inno/product release gate.
+
+Windows staging now places its temporary production dependency graph on the same
+volume and moves disjoint top-level directories into the payload, avoiding a
+second recursive copy of node_modules. Overlapping runtime/license directories
+retain their previous merge behavior. Native output qualification remains required;
+no measured speedup is claimed. Package evidence records installer byte size.
+
+The installed proof reads the Start-menu shortcut target/arguments, observes the
+real Setup exit, compares every installed payload file to the known-built fixture
+and opens/closes installed Qt before completing and archiving the durable update
+record. This is local health for identical-build qualification, not live provider,
+Windows speech engine or production recovery evidence. Native execution is pending.

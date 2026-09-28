@@ -14,7 +14,7 @@ import re
 import secrets
 
 from platform_adapters import locks
-from platform_adapters.private_files import atomic_json, descriptor, read_json, require_directory
+from platform_adapters.private_files import atomic_json, descriptor, read_json, require_directory, replace_file
 
 SCHEMA = 'augmentor-update/1'
 PHASES = ('verified', 'preparing', 'prepared', 'draining', 'drained',
@@ -159,6 +159,46 @@ class UpdateJournal:
 
     def close(self):
         if self.fd is not None: os.close(self.fd); self.fd = None
+
+    @classmethod
+    def complete_verified(cls, directory, source, target, verify_health):
+        """Finalize an independently observed installation; never resume commands.
+
+        The caller revalidates the retained artifacts and actual installed
+        selection, and observes the real installer exit before calling. The
+        bounded local-health callback must verify that selected build without
+        provider/network availability being a prerequisite. This method does
+        not infer those facts from recorded PIDs, versions or an installer log.
+        It cannot drain, launch an installer, roll back or recover unknown apply.
+        """
+        if not callable(verify_health): raise ValueError('Independent local health verification is required.')
+        journal = cls.__new__(cls)
+        journal.directory = require_directory(Path(directory))
+        journal.path = journal.directory/'active.json'
+        journal.fd = None; journal.record = None; journal.uncertain = False; journal.participants = []
+        try:
+            journal.fd = descriptor(journal.directory/'writer.lock', writable=True, create=True)
+            locks.flock(journal.fd, locks.LOCK_EX | locks.LOCK_NB)
+            journal.record = validate(read_json(journal.path))
+            if journal.record['source'] != artifact(source) or journal.record['target'] != artifact(target):
+                raise ValueError('The independently verified release pair differs from this update. Its record was preserved.')
+            if journal.record['phase'] not in ('apply-intent', 'apply-acknowledged', 'installed', 'healthy', 'complete'):
+                raise ValueError('This transaction did not authorize installation. Its record was preserved.')
+            # Give observers a copy; no callback may edit this durable history.
+            if verify_health(deepcopy(journal.record)) is not True:
+                raise ValueError('Installed local health was not verified. The update remains unresolved.')
+            if journal.record['phase'] in ('apply-intent', 'apply-acknowledged'): journal.advance('installed')
+            if journal.record['phase'] == 'installed': journal.advance('healthy')
+            if journal.record['phase'] == 'healthy': journal.advance('complete')
+            archive = journal.directory/('completed-'+journal.record['id']+'.json')
+            if archive.exists() or archive.is_symlink():
+                raise ValueError('An update archive already exists. Both records were preserved.')
+            # Same-directory durable rename retains the finished record and
+            # frees active.json only after completion. Failure is never retried
+            # here: the next observer must inspect which name actually exists.
+            replace_file(journal.path, archive)
+            return archive
+        finally: journal.close()
 
     def __enter__(self): return self
     def __exit__(self, *_): self.close()

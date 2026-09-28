@@ -63,6 +63,50 @@ class UpdateJournalTests(unittest.TestCase):
             journal.advance('healthy'); journal.advance('complete')
         self.assertEqual(recovery_action(read_json(self.directory/'active.json')), 'complete')
 
+    def test_independent_health_completion_retains_history_and_allows_next_attempt(self):
+        with self.journal() as journal:
+            self.ready(journal);journal.advance('apply-intent')
+        observed=[]
+        archive=UpdateJournal.complete_verified(self.directory,identity(),identity('1.1.0'),
+            lambda record: observed.append(record['phase']) is None)
+        self.assertEqual(observed,['apply-intent'])
+        self.assertEqual(read_json(archive)['phase'],'complete')
+        self.assertFalse((self.directory/'active.json').exists())
+        with self.journal() as next_attempt:
+            self.assertNotEqual(next_attempt.record['id'],read_json(archive)['id'])
+
+    def test_wrong_artifact_or_failed_health_preserves_unknown_application(self):
+        with self.journal() as journal:
+            self.ready(journal);journal.advance('apply-intent')
+        before=(self.directory/'active.json').read_bytes();calls=[]
+        with self.assertRaisesRegex(ValueError,'differs'):
+            UpdateJournal.complete_verified(self.directory,identity(),identity('9.0.0'),lambda r:calls.append(r))
+        self.assertEqual(calls,[])
+        with self.assertRaisesRegex(ValueError,'health'):
+            UpdateJournal.complete_verified(self.directory,identity(),identity('1.1.0'),lambda r:False)
+        self.assertEqual((self.directory/'active.json').read_bytes(),before)
+
+    def test_preapply_record_never_becomes_complete_from_health_alone(self):
+        with self.journal() as journal:self.ready(journal)
+        calls=[]
+        with self.assertRaisesRegex(ValueError,'did not authorize'):
+            UpdateJournal.complete_verified(self.directory,identity(),identity('1.1.0'),lambda r:calls.append(r))
+        self.assertEqual(calls,[])
+        self.assertEqual(read_json(self.directory/'active.json')['phase'],'installer-ready')
+
+    def test_failed_archive_retains_completed_record_for_fresh_inspection(self):
+        with self.journal() as journal:
+            self.ready(journal);journal.advance('apply-intent')
+        # Simulate failure before the final rename, not ordinary phase writes.
+        with patch('lifecycle.update_journal.replace_file',side_effect=OSError('fixture archive refusal')):
+            with self.assertRaises(OSError):
+                UpdateJournal.complete_verified(self.directory,identity(),identity('1.1.0'),lambda r:True)
+        self.assertEqual(read_json(self.directory/'active.json')['phase'],'complete')
+        seen=[]
+        archive=UpdateJournal.complete_verified(self.directory,identity(),identity('1.1.0'),
+            lambda r:seen.append(r['phase']) is None)
+        self.assertEqual(seen,['complete']);self.assertTrue(archive.is_file())
+
     def test_failed_flush_poisons_writer_even_when_replacement_already_happened(self):
         with self.journal() as journal:
             self.ready(journal)

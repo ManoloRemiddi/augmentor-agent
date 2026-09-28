@@ -30,8 +30,9 @@ Current source/ref and qualification: [agent handoff](AGENT-HANDOFF.md).
 Dated candidate sections below retain their original version-specific evidence.
 
 Release scope: DSH is the full-featured target; Pi is a supported subset.
-Additional Pi extensions and Windows are deferred. The Linux evidence below does
-not establish macOS feature qualification. See the cross-platform release ledger.
+Additional Pi extensions remain deferred. Windows implementation is active on
+`feat/windows`; its evidence and open gates are recorded below. The Linux evidence
+does not establish macOS or Windows feature qualification.
 
 This maintained checkout is the development source for both surfaces. The legacy repository paths and launcher IDs remain compatibility locations. Do not develop another UI fork there.
 
@@ -68,6 +69,29 @@ for the distinction between installed artifacts and source. Voice, acoustic
 quality and memory quality remain separate from installer success.
 
 DSH uses `services/dsh/branch.py` from both surfaces. Branch selects a final reply in a closed turn; Edit retains preceding turns, and editing the first input starts a clean child. Mid-turn replies and steered inputs that cannot be isolated are refused. Durable operation records prevent unknown fork outcomes from being replayed. Original chats and model selection are preserved.
+
+## Windows development target — September 28
+
+Windows uses the shared desktop, browser and dependency graph. This is an
+unmerged development candidate; there is no Windows customer release. Read the
+[implementation ledger](WINDOWS-IMPLEMENTATION-STATUS.md) for exact revisions and
+the [full plan](WINDOWS-IMPLEMENTATION-PLAN.md) for required completion gates.
+
+| Area | Native x64/ARM64 evidence | Remaining qualification/work |
+| --- | --- | --- |
+| Private runtime and native desktop | Compiled launchers, Qt windows, proportional sizing, process identity and private IPC pass | Ordinary-user/physical display, keyboard and current Home/Pro builds |
+| Managed DSH and chat | Actual bundled DSH with deterministic model; Send/Enter, saved history and restart pass | Real-provider and complete feature acceptance |
+| Browser companion | Compiled native-host ownership, reservation, idle commit and restart pass | Selected real Chromium, store delivery and N/N+1 compatibility |
+| Voice bridge | Shared 0.1.19, private preference saves, owned service, busy-ticket refusal and natural drain pass | Windows ASR/TTS provisioning and physical audio |
+| Prompt/memory services | Shared private clients, service ownership, reservations and observed drain pass | Windows memory engine provisioning and full memory quality/features |
+| Coordinated shutdown | Actual window/DSH/voice/companions/owner graph drain and restart pass at `f950a45` | Product apply/recovery integration and user-facing update flow |
+| Installer | Independent authenticated Inno handoff/final-access fixtures pass; real full-payload installer built in source | New install/repair/removal and same-build coordinator proof executing; signing, N-to-N+1 and rollback open |
+| Desktop actions, Home and Pi | Shared interfaces retained | Required Windows adapters and full end-to-end parity remain open |
+| RTX Spark N1X | Native ARM64 dependency preparation | Target hardware/driver/graphics/inference evidence |
+
+[Full native run 36389905723](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36389905723)
+passes both architectures. These hosted checks do not establish physical input,
+audio, live-model quality or a customer-installed build.
 
 ## Home development preview
 

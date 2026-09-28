@@ -101,6 +101,7 @@ def build(root, arch, out, *, qualification=None, compiler_path=None):
             str(ROOT/'scripts/windows-application.iss')], check=True, timeout=900, stdout=log, stderr=subprocess.STDOUT)
     installer = out/f'Augmentor-{release["version"]}-windows-{arch}-candidate.exe'
     report = {'installer':str(installer), 'sha256':digest(installer), 'release':release,
+        'installerBytes':installer.stat().st_size,
         'customerDistribution':False, 'signed':False, 'applicationId':definitions['ApplicationId'],
         'installationDirectory':definitions['InstallDirectory'], 'qualificationBase':definitions['QualificationBase']}
     (out/'package.json').write_text(json.dumps(report, indent=2)+'\n', encoding='utf-8')
