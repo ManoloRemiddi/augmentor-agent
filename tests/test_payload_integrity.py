@@ -134,7 +134,7 @@ class PayloadIntegrityTests(unittest.TestCase):
         import win32con
         import win32file
         path=self.root/'runtime.dll'
-        handle=win32file.CreateFile(str(path),win32con.FILE_WRITE_ATTRIBUTES,
+        handle=win32file.CreateFile(str(path),win32con.GENERIC_WRITE,
             win32con.FILE_SHARE_READ|win32con.FILE_SHARE_WRITE,None,win32con.OPEN_EXISTING,0,None)
         try:win32file.SetFileTime(handle,pywintypes.Time(946684800),None,None)
         finally:handle.Close()

@@ -120,6 +120,17 @@ birth time; handle-to-handle checks still compare change time. Ten portable
 cases pass, including replacement/read mutation; two Windows-specific cases and
 corrected staged/full integration remain pending. See [payload inspection](WINDOWS-UPDATE-DELIVERY.md#exact-installed-payload-inspection).
 
+
+New source adds [independent installer inspection](WINDOWS-INSTALLER-DECISION.md#independent-installer-inspection-before-recovery):
+the retained Setup extracts its own runtime and shared inspector into fresh private
+scratch, verifies its compiled metadata hash and observes a bounded read-only worker.
+It can inspect absent installed Python/launcher/metadata and unresolved updates
+without changing app files, data or journal. Local Inno script compilation and
+package checks pass; exact-template and complete native execution are pending.
+At `84f2e95`, x64 Inno already passes the corrected payload identity; the fast suite
+fails only a missing pywin32 constant in the new timestamp fixture. That fixture
+now uses its supported generic-write access constant. Corrected native rerun is pending.
+
 Next: qualify the inventory, full installed isolated health and actual-DSH cancellation; finish
 independent interrupted/cross-version recovery, obsolete-file cleanup, bounded
 cache pruning, actual N-to-N+1 and the customer notification/update action. The current Inno

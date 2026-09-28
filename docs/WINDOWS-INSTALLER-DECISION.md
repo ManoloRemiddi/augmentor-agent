@@ -748,3 +748,41 @@ the extracted files on Setup exit. Extraction placement, private ownership,
 bounded worker lifetime, authenticated apply and failure cleanup still require
 implementation/native qualification. This inspected vendor capability is not an
 implemented recovery path. It avoids adding a separately maintained agent core.
+
+
+## Independent installer inspection before recovery
+
+The development installer now accepts the fixed `/augmentorinspect=1` diagnostic
+action. It acquires native exclusive startup/installation admission and verifies
+the compiled destination's existing Root/AppId registration. Active app processes,
+unknown ownership or redirected trees refuse. The action deliberately permits an
+unresolved journal for read-only observation; it never reads saved commands,
+clears the journal, selects a build, repairs files or opens the ordinary app.
+
+The helper anchors a fresh protected scratch directory to its own Inno temporary
+module location, then Inno extracts its bundled Python and the shared payload
+inspector into it. No installed runtime or installed metadata is required. The
+native helper verifies extracted release bytes against the compiled digest before
+running one fixed `-I -B` script in a suspended-then-assigned Windows Job. A two-minute
+worker deadline and kill-on-close affect only that disposable inspection range.
+The report contains the release hash and difference counts, never arbitrary
+filenames or private configuration. Inno releases handles and removes its own
+scratch tree on exit. SHA binding is not publisher trust or rollback authority.
+
+The action returns False from [InitializeSetup](https://jrsoftware.org/ishelp/topic_scriptevents.htm)
+so no installation section can run. Consequently Setup exits nonzero even for a
+successful inspection; qualification requires exactly one valid report in the
+installer log, not merely an exit status. This is an internal diagnostic primitive,
+not the customer recovery UI. It follows Inno's supported
+[temporary extraction](https://jrsoftware.org/ishelp/topic_isxfunc_extracttemporaryfiles.htm)
+and Microsoft's [owned Job lifetime](https://learn.microsoft.com/en-us/windows/win32/procthread/job-objects).
+
+The exact-template proof compares intact files, then removes the launcher, Python
+DLLs and release metadata and requires a damaged report with every remaining file
+unchanged. It repeats inspection with an unresolved record and confirms that record
+and private sentinels remain unchanged. The full application proof adds equivalent
+missing-runtime inspection and complete-byte inspection while apply is unresolved.
+Local checks: actual Inno 7.1.0 script compiles in an inert compile-only fixture;
+Python compilation and four package-intake tests pass. New native helper/worker
+execution remains pending. Cross-version recovery, apply authorization, health and
+obsolete-file cleanup still require their separate implementation and evidence.

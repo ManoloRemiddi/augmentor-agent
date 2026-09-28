@@ -329,3 +329,19 @@ The initial `8ae02e9` Windows inventory suite and template both fail ordinary
 files because cached DirEntry metadata omits their link counts. The implementation
 now obtains full no-follow stat metadata; the same tests must pass on both native
 CPUs, including the hard-link and junction refusals. No alias assertion is waived.
+
+
+Payload identity now uses explicit Windows birth time across path/handle stat;
+handle-to-handle change time is still checked. The suite adds real file replacement
+and modification-during-hash refusal, plus native creation/change timestamp
+separation. Local: ten passing cases and two native skips. `84f2e95` x64 Inno passes
+inventory integration; fast Windows fails only the timestamp fixture's missing
+pywin32 constant, corrected to supported `GENERIC_WRITE` access.
+
+The Windows exact-template and full installed proofs now execute the retained
+installer's independent `/augmentorinspect=1` worker without installed Python,
+launcher or metadata, and with an unresolved journal. They require matching
+artifact-bound reports, preserved data/journal and no repair side effects. Inno's
+intentional nonzero no-install exit is never counted as success by itself. The
+new helper/worker is not yet native-qualified. Actual Inno script compilation,
+four package tests and Python compilation pass locally.

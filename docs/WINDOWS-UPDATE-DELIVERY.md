@@ -201,3 +201,13 @@ Tests reject real file replacement between scanning/opening and a timestamp chan
 during hashing. A native case changes the creation date without changing payload
 bytes. Local: 12 tests, ten pass and two native skips, plus four package tests.
 Native rerun remains required; no integrity requirement is waived.
+
+
+At `84f2e95`, native x64 Inno passes staged sealing/package intake. Its fast
+inventory suite passes the existing cases and both new mutation checks, but the
+new creation-time test references a constant absent from pywin32's `win32con`.
+The fixture now uses supported `GENERIC_WRITE` access for `SetFileTime`; the
+production identity comparison is unchanged. Both-CPU complete qualification is
+still required. The new [independent inspection action](WINDOWS-INSTALLER-DECISION.md#independent-installer-inspection-before-recovery)
+now consumes this same shared inventory without depending on installed Python;
+its new native execution is pending.

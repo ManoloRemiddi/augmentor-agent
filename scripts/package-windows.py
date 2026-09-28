@@ -36,7 +36,8 @@ def candidate(root, arch):
         raise ValueError('Use a staged native development candidate. Public delivery is not enabled.')
     for name in ('Augmentor.exe', 'AugmentorBrowserHost.exe', 'python/python.exe',
                  'node/node.exe', 'powershell/pwsh.exe', 'updater/WinSparkle.dll',
-                 'dsh/payload.json', 'scripts/launch-windows.py', 'scripts/windows-local-health.py'):
+                 'dsh/payload.json', 'scripts/launch-windows.py', 'scripts/windows-local-health.py',
+                 'scripts/windows-inspect-payload.py', 'services/lifecycle/payload_integrity.py'):
         if not (root/name).is_file(): raise ValueError('Incomplete shared application payload: '+name)
     # Includes aliases/redirects and stale build output. Never reseal here: a
     # mutated staged runtime must fail intake rather than become a new baseline.

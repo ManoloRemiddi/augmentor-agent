@@ -57,6 +57,15 @@ def main():
         return result
     def setup(label, *extra, success=True):
         return run([report['installer'],*flags,'/LOG='+str(out/(label+'.log')),*extra], success=success)
+    def independent_inspection(label):
+        log=out/(label+'.log')
+        run([cached_installer,*flags,'/LOG='+str(log),'/augmentorinspect=1'],success=False)
+        marker='Augmentor independent inspection result: '
+        rows=[line.split(marker,1)[1] for line in log.read_text(encoding='utf-8-sig').splitlines() if marker in line]
+        assert len(rows)==1, log.read_text(encoding='utf-8-sig')[-8192:]
+        result=json.loads(rows[0]);assert result['schema']=='augmentor-payload-inspection/1'
+        assert result['releaseSHA256']==package.digest(args.root/'release.json')
+        return result
     def command(value):
         with LocalSocket() as peer:
             peer.settimeout(5); peer.connect(str(data/'run'/(ipc_basename('main')+'.sock')))
@@ -164,6 +173,11 @@ def main():
         runtime_libraries=list((install/'current/python').glob('python3*.dll'))
         assert runtime_libraries
         for library in runtime_libraries: library.unlink()
+        damage=independent_inspection('independent-damaged-inspection')
+        assert damage['complete'] is False and damage['differences']['missing']==len(runtime_libraries)+3, damage
+        assert not executable.exists() and not owned.exists() and not (install/'current/release.json').exists()
+        assert sentinel.read_bytes()==sentinel_bytes and (data/'recovery/selected-installer').read_bytes()==selection_bytes
+        stages.append('independent-inspection-without-installed-runtime-or-metadata')
         run([command_executable(repair_command),*flags,'/LOG='+str(out/'repair.log')])
         assert owned.read_bytes()==(args.root/'scripts/launch-windows.py').read_bytes()
         for relative in ('Augmentor.exe','release.json',*[str(path.relative_to(install/'current')) for path in runtime_libraries]):
@@ -216,6 +230,9 @@ def main():
         finally:setup_process.Close()
         assert (install/'current/release.json').read_bytes()==(args.root/'release.json').read_bytes()
         assert sentinel.read_bytes()==sentinel_bytes
+        pending_bytes=(transaction/'active.json').read_bytes()
+        assert independent_inspection('independent-pending-inspection')['complete']
+        assert (transaction/'active.json').read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
         for application in (executable, install/'current/AugmentorBrowserHost.exe'):
             blocked = subprocess.run([str(application),'--qualification-root',str(data),'--preview'],
                 stdin=subprocess.DEVNULL, capture_output=True, timeout=10,

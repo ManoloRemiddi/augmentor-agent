@@ -96,6 +96,44 @@ function ManualUpdateClear: BOOL;
   external 'AugmentorManualUpdateClear@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
 function RemovalUpdateClear: BOOL;
   external 'AugmentorManualUpdateClear@{tmp}\augmentor-removal.dll stdcall delayload uninstallonly';
+function PrepareInspection(Temporary: String): BOOL;
+  external 'AugmentorInspectionPrepare@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
+function RunInspection(Installed, ReleaseDigest: String): BOOL;
+  external 'AugmentorInspectionRun@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
+
+procedure InspectIndependentPayload;
+var Ready: Boolean; ReportText: AnsiString;
+begin
+  { A read-only diagnostic action, including when an update is unresolved.
+    Returning from InitializeSetup with False prevents ALL install sections.
+    Only the private, disposable extracted worker runs; never installed code. }
+  Ready := PrepareManualMaintenance('{#QualificationBase}');
+  if not Ready then begin Log('Augmentor independent inspection: maintenance unavailable.'); exit; end;
+  MaintenanceHeld := True;
+  try
+    Ready := ValidateApplicationPath(ExpandConstant('{#InstallDirectory}'));
+    if not Ready then begin Log('Augmentor independent inspection: unsupported application path.'); exit; end;
+    if (OwnedRegistry('{#InstallationKey}', 'Root', ExpandConstant('{#InstallDirectory}\current'), 0) <> 2) or
+       (OwnedRegistry('{#InstallationKey}', 'AppId', 'com.augmentor.Agent', 0) <> 2) then begin
+      Log('Augmentor independent inspection: application ownership is unknown.'); exit;
+    end;
+    Ready := PrepareInspection(ExpandConstant('{tmp}'));
+    if not Ready then begin Log('Augmentor independent inspection: scratch creation failed.'); exit; end;
+    ExtractTemporaryFiles('{app}\current\python\*');
+    ExtractTemporaryFiles('{app}\current\scripts\windows-inspect-payload.py');
+    ExtractTemporaryFiles('{app}\current\services\lifecycle\payload_integrity.py');
+    ExtractTemporaryFiles('{app}\current\release.json');
+    ExtractTemporaryFiles('{app}\current\payload-integrity.json');
+    Ready := RunInspection(ExpandConstant('{#InstallDirectory}\current'), '{#ReleaseDigest}');
+    if not Ready then begin Log('Augmentor independent inspection: worker failed; installation preserved.'); exit; end;
+    if not LoadStringFromFile(ExpandConstant('{tmp}\') + '{app}\inspection-result.json', ReportText) then
+      RaiseException('Augmentor independent inspection result is unavailable.');
+    Log('Augmentor independent inspection result: ' + String(ReportText));
+  finally
+    CloseSetupMaintenance;
+    MaintenanceHeld := False;
+  end;
+end;
 
 function RetainedInstallerCommand(Param: String): String;
 begin
@@ -168,11 +206,17 @@ begin
 end;
 
 function InitializeSetup: Boolean;
-var Pipe, CoordinatorText: String; Coordinator: Int64;
+var Pipe, CoordinatorText, Inspection: String; Coordinator: Int64;
 begin
   Result := False;
   Pipe := ExpandConstant('{param:augmentorpipe|}');
   CoordinatorText := ExpandConstant('{param:augmentorcoordinator|}');
+  Inspection := ExpandConstant('{param:augmentorinspect|}');
+  if Inspection <> '' then begin
+    if (Inspection <> '1') or (Pipe <> '') or (CoordinatorText <> '') then exit;
+    InspectIndependentPayload;
+    exit;
+  end;
   if (Pipe <> '') or (CoordinatorText <> '') then begin
     if Pipe = '' then exit;
     Coordinator := StrToInt64Def(CoordinatorText, -1);

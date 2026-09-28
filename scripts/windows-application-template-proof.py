@@ -46,6 +46,9 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         ignore=shutil.ignore_patterns('site-packages', '__pycache__', '*.pyc'))
     (payload/'python/Lib/site-packages').mkdir(parents=True, exist_ok=True)
     shutil.copy2(ROOT/'scripts/windows-finish-launch-fixture.py', payload/'scripts/launch-windows.py')
+    for name in ('scripts/windows-inspect-payload.py','services/lifecycle/payload_integrity.py'):
+        target=payload/name;target.parent.mkdir(parents=True,exist_ok=True)
+        shutil.copy2(ROOT/name,target)
     build_spec = importlib.util.spec_from_file_location('template_launcher', ROOT/'scripts/build-windows-launcher.py')
     builder = importlib.util.module_from_spec(build_spec); build_spec.loader.exec_module(builder)
     builder.build_launcher(payload, arch)
@@ -60,9 +63,9 @@ def prove(out, arch, compiler, fixture_executable, runtime):
     flags = ['/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-']
     stages = []; removal = None
     launch_record = Path(report['qualificationBase'])/'finish-launched.json'
-    def run(executable, label, success=True):
+    def run(executable, label, success=True, arguments=()):
         child = OwnedProcess([str(executable), *flags,
-            '/LOG='+str(out/('application-template-'+label+'.log'))], stdin=subprocess.DEVNULL)
+            '/LOG='+str(out/('application-template-'+label+'.log')), *arguments], stdin=subprocess.DEVNULL)
         try:
             # Inno's first uninstall process exits before the copied remover
             # finishes. Observe natural exit of the whole disposable range.
@@ -72,6 +75,17 @@ def prove(out, arch, compiler, fixture_executable, runtime):
                 child.kill(); child.wait(timeout=10)  # Failed fixture cleanup only.
         assert (code == 0) == success, (label,code)
         assert not launch_record.exists(), 'Silent maintenance launched the application.'
+    def inspect(executable,label):
+        # InitializeSetup deliberately refuses installation after inspection.
+        # A nonzero Setup exit alone is not an inspection-success assertion.
+        run(executable,label,success=False,arguments=['/augmentorinspect=1'])
+        log=(out/('application-template-'+label+'.log')).read_text(encoding='utf-8-sig')
+        marker='Augmentor independent inspection result: '
+        rows=[line.split(marker,1)[1] for line in log.splitlines() if marker in line]
+        assert len(rows)==1, log[-8192:]
+        result=json.loads(rows[0]);assert result['schema']=='augmentor-payload-inspection/1'
+        assert result['releaseSHA256']==hashlib.sha256((payload/'release.json').read_bytes()).hexdigest()
+        return result
     try:
         run(report['installer'], 'initial')
         recovery = Path(report['qualificationBase'])/'recovery'
@@ -108,6 +122,7 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         assert cached.stat().st_mtime_ns == retained_time
         assert selection.stat().st_mtime_ns == selected_time
         stages.append('original-installer-retained-and-corrupt-cache-refused')
+        assert inspect(cached,'intact-independent-inspection')['complete']
         # Registered repair executes the retained standalone installer after
         # deleting the native app and its interpreter DLLs/version metadata.
         # It must need no executable code from the broken installed payload.
@@ -120,11 +135,21 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         runtime_libraries = list((install/'current/python').glob('python3*.dll'))
         assert runtime_libraries
         for library in runtime_libraries: library.unlink()
+        before_inspection={p.relative_to(install).as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
+            for p in install.rglob('*') if p.is_file()}
+        result=inspect(cached,'damaged-independent-inspection')
+        assert result['complete'] is False and result['differences']['missing']==len(runtime_libraries)+2, result
+        after_inspection={p.relative_to(install).as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
+            for p in install.rglob('*') if p.is_file()}
+        assert after_inspection==before_inspection and sentinel.read_bytes()==sentinel_bytes
+        stages.append('independent-inspection-without-installed-runtime-or-metadata')
         updates = private_directory(Path(report['qualificationBase'])/'updates')
         pending = updates/'active.json'
         with os.fdopen(descriptor(pending,writable=True,create=True),'wb') as stream:
             stream.write(b'Unresolved fixture update: even malformed state blocks manual repair.\n')
         pending_bytes = pending.read_bytes()
+        assert inspect(cached,'pending-independent-inspection')['complete'] is False
+        assert pending.read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
         run(repair, 'pending-update-repair-refusal', success=False)
         run(removal, 'pending-update-removal-refusal', success=False)
         assert pending.read_bytes() == pending_bytes and not installed_release.exists()

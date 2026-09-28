@@ -10,6 +10,7 @@ on:
       - 'scripts/windows-application.iss'
       - 'scripts/windows-application-template-proof.py'
       - 'scripts/windows-finish-launch-fixture.py'
+      - 'scripts/windows-inspect-payload.py'
       - 'scripts/package-windows.py'
       - 'scripts/build-windows-launcher.py'
       - 'services/platform/windows-launcher.c'
@@ -23,6 +24,7 @@ on:
       - 'tests/test_update_journal.py'
       - 'services/platform/windows-installer-handoff.c'
       - 'services/platform/windows-installer-cache.h'
+      - 'services/platform/windows-installer-inspection.h'
       - 'services/platform/windows-lease.h'
       - 'release/windows/installer-candidates.json'
 permissions:
