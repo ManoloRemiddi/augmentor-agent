@@ -216,22 +216,47 @@ def main():
         finally:setup_process.Close()
         assert (install/'current/release.json').read_bytes()==(args.root/'release.json').read_bytes()
         assert sentinel.read_bytes()==sentinel_bytes
+        for application in (executable, install/'current/AugmentorBrowserHost.exe'):
+            blocked = subprocess.run([str(application),'--qualification-root',str(data),'--preview'],
+                stdin=subprocess.DEVNULL, capture_output=True, timeout=10,
+                creationflags=subprocess.CREATE_NO_WINDOW)
+            assert blocked.returncode == 74, (application.name, blocked.returncode, blocked.stderr)
+        pending_bytes=(transaction/'active.json').read_bytes()
+        from lifecycle.windows_health import verify_local_health
+        metadata=(args.root/'release.json').read_bytes()
+        health_script=install/'current/scripts/windows-local-health.py'
+        health_script.rename(health_script.with_suffix('.unavailable'))
+        try:
+            try: verify_local_health(install/'current',metadata,qualification=data)
+            except RuntimeError: pass
+            else: raise AssertionError('Missing installed health action was accepted.')
+            assert (transaction/'active.json').read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
+        finally: health_script.with_suffix('.unavailable').rename(health_script)
+        mismatched=json.loads(metadata)
+        mismatched['sourceCommit']='0'*40
+        try: verify_local_health(install/'current',json.dumps(mismatched).encode(),qualification=data)
+        except ValueError: pass
+        else: raise AssertionError('Health accepted metadata for another installed release.')
+        assert (transaction/'active.json').read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
         # Independent local health does not depend on a provider being online.
-        # For this known-built artifact compare every payload file, then launch
-        # and close the actual installed Qt app before completing its journal.
+        # Compare every file, then invoke only the fixed isolated health action.
+        # Ordinary startup remains blocked until completion is durably archived.
         from lifecycle.update_journal import UpdateJournal
         def local_health(_record):
-            nonlocal child
             assert package.digest(artifact)==report['sha256']
             for directory,_names,files in os.walk(args.root):
                 for filename in files:
                     source=Path(directory)/filename
                     assert package.digest(install/'current'/source.relative_to(args.root))==package.digest(source)
-            child=open_preview();ready();close_preview();child=None
+            health=verify_local_health(install/'current',metadata,qualification=data)
+            assert (transaction/'active.json').read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
+            assert not list((data/'health-probes').iterdir())
+            report['localHealth']=health
             return True
         archive=UpdateJournal.complete_verified(transaction,source_identity,source_identity,local_health)
         assert read_json(archive)['phase']=='complete' and not (transaction/'active.json').exists()
         report['archivedUpdate']=archive.name
+        child=open_preview();ready();close_preview();child=None
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER,report['startupKey'],0,winreg.KEY_READ|winreg.KEY_SET_VALUE) as key:
             try: winreg.QueryValueEx(key,'Augmentor Agent')
             except FileNotFoundError: pass
@@ -239,6 +264,7 @@ def main():
             # Restore only this disposable entry to exercise exact owned removal.
             winreg.SetValueEx(key,'Augmentor Agent',0,winreg.REG_SZ,startup_command)
         stages.append('installed-graph-drain-durable-apply-setup-exit-and-relaunch')
+        stages.append('unresolved-startup-refusal-isolated-local-health-and-verified-reopen')
         # Inno must not follow a requested custom replacement directory.
         other=out/'foreign';other.mkdir();foreign=other/'untouched.txt';foreign.write_text('preserve')
         setup('custom-path-refusal','/DIR='+str(other),success=False)

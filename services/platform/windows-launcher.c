@@ -13,10 +13,12 @@
 #include <wchar.h>
 #include <io.h>
 #include <fcntl.h>
+static BOOL health_check = FALSE;
 #ifdef AUGMENTOR_LIFETIME_LEASE
 #include "windows-lease.h"
 static AugmentorLease lease = {INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE,
     INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE};
+static HANDLE updates = INVALID_HANDLE_VALUE;
 
 /* Only the startup reader is releasable from Python. The lifetime lease stays
  * held through runtime finalization and actual process exit. */
@@ -36,6 +38,12 @@ __declspec(dllexport) BOOL WINAPI AugmentorStartupReady(void) {
 #endif
 
 static int failure(const wchar_t *message) {
+    if (health_check) {
+        const char error[] = "Augmentor local health could not start.\n";
+        DWORD written;
+        WriteFile(GetStdHandle(STD_ERROR_HANDLE), error, (DWORD)(sizeof(error)-1), &written, NULL);
+        return 1;
+    }
 #ifdef AUGMENTOR_BROWSER_HOST
     (void)message;
     const char error[] = "Augmentor's native browser host could not start. Repair this installation.\n";
@@ -57,15 +65,31 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE previous, PWSTR command, int s
 #ifdef AUGMENTOR_DEVELOPMENT_CANDIDATE
     if (argc >= 3 && !wcscmp(argv[1], L"--qualification-root")) qualification = argv[2];
 #endif
+#ifndef AUGMENTOR_BROWSER_HOST
+    /* This mode chooses a fixed read-only script, never the desktop script
+     * with a journal-bypass flag. It cannot accept desktop/service arguments. */
+    int action = qualification ? 3 : 1;
+    if (argc > action && !wcscmp(argv[action], L"--local-health")) {
+        health_check = TRUE;
+        if (argc != action + 1) { LocalFree(argv); return 64; }
+    }
+#endif
     if (!augmentor_acquire(&lease, qualification)) {
         LocalFree(argv);
         /* Disposable CI launches cannot leave an unattended modal dialog. */
         if (!qualification) failure(L"Augmentor cannot start during installation maintenance or with invalid private application data. Finish maintenance or repair the installation, then try again.");
         return 73;
     }
+    if (!health_check && !augmentor_updates_clear(lease.base, &updates)) {
+        LocalFree(argv);
+        if (!qualification) failure(L"An unfinished Augmentor update needs recovery before the app can open. Your conversations and settings were preserved.");
+        return 74;
+    }
     /* Retain through CPython finalization and process exit. The OS also releases
      * the lease on a crash; no stale marker blocks the next startup. */
 #endif
+    if (health_check && (_fileno(stdout) < 0 || _setmode(_fileno(stdout), _O_BINARY) == -1))
+        return failure(L"The health observer did not provide an output handle.");
 #ifdef AUGMENTOR_BROWSER_HOST
     /* Native messaging is a binary length-prefixed protocol, never console text. */
     if (_fileno(stdin) < 0 || _fileno(stdout) < 0 ||
@@ -82,7 +106,8 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE previous, PWSTR command, int s
     if (swprintf_s(home, 32768, L"%ls\\python", root) < 0 ||
         swprintf_s(dll, 32768, L"%ls\\python313.dll", home) < 0 ||
         swprintf_s(python, 32768, L"%ls\\python.exe", home) < 0 ||
-        swprintf_s(script, 32768, L"%ls\\%ls", root, AUGMENTOR_SCRIPT) < 0)
+        swprintf_s(script, 32768, L"%ls\\%ls", root,
+            health_check ? L"scripts\\windows-local-health.py" : AUGMENTOR_SCRIPT) < 0)
         return failure(L"The application path is too long.");
     SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
     HMODULE library = LoadLibraryExW(dll, NULL,

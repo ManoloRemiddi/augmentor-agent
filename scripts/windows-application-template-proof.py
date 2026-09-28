@@ -30,7 +30,7 @@ def prove(out, arch, compiler, fixture_executable, runtime):
     # The installer only copies these markers. Runtime intake/launch is proved
     # elsewhere against the actual assembled product, never against this tree.
     for name in ('node/node.exe', 'powershell/pwsh.exe',
-                 'updater/WinSparkle.dll', 'dsh/payload.json', 'scripts/launch-windows.py'):
+                 'updater/WinSparkle.dll', 'dsh/payload.json', 'scripts/launch-windows.py', 'scripts/windows-local-health.py'):
         target = payload/name; target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(b'Inert installer template fixture; never execute.\n')
     for name in ('Augmentor.exe', 'AugmentorBrowserHost.exe'):

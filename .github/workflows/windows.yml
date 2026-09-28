@@ -170,4 +170,5 @@ jobs:
           .venv/bin/python -m unittest discover -s tests -p test_ui_scale.py -v
           .venv/bin/python -m unittest discover -s tests -p test_fluid.py -v
           .venv/bin/python -m unittest discover -s tests -p test_window.py -v
+          .venv/bin/python -m unittest discover -s tests -p test_local_health.py -v
           .venv/bin/python -m unittest discover -s tests -p test_macos_desktop.py -v

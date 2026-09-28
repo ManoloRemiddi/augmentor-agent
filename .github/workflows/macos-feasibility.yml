@@ -65,6 +65,7 @@ jobs:
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_ui_scale.py -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_fluid.py -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_window.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_local_health.py -v
       - name: Package and verify development bundle
         run: |
           .macos-build-env/bin/python3 scripts/package-macos.py --out outputs/macos

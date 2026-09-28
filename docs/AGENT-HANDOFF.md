@@ -62,7 +62,8 @@ source. [Native Inno at f61d32f](https://github.com/ManoloRemiddi/augmentor-agen
 passes both CPU template cases at merge checkout
 `b05a0c9a9747d9e52cdbdb905bc1a992a8ad782c`, including registered repair without
 an installed runtime/metadata, pending-update/foreign-source refusal and preserved
-disabled startup. The complete installed proof is still running. Earlier native
+disabled startup. The complete installed x64 proof also passes, including actual Qt reopen after
+registered repair; ARM64 is still running. Earlier native
 checks caught a Pascal Boolean mismatch and an unquoted ModifyPath; both are
 corrected. The pinned Inno
 compiler passes an isolated compile-only fixture; local 38 update tests, three
@@ -73,13 +74,24 @@ Home CI exposed a fixture deadline expiring before dispatch. The corrected test
 waits for actual MCP dispatch before advancing its test clock and checks an explicit
 denied retry. All 29 Home tests pass locally; CI Home also passes at `f61d32f`.
 Production Home behavior is unchanged. Compiler object/import-library byproducts
-now stay in the temporary build directory; new template/full assertions for clean
-payload roots await native execution.
+now stay in the temporary build directory. [Native Inno at 6f4c291](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36409755006)
+passes both CPUs with clean payload-root assertions at merge checkout
+`cbbaa57cf262d4ceb46536a0566ba126a2943381`; the full assertion still awaits execution.
+Fast Windows, Inno, Mac and complete Linux/Home/Browser validation also pass at
+documentation-only `578556d`.
 
-Next: qualify registered independent exact-build repair; then
-finish recovery-aware startup, cross-version recovery/rollback, obsolete-file cleanup
-and bounded cache pruning,
-actual N-to-N+1 and the customer notification/update action. The current Inno
+New source blocks normal native desktop/browser startup before loading Python
+whenever the private update journal is unresolved. A fixed native local-health
+action renders the real shared UI in a disposable private profile; it cannot open
+a conversation, run desktop actions or complete a transaction. The independent
+observer checks the identified release and owned process exit. Two local real-Qt
+tests and package intake checks pass; the compiled entry, pending-journal refusal
+and installed health/identity failure cases require fresh native execution. See
+[recovery-aware startup and health](WINDOWS-INSTALLER-DECISION.md#recovery-aware-startup-and-isolated-local-health).
+
+Next: qualify the new startup/health path and complete ARM64 independent repair;
+then finish cross-version recovery/rollback, obsolete-file cleanup, bounded cache
+pruning, actual N-to-N+1 and the customer notification/update action. The current Inno
 backend replaces `current` in place and does not provide atomic version selection
 or power-loss recovery. Cache artifacts currently survive normal removal; connect
 the explicit cache-retention/removal policy before customer delivery. Selection

@@ -290,3 +290,13 @@ Journal completion adds fault checks for unknown APPLY followed by independent
 health, failed health/wrong release preservation, pre-APPLY refusal and failed
 archive recovery by fresh inspection. These are storage/decision tests; they do
 not stand in for native installed health or rollback qualification.
+
+`test_local_health.py` renders the actual shared preview widget and rejects an
+unexpected Qt backend while asserting no controller, subprocess or preference
+write. It runs on Linux and in the Windows/Mac GUI jobs. The compiled launcher
+proof adds unresolved-record/unsafe-directory refusal before Python, exact health
+action routing, binary output and maintenance exclusion. Its recording script is
+inert. The full installed proof exercises the actual native Windows health script
+with disposable profile cleanup, missing-helper and mismatched-metadata refusal,
+preserved journal/data, and ordinary reopening only after archival. These native
+cases require fresh execution; portable rendering alone does not qualify them.

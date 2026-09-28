@@ -621,6 +621,16 @@ failure retains either the active completed record or its archive; this method
 never retries an uncertain write or infers installer completion from a saved PID.
 A record alone remains insufficient authority to launch, replay or roll back.
 
+Windows native startup now enforces that distinction before Python loads:
+ordinary desktop/browser launches refuse any active update record under the fixed
+private base. The dedicated [local-health action](WINDOWS-INSTALLER-DECISION.md#recovery-aware-startup-and-isolated-local-health)
+retains startup/installation read leases but uses a disposable profile and no
+controller, IPC registration or service connections. Its bounded Job observer
+verifies the independently identified release; failed or missing health leaves
+the journal unresolved. Native qualification of this addition is pending. Safe
+pre-apply abort completion and the independent interrupted-update executor remain
+required; ordinary startup must not bypass the record to work around either gap.
+
 ## Controller-free preview maintenance close
 
 Full installed Windows x64 qualification at `594b56d` found that legacy idle

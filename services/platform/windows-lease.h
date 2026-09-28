@@ -173,4 +173,33 @@ done:
 static BOOL augmentor_acquire(AugmentorLease *lease, const wchar_t *qualification) {
     return augmentor_acquire_mode(lease, qualification, FALSE);
 }
+
+/* Inspect only the OS-validated private base while startup/lifetime admission
+ * is held. Any active record blocks ordinary startup/manual maintenance; saved
+ * JSON, PIDs or phases never authorize execution here. Keep an existing private
+ * updates directory pinned until the caller releases its admission handles. */
+static BOOL augmentor_updates_clear(HANDLE base, HANDLE *updates) {
+    wchar_t directory[32768], path[32768]; PSID owner = NULL;
+    PSECURITY_DESCRIPTOR security = NULL; BOOL ok = FALSE;
+    if (base == INVALID_HANDLE_VALUE || !updates) return FALSE;
+    DWORD count = GetFinalPathNameByHandleW(base, directory, 32768,
+        FILE_NAME_NORMALIZED | VOLUME_NAME_DOS);
+    if (!count || count >= 32768 || wcsncmp(directory, L"\\\\?\\", 4)) return FALSE;
+    memmove(directory, directory + 4, (count - 3) * sizeof(wchar_t));
+    if (wcscat_s(directory, 32768, L"\\updates") ||
+            swprintf_s(path, 32768, L"\\\\?\\%ls", directory) < 0) return FALSE;
+    DWORD attributes = GetFileAttributesW(path);
+    if (attributes == INVALID_FILE_ATTRIBUTES) return GetLastError() == ERROR_FILE_NOT_FOUND;
+    if (!(attributes & FILE_ATTRIBUTE_DIRECTORY) || attributes & FILE_ATTRIBUTE_REPARSE_POINT) return FALSE;
+    if (GetSecurityInfo(base, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION,
+            &owner, NULL, NULL, NULL, &security) != ERROR_SUCCESS) return FALSE;
+    if (*updates == INVALID_HANDLE_VALUE)
+        *updates = augmentor_private_directory(directory, owner, NULL, FALSE);
+    if (*updates == INVALID_HANDLE_VALUE ||
+            swprintf_s(path, 32768, L"\\\\?\\%ls\\active.json", directory) < 0) goto done;
+    attributes = GetFileAttributesW(path);
+    ok = attributes == INVALID_FILE_ATTRIBUTES && GetLastError() == ERROR_FILE_NOT_FOUND;
+done:
+    LocalFree(security); return ok;
+}
 #endif

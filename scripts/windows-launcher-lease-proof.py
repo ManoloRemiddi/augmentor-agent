@@ -14,6 +14,7 @@ def prove(root, work):
     import win32security
     from platform_adapters import locks
     from platform_adapters.windows_identity import private_directory, private_lock_descriptor
+    from platform_adapters.private_files import descriptor
     from lifecycle.windows_startup import Startup
 
     base = private_directory(work/'native-startup')
@@ -27,12 +28,12 @@ def prove(root, work):
         shutil.copy2(root/name, copies/name)
         applications.append(copies/name)
 
-    def refused(directory):
+    def refused(directory, code=73):
         for application in applications:
             result = subprocess.run([str(application), '--qualification-root', str(directory), '--preview'],
                 stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                 timeout=5, creationflags=subprocess.CREATE_NO_WINDOW)
-            assert result.returncode == 73, (application.name, result.returncode, result.stderr)
+            assert result.returncode == code, (application.name, result.returncode, result.stderr)
 
     fd = private_lock_descriptor(lock)
     try:
@@ -51,6 +52,48 @@ def prove(root, work):
     finally: gate.Close()
 
     with Startup(base/'run', maintenance=True): refused(base)
+    # The journal refusal is before Python loading and profile configuration,
+    # including malformed records. A phase/string cannot enable normal launch.
+    updates = private_directory(base/'updates')
+    pending = updates/'active.json'
+    with os.fdopen(descriptor(pending,writable=True,create=True),'wb') as stream:
+        stream.write(b'Interrupted fixture update; deliberately not valid JSON.')
+    pending_bytes = pending.read_bytes()
+    refused(base,74)
+    assert pending.read_bytes() == pending_bytes and not (base/'config').exists()
+    # Health cannot be combined with ordinary desktop actions. The browser
+    # cannot invoke health at all, and a health check still respects maintenance.
+    result = subprocess.run([str(applications[0]), '--qualification-root', str(base),
+        '--local-health', '--preview'], capture_output=True, timeout=5,
+        creationflags=subprocess.CREATE_NO_WINDOW)
+    assert result.returncode == 64
+    result = subprocess.run([str(applications[1]), '--qualification-root', str(base),
+        '--local-health'], capture_output=True, timeout=5, creationflags=subprocess.CREATE_NO_WINDOW)
+    assert result.returncode == 74
+    with Startup(base/'run', maintenance=True):
+        result = subprocess.run([str(applications[0]), '--qualification-root', str(base),
+            '--local-health'], capture_output=True, timeout=5, creationflags=subprocess.CREATE_NO_WINDOW)
+        assert result.returncode == 73
+    pending.unlink()
+    pending.mkdir()
+    try: refused(base,74)
+    finally: pending.rmdir()
+    # A redirected or publicly writable journal directory cannot be interpreted
+    # as a clean installation, even when it has no active record.
+    updates.rmdir()
+    import _winapi
+    journal_target = private_directory(work/'journal-target')
+    _winapi.CreateJunction(str(journal_target),str(updates))
+    try:
+        refused(base,74)
+        assert not list(journal_target.iterdir())
+    finally: os.rmdir(updates)
+    updates = private_directory(updates)
+    public_descriptor = win32security.ConvertStringSecurityDescriptorToSecurityDescriptor(
+        'D:P(A;OICI;FA;;;WD)', win32security.SDDL_REVISION_1)
+    win32security.SetFileSecurity(str(updates),win32security.DACL_SECURITY_INFORMATION,public_descriptor)
+    try: refused(base,74)
+    finally: updates.rmdir()
     startup = base/'run/startup.lock'
     os.link(startup, base/'startup-second-link')
     try: refused(base)
@@ -60,9 +103,9 @@ def prove(root, work):
     try: refused(base)
     finally: (base/'second-link').unlink()
     broad = private_directory(work/'broad-startup')
-    descriptor = win32security.ConvertStringSecurityDescriptorToSecurityDescriptor(
+    security_descriptor = win32security.ConvertStringSecurityDescriptorToSecurityDescriptor(
         'D:P(A;OICI;FA;;;WD)', win32security.SDDL_REVISION_1)
-    win32security.SetFileSecurity(str(broad), win32security.DACL_SECURITY_INFORMATION, descriptor)
+    win32security.SetFileSecurity(str(broad), win32security.DACL_SECURITY_INFORMATION, security_descriptor)
     before = win32security.GetFileSecurity(str(broad), win32security.DACL_SECURITY_INFORMATION)
     refused(broad)
     after = win32security.GetFileSecurity(str(broad), win32security.DACL_SECURITY_INFORMATION)
@@ -71,7 +114,6 @@ def prove(root, work):
     assert stringify(before) == stringify(after)
     assert not (broad/'run').exists(), 'Startup changed a rejected private directory.'
 
-    import _winapi
     target = private_directory(work/'junction-target')
     link = work/'junction-startup'
     _winapi.CreateJunction(str(target), str(link))
@@ -82,7 +124,10 @@ def prove(root, work):
 
     return {'beforePythonLoad':True, 'exclusiveByteLock':True, 'installerNoSharingGate':True,
         'hardLinkRefused':True, 'broadAclPreserved':True, 'junctionRefused':True, 'desktopAndBrowser':True,
-        'startupWriterBeforePythonLoad':True, 'startupHardLinkRefused':True}
+        'startupWriterBeforePythonLoad':True, 'startupHardLinkRefused':True,
+        'unresolvedUpdateBeforePythonLoad':True, 'healthCannotRunDesktopActions':True,
+        'healthCannotBypassMaintenance':True, 'browserCannotInvokeHealth':True,
+        'unsafeJournalDirectoryRefused':True}
 
 
 def assert_held(runtime):
@@ -159,10 +204,27 @@ while not (root/'release').exists(): time.sleep(.02)
 """.replace('REPLACE_SERVICES', repr(str(root/'services')))
     for script in ('launch-windows.py','launch-windows-browser.py'):
         (runtime/'scripts'/script).write_text(fixture, encoding='utf-8')
+    # Entry routing and inherited binary stdout only. This tiny recording
+    # action is explicitly not the product's installed Qt health check.
+    (runtime/'scripts/windows-local-health.py').write_text(
+        "import os\nos.write(1,b'{\"fixture\":true}\\n')\n",encoding='utf-8')
     spec = importlib.util.spec_from_file_location('native_launcher_builder', root/'scripts/build-windows-launcher.py')
     builder = importlib.util.module_from_spec(spec); spec.loader.exec_module(builder)
     for name in ('Augmentor.exe','AugmentorBrowserHost.exe'):builder.build_launcher(runtime,args.arch,name=name)
     report = prove(runtime, work)
+    state = private_directory(work/'fixed-health-action')
+    private_directory(state/'updates')
+    from platform_adapters.private_files import descriptor
+    pending = state/'updates/active.json'
+    with os.fdopen(descriptor(pending,writable=True,create=True),'wb') as stream:
+        stream.write(b'Unresolved fixture record.')
+    health = subprocess.run([str(runtime/'Augmentor.exe'),'--qualification-root',str(state),
+        '--local-health'],stdin=subprocess.DEVNULL,capture_output=True,timeout=10,
+        creationflags=subprocess.CREATE_NO_WINDOW)
+    assert health.returncode == 0 and health.stdout == b'{"fixture":true}\n', (
+        health.returncode,health.stdout,health.stderr)
+    assert pending.read_bytes() == b'Unresolved fixture record.' and not (state/'ready').exists()
+    report['fixedHealthEntryAndBinaryOutput'] = True
     for name in ('Augmentor.exe','AugmentorBrowserHost.exe'):
         state = private_directory(work/name)
         child = subprocess.Popen([str(runtime/name),'--qualification-root',str(state)],

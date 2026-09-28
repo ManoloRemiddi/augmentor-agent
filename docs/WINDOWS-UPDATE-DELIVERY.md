@@ -107,6 +107,14 @@ refuses any unresolved `updates/active.json`; the coordinator's Windows journal
 directory is `<private Augmentor base>/updates`. See [independent repair and its
 pending native evidence](WINDOWS-INSTALLER-DECISION.md#independent-repair-from-windows-installed-app-controls).
 
+Normal native desktop/browser startup now refuses an unresolved journal before
+loading Python. The [isolated local-health action](WINDOWS-INSTALLER-DECISION.md#recovery-aware-startup-and-isolated-local-health)
+can examine the newly installed UI without starting normal services or altering
+the journal. Its observer verifies metadata identity and natural owned-process
+exit; the caller still supplies trusted full-payload verification and the release
+pair. This new path requires native qualification and is not a recovery executor,
+automatic rollback or permission to replay an uncertain installer command.
+
 ## Evidence and remaining work
 
 Eleven new local tests execute real Node Ed25519 verification and private storage,

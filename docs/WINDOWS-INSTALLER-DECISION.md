@@ -653,10 +653,56 @@ the exact template with native bootstrap/private Python and inert other componen
 The [full f61d32f application run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36409313612)
 is still executing. Compiler-byproduct cleanup was added afterward at `6f4c291`.
 
-Remaining recovery admission: ordinary native startup currently checks maintenance
+Historical gap before the next change: ordinary native startup checks maintenance
 leases, not the unresolved update journal. Before enabling customer auto-update,
 add recovery-aware startup plus an explicitly authorized independent local-health
 probe; do not let ordinary startup load a potentially partial replacement after
 maintenance exits. The manual repair/removal guard does not close this separate
 gap. Cross-version recovery must use the journal's recorded source and compatible
 persistent-data schemas, never infer a healthy source from `selected-installer`.
+
+## Recovery-aware startup and isolated local health
+
+Normal desktop and browser native entrypoints now inspect the fixed private
+`updates/active.json` while retaining startup and installation leases, before
+loading Python or any app profile. Any existing record, including malformed JSON
+or a directory, refuses with exit 74. A redirected or permissive journal directory
+also refuses. Manual repair/removal reuse the same native directory check. Saved
+phases, PIDs and commands never grant permission to start a partial replacement.
+
+The desktop executable's exact `--local-health` action selects a separate fixed
+script. It retains maintenance exclusion, cannot accept other desktop arguments
+and is unavailable through the browser host. It creates a private random temporary
+profile, clears inherited app/profile configuration, runs runtime preflight and
+renders the actual shared Qt window with no controller or persistent preferences.
+It checks native Windows Qt, text coverage and a nonempty render, removes only its
+temporary profile, and reports the exact payload-metadata hash and identity. It
+does not start the supervisor, connect a provider, register ordinary desktop IPC,
+change conversations or clear a journal. This is local UI readiness, not complete
+feature acceptance or publisher trust.
+
+`services/lifecycle/windows_health.py` runs that action in an owned Windows Job
+under read leases and a bounded deadline. It independently compares the report
+to the caller-verified release and observes the whole process range exit. Only
+that disposable probe range can be stopped on failure. The caller must separately
+verify full payload bytes, schemas, artifact trust and installer exit before
+requesting journal completion. Health refusal leaves the unresolved record intact.
+
+The installed proof now requires desktop/browser refusal while apply is unresolved,
+failed health with a missing helper or mismatched release, unchanged persistent
+sentinels/journal, successful isolated native health and profile cleanup. Ordinary
+Qt startup is tested only after verified durable archival. The fast native proof
+checks pre-Python refusal, unsafe journal directories, fixed action routing and
+binary stdout using an explicitly inert recording action; it is not installed UI
+health evidence. Two portable real-Qt checks pass and prove no controller/process
+startup or preference writes. Fresh x64/ARM64 execution remains pending.
+
+The previous [full f61d32f run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36409313612)
+passes x64 independent registered repair and actual Qt reopening; ARM64 is still
+running. [Inno 6f4c291](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36409755006)
+passes both CPUs at `cbbaa57cf262d4ceb46536a0566ba126a2943381`, including the
+compiler-byproduct cleanup assertion. These runs precede the new health action.
+Recovery from interrupted apply, actual cross-version rollback, safe cancellation
+before apply, obsolete payload removal and bounded cache retention remain required
+before enabling customer updates. An unresolved journal must lead to the future
+independent recovery flow, not an instruction to delete its record manually.
