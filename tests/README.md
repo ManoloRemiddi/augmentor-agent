@@ -125,3 +125,8 @@ expiry and irreversible committed admission. `windows-window-proof.py` checks
 the private protocol across two real preview processes without losing the other
 window's draft. The compiled managed-DSH proof uses prepare/commit for each normal
 chat-window close. A successful preview alone is not compiled or installed evidence.
+
+Windows shell tests additionally fence queued activations and prove a lost
+settings reply cannot make an executing Qt operation appear idle. Supervisor
+tests refuse commit with live children, preserve shortcut settings across
+prepare/cancel and close an empty native owner after an acknowledged commit.

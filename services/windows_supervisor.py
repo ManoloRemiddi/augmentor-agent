@@ -19,6 +19,7 @@ from platform_adapters.private_files import atomic_json, descriptor, read_json, 
 from platform_adapters.processes import OwnedProcess
 from platform_adapters.transport import LocalSocket, ThreadingLocalServer
 from platform_support import require_same_user
+from lifecycle.admission import Admission, MaintenanceBusy
 
 SCHEMA = 'augmentor-windows-supervisor/1'
 LABEL = 'Augmentor.ManagedDsh'
@@ -116,9 +117,10 @@ class ManagedAgent:
 
 
 class Supervisor:
-    def __init__(self, root=ROOT, shell=None):
+    def __init__(self, root=ROOT, shell=None, admission=None):
         self.root = root
         self.shell = shell
+        self.admission = admission or Admission()
         self.child = None
         self.companions = {}
         self.companion_exits = {}
@@ -203,25 +205,34 @@ class Supervisor:
     def dispatch(self, message):
         if message.get('action') in ('shortcut-status', 'shortcut-save'):
             if self.shell is None: raise ValueError('The Windows shortcut owner is unavailable.')
-            return self.shell.request(message)
-        if set(message) != {'action'}: raise ValueError('Unsupported background request fields.')
+            if message['action']=='shortcut-status':return self.shell.request(message)
+            # Keep the accepted queued Qt operation counted until its answer.
+            # Never hold self.lock while waiting for the GUI event loop.
+            with self.admission.work():return self.shell.request(message)
         with self.lock:
             action = message.get('action')
-            if action == 'start-dsh': self.start_dsh()
-            elif action in ('start-prompts', 'start-memory'): self.start_companion(action.removeprefix('start-'))
-            elif action == 'stop-failed-setup':
-                from dsh.setup import current
-                if current().get('home') == str(managed_directory()/'home'):
-                    raise ValueError('This runtime is already selected. Finish active work before shutting it down.')
-                self.stop_child()
-            elif action == 'exit-if-empty':
-                # Only useful for setup/maintenance while no component is alive.
-                # Normal Quit will require the shared busy-work handshake.
+            if action=='maintenance':
+                if set(message)!={'action','method','params'}:raise ValueError('Unsupported background request fields.')
                 self.status()
-                if self.child or self.companions:
-                    raise ValueError('The background owner still has a running component.')
-                self.shutdown.set()
-            elif action != 'status': raise ValueError('Unsupported background operation.')
+                if message['method']=='host.maintenance.commit' and (self.child or self.companions):
+                    raise MaintenanceBusy('The background owner still has a running component. Drain it normally before committing.')
+                return {'maintenance':self.admission.control(message['method'],message['params'])}
+            if set(message) != {'action'}: raise ValueError('Unsupported background request fields.')
+            if action=='status':return self.status()
+            with self.admission.work():
+                if action == 'start-dsh': self.start_dsh()
+                elif action in ('start-prompts', 'start-memory'): self.start_companion(action.removeprefix('start-'))
+                elif action == 'stop-failed-setup':
+                    from dsh.setup import current
+                    if current().get('home') == str(managed_directory()/'home'):
+                        raise ValueError('This runtime is already selected. Finish active work before shutting it down.')
+                    self.stop_child()
+                elif action == 'exit-if-empty':
+                    self.status()
+                    if self.child or self.companions:
+                        raise ValueError('The background owner still has a running component.')
+                    self.shutdown.set()
+                else: raise ValueError('Unsupported background operation.')
             return self.status()
 
 
@@ -237,8 +248,9 @@ def run(root=ROOT):
         from PySide6.QtCore import QCoreApplication, QTimer
         from augmentor_linux.windows_shell import Shell
         app = QCoreApplication([])
-        shell = Shell(); shell.shortcuts.restore()
-        supervisor = Supervisor(root, shell=shell)
+        admission=Admission()
+        shell = Shell(admission=admission); shell.shortcuts.restore()
+        supervisor = Supervisor(root, shell=shell, admission=admission)
         class Handler(socketserver.StreamRequestHandler):
             def handle(self):
                 require_same_user(self.request)
@@ -254,7 +266,13 @@ def run(root=ROOT):
                 except Exception:
                     traceback.print_exc()  # Private supervisor log, never the IPC response.
                     response['error'] = 'The background operation failed. Private state was preserved.'
-                self.wfile.write((json.dumps(response)+'\n').encode()); self.wfile.flush()
+                try:
+                    self.wfile.write((json.dumps(response)+'\n').encode()); self.wfile.flush()
+                finally:
+                    # The reservation was already committed, even if its reply
+                    # was lost. Acknowledge first; the Qt loop then exits empty.
+                    if response.get('ok') and response.get('maintenance',{}).get('phase')=='closing':
+                        supervisor.shutdown.set()
         with ThreadingLocalServer(str(owner/'control.sock'), Handler) as server:
             server.daemon_threads = True
             worker = threading.Thread(target=server.serve_forever, daemon=True); worker.start()

@@ -118,5 +118,30 @@ cancelled preparation and normal committed close. New source counts accepted
 controller work and pauses reconnect during preparation; Windows execution is
 pending. This does not yet add a global Quit or installer action.
 
+## Background-owner reservation
+
+The private supervisor pipe accepts `action: maintenance` with the shared exact
+`method`/`params` component contract. Preparing this owner closes admission to
+new component starts, failed-setup stops, shortcut saves and shortcut activations.
+It does **not** stop or declare idle the children already running. Their status
+and shortcut settings remain readable. Cancel/expiry restores startup admission.
+Commit refuses until every owned child has exited; it acknowledges before the
+Qt loop exits normally. The legacy empty-owner exit cannot bypass a reservation.
+
+The shell and supervisor share one admission counter. A shortcut activation is
+counted before executor submission and stays counted until completion/cancellation.
+An accepted queued Qt settings operation stays counted through its actual
+execution even if the pipe caller times out. A proven unstarted cancelled item
+releases its reservation without applying the setting. These rules prevent a
+shortcut or reconnect from opening a new component between global preparation
+and final installation-file exclusion.
+
+Portable owner/Qt tests pass, including a lost reply while the accepted Qt
+operation is still executing. Native owner tests now reserve/cancel, refuse a
+settings write and commit an empty owner to exit zero; execution is pending.
+The whole-product coordinator still needs window/browser/harness/voice discovery,
+component reservations and exclusive installation access. This source adds no
+customer-facing Quit or installer transaction by itself.
+
 References: [Microsoft RegisterHotKey](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-registerhotkey)
 and [Qt native event filters](https://doc.qt.io/qt-6/qabstractnativeeventfilter.html).

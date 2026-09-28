@@ -7,13 +7,15 @@ from PySide6.QtCore import QObject, QThread, Qt, Signal, Slot
 
 from .shortcut_activation import DesktopActivation
 from .windows_shortcuts import ShortcutOwner, DEFAULTS
+from .maintenance import Admission, MaintenanceBusy
 
 
 class Shell(QObject):
     queued = Signal(object)
-    def __init__(self, shortcuts=None):
+    def __init__(self, shortcuts=None, admission=None):
         super().__init__()
         self.shortcuts = shortcuts if shortcuts is not None else ShortcutOwner()
+        self.admission = admission or Admission()
         self.activations = {name: DesktopActivation(instance=name) for name in DEFAULTS}
         self.pool = ThreadPoolExecutor(max_workers=2, thread_name_prefix='Augmentor activation')
         self.pending = {}; self.closed = False
@@ -26,14 +28,35 @@ class Shell(QObject):
         previous = self.pending.get(instance)
         if previous is not None and not previous.done(): return
         # Never block keyboard dispatch on desktop start or pipe timeouts.
-        self.pending[instance] = self.pool.submit(self.activations[instance].activate)
+        lease=self.admission.work()
+        try:lease.__enter__()
+        except MaintenanceBusy:return
+        try:
+            future=self.pool.submit(self.activations[instance].activate)
+            self.pending[instance]=future
+            future.add_done_callback(lambda _result:lease.__exit__(None,None,None))
+        except BaseException:
+            lease.__exit__(None,None,None);raise
 
-    def request(self, message):
-        if QThread.currentThread() == self.thread(): return self.shortcuts.dispatch(message)
-        item = {'message': message, 'done': threading.Event(), 'lock': threading.Lock(), 'cancelled': False}
-        self.queued.emit(item)
-        if not item['done'].wait(10):
-            with item['lock']: item['cancelled'] = True
+    def request(self, message, *, timeout=10):
+        lease=self.admission.work() if message.get('action')=='shortcut-save' else None
+        if lease:lease.__enter__()
+        release_lock=threading.Lock()
+        def release():
+            nonlocal lease
+            with release_lock:
+                if lease:lease.__exit__(None,None,None);lease=None
+        if QThread.currentThread() == self.thread():
+            try:return self.shortcuts.dispatch(message)
+            finally:release()
+        item = {'message': message, 'done': threading.Event(), 'lock': threading.Lock(),
+                'cancelled': False, 'started':False, 'release':release}
+        try:self.queued.emit(item)
+        except BaseException:release();raise
+        if not item['done'].wait(timeout):
+            with item['lock']:
+                item['cancelled'] = True
+                if not item['started']:release()
             raise ValueError('The shortcut response timed out. Reopen Settings to check the current shortcut before retrying.')
         if 'error' in item: raise item['error']
         return item['result']
@@ -42,12 +65,12 @@ class Shell(QObject):
     def dispatch(self, item):
         with item['lock']:
             cancelled = item['cancelled'] or self.closed
-        if cancelled:
-            item['error'] = ValueError('The shortcut owner is shutting down.')
-        else:
-            try: item['result'] = self.shortcuts.dispatch(item['message'])
-            except Exception as error: item['error'] = error
-        item['done'].set()
+            if not cancelled:item['started']=True
+        try:
+            if cancelled:item['error'] = ValueError('The shortcut owner is shutting down.')
+            else:item['result'] = self.shortcuts.dispatch(item['message'])
+        except Exception as error:item['error']=error
+        finally:item['release']();item['done'].set()
 
     def close(self):
         if self.closed: return

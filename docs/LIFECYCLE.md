@@ -285,3 +285,13 @@ This contract does not grant Augmentor ownership of an externally configured
 voice service. The global coordinator must use it only for a verified owned
 companion, and must drain browser/native voice clients first. Managed Windows
 voice startup and product-wide coordination remain pending.
+
+### Windows owner reservation
+
+The [Windows background owner](WINDOWS-SHELL.md#background-owner-reservation)
+reserves component startup and shortcuts before the future coordinator reserves
+the components themselves. Preparation alone says nothing about child idleness.
+Commit requires the owner to be empty and acknowledges before normal Qt exit.
+Accepted shortcut work remains counted after a lost caller response until the
+actual operation finishes. These additions pass portable tests; native execution
+of the owner handshake is pending.

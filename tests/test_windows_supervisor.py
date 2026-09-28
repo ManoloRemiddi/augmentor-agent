@@ -17,6 +17,24 @@ from platform_adapters.transport import LocalSocket
 
 
 class SupervisorSafetyTests(unittest.TestCase):
+    def test_owner_reservation_fences_restarts_and_refuses_commit_while_children_live(self):
+        supervisor=owner.Supervisor(shell=Mock());token='b'*32
+        control=lambda action:supervisor.dispatch({'action':'maintenance','method':'host.maintenance.'+action,'params':{'token':token}})['maintenance']
+        supervisor.child=Mock();supervisor.child.poll.return_value=None
+        self.assertEqual(control('prepare')['phase'],'prepared')
+        for action in ('start-dsh','start-prompts','start-memory','stop-failed-setup','exit-if-empty'):
+            with self.assertRaises(owner.MaintenanceBusy):supervisor.dispatch({'action':action})
+        with self.assertRaises(owner.MaintenanceBusy):
+            supervisor.dispatch({'action':'shortcut-save','instance':'main','sequence':'Ctrl+Alt+Space'})
+        self.assertTrue(supervisor.dispatch({'action':'status'})['dsh']['running'])
+        with self.assertRaises(owner.MaintenanceBusy):control('commit')
+        self.assertFalse(supervisor.shutdown.is_set());supervisor.child.terminate.assert_not_called()
+        self.assertEqual(control('cancel')['phase'],'ready')
+        supervisor.child=None
+        self.assertEqual(control('prepare')['phase'],'prepared')
+        self.assertEqual(control('commit')['phase'],'closing')
+        self.assertFalse(supervisor.shutdown.is_set(),'dispatch must not exit before the handler acknowledges')
+
     def test_published_profile_cannot_be_stopped_as_failed_setup(self):
         supervisor = owner.Supervisor()
         supervisor.child = Mock(); supervisor.child.poll.return_value = None
@@ -141,7 +159,17 @@ class WindowsSupervisorTests(unittest.TestCase):
                     owner.request('run-arbitrary-command', owner=endpoint)
                 with self.assertRaisesRegex(ValueError, 'different Augmentor'):
                     owner.request('status', root=root/'wrong-app', owner=endpoint)
-                owner.request('exit-if-empty', owner=endpoint)
+                token='a'*32
+                def control(action):
+                    return owner.request('maintenance',owner=endpoint,method='host.maintenance.'+action,
+                        params={'token':token})['maintenance']
+                self.assertEqual(control('prepare')['phase'],'prepared')
+                with self.assertRaisesRegex(ValueError,'maintenance'):
+                    owner.request('shortcut-save',owner=endpoint,instance='main',sequence='Ctrl+Alt+F8')
+                self.assertEqual(owner.request('shortcut-status',owner=endpoint,instance='main')['key'],first['key'])
+                self.assertEqual(control('cancel')['phase'],'ready')
+                self.assertEqual(control('prepare')['phase'],'prepared')
+                self.assertEqual(control('commit')['phase'],'closing')
                 for process in processes:
                     _out, errors = process.communicate(timeout=10)
                     self.assertEqual(process.returncode, 0, errors.decode('utf-8', errors='replace'))

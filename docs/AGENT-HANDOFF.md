@@ -98,6 +98,13 @@ private-configuration tests pass on both Windows CPUs. Full product integration,
 owned voice startup, browser drain and global coordination remain pending. The
 actual complete installer compose/restart proof passes locally with this archive.
 
+The Windows supervisor and shell now share reversible startup admission, including
+accepted shortcut work whose caller timed out. Existing children must drain
+before the owner accepts commit, and its acknowledgment precedes normal exit.
+Portable tests pass; native owner execution is pending. Continue with global
+component discovery/coordination and browser participation, preserving the
+remaining installer, feature-parity and physical acceptance gates.
+
 ## September 27 Windows implementation plan — historical planning checkpoint
 
 The owner requested a detailed plan before coding. Read the

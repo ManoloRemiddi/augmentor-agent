@@ -7,6 +7,15 @@ connect a Windows machine for joint physical testing afterward. Follow the full
 [implementation plan](WINDOWS-IMPLEMENTATION-PLAN.md); this ledger does not narrow
 its outcome. No Windows customer release or installed-product claim exists yet.
 
+Current checkpoint: full runtime last passed both CPUs at `4f2f763`. Subsequent
+DSH token ownership failures are recorded below; `e7228e5` corrects both token
+creators and is undergoing full native qualification. Its fast desktop run passes.
+The separate voice 0.1.18 candidate passes native configuration and maintenance
+on both CPUs. Current source adds background-owner reservation; it remains under
+qualification. Installer backend is **Inno Setup/WinSparkle**; earlier Velopack
+candidate entries below are historical. Global coordination and full app release
+are not complete.
+
 ## Baseline and environments (W0)
 
 Implementation branch `feat/windows` starts from reviewed `main` `b8e36a4` plus
@@ -51,7 +60,7 @@ types. DSH staging uses its existing lock and reviewed preparation script, with
 real FFI, search, shell, termination and terminal tests. This does not prove an
 installed Augmentor conversation or physical device behavior.
 
-Velopack 1.2.158 is the candidate installer library. The native launcher embeds
+Velopack 1.2.158 was the initial, subsequently rejected candidate. The native launcher embeds
 private Python without PATH-based DLL resolution. Compilation, two-version
 installation/update/removal, busy-work coordination, independent recovery and
 publisher trust still require their own proofs; runtime imports cannot select
@@ -778,3 +787,10 @@ ASR fixture checks and the actual complete installer compose/restart proof pass.
 No real provider, microphone, audio device, global coordinator or managed Windows
 speech deployment is implied. External speech/model services are never adopted
 for shutdown merely because they speak the same protocol.
+
+The Windows owner now reserves startup, shortcut settings and activations using
+the shared component protocol, without stopping live children. Commit refuses
+until it is empty and acknowledges before normal exit. Portable owner/Qt tests
+pass, including queued activations and work still executing after a lost settings
+reply. Native supervisor handshake tests are added and pending. This is the
+startup fence needed by global coordination; it is not global Quit or an update.

@@ -12,6 +12,52 @@ from augmentor_linux.windows_shortcuts import binding, Hotkeys, WM_HOTKEY, MOD_N
 
 
 class WindowsShortcutMappingTests(unittest.TestCase):
+    def test_lost_shortcut_reply_does_not_release_work_still_executing_on_qt(self):
+        from augmentor_linux.windows_shell import Shell
+        from augmentor_linux.maintenance import MaintenanceBusy
+        app=QApplication.instance() or QApplication([])
+        target=Mock();shell=Shell(shortcuts=target)
+        entered=threading.Event();release=threading.Event();timed_out=threading.Event();outcome=[]
+        target.dispatch.side_effect=lambda _message:(entered.set(),release.wait(3))
+        def request():
+            try:shell.request({'action':'shortcut-save'},timeout=.1)
+            except ValueError:timed_out.set()
+        def inspect():
+            try:
+                if not entered.wait(3) or not timed_out.wait(3):return
+                try:shell.admission.control('host.maintenance.prepare',{'token':'a'*32})
+                except MaintenanceBusy:outcome.append('preserved')
+            finally:release.set()
+        worker=threading.Thread(target=request);observer=threading.Thread(target=inspect)
+        try:
+            worker.start();observer.start()
+            import time
+            deadline=time.monotonic()+3
+            while not release.is_set() and time.monotonic()<deadline:app.processEvents();time.sleep(.001)
+            worker.join(3);observer.join(3)
+            self.assertEqual(outcome,['preserved']);self.assertEqual(shell.admission.active,0)
+        finally:release.set();worker.join(3);observer.join(3);shell.close()
+
+    def test_activation_work_is_reserved_before_queueing_and_pauses_for_maintenance(self):
+        from augmentor_linux.windows_shell import Shell
+        from augmentor_linux.maintenance import MaintenanceBusy
+        app=QApplication.instance() or QApplication([])
+        shell=Shell(shortcuts=Mock());entered=threading.Event();release=threading.Event();calls=[]
+        shell.activations['main'].activate=lambda: (calls.append('main'),entered.set(),release.wait(3))
+        control=lambda action:shell.admission.control('host.maintenance.'+action,{'token':'a'*32})
+        try:
+            shell.activate('main');self.assertTrue(entered.wait(3))
+            with self.assertRaises(MaintenanceBusy):control('prepare')
+            release.set();shell.pending['main'].result(timeout=3)
+            # Future callbacks can be completing after result() unblocks.
+            import time
+            deadline=time.monotonic()+3
+            while shell.admission.active and time.monotonic()<deadline:time.sleep(.01)
+            control('prepare');shell.activate('main');self.assertEqual(calls,['main'])
+            control('cancel');shell.activate('main');shell.pending['main'].result(timeout=3)
+            self.assertEqual(calls,['main','main'])
+        finally:release.set();shell.close()
+
     def test_portable_key_mapping_and_reserved_combinations(self):
         self.assertEqual(binding('Ctrl+Alt+Space')[:2], (3, 0x20))
         self.assertEqual(binding('Ctrl+Alt+Shift+F9')[:2], (7, 0x78))
