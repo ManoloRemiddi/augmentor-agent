@@ -55,7 +55,9 @@ def main():
     if out.exists() and any(out.iterdir()): parser.error('Choose an empty proof directory.')
     out.mkdir(parents=True, exist_ok=True)
     pins = json.loads((ROOT/'release/windows/installer-candidates.json').read_text())
-    identity = 'Augmentor.Qualification.Inno.'+uuid.uuid4().hex
+    # Inno hashes/truncates long AppIds when naming their uninstall key.
+    # Keep this unique disposable identity below that threshold.
+    identity = 'AugmentorQ.'+uuid.uuid4().hex
     registry = r'Software\Microsoft\Windows\CurrentVersion\Uninstall'+'\\'+identity+'_is1'
     data, payload, install = out/'persistent', out/'payload', out/'installed café with spaces'
     data.mkdir(); payload.mkdir()

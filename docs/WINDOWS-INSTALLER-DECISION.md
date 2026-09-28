@@ -97,3 +97,9 @@ claim of a complete consumer update transaction. The compiler and installer
 bootstrap are x64 tools (emulated on ARM); app, Python and updater are native.
 This new workflow has not executed yet. Publisher identity and Authenticode
 remain separate from the disposable EdDSA key used for test downloads.
+
+The first native run at `762f7c6` builds both CPU fixtures and installs/opens them
+successfully, then fails a test assumption: Inno shortens long AppIds in its
+uninstall registry key. The fixture now uses a shorter unique ID; it still reads
+the registered uninstall command rather than guessing its executable. No busy
+maintenance or native updater result is claimed from that first run.
