@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
 import {presentSettingsForm} from './settings-form.mjs'
+import {registerMaintenanceState} from './maintenance-page.mjs'
 export function dshSetupDialog(doc,send,container){
   if(doc.querySelector('.dsh-setup'))return
   const make=(tag,text)=>{const e=doc.createElement(tag);if(text)e.textContent=text;return e}
@@ -14,6 +15,9 @@ export function dshSetupDialog(doc,send,container){
   }
   const detail=make('p','Install integration adds Augmentor-owned presets and appends to the profile, keeping a backup. Running tasks must finish first. Restart DSH yourself after installation, then check again. Existing custom Augmentor integration requires migration.')
   const note=make('p','Loading connection…'),actions=make('div');let token=null,installed=false,busy=false,changing=false,closed=false
+  const values=()=>JSON.stringify(Object.values(fields).map(e=>e.value))
+  let baseline=values()
+  registerMaintenanceState(dialog,()=>busy||changing||!!token||values()!==baseline)
   const button=(label,fn)=>{const b=make('button',label);b.type='button';b.onclick=fn;actions.append(b);return b}
   const request=async(action,params={})=>{const r=await send('dshSetup',{request:{action,...params}});if(!r.ok)throw Error(r.error);return r.result}
   const controls=()=>{form.disabled=busy;check.disabled=busy;install.disabled=busy||!token||installed;save.disabled=busy||!token||!installed;later.disabled=changing}
@@ -25,5 +29,5 @@ export function dshSetupDialog(doc,send,container){
   for(const e of Object.values(fields))e.oninput=()=>{token=null;controls()}
   dialog.append(make('h3','Connect DSH'),intro,form,detail,note,actions);doc.body.append(dialog)
   dialog.addEventListener('cancel',e=>{if(changing)e.preventDefault()});dialog.addEventListener('close',()=>{closed=true;dialog.remove()})
-  presentSettingsForm(dialog,container);void run('describe',{},value=>{fields.endpoint.value=value.endpoint;fields.home.value=value.home;note.textContent='Check this connection before saving or installing the integration.'});return dialog
+  presentSettingsForm(dialog,container);void run('describe',{},value=>{fields.endpoint.value=value.endpoint;fields.home.value=value.home;baseline=values();note.textContent='Check this connection before saving or installing the integration.'});return dialog
 }

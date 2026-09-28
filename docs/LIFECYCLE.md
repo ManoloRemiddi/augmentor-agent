@@ -320,10 +320,54 @@ waits for its whole Job to exit naturally before releasing its lifetime lease.
 Its explicit crash/fault containment remains separate.
 
 These are component prerequisites, not global browser maintenance. The extension
-still must preserve drafts, reserve open panels and prevent reconnect during
-coordinated updates. Portable real-process tests hold a shared request over EOF
+reservation below now protects pages; native discovery, startup exclusion and
+the final browser shutdown handoff remain pending. Portable real-process tests hold a shared request over EOF
 in the parent and both bridges, then require a complete final response and Node
 `beforeExit`. The DSH bridge case uses a deliberately unavailable isolated
 endpoint, not a real model or WebSocket session. Voice tests use controlled
 workers/submissions and do not qualify a physical audio device. The new assembled
 Windows browser flow still needs native execution.
+
+### Browser page reservation
+
+The shared Chromium worker now receives `augmentor/maintenance` over its native
+port, carrying the exact `host.maintenance.*` method and params of the component
+protocol. It counts accepted panel requests through their response, counts
+browser actions through completion, and refuses preparation while chat, pending
+requests, interactions or connection setup are active. Preparation fences new
+panel/native work and reconnect attempts. A delayed harness reset is retained
+and performed on cancellation rather than discarded. A new running-turn or
+interaction notification cancels preparation without answering or stopping it.
+
+Every sidebar and Settings document registers an extension-local long-lived
+port identified by Chrome's `sender.documentId`. The worker inventories all
+extension documents using `runtime.getContexts` before and after reservation;
+an unregistered page, unsupported inventory API or changed inventory refuses.
+Opening or losing a registered page cancels the reservation. This uses browser
+capabilities rather than a browser-name allow-list. Chrome documents
+[`getContexts` from version 114 and document identity on ports](https://developer.chrome.com/docs/extensions/reference/api/runtime).
+
+Pages refuse drafts, message/title edits, active voice gestures, pending draft
+restoration, modal dialogs, accepted page requests and unsaved inline Settings.
+Prompt instructions, Pi/DSH setup, manual memory, Home pairing and Voice changes
+are checked locally. Form values and secrets never enter maintenance replies.
+An idle page keeps its DOM and values and temporarily becomes inert; prior input
+state and focus are restored after cancellation. The worker and pages each
+expire reservations after 30 seconds using monotonic clocks. Repeated prepare
+does not renew; explicit renewal rechecks all pages. Missing hello, disconnected
+worker or lost coordinator cannot leave the page indefinitely locked.
+
+`commit` deliberately refuses: this development layer does not yet implement
+the native browser participant's authenticated discovery, launch fence and
+shutdown/reconnect handoff. It cannot authorize file replacement or global Quit.
+The installer must not treat a prepared browser worker as an exited native host.
+Extension-version compatibility/store delivery remains a separate update gate.
+
+Local proof uses actual unpacked Chromium, actual page ports/context inventory
+and native messaging frames through a disposable qualification proxy around the
+real Pi bridge. Two chat documents and Settings prove draft/API-key refusal,
+three-page reservation, cancellation, renewal, new/closed-page invalidation and
+real 30-second expiry. The documents are opened as extension tabs; this is not a
+Windows side-panel/Comet GUI or consumer installation claim. Deterministic DOM
+tests additionally cover form dirtiness, accepted work, wrong tokens, missing
+inventory and cancellation races. See [verification](../tests/README.md).

@@ -114,4 +114,10 @@ waits for the complete owned Job, preserving any surviving child rather than
 closing its Job after only the leader exits. DSH/prompt/memory ownership remains
 with the background owner. Portable real-process drain checks pass; actual
 compiled integration of this new shutdown path is pending. This adds neither
-extension-wide update reservation nor a completed global Quit.
+completed global Quit. The subsequent shared
+[browser page reservation](LIFECYCLE.md#browser-page-reservation) now inventories
+every open extension document, refuses drafts/unsaved settings, pauses input and
+reconnect, and restores admission on cancel or expiry. Its native-frame and real
+Chromium proof runs in an isolated Linux profile. Windows host discovery/control,
+the native startup fence and committed browser exit remain pending; the component
+explicitly refuses commit until that handoff is implemented.

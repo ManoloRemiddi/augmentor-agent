@@ -26,6 +26,9 @@
  */
 import { ensurePort } from './port.mjs'
 import { handlePanelMessage } from './panel-api.mjs'
+import { browserMaintenance } from './maintenance-worker.mjs'
+
+browserMaintenance.install()
 
 // ResonantOS-style behavior: clicking the toolbar icon opens the side panel
 // (the manifest no longer declares a default_popup, which would take

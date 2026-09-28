@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
 import {presentSettingsForm} from './settings-form.mjs'
+import {registerMaintenanceState} from './maintenance-page.mjs'
 export function memoryDialog(doc,send,provenance,container){
   const dialog=doc.createElement('dialog');dialog.className='shared-prompt-editor memory-dialog'
   const make=(tag,text)=>{const e=doc.createElement(tag);if(text)e.textContent=text;return e}
@@ -24,6 +25,9 @@ export function memoryDialog(doc,send,provenance,container){
   const note=make('p','Loading memory settings…'),actions=make('div')
   dialog.append(make('h3','Memory'),intro,automatic,connection,data,note,actions);doc.body.append(dialog)
   let config={},token=null,busy=false,closed=false,rows=[],offset=0,total=0
+  const values=()=>JSON.stringify([...Object.values(fields).map(e=>e.value),scope.value])
+  let baseline=values()
+  registerMaintenanceState(dialog,()=>busy||!!token||!!text.value||values()!==baseline)
   const button=(parent,label,fn)=>{const b=make('button',label);b.type='button';b.onclick=fn;parent.append(b);return b}
   const request=async(action,params={})=>{const r=await send('memory',{request:{action,...params}});if(!r.ok)throw Error(r.error);return r.result}
   let autoEnabled=true
@@ -43,6 +47,7 @@ export function memoryDialog(doc,send,provenance,container){
     fields.userBank.value=config.userBank??'augmentor-user-'+crypto.randomUUID().slice(0,12)
     fields.apiKey.value='';fields.apiKey.placeholder=config.apiKeySet?'Stored key kept if left blank':'Required for a remote service'
     scope.value=config.activeScope??'user';dataScope.value=scope.value
+    baseline=values()
     note.textContent=config.enabled?'Hindsight memory enabled.':'Hindsight memory disabled.'
   }
   const operations=async()=>{

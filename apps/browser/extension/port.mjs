@@ -32,6 +32,13 @@ import {
 import { encode as wireEncode, genId } from './wire.mjs'
 import { handleBrowserAction } from './actions.mjs'
 import { overlayShow } from './overlay.mjs'
+import { browserMaintenance } from './maintenance-worker.mjs'
+
+let resetAfterMaintenance=false
+browserMaintenance.onResume(() => {
+  if (resetAfterMaintenance) { resetAfterMaintenance=false; resetHarnessPort() }
+  else if (!state.port) ensurePort()
+})
 
 function summarize(obj) {
   try {
@@ -65,6 +72,7 @@ export async function sessionHistoryOk(sessionId) {
 }
 
 export function ensurePort() {
+  if (browserMaintenance.paused) return
   if (state.port || state.phase === 'connecting') return
   state.phase = 'connecting'
   state.error = null
@@ -80,6 +88,13 @@ export function ensurePort() {
 
   port.onMessage.addListener((msg) => {
     if(state.port!==port)return
+    if (msg.id !== undefined && msg.method === 'augmentor/maintenance') {
+      void browserMaintenance.control(msg.params?.method, msg.params?.params).then(
+        result => { if (state.port === port) port.postMessage({id:msg.id,result}) },
+        error => { if (state.port === port) port.postMessage({id:msg.id,error:{message:error.message}}) },
+      ).catch(() => {})
+      return
+    }
     // Request/response for the client requests we sent (initialize, prompt).
     if (msg.id !== undefined && msg.method === undefined) {
       log('wire', { dir: 'ext<-bridge', msg: summarize(msg) })
@@ -95,6 +110,9 @@ export function ensurePort() {
     }
     // Server->client request: a browser action from the runtime.
     if (msg.id !== undefined && msg.method === 'browser/execute') {
+      let finish
+      try { finish=browserMaintenance.begin() }
+      catch (error) { post({id:msg.id,error:{message:error.message}}); return }
       log('wire', { dir: 'bridge->ext', msg: { id: msg.id, method: msg.method, params: msg.params } })
       handleBrowserAction(msg.id, msg.params).then(
         (result) => {
@@ -105,10 +123,11 @@ export function ensurePort() {
           log('wire', { dir: 'ext->bridge', msg: { id: msg.id, error: String(e) } })
           post({ id: msg.id, error: { message: String(e?.message ?? e) } })
         },
-      )
+      ).finally(finish)
       return
     }
     if(msg.id!==undefined&&['approval.requested','question.requested'].includes(msg.method)){
+      browserMaintenance.cancel()
       state.interactions=state.interactions.filter(row=>row.id!==msg.id);state.interactions.push(msg);broadcast();return
     }
     if(msg.method==='interaction.resolved'){state.interactions=state.interactions.filter(row=>row.id!==msg.params.rpcId);broadcast();return}
@@ -127,6 +146,7 @@ export function ensurePort() {
     if (msg.method === 'session.status') {
       if (msg.params?.sessionId !== state.sessionId) return
       state.running = msg.params?.status === 'running'
+      if (state.running) browserMaintenance.cancel()
       broadcast(log('status', { sessionId: msg.params?.sessionId, status: msg.params?.status }))
       return
     }
@@ -231,6 +251,7 @@ export function ensurePort() {
 let reconnectTimer = null
 
 function scheduleReconnect(message) {
+  if (browserMaintenance.paused) return
   if (reconnectTimer) return // a retry is already armed
   state.retryCount += 1
   // 1s, 2s, 4s, 8s, 16s, then 30s steady — a dead DSH must not spin the
@@ -266,6 +287,7 @@ export function post(msg) {
 }
 
 export function request(method, params) {
+  if (browserMaintenance.paused) return Promise.reject(new Error('Augmentor maintenance is in progress. This request was not started.'))
   if (!state.port) return Promise.reject(new Error('not connected'))
   const id = nextClientId()
   log('wire', { dir: 'ext->bridge', msg: { id, method, params: summarizeParams(params) } })
@@ -286,6 +308,7 @@ export function request(method, params) {
 // when phase is 'ready' on return; false means "still not ready" (the caller
 // reports state.error, and the normal backoff continues in the background).
 export async function requireReady(timeoutMs = 3500) {
+  if (browserMaintenance.paused) return false
   if (state.phase === 'ready') return true
   if (state.phase !== 'connecting') {
     // 'error' or 'initial': force a fresh attempt NOW, bypassing the backoff.
@@ -323,6 +346,7 @@ export function onSessionEvent(params) {
   // within the turn). Mid-turn this never fires: a new turn only starts
   // after the previous one ends.
   if (ev?.type === 'turn/start') {
+    browserMaintenance.cancel()
     state.workTabId = null
   }
   // Turn ended: the agent gives back control — "Done", then fade. But only
@@ -343,6 +367,7 @@ export function onSessionEvent(params) {
 }
 
 export function resetHarnessPort(){
+  if (browserMaintenance.paused) { resetAfterMaintenance=true; return }
   if(reconnectTimer){clearTimeout(reconnectTimer);reconnectTimer=null}
   const old=state.port;state.port=null;old?.disconnect();state.pending.dropAll(new Error('Harness changed'))
   state.phase='disconnected';state.error=null;state.catalog=null;state.selection=null;state.sessionReady=false;state.sessionId='augmentor-'+crypto.randomUUID();state.log=[];state.interactions=[];state.panelViewSession=null;state.capabilities={branch:false,edit:false}

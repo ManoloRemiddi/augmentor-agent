@@ -68,6 +68,10 @@ jobs:
           export DSH_TEST_MODULES="$PWD/release/dsh/node_modules"
           python3 scripts/dsh-setup-proof.py
           DSH_INSTALL_ROOT="$PWD/release/dsh/node_modules/@deepseek-ai/dsh" node --test tests/dual-memory-integration.test.mjs
+      - name: Reserve actual Chromium pages without losing drafts or Settings
+        env:
+          AUGMENTOR_PROOF_MAINTENANCE: '1'
+        run: python3 scripts/browser-composable-proof.py
       - name: Verify stopped-runtime recovery without model requests
         run: |
           export PATH="$PWD/release/dsh/node_modules/.bin:$PATH"

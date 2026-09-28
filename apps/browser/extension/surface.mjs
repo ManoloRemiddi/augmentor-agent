@@ -22,7 +22,7 @@ export function attachSurface({send,openSettings,onError,approval,state}){
   document.addEventListener('pointerdown',e=>{if(!menu.contains(e.target)&&!more.contains(e.target))closeMenu()})
   menu.onkeydown=e=>{const items=[...menu.querySelectorAll('button')];let i=items.indexOf(document.activeElement);if(['ArrowDown','ArrowUp','Home','End'].includes(e.key)){e.preventDefault();i=e.key==='Home'?0:e.key==='End'?items.length-1:(i+(e.key==='ArrowDown'?1:-1)+items.length)%items.length;items[i].focus()}}
   const draftKey='augmentor-sidebar-draft'
-  let sessionId=null,restored=false
+  let sessionId=null,restored=false,loadingDraft=false
   const remember=()=>chrome.storage.session.set({[draftKey]:{sessionId,text:input.value}}).catch(()=>{})
   input.addEventListener('input',remember)
   const hide=()=>{cancelImprovement();closeMenu();void remember().finally(()=>window.close())}
@@ -68,7 +68,7 @@ export function attachSurface({send,openSettings,onError,approval,state}){
 
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!menu.hidden){e.preventDefault();closeMenu();more.focus()}else if(e.ctrlKey&&e.key==='End'){$('log').scrollTo({top:$('log').scrollHeight,behavior:'smooth'})}else if(e.ctrlKey&&e.key==='Home'){$('log').scrollTo({top:0,behavior:'smooth'})}})
   fit();controls()
-  return {get improving(){return improving},update(value){
-    if(value.sessionId){if(sessionId&&value.sessionId!==sessionId){cancelImprovement();undo=null;void chrome.storage.session.remove(draftKey)}sessionId=value.sessionId;if(!restored){restored=true;void chrome.storage.session.get(draftKey).then(saved=>{const draft=saved[draftKey];if(draft?.sessionId===sessionId&&!input.value){input.value=draft.text;fit();controls()}})}}
+  return {get improving(){return improving},get loadingDraft(){return loadingDraft},update(value){
+    if(value.sessionId){if(sessionId&&value.sessionId!==sessionId){cancelImprovement();undo=null;void chrome.storage.session.remove(draftKey)}sessionId=value.sessionId;if(!restored){restored=true;loadingDraft=true;void chrome.storage.session.get(draftKey).then(saved=>{const draft=saved[draftKey];if(draft?.sessionId===sessionId&&!input.value){input.value=draft.text;fit();controls()}}).catch(()=>{}).finally(()=>loadingDraft=false)}}
     const current={...state(),...value};const dot=$('connection-dot');dot.dataset.phase=current.phase;dot.title=current.phase==='ready'?'Connected':current.error||'Connecting…';dot.setAttribute('aria-label',dot.title);controls()}}
 }

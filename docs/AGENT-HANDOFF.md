@@ -12,6 +12,17 @@ W0/W1 have started with isolated baseline checks, hash-locked native x64/ARM64
 runtime candidates and hosted qualification jobs. No Windows app or customer
 release is complete. Preserve existing installations and unrelated open work.
 
+Latest checkpoint, September 28: full native runtime `6d245a7` passes both CPUs
+in [run 36374006218](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36374006218),
+including compiled window discovery and the pre-Python lifetime lease. The later
+DSH/Pi bridge drain at `264227a` passes fast desktop, installer-candidate,
+Linux and Mac checks; full x64 passes and ARM64 is finishing. Shared browser page
+reservation now has local real Chromium/native-frame evidence: all open documents
+are counted, drafts/Settings refuse, cancellation restores input and lost
+reservations expire. [The contract](LIFECYCLE.md#browser-page-reservation) explicitly
+refuses commit until native browser discovery, launch fencing and the shutdown
+handoff are implemented. The draft remains unmerged and no product is deployed.
+
 Current Windows worktree: `feat/windows` in an isolated canonical-repository
 checkout; draft [PR #20](https://github.com/ManoloRemiddi/augmentor-agent/pull/20).
 At `523fe9a`, real hosted x64/ARM64 runtime and disposable two-version installer

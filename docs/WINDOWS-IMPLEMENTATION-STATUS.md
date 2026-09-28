@@ -7,16 +7,17 @@ connect a Windows machine for joint physical testing afterward. Follow the full
 [implementation plan](WINDOWS-IMPLEMENTATION-PLAN.md); this ledger does not narrow
 its outcome. No Windows customer release or installed-product claim exists yet.
 
-Current checkpoint: full runtime passes both CPUs at `303a619`, including the
+Current checkpoint: full runtime passes both CPUs at `6d245a7`, including the
 corrected bootstrap token, actual compiled desktop/DSH maintenance, background
-owner reservation and complete Windows Job drain.
+owner reservation, complete Windows Job drain, kernel-verified window discovery
+and the pre-Python native lifetime lease.
 The separate voice 0.1.18 candidate passes native configuration and maintenance
 on both CPUs.
-Window discovery passes both native fast jobs at `dc41a56`; compiled execution
-remains pending. Current source adds pre-Python native startup exclusion, with
-compiled probes passing both CPUs at `bfde231`. Full assembled qualification is
-pending. Browser source now drains accepted parent and DSH/Pi bridge operations;
-new native integration remains pending.
+Browser source now drains accepted parent and DSH/Pi bridge operations; the full
+assembled `264227a` run is still pending (x64 passes). New shared browser source
+reserves every open document, preserves drafts/Settings and recovers from a lost
+reservation. Its real Chromium proof passes locally; native discovery and commit
+remain pending. This lifetime lease is not the short-lived global startup fence.
 Installer backend is **Inno Setup/WinSparkle**; earlier Velopack
 candidate entries below are historical. Global coordination and full app release
 are not complete.
@@ -868,3 +869,21 @@ actual pinned DSH SDK available and isolated user paths. This includes the new
 bridge drain checks and existing auth, approvals, shared prompts, voice control,
 browser actions and UI regressions. Windows wrapper qualification still depends
 on the native compiled run; no installed browser was restarted.
+
+At `6d245a7`, [full runtime run 36374006218](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36374006218)
+passes both native CPUs and the shared Mac Qt candidate. This qualifies the
+compiled early lifetime lease, window discovery and the included parent/voice
+drain source, superseding those earlier pending entries. The subsequent
+`264227a` DSH/Pi bridge drain passes both fast desktop and installer-candidate
+jobs, plus Linux and Mac workflows; its full x64 job passes, ARM64 is pending.
+
+The next source checkpoint adds reversible browser-worker/page reservation on
+all OSs. Actual isolated Chromium, the real Pi bridge and native messaging
+frames prove two chat documents plus Settings, draft/API-key refusal, cancel,
+renew, new/closed-page invalidation and actual 30-second lost-reservation expiry.
+The qualification-only framing proxy is separate from the product host.
+TypeScript check/build and all 248 combined Node/Browser checks pass before the
+additional silent-page, hello-timeout and early voice-gesture cases; those three
+focused additions also pass. Native Windows browser discovery/control and commit
+are not implemented by this checkpoint. The component refuses commit, so these
+results do not enable an installer or claim end-to-end weekly updates.

@@ -19,7 +19,7 @@ export function attachVoice({send,onError,isHistory}){
     if(!result?.ok&&action!=='close'){onError(result?.error??'Voice disconnected');close()}
   }
   function close(){
-    ++epoch;clearTimeout(timer);clearInterval(heartbeat);heartbeat=null
+    ++epoch;clearTimeout(timer);timer=null;clearInterval(heartbeat);heartbeat=null
     held=false;locked=false;handsFree=false;voiceState='closed';opening=null
     const old=lease;lease=null;const closing=control('close',old)
     button.dataset.state='closed';button.dataset.mode='';button.style.removeProperty('--voice-level')
@@ -102,7 +102,7 @@ export function attachVoice({send,onError,isHistory}){
   window.addEventListener('blur',()=>{if(held&&!locked&&!handsFree)close()})
   document.addEventListener('visibilitychange',()=>{if(document.hidden)close()})
   document.getElementById('stop')?.addEventListener('click',close)
-  return {update(state,history){
+  return {get busy(){return !!(lease||opening||held||locked||handsFree||timer)},update(state,history){
     if(state.harness==='dsh'&&state.phase==='ready'&&!lease&&!opening&&Date.now()>nextPreferences){
       nextPreferences=Date.now()+15000
       void send('voice/preferences').then(result=>{if(result?.ok&&result.result){defaultHandsFree=result.result.mode==='hands-free';voiceEnabled=result.result.enabled;button.hidden=!voiceEnabled;status.hidden=!voiceEnabled}}).catch(()=>{})
