@@ -129,14 +129,14 @@ class Supervisor:
         self.shutdown = threading.Event()
 
     def status(self):
-        if self.child and self.child.poll() is not None:
-            self.exit_code = self.child.wait()  # Close the Job, including stragglers.
+        if self.child and self.child.drained():
+            self.exit_code = self.child.wait_graceful()
             self.child = None
         for name, child in list(self.companions.items()):
-            if child.poll() is not None:
-                self.companion_exits[name] = child.wait()
+            if child.drained():
+                self.companion_exits[name] = child.wait_graceful()
                 del self.companions[name]
-        return {'dsh': {'running': bool(self.child and self.child.poll() is None),
+        return {'dsh': {'running': bool(self.child),
                         'exitCode': self.exit_code},
                 'companions': {name: {'running': name in self.companions,
                     'ownerProcessPid': self.companions[name].pid if name in self.companions else None,
@@ -171,8 +171,8 @@ class Supervisor:
             del self.companions[name]
 
     def start_dsh(self):
-        if self.child and self.child.poll() is None: return
-        if self.child: self.child.wait(); self.child = None
+        self.status()
+        if self.child:return  # A surviving descendant still belongs to this range.
         self.exit_code = None
         from dsh.managed import SCHEMA as DSH_SCHEMA, runtime_paths
         state = managed_directory(); require_directory(state)

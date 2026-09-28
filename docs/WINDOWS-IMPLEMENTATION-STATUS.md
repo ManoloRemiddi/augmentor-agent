@@ -794,3 +794,11 @@ until it is empty and acknowledges before normal exit. Portable owner/Qt tests
 pass, including queued activations and work still executing after a lost settings
 reply. Native supervisor handshake tests are added and pending. This is the
 startup fence needed by global coordination; it is not global Quit or an update.
+
+A further owner review finds that polling an exited leader previously closed its
+Job, which could terminate surviving descendants before global idle checks.
+The Windows owner now retains that range until its kernel active-process count
+is zero. New starts reuse/preserve it, and committed shutdown remains refused.
+The compiled desktop proof now waits for that whole range to drain naturally.
+Portable supervisor tests pass; a real detached-child timeout/natural-exit test
+is added to both native qualification paths and awaits execution.

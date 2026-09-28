@@ -143,5 +143,15 @@ The whole-product coordinator still needs window/browser/harness/voice discovery
 component reservations and exclusive installation access. This source adds no
 customer-facing Quit or installer transaction by itself.
 
+Normal owner status now checks the Windows Job's actual active-process count
+after its leader exits. A surviving descendant keeps the component owned and
+blocks commit/replacement startup; status never closes its Job to make it appear
+stopped. `wait_graceful` times out while preserving a live Job. The explicit
+fault/bootstrap `wait`/termination behavior remains separate. A new native test
+lets a parent exit, proves its detached descendant survives a graceful timeout,
+then lets the descendant exit itself and observes the fully drained Job. Native
+execution is pending; the portable supervisor regression passes. This Windows
+process-range check makes no new descendant-tracking claim for Unix adapters.
+
 References: [Microsoft RegisterHotKey](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-registerhotkey)
 and [Qt native event filters](https://doc.qt.io/qt-6/qabstractnativeeventfilter.html).

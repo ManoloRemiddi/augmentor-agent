@@ -16,6 +16,36 @@ sys.path.insert(0, str(ROOT/'services'))
 
 @unittest.skipUnless(sys.platform == 'win32', 'requires Windows Job objects')
 class WindowsProcessTests(unittest.TestCase):
+    def test_graceful_wait_preserves_surviving_descendant_until_its_own_exit(self):
+        import win32api,win32con,win32event
+        from platform_adapters.processes import OwnedProcess
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary);record=root/'child.pid';release=root/'release'
+            descendant=root/'descendant.py'
+            descendant.write_text('import sys,time\nfrom pathlib import Path\nwhile not Path(sys.argv[1]).exists():time.sleep(.02)\n',encoding='utf-8')
+            target=root/'parent.py'
+            target.write_text('''import subprocess,sys
+from pathlib import Path
+child=subprocess.Popen([sys.executable,sys.argv[1],sys.argv[2]],creationflags=subprocess.DETACHED_PROCESS,
+ stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+Path(sys.argv[3]).write_text(str(child.pid))
+''',encoding='utf-8')
+            child=OwnedProcess([sys.executable,str(target),str(descendant),str(release),str(record)],
+                stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+            handle=None
+            try:
+                self.assertEqual(child.process.wait(timeout=10),0)
+                handle=win32api.OpenProcess(win32con.SYNCHRONIZE,False,int(record.read_text()))
+                self.assertFalse(child.drained())
+                with self.assertRaises(subprocess.TimeoutExpired):child.wait_graceful(timeout=.1)
+                self.assertEqual(win32event.WaitForSingleObject(handle,0),win32event.WAIT_TIMEOUT)
+                release.write_text('fixture complete')
+                self.assertEqual(child.wait_graceful(timeout=5),0)
+                self.assertEqual(win32event.WaitForSingleObject(handle,0),win32event.WAIT_OBJECT_0)
+            finally:
+                child.terminate();child.wait(timeout=5)
+                if handle:handle.Close()
+
     def test_failed_job_configuration_closes_the_kernel_handle(self):
         import ctypes
         from ctypes import wintypes

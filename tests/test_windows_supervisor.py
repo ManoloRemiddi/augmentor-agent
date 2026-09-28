@@ -21,6 +21,7 @@ class SupervisorSafetyTests(unittest.TestCase):
         supervisor=owner.Supervisor(shell=Mock());token='b'*32
         control=lambda action:supervisor.dispatch({'action':'maintenance','method':'host.maintenance.'+action,'params':{'token':token}})['maintenance']
         supervisor.child=Mock();supervisor.child.poll.return_value=None
+        supervisor.child.drained.return_value=False
         self.assertEqual(control('prepare')['phase'],'prepared')
         for action in ('start-dsh','start-prompts','start-memory','stop-failed-setup','exit-if-empty'):
             with self.assertRaises(owner.MaintenanceBusy):supervisor.dispatch({'action':action})
@@ -38,6 +39,7 @@ class SupervisorSafetyTests(unittest.TestCase):
     def test_published_profile_cannot_be_stopped_as_failed_setup(self):
         supervisor = owner.Supervisor()
         supervisor.child = Mock(); supervisor.child.poll.return_value = None
+        supervisor.child.drained.return_value=False
         with patch.dict(os.environ, {'XDG_DATA_HOME': '/fixture/data'}), \
              patch('dsh.setup.current', return_value={'home': str(owner.managed_directory()/'home')}):
             with self.assertRaisesRegex(ValueError, 'already selected'):
@@ -47,6 +49,7 @@ class SupervisorSafetyTests(unittest.TestCase):
     def test_exit_requires_no_running_component(self):
         supervisor = owner.Supervisor()
         supervisor.child = Mock(); supervisor.child.poll.return_value = None
+        supervisor.child.drained.return_value=False
         with self.assertRaisesRegex(ValueError, 'running component'):
             supervisor.dispatch({'action': 'exit-if-empty'})
         self.assertFalse(supervisor.shutdown.is_set())
@@ -54,10 +57,18 @@ class SupervisorSafetyTests(unittest.TestCase):
 
     def test_finished_child_job_is_closed_before_reporting_stopped(self):
         supervisor = owner.Supervisor()
-        child = Mock(); child.poll.return_value = 7; child.wait.return_value = 7
+        child = Mock(); child.poll.return_value = 7; child.wait_graceful.return_value = 7;child.drained.return_value=True
         supervisor.child = child
         self.assertEqual(supervisor.status()['dsh'], {'running': False, 'exitCode': 7})
-        child.wait.assert_called_once(); self.assertIsNone(supervisor.child)
+        child.wait_graceful.assert_called_once(); self.assertIsNone(supervisor.child)
+
+    def test_exited_leader_with_live_descendants_stays_owned_without_termination(self):
+        supervisor=owner.Supervisor();child=Mock();supervisor.child=child
+        child.poll.return_value=0;child.drained.return_value=False
+        self.assertTrue(supervisor.status()['dsh']['running'])
+        supervisor.start_dsh()
+        child.wait.assert_not_called();child.wait_graceful.assert_not_called();child.terminate.assert_not_called()
+        self.assertIs(supervisor.child,child)
 
 
 @unittest.skipUnless(sys.platform == 'win32', 'requires real Windows named-pipe ownership')

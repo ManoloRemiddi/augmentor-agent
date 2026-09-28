@@ -105,6 +105,13 @@ Portable tests pass; native owner execution is pending. Continue with global
 component discovery/coordination and browser participation, preserving the
 remaining installer, feature-parity and physical acceptance gates.
 
+Normal Windows status must also retain an exited leader's Job until all its
+descendants exit. Source now queries the kernel active-process count and exposes
+a non-terminating graceful wait. The earlier status path closed the Job after
+leader exit and could kill a straggler. Portable owner tests pass; new native
+detached-child tests are pending. Keep this boundary separate from deliberate
+fault containment and failed-setup cleanup.
+
 ## September 27 Windows implementation plan — historical planning checkpoint
 
 The owner requested a detailed plan before coding. Read the

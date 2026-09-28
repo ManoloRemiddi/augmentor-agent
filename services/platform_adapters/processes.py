@@ -11,6 +11,7 @@ from pathlib import Path
 import signal
 import subprocess
 import sys
+import time
 
 
 class OwnedProcess:
@@ -58,6 +59,25 @@ class OwnedProcess:
     def poll(self):
         return self.process.poll()
 
+    def drained(self):
+        """Observe the whole Windows Job; other OSs observe the leader only."""
+        if self.process.poll() is None:return False
+        if sys.platform=='win32' and self.job is not None:
+            import win32job
+            return win32job.QueryInformationJobObject(self.job,win32job.JobObjectBasicAccountingInformation)['ActiveProcesses']==0
+        return True
+
+    def wait_graceful(self, timeout=None):
+        """Observe natural Windows range exit without closing a live Job."""
+        deadline=None if timeout is None else time.monotonic()+timeout
+        result=self.process.wait(timeout=timeout)
+        while not self.drained():
+            if deadline is not None and time.monotonic()>=deadline:
+                raise subprocess.TimeoutExpired(self.process.args,timeout)
+            time.sleep(.02)
+        self.close()
+        return result
+
     def terminate(self):
         if sys.platform == 'win32':
             import win32job
@@ -73,6 +93,8 @@ class OwnedProcess:
             os.killpg(self.process.pid, signal.SIGKILL)
 
     def wait(self, timeout=None):
+        # Fault/bootstrap cleanup may intentionally close a range containing
+        # stragglers. Normal Quit/update must use drained()/wait_graceful().
         result = self.process.wait(timeout=timeout)
         self.close()
         return result

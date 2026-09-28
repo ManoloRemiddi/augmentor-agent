@@ -98,7 +98,7 @@ def desktop_chat(root, work, out):
                     time.sleep(.1)
                 assert prepared['result']['phase']=='prepared' and prepared['pid']==after['pid'], prepared
                 closed = maintenance('commit'); assert closed['ok'] and closed['result']['phase']=='closing', closed
-                assert child.wait(timeout=15) == 0, 'The idle desktop did not close normally.'
+                assert child.wait_graceful(timeout=15) == 0, 'The idle desktop did not close normally.'
             finally:
                 child.terminate(); child.wait(timeout=10)
         result.update(passed=True, turns=turns, historyRestored=True, noDuplicateSubmission=True, preparedNormalWindowExit=True)
