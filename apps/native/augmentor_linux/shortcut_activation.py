@@ -39,6 +39,9 @@ class DesktopActivation:
                     if not isinstance(error, FileNotFoundError) and error.errno not in (errno.ENOENT, errno.ECONNREFUSED):
                         raise
                 else:
+                    if sys.platform == 'win32':
+                        from .windows_focus import allow_foreground
+                        allow_foreground(connection)
                     # Once connected, a failed send has an unknown outcome.
                     # Launching the app again could toggle the window twice.
                     connection.sendall(b'toggle\n' if sys.platform=='win32' else b'toggle')

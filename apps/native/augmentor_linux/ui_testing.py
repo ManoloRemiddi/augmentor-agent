@@ -15,7 +15,7 @@ def dispatch(window, request, *, enabled=False):
     controller=window.controller
     action=request.get('action')
     if action=='inspect':
-        return {'pid':os.getpid(),'visible':window.isVisible(),
+        return {'pid':os.getpid(),'visible':window.isVisible(),'active':window.isActiveWindow(),
                 'online':bool(controller and controller.online),
                 'session':controller.session if controller else None,
                 'preset':controller.preset if controller else None,

@@ -74,8 +74,10 @@ class PipeSocket:
         if self.handle is None or self._closed:
             raise ConnectionError('The private pipe is closed.')
         query = win32pipe.GetNamedPipeClientProcessId if self.server else win32pipe.GetNamedPipeServerProcessId
-        if process_sid(query(self.handle)) != current_sid():
+        pid = query(self.handle)
+        if process_sid(pid) != current_sid():
             raise PermissionError('This Augmentor companion belongs to another Windows user.')
+        return pid
 
     def settimeout(self, timeout):
         if timeout is not None and (not math.isfinite(timeout) or timeout <= 0):

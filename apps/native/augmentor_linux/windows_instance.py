@@ -30,6 +30,9 @@ class Client:
         self.connection = connection
         return True
     def write(self, payload):
+        if payload in (b'show', b'toggle', b'voice') or payload.startswith(b'harness:'):
+            from .windows_focus import allow_foreground
+            allow_foreground(self.connection)
         self.connection.sendall(payload+b'\n')
         return len(payload)
     def waitForBytesWritten(self, milliseconds): return self.connection is not None

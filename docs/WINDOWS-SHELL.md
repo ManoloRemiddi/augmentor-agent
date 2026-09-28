@@ -12,6 +12,13 @@ desktop module. Repeat app launches request Show. The shortcut activation helper
 uses the same authenticated instance endpoint to request Toggle; an absent
 endpoint permits a cold launch, while an uncertain delivery never gets replayed.
 
+Before delivering a user-initiated Show/Toggle request, the launcher/shortcut owner
+offers its foreground permission to the kernel-authenticated pipe server PID with
+`AllowSetForegroundWindow`. Windows may still refuse focus; Augmentor does not
+inject keys or attach input queues to override that policy. The shared window
+then performs its normal Qt activation. Real foreground/input acceptance remains
+a physical-machine check. [Windows foreground handoff](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-allowsetforegroundwindow).
+
 The embedded launcher intentionally excludes arbitrary PATH/current-directory DLL
 search. Its Python entrypoint retains explicit DLL-directory handles for private
 Python, PySide and Shiboken libraries and selects the bundled Qt plugin directory.

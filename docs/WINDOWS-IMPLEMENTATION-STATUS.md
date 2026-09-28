@@ -567,3 +567,10 @@ version and manifest resources without changing the approved artwork. All seven
 generated PNG icon frames locally decode at their exact sizes with alpha;
 native resource compilation/readback and physical shell/DPI appearance remain
 pending. The disposable W1 installer fixture retains its separate identity.
+
+Windows focus handoff now gives the existing desktop process the launch/hotkey
+owner's foreground permission before Show/Toggle. It uses the server PID obtained
+from the authenticated pipe, never a PID in application JSON. Windows may deny
+the handoff; normal visibility control is retained without input injection.
+Preview inspection records active-window state, but native API execution and
+physical foreground behavior remain distinct qualification gates.

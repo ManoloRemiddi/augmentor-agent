@@ -1,6 +1,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Real Windows pipe transport; no API mocks stand in for kernel behavior."""
 import json
+import os
 from pathlib import Path
 import socketserver
 import subprocess
@@ -30,11 +31,13 @@ class WindowsPipeTests(unittest.TestCase):
                 server, _ = listener.accept(10)
                 with server:
                     server.settimeout(10)
+                    self.assertEqual(server.verify_peer(), child.pid)
                     self.assertEqual(server.recv(16), b'child')
                     server.sendall(b'parent')
                 self.assertEqual(child.wait(timeout=10), 0)
                 with PipeSocket() as client:
                     client.settimeout(5); client.connect(endpoint)
+                    self.assertEqual(client.verify_peer(), os.getpid())
                     server, _ = listener.accept(5)
                     result = []
                     reader = threading.Thread(target=lambda: result.append(server.recv(16)))
