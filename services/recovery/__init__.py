@@ -13,6 +13,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import uuid
 from urllib.parse import urlsplit
 from platform_adapters import locks as fcntl
 from platform_adapters.paths import private_directory
@@ -37,7 +38,9 @@ def regular(path):
     if sys.platform == 'win32':
         from platform_adapters.windows_identity import reject_reparse_ancestors, current_sid
         import win32security
-        reject_reparse_ancestors(path)
+        try: reject_reparse_ancestors(path)
+        except PermissionError as error:
+            raise RecoveryError('Recovery needs an ordinary, user-owned file: '+str(path)) from error
         owner = win32security.GetFileSecurity(str(path), win32security.OWNER_SECURITY_INFORMATION).GetSecurityDescriptorOwner()
         info = path.lstat()
         valid = stat.S_ISREG(info.st_mode) and info.st_nlink == 1 and owner == current_sid()
@@ -52,6 +55,22 @@ def regular(path):
 def fingerprint(path):
     info = regular(path)
     return (info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns)
+
+
+def backup_directory(prefix):
+    # ACLs, including an explicit owner, must be installed at creation. A
+    # chmod after mkdtemp/copy2 cannot make an elevated Windows file user-owned.
+    return private_directory(state_directory()/(prefix+uuid.uuid4().hex))
+
+
+def backup_copy(source, target):
+    private_directory(target.parent)
+    fd = private_descriptor(target, writable=True, exclusive=True)
+    with os.fdopen(fd, 'w+b') as saved, source.open('rb') as original:
+        shutil.copyfileobj(original, saved)
+        saved.flush(); os.fsync(saved.fileno())
+        saved.seek(0)
+        return hashlib.file_digest(saved, 'sha256').hexdigest()
 
 
 def verified_prefix(plain, compressed):
@@ -96,7 +115,7 @@ def repair_history(home, emit):
                 paths.append(Path(directory)/name)
     if not paths:
         raise RecoveryError('No redundant history copies were found. The storage error needs further investigation.')
-    backup = Path(tempfile.mkdtemp(prefix='history-', dir=state_directory()))
+    backup = backup_directory('history-')
     count = 0
     emit('Checking history copies; originals will be backed up to '+str(backup))
     # Use the actual harness protocol: POSIX flock or its Windows semaphore.
@@ -112,17 +131,12 @@ def repair_history(home, emit):
             digest, before = verified_prefix(plain, compressed)
             relative = plain.relative_to(root)
             target = backup/relative
-            target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
             # Copy first (also supports separate filesystems), verify, then remove only
             # the redundant source. Write the manifest before changing live history.
-            shutil.copy2(plain, target)
-            target.chmod(0o600)
-            with target.open('r+b') as saved:
-                os.fsync(saved.fileno())
-                if hashlib.file_digest(saved, 'sha256').hexdigest() != digest:
-                    raise RecoveryError('History backup verification failed; the original was preserved.')
-            with (backup/'manifest.jsonl').open('a', encoding='utf-8') as manifest:
-                os.chmod(manifest.name, 0o600)
+            if backup_copy(plain, target) != digest:
+                raise RecoveryError('History backup verification failed; the original was preserved.')
+            fd = private_descriptor(backup/'manifest.jsonl', writable=True, create=True)
+            with os.fdopen(fd, 'a', encoding='utf-8') as manifest:
                 manifest.write(json.dumps({'source':str(plain), 'backup':str(target), 'sha256':digest})+'\n')
                 manifest.flush(); os.fsync(manifest.fileno())
             if before != (fingerprint(plain), fingerprint(compressed)):
@@ -160,9 +174,12 @@ def repair_adaptive_history(home, session, emit):
             raise RecoveryError('The affected chat is still open in DSH. Finish its work and restart DSH before repair.') from None
         bundled = Path(__file__).resolve().parents[2]/('node/node.exe' if sys.platform == 'win32' else 'node/bin/node')
         node = os.environ.get('AUGMENTOR_PI_NODE') or (str(bundled) if bundled.exists() else shutil.which('node'))
-        with tempfile.NamedTemporaryFile(dir=path.parent, prefix='.telemetry-repair-', delete=False) as output:
-            temporary = Path(output.name)
-            stack.callback(temporary.unlink, missing_ok=True)
+        temporary_directory = private_directory(path.parent/('.telemetry-repair-'+uuid.uuid4().hex))
+        stack.callback(temporary_directory.rmdir)
+        temporary = temporary_directory/'history'
+        fd = private_descriptor(temporary, writable=True, exclusive=True)
+        stack.callback(temporary.unlink, missing_ok=True)
+        with os.fdopen(fd, 'w+b') as output:
             result = subprocess.run([node, str(Path(__file__).with_name('repair-telemetry.mjs')), str(path)], stdout=output, stderr=subprocess.PIPE, timeout=30)
             if result.returncode:
                 raise RecoveryError('History verification failed; the original was preserved.')
@@ -170,17 +187,18 @@ def repair_adaptive_history(home, session, emit):
             output.flush(); os.fsync(output.fileno())
         if not summary['changed']: return None
         if before != fingerprint(path): raise RecoveryError('History changed during repair; retry when idle.')
-        backup = Path(tempfile.mkdtemp(prefix='adaptive-history-', dir=state_directory()))
+        backup = backup_directory('adaptive-history-')
         saved = backup/path.name
-        shutil.copy2(path, saved); saved.chmod(0o600)
-        with path.open('rb') as source, saved.open('r+b') as copy:
+        saved_digest = backup_copy(path, saved)
+        with path.open('rb') as source:
             digest = hashlib.file_digest(source, 'sha256').hexdigest()
-            if hashlib.file_digest(copy, 'sha256').hexdigest() != digest:
+            if saved_digest != digest:
                 raise RecoveryError('History backup verification failed; original preserved.')
-            os.fsync(copy.fileno())
         manifest = backup/'manifest.json'
-        manifest.write_text(json.dumps({'source':str(path), 'sha256':digest, **summary})+'\n'); manifest.chmod(0o600)
-        with manifest.open('r+b') as record: os.fsync(record.fileno())
+        fd = private_descriptor(manifest, writable=True, exclusive=True)
+        with os.fdopen(fd, 'w', encoding='utf-8') as record:
+            record.write(json.dumps({'source':str(path), 'sha256':digest, **summary})+'\n')
+            record.flush(); os.fsync(record.fileno())
         if before != fingerprint(path): raise RecoveryError('History changed before replacement; original preserved.')
         replace_file(temporary, path)
         emit(f'Repaired {summary["changed"]} legacy diagnostic markers; every event retained. Backup: {backup}')

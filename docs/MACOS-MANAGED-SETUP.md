@@ -173,3 +173,11 @@ only missing private configuration; speech models are separate. The browser setu
 menu prepares a stable external extension folder and native-host registration,
 then leaves final Load unpacked approval to Chrome/Chromium. See the
 [preview release record](MACOS-PREVIEW-RELEASE.md) for distribution scope.
+
+### Shared Windows/Mac first-run interface
+
+The interface now lives in `apps/native/augmentor_linux/managed_setup.py`.
+Mac keeps its LaunchAgent entrypoint, payload paths and existing setup flow;
+Windows selects its own payload and supervisor behind the same dialog. Shared
+native and Mac artifact checks must pass before promotion. This source change
+does not update an installed Mac or alter its configuration.

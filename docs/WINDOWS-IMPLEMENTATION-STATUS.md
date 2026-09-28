@@ -409,3 +409,38 @@ pass 574 tests (16 explicit platform/environment skips). ARM64 completes the
 preceding `ae17cc3` primitive/terminal/supervisor checks, but its real DSH setup
 fails with the same empty startup log as x64; the stdio correction has its own
 ongoing run.
+
+## Shared first-run UI and Windows voice configuration (September 28)
+
+At `6475a9f`, both native Windows jobs pass explicit binary stdio forwarding and
+DSH CLI version readback. The actual DSH startup log now identifies the blocker:
+Resonant Voice 0.1.16 tests Unix permission bits on Windows and rejects its token.
+No permission check is bypassed. The separately maintained voice candidate
+0.1.17 (`aae6a51`, [dependency PR #2](https://github.com/ManoloRemiddi/resonant-voice/pull/2))
+adds native protected user/SYSTEM ACL creation and opened-file validation. Its
+four native configuration checks pass on x64 and ARM64 at code ref `22fd869`
+([run 36360561703](https://github.com/ManoloRemiddi/resonant-voice/actions/runs/36360561703));
+36 Node tests pass on Linux, with two Windows-only skips. The common DSH lock and
+complete Linux assembly now select that same versioned archive. Application DSH
+setup/conversation qualification is still pending; this is not audio/GPU proof.
+
+The approved first-run interface is now `managed_setup.py`, shared by Windows and
+Mac. Payload diagnosis and the setup-worker/service-owner selection are platform
+adapters. Windows presents the existing two-step runtime/model flow, preserves
+external DSH ownership, and sends credentials over UTF-8 stdin without a console.
+No additional UI layout is introduced. Linux's existing external-runtime path is
+unchanged. The local native suite passes 576 tests (16 Windows/environment skips).
+
+The first Windows recovery suite exposed administrator-owned test files on the
+hosted runner. Synthetic histories now explicitly use the per-user security
+descriptor; production owner checks remain strict. Reparse refusal is translated
+into the common recovery error instead of leaking an adapter exception. All 24
+recovery tests pass locally; native recovery rerun remains required. Existing
+Linux/Mac apps, personal speech/model configuration and downloads are unchanged.
+
+Recovery backups, their manifests and temporary replacement histories now receive
+private ACLs and explicit ownership at creation. `copy2` plus `chmod` was
+insufficient on Windows, especially under an elevated test runner. A temporary
+private directory on the history volume preserves atomic replacement across
+separate configuration/data volumes. The 24 recovery tests pass after this
+change; native tests remain the gate for the Windows filesystem behavior.

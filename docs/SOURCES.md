@@ -252,3 +252,15 @@ completion is checked against durable failure counts because its public return
 value omits internal failures. Streaming gateway assembly was tested against the
 existing Qwen endpoint, including real cancellation. DSH surface replacement and
 Pi lifecycle hooks retain their pinned versions. See [contract and evidence](CONTROLLED-MEMORY.md).
+
+### Windows voice configuration candidate (28 September 2026)
+
+The shared DSH graph now selects Resonant Voice 0.1.17 from source `aae6a51`
+([dependency PR #2](https://github.com/ManoloRemiddi/resonant-voice/pull/2)).
+Its native Windows ACL adapter fixes the 0.1.16 Unix-mode-bit rejection without
+relaxing token privacy. Configuration tests pass on x64/ARM64 at `22fd869`;
+Augmentor integration remains under qualification. Koffi 3.2.1 was already in the
+locked DSH graph and is now also an explicit voice dependency. See the
+[Windows evidence ledger](WINDOWS-IMPLEMENTATION-STATUS.md) and
+[archive provenance](../release/dsh/plugins/README.md). No installed speech
+runtime, GPU placement or public release is changed by this candidate.

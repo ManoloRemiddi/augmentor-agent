@@ -15,7 +15,7 @@ class WindowTests(unittest.TestCase):
         from unittest.mock import Mock, patch
         owner=SimpleNamespace(controller=SimpleNamespace(harness='dsh',session=None,start_monitor=Mock()),
             open_setup=Mock(),setup_offered=False,set_status=Mock())
-        with patch('augmentor_linux.macos_setup.needed',return_value=True):
+        with patch('augmentor_linux.managed_setup.needed',return_value=True):
             Window.start_connection(owner); self.app.processEvents()
         owner.open_setup.assert_called_once(); owner.controller.start_monitor.assert_not_called()
         self.assertTrue(owner.setup_offered)
@@ -41,7 +41,7 @@ class WindowTests(unittest.TestCase):
         for harness,session,needed in [('dsh',None,False),('dsh','saved',True),('pi',None,True)]:
             owner=SimpleNamespace(controller=SimpleNamespace(harness=harness,session=session,start_monitor=Mock()),
                 open_setup=Mock(),setup_offered=False,set_status=Mock())
-            with patch('augmentor_linux.macos_setup.needed',return_value=needed):
+            with patch('augmentor_linux.managed_setup.needed',return_value=needed):
                 Window.start_connection(owner); self.app.processEvents()
             owner.controller.start_monitor.assert_called_once(); owner.open_setup.assert_not_called()
 

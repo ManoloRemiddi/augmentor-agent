@@ -15,11 +15,19 @@ class HistoryRecoveryTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(); self.addCleanup(self.tmp.cleanup)
         self.home = Path(self.tmp.name)/'home'
-        self.session = self.home/'sessions/workspace/chat'; self.session.mkdir(parents=True)
+        self.session = self.home/'sessions/workspace/chat'
+        from platform_adapters.paths import private_directory
+        private_directory(self.session)
         self.env = patch.dict(os.environ, {'XDG_STATE_HOME':str(Path(self.tmp.name)/'state')})
         self.env.start(); self.addCleanup(self.env.stop)
         self.plain = self.session/'session.v3.jsonl'
         self.compressed = Path(str(self.plain)+'.zstd')
+        # Hosted Windows runs elevated: ordinary file creation can assign the
+        # Administrators group as owner. These fixtures represent per-user DSH
+        # data, so explicitly create both with the user's protected descriptor.
+        from platform_adapters.private_files import descriptor
+        for path in (self.plain, self.compressed):
+            os.close(descriptor(path, writable=True, exclusive=True))
     def pair(self, plain=b'old\n', compressed=b'old\nnew\n'):
         self.plain.write_bytes(plain)
         self.compressed.write_bytes(subprocess.run(['node','-e', "process.stdout.write(require('node:zlib').zstdCompressSync(require('node:fs').readFileSync(0)))"], input=compressed, capture_output=True, check=True).stdout)
@@ -43,6 +51,7 @@ class HistoryRecoveryTests(unittest.TestCase):
         with self.assertRaisesRegex(RecoveryError, 'differ'): repair_history(self.home, Mock())
         self.assertEqual(self.plain.read_bytes(), b'other\n'); self.assertTrue(self.compressed.exists())
     def test_missing_counterpart_preserves_plain(self):
+        self.compressed.unlink()
         self.plain.write_bytes(b'only history\n')
         with self.assertRaisesRegex(RecoveryError, 'counterpart'): repair_history(self.home, Mock())
         self.assertTrue(self.plain.exists())

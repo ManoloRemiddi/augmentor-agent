@@ -33,6 +33,13 @@ crash containment passes on both CPUs at `89e8a84`. New staged-application DSH
 conversation/restart checks are being introduced. Keep the detailed ledger and
 latest CI authoritative; no Windows customer installation or release is complete.
 
+The current shared first-run UI also selects the Windows runtime owner. DSH
+startup exposed a voice token Unix-permission check; a separately versioned
+Resonant Voice 0.1.17 candidate has passed native ACL tests on both CPUs and is
+now in the shared graph. Full DSH conversation/restart qualification remains
+pending. Follow the evidence ledger rather than inferring completion from the
+dependency tests.
+
 ## September 27 Windows implementation plan — historical planning checkpoint
 
 The owner requested a detailed plan before coding. Read the

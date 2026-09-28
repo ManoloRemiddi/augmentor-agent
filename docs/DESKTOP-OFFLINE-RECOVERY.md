@@ -101,3 +101,11 @@ active leases, symlinks, startup routing and occupied-port protection.
 stops and recovers a real DSH fixture profile without sending model requests.
 The DSH fixture deliberately omits the product integration; the live installation
 was separately verified through its existing product adapter in the incident.
+
+Windows recovery creates backups and manifests with protected user/SYSTEM ACLs
+and the current user's SID as owner. It prepares replacement history in a private
+temporary directory on the same volume, verifies the original and backup, then
+uses an atomic Windows replacement with write-through. Existing foreign-owned,
+linked or changing histories remain untouched. No Unix `chmod` claim is used as
+Windows privacy evidence. Native Windows qualification is tracked separately in
+the [implementation ledger](WINDOWS-IMPLEMENTATION-STATUS.md).
