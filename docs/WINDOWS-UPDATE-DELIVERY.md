@@ -190,3 +190,14 @@ now calls `os.stat(..., follow_symlinks=False)` for the full metadata; link-coun
 identity and reparse checks remain required. Existing real-file tests reproduce
 the failure on Windows; local tests pass after the fix. Corrected native execution
 is pending, not inferred from the Linux result.
+
+
+The `a6708c8` rerun passes the link scan but detects differing timestamps between
+path and handle metadata. In the pinned [CPython 3.13.15 path-stat implementation](https://github.com/python/cpython/blob/v3.13.15/Modules/posixmodule.c#L2202),
+`st_ctime` retains creation time; [handle stat](https://github.com/python/cpython/blob/v3.13.15/Python/fileutils.c#L1228)
+retains change time. Windows cross-API comparison now uses explicit
+`st_birthtime_ns`; before/after handle checks still require unchanged `st_ctime_ns`.
+Tests reject real file replacement between scanning/opening and a timestamp change
+during hashing. A native case changes the creation date without changing payload
+bytes. Local: 12 tests, ten pass and two native skips, plus four package tests.
+Native rerun remains required; no integrity requirement is waived.

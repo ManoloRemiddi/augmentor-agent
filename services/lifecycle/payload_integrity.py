@@ -91,7 +91,11 @@ def _scan(root):
 
 
 def _identity(info):
-    return (info.st_dev,info.st_ino,info.st_size,info.st_mtime_ns,info.st_ctime_ns)
+    # CPython 3.13 Windows path stat preserves legacy ctime=birth time,
+    # whereas fstat exposes the actual change time. Compare birth time across
+    # those APIs; retain change-time checks between handle observations below.
+    timestamp=info.st_birthtime_ns if os.name=='nt' else info.st_ctime_ns
+    return (info.st_dev,info.st_ino,info.st_size,info.st_mtime_ns,timestamp)
 
 
 def _digest(path,expected):
@@ -102,7 +106,8 @@ def _digest(path,expected):
         before=os.fstat(source.fileno());_plain(before)
         if _identity(before)!=_identity(expected):raise ValueError('Payload changed during inspection.')
         digest=hashlib.file_digest(source,'sha256').hexdigest()
-        if _identity(os.fstat(source.fileno()))!=_identity(before):
+        after=os.fstat(source.fileno());_plain(after)
+        if _identity(after)!=_identity(before) or after.st_ctime_ns!=before.st_ctime_ns:
             raise ValueError('Payload changed during inspection.')
         return digest
 

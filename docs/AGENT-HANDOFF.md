@@ -78,7 +78,9 @@ denied retry. All 29 Home tests pass locally; CI Home also passes at `f61d32f`.
 Production Home behavior is unchanged. Compiler object/import-library byproducts
 now stay in the temporary build directory. [Native Inno at 6f4c291](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36409755006)
 passes both CPUs with clean payload-root assertions at merge checkout
-`cbbaa57cf262d4ceb46536a0566ba126a2943381`; the full assertion still awaits execution.
+`cbbaa57cf262d4ceb46536a0566ba126a2943381`; the [full 578556d run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36410018195)
+now passes both CPUs and shared Mac Qt. It predates the startup/health, cancellation
+and inventory changes below.
 Fast Windows, Inno, Mac and complete Linux/Home/Browser validation also pass at
 documentation-only `578556d`.
 
@@ -111,8 +113,12 @@ The shared inspector can identify a partial installation even when installed
 metadata is missing; the full proof now uses it before UI health. Eight portable
 inventory cases and four package tests pass. The first native run at `8ae02e9`
 fails during scanning because Windows cached `DirEntry.stat` reports zero link
-counts. Scanning now uses full no-follow `os.stat`, retaining the alias checks.
-Corrected native tests and staged/full integration remain pending. See [payload inspection](WINDOWS-UPDATE-DELIVERY.md#exact-installed-payload-inspection).
+counts. Full no-follow `os.stat` fixes that scan, but `a6708c8` exposes a second
+Windows difference: path `st_ctime` is creation time while handle `st_ctime` is
+change time in pinned CPython 3.13.15. Cross-API identity now compares explicit
+birth time; handle-to-handle checks still compare change time. Ten portable
+cases pass, including replacement/read mutation; two Windows-specific cases and
+corrected staged/full integration remain pending. See [payload inspection](WINDOWS-UPDATE-DELIVERY.md#exact-installed-payload-inspection).
 
 Next: qualify the inventory, full installed isolated health and actual-DSH cancellation; finish
 independent interrupted/cross-version recovery, obsolete-file cleanup, bounded

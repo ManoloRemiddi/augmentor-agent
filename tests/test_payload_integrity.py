@@ -12,6 +12,7 @@ from unittest.mock import patch
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'services'))
 from lifecycle.payload_integrity import INVENTORY,seal_payload,inspect_payload,verify_payload,validate_inventory
+from lifecycle.payload_integrity import _digest
 
 
 class PayloadIntegrityTests(unittest.TestCase):
@@ -111,6 +112,34 @@ class PayloadIntegrityTests(unittest.TestCase):
     def test_hard_link_refuses(self):
         os.link(self.root/'runtime.dll',self.root/'alias.dll')
         with self.assertRaisesRegex(ValueError,'reparse/link'):self.inspect()
+
+    def test_replaced_file_between_scan_and_open_refuses(self):
+        path=self.root/'runtime.dll';before=path.stat()
+        replacement=self.root/'replacement.dll';replacement.write_bytes(path.read_bytes())
+        os.replace(replacement,path)
+        with self.assertRaisesRegex(ValueError,'changed during inspection'):_digest(path,before)
+
+    def test_file_changed_during_hash_refuses(self):
+        path=self.root/'runtime.dll';before=path.stat();read_digest=hashlib.file_digest
+        def change_after_hash(source,algorithm):
+            result=read_digest(source,algorithm)
+            os.utime(path,ns=(before.st_atime_ns,before.st_mtime_ns+10_000_000_000))
+            return result
+        with patch('lifecycle.payload_integrity.hashlib.file_digest',change_after_hash):
+            with self.assertRaisesRegex(ValueError,'changed during inspection'):_digest(path,before)
+
+    @unittest.skipUnless(sys.platform=='win32','Native Windows creation/change times.')
+    def test_distinct_windows_creation_and_change_times_verify(self):
+        import pywintypes
+        import win32con
+        import win32file
+        path=self.root/'runtime.dll'
+        handle=win32file.CreateFile(str(path),win32con.FILE_WRITE_ATTRIBUTES,
+            win32con.FILE_SHARE_READ|win32con.FILE_SHARE_WRITE,None,win32con.OPEN_EXISTING,0,None)
+        try:win32file.SetFileTime(handle,pywintypes.Time(946684800),None,None)
+        finally:handle.Close()
+        # A release hash describes bytes, not their creation/change timestamps.
+        self.assertTrue(self.inspect()['complete'])
 
     @unittest.skipUnless(sys.platform=='win32','Native Windows junction check.')
     def test_windows_junction_refuses(self):
