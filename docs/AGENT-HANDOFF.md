@@ -109,8 +109,10 @@ Windows staging now seals an exact file/directory inventory, bound by the final
 release metadata. Package intake refuses changed or extra files without resealing.
 The shared inspector can identify a partial installation even when installed
 metadata is missing; the full proof now uses it before UI health. Eight portable
-inventory cases and four package tests pass; the junction test and staged/native
-integration remain pending. See [payload inspection](WINDOWS-UPDATE-DELIVERY.md#exact-installed-payload-inspection).
+inventory cases and four package tests pass. The first native run at `8ae02e9`
+fails during scanning because Windows cached `DirEntry.stat` reports zero link
+counts. Scanning now uses full no-follow `os.stat`, retaining the alias checks.
+Corrected native tests and staged/full integration remain pending. See [payload inspection](WINDOWS-UPDATE-DELIVERY.md#exact-installed-payload-inspection).
 
 Next: qualify the inventory, full installed isolated health and actual-DSH cancellation; finish
 independent interrupted/cross-version recovery, obsolete-file cleanup, bounded

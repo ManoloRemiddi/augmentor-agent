@@ -181,3 +181,12 @@ and [download verification](https://github.com/vslavik/winsparkle/blob/v0.9.4/sr
 plus Node's [crypto.verify API](https://nodejs.org/docs/latest-v24.x/api/crypto.html#cryptoverifyalgorithm-data-key-signature-callback).
 The runtime remains pinned to the tested Node 24.19.0; inspecting newer docs does
 not change that dependency.
+
+The first native inventory run at `8ae02e9` fails both the fast tests and Inno
+template at scanning. Python documents that [Windows DirEntry.stat returns zero
+file identity and link counts](https://docs.python.org/3.13/library/os.html#os.DirEntry.stat).
+Using that cache incorrectly rejected every ordinary file as an alias. Scanning
+now calls `os.stat(..., follow_symlinks=False)` for the full metadata; link-count,
+identity and reparse checks remain required. Existing real-file tests reproduce
+the failure on Windows; local tests pass after the fix. Corrected native execution
+is pending, not inferred from the Linux result.

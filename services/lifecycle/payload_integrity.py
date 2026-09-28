@@ -76,7 +76,10 @@ def _scan(root):
                 if name.casefold() in names:raise ValueError('Payload paths collide on Windows.')
                 names.add(name.casefold())
                 if len(names)>MAX_ENTRIES:raise ValueError('Payload contains too many entries.')
-                info=entry.stat(follow_symlinks=False)
+                # Windows DirEntry.stat caches FindFirstFile fields and reports
+                # st_ino/st_dev/st_nlink as zero. Use the full no-follow stat for
+                # file identity and hard-link checks on every platform.
+                info=os.stat(entry.path,follow_symlinks=False)
                 if stat.S_ISDIR(info.st_mode):
                     _plain(info,directory=True);directories.append(name);pending.append(Path(entry.path))
                 else:

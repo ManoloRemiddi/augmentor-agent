@@ -324,3 +324,8 @@ also runs its junction case. Packaging tests reject changed and extra staged
 files without resealing. The installed Windows proof now calls the product
 inspector before local health instead of comparing a private reference-tree
 walk. Native template/full-package execution of this addition remains pending.
+
+The initial `8ae02e9` Windows inventory suite and template both fail ordinary
+files because cached DirEntry metadata omits their link counts. The implementation
+now obtains full no-follow stat metadata; the same tests must pass on both native
+CPUs, including the hard-link and junction refusals. No alias assertion is waived.
