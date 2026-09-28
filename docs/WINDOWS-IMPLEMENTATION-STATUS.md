@@ -655,3 +655,9 @@ The next backend adds read-only registered-browser discovery plus static inspect
 of any user-selected Chromium executable. It uses Windows command parsing and
 product metadata, permits renamed/versioned resources and executes no discovered
 command. Native discovery fixtures and actual-browser acceptance are pending.
+
+The first discovery run (`36366023065`) reaches real Windows argument parsing and
+PE/resource inspection on both CPUs, then fails a fixture expectation comparing
+the runner's short `RUNNER~1` temp path with its resolved long spelling. The
+expectation now compares resolved paths; product normalization is retained.
+The registration safety tests still pass. Full discovery execution must rerun.

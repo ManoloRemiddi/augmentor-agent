@@ -127,7 +127,7 @@ class WindowsBrowserDiscoveryTests(unittest.TestCase):
                 details = browsers.browser_application(executable)
                 self.assertEqual(details['app'], str(executable.resolve()))
                 self.assertTrue(details['name'])
-                self.assertEqual(details['engineResources'], str(resources))
+                self.assertEqual(details['engineResources'], str(resources.resolve()))
                 set_value(registered, 'A browser absent from any brand list', capabilities)
                 for scheme in ('http', 'https'): set_value(capabilities+r'\URLAssociations', scheme, 'UnlistedBrowser.HTML')
                 set_value(classes+r'\UnlistedBrowser.HTML\shell\open\command', '', command)
