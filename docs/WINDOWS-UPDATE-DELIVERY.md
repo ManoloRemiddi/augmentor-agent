@@ -245,3 +245,9 @@ under read admission, then runs only the fixed isolated health action. It uses t
 same strict report validator as ordinary update completion. Observation never
 clears the journal or grants rollback authority. Portable validation and script
 compilation pass; native admission and actual full-payload health remain pending.
+
+At `b6b2313`, both native templates pass source-health admission and failure
+preservation; fast Windows passes the strict report cases. Actual full-payload
+independent health remains pending. The [remaining restoration executor sequence](WINDOWS-INSTALLER-DECISION.md#remaining-restoration-executor)
+keeps the original record intact, restores owned installation metadata as well as
+payload files, and requires an observer separate from the exiting APPLY coordinator.

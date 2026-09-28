@@ -24,19 +24,20 @@ qualification is claimed. The app is not complete or ready for customers.
   no differences. Bundled DSH chat/history uses a deterministic provider.
   This baseline predates source assessment/lookup, absent-root and independent
   installer health additions; it is not N-to-N+1, restoration or physical acceptance.
-- [Fast Windows at 68062de](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36420534852)
+- [Fast Windows at b6b2313](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36421972142)
   passes both CPUs, including native UI health, compiled startup guards, 49 update
-  cases, five preparation cases, six source-assessment cases and all 14 inventory
-  cases. Earlier downloaded `cca5907` managed-DSH reports also confirm held-turn
+  cases, five preparation cases, six source-assessment cases, five health-report
+  cases and all 14 inventory cases. Earlier downloaded `cca5907` managed-DSH reports also confirm held-turn
   cancellation preserved accepted work without shutdown or installer invocation
   on both CPUs.
-- [Inno at 68062de](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36420534854)
-  passes both CPUs at merge checkout `dea8a18b3625025aee41fc688dc3232c6f7b1e69`.
-  Both downloaded reports confirm exact journal-source lookup despite a replaced
-  selection, independent source assessment, busy-writer/alias/wrong-source/malformed
-  refusal, absent-root inspection/repair, preserved data/startup preference,
-  browser cleanup and interactive Finish. These exact-template tests use real
-  private Python and inert other components; full app/browser acceptance is separate.
+- [Inno at b6b2313](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36421972168)
+  passes both CPUs at merge checkout `74bda13605c23702802ac0ab1071a2675069b759`.
+  Downloaded reports confirm journal-source lookup despite replaced selection,
+  independent assessment, record/writer refusal cases, absent-root repair and the
+  new source-health admission/failure path. Synthetic health proves held writer,
+  record and installation admission plus ordinary-startup refusal; it does not
+  render Qt. Browser cleanup and interactive Finish also pass. These exact-template
+  tests use real private Python and inert other components; full app acceptance is separate.
   The older `cca5907` ARM64 inspection failure lacked diagnostics, so its exact
   cause remains unclaimed despite later successful qualification.
 
@@ -93,12 +94,14 @@ and no journal is cleared. Five portable health-report cases, 49 update cases
 (one local Windows skip), six source-assessment cases, four package cases and
 Inno script compilation pass. Native template tests now require damaged-source
 refusal, preserved state after failed synthetic health, held kernel admission
-and ordinary-startup refusal. The full app proof requires actual independent
-Windows UI health with its real pending record preserved. New native execution
-is pending; synthetic template health is not GUI qualification.
+and ordinary-startup refusal. Both native templates now pass these cases at
+`b6b2313`. The full app proof requires actual independent Windows UI health with
+its real pending record preserved; that new full run is queued behind `68062de`
+(x64 passed, ARM64 still in installed-application qualification). Synthetic template
+health is not GUI qualification.
 
-Next: qualify the independent installer health observer, then implement the
-interrupted/cross-version restoration executor, authenticated recovery
+Next: qualify full independent installer UI health and implement the
+interrupted/cross-version restoration executor with authenticated recovery
 apply, obsolete-file cleanup, bounded cache pruning, actual N-to-N+1 and customer
 notification/update wiring. Inno still replaces `current` in place: inspection and
 registered exact-build repair do not provide power-loss recovery. Cache artifacts

@@ -945,3 +945,46 @@ preserved record/data after a failed health child. Synthetic UI fields are not Q
 qualification. The full app proof separately requires the real independent native
 UI health result while preserving its actual pending record. Both new native
 executions are pending.
+
+At `b6b2313`, [native Inno qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36421972168)
+passes both CPUs at merge checkout `74bda13605c23702802ac0ab1071a2675069b759`.
+Both downloaded reports include the independent synthetic-health/admission stage;
+the preceding damaged-source and failed-health preservation assertions also pass.
+Fast Windows passes all five shared report cases on both CPUs. Full independent
+UI-health integration is queued behind the preceding full run; the template's
+synthetic UI fields are not relabelled as actual rendering evidence.
+
+### Remaining restoration executor
+
+Restoration must reuse the existing authenticated installer handoff and independent
+source runtime, with one separate recovery attempt linked to the unchanged original
+journal. It must not pretend that restoring the previous source installed the
+original transaction's target. The remaining sequence is:
+
+1. Obtain fresh maintenance/writer admission, verify the original record/source and
+   retain the exact source artifact. Persist a separate restoration intent before
+   any replacement. Saved PIDs, commands and the selected-version pointer grant
+   no execution authority.
+2. Keep an observer outside the replaceable payload. Use a fresh one-shot
+   coordinator for READY/APPLY and retain actual installer process observations.
+   The existing native handoff requires coordinator exit before file application;
+   that same coordinator cannot also wait for its installer to finish. Preserve
+   the installer's independent lifetime if the observer or coordinator crashes.
+3. Give installation a fresh payload destination, preserving the displaced tree
+   under an owned recovery location. Replacing over mixed source/target files
+   cannot establish a clean rollback. Restore source-owned installer/repair/browser
+   registrations as well as executable files; UI health alone does not verify
+   the metadata outside `current`. Preserve all private application data.
+4. After observing the actual installer exit, require complete source inventory,
+   correct selection/registrations and independent local health. Persist a distinct
+   source-restored receipt, then archive the original record without rewriting its
+   target/history. A failure or unknown outcome keeps recovery unresolved; a new
+   attempt must observe current state before choosing further work.
+5. Reopen only after completion and release of admission. Qualify crashes at each
+   durable boundary, actual N-to-N+1/previous-source restoration, obsolete-file
+   handling and bounded retention. Unknown files in displaced trees require
+   preservation; their location alone is not ownership evidence for deletion.
+
+This is unfinished implementation work, not a completed rollback contract. Reuse
+shared lifecycle classes and the retained installer's runtime; do not introduce
+another conversational core or a force flag that bypasses the unresolved record.

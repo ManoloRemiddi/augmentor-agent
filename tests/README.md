@@ -418,3 +418,10 @@ kernel admission and failure handling through the actual bootstrap/private Pytho
 The separate full-payload proof requires real native UI health from the standalone
 installer, exact identity and an unchanged active record. Native execution of this
 new path is pending; neither fixture proves completed interrupted restoration.
+
+At `b6b2313`, [native Inno](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36421972168)
+passes both CPUs at `74bda13605c23702802ac0ab1071a2675069b759`; downloaded reports
+confirm synthetic source-health admission and its damaged/failed-probe refusal
+checks. Fast Windows also passes both CPUs, including all five report-validation
+cases. Actual independent full-payload UI health and interrupted restoration still
+require their separate execution evidence.
