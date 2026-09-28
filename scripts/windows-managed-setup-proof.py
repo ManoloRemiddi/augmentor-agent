@@ -105,7 +105,7 @@ def desktop_chat(root, work, out):
                 try:
                     assert [item.pid for item in preparation.windows]==[after['pid']]
                     assert preparation.dsh is not None
-                    assert {item.name for item in preparation.companions}=={'prompts','memory'}
+                    assert {item.name for item in preparation.companions}=={'prompts','memory'}, [item.name for item in preparation.companions]
                     preparation.check()
                 finally:preparation.__exit__(*sys.exc_info())
                 restored=ui('inspect')
@@ -227,6 +227,22 @@ def main():
             'content': [{'type': 'text', 'text': 'Reply to the isolated Windows setup fixture.'}]})
         wait_for(lambda: len(calls)>before and not next(row for row in adapter.call('session.list')['items'] if row['sessionId']==session)['running'])
         assert 'Windows managed setup verified.' in json.dumps(adapter.call('session.history', {'sessionId': session}))
+        # Companions are normally lazy. This graph fixture explicitly asks the
+        # owned supervisor to start both, then observes their actual readiness;
+        # sending a model turn alone must not be assumed to start a prompt UI.
+        from platform_adapters.transport import LocalSocket
+        def companion_ready(filename):
+            with LocalSocket() as connection:
+                connection.settimeout(5);connection.connect(str(work/'run/shared'/filename))
+                identity=uuid.uuid4().hex
+                connection.sendall((json.dumps({'protocol':'augmentor-prompts/1','id':identity,
+                    'method':'host.maintenance.status','params':{}})+'\n').encode())
+                with connection.makefile('rb') as stream:response=json.loads(stream.readline(65537))
+            assert response.get('id')==identity and 'error' not in response,response
+            return response.get('result',{}).get('protocol')=='augmentor-component-maintenance/1'
+        for name,filename in (('prompts','prompts.sock'),('memory','dual-memory.sock')):
+            assert owner.request('start-'+name,root=root)['companions'][name]['running']
+            wait_for(lambda:companion_ready(filename))
         report['nativeDesktop'] = desktop_chat(root, work, args.out)
         spec = importlib.util.spec_from_file_location('windows_browser_proof', Path(__file__).with_name('windows-browser-host-proof.py'))
         browser_proof = importlib.util.module_from_spec(spec); spec.loader.exec_module(browser_proof)

@@ -253,3 +253,12 @@ disrupting the genuine prepared installer, and refuses a deliberately wrong
 coordinator PID before gate acknowledgment. Its artifact-write probe uses the
 native file adapter, preserving the actual Win32 sharing error rather than the
 Python CRT's generic permission mapping. New assertions await execution.
+
+
+The assembled graph fixture explicitly starts its prompt/memory services through
+its existing disposable supervisor and waits for actual RPC readiness. They are
+normally lazy, so merely sending a DSH turn is not evidence that both are running.
+The two-window render proof allows 15 seconds specifically for a one-shot PNG
+export, records its duration and verifies the success response/file signature.
+Its normal control timeout remains three seconds; capture is never replayed.
+The portable proof passes; corrected native graph/render assertions are pending.

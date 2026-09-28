@@ -1017,3 +1017,20 @@ adapter for an exact kernel sharing result. Authenticated handoff, cancellation
 and crash cases still require execution. The next fixture also explicitly checks
 an unrelated pipe client and a wrong coordinator PID. These are test corrections
 and additional assertions, not waived qualification.
+
+
+At `261d3c4`, [installer qualification passes both CPUs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36383382819),
+including all authenticated handoff/peer refusal/cancel/crash cases. This supersedes
+the earlier independent-helper pending/failure statuses within its disposable,
+outer-runner-Job scope. No public installer or complete updater is qualified.
+
+The full x64 run at `3748282` fails a graph-fixture assumption: an ordinary model
+turn does not necessarily start both lazy companions. The graph correctly reports
+only the running components. Current fixture explicitly starts prompts/memory
+through its own supervisor and observes their RPC readiness before asserting a
+five-component graph. The same run times out exporting a Qt screenshot after
+three seconds; capture alone now has a 15-second bounded wait, records elapsed
+time and requires a successful PNG result. Ordinary control deadlines remain
+three seconds and no request is replayed. The portable two-window proof passes
+with an 11 ms export; new native graph/render execution is pending.
+Full `0ca8348` native runtime previously passed both CPUs.

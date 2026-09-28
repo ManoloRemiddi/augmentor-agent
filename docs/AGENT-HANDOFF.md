@@ -38,6 +38,14 @@ corrects process/thread access mapping and explicitly scopes the enclosing CI Jo
 Production never silently retries a refused independent launch. Qualify these
 changes before continuing global commit/apply; read the installer decision ledger.
 
+Latest native result: `261d3c4` passes the full authenticated Inno/WinSparkle
+fixture on both CPUs, including refusal/cancel/crash boundaries. Full `3748282`
+x64 graph qualification exposed a fixture assumption about lazy companions;
+the fixture now explicitly starts and observes both owned services. Its separate
+screenshot timeout now has capture-specific timing/PNG assertions. Portable
+checks pass; corrected native execution is pending. Continue global commit,
+browser/voice participation, installer recovery/rollback and remaining app parity.
+
 Earlier checkpoint notes below are historical; later evidence supersedes their
 pending statuses without expanding physical/customer-installation claims.
 

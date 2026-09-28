@@ -59,9 +59,9 @@ def main():
         spec = importlib.util.spec_from_file_location('native_lease_proof', ROOT/'scripts/windows-launcher-lease-proof.py')
         lease_proof = importlib.util.module_from_spec(spec); spec.loader.exec_module(lease_proof)
         report['earlyNativeLease'] = lease_proof.prove(args.launcher.resolve().parent, work)
-    def command(name, value):
+    def command(name, value,*,timeout=3):
         with LocalSocket() as peer:
-            peer.settimeout(3); peer.connect(str(Path(env['XDG_RUNTIME_DIR'])/(ipc_basename(name)+'.sock')))
+            peer.settimeout(timeout); peer.connect(str(Path(env['XDG_RUNTIME_DIR'])/(ipc_basename(name)+'.sock')))
             peer.sendall(value.encode()+(b'\n' if sys.platform == 'win32' else b''))
             with peer.makefile('rb') as stream: raw = stream.readline(262145)
         if len(raw)>262144 or not raw.endswith(b'\n'): raise ValueError('Invalid instance response.')
@@ -130,7 +130,11 @@ def main():
         assert zoomed['result']['fontPixels'] > initial['main']['fontPixels']
         assert inspect('main')['draft'] == 'Keep this draft'
         screenshot = (args.out/'windows-two-window-main.png').resolve()
-        command('main','ui-test:'+json.dumps({'action':'capture','path':str(screenshot)}))
+        capture_started=time.monotonic()
+        captured=command('main','ui-test:'+json.dumps({'action':'capture','path':str(screenshot)}),timeout=15)
+        report['captureSeconds']=round(time.monotonic()-capture_started,3)
+        assert captured.get('ok') and captured.get('result',{}).get('captured'),captured
+        assert screenshot.read_bytes().startswith(b'\x89PNG\r\n\x1a\n'),'The native window did not produce a PNG.'
         token = secrets.token_hex(24)
         if sys.platform=='win32':
             from lifecycle.windows_components import discover_windows

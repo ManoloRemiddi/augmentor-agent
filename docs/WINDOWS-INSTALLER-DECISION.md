@@ -237,3 +237,13 @@ adapter for an exact kernel sharing result. Authenticated handoff, cancellation
 and crash cases still require execution. The next fixture also explicitly checks
 an unrelated pipe client and a wrong coordinator PID. These are test corrections
 and additional assertions, not waived qualification.
+
+
+At `261d3c4`, [the full Inno/WinSparkle fixture passes both CPUs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36383382819).
+This includes independent Setup ownership, immutable artifact binding, private
+pipe authentication, wrong coordinator/unrelated client refusal, explicit APPLY,
+cancel/loss before authorization and retained exclusion across exit/crash after
+it. The x64 report confirms its outer hosted-runner Job was present in all four
+handoff cases. Production breakaway and ordinary-user installation remain
+separate acceptance; the fixture does not bypass or qualify those constraints.
+Complete product commit, recovery, rollback, signing and publication remain open.
