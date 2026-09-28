@@ -85,8 +85,8 @@ the [full plan](WINDOWS-IMPLEMENTATION-PLAN.md) for required completion gates.
 | Voice bridge | Shared 0.1.19, private preference saves, owned service, busy-ticket refusal and natural drain pass | Windows ASR/TTS provisioning and physical audio |
 | Prompt/memory services | Shared private clients, ownership/drain and journal-before-listener startup pass | Windows memory engine provisioning and full memory quality/features |
 | Coordinated shutdown | Actual window/DSH/voice/companions/owner graph drain and restart pass at `f950a45` | Product apply/recovery integration and user-facing update flow |
-| Installer | Full install/repair/drain/same-build apply/health/removal pass both CPUs at `8a3ff05`; exact-template Finish/cache pass at `ba0b68c` | New selected-source publication/readback and full cache integration; signing, N-to-N+1 and rollback open |
-| Update delivery | Signed delivery and exact retained recovery-package verification pass both CPUs; initial installer source retention added | Selected-source receipt, independent recovery, pruning, trust provisioning and product UI/apply wiring open |
+| Installer | Complete workflow including install/repair/drain/same-build apply/health/removal passes both CPUs at `6c1e7cf`; exact-template Finish/cache/selection pass at `bdba572` | Full cached-source integration; signing, N-to-N+1 and rollback open |
+| Update delivery | Signed delivery and exact retained recovery-package verification pass both CPUs; initial installer source retention added | Full selected-source integration, independent recovery, pruning, trust provisioning and product UI/apply wiring open |
 | Desktop actions, Home and Pi | Shared interfaces retained | Required Windows adapters and full end-to-end parity remain open |
 | RTX Spark N1X | Native ARM64 dependency preparation | Target hardware/driver/graphics/inference evidence |
 

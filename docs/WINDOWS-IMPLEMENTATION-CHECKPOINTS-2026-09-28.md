@@ -901,4 +901,3 @@ Read [implementation status](WINDOWS-IMPLEMENTATION-STATUS.md),
 [installer decision](WINDOWS-INSTALLER-DECISION.md), and
 [the implementation plan](WINDOWS-IMPLEMENTATION-PLAN.md). Previous active checkpoints
 are preserved in the [historical archive](WINDOWS-IMPLEMENTATION-CHECKPOINTS-2026-09-28.md).
-
