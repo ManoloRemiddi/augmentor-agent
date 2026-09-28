@@ -114,7 +114,9 @@ def main():
         if holder is not None and holder.poll() is None:
             holder.wait(timeout=15)
         updater = installed/'Update.exe'
-        if updater.is_file():
+        # Update.exe can remain briefly while Windows finishes self-removal.
+        # Do not invoke a second uninstall after the application was removed.
+        if app.is_file() and updater.is_file():
             subprocess.run([str(updater), 'uninstall', '--silent'], check=True, env=env, timeout=120)
     assert sentinel.read_bytes() == sentinel_bytes
     assert not app.exists()

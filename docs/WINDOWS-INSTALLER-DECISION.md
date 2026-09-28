@@ -103,3 +103,17 @@ successfully, then fails a test assumption: Inno shortens long AppIds in its
 uninstall registry key. The fixture now uses a shorter unique ID; it still reads
 the registered uninstall command rather than guessing its executable. No busy
 maintenance or native updater result is claimed from that first run.
+
+The second alternative run, `36367490603` at `e18fbb0`, passes the installer
+busy repair/update/removal, two-holder preservation, failed preparation/retry and
+idle lifecycle sequence on both CPUs. Native valid-download handling and invalid
+signature rejection also pass. The busy updater test then times out because its
+modal refusal dialog was not dismissed before the fixture called cleanup. The
+fixture now closes only its own updater windows and retains callback progress
+before cleanup; the complete updater result still requires rerunning.
+
+The first stock-EXE busy-uninstall probe reaches forced holder exit and the
+active-marker assertion on x64, then fails redundant cleanup: `Update.exe`
+survives briefly for self-removal and a second uninstall cannot find the removed
+application. Cleanup now checks the application still exists before retrying.
+The rejected product requirement has not changed.

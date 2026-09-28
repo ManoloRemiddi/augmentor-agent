@@ -14,6 +14,30 @@ ROOT = Path(__file__).resolve().parents[1]
 CONFIG = json.loads((ROOT/'fixture.json').read_text(encoding='utf-8'))
 
 
+def dismiss_fixture_windows():
+    """Dismiss this test process's updater UI, including its busy-work warning.
+
+    WinSparkle correctly shows a modal warning when can_shutdown refuses. Its
+    cleanup waits for that dialog; hosted tests must exercise the dismissal.
+    Never enumerate/close windows belonging to another process.
+    """
+    import os
+    user = ctypes.WinDLL('user32', use_last_error=True)
+    callback_type = ctypes.WINFUNCTYPE(wintypes.BOOL,wintypes.HWND,wintypes.LPARAM)
+    user.EnumWindows.argtypes = [callback_type,wintypes.LPARAM]; user.EnumWindows.restype = wintypes.BOOL
+    user.GetWindowThreadProcessId.argtypes = [wintypes.HWND,ctypes.POINTER(wintypes.DWORD)]
+    user.GetWindowThreadProcessId.restype = wintypes.DWORD
+    user.PostMessageW.argtypes = [wintypes.HWND,wintypes.UINT,wintypes.WPARAM,wintypes.LPARAM]
+    user.PostMessageW.restype = wintypes.BOOL
+    def close(window,_context):
+        pid = wintypes.DWORD(); user.GetWindowThreadProcessId(window,ctypes.byref(pid))
+        if pid.value == os.getpid(): user.PostMessageW(window,0x0010,0,0)  # WM_CLOSE
+        return True
+    callback = callback_type(close)
+    for _ in range(10):
+        user.EnumWindows(callback,0); time.sleep(.1)
+
+
 def shared_gate():
     create = ctypes.WinDLL('kernel32', use_last_error=True).CreateFileW
     create.argtypes = [wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD, ctypes.c_void_p,
@@ -67,7 +91,10 @@ def sparkle(settings):
         function('check_update_with_ui_and_install')()
         if not done.wait(45): raise TimeoutError('No native updater result.')
         time.sleep(.3)  # Let the native callback return before cleanup joins its UI thread.
-    finally: function('cleanup')()
+    finally:
+        Path(settings['progress']).write_text(json.dumps(result),encoding='utf-8')
+        dismiss_fixture_windows()
+        function('cleanup')()
     return result
 
 

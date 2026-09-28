@@ -185,7 +185,8 @@ def prove_updater(payload, out, signer, installer, identity, arch):
                 f'type="application/octet-stream" sparkle:os="windows-{target}" sparkle:edSignature={quoteattr(sig)} />'
                 '</item></channel></rss>',encoding='utf-8')
             settings = {'id':identity, 'registry':r'Software\AugmentorQualification'+'\\'+identity+'\\'+name,
-                        'url':url+'/'+name+'.xml', 'key':public, 'busy':name=='busy'}
+                        'url':url+'/'+name+'.xml', 'key':public, 'busy':name=='busy',
+                        'progress':str(out/(name+'-progress.json'))}
             config = out/(name+'-settings.json'); config.write_text(json.dumps(settings))
             path = out/(name+'-updater.json')
             run([payload/'AugmentorFixture.exe','--sparkle',path,config])
