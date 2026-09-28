@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-"""Disposable Inno coordinator; customer handoff authentication is not implemented."""
+"""Disposable authenticated Inno coordinator; no customer update/recovery claim."""
 import argparse
 from contextlib import ExitStack
 import ctypes
@@ -9,6 +9,8 @@ import msvcrt
 import os
 from pathlib import Path
 import sys
+import sysconfig
+import subprocess
 import time
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -16,6 +18,7 @@ sys.path.insert(0,str(ROOT/'services'))
 from lifecycle.windows_startup import Startup
 from lifecycle.windows_installer_process import InstallerProcess
 from lifecycle.windows_handoff import InstallerHandoff,HELLO
+from lifecycle.update_journal import UpdateJournal
 
 
 def main():
@@ -28,6 +31,7 @@ def main():
     parser.add_argument('--cancel-before-apply',action='store_true')
     parser.add_argument('--crash-before-apply',action='store_true')
     parser.add_argument('--wrong-coordinator',action='store_true')
+    parser.add_argument('--journal',type=Path)
     args=parser.parse_args()
     kernel=ctypes.WinDLL('kernel32',use_last_error=True)
     in_job=ctypes.c_int()
@@ -35,6 +39,17 @@ def main():
     query.argtypes=[ctypes.c_void_p,ctypes.c_void_p,ctypes.POINTER(ctypes.c_int)];query.restype=ctypes.c_int
     if not query(ctypes.c_void_p(-1),None,ctypes.byref(in_job)):raise ctypes.WinError(ctypes.get_last_error())
     with ExitStack() as stack:
+        journal=None
+        if args.journal:
+            # The authenticated cases repair the already selected 0.0.2 fixture
+            # with the same artifact. No live Augmentor components exist in
+            # this fixture and no signature/publisher trust is inferred here.
+            identity={'version':'0.0.2','sourceCommit':subprocess.check_output(
+                ['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
+                'target':{'win-amd64':'windows-x64','win-arm64':'windows-arm64'}[sysconfig.get_platform()],
+                'channel':'qualification','sha256':args.sha256,'dataSchema':1,'readableDataSchemas':[1]}
+            journal=stack.enter_context(UpdateJournal(args.journal,identity,identity))
+            for phase in ('preparing','prepared','drained'):journal.advance(phase)
         gate=stack.enter_context(Startup(args.state,maintenance=True))
         handoff=stack.enter_context(InstallerHandoff(gate)) if args.authenticated else None
         launch=handoff.arguments() if handoff else ['/startupowner='+str(os.getpid()),
@@ -54,6 +69,7 @@ def main():
                     assert installer.wait(30)!=0
                     return
                 handoff.wait_ready(timeout=30)
+                if journal:journal.advance('installer-ready')
                 from platform_adapters.transport import LocalSocket
                 with LocalSocket() as outsider:
                     outsider.settimeout(5);outsider.connect(str(handoff.endpoint))
@@ -71,7 +87,9 @@ def main():
                     handoff.close()
                     assert installer.wait(30)!=0,'The cancelled installer unexpectedly succeeded.'
                     return
+                if journal:journal.advance('apply-intent')
                 handoff.authorize()  # Disposable fixture only; no app processes/data are being updated.
+                if journal:journal.advance('apply-acknowledged')
             unrelated_refused=False
             try:installer.observe(os.getpid())
             except ValueError:unrelated_refused=True

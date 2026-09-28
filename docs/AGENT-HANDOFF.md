@@ -4,6 +4,14 @@
 
 ## September 27 Windows implementation — active
 
+Current addition: the shared [durable update record](LIFECYCLE.md#durable-update-record)
+passes seven local crash/write/ordering/concurrency tests. Authenticated Inno
+fixtures now record before and after APPLY; native execution is pending. Recovery,
+archival, health/rollback and user-facing update integration remain open. The
+voice startup correction at `2b1680d` passes the fast x64 job; ARM64 is finishing.
+Its full service/drain qualification remains pending. Continue the complete app;
+do not treat these mechanisms as a released installer.
+
 The owner now authorizes autonomous implementation through the complete Windows
 app; physical testing will follow when a Windows machine is connected. Work on
 `feat/windows` in the canonical repository. Read the

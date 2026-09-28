@@ -175,6 +175,9 @@ def prove_handoff(installer,state,out):
     from lifecycle.windows_startup import Startup
     from lifecycle.windows_installer_process import InstallerProcess
     from platform_adapters.windows_identity import private_file_descriptor
+    from platform_adapters.paths import private_directory
+    from platform_adapters.private_files import read_json
+    from lifecycle.update_journal import recovery_action
     # The fixture supplies the digest. Production must obtain it from the
     # signed release-verification boundary; hashing a download is not trust.
     staged=state/'installer.exe'
@@ -188,12 +191,13 @@ def prove_handoff(installer,state,out):
     # Preserve the earlier transfer mechanism case and exercise its replacement
     # over authenticated IPC with a distinct explicit apply decision.
     for authenticated,crash in ((False,False),(False,True),(True,False),(True,True)):
+        journal=private_directory(state/('journal-'+str(authenticated)+'-'+str(crash))) if authenticated else None
         for name in ('ready.json','coordinator.json','continue','parent-release'):
             (state/name).unlink(missing_ok=True)
         parent=subprocess.Popen([sys.executable,'-I','-Xutf8','-B',str(ROOT/'scripts/windows-inno-handoff-proof.py'),
             '--installer',str(staged),'--sha256',digest,'--state',str(state),'--log',
             str(out/('handoff-'+('authenticated-' if authenticated else '')+('crash' if crash else 'exit')+'.log')),
-            *(['--authenticated'] if authenticated else [])],
+            *(['--authenticated','--journal',str(journal)] if authenticated else [])],
             stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
         setup_process=None;loader=None
         try:
@@ -222,6 +226,10 @@ def prove_handoff(installer,state,out):
             else:(state/'parent-release').write_text('release',encoding='utf-8')
             _out,errors=parent.communicate(timeout=10)
             if not crash:assert parent.returncode==0,errors.decode('utf-8',errors='replace')
+            if journal:
+                recorded=read_json(journal/'active.json')
+                assert recorded['phase']=='apply-acknowledged' and recorded['target']['sha256']==digest
+                assert recovery_action(recorded)=='inspect-installation'
             assert win32event.WaitForSingleObject(setup_process,0)==win32event.WAIT_TIMEOUT
             for maintenance in (False,True):
                 try:
@@ -240,9 +248,11 @@ def prove_handoff(installer,state,out):
             for process in (setup_process,loader):
                 if process is not None:win32event.WaitForSingleObject(process,30000);process.Close()
     for name in ('ready.json','coordinator.json','continue','parent-release'):(state/name).unlink(missing_ok=True)
+    cancelled_journal=private_directory(state/'journal-cancel')
     run([sys.executable,'-I','-Xutf8','-B',ROOT/'scripts/windows-inno-handoff-proof.py',
         '--installer',staged,'--sha256',digest,'--state',state,'--log',out/'handoff-abort.log',
-        '--authenticated','--cancel-before-apply'])
+        '--authenticated','--cancel-before-apply','--journal',cancelled_journal])
+    assert read_json(cancelled_journal/'active.json')['phase']=='installer-ready'
     assert not (state/'ready.json').exists(),'Setup progressed after cancellation without APPLY.'
     with Startup(state):pass
     run([sys.executable,'-I','-Xutf8','-B',ROOT/'scripts/windows-inno-handoff-proof.py',
@@ -250,9 +260,10 @@ def prove_handoff(installer,state,out):
         '--authenticated','--wrong-coordinator'])
     assert not (state/'ready.json').exists(),'Setup progressed with the wrong coordinator identity.'
     with Startup(state):pass
+    interrupted_journal=private_directory(state/'journal-before-apply-crash')
     parent=subprocess.Popen([sys.executable,'-I','-Xutf8','-B',str(ROOT/'scripts/windows-inno-handoff-proof.py'),
         '--installer',str(staged),'--sha256',digest,'--state',str(state),'--log',str(out/'handoff-before-apply-crash.log'),
-        '--authenticated','--crash-before-apply'],stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        '--authenticated','--crash-before-apply','--journal',str(interrupted_journal)],stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     aborted=None
     try:
         pid=wait_for(state/'prepared.json')['pid']
@@ -260,6 +271,8 @@ def prove_handoff(installer,state,out):
         (state/'crash-now').write_text('crash disposable coordinator',encoding='utf-8')
         _output,errors=parent.communicate(timeout=10)
         assert parent.returncode==79,errors.decode('utf-8',errors='replace')
+        recorded=read_json(interrupted_journal/'active.json')
+        assert recorded['phase']=='installer-ready' and recovery_action(recorded)=='inspect-stopped-components'
         assert win32event.WaitForSingleObject(aborted,10000)==win32event.WAIT_OBJECT_0
     finally:
         if parent.poll() is None:parent.kill()
@@ -274,6 +287,7 @@ def prove_handoff(installer,state,out):
         'actualSetupJobObserved':True,'unrelatedPidRefused':True,'normalCloseDoesNotTerminateInstaller':True,
         'authenticatedPipeTransfer':True,'abortBeforeApply':True,'coordinatorCrashBeforeApplyRefused':True,
         'unrelatedPipeClientRefused':True,'wrongCoordinatorPidRefused':True,
+        'durableJournalBeforeAndAfterApply':True,'noAutomaticReplayFromSavedJournal':True,
         'qualificationRetainsOuterRunnerJob':True,
         'outerRunnerJobObservations':outer_jobs,
         'productionInstallerQualified':False}

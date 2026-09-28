@@ -525,6 +525,40 @@ the installed coordinator before applying files. No Update/Quit UI is connected
 to this unfinished global transaction.
 
 
+### Durable update record
+
+`services/lifecycle/update_journal.py` records one update attempt in a private
+directory outside the replaceable application. A kernel writer lock excludes
+other coordinators. Every transition uses the shared flushed atomic-file adapter;
+a write error makes that writer unusable, including an error after replacement.
+The existing record is preserved and requires explicit recovery/archival before
+another attempt can claim it. No exception silently resets the phase.
+
+The record binds source/recovery and proposed artifact identities, CPU/OS,
+channel and data compatibility. Current support requires mutual schema
+readability; incompatible migrations need their own explicit recovery policy.
+These fields document already verified artifacts and do not establish publisher
+trust. No credentials, conversations, commands or arbitrary executable paths
+are recorded. Saved component PIDs are diagnostic hints, never process authority.
+
+Component intent precedes a single commit; acknowledgment/unknown outcome then
+observed exit must appear in order. Installer readiness, durable `apply-intent`,
+acknowledgment, independently observed installation, local health and completion
+are distinct phases. A restart only classifies what to inspect. In particular,
+an apply intent without a result is an unknown outcome and never triggers an
+automatic retry, relaunch or rollback. Health and installation evidence remain
+the coordinator/backend's responsibility, not a claim made by a JSON phase.
+
+Seven local tests pass: actual child-process crash and writer exclusion, failed
+flush after replacement, unknown acknowledgment, phase ordering, incompatible
+recovery and corrupt-record preservation. Native x64/ARM64 execution is added to
+the fast workflow. Authenticated Inno repair fixtures now record intent before
+APPLY and check durable state after coordinator exit/crash and before-apply abort;
+these new native cases await execution. This is repair of the disposable 0.0.2
+fixture with identical bytes, not full application N-to-N+1 or automatic recovery.
+Installer result recording, recovery/archival, health, rollback and product UI
+integration remain required.
+
 ### Windows installer handoff
 
 The [private installer handshake](WINDOWS-INSTALLER-DECISION.md#authenticated-handoff-source)

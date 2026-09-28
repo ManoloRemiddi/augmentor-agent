@@ -247,3 +247,10 @@ it. The x64 report confirms its outer hosted-runner Job was present in all four
 handoff cases. Production breakaway and ordinary-user installation remain
 separate acceptance; the fixture does not bypass or qualify those constraints.
 Complete product commit, recovery, rollback, signing and publication remain open.
+
+The current authenticated fixture also uses the [durable update record](LIFECYCLE.md#durable-update-record).
+It records a repair of the selected fixture with the same 0.0.2 artifact, writes
+apply intent before authorization, and checks retained records after normal
+coordinator exit, crash and before-apply abort. Seven local journal tests pass;
+actual Inno execution of this addition is pending. The record is an inspection
+input and never authorization to repeat an uncertain install.

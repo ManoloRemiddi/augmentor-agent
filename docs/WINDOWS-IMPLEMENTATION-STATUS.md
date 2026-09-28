@@ -2,6 +2,13 @@
 
 # Windows implementation evidence
 
+The shared [durable update record](LIFECYCLE.md#durable-update-record) now has seven
+passing local tests, including actual process crash and exclusive writer claims.
+New native fast tests and authenticated Inno before/after-APPLY journal assertions
+await execution. This does not implement automatic recovery/rollback or installed
+N-to-N+1 application. The port correction at `2b1680d` passes fast x64; ARM64 and
+the actual owned-service/drain integration are still being qualified.
+
 Current correction: both native CPUs reproduce the free-loopback-port timeout in
 [`c1070b2` desktop qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36387350489).
 The voice startup probe now uses exclusive wildcard binding without listening;

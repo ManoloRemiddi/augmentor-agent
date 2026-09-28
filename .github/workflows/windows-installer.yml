@@ -10,6 +10,8 @@ on:
       - 'services/platform/windows-launcher.c'
       - 'services/lifecycle/windows_installer_process.py'
       - 'services/lifecycle/windows_handoff.py'
+      - 'services/lifecycle/update_journal.py'
+      - 'tests/test_update_journal.py'
       - 'services/platform/windows-installer-handoff.c'
       - 'services/platform/windows-lease.h'
       - 'release/windows/installer-candidates.json'
