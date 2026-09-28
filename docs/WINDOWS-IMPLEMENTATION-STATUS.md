@@ -7,14 +7,16 @@ connect a Windows machine for joint physical testing afterward. Follow the full
 [implementation plan](WINDOWS-IMPLEMENTATION-PLAN.md); this ledger does not narrow
 its outcome. No Windows customer release or installed-product claim exists yet.
 
-Current checkpoint: full runtime passes both CPUs at `e7228e5`, including the
-corrected bootstrap token and actual compiled desktop/DSH maintenance paths.
+Current checkpoint: full runtime passes both CPUs at `303a619`, including the
+corrected bootstrap token, actual compiled desktop/DSH maintenance, background
+owner reservation and complete Windows Job drain.
 The separate voice 0.1.18 candidate passes native configuration and maintenance
-on both CPUs. Background-owner reservation and complete Windows Job drain pass
-both native fast desktop jobs at `303a619`; its full runtime run is pending.
+on both CPUs.
 Window discovery passes both native fast jobs at `dc41a56`; compiled execution
 remains pending. Current source adds pre-Python native startup exclusion, with
-new compiled probes awaiting native execution.
+compiled probes passing both CPUs at `bfde231`. Full assembled qualification is
+pending. Browser source now drains accepted parent and DSH/Pi bridge operations;
+new native integration remains pending.
 Installer backend is **Inno Setup/WinSparkle**; earlier Velopack
 candidate entries below are historical. Global coordination and full app release
 are not complete.
@@ -846,3 +848,23 @@ voice worker/submission drain. Native compiled integration remains pending.
 DSH/Pi bridge admission, extension panel/reconnect reservation and global
 coordination still require implementation; these corrections do not complete
 browser maintenance or speech engine qualification.
+
+Full runtime `303a619` passes both native CPUs in
+[run 36372703204](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36372703204).
+At `bfde231`, [fast desktop run 36373865190](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36373865190)
+passes both CPUs, including the compiled native early-startup lease tests. These
+supersede their earlier pending entries while preserving the distinct full-app
+early-lease integration gate.
+
+Further browser source adds accepted-work draining to both DSH/Pi bridges,
+disables DSH reconnect after EOF, waits for retiring voice workers and releases
+the interaction presenter without deciding pending approvals. The Windows host
+now waits for its complete Job to exit naturally. Four portable process cases
+pass with explicit `beforeExit` observations; the new DSH bridge case is offline,
+and real compiled Windows DSH/browser integration remains pending.
+
+The combined local Node and Browser suite passes all **237** tests with the
+actual pinned DSH SDK available and isolated user paths. This includes the new
+bridge drain checks and existing auth, approvals, shared prompts, voice control,
+browser actions and UI regressions. Windows wrapper qualification still depends
+on the native compiled run; no installed browser was restarted.

@@ -154,3 +154,9 @@ has separate qualification. `browser-shared-voice.test.mjs` additionally holds
 worker closure and a submission independently, proving neither a UI close nor
 the former two-second kill deadline clears busy state. These controlled voice
 tests do not invoke audio/model engines.
+
+The drain probe now invokes each DSH/Pi bridge directly as well, with a held
+accepted prompt request and an explicit natural-exit observer. The DSH endpoint
+is an isolated unavailable port, so this covers its offline lifecycle, not a
+real connected model session. The native compiled-browser proof exercises the
+updated Windows wrapper's complete-Job graceful wait against bundled DSH.

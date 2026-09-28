@@ -52,7 +52,7 @@ def main():
             child = OwnedProcess([str(ROOT/'node/node.exe'), str(ROOT/'apps/browser/native-host.mjs'), *args],
                 env=environment, cwd=str(ROOT), stdin=sys.stdin.buffer,
                 stdout=sys.stdout.buffer, stderr=stream)
-            try: return child.wait()
+            try: return child.wait_graceful()
             finally: child.close()
         except Exception:
             traceback.print_exc()

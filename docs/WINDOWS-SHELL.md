@@ -210,3 +210,11 @@ leases. Global startup reservation, browser participation, independent apply,
 recovery and production installer integration remain required. Implementation
 follows [Microsoft's file-lock contract](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-lockfileex)
 and [handle-based security inspection](https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-getsecurityinfo).
+
+At `bfde231`, [desktop run 36373865190](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36373865190)
+passes both CPUs, including all new compiled early-lease cases and normal release.
+The initial `653adac` probe used a file flag from the wrong pywin32 module;
+that test-only correction is included. Full assembled early-lease integration
+remains a separate pending run. Full runtime `303a619` now passes both native
+CPUs in [run 36372703204](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36372703204),
+including complete Job drain and owner reservation, before the new early lease.

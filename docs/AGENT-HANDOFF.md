@@ -137,6 +137,14 @@ actual process natural-exit observations. DSH/Pi bridge admission, extension
 panel/reconnect reservation and global coordination are still pending. No
 installed browser or private audio configuration changed.
 
+Full runtime `303a619` now passes both native CPUs. Compiled early-startup lease
+qualification passes both fast desktop jobs at `bfde231`; its full assembled
+integration is pending. Current browser source extends natural draining into
+both DSH/Pi bridges, suppresses reconnect after EOF and makes the Windows wrapper
+wait for every Job descendant. Four real-process portable checks observe natural
+exit after accepted work; real compiled connected-browser integration remains
+pending. Continue extension reservation/global coordination and installer work.
+
 ## September 27 Windows implementation plan — historical planning checkpoint
 
 The owner requested a detailed plan before coding. Read the

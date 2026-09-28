@@ -312,11 +312,18 @@ does not imply worker exit, and ordinary close no longer kills a worker after
 two seconds. A second voice session waits for the retiring work. This is shared
 behavior across OSs and adds no new audio engine or settings changes.
 
-These are component prerequisites, not global browser maintenance. The selected
-DSH/Pi bridge still needs its own admission/drain, and the extension must preserve
-drafts, reserve open panels and prevent reconnect during coordinated updates.
-The existing Windows wrapper's fault containment is not evidence of a natural
-whole-product shutdown. Portable real-process tests hold a shared request over
-EOF, with and without selecting a bridge, then require a complete final response
-and Node `beforeExit`. Voice tests use controlled workers/submissions and do not
-qualify a physical audio device.
+The DSH and Pi bridges now also close admission on EOF and drain accepted
+requests through response delivery before releasing their connections. DSH
+disables reconnect, drains closing voice workers and releases its interaction
+presenter; closing a connection never answers an approval. The Windows wrapper
+waits for its whole Job to exit naturally before releasing its lifetime lease.
+Its explicit crash/fault containment remains separate.
+
+These are component prerequisites, not global browser maintenance. The extension
+still must preserve drafts, reserve open panels and prevent reconnect during
+coordinated updates. Portable real-process tests hold a shared request over EOF
+in the parent and both bridges, then require a complete final response and Node
+`beforeExit`. The DSH bridge case uses a deliberately unavailable isolated
+endpoint, not a real model or WebSocket session. Voice tests use controlled
+workers/submissions and do not qualify a physical audio device. The new assembled
+Windows browser flow still needs native execution.

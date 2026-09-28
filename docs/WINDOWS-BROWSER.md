@@ -107,3 +107,11 @@ and [Chromium Windows launcher source](https://chromium.googlesource.com/chromiu
 Browser inventory follows [Windows application capabilities](https://learn.microsoft.com/en-us/windows/win32/shell/default-programs);
 it does not use the deprecated Start menu Internet default as the user's current
 browser selection.
+
+September 28 lifecycle source now [drains accepted bridge operations](LIFECYCLE.md#browser-transport-drain)
+instead of calling `process.exit` during ordinary disconnect. The Windows wrapper
+waits for the complete owned Job, preserving any surviving child rather than
+closing its Job after only the leader exits. DSH/prompt/memory ownership remains
+with the background owner. Portable real-process drain checks pass; actual
+compiled integration of this new shutdown path is pending. This adds neither
+extension-wide update reservation nor a completed global Quit.

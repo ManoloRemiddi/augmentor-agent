@@ -10,7 +10,7 @@ import {createServer} from 'node:net'
 import {setTimeout as delay} from 'node:timers/promises'
 import {RELEASE} from '../dist/contracts/src/release.js'
 
-for(const bridged of [false,true])test(`browser EOF drains an accepted shared request${bridged?' after selecting a child bridge':''}`,{
+for(const mode of ['parent','parent-with-child','pi-bridge','dsh-bridge'])test(`browser EOF drains an accepted shared request: ${mode}`,{
   timeout:15000,skip:process.platform==='win32'?'Uses a Unix fixture socket; native Windows transport has separate qualification.':false,
 },async t=>{
   const root=await mkdtemp(join(tmpdir(),'augmentor-native-drain-'))
@@ -33,8 +33,10 @@ for(const bridged of [false,true])test(`browser EOF drains an accepted shared re
   })
   server.listen(join(state,'prompts.sock'));await once(server,'listening')
   t.after(()=>{release();for(const socket of sockets)socket.destroy();server.close()})
-  const child=spawn(process.execPath,['--import',new URL('./fixtures/browser-natural-exit.mjs',import.meta.url).href,'apps/browser/native-host.mjs'],{
-    env:{...process.env,AUGMENTOR_SHARED_STATE:state,AUGMENTOR_SHARED_DATA:join(root,'data'),
+  const script=mode==='pi-bridge'?'pi-bridge.mjs':mode==='dsh-bridge'?'pipe.mjs':'native-host.mjs'
+  const child=spawn(process.execPath,['--import',new URL('./fixtures/browser-natural-exit.mjs',import.meta.url).href,'apps/browser/'+script],{
+    env:{...process.env,AUGMENTOR_SHARED_STATE:state,AUGMENTOR_SHARED_DATA:join(root,'data'),AUGMENTOR_SHARED_CONFIG:join(root,'config'),
+      AUGMENTOR_BROWSER_HARNESS:'',AUGMENTOR_UNIFIED:'0',DSH_AUGMENTOR_URL:'http://127.0.0.1:1',DSH_AUGMENTOR_WS_TOKEN:'a'.repeat(32),
       AUGMENTOR_PI_STATE:join(root,'pi'),DSH_HOME:join(root,'dsh'),AUGMENTOR_TEST_EXIT_OBSERVER:observed},
     stdio:['pipe','pipe','pipe'],
   })
@@ -54,10 +56,10 @@ for(const bridged of [false,true])test(`browser EOF drains an accepted shared re
     const id=String(++serial),body=Buffer.from(JSON.stringify({id,method,params})),header=Buffer.alloc(4)
     header.writeUInt32LE(body.length);pending.set(id,resolve);child.stdin.write(Buffer.concat([header,body]))
   })
-  assert.equal((await call('augmentor/handshake',{protocol:'augmentor/1',version:RELEASE.version})).result.version,RELEASE.version)
+  if(mode.startsWith('parent'))assert.equal((await call('augmentor/handshake',{protocol:'augmentor/1',version:RELEASE.version})).result.version,RELEASE.version)
   const saved=call('augmentor/prompts',{action:'save',name:'preserved',content:'accepted work'})
   await waiting
-  if(bridged)assert.equal((await call('harness.select',{harness:'pi'})).result.harness,'pi')
+  if(mode==='parent-with-child')assert.equal((await call('harness.select',{harness:'pi'})).result.harness,'pi')
   child.stdin.end()
   await delay(150);assert.equal(child.exitCode,null,'EOF must not terminate an accepted request')
   release()
