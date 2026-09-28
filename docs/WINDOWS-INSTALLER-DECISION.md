@@ -1114,6 +1114,16 @@ launch; the native parent gives the complete worker ten minutes. Failure or time
 closes observations without terminating independent Setup. Native crash/breakaway
 qualification is still required before relying on this behavior for customers.
 
+The Inno process proof now adds normal-exit and crash cases with a disposable
+observer in an explicit kill-on-close/allow-breakaway Job. It launches the real
+Inno loader and extracted Setup through `InstallerProcess` without the hosted
+fallback, verifies both are outside the observer Job, and keeps an ordinary child
+inside that Job as a control. After observer exit/crash, the ordinary child must
+end while the same observed Setup stays alive, keeps startup exclusion and
+completes naturally. This checks actual kernel lifetimes; it does not claim a
+complete power-loss recovery. Python compilation passes; native execution of
+these additional fault cases is pending.
+
 After actual installer completion, the worker retains read admission and requires
 source selection, Root/AppId and repair registration, the exact maintenance-helper
 hash, complete payload inventory and isolated native UI health. The shared journal

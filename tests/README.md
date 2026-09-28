@@ -257,6 +257,15 @@ coordinator PID before gate acknowledgment. Its artifact-write probe uses the
 native file adapter, preserving the actual Win32 sharing error rather than the
 Python CRT's generic permission mapping. New assertions await execution.
 
+The new `--observer-job` cases exercise explicit breakaway from a nested
+kill-on-close Job. No `qualification_outer_job` fallback is used in these cases.
+Both real Inno processes must be outside that observer Job, while an ordinary
+child stays inside. After both normal observer exit and a deliberate crash,
+the ordinary child must terminate and the exact retained Setup handle must stay
+live through successful installation. Python compilation passes; these new
+native fault cases await execution. The remaining hosted runner ancestor is
+still recorded rather than claimed absent.
+
 
 The assembled graph fixture explicitly starts its prompt/memory services through
 its existing disposable supervisor and waits for actual RPC readiness. They are

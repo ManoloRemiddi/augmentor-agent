@@ -219,17 +219,20 @@ def prove_handoff(installer,state,out):
     outer_jobs=[]
     # Preserve the earlier transfer mechanism case and exercise its replacement
     # over authenticated IPC with a distinct explicit apply decision.
-    for authenticated,crash,blocked in ((False,False,False),(False,True,False),(True,False,False),(True,True,False),(True,False,True)):
-        journal=private_directory(state/('journal-'+str(authenticated)+'-'+str(crash)+'-'+str(blocked))) if authenticated else None
+    for authenticated,crash,blocked,observer_job in ((False,False,False,False),(False,True,False,False),
+            (True,False,False,False),(True,True,False,False),(True,False,True,False),
+            (True,False,False,True),(True,True,False,True)):
+        journal=private_directory(state/('journal-'+str(authenticated)+'-'+str(crash)+'-'+str(blocked)+'-'+str(observer_job))) if authenticated else None
         for name in ('ready.json','coordinator.json','continue','parent-release'):
             (state/name).unlink(missing_ok=True)
         parent=subprocess.Popen([sys.executable,'-I','-Xutf8','-B',str(ROOT/'scripts/windows-inno-handoff-proof.py'),
             '--installer',str(staged),'--sha256',digest,'--state',str(state),'--log',
-            str(out/('handoff-'+('authenticated-' if authenticated else '')+('blocked' if blocked else 'crash' if crash else 'exit')+'.log')),
+            str(out/('handoff-'+('observer-' if observer_job else '')+('authenticated-' if authenticated else '')+('blocked' if blocked else 'crash' if crash else 'exit')+'.log')),
             *(['--authenticated','--journal',str(journal)] if authenticated else []),
+            *(['--observer-job'] if observer_job else []),
             *(['--blocked-final-lease'] if blocked else [])],
             stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-        setup_process=None;loader=None;blocker=None
+        setup_process=None;loader=None;blocker=None;contained=None
         try:
             deadline=time.monotonic()+30
             while not (state/'coordinator.json').is_file():
@@ -242,6 +245,10 @@ def prove_handoff(installer,state,out):
             outer_jobs.append(info['outerRunnerJobObserved'])
             assert info['actualSetupInInstallerJob'] and info['unrelatedPidRefused'] and info['setupPid']==ready['pid']
             assert info['coordinatorLifetimeLease']
+            assert info['observerBreakawayVerified']==observer_job
+            if observer_job:
+                contained=win32api.OpenProcess(win32con.SYNCHRONIZE,False,info['containedProbePid'])
+                assert win32event.WaitForSingleObject(contained,0)==win32event.WAIT_TIMEOUT
             lifetime=private_lock_descriptor(state/'installation.lock')
             try:
                 try:locks.flock(lifetime,locks.LOCK_EX|locks.LOCK_NB)
@@ -266,6 +273,8 @@ def prove_handoff(installer,state,out):
             else:(state/'parent-release').write_text('release',encoding='utf-8')
             _out,errors=parent.communicate(timeout=10)
             if not crash:assert parent.returncode==0,errors.decode('utf-8',errors='replace')
+            if contained is not None:
+                assert win32event.WaitForSingleObject(contained,10000)==win32event.WAIT_OBJECT_0
             if journal:
                 recorded=read_json(journal/'active.json')
                 assert recorded['phase']=='apply-acknowledged' and recorded['target']['sha256']==digest
@@ -286,7 +295,7 @@ def prove_handoff(installer,state,out):
             (state/'continue').write_text('continue',encoding='utf-8')
             if parent.poll() is None:parent.kill()
             parent.communicate(timeout=10)
-            for process in (setup_process,loader):
+            for process in (setup_process,loader,contained):
                 if process is not None:win32event.WaitForSingleObject(process,30000);process.Close()
             if blocker is not None:os.close(blocker)
     for name in ('ready.json','coordinator.json','continue','parent-release'):(state/name).unlink(missing_ok=True)
@@ -333,6 +342,8 @@ def prove_handoff(installer,state,out):
         'coordinatorLifetimeLeaseObserved':True,'actualSetupAcquiresFinalInstallationLease':True,
         'additionalLifetimeLeaseRefusesFileApplication':True,
         'qualificationRetainsOuterRunnerJob':True,
+        'explicitObserverJobBreakaway':True,'observerExitAndCrashPreserveSetup':True,
+        'ordinaryObserverChildTerminatesOnExitAndCrash':True,
         'outerRunnerJobObservations':outer_jobs,
         'productionInstallerQualified':False}
 

@@ -38,6 +38,16 @@ qualification is claimed. The app is not complete or ready for customers.
   [Inno at 5277087](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36434815332)
   also passes both CPUs. New extracted observer execution remains pending.
 
+- Full `5277087` x64 source restoration/completion now passes in
+  [36434815454](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36434815454),
+  merge checkout `c57a5c7492cf0f338e8e59df7f11a07b9e0fdb9e`. Downloaded evidence confirms
+  actual standalone source installation, exact original archival, distinct outcome,
+  real Windows UI health and reopening. ARM64 is still running. This revision uses
+  fixture orchestration and predates the extracted product observer at `9005784`.
+- [Fast Windows at 9005784](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36437964535)
+  passes both CPUs, including health-time active-record pinning. Its native installer
+  observer and full application workflows are running/pending; no observer pass is claimed.
+
 ### Implemented contracts and current work
 
 The retained original installer and its durable private selection identify the
@@ -140,8 +150,12 @@ then verifies source registrations, selection, helper hash, full inventory and U
 health before unchanged archival. The active record stays pinned during health.
 The exact-template and full-app proofs now invoke this product action directly;
 template health is synthetic, while the full proof requires actual rendering and
-reopening. Local update/package checks and Inno script compilation pass. Native
-observer/Job breakaway and crash-resume qualification remain pending.
+reopening. Local update/package checks and Inno script compilation pass. Fast Windows at
+`9005784` passes both CPUs with health-time record pinning. Native observer and
+crash-resume qualification remain pending. Additional Inno fault cases now require
+real Setup to escape an explicit observer Job and survive its normal exit/crash,
+while an ordinary observer child terminates. These cases use production breakaway
+without the hosted fallback; Python compilation passes and native execution is pending.
 
 Next: qualify independent observer/source completion, then finish crash-resume
 outcome inspection, bounded disk/retention policy, actual N-to-N+1

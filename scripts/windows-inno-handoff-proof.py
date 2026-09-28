@@ -36,12 +36,31 @@ def main():
     parser.add_argument('--wrong-coordinator',action='store_true')
     parser.add_argument('--journal',type=Path)
     parser.add_argument('--blocked-final-lease',action='store_true')
+    parser.add_argument('--observer-job',action='store_true')
     args=parser.parse_args()
     kernel=ctypes.WinDLL('kernel32',use_last_error=True)
     in_job=ctypes.c_int()
     query=kernel.IsProcessInJob
     query.argtypes=[ctypes.c_void_p,ctypes.c_void_p,ctypes.POINTER(ctypes.c_int)];query.restype=ctypes.c_int
     if not query(ctypes.c_void_p(-1),None,ctypes.byref(in_job)):raise ctypes.WinError(ctypes.get_last_error())
+    observer_job=None;contained_probe=None
+    if args.observer_job:
+        import win32api,win32job
+        # Match the recovery observer's explicit Job boundary. Keep the raw,
+        # non-inheritable handle until actual process exit; early closure would
+        # terminate this disposable coordinator itself.
+        create=kernel.CreateJobObjectW
+        create.argtypes=[ctypes.c_void_p,ctypes.c_wchar_p];create.restype=ctypes.c_void_p
+        observer_job=create(None,None)
+        if not observer_job:raise ctypes.WinError(ctypes.get_last_error())
+        limits=win32job.QueryInformationJobObject(observer_job,win32job.JobObjectExtendedLimitInformation)
+        limits['BasicLimitInformation']['LimitFlags']=(win32job.JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE|
+            win32job.JOB_OBJECT_LIMIT_BREAKAWAY_OK)
+        win32job.SetInformationJobObject(observer_job,win32job.JobObjectExtendedLimitInformation,limits)
+        win32job.AssignProcessToJobObject(observer_job,win32api.GetCurrentProcess())
+        contained_probe=subprocess.Popen([sys.executable,'-I','-B','-c','import time; time.sleep(90)'],
+            stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+        assert win32job.IsProcessInJob(contained_probe._handle,observer_job)
     with ExitStack() as stack:
         # Model the installed coordinator's lifetime handle. Setup must wait
         # for this actual process to exit, not merely for its APPLY message.
@@ -67,7 +86,8 @@ def main():
             assert handoff is not None and os.getpid()!=1
             launch=[value if not value.startswith('/augmentorcoordinator=') else '/augmentorcoordinator=1' for value in launch]
         with InstallerProcess(args.installer,args.sha256,['/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',
-            '/LOG='+str(args.log),*(['/finalleasetimeout=1000'] if args.blocked_final_lease else []),*launch],qualification_outer_job=True) as installer:
+            '/LOG='+str(args.log),*(['/finalleasetimeout=1000'] if args.blocked_final_lease else []),*launch],
+                qualification_outer_job=not args.observer_job) as installer:
             if handoff:
                 handoff.bind(installer)
                 if args.wrong_coordinator:
@@ -111,10 +131,15 @@ def main():
             ready=json.loads((args.state/'ready.json').read_text(encoding='utf-8'))
             if handoff:assert ready['pid']==handoff.pid
             process=installer.observe(ready['pid'])
+            if observer_job:
+                assert not win32job.IsProcessInJob(installer.process,observer_job)
+                assert not win32job.IsProcessInJob(process,observer_job)
             process.Close()
             atomic_json(args.state/'coordinator.json', {'installerPid':installer.pid,
                 'setupPid':ready['pid'],'actualSetupInInstallerJob':True,'unrelatedPidRefused':True,
                 'coordinatorLifetimeLease':True,
+                'observerBreakawayVerified':bool(observer_job),
+                'containedProbePid':contained_probe.pid if contained_probe else None,
                 'outerRunnerJobObserved':bool(in_job.value)})
             while not (args.state/'parent-release').exists():
                 if installer.poll() is not None:raise RuntimeError('The disposable installer exited before handoff.')
