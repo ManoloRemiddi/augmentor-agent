@@ -42,7 +42,7 @@ class InstallerProcess:
                 self.job=None
                 raise ctypes.WinError(ctypes.get_last_error())
             flags=(win32con.CREATE_SUSPENDED|win32con.CREATE_UNICODE_ENVIRONMENT|
-                win32con.CREATE_NO_WINDOW|win32con.CREATE_BREAKAWAY_FROM_JOB)
+                win32con.CREATE_NO_WINDOW|0x01000000)  # CREATE_BREAKAWAY_FROM_JOB; absent from pywin32 312 win32con.
             self.process,thread,self.pid,_tid=win32process.CreateProcess(
                 str(self.artifact),subprocess.list2cmdline([str(self.artifact),*arguments]),
                 security_attributes(),security_attributes(),False,flags,environment,
@@ -63,14 +63,14 @@ class InstallerProcess:
         finally:
             if thread is not None:thread.Close()
 
-    def observe(self,pid):
+    def observe(self,pid,*,transfer=False):
         """Retain a live same-user descendant; caller must bind PID to its IPC."""
         import win32api,win32con,win32event,win32job,win32security
         from platform_adapters.windows_identity import current_sid
         if self.job is None or type(pid) is not int or not 0<pid<=0xffffffff:
             raise ValueError('The installer process observation is unavailable.')
         process=win32api.OpenProcess(win32con.SYNCHRONIZE|win32con.PROCESS_QUERY_INFORMATION|
-            win32con.PROCESS_VM_READ,False,pid)
+            win32con.PROCESS_VM_READ|(win32con.PROCESS_DUP_HANDLE if transfer else 0),False,pid)
         try:
             if not win32job.IsProcessInJob(process,self.job) or win32event.WaitForSingleObject(process,0)!=win32event.WAIT_TIMEOUT:
                 raise ValueError('This process does not belong to the launched installer.')

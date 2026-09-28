@@ -991,3 +991,10 @@ path, replacing the earlier framing proxy. All 257 combined Node/Browser tests,
 four private-transport Python tests and five launcher policy tests pass. The
 expanded compiled native-host proof awaits x64/ARM64 execution. Commit explicitly
 refuses until global startup fencing and independent installer handoff exist.
+
+The first independent-process run at `3748282` fails before Setup readiness on
+both CPUs. The pinned pywin32 312 `win32con` does not export
+`CREATE_BREAKAWAY_FROM_JOB`; source now uses its documented Win32 flag value.
+The fixture also reports an early coordinator error immediately instead of only
+a missing readiness file. Native independent-process success remains pending;
+the earlier extracted-Setup handle-transfer proof remains separately qualified.

@@ -186,3 +186,10 @@ complete graph commit, durable recovery and rollback remain open.
 The launch ordering follows Microsoft's [suspended process creation flags](https://learn.microsoft.com/en-us/windows/win32/procthread/process-creation-flags),
 [assignment before running a process in a Job](https://learn.microsoft.com/en-us/windows/win32/api/jobapi2/nf-jobapi2-assignprocesstojobobject)
 and [Job lifetime and breakaway rules](https://learn.microsoft.com/en-us/windows/win32/procthread/job-objects).
+
+The first independent-process run at `3748282` fails before Setup readiness on
+both CPUs. The pinned pywin32 312 `win32con` does not export
+`CREATE_BREAKAWAY_FROM_JOB`; source now uses its documented Win32 flag value.
+The fixture also reports an early coordinator error immediately instead of only
+a missing readiness file. Native independent-process success remains pending;
+the earlier extracted-Setup handle-transfer proof remains separately qualified.

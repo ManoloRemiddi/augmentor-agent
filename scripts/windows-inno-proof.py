@@ -190,6 +190,13 @@ def prove_handoff(installer,state,out):
             stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
         setup_process=None;loader=None
         try:
+            deadline=time.monotonic()+30
+            while not (state/'coordinator.json').is_file():
+                if parent.poll() is not None:
+                    _output,error=parent.communicate(timeout=5)
+                    raise AssertionError('The disposable installer coordinator exited before readiness: '+error.decode('utf-8',errors='replace')[-4000:])
+                if time.monotonic()>=deadline:raise TimeoutError('The disposable installer coordinator did not become ready.')
+                time.sleep(.05)
             info=wait_for(state/'coordinator.json');ready=wait_for(state/'ready.json')
             assert info['actualSetupInInstallerJob'] and info['unrelatedPidRefused'] and info['setupPid']==ready['pid']
             try:
