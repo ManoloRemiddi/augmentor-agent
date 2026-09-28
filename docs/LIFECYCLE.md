@@ -461,6 +461,16 @@ these new graph assertions is pending; separate component tests already pass.
 
 ### Windows owned voice bridge
 
+The first integrated native attempt (`2bd7b67`) failed startup on both CPUs.
+The free-port test at `c1070b2` reproduces the cause: the one-second TCP connect
+probe times out on a closed Windows loopback port instead of reporting refusal.
+Startup now probes exclusive wildcard binding without listening, then launches
+the owned loopback service normally. This conservatively refuses occupied ports
+including wildcard or bound-but-not-listening sockets; it never connects to an
+external listener. Kernel Job/HTTP-peer identity is still required after launch.
+Six local ownership tests pass; corrected native integration is pending.
+See [Microsoft socket binding semantics](https://learn.microsoft.com/en-us/windows/win32/winsock/using-so-reuseaddr-and-so-exclusiveaddruse).
+
 The Windows launcher fixes `RESONANT_VOICE_HOME` inside its verified per-user
 configuration directory, including disposable qualification roots. The existing
 Resonant initializer retains configuration and creates private credentials.

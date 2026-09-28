@@ -46,13 +46,19 @@ class VoiceOwnershipTests(unittest.TestCase):
         root=Path(self.temporary.name)/'payload'
         for name in ('node/node.exe','dsh/node_modules/dsh-resonant-voice/bin/resonant-voice.js'):
             path=root/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_text('fixture',encoding='utf-8')
-        with socket.socket() as external,patch('windows_supervisor.OwnedProcess') as launch:
-            external.bind(('127.0.0.1',0));external.listen()
-            atomic_json(self.home/'config.json',{'port':external.getsockname()[1]})
-            supervisor=Supervisor(root)
-            with self.assertRaisesRegex(ValueError,'outside this background owner'):supervisor.start_voice()
-            launch.assert_not_called();self.assertIsNone(supervisor.voice)
-            external.settimeout(1);connection,_=external.accept();connection.close()
+        for address in ('127.0.0.1','0.0.0.0'):
+            for listening in (False,True):
+                with self.subTest(address=address,listening=listening),socket.socket() as external,patch('windows_supervisor.OwnedProcess') as launch:
+                    external.bind((address,0))
+                    if listening:external.listen()
+                    atomic_json(self.home/'config.json',{'port':external.getsockname()[1]})
+                    supervisor=Supervisor(root)
+                    with self.assertRaisesRegex(ValueError,'outside this background owner'):supervisor.start_voice()
+                    launch.assert_not_called();self.assertIsNone(supervisor.voice)
+                    # The preflight neither connects to nor disrupts the foreign service.
+                    if listening:
+                        external.settimeout(.05)
+                        with self.assertRaises(TimeoutError):external.accept()
 
     def test_unknown_inventory_or_changed_profile_cannot_authorize_maintenance(self):
         owner=Mock()

@@ -27,6 +27,12 @@ At `1bf1b78`, compiled browser commit passes x64; ARM64 stops earlier at a
 desktop snapshot comparison. The fixture now compares the prepared snapshot
 and records expected/actual state; corrected native qualification is pending.
 
+The new free-port check at `c1070b2` fails on both native CPUs: Windows times out
+on a closed loopback TCP connection before returning refusal. Current source
+replaces that probe with exclusive binding without listening, covering occupied
+loopback/wildcard and non-listening sockets. Six local checks pass; native service
+startup and the complete graph drain still need the corrected source qualified.
+
 Source `2bd7b67` adds the [owned Windows voice bridge](LIFECYCLE.md#windows-owned-voice-bridge)
 to the background owner and observed maintenance graph. Five local private-profile/
 ownership tests and existing preparation/supervisor/launcher checks pass. Actual

@@ -2,6 +2,13 @@
 
 # Windows implementation evidence
 
+Current correction: both native CPUs reproduce the free-loopback-port timeout in
+[`c1070b2` desktop qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36387350489).
+The voice startup probe now uses exclusive wildcard binding without listening;
+it cannot mistake a short connect timeout for an unavailable port or contact an
+external service. Six local tests pass, including occupied wildcard and
+bound-but-not-listening sockets. Native corrected startup/drain remains pending.
+
 September 27, 2026. The owner authorized autonomous implementation and will
 connect a Windows machine for joint physical testing afterward. Follow the full
 [implementation plan](WINDOWS-IMPLEMENTATION-PLAN.md); this ledger does not narrow

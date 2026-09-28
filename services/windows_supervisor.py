@@ -194,12 +194,22 @@ class Supervisor:
         script=self.root/'dsh/node_modules/dsh-resonant-voice/bin/resonant-voice.js'
         node=self.root/'node/node.exe'
         if not script.is_file() or not node.is_file():raise ValueError('The bundled voice service is missing. Repair this installation.')
-        try:
-            connection=socket.create_connection(('127.0.0.1',port),timeout=1)
-        except ConnectionRefusedError:pass
-        else:
-            connection.close()
-            raise ValueError('The configured voice port is already in use outside this background owner. Its work was preserved.')
+        # A closed Windows loopback port can time out before TCP reports
+        # refusal. Check local bind availability instead of treating that
+        # network timeout as proof that an external service exists. Exclusive
+        # use prevents socket reuse from hiding another owner's binding.
+        with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as available:
+            if sys.platform=='win32':
+                available.setsockopt(socket.SOL_SOCKET,socket.SO_EXCLUSIVEADDRUSE,1)
+            # Probe wildcard binding conservatively: on Windows a specific
+            # bind can coexist with a prior wildcard under some socket options.
+            # No listen call is made and the product still binds loopback only.
+            try:available.bind(('0.0.0.0',port))
+            except OSError as error:
+                raise ValueError('The configured voice port is unavailable outside this background owner. Its work was preserved.') from error
+        # The child must still bind normally. If another process wins the
+        # interval after this probe, Job/HTTP-peer verification refuses it;
+        # this probe never adopts a listener or grants maintenance authority.
         environment={**os.environ,'RESONANT_VOICE_HOME':str(home)}
         environment.pop('NODE_OPTIONS',None);environment.pop('NODE_PATH',None)
         with os.fdopen(descriptor(owner_directory()/'voice.log',writable=True,create=True),'a',encoding='utf-8') as log:
