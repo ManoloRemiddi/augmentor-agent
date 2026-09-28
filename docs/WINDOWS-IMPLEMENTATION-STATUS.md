@@ -65,11 +65,11 @@ providers, installed artifacts and physical hardware must remain distinguishable
 | Work | Current state | Required next evidence |
 | --- | --- | --- |
 | W0 baseline | Shared baseline and native hosted evidence recorded | Current-main reconciliation and client/hardware environments |
-| W1 native runtime and installer | Native x64/ARM64 runtime, prepared DSH terminal and two-version installer fixture pass | Clean-client install, full product lifecycle and publisher trust |
+| W1 native runtime and installer | Native runtimes and two-version fixture pass; stock EXE busy-uninstall requirement fails source review | Replacement qualification in [installer decision](WINDOWS-INSTALLER-DECISION.md), clean-client install and publisher trust |
 | W2 paths, ownership, IPC, locks | Both CPUs pass kernel adapters, cross-user ACL denial and Python/Node prompt transport | Complete component ownership and lifecycle integration |
-| W3 managed DSH/model setup | Both CPUs pass assembled setup, deterministic-model chat, Stop and history restart | Full first-run UI, native composer proof, ordinary-user/live-provider acceptance |
-| W4 desktop, two windows, shortcuts, tray | Both CPUs pass source window control, draft/zoom, native hotkeys and shortcut restart persistence | Compiled Qt plugin fix, native resources, installer startup hooks, tray/quit and physical interaction |
-| W5 chosen Chromium/Comet companion | Pending | Native host registration and real selected-browser conversation |
+| W3 managed DSH/model setup | Both CPUs pass assembled setup, compiled composer Send/Enter and history restart against deterministic DSH/model | Full first-run UI, ordinary-user/live-provider acceptance |
+| W4 desktop, two windows, shortcuts, tray | Both CPUs pass compiled preview zoom/drafts, native resources and source hotkey persistence | Installer startup hooks, tray/quit and physical interaction |
+| W5 chosen Chromium/Comet companion | Native registration/discovery fixtures pass both CPUs; compiled host passes x64 | ARM64 host, chooser/installation and real selected-browser conversation |
 | W6 computer control | Pending | Consented capture/input, Stop and Windows privilege boundaries |
 | W6 voice/memory/Home/Pi | Pending | Existing feature contracts and configured-engine connectivity |
 | W6 RTX inference | Pending hardware | Native compatible backend, measured shared-memory behavior |
@@ -661,3 +661,19 @@ PE/resource inspection on both CPUs, then fails a fixture expectation comparing
 the runner's short `RUNNER~1` temp path with its resolved long spelling. The
 expectation now compares resolved paths; product normalization is retained.
 The registration safety tests still pass. Full discovery execution must rerun.
+
+At `13c6c0d`, [desktop run 36366164943](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36366164943)
+passes both CPUs including the corrected real Windows discovery fixture. At
+`840127f`, the full [runtime run 36364832602](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36364832602)
+now passes both CPUs, including actual compiled desktop Send/Enter/reopen/history
+against the bundled DSH and deterministic model. At `13c6c0d`, x64 in
+[runtime run 36366164798](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36366164798)
+also passes the new actual native-browser-host binary/protocol sequence and
+Python/Node companion ownership/restart checks. ARM64 is still running. macOS
+feasibility passes at this ref; the shared Linux installed checks remain in progress.
+
+A separate pinned-source review finds the stock Velopack EXE terminates active
+package processes before its non-vetoing uninstall hook. W1 is reopened for this
+failed requirement; see the [installer decision](WINDOWS-INSTALLER-DECISION.md).
+An additional isolated native probe now characterizes busy uninstall explicitly;
+its execution is pending. No customer package, browser profile or website changed.

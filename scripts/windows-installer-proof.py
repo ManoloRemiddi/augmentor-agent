@@ -80,6 +80,7 @@ def main():
         assert result.returncode == expected, (action, result.returncode)
         return wait_for(report)
     holder = None
+    busy_uninstall = None
     try:
         assert invoke('--inspect', 'installed')['version'] == '0.0.1'
         assert invoke('--download', 'download', feeds[1])['pending'] == '0.0.2'
@@ -94,6 +95,20 @@ def main():
         assert invoke('--inspect', 'reopened')['version'] == '0.0.2'
         assert sentinel.read_bytes() == sentinel_bytes
         assert any('0.0.1' in path.name for path in (data/'recovery').glob('*-full.nupkg'))
+        # Characterize the normal Settings uninstall entry independently of the
+        # guarded in-app update above. Pinned Velopack force-stops the package
+        # BEFORE invoking its non-vetoing hook. This expected limitation must
+        # remain visible in the report; it disqualifies the stock EXE lifecycle.
+        holder = subprocess.Popen([str(app), '--hold', str(out/'active-uninstall.json')], env=env)
+        active = wait_for(out/'active-uninstall.json')
+        assert active['pid'] == holder.pid and holder.poll() is None
+        subprocess.run([str(installed/'Update.exe'), 'uninstall', '--silent'],
+                       check=True, env=env, timeout=120)
+        exit_code = holder.wait(timeout=15)
+        busy_uninstall = {'activeProcessTerminated': exit_code != 0,
+                          'activeWorkMarkerSurvived': (data/'busy').exists(),
+                          'exitCode': exit_code}
+        assert busy_uninstall['activeProcessTerminated'] and busy_uninstall['activeWorkMarkerSurvived']
     finally:
         (data/'busy').unlink(missing_ok=True)
         if holder is not None and holder.poll() is None:
@@ -105,6 +120,7 @@ def main():
     assert not app.exists()
     hooks = [json.loads(line) for line in (data/'hooks.jsonl').read_text().splitlines()]
     assert {'install', 'update', 'uninstall'} <= {item['hook'] for item in hooks}
+    assert any(item['hook'] == 'uninstall' and item['activeWorkMarkerPresent'] for item in hooks)
     import winreg
     try:
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER, 'Software\\Google\\Chrome\\NativeMessagingHosts\\'+host_name):
@@ -113,8 +129,10 @@ def main():
         pass
     report = {'schema': 'augmentor-windows-installer-proof/1', 'arch': args.arch,
         'installUpdateReopenRemove': True, 'settingsPreserved': True, 'autoApplyDisabled': True,
-        'busyFixtureRefused': True, 'previousPackageRetained': True, 'hooks': hooks,
-        'limits': ['Unsigned disposable fixture only; full-app coordination, authenticated rollback, standard-user and customer-package qualification remain pending.']}
+        'appRequestedBusyUpdateRefused': True, 'previousPackageRetained': True, 'hooks': hooks,
+        'stockExeBusyUninstall': busy_uninstall, 'productionInstallerQualified': False,
+        'limits': ['Stock EXE uninstall terminates active work before its hook; this is a failed product requirement, not a successful busy-uninstall test.',
+                   'Unsigned disposable fixture only; full-app coordination, authenticated rollback, standard-user and customer-package qualification remain pending.']}
     (out/'report.json').write_text(json.dumps(report, indent=2)+'\n')
     print(json.dumps(report))
 

@@ -4,6 +4,8 @@
 
 Date: September 27, 2026. Status: **implementation authorized; W0/W1 active**.
 Current work and evidence: [implementation status](WINDOWS-IMPLEMENTATION-STATUS.md).
+W1 update: [stock installer busy-uninstall failure and next qualification](WINDOWS-INSTALLER-DECISION.md).
+The successful disposable update fixture does not select Velopack for production.
 Source inspected: canonical application repository at `b8e36a44f6fc58c1a1a491040c81a21c17e82bb7`.
 This document defines future work and its acceptance criteria. A checkbox, proposed
 file or architecture decision is not evidence of an implemented feature.

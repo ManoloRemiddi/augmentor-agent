@@ -34,7 +34,8 @@ def hook(name, *args):
         with winreg.CreateKey(winreg.HKEY_CURRENT_USER, key) as entry:
             winreg.SetValueEx(entry, '', 0, winreg.REG_SZ, str(manifest))
     with (DATA/'hooks.jsonl').open('a', encoding='utf-8') as stream:
-        stream.write(json.dumps({'hook': name, 'version': CONFIG['version']})+'\n')
+        stream.write(json.dumps({'hook': name, 'version': CONFIG['version'],
+                                 'activeWorkMarkerPresent': (DATA/'busy').exists()})+'\n')
 
 
 def main():
@@ -56,7 +57,8 @@ def main():
         return
     action, report_file, *rest = args
     report = {'version': CONFIG['version'], 'python': sys.version, 'executable': sys.executable,
-              'argv': args, 'installedRoot': str(ROOT), 'utf8Mode': sys.flags.utf8_mode}
+              'argv': args, 'installedRoot': str(ROOT), 'utf8Mode': sys.flags.utf8_mode,
+              'pid': os.getpid()}
     assert sys.flags.utf8_mode == 1
     if action == '--hold':
         busy = DATA/'busy'
