@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-"""Execute the exact application Inno script with a small inert fixture payload.
+"""Execute the exact application Inno script with a small fixture payload.
 
-This proves installer event integration quickly; it never launches an application
-or claims complete-runtime, actual-browser or installed update qualification.
-The separate full-payload proof remains required.
+The Finish check runs the real native bootstrap/private Python with a recording
+script. Other component markers are inert. No shared GUI, DSH, actual-browser or
+full-runtime qualification is claimed; the full-payload proof remains required.
 """
 import hashlib
 import importlib.util
@@ -12,12 +12,13 @@ import json
 from pathlib import Path
 import shutil
 import subprocess
+import time
 import winreg
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def prove(out, arch, compiler, fixture_executable):
+def prove(out, arch, compiler, fixture_executable, runtime):
     from platform_adapters.processes import OwnedProcess
     from platform_adapters.private_files import atomic_json, descriptor
     from platform_adapters.windows_identity import private_directory
@@ -28,7 +29,7 @@ def prove(out, arch, compiler, fixture_executable):
     payload.mkdir()
     # The installer only copies these markers. Runtime intake/launch is proved
     # elsewhere against the actual assembled product, never against this tree.
-    for name in ('python/python.exe', 'node/node.exe', 'powershell/pwsh.exe',
+    for name in ('node/node.exe', 'powershell/pwsh.exe',
                  'updater/WinSparkle.dll', 'dsh/payload.json', 'scripts/launch-windows.py'):
         target = payload/name; target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(b'Inert installer template fixture; never execute.\n')
@@ -38,6 +39,15 @@ def prove(out, arch, compiler, fixture_executable):
         ['git','rev-parse','HEAD'], cwd=ROOT, text=True).strip(), 'target':'windows-'+arch,
         'customerDistribution':False, 'qualificationStatus':'development-candidate'}
     (payload/'release.json').write_text(json.dumps(release), encoding='utf-8')
+    # Only the actual native bootstrap/private Python runs at Finish, with a
+    # tiny recording script. Other component markers remain inert.
+    shutil.copytree(Path(runtime)/'python', payload/'python',
+        ignore=shutil.ignore_patterns('site-packages', '__pycache__', '*.pyc'))
+    (payload/'python/Lib/site-packages').mkdir(parents=True, exist_ok=True)
+    shutil.copy2(ROOT/'scripts/windows-finish-launch-fixture.py', payload/'scripts/launch-windows.py')
+    build_spec = importlib.util.spec_from_file_location('template_launcher', ROOT/'scripts/build-windows-launcher.py')
+    builder = importlib.util.module_from_spec(build_spec); build_spec.loader.exec_module(builder)
+    builder.build_launcher(payload, arch)
     spec = importlib.util.spec_from_file_location('template_package', ROOT/'scripts/package-windows.py')
     package = importlib.util.module_from_spec(spec); spec.loader.exec_module(package)
     report = package.build(payload, arch, out/'application-template-package',
@@ -45,6 +55,7 @@ def prove(out, arch, compiler, fixture_executable):
     install = Path(report['installationDirectory'])
     flags = ['/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-']
     stages = []; removal = None
+    launch_record = Path(report['qualificationBase'])/'finish-launched.json'
     def run(executable, label, success=True):
         child = OwnedProcess([str(executable), *flags,
             '/LOG='+str(out/('application-template-'+label+'.log'))], stdin=subprocess.DEVNULL)
@@ -56,6 +67,7 @@ def prove(out, arch, compiler, fixture_executable):
             if child.job is not None:
                 child.kill(); child.wait(timeout=10)  # Failed fixture cleanup only.
         assert (code == 0) == success, (label,code)
+        assert not launch_record.exists(), 'Silent maintenance launched the application.'
     try:
         run(report['installer'], 'initial')
         key_path = r'Software\Microsoft\Windows\CurrentVersion\Uninstall'+'\\'+report['applicationId']+'_is1'
@@ -93,7 +105,62 @@ def prove(out, arch, compiler, fixture_executable):
                 assert winreg.QueryInfoKey(key)[:2] == (0,0), key_path
             winreg.DeleteKey(winreg.HKEY_CURRENT_USER, key_path)
         stages.append('actual-template-edited-browser-refusal-and-owned-removal')
-        return {'passed':True, 'stages':stages, 'scope':'Exact application Inno script with inert payload; no app/browser launch.'}
+        interactive_finish(report['installer'], out/'application-template-interactive.log')
+        launched = json.loads(launch_record.read_text(encoding='utf-8'))
+        assert Path(launched['executable']) == install/'current/Augmentor.exe'
+        assert launched['platform'] == {'x64':'win-amd64', 'arm64':'win-arm64'}[arch]
+        launch_record.unlink()  # Fixture-owned observation; silent removal must not recreate it.
+        run(removal, 'after-interactive')
+        assert not (install/'current/Augmentor.exe').exists()
+        for key_path in (report['installationKey'], report['startupKey']):
+            winreg.DeleteKey(winreg.HKEY_CURRENT_USER, key_path)
+        stages.append('interactive-finish-native-startup-and-silent-no-launch')
+        return {'passed':True, 'stages':stages, 'scope':'Exact Inno script and native bootstrap/private Python; no shared GUI, DSH or browser launch.'}
     finally:
         (out/'application-template-result.json').write_text(json.dumps({
-            'stages':stages, 'scope':'Exact application Inno script with inert payload; no app/browser launch.'}, indent=2)+'\n', encoding='utf-8')
+            'stages':stages, 'scope':'Exact Inno script and native bootstrap/private Python; no shared GUI, DSH or browser launch.'}, indent=2)+'\n', encoding='utf-8')
+
+
+def interactive_finish(installer, log):
+    """Drive only this disposable installer's actual visible wizard buttons."""
+    import win32api, win32con, win32gui, win32job, win32process
+    from platform_adapters.processes import OwnedProcess
+    child = OwnedProcess([str(installer), '/SP-', '/NORESTART', '/LANG=english', '/LOG='+str(log)],
+        stdin=subprocess.DEVNULL)
+    deadline = time.monotonic()+120
+    clicked = set(); finished = False
+    try:
+        while not child.drained():
+            if time.monotonic() >= deadline: raise TimeoutError('The disposable installer wizard did not complete.')
+            windows = []
+            def owned(window, _context):
+                if not win32gui.IsWindowVisible(window) or win32gui.GetClassName(window) != 'TWizardForm': return
+                _thread, pid = win32process.GetWindowThreadProcessId(window)
+                try: process = win32api.OpenProcess(win32con.PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
+                except win32api.error: return
+                try:
+                    if win32job.IsProcessInJob(process, child.job): windows.append(window)
+                finally: process.Close()
+            win32gui.EnumWindows(owned, None)
+            for window in windows:
+                controls = []
+                def collect(control, _context):
+                    if win32gui.IsWindowVisible(control):
+                        controls.append((control, win32gui.GetClassName(control), win32gui.GetWindowText(control)))
+                win32gui.EnumChildWindows(window, collect, None)
+                # Different pages can reuse the same Next button. Retain visible
+                # text to avoid clicking twice while the previous event is queued.
+                page = tuple(sorted((kind, text) for _handle, kind, text in controls if text))
+                for caption in ('Finish', 'Install', 'Next >'):
+                    buttons = [handle for handle, kind, text in controls
+                        if kind == 'TNewButton' and text.replace('&','') == caption and win32gui.IsWindowEnabled(handle)]
+                    if len(buttons) != 1 or (page,caption) in clicked: continue
+                    clicked.add((page,caption))
+                    win32gui.PostMessage(buttons[0], win32con.BM_CLICK, 0, 0)
+                    if caption == 'Finish': finished = True
+                    break
+            time.sleep(.05)
+        assert child.wait_graceful(timeout=5) == 0 and finished
+    finally:
+        if child.job is not None:
+            child.kill(); child.wait(timeout=10)  # Failed disposable wizard only.

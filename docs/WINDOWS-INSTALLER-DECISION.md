@@ -471,3 +471,21 @@ range and `wait_graceful` to observe all installer/remover descendants exiting
 normally before further actions or inspection. Their existing bounds remain; no
 setup/removal command is replayed. Forced cleanup is restricted to failed disposable
 tests. Native rerun of the complete sequence is pending.
+
+## Interactive completion and startup handoff
+
+The installer offers the standard checked **Open Augmentor** option on its final
+page. Inno's [postinstall run entry](https://jrsoftware.org/ishelp/topic_runsection.htm)
+runs after successful installation. Its callback requires completed installation
+and held maintenance, then releases the gate before the installed native executable
+acquires startup/lifetime handles. Leaving the option unchecked retains normal
+end-of-installer cleanup. Silent installs do not launch. Authenticated coordinated
+updates suppress this option because independent health owns reopening.
+
+The small application-template test now drives the actual visible wizard buttons
+inside its own retained Windows Job. The finish action must start the real
+lease-holding launcher and private Python, which write a fixture observation and
+exit normally. DSH/Node/PowerShell markers remain inert and no shared desktop or
+actual-browser launch is claimed. Silent maintenance must never produce that
+observation. Native execution of this new addition is pending; preceding template
+repair/removal and signed-update qualification [pass both CPUs at 8a3ff05](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36400951199).

@@ -9,6 +9,7 @@ on:
       - 'scripts/windows-registration-fixture.iss'
       - 'scripts/windows-application.iss'
       - 'scripts/windows-application-template-proof.py'
+      - 'scripts/windows-finish-launch-fixture.py'
       - 'scripts/package-windows.py'
       - 'scripts/build-windows-launcher.py'
       - 'services/platform/windows-launcher.c'

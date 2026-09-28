@@ -412,3 +412,10 @@ The typed native registry fixture at `2f17cb0` passes on both native runners in
 [36397149278](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36397149278).
 This is actual Inno/helper registry execution, separate from the still-pending
 full installed startup command and physical logon tests.
+
+Interactive installation and same-build repair now offer **Open Augmentor** on
+the finish page. The installer releases its maintenance handles before the native
+launcher starts. Silent/coordinated updates do not use this path; independent
+health must authorize reopening. The native fixture verifies the standard wizard
+and bootstrap handoff, while actual first-run desktop acceptance remains a
+separate full-package/physical check. New native execution is pending.

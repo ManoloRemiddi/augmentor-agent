@@ -36,10 +36,13 @@ Name: "{userprograms}\{#ShortcutName}"; Filename: "{app}\current\Augmentor.exe";
 [Tasks]
 Name: startup; Description: "Start Augmentor in the background when I sign in"; Flags: checkedonce; Check: OfferStartupTask
 
+[Run]
+Filename: "{app}\current\Augmentor.exe"; Parameters: "{code:LaunchParameters}"; Description: "Open Augmentor"; Flags: postinstall nowait skipifsilent; Check: OfferLaunch; BeforeInstall: ReleaseForLaunch
+
 [Code]
 var MaintenanceHeld, AuthenticatedHandoff, RemovalHeld, FreshInstallation: Boolean;
   StartupChoiceKnown, StartupChoice: Boolean;
-  BrowserCleanupReady: Boolean; BrowserDigest: String;
+  BrowserCleanupReady, InstallationComplete: Boolean; BrowserDigest: String;
 
 function OfferStartupTask: Boolean;
 begin
@@ -122,6 +125,24 @@ begin
   Arguments := LaunchParameters('');
   if Arguments <> '' then Arguments := Arguments + ' ';
   Result := '"' + ExpandConstant('{app}\current\Augmentor.exe') + '" ' + Arguments + '--background';
+end;
+
+function OfferLaunch: Boolean;
+begin
+  { Coordinated updates reopen only after independent health verification. }
+  Result := not AuthenticatedHandoff;
+end;
+
+procedure ReleaseForLaunch;
+begin
+  { Inno runs this only after successful file/registration installation, when
+    the user accepts the final Open checkbox. Release admission before the
+    native app acquires its own startup/lifetime handles. An unchecked box or
+    silent/coordinated install keeps the normal DeinitializeSetup cleanup. }
+  if not InstallationComplete or not MaintenanceHeld or AuthenticatedHandoff or WizardSilent then
+    RaiseException('Augmentor cannot open before installation is complete.');
+  CloseSetupMaintenance;
+  MaintenanceHeld := False;
 end;
 
 function InitializeSetup: Boolean;
@@ -211,6 +232,7 @@ begin
   if FreshInstallation and WizardIsTaskSelected('startup') then
     if OwnedRegistry('{#StartupKey}', 'Augmentor Agent', StartupCommand, 1) <> 2 then
       RaiseException('Augmentor could not enable login startup. The existing entry was preserved.');
+  InstallationComplete := True;
 end;
 
 procedure DeinitializeSetup;

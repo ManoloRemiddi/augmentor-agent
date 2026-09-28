@@ -24,27 +24,31 @@ Latest native evidence:
   fixture publication corrects the observed readiness-file sharing race without
   changing the authenticated handoff or extending timeouts.
 - [Full application at 6890375](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36398267417):
-  x64 now passes initial install/browser/login identity, live-draft refusal,
+  both CPUs now pass initial install/browser/login identity, live-draft refusal,
   same-build repair/relaunch, actual installed graph drain and coordinated apply,
   full payload digest/local Qt health verification and journal archival. Disabled
   login startup remains disabled. Custom-path and redirected-tree refusals also
   pass. Final normal uninstall is incorrectly refused after restoring the fixture
-  browser manifest. ARM64 is still running. This is same-build application, not
+  browser manifest on both CPUs. This is same-build application, not
   N-to-N+1 or rollback, and complete uninstall is not yet qualified.
 
-The small native test of the exact Inno application script reproduces refusal
-before any browser is configured: its unnamed registry-value inspection fails.
-The native helper rejected a NULL value-name pointer, but Pascal Script marshals
-an empty String that way and Windows defines it as the default registry value.
-Current source normalizes this representation to the empty name while preserving
-exact value/type/ownership checks. Native tests now explicitly cover default-value
-creation, foreign-value refusal and owned removal. At `df44e1c`, x64 passes these
-checks plus exact-template repair and removal without a browser. The next test
-starts reinstallation while the copied uninstaller still owns maintenance: the
-original EXE has already exited for self-deletion. Both installed proofs now use
-the existing owned-process adapter to observe the entire installer/remover range
-exiting naturally before inspection or reinstallation. Only failed disposable
-test cleanup may terminate that range. The complete sequence remains pending.
+[Native Inno at 8a3ff05](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36400951199)
+passes both CPUs, including the exact application script's repair/removal with no
+browser, edited-manifest refusal and owned browser cleanup. Default-value handling
+is corrected, and fixtures observe the complete copied remover exiting naturally.
+The [full application run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36400951137)
+is executing; its x64 prompt-client step has failed while installed qualification
+continues. Inspect its terminal logs separately; smaller tests do not waive it.
+The prior full `6890375` ARM64 artifact confirms the same repair/drain/apply/health
+and archival stages as x64, then the since-corrected normal-removal refusal.
+
+Current source adds the standard checked **Open Augmentor** finish option for
+interactive installation/repair. It releases native maintenance before launching
+the installed executable. Silent/coordinated application cannot reopen before
+independent health. A new test drives only its own real installer wizard, then
+requires entry through the actual lease-holding native launcher/private Python.
+The test uses a recording script, not the shared UI/DSH; full client acceptance
+remains separate. Native execution of this addition is pending.
 
 Current installer code records one owned browser anchor and optional per-user
 login entry, preserves disabled startup on repair/update, and removes only exact
@@ -57,7 +61,7 @@ The earlier full `ead355c` run fails same-build repair on both CPUs, after succe
 initial launch, live-draft preservation and corrected preview exit. Its native tree
 validator lacked extended paths; x64 contained 205 ordinary paths over 260 characters.
 The `6890375` fixture verifies the correction on a tree longer than 500 characters.
-The full x64 run above now verifies repaired payload behavior; ARM64 remains pending.
+The full x64 and ARM64 artifacts now verify repaired payload behavior.
 
 [Signed WinSparkle delivery](WINDOWS-UPDATE-DELIVERY.md) at `594b56d` passes
 [both native CPUs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36394998456):

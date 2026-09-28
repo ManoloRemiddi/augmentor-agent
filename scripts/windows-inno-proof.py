@@ -115,7 +115,7 @@ def main():
     winreg.DeleteKey(winreg.HKEY_CURRENT_USER,registration_key)
     template_spec=importlib.util.spec_from_file_location('application_template_proof', ROOT/'scripts/windows-application-template-proof.py')
     template=importlib.util.module_from_spec(template_spec);template_spec.loader.exec_module(template)
-    application_template=template.prove(out,args.arch,compiler/'ISCC.exe',payload/'AugmentorFixture.exe')
+    application_template=template.prove(out,args.arch,compiler/'ISCC.exe',payload/'AugmentorFixture.exe',runtime)
     installers = []
     for version in ('0.0.1', '0.0.2'):
         (payload/'fixture.json').write_text(json.dumps({'version':version, 'gate':str(gate)}))
