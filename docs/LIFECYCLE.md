@@ -272,9 +272,9 @@ proof of global Quit or an installation transaction.
 
 ### Voice companion admission
 
-The shared Resonant Voice 0.1.18 candidate exposes the same private reservation
+The shared Resonant Voice 0.1.19 candidate exposes the same private reservation
 vocabulary through its existing authenticated `/internal/maintenance` endpoint.
-Read its [versioned contract](https://github.com/ManoloRemiddi/resonant-voice/blob/7a6645ea27f55bdd18acbc22c2893a09bed58004/docs/PROTOCOL.md).
+Read its [versioned contract](https://github.com/ManoloRemiddi/resonant-voice/blob/7d0fd6d677ea4bbbca0183a6bb3a3d3f24a8147a/docs/PROTOCOL.md).
 Open/authenticating connections, unexpired connection tickets, accepted requests,
 speech synthesis and workers still exiting keep it busy. New work is rejected
 while prepared; expiry/cancel restores admission. Idle commit closes listeners

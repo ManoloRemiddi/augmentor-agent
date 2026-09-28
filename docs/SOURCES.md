@@ -272,3 +272,13 @@ cleanup. Native private-config and five maintenance tests pass on both CPUs in
 The archive and integrity lock are updated together for Linux/macOS/Windows; see
 the archive provenance above. Complete product coordination and physical speech
 acceptance remain separate gates; existing deployed speech placement is unchanged.
+
+## September 28 voice preference replacement qualification
+
+Current shared dependency is **Resonant Voice 0.1.19**, exact source
+`7d0fd6d677ea4bbbca0183a6bb3a3d3f24a8147a`. Its native x64/ARM64 configuration and
+maintenance checks pass in [36389214161](https://github.com/ManoloRemiddi/resonant-voice/actions/runs/36389214161),
+and the packed archive passes disposable DSH install/compose/remove. This fixes
+Windows ownership during automatic profile cloning/preferences. The shared lock
+and complete package select this same archive on all OSs. Assembled native graph
+drain/restart remains to be qualified with it; physical audio remains open.

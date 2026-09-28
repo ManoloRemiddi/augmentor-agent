@@ -4,6 +4,26 @@
 
 ## September 27 Windows implementation — active
 
+Current shared dependency is **Resonant Voice 0.1.19**, exact source
+`7d0fd6d677ea4bbbca0183a6bb3a3d3f24a8147a`. Its native x64/ARM64 configuration and
+maintenance checks pass in [36389214161](https://github.com/ManoloRemiddi/resonant-voice/actions/runs/36389214161),
+and the packed archive passes disposable DSH install/compose/remove. This fixes
+Windows ownership during automatic profile cloning/preferences. The shared lock
+and complete package select this same archive on all OSs. Assembled native graph
+drain/restart remains to be qualified with it; physical audio remains open.
+
+At `9cc54b1`, [Inno final-access qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36389318640)
+and [fast Windows desktop](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36389318570)
+pass both CPUs. Actual extracted Setup retains startup exclusion through
+coordinator exit/crash, acquires final installation access and refuses an
+additional lifetime holder. The fast run includes all 12 journal/coordinator
+tests. These are controlled fixtures, not an installed customer update. Continue
+product installer/backend wiring, independent recovery and the full feature ledger.
+No Windows customer release or personal deployment is made.
+
+The pending statuses below are historical checkpoints, superseded only by the
+specific results recorded above.
+
 Latest: shared update decision orchestration has five local fault-ordering tests
 with real durable journals/admission (12 combined update tests pass). Backend/UI
 wiring and independent recovery remain open. Full `2b1680d` x64 successfully
