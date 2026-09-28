@@ -4,10 +4,10 @@ from pathlib import Path
 import hashlib
 import json
 import os
+import secrets
 import shutil
 import stat
 import sysconfig
-import tempfile
 import winreg
 from .browser_identity import extension_origin
 from .private_files import atomic_json, read_json, require_directory
@@ -88,9 +88,11 @@ def prepare_extension(root, browser, *, key_path=INSTALL_KEY, keys=KEYS):
         if extension_files(destination,private=True) != files:
             raise ValueError('The prepared extension was edited. Its files were preserved.')
     else:
-        temporary = Path(tempfile.mkdtemp(prefix='.prepare-',dir=parent))
+        # tempfile's default Windows owner can be the Administrators group on
+        # an elevated token. Create the staging directory through the same
+        # explicit current-user/SYSTEM ACL adapter as persistent data.
+        temporary = private_directory(parent/('.prepare-'+secrets.token_hex(16)))
         try:
-            private_directory(temporary)
             for name,content in files.items():
                 file = temporary/name; private_directory(file.parent)
                 with os.fdopen(descriptor(file,writable=True,exclusive=True), 'wb') as stream:

@@ -83,6 +83,12 @@ anchors/host keys and a PE/resource browser fixture. Its execution is pending;
 local tests pass all five chooser flows, 16 Mac browser tests and 28 common window
 tests. Actual-browser and clean-installer acceptance remain distinct.
 
+The first native preparation run reaches a real ACL rejection: Windows' default
+temporary-directory owner can be the Administrators group under the hosted token.
+Preparation now creates its random staging directory with the explicit private
+directory adapter instead. It does not weaken ownership checks or rewrite an
+existing directory's ACL. Native preparation must rerun after this correction.
+
 Installer anchor wiring, registry views and fork lookup locations still need
 actual-browser tests; do not infer them from browser profile directories.
 Preserve the shared chooser/instruction flow and verify an actual
