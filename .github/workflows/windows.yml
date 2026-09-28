@@ -30,7 +30,7 @@ jobs:
           - os: windows-11-arm
             arch: arm64
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 35
+    timeout-minutes: 50
     defaults:
       run:
         shell: pwsh
@@ -134,6 +134,10 @@ jobs:
           QSG_RHI_PREFER_SOFTWARE_RENDERER: '1'
         run: |
           & outputs/payload/python/python.exe -I -Xutf8 -B scripts/windows-window-proof.py --launcher outputs/payload/Augmentor.exe --out outputs/evidence/bundled-desktop
+      - name: Install, repair and remove the actual shared application candidate
+        if: ${{ !cancelled() && steps.application.outcome == 'success' }}
+        run: |
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/windows-application-install-proof.py --root outputs/payload --arch ${{ matrix.arch }} --out outputs/installed-application
       - name: Install pinned build-time packaging tool
         if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
         id: packaging
@@ -149,6 +153,10 @@ jobs:
           path: |
             outputs/evidence/**
             outputs/payload/dsh/payload.json
+            outputs/installed-application/*.json
+            outputs/installed-application/*.log
+            outputs/installed-application/package/compile.log
+            outputs/installed-application/package/package.json
             outputs/installer-proof/*.json
             outputs/installer-proof/persistent/hooks.jsonl
           retention-days: 14

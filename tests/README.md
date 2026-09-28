@@ -264,3 +264,10 @@ The two-window render proof allows 15 seconds specifically for a one-shot PNG
 export, records its duration and verifies the success response/file signature.
 Its normal control timeout remains three seconds; capture is never replayed.
 The portable proof passes; corrected native graph/render assertions are pending.
+
+Windows full application packaging: `test_windows_package.py` checks build intake;
+`scripts/windows-application-install-proof.py` builds and installs the actual
+payload into compiled-in disposable paths, checks live Qt draft refusal, repair,
+redirect refusal and software-only removal with retained persistent data. Native
+execution is required; this does not establish signed update/rollback or physical
+hardware support. See [installer scope](../docs/WINDOWS-INSTALLER-DECISION.md#actual-application-installer-candidate).

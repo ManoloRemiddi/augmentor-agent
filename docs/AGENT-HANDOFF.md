@@ -4,6 +4,26 @@
 
 ## September 27 Windows implementation — active
 
+Current source builds an unsigned installer candidate from the actual staged
+shared app with `scripts/package-windows.py`. It uses one app identity, stable
+`current/Augmentor.exe`, bundled runtimes and a Start-menu shortcut. Native
+startup/lifetime exclusion now supports fresh installation, identical-build
+repair and removal. The remover copies its exact hash-bound helper to a temporary
+location, retaining both gates while deleting installed binaries. Existing
+redirected/hard-linked trees are refused; persistent data stays outside the
+installer tree. Manual cross-build replacement is intentionally unavailable until
+the coordinated update/recovery path is connected.
+
+Three portable build-intake checks cover wrong CPU/public metadata, incomplete
+payloads and source-link refusal. New full-payload installation, native Qt preview,
+live-draft maintenance refusal, repair/relaunch, path refusal and uninstall/data
+preservation assertions are scheduled on both native CPUs; execution is pending.
+Qualification has compiled-in disposable paths and uses Server build 26100 only
+for the hosted x64 runner; the normal candidate minimum remains Windows 11 25H2
+build 26200. This is not signed/public delivery or ordinary-user/physical testing.
+Login integration, browser-registration removal, product N-to-N+1, recovery and
+rollback remain open alongside the feature ledger.
+
 Current shared dependency is **Resonant Voice 0.1.19**, exact source
 `7d0fd6d677ea4bbbca0183a6bb3a3d3f24a8147a`. Its native x64/ARM64 configuration and
 maintenance checks pass in [36389214161](https://github.com/ManoloRemiddi/resonant-voice/actions/runs/36389214161),

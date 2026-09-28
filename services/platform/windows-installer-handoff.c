@@ -15,8 +15,11 @@ static HANDLE channel = INVALID_HANDLE_VALUE, startup = INVALID_HANDLE_VALUE;
 static HANDLE runtime = INVALID_HANDLE_VALUE, coordinator = NULL;
 static HANDLE installation = INVALID_HANDLE_VALUE;
 static BOOL authorized = FALSE;
+static AugmentorLease manual = {INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE,
+    INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE};
 
 __declspec(dllexport) void WINAPI AugmentorHandoffClose(void) {
+    augmentor_release(&manual);
     if (channel != INVALID_HANDLE_VALUE) CloseHandle(channel);
     if (installation != INVALID_HANDLE_VALUE) CloseHandle(installation);
     if (coordinator) CloseHandle(coordinator);
@@ -168,4 +171,79 @@ done:
     if (file != INVALID_HANDLE_VALUE) CloseHandle(file);
     if (token) CloseHandle(token); free(identity);
     return ok;
+}
+
+/* Fresh install, same-build repair and uninstall have no running coordinator.
+ * Acquire the same private startup/lifetime gates natively, before replacement.
+ * No command line can turn an authenticated handoff into a manual fallback. */
+__declspec(dllexport) BOOL WINAPI AugmentorMaintenancePrepare(const wchar_t *qualification) {
+    if (startup != INVALID_HANDLE_VALUE || coordinator || authorized ||
+            manual.file != INVALID_HANDLE_VALUE) return FALSE;
+    const wchar_t *base = NULL;
+    if (qualification && qualification[0]) {
+#ifdef AUGMENTOR_DEVELOPMENT_CANDIDATE
+        base = qualification;
+#else
+        return FALSE;
+#endif
+    }
+    return augmentor_acquire_mode(&manual, base, TRUE);
+}
+
+/* Never traverse an existing redirect during application replacement/removal.
+ * This is path validation, not protection against a malicious same-user writer.
+ * Maintenance gates already exclude cooperating Augmentor writers. */
+static BOOL plain_tree(const wchar_t *directory, unsigned depth, unsigned *remaining) {
+    if (depth > 128 || !*remaining) return FALSE;
+    wchar_t *path = malloc(32768 * sizeof(wchar_t));
+    WIN32_FIND_DATAW found; HANDLE search = INVALID_HANDLE_VALUE;
+    BOOL ok = FALSE;
+    if (!path || swprintf_s(path, 32768, L"%ls\\*", directory) < 0) goto done;
+    search = FindFirstFileW(path, &found);
+    if (search == INVALID_HANDLE_VALUE) {
+        ok = GetLastError() == ERROR_FILE_NOT_FOUND;
+        goto done;
+    }
+    do {
+        if (!wcscmp(found.cFileName, L".") || !wcscmp(found.cFileName, L"..")) continue;
+        if (!*remaining || found.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT ||
+                swprintf_s(path, 32768, L"%ls\\%ls", directory, found.cFileName) < 0) goto done;
+        --*remaining;
+        if (found.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+            if (!plain_tree(path, depth + 1, remaining)) goto done;
+        } else {
+            HANDLE file = CreateFileW(path, FILE_READ_ATTRIBUTES, FILE_SHARE_READ | FILE_SHARE_WRITE,
+                NULL, OPEN_EXISTING, FILE_FLAG_OPEN_REPARSE_POINT, NULL);
+            if (file == INVALID_HANDLE_VALUE) goto done;
+            BY_HANDLE_FILE_INFORMATION info;
+            BOOL valid = GetFileType(file) == FILE_TYPE_DISK && GetFileInformationByHandle(file, &info) &&
+                info.nNumberOfLinks == 1 && !(info.dwFileAttributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT));
+            CloseHandle(file);
+            if (!valid) goto done;
+        }
+    } while (FindNextFileW(search, &found));
+    ok = GetLastError() == ERROR_NO_MORE_FILES;
+done:
+    if (search != INVALID_HANDLE_VALUE) FindClose(search);
+    free(path); return ok;
+}
+
+__declspec(dllexport) BOOL WINAPI AugmentorMaintenancePath(const wchar_t *directory) {
+    if ((!authorized && manual.file == INVALID_HANDLE_VALUE) || !directory) return FALSE;
+    wchar_t path[32768];
+    DWORD length = GetFullPathNameW(directory, 32768, path, NULL);
+    if (!length || length >= 32768 || path[1] != L':' || path[2] != L'\\' || wcschr(path + 2, L':')) return FALSE;
+    BOOL exists = TRUE;
+    for (DWORD i = 3; i <= length; ++i) {
+        if (i < length && path[i] != L'\\') continue;
+        wchar_t saved = path[i]; path[i] = 0;
+        DWORD attributes = GetFileAttributesW(path), error = GetLastError();
+        path[i] = saved;
+        if (attributes == INVALID_FILE_ATTRIBUTES) {
+            if (error != ERROR_FILE_NOT_FOUND && error != ERROR_PATH_NOT_FOUND) return FALSE;
+            exists = FALSE;
+        } else if (attributes & FILE_ATTRIBUTE_REPARSE_POINT || !(attributes & FILE_ATTRIBUTE_DIRECTORY)) return FALSE;
+    }
+    unsigned remaining = 250000;
+    return !exists || plain_tree(path, 0, &remaining);
 }

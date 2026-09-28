@@ -98,7 +98,7 @@ static HANDLE augmentor_private_directory(const wchar_t *path, PSID user,
 
 /* qualification is supplied only by a development-candidate build. Its existing
  * private root is verified, never created or inferred from environment values. */
-static BOOL augmentor_acquire(AugmentorLease *lease, const wchar_t *qualification) {
+static BOOL augmentor_acquire_mode(AugmentorLease *lease, const wchar_t *qualification, BOOL maintenance) {
     HANDLE token = NULL;
     TOKEN_USER *identity = NULL;
     wchar_t *sid = NULL;
@@ -137,27 +137,30 @@ static BOOL augmentor_acquire(AugmentorLease *lease, const wchar_t *qualificatio
             !ConvertStringSecurityDescriptorToSecurityDescriptorW(sddl, SDDL_REVISION_1, &security, NULL))
         goto done;
     attributes.lpSecurityDescriptor = security;
-    lease->file = CreateFileW(file, GENERIC_READ | GENERIC_WRITE,
-        FILE_SHARE_READ | FILE_SHARE_WRITE, &attributes, OPEN_ALWAYS,
-        FILE_FLAG_OPEN_REPARSE_POINT, NULL);
-    if (lease->file == INVALID_HANDLE_VALUE) goto done;
-    BY_HANDLE_FILE_INFORMATION info;
-    if (!GetFileInformationByHandle(lease->file, &info) || info.nNumberOfLinks != 1 ||
-            info.dwFileAttributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT) ||
-            !augmentor_private_descriptor(lease->file, identity->User.Sid)) goto done;
-    OVERLAPPED overlap = {0};
-    if (!LockFileEx(lease->file, LOCKFILE_FAIL_IMMEDIATELY, 0, 1, 0, &overlap)) goto done;
-    /* Shared startup readers exclude the coordinator's writer until each
-     * launch publishes its authenticated control endpoint. A writer in turn
-     * excludes new readers. This separate file can remain held by an inherited
-     * installer handle while installation.lock becomes wholly exclusive. */
+    /* Always acquire the short startup gate before installation access. This
+     * same order serves a manual installer/remover and every native launcher.
+     * Maintenance never waits for or stops active work: either both exclusive
+     * gates are available now, or all acquired handles are released. */
     if (swprintf_s(file, 32768, L"%ls\\startup.lock", run) < 0) goto done;
-    lease->startup = CreateFileW(file, GENERIC_READ, FILE_SHARE_READ,
-        &attributes, OPEN_ALWAYS, FILE_FLAG_OPEN_REPARSE_POINT, NULL);
+    lease->startup = CreateFileW(file, maintenance ? GENERIC_READ | GENERIC_WRITE : GENERIC_READ,
+        maintenance ? 0 : FILE_SHARE_READ, &attributes, OPEN_ALWAYS,
+        FILE_FLAG_OPEN_REPARSE_POINT, NULL);
+    BY_HANDLE_FILE_INFORMATION info;
     if (lease->startup == INVALID_HANDLE_VALUE ||
             !GetFileInformationByHandle(lease->startup, &info) || info.nNumberOfLinks != 1 ||
             info.dwFileAttributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT) ||
             !augmentor_private_descriptor(lease->startup, identity->User.Sid)) goto done;
+    if (swprintf_s(file, 32768, L"%ls\\installation.lock", run) < 0) goto done;
+    lease->file = CreateFileW(file, GENERIC_READ | GENERIC_WRITE,
+        maintenance ? 0 : FILE_SHARE_READ | FILE_SHARE_WRITE, &attributes, OPEN_ALWAYS,
+        FILE_FLAG_OPEN_REPARSE_POINT, NULL);
+    if (lease->file == INVALID_HANDLE_VALUE ||
+            !GetFileInformationByHandle(lease->file, &info) || info.nNumberOfLinks != 1 ||
+            info.dwFileAttributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT) ||
+            !augmentor_private_descriptor(lease->file, identity->User.Sid)) goto done;
+    OVERLAPPED overlap = {0};
+    if (!LockFileEx(lease->file, LOCKFILE_FAIL_IMMEDIATELY |
+            (maintenance ? LOCKFILE_EXCLUSIVE_LOCK : 0), 0, 1, 0, &overlap)) goto done;
     accepted = TRUE;
 done:
     if (security) LocalFree(security);
@@ -166,5 +169,8 @@ done:
     if (token) CloseHandle(token);
     if (!accepted) augmentor_release(lease);
     return accepted;
+}
+static BOOL augmentor_acquire(AugmentorLease *lease, const wchar_t *qualification) {
+    return augmentor_acquire_mode(lease, qualification, FALSE);
 }
 #endif
