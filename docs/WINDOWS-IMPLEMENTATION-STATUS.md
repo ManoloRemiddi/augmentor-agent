@@ -12,7 +12,9 @@ corrected bootstrap token and actual compiled desktop/DSH maintenance paths.
 The separate voice 0.1.18 candidate passes native configuration and maintenance
 on both CPUs. Background-owner reservation and complete Windows Job drain pass
 both native fast desktop jobs at `303a619`; its full runtime run is pending.
-Current source adds kernel-verified window discovery, awaiting native execution.
+Window discovery passes both native fast jobs at `dc41a56`; compiled execution
+remains pending. Current source adds pre-Python native startup exclusion, with
+new compiled probes awaiting native execution.
 Installer backend is **Inno Setup/WinSparkle**; earlier Velopack
 candidate entries below are historical. Global coordination and full app release
 are not complete.
@@ -819,3 +821,12 @@ added and await execution. The client preserves stale files, refuses unknown
 builds/protocols and retains exact process observations without termination
 rights. Global discovery still needs the browser and owned companions, and a
 snapshot is not the startup fence or final exclusive installation lease.
+
+At `dc41a56`, [fast desktop run 36373391019](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36373391019)
+passes both native CPUs, including kernel-verified source-window discovery.
+Its full compiled run remains pending. A startup audit also identified private
+Python loading before the Python-level lifetime lock. New source moves native
+application/browser exclusion ahead of that load and retains it through process
+exit. New compiled probes cover actual exclusion, private path rejection and
+normal release; their native execution is pending. This does not complete the
+installer transaction or browser/companion coordination.

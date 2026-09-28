@@ -137,3 +137,11 @@ different build without changing either draft, and observes a normally exited
 process through its retained handle. The source and compiled proof exercise the
 same discovery client. This snapshot does not claim startup exclusion or a
 complete update transaction.
+
+`windows-launcher-lease-proof.py` builds the actual native launchers against a
+fresh disposable bootstrap runtime. Copied binaries without Python must refuse
+exclusive installation locks and invalid private paths before attempting to load
+the runtime. Separate embedded-Python fixture entrypoints verify both launchers
+hold the lease until normal exit. The full window proof reuses the negative cases
+and tests the assembled desktop's lifetime lease. No existing application root
+may be used for the fast probe; it refuses assembled payloads.

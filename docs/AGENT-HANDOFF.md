@@ -122,6 +122,13 @@ Continue browser/companion coordination and early native startup exclusion befor
 claiming global Quit or safe production installation. Preserve the draft PR and
 all remaining installer, feature-parity and physical acceptance gates.
 
+Source-window discovery passes both native fast jobs at `dc41a56`. New source
+closes the early native-entrypoint gap by acquiring a private lifetime lease
+before Python loads. Actual compiled positive/negative probes are added to the
+fast Windows workflow and full assembled window proof; execution is pending.
+The historical installer fixture stays distinct, and complete coordinated
+installation is still required. See the shell guide for the exact new boundary.
+
 ## September 27 Windows implementation plan — historical planning checkpoint
 
 The owner requested a detailed plan before coding. Read the

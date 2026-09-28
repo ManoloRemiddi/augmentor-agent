@@ -115,6 +115,12 @@ def build_launcher(payload, arch, *, name='Augmentor.exe'):
         raise RuntimeError('Standalone Python must include its matching C headers')
     with tempfile.TemporaryDirectory(prefix='launcher-build-', dir=payload) as temporary:
         resources = Path(temporary)
+        definitions = ''
+        if name != 'AugmentorFixture.exe':
+            release = json.loads((payload/'release.json').read_text(encoding='utf-8'))
+            definitions = '/DAUGMENTOR_LIFETIME_LEASE '
+            if release.get('customerDistribution') is False and release.get('qualificationStatus') == 'development-candidate':
+                definitions += '/DAUGMENTOR_DEVELOPMENT_CANDIDATE '
         compile_resource = resource_input = manifest_option = ''
         if name == 'Augmentor.exe':
             version = json.loads((payload/'release.json').read_text(encoding='utf-8'))['version']
@@ -125,10 +131,10 @@ def build_launcher(payload, arch, *, name='Augmentor.exe'):
             manifest_option = '/MANIFEST:NO '
         command = (f'call "{vcvars}" {"amd64_arm64" if arch == "arm64" else "amd64"} && '
             +compile_resource+
-            'cl /nologo /O2 /W4 /MT '+('/DAUGMENTOR_BROWSER_HOST ' if name == 'AugmentorBrowserHost.exe' else '')+
+            'cl /nologo /O2 /W4 /MT '+definitions+('/DAUGMENTOR_BROWSER_HOST ' if name == 'AugmentorBrowserHost.exe' else '')+
             f'/I"{include}" "{ROOT / "services/platform/windows-launcher.c"}" '
             f'/Fe:"{payload / name}" /Fo:"{payload / "launcher.obj"}" '+resource_input+
-            '/link /SUBSYSTEM:WINDOWS '+manifest_option+'user32.lib shell32.lib')
+            '/link /SUBSYSTEM:WINDOWS '+manifest_option+'user32.lib shell32.lib advapi32.lib')
         # list2cmdline would backslash-escape embedded quotes, which cmd.exe does
         # not understand. This is an explicitly constructed, validated shell line.
         subprocess.run('cmd.exe /d /s /c "'+command+'"', check=True)

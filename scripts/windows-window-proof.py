@@ -38,6 +38,7 @@ def main():
     report = {'passed': False, 'platform': sys.platform, 'scope': 'Two Qt preview processes and shared controls; no model, installed launcher or physical-keyboard proof.'}
     report['nativeLauncher'] = bool(args.launcher)
     if args.launcher:
+        import importlib.util
         import win32api
         import xml.etree.ElementTree as ET
         executable = str(args.launcher.resolve())
@@ -55,6 +56,9 @@ def main():
             assert struct.unpack_from('<HHH', icon) == (0, 1, 7)
             report['embeddedResources'] = {'version': release['version'], 'iconSizes': 7, 'elevation': 'asInvoker', 'dpi': 'PerMonitorV2'}
         finally: win32api.FreeLibrary(library)
+        spec = importlib.util.spec_from_file_location('native_lease_proof', ROOT/'scripts/windows-launcher-lease-proof.py')
+        lease_proof = importlib.util.module_from_spec(spec); spec.loader.exec_module(lease_proof)
+        report['earlyNativeLease'] = lease_proof.prove(args.launcher.resolve().parent, work)
     def command(name, value):
         with LocalSocket() as peer:
             peer.settimeout(3); peer.connect(str(Path(env['XDG_RUNTIME_DIR'])/(ipc_basename(name)+'.sock')))
@@ -93,6 +97,7 @@ def main():
             children.append(subprocess.Popen(arguments(name), env=env, stdin=subprocess.DEVNULL,
                 stdout=log, stderr=log, **options))
         initial = {name: wait_for(lambda: inspect(name)) for name in ('main','secondary')}
+        if args.launcher: lease_proof.assert_held(env['XDG_RUNTIME_DIR'])
         report['initial'] = initial
         assert [initial[name]['pid'] for name in ('main','secondary')] == [child.pid for child in children], 'The desktop left its native launch process.'
         assert initial['main']['pid'] != initial['secondary']['pid']

@@ -13,6 +13,9 @@
 #include <wchar.h>
 #include <io.h>
 #include <fcntl.h>
+#ifdef AUGMENTOR_LIFETIME_LEASE
+#include "windows-lease.h"
+#endif
 
 #ifndef AUGMENTOR_SCRIPT
 #ifdef AUGMENTOR_BROWSER_HOST
@@ -36,6 +39,24 @@ static int failure(const wchar_t *message) {
 
 int WINAPI wWinMain(HINSTANCE instance, HINSTANCE previous, PWSTR command, int show) {
     (void)instance; (void)previous; (void)command; (void)show;
+    int argc = 0;
+    wchar_t **argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+    if (!argv || argc < 1) return failure(L"Cannot read launch arguments.");
+#ifdef AUGMENTOR_LIFETIME_LEASE
+    const wchar_t *qualification = NULL;
+#ifdef AUGMENTOR_DEVELOPMENT_CANDIDATE
+    if (argc >= 3 && !wcscmp(argv[1], L"--qualification-root")) qualification = argv[2];
+#endif
+    AugmentorLease lease;
+    if (!augmentor_acquire(&lease, qualification)) {
+        LocalFree(argv);
+        /* Disposable CI launches cannot leave an unattended modal dialog. */
+        if (!qualification) failure(L"Augmentor cannot start during installation maintenance or with invalid private application data. Finish maintenance or repair the installation, then try again.");
+        return 73;
+    }
+    /* Retain through CPython finalization and process exit. The OS also releases
+     * the lease on a crash; no stale marker blocks the next startup. */
+#endif
 #ifdef AUGMENTOR_BROWSER_HOST
     /* Native messaging is a binary length-prefixed protocol, never console text. */
     if (_fileno(stdin) < 0 || _fileno(stdout) < 0 ||
@@ -72,9 +93,6 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE previous, PWSTR command, int s
     LOAD(void, PyConfig_Clear, (PyConfig *));
     LOAD(int, PyStatus_Exception, (PyStatus));
     LOAD(int, Py_RunMain, (void));
-    int argc = 0;
-    wchar_t **argv = CommandLineToArgvW(GetCommandLineW(), &argc);
-    if (!argv || argc < 1) return failure(L"Cannot read launch arguments.");
     wchar_t **args = calloc((size_t)argc, sizeof(wchar_t *));
     if (!args) { LocalFree(argv); return failure(L"Not enough memory to start."); }
     args[0] = script;

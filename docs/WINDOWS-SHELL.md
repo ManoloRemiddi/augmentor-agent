@@ -179,3 +179,34 @@ Owner reservation and full Job drain additionally pass both CPUs at `303a619`
 in [desktop run 36372703256](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36372703256).
 These remain hosted component tests, not a finished customer installer or
 physical keyboard/browser acceptance.
+
+## Native startup lifetime lease
+
+The application and browser executables now acquire the existing installation
+lease before loading private Python or Qt. The native helper reads the current
+Windows token and OS Local AppData path, creates protected current-user/SYSTEM
+objects, and validates existing ownership, ACLs, reparse points and hard links
+without repairing unfamiliar data. Owned directory and file handles stay open
+through Python finalization and process exit. Its shared byte-zero lock excludes
+Python maintenance; its shared file handle also excludes Inno's no-sharing gate.
+No new persistent maintenance marker can remain after a crash.
+
+Only builds explicitly marked as development candidates compile support for the
+existing `--qualification-root` switch. They require an existing private root,
+and return early-refusal code 73 without a modal dialog for disposable launches.
+Customer builds use OS-owned paths. The historical installer fixture executable
+retains its separate fixture gate; it is not the application launcher.
+
+The new compiled probe tests both executables without a runtime beside their
+copies, proving refusal precedes Python loading. It covers byte/no-sharing
+exclusion, hard links, unchanged broad ACLs and junction targets. Positive
+embedded-Python fixtures hold the lease through their work and release it on
+normal exit. The full compiled window proof additionally checks the real app's
+lease while both windows run. Native execution of these additions is pending.
+
+This closes early native-entrypoint loading, not all update coordination: direct
+companion interpreters remain covered by their owning process ranges and Python
+leases. Global startup reservation, browser participation, independent apply,
+recovery and production installer integration remain required. Implementation
+follows [Microsoft's file-lock contract](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-lockfileex)
+and [handle-based security inspection](https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-getsecurityinfo).

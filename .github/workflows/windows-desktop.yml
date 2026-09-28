@@ -8,8 +8,11 @@ on:
       - 'apps/native/**'
       - 'services/platform_adapters/**'
       - 'services/lifecycle/**'
+      - 'services/platform/**'
       - 'services/windows_supervisor.py'
       - 'scripts/windows-window-proof.py'
+      - 'scripts/windows-launcher-lease-proof.py'
+      - 'scripts/build-windows-launcher.py'
       - 'scripts/windows-desktop-proof.py'
       - 'scripts/bootstrap-windows.py'
       - 'tests/**'
@@ -95,6 +98,13 @@ jobs:
           & outputs/payload/python/python.exe -Xutf8 -B scripts/windows-desktop-proof.py --out outputs/evidence
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B scripts/windows-window-proof.py --out outputs/evidence
+      - name: Qualify native startup exclusion before loading Python
+        if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          & outputs/payload/python/python.exe -Xutf8 -B scripts/windows-launcher-lease-proof.py --runtime outputs/payload --arch ${{ matrix.arch }} --out outputs/evidence
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
