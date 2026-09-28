@@ -17,14 +17,14 @@ const turnOn='mcp__homeassistant__intent__HassTurnOn';
 const args={name:'Test Lamp',domain:['input_boolean']};
 const tool=(name,arguments_,id)=>({role:'assistant',tool_calls:[{index:0,id,type:'function',function:{name,arguments:JSON.stringify(arguments_)}}]});
 const answer=text=>({role:'assistant',content:text});
-async function fixture(t,replies,{failWrite=false,writeResult,writeDelayMs=0,requestTimeoutMs=10000}={}) {
+async function fixture(t,replies,{failWrite=false,writeResult,onWrite,requestTimeoutMs=10000}={}) {
   const stateDir=mkdtempSync(join(tmpdir(),'home-runtime-')),ledger=new Ledger(join(stateDir,'actions.sqlite3'));
   let writes=0,requests=[];const peers=new Set();
   const mcp=createServer(async(req,res)=>{
     const server=new Server({name:'fixture',version:'1'},{capabilities:{tools:{}}});
     server.setRequestHandler(ListToolsRequestSchema,async()=>({tools:['homeassistant__GetLiveContext','intent__HassTurnOn','intent__HassTurnOff','intent__HassLightSet','intent__HassUnlock'].map(name=>({name,description:name,inputSchema:{type:'object',properties:{name:{type:'string'},domain:{type:'array',items:{type:'string'}}}}}))}));
     server.setRequestHandler(CallToolRequestSchema,async r=>{
-      if(r.params.name!=='homeassistant__GetLiveContext'){writes++;if(writeDelayMs)await new Promise(r=>setTimeout(r,writeDelayMs));if(failWrite)return {isError:true,content:[{type:'text',text:'Connection lost after dispatch'}]};}
+      if(r.params.name!=='homeassistant__GetLiveContext'){writes++;await onWrite?.();if(failWrite)return {isError:true,content:[{type:'text',text:'Connection lost after dispatch'}]};}
       return {content:[{type:'text',text:JSON.stringify(r.params.name==='homeassistant__GetLiveContext'?{success:true,result:writes?'Test Lamp on':'Test Lamp off'}:writeResult??{response_type:'action_done',data:{success:[{name:'Test Lamp',type:'entity',id:'input_boolean.test_lamp'}],failed:[]}})}]};
     });
     const transport=new StreamableHTTPServerTransport({sessionIdGenerator:undefined});peers.add(server);
@@ -71,11 +71,23 @@ test('unadvertised administrative tools and unsafe domains are denied before MCP
   await h.runtime.ask('one','household','Unlock the door');assert.equal(h.writes(),0);
 });
 
- test('deadline cancellation after dispatch latches uncertainty and does not replay',async t=>{
-  const h=await fixture(t,n=>n===1?tool(turnOn,args,'slow'):answer('Stopped.'),{writeDelayMs:250,requestTimeoutMs:100});
-  const start=Date.now();
-  const result=await h.runtime.ask('deadline','home','Turn on test');
-  assert.equal(result.status,'incomplete');assert.ok(Date.now()-start<2000);
+ test('deadline cancellation after dispatch latches uncertainty and does not replay',{timeout:10000},async t=>{
+  const dispatched=Promise.withResolvers(),response=Promise.withResolvers();
+  const h=await fixture(t,n=>n===1?tool(turnOn,args,'slow'):n===2?tool(turnOn,args,'must-not-repeat'):answer('Inspect the previous action.'),{
+    onWrite:()=>{dispatched.resolve();return response.promise;},requestTimeoutMs:100
+  });
+  // Advance the deadline only after the real MCP server receives the mutation.
+  // Wall-clock speed must not turn this into a before-dispatch cancellation test.
+  t.mock.timers.enable({apis:['setTimeout']});
+  try {
+    const request=h.runtime.ask('deadline','home','Turn on test');
+    await dispatched.promise;
+    t.mock.timers.tick(100);
+    const result=await request;
+    assert.equal(result.status,'incomplete');assert.equal(result.reason,'Request deadline exceeded');
+    assert.equal(h.writes(),1);assert.equal(h.ledger.pending()[0].status,'unknown');
+  } finally {response.resolve();t.mock.timers.reset();}
+  await h.runtime.ask('retry','home','Try again');
   assert.equal(h.writes(),1);assert.equal(h.ledger.pending()[0].status,'unknown');
 });
 
