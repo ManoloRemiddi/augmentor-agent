@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-"""Build/install two disposable Velopack versions, update and remove them."""
+"""Historical rejected-Velopack characterization; requires its archived runtime."""
 import argparse
 import json
 import os
@@ -41,6 +41,8 @@ def main():
     args = parser.parse_args()
     assert sys.platform == 'win32'
     out, runtime = args.out.resolve(), args.runtime.resolve()
+    if not (runtime/'python/Lib/site-packages/velopack').is_dir():
+        parser.error('Historical fixture: use the Velopack runtime lock at 805664f. Current packages use Inno/WinSparkle.')
     if out.exists() and any(out.iterdir()):
         parser.error('Choose a new empty proof directory')
     out.mkdir(parents=True, exist_ok=True)

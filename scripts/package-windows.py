@@ -34,7 +34,8 @@ def candidate(root, arch):
             not re.fullmatch('[a-f0-9]{40}', release.get('sourceCommit', ''))):
         raise ValueError('Use a staged native development candidate. Public delivery is not enabled.')
     for name in ('Augmentor.exe', 'AugmentorBrowserHost.exe', 'python/python.exe',
-                 'node/node.exe', 'powershell/pwsh.exe', 'dsh/payload.json', 'scripts/launch-windows.py'):
+                 'node/node.exe', 'powershell/pwsh.exe', 'updater/WinSparkle.dll',
+                 'dsh/payload.json', 'scripts/launch-windows.py'):
         if not (root/name).is_file(): raise ValueError('Incomplete shared application payload: '+name)
     # Inno follows source links when collecting payload. Reject them before
     # compilation rather than distributing files from outside the staged tree.

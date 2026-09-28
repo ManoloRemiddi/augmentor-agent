@@ -7,6 +7,13 @@ Inno remains the installer and WinSparkle 0.9.4 remains the downloader and updat
 notification framework. See [installer ownership](WINDOWS-INSTALLER-DECISION.md)
 and [the shared coordinator](LIFECYCLE.md). No package is executed by this layer.
 
+Bootstrap now includes the hash-pinned native WinSparkle DLL and license notices
+for each CPU. Its staged manifest records that customer checks are disabled.
+The runtime proof inspects its PE architecture, checks its digest and loads the
+actual DLL without initializing checks. The rejected Velopack dependency is no
+longer in the app runtime; historical fixtures require the archived lock at
+`805664f`. These new payload changes await native execution.
+
 ## Trust and compatibility boundary
 
 `services/lifecycle/release_bundle.py` verifies a handled WinSparkle download before

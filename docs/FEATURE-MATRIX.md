@@ -86,6 +86,7 @@ the [full plan](WINDOWS-IMPLEMENTATION-PLAN.md) for required completion gates.
 | Prompt/memory services | Shared private clients, service ownership, reservations and observed drain pass | Windows memory engine provisioning and full memory quality/features |
 | Coordinated shutdown | Actual window/DSH/voice/companions/owner graph drain and restart pass at `f950a45` | Product apply/recovery integration and user-facing update flow |
 | Installer | Independent authenticated Inno handoff/final-access fixtures pass; real full-payload installer built in source | New install/repair/removal and same-build coordinator proof executing; signing, N-to-N+1 and rollback open |
+| Update delivery | Signed manifest and private installer staging pass 11 local real-crypto/storage checks | Native WinSparkle ZIP callback and bundled-DLL qualification executing; trust provisioning and product UI/apply wiring open |
 | Desktop actions, Home and Pi | Shared interfaces retained | Required Windows adapters and full end-to-end parity remain open |
 | RTX Spark N1X | Native ARM64 dependency preparation | Target hardware/driver/graphics/inference evidence |
 

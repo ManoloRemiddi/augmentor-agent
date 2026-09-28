@@ -282,3 +282,13 @@ and the packed archive passes disposable DSH install/compose/remove. This fixes
 Windows ownership during automatic profile cloning/preferences. The shared lock
 and complete package select this same archive on all OSs. Assembled native graph
 drain/restart remains to be qualified with it; physical audio remains open.
+
+## Windows selected updater runtime, September 28
+
+The Windows candidate now bundles hash-pinned WinSparkle 0.9.4 from
+`release/windows/installer-candidates.json`, including x64/ARM64 DLLs and license
+notices. The previously rejected Velopack 1.2.158 Python package is removed from
+both runtime locks; historical characterization uses the archived `805664f` lock.
+The selected Inno 7.1.0/WinSparkle fixtures were qualified earlier; this actual
+application payload addition still requires native qualification. Customer update
+checks remain disabled. See [signed update delivery](WINDOWS-UPDATE-DELIVERY.md).

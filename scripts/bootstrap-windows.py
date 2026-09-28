@@ -46,6 +46,23 @@ def extract_zip(archive, destination):
         bundle.extractall(destination)
 
 
+def stage_updater(out, cache, arch):
+    """Bundle the selected native updater and its notices, without initializing it."""
+    pins = json.loads((ROOT/'release/windows/installer-candidates.json').read_text())['winsparkle']
+    archive = download(pins, cache)
+    updater, notices = out/'updater', out/'licenses/winsparkle'
+    updater.mkdir(); notices.mkdir(parents=True, exist_ok=True)
+    prefix = 'WinSparkle-'+pins['version']+'/'
+    with zipfile.ZipFile(archive) as bundle:
+        binary = bundle.read(prefix+('ARM64' if arch == 'arm64' else 'x64')+'/Release/WinSparkle.dll')
+        (updater/'WinSparkle.dll').write_bytes(binary)
+        for name in ('COPYING', 'COPYING.expat', 'AUTHORS'):
+            (notices/name).write_bytes(bundle.read(prefix+name))
+    (updater/'manifest.json').write_text(json.dumps({'version':pins['version'],
+        'archiveSha256':pins['sha256'],'dllSha256':hashlib.sha256(binary).hexdigest(),
+        'target':'windows-'+arch,'customerUpdatesEnabled':False},indent=2)+'\n',encoding='utf-8')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--arch', choices=('x64', 'arm64'), required=True)
@@ -57,6 +74,8 @@ def main():
     target = config['targets'][args.arch]
     args.cache.mkdir(parents=True, exist_ok=True)
     archives = {name: download(item, args.cache) for name, item in target.items()}
+    updater = json.loads((ROOT/'release/windows/installer-candidates.json').read_text())['winsparkle']
+    archives['updater'] = download(updater, args.cache)
     if args.download_only:
         print(json.dumps({'downloaded': list(archives), 'arch': args.arch}))
         return
@@ -68,6 +87,7 @@ def main():
     if out.exists() and any(out.iterdir()):
         parser.error('Choose a new empty runtime directory')
     out.mkdir(parents=True, exist_ok=True)
+    stage_updater(out, args.cache, args.arch)
     with tarfile.open(archives['python']) as bundle:
         bundle.extractall(out, filter='data')
     extract_zip(archives['node'], out)

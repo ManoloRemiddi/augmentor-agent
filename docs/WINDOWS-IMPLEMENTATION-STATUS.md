@@ -4,6 +4,10 @@
 
 ## Windows implementation — active, September 28
 
+Windows staging now bundles native WinSparkle 0.9.4 and its license notices; the
+rejected Velopack Python dependency is removed. New native payload/import tests
+are pending. Customer update initialization remains disabled.
+
 Current addition: the [signed release metadata boundary](WINDOWS-UPDATE-DELIVERY.md)
 passes 11 new real-crypto/private-storage tests (27 combined update checks).
 It verifies release identity and retains exact installer bytes before preparation.
@@ -25,8 +29,8 @@ and [Inno fixture](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs
 checks pass. The fast run includes all 16 journal/coordinator checks on both CPUs.
 Full [805 qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36392632237)
 passes assembled DSH/voice, desktop Send/Enter/history, observed graph drain and
-browser commit on x64, but its installed-app test fails shortcut argument readback.
-ARM64 is still running. Current source constructs shortcut quoting inside the
+browser commit on both CPUs, but both installed-app tests fail shortcut argument
+readback. Current source constructs shortcut quoting inside the
 installer script and records actual arguments on failure; new native execution
 is required. The stable application registration name now passes.
 

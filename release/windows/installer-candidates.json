@@ -1,6 +1,6 @@
 {
   "schema": "augmentor-windows-installer-candidates/1",
-  "scope": "Disposable feasibility only; no production selection",
+  "scope": "Selected Inno/WinSparkle backend; customer delivery requires remaining product qualification and publisher trust.",
   "inno": {
     "version": "7.1.0",
     "url": "https://github.com/jrsoftware/issrc/releases/download/is-7_1_0/innosetup-7.1.0-x64.exe",

@@ -51,7 +51,6 @@ def main():
     import sounddevice as sd
     import yaml
     import websocket
-    import velopack
     import win32security
     import win32pipe
     from PySide6.QtCore import qVersion
@@ -77,10 +76,15 @@ def main():
         '[ordered]@{version=$PSVersionTable.PSVersion.ToString(); arch=[System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture.ToString()} | ConvertTo-Json -Compress'], text=True))
     assert shell['version'] == config['powershell'] and shell['arch'].lower() == args.arch
     binaries = {}
-    for name in ('python/python.exe', 'python/python313.dll', 'node/node.exe', 'powershell/pwsh.exe'):
+    for name in ('python/python.exe', 'python/python313.dll', 'node/node.exe', 'powershell/pwsh.exe', 'updater/WinSparkle.dll'):
         machine = pe_machine(root/name)
         assert machine == expected, name
         binaries[name] = hex(machine)
+    import hashlib
+    updater = json.loads((root/'updater/manifest.json').read_text())
+    assert updater['target'] == 'windows-'+args.arch and updater['customerUpdatesEnabled'] is False
+    assert hashlib.sha256((root/'updater/WinSparkle.dll').read_bytes()).hexdigest() == updater['dllSha256']
+    ctypes.CDLL(str(root/'updater/WinSparkle.dll'))  # Load native dependencies, without starting checks/UI.
     # All loaded GUI/array/audio/FFI wheels must be target-native. Inventory the
     # entire Python native payload as well, including plugins not yet loaded.
     for path in (root/'python/Lib/site-packages').rglob('*'):
@@ -93,7 +97,7 @@ def main():
         'os': platform.platform(), 'windowsVersion': list(sys.getwindowsversion()),
         'python': platform.python_version(), 'qt': qVersion(), 'node': node, 'powershell': shell,
         'nativeProcess': True, 'numpyComputation': True, 'onnxImport': True,
-        'portAudioLoaded': True, 'qtWidgetRendered': True, 'binaryMachines': binaries,
+        'portAudioLoaded': True, 'qtWidgetRendered': True, 'nativeUpdaterLoaded': True, 'binaryMachines': binaries,
         'limits': ['No physical audio, D3D flare, consumer install, provider or RTX hardware qualification.']}
     args.out.write_text(json.dumps(report, indent=2)+'\n')
     print(json.dumps({key: value for key, value in report.items() if key != 'binaryMachines'}))
