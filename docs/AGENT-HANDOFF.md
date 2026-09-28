@@ -2,6 +2,13 @@
 
 # Start here: agent handoff
 
+## September 28 task reliability correction
+
+[Task reliability](TASK-RELIABILITY.md) owns binary tool-evidence protection,
+changed-command error checkpoints, bounded recovery reassessment and restored
+effective-reasoning visibility. Model/GPU settings are preserved. Read the guide
+for fixture versus real-model evidence and installed adoption boundaries.
+
 ## September 27 installed Chromium browser choice
 
 [Browser choice qualification](MACOS-BROWSER-CHOICE.md) records the generic Mac

@@ -2,6 +2,10 @@
 
 # Tool context budget
 
+The [September 28 reliability correction](TASK-RELIABILITY.md) extends this adapter
+with binary-evidence protection and advisory changed-command/progress checkpoints.
+The following original pruning contract remains in force.
+
 Augmentor's personal DSH presets now prune oversized tool-result text at each
 step boundary, before the next model request. This uses DSH 0.1.5-rc.1's existing
 `toolResultPruner` service and its configured head/tail budgets, independently of

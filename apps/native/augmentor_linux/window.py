@@ -762,12 +762,8 @@ class Window(QWidget):
             if text==self.pending_prompt:self.pending_prompt=None
             self.messages.append(('You',text));return True
         if kind=='command/done':
-            # Hide only the routine opening policy notice, including history
-            # replay. Keep the DSH event and all other command/recovery notices.
-            if data.get('kind')=='success' and data.get('text')==(
-                'Harness: Saved reasoning: minimal; requested reasoning: xhigh '
-                '(request policy). Backend enforcement is provider-dependent.'
-            ):return False
+            # Effective policy may differ from the saved picker value. Keep its
+            # notice visible, including history replay, on every native platform.
             self.messages.append(('DSH',data.get('text') or ('Command completed.' if data.get('kind')=='success' else 'Command failed.')))
             return True
         if kind=='assistant/chunk':

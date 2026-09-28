@@ -15,7 +15,7 @@ const root=process.env.DSH_INSTALL_ROOT || join(homedir(), '.local/node/lib/node
 const require=createRequire(join(root,'package.json'));
 const load=async name=>import(pathToFileURL(require.resolve('@deepseek-ai/'+name)).href);
 const large='HEAD:'+ 'x'.repeat(23000)+'MIDDLE_EVIDENCE'+ 'z'.repeat(23000)+':TAIL';
-async function harness(t, reply, preset='augmentor-linux-product', installBudget=true) {
+async function harness(t, reply, preset='augmentor-linux-product', installBudget=true, evidence=()=>large) {
   const {Context}=await load('cordis'), {createUserMessage}=await load('dsh-llm'), {installModelSelection}=await load('dsh-agent');
   const ctx=new Context(), requests=[], errors=[], store=mkdtempSync(join(tmpdir(),'augmentor-context-test-'));
   const server=createServer(async(r,s)=>{
@@ -33,7 +33,7 @@ async function harness(t, reply, preset='augmentor-linux-product', installBudget
   await ctx.plugin((await load('dsh-compaction-tool-result-pruner')).default,{thresholdChars:4096,headChars:2048,tailChars:512}).await();
   await ctx.plugin((await load('dsh-compaction-basic')).default,{thresholdRatio:0.5,retainTokens:0,maxTokens:8192}).await();
   if (installBudget) apply(ctx);
-  ctx.tools.register({name:'inspect_fixture',description:'Read fixture evidence',parameters:{type:'object',properties:{}},output:{schema:{},render:()=>[{type:'text',text:large}]},execute:()=>large});
+  ctx.tools.register({name:'inspect_fixture',description:'Read fixture evidence',parameters:{type:'object',properties:{target:{type:'string'}}},output:{schema:{},render:(_args,value)=>[{type:'text',text:value}]},execute:args=>evidence(args)});
   const h=await ctx.agents.create({sessionId:'fixture',meta:{cwd:'/tmp',agentPreset:preset},agentOptions:{provider:'local',model:'fixture'},setup(c){installModelSelection(c,{current:{provider:'local',model:'fixture'}});}});
   let disposed=false;const dispose=async()=>{if(!disposed){disposed=true;await h.dispose();}};
   t.after(async()=>{if(!disposed)h.agent.cancel({kind:'user'});await dispose();await ctx.fiber.dispose();server.closeAllConnections();await new Promise(r=>server.close(r));rmSync(store,{recursive:true,force:true});});
@@ -97,4 +97,57 @@ test('manual trim repairs existing oversized context without model work or repla
   assert.equal(h.requests.length,2,'manual trimming makes no model request');
   assert.equal(h.events().filter(e=>e.type==='tool/call').length,1,'no tool replay');
   assert.equal(h.events().filter(e=>e.type==='turn/start').length,1,'no follow-up turn');
+});
+
+
+test('different commands reporting the same error trigger reassessment without denying tools',async t=>{
+  const h=await harness(t,i=>i<=4?call(i,'inspect_fixture',{target:'object-'+i}):done,
+    'augmentor-linux-product',true,()=>"Error org.freedesktop.DBus.Error.UnknownInterface: No such interface");
+  await h.say();assert.deepEqual(h.errors,[]);assert.equal(h.requests.length,5);
+  assert.doesNotMatch(JSON.stringify(h.requests[2].messages),/Failed-approach checkpoint/);
+  assert.match(JSON.stringify(h.requests[3].messages),/Failed-approach checkpoint/);
+  assert.match(JSON.stringify(h.requests[3].messages),/incorrect syntax/);
+  assert.equal(h.events().filter(e=>e.type==='tool/call').length,4);
+  assert.equal(h.events().filter(e=>e.type==='user/message'&&e.data.source?.plugin==='augmentor-context-budget').length,1);
+});
+
+test('many different successful inspections get one advisory progress checkpoint and continue',async t=>{
+  const h=await harness(t,i=>i<=14?call(i,'inspect_fixture',{target:String(i)}):done,
+    'augmentor-linux-product',true,args=>'Evidence for '+args.target);
+  await h.say();assert.deepEqual(h.errors,[]);assert.equal(h.requests.length,15);
+  assert.doesNotMatch(JSON.stringify(h.requests[11].messages),/Progress checkpoint/);
+  assert.match(JSON.stringify(h.requests[12].messages),/Progress checkpoint/);
+  assert.match(JSON.stringify(h.requests[12].messages),/count alone does not imply failure/);
+  assert.equal(h.events().filter(e=>e.type==='user/message'&&e.data.source?.plugin==='augmentor-context-budget').length,1);
+});
+
+test('binary text is withheld before model input, originals retained, excerpts cannot reintroduce it',async t=>{
+  const binary='\x1f\ufffd\x08\x00'+ 'compressed\ufffd'.repeat(8);
+  const h=await harness(t,i=>i===1?call(i):done,'augmentor-linux-product',true,()=>binary);
+  await h.say();assert.deepEqual(h.errors,[]);
+  const result=h.requests[1].messages.find(m=>m.role==='tool');
+  assert.match(result.content,/Binary-like tool text withheld/);assert.doesNotMatch(result.content,/compressed/);
+  const original=h.events().find(e=>e.type==='tool/result'&&e.surfaceOp?.op!=='replace');
+  assert.equal(original.data.message.content[0].content[0].text,binary);
+  assert.equal(excerpt(h.agent.session).results[0].binaryLike,true);
+  assert.equal(excerpt(h.agent.session,{seq:original.seq,offset:12,limit:1}).withheld,true);
+  const count=h.events().filter(e=>e.type==='compaction/prune').length;
+  await h.ctx.commands.execute(h.agent,'/trim-tools',[],new AbortController().signal);
+  assert.equal(h.events().filter(e=>e.type==='compaction/prune').length,count,'sanitization is idempotent');
+});
+
+test('ordinary multilingual text and terminal colours are not mistaken for binary',async t=>{
+  const text='日本語 Ελληνικά café 🙂 \x1b[32mready\x1b[0m\n\tColumn A';
+  const h=await harness(t,i=>i===1?call(i):done,'augmentor-linux-product',true,()=>text);
+  await h.say();assert.deepEqual(h.errors,[]);
+  assert.equal(h.requests[1].messages.find(m=>m.role==='tool').content,text);
+  assert.equal(h.events().filter(e=>e.type==='compaction/prune').length,0);
+});
+
+test('error counters reset for a new turn and sparse failures do not trigger reassessment',async t=>{
+  let calls=0;
+  const h=await harness(t,i=>i%3?call(i,'inspect_fixture',{target:String(i)}):done,
+    'augmentor-linux-product',true,()=>{calls++;return 'TypeError: fixture failure';});
+  await h.say();await h.say();assert.equal(calls,4);assert.deepEqual(h.errors,[]);
+  assert.doesNotMatch(JSON.stringify(h.requests),/Failed-approach checkpoint/);
 });
