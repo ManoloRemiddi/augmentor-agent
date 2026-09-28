@@ -107,3 +107,14 @@ commands for Send/Enter, verifies the native process image, closes/reopens the
 same named chat and checks rendered history without duplicate submission. Its
 test-owned Job bounds fixture cleanup; this is not normal product-wide Quit,
 physical keyboard, external provider, browser or audio evidence.
+
+`dsh-maintenance.test.mjs` uses the real pinned DSH services/agents, public gateway
+and model-stream lifecycle to exercise reversible admission, retained input
+references, active jobs, expiry and cancellation. `dsh_maintenance_proof.py` is
+called only with disposable hosts by the Linux/Mac setup and Windows managed
+setup proofs. It exercises the actual authenticated product/gateway endpoints,
+history preservation and normal CLI shutdown. Its fixture-only observer requires
+Node `beforeExit`; exit code zero alone cannot distinguish forced termination.
+The Windows proof also refuses preparation during its held deterministic model
+turn and verifies history after normal shutdown and explicit restart. None of
+these component checks claims global Quit/update coordination or a live provider.

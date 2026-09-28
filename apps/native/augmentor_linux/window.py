@@ -1388,6 +1388,10 @@ def main():
                 client.disconnectFromServer()
                 client.deleteLater()
         app.instance_server.newConnection.connect(activate)
+        # The server listens before Window construction. Qt may process an
+        # arrival during initialization, before this callback exists. Drain any
+        # already queued connection as soon as the window is ready.
+        QTimer.singleShot(0,activate)
     window.bring_forward()
     if sys.platform=='darwin':
         # Finder/Dock reopen an existing application without another main().

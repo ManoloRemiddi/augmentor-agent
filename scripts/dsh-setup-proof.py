@@ -108,6 +108,9 @@ modules=Path(os.environ['DSH_TEST_MODULES']).resolve();assert modules.is_dir()
 home=work/'dsh';profile=home/'profiles/web';profile.mkdir(parents=True);(profile/'node_modules').symlink_to(modules,target_is_directory=True)
 (profile/'package.json').write_text(json.dumps({'name':'augmentor-setup-proof','private':True,'type':'module','dsh':{'profile':{'bundles':['@deepseek-ai/dsh-base','@deepseek-ai/dsh-web-app']}}}))
 (profile/'cordis.yml').write_text('[]\n');original='# Existing user customization\n- id: session-title-llm\n  disabled: true\n'
+exit_marker=work/'natural-dsh-exit.json'
+original+=yaml.safe_dump([{'insert':[{'id':'shutdown-observer-proof',
+    'name':str(ROOT/'tests/fixtures/dsh-shutdown-observer.mjs'),'config':{'path':str(exit_marker)}}]}])
 if os.environ.get('AUGMENTOR_PROOF_EXISTING_PROMPTS'):
     original+=yaml.safe_dump([{'insert':[{'id':'existing-prompts','name':str(APP/'adapters/dsh-prompt-library/lib/index.js')}]}])
 web_provider=os.environ.get('AUGMENTOR_PROOF_WEB_PROVIDER')
@@ -179,11 +182,11 @@ def start():
     until(authenticated)
 def stop():
     global process
-    if process:
+    if process and process.poll() is None:
         os.killpg(process.pid,signal.SIGTERM)
         try:process.wait(timeout=10)
         except subprocess.TimeoutExpired:os.killpg(process.pid,signal.SIGKILL);process.wait()
-        process=None
+    process=None
 
 def click(button):assert button.isEnabled();QTest.mouseClick(button,Qt.MouseButton.LeftButton);until(lambda:not dialog.busy)
 try:
@@ -482,6 +485,11 @@ try:
             subprocess.run([sys.executable,str(ROOT/'scripts/dsh-reply-proof.py')],env=reply_env,stdout=reply_log,stderr=reply_log,check=True,timeout=200)
         print('Native Qt saved/final reply recovery verified without a login URL; inspect streamObserved separately',flush=True)
     evidence={'fixture':str(work),'appRoot':str(APP),'adapterFile':loaded_adapter.__file__,'platform':sys.platform,'model':'deterministic local fixture','qtInstall':True,'modelPickerAdapter':bool(picker),'modelPickerUi':bool(picker and os.environ.get('AUGMENTOR_PROOF_PICKER_UI')),'checkedSave':True,'profilePreserved':True,'linuxSavedChats':True,'sharedPersonalAgent':True,'modelRequests':len(received),'wikiToolAndSkillWorkflow':bool(wiki_modules),'contextAndAdaptiveWorkflow':bool(host_plugins),'freeWebSearchWorkflow':bool(web_provider)}
+    # Only this freshly created host is shut down; existing user's DSH is never
+    # selected. Preserve the process handle and require its normal exit status.
+    from dsh_maintenance_proof import prove as maintenance_proof
+    evidence['maintenance']=maintenance_proof(adapter,base,home,'setup-linux',lambda:process.wait(timeout=15),exit_marker)
+    process=None
     (ROOT/'outputs/dsh-setup-proof.json').write_text(json.dumps(evidence,indent=2)+'\n');print(json.dumps(evidence),flush=True)
 finally:
     stop();log.close();server.shutdown();server.server_close()

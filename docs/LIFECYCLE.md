@@ -206,7 +206,47 @@ Gateway HTTP tests verify refusal before the upstream connection and continued
 Stop cancellation. These new memory tests pass on Linux; native execution is
 pending. External Hindsight/model processes are never owned or stopped here.
 
-DSH, voice, browser and desktop still require their own participation. The global
+At `4f2f763`, the native x64 and ARM64 desktop jobs and full runtime
+[run 36368605593](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36368605593)
+pass the prompt and memory tests, including actual acknowledged exits and restart.
+
+### DSH admission and normal shutdown
+
+The next DSH product adapter adds the same private control vocabulary through
+`POST /api/augmentor-product`, with `action: maintenance`, `method` and `params`.
+It requires the existing product token and loopback/origin validation; the public
+descriptor advertises `maintenanceAdmission: 1`. Unknown fields are refused.
+Preparation reserves every idle agent using public `runMaintenance`, refuses
+pending inbox content, active remote invocations, live jobs and model streams,
+and expires or cancels without stopping work. The public `llm/stream` waterfall
+also fences auxiliary calls and capabilities prepared before the reservation.
+
+DSH rc.1 has no single reversible process-wide input-admission API. This pinned
+adapter therefore guards the **public** gateway `invoke`, job `start`, agent
+`send` and inbox `splice` methods and vetoes new agent publication. It preserves
+Cordis's caller-specific method receiver, verifies its descriptors before
+preparation/commit and restores only its own methods on ordinary plugin unload.
+It does not edit private loop state, initiator state, messages or history. This
+is an explicit DSH-version compatibility obligation: the real SDK and gateway
+tests must pass before changing the harness pin; arbitrary third-party plugins
+that bypass those APIs are outside this qualification.
+
+Commit leaves admission closed and asks the launcher's public `appExit` to
+dispose the normal runtime after its HTTP acknowledgment. It does not send
+`TerminateProcess` or an OS signal. The launcher itself has a bounded fallback,
+so exit code zero alone is insufficient evidence. The disposable proof installs
+a fixture observer for Node `beforeExit`, which forced `process.exit` skips.
+It verifies refused input never reached history, cancellation preserves history,
+then committed shutdown reaches `beforeExit` and exits zero. Local actual DSH
+execution passes; the native Windows proof is newly added and pending.
+
+This work exposed older shared cleanup handlers using `ctx.on('dispose')`, which
+the pinned Cordis runtime does not dispatch. The runtime lease helper kept DSH
+alive after its root disposed. Product, memory, execution, steering and desktop
+cleanup now use `ctx.effect(() => cleanup)`; the lease cleanup waits for its
+helper to exit normally. This shared correction applies to all three OSs.
+
+Voice, browser and desktop still require their own participation. The global
 owner must stop automatic restarts, reserve
 all components, cancel reservations on preparation failure, and acquire the
 exclusive installation lease after they drain. No installer may infer that the

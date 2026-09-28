@@ -19,6 +19,7 @@ import tempfile
 import threading
 import time
 import uuid
+import yaml
 
 
 def desktop_chat(root, work, out):
@@ -201,6 +202,9 @@ def main():
         adapter.call('session.prompt', {'sessionId': session, 'mode': 'queue',
             'content': [{'type': 'text', 'text': 'LEASE_HOLD_FIXTURE'}]})
         assert model_waiting.wait(20), 'The deterministic model did not receive the cancellable turn.'
+        spec = importlib.util.spec_from_file_location('dsh_maintenance_proof', Path(__file__).with_name('dsh_maintenance_proof.py'))
+        maintenance_proof = importlib.util.module_from_spec(spec); spec.loader.exec_module(maintenance_proof)
+        maintenance_proof.refuse_busy(setup.current()['endpoint'], state/'home')
         contended = False
         try:
             with session_write_lease(lock_path): pass
@@ -219,6 +223,21 @@ def main():
         def released_history():
             with session_write_lease(lock_path): return True
         wait_for(released_history)
+        exit_marker = work/'natural-dsh-exit.json'
+        fixture_patch = state/'home/profiles/web/cordis.patch.yml'
+        with fixture_patch.open('a', encoding='utf-8') as stream:
+            stream.write(yaml.safe_dump([{'insert':[{'id':'shutdown-observer-proof',
+                'name':str(Path(__file__).resolve().parents[1]/'tests/fixtures/dsh-shutdown-observer.mjs'),
+                'config':{'path':str(exit_marker)}}]}]))
+        agent.start(); wait_for(lambda: adapter.call('host.describe'))
+        assert 'Windows managed setup verified.' in json.dumps(adapter.call('session.history', {'sessionId': session}))
+        def natural_exit():
+            def exited():
+                status = owner.request('status', root=root)
+                return status if not status['dsh']['running'] else None
+            return wait_for(exited)['dsh']['exitCode']
+        report['maintenance'] = maintenance_proof.prove(adapter, setup.current()['endpoint'],
+            state/'home', session, natural_exit, exit_marker)
         agent.start(); wait_for(lambda: adapter.call('host.describe'))
         assert 'Windows managed setup verified.' in json.dumps(adapter.call('session.history', {'sessionId': session}))
         report.update(passed=True, setup=True, conversation=True, crashRestartPreservedHistory=True,

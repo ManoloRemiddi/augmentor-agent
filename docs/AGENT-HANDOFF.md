@@ -72,10 +72,15 @@ native preparation/real-browser acceptance remains pending.
 
 W1 is reopened after identifying stock Velopack's forced busy-uninstall behavior.
 Read the [installer decision and alternative proof](WINDOWS-INSTALLER-DECISION.md):
-Inno/WinSparkle remain candidates until execution establishes the required gates.
-No product installer switch, signed package, safe global Quit/update or customer
-publication is implied by the disposable tests. Keep current CI and the ledger
-authoritative when continuing.
+The bounded native proof passes both CPUs, and Inno Setup 7.1.0 with WinSparkle
+0.9.4 is now selected for implementation. Full product integration, signing,
+rollback and client-machine gates remain. At `4f2f763`, full Windows runtime
+qualification passes both CPUs, including prompt/memory maintenance admission
+and the corrected browser staging ACL. New source adds actual DSH admission,
+natural shutdown and corrected Cordis cleanup; local SDK/HTTP/CLI proof passes,
+native execution is pending. Global coordination, voice/browser/desktop drain,
+production installer and public release remain incomplete. Keep the detailed
+ledger authoritative; do not change the website or merge the draft PR.
 
 ## September 27 Windows implementation plan — historical planning checkpoint
 

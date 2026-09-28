@@ -102,6 +102,11 @@ remain required for ordinary shutdown and updates.
 
 ## Remaining shell gates
 
+The shared instance handler now drains commands already queued while the window
+was being constructed. A Qt event processed before `newConnection` was connected
+could otherwise leave the first command waiting until another arrival. This is
+a shared startup correction; native regression of the new source is pending.
+
 This source does not yet complete tray Open/Quit, installer login hooks, installed
 Start menu/taskbar identity, coordinated busy-work shutdown or update ownership.
 These remain required before customer distribution. A successful preview or

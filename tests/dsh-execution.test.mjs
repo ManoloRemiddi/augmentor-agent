@@ -211,7 +211,7 @@ test('provider no-content error remains explicit and is not mislabeled as succes
 });
 test('tracker ignores replacement notifications (isolated hook fixture)',async()=>{
   const hooks={},steered=[];
-  install({on:(event,handler)=>{hooks[event]=handler;}},policy(),{persist:()=>{}});
+  install({on:(event,handler)=>{hooks[event]=handler;},effect:setup=>{hooks.dispose=setup();}},policy(),{persist:()=>{}});
   const session={id:'replaced',header:{agentPreset:'augmentor-linux-product'},snapshotEvents:()=>[],append:()=>{}};
   const agent={id:session.id,session,steer:x=>steered.push(x)};
   const signal=new AbortController().signal;

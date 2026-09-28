@@ -719,3 +719,22 @@ preserves journal data and that preference; all eight budget/gateway checks pass
 The test waits for durable gateway cleanup after its HTTP response, rather than
 mistaking received bytes for completed work. New native memory/gateway checks are
 added to the fast desktop workflow; full global coordination remains pending.
+
+At `4f2f763`, [full runtime run 36368605593](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36368605593)
+passes both native CPUs and the shared Mac Qt candidate. This includes the new
+prompt/memory maintenance RPCs and the browser staging ACL correction. Fast
+desktop and installer feasibility also pass at that ref. The preceding `85cfbd7`
+run had the already-fixed staging ACL error, a Mac test that assumed fixed
+animation timing, and one Windows startup-inspection timeout. The animation
+test now waits for actual completion with a bound. The shared window handler
+also drains requests queued during construction before its callback connected;
+this addresses a concrete startup notification race. Latest full runtime success
+predates that source correction and the following DSH changes.
+
+DSH now implements [reversible admission and normal shutdown](LIFECYCLE.md#dsh-admission-and-normal-shutdown)
+over its authenticated product endpoint. Five real SDK tests and actual local
+DSH HTTP/CLI execution pass, including Node `beforeExit`, so forced exit is not
+misreported as natural shutdown. The work also fixes shared plugin cleanup to
+use the actual Cordis effect lifecycle. Native SDK, busy-model refusal and
+natural-exit/restart checks are added to Windows qualification and remain pending.
+Voice/browser/desktop participation and the global coordinator are still required.
