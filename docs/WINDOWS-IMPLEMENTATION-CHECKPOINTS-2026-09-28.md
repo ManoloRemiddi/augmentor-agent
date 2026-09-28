@@ -1,6 +1,6 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-# Historical Windows implementation checkpoints through 805664f
+# Historical Windows implementation checkpoints — September 28
 
 These dated working checkpoints preserve the earlier evidence and investigations.
 Their pending/current statements are historical. Start with the
@@ -779,3 +779,126 @@ Read [implementation status](WINDOWS-IMPLEMENTATION-STATUS.md),
 [the implementation plan](WINDOWS-IMPLEMENTATION-PLAN.md). Earlier checkpoints,
 including superseded pending results, are preserved in the
 [historical archive](WINDOWS-IMPLEMENTATION-CHECKPOINTS-2026-09-28.md).
+
+## Superseded working checkpoint before complete 6c1e7cf and selected-source qualification
+
+These pending statements are historical; the current handoff records terminal evidence.
+
+## Windows implementation — active, September 28
+
+The owner authorizes autonomous implementation through the complete Windows app;
+physical testing follows when a Windows machine is connected. Work on
+`feat/windows` in [draft PR 20](https://github.com/ManoloRemiddi/augmentor-agent/pull/20).
+Do not merge, publish customer downloads or deploy personal installations.
+Keep one shared product, approved UI and existing model/voice settings. Native
+Windows x64 and ARM64 are targets, including NVIDIA RTX Spark N1X; no RTX hardware
+qualification is claimed.
+
+Latest native evidence:
+
+- [Desktop checks at 67eebe3 pass both CPUs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36399077554),
+  including browser receipt/private storage, update verification and normal idle
+  preview exit. These are native checks, not complete installed-product acceptance.
+- [Inno qualification at 67eebe3 passes both CPUs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36399077539),
+  actual merge checkout `85522a92c8cad9d45bf22bd1395c5607d5bd8e46`. Downloaded reports
+  verify typed registry ownership, long paths, private manifest pinning, every
+  authenticated handoff/final-access case and signed WinSparkle delivery. Closed
+  fixture publication corrects the observed readiness-file sharing race without
+  changing the authenticated handoff or extending timeouts.
+- [Full application at 6890375](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36398267417):
+  both CPUs now pass initial install/browser/login identity, live-draft refusal,
+  same-build repair/relaunch, actual installed graph drain and coordinated apply,
+  full payload digest/local Qt health verification and journal archival. Disabled
+  login startup remains disabled. Custom-path and redirected-tree refusals also
+  pass. Final normal uninstall is incorrectly refused after restoring the fixture
+  browser manifest on both CPUs. This is same-build application, not
+  N-to-N+1 or rollback, and complete uninstall is not yet qualified.
+
+[Native Inno at 8a3ff05](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36400951199)
+passes both CPUs, including the exact application script's repair/removal with no
+browser, edited-manifest refusal and owned browser cleanup. Default-value handling
+is corrected, and fixtures observe the complete copied remover exiting naturally.
+The [full application run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36400951137)
+now passes the complete installed sequence on both CPUs through normal software
+removal and retained persistent data. The entire ARM64 job passes. The separate
+x64 memory-service startup test times out, so the overall workflow is not passing.
+The new journal-before-listener correction remains under native test.
+The prior full `6890375` ARM64 artifact confirms the same repair/drain/apply/health
+and archival stages as x64, then the since-corrected normal-removal refusal.
+
+The shared memory service now initializes its journal before publishing a
+connectable endpoint. A constructor-gated child-process test reproduces the old
+race and passes with the correction; local prompt/memory restart and lifecycle
+checks pass. Both native fast jobs at `59dbbf4` pass the gated initialization and
+memory maintenance checks; complete qualification still needs its terminal result. Failed fixture runs now preserve stack/log diagnostics.
+
+Current source adds the standard checked **Open Augmentor** finish option for
+interactive installation/repair. It releases native maintenance before launching
+the installed executable. Silent/coordinated application cannot reopen before
+independent health. A new test drives only its own real installer wizard, then
+requires entry through the actual lease-holding native launcher/private Python.
+The test uses a recording script, not the shared UI/DSH; full client acceptance
+remains separate. At `8ecd4c0` both native wizard tests time out before advancing.
+The driver now retrieves cross-process control captions with bounded WM_GETTEXT
+and records only its owned wizard state for diagnosis. The observed modern
+Next caption is handled. At `59dbbf4`, x64 Finish/native startup passes; ARM64
+launches but its driver inspects a destroyed window. The corrected driver
+passes both CPUs at `ba0b68c`, including Finish/native entry and silent no-launch.
+
+Current installer code records one owned browser anchor and optional per-user
+login entry, preserves disabled startup on repair/update, and removes only exact
+owned registry values. Browser setup records a manifest digest before publishing
+pointers; removal retains the private file while checking its bytes. Persistent
+settings, manifests and prepared extensions survive software removal. Complete installed
+browser cleanup passes both CPUs at `8a3ff05`.
+
+The earlier full `ead355c` run fails same-build repair on both CPUs, after successful
+initial launch, live-draft preservation and corrected preview exit. Its native tree
+validator lacked extended paths; x64 contained 205 ordinary paths over 260 characters.
+The `6890375` fixture verifies the correction on a tree longer than 500 characters.
+The full x64 and ARM64 artifacts now verify repaired payload behavior.
+
+[Signed WinSparkle delivery](WINDOWS-UPDATE-DELIVERY.md) at `594b56d` passes
+[both native CPUs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36394998456):
+valid signed ZIP delivery and refusal of wrong-CPU metadata, invalid metadata
+signatures and replaced installers despite a valid outer signature. Native WinSparkle
+0.9.4 is now staged with its notices; the rejected Velopack runtime is removed.
+No customer key/feed or automatic updater is enabled. Signing fixtures are not
+publisher trust or actual N-to-N+1 application.
+
+Assembled DSH/voice, desktop Send/Enter/history, observed graph shutdown/restart and
+compiled browser commit pass on both CPUs at `f950a45` and `805664f`.
+[Full f950a45](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36389905723)
+is the last fully passing workflow before the actual installer step was added.
+These use actual bundled DSH and a deterministic provider, not physical audio/input
+or live model quality. Shared Resonant Voice is 0.1.19 from qualified source `7d0fd6d`,
+kept in separate [draft PR 2](https://github.com/ManoloRemiddi/resonant-voice/pull/2).
+[Linux at 2f17cb0](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36397149313)
+and [macOS](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36397149332)
+pass; later platform checks continue in CI.
+
+Retained signed recovery packages can now be revalidated against an exact recorded
+identity without executing them. This separates expired local recovery from new
+forward delivery. The 32 local update tests and both native fast jobs at `59dbbf4` pass.
+The actual installer now preserves its source EXE and compiled payload digest in a
+private cache before replacement; corrupted retained bytes refuse repair. Both exact-template native cache tests pass at `ba0b68c`; full payload
+cache integration remains under qualification. Current source additionally records
+the exact selected installer after successful installation. Its private reader
+binds actual release metadata and cached bytes, and the full coordinator proof
+uses that retained installer/source identity. The 38 local update tests pass;
+native selection/readback is pending. These raw receipts are not signed bundles
+or proof of health. Independent recovery, health and cache pruning/removal remain
+unfinished.
+
+Next: finish interactive-launch and memory startup qualification, then connect
+verified delivery to customer notification/UI and the coordinator. Qualify actual
+N-to-N+1, independent recovery/rollback and obsolete-file removal; complete the
+[feature ledger](FEATURE-MATRIX.md#windows-development-target--september-28), including
+desktop actions, speech/memory provisioning, Home/Pi parity and ordinary-user/physical
+Windows acceptance. The app is not complete or ready for customer distribution.
+
+Read [implementation status](WINDOWS-IMPLEMENTATION-STATUS.md),
+[installer decision](WINDOWS-INSTALLER-DECISION.md), and
+[the implementation plan](WINDOWS-IMPLEMENTATION-PLAN.md). Previous active checkpoints
+are preserved in the [historical archive](WINDOWS-IMPLEMENTATION-CHECKPOINTS-2026-09-28.md).
+

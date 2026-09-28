@@ -573,3 +573,12 @@ success or rollback permission from this pointer. Six private-storage reader tes
 pass locally (38 update tests total). Exact-template and full installed proofs
 exercise native publication/readback, preserved selection on repair and malformed
 selection refusal; native execution of this addition is pending.
+
+At `bdba572`, [native Inno/WinSparkle](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36405973067)
+passes both CPUs at merge checkout `7fb0927db3e8e75e03a8bae7d31c104649f2a992`,
+including selected-source publication/readback and malformed-selection refusal.
+The [complete 6c1e7cf workflow](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36403736092)
+also passes both CPUs at `0053027cbeb1feee4365ebedd589381fbe431fdb`, through
+installed removal and journal archival. That full run predates source caching;
+[full bdba572](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36405973046)
+is still executing and is the required cached-source integration proof.
