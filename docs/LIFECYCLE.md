@@ -587,3 +587,10 @@ now waits for the actual coordinator exit and takes the private exclusive
 lifetime lease before file replacement. The disposable Inno fixture verifies a
 held coordinator lease and an additional-holder refusal case. Native execution
 of this addition is pending; it does not complete product apply or recovery.
+
+### Windows apply backend
+
+The [Windows adapter and installed integration proof](WINDOWS-INSTALLER-DECISION.md#shared-coordinator-windows-backend)
+connect shared durable decisions to independent Inno ownership. No download,
+publisher verification or recovery is inferred from this adapter; callers retain
+both verified artifacts before admission. Current native integration is pending.

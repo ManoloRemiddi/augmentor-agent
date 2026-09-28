@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import shutil
 import sys
 import time
 
@@ -24,7 +25,7 @@ def main():
     import winreg
     from platform_adapters.windows_identity import private_directory
     from platform_adapters.windows_browsers import command_executable
-    from platform_adapters.private_files import atomic_json
+    from platform_adapters.private_files import atomic_json, descriptor, read_json
     from platform_adapters.transport import LocalSocket
     from augmentor_linux.instances import ipc_basename
     out = args.out.resolve()
@@ -103,6 +104,48 @@ def main():
         child=open_preview(); ready(); close_preview(); child=None
         assert shortcut.is_file() and sentinel.read_bytes()==sentinel_bytes
         stages.append('same-build-repair-and-installed-relaunch')
+        # Exercise the shared decision coordinator against installed binaries,
+        # an actual background owner/window, and the actual packaged Setup.
+        # Identical artifact repair isolates transport/process integration from
+        # the separately unfinished N-to-N+1 trust/recovery policy.
+        cache=private_directory(data/'cache')
+        artifact=cache/'qualified-installer.exe'
+        with os.fdopen(descriptor(artifact,writable=True,exclusive=True),'wb') as target, Path(report['installer']).open('rb') as source:
+            shutil.copyfileobj(source,target);target.flush();os.fsync(target.fileno())
+        run([executable,'--qualification-root',data,'--background'],timeout=30)
+        child=open_preview();ready()
+        coordinator_log=(out/'coordinator.log').open('w',encoding='utf-8')
+        coordinator=subprocess.Popen([str(install/'current/python/python.exe'),'-I','-Xutf8','-B',
+            str(ROOT/'scripts/windows-application-update-proof.py'),'--root',str(install/'current'),
+            '--data',str(data),'--installer',str(artifact),'--sha256',report['sha256']],
+            stdout=subprocess.DEVNULL,stderr=coordinator_log)
+        coordinator_log.close()
+        transaction=data/'update-proof';result_path=transaction/'coordinator-result.json'
+        deadline=time.monotonic()+90
+        while not result_path.exists():
+            assert coordinator.poll() is None, 'The installed coordinator failed; inspect coordinator.log.'
+            if time.monotonic()>=deadline:raise TimeoutError('The installed coordinator did not authorize Setup.')
+            time.sleep(.05)
+        result=read_json(result_path)
+        assert result['coordinatorMustExit'] and not result['installationComplete']
+        assert child.wait(timeout=10)==0;child=None
+        journal=read_json(transaction/'active.json')
+        assert journal['phase']=='apply-acknowledged'
+        assert {'WindowParticipant','OwnerParticipant'} <= {step['kind'] for step in journal['steps']}, journal['steps']
+        assert journal['steps'][-1]['kind']=='OwnerParticipant' and journal['steps'][-1]['phase']=='exited'
+        import win32api,win32con,win32event,win32process
+        setup_process=win32api.OpenProcess(win32con.SYNCHRONIZE|win32con.PROCESS_QUERY_INFORMATION,False,result['setupPid'])
+        try:
+            assert win32event.WaitForSingleObject(setup_process,0)==win32event.WAIT_TIMEOUT
+            (transaction/'observer-ready').touch()
+            assert coordinator.wait(timeout=30)==0
+            assert win32event.WaitForSingleObject(setup_process,300000)==win32event.WAIT_OBJECT_0
+            assert win32process.GetExitCodeProcess(setup_process)==0
+        finally:setup_process.Close()
+        assert (install/'current/release.json').read_bytes()==(args.root/'release.json').read_bytes()
+        assert sentinel.read_bytes()==sentinel_bytes
+        child=open_preview();ready();close_preview();child=None
+        stages.append('installed-graph-drain-durable-apply-setup-exit-and-relaunch')
         # Inno must not follow a requested custom replacement directory.
         other=out/'foreign';other.mkdir();foreign=other/'untouched.txt';foreign.write_text('preserve')
         setup('custom-path-refusal','/DIR='+str(other),success=False)

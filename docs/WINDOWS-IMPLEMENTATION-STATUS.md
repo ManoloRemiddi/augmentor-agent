@@ -2,6 +2,17 @@
 
 # Windows implementation evidence
 
+The actual installed-app qualification now composes the shared coordinator with
+`WindowsApply`: an independent Inno process, private authenticated handoff and
+one-shot durable APPLY. The fixture starts an installed window and background
+owner, drains their observed graph, retains the extracted Setup process across
+coordinator exit, waits for its completion and relaunches installed binaries.
+It repairs the identical retained artifact, so it does not establish N-to-N+1,
+publisher trust, health-driven recovery or rollback. New native execution is
+pending. Existing Inno handoff/final-access fixtures at `b006ebb` pass both CPUs
+in [36390819194](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36390819194);
+that result compiles the updated helper but does not execute the new app installer.
+
 Current source builds an unsigned installer candidate from the actual staged
 shared app with `scripts/package-windows.py`. It uses one app identity, stable
 `current/Augmentor.exe`, bundled runtimes and a Start-menu shortcut. Native

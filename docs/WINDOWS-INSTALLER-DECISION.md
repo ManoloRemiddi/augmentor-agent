@@ -312,3 +312,24 @@ The Inno template uses the documented [setup/uninstall event boundaries](https:/
 and [temporary DLL unloading](https://jrsoftware.org/ishelp/topic_isxfunc_unloaddll.htm).
 Its helper is compiled for the x64 Setup/uninstaller process on both CPUs; the
 application and all its runtime DLLs retain the native selected architecture.
+
+## Shared coordinator Windows backend
+
+The actual installed-app qualification now composes the shared coordinator with
+`WindowsApply`: an independent Inno process, private authenticated handoff and
+one-shot durable APPLY. The fixture starts an installed window and background
+owner, drains their observed graph, retains the extracted Setup process across
+coordinator exit, waits for its completion and relaunches installed binaries.
+It repairs the identical retained artifact, so it does not establish N-to-N+1,
+publisher trust, health-driven recovery or rollback. New native execution is
+pending. Existing Inno handoff/final-access fixtures at `b006ebb` pass both CPUs
+in [36390819194](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36390819194);
+that result compiles the updated helper but does not execute the new app installer.
+
+`WindowsApply` accepts only the startup gate and caller-verified artifact digest,
+uses fixed Inno flags and a fresh private log, and closes the handoff before its
+process observations. Unknown apply acknowledgments cannot be replayed. The
+installer remains independent after coordinator exit; a digest still does not
+establish publisher trust. Its explicit outer-runner Job option is fixture-only.
+The installed integration script is a development proof, not a public updater or
+a production trust boundary. Product update metadata/UI/recovery remain open.

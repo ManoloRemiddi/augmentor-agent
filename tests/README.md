@@ -271,3 +271,9 @@ payload into compiled-in disposable paths, checks live Qt draft refusal, repair,
 redirect refusal and software-only removal with retained persistent data. Native
 execution is required; this does not establish signed update/rollback or physical
 hardware support. See [installer scope](../docs/WINDOWS-INSTALLER-DECISION.md#actual-application-installer-candidate).
+
+The installed proof also starts the real owner and native preview, invokes
+`scripts/windows-application-update-proof.py` as a separate coordinator, and checks
+actual same-build Inno application after observed graph/coordinator exit. This
+qualifies the Windows apply adapter when native CI passes; N-to-N+1, signing,
+recovery and rollback remain separate gates.
