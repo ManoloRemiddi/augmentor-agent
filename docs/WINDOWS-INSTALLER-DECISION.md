@@ -80,3 +80,20 @@ upstream failure is explicit as `productionInstallerQualified: false`; a green
 workflow means the characterization ran, not that the installer meets W1.
 Native execution of this additional probe is pending. Previous busy-update
 refusal remains valid only for the fixture's app-initiated update entrypoint.
+
+The next independent `Windows installer feasibility` workflow pins Inno Setup
+7.1.0 and WinSparkle 0.9.4 by upstream release SHA-256. Its disposable package
+tests two simultaneous active processes against repair, update and the registered
+uninstaller, then an injected preparation failure, retry and idle removal. The
+installer owns an exclusive file-sharing handle for the complete operation;
+fixture workers share that same admission file. This qualifies the mechanism,
+not the full product's still-pending drain and admission integration.
+
+The native x64/ARM64 WinSparkle DLL separately checks an ephemeral-key signed
+download, an invalid signature, a busy callback and a wrong-architecture feed.
+Its test callback inspects the verified bytes without executing them. The Inno
+lifecycle and updater verification are deliberately separate evidence, not a
+claim of a complete consumer update transaction. The compiler and installer
+bootstrap are x64 tools (emulated on ARM); app, Python and updater are native.
+This new workflow has not executed yet. Publisher identity and Authenticode
+remain separate from the disposable EdDSA key used for test downloads.

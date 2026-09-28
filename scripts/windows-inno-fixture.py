@@ -1,0 +1,95 @@
+#!/usr/bin/env python3
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+"""Disposable installed program and native WinSparkle probe, not product code."""
+import ctypes
+from ctypes import wintypes
+import hashlib
+import json
+from pathlib import Path
+import sys
+import threading
+import time
+
+ROOT = Path(__file__).resolve().parents[1]
+CONFIG = json.loads((ROOT/'fixture.json').read_text(encoding='utf-8'))
+
+
+def shared_gate():
+    create = ctypes.WinDLL('kernel32', use_last_error=True).CreateFileW
+    create.argtypes = [wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD, ctypes.c_void_p,
+                       wintypes.DWORD, wintypes.DWORD, wintypes.HANDLE]
+    create.restype = wintypes.HANDLE
+    handle = create(CONFIG['gate'], 0xc0000000, 3, None, 4, 0x80, None)
+    if handle == ctypes.c_void_p(-1).value: raise ctypes.WinError(ctypes.get_last_error())
+    return handle
+
+
+def sparkle(settings):
+    dll = ctypes.CDLL(str(ROOT/'WinSparkle.dll'))
+    callbacks = []
+    done = threading.Event()
+    result = {'events': [], 'downloadHandled': False, 'canShutdown': None}
+    def function(name, args=(), returns=None):
+        value = getattr(dll, 'win_sparkle_'+name)
+        value.argtypes = list(args); value.restype = returns
+        return value
+    def event(name):
+        result['events'].append(name)
+        if name in ('error', 'no-update'): done.set()
+    void_callback = ctypes.CFUNCTYPE(None)
+    for api, name in [('error', 'error'), ('did_find_update', 'found'), ('did_not_find_update', 'no-update')]:
+        callback = void_callback(lambda name=name: event(name)); callbacks.append(callback)
+        function('set_'+api+'_callback', [void_callback])(callback)
+    def can_shutdown():
+        result['canShutdown'] = not settings['busy']
+        if settings['busy']: done.set()
+        return int(not settings['busy'])
+    can_callback = ctypes.CFUNCTYPE(ctypes.c_int)(can_shutdown); callbacks.append(can_callback)
+    function('set_can_shutdown_callback', [type(can_callback)])(can_callback)
+    def handled(path):
+        try:
+            result['downloadSha256'] = hashlib.sha256(Path(path).read_bytes()).hexdigest()
+            result['downloadHandled'] = True
+            return 1  # Qualification inspects the verified download; never executes a second installer here.
+        except Exception:
+            result['callbackFailed'] = True
+            return -1
+        finally: done.set()
+    run_callback = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_wchar_p)(handled); callbacks.append(run_callback)
+    function('set_user_run_installer_callback', [type(run_callback)])(run_callback)
+    function('set_app_details', [ctypes.c_wchar_p]*3)('Augmentor qualification', settings['id'], '0.0.1')
+    function('set_registry_path', [ctypes.c_char_p])(settings['registry'].encode('ascii'))
+    function('set_appcast_url', [ctypes.c_char_p])(settings['url'].encode('ascii'))
+    assert function('set_eddsa_public_key', [ctypes.c_char_p], ctypes.c_int)(settings['key'].encode('ascii'))
+    function('set_automatic_check_for_updates', [ctypes.c_int])(0)
+    function('init')()
+    try:
+        function('check_update_with_ui_and_install')()
+        if not done.wait(45): raise TimeoutError('No native updater result.')
+        time.sleep(.3)  # Let the native callback return before cleanup joins its UI thread.
+    finally: function('cleanup')()
+    return result
+
+
+def main():
+    action, destination, *arguments = sys.argv[1:]
+    result = {'version': CONFIG['version'], 'pid': __import__('os').getpid(),
+              'runtime': sys.executable, 'scope': 'Disposable fixture only'}
+    if action == '--hold':
+        handle = shared_gate()
+        Path(destination).write_text(json.dumps(result), encoding='utf-8')
+        try:
+            end = time.monotonic()+180
+            while not Path(arguments[0]).exists() and time.monotonic() < end: time.sleep(.05)
+        finally:
+            close = ctypes.WinDLL('kernel32', use_last_error=True).CloseHandle
+            close.argtypes = [wintypes.HANDLE]; close.restype = wintypes.BOOL
+            close(handle)
+        return
+    if action == '--sparkle': result.update(sparkle(json.loads(Path(arguments[0]).read_text())))
+    elif action != '--inspect': raise ValueError('Unknown fixture action')
+    Path(destination).write_text(json.dumps(result), encoding='utf-8')
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,45 @@
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+name: Windows installer feasibility
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/windows-installer.yml'
+      - 'scripts/windows-inno-*'
+      - 'scripts/build-windows-launcher.py'
+      - 'services/platform/windows-launcher.c'
+      - 'release/windows/installer-candidates.json'
+permissions:
+  contents: read
+concurrency:
+  group: windows-installer-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  installer:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2025
+            arch: x64
+          - os: windows-11-arm
+            arch: arm64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Stage private pinned runtime
+        shell: pwsh
+        run: python -Xutf8 scripts/bootstrap-windows.py --arch ${{ matrix.arch }} --out outputs/payload
+      - name: Exercise maintenance refusal, removal and native signed download checks
+        shell: pwsh
+        run: |
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/windows-inno-proof.py --runtime outputs/payload --arch ${{ matrix.arch }} --out outputs/alternative-installer
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: windows-installer-candidate-${{ matrix.arch }}
+          path: |
+            outputs/alternative-installer/*.json
+            outputs/alternative-installer/*.log
+          retention-days: 14

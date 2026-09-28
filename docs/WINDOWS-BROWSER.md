@@ -27,7 +27,8 @@ The new native qualification sequence launches the actual binary with disposable
 browser-style stdio. It checks required/versioned handshake, Unicode/newline
 prompt save/readback, selection of the actual bundled DSH, its previously generated
 fixture conversation history, refusal of the legacy plugin-update route, and
-preserved supervisor components after disconnect. These native checks are pending.
+preserved supervisor components after disconnect. These native checks pass on
+both x64 and ARM64 at `13c6c0d` in [run 36366164798](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36366164798).
 This is not evidence of registry discovery, extension loading or a real browser
 window. Those are separate W5 gates.
 
@@ -55,7 +56,8 @@ metadata and Chromium resource inspection, without a product-name allowlist.
 Renamed resource packs and version subdirectories are supported. This is a
 candidate browser check, not proof of extension/native-messaging compatibility.
 Native tests use disposable registration and resource fixtures; their discovery
-execution and real installed-browser acceptance remain pending. The executable
+execution passes both native CPUs at `13c6c0d` in [run 36366164943](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36366164943).
+Real installed-browser acceptance remains pending. The executable
 picker must remain available when discovery finds nothing.
 
 Installer/chooser wiring, registry views and fork lookup locations still need

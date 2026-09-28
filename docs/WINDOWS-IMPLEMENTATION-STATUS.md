@@ -69,7 +69,7 @@ providers, installed artifacts and physical hardware must remain distinguishable
 | W2 paths, ownership, IPC, locks | Both CPUs pass kernel adapters, cross-user ACL denial and Python/Node prompt transport | Complete component ownership and lifecycle integration |
 | W3 managed DSH/model setup | Both CPUs pass assembled setup, compiled composer Send/Enter and history restart against deterministic DSH/model | Full first-run UI, ordinary-user/live-provider acceptance |
 | W4 desktop, two windows, shortcuts, tray | Both CPUs pass compiled preview zoom/drafts, native resources and source hotkey persistence | Installer startup hooks, tray/quit and physical interaction |
-| W5 chosen Chromium/Comet companion | Native registration/discovery fixtures pass both CPUs; compiled host passes x64 | ARM64 host, chooser/installation and real selected-browser conversation |
+| W5 chosen Chromium/Comet companion | Native registration/discovery and compiled host protocol fixtures pass both CPUs | Chooser/installation and real selected-browser conversation |
 | W6 computer control | Pending | Consented capture/input, Stop and Windows privilege boundaries |
 | W6 voice/memory/Home/Pi | Pending | Existing feature contracts and configured-engine connectivity |
 | W6 RTX inference | Pending hardware | Native compatible backend, measured shared-memory behavior |
@@ -677,3 +677,15 @@ package processes before its non-vetoing uninstall hook. W1 is reopened for this
 failed requirement; see the [installer decision](WINDOWS-INSTALLER-DECISION.md).
 An additional isolated native probe now characterizes busy uninstall explicitly;
 its execution is pending. No customer package, browser profile or website changed.
+
+The complete `13c6c0d` runtime run now passes on both x64 and ARM64, including
+actual compiled browser host framing/handshake/prompts/DSH-history/disconnect
+and real Python/Node client adoption of the owned prompt/memory services. Shared
+Linux validation and macOS feasibility also finish successfully at that ref.
+Actual browser UI/store installation and physical hardware remain pending.
+
+A separate native installer-candidate workflow now exercises pinned Inno 7.1.0
+and native WinSparkle 0.9.4. It covers repair/update/removal admission with two
+live fixture processes, failed preparation/retry and signed-download refusal
+cases. Source syntax and diff checks pass; native execution is pending. The
+product packaging backend has not switched based on source alone.
