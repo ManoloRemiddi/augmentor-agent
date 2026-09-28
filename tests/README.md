@@ -186,3 +186,9 @@ Native supervisor tests discover the actual background-owner pipe through a
 retained process observation, reserve it, and verify prompt/memory peers against
 its kernel Jobs. They reject cross-component/unrelated PIDs and unknown names.
 This is identity/admission evidence, not a complete coordinated shutdown.
+
+The same native supervisor proof now uses the actual companion participant
+client to prepare, renew and cancel prompts/memory. Their authenticated pipe
+peers must belong to the selected component's Job before any maintenance request
+is sent. Portable contract tests reject active, expired, unbounded and malformed
+reservation acknowledgments. Hosted native execution is still required.

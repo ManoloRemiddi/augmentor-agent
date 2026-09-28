@@ -276,3 +276,10 @@ The eventual component client must retain its own process observation and bind
 it to the transport before using this check. A reported PID alone is insufficient.
 New native tests cover valid prompt/memory peers and reject an unrelated process,
 another component's Job and unknown component names; execution is pending.
+
+The companion maintenance client now binds prompt/memory RPCs to those exact
+kernel pipe peers and Jobs before sending a request. It verifies correlation,
+protocol, idle acknowledgments and finite reservation lifetime. Discovery refuses
+an unowned listener or incomplete owner inventory. Native supervisor qualification
+now prepares, renews and cancels each actual companion while retaining the owner
+reservation. Execution of these new assertions is pending.

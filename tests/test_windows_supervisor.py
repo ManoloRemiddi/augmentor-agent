@@ -17,6 +17,16 @@ from platform_adapters.transport import LocalSocket
 
 
 class SupervisorSafetyTests(unittest.TestCase):
+    def test_coordinator_rejects_active_or_expired_reservation_acknowledgments(self):
+        from lifecycle.windows_components import component_state
+        valid={'protocol':'augmentor-component-maintenance/1','phase':'prepared','active':0,'expiresInSeconds':29.5}
+        self.assertEqual(component_state(valid,'prepare'),valid)
+        for changes in ({'active':1},{'active':True},{'expiresInSeconds':0},
+                        {'expiresInSeconds':float('nan')},{'expiresInSeconds':float('inf')},
+                        {'expiresInSeconds':31},{'phase':'ready'}):
+            with self.subTest(changes=changes),self.assertRaises(ValueError):
+                component_state({**valid,**changes},'prepare')
+
     def test_owner_reservation_fences_restarts_and_refuses_commit_while_children_live(self):
         supervisor=owner.Supervisor(shell=Mock());token='b'*32
         control=lambda action:supervisor.dispatch({'action':'maintenance','method':'host.maintenance.'+action,'params':{'token':token}})['maintenance']
@@ -106,7 +116,7 @@ class WindowsSupervisorTests(unittest.TestCase):
             process = subprocess.Popen([sys.executable, '-I', '-Xutf8', '-B',
                 str(ROOT/'services/windows_supervisor.py')], env=env, stdin=subprocess.DEVNULL,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, creationflags=subprocess.CREATE_NO_WINDOW)
-            handles = []; component_pids = {}; participant = None
+            handles = []; component_pids = {}; participant = None; companions = []
             try:
                 endpoint = Path(env['XDG_RUNTIME_DIR'])/'supervisor'
                 ready(lambda: owner.request('status', owner=endpoint))
@@ -134,6 +144,19 @@ class WindowsSupervisorTests(unittest.TestCase):
                 token='c'*32
                 self.assertEqual(participant.control('prepare',token)['phase'],'prepared')
                 for name,pid in component_pids.items():participant.observe_child(name,pid)
+                from lifecycle.windows_components import discover_companions
+                companions=discover_companions(ROOT,Path(env['AUGMENTOR_SHARED_STATE']),participant)
+                self.assertEqual({item.name:item.pid for item in companions},component_pids)
+                for item in companions:
+                    deadline=time.monotonic()+5
+                    while True:
+                        try:
+                            self.assertEqual(item.control('prepare',token)['phase'],'prepared');break
+                        except ValueError as error:
+                            if 'active work' not in str(error) or time.monotonic()>=deadline:raise
+                            time.sleep(.02)
+                    self.assertEqual(item.control('renew',token)['phase'],'prepared')
+                    self.assertEqual(item.control('cancel',token)['phase'],'ready')
                 with self.assertRaisesRegex(ValueError,'does not belong'):
                     participant.observe_child('prompts',os.getpid())
                 with self.assertRaisesRegex(ValueError,'does not belong'):
@@ -152,6 +175,7 @@ class WindowsSupervisorTests(unittest.TestCase):
                     win32event.WaitForSingleObject(handle, 5000)
                     handle.Close()
                 if participant is not None:participant.close()
+                for item in companions:item.close()
                 if errors: print(errors.decode('utf-8', errors='replace'))
 
     def test_competing_startups_produce_one_authenticated_owner(self):

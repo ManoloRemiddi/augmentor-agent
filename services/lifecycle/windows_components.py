@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 import re
 import sys
+import uuid
 
 from platform_adapters import locks
 from platform_adapters.private_files import descriptor, require_directory
@@ -17,6 +18,22 @@ from platform_adapters.transport import LocalSocket
 
 
 def normalized(path):return os.path.normcase(str(Path(path).resolve()))
+
+
+def component_state(result, action):
+    expected={'prepare':'prepared','renew':'prepared','cancel':'ready','commit':'closing'}
+    if (not isinstance(result,dict) or result.get('protocol')!='augmentor-component-maintenance/1'
+            or result.get('phase') not in ('ready','preparing','prepared','closing')
+            or type(result.get('active')) is not int or result['active']<0
+            or action in expected and result['phase']!=expected[action]):
+        raise ValueError('Unsupported component maintenance response. No request was replayed.')
+    if action in ('prepare','renew','commit') and result['active']!=0:
+        raise ValueError('The component did not confirm idle admission. Its work was preserved.')
+    if action in ('prepare','renew'):
+        ttl=result.get('expiresInSeconds')
+        if type(ttl) not in (int,float) or not math.isfinite(ttl) or not 0<ttl<=30:
+            raise ValueError('The component did not confirm a bounded live reservation.')
+    return result
 
 
 class WindowParticipant:
@@ -27,10 +44,15 @@ class WindowParticipant:
         self.process=None;self.pid=None;self.closed=False
         try:
             state=self.exchange(initial_command)
-            if state.get('maintenanceAdmission')!=1:
-                raise ValueError('This window needs to close normally before maintenance; it has no supported reservation protocol.')
+            self.check_initial(state)
             self.initial=state
         except BaseException:self.close();raise
+
+    def check_initial(self, state):
+        if state.get('maintenanceAdmission')!=1:
+            raise ValueError('This component needs to close normally before maintenance; it has no supported reservation protocol.')
+
+    def before_send(self): pass
 
     def exchange(self, command):
         import win32api,win32con,win32event,win32process
@@ -46,27 +68,25 @@ class WindowParticipant:
                     raise ValueError('The window is running a different executable. Its work was preserved.')
             elif pid!=self.pid or win32event.WaitForSingleObject(self.process,0)!=win32event.WAIT_TIMEOUT:
                 raise ValueError('The observed window exited or changed. No request was sent to a replacement.')
+            self.before_send()
             peer.sendall(command.encode('utf-8')+b'\n')
             with peer.makefile('rb') as stream:raw=stream.readline(262145)
         if len(raw)>262144 or not raw.endswith(b'\n'):raise ValueError('The window response was incomplete; no action was replayed.')
         response=json.loads(raw)
         if not isinstance(response,dict):raise ValueError('Invalid window response.')
+        self.validate_response(response,command)
+        return response
+
+    def validate_response(self,response,command):
         if response.get('ok') is False:raise ValueError(response.get('error','The window refused maintenance.'))
         if response.get('pid')!=self.pid or not isinstance(response.get('buildRoot'),str) or normalized(response['buildRoot'])!=normalized(self.root):
             raise ValueError('The window belongs to another build. Its work was preserved.')
-        return response
 
     def control(self, action, token=None):
         if action not in ('status','prepare','renew','cancel','commit'):raise ValueError('Unsupported maintenance operation.')
         result=self.exchange('maintenance:'+json.dumps({'method':'host.maintenance.'+action,
             'params':{} if action=='status' else {'token':token}})).get('result')
-        expected={'prepare':'prepared','renew':'prepared','cancel':'ready','commit':'closing'}
-        if (not isinstance(result,dict) or result.get('protocol')!='augmentor-component-maintenance/1'
-                or result.get('phase') not in ('ready','prepared','closing')
-                or type(result.get('active')) is not int or result['active']<0
-                or action in expected and result['phase']!=expected[action]):
-            raise ValueError('Unsupported window maintenance response. No request was replayed.')
-        return result
+        return component_state(result,action)
 
     def exited(self, timeout=0):
         import win32event
@@ -114,12 +134,8 @@ class BrowserParticipant(WindowParticipant):
         if action not in ('status','prepare','renew','cancel','commit'):raise ValueError('Unsupported browser maintenance operation.')
         result=self.exchange(json.dumps({'protocol':PROTOCOL,'kind':'maintenance','method':'host.maintenance.'+action,
             'params':{} if action=='status' else {'token':token}})).get('result')
-        expected={'prepare':'prepared','renew':'prepared','cancel':'ready','commit':'closing'}
-        if (not isinstance(result,dict) or result.get('protocol')!='augmentor-component-maintenance/1'
-                or result.get('phase') not in ('ready','preparing','prepared','closing')
-                or type(result.get('active')) is not int or result['active']<0
-                or type(result.get('nativeActive')) is not int or result['nativeActive']<0
-                or action in expected and result['phase']!=expected[action]):
+        component_state(result,action)
+        if type(result.get('nativeActive')) is not int or result['nativeActive']<0:
             raise ValueError('Unsupported native browser response. No request was replayed.')
         return result
 
@@ -137,13 +153,7 @@ class OwnerParticipant(WindowParticipant):
         if action not in ('status','prepare','renew','cancel','commit'):raise ValueError('Unsupported owner maintenance operation.')
         result=self.exchange(json.dumps({'action':'maintenance','method':'host.maintenance.'+action,
             'params':{} if action=='status' else {'token':token}})).get('maintenance')
-        expected={'prepare':'prepared','renew':'prepared','cancel':'ready','commit':'closing'}
-        if (not isinstance(result,dict) or result.get('protocol')!='augmentor-component-maintenance/1'
-                or result.get('phase') not in ('ready','prepared','closing')
-                or type(result.get('active')) is not int or result['active']<0
-                or action in expected and result['phase']!=expected[action]):
-            raise ValueError('Unsupported owner maintenance response. No request was replayed.')
-        return result
+        return component_state(result,action)
 
     def observe_child(self, name, pid):
         result=self.exchange(json.dumps({'action':'observe-child','component':name,'pid':pid}))
@@ -165,6 +175,61 @@ def discover_owner(root, runtime):
         else:held=False
     finally:os.close(fd)
     return OwnerParticipant(directory/'control.sock',root) if held else None
+
+
+class CompanionParticipant(WindowParticipant):
+    """Prompt/memory RPC bound to an exact pipe peer and supervisor Job."""
+    def __init__(self, endpoint, root, *, owner, name):
+        if name not in ('prompts','memory'):raise ValueError('Unsupported private companion.')
+        self.owner,self.name=owner,name
+        super().__init__(endpoint,root,executable='python/python.exe',
+            initial_command=self.command('status'))
+
+    @staticmethod
+    def command(action,token=None):
+        if action not in ('status','prepare','renew','cancel','commit'):raise ValueError('Unsupported companion maintenance operation.')
+        return json.dumps({'protocol':'augmentor-prompts/1','id':uuid.uuid4().hex,
+            'method':'host.maintenance.'+action,'params':{} if action=='status' else {'token':token}})
+
+    def before_send(self):
+        # The pipe kernel identity and retained process handle are established
+        # before asking the reserved owner about this exact component's Job.
+        self.owner.observe_child(self.name,self.pid)
+
+    def validate_response(self,response,command):
+        if response.get('id')!=json.loads(command)['id']:
+            raise ValueError('The companion response does not match this request. No request was replayed.')
+        if response.get('error'):
+            error=response['error']
+            raise ValueError(error.get('message','The companion refused maintenance.') if isinstance(error,dict) else 'The companion refused maintenance.')
+
+    def check_initial(self,state):component_state(state.get('result'),'status')
+
+    def control(self,action,token=None):
+        return component_state(self.exchange(self.command(action,token)).get('result'),action)
+
+
+def discover_companions(root,shared,owner):
+    """Observe the reserved owner's components; preserve unowned listeners."""
+    shared=require_directory(shared);result=[]
+    status=owner.exchange(json.dumps({'action':'status'}))
+    try:
+        for name,filename in (('prompts','prompts.sock'),('memory','dual-memory.sock')):
+            endpoint=shared/filename
+            running=status.get('companions',{}).get(name,{}).get('running')
+            if type(running) is not bool:raise ValueError('The background component inventory is incomplete.')
+            if running:
+                result.append(CompanionParticipant(endpoint,root,owner=owner,name=name))
+            else:
+                with LocalSocket() as peer:
+                    peer.settimeout(2)
+                    try:peer.connect(str(endpoint))
+                    except FileNotFoundError:continue
+                    raise ValueError('A shared companion is running outside this background owner. Its work was preserved.')
+        return result
+    except BaseException:
+        for item in result:item.close()
+        raise
 
 
 def discover_browsers(root, runtime):

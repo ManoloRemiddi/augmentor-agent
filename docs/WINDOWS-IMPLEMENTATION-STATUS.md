@@ -46,6 +46,15 @@ Current source also adds retained background-owner discovery and read-only
 component Job verification; its new native assertions await execution. Global
 coordination, component transports and installer apply remain unfinished.
 
+Full native runtime `e4593b1` subsequently passes both CPUs in
+[36378514796](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36378514796),
+including actual assembled desktop/browser startup readiness. `3a379a2` contains
+the corrected per-host Chromium qualification and background-owner observation;
+its hosted jobs are running. Current source additionally binds prompt/memory
+maintenance to their retained pipe peers and owner Jobs, validates idle/expiry
+acknowledgments, and extends native companion reservation tests. Portable policy
+checks pass; new native companion execution remains pending.
+
 ## Baseline and environments (W0)
 
 Implementation branch `feat/windows` starts from reviewed `main` `b8e36a4` plus

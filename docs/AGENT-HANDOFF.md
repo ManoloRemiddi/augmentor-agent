@@ -54,6 +54,14 @@ reservation; new native execution is pending. Continue component transport
 identity, global coordinator and independent installer apply. Keep the draft
 unmerged and all public-release, feature-parity and physical test gates open.
 
+Full `e4593b1` runtime now passes both CPUs, including assembled startup readiness.
+The per-host Chromium proof and owner discovery are pushed at `3a379a2`; jobs are
+running. Current source adds prompt/memory participant transport identity and
+bounded idle acknowledgment checks. Native actual-companion prepare/renew/cancel
+assertions are added but await execution. Next are owned DSH/voice transport
+identity and the complete coordinator/apply transaction; no public installer or
+browser commit is enabled.
+
 Current Windows worktree: `feat/windows` in an isolated canonical-repository
 checkout; draft [PR #20](https://github.com/ManoloRemiddi/augmentor-agent/pull/20).
 At `523fe9a`, real hosted x64/ARM64 runtime and disposable two-version installer
