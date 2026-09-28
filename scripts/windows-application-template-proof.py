@@ -171,7 +171,8 @@ def interactive_finish(installer, log):
                 # Different pages can reuse the same Next button. Retain visible
                 # text to avoid clicking twice while the previous event is queued.
                 page = tuple(sorted((kind, text) for _handle, kind, text in controls if text))
-                for caption in ('Finish', 'Install', 'Next >'):
+                # The pinned modern wizard renders Next without the legacy >.
+                for caption in ('Finish', 'Install', 'Next', 'Next >'):
                     buttons = [handle for handle, kind, text in controls
                         if kind == 'TNewButton' and text and text.replace('&','') == caption and win32gui.IsWindowEnabled(handle)]
                     if len(buttons) != 1 or (page,caption) in clicked: continue

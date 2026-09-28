@@ -498,3 +498,9 @@ and button criteria, and writes bounded owned-window diagnostics on failure.
 The 120-second overall bound and required native launch observation remain.
 The full `8a3ff05` x64 installed proof separately passes normal removal and
 persistent-data retention; that workflow still has a memory startup-test failure.
+
+The `5bd0e45` native diagnostics identify the visible enabled control as
+`TNewButton` with caption `&Next`; the modern wizard omits the legacy arrow.
+The fixture now accepts that exact caption as well as `Next >`. No application
+or installer admission behavior changes. Finish/native-launch qualification
+remains pending until this corrected driver reaches and verifies it.
