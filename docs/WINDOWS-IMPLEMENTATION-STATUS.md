@@ -460,3 +460,12 @@ alive and authenticated pipe connection succeeds, but response reading times
 out. It is not an exited child or a missing endpoint. The next fixture launch
 records bounded thread stacks for this stalled command path; normal product
 launches do not enable that diagnostic timer.
+
+The stalled UI thread capture at `e9467ff` shows the main Qt event loop running
+while the pipe worker waits for GUI completion. The adapter now crosses threads
+through an explicit queued QObject slot, then emits the common handler callback
+on the GUI thread. The focused test uses a real `app.exec()` loop rather than
+manual event pumping. Native execution remains required to confirm the fix.
+Owned-process construction also closes its Job if limit/handle configuration
+fails; a native failure-injection test checks that repeated failures leak no
+kernel handles and launch no workload.

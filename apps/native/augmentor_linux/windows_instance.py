@@ -9,7 +9,7 @@ from collections import deque
 import os
 import socketserver
 import threading
-from PySide6.QtCore import QByteArray, QObject, Signal
+from PySide6.QtCore import QByteArray, QObject, Signal, Slot, Qt
 from .platform_runtime import LocalSocket
 from platform_adapters import locks
 from platform_adapters.private_files import descriptor
@@ -75,10 +75,18 @@ class Connection:
 
 class Server(QObject):
     newConnection = Signal()
+    commandQueued = Signal()
     def __init__(self):
         super().__init__()
         self.pending = deque(); self.pending_lock = threading.Lock()
         self.stopped = threading.Event(); self.server = self.worker = None
+        # The worker crosses into a QObject slot with explicit GUI affinity.
+        # The public callback is then emitted from the GUI thread, matching
+        # QLocalServer rather than depending on a plain Python closure's proxy.
+        self.commandQueued.connect(self.deliver, Qt.ConnectionType.QueuedConnection)
+    @Slot()
+    def deliver(self):
+        if not self.stopped.is_set(): self.newConnection.emit()
     def listen(self, address):
         owner = self
         class Handler(socketserver.StreamRequestHandler):
@@ -93,7 +101,7 @@ class Server(QObject):
                 connection = Connection(self.request, raw[:-1])
                 with owner.pending_lock: owner.pending.append(connection)
                 try:
-                    if not owner.stopped.is_set(): owner.newConnection.emit()
+                    if not owner.stopped.is_set(): owner.commandQueued.emit()
                     connection.closed.wait(10)
                 except RuntimeError: pass  # QApplication may have completed Quit.
                 finally: connection.closed.set()

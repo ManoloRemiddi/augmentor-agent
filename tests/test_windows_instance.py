@@ -11,7 +11,7 @@ import unittest
 @unittest.skipUnless(sys.platform == 'win32', 'requires Windows pipes and Qt dispatch')
 class WindowsInstanceTests(unittest.TestCase):
     def test_authenticated_pipe_dispatches_on_qt_thread_and_replies(self):
-        from PySide6.QtCore import QCoreApplication
+        from PySide6.QtCore import QCoreApplication, QTimer
         from augmentor_linux.windows_instance import Client, Server, Lock
         from augmentor_linux.platform_runtime import LocalSocket, private_directory
         app = QCoreApplication.instance() or QCoreApplication([])
@@ -39,8 +39,11 @@ class WindowsInstanceTests(unittest.TestCase):
             worker = threading.Thread(target=client); worker.start()
             try:
                 deadline = time.monotonic()+5
-                while worker.is_alive() and time.monotonic()<deadline:
-                    app.processEvents(); time.sleep(.005)
+                timer = QTimer()
+                timer.timeout.connect(lambda: app.quit() if not worker.is_alive() or time.monotonic()>=deadline else None)
+                timer.start(10)
+                app.exec()
+                timer.stop()
                 worker.join(timeout=1)
                 self.assertFalse(worker.is_alive())
                 self.assertEqual(received, [(main_thread, 'onboarding:café 🪟')])

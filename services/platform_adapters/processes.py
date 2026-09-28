@@ -32,22 +32,22 @@ class OwnedProcess:
             if not self.job:
                 self.job = None
                 raise ctypes.WinError(ctypes.get_last_error())
-            limits = win32job.QueryInformationJobObject(self.job, win32job.JobObjectExtendedLimitInformation)
-            limits['BasicLimitInformation']['LimitFlags'] |= win32job.JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
-            win32job.SetInformationJobObject(self.job, win32job.JobObjectExtendedLimitInformation, limits)
-            startup = subprocess.STARTUPINFO()
-            startup.lpAttributeList = {'handle_list': [int(self.job)]}
-            win32api.SetHandleInformation(self.job, win32con.HANDLE_FLAG_INHERIT, win32con.HANDLE_FLAG_INHERIT)
             try:
-                self.process = subprocess.Popen([sys.executable, '-I', '-Xutf8', '-B',
-                    str(Path(__file__).with_name('process_worker.py')), str(int(self.job)), *map(os.fspath, argv)],
-                    close_fds=True, startupinfo=startup, creationflags=subprocess.CREATE_NO_WINDOW, **kwargs)
+                limits = win32job.QueryInformationJobObject(self.job, win32job.JobObjectExtendedLimitInformation)
+                limits['BasicLimitInformation']['LimitFlags'] |= win32job.JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
+                win32job.SetInformationJobObject(self.job, win32job.JobObjectExtendedLimitInformation, limits)
+                startup = subprocess.STARTUPINFO()
+                startup.lpAttributeList = {'handle_list': [int(self.job)]}
+                win32api.SetHandleInformation(self.job, win32con.HANDLE_FLAG_INHERIT, win32con.HANDLE_FLAG_INHERIT)
+                try:
+                    self.process = subprocess.Popen([sys.executable, '-I', '-Xutf8', '-B',
+                        str(Path(__file__).with_name('process_worker.py')), str(int(self.job)), *map(os.fspath, argv)],
+                        close_fds=True, startupinfo=startup, creationflags=subprocess.CREATE_NO_WINDOW, **kwargs)
+                finally:
+                    win32api.SetHandleInformation(self.job, win32con.HANDLE_FLAG_INHERIT, 0)
             except BaseException:
                 self.close()
                 raise
-            finally:
-                if self.job is not None:
-                    win32api.SetHandleInformation(self.job, win32con.HANDLE_FLAG_INHERIT, 0)
         else:
             self.process = subprocess.Popen(argv, start_new_session=True, **kwargs)
 

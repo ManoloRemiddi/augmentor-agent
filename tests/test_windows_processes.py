@@ -8,6 +8,7 @@ import sys
 import tempfile
 import time
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'services'))
@@ -15,6 +16,26 @@ sys.path.insert(0, str(ROOT/'services'))
 
 @unittest.skipUnless(sys.platform == 'win32', 'requires Windows Job objects')
 class WindowsProcessTests(unittest.TestCase):
+    def test_failed_job_configuration_closes_the_kernel_handle(self):
+        import ctypes
+        from ctypes import wintypes
+        import win32api
+        import win32job
+        from platform_adapters.processes import OwnedProcess
+        count = ctypes.WinDLL('kernel32', use_last_error=True).GetProcessHandleCount
+        count.argtypes = [wintypes.HANDLE, ctypes.POINTER(wintypes.DWORD)]
+        count.restype = wintypes.BOOL
+        def handles():
+            value = wintypes.DWORD()
+            self.assertTrue(count(int(win32api.GetCurrentProcess()), ctypes.byref(value)))
+            return value.value
+        before = handles()
+        with patch.object(win32job, 'QueryInformationJobObject', side_effect=RuntimeError('fixture job configuration failure')):
+            for _ in range(5):
+                with self.assertRaisesRegex(RuntimeError, 'fixture job'):
+                    OwnedProcess([sys.executable, '-c', 'raise AssertionError("must not launch")'])
+        self.assertEqual(handles(), before)
+
     def test_binary_stdio_and_unicode_environment_reach_contained_workload(self):
         from platform_adapters.processes import OwnedProcess
         code = '''import os,sys
