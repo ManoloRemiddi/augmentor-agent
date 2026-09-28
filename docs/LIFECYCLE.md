@@ -559,6 +559,19 @@ fixture with identical bytes, not full application N-to-N+1 or automatic recover
 Installer result recording, recovery/archival, health, rollback and product UI
 integration remain required.
 
+`services/lifecycle/update.py` now composes these contracts for an already
+verified/pinned release: durable preparation, observed dependency-order drain,
+independent installer readiness, durable apply intent, one authorization and
+recorded acknowledgment. Readiness starts after drain so a large component graph
+does not consume the installer's preparation timeout. The platform startup
+writer stays held until backend observation cleanup; the installer retains its
+transferred copy. Success explicitly requires the coordinator process to exit
+and does not declare installation complete. Five local fault-ordering tests use
+real journal writes and component admission; they cover busy work, failed drain,
+missing readiness and lost APPLY replies without replay. Native checks are added
+to the fast workflow. Product backend/UI wiring and independent recovery still
+need implementation and full installed-artifact qualification.
+
 ### Windows installer handoff
 
 The [private installer handshake](WINDOWS-INSTALLER-DECISION.md#authenticated-handoff-source)

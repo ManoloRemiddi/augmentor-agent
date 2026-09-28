@@ -4,6 +4,18 @@
 
 ## September 27 Windows implementation — active
 
+Latest: shared update decision orchestration has five local fault-ordering tests
+with real durable journals/admission (12 combined update tests pass). Backend/UI
+wiring and independent recovery remain open. Full `2b1680d` x64 successfully
+starts DSH and owned voice, then exposes an ownership failure after automatic
+voice-profile cloning. The separate Resonant 0.1.19 candidate `7d0fd6d` corrects
+that write path; 42 local tests and actual DSH fixture integration pass, while
+native qualification is pending before repinning. `3394145` helper compilation
+passes but Inno reports a Boolean type mismatch; current source corrects the
+conversion. Earlier Inno journal qualification `1872e19` passes both CPUs. The
+legacy rejected-Velopack fixture also hit a partial JSON read; read-only polling
+now waits for completed fixture output. No customer installer has been released.
+
 Current source adds [final installer access](WINDOWS-INSTALLER-DECISION.md#final-installation-access-after-coordinator-exit)
 after observed coordinator exit, with an actual Inno additional-lifetime-holder
 refusal case. Native compilation/execution is pending. Fast `1872e19` passes both

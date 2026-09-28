@@ -272,3 +272,9 @@ exit. Authenticated cases test normal exit, crash, and an extra holder that must
 make Setup refuse final access. Source/syntax checks pass; these new C/Inno cases
 await native compilation/execution. Initial installation, real product data,
 recovery/health/rollback, signing and ordinary-user acceptance remain separate.
+
+At `3394145`, the helper compiles on both CPUs, then Inno compilation rejects the
+combined Boolean/Windows BOOL expression. The fixture now assigns the result to
+a Pascal Boolean before branching and uses an explicit Cardinal timeout. Native
+execution of final access remains pending. The preceding `1872e19` Inno journal
+qualification passes both CPUs in [36388207448](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36388207448).

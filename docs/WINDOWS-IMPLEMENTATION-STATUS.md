@@ -2,6 +2,16 @@
 
 # Windows implementation evidence
 
+Current source adds shared update decision orchestration: five local tests with
+real journal writes/admission pass (12 combined journal/coordinator checks).
+`2b1680d` full x64 confirms managed DSH and owned voice startup, then refuses a
+voice config whose Windows owner changed during automatic profile cloning.
+Resonant 0.1.19 candidate `7d0fd6d` corrects that separate package; native checks
+must pass before Augmentor repins it. The `3394145` native helper compiles on both
+CPUs; Inno's Boolean/BOOL type mismatch is corrected in source and awaits execution.
+Earlier [Inno journal qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36388207448)
+passes both CPUs. Full graph drain, installed update and recovery remain open.
+
 Fast native [`1872e19`](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36388207564)
 passes both CPUs, including all seven private-journal crash/write tests. Current
 source adds final Setup access after actual coordinator exit and refusal while an

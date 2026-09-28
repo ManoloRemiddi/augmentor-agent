@@ -22,6 +22,7 @@ DSH installation/environment and package acceptance steps.
 | Actual memory engine / model | `python3 scripts/proof-controlled-memory.py --help` | Disposable pinned engine, explicit fixture/live modes, archive isolation and bounded real-model completion |
 | Maintenance | `python3 -m unittest discover -s tests -p test_lifecycle.py` | Lifetime locks, preserved backups, real temporary memory service shutdown |
 | Durable update record | `python3 -m unittest discover -s tests -p test_update_journal.py` | Real private-file writes, independent writer exclusion, child-process crash, lost flush/acknowledgment and preserved recovery state. Native Inno handoff uses it in disposable repair fixtures; no automatic recovery or customer-update claim. |
+| Update decisions | `python3 -m unittest discover -s tests -p test_update_coordinator.py` | Real journal/admission with fixture graph and installer. Busy work, failed drain, readiness failure, durable intent and one-shot APPLY. Product backend/UI and recovery remain separate gates. |
 | DSH approval / questions / forks | `scripts/dsh-setup-proof.py` with workflow flags | Actual DSH and Qt, deterministic model |
 | Native pointer / clipboard | `bash scripts/native-x11-proof.sh` | Isolated X11 desktop, actual input/clipboard |
 | Flare workspace / stacking | `AUGMENTOR_UI_PROOF=scripts/flare-workspace-proof.py bash scripts/native-x11-proof.sh` | Isolated X11/KWin, two real native processes; requires wmctrl and xdotool |

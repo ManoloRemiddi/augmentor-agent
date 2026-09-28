@@ -122,12 +122,16 @@ begin
 end;
 
 function PrepareToInstall(var NeedsRestart: Boolean): String;
+var AccessReady: Boolean; AccessTimeout: Cardinal;
 begin
   Result := '';
-  if AuthenticatedHandoff and not AcquireAuthenticatedInstallation(
-      StrToIntDef(ExpandConstant('{param:finalleasetimeout|30000}'), 30000)) then begin
-    Result := 'The update coordinator or an application process has not released installation access.';
-    exit;
+  if AuthenticatedHandoff then begin
+    AccessTimeout := Cardinal(StrToIntDef(ExpandConstant('{param:finalleasetimeout|30000}'), 30000));
+    AccessReady := AcquireAuthenticatedInstallation(AccessTimeout);
+    if not AccessReady then begin
+      Result := 'The update coordinator or an application process has not released installation access.';
+      exit;
+    end;
   end;
   if not AcquireGate then
     Result := 'Augmentor qualification has active work. Finish it before maintenance.'

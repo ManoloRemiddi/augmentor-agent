@@ -17,8 +17,10 @@ ROOT = Path(__file__).resolve().parents[1]
 def wait_for(path, timeout=60):
     deadline = time.monotonic()+timeout
     while time.monotonic() < deadline:
-        if path.is_file():
-            return json.loads(path.read_text())
+        try:
+            return json.loads(path.read_text(encoding='utf-8'))
+        except (FileNotFoundError,json.JSONDecodeError):
+            pass  # Read-only wait for the disposable fixture's completed write.
         time.sleep(.2)
     raise TimeoutError('No fixture response: '+str(path))
 
