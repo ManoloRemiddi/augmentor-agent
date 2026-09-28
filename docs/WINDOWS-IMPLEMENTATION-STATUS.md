@@ -738,3 +738,23 @@ misreported as natural shutdown. The work also fixes shared plugin cleanup to
 use the actual Cordis effect lifecycle. Native SDK, busy-model refusal and
 natural-exit/restart checks are added to Windows qualification and remain pending.
 Voice/browser/desktop participation and the global coordinator are still required.
+
+At `795a72b`, shared Linux validation, macOS feasibility, both fast Windows
+desktop jobs and both Inno/WinSparkle candidate jobs pass. Full Windows runtime
+[run 36370115270](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36370115270)
+passes the actual pinned SDK admission tests but fails the new managed DSH proof
+on both CPUs: the product token was created with the elevated token's group
+owner, which the strict file validator correctly refuses. Source now creates
+and reads the token through explicit private kernel descriptors, preserving an
+external home's ACL and refusing replacement/links. New native execution remains
+pending. Fixture cleanup also retains the replacement supervisor's exact process
+handle and preserves the primary failure if its still-live companions refuse exit.
+
+Shared desktop source now implements reversible maintenance reservation, blocks
+input and reconnection while prepared, counts queued/background work and closes
+normally after commit. Four new Qt tests, affected controller/queue/window/voice
+regressions and a real two-process Linux preview proof pass. The latter verifies
+the other window's draft survives, cancelled input works again and a committed
+preview exits zero. The compiled Windows chat proof now requests the same
+prepare/commit path; native execution is pending. Voice/browser participation,
+global coordination and full installer integration remain required.

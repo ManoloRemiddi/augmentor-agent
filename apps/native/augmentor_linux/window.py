@@ -19,6 +19,7 @@ from PySide6.QtGui import QColor, QPainter, QKeySequence, QShortcut, QRegion, QD
 from PySide6.QtWidgets import (QApplication,QWidget,QFrame,QLabel,QPushButton,QVBoxLayout,QHBoxLayout,
     QStackedLayout,QTextEdit,QTextBrowser,QMessageBox,QInputDialog,QMenu,QSizePolicy,QLayout,QDialog)
 from .controller import Controller
+from .maintenance import WindowMaintenance
 from .voice_button import VoiceButton
 from .design import COPY_FEEDBACK_MS
 from .queue_panel import QueuePanel
@@ -47,6 +48,7 @@ class Window(QWidget):
         scaled(self).setMinimumSize(364,364);self.resize(424,484)
         self.preferences=Preferences(not preview)
         if preview:self.preferences.values['ui_scale']=self.ui_scale.base
+        initialize_voice_profile = None
         if not preview and current_name()!='main':
             # Materialize the independent voice profile at first open, not
             # when the user eventually visits Voice settings. No microphone.
@@ -54,10 +56,11 @@ class Window(QWidget):
             def initialize_voice_profile():
                 try:voice_request('preferences')
                 except Exception:pass  # Optional offline voice must not prevent chat.
-            threading.Thread(target=initialize_voice_profile,daemon=True).start()
         if harness in ('pi','dsh'):
             self.preferences.values['harness']=harness;self.preferences.save()
         self.controller=None if preview else Controller(self,harness=self.preferences.values['harness'])
+        self.maintenance = WindowMaintenance(self)
+        if initialize_voice_profile:self.controller.task(initialize_voice_profile)
         self.setup_dialog=None;self.appearance_dialog=None;self.setup_offered=False
         self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.expanded_thinking=set();self.editing=None
         self.rendered_messages=None;self.rendered_partial=''
@@ -181,6 +184,7 @@ class Window(QWidget):
                 'No OpenCode conversation has been transferred or replayed.'))
 
     def switch_harness(self,harness,reconnect=False):
+        if self.maintenance.phase()!='ready':return
         if self.voice_dialog or self.voice_input or self.voice_opening:self.close_voice_panel()
         if harness not in ('pi','dsh') or not self.controller:return
         if self.controller.harness==harness and not reconnect:return
@@ -231,6 +235,7 @@ class Window(QWidget):
             if not available and not self.controller.session:QTimer.singleShot(0,self.open_setup)
 
     def open_setup(self):
+        if getattr(self,'maintenance',None) and self.maintenance.phase()!='ready':return
         if not self.controller:return
         if self.controller.running or self.controller.navigating:
             self.set_status('Finish the current action before configuring a model.');return
@@ -510,7 +515,7 @@ class Window(QWidget):
             except Exception as exc:error=str(exc)
             try:self.composer.improvement_result.emit(identity,result,error)
             except RuntimeError:pass
-        threading.Thread(target=work,daemon=True,name='augmentor-improve-prompt').start()
+        self.controller.task(work)
 
     def send(self):
         if self.composer.improving:return
@@ -1176,6 +1181,9 @@ class Window(QWidget):
             self.close()
 
     def closeEvent(self, event):
+        phase = self.maintenance.phase()
+        if phase=='prepared' or phase=='closing' and self.maintenance_state(include_reservation=False)['busy']:
+            event.ignore();return
         if self.voice_dialog or self.voice_input or self.voice_opening:self.close_voice_panel()
         if self.controller and getattr(self.controller,'repairing',False):
             event.ignore();return
@@ -1252,12 +1260,17 @@ class Window(QWidget):
         if self.isVisible() and not self.isMinimized():self.hide()
         else:self.bring_forward()
 
-    def maintenance_state(self):
+    def maintenance_state(self, include_reservation=True):
+        admission = self.maintenance.gate.control('host.maintenance.status', {})
         running = bool(self.controller and self.controller.running)
         draft = bool(self.composer.toPlainText() or self.submitted_draft or self.editing)
         busy = (running or draft or self.composer.improving or self.voice_opening
-                or self.voice_input is not None or bool(self.voice_dialog and self.voice_dialog.capture)
+                or self.voice_input is not None or self.voice_dialog is not None
+                or bool(self.controller and (any(getattr(self.controller,name,False)
+                    for name in ('navigating','preparing','repairing','loading_page'))
+                    or bool(getattr(self.controller,'recovery_lock',None) and self.controller.recovery_lock.locked())))
                 or any(dialog.isVisible() for dialog in self.findChildren(QDialog)))
+        if admission['active'] or include_reservation and admission['phase']!='ready':busy=True
         return {'running': running, 'busy': busy, 'draftPresent': draft, 'accepted': not busy}
 
     def focus_composer(self):
@@ -1352,6 +1365,18 @@ def main():
                         response={'ok':True,'result':result}
                     except Exception as error:response={'ok':False,'error':str(error)}
                     client.write(json.dumps(response).encode()+b'\n');client.waitForBytesWritten(500)
+                elif command.startswith('maintenance:'):
+                    try:
+                        request=json.loads(command[len('maintenance:'):])
+                        if not isinstance(request,dict) or set(request)!={'method','params'}:raise ValueError('Unsupported maintenance request fields.')
+                        result=window.maintenance.control(request['method'],request['params'])
+                        response={'ok':True,'result':result,'pid':os.getpid(),'buildRoot':str(Path(__file__).resolve().parents[3])}
+                    except Exception as error:response={'ok':False,'error':str(error)}
+                    client.write(json.dumps(response).encode()+b'\n');client.waitForBytesWritten(500)
+                    if response.get('ok') and result['phase']=='closing':
+                        def finish_maintenance():
+                            if window.close():app.quit()
+                        QTimer.singleShot(0,finish_maintenance)
                 elif command in ('maintenance.status','maintenance.close','maintenance.recover'):
                     state=window.maintenance_state()
                     busy=state['busy']
@@ -1371,6 +1396,9 @@ def main():
                     client.waitForBytesWritten(500)
                     if command=='maintenance.close' and not busy:
                         window.close()
+                elif window.maintenance.phase()!='ready':
+                    client.write(json.dumps({'ok':False,'error':'Augmentor maintenance is in progress. This request was not started.'}).encode()+b'\n')
+                    client.waitForBytesWritten(500)
                 elif command.startswith('onboarding:'):
                     try:
                         from .onboarding import start
@@ -1387,6 +1415,7 @@ def main():
                 else:window.toggle_visibility()
                 client.disconnectFromServer()
                 client.deleteLater()
+                QTimer.singleShot(0,activate)
         app.instance_server.newConnection.connect(activate)
         # The server listens before Window construction. Qt may process an
         # arrival during initialization, before this callback exists. Drain any

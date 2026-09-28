@@ -246,8 +246,26 @@ alive after its root disposed. Product, memory, execution, steering and desktop
 cleanup now use `ctx.effect(() => cleanup)`; the lease cleanup waits for its
 helper to exit normally. This shared correction applies to all three OSs.
 
-Voice, browser and desktop still require their own participation. The global
+Voice and browser still require their own participation. The global
 owner must stop automatic restarts, reserve
 all components, cancel reservations on preparation failure, and acquire the
 exclusive installation lease after they drain. No installer may infer that the
 whole app is idle from this one component's response or terminate active Jobs.
+
+### Desktop admission
+
+The shared native window accepts the same component protocol through its private
+instance socket, as `maintenance:` followed by an exact JSON `method`/`params`
+object. Responses include the process and build identity. Preparation refuses
+drafts, open dialogs, voice panels, navigation, recovery and accepted background
+work. Controller admission counts queued work before its thread starts; each
+monitor pass is counted, while the sleeping monitor holds no work reservation.
+Prepared windows suspend health/reconnect attempts and disable input. Cancellation
+or expiry restores their prior enabled state. Other windows retain their drafts.
+
+Commit acknowledges first, then closes the idle window normally. A reservation
+does not call Stop, clear drafts, replay prompts or silently switch harnesses.
+The old maintenance status/close commands cannot bypass a reservation. Local Qt
+tests and a real two-process Linux preview proof pass; compiled Windows execution
+of this new desktop behavior is pending. These are component-level checks, not
+proof of global Quit or an installation transaction.

@@ -86,11 +86,22 @@ def desktop_chat(root, work, out):
                 session = after['session']
                 ui('capture', path=str((out/('native-chat-'+submission+'.png')).resolve()))
                 turns.append({'submission': submission, 'pid': after['pid'], 'session': session, 'online': after['online']})
-                closed = exchange('maintenance.close'); assert closed['accepted'], closed
+                maintenance_token = uuid.uuid4().hex
+                def maintenance(action):
+                    return exchange('maintenance:'+json.dumps({'method':'host.maintenance.'+action,
+                        'params':{'token':maintenance_token}}))
+                deadline = time.monotonic()+10
+                while True:
+                    prepared = maintenance('prepare')
+                    if prepared.get('ok'):break
+                    if time.monotonic()>=deadline:raise AssertionError('The idle desktop did not prepare: '+str(prepared))
+                    time.sleep(.1)
+                assert prepared['result']['phase']=='prepared' and prepared['pid']==after['pid'], prepared
+                closed = maintenance('commit'); assert closed['ok'] and closed['result']['phase']=='closing', closed
                 assert child.wait(timeout=15) == 0, 'The idle desktop did not close normally.'
             finally:
                 child.terminate(); child.wait(timeout=10)
-        result.update(passed=True, turns=turns, historyRestored=True, noDuplicateSubmission=True)
+        result.update(passed=True, turns=turns, historyRestored=True, noDuplicateSubmission=True, preparedNormalWindowExit=True)
         return result
     finally:
         (out/'native-chat.json').write_text(json.dumps(result, indent=2)+'\n', encoding='utf-8')
@@ -159,9 +170,11 @@ def main():
             time.sleep(.2)
         raise AssertionError('The isolated Windows setup proof timed out.')
     # Retain the exact process handle for the owned crash/restart test.
-    supervisor = subprocess.Popen([str(root/'python/python.exe'), '-I', '-Xutf8', '-B',
-        str(root/'services/windows_supervisor.py')], stdin=subprocess.DEVNULL,
-        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=subprocess.CREATE_NO_WINDOW)
+    def start_supervisor():
+        return subprocess.Popen([str(root/'python/python.exe'), '-I', '-Xutf8', '-B',
+            str(root/'services/windows_supervisor.py')], stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=subprocess.CREATE_NO_WINDOW)
+    supervisor = start_supervisor()
     try:
         wait_for(lambda: owner.request('status', root=root))
         from platform_adapters.processes import OwnedProcess
@@ -223,6 +236,10 @@ def main():
         def released_history():
             with session_write_lease(lock_path): return True
         wait_for(released_history)
+        # Retain the replacement owner's exact handle too. Failure cleanup may
+        # terminate this disposable process, never a discovered PID or name.
+        supervisor = start_supervisor()
+        wait_for(lambda: owner.request('status', root=root))
         exit_marker = work/'natural-dsh-exit.json'
         fixture_patch = state/'home/profiles/web/cordis.patch.yml'
         with fixture_patch.open('a', encoding='utf-8') as stream:
@@ -252,16 +269,22 @@ def main():
                 report['fixtureDiagnostics'][path.name] = excerpt.replace('fixture-only-key', '[redacted]')
         raise
     finally:
+        release_model.set()
         try:
             # This is a disposable synthetic connection, never the user's config.
             setup.configuration().unlink(missing_ok=True)
             if agent.owned(): agent.stop_failed_setup()
             try: owner.request('exit-if-empty', root=root)
             except FileNotFoundError: pass
+            except ValueError as error:
+                # Companions can still be alive in this bounded fixture. Their
+                # global Quit is not being claimed; teardown uses our handle.
+                report['fixtureOwnerCleanup'] = str(error)
+        except Exception as error:
+            report['fixtureCleanupError'] = type(error).__name__+': '+str(error)
         finally:
             if supervisor.poll() is None: supervisor.kill()
             supervisor.wait(timeout=10)
-            release_model.set()
             server.shutdown(); server.server_close()
             report['privateFixtureDirectory'] = str(work)
             (args.out/'managed-setup.json').write_text(json.dumps(report, indent=2)+'\n', encoding='utf-8')

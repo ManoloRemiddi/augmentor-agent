@@ -2,17 +2,14 @@
 """Admission/shutdown proof for an explicitly supplied disposable DSH host."""
 import hashlib
 import json
-import os
 import secrets
 import time
 import urllib.error
 
 
 def connection(base, home):
-    from dsh.setup import http
-    from platform_adapters.private_files import descriptor
-    with os.fdopen(descriptor(home/'augmentor-product-token'), encoding='utf-8') as stream:
-        secret = stream.read(128).strip()
+    from dsh.setup import http, product_token
+    secret = product_token(home/'augmentor-product-token')
     description = http(base, '/api/augmentor-product')
     assert description.get('maintenanceAdmission') == 1
     assert description['homeId'] == hashlib.sha256(secret.encode()).hexdigest()

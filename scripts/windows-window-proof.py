@@ -10,6 +10,7 @@ import struct
 import sys
 import tempfile
 import time
+import secrets
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT/'services'), str(ROOT/'apps/native')]
@@ -123,8 +124,27 @@ def main():
         assert inspect('main')['draft'] == 'Keep this draft'
         screenshot = (args.out/'windows-two-window-main.png').resolve()
         command('main','ui-test:'+json.dumps({'action':'capture','path':str(screenshot)}))
+        token = secrets.token_hex(24)
+        def maintenance(name,action):
+            return command(name,'maintenance:'+json.dumps({'method':'host.maintenance.'+action,
+                'params':{} if action=='status' else {'token':token}}))
+        assert not maintenance('main','prepare')['ok'], 'An unsent draft must refuse preparation.'
+        prepared = maintenance('secondary','prepare')
+        assert prepared['ok'] and prepared['result']['phase']=='prepared', prepared
+        refused = command('secondary','ui-test:'+json.dumps({'action':'draft','expected':'','text':'Must not enter'}))
+        assert not refused['ok'] and inspect('secondary')['draft']=='', refused
+        assert not command('secondary','voice')['ok']
+        assert inspect('main')['draft']=='Keep this draft'
+        assert maintenance('secondary','cancel')['result']['phase']=='ready'
+        accepted = command('secondary','ui-test:'+json.dumps({'action':'draft','expected':'','text':'Restored input'}))
+        assert accepted['ok'] and inspect('secondary')['draft']=='Restored input', accepted
+        command('secondary','ui-test:'+json.dumps({'action':'draft','expected':'Restored input','text':''}))
+        assert maintenance('secondary','prepare')['ok']
+        assert maintenance('secondary','commit')['result']['phase']=='closing'
+        assert children[1].wait(timeout=10)==0, 'The prepared preview window did not close normally.'
         report.update(passed=True, distinctWindows=True, repeatedLaunchPreservedOwner=True,
-            draftBlockedMaintenance=True, zoomPreservedDraft=True, shortcutActivationToggle=True, initial=initial, zoom=zoomed['result'])
+            draftBlockedMaintenance=True, zoomPreservedDraft=True, shortcutActivationToggle=True,
+            reversibleWindowAdmission=True, preparedPreviewExitCode=0, initial=initial, zoom=zoomed['result'])
     except BaseException:
         report['childExitCodes'] = [child.poll() for child in children]
         for log in logs: log.flush()

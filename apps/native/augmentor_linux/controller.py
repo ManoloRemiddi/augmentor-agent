@@ -12,6 +12,7 @@ from pathlib import Path
 
 from PySide6.QtCore import QObject, Signal
 from .pi_client import PiClient, EventStream, ContractError
+from .maintenance import Admission, MaintenanceBusy, admitted
 
 
 class Controller(QObject):
@@ -50,6 +51,7 @@ class Controller(QObject):
         self.session = None
         self.stream = None
         self.running = False
+        self.admission = Admission()
         self.lock = threading.Lock()
         self.cancel_requested = threading.Event()
         self.closed = False
@@ -96,6 +98,7 @@ class Controller(QObject):
             temporary = file.name
         os.replace(temporary, self.state_file)
 
+    @admitted
     def new_chat(self):
         if self.running or self.navigating or self.repairing or self.recovery_lock.locked():
             return False
@@ -111,17 +114,20 @@ class Controller(QObject):
         self.session_info.emit({'sessionId':None,'title':'Augmentor Agent','saved':False,'readOnly':False})
         return True
 
+    @admitted
     def refresh_models(self):
         def work():
             self.models.emit(self.client.refresh_catalog() if hasattr(self.client,'refresh_catalog') else self.client.model_catalog())
             if self.selection:self.selection_changed.emit(self.selection)
         self.task(work)
 
+    @admitted
     def choose_model(self, selection):
         if self.running or self.read_only:return
         self.selection = selection
         self.save_session()
 
+    @admitted
     def list_sessions(self):
         self.task(lambda:self.sessions.emit(self.client.session_rows()))
 
@@ -138,6 +144,7 @@ class Controller(QObject):
             self.has_more=result.get('hasMore',False)
             self.page.emit(list(self.loaded_events), self.has_more, older)
 
+    @admitted
     def load_older(self):
         if not self.has_more or self.loading_page:return
         self.loading_page=True
@@ -146,6 +153,7 @@ class Controller(QObject):
             finally:self.loading_page=False
         self.task(work)
 
+    @admitted
     def open_session(self, row):
         if self.running:return
         def work():
@@ -180,6 +188,7 @@ class Controller(QObject):
         self.selection_changed.emit(self.selection)
         self.load_page();self.subscribe(self.session)
 
+    @admitted
     def branch(self,seq):
         if not self.session or self.read_only or not self.online:return
         source=self.session;target='augmentor-linux-pi-'+uuid.uuid4().hex
@@ -189,6 +198,7 @@ class Controller(QObject):
             self.status.emit('Branched into a new chat')
         self.navigate(work)
 
+    @admitted
     def toggle_saved(self):
         sid=self.session
         if not sid or self.read_only:return
@@ -198,6 +208,7 @@ class Controller(QObject):
             if sid==self.session:self.session_info.emit({'sessionId':sid,'saved':sid in self.saved_ids})
         self.task(work)
 
+    @admitted
     def rename(self, title):
         sid=self.session
         if not sid:return
@@ -206,6 +217,7 @@ class Controller(QObject):
             if sid==self.session:self.session_info.emit({'sessionId':sid,'title':result['title']})
         self.task(work)
 
+    @admitted
     def navigate(self, fn):
         if self.navigating or self.running or self.repairing or self.recovery_lock.locked():return
         self.navigating=True
@@ -217,14 +229,25 @@ class Controller(QObject):
                 if not self.closed:self.busy.emit(self.running)
         self.task(work)
 
-    def task(self, fn):
+    def task(self, fn, *, executor=None):
+        lease = self.admission.work()
+        lease.__enter__()  # Count queued work before its thread can begin.
         def run():
             try:
                 fn()
             except Exception as exc:
                 if not self.closed:
                     self.problem.emit(str(exc))
-        threading.Thread(target=run, daemon=True).start()
+            finally:lease.__exit__(None,None,None)
+        try:
+            if executor is None:
+                threading.Thread(target=run, daemon=True).start()
+            else:
+                future = executor.submit(run)
+                future.add_done_callback(lambda result:lease.__exit__(None,None,None) if result.cancelled() else None)
+        except BaseException:
+            lease.__exit__(None,None,None)
+            raise
 
     @staticmethod
     def merge_events(*groups):
@@ -252,7 +275,8 @@ class Controller(QObject):
     def start_monitor(self):
         if self.monitor_started:return
         self.monitor_started=True
-        self.task(self.monitor)
+        # Count each finite health/recovery pass, not the sleeping monitor.
+        threading.Thread(target=self.monitor, daemon=True).start()
 
     def monitor(self):
         delay=1
@@ -260,11 +284,14 @@ class Controller(QObject):
             if self.navigating or self.preparing or self.repairing:
                 self.shutdown.wait(.25);continue
             try:
-                if not self.connected:
-                    self.recover_connection()
-                else:self.client.call('host.describe')
+                with self.admission.work():
+                    if not self.connected:
+                        self.recover_connection()
+                    else:self.client.call('host.describe')
                 delay=1
                 self.shutdown.wait(3)
+            except MaintenanceBusy:
+                self.shutdown.wait(.25)
             except Exception as exc:
                 self.online=False;self.connected=False
                 if self.closed:return
@@ -274,6 +301,7 @@ class Controller(QObject):
                 self.shutdown.wait(delay)
                 delay=min(15,delay*2)
 
+    @admitted
     def repair_connection(self):
         with self.lock:
             if self.repairing or self.navigating or self.preparing or (self.running and self.online) or self.closed:
@@ -325,6 +353,7 @@ class Controller(QObject):
         self.task(work)
         return True
 
+    @admitted
     def recover_connection(self, manual=False):
         try:
             self._recover_connection(manual)
@@ -415,6 +444,7 @@ class Controller(QObject):
             with self.events_lock:self.recover_buffer=None
             self.recovery_lock.release()
 
+    @admitted
     def prepare_voice(self, selection):
         with self.lock:
             if self.running or self.navigating or self.repairing or self.closed or self.read_only or not self.online:
@@ -436,6 +466,7 @@ class Controller(QObject):
             return self.client.voice_ticket(self.session)
         finally:self.navigating=False
 
+    @admitted
     def send(self, text, selection, edit_from=None, request_id=None):
         with self.lock:
             if self.running or self.navigating or self.repairing or self.recovery_lock.locked() or self.closed or self.read_only:
@@ -496,6 +527,7 @@ class Controller(QObject):
         self.task(work)
         return True
 
+    @admitted
     def queue_prompt(self, text, request_id, mode='queue'):
         if not getattr(self.client,'supports_queue',False) or not self.running or self.navigating or self.read_only or not self.online:return False
         generation=self.generation;sid=self.session
@@ -511,8 +543,9 @@ class Controller(QObject):
                 self.queue_result.emit({'id':request_id,'accepted':result.get('accepted') is True,'command':bool(result.get('command'))})
             except Exception as exc:
                 self.queue_result.emit({'id':request_id,'accepted':False,'error':str(exc)})
-        self.queue_executor.submit(work);return True
+        self.task(work, executor=self.queue_executor);return True
 
+    @admitted
     def update_queue(self, item_id, action):
         sid=self.session
         if not sid or self.read_only or not self.online or action not in ('steer','remove'):return
@@ -603,6 +636,7 @@ class Controller(QObject):
             if not self.preparing:
                 self.set_idle()
 
+    @admitted
     def answer(self, frame, value):
         self.task(lambda: self.client.respond(frame['rpcId'], value))
 

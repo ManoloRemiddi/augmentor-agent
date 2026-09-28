@@ -103,11 +103,14 @@ def private_lock_descriptor(path):
     return private_file_descriptor(path, writable=True, create=True)
 
 
-def private_file_descriptor(path, *, writable=False, create=False, exclusive=False):
+def private_file_descriptor(path, *, writable=False, create=False, exclusive=False, private_parent=True):
     """Read or create a protected ordinary file; validate the opened object."""
     import msvcrt
     path = reject_reparse_ancestors(path)
-    private_directory(path.parent)
+    if private_parent:
+        private_directory(path.parent)
+    elif not path.parent.is_dir():
+        raise FileNotFoundError('The selected data directory does not exist.')
     disposition = win32con.CREATE_NEW if exclusive else win32con.OPEN_ALWAYS if create else win32con.OPEN_EXISTING
     access = win32con.GENERIC_READ | (win32con.GENERIC_WRITE if writable else 0)
     try:

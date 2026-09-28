@@ -82,6 +82,14 @@ native execution is pending. Global coordination, voice/browser/desktop drain,
 production installer and public release remain incomplete. Keep the detailed
 ledger authoritative; do not change the website or merge the draft PR.
 
+At `795a72b`, Linux/macOS, fast Windows desktop and installer-candidate workflows
+pass. The full native Windows run finds a DSH token owner/ACL defect on both CPUs;
+source now creates the token with the current user's explicit private descriptor.
+Shared desktop reservation and normal committed close are also implemented, with
+local Qt/regression and two-process evidence. Both changes await native execution.
+Voice/browser participation and global coordination remain the next lifecycle
+work; source or a component pass is not a finished Windows app.
+
 ## September 27 Windows implementation plan — historical planning checkpoint
 
 The owner requested a detailed plan before coding. Read the

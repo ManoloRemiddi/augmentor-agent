@@ -118,3 +118,10 @@ Node `beforeExit`; exit code zero alone cannot distinguish forced termination.
 The Windows proof also refuses preparation during its held deterministic model
 turn and verifies history after normal shutdown and explicit restart. None of
 these component checks claims global Quit/update coordination or a live provider.
+
+`test_desktop_maintenance.py` exercises actual Qt input suppression/restoration,
+draft/dialog refusal, accepted and queued controller work, monitor suspension,
+expiry and irreversible committed admission. `windows-window-proof.py` checks
+the private protocol across two real preview processes without losing the other
+window's draft. The compiled managed-DSH proof uses prepare/commit for each normal
+chat-window close. A successful preview alone is not compiled or installed evidence.

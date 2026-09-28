@@ -14,6 +14,27 @@ spec.loader.exec_module(setup)
 
 
 class SetupHistoryTests(unittest.TestCase):
+    def test_product_token_has_private_user_ownership_without_changing_external_home(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            home=Path(temporary)/'external DSH';home.mkdir()
+            if setup.sys.platform=='win32':
+                import win32security
+                mask=win32security.OWNER_SECURITY_INFORMATION|win32security.DACL_SECURITY_INFORMATION
+                acl=lambda:win32security.ConvertSecurityDescriptorToStringSecurityDescriptor(
+                    win32security.GetFileSecurity(str(home),mask),win32security.SDDL_REVISION_1,mask)
+                before=acl()
+            path=home/'augmentor-product-token'
+            token=setup.product_token(path,create=True)
+            self.assertEqual(len(token),64)
+            self.assertEqual(setup.product_token(path),token)
+            with self.assertRaises(OSError):setup.product_token(path,create=True)
+            self.assertEqual(setup.product_token(path),token)
+            if setup.sys.platform=='win32':
+                self.assertEqual(acl(),before)
+            alias=home/'token-alias';os.link(path,alias)
+            with self.assertRaises((OSError,ValueError)):setup.product_token(alias)
+            self.assertEqual(path.read_text().strip(),token)
+
     def test_explicit_cli_is_located_without_executing_shell_shims(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)/'DSH café'/'node_modules/@deepseek-ai/dsh'

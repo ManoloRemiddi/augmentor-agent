@@ -78,6 +78,29 @@ def atomic(path,value):
         temporary.chmod(0o600);temporary.replace(path)
     finally:
         if temporary:temporary.unlink(missing_ok=True)
+
+def product_token(path, *, create=False):
+    """Protect the token itself, without changing an external DSH directory ACL.
+
+    chmod(0600) does not establish Windows ownership or a protected DACL. The
+    explicit kernel descriptor does, including when setup runs elevated. Existing
+    files are validated before reading; creation never replaces another token.
+    """
+    from platform_adapters.private_files import descriptor
+    if sys.platform == 'win32':
+        from platform_adapters.windows_identity import private_file_descriptor
+        fd = private_file_descriptor(path, writable=create, exclusive=create, private_parent=False)
+    else:
+        fd = descriptor(path, writable=create, exclusive=create)
+    with os.fdopen(fd, 'w' if create else 'r', encoding='utf-8') as stream:
+        if create:
+            value = secrets.token_hex(32)
+            stream.write(value+'\n'); stream.flush(); os.fsync(stream.fileno())
+        else:
+            value = stream.read(128).strip()
+        if not re.fullmatch('[a-f0-9]{64}',value):
+            raise ValueError('An existing integration token needs manual review.')
+        return value
 def describe():
     saved=current()
     return {'endpoint':saved.get('endpoint','http://127.0.0.1:3080'),'home':saved.get('home',os.environ.get('DSH_HOME',str(Path.home()/'.dsh'))),'configured':bool(saved),'supportedDsh':'0.1.5-rc.1','version':VERSION}
@@ -230,10 +253,8 @@ class Setup:
                 atomic(directory/'preset.yml',HEADER+json.dumps({'name':'Augmentor '+surface.title(),'description':'Augmentor product integration '+VERSION})+'\n')
                 atomic(directory/'agent.cordis.yml',HEADER+json.dumps(entries,indent=2)+'\n')
             secret=home/'augmentor-product-token'
-            if secret.exists():
-                value=secret.read_text().strip()
-                if secret.is_symlink() or not re.fullmatch('[a-f0-9]{64}',value):raise ValueError('An existing integration token needs manual review.')
-            else:atomic(secret,secrets.token_hex(32)+'\n');made.append(secret)
+            if secret.exists() or secret.is_symlink():product_token(secret)
+            else:product_token(secret,create=True);made.append(secret)
             backup=profile/('cordis.patch.yml.before-augmentor-'+uuid.uuid4().hex)
             if patch.exists():shutil.copy2(patch,backup)
             additions=[{'id':'augmentor-product','name':str(ROOT/'adapters/dsh-product/index.mjs')},{'id':'augmentor-product-browser','name':str(target/'browser/dist/index.js'),'config':{'agentPreset':PRESETS['browser'],'chatDir':str(Path(os.environ.get('AUGMENTOR_DSH_WORKSPACE_ROOT',Path.home()))/'Augmentor Browser DSH'),'deleteAfterDays':0}},{'id':'augmentor-product-prompts','name':str(ROOT/'adapters/dsh-prompt-library/lib/index.js')}]

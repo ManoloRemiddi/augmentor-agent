@@ -112,5 +112,11 @@ Start menu/taskbar identity, coordinated busy-work shutdown or update ownership.
 These remain required before customer distribution. A successful preview or
 hotkey backend test must not be described as an installed Windows application.
 
+The shared window now exposes [reversible component admission](LIFECYCLE.md#desktop-admission)
+to the future coordinator. Local two-window proof checks draft preservation,
+cancelled preparation and normal committed close. New source counts accepted
+controller work and pauses reconnect during preparation; Windows execution is
+pending. This does not yet add a global Quit or installer action.
+
 References: [Microsoft RegisterHotKey](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-registerhotkey)
 and [Qt native event filters](https://doc.qt.io/qt-6/qabstractnativeeventfilter.html).
