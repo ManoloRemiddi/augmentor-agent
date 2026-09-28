@@ -91,14 +91,21 @@ tests and package intake checks pass. The compiled entry and pending-journal/uns
 directory refusal cases pass both CPUs at `3674b4a`. Its Windows GUI job failed
 because the new font-health test incorrectly forced Qt offscreen; the same run
 passes actual Windows-QPA font rendering. The test now runs in the native Windows
-QPA step and no longer forces offscreen. Installed health/identity failure cases
-and the corrected GUI step still require fresh native execution. See
+QPA step and no longer forces offscreen. [Corrected fast Windows at 8997b4e](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36412274580)
+passes both CPUs, including source UI health, all update tests and compiled entry
+checks. Full installed health/identity failure cases remain pending. See
 [recovery-aware startup and health](WINDOWS-INSTALLER-DECISION.md#recovery-aware-startup-and-isolated-local-health).
 
-Next: qualify the isolated native health path and corrected GUI test; finish safe
-pre-apply cancellation and independent interrupted/cross-version recovery, then
-obsolete-file cleanup, bounded cache pruning, actual N-to-N+1 and the customer
-notification/update action. The current Inno
+New cancellation source archives only a live, confirmed reversible preparation
+before any shutdown checkpoint. Busy work stays running, and uncertain release,
+write or archive outcomes keep the journal unresolved. Five new journal faults
+and two platform/coordinator cleanup cases pass locally (43 update tests and five
+preparation tests). The actual held-DSH-turn proof now exercises the same path;
+native execution is pending. See [cancellation contract](LIFECYCLE.md#confirmed-cancellation-before-shutdown).
+
+Next: qualify full installed isolated health and actual-DSH cancellation; finish
+independent interrupted/cross-version recovery, obsolete-file cleanup, bounded
+cache pruning, actual N-to-N+1 and the customer notification/update action. The current Inno
 backend replaces `current` in place and does not provide atomic version selection
 or power-loss recovery. Cache artifacts currently survive normal removal; connect
 the explicit cache-retention/removal policy before customer delivery. Selection

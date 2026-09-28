@@ -3,6 +3,7 @@
 from contextlib import ExitStack
 from pathlib import Path
 import sys
+import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -10,6 +11,10 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'services'))
 from lifecycle.admission import Admission,MaintenanceBusy
 from lifecycle.windows_preparation import WindowsPreparation
+from lifecycle.update import authorize_update
+from lifecycle.update_journal import UpdateJournal
+from platform_adapters.paths import private_directory
+from platform_adapters.private_files import read_json
 
 
 class Observation:
@@ -52,6 +57,47 @@ class PreparationTests(unittest.TestCase):
         for item in (owner,window,companion):
             self.assertTrue(item.closed);self.assertNotIn('commit',item.calls)
 
+    def test_busy_update_archives_only_after_confirmed_platform_release(self):
+        owner,window,companion=Observation(),Observation(),Observation()
+        with tempfile.TemporaryDirectory() as temporary,ExitStack() as stack:
+            gate=self.fixture(stack,owner,window,companion)
+            directory=private_directory(Path(temporary)/'updates')
+            identity={'version':'1.0.0','sourceCommit':'a'*40,'target':'windows-x64',
+                'channel':'preview','sha256':'b'*64,'dataSchema':1,'readableDataSchemas':[1]}
+            preparation=WindowsPreparation(ROOT,'run','shared','state')
+            self.assertFalse(preparation.preparation_released)
+            with companion.admission.work(),UpdateJournal(directory,identity,identity) as journal:
+                with self.assertRaises(MaintenanceBusy):
+                    authorize_update(journal,lambda:preparation,lambda _gate:self.fail('Installer started for busy work.'))
+                self.assertEqual(companion.admission.active,1)
+                self.assertTrue(preparation.preparation_released);self.assertIsNone(gate.fd)
+                self.assertFalse((directory/'active.json').exists())
+                archived=list(directory.glob('cancelled-*.json'))
+                self.assertEqual(len(archived),1);self.assertEqual(read_json(archived[0])['phase'],'cancelled')
+                with window.admission.work(),owner.admission.work():pass
+            self.assertTrue(all('commit' not in item.calls for item in (owner,window,companion)))
+            with UpdateJournal(directory,identity,identity):pass
+
+    def test_unknown_release_cannot_clear_the_preparation_record(self):
+        owner,window,companion=Observation(),Observation(),Observation()
+        original=window.control
+        def lost(action,token=None):
+            if action in ('cancel','status'):raise ConnectionError('Fixture release could not be observed.')
+            return original(action,token)
+        window.control=lost
+        with tempfile.TemporaryDirectory() as temporary,ExitStack() as stack:
+            self.fixture(stack,owner,window,companion)
+            directory=private_directory(Path(temporary)/'updates')
+            identity={'version':'1.0.0','sourceCommit':'a'*40,'target':'windows-x64',
+                'channel':'preview','sha256':'b'*64,'dataSchema':1,'readableDataSchemas':[1]}
+            preparation=WindowsPreparation(ROOT,'run','shared','state')
+            with companion.admission.work(),UpdateJournal(directory,identity,identity) as journal:
+                with self.assertRaises(MaintenanceBusy):
+                    authorize_update(journal,lambda:preparation,lambda _gate:self.fail('Installer started.'))
+                self.assertFalse(preparation.preparation_released)
+                self.assertEqual(read_json(directory/'active.json')['phase'],'preparing')
+                self.assertFalse(list(directory.glob('cancelled-*.json')))
+
     def test_missing_owner_or_failed_discovery_cannot_leave_startup_fenced(self):
         owner,window,companion=Observation(),Observation(),Observation()
         with ExitStack() as stack:
@@ -82,6 +128,7 @@ class PreparationTests(unittest.TestCase):
             self.assertIsNone(gate.fd)
             self.assertTrue(all(peer.closed for peer in order))
             self.assertTrue(all('cancel' not in peer.calls for peer in order))
+            self.assertFalse(preparation.preparation_released)
 
 
 if __name__=='__main__':unittest.main()

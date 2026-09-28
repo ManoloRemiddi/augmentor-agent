@@ -18,7 +18,8 @@ from platform_adapters.private_files import atomic_json, descriptor, read_json, 
 
 SCHEMA = 'augmentor-update/1'
 PHASES = ('verified', 'preparing', 'prepared', 'draining', 'drained',
-          'installer-ready', 'apply-intent', 'apply-acknowledged', 'installed', 'healthy', 'complete')
+          'installer-ready', 'apply-intent', 'apply-acknowledged', 'installed', 'healthy', 'complete', 'cancelled')
+PREPARATION_PHASES = ('verified', 'preparing', 'prepared')
 STEP_PHASES = ('commit-intent', 'commit-acknowledged', 'commit-unknown', 'exited')
 
 
@@ -57,6 +58,8 @@ def validate(record):
     steps = record['steps']
     if not isinstance(steps, list) or len(steps) > 192:
         raise ValueError('The update shutdown record is invalid.')
+    if record['phase'] == 'cancelled' and steps:
+        raise ValueError('An update with shutdown attempts cannot be cancelled as preparation.')
     states = {}
     for step in steps:
         if (not isinstance(step, dict) or set(step) != {'participant', 'pid', 'kind', 'phase'} or
@@ -85,6 +88,7 @@ def validate(record):
 def recovery_action(record):
     """Read-only classification, never a process command or permission to apply."""
     phase = validate(record)['phase']
+    if phase == 'cancelled': return 'inspect-cancelled-preparation'
     if phase == 'complete': return 'complete'
     if phase in ('installed', 'healthy'): return 'verify-local-health'
     if PHASES.index(phase) >= PHASES.index('apply-intent'): return 'inspect-installation'
@@ -159,6 +163,32 @@ class UpdateJournal:
 
     def close(self):
         if self.fd is not None: os.close(self.fd); self.fd = None
+
+    def cancel_preparation(self, verify_released):
+        """Archive only this live writer's reversibly released preparation.
+
+        The original caller still retains its verified source/artifact scope.
+        Its platform context must confirm that all reservations are released
+        and no shutdown or installer action started. An interrupted writer,
+        recorded commit intent or unknown APPLY can never take this path.
+        This is not restart recovery, and a failed archival is not retried.
+        """
+        if (self.fd is None or self.uncertain or self.record['phase'] not in PREPARATION_PHASES
+                or self.record['steps']):
+            raise ValueError('Only a known live preparation can be cancelled before shutdown.')
+        if not callable(verify_released) or verify_released() is not True:
+            raise ValueError('Reservation release was not confirmed. The update remains unresolved.')
+        record = deepcopy(self.record); record['phase'] = 'cancelled'; record['revision'] += 1
+        self._write(record)
+        archive = self.directory/('cancelled-'+self.record['id']+'.json')
+        if archive.exists() or archive.is_symlink():
+            raise ValueError('A cancellation archive already exists. Both records were preserved.')
+        try: replace_file(self.path,archive)
+        except BaseException:
+            self.uncertain = True
+            raise
+        self.close()
+        return archive
 
     @classmethod
     def complete_verified(cls, directory, source, target, verify_health):

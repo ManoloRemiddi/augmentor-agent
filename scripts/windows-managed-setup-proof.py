@@ -325,16 +325,32 @@ def main():
         maintenance_proof.refuse_busy(setup.current()['endpoint'], state/'home')
         from lifecycle.windows_preparation import WindowsPreparation
         from platform_adapters.windows_http import HttpRefused
+        from platform_adapters.private_files import read_json
+        from lifecycle.update import authorize_update
+        from lifecycle.update_journal import UpdateJournal
+        # Real live DSH/process reservations and durable cancellation. Artifact
+        # identity is synthetic here: no installer may be constructed or applied.
+        metadata=json.loads((root/'release.json').read_text(encoding='utf-8'))
+        identity={'version':metadata['version'],'sourceCommit':metadata['sourceCommit'],
+            'target':metadata['target'],'channel':'preview','sha256':'0'*64,
+            'dataSchema':1,'readableDataSchemas':[1]}
+        transaction=private_directory(work/'updates')
+        preparation=WindowsPreparation(root,work/'run',work/'run/shared',state)
+        def unexpected_installer(_gate):raise AssertionError('An update installer was requested during active model work.')
         refused=False
-        try:
-            with WindowsPreparation(root,work/'run',work/'run/shared',state):pass
-        except HttpRefused as error:
-            assert error.code==409
-            refused=True
+        with UpdateJournal(transaction,identity,identity) as journal:
+            try:authorize_update(journal,lambda:preparation,unexpected_installer)
+            except HttpRefused as error:
+                assert error.code==409
+                refused=True
         assert refused, 'The component graph accepted an active DSH model request.'
+        assert preparation.preparation_released and not (transaction/'active.json').exists()
+        cancelled=list(transaction.glob('cancelled-*.json'))
+        assert len(cancelled)==1 and read_json(cancelled[0])['phase']=='cancelled'
         assert next(row for row in adapter.call('session.list')['items'] if row['sessionId']==session)['running']
         assert owner.request('maintenance',root=root,method='host.maintenance.status',params={})['maintenance']['phase']=='ready'
         report['graphBusyRefusalPreservedModelTurn']=True
+        report['busyUpdatePreparationArchivedWithoutShutdownOrInstaller']=True
         contended = False
         try:
             with session_write_lease(lock_path): pass

@@ -94,6 +94,61 @@ class UpdateJournalTests(unittest.TestCase):
         self.assertEqual(calls,[])
         self.assertEqual(read_json(self.directory/'active.json')['phase'],'installer-ready')
 
+    def test_confirmed_preparation_cancellation_archives_without_authorizing_install(self):
+        with self.journal() as journal:
+            self.prepared(journal)
+            archive=journal.cancel_preparation(lambda:True)
+        record=read_json(archive)
+        self.assertEqual(record['phase'],'cancelled');self.assertEqual(record['steps'],[])
+        self.assertEqual(record['source'],identity());self.assertEqual(record['target'],identity('1.1.0'))
+        self.assertFalse((self.directory/'active.json').exists())
+        with self.journal() as following:self.assertNotEqual(following.record['id'],record['id'])
+
+    def test_unconfirmed_cancellation_and_recorded_shutdown_remain_unresolved(self):
+        with self.journal() as journal:
+            self.prepared(journal);before=journal.path.read_bytes()
+            with self.assertRaisesRegex(ValueError,'release was not confirmed'):
+                journal.cancel_preparation(lambda:False)
+            self.assertEqual(journal.path.read_bytes(),before)
+            peer=Participant(123);journal.checkpoint('commit-intent',peer)
+            before=journal.path.read_bytes();calls=[]
+            with self.assertRaisesRegex(ValueError,'before shutdown'):
+                journal.cancel_preparation(lambda:calls.append('observe'))
+            self.assertEqual(calls,[]);self.assertEqual(journal.path.read_bytes(),before)
+            cancelled=deepcopy(journal.record);cancelled['phase']='cancelled'
+            with self.assertRaisesRegex(ValueError,'shutdown attempts'):validate(cancelled)
+
+    def test_apply_intent_cannot_be_cancelled_even_with_release_confirmation(self):
+        with self.journal() as journal:
+            self.ready(journal);journal.advance('apply-intent');before=journal.path.read_bytes()
+            with self.assertRaisesRegex(ValueError,'before shutdown'):
+                journal.cancel_preparation(lambda:True)
+            self.assertEqual(journal.path.read_bytes(),before)
+
+    def test_uncertain_cancel_archive_is_not_retried_or_treated_as_a_fresh_attempt(self):
+        with self.journal() as journal:
+            self.prepared(journal)
+            with patch('lifecycle.update_journal.replace_file',side_effect=OSError('fixture archive refusal')):
+                with self.assertRaises(OSError):journal.cancel_preparation(lambda:True)
+            saved=read_json(journal.path)
+            self.assertEqual(recovery_action(saved),'inspect-cancelled-preparation')
+            with self.assertRaises(ValueError):journal.cancel_preparation(lambda:True)
+        with self.assertRaisesRegex(ValueError,'earlier update'):self.journal()
+        self.assertEqual(read_json(self.directory/'active.json'),saved)
+
+    def test_cancelled_record_write_failure_preserves_uncertainty(self):
+        with self.journal() as journal:
+            self.prepared(journal)
+            def late_failure(path,record):
+                atomic_json(path,record)
+                raise OSError('Fixture cancellation flush was not confirmed.')
+            with patch('lifecycle.update_journal.atomic_json',side_effect=late_failure):
+                with self.assertRaises(OSError):journal.cancel_preparation(lambda:True)
+            self.assertTrue(journal.uncertain)
+            self.assertEqual(read_json(journal.path)['phase'],'cancelled')
+            self.assertFalse(list(self.directory.glob('cancelled-*.json')))
+            with self.assertRaises(ValueError):journal.cancel_preparation(lambda:True)
+
     def test_failed_archive_retains_completed_record_for_fresh_inspection(self):
         with self.journal() as journal:
             self.ready(journal);journal.advance('apply-intent')

@@ -719,3 +719,11 @@ same run's actual Windows-QPA rendering has valid fonts. The corrected test runs
 in the existing native-QPA step without overriding that backend. The product
 health script already requires Windows QPA, and the font-coverage requirement
 is retained. Corrected GUI execution and full installed health remain pending.
+
+[Corrected fast Windows at 8997b4e](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36412274580)
+passes both CPUs, including actual Windows-QPA source health, all update tests
+and compiled startup/health entry routing. Full installed isolated health remains
+pending. A separate [live preparation-cancellation path](LIFECYCLE.md#confirmed-cancellation-before-shutdown)
+now archives known reversible refusal before any shutdown; uncertain cleanup,
+record writes or APPLY still require independent recovery. Its local fault and
+platform/coordinator tests pass; actual native DSH integration is pending.

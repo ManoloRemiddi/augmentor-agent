@@ -627,9 +627,36 @@ private base. The dedicated [local-health action](WINDOWS-INSTALLER-DECISION.md#
 retains startup/installation read leases but uses a disposable profile and no
 controller, IPC registration or service connections. Its bounded Job observer
 verifies the independently identified release; failed or missing health leaves
-the journal unresolved. Native qualification of this addition is pending. Safe
-pre-apply abort completion and the independent interrupted-update executor remain
-required; ordinary startup must not bypass the record to work around either gap.
+the journal unresolved. Compiled guard/routing and source UI health pass both
+Windows CPUs; full installed health qualification is pending. The independent
+interrupted-update executor remains required; ordinary startup must not bypass
+the record to work around that gap.
+
+### Confirmed cancellation before shutdown
+
+The shared coordinator now archives an unsuccessful reversible preparation only
+when the same live platform context confirms release of every reservation and
+its startup fence, and the journal has no shutdown checkpoint. Windows exposes
+this observation only after cleanup returns confirmed, with no commit started.
+Busy work remains running. A generic exception, missing observer, lost release
+reply, in-flight cleanup or uncertain journal write cannot establish cancellation.
+
+The original journal writer accepts only `verified`, `preparing` or `prepared`
+with no steps. It records terminal `cancelled`, durably renames the record to
+`cancelled-<id>.json`, and releases the writer. The original refusal still reaches
+the caller, while the active record no longer blocks a later ordinary launch or
+fresh attempt. A checkpoint, installer readiness, APPLY intent or closed writer
+refuses this method. It does not resume saved commands or reopen stopped services.
+Crash/failed flush/archive preserves the active record and requires independent
+inspection; even an active `cancelled` phase is not permission to delete it.
+
+Five new journal fault tests and two platform/coordinator cleanup tests pass
+locally (43 update tests plus five preparation tests). The actual DSH Windows
+proof now attempts an update during a held model turn, requires native component
+release and cancellation archival, and asserts the turn remains running with no
+installer requested. That proof uses synthetic artifact identity and cannot apply
+software. Native execution is pending. Recovery after shutdown or installer
+preparation still needs the separate independent recovery flow.
 
 ## Controller-free preview maintenance close
 

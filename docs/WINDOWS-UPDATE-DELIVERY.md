@@ -115,6 +115,13 @@ exit; the caller still supplies trusted full-payload verification and the releas
 pair. This new path requires native qualification and is not a recovery executor,
 automatic rollback or permission to replay an uncertain installer command.
 
+Busy preparation can now be [cancelled and durably archived](LIFECYCLE.md#confirmed-cancellation-before-shutdown)
+by its original live writer after the Windows context confirms all reservations
+released, before any shutdown checkpoint or installer attempt. Unknown cleanup
+or journal outcomes remain pending. This prevents a known reversible refusal from
+permanently blocking startup; it does not clear interrupted APPLY or implement
+restart recovery. New local fault tests pass; native DSH integration is pending.
+
 ## Evidence and remaining work
 
 Eleven new local tests execute real Node Ed25519 verification and private storage,

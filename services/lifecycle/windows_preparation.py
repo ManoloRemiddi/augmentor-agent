@@ -124,6 +124,13 @@ class WindowsPreparation:
         self.release_observations()
         return confirmed
 
+    @property
+    def preparation_released(self):
+        """Live cleanup observation, never inferred from a durable phase/PID."""
+        return (self.closed and self.reservations.cancelled is True
+            and not self.reservations.draining
+            and not any(entry.commit_started for entry in self.reservations.entries))
+
     def __exit__(self,kind,value,traceback):
         try:
             if not self.close():

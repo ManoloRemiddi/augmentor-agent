@@ -306,3 +306,13 @@ font-health test fails under offscreen QPA, while the existing Windows-QPA proof
 passes actual font coverage. The test now runs in the Windows-QPA step and no
 longer overrides the selected backend. Font coverage remains mandatory; corrected
 native execution and installed health are still pending.
+
+The corrected Windows-QPA health tests and all fast desktop checks pass both CPUs
+at `8997b4e` ([run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36412274580)).
+This qualifies source UI health and compiled entry routing, not the full installed
+health observer. Five additional journal cases cover cancellation before shutdown,
+unknown release, commit/APPLY refusal and failed phase-write/archival. Two platform
+tests compose actual reservation cleanup with the shared coordinator and preserve
+active work or an unresolved record as appropriate. The native managed DSH proof
+adds a real held-turn cancellation case with synthetic artifact identity and no
+installer invocation; execution of that addition is pending.
