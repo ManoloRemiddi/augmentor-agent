@@ -12,6 +12,8 @@ static wchar_t inspection_path[32768];
 static wchar_t inspection_installer[65];
 static DWORD inspection_stage = 0, inspection_detail = 0;
 static BOOL inspection_health_attempted = FALSE;
+static BOOL inspection_source_verified = FALSE;
+static wchar_t inspection_release[65];
 
 __declspec(dllexport) DWORD WINAPI AugmentorInspectionStage(void) { return inspection_stage; }
 __declspec(dllexport) DWORD WINAPI AugmentorInspectionDetail(void) { return inspection_detail; }
@@ -23,6 +25,8 @@ static void augmentor_inspection_close(void) {
     inspection_record = inspection_writer = inspection_updates = INVALID_HANDLE_VALUE;
     inspection_installer[0] = 0;
     inspection_health_attempted = FALSE;
+    inspection_source_verified = FALSE;
+    inspection_release[0] = 0;
     if (inspection_report != INVALID_HANDLE_VALUE) CloseHandle(inspection_report);
     if (inspection_root != INVALID_HANDLE_VALUE) CloseHandle(inspection_root);
     if (inspection_parent != INVALID_HANDLE_VALUE) CloseHandle(inspection_parent);
@@ -210,7 +214,11 @@ done:
 __declspec(dllexport) BOOL WINAPI AugmentorInspectionRun(const wchar_t *installed,
         const wchar_t *release_digest) {
     if (inspection_health_attempted) return FALSE;
-    return inspection_worker(installed, release_digest, FALSE, NULL);
+    BOOL ok = inspection_worker(installed, release_digest, FALSE, NULL);
+    inspection_source_verified = ok && inspection_installer[0] &&
+        inspection_writer != INVALID_HANDLE_VALUE && inspection_record != INVALID_HANDLE_VALUE &&
+        wcscpy_s(inspection_release, 65, release_digest) == 0;
+    return ok;
 }
 
 /* Observe the fixed, isolated source-health action after independent source

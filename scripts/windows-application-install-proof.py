@@ -260,6 +260,33 @@ def main():
         report['independentLocalHealth']=assessed['localHealth']
         assert (transaction/'active.json').read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
         stages.append('independent-source-health-with-pending-record-preserved')
+        # Actual standalone source application without any usable installed
+        # launcher/runtime. The source equals target in this integration fixture;
+        # distinct-version restoration requires its own two-package qualification.
+        unknown=install/'current/displaced-recovery-fixture.bin'
+        unknown.write_bytes(b'Preserve damaged installation fixture data.\n')
+        executable.unlink();(install/'current/release.json').unlink()
+        for library in (install/'current/python').glob('python3*.dll'):library.unlink()
+        prior_backups=set((data/'payload-backups').iterdir())
+        run([cached_installer,*flags,'/LOG='+str(out/'independent-source-restoration.log'),'/augmentorrecover=source'])
+        restored=set((data/'payload-backups').iterdir())-prior_backups
+        assert len(restored)==1
+        restored=restored.pop();restoration=read_json(restored/'intent.json')
+        assert restoration['operation']=='source-restoration' and restoration['installerSHA256']==report['sha256']
+        assert restoration['recordSHA256']==package.digest(transaction/'active.json')
+        assert read_json(restored/'prepared.json')==restoration
+        assert (restored/'update.json').read_bytes()==pending_bytes
+        assert (restored/'payload/displaced-recovery-fixture.bin').read_bytes()==b'Preserve damaged installation fixture data.\n'
+        assert not unknown.exists() and not (restored/'payload/Augmentor.exe').exists()
+        assert (data/'recovery/selected-installer').read_bytes()==selection_bytes
+        assert (transaction/'active.json').read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER,registry,0,winreg.KEY_READ|winreg.KEY_WOW64_64KEY) as key:
+            assert winreg.QueryValueEx(key,'ModifyPath')[0]=='"'+str(cached_installer)+'"'
+        restored_health=independent_inspection('independent-restored-source-health',health=True)
+        assert restored_health['complete'] and restored_health['localHealth']==assessed['localHealth']
+        assert (transaction/'active.json').read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
+        report['restoredSourceHealth']=restored_health['localHealth']
+        stages.append('independent-full-source-restoration-with-original-record-preserved')
         for application in (executable, install/'current/AugmentorBrowserHost.exe'):
             blocked = subprocess.run([str(application),'--qualification-root',str(data),'--preview'],
                 stdin=subprocess.DEVNULL, capture_output=True, timeout=10,

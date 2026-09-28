@@ -440,3 +440,14 @@ Synthetic journal disposal is explicitly fixture-only. The full installed proof
 separately requires old full-payload displacement and independent UI health.
 Local package/update checks and Inno script compilation pass; new native placement
 execution is pending. These same-build cases do not prove cross-version restoration.
+
+At `e98a142`, both native templates pass clean/absent-payload placement and locked
+folder preservation in run `36432080462`, merge checkout
+`521151e33204421421981be0f1f35742bb1c688b`. Full app execution is still separate.
+New template tests invoke `/augmentorrecover=source` under a busy writer, against
+an incorrect recorded source, and successfully without installed runtime/metadata
+while selection names a synthetic target. They require retained old bytes, exact
+journal preservation, restored repair/source selection, ordinary-startup refusal
+and independent synthetic health. The full app proof separately checks actual
+source application and real UI health with the original record preserved. Native
+execution is pending; no distinct-version or recovery-completion claim follows.

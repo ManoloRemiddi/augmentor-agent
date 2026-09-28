@@ -1001,22 +1001,67 @@ Local package/update checks and actual Inno script compilation pass; new native
 execution is pending. This change does not implement restoration completion, space
 budgeting, backup pruning or N-to-N+1 qualification.
 
+## Independent previous-source application
+
+The new fixed `/augmentorrecover=source` action restores files through the retained
+source installer itself, outside the damaged application. It refuses combinations
+with inspection or coordinated-update switches. Before Inno can apply any files,
+it obtains fresh exclusive native maintenance admission and performs independent
+source assessment against its actual installer bytes and embedded metadata. A busy
+writer, invalid record, unknown registration or a different source refuses.
+
+The successful assessment retains the same live journal writer and pinned original
+record through application. Native placement checks that the retained installer
+and metadata match that assessment, saves a separate `source-restoration` intent
+and exact record snapshot, and preserves the damaged tree before fresh installation.
+The normal Inno file/registration stages restore the source's maintenance helper,
+uninstaller/repair metadata and selected installer as well as `current`. An already
+changed but valid selected pointer does not determine which version is restored.
+Malformed selection/cache state still refuses; repairing that state needs a separate
+preservation policy. Existing browser pointers and private data remain untouched.
+
+This action never rewrites the original source/target/history or clears its active
+record, and never offers ordinary launch at Finish. A successful installer exit
+means source files were applied; it is not recovery completion. A later independent
+observer must check full inventory, source selection, registrations and native UI
+health, then durably record the distinct restoration outcome before reopening.
+
+The previous proposal introduced a second READY/APPLY coordinator for restoration.
+That extra process is unnecessary for this standalone source action: Setup already
+runs independently and directly acquires the same exclusive maintenance gates.
+Normal forward updates retain their authenticated READY/APPLY protocol. The outer
+recovery observer must launch this fresh fixed action in an independent installer
+Job and observe its exit; saved PIDs/commands never become execution authority.
+Inno's [PrepareToInstall event](https://jrsoftware.org/ishelp/topic_scriptevents.htm)
+provides the refusal boundary before installation. No journal is finalized from
+`ssPostInstall` or an unobserved previous installer process.
+
+New native template cases require busy-writer and wrong-source refusal, then actual
+source installation with missing launcher/runtime/metadata and selection naming a
+synthetic target. They verify old-file preservation, restored repair registration,
+unchanged record/data, blocked ordinary startup and independent synthetic health.
+The full app proof separately repeats damaged-runtime restoration and real native
+UI health. Local package/source-assessment tests and Inno script compilation pass;
+new native restoration execution is pending. This does not prove actual N-to-N+1,
+restoration completion, publisher trust or physical Windows acceptance.
+
 ### Remaining restoration executor
 
-Restoration must reuse the existing authenticated installer handoff and independent
-source runtime, with one separate recovery attempt linked to the unchanged original
-journal. It must not pretend that restoring the previous source installed the
-original transaction's target. The remaining sequence is:
+The source-application step is implemented above and awaits native execution. The
+remaining outer observer and durable completion must keep the original transaction
+unchanged; restoring the previous source must never masquerade as installing its
+different target. The remaining sequence is:
 
 1. Obtain fresh maintenance/writer admission, verify the original record/source and
    retain the exact source artifact. Persist a separate restoration intent before
    any replacement. Saved PIDs, commands and the selected-version pointer grant
    no execution authority.
-2. Keep an observer outside the replaceable payload. Use a fresh one-shot
-   coordinator for READY/APPLY and retain actual installer process observations.
-   The existing native handoff requires coordinator exit before file application;
-   that same coordinator cannot also wait for its installer to finish. Preserve
-   the installer's independent lifetime if the observer or coordinator crashes.
+2. Keep an observer outside the replaceable payload. Launch the independently
+   verified source installer with the fixed restoration action using an independent
+   Job and fresh live process observations. Let that installer obtain its own
+   maintenance/writer admission and revalidate the original source. Preserve its
+   independent lifetime if the observer crashes. Do not reuse the forward-update
+   coordinator's requirement to exit before APPLY for this standalone path.
 3. Give installation a fresh payload destination, preserving the displaced tree
    under an owned recovery location. Replacing over mixed source/target files
    cannot establish a clean rollback. Restore source-owned installer/repair/browser

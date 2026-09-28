@@ -107,9 +107,23 @@ old files remain in the displaced tree rather than the new executable search
 path. Missing `current` is permitted only for the registered owned installation.
 A prepared receipt follows the move; the original journal remains unresolved.
 Manual exact-build repair is unchanged. Local package/update checks and Inno
-script compilation pass; new native template/full execution is pending.
+script compilation pass. Both native templates now pass at `e98a142` in
+[36432080462](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36432080462),
+merge checkout `521151e33204421421981be0f1f35742bb1c688b`; downloaded reports
+confirm locked-tree preservation, clean replacement and missing-payload cases.
+Full payload execution remains running.
 
-Next: qualify clean placement and implement interrupted/cross-version restoration
+New source adds [independent previous-source application](WINDOWS-INSTALLER-DECISION.md#independent-previous-source-application).
+The standalone installer explicitly verifies its exact recorded source under fresh
+exclusive maintenance, keeps the same writer/record pins, and performs clean
+source installation while preserving the unresolved original journal. It restores
+its installer/repair metadata and source selection as well as the app payload.
+Ordinary launch remains blocked. Native template/full tests now exercise missing
+installed launcher/runtime, changed selection, refusal and independent health;
+execution is pending. The outer recovery observer, distinct durable completion
+and actual cross-version qualification remain unfinished.
+
+Next: qualify clean placement/source application and finish interrupted/cross-version restoration
 with distinct durable completion, bounded disk/retention policy, actual N-to-N+1
 and customer notification/update wiring. Preserving a displaced tree alone is not
 power-loss recovery. Cache artifacts and displaced payloads still survive ordinary

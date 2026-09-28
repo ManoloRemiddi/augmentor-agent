@@ -261,3 +261,10 @@ install into a fresh `current`. Native locked-tree, absent-payload and full-app
 execution of this new placement remains pending. Preserved backups are not a
 completed rollback mechanism; restoration, disk budgeting and bounded retention
 remain required before customer updates.
+
+Both native exact-template clean-placement cases pass at `e98a142`; full payload
+execution is still separate. New source adds a fixed
+[independent previous-source application](WINDOWS-INSTALLER-DECISION.md#independent-previous-source-application)
+action that retains the original record and installs only the independently
+assessed source. Restored files and selection are not durable recovery completion.
+Native restoration tests, outer observation and distinct archival remain pending.

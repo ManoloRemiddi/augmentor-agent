@@ -8,6 +8,7 @@ static HANDLE placement_base = INVALID_HANDLE_VALUE, placement_updates = INVALID
 static HANDLE placement_writer = INVALID_HANDLE_VALUE, placement_record = INVALID_HANDLE_VALUE;
 static HANDLE placement_backups = INVALID_HANDLE_VALUE, placement_attempt = INVALID_HANDLE_VALUE;
 static BOOL placement_attempted = FALSE, placement_ready = FALSE;
+static BOOL placement_restoration = FALSE;
 
 static void augmentor_placement_close(void) {
     HANDLE *handles[] = {&placement_record, &placement_writer, &placement_updates,
@@ -17,6 +18,7 @@ static void augmentor_placement_close(void) {
         *handles[i] = INVALID_HANDLE_VALUE;
     }
     placement_attempted = placement_ready = FALSE;
+    placement_restoration = FALSE;
 }
 
 __declspec(dllexport) BOOL WINAPI AugmentorPrepareReplacement(const wchar_t *application) {
@@ -29,8 +31,12 @@ __declspec(dllexport) BOOL WINAPI AugmentorPrepareReplacement(const wchar_t *app
     wchar_t digest[65], nonce[33], sddl[512], *sid = NULL;
     BYTE random[16]; char receipt[1024]; DWORD count, length, attributes;
     BOOL ok = FALSE, existed = FALSE;
-    if (!authorized || installation == INVALID_HANDLE_VALUE || startup == INVALID_HANDLE_VALUE ||
-            runtime == INVALID_HANDLE_VALUE || cache_installer == INVALID_HANDLE_VALUE ||
+    HANDLE base_handle = placement_restoration ? manual.base : runtime;
+    if ((placement_restoration ?
+            (authorized || !inspection_source_verified || inspection_health_attempted ||
+             manual.file == INVALID_HANDLE_VALUE || manual.startup == INVALID_HANDLE_VALUE) :
+            (!authorized || installation == INVALID_HANDLE_VALUE || startup == INVALID_HANDLE_VALUE)) ||
+            base_handle == INVALID_HANDLE_VALUE || cache_installer == INVALID_HANDLE_VALUE ||
             cache_receipt == INVALID_HANDLE_VALUE || !cache_selection_valid(cache_selection_after) ||
             !application || !AugmentorMaintenancePath(application)) return FALSE;
     if (placement_attempted) return placement_ready;
@@ -40,32 +46,43 @@ __declspec(dllexport) BOOL WINAPI AugmentorPrepareReplacement(const wchar_t *app
     wchar_t *base = paths->base, *updates = paths->updates, *backups = paths->backups;
     wchar_t *attempt = paths->attempt, *path = paths->path;
     wchar_t *current = paths->current, *displaced = paths->displaced;
-    if (GetSecurityInfo(runtime, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION,
+    if (GetSecurityInfo(base_handle, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION,
             &user, NULL, NULL, NULL, &base_security) != ERROR_SUCCESS) goto done;
-    count = GetFinalPathNameByHandleW(runtime, base, 32768, FILE_NAME_NORMALIZED | VOLUME_NAME_DOS);
+    count = GetFinalPathNameByHandleW(base_handle, base, 32768, FILE_NAME_NORMALIZED | VOLUME_NAME_DOS);
     if (!count || count >= 32768 || wcsncmp(base, L"\\\\?\\", 4)) goto done;
     memmove(base, base + 4, (count - 3) * sizeof(wchar_t));
-    wchar_t *slash = wcsrchr(base, L'\\');
-    if (!slash || _wcsicmp(slash, L"\\run")) goto done;
-    *slash = 0;
+    if (!placement_restoration) {
+        wchar_t *slash = wcsrchr(base, L'\\');
+        if (!slash || _wcsicmp(slash, L"\\run")) goto done;
+        *slash = 0;
+    }
     placement_base = augmentor_private_directory(base, user, NULL, FALSE);
     if (placement_base == INVALID_HANDLE_VALUE ||
             swprintf_s(updates, 32768, L"%ls\\updates", base) < 0) goto done;
     placement_updates = augmentor_private_directory(updates, user, NULL, FALSE);
     if (placement_updates == INVALID_HANDLE_VALUE ||
             swprintf_s(path, 32768, L"%ls\\writer.lock", updates) < 0) goto done;
-    placement_writer = CreateFileW(path, GENERIC_READ | GENERIC_WRITE,
-        FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_OPEN_REPARSE_POINT, NULL);
-    BY_HANDLE_FILE_INFORMATION info;
-    if (placement_writer == INVALID_HANDLE_VALUE || GetFileType(placement_writer) != FILE_TYPE_DISK ||
-            !GetFileInformationByHandle(placement_writer, &info) || info.nNumberOfLinks != 1 ||
-            info.dwFileAttributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT) ||
-            !augmentor_private_descriptor(placement_writer, user)) goto done;
-    OVERLAPPED operation = {0};
-    if (!LockFileEx(placement_writer, LOCKFILE_EXCLUSIVE_LOCK | LOCKFILE_FAIL_IMMEDIATELY,
-            0, 1, 0, &operation) || swprintf_s(path, 32768, L"%ls\\active.json", updates) < 0) goto done;
-    placement_record = CreateFileW(path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
-        FILE_FLAG_OPEN_REPARSE_POINT, NULL);
+    if (placement_restoration) {
+        /* Reuse the live assessment's lock and pin; never release/reacquire the
+         * writer or substitute a freshly read record between assessment/apply. */
+        if (!DuplicateHandle(GetCurrentProcess(), inspection_writer, GetCurrentProcess(),
+                &placement_writer, 0, FALSE, DUPLICATE_SAME_ACCESS) ||
+            !DuplicateHandle(GetCurrentProcess(), inspection_record, GetCurrentProcess(),
+                &placement_record, 0, FALSE, DUPLICATE_SAME_ACCESS)) goto done;
+    } else {
+        placement_writer = CreateFileW(path, GENERIC_READ | GENERIC_WRITE,
+            FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_OPEN_REPARSE_POINT, NULL);
+        BY_HANDLE_FILE_INFORMATION info;
+        if (placement_writer == INVALID_HANDLE_VALUE || GetFileType(placement_writer) != FILE_TYPE_DISK ||
+                !GetFileInformationByHandle(placement_writer, &info) || info.nNumberOfLinks != 1 ||
+                info.dwFileAttributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT) ||
+                !augmentor_private_descriptor(placement_writer, user)) goto done;
+        OVERLAPPED operation = {0};
+        if (!LockFileEx(placement_writer, LOCKFILE_EXCLUSIVE_LOCK | LOCKFILE_FAIL_IMMEDIATELY,
+                0, 1, 0, &operation) || swprintf_s(path, 32768, L"%ls\\active.json", updates) < 0) goto done;
+        placement_record = CreateFileW(path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+            FILE_FLAG_OPEN_REPARSE_POINT, NULL);
+    }
     if (!cache_file(placement_record, user, TRUE, 65536) ||
             !cache_stream_digest(placement_record, INVALID_HANDLE_VALUE, NULL, digest) ||
             !ConvertSidToStringSidW(user, &sid) ||
@@ -102,9 +119,10 @@ __declspec(dllexport) BOOL WINAPI AugmentorPrepareReplacement(const wchar_t *app
      * become native instructions. This record describes this fresh attempt. */
     const size_t prefix = sizeof(CACHE_SELECTION_PREFIX) - 1;
     int formatted = sprintf_s(receipt, sizeof(receipt),
-        "{\"schema\":\"augmentor-payload-placement/1\",\"attempt\":\"%ls\","
+        "{\"schema\":\"augmentor-payload-placement/1\",\"attempt\":\"%ls\",\"operation\":\"%s\","
         "\"recordSHA256\":\"%ls\",\"installerSHA256\":\"%.*s\",\"releaseSHA256\":\"%.*s\",\"hadPayload\":%s}\n",
-        nonce, digest, 64, (char *)cache_selection_after + prefix,
+        nonce, placement_restoration ? "source-restoration" : "update", digest,
+        64, (char *)cache_selection_after + prefix,
         64, (char *)cache_selection_after + prefix + 65, existed ? "true" : "false");
     if (formatted < 1) goto done;
     length = (DWORD)formatted;
@@ -129,4 +147,20 @@ done:
     /* Retain every acquired admission/pin until Setup closes, including failures.
      * Preserve all attempt files and any displaced payload for fresh inspection. */
     return ok;
+}
+
+/* A separate explicit restoration action uses fresh exclusive maintenance and
+ * this installer's independent exact-source assessment. No saved command, PID,
+ * selected pointer or caller Boolean supplies that authority. Application still
+ * leaves the original journal unresolved; verification/completion is separate. */
+__declspec(dllexport) BOOL WINAPI AugmentorPrepareSourceRestoration(const wchar_t *application) {
+    if (authorized || !inspection_source_verified || inspection_health_attempted ||
+            inspection_writer == INVALID_HANDLE_VALUE || inspection_record == INVALID_HANDLE_VALUE ||
+            !cache_selection_valid(cache_selection_after)) return FALSE;
+    const size_t prefix = sizeof(CACHE_SELECTION_PREFIX) - 1;
+    for (unsigned i = 0; i < 64; ++i)
+        if (cache_selection_after[prefix + i] != inspection_installer[i] ||
+                cache_selection_after[prefix + 65 + i] != inspection_release[i]) return FALSE;
+    placement_restoration = TRUE;
+    return AugmentorPrepareReplacement(application);
 }

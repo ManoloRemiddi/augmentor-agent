@@ -349,6 +349,51 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         assert sentinel.read_bytes()==sentinel_bytes
         pending.unlink()
         stages.append('authenticated-clean-payload-placement-and-locked-tree-preservation')
+        # Fresh standalone recovery applies only the exact journal source, even
+        # with selection already naming the target and installed Python missing.
+        # This fixture target is synthetic; actual N-to-N+1 is a separate proof.
+        before=set(backups.iterdir())
+        with UpdateJournal(updates,source_identity,target_identity) as journal:
+            for phase in ('preparing','prepared','drained','installer-ready','apply-intent'):journal.advance(phase)
+            pending_bytes=pending.read_bytes()
+            run(cached,'source-restoration-busy-writer',success=False,arguments=['/augmentorrecover=source'])
+            assert pending.read_bytes()==pending_bytes and set(backups.iterdir())==before
+        damaged=install/'current/unrecognized-old-file.bin'
+        damaged.write_bytes(b'Keep these displaced fixture bytes.\n')
+        installed_release.unlink();(install/'current/Augmentor.exe').unlink()
+        for library in (install/'current/python').glob('python3*.dll'):library.unlink()
+        with os.fdopen(descriptor(selection,writable=True),'wb') as stream:
+            stream.write(changed_selection);stream.truncate()
+        wrong=json.loads(pending_bytes);wrong['source']['sha256']='d'*64
+        atomic_json(pending,wrong);wrong_bytes=pending.read_bytes()
+        run(cached,'source-restoration-wrong-source',success=False,arguments=['/augmentorrecover=source'])
+        assert pending.read_bytes()==wrong_bytes and not installed_release.exists()
+        assert set(backups.iterdir())==before and read_private(selection)==changed_selection
+        with os.fdopen(descriptor(pending,writable=True),'wb') as stream:
+            stream.write(pending_bytes);stream.truncate()
+        run(cached,'source-restoration-apply',arguments=['/augmentorrecover=source'])
+        restored=set(backups.iterdir())-before;assert len(restored)==1
+        restored=restored.pop();intent=json.loads((restored/'intent.json').read_text())
+        assert intent['operation']=='source-restoration' and intent['hadPayload'] is True
+        assert intent['installerSHA256']==source_identity['sha256']
+        assert intent['recordSHA256']==hashlib.sha256(pending_bytes).hexdigest()
+        assert json.loads((restored/'prepared.json').read_text())==intent
+        assert (restored/'update.json').read_bytes()==pending_bytes
+        assert (restored/'payload/unrecognized-old-file.bin').read_bytes()==b'Keep these displaced fixture bytes.\n'
+        assert not damaged.exists() and not (restored/'payload/release.json').exists()
+        assert pending.read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
+        assert read_private(selection)==selected_bytes
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER,key_path,0,winreg.KEY_READ|winreg.KEY_WOW64_64KEY) as key:
+            assert winreg.QueryValueEx(key,'ModifyPath')[0]==repair_command
+        ordinary=subprocess.run([str(install/'current/Augmentor.exe'),'--qualification-root',report['qualificationBase']],
+            stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=15)
+        assert ordinary.returncode==74 and not launch_record.exists()
+        restored_health=inspect(cached,'restored-source-independent-health',health=True)
+        assert restored_health['complete'] and restored_health['recovery']['recordSHA256']==intent['recordSHA256']
+        assert restored_health['localHealth']['releaseSHA256']==release_digest.decode('ascii')
+        assert pending.read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
+        pending.unlink();admission.unlink()  # Disposable fixture only; completion is still unresolved in product.
+        stages.append('independent-recorded-source-application-with-original-journal-preserved')
         # Damaged metadata (rather than an absent file) takes the same exact
         # selected-source path. No foreign/version-only match is accepted.
         installed_release.write_bytes(b'Broken fixture metadata.\n')

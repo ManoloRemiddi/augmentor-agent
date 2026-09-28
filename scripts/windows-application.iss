@@ -57,6 +57,7 @@ var MaintenanceHeld, AuthenticatedHandoff, RemovalHeld, FreshInstallation: Boole
   StartupChoiceKnown, StartupChoice: Boolean;
   BrowserCleanupReady, InstallationComplete, InstallerRetained: Boolean; BrowserDigest: String;
   RetainedInstallerDigest: String;
+  RestoreSource, SourceAssessmentReady, SourceAssessmentAttempted: Boolean;
 
 function OfferStartupTask: Boolean;
 begin
@@ -64,7 +65,7 @@ begin
     StartupChoice := not DirExists(ExpandConstant('{#InstallDirectory}\current'));
     StartupChoiceKnown := True;
   end;
-  Result := StartupChoice;
+  Result := StartupChoice and not RestoreSource;
 end;
 
 function LaunchParameters(Param: String): String;
@@ -122,48 +123,57 @@ function InspectHealth(Installed, ReleaseDigest, Qualification: String): BOOL;
   external 'AugmentorInspectionHealth@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
 function PrepareReplacement(Application: String): BOOL;
   external 'AugmentorPrepareReplacement@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
+function PrepareSourceRestoration(Application: String): BOOL;
+  external 'AugmentorPrepareSourceRestoration@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
+
+function PrepareIndependentAssessment(AssessSource: Boolean): Boolean;
+var Ready: Boolean; ReportText: AnsiString;
+begin
+  Result := False;
+  { Keep successful admission/pins until Setup closes. Read-only callers close
+    in their own finally block; explicit source restoration retains them. }
+  Ready := PrepareManualMaintenance('{#QualificationBase}');
+  if not Ready then begin Log('Augmentor independent inspection: maintenance unavailable.'); exit; end;
+  MaintenanceHeld := True;
+  Ready := ValidateApplicationPath(ExpandConstant('{#InstallDirectory}'));
+  if not Ready then begin Log('Augmentor independent inspection: unsupported application path.'); exit; end;
+  if (OwnedRegistry('{#InstallationKey}', 'Root', ExpandConstant('{#InstallDirectory}\current'), 0) <> 2) or
+     (OwnedRegistry('{#InstallationKey}', 'AppId', 'com.augmentor.Agent', 0) <> 2) then begin
+    Log('Augmentor independent inspection: application ownership is unknown.'); exit;
+  end;
+  Ready := PrepareInspection(ExpandConstant('{tmp}'));
+  if not Ready then begin Log('Augmentor independent inspection: scratch creation failed.'); exit; end;
+  if AssessSource then begin
+    Ready := SnapshotUpdate(Lowercase(GetSHA256OfFile(ExpandConstant('{srcexe}'))));
+    if not Ready then begin Log('Augmentor independent inspection: exclusive private update snapshot unavailable.'); exit; end;
+  end;
+  ExtractTemporaryFiles('{app}\current\release.json');
+  ExtractTemporaryFiles('{app}\current\payload-integrity.json');
+  ExtractTemporaryFiles('{app}\current\scripts\windows-inspect-payload.py');
+  ExtractTemporaryFiles('{app}\current\services\lifecycle\payload_integrity.py');
+  ExtractTemporaryFiles('{app}\current\services\lifecycle\recovery_source.py');
+  ExtractTemporaryFiles('{app}\current\services\lifecycle\health_report.py');
+  ExtractTemporaryFiles('{app}\current\services\lifecycle\update_journal.py');
+  ExtractTemporaryFiles('{app}\current\services\platform_adapters\private_files.py');
+  ExtractTemporaryFiles('{app}\current\services\platform_adapters\locks.py');
+  ExtractTemporaryFiles('{app}\current\python\*');
+  Ready := RunInspection(ExpandConstant('{#InstallDirectory}\current'), '{#ReleaseDigest}');
+  if not Ready then begin
+    Log('Augmentor independent inspection: worker failed; stage=' + IntToStr(InspectionStage) +
+      ', detail=' + IntToStr(InspectionDetail) + '; installation preserved.'); exit;
+  end;
+  if not LoadStringFromFile(ExpandConstant('{tmp}\') + '{app}\inspection-result.json', ReportText) then
+    RaiseException('Augmentor independent inspection result is unavailable.');
+  Log('Augmentor independent inspection result: ' + String(ReportText));
+  Result := True;
+end;
 
 procedure InspectIndependentPayload(AssessSource, ObserveHealth: Boolean);
 var Ready: Boolean; ReportText: AnsiString;
 begin
-  { A read-only diagnostic action, including when an update is unresolved.
-    Returning from InitializeSetup with False prevents ALL install sections.
-    The independent worker inspects without installed code; optional health
-    calls only the fixed isolated action after complete source verification. }
-  Ready := PrepareManualMaintenance('{#QualificationBase}');
-  if not Ready then begin Log('Augmentor independent inspection: maintenance unavailable.'); exit; end;
-  MaintenanceHeld := True;
+  { Returning False from InitializeSetup prevents all installation sections. }
   try
-    Ready := ValidateApplicationPath(ExpandConstant('{#InstallDirectory}'));
-    if not Ready then begin Log('Augmentor independent inspection: unsupported application path.'); exit; end;
-    if (OwnedRegistry('{#InstallationKey}', 'Root', ExpandConstant('{#InstallDirectory}\current'), 0) <> 2) or
-       (OwnedRegistry('{#InstallationKey}', 'AppId', 'com.augmentor.Agent', 0) <> 2) then begin
-      Log('Augmentor independent inspection: application ownership is unknown.'); exit;
-    end;
-    Ready := PrepareInspection(ExpandConstant('{tmp}'));
-    if not Ready then begin Log('Augmentor independent inspection: scratch creation failed.'); exit; end;
-    if AssessSource then begin
-      Ready := SnapshotUpdate(Lowercase(GetSHA256OfFile(ExpandConstant('{srcexe}'))));
-      if not Ready then begin Log('Augmentor independent inspection: exclusive private update snapshot unavailable.'); exit; end;
-    end;
-    ExtractTemporaryFiles('{app}\current\release.json');
-    ExtractTemporaryFiles('{app}\current\payload-integrity.json');
-    ExtractTemporaryFiles('{app}\current\scripts\windows-inspect-payload.py');
-    ExtractTemporaryFiles('{app}\current\services\lifecycle\payload_integrity.py');
-    ExtractTemporaryFiles('{app}\current\services\lifecycle\recovery_source.py');
-    ExtractTemporaryFiles('{app}\current\services\lifecycle\health_report.py');
-    ExtractTemporaryFiles('{app}\current\services\lifecycle\update_journal.py');
-    ExtractTemporaryFiles('{app}\current\services\platform_adapters\private_files.py');
-    ExtractTemporaryFiles('{app}\current\services\platform_adapters\locks.py');
-    ExtractTemporaryFiles('{app}\current\python\*');
-    Ready := RunInspection(ExpandConstant('{#InstallDirectory}\current'), '{#ReleaseDigest}');
-    if not Ready then begin
-      Log('Augmentor independent inspection: worker failed; stage=' + IntToStr(InspectionStage) +
-        ', detail=' + IntToStr(InspectionDetail) + '; installation preserved.'); exit;
-    end;
-    if not LoadStringFromFile(ExpandConstant('{tmp}\') + '{app}\inspection-result.json', ReportText) then
-      RaiseException('Augmentor independent inspection result is unavailable.');
-    Log('Augmentor independent inspection result: ' + String(ReportText));
+    if not PrepareIndependentAssessment(AssessSource) then exit;
     if ObserveHealth then begin
       Ready := InspectHealth(ExpandConstant('{#InstallDirectory}\current'), '{#ReleaseDigest}', '{#QualificationBase}');
       if not Ready then begin
@@ -235,7 +245,7 @@ end;
 function OfferLaunch: Boolean;
 begin
   { Coordinated updates reopen only after independent health verification. }
-  Result := not AuthenticatedHandoff;
+  Result := not AuthenticatedHandoff and not RestoreSource;
 end;
 
 procedure ReleaseForLaunch;
@@ -244,19 +254,26 @@ begin
     the user accepts the final Open checkbox. Release admission before the
     native app acquires its own startup/lifetime handles. An unchecked box or
     silent/coordinated install keeps the normal DeinitializeSetup cleanup. }
-  if not InstallationComplete or not MaintenanceHeld or AuthenticatedHandoff or WizardSilent then
+  if not InstallationComplete or not MaintenanceHeld or AuthenticatedHandoff or RestoreSource or WizardSilent then
     RaiseException('Augmentor cannot open before installation is complete.');
   CloseSetupMaintenance;
   MaintenanceHeld := False;
 end;
 
 function InitializeSetup: Boolean;
-var Pipe, CoordinatorText, Inspection: String; Coordinator: Int64;
+var Pipe, CoordinatorText, Inspection, Recovery: String; Coordinator: Int64;
 begin
   Result := False;
   Pipe := ExpandConstant('{param:augmentorpipe|}');
   CoordinatorText := ExpandConstant('{param:augmentorcoordinator|}');
   Inspection := ExpandConstant('{param:augmentorinspect|}');
+  Recovery := ExpandConstant('{param:augmentorrecover|}');
+  if Recovery <> '' then begin
+    if (Recovery <> 'source') or (Inspection <> '') or (Pipe <> '') or (CoordinatorText <> '') then exit;
+    RestoreSource := True;
+    Result := True;
+    exit;
+  end;
   if Inspection <> '' then begin
     if ((Inspection <> '1') and (Inspection <> 'source') and (Inspection <> 'health')) or
         (Pipe <> '') or (CoordinatorText <> '') then exit;
@@ -282,6 +299,18 @@ begin
     Result := 'This installer uses the single Augmentor application folder. Custom replacement paths are not supported.';
     exit;
   end;
+  if RestoreSource and not SourceAssessmentReady then begin
+    if SourceAssessmentAttempted then begin
+      Result := 'Source assessment failed. Close this installer before another recovery attempt.';
+      exit;
+    end;
+    SourceAssessmentAttempted := True;
+    SourceAssessmentReady := PrepareIndependentAssessment(True);
+    if not SourceAssessmentReady then begin
+      Result := 'This installer could not verify the exact previous Augmentor version. Your installation and update record were preserved.';
+      exit;
+    end;
+  end;
   if not MaintenanceHeld then begin
     if AuthenticatedHandoff then
       AccessReady := AcquireAuthenticatedInstallation(30000)
@@ -293,7 +322,7 @@ begin
     end;
     MaintenanceHeld := True;
   end;
-  if not AuthenticatedHandoff then begin
+  if not AuthenticatedHandoff and not RestoreSource then begin
     AccessReady := ManualUpdateClear;
     if not AccessReady then begin
       Result := 'An unfinished Augmentor update needs recovery before installation or repair can continue. Its records and your data were preserved.';
@@ -319,14 +348,14 @@ begin
     exit;
   end;
   OwnedInstallation := (RootRegistration = 2) and (IdentityRegistration = 2);
-  if AuthenticatedHandoff and not OwnedInstallation then begin
+  if (AuthenticatedHandoff or RestoreSource) and not OwnedInstallation then begin
     Result := 'A coordinated update requires the registered Augmentor installation. Its files were preserved.';
     exit;
   end;
   FreshInstallation := not DirExists(ExpandConstant('{app}\current')) and
     (RootRegistration = 1) and (IdentityRegistration = 1);
   NeedsSelectedRepair := False;
-  if not AuthenticatedHandoff and not FreshInstallation then begin
+  if not AuthenticatedHandoff and not RestoreSource and not FreshInstallation then begin
     NeedsSelectedRepair := True;
     if FileExists(CurrentRelease) then
       NeedsSelectedRepair := GetSHA256OfFile(CurrentRelease) <> '{#ReleaseDigest}';
@@ -357,8 +386,11 @@ begin
     if not AccessReady then
       Result := 'This installer does not match the recorded Augmentor installation. Use its registered repair option or the coordinated update in Augmentor. Your installed app was not changed.';
   end;
-  if (Result = '') and AuthenticatedHandoff then begin
-    AccessReady := PrepareReplacement(ExpandConstant('{app}'));
+  if (Result = '') and (AuthenticatedHandoff or RestoreSource) then begin
+    if RestoreSource then
+      AccessReady := PrepareSourceRestoration(ExpandConstant('{app}'))
+    else
+      AccessReady := PrepareReplacement(ExpandConstant('{app}'));
     if not AccessReady then
       Result := 'Augmentor could not prepare a clean replacement. The update remains unresolved and its recovery files were preserved. Close this installer before trying recovery.';
   end;
@@ -379,6 +411,8 @@ begin
   if not SelectInstaller then
     RaiseException('Augmentor could not record its installed build. Repair this installation.');
   InstallationComplete := True;
+  if RestoreSource then
+    Log('Augmentor previous-source files installed; recovery verification and journal completion remain required.');
 end;
 
 procedure DeinitializeSetup;
