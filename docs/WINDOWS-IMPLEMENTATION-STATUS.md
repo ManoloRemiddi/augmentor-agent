@@ -836,3 +836,13 @@ refusal checks. Its new probe then fails because the test uses a pywin32 flag
 from the wrong module. The probe now uses `win32file.FILE_FLAG_OPEN_REPARSE_POINT`,
 matching the existing product adapter. Remaining native assertions must pass
 before this startup work is qualified; this is not a waived integration failure.
+
+Shared browser source now drains accepted parent-side operations on EOF and
+observes its bridge's close without force-exiting the parent. Browser voice
+retains actual worker and accepted ticket/submission activity after its UI closes;
+the two-second force-kill timer is removed. Thirteen focused local Node/DOM
+checks pass, including two real-process EOF/`beforeExit` cases and independent
+voice worker/submission drain. Native compiled integration remains pending.
+DSH/Pi bridge admission, extension panel/reconnect reservation and global
+coordination still require implementation; these corrections do not complete
+browser maintenance or speech engine qualification.

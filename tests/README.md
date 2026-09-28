@@ -145,3 +145,12 @@ the runtime. Separate embedded-Python fixture entrypoints verify both launchers
 hold the lease until normal exit. The full window proof reuses the negative cases
 and tests the assembled desktop's lifetime lease. No existing application root
 may be used for the fast probe; it refuses assembled payloads.
+
+`browser-native-drain.test.mjs` runs actual native-messaging parent/bridge
+processes against a delayed Unix prompt fixture, closes browser input with work
+accepted, and requires a complete response plus an observed Node `beforeExit`.
+It checks both parent-only and selected-child cases; native Windows transport
+has separate qualification. `browser-shared-voice.test.mjs` additionally holds
+worker closure and a submission independently, proving neither a UI close nor
+the former two-second kill deadline clears busy state. These controlled voice
+tests do not invoke audio/model engines.

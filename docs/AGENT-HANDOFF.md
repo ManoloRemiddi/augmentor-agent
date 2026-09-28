@@ -129,6 +129,14 @@ fast Windows workflow and full assembled window proof; execution is pending.
 The historical installer fixture stays distinct, and complete coordinated
 installation is still required. See the shell guide for the exact new boundary.
 
+Current shared browser source drains accepted parent operations on disconnect,
+sends EOF to its selected bridge and waits for actual child close. Voice retains
+busy state through retiring workers and accepted operations; no ordinary
+two-second worker kill remains. Thirteen focused Node/DOM checks pass, including
+actual process natural-exit observations. DSH/Pi bridge admission, extension
+panel/reconnect reservation and global coordination are still pending. No
+installed browser or private audio configuration changed.
+
 ## September 27 Windows implementation plan — historical planning checkpoint
 
 The owner requested a detailed plan before coding. Read the

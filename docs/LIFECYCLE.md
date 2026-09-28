@@ -295,3 +295,28 @@ Commit requires the owner to be empty and acknowledges before normal Qt exit.
 Accepted shortcut work remains counted after a lost caller response until the
 actual operation finishes. These additions pass portable tests; native execution
 of the owner handshake is pending.
+
+## Browser transport drain
+
+The shared native-messaging parent now drains already accepted shared operations
+when browser input closes. It sends EOF to its selected bridge, waits for the
+child's actual close event and flushes complete response frames before natural
+exit. A child's output ending cannot truncate an outstanding parent-side prompt
+operation. The parent no longer kills its bridge or calls `process.exit` for an
+ordinary disconnect. A fatal protocol/transport failure retains a nonzero exit
+code while accepted shared work settles; it is not replayed.
+
+Browser voice separately retains busy state until its worker's actual close
+event and accepted ticket/submission operations settle. Closing the voice UI
+does not imply worker exit, and ordinary close no longer kills a worker after
+two seconds. A second voice session waits for the retiring work. This is shared
+behavior across OSs and adds no new audio engine or settings changes.
+
+These are component prerequisites, not global browser maintenance. The selected
+DSH/Pi bridge still needs its own admission/drain, and the extension must preserve
+drafts, reserve open panels and prevent reconnect during coordinated updates.
+The existing Windows wrapper's fault containment is not evidence of a natural
+whole-product shutdown. Portable real-process tests hold a shared request over
+EOF, with and without selecting a bridge, then require a complete final response
+and Node `beforeExit`. Voice tests use controlled workers/submissions and do not
+qualify a physical audio device.

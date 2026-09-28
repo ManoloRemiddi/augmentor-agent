@@ -17,14 +17,23 @@ export function voicePython(root, env=process.env){
 export class BrowserVoice {
   constructor({ticket,submit,notify,spawnWorker=spawn,root=fileURLToPath(new URL('../../../',import.meta.url))}){
     Object.assign(this,{ticket,submit,notify,spawnWorker,root});this.active=null
+    this.workers=new Set();this.operations=new Set()
   }
+  get busy(){return Boolean(this.active||this.workers.size||this.operations.size)}
+  track(operation){
+    const pending=Promise.resolve(operation).finally(()=>this.operations.delete(pending))
+    this.operations.add(pending);return pending
+  }
+  async settled(){while(this.busy)await Promise.allSettled([...this.operations,...[...this.workers].map(worker=>worker.closed)])}
   async start({sessionId,id,handsFree=false}){
     if(!/^[a-f0-9-]{36}$/.test(id??'')||typeof sessionId!=='string')throw Error('Invalid voice identity')
-    if(this.active)throw Error('Voice is already open. Close it before opening another voice session.')
+    if(this.busy)throw Error('Voice is open or still finishing. Wait for it to close before opening another voice session.')
     const worker=this.spawnWorker(voicePython(this.root),['-u',path.join(this.root,'services/voice/browser-client.py')],{
       stdio:['pipe','pipe','ignore'],env:{...process.env,AUGMENTOR_WINDOW_ID:'main'},
     })
     const active={id,sessionId,worker,submitted:new Set(),buffer:''};this.active=active
+    active.closed=new Promise(resolve=>worker.once('close',()=>{this.workers.delete(active);resolve()}))
+    this.workers.add(active)
     const emit=event=>{if(this.active===active)this.notify({method:'voice.event',params:{id,sessionId,...event}})}
     worker.on('error',()=>{emit({type:'error',message:'The shared Voice engine could not start. Check the companion installation.'});this.close(active)})
     worker.on('exit',()=>{emit({type:'state',state:'closed',closed:true,status:'Voice disconnected'});this.close(active)})
@@ -36,21 +45,21 @@ export class BrowserVoice {
         const line=active.buffer.slice(0,end);active.buffer=active.buffer.slice(end+1)
         try{
           const event=JSON.parse(line)
-          if(event.type==='transcript')void this.transcript(active,event).catch(()=>{})
+          if(event.type==='transcript')void this.track(this.transcript(active,event)).catch(()=>{})
           else emit(event)
         }catch{emit({type:'error',message:'Invalid voice response'});this.close(active)}
       }
     })
     this.write(active,{action:'prepare',handsFree})
     // Return the lease immediately, so release/cancel/heartbeats work during preparation.
-    void this.ticket(sessionId).then(ticket=>{
+    void this.track(Promise.resolve().then(()=>this.ticket(sessionId))).then(ticket=>{
       if(this.active!==active)return
       if(ticket.protocol!=='resonant-voice/1'||ticket.sessionId!==sessionId||!/^ws:\/\/127\.0\.0\.1:\d+\/voice$/.test(ticket.url))throw Error('Invalid voice endpoint')
       this.write(active,{action:'start',ticket})
     }).catch(error=>{emit({type:'error',message:error.message});this.close(active)})
     return {id,sessionId}
   }
-  write(active,value){if(this.active===active&&!active.worker.stdin.destroyed)active.worker.stdin.write(JSON.stringify(value)+'\n')}
+  write(active,value){if(this.active===active&&!active.worker.stdin.destroyed&&!active.worker.stdin.writableEnded)active.worker.stdin.write(JSON.stringify(value)+'\n')}
   control({id,sessionId,action}){
     const active=this.active
     if(!active||id!==active.id||sessionId!==active.sessionId)throw Error('Voice belongs to another or closed conversation')
@@ -71,12 +80,11 @@ export class BrowserVoice {
     this.write(active,{action:'submission',result:{...result,id}})
   }
   close(active=this.active){
-    if(!active||this.active!==active)return
+    if(!active||this.active!==active)return active?.closed
     this.write(active,{action:'close'});this.active=null
     active.worker.stdin.end()
-    const timer=setTimeout(()=>active.worker.kill(),2000);timer.unref?.()
-    active.worker.once('exit',()=>clearTimeout(timer))
     this.notify({method:'voice.event',params:{id:active.id,sessionId:active.sessionId,type:'state',state:'closed',closed:true,status:'Voice off'}})
+    return active.closed
   }
 }
 
