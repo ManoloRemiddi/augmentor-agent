@@ -64,6 +64,10 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_maintenance_admission.py -v
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_maintenance_reservations.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_preparation.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_desktop_maintenance.py -v
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_dsh_setup.py -v

@@ -82,6 +82,21 @@ extracted Setup process and checks retention across coordinator exit/crash.
 Native execution of this new Inno case is pending; production handoff identity,
 coordinated apply, health and rollback remain open.
 
+At `0ca8348`, the actual extracted Inno Setup gate-transfer proof passes both
+CPUs in [36380756992](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36380756992),
+including normal coordinator exit/crash and invalid-transfer refusal before
+version change. Both fast Windows jobs and Linux/Mac workflows also pass. At
+`f08c4f0`, full x64 managed DSH integration passes; ARM64 is still running.
+
+Current source adds [coordinated reversible preparation](LIFECYCLE.md#coordinated-reversible-preparation)
+with independent renewals, conservative expiry, single cancellation after lost
+acknowledgments, and startup exclusion retained through cleanup. Six reservation,
+two graph failure and four admission checks pass locally; six portable owner
+checks pass with two Windows-only cases skipped. Actual companion group and
+assembled desktop/DSH graph assertions are added and await hosted execution.
+This is preparation/cancellation only: no product commit, installer apply,
+voice provisioning, rollback or release gate is waived.
+
 ## Baseline and environments (W0)
 
 Implementation branch `feat/windows` starts from reviewed `main` `b8e36a4` plus

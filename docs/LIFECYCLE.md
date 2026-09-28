@@ -409,3 +409,31 @@ exit with fixture renderer replies; execution is pending on both CPUs. Real
 Chromium document behavior and compiled transport behavior remain separate
 evidence. Global commit/update, Windows Chromium/Comet GUI and customer release
 are still incomplete.
+
+
+### Coordinated reversible preparation
+
+`services/lifecycle/reservations.py` shares preparation/renewal/cancellation
+across already authenticated participants. It retains an attempted preparation
+before sending it, so even a lost reply gets one token-specific cancellation.
+It never repeats preparation, replays model work or commits shutdown. Each
+participant renews independently; the conservative deadline starts before the
+request, and any lost/expired acknowledgment invalidates the entire group.
+Cleanup stops renewals before cancelling leaves, then their background owner.
+A lost cancellation reply permits only a read-only confirmation of ready state.
+If a renewal exceeds the cleanup bound, its observations stay retained until
+that request actually ends; no installer or shutdown is authorized.
+
+The Windows context additionally holds the startup writer while discovering
+and reserving its existing owner, desktop windows, native browser hosts, managed
+DSH and prompt/memory companions. Unknown ownership or any busy participant
+unwinds the attempt, preserving accepted work. It currently requires a running
+owned supervisor and excludes external services. Owned voice, browser commit,
+independent authenticated installer handoff and final exclusive installation
+access remain prerequisites for a complete update. This context alone cannot
+apply files or close an application.
+
+Local failure/expiry/renewal tests pass. Native tests now cover actual companion
+group renewal/cancellation and assembled desktop/DSH preparation with preserved
+history, plus refusal during an actual deterministic-model turn. Execution of
+these new graph assertions is pending; separate component tests already pass.

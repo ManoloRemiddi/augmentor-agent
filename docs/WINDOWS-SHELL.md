@@ -312,3 +312,23 @@ commit, complete Job drain, retained-process exit and history after restart
 through this client. Native execution is pending. Existing external/manual DSH
 connections are not adopted or stopped. Owned voice startup remains an explicit
 feature gap; this change does not imply that the Windows speech engine is ready.
+
+
+## Reversible component preparation
+
+`windows_preparation.py` binds the startup writer and retained component clients
+to one reversible context. It reserves the live owner first, then surfaces,
+managed DSH and companions; every confirmed reservation has its own heartbeat.
+Closing the context cancels in reverse order before releasing observations and
+startup exclusion. Discovery/identity failures take the same cleanup path as
+busy responses. A transport exceeding cleanup bounds keeps those resources in
+a deferred cleanup worker until its in-flight request returns.
+
+The actual prompt/memory native proof now verifies group renewal, launch and
+second-writer exclusion, cancellation and continued process life. The assembled
+proof includes compiled desktop plus DSH and companions, unchanged restored
+history, and busy DSH refusal without cancelling its active model turn. These
+new native assertions await execution. Six portable reservation and two graph
+failure tests pass, along with existing admission/owner policy checks. This
+context intentionally exposes no commit/apply operation. See the shared
+[lifecycle contract](LIFECYCLE.md#coordinated-reversible-preparation).

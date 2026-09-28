@@ -164,6 +164,36 @@ class WindowsSupervisorTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError,'Unsupported'):
                     participant.observe_child('unknown',component_pids['prompts'])
                 self.assertEqual(participant.control('cancel',token)['phase'],'ready')
+                from lifecycle.windows_preparation import WindowsPreparation
+                from lifecycle.windows_startup import Startup
+                # Actual owned prompt/memory graph, using only this fixture's
+                # explicit private paths. No installed user service is queried.
+                deadline=time.monotonic()+5
+                while True:
+                    preparation=WindowsPreparation(ROOT,Path(env['XDG_RUNTIME_DIR']),
+                        Path(env['AUGMENTOR_SHARED_STATE']),root/'unused-managed-state')
+                    try:preparation.__enter__();break
+                    except ValueError as error:
+                        if 'active work' not in str(error) or time.monotonic()>=deadline:raise
+                        time.sleep(.02)  # Known busy refusal; never retry an unknown acknowledgment.
+                try:
+                    self.assertEqual({item.name:item.pid for item in preparation.companions},component_pids)
+                    self.assertIsNone(preparation.dsh)
+                    for maintenance in (False,True):
+                        with self.assertRaises(OSError):Startup(Path(env['XDG_RUNTIME_DIR']),maintenance=maintenance)
+                    with self.assertRaisesRegex(ValueError,'maintenance'):
+                        owner.request('start-prompts',owner=endpoint)
+                    deadlines=[entry.deadline for entry in preparation.reservations.entries]
+                    time.sleep(6)
+                    preparation.check()
+                    self.assertTrue(all(entry.deadline>previous for entry,previous in
+                        zip(preparation.reservations.entries,deadlines)))
+                finally:preparation.__exit__(*sys.exc_info())
+                with Startup(Path(env['XDG_RUNTIME_DIR'])):pass
+                self.assertEqual(participant.control('status')['phase'],'ready')
+                for item in companions:
+                    self.assertEqual(call(item.endpoint,'host.maintenance.status')['phase'],'ready')
+                    self.assertFalse(item.exited())
                 process.kill()  # Deliberate fixture fault, not a normal Quit.
                 process.communicate(timeout=10)
                 for handle in handles:

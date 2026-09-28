@@ -12,6 +12,19 @@ W0/W1 have started with isolated baseline checks, hash-locked native x64/ARM64
 runtime candidates and hosted qualification jobs. No Windows app or customer
 release is complete. Preserve existing installations and unrelated open work.
 
+Current source, September 28: coordinated reversible Windows preparation now
+holds startup exclusion, reserves the existing owner/surfaces/DSH/companions,
+renews independently and cancels safely on busy or lost replies. Portable checks
+pass; new actual-companion and assembled desktop/DSH graph tests await native
+execution. The Inno extracted-Setup handoff proof at `0ca8348` passes both CPUs,
+as do its fast Windows, Linux and Mac checks. Full owned-DSH `f08c4f0` passes x64;
+ARM64 is finishing. Continue from the [evidence ledger](WINDOWS-IMPLEMENTATION-STATUS.md)
+with native graph qualification, browser/voice participation and authenticated
+installer commit/apply/recovery. No customer release is complete.
+
+Earlier checkpoint notes below are historical; later evidence supersedes their
+pending statuses without expanding physical/customer-installation claims.
+
 Latest checkpoint, September 28: full native runtime `6d245a7` passes both CPUs
 in [run 36374006218](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36374006218),
 including compiled window discovery and the pre-Python lifetime lease. The later

@@ -22,6 +22,21 @@ import uuid
 import yaml
 
 
+def prepare_graph(root,work):
+    """Known busy refusals may settle in this fixture; lost replies never retry."""
+    from lifecycle.windows_preparation import WindowsPreparation
+    from platform_adapters.windows_http import HttpRefused
+    import windows_supervisor as owner
+    deadline=time.monotonic()+10
+    while True:
+        preparation=WindowsPreparation(root,work/'run',work/'run/shared',owner.managed_directory())
+        try:return preparation.__enter__()
+        except ValueError as error:
+            busy=(isinstance(error,HttpRefused) and error.code==409) or 'active work' in str(error)
+            if not busy or time.monotonic()>=deadline:raise
+            time.sleep(.1)
+
+
 def desktop_chat(root, work, out):
     """Actual native GUI, real DSH, Send/Enter and restored rendered history."""
     from platform_adapters.processes import OwnedProcess
@@ -86,6 +101,15 @@ def desktop_chat(root, work, out):
                 session = after['session']
                 ui('capture', path=str((out/('native-chat-'+submission+'.png')).resolve()))
                 turns.append({'submission': submission, 'pid': after['pid'], 'session': session, 'online': after['online']})
+                preparation=prepare_graph(root,work)
+                try:
+                    assert [item.pid for item in preparation.windows]==[after['pid']]
+                    assert preparation.dsh is not None
+                    assert {item.name for item in preparation.companions}=={'prompts','memory'}
+                    preparation.check()
+                finally:preparation.__exit__(*sys.exc_info())
+                restored=ui('inspect')
+                assert restored['session']==session and restored['transcript']==after['transcript'] and not restored['draft']
                 maintenance_token = uuid.uuid4().hex
                 def maintenance(action):
                     return exchange('maintenance:'+json.dumps({'method':'host.maintenance.'+action,
@@ -101,7 +125,8 @@ def desktop_chat(root, work, out):
                 assert child.wait_graceful(timeout=15) == 0, 'The idle desktop did not close normally.'
             finally:
                 child.terminate(); child.wait(timeout=10)
-        result.update(passed=True, turns=turns, historyRestored=True, noDuplicateSubmission=True, preparedNormalWindowExit=True)
+        result.update(passed=True, turns=turns, historyRestored=True, noDuplicateSubmission=True, preparedNormalWindowExit=True,
+            graphPreparedAndCancelledWithActualDesktopDshAndCompanions=True)
         return result
     finally:
         (out/'native-chat.json').write_text(json.dumps(result, indent=2)+'\n', encoding='utf-8')
@@ -218,6 +243,18 @@ def main():
         spec = importlib.util.spec_from_file_location('dsh_maintenance_proof', Path(__file__).with_name('dsh_maintenance_proof.py'))
         maintenance_proof = importlib.util.module_from_spec(spec); spec.loader.exec_module(maintenance_proof)
         maintenance_proof.refuse_busy(setup.current()['endpoint'], state/'home')
+        from lifecycle.windows_preparation import WindowsPreparation
+        from platform_adapters.windows_http import HttpRefused
+        refused=False
+        try:
+            with WindowsPreparation(root,work/'run',work/'run/shared',state):pass
+        except HttpRefused as error:
+            assert error.code==409
+            refused=True
+        assert refused, 'The component graph accepted an active DSH model request.'
+        assert next(row for row in adapter.call('session.list')['items'] if row['sessionId']==session)['running']
+        assert owner.request('maintenance',root=root,method='host.maintenance.status',params={})['maintenance']['phase']=='ready'
+        report['graphBusyRefusalPreservedModelTurn']=True
         contended = False
         try:
             with session_write_lease(lock_path): pass

@@ -15,25 +15,10 @@ import uuid
 from platform_adapters import locks
 from platform_adapters.private_files import descriptor, require_directory
 from platform_adapters.transport import LocalSocket
+from .admission import component_state
 
 
 def normalized(path):return os.path.normcase(str(Path(path).resolve()))
-
-
-def component_state(result, action):
-    expected={'prepare':'prepared','renew':'prepared','cancel':'ready','commit':'closing'}
-    if (not isinstance(result,dict) or result.get('protocol')!='augmentor-component-maintenance/1'
-            or result.get('phase') not in ('ready','preparing','prepared','closing')
-            or type(result.get('active')) is not int or result['active']<0
-            or action in expected and result['phase']!=expected[action]):
-        raise ValueError('Unsupported component maintenance response. No request was replayed.')
-    if action in ('prepare','renew','commit') and result['active']!=0:
-        raise ValueError('The component did not confirm idle admission. Its work was preserved.')
-    if action in ('prepare','renew'):
-        ttl=result.get('expiresInSeconds')
-        if type(ttl) not in (int,float) or not math.isfinite(ttl) or not 0<ttl<=30:
-            raise ValueError('The component did not confirm a bounded live reservation.')
-    return result
 
 
 class WindowParticipant:

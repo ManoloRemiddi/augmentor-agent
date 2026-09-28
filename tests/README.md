@@ -214,3 +214,16 @@ process duplicates its startup writer, remains protected after that coordinator
 exits or is deliberately crashed, completes repair and releases the gate. An
 invalid handle is refused before a version change. These tests do not use a
 customer installer or production handoff authentication; those remain separate.
+
+
+`test_maintenance_reservations.py` uses actual shared Admission peers to cover
+busy accepted work, independent heartbeat renewal, expired/lost acknowledgments,
+reverse cancellation and cleanup waiting for an in-flight renewal. It never
+commits shutdown. `test_windows_preparation.py` adds portable discovery/busy
+failure unwinding; its discovery/kernel boundaries are controlled fixtures.
+`test_windows_supervisor.py` additionally runs the whole actual prompt/memory
+preparation on Windows, checks both startup exclusions and waits for real renewal
+before restoring still-live services. `windows-managed-setup-proof.py` adds the
+compiled desktop/DSH/companion group, restored transcript, and refusal while an
+actual deterministic-model turn remains active. Those new native assertions
+await hosted execution; they do not qualify voice, browser commit or an update.
