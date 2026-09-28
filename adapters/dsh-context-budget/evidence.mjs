@@ -44,13 +44,20 @@ export function failureSignature(text, isError = false) {
   if (typed) return typed[1];
   const dbus = text.match(/\b(org\.freedesktop\.DBus\.Error\.[A-Za-z]+)\b/);
   if (dbus) return dbus[1];
+  // Shell pipelines can exit zero even when an earlier program reports failure.
+  if (/\bcommand not found\b/.test(text)) return 'command-not-found';
+  if (/\b(?:unknown|unrecognized|invalid) option\b/i.test(text)) return 'invalid-option';
+  if (/\bService ['"][^'"\n]+['"] does not exist\./.test(text)) return 'service-not-found';
   if (/\[exit code: [1-9]\d*\]/.test(text)) return 'nonzero-exit';
   if (isError) return 'tool-error';
   return null;
 }
 
 export const reassess = 'Reassess the attempted commands against the user’s latest requested outcome. ' +
+  'Reuse environmental facts already established instead of repeatedly inspecting them. ' +
   'An error can mean incorrect syntax, object path or interface, not missing capability. ' +
+  'Prefer a high-level installed utility and its built-in help before guessing low-level interfaces. ' +
+  'If its name is unknown, inspect the relevant installed package’s executable list. ' +
   'Check installed help or one authoritative reference before changing approaches. ' +
   'Prefer the smallest supported action and verify its result; do not expand a simple task into source-code research without need. ' +
   'If no supported next step is known, give an honest partial handoff explaining the observed blocker. ' +

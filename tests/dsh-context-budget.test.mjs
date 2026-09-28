@@ -115,8 +115,8 @@ test('many different successful inspections get one advisory progress checkpoint
   const h=await harness(t,i=>i<=14?call(i,'inspect_fixture',{target:String(i)}):done,
     'augmentor-linux-product',true,args=>'Evidence for '+args.target);
   await h.say();assert.deepEqual(h.errors,[]);assert.equal(h.requests.length,15);
-  assert.doesNotMatch(JSON.stringify(h.requests[11].messages),/Progress checkpoint/);
-  assert.match(JSON.stringify(h.requests[12].messages),/Progress checkpoint/);
+  assert.doesNotMatch(JSON.stringify(h.requests[7].messages),/Progress checkpoint/);
+  assert.match(JSON.stringify(h.requests[8].messages),/Progress checkpoint/);
   assert.match(JSON.stringify(h.requests[12].messages),/count alone does not imply failure/);
   assert.equal(h.events().filter(e=>e.type==='user/message'&&e.data.source?.plugin==='augmentor-context-budget').length,1);
 });
@@ -150,4 +150,25 @@ test('error counters reset for a new turn and sparse failures do not trigger rea
     'augmentor-linux-product',true,()=>{calls++;return 'TypeError: fixture failure';});
   await h.say();await h.say();assert.equal(calls,4);assert.deepEqual(h.errors,[]);
   assert.doesNotMatch(JSON.stringify(h.requests),/Failed-approach checkpoint/);
+});
+
+
+test('mixed CLI errors inside successful pipelines trigger an early checkpoint',async t=>{
+  const errors=['xset: unknown option --version','bash: line 1: missing-cli: command not found',"Service 'org.example.Missing' does not exist."];
+  const h=await harness(t,i=>i<=3?call(i,'inspect_fixture',{target:String(i)}):done,
+    'augmentor-linux-product',true,args=>errors[Number(args.target)-1]);
+  await h.say();assert.deepEqual(h.errors,[]);
+  assert.match(JSON.stringify(h.requests[3].messages),/Failed-approach checkpoint/);
+  assert.match(JSON.stringify(h.requests[3].messages),/installed package/);
+  assert.equal(h.events().filter(e=>e.type==='tool/call').length,3);
+});
+
+
+test('parallel tool batches count individual results toward the progress checkpoint',async t=>{
+  const h=await harness(t,i=>i<=2?{delta:{role:'assistant',tool_calls:Array.from({length:4},(_,j)=>({index:j,id:`batch-${i}-${j}`,type:'function',function:{name:'inspect_fixture',arguments:JSON.stringify({target:`${i}-${j}`})}}))},finish:'tool_calls'}:done,
+    'augmentor-linux-product',true,args=>'Evidence '+args.target);
+  await h.say();assert.deepEqual(h.errors,[]);assert.equal(h.requests.length,3);
+  assert.doesNotMatch(JSON.stringify(h.requests[1].messages),/Progress checkpoint/);
+  assert.match(JSON.stringify(h.requests[2].messages),/Progress checkpoint/);
+  assert.equal(h.events().filter(e=>e.type==='tool/call').length,8);
 });

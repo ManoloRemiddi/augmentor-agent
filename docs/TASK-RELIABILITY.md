@@ -27,9 +27,10 @@ a notice instead. Inspect its source file with a suitable decoder or archive lis
 `/trim-tools` also sanitizes existing tool context without inference or action replay.
 
 The model receives an advisory reassessment checkpoint when three of the last eight
-tool results contain the same recognized error category, even when arguments differ.
-A separate checkpoint after twelve tool-bearing model steps asks whether further
-investigation is necessary for the latest requested outcome. Each category is warned
+tool results contain recognized errors, including mixed categories and failed commands inside
+successful shell pipelines.
+A separate checkpoint after eight completed tool calls asks whether further
+investigation is necessary for the latest requested outcome. Each repeated error category and the mixed-error condition is warned
 once per turn. The existing identical-result checkpoint remains. These checks do not
 infer success, halt long tasks, change permissions, or authorize retries. Error text
 is evidence for guidance only; it never changes the execution action ledger.
@@ -98,3 +99,53 @@ requires both the previous desktop selection and backed-up owned preset files.
 
 Installed evidence is appended after candidate verification and activation; the
 source changes alone do not update an open window or running DSH generation.
+
+### September 28 installed Linux adoption
+
+Implementation `5a7b496` is applied over selected `20260928-000201-bcc8c6e5`
+(base artifact `bbb98668f777bd926705f047ed7fd8de4d0aa21303f4a16c046b6b9f148672ad`).
+Only the context/execution adapter files and the native notice filter changed in
+that compatible 0.2.11 artifact; the separate source branch targets current public
+0.2.12. The candidate passed eleven native reply/history checks and authenticated
+staging/promotion. Release `20260928-090939-8349fc33` is selected, with artifact
+SHA-256 `25e2818df558e83ab82c57059213b322790be68f424f5a13b8659d937b5946db`.
+
+Both owned personal preset module paths and ownership hashes were updated with
+private backups. The shared host restarted after all tasks and native windows
+were idle. Its actual Desktop and Browser compositions report both adapters
+active; `/trim-tools` on separate diagnostic sessions returned the new sanitizing
+contract without inference. The initial operator readiness probe used the newer
+source adapter against the older installed product and correctly refused the
+version mismatch. Rechecking with the matching staged adapter passed; no product
+version was changed to bypass the check.
+
+Primary, secondary and mobile then closed gracefully and reopened through the
+canonical launchers. All three report this build, online/model-ready, voice
+available, no restoration error and no pending update. Hash comparisons confirm
+model settings and saved conversation selections were preserved. Source adapter
+bytes match the staged copies. Private backup/rollback evidence stays local.
+
+The shared DSH backend is active for Browser; this update does not require new
+extension bytes. Browser already displays the policy notice. The installed Mac
+and public downloads were not replaced. Source is published for review in
+[PR #21](https://github.com/ManoloRemiddi/augmentor-agent/pull/21); merging and public
+releasing remain separate operations.
+
+
+### Follow-up from the full installed-model test
+
+The first full personal-preset read-only check did not finish before its explicit
+180-second diagnostic cancellation deadline (13 tool calls). The earlier restricted
+tool proof therefore did not establish full-agent task reliability. The live result
+exposed mixed CLI errors (`unknown option`, `command not found`, absent service)
+inside shell pipelines whose overall results were successful. These were not counted
+by the initial same-error-category detector. Parallel tool batches also delayed the
+model-step-based progress checkpoint.
+
+The follow-up recognizes those CLI diagnostics, counts three mixed errors in eight
+results, and measures the advisory progress checkpoint after eight completed tool
+calls rather than twelve model steps. The guidance asks the agent to reuse known
+environment facts, discover installed utilities and read their help before guessing
+low-level interfaces. It remains general guidance, not a monitor-specific command
+rule or an authority/side-effect classifier. No reasoning effort was lowered to make
+the proof pass. Subsequent validation and installed adoption are recorded below.

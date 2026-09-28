@@ -66,7 +66,7 @@ export function apply(ctx) {
     if (!owned(agent) || signal.aborted) return next();
     let state = states.get(agent);
     if (!state || state.turn !== turn) {
-      state = {turn, cursor: -1, calls: new Map(), results: new Map(), warned: new Set(), failures: [], steps: new Set(), progressNotice: false};
+      state = {turn, cursor: -1, calls: new Map(), results: new Map(), warned: new Set(), failures: [], resultCount: 0, progressNotice: false};
       states.set(agent, state);
     }
     let repeated = false;
@@ -87,12 +87,15 @@ export function apply(ctx) {
         const count = prior?.digest === digest ? prior.count + 1 : 1;
         state.results.set(key, {digest, count});
         if (count >= 3 && !state.warned.has(key)) { state.warned.add(key); repeated = true; }
-        state.steps.add(e.data.step);
+        state.resultCount++;
         const signature = failureSignature(text(e), e.data.message.content.some(b => b.type === 'tool-result' && b.isError));
         state.failures.push(signature);
         state.failures = state.failures.slice(-8);
         if (signature && state.failures.filter(x => x === signature).length >= 3 && !state.warned.has('error:' + signature)) {
           state.warned.add('error:' + signature); failed = true;
+        }
+        if (signature && state.failures.filter(Boolean).length >= 3 && !state.warned.has('mixed-errors')) {
+          state.warned.add('mixed-errors'); failed = true;
         }
       }
     }
@@ -102,13 +105,13 @@ export function apply(ctx) {
     ctx.toolResultPruner.pruneSession(agent.session);
     const decision = await next();
     if (signal.aborted || decision.kind === 'reject') return decision;
-    const longRun = state.steps.size >= 12 && !state.progressNotice;
+    const longRun = state.resultCount >= 8 && !state.progressNotice;
     if (longRun) state.progressNotice = true;
     if (!repeated && !failed && !longRun && !sanitized) return decision;
     const reasons = [
       repeated ? 'Repeated-tool checkpoint: the same tool arguments have returned identical output at least three times this turn.' : '',
-      failed ? 'Failed-approach checkpoint: at least three of the last eight tool results report the same kind of error, even though commands may differ.' : '',
-      longRun ? 'Progress checkpoint: twelve model steps have executed tools in this turn. Check whether the investigation is still necessary for the requested outcome; this count alone does not imply failure.' : '',
+      failed ? 'Failed-approach checkpoint: at least three of the last eight tool results report errors. Commands and error kinds may differ; a successful shell pipeline can still contain a failed command.' : '',
+      longRun ? 'Progress checkpoint: eight tool calls have returned in this turn. Check whether the investigation is still necessary for the requested outcome; this count alone does not imply failure.' : '',
       sanitized ? 'Evidence checkpoint: binary-like text was withheld from tool context. Use decoded text or metadata instead.' : '',
     ].filter(Boolean).join(' ');
     const checkpoint = {id: randomUUID(), role: 'user', source: {kind: 'plugin', plugin: name}, content: [{type: 'text', text:

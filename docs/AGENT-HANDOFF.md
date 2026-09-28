@@ -8,6 +8,10 @@
 changed-command error checkpoints, bounded recovery reassessment and restored
 effective-reasoning visibility. Model/GPU settings are preserved. Read the guide
 for fixture versus real-model evidence and installed adoption boundaries.
+Implementation `5a7b496` is selected and running in all three Linux windows as
+`20260928-090939-8349fc33`. Both shared DSH presets report the new adapters active;
+model settings and saved conversation selections were preserved. PR #21 is draft;
+Mac/public downloads are unchanged.
 
 ## September 27 installed Chromium browser choice
 
