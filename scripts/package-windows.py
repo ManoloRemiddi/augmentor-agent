@@ -73,7 +73,7 @@ def build(root, arch, out, *, qualification=None, compiler_path=None):
         'InstallDirectory':r'{localappdata}\Programs\Augmentor Agent',
         'OutputDirectory':str(out), 'HandoffHelper':str(helper), 'PayloadDirectory':str(root),
         'ReleaseDigest':digest(root/'release.json'), 'HelperDigest':digest(helper), 'QualificationBase':'',
-        'HandoffRuntime':'', 'LaunchArguments':'', 'MinimumVersion':'10.0.26200'}
+        'HandoffRuntime':'', 'MinimumVersion':'10.0.26200'}
     if qualification:
         # Build-only locations must already be explicit and private. Never
         # modify a personal installation from a qualification command switch.
@@ -85,19 +85,19 @@ def build(root, arch, out, *, qualification=None, compiler_path=None):
         identity = 'AugmentorQ.'+hashlib.sha256(str(base).encode()).hexdigest()[:24]
         definitions.update(ApplicationId=identity, ShortcutName=identity,
             InstallDirectory=str(base/'installed café'), QualificationBase=str(data),
-            HandoffRuntime=str(data/'run'), LaunchArguments='--qualification-root "'+str(data)+'"',
+            HandoffRuntime=str(data/'run'),
             MinimumVersion='10.0.26100')  # Hosted Server runner only; not an advertised OS target.
     # Compile-time strings are not code. Refuse Inno preprocessor/constants
     # injection in physical paths; only the fixed Known Folder expression above
     # is intentionally interpreted as a constant.
     for key, value in definitions.items():
-        if any(char in value for char in '\r\n') or (key not in ('InstallDirectory','LaunchArguments') and '"' in value):
+        if any(char in value for char in '\r\n') or '"' in value:
             raise ValueError('Unsupported installer definition: '+key)
         if key in ('OutputDirectory','HandoffHelper','PayloadDirectory','QualificationBase','HandoffRuntime') or (qualification and key=='InstallDirectory'):
             if any(char in value for char in '{};"'): raise ValueError('Unsupported installer path: '+key)
     tool = Path(compiler_path) if compiler_path else compiler(out)
     with (out/'compile.log').open('w', encoding='utf-8') as log:
-        subprocess.run([str(tool), *['/D'+key+'='+value.replace('"','""') for key,value in definitions.items()],
+        subprocess.run([str(tool), *['/D'+key+'='+value for key,value in definitions.items()],
             str(ROOT/'scripts/windows-application.iss')], check=True, timeout=900, stdout=log, stderr=subprocess.STDOUT)
     installer = out/f'Augmentor-{release["version"]}-windows-{arch}-candidate.exe'
     report = {'installer':str(installer), 'sha256':digest(installer), 'release':release,

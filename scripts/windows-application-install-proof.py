@@ -90,7 +90,9 @@ def main():
         link_object=pythoncom.CoCreateInstance(shell.CLSID_ShellLink,None,pythoncom.CLSCTX_INPROC_SERVER,shell.IID_IShellLink)
         link_object.QueryInterface(pythoncom.IID_IPersistFile).Load(str(shortcut))
         assert Path(link_object.GetPath(shell.SLGP_RAWPATH)[0]).resolve()==executable.resolve()
-        assert link_object.GetArguments()=='--qualification-root "'+str(data)+'"'
+        shortcut_arguments=link_object.GetArguments()
+        report['shortcutArguments']=shortcut_arguments
+        assert shortcut_arguments=='--qualification-root "'+str(data)+'"', repr(shortcut_arguments)
         del link_object
         stages.append('initial-full-payload-install')
         child = open_preview(); state=ready(); assert state['pid']==child.pid

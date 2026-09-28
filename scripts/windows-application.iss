@@ -31,10 +31,19 @@ Source: "{#HandoffHelper}"; DestDir: "{app}\maintenance"; Flags: ignoreversion
 Source: "{#PayloadDirectory}\*"; DestDir: "{app}\current"; Flags: recursesubdirs createallsubdirs ignoreversion
 
 [Icons]
-Name: "{userprograms}\{#ShortcutName}"; Filename: "{app}\current\Augmentor.exe"; Parameters: "{#LaunchArguments}"; AppUserModelID: "com.augmentor.Agent"
+Name: "{userprograms}\{#ShortcutName}"; Filename: "{app}\current\Augmentor.exe"; Parameters: "{code:LaunchParameters}"; AppUserModelID: "com.augmentor.Agent"
 
 [Code]
 var MaintenanceHeld, AuthenticatedHandoff, RemovalHeld: Boolean;
+
+function LaunchParameters(Param: String): String;
+begin
+  { Construct command quoting here, after both compiler command-line parsing
+    and section-value parsing. Physical paths never contain quote characters. }
+  Result := '';
+  if '{#QualificationBase}' <> '' then
+    Result := '--qualification-root "{#QualificationBase}"';
+end;
 
 function PrepareAuthenticatedHandoff(Pipe: String; Coordinator: Cardinal; Qualification: String): BOOL;
   external 'AugmentorHandoffPrepare@files:augmentor-installer-handoff.dll stdcall delayload setuponly';

@@ -1,278 +1,52 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-# Windows implementation evidence
+# Windows implementation status
 
-Full `3c6d78b` x64 exposes two new qualification issues: the managed chat's
-first read-only UI inspection times out after eight seconds, and the real Inno
-package installs successfully but registers Inno's default versioned display name.
-The installer now sets the stable AppVerName explicitly. Qualification records
-read-only polling timeouts within its existing overall deadline and takes one
-private Python stack sample in disposable UI-test launches; no Send/Enter/model
-operation is retried. These corrections await native execution. Compiled two-window
-preview and the native launcher lease checks passed in that same failed job.
-The full installed repair/drain/removal test has not run past its initial name
-assertion. Do not treat `3c6d78b` Windows qualification as passing.
+## Windows implementation — active, September 28
 
-All `3c6d78b` Linux source/installed-package/browser jobs, macOS feasibility,
-fast native Windows and Inno handoff fixtures pass. The actual full Windows
-application installer integration is still running and is not yet qualified.
+The owner authorizes autonomous implementation through the complete Windows app;
+physical testing follows when a Windows machine is connected. Work on
+`feat/windows` in [draft PR 20](https://github.com/ManoloRemiddi/augmentor-agent/pull/20).
+Do not merge, publish customer downloads or deploy personal installations.
+Keep one shared product, approved UI and existing model/voice settings. Native
+Windows x64 and ARM64 are targets, including NVIDIA RTX Spark N1X; no RTX hardware
+qualification is claimed.
 
-Update journals now support independent completion after the caller has observed
-installer exit, reverified the release pair/installed selection and passed a local
-health callback. Completed records are durably archived; failed health, an
-unmatched artifact pair or a pre-APPLY record cannot finish the attempt. Four
-new local fault/preservation tests pass (16 combined coordinator/journal checks).
-The installed Windows proof now checks every payload file and a real Qt launch
-before archiving. Native execution of this completion path is pending. This does
-not implement recovery from an unknown installer outcome or rollback.
+Current tested source is `805664f`. Its [Linux](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36392632260),
+[macOS](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36392632178),
+[fast Windows](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36392632173)
+and [Inno fixture](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36392632206)
+checks pass. The fast run includes all 16 journal/coordinator checks on both CPUs.
+Full [805 qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36392632237)
+passes assembled DSH/voice, desktop Send/Enter/history, observed graph drain and
+browser commit on x64, but its installed-app test fails shortcut argument readback.
+ARM64 is still running. Current source constructs shortcut quoting inside the
+installer script and records actual arguments on failure; new native execution
+is required. The stable application registration name now passes.
 
-Full native runtime at `f950a45` passes on **both x64 and ARM64** in
-[36389905723](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36389905723),
-plus the shared Mac Qt candidate. This qualifies the shared voice 0.1.19 pin with
-actual managed DSH/voice startup, compiled desktop Send/Enter/history, observed
-graph drain, exclusive access after drain, owner/service restart and compiled
-browser commit. The provider is deterministic; physical audio/input and live
-model quality are not claimed. The newer actual full-payload installer and
-`WindowsApply` integration at `3c6d78b` are now running; those installed-package
-checks have not yet passed.
+The last fully passing assembled runtime on both CPUs is `f950a45`,
+[36389905723](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36389905723).
+It uses real bundled DSH with a deterministic provider and shared Resonant Voice
+0.1.19 (qualified source `7d0fd6d`); it does not establish physical audio/input,
+live provider quality or a complete installed update. Voice work stays in
+[draft PR 2](https://github.com/ManoloRemiddi/resonant-voice/pull/2).
 
-The actual installed-app qualification now composes the shared coordinator with
-`WindowsApply`: an independent Inno process, private authenticated handoff and
-one-shot durable APPLY. The fixture starts an installed window and background
-owner, drains their observed graph, retains the extracted Setup process across
-coordinator exit, waits for its completion and relaunches installed binaries.
-It repairs the identical retained artifact, so it does not establish N-to-N+1,
-publisher trust, health-driven recovery or rollback. New native execution is
-pending. Existing Inno handoff/final-access fixtures at `b006ebb` pass both CPUs
-in [36390819194](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36390819194);
-that result compiles the updated helper but does not execute the new app installer.
+Next: finish full-payload install, live-work refusal, repair, coordinated apply,
+independent health/archive and removal on both CPUs. Then connect signed release
+metadata and WinSparkle delivery to the shared coordinator, qualify N-to-N+1 and
+recovery/rollback, and complete the [feature ledger](FEATURE-MATRIX.md#windows-development-target--september-28).
+Login/removal registration, desktop control, speech provisioning, memory engine,
+Home/Pi parity, ordinary-user Windows and physical hardware remain explicit gates.
+The app is not complete or ready for customer distribution.
 
-Current source builds an unsigned installer candidate from the actual staged
-shared app with `scripts/package-windows.py`. It uses one app identity, stable
-`current/Augmentor.exe`, bundled runtimes and a Start-menu shortcut. Native
-startup/lifetime exclusion now supports fresh installation, identical-build
-repair and removal. The remover copies its exact hash-bound helper to a temporary
-location, retaining both gates while deleting installed binaries. Existing
-redirected/hard-linked trees are refused; persistent data stays outside the
-installer tree. Manual cross-build replacement is intentionally unavailable until
-the coordinated update/recovery path is connected.
+Read [implementation status](WINDOWS-IMPLEMENTATION-STATUS.md),
+[installer decision and product integration](WINDOWS-INSTALLER-DECISION.md), and
+[the implementation plan](WINDOWS-IMPLEMENTATION-PLAN.md). Earlier checkpoints,
+including superseded pending results, are preserved in the
+[historical checkpoint archive](WINDOWS-IMPLEMENTATION-CHECKPOINTS-2026-09-28.md).
 
-Three portable build-intake checks cover wrong CPU/public metadata, incomplete
-payloads and source-link refusal. New full-payload installation, native Qt preview,
-live-draft maintenance refusal, repair/relaunch, path refusal and uninstall/data
-preservation assertions are scheduled on both native CPUs; execution is pending.
-Qualification has compiled-in disposable paths and uses Server build 26100 only
-for the hosted x64 runner; the normal candidate minimum remains Windows 11 25H2
-build 26200. This is not signed/public delivery or ordinary-user/physical testing.
-Login integration, browser-registration removal, product N-to-N+1, recovery and
-rollback remain open alongside the feature ledger.
-
-Current shared dependency is **Resonant Voice 0.1.19**, exact source
-`7d0fd6d677ea4bbbca0183a6bb3a3d3f24a8147a`. Its native x64/ARM64 configuration and
-maintenance checks pass in [36389214161](https://github.com/ManoloRemiddi/resonant-voice/actions/runs/36389214161),
-and the packed archive passes disposable DSH install/compose/remove. This fixes
-Windows ownership during automatic profile cloning/preferences. The shared lock
-and complete package select this same archive on all OSs. Assembled native graph
-drain/restart remains to be qualified with it; physical audio remains open.
-
-At `9cc54b1`, [Inno final-access qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36389318640)
-and [fast Windows desktop](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36389318570)
-pass both CPUs. Actual extracted Setup retains startup exclusion through
-coordinator exit/crash, acquires final installation access and refuses an
-additional lifetime holder. The fast run includes all 12 journal/coordinator
-tests. These are controlled fixtures, not an installed customer update. Continue
-product installer/backend wiring, independent recovery and the full feature ledger.
-No Windows customer release or personal deployment is made.
-
-The pending statuses below are historical checkpoints, superseded only by the
-specific results recorded above.
-
-Current source adds shared update decision orchestration: five local tests with
-real journal writes/admission pass (12 combined journal/coordinator checks).
-`2b1680d` full x64 confirms managed DSH and owned voice startup, then refuses a
-voice config whose Windows owner changed during automatic profile cloning.
-Resonant 0.1.19 candidate `7d0fd6d` corrects that separate package; native checks
-must pass before Augmentor repins it. The `3394145` native helper compiles on both
-CPUs; Inno's Boolean/BOOL type mismatch is corrected in source and awaits execution.
-Earlier [Inno journal qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36388207448)
-passes both CPUs. Full graph drain, installed update and recovery remain open.
-
-Fast native [`1872e19`](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36388207564)
-passes both CPUs, including all seven private-journal crash/write tests. Current
-source adds final Setup access after actual coordinator exit and refusal while an
-additional lifetime holder remains. New helper compilation/Inno execution is
-pending; full owned-voice/graph drain and the earlier Inno journal additions are
-still being qualified. See [final access contract](WINDOWS-INSTALLER-DECISION.md#final-installation-access-after-coordinator-exit).
-
-The shared [durable update record](LIFECYCLE.md#durable-update-record) now has seven
-passing local tests, including actual process crash and exclusive writer claims.
-New native fast tests and authenticated Inno before/after-APPLY journal assertions
-await execution. This does not implement automatic recovery/rollback or installed
-N-to-N+1 application. The port correction at `2b1680d` passes fast x64; ARM64 and
-the actual owned-service/drain integration are still being qualified.
-
-Current correction: both native CPUs reproduce the free-loopback-port timeout in
-[`c1070b2` desktop qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36387350489).
-The voice startup probe now uses exclusive wildcard binding without listening;
-it cannot mistake a short connect timeout for an unavailable port or contact an
-external service. Six local tests pass, including occupied wildcard and
-bound-but-not-listening sockets. Native corrected startup/drain remains pending.
-
-September 27, 2026. The owner authorized autonomous implementation and will
-connect a Windows machine for joint physical testing afterward. Follow the full
-[implementation plan](WINDOWS-IMPLEMENTATION-PLAN.md); this ledger does not narrow
-its outcome. No Windows customer release or installed-product claim exists yet.
-
-Latest source, September 28: explicit graph drain requires durable caller
-checkpoints and observed exits, renews remaining participants, and checks complete
-Jobs before owner shutdown. Twelve local reservation and three graph tests pass.
-The assembled window/DSH/voice/companion drain, exclusive-lease and restart proof
-awaits native execution; installer application and recovery remain unfinished.
-Linux [`2bd7b67`](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36385346967)
-passes all 647 native assertions but exits 139 during Qt interpreter shutdown.
-The actual Chromium commit/reconnect step passed before that failure. Local
-isolation and GDB traced the shutdown failure to the shell's temporary Qt thread
-wrappers. The corrected creating-thread dispatch passes all 645 local assertions
-and exits zero; hosted qualification is pending. See [thread dispatch evidence](WINDOWS-SHELL.md#keyboard-ownership).
-The failed workflow is not waived. The new free-loopback-port startup test also
-passes locally (six voice ownership checks total).
-
-Full `2bd7b67` x64 fails inside managed service startup, before voice integration
-qualification. The fixture now writes its previously discarded supervisor output
-to a private log and includes bounded diagnostics on failure. The earlier
-`1bf1b78` compiled browser commit passes x64; ARM64 stops earlier at a native
-transcript snapshot comparison. The updated fixture compares the snapshot taken
-inside the prepared admission fence and includes expected/actual values on
-failure. Both corrections require new native execution.
-
-Source `2bd7b67`, September 28: managed DSH now starts its bundled Resonant loopback
-bridge through the existing owner, with one retained Job, private profile and
-occupied-port refusal. Kernel-bound voice maintenance joins graph preparation.
-Five local profile/ownership refusal tests, two graph failure tests, six portable
-owner tests and five launcher tests pass (two native owner tests skip on Linux).
-Assembled real-service graph/ticket/commit/restart assertions are added; native
-execution is pending. This does not qualify Windows ASR/TTS engines or audio.
-Full runtime at [`e63312b`](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36383783733)
-now passes both CPUs, including corrected graph and capture assertions.
-
-Latest browser checkpoint, September 28: idle browser commit rechecks context inventory
-and page state, replies through its private owner, then drains the native host
-naturally. Actual local Chromium verifies retained-process exit, same-page
-reconnection, a post-commit draft and selected conversation preservation. All
-265 Node/Browser and seven private-transport tests pass. New compiled Windows
-commit assertions await execution; this is not an installed-version upgrade.
-At `e63312b`, [fast desktop](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36383783782)
-and [authenticated installer fixture](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36383783743)
-pass both CPUs. Its [full graph qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36383783733)
-also passes both CPUs. Global commit/apply, owned voice, remaining platform features,
-recovery/rollback, physical hardware and customer release gates remain open.
-
-The following checkpoints are chronological history, not the latest capability
-status; subsequent evidence supersedes pending/disabled statements only within
-its stated scope.
-
-Earlier checkpoint: full runtime passes both CPUs at `f079931`, including the
-corrected bootstrap token, actual compiled desktop/DSH maintenance, background
-owner reservation, complete Windows Job drain, kernel-verified window discovery
-and the pre-Python native lifetime lease.
-The separate voice 0.1.18 candidate passes native configuration and maintenance
-on both CPUs.
-Browser source drains accepted parent and DSH/Pi bridge operations and reserves
-all open extension documents. Linux/Mac and all hosted Windows workflows pass at
-`f079931`. New source adds the actual private native browser owner, correlated
-admission and kernel-based Windows discovery. Local real Chromium, transport and
-regression checks pass; compiled native execution is pending. Commit remains
-disabled. The lifetime lease is not the short-lived global startup fence.
-Installer backend is **Inno Setup/WinSparkle**; earlier Velopack
-candidate entries below are historical. Global coordination and full app release
-are not complete.
-
-The native browser-owner change at `df52b47` passes compiled x64 qualification,
-both fast Windows desktop jobs, installer feasibility, Linux (including actual
-Chromium through product private control), and macOS. Full ARM64 qualification
-is still running in [36377424868](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36377424868).
-Current source adds [short-lived startup exclusion](WINDOWS-SHELL.md#short-lived-startup-exclusion)
-before Python loads, releases it only after discoverable controls are ready, and
-adds real-Windows duplicated-handle transfer tests. Portable browser registration,
-supervisor policy and launcher policy checks pass. These new kernel/compiled
-assertions await native execution. No installer apply or browser commit is enabled.
-
-Subsequently, all workflows pass at `df52b47`, including full x64/ARM64 in
-[36377424868](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36377424868).
-The new startup fence at `e4593b1` passes [both fast Windows jobs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36378514808),
-including actual compiled launchers and inherited-gate preservation across exit
-and crash. Full runtime execution is still running. Its Linux Chromium proof
-exposed a qualification-owner race: initial DSH and replacement Pi native hosts
-shared one test endpoint. Current qualification uses a separate actual private
-owner per native host, matching Windows, and adds simultaneous-host registration
-and normal-exit evidence. The product's Windows owner was already per process.
-Current source also adds retained background-owner discovery and read-only
-component Job verification; its new native assertions await execution. Global
-coordination, component transports and installer apply remain unfinished.
-
-Full native runtime `e4593b1` subsequently passes both CPUs in
-[36378514796](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36378514796),
-including actual assembled desktop/browser startup readiness. `3a379a2` contains
-the corrected per-host Chromium qualification and background-owner observation;
-its hosted jobs are running. Current source additionally binds prompt/memory
-maintenance to their retained pipe peers and owner Jobs, validates idle/expiry
-acknowledgments, and extends native companion reservation tests. Portable policy
-checks pass; new native companion execution remains pending.
-
-Both fast Windows jobs at `3a379a2` pass retained background-owner discovery and
-exact prompt/memory Job observations in
-[36379432569](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36379432569).
-The companion participant client is pushed at `6531e2d` and awaits native execution.
-Current source adds established-connection TCP ownership checks before local
-HTTP credentials, retained process identity and replacement-port refusal. Syntax
-checks pass; new real-Windows HTTP assertions are pending. DSH/voice profile
-adapters, the complete coordinator and installer application remain open.
-
-The actual prompt/memory participant assertions at `6531e2d` now pass both fast
-Windows jobs in [36379716570](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36379716570).
-Current source connects the observed HTTP transport to the private managed DSH
-profile, verifying the service anchor, product version and home identity. The
-full DSH maintenance/restart proof now uses this client and checks its retained
-process exits with the complete Job. These new HTTP/DSH assertions await native
-execution; owned voice startup/provisioning and global coordination remain open.
-
-At `f08c4f0`, both [fast Windows jobs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36380441839)
-pass the actual TCP-peer/credential-refusal/reused-port tests. Its full owned-DSH
-integration is running. Full runtime `3a379a2` now passes both CPUs in
-[36379432589](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36379432589).
-Linux and Mac regressions pass at `6531e2d`, including the corrected Chromium
-proof. Current installer qualification adds gate transfer into Inno's actual
-extracted Setup process and checks retention across coordinator exit/crash.
-Native execution of this new Inno case is pending; production handoff identity,
-coordinated apply, health and rollback remain open.
-
-At `0ca8348`, the actual extracted Inno Setup gate-transfer proof passes both
-CPUs in [36380756992](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36380756992),
-including normal coordinator exit/crash and invalid-transfer refusal before
-version change. Both fast Windows jobs and Linux/Mac workflows also pass. At
-`f08c4f0`, full x64 managed DSH integration passes; ARM64 is still running.
-
-Current source adds [coordinated reversible preparation](LIFECYCLE.md#coordinated-reversible-preparation)
-with independent renewals, conservative expiry, single cancellation after lost
-acknowledgments, and startup exclusion retained through cleanup. Six reservation,
-two graph failure and four admission checks pass locally; six portable owner
-checks pass with two Windows-only cases skipped. Actual companion group and
-assembled desktop/DSH graph assertions are added and await hosted execution.
-This is preparation/cancellation only: no product commit, installer apply,
-voice provisioning, rollback or release gate is waived.
-
-At `f08c4f0`, [full native runtime](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36380441902)
-now passes both CPUs, including managed DSH's observed HTTP participant and
-normal shutdown/history restart. At `2ce8d32`, [both fast Windows jobs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36381768755)
-pass real prompt/memory group preparation, renewal, startup exclusion and
-cancellation. The assembled desktop/DSH graph additions await the full run.
-
-Current source adds a non-killing installer observation Job, suspended assignment
-and read-only artifact binding to the verified digest. The real Inno handoff
-fixture now launches through this adapter and verifies extracted-Setup ownership,
-wrong digest/unrelated PID refusal and retained gate across normal exit/crash.
-Syntax checks pass; native execution is pending. This is not yet authenticated
-installer IPC or a complete update transaction.
+The sections below retain scoped baseline and qualification evidence; use the
+active checkpoint above for the latest result and remaining work.
 
 ## Baseline and environments (W0)
 

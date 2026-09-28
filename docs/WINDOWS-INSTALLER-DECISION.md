@@ -356,3 +356,14 @@ qualification stops because Inno's default AppVerName adds the version to the
 registered display name. The template now explicitly uses `Augmentor Agent`;
 DisplayVersion continues to identify the release separately. Repair, coordinated
 apply and removal still await execution after this correction.
+
+## Actual shortcut readback correction
+
+Full x64 `805664f` installs and verifies the shared payload and stable registration,
+then fails the actual IShellLink argument comparison. The earlier compiler-command
+quote escaping crossed both command-line and Inno section parsing. Current source
+constructs the qualification command in a Pascal code constant after those parsing
+layers. It records actual shortcut arguments on any future comparison failure.
+Three portable package intake tests pass; native readback and later installed
+repair/coordinator/removal stages remain pending. Normal customer launch has no
+qualification arguments. No personal shortcut or public installer changed.
