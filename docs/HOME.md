@@ -96,7 +96,8 @@ session handles are retained in memory; durable sessions resume on demand.
 The deadline regression test uses actual DSH and a local MCP fixture, waits until
 the fixture has received the mutation, then advances Node's test clock. This
 exercises cancellation after dispatch and verifies that a subsequent request
-cannot repeat the uncertain action. Previously a 100 ms wall-clock deadline could
+cannot repeat the uncertain action, with an explicit denied-tool trace for the
+model's retry. Previously a 100 ms wall-clock deadline could
 expire before dispatch on a loaded runner: [CI at 3edb570](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36406785088)
 correctly performed zero mutations but failed the test's expectation of one.
 The corrected test and all 29 Home tests pass locally on Node 24.19.0. Production
