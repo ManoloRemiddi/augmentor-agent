@@ -11,6 +11,12 @@ from augmentor_linux.shortcut_activation import DesktopActivation
 
 
 class ShortcutActivationTests(unittest.TestCase):
+    def test_windows_cold_launch_names_main_even_if_caller_was_secondary(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)/'app';root.mkdir();native=root/'Augmentor.exe';native.touch()
+            with patch('augmentor_linux.shortcut_activation.ROOT',root),patch('augmentor_linux.shortcut_activation.sys.platform','win32'):
+                self.assertEqual(DesktopActivation(directory).command,[str(native),'--instance','main'])
+
     def test_macos_cold_launch_uses_the_installed_native_application(self):
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory)/'Desktop.app/Contents/Resources/app'
@@ -65,7 +71,8 @@ class ShortcutActivationTests(unittest.TestCase):
                 self.assertEqual(activation.activate(), 'starting')
                 self.assertEqual(activation.activate(), 'launched')
                 self.assertEqual(launch.call_count, 2)
-                self.assertEqual(launch.call_args.args, (command,))
+                expected = command + (['--instance', 'main'] if sys.platform == 'win32' else [])
+                self.assertEqual(launch.call_args.args, (expected,))
 
     def test_connection_errors_do_not_launch_a_second_app(self):
         for error in (PermissionError(errno.EACCES, 'denied'), TimeoutError('timeout')):

@@ -22,7 +22,7 @@ class DesktopActivation:
         self.command = command or ([str(ROOT/'Augmentor.exe')] if sys.platform=='win32' and (ROOT/'Augmentor.exe').is_file() else
                                   [str(native)] if sys.platform=='darwin' and native.is_file() else
                                   [sys.executable, '-B', str(ROOT/'scripts/launch-component.py'), 'desktop'])
-        if self.instance != 'main':
+        if self.instance != 'main' or sys.platform == 'win32':
             self.command = [*self.command, '--instance', self.instance]
         self.child = None
         self.lock = threading.Lock()

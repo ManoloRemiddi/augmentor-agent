@@ -64,9 +64,21 @@ Native tests exercise actual OS collision rejection, file-save rollback, queued
 message is explicitly not physical keyboard evidence. The supervisor integration
 test verifies persistence and worker-to-owner dispatch through the private pipe.
 
+## Login registration mechanism
+
+`windows_startup.py` provides one owned HKCU Run value pointing to the installer's
+stable `current/Augmentor.exe --background` path. It does not resolve that path
+to a version directory. Repeated registration performs no write, unfamiliar values
+are preserved, and removal deletes only the exact owned command. It never changes
+HKLM or Windows `StartupApproved` state. The executable's background mode starts
+the same per-user supervisor without opening a chat window. Source launches do
+not enable login startup; installer hooks still need to call this mechanism.
+Native tests use a disposable HKCU key, not the actual login key. Real Windows
+startup-disable behavior and logout/login still require installed acceptance.
+
 ## Remaining shell gates
 
-This source does not yet complete tray Open/Quit, login registration, installed
+This source does not yet complete tray Open/Quit, installer login hooks, installed
 Start menu/taskbar identity, coordinated busy-work shutdown or update ownership.
 These remain required before customer distribution. A successful preview or
 hotkey backend test must not be described as an installed Windows application.

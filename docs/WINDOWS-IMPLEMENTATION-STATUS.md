@@ -574,3 +574,18 @@ from the authenticated pipe, never a PID in application JSON. Windows may deny
 the handoff; normal visibility control is retained without input injection.
 Preview inspection records active-window state, but native API execution and
 physical foreground behavior remain distinct qualification gates.
+
+At `5c1ad26`, x64 compiled diagnostics confirm the Appearance failure is
+`The Qt SVG image plugin is unavailable`, matching the explicit-library-path
+correction already queued in `475a3a2` and later source. At `41ef486`, the fast
+source desktop/shortcut checks pass on both CPUs including foreground-handoff
+API execution; real foreground permission after physical input remains pending.
+
+The next source adds an idempotent per-user login registration mechanism and
+`Augmentor.exe --background`. The stable installer path is retained without
+resolving it into a version folder; existing foreign entries and Windows startup
+approval/disable records are preserved. No login registration is enabled by source
+launches. Tests exercise a disposable HKCU key, not the real startup key; native
+execution, installer wiring and actual login acceptance remain pending. Cold
+Windows shortcut launch also names the target window explicitly so an inherited
+secondary-window environment cannot change the first shortcut's destination.

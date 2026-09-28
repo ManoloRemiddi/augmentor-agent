@@ -91,6 +91,9 @@ def main():
         if len(args) < 2: raise ValueError('A disposable qualification directory is required.')
         environment = configure_qualification(args[1], release)
         args = args[2:]
+    background = args == ['--background']
+    if '--background' in args and not background:
+        raise ValueError('Background startup does not accept desktop actions.')
     launcher = load_launcher(); launcher.configure(windows_paths=environment)
     # Embedded GUI Python has no console streams. Give diagnostics private
     # files and keep credentials/errors out of a public command-line window.
@@ -111,6 +114,7 @@ def main():
     if '--preview' not in args and '--screenshot' not in args:
         from windows_supervisor import ensure
         ensure(ROOT)
+    if background: return
     sys.argv = ['augmentor-desktop', *args]
     runpy.run_module('augmentor_linux', run_name='__main__')
 
