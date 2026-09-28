@@ -40,6 +40,13 @@ now in the shared graph. Full DSH conversation/restart qualification remains
 pending. Follow the evidence ledger rather than inferring completion from the
 dependency tests.
 
+At `79d9efc`, native x64/ARM64 source-preview window control passes. At
+`e9467ff`, the assembled x64 DSH runtime passes setup, deterministic-model chat,
+Stop, actual history-writer exclusion and crash/restart history preservation.
+The detailed ledger distinguishes the GitHub merge checkout from branch heads.
+The next candidate adds the embedded `Augmentor.exe` entrypoint and direct binary
+window tests; it is not yet a complete installer or public Windows build.
+
 ## September 27 Windows implementation plan — historical planning checkpoint
 
 The owner requested a detailed plan before coding. Read the

@@ -24,27 +24,10 @@ def wait_for(path, timeout=60):
 
 
 def build_launcher(payload, arch):
-    vswhere = Path(os.environ.get('ProgramFiles(x86)', 'C:/Program Files (x86)'))/'Microsoft Visual Studio/Installer/vswhere.exe'
-    install = subprocess.check_output([str(vswhere), '-latest', '-products', '*', '-property', 'installationPath'], text=True).strip()
-    if not install:
-        raise RuntimeError('Windows build tools are missing')
-    vcvars = Path(install)/'VC/Auxiliary/Build/vcvarsall.bat'
-    # Build paths originate in this controlled checkout. Do not accept shell
-    # metacharacters: vcvarsall is the vendor's batch environment initializer.
-    values = (str(vcvars), str(payload), str(ROOT))
-    if any(any(c in value for c in '&|<>^%!\r\n') for value in values):
-        raise ValueError('Unsupported shell character in the build path')
-    include = payload/'python/include'
-    if not (include/'Python.h').is_file():
-        raise RuntimeError('Standalone Python must include its matching C headers')
-    command = (f'call "{vcvars}" {"amd64_arm64" if arch == "arm64" else "amd64"} && '
-        f'cl /nologo /O2 /W4 /MT /I"{include}" "{ROOT / "services/platform/windows-launcher.c"}" '
-        f'/Fe:"{payload / "AugmentorFixture.exe"}" /Fo:"{payload / "launcher.obj"}" '
-        '/link /SUBSYSTEM:WINDOWS user32.lib shell32.lib')
-    # list2cmdline would backslash-escape embedded quotes, which cmd.exe does
-    # not understand. This is an explicitly constructed, validated shell line.
-    subprocess.run('cmd.exe /d /s /c "'+command+'"', check=True)
-    (payload/'launcher.obj').unlink(missing_ok=True)
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('windows_launcher_builder', ROOT/'scripts/build-windows-launcher.py')
+    builder = importlib.util.module_from_spec(spec); spec.loader.exec_module(builder)
+    builder.build_launcher(payload, arch, name='AugmentorFixture.exe')
 
 
 def main():

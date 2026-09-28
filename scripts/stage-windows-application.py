@@ -43,6 +43,8 @@ def main():
     (target/'release.json').write_text(json.dumps({**product, 'sourceCommit': revision,
         'target': 'windows-'+args.arch, 'qualificationStatus': 'development-candidate',
         'customerDistribution': False}, indent=2)+'\n', encoding='utf-8')
+    subprocess.run([sys.executable, '-Xutf8', '-B', str(ROOT/'scripts/build-windows-launcher.py'),
+                    '--root', str(target), '--arch', args.arch], check=True)
     print(json.dumps({'candidate': str(target), 'sourceCommit': revision, 'arch': args.arch}))
 
 

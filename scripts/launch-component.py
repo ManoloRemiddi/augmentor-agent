@@ -10,14 +10,18 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def configure():
+def configure(*, windows_paths=None):
     sys.dont_write_bytecode = True
     os.environ['PYTHONDONTWRITEBYTECODE'] = '1'
     os.environ['PYTHONUTF8'] = '1'
     python = ROOT/('python/python.exe' if sys.platform=='win32' else 'python/bin/python3')
     node = ROOT/('node/node.exe' if sys.platform=='win32' else 'node/bin/node')
-    os.environ.setdefault('AUGMENTOR_PYTHON', str(python) if python.exists() else sys.executable)
-    if node.exists():os.environ.setdefault('AUGMENTOR_PI_NODE', str(node))
+    if sys.platform == 'win32':
+        os.environ['AUGMENTOR_PYTHON'] = str(python)
+        os.environ['AUGMENTOR_PI_NODE'] = str(node)
+    else:
+        os.environ.setdefault('AUGMENTOR_PYTHON', str(python) if python.exists() else sys.executable)
+        if node.exists():os.environ.setdefault('AUGMENTOR_PI_NODE', str(node))
     bins = [str(Path(os.environ['AUGMENTOR_PYTHON']).parent)]
     if node.exists():bins.insert(0, str(node.parent))
     dsh = ROOT/'dsh/node_modules/.bin'
@@ -30,7 +34,7 @@ def configure():
         from platform_adapters.paths import windows_environment
         # Product entrypoints use OS-verified paths. Tests of services can still
         # use explicit private fixture roots without running this entrypoint.
-        os.environ.update(windows_environment())
+        os.environ.update(windows_environment() if windows_paths is None else windows_paths)
         os.environ['AUGMENTOR_PI_SOCKET'] = str(Path(os.environ['XDG_RUNTIME_DIR'])/'pi.sock')
         powershell = ROOT/'powershell/pwsh.exe'
         if powershell.exists():

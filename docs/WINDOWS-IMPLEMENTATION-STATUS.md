@@ -64,11 +64,11 @@ providers, installed artifacts and physical hardware must remain distinguishable
 
 | Work | Current state | Required next evidence |
 | --- | --- | --- |
-| W0 baseline | Local baseline recorded; hosted jobs prepared | Windows job execution and current-source reconciliation |
-| W1 native runtime and installer | Native x64/ARM64 runtime and two-version installer fixture pass | Complete DSH tool payload; clean-machine and trust qualification |
+| W0 baseline | Shared baseline and native hosted evidence recorded | Current-main reconciliation and client/hardware environments |
+| W1 native runtime and installer | Native x64/ARM64 runtime, prepared DSH terminal and two-version installer fixture pass | Clean-client install, full product lifecycle and publisher trust |
 | W2 paths, ownership, IPC, locks | Kernel adapters pass; shared-service adoption in progress | Node/Python service proof, different-user rejection, complete lifecycle integration |
-| W3 managed DSH/model setup | Pending | Clean-user real harness Send, Stop and restored chat; separate live provider |
-| W4 desktop, two windows, shortcuts, tray | Pending | Shared interaction suite, actual Windows shell and approved appearance |
+| W3 managed DSH/model setup | Assembled x64 setup, deterministic-model chat, Stop and history restart pass | ARM64 run, full first-run UI, ordinary-user/live-provider acceptance |
+| W4 desktop, two windows, shortcuts, tray | Native x64/ARM64 source windows, focus, draft isolation and zoom pass | Embedded executable, shell/shortcut/tray and physical interaction |
 | W5 chosen Chromium/Comet companion | Pending | Native host registration and real selected-browser conversation |
 | W6 computer control | Pending | Consented capture/input, Stop and Windows privilege boundaries |
 | W6 voice/memory/Home/Pi | Pending | Existing feature contracts and configured-engine connectivity |
@@ -469,3 +469,39 @@ manual event pumping. Native execution remains required to confirm the fix.
 Owned-process construction also closes its Job if limit/handle configuration
 fails; a native failure-injection test checks that repeated failures leak no
 kernel handles and launch no workload.
+
+## Native desktop control and first assembled DSH success
+
+At `79d9efc`, [Windows desktop run 36361445729](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36361445729)
+passes on x64 and ARM64. The actual Windows-QPA preview test verifies separate
+window PIDs/drafts, repeat-launch ownership, busy-draft maintenance refusal,
+and immediate 120% zoom (font 13→16 pixels, send button 24→29). The x64 captured
+image was inspected and its text/icons are readable. This is source-preview
+control evidence, not an installed binary, physical input or GPU acceptance.
+
+The x64 job of [runtime run 36361250959](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36361250959)
+passes at branch head `e9467ff`. Its assembled payload records actual GitHub merge
+checkout `6f0f975477622c836bd97aa3d24f637a357a28bc`. Actual bundled DSH starts with
+the 0.1.17 voice candidate, completes first-run setup and answers the deterministic
+model. The real harness writer excludes recovery via its Windows semaphore;
+Stop cancels an active turn; an owned supervisor crash/restart preserves history;
+failed-setup cleanup refuses to stop a selected runtime. Four fixture provider
+requests were used, no personal provider secret. All 24 recovery checks and the
+remaining x64 runtime/installer probes pass. ARM64 full-runtime execution is
+still in progress. Startup diagnostics now distinguish a recovered transient
+check failure from a current error.
+
+The next source adds the actual embedded `Augmentor.exe` desktop entrypoint:
+private bundled runtimes, architecture/payload preflight, stable AppUserModelID,
+per-window private diagnostic logs and the shared native UI. The shared C build
+routine also continues to build the disposable installer fixture. Assembly now
+compiles the product executable, and the two-window probe can invoke it directly
+while checking that the GUI remains in that executable's process. Disposable-data
+redirection is allowed only by a development-candidate manifest. These binary
+launch checks are not yet executed. Full installer hooks, login registration,
+tray/hotkeys, safe Quit/update coordination, browser setup and hardware tests
+remain subsequent gates; the new entrypoint is not a customer release.
+
+The source suite after the launcher additions passes 580 tests (17 platform skips).
+Three launcher checks cover wrong architecture, missing payload, refusal of
+customer data-path overrides and selection of private bundled tools.

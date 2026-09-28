@@ -205,8 +205,9 @@ def provision(root, state, request, *, agent, manager_type, complete=None, voice
                 time.sleep(.25)
             # Private diagnostics on both outcomes expose intermittent startup
             # delays without exporting credentials or broad process state.
-            atomic_json(state/'startup-check.json', {'lastError': last_check_error,
-                'integrationInstalled': bool(checked and checked.get('installed')),
+            ready = bool(checked and checked.get('installed'))
+            atomic_json(state/'startup-check.json', {'lastError': None if ready else last_check_error,
+                'lastTransientError': last_check_error if ready else None, 'integrationInstalled': ready,
                 'attempts': attempts, 'elapsedSeconds': round(time.monotonic()-started, 3)})
             if not checked or not checked['installed']:
                 raise ValueError('The managed agent did not become ready. Setup can be retried without changing other DSH profiles.')

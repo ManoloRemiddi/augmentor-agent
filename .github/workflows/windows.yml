@@ -107,12 +107,22 @@ jobs:
         run: |
           $env:AUGMENTOR_PWSH = "$PWD/outputs/payload/powershell/pwsh.exe"
           & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-dsh.py --out outputs/payload/dsh --node "$PWD/outputs/payload/node/node.exe"
-      - name: Assemble and exercise shared managed DSH setup on Windows
+      - name: Assemble shared Windows application and native launcher
+        id: application
         if: ${{ !cancelled() && steps.dsh.outcome == 'success' }}
         run: |
           & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-windows-application.py --root outputs/payload --arch ${{ matrix.arch }}
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Exercise managed Windows DSH setup and conversation restart
+        if: ${{ !cancelled() && steps.application.outcome == 'success' }}
+        run: |
           & outputs/payload/python/python.exe -I -Xutf8 -B scripts/windows-managed-setup-proof.py --root outputs/payload --out outputs/evidence
+      - name: Exercise the assembled native executable and two desktop windows
+        if: ${{ !cancelled() && steps.application.outcome == 'success' }}
+        env:
+          QT_QPA_PLATFORM: windows
+          QSG_RHI_PREFER_SOFTWARE_RENDERER: '1'
+        run: |
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/windows-window-proof.py --launcher outputs/payload/Augmentor.exe --out outputs/evidence/bundled-desktop
       - name: Install pinned build-time packaging tool
         if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
         id: packaging

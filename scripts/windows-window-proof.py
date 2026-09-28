@@ -17,6 +17,7 @@ sys.path[:0] = [str(ROOT/'services'), str(ROOT/'apps/native')]
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--out', type=Path, required=True)
+    parser.add_argument('--launcher', type=Path, help='Exercise the assembled native executable with disposable data.')
     parser.add_argument('--portable-control-check', action='store_true', help='Check the common command flow on a development host; not Windows evidence.')
     args = parser.parse_args()
     if sys.platform != 'win32' and not args.portable_control_check: parser.error('Requires Windows.')
@@ -33,6 +34,7 @@ def main():
     children = []
     options = {'creationflags': subprocess.CREATE_NO_WINDOW} if sys.platform == 'win32' else {}
     report = {'passed': False, 'platform': sys.platform, 'scope': 'Two Qt preview processes and shared controls; no model, installed launcher or physical-keyboard proof.'}
+    report['nativeLauncher'] = bool(args.launcher)
     def command(name, value):
         with LocalSocket() as peer:
             peer.settimeout(3); peer.connect(str(Path(env['XDG_RUNTIME_DIR'])/(ipc_basename(name)+'.sock')))
@@ -57,6 +59,9 @@ def main():
             time.sleep(.1)
         raise AssertionError('The preview did not answer its instance command: '+repr(error))
     def arguments(name):
+        if args.launcher:
+            return [str(args.launcher.resolve()), '--qualification-root', str(work),
+                    '--preview', '--ui-test-control', '--instance', name]
         # A failed fixture retains thread stacks in its private log. This is
         # confined to disposable preview launches, never a normal desktop flag.
         bootstrap = "import faulthandler,runpy; faulthandler.enable(); faulthandler.dump_traceback_later(12); runpy.run_module('augmentor_linux',run_name='__main__')"
@@ -68,6 +73,7 @@ def main():
             children.append(subprocess.Popen(arguments(name), env=env, stdin=subprocess.DEVNULL,
                 stdout=log, stderr=log, **options))
         initial = {name: wait_for(lambda: inspect(name)) for name in ('main','secondary')}
+        assert [initial[name]['pid'] for name in ('main','secondary')] == [child.pid for child in children], 'The desktop left its native launch process.'
         assert initial['main']['pid'] != initial['secondary']['pid']
         assert all(item['visible'] for item in initial.values())
         command('main','ui-test:'+json.dumps({'action':'draft','expected':'','text':'Keep this draft'}))
@@ -92,6 +98,8 @@ def main():
         for log in logs: log.flush()
         report['fixtureDiagnostics'] = {name:(work/(name+'.log')).read_text(encoding='utf-8',errors='replace')[-8000:]
                                       for name in ('main','secondary') if (work/(name+'.log')).exists()}
+        for path in (work/'state/logs').glob('desktop.*.log'):
+            report['fixtureDiagnostics'][path.name] = path.read_text(encoding='utf-8', errors='replace')[-8000:]
         raise
     finally:
         # Preview has no real controller, so its Close is not normal product
