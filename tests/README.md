@@ -385,3 +385,20 @@ Local inventory: 14 cases, 12 pass and two native skips. Four package cases and
 script compilation pass. The native missing-payload repair fixture now requires
 inspection before and after restoration while retaining disabled startup/data;
 corrected/new native qualification remains pending.
+
+At `3b3f89f`, [Inno qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36418939338)
+passes both CPUs, including corrected corruption fixtures, exact recorded-source
+assessment and absent-root inspection/repair. Fast Windows passes all 14 inventory
+cases and six source-assessment cases. Full x64 at `4412deb` passes busy-draft
+inspection refusal, inventory, isolated native health and reopening; ARM64 is still
+running. These separate evidence scopes supersede the preceding pending entries.
+
+`test_update_recorded_source.py` adds six private-file lookup cases: missing,
+damaged and newer selection; absent source without fallback; corrupt source or
+receipt; CPU/malformed/incompatible-record refusal; aliases; and Windows file
+pinning. Run the existing `test_update_*.py` discovery: 49 cases, 48 local passes
+and one Windows-only skip. All six independent source-assessment cases also pass.
+The actual native template now locates the real cached source with a deliberately
+changed selection, then verifies the independent inspection's record, transaction
+and metadata hashes. Its new native run is pending; no interrupted restoration,
+N-to-N+1 or rollback is claimed by this lookup fixture.

@@ -227,3 +227,13 @@ missing without creating anything; package intake still rejects an absent root.
 Missing/redirected ancestors, wrong root types, read failures and link aliases do
 not become an empty payload. Two portable cases pass; native missing-root
 inspection followed by exact-build registered repair remains pending.
+
+Both-CPU native template qualification at `3b3f89f` now passes recorded-source
+assessment and missing-root inspection/repair; see the [current installer evidence](WINDOWS-INSTALLER-DECISION.md#independent-recorded-source-assessment).
+New source adds [exact journal-source cache lookup](WINDOWS-INSTALLER-DECISION.md#locate-the-recorded-source-after-selection-changes)
+when the installed selection has changed or disappeared. It pins only the recorded
+previous installer and checks its hash/private receipt without scanning or fallback.
+The independent assessment must subsequently match its record and metadata digests;
+a receipt alone cannot authorize execution or establish publisher trust. Local
+lookup tests pass; its native changed-selection fixture is pending. Independent
+restoration, cross-version apply/rollback and customer update wiring remain open.

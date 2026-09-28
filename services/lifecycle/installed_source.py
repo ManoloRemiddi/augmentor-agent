@@ -42,6 +42,59 @@ class InstalledSource:
     def __exit__(self, *_): self.close()
 
 
+@dataclass
+class RecordedSource(InstalledSource):
+    """Held candidate from a journal, still requiring independent assessment.
+
+    The receipt's release digest must match the installer's embedded metadata.
+    Neither this object nor a saved journal authorizes execution or restoration.
+    """
+    record_digest: str
+    transaction_id: str
+
+
+def _open_retained(recovery, digest, *, expected_release=None):
+    with os.fdopen(_held(recovery/(digest+'.release')), 'rb') as receipt:
+        raw = receipt.read(65)
+        if not re.fullmatch(rb'[a-f0-9]{64}', raw):
+            raise ValueError('The retained installer receipt is invalid. Preserve it for repair.')
+        release_digest = raw.decode('ascii')
+        if expected_release is not None and release_digest != expected_release:
+            raise ValueError('The retained installer receipt differs from the selected build.')
+    installer = recovery/(digest+'.exe'); pinned = _held(installer)
+    try:
+        with os.fdopen(os.dup(pinned), 'rb') as stream:
+            if (not 0 < os.fstat(stream.fileno()).st_size <= MAX_INSTALLER or
+                    hashlib.file_digest(stream,'sha256').hexdigest() != digest):
+                raise ValueError('The retained original installer is damaged. Preserve it for repair.')
+        return installer, release_digest, pinned
+    except BaseException:
+        os.close(pinned); raise
+
+
+def open_recorded_source(recovery, record_bytes, *, target):
+    """Find only the journal's exact source, independent of installed selection.
+
+    The caller holds fresh maintenance/writer admission and supplies the pinned
+    active record. This lookup performs no directory scan, fallback, journal
+    mutation or process launch. A returned receipt is raw identity, not trust:
+    independently extracted metadata and actual installer bytes must still pass
+    assess_source against the same record before any recovery decision.
+    """
+    from .payload_integrity import _json
+    from .recovery_source import MAX_RECORD
+    from .update_journal import validate
+
+    record = validate(_json(record_bytes, MAX_RECORD))
+    identity = artifact(record['source'])
+    if target not in ('windows-x64','windows-arm64') or identity['target'] != target:
+        raise ValueError('The recorded recovery source targets a different OS or CPU.')
+    recovery = require_directory(Path(recovery))
+    installer, release_digest, pinned = _open_retained(recovery, identity['sha256'])
+    return RecordedSource(installer, identity, release_digest, pinned,
+                          hashlib.sha256(record_bytes).hexdigest(), record['id'])
+
+
 def open_installed_source(recovery, release_bytes, *, target):
     """Pin exact retained bytes before creating a new update journal.
 
@@ -68,15 +121,5 @@ def open_installed_source(recovery, release_bytes, *, target):
             'version','sourceCommit','target','channel','dataSchema','readableDataSchemas')} | {'sha256':digest})
         if target not in ('windows-x64','windows-arm64') or identity['target'] != target:
             raise ValueError('The retained installation targets a different OS or CPU.')
-        with os.fdopen(_held(recovery/(digest+'.release')), 'rb') as receipt:
-            if receipt.read(65) != release_digest.encode('ascii'):
-                raise ValueError('The retained installer receipt differs from the selected build.')
-        installer = recovery/(digest+'.exe'); pinned = _held(installer)
-        try:
-            with os.fdopen(os.dup(pinned), 'rb') as stream:
-                if (not 0 < os.fstat(stream.fileno()).st_size <= MAX_INSTALLER or
-                        hashlib.file_digest(stream,'sha256').hexdigest() != digest):
-                    raise ValueError('The retained original installer is damaged. Preserve it for repair.')
-            return InstalledSource(installer, identity, release_digest, pinned)
-        except BaseException:
-            os.close(pinned); raise
+        installer, _, pinned = _open_retained(recovery, digest, expected_release=release_digest)
+        return InstalledSource(installer, identity, release_digest, pinned)

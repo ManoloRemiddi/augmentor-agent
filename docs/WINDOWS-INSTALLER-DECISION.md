@@ -864,3 +864,39 @@ pass (14 inventory cases total, two native skips locally). The exact-template
 missing-payload repair test now first requires an all-missing inspection, then a
 complete inspection after registered repair, with the user's disabled-startup
 choice and private data preserved. New native execution remains pending.
+
+At `3b3f89f`, [native Inno qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36418939338)
+passes both CPUs at actual merge checkout `88327d3b9cc52dfa728133b6e7596d5be7e830d8`.
+Both downloaded reports confirm source assessment, writer/alias/foreign/malformed
+record refusal, the corrected corruption fixture and absent-root inspection/repair.
+The template uses real private Python and inert other components. Full x64 at
+`4412deb` also passes busy-draft inspection refusal, complete installed inventory,
+isolated health and reopening; its ARM64 job is still running. That full run
+predates the source-assessment additions.
+
+### Locate the recorded source after selection changes
+
+`installed_source.open_recorded_source` resolves exactly the active journal's
+source SHA-256 in the private recovery cache. It does not read `selected-installer`,
+enumerate versions, use timestamps or fall back to another cached executable.
+The caller must retain fresh maintenance/writer admission and supply the pinned
+record. The helper validates the full bounded record and CPU, opens an ordinary
+single-link private receipt, hashes the exact retained executable and holds its
+Windows handle against writes/removal. Missing or damaged bytes refuse unchanged.
+It returns the record hash/transaction identity alongside the installer identity.
+
+The receipt is not independent embedded metadata or publisher trust. Before any
+recovery decision, the standalone source assessment must match that same record
+and installer, and its compiled metadata digest must equal the returned receipt.
+This API performs no launch, restoration, selection or journal archival. The
+independent recovery bootstrap and restoration executor remain unfinished.
+
+The native template now changes only its disposable selection to a synthetic
+future target, resolves/pins the real previous installer under the journal writer,
+then asks that installer to independently reacquire admission and assess the
+unchanged record. It checks record, transaction and metadata digests and preserves
+the changed selection until fixture cleanup. This is an actual source lookup and
+inspection test, not a cross-version installation. Six new lookup cases cover
+selection loss/change, absent source without fallback, corruption, CPU/record
+refusal, aliases and native pinning. Local update suite: 49 cases, 48 pass and one
+Windows-only skip; source-assessment suite: six pass. Native execution is pending.

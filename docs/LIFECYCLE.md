@@ -689,5 +689,14 @@ holds live exclusive maintenance and journal-writer locks, pins the private reco
 and snapshots it outside the installed app. A matching result records only source,
 metadata and journal hashes plus the remaining observation category; it never
 replays recorded PIDs or authorizes apply. See [the native boundary and evidence](WINDOWS-INSTALLER-DECISION.md#independent-recorded-source-assessment).
+
+Recovery source lookup now uses the validated active record's exact source digest,
+even if the installed selection already names the target or is missing/damaged.
+It never falls back to the newest cached version. The caller holds live maintenance
+and writer admission; the helper pins actual source bytes, retains record identity
+and requires later independent embedded-metadata comparison. Lookup neither changes
+the journal nor executes a saved action. Local tests pass; native changed-selection
+lookup and the complete restoration executor remain separately required. See the
+[lookup contract](WINDOWS-INSTALLER-DECISION.md#locate-the-recorded-source-after-selection-changes).
 Malformed, foreign and incompatible sources refuse. Six source-assessment tests
 and all 43 existing update cases pass locally; native integration is pending.

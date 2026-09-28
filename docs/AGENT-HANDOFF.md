@@ -24,21 +24,21 @@ qualification is claimed. The app is not complete or ready for customers.
   deterministic provider. This newest complete baseline predates isolated health,
   reversible cancellation and payload inventory; it does not establish N-to-N+1,
   interrupted recovery or physical/live-provider acceptance.
-- [Fast Windows at 11c1706](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36416227348)
+- [Fast Windows at 3b3f89f](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36418939339)
   passes x64 and ARM64, including source Windows-QPA UI health, compiled pre-Python
   unresolved-startup refusal, fixed health routing, all 43 update tests, five
-  preparation tests and all 12 inventory cases. Inventory cases cover corruption,
-  missing metadata, obsolete entries, aliases, Windows creation/change timestamps
-  and file replacement/mutation during inspection.
-- [Inno at 11c1706](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36416227313)
-  passes both CPUs at merge checkout `9e126b38d98961ecc5e9fbaff3b2a30c5d1f891a`.
-  Both downloaded reports confirm independent inspection without installed runtime
-  or metadata, unresolved-record/data preservation, exact-build registered repair,
-  browser cleanup and interactive Finish/native startup. This exact-template proof
-  uses real private Python but inert other components; it is not full app or
-  actual-browser qualification. Earlier `cca5907` passes x64 and fails ARM64 after
-  extraction without a report. Follow-up adds numeric diagnostics and complete
-  owned-Job exit observation; that earlier failure's exact cause was not recorded.
+  preparation tests, six source-assessment tests and all 14 inventory cases.
+  Inventory cases include an absent final root, corruption, aliases, Windows
+  timestamps and file replacement/mutation during inspection.
+- [Inno at 3b3f89f](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36418939338)
+  passes both CPUs at merge checkout `88327d3b9cc52dfa728133b6e7596d5be7e830d8`.
+  Downloaded reports confirm independent damaged-runtime inspection, exact
+  recorded-source matching, busy-writer/linked-record/wrong-source/malformed-record
+  refusal, absent-root inspection then repair, preserved data/startup preference,
+  browser cleanup and interactive Finish. The corrected corruption fixture passes.
+  This exact-template proof uses real private Python but inert other components;
+  it is not full app or actual-browser qualification. Earlier `cca5907` ARM64
+  inspection failed without a report; its exact cause was not recorded.
 - [Full cca5907 qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36415696154)
   passes x64 and shared Mac Qt at `5cf8e1722c7925175798e17d6028684ef99449ff`.
   Downloaded x64 reports confirm independent damaged-runtime inspection, exact
@@ -47,8 +47,10 @@ qualification is claimed. The app is not complete or ready for customers.
   cancellation preserved their held turn without shutdown/installer invocation.
   ARM64 fails at independent inspection without a report, using the older helper
   before numeric diagnostics/whole-Job waiting. Do not infer its cause. Full
-  `4412deb` qualification is now running with those changes and the busy-draft
-  inspection refusal assertion. Fast Windows, Inno and Mac also pass at `4412deb`.
+  `4412deb` qualification now passes x64 at `82a92eaa3c9598e2dccd329dc853cc839ca7cefb`,
+  including busy-draft inspection refusal, with downloaded complete inventory and
+  isolated health reports. Its ARM64 installed-application stage is still running.
+  This full run predates recorded-source assessment and absent-root additions.
 
 ### Implemented contracts and current work
 
@@ -80,22 +82,27 @@ compiled release digest and runs a bounded read-only worker under native exclusi
 maintenance admission. It reports counts without clearing a journal, applying,
 selecting or repairing a build. Recovery files are packed first in extraction
 order. The full app proof additionally checks inspection refusal while a real
-window holds an unsent draft; that new assertion awaits native execution.
+window holds an unsent draft; that assertion passes x64 at `4412deb`, with ARM64
+still running.
 
 New source adds [independent recorded-source assessment](WINDOWS-INSTALLER-DECISION.md#independent-recorded-source-assessment).
 The native helper holds a live journal-writer lock and pins the private active
 record; its extracted worker matches actual installer bytes and embedded metadata
 to the exact recorded source. It reports identity/remaining observation only,
-never apply authority. Six portable cases, 43 update tests, four package tests
-and script compilation pass. At `4b2bfaa`, native source matching and busy-writer/linked-record refusal pass
-before a corruption-fixture byte assertion fails on both CPUs. That fixture now
-truncates shorter writes and verifies their exact bytes before running Setup;
-corrected native execution is pending. Inspection also handles a completely absent
-final payload root without creating it; two additional portable tests pass, and
-the native registered-repair case now requires all-missing then complete inspection.
+never apply authority. Both native CPUs now pass source assessment and absent-root
+inspection/repair at `3b3f89f`; the preceding corruption-fixture failure is corrected.
 
-Next: qualify complete installed inventory/isolated health and real-DSH cancellation,
-then finish independent interrupted/cross-version restoration, authenticated recovery
+The next source adds exact recorded-source cache lookup, independent of a missing,
+damaged or newer selection pointer. It pins only the journal's source installer,
+verifies its bytes and reads its bounded private receipt without scanning/fallback.
+Its receipt still requires comparison with independent embedded metadata; this is
+not publisher trust or recovery apply. Local update tests: 49 cases, 48 pass and
+one Windows-only skip; all six source-assessment cases pass. The native template
+now resolves its real retained installer while selection names a synthetic future
+target, then assesses the same pinned record/source. New native execution is pending.
+
+Next: finish both-CPU installed inventory/isolated-health qualification and the new
+source lookup proof, then independent interrupted/cross-version restoration, authenticated recovery
 apply, obsolete-file cleanup, bounded cache pruning, actual N-to-N+1 and customer
 notification/update wiring. Inno still replaces `current` in place: inspection and
 registered exact-build repair do not provide power-loss recovery. Cache artifacts

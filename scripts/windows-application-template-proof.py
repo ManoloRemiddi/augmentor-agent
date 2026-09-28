@@ -160,20 +160,42 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         # Independent source assessment uses a real private journal/writer lock
         # with the real cached source and a deliberately synthetic future target.
         # It is not a cross-version apply/rollback proof.
+        from contextlib import ExitStack
         from lifecycle.update_journal import UpdateJournal
+        from lifecycle.installed_source import open_recorded_source, PREFIX
         source_identity={name:release[name] for name in
             ('version','sourceCommit','target','channel','dataSchema','readableDataSchemas')}
         source_identity['sha256']=report['sha256']
         target_identity={**source_identity,'version':'0.0.2','sourceCommit':'e'*40,'sha256':'f'*64}
-        with UpdateJournal(updates,source_identity,target_identity) as journal:
-            for phase in ('preparing','prepared','drained','installer-ready','apply-intent'):journal.advance(phase)
-            pending_bytes=pending.read_bytes()
-            run(cached,'source-held-writer-refusal',success=False,arguments=['/augmentorinspect=source'])
-            held_log=(out/'application-template-source-held-writer-refusal.log').read_text(encoding='utf-8-sig')
-            assert 'exclusive private update snapshot unavailable.' in held_log
-            assert 'Augmentor independent inspection result:' not in held_log
-            assert pending.read_bytes()==pending_bytes
-        assessed=inspect(cached,'recorded-source-inspection',source=True)['recovery']
+        # Simulate selection already naming the proposed target. Recovery must
+        # still resolve the exact original installer from the active journal.
+        selected_before=read_private(selection)
+        changed_selection=PREFIX+target_identity['sha256'].encode()+b'\n'+b'e'*64+b'\n'
+        with os.fdopen(descriptor(selection,writable=True),'wb') as stream:
+            stream.write(changed_selection);stream.truncate()
+        try:
+            with ExitStack() as held:
+                with UpdateJournal(updates,source_identity,target_identity) as journal:
+                    for phase in ('preparing','prepared','drained','installer-ready','apply-intent'):journal.advance(phase)
+                    pending_bytes=pending.read_bytes()
+                    recorded=held.enter_context(open_recorded_source(recovery,pending_bytes,target='windows-'+arch))
+                    assert recorded.installer==cached and recorded.identity==source_identity
+                    assert recorded.release_digest==release_digest.decode('ascii')
+                    run(recorded.installer,'source-held-writer-refusal',success=False,arguments=['/augmentorinspect=source'])
+                    held_log=(out/'application-template-source-held-writer-refusal.log').read_text(encoding='utf-8-sig')
+                    assert 'exclusive private update snapshot unavailable.' in held_log
+                    assert 'Augmentor independent inspection result:' not in held_log
+                    assert pending.read_bytes()==pending_bytes
+                # The independent inspector reacquires current writer admission
+                # and revalidates its own pinned active record before reporting.
+                assessed=inspect(recorded.installer,'recorded-source-inspection',source=True)['recovery']
+                assert assessed['recordSHA256']==recorded.record_digest
+                assert assessed['transactionId']==recorded.transaction_id
+                assert assessed['releaseSHA256']==recorded.release_digest
+                assert read_private(selection)==changed_selection
+        finally:
+            with os.fdopen(descriptor(selection,writable=True),'wb') as stream:
+                stream.write(selected_before);stream.truncate()
         assert assessed['recordedSourceMatches'] and not assessed['applyAuthorized']
         assert assessed['phase']=='apply-intent' and assessed['installerSHA256']==report['sha256']
         assert assessed['recordSHA256']==hashlib.sha256(pending_bytes).hexdigest()
@@ -200,6 +222,7 @@ def prove(out, arch, compiler, fixture_executable, runtime):
             assert sentinel.read_bytes()==sentinel_bytes, 'Inspection changed the fixture user data.'
         pending.unlink()  # Dispose only this synthetic journal; never customer recovery policy.
         stages.append('independent-recorded-source-assessment-and-live-writer-refusal')
+        stages.append('recorded-source-lookup-ignores-replaced-selection')
         selected_bytes = read_private(selection)
         from lifecycle.installed_source import PREFIX
         with os.fdopen(descriptor(selection,writable=True),'wb') as stream:
