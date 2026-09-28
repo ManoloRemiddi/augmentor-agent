@@ -130,3 +130,10 @@ Windows shell tests additionally fence queued activations and prove a lost
 settings reply cannot make an executing Qt operation appear idle. Supervisor
 tests refuse commit with live children, preserve shortcut settings across
 prepare/cancel and close an empty native owner after an acknowledged commit.
+
+On Windows, the two-window proof also discovers actual held instance locks,
+verifies kernel pipe/process identity and executable/build ownership, refuses a
+different build without changing either draft, and observes a normally exited
+process through its retained handle. The source and compiled proof exercise the
+same discovery client. This snapshot does not claim startup exclusion or a
+complete update transaction.

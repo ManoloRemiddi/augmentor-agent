@@ -33,7 +33,7 @@ def main():
            'XDG_CONFIG_HOME': str(private_directory(work/'config')),
            'XDG_DATA_HOME': str(private_directory(work/'data')),
            'XDG_STATE_HOME': str(private_directory(work/'state'))}
-    children = []
+    children = [];participants=[]
     options = {'creationflags': subprocess.CREATE_NO_WINDOW} if sys.platform == 'win32' else {}
     report = {'passed': False, 'platform': sys.platform, 'scope': 'Two Qt preview processes and shared controls; no model, installed launcher or physical-keyboard proof.'}
     report['nativeLauncher'] = bool(args.launcher)
@@ -125,6 +125,20 @@ def main():
         screenshot = (args.out/'windows-two-window-main.png').resolve()
         command('main','ui-test:'+json.dumps({'action':'capture','path':str(screenshot)}))
         token = secrets.token_hex(24)
+        if sys.platform=='win32':
+            from lifecycle.windows_components import discover_windows
+            selected_root=args.launcher.resolve().parent if args.launcher else ROOT
+            participants=discover_windows(selected_root,Path(env['XDG_RUNTIME_DIR']))
+            assert {item.pid for item in participants}=={initial[name]['pid'] for name in ('main','secondary')}
+            assert next(item for item in participants if item.pid==initial['main']['pid']).initial['draftPresent']
+            secondary=next(item for item in participants if item.pid==initial['secondary']['pid'])
+            assert secondary.control('prepare',token)['phase']=='prepared'
+            assert secondary.control('cancel',token)['phase']=='ready'
+            try:discover_windows(work/'different-build',Path(env['XDG_RUNTIME_DIR']))
+            except ValueError:pass
+            else:raise AssertionError('Discovery adopted a window from a different application build.')
+            assert inspect('main')['draft']=='Keep this draft'
+            report['kernelVerifiedDiscovery']=True
         def maintenance(name,action):
             return command(name,'maintenance:'+json.dumps({'method':'host.maintenance.'+action,
                 'params':{} if action=='status' else {'token':token}}))
@@ -142,6 +156,11 @@ def main():
         assert maintenance('secondary','prepare')['ok']
         assert maintenance('secondary','commit')['result']['phase']=='closing'
         assert children[1].wait(timeout=10)==0, 'The prepared preview window did not close normally.'
+        if sys.platform=='win32':
+            assert secondary.exited()
+            try:secondary.control('status')
+            except (FileNotFoundError,ValueError):pass
+            else:raise AssertionError('An exited window observation accepted a later request.')
         report.update(passed=True, distinctWindows=True, repeatedLaunchPreservedOwner=True,
             draftBlockedMaintenance=True, zoomPreservedDraft=True, shortcutActivationToggle=True,
             reversibleWindowAdmission=True, preparedPreviewExitCode=0, initial=initial, zoom=zoomed['result'])
@@ -154,8 +173,9 @@ def main():
             report['fixtureDiagnostics'][path.name] = path.read_text(encoding='utf-8', errors='replace')[-8000:]
         raise
     finally:
-        # Preview has no real controller, so its Close is not normal product
-        # Quit. Stop only the exact disposable processes created by this probe.
+        for participant in participants:participant.close()
+        # The remaining preview retains its deliberate draft. Fault cleanup
+        # stops only the exact disposable processes created by this probe.
         for process in children:
             if process.poll() is None: process.kill()
             process.wait(timeout=10)

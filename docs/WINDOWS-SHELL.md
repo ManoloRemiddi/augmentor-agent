@@ -155,3 +155,27 @@ process-range check makes no new descendant-tracking claim for Unix adapters.
 
 References: [Microsoft RegisterHotKey](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-registerhotkey)
 and [Qt native event filters](https://doc.qt.io/qt-6/qabstractnativeeventfilter.html).
+
+## Window discovery for maintenance
+
+`services/lifecycle/windows_components.py` observes held private instance locks
+and authenticates each corresponding pipe peer with the Windows kernel. It
+retains an actual process handle, checks the executable and selected build root,
+and requires the window's advertised reservation protocol before sending control
+requests. Every later connection must still belong to that same live process.
+An unknown build or old protocol refuses discovery; it is not closed or adopted.
+Stale files remain untouched. Observation handles grant no termination rights.
+
+This is a snapshot, not complete installation exclusion. A coordinator still
+must prevent new startup, reserve every participating component, observe normal
+exit and obtain exclusive installation access before replacing application files.
+The native two-window proof now exercises discovery, another build's refusal,
+prepare/cancel and observation after normal exit. Its portable path passes;
+the new native discovery assertions await execution.
+
+Earlier pending component entries above are superseded by full runtime
+`e7228e5` passing both native CPUs in [run 36372119531](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36372119531).
+Owner reservation and full Job drain additionally pass both CPUs at `303a619`
+in [desktop run 36372703256](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36372703256).
+These remain hosted component tests, not a finished customer installer or
+physical keyboard/browser acceptance.

@@ -7,6 +7,7 @@ on:
       - '.github/workflows/windows-desktop.yml'
       - 'apps/native/**'
       - 'services/platform_adapters/**'
+      - 'services/lifecycle/**'
       - 'services/windows_supervisor.py'
       - 'scripts/windows-window-proof.py'
       - 'scripts/windows-desktop-proof.py'

@@ -112,6 +112,16 @@ leader exit and could kill a straggler. Portable owner tests pass; new native
 detached-child tests are pending. Keep this boundary separate from deliberate
 fault containment and failed-setup cleanup.
 
+Full runtime `e7228e5` now passes both native CPUs, qualifying both bootstrap
+token paths, compiled desktop/DSH maintenance and the voice 0.1.18 bundle. Fast
+desktop `303a619` passes both CPUs including owner reservation and full Job drain;
+its full runtime run remains pending. New source adds held-instance discovery
+with authenticated pipe peers, retained process handles and executable/build
+checks. Its portable proof passes; native source/compiled assertions are pending.
+Continue browser/companion coordination and early native startup exclusion before
+claiming global Quit or safe production installation. Preserve the draft PR and
+all remaining installer, feature-parity and physical acceptance gates.
+
 ## September 27 Windows implementation plan — historical planning checkpoint
 
 The owner requested a detailed plan before coding. Read the

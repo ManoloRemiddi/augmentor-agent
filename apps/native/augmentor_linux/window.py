@@ -1383,7 +1383,7 @@ def main():
                     controller = window.controller
                     if command == 'maintenance.recover':
                         state['accepted'] = bool(controller and controller.repair_connection())
-                    client.write(json.dumps({'pid':os.getpid(),**state,'onboardingProtocol':1,'modelReady':bool(window.model_picker.currentData()),
+                    client.write(json.dumps({'pid':os.getpid(),**state,'onboardingProtocol':1,'maintenanceAdmission':1,'modelReady':bool(window.model_picker.currentData()),
                         'online':bool(controller and controller.online), 'repairing':bool(controller and controller.repairing),
                         'lastError':controller.last_connection_error if controller else '',
                         'sessionRestoreError':controller.session_restore_error if controller else '',

@@ -7,12 +7,13 @@ connect a Windows machine for joint physical testing afterward. Follow the full
 [implementation plan](WINDOWS-IMPLEMENTATION-PLAN.md); this ledger does not narrow
 its outcome. No Windows customer release or installed-product claim exists yet.
 
-Current checkpoint: full runtime last passed both CPUs at `4f2f763`. Subsequent
-DSH token ownership failures are recorded below; `e7228e5` corrects both token
-creators and is undergoing full native qualification. Its fast desktop run passes.
+Current checkpoint: full runtime passes both CPUs at `e7228e5`, including the
+corrected bootstrap token and actual compiled desktop/DSH maintenance paths.
 The separate voice 0.1.18 candidate passes native configuration and maintenance
-on both CPUs. Current source adds background-owner reservation; it remains under
-qualification. Installer backend is **Inno Setup/WinSparkle**; earlier Velopack
+on both CPUs. Background-owner reservation and complete Windows Job drain pass
+both native fast desktop jobs at `303a619`; its full runtime run is pending.
+Current source adds kernel-verified window discovery, awaiting native execution.
+Installer backend is **Inno Setup/WinSparkle**; earlier Velopack
 candidate entries below are historical. Global coordination and full app release
 are not complete.
 
@@ -802,3 +803,19 @@ is zero. New starts reuse/preserve it, and committed shutdown remains refused.
 The compiled desktop proof now waits for that whole range to drain naturally.
 Portable supervisor tests pass; a real detached-child timeout/natural-exit test
 is added to both native qualification paths and awaits execution.
+
+At `e7228e5`, [full runtime run 36372119531](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36372119531)
+passes native x64 and ARM64 plus the shared Mac Qt candidate. Both token creation
+paths, the actual compiled desktop, real DSH admission/natural exit/restart and
+the voice 0.1.18 bundle now pass that integration run. The hosted fixture uses
+a deterministic model; it does not qualify an external provider or audio device.
+At `303a619`, [fast desktop run 36372703256](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36372703256)
+passes both CPUs, including the real native owner reservation and detached-child
+graceful timeout/natural-exit regression. Full runtime for that ref is pending.
+
+Current source adds [kernel-verified window discovery](WINDOWS-SHELL.md#window-discovery-for-maintenance).
+The two-process portable proof passes; native source and compiled assertions are
+added and await execution. The client preserves stale files, refuses unknown
+builds/protocols and retains exact process observations without termination
+rights. Global discovery still needs the browser and owned companions, and a
+snapshot is not the startup fence or final exclusive installation lease.
