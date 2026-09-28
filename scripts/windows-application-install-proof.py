@@ -96,6 +96,23 @@ def main():
         del link_object
         from platform_adapters.windows_browser import installed_root
         assert installed_root(install/'current',key_path=report['installationKey'])==install/'current'
+        # Exercise the installed browser-preparation adapter with a synthetic
+        # Chromium resource layout and real PE identity. It never runs this
+        # fixture executable or modifies a browser's actual registry/profile.
+        browser=out/'unlisted browser';browser.mkdir()
+        shutil.copy2(executable,browser/'ChromiumFixture.exe')
+        for name in ('resources.pak','icudtl.dat','fixture_100_percent.pak'):
+            (browser/name).write_bytes(b'fixture')
+        from platform_adapters.windows_browser import prepare_extension
+        from unittest.mock import patch
+        with patch.dict(os.environ,{'XDG_DATA_HOME':str(data/'data')}):
+            prepared=prepare_extension(install/'current',browser/'ChromiumFixture.exe',
+                key_path=report['installationKey'],keys=report['browserKeys'])
+        browser_manifest=Path(prepared['manifest'])
+        assert str(browser_manifest)==report['browserManifest']
+        browser_manifest_bytes=browser_manifest.read_bytes()
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER,report['installationKey']) as key:
+            assert winreg.QueryValueEx(key,'BrowserManifestSHA256')==(package.digest(browser_manifest),winreg.REG_SZ)
         startup_command=subprocess.list2cmdline([str(executable),'--qualification-root',str(data),'--background'])
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER,report['startupKey'],0,winreg.KEY_READ|winreg.KEY_SET_VALUE) as key:
             assert winreg.QueryValueEx(key,'Augmentor Agent')==(startup_command,winreg.REG_SZ)
@@ -207,6 +224,17 @@ def main():
             assert executable.is_file() and foreign.read_text()=='preserve'
         finally: os.rmdir(link)
         stages.append('redirected-tree-repair-and-removal-refused')
+        # A changed manifest is preserved before removal changes startup or
+        # application files. Only restore this exact test-created file afterward.
+        def write_manifest(content):
+            with os.fdopen(descriptor(browser_manifest,writable=True),'wb') as stream:
+                stream.write(content);stream.truncate();stream.flush();os.fsync(stream.fileno())
+        write_manifest(browser_manifest_bytes+b' ')
+        run([removal,*flags,'/LOG='+str(out/'changed-browser-removal-refusal.log')],success=False)
+        assert executable.is_file() and browser_manifest.read_bytes()==browser_manifest_bytes+b' '
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER,report['startupKey']) as key:
+            assert winreg.QueryValueEx(key,'Augmentor Agent')==(startup_command,winreg.REG_SZ)
+        write_manifest(browser_manifest_bytes)
         run([removal,*flags,'/LOG='+str(out/'uninstall.log')])
         assert not executable.exists() and not shortcut.exists()
         try: key=winreg.OpenKey(winreg.HKEY_CURRENT_USER,registry,0,winreg.KEY_READ|winreg.KEY_WOW64_64KEY)
@@ -217,12 +245,17 @@ def main():
             assert winreg.QueryValueEx(key,'Unrelated')==('preserve this fixture entry',winreg.REG_SZ)
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER,report['installationKey']) as key:
             assert winreg.QueryInfoKey(key)[:2]==(0,0), 'Owned installation anchor survived removal.'
+        for key_path in report['browserKeys']:
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER,key_path) as key:
+                assert winreg.QueryInfoKey(key)[:2]==(0,0), 'An owned browser pointer survived removal.'
+        assert browser_manifest.read_bytes()==browser_manifest_bytes
         assert sentinel.read_bytes()==sentinel_bytes
         stages.append('software-removed-persistent-data-retained')
         # These two keys are synthetic qualification locations. Never remove a
         # real Run key, StartupApproved state or another application's values.
         winreg.DeleteKey(winreg.HKEY_CURRENT_USER,report['startupKey'])
         winreg.DeleteKey(winreg.HKEY_CURRENT_USER,report['installationKey'])
+        for key_path in report['browserKeys']:winreg.DeleteKey(winreg.HKEY_CURRENT_USER,key_path)
         report.update(passed=True,stages=stages,scope='Full installed payload and native Qt preview; no model, physical input, signed update or rollback claim.')
     finally:
         # Only this disposable preview may be closed on failure. Never clean a

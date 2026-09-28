@@ -24,6 +24,10 @@ procedure CloseManual;
   external 'AugmentorHandoffClose@files:augmentor-installer-handoff.dll stdcall delayload';
 function OwnedRegistry(Key, Name, Expected: String; Action: Cardinal): Cardinal;
   external 'AugmentorOwnedRegistry@files:augmentor-installer-handoff.dll stdcall delayload';
+function RetainManifest(Path: String): BOOL;
+  external 'AugmentorRetainManifest@files:augmentor-installer-handoff.dll stdcall delayload';
+function ValidatePath(Path: String): BOOL;
+  external 'AugmentorMaintenancePath@files:augmentor-installer-handoff.dll stdcall delayload';
 
 procedure Require(Condition: Boolean; Detail: String);
 begin
@@ -37,6 +41,8 @@ begin
   Expected := '"{#QualificationBase}\installed café\Augmentor.exe" --background';
   Ready := PrepareManual('{#QualificationBase}');
   Require(Ready, 'Could not acquire disposable native maintenance.');
+  Ready := ValidatePath('{#LongTree}');
+  Require(Ready, 'Ordinary long payload paths must pass native inspection.');
   Require(OwnedRegistry('{#RegistryKey}', 'Augmentor Agent', Expected, 0) = 1, 'Expected absent value.');
   Require(OwnedRegistry('{#RegistryKey}', 'Augmentor Agent', Expected, 1) = 2, 'Could not create owned value.');
   Require(RegQueryStringValue(HKCU, '{#RegistryKey}', 'Augmentor Agent', Actual), 'Missing actual registry value.');
@@ -59,6 +65,11 @@ begin
   Require(OwnedRegistry('{#RegistryKey}', 'Augmentor Agent', Expected, 2) = 1, 'Absent removal must be idempotent.');
   Require(RegQueryStringValue(HKCU, '{#RegistryKey}', 'Unrelated', Actual), 'Unrelated value disappeared.');
   Require(Actual = 'preserve', 'Unrelated value changed.');
+  Ready := RetainManifest('{#ManifestPath}');
+  Require(Ready, 'Could not retain the private browser manifest.');
+  Require(GetSHA256OfFile('{#ManifestPath}') = '{#ManifestDigest}', 'Pinned manifest hash differs.');
+  Require(not SaveStringToFile('{#ManifestPath}', 'overwrite', False), 'Pinned manifest allowed writes.');
+  Require(not DeleteFile('{#ManifestPath}'), 'Pinned manifest allowed deletion.');
   CloseManual;
   Require(OwnedRegistry('{#RegistryKey}', 'Augmentor Agent', Expected, 1) = 0, 'Ungated mutation must refuse.');
   Result := True;

@@ -4,13 +4,24 @@
 
 ## Windows implementation — active, September 28
 
-Current installer source now creates the exact installed-app registry anchor
-required by browser setup and offers background login startup on fresh installation.
-Native maintenance compares typed HKCU values before creating/removing them; foreign
-values and unrelated entries are preserved. Repair/update do not recreate removed
-startup, and no StartupApproved/HKLM value is written. New actual Inno registry
-fixtures and full installed startup/anchor checks await native execution. Browser
-host registration removal remains a separate open gate.
+Current source adds byte-verified removal of owned browser registrations, retaining
+persistent data and preserving edited/foreign manifests. Browser setup records its
+manifest digest before publishing registry pointers. The native remover pins the
+private file while hashing and comparing it, without loading application Python.
+New native manifest-retention and full installed browser-removal tests are pending.
+
+Actual native registry fixtures at `2f17cb0` [pass both CPUs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36397149278):
+typed exact-value creation/removal, wrong-type/content refusal, unrelated-value
+preservation and rejection without the installation gate. Actual installer startup
+and browser-anchor integration still needs its full-payload run.
+
+Full x64 `ead355c` now observes correct installed preview exit, then fails same-build
+repair at native tree validation. Its installation log contains 205 ordinary paths
+longer than 260 characters (maximum 283); source validation lacked extended paths.
+Current source uses explicit extended local paths and deletion-compatible read-only
+attribute inspection. A new actual Inno fixture exercises a deeper-than-260 payload
+and requires it to pass. This correction and later full repair/apply/removal stages
+await native execution; no passing full installer/update claim is made.
 
 The owner authorizes autonomous implementation through the complete Windows app;
 physical testing follows when a Windows machine is connected. Work on

@@ -123,3 +123,29 @@ is now implemented through the [native browser participant](LIFECYCLE.md#native-
 and awaits compiled execution. The native startup fence and committed browser
 exit remain pending; the component explicitly refuses commit until that handoff
 is implemented. Source registration/control is not a completed updater.
+
+## Installed ownership receipt and removal
+
+The actual Inno candidate now creates the Root/AppId anchor required by browser
+setup. During `prepare_extension`, after validating or creating its private host
+manifest and before publishing any new browser registry pointers, the adapter
+records the exact manifest SHA-256 under that same installed anchor. Receipt
+failure cannot publish new pointers; a new unused manifest is removed on failure.
+The root is rechecked against the actual selected installation before recording.
+
+The native uninstaller checks its own installation identity, discovers only its
+known exact HKCU pointers and pins the private single-link manifest without write
+or delete sharing. Inno hashes that retained file and compares the typed receipt.
+Changed/missing/unverifiable owned manifests refuse removal before application or
+login changes. Foreign registry pointers remain untouched. When removal actually
+starts, only matching browser pointer values and the matching receipt are removed;
+browser profiles, prepared extension copies and all persistent user data remain.
+Cancellation before removal changes no pointers. No application Python is loaded
+from a directory being removed. This receipt proves retained byte ownership, not
+publisher authenticity, browser compatibility or extension store delivery.
+
+New native tests cover receipt-before-registration ordering, failure preservation,
+read/delete refusal while the native manifest handle is held, and full installed
+preparation/removal through synthetic Chromium resources and private fixture keys.
+These new cases are scheduled, not yet qualified. Actual selected-browser/store
+and physical Windows tests remain open.

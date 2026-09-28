@@ -394,7 +394,8 @@ refuses that optional task before installation.
 Removal deletes only matching typed startup and anchor values when removal
 actually begins. Cancellation/busy refusal preserves them. Foreign or unrelated
 values remain; no registry tree is recursively removed. Empty anchor keys may
-remain. Browser native-host registration/manifest cleanup is still separate work.
+remain. Browser native-host pointer cleanup is now wired through a byte-verified receipt;
+its new native checks are pending. Persistent browser manifests are retained.
 
 Qualification uses compiled-in unique registry keys, never a real login entry.
 A new actual Inno/native-helper fixture checks type/content conflicts, repeat
@@ -406,3 +407,8 @@ pending; no physical logon/Task Manager acceptance is claimed.
 
 See Inno's [task choices](https://jrsoftware.org/ishelp/topic_taskssection.htm)
 and [setup/removal events](https://jrsoftware.org/ishelp/topic_scriptevents.htm).
+
+The typed native registry fixture at `2f17cb0` passes on both native runners in
+[36397149278](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36397149278).
+This is actual Inno/helper registry execution, separate from the still-pending
+full installed startup command and physical logon tests.

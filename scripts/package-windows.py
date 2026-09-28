@@ -76,7 +76,11 @@ def build(root, arch, out, *, qualification=None, compiler_path=None):
         'ReleaseDigest':digest(root/'release.json'), 'HelperDigest':digest(helper), 'QualificationBase':'',
         'HandoffRuntime':'', 'MinimumVersion':'10.0.26200',
         'InstallationKey':r'Software\Augmentor\Installation',
-        'StartupKey':r'Software\Microsoft\Windows\CurrentVersion\Run'}
+        'StartupKey':r'Software\Microsoft\Windows\CurrentVersion\Run',
+        'BrowserManifestPath':r'{localappdata}\Augmentor\data\browser-native-host\com.augmentor.agent.json',
+        'BrowserChromeKey':r'Software\Google\Chrome\NativeMessagingHosts\com.augmentor.agent',
+        'BrowserChromiumKey':r'Software\Chromium\NativeMessagingHosts\com.augmentor.agent',
+        'BrowserEdgeKey':r'Software\Microsoft\Edge\NativeMessagingHosts\com.augmentor.agent'}
     if qualification:
         # Build-only locations must already be explicit and private. Never
         # modify a personal installation from a qualification command switch.
@@ -91,6 +95,10 @@ def build(root, arch, out, *, qualification=None, compiler_path=None):
             HandoffRuntime=str(data/'run'),
             InstallationKey='Software\\AugmentorQualification\\'+identity+'\\Installation',
             StartupKey='Software\\AugmentorQualification\\'+identity+'\\Run',
+            BrowserManifestPath=str(data/'data/browser-native-host/com.augmentor.agent.json'),
+            BrowserChromeKey='Software\\AugmentorQualification\\'+identity+'\\ChromeNativeHost',
+            BrowserChromiumKey='Software\\AugmentorQualification\\'+identity+'\\ChromiumNativeHost',
+            BrowserEdgeKey='Software\\AugmentorQualification\\'+identity+'\\EdgeNativeHost',
             MinimumVersion='10.0.26100')  # Hosted Server runner only; not an advertised OS target.
     # Compile-time strings are not code. Refuse Inno preprocessor/constants
     # injection in physical paths; only the fixed Known Folder expression above
@@ -109,7 +117,9 @@ def build(root, arch, out, *, qualification=None, compiler_path=None):
         'installerBytes':installer.stat().st_size,
         'customerDistribution':False, 'signed':False, 'applicationId':definitions['ApplicationId'],
         'installationDirectory':definitions['InstallDirectory'], 'qualificationBase':definitions['QualificationBase'],
-        'installationKey':definitions['InstallationKey'], 'startupKey':definitions['StartupKey']}
+        'installationKey':definitions['InstallationKey'], 'startupKey':definitions['StartupKey'],
+        'browserKeys':[definitions[name] for name in ('BrowserChromeKey','BrowserChromiumKey','BrowserEdgeKey')],
+        'browserManifest':definitions['BrowserManifestPath']}
     (out/'package.json').write_text(json.dumps(report, indent=2)+'\n', encoding='utf-8')
     return report
 

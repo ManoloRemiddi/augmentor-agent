@@ -14,11 +14,15 @@
 static HANDLE channel = INVALID_HANDLE_VALUE, startup = INVALID_HANDLE_VALUE;
 static HANDLE runtime = INVALID_HANDLE_VALUE, coordinator = NULL;
 static HANDLE installation = INVALID_HANDLE_VALUE;
+static HANDLE manifest_file = INVALID_HANDLE_VALUE, manifest_parent = INVALID_HANDLE_VALUE;
 static BOOL authorized = FALSE;
 static AugmentorLease manual = {INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE,
     INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE};
 
 __declspec(dllexport) void WINAPI AugmentorHandoffClose(void) {
+    if (manifest_file != INVALID_HANDLE_VALUE) CloseHandle(manifest_file);
+    if (manifest_parent != INVALID_HANDLE_VALUE) CloseHandle(manifest_parent);
+    manifest_file = manifest_parent = INVALID_HANDLE_VALUE;
     augmentor_release(&manual);
     if (channel != INVALID_HANDLE_VALUE) CloseHandle(channel);
     if (installation != INVALID_HANDLE_VALUE) CloseHandle(installation);
@@ -212,7 +216,8 @@ static BOOL plain_tree(const wchar_t *directory, unsigned depth, unsigned *remai
         if (found.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
             if (!plain_tree(path, depth + 1, remaining)) goto done;
         } else {
-            HANDLE file = CreateFileW(path, FILE_READ_ATTRIBUTES, FILE_SHARE_READ | FILE_SHARE_WRITE,
+            HANDLE file = CreateFileW(path, FILE_READ_ATTRIBUTES,
+                FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
                 NULL, OPEN_EXISTING, FILE_FLAG_OPEN_REPARSE_POINT, NULL);
             if (file == INVALID_HANDLE_VALUE) goto done;
             BY_HANDLE_FILE_INFORMATION info;
@@ -232,9 +237,14 @@ __declspec(dllexport) BOOL WINAPI AugmentorMaintenancePath(const wchar_t *direct
     if ((!authorized && manual.file == INVALID_HANDLE_VALUE) || !directory) return FALSE;
     wchar_t path[32768];
     DWORD length = GetFullPathNameW(directory, 32768, path, NULL);
-    if (!length || length >= 32768 || path[1] != L':' || path[2] != L'\\' || wcschr(path + 2, L':')) return FALSE;
+    if (!length || length >= 32764 || path[1] != L':' || path[2] != L'\\' || wcschr(path + 2, L':')) return FALSE;
+    /* Setup's own Win32 path policy is independent of the embedded app's
+     * longPathAware manifest. Its payload includes ordinary paths over 260
+     * characters; use explicit extended local paths for every native walk. */
+    memmove(path + 4, path, (length + 1) * sizeof(wchar_t));
+    memcpy(path, L"\\\\?\\", 4 * sizeof(wchar_t)); length += 4;
     BOOL exists = TRUE;
-    for (DWORD i = 3; i <= length; ++i) {
+    for (DWORD i = 7; i <= length; ++i) {
         if (i < length && path[i] != L'\\') continue;
         wchar_t saved = path[i]; path[i] = 0;
         DWORD attributes = GetFileAttributesW(path), error = GetLastError();
@@ -295,4 +305,41 @@ __declspec(dllexport) DWORD WINAPI AugmentorOwnedRegistry(const wchar_t *path,
     }
 done:
     free(value); if (key) RegCloseKey(key); return result;
+}
+
+/* Keep a private browser manifest unchanged while Inno hashes it and removes
+ * its matching registry pointers. No application Python or JSON parser runs
+ * in the uninstaller, and persistent browser/user files are not deleted. */
+__declspec(dllexport) BOOL WINAPI AugmentorRetainManifest(const wchar_t *path) {
+    HANDLE token = NULL, file = INVALID_HANDLE_VALUE, parent = INVALID_HANDLE_VALUE;
+    TOKEN_USER *identity = NULL; DWORD size = 0; BOOL accepted = FALSE;
+    wchar_t directory[32768];
+    if ((installation == INVALID_HANDLE_VALUE && manual.file == INVALID_HANDLE_VALUE) ||
+            manifest_file != INVALID_HANDLE_VALUE || !path) return FALSE;
+    DWORD length = GetFullPathNameW(path, 32768, directory, NULL);
+    if (!length || length >= 32768) return FALSE;
+    wchar_t *slash = wcsrchr(directory, L'\\');
+    if (!slash) return FALSE;
+    *slash = 0;
+    if (!OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &token)) goto done;
+    GetTokenInformation(token, TokenUser, NULL, 0, &size);
+    if (!size || !(identity = malloc(size)) ||
+            !GetTokenInformation(token, TokenUser, identity, size, &size)) goto done;
+    parent = augmentor_private_directory(directory, identity->User.Sid, NULL, FALSE);
+    if (parent == INVALID_HANDLE_VALUE) goto done;
+    file = CreateFileW(path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+        FILE_FLAG_OPEN_REPARSE_POINT, NULL);
+    BY_HANDLE_FILE_INFORMATION info; LARGE_INTEGER length_bytes;
+    if (file == INVALID_HANDLE_VALUE || !GetFileInformationByHandle(file, &info) ||
+            !GetFileSizeEx(file, &length_bytes) || length_bytes.QuadPart < 1 || length_bytes.QuadPart > 65536 ||
+            info.nNumberOfLinks != 1 || info.dwFileAttributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT) ||
+            !augmentor_private_descriptor(file, identity->User.Sid)) goto done;
+    manifest_file = file; file = INVALID_HANDLE_VALUE;
+    manifest_parent = parent; parent = INVALID_HANDLE_VALUE;
+    accepted = TRUE;
+done:
+    if (file != INVALID_HANDLE_VALUE) CloseHandle(file);
+    if (parent != INVALID_HANDLE_VALUE) CloseHandle(parent);
+    if (token) CloseHandle(token);
+    free(identity); return accepted;
 }

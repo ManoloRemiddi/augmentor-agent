@@ -120,6 +120,10 @@ class WindowsBrowserRegistrationTests(unittest.TestCase):
             self.write(self.prefix,'com.augmentor.Agent',name='AppId')
             self.write(self.prefix,str(app),name='Root')
             prepared = api.prepare_extension(app,executable,key_path=self.prefix,keys=self.keys)
+            import hashlib
+            with self.registry.OpenKey(self.registry.HKEY_CURRENT_USER,self.prefix) as key:
+                self.assertEqual(self.registry.QueryValueEx(key,'BrowserManifestSHA256'),
+                    (hashlib.sha256(Path(prepared['manifest']).read_bytes()).hexdigest(),self.registry.REG_SZ))
             destination = Path(prepared['extensionDirectory'])
             self.assertEqual((destination/'example.js').read_bytes(),(source/'example.js').read_bytes())
             self.assertTrue(destination.is_relative_to(data))
@@ -132,6 +136,19 @@ class WindowsBrowserRegistrationTests(unittest.TestCase):
             self.write(self.prefix,str(self.root/'other-install'),name='Root')
             with self.assertRaisesRegex(ValueError,'installed Augmentor'):
                 api.prepare_extension(app,executable,key_path=self.prefix,keys=self.keys)
+
+    def test_ownership_receipt_failure_never_publishes_new_browser_pointers(self):
+        calls=[]
+        def refusal(path):
+            self.assertTrue(path.is_file())
+            self.assertTrue(all(self.registration.current(key) is None for key in self.keys))
+            calls.append('before-registration')
+            raise OSError('Fixture receipt failure')
+        with self.assertRaisesRegex(OSError,'receipt failure'):
+            self.registration.register(self.value,self.path,keys=self.keys,before_registration=refusal)
+        self.assertEqual(calls,['before-registration'])
+        self.assertFalse(self.path.exists())
+        self.assertTrue(all(self.registration.current(key) is None for key in self.keys))
 
 
 @unittest.skipUnless(sys.platform == 'win32', 'requires Windows registry discovery and PE metadata')

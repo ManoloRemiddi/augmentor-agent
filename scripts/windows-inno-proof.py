@@ -93,8 +93,17 @@ def main():
     handoff_helper=builder.build_installer_helper(out/'handoff-helper',development=True)
     registration_key=r'Software\AugmentorQualification'+'\\'+identity+'\\OwnedValues'
     registration_base=private_directory(out/'registration-private')
+    from platform_adapters.private_files import atomic_json
+    registration_manifest=private_directory(registration_base/'browser')/'host.json'
+    atomic_json(registration_manifest,{'fixture':'private manifest retention'})
+    long_tree=registration_base/'long-payload'
+    nested=long_tree.joinpath(*['nested-'+str(index)+'-'+'x'*55 for index in range(6)])
+    extended=Path('\\\\?\\'+str(nested));extended.mkdir(parents=True)
+    (extended/'ordinary.txt').write_text('fixture ordinary payload beyond MAX_PATH')
     definitions={'FixtureId':identity+'.reg','QualificationBase':registration_base,
-        'OutputDirectory':out/'registration-installer','HandoffHelper':handoff_helper,'RegistryKey':registration_key}
+        'OutputDirectory':out/'registration-installer','HandoffHelper':handoff_helper,'RegistryKey':registration_key,
+        'ManifestPath':registration_manifest,'ManifestDigest':hashlib.sha256(registration_manifest.read_bytes()).hexdigest(),
+        'LongTree':long_tree}
     with (out/'registration-compile.log').open('w',encoding='utf-8') as log:
         run([compiler/'ISCC.exe',*['/D'+key+'='+str(value) for key,value in definitions.items()],
             ROOT/'scripts/windows-registration-fixture.iss'],stdout=log,stderr=subprocess.STDOUT)
@@ -168,7 +177,7 @@ def main():
                   'tools':pins, 'twoSimultaneousHolders':True, 'busyRepairUpdateUninstallRefused':True,
                   'failedMaintenanceReleasesAdmission':True, 'idleRepairUpdateUninstall':True,
                   'persistentDataPreserved':True, 'nativeUpdater':native_update, 'signedBundle':signed_bundle,
-                  'nativeTypedOwnedRegistry':True,
+                  'nativeTypedOwnedRegistry':True, 'nativeBrowserManifestPinned':True, 'nativeLongPayloadPaths':True,
                   'independentSetupHandoff':handoff,
                   'productionInstallerQualified':False,
                   'limits':['Disposable unsigned fixture; no full Augmentor shutdown/migration/rollback or ordinary-user client acceptance.',

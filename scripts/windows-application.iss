@@ -39,6 +39,7 @@ Name: startup; Description: "Start Augmentor in the background when I sign in"; 
 [Code]
 var MaintenanceHeld, AuthenticatedHandoff, RemovalHeld, FreshInstallation: Boolean;
   StartupChoiceKnown, StartupChoice: Boolean;
+  BrowserCleanupReady: Boolean; BrowserDigest: String;
 
 function OfferStartupTask: Boolean;
 begin
@@ -78,6 +79,39 @@ function OwnedRegistry(Key, Name, Expected: String; Action: Cardinal): Cardinal;
   external 'AugmentorOwnedRegistry@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
 function RemoveOwnedRegistry(Key, Name, Expected: String; Action: Cardinal): Cardinal;
   external 'AugmentorOwnedRegistry@{tmp}\augmentor-removal.dll stdcall delayload uninstallonly';
+function RetainBrowserManifest(Path: String): BOOL;
+  external 'AugmentorRetainManifest@{tmp}\augmentor-removal.dll stdcall delayload uninstallonly';
+
+function BrowserKey(Index: Integer): String;
+begin
+  case Index of
+    0: Result := '{#BrowserChromeKey}';
+    1: Result := '{#BrowserChromiumKey}';
+    2: Result := '{#BrowserEdgeKey}';
+  end;
+end;
+
+function PrepareBrowserCleanup: Boolean;
+var Index: Integer; State: Cardinal; HasOwnedRegistration, Pinned: Boolean;
+begin
+  Result := True;
+  if (RemoveOwnedRegistry('{#InstallationKey}', 'Root', ExpandConstant('{app}\current'), 0) <> 2) or
+      (RemoveOwnedRegistry('{#InstallationKey}', 'AppId', 'com.augmentor.Agent', 0) <> 2) then exit;
+  HasOwnedRegistration := False;
+  for Index := 0 to 2 do begin
+    State := RemoveOwnedRegistry(BrowserKey(Index), '', ExpandConstant('{#BrowserManifestPath}'), 0);
+    if State = 0 then begin Result := False; exit; end;
+    if State = 2 then HasOwnedRegistration := True;
+  end;
+  if not HasOwnedRegistration then exit;
+  Result := False;
+  Pinned := RetainBrowserManifest(ExpandConstant('{#BrowserManifestPath}'));
+  if not Pinned then exit;
+  BrowserDigest := GetSHA256OfFile(ExpandConstant('{#BrowserManifestPath}'));
+  if RemoveOwnedRegistry('{#InstallationKey}', 'BrowserManifestSHA256', BrowserDigest, 0) <> 2 then exit;
+  BrowserCleanupReady := True;
+  Result := True;
+end;
 
 function StartupCommand: String;
 var Arguments: String;
@@ -197,19 +231,28 @@ begin
   RemovalHeld := PrepareRemoval('{#QualificationBase}');
   Result := RemovalHeld;
   if Result then Result := ValidateRemovalPath(ExpandConstant('{app}'));
+  if Result then Result := PrepareBrowserCleanup;
   if not Result then begin
-    Log('Running Augmentor prevented removal; no application files were changed.');
+    Log('Active work or changed installation/browser registration prevented removal; no application files were changed.');
     if not UninstallSilent then
-      MsgBox('Augmentor is still running. Finish your work and quit Augmentor before removing it.', mbInformation, MB_OK);
+      MsgBox('Augmentor cannot be removed while it is running or its browser registration has changed. Finish your work and quit Augmentor. Repair browser setup if its registration was edited.', mbInformation, MB_OK);
   end;
 end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
-var Outcome: Cardinal;
+var Outcome: Cardinal; Index: Integer;
 begin
   if CurUninstallStep <> usUninstall then exit;
   { Cancellation before the actual removal step must leave startup intact.
     Delete only exact owned values; never delete keys or unrelated entries. }
+  if BrowserCleanupReady then begin
+    for Index := 0 to 2 do begin
+      Outcome := RemoveOwnedRegistry(BrowserKey(Index), '', ExpandConstant('{#BrowserManifestPath}'), 2);
+      if Outcome = 0 then RaiseException('Augmentor could not remove an owned browser registration.');
+    end;
+    if RemoveOwnedRegistry('{#InstallationKey}', 'BrowserManifestSHA256', BrowserDigest, 2) <> 2 then
+      RaiseException('The browser ownership record changed during removal.');
+  end;
   Outcome := RemoveOwnedRegistry('{#StartupKey}', 'Augmentor Agent', StartupCommand, 2);
   if Outcome = 0 then RaiseException('Augmentor could not remove its owned login entry.');
   if (RemoveOwnedRegistry('{#InstallationKey}', 'Root', ExpandConstant('{app}\current'), 0) = 2) and

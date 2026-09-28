@@ -101,7 +101,28 @@ def prepare_extension(root, browser, *, key_path=INSTALL_KEY, keys=KEYS):
         finally:
             if temporary.exists(): shutil.rmtree(temporary)
     host = private_directory(Path(os.environ['XDG_DATA_HOME'])/'browser-native-host')/(HOST+'.json')
-    result = register(value,host,keys=keys)
+    def record_owner(path):
+        # Record the exact validated manifest BEFORE publishing any new browser
+        # registry pointers. Native uninstall can then verify it without loading
+        # Python from the directory being removed. This is byte ownership, not
+        # publisher trust or a substitute for the real extension handshake.
+        from .windows_identity import private_file_descriptor
+        with os.fdopen(private_file_descriptor(path,share_write=False),'rb') as content:
+            raw=content.read(65537)
+        if len(raw)>65536 or json.loads(raw)!=value:
+            raise ValueError('The browser companion manifest changed during preparation.')
+        digest=hashlib.sha256(raw).hexdigest()
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER,key_path,0,winreg.KEY_READ|winreg.KEY_SET_VALUE|VIEW) as key:
+            location,kind=winreg.QueryValueEx(key,'Root')
+            if (kind!=winreg.REG_SZ or Path(location)!=root or
+                    winreg.QueryValueEx(key,'AppId')!=('com.augmentor.Agent',winreg.REG_SZ)):
+                raise ValueError('The installation identity changed during browser preparation.')
+            try: previous=winreg.QueryValueEx(key,'BrowserManifestSHA256')
+            except FileNotFoundError: previous=None
+            if previous!=(digest,winreg.REG_SZ):
+                winreg.SetValueEx(key,'BrowserManifestSHA256',0,winreg.REG_SZ,digest)
+                winreg.FlushKey(key)
+    result = register(value,host,keys=keys,before_registration=record_owner)
     return {**result,'extensionDirectory':str(destination),'extensionId':value['allowed_origins'][0].split('/')[2]}
 
 
@@ -146,7 +167,7 @@ def _remove_value(path, expected):
     except FileNotFoundError: return False
 
 
-def register(value, manifest_path, *, keys=KEYS):
+def register(value, manifest_path, *, keys=KEYS, before_registration=None):
     manifest_path = Path(manifest_path).absolute()
     require_directory(manifest_path.parent)
     expected = str(manifest_path)
@@ -160,6 +181,7 @@ def register(value, manifest_path, *, keys=KEYS):
     if not exists: atomic_json(manifest_path, value)
     changed = []
     try:
+        if before_registration is not None: before_registration(manifest_path)
         for path in keys:
             with winreg.CreateKeyEx(winreg.HKEY_CURRENT_USER, path, 0, winreg.KEY_READ | winreg.KEY_SET_VALUE | VIEW) as key:
                 previous = _value(key)

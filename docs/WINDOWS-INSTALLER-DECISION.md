@@ -397,3 +397,23 @@ only owned values; unrelated values and StartupApproved are untouched. The
 [Windows shell guide](WINDOWS-SHELL.md#installer-owned-login-and-browser-anchor)
 records paths, behavior and remaining native/physical qualification. New native
 Inno registry fixtures and full installed readback are scheduled, not yet passed.
+
+## Native long paths and browser cleanup
+
+Full x64 `ead355c` passes installed preview exit after the shared fix, then refuses
+same-build repair in native tree validation. The actual initial-install log has
+65,933 file entries, including 205 paths over 260 characters (maximum 283). The
+native walk used unprefixed Win32 paths, independently of the app launcher's
+longPathAware manifest. Current source uses explicit extended local paths for
+ancestor checks, enumeration and file inspection. Attribute inspection also allows
+delete sharing, so Setup's own uninstall-log handles do not cause a false refusal.
+Hard-link/reparse/depth/count checks remain. New Inno qualification includes an
+ordinary payload over 500 characters; full installed repair must still pass.
+
+The actual native registry fixture at `2f17cb0` passes both CPUs. Current source
+adds [browser ownership receipts and removal](WINDOWS-BROWSER.md#installed-ownership-receipt-and-removal),
+plus real native held-file write/delete refusal. The full installed proof prepares
+an extension using synthetic Chromium resources and isolated registration keys,
+checks manifest-edit removal refusal, then checks normal pointer cleanup with
+persistent data retained. New execution is pending; actual browser UI/store
+acceptance and complete installed update/recovery remain open.

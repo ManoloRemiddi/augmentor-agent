@@ -81,7 +81,7 @@ the [full plan](WINDOWS-IMPLEMENTATION-PLAN.md) for required completion gates.
 | --- | --- | --- |
 | Private runtime and native desktop | Compiled launchers, Qt windows, proportional sizing, process identity and private IPC pass | Ordinary-user/physical display, keyboard and current Home/Pro builds |
 | Managed DSH and chat | Actual bundled DSH with deterministic model; Send/Enter, saved history and restart pass | Real-provider and complete feature acceptance |
-| Browser companion | Compiled native-host ownership, reservation, idle commit and restart pass | Selected real Chromium, store delivery and N/N+1 compatibility |
+| Browser companion | Compiled native-host ownership, reservation, idle commit and restart pass; installed anchor/removal code added | New installed receipt/removal qualification, selected real Chromium, store delivery and N/N+1 compatibility |
 | Voice bridge | Shared 0.1.19, private preference saves, owned service, busy-ticket refusal and natural drain pass | Windows ASR/TTS provisioning and physical audio |
 | Prompt/memory services | Shared private clients, service ownership, reservations and observed drain pass | Windows memory engine provisioning and full memory quality/features |
 | Coordinated shutdown | Actual window/DSH/voice/companions/owner graph drain and restart pass at `f950a45` | Product apply/recovery integration and user-facing update flow |
