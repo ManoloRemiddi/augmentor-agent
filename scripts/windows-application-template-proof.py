@@ -190,11 +190,14 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         for label,raw in (
             ('wrong-source',json.dumps({**json.loads(pending_bytes),'source':{**source_identity,'sourceCommit':'e'*40}}).encode()),
             ('malformed-source',b'Unparseable fixture update.')):
-            with os.fdopen(descriptor(pending,writable=True),'wb') as stream:stream.write(raw)
+            with os.fdopen(descriptor(pending,writable=True),'wb') as stream:
+                stream.write(raw);stream.truncate()
+            assert pending.read_bytes()==raw, 'The corruption fixture did not write its exact intended bytes.'
             run(cached,label+'-assessment-refusal',success=False,arguments=['/augmentorinspect=source'])
             log=(out/('application-template-'+label+'-assessment-refusal.log')).read_text(encoding='utf-8-sig')
             assert 'stage=9, detail=85;' in log and 'Augmentor independent inspection result:' not in log
-            assert pending.read_bytes()==raw and sentinel.read_bytes()==sentinel_bytes
+            assert pending.read_bytes()==raw, 'Inspection changed the synthetic interrupted record.'
+            assert sentinel.read_bytes()==sentinel_bytes, 'Inspection changed the fixture user data.'
         pending.unlink()  # Dispose only this synthetic journal; never customer recovery policy.
         stages.append('independent-recorded-source-assessment-and-live-writer-refusal')
         selected_bytes = read_private(selection)
@@ -228,8 +231,13 @@ def prove(out, arch, compiler, fixture_executable, runtime):
                             winreg.KEY_READ|winreg.KEY_SET_VALUE|winreg.KEY_WOW64_64KEY) as key:
             winreg.DeleteValue(key, 'Augmentor Agent'); winreg.FlushKey(key)
         shutil.rmtree(install/'current')  # Exact disposable fixture-owned payload.
+        absent=inspect(cached,'absent-payload-root-inspection')
+        assert absent['complete'] is False and absent['differences']['missing']==absent['files'], absent
+        assert not (install/'current').exists() and sentinel.read_bytes()==sentinel_bytes
         run(repair, 'missing-payload-repair')
         assert installed_release.read_bytes() == (payload/'release.json').read_bytes()
+        assert inspect(cached,'restored-payload-root-inspection')['complete']
+        stages.append('independent-inspection-and-repair-of-missing-payload-root')
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER, report['startupKey'], 0,
                             winreg.KEY_READ|winreg.KEY_WOW64_64KEY) as key:
             try: winreg.QueryValueEx(key, 'Augmentor Agent')

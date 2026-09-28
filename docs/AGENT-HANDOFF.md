@@ -43,8 +43,8 @@ qualification is claimed. The app is not complete or ready for customers.
   passes x64 and shared Mac Qt at `5cf8e1722c7925175798e17d6028684ef99449ff`.
   Downloaded x64 reports confirm independent damaged-runtime inspection, exact
   inventory (65,938 files, no differences), isolated native UI health/identity,
-  unresolved-startup refusal and verified reopening. The managed DSH report confirms
-  cancellation preserved its held turn without shutdown/installer invocation.
+  unresolved-startup refusal and verified reopening. Both downloaded managed DSH reports confirm
+  cancellation preserved their held turn without shutdown/installer invocation.
   ARM64 fails at independent inspection without a report, using the older helper
   before numeric diagnostics/whole-Job waiting. Do not infer its cause. Full
   `4412deb` qualification is now running with those changes and the busy-draft
@@ -87,8 +87,12 @@ The native helper holds a live journal-writer lock and pins the private active
 record; its extracted worker matches actual installer bytes and embedded metadata
 to the exact recorded source. It reports identity/remaining observation only,
 never apply authority. Six portable cases, 43 update tests, four package tests
-and script compilation pass. Native cases for a busy writer, linked record,
-foreign/malformed source and preserved data are added but not yet executed.
+and script compilation pass. At `4b2bfaa`, native source matching and busy-writer/linked-record refusal pass
+before a corruption-fixture byte assertion fails on both CPUs. That fixture now
+truncates shorter writes and verifies their exact bytes before running Setup;
+corrected native execution is pending. Inspection also handles a completely absent
+final payload root without creating it; two additional portable tests pass, and
+the native registered-repair case now requires all-missing then complete inspection.
 
 Next: qualify complete installed inventory/isolated health and real-DSH cancellation,
 then finish independent interrupted/cross-version restoration, authenticated recovery

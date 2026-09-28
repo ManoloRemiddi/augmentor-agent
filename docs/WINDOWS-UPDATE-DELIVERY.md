@@ -219,3 +219,11 @@ original update source under live maintenance/writer exclusion. It cannot choose
 a recovery build from the mutable selection pointer or a version alone. This is
 read-only source matching, not signature provisioning or rollback permission.
 Portable refusal cases pass; its new native snapshot/worker integration is pending.
+
+
+Independent inspection can now describe a completely missing final payload root
+under an intact ordinary parent. It returns every expected file/directory as
+missing without creating anything; package intake still rejects an absent root.
+Missing/redirected ancestors, wrong root types, read failures and link aliases do
+not become an empty payload. Two portable cases pass; native missing-root
+inspection followed by exact-build registered repair remains pending.

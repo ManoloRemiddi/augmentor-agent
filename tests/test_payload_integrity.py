@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import shutil
 import sys
 import tempfile
 import unittest
@@ -62,6 +63,22 @@ class PayloadIntegrityTests(unittest.TestCase):
         self.assertEqual(result['missing'],['release.json'])
         self.assertEqual(result['changed'],[INVENTORY]);self.assertFalse(result['complete'])
         self.assertEqual((self.root/INVENTORY).read_bytes(),b'interrupted')
+
+    def test_absent_payload_root_reports_every_entry_missing_without_creating_it(self):
+        shutil.rmtree(self.root)
+        result=self.inspect()
+        self.assertFalse(result['complete'])
+        self.assertEqual(result['missing'],['payload-integrity.json','release.json','runtime.dll','scripts/action.py'])
+        self.assertEqual(result['missingDirectories'],['empty','scripts'])
+        self.assertEqual(result['changed'],[]);self.assertEqual(result['unexpected'],[])
+        self.assertFalse(self.root.exists())
+        with self.assertRaises(FileNotFoundError):verify_payload(self.root,self.release)
+
+    def test_absent_ancestor_or_wrong_root_type_is_not_a_missing_payload(self):
+        with self.assertRaises(FileNotFoundError):
+            inspect_payload(self.root/'absent-parent/payload',self.release,self.inventory)
+        with self.assertRaisesRegex(ValueError,'reparse/link'):
+            inspect_payload(self.root/'runtime.dll',self.release,self.inventory)
 
     def test_manifest_cannot_redefine_an_independently_identified_release(self):
         manifest=json.loads(self.inventory);manifest['files']['runtime.dll']['sha256']='0'*64

@@ -846,3 +846,21 @@ wrong-source/malformed-record refusal and unchanged persistent data. The templat
 uses the real cached source with a synthetic future target; it is not N-to-N+1.
 The full app proof assesses its real unresolved same-build update record before
 health. New native execution is pending.
+
+
+Native `4b2bfaa` reaches successful recorded-source assessment plus busy-writer
+and linked-record refusal on both CPUs, then fails the malformed-source fixture's
+byte-preservation assertion. The fixture wrapped an existing descriptor in `wb`
+without truncating it, leaving trailing bytes when writing shorter JSON. It now
+explicitly truncates and asserts the exact corruption bytes before starting Setup;
+post-inspection record/data assertions remain mandatory. No product guard is
+weakened. Corrected native execution is pending.
+
+Independent inspection now also classifies a genuinely absent final `current`
+directory as an entirely missing payload, without creating it. Missing/redirected
+ancestors, wrong object types, aliases and denied access still refuse. Package
+intake continues to require an existing complete root. Two new portable cases
+pass (14 inventory cases total, two native skips locally). The exact-template
+missing-payload repair test now first requires an all-missing inspection, then a
+complete inspection after registered repair, with the user's disabled-startup
+choice and private data preserved. New native execution remains pending.

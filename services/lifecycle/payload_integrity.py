@@ -64,9 +64,17 @@ def _root(root):
     return root
 
 
-def _scan(root):
+def _scan(root, *, allow_missing=False):
     """Bound traversal, including empty directories, before hashing any file."""
-    root=_root(root);files={};directories=[];names=set();total=0
+    root=Path(root).absolute()
+    _root(root.parent)
+    try:_plain(root.lstat(),directory=True)
+    except FileNotFoundError:
+        # Only a genuinely absent final directory can represent a lost payload.
+        # A missing/redirected ancestor, denied access or non-directory refuses.
+        if allow_missing:return root,{},[]
+        raise
+    files={};directories=[];names=set();total=0
     pending=[root]
     while pending:
         directory=pending.pop()
@@ -188,7 +196,7 @@ def inspect_payload(root,release_bytes,inventory_bytes):
     Reparse paths, aliases, unreadable files and changed observations raise.
     """
     expected=validate_inventory(release_bytes,inventory_bytes)
-    root,actual,directories=_scan(root)
+    root,actual,directories=_scan(root,allow_missing=True)
     files=dict(expected['files'])
     for name,raw in ((METADATA,release_bytes),(INVENTORY,inventory_bytes)):
         files[name]={'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest()}

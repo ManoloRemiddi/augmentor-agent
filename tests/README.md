@@ -373,3 +373,15 @@ private record alias refusal, missing-runtime source assessment, foreign/malform
 source refusal and unchanged data. The full installed proof assesses its actual
 unresolved same-build journal. New native execution is pending; matching never
 implies apply/rollback authorization or publisher trust.
+
+
+Native `4b2bfaa` reaches successful source assessment and active-writer/record-alias
+refusal on both CPUs, then catches a fixture write that leaves trailing bytes.
+The corruption fixture now truncates its existing descriptor and checks exact
+intended bytes before launching Setup; post-inspection preservation checks remain.
+Two additional inventory cases cover an entirely absent final root (all entries
+missing, no directory creation) and refusal of missing ancestors/wrong root types.
+Local inventory: 14 cases, 12 pass and two native skips. Four package cases and
+script compilation pass. The native missing-payload repair fixture now requires
+inspection before and after restoration while retaining disabled startup/data;
+corrected/new native qualification remains pending.
