@@ -53,6 +53,16 @@ function DuplicateGate(SourceProcess, SourceHandle, TargetProcess: THandle;
   var TargetHandle: THandle; Access: Cardinal; Inherit: Boolean; Options: Cardinal): Boolean;
   external 'DuplicateHandle@kernel32.dll stdcall';
 
+function PublishReady: Boolean;
+begin
+  { Observation only: actual authority travels over the authenticated pipe.
+    Publish after SaveStringToFile has closed its exclusive writing handle.
+    FileExists alone does not mean a directly written file is readable yet. }
+  Result := SaveStringToFile('{#HandoffReady}.pending',
+    '{"pid":' + IntToStr(CurrentProcessId) + '}', False);
+  if Result then Result := RenameFile('{#HandoffReady}.pending', '{#HandoffReady}');
+end;
+
 function InitializeSetup: Boolean;
 var SourcePid: Int64; SourceHandle, SourceProcess: THandle; Count: Integer;
   SourceText, HandleText: String;
@@ -70,7 +80,7 @@ begin
     Result := PrepareAuthenticatedHandoff(SourceText, Cardinal(SourcePid), '{#HandoffRuntime}');
     if not Result then exit;
     AuthenticatedHandoff := True;
-    Result := SaveStringToFile('{#HandoffReady}', '{"pid":' + IntToStr(CurrentProcessId) + '}', False);
+    Result := PublishReady;
     if not Result then exit;
     for Count := 1 to 1000 do begin
       if FileExists('{#HandoffContinue}') then exit;
@@ -92,7 +102,7 @@ begin
   Result := DuplicateGate(SourceProcess, SourceHandle, CurrentProcess, StartupHandle, 0, False, 2);
   CloseGateFile(SourceProcess);
   if not Result then exit;
-  Result := SaveStringToFile('{#HandoffReady}', '{"pid":' + IntToStr(CurrentProcessId) + '}', False);
+  Result := PublishReady;
   if not Result then exit;
   for Count := 1 to 1000 do begin
     if FileExists('{#HandoffContinue}') then exit;

@@ -21,6 +21,7 @@ from lifecycle.windows_handoff import InstallerHandoff,HELLO
 from lifecycle.update_journal import UpdateJournal
 from platform_adapters import locks
 from platform_adapters.windows_identity import private_lock_descriptor
+from platform_adapters.private_files import atomic_json
 
 
 def main():
@@ -85,7 +86,7 @@ def main():
                     assert outsider.recv(1)==b'','An unrelated pipe client received handoff authority.'
                 assert not handoff.finished.is_set(),'An unrelated pipe client disrupted the prepared installer.'
                 if args.crash_before_apply:
-                    (args.state/'prepared.json').write_text(json.dumps({'pid':handoff.pid}),encoding='utf-8')
+                    atomic_json(args.state/'prepared.json', {'pid':handoff.pid})
                     deadline=time.monotonic()+20
                     while not (args.state/'crash-now').exists():
                         if time.monotonic()>=deadline:raise TimeoutError('The fixture did not retain the prepared Setup process.')
@@ -111,10 +112,10 @@ def main():
             if handoff:assert ready['pid']==handoff.pid
             process=installer.observe(ready['pid'])
             process.Close()
-            (args.state/'coordinator.json').write_text(json.dumps({'installerPid':installer.pid,
+            atomic_json(args.state/'coordinator.json', {'installerPid':installer.pid,
                 'setupPid':ready['pid'],'actualSetupInInstallerJob':True,'unrelatedPidRefused':True,
                 'coordinatorLifetimeLease':True,
-                'outerRunnerJobObserved':bool(in_job.value)}),encoding='utf-8')
+                'outerRunnerJobObserved':bool(in_job.value)})
             while not (args.state/'parent-release').exists():
                 if installer.poll() is not None:raise RuntimeError('The disposable installer exited before handoff.')
                 if time.monotonic()>=deadline:raise TimeoutError('The disposable handoff was not observed.')

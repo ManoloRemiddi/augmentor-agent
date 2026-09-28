@@ -417,3 +417,14 @@ an extension using synthetic Chromium resources and isolated registration keys,
 checks manifest-edit removal refusal, then checks normal pointer cleanup with
 persistent data retained. New execution is pending; actual browser UI/store
 acceptance and complete installed update/recovery remain open.
+
+## Closed fixture readiness publication
+
+At `6890375`, the [native fixture run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36398267565)
+passes completely on x64. ARM64 passes the new typed registry, long-path traversal
+and private manifest pinning cases, then encounters a sharing violation in the
+older observation file: `ready.json` exists while Inno still holds its writing
+handle. Fixture readiness now publishes by rename after the write closes. Python
+observations likewise publish complete JSON. No timeout is enlarged and no
+authority/installer assertion is removed. The actual authenticated pipe remains
+the handoff contract. Native rerun of this test correction is pending.

@@ -5,12 +5,23 @@ import ctypes
 from ctypes import wintypes
 import hashlib
 import json
+import os
 from pathlib import Path
 import sys
 import threading
 import time
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def publish_result(destination, result):
+    """Publish closed fixture observations, never half-written JSON."""
+    destination = Path(destination)
+    pending = destination.with_name(destination.name+'.pending')
+    with pending.open('w', encoding='utf-8') as stream:
+        json.dump(result, stream)
+        stream.flush(); os.fsync(stream.fileno())
+    os.replace(pending, destination)
 
 
 def dismiss_fixture_windows():
@@ -97,7 +108,7 @@ def sparkle(settings):
         if not done.wait(45): raise TimeoutError('No native updater result.')
         time.sleep(.3)  # Let the native callback return before cleanup joins its UI thread.
     finally:
-        Path(settings['progress']).write_text(json.dumps(result),encoding='utf-8')
+        publish_result(settings['progress'], result)
         dismiss_fixture_windows()
         function('cleanup')()
     return result
@@ -109,14 +120,14 @@ def main():
         # Run under the original native runtime, including real private-file
         # adapters. The minimal installed fixture intentionally omits pywin32.
         result = sparkle(json.loads(Path(arguments[0]).read_text(encoding='utf-8')))
-        Path(destination).write_text(json.dumps(result), encoding='utf-8')
+        publish_result(destination, result)
         return
     config = json.loads((ROOT/'fixture.json').read_text(encoding='utf-8'))
     result = {'version': config['version'], 'pid': __import__('os').getpid(),
               'runtime': sys.executable, 'scope': 'Disposable fixture only'}
     if action == '--hold':
         handle = shared_gate(config)
-        Path(destination).write_text(json.dumps(result), encoding='utf-8')
+        publish_result(destination, result)
         try:
             end = time.monotonic()+180
             while not Path(arguments[0]).exists() and time.monotonic() < end: time.sleep(.05)
@@ -127,7 +138,7 @@ def main():
         return
     if action == '--sparkle': result.update(sparkle(json.loads(Path(arguments[0]).read_text())))
     elif action != '--inspect': raise ValueError('Unknown fixture action')
-    Path(destination).write_text(json.dumps(result), encoding='utf-8')
+    publish_result(destination, result)
 
 
 if __name__ == '__main__':
