@@ -59,9 +59,10 @@ New source adds registered independent exact-build repair through the retained
 installer, including restoration without installed Python/Qt, launcher or version
 metadata. It refuses unfinished updates, unknown ownership and another selected
 source. [Native Inno at f61d32f](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36409313595)
-passes the x64 template cases, including registered repair without an installed
-runtime/metadata, pending-update/foreign-source refusal and preserved disabled
-startup. ARM64 and the complete installed proof are still running. Earlier native
+passes both CPU template cases at merge checkout
+`b05a0c9a9747d9e52cdbdb905bc1a992a8ad782c`, including registered repair without
+an installed runtime/metadata, pending-update/foreign-source refusal and preserved
+disabled startup. The complete installed proof is still running. Earlier native
 checks caught a Pascal Boolean mismatch and an unquoted ModifyPath; both are
 corrected. The pinned Inno
 compiler passes an isolated compile-only fixture; local 38 update tests, three
@@ -76,7 +77,8 @@ now stay in the temporary build directory; new template/full assertions for clea
 payload roots await native execution.
 
 Next: qualify registered independent exact-build repair; then
-finish cross-version recovery/rollback, obsolete-file cleanup and bounded cache pruning,
+finish recovery-aware startup, cross-version recovery/rollback, obsolete-file cleanup
+and bounded cache pruning,
 actual N-to-N+1 and the customer notification/update action. The current Inno
 backend replaces `current` in place and does not provide atomic version selection
 or power-loss recovery. Cache artifacts currently survive normal removal; connect

@@ -642,3 +642,21 @@ linker output at the installed payload root. Native builds now direct object and
 import/export-library output to their disposable compiler workspace. Template
 and full installed assertions require those byproducts absent; runtime libraries
 inside the pinned dependencies are unchanged. Native execution is pending.
+
+At `f61d32f`, [all native Inno/WinSparkle cases pass both CPUs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36409313595)
+at merge checkout `b05a0c9a9747d9e52cdbdb905bc1a992a8ad782c`. Downloaded reports
+confirm `registered-independent-repair-and-unresolved-update-refusal`, including
+missing/damaged metadata and runtime, missing whole payload, preserved disabled
+startup and persistent data, wrong selected source/registration and pending-record
+refusal, plus all earlier repair/removal/Finish/handoff/signature cases. This is
+the exact template with native bootstrap/private Python and inert other components.
+The [full f61d32f application run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36409313612)
+is still executing. Compiler-byproduct cleanup was added afterward at `6f4c291`.
+
+Remaining recovery admission: ordinary native startup currently checks maintenance
+leases, not the unresolved update journal. Before enabling customer auto-update,
+add recovery-aware startup plus an explicitly authorized independent local-health
+probe; do not let ordinary startup load a potentially partial replacement after
+maintenance exits. The manual repair/removal guard does not close this separate
+gap. Cross-version recovery must use the journal's recorded source and compatible
+persistent-data schemas, never infer a healthy source from `selected-installer`.
