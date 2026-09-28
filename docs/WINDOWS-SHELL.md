@@ -12,6 +12,12 @@ desktop module. Repeat app launches request Show. The shortcut activation helper
 uses the same authenticated instance endpoint to request Toggle; an absent
 endpoint permits a cold launch, while an uncertain delivery never gets replayed.
 
+The embedded launcher intentionally excludes arbitrary PATH/current-directory DLL
+search. Its Python entrypoint retains explicit DLL-directory handles for private
+Python, PySide and Shiboken libraries and selects the bundled Qt plugin directory.
+This allows separately loaded image plugins to resolve their Qt dependencies
+without restoring global DLL search. [Python DLL directories](https://docs.python.org/3/library/os.html#os.add_dll_directory).
+
 ## Keyboard ownership
 
 The existing Windows supervisor now hosts a Qt event loop and owns both native

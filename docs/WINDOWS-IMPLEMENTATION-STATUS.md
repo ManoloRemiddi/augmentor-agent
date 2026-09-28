@@ -543,3 +543,19 @@ customer package or public download changed.
 The complete local Python suite after this addition passes 584 tests with 19
 explicit platform/environment skips. Windows registration itself remains a native
 CI gate; the skipped cases are not counted as Windows behavior evidence.
+
+At `5c1ad26`, [desktop run 36363088603](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36363088603)
+passes on both x64 and ARM64, including real `RegisterHotKey` collision rejection,
+failed-save preservation, posted-message Qt dispatch, authenticated supervisor
+settings changes and source two-window hide/show. Physical key presses, login,
+tray and compiled-app rendering are still separate gates. The preceding
+`6cac5e5` runtime run also completes ARM64 with the same compiled zoom failure;
+all other runtime checks, including cross-user ACL denial, pass on both CPUs.
+
+Inspection of the exact pinned PySide 6.11.2 wheel confirms it relies on PATH for
+the SVG plugin's Qt DLL dependencies, while the native executable intentionally
+excludes PATH from DLL search. The next launcher explicitly registers only its
+bundled Python/Qt library directories and restricts Qt plugins to that payload.
+This addresses an identified packaging gap; the native zoom rerun must still
+confirm the original failure and the correction. The supervisor proof additionally
+restarts the owner and checks restoration of both saved shortcuts.

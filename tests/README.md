@@ -88,3 +88,14 @@ checks its rendered reply. Normal app launches reject the test operations.
 `test_ui_testing.py` verifies default denial, draft/dialog protection and
 non-overwriting screenshot output. See the
 [installed native acceptance](../docs/MACOS-DISTRIBUTION.md#september-26-follow-up-corrected-primary-mac-app-activated).
+
+### Windows shortcut and executable checks
+
+`test_windows_shortcuts.py` uses actual native registration, OS collision rejection,
+failed-save rollback and posted `WM_HOTKEY` messages through Qt. These messages
+are not physical keyboard input. `test_windows_supervisor.py` exercises both
+settings through the authenticated owner pipe and verifies restart persistence.
+The fast Windows desktop workflow runs these on x64 and ARM64. The full runtime
+workflow separately builds `Augmentor.exe` and invokes `windows-window-proof.py
+--launcher ...` to cover embedded Qt plugins and the shared Appearance control.
+Keep source-preview results separate from compiled and installed artifacts.

@@ -17,6 +17,34 @@ import traceback
 
 ROOT = Path(__file__).resolve().parents[1]
 APP_ID = 'com.augmentor.Agent'
+_dll_directories = []  # Retain AddDllDirectory cookies for the process lifetime.
+
+
+def configure_qt(root=ROOT):
+    """Supply explicit private DLL paths under the native launcher's safe search policy.
+
+    PySide adds its Qt DLL directory to PATH, but SetDefaultDllDirectories in
+    the embedding launcher deliberately excludes PATH/current-directory lookup.
+    Plugins such as SVG need their separately loaded Qt DLLs here as well.
+    """
+    root = Path(root).resolve()
+    site = root/'python/Lib/site-packages'
+    paths = [root/'python', site/'PySide6', site/'shiboken6']
+    plugins = site/'PySide6/plugins'
+    for path in [*paths, plugins]:
+        if not path.is_dir() or not path.resolve().is_relative_to(root):
+            raise ValueError('The private Qt runtime is incomplete. Repair this installation.')
+    handles = []
+    try:
+        for path in paths: handles.append(os.add_dll_directory(str(path)))
+    except BaseException:
+        for handle in handles: handle.close()
+        raise
+    _dll_directories.extend(handles)
+    os.environ['QT_PLUGIN_PATH'] = str(plugins)
+    os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = str(plugins/'platforms')
+    from PySide6.QtCore import QCoreApplication
+    QCoreApplication.setLibraryPaths([str(plugins)])
 
 
 def load_launcher():
@@ -55,6 +83,7 @@ def configure_qualification(root, release):
 def main():
     if sys.platform != 'win32': raise RuntimeError('Use the Augmentor package for this operating system.')
     sys.path[:0] = [str(ROOT/'services'), str(ROOT/'apps/native')]
+    configure_qt()
     release = preflight()
     args = list(sys.argv[1:])
     environment = None

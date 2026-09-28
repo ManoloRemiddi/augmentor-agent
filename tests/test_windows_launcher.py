@@ -6,7 +6,7 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 from augmentor_linux.managed_setup import WINDOWS_RUNTIME_PAYLOAD
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -24,6 +24,16 @@ components = load('launch-component.py')
 
 
 class WindowsLauncherTests(unittest.TestCase):
+    def test_partial_native_library_configuration_closes_search_handles(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for name in ('python/Lib/site-packages/PySide6/plugins', 'python/Lib/site-packages/shiboken6'):
+                (root/name).mkdir(parents=True)
+            handle = Mock()
+            with patch.object(launcher.os, 'add_dll_directory', create=True, side_effect=[handle, OSError('fixture failure')]):
+                with self.assertRaises(OSError): launcher.configure_qt(root)
+            handle.close.assert_called_once()
+
     def test_foreign_architecture_and_incomplete_payload_fail_before_launch(self):
         with tempfile.TemporaryDirectory() as temporary, patch.object(launcher.sysconfig, 'get_platform', return_value='win-arm64'):
             root = Path(temporary)

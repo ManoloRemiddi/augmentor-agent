@@ -79,6 +79,22 @@ class WindowsSupervisorTests(unittest.TestCase):
                 for process in processes:
                     _out, errors = process.communicate(timeout=10)
                     self.assertEqual(process.returncode, 0, errors.decode('utf-8', errors='replace'))
+                restarted = subprocess.Popen([sys.executable, '-I', '-Xutf8', '-B',
+                    str(ROOT/'services/windows_supervisor.py')], env=env, stdin=subprocess.DEVNULL,
+                    stdout=subprocess.PIPE, stderr=subprocess.PIPE, creationflags=subprocess.CREATE_NO_WINDOW)
+                processes.append(restarted)
+                deadline = time.monotonic()+15
+                while True:
+                    try:
+                        restored = owner.request('shortcut-status', owner=endpoint, instance='main'); break
+                    except FileNotFoundError:
+                        if time.monotonic() > deadline: self.fail('No restarted shortcut owner became ready.')
+                        time.sleep(.1)
+                self.assertTrue(restored['active']); self.assertEqual(restored['key'], first['key'])
+                self.assertEqual(owner.request('shortcut-status', owner=endpoint, instance='secondary')['key'], second['key'])
+                owner.request('exit-if-empty', owner=endpoint)
+                _out, errors = restarted.communicate(timeout=10)
+                self.assertEqual(restarted.returncode, 0, errors.decode('utf-8', errors='replace'))
             finally:
                 for process in processes:
                     if process.poll() is None: process.kill()
