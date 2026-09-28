@@ -204,6 +204,11 @@ def main():
                 close_preview()
             except Exception: pass
         report.setdefault('passed',False);report['stages']=stages
+        if not report['passed']:
+            # Only logs from this compiled-in, disposable preview. Preserve a
+            # bounded stack/error sample when its process fails to exit.
+            report['fixtureDiagnostics']={path.name:path.read_text(encoding='utf-8',errors='replace')[-12000:]
+                for path in (data/'state/logs').glob('desktop.*.log')}
         (out/'installed-application.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
     print(json.dumps({'passed':report['passed'],'stages':stages}))
 

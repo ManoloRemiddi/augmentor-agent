@@ -172,9 +172,17 @@ def main():
             try:secondary.control('status')
             except (FileNotFoundError,ValueError):pass
             else:raise AssertionError('An exited window observation accepted a later request.')
+        # Also observe legacy idle close. Preview has no controller to call
+        # QApplication.quit(), so closing its widget alone leaves a process.
+        cleared=command('main','ui-test:'+json.dumps({'action':'draft','expected':'Keep this draft','text':''}))
+        assert cleared['ok'],cleared
+        closed=command('main','maintenance.close')
+        assert closed['accepted'] and not closed['busy'],closed
+        assert children[0].wait(timeout=10)==0, 'The idle preview acknowledged close but did not exit.'
         report.update(passed=True, distinctWindows=True, repeatedLaunchPreservedOwner=True,
             draftBlockedMaintenance=True, zoomPreservedDraft=True, shortcutActivationToggle=True,
-            reversibleWindowAdmission=True, preparedPreviewExitCode=0, initial=initial, zoom=zoomed['result'])
+            reversibleWindowAdmission=True, preparedPreviewExitCode=0, idlePreviewExitCode=0,
+            initial=initial, zoom=zoomed['result'])
     except BaseException:
         report['childExitCodes'] = [child.poll() for child in children]
         for log in logs: log.flush()
@@ -185,8 +193,8 @@ def main():
         raise
     finally:
         for participant in participants:participant.close()
-        # The remaining preview retains its deliberate draft. Fault cleanup
-        # stops only the exact disposable processes created by this probe.
+        # Fault cleanup stops only the exact disposable preview processes
+        # created by this probe; the passing path observes both normal exits.
         for process in children:
             if process.poll() is None: process.kill()
             process.wait(timeout=10)

@@ -78,8 +78,11 @@ Eleven new local tests execute real Node Ed25519 verification and private storag
 covering valid delivery, tampering, wrong/missing keys, wrong CPU/OS/channel,
 downgrades/relabeling, schema/protocol/build mismatch, expiry, malformed archives,
 unsafe entries and inherited preload refusal. Together with journal/coordinator
-checks, 27 local tests pass. Native x64/ARM64 execution, including held-file
-write/deletion refusal and actual WinSparkle ZIP callbacks, is pending.
+checks, 27 local tests pass. Native x64/ARM64 execution passes at `594b56d`: the [fast workflow](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36394998226)
+includes real held-file write/deletion refusal, and the [Inno workflow](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36394998456)
+executes actual WinSparkle ZIP callbacks with all four acceptance/refusal cases.
+Both workflows also pass at `98891c1`; its newly bundled updater DLL still needs
+full payload/import qualification.
 
 Native fixtures use temporary signing keys, synthetic release identities and an
 explicit synthetic OS-build policy so the Server x64 runner can exercise metadata

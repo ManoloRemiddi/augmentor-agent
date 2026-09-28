@@ -620,3 +620,19 @@ private directory. A subsequent update can claim a new active record. An archive
 failure retains either the active completed record or its archive; this method
 never retries an uncertain write or infers installer completion from a saved PID.
 A record alone remains insufficient authority to launch, replay or roll back.
+
+## Controller-free preview maintenance close
+
+Full installed Windows x64 qualification at `594b56d` found that legacy idle
+`maintenance.close` acknowledged and closed a preview widget while leaving its
+process alive. Preview has no controller, and the shared app intentionally keeps
+its event loop alive when the last window is hidden. The explicit maintenance
+finish callback now rechecks local work and quits only after an accepted window
+close, after replying/disconnecting. The token-based commit path shares this
+callback. Shortcut hiding retains its existing behavior; drafts and reservations
+still refuse legacy maintenance.
+
+An actual two-preview-process portable test reproduces the old exit timeout and
+passes after the fix, observing normal exits from both token commit and legacy
+idle close. Four desktop maintenance tests also pass. Both native Windows and
+the complete installed repair/apply/removal sequence need new execution.

@@ -1362,6 +1362,12 @@ def _main(startup=None):
             app.aboutToQuit.connect(app.instance_lock.close)
     window = Window(preview=args.preview or bool(args.screenshot),harness=args.harness)
     if hasattr(app, 'instance_server'):
+        def finish_maintenance():
+            # Reply/disconnect first, then recheck work before closing. Preview
+            # has no controller, and last-window-close intentionally does not
+            # quit this app (shortcut hiding must keep a conversation alive).
+            if not window.maintenance_state(include_reservation=False)['busy'] and window.close():
+                app.quit()
         def activate():
             client = app.instance_server.nextPendingConnection()
             if client:
@@ -1383,8 +1389,6 @@ def _main(startup=None):
                     except Exception as error:response={'ok':False,'error':str(error)}
                     client.write(json.dumps(response).encode()+b'\n');client.waitForBytesWritten(500)
                     if response.get('ok') and result['phase']=='closing':
-                        def finish_maintenance():
-                            if window.close():app.quit()
                         QTimer.singleShot(0,finish_maintenance)
                 elif command in ('maintenance.status','maintenance.close','maintenance.recover'):
                     state=window.maintenance_state()
@@ -1404,7 +1408,7 @@ def _main(startup=None):
                         'voiceOutputUnderflows':window.voice_dialog.output_underflows if window.voice_dialog else 0}).encode()+b'\n')
                     client.waitForBytesWritten(500)
                     if command=='maintenance.close' and not busy:
-                        window.close()
+                        QTimer.singleShot(0,finish_maintenance)
                 elif window.maintenance.phase()!='ready':
                     client.write(json.dumps({'ok':False,'error':'Augmentor maintenance is in progress. This request was not started.'}).encode()+b'\n')
                     client.waitForBytesWritten(500)

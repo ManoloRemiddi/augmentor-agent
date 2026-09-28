@@ -375,3 +375,13 @@ metadata and retained installer bytes independently of feed labels. New native
 WinSparkle ZIP callback fixtures are scheduled on both CPUs. Local real-signature
 and storage tests pass; native execution, product UI wiring, N-to-N+1 and recovery
 remain pending. WinSparkle never receives default installer-execution authority.
+
+## First installed preview and busy-maintenance evidence
+
+Full x64 `594b56d` now passes actual payload integrity, stable application name,
+shortcut target/arguments and native installed preview launch. Repair and removal
+both refuse while its draft is present, preserving the process, draft and data.
+The next assertion exposes a shared controller-free preview close timeout, before
+repair or coordinated apply. It is reproduced and corrected in the shared UI;
+portable real-process checks pass, and native rerun is pending. Failed installed
+proofs now retain bounded logs from only their disposable preview directory.
