@@ -22,6 +22,66 @@ from platform_adapters.transport import LocalSocket
 
 
 class LocalServiceTests(unittest.TestCase):
+    def test_memory_endpoint_waits_for_journal_initialization(self):
+        with tempfile.TemporaryDirectory(prefix='memory cold startup ') as temporary:
+            root=private_directory(Path(temporary)/'private')
+            state,data=private_directory(root/'state'),private_directory(root/'data')
+            entered,resume=root/'initializing',root/'resume'
+            env={**os.environ,'AUGMENTOR_SHARED_STATE':str(state),'AUGMENTOR_SHARED_DATA':str(data)}
+            # Pause the actual constructor in this disposable process. No product
+            # environment switch, elapsed-time guess or additional request replay.
+            bootstrap='''import faulthandler, runpy, sys, time
+from pathlib import Path
+faulthandler.dump_traceback_later(4, repeat=True)
+sys.path.insert(0, str(Path(sys.argv[1]).parents[1]))
+from memory.hindsight import HindsightMemory
+original = HindsightMemory.__init__
+def initialize(self, *args, **kwargs):
+    Path(sys.argv[2]).touch()
+    deadline = time.monotonic()+10
+    while not Path(sys.argv[3]).exists():
+        if time.monotonic() >= deadline: raise TimeoutError('Fixture initialization gate')
+        time.sleep(.01)
+    original(self, *args, **kwargs)
+HindsightMemory.__init__ = initialize
+runpy.run_path(sys.argv[1], run_name='__main__')
+'''
+            with (root/'service.log').open('w',encoding='utf-8') as log:
+                child=subprocess.Popen([sys.executable,'-Xutf8','-B','-c',bootstrap,
+                    str(ROOT/'services/memory/service.py'),str(entered),str(resume)],
+                    env=env,stdin=subprocess.DEVNULL,stdout=log,stderr=log,
+                    **({'creationflags':subprocess.CREATE_NO_WINDOW} if sys.platform=='win32' else {}))
+                try:
+                    deadline=time.monotonic()+10
+                    while not entered.exists():
+                        if time.monotonic()>=deadline or child.poll() is not None:
+                            self.fail('Memory did not enter initialization')
+                        time.sleep(.01)
+                    with LocalSocket() as connection:
+                        connection.settimeout(.5)
+                        with self.assertRaises((FileNotFoundError,ConnectionRefusedError)):
+                            connection.connect(state/'dual-memory.sock')
+                    resume.touch()
+                    deadline=time.monotonic()+10
+                    while True:
+                        connection=LocalSocket();connection.settimeout(5)
+                        try:connection.connect(state/'dual-memory.sock');break
+                        except (FileNotFoundError,ConnectionRefusedError):
+                            connection.close()
+                            if time.monotonic()>=deadline or child.poll() is not None:raise
+                            time.sleep(.01)
+                    with connection:
+                        connection.sendall((json.dumps({'protocol':'augmentor-prompts/1','id':'cold-start',
+                            'method':'memory.dual.describe','params':{}})+'\n').encode())
+                        with connection.makefile('rb') as reader:response=json.loads(reader.readline(1024*1024))
+                    self.assertEqual(response['result']['engine'],'hindsight')
+                except BaseException:
+                    log.flush();print((root/'service.log').read_text(encoding='utf-8'),file=sys.stderr)
+                    raise
+                finally:
+                    if child.poll() is None:child.terminate()
+                    child.wait(timeout=10)
+
     def test_memory_maintenance_preserves_journal_and_saved_processing_preference(self):
         with tempfile.TemporaryDirectory(prefix='memory maintenance ') as temporary:
             root=private_directory(Path(temporary)/'private')
@@ -42,7 +102,8 @@ class LocalServiceTests(unittest.TestCase):
                     if 'error' in response:raise ContractError(response['error']['message'])
                     return response['result']
                 def start():
-                    child=subprocess.Popen([sys.executable,'-Xutf8','-B',str(ROOT/'services/memory/service.py')],
+                    bootstrap='import faulthandler, runpy, sys; faulthandler.dump_traceback_later(4, repeat=True); runpy.run_path(sys.argv[1], run_name="__main__")'
+                    child=subprocess.Popen([sys.executable,'-Xutf8','-B','-c',bootstrap,str(ROOT/'services/memory/service.py')],
                         env=env,stdin=subprocess.DEVNULL,stdout=log,stderr=log,
                         **({'creationflags':subprocess.CREATE_NO_WINDOW} if sys.platform=='win32' else {}))
                     children.append(child);deadline=time.monotonic()+10
@@ -76,6 +137,9 @@ class LocalServiceTests(unittest.TestCase):
                     start()
                     self.assertFalse(call('memory.dual.processing')['paused'])
                     self.assertEqual(call('memory.dual.export',{'session':'retained'}),before)
+                except BaseException:
+                    log.flush();print((root/'service.log').read_text(encoding='utf-8'),file=sys.stderr)
+                    raise
                 finally:
                     for child in children:
                         if child.poll() is None:child.terminate()

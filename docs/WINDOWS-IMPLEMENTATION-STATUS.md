@@ -44,6 +44,12 @@ its terminal report separately.
 The prior full `6890375` ARM64 artifact confirms the same repair/drain/apply/health
 and archival stages as x64, then the since-corrected normal-removal refusal.
 
+The shared memory service now initializes its journal before publishing a
+connectable endpoint. A constructor-gated child-process test reproduces the old
+race and passes with the correction; local prompt/memory restart and lifecycle
+checks pass. Native rerun must still determine whether this resolves the earlier
+x64 startup timeout. Failed fixture runs now preserve stack/log diagnostics.
+
 Current source adds the standard checked **Open Augmentor** finish option for
 interactive installation/repair. It releases native maintenance before launching
 the installed executable. Silent/coordinated application cannot reopen before

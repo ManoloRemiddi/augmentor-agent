@@ -78,8 +78,11 @@ if __name__ == '__main__':
         raise SystemExit(0)
     endpoint = state / 'dual-memory.sock'
     prepare_endpoint(endpoint)
+    # Journal/schema initialization can involve slow durable disk operations.
+    # Do not publish a connectable endpoint until requests can be served.
+    memory = HindsightMemory(data / 'dual-memory.sqlite3')
     server = Server(str(endpoint), Handler)
-    server.memory = HindsightMemory(data / 'dual-memory.sqlite3')
+    server.memory = memory
     gateway = None
     configuration = server.memory.processing.configuration
     if configuration.get('processingProtocol') == 'augmentor-memory-processing/1':
