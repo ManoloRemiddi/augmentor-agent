@@ -207,3 +207,10 @@ It confirms the observed server exits when the owner's whole Job drains, then
 cancels owner reservation before explicitly restarting DSH. Linux/macOS keep
 their existing direct component proof. No external provider or voice engine is
 substituted for this deterministic owned-DSH qualification.
+
+`windows-inno-proof.py` additionally invokes the disposable
+`windows-inno-handoff-proof.py` coordinator. The actual extracted Inno Setup
+process duplicates its startup writer, remains protected after that coordinator
+exits or is deliberately crashed, completes repair and releases the gate. An
+invalid handle is refused before a version change. These tests do not use a
+customer installer or production handoff authentication; those remain separate.

@@ -72,6 +72,16 @@ full DSH maintenance/restart proof now uses this client and checks its retained
 process exits with the complete Job. These new HTTP/DSH assertions await native
 execution; owned voice startup/provisioning and global coordination remain open.
 
+At `f08c4f0`, both [fast Windows jobs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36380441839)
+pass the actual TCP-peer/credential-refusal/reused-port tests. Its full owned-DSH
+integration is running. Full runtime `3a379a2` now passes both CPUs in
+[36379432589](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36379432589).
+Linux and Mac regressions pass at `6531e2d`, including the corrected Chromium
+proof. Current installer qualification adds gate transfer into Inno's actual
+extracted Setup process and checks retention across coordinator exit/crash.
+Native execution of this new Inno case is pending; production handoff identity,
+coordinated apply, health and rollback remain open.
+
 ## Baseline and environments (W0)
 
 Implementation branch `feat/windows` starts from reviewed `main` `b8e36a4` plus

@@ -138,3 +138,24 @@ checkout above. The installer refuses while either live holder is present,
 releases admission after injected failure, and completes idle repair/update/
 removal with persistent settings unchanged. Physical installer interaction,
 full-app process coordination and failed-health rollback remain open.
+
+## Independent Setup handoff qualification
+
+The startup writer now has separate native sharing/inheritance evidence on both
+CPUs at `e4593b1`. Current source extends the Inno fixture to the actual extracted
+Setup process: it explicitly duplicates the disposable coordinator's handle in
+`InitializeSetup`, then acknowledges before the coordinator exits normally or is
+deliberately crashed. The test observes that exact Setup process, verifies new
+startup readers and competing writers remain refused, releases the fixture to
+complete repair, and checks the gate is released after normal Setup exit. An
+invalid transfer must abort before changing the installed fixture version.
+
+This qualification intentionally does not rely on the bootstrap executable
+inheriting a handle into its extracted child. It follows Inno's documented
+[initialization/finalization events](https://jrsoftware.org/ishelp/topic_scriptevents.htm)
+and Windows [DuplicateHandle](https://learn.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-duplicatehandle).
+Native execution is pending. Its raw PID/handle arguments and compiled fixture
+acknowledgment paths are **not a production handoff protocol**. Customer integration
+still requires authenticated coordinator/installer identity, verified artifact
+binding, complete app drain, durable transaction/health recovery and rollback.
+No customer installer or updater callback is enabled by this fixture.

@@ -28,13 +28,54 @@ Source: "{#PayloadDirectory}\*"; DestDir: "{app}"; Flags: recursesubdirs createa
 Name: "{userprograms}\{#FixtureId}"; Filename: "{app}\AugmentorFixture.exe"
 
 [Code]
-var GateHandle: THandle;
+var GateHandle, StartupHandle: THandle;
 
 function OpenGateFile(Name: String; Access, Sharing: Cardinal;
   Security: NativeInt; Creation, Attributes: Cardinal; Template: THandle): THandle;
   external 'CreateFileW@kernel32.dll stdcall';
 function CloseGateFile(Handle: THandle): Boolean;
   external 'CloseHandle@kernel32.dll stdcall';
+function OpenSourceProcess(Access: Cardinal; Inherit: Boolean; Pid: Cardinal): THandle;
+  external 'OpenProcess@kernel32.dll stdcall';
+function CurrentProcess: THandle;
+  external 'GetCurrentProcess@kernel32.dll stdcall';
+function CurrentProcessId: Cardinal;
+  external 'GetCurrentProcessId@kernel32.dll stdcall';
+function DuplicateGate(SourceProcess, SourceHandle, TargetProcess: THandle;
+  var TargetHandle: THandle; Access: Cardinal; Inherit: Boolean; Options: Cardinal): Boolean;
+  external 'DuplicateHandle@kernel32.dll stdcall';
+
+function InitializeSetup: Boolean;
+var SourcePid: Int64; SourceHandle, SourceProcess: THandle; Count: Integer;
+  SourceText, HandleText: String;
+begin
+  { Disposable transfer proof only. Production still needs authenticated
+    coordinator/installer identity, artifact trust and transaction recovery.
+    Duplicate in the actual Setup process; do not assume its loader inherited
+    an incoming kernel handle through its extraction/bootstrap subprocess. }
+  Result := True;
+  SourceText := ExpandConstant('{param:startupowner|}');
+  HandleText := ExpandConstant('{param:startuphandle|}');
+  if (SourceText = '') and (HandleText = '') then exit;
+  Result := False;
+  SourcePid := StrToInt64Def(SourceText, -1);
+  if (SourcePid < 1) or (SourcePid > 4294967295) then exit;
+  SourceHandle := THandle(StrToInt64Def(HandleText, 0));
+  if SourceHandle = 0 then exit;
+  SourceProcess := OpenSourceProcess($0040, False, Cardinal(SourcePid));
+  if SourceProcess = 0 then exit;
+  Result := DuplicateGate(SourceProcess, SourceHandle, CurrentProcess, StartupHandle, 0, False, 2);
+  CloseGateFile(SourceProcess);
+  if not Result then exit;
+  Result := SaveStringToFile('{#HandoffReady}', '{"pid":' + IntToStr(CurrentProcessId) + '}', False);
+  if not Result then exit;
+  for Count := 1 to 1000 do begin
+    if FileExists('{#HandoffContinue}') then exit;
+    Sleep(20);
+  end;
+  Log('Disposable handoff was not released; aborting without file changes.');
+  Result := False;
+end;
 
 function AcquireGate: Boolean;
 begin
@@ -67,6 +108,10 @@ end;
 procedure DeinitializeSetup;
 begin
   ReleaseGate;
+  if StartupHandle <> 0 then begin
+    CloseGateFile(StartupHandle);
+    StartupHandle := 0;
+  end;
 end;
 
 function InitializeUninstall: Boolean;

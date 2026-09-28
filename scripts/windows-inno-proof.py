@@ -61,6 +61,9 @@ def main():
     registry = r'Software\Microsoft\Windows\CurrentVersion\Uninstall'+'\\'+identity+'_is1'
     data, payload, install = out/'persistent', out/'payload', out/'installed café with spaces'
     data.mkdir(); payload.mkdir()
+    sys.path.insert(0,str(ROOT/'services'))
+    from platform_adapters.windows_identity import private_directory
+    handoff_state=private_directory(data/'handoff')
     gate = data/'admission.lock'; gate.touch()
     sentinel = data/'settings.json'; sentinel.write_text('{"model":"retain this selection"}')
     sentinel_bytes = sentinel.read_bytes()
@@ -92,6 +95,7 @@ def main():
         (payload/'fixture.json').write_text(json.dumps({'version':version, 'gate':str(gate)}))
         definitions = {'FixtureId':identity, 'FixtureVersion':version, 'InstallDirectory':install,
                        'PayloadDirectory':payload, 'OutputDirectory':out/'installers', 'GateFile':gate,
+                       'HandoffReady':handoff_state/'ready.json', 'HandoffContinue':handoff_state/'continue',
                        'AllowedArchitecture':'arm64' if args.arch == 'arm64' else 'x64os'}
         with (out/('compile-'+version+'.log')).open('w', encoding='utf-8') as log:
             run([compiler/'ISCC.exe', *['/D'+key+'='+str(value) for key,value in definitions.items()],
@@ -130,7 +134,11 @@ def main():
         holder = subprocess.Popen([str(app),'--hold',str(report),str(stop)])
         holders.append((holder,stop)); wait_for(report); stop.touch(); assert holder.wait(timeout=15)==0
         setup(0, 'idle-repair'); assert inspect('repair')['version'] == '0.0.1'
+        assert setup(1,'invalid-handoff','/startupowner='+str(os.getpid()),'/startuphandle=0',expected=None).returncode!=0
+        assert inspect('after-invalid-handoff')['version']=='0.0.1'
         setup(1, 'idle-update'); assert inspect('updated')['version'] == '0.0.2'
+        handoff=prove_handoff(installers[1],handoff_state,out)
+        assert inspect('after-handoff')['version']=='0.0.2'
         assert sentinel.read_bytes() == sentinel_bytes
         run([uninstaller,*flags,'/LOG='+str(out/'idle-uninstall.log')])
         assert not app.exists() and sentinel.read_bytes() == sentinel_bytes
@@ -144,6 +152,7 @@ def main():
                   'tools':pins, 'twoSimultaneousHolders':True, 'busyRepairUpdateUninstallRefused':True,
                   'failedMaintenanceReleasesAdmission':True, 'idleRepairUpdateUninstall':True,
                   'persistentDataPreserved':True, 'nativeUpdater':native_update,
+                  'independentSetupHandoff':handoff,
                   'productionInstallerQualified':False,
                   'limits':['Disposable unsigned fixture; no full Augmentor shutdown/migration/rollback or ordinary-user client acceptance.',
                             'Updater inspects signed downloads in a callback; actual installer lifecycle is exercised separately.',
@@ -156,6 +165,51 @@ def main():
             if process.poll() is None: process.wait(timeout=15)
         if (install/'unins000.exe').is_file(): run([install/'unins000.exe',*flags],expected=None)
         if (compiler/'unins000.exe').is_file(): run([compiler/'unins000.exe',*flags],expected=None)
+
+
+def prove_handoff(installer,state,out):
+    """Actual Inno loader + Setup process, not just a Python recipient."""
+    import win32api,win32con,win32event,win32process
+    from lifecycle.windows_startup import Startup
+    for crash in (False,True):
+        for name in ('ready.json','coordinator.json','continue','parent-release'):
+            (state/name).unlink(missing_ok=True)
+        parent=subprocess.Popen([sys.executable,'-I','-Xutf8','-B',str(ROOT/'scripts/windows-inno-handoff-proof.py'),
+            '--installer',str(installer),'--state',str(state),'--log',str(out/('handoff-crash.log' if crash else 'handoff-exit.log'))],
+            stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        setup_process=None;loader=None
+        try:
+            info=wait_for(state/'coordinator.json');ready=wait_for(state/'ready.json')
+            loader=win32api.OpenProcess(win32con.SYNCHRONIZE|win32con.PROCESS_QUERY_LIMITED_INFORMATION,False,info['installerPid'])
+            setup_process=win32api.OpenProcess(win32con.SYNCHRONIZE|win32con.PROCESS_QUERY_INFORMATION|
+                win32con.PROCESS_VM_READ,False,ready['pid'])
+            assert Path(win32process.GetModuleFileNameEx(setup_process,0)).name.lower().endswith('.tmp'), 'The actual extracted Setup process must adopt the handle.'
+            assert ready['pid']!=parent.pid and ready['pid']!=info['installerPid']
+            if crash:parent.kill()  # Deliberate disposable coordinator crash.
+            else:(state/'parent-release').write_text('release',encoding='utf-8')
+            _out,errors=parent.communicate(timeout=10)
+            if not crash:assert parent.returncode==0,errors.decode('utf-8',errors='replace')
+            assert win32event.WaitForSingleObject(setup_process,0)==win32event.WAIT_TIMEOUT
+            for maintenance in (False,True):
+                try:
+                    with Startup(state,maintenance=maintenance):pass
+                except OSError as error:assert error.winerror==32,error
+                else:raise AssertionError('Inno did not retain startup exclusion after the coordinator exited.')
+            (state/'continue').write_text('continue',encoding='utf-8')
+            assert win32event.WaitForSingleObject(setup_process,30000)==win32event.WAIT_OBJECT_0
+            assert win32process.GetExitCodeProcess(setup_process)==0
+            assert win32event.WaitForSingleObject(loader,10000)==win32event.WAIT_OBJECT_0
+            with Startup(state):pass
+        finally:
+            (state/'continue').write_text('continue',encoding='utf-8')
+            if parent.poll() is None:parent.kill()
+            parent.communicate(timeout=10)
+            for process in (setup_process,loader):
+                if process is not None:win32event.WaitForSingleObject(process,30000);process.Close()
+    return {'actualExtractedSetupOwnsGate':True,'parentNormalExit':True,'parentCrash':True,
+        'newStartupAndSecondWriterRefused':True,'completedRepairReleasesGate':True,
+        'invalidTransferRefusedBeforeVersionChange':True,
+        'productionHandoffAuthentication':False}
 
 
 def prove_updater(payload, out, signer, installer, identity, arch):

@@ -77,6 +77,15 @@ HTTP and DSH execution is pending. Voice still needs an owned Windows service
 and speech provisioning; do not assume it belongs to the DSH Job merely because
 the plugin is installed. Continue global reservation, commit/apply and rollback.
 
+At `f08c4f0`, both fast Windows jobs pass the real TCP ownership tests; full DSH
+integration is running. Full `3a379a2` runtime and Linux/Mac `6531e2d` regressions
+pass. Current source extends the Inno fixture to explicitly duplicate the startup
+writer into the actual extracted Setup process and preserve it after coordinator
+exit/crash. This is a pending native mechanism proof, with intentionally
+fixture-only PID/handle arguments. Do not promote that unauthenticated interface
+into production; installer identity, artifact binding and recovery still need
+the real transaction protocol. Browser commit remains disabled.
+
 Current Windows worktree: `feat/windows` in an isolated canonical-repository
 checkout; draft [PR #20](https://github.com/ManoloRemiddi/augmentor-agent/pull/20).
 At `523fe9a`, real hosted x64/ARM64 runtime and disposable two-version installer
