@@ -12,7 +12,15 @@ W0/W1 have started with isolated baseline checks, hash-locked native x64/ARM64
 runtime candidates and hosted qualification jobs. No Windows app or customer
 release is complete. Preserve existing installations and unrelated open work.
 
-Latest source, September 28: browser idle commit now rechecks all documents,
+Current source adds the [owned Windows voice bridge](LIFECYCLE.md#windows-owned-voice-bridge)
+to the background owner and observed maintenance graph. Five local private-profile/
+ownership tests and existing preparation/supervisor/launcher checks pass. Actual
+native service ticket/refusal/commit/restart assertions await x64/ARM64 execution;
+speech engines and physical audio remain open. Full runtime at `e63312b` now
+passes both CPUs, including corrected assembled graph and screenshot assertions.
+Continue global commit/apply, recovery and the remaining shared feature ledger.
+
+Latest browser source, September 28: browser idle commit now rechecks all documents,
 delivers its reply through the private owner, and drains the native host naturally.
 Actual isolated Chromium proves observed owner exit, same-page reconnection and
 draft/conversation preservation; all 265 Node/Browser and seven private-transport

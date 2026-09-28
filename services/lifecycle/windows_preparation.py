@@ -4,8 +4,8 @@
 This context never commits shutdown, applies an installer or changes selection.
 It requires a running owned supervisor. Missing ownership is a refusal, not
 permission to adopt external services. Startup stays fenced throughout discovery,
-reservation and cleanup. A full installation transaction still needs owned voice,
-browser commit, independent installer handoff and the final installation lease.
+reservation and cleanup. A full installation transaction still needs global
+commit, independent installer integration and the final installation lease.
 """
 import threading
 
@@ -14,6 +14,7 @@ from .reservations import Reservations
 from .windows_startup import Startup
 from .windows_components import discover_owner,discover_windows,discover_browsers,discover_companions
 from .windows_dsh import discover_dsh
+from .windows_voice import discover_voice
 
 
 class WindowsPreparation:
@@ -21,7 +22,7 @@ class WindowsPreparation:
         self.root,self.runtime,self.shared,self.state=root,runtime,shared,state
         self.reservations=Reservations()
         self.gate=None;self.observations=[];self.owner=None
-        self.windows=[];self.browsers=[];self.companions=[];self.dsh=None
+        self.windows=[];self.browsers=[];self.companions=[];self.dsh=None;self.voice=None
         self.entered=False;self.closed=False;self.cleanup_thread=None
 
     def reserve(self,items):
@@ -44,6 +45,8 @@ class WindowsPreparation:
             self.browsers=self.reserve(discover_browsers(self.root,self.runtime))
             self.dsh=discover_dsh(self.root,self.state,self.owner)
             if self.dsh is not None:self.reserve([self.dsh])
+            self.voice=discover_voice(self.root,self.owner)
+            if self.voice is not None:self.reserve([self.voice])
             self.companions=self.reserve(discover_companions(self.root,self.shared,self.owner))
             self.check()
             return self

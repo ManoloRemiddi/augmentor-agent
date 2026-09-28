@@ -7,7 +7,17 @@ connect a Windows machine for joint physical testing afterward. Follow the full
 [implementation plan](WINDOWS-IMPLEMENTATION-PLAN.md); this ledger does not narrow
 its outcome. No Windows customer release or installed-product claim exists yet.
 
-Latest checkpoint, September 28: idle browser commit rechecks context inventory
+Current source, September 28: managed DSH now starts its bundled Resonant loopback
+bridge through the existing owner, with one retained Job, private profile and
+occupied-port refusal. Kernel-bound voice maintenance joins graph preparation.
+Five local profile/ownership refusal tests, two graph failure tests, six portable
+owner tests and five launcher tests pass (two native owner tests skip on Linux).
+Assembled real-service graph/ticket/commit/restart assertions are added; native
+execution is pending. This does not qualify Windows ASR/TTS engines or audio.
+Full runtime at [`e63312b`](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36383783733)
+now passes both CPUs, including corrected graph and capture assertions.
+
+Latest browser checkpoint, September 28: idle browser commit rechecks context inventory
 and page state, replies through its private owner, then drains the native host
 naturally. Actual local Chromium verifies retained-process exit, same-page
 reconnection, a post-commit draft and selected conversation preservation. All

@@ -33,7 +33,7 @@ class SupervisorSafetyTests(unittest.TestCase):
         supervisor.child=Mock();supervisor.child.poll.return_value=None
         supervisor.child.drained.return_value=False
         self.assertEqual(control('prepare')['phase'],'prepared')
-        for action in ('start-dsh','start-prompts','start-memory','stop-failed-setup','exit-if-empty'):
+        for action in ('start-dsh','start-voice','start-prompts','start-memory','stop-failed-setup','exit-if-empty'):
             with self.assertRaises(owner.MaintenanceBusy):supervisor.dispatch({'action':action})
         with self.assertRaises(owner.MaintenanceBusy):
             supervisor.dispatch({'action':'shortcut-save','instance':'main','sequence':'Ctrl+Alt+Space'})

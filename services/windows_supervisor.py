@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import socketserver
+import socket
 import subprocess
 import sys
 import threading
@@ -128,6 +129,9 @@ class Supervisor:
         self.shell = shell
         self.admission = admission or Admission()
         self.child = None
+        self.voice = None
+        self.voice_profile = None
+        self.voice_exit = None
         self.companions = {}
         self.companion_exits = {}
         self.exit_code = None
@@ -135,6 +139,8 @@ class Supervisor:
         self.shutdown = threading.Event()
 
     def status(self):
+        if self.voice and self.voice.drained():
+            self.voice_exit=self.voice.wait_graceful();self.voice=None
         if self.child and self.child.drained():
             self.exit_code = self.child.wait_graceful()
             self.child = None
@@ -142,7 +148,9 @@ class Supervisor:
             if child.drained():
                 self.companion_exits[name] = child.wait_graceful()
                 del self.companions[name]
-        return {'dsh': {'running': bool(self.child),
+        return {'voice': {'running':bool(self.voice),'exitCode':self.voice_exit,
+                          **(self.voice_profile or {})},
+                'dsh': {'running': bool(self.child),
                         'exitCode': self.exit_code},
                 'companions': {name: {'running': name in self.companions,
                     'ownerProcessPid': self.companions[name].pid if name in self.companions else None,
@@ -175,6 +183,29 @@ class Supervisor:
             child.terminate()
             self.companion_exits[name] = child.wait(timeout=10)
             del self.companions[name]
+        if self.voice:
+            self.voice.terminate();self.voice_exit=self.voice.wait(timeout=10);self.voice=None
+
+    def start_voice(self):
+        self.status()
+        if self.voice:return
+        from lifecycle.windows_voice import profile
+        home,port,_=profile()
+        script=self.root/'dsh/node_modules/dsh-resonant-voice/bin/resonant-voice.js'
+        node=self.root/'node/node.exe'
+        if not script.is_file() or not node.is_file():raise ValueError('The bundled voice service is missing. Repair this installation.')
+        try:
+            connection=socket.create_connection(('127.0.0.1',port),timeout=1)
+        except ConnectionRefusedError:pass
+        else:
+            connection.close()
+            raise ValueError('The configured voice port is already in use outside this background owner. Its work was preserved.')
+        environment={**os.environ,'RESONANT_VOICE_HOME':str(home)}
+        environment.pop('NODE_OPTIONS',None);environment.pop('NODE_PATH',None)
+        with os.fdopen(descriptor(owner_directory()/'voice.log',writable=True,create=True),'a',encoding='utf-8') as log:
+            self.voice=OwnedProcess([str(node),str(script),'serve'],env=environment,cwd=str(self.root),
+                stdin=subprocess.DEVNULL,stdout=log,stderr=log)
+        self.voice_profile={'home':str(home),'port':port};self.voice_exit=None
 
     def start_dsh(self):
         self.status()
@@ -190,8 +221,15 @@ class Supervisor:
                 not 1024 <= config['port'] <= 65535):
             raise ValueError('The managed runtime configuration does not match this application.')
         cli, node = runtime_paths(self.root)
+        from lifecycle.windows_voice import profile
+        voice_home,_,_=profile()
+        configured_voice=config['environment'].get('RESONANT_VOICE_HOME')
+        if configured_voice and os.path.normcase(str(Path(configured_voice).resolve()))!=os.path.normcase(str(voice_home.resolve())):
+            raise ValueError('The managed runtime points to a different voice profile. Its configuration was preserved.')
+        self.start_voice()
         env = {**os.environ, **config['environment'], 'DSH_HOME': config['home'],
                'DSH_TELEMETRY_MODE': 'DISABLED', 'AUGMENTOR_MODEL_API_KEY': config['apiKey'],
+               'RESONANT_VOICE_HOME':self.voice_profile['home'],
                'PYTHONDONTWRITEBYTECODE': '1', 'PYTHONUTF8': '1'}
         env.pop('NODE_OPTIONS', None); env.pop('NODE_PATH', None)
         env['PATH'] = os.pathsep.join([str(self.root/'powershell'), str(node.parent),
@@ -214,12 +252,12 @@ class Supervisor:
         Read-only; no PID supplied by a caller can start or stop a process.
         The coordinator must already have reserved owner startup admission.
         """
-        if name not in ('dsh', *COMPANIONS) or type(pid) is not int or pid <= 0:
+        if name not in ('dsh','voice', *COMPANIONS) or type(pid) is not int or pid <= 0:
             raise ValueError('Unsupported component observation.')
         if self.admission.control('host.maintenance.status', {})['phase'] != 'prepared':
             raise ValueError('Reserve the background owner before observing its components.')
         self.status()
-        child = self.child if name == 'dsh' else self.companions.get(name)
+        child = self.child if name == 'dsh' else self.voice if name=='voice' else self.companions.get(name)
         if child is None or child.job is None:
             raise ValueError('The observed component has no live owned process range.')
         import win32api, win32con, win32event, win32job, win32process
@@ -229,7 +267,7 @@ class Supervisor:
             if (win32event.WaitForSingleObject(process, 0) != win32event.WAIT_TIMEOUT or
                     not win32job.IsProcessInJob(process, child.job)):
                 raise ValueError('The process does not belong to the observed component.')
-            expected = self.root/'node/node.exe' if name == 'dsh' else Path(runtime_python(self.root))
+            expected = self.root/'node/node.exe' if name in ('dsh','voice') else Path(runtime_python(self.root))
             actual = Path(win32process.GetModuleFileNameEx(process, 0)).resolve()
             if os.path.normcase(str(actual)) != os.path.normcase(str(expected.resolve())):
                 raise ValueError('The observed component executable differs.')
@@ -251,13 +289,14 @@ class Supervisor:
             if action=='maintenance':
                 if set(message)!={'action','method','params'}:raise ValueError('Unsupported background request fields.')
                 self.status()
-                if message['method']=='host.maintenance.commit' and (self.child or self.companions):
+                if message['method']=='host.maintenance.commit' and (self.child or self.voice or self.companions):
                     raise MaintenanceBusy('The background owner still has a running component. Drain it normally before committing.')
                 return {'maintenance':self.admission.control(message['method'],message['params'])}
             if set(message) != {'action'}: raise ValueError('Unsupported background request fields.')
             if action=='status':return self.status()
             with self.admission.work():
                 if action == 'start-dsh': self.start_dsh()
+                elif action == 'start-voice': self.start_voice()
                 elif action in ('start-prompts', 'start-memory'): self.start_companion(action.removeprefix('start-'))
                 elif action == 'stop-failed-setup':
                     from dsh.setup import current
@@ -266,7 +305,7 @@ class Supervisor:
                     self.stop_child()
                 elif action == 'exit-if-empty':
                     self.status()
-                    if self.child or self.companions:
+                    if self.child or self.voice or self.companions:
                         raise ValueError('The background owner still has a running component.')
                     self.shutdown.set()
                 else: raise ValueError('Unsupported background operation.')

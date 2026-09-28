@@ -2,6 +2,13 @@
 
 # Windows desktop and background controls
 
+Current voice addition: the shared supervisor owns the bundled Resonant loopback
+bridge in a separate Job and includes it in idle maintenance. See the
+[lifecycle and evidence boundary](LIFECYCLE.md#windows-owned-voice-bridge): actual
+Windows service qualification is pending, while ASR/TTS engines and physical
+audio remain separate gates. Earlier entries below describing voice ownership as
+unimplemented are historical.
+
 This is an implementation contract for the development candidate, not a customer
 installation guide. See the [implementation evidence](WINDOWS-IMPLEMENTATION-STATUS.md)
 and [W4 plan](WINDOWS-IMPLEMENTATION-PLAN.md#w4--complete-the-native-windows-desktop-experience).

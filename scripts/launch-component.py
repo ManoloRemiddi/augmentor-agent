@@ -35,6 +35,7 @@ def configure(*, windows_paths=None):
         # Product entrypoints use OS-verified paths. Tests of services can still
         # use explicit private fixture roots without running this entrypoint.
         os.environ.update(windows_environment() if windows_paths is None else windows_paths)
+        os.environ['RESONANT_VOICE_HOME'] = str(Path(os.environ['XDG_CONFIG_HOME'])/'resonant-voice')
         os.environ['AUGMENTOR_PI_SOCKET'] = str(Path(os.environ['XDG_RUNTIME_DIR'])/'pi.sock')
         powershell = ROOT/'powershell/pwsh.exe'
         if powershell.exists():

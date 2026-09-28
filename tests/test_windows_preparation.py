@@ -31,7 +31,7 @@ class PreparationTests(unittest.TestCase):
         gate=Gate()
         for name,result in [('Startup',gate),('discover_owner',owner),
                 ('discover_windows',[window]),('discover_browsers',[]),
-                ('discover_dsh',None),('discover_companions',[companion])]:
+                ('discover_dsh',None),('discover_voice',None),('discover_companions',[companion])]:
             stack.enter_context(patch(base+name,return_value=result))
         return gate
 

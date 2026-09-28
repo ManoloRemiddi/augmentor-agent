@@ -105,6 +105,7 @@ def desktop_chat(root, work, out):
                 try:
                     assert [item.pid for item in preparation.windows]==[after['pid']]
                     assert preparation.dsh is not None
+                    assert preparation.voice is not None
                     assert {item.name for item in preparation.companions}=={'prompts','memory'}, [item.name for item in preparation.companions]
                     preparation.check()
                 finally:preparation.__exit__(*sys.exc_info())
@@ -126,7 +127,8 @@ def desktop_chat(root, work, out):
             finally:
                 child.terminate(); child.wait(timeout=10)
         result.update(passed=True, turns=turns, historyRestored=True, noDuplicateSubmission=True, preparedNormalWindowExit=True,
-            graphPreparedAndCancelledWithActualDesktopDshAndCompanions=True)
+            graphPreparedAndCancelledWithActualDesktopDshAndCompanions=True,
+            graphIncludesOwnedVoiceBridge=True)
         return result
     finally:
         (out/'native-chat.json').write_text(json.dumps(result, indent=2)+'\n', encoding='utf-8')
@@ -155,6 +157,14 @@ def main():
         AUGMENTOR_PYTHON=str(root/'python/python.exe'), AUGMENTOR_PI_NODE=str(root/'node/node.exe'),
         AUGMENTOR_PWSH=str(root/'powershell/pwsh.exe'), PYTHONUTF8='1', PYTHONDONTWRITEBYTECODE='1')
     os.environ['PATH'] = os.pathsep.join([str(root/'node'), str(root/'python'), str(root/'powershell'), os.environ.get('PATH', os.defpath)])
+    # This fixture owns a separate voice profile and free loopback port. It
+    # never reads or changes the machine's personal speech configuration.
+    import socket
+    voice_home=private_directory(work/'config/resonant-voice')
+    os.environ['RESONANT_VOICE_HOME']=str(voice_home)
+    with socket.socket() as vacant:
+        vacant.bind(('127.0.0.1',0));voice_port=vacant.getsockname()[1]
+    managed.atomic_json(voice_home/'config.json',{'port':voice_port})
     calls = []
     model_waiting, release_model = threading.Event(), threading.Event()
     class Model(http.server.BaseHTTPRequestHandler):
@@ -216,6 +226,7 @@ def main():
             'model': 'fixture', 'apiKey': 'fixture-only-key', 'context': 32768},
             agent=agent, manager_type='windows-supervisor')
         assert result['saved'] and agent.loaded()
+        assert owner.request('status',root=root)['voice']['running']
         report['startupCheck'] = managed.private_json(state/'startup-check.json')
         from augmentor_linux.adapters.dsh import DshAdapter
         adapter = DshAdapter(); adapter.call('host.describe'); assert adapter.product
@@ -311,10 +322,32 @@ def main():
         from platform_adapters.windows_http import HttpRefused
         participant=discover_owner(root,Path(os.environ['XDG_RUNTIME_DIR']))
         assert participant is not None, 'The actual background owner was not discovered.'
-        token=uuid.uuid4().hex;dsh=None;reserved=False
+        token=uuid.uuid4().hex;dsh=None;voice=None;reserved=False
         try:
             assert participant.control('prepare',token)['phase']=='prepared'
             reserved=True
+            from lifecycle.windows_voice import discover_voice
+            voice=discover_voice(root,participant)
+            assert voice is not None
+            assert voice.control('prepare',token)['phase']=='prepared'
+            assert voice.control('renew',token)['phase']=='prepared'
+            assert voice.control('cancel',token)['phase']=='ready'
+            # An unconsumed connection ticket is accepted work even without
+            # a microphone/ASR worker. It must veto shutdown until it expires.
+            ticket=voice.request('/internal/ticket',{'surface':'linux','sessionId':session},{'x-resonant-token':voice.secret})
+            assert 'ticket' in ticket,ticket
+            try:voice.control('prepare',token)
+            except HttpRefused as error:assert error.code==409
+            else:raise AssertionError('An outstanding voice ticket must refuse preparation.')
+            wait_for(lambda:voice.control('status')['active']==0,seconds=20)
+            assert participant.control('renew',token)['phase']=='prepared'
+            assert voice.control('prepare',token)['phase']=='prepared'
+            assert voice.control('commit',token)['phase']=='closing'
+            assert voice.exited(timeout=15),'The owned Resonant service did not drain naturally.'
+            wait_for(lambda:not owner.request('status',root=root)['voice']['running'])
+            report['ownedVoice']={'kernelBoundHttpPeer':True,'reservationCancel':True,
+                'pendingTicketBlocksShutdown':True,'committedNaturalExit':True,
+                'speechEnginesQualified':False,'physicalAudio':False}
             dsh=discover_dsh(root,state,participant)
             assert dsh is not None
             def observed_control(action):return dsh.control(action,None if action=='status' else token)
@@ -325,10 +358,12 @@ def main():
             report['maintenance']['kernelBoundHttpPeer']=True
         finally:
             if dsh is not None:dsh.close()
+            if voice is not None:voice.close()
             try:
                 if reserved:participant.control('cancel',token)
             finally:participant.close()
         agent.start(); wait_for(lambda: adapter.call('host.describe'))
+        assert owner.request('status',root=root)['voice']['running']
         assert 'Windows managed setup verified.' in json.dumps(adapter.call('session.history', {'sessionId': session}))
         report.update(passed=True, setup=True, conversation=True, crashRestartPreservedHistory=True,
                       selectedRuntimeProtected=True, providerRequests=len(calls))

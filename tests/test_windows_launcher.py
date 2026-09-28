@@ -69,11 +69,13 @@ class WindowsLauncherTests(unittest.TestCase):
             for name in ('node/node.exe', 'python/python.exe', 'powershell/pwsh.exe', 'dsh/node_modules/@deepseek-ai/dsh/lib/bin.js'):
                 path = root/name; path.parent.mkdir(parents=True, exist_ok=True); path.write_text('fixture')
             with patch.object(components, 'ROOT', root), patch.object(sys, 'platform', 'win32'), patch.dict(os.environ, {
-                'AUGMENTOR_PYTHON': str(root/'foreign/python.exe'), 'AUGMENTOR_PI_NODE': str(root/'foreign/node.exe')
+                'AUGMENTOR_PYTHON': str(root/'foreign/python.exe'), 'AUGMENTOR_PI_NODE': str(root/'foreign/node.exe'),
+                'RESONANT_VOICE_HOME':str(root/'foreign/voice')
             }):
-                components.configure(windows_paths={'XDG_RUNTIME_DIR': str(root/'run')})
+                components.configure(windows_paths={'XDG_RUNTIME_DIR': str(root/'run'),'XDG_CONFIG_HOME':str(root/'config')})
                 self.assertEqual(os.environ['AUGMENTOR_PYTHON'], str(root/'python/python.exe'))
                 self.assertEqual(os.environ['AUGMENTOR_PI_NODE'], str(root/'node/node.exe'))
+                self.assertEqual(os.environ['RESONANT_VOICE_HOME'],str(root/'config/resonant-voice'))
                 self.assertEqual(os.environ['PATH'].split(os.pathsep)[:3], [str(root/'powershell'), str(root/'node'), str(root/'python')])
 
 

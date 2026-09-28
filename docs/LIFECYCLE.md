@@ -445,9 +445,9 @@ that request actually ends; no installer or shutdown is authorized.
 
 The Windows context additionally holds the startup writer while discovering
 and reserving its existing owner, desktop windows, native browser hosts, managed
-DSH and prompt/memory companions. Unknown ownership or any busy participant
+DSH, its owned Resonant bridge and prompt/memory companions. Unknown ownership or any busy participant
 unwinds the attempt, preserving accepted work. It currently requires a running
-owned supervisor and excludes external services. Owned voice, global commit,
+owned supervisor and excludes external services. Global commit,
 integration with the independently qualified authenticated installer handoff and
 final exclusive installation access remain prerequisites for a complete update. This context alone cannot
 apply files or close an application.
@@ -456,6 +456,33 @@ Local failure/expiry/renewal tests pass. Native tests now cover actual companion
 group renewal/cancellation and assembled desktop/DSH preparation with preserved
 history, plus refusal during an actual deterministic-model turn. Execution of
 these new graph assertions is pending; separate component tests already pass.
+
+### Windows owned voice bridge
+
+The Windows launcher fixes `RESONANT_VOICE_HOME` inside its verified per-user
+configuration directory, including disposable qualification roots. The existing
+Resonant initializer retains configuration and creates private credentials.
+Before starting managed DSH, the supervisor starts the fixed bundled Resonant
+`serve` program in its own Job and passes that exact voice profile to DSH. It
+refuses an occupied loopback port without adopting or stopping the listener.
+One live Job is retained even if its leader exits before its descendants.
+Normal owner shutdown refuses until the voice Job drains; forced Job teardown
+remains a separately labelled supervisor-fault boundary.
+
+Voice discovery validates the private home/port/token, established TCP kernel
+peer, bundled Node executable, current user and reserved owner's exact voice Job
+before credentials. It checks the Resonant protocol and maintenance capability,
+then uses its existing prepare/renew/cancel/commit API. Windows graph preparation
+now includes this service after DSH and before durable companions. ASR/TTS engines
+outside that owned Job are not adopted or stopped.
+
+Five local profile/ownership boundary tests pass, along with existing preparation,
+supervisor-policy and launcher checks. New assembled x64/ARM64 assertions start
+the actual bundled service, reserve/cancel it with the full graph, reject shutdown
+while a real connection ticket is pending, then observe natural commit exit and
+restart. Native execution is pending. This qualifies the service lifecycle only;
+Windows ASR/TTS provisioning, device capture/playback and acoustic behavior remain
+open. The owner's existing Qwen/Breeze placement and settings are unchanged.
 
 
 ### Windows installer handoff
