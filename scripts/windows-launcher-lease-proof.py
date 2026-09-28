@@ -45,7 +45,7 @@ def prove(root, work):
     # The installer's no-sharing gate and Python byte lock both exclude native
     # startup. Release is kernel-owned; neither failure leaves a pending marker.
     gate = win32file.CreateFile(str(lock), win32con.GENERIC_READ|win32con.GENERIC_WRITE,
-        0, None, win32con.OPEN_EXISTING, win32con.FILE_FLAG_OPEN_REPARSE_POINT, None)
+        0, None, win32con.OPEN_EXISTING, win32file.FILE_FLAG_OPEN_REPARSE_POINT, None)
     try: refused(base)
     finally: gate.Close()
 

@@ -830,3 +830,9 @@ application/browser exclusion ahead of that load and retains it through process
 exit. New compiled probes cover actual exclusion, private path rejection and
 normal release; their native execution is pending. This does not complete the
 installer transaction or browser/companion coordination.
+
+The `653adac` native launchers compile on x64 and pass the pre-Python byte-lock
+refusal checks. Its new probe then fails because the test uses a pywin32 flag
+from the wrong module. The probe now uses `win32file.FILE_FLAG_OPEN_REPARSE_POINT`,
+matching the existing product adapter. Remaining native assertions must pass
+before this startup work is qualified; this is not a waived integration failure.
