@@ -448,3 +448,13 @@ qualifies real installer event integration separately from the full product, and
 makes removal regressions diagnosable without rebuilding all app dependencies.
 New native execution is pending. The preceding [67eebe3 native fixtures](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36399077539)
 pass completely on both CPUs, at merge checkout `85522a92c8cad9d45bf22bd1395c5607d5bd8e46`.
+
+The smaller exact-template test at `77731b9` reproduces the failure before any
+browser is configured: default registry-value inspection returns an error. The
+helper rejected a NULL value-name pointer. Pascal Script uses this representation
+for an empty String; [Windows defines NULL and empty names as the default value](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regqueryvalueexw).
+The helper now normalizes the representation without relaxing gating, type checks,
+exact expected content or foreign preservation. The actual Inno registry fixture
+adds default-value read/create/remove and foreign refusal. Both the small exact
+application-template test and full installed removal must pass before this is
+considered qualified.

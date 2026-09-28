@@ -65,6 +65,13 @@ begin
   Require(OwnedRegistry('{#RegistryKey}', 'Augmentor Agent', Expected, 2) = 1, 'Absent removal must be idempotent.');
   Require(RegQueryStringValue(HKCU, '{#RegistryKey}', 'Unrelated', Actual), 'Unrelated value disappeared.');
   Require(Actual = 'preserve', 'Unrelated value changed.');
+  Require(OwnedRegistry('{#RegistryKey}', '', Expected, 0) = 1, 'Expected absent default value.');
+  Require(OwnedRegistry('{#RegistryKey}', '', Expected, 1) = 2, 'Could not create default value.');
+  Require(RegQueryStringValue(HKCU, '{#RegistryKey}', '', Actual), 'Missing actual default value.');
+  Require(Actual = Expected, 'Default value changed.');
+  Require(OwnedRegistry('{#RegistryKey}', '', 'foreign', 2) = 3, 'Foreign default removal must refuse.');
+  Require(OwnedRegistry('{#RegistryKey}', '', Expected, 2) = 2, 'Could not remove owned default value.');
+  Require(OwnedRegistry('{#RegistryKey}', '', Expected, 2) = 1, 'Absent default removal must be idempotent.');
   Ready := RetainManifest('{#ManifestPath}');
   Require(Ready, 'Could not retain the private browser manifest.');
   Require(GetSHA256OfFile('{#ManifestPath}') = '{#ManifestDigest}', 'Pinned manifest hash differs.');

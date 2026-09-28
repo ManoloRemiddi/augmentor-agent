@@ -266,8 +266,11 @@ __declspec(dllexport) BOOL WINAPI AugmentorMaintenancePath(const wchar_t *direct
 __declspec(dllexport) DWORD WINAPI AugmentorOwnedRegistry(const wchar_t *path,
         const wchar_t *name, const wchar_t *expected, DWORD action) {
     HKEY key = NULL; wchar_t *value = NULL; DWORD result = 0;
+    /* Pascal Script marshals an empty String as NULL. Windows accepts NULL
+     * or an empty name for a key's default value (used by native messaging). */
+    if (!name) name = L"";
     if ((installation == INVALID_HANDLE_VALUE && manual.file == INVALID_HANDLE_VALUE) ||
-            !path || !name || !expected || action > 2 ||
+            !path || !expected || action > 2 ||
             wcsncmp(path, L"Software\\", 9) || wcslen(path) > 1024 ||
             wcslen(name) > 256 || wcslen(expected) > 32766) return 0;
     REGSAM access = KEY_QUERY_VALUE | KEY_WOW64_64KEY | (action ? KEY_SET_VALUE : 0);

@@ -149,3 +149,10 @@ read/delete refusal while the native manifest handle is held, and full installed
 preparation/removal through synthetic Chromium resources and private fixture keys.
 These new cases are scheduled, not yet qualified. Actual selected-browser/store
 and physical Windows tests remain open.
+
+Native installer cleanup accepts both native NULL and empty registry value names
+as the Windows default value used by Chromium host registration. The Pascal
+script/native bridge previously rejected the NULL representation and consequently
+refused normal removal, including without browser setup. The correction preserves
+exact content/type checks and is covered by direct Inno default-value tests plus
+the exact application template's removal sequence; native rerun is pending.

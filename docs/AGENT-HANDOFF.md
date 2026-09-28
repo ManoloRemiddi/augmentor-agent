@@ -32,12 +32,14 @@ Latest native evidence:
   browser manifest. ARM64 is still running. This is same-build application, not
   N-to-N+1 or rollback, and complete uninstall is not yet qualified.
 
-Current source adds reason-specific removal diagnostics and a small native test
-of the exact application Inno script. Its inert component files are never executed;
-it separates idle removal without browser registration from edited/owned-manifest
-removal. This isolates the failing installer event path before repeating the full
-application build. The new test and diagnosis are pending native execution; no
-uninstall correction is claimed yet.
+The small native test of the exact Inno application script reproduces refusal
+before any browser is configured: its unnamed registry-value inspection fails.
+The native helper rejected a NULL value-name pointer, but Pascal Script marshals
+an empty String that way and Windows defines it as the default registry value.
+Current source normalizes this representation to the empty name while preserving
+exact value/type/ownership checks. Native tests now explicitly cover default-value
+creation, foreign-value refusal and owned removal. Execution of this correction,
+the complete template sequence and full installed uninstall remains pending.
 
 Current installer code records one owned browser anchor and optional per-user
 login entry, preserves disabled startup on repair/update, and removes only exact
