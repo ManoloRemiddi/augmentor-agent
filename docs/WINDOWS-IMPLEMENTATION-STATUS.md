@@ -998,3 +998,13 @@ both CPUs. The pinned pywin32 312 `win32con` does not export
 The fixture also reports an early coordinator error immediately instead of only
 a missing readiness file. Native independent-process success remains pending;
 the earlier extracted-Setup handle-transfer proof remains separately qualified.
+
+
+The follow-up `bacf148` independent-installer fixture fails CreateProcess with
+access denied on both CPUs. Current source corrects process/thread security to
+use generic object rights and adds explicit hosted-runner containment scope;
+no automatic production fallback is added. It also implements authenticated
+pipe transfer into an embedded Inno helper, separate READY/APPLY decisions,
+normal/crash retention after authorization and refusal before authorization.
+Python syntax checks pass. All new native helper/independent launch execution
+remains pending; customer distribution, global commit and rollback remain open.

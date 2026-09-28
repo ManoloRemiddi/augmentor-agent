@@ -29,6 +29,15 @@ and integrates it into the actual Inno handoff fixture. New native execution and
 assembled desktop/DSH graph qualification remain pending. Continue authenticated
 handoff and global commit/apply while preserving all remaining feature gates.
 
+Current installer source adds authenticated private-pipe transfer into an embedded
+Inno helper and separates readiness from apply authorization, with actual fixture
+checks for cancellation and coordinator loss before/after authorization. Native
+execution is pending. Earlier independent-process runs failed a missing pywin32
+constant (`3748282`), then CreateProcess access denied (`bacf148`); current source
+corrects process/thread access mapping and explicitly scopes the enclosing CI Job.
+Production never silently retries a refused independent launch. Qualify these
+changes before continuing global commit/apply; read the installer decision ledger.
+
 Earlier checkpoint notes below are historical; later evidence supersedes their
 pending statuses without expanding physical/customer-installation claims.
 

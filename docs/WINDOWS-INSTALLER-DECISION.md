@@ -193,3 +193,38 @@ both CPUs. The pinned pywin32 312 `win32con` does not export
 The fixture also reports an early coordinator error immediately instead of only
 a missing readiness file. Native independent-process success remains pending;
 the earlier extracted-Setup handle-transfer proof remains separately qualified.
+
+
+## Authenticated handoff source
+
+The next source adds a one-shot private pipe from the coordinating process to
+Inno's actual Setup process. The coordinator verifies the kernel client PID
+against the exact installer Job before duplicating the startup writer into it.
+The x64 helper inside Inno verifies the pipe server's PID/current user and the
+received handle's private owner, regular single-link file identity, exact runtime
+path and active startup exclusion. Customer helper builds reject alternate
+runtime roots; the development helper permits the explicit disposable test root.
+The helper loads from Inno's embedded files, outside application replacement.
+
+`READY` only confirms retained startup exclusion. The caller must separately
+send `APPLY`, after global drain and durable recovery are established. Cancellation,
+coordinator loss or timeout before `APPLY` aborts Setup without authorizing file
+changes. Lost application acknowledgment is an unknown outcome, never a reason
+to replay the action. The separate final installation lease is still required.
+This interface is not yet wired into a customer updater or global commit.
+
+The Inno fixture now compiles the helper and tests authenticated normal handoff,
+coordinator loss after authorization, cancellation and loss before authorization.
+It retains the actual Setup process before deliberately crashing the coordinator.
+Native execution is pending; only syntax checks have run locally.
+
+The `bacf148` attempt reports CreateProcess access denied on both hosted CPUs.
+Source review also found that file-specific access bits had been reused for
+process/thread security: the new code uses each object's GENERIC_ALL mapping
+for the private current-user/SYSTEM descriptor. Hosted qualification explicitly
+allows its enclosing runner Job and records kernel Job membership; it never
+silently falls back after a refused independent product launch. Production still
+requires breakaway and refuses if that environment prevents independence. The
+new native run must distinguish these boundaries before claiming success.
+
+The helper uses Inno's documented [embedded DLL loading and setup-only calls](https://jrsoftware.org/ishelp/topic_scriptdll.htm).

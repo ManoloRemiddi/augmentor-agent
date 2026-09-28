@@ -236,3 +236,14 @@ extracted Setup waits, the coordinator verifies its Job membership and refuses
 its own unrelated PID; the parent verifies the artifact cannot be opened for
 writing. Both normal close and deliberate coordinator crash must preserve Setup
 and startup exclusion through successful repair. New native execution is pending.
+
+
+The authenticated Inno extension compiles an x64 helper for the x64 Setup host
+on both runner CPUs (the application/runtime still use their native target).
+It tests a kernel-bound private pipe, recipient-side startup-handle checks,
+READY/APPLY separation, cancellation and coordinator loss before authorization,
+and Setup survival after an authorized coordinator exit/crash. The source helper
+allows alternate roots only in a development build. The fixture records whether
+its coordinator is inside an outer runner Job; it explicitly preserves that
+runner boundary rather than claiming a production breakaway. New native tests
+are pending after correcting process/thread generic access mapping.

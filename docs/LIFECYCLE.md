@@ -437,3 +437,14 @@ Local failure/expiry/renewal tests pass. Native tests now cover actual companion
 group renewal/cancellation and assembled desktop/DSH preparation with preserved
 history, plus refusal during an actual deterministic-model turn. Execution of
 these new graph assertions is pending; separate component tests already pass.
+
+
+### Windows installer handoff
+
+The [private installer handshake](WINDOWS-INSTALLER-DECISION.md#authenticated-handoff-source)
+transfers the startup writer only to the verified installer's actual process
+range. Readiness retains exclusion without authorizing replacement; APPLY is an
+explicit subsequent decision. Cancel/loss before that decision aborts. A lost
+apply acknowledgment cannot be retried. This source requires native qualification
+and integration with global component drain, final exclusive installation access,
+transaction recovery and health rollback before a customer update can use it.

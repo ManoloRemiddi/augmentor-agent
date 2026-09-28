@@ -90,12 +90,14 @@ def main():
     spec = importlib.util.spec_from_file_location('builder', ROOT/'scripts/build-windows-launcher.py')
     builder = importlib.util.module_from_spec(spec); spec.loader.exec_module(builder)
     builder.build_launcher(payload, args.arch, name='AugmentorFixture.exe')
+    handoff_helper=builder.build_installer_helper(out/'handoff-helper',development=True)
     installers = []
     for version in ('0.0.1', '0.0.2'):
         (payload/'fixture.json').write_text(json.dumps({'version':version, 'gate':str(gate)}))
         definitions = {'FixtureId':identity, 'FixtureVersion':version, 'InstallDirectory':install,
                        'PayloadDirectory':payload, 'OutputDirectory':out/'installers', 'GateFile':gate,
                        'HandoffReady':handoff_state/'ready.json', 'HandoffContinue':handoff_state/'continue',
+                       'HandoffHelper':handoff_helper,'HandoffRuntime':handoff_state,
                        'AllowedArchitecture':'arm64' if args.arch == 'arm64' else 'x64os'}
         with (out/('compile-'+version+'.log')).open('w', encoding='utf-8') as log:
             run([compiler/'ISCC.exe', *['/D'+key+'='+str(value) for key,value in definitions.items()],
@@ -182,11 +184,16 @@ def prove_handoff(installer,state,out):
         with InstallerProcess(staged,'0'*64,[]):pass
     except ValueError as error:assert 'bytes changed' in str(error)
     else:raise AssertionError('An installer with a mismatched digest was launched.')
-    for crash in (False,True):
+    outer_jobs=[]
+    # Preserve the earlier transfer mechanism case and exercise its replacement
+    # over authenticated IPC with a distinct explicit apply decision.
+    for authenticated,crash in ((False,False),(False,True),(True,False),(True,True)):
         for name in ('ready.json','coordinator.json','continue','parent-release'):
             (state/name).unlink(missing_ok=True)
         parent=subprocess.Popen([sys.executable,'-I','-Xutf8','-B',str(ROOT/'scripts/windows-inno-handoff-proof.py'),
-            '--installer',str(staged),'--sha256',digest,'--state',str(state),'--log',str(out/('handoff-crash.log' if crash else 'handoff-exit.log'))],
+            '--installer',str(staged),'--sha256',digest,'--state',str(state),'--log',
+            str(out/('handoff-'+('authenticated-' if authenticated else '')+('crash' if crash else 'exit')+'.log')),
+            *(['--authenticated'] if authenticated else [])],
             stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
         setup_process=None;loader=None
         try:
@@ -198,6 +205,7 @@ def prove_handoff(installer,state,out):
                 if time.monotonic()>=deadline:raise TimeoutError('The disposable installer coordinator did not become ready.')
                 time.sleep(.05)
             info=wait_for(state/'coordinator.json');ready=wait_for(state/'ready.json')
+            outer_jobs.append(info['outerRunnerJobObserved'])
             assert info['actualSetupInInstallerJob'] and info['unrelatedPidRefused'] and info['setupPid']==ready['pid']
             try:
                 with staged.open('r+b'):pass
@@ -229,12 +237,38 @@ def prove_handoff(installer,state,out):
             parent.communicate(timeout=10)
             for process in (setup_process,loader):
                 if process is not None:win32event.WaitForSingleObject(process,30000);process.Close()
+    for name in ('ready.json','coordinator.json','continue','parent-release'):(state/name).unlink(missing_ok=True)
+    run([sys.executable,'-I','-Xutf8','-B',ROOT/'scripts/windows-inno-handoff-proof.py',
+        '--installer',staged,'--sha256',digest,'--state',state,'--log',out/'handoff-abort.log',
+        '--authenticated','--cancel-before-apply'])
+    assert not (state/'ready.json').exists(),'Setup progressed after cancellation without APPLY.'
+    with Startup(state):pass
+    parent=subprocess.Popen([sys.executable,'-I','-Xutf8','-B',str(ROOT/'scripts/windows-inno-handoff-proof.py'),
+        '--installer',str(staged),'--sha256',digest,'--state',str(state),'--log',str(out/'handoff-before-apply-crash.log'),
+        '--authenticated','--crash-before-apply'],stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    aborted=None
+    try:
+        pid=wait_for(state/'prepared.json')['pid']
+        aborted=win32api.OpenProcess(win32con.SYNCHRONIZE,False,pid)
+        (state/'crash-now').write_text('crash disposable coordinator',encoding='utf-8')
+        _output,errors=parent.communicate(timeout=10)
+        assert parent.returncode==79,errors.decode('utf-8',errors='replace')
+        assert win32event.WaitForSingleObject(aborted,10000)==win32event.WAIT_OBJECT_0
+    finally:
+        if parent.poll() is None:parent.kill()
+        parent.communicate(timeout=10)
+        if aborted is not None:aborted.Close()
+    assert not (state/'ready.json').exists(),'Setup progressed after coordinator loss before APPLY.'
+    with Startup(state):pass
     return {'actualExtractedSetupOwnsGate':True,'parentNormalExit':True,'parentCrash':True,
         'newStartupAndSecondWriterRefused':True,'completedRepairReleasesGate':True,
         'invalidTransferRefusedBeforeVersionChange':True,
         'verifiedDigestBoundBeforeLaunch':True,'artifactWriteExcludedWhileObserved':True,
         'actualSetupJobObserved':True,'unrelatedPidRefused':True,'normalCloseDoesNotTerminateInstaller':True,
-        'productionHandoffAuthentication':False}
+        'authenticatedPipeTransfer':True,'abortBeforeApply':True,'coordinatorCrashBeforeApplyRefused':True,
+        'qualificationRetainsOuterRunnerJob':True,
+        'outerRunnerJobObservations':outer_jobs,
+        'productionInstallerQualified':False}
 
 
 def prove_updater(payload, out, signer, installer, identity, arch):

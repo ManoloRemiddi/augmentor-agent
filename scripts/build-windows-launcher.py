@@ -141,6 +141,27 @@ def build_launcher(payload, arch, *, name='Augmentor.exe'):
     (payload/'launcher.obj').unlink(missing_ok=True)
 
 
+def build_installer_helper(output,*,development=False):
+    """Inno Setup 7 x64 needs an x64 DLL even for its ARM64 app payload."""
+    if sys.platform!='win32':raise ValueError('Compile the installer helper on Windows.')
+    output=Path(output).resolve();output.mkdir(parents=True,exist_ok=True)
+    vswhere=Path(os.environ.get('ProgramFiles(x86)','C:/Program Files (x86)'))/'Microsoft Visual Studio/Installer/vswhere.exe'
+    install=subprocess.check_output([str(vswhere),'-latest','-products','*','-property','installationPath'],text=True).strip()
+    if not install:raise RuntimeError('Windows build tools are missing.')
+    vcvars=Path(install)/'VC/Auxiliary/Build/vcvarsall.bat'
+    if any(any(c in str(value) for c in '&|<>^%!\r\n') for value in (vcvars,output,ROOT)):
+        raise ValueError('Unsupported shell character in the build path.')
+    dll=output/'augmentor-installer-handoff.dll'
+    with tempfile.TemporaryDirectory(prefix='installer-helper-') as temporary:
+        definition='/DAUGMENTOR_DEVELOPMENT_CANDIDATE ' if development else ''
+        command=(f'call "{vcvars}" amd64 && cl /nologo /LD /O2 /W4 /MT '+definition+
+            f'"{ROOT/"services/platform/windows-installer-handoff.c"}" /Fe:"{dll}" '+
+            f'/Fo:"{Path(temporary)/"helper.obj"}" /link /IMPLIB:"{Path(temporary)/"helper.lib"}" '+
+            'shell32.lib advapi32.lib')
+        subprocess.run('cmd.exe /d /s /c "'+command+'"',check=True)
+    return dll
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, required=True)

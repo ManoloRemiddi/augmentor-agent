@@ -9,6 +9,9 @@ on:
       - 'scripts/build-windows-launcher.py'
       - 'services/platform/windows-launcher.c'
       - 'services/lifecycle/windows_installer_process.py'
+      - 'services/lifecycle/windows_handoff.py'
+      - 'services/platform/windows-installer-handoff.c'
+      - 'services/platform/windows-lease.h'
       - 'release/windows/installer-candidates.json'
 permissions:
   contents: read

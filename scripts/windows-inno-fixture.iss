@@ -22,13 +22,19 @@ Compression=lzma2/fast
 SolidCompression=yes
 
 [Files]
+Source: "{#HandoffHelper}"; Flags: dontcopy
 Source: "{#PayloadDirectory}\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs ignoreversion
 
 [Icons]
 Name: "{userprograms}\{#FixtureId}"; Filename: "{app}\AugmentorFixture.exe"
 
 [Code]
-var GateHandle, StartupHandle: THandle;
+var GateHandle, StartupHandle: THandle; AuthenticatedHandoff: Boolean;
+
+function PrepareAuthenticatedHandoff(Pipe: String; Coordinator: Cardinal; Qualification: String): BOOL;
+  external 'AugmentorHandoffPrepare@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
+procedure CloseAuthenticatedHandoff;
+  external 'AugmentorHandoffClose@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
 
 function OpenGateFile(Name: String; Access, Sharing: Cardinal;
   Security: NativeInt; Creation, Attributes: Cardinal; Template: THandle): THandle;
@@ -54,6 +60,23 @@ begin
     Duplicate in the actual Setup process; do not assume its loader inherited
     an incoming kernel handle through its extraction/bootstrap subprocess. }
   Result := True;
+  SourceText := ExpandConstant('{param:augmentorpipe|}');
+  if SourceText <> '' then begin
+    Result := False;
+    SourcePid := StrToInt64Def(ExpandConstant('{param:augmentorcoordinator|}'), -1);
+    if (SourcePid < 1) or (SourcePid > 4294967295) then exit;
+    Result := PrepareAuthenticatedHandoff(SourceText, Cardinal(SourcePid), '{#HandoffRuntime}');
+    if not Result then exit;
+    AuthenticatedHandoff := True;
+    Result := SaveStringToFile('{#HandoffReady}', '{"pid":' + IntToStr(CurrentProcessId) + '}', False);
+    if not Result then exit;
+    for Count := 1 to 1000 do begin
+      if FileExists('{#HandoffContinue}') then exit;
+      Sleep(20);
+    end;
+    Result := False;
+    exit;
+  end;
   SourceText := ExpandConstant('{param:startupowner|}');
   HandleText := ExpandConstant('{param:startuphandle|}');
   if (SourceText = '') and (HandleText = '') then exit;
@@ -108,6 +131,10 @@ end;
 procedure DeinitializeSetup;
 begin
   ReleaseGate;
+  if AuthenticatedHandoff then begin
+    CloseAuthenticatedHandoff;
+    AuthenticatedHandoff := False;
+  end;
   if StartupHandle <> 0 then begin
     CloseGateFile(StartupHandle);
     StartupHandle := 0;

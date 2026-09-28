@@ -2,11 +2,12 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Disposable Inno coordinator; customer handoff authentication is not implemented."""
 import argparse
+from contextlib import ExitStack
+import ctypes
 import json
 import msvcrt
 import os
 from pathlib import Path
-import subprocess
 import sys
 import time
 
@@ -14,6 +15,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'services'))
 from lifecycle.windows_startup import Startup
 from lifecycle.windows_installer_process import InstallerProcess
+from lifecycle.windows_handoff import InstallerHandoff
 
 
 def main():
@@ -22,11 +24,36 @@ def main():
     parser.add_argument('--sha256',required=True)
     parser.add_argument('--state',required=True,type=Path)
     parser.add_argument('--log',required=True,type=Path)
+    parser.add_argument('--authenticated',action='store_true')
+    parser.add_argument('--cancel-before-apply',action='store_true')
+    parser.add_argument('--crash-before-apply',action='store_true')
     args=parser.parse_args()
-    with Startup(args.state,maintenance=True) as gate:
+    kernel=ctypes.WinDLL('kernel32',use_last_error=True)
+    in_job=ctypes.c_int()
+    query=kernel.IsProcessInJob
+    query.argtypes=[ctypes.c_void_p,ctypes.c_void_p,ctypes.POINTER(ctypes.c_int)];query.restype=ctypes.c_int
+    if not query(ctypes.c_void_p(-1),None,ctypes.byref(in_job)):raise ctypes.WinError(ctypes.get_last_error())
+    with ExitStack() as stack:
+        gate=stack.enter_context(Startup(args.state,maintenance=True))
+        handoff=stack.enter_context(InstallerHandoff(gate)) if args.authenticated else None
+        launch=handoff.arguments() if handoff else ['/startupowner='+str(os.getpid()),
+            '/startuphandle='+str(msvcrt.get_osfhandle(gate.fd))]
         with InstallerProcess(args.installer,args.sha256,['/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',
-            '/LOG='+str(args.log),'/startupowner='+str(os.getpid()),
-            '/startuphandle='+str(msvcrt.get_osfhandle(gate.fd))]) as installer:
+            '/LOG='+str(args.log),*launch],qualification_outer_job=True) as installer:
+            if handoff:
+                handoff.bind(installer);handoff.wait_ready(timeout=30)
+                if args.crash_before_apply:
+                    (args.state/'prepared.json').write_text(json.dumps({'pid':handoff.pid}),encoding='utf-8')
+                    deadline=time.monotonic()+20
+                    while not (args.state/'crash-now').exists():
+                        if time.monotonic()>=deadline:raise TimeoutError('The fixture did not retain the prepared Setup process.')
+                        time.sleep(.02)
+                    os._exit(79)  # Deliberate fixture crash, before authorizing any replacement.
+                if args.cancel_before_apply:
+                    handoff.close()
+                    assert installer.wait(30)!=0,'The cancelled installer unexpectedly succeeded.'
+                    return
+                handoff.authorize()  # Disposable fixture only; no app processes/data are being updated.
             unrelated_refused=False
             try:installer.observe(os.getpid())
             except ValueError:unrelated_refused=True
@@ -37,10 +64,12 @@ def main():
                 if time.monotonic()>=deadline:raise TimeoutError('The disposable handoff was not observed.')
                 time.sleep(.02)
             ready=json.loads((args.state/'ready.json').read_text(encoding='utf-8'))
+            if handoff:assert ready['pid']==handoff.pid
             process=installer.observe(ready['pid'])
             process.Close()
             (args.state/'coordinator.json').write_text(json.dumps({'installerPid':installer.pid,
-                'setupPid':ready['pid'],'actualSetupInInstallerJob':True,'unrelatedPidRefused':True}),encoding='utf-8')
+                'setupPid':ready['pid'],'actualSetupInInstallerJob':True,'unrelatedPidRefused':True,
+                'outerRunnerJobObserved':bool(in_job.value)}),encoding='utf-8')
             while not (args.state/'parent-release').exists():
                 if installer.poll() is not None:raise RuntimeError('The disposable installer exited before handoff.')
                 if time.monotonic()>=deadline:raise TimeoutError('The disposable handoff was not observed.')

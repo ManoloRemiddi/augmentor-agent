@@ -18,14 +18,15 @@ import sys
 
 
 class InstallerProcess:
-    def __init__(self,artifact,sha256,arguments,*,environment=None):
+    def __init__(self,artifact,sha256,arguments,*,environment=None,qualification_outer_job=False):
         if sys.platform!='win32':raise RuntimeError('Installer process ownership requires Windows.')
         if not isinstance(sha256,str) or not re.fullmatch('[a-f0-9]{64}',sha256):
             raise ValueError('A verified installer digest is required.')
         if not isinstance(arguments,(list,tuple)) or any(not isinstance(item,str) or '\0' in item for item in arguments):
             raise ValueError('Use explicit installer arguments without a command shell.')
-        import win32api,win32con,win32job,win32process
-        from platform_adapters.windows_identity import private_file_descriptor,security_attributes
+        if type(qualification_outer_job) is not bool:raise ValueError('Invalid qualification process boundary.')
+        import pywintypes,win32api,win32con,win32job,win32process,win32security
+        from platform_adapters.windows_identity import private_file_descriptor,sid_string
         self.artifact=Path(artifact).absolute()
         self.file=None;self.job=None;self.process=None;self.pid=None
         thread=None;started=False
@@ -42,10 +43,22 @@ class InstallerProcess:
                 self.job=None
                 raise ctypes.WinError(ctypes.get_last_error())
             flags=(win32con.CREATE_SUSPENDED|win32con.CREATE_UNICODE_ENVIRONMENT|
-                win32con.CREATE_NO_WINDOW|0x01000000)  # CREATE_BREAKAWAY_FROM_JOB; absent from pywin32 312 win32con.
+                win32con.CREATE_NO_WINDOW)
+            # Hosted qualification runs inside the runner's non-breakaway Job.
+            # This explicit fixture option never retries a refused production
+            # launch. The outer runner must outlive the complete test/install.
+            if not qualification_outer_job:flags|=0x01000000  # CREATE_BREAKAWAY_FROM_JOB (not in win32con 312).
+            # File-specific FA bits do not grant all process/thread rights.
+            # Use each kernel object's GENERIC_ALL mapping for the same private
+            # current-user/SYSTEM principals instead of a file descriptor.
+            user=sid_string()
+            attributes=pywintypes.SECURITY_ATTRIBUTES()
+            attributes.SECURITY_DESCRIPTOR=win32security.ConvertStringSecurityDescriptorToSecurityDescriptor(
+                f'O:{user}D:P(A;;GA;;;{user})(A;;GA;;;SY)',win32security.SDDL_REVISION_1)
+            attributes.bInheritHandle=False
             self.process,thread,self.pid,_tid=win32process.CreateProcess(
                 str(self.artifact),subprocess.list2cmdline([str(self.artifact),*arguments]),
-                security_attributes(),security_attributes(),False,flags,environment,
+                attributes,attributes,False,flags,environment,
                 str(self.artifact.parent),win32process.STARTUPINFO())
             # Assignment precedes the first instruction, so even a fast loader
             # cannot create an unobserved extracted Setup process.
