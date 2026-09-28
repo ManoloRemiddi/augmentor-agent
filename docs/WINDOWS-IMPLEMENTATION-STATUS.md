@@ -1008,3 +1008,12 @@ pipe transfer into an embedded Inno helper, separate READY/APPLY decisions,
 normal/crash retention after authorization and refusal before authorization.
 Python syntax checks pass. All new native helper/independent launch execution
 remains pending; customer distribution, global commit and rollback remain open.
+
+At `066320c`, the x64 helper compiles and the first independent Setup launch
+reaches verified Job membership. Its artifact-write probe is correctly refused,
+but the Python CRT maps the error to errno 13 rather than preserving Win32 code
+32, so the test assertion fails. The probe now uses the native private-file
+adapter for an exact kernel sharing result. Authenticated handoff, cancellation
+and crash cases still require execution. The next fixture also explicitly checks
+an unrelated pipe client and a wrong coordinator PID. These are test corrections
+and additional assertions, not waived qualification.

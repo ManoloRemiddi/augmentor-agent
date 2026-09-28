@@ -208,9 +208,11 @@ def prove_handoff(installer,state,out):
             outer_jobs.append(info['outerRunnerJobObserved'])
             assert info['actualSetupInInstallerJob'] and info['unrelatedPidRefused'] and info['setupPid']==ready['pid']
             try:
-                with staged.open('r+b'):pass
+                writable=private_file_descriptor(staged,writable=True)
             except OSError as error:assert error.winerror==32,error
-            else:raise AssertionError('Verified installer bytes remained writable during launch.')
+            else:
+                os.close(writable)
+                raise AssertionError('Verified installer bytes remained writable during launch.')
             loader=win32api.OpenProcess(win32con.SYNCHRONIZE|win32con.PROCESS_QUERY_LIMITED_INFORMATION,False,info['installerPid'])
             setup_process=win32api.OpenProcess(win32con.SYNCHRONIZE|win32con.PROCESS_QUERY_INFORMATION|
                 win32con.PROCESS_VM_READ,False,ready['pid'])
@@ -243,6 +245,11 @@ def prove_handoff(installer,state,out):
         '--authenticated','--cancel-before-apply'])
     assert not (state/'ready.json').exists(),'Setup progressed after cancellation without APPLY.'
     with Startup(state):pass
+    run([sys.executable,'-I','-Xutf8','-B',ROOT/'scripts/windows-inno-handoff-proof.py',
+        '--installer',staged,'--sha256',digest,'--state',state,'--log',out/'handoff-wrong-coordinator.log',
+        '--authenticated','--wrong-coordinator'])
+    assert not (state/'ready.json').exists(),'Setup progressed with the wrong coordinator identity.'
+    with Startup(state):pass
     parent=subprocess.Popen([sys.executable,'-I','-Xutf8','-B',str(ROOT/'scripts/windows-inno-handoff-proof.py'),
         '--installer',str(staged),'--sha256',digest,'--state',str(state),'--log',str(out/'handoff-before-apply-crash.log'),
         '--authenticated','--crash-before-apply'],stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
@@ -266,6 +273,7 @@ def prove_handoff(installer,state,out):
         'verifiedDigestBoundBeforeLaunch':True,'artifactWriteExcludedWhileObserved':True,
         'actualSetupJobObserved':True,'unrelatedPidRefused':True,'normalCloseDoesNotTerminateInstaller':True,
         'authenticatedPipeTransfer':True,'abortBeforeApply':True,'coordinatorCrashBeforeApplyRefused':True,
+        'unrelatedPipeClientRefused':True,'wrongCoordinatorPidRefused':True,
         'qualificationRetainsOuterRunnerJob':True,
         'outerRunnerJobObservations':outer_jobs,
         'productionInstallerQualified':False}

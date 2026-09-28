@@ -15,7 +15,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'services'))
 from lifecycle.windows_startup import Startup
 from lifecycle.windows_installer_process import InstallerProcess
-from lifecycle.windows_handoff import InstallerHandoff
+from lifecycle.windows_handoff import InstallerHandoff,HELLO
 
 
 def main():
@@ -27,6 +27,7 @@ def main():
     parser.add_argument('--authenticated',action='store_true')
     parser.add_argument('--cancel-before-apply',action='store_true')
     parser.add_argument('--crash-before-apply',action='store_true')
+    parser.add_argument('--wrong-coordinator',action='store_true')
     args=parser.parse_args()
     kernel=ctypes.WinDLL('kernel32',use_last_error=True)
     in_job=ctypes.c_int()
@@ -38,10 +39,27 @@ def main():
         handoff=stack.enter_context(InstallerHandoff(gate)) if args.authenticated else None
         launch=handoff.arguments() if handoff else ['/startupowner='+str(os.getpid()),
             '/startuphandle='+str(msvcrt.get_osfhandle(gate.fd))]
+        if args.wrong_coordinator:
+            assert handoff is not None and os.getpid()!=1
+            launch=[value if not value.startswith('/augmentorcoordinator=') else '/augmentorcoordinator=1' for value in launch]
         with InstallerProcess(args.installer,args.sha256,['/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',
             '/LOG='+str(args.log),*launch],qualification_outer_job=True) as installer:
             if handoff:
-                handoff.bind(installer);handoff.wait_ready(timeout=30)
+                handoff.bind(installer)
+                if args.wrong_coordinator:
+                    try:handoff.wait_ready(timeout=5)
+                    except TimeoutError:pass
+                    else:raise AssertionError('Setup accepted the wrong coordinator PID.')
+                    assert not handoff.claimed
+                    assert installer.wait(30)!=0
+                    return
+                handoff.wait_ready(timeout=30)
+                from platform_adapters.transport import LocalSocket
+                with LocalSocket() as outsider:
+                    outsider.settimeout(5);outsider.connect(str(handoff.endpoint))
+                    outsider.sendall(HELLO)
+                    assert outsider.recv(1)==b'','An unrelated pipe client received handoff authority.'
+                assert not handoff.finished.is_set(),'An unrelated pipe client disrupted the prepared installer.'
                 if args.crash_before_apply:
                     (args.state/'prepared.json').write_text(json.dumps({'pid':handoff.pid}),encoding='utf-8')
                     deadline=time.monotonic()+20

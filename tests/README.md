@@ -247,3 +247,9 @@ allows alternate roots only in a development build. The fixture records whether
 its coordinator is inside an outer runner Job; it explicitly preserves that
 runner boundary rather than claiming a production breakaway. New native tests
 are pending after correcting process/thread generic access mapping.
+
+The handoff proof additionally refuses an unrelated kernel pipe client without
+disrupting the genuine prepared installer, and refuses a deliberately wrong
+coordinator PID before gate acknowledgment. Its artifact-write probe uses the
+native file adapter, preserving the actual Win32 sharing error rather than the
+Python CRT's generic permission mapping. New assertions await execution.
