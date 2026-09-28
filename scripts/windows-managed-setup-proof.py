@@ -108,27 +108,60 @@ def desktop_chat(root, work, out):
                     assert preparation.voice is not None
                     assert {item.name for item in preparation.companions}=={'prompts','memory'}, [item.name for item in preparation.companions]
                     preparation.check()
+                    # Admission is now fenced. Compare cancellation against
+                    # this snapshot, after any accepted render/history work
+                    # between the model response and reservation has settled.
+                    frozen=ui('inspect')
+                    assert frozen['session']==session and frozen['transcript'].count(prompt)==1 and not frozen['draft'],frozen
+                    result.setdefault('reservationSnapshots',[]).append({
+                        'submission':submission,'renderChangedBeforeFence':frozen['transcript']!=after['transcript']})
                 finally:preparation.__exit__(*sys.exc_info())
                 restored=ui('inspect')
-                assert restored['session']==session and restored['transcript']==after['transcript'] and not restored['draft']
-                maintenance_token = uuid.uuid4().hex
-                def maintenance(action):
-                    return exchange('maintenance:'+json.dumps({'method':'host.maintenance.'+action,
-                        'params':{'token':maintenance_token}}))
-                deadline = time.monotonic()+10
-                while True:
-                    prepared = maintenance('prepare')
-                    if prepared.get('ok'):break
-                    if time.monotonic()>=deadline:raise AssertionError('The idle desktop did not prepare: '+str(prepared))
-                    time.sleep(.1)
-                assert prepared['result']['phase']=='prepared' and prepared['pid']==after['pid'], prepared
-                closed = maintenance('commit'); assert closed['ok'] and closed['result']['phase']=='closing', closed
+                assert restored['session']==session and restored['transcript']==frozen['transcript'] and not restored['draft'],{
+                    'expectedSession':session,'restoredSession':restored['session'],
+                    'frozenTranscript':frozen['transcript'],'restoredTranscript':restored['transcript'],
+                    'restoredDraft':restored['draft']}
+                if index:
+                    from platform_adapters.private_files import atomic_json
+                    from platform_adapters.windows_identity import private_lock_descriptor
+                    from platform_adapters import locks
+                    checkpoints=[]
+                    def checkpoint(stage,participant):
+                        checkpoints.append({'stage':stage,'pid':participant.pid,'kind':type(participant).__name__})
+                        atomic_json(work/'drain-checkpoint.json',{'schema':'augmentor-drain-proof/1','steps':checkpoints})
+                    preparation=prepare_graph(root,work)
+                    try:
+                        preparation.drain(checkpoint=checkpoint)
+                        assert all(item.exited() for item in preparation.observations)
+                        # This disposable driver does not hold a product lease.
+                        # Real installer application still requires independent
+                        # coordinator exit and the extracted Setup transaction.
+                        lease=private_lock_descriptor(work/'run/installation.lock')
+                        try:locks.flock(lease,locks.LOCK_EX|locks.LOCK_NB)
+                        finally:os.close(lease)
+                        assert preparation.gate.fd is not None
+                        result['graphDrainCheckpoints']=checkpoints
+                    finally:preparation.__exit__(*sys.exc_info())
+                else:
+                    maintenance_token = uuid.uuid4().hex
+                    def maintenance(action):
+                        return exchange('maintenance:'+json.dumps({'method':'host.maintenance.'+action,
+                            'params':{'token':maintenance_token}}))
+                    deadline = time.monotonic()+10
+                    while True:
+                        prepared = maintenance('prepare')
+                        if prepared.get('ok'):break
+                        if time.monotonic()>=deadline:raise AssertionError('The idle desktop did not prepare: '+str(prepared))
+                        time.sleep(.1)
+                    assert prepared['result']['phase']=='prepared' and prepared['pid']==after['pid'], prepared
+                    closed = maintenance('commit'); assert closed['ok'] and closed['result']['phase']=='closing', closed
                 assert child.wait_graceful(timeout=15) == 0, 'The idle desktop did not close normally.'
             finally:
                 child.terminate(); child.wait(timeout=10)
         result.update(passed=True, turns=turns, historyRestored=True, noDuplicateSubmission=True, preparedNormalWindowExit=True,
             graphPreparedAndCancelledWithActualDesktopDshAndCompanions=True,
-            graphIncludesOwnedVoiceBridge=True)
+            graphIncludesOwnedVoiceBridge=True,graphCommitObservedAllExits=True,
+            exclusiveInstallationLeaseAfterGraphDrain=True)
         return result
     finally:
         (out/'native-chat.json').write_text(json.dumps(result, indent=2)+'\n', encoding='utf-8')
@@ -206,9 +239,12 @@ def main():
         raise AssertionError('The isolated Windows setup proof timed out.')
     # Retain the exact process handle for the owned crash/restart test.
     def start_supervisor():
-        return subprocess.Popen([str(root/'python/python.exe'), '-I', '-Xutf8', '-B',
-            str(root/'services/windows_supervisor.py')], stdin=subprocess.DEVNULL,
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=subprocess.CREATE_NO_WINDOW)
+        from platform_adapters.private_files import descriptor
+        with os.fdopen(descriptor(owner.owner_directory()/'supervisor.log',writable=True,create=True),
+                       'a',encoding='utf-8') as log:
+            return subprocess.Popen([str(root/'python/python.exe'), '-I', '-Xutf8', '-B',
+                str(root/'services/windows_supervisor.py')], stdin=subprocess.DEVNULL,
+                stdout=log, stderr=log, creationflags=subprocess.CREATE_NO_WINDOW)
     supervisor = start_supervisor()
     try:
         wait_for(lambda: owner.request('status', root=root))
@@ -255,6 +291,14 @@ def main():
             assert owner.request('start-'+name,root=root)['companions'][name]['running']
             wait_for(lambda:companion_ready(filename))
         report['nativeDesktop'] = desktop_chat(root, work, args.out)
+        assert supervisor.wait(timeout=15)==0,'The graph did not shut down its background owner normally.'
+        supervisor=start_supervisor()
+        wait_for(lambda:owner.request('status',root=root))
+        agent.start();wait_for(lambda:adapter.call('host.describe'))
+        assert 'Windows managed setup verified.' in json.dumps(adapter.call('session.history',{'sessionId':session}))
+        for name,filename in (('prompts','prompts.sock'),('memory','dual-memory.sock')):
+            owner.request('start-'+name,root=root);wait_for(lambda:companion_ready(filename))
+        report['graphDrainRestartPreservesHistory']=True
         spec = importlib.util.spec_from_file_location('windows_browser_proof', Path(__file__).with_name('windows-browser-host-proof.py'))
         browser_proof = importlib.util.module_from_spec(spec); spec.loader.exec_module(browser_proof)
         report['nativeBrowserHost'] = browser_proof.prove(root, work, session)
@@ -370,6 +414,7 @@ def main():
     except BaseException:
         report['fixtureDiagnostics'] = {}
         for path in (state/'setup-dsh.log', state/'runtime.log', state/'startup-check.json', owner.owner_directory()/'supervisor.log',
+                     owner.owner_directory()/'voice.log',
                      *list((work/'state/logs').glob('desktop.*.log'))):
             if path.is_file():
                 excerpt = path.read_text(encoding='utf-8', errors='replace')[-12000:]

@@ -18,6 +18,9 @@ class Observation:
         self.calls.append(action)
         return self.admission.control('host.maintenance.'+action,{} if action=='status' else {'token':token})
     def close(self):self.closed=True
+    def exited(self,timeout=0):return self.admission.closing
+    def exchange(self,_):return {'dsh':{'running':False},'voice':{'running':False},
+        'companions':{'prompts':{'running':False},'memory':{'running':False}}}
 
 
 class Gate:
@@ -65,6 +68,20 @@ class PreparationTests(unittest.TestCase):
             with self.assertRaises(MaintenanceBusy):
                 with WindowsPreparation(ROOT,'run','shared','state'):pass
             self.assertIsNone(gate.fd)
+
+    def test_drain_records_surface_then_service_then_owner_and_retains_startup_gate(self):
+        owner,window,companion=Observation(),Observation(),Observation();order=[]
+        with ExitStack() as stack:
+            gate=self.fixture(stack,owner,window,companion)
+            with WindowsPreparation(ROOT,'run','shared','state') as preparation:
+                preparation.drain(checkpoint=lambda stage,peer:order.append(peer) if stage=='commit-intent' else None)
+                self.assertEqual(order,[window,companion,owner])
+                self.assertEqual(gate.fd,1)
+                self.assertTrue(all(peer.exited() and not peer.closed for peer in order))
+                preparation.check()
+            self.assertIsNone(gate.fd)
+            self.assertTrue(all(peer.closed for peer in order))
+            self.assertTrue(all('cancel' not in peer.calls for peer in order))
 
 
 if __name__=='__main__':unittest.main()

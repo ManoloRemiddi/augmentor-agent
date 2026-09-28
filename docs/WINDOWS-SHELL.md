@@ -60,6 +60,17 @@ The two agent windows cannot claim the same combination. Obsolete queued message
 cannot activate a replacement binding; identifiers are not reused. `MOD_NOREPEAT`
 prevents held-key repeat notifications. Shutdown unregisters owned bindings.
 
+The shell records its creating Python thread and uses that identity for direct
+versus queued dispatch; it stays on that Qt thread for its entire lifetime.
+Creating temporary `QThread.currentThread()` wrappers in Python pipe workers
+triggered a reproduced Qt shutdown crash in the complete Linux regression suite:
+645 assertions passed, then process exit was 139. Excluding those shortcut tests,
+or substituting the Python-thread identity, removed the crash. The corrected
+product source passes all 645 local assertions and exits zero. GDB placed the
+old crash in Qt adopted-thread cleanup; this is scoped reproduction evidence,
+not a claim that all Qt/PySide versions have the same bug. Native Windows CI and
+the independent Linux CI environment still need this correction qualified.
+
 The only added supervisor requests are `shortcut-status` and `shortcut-save`, with
 fixed fields and one of the two supported window identities. Pipe authentication
 and application-root matching remain required. A timed-out save is not replayed;

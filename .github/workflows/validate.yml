@@ -77,6 +77,8 @@ jobs:
           export PATH="$PWD/release/dsh/node_modules/.bin:$PATH"
           python3 scripts/proof-recovery.py
       - name: Verify Qt interactions and licensing failures
+        env:
+          PYTHONFAULTHANDLER: '1'
         run: npm run test:native
       - name: Verify prompt editor against the real shared service
         run: python3 scripts/prompt-editor-proof.py

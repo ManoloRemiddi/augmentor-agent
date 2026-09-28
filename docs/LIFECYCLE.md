@@ -435,7 +435,8 @@ are still incomplete.
 `services/lifecycle/reservations.py` shares preparation/renewal/cancellation
 across already authenticated participants. It retains an attempted preparation
 before sending it, so even a lost reply gets one token-specific cancellation.
-It never repeats preparation, replays model work or commits shutdown. Each
+Its default cleanup never commits shutdown or replays work. Explicit observed
+drain is described below. Each
 participant renews independently; the conservative deadline starts before the
 request, and any lost/expired acknowledgment invalidates the entire group.
 Cleanup stops renewals before cancelling leaves, then their background owner.
@@ -449,8 +450,9 @@ DSH, its owned Resonant bridge and prompt/memory companions. Unknown ownership o
 unwinds the attempt, preserving accepted work. It currently requires a running
 owned supervisor and excludes external services. Global commit,
 integration with the independently qualified authenticated installer handoff and
-final exclusive installation access remain prerequisites for a complete update. This context alone cannot
-apply files or close an application.
+final exclusive installation access remain prerequisites for a complete update.
+Default context exit cancels reservations; only explicit `drain()` requests
+component shutdown. This context cannot apply files.
 
 Local failure/expiry/renewal tests pass. Native tests now cover actual companion
 group renewal/cancellation and assembled desktop/DSH preparation with preserved
@@ -483,6 +485,34 @@ while a real connection ticket is pending, then observe natural commit exit and
 restart. Native execution is pending. This qualifies the service lifecycle only;
 Windows ASR/TTS provisioning, device capture/playback and acoustic behavior remain
 open. The owner's existing Qwen/Breeze placement and settings are unchanged.
+
+### Observed dependency-order drain
+
+`Reservations.commit()` now requires a caller-provided durable checkpoint
+callback. It stops and joins only that component's renewal, validates all live
+reservations again, records intent, then sends commit once. Other components
+continue renewing independently. It records acknowledgment or unknown outcome
+and waits on the retained process observation; an unknown reply is never retried.
+A failed checkpoint, expired reservation or process that does not exit prevents
+further commit and all installer authorization. Cleanup cancels the remaining
+reversible reservations; already acknowledged shutdown is never cancelled.
+
+`WindowsPreparation.drain()` orders desktop windows, browser hosts, DSH, its
+owned voice bridge, durable companions and the background owner. Before committing
+the owner, read-only inventory must confirm every complete child Job has drained,
+including descendants outliving a leader. Startup exclusion and all observations
+remain held until the caller closes the preparation context.
+
+Twelve local reservation tests and three graph boundary tests pass, covering
+checkpoint failure/expiry, renewal races, unknown replies, missing exit and
+dependency order. The assembled native fixture is extended to drain an actual
+compiled window with DSH, voice, companions and owner, write atomic private
+checkpoints, prove exclusive lifetime access and restart with retained history.
+These native additions await execution. Its driver deliberately has no product
+lease; it performs no file replacement. Production still needs a transaction
+journal/recovery implementation and independent installer integration that exits
+the installed coordinator before applying files. No Update/Quit UI is connected
+to this unfinished global transaction.
 
 
 ### Windows installer handoff

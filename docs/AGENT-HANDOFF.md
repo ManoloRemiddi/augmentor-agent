@@ -12,7 +12,22 @@ W0/W1 have started with isolated baseline checks, hash-locked native x64/ARM64
 runtime candidates and hosted qualification jobs. No Windows app or customer
 release is complete. Preserve existing installations and unrelated open work.
 
-Current source adds the [owned Windows voice bridge](LIFECYCLE.md#windows-owned-voice-bridge)
+Latest source: [observed dependency-order drain](LIFECYCLE.md#observed-dependency-order-drain)
+now requires durable caller checkpoints, sends each commit once, retains exact
+exit observations and checks complete Jobs before owner shutdown. Twelve local
+reservation and three graph tests pass. New assembled window/DSH/voice/companion
+drain and restart assertions await native execution; independent apply/recovery
+and user-facing integration remain open. The Linux shutdown crash at `2bd7b67`
+is reproduced and corrected by using the shell's creating Python thread for
+dispatch; the complete local suite passes 645 assertions and exits zero. New
+hosted execution is pending. Full `2bd7b67` x64 fails managed service startup;
+the fixture now retains its previously discarded supervisor diagnostics and
+adds a real free-loopback-port startup test. Do not treat that workflow as passing.
+At `1bf1b78`, compiled browser commit passes x64; ARM64 stops earlier at a
+desktop snapshot comparison. The fixture now compares the prepared snapshot
+and records expected/actual state; corrected native qualification is pending.
+
+Source `2bd7b67` adds the [owned Windows voice bridge](LIFECYCLE.md#windows-owned-voice-bridge)
 to the background owner and observed maintenance graph. Five local private-profile/
 ownership tests and existing preparation/supervisor/launcher checks pass. Actual
 native service ticket/refusal/commit/restart assertions await x64/ARM64 execution;

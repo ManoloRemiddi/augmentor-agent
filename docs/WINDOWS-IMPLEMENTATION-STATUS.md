@@ -7,7 +7,29 @@ connect a Windows machine for joint physical testing afterward. Follow the full
 [implementation plan](WINDOWS-IMPLEMENTATION-PLAN.md); this ledger does not narrow
 its outcome. No Windows customer release or installed-product claim exists yet.
 
-Current source, September 28: managed DSH now starts its bundled Resonant loopback
+Latest source, September 28: explicit graph drain requires durable caller
+checkpoints and observed exits, renews remaining participants, and checks complete
+Jobs before owner shutdown. Twelve local reservation and three graph tests pass.
+The assembled window/DSH/voice/companion drain, exclusive-lease and restart proof
+awaits native execution; installer application and recovery remain unfinished.
+Linux [`2bd7b67`](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36385346967)
+passes all 647 native assertions but exits 139 during Qt interpreter shutdown.
+The actual Chromium commit/reconnect step passed before that failure. Local
+isolation and GDB traced the shutdown failure to the shell's temporary Qt thread
+wrappers. The corrected creating-thread dispatch passes all 645 local assertions
+and exits zero; hosted qualification is pending. See [thread dispatch evidence](WINDOWS-SHELL.md#keyboard-ownership).
+The failed workflow is not waived. The new free-loopback-port startup test also
+passes locally (six voice ownership checks total).
+
+Full `2bd7b67` x64 fails inside managed service startup, before voice integration
+qualification. The fixture now writes its previously discarded supervisor output
+to a private log and includes bounded diagnostics on failure. The earlier
+`1bf1b78` compiled browser commit passes x64; ARM64 stops earlier at a native
+transcript snapshot comparison. The updated fixture compares the snapshot taken
+inside the prepared admission fence and includes expected/actual values on
+failure. Both corrections require new native execution.
+
+Source `2bd7b67`, September 28: managed DSH now starts its bundled Resonant loopback
 bridge through the existing owner, with one retained Job, private profile and
 occupied-port refusal. Kernel-bound voice maintenance joins graph preparation.
 Five local profile/ownership refusal tests, two graph failure tests, six portable
@@ -26,7 +48,7 @@ commit assertions await execution; this is not an installed-version upgrade.
 At `e63312b`, [fast desktop](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36383783782)
 and [authenticated installer fixture](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36383783743)
 pass both CPUs. Its [full graph qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36383783733)
-is running. Global commit/apply, owned voice, remaining platform features,
+also passes both CPUs. Global commit/apply, owned voice, remaining platform features,
 recovery/rollback, physical hardware and customer release gates remain open.
 
 The following checkpoints are chronological history, not the latest capability

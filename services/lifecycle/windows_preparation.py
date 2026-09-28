@@ -1,13 +1,16 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Reversible preparation of this installation's observed Windows components.
 
-This context never commits shutdown, applies an installer or changes selection.
+This context prepares reversibly unless drain() is explicitly requested with a
+durable checkpoint callback. It never applies an installer or changes selection.
 It requires a running owned supervisor. Missing ownership is a refusal, not
 permission to adopt external services. Startup stays fenced throughout discovery,
-reservation and cleanup. A full installation transaction still needs global
-commit, independent installer integration and the final installation lease.
+reservation and cleanup. A full installation transaction still needs independent
+installer integration, recovery and the final installation lease.
 """
 import threading
+import json
+import time
 
 from .admission import MaintenanceBusy
 from .reservations import Reservations
@@ -59,6 +62,37 @@ class WindowsPreparation:
         if not self.entered or self.gate is None or self.gate.fd is None:
             raise MaintenanceBusy('Startup exclusion is no longer held.')
 
+    def drain(self,*,checkpoint):
+        """Close idle surfaces first and their background owner last.
+
+        Retain startup exclusion and every process observation for the caller's
+        independent installer transaction. Complete exit is still insufficient
+        to apply files: the installer needs the final exclusive lifetime lease.
+        """
+        self.check()
+        order=[*self.windows,*self.browsers,
+            *([self.dsh] if self.dsh is not None else []),
+            *([self.voice] if self.voice is not None else []),*self.companions,self.owner]
+        for participant in order:
+            self.check()
+            if participant is self.owner:
+                deadline=time.monotonic()+20
+                while True:
+                    status=self.owner.exchange(json.dumps({'action':'status'}))
+                    companions=status.get('companions')
+                    if not isinstance(companions,dict) or not {'prompts','memory'}<=companions.keys():
+                        raise MaintenanceBusy('The background component inventory is incomplete.')
+                    records=[status.get('dsh'),status.get('voice'),*companions.values()]
+                    if any(not isinstance(record,dict) or type(record.get('running')) is not bool for record in records):
+                        raise MaintenanceBusy('The background component inventory is incomplete.')
+                    if not any(record['running'] for record in records):break
+                    if time.monotonic()>=deadline:
+                        raise TimeoutError('An owned process range is still draining. No installation was authorized.')
+                    time.sleep(.05)
+                    self.check()
+            self.reservations.commit(participant,checkpoint=checkpoint)
+        self.check()
+
     def release_observations(self):
         # These handles have observation rights only; closing them never kills
         # a component. The startup writer is the final resource released.
@@ -80,7 +114,7 @@ class WindowsPreparation:
     def close(self):
         if self.closed:return self.reservations.cancelled
         if self.cleanup_thread is not None:
-            raise MaintenanceBusy('Reservation cleanup is still waiting for an in-flight response. No shutdown was authorized.')
+            raise MaintenanceBusy('Reservation cleanup is still waiting for an in-flight response. No installation was authorized.')
         try:confirmed=self.reservations.close()
         except TimeoutError:
             self.cleanup_thread=threading.Thread(target=self.deferred_cleanup,
@@ -93,7 +127,7 @@ class WindowsPreparation:
     def __exit__(self,kind,value,traceback):
         try:
             if not self.close():
-                raise MaintenanceBusy('Some releases could not be confirmed. Reservations expire automatically; nothing was committed.')
+                raise MaintenanceBusy('Some releases could not be confirmed. No installation was authorized.')
         except Exception as error:
             if value is None:raise
             value.add_note(str(error))

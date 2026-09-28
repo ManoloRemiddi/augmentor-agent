@@ -3,7 +3,7 @@
 from concurrent.futures import ThreadPoolExecutor
 import threading
 
-from PySide6.QtCore import QObject, QThread, Qt, Signal, Slot
+from PySide6.QtCore import QObject, Qt, Signal, Slot
 
 from .shortcut_activation import DesktopActivation
 from .windows_shortcuts import ShortcutOwner, DEFAULTS
@@ -14,6 +14,10 @@ class Shell(QObject):
     queued = Signal(object)
     def __init__(self, shortcuts=None, admission=None):
         super().__init__()
+        # This owner stays on its creating Qt thread. Do not manufacture Qt
+        # adopted-thread wrappers in short-lived Python pipe workers merely
+        # to choose the dispatch path; their shutdown can outlive QApplication.
+        self.owner_thread = threading.current_thread()
         self.shortcuts = shortcuts if shortcuts is not None else ShortcutOwner()
         self.admission = admission or Admission()
         self.activations = {name: DesktopActivation(instance=name) for name in DEFAULTS}
@@ -46,7 +50,7 @@ class Shell(QObject):
             nonlocal lease
             with release_lock:
                 if lease:lease.__exit__(None,None,None);lease=None
-        if QThread.currentThread() == self.thread():
+        if threading.current_thread() is self.owner_thread:
             try:return self.shortcuts.dispatch(message)
             finally:release()
         item = {'message': message, 'done': threading.Event(), 'lock': threading.Lock(),

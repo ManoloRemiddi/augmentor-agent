@@ -76,5 +76,18 @@ class VoiceOwnershipTests(unittest.TestCase):
             supervisor.dispatch({'action':'maintenance','method':'host.maintenance.commit','params':{'token':token}})
         voice.terminate.assert_not_called();voice.wait_graceful.assert_not_called()
 
+    def test_available_loopback_port_allows_owned_voice_launch(self):
+        root=Path(self.temporary.name)/'payload'
+        for name in ('node/node.exe','dsh/node_modules/dsh-resonant-voice/bin/resonant-voice.js'):
+            path=root/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_text('fixture',encoding='utf-8')
+        with socket.socket() as vacant:
+            vacant.bind(('127.0.0.1',0));port=vacant.getsockname()[1]
+        atomic_json(self.home/'config.json',{'port':port})
+        with patch('windows_supervisor.OwnedProcess') as launch,patch('windows_supervisor.owner_directory',return_value=self.home):
+            supervisor=Supervisor(root);supervisor.start_voice()
+            launch.assert_called_once()
+            self.assertIs(supervisor.voice,launch.return_value)
+            self.assertEqual(supervisor.voice_profile,{'home':str(self.home),'port':port})
+
 
 if __name__=='__main__':unittest.main()
