@@ -33,9 +33,11 @@ Current evidence:
   also pass. This exact-template test uses inert component markers and a recording
   startup script; it does not replace complete app qualification.
 - [Full bdba572 qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36405973046)
-  passes x64, including application of the actual retained original installer and
-  journal identity from the native selection receipt. ARM64 is executing its
-  installed-app step. Inspect terminal results before claiming both CPUs passed.
+  now passes both CPUs and shared Mac Qt at merge checkout
+  `7fb0927db3e8e75e03a8bae7d31c104649f2a992`. Downloaded installed reports confirm
+  complete retention/selection, actual cached-source application, local Qt health,
+  journal archival and removal. This is the newest complete installed baseline;
+  registered independent repair was added afterward.
 - All 38 local update/receipt/journal/coordinator tests pass. The [bdba572 fast
   native workflow](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36405973042)
   passes ARM64; x64 failed during checkout because GitHub could not be reached,
@@ -56,11 +58,24 @@ No customer key/feed or automatic updater is enabled.
 New source adds registered independent exact-build repair through the retained
 installer, including restoration without installed Python/Qt, launcher or version
 metadata. It refuses unfinished updates, unknown ownership and another selected
-source. Native template/full proof cases are added but not yet qualified; local
-38 update tests, three package tests and script compilation pass. See the
+source. [Native Inno at f61d32f](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36409313595)
+passes the x64 template cases, including registered repair without an installed
+runtime/metadata, pending-update/foreign-source refusal and preserved disabled
+startup. ARM64 and the complete installed proof are still running. Earlier native
+checks caught a Pascal Boolean mismatch and an unquoted ModifyPath; both are
+corrected. The pinned Inno
+compiler passes an isolated compile-only fixture; local 38 update tests, three
+package tests and script compilation pass. See the
 [repair contract](WINDOWS-INSTALLER-DECISION.md#independent-repair-from-windows-installed-app-controls).
 
-Next: qualify cached-source integration and independent exact-build repair; then
+Home CI exposed a fixture deadline expiring before dispatch. The corrected test
+waits for actual MCP dispatch before advancing its test clock and checks an explicit
+denied retry. All 29 Home tests pass locally; CI Home also passes at `f61d32f`.
+Production Home behavior is unchanged. Compiler object/import-library byproducts
+now stay in the temporary build directory; new template/full assertions for clean
+payload roots await native execution.
+
+Next: qualify registered independent exact-build repair; then
 finish cross-version recovery/rollback, obsolete-file cleanup and bounded cache pruning,
 actual N-to-N+1 and the customer notification/update action. The current Inno
 backend replaces `current` in place and does not provide atomic version selection

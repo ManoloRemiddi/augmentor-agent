@@ -636,3 +636,9 @@ would break an executable path containing spaces. Command quoting now happens
 inside the code-constant function, after directive parsing; the native assertion
 is retained. The older full run at `74ec319` was cancelled because its script had
 the already reproduced compile error, not because it was slow or passed.
+
+The downloaded full baseline also exposed unnecessary launcher `.lib`/`.exp`
+linker output at the installed payload root. Native builds now direct object and
+import/export-library output to their disposable compiler workspace. Template
+and full installed assertions require those byproducts absent; runtime libraries
+inside the pinned dependencies are unchanged. Native execution is pending.

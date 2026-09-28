@@ -49,6 +49,7 @@ def prove(out, arch, compiler, fixture_executable, runtime):
     build_spec = importlib.util.spec_from_file_location('template_launcher', ROOT/'scripts/build-windows-launcher.py')
     builder = importlib.util.module_from_spec(build_spec); build_spec.loader.exec_module(builder)
     builder.build_launcher(payload, arch)
+    assert not any(payload.glob('*.lib')) and not any(payload.glob('*.exp')) and not (payload/'launcher.obj').exists()
     spec = importlib.util.spec_from_file_location('template_package', ROOT/'scripts/package-windows.py')
     package = importlib.util.module_from_spec(spec); spec.loader.exec_module(package)
     report = package.build(payload, arch, out/'application-template-package',

@@ -98,6 +98,8 @@ def main():
         selection_bytes=(data/'recovery/selected-installer').read_bytes()
         stages.append('original-full-installer-retained')
         assert (install/'current/release.json').read_bytes() == (args.root/'release.json').read_bytes()
+        assert not any((install/'current').glob('*.lib')) and not any((install/'current').glob('*.exp'))
+        assert not (install/'current/launcher.obj').exists()
         for relative in ('Augmentor.exe','AugmentorBrowserHost.exe','python/python.exe','node/node.exe',
                          'powershell/pwsh.exe','dsh/payload.json'):
             assert package.digest(install/'current'/relative)==package.digest(args.root/relative)

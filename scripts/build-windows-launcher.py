@@ -133,12 +133,12 @@ def build_launcher(payload, arch, *, name='Augmentor.exe'):
             +compile_resource+
             'cl /nologo /O2 /W4 /MT '+definitions+('/DAUGMENTOR_BROWSER_HOST ' if name == 'AugmentorBrowserHost.exe' else '')+
             f'/I"{include}" "{ROOT / "services/platform/windows-launcher.c"}" '
-            f'/Fe:"{payload / name}" /Fo:"{payload / "launcher.obj"}" '+resource_input+
-            '/link /SUBSYSTEM:WINDOWS '+manifest_option+'user32.lib shell32.lib advapi32.lib')
+            f'/Fe:"{payload / name}" /Fo:"{resources / "launcher.obj"}" '+resource_input+
+            f'/link /IMPLIB:"{resources / "launcher.lib"}" /SUBSYSTEM:WINDOWS '+
+            manifest_option+'user32.lib shell32.lib advapi32.lib')
         # list2cmdline would backslash-escape embedded quotes, which cmd.exe does
         # not understand. This is an explicitly constructed, validated shell line.
         subprocess.run('cmd.exe /d /s /c "'+command+'"', check=True)
-    (payload/'launcher.obj').unlink(missing_ok=True)
 
 
 def build_installer_helper(output,*,development=False):
