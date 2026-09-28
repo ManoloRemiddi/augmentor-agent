@@ -620,3 +620,12 @@ files, repairs through ModifyPath and reopens the actual installed Qt applicatio
 New native execution is pending; local update tests and script compilation do not
 establish these native repair cases passed. Publisher trust, independent rollback,
 obsolete-file cleanup and bounded cache policy remain open.
+
+The first native run at `74ec319` fails while compiling the new script, before
+installation: combining the DLL's Win32 `BOOL` return directly with Pascal
+`Boolean` operands is rejected. The same pinned Inno 7.1.0 compiler reproduces
+the line-205 type mismatch in an isolated Wine compile-only fixture. Assigning
+the DLL result to the existing Boolean variable before the condition compiles
+successfully. No installer was executed under Wine; this is compiler evidence
+only. Package failures now include a bounded compiler diagnostic, and CI retains
+the template compiler log. Corrected native repair execution remains pending.

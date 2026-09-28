@@ -112,8 +112,11 @@ def build(root, arch, out, *, qualification=None, compiler_path=None):
             if any(char in value for char in '{};"'): raise ValueError('Unsupported installer path: '+key)
     tool = Path(compiler_path) if compiler_path else compiler(out)
     with (out/'compile.log').open('w', encoding='utf-8') as log:
-        subprocess.run([str(tool), *['/D'+key+'='+value for key,value in definitions.items()],
-            str(ROOT/'scripts/windows-application.iss')], check=True, timeout=900, stdout=log, stderr=subprocess.STDOUT)
+        result = subprocess.run([str(tool), *['/D'+key+'='+value for key,value in definitions.items()],
+            str(ROOT/'scripts/windows-application.iss')], timeout=900, stdout=log, stderr=subprocess.STDOUT)
+    if result.returncode:
+        detail = (out/'compile.log').read_text(encoding='utf-8', errors='replace')[-8192:]
+        raise RuntimeError('Inno compilation failed:\n'+detail)
     installer = out/f'Augmentor-{release["version"]}-windows-{arch}-candidate.exe'
     report = {'installer':str(installer), 'sha256':digest(installer), 'release':release,
         'installerBytes':installer.stat().st_size,

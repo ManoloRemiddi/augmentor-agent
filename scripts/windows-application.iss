@@ -202,9 +202,12 @@ begin
     end;
     MaintenanceHeld := True;
   end;
-  if not AuthenticatedHandoff and not ManualUpdateClear then begin
-    Result := 'An unfinished Augmentor update needs recovery before installation or repair can continue. Its records and your data were preserved.';
-    exit;
+  if not AuthenticatedHandoff then begin
+    AccessReady := ManualUpdateClear;
+    if not AccessReady then begin
+      Result := 'An unfinished Augmentor update needs recovery before installation or repair can continue. Its records and your data were preserved.';
+      exit;
+    end;
   end;
   AccessReady := ValidateApplicationPath(ExpandConstant('{app}'));
   if not AccessReady then begin
@@ -254,8 +257,11 @@ begin
     if not InstallerRetained then
       Result := 'Augmentor could not save its recovery copy. Check free disk space and try again. If this continues, contact support. Your installed app was not changed.';
   end;
-  if (Result = '') and NeedsSelectedRepair and not MatchesSelectedInstaller then
-    Result := 'This installer does not match the recorded Augmentor installation. Use its registered repair option or the coordinated update in Augmentor. Your installed app was not changed.';
+  if (Result = '') and NeedsSelectedRepair then begin
+    AccessReady := MatchesSelectedInstaller;
+    if not AccessReady then
+      Result := 'This installer does not match the recorded Augmentor installation. Use its registered repair option or the coordinated update in Augmentor. Your installed app was not changed.';
+  end;
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
