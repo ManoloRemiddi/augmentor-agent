@@ -4,6 +4,13 @@
 
 ## September 27 Windows implementation — active
 
+Current source adds [final installer access](WINDOWS-INSTALLER-DECISION.md#final-installation-access-after-coordinator-exit)
+after observed coordinator exit, with an actual Inno additional-lifetime-holder
+refusal case. Native compilation/execution is pending. Fast `1872e19` passes both
+CPUs, including the seven durable-journal tests. Full `2b1680d` service/drain and
+`1872e19` Inno journal qualification are still running. Continue full product
+apply/recovery and feature parity; no customer package has been published.
+
 Current addition: the shared [durable update record](LIFECYCLE.md#durable-update-record)
 passes seven local crash/write/ordering/concurrency tests. Authenticated Inno
 fixtures now record before and after APPLY; native execution is pending. Recovery,

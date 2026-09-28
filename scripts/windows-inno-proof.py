@@ -174,7 +174,8 @@ def prove_handoff(installer,state,out):
     import win32api,win32con,win32event,win32process
     from lifecycle.windows_startup import Startup
     from lifecycle.windows_installer_process import InstallerProcess
-    from platform_adapters.windows_identity import private_file_descriptor
+    from platform_adapters.windows_identity import private_file_descriptor,private_lock_descriptor
+    from platform_adapters import locks
     from platform_adapters.paths import private_directory
     from platform_adapters.private_files import read_json
     from lifecycle.update_journal import recovery_action
@@ -190,16 +191,17 @@ def prove_handoff(installer,state,out):
     outer_jobs=[]
     # Preserve the earlier transfer mechanism case and exercise its replacement
     # over authenticated IPC with a distinct explicit apply decision.
-    for authenticated,crash in ((False,False),(False,True),(True,False),(True,True)):
-        journal=private_directory(state/('journal-'+str(authenticated)+'-'+str(crash))) if authenticated else None
+    for authenticated,crash,blocked in ((False,False,False),(False,True,False),(True,False,False),(True,True,False),(True,False,True)):
+        journal=private_directory(state/('journal-'+str(authenticated)+'-'+str(crash)+'-'+str(blocked))) if authenticated else None
         for name in ('ready.json','coordinator.json','continue','parent-release'):
             (state/name).unlink(missing_ok=True)
         parent=subprocess.Popen([sys.executable,'-I','-Xutf8','-B',str(ROOT/'scripts/windows-inno-handoff-proof.py'),
             '--installer',str(staged),'--sha256',digest,'--state',str(state),'--log',
-            str(out/('handoff-'+('authenticated-' if authenticated else '')+('crash' if crash else 'exit')+'.log')),
-            *(['--authenticated','--journal',str(journal)] if authenticated else [])],
+            str(out/('handoff-'+('authenticated-' if authenticated else '')+('blocked' if blocked else 'crash' if crash else 'exit')+'.log')),
+            *(['--authenticated','--journal',str(journal)] if authenticated else []),
+            *(['--blocked-final-lease'] if blocked else [])],
             stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-        setup_process=None;loader=None
+        setup_process=None;loader=None;blocker=None
         try:
             deadline=time.monotonic()+30
             while not (state/'coordinator.json').is_file():
@@ -211,6 +213,13 @@ def prove_handoff(installer,state,out):
             info=wait_for(state/'coordinator.json');ready=wait_for(state/'ready.json')
             outer_jobs.append(info['outerRunnerJobObserved'])
             assert info['actualSetupInInstallerJob'] and info['unrelatedPidRefused'] and info['setupPid']==ready['pid']
+            assert info['coordinatorLifetimeLease']
+            lifetime=private_lock_descriptor(state/'installation.lock')
+            try:
+                try:locks.flock(lifetime,locks.LOCK_EX|locks.LOCK_NB)
+                except BlockingIOError:pass
+                else:raise AssertionError('The coordinator did not retain its lifetime lease.')
+            finally:os.close(lifetime)
             try:
                 writable=private_file_descriptor(staged,writable=True)
             except OSError as error:assert error.winerror==32,error
@@ -222,6 +231,9 @@ def prove_handoff(installer,state,out):
                 win32con.PROCESS_VM_READ,False,ready['pid'])
             assert Path(win32process.GetModuleFileNameEx(setup_process,0)).name.lower().endswith('.tmp'), 'The actual extracted Setup process must adopt the handle.'
             assert ready['pid']!=parent.pid and ready['pid']!=info['installerPid']
+            if blocked:
+                blocker=private_lock_descriptor(state/'installation.lock')
+                locks.flock(blocker,locks.LOCK_SH|locks.LOCK_NB)
             if crash:parent.kill()  # Deliberate disposable coordinator crash.
             else:(state/'parent-release').write_text('release',encoding='utf-8')
             _out,errors=parent.communicate(timeout=10)
@@ -238,7 +250,8 @@ def prove_handoff(installer,state,out):
                 else:raise AssertionError('Inno did not retain startup exclusion after the coordinator exited.')
             (state/'continue').write_text('continue',encoding='utf-8')
             assert win32event.WaitForSingleObject(setup_process,30000)==win32event.WAIT_OBJECT_0
-            assert win32process.GetExitCodeProcess(setup_process)==0
+            exit_code=win32process.GetExitCodeProcess(setup_process)
+            assert (exit_code!=0 if blocked else exit_code==0),exit_code
             assert win32event.WaitForSingleObject(loader,10000)==win32event.WAIT_OBJECT_0
             with Startup(state):pass
         finally:
@@ -247,6 +260,7 @@ def prove_handoff(installer,state,out):
             parent.communicate(timeout=10)
             for process in (setup_process,loader):
                 if process is not None:win32event.WaitForSingleObject(process,30000);process.Close()
+            if blocker is not None:os.close(blocker)
     for name in ('ready.json','coordinator.json','continue','parent-release'):(state/name).unlink(missing_ok=True)
     cancelled_journal=private_directory(state/'journal-cancel')
     run([sys.executable,'-I','-Xutf8','-B',ROOT/'scripts/windows-inno-handoff-proof.py',
@@ -288,6 +302,8 @@ def prove_handoff(installer,state,out):
         'authenticatedPipeTransfer':True,'abortBeforeApply':True,'coordinatorCrashBeforeApplyRefused':True,
         'unrelatedPipeClientRefused':True,'wrongCoordinatorPidRefused':True,
         'durableJournalBeforeAndAfterApply':True,'noAutomaticReplayFromSavedJournal':True,
+        'coordinatorLifetimeLeaseObserved':True,'actualSetupAcquiresFinalInstallationLease':True,
+        'additionalLifetimeLeaseRefusesFileApplication':True,
         'qualificationRetainsOuterRunnerJob':True,
         'outerRunnerJobObservations':outer_jobs,
         'productionInstallerQualified':False}

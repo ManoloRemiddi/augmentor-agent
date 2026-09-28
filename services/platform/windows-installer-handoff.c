@@ -13,13 +13,17 @@
 
 static HANDLE channel = INVALID_HANDLE_VALUE, startup = INVALID_HANDLE_VALUE;
 static HANDLE runtime = INVALID_HANDLE_VALUE, coordinator = NULL;
+static HANDLE installation = INVALID_HANDLE_VALUE;
+static BOOL authorized = FALSE;
 
 __declspec(dllexport) void WINAPI AugmentorHandoffClose(void) {
     if (channel != INVALID_HANDLE_VALUE) CloseHandle(channel);
+    if (installation != INVALID_HANDLE_VALUE) CloseHandle(installation);
+    if (coordinator) CloseHandle(coordinator);
     if (startup != INVALID_HANDLE_VALUE) CloseHandle(startup);
     if (runtime != INVALID_HANDLE_VALUE) CloseHandle(runtime);
-    if (coordinator) CloseHandle(coordinator);
     channel = startup = runtime = INVALID_HANDLE_VALUE; coordinator = NULL;
+    installation = INVALID_HANDLE_VALUE; authorized = FALSE;
 }
 
 static BOOL exchange_bytes(void *buffer, DWORD length, BOOL write, DWORD timeout) {
@@ -115,9 +119,53 @@ __declspec(dllexport) BOOL WINAPI AugmentorHandoffPrepare(const wchar_t *pipe,
     /* Admission transfers only after explicit APPLY. The separate final
      * installation lease still has to exclude all application processes. */
     CloseHandle(channel); channel = INVALID_HANDLE_VALUE;
+    authorized = TRUE;
     ok = TRUE;
 done:
     if (token) CloseHandle(token); free(identity);
     if (!ok) AugmentorHandoffClose();
+    return ok;
+}
+
+/* Called by the actual extracted Setup process immediately before replacement.
+ * No private Python/Qt DLL is loaded here. The coordinator's real process must
+ * exit, then every application's lifetime file handle must be gone. Retain both
+ * this final lease and the transferred startup writer through installation. */
+__declspec(dllexport) BOOL WINAPI AugmentorHandoffExclusive(DWORD timeout) {
+    if (!authorized || !coordinator || startup == INVALID_HANDLE_VALUE ||
+            runtime == INVALID_HANDLE_VALUE || !timeout || timeout > 30000) return FALSE;
+    if (installation != INVALID_HANDLE_VALUE) return TRUE;
+    ULONGLONG deadline = GetTickCount64() + timeout;
+    if (WaitForSingleObject(coordinator, timeout) != WAIT_OBJECT_0) return FALSE;
+    HANDLE token = NULL, file = INVALID_HANDLE_VALUE;
+    TOKEN_USER *identity = NULL; DWORD size = 0;
+    wchar_t directory[32768], path[32768];
+    BOOL ok = FALSE;
+    if (!OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &token)) goto done;
+    GetTokenInformation(token, TokenUser, NULL, 0, &size);
+    if (!size || !(identity = malloc(size)) ||
+            !GetTokenInformation(token, TokenUser, identity, size, &size)) goto done;
+    DWORD count = GetFinalPathNameByHandleW(runtime, directory, 32768, FILE_NAME_NORMALIZED | VOLUME_NAME_DOS);
+    if (!count || count >= 32768 ||
+            swprintf_s(path, 32768, L"%ls\\installation.lock", directory) < 0) goto done;
+    do {
+        file = CreateFileW(path, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING,
+            FILE_FLAG_OPEN_REPARSE_POINT, NULL);
+        if (file != INVALID_HANDLE_VALUE) break;
+        if (GetLastError() != ERROR_SHARING_VIOLATION || GetTickCount64() >= deadline) goto done;
+        Sleep(10);
+    } while (TRUE);
+    BY_HANDLE_FILE_INFORMATION info;
+    if (GetFileType(file) != FILE_TYPE_DISK || !GetFileInformationByHandle(file, &info) ||
+            info.nNumberOfLinks != 1 || info.dwFileAttributes &
+                (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT) ||
+            !augmentor_private_descriptor(file, identity->User.Sid)) goto done;
+    OVERLAPPED operation = {0};
+    if (!LockFileEx(file, LOCKFILE_EXCLUSIVE_LOCK | LOCKFILE_FAIL_IMMEDIATELY,
+            0, 1, 0, &operation)) goto done;
+    installation = file; file = INVALID_HANDLE_VALUE; ok = TRUE;
+done:
+    if (file != INVALID_HANDLE_VALUE) CloseHandle(file);
+    if (token) CloseHandle(token); free(identity);
     return ok;
 }

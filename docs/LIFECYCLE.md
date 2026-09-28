@@ -568,3 +568,9 @@ explicit subsequent decision. Cancel/loss before that decision aborts. A lost
 apply acknowledgment cannot be retried. This source requires native qualification
 and integration with global component drain, final exclusive installation access,
 transaction recovery and health rollback before a customer update can use it.
+
+The helper's [final installation-access operation](WINDOWS-INSTALLER-DECISION.md#final-installation-access-after-coordinator-exit)
+now waits for the actual coordinator exit and takes the private exclusive
+lifetime lease before file replacement. The disposable Inno fixture verifies a
+held coordinator lease and an additional-holder refusal case. Native execution
+of this addition is pending; it does not complete product apply or recovery.

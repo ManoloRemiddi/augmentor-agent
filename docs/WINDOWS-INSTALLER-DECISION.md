@@ -254,3 +254,21 @@ apply intent before authorization, and checks retained records after normal
 coordinator exit, crash and before-apply abort. Seven local journal tests pass;
 actual Inno execution of this addition is pending. The record is an inspection
 input and never authorization to repeat an uncertain install.
+
+## Final installation access after coordinator exit
+
+The embedded helper now exposes a bounded final-access operation, available only
+after authenticated APPLY. It waits on the retained coordinator process handle
+for actual exit, opens the existing private `installation.lock` without sharing,
+validates its owner/ACL and ordinary single-link identity, and takes the exclusive
+byte-zero lease. It holds that handle and the transferred startup writer through
+Setup completion. Missing/foreign files, a coordinator that remains alive, or any
+other application lifetime handle refuse replacement. It loads no application
+Python/Qt DLL from the directory being replaced and never terminates a process.
+
+The Inno fixture calls this before file installation. Its coordinator now retains
+a real shared lifetime lease, which the controller independently observes before
+exit. Authenticated cases test normal exit, crash, and an extra holder that must
+make Setup refuse final access. Source/syntax checks pass; these new C/Inno cases
+await native compilation/execution. Initial installation, real product data,
+recovery/health/rollback, signing and ordinary-user acceptance remain separate.

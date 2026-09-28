@@ -2,6 +2,13 @@
 
 # Windows implementation evidence
 
+Fast native [`1872e19`](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36388207564)
+passes both CPUs, including all seven private-journal crash/write tests. Current
+source adds final Setup access after actual coordinator exit and refusal while an
+additional lifetime holder remains. New helper compilation/Inno execution is
+pending; full owned-voice/graph drain and the earlier Inno journal additions are
+still being qualified. See [final access contract](WINDOWS-INSTALLER-DECISION.md#final-installation-access-after-coordinator-exit).
+
 The shared [durable update record](LIFECYCLE.md#durable-update-record) now has seven
 passing local tests, including actual process crash and exclusive writer claims.
 New native fast tests and authenticated Inno before/after-APPLY journal assertions

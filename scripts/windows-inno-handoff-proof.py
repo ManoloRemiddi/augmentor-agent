@@ -19,6 +19,8 @@ from lifecycle.windows_startup import Startup
 from lifecycle.windows_installer_process import InstallerProcess
 from lifecycle.windows_handoff import InstallerHandoff,HELLO
 from lifecycle.update_journal import UpdateJournal
+from platform_adapters import locks
+from platform_adapters.windows_identity import private_lock_descriptor
 
 
 def main():
@@ -32,6 +34,7 @@ def main():
     parser.add_argument('--crash-before-apply',action='store_true')
     parser.add_argument('--wrong-coordinator',action='store_true')
     parser.add_argument('--journal',type=Path)
+    parser.add_argument('--blocked-final-lease',action='store_true')
     args=parser.parse_args()
     kernel=ctypes.WinDLL('kernel32',use_last_error=True)
     in_job=ctypes.c_int()
@@ -39,6 +42,11 @@ def main():
     query.argtypes=[ctypes.c_void_p,ctypes.c_void_p,ctypes.POINTER(ctypes.c_int)];query.restype=ctypes.c_int
     if not query(ctypes.c_void_p(-1),None,ctypes.byref(in_job)):raise ctypes.WinError(ctypes.get_last_error())
     with ExitStack() as stack:
+        # Model the installed coordinator's lifetime handle. Setup must wait
+        # for this actual process to exit, not merely for its APPLY message.
+        lifetime=private_lock_descriptor(args.state/'installation.lock')
+        stack.callback(os.close,lifetime)
+        locks.flock(lifetime,locks.LOCK_SH|locks.LOCK_NB)
         journal=None
         if args.journal:
             # The authenticated cases repair the already selected 0.0.2 fixture
@@ -58,7 +66,7 @@ def main():
             assert handoff is not None and os.getpid()!=1
             launch=[value if not value.startswith('/augmentorcoordinator=') else '/augmentorcoordinator=1' for value in launch]
         with InstallerProcess(args.installer,args.sha256,['/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',
-            '/LOG='+str(args.log),*launch],qualification_outer_job=True) as installer:
+            '/LOG='+str(args.log),*(['/finalleasetimeout=1000'] if args.blocked_final_lease else []),*launch],qualification_outer_job=True) as installer:
             if handoff:
                 handoff.bind(installer)
                 if args.wrong_coordinator:
@@ -105,6 +113,7 @@ def main():
             process.Close()
             (args.state/'coordinator.json').write_text(json.dumps({'installerPid':installer.pid,
                 'setupPid':ready['pid'],'actualSetupInInstallerJob':True,'unrelatedPidRefused':True,
+                'coordinatorLifetimeLease':True,
                 'outerRunnerJobObserved':bool(in_job.value)}),encoding='utf-8')
             while not (args.state/'parent-release').exists():
                 if installer.poll() is not None:raise RuntimeError('The disposable installer exited before handoff.')

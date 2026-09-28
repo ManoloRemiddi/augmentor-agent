@@ -35,6 +35,8 @@ function PrepareAuthenticatedHandoff(Pipe: String; Coordinator: Cardinal; Qualif
   external 'AugmentorHandoffPrepare@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
 procedure CloseAuthenticatedHandoff;
   external 'AugmentorHandoffClose@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
+function AcquireAuthenticatedInstallation(Timeout: Cardinal): BOOL;
+  external 'AugmentorHandoffExclusive@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
 
 function OpenGateFile(Name: String; Access, Sharing: Cardinal;
   Security: NativeInt; Creation, Attributes: Cardinal; Template: THandle): THandle;
@@ -122,6 +124,11 @@ end;
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 begin
   Result := '';
+  if AuthenticatedHandoff and not AcquireAuthenticatedInstallation(
+      StrToIntDef(ExpandConstant('{param:finalleasetimeout|30000}'), 30000)) then begin
+    Result := 'The update coordinator or an application process has not released installation access.';
+    exit;
+  end;
   if not AcquireGate then
     Result := 'Augmentor qualification has active work. Finish it before maintenance.'
   else if ExpandConstant('{param:failaftergate|0}') = '1' then
