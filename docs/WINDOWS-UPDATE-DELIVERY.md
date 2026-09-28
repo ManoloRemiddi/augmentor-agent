@@ -211,3 +211,11 @@ production identity comparison is unchanged. Both-CPU complete qualification is
 still required. The new [independent inspection action](WINDOWS-INSTALLER-DECISION.md#independent-installer-inspection-before-recovery)
 now consumes this same shared inventory without depending on installed Python;
 its new native execution is pending.
+
+
+Independent recovery now has a [recorded-source assessment](WINDOWS-INSTALLER-DECISION.md#independent-recorded-source-assessment)
+that matches the actual standalone installer digest and embedded metadata to the
+original update source under live maintenance/writer exclusion. It cannot choose
+a recovery build from the mutable selection pointer or a version alone. This is
+read-only source matching, not signature provisioning or rollback permission.
+Portable refusal cases pass; its new native snapshot/worker integration is pending.

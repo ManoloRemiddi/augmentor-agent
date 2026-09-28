@@ -21,7 +21,9 @@ class PackageTests(unittest.TestCase):
         for name in ('Augmentor.exe','AugmentorBrowserHost.exe','python/python.exe','node/node.exe',
                      'powershell/pwsh.exe','updater/WinSparkle.dll','dsh/payload.json','scripts/launch-windows.py',
                      'scripts/windows-local-health.py','scripts/windows-inspect-payload.py',
-                     'services/lifecycle/payload_integrity.py'):
+                     'services/lifecycle/payload_integrity.py','services/lifecycle/recovery_source.py',
+                     'services/lifecycle/update_journal.py','services/platform_adapters/private_files.py',
+                     'services/platform_adapters/locks.py'):
             path=self.root/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_text('fixture')
         from lifecycle.payload_integrity import seal_payload
         self.release=seal_payload(self.root)

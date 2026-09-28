@@ -57,9 +57,9 @@ def main():
         return result
     def setup(label, *extra, success=True):
         return run([report['installer'],*flags,'/LOG='+str(out/(label+'.log')),*extra], success=success)
-    def independent_inspection(label):
+    def independent_inspection(label,*,source=False):
         log=out/(label+'.log')
-        run([cached_installer,*flags,'/LOG='+str(log),'/augmentorinspect=1'],success=False)
+        run([cached_installer,*flags,'/LOG='+str(log),'/augmentorinspect='+('source' if source else '1')],success=False)
         marker='Augmentor independent inspection result: '
         rows=[line.split(marker,1)[1] for line in log.read_text(encoding='utf-8-sig').splitlines() if marker in line]
         assert len(rows)==1, log.read_text(encoding='utf-8-sig')[-8192:]
@@ -235,7 +235,11 @@ def main():
         assert (install/'current/release.json').read_bytes()==(args.root/'release.json').read_bytes()
         assert sentinel.read_bytes()==sentinel_bytes
         pending_bytes=(transaction/'active.json').read_bytes()
-        assert independent_inspection('independent-pending-inspection')['complete']
+        assessed=independent_inspection('independent-pending-inspection',source=True)
+        assert assessed['complete'] and assessed['recovery']['recordedSourceMatches']
+        assert assessed['recovery']['applyAuthorized'] is False
+        assert assessed['recovery']['recordSHA256']==package.digest(transaction/'active.json')
+        assert assessed['recovery']['installerSHA256']==report['sha256']
         assert (transaction/'active.json').read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
         for application in (executable, install/'current/AugmentorBrowserHost.exe'):
             blocked = subprocess.run([str(application),'--qualification-root',str(data),'--preview'],

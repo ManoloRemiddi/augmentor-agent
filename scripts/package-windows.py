@@ -37,7 +37,9 @@ def candidate(root, arch):
     for name in ('Augmentor.exe', 'AugmentorBrowserHost.exe', 'python/python.exe',
                  'node/node.exe', 'powershell/pwsh.exe', 'updater/WinSparkle.dll',
                  'dsh/payload.json', 'scripts/launch-windows.py', 'scripts/windows-local-health.py',
-                 'scripts/windows-inspect-payload.py', 'services/lifecycle/payload_integrity.py'):
+                 'scripts/windows-inspect-payload.py', 'services/lifecycle/payload_integrity.py',
+                 'services/lifecycle/recovery_source.py', 'services/lifecycle/update_journal.py',
+                 'services/platform_adapters/private_files.py', 'services/platform_adapters/locks.py'):
         if not (root/name).is_file(): raise ValueError('Incomplete shared application payload: '+name)
     # Includes aliases/redirects and stale build output. Never reseal here: a
     # mutated staged runtime must fail intake rather than become a new baseline.

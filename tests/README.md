@@ -362,3 +362,14 @@ state/data. The prior ARM64 failure's exact cause was not recorded. Full install
 integration remains pending and now explicitly requires independent inspection
 refusal while a real window retains an unsent draft. Python compilation and
 whitespace checks pass for that additional assertion.
+
+
+`test_recovery_source.py` adds six read-only cases: exact source/digest binding,
+same-version foreign build/installer refusal, incompatible schemas, unknown
+shutdown PIDs retained as history, non-apply observations for terminal/prepared
+phases, and bounded/duplicate/malformed records. All six plus 43 update tests and
+four package checks pass locally. Native template tests add live writer exclusion,
+private record alias refusal, missing-runtime source assessment, foreign/malformed
+source refusal and unchanged data. The full installed proof assesses its actual
+unresolved same-build journal. New native execution is pending; matching never
+implies apply/rollback authorization or publisher trust.

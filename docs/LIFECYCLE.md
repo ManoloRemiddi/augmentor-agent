@@ -679,3 +679,15 @@ An actual two-preview-process portable test reproduces the old exit timeout and
 passes after the fix, observing normal exits from both token commit and legacy
 idle close. Four desktop maintenance tests also pass. Both native Windows and
 the complete installed repair/apply/removal sequence need new execution.
+
+
+## Independent recovery source observation
+
+`lifecycle/recovery_source.py` checks an independently identified installer/release
+against a validated interrupted journal's exact source. The Windows installer
+holds live exclusive maintenance and journal-writer locks, pins the private record,
+and snapshots it outside the installed app. A matching result records only source,
+metadata and journal hashes plus the remaining observation category; it never
+replays recorded PIDs or authorizes apply. See [the native boundary and evidence](WINDOWS-INSTALLER-DECISION.md#independent-recorded-source-assessment).
+Malformed, foreign and incompatible sources refuse. Six source-assessment tests
+and all 43 existing update cases pass locally; native integration is pending.

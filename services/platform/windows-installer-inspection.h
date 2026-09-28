@@ -6,13 +6,21 @@
 static HANDLE inspection_parent = INVALID_HANDLE_VALUE;
 static HANDLE inspection_root = INVALID_HANDLE_VALUE;
 static HANDLE inspection_report = INVALID_HANDLE_VALUE;
+static HANDLE inspection_updates = INVALID_HANDLE_VALUE;
+static HANDLE inspection_writer = INVALID_HANDLE_VALUE, inspection_record = INVALID_HANDLE_VALUE;
 static wchar_t inspection_path[32768];
+static wchar_t inspection_installer[65];
 static DWORD inspection_stage = 0, inspection_detail = 0;
 
 __declspec(dllexport) DWORD WINAPI AugmentorInspectionStage(void) { return inspection_stage; }
 __declspec(dllexport) DWORD WINAPI AugmentorInspectionDetail(void) { return inspection_detail; }
 
 static void augmentor_inspection_close(void) {
+    if (inspection_record != INVALID_HANDLE_VALUE) CloseHandle(inspection_record);
+    if (inspection_writer != INVALID_HANDLE_VALUE) CloseHandle(inspection_writer);
+    if (inspection_updates != INVALID_HANDLE_VALUE) CloseHandle(inspection_updates);
+    inspection_record = inspection_writer = inspection_updates = INVALID_HANDLE_VALUE;
+    inspection_installer[0] = 0;
     if (inspection_report != INVALID_HANDLE_VALUE) CloseHandle(inspection_report);
     if (inspection_root != INVALID_HANDLE_VALUE) CloseHandle(inspection_root);
     if (inspection_parent != INVALID_HANDLE_VALUE) CloseHandle(inspection_parent);
@@ -65,6 +73,61 @@ done:
     return ok;
 }
 
+/* Snapshot only the canonical private active record while holding its live
+ * writer lock and denying record writes/deletion. This does not create a new
+ * writer file, infer liveness from saved PIDs, or change persistent state. */
+__declspec(dllexport) BOOL WINAPI AugmentorInspectionSnapshot(const wchar_t *installer_digest) {
+    PSID user = NULL; PSECURITY_DESCRIPTOR base_security = NULL, record_security = NULL;
+    HANDLE copy = INVALID_HANDLE_VALUE; BOOL ok = FALSE;
+    wchar_t directory[32768], path[32768]; BYTE *content = NULL;
+    DWORD count = 0, written = 0;
+    if (manual.base == INVALID_HANDLE_VALUE || manual.file == INVALID_HANDLE_VALUE || authorized ||
+            inspection_root == INVALID_HANDLE_VALUE || inspection_writer != INVALID_HANDLE_VALUE ||
+            inspection_record != INVALID_HANDLE_VALUE || !cache_digest(installer_digest)) return FALSE;
+    if (GetSecurityInfo(manual.base, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION,
+            &user, NULL, NULL, NULL, &base_security) != ERROR_SUCCESS) goto done;
+    count = GetFinalPathNameByHandleW(manual.base, directory, 32768, FILE_NAME_NORMALIZED | VOLUME_NAME_DOS);
+    if (!count || count >= 32768 || wcsncmp(directory, L"\\\\?\\", 4)) goto done;
+    memmove(directory, directory + 4, (count - 3) * sizeof(wchar_t));
+    if (wcscat_s(directory, 32768, L"\\updates")) goto done;
+    inspection_updates = augmentor_private_directory(directory, user, NULL, FALSE);
+    if (inspection_updates == INVALID_HANDLE_VALUE ||
+            swprintf_s(path, 32768, L"%ls\\writer.lock", directory) < 0) goto done;
+    inspection_writer = CreateFileW(path, GENERIC_READ | GENERIC_WRITE,
+        FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_OPEN_REPARSE_POINT, NULL);
+    BY_HANDLE_FILE_INFORMATION info;
+    if (inspection_writer == INVALID_HANDLE_VALUE || GetFileType(inspection_writer) != FILE_TYPE_DISK ||
+            !GetFileInformationByHandle(inspection_writer, &info) || info.nNumberOfLinks != 1 ||
+            info.dwFileAttributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT) ||
+            !augmentor_private_descriptor(inspection_writer, user)) goto done;
+    OVERLAPPED operation = {0};
+    if (!LockFileEx(inspection_writer, LOCKFILE_EXCLUSIVE_LOCK | LOCKFILE_FAIL_IMMEDIATELY,
+            0, 1, 0, &operation) || swprintf_s(path, 32768, L"%ls\\active.json", directory) < 0) goto done;
+    inspection_record = CreateFileW(path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+        FILE_FLAG_OPEN_REPARSE_POINT, NULL);
+    if (!cache_file(inspection_record, user, TRUE, 65536) ||
+            GetSecurityInfo(inspection_record, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION,
+                NULL, NULL, NULL, NULL, &record_security) != ERROR_SUCCESS) goto done;
+    content = malloc(65537);
+    if (!content || !ReadFile(inspection_record, content, 65537, &count, NULL) || !count || count > 65536 ||
+            swprintf_s(path, 32768, L"%ls\\recovery-record.json", inspection_path) < 0) goto done;
+    SECURITY_ATTRIBUTES attributes = {sizeof(attributes), record_security, FALSE};
+    copy = CreateFileW(path, GENERIC_WRITE, 0, &attributes, CREATE_NEW,
+        FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OPEN_REPARSE_POINT, NULL);
+    if (copy == INVALID_HANDLE_VALUE || !WriteFile(copy, content, count, &written, NULL) ||
+            written != count || !FlushFileBuffers(copy) ||
+            wcscpy_s(inspection_installer, 65, installer_digest)) goto done;
+    ok = TRUE;
+done:
+    if (copy != INVALID_HANDLE_VALUE) CloseHandle(copy);
+    if (record_security) LocalFree(record_security);
+    if (base_security) LocalFree(base_security);
+    free(content);
+    /* Every retained handle, including a refused snapshot, is released by the
+     * caller's existing finally block. It cannot be reused as an authority. */
+    return ok;
+}
+
 __declspec(dllexport) BOOL WINAPI AugmentorInspectionRun(const wchar_t *installed,
         const wchar_t *release_digest) {
     HANDLE metadata = INVALID_HANDLE_VALUE, job = NULL;
@@ -87,8 +150,9 @@ __declspec(dllexport) BOOL WINAPI AugmentorInspectionRun(const wchar_t *installe
             !cache_stream(metadata, INVALID_HANDLE_VALUE, release_digest)) goto done;
     inspection_stage = 3;
     command = malloc(32768 * sizeof(wchar_t));
-    if (!command || swprintf_s(command, 32768, L"\"%ls\" -I -B -X utf8 \"%ls\" \"%ls\" %ls",
-            executable, script, installed, release_digest) < 0) goto done;
+    if (!command || swprintf_s(command, 32768, L"\"%ls\" -I -B -X utf8 \"%ls\" \"%ls\" %ls %ls",
+            executable, script, installed, release_digest,
+            inspection_installer[0] ? inspection_installer : L"-") < 0) goto done;
     inspection_stage = 4;
     job = CreateJobObjectW(NULL, NULL);
     JOBOBJECT_EXTENDED_LIMIT_INFORMATION limits = {0};

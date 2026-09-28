@@ -814,3 +814,35 @@ The exact cause of the preceding uninstrumented ARM64 failure is not claimed.
 All fast desktop checks also pass both CPUs. The full installed proof now adds
 an explicit refusal assertion while a real window holds an unsent draft; complete
 application integration, including that assertion, remains pending.
+
+
+## Independent recorded-source assessment
+
+The fixed `/augmentorinspect=source` action extends independent inspection with
+an exact source identity check. It still returns before all installation sections
+and cannot apply, restore, select a build, clear a journal or reopen the app.
+The native helper first retains exclusive startup/installation admission, opens
+the canonical protected updates directory, obtains the live byte-zero writer lock
+without waiting, and pins the ordinary private active record against writes or
+deletion. It creates neither a missing writer file nor a new transaction. Only
+that bounded record is copied to fresh private scratch; all handles remain held
+through the worker's complete exit.
+
+The shared `recovery_source.py` validates the full journal and checks the
+independent installer's actual SHA-256 and embedded release identity against the
+recorded **source**, including CPU, channel and data compatibility. A version or
+`selected-installer` pointer alone cannot choose recovery bytes. Duplicate JSON,
+malformed/oversized records, another build with the same version, another installer
+or incompatible schemas refuse. The result binds the exact record, installer and
+release digests and gives the remaining observation category. Recorded PIDs stay
+history; every result has `applyAuthorized: false`. Publisher trust, observed
+health and a fresh recovery apply authorization remain separate requirements.
+
+Six portable source-assessment cases and all 43 update tests pass; four package
+checks and Python compilation pass. The actual Inno script compiles in the inert
+local fixture. Native template cases now require source matching with missing
+installed runtime/metadata, live-writer refusal, hard-linked-record refusal,
+wrong-source/malformed-record refusal and unchanged persistent data. The template
+uses the real cached source with a synthetic future target; it is not N-to-N+1.
+The full app proof assesses its real unresolved same-build update record before
+health. New native execution is pending.

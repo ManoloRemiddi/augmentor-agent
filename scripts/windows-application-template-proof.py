@@ -46,7 +46,9 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         ignore=shutil.ignore_patterns('site-packages', '__pycache__', '*.pyc'))
     (payload/'python/Lib/site-packages').mkdir(parents=True, exist_ok=True)
     shutil.copy2(ROOT/'scripts/windows-finish-launch-fixture.py', payload/'scripts/launch-windows.py')
-    for name in ('scripts/windows-inspect-payload.py','services/lifecycle/payload_integrity.py'):
+    for name in ('scripts/windows-inspect-payload.py','services/lifecycle/payload_integrity.py',
+                 'services/lifecycle/recovery_source.py','services/lifecycle/update_journal.py',
+                 'services/platform_adapters/private_files.py','services/platform_adapters/locks.py'):
         target=payload/name;target.parent.mkdir(parents=True,exist_ok=True)
         shutil.copy2(ROOT/name,target)
     build_spec = importlib.util.spec_from_file_location('template_launcher', ROOT/'scripts/build-windows-launcher.py')
@@ -75,10 +77,10 @@ def prove(out, arch, compiler, fixture_executable, runtime):
                 child.kill(); child.wait(timeout=10)  # Failed fixture cleanup only.
         assert (code == 0) == success, (label,code)
         assert not launch_record.exists(), 'Silent maintenance launched the application.'
-    def inspect(executable,label):
+    def inspect(executable,label,*,source=False):
         # InitializeSetup deliberately refuses installation after inspection.
         # A nonzero Setup exit alone is not an inspection-success assertion.
-        run(executable,label,success=False,arguments=['/augmentorinspect=1'])
+        run(executable,label,success=False,arguments=['/augmentorinspect='+('source' if source else '1')])
         log=(out/('application-template-'+label+'.log')).read_text(encoding='utf-8-sig')
         marker='Augmentor independent inspection result: '
         rows=[line.split(marker,1)[1] for line in log.splitlines() if marker in line]
@@ -155,6 +157,46 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         assert pending.read_bytes() == pending_bytes and not installed_release.exists()
         assert not (install/'current/Augmentor.exe').exists() and sentinel.read_bytes() == sentinel_bytes
         pending.unlink()  # Dispose only this test's synthetic pending record.
+        # Independent source assessment uses a real private journal/writer lock
+        # with the real cached source and a deliberately synthetic future target.
+        # It is not a cross-version apply/rollback proof.
+        from lifecycle.update_journal import UpdateJournal
+        source_identity={name:release[name] for name in
+            ('version','sourceCommit','target','channel','dataSchema','readableDataSchemas')}
+        source_identity['sha256']=report['sha256']
+        target_identity={**source_identity,'version':'0.0.2','sourceCommit':'e'*40,'sha256':'f'*64}
+        with UpdateJournal(updates,source_identity,target_identity) as journal:
+            for phase in ('preparing','prepared','drained','installer-ready','apply-intent'):journal.advance(phase)
+            pending_bytes=pending.read_bytes()
+            run(cached,'source-held-writer-refusal',success=False,arguments=['/augmentorinspect=source'])
+            held_log=(out/'application-template-source-held-writer-refusal.log').read_text(encoding='utf-8-sig')
+            assert 'exclusive private update snapshot unavailable.' in held_log
+            assert 'Augmentor independent inspection result:' not in held_log
+            assert pending.read_bytes()==pending_bytes
+        assessed=inspect(cached,'recorded-source-inspection',source=True)['recovery']
+        assert assessed['recordedSourceMatches'] and not assessed['applyAuthorized']
+        assert assessed['phase']=='apply-intent' and assessed['installerSHA256']==report['sha256']
+        assert assessed['recordSHA256']==hashlib.sha256(pending_bytes).hexdigest()
+        assert pending.read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
+        assert not installed_release.exists() and not (install/'current/Augmentor.exe').exists()
+        alias=updates/'record-alias.json';os.link(pending,alias)
+        try:
+            run(cached,'source-record-alias-refusal',success=False,arguments=['/augmentorinspect=source'])
+            alias_log=(out/'application-template-source-record-alias-refusal.log').read_text(encoding='utf-8-sig')
+            assert 'exclusive private update snapshot unavailable.' in alias_log
+            assert 'Augmentor independent inspection result:' not in alias_log
+            assert pending.read_bytes()==pending_bytes and alias.read_bytes()==pending_bytes
+        finally:alias.unlink()
+        for label,raw in (
+            ('wrong-source',json.dumps({**json.loads(pending_bytes),'source':{**source_identity,'sourceCommit':'e'*40}}).encode()),
+            ('malformed-source',b'Unparseable fixture update.')):
+            with os.fdopen(descriptor(pending,writable=True),'wb') as stream:stream.write(raw)
+            run(cached,label+'-assessment-refusal',success=False,arguments=['/augmentorinspect=source'])
+            log=(out/('application-template-'+label+'-assessment-refusal.log')).read_text(encoding='utf-8-sig')
+            assert 'stage=9, detail=85;' in log and 'Augmentor independent inspection result:' not in log
+            assert pending.read_bytes()==raw and sentinel.read_bytes()==sentinel_bytes
+        pending.unlink()  # Dispose only this synthetic journal; never customer recovery policy.
+        stages.append('independent-recorded-source-assessment-and-live-writer-refusal')
         selected_bytes = read_private(selection)
         from lifecycle.installed_source import PREFIX
         with os.fdopen(descriptor(selection,writable=True),'wb') as stream:
