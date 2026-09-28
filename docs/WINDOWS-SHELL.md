@@ -18,6 +18,16 @@ Python, PySide and Shiboken libraries and selects the bundled Qt plugin director
 This allows separately loaded image plugins to resolve their Qt dependencies
 without restoring global DLL search. [Python DLL directories](https://docs.python.org/3/library/os.html#os.add_dll_directory).
 
+The product build embeds the existing Augmentor vector icon at seven sizes
+(16–256 pixels), the shared product version, and an ordinary-user application
+manifest. Per-monitor V2 DPI awareness prevents Windows from treating the entire
+window as an old bitmap-scaled application. Long-path awareness is declared;
+this does not remove Windows policy or third-party path limits. The OS compatibility
+GUID is the shared Windows 10/11 manifest identifier, not a Windows 10 product
+support commitment. Native qualification reads these resources back from the
+compiled executable. Mixed-monitor DPI and Explorer/taskbar visuals still need
+physical Windows acceptance. See [Microsoft application manifests](https://learn.microsoft.com/en-us/windows/win32/sbscs/application-manifests).
+
 ## Keyboard ownership
 
 The existing Windows supervisor now hosts a Qt event loop and owns both native

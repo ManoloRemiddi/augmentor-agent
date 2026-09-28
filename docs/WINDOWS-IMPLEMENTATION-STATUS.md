@@ -559,3 +559,11 @@ bundled Python/Qt library directories and restricts Qt plugins to that payload.
 This addresses an identified packaging gap; the native zoom rerun must still
 confirm the original failure and the correction. The supervisor proof additionally
 restarts the owner and checks restoration of both saved shortcuts.
+
+At `475a3a2`, [desktop run 36363357087](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36363357087)
+passes on both CPUs, including closing/restarting the actual background owner
+and restoring both persisted bindings. The next product build adds native icon,
+version and manifest resources without changing the approved artwork. All seven
+generated PNG icon frames locally decode at their exact sizes with alpha;
+native resource compilation/readback and physical shell/DPI appearance remain
+pending. The disposable W1 installer fixture retains its separate identity.

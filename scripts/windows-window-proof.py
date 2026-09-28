@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import struct
 import sys
 import tempfile
 import time
@@ -35,6 +36,24 @@ def main():
     options = {'creationflags': subprocess.CREATE_NO_WINDOW} if sys.platform == 'win32' else {}
     report = {'passed': False, 'platform': sys.platform, 'scope': 'Two Qt preview processes and shared controls; no model, installed launcher or physical-keyboard proof.'}
     report['nativeLauncher'] = bool(args.launcher)
+    if args.launcher:
+        import win32api
+        import xml.etree.ElementTree as ET
+        executable = str(args.launcher.resolve())
+        release = json.loads((args.launcher.resolve().parent/'release.json').read_text(encoding='utf-8'))
+        version = win32api.GetFileVersionInfo(executable, '\\')
+        major, minor, patch = map(int, release['version'].split('.'))
+        assert version['FileVersionMS'] == major << 16 | minor
+        assert version['FileVersionLS'] == patch << 16
+        library = win32api.LoadLibraryEx(executable, 0, 2 | 32)
+        try:
+            manifest = ET.fromstring(win32api.LoadResource(library, 24, 1))
+            assert manifest.find('.//{urn:schemas-microsoft-com:asm.v3}requestedExecutionLevel').get('level') == 'asInvoker'
+            assert manifest.find('.//{http://schemas.microsoft.com/SMI/2016/WindowsSettings}dpiAwareness').text == 'PerMonitorV2,PerMonitor'
+            icon = win32api.LoadResource(library, 14, 101)
+            assert struct.unpack_from('<HHH', icon) == (0, 1, 7)
+            report['embeddedResources'] = {'version': release['version'], 'iconSizes': 7, 'elevation': 'asInvoker', 'dpi': 'PerMonitorV2'}
+        finally: win32api.FreeLibrary(library)
     def command(name, value):
         with LocalSocket() as peer:
             peer.settimeout(3); peer.connect(str(Path(env['XDG_RUNTIME_DIR'])/(ipc_basename(name)+'.sock')))
