@@ -60,6 +60,12 @@ private-directory requirement. Native `795a72b` qualification exposed the earlie
 elevated-runner ownership defect on both CPUs; the correction is awaiting native
 execution. Local creation/read/preservation and hard-link refusal tests pass.
 
+The first correction's full x64 run (`187bee6`) found a second token creator in
+`setup-complete.py`, used before the integration's first bootstrap. It now calls
+the same protected-token helper. A bootstrap startup-failure/retry test checks
+the token is readable through the strict validator and never rotates. New native
+execution is pending; no existing user's token or directory ACL was migrated.
+
 The native and browser transports use authenticated Typert RPC and scoped session
 streams. Model Picker Augmented **1.1.2** is the compatible optional DSH plugin;
 its pins and visibility are shared by both DSH surfaces. It does not curate Pi or

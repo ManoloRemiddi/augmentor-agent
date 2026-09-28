@@ -246,7 +246,7 @@ alive after its root disposed. Product, memory, execution, steering and desktop
 cleanup now use `ctx.effect(() => cleanup)`; the lease cleanup waits for its
 helper to exit normally. This shared correction applies to all three OSs.
 
-Voice and browser still require their own participation. The global
+The browser still requires its own participation. The global
 owner must stop automatic restarts, reserve
 all components, cancel reservations on preparation failure, and acquire the
 exclusive installation lease after they drain. No installer may infer that the
@@ -269,3 +269,19 @@ The old maintenance status/close commands cannot bypass a reservation. Local Qt
 tests and a real two-process Linux preview proof pass; compiled Windows execution
 of this new desktop behavior is pending. These are component-level checks, not
 proof of global Quit or an installation transaction.
+
+### Voice companion admission
+
+The shared Resonant Voice 0.1.18 candidate exposes the same private reservation
+vocabulary through its existing authenticated `/internal/maintenance` endpoint.
+Read its [versioned contract](https://github.com/ManoloRemiddi/resonant-voice/blob/7a6645ea27f55bdd18acbc22c2893a09bed58004/docs/PROTOCOL.md).
+Open/authenticating connections, unexpired connection tickets, accepted requests,
+speech synthesis and workers still exiting keep it busy. New work is rejected
+while prepared; expiry/cancel restores admission. Idle commit closes listeners
+normally, without stopping an external Breeze/model process. Both native Windows
+CPUs pass the dependency's actual HTTP/WebSocket and CLI natural-exit proof.
+
+This contract does not grant Augmentor ownership of an externally configured
+voice service. The global coordinator must use it only for a verified owned
+companion, and must drain browser/native voice clients first. Managed Windows
+voice startup and product-wide coordination remain pending.

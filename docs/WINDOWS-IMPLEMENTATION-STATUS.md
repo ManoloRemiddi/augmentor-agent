@@ -758,3 +758,23 @@ the other window's draft survives, cancelled input works again and a committed
 preview exits zero. The compiled Windows chat proof now requests the same
 prepare/commit path; native execution is pending. Voice/browser participation,
 global coordination and full installer integration remain required.
+
+At `187bee6`, fast desktop, installer feasibility, Linux and macOS workflows all
+pass. The native x64 full run reaches a second token creator in the complete
+bootstrap path before the checked installer; it still used ordinary file output.
+Source now routes both creators through the same protected-token helper. A new
+bootstrap retry test verifies the real resulting token's descriptor and unchanged
+identity after failed startup, and runs in fast Windows qualification. The actual
+compiled DSH setup/admission/exit path must pass again before this fix is qualified.
+
+The shared dependency graph now selects Resonant Voice **0.1.18**, exact source
+`7a6645e`, retaining one speech package across all OSs. Both native CPUs pass its
+private configuration and five real HTTP/WebSocket/CLI maintenance tests in
+[run 36371851225](https://github.com/ManoloRemiddi/resonant-voice/actions/runs/36371851225).
+The separate companion now reserves admission, refuses open voice/issued tickets,
+waits for accepted synthesis and actual ASR process closure, and commits an idle
+natural exit observed through `beforeExit`. Local DSH SDK cleanup, eight Python
+ASR fixture checks and the actual complete installer compose/restart proof pass.
+No real provider, microphone, audio device, global coordinator or managed Windows
+speech deployment is implied. External speech/model services are never adopted
+for shutdown merely because they speak the same protocol.

@@ -264,3 +264,11 @@ locked DSH graph and is now also an explicit voice dependency. See the
 [Windows evidence ledger](WINDOWS-IMPLEMENTATION-STATUS.md) and
 [archive provenance](../release/dsh/plugins/README.md). No installed speech
 runtime, GPU placement or public release is changed by this candidate.
+
+The next shared candidate is **0.1.18**, exact source `7a6645e`. It adds reversible
+private maintenance admission, actual idle CLI natural exit and correct Cordis
+cleanup. Native private-config and five maintenance tests pass on both CPUs in
+[run 36371851225](https://github.com/ManoloRemiddi/resonant-voice/actions/runs/36371851225).
+The archive and integrity lock are updated together for Linux/macOS/Windows; see
+the archive provenance above. Complete product coordination and physical speech
+acceptance remain separate gates; existing deployed speech placement is unchanged.

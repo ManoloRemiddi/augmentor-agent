@@ -75,13 +75,13 @@ def service(command, home, credentials):
 def configure_product(app, cli, home, endpoint, env, state, *, save=True):
     """Compose the product against a temporary owned host; never touch another DSH."""
     sys.path.insert(0,str(app/'services'))
-    from dsh.setup import Setup
+    from dsh.setup import Setup, product_token
     from dsh.remote import client
     from platform_adapters.processes import OwnedProcess
     # The voice bundle needs this fresh secret during its first boot. The
     # checked product installer subsequently validates and reuses it.
-    if not (home/'augmentor-product-token').exists():
-        write(home/'augmentor-product-token',secrets.token_hex(32)+'\n')
+    secret=home/'augmentor-product-token'
+    product_token(secret,create=not (secret.exists() or secret.is_symlink()))
     log_path=state/'setup-dsh.log';process=None
     def stop():
         nonlocal process

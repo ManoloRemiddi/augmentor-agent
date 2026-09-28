@@ -90,6 +90,14 @@ local Qt/regression and two-process evidence. Both changes await native executio
 Voice/browser participation and global coordination remain the next lifecycle
 work; source or a component pass is not a finished Windows app.
 
+At `187bee6`, both fast desktop jobs, Linux/macOS and installer-candidate checks
+pass. The full x64 run finds a second bootstrap token writer; it is now unified
+with the private helper and covered by a failure/retry check. The shared graph
+also advances to Resonant Voice 0.1.18 (`7a6645e`): its maintenance/normal-exit and
+private-configuration tests pass on both Windows CPUs. Full product integration,
+owned voice startup, browser drain and global coordination remain pending. The
+actual complete installer compose/restart proof passes locally with this archive.
+
 ## September 27 Windows implementation plan — historical planning checkpoint
 
 The owner requested a detailed plan before coding. Read the
