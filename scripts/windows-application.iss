@@ -29,7 +29,14 @@ DiskSpanning=no
 [Files]
 Source: "{#HandoffHelper}"; Flags: dontcopy
 Source: "{#HandoffHelper}"; DestDir: "{app}\maintenance"; Flags: ignoreversion
-Source: "{#PayloadDirectory}\*"; DestDir: "{app}\current"; Flags: recursesubdirs createallsubdirs ignoreversion
+; Keep inspection metadata/code and its existing Python first, in extraction
+; order. Solid decompression need not traverse DSH/Node/PowerShell to inspect.
+Source: "{#PayloadDirectory}\release.json"; DestDir: "{app}\current"; Flags: ignoreversion
+Source: "{#PayloadDirectory}\payload-integrity.json"; DestDir: "{app}\current"; Flags: ignoreversion
+Source: "{#PayloadDirectory}\scripts\windows-inspect-payload.py"; DestDir: "{app}\current\scripts"; Flags: ignoreversion
+Source: "{#PayloadDirectory}\services\lifecycle\payload_integrity.py"; DestDir: "{app}\current\services\lifecycle"; Flags: ignoreversion
+Source: "{#PayloadDirectory}\python\*"; DestDir: "{app}\current\python"; Flags: recursesubdirs createallsubdirs ignoreversion
+Source: "{#PayloadDirectory}\*"; DestDir: "{app}\current"; Excludes: "\release.json,\payload-integrity.json,\scripts\windows-inspect-payload.py,\services\lifecycle\payload_integrity.py,\python\*"; Flags: recursesubdirs createallsubdirs ignoreversion
 
 [Icons]
 Name: "{userprograms}\{#ShortcutName}"; Filename: "{app}\current\Augmentor.exe"; Parameters: "{code:LaunchParameters}"; AppUserModelID: "com.augmentor.Agent"
@@ -100,6 +107,10 @@ function PrepareInspection(Temporary: String): BOOL;
   external 'AugmentorInspectionPrepare@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
 function RunInspection(Installed, ReleaseDigest: String): BOOL;
   external 'AugmentorInspectionRun@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
+function InspectionStage: Cardinal;
+  external 'AugmentorInspectionStage@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
+function InspectionDetail: Cardinal;
+  external 'AugmentorInspectionDetail@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
 
 procedure InspectIndependentPayload;
 var Ready: Boolean; ReportText: AnsiString;
@@ -119,13 +130,16 @@ begin
     end;
     Ready := PrepareInspection(ExpandConstant('{tmp}'));
     if not Ready then begin Log('Augmentor independent inspection: scratch creation failed.'); exit; end;
-    ExtractTemporaryFiles('{app}\current\python\*');
-    ExtractTemporaryFiles('{app}\current\scripts\windows-inspect-payload.py');
-    ExtractTemporaryFiles('{app}\current\services\lifecycle\payload_integrity.py');
     ExtractTemporaryFiles('{app}\current\release.json');
     ExtractTemporaryFiles('{app}\current\payload-integrity.json');
+    ExtractTemporaryFiles('{app}\current\scripts\windows-inspect-payload.py');
+    ExtractTemporaryFiles('{app}\current\services\lifecycle\payload_integrity.py');
+    ExtractTemporaryFiles('{app}\current\python\*');
     Ready := RunInspection(ExpandConstant('{#InstallDirectory}\current'), '{#ReleaseDigest}');
-    if not Ready then begin Log('Augmentor independent inspection: worker failed; installation preserved.'); exit; end;
+    if not Ready then begin
+      Log('Augmentor independent inspection: worker failed; stage=' + IntToStr(InspectionStage) +
+        ', detail=' + IntToStr(InspectionDetail) + '; installation preserved.'); exit;
+    end;
     if not LoadStringFromFile(ExpandConstant('{tmp}\') + '{app}\inspection-result.json', ReportText) then
       RaiseException('Augmentor independent inspection result is unavailable.');
     Log('Augmentor independent inspection result: ' + String(ReportText));

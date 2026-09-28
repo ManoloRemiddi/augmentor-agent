@@ -786,3 +786,21 @@ Local checks: actual Inno 7.1.0 script compiles in an inert compile-only fixture
 Python compilation and four package-intake tests pass. New native helper/worker
 execution remains pending. Cross-version recovery, apply authorization, health and
 obsolete-file cleanup still require their separate implementation and evidence.
+
+
+At `cca5907`, all fast native checks (including 12 payload cases) pass both CPUs.
+The exact-template independent action passes x64, including damaged-runtime and
+pending-journal observation. ARM64 extracts the worker but returns no report;
+its cause is unresolved. Follow-up source adds numeric native stage/error and
+worker phase diagnostics, with no private path/exception text. It also waits for
+the entire owned Job within the original deadline instead of requiring immediate
+zero-process accounting when the primary process signals. This is not a claim
+that Job accounting caused the ARM64 failure.
+
+The existing recovery metadata/code/Python files are now listed first in the
+installer and extracted in that same order. The remaining wildcard excludes
+those exact root-relative paths, so they are installed once; no second Python
+copy is maintained. This follows Inno's solid-compression extraction guidance and
+[anchored exclusion syntax](https://jrsoftware.org/ishelp/topic_filessection.htm).
+The exact script compiles locally; corrected native and full-payload execution
+remain required.

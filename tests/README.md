@@ -345,3 +345,11 @@ artifact-bound reports, preserved data/journal and no repair side effects. Inno'
 intentional nonzero no-install exit is never counted as success by itself. The
 new helper/worker is not yet native-qualified. Actual Inno script compilation,
 four package tests and Python compilation pass locally.
+
+
+At `cca5907`, all fast desktop tests, including all 12 inventory cases, pass x64
+and ARM64. Exact-template independent inspection passes x64; ARM64 fails after
+extraction without a report. Follow-up diagnostics expose only numeric native
+stage/error and Python phase, and the helper observes whole-Job exit within its
+original deadline. The packed extraction order is also corrected. Native rerun
+and complete installed qualification remain pending.

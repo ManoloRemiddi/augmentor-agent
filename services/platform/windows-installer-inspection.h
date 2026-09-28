@@ -7,6 +7,10 @@ static HANDLE inspection_parent = INVALID_HANDLE_VALUE;
 static HANDLE inspection_root = INVALID_HANDLE_VALUE;
 static HANDLE inspection_report = INVALID_HANDLE_VALUE;
 static wchar_t inspection_path[32768];
+static DWORD inspection_stage = 0, inspection_detail = 0;
+
+__declspec(dllexport) DWORD WINAPI AugmentorInspectionStage(void) { return inspection_stage; }
+__declspec(dllexport) DWORD WINAPI AugmentorInspectionDetail(void) { return inspection_detail; }
 
 static void augmentor_inspection_close(void) {
     if (inspection_report != INVALID_HANDLE_VALUE) CloseHandle(inspection_report);
@@ -68,6 +72,7 @@ __declspec(dllexport) BOOL WINAPI AugmentorInspectionRun(const wchar_t *installe
     wchar_t executable[32768], script[32768], path[32768], *command = NULL;
     BOOL ok = FALSE, started = FALSE; DWORD code = 74;
     unsigned remaining = 250000;
+    inspection_stage = 1; inspection_detail = 0;
     if (manual.file == INVALID_HANDLE_VALUE || authorized || inspection_root == INVALID_HANDLE_VALUE ||
             inspection_report != INVALID_HANDLE_VALUE || !installed || wcschr(installed, L'"') ||
             !cache_digest(release_digest) || !AugmentorMaintenancePath(installed) ||
@@ -75,32 +80,51 @@ __declspec(dllexport) BOOL WINAPI AugmentorInspectionRun(const wchar_t *installe
     if (swprintf_s(path, 32768, L"%ls\\release.json", inspection_path) < 0 ||
             swprintf_s(executable, 32768, L"%ls\\python\\python.exe", inspection_path) < 0 ||
             swprintf_s(script, 32768, L"%ls\\scripts\\windows-inspect-payload.py", inspection_path) < 0) return FALSE;
+    inspection_stage = 2;
     metadata = CreateFileW(path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
         FILE_FLAG_OPEN_REPARSE_POINT, NULL);
     if (!cache_file(metadata, NULL, FALSE, 65536) ||
             !cache_stream(metadata, INVALID_HANDLE_VALUE, release_digest)) goto done;
+    inspection_stage = 3;
     command = malloc(32768 * sizeof(wchar_t));
     if (!command || swprintf_s(command, 32768, L"\"%ls\" -I -B -X utf8 \"%ls\" \"%ls\" %ls",
             executable, script, installed, release_digest) < 0) goto done;
+    inspection_stage = 4;
     job = CreateJobObjectW(NULL, NULL);
     JOBOBJECT_EXTENDED_LIMIT_INFORMATION limits = {0};
     limits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
-    if (!job || !SetInformationJobObject(job, JobObjectExtendedLimitInformation, &limits, sizeof(limits)) ||
-            !CreateProcessW(executable, command, NULL, NULL, FALSE,
+    if (!job || !SetInformationJobObject(job, JobObjectExtendedLimitInformation, &limits, sizeof(limits))) goto done;
+    inspection_stage = 5;
+    if (!CreateProcessW(executable, command, NULL, NULL, FALSE,
                 CREATE_SUSPENDED | CREATE_NO_WINDOW | CREATE_UNICODE_ENVIRONMENT,
                 NULL, inspection_path, &startup_info, &process)) goto done;
-    if (!AssignProcessToJobObject(job, process.hProcess) || ResumeThread(process.hThread) != 1) goto done;
+    inspection_stage = 6;
+    if (!AssignProcessToJobObject(job, process.hProcess)) goto done;
+    inspection_stage = 7;
+    if (ResumeThread(process.hThread) != 1) goto done;
     started = TRUE;
-    if (WaitForSingleObject(process.hProcess, 120000) != WAIT_OBJECT_0 ||
-            !GetExitCodeProcess(process.hProcess, &code) || code) goto done;
+    inspection_stage = 8;
+    ULONGLONG deadline = GetTickCount64() + 120000;
+    if (WaitForSingleObject(process.hProcess, 120000) != WAIT_OBJECT_0) goto done;
+    inspection_stage = 9;
+    if (!GetExitCodeProcess(process.hProcess, &code)) goto done;
+    if (code) { inspection_detail = code; goto done; }
+    inspection_stage = 10;
     JOBOBJECT_BASIC_ACCOUNTING_INFORMATION accounting;
-    if (!QueryInformationJobObject(job, JobObjectBasicAccountingInformation, &accounting,
-            sizeof(accounting), NULL) || accounting.ActiveProcesses) goto done;
+    do {
+        if (!QueryInformationJobObject(job, JobObjectBasicAccountingInformation, &accounting,
+                sizeof(accounting), NULL)) goto done;
+        if (!accounting.ActiveProcesses) break;
+        if (GetTickCount64() >= deadline) goto done;
+        Sleep(10);
+    } while (TRUE);
+    inspection_stage = 11;
     if (swprintf_s(path, 32768, L"%ls\\..\\inspection-result.json", inspection_path) < 0) goto done;
     inspection_report = CreateFileW(path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
         FILE_FLAG_OPEN_REPARSE_POINT, NULL);
     ok = cache_file(inspection_report, NULL, FALSE, 4096);
 done:
+    if (!ok && !inspection_detail) inspection_detail = GetLastError();
     /* Only the suspended worker created above can escape an assignment error.
      * Once assigned, closing its Job ends only this read-only inspection range. */
     if (process.hProcess && !started) TerminateProcess(process.hProcess, 74);

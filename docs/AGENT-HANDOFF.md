@@ -79,7 +79,9 @@ Production Home behavior is unchanged. Compiler object/import-library byproducts
 now stay in the temporary build directory. [Native Inno at 6f4c291](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36409755006)
 passes both CPUs with clean payload-root assertions at merge checkout
 `cbbaa57cf262d4ceb46536a0566ba126a2943381`; the [full 578556d run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36410018195)
-now passes both CPUs and shared Mac Qt. It predates the startup/health, cancellation
+now passes both CPUs and shared Mac Qt at merge checkout
+`dd9c761f758e207ad9556a9d505a854093fb7114`; both downloaded installed reports confirm
+independent registered repair and same-build coordinated apply/removal. It predates the startup/health, cancellation
 and inventory changes below.
 Fast Windows, Inno, Mac and complete Linux/Home/Browser validation also pass at
 documentation-only `578556d`.
@@ -130,6 +132,17 @@ package checks pass; exact-template and complete native execution are pending.
 At `84f2e95`, x64 Inno already passes the corrected payload identity; the fast suite
 fails only a missing pywin32 constant in the new timestamp fixture. That fixture
 now uses its supported generic-write access constant. Corrected native rerun is pending.
+
+
+[Fast Windows at cca5907](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36415696138)
+now passes both CPUs, including all 12 payload cases and the corrected timestamp
+fixture. The independent exact-template inspection passes x64, but ARM64 fails
+after extraction without a report in [Inno run 36415696134](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36415696134).
+No ARM64 success or cause is inferred. The helper now reports numeric stage/error
+codes and waits for complete owned-Job exit within the original deadline; the
+worker reports only a numeric phase on error. Recovery files are packed first in
+extraction order to avoid decompressing unrelated runtimes. Script compilation
+passes; corrected native execution and full app integration are pending.
 
 Next: qualify the inventory, full installed isolated health and actual-DSH cancellation; finish
 independent interrupted/cross-version recovery, obsolete-file cleanup, bounded
