@@ -55,6 +55,23 @@ maintenance to their retained pipe peers and owner Jobs, validates idle/expiry
 acknowledgments, and extends native companion reservation tests. Portable policy
 checks pass; new native companion execution remains pending.
 
+Both fast Windows jobs at `3a379a2` pass retained background-owner discovery and
+exact prompt/memory Job observations in
+[36379432569](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36379432569).
+The companion participant client is pushed at `6531e2d` and awaits native execution.
+Current source adds established-connection TCP ownership checks before local
+HTTP credentials, retained process identity and replacement-port refusal. Syntax
+checks pass; new real-Windows HTTP assertions are pending. DSH/voice profile
+adapters, the complete coordinator and installer application remain open.
+
+The actual prompt/memory participant assertions at `6531e2d` now pass both fast
+Windows jobs in [36379716570](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36379716570).
+Current source connects the observed HTTP transport to the private managed DSH
+profile, verifying the service anchor, product version and home identity. The
+full DSH maintenance/restart proof now uses this client and checks its retained
+process exits with the complete Job. These new HTTP/DSH assertions await native
+execution; owned voice startup/provisioning and global coordination remain open.
+
 ## Baseline and environments (W0)
 
 Implementation branch `feat/windows` starts from reviewed `main` `b8e36a4` plus

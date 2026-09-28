@@ -283,3 +283,32 @@ protocol, idle acknowledgments and finite reservation lifetime. Discovery refuse
 an unowned listener or incomplete owner inventory. Native supervisor qualification
 now prepares, renews and cancels each actual companion while retaining the owner
 reservation. Execution of these new assertions is pending.
+
+## Observed local HTTP
+
+Source now provides a Windows loopback transport for the owned DSH/voice
+maintenance clients. After connecting to explicit `127.0.0.1`, it finds the
+server side of that exact established TCP connection in the kernel ownership
+table, retains the process, verifies its Windows user and executable, and calls
+the reserved owner's Job verification before sending HTTP headers or tokens.
+Later requests must still reach the same live process. A new listener on a reused
+port is refused before credentials are sent. The transport does not follow
+redirects, discover proxies or reconnect/replay requests.
+
+The native test launches disposable actual HTTP processes and verifies correct
+PID observation, refusal before HTTP bytes for wrong ownership/executable, and
+refusal after a replacement binds the same port. Execution is pending. This is
+the transport primitive; DSH/voice profile integration and global coordination
+still need their own qualification. The table layout and connection ownership
+follow [GetExtendedTcpTable](https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getextendedtcptable)
+and [MIB_TCPROW_OWNER_PID](https://learn.microsoft.com/en-us/windows/win32/api/tcpmib/ns-tcpmib-mib_tcprow_owner_pid).
+
+`windows_dsh.py` now uses that transport for the supervisor-owned DSH profile.
+It checks the private managed record and service anchor, product version,
+maintenance protocol and token-derived home identity. Every maintenance request
+must reach the retained Node peer in the owner's exact DSH Job. The assembled
+managed-runtime proof now exercises prepare/cancel, refused model input, normal
+commit, complete Job drain, retained-process exit and history after restart
+through this client. Native execution is pending. Existing external/manual DSH
+connections are not adopted or stopped. Owned voice startup remains an explicit
+feature gap; this change does not imply that the Windows speech engine is ready.

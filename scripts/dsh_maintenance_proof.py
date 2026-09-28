@@ -34,8 +34,8 @@ def refuse_busy(base, home):
     raise AssertionError('DSH accepted maintenance during an active model turn.')
 
 
-def prove(adapter, base, home, session, wait_exit, exit_marker):
-    control = connection(base, home)
+def prove(adapter, base, home, session, wait_exit, exit_marker, *, control=None, busy_errors=(urllib.error.HTTPError,)):
+    control = control or connection(base, home)
 
     def prepare():
         deadline = time.monotonic()+10
@@ -44,9 +44,10 @@ def prove(adapter, base, home, session, wait_exit, exit_marker):
                 result = control('prepare')
                 assert result['phase'] == 'prepared' and result['active'] == 0, result
                 return
-            except urllib.error.HTTPError as error:
+            except busy_errors as error:
                 if error.code != 409 or time.monotonic() >= deadline: raise
-                error.close(); time.sleep(.1)
+                if hasattr(error,'close'):error.close()
+                time.sleep(.1)
 
     before = adapter.call('session.history', {'sessionId': session})
     prepare()

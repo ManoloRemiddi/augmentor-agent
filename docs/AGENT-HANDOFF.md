@@ -62,6 +62,21 @@ assertions are added but await execution. Next are owned DSH/voice transport
 identity and the complete coordinator/apply transaction; no public installer or
 browser commit is enabled.
 
+Both fast Windows jobs at `3a379a2` pass owner discovery/Job checks. The prompt/
+memory participant transport is pushed at `6531e2d` for native execution. Current
+source adds [observed loopback HTTP](WINDOWS-SHELL.md#observed-local-http), binding
+an established socket to its kernel peer before tokens and refusing replacement
+processes. New native HTTP tests are pending; follow with DSH/voice adapters and
+coordinator/apply integration. No customer installer or website change is made.
+
+Both fast jobs at `6531e2d` now pass actual prompt/memory participant reservation.
+Current source additionally integrates managed DSH profile/anchor/version/home
+checks with the observed HTTP transport. Its assembled maintenance/restart proof
+uses this client and retains the server process through normal exit. New native
+HTTP and DSH execution is pending. Voice still needs an owned Windows service
+and speech provisioning; do not assume it belongs to the DSH Job merely because
+the plugin is installed. Continue global reservation, commit/apply and rollback.
+
 Current Windows worktree: `feat/windows` in an isolated canonical-repository
 checkout; draft [PR #20](https://github.com/ManoloRemiddi/augmentor-agent/pull/20).
 At `523fe9a`, real hosted x64/ARM64 runtime and disposable two-version installer

@@ -253,8 +253,28 @@ def main():
                 status = owner.request('status', root=root)
                 return status if not status['dsh']['running'] else None
             return wait_for(exited)['dsh']['exitCode']
-        report['maintenance'] = maintenance_proof.prove(adapter, setup.current()['endpoint'],
-            state/'home', session, natural_exit, exit_marker)
+        from lifecycle.windows_components import discover_owner
+        from lifecycle.windows_dsh import discover_dsh
+        from platform_adapters.windows_http import HttpRefused
+        participant=discover_owner(root,Path(os.environ['XDG_RUNTIME_DIR']))
+        assert participant is not None, 'The actual background owner was not discovered.'
+        token=uuid.uuid4().hex;dsh=None;reserved=False
+        try:
+            assert participant.control('prepare',token)['phase']=='prepared'
+            reserved=True
+            dsh=discover_dsh(root,state,participant)
+            assert dsh is not None
+            def observed_control(action):return dsh.control(action,None if action=='status' else token)
+            report['maintenance'] = maintenance_proof.prove(adapter, setup.current()['endpoint'],
+                state/'home', session, natural_exit, exit_marker,
+                control=observed_control,busy_errors=(HttpRefused,))
+            assert dsh.exited(), 'The observed HTTP owner did not exit with the complete DSH Job.'
+            report['maintenance']['kernelBoundHttpPeer']=True
+        finally:
+            if dsh is not None:dsh.close()
+            try:
+                if reserved:participant.control('cancel',token)
+            finally:participant.close()
         agent.start(); wait_for(lambda: adapter.call('host.describe'))
         assert 'Windows managed setup verified.' in json.dumps(adapter.call('session.history', {'sessionId': session}))
         report.update(passed=True, setup=True, conversation=True, crashRestartPreservedHistory=True,

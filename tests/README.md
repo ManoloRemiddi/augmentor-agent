@@ -192,3 +192,18 @@ client to prepare, renew and cancel prompts/memory. Their authenticated pipe
 peers must belong to the selected component's Job before any maintenance request
 is sent. Portable contract tests reject active, expired, unbounded and malformed
 reservation acknowledgments. Hosted native execution is still required.
+
+`test_windows_http.py` uses actual Windows loopback HTTP processes. It compares
+the kernel-reported peer with the launched child, checks that ownership/executable
+refusals send no HTTP credentials, then lets the original exit and rebinds its
+port with another process. The retained observation must refuse the replacement
+before HTTP bytes. This is transport evidence, separate from real DSH/voice
+integration and actual update transactions.
+
+The compiled Windows managed-DSH proof now reserves the discovered background
+owner, constructs the DSH participant from its private profile, and runs the
+existing maintenance/history sequence through the kernel-bound HTTP client.
+It confirms the observed server exits when the owner's whole Job drains, then
+cancels owner reservation before explicitly restarting DSH. Linux/macOS keep
+their existing direct component proof. No external provider or voice engine is
+substituted for this deterministic owned-DSH qualification.
