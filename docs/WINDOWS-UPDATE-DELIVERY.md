@@ -251,3 +251,13 @@ preservation; fast Windows passes the strict report cases. Actual full-payload
 independent health remains pending. The [remaining restoration executor sequence](WINDOWS-INSTALLER-DECISION.md#remaining-restoration-executor)
 keeps the original record intact, restores owned installation metadata as well as
 payload files, and requires an observer separate from the exiting APPLY coordinator.
+
+Full independent installer UI health now passes both native CPUs at `c530fda`
+([full run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36423029869)),
+with exact inventory and the pending record preserved. New source adds
+[clean authenticated payload placement](WINDOWS-INSTALLER-DECISION.md#clean-payload-placement-before-authenticated-apply):
+save the original record and placement intent, retain the entire old tree, then
+install into a fresh `current`. Native locked-tree, absent-payload and full-app
+execution of this new placement remains pending. Preserved backups are not a
+completed rollback mechanism; restoration, disk budgeting and bounded retention
+remain required before customer updates.

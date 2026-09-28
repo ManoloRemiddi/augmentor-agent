@@ -120,13 +120,16 @@ function SnapshotUpdate(InstallerDigest: String): BOOL;
   external 'AugmentorInspectionSnapshot@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
 function InspectHealth(Installed, ReleaseDigest, Qualification: String): BOOL;
   external 'AugmentorInspectionHealth@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
+function PrepareReplacement(Application: String): BOOL;
+  external 'AugmentorPrepareReplacement@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
 
 procedure InspectIndependentPayload(AssessSource, ObserveHealth: Boolean);
 var Ready: Boolean; ReportText: AnsiString;
 begin
   { A read-only diagnostic action, including when an update is unresolved.
     Returning from InitializeSetup with False prevents ALL install sections.
-    Only the private, disposable extracted worker runs; never installed code. }
+    The independent worker inspects without installed code; optional health
+    calls only the fixed isolated action after complete source verification. }
   Ready := PrepareManualMaintenance('{#QualificationBase}');
   if not Ready then begin Log('Augmentor independent inspection: maintenance unavailable.'); exit; end;
   MaintenanceHeld := True;
@@ -316,6 +319,10 @@ begin
     exit;
   end;
   OwnedInstallation := (RootRegistration = 2) and (IdentityRegistration = 2);
+  if AuthenticatedHandoff and not OwnedInstallation then begin
+    Result := 'A coordinated update requires the registered Augmentor installation. Its files were preserved.';
+    exit;
+  end;
   FreshInstallation := not DirExists(ExpandConstant('{app}\current')) and
     (RootRegistration = 1) and (IdentityRegistration = 1);
   NeedsSelectedRepair := False;
@@ -349,6 +356,11 @@ begin
     AccessReady := MatchesSelectedInstaller;
     if not AccessReady then
       Result := 'This installer does not match the recorded Augmentor installation. Use its registered repair option or the coordinated update in Augmentor. Your installed app was not changed.';
+  end;
+  if (Result = '') and AuthenticatedHandoff then begin
+    AccessReady := PrepareReplacement(ExpandConstant('{app}'));
+    if not AccessReady then
+      Result := 'Augmentor could not prepare a clean replacement. The update remains unresolved and its recovery files were preserved. Close this installer before trying recovery.';
   end;
 end;
 

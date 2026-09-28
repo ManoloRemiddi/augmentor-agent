@@ -11,6 +11,7 @@ on:
       - 'scripts/windows-application-template-proof.py'
       - 'scripts/windows-finish-launch-fixture.py'
       - 'scripts/windows-health-fixture.py'
+      - 'scripts/windows-template-update-proof.py'
       - 'scripts/windows-inspect-payload.py'
       - 'scripts/package-windows.py'
       - 'scripts/build-windows-launcher.py'
@@ -30,6 +31,7 @@ on:
       - 'services/platform/windows-installer-handoff.c'
       - 'services/platform/windows-installer-cache.h'
       - 'services/platform/windows-installer-inspection.h'
+      - 'services/platform/windows-installer-placement.h'
       - 'services/platform/windows-lease.h'
       - 'release/windows/installer-candidates.json'
 permissions:

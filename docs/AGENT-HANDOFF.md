@@ -14,16 +14,16 @@ qualification is claimed. The app is not complete or ready for customers.
 
 ### Current evidence
 
-- [Full 4412deb qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36417207466)
+- [Full c530fda qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36423029869)
   passes both CPUs and shared Mac Qt at merge checkout
-  `82a92eaa3c9598e2dccd329dc853cc839ca7cefb`. Downloaded installed reports confirm
-  installation/browser/login identity, live-draft and busy-inspection refusal,
-  independent damaged-runtime inspection/registered repair, coordinated same-build
-  apply, complete inventory, isolated Windows UI health, verified reopening and
-  removal with private data retained. Inventory: x64 65,938 files; ARM64 65,922;
-  no differences. Bundled DSH chat/history uses a deterministic provider.
-  This baseline predates source assessment/lookup, absent-root and independent
-  installer health additions; it is not N-to-N+1, restoration or physical acceptance.
+  `ad703348d4faa61cff8a11d44c996fd653510995`. Downloaded installed reports confirm
+  independent installer health renders the real Windows UI with the actual pending
+  journal preserved, alongside installation/browser/login identity, live-draft
+  refusal, damaged-runtime inspection/repair, coordinated same-build apply,
+  verified reopening and removal with data retained. Complete inventories have
+  no differences: x64 65,941 files / 1,266,281,389 bytes; ARM64 65,925 files /
+  1,244,983,404 bytes. DSH chat/history uses a deterministic provider. This predates
+  clean payload placement below; it is not N-to-N+1, restoration or physical acceptance.
 - [Fast Windows at b6b2313](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36421972142)
   passes both CPUs, including native UI health, compiled startup guards, 49 update
   cases, five preparation cases, six source-assessment cases, five health-report
@@ -95,18 +95,26 @@ and no journal is cleared. Five portable health-report cases, 49 update cases
 Inno script compilation pass. Native template tests now require damaged-source
 refusal, preserved state after failed synthetic health, held kernel admission
 and ordinary-startup refusal. Both native templates now pass these cases at
-`b6b2313`. The full app proof requires actual independent Windows UI health with
-its real pending record preserved; that new full run is queued behind `68062de`
-(x64 passed, ARM64 still in installed-application qualification). Synthetic template
-health is not GUI qualification.
+`b6b2313`. Full independent UI health now passes both CPUs at `c530fda`;
+synthetic template health remains separate from that actual rendering evidence.
 
-Next: qualify full independent installer UI health and implement the
-interrupted/cross-version restoration executor with authenticated recovery
-apply, obsolete-file cleanup, bounded cache pruning, actual N-to-N+1 and customer
-notification/update wiring. Inno still replaces `current` in place: inspection and
-registered exact-build repair do not provide power-loss recovery. Cache artifacts
-still survive ordinary removal. Never infer a healthy rollback source from the
-selection pointer or clear a pending journal manually to bypass recovery.
+Current work adds [clean authenticated payload placement](WINDOWS-INSTALLER-DECISION.md#clean-payload-placement-before-authenticated-apply).
+After actual coordinator exit and final installation admission, Setup pins the
+original journal, saves its exact bytes and a fresh placement intent, then moves
+any old `current` tree into an owned recovery attempt before copying new files.
+A locked tree refuses without deleting files or terminating processes. Unknown
+old files remain in the displaced tree rather than the new executable search
+path. Missing `current` is permitted only for the registered owned installation.
+A prepared receipt follows the move; the original journal remains unresolved.
+Manual exact-build repair is unchanged. Local package/update checks and Inno
+script compilation pass; new native template/full execution is pending.
+
+Next: qualify clean placement and implement interrupted/cross-version restoration
+with distinct durable completion, bounded disk/retention policy, actual N-to-N+1
+and customer notification/update wiring. Preserving a displaced tree alone is not
+power-loss recovery. Cache artifacts and displaced payloads still survive ordinary
+removal. Never infer a healthy rollback source from the selection pointer or clear
+a pending journal manually to bypass recovery.
 
 Continue the [feature ledger](FEATURE-MATRIX.md#windows-development-target--september-28):
 Windows desktop control, speech/memory provisioning, Home/Pi parity, real selected

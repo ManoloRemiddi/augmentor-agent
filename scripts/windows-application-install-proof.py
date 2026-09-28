@@ -201,6 +201,8 @@ def main():
         # an actual background owner/window, and the actual packaged Setup.
         # Identical artifact repair isolates transport/process integration from
         # the separately unfinished N-to-N+1 trust/recovery policy.
+        obsolete=install/'current/obsolete-update-fixture/retained.bin'
+        obsolete.parent.mkdir();obsolete.write_bytes(b'Preserve this displaced fixture file.\n')
         artifact=cached_installer
         # Exercise the exact installer-created command without a command shell.
         subprocess.run(startup_command,check=True,timeout=30)
@@ -236,6 +238,18 @@ def main():
         assert (install/'current/release.json').read_bytes()==(args.root/'release.json').read_bytes()
         assert sentinel.read_bytes()==sentinel_bytes
         pending_bytes=(transaction/'active.json').read_bytes()
+        backups=list((data/'payload-backups').iterdir())
+        assert len(backups)==1
+        placement=backups[0];intent=read_json(placement/'intent.json')
+        assert read_json(placement/'prepared.json')==intent
+        assert intent['hadPayload'] is True and intent['attempt']==placement.name
+        assert intent['installerSHA256']==report['sha256'] and intent['releaseSHA256']==package.digest(args.root/'release.json')
+        assert intent['recordSHA256']==package.digest(transaction/'active.json')
+        assert (placement/'update.json').read_bytes()==pending_bytes
+        assert (placement/'payload/release.json').read_bytes()==(args.root/'release.json').read_bytes()
+        assert (placement/'payload/obsolete-update-fixture/retained.bin').read_bytes()==b'Preserve this displaced fixture file.\n'
+        assert not (install/'current/obsolete-update-fixture').exists()
+        stages.append('full-payload-displaced-before-coordinated-replacement')
         assessed=independent_inspection('independent-pending-inspection',health=True)
         assert assessed['complete'] and assessed['recovery']['recordedSourceMatches']
         assert assessed['recovery']['applyAuthorized'] is False

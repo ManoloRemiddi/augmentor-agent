@@ -954,6 +954,53 @@ Fast Windows passes all five shared report cases on both CPUs. Full independent
 UI-health integration is queued behind the preceding full run; the template's
 synthetic UI fields are not relabelled as actual rendering evidence.
 
+At `c530fda`, [full application qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36423029869)
+passes x64, ARM64 and shared Mac Qt at merge checkout
+`ad703348d4faa61cff8a11d44c996fd653510995`. Downloaded Windows reports confirm
+the independent installer observes real Windows-QPA rendering, text coverage and
+the exact source identity while preserving the pending record. The separate full
+inventory has no differences on either CPU. This closes the full independent-health
+execution gap; it does not establish previous-source restoration or N-to-N+1.
+
+## Clean payload placement before authenticated apply
+
+Coordinated replacement now requires the registered Root/AppId pair and the actual
+authenticated handoff, coordinator exit and exclusive installation/startup handles.
+The native helper derives all recovery paths from its already validated runtime
+handle. It takes the existing journal writer lock and pins the active record against
+write/delete. The original record remains unchanged and continues to block ordinary
+startup through failed or incomplete installation.
+
+Before changing `current`, Setup creates a fresh random attempt below the private
+`payload-backups` directory. It flushes an exact `update.json` snapshot plus an
+`intent.json` receipt binding its hash, the actual retained target installer and
+release metadata hashes, attempt identity and whether a payload existed. It then
+moves the entire old `current` directory to that attempt's `payload` and writes
+`prepared.json`. New files therefore populate a clean `current`; obsolete or unknown
+old files stay preserved outside the new executable search path. Missing `current`
+is accepted only after owned-registration and ordinary-ancestor checks. Manual
+same-build repair retains its existing in-place behavior.
+
+The move uses the documented [MoveFileExW directory operation](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-movefileexw)
+on the same volume, with write-through and no copy/delete fallback, replacement,
+reboot scheduling or automatic retry. A locked directory refuses. Setup retains
+all acquired handles until exit, including on failure; it neither deletes an old
+tree nor terminates its users. A failed receipt write after a successful move leaves
+the attempt and original journal for independent inspection. Descendants retain
+their existing ACLs; the private parent does not imply rewritten file permissions.
+The move plus receipt are separate operations, not one atomic transaction.
+
+The native exact-template proof now exercises actual authenticated READY/APPLY,
+coordinator exit and Setup completion for a locked tree, a clean replacement with
+an unknown old file, and an absent payload. It checks exact saved journal/receipts,
+complete replacement inventory and unchanged private data. Its disposal of synthetic
+pending records is fixture cleanup, never a production recovery operation. The full
+app proof separately requires displacement of its real packaged tree before update,
+preserved unknown bytes, complete inventory and actual independent UI health.
+Local package/update checks and actual Inno script compilation pass; new native
+execution is pending. This change does not implement restoration completion, space
+budgeting, backup pruning or N-to-N+1 qualification.
+
 ### Remaining restoration executor
 
 Restoration must reuse the existing authenticated installer handoff and independent

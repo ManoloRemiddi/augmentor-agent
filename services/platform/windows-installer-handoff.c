@@ -20,9 +20,11 @@ static AugmentorLease manual = {INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE,
     INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE};
 #include "windows-installer-cache.h"
 static void augmentor_inspection_close(void);
+static void augmentor_placement_close(void);
 
 __declspec(dllexport) void WINAPI AugmentorHandoffClose(void) {
     augmentor_inspection_close();
+    augmentor_placement_close();
     augmentor_cache_close();
     if (manifest_file != INVALID_HANDLE_VALUE) CloseHandle(manifest_file);
     if (manifest_parent != INVALID_HANDLE_VALUE) CloseHandle(manifest_parent);
@@ -352,3 +354,4 @@ done:
 }
 
 #include "windows-installer-inspection.h"
+#include "windows-installer-placement.h"

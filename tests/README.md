@@ -425,3 +425,18 @@ confirm synthetic source-health admission and its damaged/failed-probe refusal
 checks. Fast Windows also passes both CPUs, including all five report-validation
 cases. Actual independent full-payload UI health and interrupted restoration still
 require their separate execution evidence.
+
+At `c530fda`, full x64/ARM64 application qualification passes real independent
+Windows UI health and complete inventory with its actual pending record preserved.
+Merge checkout: `ad703348d4faa61cff8a11d44c996fd653510995`; see the
+[full run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36423029869).
+This is actual rendering evidence, distinct from the preceding synthetic template.
+
+The exact-template proof now uses `windows-template-update-proof.py` as a fresh
+disposable coordinator for actual READY/APPLY and observed Setup exit. It checks
+locked-directory refusal, saved journal/placement receipts, preserved unknown old
+files, a complete clean replacement, and replacement with absent `current`.
+Synthetic journal disposal is explicitly fixture-only. The full installed proof
+separately requires old full-payload displacement and independent UI health.
+Local package/update checks and Inno script compilation pass; new native placement
+execution is pending. These same-build cases do not prove cross-version restoration.

@@ -90,6 +90,36 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         result=json.loads(rows[0]);assert result['schema']=='augmentor-payload-inspection/1'
         assert result['releaseSHA256']==hashlib.sha256((payload/'release.json').read_bytes()).hexdigest()
         return result
+    def coordinated(label, *, success=True):
+        """Actual READY/APPLY and Setup exit; no running product graph in this fixture."""
+        import sys,win32api,win32con,win32event,win32process
+        from platform_adapters.private_files import read_json
+        observation=private_directory(Path(report['qualificationBase'])/'placement-proofs'/label)
+        setup=None
+        with (out/('application-template-'+label+'-coordinator.log')).open('wb') as log:
+            child=subprocess.Popen([sys.executable,'-I','-Xutf8','-B',str(ROOT/'scripts/windows-template-update-proof.py'),
+                '--data',report['qualificationBase'],'--release',str(payload/'release.json'),
+                '--observation',str(observation)],stdin=subprocess.DEVNULL,stdout=log,stderr=subprocess.STDOUT)
+            try:
+                deadline=time.monotonic()+40
+                while not (observation/'ready.json').exists():
+                    assert child.poll() is None, 'The disposable placement coordinator failed; inspect its log.'
+                    if time.monotonic()>=deadline:raise TimeoutError('The placement coordinator did not authorize Setup.')
+                    time.sleep(.05)
+                ready=read_json(observation/'ready.json');assert ready['coordinatorPid']==child.pid
+                setup=win32api.OpenProcess(win32con.SYNCHRONIZE|win32con.PROCESS_QUERY_INFORMATION,False,ready['setupPid'])
+                assert win32event.WaitForSingleObject(setup,0)==win32event.WAIT_TIMEOUT
+                atomic_json(observation/'observed',{'observed':True})
+                assert child.wait(timeout=30)==0
+                assert win32event.WaitForSingleObject(setup,90000)==win32event.WAIT_OBJECT_0
+                code=win32process.GetExitCodeProcess(setup)
+                assert (code==0)==success, (label,code)
+            finally:
+                if setup is not None:setup.Close()
+                if child.poll() is None:
+                    child.terminate();child.wait(timeout=10)  # Only this disposable qualification coordinator.
+                if (observation/'setup.log').exists():
+                    shutil.copy2(observation/'setup.log',out/('application-template-'+label+'.log'))
     try:
         run(report['installer'], 'initial')
         recovery = Path(report['qualificationBase'])/'recovery'
@@ -273,6 +303,52 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         assert all(observed[key] for key in ('writerHeld','recordPinned','installationHeld','ordinaryStartupRefused'))
         pending.unlink();admission.unlink()  # Only this disposable proof's state.
         stages.append('independent-synthetic-health-with-live-record-and-installation-admission')
+        # A coordinated update must move the old tree before copying, preserving
+        # unknown old files outside the newly selected executable search path.
+        # A handle that prevents directory rename must refuse without deletion.
+        import win32con,win32file
+        old_marker=install/'current/obsolete-fixture/deep/old.bin'
+        old_marker.parent.mkdir(parents=True);old_marker.write_bytes(b'Preserve unknown displaced fixture bytes.\n')
+        backups=Path(report['qualificationBase'])/'payload-backups'
+        assert not backups.exists()
+        protected=win32file.CreateFile(str(install/'current'),win32con.GENERIC_READ,
+            win32con.FILE_SHARE_READ|win32con.FILE_SHARE_WRITE,None,win32con.OPEN_EXISTING,
+            win32con.FILE_FLAG_BACKUP_SEMANTICS|win32file.FILE_FLAG_OPEN_REPARSE_POINT,None)
+        try:coordinated('locked-payload-placement',success=False)
+        finally:protected.Close()
+        failed=list(backups.iterdir());assert len(failed)==1
+        saved=pending.read_bytes()
+        intent=json.loads((failed[0]/'intent.json').read_text())
+        assert (failed[0]/'update.json').read_bytes()==saved
+        assert intent['recordSHA256']==hashlib.sha256(saved).hexdigest()
+        assert intent['hadPayload'] is True and not (failed[0]/'prepared.json').exists()
+        assert not (failed[0]/'payload').exists() and old_marker.read_bytes()==b'Preserve unknown displaced fixture bytes.\n'
+        assert installed_release.read_bytes()==(payload/'release.json').read_bytes()
+        assert sentinel.read_bytes()==sentinel_bytes
+        pending.unlink()  # Only this test's deliberately failed synthetic update.
+        coordinated('clean-payload-placement')
+        succeeded=[p for p in backups.iterdir() if p!=failed[0]];assert len(succeeded)==1
+        retained=succeeded[0];intent=json.loads((retained/'intent.json').read_text())
+        assert json.loads((retained/'prepared.json').read_text())==intent
+        assert intent['schema']=='augmentor-payload-placement/1' and intent['attempt']==retained.name
+        assert intent['installerSHA256']==report['sha256'] and intent['releaseSHA256']==release_digest.decode('ascii')
+        assert intent['recordSHA256']==hashlib.sha256(pending.read_bytes()).hexdigest()
+        assert (retained/'update.json').read_bytes()==pending.read_bytes()
+        assert not (install/'current/obsolete-fixture').exists()
+        assert (retained/'payload/obsolete-fixture/deep/old.bin').read_bytes()==b'Preserve unknown displaced fixture bytes.\n'
+        assert inspect(cached,'clean-placement-inventory')['complete']
+        assert read_private(selection)==selected_bytes and sentinel.read_bytes()==sentinel_bytes
+        pending.unlink()  # Fixture disposal is not a product recovery completion.
+        before=set(backups.iterdir());shutil.rmtree(install/'current')
+        coordinated('missing-payload-placement')
+        absent=set(backups.iterdir())-before;assert len(absent)==1
+        absent=absent.pop();intent=json.loads((absent/'intent.json').read_text())
+        assert intent['hadPayload'] is False and json.loads((absent/'prepared.json').read_text())==intent
+        assert not (absent/'payload').exists() and (absent/'update.json').read_bytes()==pending.read_bytes()
+        assert inspect(cached,'missing-placement-inventory')['complete']
+        assert sentinel.read_bytes()==sentinel_bytes
+        pending.unlink()
+        stages.append('authenticated-clean-payload-placement-and-locked-tree-preservation')
         # Damaged metadata (rather than an absent file) takes the same exact
         # selected-source path. No foreign/version-only match is accepted.
         installed_release.write_bytes(b'Broken fixture metadata.\n')

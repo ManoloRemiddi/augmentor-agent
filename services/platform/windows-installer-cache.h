@@ -53,12 +53,13 @@ static BOOL cache_file(HANDLE file, PSID user, BOOL private_file, LONGLONG maxim
 }
 
 /* Hash and optionally copy the already pinned handle, never reopen its name. */
-static BOOL cache_stream(HANDLE source, HANDLE destination, const wchar_t *expected) {
+static BOOL cache_stream_digest(HANDLE source, HANDLE destination, const wchar_t *expected,
+        wchar_t *observed_digest) {
     BCRYPT_ALG_HANDLE algorithm = NULL; BCRYPT_HASH_HANDLE hash = NULL;
     BYTE *buffer = malloc(1024 * 1024), digest[32];
     DWORD count, written; LARGE_INTEGER zero = {0}; BOOL ok = FALSE;
     wchar_t observed[65];
-    if (!buffer || !SetFilePointerEx(source, zero, NULL, FILE_BEGIN) ||
+    if ((!expected && !observed_digest) || !buffer || !SetFilePointerEx(source, zero, NULL, FILE_BEGIN) ||
             BCryptOpenAlgorithmProvider(&algorithm, BCRYPT_SHA256_ALGORITHM, NULL, 0) < 0 ||
             BCryptCreateHash(algorithm, &hash, NULL, 0, NULL, 0, 0) < 0) goto done;
     for (;;) {
@@ -70,12 +71,17 @@ static BOOL cache_stream(HANDLE source, HANDLE destination, const wchar_t *expec
     }
     if (BCryptFinishHash(hash, digest, sizeof(digest), 0) < 0) goto done;
     for (unsigned i = 0; i < 32; ++i) swprintf_s(observed + 2*i, 65 - 2*i, L"%02x", digest[i]);
-    ok = !wcscmp(observed, expected);
+    ok = !expected || !wcscmp(observed, expected);
+    if (ok && observed_digest) ok = wcscpy_s(observed_digest, 65, observed) == 0;
     if (ok && destination != INVALID_HANDLE_VALUE) ok = FlushFileBuffers(destination);
 done:
     if (hash) BCryptDestroyHash(hash);
     if (algorithm) BCryptCloseAlgorithmProvider(algorithm, 0);
     free(buffer); return ok;
+}
+
+static BOOL cache_stream(HANDLE source, HANDLE destination, const wchar_t *expected) {
+    return cache_stream_digest(source, destination, expected, NULL);
 }
 
 /* Create/flush/rename only a fresh random sibling; never replace an existing
