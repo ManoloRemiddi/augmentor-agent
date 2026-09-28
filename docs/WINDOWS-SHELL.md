@@ -218,3 +218,40 @@ that test-only correction is included. Full assembled early-lease integration
 remains a separate pending run. Full runtime `303a619` now passes both native
 CPUs in [run 36372703204](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36372703204),
 including complete Job drain and owner reservation, before the new early lease.
+
+## Short-lived startup exclusion
+
+The native desktop and browser launchers additionally open a private
+`run/startup.lock` reader before loading Python. The file has the same strict
+current-user/SYSTEM descriptor, no-reparse and single-link requirements as the
+lifetime lease. Readers request read access and share only read access. A
+maintenance writer requests read/write access and also shares only reads: any
+unregistered startup prevents its acquisition; once acquired it refuses new
+startup readers and competing maintenance writers. No file content signals busy
+state, and a crash releases the kernel-owned handles.
+
+`AugmentorStartupReady` releases only the native startup handle. The desktop calls
+it after constructing its window and private command handler; browser readiness
+requires its Job/executable-verified bridge registration. Windows source previews
+and independently starting supervisors use the same Python reader. A preview
+without discoverable controls keeps the reader until normal exit. Existing
+supervisor status stays readable while maintenance prevents creation of a new
+owner. The process lifetime lease remains held through finalization and exit.
+
+The separate startup file allows an independent applier to inherit a duplicate
+of the writer handle while the final no-sharing `installation.lock` gate waits
+for all running application code to exit. This avoids a close/reopen gap. The
+new kernel proof exercises explicit handle-list inheritance, normal coordinator
+exit and deliberate coordinator crash, then verifies continued startup refusal,
+independent installation exclusion and release after the recipient exits. This
+is a transfer primitive, not a production installer transaction; the authenticated
+handoff, complete component coordinator, renewal, rollback and recovery remain
+required before applying updates.
+
+Native execution of these startup additions is pending. Portable browser
+registration and supervisor policy tests pass. The compiled launcher probe now
+tests pre-Python startup-writer/hard-link refusal and an explicit readiness signal
+without releasing the lifetime lease. Full window/browser probes check readiness
+against the actual assembled applications. Sharing and transfer follow
+[Microsoft CreateFileW](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew)
+and [DuplicateHandle](https://learn.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-duplicatehandle).

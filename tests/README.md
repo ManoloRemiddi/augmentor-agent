@@ -161,3 +161,13 @@ accepted prompt request and an explicit natural-exit observer. The DSH endpoint
 is an isolated unavailable port, so this covers its offline lifecycle, not a
 real connected model session. The native compiled-browser proof exercises the
 updated Windows wrapper's complete-Job graceful wait against bundled DSH.
+
+`test_windows_startup_fence.py` requires native Windows: concurrent startup
+readers block the maintenance writer, the writer blocks new readers/other writers,
+and an explicitly inherited duplicate retains exclusion after the coordinator's
+normal exit or deliberate crash. The recipient can hold startup exclusion while
+the independent final installation file opens with no sharing. No installer
+is launched, no product data changes, and this primitive does not prove rollback.
+The compiled launcher probe additionally checks the exported readiness release
+leaves its lifetime lease held; full native window/browser proofs assert the
+actual applications release startup exclusion once discoverable.

@@ -92,6 +92,8 @@ def prove(root, work, session):
         assert [p.pid for p in observations]==[process.pid], 'Discovery must retain this exact native host.'
         participant=observations[0]
         assert participant.initial['connected'], participant.initial
+        from lifecycle.windows_startup import Startup
+        with Startup(runtime_directory(),maintenance=True): pass
         token='a'*32
         browser_busy=True
         try:participant.control('prepare',token)

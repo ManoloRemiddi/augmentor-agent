@@ -49,6 +49,7 @@ def main():
             from platform_adapters.processes import OwnedProcess
             from platform_adapters.paths import runtime_directory
             from lifecycle.browser_control import BrowserControlServer
+            from lifecycle.windows_startup import native_ready
             hold('runtime'); ensure(ROOT)
             environment = {**os.environ}
             environment.pop('NODE_OPTIONS', None); environment.pop('NODE_PATH', None)
@@ -64,7 +65,7 @@ def main():
                     if actual!=os.path.normcase(str((ROOT/'python/python.exe').resolve())): raise ValueError('The browser relay executable differs.')
                     return process
                 except BaseException: process.Close(); raise
-            with BrowserControlServer(ROOT,runtime_directory(),verify_bridge=verify_bridge) as controls:
+            with BrowserControlServer(ROOT,runtime_directory(),verify_bridge=verify_bridge,on_ready=native_ready) as controls:
                 environment.update(AUGMENTOR_BROWSER_OWNER_ENDPOINT=str(controls.endpoint),
                     AUGMENTOR_BROWSER_OWNER_NONCE=controls.nonce,AUGMENTOR_BROWSER_OWNER_PID=str(os.getpid()),
                     AUGMENTOR_BROWSER_OWNER_ROOT=str(ROOT.resolve()))

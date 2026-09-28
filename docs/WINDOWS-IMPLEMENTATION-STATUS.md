@@ -23,6 +23,16 @@ Installer backend is **Inno Setup/WinSparkle**; earlier Velopack
 candidate entries below are historical. Global coordination and full app release
 are not complete.
 
+The native browser-owner change at `df52b47` passes compiled x64 qualification,
+both fast Windows desktop jobs, installer feasibility, Linux (including actual
+Chromium through product private control), and macOS. Full ARM64 qualification
+is still running in [36377424868](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36377424868).
+Current source adds [short-lived startup exclusion](WINDOWS-SHELL.md#short-lived-startup-exclusion)
+before Python loads, releases it only after discoverable controls are ready, and
+adds real-Windows duplicated-handle transfer tests. Portable browser registration,
+supervisor policy and launcher policy checks pass. These new kernel/compiled
+assertions await native execution. No installer apply or browser commit is enabled.
+
 ## Baseline and environments (W0)
 
 Implementation branch `feat/windows` starts from reviewed `main` `b8e36a4` plus

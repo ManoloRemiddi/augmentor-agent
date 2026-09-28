@@ -12,14 +12,15 @@
 #include <shlobj.h>
 
 typedef struct {
-    HANDLE base, run, file;
+    HANDLE base, run, file, startup;
 } AugmentorLease;
 
 static void augmentor_release(AugmentorLease *lease) {
+    if (lease->startup != INVALID_HANDLE_VALUE) CloseHandle(lease->startup);
     if (lease->file != INVALID_HANDLE_VALUE) CloseHandle(lease->file);
     if (lease->run != INVALID_HANDLE_VALUE) CloseHandle(lease->run);
     if (lease->base != INVALID_HANDLE_VALUE) CloseHandle(lease->base);
-    lease->file = lease->run = lease->base = INVALID_HANDLE_VALUE;
+    lease->startup = lease->file = lease->run = lease->base = INVALID_HANDLE_VALUE;
 }
 
 static BOOL augmentor_private_descriptor(HANDLE handle, PSID user) {
@@ -105,7 +106,7 @@ static BOOL augmentor_acquire(AugmentorLease *lease, const wchar_t *qualificatio
     DWORD size = 0;
     BOOL accepted = FALSE;
     wchar_t base[32768], run[32768], file[32768], sddl[512];
-    lease->base = lease->run = lease->file = INVALID_HANDLE_VALUE;
+    lease->base = lease->run = lease->file = lease->startup = INVALID_HANDLE_VALUE;
     if (!OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &token)) goto done;
     GetTokenInformation(token, TokenUser, NULL, 0, &size);
     if (!size || !(identity = malloc(size)) ||
@@ -145,7 +146,19 @@ static BOOL augmentor_acquire(AugmentorLease *lease, const wchar_t *qualificatio
             info.dwFileAttributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT) ||
             !augmentor_private_descriptor(lease->file, identity->User.Sid)) goto done;
     OVERLAPPED overlap = {0};
-    accepted = LockFileEx(lease->file, LOCKFILE_FAIL_IMMEDIATELY, 0, 1, 0, &overlap);
+    if (!LockFileEx(lease->file, LOCKFILE_FAIL_IMMEDIATELY, 0, 1, 0, &overlap)) goto done;
+    /* Shared startup readers exclude the coordinator's writer until each
+     * launch publishes its authenticated control endpoint. A writer in turn
+     * excludes new readers. This separate file can remain held by an inherited
+     * installer handle while installation.lock becomes wholly exclusive. */
+    if (swprintf_s(file, 32768, L"%ls\\startup.lock", run) < 0) goto done;
+    lease->startup = CreateFileW(file, GENERIC_READ, FILE_SHARE_READ,
+        &attributes, OPEN_ALWAYS, FILE_FLAG_OPEN_REPARSE_POINT, NULL);
+    if (lease->startup == INVALID_HANDLE_VALUE ||
+            !GetFileInformationByHandle(lease->startup, &info) || info.nNumberOfLinks != 1 ||
+            info.dwFileAttributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT) ||
+            !augmentor_private_descriptor(lease->startup, identity->User.Sid)) goto done;
+    accepted = TRUE;
 done:
     if (security) LocalFree(security);
     if (sid) LocalFree(sid);

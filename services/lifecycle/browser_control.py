@@ -109,9 +109,10 @@ class BridgeLink:
 
 
 class BrowserControlServer:
-    def __init__(self, root, runtime, *, verify_bridge, timeout=10):
+    def __init__(self, root, runtime, *, verify_bridge, timeout=10, on_ready=None):
         self.root=Path(root).resolve(); self.runtime=require_directory(runtime)
         self.verify_bridge=verify_bridge; self.timeout=timeout
+        self.on_ready=on_ready
         self.nonce=secrets.token_hex(32)
         self.lock=threading.RLock(); self.bridge=None; self.lease=None; self.server=None; self.thread=None; self.closed=False
         self.lock_path=self.runtime/f'augmentor-browser-{os.getpid()}.lock'
@@ -138,6 +139,7 @@ class BrowserControlServer:
                     link=BridgeLink(records,self.timeout)
                     records.write({**self.identity(),'ok':True})
                     self.bridge=link
+                    if self.on_ready is not None: self.on_ready()
                 while True: link.receive(records.read())
             if message.get('kind')=='describe' and set(message)=={'protocol','kind'}:
                 with self.lock: connected=self.bridge is not None and not self.bridge.closed

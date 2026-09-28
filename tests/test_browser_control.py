@@ -24,8 +24,10 @@ class BrowserControlTests(unittest.TestCase):
         self.temp=tempfile.TemporaryDirectory(prefix='augmentor-browser-control-')
         self.root=private_directory(Path(self.temp.name)/'private')
         self.observed=[];self.connections=[]
+        self.ready=[]
         def verify(pid): self.observed.append(pid)
-        self.server=BrowserControlServer(ROOT,self.root,verify_bridge=verify,timeout=.2)
+        self.server=BrowserControlServer(ROOT,self.root,verify_bridge=verify,timeout=.2,
+            on_ready=lambda:self.ready.append(self.server.bridge is not None))
         self.server.__enter__()
 
     def tearDown(self):
@@ -47,7 +49,7 @@ class BrowserControlTests(unittest.TestCase):
         # The wire acknowledgment can arrive before the handler publishes its
         # link; wait only on a read-only observation, never replay a mutation.
         end=time.monotonic()+3
-        while self.server.bridge is None:
+        while self.server.bridge is None or not self.ready:
             if time.monotonic()>end:self.fail('Bridge not published')
             time.sleep(.001)
         return peer
@@ -61,10 +63,24 @@ class BrowserControlTests(unittest.TestCase):
             with self.assertRaises(BlockingIOError):locks.flock(lease,locks.LOCK_EX|locks.LOCK_NB)
         finally:os.close(lease)
         self.assertFalse(self.request('bridge',nonce='wrong')['ok']);self.assertEqual(self.observed,[])
+        self.assertEqual(self.ready,[])
         self.register();self.assertEqual(self.observed,[os.getpid()])
+        self.assertEqual(self.ready,[True])
         self.assertTrue(self.request('describe')['connected'])
         self.assertFalse(self.request('bridge',nonce=self.server.nonce)['ok'])
+        self.assertEqual(self.ready,[True])
         self.assertTrue(self.request('describe')['connected'])
+
+    def test_failed_readiness_does_not_leave_a_discoverable_live_bridge(self):
+        def fail(): raise RuntimeError('Disposable startup callback failed.')
+        self.server.on_ready=fail
+        peer=self.connect();peer.write({'protocol':PROTOCOL,'kind':'bridge','nonce':self.server.nonce})
+        self.assertTrue(peer.read(time.monotonic()+3)['ok'])
+        self.assertFalse(peer.read(time.monotonic()+3)['ok'])
+        end=time.monotonic()+3
+        while self.request('describe')['connected']:
+            if time.monotonic()>end:self.fail('Failed readiness left a live bridge.')
+            time.sleep(.001)
 
     def test_control_round_trip_and_timeout_never_replay(self):
         bridge=self.register();seen=[]

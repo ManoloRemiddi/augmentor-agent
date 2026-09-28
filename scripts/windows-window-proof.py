@@ -97,7 +97,9 @@ def main():
             children.append(subprocess.Popen(arguments(name), env=env, stdin=subprocess.DEVNULL,
                 stdout=log, stderr=log, **options))
         initial = {name: wait_for(lambda: inspect(name)) for name in ('main','secondary')}
-        if args.launcher: lease_proof.assert_held(env['XDG_RUNTIME_DIR'])
+        if args.launcher:
+            lease_proof.assert_held(env['XDG_RUNTIME_DIR'])
+            lease_proof.assert_startup_ready(env['XDG_RUNTIME_DIR'])
         report['initial'] = initial
         assert [initial[name]['pid'] for name in ('main','secondary')] == [child.pid for child in children], 'The desktop left its native launch process.'
         assert initial['main']['pid'] != initial['secondary']['pid']

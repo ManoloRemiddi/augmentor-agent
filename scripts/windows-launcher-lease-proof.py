@@ -14,6 +14,7 @@ def prove(root, work):
     import win32security
     from platform_adapters import locks
     from platform_adapters.windows_identity import private_directory, private_lock_descriptor
+    from lifecycle.windows_startup import Startup
 
     base = private_directory(work/'native-startup')
     private_directory(base/'run')
@@ -49,6 +50,12 @@ def prove(root, work):
     try: refused(base)
     finally: gate.Close()
 
+    with Startup(base/'run', maintenance=True): refused(base)
+    startup = base/'run/startup.lock'
+    os.link(startup, base/'startup-second-link')
+    try: refused(base)
+    finally: (base/'startup-second-link').unlink()
+
     os.link(lock, base/'second-link')
     try: refused(base)
     finally: (base/'second-link').unlink()
@@ -74,7 +81,8 @@ def prove(root, work):
     finally: os.rmdir(link)
 
     return {'beforePythonLoad':True, 'exclusiveByteLock':True, 'installerNoSharingGate':True,
-        'hardLinkRefused':True, 'broadAclPreserved':True, 'junctionRefused':True, 'desktopAndBrowser':True}
+        'hardLinkRefused':True, 'broadAclPreserved':True, 'junctionRefused':True, 'desktopAndBrowser':True,
+        'startupWriterBeforePythonLoad':True, 'startupHardLinkRefused':True}
 
 
 def assert_held(runtime):
@@ -99,6 +107,19 @@ def assert_held(runtime):
     else:
         handle.Close()
         raise AssertionError('Installer file sharing did not exclude a running native application.')
+
+
+def assert_startup_ready(runtime):
+    """A discovered native component must no longer retain a startup reader."""
+    import time
+    from lifecycle.windows_startup import Startup
+    deadline = time.monotonic()+5
+    while True:
+        try:
+            with Startup(runtime, maintenance=True): return
+        except OSError as error:
+            if error.winerror != 32 or time.monotonic() >= deadline: raise
+            time.sleep(.02)
 
 
 def main():
@@ -126,10 +147,16 @@ def main():
         'customerDistribution':False, 'qualificationStatus':'development-candidate'}), encoding='utf-8')
     (runtime/'scripts').mkdir()
     fixture = """import pathlib,sys,time
+sys.path.insert(0, REPLACE_SERVICES)
+from lifecycle.windows_startup import native_ready
 root=pathlib.Path(sys.argv[2])
 (root/'ready').write_text('ready')
+while not (root/'publish').exists(): time.sleep(.02)
+assert native_ready()
+assert native_ready()  # Repeated readiness cannot touch the lifetime lease.
+(root/'published').write_text('ready')
 while not (root/'release').exists(): time.sleep(.02)
-"""
+""".replace('REPLACE_SERVICES', repr(str(root/'services')))
     for script in ('launch-windows.py','launch-windows-browser.py'):
         (runtime/'scripts'/script).write_text(fixture, encoding='utf-8')
     spec = importlib.util.spec_from_file_location('native_launcher_builder', root/'scripts/build-windows-launcher.py')
@@ -146,6 +173,16 @@ while not (root/'release').exists(): time.sleep(.02)
             while not (state/'ready').exists() and child.poll() is None and time.monotonic()<deadline:time.sleep(.05)
             assert (state/'ready').exists(), (name,child.poll())
             assert_held(state/'run')
+            from lifecycle.windows_startup import Startup
+            try:
+                with Startup(state/'run', maintenance=True): pass
+            except OSError as error: assert error.winerror == 32, error
+            else: raise AssertionError('Native startup was released before publishing controls.')
+            (state/'publish').write_text('publish', encoding='utf-8')
+            while not (state/'published').exists() and child.poll() is None and time.monotonic()<deadline:time.sleep(.02)
+            assert (state/'published').exists(), (name,child.poll())
+            assert_startup_ready(state/'run')
+            assert_held(state/'run')
             (state/'release').write_text('release', encoding='utf-8')
             assert child.wait(timeout=10)==0
             from platform_adapters import locks
@@ -157,6 +194,7 @@ while not (root/'release').exists(): time.sleep(.02)
             if child.poll() is None:child.kill()
             child.communicate(timeout=10)
     report.update(arch=args.arch,compiled=True,normalExitReleasesLease=True,
+        nativeReadinessReleasesOnlyStartup=True,
         scope='Actual native launcher and private Python with disposable entrypoints; not complete desktop or installer evidence.')
     (args.out/'native-startup-lease.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
     print(json.dumps(report))

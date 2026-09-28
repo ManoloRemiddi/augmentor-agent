@@ -15,6 +15,16 @@
 #include <fcntl.h>
 #ifdef AUGMENTOR_LIFETIME_LEASE
 #include "windows-lease.h"
+static AugmentorLease lease = {INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE,
+    INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE};
+
+/* Only the startup reader is releasable from Python. The lifetime lease stays
+ * held through runtime finalization and actual process exit. */
+__declspec(dllexport) BOOL WINAPI AugmentorStartupReady(void) {
+    HANDLE startup = InterlockedExchangePointer((PVOID volatile *)&lease.startup,
+        INVALID_HANDLE_VALUE);
+    return startup == INVALID_HANDLE_VALUE || CloseHandle(startup);
+}
 #endif
 
 #ifndef AUGMENTOR_SCRIPT
@@ -47,7 +57,6 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE previous, PWSTR command, int s
 #ifdef AUGMENTOR_DEVELOPMENT_CANDIDATE
     if (argc >= 3 && !wcscmp(argv[1], L"--qualification-root")) qualification = argv[2];
 #endif
-    AugmentorLease lease;
     if (!augmentor_acquire(&lease, qualification)) {
         LocalFree(argv);
         /* Disposable CI launches cannot leave an unattended modal dialog. */

@@ -34,6 +34,15 @@ five launcher policy checks pass. Compiled Windows execution of this addition
 is pending. Global startup fencing, commit/installer handoff and the other full
 app gates remain open. Keep the draft unmerged and existing installations intact.
 
+At `df52b47`, compiled native browser control/discovery passes x64; full ARM64
+is still running. Both fast Windows jobs, installer feasibility and Linux/macOS
+pass. Current source adds the [startup reader/writer fence](WINDOWS-SHELL.md#short-lived-startup-exclusion)
+and readiness release in desktop, browser and supervisor, plus a native handle
+inheritance proof across coordinator exit/crash. Local registration and policy
+checks pass; new kernel/compiled execution is pending. Continue the complete
+coordinator and independent installer handoff after qualifying this primitive.
+Browser commit and public installer delivery remain disabled.
+
 Current Windows worktree: `feat/windows` in an isolated canonical-repository
 checkout; draft [PR #20](https://github.com/ManoloRemiddi/augmentor-agent/pull/20).
 At `523fe9a`, real hosted x64/ARM64 runtime and disposable two-version installer

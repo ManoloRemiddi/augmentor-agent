@@ -64,6 +64,12 @@ def ensure(root=ROOT):
         return request('status', root=root)
     except FileNotFoundError:
         pass  # Proven no pipe exists; do not replace an unknown/unresponsive owner.
+    from lifecycle.windows_startup import Startup
+    with Startup():
+        return _spawn_owner(root)
+
+
+def _spawn_owner(root):
     owner = owner_directory()
     with os.fdopen(descriptor(owner/'supervisor.log', writable=True, create=True), 'a', encoding='utf-8') as log:
         process = subprocess.Popen([runtime_python(root), '-I', '-Xutf8', '-B',
@@ -237,6 +243,12 @@ class Supervisor:
 
 
 def run(root=ROOT):
+    from lifecycle.windows_startup import Startup
+    with Startup() as startup:
+        return _run(root, startup)
+
+
+def _run(root, startup):
     owner = owner_directory()
     lease = descriptor(owner/'owner.lock', writable=True, create=True)
     try:
@@ -281,6 +293,7 @@ def run(root=ROOT):
                     with supervisor.lock: supervisor.status()
                     if supervisor.shutdown.is_set(): app.quit()
                 timer = QTimer(); timer.timeout.connect(tick); timer.start(200)
+                startup.ready()
                 app.exec()
             finally:
                 timer.stop(); shell.close()

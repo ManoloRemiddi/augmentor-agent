@@ -103,7 +103,7 @@ def private_lock_descriptor(path):
     return private_file_descriptor(path, writable=True, create=True)
 
 
-def private_file_descriptor(path, *, writable=False, create=False, exclusive=False, private_parent=True):
+def private_file_descriptor(path, *, writable=False, create=False, exclusive=False, private_parent=True, share_write=True):
     """Read or create a protected ordinary file; validate the opened object."""
     import msvcrt
     path = reject_reparse_ancestors(path)
@@ -115,7 +115,7 @@ def private_file_descriptor(path, *, writable=False, create=False, exclusive=Fal
     access = win32con.GENERIC_READ | (win32con.GENERIC_WRITE if writable else 0)
     try:
         handle = win32file.CreateFile(str(path), access,
-            win32con.FILE_SHARE_READ | win32con.FILE_SHARE_WRITE, security_attributes(),
+            win32con.FILE_SHARE_READ | (win32con.FILE_SHARE_WRITE if share_write else 0), security_attributes(),
             disposition, win32file.FILE_FLAG_OPEN_REPARSE_POINT, None)
     except pywintypes.error as error:
         # Keep the shared filesystem contract: pywin32's exception type is not

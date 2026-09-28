@@ -1295,6 +1295,15 @@ class Window(QWidget):
 
 
 def main():
+    if sys.platform=='win32':
+        sys.path.insert(0,str(Path(__file__).resolve().parents[3]/'services'))
+        from lifecycle.windows_startup import Startup
+        with Startup() as startup:
+            return _main(startup)
+    return _main()
+
+
+def _main(startup=None):
     sys.path.insert(0,str(Path(__file__).resolve().parents[3]/'services/lifecycle'))
     from lease import hold
     hold('desktop')
@@ -1436,4 +1445,6 @@ def main():
             ok = window.grab().save(str(args.screenshot))
             app.exit(0 if ok else 1)
         QTimer.singleShot(200, capture)
+    if startup is not None and hasattr(app,'instance_server'):
+        startup.ready()
     return app.exec()
