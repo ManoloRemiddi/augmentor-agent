@@ -11,18 +11,38 @@
 #include <shellapi.h>
 #include <Python.h>
 #include <wchar.h>
+#include <io.h>
+#include <fcntl.h>
 
 #ifndef AUGMENTOR_SCRIPT
+#ifdef AUGMENTOR_BROWSER_HOST
+#define AUGMENTOR_SCRIPT L"scripts\\launch-windows-browser.py"
+#else
 #define AUGMENTOR_SCRIPT L"scripts\\launch-windows.py"
+#endif
 #endif
 
 static int failure(const wchar_t *message) {
+#ifdef AUGMENTOR_BROWSER_HOST
+    (void)message;
+    const char error[] = "Augmentor's native browser host could not start. Repair this installation.\n";
+    DWORD written;
+    WriteFile(GetStdHandle(STD_ERROR_HANDLE), error, (DWORD)(sizeof(error)-1), &written, NULL);
+#else
     MessageBoxW(NULL, message, L"Augmentor could not start", MB_OK | MB_ICONERROR);
+#endif
     return 1;
 }
 
 int WINAPI wWinMain(HINSTANCE instance, HINSTANCE previous, PWSTR command, int show) {
     (void)instance; (void)previous; (void)command; (void)show;
+#ifdef AUGMENTOR_BROWSER_HOST
+    /* Native messaging is a binary length-prefixed protocol, never console text. */
+    if (_fileno(stdin) < 0 || _fileno(stdout) < 0 ||
+        _setmode(_fileno(stdin), _O_BINARY) == -1 ||
+        _setmode(_fileno(stdout), _O_BINARY) == -1)
+        return failure(L"The browser did not provide protocol handles.");
+#endif
     wchar_t root[32768], home[32768], dll[32768], python[32768], script[32768];
     DWORD length = GetModuleFileNameW(NULL, root, 32768);
     if (!length || length >= 32768) return failure(L"Cannot locate this application.");

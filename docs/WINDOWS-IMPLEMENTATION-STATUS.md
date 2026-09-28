@@ -619,3 +619,19 @@ that backend in both Python and Node prompt/memory clients. Unix startup behavio
 is retained. Local TypeScript check/build and the real Unix shared-service and
 sealed-bundle startup tests pass; native client-owned save/crash/restart execution
 remains pending. Linux/shared and macOS workflows also pass at `ade5be0`.
+
+The complete `0a1d086` [runtime run 36364000645](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36364000645)
+now passes on both native CPUs, including the compiled Qt plugin correction,
+two preview windows, zoom/drafts, embedded resources, DSH setup/history/Stop,
+cross-user kernel probes and the disposable installer lifecycle. The later
+compiled actual-composer proof is still executing; these results do not subsume it.
+
+W5 source begins with a dedicated [Windows native browser executable](WINDOWS-BROWSER.md),
+private diagnostics and binary framing through the shared Node bridge. A new
+qualification sequence checks the real executable's handshake, Unicode prompt
+storage, actual DSH history and disconnect ownership. Native execution, browser
+registration, chosen-browser UI and installation are pending. Five local launcher
+checks pass, including origin/argument refusal; syntax checks are not native
+binary evidence. This work does not publish an extension or change any browser
+profile. Client-adoption source `6c2a492` passes both fast Windows desktop jobs;
+its full native Node/Python ownership test is still queued.

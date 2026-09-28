@@ -97,7 +97,7 @@ END
 
 
 def build_launcher(payload, arch, *, name='Augmentor.exe'):
-    if sys.platform != 'win32' or arch not in ('x64','arm64') or name not in ('Augmentor.exe','AugmentorFixture.exe'):
+    if sys.platform != 'win32' or arch not in ('x64','arm64') or name not in ('Augmentor.exe','AugmentorFixture.exe','AugmentorBrowserHost.exe'):
         raise ValueError('Use a supported Windows launcher identity and architecture.')
     payload = Path(payload).resolve()
     vswhere = Path(os.environ.get('ProgramFiles(x86)', 'C:/Program Files (x86)'))/'Microsoft Visual Studio/Installer/vswhere.exe'
@@ -125,7 +125,8 @@ def build_launcher(payload, arch, *, name='Augmentor.exe'):
             manifest_option = '/MANIFEST:NO '
         command = (f'call "{vcvars}" {"amd64_arm64" if arch == "arm64" else "amd64"} && '
             +compile_resource+
-            f'cl /nologo /O2 /W4 /MT /I"{include}" "{ROOT / "services/platform/windows-launcher.c"}" '
+            'cl /nologo /O2 /W4 /MT '+('/DAUGMENTOR_BROWSER_HOST ' if name == 'AugmentorBrowserHost.exe' else '')+
+            f'/I"{include}" "{ROOT / "services/platform/windows-launcher.c"}" '
             f'/Fe:"{payload / name}" /Fo:"{payload / "launcher.obj"}" '+resource_input+
             '/link /SUBSYSTEM:WINDOWS '+manifest_option+'user32.lib shell32.lib')
         # list2cmdline would backslash-escape embedded quotes, which cmd.exe does
@@ -140,3 +141,4 @@ if __name__ == '__main__':
     parser.add_argument('--arch', choices=('x64','arm64'), required=True)
     args = parser.parse_args()
     build_launcher(args.root, args.arch)
+    build_launcher(args.root, args.arch, name='AugmentorBrowserHost.exe')

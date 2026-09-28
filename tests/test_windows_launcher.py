@@ -21,9 +21,21 @@ def load(name):
 
 launcher = load('launch-windows.py')
 components = load('launch-component.py')
+browser = load('launch-windows-browser.py')
 
 
 class WindowsLauncherTests(unittest.TestCase):
+    def test_browser_origin_and_parent_window_arguments_are_bounded(self):
+        origin = browser.origin(ROOT)
+        self.assertRegex(origin, r'^chrome-extension://[a-p]{32}/$')
+        browser.validate_arguments([origin], ROOT)
+        browser.validate_arguments([origin, '--parent-window=123'], ROOT)
+        for arguments in ([], ['chrome-extension://'+'a'*32+'/'], [origin, '--arbitrary'],
+                          [origin, '--parent-window=-1'], [origin, '--parent-window='+'1'*21],
+                          [origin, '--parent-window=0', '--parent-window=1']):
+            with self.subTest(arguments=arguments), self.assertRaisesRegex(ValueError, 'matching Augmentor'):
+                browser.validate_arguments(arguments, ROOT)
+
     def test_partial_native_library_configuration_closes_search_handles(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

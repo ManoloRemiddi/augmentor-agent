@@ -23,7 +23,8 @@ Current cross-platform direction: [one product, Linux/Mac parity audit and corre
 
 Windows: [detailed x64/ARM64 implementation plan, including RTX Spark](WINDOWS-IMPLEMENTATION-PLAN.md), [corrected research](WINDOWS-RTX-SPARK-RESEARCH.md) and [active implementation evidence](WINDOWS-IMPLEMENTATION-STATUS.md). Qualification and public delivery remain pending.
 
-Windows mechanisms: [desktop and background shortcut ownership](WINDOWS-SHELL.md).
+Windows mechanisms: [desktop and background shortcut ownership](WINDOWS-SHELL.md),
+[native browser companion and remaining integration](WINDOWS-BROWSER.md).
 
 ## Start and understand the product
 

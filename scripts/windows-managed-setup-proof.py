@@ -189,6 +189,9 @@ def main():
         wait_for(lambda: len(calls)>before and not next(row for row in adapter.call('session.list')['items'] if row['sessionId']==session)['running'])
         assert 'Windows managed setup verified.' in json.dumps(adapter.call('session.history', {'sessionId': session}))
         report['nativeDesktop'] = desktop_chat(root, work, args.out)
+        spec = importlib.util.spec_from_file_location('windows_browser_proof', Path(__file__).with_name('windows-browser-host-proof.py'))
+        browser_proof = importlib.util.module_from_spec(spec); spec.loader.exec_module(browser_proof)
+        report['nativeBrowserHost'] = browser_proof.prove(root, work, session)
         # This is the actual DSH writer, not two copies of our adapter. While
         # its model request is active, repair must fail to acquire its lease.
         from dsh.session_lease import session_write_lease
