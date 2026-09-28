@@ -12,35 +12,45 @@ Keep one shared product, approved UI and existing model/voice settings. Native
 Windows x64 and ARM64 are targets, including NVIDIA RTX Spark N1X; no RTX hardware
 qualification is claimed.
 
-Latest native evidence at `6890375`:
+Latest native evidence:
 
-- [Desktop checks pass both CPUs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36398267410),
+- [Desktop checks at 67eebe3 pass both CPUs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36399077554),
   including browser receipt/private storage, update verification and normal idle
   preview exit. These are native checks, not complete installed-product acceptance.
-- [Inno qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36398267565)
-  passes completely on x64. ARM64 passes the new native typed-registry, long-path
-  and pinned-browser-manifest fixture, then fails an older test observation:
-  `ready.json` becomes visible before Inno closes its exclusive writing handle.
-  Source now publishes closed fixture records by rename, including Python-side
-  observations. This changes test publication, not handoff authority; the actual
-  authenticated pipe protocol is unchanged. The correction awaits native rerun.
-- [Full application qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36398267417)
-  is executing. Initial installation, browser/login integration, same-build repair,
-  coordinated apply, independent health/archive and removal still require a passing
-  full run. Do not infer these outcomes from the smaller installer fixture.
+- [Inno qualification at 67eebe3 passes both CPUs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36399077539),
+  actual merge checkout `85522a92c8cad9d45bf22bd1395c5607d5bd8e46`. Downloaded reports
+  verify typed registry ownership, long paths, private manifest pinning, every
+  authenticated handoff/final-access case and signed WinSparkle delivery. Closed
+  fixture publication corrects the observed readiness-file sharing race without
+  changing the authenticated handoff or extending timeouts.
+- [Full application at 6890375](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36398267417):
+  x64 now passes initial install/browser/login identity, live-draft refusal,
+  same-build repair/relaunch, actual installed graph drain and coordinated apply,
+  full payload digest/local Qt health verification and journal archival. Disabled
+  login startup remains disabled. Custom-path and redirected-tree refusals also
+  pass. Final normal uninstall is incorrectly refused after restoring the fixture
+  browser manifest. ARM64 is still running. This is same-build application, not
+  N-to-N+1 or rollback, and complete uninstall is not yet qualified.
+
+Current source adds reason-specific removal diagnostics and a small native test
+of the exact application Inno script. Its inert component files are never executed;
+it separates idle removal without browser registration from edited/owned-manifest
+removal. This isolates the failing installer event path before repeating the full
+application build. The new test and diagnosis are pending native execution; no
+uninstall correction is claimed yet.
 
 Current installer code records one owned browser anchor and optional per-user
 login entry, preserves disabled startup on repair/update, and removes only exact
 owned registry values. Browser setup records a manifest digest before publishing
 pointers; removal retains the private file while checking its bytes. Persistent
-settings, manifests and prepared extensions survive software removal. Full installed
-refusal and cleanup evidence remains pending.
+settings, manifests and prepared extensions survive software removal. Complete installed
+browser cleanup evidence remains pending.
 
 The earlier full `ead355c` run fails same-build repair on both CPUs, after successful
 initial launch, live-draft preservation and corrected preview exit. Its native tree
 validator lacked extended paths; x64 contained 205 ordinary paths over 260 characters.
 The `6890375` fixture verifies the correction on a tree longer than 500 characters.
-Actual repaired full-payload behavior still awaits the full run above.
+The full x64 run above now verifies repaired payload behavior; ARM64 remains pending.
 
 [Signed WinSparkle delivery](WINDOWS-UPDATE-DELIVERY.md) at `594b56d` passes
 [both native CPUs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36394998456):

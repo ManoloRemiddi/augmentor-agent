@@ -428,3 +428,23 @@ handle. Fixture readiness now publishes by rename after the write closes. Python
 observations likewise publish complete JSON. No timeout is enlarged and no
 authority/installer assertion is removed. The actual authenticated pipe remains
 the handoff contract. Native rerun of this test correction is pending.
+
+## Full installed repair and isolated removal diagnosis
+
+At `6890375`, [full x64 qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36398267417)
+now passes actual initial installation/browser/login identity, live-draft refusal,
+repair and normal Qt relaunch, installed graph drain and same-build coordinated
+application, complete file-digest/local Qt health and journal archival. Removed
+login startup stays removed. Final uninstall incorrectly refuses, even after the
+fixture's edited browser manifest is restored. The existing log does not identify
+which preflight refused, so current code logs admission, tree, manifest retention
+and receipt failures separately. No refusal is bypassed.
+
+`scripts/windows-application-template-proof.py` uses the exact application Inno
+script and packaging definitions with small inert component markers. It does not
+launch or qualify those markers as an app. It first requires repair/removal with
+no browser entry, then edited-manifest refusal and exact-owned removal. This
+qualifies real installer event integration separately from the full product, and
+makes removal regressions diagnosable without rebuilding all app dependencies.
+New native execution is pending. The preceding [67eebe3 native fixtures](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36399077539)
+pass completely on both CPUs, at merge checkout `85522a92c8cad9d45bf22bd1395c5607d5bd8e46`.

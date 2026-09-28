@@ -100,15 +100,18 @@ begin
   HasOwnedRegistration := False;
   for Index := 0 to 2 do begin
     State := RemoveOwnedRegistry(BrowserKey(Index), '', ExpandConstant('{#BrowserManifestPath}'), 0);
-    if State = 0 then begin Result := False; exit; end;
+    if State = 0 then begin Log('Browser removal registry inspection failed.'); Result := False; exit; end;
     if State = 2 then HasOwnedRegistration := True;
   end;
   if not HasOwnedRegistration then exit;
   Result := False;
   Pinned := RetainBrowserManifest(ExpandConstant('{#BrowserManifestPath}'));
-  if not Pinned then exit;
+  if not Pinned then begin Log('Browser removal could not retain the private manifest.'); exit; end;
   BrowserDigest := GetSHA256OfFile(ExpandConstant('{#BrowserManifestPath}'));
-  if RemoveOwnedRegistry('{#InstallationKey}', 'BrowserManifestSHA256', BrowserDigest, 0) <> 2 then exit;
+  if RemoveOwnedRegistry('{#InstallationKey}', 'BrowserManifestSHA256', BrowserDigest, 0) <> 2 then begin
+    Log('Browser removal manifest digest does not match the ownership receipt.');
+    exit;
+  end;
   BrowserCleanupReady := True;
   Result := True;
 end;
@@ -230,7 +233,11 @@ begin
   if not Result then exit;
   RemovalHeld := PrepareRemoval('{#QualificationBase}');
   Result := RemovalHeld;
-  if Result then Result := ValidateRemovalPath(ExpandConstant('{app}'));
+  if not Result then Log('Removal could not acquire idle maintenance access.');
+  if Result then begin
+    Result := ValidateRemovalPath(ExpandConstant('{app}'));
+    if not Result then Log('Removal application-tree validation failed.');
+  end;
   if Result then Result := PrepareBrowserCleanup;
   if not Result then begin
     Log('Active work or changed installation/browser registration prevented removal; no application files were changed.');

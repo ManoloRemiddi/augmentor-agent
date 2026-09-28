@@ -113,6 +113,9 @@ def main():
         assert winreg.QueryInfoKey(registered)[:2]==(0,1)
         assert winreg.QueryValueEx(registered,'Unrelated')==('preserve',winreg.REG_SZ)
     winreg.DeleteKey(winreg.HKEY_CURRENT_USER,registration_key)
+    template_spec=importlib.util.spec_from_file_location('application_template_proof', ROOT/'scripts/windows-application-template-proof.py')
+    template=importlib.util.module_from_spec(template_spec);template_spec.loader.exec_module(template)
+    application_template=template.prove(out,args.arch,compiler/'ISCC.exe',payload/'AugmentorFixture.exe')
     installers = []
     for version in ('0.0.1', '0.0.2'):
         (payload/'fixture.json').write_text(json.dumps({'version':version, 'gate':str(gate)}))
@@ -178,6 +181,7 @@ def main():
                   'failedMaintenanceReleasesAdmission':True, 'idleRepairUpdateUninstall':True,
                   'persistentDataPreserved':True, 'nativeUpdater':native_update, 'signedBundle':signed_bundle,
                   'nativeTypedOwnedRegistry':True, 'nativeBrowserManifestPinned':True, 'nativeLongPayloadPaths':True,
+                  'applicationTemplate':application_template,
                   'independentSetupHandoff':handoff,
                   'productionInstallerQualified':False,
                   'limits':['Disposable unsigned fixture; no full Augmentor shutdown/migration/rollback or ordinary-user client acceptance.',
