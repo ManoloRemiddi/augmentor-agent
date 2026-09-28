@@ -20,12 +20,13 @@ def normalized(path):return os.path.normcase(str(Path(path).resolve()))
 
 
 class WindowParticipant:
-    def __init__(self, endpoint, root):
+    def __init__(self, endpoint, root, *, executable='Augmentor.exe', initial_command='maintenance.status'):
         if sys.platform!='win32':raise RuntimeError('Windows component discovery requires the native kernel.')
-        self.endpoint,self.root=Path(endpoint),Path(root)
+        self.endpoint,self.root,self.executable=Path(endpoint),Path(root),executable
+        self.io_timeout=5
         self.process=None;self.pid=None;self.closed=False
         try:
-            state=self.exchange('maintenance.status')
+            state=self.exchange(initial_command)
             if state.get('maintenanceAdmission')!=1:
                 raise ValueError('This window needs to close normally before maintenance; it has no supported reservation protocol.')
             self.initial=state
@@ -35,12 +36,12 @@ class WindowParticipant:
         import win32api,win32con,win32event,win32process
         if self.closed:raise ValueError('The window observation is closed.')
         with LocalSocket() as peer:
-            peer.settimeout(5);peer.connect(str(self.endpoint))
+            peer.settimeout(self.io_timeout);peer.connect(str(self.endpoint))
             pid=peer.verify_peer()
             if self.process is None:
                 self.process=win32api.OpenProcess(win32con.SYNCHRONIZE|win32con.PROCESS_QUERY_INFORMATION|win32con.PROCESS_VM_READ,False,pid)
                 self.pid=pid
-                expected=self.root/'Augmentor.exe' if (self.root/'release.json').is_file() else Path(sys.executable)
+                expected=self.root/self.executable if (self.root/'release.json').is_file() else Path(sys.executable)
                 if normalized(win32process.GetModuleFileNameEx(self.process,0))!=normalized(expected):
                     raise ValueError('The window is running a different executable. Its work was preserved.')
             elif pid!=self.pid or win32event.WaitForSingleObject(self.process,0)!=win32event.WAIT_TIMEOUT:
@@ -92,6 +93,53 @@ def discover_windows(root, runtime):
                 else:held=False
             finally:os.close(fd)
             if held:result.append(WindowParticipant(path.with_suffix('.sock'),root))
+        return result
+    except BaseException:
+        for item in result:item.close()
+        raise
+
+
+class BrowserParticipant(WindowParticipant):
+    """Retain the native wrapper identity, never a renderer-provided PID."""
+    def __init__(self, endpoint, root):
+        from .browser_control import PROTOCOL
+        super().__init__(endpoint,root,executable='AugmentorBrowserHost.exe',
+            initial_command=json.dumps({'protocol':PROTOCOL,'kind':'describe'}))
+        if self.initial.get('protocol')!=PROTOCOL:
+            self.close();raise ValueError('Unsupported native browser owner.')
+        self.io_timeout=15
+
+    def control(self, action, token=None):
+        from .browser_control import PROTOCOL
+        if action not in ('status','prepare','renew','cancel','commit'):raise ValueError('Unsupported browser maintenance operation.')
+        result=self.exchange(json.dumps({'protocol':PROTOCOL,'kind':'maintenance','method':'host.maintenance.'+action,
+            'params':{} if action=='status' else {'token':token}})).get('result')
+        expected={'prepare':'prepared','renew':'prepared','cancel':'ready','commit':'closing'}
+        if (not isinstance(result,dict) or result.get('protocol')!='augmentor-component-maintenance/1'
+                or result.get('phase') not in ('ready','preparing','prepared','closing')
+                or type(result.get('active')) is not int or result['active']<0
+                or type(result.get('nativeActive')) is not int or result['nativeActive']<0
+                or action in expected and result['phase']!=expected[action]):
+            raise ValueError('Unsupported native browser response. No request was replayed.')
+        return result
+
+
+def discover_browsers(root, runtime):
+    if sys.platform!='win32':raise RuntimeError('Windows browser discovery requires the native kernel.')
+    runtime=require_directory(runtime);result=[]
+    try:
+        for path in sorted(runtime.glob('augmentor-browser-*.lock')):
+            match=re.fullmatch(r'augmentor-browser-([1-9][0-9]{0,19})\.lock',path.name)
+            if not match:continue
+            fd=descriptor(path,writable=True)
+            try:
+                try:locks.flock(fd,locks.LOCK_EX|locks.LOCK_NB)
+                except BlockingIOError:held=True
+                else:held=False
+            finally:os.close(fd)
+            if held:
+                participant=BrowserParticipant(path.with_suffix('.sock'),root);result.append(participant)
+                if participant.pid!=int(match[1]):raise ValueError('The browser registration and observed process differ.')
         return result
     except BaseException:
         for item in result:item.close()

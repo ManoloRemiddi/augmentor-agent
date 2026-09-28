@@ -7,17 +7,18 @@ connect a Windows machine for joint physical testing afterward. Follow the full
 [implementation plan](WINDOWS-IMPLEMENTATION-PLAN.md); this ledger does not narrow
 its outcome. No Windows customer release or installed-product claim exists yet.
 
-Current checkpoint: full runtime passes both CPUs at `6d245a7`, including the
+Current checkpoint: full runtime passes both CPUs at `f079931`, including the
 corrected bootstrap token, actual compiled desktop/DSH maintenance, background
 owner reservation, complete Windows Job drain, kernel-verified window discovery
 and the pre-Python native lifetime lease.
 The separate voice 0.1.18 candidate passes native configuration and maintenance
 on both CPUs.
-Browser source now drains accepted parent and DSH/Pi bridge operations; the full
-assembled `264227a` run is still pending (x64 passes). New shared browser source
-reserves every open document, preserves drafts/Settings and recovers from a lost
-reservation. Its real Chromium proof passes locally; native discovery and commit
-remain pending. This lifetime lease is not the short-lived global startup fence.
+Browser source drains accepted parent and DSH/Pi bridge operations and reserves
+all open extension documents. Linux/Mac and all hosted Windows workflows pass at
+`f079931`. New source adds the actual private native browser owner, correlated
+admission and kernel-based Windows discovery. Local real Chromium, transport and
+regression checks pass; compiled native execution is pending. Commit remains
+disabled. The lifetime lease is not the short-lived global startup fence.
 Installer backend is **Inno Setup/WinSparkle**; earlier Velopack
 candidate entries below are historical. Global coordination and full app release
 are not complete.
@@ -887,3 +888,19 @@ additional silent-page, hello-timeout and early voice-gesture cases; those three
 focused additions also pass. Native Windows browser discovery/control and commit
 are not implemented by this checkpoint. The component refuses commit, so these
 results do not enable an installer or claim end-to-end weekly updates.
+
+At `f079931`, [full Windows qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36375929935)
+passes both CPUs and the Mac Qt candidate. Fast Windows desktop, installer
+feasibility, [Linux validation](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36375929882)
+and Mac feasibility also pass. This includes the DSH/Pi bridge drain and the
+first real Chromium page-reservation proof, superseding earlier pending entries.
+
+The following native browser source adds private wrapper registration, exact
+relay Job/executable verification, held-lock discovery with retained process
+observations and a separate control connection into the actual Node host. Native
+request/action correlations veto preparation; worker/page cancellation releases
+the matching native fence. Local actual Chromium now uses this product control
+path, replacing the earlier framing proxy. All 257 combined Node/Browser tests,
+four private-transport Python tests and five launcher policy tests pass. The
+expanded compiled native-host proof awaits x64/ARM64 execution. Commit explicitly
+refuses until global startup fencing and independent installer handoff exist.

@@ -35,7 +35,7 @@ export class BrowserMaintenance {
     this.token=null; this.expires=0; this.phase='ready'; this.operation=null
     this.timers.clearTimeout(this.timer); this.timer=null
     for (const page of this.pages.values()) void this.ask(page,'cancel',token).catch(() => {})
-    for (const resume of this.resumers) resume()
+    for (const resume of this.resumers) resume(token)
   }
   connect(port) {
     if (port.name !== PAGE_PORT) return

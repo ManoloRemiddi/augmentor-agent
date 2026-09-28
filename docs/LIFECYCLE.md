@@ -320,8 +320,9 @@ waits for its whole Job to exit naturally before releasing its lifetime lease.
 Its explicit crash/fault containment remains separate.
 
 These are component prerequisites, not global browser maintenance. The extension
-reservation below now protects pages; native discovery, startup exclusion and
-the final browser shutdown handoff remain pending. Portable real-process tests hold a shared request over EOF
+reservation below now protects pages; native control/discovery is implemented
+below and awaits compiled qualification. Startup exclusion and the final browser
+shutdown handoff remain pending. Portable real-process tests hold a shared request over EOF
 in the parent and both bridges, then require a complete final response and Node
 `beforeExit`. The DSH bridge case uses a deliberately unavailable isolated
 endpoint, not a real model or WebSocket session. Voice tests use controlled
@@ -357,17 +358,54 @@ expire reservations after 30 seconds using monotonic clocks. Repeated prepare
 does not renew; explicit renewal rechecks all pages. Missing hello, disconnected
 worker or lost coordinator cannot leave the page indefinitely locked.
 
-`commit` deliberately refuses: this development layer does not yet implement
-the native browser participant's authenticated discovery, launch fence and
-shutdown/reconnect handoff. It cannot authorize file replacement or global Quit.
+`commit` deliberately refuses: the native browser participant below still needs
+the global launch fence and shutdown/reconnect handoff. Page reservation cannot
+authorize file replacement or global Quit.
 The installer must not treat a prepared browser worker as an exited native host.
 Extension-version compatibility/store delivery remains a separate update gate.
 
-Local proof uses actual unpacked Chromium, actual page ports/context inventory
-and native messaging frames through a disposable qualification proxy around the
-real Pi bridge. Two chat documents and Settings prove draft/API-key refusal,
+Local proof now uses actual unpacked Chromium, actual page ports/context inventory
+and the private owner/native control around the real Pi bridge. The earlier
+`f079931` proof used a disposable framing proxy; that helper has been replaced
+by the actual product transport. Two chat documents and Settings prove draft/API-key refusal,
 three-page reservation, cancellation, renewal, new/closed-page invalidation and
 real 30-second expiry. The documents are opened as extension tabs; this is not a
 Windows side-panel/Comet GUI or consumer installation claim. Deterministic DOM
 tests additionally cover form dirtiness, accepted work, wrong tokens, missing
 inventory and cancellation races. See [verification](../tests/README.md).
+
+### Native browser participant
+
+The Windows wrapper now holds a private per-process registration lease and hosts
+an authenticated named-pipe control endpoint. Its Node parent registers over the
+existing Python pipe relay, using a per-launch capability. The wrapper verifies
+the relay's kernel PID, executable and membership in the exact owned Windows
+Job, retaining its process handle through registration. The capability is not
+passed to the DSH/Pi harness. Controllers may request identity or the bounded
+maintenance vocabulary; this endpoint has no arbitrary command or termination
+operation. Same-user private access is not publisher authentication.
+
+Windows discovery enumerates held registrations, verifies the wrapper's kernel
+PID/executable/build root and retains its actual process handle. It preserves
+stale files and refuses an inconsistent registration. Later control cannot
+silently adopt a different process. This remains a snapshot: global startup
+exclusion and the final exclusive installation lease are still required.
+
+The Node parent parses complete native frames even after harness selection,
+correlating accepted requests and browser actions in both directions. Those
+operations and parent-side shared work veto preparation. An idle native host
+then reserves the worker/pages through native messaging and fences new work.
+Its deadline conservatively includes the whole response round trip. A page
+invalidation releases the matching native reservation; stale notifications and
+late replies do not enter the harness. Lost control never replays a request or
+terminates model/browser work. Normal EOF still drains before natural exit.
+
+Local evidence: all 257 Node/Browser tests, four real private-transport Python
+tests, five launcher policy tests and actual Chromium using the product private
+owner and native host pass. The portable owner verifies the Linux peer/executable;
+it does not claim Windows Job membership. The compiled Windows proof now checks
+real discovery, relay ownership, reservation/refusal/cancel and observed normal
+exit with fixture renderer replies; execution is pending on both CPUs. Real
+Chromium document behavior and compiled transport behavior remain separate
+evidence. Global commit/update, Windows Chromium/Comet GUI and customer release
+are still incomplete.

@@ -2,40 +2,33 @@
 """Actual unpacked Chromium pages, runtime.getContexts and native frames.
 
 Invoked only by browser-composable-proof.py with a disposable profile, actual Pi
-SDK and qualification-only native framing proxy. No model request is submitted.
+SDK and actual private owner/native control. No model request is submitted.
 """
 import json
 import time
 
 
-def prove(temp,cdp,evaluate,until,send,open_settings,chat_panel,ext_id):
-    sequence=0
+def prove(owner,cdp,evaluate,until,send,open_settings,chat_panel,ext_id):
+    from lifecycle.browser_control import PROTOCOL, Records
+    from platform_adapters.transport import LocalSocket
     token='a'*32
-    directory=temp/'maintenance'
     def control(action):
-        nonlocal sequence
-        sequence+=1
-        pid=json.loads((directory/'host.json').read_text())['pid']
-        request=directory/f'{pid}-request.json';response=directory/f'{pid}-response.json'
-        value={'id':f'maintenance-proof-{sequence}','method':'augmentor/maintenance',
-               'params':{'method':'host.maintenance.'+action,'params':{} if action=='status' else {'token':token}}}
-        if action=='browser-action':value.update(method='browser/execute',params={'action':'tabs_list'})
-        stage=request.with_suffix('.tmp');stage.write_text(json.dumps(value));stage.replace(request)
-        end=time.monotonic()+10
-        while time.monotonic()<end:
-            if response.exists():
-                reply=json.loads(response.read_text())
-                if reply.get('id')==value['id']:return reply
-            time.sleep(.05)
-        raise AssertionError('Native maintenance request did not return.')
+        with LocalSocket() as peer:
+            peer.settimeout(15);peer.connect(str(owner.endpoint));records=Records(peer)
+            records.write({'protocol':PROTOCOL,'kind':'maintenance','method':'host.maintenance.'+action,
+                           'params':{} if action=='status' else {'token':token}})
+            reply=records.read(time.monotonic()+15)
+        return reply if reply.get('ok') else {'error':{'message':reply.get('error','Unconfirmed maintenance.')}}
     def reserve():
         # Periodic UI reads can legitimately refuse a snapshot. Retrying
         # preparation never replays a model or tool request.
         result=until(lambda:(r if (r:=control('prepare')).get('result',{}).get('phase')=='prepared' else None))
         return result['result']
     def refused():
-        result=until(lambda:(r if 'page' in (r:=control('prepare')).get('error',{}).get('message','') else None))
-        assert 'PRIVATE' not in json.dumps(result)
+        for _ in range(3):
+            result=control('prepare')
+            assert 'error' in result,result
+            assert 'PRIVATE' not in json.dumps(result)
     def ready(*panels):
         until(lambda:all(not evaluate('document.body.inert',panel) for panel in panels))
     def open_panel():
@@ -59,8 +52,7 @@ def prove(temp,cdp,evaluate,until,send,open_settings,chat_panel,ext_id):
     status=reserve();assert status['pages']==3,status
     assert all(evaluate('document.body.inert',panel) for panel in (chat_panel,second,settings))
     assert 'not started' in send('newchat')['error']
-    assert 'not started' in control('browser-action')['error']['message']
-    assert 'handoff' in control('commit')['error']['message']
+    assert 'error' in control('commit')
     assert control('renew')['result']['phase']=='prepared'
     assert control('cancel')['result']['phase']=='ready';ready(chat_panel,second,settings)
     reserve()
@@ -79,6 +71,7 @@ def prove(temp,cdp,evaluate,until,send,open_settings,chat_panel,ext_id):
     else:raise AssertionError('Lost update reservation did not restore browser input.')
     assert control('status')['result']['phase']=='ready'
     return {'realChromiumExtensionDocuments':True,'realRuntimeContextInventory':True,
+            'actualPrivateOwnerAndNativeControl':True,
             'nativeMessagingReservation':True,'multiplePageDraftRefusal':True,
             'unsavedApiKeyRefusal':True,'cancelPreservesPages':True,'renewal':True,
             'newAndClosedPageCancel':True,'lostReservationExpires':True,

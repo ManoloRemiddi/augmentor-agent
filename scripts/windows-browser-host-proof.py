@@ -14,13 +14,21 @@ import time
 
 def prove(root, work, session):
     import windows_supervisor as owner
+    from lifecycle.windows_components import discover_browsers
+    from platform_adapters.paths import runtime_directory
     spec = importlib.util.spec_from_file_location('browser_entrypoint', root/'scripts/launch-windows-browser.py')
     entrypoint = importlib.util.module_from_spec(spec); spec.loader.exec_module(entrypoint)
     argv = [str(root/'AugmentorBrowserHost.exe'), '--qualification-root', str(work), entrypoint.origin(root), '--parent-window=0']
     process = subprocess.Popen(argv, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
         creationflags=subprocess.CREATE_NO_WINDOW, cwd=root, env={**os.environ})
-    frames = queue.Queue()
+    frames = queue.Queue();write_lock=threading.Lock();observations=[]
+    browser_phase='ready';browser_busy=False
+    def send_frame(value):
+        raw=json.dumps(value,ensure_ascii=False).encode()
+        with write_lock:
+            process.stdin.write(struct.pack('<I',len(raw))+raw);process.stdin.flush()
     def read():
+        nonlocal browser_phase
         def exact(size):
             result = bytearray()
             while len(result) < size:
@@ -32,15 +40,25 @@ def prove(root, work, session):
             while True:
                 size, = struct.unpack('<I', exact(4))
                 if not 0 < size <= 1024*1024: raise ValueError('Invalid native messaging frame size.')
-                frames.put(json.loads(exact(size)))
+                value=json.loads(exact(size))
+                if value.get('method')=='augmentor/maintenance':
+                    # Renderer semantics are qualified in real Chromium by a
+                    # separate proof. Here the fixture answers binary frames to
+                    # exercise the actual compiled owner/relay/host transport.
+                    action=value['params']['method'].removeprefix('host.maintenance.')
+                    if browser_busy and action=='prepare':send_frame({'id':value['id'],'error':{'message':'Fixture browser has a draft.'}});continue
+                    if action=='prepare':browser_phase='prepared'
+                    elif action=='cancel':browser_phase='ready'
+                    send_frame({'id':value['id'],'result':{'protocol':'augmentor-component-maintenance/1',
+                        'phase':browser_phase,'active':0,'expiresInSeconds':30 if browser_phase=='prepared' else None}})
+                else:frames.put(value)
         except Exception as error: frames.put(error)
     reader = threading.Thread(target=read, daemon=True); reader.start()
     serial = 0
     def request(method, params=None, *, error=False):
         nonlocal serial
         serial += 1; identity = str(serial)
-        raw = json.dumps({'id': identity, 'method': method, 'params': params or {}}, ensure_ascii=False).encode()
-        process.stdin.write(struct.pack('<I', len(raw))+raw); process.stdin.flush()
+        send_frame({'id': identity, 'method': method, 'params': params or {}})
         deadline = time.monotonic()+30
         while True:
             result = frames.get(timeout=max(.1, deadline-time.monotonic()))
@@ -70,10 +88,29 @@ def prove(root, work, session):
         history = request('session.history', {'sessionId': session})
         assert 'Windows managed setup verified.' in json.dumps(history), history
         request('augmentor/update-plugin', {'version': '9.9.9'}, error=True)
+        observations=discover_browsers(root,runtime_directory())
+        assert [p.pid for p in observations]==[process.pid], 'Discovery must retain this exact native host.'
+        participant=observations[0]
+        assert participant.initial['connected'], participant.initial
+        token='a'*32
+        browser_busy=True
+        try:participant.control('prepare',token)
+        except ValueError:pass
+        else:raise AssertionError('A browser draft must refuse preparation.')
+        browser_busy=False
+        assert participant.control('prepare',token)['phase']=='prepared'
+        assert 'not started' in request('augmentor/prompts',{'action':'list'},error=True)['error']['message']
+        assert participant.control('renew',token)['phase']=='prepared'
+        try:participant.control('commit',token)
+        except ValueError:pass
+        else:raise AssertionError('Commit is unavailable until the installation handoff exists.')
+        assert participant.control('cancel',token)['phase']=='ready'
+        assert request('augmentor/prompts',{'action':'list'})['ok']
         before = owner.request('status', root=root)
         assert before['dsh']['running'], before
         process.stdin.close(); process.stdin = None
         assert process.wait(timeout=15) == 0, 'The native host did not exit on browser disconnect.'
+        assert participant.exited(), 'The retained kernel observation must see this exact host exit.'
         reader.join(timeout=5)
         assert not reader.is_alive(), 'The native protocol output handle leaked.'
         after = owner.request('status', root=root)
@@ -83,8 +120,10 @@ def prove(root, work, session):
         return {'passed': True, 'version': version, 'unicodeBinaryFrames': True,
             'handshakeRequired': True, 'versionMismatchBlocked': True, 'sharedPrompts': True,
             'realDshHistory': True, 'legacyUpdateBlocked': True, 'disconnectPreservesBackground': True,
+            'privateBrowserDiscovery':True,'nativeReservationWithRendererFixture':True,'nativeActionRefusal':True,
             'scope': 'Actual AugmentorBrowserHost.exe with fixture-provided browser stdio; no real-browser registry/UI claim.'}
     finally:
+        for participant in observations:participant.close()
         if process.poll() is None: process.kill()
         process.communicate(timeout=10)
         reader.join(timeout=5)

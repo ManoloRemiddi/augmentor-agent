@@ -118,6 +118,8 @@ completed global Quit. The subsequent shared
 [browser page reservation](LIFECYCLE.md#browser-page-reservation) now inventories
 every open extension document, refuses drafts/unsaved settings, pauses input and
 reconnect, and restores admission on cancel or expiry. Its native-frame and real
-Chromium proof runs in an isolated Linux profile. Windows host discovery/control,
-the native startup fence and committed browser exit remain pending; the component
-explicitly refuses commit until that handoff is implemented.
+Chromium proof runs in an isolated Linux profile. Windows host discovery/control
+is now implemented through the [native browser participant](LIFECYCLE.md#native-browser-participant)
+and awaits compiled execution. The native startup fence and committed browser
+exit remain pending; the component explicitly refuses commit until that handoff
+is implemented. Source registration/control is not a completed updater.

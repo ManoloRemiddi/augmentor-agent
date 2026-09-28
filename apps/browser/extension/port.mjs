@@ -35,7 +35,8 @@ import { overlayShow } from './overlay.mjs'
 import { browserMaintenance } from './maintenance-worker.mjs'
 
 let resetAfterMaintenance=false
-browserMaintenance.onResume(() => {
+browserMaintenance.onResume(token => {
+  post({method:'augmentor/maintenance/released',params:{token}})
   if (resetAfterMaintenance) { resetAfterMaintenance=false; resetHarnessPort() }
   else if (!state.port) ensurePort()
 })

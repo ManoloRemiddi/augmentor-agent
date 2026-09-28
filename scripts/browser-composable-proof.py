@@ -55,15 +55,24 @@ env.update(XDG_RUNTIME_DIR=str(temp/'runtime'),AUGMENTOR_PI_SOCKET=str(temp/'pi.
 config=temp/'pi-config';(config/'agent').mkdir(parents=True)
 if not os.environ.get('AUGMENTOR_PROOF_FRESH'):(config/'agent/models.json').write_text(json.dumps({'providers':{'test':{'baseUrl':f'http://127.0.0.1:{server.server_port}/v1','api':'openai-completions','apiKey':'test','models':[{'id':'test','name':'Test','reasoning':False,'input':['text'],'contextWindow':32000,'maxTokens':2048}]}}}))
 if not os.environ.get('AUGMENTOR_PROOF_FRESH'):(config/'settings.json').write_text(json.dumps({'revision':0,'defaultPreset':'danger-full-access','pinned':[],'hidden':[],'defaultModel':{'provider':'test','model':'test'}}))
-launcher=temp/'native-host';launcher.write_text('#!/bin/sh\nexec '+shlex.quote(str(app_root/'node/bin/node') if (app_root/'node/bin/node').exists() else subprocess.check_output(['which','node'],text=True).strip())+' '+shlex.quote(str(app_root/'apps/browser/native-host.mjs'))+' "$@"\n');launcher.chmod(0o700)
+native_node=str(app_root/'node/bin/node') if (app_root/'node/bin/node').exists() else subprocess.check_output(['which','node'],text=True).strip()
+launcher=temp/'native-host';launcher.write_text('#!/bin/sh\nexec '+shlex.quote(native_node)+' '+shlex.quote(str(app_root/'apps/browser/native-host.mjs'))+' "$@"\n');launcher.chmod(0o700)
+proof_control=None
 if os.environ.get('AUGMENTOR_PROOF_MAINTENANCE'):
-    (temp/'maintenance').mkdir(mode=0o700)
     (temp/'home').mkdir(mode=0o700)
     env.update(HOME=str(temp/'home'),XDG_STATE_HOME=str(temp/'xdg-state'),
                AUGMENTOR_SHARED_CONFIG=str(temp/'shared-config'),DSH_HOME=str(temp/'dsh'),
                DSH_AUGMENTOR_URL='http://127.0.0.1:1',DSH_AUGMENTOR_WS_TOKEN='disposable-maintenance-proof',
                AUGMENTOR_DSH_WORKSPACE_ROOT=str(temp/'workspace'))
-    launcher.write_text('#!/bin/sh\nexec '+shlex.join([subprocess.check_output(['which','node'],text=True).strip(),str(root/'tests/fixtures/browser-maintenance-host.mjs'),str(app_root/'apps/browser/native-host.mjs'),str(temp/'maintenance')])+'\n')
+    if sys.platform!='linux':raise RuntimeError('This private-owner Chromium proof uses the Linux qualification adapter; Windows has a separate compiled owner proof.')
+    sys.path.insert(0,str(root/'services'))
+    from lifecycle.browser_control import BrowserControlServer
+    def verify_proof_bridge(pid):
+        if Path(f'/proc/{pid}/exe').resolve()!=Path(native_node).resolve():raise ValueError('The proof bridge executable differs.')
+    proof_control=BrowserControlServer(app_root,temp/'runtime',verify_bridge=verify_proof_bridge)
+    proof_control.__enter__()
+    env.update(AUGMENTOR_BROWSER_OWNER_ENDPOINT=str(proof_control.endpoint),AUGMENTOR_BROWSER_OWNER_NONCE=proof_control.nonce,
+               AUGMENTOR_BROWSER_OWNER_PID=str(os.getpid()),AUGMENTOR_BROWSER_OWNER_ROOT=str(app_root.resolve()))
 if os.environ.get('AUGMENTOR_PROOF_NATIVE_HOST'):launcher=Path(os.environ['AUGMENTOR_PROOF_NATIVE_HOST'])
 manifest=temp/'profile/NativeMessagingHosts/com.augmentor.agent.json';manifest.parent.mkdir(parents=True)
 # Public manifest key gives a stable extension ID in all test profiles.
@@ -169,7 +178,7 @@ try:
         panel=chat_panel;cdp('Target.activateTarget',{'targetId':target})
     if os.environ.get('AUGMENTOR_PROOF_MAINTENANCE'):
         from proof_browser_maintenance import prove
-        evidence=prove(temp,cdp,evaluate,until,send,open_settings,chat_panel,ext_id)
+        evidence=prove(proof_control,cdp,evaluate,until,send,open_settings,chat_panel,ext_id)
         (root/'outputs').mkdir(exist_ok=True)
         (root/'outputs/browser-maintenance-proof.json').write_text(json.dumps(evidence,indent=2)+'\n');print(json.dumps(evidence),flush=True)
         raise SystemExit(0)
@@ -378,6 +387,7 @@ finally:
         except OSError:pass
     if ws:ws.close()
     chrome.terminate();chrome.wait(timeout=10);server.shutdown()
+    if proof_control:proof_control.close()
     # Stop only the isolated runtime, never the user's Pi host.
     import sys
     sys.path.insert(0,str(app_root/'apps/native'));os.environ.update({k:v for k,v in env.items() if k.startswith('AUGMENTOR_')})

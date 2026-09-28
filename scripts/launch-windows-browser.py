@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import re
 import sys
+import threading
 import traceback
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -46,14 +47,33 @@ def main():
             from lifecycle.lease import hold
             from windows_supervisor import ensure
             from platform_adapters.processes import OwnedProcess
+            from platform_adapters.paths import runtime_directory
+            from lifecycle.browser_control import BrowserControlServer
             hold('runtime'); ensure(ROOT)
             environment = {**os.environ}
             environment.pop('NODE_OPTIONS', None); environment.pop('NODE_PATH', None)
-            child = OwnedProcess([str(ROOT/'node/node.exe'), str(ROOT/'apps/browser/native-host.mjs'), *args],
-                env=environment, cwd=str(ROOT), stdin=sys.stdin.buffer,
-                stdout=sys.stdout.buffer, stderr=stream)
-            try: return child.wait_graceful()
-            finally: child.close()
+            started=threading.Event(); child=None
+            def verify_bridge(pid):
+                import win32api,win32con,win32job,win32process
+                if not started.wait(5) or child is None: raise ValueError('The browser process range is not ready.')
+                process=win32api.OpenProcess(win32con.SYNCHRONIZE|win32con.PROCESS_QUERY_INFORMATION|win32con.PROCESS_VM_READ,False,pid)
+                try:
+                    job=child.job
+                    if job is None or not win32job.IsProcessInJob(process,job): raise ValueError('The bridge is outside this browser process range.')
+                    actual=os.path.normcase(str(Path(win32process.GetModuleFileNameEx(process,0)).resolve()))
+                    if actual!=os.path.normcase(str((ROOT/'python/python.exe').resolve())): raise ValueError('The browser relay executable differs.')
+                    return process
+                except BaseException: process.Close(); raise
+            with BrowserControlServer(ROOT,runtime_directory(),verify_bridge=verify_bridge) as controls:
+                environment.update(AUGMENTOR_BROWSER_OWNER_ENDPOINT=str(controls.endpoint),
+                    AUGMENTOR_BROWSER_OWNER_NONCE=controls.nonce,AUGMENTOR_BROWSER_OWNER_PID=str(os.getpid()),
+                    AUGMENTOR_BROWSER_OWNER_ROOT=str(ROOT.resolve()))
+                child = OwnedProcess([str(ROOT/'node/node.exe'), str(ROOT/'apps/browser/native-host.mjs'), *args],
+                    env=environment, cwd=str(ROOT), stdin=sys.stdin.buffer,
+                    stdout=sys.stdout.buffer, stderr=stream)
+                started.set()
+                try: return child.wait_graceful()
+                finally: child.close()
         except Exception:
             traceback.print_exc()
             return 1

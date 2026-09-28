@@ -23,6 +23,17 @@ reservations expire. [The contract](LIFECYCLE.md#browser-page-reservation) expli
 refuses commit until native browser discovery, launch fencing and the shutdown
 handoff are implemented. The draft remains unmerged and no product is deployed.
 
+Subsequently, `f079931` passes all hosted workflows, including full x64/ARM64
+[qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36375929935)
+and the first real Chromium reservation proof in Linux CI. Current source adds
+the [native browser participant](LIFECYCLE.md#native-browser-participant): private
+control, actual host admission, Windows Job-verified relay registration and
+retained kernel process discovery. Local Chromium now uses the product owner
+control instead of a framing proxy; 257 Node/Browser, four private-transport and
+five launcher policy checks pass. Compiled Windows execution of this addition
+is pending. Global startup fencing, commit/installer handoff and the other full
+app gates remain open. Keep the draft unmerged and existing installations intact.
+
 Current Windows worktree: `feat/windows` in an isolated canonical-repository
 checkout; draft [PR #20](https://github.com/ManoloRemiddi/augmentor-agent/pull/20).
 At `523fe9a`, real hosted x64/ARM64 runtime and disposable two-version installer
