@@ -626,3 +626,11 @@ Preserve dated evidence rather than relabelling old tests as new qualification.
 Publish a reviewed commit and update the PR with scope and validation. A local-only
 note or an unpublished branch is not a completed handoff. Merge/release status
 must remain explicit; documentation publication does not itself merge a draft PR.
+
+
+September 28 task-reliability follow-up: the first full installed-preset test timed
+out; the next completed but overlooked an installed utility and gave an incorrect
+answer. Do not treat the restricted-tool proof as full-agent qualification. The
+Linux system profile now reports desktop-native utilities and clarifies XWayland
+and portal limitations. See [task reliability](TASK-RELIABILITY.md) for exact
+source/deployment evidence and remaining live checks.

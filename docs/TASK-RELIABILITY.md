@@ -107,7 +107,7 @@ Implementation `5a7b496` is applied over selected `20260928-000201-bcc8c6e5`
 Only the context/execution adapter files and the native notice filter changed in
 that compatible 0.2.11 artifact; the separate source branch targets current public
 0.2.12. The candidate passed eleven native reply/history checks and authenticated
-staging/promotion. Release `20260928-090939-8349fc33` is selected, with artifact
+staging/promotion. Historical release `20260928-090939-8349fc33` was selected, with artifact
 SHA-256 `25e2818df558e83ab82c57059213b322790be68f424f5a13b8659d937b5946db`.
 
 Both owned personal preset module paths and ownership hashes were updated with
@@ -149,3 +149,23 @@ environment facts, discover installed utilities and read their help before guess
 low-level interfaces. It remains general guidance, not a monitor-specific command
 rule or an authority/side-effect classifier. No reasoning effort was lowered to make
 the proof pass. Subsequent validation and installed adoption are recorded below.
+
+
+The follow-up implementation `1aaaa34` was adopted as
+`20260928-092130-e736d3da` (artifact SHA-256
+`d74cdde7c207663d35d2266aa41db01bc09c7cff48d19989221003759c4de154`).
+All three native windows and both owned DSH presets adopted it while idle, with
+model settings and selected conversations unchanged. Its full-preset read-only
+check returned in 154 seconds with seven tools, but gave an incorrect answer:
+it overlooked the installed KDE utility and misattributed physical output control
+to an X server. This is failed answer-quality evidence, despite a completed turn.
+
+The Linux system profile now inventories installed KDE, wlroots and D-Bus utilities
+alongside X11 tools, with applicability and local-help guidance. Unprobed screenshot/
+input portals no longer imply that ordinary desktop utilities are unavailable.
+The report explicitly distinguishes XWayland presence from physical output ownership.
+Discovery executes no new commands or controls; portal probing remains opt-in.
+This OS-specific report is shared by the Linux DSH/Pi helpers; macOS discovery is
+unchanged. Three Python checks cover mixed Wayland/X11 discovery, missing utilities,
+private environment exclusion and explicit portal probing. Physical standby/wake
+and general model answer quality remain separate from these capability checks.
