@@ -454,3 +454,9 @@ separate local Linux run (two processes, draft maintenance refusal, duplicate
 launch and live 120% zoom). That is not Windows evidence. Windows desktop checks
 now have their own native x64/ARM64 workflow so UI diagnostics do not wait for
 DSH dependency assembly and installer qualification to finish.
+
+The independent desktop check at `166fd2c` confirms both preview processes stay
+alive and authenticated pipe connection succeeds, but response reading times
+out. It is not an exited child or a missing endpoint. The next fixture launch
+records bounded thread stacks for this stalled command path; normal product
+launches do not enable that diagnostic timer.

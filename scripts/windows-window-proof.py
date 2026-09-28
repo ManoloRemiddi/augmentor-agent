@@ -57,7 +57,10 @@ def main():
             time.sleep(.1)
         raise AssertionError('The preview did not answer its instance command: '+repr(error))
     def arguments(name):
-        return [sys.executable, '-Xutf8', '-B', '-m', 'augmentor_linux', '--preview', '--ui-test-control', '--instance', name]
+        # A failed fixture retains thread stacks in its private log. This is
+        # confined to disposable preview launches, never a normal desktop flag.
+        bootstrap = "import faulthandler,runpy; faulthandler.enable(); faulthandler.dump_traceback_later(12); runpy.run_module('augmentor_linux',run_name='__main__')"
+        return [sys.executable, '-Xutf8', '-B', '-c', bootstrap, '--preview', '--ui-test-control', '--instance', name]
     logs = []
     try:
         for name in ('main', 'secondary'):
