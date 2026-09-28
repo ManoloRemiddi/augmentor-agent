@@ -11,7 +11,6 @@ import threading
 import time
 
 ROOT = Path(__file__).resolve().parents[1]
-CONFIG = json.loads((ROOT/'fixture.json').read_text(encoding='utf-8'))
 
 
 def dismiss_fixture_windows():
@@ -38,18 +37,18 @@ def dismiss_fixture_windows():
         user.EnumWindows(callback,0); time.sleep(.1)
 
 
-def shared_gate():
+def shared_gate(config):
     create = ctypes.WinDLL('kernel32', use_last_error=True).CreateFileW
     create.argtypes = [wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD, ctypes.c_void_p,
                        wintypes.DWORD, wintypes.DWORD, wintypes.HANDLE]
     create.restype = wintypes.HANDLE
-    handle = create(CONFIG['gate'], 0xc0000000, 3, None, 4, 0x80, None)
+    handle = create(config['gate'], 0xc0000000, 3, None, 4, 0x80, None)
     if handle == ctypes.c_void_p(-1).value: raise ctypes.WinError(ctypes.get_last_error())
     return handle
 
 
 def sparkle(settings):
-    dll = ctypes.CDLL(str(ROOT/'WinSparkle.dll'))
+    dll = ctypes.CDLL(settings.get('dllPath', str(ROOT/'WinSparkle.dll')))
     callbacks = []
     done = threading.Event()
     result = {'events': [], 'downloadHandled': False, 'canShutdown': None}
@@ -73,6 +72,12 @@ def sparkle(settings):
     def handled(path):
         try:
             result['downloadSha256'] = hashlib.sha256(Path(path).read_bytes()).hexdigest()
+            if 'bundlePolicy' in settings:
+                sys.path.insert(0, str(ROOT/'services'))
+                from lifecycle.release_bundle import stage_bundle
+                with stage_bundle(path, settings['cache'], **settings['bundlePolicy']) as release:
+                    result['verifiedRelease'] = release.identity
+                    result['retainedInstallerSha256'] = hashlib.sha256(release.installer.read_bytes()).hexdigest()
             result['downloadHandled'] = True
             return 1  # Qualification inspects the verified download; never executes a second installer here.
         except Exception:
@@ -100,10 +105,17 @@ def sparkle(settings):
 
 def main():
     action, destination, *arguments = sys.argv[1:]
-    result = {'version': CONFIG['version'], 'pid': __import__('os').getpid(),
+    if action == '--signed-bundle':
+        # Run under the original native runtime, including real private-file
+        # adapters. The minimal installed fixture intentionally omits pywin32.
+        result = sparkle(json.loads(Path(arguments[0]).read_text(encoding='utf-8')))
+        Path(destination).write_text(json.dumps(result), encoding='utf-8')
+        return
+    config = json.loads((ROOT/'fixture.json').read_text(encoding='utf-8'))
+    result = {'version': config['version'], 'pid': __import__('os').getpid(),
               'runtime': sys.executable, 'scope': 'Disposable fixture only'}
     if action == '--hold':
-        handle = shared_gate()
+        handle = shared_gate(config)
         Path(destination).write_text(json.dumps(result), encoding='utf-8')
         try:
             end = time.monotonic()+180

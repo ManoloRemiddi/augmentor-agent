@@ -149,11 +149,12 @@ def main():
             raise AssertionError('Fixture registration survived removal.')
         except FileNotFoundError: pass
         native_update = prove_updater(payload, out, signer, installers[1], identity, args.arch)
+        signed_bundle = prove_signed_bundle(runtime, payload, out, signer, installers[1], identity, args.arch)
         report = {'schema':'augmentor-windows-alternative-installer-proof/1', 'arch':args.arch,
                   'sourceCommit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
                   'tools':pins, 'twoSimultaneousHolders':True, 'busyRepairUpdateUninstallRefused':True,
                   'failedMaintenanceReleasesAdmission':True, 'idleRepairUpdateUninstall':True,
-                  'persistentDataPreserved':True, 'nativeUpdater':native_update,
+                  'persistentDataPreserved':True, 'nativeUpdater':native_update, 'signedBundle':signed_bundle,
                   'independentSetupHandoff':handoff,
                   'productionInstallerQualified':False,
                   'limits':['Disposable unsigned fixture; no full Augmentor shutdown/migration/rollback or ordinary-user client acceptance.',
@@ -351,6 +352,82 @@ def prove_updater(payload, out, signer, installer, identity, arch):
     finally:
         server.shutdown(); server.server_close(); thread.join(timeout=5)
     return results
+
+
+def prove_signed_bundle(runtime, payload, out, signer, installer, identity, arch):
+    """Actual signed WinSparkle ZIP delivery into the shared release verifier."""
+    from platform_adapters.windows_identity import private_directory
+    feed=out/'bundle-feed';feed.mkdir()
+    cache=private_directory(out/'bundle-cache')
+    key=out/'ephemeral-bundle-download.key'
+    generated=run([signer,'generate-key','--file',key],capture_output=True,text=True).stdout
+    download_public=re.search(r'Public key:\s*([A-Za-z0-9+/=]+)',generated).group(1)
+    current={'version':'0.0.1','sourceCommit':'a'*40,'target':'windows-'+arch,
+        'channel':'qualification','sha256':'c'*64,'dataSchema':1,'readableDataSchemas':[1]}
+    digest=hashlib.sha256(installer.read_bytes()).hexdigest()
+    now=int(time.time())
+    manifest={'schema':'augmentor-release-bundle/1','release':{**current,'version':'0.0.2',
+        'sourceCommit':'b'*40,'sha256':digest},'installerBytes':installer.stat().st_size,
+        'minimumOSBuild':26200,'protocols':{'product':'augmentor/1'},'issuedAt':now-60,'expiresAt':now+3600}
+    sign_metadata="""
+      const c=require('node:crypto'), chunks=[];
+      process.stdin.on('data',b=>chunks.push(b));process.stdin.on('end',()=>{
+        const pair=c.generateKeyPairSync('ed25519');
+        const raw=Buffer.concat(chunks), public=pair.publicKey.export({format:'jwk'});
+        console.log(JSON.stringify({key:Buffer.from(public.x,'base64url').toString('base64'),
+          signature:c.sign(null,Buffer.concat([Buffer.from('augmentor-release-manifest/1\\0'),raw]),pair.privateKey).toString('base64')}));
+      });
+    """
+    class QuietHandler(SimpleHTTPRequestHandler):
+        def log_message(self,*args): pass
+    server=ThreadingHTTPServer(('127.0.0.1',0),functools.partial(QuietHandler,directory=str(feed)))
+    thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
+    results={}
+    try:
+        for name in ('good','wrong-metadata-architecture','bad-metadata-signature','replaced-installer'):
+            value=json.loads(json.dumps(manifest))
+            if name=='wrong-metadata-architecture': value['release']['target']='windows-'+('x64' if arch=='arm64' else 'arm64')
+            raw=json.dumps(value).encode('utf-8')
+            signed=json.loads(run([runtime/'node/node.exe','-e',sign_metadata],input=raw,capture_output=True).stdout)
+            metadata_signature=base64.b64decode(signed['signature'])
+            if name=='bad-metadata-signature':metadata_signature=b'X'*64
+            bundle=feed/(name+'.zip')
+            with zipfile.ZipFile(bundle,'w',compression=zipfile.ZIP_STORED) as archive:
+                archive.writestr('manifest.json',raw);archive.writestr('manifest.sig',metadata_signature)
+                if name=='replaced-installer':archive.writestr('installer.exe',b'X'*installer.stat().st_size)
+                else:archive.write(installer,'installer.exe')
+            signature=run([signer,'sign','-f',key,bundle],capture_output=True,text=True).stdout.strip()
+            url=f'http://127.0.0.1:{server.server_port}'
+            (feed/(name+'.xml')).write_text('<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" '
+                'xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"><channel><title>Isolated bundle test</title>'
+                '<item><title>0.0.2</title><sparkle:version>0.0.2</sparkle:version><enclosure '
+                f'url={quoteattr(url+"/"+name+".zip")} length={quoteattr(str(bundle.stat().st_size))} '
+                f'type="application/octet-stream" sparkle:os="windows-{arch}" sparkle:edSignature={quoteattr(signature)} />'
+                '</item></channel></rss>',encoding='utf-8')
+            settings={'id':identity,'registry':r'Software\AugmentorQualification'+'\\'+identity+'\\bundle-'+name,
+                'url':url+'/'+name+'.xml','key':download_public,'busy':False,
+                'progress':str(out/('bundle-'+name+'-progress.json')),'dllPath':str(payload/'WinSparkle.dll'),
+                'cache':str(cache),'bundlePolicy':{'public_key':signed['key'],'node':str(runtime/'node/node.exe'),
+                    'current':current,'protocols':manifest['protocols'],'os_build':26200}}
+            config=out/('bundle-'+name+'-settings.json');config.write_text(json.dumps(settings),encoding='utf-8')
+            destination=out/('bundle-'+name+'-result.json')
+            before=set(cache.iterdir())
+            run([runtime/'python/python.exe','-I','-Xutf8','-B',ROOT/'scripts/windows-inno-fixture.py',
+                 '--signed-bundle',destination,config])
+            result=wait_for(destination)
+            if name=='good':
+                assert result['downloadHandled'] and result['verifiedRelease']==manifest['release'],result
+                assert result['retainedInstallerSha256']==digest,result
+                assert len(set(cache.iterdir())-before)==1
+            else:
+                assert not result['downloadHandled'] and result.get('callbackFailed'),result
+                assert set(cache.iterdir())==before
+            results[name]=result
+            winreg.DeleteKey(winreg.HKEY_CURRENT_USER,settings['registry'])
+    finally:
+        key.unlink(missing_ok=True)
+        server.shutdown();server.server_close();thread.join(timeout=5)
+    return {'cases':results,'scope':'Native WinSparkle signed ZIP callback and real private staging; ephemeral keys, synthetic release/OS policy, no installer execution.'}
 
 
 if __name__ == '__main__': main()

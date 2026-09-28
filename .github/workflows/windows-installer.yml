@@ -11,6 +11,8 @@ on:
       - 'services/lifecycle/windows_installer_process.py'
       - 'services/lifecycle/windows_handoff.py'
       - 'services/lifecycle/update_journal.py'
+      - 'services/lifecycle/release_bundle.py'
+      - 'services/lifecycle/verify-release.mjs'
       - 'tests/test_update_journal.py'
       - 'services/platform/windows-installer-handoff.c'
       - 'services/platform/windows-lease.h'

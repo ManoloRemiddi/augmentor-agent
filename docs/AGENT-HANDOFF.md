@@ -4,6 +4,12 @@
 
 ## Windows implementation — active, September 28
 
+Current addition: the [signed release metadata boundary](WINDOWS-UPDATE-DELIVERY.md)
+passes 11 new real-crypto/private-storage tests (27 combined update checks).
+It verifies release identity and retains exact installer bytes before preparation.
+The native WinSparkle fixture now sends signed ZIP bundles through this verifier;
+x64/ARM64 execution is pending. No customer trust key or updater is enabled.
+
 The owner authorizes autonomous implementation through the complete Windows app;
 physical testing follows when a Windows machine is connected. Work on
 `feat/windows` in [draft PR 20](https://github.com/ManoloRemiddi/augmentor-agent/pull/20).

@@ -25,7 +25,8 @@ Windows: [detailed x64/ARM64 implementation plan, including RTX Spark](WINDOWS-I
 
 Windows mechanisms: [desktop and background shortcut ownership](WINDOWS-SHELL.md),
 [native browser companion and remaining integration](WINDOWS-BROWSER.md),
-[installer safety findings and replacement qualification](WINDOWS-INSTALLER-DECISION.md).
+[installer safety findings and replacement qualification](WINDOWS-INSTALLER-DECISION.md),
+[signed Windows update delivery](WINDOWS-UPDATE-DELIVERY.md).
 
 ## Start and understand the product
 

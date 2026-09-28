@@ -367,3 +367,11 @@ layers. It records actual shortcut arguments on any future comparison failure.
 Three portable package intake tests pass; native readback and later installed
 repair/coordinator/removal stages remain pending. Normal customer launch has no
 qualification arguments. No personal shortcut or public installer changed.
+
+## Signed download integration
+
+The [release delivery boundary](WINDOWS-UPDATE-DELIVERY.md) now authenticates signed
+metadata and retained installer bytes independently of feed labels. New native
+WinSparkle ZIP callback fixtures are scheduled on both CPUs. Local real-signature
+and storage tests pass; native execution, product UI wiring, N-to-N+1 and recovery
+remain pending. WinSparkle never receives default installer-execution authority.
