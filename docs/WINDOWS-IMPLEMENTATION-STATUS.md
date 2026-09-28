@@ -444,3 +444,13 @@ insufficient on Windows, especially under an elevated test runner. A temporary
 private directory on the history volume preserves atomic replacement across
 separate configuration/data volumes. The 24 recovery tests pass after this
 change; native tests remain the gate for the Windows filesystem behavior.
+
+At `ae982ce`, the new two-window Windows preview probe times out awaiting its
+first instance response; direct pipe/Qt dispatch unit tests and simple native
+font/rendering still pass. Linux and Mac full artifact CI also pass at that ref.
+The proof now preserves the actual command error and child exit codes instead
+of collapsing all failures into a timeout. Its shared command sequence passes a
+separate local Linux run (two processes, draft maintenance refusal, duplicate
+launch and live 120% zoom). That is not Windows evidence. Windows desktop checks
+now have their own native x64/ARM64 workflow so UI diagnostics do not wait for
+DSH dependency assembly and installer qualification to finish.
