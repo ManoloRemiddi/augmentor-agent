@@ -86,6 +86,8 @@ function RetainBrowserManifest(Path: String): BOOL;
   external 'AugmentorRetainManifest@{tmp}\augmentor-removal.dll stdcall delayload uninstallonly';
 function RetainInstaller(SourcePath, InstallerDigest, ReleaseDigest: String): BOOL;
   external 'AugmentorRetainInstaller@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
+function SelectInstaller: BOOL;
+  external 'AugmentorSelectInstaller@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
 
 function BrowserKey(Index: Integer): String;
 begin
@@ -225,7 +227,7 @@ begin
     InstallerRetained := RetainInstaller(ExpandConstant('{srcexe}'),
       Lowercase(GetSHA256OfFile(ExpandConstant('{srcexe}'))), '{#ReleaseDigest}');
     if not InstallerRetained then
-      Result := 'Augmentor could not preserve its installer for recovery. Check free disk space and repair the private recovery cache before continuing. Application files were not changed.';
+      Result := 'Augmentor could not save its recovery copy. Check free disk space and try again. If this continues, contact support. Your installed app was not changed.';
   end;
 end;
 
@@ -241,6 +243,8 @@ begin
   if FreshInstallation and WizardIsTaskSelected('startup') then
     if OwnedRegistry('{#StartupKey}', 'Augmentor Agent', StartupCommand, 1) <> 2 then
       RaiseException('Augmentor could not enable login startup. The existing entry was preserved.');
+  if not SelectInstaller then
+    RaiseException('Augmentor could not record its installed build. Repair this installation.');
   InstallationComplete := True;
 end;
 

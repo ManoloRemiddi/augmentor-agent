@@ -37,6 +37,7 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         shutil.copy2(fixture_executable, payload/name)
     release = {'version':'0.0.1', 'sourceCommit':subprocess.check_output(
         ['git','rev-parse','HEAD'], cwd=ROOT, text=True).strip(), 'target':'windows-'+arch,
+        'channel':'preview', 'dataSchema':1, 'readableDataSchemas':[1],
         'customerDistribution':False, 'qualificationStatus':'development-candidate'}
     (payload/'release.json').write_text(json.dumps(release), encoding='utf-8')
     # Only the actual native bootstrap/private Python runs at Finish, with a
@@ -78,22 +79,28 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         assert hashlib.sha256(read_private(cached)).hexdigest() == report['sha256']
         release_digest = hashlib.sha256((payload/'release.json').read_bytes()).hexdigest().encode('ascii')
         assert read_private(receipt) == release_digest
+        from lifecycle.installed_source import open_installed_source
+        with open_installed_source(recovery, (payload/'release.json').read_bytes(), target='windows-'+arch) as source:
+            assert source.identity['sha256']==report['sha256'] and source.installer==cached
+        selection = recovery/'selected-installer'
         key_path = r'Software\Microsoft\Windows\CurrentVersion\Uninstall'+'\\'+report['applicationId']+'_is1'
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_path, 0, winreg.KEY_READ|winreg.KEY_WOW64_64KEY) as key:
             removal = command_executable(winreg.QueryValueEx(key, 'UninstallString')[0])
         assert removal.is_relative_to(install)
         # Both kinds of damaged retained bytes refuse BEFORE file replacement;
         # preserve the damaged cache for inspection, then restore this fixture.
-        for path in (cached,receipt):
+        for path in (cached,receipt,selection):
             original = read_private(path)
             changed = b'X'+original[1:]
             with os.fdopen(descriptor(path,writable=True),'wb') as stream: stream.write(changed)
-            run(report['installer'], 'corrupt-'+path.suffix[1:]+'-refusal', success=False)
+            run(report['installer'], 'corrupt-'+(path.suffix[1:] or 'selection')+'-refusal', success=False)
             assert read_private(path) == changed and (install/'current/Augmentor.exe').is_file()
             with os.fdopen(descriptor(path,writable=True),'wb') as stream: stream.write(original)
         retained_time = cached.stat().st_mtime_ns
+        selected_time = selection.stat().st_mtime_ns
         run(report['installer'], 'repair')
         assert cached.stat().st_mtime_ns == retained_time
+        assert selection.stat().st_mtime_ns == selected_time
         stages.append('original-installer-retained-and-corrupt-cache-refused')
         run(removal, 'without-browser')
         assert not (install/'current/Augmentor.exe').exists()

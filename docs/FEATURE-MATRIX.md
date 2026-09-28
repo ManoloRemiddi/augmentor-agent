@@ -81,12 +81,12 @@ the [full plan](WINDOWS-IMPLEMENTATION-PLAN.md) for required completion gates.
 | --- | --- | --- |
 | Private runtime and native desktop | Compiled launchers, Qt windows, proportional sizing, process identity and private IPC pass | Ordinary-user/physical display, keyboard and current Home/Pro builds |
 | Managed DSH and chat | Actual bundled DSH with deterministic model; Send/Enter, saved history and restart pass | Real-provider and complete feature acceptance |
-| Browser companion | Compiled native-host ownership, reservation, idle commit and restart pass; installed anchor/removal code added | New installed receipt/removal qualification, selected real Chromium, store delivery and N/N+1 compatibility |
+| Browser companion | Compiled native-host ownership, reservation, idle commit and restart pass; installed anchor/removal pass both CPUs at `8a3ff05` | Selected real Chromium, store delivery and N/N+1 compatibility |
 | Voice bridge | Shared 0.1.19, private preference saves, owned service, busy-ticket refusal and natural drain pass | Windows ASR/TTS provisioning and physical audio |
-| Prompt/memory services | Shared private clients, service ownership, reservations and observed drain pass | Windows memory engine provisioning and full memory quality/features |
+| Prompt/memory services | Shared private clients, ownership/drain and journal-before-listener startup pass | Windows memory engine provisioning and full memory quality/features |
 | Coordinated shutdown | Actual window/DSH/voice/companions/owner graph drain and restart pass at `f950a45` | Product apply/recovery integration and user-facing update flow |
-| Installer | Full repair, installed drain/same-build apply, local health/archive and login preservation pass both CPUs at `6890375`; exact-script owned-browser removal passes both at `8a3ff05` | Full corrected removal and new interactive Finish launch qualification; signing, N-to-N+1 and rollback open |
-| Update delivery | Signed manifest/private staging and actual WinSparkle ZIP callbacks pass both CPUs at `594b56d` | Bundled-DLL full qualification, trust provisioning and product UI/apply wiring open |
+| Installer | Full install/repair/drain/same-build apply/health/removal pass both CPUs at `8a3ff05`; exact-template Finish/cache pass at `ba0b68c` | New selected-source publication/readback and full cache integration; signing, N-to-N+1 and rollback open |
+| Update delivery | Signed delivery and exact retained recovery-package verification pass both CPUs; initial installer source retention added | Selected-source receipt, independent recovery, pruning, trust provisioning and product UI/apply wiring open |
 | Desktop actions, Home and Pi | Shared interfaces retained | Required Windows adapters and full end-to-end parity remain open |
 | RTX Spark N1X | Native ARM64 dependency preparation | Target hardware/driver/graphics/inference evidence |
 

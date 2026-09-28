@@ -8,12 +8,20 @@
 
 static HANDLE cache_directory = INVALID_HANDLE_VALUE;
 static HANDLE cache_installer = INVALID_HANDLE_VALUE, cache_receipt = INVALID_HANDLE_VALUE;
+#define CACHE_SELECTION_PREFIX "augmentor-installer-selection/1\n"
+#define CACHE_SELECTION_BYTES (sizeof(CACHE_SELECTION_PREFIX) - 1 + 130)
+static HANDLE cache_selection = INVALID_HANDLE_VALUE;
+static BYTE cache_selection_before[CACHE_SELECTION_BYTES], cache_selection_after[CACHE_SELECTION_BYTES];
+static BOOL cache_selection_attempted = FALSE;
 
 static void augmentor_cache_close(void) {
+    if (cache_selection != INVALID_HANDLE_VALUE) CloseHandle(cache_selection);
     if (cache_receipt != INVALID_HANDLE_VALUE) CloseHandle(cache_receipt);
     if (cache_installer != INVALID_HANDLE_VALUE) CloseHandle(cache_installer);
     if (cache_directory != INVALID_HANDLE_VALUE) CloseHandle(cache_directory);
     cache_directory = cache_installer = cache_receipt = INVALID_HANDLE_VALUE;
+    cache_selection = INVALID_HANDLE_VALUE; cache_selection_attempted = FALSE;
+    memset(cache_selection_after, 0, sizeof(cache_selection_after));
 }
 
 static BOOL cache_digest(const wchar_t *value) {
@@ -62,7 +70,7 @@ done:
  * retained installer or receipt. An interrupted pending file is not selected. */
 static BOOL cache_publish(const wchar_t *directory, const wchar_t *target,
         SECURITY_ATTRIBUTES *security, HANDLE source, const wchar_t *digest,
-        const BYTE *content, DWORD length) {
+        const BYTE *content, DWORD length, BOOL replace) {
     BYTE nonce[16]; wchar_t suffix[33], temporary[32768];
     HANDLE file = INVALID_HANDLE_VALUE; BOOL created = FALSE, ok = FALSE; DWORD written;
     if (BCryptGenRandom(NULL, nonce, sizeof(nonce), BCRYPT_USE_SYSTEM_PREFERRED_RNG) < 0) return FALSE;
@@ -75,11 +83,24 @@ static BOOL cache_publish(const wchar_t *directory, const wchar_t *target,
     if (source != INVALID_HANDLE_VALUE) ok = cache_stream(source, file, digest);
     else ok = WriteFile(file, content, length, &written, NULL) && written == length && FlushFileBuffers(file);
     CloseHandle(file); file = INVALID_HANDLE_VALUE;
-    if (ok) ok = MoveFileExW(temporary, target, MOVEFILE_WRITE_THROUGH);
+    if (ok) ok = MoveFileExW(temporary, target, MOVEFILE_WRITE_THROUGH | (replace ? MOVEFILE_REPLACE_EXISTING : 0));
 done:
     if (file != INVALID_HANDLE_VALUE) CloseHandle(file);
     if (!ok && created) DeleteFileW(temporary); /* Only this call's unpublished file. */
     return ok;
+}
+
+static BOOL cache_selection_valid(const BYTE *record) {
+    const size_t prefix = sizeof(CACHE_SELECTION_PREFIX) - 1;
+    if (memcmp(record, CACHE_SELECTION_PREFIX, prefix)) return FALSE;
+    for (unsigned row = 0; row < 2; ++row) {
+        for (unsigned column = 0; column < 64; ++column) {
+            BYTE value = record[prefix + row * 65 + column];
+            if (!((value >= '0' && value <= '9') || (value >= 'a' && value <= 'f'))) return FALSE;
+        }
+        if (record[prefix + row * 65 + 64] != '\n') return FALSE;
+    }
+    return TRUE;
 }
 
 __declspec(dllexport) BOOL WINAPI AugmentorRetainInstaller(const wchar_t *source_path,
@@ -88,7 +109,7 @@ __declspec(dllexport) BOOL WINAPI AugmentorRetainInstaller(const wchar_t *source
     TOKEN_USER *identity = NULL; DWORD size = 0, count; wchar_t *sid = NULL;
     PSECURITY_DESCRIPTOR security = NULL; BOOL ok = FALSE;
     wchar_t directory[32768], installer_path[32768], receipt_path[32768], sddl[512];
-    BYTE receipt[64], observed[65]; DWORD read;
+    BYTE receipt[64], observed[65], selection[CACHE_SELECTION_BYTES + 1]; DWORD read;
     if ((installation == INVALID_HANDLE_VALUE && manual.file == INVALID_HANDLE_VALUE) ||
             cache_directory != INVALID_HANDLE_VALUE || !source_path ||
             !cache_digest(installer_digest) || !cache_digest(release_digest)) return FALSE;
@@ -116,6 +137,18 @@ __declspec(dllexport) BOOL WINAPI AugmentorRetainInstaller(const wchar_t *source
     if (cache_directory == INVALID_HANDLE_VALUE ||
             swprintf_s(installer_path, 32768, L"\\\\?\\%ls\\%ls.exe", directory, installer_digest) < 0 ||
             swprintf_s(receipt_path, 32768, L"\\\\?\\%ls\\%ls.release", directory, installer_digest) < 0) goto done;
+    wchar_t selection_path[32768];
+    if (swprintf_s(selection_path, 32768, L"\\\\?\\%ls\\selected-installer", directory) < 0) goto done;
+    cache_selection = CreateFileW(selection_path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+        FILE_FLAG_OPEN_REPARSE_POINT, NULL);
+    if (cache_selection == INVALID_HANDLE_VALUE) {
+        if (GetLastError() != ERROR_FILE_NOT_FOUND) goto done;
+    } else {
+        if (!cache_file(cache_selection, identity->User.Sid, TRUE, CACHE_SELECTION_BYTES) ||
+                !ReadFile(cache_selection, selection, sizeof(selection), &read, NULL) ||
+                read != CACHE_SELECTION_BYTES || !cache_selection_valid(selection)) goto done;
+        memcpy(cache_selection_before, selection, CACHE_SELECTION_BYTES);
+    }
     LocalFree(security); security = NULL;
     if (swprintf_s(sddl, 512, L"O:%lsD:P(A;;FA;;;%ls)(A;;FA;;;SY)", sid, sid) < 0 ||
             !ConvertStringSecurityDescriptorToSecurityDescriptorW(sddl, SDDL_REVISION_1, &security, NULL)) goto done;
@@ -127,7 +160,7 @@ __declspec(dllexport) BOOL WINAPI AugmentorRetainInstaller(const wchar_t *source
         FILE_FLAG_OPEN_REPARSE_POINT, NULL);
     if (cache_installer == INVALID_HANDLE_VALUE) {
         if (GetLastError() != ERROR_FILE_NOT_FOUND ||
-                !cache_publish(directory, installer_path, &attributes, source, installer_digest, NULL, 0)) goto done;
+                !cache_publish(directory, installer_path, &attributes, source, installer_digest, NULL, 0, FALSE)) goto done;
         cache_installer = CreateFileW(installer_path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
             FILE_FLAG_OPEN_REPARSE_POINT, NULL);
     } else if (!cache_stream(source, INVALID_HANDLE_VALUE, installer_digest)) goto done;
@@ -138,12 +171,19 @@ __declspec(dllexport) BOOL WINAPI AugmentorRetainInstaller(const wchar_t *source
         FILE_FLAG_OPEN_REPARSE_POINT, NULL);
     if (cache_receipt == INVALID_HANDLE_VALUE) {
         if (GetLastError() != ERROR_FILE_NOT_FOUND ||
-                !cache_publish(directory, receipt_path, &attributes, INVALID_HANDLE_VALUE, NULL, receipt, 64)) goto done;
+                !cache_publish(directory, receipt_path, &attributes, INVALID_HANDLE_VALUE, NULL, receipt, 64, FALSE)) goto done;
         cache_receipt = CreateFileW(receipt_path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
             FILE_FLAG_OPEN_REPARSE_POINT, NULL);
     }
     if (!cache_file(cache_receipt, identity->User.Sid, TRUE, 64) ||
             !ReadFile(cache_receipt, observed, 65, &read, NULL) || read != 64 || memcmp(receipt, observed, 64)) goto done;
+    const size_t prefix = sizeof(CACHE_SELECTION_PREFIX) - 1;
+    memcpy(cache_selection_after, CACHE_SELECTION_PREFIX, prefix);
+    for (unsigned i = 0; i < 64; ++i) {
+        cache_selection_after[prefix + i] = (BYTE)installer_digest[i];
+        cache_selection_after[prefix + 65 + i] = (BYTE)release_digest[i];
+    }
+    cache_selection_after[prefix + 64] = cache_selection_after[prefix + 129] = '\n';
     ok = TRUE;
 done:
     if (source != INVALID_HANDLE_VALUE) CloseHandle(source);
@@ -154,4 +194,27 @@ done:
     free(identity);
     if (!ok) augmentor_cache_close();
     return ok;
+}
+
+/* Called only after successful installation/registration. This identifies the
+ * selected payload, not a healthy build; independent health remains mandatory. */
+__declspec(dllexport) BOOL WINAPI AugmentorSelectInstaller(void) {
+    wchar_t directory[32768], path[32768]; PSECURITY_DESCRIPTOR security = NULL;
+    if ((installation == INVALID_HANDLE_VALUE && manual.file == INVALID_HANDLE_VALUE) ||
+            cache_directory == INVALID_HANDLE_VALUE || cache_receipt == INVALID_HANDLE_VALUE ||
+            cache_selection_attempted || !cache_selection_valid(cache_selection_after)) return FALSE;
+    cache_selection_attempted = TRUE;
+    BOOL replacing = cache_selection != INVALID_HANDLE_VALUE;
+    if (replacing && !memcmp(cache_selection_before, cache_selection_after, CACHE_SELECTION_BYTES)) return TRUE;
+    DWORD count = GetFinalPathNameByHandleW(cache_directory, directory, 32768, FILE_NAME_NORMALIZED | VOLUME_NAME_DOS);
+    if (!count || count >= 32768 || wcsncmp(directory, L"\\\\?\\", 4)) return FALSE;
+    memmove(directory, directory + 4, (count - 3) * sizeof(wchar_t));
+    if (swprintf_s(path, 32768, L"\\\\?\\%ls\\selected-installer", directory) < 0 ||
+            GetSecurityInfo(cache_receipt, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION,
+                NULL, NULL, NULL, NULL, &security) != ERROR_SUCCESS) return FALSE;
+    SECURITY_ATTRIBUTES attributes = {sizeof(attributes), security, FALSE};
+    if (replacing) { CloseHandle(cache_selection); cache_selection = INVALID_HANDLE_VALUE; }
+    BOOL ok = cache_publish(directory, path, &attributes, INVALID_HANDLE_VALUE, NULL,
+        cache_selection_after, (DWORD)CACHE_SELECTION_BYTES, replacing);
+    LocalFree(security); return ok;
 }

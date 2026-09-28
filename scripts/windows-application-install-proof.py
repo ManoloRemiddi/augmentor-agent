@@ -91,6 +91,11 @@ def main():
         with os.fdopen(descriptor(cached_receipt),'rb') as stream:
             assert stream.read(65)==package.digest(args.root/'release.json').encode('ascii')
         cached_time=cached_installer.stat().st_mtime_ns
+        from lifecycle.installed_source import open_installed_source
+        with open_installed_source(data/'recovery', (install/'current/release.json').read_bytes(), target='windows-'+args.arch) as source:
+            assert source.identity['sha256']==report['sha256']
+            source_identity=source.identity
+        selection_bytes=(data/'recovery/selected-installer').read_bytes()
         stages.append('original-full-installer-retained')
         assert (install/'current/release.json').read_bytes() == (args.root/'release.json').read_bytes()
         for relative in ('Augmentor.exe','AugmentorBrowserHost.exe','python/python.exe','node/node.exe',
@@ -164,10 +169,7 @@ def main():
         # an actual background owner/window, and the actual packaged Setup.
         # Identical artifact repair isolates transport/process integration from
         # the separately unfinished N-to-N+1 trust/recovery policy.
-        cache=private_directory(data/'cache')
-        artifact=cache/'qualified-installer.exe'
-        with os.fdopen(descriptor(artifact,writable=True,exclusive=True),'wb') as target, Path(report['installer']).open('rb') as source:
-            shutil.copyfileobj(source,target);target.flush();os.fsync(target.fileno())
+        artifact=cached_installer
         # Exercise the exact installer-created command without a command shell.
         subprocess.run(startup_command,check=True,timeout=30)
         child=open_preview();ready()
@@ -205,9 +207,6 @@ def main():
         # For this known-built artifact compare every payload file, then launch
         # and close the actual installed Qt app before completing its journal.
         from lifecycle.update_journal import UpdateJournal
-        release=report['release']
-        identity={'version':release['version'],'sourceCommit':release['sourceCommit'],'target':release['target'],
-            'channel':'qualification','sha256':report['sha256'],'dataSchema':1,'readableDataSchemas':[1]}
         def local_health(_record):
             nonlocal child
             assert package.digest(artifact)==report['sha256']
@@ -217,7 +216,7 @@ def main():
                     assert package.digest(install/'current'/source.relative_to(args.root))==package.digest(source)
             child=open_preview();ready();close_preview();child=None
             return True
-        archive=UpdateJournal.complete_verified(transaction,identity,identity,local_health)
+        archive=UpdateJournal.complete_verified(transaction,source_identity,source_identity,local_health)
         assert read_json(archive)['phase']=='complete' and not (transaction/'active.json').exists()
         report['archivedUpdate']=archive.name
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER,report['startupKey'],0,winreg.KEY_READ|winreg.KEY_SET_VALUE) as key:
@@ -269,6 +268,7 @@ def main():
         assert sentinel.read_bytes()==sentinel_bytes
         assert package.digest(cached_installer)==report['sha256']
         assert cached_installer.stat().st_mtime_ns==cached_time
+        assert (data/'recovery/selected-installer').read_bytes()==selection_bytes
         stages.append('software-removed-persistent-data-retained')
         # These two keys are synthetic qualification locations. Never remove a
         # real Run key, StartupApproved state or another application's values.

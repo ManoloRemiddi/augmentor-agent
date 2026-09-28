@@ -36,17 +36,19 @@ def main():
     from platform_adapters import locks
     from lifecycle.update import authorize_update
     from lifecycle.update_journal import UpdateJournal
+    from lifecycle.installed_source import open_installed_source
     from lifecycle.windows_apply import WindowsApply
     from lifecycle.windows_preparation import WindowsPreparation
     import windows_supervisor as owner
     transaction=private_directory(data/'update-proof')
-    identity={'version':release['version'],'sourceCommit':release['sourceCommit'],
-        'target':release['target'],'channel':'qualification','sha256':args.sha256,
-        'dataSchema':1,'readableDataSchemas':[1]}
     with ExitStack() as stack:
         lifetime=private_lock_descriptor(data/'run/installation.lock')
         stack.callback(os.close,lifetime)
         locks.flock(lifetime,locks.LOCK_SH|locks.LOCK_NB)
+        source=stack.enter_context(open_installed_source(data/'recovery',
+            (root/'release.json').read_bytes(),target=release['target']))
+        assert source.installer.resolve()==args.installer.resolve() and source.identity['sha256']==args.sha256
+        identity=source.identity
         journal=stack.enter_context(UpdateJournal(transaction,identity,identity))
         backends=[]
         def backend(gate):

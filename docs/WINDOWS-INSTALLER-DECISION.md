@@ -539,3 +539,37 @@ reaches Finish and the log records application launch and successful Setup exit,
 then the driver reads the destroyed wizard handle (1400). The driver now observes
 only process exit after Finish and tolerates vanished controls during inspection.
 This is a fixture correction; ARM64 Finish qualification still requires a clean run.
+
+At `ba0b68c`, [all Inno/WinSparkle cases pass both CPUs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36404979491)
+at actual merge checkout `612ce6050b6ab3a80478609a7a8514913df1b467`. Downloaded
+reports confirm original-installer retention, both corrupt-cache refusals,
+repair/removal, exact browser cleanup, interactive native startup and silent
+no-launch. This is exact-template/bootstrap evidence; the full payload cache
+integration remains under qualification.
+
+## Exact selected-installer receipt
+
+Current source writes `recovery/selected-installer` only after successful payload
+installation and registration. Its strict ASCII record is the line
+`augmentor-installer-selection/1`, the 64-character installer SHA-256 and the
+64-character payload-metadata SHA-256, each followed by LF. Preflight pins and
+validates any existing record before application replacement. An invalid/private-
+ownership mismatch refuses without changing application files. The post-install
+write flushes a new private sibling and atomically replaces only the previously
+validated record. An unchanged repair performs no write. Failed/unknown publication
+is reported, not retried inside the same attempt.
+
+`services/lifecycle/installed_source.py` reads this exact record under the caller's
+installation observation/admission, matches the actual identified `release.json`
+bytes, validates target/schema/source identity and the immutable `.release`
+receipt, then hashes and pins the selected installer. Missing or damaged records
+never select another file by age or filename. The installed coordinator proof
+now takes its source identity from this native receipt and executes the actual
+retained installer, replacing its previous separately copied fixture source.
+
+Selection is not a health receipt or publisher trust. Interrupted apply still
+requires independent inspection and the journal's previous source; do not infer
+success or rollback permission from this pointer. Six private-storage reader tests
+pass locally (38 update tests total). Exact-template and full installed proofs
+exercise native publication/readback, preserved selection on repair and malformed
+selection refusal; native execution of this addition is pending.

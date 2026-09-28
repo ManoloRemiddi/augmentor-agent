@@ -60,8 +60,8 @@ remains separate. At `8ecd4c0` both native wizard tests time out before advancin
 The driver now retrieves cross-process control captions with bounded WM_GETTEXT
 and records only its owned wizard state for diagnosis. The observed modern
 Next caption is handled. At `59dbbf4`, x64 Finish/native startup passes; ARM64
-launches but its driver inspects a destroyed window. That observation race is
-corrected in source and requires native rerun.
+launches but its driver inspects a destroyed window. The corrected driver
+passes both CPUs at `ba0b68c`, including Finish/native entry and silent no-launch.
 
 Current installer code records one owned browser anchor and optional per-user
 login entry, preserves disabled startup on repair/update, and removes only exact
@@ -99,10 +99,14 @@ Retained signed recovery packages can now be revalidated against an exact record
 identity without executing them. This separates expired local recovery from new
 forward delivery. The 32 local update tests and both native fast jobs at `59dbbf4` pass.
 The actual installer now preserves its source EXE and compiled payload digest in a
-private cache before replacement; corrupted retained bytes refuse repair. Native
-cache qualification is pending. These are raw retention receipts, not signed update
-bundles. Source selection, independent recovery, health and cache pruning/removal
-remain unfinished.
+private cache before replacement; corrupted retained bytes refuse repair. Both exact-template native cache tests pass at `ba0b68c`; full payload
+cache integration remains under qualification. Current source additionally records
+the exact selected installer after successful installation. Its private reader
+binds actual release metadata and cached bytes, and the full coordinator proof
+uses that retained installer/source identity. The 38 local update tests pass;
+native selection/readback is pending. These raw receipts are not signed bundles
+or proof of health. Independent recovery, health and cache pruning/removal remain
+unfinished.
 
 Next: finish interactive-launch and memory startup qualification, then connect
 verified delivery to customer notification/UI and the coordinator. Qualify actual
