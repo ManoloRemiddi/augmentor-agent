@@ -111,7 +111,9 @@ script compilation pass. Both native templates now pass at `e98a142` in
 [36432080462](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36432080462),
 merge checkout `521151e33204421421981be0f1f35742bb1c688b`; downloaded reports
 confirm locked-tree preservation, clean replacement and missing-payload cases.
-Full payload execution remains running.
+Full x64 placement also passes, with its real displaced payload preserved and
+complete inventory/independent UI health verified. ARM64 full placement remains
+running in `36432080543`.
 
 New source adds [independent previous-source application](WINDOWS-INSTALLER-DECISION.md#independent-previous-source-application).
 The standalone installer explicitly verifies its exact recorded source under fresh
@@ -120,11 +122,25 @@ source installation while preserving the unresolved original journal. It restore
 its installer/repair metadata and source selection as well as the app payload.
 Ordinary launch remains blocked. Native template/full tests now exercise missing
 installed launcher/runtime, changed selection, refusal and independent health;
-execution is pending. The outer recovery observer, distinct durable completion
-and actual cross-version qualification remain unfinished.
+both native templates pass at `04f3317` in
+[36433486621](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36433486621),
+merge checkout `abf36a2cf01fb7c71b2604ae3e72a53c1d64f617`. Downloaded evidence from both CPUs
+confirms the source-application stage, followed by independent synthetic health.
+Full source application and actual cross-version qualification remain pending.
+
+New source adds the [distinct durable restoration outcome](WINDOWS-INSTALLER-DECISION.md#distinct-durable-restoration-outcome).
+A separate live attempt records fresh apply intent and observed installer exit,
+then requires source registration/selection, full inventory and local health under
+read admission before writing `source-restored` and archiving the original bytes
+unchanged. Thirteen new portable fault/storage tests and all 62 update cases pass
+locally (one Windows-only skip). The full proof now composes this shared journal
+with actual source installation and native health, then reopens; native execution
+is pending. Its proposed target is synthetic, not a second packaged version.
+The product outer recovery observer and crash-resume outcome inspection remain open.
 
 Next: qualify clean placement/source application and finish interrupted/cross-version restoration
-with distinct durable completion, bounded disk/retention policy, actual N-to-N+1
+with the independent product observer, qualified durable completion, bounded
+disk/retention policy, actual N-to-N+1
 and customer notification/update wiring. Preserving a displaced tree alone is not
 power-loss recovery. Cache artifacts and displaced payloads still survive ordinary
 removal. Never infer a healthy rollback source from the selection pointer or clear

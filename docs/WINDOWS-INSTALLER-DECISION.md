@@ -1045,10 +1045,52 @@ UI health. Local package/source-assessment tests and Inno script compilation pas
 new native restoration execution is pending. This does not prove actual N-to-N+1,
 restoration completion, publisher trust or physical Windows acceptance.
 
+At `04f3317`, [both native templates pass](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36433486621)
+at merge checkout `abf36a2cf01fb7c71b2604ae3e72a53c1d64f617`. Downloaded results from both CPUs
+confirm the actual source-application stage and the following independent
+synthetic health. Full native application/restoration completion remains separate.
+The prior full x64 `e98a142` run passes clean payload displacement plus complete
+inventory and real UI health; its ARM64 full job remains running.
+
+## Distinct durable restoration outcome
+
+`services/lifecycle/source_restoration.py` supplies the shared live-attempt journal
+for the independent recovery observer. It verifies the exact original record/source
+metadata and publishes a separate random restoration attempt under the existing
+journal writer lock. Its durable apply intent precedes launching the source
+installer; it releases the writer so that installer can obtain fresh admission.
+It never executes a saved PID, command or attempt.
+
+After the caller observes the actual fresh installer complete, the attempt can
+record `installed`. Finalization requires externally held installation/read
+admission plus a callback verifying source selection, owned registration, complete
+inventory and isolated native UI health against independent source bytes. The
+writer excludes other journal writers, and the original record is checked again
+after verification. The callback must not launch another installer requiring the
+same writer lock.
+
+A separate `source-restored` receipt is flushed before the unchanged original
+active record is durably moved to its uniquely named restoration archive. The
+original target, phase, shutdown history and exact bytes remain intact. Unknown
+intent/receipt/archive writes are never retried by the same attempt. A lost archive
+acknowledgment can leave either the active original or its exact archive; the
+verified restoration receipt exists before normal startup can become available.
+
+Thirteen portable tests use real private files, live writer exclusion, a child
+process crash, changed records, failed exit/health observations and injected write
+or namespace failures. All 62 update cases pass locally (one existing Windows-only
+skip). Their callbacks are fixtures, not native installer evidence. The full app
+proof now uses this completion path after actual standalone source install, source
+registration/inventory verification and Windows UI health under read leases, then
+reopens normally. Its interrupted target is synthetic; actual N-to-N+1 still needs
+two distinct packages. Native execution of completion is pending. The product's
+independent outer observer and crash-resume inspection of archived-versus-active
+outcomes remain to implement.
+
 ### Remaining restoration executor
 
-The source-application step is implemented above and awaits native execution. The
-remaining outer observer and durable completion must keep the original transaction
+Source application and shared durable completion are implemented above; complete
+integration still requires native execution. The remaining outer observer must keep the original transaction
 unchanged; restoring the previous source must never masquerade as installing its
 different target. The remaining sequence is:
 

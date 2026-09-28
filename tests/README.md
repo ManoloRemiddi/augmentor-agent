@@ -451,3 +451,14 @@ journal preservation, restored repair/source selection, ordinary-startup refusal
 and independent synthetic health. The full app proof separately checks actual
 source application and real UI health with the original record preserved. Native
 execution is pending; no distinct-version or recovery-completion claim follows.
+
+`test_update_source_restoration.py` adds thirteen real-storage/fault cases: distinct
+source outcome with exact original target/history retained, phase ordering, live
+writer exclusion, changed original/attempt, failed exit/health, child crash and
+uncertain intent/completion/archive writes. All 62 update cases pass locally (one
+existing Windows-only skip). The full app proof composes the shared attempt with
+actual retained-source Setup exit, installed selection/registration checks, full
+inventory and native health under read leases before archival/reopening. This new
+native completion execution is pending; the original proposed target is synthetic.
+Source application itself passes both native templates at `04f3317`, run
+`36433486621`; template health is synthetic, not full Qt evidence.

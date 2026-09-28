@@ -709,3 +709,19 @@ replacement/removal. The owned probe's complete exit and shared strict report
 validation are required. No record or selection changes, file restoration or
 reopening follow merely from successful health. See the [contract and separate
 synthetic/full native evidence](WINDOWS-INSTALLER-DECISION.md#independent-source-health-before-restoration-completion).
+
+## Distinct source-restoration completion
+
+`SourceRestoration` records a fresh recovery attempt separately from the original
+update. It binds exact original/source metadata, persists apply intent, requires
+fresh installer-exit observation, then verifies source selection/registrations,
+full inventory and isolated health under held read admission. Only then does it
+write a distinct `source-restored` receipt and archive the original bytes unchanged.
+The failed update's target and shutdown history never become a fabricated forward
+completion. Unknown writes stop the live attempt; no saved command or PID is replayed.
+
+Thirteen portable fault/storage tests pass, including real child crash and live
+writer exclusion; all 62 update cases pass locally (one Windows-only skip).
+Native full application qualification now composes this shared journal with the
+actual source installer and real UI health. Its execution and the product outer
+observer remain pending. See the [contract and boundaries](WINDOWS-INSTALLER-DECISION.md#distinct-durable-restoration-outcome).

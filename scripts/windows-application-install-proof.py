@@ -260,33 +260,6 @@ def main():
         report['independentLocalHealth']=assessed['localHealth']
         assert (transaction/'active.json').read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
         stages.append('independent-source-health-with-pending-record-preserved')
-        # Actual standalone source application without any usable installed
-        # launcher/runtime. The source equals target in this integration fixture;
-        # distinct-version restoration requires its own two-package qualification.
-        unknown=install/'current/displaced-recovery-fixture.bin'
-        unknown.write_bytes(b'Preserve damaged installation fixture data.\n')
-        executable.unlink();(install/'current/release.json').unlink()
-        for library in (install/'current/python').glob('python3*.dll'):library.unlink()
-        prior_backups=set((data/'payload-backups').iterdir())
-        run([cached_installer,*flags,'/LOG='+str(out/'independent-source-restoration.log'),'/augmentorrecover=source'])
-        restored=set((data/'payload-backups').iterdir())-prior_backups
-        assert len(restored)==1
-        restored=restored.pop();restoration=read_json(restored/'intent.json')
-        assert restoration['operation']=='source-restoration' and restoration['installerSHA256']==report['sha256']
-        assert restoration['recordSHA256']==package.digest(transaction/'active.json')
-        assert read_json(restored/'prepared.json')==restoration
-        assert (restored/'update.json').read_bytes()==pending_bytes
-        assert (restored/'payload/displaced-recovery-fixture.bin').read_bytes()==b'Preserve damaged installation fixture data.\n'
-        assert not unknown.exists() and not (restored/'payload/Augmentor.exe').exists()
-        assert (data/'recovery/selected-installer').read_bytes()==selection_bytes
-        assert (transaction/'active.json').read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
-        with winreg.OpenKey(winreg.HKEY_CURRENT_USER,registry,0,winreg.KEY_READ|winreg.KEY_WOW64_64KEY) as key:
-            assert winreg.QueryValueEx(key,'ModifyPath')[0]=='"'+str(cached_installer)+'"'
-        restored_health=independent_inspection('independent-restored-source-health',health=True)
-        assert restored_health['complete'] and restored_health['localHealth']==assessed['localHealth']
-        assert (transaction/'active.json').read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
-        report['restoredSourceHealth']=restored_health['localHealth']
-        stages.append('independent-full-source-restoration-with-original-record-preserved')
         for application in (executable, install/'current/AugmentorBrowserHost.exe'):
             blocked = subprocess.run([str(application),'--qualification-root',str(data),'--preview'],
                 stdin=subprocess.DEVNULL, capture_output=True, timeout=10,
@@ -337,6 +310,73 @@ def main():
             winreg.SetValueEx(key,'Augmentor Agent',0,winreg.REG_SZ,startup_command)
         stages.append('installed-graph-drain-durable-apply-setup-exit-and-relaunch')
         stages.append('unresolved-startup-refusal-isolated-local-health-and-verified-reopen')
+        # A separate interrupted transaction names a synthetic next version.
+        # Restore the real source and archive its original history unchanged;
+        # actual N-to-N+1 still requires two different packaged releases.
+        from lifecycle.source_restoration import SourceRestoration
+        synthetic_target={**source_identity,'version':'999.0.0','sourceCommit':'f'*40,'sha256':'e'*64}
+        with UpdateJournal(transaction,source_identity,synthetic_target) as interrupted:
+            for phase in ('preparing','prepared','drained','installer-ready','apply-intent'):interrupted.advance(phase)
+        pending_bytes=(transaction/'active.json').read_bytes()
+        recovery_attempt=SourceRestoration(transaction,pending_bytes,metadata,source_identity['sha256'])
+        unknown=install/'current/displaced-recovery-fixture.bin'
+        unknown.write_bytes(b'Preserve damaged installation fixture data.\n')
+        executable.unlink();(install/'current/release.json').unlink()
+        for library in (install/'current/python').glob('python3*.dll'):library.unlink()
+        prior_backups=set((data/'payload-backups').iterdir())
+        recovery_attempt.apply_intent()
+        restored_install=run([cached_installer,*flags,'/LOG='+str(out/'independent-source-restoration.log'),'/augmentorrecover=source'])
+        recovery_attempt.observed_installer_exit(lambda:restored_install.returncode==0)
+        restored=set((data/'payload-backups').iterdir())-prior_backups
+        assert len(restored)==1
+        restored=restored.pop();restoration=read_json(restored/'intent.json')
+        assert restoration['operation']=='source-restoration' and restoration['installerSHA256']==report['sha256']
+        assert restoration['recordSHA256']==package.digest(transaction/'active.json')
+        assert read_json(restored/'prepared.json')==restoration
+        assert (restored/'update.json').read_bytes()==pending_bytes
+        assert (restored/'payload/displaced-recovery-fixture.bin').read_bytes()==b'Preserve damaged installation fixture data.\n'
+        assert not unknown.exists() and not (restored/'payload/Augmentor.exe').exists()
+        assert (data/'recovery/selected-installer').read_bytes()==selection_bytes
+        assert (transaction/'active.json').read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER,registry,0,winreg.KEY_READ|winreg.KEY_WOW64_64KEY) as key:
+            assert winreg.QueryValueEx(key,'ModifyPath')[0]=='"'+str(cached_installer)+'"'
+        restored_health=independent_inspection('independent-restored-source-health',health=True)
+        assert restored_health['complete'] and restored_health['localHealth']==assessed['localHealth']
+        assert (transaction/'active.json').read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
+        report['restoredSourceHealth']=restored_health['localHealth']
+        stages.append('independent-full-source-restoration-with-original-record-preserved')
+        blocked=subprocess.run([str(executable),'--qualification-root',str(data),'--preview'],
+            stdin=subprocess.DEVNULL,capture_output=True,timeout=10,creationflags=subprocess.CREATE_NO_WINDOW)
+        assert blocked.returncode==74 and (transaction/'active.json').read_bytes()==pending_bytes
+        # The actual recovery observer must hold read admission through final
+        # source verification and archival; a saved health report is insufficient.
+        from contextlib import ExitStack
+        from lifecycle.windows_startup import Startup
+        from platform_adapters.windows_identity import private_lock_descriptor
+        from platform_adapters import locks
+        def verify_restored_source(assessment):
+            assert assessment['recordSHA256']==restoration['recordSHA256']
+            with open_installed_source(data/'recovery',metadata,target='windows-'+args.arch) as restored_source:
+                assert restored_source.identity==source_identity
+                assert restored_source.release_digest==package.digest(args.root/'release.json')
+                with winreg.OpenKey(winreg.HKEY_CURRENT_USER,report['installationKey'],0,winreg.KEY_READ|winreg.KEY_WOW64_64KEY) as key:
+                    assert winreg.QueryValueEx(key,'Root')[0]==str(install/'current')
+                    assert winreg.QueryValueEx(key,'AppId')[0]=='com.augmentor.Agent'
+                with winreg.OpenKey(winreg.HKEY_CURRENT_USER,registry,0,winreg.KEY_READ|winreg.KEY_WOW64_64KEY) as key:
+                    assert winreg.QueryValueEx(key,'ModifyPath')[0]=='"'+str(cached_installer)+'"'
+                return local_health(None)
+        with ExitStack() as admission:
+            admission.enter_context(Startup(data/'run'))
+            lifetime=private_lock_descriptor(data/'run/installation.lock');admission.callback(os.close,lifetime)
+            locks.flock(lifetime,locks.LOCK_SH|locks.LOCK_NB)
+            restored_archive=recovery_attempt.complete(verify_restored_source)
+        assert restored_archive.read_bytes()==pending_bytes and not (transaction/'active.json').exists()
+        assert read_json(restored_archive)['target']==synthetic_target
+        assert read_json(restored_archive)['phase']=='apply-intent'
+        assert read_json(recovery_attempt.path)['phase']=='source-restored'
+        report['archivedRestoration']=restored_archive.name
+        child=open_preview();ready();close_preview();child=None
+        stages.append('distinct-source-restoration-completion-and-verified-reopen')
         # Inno must not follow a requested custom replacement directory.
         other=out/'foreign';other.mkdir();foreign=other/'untouched.txt';foreign.write_text('preserve')
         setup('custom-path-refusal','/DIR='+str(other),success=False)

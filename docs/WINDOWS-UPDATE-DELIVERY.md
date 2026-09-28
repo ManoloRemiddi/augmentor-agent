@@ -268,3 +268,10 @@ execution is still separate. New source adds a fixed
 action that retains the original record and installs only the independently
 assessed source. Restored files and selection are not durable recovery completion.
 Native restoration tests, outer observation and distinct archival remain pending.
+
+Source application now passes both native templates at `04f3317`; full restoration
+and actual N-to-N+1 remain separate. New shared `SourceRestoration` provides a
+[distinct durable outcome](WINDOWS-INSTALLER-DECISION.md#distinct-durable-restoration-outcome)
+after fresh observed installer exit and complete source verification under read
+admission. Thirteen portable fault/storage cases pass; the full proof now uses the
+shared completion path but native execution and the product observer remain pending.
