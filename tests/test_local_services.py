@@ -22,6 +22,65 @@ from platform_adapters.transport import LocalSocket
 
 
 class LocalServiceTests(unittest.TestCase):
+    def test_memory_maintenance_preserves_journal_and_saved_processing_preference(self):
+        with tempfile.TemporaryDirectory(prefix='memory maintenance ') as temporary:
+            root=private_directory(Path(temporary)/'private')
+            state,data=private_directory(root/'state'),private_directory(root/'data')
+            env={**os.environ,'AUGMENTOR_SHARED_STATE':str(state),'AUGMENTOR_SHARED_DATA':str(data),
+                 'XDG_CONFIG_HOME':str(private_directory(root/'config')),
+                 'XDG_RUNTIME_DIR':str(private_directory(root/'run'))}
+            children=[]
+            with (root/'service.log').open('w',encoding='utf-8') as log:
+                def call(method,params=None):
+                    # Control messages target the memory endpoint explicitly;
+                    # generic PromptClient host methods target the prompt host.
+                    with LocalSocket() as connection:
+                        connection.settimeout(5);connection.connect(state/'dual-memory.sock')
+                        connection.sendall((json.dumps({'protocol':'augmentor-prompts/1','id':'memory-fixture',
+                            'method':method,'params':params or {}})+'\n').encode())
+                        with connection.makefile('rb') as reader:response=json.loads(reader.readline(1024*1024))
+                    if 'error' in response:raise ContractError(response['error']['message'])
+                    return response['result']
+                def start():
+                    child=subprocess.Popen([sys.executable,'-Xutf8','-B',str(ROOT/'services/memory/service.py')],
+                        env=env,stdin=subprocess.DEVNULL,stdout=log,stderr=log,
+                        **({'creationflags':subprocess.CREATE_NO_WINDOW} if sys.platform=='win32' else {}))
+                    children.append(child);deadline=time.monotonic()+10
+                    while True:
+                        try:call('memory.dual.describe');return child
+                        except (FileNotFoundError,ConnectionRefusedError):
+                            if time.monotonic()>deadline or child.poll() is not None:
+                                self.fail('Memory fixture did not start: '+(root/'service.log').read_text(encoding='utf-8'))
+                            time.sleep(.05)
+                def prepare():
+                    deadline=time.monotonic()+5
+                    while True:
+                        try:return call('host.maintenance.prepare',{'token':'b'*32})
+                        except ContractError:
+                            if time.monotonic()>deadline:raise
+                            time.sleep(.05)  # The real background step can briefly own admission.
+                try:
+                    child=start()
+                    call('memory.dual.bind',{'session':'retained'})
+                    call('memory.dual.append',{'session':'retained','events':[
+                        {'id':'one','role':'user','mode':'text','content':'Keep original café text'}]})
+                    before=call('memory.dual.export',{'session':'retained'})
+                    self.assertFalse(call('memory.dual.processing')['paused'])
+                    self.assertEqual(prepare()['phase'],'prepared')
+                    with self.assertRaisesRegex(ContractError,'not started'):
+                        call('memory.dual.processing',{'paused':True})
+                    call('host.maintenance.cancel',{'token':'b'*32})
+                    self.assertFalse(call('memory.dual.processing')['paused'])
+                    prepare();call('host.maintenance.commit',{'token':'b'*32})
+                    self.assertEqual(child.wait(timeout=10),0)
+                    start()
+                    self.assertFalse(call('memory.dual.processing')['paused'])
+                    self.assertEqual(call('memory.dual.export',{'session':'retained'}),before)
+                finally:
+                    for child in children:
+                        if child.poll() is None:child.terminate()
+                        child.wait(timeout=10)
+
     def test_concurrent_start_private_unicode_save_and_durable_restart(self):
         with tempfile.TemporaryDirectory(prefix='augmentor services café ') as temporary:
             root = private_directory(Path(temporary)/'private')

@@ -710,3 +710,12 @@ Linux prompt-service long-poll/refusal/cancel/shutdown/restart proof and 19 shar
 prompt checks pass. Native RPC execution is pending. This does not yet coordinate
 memory processing, DSH, voice, browser, desktops or their automatic restarts;
 those remain required before any global Quit/update can use it.
+
+The automatic-memory companion now adopts that same admission protocol for its
+RPC requests, background step and memory gateway. Existing inference/settlement
+refuses maintenance, preparation blocks new inference, and cancellation preserves
+the user's saved processing-pause preference. Local real-service shutdown/restart
+preserves journal data and that preference; all eight budget/gateway checks pass.
+The test waits for durable gateway cleanup after its HTTP response, rather than
+mistaking received bytes for completed work. New native memory/gateway checks are
+added to the fast desktop workflow; full global coordination remains pending.

@@ -12,9 +12,11 @@ import ipaddress
 import json
 import socket
 import threading
+from contextlib import nullcontext
 from urllib.parse import urlsplit
 
 from memory.budget import BudgetDenied
+from lifecycle.admission import MaintenanceBusy
 
 
 def completion(response):
@@ -67,7 +69,7 @@ class Gateway(ThreadingHTTPServer):
     daemon_threads = True
     allow_reuse_address = True
 
-    def __init__(self, address, budget, configuration):
+    def __init__(self, address, budget, configuration, *, admission=None):
         url = urlsplit(configuration['modelUrl'])
         if (url.scheme != 'http' or not ipaddress.ip_address(url.hostname).is_loopback or
                 url.username or url.password or url.query or url.fragment):
@@ -78,6 +80,7 @@ class Gateway(ThreadingHTTPServer):
             raise ValueError('Missing private memory gateway credential.')
         self.model_key = configuration.get('modelKey', 'local')
         self.budget = budget
+        self.admission = admission
         self.single = threading.Lock()
         super().__init__(address, Handler)
 
@@ -98,12 +101,26 @@ class Handler(BaseHTTPRequestHandler):
             pass
 
     def do_GET(self):
+        try:
+            with self.server.admission.work() if self.server.admission else nullcontext():
+                self.window_status()
+        except MaintenanceBusy:
+            self.answer(409, {'allowed': False})
+
+    def window_status(self):
         if self.path != '/window' or not hmac.compare_digest(self.headers.get('Authorization', ''), 'Bearer ' + self.server.key):
             return self.answer(403, {'allowed': False})
         token = self.headers.get('X-Augmentor-Window', '')
         return self.answer(200, {'allowed': self.server.budget.valid(token)})
 
     def do_POST(self):
+        try:
+            with self.server.admission.work() if self.server.admission else nullcontext():
+                self.complete_post()
+        except MaintenanceBusy:
+            self.answer(503, {'error': {'message': 'Memory maintenance is in progress; no model request was started'}})
+
+    def complete_post(self):
         self.connection.settimeout(5)
         if self.path != '/v1/chat/completions':
             return self.answer(404, {'error': {'message': 'Unsupported memory model route'}})

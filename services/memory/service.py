@@ -14,12 +14,13 @@ from platform_support import require_same_user
 from platform_adapters import locks as fcntl
 from platform_adapters.paths import private_directory
 from platform_adapters.transport import ThreadingLocalServer, prepare_endpoint, cleanup_endpoint
+from lifecycle.admission import Admission, MaintenanceBusy, METHODS as MAINTENANCE_METHODS
 
 
 class Handler(socketserver.StreamRequestHandler):
     def handle(self):
         self.connection.settimeout(10)
-        identity = None
+        identity = None; shutdown = False
         try:
             require_same_user(self.connection)
             raw = self.rfile.readline(1024 * 1024 + 1)
@@ -30,9 +31,15 @@ class Handler(socketserver.StreamRequestHandler):
             method = request.get('method', '')
             if request.get('protocol') != 'augmentor-prompts/1' or not isinstance(identity, str) or len(identity) > 128:
                 raise ValueError('Invalid memory envelope')
-            if not isinstance(method, str) or not method.startswith('memory.dual.') or not isinstance(request.get('params', {}), dict):
+            if not isinstance(method, str) or not (method.startswith('memory.dual.') or method in MAINTENANCE_METHODS) or not isinstance(request.get('params', {}), dict):
                 raise ValueError('Unsupported memory request')
-            response = {'id': identity, 'result': self.server.memory.call(method, request.get('params', {}))}
+            if method in MAINTENANCE_METHODS:
+                result = self.server.admission.control(method, request.get('params', {}))
+                shutdown = result['phase'] == 'closing'
+            else:
+                with self.server.admission.work():
+                    result = self.server.memory.call(method, request.get('params', {}))
+            response = {'id': identity, 'result': result}
         except Exception as error:
             response = {'id': identity, 'error': {'code': 'memory', 'message': str(error)}}
         encoded = (json.dumps(response, ensure_ascii=False) + '\n').encode()
@@ -40,12 +47,19 @@ class Handler(socketserver.StreamRequestHandler):
             encoded = (json.dumps({'id': identity, 'error': {'message': 'Memory response is too large'}}) + '\n').encode()
         try:
             self.wfile.write(encoded)
+            self.wfile.flush()
         except (BrokenPipeError, ConnectionResetError):
             pass
+        finally:
+            if shutdown: self.server.stop()
 
 
 class Server(ThreadingLocalServer):
     daemon_threads = False
+
+    def __init__(self, *args, **kwargs):
+        self.admission = Admission()
+        super().__init__(*args, **kwargs)
 
 
 if __name__ == '__main__':
@@ -70,13 +84,17 @@ if __name__ == '__main__':
     configuration = server.memory.processing.configuration
     if configuration.get('processingProtocol') == 'augmentor-memory-processing/1':
         from memory.gateway import Gateway
-        gateway = Gateway(('127.0.0.1', configuration['gatewayPort']), server.memory.processing.budget, configuration)
+        gateway = Gateway(('127.0.0.1', configuration['gatewayPort']), server.memory.processing.budget,
+                          configuration, admission=server.admission)
         threading.Thread(target=gateway.serve_forever, daemon=True).start()
     stopped = threading.Event()
     def maintain():
         while not stopped.is_set():
             try:
-                server.memory.step()
+                with server.admission.work():
+                    server.memory.step()
+            except MaintenanceBusy:
+                pass  # A reversible maintenance hold is not a memory error or a saved pause preference.
             except Exception:
                 server.memory.last_error = 'Memory processing interrupted; capture and cached recall remain available.'
             stopped.wait(.5)
@@ -86,11 +104,14 @@ if __name__ == '__main__':
         stopped.set()
         server.memory.processing.budget.paused = True
         threading.Thread(target=server.shutdown, daemon=True).start()
+    server.stop = stop
     signal.signal(signal.SIGTERM, stop)
     signal.signal(signal.SIGINT, stop)
     try:
         server.serve_forever(poll_interval=.2)
     finally:
+        stopped.set()
+        worker.join(timeout=130)  # The controlled stage already bounds its HTTP request to 125 seconds.
         if gateway:
             gateway.shutdown()
             gateway.server_close()

@@ -195,8 +195,19 @@ a prepared service rejects a new save, cancellation reopens it, and committed
 shutdown exits normally before an explicit restart restores prior data. Local
 Linux execution passes. Native execution of the new RPC proof is pending.
 
-The automatic-memory worker/gateway, DSH, voice, browser and desktop still require
-their own participation. The global owner must stop automatic restarts, reserve
+The memory companion now adopts the same control protocol on its own private
+endpoint, including request handlers, its background processing step and the
+memory-only HTTP gateway. An in-flight model request or durable budget settlement
+keeps it busy; preparation cannot terminate it. During preparation the worker
+waits and the gateway makes no new model request. Cancel/expiry leave the saved
+processing-pause preference unchanged. Normal committed shutdown stops the
+worker and listener; a real restart test checks both the journal and preference.
+Gateway HTTP tests verify refusal before the upstream connection and continued
+Stop cancellation. These new memory tests pass on Linux; native execution is
+pending. External Hindsight/model processes are never owned or stopped here.
+
+DSH, voice, browser and desktop still require their own participation. The global
+owner must stop automatic restarts, reserve
 all components, cancel reservations on preparation failure, and acquire the
 exclusive installation lease after they drain. No installer may infer that the
 whole app is idle from this one component's response or terminate active Jobs.
