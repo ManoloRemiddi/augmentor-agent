@@ -9,7 +9,6 @@ import argparse
 import hashlib
 import importlib.util
 import json
-import os
 from pathlib import Path
 import re
 import subprocess
@@ -17,6 +16,8 @@ import sys
 from urllib.request import urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT/'services'))
+from lifecycle.payload_integrity import verify_payload
 
 
 def digest(path):
@@ -37,13 +38,9 @@ def candidate(root, arch):
                  'node/node.exe', 'powershell/pwsh.exe', 'updater/WinSparkle.dll',
                  'dsh/payload.json', 'scripts/launch-windows.py', 'scripts/windows-local-health.py'):
         if not (root/name).is_file(): raise ValueError('Incomplete shared application payload: '+name)
-    # Inno follows source links when collecting payload. Reject them before
-    # compilation rather than distributing files from outside the staged tree.
-    for directory, names, files in os.walk(root, followlinks=False):
-        for name in [*names, *files]:
-            path = Path(directory)/name
-            if path.is_symlink() or (hasattr(path, 'is_junction') and path.is_junction()):
-                raise ValueError('Installer payload contains a reparse/link entry: '+str(path.relative_to(root)))
+    # Includes aliases/redirects and stale build output. Never reseal here: a
+    # mutated staged runtime must fail intake rather than become a new baseline.
+    verify_payload(root,(root/'release.json').read_bytes())
     return release
 
 

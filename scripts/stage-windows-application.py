@@ -52,6 +52,9 @@ def main():
         'customerDistribution': False}, indent=2)+'\n', encoding='utf-8')
     subprocess.run([sys.executable, '-Xutf8', '-B', str(ROOT/'scripts/build-windows-launcher.py'),
                     '--root', str(target), '--arch', args.arch], check=True)
+    sys.path.insert(0,str(ROOT/'services'))
+    from lifecycle.payload_integrity import seal_payload
+    seal_payload(target)
     print(json.dumps({'candidate': str(target), 'sourceCommit': revision, 'arch': args.arch}))
 
 

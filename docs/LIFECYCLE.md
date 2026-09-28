@@ -650,6 +650,12 @@ refuses this method. It does not resume saved commands or reopen stopped service
 Crash/failed flush/archive preserves the active record and requires independent
 inspection; even an active `cancelled` phase is not permission to delete it.
 
+Independent installed-state verification now has a shared [payload inspector](WINDOWS-UPDATE-DELIVERY.md#exact-installed-payload-inspection).
+The caller supplies trusted release/inventory bytes and retains admission; a
+complete match includes absence of obsolete files, followed separately by local
+UI health. The report alone cannot select a recovery source, delete differences,
+replay an installer or archive the journal. Native integration is pending.
+
 Five new journal fault tests and two platform/coordinator cleanup tests pass
 locally (43 update tests plus five preparation tests). The actual DSH Windows
 proof now attempts an update during a held model turn, requires native component

@@ -122,6 +122,41 @@ or journal outcomes remain pending. This prevents a known reversible refusal fro
 permanently blocking startup; it does not clear interrupted APPLY or implement
 restart recovery. New local fault tests pass; native DSH integration is pending.
 
+## Exact installed payload inspection
+
+Windows staging now seals its final tree after native launcher compilation.
+`payload-integrity.json` records every packaged file's size/SHA-256 and every
+directory, including empty ones. The final `release.json` binds the inventory
+through `payloadSHA256`; the native retained-source receipt already binds the
+exact release bytes. The inventory excludes those two metadata files to avoid a
+cycle; verification compares their exact independently supplied bytes separately.
+This adds no new product version, publisher trust or automatic recovery authority.
+
+`services/lifecycle/payload_integrity.py` inspects an installed tree without
+importing its code. The recovery caller supplies both metadata files from the
+verified artifact and holds maintenance admission. This still works if either
+installed metadata copy is missing or damaged. Results distinguish missing,
+changed and unexpected files/directories; they never authorize deletion. Aliases,
+reparse paths, colliding Windows names, malformed/duplicate metadata, changed
+file observations and unbounded input refuse. Limits match the installer's
+250,000-entry tree limit, with a 64 MiB inventory and 32 GiB extracted payload.
+The checker excludes cooperating writers through caller-owned admission; it is
+not a sandbox against a malicious administrator or another same-user writer.
+
+Package intake requires the sealed tree to match exactly and never silently
+reseals a changed runtime. The full installed proof now calls this product
+inspector before isolated UI health and journal completion, replacing its private
+reference-tree comparison. Obsolete files are therefore a visible recovery
+decision, rather than silently accepted leftovers. Actual obsolete-file cleanup,
+independent extraction/runtime and source-versus-target recovery remain to build.
+
+Eight portable inventory tests pass; the native junction case is deferred to
+Windows. Four package intake tests pass. The cases include equal-size corruption,
+lost metadata, extra old files, missing directories, path traversal/collision,
+hash mismatch, hard links and symlink refusal. Native staged/template/full install
+execution of this new inventory is pending. Linux/Mac distributions do not yet
+adopt this inventory; shared code/tests do not change their release paths.
+
 ## Evidence and remaining work
 
 Eleven new local tests execute real Node Ed25519 verification and private storage,

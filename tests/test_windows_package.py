@@ -21,6 +21,8 @@ class PackageTests(unittest.TestCase):
         for name in ('Augmentor.exe','AugmentorBrowserHost.exe','python/python.exe','node/node.exe',
                      'powershell/pwsh.exe','updater/WinSparkle.dll','dsh/payload.json','scripts/launch-windows.py','scripts/windows-local-health.py'):
             path=self.root/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_text('fixture')
+        from lifecycle.payload_integrity import seal_payload
+        self.release=seal_payload(self.root)
 
     def write_release(self): (self.root/'release.json').write_text(json.dumps(self.release))
 
@@ -33,6 +35,13 @@ class PackageTests(unittest.TestCase):
     def test_partial_payload_refuses_before_build(self):
         (self.root/'node/node.exe').unlink()
         with self.assertRaisesRegex(ValueError,'Incomplete'):package.candidate(self.root,'arm64')
+
+    def test_changed_or_extra_build_files_cannot_silently_reseal(self):
+        (self.root/'node/node.exe').write_text('changed')
+        with self.assertRaisesRegex(ValueError,'changed'):package.candidate(self.root,'arm64')
+        (self.root/'node/node.exe').write_text('fixture')
+        (self.root/'unintended-secret.txt').write_text('fixture never distribute')
+        with self.assertRaisesRegex(ValueError,'unexpected'):package.candidate(self.root,'arm64')
 
     def test_distribution_never_follows_source_link_to_outside_files(self):
         other=self.root.parent/'foreign';other.mkdir();(other/'secret').write_text('fixture')

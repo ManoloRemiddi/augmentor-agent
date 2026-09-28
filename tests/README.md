@@ -316,3 +316,11 @@ tests compose actual reservation cleanup with the shared coordinator and preserv
 active work or an unresolved record as appropriate. The native managed DSH proof
 adds a real held-turn cancellation case with synthetic artifact identity and no
 installer invocation; execution of that addition is pending.
+
+`test_payload_integrity.py` uses real files to verify sealed payloads, same-size
+corruption, missing/changed installed metadata, obsolete files/directories, alias
+refusal and malformed/colliding inventories. Eight portable cases pass; Windows
+also runs its junction case. Packaging tests reject changed and extra staged
+files without resealing. The installed Windows proof now calls the product
+inspector before local health instead of comparing a private reference-tree
+walk. Native template/full-package execution of this addition remains pending.

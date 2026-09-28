@@ -101,9 +101,18 @@ before any shutdown checkpoint. Busy work stays running, and uncertain release,
 write or archive outcomes keep the journal unresolved. Five new journal faults
 and two platform/coordinator cleanup cases pass locally (43 update tests and five
 preparation tests). The actual held-DSH-turn proof now exercises the same path;
-native execution is pending. See [cancellation contract](LIFECYCLE.md#confirmed-cancellation-before-shutdown).
+[Fast Windows at b63b188](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36412946593)
+passes both CPUs with those cases. Actual-DSH cancellation remains pending. See
+[cancellation contract](LIFECYCLE.md#confirmed-cancellation-before-shutdown).
 
-Next: qualify full installed isolated health and actual-DSH cancellation; finish
+Windows staging now seals an exact file/directory inventory, bound by the final
+release metadata. Package intake refuses changed or extra files without resealing.
+The shared inspector can identify a partial installation even when installed
+metadata is missing; the full proof now uses it before UI health. Eight portable
+inventory cases and four package tests pass; the junction test and staged/native
+integration remain pending. See [payload inspection](WINDOWS-UPDATE-DELIVERY.md#exact-installed-payload-inspection).
+
+Next: qualify the inventory, full installed isolated health and actual-DSH cancellation; finish
 independent interrupted/cross-version recovery, obsolete-file cleanup, bounded
 cache pruning, actual N-to-N+1 and the customer notification/update action. The current Inno
 backend replaces `current` in place and does not provide atomic version selection

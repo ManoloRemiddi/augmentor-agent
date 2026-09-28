@@ -242,12 +242,13 @@ def main():
         # Compare every file, then invoke only the fixed isolated health action.
         # Ordinary startup remains blocked until completion is durably archived.
         from lifecycle.update_journal import UpdateJournal
+        from lifecycle.payload_integrity import inspect_payload
+        inventory=(args.root/'payload-integrity.json').read_bytes()
         def local_health(_record):
             assert package.digest(artifact)==report['sha256']
-            for directory,_names,files in os.walk(args.root):
-                for filename in files:
-                    source=Path(directory)/filename
-                    assert package.digest(install/'current'/source.relative_to(args.root))==package.digest(source)
+            integrity=inspect_payload(install/'current',metadata,inventory)
+            assert integrity['complete'],integrity
+            report['payloadIntegrity']=integrity
             health=verify_local_health(install/'current',metadata,qualification=data)
             assert (transaction/'active.json').read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
             assert not list((data/'health-probes').iterdir())

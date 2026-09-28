@@ -18,6 +18,7 @@ on:
       - 'services/lifecycle/update_journal.py'
       - 'services/lifecycle/release_bundle.py'
       - 'services/lifecycle/installed_source.py'
+      - 'services/lifecycle/payload_integrity.py'
       - 'services/lifecycle/verify-release.mjs'
       - 'tests/test_update_journal.py'
       - 'services/platform/windows-installer-handoff.c'

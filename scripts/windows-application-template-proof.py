@@ -50,6 +50,8 @@ def prove(out, arch, compiler, fixture_executable, runtime):
     builder = importlib.util.module_from_spec(build_spec); build_spec.loader.exec_module(builder)
     builder.build_launcher(payload, arch)
     assert not any(payload.glob('*.lib')) and not any(payload.glob('*.exp')) and not (payload/'launcher.obj').exists()
+    from lifecycle.payload_integrity import seal_payload
+    release=seal_payload(payload)
     spec = importlib.util.spec_from_file_location('template_package', ROOT/'scripts/package-windows.py')
     package = importlib.util.module_from_spec(spec); spec.loader.exec_module(package)
     report = package.build(payload, arch, out/'application-template-package',

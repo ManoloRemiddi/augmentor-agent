@@ -727,3 +727,24 @@ pending. A separate [live preparation-cancellation path](LIFECYCLE.md#confirmed-
 now archives known reversible refusal before any shutdown; uncertain cleanup,
 record writes or APPLY still require independent recovery. Its local fault and
 platform/coordinator tests pass; actual native DSH integration is pending.
+
+## Complete payload identity for recovery
+
+The [sealed payload inventory](WINDOWS-UPDATE-DELIVERY.md#exact-installed-payload-inspection)
+now binds all packaged files and directories to the release metadata already
+bound by the retained original installer. Staging seals after native compilation;
+package intake rejects later changes instead of recalculating a new baseline.
+The full installed proof uses the shared inspector, with metadata from the
+independently identified artifact, before UI health/completion. It can classify
+missing or corrupt installed metadata and detects extra old-version files.
+Native execution is pending; this is preparation for recovery, not a rollback
+executor or automatic authority to remove unexpected files.
+
+The independent recovery runtime can reuse the retained original installer's
+bundled runtime, rather than depend on `current/python`. Inno's documented
+[ExtractTemporaryFiles](https://jrsoftware.org/ishelp/topic_isxfunc_extracttemporaryfiles.htm)
+preserves unexpanded destination names beneath its temporary folder and removes
+the extracted files on Setup exit. Extraction placement, private ownership,
+bounded worker lifetime, authenticated apply and failure cleanup still require
+implementation/native qualification. This inspected vendor capability is not an
+implemented recovery path. It avoids adding a separately maintained agent core.
