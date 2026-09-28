@@ -46,8 +46,8 @@ protocols and bidirectionally readable data schemas. A schema/protocol migration
 requires its own explicit implementation and qualification. Metadata expires,
 permits at most 90 days of validity and tolerates five minutes of future clock
 skew. Incorrect clocks fail with a clock/expiry error. Previously installed
-versions cannot be delivered as updates. A retained recovery release will need
-its own separately reviewed verification policy; this API has no downgrade bypass.
+versions cannot be delivered as updates. Retained recovery uses the separate
+exact-identity policy below; the forward-delivery API has no downgrade bypass.
 
 ## Bundle and retained bytes
 
@@ -71,6 +71,31 @@ Windows; WindowsApply independently rechecks the same signed digest on launch.
 Failures remove only newly created files and preserve existing releases. Closing
 the observation leaves the retained release available; it does not authorize
 installation or archive a transaction.
+
+## Revalidating retained recovery bytes
+
+`open_retained_release` reopens an existing private cache entry only when its
+signed release identity exactly matches the independently recorded recovery
+identity. The caller must obtain that identity from the verified installation
+receipt or update journal, never from the candidate cache's own metadata. The
+function checks the installed trust key, OS/CPU, channel, both directions of data
+schema readability, protocols, minimum OS and the complete installer digest and
+length. It retains a Windows handle denying writes/deletion until closed. Invalid
+or incomplete artifacts remain untouched for diagnosis; no command is executed.
+
+An already retained release may be recovered after its delivery window expires:
+expiry blocks *new delivery*, while offline recovery needs the exact prior bytes.
+Malformed/unbounded validity windows and future issuance remain refused. A future
+version is not accepted as the previous installation. This separate reader does
+not weaken the forward verifier's version or expiry checks and cannot itself
+authorize rollback. No temporary signing key is installed in the product.
+
+Five additional tests exercise reopening/held-file behavior, expiry separation,
+wrong recorded identities and incompatible installations, modified metadata/signature/
+installer bytes, and hard-linked files. The 32 local update/journal/coordinator
+tests pass; native execution of this addition is pending. Initial installer source
+retention, independently available recovery runtime, interrupted-state inspection,
+actual recovery application, health and obsolete-file cleanup are still required.
 
 ## Evidence and remaining work
 

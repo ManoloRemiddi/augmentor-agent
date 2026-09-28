@@ -37,10 +37,10 @@ passes both CPUs, including the exact application script's repair/removal with n
 browser, edited-manifest refusal and owned browser cleanup. Default-value handling
 is corrected, and fixtures observe the complete copied remover exiting naturally.
 The [full application run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36400951137)
-now passes the complete x64 installed sequence through normal software removal
-and retained persistent data. The separate x64 memory-service startup test times
-out, so the overall workflow is not passing. ARM64 remains in progress; inspect
-its terminal report separately.
+now passes the complete installed sequence on both CPUs through normal software
+removal and retained persistent data. The entire ARM64 job passes. The separate
+x64 memory-service startup test times out, so the overall workflow is not passing.
+The new journal-before-listener correction remains under native test.
 The prior full `6890375` ARM64 artifact confirms the same repair/drain/apply/health
 and archival stages as x64, then the since-corrected normal-removal refusal.
 
@@ -65,7 +65,7 @@ login entry, preserves disabled startup on repair/update, and removes only exact
 owned registry values. Browser setup records a manifest digest before publishing
 pointers; removal retains the private file while checking its bytes. Persistent
 settings, manifests and prepared extensions survive software removal. Complete installed
-browser cleanup passes x64 at `8a3ff05`; ARM64 remains pending.
+browser cleanup passes both CPUs at `8a3ff05`.
 
 The earlier full `ead355c` run fails same-build repair on both CPUs, after successful
 initial launch, live-draft preservation and corrected preview exit. Its native tree
@@ -92,7 +92,12 @@ kept in separate [draft PR 2](https://github.com/ManoloRemiddi/resonant-voice/pu
 and [macOS](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36397149332)
 pass; later platform checks continue in CI.
 
-Next: finish full-payload install/repair/apply/removal on both CPUs, then connect
+Retained signed recovery packages can now be revalidated against an exact recorded
+identity without executing them. This separates expired local recovery from new
+forward delivery. The 32 local update tests pass; native tests are pending. Source
+retention and an independent recovery executor are still missing.
+
+Next: finish interactive-launch and memory startup qualification, then connect
 verified delivery to customer notification/UI and the coordinator. Qualify actual
 N-to-N+1, independent recovery/rollback and obsolete-file removal; complete the
 [feature ledger](FEATURE-MATRIX.md#windows-development-target--september-28), including

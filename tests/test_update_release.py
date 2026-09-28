@@ -17,7 +17,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'services'))
-from lifecycle.release_bundle import SCHEMA, stage_bundle, verify_manifest
+from lifecycle.release_bundle import SCHEMA, stage_bundle, verify_manifest, open_retained_release
 from platform_adapters.paths import private_directory
 from platform_adapters.private_files import descriptor
 
@@ -181,6 +181,73 @@ class UpdateReleaseTests(unittest.TestCase):
         with patch.dict(os.environ,{'NODE_OPTIONS':'--require='+str(preload)}):
             self.assertEqual(verify_manifest(raw,sig,**policy)['schema'],SCHEMA)
         self.assertFalse(marker.exists())
+
+    def retained(self):
+        path, policy = self.bundle()
+        with stage_bundle(path, self.cache, **policy) as release:
+            directory = release.directory
+        policy.update(expected=release.identity, current={**self.current,
+            'version':'1.2.0', 'sourceCommit':'d'*40, 'sha256':'e'*64})
+        return directory, policy
+
+    def test_recovery_reopens_only_exact_signed_recorded_bytes_and_retains_handle(self):
+        directory, policy = self.retained()
+        with open_retained_release(directory, **policy) as release:
+            self.assertEqual(release.identity, policy['expected'])
+            self.assertEqual(release.installer.read_bytes(), self.installer)
+            if sys.platform == 'win32':
+                with self.assertRaises(OSError): os.close(descriptor(release.installer,writable=True))
+                with self.assertRaises(OSError): release.installer.unlink()
+        self.assertIsNone(release.fd)
+        self.assertTrue(release.installer.is_file())
+
+    def test_recovery_expiry_policy_does_not_enable_expired_forward_delivery(self):
+        directory, policy = self.retained()
+        policy['now'] = self.manifest['expiresAt']+86400
+        with open_retained_release(directory, **policy) as release:
+            self.assertEqual(release.identity, policy['expected'])
+        raw,sig,forward = self.signed(); forward['now'] = policy['now']
+        with self.assertRaisesRegex(ValueError,'expired'):
+            verify_manifest(raw,sig,**forward)
+
+    def test_recovery_refuses_other_record_future_target_and_incompatible_installation(self):
+        directory, policy = self.retained()
+        cases = [
+            {'expected':{**policy['expected'],'sha256':'f'*64}},
+            {'expected':{**policy['expected'],'sourceCommit':'a'*40}},
+            {'current':self.current},
+            {'current':{**policy['current'],'channel':'stable'}},
+            {'current':{**policy['current'],'target':'windows-arm64'}},
+            {'current':{**policy['current'],'dataSchema':2,'readableDataSchemas':[1,2]}},
+            {'protocols':{'product':'augmentor/2'}}, {'os_build':26100},
+            {'public_key':base64.b64encode(b'X'*32).decode()}, {'now':99000}]
+        before={path.name:path.read_bytes() for path in directory.iterdir()}
+        for changes in cases:
+            with self.subTest(changes=changes), self.assertRaises(ValueError):
+                open_retained_release(directory, **{**policy,**changes})
+        self.assertEqual({path.name:path.read_bytes() for path in directory.iterdir()},before)
+
+    def test_recovery_refuses_modified_metadata_signature_and_installer_without_removing_them(self):
+        directory, policy = self.retained()
+        for name in ('manifest.json','manifest.sig','installer.exe'):
+            path = directory/name; original = path.read_bytes()
+            corrupt = b'X'+original[1:]
+            with os.fdopen(descriptor(path,writable=True),'wb') as stream: stream.write(corrupt)
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                open_retained_release(directory, **policy)
+            self.assertEqual(path.read_bytes(),corrupt)
+            with os.fdopen(descriptor(path,writable=True),'wb') as stream: stream.write(original)
+        with open_retained_release(directory, **policy): pass
+
+    def test_recovery_refuses_aliased_private_files(self):
+        directory, policy = self.retained()
+        for name in ('manifest.json','manifest.sig','installer.exe'):
+            link=directory/'alias'; os.link(directory/name,link)
+            try:
+                with self.subTest(name=name), self.assertRaises((ValueError,PermissionError)):
+                    open_retained_release(directory, **policy)
+                self.assertTrue(link.is_file())
+            finally:link.unlink()
 
 
 if __name__=='__main__': unittest.main()

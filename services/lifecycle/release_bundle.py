@@ -45,13 +45,7 @@ def _version(value):
     return tuple(map(int, value.split('.')))
 
 
-def verify_manifest(raw, signature, *, public_key, node, current, protocols, os_build, now=None):
-    """Authenticate exact signed bytes, then enforce forward-delivery policy.
-
-    current/protocols/os_build and public_key come from the verified installation
-    and OS, never from an appcast. Recovery of retained older releases requires
-    its own explicit policy; this entrypoint cannot authorize a downgrade.
-    """
+def _authenticate_manifest(raw, signature, *, public_key, node):
     if not isinstance(raw, bytes) or not 0 < len(raw) <= MAX_MANIFEST or not isinstance(signature, bytes) or len(signature) != 64:
         raise ValueError('Invalid signed release metadata size.')
     try:
@@ -81,15 +75,17 @@ def verify_manifest(raw, signature, *, public_key, node, current, protocols, os_
     fields = {'schema', 'release', 'installerBytes', 'minimumOSBuild', 'protocols', 'issuedAt', 'expiresAt'}
     if not isinstance(manifest, dict) or set(manifest) != fields or manifest['schema'] != SCHEMA:
         raise ValueError('Unsupported signed release metadata.')
+    return manifest
+
+
+def _compatible_manifest(manifest, *, current, protocols, os_build, now):
+    """Common trust-independent constraints for delivery and retained recovery."""
     after, before = artifact(manifest['release']), artifact(current)
+    _version(after['version']); _version(before['version'])
     if after['target'] not in ('windows-x64', 'windows-arm64') or after['target'] != before['target']:
         raise ValueError('This release targets a different OS or CPU.')
     if after['channel'] != before['channel']:
         raise ValueError('This release targets a different update channel.')
-    if _version(after['version']) <= _version(before['version']):
-        raise ValueError('An update must be newer than the installed version.')
-    if after['sourceCommit'] == before['sourceCommit']:
-        raise ValueError('A forward release must identify its reviewed source revision.')
     if before['dataSchema'] not in after['readableDataSchemas'] or after['dataSchema'] not in before['readableDataSchemas']:
         raise ValueError('This release needs an explicit data migration and recovery plan.')
     if not isinstance(protocols, dict) or not protocols or manifest['protocols'] != protocols:
@@ -101,9 +97,26 @@ def verify_manifest(raw, signature, *, public_key, node, current, protocols, os_
     if type(manifest['installerBytes']) is not int or not 1 <= manifest['installerBytes'] <= MAX_INSTALLER:
         raise ValueError('Unsupported installer length.')
     issued, expires = manifest['issuedAt'], manifest['expiresAt']
-    now = time.time() if now is None else now
     if (type(issued) is not int or type(expires) is not int or not 0 < issued < expires or
-            expires - issued > 90 * 86400 or issued > now + 300 or expires <= now):
+            expires - issued > 90 * 86400 or issued > now + 300):
+        raise ValueError('Release metadata has expired or the system clock needs attention.')
+    return after, before
+
+
+def verify_manifest(raw, signature, *, public_key, node, current, protocols, os_build, now=None):
+    """Authenticate exact signed bytes, then enforce forward-delivery policy.
+
+    current/protocols/os_build and public_key come from the verified installation
+    and OS, never from an appcast. This entrypoint cannot authorize a downgrade.
+    """
+    now = time.time() if now is None else now
+    manifest = _authenticate_manifest(raw, signature, public_key=public_key, node=node)
+    after, before = _compatible_manifest(manifest, current=current, protocols=protocols, os_build=os_build, now=now)
+    if _version(after['version']) <= _version(before['version']):
+        raise ValueError('An update must be newer than the installed version.')
+    if after['sourceCommit'] == before['sourceCommit']:
+        raise ValueError('A forward release must identify its reviewed source revision.')
+    if manifest['expiresAt'] <= now:
         raise ValueError('Release metadata has expired or the system clock needs attention.')
     return manifest
 
@@ -156,6 +169,46 @@ class VerifiedRelease:
 
     def __enter__(self): return self
     def __exit__(self, *_): self.close()
+
+
+def open_retained_release(directory, *, expected, public_key, node, current, protocols, os_build, now=None):
+    """Revalidate an exact recorded local recovery artifact, without executing it.
+
+    expected must be the independently established retained source identity from
+    the installed receipt/update journal, never a download's self-description.
+    Delivery expiry does not make an already retained recovery artifact unusable;
+    signature, exact identity, bytes, OS/channel/schema/protocol checks still apply.
+    This does not acquire maintenance, inspect interrupted installation state,
+    authorize a downgrade, or find an independent recovery runtime.
+    """
+    directory = require_directory(Path(directory))
+    expected = artifact(expected)
+    now = time.time() if now is None else now
+    with os.fdopen(descriptor(directory/'manifest.json'), 'rb') as stream:
+        raw = stream.read(MAX_MANIFEST+1)
+    with os.fdopen(descriptor(directory/'manifest.sig'), 'rb') as stream:
+        signature = stream.read(65)
+    manifest = _authenticate_manifest(raw, signature, public_key=public_key, node=node)
+    after, before = _compatible_manifest(manifest, current=current, protocols=protocols, os_build=os_build, now=now)
+    if after != expected:
+        raise ValueError('The retained release differs from the recorded recovery identity.')
+    if _version(after['version']) > _version(before['version']):
+        raise ValueError('A future release is not the recorded previous installation.')
+    pinned = None
+    try:
+        if sys.platform == 'win32':
+            from platform_adapters.windows_identity import private_file_descriptor
+            pinned = private_file_descriptor(directory/'installer.exe', share_write=False)
+        else: pinned = descriptor(directory/'installer.exe')
+        with os.fdopen(os.dup(pinned), 'rb') as stream:
+            if (os.fstat(stream.fileno()).st_size != manifest['installerBytes'] or
+                    hashlib.file_digest(stream, 'sha256').hexdigest() != after['sha256']):
+                raise ValueError('The retained installer differs from its signed bytes.')
+        result = VerifiedRelease(directory, manifest, pinned)
+        pinned = None
+        return result
+    finally:
+        if pinned is not None: os.close(pinned)
 
 
 def stage_bundle(download, cache, **policy):
