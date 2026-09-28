@@ -76,6 +76,24 @@ not enable login startup; installer hooks still need to call this mechanism.
 Native tests use a disposable HKCU key, not the actual login key. Real Windows
 startup-disable behavior and logout/login still require installed acceptance.
 
+## Shared companion ownership
+
+The supervisor additionally exposes fixed `start-prompts` and `start-memory`
+operations. Each launches only its shipped service, with the private interpreter,
+inside a separate Windows Job retained by the same supervisor. Repeated starts
+reuse the live child. An already-running endpoint outside that owner is preserved
+and reported as a conflict; no process is adopted or killed by filename or PID.
+Status distinguishes the Job helper PID from the service PID. Logs remain in the
+private supervisor directory. A supervisor crash closes its Jobs and contains
+their descendants. This is fault containment, not graceful product Quit.
+
+The new native test queries both actual services, checks repeat-start identity,
+refuses an empty-owner exit while they run and observes their kernel process
+handles after a deliberate supervisor fault. Execution remains pending for this
+addition. Clients still have their preceding startup path until that ownership
+backend is qualified and adopted. Service quiescence and accepted-request draining
+remain required for ordinary shutdown and updates.
+
 ## Remaining shell gates
 
 This source does not yet complete tray Open/Quit, installer login hooks, installed

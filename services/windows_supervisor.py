@@ -22,6 +22,14 @@ from platform_support import require_same_user
 
 SCHEMA = 'augmentor-windows-supervisor/1'
 LABEL = 'Augmentor.ManagedDsh'
+COMPANIONS = {'prompts': 'services/prompt-library/service.py', 'memory': 'services/memory/service.py'}
+
+
+def runtime_python(root):
+    bundled = root/'python/python.exe'
+    if bundled.is_file(): return str(bundled)
+    if not (root/'release.json').exists(): return sys.executable
+    raise ValueError('The private Python runtime is missing. Repair this installation.')
 
 
 def owner_directory():
@@ -57,7 +65,7 @@ def ensure(root=ROOT):
         pass  # Proven no pipe exists; do not replace an unknown/unresponsive owner.
     owner = owner_directory()
     with os.fdopen(descriptor(owner/'supervisor.log', writable=True, create=True), 'a', encoding='utf-8') as log:
-        process = subprocess.Popen([str(root/'python/python.exe'), '-I', '-Xutf8', '-B',
+        process = subprocess.Popen([runtime_python(root), '-I', '-Xutf8', '-B',
             str(root/'services/windows_supervisor.py')], stdin=subprocess.DEVNULL,
             stdout=log, stderr=log, close_fds=True, creationflags=subprocess.CREATE_NO_WINDOW)
     deadline = time.monotonic()+15
@@ -105,6 +113,8 @@ class Supervisor:
         self.root = root
         self.shell = shell
         self.child = None
+        self.companions = {}
+        self.companion_exits = {}
         self.exit_code = None
         self.lock = threading.RLock()
         self.shutdown = threading.Event()
@@ -113,8 +123,43 @@ class Supervisor:
         if self.child and self.child.poll() is not None:
             self.exit_code = self.child.wait()  # Close the Job, including stragglers.
             self.child = None
+        for name, child in list(self.companions.items()):
+            if child.poll() is not None:
+                self.companion_exits[name] = child.wait()
+                del self.companions[name]
         return {'dsh': {'running': bool(self.child and self.child.poll() is None),
-                        'exitCode': self.exit_code}}
+                        'exitCode': self.exit_code},
+                'companions': {name: {'running': name in self.companions,
+                    'ownerProcessPid': self.companions[name].pid if name in self.companions else None,
+                    'exitCode': self.companion_exits.get(name)} for name in COMPANIONS}}
+
+    def start_companion(self, name):
+        # Only fixed shipped programs can be launched by this private RPC.
+        if name not in COMPANIONS: raise ValueError('Unsupported Augmentor companion.')
+        self.status()
+        if name in self.companions: return
+        script = self.root/COMPANIONS[name]
+        if not script.is_file(): raise ValueError('The shared companion is missing. Repair this installation.')
+        state = Path(os.environ.get('AUGMENTOR_SHARED_STATE') or Path(os.environ['XDG_STATE_HOME'])/'augmentor')
+        endpoint = state/('prompts.sock' if name == 'prompts' else 'dual-memory.sock')
+        with LocalSocket() as connection:
+            connection.settimeout(1)
+            try: connection.connect(str(endpoint))
+            except FileNotFoundError: pass
+            else: raise ValueError('A companion is running outside this background owner. It was preserved.')
+        with os.fdopen(descriptor(owner_directory()/(name+'.log'), writable=True, create=True), 'a', encoding='utf-8') as log:
+            self.companions[name] = OwnedProcess([runtime_python(self.root), '-I', '-Xutf8', '-B', str(script)],
+                env={**os.environ, 'PYTHONUTF8': '1', 'PYTHONDONTWRITEBYTECODE': '1'}, cwd=str(self.root),
+                stdin=subprocess.DEVNULL, stdout=log, stderr=log)
+        self.companion_exits.pop(name, None)
+
+    def stop_companions(self):
+        # Fault/process teardown only. Normal Quit/update needs the shared
+        # admission/busy handshake before it can reach this cleanup boundary.
+        for name, child in list(self.companions.items()):
+            child.terminate()
+            self.companion_exits[name] = child.wait(timeout=10)
+            del self.companions[name]
 
     def start_dsh(self):
         if self.child and self.child.poll() is None: return
@@ -156,6 +201,7 @@ class Supervisor:
         with self.lock:
             action = message.get('action')
             if action == 'start-dsh': self.start_dsh()
+            elif action in ('start-prompts', 'start-memory'): self.start_companion(action.removeprefix('start-'))
             elif action == 'stop-failed-setup':
                 from dsh.setup import current
                 if current().get('home') == str(managed_directory()/'home'):
@@ -164,7 +210,8 @@ class Supervisor:
             elif action == 'exit-if-empty':
                 # Only useful for setup/maintenance while no component is alive.
                 # Normal Quit will require the shared busy-work handshake.
-                if self.child and self.child.poll() is None:
+                self.status()
+                if self.child or self.companions:
                     raise ValueError('The background owner still has a running component.')
                 self.shutdown.set()
             elif action != 'status': raise ValueError('Unsupported background operation.')
@@ -213,7 +260,8 @@ def run(root=ROOT):
             finally:
                 timer.stop(); shell.close()
                 server.shutdown(); worker.join(timeout=5)
-                with supervisor.lock: supervisor.stop_child()
+                with supervisor.lock:
+                    supervisor.stop_companions(); supervisor.stop_child()
     finally:
         os.close(lease)
 

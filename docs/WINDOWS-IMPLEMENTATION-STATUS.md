@@ -66,9 +66,9 @@ providers, installed artifacts and physical hardware must remain distinguishable
 | --- | --- | --- |
 | W0 baseline | Shared baseline and native hosted evidence recorded | Current-main reconciliation and client/hardware environments |
 | W1 native runtime and installer | Native x64/ARM64 runtime, prepared DSH terminal and two-version installer fixture pass | Clean-client install, full product lifecycle and publisher trust |
-| W2 paths, ownership, IPC, locks | Kernel adapters pass; shared-service adoption in progress | Node/Python service proof, different-user rejection, complete lifecycle integration |
-| W3 managed DSH/model setup | Assembled x64 setup, deterministic-model chat, Stop and history restart pass | ARM64 run, full first-run UI, ordinary-user/live-provider acceptance |
-| W4 desktop, two windows, shortcuts, tray | Native x64/ARM64 source windows, focus, draft isolation and zoom pass | Embedded executable, shell/shortcut/tray and physical interaction |
+| W2 paths, ownership, IPC, locks | Both CPUs pass kernel adapters, cross-user ACL denial and Python/Node prompt transport | Complete component ownership and lifecycle integration |
+| W3 managed DSH/model setup | Both CPUs pass assembled setup, deterministic-model chat, Stop and history restart | Full first-run UI, native composer proof, ordinary-user/live-provider acceptance |
+| W4 desktop, two windows, shortcuts, tray | Both CPUs pass source window control, draft/zoom, native hotkeys and shortcut restart persistence | Compiled Qt plugin fix, native resources, installer startup hooks, tray/quit and physical interaction |
 | W5 chosen Chromium/Comet companion | Pending | Native host registration and real selected-browser conversation |
 | W6 computer control | Pending | Consented capture/input, Stop and Windows privilege boundaries |
 | W6 voice/memory/Home/Pi | Pending | Existing feature contracts and configured-engine connectivity |
@@ -598,3 +598,16 @@ history and duplicate prevention. It verifies the GUI's process image and test
 Job membership, retains captures and adds private desktop logs to failure reports.
 The Job is fixture cleanup for that GUI and its children; it does not qualify
 normal product-wide Quit. This new native chat sequence is not yet executed.
+
+At `0a1d086`, the x64 job in [runtime run 36364000645](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36364000645)
+now passes, including compiled preview zoom with the corrected private Qt DLL
+directories and readback of the embedded icon/version/manifest. ARM64 remains
+in progress. At `ade5be0`, both fast native desktop jobs and macOS feasibility
+pass; the compiled real-DSH native chat proof remains queued.
+
+The next source extends the existing supervisor with fixed prompt/memory companion
+Jobs, repeat-start reuse and refusal to replace an externally owned endpoint.
+Its new native test queries the actual services and verifies containment after
+deliberately killing only its disposable supervisor. Client startup adoption and
+native execution of this addition are pending; graceful Quit/update admission
+control is explicitly not implemented by a Job kill.

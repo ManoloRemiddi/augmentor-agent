@@ -1,4 +1,5 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import json
 import os
 from pathlib import Path
 import subprocess
@@ -12,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'services'))
 import windows_supervisor as owner
 from platform_adapters.paths import private_directory
+from platform_adapters.transport import LocalSocket
 
 
 class SupervisorSafetyTests(unittest.TestCase):
@@ -42,6 +44,70 @@ class SupervisorSafetyTests(unittest.TestCase):
 
 @unittest.skipUnless(sys.platform == 'win32', 'requires real Windows named-pipe ownership')
 class WindowsSupervisorTests(unittest.TestCase):
+    def test_companions_have_one_owner_and_die_with_it(self):
+        import win32api
+        import win32con
+        import win32event
+
+        def call(endpoint, method):
+            with LocalSocket() as connection:
+                connection.settimeout(5)
+                connection.connect(str(endpoint))
+                connection.sendall((json.dumps({'protocol': 'augmentor-prompts/1',
+                    'id': 'ownership-check', 'method': method, 'params': {}})+'\n').encode())
+                with connection.makefile('rb') as stream:
+                    response = json.loads(stream.readline(1024*1024+1))
+            self.assertNotIn('error', response)
+            return response['result']
+
+        def ready(operation):
+            deadline = time.monotonic()+20
+            while True:
+                try: return operation()
+                except FileNotFoundError:
+                    if time.monotonic() > deadline: self.fail('An owned companion did not become ready.')
+                    time.sleep(.1)
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = private_directory(Path(temporary)/'private')
+            env = {**os.environ, **{key: str(private_directory(root/name)) for key, name in (
+                ('XDG_RUNTIME_DIR', 'run'), ('XDG_CONFIG_HOME', 'config'),
+                ('XDG_DATA_HOME', 'data'), ('XDG_STATE_HOME', 'state'),
+                ('AUGMENTOR_SHARED_STATE', 'shared'), ('AUGMENTOR_SHARED_DATA', 'shared-data'))}}
+            process = subprocess.Popen([sys.executable, '-I', '-Xutf8', '-B',
+                str(ROOT/'services/windows_supervisor.py')], env=env, stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, creationflags=subprocess.CREATE_NO_WINDOW)
+            handles = []
+            try:
+                endpoint = Path(env['XDG_RUNTIME_DIR'])/'supervisor'
+                ready(lambda: owner.request('status', owner=endpoint))
+                for name, filename, method in (
+                    ('prompts', 'prompts.sock', 'host.describe'),
+                    ('memory', 'dual-memory.sock', 'memory.dual.describe')):
+                    first = owner.request('start-'+name, owner=endpoint)['companions'][name]
+                    self.assertTrue(first['running'])
+                    details = ready(lambda: call(Path(env['AUGMENTOR_SHARED_STATE'])/filename, method))
+                    self.assertIsInstance(details['pid'], int)
+                    self.assertNotEqual(details['pid'], first['ownerProcessPid'])
+                    handles.append(win32api.OpenProcess(win32con.SYNCHRONIZE, False, details['pid']))
+                    repeated = owner.request('start-'+name, owner=endpoint)['companions'][name]
+                    self.assertEqual(repeated['ownerProcessPid'], first['ownerProcessPid'])
+                with self.assertRaisesRegex(ValueError, 'running component'):
+                    owner.request('exit-if-empty', owner=endpoint)
+                with self.assertRaisesRegex(ValueError, 'Unsupported'):
+                    owner.request('start-prompts', owner=endpoint, command='untrusted')
+                process.kill()  # Deliberate fixture fault, not a normal Quit.
+                process.communicate(timeout=10)
+                for handle in handles:
+                    self.assertEqual(win32event.WaitForSingleObject(handle, 5000), win32event.WAIT_OBJECT_0)
+            finally:
+                if process.poll() is None: process.kill()
+                _out, errors = process.communicate(timeout=10)
+                for handle in handles:
+                    win32event.WaitForSingleObject(handle, 5000)
+                    handle.Close()
+                if errors: print(errors.decode('utf-8', errors='replace'))
+
     def test_competing_startups_produce_one_authenticated_owner(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = private_directory(Path(temporary)/'private')
