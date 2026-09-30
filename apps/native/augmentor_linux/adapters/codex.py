@@ -17,7 +17,7 @@ class CodexAdapter:
 
     def connection(self):
         connection = Connection(self.base, protocol='augmentor-codex/1')
-        connection.socket.settimeout(45)
+        connection.socket.settimeout(65)
         return connection
 
     def call(self, method, payload=None):

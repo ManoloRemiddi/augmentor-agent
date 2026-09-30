@@ -3,8 +3,8 @@
 # Codex integration: implementation and evidence
 
 Status: in development on `feat/codex-integration`, based on canonical main
-`b70d965` plus the [build plan](CODEX-INTEGRATION-PLAN.md). This is not an installed
-or user-selectable Codex release. The complete C0–C9 acceptance scope remains in
+`b70d965` plus the [build plan](CODEX-INTEGRATION-PLAN.md). Codex is selectable in development source; this is not an installed or qualified
+Codex release. The complete C0–C9 acceptance scope remains in
 the plan; no work package is certified complete by this foundation.
 
 ## Runtime foundation — 30 September 2026
@@ -52,8 +52,10 @@ unqualified. Do not substitute the user's global CLI or inherit its auth cache.
   after an owned-socket check, a refused connection and unchanged inode. The
   existing lifetime-lease launcher and startup lock now recognize Codex.
 - `apps/native/augmentor_linux/adapters/codex.py`: thin native wire adapter, model
-  selection, saved chats and shared event subscription. The controller accepts
-  this adapter, but the engine selector and setup UI are not wired yet.
+  selection, saved chats and shared event subscription. Native and Browser engine
+  selectors now expose Codex (development), with profile forms in existing setup
+  entrypoints. `apps/browser/codex-bridge.mjs` transports native-messaging frames
+  to the same host without depending on a Desktop window.
 
 The actual generated schema was inspected using:
 
@@ -170,3 +172,31 @@ Resonant Voice, Linux/macOS packaging, migration/rollback and full acceptance.
 The existing DSH/Pi interfaces and running installations have not been changed.
 Subscription distribution eligibility remains unresolved; configuration code is
 not permission to ship an authentication route.
+
+## Desktop and Browser profile setup checkpoint
+
+Both source interfaces now provide API/local profile creation and editing,
+OS-backed credential submission/removal, and an explicit text response check.
+An empty key preserves an existing credential; removal is deliberate. Forms clear
+entered secrets after successful saves, preserve drafts after failures, and
+require edited settings to be saved before checking them. Profile name changes
+preserve the connection revision; endpoint/model/key changes invalidate previous
+validation. A late check cannot validate a changed profile.
+
+The check calls the configured Responses endpoint with a short synthetic message,
+`store: false`, streaming enabled, no tools and no conversation history. It requires
+a completed text response and reports `responses-text`, not agent/tool compatibility.
+Redirects are rejected and provider error bodies are not displayed. API checks may
+be billed by the selected provider. This is independent of the real Codex runtime
+proof, which still uses a synthetic local provider.
+
+The real native-messaging entrypoint now passes initialize/create/send/history and
+saved-chat checks through the pinned Codex process, with no Desktop window. Browser
+DOM and Qt form tests cover credential clearing, explicit checks and stale edits;
+these are fixtures, not installed Browser or live-provider UI qualification.
+Root Node coverage passes 225 tests, Browser DOM coverage passes 45, and three
+focused Qt setup tests pass. The complete native suite runs 554 tests with two
+skips after fixing the settings preview without a controller. A rendered offscreen
+Qt setup dialog was inspected for readable fields and unclipped controls. Subscription sign-in remains unavailable in both
+forms. Browser tool execution, approval presentation, memory and speech remain
+pending; no installed application was updated by this checkpoint.

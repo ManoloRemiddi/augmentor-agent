@@ -9,7 +9,7 @@ import type {ResolvedProfile} from './host.js';
 
 interface Profile {
   id: string; name: string; revision: number; kind: 'api' | 'local'; model: string;
-  endpoint: string; credentialRef?: string; validation: 'unverified';
+  endpoint: string; credentialRef?: string; validation: 'unverified' | 'responses-text';
 }
 interface ProfileFile {schema: 1; profiles: Profile[]; retiredCredentials: string[]}
 export interface ProfileInput {id: string; name: string; kind: 'api' | 'local'; model: string; endpoint: string; credential?: string | null}
@@ -54,6 +54,14 @@ export class ProfileStore {
     const task = this.mutation.catch(() => {}).then(() => this.save(input));
     this.mutation = task.then(() => {}, () => {}); return task;
   }
+  validated(id: string, revision: number): Promise<void> {
+    const task = this.mutation.then(() => {
+      if (this.profile(id).revision !== revision) throw new Error('The profile changed during its connection check. Run the check again.');
+      const next: ProfileFile = {...this.data, profiles: this.data.profiles.map(profile => profile.id === id ? {...profile, validation: 'responses-text'} : profile)};
+      durableJson(this.path, next); this.data = next;
+    });
+    this.mutation = task.then(() => {}, () => {}); return task;
+  }
   private async save(input: ProfileInput) {
     this.validate(input);
     const previous = this.data.profiles.find(profile => profile.id === input.id);
@@ -61,8 +69,9 @@ export class ProfileStore {
     let reference = previous?.credentialRef;
     if (input.credential === null) reference = undefined;
     if (input.credential) {reference = `codex-${randomUUID()}`; await this.credentials.put(reference, input.credential);}
+    const changed = !previous || previous.kind !== input.kind || previous.model !== input.model || new URL(previous.endpoint).href !== new URL(input.endpoint).href || previous.credentialRef !== reference;
     const profile: Profile = {id: input.id, name: input.name.trim(), kind: input.kind, model: input.model, endpoint: input.endpoint,
-      revision: (previous?.revision ?? 0) + 1, validation: 'unverified', ...(reference ? {credentialRef: reference} : {})};
+      revision: (previous?.revision ?? 0) + (changed ? 1 : 0), validation: changed ? 'unverified' : previous.validation, ...(reference ? {credentialRef: reference} : {})};
     const next: ProfileFile = {schema: 1, profiles: [...this.data.profiles.filter(value => value.id !== input.id), profile], retiredCredentials: [...this.data.retiredCredentials]};
     if (previous?.credentialRef && previous.credentialRef !== reference) next.retiredCredentials.push(previous.credentialRef);
     try {durableJson(this.path, next); this.data = next;}

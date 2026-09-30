@@ -12,6 +12,7 @@ import {DisplayJournal} from './journal.js';
 import {durableJson, readPrivateJson, privateDirectory} from './storage.js';
 import {chatEvents, type ChatEvent} from './events.js';
 import type {ProfileStore} from './profiles.js';
+import {checkProvider} from './provider-check.js';
 
 export const CODEX_PROTOCOL = 'augmentor-codex/1';
 interface SessionMeta {
@@ -174,10 +175,20 @@ export class CodexHost extends EventEmitter {
       case 'profiles.list': return {profiles: this.options.profiles?.list() ?? []};
       case 'profiles.configure': {
         if (!this.options.profiles) throw new Error('Codex profile setup is unavailable in this host.');
-        if (this.workers.size || this.opening.size || this.configuring) throw new Error('Release open Codex conversations before changing connection profiles.');
+        if (this.opening.size || this.configuring || [...this.workers.values()].some(worker => worker.interactions.size || worker.session.ledger.list().some(operation => ['accepted', 'unconfirmed'].includes(operation.status)))) throw new Error('Finish or reconcile active Codex work before changing connection profiles.');
         this.configuring = true;
-        try {return await this.options.profiles.upsert(params as any);}
+        try {
+          for (const id of [...this.workers.keys()]) await this.release(id);
+          return await this.options.profiles.upsert(params as any);
+        }
         finally {this.configuring = false;}
+      }
+      case 'profiles.test': {
+        if (!this.options.profiles) throw new Error('Codex profile setup is unavailable in this host.');
+        const profile = await this.options.resolveProfile(identifier(params.id));
+        const checked = await checkProvider(profile.connection);
+        await this.options.profiles.validated(profile.id, profile.revision);
+        return {...checked, scope: 'text-only', toolsVerified: false};
       }
       case 'host.prepareShutdown': {
         if (this.opening.size || [...this.workers.values()].some(worker => worker.interactions.size || worker.session.ledger.list().some(operation => ['accepted', 'unconfirmed'].includes(operation.status)))) throw new Error('Codex has active or unconfirmed work. Finish or reconcile it before maintenance.');
@@ -209,6 +220,7 @@ export class CodexHost extends EventEmitter {
         const meta = this.meta(params.sessionId); meta.title = text(params.title, 200); meta.updatedAt = Date.now(); this.save(meta); return {title: meta.title};
       }
       case 'session.prompt': {
+        if (params.mode && params.mode !== 'queue') throw new Error('Codex steering is not yet available; this input was not submitted.');
         const meta = this.meta(params.sessionId);
         if (!Array.isArray(params.content) || params.content.some((part: Data) => part.type !== 'text')) throw new Error('This Codex integration currently accepts text input.');
         const input = text(params.content.map((part: Data) => text(part.text)).join('\n'));

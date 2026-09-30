@@ -182,7 +182,7 @@ class Window(QWidget):
 
     def switch_harness(self,harness,reconnect=False):
         if self.voice_dialog or self.voice_input or self.voice_opening:self.close_voice_panel()
-        if harness not in ('pi','dsh') or not self.controller:return
+        if harness not in ('pi','dsh','codex') or not self.controller:return
         if self.controller.harness==harness and not reconnect:return
         if self.controller.running or self.controller.navigating or self.editing or getattr(self.controller,'repairing',False):
             self.set_status('Finish the current action before switching harness.');return
@@ -225,7 +225,7 @@ class Window(QWidget):
         if not self.setup_offered and self.controller and self.controller.harness=='dsh' and not self.controller.session and not getattr(self.controller.client,'product',False):
             self.setup_offered=True
             QTimer.singleShot(0,self.open_setup)
-        if online and not self.setup_offered and self.controller and self.controller.harness=='pi':
+        if online and not self.setup_offered and self.controller and self.controller.harness in ('pi','codex'):
             self.setup_offered=True
             available=any(model.get('available') for group in self.model_picker.catalog.get('groups',[]) for model in group.get('models',[]))
             if not available and not self.controller.session:QTimer.singleShot(0,self.open_setup)
@@ -246,6 +246,9 @@ class Window(QWidget):
         # demand for a DSH the user does not have.
         problem=runtime_problem() if mac_setup_needed() else ''
         if self.controller.harness=='pi':self.setup_dialog=SetupDialog(self)
+        elif self.controller.harness=='codex':
+            from .codex_setup import CodexSetupDialog
+            self.setup_dialog=CodexSetupDialog(self)
         elif problem:self.setup_dialog=MacRuntimeIncompleteDialog(self,problem)
         elif mac_setup_available():self.setup_dialog=MacSetupDialog(self)
         else:self.setup_dialog=DshSetupDialog(self)

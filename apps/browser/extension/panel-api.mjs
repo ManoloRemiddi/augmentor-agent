@@ -92,7 +92,7 @@ export function handlePanelMessage(msg, sender, sendResponse) {
   }
   if(msg?.type==='harness/select'){
     if(state.running||state.mutating){sendResponse({ok:false,error:'Finish the current action before switching harness.'});return}
-    if(!['pi','dsh'].includes(msg.harness)){sendResponse({ok:false,error:'Choose DSH or Pi.'});return}
+    if(!['pi','dsh','codex'].includes(msg.harness)){sendResponse({ok:false,error:'Choose DSH, Pi or Codex.'});return}
     chrome.storage.local.set({'augmentor-harness':msg.harness}).then(()=>{resetHarnessPort();sendResponse({ok:true})});return true
   }
   if(msg?.type==='interaction/respond'){
@@ -136,6 +136,12 @@ export function handlePanelMessage(msg, sender, sendResponse) {
   if(msg?.type==='memory'){
     ensurePort()
     request('augmentor/memory',msg.request??{action:'describe'}).then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}));return true
+  }
+  if(msg?.type==='codexSetup'){
+    if(state.harness!=='codex'){sendResponse({ok:false,error:'Select Codex to manage these connections.'});return}
+    if(state.running||state.mutating){sendResponse({ok:false,error:'Finish the current action before changing connections.'});return}
+    ensurePort()
+    request('augmentor/codex',msg.request??{action:'profiles'}).then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}));return true
   }
   if(msg?.type==='modelSetup'){
     if(state.harness!=='pi'){sendResponse({ok:false,error:'Select Pi to use this model setup form.'});return}
@@ -371,10 +377,11 @@ export function handlePanelMessage(msg, sender, sendResponse) {
         const inCatalog = (sel) =>
           !!sel &&
           groups.some((g) => g.provider === sel.provider && g.models.some((m) => m.model === sel.model))
-        if (!inCatalog(state.selection) && catalog?.default) state.selection = { ...catalog.default }
+        if (!inCatalog(state.selection) && catalog?.default && (state.harness!=='codex'||!state.selection)) state.selection = { ...catalog.default }
         state.catalog = groups
         state.catalogCuration = curationOf(catalog)
         sendResponse({ ok: true, groups, selection: state.selection, error: catalog?.error ?? null, ...curationOf(state.catalogCuration) })
+        if(state.harness==='codex'&&state.phase==='needs-setup'&&state.selection){saveSelection(state.selection);setTimeout(()=>resetHarnessPort(),100)}
       })
       .catch((e) => sendResponse({ ok: false, groups: null, selection: state.selection, error: e.message, ...curationOf(state.catalogCuration) }))
     return true // async

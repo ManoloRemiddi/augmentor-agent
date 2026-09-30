@@ -136,4 +136,10 @@ test('pinned real Codex streams a fixture response and resumes persisted native 
       AUGMENTOR_CODEX_STATE: join(root, 'native'), AUGMENTOR_CODEX_SOCKET: ipc.socketPath, AUGMENTOR_CODEX_NO_AUTOSTART: '1', AUGMENTOR_CODEX_WORKSPACE: cwd},
   });
   assert.equal(JSON.parse(native.stdout).nativeAdapter, 'passed');
+  const browser = await promisify(execFile)(process.execPath, [fileURLToPath(new URL('./fixtures/codex/browser-client.mjs', import.meta.url))], {
+    timeout: 20000,
+    env: {...process.env, AUGMENTOR_CODEX_STATE: join(root, 'browser'), AUGMENTOR_CODEX_SOCKET: ipc.socketPath, AUGMENTOR_CODEX_BROWSER_WORKSPACE: cwd},
+  });
+  assert.equal(JSON.parse(browser.stdout).browserBridge, 'passed');
+  assert.equal((await host.dispatch('host.describe', {})).harness, 'codex');
 });

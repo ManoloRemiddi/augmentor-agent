@@ -56,3 +56,11 @@ test('local profiles need no keychain and stored credential loss is explicit', a
   await store.upsert({...profile, credential: 'temporary'}); secrets.clear();
   await assert.rejects(store.resolve(profile.id), /credential is missing/);
 });
+test('renaming a profile preserves its connection identity and stale checks cannot validate a new model', async t => {
+  const {store} = fixture(t); await store.upsert(profile); await store.validated(profile.id, 1);
+  await store.upsert({...profile, name: 'Renamed'});
+  assert.equal(store.list()[0].revision, 1); assert.equal(store.list()[0].validation, 'responses-text');
+  await store.upsert({...profile, model: 'changed-model'});
+  await assert.rejects(store.validated(profile.id, 1), /changed/);
+  assert.equal(store.list()[0].validation, 'unverified');
+});

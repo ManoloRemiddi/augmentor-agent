@@ -25,6 +25,16 @@ store proof remains pending. At `3ff5c5d`, Mac 14/26 bundle workflows pass and
 Debian packaging refuses the unreviewed Codex native executable; complete the
 native dependency inventory rather than bypassing that release gate.
 
+The following setup checkpoint makes Codex selectable in development source and
+adds API/local profile forms to native and Browser settings. Both forms share the
+same host and credential-store boundary, with explicit text-only provider checks.
+The actual Chromium native-messaging bridge passes the pinned-runtime fixture
+without a Desktop window. Root Node tests pass 225 and Browser DOM tests pass 45;
+the native suite runs 554 with two skips, including three new Qt setup cases.
+See the implementation evidence for the validation
+limits. Continue C3 real UI/tool/approval qualification and C4–C9; source selectors
+do not establish a finished integration or installed release.
+
 ## September 30 application SDK foundation
 
 [SDK foundation](APP-SDK.md) owns the DSH-only application contract, exact tool
