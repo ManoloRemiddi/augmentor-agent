@@ -66,7 +66,7 @@ test('pinned Codex drives the actual desktop socket bridge, releases sharing and
   const meta = await host.dispatch('session.describe', {sessionId: 'fixture'});
   assert.equal(meta.desktopTools, 1, 'Synthetic backend declares availability; live OS permissions remain a separate gate');
   const ended = [];
-  host.on('event', (_id, frame) => {if (frame.payload.event.type === 'turn/end') ended.push(frame.payload.event);});
+  host.on('event', (_id, frame) => {if (frame.payload.event?.type === 'turn/end') ended.push(frame.payload.event);});
   const events = async () => (await readFile(join(root, 'desktop-events.jsonl'), 'utf8')).trim().split('\n').map(JSON.parse);
   const prompt = id => host.dispatch('session.prompt', {sessionId: 'fixture', requestId: id, content: [{type: 'text', text: 'Run the synthetic desktop fixture.'}]});
   await prompt('task'); await until(() => ended.length === 1, 'normal turn');

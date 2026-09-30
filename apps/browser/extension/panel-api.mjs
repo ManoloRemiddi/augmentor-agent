@@ -283,6 +283,7 @@ export function handlePanelMessage(msg, sender, sendResponse) {
         const res = await request('session.prompt', {
           sessionId: state.sessionId,
           mode: 'queue',
+          ...(state.harness === 'codex' ? {resumeQueue: true} : {}),
           content: [{ type: 'text', text }],
         })
         if (res?.accepted === true && !res.command) {

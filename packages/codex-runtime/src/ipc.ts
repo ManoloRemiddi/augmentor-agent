@@ -110,10 +110,15 @@ export class CodexIpcServer {
               } else if (req.method === 'events.subscribe') {
                 if (params.sessionId !== null && params.sessionId !== undefined) await this.host.dispatch('session.describe', params);
                 if (client.sessionId !== (params.sessionId ?? undefined)) this.host.browser.detach(socket);
-                client.sessionId = params.sessionId ?? undefined; result = {subscribed: true};
+                client.sessionId = params.sessionId ?? undefined;
+                const queue = client.sessionId ? this.host.queueSnapshot(client.sessionId) : undefined;
+                result = {subscribed: true};
                 afterReply = () => {
                   this.host.approvals.detach(presenterId);
-                  if (client.sessionId && !socket.destroyed) this.host.approvals.attach(presenterId, client.sessionId, frame => this.write(socket, {event: frame}));
+                  if (client.sessionId && !socket.destroyed) {
+                    this.host.approvals.attach(presenterId, client.sessionId, frame => this.write(socket, {event: frame}));
+                    this.write(socket, {event: {method: 'session/queue', payload: {sessionId: client.sessionId, ...queue}}});
+                  }
                 };
               } else result = await this.host.dispatch(req.method, params);
             }

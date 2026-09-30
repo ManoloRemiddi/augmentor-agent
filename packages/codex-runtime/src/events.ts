@@ -24,7 +24,7 @@ export function chatEvents(notification: RpcNotification): ChatEvent[] {
     }
     case 'item/completed': {
       const item = p.item;
-      if (item.type === 'userMessage') return event('user/message', {source: {kind: 'user'}, content: item.content, itemId: item.id, requestId: item.clientId});
+      if (item.type === 'userMessage') return event('user/message', {source: {kind: 'user', rpcId: item.clientId}, content: item.content, itemId: item.id, requestId: item.clientId});
       if (item.type === 'agentMessage') return event('assistant/message', {message: {content: [{type: 'text', text: item.text}], stopReason: 'stop'}, itemId: item.id, phase: item.phase});
       if (['commandExecution', 'fileChange', 'mcpToolCall', 'dynamicToolCall'].includes(item.type)) {
         return event('tool/result', {name: item.tool ?? item.type, toolCallId: item.id,

@@ -476,7 +476,7 @@ class Controller(QObject):
                 if not self.connected or not self.stream or self.stream.session!=self.session:self.subscribe(self.session)
                 if cancelled.is_set():
                     return
-                response = self.client.call('session.prompt', {'sessionId': self.session, 'mode': 'queue', 'requestId': request_id or str(uuid.uuid4()), 'content': [{'type': 'text', 'text': text}]})
+                response = self.client.call('session.prompt', {'sessionId': self.session, 'mode': 'queue', **({'resumeQueue':True} if self.harness=='codex' else {}), 'requestId': request_id or str(uuid.uuid4()), 'content': [{'type': 'text', 'text': text}]})
                 if response.get('accepted') is not True:
                     raise ContractError('The harness did not accept the message.')
                 accepted = True
@@ -501,7 +501,7 @@ class Controller(QObject):
 
     def queue_prompt(self, text, request_id, mode='queue'):
         if not getattr(self.client,'supports_queue',False) or not self.running or self.navigating or self.read_only or not self.online:return False
-        generation=self.generation;sid=self.session
+        generation=self.generation;sid=self.session;turn_id=getattr(self,'queue_turn_id',None)
         def work():
             try:
                 # Preserve order behind the first prompt while a new chat is being prepared.
@@ -510,7 +510,7 @@ class Controller(QObject):
                     time.sleep(.03)
                 target=sid or self.session
                 if self.closed or self.generation is not generation or target!=self.session or not target or self.cancel_requested.is_set():raise ContractError('Prompt was not queued; the active response stopped or changed.')
-                result=self.client.call('session.prompt',{'sessionId':target,'requestId':request_id,'mode':mode,'content':[{'type':'text','text':text}]})
+                result=self.client.call('session.prompt',{'sessionId':target,'requestId':request_id,'mode':mode,'content':[{'type':'text','text':text}],**({'expectedTurnId':turn_id} if self.harness=='codex' and mode=='steer' else {})})
                 self.queue_result.emit({'id':request_id,'accepted':result.get('accepted') is True,'command':bool(result.get('command'))})
             except Exception as exc:
                 self.queue_result.emit({'id':request_id,'accepted':False,'error':str(exc)})
@@ -519,9 +519,10 @@ class Controller(QObject):
     def update_queue(self, item_id, action):
         sid=self.session
         if not sid or self.read_only or not self.online or action not in ('steer','remove'):return
+        turn_id=getattr(self,'queue_turn_id',None)
         def work():
             try:
-                result=self.client.call('session.updateQueue',{'sessionId':sid,'itemId':item_id,'action':{'kind':action}})
+                result=self.client.call('session.updateQueue',{'sessionId':sid,'itemId':item_id,'action':{'kind':action},**({'expectedTurnId':turn_id} if self.harness=='codex' and action=='steer' else {})})
                 self.queue_action_result.emit({'id':item_id,'accepted':result.get('accepted') is True})
             except Exception as exc:
                 self.queue_action_result.emit({'id':item_id,'error':str(exc)})
@@ -570,7 +571,9 @@ class Controller(QObject):
                         sid,generation=self.session,self.stream_generation
                         self.task(lambda:self.reconcile_turn(sid,generation))
             elif method == 'session/queue':
-                if payload.get('sessionId')==self.session:self.queue_changed.emit(payload.get('items',[]))
+                if payload.get('sessionId')==self.session:
+                    self.queue_turn_id=payload.get('activeTurnId')
+                    self.queue_changed.emit(payload.get('items',[]))
             elif method == 'session/event':
                 event = payload.get('event', {})
                 self.loaded_events=self.merge_events(self.loaded_events,[event])

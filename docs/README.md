@@ -47,7 +47,7 @@ Current cross-platform direction: [one product, Linux/Mac parity audit and corre
 - [Optional manual memory library](MEMORY.md)
 - [Improve a draft](PROMPT-IMPROVEMENT.md)
 - [Saved prompts and DSH commands](SLASH-COMMANDS.md)
-- [Native DSH queue and steering](QUEUE-AND-STEERING.md)
+- [Native queue and steering (DSH and Codex development)](QUEUE-AND-STEERING.md)
 - [Linux reply completion](REPLY-COMPLETION.md)
 - [Bounded DSH execution recovery and response validity](BOUNDED-EXECUTION-RECOVERY.md)
 - [Augmentor Pi client protocol v1](PROTOCOL.md)

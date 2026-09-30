@@ -8,7 +8,7 @@ import {runtimeOptions, installedRuntimeVersion, type CodexConnection} from './c
 import {CodexRpc, type RpcRequest} from './rpc.js';
 import {CodexSession} from './session.js';
 import {nativeHistory} from './history.js';
-import {OperationLedger} from './operations.js';
+import {OperationLedger, queueOperations} from './operations.js';
 import {DisplayJournal} from './journal.js';
 import {durableJson, readPrivateJson, privateDirectory} from './storage.js';
 import {chatEvents, type ChatEvent} from './events.js';
@@ -101,6 +101,25 @@ export class CodexHost extends EventEmitter {
       saved: meta.saved ?? false, createdAt: meta.createdAt, updatedAt: meta.updatedAt,
       selection: {provider: meta.profileId, model: meta.model}, profileRevision: meta.profileRevision};
   }
+  queueSnapshot(id: string) {
+    const meta = this.meta(id), worker = this.workers.get(id);
+    const path = join(this.sessionRoot(id), 'operations.json');
+    const ledger = worker?.session.ledger ?? (meta.threadId && existsSync(path) ? new OperationLedger(path, meta.threadId) : undefined);
+    return this.queueView(ledger, Boolean(worker));
+  }
+  private queueView(ledger?: OperationLedger, live = false) {
+    const operations = ledger?.list() ?? [];
+    const active = live && !ledger?.paused && !operations.some(operation => operation.status === 'unconfirmed')
+      ? operations.find(operation => !operation.steerTurnId && operation.status === 'accepted')?.turnId : undefined;
+    return {activeTurnId: active ?? null, paused: ledger?.paused ?? false,
+      items: queueOperations(operations).map(operation => ({
+        id: operation.id, rpcId: operation.id, placement: operation.status === 'queued' ? 'queued' : 'steering',
+        message: {content: [{type: 'text', text: operation.input}]},
+        stateLabel: operation.status === 'unconfirmed' ? 'Not confirmed — check before retrying' : operation.status === 'failed' ? 'Not sent' : operation.status === 'queued' && ledger?.paused ? 'Paused' : undefined,
+        canSteer: operation.status === 'queued' && Boolean(active),
+        canRemove: operation.status === 'queued' || operation.status === 'failed',
+      }))};
+  }
   private catalog() {
     const profiles = this.options.profiles?.list() ?? [];
     return {groups: profiles.map(profile => ({provider: profile.id, name: profile.name,
@@ -183,6 +202,15 @@ export class CodexHost extends EventEmitter {
         if (saved) this.emit('event', meta.id, {method: 'session/event', payload: {sessionId: meta.id, event: saved}});
       };
       session.on('event', publish);
+      let queueScheduled = false;
+      ledger.on('change', () => {
+        if (queueScheduled) return;
+        queueScheduled = true;
+        queueMicrotask(() => {
+          queueScheduled = false;
+          this.emit('event', meta.id, {method: 'session/queue', payload: {sessionId: meta.id, ...this.queueView(ledger, true)}});
+        });
+      });
       const fileChanges = new Map<string, unknown>();
       const toolCalls = new Map<string | number, {turnId: unknown; abort: AbortController}>();
       rpc.on('notification', frame => {
@@ -328,7 +356,7 @@ export class CodexHost extends EventEmitter {
         const worker = await this.worker(meta.id);
         const operation = params.mode === 'steer'
           ? await worker.session.steer(identifier(params.requestId), input, identifier(params.expectedTurnId))
-          : await worker.session.submit(identifier(params.requestId), input);
+          : await worker.session.submit(identifier(params.requestId), input, params.resumeQueue === true);
         return {...operation, accepted: Boolean(operation.turnId) || operation.status === 'queued'};
       }
       case 'session.cancel': {
@@ -340,7 +368,14 @@ export class CodexHost extends EventEmitter {
         return {...turnResult.value, accepted: turnResult.value.interrupted || desktopActive};
       }
       case 'session.continueQueue': await (await this.worker(identifier(params.sessionId))).session.continueQueue(); return {accepted: true};
-      case 'session.queue': return {operations: (await this.worker(identifier(params.sessionId))).session.ledger.list()};
+      case 'session.queue': {const worker = await this.worker(identifier(params.sessionId)); return {...this.queueView(worker.session.ledger, true), operations: worker.session.ledger.list()};}
+      case 'session.updateQueue': {
+        const worker = await this.worker(identifier(params.sessionId)), id = identifier(params.itemId);
+        if (params.action?.kind === 'remove') return {...worker.session.ledger.cancelQueued(id), accepted: true};
+        if (params.action?.kind !== 'steer') throw new Error('Unsupported queue action.');
+        const operation = await worker.session.promote(id, identifier(params.expectedTurnId));
+        return {...operation, accepted: Boolean(operation.turnId)};
+      }
       case 'session.removeQueued': return (await this.worker(identifier(params.sessionId))).session.ledger.cancelQueued(identifier(params.requestId));
       case 'session.history': {
         const meta = this.meta(params.sessionId);

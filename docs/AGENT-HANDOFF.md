@@ -2,6 +2,21 @@
 
 # Start here: agent handoff
 
+## September 30 Codex native queue checkpoint
+
+[Queue controls and pause](CODEX-INTEGRATION.md#native-queue-controls-and-durable-pause)
+enables existing native Enter/Steer/Remove controls with subscription baselines,
+atomic promotion and delivered-message correlation. Stop pause survives restart;
+an explicit idle Send resumes FIFO waiting input. Unknown work is never removed
+or replayed, and aggregate queue size is bounded before admission. The real
+offscreen Qt/controller/IPC/pinned-Codex fixture verifies reconnect, removal,
+same-turn steering and next-turn delivery with a synthetic provider. Build/type,
+293 Node, 48 Browser, eight queue Qt and 16 Codex Python checks pass locally.
+Browser running-turn queue controls, fork/edit and the remaining C0–C9 work are
+still unfinished; no installed app changed. Preceding `0f96407` passed Mac CI;
+Debian application checks passed but packaging still refuses unreviewed Codex
+native binaries. Check the new commit's CI before claiming Mac source parity.
+
 ## September 30 Codex durable steering checkpoint
 
 [Active-turn steering](CODEX-INTEGRATION.md#durable-active-turn-steering) now

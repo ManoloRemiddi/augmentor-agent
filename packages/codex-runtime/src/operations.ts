@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {EventEmitter} from 'node:events';
 import {existsSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {durableJson, readPrivateJson} from './storage.js';
@@ -13,24 +14,37 @@ export interface Operation {
   updatedAt: number;
   turnId?: string;
   steerTurnId?: string;
+  delivered?: boolean;
+  dismissed?: boolean;
+  wasQueued?: boolean;
 }
-interface RecordFile {schema: 1; threadId: string; operations: Operation[]}
+interface RecordFile {schema: 1; threadId: string; operations: Operation[]; paused?: boolean}
 const TERMINAL = new Set<OperationStatus>(['completed', 'failed', 'interrupted', 'cancelled']);
 const validId = (id: unknown): id is string => typeof id === 'string' && /^[a-zA-Z0-9_.:-]{1,128}$/.test(id);
+export const queueOperations = (operations: Operation[]): Operation[] => operations.filter(operation => !operation.dismissed && (
+  operation.status === 'queued' ||
+  operation.status === 'unconfirmed' && Boolean(operation.wasQueued || operation.steerTurnId) ||
+  operation.status === 'failed' && Boolean(operation.wasQueued || operation.steerTurnId) ||
+  Boolean(operation.steerTurnId) && operation.status === 'accepted' && !operation.delivered
+));
 const fingerprint = (input: string) => createHash('sha256').update(input).digest('hex');
 
 /** Per-thread durable admission ledger. Upstream acknowledgment is never assumed idempotent. */
-export class OperationLedger {
+export class OperationLedger extends EventEmitter {
   private data: RecordFile;
   constructor(readonly path: string, readonly threadId: string) {
+    super();
     if (!validId(threadId)) throw new Error('Invalid Codex thread identity.');
     if (existsSync(path)) {
       const data = readPrivateJson(path) as RecordFile;
-      if (data?.schema !== 1 || data.threadId !== threadId || !Array.isArray(data.operations)) throw new Error('Unsupported or mismatched Codex operation ledger.');
+      if (data?.schema !== 1 || data.threadId !== threadId || !Array.isArray(data.operations) || (data.paused !== undefined && typeof data.paused !== 'boolean')) throw new Error('Unsupported or mismatched Codex operation ledger.');
       const ids = new Set<string>();
       for (const operation of data.operations) {
         if (!validId(operation.id) || ids.has(operation.id) || typeof operation.input !== 'string' ||
           operation.fingerprint !== fingerprint(operation.input) || !['queued', 'unconfirmed', 'accepted', ...TERMINAL].includes(operation.status) ||
+          (operation.wasQueued !== undefined && typeof operation.wasQueued !== 'boolean') ||
+          (operation.delivered !== undefined && typeof operation.delivered !== 'boolean') ||
+          (operation.dismissed !== undefined && typeof operation.dismissed !== 'boolean') ||
           !Number.isFinite(operation.createdAt) || !Number.isFinite(operation.updatedAt) ||
           (operation.turnId !== undefined && !validId(operation.turnId)) ||
           (operation.steerTurnId !== undefined && (!validId(operation.steerTurnId) || operation.status === 'queued' || operation.turnId && operation.turnId !== operation.steerTurnId))) throw new Error('Corrupt Codex operation ledger; automatic submission is disabled.');
@@ -38,6 +52,16 @@ export class OperationLedger {
       }
       this.data = data;
     } else {this.data = {schema: 1, threadId, operations: []}; this.save();}
+  }
+  get paused(): boolean {return this.data.paused === true;}
+  pause(value: boolean): void {
+    const next = {...this.data, paused: value}; durableJson(this.path, next); this.data = next; this.emit('change');
+  }
+  delivered(id: string): void {this.update(id, {delivered: true});}
+  promote(id: string, turnId: string): Operation {
+    const operation = this.get(id);
+    if (!validId(turnId) || operation.status !== 'queued' || operation.steerTurnId) throw new Error('Only a waiting prompt can be promoted.');
+    return this.update(id, {status: 'unconfirmed', steerTurnId: turnId});
   }
   list(): Operation[] {return structuredClone(this.data.operations);}
   get(id: string): Operation {
@@ -56,7 +80,10 @@ export class OperationLedger {
     }
     if (this.data.operations.filter(operation => operation.status === 'queued').length >= 100) throw new Error('Codex input queue is full.');
     const now = Date.now();
-    const operation: Operation = {id, input, fingerprint: digest, status: steerTurnId ? 'unconfirmed' : 'queued', ...(steerTurnId ? {steerTurnId} : {}), createdAt: now, updatedAt: now};
+    const wasQueued = this.paused || this.data.operations.some(value => ['queued', 'accepted', 'unconfirmed'].includes(value.status));
+    const operation: Operation = {id, input, fingerprint: digest, ...(wasQueued ? {wasQueued: true} : {}), status: steerTurnId ? 'unconfirmed' : 'queued', ...(steerTurnId ? {steerTurnId} : {}), createdAt: now, updatedAt: now};
+    const queue = queueOperations([...this.data.operations, operation]);
+    if (queue.length > 100 || Buffer.byteLength(JSON.stringify(queue)) > 512 * 1024) throw new Error('Codex input queue is full. Remove waiting or rejected prompts before adding more.');
     this.commit([...this.data.operations, operation]);
     return {operation: structuredClone(operation), created: true};
   }
@@ -86,7 +113,10 @@ export class OperationLedger {
     return this.update(id, {status, ...(turnId ? {turnId} : {})});
   }
   cancelQueued(id: string): Operation {
-    if (this.get(id).status !== 'queued') throw new Error('Active work requires Codex turn interruption.');
+    const operation = this.get(id);
+    if (operation.status === 'cancelled') return operation;
+    if (operation.status === 'failed' && (operation.wasQueued || operation.steerTurnId)) return this.update(id, {dismissed: true});
+    if (operation.status !== 'queued') throw new Error('Active or unconfirmed input cannot be removed. Use Stop and reconcile its outcome.');
     return this.update(id, {status: 'cancelled'});
   }
   recover(): void {
@@ -98,7 +128,7 @@ export class OperationLedger {
   }
   private commit(operations: Operation[]): void {
     const next: RecordFile = {...this.data, operations};
-    durableJson(this.path, next); this.data = next;
+    durableJson(this.path, next); this.data = next; this.emit('change');
   }
   private save(): void {durableJson(this.path, this.data);}
 }

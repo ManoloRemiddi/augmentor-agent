@@ -808,10 +808,10 @@ rejection and restart without replay. Build/type checks and **289 root Node test
 pass; the final shared-host real-runtime case also passes. These use synthetic
 provider responses, not a live-model quality assessment.
 
-Native `supports_queue` remains false and Browser queue/steer presentation is
-not yet qualified. Next work must connect existing queue controls, subscription
-queue snapshots, removal/promotion and exact turn identity to this host contract
-before enabling them; no visible layout changes are included here. See the
+At this steering foundation checkpoint, native `supports_queue` was false.
+The [following queue checkpoint](#native-queue-controls-and-durable-pause) enables
+existing native controls; Browser running-turn queue presentation remains
+unqualified. No visible layout redesign is included. See the
 [official app-server steering contract](https://learn.chatgpt.com/docs/app-server).
 
 The preceding memory source `57cb362` passed both macOS jobs in
@@ -821,3 +821,40 @@ failed while downloading a dependency with a connection-reset error, before the
 previously known Codex binary-review gate. It does not establish packaging
 acceptance or resolve that gate. CI for history source `312a749` is still pending
 at this checkpoint.
+
+
+## Native queue controls and durable pause
+
+The [shared queue guide](QUEUE-AND-STEERING.md#codex-development-integration) owns
+current native behavior. Codex now advertises native queue support, publishes
+subscription baselines and replacement frames, atomically promotes a waiting
+operation using its original ID and validates the controller's observed active
+turn. Committed user receipts carry `source.rpcId` for existing UI reconciliation.
+Definitively rejected entries remain visible until dismissed; unknown entries
+cannot be removed/replayed. Admission bounds the aggregate queue before writing.
+
+Queue pause is now durable ledger state. Stop, interrupted/failed turns and
+uncertain dispatch retain it across restart. A new idle Send explicitly resumes
+FIFO processing; ordinary reconnect and queue insertion do not clear the pause.
+The in-memory gate remains closed if persisting a pause fails. Older schema-1
+records without the added flags remain readable; this is not a qualified
+installed downgrade/migration pathway. Native and Browser idle sends are wired,
+but Browser running-turn queue/steer UI still needs implementation/qualification.
+
+The offscreen Qt test uses the real Window, Controller, CodexAdapter, event stream,
+IPC host and pinned Codex with a held synthetic model response. Enter queues;
+Steer delivers the identified correction in the existing turn; Remove prevents
+inference; reconnect restores another waiting row; and an untouched follow-up
+runs once in the next turn. Both turn histories preserve their user identities
+after host restart. Additional tests cover unknown promotion, stale targets,
+persisted Stop/pause, explicit resumption and aggregate UTF-8 queue bounds.
+Local build/type checks, **293 root Node**, **48 Browser**, **eight queue Qt** and
+**16 focused Codex Python** tests pass. Source is enabled; installed apps and
+physical/macOS device evidence are unchanged.
+
+Previous steering source `0f96407` passed both macOS jobs in
+[36748520107](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36748520107).
+Its [Debian run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36748520138)
+passed application checks and still failed the unreviewed Codex executable gate.
+History source `312a749` had the same Debian gate; its Mac run was superseded and
+cancelled. No packaging review requirement has been bypassed.

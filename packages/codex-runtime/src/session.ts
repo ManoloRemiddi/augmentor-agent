@@ -10,7 +10,13 @@ import {nativeHistory, type NativeTurn} from './history.js';
 export class CodexSession extends EventEmitter {
   private sending = false;
   private closed = false;
-  private paused = false;
+  private locallyPaused = false;
+  private get paused(): boolean {return this.locallyPaused || this.ledger.paused;}
+  private set paused(value: boolean) {
+    if (value) this.locallyPaused = true;
+    this.ledger.pause(value);
+    this.locallyPaused = value;
+  }
   private maintenance = false;
   private dispatchId?: string;
   constructor(readonly rpc: CodexRpc, readonly ledger: OperationLedger) {
@@ -24,9 +30,13 @@ export class CodexSession extends EventEmitter {
     if (!value) this.schedulePump();
   }
   get threadId(): string {return this.ledger.threadId;}
-  async submit(id: string, text: string): Promise<Operation> {
+  async submit(id: string, text: string, resumeQueue = false): Promise<Operation> {
     if (this.closed) throw new Error('Codex session is closed.');
+    if (resumeQueue) {
+      if (this.ledger.list().some(operation => ['unconfirmed', 'accepted'].includes(operation.status))) throw new Error('Reconcile active work before resuming the queue.');
+    }
     this.ledger.enqueue(id, text);
+    if (resumeQueue) this.paused = false;
     if (!this.paused) await this.pump();
     return this.ledger.get(id);
   }
@@ -35,13 +45,27 @@ export class CodexSession extends EventEmitter {
     const operations = this.ledger.list();
     const existing = operations.find(operation => operation.id === id);
     if (existing) return this.ledger.enqueue(id, input, expectedTurnId).operation;
-    if (this.maintenance || this.paused || this.sending) throw new Error('Codex cannot accept steering in its current state.');
-    if (operations.some(operation => operation.status === 'unconfirmed') ||
-        !operations.some(operation => !operation.steerTurnId && operation.status === 'accepted' && operation.turnId === expectedTurnId)) {
-      throw new Error('Steering requires the confirmed active Codex turn.');
-    }
-    // Admission is persisted synchronously before the one allowed dispatch.
+    this.assertSteering(expectedTurnId);
     this.ledger.enqueue(id, input, expectedTurnId);
+    return this.dispatchSteer(id, input, expectedTurnId);
+  }
+  async promote(id: string, expectedTurnId: string): Promise<Operation> {
+    const operation = this.ledger.get(id);
+    if (operation.steerTurnId) {
+      if (operation.steerTurnId !== expectedTurnId) throw new Error('The steering target changed.');
+      return operation;
+    }
+    this.assertSteering(expectedTurnId);
+    this.ledger.promote(id, expectedTurnId);
+    return this.dispatchSteer(id, operation.input, expectedTurnId);
+  }
+  private assertSteering(expectedTurnId: string): void {
+    if (this.closed || this.maintenance || this.paused || this.sending) throw new Error('Codex cannot accept steering in its current state.');
+    const operations = this.ledger.list();
+    if (operations.some(operation => operation.status === 'unconfirmed') ||
+        !operations.some(operation => !operation.steerTurnId && operation.status === 'accepted' && operation.turnId === expectedTurnId)) throw new Error('Steering requires the confirmed active Codex turn.');
+  }
+  private async dispatchSteer(id: string, input: string, expectedTurnId: string): Promise<Operation> {
     try {
       const result = await this.rpc.call('turn/steer', {threadId: this.threadId, expectedTurnId, clientUserMessageId: id, input: [{type: 'text', text: input}]});
       this.ledger.acknowledge(id, result.turnId);
@@ -92,15 +116,20 @@ export class CodexSession extends EventEmitter {
         if (p.turn.status !== 'completed') this.paused = true;
         else this.schedulePump();
       }
+      if (notification.method === 'item/completed' && p.item?.type === 'userMessage') {
+        const operation = this.ledger.list().find(value => value.id === p.item.clientId);
+        if (operation && ['accepted', 'unconfirmed'].includes(operation.status)) {
+          this.ledger.acknowledge(operation.id, p.turnId); this.ledger.delivered(operation.id);
+        }
+      }
       for (const event of chatEvents(notification)) this.emit('event', event);
     } catch {
-      this.paused = true;
+      try {this.paused = true;} catch {}
       this.emit('attention', {reason: 'event-reconciliation-required'});
     }
   };
   private failed = (): void => {
-    this.paused = true;
-    try {this.ledger.recover();} catch {}
+    try {this.paused = true; this.ledger.recover();} catch {}
     this.emit('attention', {reason: 'runtime-disconnected'});
   };
   async interrupt(): Promise<{interrupted: boolean}> {
@@ -129,11 +158,12 @@ export class CodexSession extends EventEmitter {
       const turn = turns.find((candidate: any) => candidate.id === operation.turnId || candidate.items.some((item: any) => item.type === 'userMessage' && item.clientId === operation.id));
       if (!turn) continue; // Absence, including partial history, never proves non-execution.
       this.ledger.acknowledge(operation.id, turn.id);
+      if (turn.items.some(item => item.type === 'userMessage' && item.clientId === operation.id)) this.ledger.delivered(operation.id);
       if (turn.status !== 'inProgress') this.ledger.finish(operation.id, turn.status, turn.id);
     }
   }
   close(): void {
-    this.closed = true; this.paused = true;
+    this.closed = true;
     this.rpc.off('notification', this.notification); this.rpc.off('failure', this.failed);
   }
 }

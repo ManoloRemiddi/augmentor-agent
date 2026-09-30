@@ -20,6 +20,7 @@ async function fixture(t) {
   host.dispatch = async (method, params) => {if (method === 'session.describe' && params.sessionId !== 'one') throw new Error('Unknown conversation'); return {method};};
   host.approvals = new CodexInteractions(); host.browser = new CodexBrowser();
   host.recoverDesktop = async () => {};
+  host.queueSnapshot = () => ({items: [], activeTurnId: null, paused: false});
   host.close = async () => {host.approvals.close();};
   const server = new CodexIpcServer(host, join(root, 'host.sock')); await server.listen();
   t.after(async () => {await server.close(); rmSync(root, {recursive: true, force: true});});
@@ -41,6 +42,7 @@ test('Codex IPC requires a version handshake and isolates subscribed sessions', 
   assert.match((await a.next()).error.message, /Incompatible/);
   for (const client of [a, b]) {client.send({id: 'hello', method: 'host.hello', params: {protocol: 'augmentor-codex/1'}}); assert.ok((await client.next()).result);}
   a.send({id: 'subscribe', method: 'events.subscribe', params: {sessionId: 'one'}}); await a.next();
+  assert.equal((await a.next()).event.method, 'session/queue');
   host.emit('event', 'one', {method: 'session/event', payload: {sessionId: 'one'}});
   assert.equal((await a.next()).event.payload.sessionId, 'one');
   b.send({id: 'probe', method: 'host.describe'});
@@ -113,7 +115,7 @@ test('Codex IPC routes one approval and rotates its reply capability after prese
   const a = await connect(); const b = await connect();
   for (const client of [a, b]) {
     client.send({id: 'hello', method: 'host.hello', params: {protocol: 'augmentor-codex/1'}}); await client.next();
-    client.send({id: 'sub', method: 'events.subscribe', params: {sessionId: 'one'}}); assert.equal((await client.next()).id, 'sub');
+    client.send({id: 'sub', method: 'events.subscribe', params: {sessionId: 'one'}}); assert.equal((await client.next()).id, 'sub'); assert.equal((await client.next()).event.method, 'session/queue');
   }
   const decision = host.approvals.request('one', {id: 7, method: 'item/commandExecution/requestApproval', params: {turnId: 'turn', itemId: 'item', command: 'printf fixture'}});
   const first = (await a.next()).event; assert.equal(b.frames.length, 0);
@@ -166,7 +168,7 @@ test('browser executor attachment and replies belong to one subscribed socket', 
     client.send({id: 'hello', method: 'host.hello', params: {protocol: 'augmentor-codex/1'}}); await client.next();
   }
   a.send({id: 'early', method: 'browser.attach', params: {sessionId: 'one'}}); assert.match((await a.next()).error.message, /Subscribe/);
-  for (const client of [a, b]) {client.send({id: 'sub', method: 'events.subscribe', params: {sessionId: 'one'}}); await client.next();}
+  for (const client of [a, b]) {client.send({id: 'sub', method: 'events.subscribe', params: {sessionId: 'one'}}); await client.next(); assert.equal((await client.next()).event.method, 'session/queue');}
   a.send({id: 'attach', method: 'browser.attach', params: {sessionId: 'one'}}); assert.equal((await a.next()).result.attached, true);
   b.send({id: 'attach', method: 'browser.attach', params: {sessionId: 'one'}}); assert.match((await b.next()).error.message, /already has/);
   const called = host.browser.call('one', join(root, 'browser-calls'), {tool: 'browser_snapshot', arguments: {}, callId: 'tool', turnId: 'turn'}, new AbortController().signal);

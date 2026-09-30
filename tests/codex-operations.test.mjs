@@ -43,3 +43,13 @@ test('Codex ledger refuses corrupted or cross-thread state', t => {
   writeFileSync(store.path, JSON.stringify(saved));
   assert.throws(() => new OperationLedger(store.path, 'thread-1'), /Corrupt/);
 });
+
+test('queue admission bounds aggregate UTF-8 state before accepting another prompt', t => {
+  const store = ledger(t);
+  store.enqueue('root', 'Start'); store.dispatch('root'); store.acknowledge('root', 'turn-1');
+  for (let i = 0; i < 3; i++) store.enqueue('large-' + i, '😀'.repeat(32768));
+  assert.throws(() => store.enqueue('overflow', '😀'.repeat(32768)), /queue is full/);
+  assert.equal(store.list().length, 4);
+  store.cancelQueued('large-0');
+  store.enqueue('fits-now', '😀'.repeat(32768));
+});

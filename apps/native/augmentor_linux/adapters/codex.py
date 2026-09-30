@@ -9,7 +9,7 @@ class CodexAdapter:
     harness = 'codex'
     preset = 'augmentor-linux-codex'
     capabilities = {'branch': False, 'edit': False, 'memory': False, 'voice': False}
-    supports_queue = False  # Enable after the shared queue interaction UI is qualified.
+    supports_queue = True
 
     def __init__(self, base=None):
         self.state = Path(os.environ.get('AUGMENTOR_CODEX_STATE', Path(os.environ.get('XDG_STATE_HOME', Path.home()/'.local/state'))/'augmentor-codex'))

@@ -116,7 +116,7 @@ test('pinned real Codex streams a fixture response and resumes persisted native 
   const created = await host.dispatch('session.create', {sessionId: 'host-chat', profileId: 'local-fixture', cwd});
   assert.ok(created.threadId);
   let hostDone = Promise.withResolvers();
-  host.on('event', (_id, frame) => {if (frame.payload.event.type === 'turn/end') hostDone.resolve();});
+  host.on('event', (_id, frame) => {if (frame.payload.event?.type === 'turn/end') hostDone.resolve();});
   await host.dispatch('session.prompt', {sessionId: 'host-chat', requestId: 'host-request-one', content: [{type: 'text', text: 'Test the shared host.'}]});
   await hostDone.promise;
   assert.equal((JSON.stringify(requests.at(-1)).match(/You are Augmentor Agent/g) ?? []).length, 1);
@@ -133,7 +133,7 @@ test('pinned real Codex streams a fixture response and resumes persisted native 
   await host.dispatch('session.create', {sessionId: 'host-chat', profileId: 'local-fixture', cwd});
   assert.deepEqual(await host.dispatch('session.history', {sessionId: 'host-chat'}), firstHistory);
   hostDone = Promise.withResolvers();
-  host.on('event', (_id, frame) => {if (frame.payload.event.type === 'turn/end') hostDone.resolve();});
+  host.on('event', (_id, frame) => {if (frame.payload.event?.type === 'turn/end') hostDone.resolve();});
   await host.dispatch('session.prompt', {sessionId: 'host-chat', requestId: 'host-request-two', content: [{type: 'text', text: 'Continue after host restart.'}]});
   await hostDone.promise;
   assert.equal((JSON.stringify(requests.at(-1)).match(/You are Augmentor Agent/g) ?? []).length, 1, 'Resuming must not accumulate duplicate persona instructions');

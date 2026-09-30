@@ -156,3 +156,16 @@ suppression, both native user client IDs, and host restart/history recovery.
 `codex-session.test.mjs` covers early terminal events, lost acknowledgments,
 client-ID reconciliation, stale target rejection and no conversion to queued
 input. Native/Browser queue UI qualification remains separate.
+
+
+### Codex native queue controls
+
+`codex-steering.test.mjs` additionally launches `fixtures/codex/native-queue.py`
+with real offscreen Qt controls, the controller/adapter/event stream and private
+host socket. It exercises Enter, promotion, removal, event reconnect, same-turn
+steering, FIFO next-turn delivery and restart history using pinned Codex plus a
+synthetic Responses server. Python must include PySide6/QtTest; choose it through
+`AUGMENTOR_PYTHON` (both platform workflows declare these dependencies).
+`test_queue.py` also covers host action flags and exact observed turn identity.
+Session/ledger tests qualify durable Stop pause, unknown promotion/no replay and
+bounded aggregate queue admission. These tests do not activate installed apps.

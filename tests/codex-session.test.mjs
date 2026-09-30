@@ -121,3 +121,41 @@ test('stale or rejected steering never becomes a queued prompt', async t => {
   assert.equal(ledger.get('one').status, 'accepted');
   assert.ok(ledger.list().every(operation => operation.status !== 'queued'));
 });
+
+test('queue promotion preserves its identity atomically and unknown promotion cannot be removed or dispatched again', async t => {
+  let steers = 0;
+  const {ledger, session} = fixture(t, async method => {
+    if (method === 'turn/start') return {turn: {id: 'turn-1'}};
+    steers++; throw new CodexTransportError('lost promotion acknowledgment', true);
+  });
+  await session.submit('root', 'Start'); await session.submit('waiting', 'Correction');
+  await assert.rejects(session.promote('waiting', 'stale-turn'), /confirmed active/);
+  assert.equal(ledger.get('waiting').status, 'queued');
+  await assert.rejects(session.promote('waiting', 'turn-1'), /lost promotion/);
+  assert.equal(ledger.get('waiting').status, 'unconfirmed');
+  assert.equal((await session.promote('waiting', 'turn-1')).status, 'unconfirmed');
+  assert.throws(() => ledger.cancelQueued('waiting'), /unconfirmed/);
+  assert.throws(() => ledger.dispatch('waiting'), /undispatched/);
+  assert.equal(steers, 1);
+});
+
+test('Stop persists queue pause through restart and only explicit resume dispatches waiting input', async t => {
+  const {rpc, ledger, session} = fixture(t, async method => method === 'turn/start' ? {turn: {id: 'turn-1'}} : {});
+  await session.submit('root', 'Start'); await session.submit('waiting', 'Keep queued');
+  await session.interrupt();
+  rpc.emit('notification', {method: 'turn/completed', params: {threadId: ledger.threadId, turn: {id: 'turn-1', status: 'interrupted'}}});
+  session.close();
+  const recovered = new OperationLedger(ledger.path, ledger.threadId), calls = [];
+  rpc.call = async (method, params) => {calls.push([method, params]); return {turn: {id: 'turn-2'}};};
+  const resumed = new CodexSession(rpc, recovered); t.after(() => resumed.close());
+  assert.equal(recovered.paused, true);
+  await resumed.submit('later', 'Later queued input');
+  assert.equal(calls.length, 0);
+  await assert.rejects(resumed.submit('invalid', '', true));
+  assert.equal(recovered.paused, true);
+  await resumed.submit('explicit-resume', 'New deliberate input', true);
+  assert.equal(recovered.paused, false);
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0][1].clientUserMessageId, 'waiting');
+  assert.equal(recovered.get('later').status, 'queued');
+});
