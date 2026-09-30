@@ -880,3 +880,49 @@ Send/Stop. Build/type checks and 294 root Node + 53 Browser tests pass. The
 preceding native queue commit passed Mac 14/26 CI; this Browser checkpoint still
 needs its own CI. Full fork/edit, live account/provider, memory, voice, generic
 MCP, packaging and installed/device gates remain open.
+
+
+## Exact fork host foundation
+
+`session.branch` accepts the source session, a stable new session ID, the exact
+committed display sequence and `reply` or `edit` mode. The host resolves that
+sequence to native turn/item identity. Reply requires the last answer item of a
+closed turn and uses inclusive `lastTurnId`; Edit requires the initial user item
+and uses exclusive `beforeTurnId`. Editing a steered input or branching from an
+intermediate answer is rejected, rather than approximated with extra or missing
+history. The pinned schema/runtime, not an assumed generic API, qualifies the
+experimental exclusive boundary. Existing native/Browser Branch/Edit capability
+flags remain false until client integration and actual UI acceptance are complete.
+
+A short-lived app-server creates the fork in the same native runtime store, then
+closes to release its writer before the child worker resumes. The parent worker
+stays open. Descendants reference the original product session as native-store
+owner; profile revision, model and workspace ownership are checked on restart.
+Each child has its own display journal, operation ledger and executor receipts.
+No private Codex storage is copied or edited. Complete paginated native history
+is compared using ordered item/status fingerprints before the child becomes
+ready; item payloads and tool results must match the requested prefix.
+
+The product index records creation before the non-idempotent RPC, and records the
+returned native ID before verification. Concurrent identical requests share one
+operation; later retries return the existing child. Changed request identity is
+rejected. A lost reply or history mismatch remains unconfirmed and cannot issue
+another fork. Automated reconciliation of these incomplete creation records is
+still required before full lifecycle qualification. Other host mutations and
+maintenance are excluded during creation; shutdown closes helper processes and
+settles branch operations. Active or uncertain source work blocks branching.
+Paused, unsubmitted queue rows stay with the parent and are not copied or started.
+
+Build/type checks and **301 root Node tests** pass locally. The real pinned
+runtime/synthetic Responses fixtures qualify inclusive and exclusive boundaries,
+empty first-message edits, retained dynamic-tool results/definitions and persona,
+no inference/tool replay during creation, independent child turns, source
+preservation, restart, descendants, concurrent retries, profile changes, lost
+acknowledgments and deliberately mismatched history. These are runtime/host
+proofs, not live-provider, loaded UI or installed acceptance.
+
+Previous Browser source `b562a36` passed
+[macOS CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36751788804).
+Its [Debian workflow](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36751788807)
+passed application checks and failed on the known unreviewed Codex executable
+packaging gate. The gate remains enforced. This fork checkpoint needs its own CI.

@@ -36,5 +36,10 @@ export class DisplayJournal {
     this.events.push(saved); if (key) this.keys.add(key);
     return structuredClone(saved);
   }
+  event(seq: unknown): DisplayEvent | undefined {
+    if (typeof seq !== 'number' || !Number.isSafeInteger(seq) || seq < 1) throw new Error('Invalid Codex display sequence.');
+    const event = this.events[seq - 1];
+    return event ? structuredClone(event) : undefined;
+  }
   page(maxMessages = 12, beforeSeq?: number) {return historyPage(this.events, maxMessages, beforeSeq);}
 }

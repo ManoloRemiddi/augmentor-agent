@@ -2,6 +2,19 @@
 
 # Start here: agent handoff
 
+## September 30 Codex exact fork host checkpoint
+
+[Exact fork host foundation](CODEX-INTEGRATION.md#exact-fork-host-foundation)
+adds durable `session.branch`, exact display-to-native boundaries, native-store
+ownership, verified history and a short-lived creator to release Codex's writer
+lock. Source and child retain independent product ledgers/queues. Lost replies
+and mismatched history cannot replay creation. Build/type and 301 root Node
+tests pass, including actual pinned-runtime and shared-host synthetic-provider
+proofs. Branch/Edit UI flags remain disabled pending client and real UI work;
+unconfirmed creation reconciliation and full C0–C9 remain unfinished. Prior
+Browser source passed Mac CI; Debian application checks passed and packaging
+still fails the unreviewed binary gate. No installed application changed.
+
 ## September 30 Codex Browser queue checkpoint
 
 [Browser queue controls](CODEX-INTEGRATION.md#browser-queue-controls-and-snapshot-ordering)

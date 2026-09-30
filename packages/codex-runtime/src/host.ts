@@ -8,6 +8,7 @@ import {runtimeOptions, installedRuntimeVersion, type CodexConnection} from './c
 import {CodexRpc, type RpcRequest} from './rpc.js';
 import {CodexSession} from './session.js';
 import {nativeHistory} from './history.js';
+import {branchBoundary, verifyBranchHistory, type BranchBoundary} from './branch.js';
 import {OperationLedger, queueOperations} from './operations.js';
 import {DisplayJournal} from './journal.js';
 import {durableJson, readPrivateJson, privateDirectory} from './storage.js';
@@ -25,6 +26,8 @@ import type {control} from '../../desktop/src/index.js';
 
 export const CODEX_PROTOCOL = 'augmentor-codex/1';
 interface SessionMeta {
+  nativeOwner?: string;
+  fork?: {sessionId: string; messageSeq: number; mode: 'reply' | 'edit'; boundary: BranchBoundary};
   instructions?: InstructionSnapshot;
   browserTools?: 1;
   desktopTools?: 1;
@@ -61,6 +64,8 @@ export class CodexHost extends EventEmitter {
   private activeRequests = 0;
   private activeCreates = 0;
   private improvements = new Map<AbortController, Promise<Rewrite>>();
+  private branches = new Map<string, {key: string; promise: Promise<unknown>}>();
+  private forkCreators = new Set<CodexRpc>();
   constructor(readonly options: HostOptions) {
     super(); this.desktop = new CodexDesktop(options.desktopControl); privateDirectory(options.root); privateDirectory(join(options.root, 'sessions'));
     installedRuntimeVersion();
@@ -76,6 +81,18 @@ export class CodexHost extends EventEmitter {
       if (meta.browserTools !== undefined && meta.browserTools !== 1) throw new Error('Unsupported Codex browser tool contract.');
       if (meta.instructions !== undefined) validateInstructions(meta.instructions);
       identifier(meta.profileId); this.metadata.set(meta.id, meta);
+    }
+    for (const meta of this.metadata.values()) {
+      if (meta.nativeOwner === undefined && meta.fork === undefined) continue;
+      const owner = this.metadata.get(identifier(meta.nativeOwner));
+      const source = this.metadata.get(identifier(meta.fork?.sessionId));
+      if (!owner || owner.nativeOwner || owner.status !== 'ready' || !source || source.status !== 'ready' || source.id === meta.id ||
+          (source.nativeOwner ?? source.id) !== owner.id || meta.id === owner.id ||
+          !Number.isSafeInteger(meta.fork?.messageSeq) || meta.fork!.messageSeq < 1 ||
+          !['reply', 'edit'].includes(meta.fork!.mode) || !/^[a-f0-9]{64}$/.test(meta.fork!.boundary?.historyHash ?? '') ||
+          [owner, source].some(value => value.profileId !== meta.profileId || value.profileRevision !== meta.profileRevision || value.cwd !== meta.cwd || value.model !== meta.model)) {
+        throw new Error('Unsupported or corrupt Codex fork ownership.');
+      }
     }
   }
   private metadataPath(id: string): string {return join(this.options.root, 'sessions', `${identifier(id)}.json`);}
@@ -128,6 +145,7 @@ export class CodexHost extends EventEmitter {
   }
   async create(params: Data): Promise<SessionMeta> {
     this.assertAccepting();
+    if (this.branches.size) throw new Error('Codex is creating a conversation branch.');
     this.activeCreates++;
     try {return await this.createSession(params);}
     finally {this.activeCreates--;}
@@ -168,6 +186,61 @@ export class CodexHost extends EventEmitter {
     if (meta.status !== 'ready') throw new Error('Codex thread creation is unconfirmed.');
     return this.open(meta);
   }
+  private branch(params: Data): Promise<unknown> {
+    const sourceId = identifier(params.sessionId), id = identifier(params.newSessionId);
+    if (id === sourceId || !Number.isSafeInteger(params.messageSeq) || params.messageSeq < 1 || !['reply', 'edit'].includes(params.mode)) throw new Error('Invalid Codex branch request.');
+    const key = JSON.stringify([sourceId, params.messageSeq, params.mode]);
+    const pending = this.branches.get(id);
+    if (pending) {
+      if (pending.key !== key) throw new Error('Branch identity is already bound to a different request.');
+      return pending.promise;
+    }
+    if (this.branches.size || this.configuring || this.activeCreates || this.activeRequests > 1 || this.opening.size) throw new Error('Finish current Codex operations before branching.');
+    const promise = this.createBranch(sourceId, id, params.messageSeq, params.mode).finally(() => this.branches.delete(id));
+    this.branches.set(id, {key, promise}); return promise;
+  }
+  private async createBranch(sourceId: string, id: string, messageSeq: number, mode: 'reply' | 'edit'): Promise<unknown> {
+    const existing = this.metadata.get(id);
+    if (existing) {
+      if (!existing.fork || existing.fork.sessionId !== sourceId || existing.fork.messageSeq !== messageSeq || existing.fork.mode !== mode) throw new Error('Branch identity is already bound to a different request.');
+      if (existing.status !== 'ready') throw new Error('Codex branch creation has an unknown outcome. Preserve it and reconcile before retrying.');
+      await this.worker(id); return {...this.row(existing), fork: existing.fork};
+    }
+    const source = this.meta(sourceId), worker = await this.worker(sourceId);
+    this.assertAccepting();
+    if (worker.session.submissionPending || worker.interactions.size || this.desktop.owns(sourceId) ||
+        worker.session.ledger.list().some(operation => ['accepted', 'unconfirmed'].includes(operation.status) || operation.status === 'queued' && !worker.session.ledger.paused)) throw new Error('Finish or pause pending Codex work before branching.');
+    if (this.workers.size >= (this.options.maxWorkers ?? 4)) throw new Error('Codex worker limit reached. Close an idle conversation before branching.');
+    worker.session.setMaintenance(true);
+    let creator: CodexRpc | undefined;
+    try {
+      const history = await nativeHistory(worker.rpc, source.threadId!);
+      const boundary = branchBoundary(history, worker.journal.event(messageSeq), mode);
+      const profile = await this.options.resolveProfile(source.profileId);
+      this.assertAccepting();
+      if (profile.id !== source.profileId || profile.revision !== source.profileRevision) throw new Error('The source profile changed. Reconcile it before branching.');
+      const meta: SessionMeta = {...source, id, nativeOwner: source.nativeOwner ?? source.id, threadId: undefined,
+        fork: {sessionId: sourceId, messageSeq, mode, boundary}, title: '', saved: false, status: 'creating', createdAt: Date.now(), updatedAt: Date.now()};
+      // Durable admission precedes the non-idempotent native fork RPC.
+      this.save(meta);
+      const options = {...runtimeOptions(profile.connection, join(this.sessionRoot(meta.nativeOwner!), 'runtime'), meta.cwd), experimentalApi: true};
+      creator = this.options.createRpc?.(options) ?? new CodexRpc(options); this.forkCreators.add(creator);
+      creator.on('request', request => creator!.reject(request.id, 'Branch creation cannot execute tools or request approvals.'));
+      await creator.initialize(); this.assertAccepting();
+      const result = await creator.call('thread/fork', {threadId: source.threadId, ...boundary.params, excludeTurns: true, deferGoalContinuation: true});
+      if (typeof result?.thread?.id !== 'string' || result.thread.id === source.threadId) throw new Error('Invalid Codex fork identity.');
+      meta.threadId = result.thread.id; this.save(meta);
+      verifyBranchHistory(boundary, await nativeHistory(creator, meta.threadId!));
+      // thread/fork loads the child in its creator. Release that writer before opening its own worker.
+      await creator.close(); this.forkCreators.delete(creator); creator = undefined;
+      this.assertAccepting(); meta.status = 'ready'; this.save(meta);
+      await this.open(meta, profile);
+      return {...this.row(meta), fork: meta.fork};
+    } finally {
+      if (creator) {await creator.close(); this.forkCreators.delete(creator);}
+      if (!this.closing) worker.session.setMaintenance(false);
+    }
+  }
   private open(meta: SessionMeta, resolved?: ResolvedProfile): Promise<Worker> {
     const pending = this.opening.get(meta.id); if (pending) return pending;
     if (this.workers.size + this.opening.size >= (this.options.maxWorkers ?? 4)) return Promise.reject(new Error('Codex worker limit reached. Close an idle conversation before opening another.'));
@@ -179,7 +252,7 @@ export class CodexHost extends EventEmitter {
     if (profile.id !== meta.profileId || profile.revision !== meta.profileRevision) throw new Error('The saved conversation profile changed. Explicitly confirm its new connection before resuming.');
     this.assertOpen();
     const root = this.sessionRoot(meta.id); privateDirectory(root);
-    const state = join(root, 'runtime'); privateDirectory(state);
+    const state = join(this.sessionRoot(meta.nativeOwner ?? meta.id), 'runtime'); privateDirectory(state);
     const options = {...runtimeOptions(profile.connection, state, meta.cwd), experimentalApi: meta.browserTools === 1};
     const rpc = this.options.createRpc?.(options) ?? new CodexRpc(options);
     try {
@@ -240,7 +313,7 @@ export class CodexHost extends EventEmitter {
         })();
       });
       rpc.on('failure', () => {void this.stopDesktop(meta.id); this.browser.cancel(meta.id); for (const call of toolCalls.values()) call.abort.abort(); this.approvals.cancel(meta.id); session.close(); worker.interactions.clear(); this.workers.delete(meta.id);});
-      if (ledger.list().some(operation => operation.turnId || operation.status === 'unconfirmed')) {
+      if (meta.fork || ledger.list().some(operation => operation.turnId || operation.status === 'unconfirmed')) {
         const history = await nativeHistory(rpc, session.threadId);
         await session.reconcile(history);
         for (const turn of history) {
@@ -282,6 +355,7 @@ export class CodexHost extends EventEmitter {
     const readable = ['host.describe', 'profiles.list', 'models.list', 'session.list', 'session.models',
       'settings.describe', 'session.describe', 'session.history'];
     if (this.maintenance && !readable.includes(method)) throw new Error('Codex host is paused for maintenance.');
+    if (this.branches.size && method !== 'session.branch' && !readable.includes(method)) throw new Error('Codex is creating a conversation branch.');
     this.activeRequests++;
     try {return await this.dispatchRequest(method, params);}
     finally {this.activeRequests--;}
@@ -331,6 +405,7 @@ export class CodexHost extends EventEmitter {
       }
       case 'host.describe': return {pid: process.pid, harness: 'codex', protocol: CODEX_PROTOCOL, version: RELEASE.version, maintenance: this.maintenance, capabilities: {branch: false, edit: false, memory: false, voice: false, browserTools: true, homeTools: true, desktopTools: desktopCapabilities().available}, desktopActive: this.desktop.active, workers: this.workers.size};
       case 'session.create': {const meta = await this.create(params); return {...this.row(meta), threadId: meta.threadId};}
+      case 'session.branch': return this.branch(params);
       case 'session.list': {const items = [...this.metadata.values()].filter(meta => meta.status === 'ready').map(meta => this.row(meta)); return {items, total: items.length};}
       case 'session.models': {const meta = this.meta(params.sessionId); return {current: {provider: meta.profileId, model: meta.model}};}
       case 'session.selectModel': {
@@ -414,6 +489,8 @@ export class CodexHost extends EventEmitter {
     for (const abort of this.improvements.keys()) abort.abort();
     const desktopClosed = this.desktop.close();
     const cleanup = Promise.allSettled([desktopClosed, ...this.improvements.values()]);
+    await Promise.allSettled([...this.forkCreators].map(creator => creator.close()));
+    await Promise.allSettled([...this.branches.values()].map(branch => branch.promise));
     await Promise.allSettled([...this.opening.values()]);
     for (const worker of this.workers.values()) {
       worker.session.close(); worker.session.ledger.recover(); await worker.rpc.close();

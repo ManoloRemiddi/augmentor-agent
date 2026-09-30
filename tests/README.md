@@ -182,3 +182,19 @@ pinned Codex. It inspects synthetic provider inputs to exclude removed text and
 duplicate steering. Set `AUGMENTOR_QUEUE_SCREENSHOT` to a temporary PNG path to
 capture the waiting-row UI for visual inspection. The fixture is Linux-only;
 DOM and shared host contracts run independently of that physical-browser route.
+
+
+### Codex exact fork boundaries and host lifecycle
+
+`codex-branch.test.mjs` covers exact message selection, refusal of mid-turn cuts,
+complete item/status fingerprints and immutable journal lookup after restart.
+`codex-fork.test.mjs` uses pinned Codex and a local synthetic Responses server.
+It proves inclusive reply/exclusive edit/empty history, inherited tool results
+and definitions, retained persona, no inference or tool replay during creation,
+source preservation and independent workers sharing the supported native store.
+The host case additionally verifies duplicate identity, concurrent admission,
+paused-parent queues, descendant ownership, restart, profile changes, lost native
+acknowledgment and history mismatch without another fork. No real account or
+model credentials are required. Run after `npm run build`; these tests are in
+the root Node suite. UI Branch/Edit acceptance and unknown-creation reconciliation
+remain separate requirements; the product capabilities are still disabled.
