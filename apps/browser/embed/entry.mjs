@@ -29,7 +29,7 @@ function connectNative(){
  return {onMessage,onDisconnect,disconnect,postMessage(frame){if(frame.method==='session.prompt'&&workspaceContext)frame={...frame,params:{...frame.params,workspaceContext}};const data=JSON.stringify(frame);if(socket.readyState===WebSocket.OPEN)socket.send(data);else if(socket.readyState===WebSocket.CONNECTING&&frame.method==='augmentor/handshake')queue.push(data);else throw Error('Augmentor connection interrupted; prompt was not replayed')}}
 }
 function openTab({url}){const target=new URL(url,base);if(target.origin===base.origin&&target.pathname===base.pathname+'settings.html'){tell({type:'augmentor-settings',url:target.href});return Promise.resolve({id:1,windowId:1,url})}window.open(target.href,'_blank','noopener');return Promise.resolve({id:2,windowId:1,url})}
-globalThis.chrome={runtime:{id:'augmentor-embedded',getURL:path=>new URL(path,base).href,getManifest:()=>({version:profile.version,augmentorWorkspace:{id:profile.id,name:profile.name}}),connectNative,onMessage:runtimeEvents,sendMessage(message){
+globalThis.chrome={runtime:{id:'augmentor-embedded',getURL:path=>new URL(path,base).href,getManifest:()=>({version:profile.version,augmentorWorkspace:{id:profile.id,name:profile.name,sdkProtocol:profile.sdkProtocol}}),connectNative,onMessage:runtimeEvents,sendMessage(message){
  if(message.type==='harness/select'&&message.harness!==profile.harness)return Promise.resolve({ok:false,error:'This workspace uses its configured DSH specialist.'})
  if(profile.sdkProtocol&&message.type==='voice/preferences'&&!profile.voice.enabled)return Promise.resolve({ok:true,result:{enabled:false,mode:'push-to-talk'}})
  if(profile.sdkProtocol&&message.type==='voice/start'&&!profile.voice.enabled)return Promise.resolve({ok:false,error:'Experimental voice is disabled for this workspace.'})
@@ -53,6 +53,8 @@ await import(location.pathname.endsWith('settings.html')?'./settings.mjs':'./sid
 if(profile.sdkProtocol&&location.pathname.endsWith('settings.html')){
  const section=document.createElement('fieldset'),legend=document.createElement('legend'),label=document.createElement('label'),input=document.createElement('input');
  legend.textContent='Experimental workspace voice';input.type='checkbox';input.checked=profile.voice.enabled;
- label.append(input,' Enable Resonant Voice for this workspace (experimental)');section.append(legend,label);document.body.prepend(section);
- input.onchange=async()=>{input.disabled=true;try{await api('preferences',{set:{'experimental-voice-enabled':input.checked}});profile.voice.enabled=input.checked;label.lastChild.textContent=' Enable Resonant Voice for this workspace (experimental). Reopen the agent panel to apply.'}catch{input.checked=profile.voice.enabled}finally{input.disabled=false}};
+ const note=document.createElement('p');note.setAttribute('role','status');section.className='card';
+ label.append(input,' Enable Resonant Voice for this workspace (experimental)');section.append(legend,label,note);
+ const voiceSection=document.querySelector('#section-voice');voiceSection.insertBefore(section,voiceSection.querySelector('.section-body'));
+ input.onchange=async()=>{input.disabled=true;try{await api('preferences',{set:{'experimental-voice-enabled':input.checked}});profile.voice.enabled=input.checked;note.textContent='Saved. Reopen the agent panel to apply.'}catch(error){input.checked=profile.voice.enabled;note.textContent='Could not save: '+error.message}finally{input.disabled=false}};
 }

@@ -20,7 +20,7 @@ const button=(parent,label,fn)=>{const b=make('button',label);b.type='button';b.
 let state={},checking=false,closed=false
 const sections=new Map()
 const definitions=[
-  ['voice','Voice','Shared with the floating Augmentor window.','M9 3h6v10H9zM5 10v3a7 7 0 0 0 14 0v-3M12 20v3'],
+  ['voice','Voice',chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol?'Optional experimental speech for this application.':'Shared with the floating Augmentor window.','M9 3h6v10H9zM5 10v3a7 7 0 0 0 14 0v-3M12 20v3'],
   ['appearance','Colours','Changes apply immediately.','M12 3a9 9 0 1 0 0 18h1a2 2 0 0 0 1-4 2 2 0 0 1 1-4h2a4 4 0 0 0 4-4c0-3-4-6-9-6ZM7 10h.01M10 6h.01M15 6h.01'],
   ['models','Models','Choose the model Augmentor uses.','M9 3v6m6-6v6M6 9h12v2a6 6 0 0 1-12 0ZM12 17v4'],
   ['harnesses','Harnesses','Choose what powers your browser agent.','M4 7h16M4 17h16M8 4v6m8 4v6'],
@@ -103,6 +103,9 @@ function showMemory(container){
   manual.parentElement.addEventListener('toggle',()=>{if(manual.parentElement.open&&!manual.querySelector('dialog'))memoryDialog(document,send,()=>({surface:'browser',harness:state.harness,...(state.sessionId?{sessionId:state.sessionId}:{})}),manual)})
 }
 async function showVoice(container){
+  if(chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol){
+    container.append(make('p','Experimental voice uses the Augmentor host audio hardware. Choose voices and audio settings in standalone Augmentor. Cloud voice providers will be added later.'));return
+  }
   const response=await send('voice/preferences');if(!response?.ok)throw Error(response?.error||'Voice is unavailable')
   const data=response.result,fields={}
   const add=(key,label,input)=>{const row=make('label',label);row.append(input);container.append(row);fields[key]=input;return input}
