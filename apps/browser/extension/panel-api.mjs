@@ -28,6 +28,7 @@ import {
   sessionHistoryOk,
 } from './port.mjs'
 import { openSettingsTab } from './settings-tab.mjs'
+import {approvalPresenters} from './approval-presenters.mjs'
 import { overlayFade } from './overlay.mjs'
 
 // The DSH picker's curation rides every catalog reply: the panel's picker
@@ -95,7 +96,12 @@ export function handlePanelMessage(msg, sender, sendResponse) {
     if(!['pi','dsh','codex'].includes(msg.harness)){sendResponse({ok:false,error:'Choose DSH, Pi or Codex.'});return}
     chrome.storage.local.set({'augmentor-harness':msg.harness}).then(()=>{resetHarnessPort();sendResponse({ok:true})});return true
   }
+  if(msg?.type==='interaction/claim'){
+    const pending=state.harness==='codex'&&state.interactions.some(row=>row.id===msg.id)
+    sendResponse({ok:!!pending&&approvalPresenters.claim(msg.id,sender)});return
+  }
   if(msg?.type==='interaction/respond'){
+    if(state.harness==='codex'&&!approvalPresenters.owns(msg.id,sender)){sendResponse({ok:false,error:'This approval belongs to another Browser panel or has expired.'});return}
     const row=state.interactions.find(row=>row.id===msg.id)
     if(!row){sendResponse({ok:false,error:'This request has expired.'});return}
     if(['dsh','codex'].includes(state.harness)){

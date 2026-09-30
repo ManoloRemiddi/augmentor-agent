@@ -40,7 +40,9 @@ file-change approvals, with fresh reply capabilities on presenter transfer and n
 persistent grants. Both real client bridges now deny a synthetic escalated command
 through pinned Codex, which receives the denial and continues. Broker/socket tests
 cover stale replies, disconnect and expiry. Structured questions, scoped dynamic
-tools and actual approval-dialog qualification remain unfinished; see the updated
+tools and actual approval-dialog qualification remain unfinished. Browser now adds
+a per-document live-connection claim behind its shared host subscription; a second
+panel cannot claim the same prompt. Browser DOM coverage passes 46 tests. See the updated
 [implementation evidence](CODEX-INTEGRATION.md#one-presenter-approval-broker).
 
 ## September 30 application SDK foundation

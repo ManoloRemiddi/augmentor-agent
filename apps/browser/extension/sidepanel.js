@@ -18,6 +18,19 @@ import { attachPromptLibrary } from './prompt-library.mjs'
 
 let surfaceCapabilities={branch:false,edit:false},editingMessage=null
 const answeredInteractions=new Set()
+let approvalPresenter,approvalReconnect,approvalPageClosed=false
+function connectApprovalPresenter(){
+  if(approvalPageClosed||!chrome.runtime.connect)return
+  try{
+    approvalPresenter=chrome.runtime.connect({name:'augmentor-approval-presenter'})
+    approvalPresenter.onDisconnect.addListener(()=>{
+      approvalPresenter=null
+      if(!approvalPageClosed)approvalReconnect=setTimeout(connectApprovalPresenter,1000)
+    })
+  }catch{if(!approvalPageClosed)approvalReconnect=setTimeout(connectApprovalPresenter,1000)}
+}
+connectApprovalPresenter()
+window.addEventListener('pagehide',()=>{approvalPageClosed=true;clearTimeout(approvalReconnect);approvalPresenter?.disconnect()},{once:true})
 const ui = createChatUI({
   actionEnabled:name=>surfaceCapabilities[name]&&!viewSessionId,
   onMessageAction:messageAction,
@@ -426,6 +439,10 @@ async function refresh() {
 
     for(const row of res.interactions??[]){
       if(answeredInteractions.has(row.id))continue;answeredInteractions.add(row.id)
+      if(res.harness==='codex'){
+        const claim=await send('interaction/claim',{id:row.id})
+        if(!claim?.ok){answeredInteractions.delete(row.id);continue}
+      }
       const p=row.params;let value
       if(row.method==='approval.requested')value={outcome:window.confirm((p.toolName??'Action')+'\n'+(p.reason??'Allow this action?'))?'allowed-once':'denied'}
       else {const answers=[];for(const q of p.questions??[]){const answer=window.prompt(q.question+(q.options?.length?'\n'+q.options.map(o=>o.label).join(' / '):''),q.prefill??'');if(answer!==null)answers.push({id:q.id,selected:[],custom:answer})}value={answer:{answers}}}

@@ -17,6 +17,7 @@
  * drops everything with the disconnect error, and the reply path settles
  * by id. The wire vocabulary is the shared one (see wire.mjs header).
  */
+import {approvalPresenters} from './approval-presenters.mjs'
 import {
   state,
   log,
@@ -111,7 +112,7 @@ export function ensurePort() {
     if(msg.id!==undefined&&['approval.requested','question.requested'].includes(msg.method)){
       state.interactions=state.interactions.filter(row=>row.id!==msg.id);state.interactions.push(msg);broadcast();return
     }
-    if(msg.method==='interaction.resolved'){state.interactions=state.interactions.filter(row=>row.id!==msg.params.rpcId);broadcast();return}
+    if(msg.method==='interaction.resolved'){approvalPresenters.resolve(msg.params.rpcId);state.interactions=state.interactions.filter(row=>row.id!==msg.params.rpcId);broadcast();return}
     if(msg.method==='voice.event'){
       chrome.runtime.sendMessage({type:'voice/event',event:msg.params}).catch(()=>{});return
     }
@@ -245,6 +246,7 @@ function scheduleReconnect(message) {
 }
 
 export function fail(message) {
+  if(state.harness==='codex'){approvalPresenters.clear();state.interactions=[]}
   state.phase = 'error'
   state.error = message
   const old=state.port;state.port=null;old?.disconnect()
@@ -345,6 +347,7 @@ export function onSessionEvent(params) {
 export function resetHarnessPort(){
   if(reconnectTimer){clearTimeout(reconnectTimer);reconnectTimer=null}
   const old=state.port;state.port=null;old?.disconnect();state.pending.dropAll(new Error('Harness changed'))
+  approvalPresenters.clear()
   state.phase='disconnected';state.error=null;state.catalog=null;state.selection=null;state.sessionReady=false;state.sessionId='augmentor-'+crypto.randomUUID();state.log=[];state.interactions=[];state.panelViewSession=null;state.capabilities={branch:false,edit:false}
   ensurePort()
 }

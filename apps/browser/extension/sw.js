@@ -24,6 +24,8 @@
  * The manifest declares "type": "module"; an open native port keeps this SW
  * alive, so the side panel may close while the agent works.
  */
+import {approvalPresenters} from './approval-presenters.mjs'
+chrome.runtime.onConnect.addListener(port=>{if(port.name==='augmentor-approval-presenter')approvalPresenters.connect(port)})
 import { ensurePort } from './port.mjs'
 import { handlePanelMessage } from './panel-api.mjs'
 

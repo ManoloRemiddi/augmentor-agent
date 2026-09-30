@@ -232,6 +232,14 @@ Approval-checkpoint validation: build passes, root Node suite passes 232 tests,
 Browser DOM suite passes 45, and the final focused Codex run passes 39 after
 explicitly pinning human approval review. The earlier 554-test native-suite record
 belongs to the setup checkpoint; this checkpoint additionally exercises the actual
-Python adapter against the real Codex process. Multiple Browser panels sharing one
-extension service worker still need a separate UI-presenter claim; the current
-broker guarantees one subscribed client connection, not one Browser document.
+Python adapter against the real Codex process. The host broker guarantees one subscribed client connection. The following
+Browser refinement adds document ownership behind that connection.
+
+Browser refinement: each panel maintains a named extension connection. The service
+worker grants each pending Codex approval to one live document, checks that owner
+again on reply, and releases claims when the document disconnects. A second panel
+cannot open the same approval prompt. Panels reconnect their presenter registration
+after service-worker loss; native-bridge failure clears stale requests and claims.
+Registry tests cover competing documents, disconnect transfer, expired ownership
+and foreign origins. Browser DOM coverage now passes 46 tests. This is source/DOM
+evidence; loaded Chromium multi-panel and actual modal acceptance remain pending.
