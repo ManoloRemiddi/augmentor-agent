@@ -630,3 +630,68 @@ MCP dispatch. The test now holds an acknowledged dispatched call and triggers
 the actual deadline callback, then verifies a subsequent model-requested write
 is blocked by the unknown-outcome record. All 29 Home tests pass locally; no
 Home runtime behavior or timeout was changed.
+
+
+## Paired Home tools
+
+New Codex chats now register the existing shared Home capabilities: status,
+owner-enabled devices, direct changes, read-only requests, delegated Home
+requests, receipt lookup and request-specific cancellation. Desktop and Browser
+use the same host and persisted tool contract. Existing chats keep their recorded
+capabilities; they do not silently acquire Home tools. Browser pairing settings
+now route through the same shared prompt-service Home configuration as Desktop.
+Unpaired calls report that Home is unavailable; no NAS address or credential is
+invented from a prompt.
+
+The NAS remains DSH-owned. Codex does not start a second Home agent locally,
+connect directly to Home Assistant, or change the NAS model. Direct `home_set`
+uses the NAS device-action endpoint without another model call. Delegated
+`home_request`/`home_read` retain the existing NAS model and permission policy.
+Only their explicit request text is passed, not the surrounding conversation.
+
+The Codex adapter validates bounded arguments and durably records each tool
+identity before dispatch. A changed or interrupted call is not replayed. The
+existing SQLite Home receipts remain authoritative for NAS request IDs and
+unknown-outcome admission. A separate receipt-ownership table records hashed owners atomically with new
+receipts; the original four-column table stays compatible with older clients.
+Existing rows are preserved with no invented ownership. Codex can retrieve or
+cancel only IDs recorded for its conversation and current pairing. A global
+unknown receipt can block another chat's write without granting that chat access
+to the original request. No credentials are included in Codex tool-call records.
+
+Home adds `requests.cancelById: true` to `/capabilities` and
+`POST /requests/<request_id>/cancel`. The server checks both the paired client
+and currently admitted request before signaling cancellation. A delayed cancel
+cannot stop a newer request; even an owner client cannot use this scoped route
+to cancel another client's request. Existing `/cancel` callers retain their
+legacy behavior. Codex requires an explicit request ID and checks server support;
+there is no fallback to broad cancellation on older NAS versions. Those servers
+need this source update to support scoped cancellation; no deployed NAS was
+modified by this checkpoint.
+
+Stopping Codex interrupts waiting, but an already admitted NAS operation may
+continue. Receipt lookup and scoped cancellation remain explicit operations;
+neither a cancel acknowledgment nor ending a chat undoes a device change.
+Instructions and failures preserve that distinction. Physical device state and
+human acceptance are not established by a model's completion message.
+
+Validation: build/type checks and **276 root Node tests**, **48 Browser tests**
+and **30 Home tests** pass locally. Eleven focused Home/Codex-client cases cover
+receipt ownership, schema migration, unknown outcomes, durable call replay,
+argument validation and old-server cancellation refusal. The real pinned Codex
+0.159.2 runtime invokes Home through both actual native and Browser adapters with
+a synthetic Responses provider and isolated NAS HTTP fixture. A resumed Browser
+chat retains its Home tool definitions; the three requested direct actions each
+dispatch once. Real Home HTTP-service tests verify cross-client, wrong-request
+and stale-cancel rejection. No real household or Home Assistant device was used.
+
+The preceding `372dcfe` passed both macOS jobs in
+[36744256437](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36744256437)
+and Home CI, including the corrected deadline test. Debian
+[36744256503](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36744256503)
+failed earlier in the Chromium fixture: CDP discovered a target before its
+extension document exposed `chrome.runtime.sendMessage`. The fixture now waits
+for the exact extension URL, complete document, composer and messaging API before
+sending its first message. The loaded Chromium proof passes locally after that
+correction; the next CI run must qualify it on the Debian runner. The native
+packaging review gate remains separately unresolved.

@@ -117,3 +117,12 @@ redirect refusal, host shutdown and maintenance, and the actual native adapter
 and Browser bridge against synthetic services. `tests/test_prompt_improvement.py`
 and Browser `surface.test.mjs` cover revision protection and Undo. These checks
 do not establish live-provider quality or full-window/device acceptance.
+
+
+Codex Home: `tests/codex-home.test.mjs` covers durable calls, scoped receipt
+ownership, legacy SQLite migration and no replay; `tests/home-client.test.mjs`
+checks cancellation capability negotiation. `tests/codex-app-server.test.mjs`
+uses pinned Codex and actual native/Browser bridges with a synthetic NAS,
+including resumed tool definitions. Home's `identity.test.mjs` verifies that
+request-specific cancellation cannot stop another client/chat or replacement
+request. No test touches the owner's NAS or household devices.

@@ -8,6 +8,7 @@ import {homedir} from 'node:os';
 import {join} from 'node:path';
 import {mkdir} from 'node:fs/promises';
 import {promptLibrary} from './shared/prompts.mjs';
+import {homeConnection} from './shared/home.mjs';
 import {surfaceRequest} from './shared/surface.mjs';
 import {supportReport} from './shared/support.mjs';
 import {randomUUID} from 'node:crypto';
@@ -46,6 +47,7 @@ async function attach(sessionId) {
   currentSession = sessionId;
 }
 async function request(method, params = {}, id) {
+  if (method === 'augmentor/home') return homeConnection(params);
   if (method === 'augmentor/prompts') return promptLibrary(params);
   if (method === 'augmentor/diagnostics') return supportReport();
   if (method === 'augmentor/surface') {
@@ -68,7 +70,7 @@ async function request(method, params = {}, id) {
     selection = {provider: params.provider, model: params.model}; await c.call('models.validate', selection);
     await mkdir(workspace, {recursive: true, mode: 0o700});
     const saved = await c.call('chats.saved');
-    return {serverInfo: {home: homedir(), harness: 'codex', capabilities: {branch: false, edit: false, memory: false, voice: false, browserTools: true}, augmentor: {chatCwd: workspace, agentPreset: preset, saved: saved.saved}}};
+    return {serverInfo: {home: homedir(), harness: 'codex', capabilities: {branch: false, edit: false, memory: false, voice: false, browserTools: true, homeTools: true}, augmentor: {chatCwd: workspace, agentPreset: preset, saved: saved.saved}}};
   }
   if (method === 'session.create') {
     if (!selection) throw new Error('Select a Codex connection before starting a chat.');

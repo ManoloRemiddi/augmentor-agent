@@ -88,6 +88,17 @@ test('loaded Chromium extension executes Codex-observed typing, clicking and scr
   let panelTarget;
   for (let attempt = 0; attempt < 100; attempt++) {panelTarget = (await targets()).find(target => target.id === created.targetId); if (panelTarget) break; await delay(50);}
   assert.ok(panelTarget); const panel = await cdp(panelTarget.webSocketDebuggerUrl); sockets.push(panel);
+  // Target discovery can precede navigation into the extension document. Wait
+  // for that context and its API before sending any mutating panel message.
+  let panelReady = false, panelReadinessError;
+  for (let attempt = 0; attempt < 100; attempt++) {
+    try {
+      panelReady = await panel.evaluate(`location.href === ${JSON.stringify(`chrome-extension://${extensionId}/sidepanel.html`)} && document.readyState === 'complete' && typeof globalThis.chrome?.runtime?.sendMessage === 'function' && Boolean(document.querySelector('#input'))`);
+      if (panelReady) break;
+    } catch (error) {panelReadinessError = error.message;}
+    await delay(50);
+  }
+  assert.equal(panelReady, true, panelReadinessError ?? 'Extension document and messaging API became ready');
   const message = value => panel.evaluate(`chrome.runtime.sendMessage(${JSON.stringify(value)})`);
   assert.equal((await message({type: 'harness/select', harness: 'codex'})).ok, true);
   let status;

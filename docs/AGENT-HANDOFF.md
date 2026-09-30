@@ -2,6 +2,23 @@
 
 # Start here: agent handoff
 
+## September 30 Codex paired Home checkpoint
+
+[Home integration evidence](CODEX-INTEGRATION.md#paired-home-tools) records the
+shared NAS tool bridge for new Codex chats, persistent request ownership, no
+unknown-action replay, and server-checked request-specific cancellation. The
+actual pinned Codex/native/Browser path, including resumed Browser tools, passes
+isolated provider/NAS fixtures. Local validation: build/type checks, 276 root
+Node tests, 48 Browser tests and 30 Home tests. Existing NAS deployments and
+household devices were not changed or qualified. Old NAS versions cannot perform
+Codex's scoped cancellation and never receive a broad-cancel fallback.
+
+At preceding `372dcfe`, macOS and Home CI passed. Debian exposed a Chromium
+fixture navigation race; the corrected proof waits for the extension document
+and messaging API and passes locally. Follow the next CI run for runner evidence.
+Continue the full plan: generic MCP, account eligibility/login, memory, speech,
+remaining conversation operations, platform/device and release qualification.
+
 ## September 30 Codex draft improvement checkpoint
 
 [Draft improvement](CODEX-INTEGRATION.md#apilocal-draft-improvement) now connects

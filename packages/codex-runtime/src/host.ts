@@ -18,6 +18,7 @@ import {checkProvider} from './provider-check.js';
 import {improveDraft, validateDraft, type Rewrite} from './prompt-improvement.js';
 import {CodexBrowser, browserToolsFor} from './browser.js';
 import {CodexDesktop, desktopTools} from './desktop.js';
+import {CodexHome, homeTools} from './home.js';
 import {desktopCapabilities} from '../../desktop/src/capabilities.js';
 import type {control} from '../../desktop/src/index.js';
 
@@ -26,6 +27,7 @@ interface SessionMeta {
   instructions?: InstructionSnapshot;
   browserTools?: 1;
   desktopTools?: 1;
+  homeTools?: 1;
   imageInput?: true;
   schema: 1; id: string; profileId: string; profileRevision: number;
   cwd: string; threadId?: string; title: string; createdAt: number; updatedAt: number;
@@ -47,6 +49,7 @@ interface Worker {rpc: CodexRpc; session: CodexSession; journal: DisplayJournal;
 export class CodexHost extends EventEmitter {
   readonly approvals = new CodexInteractions();
   readonly browser = new CodexBrowser();
+  readonly home = new CodexHome();
   readonly desktop: CodexDesktop;
   private metadata = new Map<string, SessionMeta>();
   private workers = new Map<string, Worker>();
@@ -65,6 +68,7 @@ export class CodexHost extends EventEmitter {
       if (meta?.schema !== 1 || !['creating', 'ready'].includes(meta.status) || filename !== `${identifier(meta.id)}.json` ||
           !isAbsolute(meta.cwd) || typeof meta.title !== 'string' || !Number.isInteger(meta.profileRevision) ||
           (meta.status === 'ready' && typeof meta.threadId !== 'string')) throw new Error('Unsupported or corrupt Codex session index.');
+      if (meta.homeTools !== undefined && meta.homeTools !== 1) throw new Error('Unsupported Codex Home tool contract.');
       if (meta.imageInput !== undefined && meta.imageInput !== true) throw new Error('Unsupported Codex image contract.');
       if (meta.desktopTools !== undefined && (meta.desktopTools !== 1 || meta.imageInput !== true)) throw new Error('Unsupported Codex desktop tool contract.');
       if (meta.desktopTools === 1) this.desktop.register(meta.id, this.sessionRoot(meta.id));
@@ -129,7 +133,7 @@ export class CodexHost extends EventEmitter {
     // Recheck after resolution: two clients can race the same create request.
     if (this.metadata.has(id)) return this.create(params);
     const desktop = profile.connection.imageInput === true && desktopCapabilities().available;
-    const meta: SessionMeta = {schema: 1, browserTools: 1, ...(desktop ? {desktopTools: 1} : {}), ...(profile.connection.imageInput ? {imageInput: true} : {}), instructions: instructionSnapshot(undefined, true, profile.connection.imageInput === true, desktop), id, profileId, profileRevision: profile.revision, model: profile.connection.model,
+    const meta: SessionMeta = {schema: 1, browserTools: 1, homeTools: 1, ...(desktop ? {desktopTools: 1} : {}), ...(profile.connection.imageInput ? {imageInput: true} : {}), instructions: instructionSnapshot(undefined, true, profile.connection.imageInput === true, desktop, true), id, profileId, profileRevision: profile.revision, model: profile.connection.model,
       surface: params.surface === 'browser' ? 'browser' : 'linux', cwd, title: '', status: 'creating', createdAt: Date.now(), updatedAt: Date.now()};
     this.save(meta);
     await this.open(meta, profile);
@@ -162,7 +166,7 @@ export class CodexHost extends EventEmitter {
       await rpc.initialize();
       if (meta.threadId) await rpc.call('thread/resume', {threadId: meta.threadId, cwd: meta.cwd, excludeTurns: true, ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
       else {
-        const result = await rpc.call('thread/start', {cwd: meta.cwd, approvalPolicy: 'on-request', sandbox: 'workspace-write', ...(meta.browserTools ? {dynamicTools: [...browserToolsFor(meta.imageInput === true), ...(meta.desktopTools ? desktopTools : [])]} : {}), ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
+        const result = await rpc.call('thread/start', {cwd: meta.cwd, approvalPolicy: 'on-request', sandbox: 'workspace-write', ...(meta.browserTools ? {dynamicTools: [...browserToolsFor(meta.imageInput === true), ...(meta.desktopTools ? desktopTools : []), ...(meta.homeTools ? homeTools : [])]} : {}), ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
         meta.threadId = result.thread.id; meta.status = 'ready'; this.save(meta);
       }
       this.assertOpen();
@@ -199,7 +203,7 @@ export class CodexHost extends EventEmitter {
               this.assertAccepting();
               const abort = new AbortController(); toolCalls.set(request.id, {turnId: request.params.turnId, abort});
               const desktopTool = desktopTools.some(tool => tool.name === request.params.tool);
-              rpc.respond(request.id, desktopTool && meta.desktopTools ? await this.desktop.call(meta.id, root, request.params, abort.signal) : await this.browser.call(meta.id, join(root, 'browser-calls'), request.params, abort.signal, meta.imageInput === true));
+              rpc.respond(request.id, meta.homeTools && homeTools.some(tool => tool.name === request.params.tool) ? await this.home.call(meta.id, join(root, 'home-calls'), request.params, abort.signal) : desktopTool && meta.desktopTools ? await this.desktop.call(meta.id, root, request.params, abort.signal) : await this.browser.call(meta.id, join(root, 'browser-calls'), request.params, abort.signal, meta.imageInput === true));
             } else rpc.respond(request.id, await this.approvals.request(meta.id, request, fileChanges.get(String(request.params.itemId))));
           }
           catch {try {rpc.reject(request.id, 'This client operation is unsupported, expired or disconnected. Any dispatched action may have an unknown outcome.');} catch { /* disconnected worker */ }}
@@ -296,7 +300,7 @@ export class CodexHost extends EventEmitter {
         if (profile.connection.model !== params.model) throw new Error('The selected model does not match this Codex connection profile.');
         return {valid: true, validation: 'configuration-only'};
       }
-      case 'host.describe': return {pid: process.pid, harness: 'codex', protocol: CODEX_PROTOCOL, version: RELEASE.version, maintenance: this.maintenance, capabilities: {branch: false, edit: false, memory: false, voice: false, browserTools: true, desktopTools: desktopCapabilities().available}, desktopActive: this.desktop.active, workers: this.workers.size};
+      case 'host.describe': return {pid: process.pid, harness: 'codex', protocol: CODEX_PROTOCOL, version: RELEASE.version, maintenance: this.maintenance, capabilities: {branch: false, edit: false, memory: false, voice: false, browserTools: true, homeTools: true, desktopTools: desktopCapabilities().available}, desktopActive: this.desktop.active, workers: this.workers.size};
       case 'session.create': {const meta = await this.create(params); return {...this.row(meta), threadId: meta.threadId};}
       case 'session.list': {const items = [...this.metadata.values()].filter(meta => meta.status === 'ready').map(meta => this.row(meta)); return {items, total: items.length};}
       case 'session.models': {const meta = this.meta(params.sessionId); return {current: {provider: meta.profileId, model: meta.model}};}

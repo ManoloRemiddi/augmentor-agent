@@ -44,3 +44,11 @@ test('oversized response is cancelled before JSON parsing',async t=>{
  const connection=await fixture(t,(_req,res)=>{res.writeHead(200);res.end('x'.repeat(1100000));});
  await assert.rejects(homeFetch(connection,'/capabilities'),/too large/);
 });
+
+test('request-specific cancel requires server support and never falls back to paired-client cancellation',async t=>{
+ let supported=false;const posts=[];
+ await fixture(t,(req,res)=>{if(req.method==='POST'){posts.push(req.url);json(res,200,{status:'cancel requested'});}else json(res,200,{requests:{cancelById:supported}});});
+ await assert.rejects(homeTool('home_cancel',{request_id:'specific'},'chat','cancel-one'),/does not support/);assert.deepEqual(posts,[]);
+ supported=true;await homeTool('home_cancel',{request_id:'specific'},'chat','cancel-two');assert.deepEqual(posts,['/requests/specific/cancel']);
+ await assert.rejects(homeTool('home_cancel',{request_id:'../other'},'chat','cancel-three'),/Invalid/);assert.equal(posts.length,1);
+});

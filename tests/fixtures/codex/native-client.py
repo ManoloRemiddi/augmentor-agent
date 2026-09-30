@@ -10,7 +10,7 @@ client = CodexAdapter()
 assert client.call('host.describe')['harness'] == 'codex'
 selection = {'provider': 'local-fixture', 'model': 'fixture-model'}
 assert client.validate_model(selection)['valid']
-sid = 'native-questions-fixture' if os.environ.get('AUGMENTOR_PROOF_QUESTIONS') else 'native-adapter-fixture'
+sid = 'native-home-fixture' if os.environ.get('AUGMENTOR_PROOF_HOME') else 'native-questions-fixture' if os.environ.get('AUGMENTOR_PROOF_QUESTIONS') else 'native-adapter-fixture'
 created = client.call('session.create', {'sessionId': sid, 'cwd': os.environ['AUGMENTOR_CODEX_WORKSPACE'], 'selection': selection})
 assert created['agentPreset'] == client.preset
 assert client.call('session.selectModel', {'sessionId': sid, **selection})['current'] == selection

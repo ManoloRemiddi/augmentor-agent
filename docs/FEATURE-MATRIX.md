@@ -211,3 +211,10 @@ API/local profiles on both surfaces, using an isolated tool-free request and no
 chat history. Subscription usage remains unavailable. See
 [draft improvement evidence](CODEX-INTEGRATION.md#apilocal-draft-improvement) for
 fixture coverage, cancellation semantics and remaining live/UI qualification.
+
+
+New Codex development chats also expose paired Home tools through the existing
+NAS client. Shared pairing works on both surfaces; request receipt access is
+conversation-scoped, and cancellation requires the newer NAS request-specific
+endpoint. The NAS stays DSH-owned. Existing chats/deployments do not gain these
+capabilities implicitly. [Evidence and limits](CODEX-INTEGRATION.md#paired-home-tools).

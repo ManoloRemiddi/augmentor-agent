@@ -39,8 +39,9 @@ test('pinned real Codex streams a fixture response and resumes persisted native 
     res.writeHead(200, {'content-type': 'text/event-stream'});
     const send = event => res.write(`data: ${JSON.stringify(event)}\n\n`);
     if (mode === 'hold') {heldResponse = res; send({type: 'response.created', response: {id: 'resp_hold', status: 'in_progress', output: []}}); holdStarted.resolve(); return;}
-    if (['tool', 'approval', 'question', 'browser'].includes(mode) && toolRounds++ < (mode === 'browser' ? 2 : 1)) {
+    if (['tool', 'approval', 'question', 'browser', 'home'].includes(mode) && toolRounds++ < (mode === 'browser' ? 2 : 1)) {
       const item = {id: 'fc_fixture', type: 'function_call', call_id: 'call_fixture', name: 'exec_command', arguments: JSON.stringify({cmd: 'printf augmentor_tool_fixture', max_output_tokens: 100, ...(mode === 'approval' ? {sandbox_permissions: 'require_escalated', justification: 'Exercise the approval denial fixture.'} : {})})};
+      if (mode === 'home') {item.name = 'home_set'; item.arguments = JSON.stringify({entity_id: 'light.fixture', action: 'on'});}
       if (mode === 'browser') {item.name = toolRounds === 1 ? 'browser_snapshot' : 'browser_click'; item.arguments = JSON.stringify(toolRounds === 1 ? {tabId: 7} : {selector: '#fixture'}); item.id += toolRounds; item.call_id += toolRounds;}
       if (mode === 'question') {item.name = 'request_user_input'; item.arguments = JSON.stringify({questions: [{id: 'format', header: 'Format', question: 'Choose a fixture format', options: [{label: 'Text', description: 'Plain text'}, {label: 'List', description: 'A short list'}]}]});}
       send({type: 'response.created', response: {id: 'resp_tool', status: 'in_progress', output: []}});
@@ -180,5 +181,42 @@ test('pinned real Codex streams a fixture response and resumes persisted native 
     assert.ok(requests.at(-1).input.some(item => item.type === 'function_call_output' && JSON.stringify(item.output).includes('Synthetic browser observation fixture')));
     await host.dispatch('session.release', {sessionId: 'browser-tools-fixture'});
   }
+  // Use isolated pairing and NAS responses: no household configuration or devices.
+  const previousHome = [process.env.AUGMENTOR_HOME_CONNECTION, process.env.AUGMENTOR_HOME_CLIENT_STATE];
+  process.env.AUGMENTOR_HOME_CONNECTION = join(root, 'home.json');
+  process.env.AUGMENTOR_HOME_CLIENT_STATE = join(root, 'home-receipts.db');
+  let homeWrites = 0;
+  const nas = createServer(async (req, res) => {
+    assert.equal(req.headers.authorization, 'Bearer fixture-home-token-12345678');
+    if (req.url === '/device-actions') {
+      let raw = ''; for await (const chunk of req) raw += chunk;
+      const body = JSON.parse(raw); assert.deepEqual(body.action, {entity_id: 'light.fixture', action: 'on'}); homeWrites++;
+      res.end(JSON.stringify({status: 'accepted'}));
+    } else res.end(JSON.stringify({status: 'finished', response: {status: 'completed', reply: 'Synthetic NAS Home action verified'}}));
+  });
+  await new Promise(resolve => nas.listen(0, '127.0.0.1', resolve));
+  cleanup.push(async () => {
+    nas.closeAllConnections(); await new Promise(resolve => nas.close(resolve));
+    for (const [n, key] of ['AUGMENTOR_HOME_CONNECTION', 'AUGMENTOR_HOME_CLIENT_STATE'].entries()) {
+      if (previousHome[n] === undefined) delete process.env[key]; else process.env[key] = previousHome[n];
+    }
+  });
+  await writeFile(process.env.AUGMENTOR_HOME_CONNECTION, JSON.stringify({url: `http://127.0.0.1:${nas.address().port}`, token: 'fixture-home-token-12345678', name: 'Fixture'}), {mode: 0o600});
+  await host.dispatch('session.release', {sessionId: 'native-questions-fixture'});
+  for (const surface of ['native', 'browser', 'browser']) {
+    mode = 'home'; toolRounds = 0;
+    const isNative = surface === 'native';
+    const client = await promisify(execFile)(isNative ? process.env.AUGMENTOR_PYTHON ?? 'python3' : process.execPath,
+      [fileURLToPath(new URL(isNative ? './fixtures/codex/native-client.py' : './fixtures/codex/browser-client.mjs', import.meta.url))], {
+        timeout: 20000,
+        env: {...process.env, AUGMENTOR_PROOF_HOME: '1', PYTHONPATH: fileURLToPath(new URL('../apps/native', import.meta.url)),
+          AUGMENTOR_CODEX_STATE: join(root, surface + '-home'), AUGMENTOR_CODEX_SOCKET: ipc.socketPath,
+          AUGMENTOR_CODEX_NO_AUTOSTART: '1', AUGMENTOR_CODEX_WORKSPACE: cwd, AUGMENTOR_CODEX_BROWSER_WORKSPACE: cwd},
+      });
+    assert.equal(JSON.parse(client.stdout)[isNative ? 'nativeAdapter' : 'browserBridge'], 'passed');
+    assert.ok(requests.at(-1).input.some(item => item.type === 'function_call_output' && JSON.stringify(item.output).includes('Synthetic NAS Home action verified')));
+    await host.dispatch('session.release', {sessionId: surface + '-home-fixture'});
+  }
+  assert.equal(homeWrites, 3);
   assert.equal((await host.dispatch('host.describe', {})).harness, 'codex');
 });

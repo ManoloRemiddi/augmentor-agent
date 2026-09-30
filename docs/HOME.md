@@ -386,3 +386,30 @@ checks the durable unknown outcome, and verifies that a later model-requested
 mutation cannot dispatch again. This removes a 100 ms scheduling race seen in
 CI run 36742665709 without changing the production deadline or cancellation
 policy. All 29 Home tests pass locally after the fixture correction.
+
+
+### Codex client and request-specific cancellation
+
+New Codex Desktop/Browser chats use the same shared Home client and pairing as
+DSH/Pi. Direct device actions stay on the NAS's model-free action endpoint;
+delegated requests retain the NAS's existing DSH model and permissions. The NAS
+application itself is not replaced by Codex. See
+[Codex qualification](CODEX-INTEGRATION.md#paired-home-tools) for fixture evidence
+and remaining deployment/device acceptance.
+
+`GET /capabilities` advertises `requests.cancelById: true` in this source.
+`POST /requests/<request_id>/cancel` with an empty JSON object cancels only when
+that exact request is currently admitted for the authenticating client. Mismatch
+returns 409 without signaling; this includes a stale cancellation after a newer
+request starts. Owner status does not override ownership on this scoped route.
+Legacy `/cancel` behavior is unchanged. The shared client checks capability
+support before scoped cancellation and never falls back to the broad route.
+
+The local `receipt_owners` table records hashed ownership alongside newly
+created receipts in one transaction. The original four-column receipts table
+stays unchanged, so older installed clients can continue writing to it. Existing
+request identities/statuses are preserved and old rows get no inferred owner.
+Codex receipt lookup/cancellation requires its conversation's recorded ownership
+under the current pairing. Unknown outcomes still block new dispatches. Stopping
+Codex's wait does not guarantee that an admitted NAS task stopped; inspect the
+saved result, and use explicit cancellation where supported.
