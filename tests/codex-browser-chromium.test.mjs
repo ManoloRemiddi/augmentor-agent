@@ -174,4 +174,36 @@ test('loaded Chromium extension executes Codex-observed typing, clicking and scr
   assert.doesNotMatch(JSON.stringify(queueInputs[1].input), /BROWSER_QUEUE_NEXT/);
   assert.match(JSON.stringify(queueInputs[2].input), /BROWSER_QUEUE_NEXT/);
 
+  // Activate actual transcript controls and continue in each exact child.
+  const sourceId=(await message({type:'connect'})).sessionId;
+  const sourceHistory=await host.dispatch('session.history',{sessionId:sourceId,maxMessages:100});
+  await panelUntil('document.querySelector(".msg-branch")&&!document.querySelector("#send").disabled','Branch available');
+  await panel.evaluate('document.querySelector(".msg-branch").click()');
+  let childId;
+  for(let attempt=0;attempt<100;attempt++){
+    const current=await message({type:'connect'});
+    if(current.sessionId!==sourceId){childId=current.sessionId;break;}await delay(50);
+  }
+  assert.ok(childId,'Branch selected a child');
+  await panelUntil('document.body.innerText.includes("Browser fixture finished.")&&!document.body.innerText.includes("Queue fixture answer 3")','exact branch display');
+  assert.equal(queueRounds,3,'Branch does not invoke inference');
+  assert.deepEqual(await host.dispatch('session.history',{sessionId:sourceId,maxMessages:100}),sourceHistory);
+  await panel.evaluate(`(()=>{const input=document.querySelector('#input');input.value='BROWSER_BRANCH_CHILD';input.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));})()`);
+  await panelUntil('document.body.innerText.includes("Queue fixture answer 4")&&!document.querySelector("#send").disabled','child response');
+  assert.doesNotMatch(JSON.stringify(queueInputs[3].input),/BROWSER_QUEUE_NEXT|BROWSER_QUEUE_CORRECTION/);
+  assert.equal(queueInputs[3].input.filter(item=>item.type==='function_call_output').length,5,'native tool outputs remain in child context');
+  await panel.evaluate(`(()=>{document.querySelector('#input').value='BROWSER_EDIT_DRAFT';document.querySelector('.msg-edit').click();})()`);
+  await panelUntil('document.querySelector("#input").value==="BROWSER_BRANCH_CHILD"','Edit loaded exact latest input');
+  await panel.evaluate(`(()=>{const input=document.querySelector('#input');input.value='BROWSER_EDITED_CHILD';input.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));})()`);
+  await panelUntil('document.body.innerText.includes("Queue fixture answer 5")&&document.querySelector("#input").value==="BROWSER_EDIT_DRAFT"','edited child response and original draft');
+  const editedId=(await message({type:'connect'})).sessionId;
+  assert.notEqual(editedId,childId);
+  assert.match(JSON.stringify(queueInputs[4].input),/BROWSER_EDITED_CHILD/);
+  assert.doesNotMatch(JSON.stringify(queueInputs[4].input),/BROWSER_BRANCH_CHILD|BROWSER_EDIT_DRAFT|BROWSER_QUEUE_NEXT/);
+  await panel.call('Page.reload');
+  await panelUntil('document.body.innerText.includes("BROWSER_EDITED_CHILD")&&document.body.innerText.includes("Queue fixture answer 5")','edited history after reload');
+  assert.equal((await message({type:'connect'})).sessionId,editedId);
+  assert.equal(queueRounds,5,'reload does not repeat edited submission');
+
+
 });

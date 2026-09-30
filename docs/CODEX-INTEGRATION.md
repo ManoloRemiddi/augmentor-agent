@@ -891,8 +891,8 @@ closed turn and uses inclusive `lastTurnId`; Edit requires the initial user item
 and uses exclusive `beforeTurnId`. Editing a steered input or branching from an
 intermediate answer is rejected, rather than approximated with extra or missing
 history. The pinned schema/runtime, not an assumed generic API, qualifies the
-experimental exclusive boundary. Existing native/Browser Branch/Edit capability
-flags remain false until client integration and actual UI acceptance are complete.
+experimental exclusive boundary. At this host-only checkpoint, native/Browser Branch/Edit capability flags stayed
+false. The following client checkpoint enables the controls.
 
 A short-lived app-server creates the fork in the same native runtime store, then
 closes to release its writer before the child worker resumes. The parent worker
@@ -926,3 +926,44 @@ Previous Browser source `b562a36` passed
 Its [Debian workflow](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36751788807)
 passed application checks and failed on the known unreviewed Codex executable
 packaging gate. The gate remains enforced. This fork checkpoint needs its own CI.
+
+
+## Desktop and Browser exact Branch/Edit controls
+
+Both Codex clients now enable the existing transcript Branch and latest-input
+Edit controls. Browser attaches its native bridge to the child and restores its
+history and queue before selecting it. Native uses the selected harness preset
+for child IDs, preserves the source conversation and keeps the existing draft
+restoration behavior. No interface layout is replaced. Exact-turn restrictions
+from the host apply: intermediate answers and steered inputs cannot be silently
+converted to approximate cuts. Rejected cuts report an error and leave the source.
+
+Each client persists its pending source/message/mode/child identity before the
+fork request. A retry after a lost reply reuses that identity. Native records it
+in the named window's private session file with file/directory flushes. Browser
+uses extension local storage and commits selection plus pending-intent removal
+in one storage update. Storage failure prevents a new fork request. Another
+boundary cannot overwrite an unresolved intent. `session.branchStatus` reports
+in-flight, saved or authoritative absent state; only absence allows a failed
+intent to be discarded. A native child with an unconfirmed creation record
+still requires the separate lifecycle reconciliation work described above.
+
+The real offscreen Qt proof activates rendered transcript anchors through the
+actual Window/Controller/adapter/IPC path, then sends an edited first input with
+Enter. It checks exact child history, source preservation, saved selection and
+restoration of the preceding composer draft. It waits for Send to become enabled
+after asynchronous navigation before pressing Enter. The loaded Linux Chromium
+proof clicks Branch/Edit, sends into both children, inspects actual synthetic
+provider requests for inherited tool outputs/excluded later messages, restores
+the original draft, and reloads the panel without repeating the edited prompt.
+These use pinned Codex and synthetic Responses; physical pointer, live-provider
+and installed/macOS UI qualification are separate.
+
+Build/type checks, **302 root Node** and **55 Browser** tests pass. The full native suite ran
+569 tests: 567 passed and two macOS-only checks were skipped on Linux. Focused
+client tests cover persisted retry identity, authoritative rejection and failed
+storage. Prior host source `d5209a3` passed
+[macOS CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36753787500).
+Its [Debian run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36753787417)
+passed application checks and still refused the unreviewed Codex executable at
+packaging. This source change does not update installed applications.

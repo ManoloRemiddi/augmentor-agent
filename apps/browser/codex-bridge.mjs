@@ -71,7 +71,7 @@ async function request(method, params = {}, id) {
     selection = {provider: params.provider, model: params.model}; await c.call('models.validate', selection);
     await mkdir(workspace, {recursive: true, mode: 0o700});
     const saved = await c.call('chats.saved');
-    return {serverInfo: {home: homedir(), harness: 'codex', capabilities: {branch: false, edit: false, memory: false, voice: false, browserTools: true, homeTools: true, queue: true}, augmentor: {chatCwd: workspace, agentPreset: preset, saved: saved.saved}}};
+    return {serverInfo: {home: homedir(), harness: 'codex', capabilities: {branch: true, edit: true, memory: false, voice: false, browserTools: true, homeTools: true, queue: true}, augmentor: {chatCwd: workspace, agentPreset: preset, saved: saved.saved}}};
   }
   if (method === 'session.create') {
     if (!selection) throw new Error('Select a Codex connection before starting a chat.');
@@ -87,13 +87,18 @@ async function request(method, params = {}, id) {
     await attach(params.sessionId); selection = row.selection;
     return {attached: true, running: row.running === true};
   }
+  if (method === 'session.branch') {
+    const row = await c.call(method, params);
+    await attach(row.sessionId); selection = row.selection;
+    return row;
+  }
   if (method === 'session.prompt') {if (currentSession !== params.sessionId) await attach(params.sessionId); return c.call(method, {...params, requestId: params.requestId ?? randomUUID()});}
   if (method === 'session.selectModel') {const result = await c.call(method, params); selection = result.current; return result;}
   if (method === 'session.list') {
     const {items} = await c.call(method); return {items: items.map(row => ({...row, projections: {values: {title: row.title}}})), total: items.length};
   }
   if (['augmentor/save', 'augmentor/unsave', 'augmentor/state'].includes(method)) return {ok: true, ...await c.call('chats.saved', {action: method.split('/')[1], sessionId: params.sessionId})};
-  if (['session.queue', 'session.updateQueue', 'session.cancel', 'session.rename', 'session.models', 'session.history', 'settings.describe'].includes(method)) return c.call(method, params);
+  if (['session.branchStatus', 'session.queue', 'session.updateQueue', 'session.cancel', 'session.rename', 'session.models', 'session.history', 'settings.describe'].includes(method)) return c.call(method, params);
   if (method === 'shutdown') {connection?.close(); setTimeout(() => process.exit(0), 30); return {ok: true};}
   throw new Error('This Codex browser capability is not yet available: ' + method);
 }

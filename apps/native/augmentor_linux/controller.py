@@ -72,6 +72,7 @@ class Controller(QObject):
         self.preparing = False
         self.generation = None
         self.selection = None
+        self.pending_branch = None
         self.read_only = False
         self.saved_ids = set()
         self.loaded_events = []
@@ -87,6 +88,7 @@ class Controller(QObject):
                 if state.get('endpoint') == self.client.base and (state.get('session') is None or isinstance(state.get('session'),str) and re.fullmatch(r'[a-zA-Z0-9_-]{1,128}', state['session'])):
                     self.session = state['session']
                     self.selection = state.get('selection')
+                    if self.harness=='codex':self.pending_branch=state.get('pendingBranch')
             except (OSError, ValueError, TypeError):
                 pass
 
@@ -95,9 +97,14 @@ class Controller(QObject):
             return
         self.state_file.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
         with tempfile.NamedTemporaryFile(mode='w', dir=self.state_file.parent, delete=False) as file:
-            json.dump({'endpoint': self.client.base, 'session': self.session, 'selection':self.selection}, file)
+            json.dump({'endpoint': self.client.base, 'session': self.session, 'selection':self.selection, **({'pendingBranch':self.pending_branch} if self.harness=='codex' else {})}, file)
+            file.flush();os.fsync(file.fileno())
             temporary = file.name
         os.replace(temporary, self.state_file)
+        if self.harness=='codex':
+            directory=os.open(self.state_file.parent,os.O_RDONLY)
+            try:os.fsync(directory)
+            finally:os.close(directory)
 
     def new_chat(self):
         if self.running or self.navigating or self.repairing or self.recovery_lock.locked():
@@ -178,16 +185,35 @@ class Controller(QObject):
         self.stream=None;self.connected=False
         self.session=row['sessionId'];self.read_only=False
         self.loaded_events=[];self.has_more=False
-        self.selection=row['selection'];self.save_session()
+        self.selection=row['selection'];self.pending_branch=None;self.save_session()
         self.session_info.emit(dict(row,readOnly=False))
         self.selection_changed.emit(self.selection)
         self.load_page();self.subscribe(self.session)
 
+    def request_branch(self,source,seq,mode):
+        request={'sessionId':source,'newSessionId':self.preset+'-'+uuid.uuid4().hex,'messageSeq':seq,'mode':mode}
+        if self.harness=='codex':
+            if self.pending_branch:
+                if any(self.pending_branch.get(key)!=request[key] for key in ('sessionId','messageSeq','mode')):
+                    raise ContractError('A previous branch is not confirmed. Retry its original message action before creating another branch.')
+                request=dict(self.pending_branch)
+            else:
+                self.pending_branch=request
+            self.save_session()
+        try:return self.client.call('session.branch',request)
+        except Exception:
+            if self.harness=='codex':
+                try:
+                    if self.client.call('session.branchStatus',{'newSessionId':request['newSessionId']}).get('status')=='absent':
+                        self.pending_branch=None;self.save_session()
+                except Exception:pass  # No authoritative absence: preserve the original identity.
+            raise
+
     def branch(self,seq):
         if not self.session or self.read_only or not self.online:return
-        source=self.session;target='augmentor-linux-pi-'+uuid.uuid4().hex
+        source=self.session
         def work():
-            row=self.client.call('session.branch',{'sessionId':source,'newSessionId':target,'messageSeq':seq,'mode':'reply'})
+            row=self.request_branch(source,seq,'reply')
             self.attach_branch(row)
             self.status.emit('Branched into a new chat')
         self.navigate(work)
@@ -458,7 +484,7 @@ class Controller(QObject):
                     return
                 if edit_from:
                     if edit_from['sessionId']!=self.session:raise ContractError('The conversation changed. Choose Edit again.')
-                    row=self.client.call('session.branch',{'sessionId':self.session,'newSessionId':self.preset+'-'+uuid.uuid4().hex,'messageSeq':edit_from['seq'],'mode':'edit'})
+                    row=self.request_branch(self.session,edit_from['seq'],'edit')
                     self.attach_branch(row)
                     if cancelled.is_set():return
                 if not self.session:

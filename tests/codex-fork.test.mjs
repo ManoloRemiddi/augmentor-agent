@@ -129,6 +129,8 @@ test('host branches preserve native ownership, retry identity and independent hi
   const reply=events.find(event=>event.type==='assistant/message'),user=events.find(event=>event.type==='user/message');
   const params={sessionId:'parent',newSessionId:'child',messageSeq:reply.seq,mode:'reply'};
   const first=host.dispatch('session.branch',params),duplicate=host.dispatch('session.branch',params);
+  assert.equal((await host.dispatch('session.branchStatus',{newSessionId:'child'})).status,'creating');
+  assert.equal((await host.dispatch('session.branchStatus',{newSessionId:'missing'})).status,'absent');
   await assert.rejects(host.dispatch('session.prompt',{sessionId:'parent',requestId:'blocked',content:[{type:'text',text:'must not enter source'}]}),/branch/);
   await assert.rejects(host.dispatch('host.prepareShutdown',{}),/active/);
   const [child,repeated]=await Promise.all([first,duplicate]);assert.deepEqual(child,repeated);assert.equal(forkCalls,1);
@@ -136,6 +138,7 @@ test('host branches preserve native ownership, retry identity and independent hi
   assert.equal((await host.dispatch('session.queue',{sessionId:'parent'})).items.length,1);
   assert.equal((await host.dispatch('session.queue',{sessionId:'child'})).operations.length,0);
   await host.dispatch('session.branch',params);assert.equal(forkCalls,1);
+  assert.equal((await host.dispatch('session.branchStatus',{newSessionId:'child'})).status,'ready');
   await assert.rejects(host.dispatch('session.branch',{...params,messageSeq:user.seq,mode:'edit'}),/different request/);
   assert.deepEqual(await history('parent'),before);
   assert.doesNotMatch(JSON.stringify(await history('child')),/SYNTHETIC_SOURCE_SECOND/);
@@ -169,4 +172,37 @@ test('host branches preserve native ownership, retry identity and independent hi
   await host.close();host=open();
   await assert.rejects(host.dispatch('session.branch',{...params,newSessionId:'unknown'}),/unknown outcome/);
   assert.equal(forkCalls,calls,'an uncertain fork is never repeated');
+});
+
+test('native Qt transcript Branch/Edit and Enter create exact children through the host', {timeout:30000},async t=>{
+  const {CodexHost}=await import('../dist/codex-runtime/src/host.js');
+  const {CodexIpcServer}=await import('../dist/codex-runtime/src/ipc.js');
+  const {spawn}=await import('node:child_process');
+  const {fileURLToPath}=await import('node:url');
+  const root=mkdtempSync(join(process.platform==='darwin'?'/tmp':tmpdir(),'codex-ui-fork-')),requests=[];
+  const server=createServer(async(req,res)=>{
+    let raw='';for await(const chunk of req)raw+=chunk;requests.push(JSON.parse(raw));
+    const item={id:'answer-'+requests.length,type:'message',role:'assistant',status:'completed',content:[{type:'output_text',text:'Native answer '+requests.length,annotations:[]}]};
+    res.writeHead(200,{'content-type':'text/event-stream'});
+    for(const frame of [{type:'response.created',response:{id:'r',status:'in_progress',output:[]}},{type:'response.output_item.added',output_index:0,item},{type:'response.output_item.done',output_index:0,item},{type:'response.completed',response:{id:'r',status:'completed',output:[item]}}])res.write('data: '+JSON.stringify(frame)+'\n\n');
+    res.end();
+  });
+  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+  const host=new CodexHost({root:join(root,'host'),resolveProfile:async id=>({id,revision:1,connection:{kind:'local',model:'fixture',endpoint:`http://127.0.0.1:${server.address().port}/v1`}})});
+  const ipc=new CodexIpcServer(host,join(root,'host.sock'));let child;
+  t.after(async()=>{if(child&&child.exitCode===null&&child.signalCode===null)child.kill('SIGKILL');await ipc.close();await host.close();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));rmSync(root,{recursive:true,force:true});});
+  await ipc.listen();await host.create({sessionId:'native-fork-source',profileId:'fixture',cwd:root});
+  for(const text of ['NATIVE_SOURCE_FIRST','NATIVE_SOURCE_SECOND']){
+    const done=Promise.withResolvers();const listener=(id,frame)=>{if(id==='native-fork-source'&&frame.payload?.event?.type==='turn/end'){host.off('event',listener);done.resolve();}};
+    host.on('event',listener);
+    await host.dispatch('session.prompt',{sessionId:'native-fork-source',requestId:text,content:[{type:'text',text}]});await done.promise;
+  }
+  const home=join(root,'ui-home');mkdirSync(home,{mode:0o700});
+  child=spawn(process.env.AUGMENTOR_PYTHON??'python3',[fileURLToPath(new URL('./fixtures/codex/native-fork.py',import.meta.url))],{env:{...process.env,HOME:home,XDG_CONFIG_HOME:join(home,'config'),XDG_DATA_HOME:join(home,'data'),XDG_STATE_HOME:join(home,'state'),AUGMENTOR_WINDOW_ID:'main',AUGMENTOR_CODEX_STATE:join(root,'host'),AUGMENTOR_CODEX_SOCKET:ipc.socketPath,AUGMENTOR_CODEX_NO_AUTOSTART:'1',PYTHONPATH:fileURLToPath(new URL('../apps/native',import.meta.url)),QT_QPA_PLATFORM:'offscreen'},stdio:['ignore','pipe','pipe']});
+  let output='',errors='';child.stdout.on('data',chunk=>output+=chunk);child.stderr.on('data',chunk=>errors+=chunk);
+  const code=await new Promise((resolve,reject)=>{child.on('error',reject);child.on('exit',resolve);});
+  assert.equal(code,0,errors);assert.match(output,/"nativeFork": "passed"/);
+  assert.equal(requests.length,3,'only original turns and explicit edited input run inference');
+  assert.match(JSON.stringify(requests[2].input),/NATIVE_EDITED_FIRST/);
+  assert.doesNotMatch(JSON.stringify(requests[2].input),/NATIVE_SOURCE_FIRST|NATIVE_SOURCE_SECOND|RESTORED_DRAFT/);
 });

@@ -8,7 +8,7 @@ from ..pi_client import Connection, ContractError
 class CodexAdapter:
     harness = 'codex'
     preset = 'augmentor-linux-codex'
-    capabilities = {'branch': False, 'edit': False, 'memory': False, 'voice': False}
+    capabilities = {'branch': True, 'edit': True, 'memory': False, 'voice': False}
     supports_queue = True
 
     def __init__(self, base=None):

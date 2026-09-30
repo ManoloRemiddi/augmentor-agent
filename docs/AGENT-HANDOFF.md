@@ -2,6 +2,22 @@
 
 # Start here: agent handoff
 
+## September 30 Codex Branch/Edit client checkpoint
+
+[Desktop/Browser Branch/Edit](CODEX-INTEGRATION.md#desktop-and-browser-exact-branchedit-controls)
+now enables the existing transcript controls with persistent request identity,
+child attachment and exact host boundaries. Pending intent survives client
+restart; only authoritative absence clears rejected creation. Real offscreen
+Qt and loaded Chromium proofs cover branching, first/latest input edits,
+original-history preservation, tool-context inheritance, draft restoration and
+reload without duplicate submission. Build/type, 302 root Node and 55 Browser
+tests pass; the full native suite ran 569 tests, with 567 passing and two
+macOS-only skips. A repeated Qt proof now waits for asynchronous Send readiness.
+Prior `d5209a3` passed both Mac jobs; Debian checks passed before the known
+binary-review packaging failure. Installed applications remain unchanged.
+Continue unknown-creation reconciliation and the remaining C0–C9 requirements;
+subscription login, full memory/voice, packaging and live/installed gates remain.
+
 ## September 30 Codex exact fork host checkpoint
 
 [Exact fork host foundation](CODEX-INTEGRATION.md#exact-fork-host-foundation)

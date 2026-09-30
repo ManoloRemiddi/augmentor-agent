@@ -353,7 +353,7 @@ export class CodexHost extends EventEmitter {
       return {maintenance: false};
     }
     const readable = ['host.describe', 'profiles.list', 'models.list', 'session.list', 'session.models',
-      'settings.describe', 'session.describe', 'session.history'];
+      'settings.describe', 'session.describe', 'session.history', 'session.branchStatus'];
     if (this.maintenance && !readable.includes(method)) throw new Error('Codex host is paused for maintenance.');
     if (this.branches.size && method !== 'session.branch' && !readable.includes(method)) throw new Error('Codex is creating a conversation branch.');
     this.activeRequests++;
@@ -403,9 +403,13 @@ export class CodexHost extends EventEmitter {
         if (profile.connection.model !== params.model) throw new Error('The selected model does not match this Codex connection profile.');
         return {valid: true, validation: 'configuration-only'};
       }
-      case 'host.describe': return {pid: process.pid, harness: 'codex', protocol: CODEX_PROTOCOL, version: RELEASE.version, maintenance: this.maintenance, capabilities: {branch: false, edit: false, memory: false, voice: false, browserTools: true, homeTools: true, desktopTools: desktopCapabilities().available}, desktopActive: this.desktop.active, workers: this.workers.size};
+      case 'host.describe': return {pid: process.pid, harness: 'codex', protocol: CODEX_PROTOCOL, version: RELEASE.version, maintenance: this.maintenance, capabilities: {branch: true, edit: true, memory: false, voice: false, browserTools: true, homeTools: true, desktopTools: desktopCapabilities().available}, desktopActive: this.desktop.active, workers: this.workers.size};
       case 'session.create': {const meta = await this.create(params); return {...this.row(meta), threadId: meta.threadId};}
       case 'session.branch': return this.branch(params);
+      case 'session.branchStatus': {
+        const id = identifier(params.newSessionId), meta = this.metadata.get(id);
+        return {status: this.branches.has(id) ? 'creating' : meta?.status ?? 'absent'};
+      }
       case 'session.list': {const items = [...this.metadata.values()].filter(meta => meta.status === 'ready').map(meta => this.row(meta)); return {items, total: items.length};}
       case 'session.models': {const meta = this.meta(params.sessionId); return {current: {provider: meta.profileId, model: meta.model}};}
       case 'session.selectModel': {

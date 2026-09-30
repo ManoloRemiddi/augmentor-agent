@@ -19,6 +19,7 @@ import {
   saveSessionId,
   clearStoredSessionId,
   saveSelection,
+  SESSION_STORAGE_KEY, MODEL_STORAGE_KEY,
 } from './state.mjs'
 import {
   ensurePort,
@@ -30,6 +31,7 @@ import {
 import { openSettingsTab } from './settings-tab.mjs'
 import {approvalPresenters} from './approval-presenters.mjs'
 import { overlayFade } from './overlay.mjs'
+import {prepareBranch,finishBranch} from './branch-request.mjs'
 
 // The DSH picker's curation rides every catalog reply: the panel's picker
 // shows the same Pinned top section as the DSH app (empty lists when the
@@ -129,15 +131,24 @@ export function handlePanelMessage(msg, sender, sendResponse) {
   }
   if(msg?.type==='message/branch'){
     if(msg.sourceSession&&msg.sourceSession!==state.sessionId){sendResponse({ok:false,error:'The conversation changed; select the action again.'});return}
-    if(state.running||state.mutating||!state.capabilities.branch){sendResponse({ok:false,error:'Branching is unavailable for this chat.'});return}
+    if(state.phase!=='ready'||!state.sessionReady||state.panelViewSession||state.running||state.mutating||!state.capabilities[msg.mode==='edit'?'edit':'branch']){sendResponse({ok:false,error:'Branching is unavailable for this chat.'});return}
     state.mutating=true
-    request('session.branch',{sessionId:state.sessionId,newSessionId:'augmentor-'+crypto.randomUUID(),messageSeq:msg.seq,mode:msg.mode??'reply'}).then(async row=>{
-      state.sessionId=row.sessionId;state.sessionReady=true;saveSessionId(row.sessionId);state.selection=row.selection;saveSelection(row.selection)
-      state.log=[];state.panelViewSession=null
+    const codex=state.harness==='codex'
+    let intent={sessionId:state.sessionId,newSessionId:'augmentor-'+crypto.randomUUID(),messageSeq:msg.seq,mode:msg.mode??'reply'}
+    ;(async()=>{
+      if(codex)intent=await prepareBranch(chrome.storage.local,intent)
+      const row=await request('session.branch',intent)
       const history=await request('session.history',{sessionId:row.sessionId,maxMessages:100})
+      const queue=codex?{sessionId:row.sessionId,...await request('session.queue',{sessionId:row.sessionId})}:null
+      if(codex)await finishBranch(chrome.storage.local,intent,{[SESSION_STORAGE_KEY+'-codex']:row.sessionId,[MODEL_STORAGE_KEY+'-codex']:row.selection})
+      state.sessionId=row.sessionId;state.sessionReady=true;saveSessionId(row.sessionId);state.selection=row.selection;saveSelection(row.selection)
+      state.log=[];state.panelViewSession=null;state.queue=queue
       for(const item of history.events??[])log('event',{sessionId:row.sessionId,event:item.event})
       broadcast();sendResponse({ok:true,sessionId:row.sessionId})
-    }).catch(error=>sendResponse({ok:false,error:error.message})).finally(()=>state.mutating=false);return true
+    })().catch(async error=>{
+      if(codex)try{if((await request('session.branchStatus',{newSessionId:intent.newSessionId})).status==='absent')await finishBranch(chrome.storage.local,intent)}catch{}
+      sendResponse({ok:false,error:error.message})
+    }).finally(()=>state.mutating=false);return true
   }
   if (msg?.type === 'promptSettings') {
     const endpoint = state.endpoint || 'http://127.0.0.1:3080'

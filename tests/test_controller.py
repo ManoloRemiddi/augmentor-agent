@@ -18,7 +18,8 @@ class ControllerTests(unittest.TestCase):
             self.assertEqual(controller.preset, 'augmentor-linux-codex')
             self.assertEqual(controller.client.base, root+'/codex.sock')
             self.assertFalse(controller.capabilities['memory'])
-            self.assertFalse(controller.capabilities['branch'])
+            self.assertTrue(controller.capabilities['branch'])
+            self.assertTrue(controller.capabilities['edit'])
             self.assertEqual(str(controller.client.state_path()), root+'/session.json')
 
     def test_retired_harness_is_rejected_before_a_client_can_start(self):

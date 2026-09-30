@@ -196,5 +196,23 @@ The host case additionally verifies duplicate identity, concurrent admission,
 paused-parent queues, descendant ownership, restart, profile changes, lost native
 acknowledgment and history mismatch without another fork. No real account or
 model credentials are required. Run after `npm run build`; these tests are in
-the root Node suite. UI Branch/Edit acceptance and unknown-creation reconciliation
-remain separate requirements; the product capabilities are still disabled.
+the root Node suite. The following client proof enables the controls; unknown-creation reconciliation
+remains a separate requirement.
+
+
+### Codex Branch/Edit clients
+
+The third `codex-fork.test.mjs` case launches `fixtures/codex/native-fork.py`
+with the actual Qt Window/Controller/adapter/IPC host. It activates rendered
+transcript actions, waits for asynchronous Send readiness and uses Enter to
+edit the first input on an empty child. It verifies source history, draft
+restoration and persisted child selection. Set `AUGMENTOR_PYTHON` to the test
+Python with PySide6/QtTest, as for the native queue fixture.
+
+`codex-browser-chromium.test.mjs` additionally clicks the loaded panel's Branch
+and Edit controls, checks model-visible inherited tools and omitted later input,
+and reloads the edited child without another submission. Both proofs use the
+real pinned binary with a synthetic provider and isolated user state.
+`test_codex_branch.py` and Browser `branch-request.test.mjs` cover interrupted
+client recovery, identity retention and failed storage before dispatch. The
+host test distinguishes in-flight creation, ready children and absent IDs.
