@@ -192,7 +192,8 @@ export class CodexRpc extends EventEmitter {
         try {signal('SIGTERM');} catch (error) {clearTimeout(timer); reject(error);}
       });
     }
-    // A wrapper can exit before helpers that ignore TERM. Never leave that group running.
-    if (process.platform !== 'win32') signal('SIGKILL');
+    // The live guard retires helpers before exiting. Do not signal its numeric
+    // group after exit: macOS can reject that orphan-group signal, and a reused
+    // identifier would no longer establish ownership.
   }
 }

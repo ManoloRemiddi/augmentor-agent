@@ -1172,3 +1172,17 @@ Keep `bridgeId` and the service token out of model events and surface tickets.
 Do not enable Augmentor's voice capability until that end-to-end integration is
 verified. Physical audio acceptance on both platforms remains required. The
 speech source change does not deploy or change Qwen/Breeze placement/settings.
+
+
+### Guard ownership correction from macOS CI
+
+Mac run [36759527650](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36759527650)
+failed at `29cb4c9`: the old post-exit group KILL in `CodexRpc.stop` returned EPERM
+after the new guard had already retired itself and its helpers. The host no
+longer sends a group signal after its guard exits. The live guard retains cleanup
+ownership; signaling a recycled numeric group would not prove that ownership.
+Build/type checks, all 15 transport cases and all 321 root Node tests pass locally
+after this correction. The new Mac CI run must establish runner evidence; these
+Linux checks do not prove the Mac fix by themselves. The same source's Debian
+application checks reached the unchanged unreviewed Codex binary packaging gate
+in [36759527576](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36759527576).

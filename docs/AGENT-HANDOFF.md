@@ -2,6 +2,17 @@
 
 # Start here: agent handoff
 
+## September 30 Mac guard cleanup correction
+
+Mac `29cb4c9` CI exposed a redundant post-exit group KILL returning EPERM. The
+[ownership correction](CODEX-INTEGRATION.md#guard-ownership-correction-from-macos-ci)
+leaves cleanup with the live guard and avoids signaling a numeric group after
+its owner exits. Build/type and 321 root tests pass locally, including both actual
+native command crash cases. Await the new Mac run before claiming parity. Debian
+at `29cb4c9` reached the existing unreviewed Codex binary packaging gate.
+Continue the C7 trusted voice client and native/Browser wiring against Resonant
+Voice PR #3 (`7267ad8`), while retaining the full remaining C0–C9 requirements.
+
 ## September 30 native crash proof and speech dependency
 
 [Crash and speech checkpoint](CODEX-INTEGRATION.md#native-command-crash-qualification-and-speech-dependency)
