@@ -10,7 +10,8 @@ a Codex Browser I/O window. Both banks cache observations and generated pages;
 a page-only marker reaches the next native request. Startup/idle/restart cause
 no extra inference, and the complete job receipt/remaining budget survive restart.
 All seven focused real-host/companion cases and all 357 root Node tests pass
-with both Docker proofs enabled. Replies are synthetic; live classification/page quality and full C0–C9 remain
+with both Docker proofs enabled. Replies are synthetic; live classification/page
+quality and full C0–C9 remain open. The implementation checkpoint is `7dad3f2`.
 `f4f8d87` passed both Mac jobs and Debian application/Home checks; Debian
 packaging still stops at the unreviewed Codex executable notice gate. No installed
 app/settings, private speech source or model placement changed.
