@@ -76,6 +76,12 @@ Five focused maintenance cases and the standalone socket proof cover these races
 The root Node suite passed 239 tests before the fifth focused case was added.
 Installer orchestration and installed upgrade/rollback remain outstanding.
 
+Subsequent CI exposed an upstream Git helper surviving its Codex parent and racing
+fixture cleanup on Linux/macOS. Workers now own a POSIX process group and stop its
+remaining members on close or wrapper failure. All 242 root Node tests pass locally,
+including real Codex and two TERM-resistant descendant cases. Follow the next CI
+run for macOS evidence; this does not resolve the native packaging inventory gate.
+
 ## September 30 application SDK foundation
 
 [SDK foundation](APP-SDK.md) owns the DSH-only application contract, exact tool

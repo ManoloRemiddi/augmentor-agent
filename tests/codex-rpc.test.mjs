@@ -2,6 +2,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {once} from 'node:events';
+import {execFileSync} from 'node:child_process';
+import {setTimeout as delay} from 'node:timers/promises';
 import {fileURLToPath} from 'node:url';
 import {CodexRpc, CodexTransportError, CodexRemoteError} from '../dist/codex-runtime/src/rpc.js';
 import {runtimeOptions, installedRuntimeVersion} from '../dist/codex-runtime/src/config.js';
@@ -59,4 +61,19 @@ test('upstream request resolution revokes a still-visible approval', async t => 
   const rpc = await client(t); rpc.on('request', () => {});
   await rpc.call('ask'); await rpc.call('resolve');
   assert.throws(() => rpc.respond('approval', {decision: 'accept'}), /no longer pending/);
+});
+
+for (const mode of ['close', 'crash']) test(`Codex wrapper ${mode} stops owned descendants that ignore TERM`, {skip: process.platform === 'win32', timeout: 5000}, async t => {
+  const rpc = await client(t);
+  const {pid} = await rpc.call('descendant');
+  t.after(() => {try {process.kill(pid, 'SIGKILL');} catch {}});
+  const running = () => {
+    try {return !/^Z/.test(execFileSync('ps', ['-o', 'stat=', '-p', String(pid)], {encoding: 'utf8'}).trim());}
+    catch {return false;}
+  };
+  assert.equal(running(), true);
+  if (mode === 'close') await rpc.close();
+  else await assert.rejects(rpc.call('crash'), CodexTransportError);
+  for (let attempt = 0; attempt < 40 && running(); attempt++) await delay(25);
+  assert.equal(running(), false);
 });

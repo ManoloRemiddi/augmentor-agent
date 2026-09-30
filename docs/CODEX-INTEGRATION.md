@@ -328,3 +328,23 @@ and direct creation. The standalone host/socket proof also exercises prepare,
 rejected configuration and cancellation. These are fixture/process checks.
 Installer orchestration, maintenance ownership across process restart and actual
 upgrade/rollback remain unfinished; this endpoint alone does not qualify C1/C8.
+
+## Worker subprocess ownership and CI cleanup failure
+
+The `feaede6` [Debian run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36733028675)
+and [macOS run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36733028680)
+failed the real Codex fixture during directory cleanup: an upstream plugin-catalog
+Git helper was still writing after its parent exited. Those runs stopped before
+packaging; the earlier native-inventory failure remains a separate unresolved gate.
+
+On Linux/macOS, each Codex RPC worker now starts in its own process group. Shutdown
+signals that owned group, waits for the wrapper exit with bounded TERM-to-KILL
+escalation, then kills remaining members. An unexpected wrapper exit also triggers
+group cleanup. It does not enumerate or signal unrelated user processes. This
+covers ordinary inherited helpers; intentionally detached descendants require
+separate supervision and are not claimed covered by this mechanism.
+
+Validation: build and all 242 root Node tests pass locally, including the real
+pinned-runtime/provider/client fixture and two subprocess cases with a descendant
+that ignores TERM (normal close and unexpected wrapper crash). macOS CI after
+this correction is still required; Linux fixture success is not macOS evidence.

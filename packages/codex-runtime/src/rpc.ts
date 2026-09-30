@@ -45,6 +45,8 @@ export class CodexRpc extends EventEmitter {
     if (this.child || this.failure) throw new CodexTransportError('Codex process cannot be started twice.');
     const child = spawn(this.options.command, this.options.args, {
       cwd: this.options.cwd, env: this.options.env, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true,
+      // Own a distinct process group so wrapper/native/helper shutdown stays scoped.
+      detached: process.platform !== 'win32',
     });
     this.child = child;
     child.stdout.on('data', (chunk: Buffer) => this.receive(chunk));
@@ -147,7 +149,7 @@ export class CodexRpc extends EventEmitter {
     for (const pending of this.pending.values()) {clearTimeout(pending.timer); pending.reject(error);}
     this.pending.clear(); this.serverRequests.clear();
     this.emit('failure', error);
-    if (this.child?.exitCode === null && this.child?.signalCode === null) void this.close();
+    if (this.child) void this.close();
   }
   private safeError(message: string): string {
     for (const [name, value] of Object.entries(this.options.env)) {
@@ -169,11 +171,22 @@ export class CodexRpc extends EventEmitter {
       for (const pending of this.pending.values()) {clearTimeout(pending.timer); pending.reject(this.failure);}
       this.pending.clear(); this.serverRequests.clear();
     }
-    if (child.exitCode !== null || child.signalCode !== null || !child.pid) return;
-    await new Promise<void>(resolve => {
-      const timer = setTimeout(() => child.kill('SIGKILL'), 2000);
-      child.once('exit', () => {clearTimeout(timer); resolve();});
-      child.kill('SIGTERM');
-    });
+    if (!child.pid) return;
+    const signal = (value: NodeJS.Signals): void => {
+      if (process.platform === 'win32') {child.kill(value); return;}
+      try {process.kill(-child.pid!, value);}
+      catch (error) {if ((error as NodeJS.ErrnoException).code !== 'ESRCH') throw error;}
+    };
+    if (child.exitCode === null && child.signalCode === null) {
+      await new Promise<void>((resolve, reject) => {
+        const timer = setTimeout(() => {
+          try {signal('SIGKILL');} catch (error) {reject(error);}
+        }, 2000);
+        child.once('exit', () => {clearTimeout(timer); resolve();});
+        try {signal('SIGTERM');} catch (error) {clearTimeout(timer); reject(error);}
+      });
+    }
+    // A wrapper can exit before helpers that ignore TERM. Never leave that group running.
+    if (process.platform !== 'win32') signal('SIGKILL');
   }
 }
