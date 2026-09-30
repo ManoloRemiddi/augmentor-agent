@@ -31,7 +31,9 @@ DSH personal surfaces now share the agent, tools and speech engine; see [shared 
 Current source/ref and qualification: [agent handoff](AGENT-HANDOFF.md).
 Dated candidate sections below retain their original version-specific evidence.
 
-Codex is an opt-in development engine. The existing local Qwen endpoint remains
+Codex is an opt-in development engine. [Native credential packaging and isolated
+Linux storage](CODEX-CREDENTIALS.md) now have positive proof; Mac Keychain
+qualification is pending. The existing local Qwen endpoint remains
 [unqualified pending a reviewed formatting change and live tool tests](CODEX-LOCAL-QWEN.md). Its [current evidence](CODEX-INTEGRATION.md)
 covers API/local profile forms, shared chat/Stop/history, approvals/questions,
 scoped Browser tools/screenshots and consented desktop tools with real Chromium

@@ -2,6 +2,19 @@
 
 # Start here: agent handoff
 
+## October 1 native credential dependencies and actual Linux proof
+
+[Secure credential correction](CODEX-CREDENTIALS.md) supplies the missing native
+Python store dependencies for future Debian/Mac packages. Five hashed Mac wheels
+have verified notices and complete target dependency edges. A real isolated
+Secret Service proof passes through actual Node/helper processes on the pinned
+Debian image, covering update/isolation/removal and cleanup. Unit and Mac package
+inventory checks pass. Mac build/bundle Keychain proofs are required in CI but
+remain pending, including the separate Browser companion without Qt. Owner
+credentials/settings and installed apps are untouched.
+The Qwen formatter/restart question is pending; do not apply the candidate without
+the owner's answer. Continue independent C0–C9 work while waiting.
+
 ## October 1 real local-provider diagnosis and unactivated candidate
 
 [Current local Qwen blocker](CODEX-LOCAL-QWEN.md) is now traced to multiple system

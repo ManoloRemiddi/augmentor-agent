@@ -53,6 +53,7 @@ jobs:
           npm run build
           AUGMENTOR_PYTHON="$PWD/.macos-build-env/bin/python3" node --test tests/codex-*.test.mjs
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_codex_credentials.py -v
+          AUGMENTOR_PYTHON="$PWD/.macos-build-env/bin/python3" node scripts/proof-codex-credentials.mjs
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_codex_desktop.py -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_codex_setup.py -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p 'test_macos*.py' -v
@@ -87,6 +88,7 @@ jobs:
           export AUGMENTOR_PI_NODE="$project/node/bin/node"
           export DSH_TEST_MODULES="$project/dsh/node_modules"
           export PATH="$project/dsh/node_modules/.bin:$project/node/bin:$PATH"
+          AUGMENTOR_PYTHON="$project/python/bin/python3" "$project/node/bin/node" "$project/scripts/proof-codex-credentials.mjs"
           "$project/python/bin/python3" -I -B scripts/dsh-setup-proof.py
           codesign --verify --deep --strict "$app"
       - name: Verify managed first run and service restart with an isolated model
@@ -96,12 +98,21 @@ jobs:
           "$project/python/bin/python3" -I -B scripts/macos-managed-setup-proof.py --app-root "$project" --out outputs/macos-managed
           "$project/python/bin/python3" -I -B scripts/macos-managed-setup-proof.py --app-root "$project" --out outputs/macos-engine-first --engine-first
           codesign --verify --deep --strict "$app"
+      - name: Verify Browser companion credentials with its isolated packaged interpreter
+        run: |
+          .macos-build-env/bin/python3 scripts/package-macos.py --component companion --out outputs/macos-companion
+          .macos-build-env/bin/python3 scripts/verify-macos-application-inventory.py outputs/macos-companion
+          app="$PWD/outputs/macos-companion/Augmentor Agent Browser Companion.app"
+          project="$app/Contents/Resources/app"
+          AUGMENTOR_PYTHON="$project/python/bin/python3" "$project/node/bin/node" "$project/scripts/proof-codex-credentials.mjs"
+          codesign --verify --deep --strict "$app"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: macos-feasibility-${{ matrix.os }}
           path: |
             outputs/macos/*.json
+            outputs/macos-companion/*.json
             outputs/macos-managed/report.json
             outputs/macos-engine-first/report.json
           retention-days: 7

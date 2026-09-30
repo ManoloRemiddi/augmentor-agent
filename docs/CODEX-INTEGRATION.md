@@ -1671,3 +1671,20 @@ requires an owner decision under the model-settings preservation instructions;
 after it, real tools/stream/Stop/resume and other-harness regression checks remain.
 `70935e8` passed both Mac jobs and Debian application/Home checks; Debian packaging
 still stops at the unreviewed Codex native executable notice gate.
+
+## Secure credential dependencies and positive Linux proof
+
+The OS credential helper was written against `keyring`, but release dependencies
+did not include it. Synthetic unit stores could not detect the installed failure.
+[The correction](CODEX-CREDENTIALS.md) declares Debian's native Secret Service
+libraries/provider and adds five complete hashed Python wheels to Mac's exact
+package inventory. Original dependency pins remain unchanged. A new proof uses
+actual `OsCredentialStore`, helper processes and an isolated real Secret Service
+on the pinned Debian image. Roundtrip, update, reference isolation, repeated
+removal and cleanup pass; no owner wallet/configuration or provider credential
+is used. The helper/unit and Mac inventory checks also pass, and all added wheel
+hashes/notices/dependency edges were verified. Both Mac jobs now require build, Desktop
+and standalone Browser companion Keychain proofs; those results remain pending. This
+qualifies isolated Linux native storage, not the owner's wallet, live OAuth,
+API-provider inference or full distribution acceptance. The local Qwen activation
+decision and all remaining C0–C9 gates stay open.

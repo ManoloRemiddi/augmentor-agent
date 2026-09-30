@@ -320,3 +320,14 @@ single-system output, retained system-image rejection and successful tool gramma
 generation using llama.cpp's actual offline tools. Source/output/unknown-block
 guard checks and Python compilation passed. This is not a live inference/tool
 qualification and does not change the accepted provider matrix.
+
+### Codex native credential storage
+
+`python3 scripts/proof-codex-secretservice.py` creates a disposable Linux session
+bus and encrypted keyring and runs the actual Node/Python store.
+`AUGMENTOR_PYTHON=/path/to/python node scripts/proof-codex-credentials.mjs` uses
+the intended interpreter and native OS backend. Both verify separate-reference
+roundtrip, update, idempotent deletion and complete cleanup with synthetic values
+only. [Release dependencies and qualification limits](../docs/CODEX-CREDENTIALS.md)
+include the actual pinned-Debian proof, five verified Mac wheels and pending Mac
+Keychain/build/bundle evidence. These are not OAuth or paid-provider tests.
