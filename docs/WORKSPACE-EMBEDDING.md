@@ -9,6 +9,10 @@ DSH remains the conversation/context/compaction owner; the existing memory
 companion remains the continuity owner. Pi remains available in the standalone
 product; embedded profiles currently support DSH.
 
+For new integrations, use the [SDK foundation contract](APP-SDK.md). Legacy
+profiles below retain compatibility behavior until explicitly migrated. SDK
+profiles use exact tool grants and cannot administer shared settings.
+
 ## Profile and application contract
 
 Owner-installed JSON profiles in `~/.config/augmentor/workspaces` specify a
@@ -25,7 +29,7 @@ Browser preset, retaining normal tools, compaction and execution recovery,
 then adds the application's job description, skill instructions and tool set.
 It does not invent a parallel agent loop. App capabilities can be direct DSH
 tools over an authenticated API; MCP is optional, not required for that path.
-The installer backs up existing preset files. Updating a profile never rewrites
+The installer keeps private before-images and a recoverable transaction journal. Updating a profile never rewrites
 conversation IDs or silently converts historical sessions to another role.
 
 The native boundary enforces cwd/preset for lists and explicit operations.

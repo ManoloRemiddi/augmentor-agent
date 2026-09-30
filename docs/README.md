@@ -4,6 +4,8 @@
 - [Immediate composer feedback and regression evidence](COMPOSER-SEND-FEEDBACK.md)
 # Documentation index
 
+- [Application SDK foundation](APP-SDK.md): DSH integration protocol, tool grants, recoverable installation and experimental voice.
+
 See [embedded Browser and specialist workspaces](WORKSPACE-EMBEDDING.md) for the product-owned iframe host, dedicated role/tool composition, scoped memory and release lifecycle.
 
 Licensing and publication: [combined Augmentor license](LICENSING.md),

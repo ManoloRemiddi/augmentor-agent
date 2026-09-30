@@ -5,6 +5,7 @@
 import {isIP} from 'node:net'
 import {loadProfile,visibleInProfile} from '../../../services/workspaces/profiles.mjs'
 export const workspaceProfile=loadProfile()
+import {guardWorkspaceMethod} from '../../../services/workspaces/policy.mjs'
 export const visibleSession=row=>workspaceProfile?visibleInProfile(workspaceProfile,row):PERSONAL_PRESETS.has(row.agentPreset)&&row.origin!=='subagent'
 export const BROWSER_PRESET='augmentor-browser-product'
 export const PERSONAL_PRESETS=new Set([BROWSER_PRESET,'augmentor-linux-product'])
@@ -30,6 +31,7 @@ export class DshBoundary{
   async sessions(){const result=await this.call('session.list',{});this.existing=new Set(result.items.map(row=>row.sessionId));const rows=result.items.filter(row=>visibleSession(row));this.rows=rows;this.known=new Set(rows.map(r=>r.sessionId));return {...result,items:rows}}
   async owns(sessionId){if(typeof sessionId!=='string')return false;if(this.known.has(sessionId))return true;await this.sessions();return this.known.has(sessionId)}
   async guard(method,p={}){
+    guardWorkspaceMethod(workspaceProfile,method,p)
     if(workspaceProfile&&method==='augmentor/memory'&&p.action==='dual.recall'){
       await this.sessions();if(!this.known.has(p.session?.replace(/^dsh:/,'')))throw Error('Memory belongs to another workspace')
     }

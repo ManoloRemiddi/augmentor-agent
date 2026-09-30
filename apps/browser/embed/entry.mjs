@@ -31,6 +31,8 @@ function connectNative(){
 function openTab({url}){const target=new URL(url,base);if(target.origin===base.origin&&target.pathname===base.pathname+'settings.html'){tell({type:'augmentor-settings',url:target.href});return Promise.resolve({id:1,windowId:1,url})}window.open(target.href,'_blank','noopener');return Promise.resolve({id:2,windowId:1,url})}
 globalThis.chrome={runtime:{id:'augmentor-embedded',getURL:path=>new URL(path,base).href,getManifest:()=>({version:profile.version,augmentorWorkspace:{id:profile.id,name:profile.name}}),connectNative,onMessage:runtimeEvents,sendMessage(message){
  if(message.type==='harness/select'&&message.harness!==profile.harness)return Promise.resolve({ok:false,error:'This workspace uses its configured DSH specialist.'})
+ if(profile.sdkProtocol&&message.type==='voice/preferences'&&!profile.voice.enabled)return Promise.resolve({ok:true,result:{enabled:false,mode:'push-to-talk'}})
+ if(profile.sdkProtocol&&message.type==='voice/start'&&!profile.voice.enabled)return Promise.resolve({ok:false,error:'Experimental voice is disabled for this workspace.'})
  if(['evt','voice/event'].includes(message.type)){runtimeEvents.emit(message);if(message.type==='evt')tell({type:'augmentor-status',online:message.phase==='ready',busy:message.running});return Promise.resolve()}
  return new Promise(resolve=>{const asynchronous=handler(message,{id:chrome.runtime.id,url:'chrome-extension://'+chrome.runtime.id+'/sidepanel.html'},resolve);if(asynchronous!==true)setTimeout(()=>resolve({ok:false,error:'Operation unavailable'}),1000)})
 }},storage:{local:storageArea(),session:storageArea(true),onChanged:storageEvents},tabs:{onActivated:eventSet(),onRemoved:eventSet(),onUpdated:eventSet(),query:async()=>[],create:openTab,update:async(id,value)=>openTab(value)},windows:{onFocusChanged:eventSet(),WINDOW_ID_NONE:-1,update:async()=>({})},sidePanel:{setPanelBehavior:async()=>{},setOptions:async()=>{}}}
@@ -46,3 +48,11 @@ window.addEventListener('online',()=>void recover());window.addEventListener('fo
 document.addEventListener('click',event=>{const a=event.target.closest('a');if(!a)return;const url=new URL(a.href,location.href);if(url.origin===profile.parentOrigin&&url.hash&&!url.pathname.startsWith(profile.publicPath)){event.preventDefault();tell({type:'augmentor-link',hash:url.hash})}},true)
 tell({type:'augmentor-ready',profile:profile.id})
 await import(location.pathname.endsWith('settings.html')?'./settings.mjs':'./sidepanel.js')
+
+// Experimental opt-in is workspace-specific; model and global speech settings stay owned by the product.
+if(profile.sdkProtocol&&location.pathname.endsWith('settings.html')){
+ const section=document.createElement('fieldset'),legend=document.createElement('legend'),label=document.createElement('label'),input=document.createElement('input');
+ legend.textContent='Experimental workspace voice';input.type='checkbox';input.checked=profile.voice.enabled;
+ label.append(input,' Enable Resonant Voice for this workspace (experimental)');section.append(legend,label);document.body.prepend(section);
+ input.onchange=async()=>{input.disabled=true;try{await api('preferences',{set:{'experimental-voice-enabled':input.checked}});profile.voice.enabled=input.checked;label.lastChild.textContent=' Enable Resonant Voice for this workspace (experimental). Reopen the agent panel to apply.'}catch{input.checked=profile.voice.enabled}finally{input.disabled=false}};
+}

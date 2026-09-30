@@ -14,6 +14,7 @@ import {memoryRequest} from './shared/memory.mjs'
 import {spawn} from 'node:child_process'
 import {loadProfile} from '../../services/workspaces/profiles.mjs'
 const workspaceProfile=loadProfile()
+import {guardWorkspaceMethod,SDK_PROTOCOL} from '../../services/workspaces/policy.mjs'
 import {fileURLToPath} from 'node:url'
 let child,compatible=false,buffer=Buffer.alloc(0)
 const reply=value=>{const b=Buffer.from(JSON.stringify(value)),h=Buffer.alloc(4);h.writeUInt32LE(b.length);process.stdout.write(Buffer.concat([h,b]))}
@@ -23,11 +24,16 @@ process.stdin.on('data',chunk=>{
   while(buffer.length>=4){
     const n=buffer.readUInt32LE(0);if(n>1024*1024)process.exit(1);if(buffer.length<n+4)return
     let first;try{first=JSON.parse(buffer.subarray(4,n+4))}catch{process.exit(1)}buffer=buffer.subarray(n+4)
+    if(first.method==='workspace.describe'){
+      if(!workspaceProfile?.sdkProtocol||first.params?.protocol!==SDK_PROTOCOL){reply({id:first.id,error:{code:'INCOMPATIBLE_RUNTIME',message:'Register an SDK v1 workspace profile before connecting'}});continue}
+      reply({id:first.id,result:{protocol:SDK_PROTOCOL,profile:workspaceProfile.id,harness:'dsh',productProtocol:PRODUCT_PROTOCOL,productVersion:RELEASE.version,tools:workspaceProfile.policy.tools,voice:{experimental:true,enabled:workspaceProfile.policy.voice}}});continue
+    }
     if(first.method==='augmentor/handshake'){
       compatible=first.params?.protocol===PRODUCT_PROTOCOL&&first.params?.version===RELEASE.version
       reply(compatible?{id:first.id,result:{protocol:PRODUCT_PROTOCOL,version:RELEASE.version}}:{id:first.id,error:{message:'Extension and companion versions differ. Update both Augmentor components, reload the extension, then reconnect.'}});continue
     }
     if(!compatible){reply({id:first.id,error:{message:'Check Augmentor component compatibility before connecting.'}});continue}
+    try{guardWorkspaceMethod(workspaceProfile,first.method,first.params??{})}catch(error){reply({id:first.id,error:{code:'PERMISSION_DENIED',message:error.message}});continue}
     // Shared prompts work even while harness discovery/connection is unavailable.
     if(first.method==='augmentor/surface'){surfaceRequest(first.params??{}).then(result=>reply({id:first.id,result}),error=>reply({id:first.id,error:{message:error.message}}));continue}
     if(first.method==='augmentor/dsh'){dshSetup(first.params??{}).then(result=>reply({id:first.id,result}),error=>reply({id:first.id,error:{message:error.message}}));continue}
