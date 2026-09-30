@@ -2,6 +2,22 @@
 
 # Start here: agent handoff
 
+## October 1 native V8 sources and original notice collection
+
+[Native source collection](CODEX-PACKAGING.md#october-1-native-source-collection-and-v8-inputs)
+now verifies 28 public archives and retains 3,817 original notices plus 25 pinned
+source/build files. Eleven additional sources trace the embedded V8 dependencies;
+the module lock selects Abseil 20250814.1, and its registry metadata/hash are
+verified before fetching the archive. Two full native reports are byte-identical.
+Contained aliases have their original targets retained; no filesystem links are
+created and no downloaded source code is executed. Three focused native-source tests pass.
+The compact committed inventory is reproducible from the collector. Native linked
+coverage, unresolved crate/generated-source notices and actual packaging remain
+release gates. `2641227` passed both Mac jobs and Debian application/credential/Home
+checks, with the same Debian native Codex notice failure. Installed apps, private
+speech, credentials and GPU/model settings remain unchanged; Qwen activation still
+awaits the owner's answer. Continue full C0–C9, not a narrowed chat-only milestone.
+
 ## October 1 native store platform results and packaging source identity
 
 `0726234` passed both Mac 14/26 jobs, including actual Keychain roundtrip/update/

@@ -305,6 +305,13 @@ drift but does not grant release clearance. Debian's unknown-native-file gate is
 unchanged. C8 remains incomplete until notice/source coverage, Mac parity and real
 artifact execution/rollback are qualified.
 
+The [native source collection](CODEX-PACKAGING.md#october-1-native-source-collection-and-v8-inputs)
+now verifies 28 archives, including exact V8/Chromium dependencies and the locked
+Abseil revision, and retains 3,817 original notices plus 25 pinned recipes/source
+files. Two full reports are byte-identical. This supplies build/source inputs;
+linked-binary coverage, unresolved attribution and final installer acceptance
+remain incomplete. No native-file gate is bypassed.
+
 ## Shared persona and instruction snapshots
 
 New Codex chats load the maintained `config/agent-persona.md` into the supported

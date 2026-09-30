@@ -29,6 +29,10 @@ Codex component. Do not treat a matching hash as a complete license review.
 - [Native source inputs](../release/codex/native-sources.json): dependency versions,
   upstream recipe provenance and retrieved archive checksums. This is not yet a
   complete inventory of the native code linked into Rust/V8/compiler binaries.
+- [Native source notices](../release/codex/native-source-notices.json): compact
+  receipt for the actual native collection, including notice counts, full-record
+  hashes, original top-level notices and contained aliases. No license text is
+  reconstructed from metadata.
 
 The bundled patched zsh requires glibc 2.38. That is compatible with the documented
 Debian 13 target, but does not qualify older Linux distributions or the complete
@@ -42,6 +46,7 @@ an isolated directory. Retain the original source and lockfile. Use:
 
 ```sh
 python3 scripts/collect-codex-sources.py --source <extracted-source> --cache <archive-cache> --out <new-collection-directory>
+python3 scripts/collect-codex-native-sources.py --source <extracted-source> --cache <native-archive-cache> --out <new-native-collection-directory>
 python3 scripts/verify-codex-native.py
 PYTHONPATH=apps/native QT_QPA_PLATFORM=offscreen python3 -m unittest discover -s tests -p 'test_codex_*.py' -v
 ```
@@ -134,3 +139,37 @@ Required next steps before accepting the payload into an installer:
 No installed application, runtime cache, model service or global Codex CLI was
 changed by this audit. The large downloaded source archives are local build inputs;
 the durable public handoff is the pinned manifest, collector and verification code.
+
+## October 1 native source collection and V8 inputs
+
+The native catalog now includes 28 verified archives. Eleven newly retrieved
+inputs account for V8 15.0.245.2, Highway 1.2.0, fast_float 8.0.2, simdutf 7.7.0,
+the exact Chromium libc++/libc++abi/llvm-libc revisions, ICU, Dragonbox, FP16 and
+Abseil. Archive checksums come from the pinned Codex module/patch files or the
+actual exact-commit Gitiles archive. Abseil is **20250814.1**, selected by the
+module lock rather than V8's initial 20250814.0 declaration; its registry source
+metadata was checked against the module lock before retrieving its archive.
+Additional compressed inputs total 116,626,737 bytes and remain in the local cache.
+
+The source pin now retains 25 original source/build files, including the native
+build scripts, V8 manifests, build definitions and upstream patches. The new
+collector rechecks the archive and source-file hashes, retains original notices
+and copies the pinned recipes into a separate artifact. It supports rootless
+Gitiles snapshots, reads each archive once and records contained notice aliases
+without creating filesystem links. Escaping links, wrong roots, duplicate files
+and unsafe paths are rejected. Three focused native-source tests pass.
+
+The actual collection retains 3,817 original notice files across all 28 archives,
+totaling 20,451,780 bytes. Every archive has notice text, and every observed notice
+alias has its target retained. Two full collections produce byte-identical
+`collection.json` reports. The committed compact receipt matches the collector's
+`native-source-notices.json` output. Neither the collector nor its manifests grant
+redistribution approval or execute downloaded code.
+
+This improves corresponding source/notice inputs; it does **not** prove complete
+linked-binary coverage. Musl/compiler runtime coverage, final crate attribution,
+generated source review, Mac payload correspondence and installer execution/
+migration/rollback remain open. `2641227` passed both Mac jobs and Debian application/
+credential/Home checks; Debian packaging still stops at the same unreviewed Codex
+executable notice gate. The installed app, private Resonant Voice source and live
+Qwen/Breeze services are unchanged.

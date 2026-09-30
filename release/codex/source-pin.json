@@ -8,6 +8,26 @@
     "codex-rs/Cargo.lock": "4fab6fe99180e2b8f305bd4b33c1b4bd825e3fa4cdef1045be750843bd3d431e",
     ".github/workflows/rust-release.yml": "150b407712ea66d4310d0286ca4054323586ef578c898092032ca205b4c55059",
     ".github/workflows/rust-release-zsh.yml": "3a972c675740ea6378ae6320a0f49b6dbb360e13a381fc29f6536ccb7918e849",
-    "third_party/voice/sources.json": "e2f6b124f6277e7c3c4f5c7cc8830c66190f671ad65e972bb2cc9507dbfcb937"
+    "third_party/voice/sources.json": "e2f6b124f6277e7c3c4f5c7cc8830c66190f671ad65e972bb2cc9507dbfcb937",
+    "LICENSE": "d17f227e4df5da1600391338865ce0f3055211760a36688f816941d58232d8dc",
+    "NOTICE": "9d71575ecfd9a843fc1677b0efb08053c6ba9fd686a0de1a6f5382fd3c220915",
+    "MODULE.bazel": "a00f5bf29f9a5978fedf1446d5ab1dde219ecd6dec3e247bba0207148b571bb2",
+    "MODULE.bazel.lock": "be65892b2bdb12c0867dabfcaaf7ca4ee7a9ae4915e0d0de9c99448158777d31",
+    "third_party/v8/README.md": "b37e2b8db6821453337d9d590d7e2b9a32cb491037b850c0d09f54a9073fd2a9",
+    "third_party/v8/BUILD.bazel": "50b874701edde0b24166680f0ac22463661eebe55216d60e879acbb779382bc2",
+    "third_party/v8/libcxx.BUILD.bazel": "25e537d364b6e465f20e3f9ecd5168481ece3728796b137a9811273303e184d1",
+    "third_party/v8/libcxxabi.BUILD.bazel": "22fcb5a8a969a6b358ef64fdd72dcf01418fba3e047f07acd5bd34decc0b3fb2",
+    "third_party/v8/llvm_libc.BUILD.bazel": "15158ca2fcc1db8412fd64e47706f4af267ec01b82053dc5bba1b1627f7861ad",
+    "third_party/v8/rusty_v8_150_4_0_release_manifests.sha256": "7036a86ed062f4edd81667e161e5e94eade669c69362b136ccba9a1508fecc4b",
+    ".github/actions/setup-rusty-v8/action.yml": "868afbbbd5612b61f17d780ab073da70e7489af0b50da000e4f87fd19cbcd193",
+    ".github/scripts/install-musl-build-tools.sh": "ba729818732a5dd8c1aefce157871afa084016ae37566034f3d09899dc7fa46f",
+    ".github/scripts/install-musl-openssl.sh": "d55f9f295726ffd4408d194ea536a4e083ccf5e2a94f29d68281b163d9df9610",
+    "patches/v8_module_deps.patch": "ae064039eeba7a97b0f161e0ece8ae03212266face9068e61d31f75569f6bf8e",
+    "patches/v8_bazel_rules.patch": "a32713f3b5d70f43694ab06d6b62a1128dbf443799a2073346613b9b90ae5cbb",
+    "patches/v8_source_portability.patch": "0491c08e2a58cf187ff674c3837850530c8e415441757750e62f113342752573",
+    "patches/llvm_rusty_v8_custom_libcxx.patch": "4f4796e03e5334f711d53a862c7f7c3be99a1b97adfc0ef9ff99ed82d12ebee2",
+    "patches/rules_cc_rusty_v8_custom_libcxx.patch": "41e1bd894ca90e79c241fd4cbda80c13be17ff6db48ae7b7947c57804c919fcb",
+    "patches/rusty_v8_prebuilt_out_dir.patch": "aef7ba7f5609eadec0702330bfe5a54175fa4d242ef063e7135d74ee529c007a",
+    "patches/abseil_windows_gnullvm_thread_identity.patch": "8399ecd7f7bd1ba4fb9c6e543b3452d57b7e85934a98b8f0fdd502327fdbf421"
   }
 }

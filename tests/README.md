@@ -342,3 +342,11 @@ The actual [collection](../docs/CODEX-PACKAGING.md#october-1-version-and-source-
 rechecks all pinned archives and emits full Rust-file comparisons plus a compact
 hashed inventory. Source matches do not automatically grant license applicability
 or binary redistribution approval; unresolved records remain explicit.
+
+`test_codex_native_sources.py` additionally covers rootless Gitiles archives,
+retaining nested original notices and contained aliases without writing links,
+wrong archive roots, escaping links, duplicate entries and traversal. The actual
+native collector verifies all 28 pinned archives and retains 3,817 notice files;
+two full collection reports match byte for byte. Its compact committed inventory
+hashes each complete notice record. This is source/notice evidence, not final
+linked-binary coverage or installer clearance.
