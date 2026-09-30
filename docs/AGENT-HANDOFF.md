@@ -60,6 +60,13 @@ archives without rewriting Cargo resolution; 139 missing-notice sources remain
 explicit review work. The existing Debian gate is not bypassed. Continue its source
 coverage work and the remaining runtime/product phases independently.
 
+New Codex chats now bind the maintained shared persona through developer
+instructions, preserving Codex's base instructions. The host snapshots and hashes
+that guidance per conversation and reuses it on resume; existing chats without a
+snapshot are not silently migrated. The real runtime fixture verifies exactly one
+persona on initial and resumed inference. Scoped tools and prompt improvement are
+still separate C5 work.
+
 ## September 30 application SDK foundation
 
 [SDK foundation](APP-SDK.md) owns the DSH-only application contract, exact tool

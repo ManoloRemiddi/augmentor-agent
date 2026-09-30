@@ -281,3 +281,26 @@ with 139 missing-notice sources explicitly pending. The payload verifier detects
 drift but does not grant release clearance. Debian's unknown-native-file gate is
 unchanged. C8 remains incomplete until notice/source coverage, Mac parity and real
 artifact execution/rollback are qualified.
+
+## Shared persona and instruction snapshots
+
+New Codex chats load the maintained `config/agent-persona.md` into the supported
+`developerInstructions` field. Augmentor does not replace Codex's base/system
+instructions. The shared host adds an explicit current-capability statement so
+the persona's references to Browser, desktop, memory, Home, voice and metrics do
+not imply those unfinished adapters are available. Future tool registration must
+update this capability statement together with its negotiated product flags.
+
+The private conversation index stores the instruction text, format revision and
+SHA-256 hashes of the persona and combined instructions before starting the native
+thread. Resume uses that same snapshot rather than reloading a changed persona.
+Corrupt snapshots fail to load; old conversations without a snapshot retain their
+existing native instructions. Both surfaces use the same host path. The real
+runtime/provider fixture verifies the Augmentor persona arrives once on initial
+inference and still occurs once after restart, without accumulating duplicate
+instructions. This completes the persona binding, not C5's tool or prompt-library
+integration, and does not qualify live-model personal-assistant behavior.
+
+Validation for the persona checkpoint: TypeScript checks and build pass, the root
+Node suite passes 235 tests, and the focused Codex suite passes 42 tests. These
+include the real pinned-runtime fixture with a synthetic Responses provider.

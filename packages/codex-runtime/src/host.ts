@@ -12,11 +12,13 @@ import {DisplayJournal} from './journal.js';
 import {durableJson, readPrivateJson, privateDirectory} from './storage.js';
 import {chatEvents, type ChatEvent} from './events.js';
 import type {ProfileStore} from './profiles.js';
+import {instructionSnapshot, validateInstructions, type InstructionSnapshot} from './instructions.js';
 import {CodexInteractions} from './interactions.js';
 import {checkProvider} from './provider-check.js';
 
 export const CODEX_PROTOCOL = 'augmentor-codex/1';
 interface SessionMeta {
+  instructions?: InstructionSnapshot;
   schema: 1; id: string; profileId: string; profileRevision: number;
   cwd: string; threadId?: string; title: string; createdAt: number; updatedAt: number;
   status: 'creating' | 'ready';
@@ -48,6 +50,7 @@ export class CodexHost extends EventEmitter {
       if (meta?.schema !== 1 || !['creating', 'ready'].includes(meta.status) || filename !== `${identifier(meta.id)}.json` ||
           !isAbsolute(meta.cwd) || typeof meta.title !== 'string' || !Number.isInteger(meta.profileRevision) ||
           (meta.status === 'ready' && typeof meta.threadId !== 'string')) throw new Error('Unsupported or corrupt Codex session index.');
+      if (meta.instructions !== undefined) validateInstructions(meta.instructions);
       identifier(meta.profileId); this.metadata.set(meta.id, meta);
     }
   }
@@ -96,7 +99,7 @@ export class CodexHost extends EventEmitter {
     if (this.configuring) throw new Error('Codex connection setup is in progress.');
     // Recheck after resolution: two clients can race the same create request.
     if (this.metadata.has(id)) return this.create(params);
-    const meta: SessionMeta = {schema: 1, id, profileId, profileRevision: profile.revision, model: profile.connection.model,
+    const meta: SessionMeta = {schema: 1, instructions: instructionSnapshot(), id, profileId, profileRevision: profile.revision, model: profile.connection.model,
       surface: params.surface === 'browser' ? 'browser' : 'linux', cwd, title: '', status: 'creating', createdAt: Date.now(), updatedAt: Date.now()};
     this.save(meta);
     await this.open(meta, profile);
@@ -126,9 +129,9 @@ export class CodexHost extends EventEmitter {
     const rpc = this.options.createRpc?.(runtimeOptions(profile.connection, state, meta.cwd)) ?? new CodexRpc(runtimeOptions(profile.connection, state, meta.cwd));
     try {
       await rpc.initialize();
-      if (meta.threadId) await rpc.call('thread/resume', {threadId: meta.threadId, cwd: meta.cwd, excludeTurns: true});
+      if (meta.threadId) await rpc.call('thread/resume', {threadId: meta.threadId, cwd: meta.cwd, excludeTurns: true, ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
       else {
-        const result = await rpc.call('thread/start', {cwd: meta.cwd, approvalPolicy: 'on-request', sandbox: 'workspace-write'});
+        const result = await rpc.call('thread/start', {cwd: meta.cwd, approvalPolicy: 'on-request', sandbox: 'workspace-write', ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
         meta.threadId = result.thread.id; meta.status = 'ready'; this.save(meta);
       }
       this.assertOpen();

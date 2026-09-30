@@ -112,6 +112,8 @@ test('pinned real Codex streams a fixture response and resumes persisted native 
   host.on('event', (_id, frame) => {if (frame.payload.event.type === 'turn/end') hostDone.resolve();});
   await host.dispatch('session.prompt', {sessionId: 'host-chat', requestId: 'host-request-one', content: [{type: 'text', text: 'Test the shared host.'}]});
   await hostDone.promise;
+  assert.equal((JSON.stringify(requests.at(-1)).match(/You are Augmentor Agent/g) ?? []).length, 1);
+  assert.match(JSON.stringify(requests.at(-1)), /not registered by this development integration/);
   const firstHistory = await host.dispatch('session.history', {sessionId: 'host-chat'});
   assert.ok(firstHistory.events.some(({event}) => event.type === 'assistant/message'));
   await host.close();
@@ -127,6 +129,7 @@ test('pinned real Codex streams a fixture response and resumes persisted native 
   host.on('event', (_id, frame) => {if (frame.payload.event.type === 'turn/end') hostDone.resolve();});
   await host.dispatch('session.prompt', {sessionId: 'host-chat', requestId: 'host-request-two', content: [{type: 'text', text: 'Continue after host restart.'}]});
   await hostDone.promise;
+  assert.equal((JSON.stringify(requests.at(-1)).match(/You are Augmentor Agent/g) ?? []).length, 1, 'Resuming must not accumulate duplicate persona instructions');
   const finalHistory = await host.dispatch('session.history', {sessionId: 'host-chat'});
   assert.equal(finalHistory.events.filter(({event}) => event.type === 'assistant/message').length, 2);
   const ipc = new CodexIpcServer(host, join(root, 'host.sock')); await ipc.listen();
