@@ -10,6 +10,12 @@ app-server passes the isolated fixture protocol/tool/history proof described in
 Apache-2.0. Other target binaries, real providers, OAuth eligibility and product
 surface integration remain unqualified; this pin is not a release certification.
 
+The current [connection check](CODEX-INTEGRATION.md#codex-model-and-tool-connection-check)
+also exercises native dynamic-tool calls and empty `environments` through this
+exact runtime. Synthetic provider evidence covers shell/file-tool exclusion,
+nonce/receipt verification and shutdown cleanup. It does not certify a live
+model/provider or authentication eligibility.
+
 ## Home preview — 24 September 2026
 
 `apps/home/package-lock.json` pins the exercised DSH 0.1.5-rc.1 packages,

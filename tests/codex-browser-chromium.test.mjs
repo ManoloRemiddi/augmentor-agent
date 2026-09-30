@@ -176,8 +176,18 @@ test('loaded Chromium extension executes Codex-observed typing, clicking and scr
 
   // Activate actual transcript controls and continue in each exact child.
   const sourceId=(await message({type:'connect'})).sessionId;
-  const sourceHistory=await host.dispatch('session.history',{sessionId:sourceId,maxMessages:100});
   await panelUntil('document.querySelector(".msg-branch")&&!document.querySelector("#send").disabled','Branch available');
+  // Visible answer text precedes the native terminal notification. Snapshot only
+  // after the authoritative ledger settles, so a late turn/end is not mistaken
+  // for a mutation caused by Branch.
+  let sourceSettled=false;
+  for(let attempt=0;attempt<100;attempt++){
+    const state=await host.dispatch('session.queue',{sessionId:sourceId});
+    if(state.operations.length&&state.operations.every(op=>['completed','failed','interrupted','cancelled'].includes(op.status))){sourceSettled=true;break;}
+    await delay(20);
+  }
+  assert.equal(sourceSettled,true,'source turn settled before immutable history snapshot');
+  const sourceHistory=await host.dispatch('session.history',{sessionId:sourceId,maxMessages:100});
   await panel.evaluate('document.querySelector(".msg-branch").click()');
   let childId;
   for(let attempt=0;attempt<100;attempt++){

@@ -18,6 +18,7 @@ import type {ProfileStore} from './profiles.js';
 import {instructionSnapshot, validateInstructions, type InstructionSnapshot} from './instructions.js';
 import {CodexInteractions} from './interactions.js';
 import {checkProvider} from './provider-check.js';
+import {checkAgent} from './agent-check.js';
 import {improveDraft, validateDraft, type Rewrite} from './prompt-improvement.js';
 import {CodexBrowser, browserToolsFor} from './browser.js';
 import {CodexDesktop, desktopTools} from './desktop.js';
@@ -80,6 +81,7 @@ export class CodexHost extends EventEmitter {
   private preparingShutdown?: Promise<{ready: true; maintenance: true}>;
   private activeRequests = 0;
   private activeCreates = 0;
+  private checks = new Map<AbortController, Promise<unknown>>();
   private improvements = new Map<AbortController, Promise<Rewrite>>();
   private branches = new Map<string, {key: string; promise: Promise<unknown>}>();
   private forkCreators = new Set<CodexRpc>();
@@ -479,7 +481,7 @@ export class CodexHost extends EventEmitter {
       case 'profiles.list': return {profiles: this.options.profiles?.list() ?? []};
       case 'profiles.configure': {
         if (!this.options.profiles) throw new Error('Codex profile setup is unavailable in this host.');
-        if (this.improvements.size || this.activeCreates || this.voice.active || this.desktop.active || this.opening.size || this.configuring || [...this.workers.values()].some(worker => worker.interactions.size || worker.session.ledger.list().some(operation => ['accepted', 'unconfirmed'].includes(operation.status)))) throw new Error('Finish or reconcile active Codex work before changing connection profiles.');
+        if (this.checks.size || this.improvements.size || this.activeCreates || this.voice.active || this.desktop.active || this.opening.size || this.configuring || [...this.workers.values()].some(worker => worker.interactions.size || worker.session.ledger.list().some(operation => ['accepted', 'unconfirmed'].includes(operation.status)))) throw new Error('Finish or reconcile active Codex work before changing connection profiles.');
         this.configuring = true;
         try {
           for (const id of [...this.workers.keys()]) await this.release(id);
@@ -489,12 +491,19 @@ export class CodexHost extends EventEmitter {
       }
       case 'profiles.test': {
         if (!this.options.profiles) throw new Error('Codex profile setup is unavailable in this host.');
-        const profile = await this.options.resolveProfile(identifier(params.id));
         const capability = params.capability ?? 'text';
-        if (!['text', 'image'].includes(capability)) throw new Error('Choose a text or image connection check.');
-        const checked = await checkProvider(profile.connection, 45000, capability);
-        await this.options.profiles.validated(profile.id, profile.revision, capability);
-        return {...checked, scope: capability === 'image' ? 'synthetic-image' : 'text-only', toolsVerified: false};
+        if (!['text', 'image', 'agent'].includes(capability)) throw new Error('Choose a text, image or Codex tool connection check.');
+        if (this.configuring || this.checks.size) throw new Error('Another Codex connection check or setup is in progress.');
+        const abort = new AbortController();
+        const pending = (async () => {
+          const profile = await this.options.resolveProfile(identifier(params.id)); this.assertAccepting();
+          const checked = capability === 'agent' ? await checkAgent(profile.connection, AbortSignal.any([abort.signal, AbortSignal.timeout(60000)])) : await checkProvider(profile.connection, 45000, capability);
+          this.assertAccepting();
+          await this.options.profiles!.validated(profile.id, profile.revision, capability);
+          return {...checked, scope: capability === 'agent' ? 'synthetic-codex-tool' : capability === 'image' ? 'synthetic-image' : 'text-only', toolsVerified: capability === 'agent'};
+        })();
+        this.checks.set(abort, pending);
+        try {return await pending;} finally {this.checks.delete(abort);}
       }
       case 'models.list': return this.catalog();
       case 'models.validate': {
@@ -615,9 +624,10 @@ export class CodexHost extends EventEmitter {
   }
   async close(): Promise<void> {
     this.closing = true; this.approvals.close(); this.browser.close();
+    for (const abort of this.checks.keys()) abort.abort();
     for (const abort of this.improvements.keys()) abort.abort();
     const desktopClosed = this.desktop.close();
-    const cleanup = Promise.allSettled([desktopClosed, this.voice.close(), ...this.improvements.values()]);
+    const cleanup = Promise.allSettled([desktopClosed, this.voice.close(), ...this.checks.values(), ...this.improvements.values()]);
     await Promise.allSettled([...this.forkCreators].map(creator => creator.close()));
     await Promise.allSettled([...this.branches.values()].map(branch => branch.promise));
     await Promise.allSettled([...this.opening.values()]);

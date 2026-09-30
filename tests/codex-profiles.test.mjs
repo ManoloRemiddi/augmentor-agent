@@ -5,6 +5,7 @@ import {mkdtempSync, rmSync, readFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {ProfileStore} from '../dist/codex-runtime/src/profiles.js';
+import {durableJson} from '../dist/codex-runtime/src/storage.js';
 function fixture(t) {
   const root = mkdtempSync(join(tmpdir(), 'codex-profile-')); t.after(() => rmSync(root, {recursive: true, force: true}));
   const secrets = new Map(); const credentials = {get: async id => secrets.get(id), put: async (id, value) => {secrets.set(id, value);}, delete: async id => {secrets.delete(id);}};
@@ -82,4 +83,22 @@ test('image qualification is host-owned, retained on rename and invalidated by c
   await restored.validated(profile.id, 2, 'image');
   await restored.upsert({...profile, model: 'other', credential: 'replacement'});
   assert.equal((await restored.resolve(profile.id)).connection.imageInput, false);
+});
+
+
+test('tool qualification cannot be supplied by setup and expires on model or runtime changes', async t => {
+  const {store, credentials} = fixture(t);
+  await store.upsert({...profile, toolValidatedAt: Date.now(), toolRuntime: '0.159.2'});
+  assert.equal(store.list()[0].toolsVerified,false);
+  await store.validated(profile.id,1,'agent');
+  await store.upsert({...profile,name:'Renamed'});
+  const restored=new ProfileStore(store.path,credentials);
+  assert.equal(restored.list()[0].toolsVerified,true);
+  const saved = JSON.parse(readFileSync(store.path, 'utf8'));
+  saved.profiles[0].toolRuntime = '0.158.0';
+  durableJson(store.path, saved);
+  assert.equal(new ProfileStore(store.path, credentials).list()[0].toolsVerified, false);
+  await restored.upsert({...profile,model:'changed'});
+  assert.equal(restored.list()[0].toolsVerified,false);
+  await assert.rejects(restored.validated(profile.id,1,'agent'),/changed/);
 });

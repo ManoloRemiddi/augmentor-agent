@@ -179,10 +179,14 @@ The existing DSH/Pi interfaces and running installations have not been changed.
 Subscription distribution eligibility remains unresolved; configuration code is
 not permission to ship an authentication route.
 
-## Desktop and Browser profile setup checkpoint
+## Desktop and Browser profile setup checkpoint (historical text-only check)
+
+The [Codex tool check](#codex-model-and-tool-connection-check) below supersedes
+the text-only button described at this checkpoint. The text-only RPC remains
+available for compatibility; it does not qualify tools.
 
 Both source interfaces now provide API/local profile creation and editing,
-OS-backed credential submission/removal, and an explicit text response check.
+OS-backed credential submission/removal, and, at this checkpoint, an explicit text response check.
 An empty key preserves an existing credential; removal is deliberate. Forms clear
 entered secrets after successful saves, preserve drafts after failures, and
 require edited settings to be saved before checking them. Profile name changes
@@ -1295,3 +1299,49 @@ root `npm ci` could not find the new local test archive. The Docker build stage
 and its strict context allowlist now include exactly that archive. A local full
 Home image build and its packaged prompt-service probe pass; the test archive is
 absent from the final image. No NAS service or installed application was updated.
+
+## Codex model and tool connection check
+
+Both existing setup forms now offer **Check Codex connection** in place of the
+earlier text-only check. The shared host starts the pinned Codex 0.159.2 runtime
+in temporary private state with an empty home and no environments, desktop
+executor, user history or project instructions. The only custom tool accepts a
+random nonce and returns a separate random receipt. Success requires the model
+to call that tool once with the exact nonce and return the receipt. A text-only
+answer, incorrect tool arguments or another client interaction fails the check.
+The runtime owns this short agent turn; Augmentor does not implement an extra
+model loop. Empty native environments disable native shell/file tools.
+
+The check uses the selected API/local connection and may incur provider charges.
+It is limited to 60 seconds and bounded events/frames/answers, closes its owned
+process on completion/failure/cancellation, deletes temporary state, and never
+retries the turn. Profile setup and maintenance cannot race a running check.
+Shutdown cancels it before cleanup completes. No normal Augmentor chat is added.
+
+Successful host-owned evidence includes the connection revision, validation
+time and exact Codex runtime. Name changes preserve it; model, endpoint or key
+changes clear it. An old runtime version no longer yields `toolsVerified`.
+Caller-supplied qualification fields are ignored. The result proves this small
+Codex tool round trip, not arbitrary browser/desktop execution, model quality,
+live-provider qualification or subscription eligibility. The separate image
+check remains necessary before screenshots are enabled in new chats. The old
+text-only RPC remains compatible and returns `toolsVerified: false`.
+
+Build/type checks and **336 root Node tests**, **56 Browser tests** and **three
+native Qt setup tests** pass on Linux. Six new real-pinned-runtime checks use a
+deterministic local Responses fixture: valid receipt, skipped tool, wrong nonce,
+cancellation, host-owned persistence without a user chat, and shutdown/setup/
+maintenance fencing without replay. Profile tests cover caller spoofing,
+revision invalidation, rename/restart and stale runtime evidence. These checks
+use neither a paid model nor an OpenAI account. Platform CI applies only to its
+tested revision; no installed application was updated.
+
+Preceding source `c603a46` passed both Mac jobs in
+[36764092673](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36764092673)
+and Home's container job. Its Debian run
+[36764092568](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36764092568)
+found a Chromium fixture race: visible answer text preceded terminal history.
+The fixture now waits for authoritative operation settlement before taking its
+immutable source-history snapshot for Branch. The loaded Chromium proof passes
+locally after that timing correction. Native-binary packaging review and the
+remaining C0–C9 acceptance gates remain open.

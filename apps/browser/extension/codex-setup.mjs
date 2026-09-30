@@ -24,7 +24,7 @@ export function codexSetupDialog(doc,send,container){
   const selected=()=>{
     profileId=fields.profile.value||null;const row=rows.find(row=>row.id===profileId)||{}
     fields.name.value=row.name||'My Codex model';fields.kind.value=row.kind||'api';fields.endpoint.value=row.endpoint||'';fields.model.value=row.model||'';fields.credential.value='';fields.remove.checked=false;dirty=false
-    note.textContent=row.imageValidatedAt?'Image response checked; screenshots are available in new chats.':row.validation==='responses-text'?'Text response checked; tool compatibility is not verified.':'Save a connection, then check its text response.';controls()
+    note.textContent=row.toolsVerified?'Codex tool check passed for this connection.':row.imageValidatedAt?'Image response checked; screenshots are available in new chats.':row.validation==='responses-text'?'Text response checked; tool compatibility is not verified.':'Save a connection, then check it with Codex.';controls()
   }
   const load=async()=>{
     rows=(await request({action:'profiles'})).profiles
@@ -32,7 +32,7 @@ export function codexSetupDialog(doc,send,container){
     fields.profile.value=profileId||'';selected()
   }
   const close=button('Close',()=>dialog.close())
-  const check=button('Check text response',()=>run(async()=>{note.textContent='Checking a text response…';await request({action:'test',id:profileId});note.textContent='Text response verified. Tools and Codex agent compatibility still need a chat test.'}))
+  const check=button('Check Codex connection',()=>run(async()=>{note.textContent='Checking Codex chat and tool support…';await request({action:'test',id:profileId,capability:'agent'});note.textContent='Codex chat and the test tool worked. Browser and desktop tasks still need their own checks.'}))
   const imageCheck=button('Check image response',()=>run(async()=>{note.textContent='Checking a synthetic image…';await request({action:'test',id:profileId,capability:'image'});await load();note.textContent='Image response verified. Start a new chat to use browser screenshots. General vision and tool accuracy still need a chat test.'}))
   const save=button('Save connection',()=>run(async()=>{
     const profile={id:profileId||crypto.randomUUID(),kind:fields.kind.value,name:fields.name.value.trim(),endpoint:fields.endpoint.value.trim(),model:fields.model.value.trim()}
@@ -42,7 +42,7 @@ export function codexSetupDialog(doc,send,container){
   }))
   for(const [key,field] of Object.entries(fields)){if(key==='profile')continue;field.oninput=()=>{dirty=true;controls()}}
   fields.profile.onchange=selected
-  dialog.append(make('h3','Connect a model · Codex'),make('p','Use a Responses-compatible API provider or local model. Subscription sign-in is not available in this development build.'),form,make('p','Keys are stored in the operating system credential store. Checks send a short message or a synthetic image that your provider may charge for. They send no files, history or tools. The image check enables screenshots for new chats.'),note,actions)
+  dialog.append(make('h3','Connect a model · Codex'),make('p','Use a Responses-compatible API provider or local model. Subscription sign-in is not available in this development build.'),form,make('p','Keys are stored in the operating system credential store. Checks send a short tool exercise or a synthetic image that your provider may charge for. The Codex check uses one harmless test tool and sends no personal files or chat history. The image check enables screenshots for new chats.'),note,actions)
   dialog.addEventListener('cancel',event=>{if(busy)event.preventDefault()})
   dialog.addEventListener('close',()=>{closed=true;fields.credential.value='';dialog.remove()})
   doc.body.append(dialog);presentSettingsForm(dialog,container);void run(load);return dialog

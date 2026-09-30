@@ -2,6 +2,35 @@
 
 # Start here: agent handoff
 
+## September 30 Codex chat/tool connection qualification
+
+The existing Desktop/Browser setup check now runs a
+[pinned Codex tool round trip](CODEX-INTEGRATION.md#codex-model-and-tool-connection-check)
+in temporary state, with a pure nonce/receipt tool and no environment access.
+Host-owned evidence is tied to profile revision and runtime; shutdown cancels
+checks, and setup/maintenance cannot race them. Build/type, 336 root Node,
+56 Browser and three Qt setup tests pass on Linux, including actual pinned Codex
+with synthetic inference. No live model/account or installed app was used.
+Continue real provider/account qualification and remaining C0–C9 work. Preserve
+the publication boundary and core-chat priority below; do not copy more private
+speech source or change installed settings.
+
+## September 30 publication review and core-chat priority
+
+The owner accepted keeping the reviewed work without deleting repository history
+and prioritizing Codex chat/tools before further speech work. No additional
+private speech source is authorized for public copying. The test archive added
+at `c9f9067` was audited byte-for-byte; six source files and the MIT license match
+the previously public 0.1.16 package, and only the service bridge differs. No
+credentials, recordings, installed configuration or private Git history were
+found. Retain the work; preserve installed applications and private state.
+
+`c603a46` passed both macOS jobs and Home's container check. Debian exposed a
+loaded-Chromium test race: the source-history snapshot preceded native turn/end.
+The test now waits for terminal operation status before asserting Branch leaves
+source history unchanged. This is a fixture timing correction, not qualification
+of the remaining release gates.
+
 ## September 30 spoken style and late audio rejection
 
 [Request-scoped voice guidance](CODEX-INTEGRATION.md#spoken-input-style-and-interrupted-synthesis)

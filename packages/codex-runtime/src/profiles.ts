@@ -2,14 +2,14 @@
 import {existsSync} from 'node:fs';
 import {randomUUID} from 'node:crypto';
 import {identifier, text} from '../../protocol/src/index.js';
-import {runtimeOptions, type CodexConnection} from './config.js';
+import {runtimeOptions, CODEX_VERSION, type CodexConnection} from './config.js';
 import type {CredentialStore} from './credentials.js';
 import {durableJson, readPrivateJson} from './storage.js';
 import type {ResolvedProfile} from './host.js';
 
 interface Profile {
   id: string; name: string; revision: number; kind: 'api' | 'local'; model: string;
-  endpoint: string; credentialRef?: string; imageValidatedAt?: number; validation: 'unverified' | 'responses-text';
+  endpoint: string; credentialRef?: string; imageValidatedAt?: number; toolValidatedAt?: number; toolRuntime?: string; validation: 'unverified' | 'responses-text';
 }
 interface ProfileFile {schema: 1; profiles: Profile[]; retiredCredentials: string[]}
 export interface ProfileInput {id: string; name: string; kind: 'api' | 'local'; model: string; endpoint: string; credential?: string | null}
@@ -26,10 +26,11 @@ export class ProfileStore {
       if (ids.has(profile.id) || !Number.isInteger(profile.revision) || profile.revision < 1 || !['local', 'api'].includes(profile.kind) ||
         Object.hasOwn(profile, 'credential') || (profile.credentialRef && !/^codex-[a-zA-Z0-9_-]{1,100}$/.test(profile.credentialRef))) throw new Error('Invalid Codex profile configuration.');
       if (profile.imageValidatedAt !== undefined && (!Number.isFinite(profile.imageValidatedAt) || profile.imageValidatedAt <= 0)) throw new Error('Invalid image validation record.');
+      if ((profile.toolValidatedAt === undefined) !== (profile.toolRuntime === undefined) || profile.toolValidatedAt !== undefined && (!Number.isFinite(profile.toolValidatedAt) || profile.toolValidatedAt <= 0 || typeof profile.toolRuntime !== 'string' || !/^\d+\.\d+\.\d+$/.test(profile.toolRuntime))) throw new Error('Invalid Codex tool validation record.');
       this.validate(profile); ids.add(profile.id);
     }
   }
-  list() {return this.data.profiles.map(({credentialRef, ...profile}) => ({...profile, credentialConfigured: Boolean(credentialRef)}));}
+  list() {return this.data.profiles.map(({credentialRef, ...profile}) => ({...profile, credentialConfigured: Boolean(credentialRef), toolsVerified: profile.toolRuntime === CODEX_VERSION && Boolean(profile.toolValidatedAt)}));}
   private profile(id: string): Profile {
     const profile = this.data.profiles.find(value => value.id === identifier(id));
     if (!profile) throw new Error('Unknown Codex connection profile.');
@@ -55,10 +56,10 @@ export class ProfileStore {
     const task = this.mutation.catch(() => {}).then(() => this.save(input));
     this.mutation = task.then(() => {}, () => {}); return task;
   }
-  validated(id: string, revision: number, capability: 'text' | 'image' = 'text'): Promise<void> {
+  validated(id: string, revision: number, capability: 'text' | 'image' | 'agent' = 'text'): Promise<void> {
     const task = this.mutation.then(() => {
       if (this.profile(id).revision !== revision) throw new Error('The profile changed during its connection check. Run the check again.');
-      const next: ProfileFile = {...this.data, profiles: this.data.profiles.map(profile => profile.id === id ? {...profile, validation: 'responses-text', ...(capability === 'image' ? {imageValidatedAt: Date.now()} : {})} : profile)};
+      const next: ProfileFile = {...this.data, profiles: this.data.profiles.map(profile => profile.id === id ? {...profile, validation: 'responses-text', ...(capability === 'image' ? {imageValidatedAt: Date.now()} : {}), ...(capability === 'agent' ? {toolValidatedAt: Date.now(), toolRuntime: CODEX_VERSION} : {})} : profile)};
       durableJson(this.path, next); this.data = next;
     });
     this.mutation = task.then(() => {}, () => {}); return task;
@@ -73,6 +74,7 @@ export class ProfileStore {
     const changed = !previous || previous.kind !== input.kind || previous.model !== input.model || new URL(previous.endpoint).href !== new URL(input.endpoint).href || previous.credentialRef !== reference;
     const profile: Profile = {id: input.id, name: input.name.trim(), kind: input.kind, model: input.model, endpoint: input.endpoint,
       ...(!changed && previous?.imageValidatedAt ? {imageValidatedAt: previous.imageValidatedAt} : {}),
+      ...(!changed && previous?.toolValidatedAt ? {toolValidatedAt: previous.toolValidatedAt, toolRuntime: previous.toolRuntime} : {}),
       revision: (previous?.revision ?? 0) + (changed ? 1 : 0), validation: changed ? 'unverified' : previous.validation, ...(reference ? {credentialRef: reference} : {})};
     const next: ProfileFile = {schema: 1, profiles: [...this.data.profiles.filter(value => value.id !== input.id), profile], retiredCredentials: [...this.data.retiredCredentials]};
     if (previous?.credentialRef && previous.credentialRef !== reference) next.retiredCredentials.push(previous.credentialRef);
