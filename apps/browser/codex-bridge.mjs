@@ -29,6 +29,7 @@ async function client() {
       const type = frame.payload.event.type;
       if (type === 'turn/start' || type === 'turn/end') send({method: 'session.status', params: {sessionId: frame.payload.sessionId, status: type === 'turn/start' ? 'running' : 'idle'}});
     } else if (frame.method === 'approval/requested') send({id: frame.rpcId, method: 'approval.requested', params: frame.payload});
+    else if (frame.method === 'question/requested') send({id: frame.rpcId, method: 'question.requested', params: frame.payload});
     else if (frame.method === 'interaction/resolved') send({method: 'interaction.resolved', params: frame.payload});
     else if (frame.method === 'session/attention') send({method: 'session.attention', params: frame.payload});
   }, () => setImmediate(() => process.exit(1)), 'codex').then(value => {connection = value; return value;}).finally(() => {opening = undefined;});

@@ -39,7 +39,7 @@ class CodexAdapter:
                 connection.close()
 
     def respond(self, rpc_id, value):
-        return self.call('interaction.respond', {'rpcId': rpc_id, 'sessionId': value['sessionId'], 'value': value})
+        return self.call('interaction.respond', {'rpcId': rpc_id, 'sessionId': value['sessionId'], 'value': {**value, 'approvalId': rpc_id}})
 
     def state_path(self): return self.state/'session.json'
     def workspace(self): return Path(os.environ.get('AUGMENTOR_CODEX_WORKSPACE', Path.home()/'Augmentor Codex'))

@@ -39,8 +39,9 @@ test('pinned real Codex streams a fixture response and resumes persisted native 
     res.writeHead(200, {'content-type': 'text/event-stream'});
     const send = event => res.write(`data: ${JSON.stringify(event)}\n\n`);
     if (mode === 'hold') {heldResponse = res; send({type: 'response.created', response: {id: 'resp_hold', status: 'in_progress', output: []}}); holdStarted.resolve(); return;}
-    if (['tool', 'approval'].includes(mode) && toolRounds++ === 0) {
+    if (['tool', 'approval', 'question'].includes(mode) && toolRounds++ === 0) {
       const item = {id: 'fc_fixture', type: 'function_call', call_id: 'call_fixture', name: 'exec_command', arguments: JSON.stringify({cmd: 'printf augmentor_tool_fixture', max_output_tokens: 100, ...(mode === 'approval' ? {sandbox_permissions: 'require_escalated', justification: 'Exercise the approval denial fixture.'} : {})})};
+      if (mode === 'question') {item.name = 'request_user_input'; item.arguments = JSON.stringify({questions: [{id: 'format', header: 'Format', question: 'Choose a fixture format', options: [{label: 'Text', description: 'Plain text'}, {label: 'List', description: 'A short list'}]}]});}
       send({type: 'response.created', response: {id: 'resp_tool', status: 'in_progress', output: []}});
       send({type: 'response.output_item.added', output_index: 0, item});
       send({type: 'response.output_item.done', output_index: 0, item});
@@ -147,5 +148,22 @@ test('pinned real Codex streams a fixture response and resumes persisted native 
   assert.equal(JSON.parse(browser.stdout).approvalsDenied, 1);
   assert.ok(requests.at(-1).input.some(item => item.type === 'function_call_output' && /reject|denied|declin/i.test(item.output)));
   mode = 'text';
+  await host.dispatch('session.release', {sessionId: 'native-adapter-fixture'});
+  mode = 'question'; toolRounds = 0;
+  const questions = await promisify(execFile)(process.env.AUGMENTOR_PYTHON ?? 'python3', [fileURLToPath(new URL('./fixtures/codex/native-client.py', import.meta.url))], {
+    timeout: 20000,
+    env: {...process.env, PYTHONPATH: fileURLToPath(new URL('../apps/native', import.meta.url)), PYTHONDONTWRITEBYTECODE: '1', AUGMENTOR_PROOF_QUESTIONS: '1',
+      AUGMENTOR_CODEX_STATE: join(root, 'native-questions'), AUGMENTOR_CODEX_SOCKET: ipc.socketPath, AUGMENTOR_CODEX_NO_AUTOSTART: '1', AUGMENTOR_CODEX_WORKSPACE: cwd},
+  });
+  assert.equal(JSON.parse(questions.stdout).questionsAnswered, 1, JSON.stringify(requests.at(-1).input.filter(item => item.type === 'function_call_output')));
+  assert.ok(requests.at(-1).input.some(item => item.type === 'function_call_output' && item.output.includes('Text')));
+  await host.dispatch('session.release', {sessionId: 'browser-adapter-fixture'});
+  toolRounds = 0;
+  const browserQuestions = await promisify(execFile)(process.execPath, [fileURLToPath(new URL('./fixtures/codex/browser-client.mjs', import.meta.url))], {
+    timeout: 20000,
+    env: {...process.env, AUGMENTOR_PROOF_QUESTIONS: '1', AUGMENTOR_CODEX_STATE: join(root, 'browser-questions'), AUGMENTOR_CODEX_SOCKET: ipc.socketPath, AUGMENTOR_CODEX_BROWSER_WORKSPACE: cwd},
+  });
+  assert.equal(JSON.parse(browserQuestions.stdout).questionsAnswered, 1);
+  assert.ok(requests.at(-1).input.some(item => item.type === 'function_call_output' && item.output.includes('List')));
   assert.equal((await host.dispatch('host.describe', {})).harness, 'codex');
 });

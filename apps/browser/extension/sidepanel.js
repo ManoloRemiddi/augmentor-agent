@@ -12,12 +12,14 @@
  */
 
 import { createChatUI } from './chat-render.js'
+import {codexQuestions} from './codex-questions.mjs'
 import { submitDraft } from './prompt-send.mjs'
 import { attachVoice } from './voice.mjs'
 import { attachPromptLibrary } from './prompt-library.mjs'
 
 let surfaceCapabilities={branch:false,edit:false},editingMessage=null
 const answeredInteractions=new Set()
+const activeCodexQuestions=new Map()
 let approvalPresenter,approvalReconnect,approvalPageClosed=false
 function connectApprovalPresenter(){
   if(approvalPageClosed||!chrome.runtime.connect)return
@@ -30,7 +32,7 @@ function connectApprovalPresenter(){
   }catch{if(!approvalPageClosed)approvalReconnect=setTimeout(connectApprovalPresenter,1000)}
 }
 connectApprovalPresenter()
-window.addEventListener('pagehide',()=>{approvalPageClosed=true;clearTimeout(approvalReconnect);approvalPresenter?.disconnect()},{once:true})
+window.addEventListener('pagehide',()=>{approvalPageClosed=true;for(const controller of activeCodexQuestions.values())controller.abort();clearTimeout(approvalReconnect);approvalPresenter?.disconnect()},{once:true})
 const ui = createChatUI({
   actionEnabled:name=>surfaceCapabilities[name]&&!viewSessionId,
   onMessageAction:messageAction,
@@ -437,6 +439,7 @@ async function refresh() {
     surfaceCapabilities=res.capabilities??surfaceCapabilities
     setupNotice.hidden=res.phase!=='needs-setup';setupNotice.textContent=res.harness==='dsh'?'Connect DSH in Settings':'Connect a model in Settings'
 
+    for(const [id,controller] of activeCodexQuestions)if(!(res.interactions??[]).some(row=>row.id===id))controller.abort()
     for(const row of res.interactions??[]){
       if(answeredInteractions.has(row.id))continue;answeredInteractions.add(row.id)
       if(res.harness==='codex'){
@@ -445,6 +448,13 @@ async function refresh() {
       }
       const p=row.params;let value
       if(row.method==='approval.requested')value={outcome:window.confirm((p.toolName??'Action')+'\n'+(p.reason??'Allow this action?'))?'allowed-once':'denied'}
+      else if(res.harness==='codex'){
+        const controller=new AbortController();activeCodexQuestions.set(row.id,controller)
+        const answers=await codexQuestions(document,p.questions??[],controller.signal)
+        activeCodexQuestions.delete(row.id)
+        if(controller.signal.aborted)continue
+        value=answers?{answer:{answers}}:{cancelled:true}
+      }
       else {const answers=[];for(const q of p.questions??[]){const answer=window.prompt(q.question+(q.options?.length?'\n'+q.options.map(o=>o.label).join(' / '):''),q.prefill??'');if(answer!==null)answers.push({id:q.id,selected:[],custom:answer})}value={answer:{answers}}}
       const outcome=await send('interaction/respond',{id:row.id,value})
       if(!outcome?.ok)ui.sendFail(outcome?.error??'The decision was not confirmed.')

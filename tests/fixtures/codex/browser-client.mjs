@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import {RELEASE} from '../../../dist/contracts/src/release.js';
 
 const child = spawn(process.execPath, [fileURLToPath(new URL('../../../apps/browser/native-host.mjs', import.meta.url))], {env: {...process.env, AUGMENTOR_WORKSPACE_PROFILE: ''}, stdio: ['pipe', 'pipe', 'ignore']});
-let approvalsDenied = 0;
+let approvalsDenied = 0, questionsAnswered = 0;
 const pending = new Map(); const events = new EventEmitter(); let nextId = 0; let buffer = Buffer.alloc(0);
 const closed = once(child, 'exit');
 child.stdout.on('data', chunk => {
@@ -16,6 +16,10 @@ child.stdout.on('data', chunk => {
     const frame = JSON.parse(buffer.subarray(4, size + 4)); buffer = buffer.subarray(size + 4);
     const request = pending.get(frame.id);
     if (request) {clearTimeout(request.timer); pending.delete(frame.id); frame.error ? request.reject(new Error(frame.error.message)) : request.resolve(frame.result);}
+    else if (frame.method === 'question.requested') {
+      questionsAnswered++;
+      void call('augmentor/interaction', {id: frame.id, sessionId: frame.params.sessionId, value: {sessionId: frame.params.sessionId, approvalId: frame.params.approvalId, answer: {answers: [{id: 'format', selected: ['List']}]}}}).catch(error => {process.stderr.write(error.message); child.kill('SIGKILL');});
+    }
     else if (frame.method === 'approval.requested') {
       approvalsDenied++;
       void call('augmentor/interaction', {id: frame.id, sessionId: frame.params.sessionId, value: {sessionId: frame.params.sessionId, approvalId: frame.params.approvalId, outcome: 'rejected'}}).catch(error => {process.stderr.write(error.message); child.kill('SIGKILL');});
@@ -38,7 +42,7 @@ try {
   const init = await call('initialize', {provider: 'local-fixture', model: 'fixture-model'});
   assert.equal(init.serverInfo.harness, 'codex');
   assert.equal(init.serverInfo.capabilities.browserTools, false);
-  const sessionId = 'browser-adapter-fixture';
+  const sessionId = process.env.AUGMENTOR_PROOF_QUESTIONS ? 'browser-questions-fixture' : 'browser-adapter-fixture';
   await call('session.create', {sessionId});
   const done = once(events, 'done');
   const response = await call('session.prompt', {sessionId, mode: 'queue', content: [{type: 'text', text: 'Exercise browser native messaging.'}]});
@@ -47,7 +51,7 @@ try {
   assert.ok(history.events.some(({event}) => event.type === 'assistant/message'));
   await call('augmentor/save', {sessionId});
   assert.ok((await call('session.list')).items.some(row => row.sessionId === sessionId && row.saved));
-  console.log(JSON.stringify({browserBridge: 'passed', approvalsDenied, historyEvents: history.events.length}));
+  console.log(JSON.stringify({browserBridge: 'passed', approvalsDenied, questionsAnswered, historyEvents: history.events.length}));
 } finally {
   for (const request of pending.values()) clearTimeout(request.timer);
   child.stdin.end(); const timer = setTimeout(() => child.kill('SIGKILL'), 2000); await closed; clearTimeout(timer);

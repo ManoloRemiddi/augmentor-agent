@@ -209,8 +209,8 @@ Augmentor's existing allow-once/deny UI. Runtime configuration explicitly select
 human approval review. No session-wide or persistent execution rule is granted.
 File approval requires a complete proposed-change preview and rejects requests
 for a persistent grant root. Network requests show the network destination;
-oversized or incomplete previews fail closed. Other server-request types, including
-structured questions and dynamic tool execution, still require their own mappings.
+oversized or incomplete previews fail closed. Structured questions are mapped in the following checkpoint. Dynamic tool execution
+and additional server-request types still require their own mappings.
 
 The IPC event subscription owns presentation. Only one subscriber receives an
 opaque reply capability; it is never journaled or broadcast to viewers. Disconnect
@@ -243,3 +243,31 @@ after service-worker loss; native-bridge failure clears stale requests and claim
 Registry tests cover competing documents, disconnect transfer, expired ownership
 and foreign origins. Browser DOM coverage now passes 46 tests. This is source/DOM
 evidence; loaded Chromium multi-panel and actual modal acceptance remain pending.
+
+## Structured-question checkpoint
+
+The pinned runtime requires `features.default_mode_request_user_input = true` to
+permit its question tool during ordinary conversations. With that explicitly
+configured, both actual client bridges now complete a `request_user_input` round
+trip against the real Codex process and synthetic provider. The provider observes
+the selected answer in the subsequent tool output. No second agent loop is added.
+
+Questions use the same single-presenter capability and Browser document claim as
+approvals. The host validates question IDs and complete, bounded answers, and maps
+Augmentor answers into Codex's ID-keyed response. Cancellation, expiry and missing
+presenters return no fabricated answers. Secret-entry questions are rejected;
+protected profile setup remains the credential entry path. This is an explicit
+capability limit, not a generic secret-input implementation.
+
+Native reuses the existing question dialog. Browser now shows a cancellable form
+with all questions, optional choices and free text. Nothing is preselected; empty
+or partial submissions are disabled. Model text is literal text, not HTML. Upstream
+resolution and page closure dismiss the form, and input fields are cleared when
+it closes. DSH's existing question flow is unchanged.
+
+Validation: build passes; root Node suite passes 234 tests; focused Codex suite
+passes 41; Browser DOM suite passes 48; eight existing offscreen native interaction
+checks pass; complete sidebar boot/send proof passes. These are real-runtime,
+fixture, DOM and offscreen evidence, not a loaded Chromium or installed-platform
+release claim. The Debian job for `bc60f80` still fails at the reviewed-native-binary
+inventory gate for Codex, after application checks; no bypass was added.

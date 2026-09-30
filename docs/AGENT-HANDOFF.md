@@ -45,6 +45,15 @@ a per-document live-connection claim behind its shared host subscription; a seco
 panel cannot claim the same prompt. Browser DOM coverage passes 46 tests. See the updated
 [implementation evidence](CODEX-INTEGRATION.md#one-presenter-approval-broker).
 
+Structured questions now round-trip through both real client bridges and pinned
+Codex with its default-mode question flag explicitly enabled. The shared broker
+preserves IDs, rejects incomplete answers and returns no invented answer on cancel.
+Browser uses a cancellable form; native reuses its existing dialog. Secret questions
+remain unsupported. Root Node tests pass 234, focused Codex 41, Browser DOM 48 and
+eight offscreen native interaction cases. Debian CI still stops at the unreviewed
+Codex native executable inventory. Continue the full plan, including tool scoping,
+OAuth, memory, voice and artifact qualification.
+
 ## September 30 application SDK foundation
 
 [SDK foundation](APP-SDK.md) owns the DSH-only application contract, exact tool

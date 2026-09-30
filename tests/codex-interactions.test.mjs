@@ -41,3 +41,25 @@ test('managed network approvals display the actual destination and reject incomp
  const result=broker.request('chat',{...request,params:{...request.params,command:null,networkApprovalContext:{host:'example.test',protocol:'https'}}});
  assert.equal(frame.payload.toolName,'Codex network access');assert.match(frame.payload.reason,/example.test/);broker.cancel('chat');assert.deepEqual(await result,{decision:'cancel'});
 });
+
+test('structured questions preserve IDs, reject partial answers and use the same presenter ownership',async t=>{
+ const broker=new CodexInteractions();t.after(()=>broker.close());const frames=[];broker.attach('native','chat',frame=>frames.push(frame));
+ const question={...request,method:'item/tool/requestUserInput',params:{...request.params,questions:[{id:'choice',header:'Choice',question:'Choose a format',options:[{label:'Text',description:'Plain text'}]},{id:'detail',header:'Details',question:'Add details',options:null}]}};
+ const pending=broker.request('chat',question);const frame=frames[0];assert.equal(frame.method,'question/requested');
+ const identity={sessionId:'chat',approvalId:frame.rpcId};
+ assert.throws(()=>broker.answer(frame.rpcId,'chat',{...identity,answer:{answers:[{id:'choice',selected:['Text']}]}}),/each question/);
+ broker.answer(frame.rpcId,'chat',{...identity,answer:{answers:[{id:'detail',selected:[],custom:'A concise answer'},{id:'choice',selected:['Text']}]}});
+ assert.deepEqual(await pending,{answers:{choice:{answers:['Text']},detail:{answers:['A concise answer']}}});
+ const cancelled=broker.request('chat',question);broker.answer(frames.at(-1).rpcId,'chat',{sessionId:'chat',approvalId:frames.at(-1).rpcId,cancelled:true});assert.deepEqual(await cancelled,{answers:{}});
+ assert.throws(()=>broker.request('chat',{...question,params:{...question.params,questions:[{...question.params.questions[0],isSecret:true}]}}),/protected connection/);
+});
+
+test('question cancellation and disconnect return no fabricated answer',async()=>{
+ const broker=new CodexInteractions(10);
+ const question={...request,method:'item/tool/requestUserInput',params:{...request.params,questions:[{id:'answer',header:'Question',question:'What next?',options:[]}]}};
+ assert.deepEqual(await broker.request('chat',question),{answers:{}});
+ let frame;broker.attach('native','chat',value=>frame=value);
+ const expired=broker.request('chat',question);assert.deepEqual(await expired,{answers:{}});
+ assert.throws(()=>broker.answer(frame.rpcId,'chat',{sessionId:'chat',approvalId:frame.rpcId,answer:{answers:[{id:'answer',selected:[],custom:'late'}]}}),/expired/);
+ const disconnected=broker.request('chat',question);broker.detach('native');assert.deepEqual(await disconnected,{answers:{}});broker.close();
+});

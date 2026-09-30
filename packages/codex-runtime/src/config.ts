@@ -30,6 +30,7 @@ export function runtimeOptions(connection: CodexConnection, stateDirectory: stri
   config('web_search', 'disabled');
   config('approval_policy', 'on-request');
   config('approvals_reviewer', 'user');
+  config('features.default_mode_request_user_input', true);
   config('sandbox_mode', 'workspace-write');
   config('shell_environment_policy.inherit', 'none');
   config('shell_environment_policy.include_only', ALLOWED_ENV);
