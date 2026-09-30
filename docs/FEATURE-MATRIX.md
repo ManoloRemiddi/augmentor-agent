@@ -35,10 +35,10 @@ Codex is an opt-in development engine. Its [current evidence](CODEX-INTEGRATION.
 covers API/local profile forms, shared chat/Stop/history, approvals/questions,
 scoped Browser tools/screenshots and consented desktop tools with real Chromium
 and Plasma VM proofs against a synthetic provider. API/local prompt improvement,
-paired Home tools and [native queue/steering](QUEUE-AND-STEERING.md#codex-development-integration)
+paired Home tools and [Desktop/Browser queue/steering](QUEUE-AND-STEERING.md#codex-development-integration)
 also have source qualification. The tables below retain the DSH/Pi comparison;
 they do not certify Codex parity. Subscription login, generic MCP, memory, voice,
-Browser running-turn queue controls, fork/edit and complete release qualification
+fork/edit and complete release qualification
 remain open.
 
 Release scope: DSH is the full-featured target; Pi is a supported subset.

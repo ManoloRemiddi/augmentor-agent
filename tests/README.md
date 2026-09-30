@@ -169,3 +169,16 @@ synthetic Responses server. Python must include PySide6/QtTest; choose it throug
 `test_queue.py` also covers host action flags and exact observed turn identity.
 Session/ledger tests qualify durable Stop pause, unknown promotion/no replay and
 bounded aggregate queue admission. These tests do not activate installed apps.
+
+
+### Codex Browser queue controls
+
+`apps/browser/test/queue.test.mjs` checks serialized submissions/actions,
+identity-based reconciliation, stale revision rejection, duplicate clicks,
+unknown outcomes and session/read-only/disconnect boundaries. The existing
+`codex-browser-chromium.test.mjs` now exercises actual composer Enter and row
+Steer/Remove, panel reload and next-turn ordering through native messaging and
+pinned Codex. It inspects synthetic provider inputs to exclude removed text and
+duplicate steering. Set `AUGMENTOR_QUEUE_SCREENSHOT` to a temporary PNG path to
+capture the waiting-row UI for visual inspection. The fixture is Linux-only;
+DOM and shared host contracts run independently of that physical-browser route.

@@ -18,7 +18,7 @@ export interface Operation {
   dismissed?: boolean;
   wasQueued?: boolean;
 }
-interface RecordFile {schema: 1; threadId: string; operations: Operation[]; paused?: boolean}
+interface RecordFile {schema: 1; threadId: string; operations: Operation[]; paused?: boolean; revision?: number}
 const TERMINAL = new Set<OperationStatus>(['completed', 'failed', 'interrupted', 'cancelled']);
 const validId = (id: unknown): id is string => typeof id === 'string' && /^[a-zA-Z0-9_.:-]{1,128}$/.test(id);
 export const queueOperations = (operations: Operation[]): Operation[] => operations.filter(operation => !operation.dismissed && (
@@ -37,7 +37,7 @@ export class OperationLedger extends EventEmitter {
     if (!validId(threadId)) throw new Error('Invalid Codex thread identity.');
     if (existsSync(path)) {
       const data = readPrivateJson(path) as RecordFile;
-      if (data?.schema !== 1 || data.threadId !== threadId || !Array.isArray(data.operations) || (data.paused !== undefined && typeof data.paused !== 'boolean')) throw new Error('Unsupported or mismatched Codex operation ledger.');
+      if (data?.schema !== 1 || data.threadId !== threadId || !Array.isArray(data.operations) || (data.paused !== undefined && typeof data.paused !== 'boolean') || (data.revision !== undefined && (!Number.isSafeInteger(data.revision) || data.revision < 0))) throw new Error('Unsupported or mismatched Codex operation ledger.');
       const ids = new Set<string>();
       for (const operation of data.operations) {
         if (!validId(operation.id) || ids.has(operation.id) || typeof operation.input !== 'string' ||
@@ -53,9 +53,10 @@ export class OperationLedger extends EventEmitter {
       this.data = data;
     } else {this.data = {schema: 1, threadId, operations: []}; this.save();}
   }
+  get revision(): number {return this.data.revision ?? 0;}
   get paused(): boolean {return this.data.paused === true;}
   pause(value: boolean): void {
-    const next = {...this.data, paused: value}; durableJson(this.path, next); this.data = next; this.emit('change');
+    const next = {...this.data, paused: value, revision: this.revision + 1}; durableJson(this.path, next); this.data = next; this.emit('change');
   }
   delivered(id: string): void {this.update(id, {delivered: true});}
   promote(id: string, turnId: string): Operation {
@@ -127,7 +128,7 @@ export class OperationLedger extends EventEmitter {
     return this.get(id);
   }
   private commit(operations: Operation[]): void {
-    const next: RecordFile = {...this.data, operations};
+    const next: RecordFile = {...this.data, operations, revision: this.revision + 1};
     durableJson(this.path, next); this.data = next; this.emit('change');
   }
   private save(): void {durableJson(this.path, this.data);}

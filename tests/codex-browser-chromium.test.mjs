@@ -31,6 +31,7 @@ async function cdp(url) {
 test('loaded Chromium extension executes Codex-observed typing, clicking and screenshots on an isolated page', {skip: process.platform !== 'linux', timeout: 45000}, async t => {
   const root = await mkdtemp(join(tmpdir(), 'codex-chromium-')); const sockets = [];
   let chrome, ipc; let rounds = 0; const modelInputs = [];
+  let queueMode = false, queueRounds = 0, releaseQueue; const queueInputs = [];
   const server = createServer(async (req, res) => {
     if (req.url === '/page') {
       res.setHeader('content-type', 'text/html');
@@ -38,6 +39,18 @@ test('loaded Chromium extension executes Codex-observed typing, clicking and scr
     }
     if (req.url !== '/v1/responses') {res.writeHead(404); res.end(); return;}
     let body = ''; for await (const part of req) body += part; modelInputs.push(JSON.parse(body));
+    if (queueMode) {
+      queueInputs.push(modelInputs.at(-1)); const number = ++queueRounds;
+      const item = {id: 'queue-answer-' + number, type: 'message', role: 'assistant', status: 'completed', content: [{type: 'output_text', text: 'Queue fixture answer ' + number, annotations: []}]};
+      res.writeHead(200, {'content-type': 'text/event-stream'});
+      res.write('data: ' + JSON.stringify({type: 'response.created', response: {id: 'queue-' + number, status: 'in_progress', output: []}}) + '\n\n');
+      const finish = () => {
+        for (const frame of [{type: 'response.output_item.added', output_index: 0, item}, {type: 'response.output_item.done', output_index: 0, item}, {type: 'response.completed', response: {id: 'queue-' + number, status: 'completed', output: [item]}}]) res.write('data: ' + JSON.stringify(frame) + '\n\n');
+        res.end();
+      };
+      if (number === 1) releaseQueue = finish; else finish();
+      return;
+    }
     const action = [
       ['browser_snapshot', {}], ['browser_type', {selector: '#fixture-input', text: 'Codex typed once'}],
       ['browser_snapshot', {}], ['browser_click', {selector: '#fixture-button'}], ['browser_screenshot', {}],
@@ -126,4 +139,39 @@ test('loaded Chromium extension executes Codex-observed typing, clicking and scr
   assert.ok(image?.image_url?.startsWith('data:image/jpeg;base64,'), 'Pinned Codex forwards the actual screenshot as image input');
   assert.ok(Buffer.from(image.image_url.split(',')[1], 'base64').length > 100, 'Actual Chromium JPEG pixels, not an image placeholder');
   assert.ok(toolOutputs.every(item => !JSON.stringify(item.output).includes('unknown outcome')));
+  // Exercise actual loaded composer and row controls, rather than bypassing the panel.
+  queueMode = true;
+  assert.equal((await message({type: 'prompt', text: 'Hold for the Browser queue fixture.'})).accepted, true);
+  async function panelUntil(expression, description) {
+    for (let attempt = 0; attempt < 160; attempt++) {try {if (await panel.evaluate(expression)) return;} catch {} await delay(50);}
+    throw Error('Browser queue timeout: ' + description + ' ' + await panel.evaluate("document.querySelector('#prompt-queue')?.innerText"));
+  }
+  await panelUntil('!document.querySelector("#stop").hidden && !document.querySelector("#send").hidden && !document.querySelector("#send").disabled', 'queue composer ready');
+  async function enter(text) {
+    await panel.evaluate(`(()=>{const input=document.querySelector('#input');input.value=${JSON.stringify(text)};input.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));return true})()`);
+    await panelUntil(`Array.from(document.querySelectorAll('.queue-row')).some(row=>row.textContent.includes(${JSON.stringify(text)})&&row.querySelector('button')?.textContent==='Steer')`, 'queued row');
+    return panel.evaluate(`Array.from(document.querySelectorAll('.queue-row')).find(row=>row.textContent.includes(${JSON.stringify(text)})).dataset.queueId`);
+  }
+  async function action(id, label) {
+    const lookup=`Array.from(document.querySelectorAll('.queue-row')).find(row=>row.dataset.queueId===${JSON.stringify(id)})`;
+    await panelUntil(`(()=>{const row=${lookup};return row&&Array.from(row.querySelectorAll('button')).some(b=>b.textContent===${JSON.stringify(label)}&&!b.disabled)})()`, 'row action enabled');
+    await panel.evaluate(`(()=>{const row=${lookup};Array.from(row.querySelectorAll('button')).find(b=>b.textContent===${JSON.stringify(label)}).click();return true})()`);
+  }
+  const correction = await enter('BROWSER_QUEUE_CORRECTION');
+  await action(correction, 'Steer');
+  await panelUntil(`!Array.from(document.querySelectorAll('.queue-row')).some(row=>row.dataset.queueId===${JSON.stringify(correction)}&&row.querySelector('button')&&!row.querySelector('button').disabled)`, 'steering accepted');
+  const removed = await enter('BROWSER_QUEUE_REMOVED'); await action(removed, '×');
+  await panelUntil(`!Array.from(document.querySelectorAll('.queue-row')).some(row=>row.dataset.queueId===${JSON.stringify(removed)})`, 'removed row');
+  const next = await enter('BROWSER_QUEUE_NEXT');
+  await panel.call('Page.reload');
+  await panelUntil(`document.readyState==='complete'&&Array.from(document.querySelectorAll('.queue-row')).some(row=>row.dataset.queueId===${JSON.stringify(next)})`, 'reload restores waiting row');
+  if (process.env.AUGMENTOR_QUEUE_SCREENSHOT) await writeFile(process.env.AUGMENTOR_QUEUE_SCREENSHOT, Buffer.from((await panel.call('Page.captureScreenshot', {format:'png'})).data, 'base64'));
+  assert.equal(typeof releaseQueue, 'function'); releaseQueue();
+  await panelUntil('document.body.innerText.includes("Queue fixture answer 3") && document.querySelector("#prompt-queue").hidden', 'ordered completion');
+  assert.equal(queueRounds, 3);
+  assert.equal(queueInputs[1].input.filter(item=>item.role==='user'&&JSON.stringify(item.content).includes('BROWSER_QUEUE_CORRECTION')).length, 1);
+  assert.doesNotMatch(JSON.stringify(queueInputs), /BROWSER_QUEUE_REMOVED/);
+  assert.doesNotMatch(JSON.stringify(queueInputs[1].input), /BROWSER_QUEUE_NEXT/);
+  assert.match(JSON.stringify(queueInputs[2].input), /BROWSER_QUEUE_NEXT/);
+
 });

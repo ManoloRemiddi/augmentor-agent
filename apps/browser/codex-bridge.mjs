@@ -33,7 +33,8 @@ async function client() {
       send({method: 'session.event', params: frame.payload});
       const type = frame.payload.event.type;
       if (type === 'turn/start' || type === 'turn/end') send({method: 'session.status', params: {sessionId: frame.payload.sessionId, status: type === 'turn/start' ? 'running' : 'idle'}});
-    } else if (frame.method === 'approval/requested') send({id: frame.rpcId, method: 'approval.requested', params: frame.payload});
+    } else if (frame.method === 'session/queue') send({method: 'session.queue', params: frame.payload});
+    else if (frame.method === 'approval/requested') send({id: frame.rpcId, method: 'approval.requested', params: frame.payload});
     else if (frame.method === 'question/requested') send({id: frame.rpcId, method: 'question.requested', params: frame.payload});
     else if (frame.method === 'interaction/resolved') send({method: 'interaction.resolved', params: frame.payload});
     else if (frame.method === 'session/attention') send({method: 'session.attention', params: frame.payload});
@@ -70,7 +71,7 @@ async function request(method, params = {}, id) {
     selection = {provider: params.provider, model: params.model}; await c.call('models.validate', selection);
     await mkdir(workspace, {recursive: true, mode: 0o700});
     const saved = await c.call('chats.saved');
-    return {serverInfo: {home: homedir(), harness: 'codex', capabilities: {branch: false, edit: false, memory: false, voice: false, browserTools: true, homeTools: true}, augmentor: {chatCwd: workspace, agentPreset: preset, saved: saved.saved}}};
+    return {serverInfo: {home: homedir(), harness: 'codex', capabilities: {branch: false, edit: false, memory: false, voice: false, browserTools: true, homeTools: true, queue: true}, augmentor: {chatCwd: workspace, agentPreset: preset, saved: saved.saved}}};
   }
   if (method === 'session.create') {
     if (!selection) throw new Error('Select a Codex connection before starting a chat.');
@@ -92,7 +93,7 @@ async function request(method, params = {}, id) {
     const {items} = await c.call(method); return {items: items.map(row => ({...row, projections: {values: {title: row.title}}})), total: items.length};
   }
   if (['augmentor/save', 'augmentor/unsave', 'augmentor/state'].includes(method)) return {ok: true, ...await c.call('chats.saved', {action: method.split('/')[1], sessionId: params.sessionId})};
-  if (['session.cancel', 'session.rename', 'session.models', 'session.history', 'settings.describe'].includes(method)) return c.call(method, params);
+  if (['session.queue', 'session.updateQueue', 'session.cancel', 'session.rename', 'session.models', 'session.history', 'settings.describe'].includes(method)) return c.call(method, params);
   if (method === 'shutdown') {connection?.close(); setTimeout(() => process.exit(0), 30); return {ok: true};}
   throw new Error('This Codex browser capability is not yet available: ' + method);
 }

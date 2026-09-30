@@ -53,3 +53,12 @@ test('queue admission bounds aggregate UTF-8 state before accepting another prom
   store.cancelQueued('large-0');
   store.enqueue('fits-now', '😀'.repeat(32768));
 });
+
+test('queue revision advances on pause and mutation and survives ledger restart', t => {
+  const store = ledger(t); assert.equal(store.revision, 0);
+  store.enqueue('waiting', 'Queued'); const admitted = store.revision;
+  store.pause(true); assert.ok(store.revision > admitted);
+  const resumed = new OperationLedger(store.path, store.threadId);
+  assert.equal(resumed.revision, store.revision);
+  resumed.cancelQueued('waiting'); assert.ok(resumed.revision > store.revision);
+});

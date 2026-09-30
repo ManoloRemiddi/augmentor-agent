@@ -53,6 +53,19 @@ export function handlePanelMessage(msg, sender, sendResponse) {
     request('augmentor/surface',msg.type==='surface/appearance'?{action:'appearance',settings:msg.settings}:{action:'improve',text:msg.text,selection:state.selection})
       .then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}));return true
   }
+  if (msg?.type==='queue/prompt' || msg?.type==='queue/action') {
+    if (state.harness!=='codex' || state.capabilities.queue!==true || state.phase!=='ready' || !state.sessionReady || state.panelViewSession || msg.sessionId!==state.sessionId || state.mutating) {
+      sendResponse({ok:false,error:'The queue is unavailable or the conversation changed.'});return
+    }
+    const sessionId=state.sessionId
+    state.mutating=true
+    ;(async()=>{
+      if(msg.type==='queue/prompt')return request('session.prompt',{sessionId,requestId:msg.requestId,mode:'queue',content:[{type:'text',text:String(msg.text??'')}]})
+      if(!['steer','remove'].includes(msg.action))throw Error('Unsupported queue action.')
+      return request('session.updateQueue',{sessionId,itemId:msg.itemId,expectedTurnId:msg.expectedTurnId,action:{kind:msg.action}})
+    })().then(result=>sendResponse({ok:true,...result}),error=>sendResponse({ok:false,error:error.message})).finally(()=>{state.mutating=false})
+    return true
+  }
   if(msg?.type==='voice/preferences'){
     if(state.harness!=='dsh'){sendResponse({ok:false,error:'Voice uses the shared DSH harness.'});return}
     request('augmentor/voice/preferences',{action:msg.action??'get',settings:msg.settings})
@@ -329,7 +342,7 @@ export function handlePanelMessage(msg, sender, sendResponse) {
     const entries =
       since < 0 ? state.log : state.log.filter((e) => e.kind === 'event' && e.event?.seq > since)
     sendResponse({
-      harness:state.harness,capabilities:state.capabilities,interactions:state.interactions,
+      harness:state.harness,capabilities:state.capabilities,interactions:state.interactions,queue:state.queue?.sessionId===state.sessionId?state.queue:null,
       log: entries,
       phase: state.phase,
       error: state.error,

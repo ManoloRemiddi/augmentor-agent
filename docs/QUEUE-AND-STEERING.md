@@ -1,6 +1,6 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-# Native queue and steering
+# Queued prompts and steering
 
 ## DSH
 
@@ -40,8 +40,8 @@ Stop persists a paused queue across worker/host restart. Reconnecting alone does
 not resume it. A deliberate idle Send resumes remaining waiting prompts in FIFO
 order and appends the new prompt after them; `session.continueQueue` is also an
 explicit host operation. Both native and Browser idle Send use this contract.
-Unknown active work must first be reconciled. Browser does not yet expose the
-running-turn queue panel, promotion or removal controls.
+Unknown active work must first be reconciled. Browser running-turn controls
+are qualified in the following checkpoint.
 
 The real offscreen Qt fixture drives Enter, Steer and Remove through the native
 controller/adapter and private IPC into pinned Codex. It reconnects the event
@@ -55,3 +55,41 @@ Local checks: 293 root Node tests (including the Qt/runtime fixture), 48 Browser
 DOM tests, eight shared queue UI tests and 16 focused Codex Python tests. Build
 and type checks pass. See [Codex evidence](CODEX-INTEGRATION.md#native-queue-controls-and-durable-pause)
 and [agent handoff](AGENT-HANDOFF.md) for remaining C0–C9 work.
+
+
+## Codex Browser queue
+
+Codex Browser now uses Enter/Send during a running turn to add a compact waiting
+row above the composer. Stop stays available. Each row has Steer and Remove;
+they use the same host admission/promotion/removal contracts as native Desktop.
+DSH/Pi Browser sending behavior is unchanged. Read-only views, disconnected
+panels and a changed session cannot issue queue mutations.
+
+The native bridge forwards subscription queue snapshots. The service worker
+keeps current-session queue state separately from transcript history and returns
+it when the panel reloads. Queue mutations carry stable request and observed-turn
+IDs. Local submissions and actions are serialized, including typing immediately
+after Steer. A failed acknowledgment retains the pending text; native delivered
+message IDs suppress duplicate/late optimistic rows. Nothing is automatically
+resent after a disconnect.
+
+The ledger now persists a monotonically increasing queue revision across pause,
+mutations and host restart. Browser ignores older snapshots, preventing a delayed
+poll response from resurrecting removed rows. Missing revisions in older ledger
+files start at zero; the host emits the explicit revision on every snapshot.
+
+The loaded isolated Linux Chromium test types into the real composer, clicks
+Steer and Remove, reloads the panel, verifies waiting-row restoration, and runs
+an untouched follow-up in the next native Codex turn. The synthetic provider's
+actual inputs prove the correction appears once, removed text never arrives,
+and the follow-up arrives only in the next turn. The previous observed browser
+click/type/screenshot proof also passes. A captured panel image was visually
+inspected: two compact rows fit above the composer and Send/Stop remain visible.
+This is source/isolated evidence, not the owner's installed Chrome profile.
+
+Build/type checks, 294 root Node tests and 53 Browser DOM tests pass locally.
+The preceding native queue source `3fd287b` passed both macOS jobs in
+[36750430904](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36750430904).
+Its [Debian application checks](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36750430782)
+passed before packaging stopped at the known unreviewed Codex executable gate.
+Mac loaded-browser/device qualification and complete release remain separate.

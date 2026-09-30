@@ -810,8 +810,8 @@ provider responses, not a live-model quality assessment.
 
 At this steering foundation checkpoint, native `supports_queue` was false.
 The [following queue checkpoint](#native-queue-controls-and-durable-pause) enables
-existing native controls; Browser running-turn queue presentation remains
-unqualified. No visible layout redesign is included. See the
+existing native controls; Browser presentation is covered by the later
+[Browser queue checkpoint](#browser-queue-controls-and-snapshot-ordering). No visible layout redesign is included. See the
 [official app-server steering contract](https://learn.chatgpt.com/docs/app-server).
 
 The preceding memory source `57cb362` passed both macOS jobs in
@@ -839,7 +839,7 @@ FIFO processing; ordinary reconnect and queue insertion do not clear the pause.
 The in-memory gate remains closed if persisting a pause fails. Older schema-1
 records without the added flags remain readable; this is not a qualified
 installed downgrade/migration pathway. Native and Browser idle sends are wired,
-but Browser running-turn queue/steer UI still needs implementation/qualification.
+and Browser running-turn queue/steer UI is covered by the following checkpoint.
 
 The offscreen Qt test uses the real Window, Controller, CodexAdapter, event stream,
 IPC host and pinned Codex with a held synthetic model response. Enter queues;
@@ -858,3 +858,25 @@ Its [Debian run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/3
 passed application checks and still failed the unreviewed Codex executable gate.
 History source `312a749` had the same Debian gate; its Mac run was superseded and
 cancelled. No packaging review requirement has been bypassed.
+
+
+## Browser queue controls and snapshot ordering
+
+[Browser queue behavior and evidence](QUEUE-AND-STEERING.md#codex-browser-queue)
+connects the existing shared host to the native messaging bridge, service worker
+and compact composer rows. It enables Codex's running-turn Enter/Send, Steer and
+Remove while keeping Stop available. Host identities and outcome rules are
+unchanged; Browser is presentation and IPC only. The ledger adds a persisted
+queue revision, allowing the renderer to reject delayed stale poll snapshots.
+Queue state is not added to transcript history or sent to the model as context.
+
+A real loaded Chromium run verifies composer admission, same-turn steering,
+removal without model delivery, panel reload, next-turn ordering and unchanged
+browser tool/screenshot behavior with pinned Codex and a synthetic provider.
+Five DOM contracts cover ordered submissions/actions, double-click suppression,
+unknown outcomes, delivered-ID races, stale snapshots and session/read-only/
+disconnect boundaries. A visual inspection confirms compact rows and visible
+Send/Stop. Build/type checks and 294 root Node + 53 Browser tests pass. The
+preceding native queue commit passed Mac 14/26 CI; this Browser checkpoint still
+needs its own CI. Full fork/edit, live account/provider, memory, voice, generic
+MCP, packaging and installed/device gates remain open.

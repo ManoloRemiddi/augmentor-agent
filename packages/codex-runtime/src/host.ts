@@ -111,7 +111,7 @@ export class CodexHost extends EventEmitter {
     const operations = ledger?.list() ?? [];
     const active = live && !ledger?.paused && !operations.some(operation => operation.status === 'unconfirmed')
       ? operations.find(operation => !operation.steerTurnId && operation.status === 'accepted')?.turnId : undefined;
-    return {activeTurnId: active ?? null, paused: ledger?.paused ?? false,
+    return {revision: ledger?.revision ?? 0, activeTurnId: active ?? null, paused: ledger?.paused ?? false,
       items: queueOperations(operations).map(operation => ({
         id: operation.id, rpcId: operation.id, placement: operation.status === 'queued' ? 'queued' : 'steering',
         message: {content: [{type: 'text', text: operation.input}]},

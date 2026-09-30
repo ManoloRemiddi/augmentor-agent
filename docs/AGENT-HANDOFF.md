@@ -2,6 +2,20 @@
 
 # Start here: agent handoff
 
+## September 30 Codex Browser queue checkpoint
+
+[Browser queue controls](CODEX-INTEGRATION.md#browser-queue-controls-and-snapshot-ordering)
+now share native admission/steering/removal and durable pause. Compact composer
+rows retain unknown text; exact IDs prevent duplicate delivery and stale targets.
+Persisted revisions suppress older poll snapshots. The loaded Chromium fixture
+qualifies real Enter/Steer/Remove, panel reload, same-turn correction, removal
+without model delivery and next-turn FIFO input with pinned Codex/synthetic
+Responses. A race between Steer and immediate typing is fixed by serializing
+queue actions and submissions. Build/type checks, 294 root Node and 53 Browser
+DOM tests pass. No installed app/profile changed. Previous `3fd287b` passed both
+Mac jobs; Debian application checks passed and packaging still blocks unreviewed
+Codex binaries. Continue exact fork/edit and the remaining C0–C9 requirements.
+
 ## September 30 Codex native queue checkpoint
 
 [Queue controls and pause](CODEX-INTEGRATION.md#native-queue-controls-and-durable-pause)

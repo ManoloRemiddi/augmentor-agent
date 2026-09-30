@@ -121,6 +121,10 @@ export function ensurePort() {
       onSessionEvent(msg.params)
       return
     }
+    if (msg.method === 'session.queue') {
+      if (state.harness==='codex' && msg.params?.sessionId===state.sessionId) {state.queue=msg.params;broadcast({kind:'queue',sessionId:state.sessionId})}
+      return
+    }
     if (msg.method === 'session.error') {
       if(msg.params?.sessionId!==state.sessionId)return
       state.running=false;state.error=msg.params.message;broadcast(log('error',{message:msg.params.message}));return
