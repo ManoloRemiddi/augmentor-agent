@@ -348,3 +348,31 @@ Validation: build and all 242 root Node tests pass locally, including the real
 pinned-runtime/provider/client fixture and two subprocess cases with a descendant
 that ignores TERM (normal close and unexpected wrapper crash). macOS CI after
 this correction is still required; Linux fixture success is not macOS evidence.
+
+## Linux maintenance orchestration and local backups
+
+The private socket now supports `host.shutdown`. It freezes socket admission
+before awaiting the host's activity check, refuses pipelined cancellation or new
+work during that decision, flushes the accepted response, and closes the host and
+workers. A refused shutdown leaves the server reachable. `host.describe` includes
+the process ID used by the existing maintenance process-identity check.
+
+`scripts/maintenance.py prepare --component all` now discovers the configured
+Codex socket alongside Pi. It prepares Codex before closing any surface, stops an
+idle host through its RPC, and cancels preparation if a later check fails. Failure
+to reopen admission is reported explicitly. Browser-process detection includes the
+Codex bridge. The existing local backup now includes `state/codex`, preserving
+profile references, conversation metadata and native history while omitting sockets.
+OS credential-store entries remain outside this file backup.
+
+Validation: build and 244 root Node tests pass; five new Python cases cover busy
+refusal, UI-busy rollback, ordered shutdown, backup preservation, and an actual
+standalone Codex host exiting through the maintenance script. Two socket tests
+cover pipelined requests and failed shutdown. All use isolated state. The prior
+process-group correction has passed the shared-contract CI step on Debian and
+macOS 14; the remaining jobs were still running when checked.
+
+This is Linux maintenance source integration, not an installed upgrade or removal
+qualification. Existing package lifetime leases remain the installer boundary;
+macOS installer coordination and complete artifact/rollback acceptance still need
+qualification. No installed application or user service was stopped by these tests.

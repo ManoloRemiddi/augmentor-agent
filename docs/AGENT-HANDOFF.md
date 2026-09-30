@@ -82,6 +82,12 @@ remaining members on close or wrapper failure. All 242 root Node tests pass loca
 including real Codex and two TERM-resistant descendant cases. Follow the next CI
 run for macOS evidence; this does not resolve the native packaging inventory gate.
 
+Linux maintenance now discovers and prepares Codex before closing surfaces, then
+stops it through the private socket. A later refusal cancels preparation, and local
+backups include Codex state without sockets. The actual isolated host exits through
+this script; five Python cases and 244 root Node tests pass. See the implementation
+guide for the remaining installed-upgrade and macOS coordination evidence gaps.
+
 ## September 30 application SDK foundation
 
 [SDK foundation](APP-SDK.md) owns the DSH-only application contract, exact tool

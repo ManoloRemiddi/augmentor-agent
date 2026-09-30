@@ -99,7 +99,9 @@ test('standalone Codex host persists a local profile and recovers its socket aft
   assert.equal((await second.invoke('prepare', 'host.prepareShutdown')).result.maintenance, true);
   assert.match((await second.invoke('blocked', 'profiles.configure', {})).error.message, /maintenance/);
   assert.equal((await second.invoke('cancel', 'host.cancelShutdown')).result.maintenance, false);
-  second.socket.destroy(); const stopped = once(second.child, 'exit'); second.child.kill('SIGTERM'); await stopped;
+  const stopped = once(second.child, 'exit');
+  assert.equal((await second.invoke('shutdown', 'host.shutdown')).result.accepted, true);
+  await stopped; second.socket.destroy();
 });
 
 test('Codex IPC routes one approval and rotates its reply capability after presenter loss', {timeout: 5000}, async t => {
@@ -120,4 +122,36 @@ test('Codex IPC routes one approval and rotates its reply capability after prese
   assert.equal((await b.next()).event.method, 'interaction/resolved');
   assert.equal((await b.next()).result.accepted, true); assert.deepEqual(await decision, {decision: 'accept'});
   b.socket.destroy();
+});
+
+test('socket shutdown freezes pipelined cancellation and submissions before awaiting readiness', async t => {
+  const {host, connect} = await fixture(t);
+  const calls = []; let ready;
+  host.dispatch = async method => {
+    calls.push(method);
+    if (method === 'host.prepareShutdown') return new Promise(resolve => {ready = resolve;});
+    return {};
+  };
+  const client = await connect();
+  client.send({id: 'hello', method: 'host.hello', params: {protocol: 'augmentor-codex/1'}}); await client.next();
+  client.socket.write([
+    {id: 'shutdown', method: 'host.shutdown'},
+    {id: 'cancel', method: 'host.cancelShutdown'},
+    {id: 'prompt', method: 'session.prompt'},
+  ].map(value => JSON.stringify(value) + '\n').join(''));
+  assert.match((await client.next()).error.message, /closing/);
+  assert.match((await client.next()).error.message, /closing/);
+  assert.deepEqual(calls, ['host.prepareShutdown']);
+  ready({ready: true});
+  assert.equal((await client.next()).result.accepted, true);
+});
+
+test('refused socket shutdown leaves the host reachable', async t => {
+  const {host, connect} = await fixture(t);
+  host.dispatch = async method => {if (method === 'host.prepareShutdown') throw new Error('active work'); return {ready: true};};
+  const client = await connect();
+  client.send({id: 'hello', method: 'host.hello', params: {protocol: 'augmentor-codex/1'}}); await client.next();
+  client.send({id: 'shutdown', method: 'host.shutdown'}); assert.match((await client.next()).error.message, /active work/);
+  client.send({id: 'describe', method: 'host.describe'}); assert.equal((await client.next()).result.ready, true);
+  client.socket.destroy();
 });

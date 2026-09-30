@@ -13,6 +13,7 @@ export class CodexIpcServer {
   private server?: net.Server;
   private inode?: number;
   private closing = false;
+  private shutdownScheduled = false;
   constructor(readonly host: CodexHost, readonly socketPath: string) {}
   async listen(): Promise<void> {
     if (this.server || this.closing) throw new Error('Codex IPC cannot be started twice.');
@@ -45,18 +46,18 @@ export class CodexIpcServer {
     this.host.on('event', this.event);
     this.host.on('attention', this.attention);
   }
-  private write(socket: net.Socket, value: unknown): void {
+  private write(socket: net.Socket, value: unknown, flushed?: () => void): void {
     if (socket.destroyed) return;
     const line = JSON.stringify(value) + '\n';
     if (Buffer.byteLength(line) > MAX_FRAME || socket.writableLength > 4 * MAX_FRAME) {socket.destroy(); return;}
-    socket.write(line);
+    socket.write(line, flushed);
   }
   private event = (id: string, frame: unknown): void => {
     for (const [socket, client] of this.clients) if (client.ready && client.sessionId === id) this.write(socket, {event: frame});
   };
   private attention = (id: string, info: unknown): void => this.event(id, {method: 'session/attention', payload: {sessionId: id, ...info as object}});
   private connect(socket: net.Socket): void {
-    if (this.closing || this.clients.size >= 32) {socket.destroy(); return;}
+    if (this.closing || this.shutdownScheduled || this.clients.size >= 32) {socket.destroy(); return;}
     const presenterId = randomUUID();
     const client = {ready: false, sessionId: undefined as string | undefined, pending: new Set<string>()};
     this.clients.set(socket, client);
@@ -79,7 +80,7 @@ export class CodexIpcServer {
         client.pending.add(req.id);
         void (async () => {
           try {
-            if (this.closing) throw new Error('Codex host is closing.');
+            if (this.closing || this.shutdownScheduled) throw new Error('Codex host is closing.');
             const params = req.params ?? {};
             let result; let afterReply: (() => void) | undefined;
             if (req.method === 'host.hello') {
@@ -87,6 +88,17 @@ export class CodexIpcServer {
               client.ready = true; clearTimeout(handshakeTimer); result = {protocol: CODEX_PROTOCOL};
             } else {
               if (!client.ready) throw new Error('Codex host protocol handshake is required.');
+              if (req.method === 'host.shutdown') {
+                // Freeze before the first await: pipelined cancellation must not reopen admission.
+                this.shutdownScheduled = true;
+                try {await this.host.dispatch('host.prepareShutdown', {});}
+                catch (error) {this.shutdownScheduled = false; throw error;}
+                const shutdown = () => {void this.close();};
+                socket.once('close', shutdown);
+                if (socket.destroyed) shutdown();
+                else this.write(socket, {id: req.id, result: {accepted: true}}, shutdown);
+                return;
+              }
               if (req.method === 'events.subscribe') {
                 if (params.sessionId !== null && params.sessionId !== undefined) await this.host.dispatch('session.describe', params);
                 client.sessionId = params.sessionId ?? undefined; result = {subscribed: true};
