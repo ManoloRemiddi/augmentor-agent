@@ -53,8 +53,10 @@ format remains canonical and a crashed process does not leave a stale lock.
 SDK profiles default voice off. Their embedded Settings page exposes an
 experimental workspace toggle, stored only in that profile's preferences.
 The native boundary enforces it; reopen the panel after changing it to update
-the loaded controls. Resonant Voice still uses the host's audio devices and
-installed dependencies. This adds no remote microphone, cloud provider or
+the loaded controls. The connection capabilities report the saved choice. Use
+Stop to end an already active voice interaction before disabling future starts.
+Resonant Voice still uses the host's audio devices and installed dependencies.
+This adds no remote microphone, cloud provider or
 guarantee of hardware/model availability. Global voice configuration remains
 in standalone Augmentor.
 

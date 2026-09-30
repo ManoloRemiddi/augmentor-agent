@@ -14,7 +14,7 @@ import {memoryRequest} from './shared/memory.mjs'
 import {spawn} from 'node:child_process'
 import {loadProfile} from '../../services/workspaces/profiles.mjs'
 const workspaceProfile=loadProfile()
-import {guardWorkspaceMethod,SDK_PROTOCOL} from '../../services/workspaces/policy.mjs'
+import {guardWorkspaceMethod,voiceEnabled,SDK_PROTOCOL} from '../../services/workspaces/policy.mjs'
 import {fileURLToPath} from 'node:url'
 let child,compatible=false,buffer=Buffer.alloc(0)
 const reply=value=>{const b=Buffer.from(JSON.stringify(value)),h=Buffer.alloc(4);h.writeUInt32LE(b.length);process.stdout.write(Buffer.concat([h,b]))}
@@ -26,7 +26,7 @@ process.stdin.on('data',chunk=>{
     let first;try{first=JSON.parse(buffer.subarray(4,n+4))}catch{process.exit(1)}buffer=buffer.subarray(n+4)
     if(first.method==='workspace.describe'){
       if(!workspaceProfile?.sdkProtocol||first.params?.protocol!==SDK_PROTOCOL){reply({id:first.id,error:{code:'INCOMPATIBLE_RUNTIME',message:'Register an SDK v1 workspace profile before connecting'}});continue}
-      reply({id:first.id,result:{protocol:SDK_PROTOCOL,profile:workspaceProfile.id,harness:'dsh',productProtocol:PRODUCT_PROTOCOL,productVersion:RELEASE.version,tools:workspaceProfile.policy.tools,voice:{experimental:true,enabled:workspaceProfile.policy.voice}}});continue
+      reply({id:first.id,result:{protocol:SDK_PROTOCOL,profile:workspaceProfile.id,harness:'dsh',productProtocol:PRODUCT_PROTOCOL,productVersion:RELEASE.version,tools:workspaceProfile.policy.tools,voice:{experimental:true,enabled:voiceEnabled(workspaceProfile)}}});continue
     }
     if(first.method==='augmentor/handshake'){
       compatible=first.params?.protocol===PRODUCT_PROTOCOL&&first.params?.version===RELEASE.version
