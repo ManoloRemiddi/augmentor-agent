@@ -31,13 +31,16 @@ test('SDK workspaces cannot administer shared runtime or enable tools through se
  preferences(f.profile,{set:{'experimental-voice-enabled':true}});assert.equal(voiceEnabled(f.profile),true);guardWorkspaceMethod(f.profile,'augmentor/voice/start');
  preferences(f.profile,{set:{'experimental-voice-enabled':false}});assert.equal(voiceEnabled(f.profile),false);assert.throws(()=>guardWorkspaceMethod(f.profile,'augmentor/voice/start'),/disabled/);
 });
-test('monotonic tool guard denies ungranted tools and wrong workspace; revocation is read live',t=>{
- const f=fixture(t);process.env.AUGMENTOR_WORKSPACE_PROFILES=f.profilesDir;installProfile(f.profile,f);let guard;
- apply({tools:{guard:g=>{guard=g;},presentAs:()=>{},restrict:p=>assert.deepEqual(p,{allow:f.profile.policy.tools})}},{profileId:'fixture'});
+test('monotonic tool guard denies ungranted tools and wrong workspace; revocation is read live',async t=>{
+ const f=fixture(t);process.env.AUGMENTOR_WORKSPACE_PROFILES=f.profilesDir;installProfile(f.profile,f);let guard,filter;
+ apply({on:(event,fn)=>{assert.equal(event,'system-prompt/assemble');filter=fn;},tools:{guard:g=>{guard=g;},presentAs:()=>{}}},{profileId:'fixture'});
  const exec={name:'fixture_read',agent:{session:{header:{agentPreset:f.profile.preset,cwd:f.dir}}}};
+ const assembly={tools:[{name:'fixture_read'},{name:'bash'}],variables:{keep:true}};
+ assert.deepEqual((await filter(null,null,async()=>assembly)).tools,[{name:'fixture_read'}]);
  assert.equal(guard(exec),undefined);assert.match(guard({...exec,name:'bash'}),/not granted/);
  assert.match(guard({...exec,agent:{session:{header:{agentPreset:'personal',cwd:f.dir}}}}),/does not belong/);
  writeFileSync(join(f.profilesDir,'fixture.json'),JSON.stringify({...f.profile,policy:{...f.profile.policy,tools:[]}}));assert.match(guard(exec),/not granted/);
+ assert.deepEqual((await filter(null,null,async()=>assembly)).tools,[]);
 });
 test('SDK profile fails closed if DSH lacks the monotonic guard API',t=>{
  const f=fixture(t);process.env.AUGMENTOR_WORKSPACE_PROFILES=f.profilesDir;installProfile(f.profile,f);
