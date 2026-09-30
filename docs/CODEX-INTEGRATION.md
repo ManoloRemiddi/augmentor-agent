@@ -19,7 +19,7 @@ unqualified. Do not substitute the user's global CLI or inherit its auth cache.
 - `rpc.ts`: stdio JSONL app-server transport, bounded frames/pending requests,
   correlated responses, server interaction replies, timeout/crash failure and
   process shutdown. Unknown request outcomes are never retried; unhandled
-  interactions are rejected. Upstream stderr is consumed without publishing
+  unsupported interactions are rejected. Upstream stderr is consumed without publishing
   potentially private diagnostics.
 - `config.ts`: isolated runtime state and allowlisted process environment;
   explicit provider/model configuration with retries disabled. Provider secrets
@@ -40,7 +40,8 @@ unqualified. Do not substitute the user's global CLI or inherit its auth cache.
   per conversation authority, native-thread reopening, display history, bounded
   owner-only Unix socket, version handshake and per-session subscriptions.
   The host refuses changed profile revisions, unconfirmed creation and active
-  worker release. Approval presenter integration and installed-service qualification are pending.
+  worker release. Approval presentation now uses the shared broker described below;
+  installed-service qualification remains pending.
 - `profiles.ts` / `credentials.ts` and `services/codex/credentials.py`: versioned
   API/local profiles with opaque credential references, serialized replacement,
   explicit destination-change checks and an OS-store helper over private pipes.
@@ -200,3 +201,37 @@ skips after fixing the settings preview without a controller. A rendered offscre
 Qt setup dialog was inspected for readable fields and unclipped controls. Subscription sign-in remains unavailable in both
 forms. Browser tool execution, approval presentation, memory and speech remain
 pending; no installed application was updated by this checkpoint.
+
+## One-presenter approval broker
+
+`interactions.ts` maps pinned app-server command and file-change approvals to
+Augmentor's existing allow-once/deny UI. Runtime configuration explicitly selects
+human approval review. No session-wide or persistent execution rule is granted.
+File approval requires a complete proposed-change preview and rejects requests
+for a persistent grant root. Network requests show the network destination;
+oversized or incomplete previews fail closed. Other server-request types, including
+structured questions and dynamic tool execution, still require their own mappings.
+
+The IPC event subscription owns presentation. Only one subscriber receives an
+opaque reply capability; it is never journaled or broadcast to viewers. Disconnect
+transfers the request to another subscriber with a new capability. Old replies,
+wrong-session replies and repeated replies are rejected. With no presenter, on
+timeout or on upstream resolution, no action is authorized. Responses use the
+existing per-request native connection or Browser bridge and the shared host.
+
+The real pinned runtime now requests escalated execution of a fixed synthetic
+command through each client bridge. Both fixtures deny it, Codex receives the
+denial and completes its turn. This exercises the production approval policy
+without executing that command. Broker/IPC tests additionally cover single-owner
+presentation, transfer, expiry, stale replies, file preview requirements and
+upstream cancellation. Actual modal UI interaction, successful approved execution
+under the OS sandbox, structured questions and installed cross-surface behavior
+remain qualification work. Reference: [app-server approvals](https://learn.chatgpt.com/docs/app-server#approvals).
+
+Approval-checkpoint validation: build passes, root Node suite passes 232 tests,
+Browser DOM suite passes 45, and the final focused Codex run passes 39 after
+explicitly pinning human approval review. The earlier 554-test native-suite record
+belongs to the setup checkpoint; this checkpoint additionally exercises the actual
+Python adapter against the real Codex process. Multiple Browser panels sharing one
+extension service worker still need a separate UI-presenter claim; the current
+broker guarantees one subscribed client connection, not one Browser document.

@@ -29,6 +29,7 @@ export function runtimeOptions(connection: CodexConnection, stateDirectory: stri
   config('analytics.enabled', false);
   config('web_search', 'disabled');
   config('approval_policy', 'on-request');
+  config('approvals_reviewer', 'user');
   config('sandbox_mode', 'workspace-write');
   config('shell_environment_policy.inherit', 'none');
   config('shell_environment_policy.include_only', ALLOWED_ENV);

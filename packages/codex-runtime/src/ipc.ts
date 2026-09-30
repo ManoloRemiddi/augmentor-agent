@@ -1,5 +1,6 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import net from 'node:net';
+import {randomUUID} from 'node:crypto';
 import {chmodSync, existsSync, lstatSync, unlinkSync} from 'node:fs';
 import {dirname} from 'node:path';
 import {MAX_FRAME, request} from '../../protocol/src/index.js';
@@ -56,12 +57,13 @@ export class CodexIpcServer {
   private attention = (id: string, info: unknown): void => this.event(id, {method: 'session/attention', payload: {sessionId: id, ...info as object}});
   private connect(socket: net.Socket): void {
     if (this.closing || this.clients.size >= 32) {socket.destroy(); return;}
+    const presenterId = randomUUID();
     const client = {ready: false, sessionId: undefined as string | undefined, pending: new Set<string>()};
     this.clients.set(socket, client);
     let buffer = Buffer.alloc(0);
     const handshakeTimer = setTimeout(() => {if (!client.ready) socket.destroy();}, 10000);
     socket.on('error', () => {});
-    socket.on('close', () => {clearTimeout(handshakeTimer); this.clients.delete(socket);});
+    socket.on('close', () => {clearTimeout(handshakeTimer); this.clients.delete(socket); this.host.approvals.detach(presenterId);});
     socket.on('data', chunk => {
       buffer = Buffer.concat([buffer, chunk]);
       let end;
@@ -79,7 +81,7 @@ export class CodexIpcServer {
           try {
             if (this.closing) throw new Error('Codex host is closing.');
             const params = req.params ?? {};
-            let result;
+            let result; let afterReply: (() => void) | undefined;
             if (req.method === 'host.hello') {
               if (params.protocol !== CODEX_PROTOCOL) throw new Error('Incompatible Codex host protocol.');
               client.ready = true; clearTimeout(handshakeTimer); result = {protocol: CODEX_PROTOCOL};
@@ -88,9 +90,13 @@ export class CodexIpcServer {
               if (req.method === 'events.subscribe') {
                 if (params.sessionId !== null && params.sessionId !== undefined) await this.host.dispatch('session.describe', params);
                 client.sessionId = params.sessionId ?? undefined; result = {subscribed: true};
+                afterReply = () => {
+                  this.host.approvals.detach(presenterId);
+                  if (client.sessionId && !socket.destroyed) this.host.approvals.attach(presenterId, client.sessionId, frame => this.write(socket, {event: frame}));
+                };
               } else result = await this.host.dispatch(req.method, params);
             }
-            this.write(socket, {id: req.id, result});
+            this.write(socket, {id: req.id, result}); afterReply?.();
           } catch (error) {
             this.write(socket, {id: req.id, error: {message: error instanceof Error ? error.message : 'Codex host request failed.'}});
           } finally {client.pending.delete(req.id);}

@@ -12,6 +12,7 @@ import {DisplayJournal} from './journal.js';
 import {durableJson, readPrivateJson, privateDirectory} from './storage.js';
 import {chatEvents, type ChatEvent} from './events.js';
 import type {ProfileStore} from './profiles.js';
+import {CodexInteractions} from './interactions.js';
 import {checkProvider} from './provider-check.js';
 
 export const CODEX_PROTOCOL = 'augmentor-codex/1';
@@ -33,6 +34,7 @@ interface Worker {rpc: CodexRpc; session: CodexSession; journal: DisplayJournal;
 
 /** Shared local host. Initially uses one isolated worker per native thread authority. */
 export class CodexHost extends EventEmitter {
+  readonly approvals = new CodexInteractions();
   private metadata = new Map<string, SessionMeta>();
   private workers = new Map<string, Worker>();
   private opening = new Map<string, Promise<Worker>>();
@@ -142,14 +144,26 @@ export class CodexHost extends EventEmitter {
         if (saved) this.emit('event', meta.id, {method: 'session/event', payload: {sessionId: meta.id, event: saved}});
       };
       session.on('event', publish);
+      const fileChanges = new Map<string, unknown>();
+      rpc.on('notification', frame => {
+        const p = frame.params;
+        if (p.threadId !== meta.threadId) return;
+        if (frame.method === 'item/started' && p.item?.type === 'fileChange') fileChanges.set(p.item.id, p.item.changes);
+        if (frame.method === 'item/completed') fileChanges.delete(p.item?.id);
+        if (frame.method === 'serverRequest/resolved') this.approvals.cancel(meta.id, p.requestId);
+        if (frame.method === 'turn/completed') {this.approvals.cancel(meta.id, undefined, p.turn.id); fileChanges.clear();}
+      });
       session.on('attention', info => this.emit('attention', meta.id, info));
       rpc.on('request', (request: RpcRequest) => {
         if (request.params.threadId !== meta.threadId) {rpc.reject(request.id); return;}
-        if (!this.listenerCount('interaction')) {rpc.reject(request.id, 'No Augmentor approval presenter is attached.'); return;}
         worker.interactions.set(request.id, request);
-        this.emit('interaction', meta.id, request);
+        void (async () => {
+          try {rpc.respond(request.id, await this.approvals.request(meta.id, request, fileChanges.get(String(request.params.itemId))));}
+          catch {try {rpc.reject(request.id, 'This approval is unsupported, expired or disconnected.');} catch { /* disconnected worker */ }}
+          finally {worker.interactions.delete(request.id);}
+        })();
       });
-      rpc.on('failure', () => {session.close(); worker.interactions.clear(); this.workers.delete(meta.id);});
+      rpc.on('failure', () => {this.approvals.cancel(meta.id); session.close(); worker.interactions.clear(); this.workers.delete(meta.id);});
       await session.reconcile();
       if (ledger.list().some(operation => operation.turnId || operation.status === 'unconfirmed')) {
         const history = await rpc.call('thread/read', {threadId: meta.threadId, includeTurns: true});
@@ -172,6 +186,7 @@ export class CodexHost extends EventEmitter {
   async dispatch(method: string, params: Data): Promise<unknown> {
     this.assertOpen();
     switch (method) {
+      case 'interaction.respond': return this.approvals.answer(identifier(params.rpcId), identifier(params.sessionId), params.value);
       case 'profiles.list': return {profiles: this.options.profiles?.list() ?? []};
       case 'profiles.configure': {
         if (!this.options.profiles) throw new Error('Codex profile setup is unavailable in this host.');
@@ -247,7 +262,7 @@ export class CodexHost extends EventEmitter {
     worker.session.close(); await worker.rpc.close(); this.workers.delete(id);
   }
   async close(): Promise<void> {
-    this.closing = true;
+    this.closing = true; this.approvals.close();
     await Promise.allSettled([...this.opening.values()]);
     for (const worker of this.workers.values()) {
       worker.session.close(); worker.session.ledger.recover(); await worker.rpc.close();

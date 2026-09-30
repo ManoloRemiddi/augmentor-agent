@@ -39,8 +39,8 @@ test('pinned real Codex streams a fixture response and resumes persisted native 
     res.writeHead(200, {'content-type': 'text/event-stream'});
     const send = event => res.write(`data: ${JSON.stringify(event)}\n\n`);
     if (mode === 'hold') {heldResponse = res; send({type: 'response.created', response: {id: 'resp_hold', status: 'in_progress', output: []}}); holdStarted.resolve(); return;}
-    if (mode === 'tool' && toolRounds++ === 0) {
-      const item = {id: 'fc_fixture', type: 'function_call', call_id: 'call_fixture', name: 'exec_command', arguments: JSON.stringify({cmd: 'printf augmentor_tool_fixture', max_output_tokens: 100})};
+    if (['tool', 'approval'].includes(mode) && toolRounds++ === 0) {
+      const item = {id: 'fc_fixture', type: 'function_call', call_id: 'call_fixture', name: 'exec_command', arguments: JSON.stringify({cmd: 'printf augmentor_tool_fixture', max_output_tokens: 100, ...(mode === 'approval' ? {sandbox_permissions: 'require_escalated', justification: 'Exercise the approval denial fixture.'} : {})})};
       send({type: 'response.created', response: {id: 'resp_tool', status: 'in_progress', output: []}});
       send({type: 'response.output_item.added', output_index: 0, item});
       send({type: 'response.output_item.done', output_index: 0, item});
@@ -130,16 +130,22 @@ test('pinned real Codex streams a fixture response and resumes persisted native 
   assert.equal(finalHistory.events.filter(({event}) => event.type === 'assistant/message').length, 2);
   const ipc = new CodexIpcServer(host, join(root, 'host.sock')); await ipc.listen();
   cleanup.push(() => ipc.close());
+  mode = 'approval'; toolRounds = 0;
   const native = await promisify(execFile)(process.env.AUGMENTOR_PYTHON ?? 'python3', [fileURLToPath(new URL('./fixtures/codex/native-client.py', import.meta.url))], {
     timeout: 20000,
     env: {...process.env, PYTHONPATH: fileURLToPath(new URL('../apps/native', import.meta.url)), PYTHONDONTWRITEBYTECODE: '1',
       AUGMENTOR_CODEX_STATE: join(root, 'native'), AUGMENTOR_CODEX_SOCKET: ipc.socketPath, AUGMENTOR_CODEX_NO_AUTOSTART: '1', AUGMENTOR_CODEX_WORKSPACE: cwd},
   });
   assert.equal(JSON.parse(native.stdout).nativeAdapter, 'passed');
+  assert.equal(JSON.parse(native.stdout).approvalsDenied, 1);
+  mode = 'approval'; toolRounds = 0;
   const browser = await promisify(execFile)(process.execPath, [fileURLToPath(new URL('./fixtures/codex/browser-client.mjs', import.meta.url))], {
     timeout: 20000,
     env: {...process.env, AUGMENTOR_CODEX_STATE: join(root, 'browser'), AUGMENTOR_CODEX_SOCKET: ipc.socketPath, AUGMENTOR_CODEX_BROWSER_WORKSPACE: cwd},
   });
   assert.equal(JSON.parse(browser.stdout).browserBridge, 'passed');
+  assert.equal(JSON.parse(browser.stdout).approvalsDenied, 1);
+  assert.ok(requests.at(-1).input.some(item => item.type === 'function_call_output' && /reject|denied|declin/i.test(item.output)));
+  mode = 'text';
   assert.equal((await host.dispatch('host.describe', {})).harness, 'codex');
 });

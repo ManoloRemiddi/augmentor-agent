@@ -35,6 +35,14 @@ See the implementation evidence for the validation
 limits. Continue C3 real UI/tool/approval qualification and C4–C9; source selectors
 do not establish a finished integration or installed release.
 
+The approval checkpoint adds a shared one-presenter broker for Codex command and
+file-change approvals, with fresh reply capabilities on presenter transfer and no
+persistent grants. Both real client bridges now deny a synthetic escalated command
+through pinned Codex, which receives the denial and continues. Broker/socket tests
+cover stale replies, disconnect and expiry. Structured questions, scoped dynamic
+tools and actual approval-dialog qualification remain unfinished; see the updated
+[implementation evidence](CODEX-INTEGRATION.md#one-presenter-approval-broker).
+
 ## September 30 application SDK foundation
 
 [SDK foundation](APP-SDK.md) owns the DSH-only application contract, exact tool

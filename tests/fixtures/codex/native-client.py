@@ -16,9 +16,13 @@ assert created['agentPreset'] == client.preset
 assert client.call('session.selectModel', {'sessionId': sid, **selection})['current'] == selection
 done = threading.Event()
 events = []
+approvals = []
 
 
 def frame(value):
+    if value.get('method') == 'approval/requested':
+        approvals.append(value)
+        client.respond(value['rpcId'], {'sessionId': sid, 'approvalId': value['payload']['approvalId'], 'outcome': 'rejected'})
     if value.get('method') == 'session/event':
         event = value['payload']['event']
         events.append(event)
@@ -35,6 +39,6 @@ try:
     assert sid in client.saved_chats('save', sid)
     assert any(row['sessionId'] == sid for row in client.session_rows())
     assert client.call('session.models', {'sessionId': sid})['current'] == selection
-    print(json.dumps({'nativeAdapter': 'passed', 'events': len(events)}))
+    print(json.dumps({'nativeAdapter': 'passed', 'events': len(events), 'approvalsDenied': len(approvals)}))
 finally:
     stream.close()

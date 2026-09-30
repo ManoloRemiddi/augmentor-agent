@@ -6,6 +6,7 @@ import {once, EventEmitter} from 'node:events';
 import {mkdtempSync, rmSync, statSync, appendFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
+import {CodexInteractions} from '../dist/codex-runtime/src/interactions.js';
 import {CodexIpcServer} from '../dist/codex-runtime/src/ipc.js';
 import {DisplayJournal} from '../dist/codex-runtime/src/journal.js';
 import {CodexHost} from '../dist/codex-runtime/src/host.js';
@@ -16,7 +17,8 @@ async function fixture(t) {
   const root = mkdtempSync(join(tmpdir(), 'codex-ipc-'));
   const host = new EventEmitter();
   host.dispatch = async (method, params) => {if (method === 'session.describe' && params.sessionId !== 'one') throw new Error('Unknown conversation'); return {method};};
-  host.close = async () => {};
+  host.approvals = new CodexInteractions();
+  host.close = async () => {host.approvals.close();};
   const server = new CodexIpcServer(host, join(root, 'host.sock')); await server.listen();
   t.after(async () => {await server.close(); rmSync(root, {recursive: true, force: true});});
   async function connect() {
@@ -94,4 +96,24 @@ test('standalone Codex host persists a local profile and recovers its socket aft
   const listed = await second.invoke('list', 'profiles.list'); assert.equal(listed.result.profiles[0].id, 'local');
   assert.equal(listed.result.profiles[0].validation, 'unverified');
   second.socket.destroy(); const stopped = once(second.child, 'exit'); second.child.kill('SIGTERM'); await stopped;
+});
+
+test('Codex IPC routes one approval and rotates its reply capability after presenter loss', {timeout: 5000}, async t => {
+  const {host, connect} = await fixture(t);
+  const original = host.dispatch;
+  host.dispatch = async (method, params) => method === 'interaction.respond' ? host.approvals.answer(params.rpcId, params.sessionId, params.value) : original(method, params);
+  const a = await connect(); const b = await connect();
+  for (const client of [a, b]) {
+    client.send({id: 'hello', method: 'host.hello', params: {protocol: 'augmentor-codex/1'}}); await client.next();
+    client.send({id: 'sub', method: 'events.subscribe', params: {sessionId: 'one'}}); assert.equal((await client.next()).id, 'sub');
+  }
+  const decision = host.approvals.request('one', {id: 7, method: 'item/commandExecution/requestApproval', params: {turnId: 'turn', itemId: 'item', command: 'printf fixture'}});
+  const first = (await a.next()).event; assert.equal(b.frames.length, 0);
+  a.socket.destroy(); const next = (await b.next()).event; assert.notEqual(first.rpcId, next.rpcId);
+  const respond = frame => ({rpcId: frame.rpcId, sessionId: 'one', value: {sessionId: 'one', approvalId: frame.rpcId, outcome: 'allowed-once'}});
+  b.send({id: 'stale', method: 'interaction.respond', params: respond(first)}); assert.match((await b.next()).error.message, /expired/);
+  b.send({id: 'answer', method: 'interaction.respond', params: respond(next)});
+  assert.equal((await b.next()).event.method, 'interaction/resolved');
+  assert.equal((await b.next()).result.accepted, true); assert.deepEqual(await decision, {decision: 'accept'});
+  b.socket.destroy();
 });

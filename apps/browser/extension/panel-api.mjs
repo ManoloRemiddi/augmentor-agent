@@ -98,8 +98,8 @@ export function handlePanelMessage(msg, sender, sendResponse) {
   if(msg?.type==='interaction/respond'){
     const row=state.interactions.find(row=>row.id===msg.id)
     if(!row){sendResponse({ok:false,error:'This request has expired.'});return}
-    if(state.harness==='dsh'){
-      const value=msg.value
+    if(['dsh','codex'].includes(state.harness)){
+      const value={...msg.value,sessionId:row.params.sessionId,approvalId:row.params.approvalId}
       if(value?.outcome==='denied')value.outcome='rejected'
       request('augmentor/interaction',{sessionId:row.params.sessionId,id:msg.id,value}).then(()=>{
         state.interactions=state.interactions.filter(row=>row.id!==msg.id);sendResponse({ok:true});broadcast()

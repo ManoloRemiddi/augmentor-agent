@@ -28,7 +28,9 @@ async function client() {
       send({method: 'session.event', params: frame.payload});
       const type = frame.payload.event.type;
       if (type === 'turn/start' || type === 'turn/end') send({method: 'session.status', params: {sessionId: frame.payload.sessionId, status: type === 'turn/start' ? 'running' : 'idle'}});
-    } else if (frame.method === 'session/attention') send({method: 'session.attention', params: frame.payload});
+    } else if (frame.method === 'approval/requested') send({id: frame.rpcId, method: 'approval.requested', params: frame.payload});
+    else if (frame.method === 'interaction/resolved') send({method: 'interaction.resolved', params: frame.payload});
+    else if (frame.method === 'session/attention') send({method: 'session.attention', params: frame.payload});
   }, () => setImmediate(() => process.exit(1)), 'codex').then(value => {connection = value; return value;}).finally(() => {opening = undefined;});
   return opening;
 }
@@ -43,6 +45,7 @@ async function request(method, params = {}, id) {
     return surfaceRequest(params);
   }
   const c = await client();
+  if (method === 'augmentor/interaction') return c.call('interaction.respond', {rpcId: params.id, sessionId: params.sessionId, value: params.value});
   if (method === 'augmentor/models') return c.call('models.list');
   if (method === 'augmentor/codex') {
     if (params.action === 'profiles') return c.call('profiles.list');

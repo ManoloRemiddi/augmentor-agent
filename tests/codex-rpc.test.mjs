@@ -42,6 +42,7 @@ for (const method of ['bad', 'large', 'crash']) test(`Codex RPC fails pending re
 });
 test('Codex runtime config isolates credentials and forbids credential-bearing destinations', () => {
   const options = runtimeOptions({kind: 'api', model: 'test', endpoint: 'https://example.com/v1', credential: 'fixture-secret'}, '/tmp/isolated-codex', '/tmp');
+  assert.ok(options.args.includes('approvals_reviewer="user"'));
   assert.equal(options.env.CODEX_HOME, '/tmp/isolated-codex');
   assert.equal(options.env.AUGMENTOR_CODEX_CREDENTIAL, 'fixture-secret');
   assert.ok(!options.args.join(' ').includes('fixture-secret'));
@@ -52,4 +53,10 @@ test('Codex runtime config isolates credentials and forbids credential-bearing d
   assert.ok(plan.args.includes('model_providers.augmentor.base_url="https://api.openai.com/v1"'));
   assert.equal(installedRuntimeVersion(), '0.159.2');
   assert.throws(() => runtimeOptions({kind: 'local', model: 'test', endpoint: 'http://127.0.0.1:8080/v1', wireApi: 'chat'}, '/tmp/test', '/tmp'), /Chat Completions is not supported/);
+});
+
+test('upstream request resolution revokes a still-visible approval', async t => {
+  const rpc = await client(t); rpc.on('request', () => {});
+  await rpc.call('ask'); await rpc.call('resolve');
+  assert.throws(() => rpc.respond('approval', {decision: 'accept'}), /no longer pending/);
 });

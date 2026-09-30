@@ -125,7 +125,10 @@ export class CodexRpc extends EventEmitter {
           this.serverRequests.add(value.id);
           if (this.listenerCount('request')) this.emit('request', value);
           else this.reject(value.id);
-        } else this.emit('notification', value);
+        } else {
+          if (value.method === 'serverRequest/resolved') this.serverRequests.delete(value.params?.requestId);
+          this.emit('notification', value);
+        }
       } else if (value.id !== undefined) {
         const pending = this.pending.get(value.id);
         if (!pending) continue; // A late acknowledgment cannot trigger another request.
