@@ -26,7 +26,9 @@ import {desktopCapabilities} from '../../desktop/src/capabilities.js';
 import type {control} from '../../desktop/src/index.js';
 
 export const CODEX_PROTOCOL = 'augmentor-codex/1';
+class NativeActivityChanged extends Error {}
 interface SessionMeta {
+  creationDispatched?: boolean;
   nativeOwner?: string;
   fork?: {sessionId: string; messageSeq: number; mode: 'reply' | 'edit'; boundary: BranchBoundary};
   instructions?: InstructionSnapshot;
@@ -60,6 +62,11 @@ export class CodexHost extends EventEmitter {
   private workers = new Map<string, Worker>();
   private opening = new Map<string, Promise<Worker>>();
   private releasing = new Map<string, Promise<void>>();
+  private slots = new Set<string>();
+  private uses = new Map<string, number>();
+  private lastUse = new Map<string, number>();
+  private useSequence = 0;
+  private allocation: Promise<void> = Promise.resolve();
   private closing = false;
   private configuring = false;
   private maintenance = false;
@@ -71,12 +78,14 @@ export class CodexHost extends EventEmitter {
   constructor(readonly options: HostOptions) {
     super(); this.desktop = new CodexDesktop(options.desktopControl); privateDirectory(options.root); privateDirectory(join(options.root, 'sessions'));
     installedRuntimeVersion();
+    if (!Number.isSafeInteger(options.maxWorkers ?? 4) || (options.maxWorkers ?? 4) < 1 || (options.maxWorkers ?? 4) > 32) throw new Error('Codex worker capacity must be between 1 and 32.');
     for (const filename of readdirSync(join(options.root, 'sessions')).filter(name => name.endsWith('.json'))) {
       const meta = readPrivateJson(join(options.root, 'sessions', filename)) as SessionMeta;
       if (meta?.schema !== 1 || !['creating', 'ready'].includes(meta.status) || filename !== `${identifier(meta.id)}.json` ||
           !isAbsolute(meta.cwd) || typeof meta.title !== 'string' || !Number.isInteger(meta.profileRevision) ||
           (meta.status === 'ready' && typeof meta.threadId !== 'string')) throw new Error('Unsupported or corrupt Codex session index.');
       if (meta.homeTools !== undefined && meta.homeTools !== 1) throw new Error('Unsupported Codex Home tool contract.');
+      if (meta.creationDispatched !== undefined && typeof meta.creationDispatched !== 'boolean' || meta.creationDispatched === false && (meta.threadId || meta.fork || meta.status !== 'creating')) throw new Error('Invalid Codex creation admission state.');
       if (meta.imageInput !== undefined && meta.imageInput !== true) throw new Error('Unsupported Codex image contract.');
       if (meta.desktopTools !== undefined && (meta.desktopTools !== 1 || meta.imageInput !== true)) throw new Error('Unsupported Codex desktop tool contract.');
       if (meta.desktopTools === 1) this.desktop.register(meta.id, this.sessionRoot(meta.id));
@@ -148,9 +157,9 @@ export class CodexHost extends EventEmitter {
   async create(params: Data): Promise<SessionMeta> {
     this.assertAccepting();
     if (this.branches.size) throw new Error('Codex is creating a conversation branch.');
-    this.activeCreates++;
+    const unpin = this.pin(identifier(params.sessionId)); this.activeCreates++;
     try {return await this.createSession(params);}
-    finally {this.activeCreates--;}
+    finally {this.activeCreates--; unpin();}
   }
   private async createSession(params: Data): Promise<SessionMeta> {
     this.assertAccepting();
@@ -160,9 +169,11 @@ export class CodexHost extends EventEmitter {
     if (this.metadata.has(id)) {
       const existing = this.meta(id);
       if (existing.profileId !== profileId || existing.cwd !== realpathSync(params.cwd)) throw new Error('Conversation identity is already bound to a different profile or workspace.');
-      if (existing.status !== 'ready') throw new Error('Conversation creation has an unknown outcome. Reconcile it before creating a replacement.');
-      await this.worker(id);
-      return existing;
+      if (existing.status !== 'ready') {
+        if (existing.creationDispatched !== false || existing.fork) throw new Error('Conversation creation has an unknown outcome. Reconcile it before creating a replacement.');
+        await this.open(existing);
+      } else await this.worker(id);
+      return this.meta(id);
     }
     if (typeof params.cwd !== 'string' || !isAbsolute(params.cwd) || !statSync(params.cwd).isDirectory()) throw new Error('Choose an existing absolute workspace directory.');
     const cwd = realpathSync(params.cwd);
@@ -174,7 +185,7 @@ export class CodexHost extends EventEmitter {
     if (this.metadata.has(id)) return this.create(params);
     const desktop = profile.connection.imageInput === true && desktopCapabilities().available;
     const meta: SessionMeta = {schema: 1, browserTools: 1, homeTools: 1, ...(desktop ? {desktopTools: 1} : {}), ...(profile.connection.imageInput ? {imageInput: true} : {}), instructions: instructionSnapshot(undefined, true, profile.connection.imageInput === true, desktop, true), id, profileId, profileRevision: profile.revision, model: profile.connection.model,
-      surface: params.surface === 'browser' ? 'browser' : 'linux', cwd, title: '', status: 'creating', createdAt: Date.now(), updatedAt: Date.now()};
+      surface: params.surface === 'browser' ? 'browser' : 'linux', cwd, title: '', status: 'creating', creationDispatched: false, createdAt: Date.now(), updatedAt: Date.now()};
     this.save(meta);
     await this.open(meta, profile);
     return this.meta(id);
@@ -187,7 +198,7 @@ export class CodexHost extends EventEmitter {
     const existing = this.workers.get(id); if (existing) return existing;
     const pending = this.opening.get(id); if (pending) return pending;
     const meta = this.meta(id);
-    if (meta.status !== 'ready') throw new Error('Codex thread creation is unconfirmed.');
+    if (meta.status !== 'ready') throw new Error(meta.creationDispatched === false ? 'Codex conversation has not started. Retry creation when capacity is available.' : 'Codex thread creation is unconfirmed.');
     return this.open(meta);
   }
   private branch(params: Data): Promise<unknown> {
@@ -214,7 +225,6 @@ export class CodexHost extends EventEmitter {
     this.assertAccepting();
     if (worker.session.submissionPending || worker.interactions.size || this.desktop.owns(sourceId) ||
         worker.session.ledger.list().some(operation => ['accepted', 'unconfirmed'].includes(operation.status) || operation.status === 'queued' && !worker.session.ledger.paused)) throw new Error('Finish or pause pending Codex work before branching.');
-    if (this.workers.size >= (this.options.maxWorkers ?? 4)) throw new Error('Codex worker limit reached. Close an idle conversation before branching.');
     worker.session.setMaintenance(true);
     let creator: CodexRpc | undefined;
     try {
@@ -223,6 +233,7 @@ export class CodexHost extends EventEmitter {
       const profile = await this.options.resolveProfile(source.profileId);
       this.assertAccepting();
       if (profile.id !== source.profileId || profile.revision !== source.profileRevision) throw new Error('The source profile changed. Reconcile it before branching.');
+      await this.allocate(id); this.assertAccepting();
       const meta: SessionMeta = {...source, id, nativeOwner: source.nativeOwner ?? source.id, threadId: undefined,
         fork: {sessionId: sourceId, messageSeq, mode, boundary}, title: '', saved: false, status: 'creating', createdAt: Date.now(), updatedAt: Date.now()};
       // Durable admission precedes the non-idempotent native fork RPC.
@@ -242,6 +253,7 @@ export class CodexHost extends EventEmitter {
       return {...this.row(meta), fork: meta.fork};
     } finally {
       if (creator) {await creator.close(); this.forkCreators.delete(creator);}
+      if (!this.workers.has(id) && !this.opening.has(id)) this.slots.delete(id);
       if (!this.closing) worker.session.setMaintenance(false);
     }
   }
@@ -265,9 +277,35 @@ export class CodexHost extends EventEmitter {
   }
   private open(meta: SessionMeta, resolved?: ResolvedProfile): Promise<Worker> {
     const pending = this.opening.get(meta.id); if (pending) return pending;
-    if (this.workers.size + this.opening.size >= (this.options.maxWorkers ?? 4)) return Promise.reject(new Error('Codex worker limit reached. Close an idle conversation before opening another.'));
-    const opening = this.openWorker(meta, resolved).finally(() => this.opening.delete(meta.id));
+    const opening = this.allocate(meta.id).then(() => this.openWorker(meta, resolved)).catch(error => {this.slots.delete(meta.id); throw error;}).finally(() => this.opening.delete(meta.id));
     this.opening.set(meta.id, opening); return opening;
+  }
+  private pin(id: string): () => void {
+    this.uses.set(id, (this.uses.get(id) ?? 0) + 1); this.lastUse.set(id, ++this.useSequence);
+    return () => {const count = (this.uses.get(id) ?? 1) - 1; if (count) this.uses.set(id, count); else this.uses.delete(id);};
+  }
+  private allocate(id: string): Promise<void> {
+    const next = this.allocation.then(async () => {
+      this.assertAccepting();
+      if (this.slots.has(id)) return;
+      const candidates = [...this.workers.keys()].sort((a, b) => (this.lastUse.get(a) ?? 0) - (this.lastUse.get(b) ?? 0));
+      const retried = new Set<string>();
+      for (const candidate of candidates) {
+        if (this.slots.size < (this.options.maxWorkers ?? 4)) break;
+        const worker = this.workers.get(candidate);
+        if (!worker || this.uses.has(candidate) || this.opening.has(candidate) || this.releasing.has(candidate) || this.desktop.owns(candidate) || worker.session.submissionPending || worker.interactions.size ||
+            worker.session.ledger.list().some(operation => ['accepted', 'unconfirmed'].includes(operation.status) || operation.status === 'queued' && !worker.session.ledger.paused)) continue;
+        // release claims the worker synchronously; new requests wait for it.
+        try {await this.release(candidate);} catch (error) {
+          // A changed snapshot gets one fresh observation, never an unbounded poll.
+          if (error instanceof NativeActivityChanged && !retried.has(candidate)) {retried.add(candidate); candidates.push(candidate);}
+        }
+      }
+      this.assertAccepting();
+      if (this.slots.size >= (this.options.maxWorkers ?? 4)) throw new Error('Codex capacity is occupied by active, opening or unverified work. Finish that work and retry this conversation.');
+      this.slots.add(id);
+    });
+    this.allocation = next.catch(() => {}); return next;
   }
   private async openWorker(meta: SessionMeta, resolved?: ResolvedProfile): Promise<Worker> {
     const profile = resolved ?? await this.options.resolveProfile(meta.profileId);
@@ -282,6 +320,7 @@ export class CodexHost extends EventEmitter {
       await rpc.initialize();
       if (meta.threadId) await rpc.call('thread/resume', {threadId: meta.threadId, cwd: meta.cwd, excludeTurns: true, ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
       else {
+        meta.creationDispatched = true; this.save(meta);
         const result = await rpc.call('thread/start', {cwd: meta.cwd, approvalPolicy: 'on-request', sandbox: 'workspace-write', ...(meta.browserTools ? {dynamicTools: [...browserToolsFor(meta.imageInput === true), ...(meta.desktopTools ? desktopTools : []), ...(meta.homeTools ? homeTools : [])]} : {}), ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
         meta.threadId = result.thread.id; meta.status = 'ready'; this.save(meta);
       }
@@ -335,7 +374,7 @@ export class CodexHost extends EventEmitter {
           finally {worker.interactions.delete(request.id); toolCalls.delete(request.id);}
         })();
       });
-      rpc.on('failure', () => {void this.stopDesktop(meta.id); this.browser.cancel(meta.id); for (const call of toolCalls.values()) call.abort.abort(); this.approvals.cancel(meta.id); session.close(); worker.interactions.clear(); if (this.workers.get(meta.id) === worker) this.workers.delete(meta.id);});
+      rpc.on('failure', () => {void this.stopDesktop(meta.id); this.browser.cancel(meta.id); for (const call of toolCalls.values()) call.abort.abort(); this.approvals.cancel(meta.id); session.close(); worker.interactions.clear(); if (this.workers.get(meta.id) === worker) {this.workers.delete(meta.id); this.slots.delete(meta.id);}});
       if (meta.fork || ledger.list().some(operation => operation.turnId || operation.status === 'unconfirmed')) {
         const history = await nativeHistory(rpc, session.threadId);
         await session.reconcile(history);
@@ -351,6 +390,7 @@ export class CodexHost extends EventEmitter {
           }
         }
       }
+      this.lastUse.set(meta.id, ++this.useSequence);
       this.workers.set(meta.id, worker);
       return worker;
     } catch (error) {await rpc.close(); throw error;}
@@ -361,7 +401,7 @@ export class CodexHost extends EventEmitter {
       // No await between the activity check and admission freeze.
       if (this.desktop.active || this.activeRequests || this.activeCreates || this.opening.size || this.releasing.size || this.configuring ||
           [...this.workers.values()].some(worker => worker.interactions.size || worker.session.submissionPending) ||
-          [...this.metadata.values()].some(meta => meta.status !== 'ready' || this.row(meta).running)) {
+          [...this.metadata.values()].some(meta => meta.status !== 'ready' && meta.creationDispatched !== false || this.row(meta).running)) {
         throw new Error('Codex has active or unconfirmed work. Finish or reconcile it before maintenance.');
       }
       this.maintenance = true;
@@ -379,9 +419,10 @@ export class CodexHost extends EventEmitter {
       'settings.describe', 'session.describe', 'session.history', 'session.branchStatus'];
     if (this.maintenance && !readable.includes(method)) throw new Error('Codex host is paused for maintenance.');
     if (this.branches.size && method !== 'session.branch' && !readable.includes(method)) throw new Error('Codex is creating a conversation branch.');
+    const unpin = typeof params.sessionId === 'string' ? this.pin(identifier(params.sessionId)) : () => {};
     this.activeRequests++;
     try {return await this.dispatchRequest(method, params);}
-    finally {this.activeRequests--;}
+    finally {this.activeRequests--; unpin();}
   }
   private async dispatchRequest(method: string, params: Data): Promise<unknown> {
     switch (method) {
@@ -403,7 +444,7 @@ export class CodexHost extends EventEmitter {
       case 'profiles.list': return {profiles: this.options.profiles?.list() ?? []};
       case 'profiles.configure': {
         if (!this.options.profiles) throw new Error('Codex profile setup is unavailable in this host.');
-        if (this.improvements.size || this.desktop.active || this.opening.size || this.configuring || [...this.workers.values()].some(worker => worker.interactions.size || worker.session.ledger.list().some(operation => ['accepted', 'unconfirmed'].includes(operation.status)))) throw new Error('Finish or reconcile active Codex work before changing connection profiles.');
+        if (this.improvements.size || this.activeCreates || this.desktop.active || this.opening.size || this.configuring || [...this.workers.values()].some(worker => worker.interactions.size || worker.session.ledger.list().some(operation => ['accepted', 'unconfirmed'].includes(operation.status)))) throw new Error('Finish or reconcile active Codex work before changing connection profiles.');
         this.configuring = true;
         try {
           for (const id of [...this.workers.keys()]) await this.release(id);
@@ -515,9 +556,14 @@ export class CodexHost extends EventEmitter {
     worker.session.setMaintenance(true);
     const releasing = Promise.resolve().then(async () => {
       await this.desktop.stop(id);
-      if (!await nativeIdle(worker.rpc, worker.session.threadId, worker.activity) || worker.session.ledger.revision !== revision || worker.session.submissionPending || worker.interactions.size) throw new Error('Codex still has native background work or changing activity. Keep this conversation open until it finishes.');
+      const nativeRevision = worker.activity.revision;
+      if (!await nativeIdle(worker.rpc, worker.session.threadId, worker.activity)) {
+        if (worker.activity.revision !== nativeRevision) throw new NativeActivityChanged('Codex activity changed while checking whether this worker is idle.');
+        throw new Error('Codex still has native background work. Keep this conversation open until it finishes.');
+      }
+      if (worker.session.ledger.revision !== revision || worker.session.submissionPending || worker.interactions.size) throw new Error('Codex work changed during release. Keep this conversation open until it finishes.');
       worker.session.close(); await worker.rpc.close();
-      if (this.workers.get(id) === worker) this.workers.delete(id);
+      if (this.workers.get(id) === worker) {this.workers.delete(id); this.slots.delete(id);}
     }).finally(() => {
       this.releasing.delete(id);
       if (!this.closing && this.workers.get(id) === worker) worker.session.setMaintenance(this.maintenance);
@@ -537,6 +583,7 @@ export class CodexHost extends EventEmitter {
       worker.session.close(); worker.session.ledger.recover(); await worker.rpc.close();
     }
     this.workers.clear();
+    this.slots.clear();
     const [desktopResult] = await cleanup;
     if (desktopResult.status === 'rejected') throw desktopResult.reason;
   }

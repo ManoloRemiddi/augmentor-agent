@@ -236,3 +236,16 @@ incoming prompt waits for successful release, then resumes the original native
 thread without sending through a closed worker. `codex-fork.test.mjs` also checks
 the native idle API against the real pinned runtime and synthetic Responses.
 These checks precede automatic worker-pool reuse; the hard worker limit remains.
+
+
+### Codex bounded worker pool
+
+`codex-pool.test.mjs` covers idle least-recently-used replacement, native-ID
+preservation, concurrent opening reservations, active and unknown dispatch
+protection, unverified state, bounded reinspection, and retry after capacity or
+initialization refusal. Undispatched records survive restart without becoming
+unknown native work or blocking maintenance. The real `codex-fork.test.mjs`
+host fixture runs with two chat workers, requiring retirement/reopen while
+preserving exact fork history and keeping paused parent input out of inference.
+The newly opened native idle check waits for stable authoritative state because
+startup notifications can correctly invalidate an earlier snapshot.

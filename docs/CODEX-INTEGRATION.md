@@ -1033,3 +1033,50 @@ product or create a false unknown outcome. Installed applications are unchanged.
 Previous `2ef08a8` Debian application checks passed but packaging still rejected
 the unreviewed Codex executable in run `36755663208`; Mac run `36755663211` was
 still active at the last check.
+
+
+## Bounded worker reuse and creation admission
+
+The host now reuses capacity from verified idle chat workers in least-recently
+used order. Request and direct-create leases protect workers currently being
+used, and opening reservations count toward the configured bound. Allocation is
+serialized; queued allocators cannot spawn workers beyond that bound. New or
+resumed workers become most recently used. The default remains four chat workers;
+internal configuration accepts 1–32. Short-lived fork/recovery readers are
+separate auxiliary processes, not extra admitted chat workers.
+
+Candidates must have no pending submissions, interactions, desktop ownership,
+active/unknown operations or unpaused waiting input. The preceding native idle
+inspection and release fence remain mandatory. One fresh inspection is allowed
+when native notifications invalidate the snapshot; stable busy/unknown state,
+errors or continuously changing activity refuse allocation. Nothing is killed
+to force capacity. A future request resumes an evicted chat's existing native
+ID and product journals. Paused queue rows remain persisted and are not resumed
+by eviction, reopening or history reads.
+
+New creation records persist `creationDispatched: false` before allocation. The
+host durably sets it true immediately before `thread/start`. A capacity or
+initialization failure before that call is therefore retryable with the same
+session ID, including after restart, and does not block maintenance as unknown
+native work. Missing flags on older incomplete records remain conservative
+unknowns. Once native creation was dispatched, a lost reply still cannot replay.
+Profile/workspace bindings remain immutable. This additive development format
+is not an installed downgrade qualification.
+
+Build/type checks and **314 root Node tests** pass, with **55 Browser tests**.
+Protocol fixtures verify more chats than capacity, least-recently-used selection,
+original native IDs on reopen, live/opening bounds, refusal for active/unknown/
+unverified work, bounded snapshot retries, initialization failure, restart and
+maintenance of undispatched records. The real pinned-runtime fork/host fixture
+now runs with two chat workers across multiple branches, edits and recovery;
+original history survives and paused parent input never reaches the synthetic
+provider. The native idle fixture waits for a stable observation after startup
+notifications rather than assuming the first snapshot is already stable.
+
+Previous release-fence source `7f85c2a` passed
+[Mac CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36756809696).
+Its [Debian workflow](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36756809576)
+passed application checks and still rejected the unreviewed Codex executable
+at packaging. This pool change needs its own CI. No installed application changed;
+full C0–C9, orphan/unknown-native-identity recovery, live account/provider,
+memory/voice and packaging qualification remain open.

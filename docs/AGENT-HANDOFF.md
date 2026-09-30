@@ -2,6 +2,21 @@
 
 # Start here: agent handoff
 
+## September 30 Codex bounded worker pool
+
+[Worker reuse and admission](CODEX-INTEGRATION.md#bounded-worker-reuse-and-creation-admission)
+now replaces the hard idle-capacity stop with serialized reservations and
+least-recently-used verified-idle retirement. Request leases protect in-use
+workers; active/unknown work and paused queues retain their outcome rules.
+A durable pre-dispatch flag makes capacity/initialization refusals retryable
+without guessing about a native creation. Older unknown records remain blocked.
+Build/type, 314 root Node and 55 Browser tests pass. The pinned host/fork proof
+uses two chat workers across branches, edits, restart and recovery without
+replaying paused input. Prior `7f85c2a` passed both Mac jobs; its Debian application
+checks passed and packaging still rejects the unreviewed Codex executable. No installed apps changed. Next extend native background-work verification to
+host maintenance/shutdown, which still relies primarily on product-ledger state,
+then continue orphan and unknown-native-identity recovery and full C0–C9.
+
 ## September 30 Codex worker-release prerequisite
 
 [Native idle evidence and release fencing](CODEX-INTEGRATION.md#native-idle-evidence-and-worker-release-fencing)

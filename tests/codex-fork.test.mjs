@@ -40,12 +40,20 @@ test('pinned forks retain exact turn boundaries and tools across independent wor
     const result=await rpc.call('turn/start',{threadId,clientUserMessageId:text,input:[{type:'text',text}]});
     assert.equal((await completed.promise).status,'completed');return result.turn.id;
   }
+  async function waitIdle(rpc,id){
+    for(let attempt=0;attempt<100;attempt++){
+      if(await nativeIdle(rpc,id,activity.get(rpc)))return;
+      await new Promise(resolve=>setTimeout(resolve,10));
+    }
+    assert.fail('Native thread did not become verifiably idle');
+  }
   const parent=await open();
   const {thread}=await parent.call('thread/start',{cwd:root,developerInstructions:'SYNTHETIC_FORK_PERSONA',dynamicTools:[{name:'fixture_tool',description:'Synthetic fixture tool',inputSchema:{type:'object',properties:{}}}]});
+  await waitIdle(parent,thread.id); // Startup notifications may invalidate the first snapshot.
   const first=await turn(parent,thread.id,'SYNTHETIC_FIRST_TURN');
   const second=await turn(parent,thread.id,'SYNTHETIC_LATER_TURN');
   assert.equal(toolCalls,1);
-  assert.equal(await nativeIdle(parent,thread.id,activity.get(parent)),true);
+  await waitIdle(parent,thread.id);
   const source=await nativeHistory(parent,thread.id,1);
   function boundary(turnIndex,itemIndex,mode){
     const turn=source[turnIndex],item=turn.items[itemIndex];
@@ -102,7 +110,7 @@ test('host branches preserve native ownership, retry identity and independent hi
   t.after(async()=>{for(const host of hosts)await host.close();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));rmSync(root,{recursive:true,force:true});});
   const connection={kind:'local',model:'fixture',endpoint:`http://127.0.0.1:${server.address().port}/v1`};
   function open(){
-    const host=new CodexHost({root:join(root,'host'),maxWorkers:8,resolveProfile:async id=>({id,revision:profileRevision,connection}),createRpc:options=>{
+    const host=new CodexHost({root:join(root,'host'),maxWorkers:2,resolveProfile:async id=>({id,revision:profileRevision,connection}),createRpc:options=>{
       const rpc=new CodexRpc(options),call=rpc.call.bind(rpc);
       rpc.call=async(method,params)=>{
         if(method==='thread/fork')forkCalls++;
@@ -161,6 +169,7 @@ test('host branches preserve native ownership, retry identity and independent hi
   const childEvents=childHistory.events.map(entry=>entry.event);
   await host.dispatch('session.branch',{sessionId:'child',newSessionId:'grandchild',messageSeq:childEvents.filter(event=>event.type==='assistant/message').at(-1).seq,mode:'reply'});
   assert.equal((await host.dispatch('session.describe',{sessionId:'grandchild'})).nativeOwner,'parent');
+  assert.equal((await host.dispatch('host.describe',{})).workers,2,'forks reuse verified idle capacity');
   profileRevision=2;
   await assert.rejects(host.dispatch('session.branch',{...params,newSessionId:'wrong-profile'}),/profile changed/);
   profileRevision=1;corruptForkHistory=true;
@@ -200,6 +209,7 @@ test('host branches preserve native ownership, retry identity and independent hi
   await host.close();host=open();
   await assert.rejects(host.dispatch('session.branch',{...params,newSessionId:'unknown'}),/unknown outcome/);
   assert.equal(forkCalls,calls,'an uncertain fork is never repeated');
+  assert.doesNotMatch(JSON.stringify(requests),/SYNTHETIC_PARENT_QUEUE/,'eviction and restoration never resume paused parent input');
 });
 
 test('native Qt transcript Branch/Edit and Enter create exact children through the host', {timeout:30000},async t=>{
