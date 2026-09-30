@@ -309,3 +309,14 @@ host fixture runs with two chat workers, requiring retirement/reopen while
 preserving exact fork history and keeping paused parent input out of inference.
 The newly opened native idle check waits for stable authoritative state because
 startup notifications can correctly invalidate an earlier snapshot.
+
+### Local Qwen template diagnosis
+
+`python3 scripts/prepare-qwen-codex-template.py --source ORIGINAL --out SEPARATE`
+prepares a candidate file without restarting or modifying any installed service.
+[The exact observed hashes and limits](../docs/CODEX-LOCAL-QWEN.md) record real
+Codex HTTP 400 evidence, offline leading/later developer rendering, byte-identical
+single-system output, retained system-image rejection and successful tool grammar
+generation using llama.cpp's actual offline tools. Source/output/unknown-block
+guard checks and Python compilation passed. This is not a live inference/tool
+qualification and does not change the accepted provider matrix.

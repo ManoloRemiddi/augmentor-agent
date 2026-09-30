@@ -156,6 +156,10 @@ an unconfirmed cancellation remains visible to the caller.
 
 ## Observed real local-provider incompatibility
 
+Current October 1 diagnosis and the separately tested, unactivated candidate are
+in [local Qwen compatibility](CODEX-LOCAL-QWEN.md). The live Codex tool check
+still fails; offline parser/rendering evidence does not qualify real inference.
+
 A synthetic text-only request to the existing local Qwen server failed with its
 template parser error: `System message must be at the beginning`. No model
 settings, templates or service deployment were changed. This is a real-provider
@@ -1651,3 +1655,19 @@ cases enabled. **All 357 root Node tests** also pass with both Docker proofs
 enabled. Preceding `f4f8d87` passed both Mac jobs and Debian application/Home
 checks; Debian packaging retains the unreviewed native executable notice gate.
 Full C0–C9 and native-binary release review remain open.
+
+## Local Qwen compatibility diagnosis and separate candidate
+
+A fresh real `checkAgent` request confirms the existing local endpoint rejects
+Codex's base/developer instruction combination with HTTP 400 before inference.
+The running llama.cpp Responses converter adds the base system message and its
+template layer maps developer messages to further system messages. The current
+Qwen template rejects the latter. [The candidate helper and evidence](CODEX-LOCAL-QWEN.md)
+preserve later instruction text rather than discarding it, write a separate file
+and leave the running service unchanged. Actual offline parser/rendering tests
+reproduce original rejection, preserve developer/correction order with the
+candidate and verify byte-identical ordinary single-system rendering. Activation
+requires an owner decision under the model-settings preservation instructions;
+after it, real tools/stream/Stop/resume and other-harness regression checks remain.
+`70935e8` passed both Mac jobs and Debian application/Home checks; Debian packaging
+still stops at the unreviewed Codex native executable notice gate.

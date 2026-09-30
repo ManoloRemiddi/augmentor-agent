@@ -2,6 +2,21 @@
 
 # Start here: agent handoff
 
+## October 1 real local-provider diagnosis and unactivated candidate
+
+[Current local Qwen blocker](CODEX-LOCAL-QWEN.md) is now traced to multiple system
+messages after llama.cpp maps Codex developer instructions. A fresh real pinned
+Codex tool check fails once with HTTP 400, without model replay or owner data.
+The separate candidate helper preserves later system/developer text instead of
+dropping it. Actual offline tools reproduce original rejection, render both
+leading/later developer messages with the candidate, keep single-system output
+byte-identical and retain system-image rejection. Guard checks pass. No service
+was changed or restarted; owner direction is required to change approved model
+formatting. After authorization, qualify real tools/stream/Stop/resume and DSH/Pi
+regressions, restoring the original formatter on failure. Continue full C0–C9.
+`70935e8` passed both Mac jobs and Debian application/Home checks; Debian packaging
+retains the unreviewed Codex native executable notice gate.
+
 ## October 1 complete Codex-controlled memory pipeline
 
 [Complete scoped stage proof](CODEX-INTEGRATION.md#complete-scoped-memory-stages-through-actual-codex-activity)
