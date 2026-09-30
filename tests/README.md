@@ -109,3 +109,11 @@ checks its rendered reply. Normal app launches reject the test operations.
 `test_ui_testing.py` verifies default denial, draft/dialog protection and
 non-overwriting screenshot output. See the
 [installed native acceptance](../docs/MACOS-DISTRIBUTION.md#september-26-follow-up-corrected-primary-mac-app-activated).
+
+
+Codex draft transformation: `tests/codex-prompt-improvement.test.mjs` exercises
+bounded Responses streaming, invalid/incomplete outputs, selected credentials,
+redirect refusal, host shutdown and maintenance, and the actual native adapter
+and Browser bridge against synthetic services. `tests/test_prompt_improvement.py`
+and Browser `surface.test.mjs` cover revision protection and Undo. These checks
+do not establish live-provider quality or full-window/device acceptance.

@@ -49,8 +49,11 @@ async function request(method, params = {}, id) {
   if (method === 'augmentor/prompts') return promptLibrary(params);
   if (method === 'augmentor/diagnostics') return supportReport();
   if (method === 'augmentor/surface') {
-    if (params.action !== 'appearance') throw new Error('Codex draft improvement is not yet available. Your draft was preserved.');
-    return surfaceRequest(params);
+    if (params.action === 'appearance') return surfaceRequest(params);
+    if (params.action !== 'improve') throw new Error('Unsupported Codex surface operation.');
+    const saved = await promptLibrary({action: 'list'});
+    if (!saved.ok || !saved.library?.improvement) throw new Error('Prompt improvement settings are unavailable.');
+    return (await client()).call('prompt.improve', {text: params.text, instructions: saved.library.improvement.content, selection});
   }
   const c = await client();
   if (method === 'augmentor/interaction') return c.call('interaction.respond', {rpcId: params.id, sessionId: params.sessionId, value: params.value});

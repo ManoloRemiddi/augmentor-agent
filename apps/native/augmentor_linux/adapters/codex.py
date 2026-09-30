@@ -38,6 +38,11 @@ class CodexAdapter:
             if connection:
                 connection.close()
 
+    supports_prompt_improvement = True
+
+    def improve_prompt(self, text, instructions, selection):
+        return self.call('prompt.improve', {'text': text, 'instructions': instructions, 'selection': selection})
+
     def respond(self, rpc_id, value):
         return self.call('interaction.respond', {'rpcId': rpc_id, 'sessionId': value['sessionId'], 'value': {**value, 'approvalId': rpc_id}})
 

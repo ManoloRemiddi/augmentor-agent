@@ -19,7 +19,7 @@ export class PiConnection {
   fail(error:Error){if(this.closed)return;this.closed=true;this.socket.destroy();for(const row of this.pending.values()){clearTimeout(row.timer);row.reject(error);}this.pending.clear();this.disconnected(error);}
   call(method:string,params:Record<string,unknown>={},id:string=randomUUID()):Promise<any>{
     if(this.closed)return Promise.reject(new Error('Harness connection is closed'));
-    return new Promise((resolve,reject)=>{const timer=setTimeout(()=>{this.pending.delete(id);reject(new Error('Request timed out; verify the outcome before retrying.'));},method==='tools.execute'?130000:method.startsWith('profiles.')?65000:30000);this.pending.set(id,{resolve,reject,timer});this.socket.write(JSON.stringify({id,method,params})+'\n');});
+    return new Promise((resolve,reject)=>{const timer=setTimeout(()=>{this.pending.delete(id);reject(new Error('Request timed out; verify the outcome before retrying.'));},method==='tools.execute'?130000:(method.startsWith('profiles.')||method==='prompt.improve')?65000:30000);this.pending.set(id,{resolve,reject,timer});this.socket.write(JSON.stringify({id,method,params})+'\n');});
   }
   close(){this.socket.destroy();}
   static async open(event?:(frame:any)=>void,disconnected?:(error:Error)=>void,harness:'pi'|'codex'='pi'){

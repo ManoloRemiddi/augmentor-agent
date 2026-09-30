@@ -49,7 +49,7 @@ export function handlePanelMessage(msg, sender, sendResponse) {
   if (!sender || sender.id !== chrome.runtime.id) return
   if (!sender.url || !sender.url.startsWith('chrome-extension://' + chrome.runtime.id)) return
   if(msg?.type==='surface/appearance'||msg?.type==='prompt/improve'){
-    if(msg.type==='prompt/improve'&&(state.harness!=='dsh'||state.phase!=='ready'||state.running||state.panelViewSession)){sendResponse({ok:false,error:'Open an idle DSH conversation first.'});return}
+    if(msg.type==='prompt/improve'&&(!['dsh','codex'].includes(state.harness)||state.phase!=='ready'||state.running||state.panelViewSession)){sendResponse({ok:false,error:'Open an idle DSH or Codex conversation first.'});return}
     request('augmentor/surface',msg.type==='surface/appearance'?{action:'appearance',settings:msg.settings}:{action:'improve',text:msg.text,selection:state.selection})
       .then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}));return true
   }

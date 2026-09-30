@@ -558,7 +558,10 @@ Validation at this checkpoint:
   an overlay of the existing disposable VM image; the original image and the
   owner's desktop remain untouched.
 
-The proof records source revision, runtime pin and tested input hashes locally.
+The final VM run passed all three cases on exact source
+`ce77fa68721ed8b4923ba038e8edf49d0829b439` with Codex 0.159.2. Its disposable
+overlay VM was powered off after the proof. The proof records source revision,
+runtime pin and tested input hashes locally.
 The owning public documentation records the sanitized outcomes; VM keys, model
 payloads and private paths are not publication artifacts. Run it only against the
 marked disposable VM:
@@ -578,3 +581,52 @@ passed; Debian run
 [36739220130](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36739220130)
 passed application checks and still refused the unreviewed Codex native executable
 at packaging. That gate remains in force.
+
+
+## API/local draft improvement
+
+Codex's Desktop and Browser adapters now expose the existing Improve prompt
+operation. Both use the selected API/local connection profile and shared saved
+improvement instructions. The shared host resolves credentials privately and
+makes one tool-free Responses request; this auxiliary transformation neither
+starts a Codex conversation nor appends to existing history. Codex still owns
+all conversational turns and tools. Subscription profiles remain unavailable;
+there is no fallback to DSH or another provider/account.
+
+Only the draft (up to 6,000 characters) and improvement instructions (up to
+8,000 characters) are sent. Requests use `stream: true`, `store: false` and an
+empty tool list. The host accepts only a completed assistant rewrite with bounded
+output; malformed, partial, clarification, refusal and tool outputs leave the
+draft unchanged. Provider error bodies are not surfaced. Redirects are refused,
+requests are not retried, and the 60-second deadline bounds a pending rewrite.
+This follows the official [Responses streaming contract](https://developers.openai.com/api/docs/guides/streaming-responses)
+and [stateless request guidance](https://developers.openai.com/api/docs/guides/migrate-to-responses).
+`store: false` is not a promise about the provider's separate logging policy.
+
+The host allows one pending rewrite, prevents profile changes and maintenance
+while it runs, and aborts it on host shutdown. Existing composer Cancel, typing,
+session changes and Undo preserve draft revisions. As with DSH, dismissing the
+preview discards its late result but does not promise cancellation of already
+started inference; its selected provider can still charge for that request.
+No control layout was changed. Shared TypeScript/Python code applies to Linux
+and macOS; device/UI and live-provider qualification remain separate.
+
+Type checking/build, all **270 root Node tests**, **48 Browser tests**, four
+native prompt-editor cases and **29 Home tests** pass locally. Five focused
+Codex contracts cover bounded/malformed output, selected profile and
+secret isolation, redirect refusal, shutdown cancellation, maintenance admission
+and overlapping requests. The actual native Python adapter and actual Browser
+bridge round-trip through the shared Unix host and synthetic Responses endpoint;
+Browser reads saved instructions through a fixture of the shared prompt service.
+The proof verifies no chat, runtime worker or history is created. This is not a
+live-model rewrite-quality test or full native-window acceptance.
+
+At preceding desktop source `ce77fa6`, both macOS jobs passed in
+[36742665813](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36742665813).
+Debian's application checks passed before the unchanged native executable review
+gate failed in [36742665709](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36742665709).
+That run also exposed a Home test's 100 ms race: its deadline could fire before
+MCP dispatch. The test now holds an acknowledged dispatched call and triggers
+the actual deadline callback, then verifies a subsequent model-requested write
+is blocked by the unknown-outcome record. All 29 Home tests pass locally; no
+Home runtime behavior or timeout was changed.

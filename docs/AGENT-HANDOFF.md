@@ -2,6 +2,21 @@
 
 # Start here: agent handoff
 
+## September 30 Codex draft improvement checkpoint
+
+[Draft improvement](CODEX-INTEGRATION.md#apilocal-draft-improvement) now connects
+both existing composers to a shared, bounded, tool-free Responses transformation
+using the selected API/local profile and saved improvement instructions. Actual
+native/Browser bridge fixtures verify no chat history or Codex worker is created;
+subscription support and live rewrite quality remain unqualified. The preceding
+real Plasma proof passed all three cases on exact `ce77fa6`; its disposable VM is
+stopped. Both macOS CI jobs passed that source. Debian still blocks unreviewed
+native binaries; a separate Home deadline-test race has been made deterministic.
+Local validation: build/type checks, 270 root Node, 48 Browser, four native
+prompt-editor and 29 Home tests pass.
+Continue C0–C9, especially account eligibility/login, Home/MCP, memory, speech,
+remaining conversation operations and installed/device qualification.
+
 ## September 30 Codex consented desktop checkpoint
 
 [Desktop evidence](CODEX-INTEGRATION.md#consented-desktop-tools-and-plasma-vm-evidence)

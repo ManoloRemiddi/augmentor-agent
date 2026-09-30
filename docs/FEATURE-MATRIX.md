@@ -204,3 +204,10 @@ See [contract and qualification](BOUNDED-EXECUTION-RECOVERY.md).
 ## 0.2.10 recovery scope
 
 Both DSH Augmentor presets include [action-aware recovery](BOUNDED-EXECUTION-RECOVERY.md#action-aware-recovery--0210-preview). Exact duplicate changes and uncertain/background outcomes are guarded during automatic recovery; normal explicit tasks retain their behavior. Pi and delegated agents are outside this adapter. This is execution protection, not semantic task verification.
+
+
+Codex development source also supports the shared Improve prompt controls for
+API/local profiles on both surfaces, using an isolated tool-free request and no
+chat history. Subscription usage remains unavailable. See
+[draft improvement evidence](CODEX-INTEGRATION.md#apilocal-draft-improvement) for
+fixture coverage, cancellation semantics and remaining live/UI qualification.

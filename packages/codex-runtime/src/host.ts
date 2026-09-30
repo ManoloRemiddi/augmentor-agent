@@ -15,6 +15,7 @@ import type {ProfileStore} from './profiles.js';
 import {instructionSnapshot, validateInstructions, type InstructionSnapshot} from './instructions.js';
 import {CodexInteractions} from './interactions.js';
 import {checkProvider} from './provider-check.js';
+import {improveDraft, validateDraft, type Rewrite} from './prompt-improvement.js';
 import {CodexBrowser, browserToolsFor} from './browser.js';
 import {CodexDesktop, desktopTools} from './desktop.js';
 import {desktopCapabilities} from '../../desktop/src/capabilities.js';
@@ -55,6 +56,7 @@ export class CodexHost extends EventEmitter {
   private maintenance = false;
   private activeRequests = 0;
   private activeCreates = 0;
+  private improvements = new Map<AbortController, Promise<Rewrite>>();
   constructor(readonly options: HostOptions) {
     super(); this.desktop = new CodexDesktop(options.desktopControl); privateDirectory(options.root); privateDirectory(join(options.root, 'sessions'));
     installedRuntimeVersion();
@@ -253,11 +255,25 @@ export class CodexHost extends EventEmitter {
   }
   private async dispatchRequest(method: string, params: Data): Promise<unknown> {
     switch (method) {
+      case 'prompt.improve': {
+        validateDraft(params.text, params.instructions);
+        if (this.configuring || this.improvements.size) throw new Error('Another Codex setup or prompt improvement is in progress.');
+        const profileId = identifier(params.selection?.provider);
+        const abort = new AbortController();
+        const pending = (async () => {
+          const profile = await this.options.resolveProfile(profileId);
+          this.assertAccepting();
+          if (profile.connection.model !== params.selection?.model) throw new Error('The selected model does not match this Codex connection profile.');
+          return improveDraft(profile.connection, params.text, params.instructions, AbortSignal.any([abort.signal, AbortSignal.timeout(60000)]));
+        })();
+        this.improvements.set(abort, pending);
+        try {return await pending;} finally {this.improvements.delete(abort);}
+      }
       case 'interaction.respond': return this.approvals.answer(identifier(params.rpcId), identifier(params.sessionId), params.value);
       case 'profiles.list': return {profiles: this.options.profiles?.list() ?? []};
       case 'profiles.configure': {
         if (!this.options.profiles) throw new Error('Codex profile setup is unavailable in this host.');
-        if (this.desktop.active || this.opening.size || this.configuring || [...this.workers.values()].some(worker => worker.interactions.size || worker.session.ledger.list().some(operation => ['accepted', 'unconfirmed'].includes(operation.status)))) throw new Error('Finish or reconcile active Codex work before changing connection profiles.');
+        if (this.improvements.size || this.desktop.active || this.opening.size || this.configuring || [...this.workers.values()].some(worker => worker.interactions.size || worker.session.ledger.list().some(operation => ['accepted', 'unconfirmed'].includes(operation.status)))) throw new Error('Finish or reconcile active Codex work before changing connection profiles.');
         this.configuring = true;
         try {
           for (const id of [...this.workers.keys()]) await this.release(id);
@@ -353,8 +369,9 @@ export class CodexHost extends EventEmitter {
   }
   async close(): Promise<void> {
     this.closing = true; this.approvals.close(); this.browser.close();
+    for (const abort of this.improvements.keys()) abort.abort();
     const desktopClosed = this.desktop.close();
-    const cleanup = Promise.allSettled([desktopClosed]);
+    const cleanup = Promise.allSettled([desktopClosed, ...this.improvements.values()]);
     await Promise.allSettled([...this.opening.values()]);
     for (const worker of this.workers.values()) {
       worker.session.close(); worker.session.ledger.recover(); await worker.rpc.close();

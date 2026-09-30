@@ -376,3 +376,13 @@ Validation: 29 Home tests, including replaced-identity controls, discovery field
 filtering/size limits and owner-only inventory. In-app browser fixture verified
 On/Off, disabled offline/setup devices and reload without duplicate dispatch: exactly
 two actions for one On and one Off. Deployment identity is recorded separately.
+
+
+### Deadline regression fixture
+
+The cancellation-after-dispatch test synchronizes on the synthetic MCP write
+before invoking the actual request-deadline callback. It holds the remote reply,
+checks the durable unknown outcome, and verifies that a later model-requested
+mutation cannot dispatch again. This removes a 100 ms scheduling race seen in
+CI run 36742665709 without changing the production deadline or cancellation
+policy. All 29 Home tests pass locally after the fixture correction.
