@@ -8,6 +8,7 @@ import {join} from 'node:path';
 import {CodexRpc} from '../dist/codex-runtime/src/rpc.js';
 import {runtimeOptions, installedRuntimeVersion} from '../dist/codex-runtime/src/config.js';
 import {CodexSession} from '../dist/codex-runtime/src/session.js';
+import {nativeHistory} from '../dist/codex-runtime/src/history.js';
 import {OperationLedger} from '../dist/codex-runtime/src/operations.js';
 import {CodexHost} from '../dist/codex-runtime/src/host.js';
 import {CodexIpcServer} from '../dist/codex-runtime/src/ipc.js';
@@ -95,6 +96,10 @@ test('pinned real Codex streams a fixture response and resumes persisted native 
   await resumedSession.submit('request-two', 'Run the harmless fixture tool.');
   assert.equal((await toolDone).turn.status, 'completed');
   assert.equal(toolRounds, 2);
+  const paginated = await nativeHistory(resumed, threadId, 1);
+  assert.equal(paginated.length, 2);
+  assert.ok(paginated[0].items.some(item => item.clientId === 'request-one'));
+  assert.ok(paginated[1].items.some(item => item.type === 'commandExecution' && item.aggregatedOutput.includes('augmentor_tool_fixture')));
   const outputs = requests.at(-1).input.filter(item => item.type === 'function_call_output');
   assert.ok(outputs.some(item => item.call_id === 'call_fixture' && item.output.includes('augmentor_tool_fixture')));
   mode = 'hold';

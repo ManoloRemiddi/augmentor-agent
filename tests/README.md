@@ -134,3 +134,15 @@ actual isolated companion with no configured model. `tests/codex-context-contrac
 qualifies pinned Codex additional-context roles and persistence across updates,
 omission and restart; its pass documents an API limitation, not completion of
 replaceable continuity. Neither test enables production Codex memory.
+
+
+### Codex paginated history
+
+`codex-history.test.mjs` validates ascending turn/item pages, cursor loops,
+malformed pages and foreign items. `codex-session.test.mjs` proves a failed
+later page cannot resolve an unknown submission. The real pinned-runtime
+`codex-app-server.test.mjs` forces one-item pages and verifies user correlation
+and tool output, then exercises host recovery through native/Browser fixtures.
+`codex-context-contract.test.mjs` also checks that updated then cleared
+collaboration-mode developer instructions retain prior snapshots in model input.
+These are synthetic-provider contracts, not live-account qualification.

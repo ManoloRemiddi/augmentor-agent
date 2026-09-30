@@ -7,6 +7,7 @@ import {RELEASE} from '../../contracts/src/release.js';
 import {runtimeOptions, installedRuntimeVersion, type CodexConnection} from './config.js';
 import {CodexRpc, type RpcRequest} from './rpc.js';
 import {CodexSession} from './session.js';
+import {nativeHistory} from './history.js';
 import {OperationLedger} from './operations.js';
 import {DisplayJournal} from './journal.js';
 import {durableJson, readPrivateJson, privateDirectory} from './storage.js';
@@ -211,10 +212,10 @@ export class CodexHost extends EventEmitter {
         })();
       });
       rpc.on('failure', () => {void this.stopDesktop(meta.id); this.browser.cancel(meta.id); for (const call of toolCalls.values()) call.abort.abort(); this.approvals.cancel(meta.id); session.close(); worker.interactions.clear(); this.workers.delete(meta.id);});
-      await session.reconcile();
       if (ledger.list().some(operation => operation.turnId || operation.status === 'unconfirmed')) {
-        const history = await rpc.call('thread/read', {threadId: meta.threadId, includeTurns: true});
-        for (const turn of history.thread.turns) {
+        const history = await nativeHistory(rpc, session.threadId);
+        await session.reconcile(history);
+        for (const turn of history) {
           for (const event of chatEvents({method: 'turn/started', params: {threadId: meta.threadId, turn}})) publish(event);
           for (const item of turn.items) {
             const params = {threadId: meta.threadId, turnId: turn.id, item};

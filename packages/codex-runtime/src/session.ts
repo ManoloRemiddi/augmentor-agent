@@ -4,6 +4,7 @@ import {setTimeout as delay} from 'node:timers/promises';
 import {CodexRpc, CodexRemoteError, type RpcNotification} from './rpc.js';
 import {OperationLedger, type Operation} from './operations.js';
 import {chatEvents} from './events.js';
+import {nativeHistory, type NativeTurn} from './history.js';
 
 /** One native thread, with durable product admission around Codex's own agent loop. */
 export class CodexSession extends EventEmitter {
@@ -93,15 +94,15 @@ export class CodexSession extends EventEmitter {
     }
     throw new Error('Codex has not confirmed cancellation. The prompt was not resent; check the thread state.');
   }
-  async reconcile(): Promise<void> {
+  async reconcile(history?: NativeTurn[]): Promise<void> {
     const pending = this.ledger.list().filter(value => ['accepted', 'unconfirmed'].includes(value.status));
     if (!pending.length) return;
-    const result = await this.rpc.call('thread/read', {threadId: this.threadId, includeTurns: true});
+    const turns = history ?? await nativeHistory(this.rpc, this.threadId);
     for (const operation of pending) {
-      const turn = result.thread.turns.find((candidate: any) => candidate.id === operation.turnId || candidate.items.some((item: any) => item.type === 'userMessage' && item.clientId === operation.id));
+      const turn = turns.find((candidate: any) => candidate.id === operation.turnId || candidate.items.some((item: any) => item.type === 'userMessage' && item.clientId === operation.id));
       if (!turn) continue; // Absence, including partial history, never proves non-execution.
       this.ledger.acknowledge(operation.id, turn.id);
-      if (['completed', 'failed', 'interrupted'].includes(turn.status)) this.ledger.finish(operation.id, turn.status, turn.id);
+      if (turn.status !== 'inProgress') this.ledger.finish(operation.id, turn.status, turn.id);
     }
   }
   close(): void {

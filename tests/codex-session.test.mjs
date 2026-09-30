@@ -30,7 +30,7 @@ test('lost acknowledgment blocks queue and reconciliation matches the native cli
   await assert.rejects(session.submit('one', 'Hello'), /connection lost/);
   assert.equal(ledger.get('one').status, 'unconfirmed');
   await session.submit('two', 'Next'); assert.equal(ledger.get('two').status, 'queued');
-  rpc.call = async () => ({thread: {turns: [{id: 'turn-1', status: 'completed', items: [{type: 'userMessage', clientId: 'one'}]}]}});
+  rpc.call = async method => ({data: method === 'thread/turns/list' ? [{id: 'turn-1', status: 'completed'}] : [{turnId: 'turn-1', item: {id: 'user-1', type: 'userMessage', clientId: 'one'}}], nextCursor: null});
   await session.reconcile(); assert.equal(ledger.get('one').status, 'completed');
   assert.equal(ledger.get('two').status, 'queued');
 });
@@ -38,6 +38,18 @@ test('an internal RPC error does not prove a side effect failed', async t => {
   const {ledger, session} = fixture(t, async () => {throw new CodexRemoteError(-32603, 'internal error');});
   await assert.rejects(session.submit('one', 'Hello'));
   assert.equal(ledger.get('one').status, 'unconfirmed');
+});
+test('a failed later history page leaves the admission ledger unresolved', async t => {
+  const {rpc, ledger, session} = fixture(t, async () => {throw new CodexTransportError('lost acknowledgment', true);});
+  await assert.rejects(session.submit('one', 'Hello'));
+  rpc.call = async (method, params) => {
+    if (method === 'thread/turns/list') return {data: [{id: 'turn-1', status: 'completed'}], nextCursor: null};
+    if (params.cursor) throw new CodexTransportError('lost history page');
+    return {data: [{turnId: 'turn-1', item: {id: 'user-1', type: 'userMessage', clientId: 'one'}}], nextCursor: 'remaining-items'};
+  };
+  await assert.rejects(session.reconcile(), /lost history page/);
+  assert.equal(ledger.get('one').status, 'unconfirmed');
+  assert.equal(ledger.get('one').turnId, undefined);
 });
 test('Stop retries only the confirmed early-turn rejection and preserves queued input', async t => {
   let interrupts = 0;

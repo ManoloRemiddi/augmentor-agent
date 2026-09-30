@@ -41,5 +41,12 @@ test('pinned additionalContext is public-context input, not a replaceable memory
  assert.deepEqual(history.thread.turns.flatMap(t=>t.items).filter(i=>i.type==='userMessage').map(i=>i.content.filter(p=>p.type==='text').map(p=>p.text).join('')),['User request 1','User request 2','User request 3']);
  await rpc.close();rpc=await open();await rpc.call('thread/resume',{threadId:thread.id,cwd:root});await turn(4,'SYNTHETIC_MEMORY_C');
  const resumed=JSON.stringify(requests.at(-1).input);for(const key of ['A','B','C'])assert.ok(resumed.includes('SYNTHETIC_MEMORY_'+key));
- assert.equal(requests.length,4);
+ for(const [number,value] of [[5,'SYNTHETIC_SETTINGS_A'],[6,'SYNTHETIC_SETTINGS_B'],[7,'']]) {
+  await rpc.call('thread/settings/update',{threadId:thread.id,collaborationMode:{mode:'default',settings:{model:'fixture',developer_instructions:value}}});
+  await turn(number);
+ }
+ const settingsInput=JSON.stringify(requests.at(-1).input);
+ assert.match(settingsInput,/SYNTHETIC_SETTINGS_A/);
+ assert.match(settingsInput,/SYNTHETIC_SETTINGS_B/);
+ assert.equal(requests.length,7);
 });

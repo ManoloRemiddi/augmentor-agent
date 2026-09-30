@@ -728,6 +728,9 @@ untrusted fragments reach model input separately from public `userMessage`
 items. However, changed or omitted keys **do not remove previous fragments from
 model history**, and they survive worker restart/resume. Consequently this API
 alone cannot implement Augmentor's current replaceable continuity snapshot.
+The same real-runtime probe updates collaboration-mode developer instructions
+through `thread/settings/update` twice, then clears them. Both earlier instruction
+snapshots remain in model input; that route also fails the replacement contract.
 Upstream also bounds each fragment to 1,000 tokens, so forwarding the existing
 6,000-character structured snapshot without a deliberate transport strategy
 could truncate it. No snapshot is automatically inserted by this checkpoint.
@@ -753,3 +756,28 @@ Debian application checks, including the corrected loaded Chromium proof, and
 Home tests passed in [36745591131](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36745591131).
 Debian packaging still refuses the unreviewed Codex native executable; no release
 gate was bypassed.
+
+## Paginated native-history recovery
+
+Recovery now uses `thread/turns/list` with ascending `notLoaded` turn pages,
+then `thread/items/list` for each turn's complete ascending item pages. The
+host shares this result between operation reconciliation and display recovery;
+it no longer requests full `thread/read` hydration. Native history remains the
+source of user client IDs and tool results; display paging is a separate concern.
+
+All pages must succeed before this read changes ledger status or publishes
+recovered display events. Invalid pages, repeated cursors, duplicate identities,
+wrong-turn items and transport failures fail recovery without resending a prompt.
+Absence still does not prove non-execution. Aggregate reads are bounded to 128 MiB
+and 100,000 pages; exceeding either requires attention instead of silently
+truncating history. This is an in-memory recovery bound, not lazy transcript
+loading or a guarantee of an atomic snapshot during an externally active turn.
+No unsupported-method fallback to deprecated full hydration is provided.
+
+The pinned real-runtime fixture forces page size one across two turns and checks
+user correlation plus a completed command's output. Both existing native and
+Browser bridge fixtures pass through resumed host recovery. Unit tests cover
+malformed/repeated pages, ordering, foreign items and a failed later page leaving
+an unconfirmed operation unresolved. Build/type checks and all **285 root Node
+tests** pass. This is source qualification with synthetic model responses, not
+installed desktop, production provider or full C1 lifecycle acceptance.

@@ -2,6 +2,18 @@
 
 # Start here: agent handoff
 
+## September 30 Codex paginated recovery checkpoint
+
+[Native-history recovery](CODEX-INTEGRATION.md#paginated-native-history-recovery)
+uses turn/item pages, validates complete reads before ledger reconciliation and
+shares the result with display restoration. Real pinned Codex with one-item pages
+preserves client IDs and command output. Build/type checks and 285 root Node
+tests pass. A failed later page keeps unknown work unresolved without replay.
+The context probe also confirms that clearing collaboration-mode developer
+instructions retains earlier snapshots; memory remains disabled pending the
+replacement contract. Full C0–C9, packaging review and installed qualification
+remain unfinished. This source checkpoint does not change installed apps.
+
 ## September 30 Codex memory foundation checkpoint
 
 [Memory foundation and context evidence](CODEX-INTEGRATION.md#memory-capture-foundation-and-context-api-qualification)
