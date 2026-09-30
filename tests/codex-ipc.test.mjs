@@ -73,6 +73,7 @@ test('Codex host persists failed creation as unknown without spawning another th
   await assert.rejects(host.create(params), /Lost acknowledgment/);
   await assert.rejects(host.create(params), /unknown outcome/);
   assert.equal(starts, 1);
+  await assert.rejects(host.dispatch('host.prepareShutdown', {}), /active or unconfirmed/);
 });
 
 test('standalone Codex host persists a local profile and recovers its socket after a crash', {timeout: 15000}, async t => {
@@ -95,6 +96,9 @@ test('standalone Codex host persists a local profile and recovers its socket aft
   const second = await start();
   const listed = await second.invoke('list', 'profiles.list'); assert.equal(listed.result.profiles[0].id, 'local');
   assert.equal(listed.result.profiles[0].validation, 'unverified');
+  assert.equal((await second.invoke('prepare', 'host.prepareShutdown')).result.maintenance, true);
+  assert.match((await second.invoke('blocked', 'profiles.configure', {})).error.message, /maintenance/);
+  assert.equal((await second.invoke('cancel', 'host.cancelShutdown')).result.maintenance, false);
   second.socket.destroy(); const stopped = once(second.child, 'exit'); second.child.kill('SIGTERM'); await stopped;
 });
 

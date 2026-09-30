@@ -42,6 +42,9 @@ export class CodexHost extends EventEmitter {
   private opening = new Map<string, Promise<Worker>>();
   private closing = false;
   private configuring = false;
+  private maintenance = false;
+  private activeRequests = 0;
+  private activeCreates = 0;
   constructor(readonly options: HostOptions) {
     super(); privateDirectory(options.root); privateDirectory(join(options.root, 'sessions'));
     installedRuntimeVersion();
@@ -63,6 +66,10 @@ export class CodexHost extends EventEmitter {
     return structuredClone(meta);
   }
   private assertOpen(): void {if (this.closing) throw new Error('Codex host is closing.');}
+  private assertAccepting(): void {
+    this.assertOpen();
+    if (this.maintenance) throw new Error('Codex host is paused for maintenance.');
+  }
   private row(meta: SessionMeta) {
     const worker = this.workers.get(meta.id);
     const ledgerPath = join(this.sessionRoot(meta.id), 'operations.json');
@@ -80,7 +87,13 @@ export class CodexHost extends EventEmitter {
       pinned: [], hidden: [], failures: [], default: profiles.length ? {provider: profiles[0].id, model: profiles[0].model} : null};
   }
   async create(params: Data): Promise<SessionMeta> {
-    this.assertOpen();
+    this.assertAccepting();
+    this.activeCreates++;
+    try {return await this.createSession(params);}
+    finally {this.activeCreates--;}
+  }
+  private async createSession(params: Data): Promise<SessionMeta> {
+    this.assertAccepting();
     if (this.configuring) throw new Error('Codex connection setup is in progress.');
     const id = identifier(params.sessionId);
     const profileId = identifier(params.profileId ?? params.selection?.provider ?? this.metadata.get(id)?.profileId);
@@ -106,7 +119,7 @@ export class CodexHost extends EventEmitter {
     return this.meta(id);
   }
   private async worker(id: string): Promise<Worker> {
-    this.assertOpen();
+    this.assertAccepting();
     if (this.configuring) throw new Error('Codex connection setup is in progress.');
     const existing = this.workers.get(id); if (existing) return existing;
     const pending = this.opening.get(id); if (pending) return pending;
@@ -188,6 +201,32 @@ export class CodexHost extends EventEmitter {
   }
   async dispatch(method: string, params: Data): Promise<unknown> {
     this.assertOpen();
+    if (method === 'host.prepareShutdown') {
+      // No await between the activity check and admission freeze.
+      if (this.activeRequests || this.activeCreates || this.opening.size || this.configuring ||
+          [...this.workers.values()].some(worker => worker.interactions.size || worker.session.submissionPending) ||
+          [...this.metadata.values()].some(meta => meta.status !== 'ready' || this.row(meta).running)) {
+        throw new Error('Codex has active or unconfirmed work. Finish or reconcile it before maintenance.');
+      }
+      this.maintenance = true;
+      for (const worker of this.workers.values()) worker.session.setMaintenance(true);
+      return {ready: true, maintenance: true};
+    }
+    if (method === 'host.cancelShutdown') {
+      if (this.maintenance) {
+        this.maintenance = false;
+        for (const worker of this.workers.values()) worker.session.setMaintenance(false);
+      }
+      return {maintenance: false};
+    }
+    const readable = ['host.describe', 'profiles.list', 'models.list', 'session.list', 'session.models',
+      'settings.describe', 'session.describe', 'session.history'];
+    if (this.maintenance && !readable.includes(method)) throw new Error('Codex host is paused for maintenance.');
+    this.activeRequests++;
+    try {return await this.dispatchRequest(method, params);}
+    finally {this.activeRequests--;}
+  }
+  private async dispatchRequest(method: string, params: Data): Promise<unknown> {
     switch (method) {
       case 'interaction.respond': return this.approvals.answer(identifier(params.rpcId), identifier(params.sessionId), params.value);
       case 'profiles.list': return {profiles: this.options.profiles?.list() ?? []};
@@ -208,17 +247,13 @@ export class CodexHost extends EventEmitter {
         await this.options.profiles.validated(profile.id, profile.revision);
         return {...checked, scope: 'text-only', toolsVerified: false};
       }
-      case 'host.prepareShutdown': {
-        if (this.opening.size || [...this.workers.values()].some(worker => worker.interactions.size || worker.session.ledger.list().some(operation => ['accepted', 'unconfirmed'].includes(operation.status)))) throw new Error('Codex has active or unconfirmed work. Finish or reconcile it before maintenance.');
-        return {ready: true};
-      }
       case 'models.list': return this.catalog();
       case 'models.validate': {
         const profile = await this.options.resolveProfile(identifier(params.provider));
         if (profile.connection.model !== params.model) throw new Error('The selected model does not match this Codex connection profile.');
         return {valid: true, validation: 'configuration-only'};
       }
-      case 'host.describe': return {harness: 'codex', protocol: CODEX_PROTOCOL, version: RELEASE.version, capabilities: {branch: false, edit: false, memory: false, voice: false}, workers: this.workers.size};
+      case 'host.describe': return {harness: 'codex', protocol: CODEX_PROTOCOL, version: RELEASE.version, maintenance: this.maintenance, capabilities: {branch: false, edit: false, memory: false, voice: false}, workers: this.workers.size};
       case 'session.create': {const meta = await this.create(params); return {...this.row(meta), threadId: meta.threadId};}
       case 'session.list': {const items = [...this.metadata.values()].filter(meta => meta.status === 'ready').map(meta => this.row(meta)); return {items, total: items.length};}
       case 'session.models': {const meta = this.meta(params.sessionId); return {current: {provider: meta.profileId, model: meta.model}};}

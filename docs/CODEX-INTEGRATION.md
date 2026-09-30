@@ -306,3 +306,25 @@ integration, and does not qualify live-model personal-assistant behavior.
 Validation for the persona checkpoint: TypeScript checks and build pass, the root
 Node suite passes 235 tests, and the focused Codex suite passes 42 tests. These
 include the real pinned-runtime fixture with a synthetic Responses provider.
+
+## Maintenance admission checkpoint
+
+`host.prepareShutdown` now atomically checks activity and enters a reversible
+maintenance state. It refuses while requests, profile resolution, thread creation,
+submission acknowledgments or interactions are pending, or while any saved thread
+has active/unconfirmed work. A stopped worker is not evidence that an uncertain
+operation never ran. Incomplete thread creation also prevents readiness.
+
+After readiness, new work and profile mutations are rejected; local status/history
+remain readable. Existing session queue pumps are suspended so a scheduled callback
+cannot start a prompt after the check. `host.cancelShutdown` reopens admission and
+restores normal queue processing while retaining Stop's independent queue pause.
+The state is process-local and exposed by `host.describe.maintenance`.
+
+Validation: build passes; 239 root Node tests passed, followed by an additional
+focused direct-creation race test. Five maintenance cases cover admission freeze,
+in-flight profile resolution, saved uncertain operations, scheduled queue dispatch
+and direct creation. The standalone host/socket proof also exercises prepare,
+rejected configuration and cancellation. These are fixture/process checks.
+Installer orchestration, maintenance ownership across process restart and actual
+upgrade/rollback remain unfinished; this endpoint alone does not qualify C1/C8.

@@ -69,6 +69,13 @@ snapshot are not silently migrated. The real runtime fixture verifies exactly on
 persona on initial and resumed inference. Scoped tools and prompt improvement are
 still separate C5 work.
 
+The maintenance checkpoint freezes Codex admission when shutdown readiness is
+confirmed, including pending profile/thread work and saved unresolved operations.
+It also suspends scheduled queue pumps; cancellation restores normal processing.
+Five focused maintenance cases and the standalone socket proof cover these races.
+The root Node suite passed 239 tests before the fifth focused case was added.
+Installer orchestration and installed upgrade/rollback remain outstanding.
+
 ## September 30 application SDK foundation
 
 [SDK foundation](APP-SDK.md) owns the DSH-only application contract, exact tool

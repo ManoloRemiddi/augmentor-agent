@@ -10,11 +10,17 @@ export class CodexSession extends EventEmitter {
   private sending = false;
   private closed = false;
   private paused = false;
+  private maintenance = false;
   private dispatchId?: string;
   constructor(readonly rpc: CodexRpc, readonly ledger: OperationLedger) {
     super();
     rpc.on('notification', this.notification);
     rpc.on('failure', this.failed);
+  }
+  get submissionPending(): boolean {return this.sending;}
+  setMaintenance(value: boolean): void {
+    this.maintenance = value;
+    if (!value) this.schedulePump();
   }
   get threadId(): string {return this.ledger.threadId;}
   async submit(id: string, text: string): Promise<Operation> {
@@ -25,7 +31,7 @@ export class CodexSession extends EventEmitter {
   }
   async continueQueue(): Promise<void> {this.paused = false; await this.pump();}
   private async pump(): Promise<void> {
-    if (this.closed || this.paused || this.sending) return;
+    if (this.closed || this.paused || this.maintenance || this.sending) return;
     const operations = this.ledger.list();
     if (operations.some(operation => ['unconfirmed', 'accepted'].includes(operation.status))) return;
     const queued = operations.find(operation => operation.status === 'queued');
