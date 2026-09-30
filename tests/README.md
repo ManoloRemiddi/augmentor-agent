@@ -170,15 +170,20 @@ Codex Browser activity to the actual companion/gateway, holds synthetic model
 generation and verifies Stop closes the upstream socket, stops the memory job
 and prevents idle/reconstruction replay. It removes only its fresh named test
 container/volume and empty configuration; cleanup failures fail the proof.
-Requires local Docker and the pinned image; ordinary CI skips this case:
+Requires local Docker and the pinned image; ordinary CI skips both engine cases:
 
 ```sh
 AUGMENTOR_PYTHON=/path/to/test/python AUGMENTOR_CODEX_MEMORY_ENGINE_PROOF=1 \
   node --test tests/codex-memory-runtime.test.mjs
 ```
 
-This qualifies admission/cancellation with the real engine, not completed
-memory-generation stages, semantic quality or physical installed acceptance.
+The held-generation case qualifies admission/cancellation with the real engine.
+A second case completes all six retain/consolidate/page stages across both banks,
+requires actual consolidated observations and generated-page cache, and verifies
+a derived-page-only marker reaches the next Codex request. Idle/restart perform
+no extra inference and preserve the exact stage receipt and remaining budget.
+Both cases use deterministic synthetic model replies; they do not establish
+semantic classification/page quality, Mac Docker or physical installed acceptance.
 
 The standalone-launcher Qt case in `codex-memory-runtime.test.mjs` runs
 `fixtures/codex/native-memory.py` with actual composer Enter/Send and existing

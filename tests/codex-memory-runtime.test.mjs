@@ -263,3 +263,63 @@ test('actual pinned Codex capture preserves non-BMP text across source chunks an
   assert.deepEqual((await f.exported('codex:one')).events.map(row=>({id:row.event_id,content:row.content})),original);
   assert.equal(f.requests.length,1,'backfill never repeats the model request');
 });
+
+test('real controlled engine completes both scoped memory pipelines inside a Codex Browser window', {
+  timeout:240000, skip:process.platform !== 'linux' || process.env.AUGMENTOR_CODEX_MEMORY_ENGINE_PROOF !== '1',
+}, async t => {
+  const {controlledMemoryEngine} = await import('./fixtures/codex/controlled-memory-engine.mjs');
+  const calls = [], frames = [];
+  // Deterministic model replies qualify engine stages and transport, not semantic quality.
+  const model = createServer(async (req, res) => {
+    let raw = ''; for await (const chunk of req) raw += chunk;
+    const body = JSON.parse(raw); calls.push(body);
+    const properties = body.response_format?.json_schema?.schema?.properties ?? {};
+    const text = body.messages.map(message => message.content ?? '').join('\n');
+    let content;
+    if ('facts' in properties || text.includes('"facts"')) content = JSON.stringify({facts:[{what:'Atlas uses SQLite.', when:'N/A', where:'N/A', who:'N/A', why:'N/A', fact_type:'world'}]});
+    else if ('creates' in properties || text.includes('"creates"')) {
+      const ids = [...text.matchAll(/\[([0-9a-f-]{36})\]/g)].map(match => match[1]);
+      content = JSON.stringify({creates:[{text:'Atlas uses SQLite.', source_fact_ids:[...new Set(ids)], reason:'New synthetic source fact.'}], updates:[], deletes:[]});
+    } else content = 'DERIVED_PAGE_PROOF: Atlas uses SQLite. Preserve existing work.';
+    res.writeHead(200, {'content-type':'application/json'});
+    res.end(JSON.stringify({id:'memory-'+calls.length, object:'chat.completion', created:0, model:'fixture',
+      choices:[{index:0,message:{role:'assistant',content},finish_reason:'stop'}],
+      usage:{prompt_tokens:10,completion_tokens:10,total_tokens:20}}));
+  });
+  await new Promise(resolve => model.listen(0,'127.0.0.1',resolve));
+  t.after(async () => {model.closeAllConnections(); await new Promise(resolve => model.close(resolve));});
+  const f = await fixture(t,{prepareMemory:root => controlledMemoryEngine(root,`http://127.0.0.1:${model.address().port}/v1`)});
+  f.host.attachBrowser('one',{},frame => frames.push(frame));
+  await delay(600); assert.equal(calls.length,0);
+  await f.host.dispatch('session.prompt',{sessionId:'one',requestId:'complete-memory',content:[{type:'text',text:'MODEL_STEP_5 Atlas uses SQLite. Preserve existing work while reading the Browser.'}]});
+  await until(() => frames.length>0,'pending Browser executor');
+  let jobs;
+  for(let n=0;n<900;n++) {
+    jobs=(await f.services.call('memory.dual.jobs',{session:'codex:one'})).jobs;
+    if(jobs[0]?.status==='completed'||jobs[0]?.status==='stopped') break;
+    await delay(100);
+  }
+  assert.equal(jobs[0]?.status,'completed',JSON.stringify({jobs,formats:calls.map(call=>call.response_format)}));
+  assert.equal(jobs[0].phase,6,'both banks finish retain, scoped consolidation and their managed page');
+  const completedJob=jobs[0];
+  assert.ok(completedJob.seconds>0&&completedJob.seconds<=120);
+  assert.ok(completedJob.tokens>0&&completedJob.tokens<65536);
+  const recall=await f.services.call('memory.dual.recall',{session:'codex:one'});
+  for(const kind of ['relationship','work']) {
+    assert.ok(recall[kind].items.some(item=>item.type==='observation'),'consolidated observation cached for '+kind);
+    assert.match(recall[kind].summary,/DERIVED_PAGE_PROOF/);
+  }
+  assert.ok(calls.every(call=>call.stream&&call.max_tokens<=4096));
+  await f.host.dispatch('session.cancel',{sessionId:'one'});
+  await until(async ()=>(await f.host.dispatch('session.queue',{sessionId:'one'})).operations[0].status==='interrupted','native interruption after complete memory');
+  const completedCalls=calls.length;
+  await delay(700);assert.equal(calls.length,completedCalls,'completed pipeline never generates while idle');
+  await f.host.dispatch('session.continueQueue',{sessionId:'one'});
+  await f.prompt('use-derived-memory','MODEL_STEP_3 Continue with the preserved project context.');
+  assert.match(JSON.stringify(f.requests.at(-1).input),/DERIVED_PAGE_PROOF/,'the new context includes the saved page, not just original source text');
+  await f.host.close();
+  f.open();await f.host.dispatch('session.queue',{sessionId:'one'});await f.host.close();
+  await delay(600);assert.equal(calls.length,completedCalls,'restart grants no new memory inference');
+  assert.deepEqual((await f.services.call('memory.dual.jobs',{session:'codex:one'})).jobs,[completedJob],'restart preserves stage receipts and remaining budget');
+  assert.equal(f.requests.length,2,'memory stages run separately from the native conversation loop');
+});

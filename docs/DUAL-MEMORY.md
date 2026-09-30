@@ -153,7 +153,9 @@ not silently redirected into these automatic banks.
   labelled fixture engines, text/voice capture and one effective context snapshot.
 - `tests/codex-memory-runtime.test.mjs`: actual pinned Codex and isolated Python
   companions, both-interface controls, capture/recall, pause, Stop, outage,
-  Unicode chunk reconstruction and restart dedupe; inference is synthetic.
+  Unicode chunk reconstruction and restart dedupe. Two opt-in Docker cases prove
+  actual gateway cancellation and complete six-stage processing/page delivery
+  across both banks; inference is synthetic, not a memory-quality assessment.
 - `scripts/proof-controlled-memory.py`: opt-in disposable pinned-engine proof;
   default fixture model injects a failure, `--live` uses the existing model within
   the normal budget. See [the controlled guide](CONTROLLED-MEMORY.md).

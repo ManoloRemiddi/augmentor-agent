@@ -1626,3 +1626,28 @@ passed both Mac jobs, Debian application/native/Chromium checks and Home; Debian
 packaging still stops at the unreviewed Codex native executable notice gate.
 These results do not close the remaining C0–C9 provider/account, complete memory
 stage/quality, physical acceptance or distribution requirements.
+
+## Complete scoped memory stages through actual Codex activity
+
+A second opt-in Docker case in `codex-memory-runtime.test.mjs` now completes the
+actual pinned Hindsight pipeline through the actual Codex Browser I/O window.
+Both relationship and work banks finish retain, source-tag-scoped consolidation
+and their managed knowledge page: six durable stages. Cached results include
+consolidated observations and generated page content. An explicit follow-up turn
+receives a marker that exists only in the derived page, distinguishing saved-page
+injection from raw source continuity. The fixture explicitly resumes the queue
+after Stop, matching the existing paused-queue contract.
+
+Remaining seconds/tokens stay within the ordinary shared budget; shutdown and
+restart preserve the complete job receipt and its exact remaining budget. Startup,
+idle and reconstructed native history cause no extra inference. Memory calls use
+the separate gateway while only two chat-model requests run through Codex's own
+loop. The disposable engine and real companions use fresh state and deterministic
+synthetic extraction/consolidation/page replies. This proves complete stage
+execution and delivery, not real-model classification, page quality, physical
+acceptance or Mac Docker qualification. Standard CI skips both explicit Docker
+cases. The seven focused real-host/companion tests pass on Linux with both engine
+cases enabled. **All 357 root Node tests** also pass with both Docker proofs
+enabled. Preceding `f4f8d87` passed both Mac jobs and Debian application/Home
+checks; Debian packaging retains the unreviewed native executable notice gate.
+Full C0–C9 and native-binary release review remain open.

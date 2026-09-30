@@ -2,6 +2,19 @@
 
 # Start here: agent handoff
 
+## October 1 complete Codex-controlled memory pipeline
+
+[Complete scoped stage proof](CODEX-INTEGRATION.md#complete-scoped-memory-stages-through-actual-codex-activity)
+now executes all six actual pinned Hindsight retain/consolidate/page stages during
+a Codex Browser I/O window. Both banks cache observations and generated pages;
+a page-only marker reaches the next native request. Startup/idle/restart cause
+no extra inference, and the complete job receipt/remaining budget survive restart.
+All seven focused real-host/companion cases and all 357 root Node tests pass
+with both Docker proofs enabled. Replies are synthetic; live classification/page quality and full C0–C9 remain
+`f4f8d87` passed both Mac jobs and Debian application/Home checks; Debian
+packaging still stops at the unreviewed Codex executable notice gate. No installed
+app/settings, private speech source or model placement changed.
+
 ## October 1 Unicode capture integrity and platform checkpoint
 
 [Unicode source integrity](CODEX-INTEGRATION.md#original-memory-text-across-unicode-storage-boundaries)
