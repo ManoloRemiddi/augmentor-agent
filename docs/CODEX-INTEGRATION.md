@@ -695,3 +695,61 @@ for the exact extension URL, complete document, composer and messaging API befor
 sending its first message. The loaded Chromium proof passes locally after that
 correction; the next CI run must qualify it on the Debian runner. The native
 packaging review gate remains separately unresolved.
+
+
+## Memory capture foundation and context API qualification
+
+`packages/codex-runtime/src/memory.ts` adds a Codex adapter for the existing
+`DualMemoryClient`. It is a tested foundation, **not yet wired into production
+Codex hosts**; the advertised memory capability remains false. No installed
+memory service, inference route, account or GPU setting was changed.
+
+The adapter accepts committed public display events with stable sequence IDs,
+uses the `codex:<conversation>` namespace and the companion's stable person/project
+binding, and deduplicates reconstruction. Completed public messages are captured
+immediately; speculative streaming chunks, reasoning, tool payloads and injected
+plugin text are excluded. Message completion is not a claim that a user's task
+succeeded. Replaying the original committed items grants no activity lease and
+does not create a new processing window. Pause behavior is owned by the existing
+companion, which retains skipped IDs without text.
+
+Live activity is a separate explicit interface. A duplicate start for the same
+turn retains its owner; a new turn first closes the prior lease. Only known
+Browser I/O permits a tool window. Shell, Home, MCP and delegated work can use
+inference and conservatively hold the whole turn in foreground state, even after
+that tool returns. Overlapping/stale tool events cannot reopen a stopped turn.
+The companion retains its existing absolute window, renewal expiry, pause and
+budget rules. Host notification wiring, tracking delegated work that outlives a
+root turn, profile bindings and full lifecycle qualification remain C6 work.
+
+The pinned 0.159.2 schema exposes experimental `turn/start.additionalContext`,
+with `untrusted` and `application` fragments. A real binary test verifies that
+untrusted fragments reach model input separately from public `userMessage`
+items. However, changed or omitted keys **do not remove previous fragments from
+model history**, and they survive worker restart/resume. Consequently this API
+alone cannot implement Augmentor's current replaceable continuity snapshot.
+Upstream also bounds each fragment to 1,000 tokens, so forwarding the existing
+6,000-character structured snapshot without a deliberate transport strategy
+could truncate it. No snapshot is automatically inserted by this checkpoint.
+The official [app-server lifecycle documentation](https://learn.chatgpt.com/docs/app-server)
+is the integration reference; these finer observations come from the pinned
+schema/source and the actual-runtime fixture, not a claimed stable API guarantee.
+
+Four capture/lifecycle contracts pass, including a real isolated Python memory
+companion and SQLite journal. That proof verifies restart/backfill deduplication,
+cached user receipts, whole-memory pause/skip behavior, and zero inference
+eligibility from idle replay or a live flag without an activity lease. It uses
+no configured Hindsight engine or model and does not establish derived-memory
+quality or active-window model cancellation. A fifth real-Codex contract checks
+context history, roles and restart behavior. Build/type checks and all **281 root
+Node tests** pass; the final focused cases pass after the immediate committed-item
+capture refinement. End-to-end Codex capture, bounded replaceable context,
+scoped recall/source tools, compaction, fork exclusions and both settings surfaces
+remain unqualified and must be completed before enabling memory in the host.
+
+At preceding Home source `cf220f7`, both macOS jobs passed in
+[36745591163](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36745591163).
+Debian application checks, including the corrected loaded Chromium proof, and
+Home tests passed in [36745591131](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36745591131).
+Debian packaging still refuses the unreviewed Codex native executable; no release
+gate was bypassed.

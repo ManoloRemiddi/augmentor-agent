@@ -2,6 +2,22 @@
 
 # Start here: agent handoff
 
+## September 30 Codex memory foundation checkpoint
+
+[Memory foundation and context evidence](CODEX-INTEGRATION.md#memory-capture-foundation-and-context-api-qualification)
+adds a tested capture/lifecycle adapter, but does not activate memory in the
+Codex host. Real companion tests preserve committed text, deduplicate replay,
+respect skipped paused records and admit no idle inference. Pinned Codex proves
+that `additionalContext` preserves earlier snapshots in model history even when
+keys change/disappear and after restart. Do not use it as a supposedly replaceable
+memory slot or count its fragments as new user messages. Continue C6 context,
+host/lifecycle/profile wiring, scoped tools, compaction and fork exclusions.
+
+Local build/type checks and 281 root tests pass; five final focused contracts
+cover the adapter and real context transport. At `cf220f7`, macOS and Home CI
+passed, as did Debian's application/Chromium checks. Debian remains blocked at
+native executable review. Full C0–C9 completion is still outstanding.
+
 ## September 30 Codex paired Home checkpoint
 
 [Home integration evidence](CODEX-INTEGRATION.md#paired-home-tools) records the

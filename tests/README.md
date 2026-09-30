@@ -126,3 +126,11 @@ uses pinned Codex and actual native/Browser bridges with a synthetic NAS,
 including resumed tool definitions. Home's `identity.test.mjs` verifies that
 request-specific cancellation cannot stop another client/chat or replacement
 request. No test touches the owner's NAS or household devices.
+
+
+Codex memory foundation: `tests/codex-memory.test.mjs` checks committed public
+capture, duplicate/live/replay distinctions, concurrent tool activity and an
+actual isolated companion with no configured model. `tests/codex-context-contract.test.mjs`
+qualifies pinned Codex additional-context roles and persistence across updates,
+omission and restart; its pass documents an API limitation, not completion of
+replaceable continuity. Neither test enables production Codex memory.
