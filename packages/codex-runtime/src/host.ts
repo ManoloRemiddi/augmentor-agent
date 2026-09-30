@@ -70,6 +70,7 @@ export class CodexHost extends EventEmitter {
   private closing = false;
   private configuring = false;
   private maintenance = false;
+  private preparingShutdown?: Promise<{ready: true; maintenance: true}>;
   private activeRequests = 0;
   private activeCreates = 0;
   private improvements = new Map<AbortController, Promise<Rewrite>>();
@@ -395,20 +396,46 @@ export class CodexHost extends EventEmitter {
       return worker;
     } catch (error) {await rpc.close(); throw error;}
   }
+  private maintenanceBusy(): boolean {
+    return Boolean(this.desktop.active || this.activeRequests || this.activeCreates || this.opening.size || this.releasing.size || this.configuring ||
+      [...this.workers.values()].some(worker => worker.interactions.size || worker.session.submissionPending) ||
+      [...this.metadata.values()].some(meta => meta.status !== 'ready' && meta.creationDispatched !== false || this.row(meta).running));
+  }
+  private prepareShutdown(): Promise<{ready: true; maintenance: true}> {
+    if (this.preparingShutdown) return this.preparingShutdown;
+    // Freeze admission and scheduled queue pumps before the first asynchronous inventory read.
+    if (this.maintenanceBusy()) throw new Error('Codex has active or unconfirmed work. Finish or reconcile it before maintenance.');
+    const previous = this.maintenance;
+    this.maintenance = true;
+    const snapshot = [...this.workers].map(([id, worker]) => ({id, worker,
+      nativeRevision: worker.activity.revision, ledgerRevision: worker.session.ledger.revision}));
+    for (const {worker} of snapshot) worker.session.setMaintenance(true);
+    const pending = Promise.resolve().then(async (): Promise<{ready: true; maintenance: true}> => {
+      for (const {worker} of snapshot) {
+        if (!await nativeIdle(worker.rpc, worker.session.threadId, worker.activity)) {
+          throw new Error('Codex native background work is active or could not be confirmed idle. Maintenance cannot proceed.');
+        }
+      }
+      this.assertOpen();
+      // A later worker's inspection must not hide activity in an earlier worker.
+      if (this.maintenanceBusy() || this.workers.size !== snapshot.length || snapshot.some(({id, worker, nativeRevision, ledgerRevision}) =>
+        this.workers.get(id) !== worker || worker.activity.revision !== nativeRevision || worker.session.ledger.revision !== ledgerRevision)) {
+        throw new Error('Codex activity changed during maintenance verification. Retry after the work settles.');
+      }
+      return {ready: true, maintenance: true};
+    }).catch(error => {
+      this.maintenance = previous;
+      if (!this.closing) for (const worker of this.workers.values()) worker.session.setMaintenance(previous);
+      throw error;
+    }).finally(() => {this.preparingShutdown = undefined;});
+    this.preparingShutdown = pending;
+    return pending;
+  }
   async dispatch(method: string, params: Data): Promise<unknown> {
     this.assertOpen();
-    if (method === 'host.prepareShutdown') {
-      // No await between the activity check and admission freeze.
-      if (this.desktop.active || this.activeRequests || this.activeCreates || this.opening.size || this.releasing.size || this.configuring ||
-          [...this.workers.values()].some(worker => worker.interactions.size || worker.session.submissionPending) ||
-          [...this.metadata.values()].some(meta => meta.status !== 'ready' && meta.creationDispatched !== false || this.row(meta).running)) {
-        throw new Error('Codex has active or unconfirmed work. Finish or reconcile it before maintenance.');
-      }
-      this.maintenance = true;
-      for (const worker of this.workers.values()) worker.session.setMaintenance(true);
-      return {ready: true, maintenance: true};
-    }
+    if (method === 'host.prepareShutdown') return this.prepareShutdown();
     if (method === 'host.cancelShutdown') {
+      if (this.preparingShutdown) throw new Error('Codex maintenance verification is still in progress.');
       if (this.maintenance) {
         this.maintenance = false;
         for (const worker of this.workers.values()) worker.session.setMaintenance(false);
@@ -548,6 +575,7 @@ export class CodexHost extends EventEmitter {
     this.browser.attach(id, owner, send);
   }
   async release(id: string): Promise<void> {
+    if (this.preparingShutdown) throw new Error('Codex maintenance verification is still in progress.');
     const pending = this.releasing.get(id); if (pending) return pending;
     const opening = this.opening.get(id); if (opening) {await opening; return this.release(id);}
     const worker = this.workers.get(id); if (!worker) {await this.desktop.stop(id); return;}

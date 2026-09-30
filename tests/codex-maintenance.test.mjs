@@ -69,7 +69,8 @@ test('maintenance stops an already scheduled queue pump and cancellation resumes
   let starts = 0;
   rpc.initialize = async () => {};
   rpc.close = async () => {};
-  rpc.call = async method => {
+  rpc.call = async (method, params) => {
+    const idle = idleReply(method, params); if (idle) return idle;
     if (method === 'thread/start') return {thread: {id: 'thread'}};
     if (method === 'turn/start') return {turn: {id: `turn-${++starts}`}};
     throw new Error('Unexpected fixture method ' + method);
@@ -99,4 +100,83 @@ test('direct session creation holds admission while its profile is unresolved', 
   await assert.rejects(host.dispatch('host.prepareShutdown', {}), /active or unconfirmed/);
   rejectProfile(new Error('Fixture profile unavailable')); await rejected;
   assert.equal((await host.dispatch('host.prepareShutdown', {})).ready, true);
+});
+
+function idleReply(method, params) {
+  if (method === 'thread/loaded/list') return {data: ['thread', 'child'], nextCursor: null};
+  if (method === 'thread/read') return {thread: {id: params.threadId, status: {type: 'idle'}}};
+  if (method === 'thread/backgroundTerminals/list') return {data: [], nextCursor: null};
+  if (method === 'thread/goal/get') return {goal: null};
+}
+async function idleHost(t, count = 1) {
+  const root = directory(t), rpcs = [];
+  const host = new CodexHost({root, resolveProfile: async id => profile(id), createRpc: () => {
+    const rpc = new EventEmitter(); rpc.initialize = async () => {}; rpc.close = async () => {};
+    rpc.call = async (method, params) => {
+      if (method === 'thread/start') return {thread: {id: 'thread'}};
+      return idleReply(method, params);
+    };
+    rpcs.push(rpc); return rpc;
+  }});
+  t.after(() => host.close());
+  for (let i = 0; i < count; i++) await host.create({sessionId: `chat-${i}`, profileId: 'local', cwd: root});
+  return {host, rpcs};
+}
+
+test('maintenance refuses native child work, terminals, goals, hooks and unreadable inventory', async t => {
+  const {host, rpcs: [rpc]} = await idleHost(t);
+  const base = rpc.call;
+  for (const kind of ['child', 'terminal', 'goal', 'read']) {
+    rpc.call = async (method, params) => {
+      if (params.threadId === 'child') {
+        if (kind === 'child' && method === 'thread/read') return {thread: {id: 'child', status: {type: 'active'}}};
+        if (kind === 'terminal' && method === 'thread/backgroundTerminals/list') return {data: [{id: 'terminal'}], nextCursor: null};
+        if (kind === 'goal' && method === 'thread/goal/get') return {goal: {status: 'paused'}};
+        if (kind === 'read') throw new Error('Fixture inventory unavailable');
+      }
+      return base(method, params);
+    };
+    await assert.rejects(host.dispatch('host.prepareShutdown', {}), /background work|inventory unavailable/);
+    assert.equal((await host.dispatch('host.describe', {})).maintenance, false);
+  }
+  rpc.call = base;
+  rpc.emit('notification', {method: 'hook/started', params: {threadId: 'child', run: {id: 'hook'}}});
+  await assert.rejects(host.dispatch('host.prepareShutdown', {}), /background work/);
+  rpc.emit('notification', {method: 'hook/completed', params: {threadId: 'child', run: {id: 'hook'}}});
+  assert.equal((await host.dispatch('host.prepareShutdown', {})).ready, true);
+});
+
+test('maintenance shares pending verification and refuses cancellation or retirement until it settles', async t => {
+  const {host, rpcs: [rpc]} = await idleHost(t);
+  const base = rpc.call; let finish, reads = 0;
+  rpc.call = async (method, params) => {
+    if (method === 'thread/loaded/list') {reads++; await new Promise(resolve => {finish = resolve;});}
+    return base(method, params);
+  };
+  const first = host.dispatch('host.prepareShutdown', {});
+  const second = host.dispatch('host.prepareShutdown', {});
+  await nextTick();
+  await assert.rejects(host.dispatch('host.cancelShutdown', {}), /verification.*progress/);
+  await assert.rejects(host.release('chat-0'), /verification.*progress/);
+  await assert.rejects(host.dispatch('session.prompt', {}), /maintenance/);
+  assert.equal(reads, 1);
+  finish(); assert.equal((await first).ready, true); assert.equal((await second).ready, true);
+  await host.dispatch('host.cancelShutdown', {});
+  assert.equal((await host.dispatch('host.describe', {})).maintenance, false);
+});
+
+test('maintenance rejects activity in an earlier worker while inspecting a later worker', async t => {
+  const {host, rpcs} = await idleHost(t, 2);
+  const base = rpcs[1].call;
+  rpcs[1].call = async (method, params) => {
+    if (method === 'thread/goal/get') rpcs[0].emit('notification', {method: 'thread/status/changed', params: {threadId: 'child', status: {type: 'active'}}});
+    return base(method, params);
+  };
+  await assert.rejects(host.dispatch('host.prepareShutdown', {}), /activity changed/);
+  rpcs[1].call = base;
+  assert.equal((await host.dispatch('host.prepareShutdown', {})).ready, true);
+  // Repeated preparation rechecks native state; a failed repeat retains the existing freeze.
+  rpcs[1].call = async () => {throw new Error('Fixture disconnected');};
+  await assert.rejects(host.dispatch('host.prepareShutdown', {}), /disconnected/);
+  assert.equal((await host.dispatch('host.describe', {})).maintenance, true);
 });

@@ -1080,3 +1080,35 @@ passed application checks and still rejected the unreviewed Codex executable
 at packaging. This pool change needs its own CI. No installed application changed;
 full C0–C9, orphan/unknown-native-identity recovery, live account/provider,
 memory/voice and packaging qualification remain open.
+
+
+## Native idle verification before maintenance
+
+Maintenance now freezes new admission and scheduled queue pumps before checking
+native state. Every loaded chat worker must pass the same complete loaded-thread,
+background-terminal, goal and hook inspection used by idle retirement. The host
+also retains every worker's notification and ledger revision across the entire
+inspection, so activity in an earlier worker invalidates readiness even while a
+later worker is being checked. A disconnected, malformed or changing inventory
+cannot establish that shutdown is safe.
+
+Concurrent preparations share one verification. Cancellation and direct worker
+retirement are refused until it settles; status remains readable. A failed first
+preparation restores the previous admission policy. A failed repeat preserves an
+already established maintenance freeze. Successful preparation leaves admission
+frozen until explicit cancellation or shutdown. The IPC shutdown path retains its
+existing prohibition on pipelined cancellation and new requests.
+
+Validation on the maintenance checkpoint: build/type checks, 317 root Node tests
+and 55 Browser tests pass. The new host fixtures cover child activity, terminals,
+paused goals, hooks, unavailable inventory, cross-worker activity, concurrent
+preparation/cancellation, retained freezes and scheduled queue preservation. The
+desktop fixture now supplies explicit idle inventory after confirmed OS cleanup.
+Existing pinned-runtime native idle API checks and both actual surface fixtures
+remain in the full root suite. This shared host change applies to Linux and macOS;
+new Mac runner evidence is still required. No installed application was updated.
+
+These are observed-idle checks, not an upstream atomic quiesce protocol. They do
+not resolve orphan processes after an uncatchable host crash or authorize stopping
+unknown work. Full lifecycle, account, memory, voice and release qualification
+remain required by the C0–C9 plan.

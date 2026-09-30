@@ -2,6 +2,17 @@
 
 # Start here: agent handoff
 
+## September 30 Codex maintenance native-idle verification
+
+[Maintenance verification](CODEX-INTEGRATION.md#native-idle-verification-before-maintenance)
+now freezes admission before reading every worker's native child, terminal, goal
+and hook state. Host-wide revision checks reject activity during later-worker
+inspection. Concurrent preparations share verification; cancellation is refused until
+it settles, and failed checks preserve the previous admission policy. Build/type,
+317 root Node and 55 Browser tests pass. Prior `3c00243` Mac and Validate runs
+were still active when checked. No installed apps changed. Continue crash/orphan
+ownership and unknown-native-identity recovery plus the remaining full C0–C9 plan.
+
 ## September 30 Codex bounded worker pool
 
 [Worker reuse and admission](CODEX-INTEGRATION.md#bounded-worker-reuse-and-creation-admission)

@@ -130,7 +130,14 @@ test('host gates desktop tools by immutable image contract and closes sharing on
       const rpc = new EventEmitter(); const id = 'thread-' + rpcs.length; rpcs.push(rpc);
       rpc.initialize = async () => {}; rpc.close = async () => {}; rpc.reject = () => {};
       rpc.respond = (id, result) => replies.push({id, result});
-      rpc.call = async (method, params) => {frames.push({method, params}); return {thread: {id}};}; return rpc;
+      rpc.call = async (method, params) => {
+        frames.push({method, params});
+        if (method === 'thread/loaded/list') return {data: [id], nextCursor: null};
+        if (method === 'thread/read') return {thread: {id, status: {type: 'idle'}}};
+        if (method === 'thread/backgroundTerminals/list') return {data: [], nextCursor: null};
+        if (method === 'thread/goal/get') return {goal: null};
+        return {thread: {id}};
+      }; return rpc;
     }});
   t.after(() => host.close());
   await host.create({sessionId: 'text', profileId: 'profile', cwd: f.root});
