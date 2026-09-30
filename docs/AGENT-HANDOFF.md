@@ -2,6 +2,19 @@
 
 # Start here: agent handoff
 
+## September 30 Codex interrupted fork recovery
+
+[Known-ID fork recovery](CODEX-INTEGRATION.md#recovering-a-fork-with-a-saved-native-identity)
+now verifies an interrupted child's saved native history and opens that same
+thread on a repeated client request. It never repeats `thread/fork` or model
+inference. Changed profiles, incomplete/mismatched history and failed durable
+readiness keep the index unconfirmed. Build/type and 302 root Node tests pass;
+final real pinned-runtime fixtures cover restart and each failure path. A lost
+native reply before its ID was saved remains unknown and is never guessed.
+No installed apps changed. Continue worker lifecycle/orphan recovery and the
+remaining full C0–C9 plan. Previous `8d9d9e7` CI runs were still active when last
+checked: Mac `36755147294`, Validate `36755147302`.
+
 ## September 30 Codex Branch/Edit client checkpoint
 
 [Desktop/Browser Branch/Edit](CODEX-INTEGRATION.md#desktop-and-browser-exact-branchedit-controls)

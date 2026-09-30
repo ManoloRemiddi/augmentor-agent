@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
-import {mkdtempSync, mkdirSync, rmSync} from 'node:fs';
+import {mkdtempSync, mkdirSync, rmSync, renameSync} from 'node:fs';
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import {CodexRpc} from '../dist/codex-runtime/src/rpc.js';
@@ -87,7 +87,7 @@ test('pinned forks retain exact turn boundaries and tools across independent wor
 test('host branches preserve native ownership, retry identity and independent histories after restart', {timeout:30000}, async t=>{
   const {CodexHost}=await import('../dist/codex-runtime/src/host.js');
   const root=mkdtempSync(join(tmpdir(),'codex-host-fork-')),hosts=[],requests=[];
-  let forkCalls=0,loseForkReply=false,corruptForkHistory=false,profileRevision=1;
+  let forkCalls=0,loseForkReply=false,corruptForkHistory=false,failRecoveryRead=false,profileRevision=1;const forkedIds=new Set();
   const server=createServer(async(req,res)=>{
     let raw='';for await(const chunk of req)raw+=chunk;requests.push(JSON.parse(raw));
     const item={id:'answer-'+requests.length,type:'message',role:'assistant',status:'completed',content:[{type:'output_text',text:'Answer '+requests.length,annotations:[]}]};
@@ -100,12 +100,14 @@ test('host branches preserve native ownership, retry identity and independent hi
   const connection={kind:'local',model:'fixture',endpoint:`http://127.0.0.1:${server.address().port}/v1`};
   function open(){
     const host=new CodexHost({root:join(root,'host'),maxWorkers:8,resolveProfile:async id=>({id,revision:profileRevision,connection}),createRpc:options=>{
-      const rpc=new CodexRpc(options),call=rpc.call.bind(rpc);let isCreator=false;
+      const rpc=new CodexRpc(options),call=rpc.call.bind(rpc);
       rpc.call=async(method,params)=>{
-        if(method==='thread/fork'){forkCalls++;isCreator=true;}
+        if(method==='thread/fork')forkCalls++;
+        if(failRecoveryRead&&method==='thread/items/list')throw Error('Synthetic incomplete recovery page');
         const result=await call(method,params);
+        if(method==='thread/fork')forkedIds.add(result.thread.id);
         if(method==='thread/fork'&&loseForkReply)throw Error('Synthetic lost fork acknowledgment');
-        if(isCreator&&corruptForkHistory&&method==='thread/turns/list')result.data[0].status='interrupted';
+        if(forkedIds.has(params.threadId)&&corruptForkHistory&&method==='thread/turns/list')result.data[0].status='interrupted';
         return result;
       };
       return rpc;
@@ -163,9 +165,32 @@ test('host branches preserve native ownership, retry identity and independent hi
   const mismatch=await host.dispatch('session.describe',{sessionId:'mismatch'});
   assert.equal(mismatch.status,'creating');assert.ok(mismatch.threadId);
   const beforeMismatchRetry=forkCalls;
-  await assert.rejects(host.dispatch('session.branch',{...params,newSessionId:'mismatch'}),/unknown outcome/);
+  await assert.rejects(host.dispatch('session.branch',{...params,newSessionId:'mismatch'}),/history differs/);
   assert.equal(forkCalls,beforeMismatchRetry);
-  corruptForkHistory=false;loseForkReply=true;
+  await host.close();host=open();
+  profileRevision=2;
+  await assert.rejects(host.dispatch('session.branch',{...params,newSessionId:'mismatch'}),/profile changed/);
+  profileRevision=1;corruptForkHistory=false;
+  const requestsBeforeRecovery=requests.length;
+  failRecoveryRead=true;
+  await assert.rejects(host.dispatch('session.branch',{...params,newSessionId:'mismatch'}),/incomplete recovery page/);
+  assert.equal((await host.dispatch('session.branchStatus',{newSessionId:'mismatch'})).status,'creating');
+  failRecoveryRead=false;
+  const indexPath=join(root,'host','sessions','mismatch.json'),backup=indexPath+'.fixture-backup';
+  renameSync(indexPath,backup);mkdirSync(indexPath,{mode:0o700});
+  try {
+    await assert.rejects(host.dispatch('session.branch',{...params,newSessionId:'mismatch'}));
+    assert.equal((await host.dispatch('session.branchStatus',{newSessionId:'mismatch'})).status,'creating','failed durable readiness cannot mutate the live index');
+  } finally {rmSync(indexPath,{recursive:true});renameSync(backup,indexPath);}
+  const recovered=await host.dispatch('session.branch',{...params,newSessionId:'mismatch'});
+  assert.equal(recovered.sessionId,'mismatch');
+  assert.equal((await host.dispatch('session.describe',{sessionId:'mismatch'})).threadId,mismatch.threadId);
+  assert.equal((await host.dispatch('session.branchStatus',{newSessionId:'mismatch'})).status,'ready');
+  assert.equal(forkCalls,beforeMismatchRetry,'recovery reads the saved child without another fork');
+  assert.equal(requests.length,requestsBeforeRecovery,'recovery starts no inference');
+  assert.match(JSON.stringify(await history('mismatch')),/SYNTHETIC_SOURCE_FIRST/);
+  assert.doesNotMatch(JSON.stringify(await history('mismatch')),/SYNTHETIC_SOURCE_SECOND/);
+  loseForkReply=true;
   await assert.rejects(host.dispatch('session.branch',{...params,newSessionId:'unknown'}),/lost fork/);
   const calls=forkCalls;
   await assert.rejects(host.dispatch('session.branch',{...params,newSessionId:'unknown'}),/unknown outcome/);

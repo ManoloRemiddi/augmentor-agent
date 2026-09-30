@@ -967,3 +967,33 @@ storage. Prior host source `d5209a3` passed
 Its [Debian run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36753787417)
 passed application checks and still refused the unreviewed Codex executable at
 packaging. This source change does not update installed applications.
+
+
+## Recovering a fork with a saved native identity
+
+Retrying the same pending Branch/Edit request now reconciles a `creating` child
+when the host durably recorded its native thread ID. A short-lived reader uses
+the original native store and verifies the complete paginated history against
+the saved boundary fingerprint before marking it ready. It does not call
+`thread/fork`, start a turn, copy storage, or execute tool requests. The normal
+child worker opens only after verification. This also covers restart after a
+successful native fork but interrupted history verification or readiness save.
+
+Profile ID/revision must still match. Read failure, mismatched history or failed
+durable readiness writes leave the record unconfirmed; the live metadata map
+cannot be changed to ready by an unsuccessful write. In-flight recovery keeps
+the same host mutation/maintenance exclusion and shutdown handling as creation.
+Both clients already retry their persisted child identity, so no new control or
+alternate conversation is introduced.
+
+A lost native reply before the ID was recorded remains unresolved. Matching
+native threads by title, time or identical contents would not establish which
+one belongs to the request; the host does not guess or replay the fork. Recovery
+without that identity, orphan lifecycle and other C0–C9 gates remain separate.
+
+Build/type checks and **302 root Node tests** pass. The final pinned-runtime
+host proof additionally covers restart, changed profile, repeated mismatched
+history, incomplete item pages, failed index replacement, exact original native
+ID on success, no extra inference and no additional fork call. The failure test
+uses only an isolated fixture index. These are synthetic-provider source proofs;
+installed state and live subscription qualification are unchanged.

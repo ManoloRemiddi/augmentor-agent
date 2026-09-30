@@ -203,7 +203,7 @@ export class CodexHost extends EventEmitter {
     const existing = this.metadata.get(id);
     if (existing) {
       if (!existing.fork || existing.fork.sessionId !== sourceId || existing.fork.messageSeq !== messageSeq || existing.fork.mode !== mode) throw new Error('Branch identity is already bound to a different request.');
-      if (existing.status !== 'ready') throw new Error('Codex branch creation has an unknown outcome. Preserve it and reconcile before retrying.');
+      if (existing.status !== 'ready') await this.recoverBranch(existing);
       await this.worker(id); return {...this.row(existing), fork: existing.fork};
     }
     const source = this.meta(sourceId), worker = await this.worker(sourceId);
@@ -240,6 +240,24 @@ export class CodexHost extends EventEmitter {
       if (creator) {await creator.close(); this.forkCreators.delete(creator);}
       if (!this.closing) worker.session.setMaintenance(false);
     }
+  }
+  private async recoverBranch(meta: SessionMeta): Promise<void> {
+    // A missing acknowledgment provides no native identity. Never guess by title,
+    // timestamp or identical contents: separate deliberate forks may share those.
+    if (!meta.threadId || !meta.fork || !meta.nativeOwner) throw new Error('Codex branch creation has an unknown outcome without a confirmed native identity. Preserve it; creating another fork would risk duplication.');
+    const profile = await this.options.resolveProfile(meta.profileId);
+    this.assertAccepting();
+    if (profile.id !== meta.profileId || profile.revision !== meta.profileRevision) throw new Error('The source profile changed. Reconcile it before recovering the branch.');
+    const options = {...runtimeOptions(profile.connection, join(this.sessionRoot(meta.nativeOwner), 'runtime'), meta.cwd), experimentalApi: true};
+    const reader = this.options.createRpc?.(options) ?? new CodexRpc(options);
+    this.forkCreators.add(reader);
+    reader.on('request', request => reader.reject(request.id, 'Branch recovery cannot execute tools or request approvals.'));
+    try {
+      await reader.initialize(); this.assertAccepting();
+      verifyBranchHistory(meta.fork.boundary, await nativeHistory(reader, meta.threadId));
+      this.assertAccepting();
+      this.save({...meta, status: 'ready'});
+    } finally {await reader.close(); this.forkCreators.delete(reader);}
   }
   private open(meta: SessionMeta, resolved?: ResolvedProfile): Promise<Worker> {
     const pending = this.opening.get(meta.id); if (pending) return pending;

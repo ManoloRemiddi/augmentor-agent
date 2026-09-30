@@ -216,3 +216,12 @@ real pinned binary with a synthetic provider and isolated user state.
 `test_codex_branch.py` and Browser `branch-request.test.mjs` cover interrupted
 client recovery, identity retention and failed storage before dispatch. The
 host test distinguishes in-flight creation, ready children and absent IDs.
+
+
+Known-native-ID recovery is covered by `codex-fork.test.mjs`: a saved incomplete
+child survives host restart, remains blocked on changed profiles, corrupted
+read results, incomplete item pages and failed index replacement, then resumes
+its original thread after successful verification. Fork-call and inference
+counts cannot increase during recovery. The lost-acknowledgment case without
+a recorded native ID still refuses replay. The index-write failure is injected
+only inside the test's isolated temporary session directory.
