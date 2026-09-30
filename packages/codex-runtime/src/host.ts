@@ -321,7 +321,7 @@ export class CodexHost extends EventEmitter {
     this.assertOpen();
     const root = this.sessionRoot(meta.id); privateDirectory(root);
     const state = join(this.sessionRoot(meta.nativeOwner ?? meta.id), 'runtime'); privateDirectory(state);
-    const options = {...runtimeOptions(profile.connection, state, meta.cwd), experimentalApi: meta.browserTools === 1};
+    const options = {...runtimeOptions(profile.connection, state, meta.cwd), experimentalApi: true};
     const rpc = this.options.createRpc?.(options) ?? new CodexRpc(options);
     const activity = new NativeActivity(rpc);
     try {

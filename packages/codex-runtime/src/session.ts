@@ -4,6 +4,7 @@ import {setTimeout as delay} from 'node:timers/promises';
 import {CodexRpc, CodexRemoteError, type RpcNotification} from './rpc.js';
 import {OperationLedger, type Operation} from './operations.js';
 import {chatEvents} from './events.js';
+import {inputContext} from './input-context.js';
 import {nativeHistory, type NativeTurn} from './history.js';
 
 /** One native thread, with durable product admission around Codex's own agent loop. */
@@ -67,7 +68,7 @@ export class CodexSession extends EventEmitter {
   }
   private async dispatchSteer(id: string, input: string, expectedTurnId: string): Promise<Operation> {
     try {
-      const result = await this.rpc.call('turn/steer', {threadId: this.threadId, expectedTurnId, clientUserMessageId: id, input: [{type: 'text', text: input}]});
+      const result = await this.rpc.call('turn/steer', {threadId: this.threadId, expectedTurnId, clientUserMessageId: id, additionalContext: inputContext(id), input: [{type: 'text', text: input}]});
       this.ledger.acknowledge(id, result.turnId);
       // The root can finish before the acknowledgment arrives.
       const root = this.ledger.list().find(operation => !operation.steerTurnId && operation.turnId === expectedTurnId);
@@ -90,7 +91,7 @@ export class CodexSession extends EventEmitter {
     this.sending = true; this.dispatchId = queued.id;
     try {
       this.ledger.dispatch(queued.id);
-      const result = await this.rpc.call('turn/start', {threadId: this.threadId, clientUserMessageId: queued.id, input: [{type: 'text', text: queued.input}]});
+      const result = await this.rpc.call('turn/start', {threadId: this.threadId, clientUserMessageId: queued.id, additionalContext: inputContext(queued.id), input: [{type: 'text', text: queued.input}]});
       this.ledger.acknowledge(queued.id, result.turn.id);
     } catch (error) {
       // A protocol rejection is definitive. Transport loss/timeout is never a rejection.

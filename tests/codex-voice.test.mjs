@@ -16,10 +16,10 @@ import {CodexVoice} from '../dist/codex-runtime/src/voice.js';
 import {CodexHost} from '../dist/codex-runtime/src/host.js';
 
 async function until(fn) {for (let i=0;i<400;i++) {const value=fn();if(value)return value;await delay(10);}throw Error('Voice fixture timed out');}
-async function fixture(t) {
+async function fixture(t, speak) {
   const spoken=[],workers=[],config={port:0,token:'a'.repeat(64),asr:{},maxUtteranceSeconds:600};
   // Synthetic devices exercise the separately pinned service, not installed models or audio.
-  const service=createVoiceService(config,{tts:{health:async()=>({}),async *speak(text){spoken.push(text);yield Buffer.from([1,0,2,0]);}},workerFactory:(_,emit)=>{
+  const service=createVoiceService(config,{tts:{health:async()=>({}),async *speak(text, signal){spoken.push(text);if(speak)yield* speak(text,signal);else yield Buffer.from([1,0,2,0]);}},workerFactory:(_,emit)=>{
     const worker={ready:true,send(event){if(event.type==='end')queueMicrotask(()=>emit({type:'final',utterance:event.utterance,text:'Synthetic spoken request'}));},close(){this.closed=true;}};
     workers.push(worker);queueMicrotask(()=>emit({type:'ready'}));return worker;
   }});
@@ -28,7 +28,7 @@ async function fixture(t) {
   t.after(()=>service.close());
   const connect=async ticket=>{
     assert.deepEqual(Object.keys(ticket).sort(),['protocol','sessionId','ticket','url']);
-    const ws=new WebSocket(ticket.url),messages=[];ws.on('message',(data,binary)=>messages.push(binary?{type:'pcm'}:JSON.parse(data)));
+    const ws=new WebSocket(ticket.url),messages=[];ws.on('message',(data,binary)=>messages.push(binary?{type:'pcm',generation:data.readUInt32LE(0),samples:[...data.subarray(8)]}:JSON.parse(data)));
     await once(ws,'open');ws.send(JSON.stringify({type:'auth',ticket:ticket.ticket,textSource:'plugin'}));
     await until(()=>messages.find(m=>m.type==='ready'));return {ws,messages};
   };
@@ -139,6 +139,7 @@ for(const surface of ['host','native','browser']) test(`actual pinned Codex ${su
       clearInterval(heartbeat);await call('shutdown');
     }
     assert.deepEqual(f.spoken,['Confirmed public reply.']);assert.equal(inputs.length,1);
+    assert.match(JSON.stringify(inputs[0].input), /The user spoke this request/);
     const rows=(await host.dispatch('session.list',{})).items;assert.equal(rows.length,1);
     const queue=await host.dispatch('session.queue',{sessionId:rows[0].sessionId});assert.equal(queue.operations.length,1);
     assert.match(queue.operations[0].id,/^resonant-voice:/);assert.equal(queue.operations[0].status,'completed');
@@ -156,5 +157,45 @@ for(const surface of ['host','native','browser']) test(`actual pinned Codex ${su
   await until(()=>a.messages.find(m=>m.type==='turn-complete'&&m.requestId===requestId));
   await host.voice.flush();assert.deepEqual(f.spoken,['Confirmed public reply.']);
   await host.dispatch('session.prompt',params);assert.equal(inputs.length,1,'stable voice request cannot dispatch twice');
+  assert.match(JSON.stringify(inputs[0].input), /The user spoke this request/);
+  await host.dispatch('session.prompt',{sessionId:'chat',requestId:'typed-followup',content:[{type:'text',text:'Give a detailed written explanation.'}]});
+  await until(()=>a.messages.find(m=>m.type==='turn-complete'&&m.requestId==='typed-followup'));
+  const context = inputs.at(-1).input.filter(item=>JSON.stringify(item.content).includes('Augmentor input mode v1'));
+  assert.match(JSON.stringify(context.at(-1)), /The user typed this request/);
+  const history = await host.dispatch('session.history',{sessionId:'chat'});
+  assert.equal(JSON.stringify(history).includes('Augmentor input mode v1'), false, 'style context must not alter displayed user messages');
   await host.close();await until(()=>f.workers[0].closed);
+});
+
+
+test('new spoken capture and Stop discard late PCM from an interrupted synthesizer', async t => {
+  const blocked = Promise.withResolvers(), entered = Promise.withResolvers();
+  let oldSignal;
+  const f = await fixture(t, async function* (text, signal) {
+    if (text === 'Old reply.') {oldSignal = signal; entered.resolve(); await blocked.promise; yield Buffer.from([9,0,9,0]);}
+    else yield Buffer.from([1,0,2,0]);
+  });
+  t.after(() => blocked.resolve());
+  const voice = new CodexVoice(() => f.connection);t.after(() => voice.close());
+  const a = await f.connect(await voice.ticket('chat','linux')), e = events(voice);
+  e.user();e.start();e.delta('Old reply.');e.end('Old reply.');await voice.flush();await entered.promise;
+  const firstGeneration = (await until(()=>a.messages.find(m=>m.type==='speaking'))).generation;
+  a.ws.send(JSON.stringify({type:'begin'}));
+  await until(()=>oldSignal.aborted);
+  await voice.stop('chat');
+  a.ws.send(Buffer.alloc(640));a.ws.send(JSON.stringify({type:'end'}));
+  const transcript = await until(()=>a.messages.find(m=>m.type==='transcript'));
+  const id='resonant-voice:'+transcript.requestId;
+  const emit=(method,params)=>voice.observe('chat',{method,params:{threadId:'native',turnId:'new-turn',...params}},request=>request===id);
+  emit('item/completed',{item:{type:'userMessage',id:'new-user',clientId:id}});
+  e.delta('Stale reply.');e.emit('turn/completed',{turn:{id:'turn',status:'completed'}});
+  emit('item/started',{item:{type:'agentMessage',id:'new-answer',text:''}});
+  emit('item/completed',{item:{type:'agentMessage',id:'new-answer',text:'New reply.'}});
+  emit('turn/completed',{turn:{id:'new-turn',status:'completed'}});
+  await voice.flush();blocked.resolve();
+  await until(()=>a.messages.some(m=>m.type==='pcm'));
+  const pcm=a.messages.filter(m=>m.type==='pcm');
+  assert.equal(pcm.length,1);assert.deepEqual(pcm[0].samples,[1,0,2,0]);assert.ok(pcm[0].generation>firstGeneration);
+  assert.deepEqual(f.spoken,['Old reply.','New reply.']);
+  assert.equal(a.messages.filter(m=>m.type==='turn-complete').at(-1).requestId,id);
 });

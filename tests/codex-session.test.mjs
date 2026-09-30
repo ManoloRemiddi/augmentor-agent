@@ -159,3 +159,19 @@ test('Stop persists queue pause through restart and only explicit resume dispatc
   assert.equal(calls[0][1].clientUserMessageId, 'waiting');
   assert.equal(recovered.get('later').status, 'queued');
 });
+
+
+test('spoken steering and typed queue promotion carry their own input mode without changing user text', async t => {
+  const calls = [];
+  const {session} = fixture(t, async (method, params) => {
+    calls.push({method, params});
+    return method === 'turn/start' ? {turn: {id: 'turn-1'}} : {turnId: 'turn-1'};
+  });
+  await session.submit('typed-root', 'Start work');
+  await session.steer('resonant-voice:11111111-1111-4111-8111-111111111111', 'Focus on the result', 'turn-1');
+  await session.submit('typed-queued', 'Explain in detail');
+  await session.promote('typed-queued', 'turn-1');
+  assert.deepEqual(calls.map(call => call.params.input[0].text), ['Start work', 'Focus on the result', 'Explain in detail']);
+  assert.match(calls[1].params.additionalContext.augmentor_input_mode.value, /The user spoke/);
+  assert.match(calls[2].params.additionalContext.augmentor_input_mode.value, /The user typed/);
+});

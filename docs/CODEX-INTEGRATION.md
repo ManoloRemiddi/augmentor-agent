@@ -1255,3 +1255,43 @@ the existing unreviewed-native-binary gate in
 [36760842983](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36760842983).
 This voice checkpoint requires its own CI results before claiming Mac source
 qualification.
+
+
+## Spoken input style and interrupted synthesis
+
+The shared session now sends a versioned `augmentor_input_mode` application
+context on every `turn/start` and `turn/steer`, including promoted queued input.
+A stable Resonant Voice request ID selects concise conversational guidance;
+a typed request explicitly restores normal written-response guidance. User
+messages and the displayed transcript remain unchanged. Both methods use the
+pinned runtime's experimental `additionalContext`, so all conversation workers
+now negotiate that protocol capability, including older chats without tools.
+This does not grant additional tool or filesystem permissions.
+
+Each entry scopes itself to its request and continuations, and the next entry
+supersedes earlier style entries. Codex retains previous entries in native
+history; this is not an ephemeral or replaceable context slot. The fixed text is
+under 1 KiB per input plus the bounded request ID. Normal native compaction still
+applies. Live-model adherence and long-history style quality remain unqualified;
+production memory context selection and growth controls are separate C6 work.
+
+Build/type checks and all 328 root tests passed with the input-mode implementation.
+A subsequent focused run passed all seven voice tests, including the added late
+PCM test. Actual pinned Codex with synthetic inference proves spoken context
+reaches the provider through native and Browser paths, a typed follow-up receives
+the reset, and display history excludes internal context. Session tests cover
+spoken steering and typed queue promotion without rewriting user text.
+
+The new interruption proof deliberately leaves a synthesizer generating after
+cancellation, starts another captured request, delivers stale old-turn events,
+and finally releases the old PCM. Only the new generation reaches the socket.
+This complements the delayed-event Stop test; physical microphone echo,
+hands-free behavior and human listening acceptance remain open. Structured
+expressive voice reply tools remain the next C7 implementation work.
+
+The first shared-voice commit `c9f9067` exposed a Home build-input omission in
+[CI job 110051714941](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36763494714/job/110051714941):
+root `npm ci` could not find the new local test archive. The Docker build stage
+and its strict context allowlist now include exactly that archive. A local full
+Home image build and its packaged prompt-service probe pass; the test archive is
+absent from the final image. No NAS service or installed application was updated.

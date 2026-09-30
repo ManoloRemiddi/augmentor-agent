@@ -63,7 +63,7 @@ test('pinned real Codex streams a fixture response and resumes persisted native 
   const connection = {kind: 'local', model: 'fixture-model', endpoint: `http://127.0.0.1:${server.address().port}/v1`};
   const clients = []; const cleanup = [];
   t.after(async () => {heldResponse?.destroy(); for (const close of cleanup.reverse()) await close(); for (const client of clients) await client.close(); server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); await rm(root, {recursive: true, force: true});});
-  async function start() {const rpc = new CodexRpc(runtimeOptions(connection, state, cwd)); clients.push(rpc); await rpc.initialize(); return rpc;}
+  async function start() {const rpc = new CodexRpc({...runtimeOptions(connection, state, cwd), experimentalApi: true}); clients.push(rpc); await rpc.initialize(); return rpc;}
   const rpc = await start();
   // Container CI cannot create the upstream Linux namespace sandbox. This synthetic
   // provider returns only the fixed harmless printf above; sandbox policy has separate qualification.

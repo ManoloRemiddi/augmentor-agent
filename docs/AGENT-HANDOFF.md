@@ -2,6 +2,18 @@
 
 # Start here: agent handoff
 
+## September 30 spoken style and late audio rejection
+
+[Request-scoped voice guidance](CODEX-INTEGRATION.md#spoken-input-style-and-interrupted-synthesis)
+now covers starts, steering and queue promotion, with an explicit typed-input
+reset. Pinned native/Browser synthetic proofs verify provider context and clean
+display history. All 328 root tests pass; the added seventh focused voice test
+also proves late cancelled synthesis cannot play into the next generation.
+Home's CI build-input omission is corrected; the full local container build and
+packaged prompt-service probe pass with no test archive in the final image.
+Continue C7 structured expressive replies, hands-free/physical acceptance,
+C6 production memory, subscription eligibility/login and all C0–C9 gates.
+
 ## September 30 shared Codex voice transport
 
 [Codex speech integration](CODEX-INTEGRATION.md#codex-speech-through-the-shared-desktop-and-browser-engine)
