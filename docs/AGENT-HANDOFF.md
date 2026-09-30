@@ -2,6 +2,21 @@
 
 # Start here: agent handoff
 
+## October 1 actual Codex host and memory-companion qualification
+
+[Pinned host/companion evidence](CODEX-INTEGRATION.md#actual-pinned-host-and-memory-companion-qualification)
+now covers scoped source reads, voice/text provenance, historical child capture,
+capture pause across restart, pre-turn Stop and outage/backfill without replay.
+It found and fixed native rejection of mixed dynamic-tool registration formats;
+memory tools now use the same canonical function format as Browser/Home.
+Build/type, 353 root Node, 56 Browser and eight memory-budget tests pass on Linux.
+The actual Codex and Python companions use isolated state and synthetic inference;
+this does not certify real controlled-engine generation or memory quality.
+Continue controlled inference/gateway, loaded native/Browser proofs and activation;
+the standalone launcher still leaves memory disabled. No installed app/settings or
+private speech source changed. `c987f40` passed both Mac jobs and Debian
+application/Home checks; binary notices remain the packaging gate.
+
 ## September 30 Codex shared-host memory wiring
 
 [Host memory integration](CODEX-INTEGRATION.md#shared-host-memory-wiring-and-pre-turn-stop)

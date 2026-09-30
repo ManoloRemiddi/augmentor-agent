@@ -6,8 +6,8 @@ import {continuityContext, type ContinuityContext} from './memory-context.js';
 import {MEMORY_DESCRIPTION, SOURCE_DESCRIPTION, memorySource, recall} from '../../memory/src/index.js';
 
 export const memoryTools = [
-  {name: 'memory_recall', description: MEMORY_DESCRIPTION, inputSchema: {type: 'object', additionalProperties: false, required: ['query'], properties: {query: {type: 'string', minLength: 1, maxLength: 4096}}}},
-  {name: 'memory_source', description: SOURCE_DESCRIPTION, inputSchema: {type: 'object', additionalProperties: false, required: ['seq'], properties: {seq: {type: 'integer', minimum: 1}}}},
+  {type: 'function', name: 'memory_recall', description: MEMORY_DESCRIPTION, inputSchema: {type: 'object', additionalProperties: false, required: ['query'], properties: {query: {type: 'string', minLength: 1, maxLength: 4096}}}},
+  {type: 'function', name: 'memory_source', description: SOURCE_DESCRIPTION, inputSchema: {type: 'object', additionalProperties: false, required: ['seq'], properties: {seq: {type: 'integer', minimum: 1}}}},
 ];
 
 type CommittedEvent = ChatEvent & {seq: number};
@@ -73,7 +73,7 @@ export class CodexMemory {
     const combined = AbortSignal.any([signal, this.closing.signal, AbortSignal.timeout(20000)]);
     combined.throwIfAborted();
     const args = params.arguments;
-    if (!args || typeof args !== 'object' || Array.isArray(args) || Object.keys(args).length !== 1 ||
+    if (params.namespace || !args || typeof args !== 'object' || Array.isArray(args) || Object.keys(args).length !== 1 ||
         !(params.tool === 'memory_source' && Number.isSafeInteger(args.seq) && args.seq > 0 && Object.hasOwn(args, 'seq') ||
           params.tool === 'memory_recall' && typeof args.query === 'string' && args.query.trim() && args.query.length <= 4096 && Object.hasOwn(args, 'query'))) throw new Error('Invalid scoped memory tool arguments.');
     try {

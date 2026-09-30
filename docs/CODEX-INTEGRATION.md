@@ -1471,3 +1471,47 @@ and Debian application/native/Chromium and Home checks in
 Binary notices still block Debian packaging and downstream installed jobs.
 This host-wiring source needs its own subsequent CI; all remaining C0–C9 gates
 remain open.
+
+## Actual pinned host and memory-companion qualification
+
+Three new root tests run the pinned Codex process with real isolated memory and
+prompt-library Python services and a deterministic Responses provider. This
+exposed a real native startup failure: Browser/Home tools used canonical function
+definitions while memory used legacy definitions. Codex rejects mixed formats.
+Both memory tools now use `type: function`; foreign tool namespaces are refused
+before any memory call. The host contract also checks every registered tool uses
+the canonical format.
+
+The first proof invokes `memory_source` and `memory_recall` through actual native
+tool requests, reads the exact owned voice source and rejects a source from
+another conversation/project. It verifies typed input resets style, historical
+children exclude later parent context and capture only new child messages, capture
+pause stays respected after backfill, reconstruction opens no inference lease,
+and internal context/tool output does not become public transcript memory.
+Administrative export is person-scoped; test assertions select the exact session
+within that export. Model source retrieval remains strictly conversation-scoped.
+
+The second holds one actual companion reply at the transport boundary before
+native dispatch. Stop aborts preparation, preserves the queued input and prevents
+the late reply from starting a model request. Only explicit continuation starts
+one request, under a fresh owner, and captures one user/assistant pair. This is a
+controlled transport-delay proof, not cancellation of Hindsight inference.
+
+The third stops the isolated memory service. Chat completes and its public native
+history remains durable, with a degraded-memory notice. After companion and host
+restart, public history backfills without another model request; the next new
+turn recalls the recovered source. Capture remains deduplicated.
+
+Build/type, **353 root Node tests**, **56 Browser tests** and **eight memory-budget
+tests** pass on Linux. The services run in empty private state with an allowlisted
+environment. No user credentials, conversations or inference routes are used.
+The engine is unconfigured; real controlled-engine/gateway integration, loaded
+native/Browser memory behavior and production activation remain C6 gates. The
+standalone launcher still leaves memory disabled, and installed apps are unchanged.
+
+Previous host-wiring source `c987f40` passed both Mac jobs in
+[36781647508](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36781647508),
+and Debian application/native/Chromium and Home checks in
+[36781647450](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36781647450).
+Binary-notice review still blocks Debian packaging and downstream installed jobs.
+This native registration fix and new proofs need their own subsequent platform CI.

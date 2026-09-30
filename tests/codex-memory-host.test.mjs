@@ -72,6 +72,7 @@ test('host memory captures once, recalls only for new work and restart/backfill 
   const definitions = f.requests.find(request => request.method === 'thread/start').p.dynamicTools;
   assert.ok(definitions.some(tool => tool.name === 'memory_source'));
   assert.ok(definitions.some(tool => tool.name === 'memory_recall'));
+  assert.ok(definitions.every(tool => tool.type === 'function'), 'native tools use one canonical registration format');
   await f.send('first', 'Preserve this current restriction.'); await nextTick();
   await f.send('second', 'Keep the restriction.'); await f.host.close();
   assert.deepEqual([...f.memory.rows.values()].map(row => row.content), ['Preserve this current restriction.', 'Public fixture reply.', 'Keep the restriction.', 'Public fixture reply.']);
@@ -116,6 +117,7 @@ test('scoped memory tools refuse model-selected sessions, other source IDs and p
   const signal = AbortSignal.timeout(5000);
   const before = f.calls.length;
   await assert.rejects(memory.tool({tool: 'memory_source', arguments: {seq: 1, session: 'other'}}, signal), /arguments/);
+  await assert.rejects(memory.tool({namespace: 'other', tool: 'memory_source', arguments: {seq: 1}}, signal), /arguments/);
   assert.equal(f.calls.length, before);
   const source = await memory.tool({tool: 'memory_source', arguments: {seq: 1}}, signal);
   assert.equal(source.success, true); assert.match(source.contentItems[0].text, /Owned source/);

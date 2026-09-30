@@ -150,6 +150,17 @@ also rejects stale native acknowledgment during preparation. These prove the
 host wiring without enabling it in the standalone launcher; actual pinned-host,
 companion, controlled-engine and loaded-UI qualification remain separate.
 
+`codex-memory-runtime.test.mjs` joins actual pinned Codex with the real isolated
+Python memory and prompt-library companions. Three proofs cover canonical tool
+registration, exact owned/denied foreign source retrieval, modality, historical
+child capture cutoffs, capture pause/restart, Stop while a completed memory reply
+is held at the transport boundary, explicit continuation and unavailable-service
+recovery from public native history without model replay. Its service fixture
+allowlists the child environment and uses empty state without owner configuration.
+Inference is deterministic; Hindsight is unconfigured. These are host/companion
+transport proofs, not controlled-engine generation, live quality or installed UI
+qualification. Run with `AUGMENTOR_PYTHON` pointing at the test Python environment.
+
 
 ### Codex paginated history
 
