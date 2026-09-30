@@ -2,6 +2,19 @@
 
 # Start here: agent handoff
 
+## September 30 Codex image qualification checkpoint
+
+The [image checkpoint](CODEX-INTEGRATION.md#image-qualification-and-actual-browser-screenshot-transport)
+adds explicit synthetic-image checks in both setup forms and conditionally enables
+browser screenshots in new Codex chats. The loaded Chromium proof found and fixed
+the toolbar/activeTab permission mismatch and now verifies actual JPEG transport
+through pinned Codex, alongside DOM actions and rendered replies. Type checking,
+build, 256 root Node tests, 48 Browser DOM tests and three native setup cases pass.
+The model remains synthetic; this does not qualify live vision, OAuth or installed
+artifacts. Continue the full C0–C9 plan: desktop tools, prompt improvement, memory,
+voice, account eligibility/login and packaging are not finished. Previous macOS
+CI passed; Debian still blocks the unreviewed Codex native executable inventory.
+
 ## September 30 Codex runtime foundation
 
 [Implementation evidence](CODEX-INTEGRATION.md) records the pinned 0.159.2

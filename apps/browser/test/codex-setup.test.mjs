@@ -28,8 +28,11 @@ test('Codex settings save masked profiles and only check the saved, unchanged co
   assert.equal(field('API key').value,'');assert.equal(button('Check text response').disabled,false);
   assert.equal(calls.filter(row=>row.action==='test').length,0);
   button('Check text response').click();await settle();assert.match(dialog.textContent,/Tools and Codex agent compatibility still need/);
+  button('Check image response').click();assert.equal(button('Check image response').disabled,true);await settle();
+  assert.deepEqual(calls.filter(row=>row.action==='test').at(-1),{action:'test',id:rows[0].id,capability:'image'});
+  assert.match(dialog.textContent,/Start a new chat/);
   field('Model ID').value='other';field('Model ID').dispatchEvent(new dom.window.Event('input'));
-  assert.equal(button('Check text response').disabled,true);
+  assert.equal(button('Check text response').disabled,true);assert.equal(button('Check image response').disabled,true);
   button('Save connection').click();await settle();
   assert.equal(Object.hasOwn(calls.filter(row=>row.action==='configure').at(-1).profile,'credential'),false);
   field('Remove the saved key').checked=true;button('Save connection').click();await settle();

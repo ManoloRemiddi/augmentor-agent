@@ -25,12 +25,13 @@ class CodexSetupDialog(QDialog):
         for label, widget in [('Saved connection', self.profiles), ('Connection type', self.kind), ('Connection name', self.name), ('Endpoint URL', self.endpoint), ('Model ID', self.model), ('API key', self.key)]:
             widget.setAccessibleName(label); form.addRow(label, widget)
         form.addRow(self.remove_key)
-        notice = QLabel('Keys are stored in the operating system credential store. Check text response sends a short test message; your provider may charge for it. It does not send your files or conversation history, and does not verify tools.')
+        notice = QLabel('Keys are stored in the operating system credential store. Checks send a short message or a synthetic image; your provider may charge for them. They send no files, history or tools. The image check enables screenshots for new chats.')
         notice.setWordWrap(True); layout.addWidget(notice)
         self.note = QLabel('Loading saved connections…'); self.note.setWordWrap(True); layout.addWidget(self.note)
         buttons = QHBoxLayout(); layout.addLayout(buttons)
         self.close_button = QPushButton('Close'); self.close_button.clicked.connect(self.reject); buttons.addWidget(self.close_button)
         self.check_button = QPushButton('Check text response'); self.check_button.clicked.connect(self.check); buttons.addWidget(self.check_button)
+        self.image_button = QPushButton('Check image response'); self.image_button.clicked.connect(lambda: self.check('image')); buttons.addWidget(self.image_button)
         self.save_button = QPushButton('Save connection'); self.save_button.clicked.connect(self.save); buttons.addWidget(self.save_button)
         self.fields = [self.profiles, self.kind, self.name, self.endpoint, self.model, self.key, self.remove_key]
         for field in [self.name, self.endpoint, self.model, self.key]: field.textChanged.connect(self.edited)
@@ -39,15 +40,15 @@ class CodexSetupDialog(QDialog):
         self.request('profiles.list', {}, self.loaded)
 
     def edited(self, *_):
-        self.dirty = True; self.check_button.setEnabled(False)
+        self.dirty = True; self.check_button.setEnabled(False); self.image_button.setEnabled(False)
 
     def selected(self, *_):
         self.profile_id = self.profiles.currentData()
         row = next((row for row in self.rows if row['id'] == self.profile_id), {})
         self.name.setText(row.get('name', 'My Codex model')); self.endpoint.setText(row.get('endpoint', '')); self.model.setText(row.get('model', ''))
         self.kind.setCurrentIndex(self.kind.findData(row.get('kind', 'api'))); self.key.clear(); self.remove_key.setChecked(False)
-        self.dirty = False; self.check_button.setEnabled(bool(self.profile_id) and not self.busy)
-        self.note.setText('Text response checked; tool compatibility is not verified.' if row.get('validation') == 'responses-text' else 'Save a connection, then check its text response.')
+        self.dirty = False; self.check_button.setEnabled(bool(self.profile_id) and not self.busy); self.image_button.setEnabled(self.check_button.isEnabled())
+        self.note.setText('Image response checked; screenshots are available in new chats.' if row.get('imageValidatedAt') else 'Text response checked; tool compatibility is not verified.' if row.get('validation') == 'responses-text' else 'Save a connection, then check its text response.')
 
     def loaded(self, value):
         self.rows = value['profiles']; selected = self.profile_id
@@ -58,7 +59,7 @@ class CodexSetupDialog(QDialog):
     def request(self, method, payload, callback):
         if self.busy: return
         self.busy = True
-        for field in [*self.fields, self.save_button, self.check_button, self.close_button]: field.setEnabled(False)
+        for field in [*self.fields, self.save_button, self.check_button, self.image_button, self.close_button]: field.setEnabled(False)
         def work():
             try: return self.client.call(method, payload), None
             except Exception as error: return None, str(error)
@@ -66,7 +67,7 @@ class CodexSetupDialog(QDialog):
             if self.dismissed: return
             self.busy = False
             for field in [*self.fields, self.save_button, self.close_button]: field.setEnabled(True)
-            self.check_button.setEnabled(bool(self.profile_id) and not self.dirty)
+            self.check_button.setEnabled(bool(self.profile_id) and not self.dirty); self.image_button.setEnabled(self.check_button.isEnabled())
             if self.owner.controller is not self.controller: self.reject(); return
             if result[1]: self.note.setText(result[1]); return
             callback(result[0])
@@ -86,13 +87,14 @@ class CodexSetupDialog(QDialog):
             self.request('profiles.list', {}, self.loaded)
         self.request('profiles.configure', payload, saved)
 
-    def check(self):
+    def check(self, capability='text'):
+        capability = 'image' if capability == 'image' else 'text'
         if self.busy or self.dirty or not self.profile_id: return
-        self.note.setText('Checking a text response…')
+        self.note.setText('Checking a synthetic image…' if capability == 'image' else 'Checking a text response…')
         def checked(_):
-            self.note.setText('Text response verified. Tools and Codex agent compatibility still need a chat test.')
+            self.note.setText('Image response verified. Start a new chat to use browser screenshots. General vision and tool accuracy still need a chat test.' if capability == 'image' else 'Text response verified. Tools and Codex agent compatibility still need a chat test.')
             self.controller.refresh_models()
-        self.request('profiles.test', {'id': self.profile_id}, checked)
+        self.request('profiles.test', {'id': self.profile_id, 'capability': capability}, checked)
 
     def reject(self):
         if self.busy: return

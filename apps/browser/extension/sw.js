@@ -29,11 +29,13 @@ chrome.runtime.onConnect.addListener(port=>{if(port.name==='augmentor-approval-p
 import { ensurePort } from './port.mjs'
 import { handlePanelMessage } from './panel-api.mjs'
 
-// ResonantOS-style behavior: clicking the toolbar icon opens the side panel
-// (the manifest no longer declares a default_popup, which would take
-// precedence over the panel).
+// Use the explicit toolbar action: Chromium's automatic side-panel action skips
+// the activeTab grant needed for screenshots. The user still opens the same panel.
+chrome.action.onClicked.addListener(tab => {
+  chrome.sidePanel.open({windowId: tab.windowId}).catch(error => console.warn('sidePanel open failed', error))
+})
 try {
-  chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true })
+  chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: false })
   chrome.sidePanel.setOptions({ path: 'sidepanel.html' })
 } catch (e) {
   console.warn('sidePanel setup failed', e)

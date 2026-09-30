@@ -9,7 +9,7 @@ import type {ResolvedProfile} from './host.js';
 
 interface Profile {
   id: string; name: string; revision: number; kind: 'api' | 'local'; model: string;
-  endpoint: string; credentialRef?: string; validation: 'unverified' | 'responses-text';
+  endpoint: string; credentialRef?: string; imageValidatedAt?: number; validation: 'unverified' | 'responses-text';
 }
 interface ProfileFile {schema: 1; profiles: Profile[]; retiredCredentials: string[]}
 export interface ProfileInput {id: string; name: string; kind: 'api' | 'local'; model: string; endpoint: string; credential?: string | null}
@@ -25,6 +25,7 @@ export class ProfileStore {
       identifier(profile.id);
       if (ids.has(profile.id) || !Number.isInteger(profile.revision) || profile.revision < 1 || !['local', 'api'].includes(profile.kind) ||
         Object.hasOwn(profile, 'credential') || (profile.credentialRef && !/^codex-[a-zA-Z0-9_-]{1,100}$/.test(profile.credentialRef))) throw new Error('Invalid Codex profile configuration.');
+      if (profile.imageValidatedAt !== undefined && (!Number.isFinite(profile.imageValidatedAt) || profile.imageValidatedAt <= 0)) throw new Error('Invalid image validation record.');
       this.validate(profile); ids.add(profile.id);
     }
   }
@@ -46,7 +47,7 @@ export class ProfileStore {
     const credential = profile.credentialRef ? await this.credentials.get(profile.credentialRef) : undefined;
     if (this.profile(id).revision !== profile.revision) throw new Error('The Codex profile changed while credentials were being resolved. Retry with the current profile.');
     if (profile.credentialRef && !credential) throw new Error('The profile credential is missing. Reconnect this provider.');
-    const connection: CodexConnection = {kind: profile.kind, model: profile.model, endpoint: profile.endpoint, ...(credential ? {credential} : {})};
+    const connection: CodexConnection = {kind: profile.kind, model: profile.model, endpoint: profile.endpoint, imageInput: Boolean(profile.imageValidatedAt), ...(credential ? {credential} : {})};
     return {id: profile.id, revision: profile.revision, connection};
   }
   upsert(input: ProfileInput): Promise<ReturnType<ProfileStore['list']>[number]> {
@@ -54,10 +55,10 @@ export class ProfileStore {
     const task = this.mutation.catch(() => {}).then(() => this.save(input));
     this.mutation = task.then(() => {}, () => {}); return task;
   }
-  validated(id: string, revision: number): Promise<void> {
+  validated(id: string, revision: number, capability: 'text' | 'image' = 'text'): Promise<void> {
     const task = this.mutation.then(() => {
       if (this.profile(id).revision !== revision) throw new Error('The profile changed during its connection check. Run the check again.');
-      const next: ProfileFile = {...this.data, profiles: this.data.profiles.map(profile => profile.id === id ? {...profile, validation: 'responses-text'} : profile)};
+      const next: ProfileFile = {...this.data, profiles: this.data.profiles.map(profile => profile.id === id ? {...profile, validation: 'responses-text', ...(capability === 'image' ? {imageValidatedAt: Date.now()} : {})} : profile)};
       durableJson(this.path, next); this.data = next;
     });
     this.mutation = task.then(() => {}, () => {}); return task;
@@ -71,6 +72,7 @@ export class ProfileStore {
     if (input.credential) {reference = `codex-${randomUUID()}`; await this.credentials.put(reference, input.credential);}
     const changed = !previous || previous.kind !== input.kind || previous.model !== input.model || new URL(previous.endpoint).href !== new URL(input.endpoint).href || previous.credentialRef !== reference;
     const profile: Profile = {id: input.id, name: input.name.trim(), kind: input.kind, model: input.model, endpoint: input.endpoint,
+      ...(!changed && previous?.imageValidatedAt ? {imageValidatedAt: previous.imageValidatedAt} : {}),
       revision: (previous?.revision ?? 0) + (changed ? 1 : 0), validation: changed ? 'unverified' : previous.validation, ...(reference ? {credentialRef: reference} : {})};
     const next: ProfileFile = {schema: 1, profiles: [...this.data.profiles.filter(value => value.id !== input.id), profile], retiredCredentials: [...this.data.retiredCredentials]};
     if (previous?.credentialRef && previous.credentialRef !== reference) next.retiredCredentials.push(previous.credentialRef);

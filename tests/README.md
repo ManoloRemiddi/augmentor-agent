@@ -3,12 +3,15 @@
 Codex runtime tests: build first, then run `node --test tests/codex-*.test.mjs`.
 They cover real app-server operation against a synthetic Responses provider,
 the native wire adapter, durable recovery, private IPC and profile contracts.
-`test_codex_credentials.py` exercises a synthetic credential store. See
+`test_codex_credentials.py` exercises a synthetic credential store.
 The Codex Chromium test loads the real extension/native host in a temporary Linux
-profile and exercises a synthetic-model browser task; it requires Chromium and
+profile and exercises a synthetic-model browser task, including the toolbar activeTab
+grant and actual screenshot bytes through pinned Codex. It requires Chromium with
+the DevTools `Extensions.triggerAction` command (testing-only extension-debugging
+flag, temporary profile) and
 is explicitly skipped on macOS because its native-host registration is Linux-specific.
 No personal browser profile or provider credential is used.
-[Codex evidence and limitations](../docs/CODEX-INTEGRATION.md) before treating
+See [Codex evidence and limitations](../docs/CODEX-INTEGRATION.md) before treating
 these as real-provider, OAuth, OS-keychain, GUI or installed-release qualification.
 
 # Verification map

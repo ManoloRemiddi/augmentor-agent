@@ -11,6 +11,7 @@ export interface CodexConnection {
   endpoint?: string;
   credential?: string;
   wireApi?: 'responses';
+  imageInput?: boolean;
 }
 const ALLOWED_ENV = ['PATH', 'HOME', 'USER', 'LOGNAME', 'LANG', 'LC_ALL', 'TMPDIR',
   'XDG_RUNTIME_DIR', 'XDG_CONFIG_HOME', 'XDG_DATA_HOME', 'XDG_STATE_HOME', 'DISPLAY',

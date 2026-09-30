@@ -67,3 +67,30 @@ test('invalid arguments, overlapping calls and absent action acknowledgments fai
   first = f.call('browser_type', {selector: '#send', text: 'test'}); f.reply({}); assert.equal((await first).success, false);
   assert.equal((await f.call('browser_type', {selector: '#send', text: 'retry'})).success, false);
 });
+
+test('screenshots require a qualified chat and return bounded images without granting selectors', async t => {
+  const {browserToolsFor} = await import('../dist/codex-runtime/src/browser.js');
+  assert.equal(browserToolsFor().some(tool => tool.name === 'browser_screenshot'), false);
+  assert.equal(browserToolsFor(true).some(tool => tool.name === 'browser_screenshot'), true);
+  const f = fixture(t); const signal = new AbortController().signal;
+  const request = {tool: 'browser_screenshot', arguments: {}, turnId: 'turn', callId: 'image'};
+  assert.equal((await f.browser.call('one', f.root, request, signal)).success, false);
+  assert.equal(f.frames.length, 0);
+  let result = f.call('browser_snapshot'); f.reply(snapshot); await result;
+  result = f.browser.call('one', f.root, request, signal, true);
+  const data = Buffer.from([255,216,255,217]).toString('base64'); // Structural boundary fixture, not a decoded image.
+  f.reply({ok: true, url: snapshot.url, tabId: 7, image: {mimeType: 'image/jpeg', data}});
+  const reply = await result; assert.equal(reply.success, true);
+  assert.deepEqual(reply.contentItems[1], {type: 'inputImage', imageUrl: 'data:image/jpeg;base64,' + data});
+  assert.equal(reply.contentItems[0].text.includes(data), false);
+  assert.equal((await f.call('browser_click', {selector: '#send'})).success, false);
+  const count = f.frames.length;
+  assert.deepEqual(await f.browser.call('one', f.root, request, signal, true), reply);
+  assert.equal(f.frames.length, count);
+  assert.equal((await f.browser.call('one', f.root, request, signal, false)).success, false);
+  for (const [id, image] of [['url', {mimeType: 'image/jpeg', data: 'https://example.test/image'}], ['size', {mimeType: 'image/jpeg', data: 'A'.repeat(700001)}], ['wrong', {mimeType: 'image/png', data}]]) {
+    result = f.browser.call('one', f.root, {...request, callId: id}, signal, true);
+    f.reply({ok: true, url: snapshot.url, tabId: 7, image});
+    assert.equal((await result).success, false);
+  }
+});

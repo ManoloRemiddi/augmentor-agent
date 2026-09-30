@@ -64,3 +64,22 @@ test('renaming a profile preserves its connection identity and stale checks cann
   await assert.rejects(store.validated(profile.id, 1), /changed/);
   assert.equal(store.list()[0].validation, 'unverified');
 });
+
+test('image qualification is host-owned, retained on rename and invalidated by connection changes', async t => {
+  const {store, credentials} = fixture(t);
+  await store.upsert({...profile, imageValidatedAt: Date.now(), imageInput: true});
+  assert.equal((await store.resolve(profile.id)).connection.imageInput, false);
+  await store.validated(profile.id, 1, 'image');
+  await store.upsert({...profile, name: 'Renamed'});
+  const restored = new ProfileStore(store.path, credentials);
+  assert.equal((await restored.resolve(profile.id)).connection.imageInput, true);
+  assert.ok(restored.list()[0].imageValidatedAt > 0);
+  await restored.upsert({...profile, model: 'other'});
+  assert.equal((await restored.resolve(profile.id)).connection.imageInput, false);
+  await assert.rejects(restored.validated(profile.id, 1, 'image'), /changed/);
+  await restored.validated(profile.id, 2, 'text');
+  assert.equal((await restored.resolve(profile.id)).connection.imageInput, false);
+  await restored.validated(profile.id, 2, 'image');
+  await restored.upsert({...profile, model: 'other', credential: 'replacement'});
+  assert.equal((await restored.resolve(profile.id)).connection.imageInput, false);
+});

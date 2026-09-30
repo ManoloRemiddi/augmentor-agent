@@ -13,3 +13,9 @@ test('Augmentor persona snapshots are bounded and immutable across future source
  assert.throws(()=>validateInstructions({...first,text:'changed'}),/corrupt/);
  writeFileSync(path,'x'.repeat(32769));assert.throws(()=>instructionSnapshot(path),/size limit/);
 });
+
+test('screenshot guidance follows the immutable conversation capability',()=>{
+ const text = instructionSnapshot(undefined,true); const image = instructionSnapshot(undefined,true,true);
+ assert.match(text.text,/screenshots are not enabled/); assert.match(image.text,/screenshots are available/);
+ assert.match(image.text,/do not replace a fresh DOM snapshot/); assert.notEqual(text.sha256,image.sha256);
+});

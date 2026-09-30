@@ -15,12 +15,13 @@ import type {ProfileStore} from './profiles.js';
 import {instructionSnapshot, validateInstructions, type InstructionSnapshot} from './instructions.js';
 import {CodexInteractions} from './interactions.js';
 import {checkProvider} from './provider-check.js';
-import {CodexBrowser, browserTools} from './browser.js';
+import {CodexBrowser, browserToolsFor} from './browser.js';
 
 export const CODEX_PROTOCOL = 'augmentor-codex/1';
 interface SessionMeta {
   instructions?: InstructionSnapshot;
   browserTools?: 1;
+  imageInput?: true;
   schema: 1; id: string; profileId: string; profileRevision: number;
   cwd: string; threadId?: string; title: string; createdAt: number; updatedAt: number;
   status: 'creating' | 'ready';
@@ -56,6 +57,7 @@ export class CodexHost extends EventEmitter {
       if (meta?.schema !== 1 || !['creating', 'ready'].includes(meta.status) || filename !== `${identifier(meta.id)}.json` ||
           !isAbsolute(meta.cwd) || typeof meta.title !== 'string' || !Number.isInteger(meta.profileRevision) ||
           (meta.status === 'ready' && typeof meta.threadId !== 'string')) throw new Error('Unsupported or corrupt Codex session index.');
+      if (meta.imageInput !== undefined && meta.imageInput !== true) throw new Error('Unsupported Codex image contract.');
       if (meta.browserTools !== undefined && meta.browserTools !== 1) throw new Error('Unsupported Codex browser tool contract.');
       if (meta.instructions !== undefined) validateInstructions(meta.instructions);
       identifier(meta.profileId); this.metadata.set(meta.id, meta);
@@ -116,7 +118,7 @@ export class CodexHost extends EventEmitter {
     if (this.configuring) throw new Error('Codex connection setup is in progress.');
     // Recheck after resolution: two clients can race the same create request.
     if (this.metadata.has(id)) return this.create(params);
-    const meta: SessionMeta = {schema: 1, browserTools: 1, instructions: instructionSnapshot(undefined, true), id, profileId, profileRevision: profile.revision, model: profile.connection.model,
+    const meta: SessionMeta = {schema: 1, browserTools: 1, ...(profile.connection.imageInput ? {imageInput: true} : {}), instructions: instructionSnapshot(undefined, true, profile.connection.imageInput === true), id, profileId, profileRevision: profile.revision, model: profile.connection.model,
       surface: params.surface === 'browser' ? 'browser' : 'linux', cwd, title: '', status: 'creating', createdAt: Date.now(), updatedAt: Date.now()};
     this.save(meta);
     await this.open(meta, profile);
@@ -149,7 +151,7 @@ export class CodexHost extends EventEmitter {
       await rpc.initialize();
       if (meta.threadId) await rpc.call('thread/resume', {threadId: meta.threadId, cwd: meta.cwd, excludeTurns: true, ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
       else {
-        const result = await rpc.call('thread/start', {cwd: meta.cwd, approvalPolicy: 'on-request', sandbox: 'workspace-write', ...(meta.browserTools ? {dynamicTools: browserTools} : {}), ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
+        const result = await rpc.call('thread/start', {cwd: meta.cwd, approvalPolicy: 'on-request', sandbox: 'workspace-write', ...(meta.browserTools ? {dynamicTools: browserToolsFor(meta.imageInput === true)} : {}), ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
         meta.threadId = result.thread.id; meta.status = 'ready'; this.save(meta);
       }
       this.assertOpen();
@@ -184,7 +186,7 @@ export class CodexHost extends EventEmitter {
           try {
             if (request.method === 'item/tool/call' && meta.browserTools) {
               const abort = new AbortController(); toolCalls.set(request.id, {turnId: request.params.turnId, abort});
-              rpc.respond(request.id, await this.browser.call(meta.id, join(root, 'browser-calls'), request.params, abort.signal));
+              rpc.respond(request.id, await this.browser.call(meta.id, join(root, 'browser-calls'), request.params, abort.signal, meta.imageInput === true));
             } else rpc.respond(request.id, await this.approvals.request(meta.id, request, fileChanges.get(String(request.params.itemId))));
           }
           catch {try {rpc.reject(request.id, 'This client operation is unsupported, expired or disconnected. Any dispatched action may have an unknown outcome.');} catch { /* disconnected worker */ }}
@@ -255,9 +257,11 @@ export class CodexHost extends EventEmitter {
       case 'profiles.test': {
         if (!this.options.profiles) throw new Error('Codex profile setup is unavailable in this host.');
         const profile = await this.options.resolveProfile(identifier(params.id));
-        const checked = await checkProvider(profile.connection);
-        await this.options.profiles.validated(profile.id, profile.revision);
-        return {...checked, scope: 'text-only', toolsVerified: false};
+        const capability = params.capability ?? 'text';
+        if (!['text', 'image'].includes(capability)) throw new Error('Choose a text or image connection check.');
+        const checked = await checkProvider(profile.connection, 45000, capability);
+        await this.options.profiles.validated(profile.id, profile.revision, capability);
+        return {...checked, scope: capability === 'image' ? 'synthetic-image' : 'text-only', toolsVerified: false};
       }
       case 'models.list': return this.catalog();
       case 'models.validate': {

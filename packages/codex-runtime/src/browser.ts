@@ -5,15 +5,23 @@ import {join} from 'node:path';
 import {BrowserBroker, browserDefinitions} from '../../pi-browser/src/index.js';
 import {durableJson, privateDirectory, readPrivateJson} from './storage.js';
 
-// Screenshot registration awaits a qualified image-capability profile, rather than guessing from a model name.
-export const browserTools = browserDefinitions.filter(tool => tool.action !== 'screenshot').map(tool => ({
+// Screenshot registration is bound to the new conversation after explicit profile qualification.
+export const browserToolsFor = (imageInput = false) => browserDefinitions.filter(tool => imageInput || tool.action !== 'screenshot').map(tool => ({
   type: 'function', name: tool.name, description: tool.description,
   inputSchema: {...tool.parameters, additionalProperties: false},
 }));
-interface ToolReply {success: boolean; contentItems: {type: 'inputText'; text: string}[]}
+export const browserTools = browserToolsFor();
+type ToolContent = {type: 'inputText'; text: string} | {type: 'inputImage'; imageUrl: string};
+interface ToolReply {success: boolean; contentItems: ToolContent[]}
 const failure = (message: string): ToolReply => ({success: false, contentItems: [{type: 'inputText', text: message}]});
 const digest = (value: string) => createHash('sha256').update(value).digest('hex');
 const plain = (value: unknown): value is Record<string, any> => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+
+function validImageUrl(value: unknown): value is string {
+  if (typeof value !== 'string' || value.length > 700000 || !/^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(value)) return false;
+  const data = value.slice('data:image/jpeg;base64,'.length); const bytes = Buffer.from(data, 'base64');
+  return bytes.length >= 4 && bytes.toString('base64') === data && bytes[0] === 255 && bytes[1] === 216 && bytes.at(-2) === 255 && bytes.at(-1) === 217;
+}
 
 /** Browser executor binding plus durable call admission; Codex still owns the agent loop. */
 export class CodexBrowser {
@@ -34,8 +42,8 @@ export class CodexBrowser {
   }
   close(): void {for (const row of [...this.broker.owners.values()]) this.detach(row.owner);}
   respond(owner: object, id: string, result: unknown, error?: string): void {this.broker.respond(owner, id, result, error);}
-  async call(session: string, root: string, request: Record<string, any>, signal: AbortSignal): Promise<ToolReply> {
-    const tool = browserDefinitions.find(value => value.name === request.tool && value.action !== 'screenshot');
+  async call(session: string, root: string, request: Record<string, any>, signal: AbortSignal, imageInput = false): Promise<ToolReply> {
+    const tool = browserDefinitions.find(value => value.name === request.tool && (imageInput || value.action !== 'screenshot'));
     if (!tool || request.namespace) return failure('Unknown or unsupported Augmentor browser tool.');
     const args = request.arguments;
     if (!plain(args) || Buffer.byteLength(JSON.stringify(args)) > 32768) return failure('Invalid or oversized browser arguments.');
@@ -54,7 +62,7 @@ export class CodexBrowser {
       this.readable.delete(session); // Replayed observations never authorize a fresh action.
       const record = readPrivateJson(path) as any;
       if (record?.schema !== 1 || record.fingerprint !== fingerprint) return failure('Browser call identity changed; no action was dispatched.');
-      if (record.status === 'completed' && Buffer.byteLength(JSON.stringify(record.reply ?? null)) <= 270000 && typeof record.reply?.success === 'boolean' && Array.isArray(record.reply.contentItems) && record.reply.contentItems.every((item: any) => item.type === 'inputText' && typeof item.text === 'string')) return record.reply;
+      if (record.status === 'completed' && Buffer.byteLength(JSON.stringify(record.reply ?? null)) <= 1000000 && typeof record.reply?.success === 'boolean' && Array.isArray(record.reply.contentItems) && record.reply.contentItems.every((item: any) => plain(item) && ((item.type === 'inputText' && typeof item.text === 'string') || (tool.action === 'screenshot' && item.type === 'inputImage' && validImageUrl(item.imageUrl))))) return record.reply;
       return failure('A prior browser dispatch has an unknown outcome. It was not retried; observe the page before continuing.');
     }
     if (this.busy.has(session)) return failure('Another browser call is pending. Wait for its result before acting.');
@@ -72,17 +80,23 @@ export class CodexBrowser {
       let reply: ToolReply;
       try {
         const value = await this.broker.execute(session, {action: tool.action, ...args, ...(['click', 'type'].includes(tool.action) && observed ? {target: {tabId: observed.tabId, url: observed.url, documentEpoch: observed.documentEpoch}} : {})}, abort.signal);
-        if (!plain(value) || Buffer.byteLength(JSON.stringify(value)) > 262144 || Object.hasOwn(value, 'image')) throw new Error('Invalid or oversized browser result. Observe the page before continuing.');
+        if (!plain(value) || Buffer.byteLength(JSON.stringify(value)) > (tool.action === 'screenshot' ? 950000 : 262144) || (tool.action !== 'screenshot' && Object.hasOwn(value, 'image'))) throw new Error('Invalid or oversized browser result. Observe the page before continuing.');
         if (value.ok === false) throw new Error(typeof value.error === 'string' ? value.error.slice(0, 4096) : 'Browser observation or action failed.');
         if (['click', 'type'].includes(tool.action) && value.ok !== true) throw new Error('Browser action was not acknowledged. Outcome may be unknown; observe before any retry.');
         if (tool.action === 'tabs_list' && !Array.isArray(value.tabs)) throw new Error('No valid tab list was returned.');
-        if (['snapshot', 'navigate'].includes(tool.action) && (typeof value.url !== 'string' || !/^https?:\/\//i.test(value.url) || !Number.isInteger(value.tabId))) throw new Error('No verified browser target was returned.');
+        if (['snapshot', 'navigate', 'screenshot'].includes(tool.action) && (typeof value.url !== 'string' || !/^https?:\/\//i.test(value.url) || !Number.isInteger(value.tabId))) throw new Error('No verified browser target was returned.');
         if (tool.action === 'snapshot' && (value.ok !== true || !['readable', 'empty'].includes(value.observation))) throw new Error('No verified browser observation was returned.');
         if (tool.action === 'snapshot') {
           if (typeof value.url === 'string' && /^https?:\/\//i.test(value.url) && value.observation === 'readable' && Number.isInteger(value.tabId) && Number.isFinite(value.documentEpoch) && Array.isArray(value.controls)) this.readable.set(session, {tabId: value.tabId, url: value.url, documentEpoch: value.documentEpoch, selectors: value.controls.filter((control: any) => plain(control) && typeof control.selector === 'string' && control.disabled !== true).map((control: any) => control.selector)});
           else this.readable.delete(session);
         }
-        reply = {success: true, contentItems: [{type: 'inputText', text: JSON.stringify(value)}]};
+        if (tool.action === 'screenshot') {
+          this.readable.delete(session); // Pixels never authorize DOM selectors.
+          const imageUrl = value.image?.mimeType === 'image/jpeg' ? 'data:image/jpeg;base64,' + value.image.data : '';
+          if (value.ok !== true || !validImageUrl(imageUrl)) throw new Error('Invalid browser screenshot.');
+          const {image: _image, ...metadata} = value;
+          reply = {success: true, contentItems: [{type: 'inputText', text: JSON.stringify(metadata)}, {type: 'inputImage', imageUrl}]};
+        } else reply = {success: true, contentItems: [{type: 'inputText', text: JSON.stringify(value)}]};
       } catch (error) {
         this.readable.delete(session);
         reply = failure(error instanceof Error ? error.message.slice(0, 4096) : 'Browser call failed; its outcome may be unknown.');

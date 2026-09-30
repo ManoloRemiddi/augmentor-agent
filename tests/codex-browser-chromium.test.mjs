@@ -28,7 +28,7 @@ async function cdp(url) {
   }};
 }
 
-test('loaded Chromium extension executes Codex-observed typing and clicking on an isolated page', {skip: process.platform !== 'linux', timeout: 45000}, async t => {
+test('loaded Chromium extension executes Codex-observed typing, clicking and screenshots on an isolated page', {skip: process.platform !== 'linux', timeout: 45000}, async t => {
   const root = await mkdtemp(join(tmpdir(), 'codex-chromium-')); const sockets = [];
   let chrome, ipc; let rounds = 0; const modelInputs = [];
   const server = createServer(async (req, res) => {
@@ -40,7 +40,7 @@ test('loaded Chromium extension executes Codex-observed typing and clicking on a
     let body = ''; for await (const part of req) body += part; modelInputs.push(JSON.parse(body));
     const action = [
       ['browser_snapshot', {}], ['browser_type', {selector: '#fixture-input', text: 'Codex typed once'}],
-      ['browser_snapshot', {}], ['browser_click', {selector: '#fixture-button'}],
+      ['browser_snapshot', {}], ['browser_click', {selector: '#fixture-button'}], ['browser_screenshot', {}],
     ][rounds++];
     const item = action ? {id: 'call_' + rounds, type: 'function_call', call_id: 'fixture_' + rounds, name: action[0], arguments: JSON.stringify(action[1])} :
       {id: 'answer', type: 'message', role: 'assistant', status: 'completed', content: [{type: 'output_text', text: 'Browser fixture finished.', annotations: []}]};
@@ -63,6 +63,7 @@ test('loaded Chromium extension executes Codex-observed typing and clicking on a
   const base = `http://127.0.0.1:${server.address().port}`;
   const profiles = new ProfileStore(join(root, 'profiles.json'), {get: async () => undefined, put: async () => {}, delete: async () => {}});
   await profiles.upsert({id: 'fixture', name: 'Isolated fixture', kind: 'local', model: 'fixture-model', endpoint: base + '/v1'});
+  await profiles.validated('fixture', 1, 'image'); // Qualification fixture; provider-probe pixel decoding has separate coverage.
   const host = new CodexHost({root: join(root, 'host'), profiles, resolveProfile: id => profiles.resolve(id)});
   ipc = new CodexIpcServer(host, join(root, 'runtime.sock')); await ipc.listen();
   const extension = join(repo, 'apps/browser/extension');
@@ -76,7 +77,7 @@ test('loaded Chromium extension executes Codex-observed typing and clicking on a
   await writeFile(join(profile, 'NativeMessagingHosts/com.augmentor.agent.json'), JSON.stringify({name: 'com.augmentor.agent', description: 'Isolated Codex proof', path: launcher, type: 'stdio', allowed_origins: [`chrome-extension://${extensionId}/`]}));
   const isolatedEnv = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(AUGMENTOR_|DSH_|PI_)/.test(key)));
   await mkdir(join(root, 'runtime'), {mode: 0o700});
-  chrome = spawn(process.env.CHROMIUM_BIN ?? 'chromium', ['--headless=new', '--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage', '--no-first-run', '--no-default-browser-check', '--remote-debugging-port=0', '--user-data-dir=' + profile, '--load-extension=' + extension, '--disable-extensions-except=' + extension, base + '/page'], {env: {...isolatedEnv, HOME: root, XDG_CONFIG_HOME: join(root, 'config'), XDG_STATE_HOME: join(root, 'state'), XDG_DATA_HOME: join(root, 'data'), XDG_RUNTIME_DIR: join(root, 'runtime')}, stdio: 'ignore'});
+  chrome = spawn(process.env.CHROMIUM_BIN ?? 'chromium', ['--headless=new', '--enable-unsafe-extension-debugging', '--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage', '--no-first-run', '--no-default-browser-check', '--remote-debugging-port=0', '--user-data-dir=' + profile, '--load-extension=' + extension, '--disable-extensions-except=' + extension, base + '/page'], {env: {...isolatedEnv, HOME: root, XDG_CONFIG_HOME: join(root, 'config'), XDG_STATE_HOME: join(root, 'state'), XDG_DATA_HOME: join(root, 'data'), XDG_RUNTIME_DIR: join(root, 'runtime')}, stdio: 'ignore'});
   let port;
   for (let attempt = 0; attempt < 100; attempt++) {try {port = (await readFile(join(profile, 'DevToolsActivePort'), 'utf8')).split('\n')[0]; break;} catch {await delay(50);}}
   assert.ok(port, 'Isolated Chromium started');
@@ -93,15 +94,25 @@ test('loaded Chromium extension executes Codex-observed typing and clicking on a
   for (let attempt = 0; attempt < 100; attempt++) {status = await message({type: 'connect'}); if (status.phase === 'ready') break; await delay(100);}
   assert.equal(status.phase, 'ready', JSON.stringify(status));
   await page.call('Page.bringToFront');
+  const denied = await panel.evaluate('chrome.tabs.captureVisibleTab(undefined, {format: "jpeg"}).then(() => "captured", error => error.message)');
+  assert.match(denied, /activeTab|all_urls|permission/i, 'No screenshot grant before a toolbar action');
+  const browserTarget = await fetch(`http://127.0.0.1:${port}/json/version`).then(response => response.json());
+  const browserControl = await cdp(browserTarget.webSocketDebuggerUrl); sockets.push(browserControl);
+  const tabTargets = await browserControl.call('Target.getTargets', {filter: [{type: 'tab', exclude: false}]});
+  const workTab = tabTargets.targetInfos.find(target => target.url === base + '/page'); assert.ok(workTab);
+  await browserControl.call('Extensions.triggerAction', {id: extensionId, targetId: workTab.targetId});
   const submitted = await message({type: 'prompt', text: 'Use the isolated fixture page: type the fixture text, then click its action once.'});
   assert.equal(submitted.ok, true, JSON.stringify(submitted));
-  for (let attempt = 0; attempt < 200; attempt++) {status = await message({type: 'connect'}); if (rounds >= 5 && !status.running) break; await delay(50);}
-  assert.equal(rounds, 5); assert.equal(status.running, false);
+  for (let attempt = 0; attempt < 200; attempt++) {status = await message({type: 'connect'}); if (rounds >= 6 && !status.running) break; await delay(50);}
+  assert.equal(rounds, 6); assert.equal(status.running, false);
   assert.deepEqual(await page.evaluate('({text:document.querySelector("#fixture-input").value,clicks:document.body.dataset.clicks})'), {text: 'Codex typed once', clicks: '1'});
   let rendered = false;
   for (let attempt = 0; attempt < 20; attempt++) {rendered = await panel.evaluate('document.body.innerText.includes("Browser fixture finished.")'); if (rendered) break; await delay(50);}
   assert.equal(rendered, true, 'The loaded panel renders the final Codex reply');
   const toolOutputs = modelInputs.at(-1).input.filter(item => item.type === 'function_call_output');
-  assert.equal(toolOutputs.length, 4);
+  assert.equal(toolOutputs.length, 5);
+  const image = toolOutputs.flatMap(item => Array.isArray(item.output) ? item.output : []).find(item => item.type === 'input_image');
+  assert.ok(image?.image_url?.startsWith('data:image/jpeg;base64,'), 'Pinned Codex forwards the actual screenshot as image input');
+  assert.ok(Buffer.from(image.image_url.split(',')[1], 'base64').length > 100, 'Actual Chromium JPEG pixels, not an image placeholder');
   assert.ok(toolOutputs.every(item => !JSON.stringify(item.output).includes('unknown outcome')));
 });

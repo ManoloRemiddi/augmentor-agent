@@ -43,7 +43,10 @@ class CodexSetupTests(unittest.TestCase):
         self.assertFalse(any(method == 'profiles.test' for method, _ in self.owner.calls))
         dialog.check(); self.owner.finish()
         self.assertIn('Tools and Codex agent compatibility', dialog.note.text())
-        dialog.model.setText('changed'); self.assertFalse(dialog.check_button.isEnabled())
+        dialog.check('image'); self.assertFalse(dialog.image_button.isEnabled()); self.owner.finish()
+        self.assertEqual(self.owner.calls[-1], ('profiles.test', {'id': dialog.profile_id, 'capability': 'image'}))
+        self.assertIn('Start a new chat', dialog.note.text())
+        dialog.model.setText('changed'); self.assertFalse(dialog.image_button.isEnabled()); self.assertFalse(dialog.check_button.isEnabled())
         dialog.save(); self.owner.finish()
         payload = [payload for method, payload in self.owner.calls if method == 'profiles.configure'][-1]
         self.assertNotIn('credential', payload)

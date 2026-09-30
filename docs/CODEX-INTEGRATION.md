@@ -412,10 +412,10 @@ the element. Mutations, failed observations and executor changes invalidate the
 observation. This detects navigation/document replacement, not every possible DOM
 change inside an existing document. Dynamic-tool events use the existing chat log.
 
-Screenshots are not registered for Codex yet: image-capability profiles and actual
-image-provider acceptance remain unqualified. Empty/inconclusive DOM reads retain
-that limitation rather than claiming image support. Desktop GUI tools, Home, memory,
-voice and prompt improvement remain separate unfinished work.
+At this initial five-tool checkpoint screenshots were not registered. The image
+qualification checkpoint below supersedes that restriction for explicitly checked
+profiles and new chats. Desktop GUI tools, Home, memory, voice and prompt improvement
+remain separate unfinished work.
 
 Validation: build passes; all 252 root Node tests and 48 Browser DOM tests pass.
 The real pinned Codex fixture round-trips browser observation and a targeted action
@@ -437,3 +437,58 @@ to its temporary profile. User browser profiles and installed services are untou
 The preceding `73cc076` macOS 14/26 bundle jobs passed; Debian reached packaging and
 still rejected the unreviewed Codex executable. Current Browser changes need their
 own CI evidence and do not waive the remaining C0–C9 gates.
+
+
+## Image qualification and actual Browser screenshot transport
+
+Both native and Browser connection forms now offer **Check image response** for a
+saved, unchanged API/local profile. It makes an explicit potentially billable
+Responses request containing only a synthetic PNG with four random colored cells.
+The answer is checked against the pixels; a generic successful text response does
+not qualify. No user files, history or tools enter this probe. The format follows
+[Responses image input](https://developers.openai.com/api/docs/guides/images-vision).
+This checks basic input transport and interpretation, not general vision quality,
+tool accuracy or any subscription entitlement. Model behavior may change behind
+an unchanged provider/model ID; the recorded timestamp is evidence of the last
+successful check, not an ongoing availability guarantee.
+
+The host alone records image qualification. Renaming preserves it; changing the
+model, endpoint, connection kind or credential clears it. A stale check cannot
+qualify a newer profile revision. New chats persist their image capability and
+matching instruction snapshot; existing chats do not silently gain a new tool.
+Qualified chats register `browser_screenshot` alongside the five existing tools.
+Screenshot replies become app-server `inputImage` content, with bounded JPEG data
+URLs and text metadata. Arbitrary remote image URLs are rejected. Images are kept
+in private per-call records and Codex native history; the display journal includes
+text metadata only. They use the existing thread retention/backup boundary.
+Screenshots revoke selector authority: clicking/typing still needs a fresh DOM
+snapshot. Replay returns a recorded result without recapturing the page.
+
+The loaded Chromium proof exposed a real permission mismatch. Chromium's automatic
+side-panel toolbar action deliberately skips the activeTab grant (see
+[Chromium action runner](https://chromium.googlesource.com/chromium/src/+/refs/heads/main/chrome/browser/extensions/extension_action_runner.cc)).
+The extension now opens the same panel through an explicit toolbar action handler,
+which grants activeTab for the clicked tab. No broader host permissions were added.
+The existing visible-tab/target-change checks remain in the capture executor.
+
+Validation: type checking/build, **256 root Node tests**, **48 Browser DOM tests**
+and **three offscreen native Qt setup cases** pass. The image-probe fixture decodes
+the generated PNG and returns its pixel-derived answer, then verifies rejection
+of a wrong answer. Profile, cached-result, size/type, capability and setup checks
+cover the relevant failure paths. The real Linux Chromium proof verifies capture
+is denied before the toolbar action, invokes that action using Chromium's isolated
+DevTools extension interface, then transports actual captured JPEG pixels through
+the native host and pinned Codex to the synthetic Responses provider. It also
+retains real DOM typing/clicking and final-panel rendering checks. The qualification
+flag in this transport proof is fixture-supplied; it is not a live-model vision test.
+The temporary browser uses an explicit testing-only extension-debugging flag.
+
+No installed application or personal browser profile was changed. Live-provider
+vision quality, macOS loaded-extension behavior, native desktop GUI execution,
+OAuth, memory, speech and complete artifact qualification remain unfinished.
+At the preceding `4cc21f0` source checkpoint, macOS CI run
+[36737148617](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36737148617)
+passed; Debian run
+[36737148571](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36737148571)
+passed application checks and stopped at the unreviewed Codex native executable
+inventory gate. This checkpoint does not bypass or resolve that packaging gate.

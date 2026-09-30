@@ -57,7 +57,7 @@ async function request(method, params = {}, id) {
   if (method === 'augmentor/models') return c.call('models.list');
   if (method === 'augmentor/codex') {
     if (params.action === 'profiles') return c.call('profiles.list');
-    if (params.action === 'test') return c.call('profiles.test', {id: params.id});
+    if (params.action === 'test') return c.call('profiles.test', {id: params.id, capability: params.capability ?? 'text'});
     if (params.action === 'configure') return c.call('profiles.configure', params.profile);
     throw new Error('Unsupported Codex setup action.');
   }
