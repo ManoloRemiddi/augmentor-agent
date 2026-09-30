@@ -2,6 +2,17 @@
 
 # Start here: agent handoff
 
+## September 30 Codex integration build plan
+
+The owner selected Codex-backed Desktop and Browser integration with subscription,
+API-provider and local-model connection options. [The build plan](CODEX-INTEGRATION-PLAN.md)
+records the shared host/adapter design, existing DSH coupling, authentication and
+commercial eligibility gates, ten ordered work packages, acceptance matrix and
+release/rollback requirements. Begin implementation at C0 against current main.
+This is a documentation-only plan based on `b8e36a4`; no Codex runtime, login,
+provider, memory, speech or installed-app behavior has been implemented or tested
+by this planning change. Existing DSH/Pi defaults and installations remain intact.
+
 ## September 27 installed Chromium browser choice
 
 [Browser choice qualification](MACOS-BROWSER-CHOICE.md) records the generic Mac
