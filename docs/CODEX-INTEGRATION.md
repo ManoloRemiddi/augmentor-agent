@@ -1515,3 +1515,37 @@ and Debian application/native/Chromium and Home checks in
 [36781647450](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36781647450).
 Binary-notice review still blocks Debian packaging and downstream installed jobs.
 This native registration fix and new proofs need their own subsequent platform CI.
+
+## Actual Codex controlled-memory window and cancellation
+
+An opt-in Linux proof now connects pinned Codex 0.159.2, the real memory companion
+and inference gateway, and the locked Hindsight 0.10.0 image/controlled extension.
+The existing public installer creates a fresh UUID-named container, volume and
+private configuration, on separate loopback ports. Embeddings/reranking stay on
+CPU; the generation target is a local synthetic server. Cleanup verifies and
+removes only these owned test resources. No installed configuration, private
+archive, API key or account is read.
+
+The provider selects the actual registered `browser_tabs_list` tool. A held
+Browser executor creates a verified spare-compute window. One live captured
+user message becomes eligible, and Hindsight's retain stage reaches the actual
+gateway/model connection with streaming enabled and output capped at 4096 tokens.
+Generation is deliberately held. Stop interrupts Codex, closes the upstream
+memory socket, leaves the public source durable and marks that stage stopped.
+Idle time and native-history reconstruction create no retry or new lease.
+Startup and initial idle also produce no model request.
+
+The proof identified an incorrect `browser_tabs` name in the adapter's allowed
+Browser I/O list. That name was never registered. The adapter and focused tests
+now use `browser_tabs_list`, and actual native tool selection verifies the route.
+Unknown, delegated and inference-capable tools retain foreground priority.
+
+Build/type and **all 354 root Node tests** pass on Linux with
+`AUGMENTOR_CODEX_MEMORY_ENGINE_PROOF=1`. Standard runs skip this one explicit Docker
+proof. The preceding checkpoint passed 56 Browser and eight memory-budget tests;
+no Browser UI or shared-budget implementation changed here. This is actual
+engine admission/cancellation evidence with synthetic inference, not completion
+of all retain/consolidate/page stages, memory quality or Mac Docker qualification.
+Loaded native/Browser memory proofs and standalone-launcher activation remain
+before C6 completion. All other C0–C9 gates and the native-binary distribution
+review remain open; no installed app was updated.

@@ -17,16 +17,17 @@ function send(res, item, id) {
     {type: 'response.completed', response: {id: 'r-' + id, status: 'completed', output: [item]}}]) res.write('data: ' + JSON.stringify(event) + '\n\n');
   res.end();
 }
-async function fixture(t, wrapMemoryCall = call => call) {
+async function fixture(t, {wrapMemoryCall = call => call, prepareMemory} = {}) {
   const root = mkdtempSync(join(process.platform === 'darwin' ? '/tmp' : tmpdir(), 'cxm-'));
   const requests = [], hosts = [], warnings = [];
-  let services, server, host;
+  let services, server, host, engine;
   t.after(async () => {
     for (const host of hosts) await host.close();
     if (server) {server.closeAllConnections(); await new Promise(resolve => server.close(resolve));}
-    await services?.close(); rmSync(root, {recursive: true, force: true});
+    await services?.close(); await engine?.close(); rmSync(root, {recursive: true, force: true});
   });
-  services = await memoryServices(root);
+  engine = await prepareMemory?.(root);
+  services = await memoryServices(root, engine?.configuration);
   server = createServer(async (req, res) => {
     let raw = ''; for await (const chunk of req) raw += chunk;
     const body = JSON.parse(raw); requests.push(body);
@@ -40,6 +41,7 @@ async function fixture(t, wrapMemoryCall = call => call) {
       else if (!outputs.some(item => item.call_id === 'foreign-source')) tool = {id: 'foreign-source', name: 'memory_source', args: {seq: 3}};
       else if (!outputs.some(item => item.call_id === 'recall')) tool = {id: 'recall', name: 'memory_recall', args: {query: 'Original restriction'}};
     }
+    if (step === '5' && !outputs.some(item => item.call_id === 'browser-wait')) tool = {id:'browser-wait', name:'browser_tabs_list', args:{}};
     const item = tool ? {id: 'tool-' + tool.id, type: 'function_call', call_id: tool.id, name: tool.name, arguments: JSON.stringify(tool.args)} :
       {id: 'answer-' + requests.length, type: 'message', role: 'assistant', status: 'completed', content: [{type: 'output_text', text: 'PUBLIC_REPLY_' + step, annotations: []}]};
     send(res, item, requests.length);
@@ -108,7 +110,7 @@ test('real pinned host and companions preserve source scope, modality, branch cu
 
 test('real pinned host Stop cancels pre-turn memory preparation and only explicit continuation dispatches the queued input', {timeout:15000}, async t => {
   let held, cancelled = false;
-  const f = await fixture(t, call => async (method, params, id, signal) => {
+  const f = await fixture(t, {wrapMemoryCall: call => async (method, params, id, signal) => {
     const result = await call(method, params, id, signal);
     if (method !== 'memory.dual.recall' || held) return result;
     // The companion answered; hold this one response at the transport boundary.
@@ -118,7 +120,7 @@ test('real pinned host Stop cancels pre-turn memory preparation and only explici
       signal.addEventListener('abort', abort, {once:true});
       if (signal.aborted) abort();
     });
-  });
+  }});
   const pending = f.host.dispatch('session.prompt', {sessionId:'one', requestId:'waiting', content:[{type:'text', text:'MODEL_STEP_1 Preserve the queued input.'}]});
   await until(() => Boolean(held), 'real companion response waiting before native dispatch');
   assert.equal(f.requests.length, 0);
@@ -157,4 +159,43 @@ test('real companion outage preserves native chat and restart backfills public m
   assert.equal(events.length, 4);
   assert.ok(events.every(event => event.mode === 'text'));
   assert.equal(new Set(events.map(event => event.event_id)).size, 4);
+});
+
+test('real controlled engine admits Codex Browser windows and Stop closes its upstream model socket without replay', {
+  timeout:240000, skip:process.platform !== 'linux' || process.env.AUGMENTOR_CODEX_MEMORY_ENGINE_PROOF !== '1',
+}, async t => {
+  const {controlledMemoryEngine} = await import('./fixtures/codex/controlled-memory-engine.mjs');
+  const calls = [], frames = []; let disconnected = false;
+  const model = createServer(async (req, res) => {
+    let raw = ''; for await (const chunk of req) raw += chunk;
+    calls.push(JSON.parse(raw));
+    res.writeHead(200, {'content-type':'text/event-stream'}); res.flushHeaders();
+    res.once('close', () => {disconnected = true;}); // Hold generation until the real gateway cancels it.
+  });
+  await new Promise(resolve => model.listen(0, '127.0.0.1', resolve));
+  // This hook runs before fixture cleanup; release any held synthetic connections.
+  t.after(async () => {model.closeAllConnections(); await new Promise(resolve => model.close(resolve));});
+  const f = await fixture(t, {prepareMemory: root => controlledMemoryEngine(root, `http://127.0.0.1:${model.address().port}/v1`)});
+  const owner = {};
+  f.host.attachBrowser('one', owner, frame => frames.push(frame));
+  await delay(600); assert.equal(calls.length, 0, 'engine startup and idle admission never call the model');
+  await f.host.dispatch('session.prompt', {sessionId:'one', requestId:'browser-window', content:[{type:'text', text:'MODEL_STEP_5 Read the Browser while preserving my work.'}]});
+  await until(() => frames.length > 0, 'owned pending Browser executor');
+  for (let n = 0; n < 600 && !calls.length; n++) await delay(100);
+  assert.equal(calls.length, 1, 'actual Hindsight generation passes the shared admission gateway');
+  assert.ok(f.services.calls.some(call => call.method.endsWith('.activity') && call.params.phase === 'tools'));
+  assert.ok(calls[0].stream); assert.ok(calls[0].max_tokens <= 4096);
+  assert.match(JSON.stringify(calls[0]), /Read the Browser while preserving my work/);
+  await f.host.dispatch('session.cancel', {sessionId:'one'});
+  await until(() => disconnected, 'Stop closes actual upstream memory model socket');
+  await until(async () => (await f.host.dispatch('session.queue', {sessionId:'one'})).operations[0].status === 'interrupted', 'native interruption');
+  await f.host.close();
+  const captured = await f.exported('codex:one'); assert.equal(captured.events[0].content, 'MODEL_STEP_5 Read the Browser while preserving my work.');
+  await delay(700); assert.equal(calls.length, 1, 'stopped memory generation is not replayed while idle');
+  const status = await f.services.call('memory.dual.describe'); assert.equal(status.processing.active, false);
+  const jobs = await f.services.call('memory.dual.jobs', {session:'codex:one'}); assert.equal(jobs.jobs[0].status, 'stopped');
+  const beforeRestart = f.services.calls.length;
+  f.open(); await f.host.dispatch('session.queue', {sessionId:'one'}); await f.host.close();
+  await delay(600); assert.equal(calls.length, 1, 'native reconstruction grants no new processing window');
+  assert.ok(f.services.calls.slice(beforeRestart).filter(call => call.method.endsWith('.activity')).every(call => call.params.phase === 'stop'));
 });

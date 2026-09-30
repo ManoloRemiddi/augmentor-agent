@@ -113,7 +113,7 @@ export class CodexMemory {
     if (this.closed || this.activeTurn !== turn) return;
     // Browser I/O uses the trusted local executor. Shell, Home, MCP and delegated
     // work can run inference after returning; keep the entire turn foreground.
-    const spare = allowSpare && ['browser_tabs', 'browser_navigate', 'browser_snapshot', 'browser_click', 'browser_type', 'browser_screenshot'].includes(name);
+    const spare = allowSpare && ['browser_tabs_list', 'browser_navigate', 'browser_snapshot', 'browser_click', 'browser_type', 'browser_screenshot'].includes(name);
     this.tools.set(id, spare); this.uncertainTool ||= !spare;
     await this.phase();
   }

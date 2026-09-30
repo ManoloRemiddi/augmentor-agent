@@ -38,7 +38,7 @@ test('live turns use distinct bounded owners and unknown/delegated tools keep fo
  await client.toolStarted('one','browser','browser_snapshot');assert.equal(activities().at(-1).phase,'tools');
  await client.toolStarted('one','delegate','collabAgentToolCall');assert.equal(activities().at(-1).phase,'foreground');
  await client.toolFinished('one','delegate');assert.equal(activities().at(-1).phase,'foreground');
- await client.toolFinished('one','browser');await client.toolStarted('one','browser2','browser_tabs');assert.equal(activities().at(-1).phase,'foreground');
+ await client.toolFinished('one','browser');await client.toolStarted('one','browser2','browser_tabs_list');assert.equal(activities().at(-1).phase,'foreground');
  await client.stop('old-turn');assert.equal(activities().at(-1).phase,'foreground');
  await client.stop('one');assert.equal(activities().at(-1).phase,'stop');
  const stoppedCount=activities().length;await client.begin('one');assert.equal(activities().length,stoppedCount);

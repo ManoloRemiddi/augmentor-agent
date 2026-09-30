@@ -1,14 +1,15 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {spawn} from 'node:child_process';
 import {createConnection} from 'node:net';
-import {mkdirSync, existsSync} from 'node:fs';
+import {mkdirSync, existsSync, writeFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {randomUUID} from 'node:crypto';
 
 /** Real companions in empty state. Never inherit owner config, credentials or model routes. */
-export async function memoryServices(root) {
+export async function memoryServices(root, configuration) {
   const state = join(root, 's'), data = join(root, 'd');
   mkdirSync(state, {mode: 0o700}); mkdirSync(data, {mode: 0o700});
+  if (configuration) writeFileSync(join(data, 'hindsight.json'), JSON.stringify(configuration), {mode:0o600});
   const env = {PATH: process.env.PATH, LANG: process.env.LANG ?? 'C.UTF-8', HOME: root,
     AUGMENTOR_SHARED_STATE: state, AUGMENTOR_SHARED_DATA: data, AUGMENTOR_WORKSPACE_PROFILE: '',
     XDG_RUNTIME_DIR: join(root, 'run'), XDG_CONFIG_HOME: join(root, 'config'), XDG_STATE_HOME: state, XDG_DATA_HOME: data};

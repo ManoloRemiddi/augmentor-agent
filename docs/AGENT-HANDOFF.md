@@ -2,6 +2,19 @@
 
 # Start here: agent handoff
 
+## October 1 Codex controlled-engine cancellation
+
+[Actual controlled-engine proof](CODEX-INTEGRATION.md#actual-codex-controlled-memory-window-and-cancellation)
+joins pinned Codex, the real Python companion/gateway and a disposable pinned
+Hindsight 0.10.0 container with synthetic inference. Browser tool activity admits
+one generation; Stop closes its upstream socket, stops the job and grants no idle
+or restart replay. The proof corrected `browser_tabs` to the actual registered
+`browser_tabs_list` in memory's spare-compute allowlist. Build/type and all 354
+root Node tests pass on Linux with the opt-in Docker proof enabled. Default CI
+skips that one Docker case; no model-quality or completed memory-stage claim.
+Continue loaded native/Browser memory proofs and launcher activation, then full
+C0–C9 requirements. Installed apps, settings and private speech remain untouched.
+
 ## October 1 actual Codex host and memory-companion qualification
 
 [Pinned host/companion evidence](CODEX-INTEGRATION.md#actual-pinned-host-and-memory-companion-qualification)

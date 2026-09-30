@@ -161,6 +161,22 @@ Inference is deterministic; Hindsight is unconfigured. These are host/companion
 transport proofs, not controlled-engine generation, live quality or installed UI
 qualification. Run with `AUGMENTOR_PYTHON` pointing at the test Python environment.
 
+The same file's optional Linux proof provisions a disposable pinned Hindsight
+0.10.0 container/volume through the public controlled installer. It connects real
+Codex Browser activity to the actual companion/gateway, holds synthetic model
+generation and verifies Stop closes the upstream socket, stops the memory job
+and prevents idle/reconstruction replay. It removes only its fresh named test
+container/volume and empty configuration; cleanup failures fail the proof.
+Requires local Docker and the pinned image; ordinary CI skips this case:
+
+```sh
+AUGMENTOR_PYTHON=/path/to/test/python AUGMENTOR_CODEX_MEMORY_ENGINE_PROOF=1 \
+  node --test tests/codex-memory-runtime.test.mjs
+```
+
+This qualifies admission/cancellation with the real engine, not completed
+memory-generation stages, semantic quality or physical installed acceptance.
+
 
 ### Codex paginated history
 
