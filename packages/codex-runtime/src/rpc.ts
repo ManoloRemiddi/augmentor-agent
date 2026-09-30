@@ -116,6 +116,8 @@ export class CodexRpc extends EventEmitter {
         this.fail(new CodexTransportError('Codex sent an invalid protocol envelope.', true)); return;
       }
       if (typeof value.method === 'string') {
+        if (typeof value.params?.error?.message === 'string') value.params.error.message = this.safeError(value.params.error.message);
+        if (typeof value.params?.turn?.error?.message === 'string') value.params.turn.error.message = this.safeError(value.params.turn.error.message);
         if (value.id !== undefined) {
           if ((typeof value.id !== 'string' && typeof value.id !== 'number') || this.serverRequests.has(value.id) || this.serverRequests.size >= 128) {
             this.fail(new CodexTransportError('Invalid or excessive Codex interactions.', true)); return;
@@ -128,7 +130,7 @@ export class CodexRpc extends EventEmitter {
         const pending = this.pending.get(value.id);
         if (!pending) continue; // A late acknowledgment cannot trigger another request.
         this.pending.delete(value.id); clearTimeout(pending.timer);
-        if (value.error && typeof value.error.message === 'string') pending.reject(new CodexRemoteError(value.error.code, value.error.message));
+        if (value.error && typeof value.error.message === 'string') pending.reject(new CodexRemoteError(value.error.code, this.safeError(value.error.message)));
         else if (Object.hasOwn(value, 'result')) pending.resolve(value.result);
         else pending.reject(new CodexTransportError('Codex response omitted its result.', true));
       } else {this.fail(new CodexTransportError('Codex sent an unrecognized protocol frame.', true)); return;}
@@ -143,6 +145,12 @@ export class CodexRpc extends EventEmitter {
     this.pending.clear(); this.serverRequests.clear();
     this.emit('failure', error);
     if (this.child?.exitCode === null && this.child?.signalCode === null) void this.close();
+  }
+  private safeError(message: string): string {
+    for (const [name, value] of Object.entries(this.options.env)) {
+      if (value && /CREDENTIAL|TOKEN|SECRET|API_KEY/.test(name)) message = message.split(value).join('[redacted]');
+    }
+    return message.slice(0, 4096);
   }
   close(): Promise<void> {
     if (this.closing) return this.closing;

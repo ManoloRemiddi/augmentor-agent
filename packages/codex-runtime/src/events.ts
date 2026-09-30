@@ -8,7 +8,10 @@ export function chatEvents(notification: RpcNotification): ChatEvent[] {
   const event = (type: string, data: Record<string, any>, turnId = p.turnId): ChatEvent[] => [{type, data, ...(turnId ? {turnId} : {})}];
   switch (notification.method) {
     case 'turn/started': return event('turn/start', {}, p.turn.id);
-    case 'turn/completed': return event('turn/end', {reason: {kind: p.turn.status === 'completed' ? 'completed' : p.turn.status === 'interrupted' ? 'aborted' : 'error'}}, p.turn.id);
+    case 'turn/completed': return [
+      ...(p.turn.error?.message ? event('runtime/error', {message: p.turn.error.message}, p.turn.id) : []),
+      ...event('turn/end', {reason: {kind: p.turn.status === 'completed' ? 'completed' : p.turn.status === 'interrupted' ? 'aborted' : 'error'}}, p.turn.id),
+    ];
     case 'item/agentMessage/delta': return event('assistant/chunk', {chunk: {type: 'text-delta', text: p.delta}, itemId: p.itemId});
     case 'item/reasoning/summaryTextDelta': return event('assistant/chunk', {chunk: {type: 'reasoning-delta', text: p.delta}, itemId: p.itemId});
     case 'error': return event('runtime/error', {message: p.error?.message ?? 'Codex reported a runtime error.', willRetry: p.willRetry === true});

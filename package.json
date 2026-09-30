@@ -11,6 +11,7 @@
     "build": "python3 scripts/verify-plasma-shader.py && python3 scripts/sync-design.py && tsc -p tsconfig.json && node scripts/copy-protocol.mjs",
     "check": "tsc -p tsconfig.json --noEmit",
     "start": "node dist/runtime/src/main.js",
+    "start:codex": "node dist/codex-runtime/src/main.js",
     "test": "node --test tests/*.test.mjs",
     "test:native": "PYTHONPATH=apps/native QT_QPA_PLATFORM=offscreen python3 -m unittest discover -s tests -v",
     "package": "python3 scripts/package-release.py",

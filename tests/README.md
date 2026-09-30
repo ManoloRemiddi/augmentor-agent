@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Codex runtime tests: build first, then run `node --test tests/codex-*.test.mjs`.
+They cover real app-server operation against a synthetic Responses provider,
+the native wire adapter, durable recovery, private IPC and profile contracts.
+`test_codex_credentials.py` exercises a synthetic credential store. See
+[Codex evidence and limitations](../docs/CODEX-INTEGRATION.md) before treating
+these as real-provider, OAuth, OS-keychain, GUI or installed-release qualification.
+
 # Verification map
 
 Run from the repository root. The [agent handoff](../docs/AGENT-HANDOFF.md)

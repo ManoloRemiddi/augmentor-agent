@@ -9,6 +9,8 @@ import {tmpdir} from 'node:os';
 import {CodexIpcServer} from '../dist/codex-runtime/src/ipc.js';
 import {DisplayJournal} from '../dist/codex-runtime/src/journal.js';
 import {CodexHost} from '../dist/codex-runtime/src/host.js';
+import {spawn} from 'node:child_process';
+import {fileURLToPath} from 'node:url';
 
 async function fixture(t) {
   const root = mkdtempSync(join(tmpdir(), 'codex-ipc-'));
@@ -45,7 +47,7 @@ test('Codex IPC requires a version handshake and isolates subscribed sessions', 
 test('Codex IPC refuses to replace an existing socket', async t => {
   const {host, server} = await fixture(t);
   const other = new CodexIpcServer(host, server.socketPath);
-  await assert.rejects(other.listen(), /already exists/);
+  await assert.rejects(other.listen(), /already running/);
 });
 test('Codex journal deduplicates committed events, preserves partial output and rejects torn writes', t => {
   const root = mkdtempSync(join(tmpdir(), 'codex-journal-')); t.after(() => rmSync(root, {recursive: true, force: true}));
@@ -69,4 +71,27 @@ test('Codex host persists failed creation as unknown without spawning another th
   await assert.rejects(host.create(params), /Lost acknowledgment/);
   await assert.rejects(host.create(params), /unknown outcome/);
   assert.equal(starts, 1);
+});
+
+test('standalone Codex host persists a local profile and recovers its socket after a crash', {timeout: 15000}, async t => {
+  const root = mkdtempSync(join(tmpdir(), 'codex-process-')); const children = [];
+  t.after(async () => {for (const child of children) {if (child.exitCode === null && child.signalCode === null) {const exited = once(child, 'exit'); child.kill('SIGKILL'); await exited;}} rmSync(root, {recursive: true, force: true});});
+  async function start() {
+    const child = spawn(process.execPath, [fileURLToPath(new URL('../dist/codex-runtime/src/main.js', import.meta.url))], {
+      env: {...process.env, AUGMENTOR_CODEX_STATE: root, AUGMENTOR_CODEX_SOCKET: join(root, 'host.sock')}, stdio: ['ignore', 'pipe', 'pipe']});
+    children.push(child);
+    const ready = JSON.parse((await once(child.stdout, 'data'))[0].toString()); assert.equal(ready.ready, true);
+    const socket = net.createConnection(ready.socket); await once(socket, 'connect');
+    const invoke = async (id, method, params = {}) => {const answer = once(socket, 'data'); socket.write(JSON.stringify({id, method, params}) + '\n'); return JSON.parse((await answer)[0]);};
+    await invoke('hello', 'host.hello', {protocol: 'augmentor-codex/1'});
+    return {child, socket, invoke};
+  }
+  const first = await start();
+  const saved = await first.invoke('configure', 'profiles.configure', {id: 'local', name: 'Local fixture', kind: 'local', model: 'fixture', endpoint: 'http://127.0.0.1:8080/v1'});
+  assert.equal(saved.result.credentialConfigured, false);
+  const exited = once(first.child, 'exit'); first.child.kill('SIGKILL'); await exited; first.socket.destroy();
+  const second = await start();
+  const listed = await second.invoke('list', 'profiles.list'); assert.equal(listed.result.profiles[0].id, 'local');
+  assert.equal(listed.result.profiles[0].validation, 'unverified');
+  second.socket.destroy(); const stopped = once(second.child, 'exit'); second.child.kill('SIGTERM'); await stopped;
 });

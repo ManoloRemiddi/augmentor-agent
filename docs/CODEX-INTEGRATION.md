@@ -40,7 +40,20 @@ unqualified. Do not substitute the user's global CLI or inherit its auth cache.
   per conversation authority, native-thread reopening, display history, bounded
   owner-only Unix socket, version handshake and per-session subscriptions.
   The host refuses changed profile revisions, unconfirmed creation and active
-  worker release. Approval presenter integration and service bootstrap are pending.
+  worker release. Approval presenter integration and installed-service qualification are pending.
+- `profiles.ts` / `credentials.ts` and `services/codex/credentials.py`: versioned
+  API/local profiles with opaque credential references, serialized replacement,
+  explicit destination-change checks and an OS-store helper over private pipes.
+  The helper directly selects Keychain or Secret Service, without loading a
+  configured fallback backend. Subscription profiles require a future supported
+  login flow and cannot be created by pasting a token into API setup.
+- `main.ts`: standalone shared host (`npm run start:codex` after building), with
+  a private profile store and bounded socket. Startup recovers a stale socket only
+  after an owned-socket check, a refused connection and unchanged inode. The
+  existing lifetime-lease launcher and startup lock now recognize Codex.
+- `apps/native/augmentor_linux/adapters/codex.py`: thin native wire adapter, model
+  selection, saved chats and shared event subscription. The controller accepts
+  this adapter, but the engine selector and setup UI are not wired yet.
 
 The actual generated schema was inspected using:
 
@@ -62,9 +75,14 @@ npm run build
 node --test tests/codex-*.test.mjs
 ```
 
-On Linux x64 with Node 24.19.0, the focused suite now passes **21 tests**.
+On Linux x64 with Node 24.19.0, the focused suite now passes **27 tests**.
 TypeScript checking and the normal build pass; the full root `npm test` suite
-passes 214 tests, including the focused Codex tests. Evidence categories:
+passes 220 tests, including the focused Codex tests. Evidence categories:
+
+The full native suite runs 551 tests successfully with two skips in an isolated
+environment containing the pinned PySide6/QtTest wheels. The default system
+Python lacked QtTest and failed before that environment correction. No installed
+desktop Python or Qt libraries were replaced.
 
 | Coverage | Evidence type and limit |
 | --- | --- |
@@ -73,6 +91,10 @@ passes 214 tests, including the focused Codex tests. Evidence categories:
 | Session driver and normalized user/assistant events | Exercised through that same real app-server proof |
 | Shared host restart and continuation with durable display history | Real pinned binary and fixture endpoint; not yet a packaged service |
 | IPC handshake, subscription isolation and existing socket preservation | Real Unix sockets with a fixture dispatcher |
+| Standalone host startup, profile persistence, SIGKILL and socket recovery | Real host subprocess and local profile; no inference |
+| Native Python adapter send/stream/saved chats/model identity | Real adapter, shared socket, pinned Codex binary and synthetic Responses provider; not the actual Qt window |
+| Missing display completion recovered from native history without replay | Real Codex history with a deliberately removed synthetic display record |
+| Credential replacement, locked-store failure, destination changes and concurrent revisions | In-memory keychain fixture plus private profile files |
 | Intent persistence, restart, identity conflict, cross-thread/corrupt ledger rejection | Disk-backed automated tests |
 | Completion before acknowledgment, unknown-outcome reconciliation, early Stop race, private reasoning exclusion | Focused fault/order fixtures |
 
@@ -93,6 +115,25 @@ archives. The notice catalog now binds upstream texts to exact 0.159.2 package
 versions and immutable upstream commit `ff6aec96948b70d94983af2641a6b67c94faeff5`.
 Six license-inventory tests pass. This package-text correction does not complete
 the native binary dependency inventory or release qualification.
+
+At source `3ff5c5d`, Mac 14 and Mac 26 bundle workflows passed; these exercised
+existing DSH/Qt packaging, not the Codex interfaces. Debian source checks passed
+but packaging correctly refused the new unreviewed Codex native executable. The
+native binary/dependency inventory is an open C8 gate. Do not bypass it merely
+because npm license text is now present. The workflow now additionally runs the
+shared Codex tests on Mac; results apply only after that newer commit runs.
+
+`requirements-codex.txt` pins the credential helper's development dependency to
+keyring 25.6.0. Its actual Secret Service write/read proof could not run on this
+machine because the store was unavailable or locked; it returned the expected
+explicit error without a plaintext fallback. No account token was used. Both OS
+stores need successful platform proofs and release dependency locks before C2/C8
+completion. The two Python helper contract tests use a synthetic store.
+
+Profile catalogs distinguish configuration from inference validation. Listing a
+configured model does not mean a live request succeeded. `models.validate`
+currently validates selected profile/model and credential availability only and
+returns `validation: configuration-only`; real connection-test UI remains work.
 
 Observed protocol race: app-server can acknowledge `turn/start` before it accepts
 `turn/interrupt`. The session driver retries only the definitive `-32600` "no
@@ -118,12 +159,12 @@ endpoint before C0/C2 completion; do not add a silent transport/billing fallback
 ## Next work and release gaps
 
 Continue C0 proofs against a real compatible local model/API, eligibility and
-context/tool/voice spikes. C1 still needs service bootstrap/supervision, full
-worker/profile authority verification, approval presenter leases, native-history
-backfill and full recovery. Native paginated history must replace bounded full
+context/tool/voice spikes. C1 still needs installed-service supervision, full
+worker/profile authority verification, approval presenter leases and broader
+recovery qualification. Native paginated history must replace bounded full
 history reads before large-conversation qualification.
 
-C2–C9 still require protected profile credentials, real Desktop/Browser setup and
+C2–C9 still require successful OS credential proofs, real Desktop/Browser setup and
 conversation paths, eligible OAuth flows, scoped product tools/persona, memory,
 Resonant Voice, Linux/macOS packaging, migration/rollback and full acceptance.
 The existing DSH/Pi interfaces and running installations have not been changed.

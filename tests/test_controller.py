@@ -10,6 +10,17 @@ from augmentor_linux.controller import Controller
 
 
 class ControllerTests(unittest.TestCase):
+    def test_codex_uses_its_own_adapter_and_preserves_unqualified_capabilities(self):
+        with tempfile.TemporaryDirectory() as root, patch.dict(os.environ, {'AUGMENTOR_CODEX_STATE': root, 'AUGMENTOR_CODEX_SOCKET': root+'/codex.sock'}):
+            controller = Controller(harness='codex')
+            self.addCleanup(controller.close)
+            self.assertEqual(controller.client.harness, 'codex')
+            self.assertEqual(controller.preset, 'augmentor-linux-codex')
+            self.assertEqual(controller.client.base, root+'/codex.sock')
+            self.assertFalse(controller.capabilities['memory'])
+            self.assertFalse(controller.capabilities['branch'])
+            self.assertEqual(str(controller.client.state_path()), root+'/session.json')
+
     def test_retired_harness_is_rejected_before_a_client_can_start(self):
         with self.assertRaisesRegex(ValueError,'retired'):
             Controller(harness='opencode')

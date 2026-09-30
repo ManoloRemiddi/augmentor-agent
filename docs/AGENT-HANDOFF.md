@@ -15,6 +15,16 @@ sandbox fixture and license corrections. This is partial C0/C1 work. Continue th
 surfaces, login, tools, memory, voice and release qualification remain. Codex is
 not yet selectable and no installed application was changed.
 
+The next source checkpoint adds API/local profile records, OS credential-store
+plumbing, standalone host startup/crash recovery and a thin native adapter.
+Focused coverage is now 27 tests, the root Node suite passes 220, and the isolated
+native suite runs 551 with two skips. The real native adapter passes against the
+shared host and synthetic model, but actual Qt setup/send qualification remains.
+Secret Service is unavailable/locked on the development host, so its positive
+store proof remains pending. At `3ff5c5d`, Mac 14/26 bundle workflows pass and
+Debian packaging refuses the unreviewed Codex native executable; complete the
+native dependency inventory rather than bypassing that release gate.
+
 ## September 30 application SDK foundation
 
 [SDK foundation](APP-SDK.md) owns the DSH-only application contract, exact tool

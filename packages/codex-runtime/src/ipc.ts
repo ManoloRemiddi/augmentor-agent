@@ -16,7 +16,25 @@ export class CodexIpcServer {
   async listen(): Promise<void> {
     if (this.server || this.closing) throw new Error('Codex IPC cannot be started twice.');
     privateDirectory(dirname(this.socketPath));
-    if (existsSync(this.socketPath)) throw new Error('Codex socket already exists. Check the existing host before recovering a stale socket.');
+    if (existsSync(this.socketPath)) {
+      const previous = lstatSync(this.socketPath);
+      if (!previous.isSocket() || previous.isSymbolicLink() || (process.getuid && previous.uid !== process.getuid()) || (previous.mode & 0o077)) throw new Error('Codex socket is not a private, user-owned socket.');
+      const live = await new Promise<boolean>((resolve, reject) => {
+        const probe = net.createConnection(this.socketPath);
+        const timer = setTimeout(() => {probe.destroy(); reject(new Error('Existing Codex host did not respond; it was not replaced.'));}, 2000);
+        probe.once('connect', () => {clearTimeout(timer); probe.destroy(); resolve(true);});
+        probe.once('error', (error: NodeJS.ErrnoException) => {
+          clearTimeout(timer);
+          if (error.code === 'ECONNREFUSED' || error.code === 'ENOENT') resolve(false);
+          else reject(new Error('Existing Codex socket could not be checked safely.'));
+        });
+      });
+      if (live) throw new Error('Codex host is already running.');
+      if (existsSync(this.socketPath)) {
+        if (lstatSync(this.socketPath).ino !== previous.ino) throw new Error('Codex socket changed during recovery.');
+        unlinkSync(this.socketPath);
+      }
+    }
     const server = net.createServer(socket => this.connect(socket)); this.server = server;
     await new Promise<void>((resolve, reject) => {
       server.once('error', reject);

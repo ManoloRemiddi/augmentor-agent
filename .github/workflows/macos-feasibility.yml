@@ -51,6 +51,8 @@ jobs:
           npm ci --ignore-scripts --no-audit --no-fund
           npm run check
           npm run build
+          AUGMENTOR_PYTHON="$PWD/.macos-build-env/bin/python3" node --test tests/codex-*.test.mjs
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_codex_credentials.py -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p 'test_macos*.py' -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p '*shortcut*.py' -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_instances.py -v

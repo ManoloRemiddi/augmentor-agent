@@ -38,11 +38,14 @@ class Controller(QObject):
 
     def __init__(self, parent=None, client=None, harness="pi"):
         super().__init__(parent)
-        if harness not in ('pi','dsh'):
-            raise ValueError('Choose DSH or Pi. OpenCode support has been retired; its saved data is retained.')
+        if harness not in ('pi','dsh','codex'):
+            raise ValueError('Choose DSH, Pi or Codex. OpenCode support has been retired; its saved data is retained.')
         if client is None and harness=='dsh':
             from .adapters.dsh import DshAdapter
             self.client=DshAdapter()
+        elif client is None and harness=='codex':
+            from .adapters.codex import CodexAdapter
+            self.client=CodexAdapter()
         else:self.client=client or PiClient()
         self.harness=getattr(self.client,'harness',harness)
         self.preset=getattr(self.client,'preset','augmentor-linux-pi')

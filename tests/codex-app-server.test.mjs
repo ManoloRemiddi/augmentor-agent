@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
-import {mkdtemp, mkdir, rm} from 'node:fs/promises';
+import {mkdtemp, mkdir, rm, readFile, writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {CodexRpc} from '../dist/codex-runtime/src/rpc.js';
@@ -10,6 +10,10 @@ import {runtimeOptions, installedRuntimeVersion} from '../dist/codex-runtime/src
 import {CodexSession} from '../dist/codex-runtime/src/session.js';
 import {OperationLedger} from '../dist/codex-runtime/src/operations.js';
 import {CodexHost} from '../dist/codex-runtime/src/host.js';
+import {CodexIpcServer} from '../dist/codex-runtime/src/ipc.js';
+import {execFile} from 'node:child_process';
+import {promisify} from 'node:util';
+import {fileURLToPath} from 'node:url';
 
 function waitFor(rpc, method, predicate = () => true) {
   return new Promise((resolve, reject) => {
@@ -53,8 +57,8 @@ test('pinned real Codex streams a fixture response and resumes persisted native 
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const connection = {kind: 'local', model: 'fixture-model', endpoint: `http://127.0.0.1:${server.address().port}/v1`};
-  const clients = [];
-  t.after(async () => {heldResponse?.destroy(); for (const client of clients) await client.close(); server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); await rm(root, {recursive: true, force: true});});
+  const clients = []; const cleanup = [];
+  t.after(async () => {heldResponse?.destroy(); for (const close of cleanup.reverse()) await close(); for (const client of clients) await client.close(); server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); await rm(root, {recursive: true, force: true});});
   async function start() {const rpc = new CodexRpc(runtimeOptions(connection, state, cwd)); clients.push(rpc); await rpc.initialize(); return rpc;}
   const rpc = await start();
   // Container CI cannot create the upstream Linux namespace sandbox. This synthetic
@@ -100,7 +104,7 @@ test('pinned real Codex streams a fixture response and resumes persisted native 
   mode = 'text'; heldResponse?.destroy();
   const hostOptions = {root: join(root, 'host'), resolveProfile: async id => ({id, revision: 1, connection})};
   let host = new CodexHost(hostOptions);
-  t.after(() => host.close());
+  cleanup.push(() => host.close());
   const created = await host.dispatch('session.create', {sessionId: 'host-chat', profileId: 'local-fixture', cwd});
   assert.ok(created.threadId);
   let hostDone = Promise.withResolvers();
@@ -110,7 +114,13 @@ test('pinned real Codex streams a fixture response and resumes persisted native 
   const firstHistory = await host.dispatch('session.history', {sessionId: 'host-chat'});
   assert.ok(firstHistory.events.some(({event}) => event.type === 'assistant/message'));
   await host.close();
+  // Simulate a crash after Codex committed the turn but before the display end event.
+  const displayPath = join(hostOptions.root, 'threads', 'host-chat', 'display.jsonl');
+  const records = (await readFile(displayPath, 'utf8')).trimEnd().split('\n');
+  assert.equal(JSON.parse(records.pop()).event.type, 'turn/end');
+  await writeFile(displayPath, records.join('\n') + '\n');
   host = new CodexHost(hostOptions);
+  await host.dispatch('session.create', {sessionId: 'host-chat', profileId: 'local-fixture', cwd});
   assert.deepEqual(await host.dispatch('session.history', {sessionId: 'host-chat'}), firstHistory);
   hostDone = Promise.withResolvers();
   host.on('event', (_id, frame) => {if (frame.payload.event.type === 'turn/end') hostDone.resolve();});
@@ -118,4 +128,12 @@ test('pinned real Codex streams a fixture response and resumes persisted native 
   await hostDone.promise;
   const finalHistory = await host.dispatch('session.history', {sessionId: 'host-chat'});
   assert.equal(finalHistory.events.filter(({event}) => event.type === 'assistant/message').length, 2);
+  const ipc = new CodexIpcServer(host, join(root, 'host.sock')); await ipc.listen();
+  cleanup.push(() => ipc.close());
+  const native = await promisify(execFile)(process.env.AUGMENTOR_PYTHON ?? 'python3', [fileURLToPath(new URL('./fixtures/codex/native-client.py', import.meta.url))], {
+    timeout: 20000,
+    env: {...process.env, PYTHONPATH: fileURLToPath(new URL('../apps/native', import.meta.url)), PYTHONDONTWRITEBYTECODE: '1',
+      AUGMENTOR_CODEX_STATE: join(root, 'native'), AUGMENTOR_CODEX_SOCKET: ipc.socketPath, AUGMENTOR_CODEX_NO_AUTOSTART: '1', AUGMENTOR_CODEX_WORKSPACE: cwd},
+  });
+  assert.equal(JSON.parse(native.stdout).nativeAdapter, 'passed');
 });
