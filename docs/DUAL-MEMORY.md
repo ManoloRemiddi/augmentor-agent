@@ -43,7 +43,7 @@ of incremental page updates. Pages do not consume one another as evidence.
 
 ## Automatic lifecycle
 
-1. DSH/Pi capture committed human and assistant text with source IDs, speaker,
+1. DSH/Pi/Codex capture committed human and assistant text with source IDs, speaker,
    mode, completion status, session and timestamp. Audio, images, reasoning and
    tool internals are excluded; successful spoken reply text is captured.
 2. The companion immediately journals text locally. Reconnection/backfill captures
@@ -68,6 +68,14 @@ The companion can stay running, but an idle open window is not activity and it
 cannot drain a backlog after chat ends or after a restart. Hindsight's autonomous
 worker/reconciliation/ticks are disabled. Cached recall remains usable during a
 separate processing pause. Short tasks may leave derived memory pending.
+
+Codex uses the same shared capture client in the development launcher; see
+[Codex qualification](CODEX-INTEGRATION.md#codex-memory-launcher-and-existing-interface-controls).
+Original text is split into ordered pieces of at most 8,000 UTF-16 code units
+without splitting a Unicode surrogate pair. Rejoining the pieces preserves the
+source exactly, including emoji and multilingual text. Stable piece IDs prevent
+restart/backfill duplicates. The Codex native journal remains authoritative even
+when the memory companion is unavailable.
 
 ## Storage, migration and failure handling
 
@@ -143,6 +151,9 @@ not silently redirected into these automatic banks.
   omission and bounded context.
 - `tests/dual-memory-integration.test.mjs`: real DSH/Pi adapters with explicitly
   labelled fixture engines, text/voice capture and one effective context snapshot.
+- `tests/codex-memory-runtime.test.mjs`: actual pinned Codex and isolated Python
+  companions, both-interface controls, capture/recall, pause, Stop, outage,
+  Unicode chunk reconstruction and restart dedupe; inference is synthetic.
 - `scripts/proof-controlled-memory.py`: opt-in disposable pinned-engine proof;
   default fixture model injects a failure, `--live` uses the existing model within
   the normal budget. See [the controlled guide](CONTROLLED-MEMORY.md).

@@ -2,6 +2,19 @@
 
 # Start here: agent handoff
 
+## October 1 Unicode capture integrity and platform checkpoint
+
+[Unicode source integrity](CODEX-INTEGRATION.md#original-memory-text-across-unicode-storage-boundaries)
+now preserves emoji across shared memory chunk boundaries. An actual pinned
+Codex/real companion proof reproduced SQLite rejection of split surrogate pairs
+and verifies exact source reconstruction plus restart dedupe after the fix.
+Build/type and all 356 root Node tests pass with real-engine opt-in, including
+actual DSH/Pi regression contracts. `4ac6a54` passed both Mac jobs, Debian
+application/native/Chromium checks and Home. Debian packaging still stops at the
+unreviewed Codex native executable notice gate. Continue full C0–C9; complete
+memory stages/quality, live providers, eligible subscription login and release
+qualification remain open. No installed app or private speech source changed.
+
 ## October 1 Codex memory source activation and both interfaces
 
 [Launcher and UI qualification](CODEX-INTEGRATION.md#codex-memory-launcher-and-existing-interface-controls)

@@ -244,3 +244,22 @@ test('standalone launcher and actual native Qt memory controls pause capture and
   assert.equal(captured.length, 4);
   assert.doesNotMatch(JSON.stringify(captured), /NATIVE_CAPTURE_PAUSED_TEXT|augmentor_memory_manifest|external_augmentor_memory_data/);
 });
+
+
+test('actual pinned Codex capture preserves non-BMP text across source chunks and restart', {timeout:15000}, async t => {
+  const f = await fixture(t);
+  const prefix = 'MODEL_STEP_1 ';
+  const input = prefix + 'a'.repeat(7999-prefix.length) + '😀' + '文'.repeat(7997) + '🚀' + 'End of original source.';
+  await f.prompt('unicode-source', input);
+  await f.host.close();
+  const rows = (await f.exported('codex:one')).events;
+  const userRows = rows.filter(row=>row.role==='user');
+  assert.equal(userRows.length,3); assert.ok(userRows.every(row=>row.content.length<=8000));
+  assert.equal(userRows.map(row=>row.content).join(''), input);
+  assert.equal(rows.filter(row=>row.role==='assistant').map(row=>row.content).join(''), 'PUBLIC_REPLY_1');
+  assert.ok(rows.every(row=>!/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/u.test(row.content)));
+  const original = rows.map(row=>({id:row.event_id,content:row.content}));
+  f.open(); await f.host.dispatch('session.queue',{sessionId:'one'}); await f.host.close();
+  assert.deepEqual((await f.exported('codex:one')).events.map(row=>({id:row.event_id,content:row.content})),original);
+  assert.equal(f.requests.length,1,'backfill never repeats the model request');
+});

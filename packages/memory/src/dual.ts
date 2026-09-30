@@ -29,7 +29,17 @@ export class DualMemoryClient{
   }
   append(events:MemoryEvent[]){
     // Chunk without dropping raw text; IDs retain reconstruction order.
-    const pieces=events.flatMap(event=>Array.from({length:Math.ceil(event.content.length/8000)},(_,n)=>({...event,id:event.id+':'+n,content:event.content.slice(n*8000,(n+1)*8000)})));
+    const pieces=events.flatMap(event=>{
+      const parts:MemoryEvent[]=[];
+      for(let start=0,n=0;start<event.content.length;n++){
+        let end=Math.min(start+8000,event.content.length);
+        // Never turn a valid non-BMP character into two lone surrogates. SQLite
+        // rejects those strings; one bad piece would roll back the whole batch.
+        if(end<event.content.length&&event.content.charCodeAt(end-1)>=0xd800&&event.content.charCodeAt(end-1)<=0xdbff&&event.content.charCodeAt(end)>=0xdc00&&event.content.charCodeAt(end)<=0xdfff)end--;
+        parts.push({...event,id:event.id+':'+n,content:event.content.slice(start,end)});start=end;
+      }
+      return parts;
+    });
     this.pending.push(...pieces);
     const admission=this.activityWrites;
     this.writes=this.writes.then(async()=>{await admission;while(this.pending.length){const batch=this.pending.slice(0,50);await this.rpc('append',{events:batch},AbortSignal.timeout(5000));this.pending.splice(0,batch.length);}}).catch(()=>{

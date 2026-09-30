@@ -157,6 +157,9 @@ child capture cutoffs, capture pause/restart, Stop while a completed memory repl
 is held at the transport boundary, explicit continuation and unavailable-service
 recovery from public native history without model replay. Its service fixture
 allowlists the child environment and uses empty state without owner configuration.
+A further actual host/companion case captures emoji at both 8,000-unit chunk
+boundaries with multilingual text, requires exact three-piece reconstruction,
+and verifies identical durable IDs/content after restart without model replay.
 Inference is deterministic; Hindsight is unconfigured. These are host/companion
 transport proofs, not controlled-engine generation, live quality or installed UI
 qualification. Run with `AUGMENTOR_PYTHON` pointing at the test Python environment.

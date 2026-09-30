@@ -1604,3 +1604,25 @@ window lifecycle validation asserted animation completion after a fixed 350 ms;
 it now waits at most 1.5 seconds for the actual transition and still requires the
 activity timer to be running. No animation/product behavior was changed.
 Mac 14 passed at that ref. Fresh platform CI is required for this activation.
+
+## Original memory text across Unicode storage boundaries
+
+The shared memory capture client previously split text at fixed 8,000 UTF-16
+code-unit offsets. An emoji crossing that offset became two invalid surrogate
+strings. The Python companion's SQLite write rejected them and rolled back the
+entire capture batch, while Codex's native conversation remained intact. Chunk
+boundaries now preserve each valid surrogate pair. Piece IDs remain sequential
+and deterministic; ordinary existing boundaries are unchanged. No inference,
+identity, schema, conversation history or installed setting is changed.
+
+A new actual pinned-host/real-companion proof first reproduced the lost capture,
+then verified exact reconstruction of a three-piece multilingual message,
+complete assistant capture and restart with identical IDs/content and no model
+replay. It uses synthetic inference and empty state. Malformed source input is
+not silently repaired. Build/type and **all 356 root Node tests** pass on Linux
+with the real-engine opt-in enabled, including existing actual DSH/Pi lifecycle
+checks against the installed qualification host. The preceding `4ac6a54` also
+passed both Mac jobs, Debian application/native/Chromium checks and Home; Debian
+packaging still stops at the unreviewed Codex native executable notice gate.
+These results do not close the remaining C0–C9 provider/account, complete memory
+stage/quality, physical acceptance or distribution requirements.
