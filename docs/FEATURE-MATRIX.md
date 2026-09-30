@@ -24,6 +24,8 @@ an isolated real Mac/DSH fixture; the public signed app, additional plugins and
 complete feature parity are not yet qualified.
 # Feature ownership and compatibility · Augmentor 0.2.9 development
 
+See [embedded Browser and specialist workspaces](WORKSPACE-EMBEDDING.md) for the product-owned iframe host, dedicated role/tool composition, scoped memory and release lifecycle.
+
 DSH personal surfaces now share the agent, tools and speech engine; see [shared surfaces and evidence](SHARED-SURFACES-2026-09-24.md).
 
 Current source/ref and qualification: [agent handoff](AGENT-HANDOFF.md).

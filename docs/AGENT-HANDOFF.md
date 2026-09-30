@@ -2,6 +2,16 @@
 
 # Start here: agent handoff
 
+## September 30 application SDK foundation
+
+[SDK foundation](APP-SDK.md) owns the DSH-only application contract, exact tool
+grants, recoverable profile installation and experimental workspace voice toggle.
+The SDK is a separate private repository; product changes belong here. Preserve
+the owner’s independent third-app test. Source qualification is recorded there;
+source success does not imply activation of any existing application.
+
+See [embedded Browser and specialist workspaces](WORKSPACE-EMBEDDING.md) for product-owned embedding, scoped tools and memory.
+
 ## September 27 installed Chromium browser choice
 
 [Browser choice qualification](MACOS-BROWSER-CHOICE.md) records the generic Mac
