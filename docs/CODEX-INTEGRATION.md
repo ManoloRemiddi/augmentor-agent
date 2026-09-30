@@ -1139,3 +1139,36 @@ runtime/native Qt/Chromium proofs remain passing in the root suite. This does no
 claim recovery for processes that deliberately establish a different group or
 for a simultaneous kill of both owner and guard; those need separate ownership
 and OS supervision qualification. No installed application was changed.
+
+
+## Native command crash qualification and speech dependency
+
+The process-guard checkpoint now has real pinned 0.159.2 evidence beyond the
+synthetic wrapper. One fixture starts a PTY through `command/exec`; another uses
+a synthetic Responses provider to invoke Codex's actual `exec_command` tool,
+yields a background terminal, and completes the assistant turn. Both commands
+run in process groups different from the guard and deliberately ignore TERM.
+The second fixture verifies that native idle inspection refuses that background
+terminal even after the root turn is complete. Killing the Augmentor RPC owner
+with SIGKILL stops both commands through native connection cleanup. The test
+uses disposable directories and no live model, account or installed service.
+All 321 root Node tests pass, including 15 transport/lifecycle cases.
+This still does not establish behavior for arbitrary daemons that escape native
+ownership or simultaneous owner/native/guard death.
+
+C7 work now has a proposed independent speech dependency:
+[Resonant Voice PR #3](https://github.com/ManoloRemiddi/resonant-voice/pull/3),
+source `7267ad8`, development version **0.1.17**. Its opt-in Codex bridge binds
+harness, product session and a private connection identity. Ordered events and
+current-request checks prevent cross-harness or stale playback. A host heartbeat
+lease invalidates audio and closes recognition if the trusted bridge disappears.
+The existing DSH route remains compatible; 37 service tests and an isolated real
+DSH 0.1.5-rc.1 lifecycle fixture pass with synthetic LLM/TTS.
+
+Augmentor must still implement the trusted bridge client, ticket capability
+negotiation, public assistant-text streaming, Stop/failure/close cleanup, spoken
+request association, native/Browser wiring and a pinned distributable dependency.
+Keep `bridgeId` and the service token out of model events and surface tickets.
+Do not enable Augmentor's voice capability until that end-to-end integration is
+verified. Physical audio acceptance on both platforms remains required. The
+speech source change does not deploy or change Qwen/Breeze placement/settings.

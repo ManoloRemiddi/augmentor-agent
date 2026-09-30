@@ -110,3 +110,30 @@ test('normal guarded shutdown sends one TERM so native cleanup is not force-esca
   await rpc.call('observe-term', {path}); await rpc.close();
   assert.equal(readFileSync(path, 'utf8'), 'TERM\n');
 });
+
+for (const mode of ['pty', 'tool']) test(`pinned native ${mode} cleanup survives an uncatchable owner crash`, {skip: process.platform === 'win32', timeout: 15000}, async t => {
+  const root = mkdtempSync(join(tmpdir(), 'codex-native-crash-'));
+  const owner = fork(fileURLToPath(new URL('./fixtures/codex/native-crash-owner.mjs', import.meta.url)), [root, mode], {stdio: ['ignore', 'ignore', 'pipe', 'ipc']});
+  let descendant, guard, errors = '';
+  owner.stderr.on('data', chunk => errors += chunk);
+  t.after(() => {
+    owner.kill('SIGKILL');
+    for (const pid of [descendant, guard ? -guard : undefined]) if (pid) try {process.kill(pid, 'SIGKILL');} catch {}
+    rmSync(root, {recursive: true, force: true});
+  });
+  const ready = await new Promise((resolve, reject) => {
+    owner.once('message', resolve); owner.once('exit', () => reject(new Error('Native owner exited before ready: ' + errors)));
+  });
+  descendant = ready.descendant; guard = ready.guard;
+  if (mode === 'tool') {assert.equal(ready.idle, false); assert.equal(ready.terminals, 1); assert.equal(ready.requests, 2);}
+  const running = pid => {
+    try {return !/^Z/.test(execFileSync('ps', ['-o', 'stat=', '-p', String(pid)], {encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore']}).trim());}
+    catch {return false;}
+  };
+  const group = pid => Number(execFileSync('ps', ['-o', 'pgid=', '-p', String(pid)], {encoding: 'utf8'}).trim());
+  assert.equal(running(descendant), true);
+  assert.notEqual(group(descendant), group(guard), 'the real native PTY must exercise a separate group');
+  const exited = once(owner, 'exit'); owner.kill('SIGKILL'); await exited;
+  for (let i = 0; i < 160 && running(descendant); i++) await delay(25);
+  assert.equal(running(descendant), false, 'native connection cleanup must stop its separately owned PTY');
+});

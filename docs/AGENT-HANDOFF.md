@@ -2,6 +2,22 @@
 
 # Start here: agent handoff
 
+## September 30 native crash proof and speech dependency
+
+[Crash and speech checkpoint](CODEX-INTEGRATION.md#native-command-crash-qualification-and-speech-dependency)
+adds actual pinned Codex PTY and background `exec_command` cleanup after owner
+SIGKILL. The tool fixture finishes its root turn first and proves native idle
+inspection still sees the background terminal. Both separate native groups stop;
+321 root tests pass. Arbitrary escaped daemons remain outside this evidence.
+C7 now has [Resonant Voice PR #3](https://github.com/ManoloRemiddi/resonant-voice/pull/3),
+source `7267ad8`, development 0.1.17, with a scoped Codex bridge and host-expiry
+cleanup. All 37 speech tests and the isolated real-DSH lifecycle fixture pass.
+Continue the Augmentor host bridge, exact public-text/request association and
+both voice surfaces, then dependency/artifact and physical audio qualification.
+Voice stays disabled until this wiring works. No installed apps or model settings
+changed. Full C0–C9 remains active, including subscription/account, memory and
+packaging gates.
+
 ## September 30 Codex crash cleanup guard
 
 [Process guard](CODEX-INTEGRATION.md#process-group-cleanup-after-an-owner-crash)
