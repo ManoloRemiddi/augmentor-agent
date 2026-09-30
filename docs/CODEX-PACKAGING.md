@@ -20,6 +20,9 @@ Codex component. Do not treat a matching hash as a complete license review.
   archives verified against the original lockfile and seven Git source archives
   pinned by commit. The source lock contains 1,472 packages including 159 workspace
   packages and 16 packages from the seven Git repositories.
+- [Notice supplements](../release/codex/notice-supplements.json): 53 exact-commit
+  repository archives with candidate notice paths and hashes. Applicability still
+  requires review; these are not declarations of license clearance.
 - [Native source inputs](../release/codex/native-sources.json): dependency versions,
   upstream recipe provenance and retrieved archive checksums. This is not yet a
   complete inventory of the native code linked into Rust/V8/compiler binaries.
@@ -55,13 +58,23 @@ dependencies; it is not evidence that every collected package is linked into Lin
 ## September 30 evidence and next work
 
 The actual collection verified all 1,304 external source archives and preserved
-4,688 notice/metadata files. Of these archives, 139 lack standalone notice files;
-129 of those identify a VCS commit. The recorded missing-notice list includes
+4,690 notice/metadata files after including SPDX-named files inside `LICENSES/`
+directories. Of these archives, 138 lack standalone notice files;
+128 of those identify a VCS commit. The recorded missing-notice list includes
 repository and VCS provenance for follow-up. A second collection using the pinned
-archive catalog produced a byte-identical report from the verified cache. The
+archive catalog produced a byte-identical report from the verified cache before
+the nested-license correction (4,688 files and 139 missing sources). The
 Rust 1.95.0 source archive was also verified against its upstream checksum.
 A license expression in Cargo metadata
 is not substituted for the missing attribution text.
+
+A subsequent collection also verified all 53 supplementary repository archives.
+Their candidate index records 145 notice files, with candidates for 116 of the
+remaining 138 missing-notice sources; 22 have no retrieved candidate. The collector
+retains the full available notice set from those archives separately from the
+locked-source collection. Candidate retrieval does not establish applicability or
+linked-binary coverage. Metadata-only license declarations are not counted as
+resolved standalone notices.
 
 The native verifier matches all 32 installed supplier payloads and returns
 `releaseApproval: false`. It detects added, missing, modified and symlinked files.

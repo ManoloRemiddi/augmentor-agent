@@ -56,8 +56,10 @@ OAuth, memory, voice and artifact qualification.
 
 [Packaging inventory](CODEX-PACKAGING.md) now pins the complete observed Linux
 Codex native payload and source inputs. The collector verifies 1,304 locked source
-archives without rewriting Cargo resolution; 139 missing-notice sources remain
-explicit review work. The existing Debian gate is not bypassed. Continue its source
+archives without rewriting Cargo resolution. The corrected nested-license scan
+leaves 138 missing-notice sources. Another 53 exact-commit archives supply candidate
+notices for 116 of those; 22 lack a retrieved candidate. Applicability and native
+binary coverage remain explicit review work. The existing Debian gate is not bypassed. Continue its source
 coverage work and the remaining runtime/product phases independently.
 
 New Codex chats now bind the maintained shared persona through developer

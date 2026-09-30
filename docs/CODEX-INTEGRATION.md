@@ -276,8 +276,10 @@ inventory gate for Codex, after application checks; no bypass was added.
 
 [Codex packaging](CODEX-PACKAGING.md) records 32 supplier native-file hashes and
 ABI requirements, the exact upstream source pin and a reproducible source collector.
-It verified 1,304 locked external archives and retained 4,688 notice/metadata files,
-with 139 missing-notice sources explicitly pending. The payload verifier detects
+It verified 1,304 locked external archives and, after the nested-license scan fix,
+retained 4,690 notice/metadata files with 138 missing-notice sources. Another 53
+exact-commit archives supply candidate attribution for 116 of these; 22 remain
+without a retrieved candidate. Candidate applicability is still pending. The payload verifier detects
 drift but does not grant release clearance. Debian's unknown-native-file gate is
 unchanged. C8 remains incomplete until notice/source coverage, Mac parity and real
 artifact execution/rollback are qualified.

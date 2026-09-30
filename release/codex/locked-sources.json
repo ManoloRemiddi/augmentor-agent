@@ -11749,7 +11749,7 @@
       "bytes": 293806
     }
   ],
-  "noticeFileCount": 4688,
+  "noticeFileCount": 4690,
   "missingNoticeSources": [
     "crates/Inflector-0.11.4.crate",
     "crates/age-0.11.2.crate",
@@ -11762,7 +11762,6 @@
     "crates/block2-0.6.2.crate",
     "crates/clipboard-win-5.4.1.crate",
     "crates/cookie-factory-0.3.3.crate",
-    "crates/crc-catalog-2.4.0.crate",
     "crates/crc32c-0.6.8.crate",
     "crates/dasp_sample-0.11.0.crate",
     "crates/debugserver-types-0.5.0.crate",
@@ -11984,15 +11983,6 @@
       "repository": "https://github.com/rust-bakery/cookie-factory",
       "git": {
         "sha1": "d36b805dbd7dd65f2df947235c5bcc573afe2c76"
-      },
-      "pathInVcs": ""
-    },
-    {
-      "source": "crates/crc-catalog-2.4.0.crate",
-      "license": "MIT OR Apache-2.0",
-      "repository": "https://github.com/akhilles/crc-catalog.git",
-      "git": {
-        "sha1": "b500ea693c552f8d946e290722a7b3ee8b9a7ee2"
       },
       "pathInVcs": ""
     },

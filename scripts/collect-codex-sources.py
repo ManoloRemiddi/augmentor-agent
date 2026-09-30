@@ -76,7 +76,7 @@ def notices(row, cache, out):
             relative = PurePosixPath(member.name)
             if relative.is_absolute() or '..' in relative.parts: raise ValueError('Unsafe archive path')
             if not member.isfile(): continue
-            is_notice = bool(NOTICE.search(relative.name))
+            is_notice = bool(NOTICE.search(relative.name)) or any(part.lower() in ('licenses', 'licences', 'license', 'licence') for part in relative.parts[1:-1])
             is_manifest = relative.name in ('Cargo.toml', 'Cargo.toml.orig') and len(relative.parts) == 2
             if not is_notice and not is_manifest: continue
             if member.size > 8*1024*1024: raise ValueError('Oversized notice: '+member.name)
@@ -107,14 +107,19 @@ def collect(source, cache, out):
     cache.mkdir(parents=True, exist_ok=True)
     with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
         sources = list(pool.map(lambda row: fetch(row, cache), rows))
+    supplement_catalog = json.loads((ROOT/'release/codex/notice-supplements.json').read_text())
+    supplement_rows = [{'name': row['repository'], 'version': row['commit'], 'kind': 'notice-supplement', 'file': 'supplements/'+row['file'], 'url': row['url'], 'sha256': row['sha256']} for row in supplement_catalog['sources']]
+    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
+        supplements = list(pool.map(lambda row: fetch(row, cache), supplement_rows))
     if out.exists(): raise ValueError('Choose a new collection directory')
     out.mkdir(parents=True)
     records = [notices(row, cache, out/'notices') for row in sources]
+    supplement_records = [notices(row, cache, out/'notices') for row in supplements]
     report = {'schema': 'augmentor-codex-sources/1', 'sourceCommit': pin['commit'], 'sourceLockSha256': pin['files']['codex-rs/Cargo.lock'],
               'coverage': 'All external packages in the release lockfile; includes unused/platform/build dependencies. Does not establish linked native dependency coverage.',
-              'binaryCoverageVerified': False, 'archives': sources, 'records': records}
+              'binaryCoverageVerified': False, 'archives': sources, 'records': records, 'supplementArchives': supplements, 'supplementRecords': supplement_records}
     (out/'collection.json').write_text(json.dumps(report, indent=2)+'\n')
-    print(json.dumps({'archives': len(sources), 'noticeFiles': sum(len(r['files']) for r in records),
+    print(json.dumps({'archives': len(sources), 'supplementArchives': len(supplements), 'noticeFiles': sum(len(r['files']) for r in records),
                       'needsNoticeReview': [r['source'] for r in records if r['needsNoticeReview']]}))
 
 

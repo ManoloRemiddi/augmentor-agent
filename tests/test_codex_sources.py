@@ -36,13 +36,13 @@ source = "git+https://github.com/example/fork.git?rev='''+('b'*40)+'#'+('b'*40)+
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory);archive=root/'fixture.crate'
             with tarfile.open(archive,'w:gz') as target:
-                for name,content in [('fixture-1/LICENSE','Copyright fixture'),('fixture-1/Cargo.toml','[package]\nname="fixture"\nversion="1"\nlicense="MIT"\n'),('fixture-1/src/main.rs','unneeded code')]:
+                for name,content in [('fixture-1/LICENSE','Copyright fixture'),('fixture-1/Cargo.toml','[package]\nname="fixture"\nversion="1"\nlicense="MIT"\n'),('fixture-1/LICENSES/MIT.txt','Nested license attribution'),('fixture-1/src/main.rs','unneeded code')]:
                     content=content.encode();member=tarfile.TarInfo(name);member.size=len(content);target.addfile(member,io.BytesIO(content))
             row={'file':archive.name,'sha256':hashlib.sha256(archive.read_bytes()).hexdigest()}
             self.assertEqual(module.fetch(row,root)['sha256'],row['sha256'])
             record=module.notices(row,root,root/'notices')
             self.assertEqual(record['license'],'MIT');self.assertFalse(record['needsNoticeReview'])
-            self.assertEqual(len(record['files']),2)
+            self.assertEqual(len(record['files']),3)
             archive.write_bytes(b'changed')
             with self.assertRaisesRegex(ValueError,'checksum mismatch'):module.fetch(row,root)
 
