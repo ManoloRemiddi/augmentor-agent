@@ -2,6 +2,20 @@
 
 # Start here: agent handoff
 
+## September 30 Codex crash cleanup guard
+
+[Process guard](CODEX-INTEGRATION.md#process-group-cleanup-after-an-owner-crash)
+now keeps POSIX group ownership alive if the Augmentor RPC owner is killed.
+A private liveness channel triggers scoped cleanup; wrapper exit also retires
+helpers. Normal shutdown sends only one TERM to preserve native graceful cleanup.
+Build/type and 318 root tests pass; 13 final transport cases include host SIGKILL,
+an ignored-TERM helper, unrelated-process survival and single-TERM behavior.
+The maintenance checkpoint `25f4ba6` has Mac run `36759092419` active; its Validate
+run is `36759092307`. Prior `3c00243` Debian checks reached the known unreviewed
+Codex binary gate; its Mac run was cancelled. No installed apps changed. Continue
+native shell groups that escape the guard, unknown-native-identity recovery and
+the full C0–C9 integration; simultaneous owner/guard death is not qualified.
+
 ## September 30 Codex maintenance native-idle verification
 
 [Maintenance verification](CODEX-INTEGRATION.md#native-idle-verification-before-maintenance)

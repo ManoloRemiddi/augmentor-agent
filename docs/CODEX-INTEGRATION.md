@@ -1112,3 +1112,30 @@ These are observed-idle checks, not an upstream atomic quiesce protocol. They do
 not resolve orphan processes after an uncatchable host crash or authorize stopping
 unknown work. Full lifecycle, account, memory, voice and release qualification
 remain required by the C0–C9 plan.
+
+
+## Process-group cleanup after an owner crash
+
+On Linux and macOS, each `CodexRpc` starts a small Node process guard as its
+separate POSIX process-group leader. The guard starts the existing pinned runtime
+in that group and passes its standard streams through unchanged. A private IPC
+channel connects only the guard and its owning Augmentor process. Host death
+closes the channel, so the surviving guard sends TERM and enforces a two-second
+KILL deadline without looking up, persisting or trusting a possibly reused PID.
+Native exit or spawn failure also retires the group, including helpers that
+outlive the wrapper. The guard's own live PID remains the group identity.
+
+Normal RPC shutdown already sends TERM to that group. The guard does not send a
+second TERM in response: upstream may interpret a second shutdown signal as a
+request to skip graceful cleanup. Windows retains its existing direct process
+path and is not qualified by this POSIX change. Each chat worker therefore has
+an additional small supervisor process; the chat-worker capacity is unchanged.
+
+Build/type checks and the full 318-test root suite pass with the guard. The final
+13 focused transport tests also include a single-TERM regression. An isolated
+process test kills the RPC owner with SIGKILL, verifies a helper that ignores TERM
+is retired, and confirms an unrelated process stays alive. Existing real pinned
+runtime/native Qt/Chromium proofs remain passing in the root suite. This does not
+claim recovery for processes that deliberately establish a different group or
+for a simultaneous kill of both owner and guard; those need separate ownership
+and OS supervision qualification. No installed application was changed.

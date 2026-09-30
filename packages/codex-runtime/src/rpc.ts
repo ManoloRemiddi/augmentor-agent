@@ -1,6 +1,7 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {spawn, type ChildProcessWithoutNullStreams} from 'node:child_process';
 import {EventEmitter} from 'node:events';
+import {fileURLToPath} from 'node:url';
 import {RELEASE} from '../../contracts/src/release.js';
 
 export type RpcId = string | number;
@@ -44,11 +45,15 @@ export class CodexRpc extends EventEmitter {
   }
   start(): void {
     if (this.child || this.failure) throw new CodexTransportError('Codex process cannot be started twice.');
-    const child = spawn(this.options.command, this.options.args, {
-      cwd: this.options.cwd, env: this.options.env, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true,
+    const guarded = process.platform !== 'win32';
+    const command = guarded ? process.execPath : this.options.command;
+    const args = guarded ? [fileURLToPath(new URL('./process-guard.js', import.meta.url)), this.options.command, ...this.options.args] : this.options.args;
+    const child = spawn(command, args, {
+      cwd: this.options.cwd, env: this.options.env,
+      stdio: guarded ? ['pipe', 'pipe', 'pipe', 'ipc'] : ['pipe', 'pipe', 'pipe'], windowsHide: true,
       // Own a distinct process group so wrapper/native/helper shutdown stays scoped.
-      detached: process.platform !== 'win32',
-    });
+      detached: guarded,
+    }) as ChildProcessWithoutNullStreams;
     this.child = child;
     child.stdout.on('data', (chunk: Buffer) => this.receive(chunk));
     // Upstream diagnostics can include prompts or credentials. Consume without forwarding.

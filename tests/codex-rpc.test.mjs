@@ -2,7 +2,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {once} from 'node:events';
-import {execFileSync} from 'node:child_process';
+import {mkdtempSync, readFileSync, rmSync} from 'node:fs';
+import {join} from 'node:path';
+import {tmpdir} from 'node:os';
+import {execFileSync, fork, spawn} from 'node:child_process';
 import {setTimeout as delay} from 'node:timers/promises';
 import {fileURLToPath} from 'node:url';
 import {CodexRpc, CodexTransportError, CodexRemoteError} from '../dist/codex-runtime/src/rpc.js';
@@ -76,4 +79,34 @@ for (const mode of ['close', 'crash']) test(`Codex wrapper ${mode} stops owned d
   else await assert.rejects(rpc.call('crash'), CodexTransportError);
   for (let attempt = 0; attempt < 40 && running(); attempt++) await delay(25);
   assert.equal(running(), false);
+});
+
+
+test('an uncatchable owner crash retires its Codex group without stopping an unrelated process', {skip: process.platform === 'win32', timeout: 10000}, async t => {
+  const unrelated = spawn(process.execPath, ['-e', 'setInterval(()=>{},1000)'], {stdio: 'ignore'});
+  const owner = fork(fileURLToPath(new URL('./fixtures/codex/crash-owner.mjs', import.meta.url)), [], {stdio: ['ignore', 'ignore', 'ignore', 'ipc']});
+  let descendant;
+  t.after(() => {
+    owner.kill('SIGKILL'); unrelated.kill('SIGKILL');
+    if (descendant) try {process.kill(descendant, 'SIGKILL');} catch {}
+  });
+  const [message] = await once(owner, 'message'); descendant = message.descendant;
+  const running = pid => {
+    try {return !/^Z/.test(execFileSync('ps', ['-o', 'stat=', '-p', String(pid)], {encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore']}).trim());}
+    catch {return false;}
+  };
+  assert.equal(running(descendant), true);
+  const exited = once(owner, 'exit'); owner.kill('SIGKILL'); await exited;
+  for (let i = 0; i < 120 && running(descendant); i++) await delay(25);
+  assert.equal(running(descendant), false, 'the liveness channel must clean up helpers that ignore TERM');
+  assert.equal(running(unrelated.pid), true);
+});
+
+
+test('normal guarded shutdown sends one TERM so native cleanup is not force-escalated', {skip: process.platform === 'win32'}, async t => {
+  const root = mkdtempSync(join(tmpdir(), 'codex-term-'));
+  t.after(() => rmSync(root, {recursive: true, force: true}));
+  const rpc = await client(t), path = join(root, 'signals');
+  await rpc.call('observe-term', {path}); await rpc.close();
+  assert.equal(readFileSync(path, 'utf8'), 'TERM\n');
 });
