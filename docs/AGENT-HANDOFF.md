@@ -2,6 +2,16 @@
 
 # Start here: agent handoff
 
+## September 30 Codex runtime foundation
+
+[Implementation evidence](CODEX-INTEGRATION.md) records the pinned 0.159.2
+app-server transport, durable submission ledger and session driver. The real
+Linux binary passes streaming/tool/Stop/reopen against a synthetic Responses
+endpoint; 17 focused tests pass. This is partial C0/C1 work. Continue the full
+[build plan](CODEX-INTEGRATION-PLAN.md): shared host/IPC, profiles, both actual
+surfaces, login, tools, memory, voice and release qualification remain. Codex is
+not yet selectable and no installed application was changed.
+
 ## September 30 application SDK foundation
 
 [SDK foundation](APP-SDK.md) owns the DSH-only application contract, exact tool

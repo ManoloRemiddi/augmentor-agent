@@ -2,6 +2,14 @@
 
 # Source baselines and migration inventory
 
+## Codex foundation — 30 September 2026
+
+`@openai/codex` 0.159.2 is pinned in the root lockfile. The installed Linux x64
+app-server passes the isolated fixture protocol/tool/history proof described in
+[Codex implementation evidence](CODEX-INTEGRATION.md). Its declared license is
+Apache-2.0. Other target binaries, real providers, OAuth eligibility and product
+surface integration remain unqualified; this pin is not a release certification.
+
 ## Home preview — 24 September 2026
 
 `apps/home/package-lock.json` pins the exercised DSH 0.1.5-rc.1 packages,

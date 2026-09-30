@@ -1,0 +1,101 @@
+// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {existsSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {durableJson, readPrivateJson} from './storage.js';
+
+export type OperationStatus = 'queued' | 'unconfirmed' | 'accepted' | 'completed' | 'failed' | 'interrupted' | 'cancelled';
+export interface Operation {
+  id: string;
+  input: string;
+  fingerprint: string;
+  status: OperationStatus;
+  createdAt: number;
+  updatedAt: number;
+  turnId?: string;
+}
+interface RecordFile {schema: 1; threadId: string; operations: Operation[]}
+const TERMINAL = new Set<OperationStatus>(['completed', 'failed', 'interrupted', 'cancelled']);
+const validId = (id: unknown): id is string => typeof id === 'string' && /^[a-zA-Z0-9_.:-]{1,128}$/.test(id);
+const fingerprint = (input: string) => createHash('sha256').update(input).digest('hex');
+
+/** Per-thread durable admission ledger. Upstream acknowledgment is never assumed idempotent. */
+export class OperationLedger {
+  private data: RecordFile;
+  constructor(readonly path: string, readonly threadId: string) {
+    if (!validId(threadId)) throw new Error('Invalid Codex thread identity.');
+    if (existsSync(path)) {
+      const data = readPrivateJson(path) as RecordFile;
+      if (data?.schema !== 1 || data.threadId !== threadId || !Array.isArray(data.operations)) throw new Error('Unsupported or mismatched Codex operation ledger.');
+      const ids = new Set<string>();
+      for (const operation of data.operations) {
+        if (!validId(operation.id) || ids.has(operation.id) || typeof operation.input !== 'string' ||
+          operation.fingerprint !== fingerprint(operation.input) || !['queued', 'unconfirmed', 'accepted', ...TERMINAL].includes(operation.status) ||
+          !Number.isFinite(operation.createdAt) || !Number.isFinite(operation.updatedAt) ||
+          (operation.turnId !== undefined && !validId(operation.turnId))) throw new Error('Corrupt Codex operation ledger; automatic submission is disabled.');
+        ids.add(operation.id);
+      }
+      this.data = data;
+    } else {this.data = {schema: 1, threadId, operations: []}; this.save();}
+  }
+  list(): Operation[] {return structuredClone(this.data.operations);}
+  get(id: string): Operation {
+    const value = this.data.operations.find(operation => operation.id === id);
+    if (!value) throw new Error('Unknown Codex operation.');
+    return structuredClone(value);
+  }
+  enqueue(id: string, input: string): {operation: Operation; created: boolean} {
+    if (!validId(id) || typeof input !== 'string' || !input.trim() || input.length > 65536) throw new Error('Invalid Codex submission.');
+    const digest = fingerprint(input);
+    const existing = this.data.operations.find(operation => operation.id === id);
+    if (existing) {
+      if (existing.fingerprint !== digest) throw new Error('Submission identity was reused for different input.');
+      return {operation: structuredClone(existing), created: false};
+    }
+    if (this.data.operations.filter(operation => operation.status === 'queued').length >= 100) throw new Error('Codex input queue is full.');
+    const now = Date.now();
+    const operation: Operation = {id, input, fingerprint: digest, status: 'queued', createdAt: now, updatedAt: now};
+    this.commit([...this.data.operations, operation]);
+    return {operation: structuredClone(operation), created: true};
+  }
+  /** Call and persist BEFORE dispatch. Never automatically dispatch an unconfirmed operation. */
+  dispatch(id: string): Operation {
+    const operation = this.get(id);
+    if (operation.status !== 'queued') throw new Error('Only an undispatched queued operation can be sent.');
+    if (this.data.operations.some(value => value.status === 'accepted' || value.status === 'unconfirmed')) throw new Error('Reconcile the active or unconfirmed Codex operation first.');
+    return this.update(id, {status: 'unconfirmed'});
+  }
+  acknowledge(id: string, turnId: string): Operation {
+    if (!validId(turnId)) throw new Error('Invalid Codex turn identity.');
+    const operation = this.get(id);
+    if (operation.turnId && operation.turnId !== turnId) throw new Error('Codex operation acknowledgment changed its turn identity.');
+    if (TERMINAL.has(operation.status)) return operation; // A terminal event may precede the RPC response.
+    if (!['unconfirmed', 'accepted'].includes(operation.status)) throw new Error('Codex operation was not dispatched.');
+    return this.update(id, {status: 'accepted', turnId});
+  }
+  finish(id: string, status: 'completed' | 'failed' | 'interrupted', turnId?: string): Operation {
+    const operation = this.get(id);
+    if (turnId && (!validId(turnId) || (operation.turnId && operation.turnId !== turnId))) throw new Error('Codex terminal event belongs to a different turn.');
+    if (TERMINAL.has(operation.status)) {
+      if (operation.status !== status) throw new Error('Conflicting Codex terminal status.');
+      return operation;
+    }
+    if (operation.status === 'queued') throw new Error('An undispatched operation cannot have a terminal turn.');
+    return this.update(id, {status, ...(turnId ? {turnId} : {})});
+  }
+  cancelQueued(id: string): Operation {
+    if (this.get(id).status !== 'queued') throw new Error('Active work requires Codex turn interruption.');
+    return this.update(id, {status: 'cancelled'});
+  }
+  recover(): void {
+    this.commit(this.data.operations.map(operation => operation.status === 'accepted' ? {...operation, status: 'unconfirmed', updatedAt: Date.now()} : operation));
+  }
+  private update(id: string, patch: Partial<Operation>): Operation {
+    this.commit(this.data.operations.map(operation => operation.id === id ? {...operation, ...patch, updatedAt: Date.now()} : operation));
+    return this.get(id);
+  }
+  private commit(operations: Operation[]): void {
+    const next: RecordFile = {...this.data, operations};
+    durableJson(this.path, next); this.data = next;
+  }
+  private save(): void {durableJson(this.path, this.data);}
+}
