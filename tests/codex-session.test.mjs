@@ -9,14 +9,28 @@ import {CodexSession} from '../dist/codex-runtime/src/session.js';
 import {OperationLedger} from '../dist/codex-runtime/src/operations.js';
 import {CodexTransportError, CodexRemoteError} from '../dist/codex-runtime/src/rpc.js';
 import {chatEvents} from '../dist/codex-runtime/src/events.js';
-function fixture(t, call) {
+function fixture(t, call, prepare) {
   const root = mkdtempSync(join(tmpdir(), 'codex-session-'));
   const rpc = new EventEmitter(); rpc.call = call;
   const ledger = new OperationLedger(join(root, 'operations.json'), 'thread-1');
-  const session = new CodexSession(rpc, ledger);
+  const session = new CodexSession(rpc, ledger, prepare);
   t.after(() => {session.close(); rmSync(root, {recursive: true, force: true});});
   return {rpc, ledger, session};
 }
+test('native notifications during context preparation cannot acknowledge queued input, and Stop prevents dispatch', async t => {
+  let release, calls = 0, waits = true;
+  const {rpc, ledger, session} = fixture(t, async () => {calls++; return {turn: {id: 'new-turn'}};}, async (_operation, signal) => {
+    if (waits) await new Promise(resolve => {release = resolve;});
+    signal.throwIfAborted(); return {};
+  });
+  const pending = session.submit('new', 'Retain queued input.');
+  rpc.emit('notification', {method: 'turn/started', params: {threadId: 'thread-1', turn: {id: 'older-native-turn'}}});
+  assert.equal(ledger.get('new').status, 'queued'); assert.equal(ledger.get('new').turnId, undefined);
+  assert.equal((await session.interrupt()).interrupted, true);
+  release(); await pending;
+  assert.equal(calls, 0); assert.equal(ledger.get('new').status, 'queued'); assert.equal(ledger.paused, true);
+  waits = false; await session.continueQueue(); assert.equal(calls, 1); assert.equal(ledger.get('new').turnId, 'new-turn');
+});
 test('early terminal notification cannot revert completed work to accepted', async t => {
   const {rpc, ledger, session} = fixture(t, async () => {
     rpc.emit('notification', {method: 'turn/started', params: {threadId: 'thread-1', turn: {id: 'turn-1'}}});

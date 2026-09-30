@@ -6,6 +6,7 @@ import {OperationLedger, type Operation} from './operations.js';
 import {chatEvents} from './events.js';
 import {inputContext} from './input-context.js';
 import {nativeHistory, type NativeTurn} from './history.js';
+import type {ContinuityContext} from './memory-context.js';
 
 /** One native thread, with durable product admission around Codex's own agent loop. */
 export class CodexSession extends EventEmitter {
@@ -20,7 +21,8 @@ export class CodexSession extends EventEmitter {
   }
   private maintenance = false;
   private dispatchId?: string;
-  constructor(readonly rpc: CodexRpc, readonly ledger: OperationLedger) {
+  private preparing?: AbortController;
+  constructor(readonly rpc: CodexRpc, readonly ledger: OperationLedger, private readonly prepare?: (operation: Operation, signal: AbortSignal) => Promise<ContinuityContext>) {
     super();
     rpc.on('notification', this.notification);
     rpc.on('failure', this.failed);
@@ -88,17 +90,26 @@ export class CodexSession extends EventEmitter {
     if (operations.some(operation => ['unconfirmed', 'accepted'].includes(operation.status))) return;
     const queued = operations.find(operation => operation.status === 'queued');
     if (!queued) return;
-    this.sending = true; this.dispatchId = queued.id;
+    this.sending = true;
+    const preparing = new AbortController(); this.preparing = preparing;
     try {
+      const context = this.prepare ? await this.prepare(queued, preparing.signal) : {};
+      if (this.closed || this.paused || this.maintenance || preparing.signal.aborted) return;
+      this.preparing = undefined;
+      this.dispatchId = queued.id;
       this.ledger.dispatch(queued.id);
-      const result = await this.rpc.call('turn/start', {threadId: this.threadId, clientUserMessageId: queued.id, additionalContext: inputContext(queued.id), input: [{type: 'text', text: queued.input}]});
+      const result = await this.rpc.call('turn/start', {threadId: this.threadId, clientUserMessageId: queued.id, additionalContext: {...context, ...inputContext(queued.id)}, input: [{type: 'text', text: queued.input}]});
       this.ledger.acknowledge(queued.id, result.turn.id);
     } catch (error) {
+      if (preparing.signal.aborted && this.ledger.get(queued.id).status === 'queued') return;
       // A protocol rejection is definitive. Transport loss/timeout is never a rejection.
       if (error instanceof CodexRemoteError && [-32600, -32601, -32602].includes(error.code) && !this.ledger.get(queued.id).turnId) this.ledger.finish(queued.id, 'failed');
       this.paused = true;
       throw error;
-    } finally {this.sending = false; this.dispatchId = undefined;}
+    } finally {
+      this.preparing = undefined; this.sending = false; this.dispatchId = undefined;
+      if (['queued', 'failed'].includes(this.ledger.get(queued.id).status)) this.emit('preparation-stopped', queued.id);
+    }
     // The terminal event can arrive before the turn/start acknowledgment.
     if (this.ledger.get(queued.id).status === 'completed') this.schedulePump();
   }
@@ -134,10 +145,11 @@ export class CodexSession extends EventEmitter {
     this.emit('attention', {reason: 'runtime-disconnected'});
   };
   async interrupt(): Promise<{interrupted: boolean}> {
+    const preparing = Boolean(this.preparing); this.preparing?.abort();
     this.paused = true; // Stop must not start the next queued prompt.
     for (let attempt = 0; attempt < 20; attempt++) {
       const operation = this.ledger.list().find(value => ['accepted', 'unconfirmed'].includes(value.status));
-      if (!operation) return {interrupted: false};
+      if (!operation) return {interrupted: preparing};
       if (!operation.turnId) {
         if (!this.sending) throw new Error('The last submission outcome is unknown; reconcile the native thread before cancelling.');
         await delay(25); continue;
@@ -164,7 +176,7 @@ export class CodexSession extends EventEmitter {
     }
   }
   close(): void {
-    this.closed = true;
+    this.closed = true; this.preparing?.abort();
     this.rpc.off('notification', this.notification); this.rpc.off('failure', this.failed);
   }
 }

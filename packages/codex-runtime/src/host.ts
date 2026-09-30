@@ -24,6 +24,8 @@ import {CodexBrowser, browserToolsFor} from './browser.js';
 import {CodexDesktop, desktopTools} from './desktop.js';
 import {CodexHome, homeTools} from './home.js';
 import {CodexVoice, type VoiceConnection} from './voice.js';
+import {CodexMemory, memoryTools} from './memory.js';
+import type {promptCall} from '../../prompt-library/src/client.js';
 import {desktopCapabilities} from '../../desktop/src/capabilities.js';
 import type {control} from '../../desktop/src/index.js';
 
@@ -33,6 +35,17 @@ function requestIdentifier(value: unknown): string {
   return identifier(value);
 }
 class NativeActivityChanged extends Error {}
+function observe<T>(pending: Promise<T>, signal: AbortSignal): Promise<T> {
+  signal.throwIfAborted();
+  let abort!: () => void;
+  const result = new Promise<T>((resolve, reject) => {
+    abort = () => reject(signal.reason);
+    signal.addEventListener('abort', abort, {once: true});
+    pending.then(resolve, reject);
+    if (signal.aborted) abort();
+  });
+  return result.finally(() => signal.removeEventListener('abort', abort));
+}
 interface SessionMeta {
   creationDispatched?: boolean;
   nativeOwner?: string;
@@ -41,6 +54,8 @@ interface SessionMeta {
   browserTools?: 1;
   desktopTools?: 1;
   homeTools?: 1;
+  memoryTools?: 1;
+  memoryStartSeq?: number;
   imageInput?: true;
   schema: 1; id: string; profileId: string; profileRevision: number;
   cwd: string; threadId?: string; title: string; createdAt: number; updatedAt: number;
@@ -56,8 +71,9 @@ export interface HostOptions {
   profiles?: ProfileStore;
   desktopControl?: typeof control;
   voiceConnection?: () => VoiceConnection;
+  memoryCall?: typeof promptCall;
 }
-interface Worker {rpc: CodexRpc; session: CodexSession; journal: DisplayJournal; interactions: Map<string | number, RpcRequest>; activity: NativeActivity}
+interface Worker {rpc: CodexRpc; session: CodexSession; journal: DisplayJournal; interactions: Map<string | number, RpcRequest>; activity: NativeActivity; memory?: CodexMemory}
 
 /** Shared local host. Initially uses one isolated worker per native thread authority. */
 export class CodexHost extends EventEmitter {
@@ -82,6 +98,7 @@ export class CodexHost extends EventEmitter {
   private activeRequests = 0;
   private activeCreates = 0;
   private checks = new Map<AbortController, Promise<unknown>>();
+  private memoryCleanup = new Set<Promise<void>>();
   private improvements = new Map<AbortController, Promise<Rewrite>>();
   private branches = new Map<string, {key: string; promise: Promise<unknown>}>();
   private forkCreators = new Set<CodexRpc>();
@@ -95,6 +112,7 @@ export class CodexHost extends EventEmitter {
           !isAbsolute(meta.cwd) || typeof meta.title !== 'string' || !Number.isInteger(meta.profileRevision) ||
           (meta.status === 'ready' && typeof meta.threadId !== 'string')) throw new Error('Unsupported or corrupt Codex session index.');
       if (meta.homeTools !== undefined && meta.homeTools !== 1) throw new Error('Unsupported Codex Home tool contract.');
+      if (meta.memoryTools !== undefined && (meta.memoryTools !== 1 || meta.browserTools !== 1) || meta.memoryStartSeq !== undefined && (!meta.fork || !Number.isSafeInteger(meta.memoryStartSeq) || meta.memoryStartSeq < 0)) throw new Error('Unsupported Codex memory contract.');
       if (meta.creationDispatched !== undefined && typeof meta.creationDispatched !== 'boolean' || meta.creationDispatched === false && (meta.threadId || meta.fork || meta.status !== 'creating')) throw new Error('Invalid Codex creation admission state.');
       if (meta.imageInput !== undefined && meta.imageInput !== true) throw new Error('Unsupported Codex image contract.');
       if (meta.desktopTools !== undefined && (meta.desktopTools !== 1 || meta.imageInput !== true)) throw new Error('Unsupported Codex desktop tool contract.');
@@ -194,7 +212,8 @@ export class CodexHost extends EventEmitter {
     // Recheck after resolution: two clients can race the same create request.
     if (this.metadata.has(id)) return this.create(params);
     const desktop = profile.connection.imageInput === true && desktopCapabilities().available;
-    const meta: SessionMeta = {schema: 1, browserTools: 1, homeTools: 1, ...(desktop ? {desktopTools: 1} : {}), ...(profile.connection.imageInput ? {imageInput: true} : {}), instructions: instructionSnapshot(undefined, true, profile.connection.imageInput === true, desktop, true), id, profileId, profileRevision: profile.revision, model: profile.connection.model,
+    const memory = Boolean(this.options.memoryCall);
+    const meta: SessionMeta = {schema: 1, browserTools: 1, homeTools: 1, ...(memory ? {memoryTools: 1} : {}), ...(desktop ? {desktopTools: 1} : {}), ...(profile.connection.imageInput ? {imageInput: true} : {}), instructions: instructionSnapshot(undefined, true, profile.connection.imageInput === true, desktop, true, memory), id, profileId, profileRevision: profile.revision, model: profile.connection.model,
       surface: params.surface === 'browser' ? 'browser' : 'linux', cwd, title: '', status: 'creating', creationDispatched: false, createdAt: Date.now(), updatedAt: Date.now()};
     this.save(meta);
     await this.open(meta, profile);
@@ -245,6 +264,7 @@ export class CodexHost extends EventEmitter {
       if (profile.id !== source.profileId || profile.revision !== source.profileRevision) throw new Error('The source profile changed. Reconcile it before branching.');
       await this.allocate(id); this.assertAccepting();
       const meta: SessionMeta = {...source, id, nativeOwner: source.nativeOwner ?? source.id, threadId: undefined,
+        memoryStartSeq: undefined,
         fork: {sessionId: sourceId, messageSeq, mode, boundary}, title: '', saved: false, status: 'creating', createdAt: Date.now(), updatedAt: Date.now()};
       // Durable admission precedes the non-idempotent native fork RPC.
       this.save(meta);
@@ -326,27 +346,47 @@ export class CodexHost extends EventEmitter {
     const options = {...runtimeOptions(profile.connection, state, meta.cwd), experimentalApi: true};
     const rpc = this.options.createRpc?.(options) ?? new CodexRpc(options);
     const activity = new NativeActivity(rpc);
+    let memory: CodexMemory | undefined;
     try {
       await rpc.initialize();
       if (meta.threadId) await rpc.call('thread/resume', {threadId: meta.threadId, cwd: meta.cwd, excludeTurns: true, ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
       else {
         meta.creationDispatched = true; this.save(meta);
-        const result = await rpc.call('thread/start', {cwd: meta.cwd, approvalPolicy: 'on-request', sandbox: 'workspace-write', ...(meta.browserTools ? {dynamicTools: [...browserToolsFor(meta.imageInput === true), ...(meta.desktopTools ? desktopTools : []), ...(meta.homeTools ? homeTools : [])]} : {}), ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
+        const result = await rpc.call('thread/start', {cwd: meta.cwd, approvalPolicy: 'on-request', sandbox: 'workspace-write', ...(meta.browserTools ? {dynamicTools: [...browserToolsFor(meta.imageInput === true), ...(meta.desktopTools ? desktopTools : []), ...(meta.homeTools ? homeTools : []), ...(meta.memoryTools ? memoryTools : [])]} : {}), ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
         meta.threadId = result.thread.id; meta.status = 'ready'; this.save(meta);
       }
       this.assertOpen();
       const ledger = new OperationLedger(join(root, 'operations.json'), meta.threadId!); ledger.recover();
-      const session = new CodexSession(rpc, ledger);
+      let lastMemoryWarning = '';
+      let memorySpareAllowed = false;
+      if (meta.memoryTools && this.options.memoryCall) memory = new CodexMemory(meta.id, meta.cwd, this.options.memoryCall, message => {
+        if (message !== lastMemoryWarning) {lastMemoryWarning = message; this.emit('attention', meta.id, {reason: 'memory-degraded', message});}
+      });
+      const session = new CodexSession(rpc, ledger, memory ? async (operation, signal) => {
+        signal.throwIfAborted(); await memory!.begin('request:' + operation.id, true); signal.throwIfAborted();
+        memorySpareAllowed = false;
+        const inventorySignal = AbortSignal.any([signal, AbortSignal.timeout(3000)]);
+        try {
+          const idle = await nativeIdle({call: (method, params) => {inventorySignal.throwIfAborted(); return observe(rpc.call(method, params), inventorySignal);}}, meta.threadId!, activity);
+          signal.throwIfAborted(); memorySpareAllowed = idle;
+        } catch {signal.throwIfAborted();}
+        return memory!.context(operation.id, ledger.list().findIndex(value => value.id === operation.id) + 1, operation.input, Boolean(meta.fork), signal);
+      } : undefined);
       const journal = new DisplayJournal(join(root, 'display.jsonl'));
-      const worker: Worker = {rpc, session, journal, interactions: new Map(), activity};
+      const worker: Worker = {rpc, session, journal, interactions: new Map(), activity, memory};
+      let recovering = true;
       const publish = (event: ChatEvent) => {
         const item = event.data.itemId ?? event.data.toolCallId;
         const key = item ? `${event.type}:${event.turnId}:${item}` : ['turn/start', 'turn/end'].includes(event.type) ? `${event.type}:${event.turnId}` : undefined;
         // Deltas intentionally have no dedupe key: all fragments belong to the item.
         const saved = journal.append(event, event.type === 'assistant/chunk' ? undefined : key);
-        if (saved) this.emit('event', meta.id, {method: 'session/event', payload: {sessionId: meta.id, event: saved}});
+        if (saved) {
+          if (!meta.fork || meta.memoryStartSeq !== undefined && saved.seq > meta.memoryStartSeq) memory?.capture(saved, !recovering);
+          this.emit('event', meta.id, {method: 'session/event', payload: {sessionId: meta.id, event: saved}});
+        }
       };
       session.on('event', publish);
+      session.on('preparation-stopped', id => {void memory?.stop('request:' + id);});
       let queueScheduled = false;
       ledger.on('change', () => {
         if (queueScheduled) return;
@@ -360,13 +400,20 @@ export class CodexHost extends EventEmitter {
       const toolCalls = new Map<string | number, {turnId: unknown; abort: AbortController}>();
       rpc.on('notification', frame => {
         const p = frame.params;
+        if (p.threadId !== meta.threadId || frame.method === 'hook/started') {memorySpareAllowed = false; memory?.blockSpare();}
         if (p.threadId !== meta.threadId) return;
+        if (frame.method === 'turn/started') {
+          const operation = ledger.list().find(value => !value.steerTurnId && value.turnId === p.turn.id);
+          if (operation) memory?.confirm(operation.id, p.turn.id);
+        }
+        if (frame.method === 'item/started' && ['commandExecution', 'fileChange', 'mcpToolCall', 'dynamicToolCall', 'collabAgentToolCall'].includes(p.item?.type)) void memory?.toolStarted(p.turnId, p.item.id, p.item.tool ?? p.item.type, memorySpareAllowed && !this.voice.owns(meta.id));
+        if (frame.method === 'item/completed') void memory?.toolFinished(p.turnId, p.item?.id);
         this.voice.observe(meta.id, frame, (id, turn) => ledger.list().some(operation => operation.id === id && operation.turnId === turn && operation.delivered));
         if (frame.method === 'turn/started') this.browser.cancel(meta.id);
         if (frame.method === 'item/started' && p.item?.type === 'fileChange') fileChanges.set(p.item.id, p.item.changes);
         if (frame.method === 'item/completed') fileChanges.delete(p.item?.id);
         if (frame.method === 'serverRequest/resolved') {this.approvals.cancel(meta.id, p.requestId); toolCalls.get(p.requestId)?.abort.abort();}
-        if (frame.method === 'turn/completed') {void this.stopDesktop(meta.id); this.approvals.cancel(meta.id, undefined, p.turn.id); fileChanges.clear(); for (const call of toolCalls.values()) if (call.turnId === p.turn.id) call.abort.abort();}
+        if (frame.method === 'turn/completed') {void memory?.stop(p.turn.id); void this.stopDesktop(meta.id); this.approvals.cancel(meta.id, undefined, p.turn.id); fileChanges.clear(); for (const call of toolCalls.values()) if (call.turnId === p.turn.id) call.abort.abort();}
       });
       session.on('attention', info => this.emit('attention', meta.id, info));
       rpc.on('request', (request: RpcRequest) => {
@@ -378,14 +425,17 @@ export class CodexHost extends EventEmitter {
               this.assertAccepting();
               const abort = new AbortController(); toolCalls.set(request.id, {turnId: request.params.turnId, abort});
               const desktopTool = desktopTools.some(tool => tool.name === request.params.tool);
-              rpc.respond(request.id, meta.homeTools && homeTools.some(tool => tool.name === request.params.tool) ? await this.home.call(meta.id, join(root, 'home-calls'), request.params, abort.signal) : desktopTool && meta.desktopTools ? await this.desktop.call(meta.id, root, request.params, abort.signal) : await this.browser.call(meta.id, join(root, 'browser-calls'), request.params, abort.signal, meta.imageInput === true));
+              rpc.respond(request.id, meta.memoryTools && memoryTools.some(tool => tool.name === request.params.tool) ? memory ? await memory.tool(request.params, abort.signal) : {success: false, contentItems: [{type: 'inputText', text: 'Memory is unavailable in this host.'}]} : meta.homeTools && homeTools.some(tool => tool.name === request.params.tool) ? await this.home.call(meta.id, join(root, 'home-calls'), request.params, abort.signal) : desktopTool && meta.desktopTools ? await this.desktop.call(meta.id, root, request.params, abort.signal) : await this.browser.call(meta.id, join(root, 'browser-calls'), request.params, abort.signal, meta.imageInput === true));
             } else rpc.respond(request.id, await this.approvals.request(meta.id, request, fileChanges.get(String(request.params.itemId))));
           }
           catch {try {rpc.reject(request.id, 'This client operation is unsupported, expired or disconnected. Any dispatched action may have an unknown outcome.');} catch { /* disconnected worker */ }}
           finally {worker.interactions.delete(request.id); toolCalls.delete(request.id);}
         })();
       });
-      rpc.on('failure', () => {void this.voice.release(meta.id); void this.stopDesktop(meta.id); this.browser.cancel(meta.id); for (const call of toolCalls.values()) call.abort.abort(); this.approvals.cancel(meta.id); session.close(); worker.interactions.clear(); if (this.workers.get(meta.id) === worker) {this.workers.delete(meta.id); this.slots.delete(meta.id);}});
+      rpc.on('failure', () => {
+        if (memory) {const pending = memory.close(); this.memoryCleanup.add(pending); void pending.finally(() => this.memoryCleanup.delete(pending)).catch(() => {});}
+        void this.voice.release(meta.id); void this.stopDesktop(meta.id); this.browser.cancel(meta.id); for (const call of toolCalls.values()) call.abort.abort(); this.approvals.cancel(meta.id); session.close(); worker.interactions.clear(); if (this.workers.get(meta.id) === worker) {this.workers.delete(meta.id); this.slots.delete(meta.id);}
+      });
       if (meta.fork || ledger.list().some(operation => operation.turnId || operation.status === 'unconfirmed')) {
         const history = await nativeHistory(rpc, session.threadId);
         await session.reconcile(history);
@@ -401,10 +451,15 @@ export class CodexHost extends EventEmitter {
           }
         }
       }
+      if (memory) {
+        if (meta.fork && meta.memoryStartSeq === undefined) {meta.memoryStartSeq = journal.page(100).events.at(-1)?.event.seq ?? 0; this.save(meta);}
+        for (const event of journal.committed(meta.memoryStartSeq ?? 0)) memory.capture(event, false);
+      }
+      recovering = false;
       this.lastUse.set(meta.id, ++this.useSequence);
       this.workers.set(meta.id, worker);
       return worker;
-    } catch (error) {await rpc.close(); throw error;}
+    } catch (error) {await rpc.close(); await memory?.close(); throw error;}
   }
   private maintenanceBusy(): boolean {
     return Boolean(this.voice.active || this.desktop.active || this.activeRequests || this.activeCreates || this.opening.size || this.releasing.size || this.configuring ||
@@ -511,7 +566,7 @@ export class CodexHost extends EventEmitter {
         if (profile.connection.model !== params.model) throw new Error('The selected model does not match this Codex connection profile.');
         return {valid: true, validation: 'configuration-only'};
       }
-      case 'host.describe': return {pid: process.pid, harness: 'codex', protocol: CODEX_PROTOCOL, version: RELEASE.version, maintenance: this.maintenance, capabilities: {branch: true, edit: true, memory: false, voice: true, browserTools: true, homeTools: true, desktopTools: desktopCapabilities().available}, desktopActive: this.desktop.active, workers: this.workers.size};
+      case 'host.describe': return {pid: process.pid, harness: 'codex', protocol: CODEX_PROTOCOL, version: RELEASE.version, maintenance: this.maintenance, capabilities: {branch: true, edit: true, memory: Boolean(this.options.memoryCall), voice: true, browserTools: true, homeTools: true, desktopTools: desktopCapabilities().available}, desktopActive: this.desktop.active, workers: this.workers.size};
       case 'voice.ticket': {
         const id = identifier(params.sessionId), meta = this.meta(id), worker = await this.worker(id);
         if (this.row(meta).running || worker.session.submissionPending || worker.interactions.size) throw new Error('Open an idle Codex conversation before starting voice.');
@@ -554,7 +609,9 @@ export class CodexHost extends EventEmitter {
       }
       case 'session.cancel': {
         const id = identifier(params.sessionId); this.browser.cancel(id); const desktopActive = this.desktop.owns(id);
-        const stopped = Promise.all([this.desktop.stop(id), this.voice.stop(id)]); const interrupted = this.worker(id).then(worker => worker.session.interrupt());
+        const current = this.workers.get(id);
+        const stopped = Promise.all([this.desktop.stop(id), this.voice.stop(id), current?.memory?.stop()]);
+        const interrupted = current ? current.session.interrupt() : this.worker(id).then(worker => worker.session.interrupt());
         const [stopResult, turnResult] = await Promise.allSettled([stopped, interrupted]);
         if (stopResult.status === 'rejected') throw new Error('Desktop sharing could not be confirmed stopped. Use its independent Stop button.');
         if (turnResult.status === 'rejected') throw turnResult.reason;
@@ -614,7 +671,7 @@ export class CodexHost extends EventEmitter {
         throw new Error('Codex still has native background work. Keep this conversation open until it finishes.');
       }
       if (worker.session.ledger.revision !== revision || worker.session.submissionPending || worker.interactions.size) throw new Error('Codex work changed during release. Keep this conversation open until it finishes.');
-      worker.session.close(); await worker.rpc.close();
+      worker.session.close(); await worker.rpc.close(); await worker.memory?.close();
       if (this.workers.get(id) === worker) {this.workers.delete(id); this.slots.delete(id);}
     }).finally(() => {
       this.releasing.delete(id);
@@ -633,9 +690,10 @@ export class CodexHost extends EventEmitter {
     await Promise.allSettled([...this.opening.values()]);
     await Promise.allSettled([...this.releasing.values()]);
     for (const worker of this.workers.values()) {
-      worker.session.close(); worker.session.ledger.recover(); await worker.rpc.close();
+      worker.session.close(); worker.session.ledger.recover(); await worker.rpc.close(); await worker.memory?.close();
     }
     this.workers.clear();
+    await Promise.allSettled([...this.memoryCleanup]);
     this.slots.clear();
     const [desktopResult] = await cleanup;
     if (desktopResult.status === 'rejected') throw desktopResult.reason;

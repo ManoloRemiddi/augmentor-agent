@@ -41,5 +41,8 @@ export class DisplayJournal {
     const event = this.events[seq - 1];
     return event ? structuredClone(event) : undefined;
   }
+  *committed(afterSeq = 0): Iterable<DisplayEvent> {
+    for (const event of this.events) if (event.seq > afterSeq && ['user/message', 'assistant/message'].includes(event.type)) yield structuredClone(event);
+  }
   page(maxMessages = 12, beforeSeq?: number) {return historyPage(this.events, maxMessages, beforeSeq);}
 }

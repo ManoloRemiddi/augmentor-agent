@@ -2,6 +2,22 @@
 
 # Start here: agent handoff
 
+## September 30 Codex shared-host memory wiring
+
+[Host memory integration](CODEX-INTEGRATION.md#shared-host-memory-wiring-and-pre-turn-stop)
+now connects an explicitly injected shared client to scoped source/recall tools,
+pre-turn context, durable capture, historical-child cutoffs and activity owners.
+Stop cancels lookup before dispatch; stale native events cannot acknowledge
+queued work. Native idle inventory and subsequent child/hook/voice activity
+govern Browser processing windows. Shutdown awaits removed-worker cleanup.
+Build/type, 350 root Node and 56 Browser tests pass on Linux. New host wiring is
+synthetic-boundary qualified; pinned context and actual isolated memory-companion
+proofs also pass. Main launcher still leaves memory disabled pending actual
+pinned-host/companion, controlled inference, failure and both-surface tests, then
+activation. Continue those C6 proofs, not another replacement-context spike.
+`12f6608` passed Mac and Debian application/Home checks; binary notices remain
+the packaging gate. No installed configuration or private speech source changed.
+
 ## September 30 bounded versioned continuity qualification
 
 [Continuity transport](CODEX-INTEGRATION.md#versioned-continuity-transport-and-native-compaction)

@@ -91,7 +91,7 @@ test('closing during recall refuses late context, and oversized briefs degrade w
   const memory = new CodexMemory('fixture', '/synthetic/project', async method => method.endsWith('.recall') ? waiting : {});
   t.after(() => memory.close());
   const pending = memory.context('request', 1, 'query');
-  const rejected = assert.rejects(pending, /closed during recall/);
+  const rejected = assert.rejects(pending, /abort|closed during recall/i);
   await memory.close(); release({enabled: true, userReceipts: []}); await rejected;
 
   const warnings = [];

@@ -142,6 +142,14 @@ reply/edit context boundaries, supported native compaction, unchanged display
 history and restart. Inference is synthetic, and production host wiring remains
 disabled; this is not a fixed lifetime context-size or live-memory quality claim.
 
+`codex-memory-host.test.mjs` now uses an explicitly injected memory client and
+synthetic native events to verify pre-turn Stop, capture/recall order, restart
+dedupe without leases, fixed source/tool scope, historical capture cutoffs,
+native child revocation and awaited failed-worker cleanup. The session contract
+also rejects stale native acknowledgment during preparation. These prove the
+host wiring without enabling it in the standalone launcher; actual pinned-host,
+companion, controlled-engine and loaded-UI qualification remain separate.
+
 
 ### Codex paginated history
 

@@ -1401,3 +1401,73 @@ Debian source/native/Chromium checks and Home passed in
 Debian packaging still correctly refuses the unreviewed Codex executable;
 installed-package jobs did not run. This transport needs its own subsequent
 platform CI and does not remove that distribution gate.
+
+## Shared-host memory wiring and pre-turn Stop
+
+`CodexHost` now accepts an explicit shared-memory client dependency. New sessions
+created with it persist a versioned memory capability and register the existing
+`memory_recall` and `memory_source` contracts. The standalone production launcher
+does **not yet supply that dependency**, so its existing memory capability remains
+false. Activation awaits real pinned-host/companion and both-surface qualification;
+this checkpoint does not certify C6 complete or change installed apps.
+
+The host owns each adapter's `codex:<session>` namespace and workspace. Tool
+arguments accept only query or source sequence, never a caller-selected session,
+person, bank or project. Source reads are bound to this conversation. Explicit
+recall uses the companion's bound automatic scopes and the existing configured
+manual library. It cannot retain/delete memory or change its configuration.
+Capture is flushed before source retrieval. Errors and oversized results return
+a generic failure without private diagnostics or partial text; unavailable manual
+recall also strips its diagnostic field. Closing aborts outstanding tool/context
+requests. Shared helper functions accept an injected client for isolated proofs;
+the existing Pi call sites keep their default behavior.
+
+Before a root turn, memory admits one foreground owner and builds the current
+versioned brief. Native acknowledgment attaches that same owner to the confirmed
+turn rather than opening another processing window. Admission remains queued
+until preparation finishes. Stop synchronously pauses the queue and aborts
+lookup before any native dispatch; the original input remains available for
+explicit continuation. An older native turn-start notification during lookup
+cannot acknowledge the waiting request. Lookup cancellation propagates through
+the shared client without allowing a late bind to submit a recall request.
+Steering keeps the current root's continuity; its input style/provenance still
+updates independently.
+
+Committed public messages are captured after durable display writes. Recovery
+is capture-only and opens no lease. Historical children save a durable initial
+display cutoff, excluding inherited parent text from new capture on every
+restart. They add no fresh automatic brief; subsequent child messages have
+their own source namespace. Inherited parent source IDs cannot bypass that
+child-only source boundary. Model/profile changes still require a new or
+explicitly reconciled conversation; account identity does not select a memory
+person or silently redirect its inference route.
+
+Known Browser I/O can open a spare-compute phase only after a bounded native idle
+inventory confirms no child, terminal, goal or hook activity. Unreadable/expired
+inventory keeps foreground state. Later native child activity or hooks revoke
+that permission for the rest of the turn. Voice ownership, shell, Home, memory,
+MCP and unknown/delegated tools also retain foreground state. End, Stop, worker
+failure and close terminate admission. Failed-worker cleanup stays owned even
+after the worker is removed, and shutdown awaits it. Repeated close shares the
+same completion promise. The companion retains its established lease expiry,
+absolute windows, processing pause, budget and inference gateway.
+
+Build/type, **350 root Node tests** and **56 Browser tests** pass on Linux. Six
+new host/tool contracts use synthetic native events and a deterministic memory
+client; a separate new session test covers stale native identity during lookup.
+They verify capture/recall ordering, one owner per turn, restart dedupe, idle
+replay, pre-dispatch Stop and explicit continuation, fixed tool scope, diagnostic
+exclusion, historical cutoffs, child-activity revocation and awaited crash cleanup.
+Existing actual pinned-runtime continuity and isolated Python companion proofs
+also pass in the root suite. The new host-to-companion/model path, real controlled
+inference cancellation, unavailable-service recovery, both loaded interfaces and
+production activation still need dedicated C6 qualification. No paid account or
+private conversation was used in these tests.
+
+Preceding `12f6608` passed both Mac jobs in
+[36779157695](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36779157695),
+and Debian application/native/Chromium and Home checks in
+[36779157808](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36779157808).
+Binary notices still block Debian packaging and downstream installed jobs.
+This host-wiring source needs its own subsequent CI; all remaining C0–C9 gates
+remain open.

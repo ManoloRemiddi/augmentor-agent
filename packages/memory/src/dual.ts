@@ -19,7 +19,7 @@ export class DualMemoryClient{
   private phase:'foreground'|'tools'|'stop'='stop';
   constructor(readonly session:string,readonly cwd:string,readonly call:typeof promptCall=promptCall,readonly warn:(message:string)=>void=()=>{}){}
   private async bind(signal?:AbortSignal){if(!this.bound){await this.call('memory.dual.bind',{session:this.session,cwd:this.cwd},undefined,signal);this.bound=true;}}
-  private async rpc(action:string,p:Record<string,unknown>={},signal?:AbortSignal){await this.bind(signal);return this.call('memory.dual.'+action,{session:this.session,...p},undefined,signal);}
+  private async rpc(action:string,p:Record<string,unknown>={},signal?:AbortSignal){signal?.throwIfAborted();await this.bind(signal);signal?.throwIfAborted();return this.call('memory.dual.'+action,{session:this.session,...p},undefined,signal);}
   activity(phase:'foreground'|'tools'|'stop'){
     if(this.phase==='stop'&&phase!=='stop')this.owner=randomUUID();
     this.phase=phase;clearInterval(this.activityTimer);
@@ -38,12 +38,18 @@ export class DualMemoryClient{
     });
     return this.writes;
   }
-  async recall(mode:'voice'|'text',query=''){
+  async recall(mode:'voice'|'text',query='',signal?:AbortSignal){
+    signal?.throwIfAborted();
     const controller=new AbortController();let timer:ReturnType<typeof setTimeout>|undefined;
-    try{return await Promise.race([(async()=>{await this.writes;return memoryContext(await this.rpc('recall',{},controller.signal),mode,query);})(),new Promise<string>((_resolve,reject)=>{timer=setTimeout(()=>{controller.abort();reject(new Error('Memory recall timed out'));},3000);})]);}
-    catch{this.warn('Automatic memory recall is unavailable; continuing without recalled context.');return '';}
-    finally{clearTimeout(timer);}
+    let rejectAbort!:(error:unknown)=>void;
+    const cancelled=new Promise<never>((_resolve,reject)=>{rejectAbort=reject;});
+    const abort=()=>{controller.abort();rejectAbort(signal?.reason??new Error('Memory recall cancelled'));};
+    signal?.addEventListener('abort',abort,{once:true});
+    if(signal?.aborted)abort();
+    try{return await Promise.race([(async()=>{await this.writes;controller.signal.throwIfAborted();return memoryContext(await this.rpc('recall',{},controller.signal),mode,query);})(),cancelled,new Promise<string>((_resolve,reject)=>{timer=setTimeout(()=>{controller.abort();reject(new Error('Memory recall timed out'));},3000);})]);}
+    catch(error){if(signal?.aborted)throw error;this.warn('Automatic memory recall is unavailable; continuing without recalled context.');return '';}
+    finally{clearTimeout(timer);signal?.removeEventListener('abort',abort);}
   }
-  async flush(){await this.writes;}
+  async flush(){await Promise.all([this.writes,this.activityWrites]);}
   close(){this.closed=true;clearTimeout(this.captureTimer);void this.activity('stop');}
 }
