@@ -10,7 +10,7 @@ export interface CodexConnection {
   model: string;
   endpoint?: string;
   credential?: string;
-  wireApi?: 'responses' | 'chat';
+  wireApi?: 'responses';
 }
 const ALLOWED_ENV = ['PATH', 'HOME', 'USER', 'LOGNAME', 'LANG', 'LC_ALL', 'TMPDIR',
   'XDG_RUNTIME_DIR', 'XDG_CONFIG_HOME', 'XDG_DATA_HOME', 'XDG_STATE_HOME', 'DISPLAY',
@@ -19,6 +19,7 @@ const ALLOWED_ENV = ['PATH', 'HOME', 'USER', 'LOGNAME', 'LANG', 'LC_ALL', 'TMPDI
 export function runtimeOptions(connection: CodexConnection, stateDirectory: string, cwd: string): RpcOptions {
   if (!connection.model || connection.model.length > 256 || /[\r\n\0]/.test(connection.model)) throw new Error('Choose a valid Codex model.');
   if (!['api', 'local', 'chatgpt', 'chatgpt-plan'].includes(connection.kind)) throw new Error('Unsupported Codex connection.');
+  if (connection.wireApi !== undefined && connection.wireApi !== 'responses') throw new Error('This pinned Codex runtime requires the Responses API; Chat Completions is not supported.');
   const env: NodeJS.ProcessEnv = {};
   for (const key of ALLOWED_ENV) if (process.env[key] !== undefined) env[key] = process.env[key];
   env.CODEX_HOME = stateDirectory;

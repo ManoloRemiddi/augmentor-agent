@@ -9,6 +9,7 @@ import {CodexRpc} from '../dist/codex-runtime/src/rpc.js';
 import {runtimeOptions, installedRuntimeVersion} from '../dist/codex-runtime/src/config.js';
 import {CodexSession} from '../dist/codex-runtime/src/session.js';
 import {OperationLedger} from '../dist/codex-runtime/src/operations.js';
+import {CodexHost} from '../dist/codex-runtime/src/host.js';
 
 function waitFor(rpc, method, predicate = () => true) {
   return new Promise((resolve, reject) => {
@@ -56,7 +57,9 @@ test('pinned real Codex streams a fixture response and resumes persisted native 
   t.after(async () => {heldResponse?.destroy(); for (const client of clients) await client.close(); server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); await rm(root, {recursive: true, force: true});});
   async function start() {const rpc = new CodexRpc(runtimeOptions(connection, state, cwd)); clients.push(rpc); await rpc.initialize(); return rpc;}
   const rpc = await start();
-  const started = await rpc.call('thread/start', {cwd, approvalPolicy: 'never', sandbox: 'read-only', baseInstructions: 'You are a test assistant.'});
+  // Container CI cannot create the upstream Linux namespace sandbox. This synthetic
+  // provider returns only the fixed harmless printf above; sandbox policy has separate qualification.
+  const started = await rpc.call('thread/start', {cwd, approvalPolicy: 'never', sandbox: 'danger-full-access', baseInstructions: 'You are a test assistant.'});
   const threadId = started.thread.id;
   const ledger = new OperationLedger(join(state, 'operations.json'), threadId);
   const session = new CodexSession(rpc, ledger); const display = [];
@@ -74,7 +77,7 @@ test('pinned real Codex streams a fixture response and resumes persisted native 
   session.close();
   await rpc.close();
   const resumed = await start();
-  const result = await resumed.call('thread/resume', {threadId});
+  const result = await resumed.call('thread/resume', {threadId, approvalPolicy: 'never', sandbox: 'danger-full-access'});
   const resumedSession = new CodexSession(resumed, new OperationLedger(ledger.path, threadId));
   t.after(() => resumedSession.close());
   assert.equal(result.thread.id, threadId);
@@ -94,4 +97,25 @@ test('pinned real Codex streams a fixture response and resumes persisted native 
   await resumedSession.interrupt();
   assert.equal((await interrupted).turn.status, 'interrupted');
   assert.equal(resumedSession.ledger.get('request-three').status, 'interrupted');
+  mode = 'text'; heldResponse?.destroy();
+  const hostOptions = {root: join(root, 'host'), resolveProfile: async id => ({id, revision: 1, connection})};
+  let host = new CodexHost(hostOptions);
+  t.after(() => host.close());
+  const created = await host.dispatch('session.create', {sessionId: 'host-chat', profileId: 'local-fixture', cwd});
+  assert.ok(created.threadId);
+  let hostDone = Promise.withResolvers();
+  host.on('event', (_id, frame) => {if (frame.payload.event.type === 'turn/end') hostDone.resolve();});
+  await host.dispatch('session.prompt', {sessionId: 'host-chat', requestId: 'host-request-one', content: [{type: 'text', text: 'Test the shared host.'}]});
+  await hostDone.promise;
+  const firstHistory = await host.dispatch('session.history', {sessionId: 'host-chat'});
+  assert.ok(firstHistory.events.some(({event}) => event.type === 'assistant/message'));
+  await host.close();
+  host = new CodexHost(hostOptions);
+  assert.deepEqual(await host.dispatch('session.history', {sessionId: 'host-chat'}), firstHistory);
+  hostDone = Promise.withResolvers();
+  host.on('event', (_id, frame) => {if (frame.payload.event.type === 'turn/end') hostDone.resolve();});
+  await host.dispatch('session.prompt', {sessionId: 'host-chat', requestId: 'host-request-two', content: [{type: 'text', text: 'Continue after host restart.'}]});
+  await hostDone.promise;
+  const finalHistory = await host.dispatch('session.history', {sessionId: 'host-chat'});
+  assert.equal(finalHistory.events.filter(({event}) => event.type === 'assistant/message').length, 2);
 });

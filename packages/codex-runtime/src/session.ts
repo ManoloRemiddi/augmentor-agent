@@ -88,8 +88,10 @@ export class CodexSession extends EventEmitter {
     throw new Error('Codex has not confirmed cancellation. The prompt was not resent; check the thread state.');
   }
   async reconcile(): Promise<void> {
+    const pending = this.ledger.list().filter(value => ['accepted', 'unconfirmed'].includes(value.status));
+    if (!pending.length) return;
     const result = await this.rpc.call('thread/read', {threadId: this.threadId, includeTurns: true});
-    for (const operation of this.ledger.list().filter(value => ['accepted', 'unconfirmed'].includes(value.status))) {
+    for (const operation of pending) {
       const turn = result.thread.turns.find((candidate: any) => candidate.id === operation.turnId || candidate.items.some((item: any) => item.type === 'userMessage' && item.clientId === operation.id));
       if (!turn) continue; // Absence, including partial history, never proves non-execution.
       this.ledger.acknowledge(operation.id, turn.id);

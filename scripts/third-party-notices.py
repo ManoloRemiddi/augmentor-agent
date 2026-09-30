@@ -84,6 +84,15 @@ def inventory(tree, catalog_root):
             if file.is_file() and NOTICE_NAME.match(file.name):
                 content = file.read_bytes(); sha = digest(content); texts[sha] = content
                 sources.append({'path': file.relative_to(tree).as_posix(), 'sha256': sha})
+        # Some upstream npm wrappers omit their repository NOTICE as well as LICENSE.
+        # Keep additional texts bound to the reviewed exact package version.
+        for notice in catalog.get('additionalNotices', {}).get(key, []):
+            entry = catalog['sources'][notice]
+            content = (catalog_root / entry['file']).read_bytes(); sha = digest(content)
+            if sha != entry['sha256']:
+                errors.append(f'{key}: reviewed notice hash changed'); continue
+            texts[sha] = content
+            sources.append({'path': 'licenses/' + entry['file'], 'url': entry['url'], 'sha256': sha})
         components.append({'name': meta['name'], 'version': meta['version'], 'path': relative,
                            'license': effective_license, 'declaredLicense':meta['license'], 'integrity': locked.get('integrity'), 'notices': sources})
     if errors:

@@ -97,6 +97,16 @@
       "file": "LGPL-3.0.txt",
       "url": "https://www.gnu.org/licenses/lgpl-3.0.txt",
       "sha256": "e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118"
+    },
+    "codex-0.159.2": {
+      "file": "upstream/codex-0.159.2.txt",
+      "url": "https://raw.githubusercontent.com/openai/codex/ff6aec96948b70d94983af2641a6b67c94faeff5/LICENSE",
+      "sha256": "d17f227e4df5da1600391338865ce0f3055211760a36688f816941d58232d8dc"
+    },
+    "codex-0.159.2-notice": {
+      "file": "upstream/codex-0.159.2-notice.txt",
+      "url": "https://raw.githubusercontent.com/openai/codex/ff6aec96948b70d94983af2641a6b67c94faeff5/NOTICE",
+      "sha256": "9d71575ecfd9a843fc1677b0efb08053c6ba9fd686a0de1a6f5382fd3c220915"
     }
   },
   "overrides": {
@@ -157,7 +167,14 @@
     "@img/sharp-libvips-darwin-arm64@1.3.3": "lgpl-3.0",
     "@img/sharp-libvips-darwin-x64@1.3.3": "lgpl-3.0",
     "@img/sharp-libvips-linux-x64@1.3.3": "lgpl-3.0",
-    "@img/sharp-libvips-linux-arm64@1.3.3": "lgpl-3.0"
+    "@img/sharp-libvips-linux-arm64@1.3.3": "lgpl-3.0",
+    "@openai/codex@0.159.2": "codex-0.159.2",
+    "@openai/codex@0.159.2-linux-x64": "codex-0.159.2",
+    "@openai/codex@0.159.2-linux-arm64": "codex-0.159.2",
+    "@openai/codex@0.159.2-darwin-x64": "codex-0.159.2",
+    "@openai/codex@0.159.2-darwin-arm64": "codex-0.159.2",
+    "@openai/codex@0.159.2-win32-x64": "codex-0.159.2",
+    "@openai/codex@0.159.2-win32-arm64": "codex-0.159.2"
   },
   "choices": {
     "json-schema@0.4.0": {
@@ -171,5 +188,28 @@
     "@img/sharp-libvips-darwin-x64@1.3.3": "LGPL-3.0-or-later",
     "@img/sharp-libvips-linux-x64@1.3.3": "LGPL-3.0-or-later",
     "@img/sharp-libvips-linux-arm64@1.3.3": "LGPL-3.0-or-later"
+  },
+  "additionalNotices": {
+    "@openai/codex@0.159.2": [
+      "codex-0.159.2-notice"
+    ],
+    "@openai/codex@0.159.2-linux-x64": [
+      "codex-0.159.2-notice"
+    ],
+    "@openai/codex@0.159.2-linux-arm64": [
+      "codex-0.159.2-notice"
+    ],
+    "@openai/codex@0.159.2-darwin-x64": [
+      "codex-0.159.2-notice"
+    ],
+    "@openai/codex@0.159.2-darwin-arm64": [
+      "codex-0.159.2-notice"
+    ],
+    "@openai/codex@0.159.2-win32-x64": [
+      "codex-0.159.2-notice"
+    ],
+    "@openai/codex@0.159.2-win32-arm64": [
+      "codex-0.159.2-notice"
+    ]
   }
 }

@@ -51,4 +51,5 @@ test('Codex runtime config isolates credentials and forbids credential-bearing d
   const plan = runtimeOptions({kind: 'chatgpt-plan', model: 'test', endpoint: 'https://evil.example/v1', credential: 'oauth'}, '/tmp/test', '/tmp');
   assert.ok(plan.args.includes('model_providers.augmentor.base_url="https://api.openai.com/v1"'));
   assert.equal(installedRuntimeVersion(), '0.159.2');
+  assert.throws(() => runtimeOptions({kind: 'local', model: 'test', endpoint: 'http://127.0.0.1:8080/v1', wireApi: 'chat'}, '/tmp/test', '/tmp'), /Chat Completions is not supported/);
 });

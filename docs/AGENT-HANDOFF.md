@@ -5,10 +5,13 @@
 ## September 30 Codex runtime foundation
 
 [Implementation evidence](CODEX-INTEGRATION.md) records the pinned 0.159.2
-app-server transport, durable submission ledger and session driver. The real
-Linux binary passes streaming/tool/Stop/reopen against a synthetic Responses
-endpoint; 17 focused tests pass. This is partial C0/C1 work. Continue the full
-[build plan](CODEX-INTEGRATION-PLAN.md): shared host/IPC, profiles, both actual
+app-server transport, durable submission ledger, session driver, shared host and
+private IPC. The real Linux binary passes streaming/tool/Stop/reopen and host
+restart against a synthetic Responses endpoint; 21 focused tests pass. The real
+local Qwen endpoint rejects the Responses instruction layout, and the pinned
+runtime no longer supports Chat Completions. See the evidence guide for the CI
+sandbox fixture and license corrections. This is partial C0/C1 work. Continue the full
+[build plan](CODEX-INTEGRATION-PLAN.md): service supervision, profiles, both actual
 surfaces, login, tools, memory, voice and release qualification remain. Codex is
 not yet selectable and no installed application was changed.
 
