@@ -139,16 +139,16 @@ replaceable continuity. Neither test enables production Codex memory.
 current-request manifests, modality, unavailable/oversized recall and close races.
 Its actual pinned-runtime fixture also verifies unchanged-data dedupe, historical
 reply/edit context boundaries, supported native compaction, unchanged display
-history and restart. Inference is synthetic, and production host wiring remains
-disabled; this is not a fixed lifetime context-size or live-memory quality claim.
+history and restart. Inference is synthetic; this is not a fixed lifetime
+context-size or live-memory quality claim. Current launcher activation is below.
 
 `codex-memory-host.test.mjs` now uses an explicitly injected memory client and
 synthetic native events to verify pre-turn Stop, capture/recall order, restart
 dedupe without leases, fixed source/tool scope, historical capture cutoffs,
 native child revocation and awaited failed-worker cleanup. The session contract
 also rejects stale native acknowledgment during preparation. These prove the
-host wiring without enabling it in the standalone launcher; actual pinned-host,
-companion, controlled-engine and loaded-UI qualification remain separate.
+host wiring with synthetic native events; actual pinned-host, companion,
+controlled-engine and loaded-UI proofs below qualify the development launcher.
 
 `codex-memory-runtime.test.mjs` joins actual pinned Codex with the real isolated
 Python memory and prompt-library companions. Three proofs cover canonical tool
@@ -176,6 +176,16 @@ AUGMENTOR_PYTHON=/path/to/test/python AUGMENTOR_CODEX_MEMORY_ENGINE_PROOF=1 \
 
 This qualifies admission/cancellation with the real engine, not completed
 memory-generation stages, semantic quality or physical installed acceptance.
+
+The standalone-launcher Qt case in `codex-memory-runtime.test.mjs` runs
+`fixtures/codex/native-memory.py` with actual composer Enter/Send and existing
+Memory dialog controls. It verifies paused capture, preserved records, resumed
+continuity and hidden internal context against real isolated companions. The
+loaded `codex-browser-chromium.test.mjs` also validates next-turn continuity,
+exact parent/child source capture and actual Settings Memory pause/resume. Both
+use synthetic inference; Qt is offscreen and Chromium uses an empty test profile.
+The development launcher supplies the shared client following these proofs;
+installed applications and existing memory/model configuration are unchanged.
 
 
 ### Codex paginated history

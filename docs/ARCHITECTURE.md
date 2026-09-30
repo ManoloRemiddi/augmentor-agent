@@ -29,10 +29,13 @@ installed apps. The owner's approved UI remains the design baseline.
 
 ## Product and runtime ownership
 
-The [Codex integration build plan](CODEX-INTEGRATION-PLAN.md) defines the proposed
-third harness for both surfaces, with subscription/API/local connection profiles.
-It is not implemented by the planning change; the runtime inventory below remains
-the current architecture until the plan's acceptance gates are completed.
+The [Codex integration build plan](CODEX-INTEGRATION-PLAN.md) defines the third
+harness for both surfaces. Its [development implementation](CODEX-INTEGRATION.md)
+uses the pinned native app-server as the agent engine and the same presentation,
+memory and tool companions. API/local setup is implemented; subscription login
+and full acceptance remain open. [Shared memory source activation](CODEX-INTEGRATION.md#codex-memory-launcher-and-existing-interface-controls)
+is qualified through isolated Qt/Chromium interfaces. This development source
+has not replaced the installed DSH/Pi applications or completed release gates.
 
 Augmentor is one product with native PySide6/Qt and Chromium surfaces in this
 repository. Both DSH presentations use [one personal-agent composition and voice engine](SHARED-SURFACES-2026-09-24.md); preset IDs are historical aliases. DSH is the full-featured conversational harness; Pi is a supported

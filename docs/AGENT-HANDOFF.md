@@ -2,6 +2,24 @@
 
 # Start here: agent handoff
 
+## October 1 Codex memory source activation and both interfaces
+
+[Launcher and UI qualification](CODEX-INTEGRATION.md#codex-memory-launcher-and-existing-interface-controls)
+now enables the shared memory client in the development launcher. Actual Qt
+Enter/Send and Memory dialog tests use that launcher, pinned Codex and isolated
+real companions. Loaded Chromium verifies continuity, exact branch/edit capture
+and existing Memory settings pause/resume. Browser's missing memory RPC route is
+connected; both adapters report host-owned capability. Old chats retain their
+recorded contract; new chats receive memory tools. Build/type, all 355 root Node
+tests (real engine opt-in enabled), 56 Browser tests and 570 native tests (568 pass,
+two Mac-only skips) pass on Linux. Window lifecycle assertions also pass after
+replacing the Mac CI fixed animation sleep with a bounded completion wait.
+`cec1fe4` CI exposed an asynchronous recovery-export race and that Mac 26 timing
+failure; both are corrected in source. Await fresh Mac/Debian CI before claiming
+platform parity. Full C0–C9, memory quality/complete stage qualification and
+distribution gates remain. No installed app, private speech source or inference
+configuration changed.
+
 ## October 1 Codex controlled-engine cancellation
 
 [Actual controlled-engine proof](CODEX-INTEGRATION.md#actual-codex-controlled-memory-window-and-cancellation)

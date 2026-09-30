@@ -70,4 +70,23 @@ class CodexSetupTests(unittest.TestCase):
         self.assertFalse(self.dialog.check_button.isEnabled())
 
 
+class CodexCapabilityTests(unittest.TestCase):
+    def test_host_memory_capability_is_per_adapter_and_absent_reply_disables_it(self):
+        from unittest.mock import Mock
+        from augmentor_linux.adapters.codex import CodexAdapter
+        first, second = CodexAdapter('/synthetic/one'), CodexAdapter('/synthetic/two')
+        observed = first.capabilities
+        connection = Mock()
+        connection.call.return_value = {'capabilities': {'memory': True}}
+        first.connection = lambda: connection
+        first.call('host.describe')
+        self.assertTrue(observed['memory'])
+        self.assertFalse(second.capabilities['memory'])
+        self.assertFalse(CodexAdapter.capabilities['memory'])
+        connection.call.return_value = {'capabilities': {}}
+        first.call('host.describe')
+        self.assertFalse(observed['memory'])
+        self.assertEqual(connection.close.call_count, 2)
+
+
 if __name__ == '__main__': unittest.main()

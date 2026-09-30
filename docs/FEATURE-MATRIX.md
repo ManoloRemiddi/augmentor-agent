@@ -37,9 +37,12 @@ scoped Browser tools/screenshots and consented desktop tools with real Chromium
 and Plasma VM proofs against a synthetic provider. API/local prompt improvement,
 paired Home tools and [Desktop/Browser queue/steering](QUEUE-AND-STEERING.md#codex-development-integration)
 and [exact Branch/Edit controls](CODEX-INTEGRATION.md#desktop-and-browser-exact-branchedit-controls)
-also have source qualification. The tables below retain the DSH/Pi comparison;
-they do not certify Codex parity. Subscription login, generic MCP, memory, voice,
-unconfirmed creation reconciliation and complete release qualification remain open.
+also have source qualification. [Codex memory source activation and existing controls](CODEX-INTEGRATION.md#codex-memory-launcher-and-existing-interface-controls)
+now have actual isolated Qt/Chromium and controlled-engine cancellation evidence.
+Shared voice transport is also qualified with synthetic boundaries. The tables
+below retain the DSH/Pi comparison; they do not certify Codex parity. Subscription
+login, generic MCP, full memory/voice acceptance, unconfirmed creation reconciliation
+and complete release qualification remain open.
 
 Release scope: DSH is the full-featured target; Pi is a supported subset.
 Additional Pi extensions and Windows are deferred. The Linux evidence below does

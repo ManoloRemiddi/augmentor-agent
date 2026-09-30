@@ -7,13 +7,14 @@ import {CodexIpcServer} from './ipc.js';
 import {ProfileStore} from './profiles.js';
 import {OsCredentialStore} from './credentials.js';
 import {privateDirectory} from './storage.js';
+import {promptCall} from '../../prompt-library/src/client.js';
 
 process.umask(0o077);
 const env = componentEnvironment();
 const root = env.AUGMENTOR_CODEX_STATE ?? join(env.XDG_STATE_HOME ?? join(homedir(), '.local', 'state'), 'augmentor-codex');
 privateDirectory(root);
 const profiles = new ProfileStore(join(root, 'profiles.json'), new OsCredentialStore());
-const host = new CodexHost({root, profiles, resolveProfile: id => profiles.resolve(id)});
+const host = new CodexHost({root, profiles, memoryCall: promptCall, resolveProfile: id => profiles.resolve(id)});
 const socket = env.AUGMENTOR_CODEX_SOCKET ?? join(root, 'runtime.sock');
 const server = new CodexIpcServer(host, socket);
 let stopping: Promise<void> | undefined;

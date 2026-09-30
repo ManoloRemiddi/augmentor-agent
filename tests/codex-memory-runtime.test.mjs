@@ -3,7 +3,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
 import {mkdtempSync, mkdirSync, rmSync} from 'node:fs';
-import {join} from 'node:path';
+import {join, resolve} from 'node:path';
+import {execFile, spawn} from 'node:child_process';
+import {promisify} from 'node:util';
+import {once} from 'node:events';
+import {ProfileStore} from '../dist/codex-runtime/src/profiles.js';
 import {tmpdir} from 'node:os';
 import {CodexHost} from '../dist/codex-runtime/src/host.js';
 import {memoryServices} from './fixtures/codex/memory-services.mjs';
@@ -17,7 +21,7 @@ function send(res, item, id) {
     {type: 'response.completed', response: {id: 'r-' + id, status: 'completed', output: [item]}}]) res.write('data: ' + JSON.stringify(event) + '\n\n');
   res.end();
 }
-async function fixture(t, {wrapMemoryCall = call => call, prepareMemory} = {}) {
+async function fixture(t, {wrapMemoryCall = call => call, prepareMemory, createSession = true} = {}) {
   const root = mkdtempSync(join(process.platform === 'darwin' ? '/tmp' : tmpdir(), 'cxm-'));
   const requests = [], hosts = [], warnings = [];
   let services, server, host, engine;
@@ -49,7 +53,7 @@ async function fixture(t, {wrapMemoryCall = call => call, prepareMemory} = {}) {
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const options = {root: join(root, 'host'), memoryCall: wrapMemoryCall(services.call), resolveProfile: async id => ({id, revision: 1, connection: {kind: 'local', model: 'fixture', endpoint: `http://127.0.0.1:${server.address().port}/v1`}})};
   const open = () => {host = new CodexHost(options); hosts.push(host); host.on('attention', (_id, info) => warnings.push(info)); return host;};
-  open(); await host.create({sessionId: 'one', profileId: 'local', cwd: root});
+  open(); if (createSession) await host.create({sessionId: 'one', profileId: 'local', cwd: root});
   const prompt = async (requestId, text, sessionId = 'one') => {
     await host.dispatch('session.prompt', {sessionId, requestId, content: [{type: 'text', text}]});
     await until(async () => (await host.dispatch('session.queue', {sessionId})).operations.some(operation => operation.id === requestId && operation.status === 'completed'), 'native completion');
@@ -150,7 +154,10 @@ test('real companion outage preserves native chat and restart backfills public m
   await f.host.close();
   await f.services.restartMemory();
   f.open(); await f.host.dispatch('session.queue', {sessionId:'one'});
-  await until(async () => (await f.exported('codex:one')).events.length === 2, 'durable backfill after service restart');
+  // Reconstruction queues capture asynchronously; wait for durable rows before
+  // asking the scoped export, which correctly refuses an as-yet-unbound session.
+  await until(async () => (await f.services.call('memory.dual.describe')).events === 2, 'durable backfill after service restart');
+  assert.equal((await f.exported('codex:one')).events.length, 2);
   assert.equal(f.requests.length, 1, 'restoration never resends the completed request');
   await f.prompt('after-outage', 'MODEL_STEP_3 Continue after memory recovery.'); await f.host.close();
   assert.equal(f.requests.length, 2);
@@ -198,4 +205,42 @@ test('real controlled engine admits Codex Browser windows and Stop closes its up
   f.open(); await f.host.dispatch('session.queue', {sessionId:'one'}); await f.host.close();
   await delay(600); assert.equal(calls.length, 1, 'native reconstruction grants no new processing window');
   assert.ok(f.services.calls.slice(beforeRestart).filter(call => call.method.endsWith('.activity')).every(call => call.params.phase === 'stop'));
+});
+
+
+test('standalone launcher and actual native Qt memory controls pause capture and retain context across Enter and Send', {timeout:20000}, async t => {
+  const f = await fixture(t, {createSession:false});
+  await f.host.close();
+  const profile = await f.options.resolveProfile('local');
+  const profiles = new ProfileStore(join(f.options.root, 'profiles.json'), {get:async()=>undefined, put:async()=>{}, delete:async()=>{}});
+  await profiles.upsert({id:'local', name:'Isolated fixture', kind:'local', model:'fixture', endpoint:profile.connection.endpoint});
+  const home = join(f.root, 'ui'); mkdirSync(home, {mode:0o700});
+  const env = {PATH:process.env.PATH, LANG:process.env.LANG ?? 'C.UTF-8', HOME:home,
+    XDG_CONFIG_HOME:join(home,'config'), XDG_STATE_HOME:join(home,'state'), XDG_DATA_HOME:join(home,'data'),
+    AUGMENTOR_SHARED_STATE:f.services.state, AUGMENTOR_SHARED_DATA:f.services.data,
+    AUGMENTOR_CODEX_STATE:f.options.root, AUGMENTOR_CODEX_SOCKET:join(f.root,'ui.sock'), AUGMENTOR_CODEX_NO_AUTOSTART:'1',
+    AUGMENTOR_CODEX_WORKSPACE:f.root,
+    AUGMENTOR_WORKSPACE_PROFILE:'', PYTHONPATH:resolve('apps/native'), QT_QPA_PLATFORM:'offscreen'};
+  const child = spawn(process.execPath, ['dist/codex-runtime/src/main.js'], {env,stdio:['ignore','pipe','pipe']});
+  let output = '', errors = '';
+  child.stdout.on('data', chunk => {output += chunk;}); child.stderr.on('data', chunk => {errors += chunk;});
+  const exited = once(child, 'exit');
+  try {
+    await until(() => {if(child.exitCode!==null||child.signalCode!==null)throw Error('Isolated launcher failed: '+errors);return output.includes('\n');}, 'standalone launcher readiness');
+    assert.equal(JSON.parse(output.trim()).ready, true);
+    const result = await promisify(execFile)(process.env.AUGMENTOR_PYTHON ?? 'python3', ['tests/fixtures/codex/native-memory.py'], {env,timeout:15000});
+    assert.equal(JSON.parse(result.stdout).nativeMemory, 'passed');
+  } finally {
+    let timer;
+    if(child.exitCode===null&&child.signalCode===null){child.kill('SIGTERM');timer=setTimeout(()=>child.kill('SIGKILL'),3000);}
+    try {await exited;} finally {clearTimeout(timer);}
+  }
+  assert.equal(child.exitCode, 0, errors);
+  assert.equal(f.requests.length, 3);
+  const entries = f.requests.at(-1).input.filter(item => item.role === 'user' && JSON.stringify(item.content).includes('external_augmentor_memory_data'));
+  assert.match(JSON.stringify(entries), /NATIVE_BOUNDARY_FIXTURE_TEXT/);
+  assert.doesNotMatch(JSON.stringify(entries), /NATIVE_CAPTURE_PAUSED_TEXT/);
+  const captured = (await f.exported('codex:one')).events;
+  assert.equal(captured.length, 4);
+  assert.doesNotMatch(JSON.stringify(captured), /NATIVE_CAPTURE_PAUSED_TEXT|augmentor_memory_manifest|external_augmentor_memory_data/);
 });

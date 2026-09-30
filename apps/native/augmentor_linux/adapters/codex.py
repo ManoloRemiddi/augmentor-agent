@@ -12,6 +12,7 @@ class CodexAdapter:
     supports_queue = True
 
     def __init__(self, base=None):
+        self.capabilities = dict(type(self).capabilities)
         self.state = Path(os.environ.get('AUGMENTOR_CODEX_STATE', Path(os.environ.get('XDG_STATE_HOME', Path.home()/'.local/state'))/'augmentor-codex'))
         self.base = base or os.environ.get('AUGMENTOR_CODEX_SOCKET', str(self.state/'runtime.sock'))
 
@@ -31,7 +32,10 @@ class CodexAdapter:
                 from ..runtime_start import ensure_running
                 ensure_running('codex')
                 connection = self.connection()
-            return connection.call(method, payload)
+            result = connection.call(method, payload)
+            if method == 'host.describe':
+                self.capabilities['memory'] = result.get('capabilities', {}).get('memory') is True
+            return result
         except (OSError, ValueError) as error:
             raise ContractError('Cannot reach the Codex runtime. Check its connection status.') from error
         finally:

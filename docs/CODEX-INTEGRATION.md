@@ -7,6 +7,11 @@ Status: in development on `feat/codex-integration`, based on canonical main
 Codex release. The complete C0–C9 acceptance scope remains in
 the plan; no work package is certified complete by this foundation.
 
+Current memory status: [the development launcher now supplies the shared client](#codex-memory-launcher-and-existing-interface-controls)
+for new Codex chats. Earlier dated checkpoints that leave memory disabled describe
+their original source revision. Installed applications and memory inference
+configuration have not been changed.
+
 ## Runtime foundation — 30 September 2026
 
 `@openai/codex` is pinned to **0.159.2** in the application lockfile. The package
@@ -1549,3 +1554,53 @@ of all retain/consolidate/page stages, memory quality or Mac Docker qualificatio
 Loaded native/Browser memory proofs and standalone-launcher activation remain
 before C6 completion. All other C0–C9 gates and the native-binary distribution
 review remain open; no installed app was updated.
+
+## Codex memory launcher and existing interface controls
+
+The development `main.ts` now supplies the existing `promptCall` transport to the
+shared host. New chats persist the memory contract, register source/recall tools,
+capture public messages and select bounded continuity before dispatch. Companion
+startup and user-selected memory/inference settings remain owned by the existing
+shared service. No new model loop, inference destination or account-to-person
+mapping is introduced. Older Codex chats without the recorded memory contract
+remain unchanged; start a new chat to use it. This is source activation, not an
+installed Desktop/Browser rollout or C6 release certification.
+
+Native capabilities now belong to each adapter instance and update from
+`host.describe`; changing one connection cannot mutate another adapter's memory
+flag. Browser initialization also reads the host's actual capability. Its missing
+`augmentor/memory` route now uses the existing shared Memory request helper, with
+the same independent settings and profile restrictions as other harnesses.
+Both existing memory interfaces keep their layout and controls.
+
+The actual Qt proof launches the real standalone host in empty state, configures
+a synthetic local profile without credentials, creates a new conversation and
+uses both Enter and the Send button. The existing Memory dialog pauses capture,
+shows preserved records, resumes capture and receives continuity on the next
+turn. The paused input appears in normal native conversation history but never
+in captured memory or the subsequent memory brief. Internal continuity data is
+absent from the displayed messages. This is offscreen Qt, not physical acceptance.
+
+The loaded Chromium proof now runs against the actual isolated memory companion.
+Its existing queue, steering, Branch/Edit and reload actions retain their earlier
+assertions. New assertions compare captured source text against authoritative
+public native history, including intermediate steering replies, and require only
+new messages in each historical child. The next root turn receives committed
+user continuity, removed queued text is excluded, and tool output/internal
+context never becomes memory text. The actual Settings page's existing manual
+Memory section pauses/resumes the shared setting while preserving the journal.
+
+Build/type, **all 355 root Node tests** with the real-engine opt-in enabled,
+**56 Browser tests**, and **570 native tests** (568 passing, two Mac-only skips)
+pass on Linux. The loaded Browser/standalone Qt proofs use synthetic inference
+and empty configuration; no owner data, key or paid account is used. C6's live
+quality, complete retain/consolidate/page stages and remaining acceptance matrix
+are still open, alongside the rest of C0–C9 and binary distribution review.
+
+CI at preceding `cec1fe4` exposed two concrete test timing issues. Debian's outage
+proof asked scoped export before asynchronous backfill had bound the session;
+it now waits for durable records through the unscoped status read first. Mac 26
+window lifecycle validation asserted animation completion after a fixed 350 ms;
+it now waits at most 1.5 seconds for the actual transition and still requires the
+activity timer to be running. No animation/product behavior was changed.
+Mac 14 passed at that ref. Fresh platform CI is required for this activation.
