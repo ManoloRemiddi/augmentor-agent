@@ -176,11 +176,23 @@
         {
           "source": "crates/bech32-0.9.1.crate",
           "pathInVcs": "",
-          "candidateNotices": [],
+          "candidateNotices": [
+            {
+              "path": "src/lib.rs",
+              "sha256": "8a4efd91229148ea1e86234c9513628910a7419a3c8a6500e8ce18149b8f3a85",
+              "form": "inline-license"
+            }
+          ],
           "needsApplicabilityReview": true
         }
       ],
-      "noticeFiles": []
+      "noticeFiles": [
+        {
+          "path": "src/lib.rs",
+          "sha256": "8a4efd91229148ea1e86234c9513628910a7419a3c8a6500e8ce18149b8f3a85",
+          "form": "inline-license"
+        }
+      ]
     },
     {
       "repository": "https://github.com/madsmtm/objc2",
@@ -1184,6 +1196,17 @@
         {
           "source": "crates/pagable-0.4.1.crate",
           "pathInVcs": "pagable",
+          "candidateNotices": [
+            {
+              "path": "LICENSE",
+              "sha256": "50e6751797c50dedd75ef1b8a0d9e42f5f8472e9fbce91f34718e9f97b0c780a"
+            }
+          ],
+          "needsApplicabilityReview": true
+        },
+        {
+          "source": "crates/pagable_derive-0.4.1.crate",
+          "pathInVcs": "pagable_derive",
           "candidateNotices": [
             {
               "path": "LICENSE",

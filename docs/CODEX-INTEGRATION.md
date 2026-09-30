@@ -296,8 +296,11 @@ inventory gate for Codex, after application checks; no bypass was added.
 ABI requirements, the exact upstream source pin and a reproducible source collector.
 It verified 1,304 locked external archives and, after the nested-license scan fix,
 retained 4,690 notice/metadata files with 138 missing-notice sources. Another 53
-exact-commit archives supply candidate attribution for 116 of these; 22 remain
-without a retrieved candidate. Candidate applicability is still pending. The payload verifier detects
+exact-commit archives now supply candidate attribution for 118 of these; 20 remain
+without a retrieved candidate. Version/commit/path identity matches for 128
+supplementary package records; 109 also match all published Rust files, while 19
+retain generated/mismatching source gaps. Inline MIT attribution is retained at
+its pinned hash. Candidate applicability is still pending. The payload verifier detects
 drift but does not grant release clearance. Debian's unknown-native-file gate is
 unchanged. C8 remains incomplete until notice/source coverage, Mac parity and real
 artifact execution/rollback are qualified.
@@ -1683,8 +1686,10 @@ actual `OsCredentialStore`, helper processes and an isolated real Secret Service
 on the pinned Debian image. Roundtrip, update, reference isolation, repeated
 removal and cleanup pass; no owner wallet/configuration or provider credential
 is used. The helper/unit and Mac inventory checks also pass, and all added wheel
-hashes/notices/dependency edges were verified. Both Mac jobs now require build, Desktop
-and standalone Browser companion Keychain proofs; those results remain pending. This
-qualifies isolated Linux native storage, not the owner's wallet, live OAuth,
+hashes/notices/dependency edges were verified. At `0726234`, both Mac 14/26 jobs
+pass actual Keychain proofs using the build, Desktop and standalone Browser
+companion interpreters, plus package inventory/signature checks. Debian application
+and Home checks pass; the existing Codex native notice gate still blocks packaging.
+This qualifies isolated Linux/Mac native storage, not the owner's wallet, live OAuth,
 API-provider inference or full distribution acceptance. The local Qwen activation
 decision and all remaining C0–C9 gates stay open.

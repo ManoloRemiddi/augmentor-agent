@@ -23,6 +23,9 @@ Codex component. Do not treat a matching hash as a complete license review.
 - [Notice supplements](../release/codex/notice-supplements.json): 53 exact-commit
   repository archives with candidate notice paths and hashes. Applicability still
   requires review; these are not declarations of license clearance.
+- [Source identity evidence](../release/codex/notice-source-identity.json): version,
+  published VCS commit/path and Rust-file comparisons for each supplement package.
+  Includes unresolved generated/changed files; it grants no redistribution approval.
 - [Native source inputs](../release/codex/native-sources.json): dependency versions,
   upstream recipe provenance and retrieved archive checksums. This is not yet a
   complete inventory of the native code linked into Rust/V8/compiler binaries.
@@ -68,13 +71,44 @@ Rust 1.95.0 source archive was also verified against its upstream checksum.
 A license expression in Cargo metadata
 is not substituted for the missing attribution text.
 
-A subsequent collection also verified all 53 supplementary repository archives.
+The initial supplementary collection also verified all 53 repository archives.
 Their candidate index records 145 notice files, with candidates for 116 of the
 remaining 138 missing-notice sources; 22 have no retrieved candidate. The collector
 retains the full available notice set from those archives separately from the
 locked-source collection. Candidate retrieval does not establish applicability or
 linked-binary coverage. Metadata-only license declarations are not counted as
 resolved standalone notices.
+
+## October 1 version and source identity evidence
+
+The collector now retains explicitly pinned inline license files as well as
+standalone notices. `bech32 0.9.1` embeds the full MIT text and copyright in
+`src/lib.rs`; its exact-commit supplement now preserves that original file and
+checks its hash. The existing `pagable 0.4.1` repository archive also supplies a
+candidate root notice for the version-matched `pagable_derive 0.4.1` package.
+Candidate coverage is now 118 of 138 sources lacking standalone notices, leaving
+20 without a retrieved candidate. The crate's original omission is still recorded;
+a supplement does not rewrite the locked archive.
+
+The actual collection verifies all 1,304 locked and 53 supplementary archives.
+All 128 supplementary package records match their published VCS commit/path and
+upstream package version, resolving inherited metadata from the nearest enclosing
+workspace. Older crate metadata without a package path requires a unique
+name/version manifest; this corrects the apparent root-path mismatches for
+`dasp_sample`, `schemafy_core` and `schemafy_lib`. All published Rust files match
+byte for byte for 109 records. Nineteen records retain missing or different Rust
+files, including generated Apple bindings and `debugserver-types`; these require
+further attribution/source review. No generated code is fabricated or executed.
+
+`collection.json` records every compared Rust-file hash. The new
+`notice-source-identity.json` output summarizes the same evidence and hashes each
+package's full comparison list; the committed inventory is a copy of that output.
+Candidate notices must agree with the archive inventory and their actual bytes.
+Eight focused tests pass, including changed/missing inline notices, ambiguous
+monorepo identity, mismatching versions/generated files, workspace inheritance,
+duplicate files and archive traversal. These checks establish source identity,
+not complete license applicability or linked-binary coverage. The installer gate
+remains enabled.
 
 The native verifier matches all 32 installed supplier payloads and returns
 `releaseApproval: false`. It detects added, missing, modified and symlinked files.

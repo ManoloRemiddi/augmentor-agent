@@ -2,6 +2,24 @@
 
 # Start here: agent handoff
 
+## October 1 native store platform results and packaging source identity
+
+`0726234` passed both Mac 14/26 jobs, including actual Keychain roundtrip/update/
+isolation/removal/cleanup through build, packaged Desktop and standalone Browser
+companion interpreters. Package inventory/signature checks pass. Debian credential,
+application and Home checks pass; its Codex native notice gate still blocks
+packaging. See [credential evidence](CODEX-CREDENTIALS.md).
+
+[Packaging source identity](CODEX-PACKAGING.md#october-1-version-and-source-identity-evidence)
+now verifies supplementary notices against actual archive bytes and compares
+version/commit/path plus all published Rust files. All 128 identity records match
+version/VCS metadata; 109 match Rust source completely and 19 retain explicit
+source gaps. Two added candidates reduce missing candidate attribution to 20 of
+138 archives. Eight focused tests and actual full collection pass; no release
+clearance or installer-gate bypass. Installed apps, owner settings and private
+speech are untouched. Qwen activation still awaits the owner's answer; continue
+remaining C0–C9 work without silently changing its formatter/service.
+
 ## October 1 native credential dependencies and actual Linux proof
 
 [Secure credential correction](CODEX-CREDENTIALS.md) supplies the missing native

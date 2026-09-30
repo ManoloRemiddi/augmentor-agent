@@ -329,5 +329,16 @@ bus and encrypted keyring and runs the actual Node/Python store.
 the intended interpreter and native OS backend. Both verify separate-reference
 roundtrip, update, idempotent deletion and complete cleanup with synthetic values
 only. [Release dependencies and qualification limits](../docs/CODEX-CREDENTIALS.md)
-include the actual pinned-Debian proof, five verified Mac wheels and pending Mac
-Keychain/build/bundle evidence. These are not OAuth or paid-provider tests.
+include the actual pinned-Debian proof, five verified Mac wheels and passing Mac
+14/26 build/Desktop/standalone companion Keychain evidence at `0726234`.
+These are not OAuth or paid-provider tests.
+
+### Codex supplementary source identity
+
+`test_codex_sources.py` covers source pin/checksum handling, unsafe/duplicate
+archive members, explicit inline license integrity, unique versioned monorepo
+paths, generated/changed source gaps and nearest-workspace metadata inheritance.
+The actual [collection](../docs/CODEX-PACKAGING.md#october-1-version-and-source-identity-evidence)
+rechecks all pinned archives and emits full Rust-file comparisons plus a compact
+hashed inventory. Source matches do not automatically grant license applicability
+or binary redistribution approval; unresolved records remain explicit.

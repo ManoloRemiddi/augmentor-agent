@@ -56,9 +56,16 @@ Debian CI now requires that positive proof. Both Mac jobs require the native
 Keychain proof with the build interpreter, packaged Desktop interpreter and
 standalone Browser companion interpreter. Both packages also import the native
 backend during staging and verify their inventory and signatures.
-Mac results for this change remain pending; Linux's isolated proof does not
-qualify the owner's desktop wallet or Mac Keychain. An interactive locked store
-may require its owner to unlock it. No automatic plaintext fallback is permitted.
+[Mac CI for `0726234`](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36790411563)
+passed on macOS 14 and 26. Each job reports positive actual Keychain proofs with
+all three interpreters, including complete synthetic-reference cleanup. Desktop
+and standalone companion inventory/signature checks also pass.
+[Linux CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36790411609)
+passes the credential/application and Home checks; Debian packaging stops at the
+existing unreviewed Codex executable notice gate. These native store proofs do
+not qualify the owner's desktop wallet, interactive locked-store recovery or live
+OAuth. An interactive locked store may require its owner to unlock it. No automatic
+plaintext fallback is permitted.
 
 The two credential unit tests and two Mac package-inventory tests also pass.
 See [full integration status](CODEX-INTEGRATION.md), [local Qwen activation
