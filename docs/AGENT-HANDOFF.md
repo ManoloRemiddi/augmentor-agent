@@ -2,6 +2,20 @@
 
 # Start here: agent handoff
 
+## September 30 Codex worker-release prerequisite
+
+[Native idle evidence and release fencing](CODEX-INTEGRATION.md#native-idle-evidence-and-worker-release-fencing)
+checks every loaded thread, background terminals, unfinished goals, hook activity
+and changing native notifications before release. Incoming worker requests wait
+for release and resume the original thread; failed release preserves the worker.
+Build/type and 307 root Node tests pass, with real pinned idle-inventory evidence
+and release/queued-request race coverage. Automatic idle-worker reuse is **not
+yet implemented**. Continue bounded pool admission with request reservations;
+current capacity refusal can leave a pre-dispatch creation falsely unconfirmed
+and must be distinguished from an actual lost native reply. Full C0–C9 remains
+open; no installed apps changed. Prior `2ef08a8` Debian packaging still blocks the
+unreviewed binary; Mac run `36755663211` was still active when checked.
+
 ## September 30 Codex interrupted fork recovery
 
 [Known-ID fork recovery](CODEX-INTEGRATION.md#recovering-a-fork-with-a-saved-native-identity)

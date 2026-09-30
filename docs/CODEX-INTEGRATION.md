@@ -997,3 +997,39 @@ history, incomplete item pages, failed index replacement, exact original native
 ID on success, no extra inference and no additional fork call. The failure test
 uses only an isolated fixture index. These are synthetic-provider source proofs;
 installed state and live subscription qualification are unchanged.
+
+
+## Native idle evidence and worker-release fencing
+
+Worker release now freezes queue dispatch before asynchronous cleanup and waits
+for native idle evidence. The read-only inventory pages every loaded thread,
+including loaded descendants; each must report idle, no background terminals
+and no unfinished goal. Hook start/completion notifications are observed before
+initialization; outstanding or malformed hook identity blocks release. Any
+native notification during the inventory invalidates that snapshot. Missing,
+malformed, duplicate or unavailable inventory pages cannot establish idleness.
+This uses the pinned [app-server thread/status and background-terminal APIs](https://learn.chatgpt.com/docs/app-server).
+
+A per-session release promise fences incoming worker requests until closure.
+Queued input cannot dispatch through the retiring worker; after successful
+release, the next request resumes the same native thread. The operation ledger
+revision is rechecked before closure. A refused release retains its worker,
+restores the existing maintenance policy and can be retried after work ends.
+Release also waits for an in-progress open; host maintenance and shutdown account
+for release work. Late failure cleanup cannot remove a replacement worker entry.
+
+Build/type checks and **307 root Node tests** pass. The pinned-runtime fork
+fixture validates real idle inventory on a completed native thread. Focused
+contracts cover active descendants, terminals, unfinished goals, hooks, changing
+notifications, inventory pagination/errors, release refusal/retry and a prompt
+racing release that uses the original native identity through a fresh worker.
+These source checks do not qualify every external process or plugin lifecycle.
+
+This is the release prerequisite, not automatic eviction. The current worker
+limit still requires explicit release. Next, implement bounded idle-worker reuse
+with request reservations and distinguish pre-dispatch capacity refusal from
+unknown native creation, so opening many completed chats cannot exhaust the
+product or create a false unknown outcome. Installed applications are unchanged.
+Previous `2ef08a8` Debian application checks passed but packaging still rejected
+the unreviewed Codex executable in run `36755663208`; Mac run `36755663211` was
+still active at the last check.

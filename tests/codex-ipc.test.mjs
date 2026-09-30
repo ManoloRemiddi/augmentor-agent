@@ -71,7 +71,7 @@ test('Codex host persists failed creation as unknown without spawning another th
   const root = mkdtempSync(join(tmpdir(), 'codex-host-')); t.after(() => rmSync(root, {recursive: true, force: true}));
   let starts = 0;
   const host = new CodexHost({root, resolveProfile: async id => ({id, revision: 1, connection: {kind: 'local', model: 'fixture', endpoint: 'http://127.0.0.1:1/v1'}}),
-    createRpc: () => ({initialize: async () => {}, close: async () => {}, call: async () => {starts++; throw new Error('Lost acknowledgment');}})});
+    createRpc: () => ({on: () => {}, initialize: async () => {}, close: async () => {}, call: async () => {starts++; throw new Error('Lost acknowledgment');}})});
   t.after(() => host.close());
   const params = {sessionId: 'one', profileId: 'local', cwd: root};
   await assert.rejects(host.create(params), /Lost acknowledgment/);

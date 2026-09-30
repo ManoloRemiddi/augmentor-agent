@@ -8,6 +8,7 @@ import {runtimeOptions, installedRuntimeVersion, type CodexConnection} from './c
 import {CodexRpc, type RpcRequest} from './rpc.js';
 import {CodexSession} from './session.js';
 import {nativeHistory} from './history.js';
+import {NativeActivity, nativeIdle} from './idle.js';
 import {branchBoundary, verifyBranchHistory, type BranchBoundary} from './branch.js';
 import {OperationLedger, queueOperations} from './operations.js';
 import {DisplayJournal} from './journal.js';
@@ -47,7 +48,7 @@ export interface HostOptions {
   profiles?: ProfileStore;
   desktopControl?: typeof control;
 }
-interface Worker {rpc: CodexRpc; session: CodexSession; journal: DisplayJournal; interactions: Map<string | number, RpcRequest>}
+interface Worker {rpc: CodexRpc; session: CodexSession; journal: DisplayJournal; interactions: Map<string | number, RpcRequest>; activity: NativeActivity}
 
 /** Shared local host. Initially uses one isolated worker per native thread authority. */
 export class CodexHost extends EventEmitter {
@@ -58,6 +59,7 @@ export class CodexHost extends EventEmitter {
   private metadata = new Map<string, SessionMeta>();
   private workers = new Map<string, Worker>();
   private opening = new Map<string, Promise<Worker>>();
+  private releasing = new Map<string, Promise<void>>();
   private closing = false;
   private configuring = false;
   private maintenance = false;
@@ -179,6 +181,8 @@ export class CodexHost extends EventEmitter {
   }
   private async worker(id: string): Promise<Worker> {
     this.assertAccepting();
+    while (this.releasing.has(id)) await this.releasing.get(id);
+    this.assertAccepting();
     if (this.configuring) throw new Error('Codex connection setup is in progress.');
     const existing = this.workers.get(id); if (existing) return existing;
     const pending = this.opening.get(id); if (pending) return pending;
@@ -273,6 +277,7 @@ export class CodexHost extends EventEmitter {
     const state = join(this.sessionRoot(meta.nativeOwner ?? meta.id), 'runtime'); privateDirectory(state);
     const options = {...runtimeOptions(profile.connection, state, meta.cwd), experimentalApi: meta.browserTools === 1};
     const rpc = this.options.createRpc?.(options) ?? new CodexRpc(options);
+    const activity = new NativeActivity(rpc);
     try {
       await rpc.initialize();
       if (meta.threadId) await rpc.call('thread/resume', {threadId: meta.threadId, cwd: meta.cwd, excludeTurns: true, ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
@@ -284,7 +289,7 @@ export class CodexHost extends EventEmitter {
       const ledger = new OperationLedger(join(root, 'operations.json'), meta.threadId!); ledger.recover();
       const session = new CodexSession(rpc, ledger);
       const journal = new DisplayJournal(join(root, 'display.jsonl'));
-      const worker: Worker = {rpc, session, journal, interactions: new Map()};
+      const worker: Worker = {rpc, session, journal, interactions: new Map(), activity};
       const publish = (event: ChatEvent) => {
         const item = event.data.itemId ?? event.data.toolCallId;
         const key = item ? `${event.type}:${event.turnId}:${item}` : ['turn/start', 'turn/end'].includes(event.type) ? `${event.type}:${event.turnId}` : undefined;
@@ -330,7 +335,7 @@ export class CodexHost extends EventEmitter {
           finally {worker.interactions.delete(request.id); toolCalls.delete(request.id);}
         })();
       });
-      rpc.on('failure', () => {void this.stopDesktop(meta.id); this.browser.cancel(meta.id); for (const call of toolCalls.values()) call.abort.abort(); this.approvals.cancel(meta.id); session.close(); worker.interactions.clear(); this.workers.delete(meta.id);});
+      rpc.on('failure', () => {void this.stopDesktop(meta.id); this.browser.cancel(meta.id); for (const call of toolCalls.values()) call.abort.abort(); this.approvals.cancel(meta.id); session.close(); worker.interactions.clear(); if (this.workers.get(meta.id) === worker) this.workers.delete(meta.id);});
       if (meta.fork || ledger.list().some(operation => operation.turnId || operation.status === 'unconfirmed')) {
         const history = await nativeHistory(rpc, session.threadId);
         await session.reconcile(history);
@@ -354,7 +359,7 @@ export class CodexHost extends EventEmitter {
     this.assertOpen();
     if (method === 'host.prepareShutdown') {
       // No await between the activity check and admission freeze.
-      if (this.desktop.active || this.activeRequests || this.activeCreates || this.opening.size || this.configuring ||
+      if (this.desktop.active || this.activeRequests || this.activeCreates || this.opening.size || this.releasing.size || this.configuring ||
           [...this.workers.values()].some(worker => worker.interactions.size || worker.session.submissionPending) ||
           [...this.metadata.values()].some(meta => meta.status !== 'ready' || this.row(meta).running)) {
         throw new Error('Codex has active or unconfirmed work. Finish or reconcile it before maintenance.');
@@ -502,9 +507,22 @@ export class CodexHost extends EventEmitter {
     this.browser.attach(id, owner, send);
   }
   async release(id: string): Promise<void> {
+    const pending = this.releasing.get(id); if (pending) return pending;
+    const opening = this.opening.get(id); if (opening) {await opening; return this.release(id);}
     const worker = this.workers.get(id); if (!worker) {await this.desktop.stop(id); return;}
-    if (worker.session.ledger.list().some(operation => ['accepted', 'unconfirmed'].includes(operation.status)) || worker.interactions.size) throw new Error('Codex conversation still has active or unconfirmed work.');
-    await this.desktop.stop(id); worker.session.close(); await worker.rpc.close(); this.workers.delete(id);
+    if (worker.session.submissionPending || worker.session.ledger.list().some(operation => ['accepted', 'unconfirmed'].includes(operation.status)) || worker.interactions.size) throw new Error('Codex conversation still has active or unconfirmed work.');
+    const revision = worker.session.ledger.revision;
+    worker.session.setMaintenance(true);
+    const releasing = Promise.resolve().then(async () => {
+      await this.desktop.stop(id);
+      if (!await nativeIdle(worker.rpc, worker.session.threadId, worker.activity) || worker.session.ledger.revision !== revision || worker.session.submissionPending || worker.interactions.size) throw new Error('Codex still has native background work or changing activity. Keep this conversation open until it finishes.');
+      worker.session.close(); await worker.rpc.close();
+      if (this.workers.get(id) === worker) this.workers.delete(id);
+    }).finally(() => {
+      this.releasing.delete(id);
+      if (!this.closing && this.workers.get(id) === worker) worker.session.setMaintenance(this.maintenance);
+    });
+    this.releasing.set(id, releasing); return releasing;
   }
   async close(): Promise<void> {
     this.closing = true; this.approvals.close(); this.browser.close();
@@ -514,6 +532,7 @@ export class CodexHost extends EventEmitter {
     await Promise.allSettled([...this.forkCreators].map(creator => creator.close()));
     await Promise.allSettled([...this.branches.values()].map(branch => branch.promise));
     await Promise.allSettled([...this.opening.values()]);
+    await Promise.allSettled([...this.releasing.values()]);
     for (const worker of this.workers.values()) {
       worker.session.close(); worker.session.ledger.recover(); await worker.rpc.close();
     }

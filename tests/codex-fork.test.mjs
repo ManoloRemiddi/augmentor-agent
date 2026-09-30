@@ -8,6 +8,7 @@ import {tmpdir} from 'node:os';
 import {CodexRpc} from '../dist/codex-runtime/src/rpc.js';
 import {runtimeOptions} from '../dist/codex-runtime/src/config.js';
 import {nativeHistory} from '../dist/codex-runtime/src/history.js';
+import {NativeActivity,nativeIdle} from '../dist/codex-runtime/src/idle.js';
 import {branchBoundary, verifyBranchHistory} from '../dist/codex-runtime/src/branch.js';
 import {chatEvents} from '../dist/codex-runtime/src/events.js';
 
@@ -26,8 +27,9 @@ test('pinned forks retain exact turn boundaries and tools across independent wor
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
   t.after(async()=>{for(const client of clients)await client.close();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));rmSync(root,{recursive:true,force:true});});
   const connection={kind:'local',model:'fixture',endpoint:`http://127.0.0.1:${server.address().port}/v1`};
+  const activity=new Map();
   async function open(){
-    const rpc=new CodexRpc({...runtimeOptions(connection,state,root),experimentalApi:true});clients.push(rpc);await rpc.initialize();
+    const rpc=new CodexRpc({...runtimeOptions(connection,state,root),experimentalApi:true});clients.push(rpc);activity.set(rpc,new NativeActivity(rpc));await rpc.initialize();
     rpc.on('request',request=>{assert.equal(request.method,'item/tool/call');toolCalls++;rpc.respond(request.id,{success:true,contentItems:[{type:'inputText',text:'SYNTHETIC_TOOL_RESULT'}]});});
     return rpc;
   }
@@ -43,6 +45,7 @@ test('pinned forks retain exact turn boundaries and tools across independent wor
   const first=await turn(parent,thread.id,'SYNTHETIC_FIRST_TURN');
   const second=await turn(parent,thread.id,'SYNTHETIC_LATER_TURN');
   assert.equal(toolCalls,1);
+  assert.equal(await nativeIdle(parent,thread.id,activity.get(parent)),true);
   const source=await nativeHistory(parent,thread.id,1);
   function boundary(turnIndex,itemIndex,mode){
     const turn=source[turnIndex],item=turn.items[itemIndex];

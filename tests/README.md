@@ -225,3 +225,14 @@ its original thread after successful verification. Fork-call and inference
 counts cannot increase during recovery. The lost-acknowledgment case without
 a recorded native ID still refuses replay. The index-write failure is injected
 only inside the test's isolated temporary session directory.
+
+
+### Codex worker idle/release checks
+
+`codex-idle.test.mjs` covers loaded-descendant activity, background terminals,
+unfinished goals, hooks, notification changes and complete inventory handling.
+Its host fixtures check that a refused release retains the worker and that an
+incoming prompt waits for successful release, then resumes the original native
+thread without sending through a closed worker. `codex-fork.test.mjs` also checks
+the native idle API against the real pinned runtime and synthetic Responses.
+These checks precede automatic worker-pool reuse; the hard worker limit remains.
