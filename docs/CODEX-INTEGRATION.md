@@ -1345,3 +1345,59 @@ The fixture now waits for authoritative operation settlement before taking its
 immutable source-history snapshot for Branch. The loaded Chromium proof passes
 locally after that timing correction. Native-binary packaging review and the
 remaining C0–C9 acceptance gates remain open.
+
+## Versioned continuity transport and native compaction
+
+`memory-context.ts` now provides a bounded transport for the existing selected
+continuity brief. This is staged alongside the capture adapter; **production
+host memory remains disabled** until tools, activity, source identity and
+pre-turn cancellation are wired and qualified. No installed memory service,
+account, inference route or model setting changed.
+
+Each current request gets an application manifest with its identity, revision,
+snapshot digest and part count. The fixed policy identifies older manifests as
+historical and memory text as untrusted reference data. Snapshot text enters only
+`untrusted` fragments. A missing or unavailable brief produces an explicit empty
+current manifest; it cannot imply erasure of prior user restrictions. The
+adapter calls no fresh recall for a historical child, which keeps its selected
+native context. This is a versioned-context strategy; it does not claim deletion
+or replacement of older native history, or guarantee live-model adherence.
+
+The complete selected brief must fit the existing 6,000-character limit.
+Transport divides it at Unicode code-point boundaries into at most 32 fragments,
+each below 900 UTF-8 bytes, including the per-part header. The manifest has the
+same byte bound. Incomplete Unicode and oversized briefs are refused whole,
+without misleading excerpts. The adapter reports degraded context and supplies
+an empty manifest when an otherwise valid recall exceeds the limit. Identical
+briefs retain identical data fragments, so the pinned runtime deduplicates data
+while a new request manifest still identifies the current scope. Changed briefs
+remain in native history until normal Codex compaction; per-turn bounds do not
+establish a fixed lifetime context size.
+
+The capture adapter now preserves voice/text provenance from confirmed public
+user request IDs and applies the latest modality to subsequent public replies.
+Typed steering changes later replies; replaying an old voice source cannot
+reset it. Capture and context retrieval still grant no activity lease on their
+own. Closing during recall rejects late context rather than dispatching it.
+
+Build/type checks and **343 root Node tests** pass on Linux. Seven new transport
+tests include actual pinned Codex with synthetic Responses inference. The real
+runtime receives every multilingual fragment without truncation, keeps memory
+out of public user-message history, inserts unchanged data once, and exposes the
+new manifest separately as developer context. Reply branching at the first
+answer excludes newer parent recall; editing before the first input excludes
+that input's context; neither child changes parent history. Explicit
+`thread/compact/start` reduces accumulated input size, and the next request and
+restart both receive their current manifest. Five parent turns, two child turns
+and one explicit compaction produce exactly eight inference requests. No private
+native storage was edited, paid provider was used, or automatic compaction policy
+was added. Production admission/growth handling and live compaction quality
+remain C6 work.
+
+The preceding connection-check source `1f62a80` passed both Mac jobs in
+[36777339640](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36777339640).
+Debian source/native/Chromium checks and Home passed in
+[36777339540](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36777339540).
+Debian packaging still correctly refuses the unreviewed Codex executable;
+installed-package jobs did not run. This transport needs its own subsequent
+platform CI and does not remove that distribution gate.

@@ -135,6 +135,13 @@ qualifies pinned Codex additional-context roles and persistence across updates,
 omission and restart; its pass documents an API limitation, not completion of
 replaceable continuity. Neither test enables production Codex memory.
 
+`codex-memory-transport.test.mjs` qualifies bounded Unicode-preserving fragments,
+current-request manifests, modality, unavailable/oversized recall and close races.
+Its actual pinned-runtime fixture also verifies unchanged-data dedupe, historical
+reply/edit context boundaries, supported native compaction, unchanged display
+history and restart. Inference is synthetic, and production host wiring remains
+disabled; this is not a fixed lifetime context-size or live-memory quality claim.
+
 
 ### Codex paginated history
 

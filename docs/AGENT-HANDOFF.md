@@ -2,6 +2,19 @@
 
 # Start here: agent handoff
 
+## September 30 bounded versioned continuity qualification
+
+[Continuity transport](CODEX-INTEGRATION.md#versioned-continuity-transport-and-native-compaction)
+now separates a current-request manifest from bounded untrusted data fragments,
+preserves Unicode without truncation, retains voice/text source provenance and
+omits fresh historical-child recall. Seven new contracts include actual pinned
+Codex fragment dedupe, exact reply/edit inheritance, supported native compaction
+and restart. Build/type and 343 root Node tests pass on Linux. Host memory is
+still disabled; continue scoped source/recall tools, pre-turn cancellation,
+capture/activity/branch cutoff wiring and full C6 qualification. No private
+native store or installed configuration changed. Preceding `1f62a80` passed both
+Mac jobs and Debian application/Home checks; binary notices still block packaging.
+
 ## September 30 Codex chat/tool connection qualification
 
 The existing Desktop/Browser setup check now runs a

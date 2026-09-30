@@ -2,6 +2,7 @@
 import {DualMemoryClient, type MemoryEvent} from '../../memory/src/dual.js';
 import type {promptCall} from '../../prompt-library/src/client.js';
 import type {ChatEvent} from './events.js';
+import {continuityContext, type ContinuityContext} from './memory-context.js';
 
 type CommittedEvent = ChatEvent & {seq: number};
 /** Lifecycle/capture adapter. Binding and inference remain owned by the shared companion. */
@@ -10,11 +11,12 @@ export class CodexMemory {
   private users = new Set<number>();
   private captured = new Set<number>();
   private activeTurn?: string;
+  private modes = new Map<string, 'voice' | 'text'>();
   private seenTurns = new Set<string>();
   private tools = new Map<string, boolean>();
   private uncertainTool = false;
   private closed = false;
-  constructor(session: string, cwd: string, call: typeof promptCall, warn: (message: string) => void = () => {}) {
+  constructor(session: string, cwd: string, call: typeof promptCall, private readonly warn: (message: string) => void = () => {}) {
     this.client = new DualMemoryClient('codex:' + session, cwd, call, warn);
   }
   private text(event: CommittedEvent): string {
@@ -26,8 +28,10 @@ export class CodexMemory {
     if (this.closed || !Number.isSafeInteger(event.seq) || event.seq < 1) return;
     if (event.type === 'user/message' && event.data.source?.kind === 'user' && !this.users.has(event.seq)) {
       const content = this.text(event);
+      const mode = /^resonant-voice:[a-f0-9-]{36}$/.test(event.data.requestId ?? event.data.source?.rpcId ?? '') ? 'voice' : 'text';
+      if (event.turnId) this.modes.set(event.turnId, mode);
       this.users.add(event.seq);
-      if (content.trim()) void this.client.append([{id: String(event.seq), role: 'user', mode: 'text', content, live}]);
+      if (content.trim()) void this.client.append([{id: String(event.seq), role: 'user', mode, content, live}]);
     }
     if (event.type === 'assistant/message' && !this.captured.has(event.seq)) {
       const content = this.text(event);
@@ -36,7 +40,22 @@ export class CodexMemory {
       // succeeded. A later turn failure does not rewrite an earlier public item.
       const reason = event.data.message?.stopReason;
       const status: MemoryEvent['status'] = event.data.interrupted || reason === 'aborted' ? 'interrupted' : reason === 'error' ? 'error' : 'complete';
-      if (content.trim()) void this.client.append([{id: String(event.seq), role: 'assistant', mode: 'text', content, status, live}]);
+      if (content.trim()) void this.client.append([{id: String(event.seq), role: 'assistant', mode: event.turnId ? this.modes.get(event.turnId) ?? 'text' : 'text', content, status, live}]);
+    }
+  }
+
+  /** Historical children inherit their selected native context, never fresh recall. */
+  async context(requestId: string, revision: number, query: string, historicalBranch = false): Promise<ContinuityContext> {
+    if (this.closed) throw new Error('Codex memory adapter is closed.');
+    const empty = continuityContext(requestId, revision, '');
+    if (historicalBranch) return {};
+    const mode = /^resonant-voice:[a-f0-9-]{36}$/.test(requestId) ? 'voice' : 'text';
+    const snapshot = await this.client.recall(mode, query);
+    if (this.closed) throw new Error('Codex memory adapter closed during recall.');
+    try {return continuityContext(requestId, revision, snapshot);}
+    catch {
+      this.warn('Automatic memory context exceeds its transport limit; continuing without a new snapshot.');
+      return empty;
     }
   }
 
