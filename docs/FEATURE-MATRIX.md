@@ -31,6 +31,13 @@ DSH personal surfaces now share the agent, tools and speech engine; see [shared 
 Current source/ref and qualification: [agent handoff](AGENT-HANDOFF.md).
 Dated candidate sections below retain their original version-specific evidence.
 
+Codex is an opt-in development engine. Its [current evidence](CODEX-INTEGRATION.md)
+covers API/local profile forms, shared chat/Stop/history, approvals/questions,
+scoped Browser tools/screenshots and consented desktop tools with real Chromium
+and Plasma VM proofs against a synthetic provider. The tables below retain the
+DSH/Pi comparison; they do not certify Codex parity. Subscription login, prompt
+improvement, Home/MCP, memory, voice and complete release qualification remain open.
+
 Release scope: DSH is the full-featured target; Pi is a supported subset.
 Additional Pi extensions and Windows are deferred. The Linux evidence below does
 not establish macOS feature qualification. See the cross-platform release ledger.

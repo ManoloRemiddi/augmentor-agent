@@ -4,6 +4,7 @@ import {existsSync} from 'node:fs';
 import {join} from 'node:path';
 import {BrowserBroker, browserDefinitions} from '../../pi-browser/src/index.js';
 import {durableJson, privateDirectory, readPrivateJson} from './storage.js';
+import {type ToolReply, toolFailure as failure, validImageUrl} from './tool-content.js';
 
 // Screenshot registration is bound to the new conversation after explicit profile qualification.
 export const browserToolsFor = (imageInput = false) => browserDefinitions.filter(tool => imageInput || tool.action !== 'screenshot').map(tool => ({
@@ -11,17 +12,8 @@ export const browserToolsFor = (imageInput = false) => browserDefinitions.filter
   inputSchema: {...tool.parameters, additionalProperties: false},
 }));
 export const browserTools = browserToolsFor();
-type ToolContent = {type: 'inputText'; text: string} | {type: 'inputImage'; imageUrl: string};
-interface ToolReply {success: boolean; contentItems: ToolContent[]}
-const failure = (message: string): ToolReply => ({success: false, contentItems: [{type: 'inputText', text: message}]});
 const digest = (value: string) => createHash('sha256').update(value).digest('hex');
 const plain = (value: unknown): value is Record<string, any> => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
-
-function validImageUrl(value: unknown): value is string {
-  if (typeof value !== 'string' || value.length > 700000 || !/^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(value)) return false;
-  const data = value.slice('data:image/jpeg;base64,'.length); const bytes = Buffer.from(data, 'base64');
-  return bytes.length >= 4 && bytes.toString('base64') === data && bytes[0] === 255 && bytes[1] === 216 && bytes.at(-2) === 255 && bytes.at(-1) === 217;
-}
 
 /** Browser executor binding plus durable call admission; Codex still owns the agent loop. */
 export class CodexBrowser {

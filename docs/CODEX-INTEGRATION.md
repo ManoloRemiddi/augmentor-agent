@@ -51,6 +51,8 @@ unqualified. Do not substitute the user's global CLI or inherit its auth cache.
 - `browser.ts`: scoped executor ownership, bounded browser tool arguments/results,
   durable per-call admission and observation-bound mutations; see the Browser
   checkpoint below for supported tools and qualification limits.
+- `desktop.ts`: scoped consented desktop tools, per-call/consent records, fresh
+  observation-token admission and owned-sharing recovery; see the desktop checkpoint.
 - `main.ts`: standalone shared host (`npm run start:codex` after building), with
   a private profile store and bounded socket. Startup recovers a stale socket only
   after an owned-socket check, a refused connection and unchanged inode. The
@@ -492,3 +494,87 @@ passed; Debian run
 [36737148571](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36737148571)
 passed application checks and stopped at the unreviewed Codex native executable
 inventory gate. This checkpoint does not bypass or resolve that packaging gate.
+
+
+## Consented desktop tools and Plasma VM evidence
+
+New image-qualified conversations on a supported desktop backend now register the
+existing `linux_desktop_connect`, `linux_desktop_snapshot`, `linux_desktop_action`
+and `linux_desktop_stop` tools. The legacy names also serve macOS. This is available
+to both Augmentor clients through their shared Codex host; an open Qt window is not
+required. The existing OS executor, consent prompt and independent Stop control
+remain authoritative. The macOS helper must be present before new chats advertise
+the tools. Older chats retain their persisted definitions and instructions.
+
+The new bridge binds ownership as `codex:<conversation>`, validates bounded tool
+arguments/results and returns JPEGs through app-server image content. An action
+needs a token from a fresh capture in the same turn. Tokens are consumed before
+dispatch and the existing executor additionally checks their expiry, current
+window/focus and geometry. Cached captures cannot grant fresh action authority.
+The bridge records each call before dispatch and returns recorded results without
+repeating side effects. Unknown outcomes stay unknown; they are never replayed.
+Consent requests are durably limited to one per turn, including after restart.
+A declined or uncertain consent request cannot trigger another dialog in that turn.
+
+Stop aborts the pending helper request, waits for it to settle, then checks and
+releases only this chat's sharing. Turn end, worker failure, idle release and host
+shutdown also release ownership. Durable lease markers let a newly listening host
+reconcile surviving sharing after a crash; a duplicate host that fails socket
+ownership does not stop the live peer. An uncertain/busy ownerless executor is
+not treated as confirmed cleanup. Unconfirmed sharing blocks maintenance and
+profile changes and produces a saved runtime-error message using both existing
+chat renderers. The independent OS Stop button remains the immediate fallback.
+A hard-killed host cannot synchronously guarantee cleanup; startup reconciliation
+and the existing executor idle expiry are separate safeguards.
+
+Images live in Codex native history and private per-call records; display history
+contains text metadata. No new inference engine, automatic billing fallback,
+broader OS grant or desktop specialist model is introduced. Existing Linux limits
+(single-monitor KDE Wayland, ASCII text up to 256 characters) and macOS executor
+requirements remain. These target checks do not constitute an OS sandbox.
+
+Validation at this checkpoint:
+
+- Type checking/build and all **265 root Node tests** pass. Nine desktop tests
+  include the actual pinned runtime, real Python desktop client/socket handler
+  and a synthetic OS backend. The runtime sends image bytes, resumes persisted
+  tool definitions, denies consent, cancels an in-flight action and releases
+  sharing. Contract cases cover stale/replayed tokens, cross-owner cleanup,
+  unknown dispatches, repeated consent, overlapping calls and failed cleanup.
+- **16 focused native Python cases** pass, including two real socket/client cases
+  for the Codex owner namespace, foreign-owner rejection, token replay and the
+  explicit non-starting status probe. These are fixtures, not native-device tests.
+- `scripts/vm-codex-desktop-proof.py` passes against an isolated Debian 13 Plasma
+  Wayland VM with staged candidate source, one monitor, scale 1.0 and pinned Codex
+  0.159.2. It uses the actual native adapter and an explicitly forwarded private
+  desktop socket with host desktop autostart disabled. The provider is a
+  deterministic Responses fixture, including pixel decoding for profile
+  qualification; it is not a visual-reasoning benchmark.
+- The VM rejects declined OS consent, transports an actual screenshot to Codex,
+  edits Kate and saves exactly `CODEX desktop verified` followed by a newline,
+  then verifies sharing closes at turn end. A separate turn is stopped after
+  partial text input begins; the saved file remains partial and unchanged after
+  waiting, with no additional provider request or input replay. This qualification run used
+  an overlay of the existing disposable VM image; the original image and the
+  owner's desktop remain untouched.
+
+The proof records source revision, runtime pin and tested input hashes locally.
+The owning public documentation records the sanitized outcomes; VM keys, model
+payloads and private paths are not publication artifacts. Run it only against the
+marked disposable VM:
+
+```sh
+npm run build
+python3 scripts/vm-codex-desktop-proof.py --vm-dir /absolute/path/to/disposable-vm
+```
+
+The loaded macOS desktop-control path, actual Augmentor Qt send/tool UI, live-model
+vision quality, multi-monitor support and installed artifacts are not qualified by
+this proof. C0–C9 remains open, including OAuth eligibility/login, Home/MCP tools,
+prompt improvement, controlled memory, speech, remaining conversation operations
+and packaging. At the preceding image checkpoint `ed5af14`, macOS run
+[36739219839](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36739219839)
+passed; Debian run
+[36739220130](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36739220130)
+passed application checks and still refused the unreviewed Codex native executable
+at packaging. That gate remains in force.

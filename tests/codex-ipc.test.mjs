@@ -19,6 +19,7 @@ async function fixture(t) {
   const host = new EventEmitter();
   host.dispatch = async (method, params) => {if (method === 'session.describe' && params.sessionId !== 'one') throw new Error('Unknown conversation'); return {method};};
   host.approvals = new CodexInteractions(); host.browser = new CodexBrowser();
+  host.recoverDesktop = async () => {};
   host.close = async () => {host.approvals.close();};
   const server = new CodexIpcServer(host, join(root, 'host.sock')); await server.listen();
   t.after(async () => {await server.close(); rmSync(root, {recursive: true, force: true});});

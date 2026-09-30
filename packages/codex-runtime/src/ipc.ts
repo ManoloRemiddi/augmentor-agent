@@ -45,6 +45,7 @@ export class CodexIpcServer {
     chmodSync(this.socketPath, 0o600); this.inode = lstatSync(this.socketPath).ino;
     this.host.on('event', this.event);
     this.host.on('attention', this.attention);
+    await this.host.recoverDesktop();
   }
   private write(socket: net.Socket, value: unknown, flushed?: () => void): void {
     if (socket.destroyed) return;

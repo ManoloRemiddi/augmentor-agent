@@ -16,11 +16,15 @@ import {instructionSnapshot, validateInstructions, type InstructionSnapshot} fro
 import {CodexInteractions} from './interactions.js';
 import {checkProvider} from './provider-check.js';
 import {CodexBrowser, browserToolsFor} from './browser.js';
+import {CodexDesktop, desktopTools} from './desktop.js';
+import {desktopCapabilities} from '../../desktop/src/capabilities.js';
+import type {control} from '../../desktop/src/index.js';
 
 export const CODEX_PROTOCOL = 'augmentor-codex/1';
 interface SessionMeta {
   instructions?: InstructionSnapshot;
   browserTools?: 1;
+  desktopTools?: 1;
   imageInput?: true;
   schema: 1; id: string; profileId: string; profileRevision: number;
   cwd: string; threadId?: string; title: string; createdAt: number; updatedAt: number;
@@ -34,6 +38,7 @@ export interface HostOptions {
   maxWorkers?: number;
   createRpc?: (options: ReturnType<typeof runtimeOptions>) => CodexRpc;
   profiles?: ProfileStore;
+  desktopControl?: typeof control;
 }
 interface Worker {rpc: CodexRpc; session: CodexSession; journal: DisplayJournal; interactions: Map<string | number, RpcRequest>}
 
@@ -41,6 +46,7 @@ interface Worker {rpc: CodexRpc; session: CodexSession; journal: DisplayJournal;
 export class CodexHost extends EventEmitter {
   readonly approvals = new CodexInteractions();
   readonly browser = new CodexBrowser();
+  readonly desktop: CodexDesktop;
   private metadata = new Map<string, SessionMeta>();
   private workers = new Map<string, Worker>();
   private opening = new Map<string, Promise<Worker>>();
@@ -50,7 +56,7 @@ export class CodexHost extends EventEmitter {
   private activeRequests = 0;
   private activeCreates = 0;
   constructor(readonly options: HostOptions) {
-    super(); privateDirectory(options.root); privateDirectory(join(options.root, 'sessions'));
+    super(); this.desktop = new CodexDesktop(options.desktopControl); privateDirectory(options.root); privateDirectory(join(options.root, 'sessions'));
     installedRuntimeVersion();
     for (const filename of readdirSync(join(options.root, 'sessions')).filter(name => name.endsWith('.json'))) {
       const meta = readPrivateJson(join(options.root, 'sessions', filename)) as SessionMeta;
@@ -58,6 +64,8 @@ export class CodexHost extends EventEmitter {
           !isAbsolute(meta.cwd) || typeof meta.title !== 'string' || !Number.isInteger(meta.profileRevision) ||
           (meta.status === 'ready' && typeof meta.threadId !== 'string')) throw new Error('Unsupported or corrupt Codex session index.');
       if (meta.imageInput !== undefined && meta.imageInput !== true) throw new Error('Unsupported Codex image contract.');
+      if (meta.desktopTools !== undefined && (meta.desktopTools !== 1 || meta.imageInput !== true)) throw new Error('Unsupported Codex desktop tool contract.');
+      if (meta.desktopTools === 1) this.desktop.register(meta.id, this.sessionRoot(meta.id));
       if (meta.browserTools !== undefined && meta.browserTools !== 1) throw new Error('Unsupported Codex browser tool contract.');
       if (meta.instructions !== undefined) validateInstructions(meta.instructions);
       identifier(meta.profileId); this.metadata.set(meta.id, meta);
@@ -118,7 +126,8 @@ export class CodexHost extends EventEmitter {
     if (this.configuring) throw new Error('Codex connection setup is in progress.');
     // Recheck after resolution: two clients can race the same create request.
     if (this.metadata.has(id)) return this.create(params);
-    const meta: SessionMeta = {schema: 1, browserTools: 1, ...(profile.connection.imageInput ? {imageInput: true} : {}), instructions: instructionSnapshot(undefined, true, profile.connection.imageInput === true), id, profileId, profileRevision: profile.revision, model: profile.connection.model,
+    const desktop = profile.connection.imageInput === true && desktopCapabilities().available;
+    const meta: SessionMeta = {schema: 1, browserTools: 1, ...(desktop ? {desktopTools: 1} : {}), ...(profile.connection.imageInput ? {imageInput: true} : {}), instructions: instructionSnapshot(undefined, true, profile.connection.imageInput === true, desktop), id, profileId, profileRevision: profile.revision, model: profile.connection.model,
       surface: params.surface === 'browser' ? 'browser' : 'linux', cwd, title: '', status: 'creating', createdAt: Date.now(), updatedAt: Date.now()};
     this.save(meta);
     await this.open(meta, profile);
@@ -151,7 +160,7 @@ export class CodexHost extends EventEmitter {
       await rpc.initialize();
       if (meta.threadId) await rpc.call('thread/resume', {threadId: meta.threadId, cwd: meta.cwd, excludeTurns: true, ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
       else {
-        const result = await rpc.call('thread/start', {cwd: meta.cwd, approvalPolicy: 'on-request', sandbox: 'workspace-write', ...(meta.browserTools ? {dynamicTools: browserToolsFor(meta.imageInput === true)} : {}), ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
+        const result = await rpc.call('thread/start', {cwd: meta.cwd, approvalPolicy: 'on-request', sandbox: 'workspace-write', ...(meta.browserTools ? {dynamicTools: [...browserToolsFor(meta.imageInput === true), ...(meta.desktopTools ? desktopTools : [])]} : {}), ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
         meta.threadId = result.thread.id; meta.status = 'ready'; this.save(meta);
       }
       this.assertOpen();
@@ -176,7 +185,7 @@ export class CodexHost extends EventEmitter {
         if (frame.method === 'item/started' && p.item?.type === 'fileChange') fileChanges.set(p.item.id, p.item.changes);
         if (frame.method === 'item/completed') fileChanges.delete(p.item?.id);
         if (frame.method === 'serverRequest/resolved') {this.approvals.cancel(meta.id, p.requestId); toolCalls.get(p.requestId)?.abort.abort();}
-        if (frame.method === 'turn/completed') {this.approvals.cancel(meta.id, undefined, p.turn.id); fileChanges.clear(); for (const call of toolCalls.values()) if (call.turnId === p.turn.id) call.abort.abort();}
+        if (frame.method === 'turn/completed') {void this.stopDesktop(meta.id); this.approvals.cancel(meta.id, undefined, p.turn.id); fileChanges.clear(); for (const call of toolCalls.values()) if (call.turnId === p.turn.id) call.abort.abort();}
       });
       session.on('attention', info => this.emit('attention', meta.id, info));
       rpc.on('request', (request: RpcRequest) => {
@@ -185,15 +194,17 @@ export class CodexHost extends EventEmitter {
         void (async () => {
           try {
             if (request.method === 'item/tool/call' && meta.browserTools) {
+              this.assertAccepting();
               const abort = new AbortController(); toolCalls.set(request.id, {turnId: request.params.turnId, abort});
-              rpc.respond(request.id, await this.browser.call(meta.id, join(root, 'browser-calls'), request.params, abort.signal, meta.imageInput === true));
+              const desktopTool = desktopTools.some(tool => tool.name === request.params.tool);
+              rpc.respond(request.id, desktopTool && meta.desktopTools ? await this.desktop.call(meta.id, root, request.params, abort.signal) : await this.browser.call(meta.id, join(root, 'browser-calls'), request.params, abort.signal, meta.imageInput === true));
             } else rpc.respond(request.id, await this.approvals.request(meta.id, request, fileChanges.get(String(request.params.itemId))));
           }
           catch {try {rpc.reject(request.id, 'This client operation is unsupported, expired or disconnected. Any dispatched action may have an unknown outcome.');} catch { /* disconnected worker */ }}
           finally {worker.interactions.delete(request.id); toolCalls.delete(request.id);}
         })();
       });
-      rpc.on('failure', () => {this.browser.cancel(meta.id); for (const call of toolCalls.values()) call.abort.abort(); this.approvals.cancel(meta.id); session.close(); worker.interactions.clear(); this.workers.delete(meta.id);});
+      rpc.on('failure', () => {void this.stopDesktop(meta.id); this.browser.cancel(meta.id); for (const call of toolCalls.values()) call.abort.abort(); this.approvals.cancel(meta.id); session.close(); worker.interactions.clear(); this.workers.delete(meta.id);});
       await session.reconcile();
       if (ledger.list().some(operation => operation.turnId || operation.status === 'unconfirmed')) {
         const history = await rpc.call('thread/read', {threadId: meta.threadId, includeTurns: true});
@@ -217,7 +228,7 @@ export class CodexHost extends EventEmitter {
     this.assertOpen();
     if (method === 'host.prepareShutdown') {
       // No await between the activity check and admission freeze.
-      if (this.activeRequests || this.activeCreates || this.opening.size || this.configuring ||
+      if (this.desktop.active || this.activeRequests || this.activeCreates || this.opening.size || this.configuring ||
           [...this.workers.values()].some(worker => worker.interactions.size || worker.session.submissionPending) ||
           [...this.metadata.values()].some(meta => meta.status !== 'ready' || this.row(meta).running)) {
         throw new Error('Codex has active or unconfirmed work. Finish or reconcile it before maintenance.');
@@ -246,7 +257,7 @@ export class CodexHost extends EventEmitter {
       case 'profiles.list': return {profiles: this.options.profiles?.list() ?? []};
       case 'profiles.configure': {
         if (!this.options.profiles) throw new Error('Codex profile setup is unavailable in this host.');
-        if (this.opening.size || this.configuring || [...this.workers.values()].some(worker => worker.interactions.size || worker.session.ledger.list().some(operation => ['accepted', 'unconfirmed'].includes(operation.status)))) throw new Error('Finish or reconcile active Codex work before changing connection profiles.');
+        if (this.desktop.active || this.opening.size || this.configuring || [...this.workers.values()].some(worker => worker.interactions.size || worker.session.ledger.list().some(operation => ['accepted', 'unconfirmed'].includes(operation.status)))) throw new Error('Finish or reconcile active Codex work before changing connection profiles.');
         this.configuring = true;
         try {
           for (const id of [...this.workers.keys()]) await this.release(id);
@@ -269,7 +280,7 @@ export class CodexHost extends EventEmitter {
         if (profile.connection.model !== params.model) throw new Error('The selected model does not match this Codex connection profile.');
         return {valid: true, validation: 'configuration-only'};
       }
-      case 'host.describe': return {pid: process.pid, harness: 'codex', protocol: CODEX_PROTOCOL, version: RELEASE.version, maintenance: this.maintenance, capabilities: {branch: false, edit: false, memory: false, voice: false, browserTools: true}, workers: this.workers.size};
+      case 'host.describe': return {pid: process.pid, harness: 'codex', protocol: CODEX_PROTOCOL, version: RELEASE.version, maintenance: this.maintenance, capabilities: {branch: false, edit: false, memory: false, voice: false, browserTools: true, desktopTools: desktopCapabilities().available}, desktopActive: this.desktop.active, workers: this.workers.size};
       case 'session.create': {const meta = await this.create(params); return {...this.row(meta), threadId: meta.threadId};}
       case 'session.list': {const items = [...this.metadata.values()].filter(meta => meta.status === 'ready').map(meta => this.row(meta)); return {items, total: items.length};}
       case 'session.models': {const meta = this.meta(params.sessionId); return {current: {provider: meta.profileId, model: meta.model}};}
@@ -297,7 +308,14 @@ export class CodexHost extends EventEmitter {
         const operation = await worker.session.submit(identifier(params.requestId), input);
         return {...operation, accepted: Boolean(operation.turnId) || operation.status === 'queued'};
       }
-      case 'session.cancel': {this.browser.cancel(identifier(params.sessionId)); const result = await (await this.worker(identifier(params.sessionId))).session.interrupt(); return {...result, accepted: result.interrupted};}
+      case 'session.cancel': {
+        const id = identifier(params.sessionId); this.browser.cancel(id); const desktopActive = this.desktop.owns(id);
+        const stopped = this.desktop.stop(id); const interrupted = this.worker(id).then(worker => worker.session.interrupt());
+        const [stopResult, turnResult] = await Promise.allSettled([stopped, interrupted]);
+        if (stopResult.status === 'rejected') throw new Error('Desktop sharing could not be confirmed stopped. Use its independent Stop button.');
+        if (turnResult.status === 'rejected') throw turnResult.reason;
+        return {...turnResult.value, accepted: turnResult.value.interrupted || desktopActive};
+      }
       case 'session.continueQueue': await (await this.worker(identifier(params.sessionId))).session.continueQueue(); return {accepted: true};
       case 'session.queue': return {operations: (await this.worker(identifier(params.sessionId))).session.ledger.list()};
       case 'session.removeQueued': return (await this.worker(identifier(params.sessionId))).session.ledger.cancelQueued(identifier(params.requestId));
@@ -310,22 +328,39 @@ export class CodexHost extends EventEmitter {
       default: throw new Error(`Unsupported Codex host method: ${method}`);
     }
   }
+  async recoverDesktop(): Promise<void> {
+    for (const failure of await this.desktop.recover()) this.reportDesktopFailure(failure.session);
+  }
+  private async stopDesktop(id: string): Promise<void> {
+    try {await this.desktop.stop(id);}
+    catch {this.reportDesktopFailure(id);}
+  }
+  private reportDesktopFailure(id: string): void {
+    const message = 'Desktop sharing could not be confirmed stopped. Use its independent Stop button.';
+    const journal = this.workers.get(id)?.journal ?? new DisplayJournal(join(this.sessionRoot(id), 'display.jsonl'));
+    const saved = journal.append({type: 'runtime/error', data: {message, reason: 'desktop-stop-unconfirmed'}});
+    if (saved) this.emit('event', id, {method: 'session/event', payload: {sessionId: id, event: saved}});
+  }
   attachBrowser(id: string, owner: object, send: (message: unknown) => void): void {
     this.assertAccepting();
     if (this.meta(id).browserTools !== 1) throw new Error('Start a new Codex chat to use browser tools.');
     this.browser.attach(id, owner, send);
   }
   async release(id: string): Promise<void> {
-    const worker = this.workers.get(id); if (!worker) return;
+    const worker = this.workers.get(id); if (!worker) {await this.desktop.stop(id); return;}
     if (worker.session.ledger.list().some(operation => ['accepted', 'unconfirmed'].includes(operation.status)) || worker.interactions.size) throw new Error('Codex conversation still has active or unconfirmed work.');
-    worker.session.close(); await worker.rpc.close(); this.workers.delete(id);
+    await this.desktop.stop(id); worker.session.close(); await worker.rpc.close(); this.workers.delete(id);
   }
   async close(): Promise<void> {
     this.closing = true; this.approvals.close(); this.browser.close();
+    const desktopClosed = this.desktop.close();
+    const cleanup = Promise.allSettled([desktopClosed]);
     await Promise.allSettled([...this.opening.values()]);
     for (const worker of this.workers.values()) {
       worker.session.close(); worker.session.ledger.recover(); await worker.rpc.close();
     }
     this.workers.clear();
+    const [desktopResult] = await cleanup;
+    if (desktopResult.status === 'rejected') throw desktopResult.reason;
   }
 }

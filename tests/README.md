@@ -14,6 +14,13 @@ No personal browser profile or provider credential is used.
 See [Codex evidence and limitations](../docs/CODEX-INTEGRATION.md) before treating
 these as real-provider, OAuth, OS-keychain, GUI or installed-release qualification.
 
+The Codex desktop runtime test uses the real pinned app-server and Python desktop
+socket handler with a synthetic OS backend. It proves transport/ownership/Stop,
+not GUI control. `scripts/vm-codex-desktop-proof.py --vm-dir ...` adds actual
+consent, capture, input and saved-file checks in the marked disposable Plasma VM,
+with host desktop autostart disabled. Its deterministic provider does not establish
+live-model vision quality or installed/macOS qualification.
+
 # Verification map
 
 Run from the repository root. The [agent handoff](../docs/AGENT-HANDOFF.md)

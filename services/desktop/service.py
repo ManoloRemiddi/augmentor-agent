@@ -63,7 +63,7 @@ class Handler(socketserver.StreamRequestHandler):
             request=json.loads(raw)
             if request.get('protocol')!='augmentor-desktop/1':raise RuntimeError('Incompatible desktop executor.')
             method=request.get('method');owner=request.get('owner')
-            if method not in ('status','shutdown') and (not isinstance(owner,str) or not re.fullmatch(r'(pi|dsh):[A-Za-z0-9_.:-]{1,180}',owner)):raise RuntimeError('A harness conversation must own desktop control.')
+            if method not in ('status','shutdown') and (not isinstance(owner,str) or not re.fullmatch(r'(pi|dsh|codex):[A-Za-z0-9_.:-]{1,180}',owner)):raise RuntimeError('A harness conversation must own desktop control.')
             backend=self.server.backend
             if method=='status':result=backend.status()
             else:

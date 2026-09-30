@@ -2,6 +2,19 @@
 
 # Start here: agent handoff
 
+## September 30 Codex consented desktop checkpoint
+
+[Desktop evidence](CODEX-INTEGRATION.md#consented-desktop-tools-and-plasma-vm-evidence)
+records the shared desktop tool bridge, durable consent/call admission, fresh
+observation tokens, sharing cleanup and crash recovery. The actual native adapter
+and pinned Codex pass a real isolated Plasma Wayland task: declined consent, screen
+pixels, exact Kate saved-file contents and Stop during partial typing with no
+replay. This uses staged source and a deterministic provider, not the owner's
+installed app or a live-model vision test. Build/type checks, 265 Node tests and
+16 focused Python cases pass. Continue the complete plan: Mac/device and actual
+Qt UI qualification, OAuth, Home/MCP, prompt improvement, memory, speech, remaining
+conversation operations and native binary distribution gates remain open.
+
 ## September 30 Codex image qualification checkpoint
 
 The [image checkpoint](CODEX-INTEGRATION.md#image-qualification-and-actual-browser-screenshot-transport)
