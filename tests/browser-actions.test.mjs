@@ -37,3 +37,13 @@ test('page-root clicks do not dispatch and missing acknowledgements never succee
  assert.equal(snapshot.ok,false);assert.match(snapshot.error,/No document observation/)
  missing=false
 })
+test('Codex action targets refuse changed tabs and changed documents before a click',async()=>{
+ state.workTabId=7
+ globalThis.location={href:'https://nas.test/'}
+ const before=clicked
+ let result=await handleBrowserAction('guard',{action:'click',selector:'#button',target:{tabId:1,url:'https://old.test/',documentEpoch:performance.timeOrigin}})
+ assert.equal(result.ok,false);assert.match(result.error,/work tab changed/)
+ result=await handleBrowserAction('guard',{action:'click',selector:'#button',target:{tabId:7,url:'https://nas.test/',documentEpoch:performance.timeOrigin-1}})
+ assert.equal(result.ok,false);assert.match(result.error,/document changed/)
+ assert.equal(clicked,before)
+})

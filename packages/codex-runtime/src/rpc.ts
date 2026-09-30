@@ -25,6 +25,7 @@ export interface RpcOptions {
   timeoutMs?: number;
   maxFrameBytes?: number;
   maxPending?: number;
+  experimentalApi?: boolean;
 }
 
 /** Owns one app-server process. Never retries a request with an unknown outcome. */
@@ -63,7 +64,7 @@ export class CodexRpc extends EventEmitter {
     this.start();
     const result = await this.call('initialize', {
       clientInfo: {name: 'augmentor_agent', title: 'Augmentor Agent', version: RELEASE.version},
-      capabilities: {experimentalApi: false},
+      capabilities: {experimentalApi: this.options.experimentalApi === true},
     });
     this.notify('initialized', {});
     return result;

@@ -48,6 +48,9 @@ unqualified. Do not substitute the user's global CLI or inherit its auth cache.
   The helper directly selects Keychain or Secret Service, without loading a
   configured fallback backend. Subscription profiles require a future supported
   login flow and cannot be created by pasting a token into API setup.
+- `browser.ts`: scoped executor ownership, bounded browser tool arguments/results,
+  durable per-call admission and observation-bound mutations; see the Browser
+  checkpoint below for supported tools and qualification limits.
 - `main.ts`: standalone shared host (`npm run start:codex` after building), with
   a private profile store and bounded socket. Startup recovers a stale socket only
   after an owned-socket check, a refused connection and unchanged inode. The
@@ -376,3 +379,61 @@ This is Linux maintenance source integration, not an installed upgrade or remova
 qualification. Existing package lifetime leases remain the installer boundary;
 macOS installer coordination and complete artifact/rollback acceptance still need
 qualification. No installed application or user service was stopped by these tests.
+
+## Scoped Browser tools and loaded Chromium evidence
+
+New Codex conversations register five existing Augmentor browser tools: tab listing,
+navigation, DOM snapshot, clicking and typing. This uses the pinned app-server's
+[experimental dynamic-tool protocol](https://learn.chatgpt.com/docs/app-server),
+with `experimentalApi` enabled only for conversations carrying the versioned
+`browserTools: 1` contract. The generated schema was inspected with
+`app-server generate-json-schema --experimental`. Codex persists the definitions
+and restores them on native thread resume; no second agent loop is introduced.
+Older conversations retain their previous tool and instruction contracts.
+
+The existing browser executor/broker is reused. An executor must attach to its
+subscribed chat and only that socket can answer its requests. Changing subscriptions
+or disconnecting revokes ownership and settles pending calls without retrying.
+New native conversations can also use these tools when their chat is explicitly
+attached in Browser. Without an attached extension, execution fails visibly.
+
+The host validates arguments and bounded results and writes a private per-call
+record before dispatch. Completed calls return their recorded result when repeated;
+unconfirmed records report an unknown outcome instead of executing again. Cached
+snapshots never grant fresh action authority. Only one dispatch may be pending per chat. Stop,
+upstream resolution, turn completion and worker loss invalidate pending calls;
+there is no claim that a dispatched browser side effect can be undone.
+
+Clicking and typing require an exact enabled-control selector from a successful
+snapshot in the current turn. The host passes the observed tab ID, URL and document
+origin timestamp separately from model arguments. The extension checks the tab
+before dispatch and the URL/timestamp inside the injected action before touching
+the element. Mutations, failed observations and executor changes invalidate the
+observation. This detects navigation/document replacement, not every possible DOM
+change inside an existing document. Dynamic-tool events use the existing chat log.
+
+Screenshots are not registered for Codex yet: image-capability profiles and actual
+image-provider acceptance remain unqualified. Empty/inconclusive DOM reads retain
+that limitation rather than claiming image support. Desktop GUI tools, Home, memory,
+voice and prompt improvement remain separate unfinished work.
+
+Validation: build passes; all 252 root Node tests and 48 Browser DOM tests pass.
+The real pinned Codex fixture round-trips browser observation and a targeted action
+through native messaging, then repeats after reopening the saved thread. The new
+`tests/codex-browser-chromium.test.mjs` loads the actual unpacked extension in an
+isolated Linux Chromium profile, connects its native host to the shared Codex host,
+and uses a deterministic local Responses provider. Through the normal panel message
+API, it creates a first chat, reads a local fixture page, types in its observed input,
+refreshes the observation, clicks once, and verifies both the real DOM and the final
+reply rendered in the panel. This found and fixed a first-chat error: the host's
+missing-conversation message now matches Browser's explicit not-found distinction.
+Socket/unit tests cover foreign owners, stale replies, cancelled/timed-out calls,
+unknown saved dispatches and changed tab/document rejection.
+
+This is real Chromium/native-messaging/runtime evidence with a synthetic model,
+not live-model quality, physical user acceptance, macOS Browser qualification or
+an installed release. The Linux native-host registration used by the test is confined
+to its temporary profile. User browser profiles and installed services are untouched.
+The preceding `73cc076` macOS 14/26 bundle jobs passed; Debian reached packaging and
+still rejected the unreviewed Codex executable. Current Browser changes need their
+own CI evidence and do not waive the remaining C0–C9 gates.

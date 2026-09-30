@@ -16,6 +16,7 @@ const preset = 'augmentor-browser-codex';
 const workspace = process.env.AUGMENTOR_CODEX_BROWSER_WORKSPACE ?? join(homedir(), 'Augmentor Browser Codex');
 const MAX_FRAME = 1024 * 1024;
 let connection, opening, selection, currentSession;
+const browserCalls = new Map();
 const send = value => {
   const body = Buffer.from(JSON.stringify(value));
   if (body.length > MAX_FRAME || process.stdout.writableLength > MAX_FRAME * 4) throw new Error('Browser connection is backpressured.');
@@ -24,7 +25,10 @@ const send = value => {
 async function client() {
   if (connection && !connection.closed) return connection;
   opening ??= PiConnection.open(frame => {
-    if (frame.method === 'session/event') {
+    if (frame.method === 'browser/execute') {
+      const timer = setTimeout(() => browserCalls.delete(frame.payload.id), 25000);
+      browserCalls.set(frame.payload.id, timer); send(frame.payload);
+    } else if (frame.method === 'session/event') {
       send({method: 'session.event', params: frame.payload});
       const type = frame.payload.event.type;
       if (type === 'turn/start' || type === 'turn/end') send({method: 'session.status', params: {sessionId: frame.payload.sessionId, status: type === 'turn/start' ? 'running' : 'idle'}});
@@ -36,7 +40,10 @@ async function client() {
   return opening;
 }
 async function attach(sessionId) {
-  const c = await client(); await c.call('events.subscribe', {sessionId}); currentSession = sessionId;
+  const c = await client(); await c.call('events.subscribe', {sessionId});
+  const meta = await c.call('session.describe', {sessionId});
+  if (meta.browserTools === 1) await c.call('browser.attach', {sessionId});
+  currentSession = sessionId;
 }
 async function request(method, params = {}, id) {
   if (method === 'augmentor/prompts') return promptLibrary(params);
@@ -58,7 +65,7 @@ async function request(method, params = {}, id) {
     selection = {provider: params.provider, model: params.model}; await c.call('models.validate', selection);
     await mkdir(workspace, {recursive: true, mode: 0o700});
     const saved = await c.call('chats.saved');
-    return {serverInfo: {home: homedir(), harness: 'codex', capabilities: {branch: false, edit: false, memory: false, voice: false, browserTools: false}, augmentor: {chatCwd: workspace, agentPreset: preset, saved: saved.saved}}};
+    return {serverInfo: {home: homedir(), harness: 'codex', capabilities: {branch: false, edit: false, memory: false, voice: false, browserTools: true}, augmentor: {chatCwd: workspace, agentPreset: preset, saved: saved.saved}}};
   }
   if (method === 'session.create') {
     if (!selection) throw new Error('Select a Codex connection before starting a chat.');
@@ -93,6 +100,14 @@ process.stdin.on('data', chunk => {
     let frame;
     try {frame = JSON.parse(buffer.subarray(4, size + 4));} catch {process.exit(1);}
     buffer = buffer.subarray(size + 4);
+    if (frame && frame.method === undefined && typeof frame.id === 'string') {
+      const timer = browserCalls.get(frame.id);
+      if (timer) {
+        clearTimeout(timer); browserCalls.delete(frame.id);
+        void client().then(c => c.call('browser.respond', {rpcId: frame.id, result: frame.result, error: frame.error?.message})).catch(() => {});
+      }
+      continue;
+    }
     if (!frame || typeof frame.method !== 'string' || !['string', 'number'].includes(typeof frame.id) || pending.has(frame.id) || pending.size >= 32) process.exit(1);
     pending.add(frame.id);
     void request(frame.method, frame.params, frame.id).then(result => send({id: frame.id, result}), error => send({id: frame.id, error: {message: error.message}})).finally(() => pending.delete(frame.id));

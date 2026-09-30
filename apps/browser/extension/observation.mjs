@@ -46,7 +46,7 @@ export async function snapshotPage() {
         if (embedded.length >= 10) break
       }
       const extra = embedded.join('\n').slice(0, 4000)
-      return {title: document.title, url: location.href, text: [text, extra].filter(Boolean).join('\n'), controls,
+      return {title: document.title, url: location.href, documentEpoch: performance.timeOrigin, text: [text, extra].filter(Boolean).join('\n'), controls,
         readyState: document.readyState, inaccessibleFrames,
         links: [...document.querySelectorAll('a[href]')].filter(visible).slice(0, 40).map(a => ({text: (a.innerText || '').trim().slice(0, 80), href: a.href}))}
     } finally { if (overlay) overlay.style.display = display }

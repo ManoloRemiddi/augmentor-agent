@@ -17,7 +17,7 @@ export function chatEvents(notification: RpcNotification): ChatEvent[] {
     case 'error': return event('runtime/error', {message: p.error?.message ?? 'Codex reported a runtime error.', willRetry: p.willRetry === true});
     case 'item/started': {
       const item = p.item;
-      if (['commandExecution', 'fileChange', 'mcpToolCall'].includes(item.type)) {
+      if (['commandExecution', 'fileChange', 'mcpToolCall', 'dynamicToolCall'].includes(item.type)) {
         return event('tool/call', {name: item.tool ?? item.type, toolCallId: item.id});
       }
       return [];
@@ -26,10 +26,10 @@ export function chatEvents(notification: RpcNotification): ChatEvent[] {
       const item = p.item;
       if (item.type === 'userMessage') return event('user/message', {source: {kind: 'user'}, content: item.content, itemId: item.id, requestId: item.clientId});
       if (item.type === 'agentMessage') return event('assistant/message', {message: {content: [{type: 'text', text: item.text}], stopReason: 'stop'}, itemId: item.id, phase: item.phase});
-      if (['commandExecution', 'fileChange', 'mcpToolCall'].includes(item.type)) {
+      if (['commandExecution', 'fileChange', 'mcpToolCall', 'dynamicToolCall'].includes(item.type)) {
         return event('tool/result', {name: item.tool ?? item.type, toolCallId: item.id,
-          isError: ['failed', 'declined'].includes(item.status) || (typeof item.exitCode === 'number' && item.exitCode !== 0),
-          result: item.type === 'mcpToolCall' ? item.result ?? {error: item.error} : {content: [{type: 'text', text: item.aggregatedOutput ?? JSON.stringify(item.changes ?? [])}]}});
+          isError: item.success === false || ['failed', 'declined'].includes(item.status) || (typeof item.exitCode === 'number' && item.exitCode !== 0),
+          result: item.type === 'dynamicToolCall' ? {content: (item.contentItems ?? []).filter((part: any) => part.type === 'inputText').map((part: any) => ({type: 'text', text: part.text}))} : item.type === 'mcpToolCall' ? item.result ?? {error: item.error} : {content: [{type: 'text', text: item.aggregatedOutput ?? JSON.stringify(item.changes ?? [])}]}});
       }
       return [];
     }

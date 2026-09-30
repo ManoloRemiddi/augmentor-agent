@@ -6,6 +6,7 @@ import {once, EventEmitter} from 'node:events';
 import {mkdtempSync, rmSync, statSync, appendFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
+import {CodexBrowser} from '../dist/codex-runtime/src/browser.js';
 import {CodexInteractions} from '../dist/codex-runtime/src/interactions.js';
 import {CodexIpcServer} from '../dist/codex-runtime/src/ipc.js';
 import {DisplayJournal} from '../dist/codex-runtime/src/journal.js';
@@ -17,7 +18,7 @@ async function fixture(t) {
   const root = mkdtempSync(join(tmpdir(), 'codex-ipc-'));
   const host = new EventEmitter();
   host.dispatch = async (method, params) => {if (method === 'session.describe' && params.sessionId !== 'one') throw new Error('Unknown conversation'); return {method};};
-  host.approvals = new CodexInteractions();
+  host.approvals = new CodexInteractions(); host.browser = new CodexBrowser();
   host.close = async () => {host.approvals.close();};
   const server = new CodexIpcServer(host, join(root, 'host.sock')); await server.listen();
   t.after(async () => {await server.close(); rmSync(root, {recursive: true, force: true});});
@@ -154,4 +155,24 @@ test('refused socket shutdown leaves the host reachable', async t => {
   client.send({id: 'shutdown', method: 'host.shutdown'}); assert.match((await client.next()).error.message, /active work/);
   client.send({id: 'describe', method: 'host.describe'}); assert.equal((await client.next()).result.ready, true);
   client.socket.destroy();
+});
+
+test('browser executor attachment and replies belong to one subscribed socket', async t => {
+  const {host, root, connect} = await fixture(t);
+  host.attachBrowser = (id, owner, send) => host.browser.attach(id, owner, send);
+  const a = await connect(); const b = await connect();
+  for (const client of [a, b]) {
+    client.send({id: 'hello', method: 'host.hello', params: {protocol: 'augmentor-codex/1'}}); await client.next();
+  }
+  a.send({id: 'early', method: 'browser.attach', params: {sessionId: 'one'}}); assert.match((await a.next()).error.message, /Subscribe/);
+  for (const client of [a, b]) {client.send({id: 'sub', method: 'events.subscribe', params: {sessionId: 'one'}}); await client.next();}
+  a.send({id: 'attach', method: 'browser.attach', params: {sessionId: 'one'}}); assert.equal((await a.next()).result.attached, true);
+  b.send({id: 'attach', method: 'browser.attach', params: {sessionId: 'one'}}); assert.match((await b.next()).error.message, /already has/);
+  const called = host.browser.call('one', join(root, 'browser-calls'), {tool: 'browser_snapshot', arguments: {}, callId: 'tool', turnId: 'turn'}, new AbortController().signal);
+  const frame = (await a.next()).event.payload;
+  b.send({id: 'forged', method: 'browser.respond', params: {rpcId: frame.id, result: {ok: true}}}); assert.match((await b.next()).error.message, /unowned/);
+  a.send({id: 'detach', method: 'events.subscribe', params: {sessionId: null}}); await a.next();
+  assert.equal((await called).success, false);
+  a.send({id: 'late', method: 'browser.respond', params: {rpcId: frame.id, result: {ok: true}}}); assert.match((await a.next()).error.message, /Stale/);
+  a.socket.destroy(); b.socket.destroy();
 });

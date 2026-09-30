@@ -3,7 +3,7 @@ import net from 'node:net';
 import {randomUUID} from 'node:crypto';
 import {chmodSync, existsSync, lstatSync, unlinkSync} from 'node:fs';
 import {dirname} from 'node:path';
-import {MAX_FRAME, request} from '../../protocol/src/index.js';
+import {MAX_FRAME, request, identifier} from '../../protocol/src/index.js';
 import {CodexHost, CODEX_PROTOCOL} from './host.js';
 import {privateDirectory} from './storage.js';
 
@@ -64,7 +64,7 @@ export class CodexIpcServer {
     let buffer = Buffer.alloc(0);
     const handshakeTimer = setTimeout(() => {if (!client.ready) socket.destroy();}, 10000);
     socket.on('error', () => {});
-    socket.on('close', () => {clearTimeout(handshakeTimer); this.clients.delete(socket); this.host.approvals.detach(presenterId);});
+    socket.on('close', () => {clearTimeout(handshakeTimer); this.clients.delete(socket); this.host.approvals.detach(presenterId); this.host.browser.detach(socket);});
     socket.on('data', chunk => {
       buffer = Buffer.concat([buffer, chunk]);
       let end;
@@ -99,8 +99,16 @@ export class CodexIpcServer {
                 else this.write(socket, {id: req.id, result: {accepted: true}}, shutdown);
                 return;
               }
-              if (req.method === 'events.subscribe') {
+              if (req.method === 'browser.attach') {
+                if (!client.sessionId || client.sessionId !== params.sessionId) throw new Error('Subscribe to this chat before attaching its browser executor.');
+                this.host.attachBrowser(client.sessionId, socket, frame => this.write(socket, {event: {method: 'browser/execute', payload: frame}}));
+                result = {attached: true};
+              } else if (req.method === 'browser.respond') {
+                this.host.browser.respond(socket, identifier(params.rpcId), params.result, typeof params.error === 'string' ? params.error.slice(0, 4096) : undefined);
+                result = {accepted: true};
+              } else if (req.method === 'events.subscribe') {
                 if (params.sessionId !== null && params.sessionId !== undefined) await this.host.dispatch('session.describe', params);
+                if (client.sessionId !== (params.sessionId ?? undefined)) this.host.browser.detach(socket);
                 client.sessionId = params.sessionId ?? undefined; result = {subscribed: true};
                 afterReply = () => {
                   this.host.approvals.detach(presenterId);

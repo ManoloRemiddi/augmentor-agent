@@ -88,6 +88,16 @@ backups include Codex state without sockets. The actual isolated host exits thro
 this script; five Python cases and 244 root Node tests pass. See the implementation
 guide for the remaining installed-upgrade and macOS coordination evidence gaps.
 
+New Codex chats now expose scoped Browser tab/navigation/snapshot/click/type tools
+through the pinned experimental dynamic-tool protocol. Calls are durable before
+dispatch, executor replies are socket-owned, and writes require observed selectors
+bound to the same tab/document. A real loaded Linux Chromium extension completes
+an isolated snapshot/type/snapshot/click task and renders the reply through native
+messaging and Codex with a synthetic model. All 252 root Node and 48 Browser DOM
+tests pass. Screenshots/model image qualification, native GUI tools, memory, voice,
+OAuth and installed release acceptance remain unfinished. See the current
+[Browser evidence](CODEX-INTEGRATION.md#scoped-browser-tools-and-loaded-chromium-evidence).
+
 ## September 30 application SDK foundation
 
 [SDK foundation](APP-SDK.md) owns the DSH-only application contract, exact tool

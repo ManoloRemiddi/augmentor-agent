@@ -15,10 +15,12 @@ import type {ProfileStore} from './profiles.js';
 import {instructionSnapshot, validateInstructions, type InstructionSnapshot} from './instructions.js';
 import {CodexInteractions} from './interactions.js';
 import {checkProvider} from './provider-check.js';
+import {CodexBrowser, browserTools} from './browser.js';
 
 export const CODEX_PROTOCOL = 'augmentor-codex/1';
 interface SessionMeta {
   instructions?: InstructionSnapshot;
+  browserTools?: 1;
   schema: 1; id: string; profileId: string; profileRevision: number;
   cwd: string; threadId?: string; title: string; createdAt: number; updatedAt: number;
   status: 'creating' | 'ready';
@@ -37,6 +39,7 @@ interface Worker {rpc: CodexRpc; session: CodexSession; journal: DisplayJournal;
 /** Shared local host. Initially uses one isolated worker per native thread authority. */
 export class CodexHost extends EventEmitter {
   readonly approvals = new CodexInteractions();
+  readonly browser = new CodexBrowser();
   private metadata = new Map<string, SessionMeta>();
   private workers = new Map<string, Worker>();
   private opening = new Map<string, Promise<Worker>>();
@@ -53,6 +56,7 @@ export class CodexHost extends EventEmitter {
       if (meta?.schema !== 1 || !['creating', 'ready'].includes(meta.status) || filename !== `${identifier(meta.id)}.json` ||
           !isAbsolute(meta.cwd) || typeof meta.title !== 'string' || !Number.isInteger(meta.profileRevision) ||
           (meta.status === 'ready' && typeof meta.threadId !== 'string')) throw new Error('Unsupported or corrupt Codex session index.');
+      if (meta.browserTools !== undefined && meta.browserTools !== 1) throw new Error('Unsupported Codex browser tool contract.');
       if (meta.instructions !== undefined) validateInstructions(meta.instructions);
       identifier(meta.profileId); this.metadata.set(meta.id, meta);
     }
@@ -62,7 +66,7 @@ export class CodexHost extends EventEmitter {
   private save(meta: SessionMeta): void {durableJson(this.metadataPath(meta.id), meta); this.metadata.set(meta.id, structuredClone(meta));}
   private meta(id: unknown): SessionMeta {
     const meta = this.metadata.get(identifier(id));
-    if (!meta) throw new Error('Unknown Codex conversation.');
+    if (!meta) throw new Error('Codex conversation not found.');
     return structuredClone(meta);
   }
   private assertOpen(): void {if (this.closing) throw new Error('Codex host is closing.');}
@@ -112,7 +116,7 @@ export class CodexHost extends EventEmitter {
     if (this.configuring) throw new Error('Codex connection setup is in progress.');
     // Recheck after resolution: two clients can race the same create request.
     if (this.metadata.has(id)) return this.create(params);
-    const meta: SessionMeta = {schema: 1, instructions: instructionSnapshot(), id, profileId, profileRevision: profile.revision, model: profile.connection.model,
+    const meta: SessionMeta = {schema: 1, browserTools: 1, instructions: instructionSnapshot(undefined, true), id, profileId, profileRevision: profile.revision, model: profile.connection.model,
       surface: params.surface === 'browser' ? 'browser' : 'linux', cwd, title: '', status: 'creating', createdAt: Date.now(), updatedAt: Date.now()};
     this.save(meta);
     await this.open(meta, profile);
@@ -139,12 +143,13 @@ export class CodexHost extends EventEmitter {
     this.assertOpen();
     const root = this.sessionRoot(meta.id); privateDirectory(root);
     const state = join(root, 'runtime'); privateDirectory(state);
-    const rpc = this.options.createRpc?.(runtimeOptions(profile.connection, state, meta.cwd)) ?? new CodexRpc(runtimeOptions(profile.connection, state, meta.cwd));
+    const options = {...runtimeOptions(profile.connection, state, meta.cwd), experimentalApi: meta.browserTools === 1};
+    const rpc = this.options.createRpc?.(options) ?? new CodexRpc(options);
     try {
       await rpc.initialize();
       if (meta.threadId) await rpc.call('thread/resume', {threadId: meta.threadId, cwd: meta.cwd, excludeTurns: true, ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
       else {
-        const result = await rpc.call('thread/start', {cwd: meta.cwd, approvalPolicy: 'on-request', sandbox: 'workspace-write', ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
+        const result = await rpc.call('thread/start', {cwd: meta.cwd, approvalPolicy: 'on-request', sandbox: 'workspace-write', ...(meta.browserTools ? {dynamicTools: browserTools} : {}), ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
         meta.threadId = result.thread.id; meta.status = 'ready'; this.save(meta);
       }
       this.assertOpen();
@@ -161,25 +166,32 @@ export class CodexHost extends EventEmitter {
       };
       session.on('event', publish);
       const fileChanges = new Map<string, unknown>();
+      const toolCalls = new Map<string | number, {turnId: unknown; abort: AbortController}>();
       rpc.on('notification', frame => {
         const p = frame.params;
         if (p.threadId !== meta.threadId) return;
+        if (frame.method === 'turn/started') this.browser.cancel(meta.id);
         if (frame.method === 'item/started' && p.item?.type === 'fileChange') fileChanges.set(p.item.id, p.item.changes);
         if (frame.method === 'item/completed') fileChanges.delete(p.item?.id);
-        if (frame.method === 'serverRequest/resolved') this.approvals.cancel(meta.id, p.requestId);
-        if (frame.method === 'turn/completed') {this.approvals.cancel(meta.id, undefined, p.turn.id); fileChanges.clear();}
+        if (frame.method === 'serverRequest/resolved') {this.approvals.cancel(meta.id, p.requestId); toolCalls.get(p.requestId)?.abort.abort();}
+        if (frame.method === 'turn/completed') {this.approvals.cancel(meta.id, undefined, p.turn.id); fileChanges.clear(); for (const call of toolCalls.values()) if (call.turnId === p.turn.id) call.abort.abort();}
       });
       session.on('attention', info => this.emit('attention', meta.id, info));
       rpc.on('request', (request: RpcRequest) => {
         if (request.params.threadId !== meta.threadId) {rpc.reject(request.id); return;}
         worker.interactions.set(request.id, request);
         void (async () => {
-          try {rpc.respond(request.id, await this.approvals.request(meta.id, request, fileChanges.get(String(request.params.itemId))));}
-          catch {try {rpc.reject(request.id, 'This approval is unsupported, expired or disconnected.');} catch { /* disconnected worker */ }}
-          finally {worker.interactions.delete(request.id);}
+          try {
+            if (request.method === 'item/tool/call' && meta.browserTools) {
+              const abort = new AbortController(); toolCalls.set(request.id, {turnId: request.params.turnId, abort});
+              rpc.respond(request.id, await this.browser.call(meta.id, join(root, 'browser-calls'), request.params, abort.signal));
+            } else rpc.respond(request.id, await this.approvals.request(meta.id, request, fileChanges.get(String(request.params.itemId))));
+          }
+          catch {try {rpc.reject(request.id, 'This client operation is unsupported, expired or disconnected. Any dispatched action may have an unknown outcome.');} catch { /* disconnected worker */ }}
+          finally {worker.interactions.delete(request.id); toolCalls.delete(request.id);}
         })();
       });
-      rpc.on('failure', () => {this.approvals.cancel(meta.id); session.close(); worker.interactions.clear(); this.workers.delete(meta.id);});
+      rpc.on('failure', () => {this.browser.cancel(meta.id); for (const call of toolCalls.values()) call.abort.abort(); this.approvals.cancel(meta.id); session.close(); worker.interactions.clear(); this.workers.delete(meta.id);});
       await session.reconcile();
       if (ledger.list().some(operation => operation.turnId || operation.status === 'unconfirmed')) {
         const history = await rpc.call('thread/read', {threadId: meta.threadId, includeTurns: true});
@@ -253,7 +265,7 @@ export class CodexHost extends EventEmitter {
         if (profile.connection.model !== params.model) throw new Error('The selected model does not match this Codex connection profile.');
         return {valid: true, validation: 'configuration-only'};
       }
-      case 'host.describe': return {pid: process.pid, harness: 'codex', protocol: CODEX_PROTOCOL, version: RELEASE.version, maintenance: this.maintenance, capabilities: {branch: false, edit: false, memory: false, voice: false}, workers: this.workers.size};
+      case 'host.describe': return {pid: process.pid, harness: 'codex', protocol: CODEX_PROTOCOL, version: RELEASE.version, maintenance: this.maintenance, capabilities: {branch: false, edit: false, memory: false, voice: false, browserTools: true}, workers: this.workers.size};
       case 'session.create': {const meta = await this.create(params); return {...this.row(meta), threadId: meta.threadId};}
       case 'session.list': {const items = [...this.metadata.values()].filter(meta => meta.status === 'ready').map(meta => this.row(meta)); return {items, total: items.length};}
       case 'session.models': {const meta = this.meta(params.sessionId); return {current: {provider: meta.profileId, model: meta.model}};}
@@ -281,7 +293,7 @@ export class CodexHost extends EventEmitter {
         const operation = await worker.session.submit(identifier(params.requestId), input);
         return {...operation, accepted: Boolean(operation.turnId) || operation.status === 'queued'};
       }
-      case 'session.cancel': {const result = await (await this.worker(identifier(params.sessionId))).session.interrupt(); return {...result, accepted: result.interrupted};}
+      case 'session.cancel': {this.browser.cancel(identifier(params.sessionId)); const result = await (await this.worker(identifier(params.sessionId))).session.interrupt(); return {...result, accepted: result.interrupted};}
       case 'session.continueQueue': await (await this.worker(identifier(params.sessionId))).session.continueQueue(); return {accepted: true};
       case 'session.queue': return {operations: (await this.worker(identifier(params.sessionId))).session.ledger.list()};
       case 'session.removeQueued': return (await this.worker(identifier(params.sessionId))).session.ledger.cancelQueued(identifier(params.requestId));
@@ -294,13 +306,18 @@ export class CodexHost extends EventEmitter {
       default: throw new Error(`Unsupported Codex host method: ${method}`);
     }
   }
+  attachBrowser(id: string, owner: object, send: (message: unknown) => void): void {
+    this.assertAccepting();
+    if (this.meta(id).browserTools !== 1) throw new Error('Start a new Codex chat to use browser tools.');
+    this.browser.attach(id, owner, send);
+  }
   async release(id: string): Promise<void> {
     const worker = this.workers.get(id); if (!worker) return;
     if (worker.session.ledger.list().some(operation => ['accepted', 'unconfirmed'].includes(operation.status)) || worker.interactions.size) throw new Error('Codex conversation still has active or unconfirmed work.');
     worker.session.close(); await worker.rpc.close(); this.workers.delete(id);
   }
   async close(): Promise<void> {
-    this.closing = true; this.approvals.close();
+    this.closing = true; this.approvals.close(); this.browser.close();
     await Promise.allSettled([...this.opening.values()]);
     for (const worker of this.workers.values()) {
       worker.session.close(); worker.session.ledger.recover(); await worker.rpc.close();

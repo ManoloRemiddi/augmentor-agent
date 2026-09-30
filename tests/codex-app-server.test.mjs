@@ -39,8 +39,9 @@ test('pinned real Codex streams a fixture response and resumes persisted native 
     res.writeHead(200, {'content-type': 'text/event-stream'});
     const send = event => res.write(`data: ${JSON.stringify(event)}\n\n`);
     if (mode === 'hold') {heldResponse = res; send({type: 'response.created', response: {id: 'resp_hold', status: 'in_progress', output: []}}); holdStarted.resolve(); return;}
-    if (['tool', 'approval', 'question'].includes(mode) && toolRounds++ === 0) {
+    if (['tool', 'approval', 'question', 'browser'].includes(mode) && toolRounds++ < (mode === 'browser' ? 2 : 1)) {
       const item = {id: 'fc_fixture', type: 'function_call', call_id: 'call_fixture', name: 'exec_command', arguments: JSON.stringify({cmd: 'printf augmentor_tool_fixture', max_output_tokens: 100, ...(mode === 'approval' ? {sandbox_permissions: 'require_escalated', justification: 'Exercise the approval denial fixture.'} : {})})};
+      if (mode === 'browser') {item.name = toolRounds === 1 ? 'browser_snapshot' : 'browser_click'; item.arguments = JSON.stringify(toolRounds === 1 ? {tabId: 7} : {selector: '#fixture'}); item.id += toolRounds; item.call_id += toolRounds;}
       if (mode === 'question') {item.name = 'request_user_input'; item.arguments = JSON.stringify({questions: [{id: 'format', header: 'Format', question: 'Choose a fixture format', options: [{label: 'Text', description: 'Plain text'}, {label: 'List', description: 'A short list'}]}]});}
       send({type: 'response.created', response: {id: 'resp_tool', status: 'in_progress', output: []}});
       send({type: 'response.output_item.added', output_index: 0, item});
@@ -168,5 +169,16 @@ test('pinned real Codex streams a fixture response and resumes persisted native 
   });
   assert.equal(JSON.parse(browserQuestions.stdout).questionsAnswered, 1);
   assert.ok(requests.at(-1).input.some(item => item.type === 'function_call_output' && item.output.includes('List')));
+  await host.dispatch('session.release', {sessionId: 'browser-questions-fixture'});
+  for (let pass = 0; pass < 2; pass++) {
+    mode = 'browser'; toolRounds = 0;
+    const browserTools = await promisify(execFile)(process.execPath, [fileURLToPath(new URL('./fixtures/codex/browser-client.mjs', import.meta.url))], {
+      timeout: 20000,
+      env: {...process.env, AUGMENTOR_PROOF_BROWSER_TOOLS: '1', AUGMENTOR_CODEX_STATE: join(root, 'browser-tools'), AUGMENTOR_CODEX_SOCKET: ipc.socketPath, AUGMENTOR_CODEX_BROWSER_WORKSPACE: cwd},
+    });
+    assert.equal(JSON.parse(browserTools.stdout).browserActions, 2);
+    assert.ok(requests.at(-1).input.some(item => item.type === 'function_call_output' && JSON.stringify(item.output).includes('Synthetic browser observation fixture')));
+    await host.dispatch('session.release', {sessionId: 'browser-tools-fixture'});
+  }
   assert.equal((await host.dispatch('host.describe', {})).harness, 'codex');
 });
