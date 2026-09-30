@@ -29,6 +29,11 @@ installed apps. The owner's approved UI remains the design baseline.
 
 ## Product and runtime ownership
 
+The [Codex integration build plan](CODEX-INTEGRATION-PLAN.md) defines the proposed
+third harness for both surfaces, with subscription/API/local connection profiles.
+It is not implemented by the planning change; the runtime inventory below remains
+the current architecture until the plan's acceptance gates are completed.
+
 Augmentor is one product with native PySide6/Qt and Chromium surfaces in this
 repository. Both DSH presentations use [one personal-agent composition and voice engine](SHARED-SURFACES-2026-09-24.md); preset IDs are historical aliases. DSH is the full-featured conversational harness; Pi is a supported
 subset. Each chat stays owned by its selected harness. Neither memory nor voice
