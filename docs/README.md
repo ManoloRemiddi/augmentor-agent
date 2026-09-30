@@ -29,6 +29,7 @@ Current cross-platform direction: [one product, Linux/Mac parity audit and corre
 
 - [Codex integration build plan: Desktop, Browser and connection profiles](CODEX-INTEGRATION-PLAN.md) — full C0–C9 scope and acceptance gates.
 - [Codex implementation and evidence](CODEX-INTEGRATION.md) — runtime foundation, reproducible proofs and remaining integration work.
+- [Codex packaging inventory and release gates](CODEX-PACKAGING.md)
 - [Start here: agent handoff](AGENT-HANDOFF.md)
 - [Current architecture](ARCHITECTURE.md)
 - [One personal agent, two presentations](SHARED-SURFACES-2026-09-24.md)

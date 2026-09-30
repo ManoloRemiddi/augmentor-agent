@@ -271,3 +271,13 @@ checks pass; complete sidebar boot/send proof passes. These are real-runtime,
 fixture, DOM and offscreen evidence, not a loaded Chromium or installed-platform
 release claim. The Debian job for `bc60f80` still fails at the reviewed-native-binary
 inventory gate for Codex, after application checks; no bypass was added.
+
+## Packaging inventory checkpoint
+
+[Codex packaging](CODEX-PACKAGING.md) records 32 supplier native-file hashes and
+ABI requirements, the exact upstream source pin and a reproducible source collector.
+It verified 1,304 locked external archives and retained 4,688 notice/metadata files,
+with 139 missing-notice sources explicitly pending. The payload verifier detects
+drift but does not grant release clearance. Debian's unknown-native-file gate is
+unchanged. C8 remains incomplete until notice/source coverage, Mac parity and real
+artifact execution/rollback are qualified.

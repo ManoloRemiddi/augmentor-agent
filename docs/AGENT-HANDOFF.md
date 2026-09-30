@@ -54,6 +54,12 @@ eight offscreen native interaction cases. Debian CI still stops at the unreviewe
 Codex native executable inventory. Continue the full plan, including tool scoping,
 OAuth, memory, voice and artifact qualification.
 
+[Packaging inventory](CODEX-PACKAGING.md) now pins the complete observed Linux
+Codex native payload and source inputs. The collector verifies 1,304 locked source
+archives without rewriting Cargo resolution; 139 missing-notice sources remain
+explicit review work. The existing Debian gate is not bypassed. Continue its source
+coverage work and the remaining runtime/product phases independently.
+
 ## September 30 application SDK foundation
 
 [SDK foundation](APP-SDK.md) owns the DSH-only application contract, exact tool

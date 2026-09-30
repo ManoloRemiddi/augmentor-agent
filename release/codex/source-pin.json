@@ -1,0 +1,13 @@
+{
+  "version": "0.159.2",
+  "commit": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+  "url": "https://codeload.github.com/openai/codex/tar.gz/ff6aec96948b70d94983af2641a6b67c94faeff5",
+  "sha256": "8cfd92ccc784603d0ef94165f5a70bb99fd3de6e8b4bccda58580fc3f5f4961d",
+  "files": {
+    "codex-rs/Cargo.toml": "71396507bfea65c2b34c91dfcf38798aabb3ebf3e544d02dab7c45a3d1f5bd6b",
+    "codex-rs/Cargo.lock": "4fab6fe99180e2b8f305bd4b33c1b4bd825e3fa4cdef1045be750843bd3d431e",
+    ".github/workflows/rust-release.yml": "150b407712ea66d4310d0286ca4054323586ef578c898092032ca205b4c55059",
+    ".github/workflows/rust-release-zsh.yml": "3a972c675740ea6378ae6320a0f49b6dbb360e13a381fc29f6536ccb7918e849",
+    "third_party/voice/sources.json": "e2f6b124f6277e7c3c4f5c7cc8830c66190f671ad65e972bb2cc9507dbfcb937"
+  }
+}
