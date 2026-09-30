@@ -2,6 +2,22 @@
 
 # Start here: agent handoff
 
+## September 30 shared Codex voice transport
+
+[Codex speech integration](CODEX-INTEGRATION.md#codex-speech-through-the-shared-desktop-and-browser-engine)
+now joins the shared host, confirmed operation IDs, public reply streaming,
+scoped cancellation and both existing voice interfaces. Actual offscreen Qt
+hold/release and Browser native-worker proofs pass with real pinned Codex and
+synthetic device/model/ASR/TTS boundaries. Build/type, 327 root Node, 56 Browser
+and 569 native tests (567 pass, two Mac-only skips) pass. Requires the proposed
+Resonant Voice 0.1.17 scoped bridge at `cbf956d`; old companions fail explicitly.
+The minimal MIT test archive is reviewed, hashed and development-only.
+Continue C7 expressive/voice style, full hands-free and interrupted-generation
+proofs, full dependency artifact and physical Linux/Mac audio qualification.
+No installed service/app or Qwen/Breeze configuration changed. `b917153` passed
+both Mac jobs; Debian still stops at native-binary packaging review. Full C0–C9,
+including subscription login and production memory, remains unfinished.
+
 ## September 30 Mac guard cleanup correction
 
 Mac `29cb4c9` CI exposed a redundant post-exit group KILL returning EPERM. The

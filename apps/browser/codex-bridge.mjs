@@ -12,6 +12,7 @@ import {homeConnection} from './shared/home.mjs';
 import {surfaceRequest} from './shared/surface.mjs';
 import {supportReport} from './shared/support.mjs';
 import {randomUUID} from 'node:crypto';
+import {BrowserVoice, voicePreferences} from './shared/voice-client.mjs';
 
 const preset = 'augmentor-browser-codex';
 const workspace = process.env.AUGMENTOR_CODEX_BROWSER_WORKSPACE ?? join(homedir(), 'Augmentor Browser Codex');
@@ -23,6 +24,16 @@ const send = value => {
   if (body.length > MAX_FRAME || process.stdout.writableLength > MAX_FRAME * 4) throw new Error('Browser connection is backpressured.');
   const header = Buffer.alloc(4); header.writeUInt32LE(body.length); process.stdout.write(Buffer.concat([header, body]));
 };
+const voice = new BrowserVoice({
+  ticket: async sessionId => (await client()).call('voice.ticket', {sessionId, surface: 'browser'}),
+  submit: async (sessionId, requestId, text) => {
+    if (sessionId !== currentSession) throw new Error('The voice conversation changed.');
+    const c = await client(), queue = await c.call('session.queue', {sessionId});
+    if (queue.operations.some(value => value.status === 'unconfirmed')) throw new Error('Reconcile the last input before speaking again.');
+    return c.call('session.prompt', {sessionId, requestId, content: [{type: 'text', text}],
+      ...(queue.activeTurnId ? {mode: 'steer', expectedTurnId: queue.activeTurnId} : {mode: 'queue', resumeQueue: true})});
+  }, notify: send,
+});
 async function client() {
   if (connection && !connection.closed) return connection;
   opening ??= PiConnection.open(frame => {
@@ -30,6 +41,7 @@ async function client() {
       const timer = setTimeout(() => browserCalls.delete(frame.payload.id), 25000);
       browserCalls.set(frame.payload.id, timer); send(frame.payload);
     } else if (frame.method === 'session/event') {
+      voice.observe(frame.payload.sessionId, frame.payload.event);
       send({method: 'session.event', params: frame.payload});
       const type = frame.payload.event.type;
       if (type === 'turn/start' || type === 'turn/end') send({method: 'session.status', params: {sessionId: frame.payload.sessionId, status: type === 'turn/start' ? 'running' : 'idle'}});
@@ -38,16 +50,20 @@ async function client() {
     else if (frame.method === 'question/requested') send({id: frame.rpcId, method: 'question.requested', params: frame.payload});
     else if (frame.method === 'interaction/resolved') send({method: 'interaction.resolved', params: frame.payload});
     else if (frame.method === 'session/attention') send({method: 'session.attention', params: frame.payload});
-  }, () => setImmediate(() => process.exit(1)), 'codex').then(value => {connection = value; return value;}).finally(() => {opening = undefined;});
+  }, () => {voice.close(); setImmediate(() => process.exit(1));}, 'codex').then(value => {connection = value; return value;}).finally(() => {opening = undefined;});
   return opening;
 }
 async function attach(sessionId) {
+  if (currentSession !== sessionId) voice.close();
   const c = await client(); await c.call('events.subscribe', {sessionId});
   const meta = await c.call('session.describe', {sessionId});
   if (meta.browserTools === 1) await c.call('browser.attach', {sessionId});
   currentSession = sessionId;
 }
 async function request(method, params = {}, id) {
+  if (method === 'augmentor/voice/preferences') {if (params.action === 'save') voice.close(); return voicePreferences(params);}
+  if (method === 'augmentor/voice/start') {if (params.sessionId !== currentSession) throw new Error('Open the current Codex conversation first.'); return voice.start(params);}
+  if (method === 'augmentor/voice/control') return voice.control(params);
   if (method === 'augmentor/home') return homeConnection(params);
   if (method === 'augmentor/prompts') return promptLibrary(params);
   if (method === 'augmentor/diagnostics') return supportReport();
@@ -71,7 +87,7 @@ async function request(method, params = {}, id) {
     selection = {provider: params.provider, model: params.model}; await c.call('models.validate', selection);
     await mkdir(workspace, {recursive: true, mode: 0o700});
     const saved = await c.call('chats.saved');
-    return {serverInfo: {home: homedir(), harness: 'codex', capabilities: {branch: true, edit: true, memory: false, voice: false, browserTools: true, homeTools: true, queue: true}, augmentor: {chatCwd: workspace, agentPreset: preset, saved: saved.saved}}};
+    return {serverInfo: {home: homedir(), harness: 'codex', capabilities: {branch: true, edit: true, memory: false, voice: true, browserTools: true, homeTools: true, queue: true}, augmentor: {chatCwd: workspace, agentPreset: preset, saved: saved.saved}}};
   }
   if (method === 'session.create') {
     if (!selection) throw new Error('Select a Codex connection before starting a chat.');
@@ -99,7 +115,7 @@ async function request(method, params = {}, id) {
   }
   if (['augmentor/save', 'augmentor/unsave', 'augmentor/state'].includes(method)) return {ok: true, ...await c.call('chats.saved', {action: method.split('/')[1], sessionId: params.sessionId})};
   if (['session.branchStatus', 'session.queue', 'session.updateQueue', 'session.cancel', 'session.rename', 'session.models', 'session.history', 'settings.describe'].includes(method)) return c.call(method, params);
-  if (method === 'shutdown') {connection?.close(); setTimeout(() => process.exit(0), 30); return {ok: true};}
+  if (method === 'shutdown') {voice.close(); connection?.close(); setTimeout(() => process.exit(0), 30); return {ok: true};}
   throw new Error('This Codex browser capability is not yet available: ' + method);
 }
 let buffer = Buffer.alloc(0); const pending = new Set();
@@ -124,5 +140,5 @@ process.stdin.on('data', chunk => {
     void request(frame.method, frame.params, frame.id).then(result => send({id: frame.id, result}), error => send({id: frame.id, error: {message: error.message}})).finally(() => pending.delete(frame.id));
   }
 });
-process.stdin.on('end', () => {connection?.close(); process.exit(0);});
-process.on('SIGTERM', () => {connection?.close(); process.exit(0);});
+process.stdin.on('end', () => {voice.close(); connection?.close(); process.exit(0);});
+process.on('SIGTERM', () => {voice.close(); connection?.close(); process.exit(0);});

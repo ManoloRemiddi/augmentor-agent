@@ -260,3 +260,15 @@ completion is checked against durable failure counts because its public return
 value omits internal failures. Streaming gateway assembly was tested against the
 existing Qwen endpoint, including real cancellation. DSH surface replacement and
 Pi lifecycle hooks retain their pinned versions. See [contract and evidence](CONTROLLED-MEMORY.md).
+
+
+### Codex voice development contract
+
+Codex's shared voice adapter requires the scoped bridge proposed in Resonant
+Voice 0.1.17 at `cbf956ddc9c644a6ca3fbef02857688bb38dc8ee` (MIT). The separately
+installed production companion is not upgraded by this source change. The
+[development fixture inventory](../vendor/testing/README.md) records the selected
+service files, archive hash, reproduction command and privacy review. It contains
+no model/voice assets or private repository history and is not a deployable speech
+package. See [integration evidence](CODEX-INTEGRATION.md#codex-speech-through-the-shared-desktop-and-browser-engine)
+for actual versus synthetic test boundaries and remaining C7 gates.

@@ -1186,3 +1186,72 @@ after this correction. The new Mac CI run must establish runner evidence; these
 Linux checks do not prove the Mac fix by themselves. The same source's Debian
 application checks reached the unchanged unreviewed Codex binary packaging gate
 in [36759527576](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36759527576).
+
+
+## Codex speech through the shared Desktop and Browser engine
+
+The host now owns `CodexVoice` and an explicit `voice.ticket` operation. It reads
+only the selected user's private speech-service connection configuration, checks
+`resonant-voice/1` plus `scopedHarnessBridge: 1`, and requires the 0.1.17 scoped
+bridge contract. Service tokens and private bridge identities stay in the host;
+the surface receives only its one-time ordinary ticket. Remote endpoints,
+redirects and malformed responses cannot forward the service credential.
+
+Only live native public assistant items associated with a confirmed, delivered
+operation are streamed to speech. Reasoning, tool outputs, restored history,
+duplicate completions and late turns cannot speak. Text is coalesced with bounded
+pending work. Stable `resonant-voice:<UUID>` request identities pass through the
+existing operation ledger, including steering into a confirmed active turn.
+Unknown submission outcomes are never replayed. Full reply text remains in the
+normal conversation when speech fails.
+
+Stop clears local pending speech and sends a higher-sequence cancellation without
+waiting for an older speech acknowledgment. The service ignores stale delivery;
+Stop keeps voice available for a later input. Runtime failure and host close
+retire the scoped bridge. Heartbeats distinguish pending ticket redemption,
+active connection and closed surface; the service's independent eight-second
+lease stops audio/recognition after abrupt host loss. Active/opening voice prevents
+worker retirement, profile replacement and maintenance.
+
+Both existing interfaces now advertise this voice integration. Native
+`Controller.prepare_voice` carries the selected Codex profile when creating a
+chat before asking for a ticket. The Browser bridge uses the existing
+`BrowserVoice` and shared Python `VoiceSession`; it does not add another agent
+loop or device engine. Existing hold/release controls, preferences, named-window
+profiles and playback generation logic remain in their shared implementations.
+An older installed companion produces an explicit compatibility error when voice
+is opened. No companion, model setting, GPU or installed application was changed.
+
+Validation: build/type checks and **327 root Node tests**, **56 Browser tests**,
+and the full native suite (**569 tests, 567 passed, two Mac-only skips**) pass.
+Six focused voice contracts use the actual pinned Codex runtime and the separately
+versioned speech-service sources. The offscreen Qt proof clicks the real voice
+button, holds/releases it, creates a Codex conversation through its actual
+controller/adapter and receives PCM through the real playback buffer. The Browser
+proof runs native messaging plus the unmodified Python voice worker and checks
+exactly one spoken request and matching playback. Only audio-device callbacks,
+ASR and the model/TTS outputs are synthetic. The Browser gesture DOM test checks
+capability gating and disconnection closure; this is not yet a loaded Chromium
+voice gesture/device acceptance run.
+
+The speech dependency is proposed in
+[Resonant Voice PR #3](https://github.com/ManoloRemiddi/resonant-voice/pull/3),
+commit `cbf956d`. Its **38 service tests** cover scoped identity, heartbeat expiry,
+redemption status and disconnect; the prior DSH lifecycle proof remains separate.
+Public CI installs a [reviewed development-only archive](../vendor/testing/README.md)
+of the necessary MIT files, preserving hashes and attribution. This is not the
+complete production speech distribution.
+
+Remaining C7 work includes Codex spoken-style/structured expressive delivery,
+full hands-free/echo and interrupted-generation qualification on both surfaces,
+service artifact/installer pinning and physical microphone/playback acceptance
+on Linux and macOS. C6 capture still needs correct voice modality binding when
+memory is enabled. Subscription and the rest of C0–C9 remain open.
+
+The preceding `b917153` passed both macOS jobs in
+[36760843024](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36760843024),
+confirming the guard ownership correction. Its Debian application tests reached
+the existing unreviewed-native-binary gate in
+[36760842983](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36760842983).
+This voice checkpoint requires its own CI results before claiming Mac source
+qualification.

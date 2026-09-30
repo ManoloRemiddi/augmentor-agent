@@ -69,13 +69,13 @@ export function handlePanelMessage(msg, sender, sendResponse) {
     return true
   }
   if(msg?.type==='voice/preferences'){
-    if(state.harness!=='dsh'){sendResponse({ok:false,error:'Voice uses the shared DSH harness.'});return}
+    if(state.harness!=='dsh'&&state.capabilities.voice!==true){sendResponse({ok:false,error:'Voice is unavailable with this harness.'});return}
     request('augmentor/voice/preferences',{action:msg.action??'get',settings:msg.settings})
       .then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}))
     return true
   }
   if(msg?.type==='voice/start'){
-    if(state.harness!=='dsh'||state.phase!=='ready'||state.running||state.mutating||state.panelViewSession){sendResponse({ok:false,error:'Open an idle DSH conversation first.'});return}
+    if((state.harness!=='dsh'&&state.capabilities.voice!==true)||state.phase!=='ready'||state.running||state.mutating||state.panelViewSession){sendResponse({ok:false,error:'Open an idle connected conversation first.'});return}
     state.mutating=true
     ;(async()=>{
       if(!state.sessionReady){
@@ -95,7 +95,7 @@ export function handlePanelMessage(msg, sender, sendResponse) {
     return true
   }
   if(msg?.type==='voice/control'){
-    if(state.harness!=='dsh'||msg.action!=='close'&&msg.sessionId!==state.sessionId){sendResponse({ok:false,error:'Voice conversation changed.'});return}
+    if((state.harness!=='dsh'&&state.capabilities.voice!==true)||msg.action!=='close'&&msg.sessionId!==state.sessionId){sendResponse({ok:false,error:'Voice conversation changed.'});return}
     request('augmentor/voice/control',{sessionId:msg.sessionId,id:msg.id,action:msg.action})
       .then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}))
     return true

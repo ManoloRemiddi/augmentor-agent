@@ -31,6 +31,7 @@
   },
   "devDependencies": {
     "@types/node": "24.10.1",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "@augmentor-tests/resonant-voice": "file:vendor/testing/resonant-voice-service-0.1.17.tgz"
   }
 }

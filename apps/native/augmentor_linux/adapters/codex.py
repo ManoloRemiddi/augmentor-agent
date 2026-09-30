@@ -8,7 +8,7 @@ from ..pi_client import Connection, ContractError
 class CodexAdapter:
     harness = 'codex'
     preset = 'augmentor-linux-codex'
-    capabilities = {'branch': True, 'edit': True, 'memory': False, 'voice': False}
+    capabilities = {'branch': True, 'edit': True, 'memory': False, 'voice': True}
     supports_queue = True
 
     def __init__(self, base=None):
@@ -37,6 +37,9 @@ class CodexAdapter:
         finally:
             if connection:
                 connection.close()
+
+    def voice_ticket(self, session):
+        return self.call('voice.ticket', {'sessionId': session, 'surface': 'linux'})
 
     supports_prompt_improvement = True
 

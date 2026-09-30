@@ -22,10 +22,15 @@ import {improveDraft, validateDraft, type Rewrite} from './prompt-improvement.js
 import {CodexBrowser, browserToolsFor} from './browser.js';
 import {CodexDesktop, desktopTools} from './desktop.js';
 import {CodexHome, homeTools} from './home.js';
+import {CodexVoice, type VoiceConnection} from './voice.js';
 import {desktopCapabilities} from '../../desktop/src/capabilities.js';
 import type {control} from '../../desktop/src/index.js';
 
 export const CODEX_PROTOCOL = 'augmentor-codex/1';
+function requestIdentifier(value: unknown): string {
+  if (typeof value === 'string' && /^resonant-voice:[a-f0-9-]{36}$/.test(value)) return value;
+  return identifier(value);
+}
 class NativeActivityChanged extends Error {}
 interface SessionMeta {
   creationDispatched?: boolean;
@@ -49,6 +54,7 @@ export interface HostOptions {
   createRpc?: (options: ReturnType<typeof runtimeOptions>) => CodexRpc;
   profiles?: ProfileStore;
   desktopControl?: typeof control;
+  voiceConnection?: () => VoiceConnection;
 }
 interface Worker {rpc: CodexRpc; session: CodexSession; journal: DisplayJournal; interactions: Map<string | number, RpcRequest>; activity: NativeActivity}
 
@@ -58,6 +64,7 @@ export class CodexHost extends EventEmitter {
   readonly browser = new CodexBrowser();
   readonly home = new CodexHome();
   readonly desktop: CodexDesktop;
+  readonly voice: CodexVoice;
   private metadata = new Map<string, SessionMeta>();
   private workers = new Map<string, Worker>();
   private opening = new Map<string, Promise<Worker>>();
@@ -77,7 +84,7 @@ export class CodexHost extends EventEmitter {
   private branches = new Map<string, {key: string; promise: Promise<unknown>}>();
   private forkCreators = new Set<CodexRpc>();
   constructor(readonly options: HostOptions) {
-    super(); this.desktop = new CodexDesktop(options.desktopControl); privateDirectory(options.root); privateDirectory(join(options.root, 'sessions'));
+    super(); this.voice = new CodexVoice(options.voiceConnection, (id, message) => this.emit('attention', id, {reason: 'voice-unavailable', message})); this.desktop = new CodexDesktop(options.desktopControl); privateDirectory(options.root); privateDirectory(join(options.root, 'sessions'));
     installedRuntimeVersion();
     if (!Number.isSafeInteger(options.maxWorkers ?? 4) || (options.maxWorkers ?? 4) < 1 || (options.maxWorkers ?? 4) > 32) throw new Error('Codex worker capacity must be between 1 and 32.');
     for (const filename of readdirSync(join(options.root, 'sessions')).filter(name => name.endsWith('.json'))) {
@@ -294,7 +301,7 @@ export class CodexHost extends EventEmitter {
       for (const candidate of candidates) {
         if (this.slots.size < (this.options.maxWorkers ?? 4)) break;
         const worker = this.workers.get(candidate);
-        if (!worker || this.uses.has(candidate) || this.opening.has(candidate) || this.releasing.has(candidate) || this.desktop.owns(candidate) || worker.session.submissionPending || worker.interactions.size ||
+        if (!worker || this.uses.has(candidate) || this.opening.has(candidate) || this.releasing.has(candidate) || this.desktop.owns(candidate) || this.voice.owns(candidate) || worker.session.submissionPending || worker.interactions.size ||
             worker.session.ledger.list().some(operation => ['accepted', 'unconfirmed'].includes(operation.status) || operation.status === 'queued' && !worker.session.ledger.paused)) continue;
         // release claims the worker synchronously; new requests wait for it.
         try {await this.release(candidate);} catch (error) {
@@ -352,6 +359,7 @@ export class CodexHost extends EventEmitter {
       rpc.on('notification', frame => {
         const p = frame.params;
         if (p.threadId !== meta.threadId) return;
+        this.voice.observe(meta.id, frame, (id, turn) => ledger.list().some(operation => operation.id === id && operation.turnId === turn && operation.delivered));
         if (frame.method === 'turn/started') this.browser.cancel(meta.id);
         if (frame.method === 'item/started' && p.item?.type === 'fileChange') fileChanges.set(p.item.id, p.item.changes);
         if (frame.method === 'item/completed') fileChanges.delete(p.item?.id);
@@ -375,7 +383,7 @@ export class CodexHost extends EventEmitter {
           finally {worker.interactions.delete(request.id); toolCalls.delete(request.id);}
         })();
       });
-      rpc.on('failure', () => {void this.stopDesktop(meta.id); this.browser.cancel(meta.id); for (const call of toolCalls.values()) call.abort.abort(); this.approvals.cancel(meta.id); session.close(); worker.interactions.clear(); if (this.workers.get(meta.id) === worker) {this.workers.delete(meta.id); this.slots.delete(meta.id);}});
+      rpc.on('failure', () => {void this.voice.release(meta.id); void this.stopDesktop(meta.id); this.browser.cancel(meta.id); for (const call of toolCalls.values()) call.abort.abort(); this.approvals.cancel(meta.id); session.close(); worker.interactions.clear(); if (this.workers.get(meta.id) === worker) {this.workers.delete(meta.id); this.slots.delete(meta.id);}});
       if (meta.fork || ledger.list().some(operation => operation.turnId || operation.status === 'unconfirmed')) {
         const history = await nativeHistory(rpc, session.threadId);
         await session.reconcile(history);
@@ -397,7 +405,7 @@ export class CodexHost extends EventEmitter {
     } catch (error) {await rpc.close(); throw error;}
   }
   private maintenanceBusy(): boolean {
-    return Boolean(this.desktop.active || this.activeRequests || this.activeCreates || this.opening.size || this.releasing.size || this.configuring ||
+    return Boolean(this.voice.active || this.desktop.active || this.activeRequests || this.activeCreates || this.opening.size || this.releasing.size || this.configuring ||
       [...this.workers.values()].some(worker => worker.interactions.size || worker.session.submissionPending) ||
       [...this.metadata.values()].some(meta => meta.status !== 'ready' && meta.creationDispatched !== false || this.row(meta).running));
   }
@@ -471,7 +479,7 @@ export class CodexHost extends EventEmitter {
       case 'profiles.list': return {profiles: this.options.profiles?.list() ?? []};
       case 'profiles.configure': {
         if (!this.options.profiles) throw new Error('Codex profile setup is unavailable in this host.');
-        if (this.improvements.size || this.activeCreates || this.desktop.active || this.opening.size || this.configuring || [...this.workers.values()].some(worker => worker.interactions.size || worker.session.ledger.list().some(operation => ['accepted', 'unconfirmed'].includes(operation.status)))) throw new Error('Finish or reconcile active Codex work before changing connection profiles.');
+        if (this.improvements.size || this.activeCreates || this.voice.active || this.desktop.active || this.opening.size || this.configuring || [...this.workers.values()].some(worker => worker.interactions.size || worker.session.ledger.list().some(operation => ['accepted', 'unconfirmed'].includes(operation.status)))) throw new Error('Finish or reconcile active Codex work before changing connection profiles.');
         this.configuring = true;
         try {
           for (const id of [...this.workers.keys()]) await this.release(id);
@@ -494,7 +502,13 @@ export class CodexHost extends EventEmitter {
         if (profile.connection.model !== params.model) throw new Error('The selected model does not match this Codex connection profile.');
         return {valid: true, validation: 'configuration-only'};
       }
-      case 'host.describe': return {pid: process.pid, harness: 'codex', protocol: CODEX_PROTOCOL, version: RELEASE.version, maintenance: this.maintenance, capabilities: {branch: true, edit: true, memory: false, voice: false, browserTools: true, homeTools: true, desktopTools: desktopCapabilities().available}, desktopActive: this.desktop.active, workers: this.workers.size};
+      case 'host.describe': return {pid: process.pid, harness: 'codex', protocol: CODEX_PROTOCOL, version: RELEASE.version, maintenance: this.maintenance, capabilities: {branch: true, edit: true, memory: false, voice: true, browserTools: true, homeTools: true, desktopTools: desktopCapabilities().available}, desktopActive: this.desktop.active, workers: this.workers.size};
+      case 'voice.ticket': {
+        const id = identifier(params.sessionId), meta = this.meta(id), worker = await this.worker(id);
+        if (this.row(meta).running || worker.session.submissionPending || worker.interactions.size) throw new Error('Open an idle Codex conversation before starting voice.');
+        if (!['linux', 'browser'].includes(params.surface)) throw new Error('Choose the native or Browser voice surface.');
+        return this.voice.ticket(id, params.surface);
+      }
       case 'session.create': {const meta = await this.create(params); return {...this.row(meta), threadId: meta.threadId};}
       case 'session.branch': return this.branch(params);
       case 'session.branchStatus': {
@@ -525,13 +539,13 @@ export class CodexHost extends EventEmitter {
         const input = text(params.content.map((part: Data) => text(part.text)).join('\n'));
         const worker = await this.worker(meta.id);
         const operation = params.mode === 'steer'
-          ? await worker.session.steer(identifier(params.requestId), input, identifier(params.expectedTurnId))
-          : await worker.session.submit(identifier(params.requestId), input, params.resumeQueue === true);
+          ? await worker.session.steer(requestIdentifier(params.requestId), input, identifier(params.expectedTurnId))
+          : await worker.session.submit(requestIdentifier(params.requestId), input, params.resumeQueue === true);
         return {...operation, accepted: Boolean(operation.turnId) || operation.status === 'queued'};
       }
       case 'session.cancel': {
         const id = identifier(params.sessionId); this.browser.cancel(id); const desktopActive = this.desktop.owns(id);
-        const stopped = this.desktop.stop(id); const interrupted = this.worker(id).then(worker => worker.session.interrupt());
+        const stopped = Promise.all([this.desktop.stop(id), this.voice.stop(id)]); const interrupted = this.worker(id).then(worker => worker.session.interrupt());
         const [stopResult, turnResult] = await Promise.allSettled([stopped, interrupted]);
         if (stopResult.status === 'rejected') throw new Error('Desktop sharing could not be confirmed stopped. Use its independent Stop button.');
         if (turnResult.status === 'rejected') throw turnResult.reason;
@@ -540,13 +554,13 @@ export class CodexHost extends EventEmitter {
       case 'session.continueQueue': await (await this.worker(identifier(params.sessionId))).session.continueQueue(); return {accepted: true};
       case 'session.queue': {const worker = await this.worker(identifier(params.sessionId)); return {...this.queueView(worker.session.ledger, true), operations: worker.session.ledger.list()};}
       case 'session.updateQueue': {
-        const worker = await this.worker(identifier(params.sessionId)), id = identifier(params.itemId);
+        const worker = await this.worker(identifier(params.sessionId)), id = requestIdentifier(params.itemId);
         if (params.action?.kind === 'remove') return {...worker.session.ledger.cancelQueued(id), accepted: true};
         if (params.action?.kind !== 'steer') throw new Error('Unsupported queue action.');
         const operation = await worker.session.promote(id, identifier(params.expectedTurnId));
         return {...operation, accepted: Boolean(operation.turnId)};
       }
-      case 'session.removeQueued': return (await this.worker(identifier(params.sessionId))).session.ledger.cancelQueued(identifier(params.requestId));
+      case 'session.removeQueued': return (await this.worker(identifier(params.sessionId))).session.ledger.cancelQueued(requestIdentifier(params.requestId));
       case 'session.history': {
         const meta = this.meta(params.sessionId);
         const journal = this.workers.get(meta.id)?.journal ?? new DisplayJournal(join(this.sessionRoot(meta.id), 'display.jsonl'));
@@ -579,6 +593,7 @@ export class CodexHost extends EventEmitter {
     const pending = this.releasing.get(id); if (pending) return pending;
     const opening = this.opening.get(id); if (opening) {await opening; return this.release(id);}
     const worker = this.workers.get(id); if (!worker) {await this.desktop.stop(id); return;}
+    if (this.voice.owns(id)) throw new Error('Close voice before releasing its Codex conversation.');
     if (worker.session.submissionPending || worker.session.ledger.list().some(operation => ['accepted', 'unconfirmed'].includes(operation.status)) || worker.interactions.size) throw new Error('Codex conversation still has active or unconfirmed work.');
     const revision = worker.session.ledger.revision;
     worker.session.setMaintenance(true);
@@ -602,7 +617,7 @@ export class CodexHost extends EventEmitter {
     this.closing = true; this.approvals.close(); this.browser.close();
     for (const abort of this.improvements.keys()) abort.abort();
     const desktopClosed = this.desktop.close();
-    const cleanup = Promise.allSettled([desktopClosed, ...this.improvements.values()]);
+    const cleanup = Promise.allSettled([desktopClosed, this.voice.close(), ...this.improvements.values()]);
     await Promise.allSettled([...this.forkCreators].map(creator => creator.close()));
     await Promise.allSettled([...this.branches.values()].map(branch => branch.promise));
     await Promise.allSettled([...this.opening.values()]);

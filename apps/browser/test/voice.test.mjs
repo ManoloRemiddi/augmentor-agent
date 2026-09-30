@@ -50,3 +50,16 @@ test('release during preparation never starts a delayed recording',async t=>{
  // Regardless of timer ordering the final command must terminate capture.
  assert.equal(sent.at(-1).action,'end')
 })
+
+
+test('Codex voice uses the shared gesture controls only when its capability is advertised',async t=>{
+ const {voice,button,sent,down}=setup(t)
+ voice.update({harness:'codex',capabilities:{voice:false},phase:'ready',sessionId:'one'},false)
+ assert.equal(button.disabled,true)
+ voice.update({harness:'codex',capabilities:{voice:true},phase:'ready',sessionId:'one'},false)
+ assert.equal(button.disabled,false)
+ down();await delay(260);assert.equal(sent.at(-1).action,'begin')
+ button.onpointerup();assert.equal(sent.at(-1).action,'end')
+ voice.update({harness:'codex',capabilities:{voice:true},phase:'disconnected',sessionId:'one'},false)
+ assert.equal(sent.at(-1).action,'close');assert.equal(button.disabled,true)
+})

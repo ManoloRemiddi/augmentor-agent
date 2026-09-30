@@ -305,7 +305,7 @@ class Window(QWidget):
                 self.open_voice();return
             remaining[0]-=1
             if remaining[0]>0:QTimer.singleShot(500,ready)
-            else:self.set_status('Voice could not connect. Check the DSH connection and try the voice button again.')
+            else:self.set_status('Voice could not connect. Check the conversation connection and try the voice button again.')
         ready()
 
     def voice_is_hands_free(self):
@@ -467,7 +467,7 @@ class Window(QWidget):
         self.voice_button.hands_free=self.voice_is_hands_free()
         self.voice_button.refresh_tip()
         self.voice_button.setVisible(self.preferences.values.get('resonant_voice',True))
-        self.voice_button.setEnabled(bool(self.controller and getattr(self.controller,'harness',None)=='dsh' and getattr(self.controller,'online',False) and not getattr(self.controller,'read_only',False) and (not getattr(self.controller,'navigating',False) or self.voice_opening)))
+        self.voice_button.setEnabled(bool(self.controller and (getattr(self.controller,'harness',None)=='dsh' or getattr(self.controller,'capabilities',{}).get('voice')) and getattr(self.controller,'online',False) and not getattr(self.controller,'read_only',False) and (not getattr(self.controller,'navigating',False) or self.voice_opening)))
         running=bool(self.controller and (self.controller.running or getattr(self.controller,'navigating',False)))
         can_queue=bool(self.controller and getattr(getattr(self.controller,'client',None),'supports_queue',False))
         self.send_button.setEnabled(bool(self.controller and self.model_picker.currentData()) and (not running or can_queue) and not getattr(self.controller,'navigating',False) and not self.read_only and getattr(self.controller,'online',True))
