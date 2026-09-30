@@ -53,6 +53,8 @@ await import(location.pathname.endsWith('settings.html')?'./settings.mjs':'./sid
 if(profile.sdkProtocol&&location.pathname.endsWith('settings.html')){
  const section=document.createElement('fieldset'),legend=document.createElement('legend'),label=document.createElement('label'),input=document.createElement('input');
  legend.textContent='Experimental workspace voice';input.type='checkbox';input.checked=profile.voice.enabled;
- label.append(input,' Enable Resonant Voice for this workspace (experimental)');section.append(legend,label);document.body.prepend(section);
- input.onchange=async()=>{input.disabled=true;try{await api('preferences',{set:{'experimental-voice-enabled':input.checked}});profile.voice.enabled=input.checked;label.lastChild.textContent=' Enable Resonant Voice for this workspace (experimental). Reopen the agent panel to apply.'}catch{input.checked=profile.voice.enabled}finally{input.disabled=false}};
+ const note=document.createElement('p');note.setAttribute('role','status');section.className='card';
+ label.append(input,' Enable Resonant Voice for this workspace (experimental)');section.append(legend,label,note);
+ const voiceSection=document.querySelector('#section-voice');voiceSection.insertBefore(section,voiceSection.querySelector('.section-body'));
+ input.onchange=async()=>{input.disabled=true;try{await api('preferences',{set:{'experimental-voice-enabled':input.checked}});profile.voice.enabled=input.checked;note.textContent='Saved. Reopen the agent panel to apply.'}catch(error){input.checked=profile.voice.enabled;note.textContent='Could not save: '+error.message}finally{input.disabled=false}};
 }
