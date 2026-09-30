@@ -33,7 +33,7 @@ test('SDK workspaces cannot administer shared runtime or enable tools through se
 });
 test('monotonic tool guard denies ungranted tools and wrong workspace; revocation is read live',t=>{
  const f=fixture(t);process.env.AUGMENTOR_WORKSPACE_PROFILES=f.profilesDir;installProfile(f.profile,f);let guard;
- apply({tools:{guard:g=>{guard=g;},presentAs:()=>{}}},{profileId:'fixture'});
+ apply({tools:{guard:g=>{guard=g;},presentAs:()=>{},restrict:p=>assert.deepEqual(p,{allow:f.profile.policy.tools})}},{profileId:'fixture'});
  const exec={name:'fixture_read',agent:{session:{header:{agentPreset:f.profile.preset,cwd:f.dir}}}};
  assert.equal(guard(exec),undefined);assert.match(guard({...exec,name:'bash'}),/not granted/);
  assert.match(guard({...exec,agent:{session:{header:{agentPreset:'personal',cwd:f.dir}}}}),/does not belong/);

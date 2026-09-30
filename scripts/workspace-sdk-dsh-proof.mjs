@@ -19,11 +19,12 @@ try{
  for(const name of ['fixture_read','fixture_write'])ctx.tools.register(defineTool({name,description:name,parameters:{},output:{schema:{type:'string'},render:(_a,v)=>[{type:'text',text:v}]},execute:async()=>{name==='fixture_read'?reads++:writes++;return 'fixture';}}));
  const agent={id:'fixture-session',session:{header:{agentPreset:profile.preset,cwd:dir}}};
  const scoped=createScope(ctx,agent);agent.ctx=scoped.ctx;await scoped.ctx.plugin({name:'sdk-proof-policy',inject:['tools'],apply},{profileId:'fixture'}).await();
+ assert.deepEqual(ctx.tools.schemas(agent).map(tool=>tool.name),['fixture_read']);
  // A cooperative plugin returning allow cannot undo the monotonic denial.
  ctx.on('tools/pre-execute',async()=>({kind:'allow'}));
  const run=name=>ctx.tools.execute({name,arguments:{},agent,callId:'call-'+name,signal:new AbortController().signal});
  assert.equal((await run('fixture_read')).isError,false);assert.equal((await run('fixture_write')).isError,true);assert.equal(reads,1);assert.equal(writes,0);
  const personal={id:'other',session:{header:{agentPreset:'augmentor-linux-product',cwd:dir}}};
  assert.equal((await ctx.tools.execute({name:'fixture_write',arguments:{},agent:personal,callId:'personal-call',signal:new AbortController().signal})).isError,false);assert.equal(writes,1);
- console.log(JSON.stringify({realDsh:true,allowedTool:true,deniedToolNeverExecuted:true,unrelatedAgentPreserved:true}));
+ console.log(JSON.stringify({realDsh:true,ungrantedToolsNotAdvertised:true,allowedTool:true,deniedToolNeverExecuted:true,unrelatedAgentPreserved:true}));
 }finally{await ctx.fiber.dispose();rmSync(dir,{recursive:true,force:true});}
