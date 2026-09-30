@@ -2,6 +2,18 @@
 
 # Start here: agent handoff
 
+## September 30 Codex durable steering checkpoint
+
+[Active-turn steering](CODEX-INTEGRATION.md#durable-active-turn-steering) now
+uses exact target/client identities and durable admission through the shared
+host. Real pinned Codex consumes the correction once in the existing turn and
+preserves both user IDs after host restart. Lost acknowledgments remain unknown
+until native client-ID reconciliation; no correction becomes a new prompt.
+Build/type checks and 289 Node tests pass, plus the final shared-host fixture.
+Existing native/Browser queue presentation, snapshots, queued-item promotion
+and removal still need integration before enabling the UI. Exact fork/edit and
+remaining C0–C9 gates remain open; installed applications are unchanged.
+
 ## September 30 Codex paginated recovery checkpoint
 
 [Native-history recovery](CODEX-INTEGRATION.md#paginated-native-history-recovery)

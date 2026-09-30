@@ -30,6 +30,32 @@ export class CodexSession extends EventEmitter {
     if (!this.paused) await this.pump();
     return this.ledger.get(id);
   }
+  async steer(id: string, input: string, expectedTurnId: string): Promise<Operation> {
+    if (this.closed) throw new Error('Codex session is closed.');
+    const operations = this.ledger.list();
+    const existing = operations.find(operation => operation.id === id);
+    if (existing) return this.ledger.enqueue(id, input, expectedTurnId).operation;
+    if (this.maintenance || this.paused || this.sending) throw new Error('Codex cannot accept steering in its current state.');
+    if (operations.some(operation => operation.status === 'unconfirmed') ||
+        !operations.some(operation => !operation.steerTurnId && operation.status === 'accepted' && operation.turnId === expectedTurnId)) {
+      throw new Error('Steering requires the confirmed active Codex turn.');
+    }
+    // Admission is persisted synchronously before the one allowed dispatch.
+    this.ledger.enqueue(id, input, expectedTurnId);
+    try {
+      const result = await this.rpc.call('turn/steer', {threadId: this.threadId, expectedTurnId, clientUserMessageId: id, input: [{type: 'text', text: input}]});
+      this.ledger.acknowledge(id, result.turnId);
+      // The root can finish before the acknowledgment arrives.
+      const root = this.ledger.list().find(operation => !operation.steerTurnId && operation.turnId === expectedTurnId);
+      if (root && (root.status === 'completed' || root.status === 'failed' || root.status === 'interrupted')) this.ledger.finish(id, root.status, expectedTurnId);
+    } catch (error) {
+      if (error instanceof CodexRemoteError && [-32600, -32601, -32602].includes(error.code) && !this.ledger.get(id).turnId) this.ledger.finish(id, 'failed');
+      else this.paused = true;
+      throw error;
+    }
+    this.schedulePump();
+    return this.ledger.get(id);
+  }
   async continueQueue(): Promise<void> {this.paused = false; await this.pump();}
   private async pump(): Promise<void> {
     if (this.closed || this.paused || this.maintenance || this.sending) return;
@@ -60,8 +86,9 @@ export class CodexSession extends EventEmitter {
     try {
       if (notification.method === 'turn/started' && this.dispatchId) this.ledger.acknowledge(this.dispatchId, p.turn.id);
       if (notification.method === 'turn/completed') {
-        const operation = this.ledger.list().find(value => value.turnId === p.turn.id) ?? (this.dispatchId ? this.ledger.get(this.dispatchId) : undefined);
-        if (operation && ['completed', 'failed', 'interrupted'].includes(p.turn.status)) this.ledger.finish(operation.id, p.turn.status, p.turn.id);
+        const operations = this.ledger.list().filter(value => value.turnId === p.turn.id);
+        if (!operations.length && this.dispatchId) operations.push(this.ledger.get(this.dispatchId));
+        if (['completed', 'failed', 'interrupted'].includes(p.turn.status)) for (const operation of operations) this.ledger.finish(operation.id, p.turn.status, p.turn.id);
         if (p.turn.status !== 'completed') this.paused = true;
         else this.schedulePump();
       }

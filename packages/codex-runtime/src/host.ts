@@ -321,12 +321,14 @@ export class CodexHost extends EventEmitter {
         const meta = this.meta(params.sessionId); meta.title = text(params.title, 200); meta.updatedAt = Date.now(); this.save(meta); return {title: meta.title};
       }
       case 'session.prompt': {
-        if (params.mode && params.mode !== 'queue') throw new Error('Codex steering is not yet available; this input was not submitted.');
+        if (params.mode && !['queue', 'steer'].includes(params.mode)) throw new Error('Unsupported Codex submission mode.');
         const meta = this.meta(params.sessionId);
         if (!Array.isArray(params.content) || params.content.some((part: Data) => part.type !== 'text')) throw new Error('This Codex integration currently accepts text input.');
         const input = text(params.content.map((part: Data) => text(part.text)).join('\n'));
         const worker = await this.worker(meta.id);
-        const operation = await worker.session.submit(identifier(params.requestId), input);
+        const operation = params.mode === 'steer'
+          ? await worker.session.steer(identifier(params.requestId), input, identifier(params.expectedTurnId))
+          : await worker.session.submit(identifier(params.requestId), input);
         return {...operation, accepted: Boolean(operation.turnId) || operation.status === 'queued'};
       }
       case 'session.cancel': {

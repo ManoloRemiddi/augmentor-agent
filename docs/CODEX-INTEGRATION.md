@@ -781,3 +781,43 @@ malformed/repeated pages, ordering, foreign items and a failed later page leavin
 an unconfirmed operation unresolved. Build/type checks and all **285 root Node
 tests** pass. This is source qualification with synthetic model responses, not
 installed desktop, production provider or full C1 lifecycle acceptance.
+
+## Durable active-turn steering
+
+The shared host now accepts `session.prompt` with `mode: "steer"`, a stable
+`requestId` and explicit `expectedTurnId`. It uses supported `turn/steer` with
+`clientUserMessageId`, never interrupt-and-replay or a substitute queued turn.
+The caller must identify a confirmed active turn. Stale identities, pending
+initial admission, maintenance, Stop and unresolved work prevent new steering.
+
+A steering operation persists its target before dispatch. Repeating its identity
+and payload returns its recorded state; changed text, mode or target is rejected.
+An acknowledged correction shares the root turn's terminal status, including when
+completion arrives before the steering response. A transport error preserves an
+unconfirmed operation. Root completion alone cannot prove an unacknowledged
+correction was accepted: recovery requires its native user-message client ID.
+Unknown steering blocks further automatic queued work. Definitive protocol
+rejections record failure and never convert the correction into a new prompt.
+
+The pinned-runtime test holds the first model response, steers through the real
+shared host, repeats the request identity, then releases the response. It verifies
+one native turn, exactly one correction in the next model request, matching
+terminal status, and both user client IDs after host restart and paginated
+recovery. Unit cases cover early completion, unknown outcomes, stale identities,
+rejection and restart without replay. Build/type checks and **289 root Node tests**
+pass; the final shared-host real-runtime case also passes. These use synthetic
+provider responses, not a live-model quality assessment.
+
+Native `supports_queue` remains false and Browser queue/steer presentation is
+not yet qualified. Next work must connect existing queue controls, subscription
+queue snapshots, removal/promotion and exact turn identity to this host contract
+before enabling them; no visible layout changes are included here. See the
+[official app-server steering contract](https://learn.chatgpt.com/docs/app-server).
+
+The preceding memory source `57cb362` passed both macOS jobs in
+[36746845993](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36746845993).
+Its Debian packaging run [36746846260](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36746846260)
+failed while downloading a dependency with a connection-reset error, before the
+previously known Codex binary-review gate. It does not establish packaging
+acceptance or resolve that gate. CI for history source `312a749` is still pending
+at this checkpoint.

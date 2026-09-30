@@ -12,6 +12,7 @@ export interface Operation {
   createdAt: number;
   updatedAt: number;
   turnId?: string;
+  steerTurnId?: string;
 }
 interface RecordFile {schema: 1; threadId: string; operations: Operation[]}
 const TERMINAL = new Set<OperationStatus>(['completed', 'failed', 'interrupted', 'cancelled']);
@@ -31,7 +32,8 @@ export class OperationLedger {
         if (!validId(operation.id) || ids.has(operation.id) || typeof operation.input !== 'string' ||
           operation.fingerprint !== fingerprint(operation.input) || !['queued', 'unconfirmed', 'accepted', ...TERMINAL].includes(operation.status) ||
           !Number.isFinite(operation.createdAt) || !Number.isFinite(operation.updatedAt) ||
-          (operation.turnId !== undefined && !validId(operation.turnId))) throw new Error('Corrupt Codex operation ledger; automatic submission is disabled.');
+          (operation.turnId !== undefined && !validId(operation.turnId)) ||
+          (operation.steerTurnId !== undefined && (!validId(operation.steerTurnId) || operation.status === 'queued' || operation.turnId && operation.turnId !== operation.steerTurnId))) throw new Error('Corrupt Codex operation ledger; automatic submission is disabled.');
         ids.add(operation.id);
       }
       this.data = data;
@@ -43,17 +45,18 @@ export class OperationLedger {
     if (!value) throw new Error('Unknown Codex operation.');
     return structuredClone(value);
   }
-  enqueue(id: string, input: string): {operation: Operation; created: boolean} {
+  enqueue(id: string, input: string, steerTurnId?: string): {operation: Operation; created: boolean} {
+    if (steerTurnId !== undefined && !validId(steerTurnId)) throw new Error('Invalid steering turn identity.');
     if (!validId(id) || typeof input !== 'string' || !input.trim() || input.length > 65536) throw new Error('Invalid Codex submission.');
     const digest = fingerprint(input);
     const existing = this.data.operations.find(operation => operation.id === id);
     if (existing) {
-      if (existing.fingerprint !== digest) throw new Error('Submission identity was reused for different input.');
+      if (existing.fingerprint !== digest || existing.steerTurnId !== steerTurnId) throw new Error('Submission identity was reused for different input.');
       return {operation: structuredClone(existing), created: false};
     }
     if (this.data.operations.filter(operation => operation.status === 'queued').length >= 100) throw new Error('Codex input queue is full.');
     const now = Date.now();
-    const operation: Operation = {id, input, fingerprint: digest, status: 'queued', createdAt: now, updatedAt: now};
+    const operation: Operation = {id, input, fingerprint: digest, status: steerTurnId ? 'unconfirmed' : 'queued', ...(steerTurnId ? {steerTurnId} : {}), createdAt: now, updatedAt: now};
     this.commit([...this.data.operations, operation]);
     return {operation: structuredClone(operation), created: true};
   }
@@ -67,14 +70,14 @@ export class OperationLedger {
   acknowledge(id: string, turnId: string): Operation {
     if (!validId(turnId)) throw new Error('Invalid Codex turn identity.');
     const operation = this.get(id);
-    if (operation.turnId && operation.turnId !== turnId) throw new Error('Codex operation acknowledgment changed its turn identity.');
+    if ((operation.turnId && operation.turnId !== turnId) || (operation.steerTurnId && operation.steerTurnId !== turnId)) throw new Error('Codex operation acknowledgment changed its turn identity.');
     if (TERMINAL.has(operation.status)) return operation; // A terminal event may precede the RPC response.
     if (!['unconfirmed', 'accepted'].includes(operation.status)) throw new Error('Codex operation was not dispatched.');
     return this.update(id, {status: 'accepted', turnId});
   }
   finish(id: string, status: 'completed' | 'failed' | 'interrupted', turnId?: string): Operation {
     const operation = this.get(id);
-    if (turnId && (!validId(turnId) || (operation.turnId && operation.turnId !== turnId))) throw new Error('Codex terminal event belongs to a different turn.');
+    if (turnId && (!validId(turnId) || (operation.turnId && operation.turnId !== turnId) || (operation.steerTurnId && operation.steerTurnId !== turnId))) throw new Error('Codex terminal event belongs to a different turn.');
     if (TERMINAL.has(operation.status)) {
       if (operation.status !== status) throw new Error('Conflicting Codex terminal status.');
       return operation;

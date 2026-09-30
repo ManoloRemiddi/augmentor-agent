@@ -67,3 +67,57 @@ test('reasoning content is not exposed or captured as public transcript', () => 
   assert.deepEqual(chatEvents({method: 'item/completed', params: {item: {type: 'reasoning', content: ['private']}}}), []);
   assert.equal(chatEvents({method: 'item/reasoning/summaryTextDelta', params: {delta: 'public summary'}})[0].data.chunk.text, 'public summary');
 });
+
+test('steering uses one exact turn and settles even when completion precedes acknowledgment', async t => {
+  let calls = 0;
+  const {rpc, ledger, session} = fixture(t, async method => {
+    if (method === 'turn/start') return {turn: {id: 'turn-1'}};
+    assert.equal(method, 'turn/steer'); calls++;
+    rpc.emit('notification', {method: 'turn/completed', params: {threadId: 'thread-1', turn: {id: 'turn-1', status: 'completed'}}});
+    return {turnId: 'turn-1'};
+  });
+  await session.submit('one', 'Hello');
+  assert.equal((await session.steer('correction', 'Focus on tests', 'turn-1')).status, 'completed');
+  await session.steer('correction', 'Focus on tests', 'turn-1');
+  assert.equal(calls, 1);
+  assert.equal(ledger.get('one').status, 'completed');
+  await assert.rejects(session.steer('correction', 'Different', 'turn-1'), /different input/);
+  await assert.rejects(session.steer('other', 'Late input', 'turn-1'), /confirmed active/);
+});
+
+test('unknown steering cannot resolve from root completion alone or replay on restart', async t => {
+  let calls = 0;
+  const {rpc, ledger, session} = fixture(t, async method => {
+    if (method === 'turn/start') return {turn: {id: 'turn-1'}};
+    calls++; throw new CodexTransportError('lost steering acknowledgment', true);
+  });
+  await session.submit('one', 'Hello');
+  await assert.rejects(session.steer('correction', 'Focus on tests', 'turn-1'), /lost steering/);
+  rpc.emit('notification', {method: 'turn/completed', params: {threadId: 'thread-1', turn: {id: 'turn-1', status: 'completed'}}});
+  await session.reconcile([{id: 'turn-1', status: 'completed', items: [{type: 'userMessage', clientId: 'one'}]}]);
+  assert.equal(ledger.get('correction').status, 'unconfirmed');
+  assert.equal((await session.steer('correction', 'Focus on tests', 'turn-1')).status, 'unconfirmed');
+  const restarted = new OperationLedger(ledger.path, ledger.threadId);
+  assert.equal(restarted.get('correction').steerTurnId, 'turn-1');
+  assert.throws(() => restarted.dispatch('correction'), /undispatched/);
+  await session.reconcile([{id: 'turn-1', status: 'completed', items: [{type: 'userMessage', clientId: 'correction'}]}]);
+  assert.equal(ledger.get('correction').status, 'completed');
+  assert.equal(calls, 1);
+});
+
+
+test('stale or rejected steering never becomes a queued prompt', async t => {
+  let calls = 0;
+  const {ledger, session} = fixture(t, async method => {
+    if (method === 'turn/start') return {turn: {id: 'turn-1'}};
+    calls++; throw new CodexRemoteError(-32600, 'no active turn');
+  });
+  await session.submit('one', 'Hello');
+  await assert.rejects(session.steer('stale', 'Correction', 'turn-2'), /confirmed active/);
+  assert.equal(ledger.list().length, 1);
+  await assert.rejects(session.steer('rejected', 'Correction', 'turn-1'), /no active turn/);
+  assert.equal((await session.steer('rejected', 'Correction', 'turn-1')).status, 'failed');
+  assert.equal(calls, 1);
+  assert.equal(ledger.get('one').status, 'accepted');
+  assert.ok(ledger.list().every(operation => operation.status !== 'queued'));
+});

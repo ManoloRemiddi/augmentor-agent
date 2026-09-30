@@ -146,3 +146,13 @@ and tool output, then exercises host recovery through native/Browser fixtures.
 `codex-context-contract.test.mjs` also checks that updated then cleared
 collaboration-mode developer instructions retain prior snapshots in model input.
 These are synthetic-provider contracts, not live-account qualification.
+
+
+### Codex active-turn steering
+
+`codex-steering.test.mjs` runs the shared host with pinned Codex and a held
+synthetic Responses stream. It proves same-turn delivery, duplicate-request
+suppression, both native user client IDs, and host restart/history recovery.
+`codex-session.test.mjs` covers early terminal events, lost acknowledgments,
+client-ID reconciliation, stale target rejection and no conversion to queued
+input. Native/Browser queue UI qualification remains separate.
