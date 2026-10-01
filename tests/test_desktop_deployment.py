@@ -30,6 +30,15 @@ class DeploymentTests(unittest.TestCase):
 
     def stage(self):return self.tool.stage(self.source,'tested-fixture')
 
+    def test_staging_retains_and_verifies_external_runtime_prerequisites(self):
+        prerequisite=self.source/'distribution-prerequisites.json'
+        prerequisite.write_text('[{"name":"@openai/codex","version":"0.159.2","bundled":false}]')
+        release=self.stage()
+        self.assertEqual((release/prerequisite.name).read_bytes(),prerequisite.read_bytes())
+        self.assertIn(prerequisite.name,self.tool.verify(release)['files'])
+        (release/prerequisite.name).write_text('[]')
+        with self.assertRaisesRegex(ValueError,'changed after staging'):self.tool.activate(release)
+
     def test_staging_is_separate_and_preserves_selection(self):
         (self.source/'apps/browser/plugin/dist').mkdir(parents=True)
         (self.source/'apps/browser/plugin/dist/index.js').write_text('browser integration')

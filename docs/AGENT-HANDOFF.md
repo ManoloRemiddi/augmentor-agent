@@ -2,6 +2,23 @@
 
 # Start here: agent handoff
 
+
+## October 2: Codex Linux deployment preparation
+
+The merged Codex integration requires an external, version-checked Codex CLI
+0.159.2 and an interpreter with the protected OS credential-store dependency.
+Detached native Codex startup now passes the running native interpreter to its
+credential helper, rather than falling back to system Python. Desktop staging
+retains and inventories `distribution-prerequisites.json`.
+
+Focused startup and promotion tests pass (12 cases). Installed activation and
+running-window evidence are recorded separately after candidate qualification.
+The owner's compatible 0.2.11 installation requires an incremental candidate that
+preserves its DSH product identity and existing native improvements; replacing it
+with the complete public 0.2.13 artifact is not a compatible update. ChatGPT plan
+login remains disabled, and the local Qwen template change is a separate pending
+model-service operation. No model-service restart is part of this desktop update.
+
 ## October 1 merge blockers: current main and separate Codex prerequisite
 
 The feature branch integrates canonical main `8c3be5a` at merge `338dbc5`.

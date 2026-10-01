@@ -113,7 +113,7 @@ def stage(source, source_ref, python=None, node=None):
             if (source/part).is_dir():
                 shutil.copytree(source/part, temporary/part, symlinks=True,
                                 ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '.git', '.env', 'outputs'))
-        for part in ('package.json', 'package-lock.json', 'release.json', 'LICENSE', 'README.md', 'distribution-exclusions.json', 'distribution-overrides.json'):
+        for part in ('package.json', 'package-lock.json', 'release.json', 'LICENSE', 'README.md', 'distribution-exclusions.json', 'distribution-overrides.json', 'distribution-prerequisites.json'):
             if (source/part).is_file():
                 target = temporary/part; target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(source/part, target)
