@@ -4,6 +4,13 @@ Codex runtime tests: build first, then run `node --test tests/codex-*.test.mjs`.
 They cover real app-server operation against a synthetic Responses provider,
 the native wire adapter, durable recovery, private IPC and profile contracts.
 `test_codex_credentials.py` exercises a synthetic credential store.
+`codex-chatgpt-auth.test.mjs` uses actual loopback callbacks and freshly signed
+identity tokens with a mocked OpenAI transport. `codex-chatgpt-accounts.test.mjs`
+covers protected-account/index contracts, rotation/crash fencing and logout.
+The expanded `proof-codex-credentials.mjs` tests account save/rotation/reopen/logout
+through real OS storage with synthetic tokens and renewal, including final cleanup.
+No real OpenAI OAuth, account, inference or owner credential is involved. See
+[account implementation and remaining host/UI work](../docs/CODEX-ACCOUNTS.md).
 The Codex Chromium test loads the real extension/native host in a temporary Linux
 profile and exercises a synthetic-model browser task, including the toolbar activeTab
 grant and actual screenshot bytes through pinned Codex. It requires Chromium with

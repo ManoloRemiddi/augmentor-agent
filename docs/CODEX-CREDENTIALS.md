@@ -30,6 +30,12 @@ not close unrelated native-binary source/license gates.
 
 ## Actual store proofs
 
+The October 1 [account lifecycle checkpoint](CODEX-ACCOUNTS.md) extends the
+same proof to synthetic OAuth grant records, rotating-token persistence,
+account-index restart and logout through the actual native store. Linux passes
+in a disposable isolated keyring. These new account cases need fresh Mac CI;
+the earlier Mac results below qualify the previous scalar-store proof only.
+
 ```sh
 # Linux: separate encrypted keyring and D-Bus session; owner stores are untouched.
 python3 scripts/proof-codex-secretservice.py

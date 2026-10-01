@@ -32,7 +32,8 @@ installed apps. The owner's approved UI remains the design baseline.
 The [Codex integration build plan](CODEX-INTEGRATION-PLAN.md) defines the third
 harness for both surfaces. Its [development implementation](CODEX-INTEGRATION.md)
 uses the pinned native app-server as the agent engine and the same presentation,
-memory and tool companions. API/local setup is implemented; subscription login
+memory and tool companions. API/local setup and internal
+[OAuth/account lifecycle primitives](CODEX-ACCOUNTS.md) are implemented; subscription login wiring
 and full acceptance remain open. [Shared memory source activation](CODEX-INTEGRATION.md#codex-memory-launcher-and-existing-interface-controls)
 is qualified through isolated Qt/Chromium interfaces. This development source
 has not replaced the installed DSH/Pi applications or completed release gates.

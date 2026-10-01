@@ -175,6 +175,13 @@ endpoint before C0/C2 completion; do not add a silent transport/billing fallback
 
 ## Next work and release gaps
 
+The [October 1 ChatGPT account primitives](CODEX-ACCOUNTS.md) add verified OAuth
+transactions and protected account save/renewal/logout with a real isolated Linux
+store proof. They are not yet attached to host RPC, profile resolution, either
+surface or running workers. C4 eligibility, actual login/inference and full
+worker/surface qualification remain open; the earlier foundation descriptions
+retain their historical implementation scope.
+
 Continue C0 proofs against a real compatible local model/API, eligibility and
 context/tool/voice spikes. C1 still needs installed-service supervision, full
 worker/profile authority verification, approval presenter leases and broader

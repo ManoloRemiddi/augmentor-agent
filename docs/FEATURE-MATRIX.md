@@ -34,7 +34,9 @@ Dated candidate sections below retain their original version-specific evidence.
 Codex is an opt-in development engine. [Native credential packaging and isolated
 Linux storage](CODEX-CREDENTIALS.md) and actual Mac 14/26 Keychain storage now
 have positive isolated proof, including packaged Desktop/Browser companion
-interpreters. Installed owner-wallet recovery and subscription login remain open.
+interpreters. [OAuth/account lifecycle primitives](CODEX-ACCOUNTS.md) now have
+synthetic transaction and real Linux account-store evidence. Installed owner-wallet
+recovery, login UI/worker wiring and real subscription acceptance remain open.
 The existing local Qwen endpoint remains
 [unqualified pending a reviewed formatting change and live tool tests](CODEX-LOCAL-QWEN.md). Its [current evidence](CODEX-INTEGRATION.md)
 covers API/local profile forms, shared chat/Stop/history, approvals/questions,

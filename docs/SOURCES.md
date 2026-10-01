@@ -16,6 +16,15 @@ exact runtime. Synthetic provider evidence covers shell/file-tool exclusion,
 nonce/receipt verification and shutdown cleanup. It does not certify a live
 model/provider or authentication eligibility.
 
+## ChatGPT identity verifier — October 1
+
+`jose` **6.2.12** is pinned and locked for the
+[internal OAuth/account implementation](CODEX-ACCOUNTS.md). The actual installed
+package and lock agree on the MIT license; its original `LICENSE.md` SHA-256 is
+`8078b0829d6c3e9ecde2f003e1966e4cad3efc6e7a640efbab0313cc166b1af1`.
+Real cryptographic identity checks and synthetic OpenAI transport pass on Linux.
+This does not qualify live sign-in, subscription eligibility or installed login.
+
 ## Home preview — 24 September 2026
 
 `apps/home/package-lock.json` pins the exercised DSH 0.1.5-rc.1 packages,

@@ -2,6 +2,28 @@
 
 # Start here: agent handoff
 
+## October 1 protected ChatGPT account primitives
+
+[Account implementation and remaining integration](CODEX-ACCOUNTS.md) now covers
+actual cryptographic/loopback OAuth transactions, issued-client reuse, identity
+and scope validation, protected account mappings, serialized rotating-token
+persistence, interrupted-refresh fencing and bounded revocation/local logout.
+Identity-only consent does not enable inference; network-uncertain rotations
+quarantine old tokens without replay. The actual isolated Linux native-store proof
+passes account save/rotate/reopen/logout/cleanup, with synthetic OAuth/renewal.
+Build/type, 55 focused cases, six license-inventory tests and the complete 412-case
+Node suite pass (410 pass, two opt-in Docker memory proofs skipped). The default
+system Python lacked QtTest; the passing suite used the existing isolated Qt
+test environment. No installed dependencies or apps were altered.
+`jose` 6.2.12 is locked, and its real MIT notice passes the inventory collector.
+
+These classes remain internal and production login defaults off: no host/profile,
+Desktop/Browser or worker-renewal wiring, real account consent/inference,
+distribution eligibility or C4/full C0–C9 completion is claimed. Existing Mac CI
+must now qualify the expanded account-store proof. Continue that wiring and the
+remaining full plan. The separate Qwen activation/restart decision is pending;
+do not change its approved formatting/model deployment without owner direction.
+
 ## October 1 owner-authorized private-source cleanup
 
 The owner explicitly approved preserving all work privately and removing the
@@ -10,8 +32,9 @@ speech-source archive from public GitHub history. See
 bundle and working-file backups preserve the integration and unrelated native
 changes. The approved rewrite is now public at `8e418a0`; current branch/PR
 archive requests return 404, but the old cached introduction commit still serves
-it. A private Support request is prepared; sending it awaits separate owner
-authorization. Source-boundary and Home CI pass; Debian/Mac checks are pending.
+it. The owner-approved private Support request has been submitted; cached-copy
+removal awaits GitHub's review. At `1281935`, source-boundary/Home and both Mac
+jobs pass; Debian still stops at the existing native Codex notice gate.
 Public voice tests now use an independently authored scripted peer;
 real-service source qualification is historical and must not be claimed for the
 replacement. No installed app, production speech, owner settings or GPU/model
