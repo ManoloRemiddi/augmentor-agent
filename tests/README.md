@@ -118,6 +118,14 @@ non-overwriting screenshot output. See the
 [installed native acceptance](../docs/MACOS-DISTRIBUTION.md#september-26-follow-up-corrected-primary-mac-app-activated).
 
 
+Codex production prerequisite: `tests/codex-external-runtime.test.mjs` starts
+the actual pinned app-server through an external npm symlink from a simulated
+production application with no bundled Codex package. It checks wrong/missing
+CLI refusal and credential-free private version probes. `test_codex_packaging.py`
+checks the maintained prerequisite, refuses nested supplier packages/production
+dependency regressions and preserves unknown-native-file rejection. These checks
+do not clear supplier redistribution or real model/account acceptance.
+
 Codex draft transformation: `tests/codex-prompt-improvement.test.mjs` exercises
 bounded Responses streaming, invalid/incomplete outputs, selected credentials,
 redirect refusal, host shutdown and maintenance, and the actual native adapter

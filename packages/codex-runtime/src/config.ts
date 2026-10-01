@@ -1,9 +1,8 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-import {fileURLToPath} from 'node:url';
-import {readFileSync} from 'node:fs';
 import type {RpcOptions} from './rpc.js';
+import {resolveCodexRuntime} from './runtime.js';
+export {CODEX_VERSION, installedRuntimeVersion} from './runtime.js';
 
-export const CODEX_VERSION = '0.159.2';
 export type ConnectionKind = 'api' | 'local' | 'chatgpt' | 'chatgpt-plan';
 export interface CodexConnection {
   kind: ConnectionKind;
@@ -24,7 +23,8 @@ export function runtimeOptions(connection: CodexConnection, stateDirectory: stri
   const env: NodeJS.ProcessEnv = {};
   for (const key of ALLOWED_ENV) if (process.env[key] !== undefined) env[key] = process.env[key];
   env.CODEX_HOME = stateDirectory;
-  const args = [fileURLToPath(new URL('../../../node_modules/@openai/codex/bin/codex.js', import.meta.url)), 'app-server', '--listen', 'stdio://'];
+  const runtime = resolveCodexRuntime();
+  const args = [...runtime.args, 'app-server', '--listen', 'stdio://'];
   const config = (key: string, value: unknown) => args.push('-c', `${key}=${JSON.stringify(value)}`);
   config('model', connection.model);
   config('analytics.enabled', false);
@@ -59,12 +59,5 @@ export function runtimeOptions(connection: CodexConnection, stateDirectory: stri
       config('model_providers.augmentor.env_key', 'AUGMENTOR_CODEX_CREDENTIAL');
     }
   }
-  return {command: process.execPath, args, cwd, env};
-}
-
-export function installedRuntimeVersion(): string {
-  const path = new URL('../../../node_modules/@openai/codex/package.json', import.meta.url);
-  const actual = JSON.parse(readFileSync(path, 'utf8')).version;
-  if (actual !== CODEX_VERSION) throw new Error(`Unsupported Codex package version; this release requires ${CODEX_VERSION}.`);
-  return actual;
+  return {command: runtime.command, args, cwd, env};
 }

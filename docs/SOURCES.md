@@ -4,7 +4,9 @@
 
 ## Codex foundation — 30 September 2026
 
-`@openai/codex` 0.159.2 is pinned in the root lockfile. The installed Linux x64
+`@openai/codex` 0.159.2 is pinned as a **development dependency** in the root
+lockfile. Production artifacts require the [separately installed exact CLI](CODEX-PACKAGING.md#separately-installed-runtime--october-1)
+and do not redistribute its supplier binaries. The installed Linux x64
 app-server passes the isolated fixture protocol/tool/history proof described in
 [Codex implementation evidence](CODEX-INTEGRATION.md). Its declared license is
 Apache-2.0. Other target binaries, real providers, OAuth eligibility and product

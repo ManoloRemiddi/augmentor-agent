@@ -31,7 +31,8 @@ DSH personal surfaces now share the agent, tools and speech engine; see [shared 
 Current source/ref and qualification: [agent handoff](AGENT-HANDOFF.md).
 Dated candidate sections below retain their original version-specific evidence.
 
-Codex is an opt-in development engine. [Native credential packaging and isolated
+Codex is an opt-in development engine with a [separately installed pinned CLI](CODEX-PACKAGING.md#separately-installed-runtime--october-1);
+the Linux/Mac installers exclude its supplier binaries. [Native credential packaging and isolated
 Linux storage](CODEX-CREDENTIALS.md) and actual Mac 14/26 Keychain storage now
 have positive isolated proof, including packaged Desktop/Browser companion
 interpreters. [OAuth/account lifecycle primitives](CODEX-ACCOUNTS.md) now have

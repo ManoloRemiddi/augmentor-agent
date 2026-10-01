@@ -3,9 +3,15 @@
 # Codex integration: implementation and evidence
 
 Status: in development on `feat/codex-integration`, based on canonical main
-`b70d965` plus the [build plan](CODEX-INTEGRATION-PLAN.md). Codex is selectable in development source; this is not an installed or qualified
+`8c3be5a` plus the [build plan](CODEX-INTEGRATION-PLAN.md). Codex is selectable in development source; this is not an installed or qualified
 Codex release. The complete C0–C9 acceptance scope remains in
 the plan; no work package is certified complete by this foundation.
+
+Current packaging: [Codex is a separate pinned prerequisite](CODEX-PACKAGING.md#separately-installed-runtime--october-1).
+Linux/Mac products exclude its supplier binaries while preserving the adapter;
+source tests retain the locked development dependency. The native notice gate
+is preserved. A successful merge does not enable subscription use, deploy the
+owner's installation or certify the full integration.
 
 Current account status: [bound plan profiles and safe worker renewal](CODEX-ACCOUNTS.md#bound-connections-and-worker-renewal--october-1)
 now connect shared setup controls to queued turn admission. Production SIWC is

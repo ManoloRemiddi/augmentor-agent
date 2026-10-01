@@ -2,6 +2,27 @@
 
 # Start here: agent handoff
 
+## October 1 merge blockers: current main and separate Codex prerequisite
+
+The feature branch integrates canonical main `8c3be5a` at merge `338dbc5`.
+Browser observations retain both current main's paging/explicit-read behavior
+and Codex's document-epoch action ownership; both documentation/test histories
+are preserved. Product versions follow main's 0.2.13.
+
+[Codex packaging](CODEX-PACKAGING.md#separately-installed-runtime--october-1)
+now excludes supplier Codex files from production staging on Linux and Mac.
+The exact 0.159.2 dependency remains for source tests; products use an explicitly
+installed, version-checked CLI in a separate location. Native unknown-file
+rejection stays enabled. Bundled supplier redistribution review is incomplete,
+not bypassed. Local type/build, 480 Node cases (478 pass, two opt-in memory proof
+skips), 65 Browser cases and 598 native cases (596 pass, two Mac-only skips) pass.
+The actual production stage collects 229 npm notices, contains no Codex package,
+and records the external prerequisite. The real isolated external app-server
+startup passes. Final GitHub package evidence follows after qualification.
+No installed app, source from private dependencies, original canonical working
+files, user login cache or live model/speech configuration changed. Subscription
+eligibility gates and full C0–C9 acceptance remain open.
+
 ## October 1 model-catalog platform qualification
 
 Source `3ca4778b1a6b4e368dd1e82e106a10c29cdea504` passes Mac 14/26 CI,

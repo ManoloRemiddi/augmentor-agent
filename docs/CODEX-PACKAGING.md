@@ -2,10 +2,70 @@
 
 # Codex packaging inventory and remaining release gates
 
-Status: source and supplier-payload audit for Codex **0.159.2**. This is not
-redistribution clearance, an installed package, or completion of C8. The existing
-Debian native-inventory gate remains enabled and still rejects the unreviewed
-Codex component. Do not treat a matching hash as a complete license review.
+Status: Codex **0.159.2** is a separately installed prerequisite. Its npm package
+is a locked development dependency for source tests, excluded from production
+Desktop/Browser payloads on both Linux and Mac. This fixes the installer regression
+without declaring its supplier binaries reviewed. The Debian unknown-native-file
+gate remains enabled. The audit below is historical and still applies before any
+future bundled Codex release; this change does not complete C8 or C0–C9.
+
+## Separately installed runtime — October 1
+
+The maintained [prerequisite record](../release/codex/runtime-prerequisite.json)
+is copied into `distribution-prerequisites.json` in staged products. Staging
+refuses any installed Codex wrapper or platform package, including nested ones,
+and refuses moving Codex back into production dependencies. Production artifacts
+contain Augmentor's adapter, account controls and protected credential helper,
+but no Codex supplier binary. DSH and Pi installation remain self-contained.
+
+Install the exact CLI directly from its supplier with npm. OpenAI documents
+[npm installation of Codex CLI](https://learn.chatgpt.com/docs/codex/cli).
+Augmentor's private prerequisite location keeps it separate from an existing
+global CLI and does not require changing that CLI or its login:
+
+```sh
+# Linux; use the same XDG_DATA_HOME as the application, if customized.
+augmentor_codex_dir="${XDG_DATA_HOME:-$HOME/.local/share}/augmentor/codex-cli/0.159.2"
+npm install --prefix "$augmentor_codex_dir" --ignore-scripts --no-audit --no-fund --save-exact @openai/codex@0.159.2
+```
+
+```sh
+# macOS; this matches the launcher's Application Support data directory.
+augmentor_codex_dir="${XDG_DATA_HOME:-$HOME/Library/Application Support/Augmentor/data}/augmentor/codex-cli/0.159.2"
+npm install --prefix "$augmentor_codex_dir" --ignore-scripts --no-audit --no-fund --save-exact @openai/codex@0.159.2
+```
+
+These commands install software only; they do not sign in, start inference, change
+the selected Augmentor harness or enable ChatGPT subscription eligibility. They
+require npm/network access at this explicit prerequisite step, not during normal
+DSH/Pi installation. The commands were not applied to the owner's installation.
+An installer that provisions Codex automatically remains future work.
+
+For a CLI installed elsewhere, set `AUGMENTOR_CODEX_CLI` to its **absolute executable
+path** in Augmentor's launch environment. A selected npm symlink is resolved and
+its wrapper runs with Augmentor's Node; a selected standalone executable runs
+directly. Shell command strings, arguments and relative paths are rejected.
+There is no automatic PATH search or fallback after an explicit missing/invalid
+selection. Without an override, a source checkout uses its exact locked development
+package, and a production app uses the private prerequisite location above.
+
+Before starting its shared host, Augmentor verifies `codex-cli 0.159.2` with a
+bounded, credential-free probe in disposable private Codex state. A missing,
+unresponsive or different CLI refuses Codex startup with installation guidance.
+Workers retain their per-conversation `CODEX_HOME`, allowlisted environment,
+selected provider/model and scoped process ownership. Neither the global auth
+cache nor the prerequisite package directory supplies conversation credentials.
+Changing the executable while conversations are running is unsupported: stop
+Codex work and reopen its host before changing the launch override.
+
+Regression coverage: `codex-external-runtime.test.mjs` starts the actual pinned
+app-server from a simulated production app with no bundled supplier files, and
+checks missing/incorrect installations and probe isolation. `test_codex_packaging.py`
+checks the prerequisite record, nested supplier rejection, dependency regression
+and continued rejection of unknown native executables. Full package/platform
+results and the tested source revision are recorded in the handoff after CI.
+
+## Historical bundled-payload audit
 
 ## Pinned inputs
 

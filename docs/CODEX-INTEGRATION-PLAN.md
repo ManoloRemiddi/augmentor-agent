@@ -12,6 +12,12 @@ surfaces with subscription, API-provider and local-model connections. Publishing
 this plan does not change the installed application, default harness, license,
 or any account. All implementation checkboxes begin uncompleted.
 
+October 1 implementation decision: the [separate pinned Codex prerequisite](CODEX-PACKAGING.md#separately-installed-runtime--october-1)
+keeps the current Linux/Mac installers working while supplier redistribution
+review remains incomplete. This is an interim distribution mode, not completion
+of C8 or a reduction of the full acceptance scope below. Preserve the native
+notice gate before any future bundled Codex payload.
+
 ## 1. Product outcome and boundaries
 
 Users keep Augmentor's native desktop and Chromium interfaces, persona, prompt
