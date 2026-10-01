@@ -243,6 +243,10 @@ jobs:
               ln -s /usr/lib/augmentor/node_modules /tmp/augmentor-native-fixture/node_modules
               cd /tmp/augmentor-native-fixture
               export PATH=/usr/lib/augmentor/node/bin:$PATH
+              mkdir /tmp/augmentor-native-prerequisite
+              cp package.json package-lock.json /tmp/augmentor-native-prerequisite/
+              npm ci --prefix /tmp/augmentor-native-prerequisite --ignore-scripts --no-audit --no-fund
+              export AUGMENTOR_CODEX_CLI=/tmp/augmentor-native-prerequisite/node_modules/@openai/codex/bin/codex.js
               export PYTHONPATH=apps/native QT_QPA_PLATFORM=offscreen
               python3 -m unittest discover -s tests -v
             ' 2>&1 | tee outputs/linux-qualification/test.log

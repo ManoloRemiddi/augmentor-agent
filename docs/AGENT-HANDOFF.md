@@ -25,13 +25,22 @@ Linux CI passed root checks and exposed the setup proof's outdated unconditional
 capture-tool assertion; its correction passes the full isolated DSH/Qt proof.
 At `c964fd5`, Linux Debian/source/installed lifecycle/Browser CI passes; distro
 native tests expose missing source-build files, and Mac discovery uses the wrong
-application root. Both fixture paths are corrected; hosted confirmation remains
-open. Fresh isolated GNOME 50.5 discovery reports GlobalShortcuts 1 (existing
+application root. Both fixture paths are corrected; Mac 14/26 passes clean `5d97cf5`. Linux
+then exposes a voice PCM/queue completion timing race, now synchronized against
+the durable queue. The distro native fixture also provisions a separate locked
+Codex prerequisite; a reproduction passes 619 cases (two skips) using actual
+`c964fd5` installed JavaScript and `5d97cf5` source test instrumentation. Hosted
+Linux confirmation of the final corrections remains open. Fresh isolated GNOME
+50.5 discovery reports GlobalShortcuts 1 (existing
 bindings cannot be edited through portal v1), RemoteDesktop 2 and ScreenCast 5.
 The checked report and reproducible fixture are in the rollout guide. Complete
 setup now blocks stale same-version installed payloads before private runtime/
-credential writes. Native GNOME shortcuts/observation and current-source artifacts
-are the next implementation stages; full compatibility remains open.
+credential writes. Private GSD MediaKeys tests now deliver both synthetic shortcuts, release an
+old binding after change, disable delivery, restore after daemon restart and
+preserve foreign settings. This qualifies the mechanism, not the production
+adapter, launch/focus, physical keys or real login. Native GNOME shortcuts/
+observation and current-source artifacts remain open; full compatibility is
+not complete.
 
 ## October 1 merge blockers: current main and separate Codex prerequisite
 

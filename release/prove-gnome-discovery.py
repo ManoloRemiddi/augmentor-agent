@@ -5,7 +5,9 @@ import hashlib
 from pathlib import Path
 parser=argparse.ArgumentParser(description='Read-only compositor-interface discovery in an isolated GNOME fixture. Does not qualify login or input.')
 parser.add_argument('--out',type=Path,required=True)
+parser.add_argument('--exercise-custom-shortcuts',action='store_true',help='Exercise native GSD with synthetic input in this private compositor only.')
 args=parser.parse_args()
+exercise=args.exercise_custom_shortcuts
 if os.geteuid()==0 or not any(Path(p).exists() for p in ('/.dockerenv','/run/.containerenv')):
  raise SystemExit('Use an ordinary user in a disposable Docker/Podman container.')
 if Path('/run/systemd/seats').exists():
@@ -16,6 +18,10 @@ proof=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 os.environ.update(XDG_RUNTIME_DIR=str(run),XDG_CURRENT_DESKTOP='GNOME',XDG_SESSION_TYPE='wayland',GNOME_SHELL_SESSION_MODE='user',LIBGL_ALWAYS_SOFTWARE='1',GALLIUM_DRIVER='llvmpipe',WAYLAND_DISPLAY='wayland-augmentor')
 processes=[]
 try:
+ if exercise:
+  # The fresh private user would otherwise receive a modal welcome tour,
+  # which correctly prevents ordinary launcher shortcut delivery.
+  subprocess.run(['gsettings','set','org.gnome.shell','welcome-dialog-last-shown-version','50.5'],check=True,timeout=5)
  for name,args in [('pipewire',['pipewire']),('wireplumber',['wireplumber']),('shell',['gnome-shell','--headless','--wayland','--virtual-monitor','1280x800','--wayland-display','wayland-augmentor'])]:
   log=(out/(name+'.log')).open('w');processes.append((subprocess.Popen(args,stdout=log,stderr=log),log))
  deadline=time.monotonic()+45
@@ -42,6 +48,9 @@ try:
  report={'portalVersions':portal_versions,'proofScriptSha256':proof,'shell':version,'virtualMonitor':'1280x800','waylandSocket':True,'privateBus':True,'compositorOwnerMatchesChild':True,'softwareRendering':True,'loginManager':'GNOME built-in dummy (headless fixture)','interfaces':{label:hashlib.sha256((out/(label+'-interfaces.txt')).read_bytes()).hexdigest() for label in ('shell','display','input','portal')},'actualInputTested':False,'portalConsentTested':False,'actualLoginRebootTested':False}
  (out/'session.json').write_text(json.dumps(report,indent=2)+'\n')
  print('ISOLATED GNOME SESSION READY')
+ if exercise:
+  subprocess.run(['python3',str(Path(__file__).with_name('prove-gnome-custom-shortcuts.py')),
+                  '--compositor-pid',str(processes[-1][0].pid),'--out',str(out)],check=True,timeout=90)
 finally:
  for process,log in reversed(processes):
   if process.poll() is None:

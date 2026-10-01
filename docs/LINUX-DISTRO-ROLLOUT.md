@@ -416,3 +416,60 @@ portal success also does not establish delivery. The next shortcut adapter must
 preserve the approved two-row Save semantics through a separately qualified
 native GNOME mechanism, or record the parity gap. No GNOME input tools are enabled
 by this discovery fixture.
+
+
+### Native GNOME shortcut mechanism and final fixture corrections
+
+[Mac CI at clean `5d97cf5`](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36938051200)
+passes both macOS 14 and 26, including the packaged-helper availability check.
+[Its Linux run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36938051206)
+passes Home/source boundaries but catches another fixture race: Browser voice PCM
+can arrive before native turn completion durably updates the queue. The test now
+waits, with its existing bounded deadline, for the actual completed queue record;
+request identity, one model request and exactly one operation remain asserted.
+All seven focused Codex voice cases pass in the Fedora native/Node fixture using
+an independently authored synthetic voice peer, never private speech source.
+
+The distro matrix also needs the separately installed Codex prerequisite for its
+real idle-host maintenance test. It now installs the exact locked development
+supplier package in a disposable `/tmp` prerequisite directory and selects it
+explicitly. It does not add supplier files to the production payload. A local
+reproduction using the actual CI `c964fd5` RPM payload, committed `5d97cf5` test
+instrumentation and a separate pinned supplier passes all 619 native cases
+(617 pass, two Mac-only skips). Installed compiled JavaScript and production
+modules are used; the original checkout provides no missing source build files.
+This is fixture validation across those stated revisions, not a newly qualified
+complete candidate. Hosted Linux confirmation for the final corrections remains
+open.
+
+The native GNOME mechanism is now exercised through GSD MediaKeys 50.1 in the
+same isolated Shell/Mutter 50.5 compositor. The
+[checked mechanism report](../release/qualification/gnome50/fedora44-custom-shortcuts.json)
+records exact proof hashes. Two custom bindings independently execute synthetic
+commands; changing one releases its former combination, clearing one stops its
+delivery, and a real daemon restart restores the persisted assignment. An unrelated
+custom path and all its values survive. The proof uses one persistent private
+Mutter connection and verifies compositor ownership before injecting synthetic
+press/release events. The
+[tagged Mutter input API](https://github.com/GNOME/mutter/blob/50.5/data/dbus-interfaces/org.gnome.Mutter.RemoteDesktop.xml)
+is fixture infrastructure only; product control still requires the consent portal
+and trusted observation.
+
+The fresh user's modal welcome tour initially prevented normal shortcut delivery.
+Only the disposable fixture marks that tour as previously shown before launching
+Shell, matching the [tagged startup behavior](https://github.com/GNOME/gnome-shell/blob/50.5/js/ui/main.js).
+Another fixture error retained Gio.Settings delay mode after an initial apply;
+subsequent changes now explicitly apply before testing the old binding. These
+failures are preserved in local logs; no failed run is described as a pass.
+
+Repeat the discovery command above with `--exercise-custom-shortcuts` added to
+its Python invocation. This tests the native mechanism with synthetic commands,
+not our production adapter or actual Augmentor launch/focus. It does not qualify
+physical keys, real login/reboot, consent or all conflicts. The production adapter
+must use stable owned paths, preserve foreign settings, check writability and
+normalized known conflicts, and save the canonical per-user launcher. The
+[tagged GSD implementation](https://github.com/GNOME/gnome-settings-daemon/blob/50.0/plugins/media-keys/gsd-media-keys-manager.c)
+does not acknowledge asynchronous custom grabs to applications. Retain the
+existing “Saved. Press the shortcut to test this window” contract; never infer
+active delivery solely from settings readback. GNOME shortcuts and trusted window/
+modal/chrome observation remain the next production implementation stage.
