@@ -117,6 +117,15 @@ jobs:
           if-no-files-found: error
       - name: Build Debian packages with binary notices
         run: python3 scripts/package-debian.py
+      - name: Verify packaged Codex with a separate supplier prerequisite
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, subprocess
+          directory = pathlib.Path('outputs/debian')
+          artifact = next(row['file'] for row in json.loads((directory/'artifacts.json').read_text())['artifacts'] if row['file'].startswith('augmentor-runtime_'))
+          subprocess.run(['dpkg-deb', '--extract', str(directory/artifact), 'outputs/codex-prerequisite-proof'], check=True)
+          PY
+          outputs/codex-prerequisite-proof/usr/lib/augmentor/node/bin/node scripts/proof-codex-prerequisite.mjs outputs/codex-prerequisite-proof/usr/lib/augmentor node_modules/@openai/codex
       - name: Review final package and extension identity, contents and notices
         run: python3 scripts/review-artifacts.py --debian outputs/debian --browser outputs/browser --output outputs/debian/review.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

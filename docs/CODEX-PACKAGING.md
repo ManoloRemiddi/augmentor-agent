@@ -62,8 +62,18 @@ Regression coverage: `codex-external-runtime.test.mjs` starts the actual pinned
 app-server from a simulated production app with no bundled supplier files, and
 checks missing/incorrect installations and probe isolation. `test_codex_packaging.py`
 checks the prerequisite record, nested supplier rejection, dependency regression
-and continued rejection of unknown native executables. Full package/platform
-results and the tested source revision are recorded in the handoff after CI.
+and continued rejection of unknown native executables.
+
+`scripts/proof-codex-prerequisite.mjs <packaged-app-root> <supplier-npm-package>`
+uses the packaged Node and adapter with a disposable default prerequisite
+location linked to the separately installed exact supplier. It verifies the
+version, completes one fixed loopback synthetic Responses turn, stops/restarts
+app-server, resumes the exact native thread and reads its saved answer without
+another inference request. The private test state and server are removed; no
+tools, real model, login or owner state participate. Linux CI runs this on the
+extracted actual Debian runtime, and Mac CI on both actual app bundles before
+signature verification. Full package/platform results and tested source revisions
+are recorded in the handoff after CI.
 
 ## Historical bundled-payload audit
 

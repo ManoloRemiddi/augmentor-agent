@@ -19,6 +19,12 @@ skips), 65 Browser cases and 598 native cases (596 pass, two Mac-only skips) pas
 The actual production stage collects 229 npm notices, contains no Codex package,
 and records the external prerequisite. The real isolated external app-server
 startup passes. Final GitHub package evidence follows after qualification.
+Source `84beebca01d5f9ee997a2d1ab14f1e50d0dda9f6` also builds both Debian packages
+locally from a clean tree and passes artifact hashes/private-state/native notices
+review. Its extracted real runtime, using packaged Node, completes one synthetic
+Responses request through the default external prerequisite location and reopens
+the exact native thread/history without another request. The followup reusable
+proof runs at the real Debian and Mac Desktop/Browser packaging boundaries in CI.
 No installed app, source from private dependencies, original canonical working
 files, user login cache or live model/speech configuration changed. Subscription
 eligibility gates and full C0–C9 acceptance remain open.

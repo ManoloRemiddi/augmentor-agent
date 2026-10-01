@@ -75,6 +75,7 @@ jobs:
           .macos-build-env/bin/python3 scripts/verify-macos-application-inventory.py outputs/macos
           app="$PWD/outputs/macos/Augmentor Agent Desktop.app"
           project="$app/Contents/Resources/app"
+          "$project/node/bin/node" scripts/proof-codex-prerequisite.mjs "$project" node_modules/@openai/codex
           "$project/node/bin/node" scripts/dsh-payload-proof.mjs "$project/dsh"
           codesign --verify --deep --strict "$app"
       - name: Exercise bundled DSH and Qt with an isolated model fixture
@@ -108,6 +109,7 @@ jobs:
           .macos-build-env/bin/python3 scripts/verify-macos-application-inventory.py outputs/macos-companion
           app="$PWD/outputs/macos-companion/Augmentor Agent Browser Companion.app"
           project="$app/Contents/Resources/app"
+          "$project/node/bin/node" scripts/proof-codex-prerequisite.mjs "$project" node_modules/@openai/codex
           AUGMENTOR_PYTHON="$project/python/bin/python3" "$project/node/bin/node" "$project/scripts/proof-codex-credentials.mjs"
           codesign --verify --deep --strict "$app"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
