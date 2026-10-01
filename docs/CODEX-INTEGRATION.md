@@ -1261,9 +1261,11 @@ The speech dependency is proposed in
 [Resonant Voice PR #3](https://github.com/ManoloRemiddi/resonant-voice/pull/3),
 commit `cbf956d`. Its **38 service tests** cover scoped identity, heartbeat expiry,
 redemption status and disconnect; the prior DSH lifecycle proof remains separate.
-Public CI installs a [reviewed development-only archive](../vendor/testing/README.md)
-of the necessary MIT files, preserving hashes and attribution. This is not the
-complete production speech distribution.
+Historical evidence at this checkpoint used private speech-service source in
+a test archive. The October 1 source cleanup removes that archive from the
+public branch and replaces it with an independently authored
+[synthetic protocol peer](../tests/fixtures/codex/VOICE.md). Current public tests
+qualify Augmentor transport, not the real speech-service implementation.
 
 Remaining C7 work includes Codex spoken-style/structured expressive delivery,
 full hands-free/echo and interrupted-generation qualification on both surfaces,
@@ -1314,10 +1316,10 @@ expressive voice reply tools remain the next C7 implementation work.
 
 The first shared-voice commit `c9f9067` exposed a Home build-input omission in
 [CI job 110051714941](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36763494714/job/110051714941):
-root `npm ci` could not find the new local test archive. The Docker build stage
-and its strict context allowlist now include exactly that archive. A local full
-Home image build and its packaged prompt-service probe pass; the test archive is
-absent from the final image. No NAS service or installed application was updated.
+root `npm ci` could not find the former local test archive. That historical
+build included the archive only during compilation. The October 1 cleanup
+removes this dependency and its build-context exceptions; current Home builds
+do not receive speech-service source. No NAS service or installed application was updated.
 
 ## Codex model and tool connection check
 
@@ -1700,3 +1702,11 @@ and Home checks pass; the existing Codex native notice gate still blocks packagi
 This qualifies isolated Linux/Mac native storage, not the owner's wallet, live OAuth,
 API-provider inference or full distribution acceptance. The local Qwen activation
 decision and all remaining C0–C9 gates stay open.
+
+
+## October 1 private-source cleanup
+
+The owner authorized removing the private speech-source test archive while
+preserving Augmentor and Codex work. See [cleanup and current test boundaries](CODEX-SOURCE-CLEANUP.md). The adapter remains intact; the current public
+voice tests use an independently authored scripted protocol peer. Earlier
+service-source tests above are historical evidence, not current CI coverage.

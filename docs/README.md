@@ -32,6 +32,7 @@ Current cross-platform direction: [one product, Linux/Mac parity audit and corre
 - [Codex packaging inventory and release gates](CODEX-PACKAGING.md)
 - [Local Qwen compatibility, candidate and activation boundary](CODEX-LOCAL-QWEN.md)
 - [Codex secure credentials, release dependencies and native-store proofs](CODEX-CREDENTIALS.md)
+- [Private speech-source cleanup and current synthetic voice test boundaries](CODEX-SOURCE-CLEANUP.md)
 - [Start here: agent handoff](AGENT-HANDOFF.md)
 - [Current architecture](ARCHITECTURE.md)
 - [One personal agent, two presentations](SHARED-SURFACES-2026-09-24.md)

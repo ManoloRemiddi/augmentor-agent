@@ -4,7 +4,6 @@ FROM ${NODE_IMAGE} AS build
 WORKDIR /app
 COPY package.json package-lock.json tsconfig.json ./
 COPY scripts/prepare-ws.mjs scripts/prepare-ws.mjs
-COPY vendor/testing/resonant-voice-service-0.1.17.tgz vendor/testing/resonant-voice-service-0.1.17.tgz
 RUN npm ci --ignore-scripts --no-audit --no-fund
 COPY packages packages
 RUN ./node_modules/.bin/tsc -p tsconfig.json

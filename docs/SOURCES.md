@@ -270,11 +270,11 @@ Pi lifecycle hooks retain their pinned versions. See [contract and evidence](CON
 
 ### Codex voice development contract
 
-Codex's shared voice adapter requires the scoped bridge proposed in Resonant
-Voice 0.1.17 at `cbf956ddc9c644a6ca3fbef02857688bb38dc8ee` (MIT). The separately
-installed production companion is not upgraded by this source change. The
-[development fixture inventory](../vendor/testing/README.md) records the selected
-service files, archive hash, reproduction command and privacy review. It contains
-no model/voice assets or private repository history and is not a deployable speech
-package. See [integration evidence](CODEX-INTEGRATION.md#codex-speech-through-the-shared-desktop-and-browser-engine)
-for actual versus synthetic test boundaries and remaining C7 gates.
+Codex's shared voice adapter requires a separately installed Resonant Voice
+companion with the scoped bridge contract. Public tests use the independently
+written [synthetic protocol peer](../tests/fixtures/codex/VOICE.md), with fixed
+transcripts and PCM. They do not include or qualify private service source.
+The former source archive and reproduction helper were removed in the
+[October 1 cleanup](CODEX-SOURCE-CLEANUP.md). Installed speech, models and device
+placement are unchanged; production companion/physical-audio qualification
+remains separate.

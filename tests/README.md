@@ -350,3 +350,6 @@ native collector verifies all 28 pinned archives and retains 3,817 notice files;
 two full collection reports match byte for byte. Its compact committed inventory
 hashes each complete notice record. This is source/notice evidence, not final
 linked-binary coverage or installer clearance.
+
+Codex voice tests now use the independently authored [synthetic protocol peer](fixtures/codex/VOICE.md). They qualify Augmentor transport and client playback
+plumbing, not the private Resonant Voice service or physical audio.

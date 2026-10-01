@@ -4,9 +4,6 @@
 !package-lock.json
 !tsconfig.json
 !LICENSE
-!vendor/
-!vendor/testing/
-!vendor/testing/resonant-voice-service-0.1.17.tgz
 !scripts/
 !scripts/prepare-ws.mjs
 !packages/

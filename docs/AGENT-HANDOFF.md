@@ -2,6 +2,18 @@
 
 # Start here: agent handoff
 
+## October 1 owner-authorized private-source cleanup
+
+The owner explicitly approved preserving all work privately and removing the
+speech-source archive from public GitHub history. See
+[cleanup and current evidence](CODEX-SOURCE-CLEANUP.md). A verified private Git
+bundle and working-file backups preserve the integration and unrelated native
+changes. Public voice tests now use an independently authored scripted peer;
+real-service source qualification is historical and must not be claimed for the
+replacement. No installed app, production speech, owner settings or GPU/model
+placement changed. Continue Codex C0–C9 after cleanup; do not reintroduce private
+source from old refs, local backups, sibling repositories or npm caches.
+
 ## October 1 native V8 sources and original notice collection
 
 [Native source collection](CODEX-PACKAGING.md#october-1-native-source-collection-and-v8-inputs)

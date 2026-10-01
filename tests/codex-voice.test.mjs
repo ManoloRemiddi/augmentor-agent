@@ -11,20 +11,16 @@ import {promisify} from 'node:util';
 import {CodexIpcServer} from '../dist/codex-runtime/src/ipc.js';
 import {setTimeout as delay} from 'node:timers/promises';
 import {WebSocket} from 'ws';
-import {createVoiceService} from '@augmentor-tests/resonant-voice/src/service.js';
+import {createSyntheticVoicePeer} from './fixtures/codex/synthetic-voice-peer.mjs';
 import {CodexVoice} from '../dist/codex-runtime/src/voice.js';
 import {CodexHost} from '../dist/codex-runtime/src/host.js';
 
 async function until(fn) {for (let i=0;i<400;i++) {const value=fn();if(value)return value;await delay(10);}throw Error('Voice fixture timed out');}
 async function fixture(t, speak) {
-  const spoken=[],workers=[],config={port:0,token:'a'.repeat(64),asr:{},maxUtteranceSeconds:600};
-  // Synthetic devices exercise the separately pinned service, not installed models or audio.
-  const service=createVoiceService(config,{tts:{health:async()=>({}),async *speak(text, signal){spoken.push(text);if(speak)yield* speak(text,signal);else yield Buffer.from([1,0,2,0]);}},workerFactory:(_,emit)=>{
-    const worker={ready:true,send(event){if(event.type==='end')queueMicrotask(()=>emit({type:'final',utterance:event.utterance,text:'Synthetic spoken request'}));},close(){this.closed=true;}};
-    workers.push(worker);queueMicrotask(()=>emit({type:'ready'}));return worker;
-  }});
-  await service.listen();config.port=service.server.address().port;
-  const connection={base:`http://127.0.0.1:${config.port}`,token:config.token};
+  // Scripted protocol peer; this never executes the private speech service.
+  const service=createSyntheticVoicePeer({render:speak});
+  await service.listen();
+  const connection=service.connection, spoken=service.spoken, workers=service.connections;
   t.after(()=>service.close());
   const connect=async ticket=>{
     assert.deepEqual(Object.keys(ticket).sort(),['protocol','sessionId','ticket','url']);
