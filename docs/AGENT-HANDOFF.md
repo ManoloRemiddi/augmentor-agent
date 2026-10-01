@@ -3,6 +3,51 @@
 # Start here: agent handoff
 
 
+
+## October 2: installed Codex development option
+
+The owner-authorized Linux update is selected and running in the primary and
+mobile surfaces: release `20261002-004606-8f44c801`, compatible product 0.2.11,
+artifact SHA-256 `3e89dedc3d701fe66a41bfd0b7ff2558d0aaeb70b76750a9409eac7b0fbf30be`. Both report online/model-ready, voice
+controls available, no session restoration error and no pending update. Secondary
+is absent. Six saved native settings/conversation-selection files remain byte
+identical to their protected rollback copies. No DSH, memory, speech or model
+service was restarted; Qwen/Breeze placement and model settings remain unchanged.
+
+This is an incremental private desktop candidate over artifact
+`9a68b2442a998e0d0bffafc4c37ec8c1a54aa7b712c53c15dfabf664d4157d08`,
+with the reviewed Codex integration through `8796d2b` and deployment corrections
+`aa63d5b`, `d800690` and `dfa0922`. It preserves organized native Settings,
+submission progress, matching DSH integration and existing speech dependencies.
+It is not the complete public 0.2.13 artifact or a new public binary release.
+The prior selection remains available through `augmentor-update rollback`.
+
+Codex CLI 0.159.2 is installed in the documented per-user prerequisite location.
+A separate desktop Python environment supplies keyring 25.6.0 and retains access
+to existing native dependencies; the speech service environment is unchanged.
+Detached Codex receives this interpreter. Candidate checks pass: 265 Codex cases
+(two opt-in real-engine cases skipped), 53 focused native cases and 14 deployment/
+startup cases, plus a real external-CLI synthetic response/reopen proof, actual
+native entrypoint rendering and an isolated native Codex setup using the selected
+interpreter. Browser bridge/loaded Chromium fixture checks pass; the owner's
+installed Browser extension has not been reloaded or qualified by this update.
+
+The first candidate activation failed because a synthetic proof metadata file
+incorrectly marked this developer artifact as a fully installed distro package.
+The package-version guard refused startup; the working selection was restored
+before correction. The replacement preserves the original developer-artifact
+lifecycle and now checks the real native lifecycle during promotion. No guard is
+disabled and neither immutable artifact was edited in place.
+
+To use the development option, open Settings → Connections → Agent engine →
+Codex, then configure a compatible model. The existing DSH selection is retained.
+No owner model request was made for qualification. ChatGPT subscription login is
+still disabled. The owner's session has no active Secret Service and their wallet
+is disabled, so saving API credentials requires an explicitly chosen secure-store
+setup. The local Qwen formatter fix and idle model-service restart also remain
+separate pending choices. This update qualifies the installed harness option,
+not a live owner-provider conversation or physical Codex speech acceptance.
+
 ## October 2: Codex Linux deployment preparation
 
 The merged Codex integration requires an external, version-checked Codex CLI
