@@ -22,3 +22,6 @@ credentials.json
 .credentials.yaml
 *.pem
 *.key
+
+# Private speech-source archives must not return to the public application.
+/vendor/testing/resonant-voice-service-*.tgz

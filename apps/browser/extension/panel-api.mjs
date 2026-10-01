@@ -19,6 +19,7 @@ import {
   saveSessionId,
   clearStoredSessionId,
   saveSelection,
+  SESSION_STORAGE_KEY, MODEL_STORAGE_KEY,
 } from './state.mjs'
 import {
   ensurePort,
@@ -28,7 +29,9 @@ import {
   sessionHistoryOk,
 } from './port.mjs'
 import { openSettingsTab } from './settings-tab.mjs'
+import {approvalPresenters} from './approval-presenters.mjs'
 import { overlayFade } from './overlay.mjs'
+import {prepareBranch,finishBranch} from './branch-request.mjs'
 
 // The DSH picker's curation rides every catalog reply: the panel's picker
 // shows the same Pinned top section as the DSH app (empty lists when the
@@ -48,18 +51,31 @@ export function handlePanelMessage(msg, sender, sendResponse) {
   if (!sender || sender.id !== chrome.runtime.id) return
   if (!sender.url || !sender.url.startsWith('chrome-extension://' + chrome.runtime.id)) return
   if(msg?.type==='surface/appearance'||msg?.type==='prompt/improve'){
-    if(msg.type==='prompt/improve'&&(state.harness!=='dsh'||state.phase!=='ready'||state.running||state.panelViewSession)){sendResponse({ok:false,error:'Open an idle DSH conversation first.'});return}
+    if(msg.type==='prompt/improve'&&(!['dsh','codex'].includes(state.harness)||state.phase!=='ready'||state.running||state.panelViewSession)){sendResponse({ok:false,error:'Open an idle DSH or Codex conversation first.'});return}
     request('augmentor/surface',msg.type==='surface/appearance'?{action:'appearance',settings:msg.settings}:{action:'improve',text:msg.text,selection:state.selection})
       .then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}));return true
   }
+  if (msg?.type==='queue/prompt' || msg?.type==='queue/action') {
+    if (state.harness!=='codex' || state.capabilities.queue!==true || state.phase!=='ready' || !state.sessionReady || state.panelViewSession || msg.sessionId!==state.sessionId || state.mutating) {
+      sendResponse({ok:false,error:'The queue is unavailable or the conversation changed.'});return
+    }
+    const sessionId=state.sessionId
+    state.mutating=true
+    ;(async()=>{
+      if(msg.type==='queue/prompt')return request('session.prompt',{sessionId,requestId:msg.requestId,mode:'queue',content:[{type:'text',text:String(msg.text??'')}]})
+      if(!['steer','remove'].includes(msg.action))throw Error('Unsupported queue action.')
+      return request('session.updateQueue',{sessionId,itemId:msg.itemId,expectedTurnId:msg.expectedTurnId,action:{kind:msg.action}})
+    })().then(result=>sendResponse({ok:true,...result}),error=>sendResponse({ok:false,error:error.message})).finally(()=>{state.mutating=false})
+    return true
+  }
   if(msg?.type==='voice/preferences'){
-    if(state.harness!=='dsh'){sendResponse({ok:false,error:'Voice uses the shared DSH harness.'});return}
+    if(state.harness!=='dsh'&&state.capabilities.voice!==true){sendResponse({ok:false,error:'Voice is unavailable with this harness.'});return}
     request('augmentor/voice/preferences',{action:msg.action??'get',settings:msg.settings})
       .then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}))
     return true
   }
   if(msg?.type==='voice/start'){
-    if(state.harness!=='dsh'||state.phase!=='ready'||state.running||state.mutating||state.panelViewSession){sendResponse({ok:false,error:'Open an idle DSH conversation first.'});return}
+    if((state.harness!=='dsh'&&state.capabilities.voice!==true)||state.phase!=='ready'||state.running||state.mutating||state.panelViewSession){sendResponse({ok:false,error:'Open an idle connected conversation first.'});return}
     state.mutating=true
     ;(async()=>{
       if(!state.sessionReady){
@@ -79,7 +95,7 @@ export function handlePanelMessage(msg, sender, sendResponse) {
     return true
   }
   if(msg?.type==='voice/control'){
-    if(state.harness!=='dsh'||msg.action!=='close'&&msg.sessionId!==state.sessionId){sendResponse({ok:false,error:'Voice conversation changed.'});return}
+    if((state.harness!=='dsh'&&state.capabilities.voice!==true)||msg.action!=='close'&&msg.sessionId!==state.sessionId){sendResponse({ok:false,error:'Voice conversation changed.'});return}
     request('augmentor/voice/control',{sessionId:msg.sessionId,id:msg.id,action:msg.action})
       .then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}))
     return true
@@ -92,14 +108,19 @@ export function handlePanelMessage(msg, sender, sendResponse) {
   }
   if(msg?.type==='harness/select'){
     if(state.running||state.mutating){sendResponse({ok:false,error:'Finish the current action before switching harness.'});return}
-    if(!['pi','dsh'].includes(msg.harness)){sendResponse({ok:false,error:'Choose DSH or Pi.'});return}
+    if(!['pi','dsh','codex'].includes(msg.harness)){sendResponse({ok:false,error:'Choose DSH, Pi or Codex.'});return}
     chrome.storage.local.set({'augmentor-harness':msg.harness}).then(()=>{resetHarnessPort();sendResponse({ok:true})});return true
   }
+  if(msg?.type==='interaction/claim'){
+    const pending=state.harness==='codex'&&state.interactions.some(row=>row.id===msg.id)
+    sendResponse({ok:!!pending&&approvalPresenters.claim(msg.id,sender)});return
+  }
   if(msg?.type==='interaction/respond'){
+    if(state.harness==='codex'&&!approvalPresenters.owns(msg.id,sender)){sendResponse({ok:false,error:'This approval belongs to another Browser panel or has expired.'});return}
     const row=state.interactions.find(row=>row.id===msg.id)
     if(!row){sendResponse({ok:false,error:'This request has expired.'});return}
-    if(state.harness==='dsh'){
-      const value=msg.value
+    if(['dsh','codex'].includes(state.harness)){
+      const value={...msg.value,sessionId:row.params.sessionId,approvalId:row.params.approvalId}
       if(value?.outcome==='denied')value.outcome='rejected'
       request('augmentor/interaction',{sessionId:row.params.sessionId,id:msg.id,value}).then(()=>{
         state.interactions=state.interactions.filter(row=>row.id!==msg.id);sendResponse({ok:true});broadcast()
@@ -110,15 +131,24 @@ export function handlePanelMessage(msg, sender, sendResponse) {
   }
   if(msg?.type==='message/branch'){
     if(msg.sourceSession&&msg.sourceSession!==state.sessionId){sendResponse({ok:false,error:'The conversation changed; select the action again.'});return}
-    if(state.running||state.mutating||!state.capabilities.branch){sendResponse({ok:false,error:'Branching is unavailable for this chat.'});return}
+    if(state.phase!=='ready'||!state.sessionReady||state.panelViewSession||state.running||state.mutating||!state.capabilities[msg.mode==='edit'?'edit':'branch']){sendResponse({ok:false,error:'Branching is unavailable for this chat.'});return}
     state.mutating=true
-    request('session.branch',{sessionId:state.sessionId,newSessionId:'augmentor-'+crypto.randomUUID(),messageSeq:msg.seq,mode:msg.mode??'reply'}).then(async row=>{
-      state.sessionId=row.sessionId;state.sessionReady=true;saveSessionId(row.sessionId);state.selection=row.selection;saveSelection(row.selection)
-      state.log=[];state.panelViewSession=null
+    const codex=state.harness==='codex'
+    let intent={sessionId:state.sessionId,newSessionId:'augmentor-'+crypto.randomUUID(),messageSeq:msg.seq,mode:msg.mode??'reply'}
+    ;(async()=>{
+      if(codex)intent=await prepareBranch(chrome.storage.local,intent)
+      const row=await request('session.branch',intent)
       const history=await request('session.history',{sessionId:row.sessionId,maxMessages:100})
+      const queue=codex?{sessionId:row.sessionId,...await request('session.queue',{sessionId:row.sessionId})}:null
+      if(codex)await finishBranch(chrome.storage.local,intent,{[SESSION_STORAGE_KEY+'-codex']:row.sessionId,[MODEL_STORAGE_KEY+'-codex']:row.selection})
+      state.sessionId=row.sessionId;state.sessionReady=true;saveSessionId(row.sessionId);state.selection=row.selection;saveSelection(row.selection)
+      state.log=[];state.panelViewSession=null;state.queue=queue
       for(const item of history.events??[])log('event',{sessionId:row.sessionId,event:item.event})
       broadcast();sendResponse({ok:true,sessionId:row.sessionId})
-    }).catch(error=>sendResponse({ok:false,error:error.message})).finally(()=>state.mutating=false);return true
+    })().catch(async error=>{
+      if(codex)try{if((await request('session.branchStatus',{newSessionId:intent.newSessionId})).status==='absent')await finishBranch(chrome.storage.local,intent)}catch{}
+      sendResponse({ok:false,error:error.message})
+    }).finally(()=>state.mutating=false);return true
   }
   if (msg?.type === 'promptSettings') {
     const endpoint = state.endpoint || 'http://127.0.0.1:3080'
@@ -136,6 +166,12 @@ export function handlePanelMessage(msg, sender, sendResponse) {
   if(msg?.type==='memory'){
     ensurePort()
     request('augmentor/memory',msg.request??{action:'describe'}).then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}));return true
+  }
+  if(msg?.type==='codexSetup'){
+    if(state.harness!=='codex'){sendResponse({ok:false,error:'Select Codex to manage these connections.'});return}
+    if(state.running||state.mutating){sendResponse({ok:false,error:'Finish the current action before changing connections.'});return}
+    ensurePort()
+    request('augmentor/codex',msg.request??{action:'profiles'}).then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}));return true
   }
   if(msg?.type==='modelSetup'){
     if(state.harness!=='pi'){sendResponse({ok:false,error:'Select Pi to use this model setup form.'});return}
@@ -271,6 +307,7 @@ export function handlePanelMessage(msg, sender, sendResponse) {
         const res = await request('session.prompt', {
           sessionId: state.sessionId,
           mode: 'queue',
+          ...(state.harness === 'codex' ? {resumeQueue: true} : {}),
           content: [{ type: 'text', text }],
         })
         if (res?.accepted === true && !res.command) {
@@ -316,7 +353,7 @@ export function handlePanelMessage(msg, sender, sendResponse) {
     const entries =
       since < 0 ? state.log : state.log.filter((e) => e.kind === 'event' && e.event?.seq > since)
     sendResponse({
-      harness:state.harness,capabilities:state.capabilities,interactions:state.interactions,
+      harness:state.harness,capabilities:state.capabilities,interactions:state.interactions,queue:state.queue?.sessionId===state.sessionId?state.queue:null,
       log: entries,
       phase: state.phase,
       error: state.error,
@@ -371,10 +408,11 @@ export function handlePanelMessage(msg, sender, sendResponse) {
         const inCatalog = (sel) =>
           !!sel &&
           groups.some((g) => g.provider === sel.provider && g.models.some((m) => m.model === sel.model))
-        if (!inCatalog(state.selection) && catalog?.default) state.selection = { ...catalog.default }
+        if (!inCatalog(state.selection) && catalog?.default && (state.harness!=='codex'||!state.selection)) state.selection = { ...catalog.default }
         state.catalog = groups
         state.catalogCuration = curationOf(catalog)
         sendResponse({ ok: true, groups, selection: state.selection, error: catalog?.error ?? null, ...curationOf(state.catalogCuration) })
+        if(state.harness==='codex'&&state.phase==='needs-setup'&&state.selection){saveSelection(state.selection);setTimeout(()=>resetHarnessPort(),100)}
       })
       .catch((e) => sendResponse({ ok: false, groups: null, selection: state.selection, error: e.message, ...curationOf(state.catalogCuration) }))
     return true // async

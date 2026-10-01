@@ -1,0 +1,9 @@
+{
+  "schema": "augmentor-runtime-prerequisite/1",
+  "name": "@openai/codex",
+  "version": "0.159.2",
+  "bundled": false,
+  "installSubdirectory": "augmentor/codex-cli/0.159.2",
+  "executableOverride": "AUGMENTOR_CODEX_CLI",
+  "guide": "docs/CODEX-PACKAGING.md"
+}

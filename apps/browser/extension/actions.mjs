@@ -43,6 +43,13 @@ export async function handleBrowserAction(id, params) {
       if (!/^https?:\/\//i.test(selected.url ?? '') || isDshTab(selected)) throw new Error('Selected tab is not a readable web work tab')
       observationTab = selected
     }
+    if (['click', 'type'].includes(params?.action) && params.target !== undefined) {
+      const target = params.target
+      const current = await readableWorkTab()
+      if (!target || !Number.isInteger(target.tabId) || typeof target.url !== 'string' || !Number.isFinite(target.documentEpoch) || current.id !== target.tabId || current.url !== target.url) {
+        throw new Error('The observed work tab changed. Read a fresh snapshot before acting.')
+      }
+    }
     switch (params?.action) {
       case 'tabs_list': {
         const tabs = await chrome.tabs.query({})
@@ -113,7 +120,8 @@ export async function handleBrowserAction(id, params) {
         await injectFiles(tab.id, ['dom-actions.js'])
         out = await inject(
           tab.id,
-          (selector, pulse) => {
+          (selector, pulse, target) => {
+            if (target && (location.href !== target.url || performance.timeOrigin !== target.documentEpoch)) return {ok: false, error: 'The observed document changed. Read a fresh snapshot before acting.'}
             const el = document.querySelector(selector)
             if (!el) return { ok: false, error: `no element matches selector: ${selector}; read a fresh snapshot before choosing another target` }
             if (el === document.body || el === document.documentElement) return {ok: false, error: 'Page-root actions are not an observation method. Use browser_snapshot or browser_screenshot.'}
@@ -127,7 +135,7 @@ export async function handleBrowserAction(id, params) {
               name: dom ? dom.humanName(el) : el.tagName.toLowerCase(),
             }
           },
-          [String(params.selector ?? ''), pulseRgba()],
+          [String(params.selector ?? ''), pulseRgba(), params.target ?? null],
         )
         if (typeof out?.ok !== 'boolean') throw new Error('No action acknowledgement returned. Outcome unknown; observe before retrying.')
         if (out?.ok) overlayShow(tab.id, overlayTextFor('click', params, 'after', out))
@@ -140,7 +148,8 @@ export async function handleBrowserAction(id, params) {
         await injectFiles(tab.id, ['dom-actions.js'])
         out = await inject(
           tab.id,
-          (selector, text, pulse) => {
+          (selector, text, pulse, target) => {
+            if (target && (location.href !== target.url || performance.timeOrigin !== target.documentEpoch)) return {ok: false, error: 'The observed document changed. Read a fresh snapshot before acting.'}
             const el = document.querySelector(selector)
             if (!el) return { ok: false, error: `no element matches selector: ${selector}; read a fresh snapshot before choosing another target` }
             if (el === document.body || el === document.documentElement) return {ok: false, error: 'Page-root actions are not an observation method. Use browser_snapshot or browser_screenshot.'}
@@ -157,7 +166,7 @@ export async function handleBrowserAction(id, params) {
               name: dom ? dom.humanName(el) : el.tagName.toLowerCase(),
             }
           },
-          [String(params.selector ?? ''), String(params.text ?? ''), pulseRgba()],
+          [String(params.selector ?? ''), String(params.text ?? ''), pulseRgba(), params.target ?? null],
         )
         if (typeof out?.ok !== 'boolean') throw new Error('No action acknowledgement returned. Outcome unknown; observe before retrying.')
         if (out?.ok) overlayShow(tab.id, overlayTextFor('type', params, 'after', out))

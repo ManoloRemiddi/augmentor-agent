@@ -51,7 +51,7 @@ class Preferences:
         if self.values['voice_mode'] not in ('manual','hands-free'):self.values['voice_mode']='manual'
         self.values['voice_pause_ms']=max(400,min(2000,self.values['voice_pause_ms']))
         self.retired_harness = self.values['harness'] == 'opencode'
-        if self.values['harness'] not in ('pi','dsh'):self.values['harness']='dsh'
+        if self.values['harness'] not in ('pi','dsh','codex'):self.values['harness']='dsh'
         if self.values['theme'] not in ('light', 'dark'):
             self.values['theme'] = 'dark'
         # Persist the first clone now, even if the user never opens Settings.

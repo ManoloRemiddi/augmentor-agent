@@ -23,8 +23,8 @@ export const HOST = 'com.augmentor.agent'
 export function storedHarness(saved){
   // Preserve a retired selection until the user chooses a supported engine.
   // Never interpret an old engine's session/model keys as another engine's data.
-  if(saved['augmentor-harness']&&!['pi','dsh'].includes(saved['augmentor-harness']))return null
-  if(saved['augmentor-harness']==='pi')return 'pi'
+  if(saved['augmentor-harness']&&!['pi','dsh','codex'].includes(saved['augmentor-harness']))return null
+  if(['pi','codex'].includes(saved['augmentor-harness']))return saved['augmentor-harness']
   return 'dsh'
 }
 
@@ -46,6 +46,7 @@ export const state = {
   harness:'dsh',
   capabilities:{branch:false,edit:false},
   interactions:[],
+  queue:null,
   phase: 'disconnected', // disconnected | connecting | ready | error
   error: null,
   retryCount: 0, // consecutive failed attempts (backoff ladder; reset on ready)
@@ -131,7 +132,7 @@ export function log(kind, data) {
 // publish path). Entry-less broadcasts ask the panel for a full resync.
 export function broadcast(entry = null) {
   chrome.runtime
-    .sendMessage({ type: 'evt', harness:state.harness,capabilities:state.capabilities,sessionId:state.sessionId, running: state.running, phase: state.phase, error: state.error, entry })
+    .sendMessage({ type: 'evt', harness:state.harness,capabilities:state.capabilities,sessionId:state.sessionId, running: state.running, phase: state.phase, error: state.error, ...(!entry || entry.kind==='queue' ? {queue:state.queue?.sessionId===state.sessionId?state.queue:null} : {}), entry })
     .catch(() => {})
 }
 

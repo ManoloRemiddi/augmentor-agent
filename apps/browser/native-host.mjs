@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-import {surfaceRequest} from './shared/surface.mjs'
 // Augmentor — dsh-augmentor plugin, pipe, and Chromium extension
 // Copyright © 2026 Manolo Remiddi
 // SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
+import {surfaceRequest} from './shared/surface.mjs'
 import {PRODUCT_PROTOCOL,HARNESS_CAPABILITIES} from '../../dist/contracts/src/index.js'
 import {RELEASE} from '../../dist/contracts/src/release.js'
 import {promptLibrary} from './shared/prompts.mjs'
@@ -48,8 +48,9 @@ process.stdin.on('data',chunk=>{
       promptLibrary(first.params??{}).then(result=>reply({id:first.id,result}),error=>reply({id:first.id,error:{message:error.message}}));continue
     }
     if(workspaceProfile&&first.method==='harness.select'&&first.params?.harness!=='dsh'){reply({id:first.id,error:{message:'This workspace uses its configured DSH specialist.'}});continue}
-    if(first.method!=='harness.select'||!['pi','dsh'].includes(first.params?.harness)){reply({id:first.id,error:{message:'Choose DSH or Pi. Other harnesses are no longer supported; saved data is retained.'}});continue}
-    child=spawn(process.execPath,[fileURLToPath(new URL(first.params.harness==='dsh'?'./pipe.mjs':'./pi-bridge.mjs',import.meta.url))],{stdio:['pipe','pipe','inherit'],env:{...process.env,AUGMENTOR_UNIFIED:'1',AUGMENTOR_BROWSER_HARNESS:first.params.harness}})
+    if(first.method!=='harness.select'||!['pi','dsh','codex'].includes(first.params?.harness)){reply({id:first.id,error:{message:'Choose DSH, Pi or Codex. Other harnesses are no longer supported; saved data is retained.'}});continue}
+    const bridge={dsh:'./pipe.mjs',pi:'./pi-bridge.mjs',codex:'./codex-bridge.mjs'}[first.params.harness]
+    child=spawn(process.execPath,[fileURLToPath(new URL(bridge,import.meta.url))],{stdio:['pipe','pipe','inherit'],env:{...process.env,AUGMENTOR_UNIFIED:'1',AUGMENTOR_BROWSER_HARNESS:first.params.harness}})
     child.stdout.pipe(process.stdout);child.on('error',()=>process.exit(1));child.on('exit',()=>process.exit(0));child.stdin.on('error',()=>process.exit(1))
     reply({id:first.id,result:{protocol:PRODUCT_PROTOCOL,harness:first.params.harness,capabilities:HARNESS_CAPABILITIES[first.params.harness]}})
     if(buffer.length)child.stdin.write(buffer);buffer=Buffer.alloc(0);return

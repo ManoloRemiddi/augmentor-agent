@@ -186,3 +186,14 @@ No model service, GPU placement, chat context/concurrency/precision or speech
 configuration was changed. Browser recovery policy was preserved in a separate
 artifact with only the read-only `memory_source` allowance added. See the
 [deployment ledger](DESKTOP-DEPLOYMENTS.md) for compatibility and rollback scope.
+
+
+## Codex development boundary
+
+The [Codex memory foundation](CODEX-INTEGRATION.md#memory-capture-foundation-and-context-api-qualification)
+provides a tested adapter for committed transcript capture and separate live
+activity; it is not activated in the host yet. Codex's pinned additional-context
+API appends historical fragments rather than replacing them. Full integration
+must resolve context lifecycle, compaction/fork exclusions, host wiring and
+settings before claiming the shared memory contract. Existing DSH/Pi behavior,
+companion budgets and installed data are unchanged.
