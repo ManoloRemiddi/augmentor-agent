@@ -25,8 +25,8 @@ export function control(method:string,owner:string,params:unknown={},signal?:Abo
   child.stdin.end(JSON.stringify({method,owner,params}));
  });
 }
-export function desktopPackage(owner:string){return (pi:ExtensionAPI)=>{
- for(const d of definitions)pi.registerTool({name:d.name,label:d.name,description:d.description,parameters:d.parameters,
+export function desktopPackage(owner:string,available=true){return (pi:ExtensionAPI)=>{
+ for(const d of definitions.filter(d=>d.method==='stop'||available))pi.registerTool({name:d.name,label:d.name,description:d.description,parameters:d.parameters,
   execute:async(_id,args,signal,_update,ctx)=>{
    if(d.method==='capture'&&!ctx.model?.input.includes('image'))throw Error('Select a model configured for image input before capturing the desktop.');
    const value=await control(d.method,owner,args,signal);const {image,...metadata}=value;

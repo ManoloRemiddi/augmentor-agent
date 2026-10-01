@@ -8,6 +8,7 @@ import socket
 import subprocess
 import sys
 import time
+from session_environment import graphical_environment
 
 
 def call(request,start=True):
@@ -21,13 +22,7 @@ def call(request,start=True):
                 if request.get('method')=='status' and request.get('params',{}).get('allowAbsent') is True:return {'ok':True,'result':{'active':False,'sharing':False,'owner':None,'available':False}}
                 raise RuntimeError('Desktop control is not connected. Use linux_desktop_connect first.')
             # Retrieve only graphical session variables from the user's own manager.
-            env=dict(os.environ)
-            allowed={'DISPLAY','WAYLAND_DISPLAY','XAUTHORITY','XDG_RUNTIME_DIR','DBUS_SESSION_BUS_ADDRESS','XDG_CURRENT_DESKTOP','XDG_SESSION_TYPE'}
-            try:
-                for line in subprocess.check_output(['systemctl','--user','show-environment'],text=True,timeout=3).splitlines():
-                    key,_,value=line.partition('=')
-                    if key in allowed:env[key]=value
-            except (OSError,subprocess.SubprocessError):pass
+            env=graphical_environment()
             if sys.platform=='linux':env['QT_QPA_PLATFORM']='xcb'
             child=subprocess.Popen([sys.executable,str(Path(__file__).with_name('service.py'))],env=env,stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
             import threading

@@ -279,3 +279,59 @@ Next: publish this foundation for review, then replace unconditional Linux backe
 advertising with actual session/dependency/interface discovery before the GNOME
 shortcut and observation adapters. Installed application/model/audio services
 remain unchanged.
+
+### Session discovery implementation
+
+Desktop availability now comes from the selected Python interpreter's read-only
+probe, shared by Pi, Codex and DSH registration. A KDE Wayland backend requires
+its graphical session environment, an XWayland display for independent Stop,
+Qt Widgets/GI/AT-SPI/GStreamer plus `pipewiresrc`, already-owned portal interfaces
+advertising keyboard/pointer and monitor capture, and KWin's scripting interface
+on running KWin 6.3.6 or later in the qualified major 6 API family. The KWin
+version is read through `supportInformation`; only its version is used and no
+hardware information is returned. The probe uses bounded D-Bus calls to unique
+service owners without activation and opens no sharing session or observation.
+[Portal properties](https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.RemoteDesktop.html)
+and the [KWin observer API](https://develop.kde.org/docs/plasma/kwin/api/) remain
+separate from live permission and successful control.
+
+The desktop client and discovery share the same graphical environment allowlist
+from the user's own manager, so an externally launched DSH process can discover
+the logged-in session. No unrelated manager variables or private bus address
+are returned. Discovery failure returns a reason instead of enabling input.
+Results are cached for five seconds with environment changes invalidating the
+cache. An inactive portal is unverified until it owns its bus name; discovery
+does not launch it. DSH registration is fixed for that plugin lifetime; restart
+its host after session/portal changes. Later shortcut/session recovery work
+must address portal readiness and host registration refresh.
+
+GNOME, X11 and headless sessions do not inherit the KDE input adapter. Pi and DSH
+retain Stop while omitting unavailable input/delegation tools; Codex gates new
+immutable desktop contracts by the same result. Existing Codex histories keep
+their saved tool contracts and cleanup behavior. Mac helper discovery and live
+permission gates are preserved. Synthetic OS-boundary tests inject availability
+through internal constructors instead of inferring it from the operating system.
+
+The working capability source passes type/build, 617 native cases per target
+(two Mac-only skips), 490 Fedora Node cases (488 pass, two optional memory skips),
+42 focused common/Pi cases and the real DSH/Pi synthetic memory lifecycle check.
+Each headless target's actual probe reports unavailable. Read-only live discovery
+on the existing KDE host observes KWin 6.3.6 and the required portal capabilities
+without consent, screenshots or input. The last version-gating assertions also
+pass the focused seven-case native discovery suite. Mac CI at the prior installer
+checkpoint passes both macOS 14 and 26; current capability-source hosted CI still
+needs confirmation. No new matching release artifacts have been built for this
+capability source yet; `a5d27c3` reports above remain the installer checkpoint.
+
+Initial Linux CI for the installer checkpoint failed at the memory restart
+fixture after 489 passing Node cases. Inspection confirms socket removal can
+precede interpreter exit/startup-lock release. That fixture now waits for the
+old process to exit before restarting, while retaining all persistence, freshness
+and no-custom-distillation assertions. The focused actual lifecycle check passes.
+This test synchronization change does not qualify optional memory provisioning
+or change the production companion's startup behavior. The next CI run confirms
+its effect in the hosted environment.
+
+Next source stage: actual GNOME/KDE session fixtures and the owned shortcut portal
+adapter, followed by trusted GNOME window/occlusion observation. Backend discovery
+does not complete those adapters or the remaining distro/hardware acceptance.

@@ -18,7 +18,10 @@ RPM credential dependencies and published-source snapshot reuse are included in
 clean candidate `a5d27c3`. All four package/complete proofs, 610 native cases
 (two skips) per target and isolated Secret Service lifecycle proofs pass. The
 rollout guide and checked reports record exact artifacts and remaining desktop/
-other-distro gates. Capability discovery is the next source stage.
+other-distro gates. Capability discovery now gates actual KDE session/dependency/interfaces in all
+three harnesses, with explicit unavailability and Stop retention. Its working
+regression checks pass; hosted CI and new artifacts remain to be confirmed.
+GNOME/session-owned shortcuts and observation are the next source stage.
 
 ## October 1 merge blockers: current main and separate Codex prerequisite
 

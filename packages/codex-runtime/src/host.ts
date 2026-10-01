@@ -73,6 +73,7 @@ export interface HostOptions {
   /** Lazy: account recovery is permitted only after exclusive IPC ownership. */
   createChatGptLogin?: (commit: <T>(operation: () => Promise<T>) => Promise<T>) => ChatGptLogin;
   desktopControl?: typeof control;
+  desktopCapabilities?: typeof desktopCapabilities;
   voiceConnection?: () => VoiceConnection;
   memoryCall?: typeof promptCall;
 }
@@ -237,7 +238,7 @@ export class CodexHost extends EventEmitter {
     if (this.configuring) throw new Error('Codex connection setup is in progress.');
     // Recheck after resolution: two clients can race the same create request.
     if (this.metadata.has(id)) return this.create(params);
-    const desktop = profile.connection.imageInput === true && desktopCapabilities().available;
+    const desktop = profile.connection.imageInput === true && (this.options.desktopCapabilities ?? desktopCapabilities)().available;
     const memory = Boolean(this.options.memoryCall);
     const meta: SessionMeta = {schema: 1, browserTools: 1, homeTools: 1, ...(memory ? {memoryTools: 1} : {}), ...(desktop ? {desktopTools: 1} : {}), ...(profile.connection.imageInput ? {imageInput: true} : {}), instructions: instructionSnapshot(undefined, true, profile.connection.imageInput === true, desktop, true, memory), id, profileId, profileRevision: profile.revision, model: profile.connection.model,
       surface: params.surface === 'browser' ? 'browser' : 'linux', cwd, title: '', status: 'creating', creationDispatched: false, createdAt: Date.now(), updatedAt: Date.now()};
@@ -622,7 +623,7 @@ export class CodexHost extends EventEmitter {
         if (profile.connection.model !== params.model) throw new Error('The selected model does not match this Codex connection profile.');
         return {valid: true, validation: 'configuration-only'};
       }
-      case 'host.describe': return {pid: process.pid, harness: 'codex', protocol: CODEX_PROTOCOL, version: RELEASE.version, maintenance: this.maintenance, capabilities: {branch: true, edit: true, memory: Boolean(this.options.memoryCall), voice: true, browserTools: true, homeTools: true, desktopTools: desktopCapabilities().available}, desktopActive: this.desktop.active, workers: this.workers.size};
+      case 'host.describe': {const desktop=(this.options.desktopCapabilities ?? desktopCapabilities)();return {pid: process.pid, harness: 'codex', protocol: CODEX_PROTOCOL, version: RELEASE.version, maintenance: this.maintenance, capabilities: {branch: true, edit: true, memory: Boolean(this.options.memoryCall), voice: true, browserTools: true, homeTools: true, desktopTools: desktop.available}, desktopControl:desktop, desktopActive: this.desktop.active, workers: this.workers.size};}
       case 'voice.ticket': {
         const id = identifier(params.sessionId), meta = this.meta(id), worker = await this.worker(id);
         if (this.row(meta).running || worker.session.submissionPending || worker.interactions.size) throw new Error('Open an idle Codex conversation before starting voice.');

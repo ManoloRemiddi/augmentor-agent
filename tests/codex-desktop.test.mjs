@@ -8,6 +8,8 @@ import {setImmediate as tick} from 'node:timers/promises';
 import {EventEmitter} from 'node:events';
 import {CodexDesktop} from '../dist/codex-runtime/src/desktop.js';
 import {CodexHost} from '../dist/codex-runtime/src/host.js';
+import {desktopCapabilities} from '../dist/desktop/src/capabilities.js';
+const syntheticCapabilities=()=>desktopCapabilities('linux',{},()=>false,()=>({schema:1,available:true,backend:'kde-wayland-portal',reason:null,permission:'not-requested',functionalTested:false}));
 import {durableJson} from '../dist/codex-runtime/src/storage.js';
 
 const jpeg = Buffer.from([255, 216, 255, 217]).toString('base64'); // Envelope fixture only.
@@ -123,8 +125,8 @@ test('malformed calls and concurrent actions never reach the OS executor', async
 
 test('host gates desktop tools by immutable image contract and closes sharing on turn end', async t => {
   const f = fixture(t); const frames = []; const replies = [];
-  let imageInput = false; const rpcs = [];
-  const host = new CodexHost({root: join(f.root, 'host'), desktopControl: f.execute,
+  let imageInput = false; let available = true; const rpcs = [];
+  const host = new CodexHost({root: join(f.root, 'host'), desktopControl: f.execute, desktopCapabilities: () => available ? syntheticCapabilities() : {...syntheticCapabilities(),available:false,reason:'unsupported-session',backend:null},
     resolveProfile: async id => ({id, revision: 1, connection: {kind: 'local', model: 'fixture', endpoint: 'http://127.0.0.1:1/v1', imageInput}}),
     createRpc: () => {
       const rpc = new EventEmitter(); const id = 'thread-' + rpcs.length; rpcs.push(rpc);
@@ -140,20 +142,25 @@ test('host gates desktop tools by immutable image contract and closes sharing on
       }; return rpc;
     }});
   t.after(() => host.close());
+  available = false; imageInput = true;
   await host.create({sessionId: 'text', profileId: 'profile', cwd: f.root});
   assert.equal(frames[0].params.dynamicTools.some(tool => tool.name === 'linux_desktop_connect'), false);
+  assert.equal((await host.dispatch('host.describe',{})).capabilities.desktopTools,false);
+  assert.equal((await host.dispatch('host.describe',{})).desktopControl.reason,'unsupported-session');
+  available = true; imageInput = false;
+  await host.create({sessionId:'nonvision',profileId:'profile',cwd:f.root});
+  assert.equal((await host.dispatch('session.describe',{sessionId:'nonvision'})).desktopTools,undefined);
   imageInput = true;
   await host.create({sessionId: 'image', profileId: 'profile', cwd: f.root});
   const meta = await host.dispatch('session.describe', {sessionId: 'image'});
-  // macOS fixture uses the packaging helper-availability check; absence is an explicit unsupported contract.
-  if (meta.desktopTools !== 1) {assert.equal(process.platform, 'darwin'); return;}
+  assert.equal(meta.desktopTools,1,'The injected synthetic OS boundary is available on both platforms.');
   assert.equal((await host.dispatch('session.describe', {sessionId: 'text'})).desktopTools, undefined);
-  assert.ok(frames[1].params.dynamicTools.some(tool => tool.name === 'linux_desktop_connect'));
-  rpcs[1].emit('request', {id: 1, method: 'item/tool/call', params: {...f.request('connect'), threadId: meta.threadId}});
+  assert.ok(frames[2].params.dynamicTools.some(tool => tool.name === 'linux_desktop_connect'));
+  rpcs[2].emit('request', {id: 1, method: 'item/tool/call', params: {...f.request('connect'), threadId: meta.threadId}});
   await tick(); assert.equal(replies[0].result.success, true); assert.equal(f.state.owner, 'codex:image');
   await assert.rejects(host.dispatch('host.prepareShutdown', {}), /active or unconfirmed/);
   f.state.stopFails = true;
-  rpcs[1].emit('notification', {method: 'turn/completed', params: {threadId: meta.threadId, turn: {id: 'turn', status: 'completed', items: []}}});
+  rpcs[2].emit('notification', {method: 'turn/completed', params: {threadId: meta.threadId, turn: {id: 'turn', status: 'completed', items: []}}});
   await tick(); assert.equal(f.state.owner, 'codex:image');
   const history = await host.dispatch('session.history', {sessionId: 'image'});
   assert.ok(history.events.some(row => row.event.type === 'runtime/error' && row.event.data.reason === 'desktop-stop-unconfirmed'), 'Cleanup failure is durable and visible through both existing event renderers');
