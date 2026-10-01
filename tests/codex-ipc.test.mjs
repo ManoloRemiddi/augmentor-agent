@@ -94,6 +94,10 @@ test('standalone Codex host persists a local profile and recovers its socket aft
     return {child, socket, invoke};
   }
   const first = await start();
+  const accountStatus = await first.invoke('account-status', 'accounts.status');
+  assert.equal(accountStatus.result.enabled, false); assert.match(accountStatus.result.reason, /eligibility/);
+  assert.doesNotMatch(JSON.stringify(accountStatus.result), /credentialRef|accessToken|refreshToken|idToken/);
+  assert.match((await first.invoke('disabled-login', 'accounts.start')).error.message, /eligibility/);
   const saved = await first.invoke('configure', 'profiles.configure', {id: 'local', name: 'Local fixture', kind: 'local', model: 'fixture', endpoint: 'http://127.0.0.1:8080/v1'});
   assert.equal(saved.result.credentialConfigured, false);
   const exited = once(first.child, 'exit'); first.child.kill('SIGKILL'); await exited; first.socket.destroy();

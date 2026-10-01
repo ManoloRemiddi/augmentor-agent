@@ -12,6 +12,7 @@ type State = 'ready' | 'renewing' | 'reconnect' | 'signed-out';
 interface Account {
   id: string; label: string; issuer: string; subject: string; clientId: string; email?: string;
   revision: number; state: State; credentialRef?: string;
+  planUsage?: boolean;
   remoteRevocation?: 'confirmed' | 'unconfirmed';
 }
 interface AccountFile {schema: 1; accounts: Account[]; retiredCredentials: string[]; activeId?: string}
@@ -49,7 +50,7 @@ export class ChatGptAccounts {
     let loaded: unknown;
     try {loaded = readPrivateJson(path);} catch (error: any) {if (error?.code !== 'ENOENT') throw error;}
     this.data = loaded === undefined ? {schema: 1, accounts: [], retiredCredentials: []} : loaded as AccountFile;
-    const allowed = ['id', 'label', 'issuer', 'subject', 'clientId', 'email', 'revision', 'state', 'credentialRef', 'remoteRevocation'];
+    const allowed = ['id', 'label', 'issuer', 'subject', 'clientId', 'email', 'revision', 'state', 'credentialRef', 'remoteRevocation', 'planUsage'];
     if (this.data?.schema !== 1 || !Array.isArray(this.data.accounts) || !Array.isArray(this.data.retiredCredentials) ||
       Object.keys(this.data).some(key => !['schema', 'accounts', 'retiredCredentials', 'activeId'].includes(key))) throw new Error('Invalid ChatGPT account index.');
     const ids = new Set<string>(); const identities = new Set<string>(); const references = new Set<string>();
@@ -59,6 +60,7 @@ export class ChatGptAccounts {
         typeof account.label !== 'string' || !account.label.trim() || account.label.length > 100 || /[\x00-\x1f\x7f]/.test(account.label) ||
         !Number.isSafeInteger(account.revision) || account.revision < 1 || !['ready', 'renewing', 'reconnect', 'signed-out'].includes(account.state) ||
         Object.keys(account).some(key => !allowed.includes(key)) ||
+        (account.planUsage !== undefined && typeof account.planUsage !== 'boolean') ||
         (account.credentialRef !== undefined && (!REF.test(account.credentialRef) || references.has(account.credentialRef))) ||
         (['ready', 'renewing'].includes(account.state) && !account.credentialRef) || (account.state === 'signed-out' && Boolean(account.credentialRef)) ||
         (account.remoteRevocation !== undefined && !['confirmed', 'unconfirmed'].includes(account.remoteRevocation))) throw new Error('Invalid ChatGPT account index.');
@@ -72,10 +74,14 @@ export class ChatGptAccounts {
     for (const account of [...this.data.accounts]) if (account.state === 'renewing') this.disconnect(account, 'reconnect', true);
   }
   list() {
-    return this.data.accounts.map(({credentialRef, ...account}) => ({...account,
+    return this.data.accounts.map(account => ({id: account.id, label: account.label, email: account.email,
+      revision: account.revision, state: account.state, remoteRevocation: account.remoteRevocation,
       active: account.id === this.data.activeId, signedIn: account.state === 'ready',
+      planUsage: account.state === 'ready' && account.planUsage === true,
     }));
   }
+  /** Internal recovery: a client saved by verified OAuth is no longer provisional. */
+  hasRegistration(clientId: string): boolean {return this.data.accounts.some(account => account.clientId === clientId);}
   private queue<T>(operation: () => Promise<T>): Promise<T> {
     const result = this.serial.then(() => {
       if (this.storageFailed) throw new Error('ChatGPT account storage could not be committed. Restart before continuing.');
@@ -124,9 +130,10 @@ export class ChatGptAccounts {
     return verified;
   }
   /** Receives only an internally signature-verified OAuth result. */
-  save(grant: VerifiedChatGptGrant, selectedId?: string): Promise<ReturnType<ChatGptAccounts['list']>[number]> {
+  save(grant: VerifiedChatGptGrant, selectedId?: string, signal?: AbortSignal): Promise<ReturnType<ChatGptAccounts['list']>[number]> {
     const snapshot = structuredClone(grant);
     return this.queue(async () => {
+      if (signal?.aborted) throw new Error('ChatGPT sign-in cancelled.');
       validateGrant(snapshot);
       const previous = selectedId ? this.account(selectedId) : this.data.accounts.find(account =>
         account.issuer === snapshot.issuer && account.subject === snapshot.subject && account.clientId === snapshot.clientId);
@@ -135,12 +142,15 @@ export class ChatGptAccounts {
       }
       const account: Account = {id: previous?.id ?? `chatgpt-${randomUUID()}`, label: previous?.label ?? `ChatGPT account ${this.data.accounts.length + 1}`,
         issuer: snapshot.issuer, subject: snapshot.subject, clientId: snapshot.clientId, email: snapshot.email,
-        revision: (previous?.revision ?? 0) + 1, state: 'ready', credentialRef: `codex-${randomUUID()}`};
+        revision: (previous?.revision ?? 0) + 1, state: 'ready', planUsage: snapshot.planUsage, credentialRef: `codex-${randomUUID()}`};
       // Reserve cleanup ownership before touching the OS store, including failures
       // after the store wrote a value but before its helper acknowledgment.
       this.commit({...this.data, retiredCredentials: [...this.data.retiredCredentials, account.credentialRef!]});
       try {await this.credentials.put(account.credentialRef!, JSON.stringify(snapshot));}
       catch {await this.cleanup(); throw new Error('ChatGPT credentials could not be saved in the OS store. Unlock it and retry.');}
+      // Cancellation may arrive while the native helper writes. The reservation
+      // still owns cleanup, but no late grant may replace/activate an account.
+      if (signal?.aborted) {await this.cleanup(); throw new Error('ChatGPT sign-in cancelled.');}
       this.commit({...this.data, activeId: account.id,
         accounts: [...this.data.accounts.filter(value => value.id !== account.id), account],
         retiredCredentials: this.data.retiredCredentials.filter(ref => ref !== account.credentialRef).concat(previous?.credentialRef ? [previous.credentialRef] : []),
@@ -182,7 +192,7 @@ export class ChatGptAccounts {
       try {await this.credentials.put(ref, JSON.stringify(grant));}
       catch {this.disconnect(this.account(id), 'reconnect', true); await this.cleanup(); throw new Error('Renewed ChatGPT credentials could not be saved. Sign in again.');}
       this.commit({...this.data, accounts: this.data.accounts.map(value => value.id === id ?
-        {...account, state: 'ready', credentialRef: ref, revision: account.revision + 1} : value),
+        {...account, state: 'ready', planUsage: grant.planUsage, credentialRef: ref, revision: account.revision + 1} : value),
         retiredCredentials: this.data.retiredCredentials.filter(value => value !== ref).concat(account.credentialRef!),
       });
       await this.cleanup();

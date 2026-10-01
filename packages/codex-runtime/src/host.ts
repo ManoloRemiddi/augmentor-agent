@@ -15,6 +15,7 @@ import {DisplayJournal} from './journal.js';
 import {durableJson, readPrivateJson, privateDirectory} from './storage.js';
 import {chatEvents, type ChatEvent} from './events.js';
 import type {ProfileStore} from './profiles.js';
+import type {ChatGptLogin} from './chatgpt-login.js';
 import {instructionSnapshot, validateInstructions, type InstructionSnapshot} from './instructions.js';
 import {CodexInteractions} from './interactions.js';
 import {checkProvider} from './provider-check.js';
@@ -69,6 +70,8 @@ export interface HostOptions {
   maxWorkers?: number;
   createRpc?: (options: ReturnType<typeof runtimeOptions>) => CodexRpc;
   profiles?: ProfileStore;
+  /** Lazy: account recovery is permitted only after exclusive IPC ownership. */
+  createChatGptLogin?: (commit: <T>(operation: () => Promise<T>) => Promise<T>) => ChatGptLogin;
   desktopControl?: typeof control;
   voiceConnection?: () => VoiceConnection;
   memoryCall?: typeof promptCall;
@@ -93,6 +96,7 @@ export class CodexHost extends EventEmitter {
   private allocation: Promise<void> = Promise.resolve();
   private closing = false;
   private configuring = false;
+  private chatGptLogin?: ChatGptLogin;
   private maintenance = false;
   private preparingShutdown?: Promise<{ready: true; maintenance: true}>;
   private activeRequests = 0;
@@ -146,6 +150,28 @@ export class CodexHost extends EventEmitter {
   private assertAccepting(): void {
     this.assertOpen();
     if (this.maintenance) throw new Error('Codex host is paused for maintenance.');
+  }
+  private login(): ChatGptLogin {
+    if (!this.options.createChatGptLogin) throw new Error('ChatGPT login is unavailable in this host.');
+    return this.chatGptLogin ??= this.options.createChatGptLogin(operation => this.changeConnections(operation));
+  }
+  private async changeConnections<T>(operation: () => Promise<T>): Promise<T> {
+    this.assertAccepting();
+    if (this.branches.size || this.checks.size || this.improvements.size || this.activeCreates || this.activeRequests > 1 ||
+        this.voice.active || this.desktop.active || this.opening.size || this.releasing.size || this.configuring ||
+        [...this.metadata.values()].some(meta => meta.status !== 'ready' && meta.creationDispatched !== false || this.row(meta).running) ||
+        [...this.workers.values()].some(worker => worker.interactions.size || worker.session.submissionPending || worker.session.ledger.list().some(item => ['accepted', 'unconfirmed'].includes(item.status)))) {
+      throw new Error('Finish or reconcile active Codex work before changing connections or accounts.');
+    }
+    this.configuring = true;
+    for (const worker of this.workers.values()) worker.session.setMaintenance(true);
+    try {
+      for (const id of [...this.workers.keys()]) await this.release(id);
+      this.assertAccepting(); return await operation();
+    } finally {
+      this.configuring = false;
+      if (!this.closing) for (const worker of this.workers.values()) worker.session.setMaintenance(this.maintenance);
+    }
   }
   private row(meta: SessionMeta) {
     const worker = this.workers.get(meta.id);
@@ -462,7 +488,7 @@ export class CodexHost extends EventEmitter {
     } catch (error) {await rpc.close(); await memory?.close(); throw error;}
   }
   private maintenanceBusy(): boolean {
-    return Boolean(this.voice.active || this.desktop.active || this.activeRequests || this.activeCreates || this.opening.size || this.releasing.size || this.configuring ||
+    return Boolean(this.chatGptLogin?.busy || this.voice.active || this.desktop.active || this.activeRequests || this.activeCreates || this.opening.size || this.releasing.size || this.configuring ||
       [...this.workers.values()].some(worker => worker.interactions.size || worker.session.submissionPending) ||
       [...this.metadata.values()].some(meta => meta.status !== 'ready' && meta.creationDispatched !== false || this.row(meta).running));
   }
@@ -507,9 +533,10 @@ export class CodexHost extends EventEmitter {
       }
       return {maintenance: false};
     }
-    const readable = ['host.describe', 'profiles.list', 'models.list', 'session.list', 'session.models',
+    const readable = ['host.describe', 'profiles.list', 'accounts.status', 'accounts.cancel', 'models.list', 'session.list', 'session.models',
       'settings.describe', 'session.describe', 'session.history', 'session.branchStatus'];
     if (this.maintenance && !readable.includes(method)) throw new Error('Codex host is paused for maintenance.');
+    if (this.configuring && !readable.includes(method)) throw new Error('Codex connection setup is in progress.');
     if (this.branches.size && method !== 'session.branch' && !readable.includes(method)) throw new Error('Codex is creating a conversation branch.');
     const unpin = typeof params.sessionId === 'string' ? this.pin(identifier(params.sessionId)) : () => {};
     this.activeRequests++;
@@ -534,15 +561,17 @@ export class CodexHost extends EventEmitter {
       }
       case 'interaction.respond': return this.approvals.answer(identifier(params.rpcId), identifier(params.sessionId), params.value);
       case 'profiles.list': return {profiles: this.options.profiles?.list() ?? []};
+      case 'accounts.status': {
+        if (Object.keys(params).length) throw new Error('Invalid ChatGPT account operation.');
+        return this.options.createChatGptLogin ? this.login().status() : {enabled: false, reason: 'ChatGPT login is unavailable in this host.', accounts: [], attempt: null};
+      }
+      case 'accounts.start': return this.login().start(params);
+      case 'accounts.cancel': return this.login().cancel(params);
+      case 'accounts.select': return this.changeConnections(() => this.login().select(params));
+      case 'accounts.signOut': return this.changeConnections(() => this.login().signOut(params));
       case 'profiles.configure': {
         if (!this.options.profiles) throw new Error('Codex profile setup is unavailable in this host.');
-        if (this.checks.size || this.improvements.size || this.activeCreates || this.voice.active || this.desktop.active || this.opening.size || this.configuring || [...this.workers.values()].some(worker => worker.interactions.size || worker.session.ledger.list().some(operation => ['accepted', 'unconfirmed'].includes(operation.status)))) throw new Error('Finish or reconcile active Codex work before changing connection profiles.');
-        this.configuring = true;
-        try {
-          for (const id of [...this.workers.keys()]) await this.release(id);
-          return await this.options.profiles.upsert(params as any);
-        }
-        finally {this.configuring = false;}
+        return this.changeConnections(() => this.options.profiles!.upsert(params as any));
       }
       case 'profiles.test': {
         if (!this.options.profiles) throw new Error('Codex profile setup is unavailable in this host.');
@@ -681,10 +710,11 @@ export class CodexHost extends EventEmitter {
   }
   async close(): Promise<void> {
     this.closing = true; this.approvals.close(); this.browser.close();
+    const loginClosed = this.chatGptLogin?.close();
     for (const abort of this.checks.keys()) abort.abort();
     for (const abort of this.improvements.keys()) abort.abort();
     const desktopClosed = this.desktop.close();
-    const cleanup = Promise.allSettled([desktopClosed, this.voice.close(), ...this.checks.values(), ...this.improvements.values()]);
+    const cleanup = Promise.allSettled([desktopClosed, this.voice.close(), loginClosed, ...this.checks.values(), ...this.improvements.values()]);
     await Promise.allSettled([...this.forkCreators].map(creator => creator.close()));
     await Promise.allSettled([...this.branches.values()].map(branch => branch.promise));
     await Promise.allSettled([...this.opening.values()]);

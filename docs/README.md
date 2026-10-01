@@ -32,7 +32,7 @@ Current cross-platform direction: [one product, Linux/Mac parity audit and corre
 - [Codex packaging inventory and release gates](CODEX-PACKAGING.md)
 - [Local Qwen compatibility, candidate and activation boundary](CODEX-LOCAL-QWEN.md)
 - [Codex secure credentials, release dependencies and native-store proofs](CODEX-CREDENTIALS.md)
-- [Codex ChatGPT account transactions, protected renewal/logout and remaining login integration](CODEX-ACCOUNTS.md)
+- [Codex ChatGPT accounts, shared Desktop/Browser login controls and remaining inference integration](CODEX-ACCOUNTS.md)
 - [Private speech-source cleanup and current synthetic voice test boundaries](CODEX-SOURCE-CLEANUP.md)
 - [Start here: agent handoff](AGENT-HANDOFF.md)
 - [Current architecture](ARCHITECTURE.md)

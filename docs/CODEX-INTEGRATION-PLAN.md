@@ -455,10 +455,13 @@ speech or subscription features remain visibly unavailable and unadvertised.
 
 ### C4 — Subscription login implementations
 
-October 1 implementation checkpoint: [OAuth transactions and protected account
-lifecycle](CODEX-ACCOUNTS.md) are internally implemented and separately tested.
-Host/profile/UI/worker wiring, eligibility and real account/inference acceptance
-remain open, so the C4 acceptance checkboxes below are not certified complete.
+October 1 implementation checkpoint: [OAuth transactions, protected accounts and
+shared login controls](CODEX-ACCOUNTS.md) now include host RPC and existing
+Desktop/Browser status/sign-in/cancellation/consent/logout controls. Source
+contract tests and isolated actual Linux storage pass; production login remains
+disabled. Profile/model binding, worker renewal, Mac qualification of these
+controls, eligibility and real account/inference acceptance remain open, so the
+C4 acceptance checkboxes below are not certified complete.
 
 Dependencies: C1–C2 and the applicable C0 eligibility gate. Can be developed
 alongside C3 once shared account contracts are stable.

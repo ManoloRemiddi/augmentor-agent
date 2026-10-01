@@ -2,6 +2,33 @@
 
 # Start here: agent handoff
 
+## October 1 shared ChatGPT host and setup controls
+
+[The account guide](CODEX-ACCOUNTS.md) now covers one lazy host-owned login
+controller, provisional issued-client recovery, shared status/cancellation,
+explicit plan consent and logout. Existing Desktop/Browser forms use the same
+host RPC. Closing cancels only the form's owned attempt, including late start
+replies. Cancelled native-store writes cannot activate new credentials; completed
+durable activation cannot be falsely reported cancelled. Account changes freeze
+admission and release only verified-idle workers; active/unknown work refuses them.
+Logout receipts replace stale successful-login text across surfaces.
+
+Build/type, 71 focused account cases, the full 428-case Node suite (426 pass,
+two opt-in Docker memory proofs skipped), 61 Browser tests and 586 native tests
+(584 pass, two Mac-only skips) pass on Linux with the existing isolated Qt
+environment. Actual native-adapter/Browser-bridge IPC tests pass with synthetic
+grants; real isolated Secret Service save/rotation/restart/logout/cleanup passes
+again. The private-source boundary passes. Exact published source ref and new
+Mac/Linux CI results will be recorded after publication; prior `91db7aa` CI is
+historical evidence for the account primitives, not this host/UI implementation.
+
+Production login stays disabled pending eligibility, with no RPC/environment
+bypass. Profile/model binding, safe worker token renewal, the Codex-managed
+subscription route, live consent/inference and full C0–C9 acceptance remain open.
+Installed apps, the canonical checkout's unrelated work, private speech and
+approved model/GPU placement remain untouched. Qwen activation/restart still
+awaits the owner's answer. Continue the full plan.
+
 ## October 1 protected ChatGPT account primitives
 
 [Account implementation and remaining integration](CODEX-ACCOUNTS.md) now covers
@@ -17,7 +44,8 @@ system Python lacked QtTest; the passing suite used the existing isolated Qt
 test environment. No installed dependencies or apps were altered.
 `jose` 6.2.12 is locked, and its real MIT notice passes the inventory collector.
 
-These classes remain internal and production login defaults off: no host/profile,
+Historical primitive checkpoint, superseded for host/UI wiring by the section
+above. These classes remained internal and production login defaulted off: no host/profile,
 Desktop/Browser or worker-renewal wiring, real account consent/inference,
 distribution eligibility or C4/full C0–C9 completion is claimed. Existing Mac CI
 passes the expanded account-store proof on Mac 14/26 for source `91db7aa` through

@@ -17,8 +17,17 @@ export function codexSetupDialog(doc,send,container){
   fields.endpoint.placeholder='https://provider.example/v1 or http://127.0.0.1:8080/v1'
   const note=make('p'),actions=make('div');note.setAttribute('role','status')
   let rows=[],profileId=null,busy=false,dirty=false,closed=false
+  const accountForm=make('fieldset'),accountSelect=make('select'),accountNote=make('p'),accountActions=make('div')
+  accountSelect.setAttribute('aria-label','ChatGPT account');accountNote.setAttribute('role','status');accountForm.append(make('legend','ChatGPT account'),accountSelect,accountNote,accountActions)
+  let accountStatus={},accountBusy=false,ownedAttempt=null,pollTimer=null
+  const view=doc.defaultView
   const request=async payload=>{const result=await send('codexSetup',{request:payload});if(!result.ok)throw Error(result.error);return result.result}
-  const controls=()=>{form.disabled=busy;save.disabled=busy;check.disabled=busy||dirty||!profileId;imageCheck.disabled=check.disabled;close.disabled=busy}
+  const accountControls=()=>{
+    const pending=['opening','waiting','saving'].includes(accountStatus.attempt?.state),allowed=accountStatus.enabled===true&&!pending&&!accountBusy&&!busy
+    signIn.disabled=!allowed;allowPlan.disabled=!allowed||!accountSelect.value;cancelLogin.disabled=!pending||accountBusy;signOut.disabled=!accountSelect.value||pending||accountBusy||busy
+    accountSelect.disabled=pending||accountBusy||busy
+  }
+  const controls=()=>{form.disabled=busy;save.disabled=busy;check.disabled=busy||dirty||!profileId;imageCheck.disabled=check.disabled;close.disabled=busy;accountControls()}
   const button=(label,fn)=>{const b=make('button',label);b.type='button';b.onclick=fn;actions.append(b);return b}
   const run=async fn=>{if(busy)return;busy=true;controls();try{await fn()}catch(error){if(!closed)note.textContent=error.message}finally{busy=false;if(!closed)controls()}}
   const selected=()=>{
@@ -31,6 +40,42 @@ export function codexSetupDialog(doc,send,container){
     fields.profile.replaceChildren();for(const row of [{id:'',name:'New connection'},...rows]){const option=make('option',row.name);option.value=row.id;fields.profile.append(option)}
     fields.profile.value=profileId||'';selected()
   }
+  const showAccounts=value=>{
+    if(closed)return
+    accountStatus=value;const selected=accountSelect.value
+    accountSelect.replaceChildren();for(const row of [{id:'',label:'Add a ChatGPT account'},...value.accounts||[]]){const option=make('option',row.label+(row.active?' · selected':''));option.value=row.id;accountSelect.append(option)}
+    accountSelect.value=[...accountSelect.options].some(row=>row.value===selected)?selected:''
+    const attempt=value.attempt
+    accountNote.textContent=value.reason?value.reason+(value.notice?' '+value.notice:''):value.notice||attempt?.message||(['opening','waiting'].includes(attempt?.state)?'Complete sign-in in your browser.':attempt?.state==='saving'?'Saving the verified account…':'Account login is available. Model connections are configured separately.')
+    if(attempt?.id===ownedAttempt&&!['opening','waiting','saving'].includes(attempt.state))ownedAttempt=null
+    accountControls()
+  }
+  const cancelOwned=()=>{const id=ownedAttempt;ownedAttempt=null;if(id)void request({action:'account-cancel',account:{attemptId:id}}).catch(()=>{})}
+  const accountRun=async fn=>{
+    if(accountBusy||closed)return;accountBusy=true;accountControls()
+    try{await fn()}catch(error){if(!closed)accountNote.textContent=error.message}
+    finally{accountBusy=false;if(!closed)accountControls()}
+  }
+  const pollAccounts=async()=>{
+    if(closed)return
+    await accountRun(async()=>showAccounts(await request({action:'account-status'})))
+    if(!closed)pollTimer=view.setTimeout(pollAccounts,1000)
+  }
+  const accountButton=(label,fn)=>{const b=make('button',label);b.type='button';b.onclick=fn;accountActions.append(b);return b}
+  const startLogin=plan=>accountRun(async()=>{
+    const account={requestPlanUsage:plan};if(accountSelect.value)account.accountId=accountSelect.value
+    const value=await request({action:'account-start',account});ownedAttempt=value.attempt.id
+    if(closed){cancelOwned();return}showAccounts({...accountStatus,notice:undefined,attempt:value.attempt})
+  })
+  const signIn=accountButton('Sign in with ChatGPT',()=>startLogin(false))
+  const allowPlan=accountButton('Allow ChatGPT plan usage',()=>startLogin(true))
+  const cancelLogin=accountButton('Cancel sign-in',()=>accountRun(async()=>{await request({action:'account-cancel',account:{attemptId:accountStatus.attempt.id}});showAccounts(await request({action:'account-status'}))}))
+  const signOut=accountButton('Sign out',()=>accountRun(async()=>{
+    const value=await request({action:'account-sign-out',account:{accountId:accountSelect.value}});showAccounts(value.status)
+    if(!closed)accountNote.textContent=value.remoteRevocationConfirmed&&value.localCleanupConfirmed?'Signed out; remote revocation and local cleanup confirmed.':
+      'Signed out. '+(!value.remoteRevocationConfirmed?'Remote revocation is unconfirmed. ':'')+(!value.localCleanupConfirmed?'Unlock the OS credential store to finish local cleanup.':'')
+  }))
+  accountSelect.onchange=accountControls
   const close=button('Close',()=>dialog.close())
   const check=button('Check Codex connection',()=>run(async()=>{note.textContent='Checking Codex chat and tool support…';await request({action:'test',id:profileId,capability:'agent'});note.textContent='Codex chat and the test tool worked. Browser and desktop tasks still need their own checks.'}))
   const imageCheck=button('Check image response',()=>run(async()=>{note.textContent='Checking a synthetic image…';await request({action:'test',id:profileId,capability:'image'});await load();note.textContent='Image response verified. Start a new chat to use browser screenshots. General vision and tool accuracy still need a chat test.'}))
@@ -42,8 +87,8 @@ export function codexSetupDialog(doc,send,container){
   }))
   for(const [key,field] of Object.entries(fields)){if(key==='profile')continue;field.oninput=()=>{dirty=true;controls()}}
   fields.profile.onchange=selected
-  dialog.append(make('h3','Connect a model · Codex'),make('p','Use a Responses-compatible API provider or local model. Subscription sign-in is not available in this development build.'),form,make('p','Keys are stored in the operating system credential store. Checks send a short tool exercise or a synthetic image that your provider may charge for. The Codex check uses one harmless test tool and sends no personal files or chat history. The image check enables screenshots for new chats.'),note,actions)
+  dialog.append(make('h3','Connect a model · Codex'),make('p','Use a Responses-compatible API provider or local model. ChatGPT account availability is shown below.'),form,accountForm,make('p','Keys are stored in the operating system credential store. Checks send a short tool exercise or a synthetic image that your provider may charge for. The Codex check uses one harmless test tool and sends no personal files or chat history. The image check enables screenshots for new chats.'),note,actions)
   dialog.addEventListener('cancel',event=>{if(busy)event.preventDefault()})
-  dialog.addEventListener('close',()=>{closed=true;fields.credential.value='';dialog.remove()})
-  doc.body.append(dialog);presentSettingsForm(dialog,container);void run(load);return dialog
+  dialog.addEventListener('close',()=>{closed=true;view.clearTimeout(pollTimer);cancelOwned();fields.credential.value='';dialog.remove()})
+  doc.body.append(dialog);presentSettingsForm(dialog,container);accountControls();void run(load);void pollAccounts();return dialog
 }
