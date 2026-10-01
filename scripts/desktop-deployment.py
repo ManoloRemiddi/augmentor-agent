@@ -81,6 +81,8 @@ def check(config, connected=False):
            'PYTHONDONTWRITEBYTECODE':'1', 'QT_QPA_PLATFORM':'offscreen',
            'AUGMENTOR_PI_NODE':config['node']}
     code = 'from augmentor_linux import window, controller\n'
+    code += ('import sys\nsys.path.insert(0, '+repr(str(root/'services/lifecycle'))+')\n'
+             'from lease import hold\nhold("desktop")\n')
     if connected and config.get('dshService'):
         # This reads the matching product identity and model catalog. No prompts,
         # new chats, runtime restarts or configuration writes are involved.

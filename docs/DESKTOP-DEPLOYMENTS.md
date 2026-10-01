@@ -13,8 +13,12 @@ retains and inventories `distribution-prerequisites.json`.
 
 Explicit native `--harness codex` selection now reaches the selected engine,
 and future maintenance refuses unsent drafts. Focused startup and promotion tests
-pass (13 cases). Installed activation and
-running-window evidence are recorded separately after candidate qualification.
+pass (14 cases). Preflight now takes the same package lifecycle lease as the native entrypoint.
+The first local candidate was rolled back after a proof-only packaging marker
+triggered the installed package version guard. The corrected candidate retains
+the existing developer-artifact lifecycle; no package guard is disabled. Real
+entrypoint, isolated Codex setup and subsequent activation evidence are recorded
+separately below.
 The owner's compatible 0.2.11 installation requires an incremental candidate that
 preserves its DSH product identity and existing native improvements; replacing it
 with the complete public 0.2.13 artifact is not a compatible update. ChatGPT plan
