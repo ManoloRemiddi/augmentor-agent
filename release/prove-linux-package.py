@@ -80,6 +80,10 @@ def main():
     user = 'augmentor-proof'
     home = Path('/home')/user
     run(['useradd', '-m', '-s', '/bin/sh', user])
+    gtk = subprocess.check_output(['runuser', '-u', user, '--', '/usr/bin/python3', '-c',
+        'import gi; gi.require_version("Gtk", "4.0"); from gi.repository import Gtk; '
+        'assert callable(Gtk.accelerator_parse_with_keycode); '
+        'print(str(Gtk.get_major_version())+"."+str(Gtk.get_minor_version())+"."+str(Gtk.get_micro_version()))'],text=True).strip()
     run(['runuser', '-u', user, '--', '/usr/bin/python3', str(app/'scripts/run-component.py'), 'runtime', str(app/'node/bin/node'), '--version'])
     run(['runuser', '-u', user, '--', 'env', 'QT_QPA_PLATFORM=offscreen', 'augmentor-agent', '--preview', '--screenshot', str(home/'window.png')])
     assert (home/'window.png').stat().st_size > 1000
@@ -127,7 +131,8 @@ def main():
     versions['node'] = subprocess.check_output([str(app/'node/bin/node'), '--version'], text=True).strip()
     report = {'target': target, 'imageDigest': a.image_digest, 'source': manifest['source'], 'artifacts': hashes,
               'proofScriptSha256': PROOF_SHA256,
-              'versions': versions, 'freshInstall': fresh, 'nonRootRuntimeLease': True, 'nonRootQtRender': True,
+              'versions': versions, 'gtk4Version': gtk, 'gtk4ShortcutApiImportTested': True,
+              'freshInstall': fresh, 'nonRootRuntimeLease': True, 'nonRootQtRender': True,
               'activeRuntimeAndDesktopReinstallBlocked': True, 'activeComponentRemovalBlocked': True,
               'idleReinstall': True, 'removePreservesPrivateFiles': True, 'reinstallAfterRemove': True,
               'realDesktopSessionTested': False, 'physicalAudioTested': False, 'selinuxEnforcingTested': False,

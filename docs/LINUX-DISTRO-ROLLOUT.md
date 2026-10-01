@@ -540,3 +540,15 @@ test-only provisioning now installs verified Fedora 43 `nodejs-npm`, Fedora 44
 Product Node remains the pinned bundled runtime. Current-source hosted Linux and
 Mac confirmation remains open until the next clean push is qualified. No
 installed release, owner settings or model/audio services were changed.
+
+The adapter is published at `8931cd8a19177d2ab9885abb50fbaa640e5e6ea9`.
+A subsequent package-prerequisite audit reproduced missing GTK 4 GI imports in
+the historical headless Ubuntu and Fedora package fixtures. Debian Desktop now
+requires `gir1.2-gtk-4.0`; Fedora requires `gtk4`, which owns `Gtk-4.0.typelib`.
+Actual package installs and API imports pass in disposable dependency fixtures:
+Debian 13 GTK 4.18.6, Ubuntu 26.04 GTK 4.22.4, Fedora 43 GTK 4.20.4 and Fedora 44
+GTK 4.22.5. These are supplemental dependency proofs against existing image
+caches, not newly built Augmentor artifacts or GNOME acceptance on all four
+targets. The installed-package proof now checks GTK 4's accelerator API through
+the ordinary test user and records its actual version. Current-source package/
+complete artifacts remain to be qualified after a clean push.

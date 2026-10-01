@@ -50,6 +50,13 @@ CI and Linux root/Debian/lifecycle/Browser/package proofs; distro native jobs st
 at missing npm. Test-only distro npm provisioning is corrected; new-source hosted
 confirmation remains open. Full compatibility is not complete.
 
+The GNOME adapter is published at `8931cd8`. Followup package prerequisites now
+install GTK 4 GI (`gir1.2-gtk-4.0` on Debian/Ubuntu, `gtk4` on Fedora); real imports
+pass on all four dependency fixtures. The package proof checks the installed
+ordinary user's accelerator API. These imports do not qualify fresh current-source
+packages, full GNOME desktop sessions or all keyboard layouts. Continue the
+rollout guide's remaining startup/window/control and release gates.
+
 ## October 1 merge blockers: current main and separate Codex prerequisite
 
 The feature branch integrates canonical main `8c3be5a` at merge `338dbc5`.
