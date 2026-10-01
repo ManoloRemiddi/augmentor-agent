@@ -249,3 +249,33 @@ The actual Fedora Chromium executable contains `/etc/chromium/native-messaging-h
 matching the standard system registration; default graphical profile registration
 still needs the desktop acceptance stage. These checks do not qualify GNOME,
 KDE, physical audio or enforcing SELinux.
+
+### October 2 matching-candidate qualification
+
+Clean source `a5d27c3053f3015dad27af3da8e39b53f63ccde7` builds matching Debian,
+Fedora 43/44, Browser and all four complete bundles. Artifact/private-state/native
+notice review passes. [Checked qualification reports](../release/qualification/a5d27c3/)
+record exact package hashes, proof-script hashes, source, base-image digests,
+dependency-cache provenance, runtime versions and separately qualified dimensions.
+Old Augmentor payloads were removed in disposable containers before fresh installs;
+these runs reuse dependency caches derived from the pinned bases.
+
+Debian 13, Ubuntu 26.04, Fedora 43 and Fedora 44 all pass both component leases,
+active maintenance/removal refusal, idle reinstall/removal retention, ordinary-user
+complete setup/repeat preservation, real installed DSH/plugins, both role fixture
+turns and restart/history preservation without replay. Every target passes 610
+native tests (two Mac-only skips). Actual isolated Secret Service proofs also pass
+on each target, including update, reference isolation, token rotation, restart,
+logout and complete synthetic-entry cleanup. Fedora's minimal container needed
+test-only `dbus-daemon` to supply `dbus-run-session`; its first proof attempt and
+successful continuation are both recorded. Production graphical Fedora uses its
+existing session bus; this test dependency is not an installer prerequisite.
+
+These reports qualify the installer/package foundation. They do not qualify
+actual GNOME/KDE sessions, default graphical Browser connections, physical voice,
+memory provisioning, enforcing SELinux or older/other distros. The source-only
+Debian/Fedora Node checks above remain separate from installed-candidate evidence.
+Next: publish this foundation for review, then replace unconditional Linux backend
+advertising with actual session/dependency/interface discovery before the GNOME
+shortcut and observation adapters. Installed application/model/audio services
+remain unchanged.

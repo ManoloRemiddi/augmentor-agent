@@ -1,0 +1,115 @@
+{
+  "format": "augmentor-linux-qualification/1",
+  "checkpointDate": "2026-10-02",
+  "environment": {
+    "sourceCommit": "a5d27c3053f3015dad27af3da8e39b53f63ccde7",
+    "baseImage": "docker.io/library/fedora@sha256:43b29f65a41eb9c35e1cd5323e3bdf3b655c2357a9f4f1ff2f9c2798e5045d80",
+    "derivedDependencyCache": "augmentor-rollout-fedora-complete-cache",
+    "oldPayloadRemovedBeforeProof": true,
+    "exitCode": 1,
+    "postQualificationExitCode": 0,
+    "testOnlyAdditionalPackages": [
+      "dbus-daemon"
+    ]
+  },
+  "package": {
+    "target": "fedora44-x86_64",
+    "imageDigest": "docker.io/library/fedora@sha256:43b29f65a41eb9c35e1cd5323e3bdf3b655c2357a9f4f1ff2f9c2798e5045d80",
+    "source": {
+      "commit": "a5d27c3053f3015dad27af3da8e39b53f63ccde7",
+      "dirty": false
+    },
+    "artifacts": {
+      "augmentor-agent-0.2.13-1.fc44.x86_64.rpm": "7e24b2ae1b1551f6197c6b474a5c870fb3d93eb52cadaa5d6b4bfde47f8f1ef8"
+    },
+    "proofScriptSha256": "5a98f411d116f3a0dfd855e58f6a1246f520bbc68729ca4bd53c7aab7da0711f",
+    "versions": {
+      "python": "3.14.7",
+      "pyside": "6.11.2",
+      "qt": "6.11.2",
+      "node": "v24.19.0"
+    },
+    "freshInstall": true,
+    "nonRootRuntimeLease": true,
+    "nonRootQtRender": true,
+    "activeRuntimeAndDesktopReinstallBlocked": true,
+    "activeComponentRemovalBlocked": true,
+    "idleReinstall": true,
+    "removePreservesPrivateFiles": true,
+    "reinstallAfterRemove": true,
+    "realDesktopSessionTested": false,
+    "physicalAudioTested": false,
+    "selinuxEnforcingTested": false,
+    "dshModelTurnTested": false
+  },
+  "complete": {
+    "target": "fedora44-x86_64",
+    "sourceCommit": "a5d27c3053f3015dad27af3da8e39b53f63ccde7",
+    "bundle": "0.2.13-fedora44-x86_64-complete-preview.1-a5d27c3053f3",
+    "proofScriptSha256": "7cffa5862f48668cf9136b83f95fb6b80e50686d6dcecf933ad146ee0c5db267",
+    "ordinaryUserSetup": true,
+    "realInstalledDshAndPlugins": true,
+    "offscreenNativeRender": true,
+    "secondWindowEntry": true,
+    "nativeHostRegistered": true,
+    "repeatPreservesSettings": true,
+    "linuxAndBrowserRoleFixtureTurns": true,
+    "restartPreservesHistoryWithoutReplay": true,
+    "modelRequests": 4,
+    "realDesktopSessionTested": false,
+    "graphicalBrowserTested": false,
+    "physicalVoiceTested": false,
+    "memoryEngineTested": false,
+    "systemPlan": {
+      "target": "fedora44-x86_64",
+      "packageManager": "dnf",
+      "packages": [
+        "augmentor-agent-0.2.13-1.fc44.x86_64.rpm"
+      ],
+      "dependencies": [
+        "ca-certificates",
+        "python3-pip",
+        "nodejs24-npm",
+        "portaudio",
+        "alsa-plugins-pulseaudio",
+        "pulseaudio-utils"
+      ],
+      "command": [
+        "sudo",
+        "dnf",
+        "install",
+        "-y",
+        "/bundle/augmentor-agent-0.2.13-1.fc44.x86_64.rpm",
+        "ca-certificates",
+        "python3-pip",
+        "nodejs24-npm",
+        "portaudio",
+        "alsa-plugins-pulseaudio",
+        "pulseaudio-utils"
+      ],
+      "memoryEngine": "deferred",
+      "installMemoryEngine": false,
+      "qualification": "Package adapter; real desktop/browser/voice acceptance is separate."
+    }
+  },
+  "credentials": {
+    "proof": "PASS",
+    "platform": "linux",
+    "backend": "Secret Service",
+    "roundTrip": true,
+    "update": true,
+    "referenceIsolation": true,
+    "idempotentRemoval": true,
+    "accountRoundTrip": true,
+    "rotatingTokenPersistence": true,
+    "accountRestart": true,
+    "accountLogout": true,
+    "cleanup": true
+  },
+  "native": {
+    "tests": 610,
+    "skipped": 2,
+    "failed": 0,
+    "seconds": 45.252
+  }
+}

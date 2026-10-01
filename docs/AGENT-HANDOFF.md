@@ -15,8 +15,10 @@ an intermediate package/container pass as completion of the distro rollout.
 Current main `d91c520` is integrated at `4183895`; previous candidates are
 historical. Preserve Codex's external prerequisite and account eligibility gates.
 RPM credential dependencies and published-source snapshot reuse are included in
-the next clean candidate. The rollout guide records current test evidence and
-remaining desktop/other-distro gates.
+clean candidate `a5d27c3`. All four package/complete proofs, 610 native cases
+(two skips) per target and isolated Secret Service lifecycle proofs pass. The
+rollout guide and checked reports record exact artifacts and remaining desktop/
+other-distro gates. Capability discovery is the next source stage.
 
 ## October 1 merge blockers: current main and separate Codex prerequisite
 
