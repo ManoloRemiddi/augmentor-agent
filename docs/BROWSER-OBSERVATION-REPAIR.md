@@ -110,7 +110,23 @@ not establish that the open extension has adopted the new observer.
 Primary, secondary and mobile native windows remain on
 `20260928-093018-2d4431f6`, online with voice available and the selected update
 pending. Their context handling already uses the refreshed shared DSH service;
-native UI adoption happens at close/reopen or login. Installed Mac adoption and
-public release packaging remain unperformed. Rollback includes the previous
+native UI adoption happens at close/reopen or login. At this local-install checkpoint, installed Mac adoption and public release
+packaging remained unperformed; subsequent public packaging is recorded below. Rollback includes the previous
 selection plus the privately backed-up presets, plugin inventory and extension
 files; desktop selection rollback alone does not undo backend/extension updates.
+
+## Public distribution — 1 October 2026
+
+The shared repair and general task-reliability dependency are merged into the
+canonical application repository and packaged as matched 0.2.13 Linux and Mac
+previews from clean source `0eb2ec112afa52b886b63606f80967198a7feb0c`.
+Both public downloads match the tested candidates byte for byte. See the
+[0.2.13 release record](RELEASE-0.2.13.md) for exact URLs, checksums, package/CI
+qualification and website publication. The Mac source-notice copier additionally
+preserves all verified upstream notices, including test-directory README files.
+This is a general capability repair across websites and task types; historical
+Amazon evidence is one regression case, with no shopping-specific agent or rule.
+
+Public packaging does not change the owner's selected compatible 0.2.11 artifact,
+open Linux windows or existing Mac installation. The installed Chromium Reload
+and fresh live-site acceptance remain separate manual adoption steps.

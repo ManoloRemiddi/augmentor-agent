@@ -13,7 +13,9 @@ personal adapters are active, and the restricted real local model correctly read
 the saved Amazon product price. Chromium extension Reload and fresh live-site
 acceptance remain pending; existing native windows retain their earlier build.
 [PR #26](https://github.com/ManoloRemiddi/augmentor-agent/pull/26) includes the #21 dependency and current main.
-[0.2.13 public release qualification](RELEASE-0.2.13.md) is in progress.
+[Matched 0.2.13 public previews](RELEASE-0.2.13.md) are published with verified
+anonymous Linux/Mac downloads. The live website serves the matching downloads
+and prompt; package checksums, Pages deployment and source tests are verified.
 Preserve the selected compatible application/SDK build when staging this repair.
 
 ## September 28 task reliability correction
@@ -24,8 +26,8 @@ effective-reasoning visibility. Model/GPU settings are preserved. Read the guide
 for fixture versus real-model evidence and installed adoption boundaries.
 Implementation through `70c5c79` is selected and running in all three Linux windows
 as `20260928-093018-2d4431f6`. Both shared DSH presets use the updated adapters;
-model settings and saved conversation selections were preserved. PR #21 is draft;
-Mac/public downloads are unchanged. After two unsuccessful full-preset checks,
+model settings and saved conversation selections were preserved. At that September 28 checkpoint, PR #21 was draft and Mac/public downloads
+were unchanged. PR #21 is now merged and included in the 0.2.13 previews above. After two unsuccessful full-preset checks,
 the final read-only retest identified the correct control in 79 seconds / six calls.
 Physical standby/wake remains untested; xhigh reasoning and task latency remain.
 ## September 30 application SDK foundation
