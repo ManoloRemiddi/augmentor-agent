@@ -9,6 +9,15 @@ from augmentor_linux import runtime_start
 
 
 class CodexRuntimeStartTests(unittest.TestCase):
+    def test_explicit_native_codex_selection_is_kept(self):
+        from PySide6.QtWidgets import QApplication
+        from augmentor_linux.window import Window
+        app=QApplication.instance() or QApplication([])
+        with tempfile.TemporaryDirectory() as folder, patch.dict(os.environ,{'AUGMENTOR_PI_CONFIG':folder,'AUGMENTOR_WINDOW_ID':'main'}):
+            window=Window(preview=True,harness='codex')
+            try:self.assertEqual(window.preferences.values['harness'],'codex')
+            finally:window.close();app.processEvents()
+
     def test_selected_interpreter_reaches_the_detached_credential_helper(self):
         with tempfile.TemporaryDirectory() as folder:
             state=Path(folder)/'codex'

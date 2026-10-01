@@ -11,7 +11,9 @@ Detached native Codex startup now passes the running native interpreter to its
 credential helper, rather than falling back to system Python. Desktop staging
 retains and inventories `distribution-prerequisites.json`.
 
-Focused startup and promotion tests pass (12 cases). Installed activation and
+Explicit native `--harness codex` selection now reaches the selected engine,
+and future maintenance refuses unsent drafts. Focused startup and promotion tests
+pass (13 cases). Installed activation and
 running-window evidence are recorded separately after candidate qualification.
 The owner's compatible 0.2.11 installation requires an incremental candidate that
 preserves its DSH product identity and existing native improvements; replacing it
