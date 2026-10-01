@@ -152,7 +152,9 @@ def main():
             path = args.source_notices/name
             if path.is_symlink() or not path.resolve().is_relative_to(args.source_notices.resolve()) or hashlib.sha256(path.read_bytes()).hexdigest()!=sha:
                 raise ValueError('Source notice differs from its inventory: '+name)
-        copy(args.source_notices, project/'licenses/macos-sources')
+        # Preserve the complete verified notice inventory, including upstream
+        # test/README notices excluded by the application source copier.
+        shutil.copytree(args.source_notices, project/'licenses/macos-sources')
     # python-build-standalone (used by uv) supplies a relocatable interpreter.
     # Copy its stdlib as well as this build environment's locked GUI dependencies.
     python = project/'python'

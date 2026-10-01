@@ -16,6 +16,8 @@ qualification using historical page evidence. See [task reliability](TASK-RELIAB
 for recovery semantics and limits. Complete local merged-source checks pass:
 TypeScript check/build, 207 Node tests and 44 Browser tests. Final package, clean
 installation and Linux/macOS CI qualification are recorded below after completion.
+The Mac packager preserves the complete verified source-notice inventory, including
+upstream test-directory README notices excluded by its application source copier.
 
 ## Distribution
 
