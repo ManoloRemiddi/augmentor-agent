@@ -81,6 +81,8 @@ def check(config, connected=False):
            'PYTHONDONTWRITEBYTECODE':'1', 'QT_QPA_PLATFORM':'offscreen',
            'AUGMENTOR_PI_NODE':config['node']}
     code = 'from augmentor_linux import window, controller\n'
+    code += ('import sys\nsys.path.insert(0, '+repr(str(root/'services/lifecycle'))+')\n'
+             'from lease import hold\nhold("desktop")\n')
     if connected and config.get('dshService'):
         # This reads the matching product identity and model catalog. No prompts,
         # new chats, runtime restarts or configuration writes are involved.
@@ -113,7 +115,7 @@ def stage(source, source_ref, python=None, node=None):
             if (source/part).is_dir():
                 shutil.copytree(source/part, temporary/part, symlinks=True,
                                 ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '.git', '.env', 'outputs'))
-        for part in ('package.json', 'package-lock.json', 'release.json', 'LICENSE', 'README.md', 'distribution-exclusions.json', 'distribution-overrides.json'):
+        for part in ('package.json', 'package-lock.json', 'release.json', 'LICENSE', 'README.md', 'distribution-exclusions.json', 'distribution-overrides.json', 'distribution-prerequisites.json'):
             if (source/part).is_file():
                 target = temporary/part; target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(source/part, target)

@@ -55,7 +55,7 @@ class Window(QWidget):
                 try:voice_request('preferences')
                 except Exception:pass  # Optional offline voice must not prevent chat.
             threading.Thread(target=initialize_voice_profile,daemon=True).start()
-        if harness in ('pi','dsh'):
+        if harness in ('pi','dsh','codex'):
             self.preferences.values['harness']=harness;self.preferences.save()
         self.controller=None if preview else Controller(self,harness=self.preferences.values['harness'])
         self.setup_dialog=None;self.appearance_dialog=None;self.setup_offered=False
@@ -1289,7 +1289,7 @@ def main():
     parser.add_argument('--preview', action='store_true', help='Open without connecting to a harness.')
     parser.add_argument('--onboarding-host', action='store_true', help=argparse.SUPPRESS)
     parser.add_argument('--ui-test-control', action='store_true', help=argparse.SUPPRESS)
-    parser.add_argument('--harness', choices=['pi','dsh'], help='Open the shared UI with this harness.')
+    parser.add_argument('--harness', choices=['pi','dsh','codex'], help='Open the shared UI with this harness.')
     parser.add_argument('--instance', type=validate_name, default=current_name(), help='Named independent window (for example secondary); repeated launches toggle that window.')
     args = parser.parse_args()
     configure(args.instance)
