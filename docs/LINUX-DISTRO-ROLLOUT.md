@@ -335,3 +335,16 @@ its effect in the hosted environment.
 Next source stage: actual GNOME/KDE session fixtures and the owned shortcut portal
 adapter, followed by trusted GNOME window/occlusion observation. Backend discovery
 does not complete those adapters or the remaining distro/hardware acceptance.
+
+### Hosted capability checkpoint and GNOME fixture preparation
+
+Source `89c7f507954a5fbb8723338a02156a7c28106c81` passes
+[macOS 14/26 hosted CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36934724347).
+The [Linux hosted run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36934724286)
+passes the root Node/memory lifecycle checks and reaches actual DSH/Qt setup; its
+remaining failure is the old assertion that every Linux session must advertise
+`linux_desktop_snapshot`. The setup proof now checks registration against observed
+availability and always checks Stop. The full isolated Fedora DSH/Qt proof passes,
+including preserved original profile, both personal surfaces, saved chats, actual
+approval reject/allow/cancel, question delivery and exact branching without replay
+(16 fixture requests). Hosted Linux acceptance for that correction remains pending.

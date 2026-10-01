@@ -20,7 +20,10 @@ clean candidate `a5d27c3`. All four package/complete proofs, 610 native cases
 rollout guide and checked reports record exact artifacts and remaining desktop/
 other-distro gates. Capability discovery now gates actual KDE session/dependency/interfaces in all
 three harnesses, with explicit unavailability and Stop retention. Its working
-regression checks pass; hosted CI and new artifacts remain to be confirmed.
+regression checks pass and macOS 14/26 hosted CI passes source `89c7f50`.
+Linux CI passed root checks and exposed the setup proof's outdated unconditional
+capture-tool assertion; its correction passes the full isolated DSH/Qt proof.
+Hosted Linux CI and new capability-source artifacts remain to be confirmed.
 GNOME/session-owned shortcuts and observation are the next source stage.
 
 ## October 1 merge blockers: current main and separate Codex prerequisite

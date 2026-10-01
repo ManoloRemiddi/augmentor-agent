@@ -337,7 +337,13 @@ try:
         tools={t['function']['name'] for t in received[before]['tools']};assert 'memory_recall' in tools,tools
         if surface=='linux':
             desktop_tools=tools
-            assert 'linux_desktop_snapshot' in tools,tools
+            discovery=json.loads(subprocess.check_output(['node','--input-type=module','-e',
+                "import {desktopCapabilities} from './dist/desktop/src/capabilities.js';console.log(JSON.stringify(desktopCapabilities()));"],cwd=ROOT,text=True))
+            input_tools={'linux_desktop_connect','linux_desktop_snapshot','linux_desktop_action'}
+            assert 'linux_desktop_stop' in tools,tools
+            if discovery['available']:assert input_tools<=tools,tools
+            else:assert input_tools.isdisjoint(tools),tools
+            print('Desktop input registration matches observed availability: '+str(discovery['available']),flush=True)
             required={'glob','grep','job_list','job_output','job_kill','skill','create_goal','get_goal','update_goal','exit_plan_mode','list_agents','subagent','subagent_fork','interrupt_agent','send_message','workflow','ralph','todo_write','web_search'}
             assert required <= tools, 'Missing desktop capabilities: '+str(sorted(required-tools))
             print('Desktop model-facing tools: '+json.dumps(sorted(tools)),flush=True)
