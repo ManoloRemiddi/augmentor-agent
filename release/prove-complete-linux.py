@@ -6,6 +6,7 @@ Uses a deterministic localhost model with real installed DSH/plugins/adapters.
 Offscreen rendering and adapter turns do not qualify a graphical browser/session.
 """
 import argparse
+import hashlib
 import http.server
 import json
 import os
@@ -16,6 +17,8 @@ import subprocess
 import sys
 import threading
 import time
+
+PROOF_SHA256 = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 
 
 def run(command, **kwargs):
@@ -51,7 +54,7 @@ def user_proof(bundle):
     node = app/'node/bin/node'
     os.environ.update(AUGMENTOR_FIXTURE_KEY='qualification-fixture', QT_QPA_PLATFORM='offscreen',
                       XDG_RUNTIME_DIR=str(home/'runtime'), PATH=str(node.parent)+':'+os.environ['PATH'])
-    Path(os.environ['XDG_RUNTIME_DIR']).mkdir(mode=0o700)
+    Path(os.environ['XDG_RUNTIME_DIR']).mkdir(mode=0o700, exist_ok=True)
     command = ['/usr/bin/python3', bundle/'setup.py', '--bundle', bundle, '--skip-packages', '--no-services',
                '--non-interactive', '--model-url', f'http://127.0.0.1:{server.server_port}/v1', '--model', 'fixture',
                '--api-key-env', 'AUGMENTOR_FIXTURE_KEY', '--port', str(port)]
@@ -125,14 +128,24 @@ def user_proof(bundle):
                 time.sleep(.1)
             else:
                 raise AssertionError('Installed '+role+' role did not complete a fixture model turn')
+        histories = {session: adapter.call('session.history', {'sessionId': session}) for session in histories}
+        (home/'history-before.json').write_text(json.dumps(histories, indent=2)+'\n')
         count = len(requests)
         stop()
         adapter = start()
-        for session, history in histories.items():
-            assert adapter.call('session.history', {'sessionId': session}) == history
+        reopened = {session: adapter.call('session.history', {'sessionId': session}) for session in histories}
+        (home/'history-after.json').write_text(json.dumps(reopened, indent=2)+'\n')
+        # Actual DSH initializes an omitted delegationDepth to zero when loading
+        # its session header. Compare the documented default semantically; every
+        # saved event and every other header field must remain exactly equal.
+        for session in histories:
+            for snapshot in (histories[session], reopened[session]):
+                snapshot['header'].setdefault('delegationDepth', 0)
+        assert reopened == histories, 'Restart history differs; inspect history-before.json and history-after.json'
         assert len(requests) == count, 'Restart replayed a model request'
         stop()
         report = {'target': manifest['target'], 'sourceCommit': manifest['sourceCommit'], 'bundle': manifest['artifactId'],
+                  'proofScriptSha256': PROOF_SHA256,
                   'ordinaryUserSetup': True, 'realInstalledDshAndPlugins': True, 'offscreenNativeRender': True,
                   'secondWindowEntry': True, 'nativeHostRegistered': True, 'repeatPreservesSettings': True,
                   'linuxAndBrowserRoleFixtureTurns': True, 'restartPreservesHistoryWithoutReplay': True,
@@ -162,6 +175,8 @@ def main():
         user_proof(bundle)
         return
     assert os.geteuid() == 0
+    if Path('/usr/lib/augmentor/release.json').exists():
+        raise ValueError('Use a fresh container without an installed Augmentor payload; equal package versions can mask another source revision.')
     plan = json.loads(subprocess.check_output(['/usr/bin/python3', str(bundle/'setup.py'), '--bundle', str(bundle), '--plan'], text=True))
     command = plan['system']['command']
     assert command[:2] in (['sudo', 'apt'], ['sudo', 'dnf'])
@@ -173,6 +188,10 @@ def main():
     # The actual installer runs as a fresh ordinary user below; root performs
     # only the exact package plan, avoiding a sudo dependency in minimal images.
     run(command[1:])
+    manifest = json.loads((bundle/'bundle.json').read_text())
+    release = json.loads(Path('/usr/lib/augmentor/release.json').read_text())
+    assert release['source'] == {'commit': manifest['sourceCommit'], 'dirty': False}
+    assert release['version'] == manifest['version']
     run(['useradd', '-m', '-s', '/bin/sh', 'augmentor-complete-proof'])
     run(['runuser', '-u', 'augmentor-complete-proof', '--', '/usr/bin/python3', Path(__file__).resolve(), '--bundle', bundle, '--user-phase'])
     report = json.loads(Path('/home/augmentor-complete-proof/complete-proof.json').read_text())

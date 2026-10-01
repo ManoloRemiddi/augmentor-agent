@@ -43,7 +43,7 @@ def host_target(info=None, machine=None):
         if (info.get('ID'), info.get('VERSION_ID')) == (name, version):
             return target
     label = info.get('PRETTY_NAME', info.get('ID', 'unknown Linux'))
-    if info.get('ID') in ('ubuntu', 'linuxmint'):
+    if (info.get('ID'), info.get('VERSION_ID')) == ('ubuntu', '24.04') or (info.get('ID') == 'linuxmint' and info.get('VERSION_ID', '').split('.')[0] == '22'):
         raise ValueError(label + ' needs the managed PySide6 runtime; this system-Qt bundle cannot install it.')
     raise ValueError('No qualified package adapter for ' + label + '. Supported candidates: ' + ', '.join(TARGETS))
 
@@ -84,7 +84,8 @@ def dependency_packages(target, *, voice=False, gpu=False, memory=False, memory_
         if memory and not memory_engine_present:
             result += ['docker.io']
     else:
-        result = ['ca-certificates', 'python3-pip', 'nodejs24-npm', 'portaudio',
+        npm = 'nodejs-npm' if target == 'fedora43-x86_64' else 'nodejs24-npm'
+        result = ['ca-certificates', 'python3-pip', npm, 'portaudio',
                   'alsa-plugins-pulseaudio', 'pulseaudio-utils']
         if voice:
             result += ['git', 'cmake', 'gcc-c++', 'pkgconf-pkg-config']

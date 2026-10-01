@@ -176,3 +176,33 @@ the source branch and draft PR. All desktop/older-runtime/other-distro stages
 above remain open. The build host has Docker/Podman and QEMU, but no `/dev/kvm`;
 full desktop VM work may use TCG. No public compatibility claim or installed
 deployment has changed.
+
+### Clean-source qualification checkpoint
+
+Candidates built from clean `58150e58d4ca24e5034dd598a1231a64b28e8b2f` are now
+assembled for Ubuntu 26.04 and Fedora 44 with the exact pinned Voice/Adaptive
+source archives. Both actual ordinary-user setups install DSH and all three
+plugins, render the native UI, register the matching Browser host, preserve
+settings on repeat, complete Desktop/Browser-role fixture turns and retain
+history on DSH restart without another model request. This exercises actual
+installed adapters and roles, not a graphical browser. Corrected test
+instrumentation is tracked in the follow-up source commit: DSH's persistence
+normalizes an omitted `delegationDepth` header field to zero on reload. Its
+upstream persistence and header equality code explicitly use that default;
+every saved event and every other header field is still compared exactly.
+
+Debian 13 clean-package regression passes fresh install, both component leases,
+rendering, idle retry/removal retention and the full 560-test native suite
+(two skips), with Python 3.13.5/PySide 6.8.2.1/Qt 6.8.2. Fedora 43 also installs
+the current RPM and passes lifecycle/rendering and all 560 native tests (two
+skips): Python 3.14.7/PySide and Qt 6.10.3. Its default npm provider is
+`nodejs-npm` 10.9.7, while Fedora 44 uses `nodejs24-npm`; both application
+runtimes continue using the pinned private Node 24.19.0. A new CI matrix runs
+these package/native checks on the three added targets after building the
+existing Debian artifact. Hosted CI execution remains to be confirmed.
+
+Next source checkpoint includes the proven fixture-header normalization, fresh
+container/source verification, proof-driver hashes and corrected Fedora 43
+package mapping. Rebuild all candidates from that clean ref before final
+complete-installer acceptance, including Fedora 43 and Debian. GNOME integration
+and the remaining rollout stages stay open.

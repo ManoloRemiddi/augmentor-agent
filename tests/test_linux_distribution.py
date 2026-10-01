@@ -73,6 +73,8 @@ class DistributionPlans(unittest.TestCase):
         with self.assertRaises(ValueError):distro.package_files(value,'fedora44-x86_64')
 
     def test_voice_gpu_and_memory_dependencies_follow_explicit_choices(self):
+        self.assertIn('nodejs-npm', distro.dependency_packages('fedora43-x86_64'))
+        self.assertIn('nodejs24-npm', distro.dependency_packages('fedora44-x86_64'))
         for target in ('debian13-amd64','ubuntu26.04-amd64','fedora44-x86_64'):
             plain=distro.dependency_packages(target)
             full=distro.dependency_packages(target,voice=True,gpu=True,memory=True)

@@ -16,6 +16,7 @@ import sys
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
+PROOF_SHA256 = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 sys.path.insert(0, str(ROOT/'scripts'))
 from linux_distribution import host_target, package_files
 
@@ -125,6 +126,7 @@ def main():
     versions = json.loads(subprocess.check_output(['/usr/bin/python3', '-c', 'import json,platform,PySide6;from PySide6.QtCore import qVersion;print(json.dumps({"python":platform.python_version(),"pyside":PySide6.__version__,"qt":qVersion()}))'], text=True))
     versions['node'] = subprocess.check_output([str(app/'node/bin/node'), '--version'], text=True).strip()
     report = {'target': target, 'imageDigest': a.image_digest, 'source': manifest['source'], 'artifacts': hashes,
+              'proofScriptSha256': PROOF_SHA256,
               'versions': versions, 'freshInstall': fresh, 'nonRootRuntimeLease': True, 'nonRootQtRender': True,
               'activeRuntimeAndDesktopReinstallBlocked': True, 'activeComponentRemovalBlocked': True,
               'idleReinstall': True, 'removePreservesPrivateFiles': True, 'reinstallAfterRemove': True,
