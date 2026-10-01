@@ -12,7 +12,8 @@ Compatible Linux release `20261001-161942-544b2e90` is selected, both shared
 personal adapters are active, and the restricted real local model correctly reads
 the saved Amazon product price. Chromium extension Reload and fresh live-site
 acceptance remain pending; existing native windows retain their earlier build.
-[PR #26](https://github.com/ManoloRemiddi/augmentor-agent/pull/26) is stacked on #21.
+[PR #26](https://github.com/ManoloRemiddi/augmentor-agent/pull/26) includes the #21 dependency and current main.
+[0.2.13 public release qualification](RELEASE-0.2.13.md) is in progress.
 Preserve the selected compatible application/SDK build when staging this repair.
 
 ## September 28 task reliability correction

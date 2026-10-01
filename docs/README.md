@@ -158,3 +158,5 @@ files available only in a developer's working directory.
 - [Browser observation repair](BROWSER-OBSERVATION-REPAIR.md): preserve fresh evidence, recover omitted text, page long observations and retain the work target.
 
 - [Task reliability](TASK-RELIABILITY.md): binary evidence protection, failed-approach checkpoints and effective reasoning visibility.
+
+- [0.2.13 browser reliability release](RELEASE-0.2.13.md): general browser evidence recovery and matched public artifacts.
