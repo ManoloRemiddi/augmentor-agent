@@ -88,6 +88,7 @@ BuildArch: x86_64
 AutoReqProv: no
 Requires: rpm
 Requires: python3 >= 3.11
+Requires: python3-keyring >= 25.6, python3-secretstorage, gnome-keyring
 Requires: python3-pyside6 >= 6.8.2
 Requires: python3-pyyaml, python3-websocket-client, python3-pygments >= 2.18, python3-numpy >= 1.24
 Requires: python3-gobject, qt6-qtsvg, at-spi2-core, gstreamer1, pipewire-gstreamer, gstreamer1-plugins-base

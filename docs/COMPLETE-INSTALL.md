@@ -62,6 +62,12 @@ reasoning until you explicitly configure a supported provider/model/effort map.
 This avoids applying the developer's Qwen settings to another person's model.
 The public package includes the cold-history correction from 0.2.2.
 
+Current source candidates also retain the Codex adapter, with
+[Codex 0.159.2 as a separate prerequisite](CODEX-PACKAGING.md#separately-installed-runtime--october-1).
+This installer sets up DSH and does not install Codex, sign in or enable
+subscription eligibility. Candidate RPMs include the same native Secret Service
+credential dependencies as Debian; live keyring/session qualification is separate.
+
 The standalone Prompt Library plugin is not duplicated: the matching product
 prompt adapter supplies the shared library. Wiki, Metafolder, external MCP
 servers and unrelated developer utilities are optional additions, not required

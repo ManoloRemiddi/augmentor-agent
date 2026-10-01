@@ -206,3 +206,38 @@ container/source verification, proof-driver hashes and corrected Fedora 43
 package mapping. Rebuild all candidates from that clean ref before final
 complete-installer acceptance, including Fedora 43 and Debian. GNOME integration
 and the remaining rollout stages stay open.
+
+### Current-main integration
+
+Canonical main advanced to `d91c520` with the shared Codex integration during
+qualification. Merge `4183895` retains that product, both handoff histories and
+the new distro CI job. Earlier `58150e5`/`a76fcda` candidates are historical
+foundation checkpoints, not the final candidates for current main.
+Type/build checks pass. Debian's complete 484-case Node suite now passes (482
+pass, two opt-in skips), using actual Chromium, the declared locked DSH modules
+and distro QtTest. Merged native checks pass on all four targets; Debian/Fedora 44
+ran 607 tests before three source-reuse cases were added, Ubuntu/Fedora 43 ran
+610. The next candidate qualification repeats the full current suite.
+
+The RPM now includes the same native Secret Service dependencies as Debian:
+`python3-keyring >= 25.6`, `python3-secretstorage`, `gnome-keyring`. Actual Fedora
+43/44 repository catalogs provide these versions. Codex remains an external
+0.159.2 prerequisite; supplier binaries, sign-in and subscription eligibility
+are not provisioned or changed by this rollout. Keyring/live-session checks and
+the upstream Codex acceptance gates remain explicit.
+
+New complete bundles use `--source-bundle` to reuse the exact source snapshots
+already published in the [0.2.13 complete preview](https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/v0.2.13-complete-preview.1).
+The downloaded archive verifies against published SHA-256
+`6c327d99b04796f2901850364670aa61015b17f739582c64126421858b56b65d`;
+the contained Voice/Adaptive snapshots verify against its bundle manifest.
+Reusing those bytes preserves the approved private-dependency publication
+boundary. No new source is copied from the private Voice repository. The new
+manifest records the originating bundle ID/hash and source refs, while the
+application snapshot still comes from the clean public source revision.
+
+Next: commit this merged packaging correction, rebuild all candidates using the
+checked published snapshots, run package/complete proofs on all four targets,
+and publish the reviewed branch/draft PR. Fedora's broad Node checks also need
+the distro's `chromium-browser` executable and test-only `procps-ng`; direct
+`chromium`/`ps` assumptions are being verified before adding support claims.

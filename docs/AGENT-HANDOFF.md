@@ -12,6 +12,11 @@ worktree. Installer/package adapters are being implemented first; real GNOME/KDE
 and later Ubuntu 24.04/Mint/openSUSE/Arch qualification remain open. The modified
 original checkout and installed releases have not been replaced. Do not present
 an intermediate package/container pass as completion of the distro rollout.
+Current main `d91c520` is integrated at `4183895`; previous candidates are
+historical. Preserve Codex's external prerequisite and account eligibility gates.
+RPM credential dependencies and published-source snapshot reuse are included in
+the next clean candidate. The rollout guide records current test evidence and
+remaining desktop/other-distro gates.
 
 ## October 1 merge blockers: current main and separate Codex prerequisite
 
