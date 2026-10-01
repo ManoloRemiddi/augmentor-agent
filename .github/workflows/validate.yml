@@ -219,6 +219,7 @@ jobs:
       - name: Verify actual package lifecycle and complete native suite
         run: |
           set -euo pipefail
+          git archive --format=tar HEAD > outputs/linux-qualification/source-fixture.tar
           docker run --rm --cpus 2 --memory 4g \
             -v "$PWD:/work:ro" -v "$PWD/$AUGMENTOR_TEST_ARTIFACTS:/artifacts:ro" \
             -v "$PWD/outputs/linux-qualification:/reports" \
@@ -236,7 +237,11 @@ jobs:
               else
                 apt-get install -y --no-install-recommends git python3-pyside6.qttest
               fi
-              cd /work
+              mkdir /tmp/augmentor-native-fixture
+              tar -xf /reports/source-fixture.tar -C /tmp/augmentor-native-fixture
+              ln -s /usr/lib/augmentor/dist /tmp/augmentor-native-fixture/dist
+              ln -s /usr/lib/augmentor/node_modules /tmp/augmentor-native-fixture/node_modules
+              cd /tmp/augmentor-native-fixture
               export PATH=/usr/lib/augmentor/node/bin:$PATH
               export PYTHONPATH=apps/native QT_QPA_PLATFORM=offscreen
               python3 -m unittest discover -s tests -v

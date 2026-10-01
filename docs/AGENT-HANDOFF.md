@@ -23,8 +23,15 @@ three harnesses, with explicit unavailability and Stop retention. Its working
 regression checks pass and macOS 14/26 hosted CI passes source `89c7f50`.
 Linux CI passed root checks and exposed the setup proof's outdated unconditional
 capture-tool assertion; its correction passes the full isolated DSH/Qt proof.
-Hosted Linux CI and new capability-source artifacts remain to be confirmed.
-GNOME/session-owned shortcuts and observation are the next source stage.
+At `c964fd5`, Linux Debian/source/installed lifecycle/Browser CI passes; distro
+native tests expose missing source-build files, and Mac discovery uses the wrong
+application root. Both fixture paths are corrected; hosted confirmation remains
+open. Fresh isolated GNOME 50.5 discovery reports GlobalShortcuts 1 (existing
+bindings cannot be edited through portal v1), RemoteDesktop 2 and ScreenCast 5.
+The checked report and reproducible fixture are in the rollout guide. Complete
+setup now blocks stale same-version installed payloads before private runtime/
+credential writes. Native GNOME shortcuts/observation and current-source artifacts
+are the next implementation stages; full compatibility remains open.
 
 ## October 1 merge blockers: current main and separate Codex prerequisite
 

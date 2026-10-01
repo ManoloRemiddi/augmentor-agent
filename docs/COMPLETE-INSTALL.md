@@ -41,6 +41,12 @@ or `sudo dnf` for Fedora. DSH, model settings, tokens, plugins and user services
 as your normal user. Internet access is needed for the pinned DSH dependency tree
 and Python packages. Do not run the whole script as root.
 
+New candidates verify the installed payload's clean source revision and product
+version against the complete bundle before creating a private DSH runtime or
+writing model credentials. Package managers may keep an older same-version
+payload; a mismatch stops setup with package/update guidance. An already completed
+installation keeps its repeat-run receipt and preservation behavior.
+
 ## Included and configured
 
 - Matching Augmentor Desktop and Chromium Browser 0.2.13 surfaces and companion.

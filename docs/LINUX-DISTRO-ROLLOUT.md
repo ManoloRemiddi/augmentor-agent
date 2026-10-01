@@ -348,3 +348,71 @@ availability and always checks Stop. The full isolated Fedora DSH/Qt proof passe
 including preserved original profile, both personal surfaces, saved chats, actual
 approval reject/allow/cancel, question delivery and exact branching without replay
 (16 fixture requests). Hosted Linux acceptance for that correction remains pending.
+
+
+### October 2 hosted corrections and fresh GNOME discovery
+
+At `c964fd59c85d3f434dd1ded26bc6ab9bdb953bdc`, [Linux CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36936210109)
+passes source, Home, Debian source/DSH/Qt, installed Debian lifecycle and packaged
+Browser acceptance. All three distribution jobs pass their actual package proof,
+then fail two native tests because the source checkout lacks compiled JavaScript.
+The matrix now archives only committed public source for test instrumentation and
+uses the installed payload's `dist` and production dependencies for those tests.
+No tests are skipped. [Mac CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36936210260)
+fails the new availability assertion because it probes the source helper while
+DSH loads the packaged helper. Discovery now runs from the same application root.
+These corrections still need hosted confirmation; `89c7f50` retains its earlier
+passing Mac evidence.
+
+Complete setup now compares installed `release.json` source/clean status/version
+with its bundle before per-user runtime and credential writes, including the
+internal skip-packages fixture path. This catches package managers retaining an
+older payload with the same product version. Existing completed receipts preserve
+the repeat-run contract. Seven focused setup tests pass, including actual setup
+refusal before private data/configuration creation.
+
+A fresh pinned Fedora 44 image runs GNOME Shell/Mutter 50.5, portal 1.22.1,
+GNOME portal backend 50.0, PipeWire 1.6.9 and WirePlumber 0.5.18. The
+[checked discovery report](../release/qualification/gnome50/fedora44-discovery.json)
+records script/image/interface hashes. The compositor's D-Bus owner PID matches
+our child. Its actual portal advertises RemoteDesktop 2, ScreenCast 5 and
+GlobalShortcuts 1. This ordinary-user session uses a private bus, software virtual
+monitor, no host devices and no network. GNOME's built-in dummy login manager is
+explicit test infrastructure: input, consent and real login/reboot are untested.
+
+Build without a repository context:
+
+```sh
+docker build -t augmentor-gnome-discovery - < release/gnome-discovery.Dockerfile
+mkdir -p outputs/gnome-discovery
+docker run --rm --network none --cpus 4 --memory 6g --tmpfs /run/systemd \
+  -v "$PWD:/work:ro" -v "$PWD/outputs/gnome-discovery:/reports" \
+  augmentor-gnome-discovery sh -c '
+    set -eu
+    mkdir -p /run/dbus
+    dbus-uuidgen --ensure
+    dbus-daemon --system --fork
+    useradd -m -s /bin/sh augmentor-session-proof
+    runuser -u augmentor-session-proof -- sh -c '\''
+      mkdir -m 700 "$HOME/runtime"
+      export XDG_RUNTIME_DIR="$HOME/runtime" DISPLAY=:0
+      dbus-run-session -- python3 /work/release/prove-gnome-discovery.py --out "$HOME/gnome-proof"
+    '\''
+    cp -r /home/augmentor-session-proof/gnome-proof/. /reports/
+    rpm -q gnome-shell mutter xdg-desktop-portal xdg-desktop-portal-gnome pipewire wireplumber > /reports/packages.txt
+  '
+```
+
+Do not treat introspected `ConfigureShortcuts` as editing support. The
+[tagged portal implementation](https://github.com/flatpak/xdg-desktop-portal/blob/1.22.1/src/global-shortcuts.c)
+requires backend version 2; the
+[GNOME 50 backend](https://github.com/GNOME/xdg-desktop-portal-gnome/blob/50.0/src/globalshortcuts.c)
+advertises version 1. The
+[tagged settings dialog](https://github.com/GNOME/gnome-control-center/blob/50.0/global-shortcuts-provider/cc-global-shortcut-dialog.c)
+restores existing app/shortcut IDs and ignores changed preferred triggers. A new
+session with the same IDs therefore cannot implement our existing Save action.
+Human trigger descriptions are localized and are not machine-readable bindings;
+portal success also does not establish delivery. The next shortcut adapter must
+preserve the approved two-row Save semantics through a separately qualified
+native GNOME mechanism, or record the parity gap. No GNOME input tools are enabled
+by this discovery fixture.

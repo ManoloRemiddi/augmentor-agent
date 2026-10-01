@@ -61,6 +61,16 @@ def model_settings(url, model, context):
              'agent-default-model':{'provider':'augmentor-model','model':model}}
 
 
+def verify_installed_payload(app, manifest):
+    """Package managers may retain an older payload with the same version."""
+    try:
+        release=json.loads((app/'release.json').read_text())
+    except (OSError, ValueError):
+        raise ValueError('The installed Augmentor release identity is missing or invalid. Install the matching bundle package before continuing.') from None
+    if not isinstance(release,dict) or release.get('version')!=manifest['version'] or release.get('source')!={'commit':manifest['sourceCommit'],'dirty':False}:
+        raise ValueError('The installed Augmentor package does not match this bundle source and version. Use the documented package/update workflow to install its matching payload before continuing; a same-version package may have been retained.')
+
+
 def environment_value(value):
     if any(c in value for c in '\r\n\0'):raise ValueError('API key must be a single line.')
     return '"'+value.replace('\\','\\\\').replace('"','\\"')+'"'
@@ -167,6 +177,7 @@ def install(args):
     if not args.skip_packages:
         run(*package_plan['command'])
     app=args.app_root.resolve();node=app/'node/bin/node'
+    verify_installed_payload(app,manifest)
     runtime=data/'dsh-runtime';runtime.mkdir(parents=True,exist_ok=True)
     env={**os.environ,'PATH':str(node.parent)+':'+os.environ.get('PATH','')}
     for name in ('package.json','package-lock.json'):shutil.copy2(bundle/'dsh'/name,runtime/name)

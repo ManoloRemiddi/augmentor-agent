@@ -1,10 +1,14 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import hashlib
+import argparse
 import importlib.util
 import json
+import os
+import socket
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('complete_setup',ROOT/'scripts/setup-complete.py')
@@ -45,3 +49,43 @@ class CompleteSetupTests(unittest.TestCase):
         self.assertIn('"/path with spaces/node"',text)
         self.assertNotIn('apiKey',text)
         self.assertIn('UMask=0077',text)
+
+    def test_same_version_old_or_dirty_payload_cannot_configure_new_bundle(self):
+        manifest={'version':'0.2.13','sourceCommit':'a'*40}
+        with tempfile.TemporaryDirectory() as directory:
+            app=Path(directory);identity=app/'release.json'
+            for source,version in (({'commit':'b'*40,'dirty':False},'0.2.13'),
+                                   ({'commit':'a'*40,'dirty':True},'0.2.13'),
+                                   ({'commit':'a'*40,'dirty':False},'0.2.12')):
+                identity.write_text(json.dumps({'version':version,'source':source}))
+                with self.subTest(source=source,version=version),self.assertRaisesRegex(ValueError,'does not match'):
+                    setup.verify_installed_payload(app,manifest)
+            identity.write_text(json.dumps({'version':'0.2.13','source':{'commit':'a'*40,'dirty':False}}))
+            setup.verify_installed_payload(app,manifest)
+            for contents in ('bad JSON','null'):
+                identity.write_text(contents)
+                with self.assertRaises(ValueError):setup.verify_installed_payload(app,manifest)
+            identity.unlink()
+            with self.assertRaisesRegex(ValueError,'identity is missing'):setup.verify_installed_payload(app,manifest)
+
+    def test_skip_packages_mismatch_stops_before_private_runtime_and_secrets(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);app=root/'app';app.mkdir()
+            manifest={'version':'0.2.13','sourceCommit':'a'*40,'artifactId':'fixture'}
+            (app/'release.json').write_text(json.dumps({'version':'0.2.13','source':{'commit':'b'*40,'dirty':False}}))
+            with socket.socket() as listener:
+                listener.bind(('127.0.0.1',0));port=listener.getsockname()[1]
+            args=argparse.Namespace(bundle=root,plan=False,skip_packages=True,app_root=app,
+                model_url='http://127.0.0.1:8080/v1',model='fixture',context=32768,
+                non_interactive=True,memory=False,voice=False,gpu=None,api_key_env='FIXTURE_MODEL_KEY',port=port)
+            environment={'XDG_DATA_HOME':str(root/'data'),'XDG_CONFIG_HOME':str(root/'config'),
+                         'XDG_STATE_HOME':str(root/'state'),'FIXTURE_MODEL_KEY':'synthetic'}
+            with patch.dict(os.environ,environment),patch.object(Path,'home',return_value=root),\
+                 patch.object(setup.os,'geteuid',return_value=1000),\
+                 patch.object(setup,'verify_bundle',return_value=manifest),patch.object(setup,'run') as command:
+                with self.assertRaisesRegex(ValueError,'does not match'):setup.install(args)
+                command.assert_not_called()
+            self.assertFalse((root/'data').exists())
+            self.assertFalse((root/'config').exists())
+            record=json.loads((root/'state/augmentor-install/installation.json').read_text())
+            self.assertEqual(record,{'bundle':'fixture','status':'preparing'})

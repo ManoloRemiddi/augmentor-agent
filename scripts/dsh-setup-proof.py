@@ -338,7 +338,7 @@ try:
         if surface=='linux':
             desktop_tools=tools
             discovery=json.loads(subprocess.check_output(['node','--input-type=module','-e',
-                "import {desktopCapabilities} from './dist/desktop/src/capabilities.js';console.log(JSON.stringify(desktopCapabilities()));"],cwd=ROOT,text=True))
+                "import {desktopCapabilities} from './dist/desktop/src/capabilities.js';console.log(JSON.stringify(desktopCapabilities()));"],cwd=APP,text=True))
             input_tools={'linux_desktop_connect','linux_desktop_snapshot','linux_desktop_action'}
             assert 'linux_desktop_stop' in tools,tools
             if discovery['available']:assert input_tools<=tools,tools
