@@ -49,9 +49,11 @@ Wayland control nor microphone quality. Upstream support is not our acceptance.
    independently of live permission and successful operation. Test unavailable
    dependencies and compositor combinations; do not advertise KDE execution on
    every Linux system. Keep Linux-only adapter changes from altering macOS.
-3. **Shortcuts and startup** — add a GlobalShortcuts portal adapter with version
-   probing, retained choices, conflicts, two instance IDs, session reconnection
-   and actual activation delivery. Preserve KDE KGlobalAccel and macOS adapters.
+3. **Shortcuts and startup** — probe GlobalShortcuts versions and use a qualified
+   native adapter where the portal cannot preserve editable Save semantics (GNOME
+   50 advertises version 1). Preserve choices, conflicts, two instance IDs,
+   session reconnection and actual activation delivery. Preserve KDE KGlobalAccel
+   and macOS adapters.
    Provide an owned launcher fallback for unsupported sessions and closed-app
    launch. Qualify login/logout/reboot/crash recovery and prevent duplicate
    autostart/service owners. Test GNOME and KDE in disposable full desktops.
@@ -473,3 +475,68 @@ does not acknowledge asynchronous custom grabs to applications. Retain the
 existing “Saved. Press the shortcut to test this window” contract; never infer
 active delivery solely from settings readback. GNOME shortcuts and trusted window/
 modal/chrome observation remain the next production implementation stage.
+
+### October 2 native GNOME Save adapter
+
+The production shortcut path now routes GNOME sessions to
+[`services/desktop/gnome_shortcuts.py`](../services/desktop/gnome_shortcuts.py)
+through a bounded worker using the native window's selected Python. It requires
+an owned live Shell/MediaKeys session, GNOME 50, GTK 4 GI and the actual graphical
+display/settings schemas. Missing prerequisites produce an explicit unavailable
+state in the existing rows. KDE KGlobalAccel and the Mac adapter retain their
+paths; the shared capture fields, Save controls and layout are unchanged.
+
+Each row owns a stable custom-keybinding path and saves the absolute canonical
+`~/.local/bin/augmentor-agent` launcher, with `--instance secondary` for the second
+window. Foreign commands/occupied paths and locked settings are refused. GTK
+converts structured Qt key/modifier identities; system, custom and persisted
+portal assignments are checked using normalized key symbols and hardware codes.
+Saved portal assignments come from the machine binding arrays, not localized
+trigger descriptions. Unsupported keypad/AltGr modifiers and unrepresentable
+bindings are explicit errors; full physical keyboard/layout qualification remains
+open. Saves serialize our writers, merge the latest parent path list and verify
+actual persisted values. A failed registration restores only matching owned
+fields and retains unrelated concurrent additions or a foreign takeover. This
+does not promise atomic exclusion of all external settings writers.
+
+The [checked adapter report](../release/qualification/gnome50/fedora44-augmentor-shortcuts.json)
+records exact production/fixture hashes and packages: GNOME Shell/Mutter 50.5,
+GSD 50.1 and PySide6 6.11.2. Actual shared Qt Save button clicks write the real
+private dconf backend and GSD delivers both assignments. Changing, disabling and
+restarting the daemon retain the previously proved behavior. Tests refuse actual
+system/custom/portal/hardware-key conflicts, preserve a foreign owned-path
+command, and inject a registration failure after real writes to verify rollback
+and preservation of a concurrent foreign addition/takeover. The canonical path
+contains an independently authored activation marker, not the actual Augmentor
+process. The form uses Qt offscreen; GTK and shortcut delivery use the real
+private Wayland compositor. Actual closed-app launch/focus, physical input,
+login/reboot, portal consent and GNOME observation/control remain unqualified.
+Settings readback always returns `functionalTested: false`.
+
+Reproduce the adapter fixture by building the discovery image above, then its
+test-only Qt layer without sending repository contents as a build context:
+
+```sh
+docker build -t augmentor-gnome-shortcuts \
+  --build-arg GNOME_BASE=augmentor-gnome-discovery - < release/gnome-shortcuts.Dockerfile
+```
+
+Run the discovery command above with image `augmentor-gnome-shortcuts` and
+`--exercise-augmentor-shortcuts` on the Python invocation. Repository state is a
+read-only mount; all settings, launcher files and input belong to the ordinary
+disposable user. Package repositories are mutable, so record the resulting image
+ID and packages for each run rather than assuming identical resolved versions.
+
+Seven focused GNOME Qt/routing cases and four KDE shortcut cases pass. The native
+source suite passes 626 cases (624 pass, two Mac-only skips) before the final
+GNOME rollback hardening, which passes the real compositor proof above. The
+latest published mechanism checkpoint `4764b6f` passes
+[Mac 14/26 CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36939492167).
+[Its Linux run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36939492367)
+passes root, Home/source, Debian package/installed lifecycle/Browser and distro
+package proofs, but all three distro native jobs stop at missing `npm`. The
+test-only provisioning now installs verified Fedora 43 `nodejs-npm`, Fedora 44
+`nodejs24-npm`, or Ubuntu `npm` before creating the external Codex prerequisite.
+Product Node remains the pinned bundled runtime. Current-source hosted Linux and
+Mac confirmation remains open until the next clean push is qualified. No
+installed release, owner settings or model/audio services were changed.

@@ -23,3 +23,10 @@ Run native tests from the repository root with its Python/Qt environment:
 acceptance are separate checks described in [tests](../../tests/README.md).
 Hiding a window must not cancel its task; Stop must remain explicit. Do not
 restart an active installed window to verify a source-only documentation change.
+
+The existing two shortcut rows select KDE KGlobalAccel, macOS or the native GNOME
+50 settings adapter. GNOME requires GTK 4 GI in the selected interpreter and a
+live Shell/MediaKeys graphical session; failures stay explicit in those rows.
+See [distro qualification and limits](../../docs/LINUX-DISTRO-ROLLOUT.md#october-2-native-gnome-save-adapter):
+the real private GNOME daemon proof covers Save/conflicts and synthetic launcher
+delivery, while actual application focus, login and physical keys remain open.

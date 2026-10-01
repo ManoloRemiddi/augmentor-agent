@@ -38,9 +38,17 @@ setup now blocks stale same-version installed payloads before private runtime/
 credential writes. Private GSD MediaKeys tests now deliver both synthetic shortcuts, release an
 old binding after change, disable delivery, restore after daemon restart and
 preserve foreign settings. This qualifies the mechanism, not the production
-adapter, launch/focus, physical keys or real login. Native GNOME shortcuts/
-observation and current-source artifacts remain open; full compatibility is
-not complete.
+adapter, launch/focus, physical keys or real login. The next production GNOME 50
+adapter now implements both existing Save rows through native GSD settings, with
+canonical launchers, normalized conflict refusal and ownership-preserving
+rollback. Its real private compositor proof passes, including concurrent foreign
+addition/takeover preservation; a synthetic canonical launcher records activation.
+See the rollout guide's checked adapter report and exact test limits. Actual
+Augmentor closed launch/focus, physical keys, login/reboot, GNOME observation/
+control and current-source artifacts remain open. Clean `4764b6f` passes Mac 14/26
+CI and Linux root/Debian/lifecycle/Browser/package proofs; distro native jobs stop
+at missing npm. Test-only distro npm provisioning is corrected; new-source hosted
+confirmation remains open. Full compatibility is not complete.
 
 ## October 1 merge blockers: current main and separate Codex prerequisite
 

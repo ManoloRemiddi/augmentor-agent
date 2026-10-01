@@ -23,6 +23,14 @@ keyboard actually sends. Conflicting assignments are rejected; failed KDE update
 restore the previous binding and launcher files. Entries persist for later desktop
 sessions. Both KDE and macOS provide this two-window launcher integration.
 
+The Linux rollout adds the same two Save rows on GNOME 50 through native custom
+bindings. Each targets the canonical per-user launcher and its own instance;
+system/custom/portal conflicts and foreign ownership are refused. The
+[checked private GNOME proof](LINUX-DISTRO-ROLLOUT.md#october-2-native-gnome-save-adapter)
+tests real Save and daemon delivery to synthetic launch markers. Actual Augmentor
+launch/focus, physical keys and real login qualification remain open. A saved
+settings value keeps the existing instruction to press the shortcut to test it.
+
 Colours & visual effects saves to each window's own appearance file, including
 custom skins, formatting colours, backgrounds and visual effects. Resonant Voice
 saves the selected voice, speed and volume to that window's speech-service profile;

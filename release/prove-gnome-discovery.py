@@ -6,8 +6,10 @@ from pathlib import Path
 parser=argparse.ArgumentParser(description='Read-only compositor-interface discovery in an isolated GNOME fixture. Does not qualify login or input.')
 parser.add_argument('--out',type=Path,required=True)
 parser.add_argument('--exercise-custom-shortcuts',action='store_true',help='Exercise native GSD with synthetic input in this private compositor only.')
+parser.add_argument('--exercise-augmentor-shortcuts',action='store_true',help='Exercise Augmentor shared Qt Save rows and native GNOME adapter in this private compositor.')
 args=parser.parse_args()
-exercise=args.exercise_custom_shortcuts
+production=args.exercise_augmentor_shortcuts
+exercise=args.exercise_custom_shortcuts or production
 if os.geteuid()==0 or not any(Path(p).exists() for p in ('/.dockerenv','/run/.containerenv')):
  raise SystemExit('Use an ordinary user in a disposable Docker/Podman container.')
 if Path('/run/systemd/seats').exists():
@@ -50,7 +52,8 @@ try:
  print('ISOLATED GNOME SESSION READY')
  if exercise:
   subprocess.run(['python3',str(Path(__file__).with_name('prove-gnome-custom-shortcuts.py')),
-                  '--compositor-pid',str(processes[-1][0].pid),'--out',str(out)],check=True,timeout=90)
+                  '--compositor-pid',str(processes[-1][0].pid),'--out',str(out),
+                  *(['--production-adapter'] if production else [])],check=True,timeout=90)
 finally:
  for process,log in reversed(processes):
   if process.poll() is None:

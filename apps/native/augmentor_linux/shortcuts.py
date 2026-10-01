@@ -1,5 +1,5 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-"""Manage only Augmentor's KDE launcher shortcut and matching desktop entries."""
+"""Manage Augmentor's launcher shortcuts through the current desktop adapter."""
 from .instances import desktop_component, current_name, validate_name
 import os
 import sys
@@ -38,6 +38,8 @@ def current_keys(instance=None):
     if sys.platform=='darwin':
         from .macos_shortcuts import current_keys as read
         return read(instance or current_name())
+    from . import gnome_shortcuts
+    if gnome_shortcuts.active():return gnome_shortcuts.current_keys(instance or current_name())
     return [int(value) for value in re.findall(r'-?\d+',call('shortcut',target(instance)[1])) if int(value)>0]
 
 
@@ -70,6 +72,8 @@ def save_shortcut(sequence,instance=None):
     if sys.platform=='darwin':
         from .macos_shortcuts import save_shortcut as save
         return save(sequence,instance or current_name())
+    from . import gnome_shortcuts
+    if gnome_shortcuts.active():return gnome_shortcuts.save_shortcut(sequence,instance or current_name())
     component,action=target(instance)
     key=shortcut_key(sequence);previous=current_keys(instance)
     if key not in previous and 'true' not in call('isGlobalShortcutAvailable',str(key),component):

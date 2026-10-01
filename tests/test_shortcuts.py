@@ -12,6 +12,8 @@ class ShortcutTests(unittest.TestCase):
         # These tests exercise the KDE adapter even when run by the Mac matrix.
         platform = patch('augmentor_linux.shortcuts.sys.platform', 'linux')
         platform.start(); self.addCleanup(platform.stop)
+        desktop=patch.dict(os.environ,{'XDG_CURRENT_DESKTOP':'KDE'})
+        desktop.start();self.addCleanup(desktop.stop)
 
     def test_packaged_shortcut_creates_activatable_entries_and_rolls_back_failure(self):
         sequence=QKeySequence('Ctrl+Alt+J');key=sequence[0].toCombined()

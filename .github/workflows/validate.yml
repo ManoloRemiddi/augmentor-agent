@@ -233,9 +233,14 @@ jobs:
               fi
               python3 /work/release/prove-linux-package.py --artifacts /artifacts --image-digest "$AUGMENTOR_TEST_IMAGE" --out /reports/package-proof.json
               if command -v dnf >/dev/null; then
-                dnf install -y git
+                . /etc/os-release
+                if [ "$VERSION_ID" = 43 ]; then
+                  dnf install -y git nodejs-npm
+                else
+                  dnf install -y git nodejs24-npm
+                fi
               else
-                apt-get install -y --no-install-recommends git python3-pyside6.qttest
+                apt-get install -y --no-install-recommends git npm python3-pyside6.qttest
               fi
               mkdir /tmp/augmentor-native-fixture
               tar -xf /reports/source-fixture.tar -C /tmp/augmentor-native-fixture
