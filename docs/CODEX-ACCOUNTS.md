@@ -132,9 +132,15 @@ script is required by existing Mac build/Desktop/Browser Keychain CI steps;
 [CI for `91db7aa`](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36861022280)
 passes on macOS 14 and 26, with all three interpreters reporting positive account
 save/rotation/restart/logout and cleanup. This preceding CI does not certify the
-new host/UI source; its Mac/Linux checks are pending publication. The isolated
-actual Linux store proof passes again after the new account metadata and
-cancellation changes. The owner's wallet was untouched.
+new host/UI source. For the new source checkpoint
+`95229aaf0dfc979b895fb0ef06ed131aaf84c550`,
+[Mac CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36866967195)
+passes on Mac 14/26, including new controller/native setup contracts and all
+three real Keychain interpreter proofs on each runner. All six confirm account
+save/rotation/restart/logout and final cleanup. The isolated actual Linux store
+proof passes again after the new metadata and cancellation changes. The owner's
+wallet was untouched; all 30 original changed canonical files match their private
+backup bytes. No actual OpenAI sign-in or browser-launch acceptance is claimed.
 
 The public OpenAI discovery endpoint was independently read without credentials:
 issuer, authorization/token/JWKS/revocation endpoints and RS256 match the adapter's
@@ -145,12 +151,39 @@ passes application/Browser/credential checks, production npm notices and the Hom
 job. Debian packaging still fails its pre-existing unreviewed native Codex
 executable gate; installed-package jobs therefore do not run. The green Mac jobs
 do not clear native dependency review or qualify an installed Codex product.
+[Linux/Home CI for `95229aa`](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36866967360)
+has the same result: source-boundary/Home, application/UI/credential checks,
+production npm notices and extension packaging pass. The native executable
+notice gate still blocks Debian packages and skips installed-package checks.
 
 ## Remaining C4 requirements
 
+The next implementation must keep three identities separate: a profile's model,
+account and destination configuration; its protected account's rotating credential
+revision; and the saved native thread. Renewing a token must not change the
+configuration revision and invalidate an otherwise unchanged saved chat.
+Selecting the default account must never rebind existing chats or auxiliary work.
+
+Credential preflight belongs before every native turn admission, including the
+scheduled queue pump in `CodexSession.pump`, before `ledger.dispatch` and
+`turn/start`. Checking only `session.prompt` misses queued work. The preparation
+hook already runs before durable dispatch and before continuity-context injection;
+account renewal must preserve Stop during that preparation and keep any unsent
+operation queued/paused on failure. Runtime renewal must verify native idleness,
+retire the owned old process, initialize a worker with current credentials and
+resume the exact saved thread. Old child output/exit handlers must not corrupt
+the replacement; no unknown turn/tool outcome may be resent.
+
+Account-bound model checks, prompt improvement, branching/recovery and memory
+auxiliary work need the same permission and funding policy. A model catalog or
+saved permission flag does not prove current entitlement or successful inference.
+The API/local routes remain explicit alternatives, never subscription-failure
+fallbacks. The separate Codex-managed login route still requires its own supported
+authentication and isolated state contract.
+
 - Confirm the distribution's eligibility for each subscription route.
-- Qualify the now-wired host/controller and Desktop/Browser account controls on
-  Mac, then actual consent and browser launch on eligible distributions.
+- Qualify actual consent and browser launch through the now-wired controls on
+  eligible Linux/Mac distributions; source/fixture contracts already pass on both.
 - Bind selected accounts/models to connection profiles and fence worker/account
   switching, logout and token renewal. Renew an idle app-server process and resume
   its saved thread; never retry unknown prompt/tool outcomes.

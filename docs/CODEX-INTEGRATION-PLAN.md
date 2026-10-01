@@ -459,8 +459,9 @@ October 1 implementation checkpoint: [OAuth transactions, protected accounts and
 shared login controls](CODEX-ACCOUNTS.md) now include host RPC and existing
 Desktop/Browser status/sign-in/cancellation/consent/logout controls. Source
 contract tests and isolated actual Linux storage pass; production login remains
-disabled. Profile/model binding, worker renewal, Mac qualification of these
-controls, eligibility and real account/inference acceptance remain open, so the
+disabled. The host/UI source checkpoint `95229aa` passes Mac 14/26 contracts and
+all actual Keychain proofs; Linux packaging retains its native notice gate.
+Profile/model binding, worker renewal, eligibility and real account/inference acceptance remain open, so the
 C4 acceptance checkboxes below are not certified complete.
 
 Dependencies: C1–C2 and the applicable C0 eligibility gate. Can be developed

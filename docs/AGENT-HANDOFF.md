@@ -18,9 +18,18 @@ two opt-in Docker memory proofs skipped), 61 Browser tests and 586 native tests
 (584 pass, two Mac-only skips) pass on Linux with the existing isolated Qt
 environment. Actual native-adapter/Browser-bridge IPC tests pass with synthetic
 grants; real isolated Secret Service save/rotation/restart/logout/cleanup passes
-again. The private-source boundary passes. Exact published source ref and new
-Mac/Linux CI results will be recorded after publication; prior `91db7aa` CI is
-historical evidence for the account primitives, not this host/UI implementation.
+again. The private-source boundary passes. Published implementation source is
+`95229aaf0dfc979b895fb0ef06ed131aaf84c550`.
+[Mac CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36866967195)
+passes on Mac 14/26, including the new account/controller/native setup tests and
+all six actual Keychain proofs through build, packaged Desktop and standalone
+Browser interpreters. These use synthetic grants/renewal, not live OpenAI consent.
+[Linux CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36866967360)
+passes source boundary, Home, application/UI/credential checks, production
+dependency notices and extension packaging. Debian packaging still fails only at
+the known unreviewed native Codex executable gate; installed-package jobs skip.
+All 30 original dirty canonical files again match their private backup bytes.
+The following evidence/next-contract documentation update changes no code.
 
 Production login stays disabled pending eligibility, with no RPC/environment
 bypass. Profile/model binding, safe worker token renewal, the Codex-managed
