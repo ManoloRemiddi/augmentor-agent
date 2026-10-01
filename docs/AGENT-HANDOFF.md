@@ -8,6 +8,11 @@
 of unread browser results, adds direct original-result recovery and paged DOM
 reads, and keeps explicit observations from replacing the action target. Shared
 DSH/Pi and Chromium checks pass; installation evidence is recorded in that guide.
+Compatible Linux release `20261001-161942-544b2e90` is selected, both shared
+personal adapters are active, and the restricted real local model correctly reads
+the saved Amazon product price. Chromium extension Reload and fresh live-site
+acceptance remain pending; existing native windows retain their earlier build.
+[PR #26](https://github.com/ManoloRemiddi/augmentor-agent/pull/26) is stacked on #21.
 Preserve the selected compatible application/SDK build when staging this repair.
 
 ## September 28 task reliability correction
