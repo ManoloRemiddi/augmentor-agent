@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {ownsProductSession,profileForSession,profiles} from '../../services/workspaces/profiles.mjs'
 import {randomUUID, createHash} from 'node:crypto';
 import {mkdirSync, writeFileSync, renameSync} from 'node:fs';
 import {join} from 'node:path';
@@ -8,7 +9,7 @@ import {actionKey,actionEffect,actionOutcome,recoveryDenial} from './actions.mjs
 export const name = 'augmentor-execution';
 export const inject = ['tools'];
 const presets = new Set(['augmentor-linux-product', 'augmentor-browser-product']);
-const owned = agent => presets.has(agent.session.header.agentPreset) && agent.session.header.origin !== 'subagent';
+const owned = agent => ownsProductSession(agent.session.header);
 const source = {kind:'plugin', plugin:name};
 const message = text => ({id:randomUUID(), role:'user', source, content:[{type:'text', text}]});
 

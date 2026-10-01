@@ -27,6 +27,15 @@ model settings and saved conversation selections were preserved. PR #21 is draft
 Mac/public downloads are unchanged. After two unsuccessful full-preset checks,
 the final read-only retest identified the correct control in 79 seconds / six calls.
 Physical standby/wake remains untested; xhigh reasoning and task latency remain.
+## September 30 application SDK foundation
+
+[SDK foundation](APP-SDK.md) owns the DSH-only application contract, exact tool
+grants, recoverable profile installation and experimental workspace voice toggle.
+The SDK is a separate private repository; product changes belong here. Preserve
+the owner’s independent third-app test. Source qualification is recorded there;
+source success does not imply activation of any existing application.
+
+See [embedded Browser and specialist workspaces](WORKSPACE-EMBEDDING.md) for product-owned embedding, scoped tools and memory.
 
 ## September 27 installed Chromium browser choice
 

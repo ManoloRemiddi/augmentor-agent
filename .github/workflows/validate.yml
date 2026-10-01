@@ -55,6 +55,7 @@ jobs:
           npm run build
           export DSH_INSTALL_ROOT="$PWD/release/dsh/node_modules/@deepseek-ai/dsh"
           npm test
+          node scripts/workspace-sdk-dsh-proof.mjs "$DSH_INSTALL_ROOT"
           node --test apps/browser/test/*.test.mjs
           npm --prefix apps/mobile run build
       - name: Verify DSH setup, approvals, questions and exact branching

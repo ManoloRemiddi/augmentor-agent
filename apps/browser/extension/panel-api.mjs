@@ -235,8 +235,9 @@ export function handlePanelMessage(msg, sender, sendResponse) {
           // Verify the remembered session once per SW instance; on the first
           // prompt (or after a "new chat") create the real DSH session.
           const exists = await sessionHistoryOk(state.sessionId)
-          if (exists !== true) {
-            if (exists === false) clearStoredSessionId()
+          if(exists===null)throw Error('Conversation status is unknown. Reconnect before sending; your original chat is kept.')
+          if (exists === false) {
+            clearStoredSessionId()
             state.sessionId = `augmentor-${crypto.randomUUID().slice(0, 8)}`
             saveSessionId(state.sessionId)
             // M3: create the session IN the plugin's dedicated chat dir —
@@ -480,6 +481,23 @@ export function handlePanelMessage(msg, sender, sendResponse) {
         .catch((e) => sendResponse({ ok: false, error: e.message }))
     })
     return true // async
+  }
+  if(msg?.type==='session/resume'){
+    if(state.running||state.mutating){sendResponse({ok:false,error:'Finish or stop the current action before changing conversations.'});return}
+    state.mutating=true
+    ;(async()=>{
+      if(!await requireReady())throw Error('Reconnect before choosing a conversation.')
+      const sessionId=String(msg.sessionId??'')
+      await request('session.resume',{sessionId})
+      const history=await request('session.history',{sessionId,maxMessages:200})
+      const catalog=await request('session.models',{sessionId})
+      state.sessionId=sessionId;state.sessionReady=true;state.panelViewSession=null;state.running=!!history.running
+      state.log=[];state.interactions=[];saveSessionId(sessionId)
+      if(catalog.current){state.selection=catalog.current;saveSelection(catalog.current)}
+      for(const row of history.events??[])log('event',{sessionId,event:row.event})
+      broadcast();sendResponse({ok:true,sessionId})
+    })().catch(error=>sendResponse({ok:false,error:error.message})).finally(()=>state.mutating=false)
+    return true
   }
   if (msg?.type === 'session/history') {
     // M1: one DSH session's event history for the panel's live-event

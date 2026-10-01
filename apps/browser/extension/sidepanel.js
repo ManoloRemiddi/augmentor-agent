@@ -554,6 +554,11 @@ function renderSessionsList(items) {
 async function openDshSession(item, title) {
   closeSessionsPop()
   if(ui.state.submitting)return
+  if(item.resumable){
+    const resumed=await send('session/resume',{sessionId:item.sessionId})
+    if(!resumed?.ok){ui.sendFail(resumed?.error??'Could not resume this conversation');return}
+    viewSessionId=null;viewSessionTitle=null;ui.clear();setViewComposer(true);await refresh();document.getElementById('title').textContent=title;return
+  }
   const res = await send('session/history', { sessionId: item.sessionId })
   if (!res?.ok) {
     ui.sendFail(res?.error ?? 'could not load the session history')
