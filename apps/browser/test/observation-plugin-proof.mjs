@@ -12,7 +12,7 @@ import {tmpdir} from 'node:os'
 import {join,resolve} from 'node:path'
 import {fileURLToPath,pathToFileURL} from 'node:url'
 const root=fileURLToPath(new URL('..',import.meta.url)),dir=await mkdtemp(join(tmpdir(),'augmentor-plugin-proof-'))
-const cleanups=[],registered=new Map(),routes=new Map();let upgrade,pipe,server,response
+ const cleanups=[],registered=new Map(),routes=new Map();let upgrade,pipe,server,response,lastRequest
 try {
  await copyFile(join(root,'plugin/dist/index.js'),join(dir,'index.mjs'))
  await symlink(resolve(process.env.AUGMENTOR_TEST_MODULES??join(root,'plugin/node_modules')),join(dir,'node_modules'),'dir')
@@ -29,13 +29,21 @@ try {
  pipe=new WebSocket(`ws://127.0.0.1:${server.address().port}/api/augmentor/ws?token=test-only-token`)
  await new Promise((r,j)=>{pipe.onopen=r;pipe.onerror=j})
  let requests=0
- pipe.onmessage=e=>{const frame=JSON.parse(e.data);if(frame.type==='request'){requests++;pipe.send(JSON.stringify({type:'reply',id:frame.id,result:response}))}}
+ pipe.onmessage=e=>{const frame=JSON.parse(e.data);if(frame.type==='request'){lastRequest=frame;requests++;pipe.send(JSON.stringify({type:'reply',id:frame.id,result:response}))}}
  const exec={signal:new AbortController().signal,agent:{session:{requestHeader:()=>({config:{}})},options:{provider:'fixture',model:'vision'}}}
  response=undefined
  const blank=await registered.get('browser_snapshot').execute({},exec)
  assert.equal(blank.ok,false);assert.match(blank.error,/No document observation/)
  response={ok:false,error:'protected page'}
  assert.equal((await registered.get('browser_snapshot').execute({},exec)).error,'protected page')
+ response={ok:true,url:'https://fixture.test/',tabId:7,title:'Store',text:'Product 109.99 EUR',links:[]}
+ const snapshot=await registered.get('browser_snapshot').execute({tabId:7,offset:6000,controlOffset:60,linkOffset:40,scope:'document'},exec)
+ assert.equal(snapshot.tabId,7);assert.match(registered.get('browser_snapshot').output.render({},snapshot)[0].text,/Tab: 7/)
+ assert.equal(lastRequest.params.offset,6000);assert.equal(lastRequest.params.scope,'document')
+ const navigation=await registered.get('browser_navigate').execute({url:'https://fixture.test/'},exec)
+ assert.equal(navigation.tabId,7);assert.match(registered.get('browser_navigate').output.render({},navigation)[0].text,/Work tabId: 7/)
+ const tabText=registered.get('browser_tabs_list').output.render({}, {ok:true,tabs:[{id:1,title:'Other',url:'https://other.test/'},{id:7,title:'Store',url:'https://fixture.test/',workTab:true} ]})[0].text
+ assert.match(tabText,/^tab 7 \[work tab\]/)
  response=undefined
  assert.equal((await registered.get('browser_click').execute({selector:'span:has-text("Control Panel")'},exec)).ok,false)
  response={ok:true,url:'https://fixture.test/',tabId:7,image:{mimeType:'image/jpeg',data:'aGVsbG8='}}
@@ -44,7 +52,7 @@ try {
  supportsImages=false;const before=requests
  await assert.rejects(registered.get('browser_screenshot').execute({},exec),/does not declare image input/)
  assert.equal(requests,before)
- console.log('PASS: real DSH plugin/WS handles missing snapshots, nested failures, missing action acknowledgements, image delivery, and text-only gating.')
+ console.log('PASS: real DSH plugin/WS handles paged observations, navigation/tab identities, missing snapshots, nested failures, action acknowledgements, image delivery, and text-only gating.')
 } finally {
  pipe?.close()
  for(const cleanup of cleanups.reverse())for(const fn of Array.isArray(cleanup)?cleanup:[cleanup])if(typeof fn==='function')await fn()

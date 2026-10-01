@@ -2,6 +2,24 @@
 
 # Consistent installed desktop releases
 
+## October 1: browser evidence recovery
+
+[Browser observation repair](BROWSER-OBSERVATION-REPAIR.md#installed-linux-evidence--1-october-2026)
+records implementation `13a24e2`, selected compatible release
+`20261001-161942-544b2e90`, active shared Desktop/Browser adapters, real-model
+qualification with saved Amazon evidence, preserved settings, and private rollback
+backups. Native windows retain their earlier build. Chromium extension files are
+installed; its Reload and fresh live-site acceptance remain pending.
+
+## September 28: task reliability
+
+[Task reliability](TASK-RELIABILITY.md#september-28-installed-linux-adoption) owns
+implementation through `70c5c79`, selected/running release `20260928-093018-2d4431f6`,
+exact artifact identity, candidate checks and shared DSH preset activation. All
+three windows are online/model-ready with voice available and no pending update.
+Settings and saved conversation selections were preserved. Rollback includes the
+backed-up preset files as well as the previous desktop selection.
+
 ## September 25: immediate composer feedback
 
 [Composer correction and installed evidence](COMPOSER-SEND-FEEDBACK.md) records

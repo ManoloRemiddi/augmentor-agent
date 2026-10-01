@@ -70,7 +70,7 @@ def inspect_portals():
 def recommendation(session, portal):
     if session == 'wayland':
         if portal['status'] != 'observed':
-            return 'Wayland: portal support is unverified. Run this checker in the logged-in desktop session.'
+            return 'Wayland: screenshot/input portal support is unverified. This does not assess installed desktop utilities or their controls.'
         interfaces = portal['interfaces']
         devices = interfaces.get('RemoteDesktop', {}).get('AvailableDeviceTypes', 0)
         if devices & 3 == 3 and 'ScreenCast' in interfaces:
@@ -85,19 +85,36 @@ def report(probe=False, environment=None):
     environment = os.environ if environment is None else environment
     session = environment.get('XDG_SESSION_TYPE', 'unknown').lower()
     portal = inspect_portals() if probe else {'status': 'not_probed'}
+    commands = {name: shutil.which(name) is not None for name in (
+        'kscreen-doctor', 'qdbus6', 'qdbus', 'gdbus', 'busctl', 'loginctl',
+        'swaymsg', 'wlr-randr', 'xrandr', 'xset', 'xdotool', 'wmctrl', 'Xvfb',
+    )}
+    utilities = {
+        'kscreen-doctor': 'KDE display management; inspect installed --help for supported operations.',
+        'swaymsg': 'Sway compositor interface; applicable only to a running Sway session.',
+        'wlr-randr': 'Output management for compositors implementing the wlroots output-management protocol.',
+        'qdbus6': 'Qt D-Bus discovery and calls; inspect interfaces before invoking methods.',
+        'qdbus': 'Qt D-Bus discovery and calls; inspect interfaces before invoking methods.',
+        'gdbus': 'D-Bus introspection and calls.',
+        'busctl': 'D-Bus introspection and calls; desktop services normally use the user bus.',
+        'loginctl': 'Inspect login sessions; distinguish the graphical session from remote/TTY sessions.',
+    }
     return {
         'schema_version': 1,
         'os': read_release(),
         'desktop': environment.get('XDG_CURRENT_DESKTOP', 'unknown'),
         'session_type': session,
         'python_gi_installed': importlib.util.find_spec('gi') is not None,
-        'commands': {name: shutil.which(name) is not None for name in ('gdbus', 'xdotool', 'wmctrl', 'Xvfb')},
+        'commands': commands,
+        'installed_utilities': {name: purpose for name, purpose in utilities.items() if commands[name]},
         'portals': portal,
         'assessment': recommendation(session, portal),
         'limitations': [
             'Package/interface presence is not a functional control test.',
             'Python GI presence does not establish AT-SPI accessibility coverage.',
             'X11 tools do not establish native Wayland control, even when DISPLAY exists.',
+            'A Wayland session may also run XWayland or another X server. Their presence does not establish ownership of physical outputs.',
+            'Prefer installed utilities for the active desktop and their local help before guessing D-Bus interfaces. Availability does not prove permission or successful execution.',
         ],
     }
 

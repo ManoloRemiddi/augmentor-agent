@@ -2,6 +2,32 @@
 
 # Start here: agent handoff
 
+## October 1 browser observation repair
+
+[Browser observation repair](BROWSER-OBSERVATION-REPAIR.md) corrects early pruning
+of unread browser results, adds direct original-result recovery and paged DOM
+reads, and keeps explicit observations from replacing the action target. Shared
+DSH/Pi and Chromium checks pass; installation evidence is recorded in that guide.
+Compatible Linux release `20261001-161942-544b2e90` is selected, both shared
+personal adapters are active, and the restricted real local model correctly reads
+the saved Amazon product price. Chromium extension Reload and fresh live-site
+acceptance remain pending; existing native windows retain their earlier build.
+[PR #26](https://github.com/ManoloRemiddi/augmentor-agent/pull/26) includes the #21 dependency and current main.
+[0.2.13 public release qualification](RELEASE-0.2.13.md) is in progress.
+Preserve the selected compatible application/SDK build when staging this repair.
+
+## September 28 task reliability correction
+
+[Task reliability](TASK-RELIABILITY.md) owns binary tool-evidence protection,
+changed-command error checkpoints, bounded recovery reassessment and restored
+effective-reasoning visibility. Model/GPU settings are preserved. Read the guide
+for fixture versus real-model evidence and installed adoption boundaries.
+Implementation through `70c5c79` is selected and running in all three Linux windows
+as `20260928-093018-2d4431f6`. Both shared DSH presets use the updated adapters;
+model settings and saved conversation selections were preserved. PR #21 is draft;
+Mac/public downloads are unchanged. After two unsuccessful full-preset checks,
+the final read-only retest identified the correct control in 79 seconds / six calls.
+Physical standby/wake remains untested; xhigh reasoning and task latency remain.
 ## September 30 application SDK foundation
 
 [SDK foundation](APP-SDK.md) owns the DSH-only application contract, exact tool
@@ -139,6 +165,14 @@ The qualified candidate is now installed and reopened on the 32 GB Mac after
 the owner closed its earlier window. Integrity, the native process and shortcut
 service were checked; model setup remains unfinished. Both full validation and
 the Mac 14/26 workflow passed at `6bead5a`. The published preview DMG is unchanged.
+## September 27 tool context correction
+
+[Tool context budget](CONTEXT-BUDGET.md) separates per-result trimming from the
+model-relative compaction trigger. Both personal presets compose the existing
+DSH pruner at step boundaries, retain original evidence with bounded excerpts,
+and expose `/trim-tools` for idle conversations without inference. Repeated
+identical outputs produce one reassessment checkpoint. Consult its qualification
+and installed evidence before assuming a running host has adopted this change.
 
 ## September 26 public Apple-independent macOS preview
 
