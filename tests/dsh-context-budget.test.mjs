@@ -15,7 +15,7 @@ const root=process.env.DSH_INSTALL_ROOT || join(homedir(), '.local/node/lib/node
 const require=createRequire(join(root,'package.json'));
 const load=async name=>import(pathToFileURL(require.resolve('@deepseek-ai/'+name)).href);
 const large='HEAD:'+ 'x'.repeat(23000)+'MIDDLE_EVIDENCE'+ 'z'.repeat(23000)+':TAIL';
-async function harness(t, reply, preset='augmentor-linux-product', installBudget=true, evidence=()=>large) {
+async function harness(t, reply, preset='augmentor-linux-product', installBudget=true, evidence=()=>large, toolName='inspect_fixture') {
   const {Context}=await load('cordis'), {createUserMessage}=await load('dsh-llm'), {installModelSelection}=await load('dsh-agent');
   const ctx=new Context(), requests=[], errors=[], store=mkdtempSync(join(tmpdir(),'augmentor-context-test-'));
   const server=createServer(async(r,s)=>{
@@ -33,7 +33,7 @@ async function harness(t, reply, preset='augmentor-linux-product', installBudget
   await ctx.plugin((await load('dsh-compaction-tool-result-pruner')).default,{thresholdChars:4096,headChars:2048,tailChars:512}).await();
   await ctx.plugin((await load('dsh-compaction-basic')).default,{thresholdRatio:0.5,retainTokens:0,maxTokens:8192}).await();
   if (installBudget) apply(ctx);
-  ctx.tools.register({name:'inspect_fixture',description:'Read fixture evidence',parameters:{type:'object',properties:{target:{type:'string'}}},output:{schema:{},render:(_args,value)=>[{type:'text',text:value}]},execute:args=>evidence(args)});
+  ctx.tools.register({name:toolName,description:'Read fixture evidence',parameters:{type:'object',properties:{target:{type:'string'}}},output:{schema:{},render:(_args,value)=>[{type:'text',text:value}]},execute:args=>evidence(args)});
   const h=await ctx.agents.create({sessionId:'fixture',meta:{cwd:'/tmp',agentPreset:preset},agentOptions:{provider:'local',model:'fixture'},setup(c){installModelSelection(c,{current:{provider:'local',model:'fixture'}});}});
   let disposed=false;const dispose=async()=>{if(!disposed){disposed=true;await h.dispose();}};
   t.after(async()=>{if(!disposed)h.agent.cancel({kind:'user'});await dispose();await ctx.fiber.dispose();server.closeAllConnections();await new Promise(r=>server.close(r));rmSync(store,{recursive:true,force:true});});
@@ -171,4 +171,40 @@ test('parallel tool batches count individual results toward the progress checkpo
   assert.doesNotMatch(JSON.stringify(h.requests[1].messages),/Progress checkpoint/);
   assert.match(JSON.stringify(h.requests[2].messages),/Progress checkpoint/);
   assert.equal(h.events().filter(e=>e.type==='tool/call').length,8);
+});
+
+test('fresh browser listings reach the next request intact; older listings get recovery references',async t=>{
+  const listing='Page: Store\nURL: https://store.test/\n'+'Site navigation\n'.repeat(220)+
+    'Lefant V1: 109,99 EUR\nHoover HF3: 139,99 EUR\n'+'CONTROL navigation\n'.repeat(500);
+  let originalSeq;
+  const h=await harness(t,(i,body)=>{
+    if(i===1)return call(i,'browser_snapshot');
+    if(i===2){
+      const result=body.messages.find(m=>m.role==='tool');
+      assert.equal(result.content,listing,'fresh evidence is not cut before first use');
+      originalSeq=h.events().find(e=>e.type==='tool/result').seq;
+      return call(i,'tool_result_excerpt',{seq:originalSeq,find:'lefant',limit:100});
+    }
+    const results=body.messages.filter(m=>m.role==='tool');
+    assert.match(results[0].content,new RegExp(`Saved browser_snapshot result ${originalSeq}`));
+    assert.ok(results[0].content.length<=4096);assert.doesNotMatch(results[0].content,/Lefant/);
+    assert.match(results.at(-1).content,/Lefant V1: 109,99/);
+    return done;
+  },'augmentor-browser-product',true,()=>listing,'browser_snapshot');
+  await h.say();assert.deepEqual(h.errors,[]);assert.equal(h.requests.length,3);
+  assert.equal(h.events().filter(e=>e.type==='compaction/prune').length,1);
+  assert.equal(h.events().filter(e=>e.type==='tool/call'&&e.data.name==='browser_snapshot').length,1,'recovery never replays browser actions');
+  assert.equal(excerpt(h.agent.session,{seq:originalSeq,find:'absent'}).nextOffset,null);
+  assert.throws(()=>excerpt(h.agent.session,{seq:originalSeq,find:''}));
+});
+
+test('oversized browser results still obey admission limits and binary protection',async t=>{
+  const h=await harness(t,i=>i===1?call(i,'browser_snapshot'):done,'augmentor-browser-product',true,
+    ()=>large.repeat(2),'browser_snapshot');
+  await h.say();assert.deepEqual(h.errors,[]);
+  assert.ok(h.requests[1].messages.find(m=>m.role==='tool').content.length<=4096);
+  const binary=await harness(t,i=>i===1?call(i,'browser_snapshot'):done,'augmentor-browser-product',true,
+    ()=>'\x00compressed\ufffd\ufffd\ufffd\ufffd','browser_snapshot');
+  await binary.say();assert.deepEqual(binary.errors,[]);
+  assert.match(binary.requests[1].messages.find(m=>m.role==='tool').content,/Binary-like tool text withheld/);
 });

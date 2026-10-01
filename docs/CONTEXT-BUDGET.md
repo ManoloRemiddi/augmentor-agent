@@ -4,7 +4,10 @@
 
 The [September 28 reliability correction](TASK-RELIABILITY.md) extends this adapter
 with binary-evidence protection and advisory changed-command/progress checkpoints.
-The following original pruning contract remains in force.
+The [October 1 browser repair](BROWSER-OBSERVATION-REPAIR.md) preserves bounded
+fresh browser observations for their first model step and adds direct recovery
+references and literal excerpt search. The original contract below is historical
+where it says every fresh result is trimmed before first use.
 
 Augmentor's personal DSH presets now prune oversized tool-result text at each
 step boundary, before the next model request. This uses DSH 0.1.5-rc.1's existing

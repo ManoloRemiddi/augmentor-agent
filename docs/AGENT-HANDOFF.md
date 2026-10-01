@@ -2,6 +2,14 @@
 
 # Start here: agent handoff
 
+## October 1 browser observation repair
+
+[Browser observation repair](BROWSER-OBSERVATION-REPAIR.md) corrects early pruning
+of unread browser results, adds direct original-result recovery and paged DOM
+reads, and keeps explicit observations from replacing the action target. Shared
+DSH/Pi and Chromium checks pass; installation evidence is recorded in that guide.
+Preserve the selected compatible application/SDK build when staging this repair.
+
 ## September 28 task reliability correction
 
 [Task reliability](TASK-RELIABILITY.md) owns binary tool-evidence protection,

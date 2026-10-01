@@ -151,5 +151,6 @@ files available only in a developer's working directory.
 
 - [Live app zoom correction and qualification](MACOS-LIVE-ZOOM-2026-09-27.md)
 - [Tool context budget](CONTEXT-BUDGET.md): early pruning, original-result excerpts and deterministic repair of existing conversations.
+- [Browser observation repair](BROWSER-OBSERVATION-REPAIR.md): preserve fresh evidence, recover omitted text, page long observations and retain the work target.
 
 - [Task reliability](TASK-RELIABILITY.md): binary evidence protection, failed-approach checkpoints and effective reasoning visibility.
