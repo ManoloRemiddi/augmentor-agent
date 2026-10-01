@@ -25,6 +25,11 @@ review. Its extracted real runtime, using packaged Node, completes one synthetic
 Responses request through the default external prerequisite location and reopens
 the exact native thread/history without another request. The followup reusable
 proof runs at the real Debian and Mac Desktop/Browser packaging boundaries in CI.
+The first Linux CI for `84beebc` exposed a loaded-Chromium proof timing race:
+the memory status/label changes while its button remains disabled until context
+loading finishes. The proof now waits for the requested button to become enabled
+before clicking once; it does not retry the configuration action or skip the
+pause/resume assertions. This changes test synchronization, not memory behavior.
 No installed app, source from private dependencies, original canonical working
 files, user login cache or live model/speech configuration changed. Subscription
 eligibility gates and full C0–C9 acceptance remain open.

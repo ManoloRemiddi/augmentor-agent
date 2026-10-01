@@ -128,6 +128,9 @@ do not clear supplier redistribution or real model/account acceptance.
 `scripts/proof-codex-prerequisite.mjs` repeats version/one synthetic turn/exact
 native restart/history through the actual extracted Debian package and both Mac
 bundles in CI, using packaged Node and a separately installed supplier CLI.
+The loaded-Chromium Codex proof waits for each memory button to become enabled
+before clicking once; a changed status label precedes completion of context
+loading and is not sufficient evidence that the control can accept another click.
 
 Codex draft transformation: `tests/codex-prompt-improvement.test.mjs` exercises
 bounded Responses streaming, invalid/incomplete outputs, selected credentials,

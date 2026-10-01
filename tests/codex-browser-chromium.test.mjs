@@ -244,7 +244,12 @@ test('loaded Chromium extension executes Codex-observed typing, clicking and scr
   await memoryUntil('Array.from(document.querySelectorAll("summary")).some(node=>node.textContent.includes("manual setup and stored memories"))','existing settings section');
   await settings.evaluate('Array.from(document.querySelectorAll("summary")).find(node=>node.textContent.includes("manual setup and stored memories")).click()');
   await memoryUntil('document.body.innerText.includes("Automatic memory is on.")','shared-memory status');
-  const clickMemory = label => settings.evaluate(`Array.from(document.querySelectorAll('button')).find(button=>button.textContent===${JSON.stringify(label)}).click()`);
+  const clickMemory = async label => {
+    // The status/label updates before remembered-context loading finishes.
+    // DOM click() on the still-disabled button is silently ignored by Chromium.
+    await memoryUntil(`Array.from(document.querySelectorAll('button')).some(button=>button.textContent===${JSON.stringify(label)}&&!button.disabled)`, label+' enabled');
+    await settings.evaluate(`Array.from(document.querySelectorAll('button')).find(button=>button.textContent===${JSON.stringify(label)}).click()`);
+  };
   await clickMemory('Pause automatic memory');
   await memoryUntil('document.body.innerText.includes("Automatic memory is paused.")','pause acknowledgement');
   assert.equal((await memory.call('memory.dual.describe')).enabled, 0);
