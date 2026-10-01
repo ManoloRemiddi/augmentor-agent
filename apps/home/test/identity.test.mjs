@@ -90,3 +90,20 @@ test('unlinked device discovery is owner-only, never available to members or ano
  assert.equal((await h.request('/devices/discovered',{token:member.body.token})).status,403);
  assert.deepEqual((await h.request('/devices/discovered',{token:owner.body.token})).body,{devices:[],scanned_at:null});
 });
+
+test('request-specific cancellation cannot stop another chat, client or a replacement request',async t=>{
+ const h=await fixture(t),a=await h.pair(),owner=await h.pair('owner');
+ const token=a.body.token;
+ assert.equal((await h.request('/capabilities',{token})).body.requests.cancelById,true);
+ await h.request('/ask',{token,body:{request_id:'first',session_id:'chat-a',prompt:'hold',async:true}});
+ const first=h.calls[0][3].signal;
+ for(const [id,credential] of [['wrong-chat',token],['first',owner.body.token]]){
+  assert.equal((await h.request('/requests/'+id+'/cancel',{token:credential,body:{}})).status,409);
+  assert.equal(first.aborted,false);
+ }
+ assert.equal((await h.request('/requests/first/cancel',{token,body:{}})).status,200);assert.equal(first.aborted,true);
+ await h.request('/ask',{token,body:{request_id:'second',session_id:'chat-b',prompt:'hold',async:true}});
+ const second=h.calls[1][3].signal;
+ assert.equal((await h.request('/requests/first/cancel',{token,body:{}})).status,409);assert.equal(second.aborted,false);
+ assert.equal((await h.request('/requests/second/cancel',{token,body:{}})).status,200);assert.equal(second.aborted,true);
+});

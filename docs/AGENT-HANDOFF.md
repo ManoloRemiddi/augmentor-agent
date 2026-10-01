@@ -2,6 +2,753 @@
 
 # Start here: agent handoff
 
+## October 1 merge blockers: current main and separate Codex prerequisite
+
+The feature branch integrates canonical main `8c3be5a` at merge `338dbc5`.
+Browser observations retain both current main's paging/explicit-read behavior
+and Codex's document-epoch action ownership; both documentation/test histories
+are preserved. Product versions follow main's 0.2.13.
+
+[Codex packaging](CODEX-PACKAGING.md#separately-installed-runtime--october-1)
+now excludes supplier Codex files from production staging on Linux and Mac.
+The exact 0.159.2 dependency remains for source tests; products use an explicitly
+installed, version-checked CLI in a separate location. Native unknown-file
+rejection stays enabled. Bundled supplier redistribution review is incomplete,
+not bypassed. Local type/build, 480 Node cases (478 pass, two opt-in memory proof
+skips), 65 Browser cases and 598 native cases (596 pass, two Mac-only skips) pass.
+The actual production stage collects 229 npm notices, contains no Codex package,
+and records the external prerequisite. The real isolated external app-server
+startup passes. Final GitHub package evidence follows after qualification.
+Source `84beebca01d5f9ee997a2d1ab14f1e50d0dda9f6` also builds both Debian packages
+locally from a clean tree and passes artifact hashes/private-state/native notices
+review. Its extracted real runtime, using packaged Node, completes one synthetic
+Responses request through the default external prerequisite location and reopens
+the exact native thread/history without another request. The followup reusable
+proof runs at the real Debian and Mac Desktop/Browser packaging boundaries in CI.
+The first Linux CI for `84beebc` exposed a loaded-Chromium proof timing race:
+the memory status/label changes while its button remains disabled until context
+loading finishes. The proof now waits for the requested button to become enabled
+before clicking once; it does not retry the configuration action or skip the
+pause/resume assertions. This changes test synchronization, not memory behavior.
+No installed app, source from private dependencies, original canonical working
+files, user login cache or live model/speech configuration changed. Subscription
+eligibility gates and full C0–C9 acceptance remain open.
+
+## October 1 model-catalog platform qualification
+
+Source `3ca4778b1a6b4e368dd1e82e106a10c29cdea504` passes Mac 14/26 CI,
+including all six actual Keychain account lifecycle proofs through the build,
+packaged Desktop and standalone Browser interpreters. Linux type/build and
+462 root, 65 Browser and 590 native cases pass, with the four documented opt-in/
+Mac-only skips; isolated actual Linux protected storage passes again. Linux CI
+passes application/Home/credential/source/npm/extension checks and still fails
+only at the known native Codex executable notice gate. See
+[exact account-model source and CI](CODEX-ACCOUNTS.md#published-account-model-source-and-platform-checkpoint).
+
+All 30 original canonical working files remain byte-identical to their private
+backups. No installed app, global auth cache, private speech or approved model
+placement changed. A short OpenAI eligibility request is prepared in the account
+guide for owner review; it was not submitted. The owner was asked whether OpenAI
+has already approved Augmentor's subscription use. Keep production gates false
+without confirmed eligibility, and retain the separate pending Qwen activation
+question. Native managed auth, live acceptance, notices and the complete C0–C9
+plan remain open; do not mark the full integration complete. These followups are
+documentation only.
+
+## October 1 current account model catalog
+
+[Current account models](CODEX-ACCOUNTS.md#current-account-model-choices--october-1)
+now load through the same host and both existing setup forms. The fixed OpenAI
+GET uses only the selected account's protected bearer; no bundled catalog,
+inference, redirects, retries or fallback. Visible names/IDs preserve server
+order. Bounded parsing, logout/revision/cancellation fencing and both surface
+contracts pass with synthetic responses. A choice edits a draft and needs a
+completed connection check. Production SIWC eligibility stays false.
+
+The actual pinned native auth schema was also inspected: external
+`chatgptAuthTokens` is internal-only and is not used. Native managed auth still
+needs its separate eligible, keyring-only, serialized account authority and
+thread-state design; it cannot bypass commercial restrictions. Continue the
+complete C0–C9 plan. Local Qwen activation awaits owner direction, native package
+notices remain a gate, and no installed app/private speech/model placement changed.
+
+The preceding renewal source `57ba17d` passes Mac 14/26 CI and all six actual
+Keychain account proofs; Linux application/Home/source/credential/extension
+checks pass with only the known Debian native executable notice failure. This
+platform evidence is for that exact source; model-catalog source is newer.
+
+## October 1 account-bound profiles and credential renewal
+
+[Bound account/model connections](CODEX-ACCOUNTS.md#bound-connections-and-worker-renewal--october-1)
+now separate profile configuration revisions from protected-account token
+revisions. Desktop and Browser save the chosen consented account without API-key
+fields; changing the default account cannot redirect existing connections.
+Every queued root turn checks its saved binding and authoritative native idleness
+before durable dispatch. Token changes retire the owned process and initialize/
+resume the same native thread. Stop, unknown outcomes and failed resume preserve
+unsent work without replay or billing fallback. The transport observer stays
+attached and ignores retired child output.
+
+Full local source/UI suites pass; scripted subscription protocol tests and the
+actual pinned Codex/loopback synthetic API provider renewal proof pass. The latter
+proves new-bearer transport and exact native history, not real SIWC inference.
+Final publishing/CI source identity follows in the account guide. Production
+SIWC remains source-disabled; the native managed account route, eligibility,
+models/limits, live subscription/provider qualification, native executable notice
+review and full C0–C9 acceptance remain open. Installed apps, original canonical
+work and approved speech/GPU/model placement remain unchanged. Qwen formatter
+activation still awaits owner direction. Continue the complete plan.
+
+## October 1 shared ChatGPT host and setup controls
+
+[The account guide](CODEX-ACCOUNTS.md) now covers one lazy host-owned login
+controller, provisional issued-client recovery, shared status/cancellation,
+explicit plan consent and logout. Existing Desktop/Browser forms use the same
+host RPC. Closing cancels only the form's owned attempt, including late start
+replies. Cancelled native-store writes cannot activate new credentials; completed
+durable activation cannot be falsely reported cancelled. Account changes freeze
+admission and release only verified-idle workers; active/unknown work refuses them.
+Logout receipts replace stale successful-login text across surfaces.
+
+Build/type, 71 focused account cases, the full 428-case Node suite (426 pass,
+two opt-in Docker memory proofs skipped), 61 Browser tests and 586 native tests
+(584 pass, two Mac-only skips) pass on Linux with the existing isolated Qt
+environment. Actual native-adapter/Browser-bridge IPC tests pass with synthetic
+grants; real isolated Secret Service save/rotation/restart/logout/cleanup passes
+again. The private-source boundary passes. Published implementation source is
+`95229aaf0dfc979b895fb0ef06ed131aaf84c550`.
+[Mac CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36866967195)
+passes on Mac 14/26, including the new account/controller/native setup tests and
+all six actual Keychain proofs through build, packaged Desktop and standalone
+Browser interpreters. These use synthetic grants/renewal, not live OpenAI consent.
+[Linux CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36866967360)
+passes source boundary, Home, application/UI/credential checks, production
+dependency notices and extension packaging. Debian packaging still fails only at
+the known unreviewed native Codex executable gate; installed-package jobs skip.
+All 30 original dirty canonical files again match their private backup bytes.
+The following evidence/next-contract documentation update changes no code.
+
+Historical host-controls checkpoint, superseded for account/model binding and
+worker renewal by the section above. Production login stays disabled pending
+eligibility, with no RPC/environment bypass. The Codex-managed subscription
+route, live consent/inference and full C0–C9 acceptance remain open.
+Installed apps, the canonical checkout's unrelated work, private speech and
+approved model/GPU placement remain untouched. Qwen activation/restart still
+awaits the owner's answer. Continue the full plan.
+
+## October 1 protected ChatGPT account primitives
+
+[Account implementation and remaining integration](CODEX-ACCOUNTS.md) now covers
+actual cryptographic/loopback OAuth transactions, issued-client reuse, identity
+and scope validation, protected account mappings, serialized rotating-token
+persistence, interrupted-refresh fencing and bounded revocation/local logout.
+Identity-only consent does not enable inference; network-uncertain rotations
+quarantine old tokens without replay. The actual isolated Linux native-store proof
+passes account save/rotate/reopen/logout/cleanup, with synthetic OAuth/renewal.
+Build/type, 55 focused cases, six license-inventory tests and the complete 412-case
+Node suite pass (410 pass, two opt-in Docker memory proofs skipped). The default
+system Python lacked QtTest; the passing suite used the existing isolated Qt
+test environment. No installed dependencies or apps were altered.
+`jose` 6.2.12 is locked, and its real MIT notice passes the inventory collector.
+
+Historical primitive checkpoint, superseded for host/UI wiring by the section
+above. These classes remained internal and production login defaulted off: no host/profile,
+Desktop/Browser or worker-renewal wiring, real account consent/inference,
+distribution eligibility or C4/full C0–C9 completion is claimed. Existing Mac CI
+passes the expanded account-store proof on Mac 14/26 for source `91db7aa` through
+the build, packaged Desktop and standalone Browser interpreters; see
+[Mac CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36861022280).
+[Debian CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36861022467)
+passes application/Browser/credential/npm-notice/Home checks and still stops at
+the unreviewed native Codex executable gate. All 30 original dirty canonical
+working files remain byte-identical to their private backups. Continue wiring and the
+remaining full plan. The separate Qwen activation/restart decision is pending;
+do not change its approved formatting/model deployment without owner direction.
+
+## October 1 owner-authorized private-source cleanup
+
+The owner explicitly approved preserving all work privately and removing the
+speech-source archive from public GitHub history. See
+[cleanup and current evidence](CODEX-SOURCE-CLEANUP.md). A verified private Git
+bundle and working-file backups preserve the integration and unrelated native
+changes. The approved rewrite is now public at `8e418a0`; current branch/PR
+archive requests return 404, but the old cached introduction commit still serves
+it. The owner-approved private Support request has been submitted; cached-copy
+removal awaits GitHub's review. At `1281935`, source-boundary/Home and both Mac
+jobs pass; Debian still stops at the existing native Codex notice gate.
+Public voice tests now use an independently authored scripted peer;
+real-service source qualification is historical and must not be claimed for the
+replacement. No installed app, production speech, owner settings or GPU/model
+placement changed. Continue Codex C0–C9 after cleanup; do not reintroduce private
+source from old refs, local backups, sibling repositories or npm caches.
+
+## October 1 native V8 sources and original notice collection
+
+[Native source collection](CODEX-PACKAGING.md#october-1-native-source-collection-and-v8-inputs)
+now verifies 28 public archives and retains 3,817 original notices plus 25 pinned
+source/build files. Eleven additional sources trace the embedded V8 dependencies;
+the module lock selects Abseil 20250814.1, and its registry metadata/hash are
+verified before fetching the archive. Two full native reports are byte-identical.
+Contained aliases have their original targets retained; no filesystem links are
+created and no downloaded source code is executed. Three focused native-source tests pass.
+The compact committed inventory is reproducible from the collector. Native linked
+coverage, unresolved crate/generated-source notices and actual packaging remain
+release gates. `2641227` passed both Mac jobs and Debian application/credential/Home
+checks, with the same Debian native Codex notice failure. Installed apps, private
+speech, credentials and GPU/model settings remain unchanged; Qwen activation still
+awaits the owner's answer. Continue full C0–C9, not a narrowed chat-only milestone.
+
+## October 1 native store platform results and packaging source identity
+
+`0726234` passed both Mac 14/26 jobs, including actual Keychain roundtrip/update/
+isolation/removal/cleanup through build, packaged Desktop and standalone Browser
+companion interpreters. Package inventory/signature checks pass. Debian credential,
+application and Home checks pass; its Codex native notice gate still blocks
+packaging. See [credential evidence](CODEX-CREDENTIALS.md).
+
+[Packaging source identity](CODEX-PACKAGING.md#october-1-version-and-source-identity-evidence)
+now verifies supplementary notices against actual archive bytes and compares
+version/commit/path plus all published Rust files. All 128 identity records match
+version/VCS metadata; 109 match Rust source completely and 19 retain explicit
+source gaps. Two added candidates reduce missing candidate attribution to 20 of
+138 archives. Eight focused tests and actual full collection pass; no release
+clearance or installer-gate bypass. Installed apps, owner settings and private
+speech are untouched. Qwen activation still awaits the owner's answer; continue
+remaining C0–C9 work without silently changing its formatter/service.
+
+## October 1 native credential dependencies and actual Linux proof
+
+[Secure credential correction](CODEX-CREDENTIALS.md) supplies the missing native
+Python store dependencies for future Debian/Mac packages. Five hashed Mac wheels
+have verified notices and complete target dependency edges. A real isolated
+Secret Service proof passes through actual Node/helper processes on the pinned
+Debian image, covering update/isolation/removal and cleanup. Unit and Mac package
+inventory checks pass. Mac build/bundle Keychain proofs are required in CI but
+remain pending, including the separate Browser companion without Qt. Owner
+credentials/settings and installed apps are untouched.
+The Qwen formatter/restart question is pending; do not apply the candidate without
+the owner's answer. Continue independent C0–C9 work while waiting.
+
+## October 1 real local-provider diagnosis and unactivated candidate
+
+[Current local Qwen blocker](CODEX-LOCAL-QWEN.md) is now traced to multiple system
+messages after llama.cpp maps Codex developer instructions. A fresh real pinned
+Codex tool check fails once with HTTP 400, without model replay or owner data.
+The separate candidate helper preserves later system/developer text instead of
+dropping it. Actual offline tools reproduce original rejection, render both
+leading/later developer messages with the candidate, keep single-system output
+byte-identical and retain system-image rejection. Guard checks pass. No service
+was changed or restarted; owner direction is required to change approved model
+formatting. After authorization, qualify real tools/stream/Stop/resume and DSH/Pi
+regressions, restoring the original formatter on failure. Continue full C0–C9.
+`70935e8` passed both Mac jobs and Debian application/Home checks; Debian packaging
+retains the unreviewed Codex native executable notice gate.
+
+## October 1 complete Codex-controlled memory pipeline
+
+[Complete scoped stage proof](CODEX-INTEGRATION.md#complete-scoped-memory-stages-through-actual-codex-activity)
+now executes all six actual pinned Hindsight retain/consolidate/page stages during
+a Codex Browser I/O window. Both banks cache observations and generated pages;
+a page-only marker reaches the next native request. Startup/idle/restart cause
+no extra inference, and the complete job receipt/remaining budget survive restart.
+All seven focused real-host/companion cases and all 357 root Node tests pass
+with both Docker proofs enabled. Replies are synthetic; live classification/page
+quality and full C0–C9 remain open. The implementation checkpoint is `7dad3f2`.
+`f4f8d87` passed both Mac jobs and Debian application/Home checks; Debian
+packaging still stops at the unreviewed Codex executable notice gate. No installed
+app/settings, private speech source or model placement changed.
+
+## October 1 Unicode capture integrity and platform checkpoint
+
+[Unicode source integrity](CODEX-INTEGRATION.md#original-memory-text-across-unicode-storage-boundaries)
+now preserves emoji across shared memory chunk boundaries. An actual pinned
+Codex/real companion proof reproduced SQLite rejection of split surrogate pairs
+and verifies exact source reconstruction plus restart dedupe after the fix.
+Build/type and all 356 root Node tests pass with real-engine opt-in, including
+actual DSH/Pi regression contracts. `4ac6a54` passed both Mac jobs, Debian
+application/native/Chromium checks and Home. Debian packaging still stops at the
+unreviewed Codex native executable notice gate. Continue full C0–C9; complete
+memory stages/quality, live providers, eligible subscription login and release
+qualification remain open. No installed app or private speech source changed.
+
+## October 1 Codex memory source activation and both interfaces
+
+[Launcher and UI qualification](CODEX-INTEGRATION.md#codex-memory-launcher-and-existing-interface-controls)
+now enables the shared memory client in the development launcher. Actual Qt
+Enter/Send and Memory dialog tests use that launcher, pinned Codex and isolated
+real companions. Loaded Chromium verifies continuity, exact branch/edit capture
+and existing Memory settings pause/resume. Browser's missing memory RPC route is
+connected; both adapters report host-owned capability. Old chats retain their
+recorded contract; new chats receive memory tools. Build/type, all 355 root Node
+tests (real engine opt-in enabled), 56 Browser tests and 570 native tests (568 pass,
+two Mac-only skips) pass on Linux. Window lifecycle assertions also pass after
+replacing the Mac CI fixed animation sleep with a bounded completion wait.
+`cec1fe4` CI exposed an asynchronous recovery-export race and that Mac 26 timing
+failure; both are corrected in source. Await fresh Mac/Debian CI before claiming
+platform parity. Full C0–C9, memory quality/complete stage qualification and
+distribution gates remain. No installed app, private speech source or inference
+configuration changed.
+
+## October 1 Codex controlled-engine cancellation
+
+[Actual controlled-engine proof](CODEX-INTEGRATION.md#actual-codex-controlled-memory-window-and-cancellation)
+joins pinned Codex, the real Python companion/gateway and a disposable pinned
+Hindsight 0.10.0 container with synthetic inference. Browser tool activity admits
+one generation; Stop closes its upstream socket, stops the job and grants no idle
+or restart replay. The proof corrected `browser_tabs` to the actual registered
+`browser_tabs_list` in memory's spare-compute allowlist. Build/type and all 354
+root Node tests pass on Linux with the opt-in Docker proof enabled. Default CI
+skips that one Docker case; no model-quality or completed memory-stage claim.
+Continue loaded native/Browser memory proofs and launcher activation, then full
+C0–C9 requirements. Installed apps, settings and private speech remain untouched.
+
+## October 1 actual Codex host and memory-companion qualification
+
+[Pinned host/companion evidence](CODEX-INTEGRATION.md#actual-pinned-host-and-memory-companion-qualification)
+now covers scoped source reads, voice/text provenance, historical child capture,
+capture pause across restart, pre-turn Stop and outage/backfill without replay.
+It found and fixed native rejection of mixed dynamic-tool registration formats;
+memory tools now use the same canonical function format as Browser/Home.
+Build/type, 353 root Node, 56 Browser and eight memory-budget tests pass on Linux.
+The actual Codex and Python companions use isolated state and synthetic inference;
+this does not certify real controlled-engine generation or memory quality.
+Continue controlled inference/gateway, loaded native/Browser proofs and activation;
+the standalone launcher still leaves memory disabled. No installed app/settings or
+private speech source changed. `c987f40` passed both Mac jobs and Debian
+application/Home checks; binary notices remain the packaging gate.
+
+## September 30 Codex shared-host memory wiring
+
+[Host memory integration](CODEX-INTEGRATION.md#shared-host-memory-wiring-and-pre-turn-stop)
+now connects an explicitly injected shared client to scoped source/recall tools,
+pre-turn context, durable capture, historical-child cutoffs and activity owners.
+Stop cancels lookup before dispatch; stale native events cannot acknowledge
+queued work. Native idle inventory and subsequent child/hook/voice activity
+govern Browser processing windows. Shutdown awaits removed-worker cleanup.
+Build/type, 350 root Node and 56 Browser tests pass on Linux. New host wiring is
+synthetic-boundary qualified; pinned context and actual isolated memory-companion
+proofs also pass. Main launcher still leaves memory disabled pending actual
+pinned-host/companion, controlled inference, failure and both-surface tests, then
+activation. Continue those C6 proofs, not another replacement-context spike.
+`12f6608` passed Mac and Debian application/Home checks; binary notices remain
+the packaging gate. No installed configuration or private speech source changed.
+
+## September 30 bounded versioned continuity qualification
+
+[Continuity transport](CODEX-INTEGRATION.md#versioned-continuity-transport-and-native-compaction)
+now separates a current-request manifest from bounded untrusted data fragments,
+preserves Unicode without truncation, retains voice/text source provenance and
+omits fresh historical-child recall. Seven new contracts include actual pinned
+Codex fragment dedupe, exact reply/edit inheritance, supported native compaction
+and restart. Build/type and 343 root Node tests pass on Linux. Host memory is
+still disabled; continue scoped source/recall tools, pre-turn cancellation,
+capture/activity/branch cutoff wiring and full C6 qualification. No private
+native store or installed configuration changed. Preceding `1f62a80` passed both
+Mac jobs and Debian application/Home checks; binary notices still block packaging.
+
+## September 30 Codex chat/tool connection qualification
+
+The existing Desktop/Browser setup check now runs a
+[pinned Codex tool round trip](CODEX-INTEGRATION.md#codex-model-and-tool-connection-check)
+in temporary state, with a pure nonce/receipt tool and no environment access.
+Host-owned evidence is tied to profile revision and runtime; shutdown cancels
+checks, and setup/maintenance cannot race them. Build/type, 336 root Node,
+56 Browser and three Qt setup tests pass on Linux, including actual pinned Codex
+with synthetic inference. No live model/account or installed app was used.
+Continue real provider/account qualification and remaining C0–C9 work. Preserve
+the publication boundary and core-chat priority below; do not copy more private
+speech source or change installed settings.
+
+## September 30 publication review and core-chat priority
+
+The owner accepted keeping the reviewed work without deleting repository history
+and prioritizing Codex chat/tools before further speech work. No additional
+private speech source is authorized for public copying. The test archive added
+at `c9f9067` was audited byte-for-byte; six source files and the MIT license match
+the previously public 0.1.16 package, and only the service bridge differs. No
+credentials, recordings, installed configuration or private Git history were
+found. Retain the work; preserve installed applications and private state.
+
+`c603a46` passed both macOS jobs and Home's container check. Debian exposed a
+loaded-Chromium test race: the source-history snapshot preceded native turn/end.
+The test now waits for terminal operation status before asserting Branch leaves
+source history unchanged. This is a fixture timing correction, not qualification
+of the remaining release gates.
+
+## September 30 spoken style and late audio rejection
+
+[Request-scoped voice guidance](CODEX-INTEGRATION.md#spoken-input-style-and-interrupted-synthesis)
+now covers starts, steering and queue promotion, with an explicit typed-input
+reset. Pinned native/Browser synthetic proofs verify provider context and clean
+display history. All 328 root tests pass; the added seventh focused voice test
+also proves late cancelled synthesis cannot play into the next generation.
+Home's CI build-input omission is corrected; the full local container build and
+packaged prompt-service probe pass with no test archive in the final image.
+Continue C7 structured expressive replies, hands-free/physical acceptance,
+C6 production memory, subscription eligibility/login and all C0–C9 gates.
+
+## September 30 shared Codex voice transport
+
+[Codex speech integration](CODEX-INTEGRATION.md#codex-speech-through-the-shared-desktop-and-browser-engine)
+now joins the shared host, confirmed operation IDs, public reply streaming,
+scoped cancellation and both existing voice interfaces. Actual offscreen Qt
+hold/release and Browser native-worker proofs pass with real pinned Codex and
+synthetic device/model/ASR/TTS boundaries. Build/type, 327 root Node, 56 Browser
+and 569 native tests (567 pass, two Mac-only skips) pass. Requires the proposed
+Resonant Voice 0.1.17 scoped bridge at `cbf956d`; old companions fail explicitly.
+The minimal MIT test archive is reviewed, hashed and development-only.
+Continue C7 expressive/voice style, full hands-free and interrupted-generation
+proofs, full dependency artifact and physical Linux/Mac audio qualification.
+No installed service/app or Qwen/Breeze configuration changed. `b917153` passed
+both Mac jobs; Debian still stops at native-binary packaging review. Full C0–C9,
+including subscription login and production memory, remains unfinished.
+
+## September 30 Mac guard cleanup correction
+
+Mac `29cb4c9` CI exposed a redundant post-exit group KILL returning EPERM. The
+[ownership correction](CODEX-INTEGRATION.md#guard-ownership-correction-from-macos-ci)
+leaves cleanup with the live guard and avoids signaling a numeric group after
+its owner exits. Build/type and 321 root tests pass locally, including both actual
+native command crash cases. Await the new Mac run before claiming parity. Debian
+at `29cb4c9` reached the existing unreviewed Codex binary packaging gate.
+Continue the C7 trusted voice client and native/Browser wiring against Resonant
+Voice PR #3 (`7267ad8`), while retaining the full remaining C0–C9 requirements.
+
+## September 30 native crash proof and speech dependency
+
+[Crash and speech checkpoint](CODEX-INTEGRATION.md#native-command-crash-qualification-and-speech-dependency)
+adds actual pinned Codex PTY and background `exec_command` cleanup after owner
+SIGKILL. The tool fixture finishes its root turn first and proves native idle
+inspection still sees the background terminal. Both separate native groups stop;
+321 root tests pass. Arbitrary escaped daemons remain outside this evidence.
+C7 now has [Resonant Voice PR #3](https://github.com/ManoloRemiddi/resonant-voice/pull/3),
+source `7267ad8`, development 0.1.17, with a scoped Codex bridge and host-expiry
+cleanup. All 37 speech tests and the isolated real-DSH lifecycle fixture pass.
+Continue the Augmentor host bridge, exact public-text/request association and
+both voice surfaces, then dependency/artifact and physical audio qualification.
+Voice stays disabled until this wiring works. No installed apps or model settings
+changed. Full C0–C9 remains active, including subscription/account, memory and
+packaging gates.
+
+## September 30 Codex crash cleanup guard
+
+[Process guard](CODEX-INTEGRATION.md#process-group-cleanup-after-an-owner-crash)
+now keeps POSIX group ownership alive if the Augmentor RPC owner is killed.
+A private liveness channel triggers scoped cleanup; wrapper exit also retires
+helpers. Normal shutdown sends only one TERM to preserve native graceful cleanup.
+Build/type and 318 root tests pass; 13 final transport cases include host SIGKILL,
+an ignored-TERM helper, unrelated-process survival and single-TERM behavior.
+The maintenance checkpoint `25f4ba6` has Mac run `36759092419` active; its Validate
+run is `36759092307`. Prior `3c00243` Debian checks reached the known unreviewed
+Codex binary gate; its Mac run was cancelled. No installed apps changed. Continue
+native shell groups that escape the guard, unknown-native-identity recovery and
+the full C0–C9 integration; simultaneous owner/guard death is not qualified.
+
+## September 30 Codex maintenance native-idle verification
+
+[Maintenance verification](CODEX-INTEGRATION.md#native-idle-verification-before-maintenance)
+now freezes admission before reading every worker's native child, terminal, goal
+and hook state. Host-wide revision checks reject activity during later-worker
+inspection. Concurrent preparations share verification; cancellation is refused until
+it settles, and failed checks preserve the previous admission policy. Build/type,
+317 root Node and 55 Browser tests pass. Prior `3c00243` Mac and Validate runs
+were still active when checked. No installed apps changed. Continue crash/orphan
+ownership and unknown-native-identity recovery plus the remaining full C0–C9 plan.
+
+## September 30 Codex bounded worker pool
+
+[Worker reuse and admission](CODEX-INTEGRATION.md#bounded-worker-reuse-and-creation-admission)
+now replaces the hard idle-capacity stop with serialized reservations and
+least-recently-used verified-idle retirement. Request leases protect in-use
+workers; active/unknown work and paused queues retain their outcome rules.
+A durable pre-dispatch flag makes capacity/initialization refusals retryable
+without guessing about a native creation. Older unknown records remain blocked.
+Build/type, 314 root Node and 55 Browser tests pass. The pinned host/fork proof
+uses two chat workers across branches, edits, restart and recovery without
+replaying paused input. Prior `7f85c2a` passed both Mac jobs; its Debian application
+checks passed and packaging still rejects the unreviewed Codex executable. No installed apps changed. Next extend native background-work verification to
+host maintenance/shutdown, which still relies primarily on product-ledger state,
+then continue orphan and unknown-native-identity recovery and full C0–C9.
+
+## September 30 Codex worker-release prerequisite
+
+[Native idle evidence and release fencing](CODEX-INTEGRATION.md#native-idle-evidence-and-worker-release-fencing)
+checks every loaded thread, background terminals, unfinished goals, hook activity
+and changing native notifications before release. Incoming worker requests wait
+for release and resume the original thread; failed release preserves the worker.
+Build/type and 307 root Node tests pass, with real pinned idle-inventory evidence
+and release/queued-request race coverage. Automatic idle-worker reuse is **not
+yet implemented**. Continue bounded pool admission with request reservations;
+current capacity refusal can leave a pre-dispatch creation falsely unconfirmed
+and must be distinguished from an actual lost native reply. Full C0–C9 remains
+open; no installed apps changed. Prior `2ef08a8` Debian packaging still blocks the
+unreviewed binary; Mac run `36755663211` was still active when checked.
+
+## September 30 Codex interrupted fork recovery
+
+[Known-ID fork recovery](CODEX-INTEGRATION.md#recovering-a-fork-with-a-saved-native-identity)
+now verifies an interrupted child's saved native history and opens that same
+thread on a repeated client request. It never repeats `thread/fork` or model
+inference. Changed profiles, incomplete/mismatched history and failed durable
+readiness keep the index unconfirmed. Build/type and 302 root Node tests pass;
+final real pinned-runtime fixtures cover restart and each failure path. A lost
+native reply before its ID was saved remains unknown and is never guessed.
+No installed apps changed. Continue worker lifecycle/orphan recovery and the
+remaining full C0–C9 plan. Previous `8d9d9e7` CI runs were still active when last
+checked: Mac `36755147294`, Validate `36755147302`.
+
+## September 30 Codex Branch/Edit client checkpoint
+
+[Desktop/Browser Branch/Edit](CODEX-INTEGRATION.md#desktop-and-browser-exact-branchedit-controls)
+now enables the existing transcript controls with persistent request identity,
+child attachment and exact host boundaries. Pending intent survives client
+restart; only authoritative absence clears rejected creation. Real offscreen
+Qt and loaded Chromium proofs cover branching, first/latest input edits,
+original-history preservation, tool-context inheritance, draft restoration and
+reload without duplicate submission. Build/type, 302 root Node and 55 Browser
+tests pass; the full native suite ran 569 tests, with 567 passing and two
+macOS-only skips. A repeated Qt proof now waits for asynchronous Send readiness.
+Prior `d5209a3` passed both Mac jobs; Debian checks passed before the known
+binary-review packaging failure. Installed applications remain unchanged.
+Continue unknown-creation reconciliation and the remaining C0–C9 requirements;
+subscription login, full memory/voice, packaging and live/installed gates remain.
+
+## September 30 Codex exact fork host checkpoint
+
+[Exact fork host foundation](CODEX-INTEGRATION.md#exact-fork-host-foundation)
+adds durable `session.branch`, exact display-to-native boundaries, native-store
+ownership, verified history and a short-lived creator to release Codex's writer
+lock. Source and child retain independent product ledgers/queues. Lost replies
+and mismatched history cannot replay creation. Build/type and 301 root Node
+tests pass, including actual pinned-runtime and shared-host synthetic-provider
+proofs. Branch/Edit UI flags remain disabled pending client and real UI work;
+unconfirmed creation reconciliation and full C0–C9 remain unfinished. Prior
+Browser source passed Mac CI; Debian application checks passed and packaging
+still fails the unreviewed binary gate. No installed application changed.
+
+## September 30 Codex Browser queue checkpoint
+
+[Browser queue controls](CODEX-INTEGRATION.md#browser-queue-controls-and-snapshot-ordering)
+now share native admission/steering/removal and durable pause. Compact composer
+rows retain unknown text; exact IDs prevent duplicate delivery and stale targets.
+Persisted revisions suppress older poll snapshots. The loaded Chromium fixture
+qualifies real Enter/Steer/Remove, panel reload, same-turn correction, removal
+without model delivery and next-turn FIFO input with pinned Codex/synthetic
+Responses. A race between Steer and immediate typing is fixed by serializing
+queue actions and submissions. Build/type checks, 294 root Node and 53 Browser
+DOM tests pass. No installed app/profile changed. Previous `3fd287b` passed both
+Mac jobs; Debian application checks passed and packaging still blocks unreviewed
+Codex binaries. Continue exact fork/edit and the remaining C0–C9 requirements.
+
+## September 30 Codex native queue checkpoint
+
+[Queue controls and pause](CODEX-INTEGRATION.md#native-queue-controls-and-durable-pause)
+enables existing native Enter/Steer/Remove controls with subscription baselines,
+atomic promotion and delivered-message correlation. Stop pause survives restart;
+an explicit idle Send resumes FIFO waiting input. Unknown work is never removed
+or replayed, and aggregate queue size is bounded before admission. The real
+offscreen Qt/controller/IPC/pinned-Codex fixture verifies reconnect, removal,
+same-turn steering and next-turn delivery with a synthetic provider. Build/type,
+293 Node, 48 Browser, eight queue Qt and 16 Codex Python checks pass locally.
+Browser running-turn queue controls, fork/edit and the remaining C0–C9 work are
+still unfinished; no installed app changed. Preceding `0f96407` passed Mac CI;
+Debian application checks passed but packaging still refuses unreviewed Codex
+native binaries. Check the new commit's CI before claiming Mac source parity.
+
+## September 30 Codex durable steering checkpoint
+
+[Active-turn steering](CODEX-INTEGRATION.md#durable-active-turn-steering) now
+uses exact target/client identities and durable admission through the shared
+host. Real pinned Codex consumes the correction once in the existing turn and
+preserves both user IDs after host restart. Lost acknowledgments remain unknown
+until native client-ID reconciliation; no correction becomes a new prompt.
+Build/type checks and 289 Node tests pass, plus the final shared-host fixture.
+Existing native/Browser queue presentation, snapshots, queued-item promotion
+and removal still need integration before enabling the UI. Exact fork/edit and
+remaining C0–C9 gates remain open; installed applications are unchanged.
+
+## September 30 Codex paginated recovery checkpoint
+
+[Native-history recovery](CODEX-INTEGRATION.md#paginated-native-history-recovery)
+uses turn/item pages, validates complete reads before ledger reconciliation and
+shares the result with display restoration. Real pinned Codex with one-item pages
+preserves client IDs and command output. Build/type checks and 285 root Node
+tests pass. A failed later page keeps unknown work unresolved without replay.
+The context probe also confirms that clearing collaboration-mode developer
+instructions retains earlier snapshots; memory remains disabled pending the
+replacement contract. Full C0–C9, packaging review and installed qualification
+remain unfinished. This source checkpoint does not change installed apps.
+
+## September 30 Codex memory foundation checkpoint
+
+[Memory foundation and context evidence](CODEX-INTEGRATION.md#memory-capture-foundation-and-context-api-qualification)
+adds a tested capture/lifecycle adapter, but does not activate memory in the
+Codex host. Real companion tests preserve committed text, deduplicate replay,
+respect skipped paused records and admit no idle inference. Pinned Codex proves
+that `additionalContext` preserves earlier snapshots in model history even when
+keys change/disappear and after restart. Do not use it as a supposedly replaceable
+memory slot or count its fragments as new user messages. Continue C6 context,
+host/lifecycle/profile wiring, scoped tools, compaction and fork exclusions.
+
+Local build/type checks and 281 root tests pass; five final focused contracts
+cover the adapter and real context transport. At `cf220f7`, macOS and Home CI
+passed, as did Debian's application/Chromium checks. Debian remains blocked at
+native executable review. Full C0–C9 completion is still outstanding.
+
+## September 30 Codex paired Home checkpoint
+
+[Home integration evidence](CODEX-INTEGRATION.md#paired-home-tools) records the
+shared NAS tool bridge for new Codex chats, persistent request ownership, no
+unknown-action replay, and server-checked request-specific cancellation. The
+actual pinned Codex/native/Browser path, including resumed Browser tools, passes
+isolated provider/NAS fixtures. Local validation: build/type checks, 276 root
+Node tests, 48 Browser tests and 30 Home tests. Existing NAS deployments and
+household devices were not changed or qualified. Old NAS versions cannot perform
+Codex's scoped cancellation and never receive a broad-cancel fallback.
+
+At preceding `372dcfe`, macOS and Home CI passed. Debian exposed a Chromium
+fixture navigation race; the corrected proof waits for the extension document
+and messaging API and passes locally. Follow the next CI run for runner evidence.
+Continue the full plan: generic MCP, account eligibility/login, memory, speech,
+remaining conversation operations, platform/device and release qualification.
+
+## September 30 Codex draft improvement checkpoint
+
+[Draft improvement](CODEX-INTEGRATION.md#apilocal-draft-improvement) now connects
+both existing composers to a shared, bounded, tool-free Responses transformation
+using the selected API/local profile and saved improvement instructions. Actual
+native/Browser bridge fixtures verify no chat history or Codex worker is created;
+subscription support and live rewrite quality remain unqualified. The preceding
+real Plasma proof passed all three cases on exact `ce77fa6`; its disposable VM is
+stopped. Both macOS CI jobs passed that source. Debian still blocks unreviewed
+native binaries; a separate Home deadline-test race has been made deterministic.
+Local validation: build/type checks, 270 root Node, 48 Browser, four native
+prompt-editor and 29 Home tests pass.
+Continue C0–C9, especially account eligibility/login, Home/MCP, memory, speech,
+remaining conversation operations and installed/device qualification.
+
+## September 30 Codex consented desktop checkpoint
+
+[Desktop evidence](CODEX-INTEGRATION.md#consented-desktop-tools-and-plasma-vm-evidence)
+records the shared desktop tool bridge, durable consent/call admission, fresh
+observation tokens, sharing cleanup and crash recovery. The actual native adapter
+and pinned Codex pass a real isolated Plasma Wayland task: declined consent, screen
+pixels, exact Kate saved-file contents and Stop during partial typing with no
+replay. This uses staged source and a deterministic provider, not the owner's
+installed app or a live-model vision test. Build/type checks, 265 Node tests and
+16 focused Python cases pass. Continue the complete plan: Mac/device and actual
+Qt UI qualification, OAuth, Home/MCP, prompt improvement, memory, speech, remaining
+conversation operations and native binary distribution gates remain open.
+
+## September 30 Codex image qualification checkpoint
+
+The [image checkpoint](CODEX-INTEGRATION.md#image-qualification-and-actual-browser-screenshot-transport)
+adds explicit synthetic-image checks in both setup forms and conditionally enables
+browser screenshots in new Codex chats. The loaded Chromium proof found and fixed
+the toolbar/activeTab permission mismatch and now verifies actual JPEG transport
+through pinned Codex, alongside DOM actions and rendered replies. Type checking,
+build, 256 root Node tests, 48 Browser DOM tests and three native setup cases pass.
+The model remains synthetic; this does not qualify live vision, OAuth or installed
+artifacts. Continue the full C0–C9 plan: desktop tools, prompt improvement, memory,
+voice, account eligibility/login and packaging are not finished. Previous macOS
+CI passed; Debian still blocks the unreviewed Codex native executable inventory.
+
+## September 30 Codex runtime foundation
+
+[Implementation evidence](CODEX-INTEGRATION.md) records the pinned 0.159.2
+app-server transport, durable submission ledger, session driver, shared host and
+private IPC. The real Linux binary passes streaming/tool/Stop/reopen and host
+restart against a synthetic Responses endpoint; 21 focused tests pass. The real
+local Qwen endpoint rejects the Responses instruction layout, and the pinned
+runtime no longer supports Chat Completions. See the evidence guide for the CI
+sandbox fixture and license corrections. This is partial C0/C1 work. Continue the full
+[build plan](CODEX-INTEGRATION-PLAN.md): service supervision, profiles, both actual
+surfaces, login, tools, memory, voice and release qualification remain. Codex is
+not yet selectable and no installed application was changed.
+
+The next source checkpoint adds API/local profile records, OS credential-store
+plumbing, standalone host startup/crash recovery and a thin native adapter.
+Focused coverage is now 27 tests, the root Node suite passes 220, and the isolated
+native suite runs 551 with two skips. The real native adapter passes against the
+shared host and synthetic model, but actual Qt setup/send qualification remains.
+Secret Service is unavailable/locked on the development host, so its positive
+store proof remains pending. At `3ff5c5d`, Mac 14/26 bundle workflows pass and
+Debian packaging refuses the unreviewed Codex native executable; complete the
+native dependency inventory rather than bypassing that release gate.
+
+The following setup checkpoint makes Codex selectable in development source and
+adds API/local profile forms to native and Browser settings. Both forms share the
+same host and credential-store boundary, with explicit text-only provider checks.
+The actual Chromium native-messaging bridge passes the pinned-runtime fixture
+without a Desktop window. Root Node tests pass 225 and Browser DOM tests pass 45;
+the native suite runs 554 with two skips, including three new Qt setup cases.
+See the implementation evidence for the validation
+limits. Continue C3 real UI/tool/approval qualification and C4–C9; source selectors
+do not establish a finished integration or installed release.
+
+The approval checkpoint adds a shared one-presenter broker for Codex command and
+file-change approvals, with fresh reply capabilities on presenter transfer and no
+persistent grants. Both real client bridges now deny a synthetic escalated command
+through pinned Codex, which receives the denial and continues. Broker/socket tests
+cover stale replies, disconnect and expiry. Structured questions, scoped dynamic
+tools and actual approval-dialog qualification remain unfinished. Browser now adds
+a per-document live-connection claim behind its shared host subscription; a second
+panel cannot claim the same prompt. Browser DOM coverage passes 46 tests. See the updated
+[implementation evidence](CODEX-INTEGRATION.md#one-presenter-approval-broker).
+
+Structured questions now round-trip through both real client bridges and pinned
+Codex with its default-mode question flag explicitly enabled. The shared broker
+preserves IDs, rejects incomplete answers and returns no invented answer on cancel.
+Browser uses a cancellable form; native reuses its existing dialog. Secret questions
+remain unsupported. Root Node tests pass 234, focused Codex 41, Browser DOM 48 and
+eight offscreen native interaction cases. Debian CI still stops at the unreviewed
+Codex native executable inventory. Continue the full plan, including tool scoping,
+OAuth, memory, voice and artifact qualification.
+
+[Packaging inventory](CODEX-PACKAGING.md) now pins the complete observed Linux
+Codex native payload and source inputs. The collector verifies 1,304 locked source
+archives without rewriting Cargo resolution. The corrected nested-license scan
+leaves 138 missing-notice sources. Another 53 exact-commit archives supply candidate
+notices for 116 of those; 22 lack a retrieved candidate. Applicability and native
+binary coverage remain explicit review work. The existing Debian gate is not bypassed. Continue its source
+coverage work and the remaining runtime/product phases independently.
+
+New Codex chats now bind the maintained shared persona through developer
+instructions, preserving Codex's base instructions. The host snapshots and hashes
+that guidance per conversation and reuses it on resume; existing chats without a
+snapshot are not silently migrated. The real runtime fixture verifies exactly one
+persona on initial and resumed inference. Scoped tools and prompt improvement are
+still separate C5 work.
+
+The maintenance checkpoint freezes Codex admission when shutdown readiness is
+confirmed, including pending profile/thread work and saved unresolved operations.
+It also suspends scheduled queue pumps; cancellation restores normal processing.
+Five focused maintenance cases and the standalone socket proof cover these races.
+The root Node suite passed 239 tests before the fifth focused case was added.
+Installer orchestration and installed upgrade/rollback remain outstanding.
+
+Subsequent CI exposed an upstream Git helper surviving its Codex parent and racing
+fixture cleanup on Linux/macOS. Workers now own a POSIX process group and stop its
+remaining members on close or wrapper failure. All 242 root Node tests pass locally,
+including real Codex and two TERM-resistant descendant cases. Follow the next CI
+run for macOS evidence; this does not resolve the native packaging inventory gate.
+
+Linux maintenance now discovers and prepares Codex before closing surfaces, then
+stops it through the private socket. A later refusal cancels preparation, and local
+backups include Codex state without sockets. The actual isolated host exits through
+this script; five Python cases and 244 root Node tests pass. See the implementation
+guide for the remaining installed-upgrade and macOS coordination evidence gaps.
+
+New Codex chats now expose scoped Browser tab/navigation/snapshot/click/type tools
+through the pinned experimental dynamic-tool protocol. Calls are durable before
+dispatch, executor replies are socket-owned, and writes require observed selectors
+bound to the same tab/document. A real loaded Linux Chromium extension completes
+an isolated snapshot/type/snapshot/click task and renders the reply through native
+messaging and Codex with a synthetic model. All 252 root Node and 48 Browser DOM
+tests pass. Screenshots/model image qualification, native GUI tools, memory, voice,
+OAuth and installed release acceptance remain unfinished. See the current
+[Browser evidence](CODEX-INTEGRATION.md#scoped-browser-tools-and-loaded-chromium-evidence).
+
 ## October 1 browser observation repair
 
 [Browser observation repair](BROWSER-OBSERVATION-REPAIR.md) corrects early pruning
@@ -39,6 +786,17 @@ the owner’s independent third-app test. Source qualification is recorded there
 source success does not imply activation of any existing application.
 
 See [embedded Browser and specialist workspaces](WORKSPACE-EMBEDDING.md) for product-owned embedding, scoped tools and memory.
+
+## September 30 Codex integration build plan
+
+The owner selected Codex-backed Desktop and Browser integration with subscription,
+API-provider and local-model connection options. [The build plan](CODEX-INTEGRATION-PLAN.md)
+records the shared host/adapter design, existing DSH coupling, authentication and
+commercial eligibility gates, ten ordered work packages, acceptance matrix and
+release/rollback requirements. Begin implementation at C0 against current main.
+This is a documentation-only plan based on `b8e36a4`; no Codex runtime, login,
+provider, memory, speech or installed-app behavior has been implemented or tested
+by this planning change. Existing DSH/Pi defaults and installations remain intact.
 
 ## September 27 installed Chromium browser choice
 

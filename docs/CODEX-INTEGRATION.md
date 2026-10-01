@@ -1,0 +1,1733 @@
+<!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
+
+# Codex integration: implementation and evidence
+
+Status: in development on `feat/codex-integration`, based on canonical main
+`8c3be5a` plus the [build plan](CODEX-INTEGRATION-PLAN.md). Codex is selectable in development source; this is not an installed or qualified
+Codex release. The complete C0–C9 acceptance scope remains in
+the plan; no work package is certified complete by this foundation.
+
+Current packaging: [Codex is a separate pinned prerequisite](CODEX-PACKAGING.md#separately-installed-runtime--october-1).
+Linux/Mac products exclude its supplier binaries while preserving the adapter;
+source tests retain the locked development dependency. The native notice gate
+is preserved. A successful merge does not enable subscription use, deploy the
+owner's installation or certify the full integration.
+
+Current account status: [bound plan profiles and safe worker renewal](CODEX-ACCOUNTS.md#bound-connections-and-worker-renewal--october-1)
+now connect shared setup controls to queued turn admission. Production SIWC is
+still disabled pending eligibility; native managed login and live subscription
+qualification remain open. Earlier dated foundation statements describe their
+original checkpoint, not the current account implementation.
+
+Current memory status: [the development launcher now supplies the shared client](#codex-memory-launcher-and-existing-interface-controls)
+for new Codex chats. Earlier dated checkpoints that leave memory disabled describe
+their original source revision. Installed applications and memory inference
+configuration have not been changed.
+
+## Runtime foundation — 30 September 2026
+
+`@openai/codex` is pinned to **0.159.2** in the application lockfile. The package
+declares Apache-2.0 and platform-specific optional binaries. The installed Linux
+x64 binary reports `codex-cli 0.159.2`. Mac/ARM and packaged redistribution remain
+unqualified. Do not substitute the user's global CLI or inherit its auth cache.
+
+`packages/codex-runtime/src/` currently contains:
+
+- `rpc.ts`: stdio JSONL app-server transport, bounded frames/pending requests,
+  correlated responses, server interaction replies, timeout/crash failure and
+  process shutdown. Unknown request outcomes are never retried; unhandled
+  unsupported interactions are rejected. Upstream stderr is consumed without publishing
+  potentially private diagnostics.
+- `config.ts`: isolated runtime state and allowlisted process environment;
+  explicit provider/model configuration with retries disabled. Provider secrets
+  enter the runtime environment rather than command arguments. Remote endpoints
+  require HTTPS; local profiles require loopback; URLs cannot contain credentials,
+  queries or fragments. The plan-usage endpoint is fixed to OpenAI. These are
+  configuration primitives, not an implemented login or credential store.
+- `storage.ts` / `operations.ts`: owner-only durable JSON replacement with file
+  and directory sync; per-thread queued/accepted/terminal/unconfirmed ledger.
+  Intent becomes unconfirmed before dispatch. Restarts preserve unknown outcomes
+  and block subsequent admission until reconciliation. Duplicate request IDs
+  cannot silently change their input or replay completed work.
+- `session.ts` / `events.ts`: admission around Codex's native thread, queue
+  pausing, Stop, native client-ID reconciliation, and conversion into existing
+  Augmentor chat events. Public reasoning summaries can be displayed; raw
+  reasoning content is excluded. No second agent loop is implemented.
+- `host.ts` / `journal.ts` / `ipc.ts`: durable product session index, one worker
+  per conversation authority, native-thread reopening, display history, bounded
+  owner-only Unix socket, version handshake and per-session subscriptions.
+  The host refuses changed profile revisions, unconfirmed creation and active
+  worker release. Approval presentation now uses the shared broker described below;
+  installed-service qualification remains pending.
+- `profiles.ts` / `credentials.ts` and `services/codex/credentials.py`: versioned
+  API/local profiles with opaque credential references, serialized replacement,
+  explicit destination-change checks and an OS-store helper over private pipes.
+  The helper directly selects Keychain or Secret Service, without loading a
+  configured fallback backend. Subscription profiles require a future supported
+  login flow and cannot be created by pasting a token into API setup.
+- `browser.ts`: scoped executor ownership, bounded browser tool arguments/results,
+  durable per-call admission and observation-bound mutations; see the Browser
+  checkpoint below for supported tools and qualification limits.
+- `desktop.ts`: scoped consented desktop tools, per-call/consent records, fresh
+  observation-token admission and owned-sharing recovery; see the desktop checkpoint.
+- `main.ts`: standalone shared host (`npm run start:codex` after building), with
+  a private profile store and bounded socket. Startup recovers a stale socket only
+  after an owned-socket check, a refused connection and unchanged inode. The
+  existing lifetime-lease launcher and startup lock now recognize Codex.
+- `apps/native/augmentor_linux/adapters/codex.py`: thin native wire adapter, model
+  selection, saved chats and shared event subscription. Native and Browser engine
+  selectors now expose Codex (development), with profile forms in existing setup
+  entrypoints. `apps/browser/codex-bridge.mjs` transports native-messaging frames
+  to the same host without depending on a Desktop window.
+
+The actual generated schema was inspected using:
+
+```sh
+node node_modules/@openai/codex/bin/codex.js app-server generate-json-schema --out /tmp/augmentor-codex-schema
+```
+
+Generated schema and isolated native state are local test artifacts, not product
+configuration. The stable protocol uses `clientUserMessageId` on `turn/start`
+and `clientId` on native user-message items for reconciliation. This correlation
+does not imply upstream idempotency. A history read that omits an operation never
+proves it was not executed.
+
+## Reproducible evidence
+
+```sh
+npm ci --ignore-scripts
+npm run build
+node --test tests/codex-*.test.mjs
+```
+
+On Linux x64 with Node 24.19.0, the focused suite now passes **27 tests**.
+TypeScript checking and the normal build pass; the full root `npm test` suite
+passes 220 tests, including the focused Codex tests. Evidence categories:
+
+The full native suite runs 551 tests successfully with two skips in an isolated
+environment containing the pinned PySide6/QtTest wheels. The default system
+Python lacked QtTest and failed before that environment correction. No installed
+desktop Python or Qt libraries were replaced.
+
+| Coverage | Evidence type and limit |
+| --- | --- |
+| Request correlation, malformed/oversized frames, timeout, crash, stale approval replies | Synthetic subprocess fixture; does not certify upstream approval UI |
+| Streaming, saved thread reopen after app-server restart, harmless shell tool execution, Stop | Real pinned Codex binary against a deterministic loopback Responses SSE fixture; no real model or account involved |
+| Session driver and normalized user/assistant events | Exercised through that same real app-server proof |
+| Shared host restart and continuation with durable display history | Real pinned binary and fixture endpoint; not yet a packaged service |
+| IPC handshake, subscription isolation and existing socket preservation | Real Unix sockets with a fixture dispatcher |
+| Standalone host startup, profile persistence, SIGKILL and socket recovery | Real host subprocess and local profile; no inference |
+| Native Python adapter send/stream/saved chats/model identity | Real adapter, shared socket, pinned Codex binary and synthetic Responses provider; not the actual Qt window |
+| Missing display completion recovered from native history without replay | Real Codex history with a deliberately removed synthetic display record |
+| Credential replacement, locked-store failure, destination changes and concurrent revisions | In-memory keychain fixture plus private profile files |
+| Intent persistence, restart, identity conflict, cross-thread/corrupt ledger rejection | Disk-backed automated tests |
+| Completion before acknowledgment, unknown-outcome reconciliation, early Stop race, private reasoning exclusion | Focused fault/order fixtures |
+
+The real-binary test asserts `stream: true` and `store: false` in its provider
+request. It creates synthetic conversations in a temporary isolated CODEX_HOME,
+uses no account tokens, performs only a harmless fixture shell command, and
+removes its own test state. This is transport/tool evidence, not API-provider,
+local-model, OAuth, desktop, browser, voice or installed-artifact qualification.
+
+The harmless shell-tool fixture explicitly uses `danger-full-access` because
+container CI cannot create Codex's Linux sandbox namespace. It uses a fixed
+synthetic provider and temporary workspace. Production configuration remains
+`workspace-write` with `on-request` approvals. Sandbox enforcement must be
+qualified separately; this fixture is not evidence for it.
+
+The first remote CI run exposed missing license/NOTICE files in the Codex npm
+archives. The notice catalog now binds upstream texts to exact 0.159.2 package
+versions and immutable upstream commit `ff6aec96948b70d94983af2641a6b67c94faeff5`.
+Six license-inventory tests pass. This package-text correction does not complete
+the native binary dependency inventory or release qualification.
+
+At source `3ff5c5d`, Mac 14 and Mac 26 bundle workflows passed; these exercised
+existing DSH/Qt packaging, not the Codex interfaces. Debian source checks passed
+but packaging correctly refused the new unreviewed Codex native executable. The
+native binary/dependency inventory is an open C8 gate. Do not bypass it merely
+because npm license text is now present. The workflow now additionally runs the
+shared Codex tests on Mac; results apply only after that newer commit runs.
+
+`requirements-codex.txt` pins the credential helper's development dependency to
+keyring 25.6.0. Its actual Secret Service write/read proof could not run on this
+machine because the store was unavailable or locked; it returned the expected
+explicit error without a plaintext fallback. No account token was used. Both OS
+stores need successful platform proofs and release dependency locks before C2/C8
+completion. The two Python helper contract tests use a synthetic store.
+
+Profile catalogs distinguish configuration from inference validation. Listing a
+configured model does not mean a live request succeeded. `models.validate`
+currently validates selected profile/model and credential availability only and
+returns `validation: configuration-only`; real connection-test UI remains work.
+
+Observed protocol race: app-server can acknowledge `turn/start` before it accepts
+`turn/interrupt`. The session driver retries only the definitive `-32600` "no
+active turn" interrupt rejection, against the same turn, for a bounded interval.
+It does not resend the prompt. Stop pauses admission of the next queued message;
+an unconfirmed cancellation remains visible to the caller.
+
+## Observed real local-provider incompatibility
+
+Current October 1 diagnosis and the separately tested, unactivated candidate are
+in [local Qwen compatibility](CODEX-LOCAL-QWEN.md). The live Codex tool check
+still fails; offline parser/rendering evidence does not qualify real inference.
+
+A synthetic text-only request to the existing local Qwen server failed with its
+template parser error: `System message must be at the beginning`. No model
+settings, templates or service deployment were changed. This is a real-provider
+failure, separate from the passing synthetic provider proof.
+
+The pinned runtime's generated configuration schema permits only
+`wire_api = "responses"`; starting it with `"chat"` terminates before initialize.
+The configuration validator now rejects Chat Completions explicitly. Thus the
+plan's possible legacy transport is unavailable on this chosen release. The
+current Qwen endpoint cannot yet be advertised as compatible. Resolve its
+Responses instruction/tool handling or qualify another compatible local
+endpoint before C0/C2 completion; do not add a silent transport/billing fallback.
+
+## Next work and release gaps
+
+The [October 1 ChatGPT account implementation](CODEX-ACCOUNTS.md) adds verified
+OAuth, protected account save/renewal/logout and one host-owned login controller.
+Desktop/Browser setup controls share status, cancellation and logout through IPC,
+with explicit consent and no secret-bearing URLs or tokens in surface replies.
+Actual isolated Linux storage and source UI/bridge lifecycle checks pass. The
+production host keeps login disabled; account/model profile resolution and safe
+running-worker renewal remain unwired. C4 eligibility, actual login/inference
+and full worker/surface qualification remain open.
+
+Continue C0 proofs against a real compatible local model/API, eligibility and
+context/tool/voice spikes. C1 still needs installed-service supervision, full
+worker/profile authority verification, approval presenter leases and broader
+recovery qualification. Native paginated history must replace bounded full
+history reads before large-conversation qualification.
+
+C2–C9 still require successful OS credential proofs, real Desktop/Browser setup and
+conversation paths, eligible OAuth flows, scoped product tools/persona, memory,
+Resonant Voice, Linux/macOS packaging, migration/rollback and full acceptance.
+The existing DSH/Pi interfaces and running installations have not been changed.
+Subscription distribution eligibility remains unresolved; configuration code is
+not permission to ship an authentication route.
+
+## Desktop and Browser profile setup checkpoint (historical text-only check)
+
+The [Codex tool check](#codex-model-and-tool-connection-check) below supersedes
+the text-only button described at this checkpoint. The text-only RPC remains
+available for compatibility; it does not qualify tools.
+
+Both source interfaces now provide API/local profile creation and editing,
+OS-backed credential submission/removal, and, at this checkpoint, an explicit text response check.
+An empty key preserves an existing credential; removal is deliberate. Forms clear
+entered secrets after successful saves, preserve drafts after failures, and
+require edited settings to be saved before checking them. Profile name changes
+preserve the connection revision; endpoint/model/key changes invalidate previous
+validation. A late check cannot validate a changed profile.
+
+The check calls the configured Responses endpoint with a short synthetic message,
+`store: false`, streaming enabled, no tools and no conversation history. It requires
+a completed text response and reports `responses-text`, not agent/tool compatibility.
+Redirects are rejected and provider error bodies are not displayed. API checks may
+be billed by the selected provider. This is independent of the real Codex runtime
+proof, which still uses a synthetic local provider.
+
+The real native-messaging entrypoint now passes initialize/create/send/history and
+saved-chat checks through the pinned Codex process, with no Desktop window. Browser
+DOM and Qt form tests cover credential clearing, explicit checks and stale edits;
+these are fixtures, not installed Browser or live-provider UI qualification.
+Root Node coverage passes 225 tests, Browser DOM coverage passes 45, and three
+focused Qt setup tests pass. The complete native suite runs 554 tests with two
+skips after fixing the settings preview without a controller. A rendered offscreen
+Qt setup dialog was inspected for readable fields and unclipped controls. Subscription sign-in remains unavailable in both
+forms. Browser tool execution, approval presentation, memory and speech remain
+pending; no installed application was updated by this checkpoint.
+
+## One-presenter approval broker
+
+`interactions.ts` maps pinned app-server command and file-change approvals to
+Augmentor's existing allow-once/deny UI. Runtime configuration explicitly selects
+human approval review. No session-wide or persistent execution rule is granted.
+File approval requires a complete proposed-change preview and rejects requests
+for a persistent grant root. Network requests show the network destination;
+oversized or incomplete previews fail closed. Structured questions are mapped in the following checkpoint. Dynamic tool execution
+and additional server-request types still require their own mappings.
+
+The IPC event subscription owns presentation. Only one subscriber receives an
+opaque reply capability; it is never journaled or broadcast to viewers. Disconnect
+transfers the request to another subscriber with a new capability. Old replies,
+wrong-session replies and repeated replies are rejected. With no presenter, on
+timeout or on upstream resolution, no action is authorized. Responses use the
+existing per-request native connection or Browser bridge and the shared host.
+
+The real pinned runtime now requests escalated execution of a fixed synthetic
+command through each client bridge. Both fixtures deny it, Codex receives the
+denial and completes its turn. This exercises the production approval policy
+without executing that command. Broker/IPC tests additionally cover single-owner
+presentation, transfer, expiry, stale replies, file preview requirements and
+upstream cancellation. Actual modal UI interaction, successful approved execution
+under the OS sandbox, structured questions and installed cross-surface behavior
+remain qualification work. Reference: [app-server approvals](https://learn.chatgpt.com/docs/app-server#approvals).
+
+Approval-checkpoint validation: build passes, root Node suite passes 232 tests,
+Browser DOM suite passes 45, and the final focused Codex run passes 39 after
+explicitly pinning human approval review. The earlier 554-test native-suite record
+belongs to the setup checkpoint; this checkpoint additionally exercises the actual
+Python adapter against the real Codex process. The host broker guarantees one subscribed client connection. The following
+Browser refinement adds document ownership behind that connection.
+
+Browser refinement: each panel maintains a named extension connection. The service
+worker grants each pending Codex approval to one live document, checks that owner
+again on reply, and releases claims when the document disconnects. A second panel
+cannot open the same approval prompt. Panels reconnect their presenter registration
+after service-worker loss; native-bridge failure clears stale requests and claims.
+Registry tests cover competing documents, disconnect transfer, expired ownership
+and foreign origins. Browser DOM coverage now passes 46 tests. This is source/DOM
+evidence; loaded Chromium multi-panel and actual modal acceptance remain pending.
+
+## Structured-question checkpoint
+
+The pinned runtime requires `features.default_mode_request_user_input = true` to
+permit its question tool during ordinary conversations. With that explicitly
+configured, both actual client bridges now complete a `request_user_input` round
+trip against the real Codex process and synthetic provider. The provider observes
+the selected answer in the subsequent tool output. No second agent loop is added.
+
+Questions use the same single-presenter capability and Browser document claim as
+approvals. The host validates question IDs and complete, bounded answers, and maps
+Augmentor answers into Codex's ID-keyed response. Cancellation, expiry and missing
+presenters return no fabricated answers. Secret-entry questions are rejected;
+protected profile setup remains the credential entry path. This is an explicit
+capability limit, not a generic secret-input implementation.
+
+Native reuses the existing question dialog. Browser now shows a cancellable form
+with all questions, optional choices and free text. Nothing is preselected; empty
+or partial submissions are disabled. Model text is literal text, not HTML. Upstream
+resolution and page closure dismiss the form, and input fields are cleared when
+it closes. DSH's existing question flow is unchanged.
+
+Validation: build passes; root Node suite passes 234 tests; focused Codex suite
+passes 41; Browser DOM suite passes 48; eight existing offscreen native interaction
+checks pass; complete sidebar boot/send proof passes. These are real-runtime,
+fixture, DOM and offscreen evidence, not a loaded Chromium or installed-platform
+release claim. The Debian job for `bc60f80` still fails at the reviewed-native-binary
+inventory gate for Codex, after application checks; no bypass was added.
+
+## Packaging inventory checkpoint
+
+[Codex packaging](CODEX-PACKAGING.md) records 32 supplier native-file hashes and
+ABI requirements, the exact upstream source pin and a reproducible source collector.
+It verified 1,304 locked external archives and, after the nested-license scan fix,
+retained 4,690 notice/metadata files with 138 missing-notice sources. Another 53
+exact-commit archives now supply candidate attribution for 118 of these; 20 remain
+without a retrieved candidate. Version/commit/path identity matches for 128
+supplementary package records; 109 also match all published Rust files, while 19
+retain generated/mismatching source gaps. Inline MIT attribution is retained at
+its pinned hash. Candidate applicability is still pending. The payload verifier detects
+drift but does not grant release clearance. Debian's unknown-native-file gate is
+unchanged. C8 remains incomplete until notice/source coverage, Mac parity and real
+artifact execution/rollback are qualified.
+
+The [native source collection](CODEX-PACKAGING.md#october-1-native-source-collection-and-v8-inputs)
+now verifies 28 archives, including exact V8/Chromium dependencies and the locked
+Abseil revision, and retains 3,817 original notices plus 25 pinned recipes/source
+files. Two full reports are byte-identical. This supplies build/source inputs;
+linked-binary coverage, unresolved attribution and final installer acceptance
+remain incomplete. No native-file gate is bypassed.
+
+## Shared persona and instruction snapshots
+
+New Codex chats load the maintained `config/agent-persona.md` into the supported
+`developerInstructions` field. Augmentor does not replace Codex's base/system
+instructions. The shared host adds an explicit current-capability statement so
+the persona's references to Browser, desktop, memory, Home, voice and metrics do
+not imply those unfinished adapters are available. Future tool registration must
+update this capability statement together with its negotiated product flags.
+
+The private conversation index stores the instruction text, format revision and
+SHA-256 hashes of the persona and combined instructions before starting the native
+thread. Resume uses that same snapshot rather than reloading a changed persona.
+Corrupt snapshots fail to load; old conversations without a snapshot retain their
+existing native instructions. Both surfaces use the same host path. The real
+runtime/provider fixture verifies the Augmentor persona arrives once on initial
+inference and still occurs once after restart, without accumulating duplicate
+instructions. This completes the persona binding, not C5's tool or prompt-library
+integration, and does not qualify live-model personal-assistant behavior.
+
+Validation for the persona checkpoint: TypeScript checks and build pass, the root
+Node suite passes 235 tests, and the focused Codex suite passes 42 tests. These
+include the real pinned-runtime fixture with a synthetic Responses provider.
+
+## Maintenance admission checkpoint
+
+`host.prepareShutdown` now atomically checks activity and enters a reversible
+maintenance state. It refuses while requests, profile resolution, thread creation,
+submission acknowledgments or interactions are pending, or while any saved thread
+has active/unconfirmed work. A stopped worker is not evidence that an uncertain
+operation never ran. Incomplete thread creation also prevents readiness.
+
+After readiness, new work and profile mutations are rejected; local status/history
+remain readable. Existing session queue pumps are suspended so a scheduled callback
+cannot start a prompt after the check. `host.cancelShutdown` reopens admission and
+restores normal queue processing while retaining Stop's independent queue pause.
+The state is process-local and exposed by `host.describe.maintenance`.
+
+Validation: build passes; 239 root Node tests passed, followed by an additional
+focused direct-creation race test. Five maintenance cases cover admission freeze,
+in-flight profile resolution, saved uncertain operations, scheduled queue dispatch
+and direct creation. The standalone host/socket proof also exercises prepare,
+rejected configuration and cancellation. These are fixture/process checks.
+Installer orchestration, maintenance ownership across process restart and actual
+upgrade/rollback remain unfinished; this endpoint alone does not qualify C1/C8.
+
+## Worker subprocess ownership and CI cleanup failure
+
+The `feaede6` [Debian run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36733028675)
+and [macOS run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36733028680)
+failed the real Codex fixture during directory cleanup: an upstream plugin-catalog
+Git helper was still writing after its parent exited. Those runs stopped before
+packaging; the earlier native-inventory failure remains a separate unresolved gate.
+
+On Linux/macOS, each Codex RPC worker now starts in its own process group. Shutdown
+signals that owned group, waits for the wrapper exit with bounded TERM-to-KILL
+escalation, then kills remaining members. An unexpected wrapper exit also triggers
+group cleanup. It does not enumerate or signal unrelated user processes. This
+covers ordinary inherited helpers; intentionally detached descendants require
+separate supervision and are not claimed covered by this mechanism.
+
+Validation: build and all 242 root Node tests pass locally, including the real
+pinned-runtime/provider/client fixture and two subprocess cases with a descendant
+that ignores TERM (normal close and unexpected wrapper crash). macOS CI after
+this correction is still required; Linux fixture success is not macOS evidence.
+
+## Linux maintenance orchestration and local backups
+
+The private socket now supports `host.shutdown`. It freezes socket admission
+before awaiting the host's activity check, refuses pipelined cancellation or new
+work during that decision, flushes the accepted response, and closes the host and
+workers. A refused shutdown leaves the server reachable. `host.describe` includes
+the process ID used by the existing maintenance process-identity check.
+
+`scripts/maintenance.py prepare --component all` now discovers the configured
+Codex socket alongside Pi. It prepares Codex before closing any surface, stops an
+idle host through its RPC, and cancels preparation if a later check fails. Failure
+to reopen admission is reported explicitly. Browser-process detection includes the
+Codex bridge. The existing local backup now includes `state/codex`, preserving
+profile references, conversation metadata and native history while omitting sockets.
+OS credential-store entries remain outside this file backup.
+
+Validation: build and 244 root Node tests pass; five new Python cases cover busy
+refusal, UI-busy rollback, ordered shutdown, backup preservation, and an actual
+standalone Codex host exiting through the maintenance script. Two socket tests
+cover pipelined requests and failed shutdown. All use isolated state. The prior
+process-group correction has passed the shared-contract CI step on Debian and
+macOS 14; the remaining jobs were still running when checked.
+
+This is Linux maintenance source integration, not an installed upgrade or removal
+qualification. Existing package lifetime leases remain the installer boundary;
+macOS installer coordination and complete artifact/rollback acceptance still need
+qualification. No installed application or user service was stopped by these tests.
+
+## Scoped Browser tools and loaded Chromium evidence
+
+New Codex conversations register five existing Augmentor browser tools: tab listing,
+navigation, DOM snapshot, clicking and typing. This uses the pinned app-server's
+[experimental dynamic-tool protocol](https://learn.chatgpt.com/docs/app-server),
+with `experimentalApi` enabled only for conversations carrying the versioned
+`browserTools: 1` contract. The generated schema was inspected with
+`app-server generate-json-schema --experimental`. Codex persists the definitions
+and restores them on native thread resume; no second agent loop is introduced.
+Older conversations retain their previous tool and instruction contracts.
+
+The existing browser executor/broker is reused. An executor must attach to its
+subscribed chat and only that socket can answer its requests. Changing subscriptions
+or disconnecting revokes ownership and settles pending calls without retrying.
+New native conversations can also use these tools when their chat is explicitly
+attached in Browser. Without an attached extension, execution fails visibly.
+
+The host validates arguments and bounded results and writes a private per-call
+record before dispatch. Completed calls return their recorded result when repeated;
+unconfirmed records report an unknown outcome instead of executing again. Cached
+snapshots never grant fresh action authority. Only one dispatch may be pending per chat. Stop,
+upstream resolution, turn completion and worker loss invalidate pending calls;
+there is no claim that a dispatched browser side effect can be undone.
+
+Clicking and typing require an exact enabled-control selector from a successful
+snapshot in the current turn. The host passes the observed tab ID, URL and document
+origin timestamp separately from model arguments. The extension checks the tab
+before dispatch and the URL/timestamp inside the injected action before touching
+the element. Mutations, failed observations and executor changes invalidate the
+observation. This detects navigation/document replacement, not every possible DOM
+change inside an existing document. Dynamic-tool events use the existing chat log.
+
+At this initial five-tool checkpoint screenshots were not registered. The image
+qualification checkpoint below supersedes that restriction for explicitly checked
+profiles and new chats. Desktop GUI tools, Home, memory, voice and prompt improvement
+remain separate unfinished work.
+
+Validation: build passes; all 252 root Node tests and 48 Browser DOM tests pass.
+The real pinned Codex fixture round-trips browser observation and a targeted action
+through native messaging, then repeats after reopening the saved thread. The new
+`tests/codex-browser-chromium.test.mjs` loads the actual unpacked extension in an
+isolated Linux Chromium profile, connects its native host to the shared Codex host,
+and uses a deterministic local Responses provider. Through the normal panel message
+API, it creates a first chat, reads a local fixture page, types in its observed input,
+refreshes the observation, clicks once, and verifies both the real DOM and the final
+reply rendered in the panel. This found and fixed a first-chat error: the host's
+missing-conversation message now matches Browser's explicit not-found distinction.
+Socket/unit tests cover foreign owners, stale replies, cancelled/timed-out calls,
+unknown saved dispatches and changed tab/document rejection.
+
+This is real Chromium/native-messaging/runtime evidence with a synthetic model,
+not live-model quality, physical user acceptance, macOS Browser qualification or
+an installed release. The Linux native-host registration used by the test is confined
+to its temporary profile. User browser profiles and installed services are untouched.
+The preceding `73cc076` macOS 14/26 bundle jobs passed; Debian reached packaging and
+still rejected the unreviewed Codex executable. Current Browser changes need their
+own CI evidence and do not waive the remaining C0–C9 gates.
+
+
+## Image qualification and actual Browser screenshot transport
+
+Both native and Browser connection forms now offer **Check image response** for a
+saved, unchanged API/local profile. It makes an explicit potentially billable
+Responses request containing only a synthetic PNG with four random colored cells.
+The answer is checked against the pixels; a generic successful text response does
+not qualify. No user files, history or tools enter this probe. The format follows
+[Responses image input](https://developers.openai.com/api/docs/guides/images-vision).
+This checks basic input transport and interpretation, not general vision quality,
+tool accuracy or any subscription entitlement. Model behavior may change behind
+an unchanged provider/model ID; the recorded timestamp is evidence of the last
+successful check, not an ongoing availability guarantee.
+
+The host alone records image qualification. Renaming preserves it; changing the
+model, endpoint, connection kind or credential clears it. A stale check cannot
+qualify a newer profile revision. New chats persist their image capability and
+matching instruction snapshot; existing chats do not silently gain a new tool.
+Qualified chats register `browser_screenshot` alongside the five existing tools.
+Screenshot replies become app-server `inputImage` content, with bounded JPEG data
+URLs and text metadata. Arbitrary remote image URLs are rejected. Images are kept
+in private per-call records and Codex native history; the display journal includes
+text metadata only. They use the existing thread retention/backup boundary.
+Screenshots revoke selector authority: clicking/typing still needs a fresh DOM
+snapshot. Replay returns a recorded result without recapturing the page.
+
+The loaded Chromium proof exposed a real permission mismatch. Chromium's automatic
+side-panel toolbar action deliberately skips the activeTab grant (see
+[Chromium action runner](https://chromium.googlesource.com/chromium/src/+/refs/heads/main/chrome/browser/extensions/extension_action_runner.cc)).
+The extension now opens the same panel through an explicit toolbar action handler,
+which grants activeTab for the clicked tab. No broader host permissions were added.
+The existing visible-tab/target-change checks remain in the capture executor.
+
+Validation: type checking/build, **256 root Node tests**, **48 Browser DOM tests**
+and **three offscreen native Qt setup cases** pass. The image-probe fixture decodes
+the generated PNG and returns its pixel-derived answer, then verifies rejection
+of a wrong answer. Profile, cached-result, size/type, capability and setup checks
+cover the relevant failure paths. The real Linux Chromium proof verifies capture
+is denied before the toolbar action, invokes that action using Chromium's isolated
+DevTools extension interface, then transports actual captured JPEG pixels through
+the native host and pinned Codex to the synthetic Responses provider. It also
+retains real DOM typing/clicking and final-panel rendering checks. The qualification
+flag in this transport proof is fixture-supplied; it is not a live-model vision test.
+The temporary browser uses an explicit testing-only extension-debugging flag.
+
+No installed application or personal browser profile was changed. Live-provider
+vision quality, macOS loaded-extension behavior, native desktop GUI execution,
+OAuth, memory, speech and complete artifact qualification remain unfinished.
+At the preceding `4cc21f0` source checkpoint, macOS CI run
+[36737148617](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36737148617)
+passed; Debian run
+[36737148571](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36737148571)
+passed application checks and stopped at the unreviewed Codex native executable
+inventory gate. This checkpoint does not bypass or resolve that packaging gate.
+
+
+## Consented desktop tools and Plasma VM evidence
+
+New image-qualified conversations on a supported desktop backend now register the
+existing `linux_desktop_connect`, `linux_desktop_snapshot`, `linux_desktop_action`
+and `linux_desktop_stop` tools. The legacy names also serve macOS. This is available
+to both Augmentor clients through their shared Codex host; an open Qt window is not
+required. The existing OS executor, consent prompt and independent Stop control
+remain authoritative. The macOS helper must be present before new chats advertise
+the tools. Older chats retain their persisted definitions and instructions.
+
+The new bridge binds ownership as `codex:<conversation>`, validates bounded tool
+arguments/results and returns JPEGs through app-server image content. An action
+needs a token from a fresh capture in the same turn. Tokens are consumed before
+dispatch and the existing executor additionally checks their expiry, current
+window/focus and geometry. Cached captures cannot grant fresh action authority.
+The bridge records each call before dispatch and returns recorded results without
+repeating side effects. Unknown outcomes stay unknown; they are never replayed.
+Consent requests are durably limited to one per turn, including after restart.
+A declined or uncertain consent request cannot trigger another dialog in that turn.
+
+Stop aborts the pending helper request, waits for it to settle, then checks and
+releases only this chat's sharing. Turn end, worker failure, idle release and host
+shutdown also release ownership. Durable lease markers let a newly listening host
+reconcile surviving sharing after a crash; a duplicate host that fails socket
+ownership does not stop the live peer. An uncertain/busy ownerless executor is
+not treated as confirmed cleanup. Unconfirmed sharing blocks maintenance and
+profile changes and produces a saved runtime-error message using both existing
+chat renderers. The independent OS Stop button remains the immediate fallback.
+A hard-killed host cannot synchronously guarantee cleanup; startup reconciliation
+and the existing executor idle expiry are separate safeguards.
+
+Images live in Codex native history and private per-call records; display history
+contains text metadata. No new inference engine, automatic billing fallback,
+broader OS grant or desktop specialist model is introduced. Existing Linux limits
+(single-monitor KDE Wayland, ASCII text up to 256 characters) and macOS executor
+requirements remain. These target checks do not constitute an OS sandbox.
+
+Validation at this checkpoint:
+
+- Type checking/build and all **265 root Node tests** pass. Nine desktop tests
+  include the actual pinned runtime, real Python desktop client/socket handler
+  and a synthetic OS backend. The runtime sends image bytes, resumes persisted
+  tool definitions, denies consent, cancels an in-flight action and releases
+  sharing. Contract cases cover stale/replayed tokens, cross-owner cleanup,
+  unknown dispatches, repeated consent, overlapping calls and failed cleanup.
+- **16 focused native Python cases** pass, including two real socket/client cases
+  for the Codex owner namespace, foreign-owner rejection, token replay and the
+  explicit non-starting status probe. These are fixtures, not native-device tests.
+- `scripts/vm-codex-desktop-proof.py` passes against an isolated Debian 13 Plasma
+  Wayland VM with staged candidate source, one monitor, scale 1.0 and pinned Codex
+  0.159.2. It uses the actual native adapter and an explicitly forwarded private
+  desktop socket with host desktop autostart disabled. The provider is a
+  deterministic Responses fixture, including pixel decoding for profile
+  qualification; it is not a visual-reasoning benchmark.
+- The VM rejects declined OS consent, transports an actual screenshot to Codex,
+  edits Kate and saves exactly `CODEX desktop verified` followed by a newline,
+  then verifies sharing closes at turn end. A separate turn is stopped after
+  partial text input begins; the saved file remains partial and unchanged after
+  waiting, with no additional provider request or input replay. This qualification run used
+  an overlay of the existing disposable VM image; the original image and the
+  owner's desktop remain untouched.
+
+The final VM run passed all three cases on exact source
+`ce77fa68721ed8b4923ba038e8edf49d0829b439` with Codex 0.159.2. Its disposable
+overlay VM was powered off after the proof. The proof records source revision,
+runtime pin and tested input hashes locally.
+The owning public documentation records the sanitized outcomes; VM keys, model
+payloads and private paths are not publication artifacts. Run it only against the
+marked disposable VM:
+
+```sh
+npm run build
+python3 scripts/vm-codex-desktop-proof.py --vm-dir /absolute/path/to/disposable-vm
+```
+
+The loaded macOS desktop-control path, actual Augmentor Qt send/tool UI, live-model
+vision quality, multi-monitor support and installed artifacts are not qualified by
+this proof. C0–C9 remains open, including OAuth eligibility/login, Home/MCP tools,
+prompt improvement, controlled memory, speech, remaining conversation operations
+and packaging. At the preceding image checkpoint `ed5af14`, macOS run
+[36739219839](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36739219839)
+passed; Debian run
+[36739220130](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36739220130)
+passed application checks and still refused the unreviewed Codex native executable
+at packaging. That gate remains in force.
+
+
+## API/local draft improvement
+
+Codex's Desktop and Browser adapters now expose the existing Improve prompt
+operation. Both use the selected API/local connection profile and shared saved
+improvement instructions. The shared host resolves credentials privately and
+makes one tool-free Responses request; this auxiliary transformation neither
+starts a Codex conversation nor appends to existing history. Codex still owns
+all conversational turns and tools. Subscription profiles remain unavailable;
+there is no fallback to DSH or another provider/account.
+
+Only the draft (up to 6,000 characters) and improvement instructions (up to
+8,000 characters) are sent. Requests use `stream: true`, `store: false` and an
+empty tool list. The host accepts only a completed assistant rewrite with bounded
+output; malformed, partial, clarification, refusal and tool outputs leave the
+draft unchanged. Provider error bodies are not surfaced. Redirects are refused,
+requests are not retried, and the 60-second deadline bounds a pending rewrite.
+This follows the official [Responses streaming contract](https://developers.openai.com/api/docs/guides/streaming-responses)
+and [stateless request guidance](https://developers.openai.com/api/docs/guides/migrate-to-responses).
+`store: false` is not a promise about the provider's separate logging policy.
+
+The host allows one pending rewrite, prevents profile changes and maintenance
+while it runs, and aborts it on host shutdown. Existing composer Cancel, typing,
+session changes and Undo preserve draft revisions. As with DSH, dismissing the
+preview discards its late result but does not promise cancellation of already
+started inference; its selected provider can still charge for that request.
+No control layout was changed. Shared TypeScript/Python code applies to Linux
+and macOS; device/UI and live-provider qualification remain separate.
+
+Type checking/build, all **270 root Node tests**, **48 Browser tests**, four
+native prompt-editor cases and **29 Home tests** pass locally. Five focused
+Codex contracts cover bounded/malformed output, selected profile and
+secret isolation, redirect refusal, shutdown cancellation, maintenance admission
+and overlapping requests. The actual native Python adapter and actual Browser
+bridge round-trip through the shared Unix host and synthetic Responses endpoint;
+Browser reads saved instructions through a fixture of the shared prompt service.
+The proof verifies no chat, runtime worker or history is created. This is not a
+live-model rewrite-quality test or full native-window acceptance.
+
+At preceding desktop source `ce77fa6`, both macOS jobs passed in
+[36742665813](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36742665813).
+Debian's application checks passed before the unchanged native executable review
+gate failed in [36742665709](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36742665709).
+That run also exposed a Home test's 100 ms race: its deadline could fire before
+MCP dispatch. The test now holds an acknowledged dispatched call and triggers
+the actual deadline callback, then verifies a subsequent model-requested write
+is blocked by the unknown-outcome record. All 29 Home tests pass locally; no
+Home runtime behavior or timeout was changed.
+
+
+## Paired Home tools
+
+New Codex chats now register the existing shared Home capabilities: status,
+owner-enabled devices, direct changes, read-only requests, delegated Home
+requests, receipt lookup and request-specific cancellation. Desktop and Browser
+use the same host and persisted tool contract. Existing chats keep their recorded
+capabilities; they do not silently acquire Home tools. Browser pairing settings
+now route through the same shared prompt-service Home configuration as Desktop.
+Unpaired calls report that Home is unavailable; no NAS address or credential is
+invented from a prompt.
+
+The NAS remains DSH-owned. Codex does not start a second Home agent locally,
+connect directly to Home Assistant, or change the NAS model. Direct `home_set`
+uses the NAS device-action endpoint without another model call. Delegated
+`home_request`/`home_read` retain the existing NAS model and permission policy.
+Only their explicit request text is passed, not the surrounding conversation.
+
+The Codex adapter validates bounded arguments and durably records each tool
+identity before dispatch. A changed or interrupted call is not replayed. The
+existing SQLite Home receipts remain authoritative for NAS request IDs and
+unknown-outcome admission. A separate receipt-ownership table records hashed owners atomically with new
+receipts; the original four-column table stays compatible with older clients.
+Existing rows are preserved with no invented ownership. Codex can retrieve or
+cancel only IDs recorded for its conversation and current pairing. A global
+unknown receipt can block another chat's write without granting that chat access
+to the original request. No credentials are included in Codex tool-call records.
+
+Home adds `requests.cancelById: true` to `/capabilities` and
+`POST /requests/<request_id>/cancel`. The server checks both the paired client
+and currently admitted request before signaling cancellation. A delayed cancel
+cannot stop a newer request; even an owner client cannot use this scoped route
+to cancel another client's request. Existing `/cancel` callers retain their
+legacy behavior. Codex requires an explicit request ID and checks server support;
+there is no fallback to broad cancellation on older NAS versions. Those servers
+need this source update to support scoped cancellation; no deployed NAS was
+modified by this checkpoint.
+
+Stopping Codex interrupts waiting, but an already admitted NAS operation may
+continue. Receipt lookup and scoped cancellation remain explicit operations;
+neither a cancel acknowledgment nor ending a chat undoes a device change.
+Instructions and failures preserve that distinction. Physical device state and
+human acceptance are not established by a model's completion message.
+
+Validation: build/type checks and **276 root Node tests**, **48 Browser tests**
+and **30 Home tests** pass locally. Eleven focused Home/Codex-client cases cover
+receipt ownership, schema migration, unknown outcomes, durable call replay,
+argument validation and old-server cancellation refusal. The real pinned Codex
+0.159.2 runtime invokes Home through both actual native and Browser adapters with
+a synthetic Responses provider and isolated NAS HTTP fixture. A resumed Browser
+chat retains its Home tool definitions; the three requested direct actions each
+dispatch once. Real Home HTTP-service tests verify cross-client, wrong-request
+and stale-cancel rejection. No real household or Home Assistant device was used.
+
+The preceding `372dcfe` passed both macOS jobs in
+[36744256437](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36744256437)
+and Home CI, including the corrected deadline test. Debian
+[36744256503](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36744256503)
+failed earlier in the Chromium fixture: CDP discovered a target before its
+extension document exposed `chrome.runtime.sendMessage`. The fixture now waits
+for the exact extension URL, complete document, composer and messaging API before
+sending its first message. The loaded Chromium proof passes locally after that
+correction; the next CI run must qualify it on the Debian runner. The native
+packaging review gate remains separately unresolved.
+
+
+## Memory capture foundation and context API qualification
+
+`packages/codex-runtime/src/memory.ts` adds a Codex adapter for the existing
+`DualMemoryClient`. It is a tested foundation, **not yet wired into production
+Codex hosts**; the advertised memory capability remains false. No installed
+memory service, inference route, account or GPU setting was changed.
+
+The adapter accepts committed public display events with stable sequence IDs,
+uses the `codex:<conversation>` namespace and the companion's stable person/project
+binding, and deduplicates reconstruction. Completed public messages are captured
+immediately; speculative streaming chunks, reasoning, tool payloads and injected
+plugin text are excluded. Message completion is not a claim that a user's task
+succeeded. Replaying the original committed items grants no activity lease and
+does not create a new processing window. Pause behavior is owned by the existing
+companion, which retains skipped IDs without text.
+
+Live activity is a separate explicit interface. A duplicate start for the same
+turn retains its owner; a new turn first closes the prior lease. Only known
+Browser I/O permits a tool window. Shell, Home, MCP and delegated work can use
+inference and conservatively hold the whole turn in foreground state, even after
+that tool returns. Overlapping/stale tool events cannot reopen a stopped turn.
+The companion retains its existing absolute window, renewal expiry, pause and
+budget rules. Host notification wiring, tracking delegated work that outlives a
+root turn, profile bindings and full lifecycle qualification remain C6 work.
+
+The pinned 0.159.2 schema exposes experimental `turn/start.additionalContext`,
+with `untrusted` and `application` fragments. A real binary test verifies that
+untrusted fragments reach model input separately from public `userMessage`
+items. However, changed or omitted keys **do not remove previous fragments from
+model history**, and they survive worker restart/resume. Consequently this API
+alone cannot implement Augmentor's current replaceable continuity snapshot.
+The same real-runtime probe updates collaboration-mode developer instructions
+through `thread/settings/update` twice, then clears them. Both earlier instruction
+snapshots remain in model input; that route also fails the replacement contract.
+Upstream also bounds each fragment to 1,000 tokens, so forwarding the existing
+6,000-character structured snapshot without a deliberate transport strategy
+could truncate it. No snapshot is automatically inserted by this checkpoint.
+The official [app-server lifecycle documentation](https://learn.chatgpt.com/docs/app-server)
+is the integration reference; these finer observations come from the pinned
+schema/source and the actual-runtime fixture, not a claimed stable API guarantee.
+
+Four capture/lifecycle contracts pass, including a real isolated Python memory
+companion and SQLite journal. That proof verifies restart/backfill deduplication,
+cached user receipts, whole-memory pause/skip behavior, and zero inference
+eligibility from idle replay or a live flag without an activity lease. It uses
+no configured Hindsight engine or model and does not establish derived-memory
+quality or active-window model cancellation. A fifth real-Codex contract checks
+context history, roles and restart behavior. Build/type checks and all **281 root
+Node tests** pass; the final focused cases pass after the immediate committed-item
+capture refinement. End-to-end Codex capture, bounded replaceable context,
+scoped recall/source tools, compaction, fork exclusions and both settings surfaces
+remain unqualified and must be completed before enabling memory in the host.
+
+At preceding Home source `cf220f7`, both macOS jobs passed in
+[36745591163](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36745591163).
+Debian application checks, including the corrected loaded Chromium proof, and
+Home tests passed in [36745591131](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36745591131).
+Debian packaging still refuses the unreviewed Codex native executable; no release
+gate was bypassed.
+
+## Paginated native-history recovery
+
+Recovery now uses `thread/turns/list` with ascending `notLoaded` turn pages,
+then `thread/items/list` for each turn's complete ascending item pages. The
+host shares this result between operation reconciliation and display recovery;
+it no longer requests full `thread/read` hydration. Native history remains the
+source of user client IDs and tool results; display paging is a separate concern.
+
+All pages must succeed before this read changes ledger status or publishes
+recovered display events. Invalid pages, repeated cursors, duplicate identities,
+wrong-turn items and transport failures fail recovery without resending a prompt.
+Absence still does not prove non-execution. Aggregate reads are bounded to 128 MiB
+and 100,000 pages; exceeding either requires attention instead of silently
+truncating history. This is an in-memory recovery bound, not lazy transcript
+loading or a guarantee of an atomic snapshot during an externally active turn.
+No unsupported-method fallback to deprecated full hydration is provided.
+
+The pinned real-runtime fixture forces page size one across two turns and checks
+user correlation plus a completed command's output. Both existing native and
+Browser bridge fixtures pass through resumed host recovery. Unit tests cover
+malformed/repeated pages, ordering, foreign items and a failed later page leaving
+an unconfirmed operation unresolved. Build/type checks and all **285 root Node
+tests** pass. This is source qualification with synthetic model responses, not
+installed desktop, production provider or full C1 lifecycle acceptance.
+
+## Durable active-turn steering
+
+The shared host now accepts `session.prompt` with `mode: "steer"`, a stable
+`requestId` and explicit `expectedTurnId`. It uses supported `turn/steer` with
+`clientUserMessageId`, never interrupt-and-replay or a substitute queued turn.
+The caller must identify a confirmed active turn. Stale identities, pending
+initial admission, maintenance, Stop and unresolved work prevent new steering.
+
+A steering operation persists its target before dispatch. Repeating its identity
+and payload returns its recorded state; changed text, mode or target is rejected.
+An acknowledged correction shares the root turn's terminal status, including when
+completion arrives before the steering response. A transport error preserves an
+unconfirmed operation. Root completion alone cannot prove an unacknowledged
+correction was accepted: recovery requires its native user-message client ID.
+Unknown steering blocks further automatic queued work. Definitive protocol
+rejections record failure and never convert the correction into a new prompt.
+
+The pinned-runtime test holds the first model response, steers through the real
+shared host, repeats the request identity, then releases the response. It verifies
+one native turn, exactly one correction in the next model request, matching
+terminal status, and both user client IDs after host restart and paginated
+recovery. Unit cases cover early completion, unknown outcomes, stale identities,
+rejection and restart without replay. Build/type checks and **289 root Node tests**
+pass; the final shared-host real-runtime case also passes. These use synthetic
+provider responses, not a live-model quality assessment.
+
+At this steering foundation checkpoint, native `supports_queue` was false.
+The [following queue checkpoint](#native-queue-controls-and-durable-pause) enables
+existing native controls; Browser presentation is covered by the later
+[Browser queue checkpoint](#browser-queue-controls-and-snapshot-ordering). No visible layout redesign is included. See the
+[official app-server steering contract](https://learn.chatgpt.com/docs/app-server).
+
+The preceding memory source `57cb362` passed both macOS jobs in
+[36746845993](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36746845993).
+Its Debian packaging run [36746846260](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36746846260)
+failed while downloading a dependency with a connection-reset error, before the
+previously known Codex binary-review gate. It does not establish packaging
+acceptance or resolve that gate. CI for history source `312a749` is still pending
+at this checkpoint.
+
+
+## Native queue controls and durable pause
+
+The [shared queue guide](QUEUE-AND-STEERING.md#codex-development-integration) owns
+current native behavior. Codex now advertises native queue support, publishes
+subscription baselines and replacement frames, atomically promotes a waiting
+operation using its original ID and validates the controller's observed active
+turn. Committed user receipts carry `source.rpcId` for existing UI reconciliation.
+Definitively rejected entries remain visible until dismissed; unknown entries
+cannot be removed/replayed. Admission bounds the aggregate queue before writing.
+
+Queue pause is now durable ledger state. Stop, interrupted/failed turns and
+uncertain dispatch retain it across restart. A new idle Send explicitly resumes
+FIFO processing; ordinary reconnect and queue insertion do not clear the pause.
+The in-memory gate remains closed if persisting a pause fails. Older schema-1
+records without the added flags remain readable; this is not a qualified
+installed downgrade/migration pathway. Native and Browser idle sends are wired,
+and Browser running-turn queue/steer UI is covered by the following checkpoint.
+
+The offscreen Qt test uses the real Window, Controller, CodexAdapter, event stream,
+IPC host and pinned Codex with a held synthetic model response. Enter queues;
+Steer delivers the identified correction in the existing turn; Remove prevents
+inference; reconnect restores another waiting row; and an untouched follow-up
+runs once in the next turn. Both turn histories preserve their user identities
+after host restart. Additional tests cover unknown promotion, stale targets,
+persisted Stop/pause, explicit resumption and aggregate UTF-8 queue bounds.
+Local build/type checks, **293 root Node**, **48 Browser**, **eight queue Qt** and
+**16 focused Codex Python** tests pass. Source is enabled; installed apps and
+physical/macOS device evidence are unchanged.
+
+Previous steering source `0f96407` passed both macOS jobs in
+[36748520107](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36748520107).
+Its [Debian run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36748520138)
+passed application checks and still failed the unreviewed Codex executable gate.
+History source `312a749` had the same Debian gate; its Mac run was superseded and
+cancelled. No packaging review requirement has been bypassed.
+
+
+## Browser queue controls and snapshot ordering
+
+[Browser queue behavior and evidence](QUEUE-AND-STEERING.md#codex-browser-queue)
+connects the existing shared host to the native messaging bridge, service worker
+and compact composer rows. It enables Codex's running-turn Enter/Send, Steer and
+Remove while keeping Stop available. Host identities and outcome rules are
+unchanged; Browser is presentation and IPC only. The ledger adds a persisted
+queue revision, allowing the renderer to reject delayed stale poll snapshots.
+Queue state is not added to transcript history or sent to the model as context.
+
+A real loaded Chromium run verifies composer admission, same-turn steering,
+removal without model delivery, panel reload, next-turn ordering and unchanged
+browser tool/screenshot behavior with pinned Codex and a synthetic provider.
+Five DOM contracts cover ordered submissions/actions, double-click suppression,
+unknown outcomes, delivered-ID races, stale snapshots and session/read-only/
+disconnect boundaries. A visual inspection confirms compact rows and visible
+Send/Stop. Build/type checks and 294 root Node + 53 Browser tests pass. The
+preceding native queue commit passed Mac 14/26 CI; this Browser checkpoint still
+needs its own CI. Full fork/edit, live account/provider, memory, voice, generic
+MCP, packaging and installed/device gates remain open.
+
+
+## Exact fork host foundation
+
+`session.branch` accepts the source session, a stable new session ID, the exact
+committed display sequence and `reply` or `edit` mode. The host resolves that
+sequence to native turn/item identity. Reply requires the last answer item of a
+closed turn and uses inclusive `lastTurnId`; Edit requires the initial user item
+and uses exclusive `beforeTurnId`. Editing a steered input or branching from an
+intermediate answer is rejected, rather than approximated with extra or missing
+history. The pinned schema/runtime, not an assumed generic API, qualifies the
+experimental exclusive boundary. At this host-only checkpoint, native/Browser Branch/Edit capability flags stayed
+false. The following client checkpoint enables the controls.
+
+A short-lived app-server creates the fork in the same native runtime store, then
+closes to release its writer before the child worker resumes. The parent worker
+stays open. Descendants reference the original product session as native-store
+owner; profile revision, model and workspace ownership are checked on restart.
+Each child has its own display journal, operation ledger and executor receipts.
+No private Codex storage is copied or edited. Complete paginated native history
+is compared using ordered item/status fingerprints before the child becomes
+ready; item payloads and tool results must match the requested prefix.
+
+The product index records creation before the non-idempotent RPC, and records the
+returned native ID before verification. Concurrent identical requests share one
+operation; later retries return the existing child. Changed request identity is
+rejected. A lost reply or history mismatch remains unconfirmed and cannot issue
+another fork. Automated reconciliation of these incomplete creation records is
+still required before full lifecycle qualification. Other host mutations and
+maintenance are excluded during creation; shutdown closes helper processes and
+settles branch operations. Active or uncertain source work blocks branching.
+Paused, unsubmitted queue rows stay with the parent and are not copied or started.
+
+Build/type checks and **301 root Node tests** pass locally. The real pinned
+runtime/synthetic Responses fixtures qualify inclusive and exclusive boundaries,
+empty first-message edits, retained dynamic-tool results/definitions and persona,
+no inference/tool replay during creation, independent child turns, source
+preservation, restart, descendants, concurrent retries, profile changes, lost
+acknowledgments and deliberately mismatched history. These are runtime/host
+proofs, not live-provider, loaded UI or installed acceptance.
+
+Previous Browser source `b562a36` passed
+[macOS CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36751788804).
+Its [Debian workflow](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36751788807)
+passed application checks and failed on the known unreviewed Codex executable
+packaging gate. The gate remains enforced. This fork checkpoint needs its own CI.
+
+
+## Desktop and Browser exact Branch/Edit controls
+
+Both Codex clients now enable the existing transcript Branch and latest-input
+Edit controls. Browser attaches its native bridge to the child and restores its
+history and queue before selecting it. Native uses the selected harness preset
+for child IDs, preserves the source conversation and keeps the existing draft
+restoration behavior. No interface layout is replaced. Exact-turn restrictions
+from the host apply: intermediate answers and steered inputs cannot be silently
+converted to approximate cuts. Rejected cuts report an error and leave the source.
+
+Each client persists its pending source/message/mode/child identity before the
+fork request. A retry after a lost reply reuses that identity. Native records it
+in the named window's private session file with file/directory flushes. Browser
+uses extension local storage and commits selection plus pending-intent removal
+in one storage update. Storage failure prevents a new fork request. Another
+boundary cannot overwrite an unresolved intent. `session.branchStatus` reports
+in-flight, saved or authoritative absent state; only absence allows a failed
+intent to be discarded. A native child with an unconfirmed creation record
+still requires the separate lifecycle reconciliation work described above.
+
+The real offscreen Qt proof activates rendered transcript anchors through the
+actual Window/Controller/adapter/IPC path, then sends an edited first input with
+Enter. It checks exact child history, source preservation, saved selection and
+restoration of the preceding composer draft. It waits for Send to become enabled
+after asynchronous navigation before pressing Enter. The loaded Linux Chromium
+proof clicks Branch/Edit, sends into both children, inspects actual synthetic
+provider requests for inherited tool outputs/excluded later messages, restores
+the original draft, and reloads the panel without repeating the edited prompt.
+These use pinned Codex and synthetic Responses; physical pointer, live-provider
+and installed/macOS UI qualification are separate.
+
+Build/type checks, **302 root Node** and **55 Browser** tests pass. The full native suite ran
+569 tests: 567 passed and two macOS-only checks were skipped on Linux. Focused
+client tests cover persisted retry identity, authoritative rejection and failed
+storage. Prior host source `d5209a3` passed
+[macOS CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36753787500).
+Its [Debian run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36753787417)
+passed application checks and still refused the unreviewed Codex executable at
+packaging. This source change does not update installed applications.
+
+
+## Recovering a fork with a saved native identity
+
+Retrying the same pending Branch/Edit request now reconciles a `creating` child
+when the host durably recorded its native thread ID. A short-lived reader uses
+the original native store and verifies the complete paginated history against
+the saved boundary fingerprint before marking it ready. It does not call
+`thread/fork`, start a turn, copy storage, or execute tool requests. The normal
+child worker opens only after verification. This also covers restart after a
+successful native fork but interrupted history verification or readiness save.
+
+Profile ID/revision must still match. Read failure, mismatched history or failed
+durable readiness writes leave the record unconfirmed; the live metadata map
+cannot be changed to ready by an unsuccessful write. In-flight recovery keeps
+the same host mutation/maintenance exclusion and shutdown handling as creation.
+Both clients already retry their persisted child identity, so no new control or
+alternate conversation is introduced.
+
+A lost native reply before the ID was recorded remains unresolved. Matching
+native threads by title, time or identical contents would not establish which
+one belongs to the request; the host does not guess or replay the fork. Recovery
+without that identity, orphan lifecycle and other C0–C9 gates remain separate.
+
+Build/type checks and **302 root Node tests** pass. The final pinned-runtime
+host proof additionally covers restart, changed profile, repeated mismatched
+history, incomplete item pages, failed index replacement, exact original native
+ID on success, no extra inference and no additional fork call. The failure test
+uses only an isolated fixture index. These are synthetic-provider source proofs;
+installed state and live subscription qualification are unchanged.
+
+
+## Native idle evidence and worker-release fencing
+
+Worker release now freezes queue dispatch before asynchronous cleanup and waits
+for native idle evidence. The read-only inventory pages every loaded thread,
+including loaded descendants; each must report idle, no background terminals
+and no unfinished goal. Hook start/completion notifications are observed before
+initialization; outstanding or malformed hook identity blocks release. Any
+native notification during the inventory invalidates that snapshot. Missing,
+malformed, duplicate or unavailable inventory pages cannot establish idleness.
+This uses the pinned [app-server thread/status and background-terminal APIs](https://learn.chatgpt.com/docs/app-server).
+
+A per-session release promise fences incoming worker requests until closure.
+Queued input cannot dispatch through the retiring worker; after successful
+release, the next request resumes the same native thread. The operation ledger
+revision is rechecked before closure. A refused release retains its worker,
+restores the existing maintenance policy and can be retried after work ends.
+Release also waits for an in-progress open; host maintenance and shutdown account
+for release work. Late failure cleanup cannot remove a replacement worker entry.
+
+Build/type checks and **307 root Node tests** pass. The pinned-runtime fork
+fixture validates real idle inventory on a completed native thread. Focused
+contracts cover active descendants, terminals, unfinished goals, hooks, changing
+notifications, inventory pagination/errors, release refusal/retry and a prompt
+racing release that uses the original native identity through a fresh worker.
+These source checks do not qualify every external process or plugin lifecycle.
+
+This is the release prerequisite, not automatic eviction. The current worker
+limit still requires explicit release. Next, implement bounded idle-worker reuse
+with request reservations and distinguish pre-dispatch capacity refusal from
+unknown native creation, so opening many completed chats cannot exhaust the
+product or create a false unknown outcome. Installed applications are unchanged.
+Previous `2ef08a8` Debian application checks passed but packaging still rejected
+the unreviewed Codex executable in run `36755663208`; Mac run `36755663211` was
+still active at the last check.
+
+
+## Bounded worker reuse and creation admission
+
+The host now reuses capacity from verified idle chat workers in least-recently
+used order. Request and direct-create leases protect workers currently being
+used, and opening reservations count toward the configured bound. Allocation is
+serialized; queued allocators cannot spawn workers beyond that bound. New or
+resumed workers become most recently used. The default remains four chat workers;
+internal configuration accepts 1–32. Short-lived fork/recovery readers are
+separate auxiliary processes, not extra admitted chat workers.
+
+Candidates must have no pending submissions, interactions, desktop ownership,
+active/unknown operations or unpaused waiting input. The preceding native idle
+inspection and release fence remain mandatory. One fresh inspection is allowed
+when native notifications invalidate the snapshot; stable busy/unknown state,
+errors or continuously changing activity refuse allocation. Nothing is killed
+to force capacity. A future request resumes an evicted chat's existing native
+ID and product journals. Paused queue rows remain persisted and are not resumed
+by eviction, reopening or history reads.
+
+New creation records persist `creationDispatched: false` before allocation. The
+host durably sets it true immediately before `thread/start`. A capacity or
+initialization failure before that call is therefore retryable with the same
+session ID, including after restart, and does not block maintenance as unknown
+native work. Missing flags on older incomplete records remain conservative
+unknowns. Once native creation was dispatched, a lost reply still cannot replay.
+Profile/workspace bindings remain immutable. This additive development format
+is not an installed downgrade qualification.
+
+Build/type checks and **314 root Node tests** pass, with **55 Browser tests**.
+Protocol fixtures verify more chats than capacity, least-recently-used selection,
+original native IDs on reopen, live/opening bounds, refusal for active/unknown/
+unverified work, bounded snapshot retries, initialization failure, restart and
+maintenance of undispatched records. The real pinned-runtime fork/host fixture
+now runs with two chat workers across multiple branches, edits and recovery;
+original history survives and paused parent input never reaches the synthetic
+provider. The native idle fixture waits for a stable observation after startup
+notifications rather than assuming the first snapshot is already stable.
+
+Previous release-fence source `7f85c2a` passed
+[Mac CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36756809696).
+Its [Debian workflow](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36756809576)
+passed application checks and still rejected the unreviewed Codex executable
+at packaging. This pool change needs its own CI. No installed application changed;
+full C0–C9, orphan/unknown-native-identity recovery, live account/provider,
+memory/voice and packaging qualification remain open.
+
+
+## Native idle verification before maintenance
+
+Maintenance now freezes new admission and scheduled queue pumps before checking
+native state. Every loaded chat worker must pass the same complete loaded-thread,
+background-terminal, goal and hook inspection used by idle retirement. The host
+also retains every worker's notification and ledger revision across the entire
+inspection, so activity in an earlier worker invalidates readiness even while a
+later worker is being checked. A disconnected, malformed or changing inventory
+cannot establish that shutdown is safe.
+
+Concurrent preparations share one verification. Cancellation and direct worker
+retirement are refused until it settles; status remains readable. A failed first
+preparation restores the previous admission policy. A failed repeat preserves an
+already established maintenance freeze. Successful preparation leaves admission
+frozen until explicit cancellation or shutdown. The IPC shutdown path retains its
+existing prohibition on pipelined cancellation and new requests.
+
+Validation on the maintenance checkpoint: build/type checks, 317 root Node tests
+and 55 Browser tests pass. The new host fixtures cover child activity, terminals,
+paused goals, hooks, unavailable inventory, cross-worker activity, concurrent
+preparation/cancellation, retained freezes and scheduled queue preservation. The
+desktop fixture now supplies explicit idle inventory after confirmed OS cleanup.
+Existing pinned-runtime native idle API checks and both actual surface fixtures
+remain in the full root suite. This shared host change applies to Linux and macOS;
+new Mac runner evidence is still required. No installed application was updated.
+
+These are observed-idle checks, not an upstream atomic quiesce protocol. They do
+not resolve orphan processes after an uncatchable host crash or authorize stopping
+unknown work. Full lifecycle, account, memory, voice and release qualification
+remain required by the C0–C9 plan.
+
+
+## Process-group cleanup after an owner crash
+
+On Linux and macOS, each `CodexRpc` starts a small Node process guard as its
+separate POSIX process-group leader. The guard starts the existing pinned runtime
+in that group and passes its standard streams through unchanged. A private IPC
+channel connects only the guard and its owning Augmentor process. Host death
+closes the channel, so the surviving guard sends TERM and enforces a two-second
+KILL deadline without looking up, persisting or trusting a possibly reused PID.
+Native exit or spawn failure also retires the group, including helpers that
+outlive the wrapper. The guard's own live PID remains the group identity.
+
+Normal RPC shutdown already sends TERM to that group. The guard does not send a
+second TERM in response: upstream may interpret a second shutdown signal as a
+request to skip graceful cleanup. Windows retains its existing direct process
+path and is not qualified by this POSIX change. Each chat worker therefore has
+an additional small supervisor process; the chat-worker capacity is unchanged.
+
+Build/type checks and the full 318-test root suite pass with the guard. The final
+13 focused transport tests also include a single-TERM regression. An isolated
+process test kills the RPC owner with SIGKILL, verifies a helper that ignores TERM
+is retired, and confirms an unrelated process stays alive. Existing real pinned
+runtime/native Qt/Chromium proofs remain passing in the root suite. This does not
+claim recovery for processes that deliberately establish a different group or
+for a simultaneous kill of both owner and guard; those need separate ownership
+and OS supervision qualification. No installed application was changed.
+
+
+## Native command crash qualification and speech dependency
+
+The process-guard checkpoint now has real pinned 0.159.2 evidence beyond the
+synthetic wrapper. One fixture starts a PTY through `command/exec`; another uses
+a synthetic Responses provider to invoke Codex's actual `exec_command` tool,
+yields a background terminal, and completes the assistant turn. Both commands
+run in process groups different from the guard and deliberately ignore TERM.
+The second fixture verifies that native idle inspection refuses that background
+terminal even after the root turn is complete. Killing the Augmentor RPC owner
+with SIGKILL stops both commands through native connection cleanup. The test
+uses disposable directories and no live model, account or installed service.
+All 321 root Node tests pass, including 15 transport/lifecycle cases.
+This still does not establish behavior for arbitrary daemons that escape native
+ownership or simultaneous owner/native/guard death.
+
+C7 work now has a proposed independent speech dependency:
+[Resonant Voice PR #3](https://github.com/ManoloRemiddi/resonant-voice/pull/3),
+source `7267ad8`, development version **0.1.17**. Its opt-in Codex bridge binds
+harness, product session and a private connection identity. Ordered events and
+current-request checks prevent cross-harness or stale playback. A host heartbeat
+lease invalidates audio and closes recognition if the trusted bridge disappears.
+The existing DSH route remains compatible; 37 service tests and an isolated real
+DSH 0.1.5-rc.1 lifecycle fixture pass with synthetic LLM/TTS.
+
+Augmentor must still implement the trusted bridge client, ticket capability
+negotiation, public assistant-text streaming, Stop/failure/close cleanup, spoken
+request association, native/Browser wiring and a pinned distributable dependency.
+Keep `bridgeId` and the service token out of model events and surface tickets.
+Do not enable Augmentor's voice capability until that end-to-end integration is
+verified. Physical audio acceptance on both platforms remains required. The
+speech source change does not deploy or change Qwen/Breeze placement/settings.
+
+
+### Guard ownership correction from macOS CI
+
+Mac run [36759527650](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36759527650)
+failed at `29cb4c9`: the old post-exit group KILL in `CodexRpc.stop` returned EPERM
+after the new guard had already retired itself and its helpers. The host no
+longer sends a group signal after its guard exits. The live guard retains cleanup
+ownership; signaling a recycled numeric group would not prove that ownership.
+Build/type checks, all 15 transport cases and all 321 root Node tests pass locally
+after this correction. The new Mac CI run must establish runner evidence; these
+Linux checks do not prove the Mac fix by themselves. The same source's Debian
+application checks reached the unchanged unreviewed Codex binary packaging gate
+in [36759527576](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36759527576).
+
+
+## Codex speech through the shared Desktop and Browser engine
+
+The host now owns `CodexVoice` and an explicit `voice.ticket` operation. It reads
+only the selected user's private speech-service connection configuration, checks
+`resonant-voice/1` plus `scopedHarnessBridge: 1`, and requires the 0.1.17 scoped
+bridge contract. Service tokens and private bridge identities stay in the host;
+the surface receives only its one-time ordinary ticket. Remote endpoints,
+redirects and malformed responses cannot forward the service credential.
+
+Only live native public assistant items associated with a confirmed, delivered
+operation are streamed to speech. Reasoning, tool outputs, restored history,
+duplicate completions and late turns cannot speak. Text is coalesced with bounded
+pending work. Stable `resonant-voice:<UUID>` request identities pass through the
+existing operation ledger, including steering into a confirmed active turn.
+Unknown submission outcomes are never replayed. Full reply text remains in the
+normal conversation when speech fails.
+
+Stop clears local pending speech and sends a higher-sequence cancellation without
+waiting for an older speech acknowledgment. The service ignores stale delivery;
+Stop keeps voice available for a later input. Runtime failure and host close
+retire the scoped bridge. Heartbeats distinguish pending ticket redemption,
+active connection and closed surface; the service's independent eight-second
+lease stops audio/recognition after abrupt host loss. Active/opening voice prevents
+worker retirement, profile replacement and maintenance.
+
+Both existing interfaces now advertise this voice integration. Native
+`Controller.prepare_voice` carries the selected Codex profile when creating a
+chat before asking for a ticket. The Browser bridge uses the existing
+`BrowserVoice` and shared Python `VoiceSession`; it does not add another agent
+loop or device engine. Existing hold/release controls, preferences, named-window
+profiles and playback generation logic remain in their shared implementations.
+An older installed companion produces an explicit compatibility error when voice
+is opened. No companion, model setting, GPU or installed application was changed.
+
+Validation: build/type checks and **327 root Node tests**, **56 Browser tests**,
+and the full native suite (**569 tests, 567 passed, two Mac-only skips**) pass.
+Six focused voice contracts use the actual pinned Codex runtime and the separately
+versioned speech-service sources. The offscreen Qt proof clicks the real voice
+button, holds/releases it, creates a Codex conversation through its actual
+controller/adapter and receives PCM through the real playback buffer. The Browser
+proof runs native messaging plus the unmodified Python voice worker and checks
+exactly one spoken request and matching playback. Only audio-device callbacks,
+ASR and the model/TTS outputs are synthetic. The Browser gesture DOM test checks
+capability gating and disconnection closure; this is not yet a loaded Chromium
+voice gesture/device acceptance run.
+
+The speech dependency is proposed in
+[Resonant Voice PR #3](https://github.com/ManoloRemiddi/resonant-voice/pull/3),
+commit `cbf956d`. Its **38 service tests** cover scoped identity, heartbeat expiry,
+redemption status and disconnect; the prior DSH lifecycle proof remains separate.
+Historical evidence at this checkpoint used private speech-service source in
+a test archive. The October 1 source cleanup removes that archive from the
+public branch and replaces it with an independently authored
+[synthetic protocol peer](../tests/fixtures/codex/VOICE.md). Current public tests
+qualify Augmentor transport, not the real speech-service implementation.
+
+Remaining C7 work includes Codex spoken-style/structured expressive delivery,
+full hands-free/echo and interrupted-generation qualification on both surfaces,
+service artifact/installer pinning and physical microphone/playback acceptance
+on Linux and macOS. C6 capture still needs correct voice modality binding when
+memory is enabled. Subscription and the rest of C0–C9 remain open.
+
+The preceding `b917153` passed both macOS jobs in
+[36760843024](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36760843024),
+confirming the guard ownership correction. Its Debian application tests reached
+the existing unreviewed-native-binary gate in
+[36760842983](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36760842983).
+This voice checkpoint requires its own CI results before claiming Mac source
+qualification.
+
+
+## Spoken input style and interrupted synthesis
+
+The shared session now sends a versioned `augmentor_input_mode` application
+context on every `turn/start` and `turn/steer`, including promoted queued input.
+A stable Resonant Voice request ID selects concise conversational guidance;
+a typed request explicitly restores normal written-response guidance. User
+messages and the displayed transcript remain unchanged. Both methods use the
+pinned runtime's experimental `additionalContext`, so all conversation workers
+now negotiate that protocol capability, including older chats without tools.
+This does not grant additional tool or filesystem permissions.
+
+Each entry scopes itself to its request and continuations, and the next entry
+supersedes earlier style entries. Codex retains previous entries in native
+history; this is not an ephemeral or replaceable context slot. The fixed text is
+under 1 KiB per input plus the bounded request ID. Normal native compaction still
+applies. Live-model adherence and long-history style quality remain unqualified;
+production memory context selection and growth controls are separate C6 work.
+
+Build/type checks and all 328 root tests passed with the input-mode implementation.
+A subsequent focused run passed all seven voice tests, including the added late
+PCM test. Actual pinned Codex with synthetic inference proves spoken context
+reaches the provider through native and Browser paths, a typed follow-up receives
+the reset, and display history excludes internal context. Session tests cover
+spoken steering and typed queue promotion without rewriting user text.
+
+The new interruption proof deliberately leaves a synthesizer generating after
+cancellation, starts another captured request, delivers stale old-turn events,
+and finally releases the old PCM. Only the new generation reaches the socket.
+This complements the delayed-event Stop test; physical microphone echo,
+hands-free behavior and human listening acceptance remain open. Structured
+expressive voice reply tools remain the next C7 implementation work.
+
+The first shared-voice commit `c9f9067` exposed a Home build-input omission in
+[CI job 110051714941](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36763494714/job/110051714941):
+root `npm ci` could not find the former local test archive. That historical
+build included the archive only during compilation. The October 1 cleanup
+removes this dependency and its build-context exceptions; current Home builds
+do not receive speech-service source. No NAS service or installed application was updated.
+
+## Codex model and tool connection check
+
+Both existing setup forms now offer **Check Codex connection** in place of the
+earlier text-only check. The shared host starts the pinned Codex 0.159.2 runtime
+in temporary private state with an empty home and no environments, desktop
+executor, user history or project instructions. The only custom tool accepts a
+random nonce and returns a separate random receipt. Success requires the model
+to call that tool once with the exact nonce and return the receipt. A text-only
+answer, incorrect tool arguments or another client interaction fails the check.
+The runtime owns this short agent turn; Augmentor does not implement an extra
+model loop. Empty native environments disable native shell/file tools.
+
+The check uses the selected API/local connection and may incur provider charges.
+It is limited to 60 seconds and bounded events/frames/answers, closes its owned
+process on completion/failure/cancellation, deletes temporary state, and never
+retries the turn. Profile setup and maintenance cannot race a running check.
+Shutdown cancels it before cleanup completes. No normal Augmentor chat is added.
+
+Successful host-owned evidence includes the connection revision, validation
+time and exact Codex runtime. Name changes preserve it; model, endpoint or key
+changes clear it. An old runtime version no longer yields `toolsVerified`.
+Caller-supplied qualification fields are ignored. The result proves this small
+Codex tool round trip, not arbitrary browser/desktop execution, model quality,
+live-provider qualification or subscription eligibility. The separate image
+check remains necessary before screenshots are enabled in new chats. The old
+text-only RPC remains compatible and returns `toolsVerified: false`.
+
+Build/type checks and **336 root Node tests**, **56 Browser tests** and **three
+native Qt setup tests** pass on Linux. Six new real-pinned-runtime checks use a
+deterministic local Responses fixture: valid receipt, skipped tool, wrong nonce,
+cancellation, host-owned persistence without a user chat, and shutdown/setup/
+maintenance fencing without replay. Profile tests cover caller spoofing,
+revision invalidation, rename/restart and stale runtime evidence. These checks
+use neither a paid model nor an OpenAI account. Platform CI applies only to its
+tested revision; no installed application was updated.
+
+Preceding source `c603a46` passed both Mac jobs in
+[36764092673](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36764092673)
+and Home's container job. Its Debian run
+[36764092568](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36764092568)
+found a Chromium fixture race: visible answer text preceded terminal history.
+The fixture now waits for authoritative operation settlement before taking its
+immutable source-history snapshot for Branch. The loaded Chromium proof passes
+locally after that timing correction. Native-binary packaging review and the
+remaining C0–C9 acceptance gates remain open.
+
+## Versioned continuity transport and native compaction
+
+`memory-context.ts` now provides a bounded transport for the existing selected
+continuity brief. This is staged alongside the capture adapter; **production
+host memory remains disabled** until tools, activity, source identity and
+pre-turn cancellation are wired and qualified. No installed memory service,
+account, inference route or model setting changed.
+
+Each current request gets an application manifest with its identity, revision,
+snapshot digest and part count. The fixed policy identifies older manifests as
+historical and memory text as untrusted reference data. Snapshot text enters only
+`untrusted` fragments. A missing or unavailable brief produces an explicit empty
+current manifest; it cannot imply erasure of prior user restrictions. The
+adapter calls no fresh recall for a historical child, which keeps its selected
+native context. This is a versioned-context strategy; it does not claim deletion
+or replacement of older native history, or guarantee live-model adherence.
+
+The complete selected brief must fit the existing 6,000-character limit.
+Transport divides it at Unicode code-point boundaries into at most 32 fragments,
+each below 900 UTF-8 bytes, including the per-part header. The manifest has the
+same byte bound. Incomplete Unicode and oversized briefs are refused whole,
+without misleading excerpts. The adapter reports degraded context and supplies
+an empty manifest when an otherwise valid recall exceeds the limit. Identical
+briefs retain identical data fragments, so the pinned runtime deduplicates data
+while a new request manifest still identifies the current scope. Changed briefs
+remain in native history until normal Codex compaction; per-turn bounds do not
+establish a fixed lifetime context size.
+
+The capture adapter now preserves voice/text provenance from confirmed public
+user request IDs and applies the latest modality to subsequent public replies.
+Typed steering changes later replies; replaying an old voice source cannot
+reset it. Capture and context retrieval still grant no activity lease on their
+own. Closing during recall rejects late context rather than dispatching it.
+
+Build/type checks and **343 root Node tests** pass on Linux. Seven new transport
+tests include actual pinned Codex with synthetic Responses inference. The real
+runtime receives every multilingual fragment without truncation, keeps memory
+out of public user-message history, inserts unchanged data once, and exposes the
+new manifest separately as developer context. Reply branching at the first
+answer excludes newer parent recall; editing before the first input excludes
+that input's context; neither child changes parent history. Explicit
+`thread/compact/start` reduces accumulated input size, and the next request and
+restart both receive their current manifest. Five parent turns, two child turns
+and one explicit compaction produce exactly eight inference requests. No private
+native storage was edited, paid provider was used, or automatic compaction policy
+was added. Production admission/growth handling and live compaction quality
+remain C6 work.
+
+The preceding connection-check source `1f62a80` passed both Mac jobs in
+[36777339640](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36777339640).
+Debian source/native/Chromium checks and Home passed in
+[36777339540](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36777339540).
+Debian packaging still correctly refuses the unreviewed Codex executable;
+installed-package jobs did not run. This transport needs its own subsequent
+platform CI and does not remove that distribution gate.
+
+## Shared-host memory wiring and pre-turn Stop
+
+`CodexHost` now accepts an explicit shared-memory client dependency. New sessions
+created with it persist a versioned memory capability and register the existing
+`memory_recall` and `memory_source` contracts. The standalone production launcher
+does **not yet supply that dependency**, so its existing memory capability remains
+false. Activation awaits real pinned-host/companion and both-surface qualification;
+this checkpoint does not certify C6 complete or change installed apps.
+
+The host owns each adapter's `codex:<session>` namespace and workspace. Tool
+arguments accept only query or source sequence, never a caller-selected session,
+person, bank or project. Source reads are bound to this conversation. Explicit
+recall uses the companion's bound automatic scopes and the existing configured
+manual library. It cannot retain/delete memory or change its configuration.
+Capture is flushed before source retrieval. Errors and oversized results return
+a generic failure without private diagnostics or partial text; unavailable manual
+recall also strips its diagnostic field. Closing aborts outstanding tool/context
+requests. Shared helper functions accept an injected client for isolated proofs;
+the existing Pi call sites keep their default behavior.
+
+Before a root turn, memory admits one foreground owner and builds the current
+versioned brief. Native acknowledgment attaches that same owner to the confirmed
+turn rather than opening another processing window. Admission remains queued
+until preparation finishes. Stop synchronously pauses the queue and aborts
+lookup before any native dispatch; the original input remains available for
+explicit continuation. An older native turn-start notification during lookup
+cannot acknowledge the waiting request. Lookup cancellation propagates through
+the shared client without allowing a late bind to submit a recall request.
+Steering keeps the current root's continuity; its input style/provenance still
+updates independently.
+
+Committed public messages are captured after durable display writes. Recovery
+is capture-only and opens no lease. Historical children save a durable initial
+display cutoff, excluding inherited parent text from new capture on every
+restart. They add no fresh automatic brief; subsequent child messages have
+their own source namespace. Inherited parent source IDs cannot bypass that
+child-only source boundary. Model/profile changes still require a new or
+explicitly reconciled conversation; account identity does not select a memory
+person or silently redirect its inference route.
+
+Known Browser I/O can open a spare-compute phase only after a bounded native idle
+inventory confirms no child, terminal, goal or hook activity. Unreadable/expired
+inventory keeps foreground state. Later native child activity or hooks revoke
+that permission for the rest of the turn. Voice ownership, shell, Home, memory,
+MCP and unknown/delegated tools also retain foreground state. End, Stop, worker
+failure and close terminate admission. Failed-worker cleanup stays owned even
+after the worker is removed, and shutdown awaits it. Repeated close shares the
+same completion promise. The companion retains its established lease expiry,
+absolute windows, processing pause, budget and inference gateway.
+
+Build/type, **350 root Node tests** and **56 Browser tests** pass on Linux. Six
+new host/tool contracts use synthetic native events and a deterministic memory
+client; a separate new session test covers stale native identity during lookup.
+They verify capture/recall ordering, one owner per turn, restart dedupe, idle
+replay, pre-dispatch Stop and explicit continuation, fixed tool scope, diagnostic
+exclusion, historical cutoffs, child-activity revocation and awaited crash cleanup.
+Existing actual pinned-runtime continuity and isolated Python companion proofs
+also pass in the root suite. The new host-to-companion/model path, real controlled
+inference cancellation, unavailable-service recovery, both loaded interfaces and
+production activation still need dedicated C6 qualification. No paid account or
+private conversation was used in these tests.
+
+Preceding `12f6608` passed both Mac jobs in
+[36779157695](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36779157695),
+and Debian application/native/Chromium and Home checks in
+[36779157808](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36779157808).
+Binary notices still block Debian packaging and downstream installed jobs.
+This host-wiring source needs its own subsequent CI; all remaining C0–C9 gates
+remain open.
+
+## Actual pinned host and memory-companion qualification
+
+Three new root tests run the pinned Codex process with real isolated memory and
+prompt-library Python services and a deterministic Responses provider. This
+exposed a real native startup failure: Browser/Home tools used canonical function
+definitions while memory used legacy definitions. Codex rejects mixed formats.
+Both memory tools now use `type: function`; foreign tool namespaces are refused
+before any memory call. The host contract also checks every registered tool uses
+the canonical format.
+
+The first proof invokes `memory_source` and `memory_recall` through actual native
+tool requests, reads the exact owned voice source and rejects a source from
+another conversation/project. It verifies typed input resets style, historical
+children exclude later parent context and capture only new child messages, capture
+pause stays respected after backfill, reconstruction opens no inference lease,
+and internal context/tool output does not become public transcript memory.
+Administrative export is person-scoped; test assertions select the exact session
+within that export. Model source retrieval remains strictly conversation-scoped.
+
+The second holds one actual companion reply at the transport boundary before
+native dispatch. Stop aborts preparation, preserves the queued input and prevents
+the late reply from starting a model request. Only explicit continuation starts
+one request, under a fresh owner, and captures one user/assistant pair. This is a
+controlled transport-delay proof, not cancellation of Hindsight inference.
+
+The third stops the isolated memory service. Chat completes and its public native
+history remains durable, with a degraded-memory notice. After companion and host
+restart, public history backfills without another model request; the next new
+turn recalls the recovered source. Capture remains deduplicated.
+
+Build/type, **353 root Node tests**, **56 Browser tests** and **eight memory-budget
+tests** pass on Linux. The services run in empty private state with an allowlisted
+environment. No user credentials, conversations or inference routes are used.
+The engine is unconfigured; real controlled-engine/gateway integration, loaded
+native/Browser memory behavior and production activation remain C6 gates. The
+standalone launcher still leaves memory disabled, and installed apps are unchanged.
+
+Previous host-wiring source `c987f40` passed both Mac jobs in
+[36781647508](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36781647508),
+and Debian application/native/Chromium and Home checks in
+[36781647450](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36781647450).
+Binary-notice review still blocks Debian packaging and downstream installed jobs.
+This native registration fix and new proofs need their own subsequent platform CI.
+
+## Actual Codex controlled-memory window and cancellation
+
+An opt-in Linux proof now connects pinned Codex 0.159.2, the real memory companion
+and inference gateway, and the locked Hindsight 0.10.0 image/controlled extension.
+The existing public installer creates a fresh UUID-named container, volume and
+private configuration, on separate loopback ports. Embeddings/reranking stay on
+CPU; the generation target is a local synthetic server. Cleanup verifies and
+removes only these owned test resources. No installed configuration, private
+archive, API key or account is read.
+
+The provider selects the actual registered `browser_tabs_list` tool. A held
+Browser executor creates a verified spare-compute window. One live captured
+user message becomes eligible, and Hindsight's retain stage reaches the actual
+gateway/model connection with streaming enabled and output capped at 4096 tokens.
+Generation is deliberately held. Stop interrupts Codex, closes the upstream
+memory socket, leaves the public source durable and marks that stage stopped.
+Idle time and native-history reconstruction create no retry or new lease.
+Startup and initial idle also produce no model request.
+
+The proof identified an incorrect `browser_tabs` name in the adapter's allowed
+Browser I/O list. That name was never registered. The adapter and focused tests
+now use `browser_tabs_list`, and actual native tool selection verifies the route.
+Unknown, delegated and inference-capable tools retain foreground priority.
+
+Build/type and **all 354 root Node tests** pass on Linux with
+`AUGMENTOR_CODEX_MEMORY_ENGINE_PROOF=1`. Standard runs skip this one explicit Docker
+proof. The preceding checkpoint passed 56 Browser and eight memory-budget tests;
+no Browser UI or shared-budget implementation changed here. This is actual
+engine admission/cancellation evidence with synthetic inference, not completion
+of all retain/consolidate/page stages, memory quality or Mac Docker qualification.
+Loaded native/Browser memory proofs and standalone-launcher activation remain
+before C6 completion. All other C0–C9 gates and the native-binary distribution
+review remain open; no installed app was updated.
+
+## Codex memory launcher and existing interface controls
+
+The development `main.ts` now supplies the existing `promptCall` transport to the
+shared host. New chats persist the memory contract, register source/recall tools,
+capture public messages and select bounded continuity before dispatch. Companion
+startup and user-selected memory/inference settings remain owned by the existing
+shared service. No new model loop, inference destination or account-to-person
+mapping is introduced. Older Codex chats without the recorded memory contract
+remain unchanged; start a new chat to use it. This is source activation, not an
+installed Desktop/Browser rollout or C6 release certification.
+
+Native capabilities now belong to each adapter instance and update from
+`host.describe`; changing one connection cannot mutate another adapter's memory
+flag. Browser initialization also reads the host's actual capability. Its missing
+`augmentor/memory` route now uses the existing shared Memory request helper, with
+the same independent settings and profile restrictions as other harnesses.
+Both existing memory interfaces keep their layout and controls.
+
+The actual Qt proof launches the real standalone host in empty state, configures
+a synthetic local profile without credentials, creates a new conversation and
+uses both Enter and the Send button. The existing Memory dialog pauses capture,
+shows preserved records, resumes capture and receives continuity on the next
+turn. The paused input appears in normal native conversation history but never
+in captured memory or the subsequent memory brief. Internal continuity data is
+absent from the displayed messages. This is offscreen Qt, not physical acceptance.
+
+The loaded Chromium proof now runs against the actual isolated memory companion.
+Its existing queue, steering, Branch/Edit and reload actions retain their earlier
+assertions. New assertions compare captured source text against authoritative
+public native history, including intermediate steering replies, and require only
+new messages in each historical child. The next root turn receives committed
+user continuity, removed queued text is excluded, and tool output/internal
+context never becomes memory text. The actual Settings page's existing manual
+Memory section pauses/resumes the shared setting while preserving the journal.
+
+Build/type, **all 355 root Node tests** with the real-engine opt-in enabled,
+**56 Browser tests**, and **570 native tests** (568 passing, two Mac-only skips)
+pass on Linux. The loaded Browser/standalone Qt proofs use synthetic inference
+and empty configuration; no owner data, key or paid account is used. C6's live
+quality, complete retain/consolidate/page stages and remaining acceptance matrix
+are still open, alongside the rest of C0–C9 and binary distribution review.
+
+CI at preceding `cec1fe4` exposed two concrete test timing issues. Debian's outage
+proof asked scoped export before asynchronous backfill had bound the session;
+it now waits for durable records through the unscoped status read first. Mac 26
+window lifecycle validation asserted animation completion after a fixed 350 ms;
+it now waits at most 1.5 seconds for the actual transition and still requires the
+activity timer to be running. No animation/product behavior was changed.
+Mac 14 passed at that ref. Fresh platform CI is required for this activation.
+
+## Original memory text across Unicode storage boundaries
+
+The shared memory capture client previously split text at fixed 8,000 UTF-16
+code-unit offsets. An emoji crossing that offset became two invalid surrogate
+strings. The Python companion's SQLite write rejected them and rolled back the
+entire capture batch, while Codex's native conversation remained intact. Chunk
+boundaries now preserve each valid surrogate pair. Piece IDs remain sequential
+and deterministic; ordinary existing boundaries are unchanged. No inference,
+identity, schema, conversation history or installed setting is changed.
+
+A new actual pinned-host/real-companion proof first reproduced the lost capture,
+then verified exact reconstruction of a three-piece multilingual message,
+complete assistant capture and restart with identical IDs/content and no model
+replay. It uses synthetic inference and empty state. Malformed source input is
+not silently repaired. Build/type and **all 356 root Node tests** pass on Linux
+with the real-engine opt-in enabled, including existing actual DSH/Pi lifecycle
+checks against the installed qualification host. The preceding `4ac6a54` also
+passed both Mac jobs, Debian application/native/Chromium checks and Home; Debian
+packaging still stops at the unreviewed Codex native executable notice gate.
+These results do not close the remaining C0–C9 provider/account, complete memory
+stage/quality, physical acceptance or distribution requirements.
+
+## Complete scoped memory stages through actual Codex activity
+
+A second opt-in Docker case in `codex-memory-runtime.test.mjs` now completes the
+actual pinned Hindsight pipeline through the actual Codex Browser I/O window.
+Both relationship and work banks finish retain, source-tag-scoped consolidation
+and their managed knowledge page: six durable stages. Cached results include
+consolidated observations and generated page content. An explicit follow-up turn
+receives a marker that exists only in the derived page, distinguishing saved-page
+injection from raw source continuity. The fixture explicitly resumes the queue
+after Stop, matching the existing paused-queue contract.
+
+Remaining seconds/tokens stay within the ordinary shared budget; shutdown and
+restart preserve the complete job receipt and its exact remaining budget. Startup,
+idle and reconstructed native history cause no extra inference. Memory calls use
+the separate gateway while only two chat-model requests run through Codex's own
+loop. The disposable engine and real companions use fresh state and deterministic
+synthetic extraction/consolidation/page replies. This proves complete stage
+execution and delivery, not real-model classification, page quality, physical
+acceptance or Mac Docker qualification. Standard CI skips both explicit Docker
+cases. The seven focused real-host/companion tests pass on Linux with both engine
+cases enabled. **All 357 root Node tests** also pass with both Docker proofs
+enabled. Preceding `f4f8d87` passed both Mac jobs and Debian application/Home
+checks; Debian packaging retains the unreviewed native executable notice gate.
+Full C0–C9 and native-binary release review remain open.
+
+## Local Qwen compatibility diagnosis and separate candidate
+
+A fresh real `checkAgent` request confirms the existing local endpoint rejects
+Codex's base/developer instruction combination with HTTP 400 before inference.
+The running llama.cpp Responses converter adds the base system message and its
+template layer maps developer messages to further system messages. The current
+Qwen template rejects the latter. [The candidate helper and evidence](CODEX-LOCAL-QWEN.md)
+preserve later instruction text rather than discarding it, write a separate file
+and leave the running service unchanged. Actual offline parser/rendering tests
+reproduce original rejection, preserve developer/correction order with the
+candidate and verify byte-identical ordinary single-system rendering. Activation
+requires an owner decision under the model-settings preservation instructions;
+after it, real tools/stream/Stop/resume and other-harness regression checks remain.
+`70935e8` passed both Mac jobs and Debian application/Home checks; Debian packaging
+still stops at the unreviewed Codex native executable notice gate.
+
+## Secure credential dependencies and positive Linux proof
+
+The OS credential helper was written against `keyring`, but release dependencies
+did not include it. Synthetic unit stores could not detect the installed failure.
+[The correction](CODEX-CREDENTIALS.md) declares Debian's native Secret Service
+libraries/provider and adds five complete hashed Python wheels to Mac's exact
+package inventory. Original dependency pins remain unchanged. A new proof uses
+actual `OsCredentialStore`, helper processes and an isolated real Secret Service
+on the pinned Debian image. Roundtrip, update, reference isolation, repeated
+removal and cleanup pass; no owner wallet/configuration or provider credential
+is used. The helper/unit and Mac inventory checks also pass, and all added wheel
+hashes/notices/dependency edges were verified. At `0726234`, both Mac 14/26 jobs
+pass actual Keychain proofs using the build, Desktop and standalone Browser
+companion interpreters, plus package inventory/signature checks. Debian application
+and Home checks pass; the existing Codex native notice gate still blocks packaging.
+This qualifies isolated Linux/Mac native storage, not the owner's wallet, live OAuth,
+API-provider inference or full distribution acceptance. The local Qwen activation
+decision and all remaining C0–C9 gates stay open.
+
+
+## October 1 private-source cleanup
+
+The owner authorized removing the private speech-source test archive while
+preserving Augmentor and Codex work. See [cleanup and current test boundaries](CODEX-SOURCE-CLEANUP.md). The adapter remains intact; the current public
+voice tests use an independently authored scripted protocol peer. Earlier
+service-source tests above are historical evidence, not current CI coverage.

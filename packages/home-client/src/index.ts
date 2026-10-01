@@ -34,10 +34,19 @@ export async function homeTool(name:string,args:any,session:string,callId:string
  if(name==='home_status')return homeFetch(c,'/capabilities',undefined,signal);
  const path=statePath();mkdirSync(dirname(path),{recursive:true,mode:0o700});
  const db=new DatabaseSync(path);db.exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL; CREATE TABLE IF NOT EXISTS receipts(home TEXT NOT NULL,call TEXT NOT NULL,id TEXT NOT NULL,status TEXT NOT NULL,PRIMARY KEY(home,call));");
+ db.exec('PRAGMA busy_timeout=5000; CREATE TABLE IF NOT EXISTS receipt_owners(home TEXT NOT NULL,id TEXT NOT NULL,owner TEXT NOT NULL,PRIMARY KEY(home,id))');
  const home=createHash('sha256').update(c.url+':'+c.token).digest('hex');
  const call=createHash('sha256').update(session+':'+callId).digest('hex');
  try{
-  if(name==='home_cancel')return homeFetch(c,'/cancel',{},signal);
+  if(name==='home_cancel'){
+   if(args.request_id!==undefined){
+    if(typeof args.request_id!=='string'||!/^[-a-zA-Z0-9_]{1,100}$/.test(args.request_id))throw Error('Invalid Home request ID');
+    const capabilities=await homeFetch(c,'/capabilities',undefined,signal);
+    if(capabilities.requests?.cancelById!==true)throw Error('This Home server does not support request-specific cancellation. Use its own Stop control.');
+    return homeFetch(c,'/requests/'+args.request_id+'/cancel',{},signal);
+   }
+   return homeFetch(c,'/cancel',{},signal);
+  }
   if(name==='home_result'){
    if(typeof args.request_id!=='string'||!/^[-a-zA-Z0-9_]{1,100}$/.test(args.request_id))throw Error('Invalid Home request ID');
    const result=await homeFetch(c,'/requests/'+args.request_id,undefined,signal);
@@ -49,7 +58,13 @@ export async function homeTool(name:string,args:any,session:string,callId:string
   if(prior)return homeFetch(c,'/requests/'+prior.id,undefined,signal);
   const pending=db.prepare("SELECT id FROM receipts WHERE home=? AND status='unknown'").get(home) as any;
   if(pending)return {status:'unknown',request_id:pending.id,reply:'Retrieve the existing Home request with home_result before submitting another action.'};
-  const id=randomUUID();db.prepare("INSERT INTO receipts VALUES(?,?,?,'unknown')").run(home,call,id);
+  const id=randomUUID();
+  db.exec('BEGIN IMMEDIATE');
+  try{
+   db.prepare("INSERT INTO receipts VALUES(?,?,?,'unknown')").run(home,call,id);
+   db.prepare('INSERT INTO receipt_owners VALUES(?,?,?)').run(home,id,createHash('sha256').update(session).digest('hex'));
+   db.exec('COMMIT');
+  }catch(error){db.exec('ROLLBACK');throw error;}
   let admitted=false;
   try{
    await homeFetch(c,name==='home_set'?'/device-actions':'/ask',{request_id:id,session_id:createHash('sha256').update(session).digest('hex'),...(name==='home_set'?{action:args}:{prompt:args.prompt,read_only:name==='home_read'}),async:true},signal);
@@ -68,5 +83,18 @@ export async function homeTool(name:string,args:any,session:string,callId:string
    if(!admitted&&[400,401,403,409,413,415,429].includes((error as any).status)){db.prepare("UPDATE receipts SET status='rejected' WHERE home=? AND call=?").run(home,call);throw error;}
    return {status:'unknown',request_id:id,reply:'Connection interrupted. The NAS may still be working; retrieve this request rather than submitting it again.'};
   }
+ }finally{db.close();}
+}
+
+
+/** Receipt ownership is local authority; an ID quoted by a model is not. */
+export function homeRequestOwned(session:string,id:string):boolean {
+ const c=connection(),path=statePath();if(!c||!existsSync(path))return false;
+ const db=new DatabaseSync(path,{readOnly:true});
+ try{
+  if(!db.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='receipt_owners'").get())return false;
+  const home=createHash('sha256').update(c.url+':'+c.token).digest('hex');
+  const owner=createHash('sha256').update(session).digest('hex');
+  return Boolean(db.prepare('SELECT 1 FROM receipt_owners WHERE home=? AND owner=? AND id=?').get(home,owner,id));
  }finally{db.close();}
 }

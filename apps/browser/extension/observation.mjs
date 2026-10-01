@@ -63,7 +63,7 @@ export async function snapshotPage({offset = 0, controlOffset = 0, linkOffset = 
         nextOffset: offset + 6000 < fullText.length ? offset + 6000 : null,
         controlOffset, totalControls: allControls.length, nextControlOffset: controlOffset + 60 < allControls.length ? controlOffset + 60 : null,
         linkOffset, totalLinks: allLinks.length, nextLinkOffset: linkOffset + 40 < allLinks.length ? linkOffset + 40 : null}
-      return {title: document.title, url: location.href, text: fullText.slice(offset, offset + 6000).join(''), controls, page,
+      return {title: document.title, url: location.href, documentEpoch: performance.timeOrigin, text: fullText.slice(offset, offset + 6000).join(''), controls, page,
         readyState: document.readyState, inaccessibleFrames,
         links: allLinks.slice(linkOffset, linkOffset + 40).map(a => ({text: (a.innerText || '').trim().slice(0, 80), href: a.href}))}
     } finally { if (overlay) overlay.style.display = display }

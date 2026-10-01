@@ -19,12 +19,12 @@ export class PiConnection {
   fail(error:Error){if(this.closed)return;this.closed=true;this.socket.destroy();for(const row of this.pending.values()){clearTimeout(row.timer);row.reject(error);}this.pending.clear();this.disconnected(error);}
   call(method:string,params:Record<string,unknown>={},id:string=randomUUID()):Promise<any>{
     if(this.closed)return Promise.reject(new Error('Harness connection is closed'));
-    return new Promise((resolve,reject)=>{const timer=setTimeout(()=>{this.pending.delete(id);reject(new Error('Request timed out; verify the outcome before retrying.'));},method==='tools.execute'?130000:30000);this.pending.set(id,{resolve,reject,timer});this.socket.write(JSON.stringify({id,method,params})+'\n');});
+    return new Promise((resolve,reject)=>{const timer=setTimeout(()=>{this.pending.delete(id);reject(new Error('Request timed out; verify the outcome before retrying.'));},method==='tools.execute'?130000:(method.startsWith('profiles.')||method==='prompt.improve')?65000:30000);this.pending.set(id,{resolve,reject,timer});this.socket.write(JSON.stringify({id,method,params})+'\n');});
   }
   close(){this.socket.destroy();}
-  static async open(event?:(frame:any)=>void,disconnected?:(error:Error)=>void,harness:'pi'='pi'){
-    if(harness!=='pi')throw new Error('Only Pi uses this runtime connection.');
-    const prefix='AUGMENTOR_PI';
+  static async open(event?:(frame:any)=>void,disconnected?:(error:Error)=>void,harness:'pi'|'codex'='pi'){
+    if(!['pi','codex'].includes(harness))throw new Error('This harness does not use the shared runtime connection.');
+    const prefix='AUGMENTOR_'+harness.toUpperCase();
     const env=componentEnvironment();
     const state=env[prefix+'_STATE']??join(env.XDG_STATE_HOME??join(homedir(),'.local/state'),'augmentor-'+harness);const path=env[prefix+'_SOCKET']??join(state,'runtime.sock');
     const dial=()=>new Promise<Socket>((resolve,reject)=>{const s=connect(path);s.once('connect',()=>resolve(s));s.once('error',reject);});

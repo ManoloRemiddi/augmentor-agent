@@ -31,6 +31,27 @@ DSH personal surfaces now share the agent, tools and speech engine; see [shared 
 Current source/ref and qualification: [agent handoff](AGENT-HANDOFF.md).
 Dated candidate sections below retain their original version-specific evidence.
 
+Codex is an opt-in development engine with a [separately installed pinned CLI](CODEX-PACKAGING.md#separately-installed-runtime--october-1);
+the Linux/Mac installers exclude its supplier binaries. [Native credential packaging and isolated
+Linux storage](CODEX-CREDENTIALS.md) and actual Mac 14/26 Keychain storage now
+have positive isolated proof, including packaged Desktop/Browser companion
+interpreters. [OAuth/account lifecycle primitives](CODEX-ACCOUNTS.md) now have
+synthetic transaction and real Linux account-store evidence. Installed owner-wallet
+recovery, login UI/worker wiring and real subscription acceptance remain open.
+The existing local Qwen endpoint remains
+[unqualified pending a reviewed formatting change and live tool tests](CODEX-LOCAL-QWEN.md). Its [current evidence](CODEX-INTEGRATION.md)
+covers API/local profile forms, shared chat/Stop/history, approvals/questions,
+scoped Browser tools/screenshots and consented desktop tools with real Chromium
+and Plasma VM proofs against a synthetic provider. API/local prompt improvement,
+paired Home tools and [Desktop/Browser queue/steering](QUEUE-AND-STEERING.md#codex-development-integration)
+and [exact Branch/Edit controls](CODEX-INTEGRATION.md#desktop-and-browser-exact-branchedit-controls)
+also have source qualification. [Codex memory source activation and existing controls](CODEX-INTEGRATION.md#codex-memory-launcher-and-existing-interface-controls)
+now have actual isolated Qt/Chromium and controlled-engine cancellation evidence.
+Shared voice transport is also qualified with synthetic boundaries. The tables
+below retain the DSH/Pi comparison; they do not certify Codex parity. Subscription
+login, generic MCP, full memory/voice acceptance, unconfirmed creation reconciliation
+and complete release qualification remain open.
+
 Release scope: DSH is the full-featured target; Pi is a supported subset.
 Additional Pi extensions and Windows are deferred. The Linux evidence below does
 not establish macOS feature qualification. See the cross-platform release ledger.
@@ -197,3 +218,17 @@ See [contract and qualification](BOUNDED-EXECUTION-RECOVERY.md).
 ## 0.2.10 recovery scope
 
 Both DSH Augmentor presets include [action-aware recovery](BOUNDED-EXECUTION-RECOVERY.md#action-aware-recovery--0210-preview). Exact duplicate changes and uncertain/background outcomes are guarded during automatic recovery; normal explicit tasks retain their behavior. Pi and delegated agents are outside this adapter. This is execution protection, not semantic task verification.
+
+
+Codex development source also supports the shared Improve prompt controls for
+API/local profiles on both surfaces, using an isolated tool-free request and no
+chat history. Subscription usage remains unavailable. See
+[draft improvement evidence](CODEX-INTEGRATION.md#apilocal-draft-improvement) for
+fixture coverage, cancellation semantics and remaining live/UI qualification.
+
+
+New Codex development chats also expose paired Home tools through the existing
+NAS client. Shared pairing works on both surfaces; request receipt access is
+conversation-scoped, and cancellation requires the newer NAS request-specific
+endpoint. The NAS stays DSH-owned. Existing chats/deployments do not gain these
+capabilities implicitly. [Evidence and limits](CODEX-INTEGRATION.md#paired-home-tools).

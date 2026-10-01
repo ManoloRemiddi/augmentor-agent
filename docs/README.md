@@ -27,6 +27,13 @@ Current cross-platform direction: [one product, Linux/Mac parity audit and corre
 
 ## Start and understand the product
 
+- [Codex integration build plan: Desktop, Browser and connection profiles](CODEX-INTEGRATION-PLAN.md) — full C0–C9 scope and acceptance gates.
+- [Codex implementation and evidence](CODEX-INTEGRATION.md) — runtime foundation, reproducible proofs and remaining integration work.
+- [Codex packaging inventory and release gates](CODEX-PACKAGING.md)
+- [Local Qwen compatibility, candidate and activation boundary](CODEX-LOCAL-QWEN.md)
+- [Codex secure credentials, release dependencies and native-store proofs](CODEX-CREDENTIALS.md)
+- [Codex ChatGPT accounts, shared Desktop/Browser login controls and remaining inference integration](CODEX-ACCOUNTS.md)
+- [Private speech-source cleanup and current synthetic voice test boundaries](CODEX-SOURCE-CLEANUP.md)
 - [Start here: agent handoff](AGENT-HANDOFF.md)
 - [Current architecture](ARCHITECTURE.md)
 - [One personal agent, two presentations](SHARED-SURFACES-2026-09-24.md)
@@ -44,7 +51,7 @@ Current cross-platform direction: [one product, Linux/Mac parity audit and corre
 - [Optional manual memory library](MEMORY.md)
 - [Improve a draft](PROMPT-IMPROVEMENT.md)
 - [Saved prompts and DSH commands](SLASH-COMMANDS.md)
-- [Native DSH queue and steering](QUEUE-AND-STEERING.md)
+- [Queued prompts and steering (DSH native and Codex Desktop/Browser)](QUEUE-AND-STEERING.md)
 - [Linux reply completion](REPLY-COMPLETION.md)
 - [Bounded DSH execution recovery and response validity](BOUNDED-EXECUTION-RECOVERY.md)
 - [Augmentor Pi client protocol v1](PROTOCOL.md)

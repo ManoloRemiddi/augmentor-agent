@@ -9,5 +9,5 @@ if '--harness' in sys.argv:
 else:
     from augmentor_linux.preferences import Preferences
     harness=Preferences().values['harness']
-if harness=='pi':ensure_running(harness)
-elif harness!='dsh':raise SystemExit('Only DSH and Pi are supported.')
+if harness in ('pi','codex'):ensure_running(harness)
+elif harness!='dsh':raise SystemExit('Choose DSH, Pi or Codex.')

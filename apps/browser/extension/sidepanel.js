@@ -12,12 +12,28 @@
  */
 
 import { createChatUI } from './chat-render.js'
+import {codexQuestions} from './codex-questions.mjs'
+import {createQueue} from './queue.mjs'
 import { submitDraft } from './prompt-send.mjs'
 import { attachVoice } from './voice.mjs'
 import { attachPromptLibrary } from './prompt-library.mjs'
 
 let surfaceCapabilities={branch:false,edit:false},editingMessage=null
 const answeredInteractions=new Set()
+const activeCodexQuestions=new Map()
+let approvalPresenter,approvalReconnect,approvalPageClosed=false
+function connectApprovalPresenter(){
+  if(approvalPageClosed||!chrome.runtime.connect)return
+  try{
+    approvalPresenter=chrome.runtime.connect({name:'augmentor-approval-presenter'})
+    approvalPresenter.onDisconnect.addListener(()=>{
+      approvalPresenter=null
+      if(!approvalPageClosed)approvalReconnect=setTimeout(connectApprovalPresenter,1000)
+    })
+  }catch{if(!approvalPageClosed)approvalReconnect=setTimeout(connectApprovalPresenter,1000)}
+}
+connectApprovalPresenter()
+window.addEventListener('pagehide',()=>{approvalPageClosed=true;for(const controller of activeCodexQuestions.values())controller.abort();clearTimeout(approvalReconnect);approvalPresenter?.disconnect()},{once:true})
 const ui = createChatUI({
   actionEnabled:name=>surfaceCapabilities[name]&&!viewSessionId,
   onMessageAction:messageAction,
@@ -45,6 +61,7 @@ function send(type, payload) {
   return chrome.runtime.sendMessage({ type, ...payload })
 }
 
+const queue=createQueue({container:document.getElementById('prompt-queue'),input:document.getElementById('input'),send})
 const voice=attachVoice({send,onError:message=>ui.sendFail(message),isHistory:()=>!!viewSessionId})
 attachPromptLibrary({input:document.getElementById('input'),send})
 import {watchAppearance,refreshDesktopAppearance} from './appearance.mjs'
@@ -419,15 +436,28 @@ async function refresh() {
     // requests the full history — a fresh panel load replays the whole chat.
     const res = await send('log', { sinceSeq: ui.lastSeq })
     if(!res||serial!==refreshSerial)return
+    queue.update(res,!!viewSessionId)
     voice.update(res,!!viewSessionId)
     surface.update(res)
     surfaceCapabilities=res.capabilities??surfaceCapabilities
     setupNotice.hidden=res.phase!=='needs-setup';setupNotice.textContent=res.harness==='dsh'?'Connect DSH in Settings':'Connect a model in Settings'
 
+    for(const [id,controller] of activeCodexQuestions)if(!(res.interactions??[]).some(row=>row.id===id))controller.abort()
     for(const row of res.interactions??[]){
       if(answeredInteractions.has(row.id))continue;answeredInteractions.add(row.id)
+      if(res.harness==='codex'){
+        const claim=await send('interaction/claim',{id:row.id})
+        if(!claim?.ok){answeredInteractions.delete(row.id);continue}
+      }
       const p=row.params;let value
       if(row.method==='approval.requested')value={outcome:window.confirm((p.toolName??'Action')+'\n'+(p.reason??'Allow this action?'))?'allowed-once':'denied'}
+      else if(res.harness==='codex'){
+        const controller=new AbortController();activeCodexQuestions.set(row.id,controller)
+        const answers=await codexQuestions(document,p.questions??[],controller.signal)
+        activeCodexQuestions.delete(row.id)
+        if(controller.signal.aborted)continue
+        value=answers?{answer:{answers}}:{cancelled:true}
+      }
       else {const answers=[];for(const q of p.questions??[]){const answer=window.prompt(q.question+(q.options?.length?'\n'+q.options.map(o=>o.label).join(' / '):''),q.prefill??'');if(answer!==null)answers.push({id:q.id,selected:[],custom:answer})}value={answer:{answers}}}
       const outcome=await send('interaction/respond',{id:row.id,value})
       if(!outcome?.ok)ui.sendFail(outcome?.error??'The decision was not confirmed.')
@@ -445,6 +475,7 @@ async function refresh() {
 if (globalThis.chrome?.runtime?.onMessage) {
   chrome.runtime.onMessage.addListener((msg) => {
     if (msg?.type !== 'evt') return
+    queue.update(msg,!!viewSessionId)
     voice.update(msg,!!viewSessionId)
     surface.update(msg)
     surfaceCapabilities=msg.capabilities??surfaceCapabilities
@@ -453,6 +484,7 @@ if (globalThis.chrome?.runtime?.onMessage) {
     // The SW pushes each new log entry with the event: render it directly.
     // The old per-event 'log' round-trip plus the 2 s poll is what made
     // streaming arrive in blocks.
+    if (msg.entry?.kind==='queue') return
     if (msg.entry) {
       // In a DSH view only that session's events render (the SW's own
       // transcript stays in its own log).
@@ -619,7 +651,10 @@ ui.setState = (s) => {
   _setState(s)
   const running = ui.state.running
   surface.update(ui.state)
-  document.getElementById('send').hidden = running
+  const canQueue=queue.enabled&&!viewSessionId
+  document.getElementById('send').hidden = running&&!canQueue
+  document.getElementById('send').disabled=ui.state.phase!=='ready'||!!ui.state.submitting||running&&!canQueue
+  document.getElementById('send').title=running&&canQueue?'Queue prompt · Enter':'Send · Enter (Shift+Enter for a new line)'
   document.getElementById('stop').hidden = !running
   modelBtn.disabled = running || !!ui.state.submitting
   cancelEdit.disabled = !!ui.state.submitting
@@ -873,6 +908,7 @@ async function pickAccess(value) {
 
 async function doSend() {
   if (viewSessionId || surface.improving) return
+  if(ui.state.running&&queue.enabled){await queue.submit();return}
   const input = document.getElementById('input')
   await submitDraft({input, ui, send,
     prepare: async () => {

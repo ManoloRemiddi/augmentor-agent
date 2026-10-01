@@ -72,3 +72,25 @@ class QueueTests(unittest.TestCase):
         p=QueuePanel();p.submitted('rpc','/goal pause')
         p.submission_result({'id':'rpc','accepted':True,'command':True})
         self.assertFalse(p.pending);self.assertFalse(p.items);p.close()
+
+    def test_codex_unknown_and_paused_queue_honors_host_action_flags(self):
+        p=QueuePanel();p.running=True
+        row={**item(placement='steering'),'stateLabel':'Not confirmed — check before retrying','canSteer':False,'canRemove':False}
+        p.replace([row])
+        self.assertTrue(all(not b.isEnabled() for b in p.findChildren(QPushButton)))
+        p.replace([{**item(),'stateLabel':'Paused','canSteer':False,'canRemove':True}])
+        buttons=[b for b in p.findChildren(QPushButton) if not b.isHidden()]
+        self.assertFalse(next(b for b in buttons if b.text()=='Steer').isEnabled())
+        self.assertTrue(next(b for b in buttons if b.text()=='×').isEnabled());p.close()
+
+    def test_codex_queue_promotion_uses_the_observed_turn_identity(self):
+        calls=[]
+        c=Controller(client=SimpleNamespace(call=lambda *args:calls.append(args) or {'accepted':True}),harness='codex')
+        c.session='s';c.online=True;c.task=lambda fn:fn()
+        c.frame({'method':'session/queue','payload':{'sessionId':'s','activeTurnId':'turn-1','items':[]}})
+        c.update_queue('queued','steer')
+        self.assertEqual(calls[-1][1]['expectedTurnId'],'turn-1')
+        c.frame({'method':'session/queue','payload':{'sessionId':'other','activeTurnId':'foreign','items':[]}})
+        c.update_queue('queued','steer')
+        self.assertEqual(calls[-1][1]['expectedTurnId'],'turn-1')
+        c.close()

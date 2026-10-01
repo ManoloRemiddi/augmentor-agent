@@ -24,6 +24,8 @@ import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
 HEADER = '# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0\n'
+COMPANION_PYTHON_PACKAGES = ('PyYAML', 'websocket-client', 'keyring',
+                            'jaraco.classes', 'jaraco.context', 'jaraco.functools', 'more-itertools')
 
 
 def build_launcher(destination, component, minimum_macos):
@@ -174,7 +176,7 @@ def main():
         shutil.rmtree(site)
         site.mkdir(parents=True)
         from importlib.metadata import distribution
-        for name in ('PyYAML','websocket-client'):
+        for name in COMPANION_PYTHON_PACKAGES:
             package=distribution(name)
             for entry in package.files or ():
                 relative=Path(str(entry))
@@ -192,8 +194,8 @@ def main():
         if path.is_symlink() and os.path.isabs(os.readlink(path)):
             raise RuntimeError('The Python distribution contains a non-relocatable symlink: '+str(path.relative_to(python)))
     subprocess.run([str(python/'bin/python3'),'-I','-c',
-        ('import sys,PySide6,numpy,websocket,yaml,sounddevice,onnxruntime; from PySide6.QtWidgets import QApplication; print(sys.prefix)' if desktop else
-         'import sys,websocket,yaml,importlib.util; assert importlib.util.find_spec("PySide6") is None; print(sys.prefix)')],check=True)
+        ('import sys,PySide6,numpy,websocket,yaml,sounddevice,onnxruntime; from keyring.backends.macOS import Keyring; from PySide6.QtWidgets import QApplication; print(sys.prefix)' if desktop else
+         'import sys,websocket,yaml,importlib.util; from keyring.backends.macOS import Keyring; assert importlib.util.find_spec("PySide6") is None; print(sys.prefix)')],check=True)
     subprocess.run([str(python/'bin/python3'),'-I','-B',str(ROOT/'scripts/python-license-inventory.py'),
         '--out',str(project/'licenses/python-inventory.json')],check=True)
     item = config['node']
@@ -223,7 +225,7 @@ def main():
         'licenseReviewComplete':dsh_payload['licenseReviewComplete']}
     if not desktop:
         packaged_config.pop('qt',None);packaged_config.pop('pythonBindings',None)
-        packaged_config['pythonPackages']={name:config['pythonPackages'][name] for name in ('PyYAML','websocket-client')}
+        packaged_config['pythonPackages']={name:config['pythonPackages'][name] for name in COMPANION_PYTHON_PACKAGES}
     (project/'release.json').write_text(json.dumps({**product,**packaged_config,'channel':channel,'component':args.component,'sourceCommit':args.source_commit,'signedForDistribution':False,'notarized':False},indent=2)+'\n')
     if desktop:
         native=project/'native';native.mkdir(exist_ok=True)

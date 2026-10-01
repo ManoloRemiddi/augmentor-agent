@@ -86,7 +86,8 @@ const chrome = {
     onMessage: { addListener: (fn) => runtimeListeners.push(fn) },
     sendMessage: () => Promise.resolve(),
   },
-  sidePanel: { setPanelBehavior: () => {}, setOptions: () => {} },
+  action: { onClicked: { addListener: () => {} } },
+  sidePanel: { open: async () => {}, setPanelBehavior: () => {}, setOptions: () => {} },
   storage: {
     local: {
       get: (_keys, cb) => cb({}),

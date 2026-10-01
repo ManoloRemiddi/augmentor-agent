@@ -37,6 +37,7 @@ def configure():
             raise RuntimeError('Augmentor needs a private runtime directory owned by this user.')
         os.environ['XDG_RUNTIME_DIR'] = str(runtime)
         os.environ.setdefault('AUGMENTOR_PI_SOCKET', str(runtime/'pi.sock'))
+        os.environ.setdefault('AUGMENTOR_CODEX_SOCKET', str(runtime/'codex.sock'))
         os.environ.setdefault('AUGMENTOR_SHARED_STATE', str(runtime/'shared'))
 
 

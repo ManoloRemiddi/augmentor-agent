@@ -2,6 +2,31 @@
 
 # Source baselines and migration inventory
 
+## Codex foundation — 30 September 2026
+
+`@openai/codex` 0.159.2 is pinned as a **development dependency** in the root
+lockfile. Production artifacts require the [separately installed exact CLI](CODEX-PACKAGING.md#separately-installed-runtime--october-1)
+and do not redistribute its supplier binaries. The installed Linux x64
+app-server passes the isolated fixture protocol/tool/history proof described in
+[Codex implementation evidence](CODEX-INTEGRATION.md). Its declared license is
+Apache-2.0. Other target binaries, real providers, OAuth eligibility and product
+surface integration remain unqualified; this pin is not a release certification.
+
+The current [connection check](CODEX-INTEGRATION.md#codex-model-and-tool-connection-check)
+also exercises native dynamic-tool calls and empty `environments` through this
+exact runtime. Synthetic provider evidence covers shell/file-tool exclusion,
+nonce/receipt verification and shutdown cleanup. It does not certify a live
+model/provider or authentication eligibility.
+
+## ChatGPT identity verifier — October 1
+
+`jose` **6.2.12** is pinned and locked for the
+[internal OAuth/account implementation](CODEX-ACCOUNTS.md). The actual installed
+package and lock agree on the MIT license; its original `LICENSE.md` SHA-256 is
+`8078b0829d6c3e9ecde2f003e1966e4cad3efc6e7a640efbab0313cc166b1af1`.
+Real cryptographic identity checks and synthetic OpenAI transport pass on Linux.
+This does not qualify live sign-in, subscription eligibility or installed login.
+
 ## Home preview — 24 September 2026
 
 `apps/home/package-lock.json` pins the exercised DSH 0.1.5-rc.1 packages,
@@ -252,3 +277,15 @@ completion is checked against durable failure counts because its public return
 value omits internal failures. Streaming gateway assembly was tested against the
 existing Qwen endpoint, including real cancellation. DSH surface replacement and
 Pi lifecycle hooks retain their pinned versions. See [contract and evidence](CONTROLLED-MEMORY.md).
+
+
+### Codex voice development contract
+
+Codex's shared voice adapter requires a separately installed Resonant Voice
+companion with the scoped bridge contract. Public tests use the independently
+written [synthetic protocol peer](../tests/fixtures/codex/VOICE.md), with fixed
+transcripts and PCM. They do not include or qualify private service source.
+The former source archive and reproduction helper were removed in the
+[October 1 cleanup](CODEX-SOURCE-CLEANUP.md). Installed speech, models and device
+placement are unchanged; production companion/physical-audio qualification
+remains separate.

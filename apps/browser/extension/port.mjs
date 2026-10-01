@@ -17,6 +17,7 @@
  * drops everything with the disconnect error, and the reply path settles
  * by id. The wire vocabulary is the shared one (see wire.mjs header).
  */
+import {approvalPresenters} from './approval-presenters.mjs'
 import {
   state,
   log,
@@ -111,13 +112,17 @@ export function ensurePort() {
     if(msg.id!==undefined&&['approval.requested','question.requested'].includes(msg.method)){
       state.interactions=state.interactions.filter(row=>row.id!==msg.id);state.interactions.push(msg);broadcast();return
     }
-    if(msg.method==='interaction.resolved'){state.interactions=state.interactions.filter(row=>row.id!==msg.params.rpcId);broadcast();return}
+    if(msg.method==='interaction.resolved'){approvalPresenters.resolve(msg.params.rpcId);state.interactions=state.interactions.filter(row=>row.id!==msg.params.rpcId);broadcast();return}
     if(msg.method==='voice.event'){
       chrome.runtime.sendMessage({type:'voice/event',event:msg.params}).catch(()=>{});return
     }
     // Notifications: session.event / session.status / subagent.*
     if (msg.method === 'session.event') {
       onSessionEvent(msg.params)
+      return
+    }
+    if (msg.method === 'session.queue') {
+      if (state.harness==='codex' && msg.params?.sessionId===state.sessionId) {state.queue=msg.params;broadcast({kind:'queue',sessionId:state.sessionId})}
       return
     }
     if (msg.method === 'session.error') {
@@ -150,7 +155,7 @@ export function ensurePort() {
     if(hello.protocol!=='augmentor/1'||hello.version!==chrome.runtime.getManifest().version)throw Error('Update the Augmentor extension and companion together, then reconnect.')
     const savedHarness=await new Promise(resolve=>chrome.storage.local.get(['augmentor-harness','augmentor-session-id','augmentor-model-selection'],resolve))
     state.harness=storedHarness(savedHarness)
-    if(!state.harness)throw new Error('The previously selected harness is no longer supported. Choose DSH or Pi in Settings. Saved conversations and model settings are retained.')
+    if(!state.harness)throw new Error('The previously selected harness is no longer supported. Choose DSH, Pi or Codex in Settings. Saved conversations and model settings are retained.')
     const adapter=await request('harness.select',{harness:state.harness})
     if(adapter.protocol!=='augmentor/1')throw new Error('Incompatible Augmentor bridge. Update the extension and host together.')
     const stored = await loadStoredSelection()
@@ -245,6 +250,7 @@ function scheduleReconnect(message) {
 }
 
 export function fail(message) {
+  if(state.harness==='codex'){approvalPresenters.clear();state.interactions=[]}
   state.phase = 'error'
   state.error = message
   const old=state.port;state.port=null;old?.disconnect()
@@ -273,7 +279,7 @@ export function request(method, params) {
   // 0.1.18: 20s, not 60s — a lost response (dead port, dropped frame)
   // should fail the UI fast enough that the panel's retry can recover it.
   // F5: the timeout now lives in the canonical Pending table.
-  return state.pending.add(id, { timeoutMs: method==='augmentor/surface'&&params?.action==='improve'?80000:method==='augmentor/onboarding'?40000:20000 })
+  return state.pending.add(id, { timeoutMs: method==='augmentor/codex'?70000:method==='augmentor/surface'&&params?.action==='improve'?80000:method==='augmentor/onboarding'?40000:20000 })
 }
 
 // 0.1.18: self-heal for user-initiated reads. The old path returned a stale
@@ -345,6 +351,7 @@ export function onSessionEvent(params) {
 export function resetHarnessPort(){
   if(reconnectTimer){clearTimeout(reconnectTimer);reconnectTimer=null}
   const old=state.port;state.port=null;old?.disconnect();state.pending.dropAll(new Error('Harness changed'))
+  approvalPresenters.clear()
   state.phase='disconnected';state.error=null;state.catalog=null;state.selection=null;state.sessionReady=false;state.sessionId='augmentor-'+crypto.randomUUID();state.log=[];state.interactions=[];state.panelViewSession=null;state.capabilities={branch:false,edit:false}
   ensurePort()
 }

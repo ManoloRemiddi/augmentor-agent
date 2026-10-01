@@ -1,0 +1,636 @@
+{
+  "schema": "augmentor-codex-native-observation/1",
+  "version": "0.159.2-linux-x64",
+  "npmIntegrity": "sha512-RrCZ1X52wpa1lOsXtCtSyhjOFdQPh7LH5Ccv8HsKmd/2UXbUwxXFqWXFK3JzatquUNGtW/TLox5Y7qVOGkV0/Q==",
+  "npmArchive": "https://registry.npmjs.org/@openai/codex/-/codex-0.159.2-linux-x64.tgz",
+  "platform": "linux-x64",
+  "releaseApproval": false,
+  "scope": "Observed supplier binary inventory. License, ABI and source coverage remain release gates.",
+  "files": [
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/bin/codex",
+      "sha256": "1748767b230ebfc3d4ab7e4e254920d0c0ad9691fd8c11f190e7d44511a4a92e",
+      "bytes": 286754152,
+      "needed": [],
+      "versionRequirements": []
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/bin/codex-code-mode-host",
+      "sha256": "5b2c075ac2380fa04d76d7313fbc044d29c8d0a0d0b9138415acd4610211ca03",
+      "bytes": 74068880,
+      "needed": [],
+      "versionRequirements": []
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-path/rg",
+      "sha256": "e62198eb19b136b88c330af83647b5a962cb99b6b1f066758568f12de1974849",
+      "bytes": 5408904,
+      "needed": [],
+      "versionRequirements": []
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/bwrap",
+      "sha256": "77360cb751ccedc5971391444ac86a8a33c15b04d6b4a6fe45f5d25496e62c4c",
+      "bytes": 529776,
+      "needed": [],
+      "versionRequirements": []
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/bin/codex-voice-host",
+      "sha256": "ec657f62509489459849219047bf397f05c0a09c5d2f092a07c9edbdfb89c769",
+      "bytes": 64531104,
+      "needed": [
+        "libgio-2.0.so.0",
+        "libglib-2.0.so.0",
+        "libgobject-2.0.so.0",
+        "libgstapp-1.0.so.0",
+        "libgstaudio-1.0.so.0",
+        "libgstbase-1.0.so.0",
+        "libgstreamer-1.0.so.0",
+        "libopus.so.0",
+        "libdl.so.2",
+        "librt.so.1",
+        "libpthread.so.0",
+        "libm.so.6",
+        "libc.so.6",
+        "ld-linux-x86-64.so.2"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.10",
+        "GLIBC_2.12",
+        "GLIBC_2.14",
+        "GLIBC_2.16",
+        "GLIBC_2.18",
+        "GLIBC_2.2.5",
+        "GLIBC_2.25",
+        "GLIBC_2.27",
+        "GLIBC_2.28",
+        "GLIBC_2.3",
+        "GLIBC_2.3.2",
+        "GLIBC_2.3.3",
+        "GLIBC_2.3.4",
+        "GLIBC_2.4",
+        "GLIBC_2.7",
+        "GLIBC_2.9"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/lib/gstreamer-1.0/libgstapp.so",
+      "sha256": "05372bf869c2b4ce254eb596ecbe6dae7508b34c21994d2aa3bac534f01aae05",
+      "bytes": 6488,
+      "needed": [
+        "libgstapp-1.0.so.0",
+        "libgsttag-1.0.so.0",
+        "libgstbase-1.0.so.0",
+        "libgstreamer-1.0.so.0",
+        "libgobject-2.0.so.0",
+        "libglib-2.0.so.0",
+        "libintl.so.8",
+        "libm.so.6",
+        "libz.so.1",
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.2.5"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/lib/gstreamer-1.0/libgstaudioconvert.so",
+      "sha256": "657f8d61ea52a663591f38f9e3ed9a6fb296de17c4f45fcf8a57c332a6e5bb5b",
+      "bytes": 40928,
+      "needed": [
+        "libgstaudio-1.0.so.0",
+        "libgsttag-1.0.so.0",
+        "libgstbase-1.0.so.0",
+        "libgstreamer-1.0.so.0",
+        "libgobject-2.0.so.0",
+        "libglib-2.0.so.0",
+        "libintl.so.8",
+        "libm.so.6",
+        "libz.so.1",
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.14",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3.4"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/lib/gstreamer-1.0/libgstaudioresample.so",
+      "sha256": "fc2888cf80bcf2f44d613eb7f86bd9e0988a1cae21ee86c8a62a00f1c559456b",
+      "bytes": 35120,
+      "needed": [
+        "libgstaudio-1.0.so.0",
+        "libgsttag-1.0.so.0",
+        "libgstbase-1.0.so.0",
+        "libgstreamer-1.0.so.0",
+        "libgobject-2.0.so.0",
+        "libglib-2.0.so.0",
+        "libintl.so.8",
+        "libm.so.6",
+        "libz.so.1",
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.14",
+        "GLIBC_2.2.5"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/lib/gstreamer-1.0/libgstcoreelements.so",
+      "sha256": "f946fbc9f37b4d775f2c52d45f68e61dddb8e9f824c3fddcc9ae046f8a8c1477",
+      "bytes": 473176,
+      "needed": [
+        "libpthread.so.0",
+        "libgstreamer-1.0.so.0",
+        "libgstbase-1.0.so.0",
+        "libglib-2.0.so.0",
+        "libintl.so.8",
+        "libgobject-2.0.so.0",
+        "libgmodule-2.0.so.0",
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.14",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3.4",
+        "GLIBC_2.4",
+        "GLIBC_2.7"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/lib/gstreamer-1.0/libgstopus.so",
+      "sha256": "75af8aa18e6fbc14e2198c5334a17043a46027612b34cb482d912c3c5df8839d",
+      "bytes": 71992,
+      "needed": [
+        "libgstpbutils-1.0.so.0",
+        "libgstvideo-1.0.so.0",
+        "libgstallocators-1.0.so.0",
+        "libgstaudio-1.0.so.0",
+        "libgsttag-1.0.so.0",
+        "libgstreamer-1.0.so.0",
+        "libgobject-2.0.so.0",
+        "libglib-2.0.so.0",
+        "libintl.so.8",
+        "libgstbase-1.0.so.0",
+        "libm.so.6",
+        "libz.so.1",
+        "libopus.so.0",
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.14",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3.4",
+        "GLIBC_2.4"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/lib/gstreamer-1.0/libgstrtp.so",
+      "sha256": "c58d49189b52d88910147bbbb3673700e927c518b3a7880e8b3a149fcccb062a",
+      "bytes": 739744,
+      "needed": [
+        "libgstbase-1.0.so.0",
+        "libgstreamer-1.0.so.0",
+        "libgobject-2.0.so.0",
+        "libglib-2.0.so.0",
+        "libintl.so.8",
+        "libgstaudio-1.0.so.0",
+        "libgstvideo-1.0.so.0",
+        "libgsttag-1.0.so.0",
+        "libgstrtp-1.0.so.0",
+        "libgstpbutils-1.0.so.0",
+        "libm.so.6",
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.14",
+        "GLIBC_2.2.5",
+        "GLIBC_2.4",
+        "GLIBC_2.7"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/lib/gstreamer-1.0/libgstrtpmanager.so",
+      "sha256": "894f7c73a26d2360203f17bfe5e56095fa7333ac2abc403a7f1dc19a8ee9f3b2",
+      "bytes": 558104,
+      "needed": [
+        "libgstbase-1.0.so.0",
+        "libgstreamer-1.0.so.0",
+        "libgobject-2.0.so.0",
+        "libglib-2.0.so.0",
+        "libintl.so.8",
+        "libgstnet-1.0.so.0",
+        "libgstrtp-1.0.so.0",
+        "libgstaudio-1.0.so.0",
+        "libgio-2.0.so.0",
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.14",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3.4",
+        "GLIBC_2.4",
+        "GLIBC_2.7"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/lib/libffi.so.8",
+      "sha256": "6ef5db59b2e4b1eb63032fa6c8afb1669bc09b073789233c379efda85b1353db",
+      "bytes": 63112,
+      "needed": [
+        "libpthread.so.0",
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.14",
+        "GLIBC_2.2.5",
+        "GLIBC_2.27",
+        "GLIBC_2.4"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/lib/libgio-2.0.so.0",
+      "sha256": "81d92399c8d3c4b97cfe8058750387a51d8dd03de408aa943a4c83fb74704f8d",
+      "bytes": 2307904,
+      "needed": [
+        "libpthread.so.0",
+        "libglib-2.0.so.0",
+        "libgobject-2.0.so.0",
+        "libgmodule-2.0.so.0",
+        "libz.so.1",
+        "libintl.so.8",
+        "libresolv.so.2",
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.10",
+        "GLIBC_2.12",
+        "GLIBC_2.14",
+        "GLIBC_2.2.5",
+        "GLIBC_2.27",
+        "GLIBC_2.28",
+        "GLIBC_2.3",
+        "GLIBC_2.3.2",
+        "GLIBC_2.3.4",
+        "GLIBC_2.4",
+        "GLIBC_2.5",
+        "GLIBC_2.6",
+        "GLIBC_2.9"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/lib/libglib-2.0.so.0",
+      "sha256": "cfa99126563d2b434a239fcafaa91af531131da85c4afe5c2975d26a0486d765",
+      "bytes": 1480224,
+      "needed": [
+        "libpthread.so.0",
+        "libintl.so.8",
+        "libm.so.6",
+        "libpcre2-8.so.0",
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.10",
+        "GLIBC_2.12",
+        "GLIBC_2.14",
+        "GLIBC_2.15",
+        "GLIBC_2.16",
+        "GLIBC_2.17",
+        "GLIBC_2.2.5",
+        "GLIBC_2.28",
+        "GLIBC_2.3",
+        "GLIBC_2.3.3",
+        "GLIBC_2.3.4",
+        "GLIBC_2.4",
+        "GLIBC_2.6",
+        "GLIBC_2.7",
+        "GLIBC_2.9"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/lib/libgmodule-2.0.so.0",
+      "sha256": "14e6c565b48399a157a7c75a471c70f35b59959547ff31d9487ff9cecd0b4f5a",
+      "bytes": 15656,
+      "needed": [
+        "libpthread.so.0",
+        "libdl.so.2",
+        "libglib-2.0.so.0",
+        "libintl.so.8",
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.2.5"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/lib/libgobject-2.0.so.0",
+      "sha256": "4d60cc690456b854109d82443c6d80ca8d83224964fcba007a035379c2a103e6",
+      "bytes": 449600,
+      "needed": [
+        "libglib-2.0.so.0",
+        "libffi.so.8",
+        "libintl.so.8",
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.14",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3.4",
+        "GLIBC_2.4"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/lib/libgstallocators-1.0.so.0",
+      "sha256": "3a3b5a49b39f087c2d8a66057051b97d347db274edfdf0c220267ef56e87d1a9",
+      "bytes": 30128,
+      "needed": [
+        "libpthread.so.0",
+        "libgstreamer-1.0.so.0",
+        "libgobject-2.0.so.0",
+        "libglib-2.0.so.0",
+        "libintl.so.8",
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.2.5",
+        "GLIBC_2.27",
+        "GLIBC_2.28"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/lib/libgstapp-1.0.so.0",
+      "sha256": "55a6d6f7ec47f97efa69f7a112e0e9bb20ae06a3cd8753eb37125d8dba6531d4",
+      "bytes": 105200,
+      "needed": [
+        "libpthread.so.0",
+        "libgstbase-1.0.so.0",
+        "libgstreamer-1.0.so.0",
+        "libgobject-2.0.so.0",
+        "libglib-2.0.so.0",
+        "libintl.so.8",
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.2.5"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/lib/libgstaudio-1.0.so.0",
+      "sha256": "0d074b4119f64399f7c0ee5857dc62c2cdcf2b31af8378abbced2887b6b1c8d3",
+      "bytes": 597832,
+      "needed": [
+        "libpthread.so.0",
+        "libgsttag-1.0.so.0",
+        "libgstreamer-1.0.so.0",
+        "libgobject-2.0.so.0",
+        "libglib-2.0.so.0",
+        "libintl.so.8",
+        "libgstbase-1.0.so.0",
+        "libm.so.6",
+        "libz.so.1",
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.14",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3.4",
+        "GLIBC_2.4",
+        "GLIBC_2.7"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/lib/libgstbase-1.0.so.0",
+      "sha256": "5f4a20109b86120ed9327a48d80549ec98750c7dc08f9b8838886438962d6747",
+      "bytes": 564592,
+      "needed": [
+        "libpthread.so.0",
+        "libgstreamer-1.0.so.0",
+        "libglib-2.0.so.0",
+        "libintl.so.8",
+        "libgobject-2.0.so.0",
+        "libgmodule-2.0.so.0",
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.14",
+        "GLIBC_2.2.5",
+        "GLIBC_2.4"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/lib/libgstnet-1.0.so.0",
+      "sha256": "770aae3497bf3128e92cfbb3fb7369be1263ed212c5b94bfe3fa0f55335c229b",
+      "bytes": 73856,
+      "needed": [
+        "libpthread.so.0",
+        "libgstbase-1.0.so.0",
+        "libgstreamer-1.0.so.0",
+        "libgio-2.0.so.0",
+        "libgobject-2.0.so.0",
+        "libglib-2.0.so.0",
+        "libintl.so.8",
+        "libgmodule-2.0.so.0",
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.2.5",
+        "GLIBC_2.4"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/lib/libgstpbutils-1.0.so.0",
+      "sha256": "60a654b690be3da35418e75294bbf243a9e953c4905a194bdee5498f3d8558a1",
+      "bytes": 316576,
+      "needed": [
+        "libpthread.so.0",
+        "libgstvideo-1.0.so.0",
+        "libgstallocators-1.0.so.0",
+        "libgstaudio-1.0.so.0",
+        "libgsttag-1.0.so.0",
+        "libgstreamer-1.0.so.0",
+        "libgobject-2.0.so.0",
+        "libglib-2.0.so.0",
+        "libintl.so.8",
+        "libgstbase-1.0.so.0",
+        "libm.so.6",
+        "libz.so.1",
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.14",
+        "GLIBC_2.2.5",
+        "GLIBC_2.4",
+        "GLIBC_2.7"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/lib/libgstreamer-1.0.so.0",
+      "sha256": "8fadf43bdb8e81b29662277ff42424fd8b9f998207f6bfe703b900a467478e7a",
+      "bytes": 1548568,
+      "needed": [
+        "libpthread.so.0",
+        "libdl.so.2",
+        "libgobject-2.0.so.0",
+        "libglib-2.0.so.0",
+        "libintl.so.8",
+        "libgmodule-2.0.so.0",
+        "libm.so.6",
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.14",
+        "GLIBC_2.15",
+        "GLIBC_2.17",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3",
+        "GLIBC_2.3.4",
+        "GLIBC_2.4"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/lib/libgstrtp-1.0.so.0",
+      "sha256": "a48ef4b17b0bd22630dda672c4c9a81dc1fd4b32ca6d1a809c4de88796050d3d",
+      "bytes": 209200,
+      "needed": [
+        "libpthread.so.0",
+        "libgstaudio-1.0.so.0",
+        "libgsttag-1.0.so.0",
+        "libgstbase-1.0.so.0",
+        "libgstreamer-1.0.so.0",
+        "libgobject-2.0.so.0",
+        "libglib-2.0.so.0",
+        "libintl.so.8",
+        "libm.so.6",
+        "libz.so.1",
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.14",
+        "GLIBC_2.2.5",
+        "GLIBC_2.4"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/lib/libgsttag-1.0.so.0",
+      "sha256": "4e1afca9a1bfe815ea0e18c4caeccee5923935ee277c9709957a98b62fb28615",
+      "bytes": 268280,
+      "needed": [
+        "libgstbase-1.0.so.0",
+        "libgstreamer-1.0.so.0",
+        "libgobject-2.0.so.0",
+        "libglib-2.0.so.0",
+        "libintl.so.8",
+        "libm.so.6",
+        "libz.so.1",
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.14",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3.4",
+        "GLIBC_2.4",
+        "GLIBC_2.7"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/lib/libgstvideo-1.0.so.0",
+      "sha256": "6254a976661d2a3807071dd35dd70a47e7f4232c18dae3a722dc75e64d858c53",
+      "bytes": 975136,
+      "needed": [
+        "libgstallocators-1.0.so.0",
+        "libgstreamer-1.0.so.0",
+        "libgobject-2.0.so.0",
+        "libglib-2.0.so.0",
+        "libintl.so.8",
+        "libgstbase-1.0.so.0",
+        "libm.so.6",
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.14",
+        "GLIBC_2.2.5",
+        "GLIBC_2.4",
+        "GLIBC_2.7"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/lib/libintl.so.8",
+      "sha256": "f50f3ab34be7b3392f2db82bd67d50e133b35fa41d352dc3b3a97b70b0ffd960",
+      "bytes": 6288,
+      "needed": [
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.2.5"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/lib/libopus.so.0",
+      "sha256": "8596a3dc8e3f85ebf0649e45e649a584d4ea472c646bd0c0ce4bf0f76aeb72cd",
+      "bytes": 565744,
+      "needed": [
+        "libm.so.6",
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.14",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3.4",
+        "GLIBC_2.4"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/lib/libpcre2-8.so.0",
+      "sha256": "e39519b242f40686734ed8d0218f68cac24f0e956ec64c8c1b49b9da5cc9788b",
+      "bytes": 442424,
+      "needed": [
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.14",
+        "GLIBC_2.2.5",
+        "GLIBC_2.3",
+        "GLIBC_2.3.4",
+        "GLIBC_2.4"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/voice/lib/libz.so.1",
+      "sha256": "6c5d765f42d9368cc4bdbd11f725c1bcf6b14b78322033d3c94f787fc6261f5e",
+      "bytes": 109296,
+      "needed": [
+        "libpthread.so.0",
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.14",
+        "GLIBC_2.2.5"
+      ]
+    },
+    {
+      "path": "vendor/x86_64-unknown-linux-musl/codex-resources/zsh/bin/zsh",
+      "sha256": "67faaaa89242c4a332e16e508a1977cffc24bf7fca31d4411cdfd101f3831ef3",
+      "bytes": 898480,
+      "needed": [
+        "libtinfo.so.6",
+        "libm.so.6",
+        "libc.so.6"
+      ],
+      "versionRequirements": [
+        "GLIBC_2.14",
+        "GLIBC_2.15",
+        "GLIBC_2.17",
+        "GLIBC_2.2.5",
+        "GLIBC_2.29",
+        "GLIBC_2.3",
+        "GLIBC_2.3.4",
+        "GLIBC_2.33",
+        "GLIBC_2.34",
+        "GLIBC_2.38",
+        "GLIBC_2.4"
+      ]
+    }
+  ]
+}
