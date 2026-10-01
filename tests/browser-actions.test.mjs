@@ -15,17 +15,19 @@ globalThis.chrome={runtime:{id:'test'},storage:{local:{get:async()=>({})},onChan
 const {handleBrowserAction}=await import('../apps/browser/extension/actions.mjs')
 const {state}=await import('../apps/browser/extension/state.mjs')
 state.turnActive=true;state.endpoint='http://127.0.0.1:3080'
-test('explicit observation target replaces stale work tab without navigation',async()=>{
+test('explicit observation reads another tab without changing subsequent work',async()=>{
  state.workTabId=1
  const result=await handleBrowserAction('read',{action:'snapshot',tabId:7})
- assert.equal(result.url,'https://nas.test/');assert.equal(state.workTabId,7);assert.ok(injected.includes(7))
+ assert.equal(result.url,'https://nas.test/');assert.equal(state.workTabId,1);assert.ok(injected.includes(7))
+ const next=await handleBrowserAction('read',{action:'snapshot'})
+ assert.equal(next.url,'https://old.test/');assert.equal(state.workTabId,1)
  const listing=await handleBrowserAction('list',{action:'tabs_list'})
- assert.equal(listing.tabs.find(x=>x.id===7).workTab,true)
+ assert.equal(listing.tabs.find(x=>x.id===1).workTab,true)
 })
 test('explicit targeting refuses DSH session and invalid IDs',async()=>{
  assert.equal((await handleBrowserAction('read',{action:'snapshot',tabId:9})).ok,false)
  assert.equal((await handleBrowserAction('read',{action:'snapshot',tabId:'7'})).ok,false)
- assert.equal(state.workTabId,7)
+ assert.equal(state.workTabId,1)
 })
 test('page-root clicks do not dispatch and missing acknowledgements never succeed',async()=>{
  const result=await handleBrowserAction('click',{action:'click',selector:'body'})

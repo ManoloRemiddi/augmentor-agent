@@ -34,13 +34,14 @@ export async function handleBrowserAction(id, params) {
   const t0 = Date.now()
   try {
     let out
-    // Explicit read targeting avoids silently reusing an older work tab after
-    // the user opens or selects another tab outside the extension chat.
+    // An explicit observation is a read of that tab, not a change to the target
+    // of subsequent navigation/click/type. A mistaken read must not hijack work.
+    let observationTab
     if (['snapshot', 'screenshot'].includes(params?.action) && params.tabId !== undefined) {
       if (!Number.isInteger(params.tabId)) throw new Error('tabId must be an observed browser tab ID')
       const selected = await chrome.tabs.get(params.tabId)
       if (!/^https?:\/\//i.test(selected.url ?? '') || isDshTab(selected)) throw new Error('Selected tab is not a readable web work tab')
-      state.workTabId = selected.id
+      observationTab = selected
     }
     if (['click', 'type'].includes(params?.action) && params.target !== undefined) {
       const target = params.target
@@ -100,13 +101,14 @@ export async function handleBrowserAction(id, params) {
         break
       }
       case 'snapshot': {
-        const tab = await readableWorkTab()
+        const tab = observationTab ?? await readableWorkTab()
         overlayShow(tab.id, overlayTextFor('snapshot', params))
-        out = await readSnapshot(tab, inject)
+        const {offset, controlOffset, linkOffset, scope} = params
+        out = await readSnapshot(tab, inject, {offset, controlOffset, linkOffset, scope})
         break
       }
       case 'screenshot': {
-        const tab = await readableWorkTab()
+        const tab = observationTab ?? await readableWorkTab()
         out = await captureWorkTab(tab, chrome, inject)
         break
       }

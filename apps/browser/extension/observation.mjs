@@ -4,7 +4,11 @@
 // License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
 
 // Self-contained: Chromium serializes this function into the selected document.
-export async function snapshotPage() {
+export async function snapshotPage({offset = 0, controlOffset = 0, linkOffset = 0, scope = 'main'} = {}) {
+  for (const value of [offset, controlOffset, linkOffset]) {
+    if (!Number.isSafeInteger(value) || value < 0) throw Error('Snapshot offsets must be nonnegative integers.');
+  }
+  if (!['main', 'document'].includes(scope)) throw Error('Snapshot scope must be main or document.');
   const read = () => {
     const overlay = document.getElementById('__dshAugOverlay')
     const display = overlay?.style.display
@@ -22,11 +26,18 @@ export async function snapshotPage() {
         }
         return parts.join(' > ')
       }
-      const controls = [...document.querySelectorAll('input, textarea, button, select, a[href], [role="button"], [tabindex], [onclick], [contenteditable="true"]')]
-        .filter(el => visible(el) && el.type !== 'hidden' && el.type !== 'password').slice(0, 60)
+      const main = scope === 'main' ? [...document.querySelectorAll('main, [role="main"]')].find(visible) : null
+      // Put content links/controls before site navigation, while preserving DOM
+      // order within each group. Never invent site-specific selectors.
+      const rank = el => main?.contains(el) || el.closest('main, [role="main"], article') || el.querySelector('h1,h2,h3,[role="heading"]') ? 0 :
+        el.closest('header,nav,[role="navigation"]') ? 2 : 1
+      const ordered = query => [...document.querySelectorAll(query)].filter(visible).sort((a,b) => rank(a) - rank(b))
+      const allControls = ordered('input, textarea, button, select, a[href], [role="button"], [tabindex], [onclick], [contenteditable="true"]')
+        .filter(el => el.type !== 'hidden' && el.type !== 'password')
+      const controls = allControls.slice(controlOffset, controlOffset + 60)
         .map(el => ({selector: selector(el), tag: el.tagName.toLowerCase(),
           label: (el.getAttribute('aria-label') || el.labels?.[0]?.innerText || el.getAttribute('placeholder') || el.innerText || '').trim().slice(0, 120), disabled: Boolean(el.disabled)}))
-      const text = (document.body?.innerText ?? '').trim().slice(0, 6000)
+      const text = ((main ?? document.body)?.innerText ?? '').trim()
       // A distinct read path for embedded application content. No scripts run,
       // no hidden text/input values collected, and no cross-origin access bypass.
       const embedded = []
@@ -46,9 +57,15 @@ export async function snapshotPage() {
         if (embedded.length >= 10) break
       }
       const extra = embedded.join('\n').slice(0, 4000)
-      return {title: document.title, url: location.href, documentEpoch: performance.timeOrigin, text: [text, extra].filter(Boolean).join('\n'), controls,
+      const fullText = Array.from([text, extra].filter(Boolean).join('\n'))
+      const allLinks = ordered('a[href]')
+      const page = {scope: main ? 'main' : 'document', offset, totalCharacters: fullText.length,
+        nextOffset: offset + 6000 < fullText.length ? offset + 6000 : null,
+        controlOffset, totalControls: allControls.length, nextControlOffset: controlOffset + 60 < allControls.length ? controlOffset + 60 : null,
+        linkOffset, totalLinks: allLinks.length, nextLinkOffset: linkOffset + 40 < allLinks.length ? linkOffset + 40 : null}
+      return {title: document.title, url: location.href, documentEpoch: performance.timeOrigin, text: fullText.slice(offset, offset + 6000).join(''), controls, page,
         readyState: document.readyState, inaccessibleFrames,
-        links: [...document.querySelectorAll('a[href]')].filter(visible).slice(0, 40).map(a => ({text: (a.innerText || '').trim().slice(0, 80), href: a.href}))}
+        links: allLinks.slice(linkOffset, linkOffset + 40).map(a => ({text: (a.innerText || '').trim().slice(0, 80), href: a.href}))}
     } finally { if (overlay) overlay.style.display = display }
   }
   let value = read()
@@ -61,12 +78,12 @@ export async function snapshotPage() {
   }
   const readable = Boolean(value.text || value.controls.length)
   return {...value, ok: true, observation: readable ? 'readable' : 'empty', attempts,
-    text: value.text + (value.controls.length ? '\n\nObserved controls (exact CSS selectors; refresh after changes):\n' + value.controls.map(c => 'CONTROL ' + JSON.stringify(c)).join('\n') : '') +
+    text: 'Read page: ' + JSON.stringify(value.page) + '\nUse browser_snapshot with the same tabId, scope and next offsets to read more. scope="document" includes site navigation outside main content.\n\n' + value.text + (value.controls.length ? '\n\nObserved controls (exact CSS selectors; refresh after changes):\n' + value.controls.map(c => 'CONTROL ' + JSON.stringify(c)).join('\n') : '') +
       (!readable ? '\nObservation is inconclusive after bounded DOM recovery. Use browser_screenshot if available; do not guess the layout, invent routes, or click the page body to read it.' : '')}
 }
 
-export async function readSnapshot(tab, inject) {
-  const result = await inject(tab.id, snapshotPage)
+export async function readSnapshot(tab, inject, options = {}) {
+  const result = await inject(tab.id, snapshotPage, [options])
   if (!result || typeof result.url !== 'string' || !result.url) {
     return {ok: false, tabId: tab.id, title: tab.title ?? '', url: tab.url ?? '', observation: 'unavailable',
       error: 'No document observation returned. This may be a protected browser page, navigation, or an injection failure. Inspect browser_tabs_list and use browser_screenshot if available. No page content was verified.'}

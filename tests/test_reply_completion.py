@@ -82,7 +82,7 @@ class ReplyCompletionTests(unittest.TestCase):
             self.assertEqual(self.window.messages.count(('DSH',text)),1)
             self.assertFalse(any(role=='Augmentor' for role,_ in self.window.messages))
 
-    def test_only_exact_routine_reasoning_notice_is_hidden_live_and_on_reopen(self):
+    def test_effective_reasoning_policy_is_visible_live_and_on_reopen(self):
         from copy import deepcopy
         routine='Harness: Saved reasoning: minimal; requested reasoning: xhigh (request policy). Backend enforcement is provider-dependent.'
         notices=[('success',routine), ('success',routine.replace('(request policy)','(bounded recovery)')),
@@ -93,13 +93,13 @@ class ReplyCompletionTests(unittest.TestCase):
                 for index,(kind,text) in enumerate(notices)]
         original=deepcopy(events)
         for event in events:self.window.on_event(event)
-        expected=[('DSH',text) for _,text in notices[1:]]
+        expected=[('DSH',text) for _,text in notices]
         for reopen in (False,True):
             if reopen:self.window.restore_history(events)
             QTest.qWait(70)
             self.assertEqual(self.window.messages,expected)
-            self.assertEqual(self.window.messages.count(('DSH',routine)),1)  # Error remains visible.
-            self.assertFalse(self.window.fold_event(events[0]))  # Duplicate stays hidden.
+            self.assertEqual(self.window.messages.count(('DSH',routine)),2)  # Policy and error both remain visible.
+            self.assertFalse(self.window.fold_event(events[0]))  # Duplicate is not appended again.
         self.assertEqual(events,original)  # Presentation only; history is not edited.
 
     def test_routine_notice_does_not_hide_user_or_assistant_text(self):

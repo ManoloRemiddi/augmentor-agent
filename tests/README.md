@@ -360,3 +360,7 @@ linked-binary coverage or installer clearance.
 
 Codex voice tests now use the independently authored [synthetic protocol peer](fixtures/codex/VOICE.md). They qualify Augmentor transport and client playback
 plumbing, not the private Resonant Voice service or physical audio.
+Task reliability: `tests/dsh-context-budget.test.mjs`, `tests/dsh-execution.test.mjs`,
+`tests/test_reply_completion.py` and `tests/test_desktop_profile.py` exercise
+deterministic evidence/recovery, UI and Linux capability-discovery contracts. The opt-in `scripts/task-reliability-proof.mjs` checks a real local
+model with restricted read-only tools; see [scope and limits](../docs/TASK-RELIABILITY.md).
