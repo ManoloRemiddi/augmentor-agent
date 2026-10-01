@@ -11,8 +11,11 @@ import {ProfileStore} from '../dist/codex-runtime/src/profiles.js';
 
 async function fixture(t, mode='success') {
   const requests=[];
+  let announceRequest;
+  const firstRequest = new Promise(resolve => {announceRequest = resolve;});
   const server=createServer(async(req,res)=>{
     let raw='';for await(const chunk of req)raw+=chunk;const input=JSON.parse(raw);requests.push(input);
+    announceRequest();
     if(mode==='wait'){return;}
     const toolOutput=input.input.find(item=>item.type==='function_call_output');
     const receipt=toolOutput?JSON.stringify(toolOutput.output).match(/[a-f0-9]{48}/)?.[0]:undefined;
@@ -26,7 +29,13 @@ async function fixture(t, mode='success') {
       {type:'response.completed',response:{id:'response-'+requests.length,status:'completed',output:[item]}}])res.write('data: '+JSON.stringify(event)+'\n\n');res.end();
   });await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
   t.after(async()=>{server.closeAllConnections();await new Promise(resolve=>server.close(resolve));});
-  return {requests,connection:{kind:'local',model:'fixture',endpoint:`http://127.0.0.1:${server.address().port}/v1`}};
+  return {requests,firstRequest,connection:{kind:'local',model:'fixture',endpoint:`http://127.0.0.1:${server.address().port}/v1`}};
+}
+async function waitForRequest(f) {
+  let timer;
+  try {
+    await Promise.race([f.firstRequest, new Promise((_, reject) => {timer = setTimeout(() => reject(Error('Pinned runtime did not reach the fixture provider')), 5000);})]);
+  } finally {clearTimeout(timer);}
 }
 test('pinned Codex check verifies a synthetic tool receipt with no environment or user state', {timeout:10000}, async t=>{
   const f=await fixture(t);
@@ -48,7 +57,7 @@ for(const mode of ['skip','wrong'])test(`Codex check rejects ${mode} tool behavi
 test('Codex check cancellation closes the outstanding provider request without replay', {timeout:10000},async t=>{
   const f=await fixture(t,'wait'),abort=new AbortController();
   const pending=checkAgent(f.connection,abort.signal);
-  for(let i=0;i<100&&!f.requests.length;i++)await new Promise(resolve=>setTimeout(resolve,10));
+  await waitForRequest(f);
   assert.equal(f.requests.length,1);abort.abort();await assert.rejects(pending,/cancelled or timed out/);assert.equal(f.requests.length,1);
 });
 
@@ -77,7 +86,7 @@ test('an outstanding tool check fences setup and maintenance, then shutdown canc
   const f = await hostFixture(t, 'wait');
   const pending = f.host.dispatch('profiles.test', {id: 'local', capability: 'agent'});
   const rejected = assert.rejects(pending, /cancelled or timed out/);
-  for (let i = 0; i < 100 && !f.requests.length; i++) await new Promise(resolve => setTimeout(resolve, 10));
+  await waitForRequest(f);
   assert.equal(f.requests.length, 1);
   await assert.rejects(f.host.dispatch('profiles.configure', f.profile), /active Codex work/);
   await assert.rejects(f.host.dispatch('profiles.test', {id: 'local', capability: 'agent'}), /in progress/);

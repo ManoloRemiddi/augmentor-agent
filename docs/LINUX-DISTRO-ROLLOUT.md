@@ -238,6 +238,14 @@ application snapshot still comes from the clean public source revision.
 
 Next: commit this merged packaging correction, rebuild all candidates using the
 checked published snapshots, run package/complete proofs on all four targets,
-and publish the reviewed branch/draft PR. Fedora's broad Node checks also need
-the distro's `chromium-browser` executable and test-only `procps-ng`; direct
-`chromium`/`ps` assumptions are being verified before adding support claims.
+and publish the reviewed branch/draft PR. Fedora 44's complete 484-case Node suite passes (482 pass, two opt-in memory
+skips), with the distro's `/usr/bin/chromium-browser`, test-only `procps-ng`,
+locked DSH and QtTest. Its loaded extension performs actual observed typing,
+clicking and screenshots in an isolated headless profile. The cancellation
+fixture now waits for its first provider request with a bounded deadline,
+replacing a one-second startup assumption while preserving cancellation,
+maintenance fencing and no-replay assertions. The focused six cases pass too.
+The actual Fedora Chromium executable contains `/etc/chromium/native-messaging-hosts`,
+matching the standard system registration; default graphical profile registration
+still needs the desktop acceptance stage. These checks do not qualify GNOME,
+KDE, physical audio or enforcing SELinux.
