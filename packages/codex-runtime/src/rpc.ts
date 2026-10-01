@@ -37,14 +37,22 @@ export class CodexRpc extends EventEmitter {
   private pending = new Map<RpcId, Pending>();
   private serverRequests = new Set<RpcId>();
   private failure?: Error;
+  private failureEmitted = false;
+  private boundThreadId?: string;
   private closing?: Promise<void>;
+  private permanentlyClosed = false;
+  private renewal?: Promise<void>;
+  private retiring?: ChildProcessWithoutNullStreams;
   private maxFrame: number;
-  constructor(readonly options: RpcOptions) {
+  private configuration: RpcOptions;
+  constructor(options: RpcOptions) {
     super();
+    this.configuration = options;
     this.maxFrame = options.maxFrameBytes ?? 16 * 1024 * 1024;
   }
+  get options(): RpcOptions {return this.configuration;}
   start(): void {
-    if (this.child || this.failure) throw new CodexTransportError('Codex process cannot be started twice.');
+    if (this.child || this.failure || this.permanentlyClosed) throw new CodexTransportError('Codex process cannot be started twice.');
     const guarded = process.platform !== 'win32';
     const command = guarded ? process.execPath : this.options.command;
     const args = guarded ? [fileURLToPath(new URL('./process-guard.js', import.meta.url)), this.options.command, ...this.options.args] : this.options.args;
@@ -55,19 +63,24 @@ export class CodexRpc extends EventEmitter {
       detached: guarded,
     }) as ChildProcessWithoutNullStreams;
     this.child = child;
-    child.stdout.on('data', (chunk: Buffer) => this.receive(chunk));
+    child.stdout.on('data', (chunk: Buffer) => {if (this.child === child) this.receive(chunk);});
     // Upstream diagnostics can include prompts or credentials. Consume without forwarding.
     child.stderr.on('data', () => {});
-    child.stdin.on('error', () => this.fail(new CodexTransportError('Codex input connection failed.', true)));
-    child.on('error', () => this.fail(new CodexTransportError('Codex could not be started. Check the installed runtime.')));
+    child.stdin.on('error', () => {if (this.child === child) this.fail(new CodexTransportError('Codex input connection failed.', true));});
+    child.on('error', () => {if (this.child === child) this.fail(new CodexTransportError('Codex could not be started. Check the installed runtime.'));});
     child.on('exit', (code, signal) => {
+      if (this.child !== child || this.retiring === child) return;
       this.fail(new CodexTransportError('Codex process stopped; reconcile active work before continuing.', true));
       this.emit('exit', {code, signal});
     });
   }
   async initialize(): Promise<Record<string, unknown>> {
+    if (this.renewal) throw new CodexTransportError('Codex authentication renewal is in progress.');
+    return this.initializeTransport();
+  }
+  private async initializeTransport(): Promise<Record<string, unknown>> {
     this.start();
-    const result = await this.call('initialize', {
+    const result = await this.request('initialize', {
       clientInfo: {name: 'augmentor_agent', title: 'Augmentor Agent', version: RELEASE.version},
       capabilities: {experimentalApi: this.options.experimentalApi === true},
     });
@@ -75,6 +88,10 @@ export class CodexRpc extends EventEmitter {
     return result;
   }
   call<T = any>(method: string, params: Record<string, unknown> = {}, timeoutMs = this.options.timeoutMs ?? 30_000): Promise<T> {
+    if (this.renewal) return Promise.reject(new CodexTransportError('Codex authentication renewal is in progress.'));
+    return this.request(method, params, timeoutMs);
+  }
+  private request<T = any>(method: string, params: Record<string, unknown> = {}, timeoutMs = this.options.timeoutMs ?? 30_000): Promise<T> {
     if (this.failure || this.closing) return Promise.reject(this.failure ?? new CodexTransportError('Codex is closing.'));
     if (!this.child) return Promise.reject(new CodexTransportError('Codex has not started.'));
     if (this.pending.size >= (this.options.maxPending ?? 128)) return Promise.reject(new CodexTransportError('Too many pending Codex requests.'));
@@ -84,7 +101,11 @@ export class CodexRpc extends EventEmitter {
         this.pending.delete(id);
         reject(new CodexTransportError(`Codex ${method} acknowledgment timed out. The request was not retried.`, true));
       }, timeoutMs);
-      this.pending.set(id, {resolve, reject, timer});
+      this.pending.set(id, {resolve: value => {
+        const thread = method === 'thread/start' ? value?.thread?.id : method === 'thread/resume' ? params.threadId : undefined;
+        if (typeof thread === 'string' && thread) this.boundThreadId = thread;
+        resolve(value);
+      }, reject, timer});
       try {this.write({id, method, params});}
       catch (error) {
         clearTimeout(timer); this.pending.delete(id); reject(error);
@@ -152,6 +173,7 @@ export class CodexRpc extends EventEmitter {
   private fail(error: Error): void {
     if (this.failure) return;
     this.failure = error;
+    this.failureEmitted = true;
     for (const pending of this.pending.values()) {clearTimeout(pending.timer); pending.reject(error);}
     this.pending.clear(); this.serverRequests.clear();
     this.emit('failure', error);
@@ -163,9 +185,54 @@ export class CodexRpc extends EventEmitter {
     }
     return message.slice(0, 4096);
   }
+  /** Caller must prove native idleness and fence turn admission first. Only the
+   * bearer environment value changes; destination/model/home/thread stay fixed.
+   * A fresh initialize/resume sends no turn and never replays unknown work. */
+  renew(options: RpcOptions, resume: Record<string, unknown>, signal: AbortSignal): Promise<void> {
+    if (this.renewal || this.closing || this.failure || this.permanentlyClosed || !this.child || this.pending.size || this.serverRequests.size) {
+      return Promise.reject(new CodexTransportError('Codex cannot renew credentials while requests or interactions are pending.'));
+    }
+    const binding = (value: RpcOptions) => {
+      const {AUGMENTOR_CODEX_CREDENTIAL, ...env} = value.env;
+      return JSON.stringify({...value, env});
+    };
+    if (binding(options) !== binding(this.options) || typeof options.env.AUGMENTOR_CODEX_CREDENTIAL !== 'string' ||
+      !options.env.AUGMENTOR_CODEX_CREDENTIAL || /[\r\n\0]/.test(options.env.AUGMENTOR_CODEX_CREDENTIAL) ||
+      typeof resume.threadId !== 'string' || !this.boundThreadId || resume.threadId !== this.boundThreadId || resume.cwd !== this.options.cwd || resume.excludeTurns !== true ||
+      Object.keys(resume).some(key => !['threadId', 'cwd', 'excludeTurns', 'developerInstructions'].includes(key))) {
+      return Promise.reject(new CodexTransportError('Authentication renewal cannot change the Codex process or thread binding.'));
+    }
+    const replacement = structuredClone(options), thread = structuredClone(resume), old = this.child;
+    const abort = () => {if (this.child && this.child !== old) this.fail(new CodexTransportError('Codex authentication renewal was cancelled.'));};
+    this.retiring = old;
+    const pending = Promise.resolve().then(async () => {
+      signal.throwIfAborted();
+      await this.stop();
+      signal.throwIfAborted();
+      if (this.permanentlyClosed) throw new CodexTransportError('Codex is closing.');
+      this.child = undefined; this.buffer = Buffer.alloc(0); this.failure = undefined; this.failureEmitted = false;
+      this.configuration = replacement; this.retiring = undefined;
+      signal.addEventListener('abort', abort, {once: true});
+      await this.initializeTransport(); signal.throwIfAborted();
+      const resumed = await this.request('thread/resume', thread); signal.throwIfAborted();
+      if (resumed?.thread?.id !== thread.threadId) throw new CodexTransportError('Codex did not confirm the saved thread during authentication renewal.');
+    }).catch(async error => {
+      // Never reactivate the previous token. Failure leaves the native process
+      // closed and the caller's pre-dispatch operation queued/paused.
+      await this.stop();
+      const failure = error instanceof CodexRemoteError || error instanceof CodexTransportError ? error : new CodexTransportError('Codex authentication renewal was cancelled or could not be completed.');
+      if (!this.failureEmitted) {this.failureEmitted = true; this.emit('failure', failure);}
+      // The owned group is now gone. Let the host retire its cached worker while
+      // the pre-dispatch ledger preserves the unsent prompt for explicit resume.
+      this.emit('exit', {code: null, signal: null});
+      throw failure;
+    }).finally(() => {signal.removeEventListener('abort', abort); this.retiring = undefined; this.renewal = undefined;});
+    this.renewal = pending; return pending;
+  }
   close(): Promise<void> {
+    this.permanentlyClosed = true;
     if (this.closing) return this.closing;
-    this.closing = this.stop();
+    this.closing = (async () => {await this.renewal?.catch(() => {}); await this.stop();})();
     return this.closing;
   }
   private async stop(): Promise<void> {

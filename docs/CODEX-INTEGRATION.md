@@ -7,6 +7,12 @@ Status: in development on `feat/codex-integration`, based on canonical main
 Codex release. The complete C0–C9 acceptance scope remains in
 the plan; no work package is certified complete by this foundation.
 
+Current account status: [bound plan profiles and safe worker renewal](CODEX-ACCOUNTS.md#bound-connections-and-worker-renewal--october-1)
+now connect shared setup controls to queued turn admission. Production SIWC is
+still disabled pending eligibility; native managed login and live subscription
+qualification remain open. Earlier dated foundation statements describe their
+original checkpoint, not the current account implementation.
+
 Current memory status: [the development launcher now supplies the shared client](#codex-memory-launcher-and-existing-interface-controls)
 for new Codex chats. Earlier dated checkpoints that leave memory disabled describe
 their original source revision. Installed applications and memory inference

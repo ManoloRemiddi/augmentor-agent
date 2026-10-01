@@ -63,10 +63,10 @@ interface SessionMeta {
   status: 'creating' | 'ready';
   model?: string; surface?: 'linux' | 'browser'; saved?: boolean;
 }
-export interface ResolvedProfile {id: string; revision: number; connection: CodexConnection}
+export interface ResolvedProfile {id: string; revision: number; connection: CodexConnection; accountId?: string; credentialRevision?: number}
 export interface HostOptions {
   root: string;
-  resolveProfile: (id: string) => Promise<ResolvedProfile>;
+  resolveProfile: (id: string, signal?: AbortSignal) => Promise<ResolvedProfile>;
   maxWorkers?: number;
   createRpc?: (options: ReturnType<typeof runtimeOptions>) => CodexRpc;
   profiles?: ProfileStore;
@@ -205,7 +205,7 @@ export class CodexHost extends EventEmitter {
   private catalog() {
     const profiles = this.options.profiles?.list() ?? [];
     return {groups: profiles.map(profile => ({provider: profile.id, name: profile.name,
-      models: [{provider: profile.id, model: profile.model, name: profile.model, location: profile.kind === 'local' ? 'local' : 'cloud', available: true, validation: profile.validation}]})),
+      models: [{provider: profile.id, model: profile.model, name: profile.model, location: profile.kind === 'local' ? 'local' : 'cloud', available: profile.available, funding: profile.funding, validation: profile.validation}]})),
       pinned: [], hidden: [], failures: [], default: profiles.length ? {provider: profiles[0].id, model: profiles[0].model} : null};
   }
   async create(params: Data): Promise<SessionMeta> {
@@ -366,12 +366,14 @@ export class CodexHost extends EventEmitter {
   private async openWorker(meta: SessionMeta, resolved?: ResolvedProfile): Promise<Worker> {
     const profile = resolved ?? await this.options.resolveProfile(meta.profileId);
     if (profile.id !== meta.profileId || profile.revision !== meta.profileRevision) throw new Error('The saved conversation profile changed. Explicitly confirm its new connection before resuming.');
+    if (profile.connection.kind === 'chatgpt-plan' && (!profile.accountId || !Number.isSafeInteger(profile.credentialRevision) || profile.credentialRevision! < 1)) throw new Error('ChatGPT plan credentials must resolve through the saved account.');
     this.assertOpen();
     const root = this.sessionRoot(meta.id); privateDirectory(root);
     const state = join(this.sessionRoot(meta.nativeOwner ?? meta.id), 'runtime'); privateDirectory(state);
     const options = {...runtimeOptions(profile.connection, state, meta.cwd), experimentalApi: true};
     const rpc = this.options.createRpc?.(options) ?? new CodexRpc(options);
     const activity = new NativeActivity(rpc);
+    let credentialRevision = profile.credentialRevision;
     let memory: CodexMemory | undefined;
     try {
       await rpc.initialize();
@@ -388,8 +390,32 @@ export class CodexHost extends EventEmitter {
       if (meta.memoryTools && this.options.memoryCall) memory = new CodexMemory(meta.id, meta.cwd, this.options.memoryCall, message => {
         if (message !== lastMemoryWarning) {lastMemoryWarning = message; this.emit('attention', meta.id, {reason: 'memory-degraded', message});}
       });
-      const session = new CodexSession(rpc, ledger, memory ? async (operation, signal) => {
-        signal.throwIfAborted(); await memory!.begin('request:' + operation.id, true); signal.throwIfAborted();
+      const session = new CodexSession(rpc, ledger, memory || profile.accountId ? async (operation, signal) => {
+        signal.throwIfAborted();
+        if (profile.accountId) {
+          // Every pump enters here while its prompt is still queued. No turn is
+          // dispatched until current permission and native idleness are known.
+          this.assertAccepting();
+          if (ledger.list().some(item => ['accepted', 'unconfirmed'].includes(item.status))) throw new Error('Reconcile active Codex work before renewing account credentials.');
+          const revision = activity.revision;
+          const idle = await nativeIdle({call: (method, params) => {signal.throwIfAborted(); return observe(rpc.call(method, params), signal);}}, meta.threadId!, activity);
+          signal.throwIfAborted();
+          if (!idle || activity.revision !== revision) throw new Error('Native Codex background work must finish before account preflight.');
+          const current = await this.options.resolveProfile(meta.profileId, signal);
+          signal.throwIfAborted(); this.assertAccepting();
+          if (current.id !== meta.profileId || current.revision !== meta.profileRevision || current.accountId !== profile.accountId ||
+              current.connection.kind !== 'chatgpt-plan' || current.connection.model !== meta.model || !Number.isSafeInteger(current.credentialRevision) || current.credentialRevision! < 1) {
+            throw new Error('The saved Codex account or model binding changed. Explicitly reconnect this conversation.');
+          }
+          if (activity.revision !== revision || ledger.list().some(item => ['accepted', 'unconfirmed'].includes(item.status))) throw new Error('Codex activity changed during credential preflight.');
+          if (current.credentialRevision !== credentialRevision) {
+            await rpc.renew({...runtimeOptions(current.connection, state, meta.cwd), experimentalApi: true},
+              {threadId: meta.threadId!, cwd: meta.cwd, excludeTurns: true, ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})}, signal);
+            credentialRevision = current.credentialRevision;
+          }
+        }
+        if (!memory) return {};
+        await memory.begin('request:' + operation.id, true); signal.throwIfAborted();
         memorySpareAllowed = false;
         const inventorySignal = AbortSignal.any([signal, AbortSignal.timeout(3000)]);
         try {

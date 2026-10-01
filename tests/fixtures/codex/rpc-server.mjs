@@ -6,6 +6,15 @@ const send = value => process.stdout.write(JSON.stringify(value) + '\n');
 createInterface({input: process.stdin}).on('line', line => {
   const r = JSON.parse(line);
   if (r.method === 'initialize') send({id: r.id, result: {userAgent: 'fixture'}});
+  else if (r.method === 'thread/start') send({id:r.id,result:{thread:{id:'fixture-thread'}}});
+  else if (r.method === 'thread/resume') {
+    if(process.env.AUGMENTOR_CODEX_CREDENTIAL==='synthetic-resume-failure')send({id:r.id,error:{code:-32602,message:'Synthetic resume rejection'}});
+    else {
+      if(process.env.AUGMENTOR_CODEX_CREDENTIAL==='synthetic-slow-resume')send({method:'synthetic/resuming',params:{}});
+      setTimeout(()=>send({id:r.id,result:{thread:{id:r.params.threadId}}}),process.env.AUGMENTOR_CODEX_CREDENTIAL==='synthetic-slow-resume'?250:0);
+    }
+  }
+  else if (r.method === 'credential-marker') send({id:r.id,result:{marker:process.env.AUGMENTOR_CODEX_CREDENTIAL,pid:process.pid}});
   else if (r.method === 'descendant') {
     const child = spawn(process.execPath, ['-e', "process.on('SIGTERM',()=>{});process.stdout.write('ready');setInterval(()=>{},1000)"], {stdio: ['ignore', 'pipe', 'ignore']});
     child.stdout.once('data', () => send({id: r.id, result: {pid: child.pid}}));

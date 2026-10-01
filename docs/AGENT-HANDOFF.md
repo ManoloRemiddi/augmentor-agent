@@ -2,6 +2,28 @@
 
 # Start here: agent handoff
 
+## October 1 account-bound profiles and credential renewal
+
+[Bound account/model connections](CODEX-ACCOUNTS.md#bound-connections-and-worker-renewal--october-1)
+now separate profile configuration revisions from protected-account token
+revisions. Desktop and Browser save the chosen consented account without API-key
+fields; changing the default account cannot redirect existing connections.
+Every queued root turn checks its saved binding and authoritative native idleness
+before durable dispatch. Token changes retire the owned process and initialize/
+resume the same native thread. Stop, unknown outcomes and failed resume preserve
+unsent work without replay or billing fallback. The transport observer stays
+attached and ignores retired child output.
+
+Full local source/UI suites pass; scripted subscription protocol tests and the
+actual pinned Codex/loopback synthetic API provider renewal proof pass. The latter
+proves new-bearer transport and exact native history, not real SIWC inference.
+Final publishing/CI source identity follows in the account guide. Production
+SIWC remains source-disabled; the native managed account route, eligibility,
+models/limits, live subscription/provider qualification, native executable notice
+review and full C0–C9 acceptance remain open. Installed apps, original canonical
+work and approved speech/GPU/model placement remain unchanged. Qwen formatter
+activation still awaits owner direction. Continue the complete plan.
+
 ## October 1 shared ChatGPT host and setup controls
 
 [The account guide](CODEX-ACCOUNTS.md) now covers one lazy host-owned login
@@ -31,9 +53,10 @@ the known unreviewed native Codex executable gate; installed-package jobs skip.
 All 30 original dirty canonical files again match their private backup bytes.
 The following evidence/next-contract documentation update changes no code.
 
-Production login stays disabled pending eligibility, with no RPC/environment
-bypass. Profile/model binding, safe worker token renewal, the Codex-managed
-subscription route, live consent/inference and full C0–C9 acceptance remain open.
+Historical host-controls checkpoint, superseded for account/model binding and
+worker renewal by the section above. Production login stays disabled pending
+eligibility, with no RPC/environment bypass. The Codex-managed subscription
+route, live consent/inference and full C0–C9 acceptance remain open.
 Installed apps, the canonical checkout's unrelated work, private speech and
 approved model/GPU placement remain untouched. Qwen activation/restart still
 awaits the owner's answer. Continue the full plan.

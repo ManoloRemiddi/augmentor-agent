@@ -40,6 +40,62 @@ test('Codex RPC timeout preserves unknown outcome and stays correlated', async t
   await assert.rejects(rpc.call('wait', {}, 20), error => error instanceof CodexTransportError && error.outcomeUnknown);
   assert.equal((await rpc.call('echo', {value: 'next'})).value, 'next');
 });
+
+async function renewableClient(t) {
+  const rpc=await client(t,{env:{AUGMENTOR_CODEX_CREDENTIAL:'synthetic-original'}});
+  await rpc.call('thread/start',{});
+  const replacement=marker=>({...rpc.options,env:{...rpc.options.env,AUGMENTOR_CODEX_CREDENTIAL:marker}});
+  const resume={threadId:'fixture-thread',cwd:rpc.options.cwd,excludeTurns:true};
+  return {rpc,replacement,resume};
+}
+test('credential renewal retires the owned process, preserves observers and resumes exactly the same thread',async t=>{
+  const {rpc,replacement,resume}=await renewableClient(t),exits=[],failures=[];
+  rpc.on('exit',value=>exits.push(value));rpc.on('failure',value=>failures.push(value));
+  const before=await rpc.call('credential-marker');
+  await rpc.renew(replacement('synthetic-replacement'),resume,new AbortController().signal);
+  const after=await rpc.call('credential-marker');assert.notEqual(before.pid,after.pid);assert.equal(after.marker,'synthetic-replacement');
+  assert.equal(exits.length,0);assert.equal(failures.length,0);
+  const notification=once(rpc,'notification');await rpc.call('notify');assert.equal((await notification)[0].params.delta,'hello');
+  assert.equal((await rpc.call('echo',{value:'continued'})).value,'continued');
+});
+test('renewal refuses a changed destination, command, workspace, thread or non-credential environment',async t=>{
+  const {rpc,replacement,resume}=await renewableClient(t);
+  for(const options of [{...replacement('new'),command:'/different'}, {...replacement('new'),args:[fixture,'different']},
+    {...replacement('new'),cwd:'/tmp'}, {...replacement('new'),env:{AUGMENTOR_CODEX_CREDENTIAL:'new',CODEX_HOME:'/different'}}]){
+    await assert.rejects(rpc.renew(options,resume,new AbortController().signal),/binding/);
+  }
+  for(const params of [{...resume,threadId:'other'}, {...resume,excludeTurns:false}, {...resume,model:'other'}])await assert.rejects(rpc.renew(replacement('new'),params,new AbortController().signal),/binding/);
+  assert.equal((await rpc.call('credential-marker')).marker,'synthetic-original');
+});
+test('pending transport calls or unanswered approvals prohibit credential renewal',async t=>{
+  const {rpc,replacement,resume}=await renewableClient(t);
+  const pending=rpc.call('echo',{delay:100});await assert.rejects(rpc.renew(replacement('new'),resume,new AbortController().signal),/pending/);await pending;
+  rpc.on('request',()=>{});await rpc.call('ask');await assert.rejects(rpc.renew(replacement('new'),resume,new AbortController().signal),/pending/);
+  rpc.reject('approval');
+});
+test('new requests and a competing renewal cannot enter while a thread is resuming',async t=>{
+  const {rpc,replacement,resume}=await renewableClient(t);
+  const renewing=rpc.renew(replacement('synthetic-slow-resume'),resume,new AbortController().signal);
+  await assert.rejects(rpc.call('echo'),/renewal is in progress/);await assert.rejects(rpc.renew(replacement('new'),resume,new AbortController().signal),/pending/);
+  await renewing;assert.equal((await rpc.call('echo',{value:'after'})).value,'after');
+});
+test('a failed resume retires the new process without restoring the old bearer',async t=>{
+  const {rpc,replacement,resume}=await renewableClient(t);let exits=0;rpc.on('exit',()=>exits++);
+  await assert.rejects(rpc.renew(replacement('synthetic-resume-failure'),resume,new AbortController().signal),/resume rejection/);
+  assert.ok(exits>=1);await assert.rejects(rpc.call('echo'),CodexTransportError);
+  assert.equal(rpc.options.env.AUGMENTOR_CODEX_CREDENTIAL,'synthetic-resume-failure');
+});
+test('Close during renewal prevents replacement admission and remains final',async t=>{
+  const {rpc,replacement,resume}=await renewableClient(t);
+  const renewing=rpc.renew(replacement('synthetic-slow-resume'),resume,new AbortController().signal),rejected=assert.rejects(renewing,/closing/);
+  await rpc.close();await rejected;await assert.rejects(rpc.call('echo'),CodexTransportError);assert.throws(()=>rpc.start(),/cannot/);
+});
+test('Stop during new-process resume closes the replacement and cannot restore the old credential',async t=>{
+  const {rpc,replacement,resume}=await renewableClient(t),abort=new AbortController();
+  const entered=once(rpc,'notification'),renewing=rpc.renew(replacement('synthetic-slow-resume'),resume,abort.signal),rejected=assert.rejects(renewing,/cancelled/);
+  assert.equal((await entered)[0].method,'synthetic/resuming');abort.abort();await rejected;
+  await assert.rejects(rpc.call('echo'),CodexTransportError);assert.equal(rpc.options.env.AUGMENTOR_CODEX_CREDENTIAL,'synthetic-slow-resume');
+});
 for (const method of ['bad', 'large', 'crash']) test(`Codex RPC fails pending requests on ${method}`, async t => {
   const rpc = await client(t, {maxFrameBytes: 1024});
   await assert.rejects(rpc.call(method), CodexTransportError);

@@ -84,6 +84,24 @@ class CodexSetupTests(unittest.TestCase):
         self.assertIn('eligibility', self.dialog.account_note.text())
         self.dialog.account_start(False); self.owner.finish()
         self.assertFalse(any(method == 'accounts.start' for method, _ in self.owner.calls))
+        self.assertFalse(self.dialog.kind.model().item(self.dialog.kind.findData('chatgpt-plan')).isEnabled())
+    def test_plan_profile_uses_one_consented_account_and_never_sends_an_api_key(self):
+        account = {'id': 'chatgpt-00000000-0000-4000-8000-000000000001', 'label': 'Fixture', 'signedIn': True, 'planUsage': True}
+        self.owner.account_status['accounts'] = [account]; self.enable_accounts()
+        self.dialog.key.setText('synthetic-api-key'); self.dialog.kind.setCurrentIndex(self.dialog.kind.findData('chatgpt-plan'))
+        self.assertEqual(self.dialog.key.text(), ''); self.assertFalse(self.dialog.key.isEnabled()); self.assertFalse(self.dialog.endpoint.isEnabled())
+        self.assertFalse(self.dialog.save_button.isEnabled()); self.dialog.accounts.setCurrentIndex(1)
+        self.dialog.model.setText('fixture-plan-model'); self.dialog.key.setText('synthetic-ignored')
+        self.dialog.save(); self.owner.finish()
+        payload = [payload for method, payload in self.owner.calls if method == 'profiles.configure'][-1]
+        self.assertEqual(payload['accountId'], account['id']); self.assertEqual(payload['kind'], 'chatgpt-plan'); self.assertEqual(payload['endpoint'], 'https://api.openai.com/v1')
+        self.assertNotIn('credential', payload); self.assertIn('consume plan usage', self.dialog.provider_notice.text())
+        self.assertEqual(self.dialog.accounts.currentData(), account['id']); self.assertTrue(self.dialog.check_button.isEnabled())
+    def test_identity_only_account_cannot_save_or_check_a_plan_profile(self):
+        self.owner.account_status['accounts'] = [{'id': 'fixture-account', 'label': 'Identity only', 'signedIn': True, 'planUsage': False}]
+        self.enable_accounts(); self.dialog.kind.setCurrentIndex(self.dialog.kind.findData('chatgpt-plan')); self.dialog.accounts.setCurrentIndex(1)
+        self.assertFalse(self.dialog.save_button.isEnabled()); self.dialog.save(); self.owner.finish()
+        self.assertFalse(any(method == 'profiles.configure' for method, _ in self.owner.calls))
     def test_sign_in_keeps_close_available_and_cancel_works_through_a_fresh_request(self):
         self.enable_accounts(); self.dialog.account_start(False); self.owner.finish()
         self.assertEqual([payload for method, payload in self.owner.calls if method == 'accounts.start'], [{'requestPlanUsage': False}])

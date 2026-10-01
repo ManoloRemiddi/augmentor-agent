@@ -45,10 +45,12 @@ function accountFixture(t,{enabled=true,startGate}={}){
   dom.window.HTMLDialogElement.prototype.showModal=function(){this.open=true};
   dom.window.HTMLDialogElement.prototype.close=function(){this.open=false;this.dispatchEvent(new dom.window.Event('close'))};
   const timers=[];dom.window.setTimeout=fn=>{timers.push(fn);return timers.length};dom.window.clearTimeout=id=>{timers[id-1]=null};
-  const calls=[],status={enabled,reason:enabled?undefined:'Subscription login awaits eligibility confirmation.',accounts:[],attempt:null};
+  const calls=[],profiles=[],status={enabled,reason:enabled?undefined:'Subscription login awaits eligibility confirmation.',accounts:[],attempt:null};
   const send=async(type,{request}={})=>{
+    if(type==='models-refresh')return {ok:true};
     calls.push(request);
-    if(request.action==='profiles')return {ok:true,result:{profiles:[]}};
+    if(request.action==='profiles')return {ok:true,result:{profiles:[...profiles]}};
+    if(request.action==='configure'){profiles.push({...request.profile});return {ok:true,result:{...request.profile}}};
     if(request.action==='account-status')return {ok:true,result:structuredClone(status)};
     if(request.action==='account-start'){
       await startGate?.promise;status.attempt={id:'synthetic-attempt',state:'opening'};return {ok:true,result:{attempt:{...status.attempt}}};
@@ -66,6 +68,23 @@ test('unconfirmed subscription eligibility is visible and prevents Browser login
   const f=accountFixture(t,{enabled:false});await settle();
   assert.equal(f.button('Sign in with ChatGPT').disabled,true);assert.match(f.dialog.textContent,/eligibility confirmation/);
   f.button('Sign in with ChatGPT').click();await settle();assert.equal(f.calls.filter(row=>row.action==='account-start').length,0);
+  assert.equal(f.dialog.querySelector('[value="chatgpt-plan"]').disabled,true);
+});
+test('Browser plan profile binds the chosen consented account and excludes an API key',async t=>{
+  const f=accountFixture(t);await settle();const field=label=>f.dialog.querySelector(`[aria-label="${label}"]`);
+  f.status.accounts=[{id:'fixture-consented',label:'Fixture',signedIn:true,planUsage:true}];await f.poll();
+  field('API key').value='synthetic-api-key';field('Connection type').value='chatgpt-plan';field('Connection type').dispatchEvent(new f.dom.window.Event('input'));
+  assert.equal(field('API key').value,'');assert.equal(field('API key').disabled,true);assert.equal(field('Endpoint URL').disabled,true);assert.equal(f.button('Save connection').disabled,true);
+  f.select.value='fixture-consented';f.select.dispatchEvent(new f.dom.window.Event('change'));field('Model ID').value='fixture-model';field('API key').value='synthetic-ignored';
+  f.button('Save connection').click();await settle();const profile=f.calls.find(row=>row.action==='configure').profile;
+  assert.equal(profile.kind,'chatgpt-plan');assert.equal(profile.accountId,'fixture-consented');assert.equal(profile.endpoint,'https://api.openai.com/v1');assert.equal(Object.hasOwn(profile,'credential'),false);
+  assert.match(f.dialog.textContent,/consume plan usage/);assert.equal(f.select.value,'fixture-consented');
+});
+test('Browser identity-only accounts cannot save a subscription model connection',async t=>{
+  const f=accountFixture(t);await settle();f.status.accounts=[{id:'identity-only',label:'Identity',signedIn:true,planUsage:false}];await f.poll();
+  const kind=f.dialog.querySelector('[aria-label="Connection type"]');kind.value='chatgpt-plan';kind.dispatchEvent(new f.dom.window.Event('input'));
+  f.select.value='identity-only';f.select.dispatchEvent(new f.dom.window.Event('change'));assert.equal(f.button('Save connection').disabled,true);
+  f.button('Save connection').click();await settle();assert.equal(f.calls.some(row=>row.action==='configure'),false);
 });
 test('Browser login keeps Close available; explicit cancellation shares host status',async t=>{
   const f=accountFixture(t);await settle();f.button('Sign in with ChatGPT').click();await settle();

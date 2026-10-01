@@ -11,7 +11,7 @@ class CodexSetupDialog(QDialog):
         super().__init__(window)
         self.owner = window; self.controller = window.controller; self.client = self.controller.client
         self.rows = []; self.profile_id = None; self.busy = False; self.dismissed = False
-        self.account_busy = False; self.account_status = {}; self.owned_attempt = None
+        self.account_busy = False; self.account_status = {}; self.owned_attempt = None; self.profile_account_id = None
         self.setWindowTitle('Connect a model · Codex'); self.setModal(True); scaled(self).setMinimumWidth(470)
         layout = QVBoxLayout(self)
         intro = QLabel('Use a Responses-compatible API provider or a model running on this computer. ChatGPT account availability is shown below.')
@@ -19,6 +19,7 @@ class CodexSetupDialog(QDialog):
         form = QFormLayout(); layout.addLayout(form)
         self.profiles = QComboBox(); self.profiles.addItem('New connection', None); self.profiles.currentIndexChanged.connect(self.selected)
         self.kind = QComboBox(); self.kind.addItem('API provider', 'api'); self.kind.addItem('Local model', 'local')
+        self.kind.addItem('ChatGPT plan', 'chatgpt-plan')
         self.name = QLineEdit('My Codex model'); self.name.setMaxLength(100)
         self.endpoint = QLineEdit(); self.endpoint.setPlaceholderText('https://provider.example/v1 or http://127.0.0.1:8080/v1')
         self.model = QLineEdit(); self.model.setPlaceholderText('Exact model ID')
@@ -28,7 +29,7 @@ class CodexSetupDialog(QDialog):
             widget.setAccessibleName(label); form.addRow(label, widget)
         form.addRow(self.remove_key)
         self.accounts = QComboBox(); self.accounts.setAccessibleName('ChatGPT account'); self.accounts.addItem('Add a ChatGPT account', None)
-        self.accounts.currentIndexChanged.connect(self.account_controls); form.addRow('ChatGPT account', self.accounts)
+        self.accounts.currentIndexChanged.connect(self.account_selected); form.addRow('ChatGPT account', self.accounts)
         self.account_note = QLabel('Checking ChatGPT account availability…'); self.account_note.setWordWrap(True); layout.addWidget(self.account_note)
         account_buttons = QHBoxLayout(); layout.addLayout(account_buttons)
         self.sign_in_button = QPushButton('Sign in with ChatGPT'); self.sign_in_button.clicked.connect(lambda: self.account_start(False)); account_buttons.addWidget(self.sign_in_button)
@@ -37,6 +38,7 @@ class CodexSetupDialog(QDialog):
         self.sign_out_button = QPushButton('Sign out'); self.sign_out_button.clicked.connect(self.account_sign_out); account_buttons.addWidget(self.sign_out_button)
         notice = QLabel('Keys are stored in the operating system credential store. Checks send a short tool exercise or a synthetic image; your provider may charge for them. The Codex check uses one harmless test tool and sends no personal files or chat history. The image check enables screenshots for new chats.')
         notice.setWordWrap(True); layout.addWidget(notice)
+        self.provider_notice = notice; self.api_notice = notice.text()
         self.note = QLabel('Loading saved connections…'); self.note.setWordWrap(True); layout.addWidget(self.note)
         buttons = QHBoxLayout(); layout.addLayout(buttons)
         self.close_button = QPushButton('Close'); self.close_button.clicked.connect(self.reject); buttons.addWidget(self.close_button)
@@ -45,7 +47,7 @@ class CodexSetupDialog(QDialog):
         self.save_button = QPushButton('Save connection'); self.save_button.clicked.connect(self.save); buttons.addWidget(self.save_button)
         self.fields = [self.profiles, self.kind, self.name, self.endpoint, self.model, self.key, self.remove_key]
         for field in [self.name, self.endpoint, self.model, self.key]: field.textChanged.connect(self.edited)
-        self.kind.currentIndexChanged.connect(self.edited); self.remove_key.toggled.connect(self.edited)
+        self.kind.currentIndexChanged.connect(self.kind_changed); self.remove_key.toggled.connect(self.edited)
         self.dirty = False
         self.account_timer = QTimer(self); self.account_timer.setInterval(1000); self.account_timer.timeout.connect(self.refresh_accounts); self.account_timer.start()
         self.account_controls(); self.refresh_accounts()
@@ -60,9 +62,27 @@ class CodexSetupDialog(QDialog):
         self.cancel_login_button.setEnabled(pending and not self.account_busy)
         self.sign_out_button.setEnabled(bool(self.accounts.currentData()) and not pending and not self.account_busy and not self.busy)
         self.accounts.setEnabled(not pending and not self.account_busy and not self.busy)
+        self.kind.model().item(self.kind.findData('chatgpt-plan')).setEnabled(self.account_status.get('enabled') is True)
+        plan = self.kind.currentData() == 'chatgpt-plan'
+        row = next((row for row in self.account_status.get('accounts', []) if row['id'] == self.accounts.currentData()), {})
+        ready = not plan or self.account_status.get('enabled') is True and row.get('signedIn') is True and row.get('planUsage') is True
+        for field in (self.endpoint, self.key, self.remove_key): field.setEnabled(not self.busy and not plan)
+        self.save_button.setEnabled(not self.busy and ready)
+        self.check_button.setEnabled(not self.busy and ready and bool(self.profile_id) and not self.dirty); self.image_button.setEnabled(self.check_button.isEnabled())
+        self.provider_notice.setText('This connection uses the selected ChatGPT plan. Connection checks consume plan usage and send only synthetic test input. No API key is used. Enter a model ID and check its availability before starting a chat.' if plan else self.api_notice)
+
+    def account_selected(self, *_):
+        self.profile_account_id = None
+        if self.kind.currentData() == 'chatgpt-plan': self.edited()
+        else: self.account_controls()
+
+    def kind_changed(self, *_):
+        if self.kind.currentData() == 'chatgpt-plan':
+            self.endpoint.setText('https://api.openai.com/v1'); self.key.clear(); self.remove_key.setChecked(False)
+        self.edited()
 
     def account_loaded(self, value):
-        self.account_status = value; selected = self.accounts.currentData()
+        self.account_status = value; selected = self.profile_account_id or self.accounts.currentData()
         self.accounts.blockSignals(True); self.accounts.clear(); self.accounts.addItem('Add a ChatGPT account', None)
         for row in value.get('accounts', []):
             self.accounts.addItem(row['label'] + (' · selected' if row.get('active') else ''), row['id'])
@@ -127,14 +147,18 @@ class CodexSetupDialog(QDialog):
 
     def edited(self, *_):
         self.dirty = True; self.check_button.setEnabled(False); self.image_button.setEnabled(False)
+        self.account_controls()
 
     def selected(self, *_):
         self.profile_id = self.profiles.currentData()
         row = next((row for row in self.rows if row['id'] == self.profile_id), {})
+        self.profile_account_id = row.get('accountId')
+        self.accounts.blockSignals(True); self.accounts.setCurrentIndex(max(0, self.accounts.findData(self.profile_account_id))); self.accounts.blockSignals(False)
         self.name.setText(row.get('name', 'My Codex model')); self.endpoint.setText(row.get('endpoint', '')); self.model.setText(row.get('model', ''))
         self.kind.setCurrentIndex(self.kind.findData(row.get('kind', 'api'))); self.key.clear(); self.remove_key.setChecked(False)
         self.dirty = False; self.check_button.setEnabled(bool(self.profile_id) and not self.busy); self.image_button.setEnabled(self.check_button.isEnabled())
         self.note.setText('Codex tool check passed for this connection.' if row.get('toolsVerified') else 'Image response checked; screenshots are available in new chats.' if row.get('imageValidatedAt') else 'Text response checked; tool compatibility is not verified.' if row.get('validation') == 'responses-text' else 'Save a connection, then check it with Codex.')
+        self.account_controls()
 
     def loaded(self, value):
         self.rows = value['profiles']; selected = self.profile_id
@@ -153,9 +177,9 @@ class CodexSetupDialog(QDialog):
         def finished(result):
             if self.dismissed: return
             self.busy = False
-            self.account_controls()
             for field in [*self.fields, self.save_button, self.close_button]: field.setEnabled(True)
             self.check_button.setEnabled(bool(self.profile_id) and not self.dirty); self.image_button.setEnabled(self.check_button.isEnabled())
+            self.account_controls()
             if self.owner.controller is not self.controller: self.reject(); return
             if result[1]: self.note.setText(result[1]); return
             callback(result[0])
@@ -164,7 +188,10 @@ class CodexSetupDialog(QDialog):
     def save(self):
         if self.busy: return
         payload = {'id': self.profile_id or str(uuid.uuid4()), 'name': self.name.text().strip(), 'kind': self.kind.currentData(), 'endpoint': self.endpoint.text().strip(), 'model': self.model.text().strip()}
-        if self.remove_key.isChecked(): payload['credential'] = None
+        if self.kind.currentData() == 'chatgpt-plan':
+            payload['accountId'] = self.accounts.currentData()
+            if not self.save_button.isEnabled(): return
+        elif self.remove_key.isChecked(): payload['credential'] = None
         elif self.key.text(): payload['credential'] = self.key.text()
         self.note.setText('Saving connection…')
         def saved(row):

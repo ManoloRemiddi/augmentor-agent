@@ -5,9 +5,11 @@
 Status, October 1: OAuth transactions, protected account persistence and one
 shared host login controller are implemented in development source. Desktop and
 Browser settings use that controller for account status, login/cancellation,
-explicit plan-permission requests and logout. This remains partial C4 work in the
-[full C0–C9 plan](CODEX-INTEGRATION-PLAN.md): account/model profile binding,
-running-worker renewal and actual subscription inference are not connected.
+explicit plan-permission requests and logout. Saved plan profiles now bind one
+account, model and fixed OpenAI destination, and queued turn admission renews an
+idle worker before dispatch when its credential revision changes. This remains
+partial C4 work in the [full C0–C9 plan](CODEX-INTEGRATION-PLAN.md): the separate
+Codex-managed account route, eligibility and actual subscription inference remain open.
 The shipped host keeps login disabled pending distribution eligibility; neither
 RPC nor environment variables can turn that gate on. No real account or provider
 token was used in these proofs. Installed apps remain unchanged.
@@ -95,7 +97,7 @@ form cancels only the attempt it started, including a late start reply. Closing 
 form observing the other surface's attempt leaves that attempt intact. Polling
 stops on Close; replacing the native controller cancels its owned attempt.
 Logout clears stale successful-login text and preserves an accurate receipt for
-the other surface. Account selection is not yet a model/billing connection.
+the other surface. Default account selection does not rebind saved connections.
 
 ## Evidence
 
@@ -156,41 +158,75 @@ has the same result: source-boundary/Home, application/UI/credential checks,
 production npm notices and extension packaging pass. The native executable
 notice gate still blocks Debian packages and skips installed-package checks.
 
+## Bound connections and worker renewal — October 1
+
+A `chatgpt-plan` profile stores an account ID and model, with the fixed destination
+`https://api.openai.com/v1`. It contains neither an API credential reference nor
+OAuth tokens. API/local profiles reject account inheritance; explicit conversion
+retires the previous API key. Both setup forms restore a saved profile's pinned
+account, require a ready account with plan consent, disable API-key controls and
+send no credential field in the plan payload. The production eligibility gate
+also disables the plan choice; injected test authorities cannot enable production.
+
+Configuration revisions and protected-account credential revisions are separate.
+Changing model/account/destination invalidates old chats and connection checks;
+rotating a token preserves the profile revision and existing image/tool checks.
+Changing the default selected account never redirects a saved profile or chat.
+A missing, identity-only, signed-out or quarantined account refuses inference,
+without choosing another account or API billing.
+
+Every root turn, including the scheduled queue pump, runs account preflight while
+its operation is still queued, before `ledger.dispatch` and `turn/start`. It first
+verifies native idleness and a stable activity snapshot, resolves the exact saved
+account/profile, and rechecks the binding and activity. Only a changed credential
+revision causes renewal. `CodexRpc.renew` retires the owned process, initializes
+its replacement and resumes the exact bound thread; it sends no turn. Destination,
+model, runtime arguments, workspace and isolated state remain fixed. Captured
+child handlers ignore retired output and suppress retirement exit events, while
+the existing observer object remains attached. Pending calls/interactions refuse
+renewal. Stop/Close cannot resurrect a replacement. Failed renewal retires the
+worker and leaves the unsent operation queued/paused for explicit recovery.
+Unknown acknowledged or unconfirmed work blocks renewal and cannot be replayed.
+Steering continues within the already admitted active turn; it never restarts an
+active worker. Further account-specific model/limit and auxiliary funding
+acceptance remains required.
+
+New focused evidence comprises nine profile cases, eight host admission/recovery
+cases, seven transport renewal cases and an actual pinned Codex renewal proof.
+The host peer is independently authored and scripted, uses synthetic grants and
+never calls a provider. Its cases cover queued renewal, native child activity,
+uncertain refresh, Stop during rotation, default-account isolation, explicit
+rebinding, unknown turn outcomes and failed resume with explicit recovery.
+The actual Codex 0.159.2 proof uses a disposable loopback Responses provider and
+synthetic API bearers: initialize/resume makes no inference request, the second
+turn uses the new bearer, and native history preserves both distinct client IDs.
+It proves native renewal transport, not live OpenAI subscription inference.
+The complete suites pass 453 root cases (451 pass, two opt-in memory proofs
+skipped), all 63 Browser cases and 588 native cases (586 pass, two Mac-only
+skips). Type/build, 40 focused profile/host/transport/native-renewal cases and
+the private-source boundary pass. All 30 original changed canonical files
+still match their private backup bytes. Publishing and platform CI source
+identity follow below; earlier CI above covers only its stated source.
+
+Reproduce the new contracts after building:
+
+```sh
+node --test tests/codex-plan-profiles.test.mjs tests/codex-plan-host.test.mjs
+node --test tests/codex-rpc.test.mjs tests/codex-native-renewal.test.mjs
+```
+
 ## Remaining C4 requirements
 
-The next implementation must keep three identities separate: a profile's model,
-account and destination configuration; its protected account's rotating credential
-revision; and the saved native thread. Renewing a token must not change the
-configuration revision and invalidate an otherwise unchanged saved chat.
-Selecting the default account must never rebind existing chats or auxiliary work.
-
-Credential preflight belongs before every native turn admission, including the
-scheduled queue pump in `CodexSession.pump`, before `ledger.dispatch` and
-`turn/start`. Checking only `session.prompt` misses queued work. The preparation
-hook already runs before durable dispatch and before continuity-context injection;
-account renewal must preserve Stop during that preparation and keep any unsent
-operation queued/paused on failure. Runtime renewal must verify native idleness,
-retire the owned old process, initialize a worker with current credentials and
-resume the exact saved thread. Old child output/exit handlers must not corrupt
-the replacement; no unknown turn/tool outcome may be resent.
-
-Account-bound model checks, prompt improvement, branching/recovery and memory
-auxiliary work need the same permission and funding policy. A model catalog or
-saved permission flag does not prove current entitlement or successful inference.
-The API/local routes remain explicit alternatives, never subscription-failure
-fallbacks. The separate Codex-managed login route still requires its own supported
-authentication and isolated state contract.
-
-- Confirm the distribution's eligibility for each subscription route.
-- Qualify actual consent and browser launch through the now-wired controls on
-  eligible Linux/Mac distributions; source/fixture contracts already pass on both.
-- Bind selected accounts/models to connection profiles and fence worker/account
-  switching, logout and token renewal. Renew an idle app-server process and resume
-  its saved thread; never retry unknown prompt/tool outcomes.
-- Implement the separately permitted Codex-managed login route and account-specific
-  model/usage behavior, with explicit billing selection and no silent fallback.
+- Confirm distribution eligibility and qualify actual consent/browser launch on
+  eligible Linux/Mac builds; production SIWC remains disabled.
+- Implement the separately permitted Codex-managed login route and isolated state.
+- Complete account-specific models and known usage/limits, including exhaustion
+  after partial streaming, with explicit funding and no silent fallback.
+- Audit and qualify model checks, prompt improvement, branches/recovery and memory
+  auxiliary work under the same account permission and funding policy.
 - Qualify real consent, expiry/revocation, completed inference, worker restart and
-  both user interfaces on Linux and macOS. Complete C0–C3 and C5–C9 acceptance too.
+  both user interfaces. Complete C0–C3 and C5–C9 acceptance too; the native package
+  notice gate and pending owner-directed Qwen formatter activation remain open.
 
 The behavior follows official OpenAI documentation inspected October 1:
 [registration](https://developers.openai.com/siwc/token-sharing-open-source/sign-in),

@@ -461,8 +461,13 @@ Desktop/Browser status/sign-in/cancellation/consent/logout controls. Source
 contract tests and isolated actual Linux storage pass; production login remains
 disabled. The host/UI source checkpoint `95229aa` passes Mac 14/26 contracts and
 all actual Keychain proofs; Linux packaging retains its native notice gate.
-Profile/model binding, worker renewal, eligibility and real account/inference acceptance remain open, so the
-C4 acceptance checkboxes below are not certified complete.
+Account/model profile binding and pre-dispatch worker renewal are now implemented:
+configuration revisions remain separate from rotating credentials, default-account
+selection cannot redirect saved chats, and failed renewal preserves unsent work.
+Scripted host and actual pinned Codex/loopback provider proofs pass. The separate
+Codex-managed route, account-specific models/limits, eligibility and real
+account/inference acceptance remain open; the C4 acceptance checkboxes below
+are not certified complete. See the account guide for exact evidence scope.
 
 Dependencies: C1–C2 and the applicable C0 eligibility gate. Can be developed
 alongside C3 once shared account contracts are stable.
