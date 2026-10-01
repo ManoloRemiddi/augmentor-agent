@@ -33,8 +33,11 @@ not close unrelated native-binary source/license gates.
 The October 1 [account lifecycle checkpoint](CODEX-ACCOUNTS.md) extends the
 same proof to synthetic OAuth grant records, rotating-token persistence,
 account-index restart and logout through the actual native store. Linux passes
-in a disposable isolated keyring. These new account cases need fresh Mac CI;
-the earlier Mac results below qualify the previous scalar-store proof only.
+in a disposable isolated keyring. [Mac CI for `91db7aa`](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36861022280)
+passes those new account cases on macOS 14/26 through the build, packaged Desktop
+and standalone Browser interpreters, including complete cleanup. Earlier Mac
+results below qualify their previous scalar-store proof only. No live OAuth or
+interactive owner-wallet qualification is implied.
 
 ```sh
 # Linux: separate encrypted keyring and D-Bus session; owner stores are untouched.

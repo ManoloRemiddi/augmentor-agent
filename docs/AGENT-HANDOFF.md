@@ -20,7 +20,13 @@ test environment. No installed dependencies or apps were altered.
 These classes remain internal and production login defaults off: no host/profile,
 Desktop/Browser or worker-renewal wiring, real account consent/inference,
 distribution eligibility or C4/full C0–C9 completion is claimed. Existing Mac CI
-must now qualify the expanded account-store proof. Continue that wiring and the
+passes the expanded account-store proof on Mac 14/26 for source `91db7aa` through
+the build, packaged Desktop and standalone Browser interpreters; see
+[Mac CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36861022280).
+[Debian CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36861022467)
+passes application/Browser/credential/npm-notice/Home checks and still stops at
+the unreviewed native Codex executable gate. All 30 original dirty canonical
+working files remain byte-identical to their private backups. Continue wiring and the
 remaining full plan. The separate Qwen activation/restart decision is pending;
 do not change its approved formatting/model deployment without owner direction.
 

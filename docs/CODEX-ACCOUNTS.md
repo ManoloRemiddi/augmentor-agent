@@ -83,7 +83,19 @@ Debian container, using a separate D-Bus session/keyring and no network. It veri
 account save/rotation/reopen/logout and cleanup through the real Node/Python OS
 store. Renewal and revocation remain synthetic in this proof. The same expanded
 script is required by existing Mac build/Desktop/Browser Keychain CI steps;
-fresh Mac results must be recorded separately. The owner's wallet was untouched.
+[CI for `91db7aa`](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36861022280)
+passes on macOS 14 and 26, with all three interpreters reporting positive account
+save/rotation/restart/logout and cleanup. The owner's wallet was untouched.
+
+The public OpenAI discovery endpoint was independently read without credentials:
+issuer, authorization/token/JWKS/revocation endpoints and RS256 match the adapter's
+constraints. This is metadata compatibility, not completed live authorization.
+
+[Debian CI for the same source](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36861022467)
+passes application/Browser/credential checks, production npm notices and the Home
+job. Debian packaging still fails its pre-existing unreviewed native Codex
+executable gate; installed-package jobs therefore do not run. The green Mac jobs
+do not clear native dependency review or qualify an installed Codex product.
 
 ## Remaining C4 requirements
 
