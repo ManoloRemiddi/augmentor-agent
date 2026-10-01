@@ -18,6 +18,10 @@ root=Path.home();run=Path(os.environ['XDG_RUNTIME_DIR']);run.mkdir(mode=0o700,ex
 out=args.out.resolve();out.mkdir(parents=True,exist_ok=True)
 proof=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 os.environ.update(XDG_RUNTIME_DIR=str(run),XDG_CURRENT_DESKTOP='GNOME',XDG_SESSION_TYPE='wayland',GNOME_SHELL_SESSION_MODE='user',LIBGL_ALWAYS_SOFTWARE='1',GALLIUM_DRIVER='llvmpipe',WAYLAND_DISPLAY='wayland-augmentor')
+# dbus-run-session started before Python set these values. Propagate only the
+# private graphical environment so early Shell/IBus activation selects GNOME.
+subprocess.run(['dbus-update-activation-environment','XDG_CURRENT_DESKTOP','XDG_SESSION_TYPE',
+                'GNOME_SHELL_SESSION_MODE','WAYLAND_DISPLAY','XDG_RUNTIME_DIR','DISPLAY'],check=True,timeout=5)
 processes=[]
 try:
  if exercise:
@@ -47,6 +51,8 @@ try:
  for interface,body in re.findall(r'interface (org\.freedesktop\.portal\.\w+)\s*\{(.*?)\n\s*\};',portal,re.S):
   version_property=re.search(r'\bversion\s*=\s*(\d+)',body)
   if version_property:portal_versions[interface.rsplit('.',1)[-1]]=int(version_property[1])
+ for interface,minimum in {'RemoteDesktop':2,'ScreenCast':5,'GlobalShortcuts':1}.items():
+  if portal_versions.get(interface,0)<minimum:raise RuntimeError('GNOME portal interface unavailable: '+interface)
  report={'portalVersions':portal_versions,'proofScriptSha256':proof,'shell':version,'virtualMonitor':'1280x800','waylandSocket':True,'privateBus':True,'compositorOwnerMatchesChild':True,'softwareRendering':True,'loginManager':'GNOME built-in dummy (headless fixture)','interfaces':{label:hashlib.sha256((out/(label+'-interfaces.txt')).read_bytes()).hexdigest() for label in ('shell','display','input','portal')},'actualInputTested':False,'portalConsentTested':False,'actualLoginRebootTested':False}
  (out/'session.json').write_text(json.dumps(report,indent=2)+'\n')
  print('ISOLATED GNOME SESSION READY')

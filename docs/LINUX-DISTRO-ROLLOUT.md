@@ -552,3 +552,84 @@ caches, not newly built Augmentor artifacts or GNOME acceptance on all four
 targets. The installed-package proof now checks GTK 4's accelerator API through
 the ordinary test user and records its actual version. Current-source package/
 complete artifacts remain to be qualified after a clean push.
+
+The current adapter report also records a repeated proof after fixing the
+private D-Bus activation environment. Python originally set GNOME variables
+after `dbus-run-session` started; early Shell/IBus activation could then choose a
+generic portal backend. The fixture now propagates only its graphical variables
+to its private bus before starting Shell and refuses discovery without
+RemoteDesktop 2, ScreenCast 5 and GlobalShortcuts 1. The repeat passes those real
+interfaces and every shortcut/rollback assertion. Earlier shortcut delivery
+evidence is valid independently of portal selection; use the updated report/hash
+to reproduce the combined GNOME fixture. This is test infrastructure, not a change
+to the owner's activation environment. GNOME 49/48/46 and non-KDE/non-GNOME
+desktop shortcut qualification remain open; the adapter currently admits GNOME 50.
+
+### Researched GNOME observation design: next implementation stage
+
+A version-qualified, read-only Shell extension is needed for the trusted observer.
+The [tagged Shell introspection interface](https://github.com/GNOME/gnome-shell/blob/50.5/js/misc/introspect.js)
+restricts callers to portal services, omits x/y and stacking, and filters some
+popup windows. It cannot replace KWin observations. GNOME's
+[extension guidance](https://gjs.guide/extensions/overview/updates-and-breakage.html)
+requires version-specific qualification; begin with Shell 50, tested on 50.5.
+This is a researched design, not an implemented or enabled input adapter.
+
+Use public introspected APIs from the tagged
+[window](https://github.com/GNOME/mutter/blob/50.5/src/meta/window.h),
+[display](https://github.com/GNOME/mutter/blob/50.5/src/core/display.c),
+[actor enumeration](https://github.com/GNOME/gnome-shell/blob/50.5/src/shell-global.c)
+and [workspace manager](https://github.com/GNOME/mutter/blob/50.5/src/core/meta-workspace-manager.c):
+
+| Observation | Planned API/identity contract |
+| --- | --- |
+| Focus | `global.display.get_focus_window()`; null is unavailable |
+| Window | `get_stable_sequence()` plus fresh extension-enable epoch and pinned Shell bus owner |
+| Bounds | `get_frame_rect()` in logical coordinates; no shadow/input-border inference |
+| Visible windows | `global.get_window_actors()`, `get_meta_window()`, workspace membership, mapped/paint visibility and lifecycle filtering |
+| Stacking | `sort_windows_by_stacking()` for managed windows; retain override-redirect/popups as blockers |
+| Workspace | active object identity plus display index; handle sticky windows and dynamic removal/reordering |
+| Monitors | `get_n_monitors()`, geometry and scale; retain one-monitor input limit |
+
+Window [PID is client-spoofable](https://github.com/GNOME/mutter/blob/50.5/src/core/window.c),
+so it is metadata for accessibility lookup, never target identity or authorization.
+`get_tab_list()` is an Alt-Tab/MRU selection, not a complete stacking observation.
+Closing actors can persist during animation. Track unmanaging/unmanaged and actor
+destruction, and invalidate tokens on extension/Shell replacement. The extension
+should export only typed Status/Read and a separately qualified InspectPoint on
+Shell's D-Bus connection; no arbitrary code, focus or window-management methods.
+The client pins the unique Shell owner, bounds requests and rejects malformed or
+missing responses. An epoch and event serial must fence focus, geometry, stacking,
+workspace, monitor, modal and lifecycle changes, including change-away/back.
+
+Before GNOME actions, correct and qualify the shared portal checks that currently
+exclude same-PID covering windows: application dialogs/popups remain blockers.
+Mutter focus alone does not prove keyboard ownership. Snapshot Shell action mode,
+modal count, stage key focus and stage grab actor; refuse Shell modal/overview,
+lock/greeter, drag and unqualified transition states. `Meta.Display.is_grabbed()`
+reports window dragging, not every keyboard/popup grab. See
+[Shell modal handling](https://github.com/GNOME/gnome-shell/blob/50.5/js/ui/main.js),
+[stage focus/grab/pick APIs](https://github.com/GNOME/mutter/blob/50.5/clutter/clutter/clutter-stage.c)
+and [extension mode checks](https://github.com/GNOME/gnome-shell/blob/50.5/js/ui/extensionSystem.js).
+`session-modes: ["user"]` still needs an explicit lock-state guard because parent
+mode can keep an extension active.
+
+Shell [chrome](https://github.com/GNOME/gnome-shell/blob/50.5/js/ui/layout.js) and
+[workspace animation clones](https://github.com/GNOME/gnome-shell/blob/50.5/js/ui/workspaceAnimation.js)
+are outside the managed-window list. Frame geometry alone cannot establish an
+uncovered click target. Qualify stage point picking and actor ancestry against
+the expected window actor; block other windows, chrome, clones and unknown picks.
+[Surface input regions](https://github.com/GNOME/mutter/blob/50.5/src/compositor/meta-surface-actor.c)
+affect picking; do not describe it as universal pixel-occlusion detection.
+Preserve portal consent, capture-before/after fencing, one-use tokens, AT-SPI
+keyboard checks, independent Stop and held-input release.
+
+The private fixture must cover Wayland/XWayland, close/reopen identity, extension
+restart and owner loss; focus changes and change-away/back; move/resize/minimize/
+restore/restack; workspace switches/removal/sticky windows; same-process dialogs
+and popup menus plus foreign covers; overview/animation/Shell menus/notifications/
+on-screen keyboard; lock guards/errors; scale/topology and capture coordinates.
+Only after those observer and point-guard proofs may capability discovery admit
+GNOME control. Actual application launch/focus and full login/reboot remain the
+preceding startup acceptance gates. All input fixtures remain in the private
+compositor; never use Shell Eval or the owner's desktop to obtain this evidence.

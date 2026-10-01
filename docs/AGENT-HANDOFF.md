@@ -57,6 +57,17 @@ ordinary user's accelerator API. These imports do not qualify fresh current-sour
 packages, full GNOME desktop sessions or all keyboard layouts. Continue the
 rollout guide's remaining startup/window/control and release gates.
 
+The combined private GNOME fixture now sets its graphical D-Bus activation
+environment before Shell starts and requires all three GNOME portal interfaces.
+Its repeated production shortcut proof passes; the updated checked report records
+the new discovery hash and actual versions. Keep the older standalone mechanism
+report as historical evidence. GNOME 49/48/46 qualification remains open.
+Primary-source research for the next observer is recorded in the rollout guide:
+use a version-qualified read-only Shell extension and pinned compositor identity.
+Before GNOME input, qualify same-PID occlusion, Shell chrome/modal/lock/transition
+guards and point picking as well as the existing portal/focus/Stop contracts.
+Do not enable GNOME tools solely because portal interfaces or shortcuts work.
+
 ## October 1 merge blockers: current main and separate Codex prerequisite
 
 The feature branch integrates canonical main `8c3be5a` at merge `338dbc5`.

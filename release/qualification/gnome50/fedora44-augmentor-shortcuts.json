@@ -54,9 +54,40 @@
   "gnomeGtkDisplay": "wayland",
   "canonicalLauncherIsSynthetic": true,
   "networkEnabled": false,
-  "discoveryProofScriptSha256": "ba6af41e29c1aef9dfcd3f0e14867dc2a6076b3ad66bfd56d6b1178d6a9a53f3",
+  "discoveryProofScriptSha256": "c11e923bc1c05bd55632ded264593a8789166c1c474e9e6336b18738405dc590",
   "fixtureDockerfileSha256": {
     "release/gnome-discovery.Dockerfile": "34095e7cd885250a96929decb26ad28162f992bd798704be92dfdf7354691628",
     "release/gnome-shortcuts.Dockerfile": "353582645412b81d51f42fb0d3bb66122b511627a115ab4facf9cfaf307d8634"
-  }
+  },
+  "portalVersions": {
+    "Inhibit": 3,
+    "Background": 2,
+    "Location": 1,
+    "Notification": 1,
+    "Screenshot": 2,
+    "Account": 1,
+    "NetworkMonitor": 3,
+    "Print": 4,
+    "Settings": 2,
+    "GameMode": 4,
+    "RemoteDesktop": 2,
+    "MemoryMonitor": 1,
+    "OpenURI": 5,
+    "Realtime": 1,
+    "DynamicLauncher": 1,
+    "Usb": 1,
+    "Wallpaper": 1,
+    "Camera": 1,
+    "InputCapture": 1,
+    "GlobalShortcuts": 1,
+    "PowerProfileMonitor": 1,
+    "Clipboard": 1,
+    "ScreenCast": 5,
+    "Secret": 1,
+    "Email": 4,
+    "Trash": 1,
+    "ProxyResolver": 1,
+    "FileChooser": 4
+  },
+  "privateDbusGraphicalActivationEnvironmentSet": true
 }
