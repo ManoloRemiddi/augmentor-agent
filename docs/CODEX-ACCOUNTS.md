@@ -303,3 +303,30 @@ passes application/Browser/credential, Home, source boundary, production npm
 notices and extension packaging; Debian still fails at the existing unreviewed
 native Codex executable gate. Installed-package checks skip. This CI qualifies
 the preceding renewal checkpoint, not the subsequent model catalog source.
+
+## Eligibility request prepared for owner review
+
+The following is a draft for OpenAI, not a submitted request or evidence of approval:
+
+> Augmentor Agent is a local personal-agent application for Linux and macOS,
+> with a Chromium interface sharing the same local host. Its public repository
+> is https://github.com/ManoloRemiddi/augmentor-agent. Augmentor-authored code
+> uses MIT with Augmentor Resale Restriction, rather than unmodified MIT.
+>
+> We are adding Codex app-server as a replaceable local execution harness.
+> Users may explicitly choose their own Responses-compatible API/local provider,
+> or authorize ChatGPT plan usage through Sign in with ChatGPT. The latter would
+> use the documented public Responses endpoint, protected per-account credentials
+> and explicit usage consent, without shared accounts or an Augmentor inference proxy.
+>
+> Please confirm which subscription route is permitted for this license and for
+> free local versus any future paid distribution, and whether commercial partner
+> registration is required. Please also clarify whether newly integrated local
+> applications may use the legacy managed Codex login route. We will preserve
+> the current license and keep affected production login disabled until confirmed.
+
+The owner must confirm launch/business details and authorize any external
+submission. Do not attach source archives, credentials, private transcripts or
+local configuration. The API/local implementation and native notice review can
+continue independently; this eligibility question blocks live subscription
+acceptance and its affected distribution, not those engineering tasks.
