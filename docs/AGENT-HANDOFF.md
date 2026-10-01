@@ -8,7 +8,11 @@ The owner explicitly approved preserving all work privately and removing the
 speech-source archive from public GitHub history. See
 [cleanup and current evidence](CODEX-SOURCE-CLEANUP.md). A verified private Git
 bundle and working-file backups preserve the integration and unrelated native
-changes. Public voice tests now use an independently authored scripted peer;
+changes. The approved rewrite is now public at `8e418a0`; current branch/PR
+archive requests return 404, but the old cached introduction commit still serves
+it. A private Support request is prepared; sending it awaits separate owner
+authorization. Source-boundary and Home CI pass; Debian/Mac checks are pending.
+Public voice tests now use an independently authored scripted peer;
 real-service source qualification is historical and must not be claimed for the
 replacement. No installed app, production speech, owner settings or GPU/model
 placement changed. Continue Codex C0–C9 after cleanup; do not reintroduce private

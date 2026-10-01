@@ -24,6 +24,10 @@ specific to this incident; it does not replace reviewing any future publication.
 ## Validation and current limits
 
 - Clean locked dependency installation, TypeScript check and build pass.
+- Home Docker build and its packaged prompt-service probe pass without the
+  archive. The first local probe could not read inputs copied from the owner-only
+  cleanup checkout; normalizing reviewed build-input permissions inside its
+  private parent fixed the isolated proof. No product permissions changed.
 - All seven Codex voice tests pass with the scripted peer, including actual
   pinned Codex plus native Qt and Browser native-messaging paths.
 - Root Node suite: 357 tests, 355 pass, two opt-in real-memory-engine proofs skip.
@@ -47,3 +51,20 @@ internal pull-request references. GitHub-controlled remnants need a Support
 request; copies already downloaded elsewhere cannot be recalled. See
 [GitHub's removal procedure](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository).
 Support decides whether this source disclosure qualifies for purging.
+
+## Applied public branch cleanup
+
+The approved rewrite is published at `8e418a0`. All 1,496 unaffected files and
+all Codex runtime source remain identical; the main baseline is preserved.
+Anonymous requests for the archive at the current branch, rewritten head and
+new PR merge ref return HTTP 404. The original cached introduction commit still
+returns the archive, so complete GitHub-side erasure remains unresolved.
+A private, ready-to-send Support request records the affected PR and first
+changed commit. Sending it requires the owner's separate authorization.
+
+The current source-boundary and Home GitHub jobs pass in
+[run 36832196905](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36832196905).
+Debian application/package and Mac 14/26 jobs are still pending at this checkpoint.
+The local development worktree now follows the clean branch and preserves the
+unfinished login files exactly; its former installed test dependency is gone.
+The canonical checkout's 30 backed-up changed files remain byte-identical.
