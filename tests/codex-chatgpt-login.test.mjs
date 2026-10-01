@@ -9,6 +9,7 @@ import {execFile, spawn} from 'node:child_process';
 import {promisify} from 'node:util';
 import {ChatGptLogin} from '../dist/codex-runtime/src/chatgpt-login.js';
 import {ChatGptAccounts} from '../dist/codex-runtime/src/chatgpt-accounts.js';
+import {ChatGptModels} from '../dist/codex-runtime/src/chatgpt-models.js';
 import {CodexHost} from '../dist/codex-runtime/src/host.js';
 import {CodexIpcServer} from '../dist/codex-runtime/src/ipc.js';
 import {durableJson} from '../dist/codex-runtime/src/storage.js';
@@ -132,7 +133,7 @@ async function hostFixture(t) {
     createChatGptLogin:commit=>{creations++;return login=new ChatGptLogin({path:f.path,enabled:true,authorization:{start:options=>{
       const promise=Promise.withResolvers();f.calls.push(options);void promise.promise.catch(()=>{});options.signal.addEventListener('abort',()=>promise.reject(Error('cancelled')),{once:true});
       f.complete=()=>promise.resolve(grant());return Promise.resolve({id:'private-id',result:promise.promise,cancel:()=>promise.reject(Error('cancelled'))});
-    }},accounts:f.accounts,commit,openBrowser:async()=>{}});},
+    }},accounts:f.accounts,models:new ChatGptModels(f.accounts,true,async()=>Response.json({models:[{slug:'gpt-fixture',display_name:'Test model',visibility:'list'}]})),commit,openBrowser:async()=>{}});},
     createRpc:()=>{
       const rpc=new EventEmitter();rpc.active=false;rpc.closed=false;rpc.initialize=async()=>{};rpc.close=async()=>{rpc.closed=true;};
       rpc.call=async(method,params)=>{
@@ -158,6 +159,7 @@ test('shared host initializes accounts lazily; pending login blocks maintenance 
   assert.equal((await f.host.dispatch('host.prepareShutdown',{})).ready,true);
   assert.equal((await f.host.dispatch('accounts.status',{})).attempt.state,'cancelled');
   await assert.rejects(f.host.dispatch('accounts.start',{}),/maintenance/);
+  await assert.rejects(f.host.dispatch('accounts.models',{accountId:'chatgpt-12345678-1234-4123-8123-123456789abc'}),/maintenance/);
 });
 test('logout closes an idle native worker before deleting credentials and refuses active/unconfirmed work',async t=>{
   const f=await hostFixture(t);const account=await f.accounts.save(grant());await f.host.create({sessionId:'one',profileId:'local',cwd:f.root});
@@ -196,8 +198,12 @@ test('actual Browser bridge and native adapter share account attempts across fre
   assert.equal((await browser({action:'account-status'})).attempt.state,'cancelled');
   await browser({action:'account-start',account:{requestPlanUsage:true}});await until(()=>f.calls.length===2);f.complete();await until(()=>!f.controller.busy);
   const status=await native('accounts.status');assert.equal(status.attempt.state,'signed-in');assert.equal(status.accounts[0].planUsage,true);
+  const catalog=await native('accounts.models',{accountId:status.accounts[0].id});assert.deepEqual(catalog.models,[{id:'gpt-fixture',name:'Test model'}]);
+  assert.deepEqual((await browser({action:'account-models',account:{accountId:status.accounts[0].id}})).models,catalog.models);
   const logout=await browser({action:'account-sign-out',account:{accountId:status.accounts[0].id}});assert.equal(logout.localCleanupConfirmed,true);assert.equal(f.secrets.size,0);
   const afterLogout=await native('accounts.status');assert.equal(afterLogout.attempt,null);assert.match(afterLogout.notice,/Signed out/);
+  await assert.rejects(browser({action:'account-models',account:{accountId:status.accounts[0].id}}),/selected account/);
+  await assert.rejects(native('accounts.models',{accountId:status.accounts[0].id,accessToken:'forged'}),/Invalid ChatGPT account operation/);
   await assert.rejects(browser({action:'account-start',account:{credential:'ignored-private-value'}}),/Invalid ChatGPT account operation/);
   await assert.rejects(browser({action:'__proto__'}),/Unsupported/);
   child.stdin.end();await exited;

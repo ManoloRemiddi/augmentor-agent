@@ -52,6 +52,7 @@ function accountFixture(t,{enabled=true,startGate}={}){
     if(request.action==='profiles')return {ok:true,result:{profiles:[...profiles]}};
     if(request.action==='configure'){profiles.push({...request.profile});return {ok:true,result:{...request.profile}}};
     if(request.action==='account-status')return {ok:true,result:structuredClone(status)};
+    if(request.action==='account-models')return {ok:true,result:{accountId:request.account.accountId,models:[{id:'test-model',name:'Test model'}]}};
     if(request.action==='account-start'){
       await startGate?.promise;status.attempt={id:'synthetic-attempt',state:'opening'};return {ok:true,result:{attempt:{...status.attempt}}};
     }
@@ -79,6 +80,22 @@ test('Browser plan profile binds the chosen consented account and excludes an AP
   f.button('Save connection').click();await settle();const profile=f.calls.find(row=>row.action==='configure').profile;
   assert.equal(profile.kind,'chatgpt-plan');assert.equal(profile.accountId,'fixture-consented');assert.equal(profile.endpoint,'https://api.openai.com/v1');assert.equal(Object.hasOwn(profile,'credential'),false);
   assert.match(f.dialog.textContent,/consume plan usage/);assert.equal(f.select.value,'fixture-consented');
+});
+test('Browser model choices use the selected account and show server names without saving or changing the draft',async t=>{
+  const f=accountFixture(t);await settle();f.status.accounts=[{id:'fixture-account',label:'Fixture',signedIn:true,planUsage:true}];await f.poll();
+  const kind=f.dialog.querySelector('[aria-label="Connection type"]');kind.value='chatgpt-plan';kind.dispatchEvent(new f.dom.window.Event('input'));
+  f.select.value='fixture-account';f.select.dispatchEvent(new f.dom.window.Event('change'));
+  f.button('Load ChatGPT models').click();await settle();
+  assert.deepEqual(f.calls.find(row=>row.action==='account-models').account,{accountId:'fixture-account'});
+  const option=f.dialog.querySelector('datalist option');assert.equal(option.value,'test-model');assert.equal(option.label,'Test model');
+  assert.equal(f.calls.some(row=>row.action==='configure'),false);f.select.value='';f.select.dispatchEvent(new f.dom.window.Event('change'));
+  assert.equal(f.dialog.querySelectorAll('datalist option').length,0);assert.equal(f.button('Load ChatGPT models').disabled,true);
+});
+test('Browser identity-only accounts cannot request a model list',async t=>{
+  const f=accountFixture(t);await settle();f.status.accounts=[{id:'identity',label:'Identity',signedIn:true,planUsage:false}];await f.poll();
+  const kind=f.dialog.querySelector('[aria-label="Connection type"]');kind.value='chatgpt-plan';kind.dispatchEvent(new f.dom.window.Event('input'));
+  f.select.value='identity';f.select.dispatchEvent(new f.dom.window.Event('change'));assert.equal(f.button('Load ChatGPT models').disabled,true);
+  f.button('Load ChatGPT models').click();await settle();assert.equal(f.calls.some(row=>row.action==='account-models'),false);
 });
 test('Browser identity-only accounts cannot save a subscription model connection',async t=>{
   const f=accountFixture(t);await settle();f.status.accounts=[{id:'identity-only',label:'Identity',signedIn:true,planUsage:false}];await f.poll();

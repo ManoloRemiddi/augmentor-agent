@@ -2,7 +2,7 @@
 """Codex connection UI; profile and credential logic stays in the shared host."""
 import uuid
 from PySide6.QtCore import QTimer
-from PySide6.QtWidgets import QDialog, QVBoxLayout, QFormLayout, QHBoxLayout, QLabel, QComboBox, QLineEdit, QCheckBox, QPushButton
+from PySide6.QtWidgets import QDialog, QVBoxLayout, QFormLayout, QHBoxLayout, QLabel, QComboBox, QLineEdit, QCheckBox, QPushButton, QMenu
 from .ui_scale import scaled
 
 
@@ -23,6 +23,7 @@ class CodexSetupDialog(QDialog):
         self.name = QLineEdit('My Codex model'); self.name.setMaxLength(100)
         self.endpoint = QLineEdit(); self.endpoint.setPlaceholderText('https://provider.example/v1 or http://127.0.0.1:8080/v1')
         self.model = QLineEdit(); self.model.setPlaceholderText('Exact model ID')
+        self.model_menu = QMenu(self)
         self.key = QLineEdit(); self.key.setEchoMode(QLineEdit.EchoMode.Password); self.key.setPlaceholderText('Optional; leave blank to keep an existing key')
         self.remove_key = QCheckBox('Remove the saved key')
         for label, widget in [('Saved connection', self.profiles), ('Connection type', self.kind), ('Connection name', self.name), ('Endpoint URL', self.endpoint), ('Model ID', self.model), ('API key', self.key)]:
@@ -45,6 +46,7 @@ class CodexSetupDialog(QDialog):
         self.check_button = QPushButton('Check Codex connection'); self.check_button.clicked.connect(self.check); buttons.addWidget(self.check_button)
         self.image_button = QPushButton('Check image response'); self.image_button.clicked.connect(lambda: self.check('image')); buttons.addWidget(self.image_button)
         self.save_button = QPushButton('Save connection'); self.save_button.clicked.connect(self.save); buttons.addWidget(self.save_button)
+        self.models_button = QPushButton('Choose ChatGPT model'); self.models_button.clicked.connect(self.load_account_models); buttons.addWidget(self.models_button)
         self.fields = [self.profiles, self.kind, self.name, self.endpoint, self.model, self.key, self.remove_key]
         for field in [self.name, self.endpoint, self.model, self.key]: field.textChanged.connect(self.edited)
         self.kind.currentIndexChanged.connect(self.kind_changed); self.remove_key.toggled.connect(self.edited)
@@ -66,20 +68,37 @@ class CodexSetupDialog(QDialog):
         plan = self.kind.currentData() == 'chatgpt-plan'
         row = next((row for row in self.account_status.get('accounts', []) if row['id'] == self.accounts.currentData()), {})
         ready = not plan or self.account_status.get('enabled') is True and row.get('signedIn') is True and row.get('planUsage') is True
+        if not plan or not ready: self.model_menu.clear()
+        self.models_button.setVisible(plan); self.models_button.setEnabled(plan and ready and allowed)
         for field in (self.endpoint, self.key, self.remove_key): field.setEnabled(not self.busy and not plan)
         self.save_button.setEnabled(not self.busy and ready)
         self.check_button.setEnabled(not self.busy and ready and bool(self.profile_id) and not self.dirty); self.image_button.setEnabled(self.check_button.isEnabled())
         self.provider_notice.setText('This connection uses the selected ChatGPT plan. Connection checks consume plan usage and send only synthetic test input. No API key is used. Enter a model ID and check its availability before starting a chat.' if plan else self.api_notice)
 
     def account_selected(self, *_):
+        self.model_menu.clear()
         self.profile_account_id = None
         if self.kind.currentData() == 'chatgpt-plan': self.edited()
         else: self.account_controls()
 
     def kind_changed(self, *_):
+        self.model_menu.clear()
         if self.kind.currentData() == 'chatgpt-plan':
             self.endpoint.setText('https://api.openai.com/v1'); self.key.clear(); self.remove_key.setChecked(False)
         self.edited()
+
+    def load_account_models(self):
+        if not self.models_button.isEnabled(): return
+        account_id = self.accounts.currentData(); self.model_menu.clear()
+        self.account_note.setText('Loading models for the selected ChatGPT account…')
+        def loaded(value):
+            if self.kind.currentData() != 'chatgpt-plan' or self.accounts.currentData() != account_id or value.get('accountId') != account_id: return
+            for row in value['models']:
+                action = self.model_menu.addAction(row['name'] + ' · ' + row['id']); action.setData(row['id'])
+                action.triggered.connect(lambda _checked=False, model=row['id']: self.model.setText(model))
+            self.account_note.setText('Choose a model, save the connection and check it before starting a chat.' if value['models'] else 'This account returned no models to display.')
+            if value['models']: self.model_menu.popup(self.models_button.mapToGlobal(self.models_button.rect().bottomLeft()))
+        self.account_request('accounts.models', {'accountId': account_id}, loaded)
 
     def account_loaded(self, value):
         self.account_status = value; selected = self.profile_account_id or self.accounts.currentData()
@@ -150,6 +169,7 @@ class CodexSetupDialog(QDialog):
         self.account_controls()
 
     def selected(self, *_):
+        self.model_menu.clear()
         self.profile_id = self.profiles.currentData()
         row = next((row for row in self.rows if row['id'] == self.profile_id), {})
         self.profile_account_id = row.get('accountId')

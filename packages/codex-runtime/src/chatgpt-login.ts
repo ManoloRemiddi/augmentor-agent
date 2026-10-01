@@ -3,6 +3,7 @@ import {randomUUID} from 'node:crypto';
 import {spawn} from 'node:child_process';
 import type {ChatGptAuthorization, ChatGptSignInAttempt} from './chatgpt-auth.js';
 import type {ChatGptAccounts} from './chatgpt-accounts.js';
+import {ChatGptModels} from './chatgpt-models.js';
 import {durableJson, readPrivateJson} from './storage.js';
 
 const DISABLED = 'ChatGPT subscription login is unavailable until distribution eligibility is confirmed.';
@@ -26,6 +27,7 @@ interface LoginOptions {
   path: string; enabled?: boolean;
   authorization: Pick<ChatGptAuthorization, 'start'>;
   accounts: ChatGptAccounts;
+  models?: Pick<ChatGptModels, 'read'>;
   openBrowser: (url: string) => Promise<void>;
   /** Host fences admission and releases idle workers immediately before activation. */
   commit: <T>(operation: () => Promise<T>) => Promise<T>;
@@ -48,7 +50,10 @@ export class ChatGptLogin {
   private notice?: string;
   private closed = false;
   private storageFailed = false;
+  private modelStop = new AbortController();
+  private catalog: Pick<ChatGptModels, 'read'>;
   constructor(private readonly options: LoginOptions) {
+    this.catalog = options.models ?? new ChatGptModels(options.accounts, options.enabled === true);
     let saved: any;
     try {saved = readPrivateJson(options.path);} catch (error: any) {if (error?.code !== 'ENOENT') throw error;}
     if (saved !== undefined && (saved?.schema !== 1 || Object.keys(saved).some(key => !['schema', 'clientId'].includes(key)) ||
@@ -57,6 +62,13 @@ export class ChatGptLogin {
     if (this.provisional && options.accounts.hasRegistration(this.provisional)) this.persist();
   }
   get busy(): boolean {return Boolean(this.pending);}
+  async models(params: unknown) {
+    fields(params, ['accountId']);
+    if (this.closed) throw new Error('ChatGPT login is closing.');
+    if (!this.options.enabled || this.storageFailed) throw new Error(DISABLED);
+    if (this.pending) throw new Error('Finish or cancel ChatGPT sign-in before loading models.');
+    return this.catalog.read(accountId((params as any).accountId), this.modelStop.signal);
+  }
   status() {
     return {enabled: this.options.enabled === true && !this.closed && !this.storageFailed,
       reason: this.closed ? 'ChatGPT login is closing.' : !this.options.enabled ? DISABLED : this.storageFailed ? 'ChatGPT registration storage needs a host restart.' : undefined,
@@ -136,6 +148,7 @@ export class ChatGptLogin {
     return {...result, status: this.status()};
   }
   async close(): Promise<void> {
+    this.modelStop.abort();
     this.closed = true; const pending = this.pending;
     if (pending && pending.status.state !== 'signed-in') {pending.abort.abort(); pending.handle?.cancel();}
     await pending?.done; await this.options.accounts.cleanupRetired();

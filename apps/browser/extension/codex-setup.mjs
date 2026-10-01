@@ -15,6 +15,7 @@ export function codexSetupDialog(doc,send,container){
   for(const [value,label] of [['api','API provider'],['local','Local model'],['chatgpt-plan','ChatGPT plan']]){const option=make('option',label);option.value=value;fields.kind.append(option)}
   fields.credential.placeholder='Optional; blank keeps the saved key'
   fields.endpoint.placeholder='https://provider.example/v1 or http://127.0.0.1:8080/v1'
+  const modelChoices=make('datalist');modelChoices.id='codex-account-models-'+crypto.randomUUID();fields.model.setAttribute('list',modelChoices.id);form.append(modelChoices)
   const note=make('p'),actions=make('div');note.setAttribute('role','status')
   let rows=[],profileId=null,busy=false,dirty=false,closed=false,profileAccountId=null
   const accountForm=make('fieldset'),accountSelect=make('select'),accountNote=make('p'),accountActions=make('div')
@@ -28,8 +29,10 @@ export function codexSetupDialog(doc,send,container){
     accountSelect.disabled=pending||accountBusy||busy
     fields.kind.querySelector('[value="chatgpt-plan"]').disabled=accountStatus.enabled!==true
     const plan=fields.kind.value==='chatgpt-plan',account=accountStatus.accounts?.find(row=>row.id===accountSelect.value),ready=!plan||(accountStatus.enabled===true&&account?.signedIn===true&&account?.planUsage===true)
+    if(!plan||!ready)modelChoices.replaceChildren()
     for(const field of [fields.endpoint,fields.credential,fields.remove])field.disabled=plan
     save.disabled=busy||!ready;check.disabled=busy||dirty||!profileId||!ready;imageCheck.disabled=check.disabled
+    loadModels.hidden=!plan;loadModels.disabled=!plan||!ready||!allowed
     providerNotice.textContent=plan?'This connection uses the selected ChatGPT plan. Connection checks consume plan usage and send only synthetic test input. No API key is used. Enter a model ID and check its availability before starting a chat.':apiNotice
   }
   const controls=()=>{form.disabled=busy;save.disabled=busy;check.disabled=busy||dirty||!profileId;imageCheck.disabled=check.disabled;close.disabled=busy;accountControls()}
@@ -81,7 +84,7 @@ export function codexSetupDialog(doc,send,container){
     if(!closed)accountNote.textContent=value.remoteRevocationConfirmed&&value.localCleanupConfirmed?'Signed out; remote revocation and local cleanup confirmed.':
       'Signed out. '+(!value.remoteRevocationConfirmed?'Remote revocation is unconfirmed. ':'')+(!value.localCleanupConfirmed?'Unlock the OS credential store to finish local cleanup.':'')
   }))
-  accountSelect.onchange=()=>{profileAccountId=null;if(fields.kind.value==='chatgpt-plan')dirty=true;accountControls()}
+  accountSelect.onchange=()=>{profileAccountId=null;modelChoices.replaceChildren();if(fields.kind.value==='chatgpt-plan')dirty=true;accountControls()}
   const close=button('Close',()=>dialog.close())
   const check=button('Check Codex connection',()=>run(async()=>{note.textContent='Checking Codex chat and tool support…';await request({action:'test',id:profileId,capability:'agent'});note.textContent='Codex chat and the test tool worked. Browser and desktop tasks still need their own checks.'}))
   const imageCheck=button('Check image response',()=>run(async()=>{note.textContent='Checking a synthetic image…';await request({action:'test',id:profileId,capability:'image'});await load();note.textContent='Image response verified. Start a new chat to use browser screenshots. General vision and tool accuracy still need a chat test.'}))
@@ -92,8 +95,16 @@ export function codexSetupDialog(doc,send,container){
     note.textContent='Saving connection…';const row=await request({action:'configure',profile});profileId=row.id;fields.credential.value=''
     await load();const refreshed=await send('models-refresh');if(!refreshed.ok)throw Error('Connection saved. Refresh the model picker to use it. '+(refreshed.error||''))
   }))
+  const loadModels=button('Load ChatGPT models',()=>run(async()=>{
+    const accountId=accountSelect.value;modelChoices.replaceChildren();note.textContent='Loading models for the selected ChatGPT account…'
+    const result=await request({action:'account-models',account:{accountId}})
+    if(closed||fields.kind.value!=='chatgpt-plan'||accountSelect.value!==accountId||result.accountId!==accountId)return
+    for(const row of result.models){const option=make('option',row.name);option.value=row.id;option.label=row.name;modelChoices.append(option)}
+    note.textContent=result.models.length?'Account models loaded. Choose a model, save the connection and check it before starting a chat.':'This account returned no models to display.'
+  }))
   for(const [key,field] of Object.entries(fields)){if(key==='profile')continue;field.oninput=()=>{
     if(key==='kind'&&fields.kind.value==='chatgpt-plan'){fields.endpoint.value='https://api.openai.com/v1';fields.credential.value='';fields.remove.checked=false}
+    if(key==='kind')modelChoices.replaceChildren()
     dirty=true;controls()
   }}
   fields.profile.onchange=selected

@@ -84,7 +84,7 @@ async function request(method, params = {}, id) {
     if (params.action === 'test') return c.call('profiles.test', {id: params.id, capability: params.capability ?? 'text'});
     if (params.action === 'configure') return c.call('profiles.configure', params.profile);
     const accountMethods = {'account-status': 'accounts.status', 'account-start': 'accounts.start',
-      'account-cancel': 'accounts.cancel', 'account-select': 'accounts.select', 'account-sign-out': 'accounts.signOut'};
+      'account-cancel': 'accounts.cancel', 'account-select': 'accounts.select', 'account-sign-out': 'accounts.signOut', 'account-models': 'accounts.models'};
     if (Object.hasOwn(accountMethods, params.action)) {
       if (Object.keys(params).some(key => !['action', 'account'].includes(key))) throw new Error('Invalid ChatGPT account operation.');
       return c.call(accountMethods[params.action], params.account ?? {});

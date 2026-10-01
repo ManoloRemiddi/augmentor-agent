@@ -24,7 +24,7 @@ async function fixture(t){
   const renewal={refresh:async old=>{rotations.push(old.refreshToken);await refreshGate?.promise;return {...old,accessToken:'SYNTHETIC-ROTATED',refreshToken:'SYNTHETIC-NEW-REFRESH',expiresAt:Date.now()+3600000};},revoke:async()=>({confirmed:true})};
   const accounts=new ChatGptAccounts(join(root,'accounts.json'),credentials,renewal),account=await accounts.save(grant());
   const profiles=new ProfileStore(join(root,'profiles.json'),credentials,{enabled:()=>true,describe:id=>accounts.list().find(row=>row.id===id),access:async(id,signal)=>{
-    const current=await accounts.access(id,signal);return {credential:current.accessToken,revision:accounts.list().find(row=>row.id===id).revision};
+    const {grant,revision}=await accounts.accessBinding(id,signal);return {credential:grant.accessToken,revision};
   }});
   await profiles.upsert({id:'plan',name:'Synthetic plan',kind:'chatgpt-plan',accountId:account.id,model:'synthetic-model'});
   const host=new CodexHost({root:join(root,'host'),profiles,resolveProfile:(id,signal)=>profiles.resolve(id,signal),createRpc:options=>{

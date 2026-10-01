@@ -171,10 +171,16 @@ export class ChatGptAccounts {
   }
   /** Internal pre-dispatch credential access. No fallback to another account/API key. */
   access(id: string, signal?: AbortSignal): Promise<VerifiedChatGptGrant> {
+    return this.accessBinding(id, signal).then(result => result.grant);
+  }
+  /** Capture the exact credential revision inside the serialized authority.
+   * Reading list() after awaiting access() can label an old token with a newer
+   * revision when another caller has already queued rotation or authorization. */
+  accessBinding(id: string, signal?: AbortSignal): Promise<{grant: VerifiedChatGptGrant; revision: number}> {
     return this.queue(async () => {
       const account = this.account(id); let grant = await this.read(account);
       if (!grant.planUsage) throw new Error('ChatGPT plan usage is not enabled for this account.');
-      if (grant.expiresAt! > Date.now() + 60000) return grant;
+      if (grant.expiresAt! > Date.now() + 60000) return {grant, revision: account.revision};
       if (!grant.refreshToken) {this.disconnect(account, 'reconnect'); await this.cleanup(); throw new Error('Sign in again to this ChatGPT account.');}
       // Write-ahead status makes interrupted rotations visible on next startup.
       this.replace({...account, state: 'renewing'});
@@ -197,7 +203,7 @@ export class ChatGptAccounts {
       });
       await this.cleanup();
       if (!grant.planUsage) throw new Error('ChatGPT plan usage is not enabled for this account.');
-      return grant;
+      return {grant, revision: account.revision + 1};
     });
   }
   /** Host must stop this account's workers and close inference admission first. */

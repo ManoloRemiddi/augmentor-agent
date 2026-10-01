@@ -2,6 +2,28 @@
 
 # Start here: agent handoff
 
+## October 1 current account model catalog
+
+[Current account models](CODEX-ACCOUNTS.md#current-account-model-choices--october-1)
+now load through the same host and both existing setup forms. The fixed OpenAI
+GET uses only the selected account's protected bearer; no bundled catalog,
+inference, redirects, retries or fallback. Visible names/IDs preserve server
+order. Bounded parsing, logout/revision/cancellation fencing and both surface
+contracts pass with synthetic responses. A choice edits a draft and needs a
+completed connection check. Production SIWC eligibility stays false.
+
+The actual pinned native auth schema was also inspected: external
+`chatgptAuthTokens` is internal-only and is not used. Native managed auth still
+needs its separate eligible, keyring-only, serialized account authority and
+thread-state design; it cannot bypass commercial restrictions. Continue the
+complete C0–C9 plan. Local Qwen activation awaits owner direction, native package
+notices remain a gate, and no installed app/private speech/model placement changed.
+
+The preceding renewal source `57ba17d` passes Mac 14/26 CI and all six actual
+Keychain account proofs; Linux application/Home/source/credential/extension
+checks pass with only the known Debian native executable notice failure. This
+platform evidence is for that exact source; model-catalog source is newer.
+
 ## October 1 account-bound profiles and credential renewal
 
 [Bound account/model connections](CODEX-ACCOUNTS.md#bound-connections-and-worker-renewal--october-1)

@@ -18,7 +18,7 @@ async function fixture(t){
   const accounts=new ChatGptAccounts(join(root,'accounts.json'),credentials,{refresh:async old=>({...old,accessToken:'SYNTHETIC-ROTATED',refreshToken:'SYNTHETIC-ROTATED-REFRESH',expiresAt:Date.now()+3600000}),revoke:async()=>({confirmed:true})});
   const a=await accounts.save(grant()),b=await accounts.save(grant({subject:'other-subject',clientId:'oaiapp_other',accessToken:'SYNTHETIC-OTHER'}));
   const source={enabled:()=>enabled,describe:id=>accounts.list().find(row=>row.id===id),access:async(id,signal)=>{
-    accesses.push(id);const current=await accounts.access(id,signal);return {credential:current.accessToken,revision:accounts.list().find(row=>row.id===id).revision};
+    accesses.push(id);const {grant,revision}=await accounts.accessBinding(id,signal);return {credential:grant.accessToken,revision};
   }};
   const profiles=new ProfileStore(join(root,'profiles.json'),credentials,source);
   const input={id:'plan-profile',name:'ChatGPT plan fixture',kind:'chatgpt-plan',model:'fixture-model',accountId:a.id};

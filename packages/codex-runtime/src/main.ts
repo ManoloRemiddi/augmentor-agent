@@ -33,10 +33,11 @@ const profiles = new ProfileStore(join(root, 'profiles.json'), credentials, {
   describe: id => accountState().accounts.list().find(account => account.id === id),
   access: async (id, signal) => {
     const accounts = accountState().accounts;
-    const grant = await accounts.access(id, signal);
+    const {grant, revision} = await accounts.accessBinding(id, signal);
     const account = accounts.list().find(value => value.id === id);
     if (!account?.signedIn || !grant.planUsage || !grant.accessToken) throw new Error('Sign in again and allow ChatGPT plan usage.');
-    return {credential: grant.accessToken, revision: account.revision};
+    if (account.revision !== revision) throw new Error('ChatGPT credentials changed during resolution. Retry with the current account.');
+    return {credential: grant.accessToken, revision};
   },
 });
 const host = new CodexHost({root, profiles, memoryCall: promptCall, resolveProfile: (id, signal) => profiles.resolve(id, signal),

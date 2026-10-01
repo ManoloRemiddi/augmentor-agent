@@ -24,6 +24,7 @@ class Owner(QWidget):
             self.rows = [row]; return row
         if method == 'profiles.test': return {'valid': True}
         if method == 'accounts.status': return self.account_status
+        if method == 'accounts.models': return {'accountId': payload['accountId'], 'models': [{'id': 'test-model', 'name': 'Test model'}]}
         if method == 'accounts.start':
             self.account_status['attempt'] = {'id': 'synthetic-attempt', 'state': 'opening'}
             return {'attempt': self.account_status['attempt']}
@@ -97,6 +98,20 @@ class CodexSetupTests(unittest.TestCase):
         self.assertEqual(payload['accountId'], account['id']); self.assertEqual(payload['kind'], 'chatgpt-plan'); self.assertEqual(payload['endpoint'], 'https://api.openai.com/v1')
         self.assertNotIn('credential', payload); self.assertIn('consume plan usage', self.dialog.provider_notice.text())
         self.assertEqual(self.dialog.accounts.currentData(), account['id']); self.assertTrue(self.dialog.check_button.isEnabled())
+    def test_account_models_show_names_and_choose_server_model_id_without_saving(self):
+        account = {'id': 'fixture-account', 'label': 'Fixture', 'signedIn': True, 'planUsage': True}
+        self.owner.account_status['accounts'] = [account]; self.enable_accounts()
+        self.dialog.kind.setCurrentIndex(self.dialog.kind.findData('chatgpt-plan')); self.dialog.accounts.setCurrentIndex(1)
+        self.dialog.load_account_models(); self.owner.finish()
+        self.assertIn(('accounts.models', {'accountId': account['id']}), self.owner.calls)
+        action = self.dialog.model_menu.actions()[0]; self.assertIn('Test model', action.text()); action.trigger()
+        self.assertEqual(self.dialog.model.text(), 'test-model'); self.assertTrue(self.dialog.dirty)
+        self.assertFalse(any(method == 'profiles.configure' for method, _ in self.owner.calls))
+    def test_late_model_list_cannot_populate_a_changed_provider(self):
+        self.owner.account_status['accounts'] = [{'id': 'fixture-account', 'label': 'Fixture', 'signedIn': True, 'planUsage': True}]; self.enable_accounts()
+        self.dialog.kind.setCurrentIndex(self.dialog.kind.findData('chatgpt-plan')); self.dialog.accounts.setCurrentIndex(1)
+        self.dialog.load_account_models(); self.dialog.kind.setCurrentIndex(self.dialog.kind.findData('local')); self.owner.finish()
+        self.assertEqual(self.dialog.model_menu.actions(), [])
     def test_identity_only_account_cannot_save_or_check_a_plan_profile(self):
         self.owner.account_status['accounts'] = [{'id': 'fixture-account', 'label': 'Identity only', 'signedIn': True, 'planUsage': False}]
         self.enable_accounts(); self.dialog.kind.setCurrentIndex(self.dialog.kind.findData('chatgpt-plan')); self.dialog.accounts.setCurrentIndex(1)

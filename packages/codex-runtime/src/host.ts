@@ -592,6 +592,7 @@ export class CodexHost extends EventEmitter {
         return this.options.createChatGptLogin ? this.login().status() : {enabled: false, reason: 'ChatGPT login is unavailable in this host.', accounts: [], attempt: null};
       }
       case 'accounts.start': return this.login().start(params);
+      case 'accounts.models': return this.login().models(params);
       case 'accounts.cancel': return this.login().cancel(params);
       case 'accounts.select': return this.changeConnections(() => this.login().select(params));
       case 'accounts.signOut': return this.changeConnections(() => this.login().signOut(params));

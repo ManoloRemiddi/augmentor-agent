@@ -215,13 +215,71 @@ node --test tests/codex-plan-profiles.test.mjs tests/codex-plan-host.test.mjs
 node --test tests/codex-rpc.test.mjs tests/codex-native-renewal.test.mjs
 ```
 
+## Current account model choices — October 1
+
+`chatgpt-models.ts` reads the selected consented account's catalog using its
+protected current bearer at the fixed `GET https://api.openai.com/v1/models`
+destination. It does not call Codex's bundled/cached `model/list`, perform
+inference, redirect, retry, cache across accounts or choose another funding route.
+Responses are bounded to 1 MiB/1,000 records and ten seconds. Only visible model
+slugs/display names are returned, in server order. Invalid/duplicate records,
+provider diagnostics and reflected credentials cannot enter the public response.
+Identity-only/signed-out accounts refuse access before the request; changed
+permission/revision or a late cancelled reply invalidates the result. Credential
+reads capture the grant and its own revision inside the serialized store: a
+later queued authorization cannot label an old bearer with a newer revision.
+Profile resolution and catalog loading refuse that race before admission/network.
+
+The shared `accounts.models` RPC accepts only an account ID. Both the actual
+Python native adapter and Browser messaging bridge exercise it through one IPC
+host, including logout and secret-field refusal. Host shutdown cancels catalog
+requests; maintenance refuses new model loads because protected access can renew
+credentials. Existing connection setup adds a plan-only model chooser: native lists
+server display names with their model IDs, Browser supplies input suggestions.
+Selecting an option edits the draft; it neither saves nor starts inference.
+Provider/account changes clear suggestions, and late replies cannot fill a
+changed connection. Model availability still requires a completed connection
+check. Production eligibility remains false.
+
+Eight catalog contracts and both expanded setup suites pass with synthetic
+responses. The documented endpoint is verified against official
+[account-specific models and inference](https://developers.openai.com/siwc/token-sharing-open-source/models-and-inference).
+No real account catalog or inference is claimed. Type/build and 60 focused
+account/catalog/controller/profile/host cases pass. All 65 Browser cases and
+590 native cases pass (588 pass, two Mac-only skips). The isolated real Linux
+Secret Service account save/rotate/restart/logout/cleanup proof passes again.
+The final root suite passes 462 cases (460 pass, two opt-in Docker memory proofs
+skipped). Platform source identity follows in the publishing checkpoint.
+
+## Native managed account route: inspected constraints — October 1
+
+The actual pinned Codex 0.159.2 generated schema includes managed browser/device
+login, login cancellation, account read/logout and rate-limit read. Its external
+`chatgptAuthTokens` input is explicitly marked **internal use only — do not use**;
+this implementation does not import SIWC or native tokens through that route.
+The [current app-server documentation](https://learn.chatgpt.com/docs/app-server#auth-endpoints)
+excludes commercial/hosted use of legacy managed authentication and recommends
+SIWC; this is not a commercial eligibility workaround.
+
+Native managed login needs a separate reviewed authority/state design before
+wiring: isolated Augmentor-owned `CODEX_HOME`, mandatory protected keyring mode
+without `auto`/file fallback, one serialized refresh authority per account, and
+stable account/thread/funding bindings across model workers and logout. Email
+alone cannot identify a workspace. Never read the owner's global Codex cache,
+extract its tokens or silently relocate existing native history to share auth.
+The [official auth configuration](https://learn.chatgpt.com/docs/auth#credential-storage)
+provides strict keyring storage; actual Linux/Mac store and live login acceptance
+remain necessary. This inspection is a remaining design contract, not a built
+native managed account route.
+
 ## Remaining C4 requirements
 
 - Confirm distribution eligibility and qualify actual consent/browser launch on
   eligible Linux/Mac builds; production SIWC remains disabled.
 - Implement the separately permitted Codex-managed login route and isolated state.
-- Complete account-specific models and known usage/limits, including exhaustion
-  after partial streaming, with explicit funding and no silent fallback.
+- Qualify the now-wired current account model choices against real OpenAI and
+  complete known usage/limits, including exhaustion after partial streaming,
+  with explicit funding and no silent fallback.
 - Audit and qualify model checks, prompt improvement, branches/recovery and memory
   auxiliary work under the same account permission and funding policy.
 - Qualify real consent, expiry/revocation, completed inference, worker restart and
@@ -233,3 +291,15 @@ The behavior follows official OpenAI documentation inspected October 1:
 [accounts and sessions](https://developers.openai.com/siwc/token-sharing-open-source/profiles-and-sessions),
 [recovery](https://developers.openai.com/siwc/token-sharing-open-source/errors-and-recovery)
 and [Codex app-server renewal](https://developers.openai.com/siwc/token-sharing-open-source/codex-app-server).
+
+## Published renewal source and platform checkpoint
+
+Implementation `57ba17d64721ae79322a366ef0e87d8aafe34730` passes
+[Mac 14/26 CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36875229525),
+including actual pinned renewal contracts, native setup and all six real Keychain
+account lifecycle proofs through build, packaged Desktop and Browser interpreters.
+[Linux CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36875229544)
+passes application/Browser/credential, Home, source boundary, production npm
+notices and extension packaging; Debian still fails at the existing unreviewed
+native Codex executable gate. Installed-package checks skip. This CI qualifies
+the preceding renewal checkpoint, not the subsequent model catalog source.

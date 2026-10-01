@@ -145,3 +145,11 @@ test('grant losing plan permission after renewal persists identity but blocks in
   await assert.rejects(f.store.access(account.id),/not enabled/); assert.equal(f.store.list()[0].state,'ready');
   await assert.rejects(f.reopen().access(account.id),/not enabled/); assert.equal(f.secrets.size,1);
 });
+
+test('protected credential reads carry their own serialized revision across later authorization or rotation',async t=>{
+  const f=fixture(t),account=await f.store.save(grant());
+  const old=f.store.accessBinding(account.id),changed=f.store.save(grant({accessToken:'SYNTHETIC-NEW-BINDING',expiresAt:Date.now()+1000}),account.id);
+  const read=await old;await changed;assert.equal(read.grant.accessToken,'SYNTHETIC-ACCESS-SECRET');assert.equal(read.revision,1);assert.equal(f.store.list()[0].revision,2);
+  const rotated=await f.store.accessBinding(account.id);assert.equal(rotated.grant.accessToken,'SYNTHETIC-ROTATED-ACCESS');assert.equal(rotated.revision,3);
+  assert.doesNotMatch(readFileSync(f.path,'utf8'),/SYNTHETIC|accessBinding/);assert.equal((await f.store.access(account.id)).accessToken,rotated.grant.accessToken);
+});

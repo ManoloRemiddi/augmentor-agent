@@ -465,9 +465,10 @@ Account/model profile binding and pre-dispatch worker renewal are now implemente
 configuration revisions remain separate from rotating credentials, default-account
 selection cannot redirect saved chats, and failed renewal preserves unsent work.
 Scripted host and actual pinned Codex/loopback provider proofs pass. The separate
-Codex-managed route, account-specific models/limits, eligibility and real
-account/inference acceptance remain open; the C4 acceptance checkboxes below
-are not certified complete. See the account guide for exact evidence scope.
+Codex-managed route, known limits, eligibility and real account/inference
+acceptance remain open. Current account catalogs now use the documented fixed
+OpenAI model endpoint through shared setup controls, with synthetic acceptance.
+The C4 acceptance checkboxes below are not certified complete. See the account guide for exact evidence scope.
 
 Dependencies: C1–C2 and the applicable C0 eligibility gate. Can be developed
 alongside C3 once shared account contracts are stable.
