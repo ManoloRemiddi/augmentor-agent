@@ -59,12 +59,17 @@ all Codex runtime source remain identical; the main baseline is preserved.
 Anonymous requests for the archive at the current branch, rewritten head and
 new PR merge ref return HTTP 404. The original cached introduction commit still
 returns the archive, so complete GitHub-side erasure remains unresolved.
-A private, ready-to-send Support request records the affected PR and first
-changed commit. Sending it requires the owner's separate authorization.
+The owner subsequently authorized sending the private Support request, and
+GitHub confirmed its submission. It records the affected PR and first changed
+commit without attaching the source archive. Cached-copy removal remains subject
+to GitHub's review; ticket/contact details remain private.
 
-The current source-boundary and Home GitHub jobs pass in
+At the rewrite checkpoint, source-boundary and Home GitHub jobs passed in
 [run 36832196905](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36832196905).
-Debian application/package and Mac 14/26 jobs are still pending at this checkpoint.
+Debian application/package and Mac 14/26 jobs were still pending at that checkpoint.
+The later `91db7aa` account checkpoint passes both Mac jobs and Debian
+application/Browser/credential/Home checks; Debian packaging still fails at the
+unreviewed native Codex executable gate. See [account evidence](CODEX-ACCOUNTS.md).
 The local development worktree now follows the clean branch and preserves the
 unfinished login files exactly; its former installed test dependency is gone.
 The canonical checkout's 30 backed-up changed files remain byte-identical.
