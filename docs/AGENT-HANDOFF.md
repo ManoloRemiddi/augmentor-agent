@@ -2,6 +2,17 @@
 
 # Start here: agent handoff
 
+## October 1 Linux distribution rollout in progress
+
+The owner authorized autonomous Fedora/Ubuntu and major Linux distro implementation.
+[The rollout plan](LINUX-DISTRO-ROLLOUT.md) owns the complete scope, ordered work,
+preserved contracts and acceptance gates. Work starts from public 0.2.13 at
+`8c3be5a` in `feature/linux-distro-rollout`, an isolated canonical-repository
+worktree. Installer/package adapters are being implemented first; real GNOME/KDE
+and later Ubuntu 24.04/Mint/openSUSE/Arch qualification remain open. The modified
+original checkout and installed releases have not been replaced. Do not present
+an intermediate package/container pass as completion of the distro rollout.
+
 ## October 1 browser observation repair
 
 [Browser observation repair](BROWSER-OBSERVATION-REPAIR.md) corrects early pruning

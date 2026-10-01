@@ -66,6 +66,8 @@ Current cross-platform direction: [one product, Linux/Mac parity audit and corre
 
 ## Setup, operations and distribution
 
+- [Linux distribution rollout: implementation order and qualification gates](LINUX-DISTRO-ROLLOUT.md)
+
 - [Current Mac recovery and shared renderer qualification](MACOS-RECOVERY-2026-09-26.md)
 - [Mac effect transparency and shared App size slider](MACOS-APPEARANCE-2026-09-27.md)
 

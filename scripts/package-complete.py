@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-"""Assemble the public, fresh-user Debian bundle from reviewed component artifacts."""
+"""Assemble a target-specific fresh-user Linux bundle from reviewed artifacts."""
 import argparse
 import hashlib
 import json
@@ -8,6 +8,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import tarfile
+from linux_distribution import TARGETS,package_files
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -33,18 +34,29 @@ def source_archive(repository, target):
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    for name in ('debian','browser','voice','adaptive','model-picker','voice-source','adaptive-source','out'):
+    packages=p.add_mutually_exclusive_group(required=True)
+    packages.add_argument('--debian',type=Path,help='Debian/Ubuntu package artifacts.')
+    packages.add_argument('--fedora',type=Path,help='Fedora RPM artifacts.')
+    p.add_argument('--target',choices=tuple(TARGETS),default='debian13-amd64')
+    for name in ('browser','voice','adaptive','model-picker','voice-source','adaptive-source','out'):
         p.add_argument('--'+name,type=Path,required=True)
     a=p.parse_args();out=a.out.resolve()
     if out.exists() and any(out.iterdir()):raise ValueError('Use an empty output directory.')
     out.mkdir(parents=True)
     product=json.loads((ROOT/'release/product.json').read_text());version=product['version']
-    deb=json.loads((a.debian/'artifacts.json').read_text());browser=json.loads((a.browser/'artifacts.json').read_text())
+    package_root=a.debian or a.fedora
+    deb=json.loads((package_root/'artifacts.json').read_text());browser=json.loads((a.browser/'artifacts.json').read_text())
     ref=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
     if any(m['source']['dirty'] or m['source']['commit']!=ref or m['version']!=version for m in (deb,browser)):
         raise ValueError('Desktop and browser artifacts must come from this clean source commit.')
+    if a.fedora and deb['target']!=a.target:
+        raise ValueError('The RPM target differs from the requested complete bundle target.')
+    if a.debian and TARGETS[a.target][2]!='apt':
+        raise ValueError('A Fedora complete bundle requires its matching RPM artifacts.')
+    package_names=[item['file'] for item in deb['artifacts']]
+    package_files({'version':version,'packages':package_names,'sha256':{name:'checked below' for name in package_names}},a.target)
     for item in deb['artifacts']:
-        path=a.debian/item['file']
+        path=package_root/item['file']
         if sha(path)!=item['sha256']:raise ValueError('Debian artifact hash differs.')
         shutil.copy2(path,out/path.name)
     path=a.browser/browser['artifact']
@@ -62,6 +74,7 @@ def main():
     for name in ('package.json','package-lock.json'):shutil.copy2(ROOT/'release/dsh'/name,out/'dsh'/name)
     shutil.copytree(ROOT/'release/dsh/plugins',out/'dsh/plugins')
     shutil.copy2(ROOT/'scripts/setup-complete.py',out/'setup.py')
+    shutil.copy2(ROOT/'scripts/linux_distribution.py',out/'linux_distribution.py')
     shutil.copy2(ROOT/'docs/COMPLETE-INSTALL.md',out/'INSTALL.md')
     shutil.copy2(ROOT/'LICENSE',out/'LICENSE')
     sources=out/'sources';sources.mkdir()
@@ -71,8 +84,8 @@ def main():
     script='#!/bin/sh\n# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0\nset -eu\ncd -- "$(dirname -- "$0")"\nsha256sum -c SHA256SUMS\nexec /usr/bin/python3 ./setup.py --bundle "$PWD" "$@"\n'
     (out/'install.sh').write_text(script);(out/'install.sh').chmod(0o755)
     hashes={str(f.relative_to(out)):sha(f) for f in sorted(out.rglob('*')) if f.is_file()}
-    manifest={'format':'augmentor-complete/1','artifactId':version+'-complete-preview.1-'+ref[:12],
-              'version':version,'sourceCommit':ref,'sourceRefs':refs,'target':'debian13-amd64','components':components,
+    manifest={'format':'augmentor-complete/1','artifactId':version+'-'+a.target+'-complete-preview.1-'+ref[:12],
+              'version':version,'sourceCommit':ref,'sourceRefs':refs,'target':a.target,'components':components,'packages':package_names,
               'plugins':plugins,'browser':browser['artifact'],'extensionId':browser['extensionId'],'sha256':hashes}
     (out/'bundle.json').write_text(json.dumps(manifest,indent=2)+'\n');hashes['bundle.json']=sha(out/'bundle.json')
     (out/'SHA256SUMS').write_text(''.join(value+'  '+name+'\n' for name,value in sorted(hashes.items())))

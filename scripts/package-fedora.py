@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-"""Build a Fedora x86_64 preview RPM from the checksum-verified Linux bundle.
+"""Build a Fedora x86_64 preview RPM from a checksum-verified Linux payload.
 
 Reuses the reviewed payload, not Debian dependency metadata or dpkg hooks.
 Requires dpkg-deb and rpmbuild on the build machine; neither is needed to install.
@@ -28,11 +28,24 @@ def guard(version):
         parts.append("/usr/bin/python3 -I <<'AUGMENTOR_HOOK'\n"+source.replace('@COMPONENT@',component)+"\naction='upgrade'\nbegin()\nAUGMENTOR_HOOK\n")
     return 'set -e\n'+''.join(parts)
 
-def build(bundle,out):
-    verification=json.loads((bundle/'VERIFICATION.json').read_text())
+def payload_manifest(bundle):
+    if (bundle/'artifacts.json').exists():
+        verification=json.loads((bundle/'artifacts.json').read_text())
+        sums={item['file']:item['sha256'] for item in verification['artifacts']}
+    else:
+        name='bundle.json' if (bundle/'bundle.json').exists() else 'VERIFICATION.json'
+        verification=json.loads((bundle/name).read_text())
+        sums={line.split()[1].lstrip('*'):line.split()[0] for line in (bundle/'SHA256SUMS').read_text().splitlines() if line.strip()}
+        if name=='bundle.json' and any(sums.get(key)!=value for key,value in verification['sha256'].items()):
+            raise ValueError('Complete bundle checksum records differ.')
+    return verification,sums
+
+
+def build(bundle,out,fedora='44'):
+    if fedora not in ('43','44'):raise ValueError('Use Fedora 43 or 44; other releases require qualification.')
+    verification,sums=payload_manifest(bundle)
     version=verification['version']
     if not all(c.isdigit() or c=='.' for c in version): raise ValueError('Invalid version')
-    sums={line.split()[1].lstrip('*'):line.split()[0] for line in (bundle/'SHA256SUMS').read_text().splitlines() if line.strip()}
     inputs=[bundle/f'augmentor-{kind}_{version}_amd64.deb' for kind in ('runtime','desktop')]
     for path in inputs:
         if sums.get(path.name)!=digest(path):raise ValueError('Payload checksum mismatch: '+path.name)
@@ -41,10 +54,20 @@ def build(bundle,out):
     with tempfile.TemporaryDirectory(prefix='augmentor-fedora-') as temp:
         top=Path(temp);payload=top/'payload';payload.mkdir()
         for source in inputs:subprocess.run(['dpkg-deb','-x',str(source),str(payload)],check=True)
-        # Preserve the reviewed payload except the recorded RPM lifecycle adapter.
-        # Separate Fedora packaging provenance avoids rewriting release.json.
-        shutil.copy2(ROOT/'services/lifecycle/lease.py',payload/'usr/lib/augmentor/services/lifecycle/lease.py')
-        record={'overrides':{'services/lifecycle/lease.py':digest(ROOT/'services/lifecycle/lease.py')},'target':'fedora44-x86_64','version':version,'payloadSource':verification,'inputDebs':{p.name:digest(p) for p in inputs}}
+        app=payload/'usr/lib/augmentor'
+        release=json.loads((app/'release.json').read_text())
+        if release['version']!=version:raise ValueError('Runtime product version differs from the input manifest.')
+        if 'source' in verification and verification['source']!=release['source']:
+            raise ValueError('Runtime source differs from the input manifest.')
+        desktop=(payload/'usr/share/augmentor/desktop-version').read_text().strip()
+        if desktop!=version:raise ValueError('Desktop and runtime package versions differ.')
+        # Current source already contains RPM-aware leases. Never silently replace
+        # a reviewed dependency with this checkout's different implementation.
+        if 'fedora-package.json' not in (app/'services/lifecycle/lease.py').read_text():
+            raise ValueError('The payload lacks RPM-aware lifecycle support; rebuild it from current source.')
+        record={'overrides':{},'target':f'fedora{fedora}-x86_64','version':version,'source':release['source'],
+                'maintainerSourceSha256':digest(ROOT/'release/debian-maintainer.py'),
+                'payloadSource':verification,'inputDebs':{p.name:digest(p) for p in inputs}}
         (payload/'usr/lib/augmentor/fedora-package.json').write_text(json.dumps(record,indent=2)+'\n')
         # Fedora Chromium also accepts this distro-specific system host directory.
         dest=payload/'usr/lib64/chromium/native-messaging-hosts';dest.mkdir(parents=True)
@@ -57,7 +80,7 @@ def build(bundle,out):
 %global _build_id_links none
 Name: augmentor-agent
 Version: {version}
-Release: 1.fc44
+Release: 1.fc{fedora}
 Summary: Augmentor Agent Desktop and browser companion (Fedora preview)
 License: LicenseRef-Augmentor-MIT-Resale-1.0 AND MIT AND BSD-3-Clause AND Apache-2.0
 URL: https://github.com/ManoloRemiddi/augmentor-agent
@@ -68,8 +91,9 @@ Requires: python3 >= 3.11
 Requires: python3-pyside6 >= 6.8.2
 Requires: python3-pyyaml, python3-websocket-client, python3-pygments >= 2.18, python3-numpy >= 1.24
 Requires: python3-gobject, qt6-qtsvg, at-spi2-core, gstreamer1, pipewire-gstreamer, gstreamer1-plugins-base
+Requires: qt6-qtdeclarative
 Requires: dejavu-sans-fonts, glib2, glibc >= 2.36, libstdc++
-Requires(pretrans): python3
+Requires(pre): python3
 Requires(preun): python3
 Requires(postun): python3
 Requires(posttrans): python3
@@ -77,7 +101,7 @@ Conflicts: augmentor-runtime, augmentor-desktop
 
 %description
 Native Augmentor Agent and Chromium companion with DSH integration.
-Experimental Fedora 44 package using the verified 0.2.9 Linux payload.
+Experimental Fedora {fedora} package using the verified {version} Linux payload.
 Dependency notices are installed in /usr/lib/augmentor/licenses.
 DSH, models and the unpacked Browser extension are installed separately.
 
@@ -87,7 +111,7 @@ DSH, models and the unpacked Browser extension are installed separately.
 mkdir -p %{{buildroot}}
 cp -a {shlex.quote(str(payload))}/. %{{buildroot}}/
 
-%pretrans
+%pre
 {guard(version)}
 %posttrans
 {clean}
@@ -121,12 +145,16 @@ fi
         subprocess.run(['rpmbuild','-bb','--define',f'_topdir {top}',str(path)],check=True)
         rpm=next((top/'RPMS/x86_64').glob('*.rpm'));target=out/rpm.name;shutil.copy2(rpm,target)
         record['rpm']={'file':target.name,'sha256':digest(target),'bytes':target.stat().st_size}
+        record['artifacts']=[record['rpm']]
         (out/'artifacts.json').write_text(json.dumps(record,indent=2)+'\n')
         (out/'SHA256SUMS').write_text(f'{digest(target)}  {target.name}\n')
         print(json.dumps(record['rpm']))
 
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--bundle',type=Path,required=True)
-    p.add_argument('--out',type=Path,default=ROOT/'outputs/fedora-0.2.9')
-    args=p.parse_args();build(args.bundle.resolve(),args.out.resolve())
+    inputs=p.add_mutually_exclusive_group(required=True)
+    inputs.add_argument('--bundle',type=Path,help='Verified legacy or complete Linux bundle.')
+    inputs.add_argument('--debian',type=Path,help='Current Debian artifacts.json and matching packages.')
+    p.add_argument('--fedora',choices=('43','44'),default='44')
+    p.add_argument('--out',type=Path,default=ROOT/'outputs/fedora')
+    args=p.parse_args();build((args.debian or args.bundle).resolve(),args.out.resolve(),args.fedora)

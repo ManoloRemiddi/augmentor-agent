@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-"""Guided fresh-user setup for the complete, checksummed Debian preview bundle."""
+"""Guided fresh-user setup for a complete, checksummed Linux preview bundle."""
 import argparse
 import getpass
 import hashlib
 import importlib.util
 import json
 import os
-import platform
 from pathlib import Path
 import re
 import secrets
@@ -29,6 +28,9 @@ def run(*args, **kwargs):return subprocess.run([str(a) for a in args],check=True
 def load(path):
     spec=importlib.util.spec_from_file_location(path.stem.replace('-','_'),path)
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
+
+
+distribution=load(Path(__file__).with_name('linux_distribution.py'))
 
 
 def write(path, text, mode=0o600):
@@ -116,8 +118,14 @@ def configure_product(app, cli, home, endpoint, env, state, *, save=True):
 
 def install(args):
     os.umask(0o077)
-    if os.geteuid()==0:raise ValueError('Run this installer as your normal desktop user. It requests sudo only for system packages.')
     bundle=args.bundle.resolve();manifest=verify_bundle(bundle)
+    package_plan=None
+    if not args.skip_packages:
+        package_plan=distribution.install_plan(manifest,bundle,voice=args.voice,gpu=bool(args.gpu),memory=args.memory,memory_engine_present=shutil.which('docker') is not None)
+    if args.plan:
+        return {'bundle':manifest['version'],'components':manifest['components'],'system':package_plan,
+                'changes':'Fresh private DSH home, desktop/browser, plugins, login recovery and optional local voice/memory.'}
+    if os.geteuid()==0:raise ValueError('Run this installer as your normal desktop user. It requests sudo only for system packages.')
     data=Path(os.environ.get('XDG_DATA_HOME',Path.home()/'.local/share'))/'augmentor'
     config=Path(os.environ.get('XDG_CONFIG_HOME',Path.home()/'.config'))
     state=Path(os.environ.get('XDG_STATE_HOME',Path.home()/'.local/state'))/'augmentor-install'
@@ -128,11 +136,6 @@ def install(args):
     if (data/'desktop.json').exists() and not resumable:raise ValueError('An Augmentor desktop is already installed. Use its documented update/migration workflow; this wizard is for fresh users.')
     if (Path.home()/'.dsh').exists() and any((Path.home()/'.dsh').iterdir()):
         raise ValueError('An existing DSH installation was found. Follow the existing-installation migration guide; no profile or model was changed.')
-    if not args.skip_packages:
-        info=dict(line.split('=',1) for line in Path('/etc/os-release').read_text().splitlines() if '=' in line)
-        if info.get('ID','').strip('"')!='debian' or info.get('VERSION_ID','').strip('"')!='13' or platform.machine() not in ('x86_64','amd64'):
-            raise ValueError('This complete installer is qualified for Debian 13 amd64. Other distributions require separate qualification.')
-    if args.plan:return {'bundle':manifest['version'],'components':manifest['components'],'changes':'Fresh private DSH home, desktop/browser, plugins, login recovery and optional local voice/memory.'}
     if not args.model_url:args.model_url=input('Your OpenAI-compatible model API URL (including /v1): ').strip()
     if not args.model:args.model=input('Model ID: ').strip()
     settings=model_settings(args.model_url,args.model,args.context)
@@ -145,6 +148,10 @@ def install(args):
         if not args.memory:args.memory=input('Set up dual memory with Docker and this local model? [y/N] ').strip().lower()=='y'
     if args.memory and urlsplit(args.model_url).hostname not in ('127.0.0.1','::1'):
         raise ValueError('The bundled memory setup currently requires a local numeric-loopback model API. Omit memory for a cloud-only setup.')
+    # Interactive feature choices change the system dependency plan. Validate it
+    # again before writing the install receipt or requesting administrator access.
+    if not args.skip_packages:
+        package_plan=distribution.install_plan(manifest,bundle,voice=args.voice,gpu=bool(args.gpu),memory=args.memory,memory_engine_present=shutil.which('docker') is not None)
     secret=os.environ.get(args.api_key_env) if args.api_key_env else getpass.getpass('Model API key (Enter for a local model without authentication): ')
     if args.api_key_env and secret is None:raise ValueError('The requested API-key environment variable is not set.')
     secret=secret or 'local'
@@ -158,8 +165,7 @@ def install(args):
     state.mkdir(parents=True,exist_ok=True,mode=0o700)
     write(stamp,json.dumps({'bundle':manifest['artifactId'],'status':'preparing'})+'\n')
     if not args.skip_packages:
-        packages=[bundle/name for name in manifest['sha256'] if name.endswith('.deb')]
-        run('sudo','apt','install','-y',*packages,'python3-venv','npm','libportaudio2','git','cmake','g++','pkg-config')
+        run(*package_plan['command'])
     app=args.app_root.resolve();node=app/'node/bin/node'
     runtime=data/'dsh-runtime';runtime.mkdir(parents=True,exist_ok=True)
     env={**os.environ,'PATH':str(node.parent)+':'+os.environ.get('PATH','')}
@@ -187,7 +193,6 @@ def install(args):
     if args.voice:
         command=['/usr/bin/python3',voice/'bin/setup-linux.py','--node',node,'--accept-model-license']
         if args.gpu:
-            if not args.skip_packages:run('sudo','apt','install','-y','libvulkan-dev','glslc','spirv-headers')
             command+=['--gpu',args.gpu]
         else:command+=['--cpu']
         if args.no_services:command+=['--no-start']
@@ -219,8 +224,11 @@ def install(args):
     for browser in ('chromium','google-chrome','BraveSoftware/Brave-Browser'):
         write(config/browser/'NativeMessagingHosts/com.augmentor.agent.json',json.dumps(native,indent=2)+'\n')
     if args.memory:
-        if not args.skip_packages:run('sudo','apt','install','-y','docker.io')
         docker_ok=subprocess.run(['docker','info'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL).returncode==0
+        if not docker_ok and package_plan and package_plan['installMemoryEngine']:
+            # Provision only the explicitly requested engine; never remove or
+            # replace a user's existing Docker/Podman packages or services.
+            run('sudo','systemctl','enable','--now','docker.service')
         command=[python,app/'scripts/setup-hindsight.py','--model-url',args.model_url,'--model',args.model,'--api-key-env','AUGMENTOR_MODEL_API_KEY']
         if not docker_ok:command+=['--sudo-docker']
         run(*command,env=env)
@@ -238,6 +246,7 @@ def install(args):
                     time.sleep(1)
         run('systemctl','--user','start','augmentor-desktop.service')
     result={'bundle':manifest['artifactId'],'status':'installed','desktop':True,'browserExtension':str(extension),
+            'target':manifest.get('target'),'system':package_plan,
             'browserAction':'Load this folder once in chrome://extensions (Developer mode).',
             'voice':'configured' if args.voice else 'plugin installed; speech engine setup deferred',
             'memory':'configured' if args.memory else 'adapter installed; memory engine setup deferred',

@@ -2,9 +2,12 @@
 
 # Install Desktop, Browser and their shared components
 
-This complete preview targets **Debian 13, x86-64**. Desktop-control acceptance
-is scoped to KDE Plasma Wayland. macOS is the next compatibility phase; this
-Linux installer does not establish macOS or Fedora feature parity.
+The published complete preview targets **Debian 13, x86-64**. Desktop-control
+acceptance is scoped to KDE Plasma Wayland. The
+[Linux distribution rollout](LINUX-DISTRO-ROLLOUT.md) adds separate Ubuntu 26.04
+and Fedora 43/44 candidate bundles; their package adapters do not establish full
+desktop compatibility. Ubuntu 24.04/Mint need the planned managed Qt runtime.
+macOS uses its own matched release artifacts and qualification.
 
 The active project is [augmentor-agent](https://github.com/ManoloRemiddi/augmentor-agent).
 The current downloadable preview is the **0.2.13 browser reliability preview**:
@@ -27,8 +30,14 @@ capabilities, use DSH Settings after this basic text-model setup. This wizard do
 not download or select a chat model for you. The default context limit is 32,768;
 pass `--context` with your model's supported limit if different.
 
-The installer requests administrator access through `sudo apt` for Debian
-packages. DSH, model settings, tokens, plugins and user services are then installed
+For a newly assembled candidate, `./install.sh --plan` verifies the supplied files
+and prints its system package/dependency command without prompting or writing
+installation state. Use a bundle whose target matches your exact distribution,
+version and architecture; Debian packages inside an Ubuntu candidate retain their
+original build provenance. The older downloadable preview predates this plan mode.
+
+The installer requests administrator access through `sudo apt` for Debian/Ubuntu
+or `sudo dnf` for Fedora. DSH, model settings, tokens, plugins and user services are then installed
 as your normal user. Internet access is needed for the pinned DSH dependency tree
 and Python packages. Do not run the whole script as root.
 

@@ -8,7 +8,7 @@ from pathlib import Path
 import subprocess
 import sys
 
-if 'Fedora' not in Path('/etc/os-release').read_text() or not Path('/run/.containerenv').exists():
+if 'Fedora' not in Path('/etc/os-release').read_text() or not any(Path(marker).exists() for marker in ('/run/.containerenv', '/.dockerenv')):
     raise SystemExit('This proof requires a disposable Fedora container')
 rpm=Path(sys.argv[1]).resolve()
 def run(args,**kw):return subprocess.run(args,check=True,text=True,**kw)
