@@ -2,6 +2,27 @@
 
 # Start here: agent handoff
 
+## October 1 model-catalog platform qualification
+
+Source `3ca4778b1a6b4e368dd1e82e106a10c29cdea504` passes Mac 14/26 CI,
+including all six actual Keychain account lifecycle proofs through the build,
+packaged Desktop and standalone Browser interpreters. Linux type/build and
+462 root, 65 Browser and 590 native cases pass, with the four documented opt-in/
+Mac-only skips; isolated actual Linux protected storage passes again. Linux CI
+passes application/Home/credential/source/npm/extension checks and still fails
+only at the known native Codex executable notice gate. See
+[exact account-model source and CI](CODEX-ACCOUNTS.md#published-account-model-source-and-platform-checkpoint).
+
+All 30 original canonical working files remain byte-identical to their private
+backups. No installed app, global auth cache, private speech or approved model
+placement changed. A short OpenAI eligibility request is prepared in the account
+guide for owner review; it was not submitted. The owner was asked whether OpenAI
+has already approved Augmentor's subscription use. Keep production gates false
+without confirmed eligibility, and retain the separate pending Qwen activation
+question. Native managed auth, live acceptance, notices and the complete C0–C9
+plan remain open; do not mark the full integration complete. These followups are
+documentation only.
+
 ## October 1 current account model catalog
 
 [Current account models](CODEX-ACCOUNTS.md#current-account-model-choices--october-1)

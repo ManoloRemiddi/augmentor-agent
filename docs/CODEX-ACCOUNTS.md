@@ -330,3 +330,21 @@ submission. Do not attach source archives, credentials, private transcripts or
 local configuration. The API/local implementation and native notice review can
 continue independently; this eligibility question blocks live subscription
 acceptance and its affected distribution, not those engineering tasks.
+
+## Published account-model source and platform checkpoint
+
+Implementation `3ca4778b1a6b4e368dd1e82e106a10c29cdea504` passes
+[Mac 14/26 CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36878005081),
+including current catalog, native chooser, binding/renewal contracts and all six
+real Keychain lifecycle proofs through build, packaged Desktop and Browser
+interpreters. Grants/catalog/network renewal are synthetic; native credential
+storage and pinned Codex transport are real. Linux type/build, 462 root cases
+(460 pass/two opt-in skips), 65 Browser cases and 590 native cases (588 pass/two
+Mac-only skips) pass, as does the isolated actual Secret Service lifecycle proof.
+[Linux CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36878005000)
+passes application/UI/credential, source boundary, Home, npm notices and extension
+packaging; its known native Codex executable notice failure blocks Debian and
+skips installed-package checks. All 30 original canonical working files again
+match their private backups. The eligibility-draft and platform-record followups
+change only documentation. Production SIWC stays disabled, installed apps and
+speech/model placement are unchanged, and the full C0–C9 scope remains open.
