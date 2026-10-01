@@ -2,6 +2,15 @@
 
 # Consistent installed desktop releases
 
+## October 1: browser evidence recovery
+
+[Browser observation repair](BROWSER-OBSERVATION-REPAIR.md#installed-linux-evidence--1-october-2026)
+records implementation `13a24e2`, selected compatible release
+`20261001-161942-544b2e90`, active shared Desktop/Browser adapters, real-model
+qualification with saved Amazon evidence, preserved settings, and private rollback
+backups. Native windows retain their earlier build. Chromium extension files are
+installed; its Reload and fresh live-site acceptance remain pending.
+
 ## September 28: task reliability
 
 [Task reliability](TASK-RELIABILITY.md#september-28-installed-linux-adoption) owns

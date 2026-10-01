@@ -72,3 +72,45 @@ Source, selected build, loaded preset generation and loaded extension are separa
 states. Rollback needs the previous desktop selection, backed-up preset/plugin
 ownership files and previous unpacked extension code. Original conversation
 events stay append-only. Never restart active work or replay an uncertain action.
+
+## Installed Linux evidence — 1 October 2026
+
+Implementation `13a24e2` was selectively applied over the September 30 SDK
+artifact `91ae4b61eb4ce837477acaa19edbd8be1dbe21e5a2e047baf7a61e2a211484b3`.
+The managed updater staged and activated compatible product 0.2.11 release
+`20261001-161942-544b2e90`, with artifact SHA-256
+`9a68b2442a998e0d0bffafc4c37ec8c1a54aa7b712c53c15dfabf664d4157d08`.
+The existing SDK composition, product identity, interpreters and speech dependencies
+were retained; this is a mixed compatible artifact, not an unmodified source build.
+
+The two owned personal preset adapter paths and recovery guidance, compiled DSH
+browser plugin and unpacked 0.2.11 extension observer/executor were updated after
+ownership validation, private backups and shared-host idle checks. The DSH service
+restarted while idle; open native windows stayed open and reconnected. Authenticated
+plugin inventory reports the new adapter active in both Desktop and Browser
+compositions and the browser plugin active. All 16 checked model/configuration
+and saved-selection files retained their original hashes.
+
+A separate restricted real-model harness loaded the installed adapter and returned
+the original saved 18,228-character Amazon observation. The local Qwen model made
+two requests; the complete fresh tool result reached the model, and its answer
+correctly recovered the observed Lefant V1 price of EUR109.99. This uses historical
+page evidence with an actual model, not a fresh Amazon availability check. No
+click, purchase, navigation, user-chat prompt or model-settings change was possible.
+An initial harness attempt lacked declared reasoning capability and was rejected
+before inference; declaring its own minimal-effort capability enabled the test.
+
+**Chromium extension reload remains pending.** Its new files are installed, but
+this Codex chat has no external-Chromium control connection. Reload Augmentor
+Agent in `chrome://extensions/`, then perform a fresh read-only Amazon comparison
+in the existing chat. The extension ID, permissions and saved browser chats stay
+unchanged. Source/isolated-browser checks and archived-page model qualification do
+not establish that the open extension has adopted the new observer.
+
+Primary, secondary and mobile native windows remain on
+`20260928-093018-2d4431f6`, online with voice available and the selected update
+pending. Their context handling already uses the refreshed shared DSH service;
+native UI adoption happens at close/reopen or login. Installed Mac adoption and
+public release packaging remain unperformed. Rollback includes the previous
+selection plus the privately backed-up presets, plugin inventory and extension
+files; desktop selection rollback alone does not undo backend/extension updates.
