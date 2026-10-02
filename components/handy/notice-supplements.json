@@ -322,5 +322,15 @@
     ],
     "url": "https://raw.githubusercontent.com/tauri-apps/tauri/8d67af37b6d3fc0aedaab58549b1bca5b34fda19/LICENSE_MIT",
     "sha256": "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d"
+  },
+  {
+    "packages": [
+      [
+        "clipboard-win",
+        "5.4.1"
+      ]
+    ],
+    "url": "https://raw.githubusercontent.com/DoumanAsh/clipboard-win/3b27cf2bfd1adcfa6e0264eb51c1025ddaf0f342/LICENSE",
+    "sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566"
   }
 ]

@@ -353,3 +353,46 @@ macOS Accessibility consent is requested only after explicit Enable. A denied
 request leaves dictation disabled and identifies the System Settings permission
 and retry action. Startup, status and Disable never request consent. Physical
 microphone and Accessibility grant/revocation acceptance remains a release gate.
+
+### Clean final installer checkpoint
+
+Source `c40e53b243d1b9df2030d513a2c9ff38164b7048` passes all 617 shared native
+cases (614 pass, 3 expected skips), release compilation, formatting, Clippy and
+the actual copied native lifecycle proof. Both Debian packages are built with
+`dirty: false`. Runtime SHA-256 is
+`0a7a9d8da9af5e856e122b4cae896dd485f6dfec41583b4f1fa7e80d34cf5b44`;
+Desktop SHA-256 is
+`2a8d73c5329149cbf262fec2d3c58327b8905c05d213909609cec340dc2c6c90`.
+The fresh-user clean-install proof passes native dependency resolution, bundled
+component lifecycle, first-run/file task, actual launch shortcut/service restart
+and owned uninstall with user state preservation. Subsequent source `0e7a19a`
+changes CI source/cache ordering only; final hosted results are recorded below.
+
+The complete Windows distribution depends on the separate public
+[Windows application/installer PR #20](https://github.com/ManoloRemiddi/augmentor-agent/pull/20).
+Convergence must call `scripts/stage-handy.py` inside its application payload,
+ship the same broker/settings integration, and provision the actual component's
+WebView2 and matching MSVC runtime requirements. Its clean-user installer must
+exercise dictation and retain uninstall/update ownership. A hosted Windows
+component build and lifecycle proof do not establish that complete installer.
+
+### Final Mac product and Windows notice checkpoint
+
+At source `0e7a19a`, [the final macOS feasibility run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37024221742)
+passes the native Handy component and both macOS 14/26 product jobs. Both signed
+Desktop and Browser companion bundles run the actual copied helper lifecycle
+proof, with signature verification afterward. Shared application/native/voice
+contracts, packaged credential isolation, DSH/Qt, managed first run and service
+restart all pass. These are development bundle proofs; Developer ID/notarization
+and physical OS permission acceptance remain distinct release gates.
+
+The same source passes Linux native build/lint/lifecycle qualification. Windows
+release compilation succeeds, then fails closed because `clipboard-win` 5.4.1's
+crate omits its original license text. Its exact published revision
+`3b27cf2bfd1adcfa6e0264eb51c1025ddaf0f342` supplies the original BSL-1.0 text,
+retained byte-for-byte at SHA-256
+`c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566`.
+The complete target-filtered Windows production/build notice collection now
+passes locally: 578 Rust and 187 frontend dependencies, with original source
+archives retained. This changes notice inputs only; final hosted Windows
+staging/lifecycle and resulting package jobs still require success.

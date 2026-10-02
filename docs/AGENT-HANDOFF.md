@@ -26,6 +26,16 @@ expiry and the short Unix socket path. All 615 native cases pass (3 expected ski
 both clean-source Debian packages build and their extracted component passes
 actual lifecycle/theme/ownership/EOF proof. Hosted platform results are recorded
 in the owning guide as they qualify.
+Final feature source `c40e53b` passes 617 shared native cases (3 expected skips)
+and a fresh-user clean Debian install/component/shortcut/uninstall proof.
+CI follow-up `0e7a19a` prepares reviewed source before restoring compiler files;
+Windows checksum-pinned notices retain exact bytes under automatic conversion.
+The current installed Linux root above stays enabled and ready; Mac-only
+permission/package refinements do not require another Linux cutover.
+At `0e7a19a`, macOS 14/26 signed Desktop/Browser development product jobs
+pass, including actual copied-helper proofs. The Windows notice-only follow-up
+preserves the original missing clipboard dependency license and passes the full
+target-filtered notice audit. Final hosted results are recorded in the guide.
 Do not claim a qualified Windows installer or physical microphone acceptance
 solely from a native build or successful component enable.
 

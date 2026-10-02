@@ -317,3 +317,16 @@ acceptance still requires its recorded gates. Milestone 6 remains dependent on
 convergence with the public Augmentor Windows application/installer work, beyond
 building the native Handy component. No complete Windows installer is promised
 from a standalone component compilation.
+
+The final clean Debian candidate and all 617 shared native cases pass. macOS
+14/26 development product qualification passes at `44b13ee`; the final
+Accessibility setup and checkout/cache corrections require the hosted results
+recorded in the implementation guide. Windows convergence depends specifically
+on [the public Windows distribution PR #20](https://github.com/ManoloRemiddi/augmentor-agent/pull/20),
+including actual component payload staging and WebView2/MSVC provisioning.
+
+Final macOS 14/26 signed Desktop/Browser development product qualification now
+passes at `0e7a19a`, including actual copied-helper proofs. Final Windows release
+compilation succeeds; the notice-only follow-up supplies a missing original
+clipboard dependency license and passes the complete target-filtered notice audit.
+Final hosted Windows lifecycle and package results remain required.
