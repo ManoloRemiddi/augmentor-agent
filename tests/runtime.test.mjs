@@ -5,7 +5,7 @@ import http from 'node:http';
 import net from 'node:net';
 import {spawn} from 'node:child_process';
 import {once} from 'node:events';
-import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,existsSync,statSync,appendFileSync} from 'node:fs';
+import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,existsSync,statSync,appendFileSync,unlinkSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
 import {randomUUID} from 'node:crypto';
@@ -44,7 +44,7 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
  });mock.listen(0,'127.0.0.1');await once(mock,'listening');t.after(()=>{mock.closeAllConnections();mock.close();});
  const modelConfig={providers:{test:{baseUrl:`http://127.0.0.1:${mock.address().port}/v1`,api:'openai-completions',apiKey:'dummy',models:[{id:'test',name:'Test',reasoning:false,input:['text'],contextWindow:32000,maxTokens:2048}]}}};
  writeFileSync(join(config,'agent/models.json'),JSON.stringify(modelConfig));
- const env={...process.env,AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_SHARED_STATE:join(root,'shared-state'),AUGMENTOR_SHARED_DATA:join(root,'shared-data'),AUGMENTOR_PI_INTERACTION_TIMEOUT:'300',PI_OFFLINE:'1'};
+ const env={...process.env,AUGMENTOR_IDENTITY_DIR:join(config,'identity'),AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_SHARED_STATE:join(root,'shared-state'),AUGMENTOR_SHARED_DATA:join(root,'shared-data'),AUGMENTOR_PI_INTERACTION_TIMEOUT:'300',PI_OFFLINE:'1'};
  let child;let stderr='';
  const start=async()=>{child=spawn(process.execPath,['dist/runtime/src/main.js'],{cwd:resolve('.'),env,stdio:['ignore','pipe','pipe']});child.stderr.on('data',b=>stderr+=b);await until(async()=>{assert.equal(child.exitCode,null,stderr);if(!existsSync(join(state,'runtime.sock')))return false;try{const c=await Client.open(join(state,'runtime.sock'));c.close();return true;}catch{return false;}},20000);};
  const stop=async(signal='SIGTERM')=>{if(child&&child.exitCode===null){child.kill(signal);await once(child,'exit');}};
@@ -134,7 +134,7 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
   const meta=JSON.parse(readFileSync(join(state,'sessions/branch-source.meta.json'),'utf8'));
   const original=readFileSync(meta.file,'utf8');const before=requests;
   const params={sessionId:'branch-source',newSessionId:'branched',messageSeq:reply,mode:'reply'};
-  const branch=await client.call('session.branch',params);assert.equal(branch.sessionId,'branched');assert.equal(requests,before);
+  const branch=await client.call('session.branch',params);assert.equal(JSON.parse(readFileSync(join(state,'sessions/branched.meta.json'))).soul,meta.soul);assert.equal(branch.sessionId,'branched');assert.equal(requests,before);
   assert.deepEqual(await client.call('session.branch',params),branch);
   assert.equal(readFileSync(meta.file,'utf8'),original);
   assert.deepEqual(await client.call('session.history',{sessionId:'branch-source'}),history);
@@ -170,6 +170,17 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
   const before=requests;await client.call('session.branch',{sessionId:'clock-workspace-write',newSessionId:'tools-branch',messageSeq:seq,mode:'reply'});assert.equal(requests,before);
   await client.call('events.subscribe',{sessionId:'tools-branch'});await prompt('tools-branch','CONTINUE_CONTEXT');await idle('tools-branch');
   assert(received.at(-1).messages.some(m=>m.role==='tool'&&/\d{2}:\d{2}:\d{2}/.test(String(m.content))));
+ });
+ await t.test('Soul snapshots persist through restart while legacy chats retain their original instructions',async()=>{
+  const folder=join(config,'identity');mkdirSync(folder,{recursive:true});const path=join(folder,'soul.md');
+  writeFileSync(path,'SYNTHETIC_SOUL_ALPHA');await create('soul-snapshot');await prompt('soul-snapshot','Soul snapshot fixture');await idle('soul-snapshot');
+  assert.match(JSON.stringify(received.at(-1).messages.filter(message=>message.role==='system')),/SYNTHETIC_SOUL_ALPHA/);
+  writeFileSync(path,'SYNTHETIC_SOUL_BETA');client.close();await stop();await start();client=await Client.open(join(state,'runtime.sock'));
+  await prompt('soul-snapshot','Continue snapshot fixture');await idle('soul-snapshot');assert.match(JSON.stringify(received.at(-1).messages.filter(message=>message.role==='system')),/SYNTHETIC_SOUL_ALPHA/);
+  const legacyPath=join(state,'sessions/basic.meta.json'),legacy=JSON.parse(readFileSync(legacyPath));delete legacy.soul;writeFileSync(legacyPath,JSON.stringify(legacy));
+  client.close();await stop();await start();client=await Client.open(join(state,'runtime.sock'));await prompt('basic','Legacy Soul fixture');await idle('basic');
+  assert.doesNotMatch(JSON.stringify(received.at(-1).messages.filter(message=>message.role==='system')),/SYNTHETIC_SOUL_(ALPHA|BETA)/);
+  unlinkSync(path);
  });
  await t.test('crash recovery never resends accepted prompts and Pi session resumes',async()=>{await create('crash');const requestId=randomUUID();await prompt('crash','SLOW',requestId);await delay(100);client.close();const before=requests;await stop('SIGKILL');await start();client=await Client.open(join(state,'runtime.sock'));assert.equal(requests,before);await prompt('crash','SLOW',requestId);assert.equal(requests,before);const h=await client.call('session.history',{sessionId:'crash'});assert.equal(h.events.at(-1).event.data.reason.kind,'interrupted');await client.call('events.subscribe',{sessionId:'basic'});await prompt('basic','resume hello');await idle('basic');assert(received.at(-1).messages.some(m=>m.role==='assistant'&&JSON.stringify(m.content).includes('Verified response')));});
  await t.test('saved branches resume after restart and a cold source can branch',async()=>{

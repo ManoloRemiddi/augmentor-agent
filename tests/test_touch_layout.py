@@ -19,10 +19,15 @@ class TouchTests(unittest.TestCase):
                 self.assertGreaterEqual(b.width(),44);self.assertGreaterEqual(b.height(),44)
                 if b.isVisible():self.assertLessEqual(b.mapTo(w,b.rect().bottomRight()).x(),width)
             self.assertEqual(w.activity.margin,8)
-        observed=[]
-        def inspect():
-            popup=QApplication.activePopupWidget();observed.extend(a.text() for a in popup.actions());popup.close()
-        QTimer.singleShot(10,inspect);w.more_button.click();self.assertIn('Colors & skins',observed);w.close()
+        w.more_button.click();self.app.processEvents()
+        self.assertIs(w.stack.currentWidget(),w.settings_panel)
+        self.assertIsNone(QApplication.activePopupWidget())
+        w.settings_panel.show_page('all')
+        self.assertTrue(any(b.text().startswith('Prompt library') for b in w.settings_panel.findChildren(QPushButton)))
+        w.settings_panel.open_appearance();self.app.processEvents();w.touch_layout.poll()
+        self.assertFalse(w.settings_panel.editor.isWindow())
+        self.assertFalse(w.settings_panel.editor.property('touchFitted'))
+        w.close()
     def test_dialog_remains_reachable_on_narrow_screen(self):
         w=Window();w.touch_layout=TouchLayout(w);w.touch_layout.viewport=(360,500)
         dialog=QDialog(w);dialog.setMinimumSize(600,650);layout=QVBoxLayout(dialog);layout.addWidget(QPushButton('Original action'));dialog.show();self.app.processEvents();w.touch_layout.fit_dialog(dialog)

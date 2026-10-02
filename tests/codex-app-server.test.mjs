@@ -141,6 +141,9 @@ test('pinned real Codex streams a fixture response and resumes persisted native 
   assert.equal(finalHistory.events.filter(({event}) => event.type === 'assistant/message').length, 2);
   const ipc = new CodexIpcServer(host, join(root, 'host.sock')); await ipc.listen();
   cleanup.push(() => ipc.close());
+  const permission = (await host.dispatch('settings.describe', {})).namespaces.find(value => value.ns === 'permission');
+  assert.equal(permission.value.defaultPreset, 'danger-full-access');
+  await host.dispatch('settings.mutate', {ns:'permission',expectedRevision:permission.revision,ops:[{op:'set',path:['defaultPreset'],value:'workspace-write'}]});
   mode = 'approval'; toolRounds = 0;
   const native = await promisify(execFile)(process.env.AUGMENTOR_PYTHON ?? 'python3', [fileURLToPath(new URL('./fixtures/codex/native-client.py', import.meta.url))], {
     timeout: 20000,
@@ -176,6 +179,8 @@ test('pinned real Codex streams a fixture response and resumes persisted native 
   assert.equal(JSON.parse(browserQuestions.stdout).questionsAnswered, 1);
   assert.ok(requests.at(-1).input.some(item => item.type === 'function_call_output' && item.output.includes('List')));
   await host.dispatch('session.release', {sessionId: 'browser-questions-fixture'});
+  const accessRevision = (await host.dispatch('settings.describe', {})).namespaces[0].revision;
+  await host.dispatch('settings.mutate', {ns:'permission',expectedRevision:accessRevision,ops:[{op:'set',path:['defaultPreset'],value:'danger-full-access'}]});
   for (let pass = 0; pass < 2; pass++) {
     mode = 'browser'; toolRounds = 0;
     const browserTools = await promisify(execFile)(process.execPath, [fileURLToPath(new URL('./fixtures/codex/browser-client.mjs', import.meta.url))], {
@@ -186,6 +191,19 @@ test('pinned real Codex streams a fixture response and resumes persisted native 
     assert.ok(requests.at(-1).input.some(item => item.type === 'function_call_output' && JSON.stringify(item.output).includes('Synthetic browser observation fixture')));
     await host.dispatch('session.release', {sessionId: 'browser-tools-fixture'});
   }
+  for (const policy of ['read-only','workspace-write']) {
+    const descriptor = (await host.dispatch('settings.describe', {})).namespaces[0];
+    await host.dispatch('settings.mutate', {ns:'permission',expectedRevision:descriptor.revision,ops:[{op:'set',path:['defaultPreset'],value:policy}]});
+    mode='browser'; toolRounds=0;
+    const guarded = await promisify(execFile)(process.execPath, [fileURLToPath(new URL('./fixtures/codex/browser-client.mjs', import.meta.url))], {
+      timeout:20000, env:{...process.env,AUGMENTOR_PROOF_BROWSER_TOOLS:'1',AUGMENTOR_PROOF_ACCESS_SUFFIX:'-'+policy,AUGMENTOR_CODEX_SOCKET:ipc.socketPath,AUGMENTOR_CODEX_BROWSER_WORKSPACE:cwd}
+    });
+    assert.equal(JSON.parse(guarded.stdout).browserActions,1,'Only the observation may reach the executor after an action is denied.');
+    assert.equal(JSON.parse(guarded.stdout).approvalsDenied,policy==='workspace-write'?1:0);
+    await host.dispatch('session.release',{sessionId:'browser-tools-fixture-'+policy});
+  }
+  const finalAccess = (await host.dispatch('settings.describe', {})).namespaces[0];
+  await host.dispatch('settings.mutate', {ns:'permission',expectedRevision:finalAccess.revision,ops:[{op:'set',path:['defaultPreset'],value:'danger-full-access'}]});
   // Use isolated pairing and NAS responses: no household configuration or devices.
   const previousHome = [process.env.AUGMENTOR_HOME_CONNECTION, process.env.AUGMENTOR_HOME_CLIENT_STATE];
   process.env.AUGMENTOR_HOME_CONNECTION = join(root, 'home.json');

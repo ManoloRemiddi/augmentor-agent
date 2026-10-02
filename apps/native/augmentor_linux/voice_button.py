@@ -260,23 +260,7 @@ class VoiceButton(QPushButton):
         accent = self.recording_colour()
         if not self.isEnabled():painter.setOpacity(.35)
         phase = self.phase
-        radius = 8.8 + (.5 * math.sin(phase*2) if phase else 0)
-        path = QPainterPath()
-        for i in range(97):
-            angle = i*math.tau/96
-            r = radius*(1 + .065*math.sin(3*angle+phase*.85) + .035*math.cos(2*angle-phase))
-            point = QPointF(math.cos(angle)*r, math.sin(angle)*r)
-            if i == 0:path.moveTo(point)
-            else:path.lineTo(point)
-        path.closeSubpath()
-        glow = QRadialGradient(QPointF(-2, -2), 14)
-        soft = QColor(accent);soft.setAlpha(100 if self.hovered or self.state=='listening' else 55)
-        clear = QColor(accent);clear.setAlpha(0)
-        glow.setColorAt(0, soft);glow.setColorAt(1, clear)
-        painter.setPen(Qt.PenStyle.NoPen);painter.setBrush(glow)
-        painter.drawEllipse(QPointF(0,0),14,14)
-        fill = QColor(accent);fill.setAlpha(75 if self.state=='listening' else 24)
-        painter.setBrush(fill);painter.setPen(QPen(accent,1.3));painter.drawPath(path)
+        paint_energy_ring(painter, accent, phase, self.hovered or self.state=='listening', self.state=='listening')
         painter.setBrush(accent);painter.setPen(Qt.PenStyle.NoPen)
         if self.state=='listening':
             # The waveform is microphone data, not a decorative animation.
@@ -301,3 +285,23 @@ class VoiceButton(QPushButton):
         if self.hasFocus():
             painter.setBrush(Qt.BrushStyle.NoBrush);painter.setPen(QPen(accent,1,Qt.PenStyle.DotLine))
             painter.drawEllipse(QPointF(0,0),12,12)
+
+
+def paint_energy_ring(painter, accent, phase, active=False, listening=False):
+    radius = 8.8 + (.5 * math.sin(phase*2) if phase else 0)
+    path = QPainterPath()
+    for i in range(97):
+        angle = i*math.tau/96
+        r = radius*(1 + .065*math.sin(3*angle+phase*.85) + .035*math.cos(2*angle-phase))
+        point = QPointF(math.cos(angle)*r, math.sin(angle)*r)
+        if i == 0:path.moveTo(point)
+        else:path.lineTo(point)
+    path.closeSubpath()
+    glow = QRadialGradient(QPointF(-2, -2), 14)
+    soft = QColor(accent);soft.setAlpha(100 if active else 55)
+    clear = QColor(accent);clear.setAlpha(0)
+    glow.setColorAt(0, soft);glow.setColorAt(1, clear)
+    painter.setPen(Qt.PenStyle.NoPen);painter.setBrush(glow)
+    painter.drawEllipse(QPointF(0,0),14,14)
+    fill = QColor(accent);fill.setAlpha(75 if listening else 24)
+    painter.setBrush(fill);painter.setPen(QPen(accent,1.3));painter.drawPath(path)

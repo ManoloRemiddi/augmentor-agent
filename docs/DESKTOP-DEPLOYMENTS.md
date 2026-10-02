@@ -2,6 +2,68 @@
 
 # Consistent installed desktop releases
 
+## October 2: Desktop profile adoption followup
+
+[Desktop profile adoption](AGENT-SETTINGS.md#desktop-adoption-followup--2-october-2026)
+now qualifies actual running Desktop/mobile on latest compatible selection
+`20261002-141437-663e6383`, with voice available, online and no pending update.
+Both accepted idle maintenance closure. This selection preserves the reviewed
+profile/calendar and includes the independently installed Handy integration;
+no immutable artifact was edited or selection rolled back. Actual Desktop
+Settings controls were verified and its Agent page left open for owner testing.
+No model or backend/speech configuration change; PR #29 remains draft/unmerged.
+
+## Agent profile and recorded token activity initial selection (historical)
+
+[Installed profile/activity update](AGENT-SETTINGS.md#installed-profileactivity-update)
+records source `41e0441`, compatible selected release `20261002-135127-a99dafb5`,
+exact artifact identity, 637 native/491 Node source cases and 37 native/seven Node
+candidate cases, with documented skips. Actual installed-interpreter stored-count
+and same-frame/geometry proof and immutable stage/activation pass. Mobile adopted
+the selected root through its idle guard, online with voice available; Desktop
+remains on the prior fixed-frame build with `updatePending: true` because its
+maintenance guard is busy. Finish its open UI and quit/relaunch to adopt the
+selection. DSH/speech and product 0.2.11 contracts remain intact. Rollback selects
+`20261002-130745-7e74c395`; PR #29 remains draft/unmerged for owner acceptance.
+
+## Fixed settings frame and readable inputs checkpoint (historical)
+
+[Installed fixed-frame update](AGENT-SETTINGS.md#installed-fixed-frame-update)
+records implementation `e567ccf`, compatible selected/running release
+`20261002-130745-7e74c395`, exact artifact identity, 631 native cases (629 pass,
+two Mac-only skips) and 31 candidate cases (29 pass, two source-only sizing skips).
+Installed-interpreter synthetic field/layout/geometry/resize checks and immutable
+stage/activation pass. Desktop/mobile adopted the root after idle guards, with
+voice available and no pending update. Product 0.2.11 backends/dependencies/speech
+and user data are preserved. Rollback selects `20261002-124829-c8553509`.
+PR #29 remains draft/unmerged for owner acceptance.
+
+## Agent Identity and Agent Memory naming checkpoint (historical)
+
+[Installed naming update](AGENT-SETTINGS.md#installed-naming-update) records
+source `14e5783`, compatible release `20261002-124829-c8553509`, exact artifact
+identity, 42 passing focused source cases and 28 compatible candidate cases
+(26 pass, two explicit source-only skips). Stage/activation and installed-interpreter
+synthetic labels/layout/geometry checks passed. Desktop/mobile adopted the root
+through idle maintenance guards; voice is available and no update is pending.
+The component-only overlay retains product 0.2.11 dependencies/backends/speech and
+user data. Rollback selects `20261002-124301-57f19808`. PR #29 is draft/unmerged.
+
+## Compact Desktop settings checkpoint (historical)
+
+[Current settings installation](AGENT-SETTINGS.md#installed-compact-layout-candidate)
+records implementation `abc62ef`, compatible selected/running release
+`20261002-124301-57f19808`, exact artifact identity, 628 shared native cases and
+28 compatible candidate cases. The actual installed-interpreter proof covers
+same-frame adaptive sizing, short-page fit and retained geometry/drafts.
+Desktop/mobile adopted it through idle maintenance guards and are online with
+voice available and no pending update. Product 0.2.11 dependencies, backends,
+speech and unrelated deployed improvements are preserved. DSH/speech services
+were not restarted. Earlier identity/preset and overlay evidence is historical
+in that guide. This remains an unmerged local acceptance candidate; the owner
+must give the green light before merging. Rollback selects the preceding
+`20261002-115054-5eb68ad8` overlay release.
+
 ## October 1: browser evidence recovery
 
 [Browser observation repair](BROWSER-OBSERVATION-REPAIR.md#installed-linux-evidence--1-october-2026)

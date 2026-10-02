@@ -55,7 +55,7 @@ try {
   const init = await call('initialize', {provider: 'local-fixture', model: 'fixture-model'});
   assert.equal(init.serverInfo.harness, 'codex');
   assert.equal(init.serverInfo.capabilities.browserTools, true);
-  const sessionId = process.env.AUGMENTOR_PROOF_HOME ? 'browser-home-fixture' : process.env.AUGMENTOR_PROOF_BROWSER_TOOLS ? 'browser-tools-fixture' : process.env.AUGMENTOR_PROOF_QUESTIONS ? 'browser-questions-fixture' : 'browser-adapter-fixture';
+  const sessionId = (process.env.AUGMENTOR_PROOF_HOME ? 'browser-home-fixture' : process.env.AUGMENTOR_PROOF_BROWSER_TOOLS ? 'browser-tools-fixture' : process.env.AUGMENTOR_PROOF_QUESTIONS ? 'browser-questions-fixture' : 'browser-adapter-fixture')+(process.env.AUGMENTOR_PROOF_ACCESS_SUFFIX??'');
   await call('session.create', {sessionId});
   const done = once(events, 'done');
   const response = await call('session.prompt', {sessionId, mode: 'queue', content: [{type: 'text', text: 'Exercise browser native messaging.'}]});

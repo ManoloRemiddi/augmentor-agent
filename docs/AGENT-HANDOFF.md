@@ -2,6 +2,119 @@
 
 # Start here: agent handoff
 
+## 2 October: Agent profile and recorded token activity
+
+The larger animated profile, subtle stacked Identity/Memory actions and access
+row now balance the fixed frame with a daily token calendar at the bottom.
+[Recorded token activity](TOKEN-USAGE.md) specifies the independently authored
+read-only DSH/Pi/Codex journal aggregator, deduplication, provider-total semantics,
+coverage and accessible selection. Native source passes 637 cases (635 pass,
+two Mac-only skips), with standard frame/theme/custom-image and narrow width
+checks. Seven Node aggregation fixtures pass. The full root Node suite passes 491 cases
+(489 pass, two opt-in memory proof skips). Synthetic renders are separate
+from a read-only local stored-count proof; no private history is published.
+Tested source `41e0441` was initially selected as compatible Linux product 0.2.11 release
+`20261002-135127-a99dafb5`, artifact
+`b72b7f883e65c7b27d0e077892a9cdbf2744d56348d132796532b3efab62a29d`.
+The separate candidate passes 37 native cases (35 pass, two source-only sizing
+skips), seven Node fixtures and an actual installed-interpreter stored-count,
+frame/theme/geometry proof. Stage/activation pass. Mobile adopted it through its
+idle guard, online with voice available and no pending update. Desktop initially remained
+on `20261002-130745-7e74c395` with a pending update because its maintenance guard
+reports busy; no running turn/chat draft, and no forced close. That pending adoption was resolved in the followup below. Existing product/dependency/
+backend/speech contracts and user state are retained. Rollback selects the prior
+fixed-frame release; DSH/speech services and GPU/model settings are untouched.
+See [installed profile/activity evidence](AGENT-SETTINGS.md#installed-profileactivity-update).
+Mac installed GUI acceptance remains unverified. PR #29 remains draft/unmerged.
+
+Adoption followup: both windows now run latest compatible selection
+`20261002-141437-663e6383` (Handy source `c8f67a3` over the tested profile build),
+online with voice available and no pending update, after accepted idle guards.
+The reviewed profile and token calendar are preserved. Actual Desktop Settings
+opened and exposed Identity, Memory, calendar and Back; it is left open for local
+testing. See [adoption evidence](AGENT-SETTINGS.md#desktop-adoption-followup--2-october-2026).
+No source/runtime/backend/speech configuration changed in this adoption.
+
+
+## Fixed settings frame and readable inputs checkpoint (historical)
+
+The owner requested stable settings dimensions and readable fields after the
+model setup screenshot showed squashed inputs and clipped descriptions. All
+pages now share one 700 × 760 design-unit frame, capped to the screen/touch
+viewport at entry. Forms use readable minimum heights and full available width;
+wrapped notes increase body height instead of compressing inputs. Long forms
+scroll vertically. Prompt library browses beside its editor at standard widths.
+Back to chat restores its latest geometry and resize constraints. Shared source
+passes 631 native cases (629 pass, two Mac-only skips); all 21 overlay cases pass,
+including short-screen font/field/status checks, model/memory forms and frame lock.
+Tested implementation `e567ccf` is installed as compatible Linux product 0.2.11
+release `20261002-130745-7e74c395`, artifact
+`14134df91f3a049834ef94da95a5a156b1ce02760115a141ea7c80fb4fa9f92d`.
+The candidate passes 31 focused cases (29 pass, two source-only sizing skips),
+plus an actual installed-interpreter synthetic fields/layout/geometry proof.
+Immutable stage/activation pass. Desktop/mobile adopted the selected root after
+idle maintenance guards, with voice available and no pending update. Prior
+installed dependency/backend/speech contracts and private state are preserved;
+DSH/speech services and GPU/model settings were not changed. Rollback selects
+`20261002-124829-c8553509`; installed Mac GUI acceptance remains unverified. PR #29 remains draft/unmerged.
+See [fixed frame guide](AGENT-SETTINGS.md#fixed-frame-and-readable-fields--2-october-2026).
+
+## Agent Identity and Agent Memory naming checkpoint (historical)
+
+The Desktop cards and destination headings now read Agent Identity and Agent
+Memory; identity messages and its accessible editor name follow the rename.
+Stored `soul.md`, internal routes, reset behavior and memory contracts are unchanged.
+Tested source `14e5783`: 42 focused source settings cases pass. The compatible
+candidate passes 28 cases (26 pass, two source-only sizing skips), plus an actual
+installed-interpreter synthetic label/layout/geometry preview. Linux release
+`20261002-124829-c8553509`, artifact
+`dd35e134a9973beab85acf00800d70c94a1e205e791044799f06e3f03397d0c4`, is
+selected/running on Desktop/mobile after idle maintenance guards; voice is available
+and no update is pending. Existing product 0.2.11 dependencies/backends/speech
+and private data are preserved. Shared Mac source changes apply; installed Mac
+GUI remains unverified. Rollback selects `20261002-124301-57f19808`.
+[Draft PR #29](https://github.com/ManoloRemiddi/augmentor-agent/pull/29) remains
+unmerged pending owner acceptance. See [naming evidence](AGENT-SETTINGS.md#installed-naming-update).
+
+## Compact Desktop settings checkpoint (historical)
+
+The latest [settings layout](AGENT-SETTINGS.md#compact-layout-revision--2-october-2026)
+shrinks Agent/Soul/Memory, removes repeated Look/Voice/access entries from More,
+sizes only the active page, widens large editors and wraps actions on narrow
+screens. Appearance uses one outer scrollbar at the frame edge; selected SVGs
+match their text in both themes. Shared native qualification: 628 cases, 626 pass,
+two Mac-only skips. Compatible product 0.2.11 candidate: 28 focused cases, 26 pass,
+two source-only sizing skips. Tested source `abc62ef` is installed as compatible product 0.2.11 release
+`20261002-124301-57f19808`, artifact
+`5e3be8861171b303f923b204c4bf7035fd20f7880136a13be7549be66efba37e`.
+Stage/activation and an actual installed-interpreter layout/geometry proof pass.
+Desktop/mobile adopted it after idle maintenance guards and report online with
+voice available, no pending update. DSH/speech services, GPU/model settings,
+private user state and unrelated canonical edits are preserved. Rollback returns
+to `20261002-115054-5eb68ad8`. Installed Mac acceptance remains unverified. Draft PR #29 remains
+unmerged pending the owner's local acceptance.
+
+## Previous frame-overlay checkpoint (historical)
+
+See [Desktop agent settings](AGENT-SETTINGS.md). Tested source `3f2837b` plus
+`0481143` on `feat/desktop-agent-settings` uses direct three-dot entry, embedded
+forms in the same native frame, and restoration of the latest chat geometry.
+Identity, stacked Soul/Memory cards and all previous menu actions remain available.
+Unsaved Soul choices are inline; Stop, chat drafts and form lifecycle are preserved.
+Shared source passes 623 native cases (621 pass, two Mac-only skips). The compatible
+candidate passes 23 focused cases (21 pass, two source-only app-sizing skips), plus
+a synthetic same-window/geometry proof using the actual installed interpreter.
+
+Compatible Linux release `20261002-115054-5eb68ad8`, artifact
+`f077cb698826852028a4828aae012aa38e85d8f6750d94c319924a538fbf951e`, is selected
+and running on Desktop/mobile, online with voice available and no pending update.
+It preserves installed product 0.2.11 dependencies, speech, backends and prior native
+improvements. DSH/speech services and GPU/model settings were not changed. Source
+is based on `d91c520`; the original checkout’s unrelated edits remain preserved.
+Mac installed GUI acceptance is unverified. Rollback and initial identity/runtime
+qualification are in the guide. [Draft PR #29](https://github.com/ManoloRemiddi/augmentor-agent/pull/29)
+must remain unmerged until the owner tests locally and gives the green light.
+
 ## October 1 merge blockers: current main and separate Codex prerequisite
 
 The feature branch integrates canonical main `8c3be5a` at merge `338dbc5`.

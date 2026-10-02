@@ -34,5 +34,5 @@ value={'providers':{'mx-qwen':{'baseUrl':args.endpoint,'api':'openai-completions
 from augmentor_linux.migration import atomic_json
 atomic_json(agent/'models.json',value)
 settings=config/'settings.json'
-if not settings.exists():atomic_json(settings,{'revision':0,'defaultPreset':'workspace-write','pinned':['mx-qwen/'+model],'hidden':[],'defaultModel':{'provider':'mx-qwen','model':model}})
+if not settings.exists():atomic_json(settings,{'revision':0,'defaultPreset':'danger-full-access','pinned':['mx-qwen/'+model],'hidden':[],'defaultModel':{'provider':'mx-qwen','model':model}})
 print('Configured Pi directly against',args.endpoint,'with model',model)

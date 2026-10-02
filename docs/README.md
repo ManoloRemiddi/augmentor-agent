@@ -1,6 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
 
+- [Recorded token activity and Agent profile](TOKEN-USAGE.md): larger animated identity, proportional actions and a bottom daily calendar of local provider-reported usage, with explicit coverage and accessible day selection.
+- [Desktop Agent Identity, Agent Memory and settings](AGENT-SETTINGS.md): direct same-frame entry, a fixed frame, readable fields and compact pages and size restoration, prompt snapshots, access defaults and qualification.
+
+
 - [Immediate composer feedback and regression evidence](COMPOSER-SEND-FEEDBACK.md)
 # Documentation index
 

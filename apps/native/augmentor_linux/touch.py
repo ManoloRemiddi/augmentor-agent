@@ -101,7 +101,7 @@ class TouchLayout(QObject):
         if not self.window.compact:
             self.window.setGeometry(0, 0, *self.viewport)
         for dialog in self.window.findChildren(QDialog):
-            if dialog.isVisible(): self.fit_dialog(dialog)
+            if dialog.isWindow() and dialog.isVisible(): self.fit_dialog(dialog)
 
     def fit_menu(self,menu):
         if not menu.isVisible():return

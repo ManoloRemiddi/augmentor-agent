@@ -39,8 +39,8 @@ class VoiceSettingsTests(unittest.TestCase):
         from augmentor_linux.panels import SettingsDialog
         window=Window(preview=True);dialog=SettingsDialog(window)
         buttons=dialog.findChildren(QPushButton)
-        labelled=[b for b in buttons if b.text() in ('Resonant Voice','Connect DSH','Recover connection','Save','Colours && visual effects','Prompt library','Memory','Support report','Done')]
-        self.assertEqual(len(labelled),10)
+        labelled=[b for b in buttons if b.text() in ('Agent','Look','Voice','More')]
+        self.assertEqual(len(labelled),4)
         self.assertTrue(all(not b.icon().isNull() for b in labelled))
         dialog.close();window.close()
 

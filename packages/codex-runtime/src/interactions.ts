@@ -39,6 +39,11 @@ export class CodexInteractions {
     if (reason.length > 64000 || (command && !p.command && !p.networkApprovalContext)) throw new Error('Codex approval cannot be displayed completely.');
     return this.enqueue(sessionId, request, {sessionId, toolName: file ? 'Codex file changes' : p.networkApprovalContext ? 'Codex network access' : 'Codex command', reason});
   }
+  tool(sessionId: string, request: RpcRequest): Promise<Reply> {
+    const reason = JSON.stringify({tool: request.params.tool, arguments: request.params.arguments}, null, 2);
+    if (reason.length > 64000) throw new Error('Tool approval exceeds its size limit.');
+    return this.enqueue(sessionId, {...request, params: {...request.params, itemId: request.params.callId}}, {sessionId, toolName: request.params.tool, reason});
+  }
   private question(sessionId: string, request: RpcRequest): Promise<Reply> {
     const input = request.params.questions;
     if (!Array.isArray(input) || !input.length || input.length > 10) throw new Error('Invalid Codex questions.');
