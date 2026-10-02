@@ -7,6 +7,17 @@ Implementation branch: `feat/handy-integration`, based on public main
 contract; [the approved plan](HANDY-INTEGRATION-PLAN.md) retains its rationale.
 Source, component qualification and installed promotion are separate evidence.
 
+Owner acceptance and merge review (2 October): the owner tested dictation on
+their installed Linux system, confirmed it works well and authorized merging
+PR #30 when safe. The latest documentation-only CI run exposed an existing
+Codex cancellation fixture's one-second startup polling limit. That fixture now
+waits for the provider's actual request receipt within its bounded test deadline;
+the cancellation, maintenance fencing and no-replay assertions remain intact.
+This follow-up changes test synchronization only. Its hosted checks must pass
+before merge; the selected Linux installation remains unchanged. Physical
+acceptance on other operating systems and complete Windows installer integration
+remain separate release qualifications.
+
 Current implementation qualification: source `81a2bba` passes all hosted native
 component jobs (Linux x64, Mac ARM64, Windows x64), shared SDK/application checks,
 Debian build and clean installation/update/rollback/removal, actual packaged

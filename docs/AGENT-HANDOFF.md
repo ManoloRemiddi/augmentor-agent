@@ -4,6 +4,13 @@
 
 ## October 2 embedded Handy candidate
 
+The owner has now accepted the installed Linux dictation through real use and
+authorized PR #30's merge after successful checks. The merge review fixes an
+existing Codex cancellation fixture to wait for actual provider request receipt
+within a bounded deadline, preserving all cancellation/fencing/no-replay
+assertions. Await that follow-up's hosted checks before merging; no new installed
+cutover is needed. See [the owning guide](HANDY-INTEGRATION.md).
+
 Current implementation qualification: source `81a2bba` passes all hosted native
 component jobs (Linux x64, Mac ARM64, Windows x64), shared SDK/application checks,
 Debian build and clean installation/update/rollback/removal, actual packaged
