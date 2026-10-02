@@ -14,7 +14,7 @@ import urllib.request
 ROOT = Path(__file__).resolve().parents[1]
 
 def prepare(target):
-    spec = json.loads((ROOT/'components/handy/upstream.json').read_text())
+    spec = json.loads((ROOT/'components/handy/upstream.json').read_text(encoding='utf-8'))
     if target.exists():
         raise ValueError('Source destination already exists; choose a fresh directory')
     with tempfile.TemporaryDirectory(prefix='augmentor-handy-source-') as temp:

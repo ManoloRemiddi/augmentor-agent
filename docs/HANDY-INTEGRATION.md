@@ -396,3 +396,24 @@ The complete target-filtered Windows production/build notice collection now
 passes locally: 578 Rust and 187 frontend dependencies, with original source
 archives retained. This changes notice inputs only; final hosted Windows
 staging/lifecycle and resulting package jobs still require success.
+
+### Locale-independent build tooling checkpoint
+
+Source `52c1416` passes Linux/Mac native component qualification, the macOS 26
+product job and another clean Debian installation proof. Its clean runtime
+SHA-256 is `7439a78e06262a2bf6da859bb043beb10da410d25a5f03890cd192a60247f61f`;
+Desktop is `4bde2172c9a36895cd04ab1a86866838d9b15c7877faed496b1fb6e049f5e295`.
+Windows release compilation and supplier license checks succeed, then frontend
+notice JSON hits the Windows default text codec. All build/preparation/staging
+JSON reads now explicitly use UTF-8. The complete target-filtered Windows notice
+collector passes again under `LC_ALL=C`, `PYTHONUTF8=0` and
+`PYTHONCOERCECLOCALE=0`: actual default encoding `ANSI_X3.4-1968`, 578 Rust and
+187 frontend dependencies. Exact supplier bytes remain unchanged.
+
+The macOS 14 common transcript fork fixture exposes a queued-page timing race: a
+worker completes navigation before the child transcript renders. Its conditions
+now wait for the actual branch/edit page before retaining the same strict
+history/input assertions. All three actual Qt/Codex fork cases pass locally.
+Both source-preparation/Windows automatic-conversion cases pass. This follow-up
+changes build text decoding and a fixture synchronization point, not product
+behavior. Final hosted lifecycle/product/package results remain required.

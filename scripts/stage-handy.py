@@ -13,11 +13,11 @@ ROOT=Path(__file__).resolve().parents[1]
 def validate():
     source=ROOT/'components/handy/runtime'
     if not (source/'BUILD.json').is_file():raise ValueError('Build the bundled dictation component with scripts/build-handy.py before packaging.')
-    record=json.loads((source/'BUILD.json').read_text())
+    record=json.loads((source/'BUILD.json').read_text(encoding='utf-8'))
     if record['target']!=sys.platform+'-'+platform.machine():raise ValueError('Dictation component belongs to another operating system/architecture.')
-    pin=json.loads((ROOT/'components/handy/upstream.json').read_text())
+    pin=json.loads((ROOT/'components/handy/upstream.json').read_text(encoding='utf-8'))
     if record['upstream']!=pin:raise ValueError('Dictation component uses an unreviewed Handy source.')
-    configuration=json.loads((ROOT/'components/handy/onnxruntime.json').read_text())
+    configuration=json.loads((ROOT/'components/handy/onnxruntime.json').read_text(encoding='utf-8'))
     if record['onnxruntime']!=configuration['targets'][record['target']]:raise ValueError('Unreviewed ONNX Runtime supplier.')
     expected={*record['files'],'BUILD.json'}
     actual={file.relative_to(source).as_posix() for file in source.rglob('*') if file.is_file()}

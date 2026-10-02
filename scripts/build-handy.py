@@ -38,7 +38,7 @@ def verify_source(source):
         if sha(ROOT/'components/handy'/name)!=sha(source/target):raise ValueError('Handy source does not contain the reviewed '+name)
 
 def ort_runtime(source):
-    config=json.loads((ROOT/'components/handy/onnxruntime.json').read_text())
+    config=json.loads((ROOT/'components/handy/onnxruntime.json').read_text(encoding='utf-8'))
     target=sys.platform+'-'+platform.machine()
     if target not in config['targets']:raise ValueError('No reviewed ONNX Runtime supplier for '+target)
     item=config['targets'][target];directory=source/'onnxruntime'/item['folder']
@@ -54,7 +54,7 @@ def ort_runtime(source):
     return directory,item
 
 def helper(output):
-    specification=json.loads((ROOT/'components/handy/ydotool.json').read_text())
+    specification=json.loads((ROOT/'components/handy/ydotool.json').read_text(encoding='utf-8'))
     with tempfile.TemporaryDirectory(prefix='augmentor-input-build-') as temporary:
         base=Path(temporary);archive=base/'source.tar.gz'
         with urllib.request.urlopen(specification['url'],timeout=60) as source,archive.open('wb') as target:shutil.copyfileobj(source,target)
@@ -81,12 +81,12 @@ def notices(source,metadata,output,cargo_home=None):
     sysroot=Path(subprocess.check_output(['rustc','--print','sysroot'],text=True).strip())
     shutil.copy2(sysroot/'share/doc/rust/COPYRIGHT-library.html',destination/'Rust-standard-library.html')
     (destination/'Rust-version.txt').write_text(rust_version+'\n')
-    silero=json.loads((ROOT/'components/handy/silero.json').read_text())
+    silero=json.loads((ROOT/'components/handy/silero.json').read_text(encoding='utf-8'))
     if sha(source/'src-tauri/resources/models/silero_vad_v4.onnx')!=silero['modelSha256'] or sha(ROOT/'components/handy/licenses/Silero-v4.txt')!=silero['licenseSha256']:raise ValueError('Unreviewed VAD resource or license.')
     shutil.copy2(ROOT/'components/handy/licenses/Silero-v4.txt',destination/'Silero-v4-MIT.txt')
     shutil.copy2(ROOT/'components/handy/silero.json',destination/'Silero-v4.json')
     cargo_home=cargo_home or Path(os.environ.get('CARGO_HOME',str(Path.home()/'.cargo')))
-    supplements=json.loads((ROOT/'components/handy/notice-supplements.json').read_text())
+    supplements=json.loads((ROOT/'components/handy/notice-supplements.json').read_text(encoding='utf-8'))
     nodes={node['id']:node for node in metadata['resolve']['nodes']};active=set();todo=[metadata['resolve']['root']]
     while todo:
         key=todo.pop()
@@ -127,14 +127,14 @@ def notices(source,metadata,output,cargo_home=None):
                 archive.add(package_path,arcname=package['name']+'-'+package['version'],filter=lambda info:None if any(part in ('target','.git','node_modules') for part in Path(info.name).parts) else info)
         rows.append({'name':package['name'],'version':package['version'],'license':declaration,'authors':package['authors'],'source':package['source'] or 'Pinned Handy source plus Augmentor patch','sourceArchive':source_name,'sourceSha256':sha(target),'notices':licenses})
     frontend=[];visited=set()
-    root_package=json.loads((source/'package.json').read_text())
+    root_package=json.loads((source/'package.json').read_text(encoding='utf-8'))
     pending=[source/'node_modules'/name for name in root_package['dependencies'] if name not in ('@tailwindcss/vite','tailwindcss')]
     while pending:
         directory=pending.pop().resolve()
         if directory in visited:continue
         visited.add(directory);manifest=directory/'package.json'
         if not manifest.is_file():raise ValueError('Unresolved frontend dependency: '+str(directory))
-        record=json.loads(manifest.read_text());files=[]
+        record=json.loads(manifest.read_text(encoding='utf-8'));files=[]
         for file in directory.iterdir():
             if file.is_file() and re.match(r'^(licen[sc]e|copying|notice|unlicense)([._-]|$)',file.name,re.I):
                 name='frontend/'+sha(file)+'.txt';target=destination/name;target.parent.mkdir(exist_ok=True);shutil.copyfile(file,target);files.append(name)
@@ -184,7 +184,7 @@ def stage(source,output,metadata,cargo_home=None):
             if file.suffix=='.dylib':run(['install_name_tool','-id','@rpath/'+file.name,str(file)],output)
     notices(source,metadata,output,cargo_home)
     if sys.platform.startswith('linux'):helper(output)
-    record={'schema':'augmentor-handy-build/1','target':sys.platform+'-'+platform.machine(),'upstream':json.loads((ROOT/'components/handy/upstream.json').read_text()),
+    record={'schema':'augmentor-handy-build/1','target':sys.platform+'-'+platform.machine(),'upstream':json.loads((ROOT/'components/handy/upstream.json').read_text(encoding='utf-8')),
         'patchSha256':sha(ROOT/'components/handy/augmentor.patch'),'embeddedSources':{name:sha(ROOT/'components/handy'/name) for name in ('embedding.rs','AugmentorOverlay.tsx')},
         'onnxruntime':item,'buildInputs':{name:sha(ROOT/name) for name in ('scripts/build-handy.py','scripts/prepare-handy.py','components/handy/onnxruntime.json','components/handy/ydotool.json','components/handy/silero.json','components/handy/notice-supplements.json')},'files':{file.relative_to(output).as_posix():sha(file) for file in sorted(output.rglob('*')) if file.is_file()},'modelsBundled':False}
     (output/'BUILD.json').write_text(json.dumps(record,indent=2)+'\n')
@@ -205,5 +205,5 @@ if __name__=='__main__':
             with open(os.environ['GITHUB_ENV'],'a') as ci:ci.write('ORT_LIB_LOCATION='+str(ort/'lib')+'\nORT_PREFER_DYNAMIC_LINK=1\nTRANSCRIBE_CMAKE_ARGS='+cmake_args+'\n')
         env={**os.environ,'ORT_LIB_LOCATION':str(ort/'lib'),'ORT_PREFER_DYNAMIC_LINK':'1','CARGO_BUILD_JOBS':'2','TRANSCRIBE_CMAKE_ARGS':cmake_args}
         subprocess.run(['cargo','build','--release','--locked','--features','tauri/custom-protocol'],cwd=source/'src-tauri',env=env,check=True)
-    metadata=json.loads(args.metadata.read_text()) if args.metadata else json.loads(subprocess.check_output(['cargo','metadata','--locked','--features','tauri/custom-protocol','--format-version','1','--filter-platform',subprocess.check_output(['rustc','-vV'],text=True).split('host: ')[1].splitlines()[0]],cwd=source/'src-tauri'))
+    metadata=json.loads(args.metadata.read_text(encoding='utf-8')) if args.metadata else json.loads(subprocess.check_output(['cargo','metadata','--locked','--features','tauri/custom-protocol','--format-version','1','--filter-platform',subprocess.check_output(['rustc','-vV'],text=True).split('host: ')[1].splitlines()[0]],cwd=source/'src-tauri'))
     stage(source,args.out.resolve(),metadata,args.cargo_home)
