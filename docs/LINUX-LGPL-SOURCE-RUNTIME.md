@@ -120,6 +120,69 @@ concrete corresponding-source/generated-shader/notice/control-script scope,
 recipient instructions and suitable script permissions. Existing Augmentor source
 licenses are unchanged; this checkpoint does not approve release licensing.
 
+## Authenticated builder/base sources, shader and private kit checkpoint
+
+[The October2 source-kit report](../release/qualification/next-targets/20261002-authenticated-recipient-source-kit.json)
+extends the binary-only toolchain checkpoint above. The original builder has178
+unique source package/version pairs; the public base has66, with64 shared and two
+additional versions: openssl3.0.13-0ubuntu3.15 and perl5.38.2-3.2ubuntu0.4. The
+[180-version source lock](../release/qualification/next-targets/20261002-ubuntu-builder-base-source-lock.json)
+pins the original binary lock and [base inventory](../release/qualification/next-targets/20261002-public-noble-base-packages.json),
+archive keyring, four signed releases, six complete compressed/plain Sources
+indexes and565 original source objects. All565 files,1,358,989,460 bytes, were
+actually acquired and match the authenticated signed size/hash chain. Every180
+.dsc identity/checksum set matches Sources; uploader signatures are not separately
+verified. Source objects were not extracted or executed.
+
+[Source acquisition/recheck](../release/acquire-ubuntu-toolchain-sources.py) refuses
+unsafe/symlink paths, changed cached files, mismatched source identities, missing
+coverage and unapproved URLs. Publication uses an exclusive link and preserves
+partial downloads; receipts use separate exclusively created temporary paths.
+[The real refusal probe](../release/probe-ubuntu-toolchain-source-auth.py) passes12
+altered-copy cases, including an invalid signed body with a recomputed local hash.
+Eight small source-object refusal tests and six OCI/path tests also pass with
+Python optimization enabled; those synthetic cases are distinct from actual
+signed source acquisition and public-base verification.
+
+[The base-export verifier](../release/verify-ubuntu-base-archive.py) verifies the
+retained31,723,520-byte public OCI/Docker export, pinned original public index,
+AMD64 manifest/config, all seven retained blobs, layer sizes and decompressed diff
+ID. It does not import/extract/execute a filesystem or qualify an empty-daemon
+restore. [Shader regeneration](../release/probe-source-plasma-shader.py) runs the
+actual source-built qsb6.8.2 in the owned normal-user offline builder and reproduces
+the exact published plasma.frag.qsb hash. Native shader rendering remains open.
+
+The separately retained private kit18 has1,712 manifest files/2,072,651,811 bytes;
+every path, size and hash was checked after assembly. It includes the seven Qt/
+PySide archives and original checksum records,410 authenticated .debs, public base
+export, all565 toolchain source objects and full original signed metadata,
+146 upstream Qt/PySide notice members, published control/probe scripts and actual
+build/runtime/replacement/shader evidence. Original toolchain archives retain485
+regular copyright/common-license files and263 link references. The link map
+resolves all410 builder and92 base package copyright paths against the correct
+scope. This package-level collection does not prove compiled Qt file notice
+mapping or package-specific legal compliance.
+
+The README explicitly confines Augmentor's existing terms to Augmentor-authored
+files, including controls, docs, policies and application shader/QML source.
+Separately identified upstream components/notices retain their own terms;
+generated outputs retain applicable underlying-source terms. A first kit17 scope
+sentence was too broad about generated outputs; kit18 corrects it while preserving
+kit17. Neither kit is publicly offered. The kit18 manifest hash is
+0770ed3ccab87552b65c5c43fab77118f889f2019ef70a68ef076a43296d2229.
+Suitable recipient control-script permissions, fresh README execution, empty-daemon
+base import, compiled-content notice mapping, native/product/other-ABI runtime
+qualification and final legal/release acceptance remain open. No repository
+license change or selected installation change occurred.
+
+Both hosted checks for the authenticated runtime completion8b7abed pass:
+[Linux37047133286](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37047133286)
+and [Mac37047133117](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37047133117).
+The prior helper435eab2 also passes both
+[Linux37045885191](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37045885191)
+and [Mac37045885183](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37045885183).
+This new source-kit checkpoint requires its own hosted checks.
+
 ## Completed build and separate runtime candidate
 
 The [exact producer image recipe](../release/qt-source-runtime-builder.Dockerfile)

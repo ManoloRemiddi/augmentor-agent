@@ -1,0 +1,251 @@
+{
+  "format": "augmentor-authenticated-recipient-source-kit-checkpoint/1",
+  "date": "2026-10-02",
+  "scope": "Ubuntu24.04 AMD64, Python3.12, Qt6.8.2/PySide6.8.2.1; separate private kit candidate",
+  "priorSourceCommit": "8b7abeda353ca1d40da8f75d5b068090b2e93fb3",
+  "priorHostedChecks": {
+    "linux": {
+      "run": 37047133286,
+      "conclusion": "success"
+    },
+    "mac": {
+      "run": 37047133117,
+      "conclusion": "success"
+    }
+  },
+  "priorHelperHostedChecks": {
+    "commit": "435eab21b581def3cc96027c69f815f24d57da2b",
+    "linux": {
+      "run": 37045885191,
+      "conclusion": "success"
+    },
+    "mac": {
+      "run": 37045885183,
+      "conclusion": "success"
+    }
+  },
+  "sourceAcquisition": {
+    "format": "augmentor-ubuntu-toolchain-source-acquisition/1",
+    "toolSha256": "0d098d6cdaba46718057e7886dbebafd70aba5ca67ac9531457cb8a0d6238791",
+    "policySha256": "76d303297daed229aa5350d6e81e47d29184a290d036023d2653a5d7ae14e102",
+    "authenticatedSourcePairs": 180,
+    "signedReleases": 4,
+    "fullSourceIndexes": 6,
+    "failures": [],
+    "allSourceObjectsVerified": true,
+    "dscChecksumCrossCheckPerformed": true,
+    "dscUploaderSignatureVerified": false,
+    "sourceObjectsExtractedOrExecuted": false,
+    "packagesInstalled": false,
+    "trustChanged": false,
+    "licenseReviewComplete": false,
+    "fullSourceKitQualified": false,
+    "verifiedBytes": 1358989460
+  },
+  "sourceAcquisitionReceiptSha256": "1467957e21e9705f3f2ae50707170f37b2992d8d643a0eadf1531cc476fd7d44",
+  "objectsVerified": 565,
+  "sourceVersionsVerified": 180,
+  "coverage": {
+    "builderSourcePairs": 178,
+    "baseSourcePairs": 66,
+    "sharedSourcePairs": 64,
+    "baseOnlySourcePairs": 2,
+    "baseOnlyVersions": [
+      {
+        "sourcePackage": "openssl",
+        "sourceVersion": "3.0.13-0ubuntu3.15"
+      },
+      {
+        "sourcePackage": "perl",
+        "sourceVersion": "5.38.2-3.2ubuntu0.4"
+      }
+    ]
+  },
+  "sourceRefusalProbe": {
+    "format": "augmentor-toolchain-source-authentication-refusal/1",
+    "toolSha256": "0d098d6cdaba46718057e7886dbebafd70aba5ca67ac9531457cb8a0d6238791",
+    "probeSha256": "d4fe8cd2ed4c0ec1b3d8f0ffabf4c4528e07dcbf04734d87a5e6cbd8d36d8aae",
+    "policySha256": "76d303297daed229aa5350d6e81e47d29184a290d036023d2653a5d7ae14e102",
+    "cases": {
+      "wrong-reference-pin": {
+        "refused": true,
+        "error": "Pinned source reference differs."
+      },
+      "wrong-keyring": {
+        "refused": true,
+        "error": "Wrong pinned archive keyring."
+      },
+      "changed-signed-release": {
+        "refused": true,
+        "error": "Changed or duplicate signed source release."
+      },
+      "changed-compressed-index": {
+        "refused": true,
+        "error": "Full compressed source index differs from signed release."
+      },
+      "changed-plain-index": {
+        "refused": true,
+        "error": "Full plain source index differs from signed release."
+      },
+      "wrong-source-version": {
+        "refused": true,
+        "error": "Source lock omits builder/base versions."
+      },
+      "duplicate-source": {
+        "refused": true,
+        "error": "Duplicate locked source identity."
+      },
+      "wrong-source-object-hash": {
+        "refused": true,
+        "error": "Locked source object differs from signed index."
+      },
+      "unapproved-download": {
+        "refused": true,
+        "error": "Unapproved source acquisition URL."
+      },
+      "escaping-source-path": {
+        "refused": true,
+        "error": "Unsafe source object path."
+      },
+      "invalid-signature-with-updated-local-hash": {
+        "refused": true,
+        "error": "Source archive release signature does not verify."
+      },
+      "changed-existing-source-object": {
+        "refused": true,
+        "error": "Existing source object differs from signed bytes."
+      }
+    },
+    "originalMetadataMutated": false,
+    "originalSourceObjectsMutated": false,
+    "sourceObjectsExecuted": false,
+    "packagesInstalled": false,
+    "networkUsed": false
+  },
+  "sourceRefusalProbeReceiptSha256": "c0ab45cc8c84ca7aa2515f1aceacb424f3f2046f1b251ae3b64ff4cd0072570e",
+  "baseExportVerification": {
+    "format": "augmentor-public-noble-base-export-proof/1",
+    "toolSha256": "f8eff4c75bccacd3db07191dd9b30f79ea6c9dbd3c82eee2e355983aa11eed35",
+    "archiveSha256": "e6dc7a492df0dd9ff255d22e887cc07b32a8874360990b3ebe2cb30ee96f6207",
+    "archiveBytes": 31723520,
+    "publicIndexDigest": "sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3",
+    "platformManifest": {
+      "annotations": {
+        "com.docker.official-images.bashbrew.arch": "amd64",
+        "org.opencontainers.image.base.name": "scratch",
+        "org.opencontainers.image.created": "2026-09-11T00:00:00Z",
+        "org.opencontainers.image.revision": "4fde35ab880af6a7c67aa9802ea978137542dc35",
+        "org.opencontainers.image.source": "https://git.launchpad.net/cloud-images/+oci/ubuntu-base",
+        "org.opencontainers.image.url": "https://hub.docker.com/_/ubuntu",
+        "org.opencontainers.image.version": "24.04"
+      },
+      "digest": "sha256:496754492fb28b4d3049432f2ca787449331e23fb14f0dd3fffea86bf5a93eb4",
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "platform": {
+        "architecture": "amd64",
+        "os": "linux"
+      },
+      "size": 424
+    },
+    "config": {
+      "mediaType": "application/vnd.oci.image.config.v1+json",
+      "size": 2051,
+      "digest": "sha256:6232b38791000e3818b58d8847b5a8f5612d606929e01156dd8febc423e0f2ef"
+    },
+    "layers": [
+      {
+        "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+        "size": 29764116,
+        "digest": "sha256:edd1ed89f0d443580bd42e5a10cd8736aba5a3438b2a0645c2ebb50119bb0eba",
+        "diffId": "sha256:65e5d715ea720349e6475f91651a0956279fc295a45fd73aa04f1cec046281a1",
+        "decompressedBytes": 80691200
+      }
+    ],
+    "retainedBlobsVerified": 7,
+    "amd64ScopeOnly": true,
+    "rootfsExtracted": false,
+    "dockerImportExecuted": false,
+    "freshOfflineImportQualified": false,
+    "fullSourceKitQualified": false
+  },
+  "shaderRegeneration": {
+    "format": "augmentor-source-plasma-shader-regeneration/1",
+    "toolSha256": "65d05f5e8d45bc3dad571098a3e6f10f971bd1add6278e0a02e9099afb992a54",
+    "sourceBuildReportSha256": "8127441e2a84f44ccdc7671c086f469c74b421e222ad4457071e6894f4bcebdc",
+    "compilerVersion": "qsb 6.8.2",
+    "compilerSha256": "ba492098ab4ad187509a8c67f0a33c48d4c35d9dc526530feaa02f6d8b8fbd0d",
+    "argv": [
+      "/work/runtime-build/qt-prefix/bin/qsb",
+      "--glsl",
+      "300 es,150",
+      "--hlsl",
+      "50",
+      "--msl",
+      "12",
+      "-o",
+      "/work/generated-shader-proof/plasma.frag.qsb",
+      "/inputs/effects/plasma.frag"
+    ],
+    "exit": 0,
+    "inputSha256": {
+      "plasma.frag": "192857329934b69609bc8e5c5c974a1e76c25917ada7c5c2367f5df432dbd8d9",
+      "plasma.frag.qsb": "f18b75872b575cfb84bcd43533af2ce59bc4aed2a7e47b471ef5a05fe28c1aa4",
+      "plasma.qml": "f3203abd196a2565251124468219ed94aeeb8899674cd41a5e4f640eee68ec50",
+      "shader-build.json": "b713565e1ad1a2272030e0d53fb7ca5a6a8865de8eb5594810c327c6cf900824"
+    },
+    "outputSha256": "f18b75872b575cfb84bcd43533af2ce59bc4aed2a7e47b471ef5a05fe28c1aa4",
+    "publishedPackageBytesReproduced": true,
+    "originalInputsPreserved": true,
+    "nativeShaderRenderQualified": false,
+    "fullProductQualified": false,
+    "licenseReviewComplete": false
+  },
+  "originalToolchainNotices": {
+    "inventorySha256": "077b7e2ea15a164fe1d8cf2e59bab0f4eac345d6b435040b795fbd2e91f015fc",
+    "linkMapSha256": "67855e7fb7ba95da935c37a0cbd7424d17d71e1ebe24a367e5c11f0a893816ed",
+    "regularNoticeFiles": 485,
+    "originalNoticeBytes": 6005415,
+    "linkReferences": 263,
+    "builderPackagePathsResolved": 410,
+    "basePackagePathsResolved": 92,
+    "allDeclaredPackageCopyrightPathsResolved": true,
+    "compiledFileNoticeMappingComplete": false,
+    "licenseReviewComplete": false
+  },
+  "focusedTests": {
+    "cases": 14,
+    "passed": 14,
+    "pythonOptimizationEnabled": true,
+    "scope": "Synthetic source-object integrity/refusal and OCI descriptor/path fixtures, distinct from actual signed acquisition and public base proof"
+  },
+  "remaining": {
+    "privateKitAssembled": true,
+    "freshRecipientInstructionsExecuted": false,
+    "freshEmptyDaemonBaseImportQualified": false,
+    "scriptPermissionChangeApproved": false,
+    "compiledQtNoticeMappingComplete": false,
+    "nativeShaderRenderQualified": false,
+    "productSourceRuntimeEntrypointsQualified": false,
+    "otherDistroSourceRuntimesQualified": false,
+    "fullSourceKitQualified": false,
+    "licenseReviewComplete": false,
+    "publicBinaryReleaseQualified": false
+  },
+  "selectedInstallationChanged": false,
+  "allFiveRolloutPointsRemainActive": true,
+  "privateKitManifestVerification": {
+    "format": "augmentor-private-recipient-kit-manifest-verification/1",
+    "filesVerified": 1712,
+    "bytesVerified": 2072651811,
+    "manifestSha256": "0770ed3ccab87552b65c5c43fab77118f889f2019ef70a68ef076a43296d2229",
+    "exactPathSetVerified": true,
+    "allDeclaredBytesVerified": true,
+    "upstreamComponentsNotRelicensed": true,
+    "recipientInstructionsFreshlyExecuted": false,
+    "scriptPermissionChangeApproved": false,
+    "fullSourceKitQualified": false
+  },
+  "historicalKit17ScopeWordingCorrectedInSeparateKit18": true,
+  "officialQtPySideChecksumRecordsRetained": 7,
+  "originalQtPySideNoticeMembersRetained": 146
+}

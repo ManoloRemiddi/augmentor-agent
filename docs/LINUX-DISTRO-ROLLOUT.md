@@ -2327,3 +2327,17 @@ lifecycle must pass in disposable containers before full GNOME/KDE guests. GNOME
 48 remains refused by the current explicit 46/50 adapters until its own source
 profile and actual-session qualification exist. Keep all researched-only targets
 outside the released compatibility list.
+
+
+## October2 authenticated recipient source-kit checkpoint
+
+The [source-kit report](../release/qualification/next-targets/20261002-authenticated-recipient-source-kit.json)
+now records565 actual authenticated source objects for180 builder/base source
+versions,12 real altered-copy refusals,502 resolved original package copyright
+paths, exact source-built shader regeneration and read-only public OCI verification.
+A separately preserved private kit has1,712 files with every manifest path/hash/size
+checked. [The owning source-runtime guide](LINUX-LGPL-SOURCE-RUNTIME.md#authenticated-builderbase-sources-shader-and-private-kit-checkpoint)
+distinguishes this retained-source proof from script permissions, compiled-content
+notice mapping, fresh full instructions/base import, product/native/other-ABI and
+legal/release qualification. Both435eab2 and8b7abed hosted Linux/Mac checks pass;
+this checkpoint needs its own checks. All five rollout points remain active.

@@ -22,6 +22,11 @@ def acquire(row,out):
     assert row['url'].startswith('https://download.qt.io/') and row['checksumUrl']==row['url']+'.sha256'
     with urllib.request.urlopen(row['checksumUrl'],timeout=60) as response:metadata=response.read(4096)
     assert metadata.decode().split()[0]==row['sha256']
+    checksum=out/(row['file']+'.sha256')
+    if checksum.exists():assert not checksum.is_symlink() and checksum.read_bytes()==metadata
+    else:
+        with checksum.open('xb') as stream:stream.write(metadata)
+        checksum.chmod(0o444)
     final=out/row['file'];partial=out/(row['file']+'.download')
     if final.exists():assert not final.is_symlink() and sha(final)==row['sha256']
     else:
@@ -35,7 +40,8 @@ def acquire(row,out):
         assert h.hexdigest()==row['sha256'];partial.chmod(0o444);partial.replace(final)
     record={'name':row['name'],'url':row['url'],'file':final.name,'bytes':final.stat().st_size,
         'sha256':sha(final),'actualBytesVerified':True,'officialChecksumRecordMatched':True,
-        'checksumRecordSha256':hashlib.sha256(metadata).hexdigest(),'detachedSignatureVerified':False,
+        'checksumRecordSha256':hashlib.sha256(metadata).hexdigest(),'checksumRecordFile':checksum.name,
+        'detachedSignatureVerified':False,
         'reviewedGitCommit':row['reviewedGitCommit'],'archiveToGitTreeEqualityVerified':False}
     print(json.dumps(record),flush=True);return record
 
