@@ -33,8 +33,10 @@ refuse Save; 50 retains its explicit lock-screen false setting and portal checks
 The read-only observer also admits 46 and Ubuntu's specific user-derived normal
 mode. A clean Noble candidate now passes actual canonical startup, observer
 readback and approved UI rendering in Ubuntu's X11 fallback, with all four default
-extensions active. Wayland hits a diagnosed Mesa software-display crash before
-login; shortcut delivery, lock recovery and complete extension composition remain
+extensions active. A separate official Mesa .2 fixture also passes actual Wayland
+login, canonical startup and UI capture; the app uses XWayland there. Latest .3
+hits a diagnosed Mesa software-display crash before login. Native Qt Wayland,
+shortcut delivery, lock recovery and complete extension composition remain
 separate qualification.
 See [the Noble GNOME checkpoint](../../docs/LINUX-DISTRO-ROLLOUT.md#noble-gnome-46-source-profile-and-owned-vm).
 See [distro qualification and limits](../../docs/LINUX-DISTRO-ROLLOUT.md#october-2-native-gnome-save-adapter):

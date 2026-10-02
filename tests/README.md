@@ -433,3 +433,10 @@ GSD profile without Save/delivery or input authorization. The checked
 `release/qualification/ubuntu24.04/gnome-x11-a7ee9c5.json` additionally binds real
 guest screenshots and focused idle readback; fixture timer/unlock controls and
 connected/shortcut/physical limits remain explicit.
+
+The separate `gnome-wayland-mesa2-a7ee9c5.json` checkpoint records one actual
+Wayland login/startup/observer/UI pass with a coherent official Mesa .2 cohort,
+independently verified archive signature/index/package hashes and controlled
+networkd fixture recovery. The application uses XWayland. Latest .3 failure,
+native Qt Wayland, repeated startup, delivery/lock and connected/physical tests
+remain separate; neither checkpoint enables GNOME input tools.

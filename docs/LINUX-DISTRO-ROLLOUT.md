@@ -1678,3 +1678,98 @@ failed job rerun passes on unchanged source. Keep the failed attempt explicit.
 Next: the finite Mesa fixture comparison, actual GNOME 46 shortcut delivery,
 closed launch/two-instance/lock fencing, connected UI/Browser and the complete
 remaining distro, voice, control, coordinated-update and redistribution gates.
+
+### Official Mesa .2 Wayland comparison
+
+The original latest-Mesa .3 guest was closed through idle maintenance and shut
+down cleanly before cloning. Its disk is preserved offline. The separate clone
+uses the same signed cloud base, Nehalem/TCG CPU, four CPUs, 6 GiB RAM, GNOME/
+Mutter/kernel and pristine clean `a7ee9c5` application. No host device or mount is
+attached. Ubuntu's still-current noble-security repository supplies official
+Mesa `25.2.8-0ubuntu0.24.04.2`. Independent `gpgv` verifies the actual cached
+InRelease against Ubuntu's archive keyring; its full main Packages index hash
+matches, and the five exact package records match every downloaded archive.
+All installed packages from source `mesa` were selected, including libgbm1 rather
+than only names containing mesa. APT simulation allows exactly five downgrades,
+zero additions and zero removals. The first local-URI `--no-download` attempt
+failed before changes; staging the verified files in APT's cache allows the
+exact-version offline installation. No Augmentor payload is patched.
+
+The clone's first reboot also exposed a distinct fixture issue. Installing this
+minimal desktop without recommends leaves NetworkManager absent while Ubuntu
+settings install a default NetworkManager renderer. The actual inherited cloud
+netplan defines DHCP on enp0s2 without overriding that renderer. Network access
+was lost. A first explicit NetworkManager recovery refused because its unit was
+absent; the captured boot/config evidence then guided a successful explicit
+networkd configuration using the already installed service. A one-time sentinel
+prevents repeated setup. This private cloud-derived renderer/timer/seed setup
+does not qualify the standard Desktop installer. See
+[Netplan's documented Ubuntu default](https://netplan.readthedocs.io/en/0.107/nm-all/)
+and [renderer selection](https://netplan.readthedocs.io/en/stable/howto/).
+
+The [checked comparison](../release/qualification/ubuntu24.04/gnome-wayland-mesa2-a7ee9c5.json)
+now records one successful fresh actual Ubuntu Wayland seat0 login, canonical
+application/service ownership, full selected Python verification, pristine
+packages, active AppArmor, Ubuntu/user observer and all four default extensions
+plus observer active. Actual QMP display capture, visually inspected, renders the
+approved application and Connect DSH dialog. The real application maps
+`libqxcb.so`, so it is XWayland UI inside Wayland. Native Qt Wayland, repeated
+starts/reboot, actual shortcut delivery/lock recovery, connected DSH/Browser,
+input consent/Stop and physical speech remain unqualified.
+
+This official older-build fixture avoids the diagnosed legacy-extension path;
+it neither applies the upstream guard nor qualifies latest .3 software-only
+Wayland. Keep the original failure separate and do not prescribe a general
+owner-machine downgrade. Continue three fresh startup checks and real GNOME 46
+GSD/instance/lock acceptance in the clone, followed by the complete remaining
+rollout. Report publication `7856c84` Linux/Mac CI passes all jobs; later
+documentation/report revisions keep their own hosted result identities.
+
+### Next exact targets: Leap 16.0 and Arch snapshot
+
+Read-only primary-source research on October 2 identifies stable Leap 16.0,
+with 16.1 still RC, and a coherent Arch repository snapshot dated 2026-10-01.
+These are researched next targets, not implemented or qualified recipes.
+
+| Target | Inspected native stack | Required adapter work |
+| --- | --- | --- |
+| Leap 16.0 x86_64 | Python 3.13.14, PySide6 6.9.1, glibc 2.40, GTK 4.18.6, GNOME 48.4, Plasma 6.4.2 | Explicit SUSE/zypper RPM identity and recovery; x86-64-v2 OS floor; keyring/sounddevice/CPU ONNX overlay; review GNOME 48 separately |
+| Arch x86_64, 2026-10-01 | Python 3.14.7, PySide6/Qt 6.11.2, glibc 2.44, GTK 4.22.5, GNOME 50.5, Plasma 6.7.5 | PKGBUILD/pacman identity and guarded transactions; coherent dated repositories; sounddevice/CPU ONNX overlay for Python 3.14 |
+
+Leap's official [download](https://get.opensuse.org/leap/16.0/) and
+[release notes](https://doc.opensuse.org/release-notes/x86_64/openSUSE/Leap/16.0/html/release-notes-leap-160/index.html)
+describe the x86-64-v2 floor, Wayland installer choices and fresh-install SELinux.
+Its actual [OSS metadata](https://download.opensuse.org/distribution/leap/16.0/repo/oss/repodata/repomd.xml)
+contains `python313-pyside6`, `python313-shiboken6`, `libQt6Test6`,
+`qt6-declarative-imports`, `qt6-wayland`, `libQt6Svg6`, `python313-gobject`,
+`typelib-1_0-Gtk-4_0`, `typelib-1_0-Atspi-2_0`, `python313-gst`,
+`gstreamer-plugin-pipewire`, `python313-SecretStorage`, `python313-jeepney`,
+`python313-cffi`, `python313-numpy`, `libportaudio2`, `wmctrl` and `xwayland`.
+Its `python313-keyring` is 25.2.1, below the current >=25.6 contract, and
+`python313-sounddevice` is absent from inspected OSS metadata. Metadata hashes
+were checked, but the repository signature and zypper solver remain unverified.
+Do not reuse Fedora's allowlist or `fedora-package.json` as a SUSE identity.
+
+Arch's actual [Core](https://archive.archlinux.org/repos/2026/10/01/core/os/x86_64/core.db)
+and [Extra](https://archive.archlinux.org/repos/2026/10/01/extra/os/x86_64/extra.db)
+databases provide `pyside6`, `shiboken6`, `qt6-base`, `qt6-declarative`, `qt6-svg`,
+`qt6-wayland`, `python-gobject`, `gtk4`, `at-spi2-core`, `gst-python`,
+`gst-plugin-pipewire`, `python-keyring`, `python-secretstorage`, `python-jeepney`,
+`python-cffi`, `python-numpy`, `portaudio`, `wmctrl` and `xorg-xwayland`.
+Sounddevice and CPU ONNX Python packages are absent from these two repositories.
+Keep complete snapshot upgrades: Arch [does not support partial upgrades](https://wiki.archlinux.org/title/System_maintenance).
+[ALPM hooks](https://man.archlinux.org/man/alpm-hooks.5.en) permit PreTransaction
+AbortOnFail; failed transactions skip PostTransaction, so pending state must
+remain available for recovery. Preserve the separately bundled Node 24.19;
+inspected system Node versions differ from that product contract.
+
+Inspected public OCI amd64 manifest pins are Leap
+`sha256:d14143fa7f3f45d5de6dd549c8bb124f03c8b3409dafb579e501d2afb4313a5a`
+and Arch
+`sha256:eb8f6dcc89a38977c9735f10fcf6ae4afe496283e7008eb7a3420cdba31fbd04`.
+No layers were pulled or executed in this research. Archive signatures, actual
+QtTest/Quick/SVG/GI imports, credential lock/unlock, CPU/physical speech and package
+lifecycle must pass in disposable containers before full GNOME/KDE guests. GNOME
+48 remains refused by the current explicit 46/50 adapters until its own source
+profile and actual-session qualification exist. Keep all researched-only targets
+outside the released compatibility list.

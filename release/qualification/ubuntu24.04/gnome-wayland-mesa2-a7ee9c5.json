@@ -1,0 +1,245 @@
+{
+  "format": "augmentor-noble-official-mesa2-wayland-checkpoint/1",
+  "target": "ubuntu24.04-amd64",
+  "source": {
+    "commit": "a7ee9c55586b6a131524a8c53489463e45f6d515",
+    "dirty": false
+  },
+  "version": "0.2.13",
+  "candidateOnly": true,
+  "fixture": {
+    "signedCloudImageBuild": "20260926",
+    "acceleration": "tcg",
+    "cpuModel": "Nehalem",
+    "memoryMiB": 6144,
+    "cpus": 4,
+    "clonedAfterOriginalCleanShutdown": true,
+    "originalMesa3BaselinePreservedOffline": true,
+    "hostMounts": false,
+    "hostDevicesAttached": false,
+    "standardDesktopInstallerTested": false,
+    "desktopInstall": "ubuntu-desktop-minimal --no-install-recommends",
+    "controlledIdleDelay": 0,
+    "network": {
+      "initialCloneRebootLostConnectivity": true,
+      "globalUbuntuSettingsRenderer": "NetworkManager",
+      "NetworkManagerServiceInstalled": false,
+      "firstNetworkManagerRecoveryAttemptFailed": true,
+      "explicitFixtureRenderer": "networkd",
+      "existingSystemdNetworkdUsed": true,
+      "newNetworkPackagesInstalled": false,
+      "networkRecoverySucceeded": true,
+      "oneTimeCloudInitRecovery": true
+    }
+  },
+  "mesa": {
+    "version": "25.2.8-0ubuntu0.24.04.2",
+    "installedSourcePackageCohort": [
+      [
+        "libegl-mesa0:amd64",
+        "mesa",
+        "25.2.8-0ubuntu0.24.04.2",
+        "amd64"
+      ],
+      [
+        "libgbm1:amd64",
+        "mesa",
+        "25.2.8-0ubuntu0.24.04.2",
+        "amd64"
+      ],
+      [
+        "libgl1-mesa-dri:amd64",
+        "mesa",
+        "25.2.8-0ubuntu0.24.04.2",
+        "amd64"
+      ],
+      [
+        "libglx-mesa0:amd64",
+        "mesa",
+        "25.2.8-0ubuntu0.24.04.2",
+        "amd64"
+      ],
+      [
+        "mesa-libgallium:amd64",
+        "mesa",
+        "25.2.8-0ubuntu0.24.04.2",
+        "amd64"
+      ]
+    ],
+    "coherentFivePackageOnlyReplacement": true,
+    "aptSimulationNoNewPackagesOrRemovals": true,
+    "offlineCachedAptInstallPassed": true,
+    "initialLocalUriNoDownloadAttemptFailedBeforeChanges": true,
+    "signedMetadata": {
+      "format": "augmentor-noble-mesa-authenticated-metadata/1",
+      "archiveFingerprint": "F6ECB3762474EDA9D21B7022871920D1991BC93C",
+      "inReleaseSignatureVerified": true,
+      "inReleaseSha256": "28d80d7ed3ab34757f1b31382ad7f6b33b8f7c7982b9196a0e1eaecaf3c0813a",
+      "archiveKeyringSha256": "80a36b0a6de2f69f49d2df75ef473ccde121e9e190b9ea01d20a4f63778d5c31",
+      "packageIndexSha256": "96ebaa6dcfaa00ad04c5a56f26f7bdc104a6da15d0fdd22ae29c91c299c3f276",
+      "packageIndexBytes": 5812460,
+      "packageIndexMatchesSignedRelease": true,
+      "allFiveCandidateMetadataMatch": true,
+      "candidate": {
+        "format": "augmentor-noble-mesa-comparison-candidate/1",
+        "baselineSourcePackages": [
+          [
+            "libegl-mesa0:amd64",
+            "mesa",
+            "25.2.8-0ubuntu0.24.04.3",
+            "amd64"
+          ],
+          [
+            "libgbm1:amd64",
+            "mesa",
+            "25.2.8-0ubuntu0.24.04.3",
+            "amd64"
+          ],
+          [
+            "libgl1-mesa-dri:amd64",
+            "mesa",
+            "25.2.8-0ubuntu0.24.04.3",
+            "amd64"
+          ],
+          [
+            "libglx-mesa0:amd64",
+            "mesa",
+            "25.2.8-0ubuntu0.24.04.3",
+            "amd64"
+          ],
+          [
+            "mesa-libgallium:amd64",
+            "mesa",
+            "25.2.8-0ubuntu0.24.04.3",
+            "amd64"
+          ]
+        ],
+        "candidateVersion": "25.2.8-0ubuntu0.24.04.2",
+        "packages": [
+          {
+            "package": "libegl-mesa0",
+            "file": "libegl-mesa0_25.2.8-0ubuntu0.24.04.2_amd64.deb",
+            "bytes": 117222,
+            "sha256": "8ccb85abbc76d53d47d952c975c5630bf305244a2af20e2b262725d1378d73c1"
+          },
+          {
+            "package": "libgbm1",
+            "file": "libgbm1_25.2.8-0ubuntu0.24.04.2_amd64.deb",
+            "bytes": 34172,
+            "sha256": "1c0b8daf0130d68de428334ce6d1e11bd11f7369bf9099bbc65ac88117336dc3"
+          },
+          {
+            "package": "libgl1-mesa-dri",
+            "file": "libgl1-mesa-dri_25.2.8-0ubuntu0.24.04.2_amd64.deb",
+            "bytes": 37884,
+            "sha256": "cb46b5d0cdaa9174b7f5362ead3f794d1e3674fcdfb9631950216f5acc9c591d"
+          },
+          {
+            "package": "libglx-mesa0",
+            "file": "libglx-mesa0_25.2.8-0ubuntu0.24.04.2_amd64.deb",
+            "bytes": 110124,
+            "sha256": "83ff69f8d68c073efd1e1ea66e5709562b677d0e3e17b8bcd65850cab887c4f6"
+          },
+          {
+            "package": "mesa-libgallium",
+            "file": "mesa-libgallium_25.2.8-0ubuntu0.24.04.2_amd64.deb",
+            "bytes": 10783204,
+            "sha256": "e46e42e305339765f51f994543cef2a8bf4a7d9ab7004161db1a6d1f291694de"
+          }
+        ],
+        "allDownloadedArchivesVerified": true,
+        "installed": false,
+        "originalBaselinePreserved": true
+      }
+    }
+  },
+  "actual": {
+    "sessionType": "wayland",
+    "waylandDisplay": "wayland-0",
+    "freshWaylandStartsObserved": 1,
+    "service": {
+      "MainPID": "4770",
+      "ActiveState": "active",
+      "SubState": "running"
+    },
+    "canonicalRoot": "/usr/lib/augmentor",
+    "selectedPython": "/home/augmentor-proof/.local/share/augmentor/python-runtimes/noble-cp312-x86_64-voice-81b66921d3a2eb01/bin/python3",
+    "packageVerified": true,
+    "pythonRuntimeVerified": true,
+    "apparmorEnabled": true,
+    "apparmorServiceActive": true,
+    "previewLaunch": false,
+    "qtPlatformPluginObserved": "libqxcb.so",
+    "applicationUsesXWayland": true,
+    "nativeQtWaylandTested": false,
+    "ubuntuDefaultExtensionsActive": {
+      "ubuntu-dock@ubuntu.com": 1.0,
+      "ubuntu-appindicators@ubuntu.com": 1.0,
+      "ding@rastersoft.com": 1.0,
+      "tiling-assistant@ubuntu.com": 1.0,
+      "observer@augmentoragent.com": 1.0
+    },
+    "observer": {
+      "shellVersion": "46.0",
+      "sessionMode": "ubuntu",
+      "parentMode": "user",
+      "screenShieldAvailable": true,
+      "inputQualified": false
+    },
+    "shortcutProfile": {
+      "fields": [
+        "name",
+        "binding",
+        "command"
+      ],
+      "savedPortalSchemasAvailable": false,
+      "functionalTested": false
+    },
+    "installedPackages": [
+      "gdm3\t46.2-1ubuntu1~24.04.9",
+      "gnome-settings-daemon\t46.0-1ubuntu1.24.04.1",
+      "gnome-shell\t46.0-0ubuntu6~24.04.15",
+      "libmutter-14-0\t46.2-1ubuntu0.24.04.16",
+      "ubuntu-desktop-minimal\t1.539.2",
+      "ubuntu-session\t46.0-1ubuntu4",
+      "xdg-desktop-portal\t1.18.4-1ubuntu2.24.04.3",
+      "xdg-desktop-portal-gnome\t46.2-0ubuntu1"
+    ]
+  },
+  "visualReview": {
+    "actualQmpDisplayCaptured": true,
+    "resolution": [
+      1280,
+      800
+    ],
+    "approvedUiAndConnectionDialogRendered": true,
+    "modelConnectionConfigured": false,
+    "syntheticFixtureOnly": true
+  },
+  "inspectionSha256": "b191a43032b64adbc5dface206abd74b4e82fc5a584c32cbe325dcea2d877d5f",
+  "evidenceSha256": {
+    "gnome-inspection-wayland-mesa2.json": "245d5397330853318cbebcb892464599db972a7fc2d375b0efc1cf959dd19c7b",
+    "installed.json": "1a618117811a78a951a281d65673e2554177650de1e4098546e78e2729088b43",
+    "authenticated-metadata.json": "48ed8de34d31558cc2fbbe8326559c0dccfbde99730a03aea7c76500b16639e0",
+    "cached-install-log.txt": "082e0c1068197632d6a6b4a018511e7ef4d7e9aa7c5f60337454afa6639ebe60",
+    "cached-install-simulation.txt": "7630df0939181ee32a0fc648e475f5d74416b6bdb6cb1d31736720a6bcd296e7",
+    "clone-network-before-networkd.json": "d5e2875e4773cd07f6ff29a31ed56a0fd86d34ee26e14195f91e2fdd15916c1d",
+    "networkd-recovery.py": "73b216df98709111a8510f58e81f257f6f09e43ad2a3ded5d60b35a784fc57e2",
+    "wayland-mesa2.png": "9497862a299e2a4c99c2721a6cfb176bed1d4dcb20906fbd5cd8e87f12cbea6b"
+  },
+  "scope": {
+    "latestMesa3WaylandQualified": false,
+    "repeatedWaylandStartupTested": false,
+    "rebootStartupTested": false,
+    "shortcutDeliveryTested": false,
+    "shortcutLockRecoveryTested": false,
+    "connectedHarnessTested": false,
+    "modelTurnTested": false,
+    "graphicalBrowserTested": false,
+    "gnomeInputToolsEnabled": false,
+    "physicalAudioTested": false,
+    "minimumPhysicalCpuQualified": false,
+    "nativeLibraryRedistributionApproved": false
+  },
+  "next": "Repeat fresh Wayland startup and prove GSD delivery/two-instance/lock lifecycle in this explicitly pinned official Mesa .2 fixture. Keep latest .3 failure separate; continue remaining distro/product/release gates."
+}

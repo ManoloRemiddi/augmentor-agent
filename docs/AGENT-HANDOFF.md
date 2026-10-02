@@ -2,6 +2,33 @@
 
 # Start here: agent handoff
 
+## October 2 official Mesa .2 Wayland comparison checkpoint
+
+A separate clone now passes its first actual Ubuntu GNOME 46 **Wayland** login
+and canonical Augmentor startup using official Mesa `25.2.8-0ubuntu0.24.04.2`.
+The [checked report](../release/qualification/ubuntu24.04/gnome-wayland-mesa2-a7ee9c5.json)
+binds the exact `a7ee9c5` app, five coherent Mesa packages and authenticated APT
+metadata. Canonical's archive signature, complete binary Packages index and each
+package hash were independently verified; simulation adds/removes no packages.
+Pristine Augmentor payload, seven-wheel Python, AppArmor, actual service PID,
+Ubuntu/user observer and all default extensions pass. Actual QMP capture shows
+the approved UI/dialog. The application loads `libqxcb.so`: this is XWayland UI
+inside a real Wayland session, not native Qt Wayland qualification.
+
+Original latest-Mesa .3 failure baseline is preserved offline. The clone exposed
+a separate cloud/minimal-GNOME reboot issue: Ubuntu settings select NetworkManager
+but that service was absent under `--no-install-recommends`. A guarded one-time
+fixture configuration uses the already installed networkd; no new network package
+was added. Timer, renderer and cloud-init controls remain explicit. The initial
+offline APT local-URI attempt failed before changes; exact verified files staged
+in APT's cache then installed successfully offline. Do not recommend this private
+fixture pin as a general owner-machine downgrade or mark latest .3 passing.
+
+Continue repeated Wayland/reboot startup, real GSD Save/conflict/delivery,
+two-instance/closed launch/lock lifecycle and all connected/control/voice/distro/
+release gates. `7856c84` Linux and Mac 14/26 CI now passes all jobs; newer report
+publication CI remains separate. See [the comparison scope](LINUX-DISTRO-ROLLOUT.md#official-mesa-2-wayland-comparison).
+
 ## October 2 Noble graphical X11 and Wayland crash checkpoint
 
 Clean candidate `a7ee9c5` now passes real canonical startup in the marked Ubuntu
