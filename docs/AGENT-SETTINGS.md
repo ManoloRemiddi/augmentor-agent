@@ -37,6 +37,7 @@ retains the saved version. Closing an unsaved draft asks before discarding it.
 Reset affects no other identity, access or memory data.
 
 Pi captures Soul in new conversation metadata; forks inherit the source snapshot.
+Legacy Pi chats without Soul metadata retain their earlier system instructions.
 Codex captures it in its existing immutable developer-instruction snapshot and
 preserves its base instructions and capability guidance. DSH uses a scoped prompt
 registry section and per-conversation `identity/dsh-sessions/<hashed-id>.md` snapshots:
@@ -77,7 +78,7 @@ Implementation: `eef21cf` on `feat/desktop-agent-settings`, based on `d91c520`. 
 been merged and awaits the owner's local acceptance.
 
 - Build and TypeScript checks pass.
-- Node suite: 483 tests, 481 passed, two explicit platform/fixture skips.
+- Node suite: 484 tests, 482 passed, two explicit platform/fixture skips.
 - Native suite: 610 tests, 608 passed, two explicit skips, with PySide6 6.8.2.1.
 - Ten new Qt checks cover navigation, scoped Memory, name/avatar persistence,
   animation lifecycle, reset/cancel/save and optimistic Soul conflicts.
