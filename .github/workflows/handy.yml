@@ -41,6 +41,9 @@ jobs:
       - name: Verify cached component inventory against current source
         if: steps.component-cache.outputs.cache-hit == 'true'
         run: python -c "import importlib.util; s=importlib.util.spec_from_file_location('stage','scripts/stage-handy.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.validate()"
+      - name: Materialize reviewed source before restoring compiler intermediates
+        if: steps.component-cache.outputs.cache-hit != 'true'
+        run: python scripts/prepare-handy.py
       - name: Restore compiler intermediates
         if: steps.component-cache.outputs.cache-hit != 'true'
         id: compiler-cache
