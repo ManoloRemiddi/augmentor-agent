@@ -18,10 +18,11 @@ owner's actual palette. [The adoption record](HANDY-INTEGRATION.md#owners-instal
 separates that Linux evidence from open hosted lifecycle/platform package gates.
 Follow-up source `f60148b` verifies patch application in a separate build Git root
 and fences delayed microphone admission. Current selected/running adoption is
-`20261002-154843-0eedcd1a`, artifact
-`eee72c10f9ad9268dc66c69de819536f033e3b6edd30b27366880526f8f5a478`;
+`20261002-160803-407ce464`, artifact
+`ac681aadeea466f7ce280f5641e8c89ba01e216a299702de3f1de134886240b9`;
 both idle windows adopted through acknowledged maintenance. The original cutover
-above remains historical evidence. All 614 native cases pass (3 expected skips),
+above remains historical evidence. Source `85034ac` includes native admission
+expiry and the short Unix socket path. All 615 native cases pass (3 expected skips),
 both clean-source Debian packages build and their extracted component passes
 actual lifecycle/theme/ownership/EOF proof. Hosted platform results are recorded
 in the owning guide as they qualify.

@@ -24,11 +24,11 @@ class HandyPreparationTests(unittest.TestCase):
             subprocess.run(['git','init','--quiet',str(base)],check=True)
             payload=io.BytesIO()
             with tarfile.open(fileobj=payload,mode='w:gz') as archive:
-                for name,content in {'src-tauri/src/lib.rs':b'original\n','src/overlay/placeholder':b'fixture\n'}.items():
+                for name,content in {'src-tauri/src/lib.rs':'original — fixture\n'.encode('utf-8'),'src/overlay/placeholder':b'fixture\n'}.items():
                     entry=tarfile.TarInfo('Handy-fixture/'+name);entry.size=len(content);archive.addfile(entry,io.BytesIO(content))
             data=payload.getvalue()
             (component/'upstream.json').write_text(json.dumps({'url':'https://supplier.invalid/fixture','commit':'fixture','sha256':hashlib.sha256(data).hexdigest()}))
-            (component/'augmentor.patch').write_bytes('diff --git a/src-tauri/src/lib.rs b/src-tauri/src/lib.rs\n--- a/src-tauri/src/lib.rs\n+++ b/src-tauri/src/lib.rs\n@@ -1 +1 @@\n-original\n+embedded\n'.replace('\n','\r\n').encode())
+            (component/'augmentor.patch').write_bytes('diff --git a/src-tauri/src/lib.rs b/src-tauri/src/lib.rs\n--- a/src-tauri/src/lib.rs\n+++ b/src-tauri/src/lib.rs\n@@ -1 +1 @@\n-original — fixture\n+embedded\n'.replace('\n','\r\n').encode('utf-8'))
             (component/'embedding.rs').write_text('owned embedding fixture\n')
             (component/'AugmentorOverlay.tsx').write_text('owned overlay fixture\n')
             target=base/'build/handy'

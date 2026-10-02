@@ -69,7 +69,7 @@ Maintenance refuses active capture and retires an idle broker before promotion.
 | Linux X11 | Handy/Tauri global shortcut; standard X11 clipboard/paste | Actual component, separate Qt target, synthetic audio, live theme and real close-button click passed locally under KWin/Xvfb |
 | KDE Wayland | Handy/Tauri shortcut; private non-root ydotool daemon for native Wayland insertion | Staged real component enabled with a separate shortcut and verified its private `0600` input socket/disable cleanup; physical capture and clean-system acceptance remain a release gate |
 | Other Linux Wayland | XDG GlobalShortcuts portal; XWayland bottom pill; private ydotool daemon | Actual private D-Bus consent/press/release/denial fixture passes; compositor-specific physical acceptance is separate |
-| macOS Apple Silicon | Handy native keyboard/accessibility/clipboard adapter; app-bundled component | Shared source and packaging wired; GitHub native build/lifecycle and existing Mac bundle qualification must pass |
+| macOS Apple Silicon | Handy native keyboard/accessibility/clipboard adapter; hidden nested helper app | Shared source and packaging wired; GitHub native build/lifecycle and existing Mac bundle qualification must pass |
 | Windows | Handy native keyboard/insertion adapter; `.exe` component and named-pipe broker | Native component CI added; complete Windows app packaging belongs to the existing public Windows work and must converge before a supported installer is claimed |
 
 Linux requires the existing WebKit/GTK runtime and the declared portal/Gio,
@@ -131,6 +131,11 @@ defines the native compiler dependencies. Build jobs default to two. The output
 is `components/handy/runtime`; `scripts/stage-handy.py` rejects mismatched OS,
 source pins, patch/owned-source hashes, build inputs or altered file inventories.
 Existing Debian, Mac and release packagers require and include this component.
+Mac packaging gives dictation a hidden nested app with a stable bundle identifier,
+Microphone/Apple Events usage descriptions and preserved resource/library paths.
+The broker launches its actual executable. Both signed Desktop and Browser
+companion bundles run the copied-component lifecycle proof, preserving the
+original signatures and avoiding physical microphone or model downloads.
 The immutable desktop deployment copier carries `components/` into staged builds.
 Mac packaging explicitly signs each component Mach-O before sealing the enclosing
 bundle, verifies those signatures and writes an external inventory of the signed
@@ -145,6 +150,9 @@ OS/architecture/source/build-input cache key. Intake rechecks its full inventory
 and the actual lifecycle proof still runs; no partial-key restoration is allowed.
 A cached build or a diagnostic artifact from a failed lifecycle job is not
 qualified. Product packaging waits for successful component jobs.
+Compiler intermediates have a separate cache that can restore previous source
+fingerprints. They are never accepted as a component artifact: locked compilation,
+source checks, notice collection, staging and lifecycle qualification still run.
 Source preparation creates its own local build repository before applying the
 patch; build and staging verify the reverse patch and owned source hashes.
 This prevents Git from discovering the parent Augmentor checkout and silently
@@ -161,7 +169,7 @@ separate QTextEdit, live light/dark theme without focus changes, cancellation
 through the actual close button, microphone exclusion, disable, no Handy tray
 and parent-exit cleanup. It does not listen to the physical microphone.
 The same proof also passes through the authenticated broker (`--broker`). Broad
-local regression suites pass: 614 native cases (611 pass, 3 platform/opt-in
+local regression suites pass: 616 native cases (613 pass, 3 platform/opt-in
 skips), 480 Node cases (478 pass, 2 opt-in skips), and 66 Browser cases. The native
 settings visual proof exposed and corrected white scroll content under a dark
 label palette; model-card links now use the accent colour. Both Debian packages
@@ -271,3 +279,37 @@ The regression fixture combines a nested parent checkout, Windows automatic
 conversion and a CRLF patch. Native admission also rejects expired tokens before
 reserving the microphone. Final hosted component/product proofs must qualify
 these follow-up inputs before their complete platform artifacts are claimed.
+
+### Current installed admission build
+
+Source `85034acb8900082873a6e5b53117e8c6e43444d5` adds native token expiry,
+Windows patch conversion and short private Unix endpoints. Local native release
+compilation, formatting and Clippy pass; all 615 native cases pass (612 pass,
+3 expected skips), including real long-path broker/lease startup. All seven
+Codex voice integration cases pass, including native and Browser paths. The
+actual component rejects expired native admission; the authenticated synthetic
+recording/paste/theme/focus/cancel proof passes again.
+
+Clean-source Debian runtime SHA-256 is
+`c4c50fa9b059263fea40d28ba918e066ccb313f1d3489be3917b757dc7b0b344`;
+Desktop SHA-256 is `7e3c96751da681775e13a73ce5f2b026f1542d256ffc299d3d7856f3a63f75f0`.
+The separately composed compatible installed build is
+`20261002-160803-407ce464`, artifact
+`ac681aadeea466f7ce280f5641e8c89ba01e216a299702de3f1de134886240b9`.
+Both Desktop and Mobile adopted this root through idle acknowledged maintenance,
+with the original installed 0.2.11 UI/DSH/speech contracts retained. Both report
+online, voice available and no pending update. Ctrl+Space remains enabled,
+ready, CPU, current palette, no Handy tray, and standalone autostart is absent.
+
+The subsequent platform-only follow-up explicitly decodes UTF-8 patch context
+on Windows and gives the Mac microphone helper its own hidden, signed app bundle.
+Its fixture verifies permission identity and unchanged executable/resource/
+library/notice bytes; 131 Mac adapter cases pass locally (2 native-tool skips).
+Real signed-bundle lifecycle and remaining hosted checks are separate evidence.
+
+The final platform follow-up passes all 616 shared native cases locally (613 pass,
+3 expected skips) and the real copied-component lifecycle proof with current
+build-input inventory. Compiler caches accelerate source corrections but never
+replace source validation or artifact qualification. Public application source
+and the original canonical checkout's unrelated working files remain separate;
+Mac-only packaging work does not change the installed Linux UI or model setup.

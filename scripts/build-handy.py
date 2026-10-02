@@ -33,7 +33,7 @@ def run(args,cwd):
 def verify_source(source):
     top=Path(subprocess.check_output(['git','rev-parse','--show-toplevel'],cwd=source,text=True).strip())
     if top.resolve()!=source.resolve():raise ValueError('Handy source must have its own build repository; refusing parent-checkout patch discovery.')
-    subprocess.run(['git','-c','core.autocrlf=false','apply','--reverse','--check','-'],input=(ROOT/'components/handy/augmentor.patch').read_text().encode(),cwd=source,check=True)
+    subprocess.run(['git','-c','core.autocrlf=false','apply','--reverse','--check','-'],input=(ROOT/'components/handy/augmentor.patch').read_text(encoding='utf-8').encode('utf-8'),cwd=source,check=True)
     for name,target in (('embedding.rs','src-tauri/src/embedding.rs'),('AugmentorOverlay.tsx','src/overlay/AugmentorOverlay.tsx')):
         if sha(ROOT/'components/handy'/name)!=sha(source/target):raise ValueError('Handy source does not contain the reviewed '+name)
 

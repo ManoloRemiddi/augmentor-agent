@@ -28,6 +28,30 @@ COMPANION_PYTHON_PACKAGES = ('PyYAML', 'websocket-client', 'keyring',
                             'jaraco.classes', 'jaraco.context', 'jaraco.functools', 'more-itertools')
 
 
+def bundle_dictation(project, minimum_macos):
+    """Give the hidden microphone helper its own stable macOS bundle identity."""
+    runtime=project/'components/handy/runtime'
+    app=runtime/'Augmentor Dictation.app';contents=app/'Contents'
+    contents.mkdir(parents=True)
+    # Preserve the executable's existing ../Resources and ../lib/Handy lookups.
+    shutil.move(str(runtime/'bin'),contents/'MacOS')
+    shutil.move(str(runtime/'Resources'),contents/'Resources')
+    shutil.move(str(runtime/'lib'),contents/'lib')
+    info={'CFBundleIdentifier':'com.augmentor.agent.dictation',
+          'CFBundleName':'Augmentor Dictation','CFBundleDisplayName':'Augmentor Dictation — Handy',
+          'CFBundleExecutable':'handy','CFBundlePackageType':'APPL',
+          'CFBundleVersion':json.loads((runtime/'BUILD.json').read_text())['upstream']['version'].lstrip('v'),
+          'LSUIElement':True,'LSMinimumSystemVersion':minimum_macos,'NSHighResolutionCapable':True,
+          'NSMicrophoneUsageDescription':'Augmentor uses Handy to transcribe your voice when you activate dictation.',
+          'NSAppleEventsUsageDescription':'Insert your transcribed text into the application you selected.'}
+    (contents/'Info.plist').write_bytes(plistlib.dumps(info))
+    (runtime/'bin').mkdir()
+    launcher=runtime/'bin/handy'
+    launcher.write_text('#!/bin/sh\nexec "$(dirname "$0")/../Augmentor Dictation.app/Contents/MacOS/handy" "$@"\n')
+    launcher.chmod(0o755)
+    return app
+
+
 def build_launcher(destination, component, minimum_macos):
     """Embed the pinned Python without changing the native desktop process identity."""
     if component not in ('desktop', 'browser', 'runtime'):
@@ -258,6 +282,7 @@ def main():
         'NSScreenCaptureUsageDescription':'Augmentor observes the desktop when you request computer control.',
         'NSAppleEventsUsageDescription':'Augmentor interacts with applications when you request computer control.'}
     (contents/'Info.plist').write_bytes(plistlib.dumps(info))
+    dictation_app=bundle_dictation(project,config['minimumMacOS'])
     inventory=json.dumps(application_inventory(project),sort_keys=True,indent=2)+'\n'
     (project/'application-inventory.json').write_text(inventory)
     inventory_hash=hashlib.sha256(inventory.encode()).hexdigest()
@@ -271,6 +296,8 @@ def main():
         if magic in macho_magic:
             subprocess.run(['codesign','--force','--sign','-',str(file)],check=True)
             subprocess.run(['codesign','--verify','--strict',str(file)],check=True)
+    subprocess.run(['codesign','--force','--sign','-',str(dictation_app)],check=True)
+    subprocess.run(['codesign','--verify','--deep','--strict',str(dictation_app)],check=True)
     # Ad-hoc integrity signature. Preview users must explicitly approve this app
     # in macOS; no Apple distribution identity or notarization is claimed.
     subprocess.run(['codesign','--force','--deep','--sign','-',str(app)],check=True)

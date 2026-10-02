@@ -91,6 +91,8 @@ jobs:
           "$project/node/bin/node" scripts/proof-codex-prerequisite.mjs "$project" node_modules/@openai/codex
           "$project/node/bin/node" scripts/dsh-payload-proof.mjs "$project/dsh"
           codesign --verify --deep --strict "$app"
+          "$project/python/bin/python3" -I -B scripts/proof-handy-component.py --runtime "$project/components/handy/runtime"
+          codesign --verify --deep --strict "$app"
       - name: Exercise bundled DSH and Qt with an isolated model fixture
         env:
           AUGMENTOR_PROOF_QT_PLATFORM: offscreen
@@ -124,6 +126,8 @@ jobs:
           project="$app/Contents/Resources/app"
           "$project/node/bin/node" scripts/proof-codex-prerequisite.mjs "$project" node_modules/@openai/codex
           AUGMENTOR_PYTHON="$project/python/bin/python3" "$project/node/bin/node" "$project/scripts/proof-codex-credentials.mjs"
+          codesign --verify --deep --strict "$app"
+          "$project/python/bin/python3" -I -B scripts/proof-handy-component.py --runtime "$project/components/handy/runtime"
           codesign --verify --deep --strict "$app"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()

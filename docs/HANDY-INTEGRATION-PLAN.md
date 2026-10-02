@@ -295,3 +295,25 @@ data/permissions, licensing and handoff with exact contract/deployment evidence.
 Remaining release decisions are the default weight terms, offline package,
 component source ownership, branding permissions and supported OS/compositor
 matrix. Isolated protocol work can begin while these are resolved.
+
+## Implementation checkpoint — 2 October 2026
+
+The [implementation guide](HANDY-INTEGRATION.md) owns the resulting contracts
+and exact evidence. Milestones 1–3 are implemented: pinned public Handy 0.9.7,
+reviewed initial model terms, private embedding/lifecycle, shared branded
+settings, microphone ownership, editable Ctrl+Space and the themed animated
+Augmentor recording pill. Debian packaging/update integration is implemented;
+the owner's actual Linux installation has been adopted with reversible removal
+of the separate Handy startup/tray owner. Existing UI, voice dependencies, caches
+and data are preserved.
+
+Milestone 4 has actual Linux virtual-microphone recording/insertion/focus/cancel
+proof and a real Mac component lifecycle pass. The Mac package now gives the
+microphone helper a hidden bundle identity and qualifies the signed Desktop and
+Browser components. Final hosted tests, physical permission/compositor tests and
+clean-user acceptance remain explicit. Milestone 5 has clean-source Debian
+packages and installed idle activation; all-platform lifecycle/update/rollback
+acceptance still requires its recorded gates. Milestone 6 remains dependent on
+convergence with the public Augmentor Windows application/installer work, beyond
+building the native Handy component. No complete Windows installer is promised
+from a standalone component compilation.

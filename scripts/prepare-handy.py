@@ -35,7 +35,7 @@ def prepare(target):
     subprocess.run(['git','config','core.autocrlf','false'],cwd=target,check=True)
     # Windows checkout may convert the patch to CRLF. Its archive context is LF;
     # normalize the patch stream without modifying the verified supplier files.
-    patch=(ROOT/'components/handy/augmentor.patch').read_text().encode()
+    patch=(ROOT/'components/handy/augmentor.patch').read_text(encoding='utf-8').encode('utf-8')
     subprocess.run(['git','apply','--check','-'],input=patch,cwd=target,check=True)
     subprocess.run(['git','apply','-'],input=patch,cwd=target,check=True)
     subprocess.run(['git','apply','--reverse','--check','-'],input=patch,cwd=target,check=True)

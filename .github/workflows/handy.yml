@@ -41,6 +41,17 @@ jobs:
       - name: Verify cached component inventory against current source
         if: steps.component-cache.outputs.cache-hit == 'true'
         run: python -c "import importlib.util; s=importlib.util.spec_from_file_location('stage','scripts/stage-handy.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.validate()"
+      - name: Restore compiler intermediates
+        if: steps.component-cache.outputs.cache-hit != 'true'
+        id: compiler-cache
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
+        with:
+          path: |
+            build/handy/src-tauri/target
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: handy-compiler-1.97.1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('components/handy/upstream.json') }}-${{ hashFiles('components/handy/**', 'scripts/build-handy.py', 'scripts/prepare-handy.py') }}
+          restore-keys: handy-compiler-1.97.1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('components/handy/upstream.json') }}-
       - name: Build the private component and complete source notices
         if: steps.component-cache.outputs.cache-hit != 'true'
         run: python scripts/build-handy.py
@@ -53,6 +64,15 @@ jobs:
           cd build/handy/src-tauri
           cargo fmt --all -- --check
           cargo clippy --release --locked --features tauri/custom-protocol
+      - name: Retain compiler intermediates for source fixes
+        if: always() && steps.compiler-cache.outputs.cache-hit != 'true' && steps.component-cache.outputs.cache-hit != 'true' && hashFiles('build/handy/src-tauri/target/release/handy*') != ''
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830
+        with:
+          path: |
+            build/handy/src-tauri/target
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ steps.compiler-cache.outputs.cache-primary-key }}
       - name: Retain the checked build for repeat lifecycle qualification
         if: steps.component-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830

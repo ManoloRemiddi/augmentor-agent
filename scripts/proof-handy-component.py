@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Exercise the actual packaged component without a microphone or model download."""
+import argparse
 import json
 import os
 from pathlib import Path
@@ -16,10 +17,16 @@ ROOT=Path(__file__).resolve().parents[1]
 
 
 def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--runtime',type=Path,default=ROOT/'components/handy/runtime')
+    options=parser.parse_args()
     with tempfile.TemporaryDirectory(prefix='augmentor-component-proof-') as temporary:
         base=Path(temporary);runtime=base/'runtime'
-        shutil.copytree(ROOT/'components/handy/runtime',runtime)
+        shutil.copytree(options.runtime,runtime)
         binary=runtime/'bin'/('handy.exe' if os.name=='nt' else 'handy')
+        if sys.platform=='darwin':
+            bundled=runtime/'Augmentor Dictation.app/Contents/MacOS/handy'
+            if bundled.is_file():binary=bundled
         (binary.parent/'portable').write_text('Handy Portable Mode\n')
         environment={**os.environ,'AUGMENTOR_HANDY_EMBEDDED':'1','HANDY_DISABLE_UPDATER':'1','WEBKIT_DISABLE_DMABUF_RENDERER':'1','WEBKIT_DISABLE_COMPOSITING_MODE':'1','RUST_BACKTRACE':'1'}
         if sys.platform.startswith('linux'):

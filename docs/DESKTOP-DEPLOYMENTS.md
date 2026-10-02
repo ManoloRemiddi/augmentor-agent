@@ -332,3 +332,11 @@ The compatible installed 0.2.11 UI/DSH/speech contracts are preserved. Both idle
 windows closed through acknowledged maintenance and reopened through the selected
 launcher. The owned broker also restarted from that root. Dictation remains ready
 on Ctrl+Space with the owner's palette and no Handy tray/startup owner.
+
+The later native-admission build in the same [adoption guide](HANDY-INTEGRATION.md#current-installed-admission-build)
+is now selected and running: `20261002-160803-407ce464`, artifact
+`ac681aadeea466f7ce280f5641e8c89ba01e216a299702de3f1de134886240b9`,
+source `85034ac`. Both windows closed only while idle; the primary launcher was
+invoked after its old service had exited. Desktop/Mobile report online and no
+pending update. This supersedes the preceding installed root without altering
+its preserved product, DSH or speech contract.

@@ -53,6 +53,9 @@ class Backend:
 
     def binary(self):
         candidate=ROOT/'components/handy/runtime/bin'/('handy.exe' if os.name=='nt' else 'handy')
+        if sys.platform=='darwin':
+            bundled=ROOT/'components/handy/runtime/Augmentor Dictation.app/Contents/MacOS/handy'
+            if bundled.is_file():candidate=bundled
         if not candidate.is_file(): raise RuntimeError('The bundled Handy component is unavailable. Install a complete Augmentor package.')
         return candidate
 
