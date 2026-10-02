@@ -309,3 +309,33 @@ renders were inspected. Runtime/backend behavior remains unchanged. Prior full
 suite and artifact evidence above remains historical; shared source qualification passes 631 native cases (629 pass, two Mac-only
 skips); the final focused overlay suite passes all 21 cases. Installed identity
 follows below. Installed Mac GUI acceptance remains unverified.
+
+
+### Installed fixed-frame update
+
+Tested implementation: `e567ccf`. Selected and running Linux release:
+`20261002-130745-7e74c395`, compatible product 0.2.11, artifact
+`14134df91f3a049834ef94da95a5a156b1ce02760115a141ea7c80fb4fa9f92d`.
+The separate candidate copies naming artifact
+`dd35e134a9973beab85acf00800d70c94a1e205e791044799f06e3f03397d0c4`
+and overlays only the authored settings component and Window entry method,
+removing its obsolete page-resize handler. Its 31 focused cases pass (29 passed,
+two source-only sizing skips because the preserved installed base has no live
+scale slider). Installed dependencies/backends, speech and unrelated native
+improvements remain from product 0.2.11.
+
+Immutable stage/activation passed inventory, import and authenticated product
+checks. A separate synthetic proof using the actual installed interpreter
+verifies readable DSH inputs and wrapped notes, fixed geometry across short
+pages and Prompt library, generous prompt editor/list heights, visible action
+buttons, one native window, exact chat geometry/draft restoration and released
+resize constraints. Candidate dark/light renders were inspected; no live model
+or private conversation was used as a test fixture. Desktop/mobile accepted idle
+maintenance closure before supervisor restart and report the selected root,
+voice available and no pending update. No DSH/speech service restart, GPU/model
+change or user-data migration was needed. Installed Mac GUI remains unverified.
+
+Rollback selects naming release `20261002-124829-c8553509`. Test Agent → More →
+model setup → Prompt library → Agent: the frame stays still, longer pages scroll
+vertically and fields retain their height. Back to chat restores your chosen
+chat dimensions. PR #29 remains draft and unmerged pending owner acceptance.

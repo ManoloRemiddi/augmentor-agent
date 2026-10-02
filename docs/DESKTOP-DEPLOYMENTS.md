@@ -2,7 +2,19 @@
 
 # Consistent installed desktop releases
 
-## October 2: Agent Identity and Agent Memory naming
+## October 2: Fixed settings frame and readable inputs
+
+[Installed fixed-frame update](AGENT-SETTINGS.md#installed-fixed-frame-update)
+records implementation `e567ccf`, compatible selected/running release
+`20261002-130745-7e74c395`, exact artifact identity, 631 native cases (629 pass,
+two Mac-only skips) and 31 candidate cases (29 pass, two source-only sizing skips).
+Installed-interpreter synthetic field/layout/geometry/resize checks and immutable
+stage/activation pass. Desktop/mobile adopted the root after idle guards, with
+voice available and no pending update. Product 0.2.11 backends/dependencies/speech
+and user data are preserved. Rollback selects `20261002-124829-c8553509`.
+PR #29 remains draft/unmerged for owner acceptance.
+
+## Agent Identity and Agent Memory naming checkpoint (historical)
 
 [Installed naming update](AGENT-SETTINGS.md#installed-naming-update) records
 source `14e5783`, compatible release `20261002-124829-c8553509`, exact artifact

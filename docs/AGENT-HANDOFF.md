@@ -13,8 +13,16 @@ scroll vertically. Prompt library browses beside its editor at standard widths.
 Back to chat restores its latest geometry and resize constraints. Shared source
 passes 631 native cases (629 pass, two Mac-only skips); all 21 overlay cases pass,
 including short-screen font/field/status checks, model/memory forms and frame lock.
-The latest installed naming release below is the baseline; final installed
-identity follows after immutable activation. PR #29 remains draft/unmerged.
+Tested implementation `e567ccf` is installed as compatible Linux product 0.2.11
+release `20261002-130745-7e74c395`, artifact
+`14134df91f3a049834ef94da95a5a156b1ce02760115a141ea7c80fb4fa9f92d`.
+The candidate passes 31 focused cases (29 pass, two source-only sizing skips),
+plus an actual installed-interpreter synthetic fields/layout/geometry proof.
+Immutable stage/activation pass. Desktop/mobile adopted the selected root after
+idle maintenance guards, with voice available and no pending update. Prior
+installed dependency/backend/speech contracts and private state are preserved;
+DSH/speech services and GPU/model settings were not changed. Rollback selects
+`20261002-124829-c8553509`; installed Mac GUI acceptance remains unverified. PR #29 remains draft/unmerged.
 See [fixed frame guide](AGENT-SETTINGS.md#fixed-frame-and-readable-fields--2-october-2026).
 
 ## Agent Identity and Agent Memory naming checkpoint (historical)
