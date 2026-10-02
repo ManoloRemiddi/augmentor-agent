@@ -3,6 +3,7 @@
 """Review clean CI artifact identity, contents and included binary notices."""
 import argparse
 import hashlib
+import io
 import json
 from pathlib import Path,PurePosixPath
 import subprocess
@@ -35,7 +36,7 @@ for artifact in deb['artifacts']:
             if member.isfile():
                 data=archive.extractfile(member).read();relative=name.removeprefix('usr/lib/augmentor/')
                 hashes[relative]=hashlib.sha256(data).hexdigest()
-                if name.startswith('usr/lib/augmentor/licenses/') or name in ('usr/lib/augmentor/release.json','usr/lib/augmentor/LICENSE'):
+                if name.startswith(('usr/lib/augmentor/licenses/','usr/lib/augmentor/python-wheels/')) or name in ('usr/lib/augmentor/release.json','usr/lib/augmentor/LICENSE','usr/lib/augmentor/linux-python-runtime.json'):
                     included[relative]=data
     assert process.wait()==0
     if 'runtime' in path.name:
@@ -45,7 +46,42 @@ for artifact in deb['artifacts']:
             assert hashes.get(item['path'])==item['sha256'],item['path']
             for notice in item['notices']:assert 'licenses/'+notice in included,(item['component'],notice)
         assert included['LICENSE'] and included['licenses/LGPL-3.0.txt'] and included['licenses/GPL-3.0.txt']
-        results.append({'file':path.name,'members':count,'nativeComponents':[{'name':i['component'],'version':i['version'],'binaryHashMatches':True,'noticesPresent':True} for i in inventory]})
+        result={'file':path.name,'members':count,'nativeComponents':[{'name':i['component'],'version':i['version'],'binaryHashMatches':True,'noticesPresent':True} for i in inventory]}
+        if deb.get('pythonRuntime'):
+            contract=deb['pythonRuntime'];assert release['pythonRuntime']==contract
+            assert hashes['linux-python-runtime.json']==contract['policySha256']
+            policy=json.loads(included['linux-python-runtime.json'])
+            wheels=json.loads(included['licenses/linux-wheel-inventory.json'])
+            assert wheels['policyIdentity']==contract['lockIdentity']
+            assert wheels['licenseReviewComplete'] is False and wheels['embeddedSourceCoverageComplete'] is False
+            assert {w['file'] for w in wheels['wheels']}=={w['file'] for w in policy['wheels']}
+            locked={w['file']:w for w in policy['wheels']}
+            for wheel in wheels['wheels']:
+                name=wheel['file'];data=included['python-wheels/'+name]
+                assert hashlib.sha256(data).hexdigest()==wheel['sha256']==locked[name]['sha256']
+                assert len(data)==locked[name]['bytes']
+                with zipfile.ZipFile(io.BytesIO(data)) as archive:
+                    elfs={}
+                    for member in archive.infolist():
+                        if member.is_dir():continue
+                        with archive.open(member) as stream:
+                            if stream.read(4)==b'\x7fELF':elfs[member.filename]=hashlib.sha256(archive.read(member)).hexdigest()
+                    assert elfs=={row['path']:row['sha256'] for row in wheel['elfBinaries']}
+                    for notice in wheel['notices']:
+                        original=archive.read(notice['path'])
+                        assert original==included[notice['copiedTo']]
+                        assert hashlib.sha256(original).hexdigest()==notice['sha256']
+            for collection in wheels['supplementaryNoticeCollections']:
+                assert hashes[collection['record']]==collection['recordSha256']
+                notice_record=json.loads(included[collection['record']])
+                assert notice_record['commit']==collection['commit']
+                base=str(PurePosixPath(collection['record']).parent)+'/'
+                for row in notice_record['files']:
+                    assert hashes[base+row.get('path',row.get('file'))]==row['sha256']
+            result.update(verifiedWheelArchives=len(wheels['wheels']), verifiedWheelElfMembers=sum(len(w['elfBinaries']) for w in wheels['wheels']),
+                          originalWheelNoticeBytesMatch=True, supplementaryNoticeCollectionsMatch=True,
+                          licenseReviewComplete=False, embeddedSourceCoverageComplete=False)
+        results.append(result)
     else:results.append({'file':path.name,'members':count})
 report={'version':deb['version'],'source':deb['source'],'artifactHashesMatch':True,'extensionInventoryAndNoticesMatch':True if browser else None,'privateStateFilesAbsent':True,'packages':results,'scope':'Artifact and notice engineering checks; not independent security or legal certification.'}
 a.output.parent.mkdir(parents=True,exist_ok=True);a.output.write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report))

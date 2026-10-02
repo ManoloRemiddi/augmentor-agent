@@ -7,6 +7,7 @@ It does not establish desktop-session, physical audio or SELinux acceptance.
 """
 import argparse
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -19,7 +20,7 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 PROOF_SHA256 = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 sys.path.insert(0, str(ROOT/'scripts'))
-from linux_distribution import host_target, package_files
+from linux_distribution import host_target, package_files, python_runtime_contract, NOBLE
 
 
 def digest(path):
@@ -71,6 +72,9 @@ def main():
     target = host_target()
     artifacts = a.artifacts.resolve()
     manifest = json.loads((artifacts/'artifacts.json').read_text())
+    runtime_contract = python_runtime_contract(manifest, target)
+    if target == NOBLE and manifest.get('target') != target:
+        raise ValueError('The Noble package target differs from this container.')
     hashes = {item['file']: item['sha256'] for item in manifest['artifacts']}
     names = package_files({'version': manifest['version'], 'sha256': hashes}, target)
     if target.startswith('fedora') and manifest.get('target') != target:
@@ -110,6 +114,19 @@ def main():
     user = 'augmentor-proof'
     home = Path('/home')/user
     run(['useradd', '-m', '-s', '/bin/sh', user])
+    python = '/usr/bin/python3'
+    runtime_receipt = None
+    if runtime_contract:
+        marker = app/'linux-python-runtime.json'
+        spec = importlib.util.spec_from_file_location('package_runtime', app/'scripts/linux-python-runtime.py')
+        tool = importlib.util.module_from_spec(spec); spec.loader.exec_module(tool)
+        value = tool.policy(marker)
+        assert tool.contract(value, tool.digest(marker)) == runtime_contract
+        # Historical candidates print pip progress before the final receipt.
+        runtime_receipt = json.loads(subprocess.check_output(['runuser', '-u', user, '--', python,
+            str(app/'scripts/linux-python-runtime.py'), 'prepare', '--policy', str(marker),
+            '--wheelhouse', str(app/'python-wheels'), '--store', str(home/'.local/share/augmentor/python-runtimes')], text=True).strip().splitlines()[-1])
+        python = runtime_receipt['python']
     gtk = subprocess.check_output(['runuser', '-u', user, '--', '/usr/bin/python3', '-c',
         'import gi; gi.require_version("Gtk", "4.0"); from gi.repository import Gtk; '
         'assert callable(Gtk.accelerator_parse_with_keycode); '
@@ -158,7 +175,7 @@ def main():
     assert sentinel.read_text() == 'preserved'
     if rpm:
         run(['rpm', '-V', 'augmentor-agent'])
-    versions = json.loads(subprocess.check_output(['/usr/bin/python3', '-c', 'import json,platform,PySide6;from PySide6.QtCore import qVersion;print(json.dumps({"python":platform.python_version(),"pyside":PySide6.__version__,"qt":qVersion()}))'], text=True))
+    versions = json.loads(subprocess.check_output(['runuser', '-u', user, '--', python, '-c', 'import json,platform,PySide6;from PySide6.QtCore import qVersion;print(json.dumps({"python":platform.python_version(),"pyside":PySide6.__version__,"qt":qVersion()}))'], text=True))
     versions['node'] = subprocess.check_output([str(app/'node/bin/node'), '--version'], text=True).strip()
     report = {'target': target, 'imageDigest': a.image_digest, 'source': manifest['source'], 'artifacts': hashes,
               'proofScriptSha256': PROOF_SHA256,
@@ -169,6 +186,10 @@ def main():
               'idleReinstall': True, 'removePreservesPrivateFiles': True, 'reinstallAfterRemove': True,
               'realDesktopSessionTested': False, 'physicalAudioTested': False, 'selinuxEnforcingTested': False,
               'dshModelTurnTested': False}
+    if runtime_receipt:
+        report.update(pythonRuntime=runtime_contract, pythonRuntimeArtifactSha256=runtime_receipt['artifactSha256'],
+                      offlineOrdinaryUserRuntimePrepared=True, licenseReviewComplete=False,
+                      embeddedSourceCoverageComplete=False)
     a.out.write_text(json.dumps(report, indent=2)+'\n')
     print(json.dumps(report))
 

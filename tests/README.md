@@ -392,3 +392,14 @@ reuses the runtime through setup, verifies selection/stage/rollback, executes
 Node/Browser selection and the actual CPU VAD, and checks corruption refusal.
 The [checked report and limits](../docs/LINUX-DISTRO-ROLLOUT.md#noble-runtime-selection-and-cpu-vad)
 remain distinct from a package, connected harness, GNOME or physical audio proof.
+
+`test_linux_wheel_inventory.py` uses synthetic wheels to check notice byte
+preservation, versioned ELF/executable hashing, unsafe/duplicate archive members,
+metadata mismatch and changed archive refusal. Distribution/setup cases check
+the Noble contract, cross-target refusal and verification after completed setup.
+`release/prove-linux-package.py` additionally prepares Noble's installed offline
+cache as the ordinary user before rendering and exercising both package leases.
+`release/prove-complete-linux.py` renders and runs helpers with the actual desktop
+descriptor interpreter. The artifact review verifies whole wheel and embedded ELF
+hashes, original notice bytes and pinned supplementary collections; its license
+and corresponding-source completeness flags remain false.

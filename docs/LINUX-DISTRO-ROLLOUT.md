@@ -1401,3 +1401,62 @@ Next: Noble target-specific package dependencies and complete wheel-cache bundle
 fresh-user/resume/native/Browser/credentials proofs, matching managed DSH/runtime
 upgrades, actual GNOME 46/Cinnamon and physical speech acceptance. Mint, openSUSE,
 Arch and GNOME control consent/input/Stop work remain in the full objective.
+
+### Noble package and complete candidate
+
+The next source stage enables a private `ubuntu24.04-amd64` candidate in
+`package-debian.py --target ubuntu24.04-amd64 --wheelhouse <verified-cache>`.
+Its Debian system recipe uses Noble Python 3.12, GI/GTK/GStreamer, Secret Service,
+jaraco/CFFI, NumPy/flatbuffers, PortAudio and Qt platform libraries. The existing
+Debian 13/system-Qt recipe remains the default. Only Noble embeds the exact seven
+locked wheels; the builder preserves the original policy file bytes and never
+copies its environment. Both package and complete manifests declare policy hash,
+lock identity, ABI/profile and explicit incomplete review flags. The package
+pre-install hook checks Ubuntu 24.04/x86-64 before maintenance state writes.
+Fedora repackaging and other complete targets refuse a declared Noble payload.
+
+Setup matches the installed package/source and policy contract before preparing
+the ordinary user's immutable environment. Even an already completed setup
+receipt requires verification on repeat, without repair. Package qualification
+prepares the installed cache offline as that user; complete qualification reads
+the actual desktop descriptor interpreter for native render and DSH helpers.
+Fresh clean package/complete acceptance is still pending at this checkpoint.
+
+`linux-wheel-inventory.py` verifies every archive and records 266 ELF members:
+262 from PySide/shiboken and four ONNX/protobuf binaries. Six original wheel
+notice files are retained byte for byte. PySide/shiboken contain no notice files
+matching LICENSE/COPYING/NOTICE/COPYRIGHT, so the package also preserves and
+verifies the existing pinned PySide and six Qt source notice collections, including
+test/tool attribution paths. Artifact review independently checks whole archive,
+ELF and notice hashes. This inventory does not establish binary build provenance,
+complete corresponding sources or a release license choice. All review/source
+completeness flags remain false and the manifests mark `candidateOnly: true`.
+
+Research verified the existing PySide notice texts at pinned commit
+`f62088b4cd516a3080a6b2e68bc79903da8b67ce`, including its LGPL/GPL and legacy
+LGPL 2.1 texts. QtQuickTimeline/BlendTrees implementations carry GPL/commercial
+terms; see [the pinned timeline source](https://code.qt.io/cgit/qt/qtquicktimeline.git/plain/src/timeline/qquicktimeline.cpp?id=b26772602cc02e5a5caeb623b493c5922727b80b)
+and [Qt's module documentation](https://doc.qt.io/qt-6.8/qtquicktimeline-index.html).
+The wheel also ships QtWayland and ICU 73 binaries beyond the current source
+catalog. Exact build/source/license mapping and recipient replacement/rebuild
+proof remain release gates. Official archive metadata research is not an actual
+download/hash verification or binary-source coverage claim.
+
+The working-source package builds. Its wrong-host preinst test refuses before
+changing existing maintenance state. The first fresh Noble probe resolves all
+dependencies and prepares its offline runtime, then stops in proof JSON parsing
+because pip prints progress before the receipt; the proof parser is corrected.
+No package lifecycle pass is claimed from that interrupted probe. Shared source
+JavaScript checks pass 493 cases (two skips); final native checks pass 672 cases
+(two Mac-only skips). The Qt/host fork file passes three consecutive runs after
+both page-delivery waits. Clean artifact proofs follow. These private working
+artifacts are not release downloads.
+
+Hosted [Linux validation for `547ac1d`](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36966459126)
+fails in the native Qt Branch fixture before package jobs. The queued child page
+had not been delivered when the fixture checked old displayed messages. Waiting
+for actual page delivery in Branch/Edit passes three repeated real Qt/host runs.
+[Mac 14/26 validation](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36966459169)
+passes. New-source hosted confirmation remains open. Keep all GNOME input/Stop,
+full desktop, Mint/openSUSE/Arch, coordinated upgrades and physical speech/memory
+acceptance in the complete autonomous objective.

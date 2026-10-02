@@ -8,7 +8,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import tarfile
-from linux_distribution import TARGETS,package_files
+from linux_distribution import TARGETS,package_files,python_runtime_contract,NOBLE
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -74,6 +74,9 @@ def main():
         raise ValueError('The RPM target differs from the requested complete bundle target.')
     if a.debian and TARGETS[a.target][2]!='apt':
         raise ValueError('A Fedora complete bundle requires its matching RPM artifacts.')
+    runtime_contract=python_runtime_contract(deb,a.target)
+    if a.target==NOBLE and deb.get('target')!=NOBLE:
+        raise ValueError('The Noble complete bundle requires its matching Noble packages.')
     package_names=[item['file'] for item in deb['artifacts']]
     package_files({'version':version,'packages':package_names,'sha256':{name:'checked below' for name in package_names}},a.target)
     for item in deb['artifacts']:
@@ -114,6 +117,7 @@ def main():
     manifest={'format':'augmentor-complete/1','artifactId':version+'-'+a.target+'-complete-preview.1-'+ref[:12],
               'version':version,'sourceCommit':ref,'sourceRefs':refs,'target':a.target,'components':components,'packages':package_names,
               'plugins':plugins,'browser':browser['artifact'],'extensionId':browser['extensionId'],'sha256':hashes}
+    if runtime_contract is not None:manifest.update(pythonRuntime=runtime_contract,candidateOnly=True)
     if source_bundle is not None:manifest['sourceSnapshotBundle']=source_bundle
     (out/'bundle.json').write_text(json.dumps(manifest,indent=2)+'\n');hashes['bundle.json']=sha(out/'bundle.json')
     (out/'SHA256SUMS').write_text(''.join(value+'  '+name+'\n' for name,value in sorted(hashes.items())))

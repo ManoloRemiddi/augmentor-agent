@@ -2,6 +2,29 @@
 
 # Start here: agent handoff
 
+## October 2 Noble package implementation checkpoint
+
+The rollout now adds an explicit private `ubuntu24.04-amd64` Debian/complete
+candidate. Its seven-wheel policy/cache and runtime contract are bound to both
+manifests; setup verifies the installed policy and completed repeat runs. The
+package declares Noble's system GI/credential/NumPy/Qt platform dependencies,
+refuses wrong hosts before maintenance writes, preserves upstream notice paths,
+and inventories all 266 wheel ELF members. Artifact review checks their bytes and
+supplementary notice collections without approving redistribution. Package and
+complete proofs now use the selected interpreter. A working-source package builds
+and the wrong-host refusal passes; fresh clean package/complete acceptance follows.
+Final source checks pass 672 native cases (two skips), 493 JavaScript cases
+(two skips), private-source boundary, version consistency and diff checks.
+Full compatibility and native-library release gates remain open. See
+[the checkpoint](LINUX-DISTRO-ROLLOUT.md#noble-package-and-complete-candidate).
+
+Hosted `547ac1d` macOS 14/26 passes. Linux stops in the SDK suite at the native Qt
+Branch fixture, before downstream packages: the fixture read old displayed
+messages before the queued child page arrived. Its correction waits for actual
+page delivery for Branch and Edit; three repeated real Qt/host tests pass. This
+does not turn the failed hosted run into a package or distro pass. Preserve the
+prior runtime proof/report's exact historical source scope.
+
 ## October 2 Noble runtime selection and CPU VAD checkpoint
 
 The autonomous Linux rollout continues. Published implementation `1c1c1ef` now

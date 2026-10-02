@@ -65,6 +65,13 @@ def identity(value):
     return hashlib.sha256(json.dumps(contract, sort_keys=True).encode()).hexdigest()
 
 
+def contract(value,policy_sha256):
+    return {'format':'augmentor-linux-python-runtime-contract/1','target':value['target'],
+            'profile':value['profile'],'pythonAbi':value['pythonAbi'],'architecture':value['architecture'],
+            'lockIdentity':identity(value),'policySha256':policy_sha256,
+            'licenseReviewComplete':False,'embeddedSourceCoverageComplete':False}
+
+
 def verify_wheels(value, wheelhouse):
     for row in value['wheels']:
         path = Path(wheelhouse)/row['file']

@@ -69,6 +69,9 @@ def verify_installed_payload(app, manifest):
         raise ValueError('The installed Augmentor release identity is missing or invalid. Install the matching bundle package before continuing.') from None
     if not isinstance(release,dict) or release.get('version')!=manifest['version'] or release.get('source')!={'commit':manifest['sourceCommit'],'dirty':False}:
         raise ValueError('The installed Augmentor package does not match this bundle source and version. Use the documented package/update workflow to install its matching payload before continuing; a same-version package may have been retained.')
+    if manifest.get('target')==distribution.NOBLE:
+        if release.get('target')!=distribution.NOBLE or release.get('pythonRuntime')!=manifest.get('pythonRuntime'):
+            raise ValueError('The installed Noble package differs from this complete bundle runtime contract.')
 
 
 def environment_value(value):
@@ -85,13 +88,17 @@ def service(command, home, credentials, python=None):
             '\nRestart=on-failure\nRestartSec=5\nUMask=0077\n\n[Install]\nWantedBy=default.target\n')
 
 
-def prepare_python(app, data, target):
+def prepare_python(app, data, target, runtime_contract=None):
     marker=app/'linux-python-runtime.json'
     if marker.exists() or marker.is_symlink():
         if marker.is_symlink():raise ValueError('Linux Python policy must be a regular artifact file.')
         runtime=load(app/'scripts/linux-python-runtime.py')
         value=runtime.policy(marker)
         if value['target']!=target:raise ValueError('The Python runtime policy differs from the bundle target.')
+        if target==distribution.NOBLE:
+            distribution.python_runtime_contract({'pythonRuntime':runtime_contract},target)
+            if runtime_contract!=runtime.contract(value,runtime.digest(marker)):
+                raise ValueError('The installed Python runtime policy differs from the complete bundle contract.')
         receipt=runtime.prepare(value,app/'python-wheels',runtime.runtime_store())
         return Path(receipt['python'])
     if target=='ubuntu24.04-amd64':raise ValueError('The Noble package lacks its required Python runtime policy.')
@@ -159,7 +166,16 @@ def install(args):
     stamp=state/'installation.json'
     record=json.loads(stamp.read_text()) if stamp.exists() else {}
     resumable=record.get('bundle')==manifest['artifactId'] and record.get('status')=='preparing'
-    if record.get('bundle')==manifest['artifactId'] and record.get('status')=='installed':return record
+    if record.get('bundle')==manifest['artifactId'] and record.get('status')=='installed':
+        if manifest.get('target')==distribution.NOBLE:
+            app=args.app_root.resolve()
+            verify_installed_payload(app,manifest)
+            runtime=load(app/'scripts/linux-python-runtime.py')
+            marker=app/'linux-python-runtime.json';value=runtime.policy(marker)
+            if manifest.get('pythonRuntime')!=runtime.contract(value,runtime.digest(marker)):
+                raise ValueError('The installed Python runtime policy differs from the complete bundle contract.')
+            runtime.resolve(app)
+        return record
     if (data/'desktop.json').exists() and not resumable:raise ValueError('An Augmentor desktop is already installed. Use its documented update/migration workflow; this wizard is for fresh users.')
     if (Path.home()/'.dsh').exists() and any((Path.home()/'.dsh').iterdir()):
         raise ValueError('An existing DSH installation was found. Follow the existing-installation migration guide; no profile or model was changed.')
@@ -195,7 +211,7 @@ def install(args):
         run(*package_plan['command'])
     app=args.app_root.resolve();node=app/'node/bin/node'
     verify_installed_payload(app,manifest)
-    python=prepare_python(app,data,manifest.get('target'))
+    python=prepare_python(app,data,manifest.get('target'),manifest.get('pythonRuntime'))
     runtime=data/'dsh-runtime';runtime.mkdir(parents=True,exist_ok=True)
     env={**os.environ,'AUGMENTOR_PYTHON':str(python),
          'PATH':str(node.parent)+':'+str(python.parent)+':'+os.environ.get('PATH','')}

@@ -6,7 +6,9 @@ The published complete preview targets **Debian 13, x86-64**. Desktop-control
 acceptance is scoped to KDE Plasma Wayland. The
 [Linux distribution rollout](LINUX-DISTRO-ROLLOUT.md) adds separate Ubuntu 26.04
 and Fedora 43/44 candidate bundles; their package adapters do not establish full
-desktop compatibility. Ubuntu 24.04/Mint need the planned managed Qt runtime.
+desktop compatibility. Ubuntu 24.04 now has a separate private qualification
+candidate with a verified managed Qt/Python runtime; its package/complete and
+native-library release gates are tracked in the rollout. Mint remains separate.
 macOS uses its own matched release artifacts and qualification.
 
 The active project is [augmentor-agent](https://github.com/ManoloRemiddi/augmentor-agent).
@@ -46,6 +48,15 @@ version against the complete bundle before creating a private DSH runtime or
 writing model credentials. Package managers may keep an older same-version
 payload; a mismatch stops setup with package/update guidance. An already completed
 installation keeps its repeat-run receipt and preservation behavior.
+
+The Ubuntu 24.04 candidate requires its exact seven-wheel runtime contract in
+both package and complete manifests. Its package carries a verified offline
+wheel cache; setup creates the immutable environment as the ordinary user before
+configuring DSH. Repeating completed setup verifies that environment without
+repairing it. The package pre-install hook refuses other distro versions and
+architectures. A Noble payload cannot be relabeled as a Fedora or system-Qt
+complete bundle. This candidate is not a public compatibility release; native
+binary license/source review, desktop and physical speech acceptance remain open.
 
 ## Included and configured
 

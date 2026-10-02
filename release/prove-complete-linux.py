@@ -75,7 +75,9 @@ def user_proof(bundle):
         dsh_home = data/'dsh-home'
         for plugin in ('dsh-resonant-voice', 'dsh-adaptive-reasoning', 'dsh-model-picker-augmented'):
             assert (dsh_home/'profiles/web/node_modules'/plugin/'package.json').is_file()
-        python = data/'python/bin/python'
+        desktop = json.loads((data/'desktop.json').read_text())
+        python = Path(desktop['python'])
+        os.environ['AUGMENTOR_PYTHON'] = str(python)
         run([python, '-m', 'augmentor_linux', '--preview', '--screenshot', home/'desktop.png'],
             env={**os.environ, 'PYTHONPATH': str(app/'apps/native')})
         assert (home/'desktop.png').stat().st_size > 10000
@@ -151,6 +153,9 @@ def user_proof(bundle):
                   'linuxAndBrowserRoleFixtureTurns': True, 'restartPreservesHistoryWithoutReplay': True,
                   'modelRequests': count, 'realDesktopSessionTested': False, 'graphicalBrowserTested': False,
                   'physicalVoiceTested': False, 'memoryEngineTested': False}
+        if manifest.get('pythonRuntime'):
+            report.update(pythonRuntime=manifest['pythonRuntime'], selectedPython=str(python),
+                          licenseReviewComplete=False, embeddedSourceCoverageComplete=False)
         (home/'complete-proof.json').write_text(json.dumps(report, indent=2)+'\n')
         print(json.dumps(report))
     finally:

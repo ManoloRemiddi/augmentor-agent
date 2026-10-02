@@ -18,6 +18,7 @@ for name,slot in [('session_info',window.session_changed),('selection_changed',w
                   ('connection',window.connection_changed),('problem',window.on_problem)]:
     getattr(controller,name).connect(slot)
 problems=[];controller.problem.connect(problems.append)
+pages=[];controller.page.connect(lambda *args:pages.append(args))
 window.set_models([{'provider':'fixture','model':'fixture','name':'Fixture'}]);window.show()
 
 def until(check):
@@ -40,8 +41,9 @@ try:
     until(lambda:controller.connected and len([r for r in window.messages if r[0]=='Augmentor'])==2)
     before=controller.client.call('session.history',{'sessionId':controller.session,'maxMessages':100})
     first=next(i for i,(role,_) in enumerate(window.messages) if role=='Augmentor')
+    page_count=len(pages)
     activate('branch',first)
-    until(lambda:controller.session!='native-fork-source' and not controller.navigating and controller.connected and window.send_button.isEnabled())
+    until(lambda:controller.session!='native-fork-source' and not controller.navigating and controller.connected and window.send_button.isEnabled() and len(pages)>page_count)
     branch=controller.session
     assert branch.startswith('augmentor-linux-codex-')
     assert not any('NATIVE_SOURCE_SECOND' in text for _,text in window.messages)
@@ -52,8 +54,9 @@ try:
     assert window.editing and window.composer.toPlainText()=='NATIVE_SOURCE_FIRST'
     window.composer.setPlainText('NATIVE_EDITED_FIRST')
     until(lambda:window.send_button.isEnabled())
+    page_count=len(pages)
     QTest.keyClick(window.composer,Qt.Key.Key_Return)
-    until(lambda:controller.session!=branch and not controller.running and not window.editing)
+    until(lambda:controller.session!=branch and not controller.running and not window.editing and len(pages)>page_count)
     until(lambda:any(role=='Augmentor' for role,_ in window.messages))
     edited=controller.session
     assert window.composer.toPlainText()=='RESTORED_DRAFT'

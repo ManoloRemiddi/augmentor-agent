@@ -8,6 +8,7 @@ require npm or fetch JavaScript dependencies. System Qt remains replaceable.
 import argparse
 import base64
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -18,8 +19,11 @@ import sys
 import tarfile
 import tempfile
 import urllib.request
-
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT/'scripts'))
+from linux_distribution import NOBLE
+from linux_debian import TARGETS,dependencies
+
 HEADER = '# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0\n'
 
 
@@ -100,9 +104,9 @@ def native_notices(app, configuration):
     write(app / 'licenses/native-components.json', json.dumps(components, indent=2) + '\n')
 
 
-def control(root, name, version, depends, description):
+def control(root, name, version, depends, description, target='debian13-amd64'):
     for hook in ('preinst','prerm','postinst','postrm'):
-        script=(ROOT/'release/debian-maintainer.py').read_text().replace('@COMPONENT@',name.removeprefix('augmentor-')).replace('@HOOK@',hook).replace('@VERSION@',version)
+        script=(ROOT/'release/debian-maintainer.py').read_text().replace('@COMPONENT@',name.removeprefix('augmentor-')).replace('@HOOK@',hook).replace('@VERSION@',version).replace('@TARGET@',target)
         write(root/'DEBIAN'/hook,script,True)
     write(root / 'DEBIAN/control', f'''Package: {name}
 Version: {version}
@@ -121,13 +125,25 @@ Description: {description}
           'Complete component notices: /usr/lib/augmentor/licenses/\n\n' + (ROOT / 'LICENSE').read_text())
 
 
-def build(output):
+def build(output,target='debian13-amd64',wheelhouse=None):
+    if target not in TARGETS:raise ValueError('Unsupported Debian package target.')
+    python_runtime=None;wheel_tool=None;value=None
+    if target==NOBLE:
+        if wheelhouse is None:raise ValueError('Noble requires its verified seven-wheel cache.')
+        spec=importlib.util.spec_from_file_location('packaged_linux_wheels',ROOT/'scripts/linux-wheel-inventory.py')
+        wheel_tool=importlib.util.module_from_spec(spec);spec.loader.exec_module(wheel_tool)
+        policy_path=ROOT/'release/ubuntu24.04-python-voice.json'
+        value=wheel_tool.runtime.policy(policy_path)
+        wheel_tool.runtime.verify_wheels(value,wheelhouse)
+        python_runtime=wheel_tool.runtime.contract(value,wheel_tool.runtime.digest(policy_path))
+    elif wheelhouse is not None:raise ValueError('This system-Qt target cannot embed the Noble wheel cache.')
     subprocess.run([sys.executable,str(ROOT/'scripts/sync-version.py'),'--check'],check=True)
     version = json.loads((ROOT / 'package.json').read_text())['version']
     product = json.loads((ROOT / 'release/product.json').read_text())
     source = {'commit':subprocess.check_output(['git','-c',f'safe.directory={ROOT}','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
               'dirty':bool(subprocess.check_output(['git','-c',f'safe.directory={ROOT}','status','--porcelain'],cwd=ROOT,text=True).strip())}
     configuration = json.loads((ROOT / 'release/runtime.json').read_text())
+    configuration['target']=target
     if not (ROOT / 'dist/runtime/src/main.js').exists():
         raise ValueError('Run npm run build before packaging')
     output.mkdir(parents=True, exist_ok=True)
@@ -137,13 +153,24 @@ def build(output):
         app = runtime / 'usr/lib/augmentor'
         subprocess.run([sys.executable, str(ROOT / 'scripts/stage-production.py'), '--out', str(app)], check=True)
         for name in ('dist', 'apps/native', 'apps/browser', 'scripts', 'services', 'adapters', 'config', 'docs', 'licenses', 'LICENSE', 'README.md', 'release/runtime.json', 'release/product.json'):
-            copy(ROOT / name, app / name)
+            if target==NOBLE and name=='licenses':
+                # Preserve recorded upstream notice paths, including test/tool
+                # attribution texts; application source exclusions do not apply.
+                shutil.copytree(ROOT/name,app/name,dirs_exist_ok=True)
+            else:copy(ROOT / name, app / name)
         for name in ('desktop-capabilities.json', 'desktop-capabilities.LICENSE'):
             copy(ROOT / 'release/dsh' / name, app / 'release/dsh' / name)
         node_runtime(app, configuration, cache)
         native_notices(app, configuration)
+        write(app/'release/runtime.json',json.dumps(configuration,indent=2)+'\n')
+        if python_runtime:
+            copy(policy_path,app/'linux-python-runtime.json')
+            # Store only the exact checked wheel files, never a builder venv.
+            for row in value['wheels']:copy(Path(wheelhouse)/row['file'],app/'python-wheels'/row['file'])
+            wheel_tool.stage(value,wheelhouse,app)
         write(app / 'release.json', json.dumps({**product,'source':source,'target': configuration['target'],
-                                               'node': configuration['node'], 'pi': configuration['pi']}, indent=2) + '\n')
+                                               'node': configuration['node'], 'pi': configuration['pi'],
+                                               **({'pythonRuntime':python_runtime,'candidateOnly':True} if python_runtime else {})}, indent=2) + '\n')
         launcher = '#!/bin/sh\n' + HEADER + 'export AUGMENTOR_PI_NODE=/usr/lib/augmentor/node/bin/node\nexport PI_TELEMETRY=0 PI_SKIP_VERSION_CHECK=1\n'
         lease='exec /usr/bin/python3 /usr/lib/augmentor/scripts/run-component.py runtime "$AUGMENTOR_PI_NODE" '
         write(runtime / 'usr/bin/augmentor-browser-host', launcher + lease + '/usr/lib/augmentor/apps/browser/native-host.mjs "$@"\n', True)
@@ -156,10 +183,11 @@ def build(output):
                     'type': 'stdio', 'allowed_origins': ['chrome-extension://' + identity + '/']}
         for directory in ('etc/chromium/native-messaging-hosts', 'etc/opt/chrome/native-messaging-hosts'):
             write(runtime / directory / 'com.augmentor.agent.json', json.dumps(manifest, indent=2) + '\n')
-        control(runtime, 'augmentor-runtime', version, 'python3 (>= 3.11), python3-yaml, python3-websocket, python3-keyring (>= 25.6), python3-secretstorage, gnome-keyring, libc6 (>= 2.36), libstdc++6', 'Augmentor runtime and Chromium companion')
+        runtime_depends,desktop_depends=dependencies(target,version)
+        control(runtime, 'augmentor-runtime', version, runtime_depends, 'Augmentor runtime and Chromium companion',target)
         write(desktop / 'usr/bin/augmentor-agent', launcher + 'exec /usr/lib/augmentor/scripts/augmentor-linux "$@"\n', True)
         write(desktop / 'usr/share/augmentor/desktop-version',version+'\n')
-        control(desktop, 'augmentor-desktop', version, f'augmentor-runtime (= {version}), python3-pyside6.qtcore (>= 6.8.2.1), python3-pyside6.qtgui, python3-pyside6.qtwidgets, python3-pyside6.qtnetwork, python3-pyside6.qtdbus, python3-pyside6.qtquick, python3-pyside6.qtquickwidgets, qml6-module-qtquick, qml6-module-qtqml, qml6-module-qtqml-models, qml6-module-qtqml-workerscript, libqt6svg6, qt6-svg-plugins, python3-gi, gir1.2-gtk-4.0, gir1.2-atspi-2.0, at-spi2-core, gir1.2-gstreamer-1.0, gstreamer1.0-pipewire, gstreamer1.0-plugins-base, python3-yaml, python3-websocket, python3-pygments (>= 2.18), python3-numpy (>= 1.24), fonts-dejavu-core, libglib2.0-bin, wmctrl', 'Augmentor Agent Desktop application')
+        control(desktop, 'augmentor-desktop', version, desktop_depends, 'Augmentor Agent Desktop application',target)
         write(desktop / 'usr/share/applications/com.augmentor.Agent.desktop', HEADER + '''[Desktop Entry]
 Type=Application
 Name=Augmentor Agent
@@ -183,12 +211,15 @@ StartupWMClass=Augmentor Agent
                            env={**os.environ, 'SOURCE_DATE_EPOCH': str(epoch)}, check=True)
             with artifact.open('rb') as stream: sha = hashlib.file_digest(stream, 'sha256').hexdigest()
             results.append({'file': artifact.name, 'sha256': sha, 'bytes': artifact.stat().st_size})
-        write(output / 'artifacts.json', json.dumps({'version': version, 'source':source,'target': configuration['target'], 'artifacts': results}, indent=2) + '\n')
+        write(output / 'artifacts.json', json.dumps({'version': version, 'source':source,'target': configuration['target'], 'artifacts': results,
+             **({'pythonRuntime':python_runtime,'candidateOnly':True} if python_runtime else {})}, indent=2) + '\n')
         print(json.dumps(results))
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--out', type=Path, default=ROOT / 'outputs/debian')
+    parser.add_argument('--target',choices=TARGETS,default='debian13-amd64')
+    parser.add_argument('--wheelhouse',type=Path,help='Exact verified Noble wheel cache; builds an unqualified candidate.')
     args = parser.parse_args()
-    build(args.out.resolve())
+    build(args.out.resolve(),args.target,args.wheelhouse.resolve() if args.wheelhouse else None)

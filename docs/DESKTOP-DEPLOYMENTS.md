@@ -135,8 +135,15 @@ explicit external dependencies and must be upgraded deliberately with validation
 
 For a Linux artifact declaring `linux-python-runtime.json`, staging selects the
 runtime belonging to that candidate's policy rather than inheriting a previous
-profile. The policy is retained in the immutable artifact inventory. Setup,
-startup registration, cold launch and promotion verify the external environment's
+profile. The policy is retained in the immutable artifact inventory.
+
+The Noble package and complete bundle also declare the policy file hash and lock
+identity in `pythonRuntime`. Setup checks both against the installed payload;
+even a completed installation receipt cannot bypass runtime verification.
+The package contains verified wheels, never a build-machine environment. This
+does not qualify coordinated DSH/runtime updates or clear release review gates.
+
+Setup, startup registration, cold launch and promotion verify the external environment's
 complete receipt/files/imports. The environment stays at its original private
 path; it is never copied, renamed or upgraded in place. Rollback retains both
 environments. Active Node helpers use receipt/configuration validation without

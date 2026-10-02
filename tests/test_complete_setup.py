@@ -8,6 +8,7 @@ import socket
 from pathlib import Path
 import tempfile
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -66,6 +67,41 @@ class CompleteSetupTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'differs from the bundle target'):
                 setup.prepare_python(app,app/'data','fedora44-x86_64')
             run.assert_not_called()
+
+    def test_noble_policy_hash_mismatch_cannot_prepare_runtime(self):
+        with tempfile.TemporaryDirectory() as directory:
+            app=Path(directory);marker=app/'linux-python-runtime.json'
+            marker.write_bytes((ROOT/'release/ubuntu24.04-python-voice.json').read_bytes())
+            runtime=setup.load(ROOT/'scripts/linux-python-runtime.py')
+            contract=runtime.contract(runtime.policy(marker),runtime.digest(marker))
+            contract['policySha256']='a'*64
+            with patch.object(setup,'load',return_value=runtime),patch.object(runtime,'prepare') as prepare:
+                with self.assertRaisesRegex(ValueError,'differs from the complete bundle contract'):
+                    setup.prepare_python(app,app/'data',setup.distribution.NOBLE,contract)
+                prepare.assert_not_called()
+            self.assertFalse((app/'data').exists())
+
+    def test_noble_installed_receipt_still_verifies_runtime_without_repair(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);app=root/'app';app.mkdir();state=root/'state/augmentor-install';state.mkdir(parents=True)
+            marker=app/'linux-python-runtime.json'
+            marker.write_bytes((ROOT/'release/ubuntu24.04-python-voice.json').read_bytes())
+            runtime=setup.load(ROOT/'scripts/linux-python-runtime.py')
+            contract=runtime.contract(runtime.policy(marker),runtime.digest(marker))
+            manifest={'version':'0.2.13','sourceCommit':'a'*40,'artifactId':'fixture',
+                      'target':setup.distribution.NOBLE,'pythonRuntime':contract}
+            (app/'release.json').write_text(json.dumps({'version':'0.2.13','source':{'commit':'a'*40,'dirty':False},
+                                                       'target':manifest['target'],'pythonRuntime':contract}))
+            stamp=state/'installation.json';stamp.write_text(json.dumps({'bundle':'fixture','status':'installed'}))
+            before=stamp.read_bytes()
+            args=SimpleNamespace(bundle=root,plan=False,skip_packages=True,app_root=app)
+            with patch.dict(os.environ,{'XDG_STATE_HOME':str(root/'state')}),patch.object(Path,'home',return_value=root),\
+                    patch.object(setup.os,'geteuid',return_value=1000),patch.object(setup,'verify_bundle',return_value=manifest),\
+                    patch.object(setup,'load',return_value=runtime),patch.object(runtime,'resolve',side_effect=ValueError('runtime corrupted')),\
+                    patch.object(runtime,'prepare') as prepare,patch.object(setup,'run') as run:
+                with self.assertRaisesRegex(ValueError,'runtime corrupted'):setup.install(args)
+                prepare.assert_not_called();run.assert_not_called()
+            self.assertEqual(stamp.read_bytes(),before)
 
     def test_same_version_old_or_dirty_payload_cannot_configure_new_bundle(self):
         manifest={'version':'0.2.13','sourceCommit':'a'*40}

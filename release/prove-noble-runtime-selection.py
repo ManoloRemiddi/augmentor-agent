@@ -60,7 +60,7 @@ def main():
     assert tool.resolve(app)==second['python']
     setup=load('noble_setup',app/'scripts/setup-complete.py')
     # Reuse has no network/pip command, and does not write credentials or a harness.
-    assert str(setup.prepare_python(app,data/'augmentor',speech['target']))==second['python']
+    assert str(setup.prepare_python(app,data/'augmentor',speech['target'],tool.contract(speech,tool.digest(app/'linux-python-runtime.json'))))==second['python']
     startup=load('noble_startup',ROOT/'scripts/install-desktop-startup.py')
     startup.install(base/'basic',first['python'],args.node,enable=False)
     deployment=load('noble_deployment',ROOT/'scripts/desktop-deployment.py')

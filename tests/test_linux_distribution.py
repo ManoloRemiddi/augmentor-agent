@@ -28,8 +28,13 @@ def manifest(target):
         names=[f'augmentor-agent-{version}-1.fc{release}.x86_64.rpm']
     else:
         names=[f'augmentor-{kind}_{version}_amd64.deb' for kind in ('runtime','desktop')]
-    return {'format':'augmentor-complete/1','target':target,'version':version,'components':{},
+    value = {'format':'augmentor-complete/1','target':target,'version':version,'components':{},
             'packages':names,'sha256':{name:hashlib.sha256(b'fixture').hexdigest() for name in names}}
+    if target==distro.NOBLE:
+        value['pythonRuntime']={'format':'augmentor-linux-python-runtime-contract/1','target':target,
+            'profile':'noble-cp312-x86_64-voice','pythonAbi':[3,12],'architecture':'x86_64',
+            'policySha256':'a'*64,'lockIdentity':'b'*64}
+    return value
 
 
 class DistributionPlans(unittest.TestCase):
@@ -48,7 +53,7 @@ class DistributionPlans(unittest.TestCase):
 
     def test_derivatives_older_releases_and_other_architectures_fail_closed(self):
         for info in ({'ID':'linuxmint','VERSION_ID':'22.3','ID_LIKE':'ubuntu debian'},
-                     {'ID':'ubuntu','VERSION_ID':'24.04'},{'ID':'debian','VERSION_ID':'12'},
+                     {'ID':'ubuntu','VERSION_ID':'22.04'},{'ID':'debian','VERSION_ID':'12'},
                      {'ID':'unknown','VERSION_ID':'44','ID_LIKE':'fedora'}):
             with self.subTest(info=info),self.assertRaises(ValueError):distro.host_target(info,'x86_64')
         with self.assertRaisesRegex(ValueError,'separately qualified'):distro.host_target({'ID':'fedora','VERSION_ID':'44'},'aarch64')
@@ -56,6 +61,16 @@ class DistributionPlans(unittest.TestCase):
     def test_wrong_bundle_target_is_refused_even_for_debian_related_hosts(self):
         with self.assertRaisesRegex(ValueError,'matching bundle'):
             distro.install_plan(manifest('debian13-amd64'),'/bundle',info={'ID':'ubuntu','VERSION_ID':'26.04'},machine='x86_64')
+
+    def test_noble_contract_is_required_and_cannot_cross_targets(self):
+        value=manifest(distro.NOBLE)
+        for key,replacement in [('profile','noble-cp312-x86_64'),('target','ubuntu26.04-amd64'),
+                                ('pythonAbi',[3,13]),('policySha256','unverified'),('architecture','aarch64')]:
+            with self.subTest(key=key):
+                broken={**value,'pythonRuntime':{**value['pythonRuntime'],key:replacement}}
+                with self.assertRaises(ValueError):distro.python_runtime_contract(broken,distro.NOBLE)
+        with self.assertRaises(ValueError):distro.python_runtime_contract({},distro.NOBLE)
+        with self.assertRaises(ValueError):distro.python_runtime_contract(value,'debian13-amd64')
 
     def test_legacy_debian_bundle_without_explicit_package_list_is_supported(self):
         value=manifest('debian13-amd64');value.pop('packages')

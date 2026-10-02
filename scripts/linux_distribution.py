@@ -8,10 +8,14 @@ No command is executed and no state is written by this module.
 from pathlib import Path
 import platform
 import shlex
+import re
+
+NOBLE='ubuntu24.04-amd64'
 
 TARGETS = {
     'debian13-amd64': ('debian', '13', 'apt', '.deb'),
     'ubuntu26.04-amd64': ('ubuntu', '26.04', 'apt', '.deb'),
+    NOBLE: ('ubuntu', '24.04', 'apt', '.deb'),
     'fedora43-x86_64': ('fedora', '43', 'dnf', '.rpm'),
     'fedora44-x86_64': ('fedora', '44', 'dnf', '.rpm'),
 }
@@ -72,6 +76,19 @@ def package_files(manifest, target):
     return sorted(files)
 
 
+def python_runtime_contract(manifest,target):
+    value=manifest.get('pythonRuntime')
+    if target!=NOBLE:
+        if value is not None:raise ValueError('This bundle target cannot use a Noble Python runtime.')
+        return None
+    if (not isinstance(value,dict) or value.get('format')!='augmentor-linux-python-runtime-contract/1'
+            or value.get('target')!=NOBLE or value.get('profile')!='noble-cp312-x86_64-voice'
+            or value.get('pythonAbi')!=[3,12] or value.get('architecture')!='x86_64'
+            or not all(isinstance(value.get(key),str) and re.fullmatch('[a-f0-9]{64}',value[key]) for key in ('policySha256','lockIdentity'))):
+        raise ValueError('The Noble bundle requires its complete verified Python runtime contract.')
+    return value
+
+
 def dependency_packages(target, *, voice=False, gpu=False, memory=False, memory_engine_present=False):
     manager = TARGETS[target][2]
     if manager == 'apt':
@@ -104,11 +121,12 @@ def install_plan(manifest, bundle, *, info=None, machine=None, voice=False, gpu=
     if gpu and not voice:
         raise ValueError('GPU speech requires voice provisioning.')
     files = package_files(manifest, target)
+    runtime=python_runtime_contract(manifest,target)
     dependencies = dependency_packages(target, voice=voice, gpu=gpu, memory=memory,memory_engine_present=memory_engine_present)
     manager = TARGETS[target][2]
     command = ['sudo', manager, 'install', '-y']
     command += [str(Path(bundle).resolve() / name) for name in files] + dependencies
-    return {'target': target, 'packageManager': manager, 'packages': files,
+    return {'target': target, 'packageManager': manager, 'packages': files, 'pythonRuntime':runtime,
             'dependencies': dependencies, 'command': command,
             'memoryEngine': 'docker' if memory else 'deferred',
             'installMemoryEngine': bool(memory and not memory_engine_present),

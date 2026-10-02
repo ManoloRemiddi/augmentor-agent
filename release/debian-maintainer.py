@@ -6,10 +6,17 @@ import json
 import os
 from pathlib import Path
 import sys
+import platform
 
 COMPONENT = '@COMPONENT@'
 HOOK = '@HOOK@'
 VERSION = '@VERSION@'
+PACKAGE_TARGET = '@TARGET@'
+action = sys.argv[1] if len(sys.argv) > 1 else ''
+if PACKAGE_TARGET=='ubuntu24.04-amd64' and HOOK=='preinst' and action in ('install','upgrade'):
+    fields=dict(row.split('=',1) for row in Path('/etc/os-release').read_text().splitlines() if '=' in row)
+    if (fields.get('ID','').strip('"'),fields.get('VERSION_ID','').strip('"'),platform.machine())!=('ubuntu','24.04','x86_64'):
+        raise SystemExit('This Augmentor candidate requires Ubuntu 24.04 x86-64; use the matching distro artifact.')
 directory=Path('/run/augmentor')
 directory.mkdir(mode=0o755,exist_ok=True)
 if directory.is_symlink() or not directory.is_dir() or directory.stat().st_uid!=0 or directory.stat().st_mode & 0o022:
@@ -64,7 +71,6 @@ def begin():
         if runtime_descriptor is not None:os.close(runtime_descriptor)
 
 
-action = sys.argv[1] if len(sys.argv) > 1 else ''
 if HOOK == 'preinst' and action in ('install', 'upgrade'):
     begin()
 elif HOOK == 'prerm' and action in ('remove', 'upgrade', 'deconfigure'):
