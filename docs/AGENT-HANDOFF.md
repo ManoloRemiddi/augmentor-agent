@@ -13,6 +13,10 @@ establish every application's GUI support or live Google Forms acceptance.
 Existing desktop consent, Stop, platform limits and document-target checks remain.
 Installed adoption must preserve compatible artifact versions and saved identity
 snapshots; the guide distinguishes extension reload from source publication.
+Implementation `dffa45c` is pushed in PR #31; the compatible installed Linux
+release is selected and DSH guidance reloaded with idle/readiness checks.
+Primary retains its draft and original UI process; extension file replacement
+is complete but loaded-worker reload remains pending. See the installed checkpoint.
 
 ## October 1 merge blockers: current main and separate Codex prerequisite
 

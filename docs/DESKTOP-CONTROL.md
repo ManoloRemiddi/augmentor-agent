@@ -121,3 +121,34 @@ and all unrelated code, with a complete directory backup before replacement.
 The loaded extension must be reloaded before its cached executor adopts changes.
 Public source is 0.2.13; do not copy that full extension over a 0.2.11 companion.
 Source publication, installed selection and running adoption are separate checks.
+
+### Installed Linux checkpoint
+
+Implementation `dffa45c` is pushed in PR #31. Mixed release
+`20261002-224825-07392208` is staged and selected through `augmentor-update`,
+artifact SHA-256
+`6394c68a74b45ba1f3a2acdb416594e9aca60a108f76f14f17b3938730ff2abc`,
+over prior artifact
+`ac681aadeea466f7ce280f5641e8c89ba01e216a299702de3f1de134886240b9`.
+Only persona/recovery configuration changed in this native artifact; installed
+0.2.11 UI/runtime/speech contracts are retained.
+
+Both DSH personal-preset identity references point to the new immutable release;
+other entries and saved soul snapshots were preserved, with private backups and
+updated preset ownership hashes. Before the controlled backend restart, the
+authenticated session list showed every listed chat idle. Afterwards, the model
+catalog returned seven provider groups, and primary/mobile reported online,
+model-ready, voice available and no restore error. An isolated invocation of
+the actual installed identity adapter verified that the new capability guidance
+is appended to an existing historical persona without rewriting its snapshot.
+No model-obedience claim follows from this composition proof.
+
+The native windows still run `20261002-160803-407ce464`; primary has a draft.
+They were not closed. This UI build difference does not prevent the separately
+reloaded DSH guidance from taking effect. Normal close/reopen adopts the selected
+UI root. The installed unpacked 0.2.11 extension has only `actions.mjs` replaced,
+with its complete previous directory retained for rollback. Manifest/version,
+extension identity and all other files match the previous install. Its loaded
+service worker still requires Reload in `chrome://extensions`: this Codex chat
+has in-app browser access but no connection to the user's installed Chromium.
+Mac installed adoption and live Google Forms verification remain untested.
