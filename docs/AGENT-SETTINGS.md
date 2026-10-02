@@ -73,7 +73,7 @@ retain their previous native policy and custom-tool behavior.
 
 ## Qualification — 2 October 2026
 
-Source: `feat/desktop-agent-settings`, based on `d91c520`. Implementation has not
+Implementation: `eef21cf` on `feat/desktop-agent-settings`, based on `d91c520`. Implementation has not
 been merged and awaits the owner's local acceptance.
 
 - Build and TypeScript checks pass.
@@ -96,3 +96,35 @@ Linux and macOS share the UI, file persistence and harness adapters. Both use
 POSIX file locks and atomic writes; no new OS adapter is required. No installed
 Mac app or real Mac desktop interaction was tested in this turn. Packaging and
 native dependency qualification on macOS remain acceptance work.
+
+## Installed Linux acceptance candidate
+
+Selected and running release: `20261002-105319-5bfc98af`, compatible product
+0.2.11, artifact `873d200b12f4b2d9cc4fe872e0a5c50d9364c44670010fdaa5f383410eae7f2e`.
+`augmentor-update stage` and `activate` passed the installed identity/import checks.
+Main Desktop and mobile were idle, with no drafts, and closed through their guarded
+maintenance calls before restarting their supervisors. Both now report this
+build, online with voice available and no pending update. Pi/Codex were not running;
+the next startup uses the selected artifact. No model request, GPU/model setting,
+voice placement or private conversation was changed as deployment evidence.
+
+The existing DSH global composition contains earlier customizations, so the full
+installer refused replacement before writing files. A narrow migration checked the
+ownership checksum of each personal `agent.cordis.yml`, backed up both files and
+`ownership.json` under the private DSH profile, replaced only its `persona` row
+with this release's identity adapter, and updated those two ownership hashes.
+Other rows, the Browser plugin and global composition were preserved. The idle
+`dsh-web.service` was restarted, and both product presets remain available. The
+full installer still requires a separately reviewed migration of the already edited
+global composition; this feature does not silently normalize it.
+
+Open the installed Desktop's menu → Settings to test Agent, Soul, Memory and More.
+Identity and Soul are shared by the two personal surfaces; access choices affect
+future chats. Live-provider responses to a customized Soul remain the owner's
+acceptance test. No merge has been performed.
+
+Rollback: select the prior artifact with `augmentor-update rollback`, restore the
+backed-up personal preset files and ownership metadata, and restart idle DSH and
+Desktop supervisors. New identity files remain private user data; rolling back the
+UI does not delete them. Keep the local test candidate and preset backups until
+acceptance is complete.
