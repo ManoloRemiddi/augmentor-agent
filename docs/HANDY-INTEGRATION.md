@@ -437,3 +437,21 @@ Desktop is `728aeb7782d2286c37c3f92c77cac39aaa3c610ec9aaa79658efa6304196c274`.
 Linux and Mac native component jobs pass. Both macOS product jobs pass the shared
 contracts and corrected Branch/Edit fixture and proceed to package qualification.
 The complete installer and physical acceptance boundaries above remain in force.
+
+### Qualified component and Mac product source
+
+At source `68ba303`, [Windows component qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37031939981/job/110920890421)
+passes in full, including strict private WebView profile cleanup. The Mac native
+component also passes; [macOS 14/26 development product qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37031939996)
+passes in full with both signed Desktop and Browser helper proofs, common
+contracts and managed first-run/service/engine checks. The owner's installed
+Linux Desktop/Mobile remain online, voice available, enabled/ready, no Handy tray
+and no standalone autostart. Actual current palette and animation are retained.
+
+The repeat Linux job stalls while installing build-time packages before restoring
+an already qualified native component. CI now restores and validates the exact
+component inventory first, installs only runtime libraries on an exact cache hit,
+and bounds package-network waits. Native compiler/toolchain/build/lint still run
+on a miss; every cache hit still runs the actual component lifecycle proof. No
+compiled code, runtime inventory or installed owner settings change in this CI
+follow-up. Hosted Linux/package completion remains required.
