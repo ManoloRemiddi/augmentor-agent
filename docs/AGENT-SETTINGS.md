@@ -15,12 +15,22 @@ Agent, Look, Voice and More remain the main navigation. Agent contains an editab
 name, image picker and the existing voice energy ring, vertically stacked rectangular
 Soul/Memory cards, and access for new chats. Look and Voice immediately open their
 complete existing forms inside the frame, with no intermediate landing page.
-More opens All settings with direct links for every old menu action: Appearance
-(colours/skins), Prompt library, model/agent setup, DSH browser access or model
-providers, Approval mode, Versions/updates, About/licenses and Quit. Mac browser
-extension setup is retained when available. Conversation, Connections/Home and
-Advanced keep the additional controls. There is no duplicate bottom Settings entry.
-Approval mode takes the user directly to the Agent access control.
+More opens All settings with direct links for Prompt library, Conversation,
+model/agent setup, DSH browser access or model providers, Connections/Home,
+Versions/updates, Advanced, About/licenses and Quit. Mac browser extension setup
+is retained when available. Look and Voice use their top tabs; access lives on
+Agent, so these are not repeated in More. There is no duplicate bottom Settings entry.
+
+The active page determines the temporary frame size; hidden editors cannot impose
+minimum dimensions on Agent, More or Connections. The Agent avatar and stacked
+Soul/Memory cards are compact. Larger forms such as Prompt library widen the same
+frame to fit their fields and actions, then returning to a short page narrows it.
+Available screen/touch bounds cap the frame, with button rows wrapping on narrow
+screens. Text editors soft-wrap without changing their stored text. Settings use
+one outer vertical scrollbar at the frame edge when the body genuinely needs it;
+Appearance's former nested scrollbar is flattened. Horizontal settings scrolling
+is disabled. Navigation SVGs follow the text foreground in normal and selected
+states, including theme changes.
 
 Settings forms are embedded child widgets, with their existing save/cancel and
 worker cleanup preserved. Busy operations that already refused dismissal still
@@ -198,3 +208,25 @@ chat size and reopening settings captures that new size for the next restoration
 The PR remains draft and unmerged pending the owner’s green light. Rollback through
 `augmentor-update rollback` now returns to initial settings release
 `20261002-111240-1618d51b`; no persona/preset rollback is needed for this UI revision.
+
+
+## Compact layout revision — 2 October 2026
+
+The owner requested shorter Agent cards, fewer duplicate links, fitting short
+pages and wider editors without horizontal scrolling. Shared source passes 628
+native cases (626 passed, two Mac-only skips). Eighteen real-window overlay checks
+include five new layout cases: short pages after large editors, Prompt library
+width and action visibility, the single outer scrollbar/gutter, SVG foreground
+pixels for every selected tab in dark/light themes, and action wrapping within a
+420-pixel screen. Synthetic native renders of Agent, More, Connections, Prompt
+library and Look were inspected. Existing draft/Stop, lifecycle, Soul conflict and
+exact geometry restoration checks remain. Runtime behavior is unchanged; the Node
+qualification above remains historical.
+
+The compatible candidate retains installed product 0.2.11 artifact
+`f077cb698826852028a4828aae012aa38e85d8f6750d94c319924a538fbf951e`, overlays
+only the authored settings component and window methods, and passes 28 focused
+cases (26 passed, two explicit source-only app-sizing skips). Installed dependencies,
+backends, speech and unrelated native improvements are preserved. Common Mac UI
+checks run on Linux; installed Mac acceptance remains unverified. The feature
+continues in draft PR #29 pending owner acceptance.

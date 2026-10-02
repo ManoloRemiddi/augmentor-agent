@@ -2,7 +2,19 @@
 
 # Start here: agent handoff
 
-## 2 October: Desktop settings feature branch, awaiting owner acceptance
+## 2 October: Compact Desktop settings refinement
+
+The latest [settings layout](AGENT-SETTINGS.md#compact-layout-revision--2-october-2026)
+shrinks Agent/Soul/Memory, removes repeated Look/Voice/access entries from More,
+sizes only the active page, widens large editors and wraps actions on narrow
+screens. Appearance uses one outer scrollbar at the frame edge; selected SVGs
+match their text in both themes. Shared native qualification: 628 cases, 626 pass,
+two Mac-only skips. Compatible product 0.2.11 candidate: 28 focused cases, 26 pass,
+two source-only sizing skips. The previous installed release below is the baseline;
+installation/ref identity follows after immutable activation. Draft PR #29 remains
+unmerged pending the owner's local acceptance.
+
+## Previous frame-overlay checkpoint (historical)
 
 See [Desktop agent settings](AGENT-SETTINGS.md). Tested source `3f2837b` plus
 `0481143` on `feat/desktop-agent-settings` uses direct three-dot entry, embedded

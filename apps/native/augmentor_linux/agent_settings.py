@@ -5,10 +5,10 @@ import importlib.util
 import sys
 from pathlib import Path
 from PySide6.QtCore import Signal, Qt, QTimer, QSize, QRectF, QByteArray, QBuffer, QIODevice
-from PySide6.QtGui import QColor, QIcon, QPainter, QPainterPath, QImageReader, QPixmap
+from PySide6.QtGui import QColor, QIcon, QPalette, QPainter, QPainterPath, QImageReader, QPixmap
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
     QPushButton, QLineEdit, QComboBox, QPlainTextEdit, QTextBrowser, QTabWidget,
-    QScrollArea, QStackedWidget, QFileDialog, QCheckBox, QSizePolicy)
+    QScrollArea, QStackedLayout, QFileDialog, QCheckBox, QSizePolicy, QLayout, QGridLayout, QBoxLayout, QTextEdit)
 from .ui_scale import scaled, px
 from .voice_button import paint_energy_ring
 from .settings_icons import settings_icon
@@ -22,11 +22,40 @@ def identity_store():
     return module
 
 
-class PageStack(QStackedWidget):
-    def minimumSizeHint(self):
-        return self.currentWidget().minimumSizeHint() if self.currentWidget() else super().minimumSizeHint()
+class CurrentPageLayout(QStackedLayout):
+    def minimumSize(self):
+        page=self.currentWidget()
+        return page.minimumSizeHint().expandedTo(page.minimumSize()) if page else QSize(0,0)
     def sizeHint(self):
-        return self.currentWidget().sizeHint() if self.currentWidget() else super().sizeHint()
+        return self.currentWidget().sizeHint() if self.currentWidget() else QSize(0,0)
+    def hasHeightForWidth(self):
+        # The scroll area must allow flexible lists/editors to shrink; Qt's
+        # generic height-for-width uses their preferred (rather than minimum) size.
+        return False
+    def heightForWidth(self,width):
+        page=self.currentWidget()
+        return page.layout().minimumHeightForWidth(width) if page else -1
+
+
+class PageStack(QWidget):
+    currentChanged=Signal(int)
+    def __init__(self):
+        super().__init__();self.pages=CurrentPageLayout(self)
+        self.pages.setContentsMargins(0,0,0,0)
+        self.pages.setSizeConstraint(QLayout.SizeConstraint.SetNoConstraint)
+        self.pages.currentChanged.connect(self.currentChanged)
+    def addWidget(self,page):return self.pages.addWidget(page)
+    def removeWidget(self,page):self.pages.removeWidget(page)
+    def currentWidget(self):return self.pages.currentWidget()
+    def setCurrentWidget(self,page):self.pages.setCurrentWidget(page)
+    def minimumSizeHint(self):return self.pages.minimumSize()
+    def sizeHint(self):return self.pages.sizeHint()
+
+
+class SettingsStatus(QLabel):
+    def setText(self,text):
+        super().setText(text);self.setVisible(bool(text))
+    def clear(self):self.setText('')
 
 
 class AgentAvatar(QPushButton):
@@ -34,7 +63,7 @@ class AgentAvatar(QPushButton):
         super().__init__()
         self.setAutoDefault(False)
         self.owner = owner; self.phase = 0.; self.image = QPixmap()
-        scaled(self).setFixedSize(96,96)
+        scaled(self).setFixedSize(64,64)
         self.setAccessibleName('Change agent image'); self.setToolTip('Change agent image')
         self.setStyleSheet('border:0;background:transparent;')
         self.motion = QTimer(self); self.motion.setInterval(40); self.motion.timeout.connect(self.advance)
@@ -74,28 +103,29 @@ class AgentAvatar(QPushButton):
 
 class SettingsPanel(QWidget):
     closed = Signal()
+    size_requested = Signal(int,int)
     def __init__(self, window):
         super().__init__(window); self.owner = window; self.store = identity_store(); self.pages = {}; self.shortcuts = None; self.closing = False
-        self.editor = None; self.editor_page = None; self.editor_return = 'all'; self.leaving_editor = False
+        self.editor = None; self.editor_page = None; self.editor_return = 'all'; self.leaving_editor = False; self.editor_width = 0; self.editor_height = 0
         self.setObjectName('agentSettings'); self.setAccessibleName('Your agent settings')
-        outer = QVBoxLayout(self); outer.setContentsMargins(px(self,18),px(self,14),px(self,18),px(self,14)); outer.setSpacing(px(self,12))
-        header = QHBoxLayout()
+        outer = QVBoxLayout(self); scaled(outer).setContentsMargins(6,12,6,12); scaled(outer).setSpacing(8)
+        header = QHBoxLayout(); scaled(header).setContentsMargins(12,0,12,0)
         back = QPushButton('‹  Back to chat'); back.setObjectName('settings-back'); back.clicked.connect(self.accept); header.addWidget(back)
         self.stop = QPushButton('Stop'); self.stop.clicked.connect(lambda:self.owner.controller.stop()); header.addWidget(self.stop)
         hide = QPushButton('Hide'); hide.clicked.connect(self.owner.hide); header.addWidget(hide); outer.addLayout(header)
         self.update_activity()
-        navigation = QHBoxLayout(); scaled(navigation).setSpacing(4); self.nav = {}
+        navigation = QHBoxLayout(); scaled(navigation).setSpacing(4); scaled(navigation).setContentsMargins(12,0,12,0); self.nav = {}
         for text, page in [('Agent','agent'),('Look','appearance'),('Voice','voice'),('More','all')]:
             button = QPushButton(text); button.setAutoDefault(False); button.setIcon(settings_icon({'agent':'memory','appearance':'appearance','voice':'voice','all':'harness'}[page],window.accent)); button.setCheckable(True); button.setAccessibleName(text+' settings')
             scaled(button).setStyleSheet('padding:7px 4px;font-size:12px;'); scaled(button).setIconSize(QSize(14,14))
-            button.setProperty('settingsIcon',button.icon())
+            button.setProperty('settingsIconName',{'agent':'memory','appearance':'appearance','voice':'voice','all':'harness'}[page])
             button.clicked.connect(lambda _=False,p=page:self.open_appearance() if p=='appearance' else self.open_voice() if p=='voice' else self.show_page(p)); navigation.addWidget(button); self.nav[page]=button
         outer.addLayout(navigation)
-        scroll = QScrollArea(); self.scroll = scroll; scroll.setWidgetResizable(True); scroll.setFrameShape(QScrollArea.Shape.NoFrame)
-        self.stack = PageStack(); self.stack.currentChanged.connect(self.stack.updateGeometry); scroll.setWidget(self.stack); outer.addWidget(scroll)
-        self.feedback = QLabel(); self.feedback.setWordWrap(True); self.feedback.setAccessibleName('Settings status'); outer.addWidget(self.feedback)
+        scroll = QScrollArea(); self.scroll = scroll; scroll.setWidgetResizable(True); scroll.setFrameShape(QScrollArea.Shape.NoFrame); scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.stack = PageStack(); self.stack.layout().setSizeConstraint(QLayout.SizeConstraint.SetNoConstraint); self.stack.setMinimumSize(0,0); self.stack.currentChanged.connect(self.stack.updateGeometry); scroll.setWidget(self.stack); self.stack.setAutoFillBackground(False); scroll.viewport().setAutoFillBackground(False); outer.addWidget(scroll)
+        self.feedback = SettingsStatus(); self.feedback.hide(); self.feedback.setWordWrap(True); self.feedback.setAccessibleName('Settings status'); outer.addWidget(self.feedback)
         self.exit_choices = QWidget(); choices = QHBoxLayout(self.exit_choices); choices.setContentsMargins(0,0,0,0)
-        for text,callback in [('Save & return',self.save_and_return),('Discard & return',self.discard_and_return),('Keep editing',self.keep_editing)]:
+        for text,callback in [('Save',self.save_and_return),('Discard',self.discard_and_return),('Keep editing',self.keep_editing)]:
             button = QPushButton(text.replace('&','&&')); button.clicked.connect(callback); choices.addWidget(button)
         outer.addWidget(self.exit_choices); self.exit_choices.hide()
         try: self.identity = self.store.profile()
@@ -103,17 +133,49 @@ class SettingsPanel(QWidget):
         self.show_page('agent')
 
     def resizeEvent(self,event):
-        super().resizeEvent(event)
+        super().resizeEvent(event);self.sync_navigation()
+
+    def sync_navigation(self):
         for button in getattr(self,'nav',{}).values():
-            button.setIcon(QIcon() if self.width()<px(self,300) else button.property('settingsIcon'))
+            colour=QColor(self.owner.background) if button.isChecked() and hasattr(self.owner,'background') else self.owner.palette().color(QPalette.ColorRole.WindowText)
+            icon=settings_icon(button.property('settingsIconName'),colour)
+            button.setIcon(QIcon() if self.isVisible() and self.width()<px(self,300) else icon)
+
+    def request_fit(self):
+        # SetNoConstraint prevents hidden QStackedWidget pages from imposing their
+        # minimum sizes on short views. Only the active page determines the frame.
+        page=self.stack.currentWidget()
+        if not page or self.closing:return
+        page.ensurePolished();page.layout().activate()
+        margin=2*self.owner.activity.margin if hasattr(self.owner,'activity') else 0
+        chrome=self.layout().contentsMargins();gutter=px(self,12)
+        width=max(px(self,450),page.minimumSizeHint().width()+chrome.left()+chrome.right()+gutter+margin)
+        if self.editor:width=max(width,self.editor_width+px(self,24)+chrome.left()+chrome.right()+gutter+margin)
+        area=self.owner.screen().availableGeometry()
+        available_width=min(area.width(),self.owner.touch_layout.viewport[0]) if getattr(self.owner,'touch_layout',None) else area.width()
+        width=min(width,available_width)
+        content_width=width-margin-chrome.left()-chrome.right()-gutter
+        height=page.layout().totalHeightForWidth(content_width)
+        if height<0:height=page.sizeHint().height()
+        if self.editor:
+            height=max(page.minimumSizeHint().height(),self.editor_height)
+        # Header and tabs stay visible while the body gets one vertical scrollbar.
+        extras=chrome.top()+chrome.bottom()+margin
+        for i in range(self.layout().count()):
+            item=self.layout().itemAt(i)
+            if item.widget() is self.scroll:continue
+            widget=item.widget()
+            if widget and widget.isHidden():continue
+            extras+=item.sizeHint().height()+self.layout().spacing()
+        self.size_requested.emit(width,max(px(self,364),min(height+extras+px(self,8),px(self,760),area.height()-px(self,24))))
+        self.scroll.verticalScrollBar().setValue(0)
 
     def background(self, work, callback):
         self.owner.call_in_background(work,lambda result:callback(result) if not self.closing else None)
 
     def make_page(self, title=None, subtitle=None, back='all'):
-        page = QWidget(); layout = QVBoxLayout(page); layout.setContentsMargins(0,0,0,0); layout.setSpacing(px(self,12))
+        page = QWidget(); layout = QVBoxLayout(page); scaled(layout).setContentsMargins(12,0,12,8); scaled(layout).setSpacing(8)
         if title:
-            button = QPushButton('‹  Your agent' if back=='agent' else '‹  All settings'); button.clicked.connect(lambda:self.show_page(back)); layout.addWidget(button)
             heading = QLabel(title); scaled(heading).setStyleSheet('font-size:22px;font-weight:600;'); layout.addWidget(heading)
         if subtitle:
             note = QLabel(subtitle); note.setWordWrap(True); layout.addWidget(note)
@@ -132,24 +194,22 @@ class SettingsPanel(QWidget):
             self.pages[name]=page; self.stack.addWidget(page)
         self.stack.setCurrentWidget(self.pages[name]); self.feedback.clear()
         for key,button in self.nav.items(): button.setChecked(key==name or (key=='all' and name in ('conversation','connections','advanced')))
-        self.avatar.sync_motion()
+        self.avatar.sync_motion();self.sync_navigation();QTimer.singleShot(0,self.request_fit)
 
     def page_agent(self):
         page, layout = self.make_page()
         self.avatar = AgentAvatar(self.owner); self.avatar.clicked.connect(self.change_image); layout.addWidget(self.avatar,0,Qt.AlignmentFlag.AlignHCenter)
         self.name = QLineEdit((self.identity or {}).get('name','Augmentor')); self.name.setAccessibleName('Agent name'); self.name.setMaxLength(80); self.name.setAlignment(Qt.AlignmentFlag.AlignCenter); self.name.setSizePolicy(QSizePolicy.Policy.Ignored,QSizePolicy.Policy.Fixed)
-        scaled(self.name).setStyleSheet('font-size:22px;font-weight:600;padding:8px;'); layout.addWidget(self.name)
+        scaled(self.name).setStyleSheet('font-size:20px;font-weight:600;padding:6px;'); layout.addWidget(self.name)
         self.name.editingFinished.connect(self.save_name)
         self.avatar.set_image((self.identity or {}).get('avatar',''))
-        self.default_image=self.action(layout,'Use the default energy ring',self.reset_image,'reset-avatar'); self.default_image.setVisible(bool((self.identity or {}).get('avatar')))
+        self.default_image=self.action(layout,'Reset image',self.reset_image,'reset-avatar'); self.default_image.setVisible(bool((self.identity or {}).get('avatar')))
         connection=QLabel('Connected' if getattr(self.owner.controller,'online',False) else 'Not connected'); connection.setAlignment(Qt.AlignmentFlag.AlignCenter); layout.addWidget(connection)
-        subtitle = QLabel('Make it yours'); scaled(subtitle).setStyleSheet('font-size:18px;font-weight:600;'); layout.addWidget(subtitle)
-        note = QLabel('Choose how your agent behaves and see what it remembers.'); note.setWordWrap(True); layout.addWidget(note)
         for title,sub,link,destination,color in [('Soul','How I behave','Edit instructions  ↗','soul','#9d234f'),('Memory','What I know about you','View memory  ↗','memory','#235d82')]:
-            button = self.action(layout,title+'\n'+sub+'\n\n'+link,lambda _=False,p=destination:self.show_page(p),destination+'-card')
+            button = self.action(layout,title+'\n'+sub+'   ›',lambda _=False,p=destination:self.show_page(p),destination+'-card')
             button.setSizePolicy(QSizePolicy.Policy.Ignored,QSizePolicy.Policy.Preferred)
-            scaled(button).setMinimumHeight(120)
-            scaled(button).setStyleSheet(f'QPushButton {{text-align:left;padding:16px 20px;border:0;border-radius:18px;background:{color};color:#ffffff;font-size:15px;}} QPushButton:hover {{background:{QColor(color).lighter(115).name()};}} QPushButton:focus {{border:2px solid {QColor(self.owner.accent).name()};}}')
+            scaled(button).setFixedHeight(72)
+            scaled(button).setStyleSheet(f'QPushButton {{text-align:left;padding:10px 16px;border:0;border-radius:14px;background:{color};color:#ffffff;font-size:15px;}} QPushButton:hover {{background:{QColor(color).lighter(115).name()};}} QPushButton:focus {{border:2px solid {QColor(self.owner.accent).name()};}}')
         layout.addWidget(QLabel('Agent access'))
         self.access = QComboBox(); self.access.setAccessibleName('Agent access')
         for text,value in [('Full access','danger-full-access'),('Ask before actions','workspace-write'),('Read only','read-only')]: self.access.addItem(text,value)
@@ -171,7 +231,7 @@ class SettingsPanel(QWidget):
         index = self.access.findData(value.get('value',{}).get('defaultPreset'))
         if index<0: self.access_note.setText('This connection uses a policy that cannot be edited here.'); return
         self.access.setCurrentIndex(index); self.access.setEnabled(True)
-        self.access_note.setText('Applies to new chats. Existing chats keep their access level.')
+        self.access_note.setText('Applies to new chats. Existing access stays unchanged.'); QTimer.singleShot(0,self.request_fit)
 
     def save_access(self, _=None):
         value = self.access.currentData(); descriptor = self.permission; self.access.setEnabled(False)
@@ -187,7 +247,7 @@ class SettingsPanel(QWidget):
         if not self.identity: return False
         try: self.identity=self.store.save_profile(name,avatar,self.identity['revision'])
         except Exception as error: self.feedback.setText(str(error)); return False
-        self.avatar.set_image(self.identity['avatar']); self.default_image.setVisible(bool(self.identity['avatar'])); self.feedback.setText('Agent identity saved.'); return True
+        self.avatar.set_image(self.identity['avatar']); self.default_image.setVisible(bool(self.identity['avatar'])); self.feedback.setText('Agent identity saved.'); QTimer.singleShot(0,self.request_fit); return True
 
     def save_name(self):
         if self.identity and self.name.text().strip()!=self.identity['name']:
@@ -272,12 +332,10 @@ class SettingsPanel(QWidget):
     def page_all(self):
         page,layout=self.make_page('All settings','Choose what you’d like to adjust.','agent')
         from .panels import UpdatesDialog, LicensesDialog
-        entries=[('Appearance',self.open_appearance),('Voice',self.open_voice),
-                 ('Prompt library',self.open_prompts),('Conversation',lambda:self.show_page('conversation')),
+        entries=[('Prompt library',self.open_prompts),('Conversation',lambda:self.show_page('conversation')),
                  ('Agent setup' if getattr(self.owner.controller,'harness','dsh')=='dsh' else 'Connect a model',self.open_setup),
                  ('Open DSH in browser' if getattr(self.owner.controller,'harness','dsh')=='dsh' else 'Models && providers',self.open_models),
                  ('Connections && Home',lambda:self.show_page('connections')),
-                 ('Approval mode',self.open_access),
                  ('Versions && updates',lambda:self.open_editor('Versions & updates',lambda:UpdatesDialog(self.owner))),
                  ('Advanced',lambda:self.show_page('advanced')),
                  ('About && licenses',lambda:self.open_editor('About & licenses',lambda:LicensesDialog(self.owner)))]
@@ -317,9 +375,11 @@ class SettingsPanel(QWidget):
         page,layout=self.make_page(title,back=back)
         # Reuse the established form and its lifecycle as a child widget. Never
         # show/exec a top-level settings dialog or run a nested modal loop.
+        self.editor_width=max(dialog.width(),dialog.minimumSizeHint().width()); self.editor_height=dialog.height()+px(self,40)
         dialog.setParent(page,Qt.WindowType.Widget)
         dialog.setWindowModality(Qt.WindowModality.NonModal)
         dialog.setModal(False)
+        self.prepare_editor(dialog)
         scaled(dialog).setMinimumSize(0,0)
         layout.addWidget(dialog)
         self.editor=dialog; self.editor_page=page; self.editor_return=back
@@ -327,7 +387,42 @@ class SettingsPanel(QWidget):
         self.stack.addWidget(page); self.stack.setCurrentWidget(page); dialog.show()
         self.feedback.clear()
         for key,button in self.nav.items():button.setChecked(key==('appearance' if title=='Appearance' else 'voice' if title=='Voice' else 'all'))
-        self.avatar.sync_motion()
+        self.avatar.sync_motion();self.sync_navigation();QTimer.singleShot(0,self.request_fit)
+
+    def prepare_editor(self,dialog):
+        for button in dialog.findChildren(QPushButton):
+            if button.text().replace('&','') in ('Done','Close'):button.hide()
+        if dialog.__class__.__name__=='PromptLibraryDialog':
+            scaled(dialog.list).setMinimumHeight(96)
+            scaled(dialog.content).setMinimumHeight(128)
+        # Appearance's legacy nested scroll area becomes part of the single
+        # settings body; text editors retain their own vertical content scrolling.
+        if dialog.__class__.__name__=='AppearanceDialog':
+            layout=dialog.layout()
+            for i in range(layout.count()):
+                scroll=layout.itemAt(i).widget()
+                if isinstance(scroll,QScrollArea):
+                    content=scroll.takeWidget();layout.removeWidget(scroll);layout.insertWidget(i,content);scroll.hide();scroll.deleteLater();break
+        for widget in dialog.findChildren(QTextEdit)+dialog.findChildren(QPlainTextEdit):
+            widget.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+            widget.setLineWrapMode(widget.LineWrapMode.WidgetWidth)
+        # On screens narrower than a form's action row, wrap its existing buttons
+        # without changing actions, keyboard focus or editor contents.
+        width=self.owner.screen().availableGeometry().width()
+        if getattr(self.owner,'touch_layout',None):width=min(width,self.owner.touch_layout.viewport[0])
+        available=max(px(self,128),width-px(self,160))
+        for row in dialog.findChildren(QHBoxLayout):
+            buttons=[row.itemAt(i).widget() for i in range(row.count())]
+            parent=row.parent()
+            if len(buttons)<3 or not all(isinstance(b,QPushButton) for b in buttons) or not isinstance(parent,QBoxLayout) or row.minimumSize().width()<=available:continue
+            index=next((i for i in range(parent.count()) if parent.itemAt(i).layout() is row),None)
+            if index is None:continue
+            columns=max(1,min(len(buttons),available//max(b.minimumSizeHint().width()+px(self,8) for b in buttons)))
+            holder=QWidget();grid=QGridLayout(holder)
+            scaled(grid).setContentsMargins(0,0,0,0)
+            for i,button in enumerate(buttons):row.removeWidget(button);grid.addWidget(button,i//columns,i%columns)
+            parent.takeAt(index);parent.insertWidget(index,holder);row.deleteLater()
+        self.editor_width=min(self.editor_width,max(available,dialog.minimumSizeHint().width()))
 
     def editor_finished(self,*_):
         if self.leaving_editor: return
@@ -339,7 +434,7 @@ class SettingsPanel(QWidget):
         if self.editor_page:
             self.stack.removeWidget(self.editor_page)
             self.editor_page.deleteLater()
-        self.editor=None; self.editor_page=None
+        self.editor=None; self.editor_page=None; self.editor_width=0; self.editor_height=0
 
     def leave_editor(self):
         if not self.editor: return True

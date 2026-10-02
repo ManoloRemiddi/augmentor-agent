@@ -7,7 +7,7 @@ import unittest
 from unittest.mock import patch
 from PySide6.QtCore import Qt, QRect, QCoreApplication, QEvent
 from PySide6.QtTest import QTest
-from PySide6.QtWidgets import QApplication, QDialog, QPushButton
+from PySide6.QtWidgets import QApplication, QDialog, QPushButton, QScrollArea
 from augmentor_linux.window import Window
 from augmentor_linux.agent_settings import identity_store
 from augmentor_linux.voice_settings import VoiceSettingsDialog
@@ -73,8 +73,9 @@ class OverlayTests(unittest.TestCase):
     def test_more_preserves_all_previous_menu_actions(self):
         p=self.open();p.show_page('all')
         labels={b.text().replace('&','').strip().removesuffix('    ›') for b in p.pages['all'].findChildren(QPushButton)}
-        for label in ('Appearance','Prompt library','Agent setup','Open DSH in browser','Versions  updates','Approval mode','About  licenses','Quit Augmentor'):
+        for label in ('Prompt library','Agent setup','Open DSH in browser','Versions  updates','About  licenses','Quit Augmentor'):
             self.assertIn(label,labels)
+        self.assertNotIn('Appearance',labels);self.assertNotIn('Voice',labels);self.assertNotIn('Approval mode',labels)
         p.access.setEnabled(True);p.open_access();self.app.processEvents();self.assertIs(p.stack.currentWidget(),p.pages['agent']);self.assertTrue(p.access.hasFocus())
 
     def test_escape_and_main_window_close_keep_unsaved_soul_until_inline_decision(self):
@@ -157,3 +158,68 @@ class OverlayTests(unittest.TestCase):
         with patch('sys.excepthook',lambda *error:errors.append(error)):
             w.completed.emit(callbacks[0],{'version':'Synthetic late result'})
         self.assertEqual(errors,[]);w.controller=None
+
+    def settle(self):
+        for _ in range(5):self.app.processEvents()
+
+    def test_compact_root_pages_fit_without_scrolling_after_larger_pages(self):
+        p=self.open()
+        for theme in ('dark','light'):
+            self.window.apply_appearance({'theme':theme});p.open_appearance();self.settle()
+            for name in ('connections','agent','all','soul','connections','agent'):
+                p.show_page(name);self.settle()
+                self.assertEqual(p.scroll.horizontalScrollBar().maximum(),0,name)
+                self.assertEqual(p.scroll.verticalScrollBar().maximum(),0,name)
+                if name in ('agent','all','connections'):self.assertLess(self.window.height(),650)
+            p.receive_access(({'revision':1,'value':{'defaultPreset':'danger-full-access'}},None));self.settle()
+            self.assertEqual(p.scroll.verticalScrollBar().maximum(),0)
+            self.assertTrue(p.access.isVisible());self.assertLessEqual(p.access.mapTo(p.scroll.viewport(),p.access.rect().bottomRight()).y(),p.scroll.viewport().height())
+
+    def test_prompt_library_grows_wider_with_visible_actions_and_restores_narrow_pages(self):
+        p=self.open();narrow=self.window.width();p.open_prompts();self.settle()
+        self.assertIsNotNone(p.editor);self.assertGreater(self.window.width(),narrow)
+        self.assertEqual(p.scroll.horizontalScrollBar().maximum(),0);self.assertEqual(p.scroll.verticalScrollBar().maximum(),0)
+        for button in p.editor.findChildren(QPushButton):
+            if button.isVisible():
+                position=button.mapTo(p.scroll.viewport(),button.rect().bottomRight())
+                self.assertLess(position.x(),p.scroll.viewport().width(),button.text())
+                self.assertLess(position.y(),p.scroll.viewport().height(),button.text())
+        p.editor.content.setPlainText('Synthetic long unbroken text '+('x'*2000));self.settle()
+        self.assertEqual(p.editor.content.horizontalScrollBar().maximum(),0)
+        p.editor.tabs.setCurrentIndex(1);self.settle();self.assertEqual(p.scroll.horizontalScrollBar().maximum(),0)
+        p.show_page('connections');self.settle();self.assertEqual(self.window.width(),narrow)
+        self.assertEqual(p.scroll.verticalScrollBar().maximum(),0)
+
+    def test_scroll_gutter_is_at_frame_edge_and_appearance_has_no_nested_scroll_area(self):
+        p=self.open();p.open_appearance();self.settle()
+        scrollbars=[s for s in p.findChildren(QScrollArea) if s.isVisible()]
+        self.assertEqual(scrollbars,[p.scroll]);self.assertGreater(p.scroll.verticalScrollBar().maximum(),0)
+        bar=p.scroll.verticalScrollBar();right=bar.mapTo(self.window,bar.rect().bottomRight()).x()
+        self.assertLessEqual(self.window.surface_rect().right()-right,8)
+        self.assertGreater(bar.mapTo(self.window,bar.rect().topLeft()).x(),p.scroll.viewport().mapTo(self.window,p.scroll.viewport().rect().topRight()).x())
+        self.assertEqual(p.scroll.horizontalScrollBar().maximum(),0)
+
+    def test_selected_icons_follow_text_foreground_in_dark_and_light_themes(self):
+        from PySide6.QtGui import QPalette
+        p=self.open()
+        for theme in ('dark','light'):
+            self.window.apply_appearance({'theme':theme})
+            for page in ('all','agent','appearance','voice'):
+                if page=='appearance':p.open_appearance()
+                elif page=='voice':p.open_voice()
+                else:p.show_page(page)
+                self.settle()
+                for button in p.nav.values():
+                    expected=self.window.background if button.isChecked() else self.window.palette().color(QPalette.ColorRole.WindowText)
+                    picture=button.icon().pixmap(28,28).toImage()
+                    colours=[picture.pixelColor(x,y) for x in range(picture.width()) for y in range(picture.height()) if picture.pixelColor(x,y).alpha()>220]
+                    self.assertTrue(colours,button.text())
+                    self.assertTrue(all(max(abs(c.red()-expected.red()),abs(c.green()-expected.green()),abs(c.blue()-expected.blue()))<4 for c in colours),button.text())
+
+    def test_small_screen_wraps_prompt_action_rows_without_horizontal_scroll_or_clipping(self):
+        screen=SimpleNamespace(availableGeometry=lambda:QRect(0,0,420,780))
+        with patch.object(self.window,'screen',return_value=screen):
+            p=self.open();p.open_prompts();self.settle()
+            self.assertLessEqual(self.window.width(),420);self.assertEqual(p.scroll.horizontalScrollBar().maximum(),0)
+            for button in p.editor.findChildren(QPushButton):
+                if button.isVisible():self.assertLess(button.mapTo(p.scroll.viewport(),button.rect().bottomRight()).x(),p.scroll.viewport().width(),button.text())

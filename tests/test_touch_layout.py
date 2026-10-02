@@ -23,7 +23,7 @@ class TouchTests(unittest.TestCase):
         self.assertIs(w.stack.currentWidget(),w.settings_panel)
         self.assertIsNone(QApplication.activePopupWidget())
         w.settings_panel.show_page('all')
-        self.assertTrue(any(b.text().startswith('Appearance') for b in w.settings_panel.findChildren(QPushButton)))
+        self.assertTrue(any(b.text().startswith('Prompt library') for b in w.settings_panel.findChildren(QPushButton)))
         w.settings_panel.open_appearance();self.app.processEvents();w.touch_layout.poll()
         self.assertFalse(w.settings_panel.editor.isWindow())
         self.assertFalse(w.settings_panel.editor.property('touchFitted'))
