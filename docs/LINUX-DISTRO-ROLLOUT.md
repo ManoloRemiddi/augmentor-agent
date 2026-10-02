@@ -2,6 +2,35 @@
 
 # Linux distribution rollout
 
+## October 2 authenticated toolchain reconstruction checkpoint
+
+[The new locked410-package policy](../release/qualification/next-targets/20261002-ubuntu-source-toolchain-lock.json)
+and [executed report](../release/qualification/next-targets/20261002-ubuntu-source-toolchain-reconstruction.json)
+now preserve signed Ubuntu metadata and verified package objects.408 versions
+match retained original indexes;2 audit versions match an actual verified official
+20260825 snapshot. All5 release signatures and17 full indexes verify; all410
+.debs match signed hashes/sizes,395,555,966 bytes. Ten actual changed-key/signature/
+index/package/source/URL/path refusal probes pass without changing originals.
+
+A fresh offline image from the pinned public Noble base and these package files
+reconstructs the exact410-row inventory hash. No earlier derived producer image,
+Qt source tree or compiled intermediate is reused. Its normal UID1001, no-network,
+2-CPU/8GiB/512-PID container starts the original seven verified archives with the
+published recipe in fresh source/build roots; at this checkpoint QtBase configure
+passes and compilation runs. Full rebuilt runtime/recipient execution is still
+pending. The first local-APT --no-download pathname failure and corrected offline
+repeat remain distinct. Full source/control-script permissions, generated shader,
+notice mapping, native/product/other-ABI and release qualification remain open.
+
+Both ee8dbdd native-capture hosted workflows pass:
+[Linux37038972316](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37038972316),
+[Mac37038972337](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37038972337).
+The application source's742 native cases/740 successes/two platform skips are
+unchanged; new kit tools have actual signature/acquisition/reconstruction evidence
+and still need their own hosted validation. All five authorized rollout points
+remain active. Source publication does not select an app, change owner state or
+publish a binary release.
+
 ## October 2 native GNOME capture and cancellation checkpoint
 
 The separate [Fedora candidate report](../release/qualification/next-targets/20261002-gnome-native-capture.json)
@@ -21,8 +50,8 @@ All742 native source cases pass in owned Arch, with740 successes/two Mac-only
 skips. Both prior83bcb6c hosted workflows pass:
 [Linux37033230709](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37033230709),
 [Mac37033230525](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37033230525).
-000c10e workflows were superseded/cancelled; this new candidate still needs its
-own hosted validation. Production GNOME input remains disabled. Keyboard/pointer,
+000c10e workflows were superseded/cancelled; both ee8dbdd hosted workflows
+subsequently pass as recorded in the newer toolchain checkpoint above. Production GNOME input remains disabled. Keyboard/pointer,
 mid-PipeWire revocation, lock/restart/scaling, supported profile repetition, KDE
 threading, full product/Browser/audio/packages/source-kit/legal/release gates
 remain active. All five original rollout points continue; selected artifacts and

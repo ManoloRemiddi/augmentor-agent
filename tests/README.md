@@ -516,3 +516,15 @@ Stop during a synthetic stalled frame and native sharing revocation after captur
 [Checked source hashes, failed candidates and limits](../release/qualification/next-targets/20261002-gnome-native-capture.json)
 keep source tests, native capture and future input qualification distinct. No
 Notify/action is invoked; production GNOME input remains disabled.
+
+### Authenticated source toolchain and fresh reconstruction
+
+`release/acquire-ubuntu-toolchain.py` executes real gpgv/full-index/package/source
+checks against complete preserved Ubuntu metadata before obtaining separate bytes.
+`release/probe-ubuntu-toolchain-auth.py` checks ten actual refusal paths against the
+owned kit, including corrupted signed content and altered package bodies. These
+require the separately retained complete metadata and acquired package objects;
+they are not synthetic passing package-install tests. The fresh no-network builder
+reconstructs the exact410-row inventory from the pinned public base and verified
+.debs. [Proof, first failure and ongoing source-build boundary](../release/qualification/next-targets/20261002-ubuntu-source-toolchain-reconstruction.json)
+remain separate from full recipient/runtime/license/release qualification.

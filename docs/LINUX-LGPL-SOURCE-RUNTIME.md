@@ -45,6 +45,62 @@ their GPL-only libraries without closure review or assume a commercial license.
 No owner runtime or selected desktop has changed. [Licensing](LICENSING.md) owns
 the distribution conditions; this recipe is engineering work, not legal approval.
 
+## Authenticated recipient toolchain reconstruction
+
+The [410-row reviewed lock](../release/qualification/next-targets/20261002-ubuntu-source-toolchain-lock.json)
+records binary architecture/version, matching source package/version, original
+signed index path, package filename/size/hash and official acquisition URLs. It
+matches the original [build inventory](../release/qualification/next-targets/20261002-qt-source-build-packages.tsv).
+[Executed proof](../release/qualification/next-targets/20261002-ubuntu-source-toolchain-reconstruction.json)
+is independent of the earlier local derived-image builds:408 exact installed
+versions match four retained, verified Ubuntu releases and15 complete decompressed
+Packages indexes. The two inherited audit packages at1:3.1.2-2.1build1.1 match the
+actual signed20260825T120000Z noble-updates main Packages index; that snapshot's
+complete matching Sources index also verifies. All410 signed binary records are
+now covered. Only audit's corresponding Sources metadata was inspected; this is
+not acquisition of all178 unique corresponding source pairs.
+
+The five original InRelease files, seventeen complete plain indexes and original
+keyring bytes are retained separately. [Acquisition tool](../release/acquire-ubuntu-toolchain.py)
+requires the exact keyring hash and archive signer fingerprint, validates real
+gpgv signatures and the full signed SHA256/size chain, then independently matches
+binary/source versions and approved HTTPS pool paths before downloads. It does
+not install packages, refresh APT or change trust. Actual410 .debs/395,555,966 bytes
+match signed hashes/sizes. [Refusal probe](../release/probe-ubuntu-toolchain-auth.py)
+executes ten invalid-key/release/index/package/source/URL/path/duplicate cases,
+including a corrupted signed body with recomputed local hash and a modified cached
+.deb. It changes only copies or in-memory policies; all originals are preserved.
+
+With complete metadata under `metadata/` in a separate kit root, run the acquisition
+tool with `--policy` pointing to the reviewed lock, `--root` pointing to that kit,
+and `--acquire`. `gpgv` is required. Run the refusal probe with the same policy/root
+after acquisition. Receipts are exclusively created; downloads may reuse an
+existing file only after exact signed size/hash checks. No untrusted .deb runs
+on the host. The [fresh builder recipe](../release/qt-source-runtime-recipient-builder.Dockerfile)
+expects `debs/` and its exact locked SHA256SUMS in its build context. It verifies
+both manifest and all bytes, installs absolute local package paths with Docker
+`--network=none --pull=false`, then verifies the entire dpkg410-row inventory hash.
+
+The first attempt with APT --no-download failed before installation at an internal
+relative perl-base filename. Its recipe/log are preserved. Removing that option
+allows the corrected network-disabled local-file install and exact inventory
+comparison to pass. No APT network refresh or unsigned/trusted override was used.
+The image derives only from the pinned public base plus authenticated package
+objects, not the previous producer image. Normal UID1001, two CPUs,8GiB,512 PIDs,
+no network/devices/host mounts/privileged mode then starts seven unchanged official
+source archives with the published source-build driver; its dependency inventory
+matches exactly. Fresh QtBase configure passes and compile runs at this checkpoint.
+No compiled producer intermediates are copied. Full source rebuild/runtime imports,
+rendering/replacement via product entrypoints and source-kit/license qualification
+remain false until executed.
+
+[Ubuntu's snapshot service](https://snapshot.ubuntu.com/) supports historical
+acquisition; the locally retained authentic objects/metadata make this finite
+proof independent of future pool retention. A final offered kit still needs a
+concrete corresponding-source/generated-shader/notice/control-script scope,
+recipient instructions and suitable script permissions. Existing Augmentor source
+licenses are unchanged; this checkpoint does not approve release licensing.
+
 ## Completed build and separate runtime candidate
 
 The [exact producer image recipe](../release/qt-source-runtime-builder.Dockerfile)
