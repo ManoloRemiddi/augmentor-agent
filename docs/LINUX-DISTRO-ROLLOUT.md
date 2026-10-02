@@ -2,6 +2,27 @@
 
 # Linux distribution rollout
 
+## October 2 actual Arch ALPM guard mechanism
+
+Ordinary makepkg now builds a SHA256-pinned independent guard package from
+published `daf35a3`. Real pacman transactions against synthetic receipts/text
+pass first installation/reinstall, active runtime/desktop and joint UID1000/
+UID1001 lease refusal with unchanged payload, guard removal refusal, later-hook
+abort and exact old recovery, upgrade/downgrade and staged app/guard removal.
+The [checked proof](../release/qualification/next-targets/20261002-arch-alpm-guard.json)
+binds recipe, artifact, helper and run hashes; three earlier build/proof-driver
+failures are retained separately with observed-state cleanup.
+
+Crucially, real pacman exits **0** after the post-hook rejects injected extra
+synthetic inventory. The new package is registered but durable pending survives,
+startup refuses, and both unverified completion and unchanged-old recovery
+refuse. Removal of only that exact empty fixture injection precedes explicit
+verified completion. The complete installer must independently verify final
+state; this fixture cleanup is not a production repair procedure. Volatile mirror
+loss is simulated, not an actual reboot. Read [Arch recipe scope](../release/arch/README.md).
+The full application PKGBUILD, actual application/users/data, RPM transactions
+and every original desktop/browser/audio/licensing/release gate remain active.
+
 ## October 2 Leap GNOME48 session and verified package recovery
 
 The actual signed Cloud-derived Leap session is GNOME Shell 48.4/Mutter48.4/

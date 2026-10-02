@@ -65,7 +65,8 @@ adds two focused cases, for nine guard cases in total. Both actual Arch/Leap
 native suites pass **701 tests, two Mac-only skips**. The first attempt exposed
 a strict legacy Fedora query mock rejecting a new environment argument; that
 failure is retained, and the locale override is limited to the new Arch query.
-These are source/synthetic-root results; real ALPM/RPM transactions remain open.
+These are source/synthetic-root results; the downstream checkpoint below is
+distinct and still does not establish full product or RPM transaction acceptance.
 
 ## Leap RPM adapter design
 
@@ -107,6 +108,26 @@ absent before first install and gone after removal. Guard removal must refuse
 while the app remains installed; combined removal needs an explicit staged
 procedure. PostTransaction validates actual complete receipt state, and the
 installer independently confirms finalization.
+
+### Actual Arch mechanism checkpoint
+
+The [guard recipe](../release/arch/README.md) pins published `daf35a3` helper bytes
+and all source checksums. Ordinary-user makepkg succeeds, and the
+[checked real ALPM proof](../release/qualification/next-targets/20261002-arch-alpm-guard.json)
+passes with explicitly synthetic application receipts/text. Real pacman hooks
+protect first install/reinstall, runtime/desktop and joint UID1000/1001 shared
+leases, guard removal, upgrades, downgrade and staged removal. A later abort
+retains persistent intent; losing volatile mirrors still fences startup, and
+exact old-state recovery resolves it.
+
+An actual post-hook complete-inventory refusal leaves the new package registered
+and pending **while pacman exits 0**. Independent completion and unchanged-old
+recovery both refuse the bad state. Only removal of the exact known empty
+synthetic injection followed by full state verification allows completion.
+This is not a production repair procedure or selected product payload edit.
+Three earlier proof-driver/build setup failures and safe observed-state cleanup
+are retained separately. Full application PKGBUILD/runtime/desktop/browser,
+real multiuser applications, data retention and interrupted reboot remain open.
 
 ## Required real qualification
 

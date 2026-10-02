@@ -2,6 +2,19 @@
 
 # Start here: agent handoff
 
+## October 2 real Arch package-hook mechanism
+
+The separate [Arch guard recipe](../release/arch/README.md) pins clean `daf35a3`
+source and builds through ordinary makepkg. Real pacman transactions pass the
+synthetic payload mechanism test: first/reinstall, two user/component leases,
+joint refusal with unchanged payload, guard removal refusal, later-hook abort
+with durable old recovery, upgrade/downgrade and separate app/guard removal.
+Actual post-hook inventory refusal leaves pending state even though pacman exits
+0; startup remains fenced. The [checked proof](../release/qualification/next-targets/20261002-arch-alpm-guard.json)
+retains three earlier driver failures and safe cleanup. No full application,
+actual multiuser application, reboot or public release pass is claimed.
+Continue full Arch/SUSE builders and all five original rollout points.
+
 ## October 2 Leap GNOME session and verified package recovery
 
 Actual Leap 16 GNOME 48.4 Wayland passes the source-only observer inspector
