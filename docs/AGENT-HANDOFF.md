@@ -2,6 +2,28 @@
 
 # Start here: agent handoff
 
+## October 2 Mint reboot/password and source runtime checkpoint
+
+Actual standard-ISO Mint22.3 passes installed X11/password login, wrong/correct
+password lock and normal reboot/repeat with AppArmor and unchanged Cinnamon6.6.4/
+Muffin/screensaver6.6.1 packages. No Augmentor is installed. The missing installer
+hook and two reboot input-driver authentication refusals remain explicit.
+The inspector now owner-pins Cinnamon ScreenSaver and refuses actual lock and
+missing owner; logind falsely remained unlocked during active screensaver.
+Normal 30-second inactive exit and query activation are source-verified. Read
+[Cinnamon contract/evidence](LINUX-CINNAMON-ADAPTER.md) and the source-only
+[GNOME control plan](LINUX-GNOME-CONTROL-PLAN.md) before implementing adapters.
+
+Seven official Qt/PySide archives pass actual hashes/upstream checksum records;
+[source build/rebuild/replacement work](LINUX-LGPL-SOURCE-RUNTIME.md) remains
+unbuilt/unqualified. Actual shell entrypoint now supports Leap's versioned
+bootstrap with strict runtime validation: both real locked target runtimes,
+wrong-interpreter refusal and six startup regressions each pass. The explicit
+synthetic absent-alias test temporarily hides/restores the current Leap alias
+added by signed rpm-build dependencies. Both preceding fd7e6e4 hosted workflows
+pass. All five original rollout points remain active. No owner services/devices/
+models/settings or selected application artifacts were changed.
+
 ## October 2 real Leap RPM scriptlet mechanism
 
 Ordinary rpmbuild and actual Leap RPM/zypper pass the synthetic receipt/text

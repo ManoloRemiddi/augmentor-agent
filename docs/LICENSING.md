@@ -35,6 +35,12 @@ licenses and notices.
 
 ## Native UI
 
+The [Linux source-runtime work](LINUX-LGPL-SOURCE-RUNTIME.md) now pins and acquires
+the actual Qt/PySide archives for a separate build with client-only Wayland and
+the application's Quick/Test closure. This does not qualify the existing vendor
+wheel bundle or complete source correspondence, rebuilding, replacement or release
+review. Those gates remain explicit and false in the checked acquisition report.
+
 PyQt is GPLv3/commercial, whereas Qt for Python offers LGPL licensing. Imports and
 signals have been migrated to PySide6. Development is pinned to PySide6 Essentials
 and Shiboken 6.8.2.1. The initial Debian package will depend on the distribution's

@@ -2,6 +2,20 @@
 
 # Consistent installed desktop releases
 
+## October 2 source shell bootstrap correction
+
+`scripts/augmentor-linux` now uses the system Python3.13 bootstrap when the generic
+alias is absent, then runs the same strict declared-runtime resolver. It does not
+retry or bypass policy/inventory refusal. The actual source shell entrypoint,
+selected runtime and wrong-interpreter refusal pass in owned Arch/Leap containers,
+as do six startup regressions on each. The
+[checked report](../release/qualification/next-targets/20261002-source-shell-bootstrap.json)
+distinguishes current Leap's alias, added by signed rpm-build dependencies, from
+the explicit temporary-hide synthetic test; the original alias was restored.
+Existing per-user service/secondary/update wrapper checks also pass. No full
+product/menu/graphical acceptance or installed update is claimed. The selected
+owner and Noble/Fedora desktop artifacts remain unchanged.
+
 ## October 1: browser evidence recovery
 
 [Browser observation repair](BROWSER-OBSERVATION-REPAIR.md#installed-linux-evidence--1-october-2026)

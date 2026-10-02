@@ -1,0 +1,95 @@
+{
+  "format": "augmentor-linux-source-runtime-acquisition/1",
+  "intendedTarget": "ubuntu24.04-amd64",
+  "pythonAbi": [
+    3,
+    12
+  ],
+  "architecture": "x86_64",
+  "sources": [
+    {
+      "name": "qtbase",
+      "version": "6.8.2",
+      "file": "qtbase-everywhere-src-6.8.2.tar.xz",
+      "url": "https://download.qt.io/archive/qt/6.8/6.8.2/submodules/qtbase-everywhere-src-6.8.2.tar.xz",
+      "checksumUrl": "https://download.qt.io/archive/qt/6.8/6.8.2/submodules/qtbase-everywhere-src-6.8.2.tar.xz.sha256",
+      "sha256": "012043ce6d411e6e8a91fdc4e05e6bedcfa10fcb1347d3c33908f7fdd10dfe05",
+      "reviewedGitCommit": "f1136de66638060b8a1ab9bc0cdf1a91dcb5ec01",
+      "archiveToGitTreeEqualityVerified": false
+    },
+    {
+      "name": "qtshadertools",
+      "version": "6.8.2",
+      "file": "qtshadertools-everywhere-src-6.8.2.tar.xz",
+      "url": "https://download.qt.io/archive/qt/6.8/6.8.2/submodules/qtshadertools-everywhere-src-6.8.2.tar.xz",
+      "checksumUrl": "https://download.qt.io/archive/qt/6.8/6.8.2/submodules/qtshadertools-everywhere-src-6.8.2.tar.xz.sha256",
+      "sha256": "d1d5f90e8885fc70d63ac55a4ce4d9a2688562033a000bc4aff9320f5f551871",
+      "reviewedGitCommit": "9b81996cea92b13d9f896504516d920976a77a86",
+      "archiveToGitTreeEqualityVerified": false
+    },
+    {
+      "name": "qtsvg",
+      "version": "6.8.2",
+      "file": "qtsvg-everywhere-src-6.8.2.tar.xz",
+      "url": "https://download.qt.io/archive/qt/6.8/6.8.2/submodules/qtsvg-everywhere-src-6.8.2.tar.xz",
+      "checksumUrl": "https://download.qt.io/archive/qt/6.8/6.8.2/submodules/qtsvg-everywhere-src-6.8.2.tar.xz.sha256",
+      "sha256": "aa2579f21ca66d19cbcf31d87e9067e07932635d36869c8239d4decd0a9dc1fa",
+      "reviewedGitCommit": "e59eaa7dbc09fbf885b1c5a69d93b7e2fb1c7ce3",
+      "archiveToGitTreeEqualityVerified": false
+    },
+    {
+      "name": "qtimageformats",
+      "version": "6.8.2",
+      "file": "qtimageformats-everywhere-src-6.8.2.tar.xz",
+      "url": "https://download.qt.io/archive/qt/6.8/6.8.2/submodules/qtimageformats-everywhere-src-6.8.2.tar.xz",
+      "checksumUrl": "https://download.qt.io/archive/qt/6.8/6.8.2/submodules/qtimageformats-everywhere-src-6.8.2.tar.xz.sha256",
+      "sha256": "d2a1bbb84707b8a0aec29227b170be00f04383fbf2361943596d09e7e443c8e1",
+      "reviewedGitCommit": "20d46d1fa669191d8f855ba8ac1c35719bace83a",
+      "archiveToGitTreeEqualityVerified": false
+    },
+    {
+      "name": "qtdeclarative",
+      "version": "6.8.2",
+      "file": "qtdeclarative-everywhere-src-6.8.2.tar.xz",
+      "url": "https://download.qt.io/archive/qt/6.8/6.8.2/submodules/qtdeclarative-everywhere-src-6.8.2.tar.xz",
+      "checksumUrl": "https://download.qt.io/archive/qt/6.8/6.8.2/submodules/qtdeclarative-everywhere-src-6.8.2.tar.xz.sha256",
+      "sha256": "144d876adc8bb55909735143e678d1e24eadcd0a380a0186792d88b731346d56",
+      "reviewedGitCommit": "75534f3e7fff24ed7ccb364e2ed9950a73da879f",
+      "archiveToGitTreeEqualityVerified": false
+    },
+    {
+      "name": "qtwayland",
+      "version": "6.8.2",
+      "file": "qtwayland-everywhere-src-6.8.2.tar.xz",
+      "url": "https://download.qt.io/archive/qt/6.8/6.8.2/submodules/qtwayland-everywhere-src-6.8.2.tar.xz",
+      "checksumUrl": "https://download.qt.io/archive/qt/6.8/6.8.2/submodules/qtwayland-everywhere-src-6.8.2.tar.xz.sha256",
+      "sha256": "5e46157908295f2bf924462d8c0855b0508ba338ced9e810891fefa295dc9647",
+      "reviewedGitCommit": "4261629005d174311045a44914d599ad67d2b7a3",
+      "archiveToGitTreeEqualityVerified": false
+    },
+    {
+      "name": "pyside-setup",
+      "version": "6.8.2.1",
+      "file": "pyside-setup-everywhere-src-6.8.2.1.tar.xz",
+      "url": "https://download.qt.io/official_releases/QtForPython/pyside6/PySide6-6.8.2.1-src/pyside-setup-everywhere-src-6.8.2.1.tar.xz",
+      "checksumUrl": "https://download.qt.io/official_releases/QtForPython/pyside6/PySide6-6.8.2.1-src/pyside-setup-everywhere-src-6.8.2.1.tar.xz.sha256",
+      "sha256": "13f7a00b360a5869084fcc085c48ba236915a200bb5a13c1548ed8ab7a8b606b",
+      "reviewedGitCommit": "f62088b4cd516a3080a6b2e68bc79903da8b67ce",
+      "archiveToGitTreeEqualityVerified": false
+    }
+  ],
+  "buildOrder": [
+    "qtbase",
+    "qtshadertools",
+    "qtsvg",
+    "qtimageformats",
+    "qtdeclarative",
+    "qtwayland",
+    "pyside-setup"
+  ],
+  "runtimeBuilt": false,
+  "licenseReviewComplete": false,
+  "correspondingSourceRebuildTested": false,
+  "recipientReplacementTested": false,
+  "publicReleaseQualified": false
+}

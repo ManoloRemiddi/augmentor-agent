@@ -22,6 +22,13 @@ qualification remain separate gates.
 
 ## October 2 capture compatibility checkpoint
 
+The pinned [GNOME control plan](LINUX-GNOME-CONTROL-PLAN.md) records portal
+negotiation, logical coordinate mapping, owner/capture cancellation, responsive
+Stop and eight real graphical acceptance cases. The separate
+[Cinnamon contract](LINUX-CINNAMON-ADAPTER.md) includes actual Mint password-lock
+and reboot evidence plus its activatable screensaver lifecycle. Both remain
+source plans; GNOME/Cinnamon capture and input are not enabled or qualified.
+
 Actual Leap 16/Python 3.13 native tests exposed gst-python's context-managed
 `StructureWrapper`. RGB-frame validation now keeps its parent caps alive through
 that context, while retaining exact RGB format, integer positive dimensions and

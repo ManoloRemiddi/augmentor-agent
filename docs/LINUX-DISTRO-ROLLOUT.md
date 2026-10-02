@@ -2,6 +2,42 @@
 
 # Linux distribution rollout
 
+## October 2 Mint password/reboot and source acquisition checkpoint
+
+The [checked installed Mint report](../release/qualification/next-targets/20261002-mint223-installed-session.json)
+now passes standard signed-ISO installation, detached-ISO cold boot, normal
+password login, configured CtrlAltL wrong/correct-password lock and one normal
+reboot followed by repeated password login/lock. The exact unchanged Cinnamon
+6.6.4+zena/Muffin/screensaver6.6.1+zena packages, X11 seat, AppArmor, schemas,
+PAM and pre-SSH baseline/installer log hashes are recorded. The installer hook
+receipt was absent; disk/login evidence is independent. Reboot input-driver
+refusals are preserved, followed by a corrected successful sequence. No Augmentor
+is installed, so none of its shortcuts/control/Stop/Browser/audio are qualified.
+
+The stricter inspector refuses both actual lock and missing screensaver owner.
+Actual GetActive true with logind LockedHint no proves a separate guard is needed.
+The stock service's 30-second inactive exit is normal; a normal query autoactivates
+it, followed by a fresh owner-pinned inactive read. Research and the finite native
+adapter cases are saved in [Cinnamon contract](LINUX-CINNAMON-ADAPTER.md).
+The [GNOME control plan](LINUX-GNOME-CONTROL-PLAN.md) retains source-grounded
+portal/threading/owner/Stop requirements with input still disabled.
+
+All seven actual official Qt6.8.2/PySide6.8.2.1 source archives pass hashes and
+upstream checksum records. [Acquisition evidence](../release/qualification/next-targets/20261002-lgpl-source-acquisition.json)
+and [build/rebuild/replacement plan](LINUX-LGPL-SOURCE-RUNTIME.md) keep compilation,
+license/closure, correspondence, independent replacement and release gates false.
+This does not reclassify current vendor wheels or update a selected runtime.
+
+The actual source shell launcher now handles Leap's versioned bootstrap without
+bypassing declared runtime verification. [Entrypoint evidence](../release/qualification/next-targets/20261002-source-shell-bootstrap.json)
+passes real locked Arch/Leap runtimes and mismatched-interpreter refusal; six
+startup regressions pass on each. Signed rpm-build dependencies added the current
+Leap alias, so absent-alias acceptance is an explicit temporary-hide synthetic
+case with verified restoration, separate from the earlier actual alias absence.
+Current implementation remains distinct from the unchanged installed candidates.
+Both preceding fd7e6e4 hosted Linux/Mac workflows pass. All five original points
+and complete product/runtime/desktop/public release acceptance remain active.
+
 ## October 2 actual Leap RPM guard mechanism
 
 Actual Leap ordinary-user rpmbuild and root RPM/zypper pass the

@@ -49,6 +49,7 @@ def main():
         (native/'__main__.py').write_text('import json,sys\nprint(json.dumps({"python":sys.executable,"arguments":sys.argv[1:]}))\n')
         (app/'release').mkdir();(app/'release/product.json').write_text('{"version":"synthetic"}')
         (app/'scripts').mkdir();shutil.copy2(ROOT/'scripts/linux-python-runtime.py',app/'scripts/linux-python-runtime.py')
+        shutil.copy2(ROOT/'scripts/augmentor-linux',app/'scripts/augmentor-linux')
         shutil.copy2(policy_path,app/'linux-python-runtime.json')
         env={**os.environ,'HOME':str(home),'XDG_DATA_HOME':str(home/'data'),
              'XDG_CONFIG_HOME':str(home/'config'),'XDG_STATE_HOME':str(home/'state'),
@@ -63,6 +64,16 @@ def main():
         executable=next(line.split('=',1)[1] for line in service.splitlines() if line.startswith('ExecStart='))
         command=shlex.split(executable);assert command[0]==value['python']
         def run(command):return json.loads(subprocess.check_output(command,text=True,env=env,timeout=60))
+        # This is the actual package/source shell entrypoint, distinct from the
+        # generated per-user deployment wrappers tested below.
+        direct_env={**env,'AUGMENTOR_PYTHON':selected}
+        direct=json.loads(subprocess.check_output([str(app/'scripts/augmentor-linux'),'--instance','secondary'],
+            text=True,env=direct_env,timeout=60))
+        assert direct=={'python':selected,'arguments':['--instance','secondary']}
+        rejected=subprocess.run([str(app/'scripts/augmentor-linux')],text=True,
+            capture_output=True,env={**env,'AUGMENTOR_PYTHON':value['python']},timeout=60)
+        assert rejected.returncode!=0 and 'does not match this artifact runtime policy' in rejected.stderr
+        assert not rejected.stdout
         cold=run(command);assert cold=={'python':selected,'arguments':['--ensure-running']}
         secondary=run([str(home/'.local/bin/augmentor-agent'),'--instance','secondary'])
         assert secondary=={'python':selected,'arguments':['--instance','secondary']}
@@ -74,9 +85,11 @@ def main():
             'runtimeArtifactSha256':receipt['artifactSha256'],'bootstrapPython':value['python'],
             'selectedPythonPreserved':True,'actualServiceExecStartTested':True,
             'actualSecondaryWrapperTested':True,'actualUpdateStatusWrapperTested':True,
+            'actualSourceShellEntrypointTested':True,'sourceShellWrongSelectedPythonRefused':True,
             'systemPython3AliasPresent':Path('/usr/bin/python3').is_file(),
             'wrapperContents':wrappers,'proofSha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
             'installerSha256':hashlib.sha256((ROOT/'scripts/install-desktop-startup.py').read_bytes()).hexdigest(),
+            'sourceShellSha256':hashlib.sha256((ROOT/'scripts/augmentor-linux').read_bytes()).hexdigest(),
             'syntheticApplication':True,'userServiceEnabled':False,'graphicalLoginTested':False,
             'recoveryConnectionTested':False,'installedProductTested':False,'ownerStateChanged':False}
     args.out.parent.mkdir(parents=True,exist_ok=True);args.out.write_text(json.dumps(report,indent=2)+'\n')
