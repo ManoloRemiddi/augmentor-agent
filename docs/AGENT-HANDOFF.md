@@ -2,6 +2,29 @@
 
 # Start here: agent handoff
 
+## October2 native selected accessibility owner loss
+
+[The native owner-loss report](../release/qualification/next-targets/20261002-gnome-native-selected-owner-loss.json)
+and [probe](../release/probe-gnome-a11y-owner.py) prove retirement when a disposable
+exporter's accessibility connection closes while its PID/start identity stays
+alive. Both actual Fedora/GNOME cases answer supervisor pings, reconnect with a
+new unique owner in the same process, reject reuse of the old helper and accept
+the new owner only through a fresh helper. The current probe closes in0.059s;
+all eight owned proof PIDs are confirmed absent. Both native bus IDs and global
+launcher/registry owners remain unchanged. This uses a synthetic two-node tree,
+not GTK/input acceptance; zero focus events or input are sent. Global-service
+replacement, shell/controller integration, inaccessible/ambiguous native trees,
+per-action/lock/Stop and other-profile/KDE qualification remain open.
+
+Both5df6fa5 source-kit hosted checks pass:
+[Linux37051754737](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37051754737)
+and [Mac37051754750](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37051754750).
+The owner proof needs its own source checks. The
+[22-file recipient-control license proposal](RECIPIENT-SOURCE-CONTROLS-LICENSE-PROPOSAL.md)
+is prepared for the owner's explicit decision; no license grant/headers have
+changed. All five authorized rollout points remain active. Selected artifacts and
+owner services/devices/models/audio settings remain unchanged.
+
 ## October2 authenticated sources, shader and private recipient kit
 
 [The new source-kit checkpoint](../release/qualification/next-targets/20261002-authenticated-recipient-source-kit.json)
@@ -23,8 +46,7 @@ fresh README/empty-daemon restoration, native/product/other-distro runtimes and
 legal/release conditions remain open. See [source-runtime scope and evidence](LINUX-LGPL-SOURCE-RUNTIME.md#authenticated-builderbase-sources-shader-and-private-kit-checkpoint).
 
 Both435eab2 helper hosted checks pass (Linux37045885191/Mac37045885183); both8b7abed
-runtime-completion checks pass (Linux37047133286/Mac37047133117). This source-kit
-checkpoint needs its own hosted checks. All five authorized rollout points remain
+runtime-completion checks pass (Linux37047133286/Mac37047133117). Both source-kit hosted checks subsequently pass; see the newer owner-loss checkpoint above. All five authorized rollout points remain
 active; selected artifacts, owner services/devices/models/audio settings and
 repository licenses are unchanged.
 

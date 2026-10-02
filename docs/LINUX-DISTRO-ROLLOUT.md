@@ -2341,3 +2341,16 @@ distinguishes this retained-source proof from script permissions, compiled-conte
 notice mapping, fresh full instructions/base import, product/native/other-ABI and
 legal/release qualification. Both435eab2 and8b7abed hosted Linux/Mac checks pass;
 this checkpoint needs its own checks. All five rollout points remain active.
+
+
+## October2 native selected accessibility owner loss
+
+The [executed owner-loss proof](../release/qualification/next-targets/20261002-gnome-native-selected-owner-loss.json)
+now retires the helper with a live synthetic exporter PID, confirms a supervisor
+ping after disconnection, refuses old-helper reuse and accepts the reconnected
+unique owner through a fresh helper. Both native bus IDs and launcher/registry
+owners stay unchanged. All owned processes are disposed; no GTK/input/global-
+service-restart acceptance is claimed. Both5df6fa5 source-kit hosted workflows pass.
+The [recipient-control permission proposal](RECIPIENT-SOURCE-CONTROLS-LICENSE-PROPOSAL.md)
+is awaiting an owner decision; no license changed and all five rollout points remain
+active. See [GNOME scope and remaining native guards](LINUX-GNOME-CONTROL-PLAN.md#native-selected-application-owner-loss-with-a-live-process).

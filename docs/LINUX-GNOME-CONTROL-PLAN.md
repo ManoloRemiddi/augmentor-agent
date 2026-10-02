@@ -45,6 +45,36 @@ Pointer/widget/keyboard, full AT-SPI delivery, normal password lock, owner/epoch
 restart, scaled/far-edge/hover cases, Ubuntu/Leap/profile repetition and KDE service
 threading remain open. Production discovery and inputQualified remain false.
 
+## Native selected-application owner loss with a live process
+
+[The two executed owner-loss cases](../release/qualification/next-targets/20261002-gnome-native-selected-owner-loss.json)
+use the actual Fedora44/GNOME50 accessibility bus, registry and helper with a
+separate synthetic two-node Gio exporter. [The owned probe](../release/probe-gnome-a11y-owner.py)
+registers only its private exporter connection, closes that connection while its
+process/PID/start identity remains alive, and observes the helper's permanent
+native-owner refusal. The first case closes in0.023 seconds; the current probe
+with fresh-path/acknowledgment identity checks closes in0.059 seconds. These are
+request-to-child-disposal durations, not physical input latency.
+
+Both live exporters answer supervisor pings after disconnection. Reconnection
+creates a different unique accessibility owner in the same process. The retired
+helper refuses to resume; a fresh helper discovers/pins the new owner. Session
+and accessibility bus IDs, launcher and registry owners stay unchanged. All eight
+owned parent/exporter/helper PIDs subsequently disappear. Selection bytes remain
+unchanged and no keyboard/pointer input is sent. No GTK focus-event, widget or
+product input acceptance is inferred from the synthetic tree's role/state values;
+its serial stays zero and it emits no focus events.
+
+The exporter follows pinned upstream [Application](https://github.com/GNOME/at-spi2-core/blob/66707c370bef824ed4edb08a909fc6a61449c12c/xml/Application.xml),
+[Accessible](https://github.com/GNOME/at-spi2-core/blob/66707c370bef824ed4edb08a909fc6a61449c12c/xml/Accessible.xml)
+and [Socket](https://github.com/GNOME/at-spi2-core/blob/66707c370bef824ed4edb08a909fc6a61449c12c/xml/Socket.xml)
+contracts: actual two-word state bitmasks, private bus unique-name references,
+one Embed per connection and empty P2P bus address. This is selected-application
+owner loss, not launcher/registry replacement or full accessibility-tree fidelity.
+A separate isolated native-daemon fixture is being prepared for global service
+fences; existing owner/guest services are not restarted for this proof. Production
+GNOME discovery/keyboard/pointer remain disabled.
+
 ## October 2 native consent and worker checkpoint
 
 The [checked report](../release/qualification/next-targets/20261002-gnome-native-consent.json)
@@ -149,7 +179,8 @@ exports SENSITIVE from disabled state and omits ENABLED. The helper retains both
 flags. Focus/showing may survive while another application covers the target; the
 future controller must independently bind the shell's selected/active window and
 geometry to the same PID, owner, epoch and fresh event serial. These facts are not
-permission to type. Registry/launcher replacement with a live target, inaccessible
+permission to type. Selected application owner loss now passes the separate
+synthetic native-bus proof above. Registry/launcher replacement, inaccessible
 and ambiguous native trees, per-character/Stop/lock guards and matching GNOME/KDE
 regressions remain open. The GUI process's singleton is untouched.
 

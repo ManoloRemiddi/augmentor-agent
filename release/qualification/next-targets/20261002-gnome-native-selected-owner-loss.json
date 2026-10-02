@@ -1,0 +1,377 @@
+{
+  "format": "augmentor-owned-fedora-native-selected-owner-loss-qualification/1",
+  "date": "2026-10-02",
+  "scope": "Real existing Fedora44/GNOME50 accessibility daemon, registry and helper; synthetic two-node exporter, not GTK or input acceptance",
+  "cases": [
+    {
+      "candidate": "gnome-execution-probe-owner-v1",
+      "result": {
+        "format": "augmentor-gnome-native-selected-owner-loss/1",
+        "parentPid": 10846,
+        "targetPid": 10852,
+        "targetStart": "5477062",
+        "records": [
+          {
+            "operation": "focus",
+            "reply": {
+              "complete": true,
+              "focus": {
+                "owner": ":1.89",
+                "path": "/org/a11y/atspi/accessible/entry",
+                "role": 79,
+                "password": false,
+                "focused": true,
+                "showing": true,
+                "defunct": false,
+                "editable": true,
+                "enabled": true,
+                "sensitive": true
+              },
+              "visitedNodes": 2,
+              "observedSerial": 0,
+              "nonce": "3912f758e6154117b5c7991ff7a58a2d",
+              "generation": 0,
+              "helperPid": 10863,
+              "targetPid": 10852,
+              "targetStart": "5477062",
+              "epoch": "2a5b52c3918a46199f89df39b88fb2fd",
+              "pins": {
+                "sessionBusId": "6107051b99f0e08b2586d351292153d5",
+                "launcherOwner": ":1.11",
+                "accessibilityBusId": "42d57effc70605967326b9e038cf1065",
+                "registryOwner": ":1.1"
+              },
+              "valid": true,
+              "serial": 0,
+              "selectedOwner": ":1.89",
+              "lastEvent": null,
+              "stopReason": null,
+              "inputQualified": false
+            },
+            "durationSeconds": 0.2323477850004565
+          },
+          {
+            "operation": "focus",
+            "reply": {
+              "complete": true,
+              "focus": {
+                "owner": ":1.92",
+                "path": "/org/a11y/atspi/accessible/entry",
+                "role": 79,
+                "password": false,
+                "focused": true,
+                "showing": true,
+                "defunct": false,
+                "editable": true,
+                "enabled": true,
+                "sensitive": true
+              },
+              "visitedNodes": 2,
+              "observedSerial": 0,
+              "nonce": "35f2106f90bb4aae9a289771df8efefe",
+              "generation": 1,
+              "helperPid": 10870,
+              "targetPid": 10852,
+              "targetStart": "5477062",
+              "epoch": "006f922dd52745449f29bfb1f79058f8",
+              "pins": {
+                "sessionBusId": "6107051b99f0e08b2586d351292153d5",
+                "launcherOwner": ":1.11",
+                "accessibilityBusId": "42d57effc70605967326b9e038cf1065",
+                "registryOwner": ":1.1"
+              },
+              "valid": true,
+              "serial": 0,
+              "selectedOwner": ":1.92",
+              "lastEvent": null,
+              "stopReason": null,
+              "inputQualified": false
+            },
+            "durationSeconds": 0.15710452599887503
+          }
+        ],
+        "inputSent": false,
+        "treeSynthetic": true,
+        "gtkTarget": false,
+        "selectedSource": "aef93bb04520a003c5c48536aa6d4210105fc8ad",
+        "sourceSha256": {
+          "probe-gnome-a11y-owner.py": "25b2f4e61bbf4c28f3176edc7a577cb0651d34822f39e966feefe315273a611c",
+          "a11y_helper.py": "4b6fc94396ca3f3282d1fd59d0484e8680d5e548584e08fb4084892d4841e788",
+          "a11y_service.py": "e6547181f01f44b67f0468fda001a50df0c619f71324282009b2a1b38de423ba"
+        },
+        "liveProcessOwnerLossQualified": true,
+        "fullProductInputQualified": false,
+        "before": {
+          "pid": 10852,
+          "generation": 1,
+          "connectionOpen": true,
+          "applicationId": 0,
+          "sessionBusId": "6107051b99f0e08b2586d351292153d5",
+          "launcherOwner": ":1.11",
+          "inputSent": false,
+          "gtkTarget": false,
+          "treeSynthetic": true,
+          "accessibilityBusId": "42d57effc70605967326b9e038cf1065",
+          "registryOwner": ":1.1",
+          "owner": ":1.89"
+        },
+        "afterDisconnect": {
+          "pid": 10852,
+          "generation": 1,
+          "connectionOpen": false,
+          "applicationId": 63,
+          "sessionBusId": "6107051b99f0e08b2586d351292153d5",
+          "launcherOwner": ":1.11",
+          "inputSent": false,
+          "gtkTarget": false,
+          "treeSynthetic": true,
+          "accessibilityBusId": "42d57effc70605967326b9e038cf1065",
+          "registryOwner": ":1.1",
+          "owner": ":1.89",
+          "lastCommand": "d83e0e31b0434ca28fb5640efa886177"
+        },
+        "ownerLossRefusal": {
+          "kind": "RuntimeError",
+          "message": "Accessibility native owner changed; fresh helper required.",
+          "durationSeconds": 0.022779140002967324,
+          "helperClosed": true
+        },
+        "processAliveAfterOwnerLoss": true,
+        "supervisorPing": {
+          "pid": 10852,
+          "generation": 1,
+          "connectionOpen": false,
+          "applicationId": 63,
+          "sessionBusId": "6107051b99f0e08b2586d351292153d5",
+          "launcherOwner": ":1.11",
+          "inputSent": false,
+          "gtkTarget": false,
+          "treeSynthetic": true,
+          "accessibilityBusId": "42d57effc70605967326b9e038cf1065",
+          "registryOwner": ":1.1",
+          "owner": ":1.89",
+          "lastCommand": "7fa2740c318b47cfb7f90acc88021b8e"
+        },
+        "afterReconnect": {
+          "pid": 10852,
+          "generation": 2,
+          "connectionOpen": true,
+          "applicationId": 63,
+          "sessionBusId": "6107051b99f0e08b2586d351292153d5",
+          "launcherOwner": ":1.11",
+          "inputSent": false,
+          "gtkTarget": false,
+          "treeSynthetic": true,
+          "accessibilityBusId": "42d57effc70605967326b9e038cf1065",
+          "registryOwner": ":1.1",
+          "owner": ":1.92",
+          "lastCommand": "48e8d16f350e46cb9e51c1775f0768f3"
+        },
+        "oldHelperRearmRefused": true,
+        "processAliveAfterReconnect": true,
+        "ownedProcessesDisposed": true,
+        "selectedApplicationChanged": false,
+        "parentAtspiImported": false
+      },
+      "rawSha256": "2829c873faa2ec7c5ca07f1f01125fbd346480227a34bafff55ee027314ec323",
+      "ownedPidsAbsent": [
+        10846,
+        10852,
+        10863,
+        10870
+      ]
+    },
+    {
+      "candidate": "gnome-execution-probe-owner-v2",
+      "result": {
+        "format": "augmentor-gnome-native-selected-owner-loss/1",
+        "parentPid": 10920,
+        "targetPid": 10926,
+        "targetStart": "5495089",
+        "records": [
+          {
+            "operation": "focus",
+            "reply": {
+              "complete": true,
+              "focus": {
+                "owner": ":1.95",
+                "path": "/org/a11y/atspi/accessible/entry",
+                "role": 79,
+                "password": false,
+                "focused": true,
+                "showing": true,
+                "defunct": false,
+                "editable": true,
+                "enabled": true,
+                "sensitive": true
+              },
+              "visitedNodes": 2,
+              "observedSerial": 0,
+              "nonce": "8401c3e905594b4b9b0ea4c9c0b2437f",
+              "generation": 0,
+              "helperPid": 10937,
+              "targetPid": 10926,
+              "targetStart": "5495089",
+              "epoch": "394a4979b3c14d009865fd23fbdb4878",
+              "pins": {
+                "sessionBusId": "6107051b99f0e08b2586d351292153d5",
+                "launcherOwner": ":1.11",
+                "accessibilityBusId": "42d57effc70605967326b9e038cf1065",
+                "registryOwner": ":1.1"
+              },
+              "valid": true,
+              "serial": 0,
+              "selectedOwner": ":1.95",
+              "lastEvent": null,
+              "stopReason": null,
+              "inputQualified": false
+            },
+            "durationSeconds": 0.19448635899607325
+          },
+          {
+            "operation": "focus",
+            "reply": {
+              "complete": true,
+              "focus": {
+                "owner": ":1.98",
+                "path": "/org/a11y/atspi/accessible/entry",
+                "role": 79,
+                "password": false,
+                "focused": true,
+                "showing": true,
+                "defunct": false,
+                "editable": true,
+                "enabled": true,
+                "sensitive": true
+              },
+              "visitedNodes": 2,
+              "observedSerial": 0,
+              "nonce": "e95592db1f9244c5854fe7609f31f3b3",
+              "generation": 1,
+              "helperPid": 10944,
+              "targetPid": 10926,
+              "targetStart": "5495089",
+              "epoch": "c00fa9b066d04f6da93de6bddc9fb94f",
+              "pins": {
+                "sessionBusId": "6107051b99f0e08b2586d351292153d5",
+                "launcherOwner": ":1.11",
+                "accessibilityBusId": "42d57effc70605967326b9e038cf1065",
+                "registryOwner": ":1.1"
+              },
+              "valid": true,
+              "serial": 0,
+              "selectedOwner": ":1.98",
+              "lastEvent": null,
+              "stopReason": null,
+              "inputQualified": false
+            },
+            "durationSeconds": 0.16389169900503475
+          }
+        ],
+        "inputSent": false,
+        "treeSynthetic": true,
+        "gtkTarget": false,
+        "selectedSource": "aef93bb04520a003c5c48536aa6d4210105fc8ad",
+        "sourceSha256": {
+          "probe-gnome-a11y-owner.py": "53e5e36dbd48345568b581c91234438f9f9540aad62d76920041b83125f9923f",
+          "a11y_helper.py": "4b6fc94396ca3f3282d1fd59d0484e8680d5e548584e08fb4084892d4841e788",
+          "a11y_service.py": "e6547181f01f44b67f0468fda001a50df0c619f71324282009b2a1b38de423ba"
+        },
+        "liveProcessOwnerLossQualified": true,
+        "fullProductInputQualified": false,
+        "before": {
+          "pid": 10926,
+          "generation": 1,
+          "connectionOpen": true,
+          "applicationId": 0,
+          "sessionBusId": "6107051b99f0e08b2586d351292153d5",
+          "launcherOwner": ":1.11",
+          "inputSent": false,
+          "gtkTarget": false,
+          "treeSynthetic": true,
+          "accessibilityBusId": "42d57effc70605967326b9e038cf1065",
+          "registryOwner": ":1.1",
+          "owner": ":1.95"
+        },
+        "afterDisconnect": {
+          "pid": 10926,
+          "generation": 1,
+          "connectionOpen": false,
+          "applicationId": 65,
+          "sessionBusId": "6107051b99f0e08b2586d351292153d5",
+          "launcherOwner": ":1.11",
+          "inputSent": false,
+          "gtkTarget": false,
+          "treeSynthetic": true,
+          "accessibilityBusId": "42d57effc70605967326b9e038cf1065",
+          "registryOwner": ":1.1",
+          "owner": ":1.95",
+          "lastCommand": "68f12f1699dc4a73ba1564ce09d706e1"
+        },
+        "ownerLossRefusal": {
+          "kind": "RuntimeError",
+          "message": "Accessibility native owner changed; fresh helper required.",
+          "durationSeconds": 0.05891705799876945,
+          "helperClosed": true
+        },
+        "processAliveAfterOwnerLoss": true,
+        "supervisorPing": {
+          "pid": 10926,
+          "generation": 1,
+          "connectionOpen": false,
+          "applicationId": 65,
+          "sessionBusId": "6107051b99f0e08b2586d351292153d5",
+          "launcherOwner": ":1.11",
+          "inputSent": false,
+          "gtkTarget": false,
+          "treeSynthetic": true,
+          "accessibilityBusId": "42d57effc70605967326b9e038cf1065",
+          "registryOwner": ":1.1",
+          "owner": ":1.95",
+          "lastCommand": "17045e69ec574002871d714955d94c90"
+        },
+        "afterReconnect": {
+          "pid": 10926,
+          "generation": 2,
+          "connectionOpen": true,
+          "applicationId": 65,
+          "sessionBusId": "6107051b99f0e08b2586d351292153d5",
+          "launcherOwner": ":1.11",
+          "inputSent": false,
+          "gtkTarget": false,
+          "treeSynthetic": true,
+          "accessibilityBusId": "42d57effc70605967326b9e038cf1065",
+          "registryOwner": ":1.1",
+          "owner": ":1.98",
+          "lastCommand": "75142e3aa85b4c028f38379dc3727a27"
+        },
+        "oldHelperRearmRefused": true,
+        "processAliveAfterReconnect": true,
+        "ownedProcessesDisposed": true,
+        "selectedApplicationChanged": false,
+        "parentAtspiImported": false
+      },
+      "rawSha256": "67f230f294abe146739335892971429c332b7c3980d9d19020803b9ed39a242a",
+      "ownedPidsAbsent": [
+        10920,
+        10926,
+        10937,
+        10944
+      ]
+    }
+  ],
+  "exporterStderrEmpty": false,
+  "allOwnedProofPidsAbsent": true,
+  "globalNativeServicesRestarted": false,
+  "selectedInstallationChanged": false,
+  "keyboardPointerInputSent": false,
+  "productionInputEnabled": false,
+  "liveGlobalLauncherRegistryReplacementQualified": false,
+  "fullProductInputQualified": false,
+  "allFiveRolloutPointsRemainActive": true,
+  "upstreamContractReferences": [
+    "https://github.com/GNOME/at-spi2-core/blob/66707c370bef824ed4edb08a909fc6a61449c12c/xml/Application.xml",
+    "https://github.com/GNOME/at-spi2-core/blob/66707c370bef824ed4edb08a909fc6a61449c12c/xml/Accessible.xml",
+    "https://github.com/GNOME/at-spi2-core/blob/66707c370bef824ed4edb08a909fc6a61449c12c/xml/Socket.xml"
+  ]
+}
