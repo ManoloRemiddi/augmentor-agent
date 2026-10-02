@@ -13,7 +13,19 @@ two Mac-only skips), with standard frame/theme/custom-image and narrow width
 checks. Seven Node aggregation fixtures pass. The full root Node suite passes 491 cases
 (489 pass, two opt-in memory proof skips). Synthetic renders are separate
 from a read-only local stored-count proof; no private history is published.
-Linux installation evidence and tested source follow after candidate qualification.
+Tested source `41e0441` is selected as compatible Linux product 0.2.11 release
+`20261002-135127-a99dafb5`, artifact
+`b72b7f883e65c7b27d0e077892a9cdbf2744d56348d132796532b3efab62a29d`.
+The separate candidate passes 37 native cases (35 pass, two source-only sizing
+skips), seven Node fixtures and an actual installed-interpreter stored-count,
+frame/theme/geometry proof. Stage/activation pass. Mobile adopted it through its
+idle guard, online with voice available and no pending update. Desktop remains
+on `20261002-130745-7e74c395` with a pending update because its maintenance guard
+reports busy; no running turn/chat draft, and no forced close. Quit/relaunch the
+Desktop after finishing its open UI to adopt it. Existing product/dependency/
+backend/speech contracts and user state are retained. Rollback selects the prior
+fixed-frame release; DSH/speech services and GPU/model settings are untouched.
+See [installed profile/activity evidence](AGENT-SETTINGS.md#installed-profileactivity-update).
 Mac installed GUI acceptance remains unverified. PR #29 remains draft/unmerged.
 
 ## Fixed settings frame and readable inputs checkpoint (historical)

@@ -2,7 +2,20 @@
 
 # Consistent installed desktop releases
 
-## October 2: Fixed settings frame and readable inputs
+## October 2: Agent profile and recorded token activity
+
+[Installed profile/activity update](AGENT-SETTINGS.md#installed-profileactivity-update)
+records source `41e0441`, compatible selected release `20261002-135127-a99dafb5`,
+exact artifact identity, 637 native/491 Node source cases and 37 native/seven Node
+candidate cases, with documented skips. Actual installed-interpreter stored-count
+and same-frame/geometry proof and immutable stage/activation pass. Mobile adopted
+the selected root through its idle guard, online with voice available; Desktop
+remains on the prior fixed-frame build with `updatePending: true` because its
+maintenance guard is busy. Finish its open UI and quit/relaunch to adopt the
+selection. DSH/speech and product 0.2.11 contracts remain intact. Rollback selects
+`20261002-130745-7e74c395`; PR #29 remains draft/unmerged for owner acceptance.
+
+## Fixed settings frame and readable inputs checkpoint (historical)
 
 [Installed fixed-frame update](AGENT-SETTINGS.md#installed-fixed-frame-update)
 records implementation `e567ccf`, compatible selected/running release

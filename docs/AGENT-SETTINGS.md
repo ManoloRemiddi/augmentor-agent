@@ -354,8 +354,9 @@ coverage, accessible day selection and fixture/live evidence. The 637-case nativ
 passes with two Mac-only skips (635 pass); standard-width profile pages with loaded
 usage and a custom image have no scrollbars in both themes. Narrow layouts use
 vertical scrolling and have no horizontal overflow. Seven Node aggregation
-fixtures pass. The implementation remains on the draft feature PR for local
-acceptance before merging; installation evidence follows after qualification.
+fixtures pass. The full root Node suite passes 491 cases (489 pass, two opt-in
+memory proof skips). The implementation remains on the draft feature PR for local
+acceptance before merging; installation evidence follows below.
 
 
 The separate compatible product 0.2.11 candidate passes 37 focused native cases
@@ -369,3 +370,21 @@ replacing only the authored Agent settings module, adding the usage widget/helpe
 and updating owning documentation. The deployed Window and existing product,
 dependency, backend and speech contracts are retained unchanged. No user history,
 configuration, DSH/speech service or GPU/model settings are changed.
+
+
+### Installed profile/activity update
+
+Tested implementation: `41e0441`. Selected Linux product 0.2.11 release:
+`20261002-135127-a99dafb5`, artifact
+`b72b7f883e65c7b27d0e077892a9cdbf2744d56348d132796532b3efab62a29d`.
+Immutable stage and activation pass inventory, import and authenticated product
+compatibility checks. Mobile adopted the selected root after accepted idle
+maintenance closure and supervisor restart; it reports online, voice available
+and no pending update. Desktop remains on `20261002-130745-7e74c395`, online
+with voice available and `updatePending: true`: its maintenance guard reports
+busy, with no running turn or chat draft, so it was not closed or restarted.
+Quit/relaunch after finishing the open UI to adopt the selection. This is a
+selected update and live mobile adoption, not a claim of Desktop adoption.
+Rollback selects `20261002-130745-7e74c395`. DSH and speech services were not
+restarted; installed Mac GUI acceptance remains unverified. Draft PR #29 is
+unmerged until the owner gives the green light.
