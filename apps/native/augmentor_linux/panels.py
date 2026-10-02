@@ -142,50 +142,7 @@ class LicensesDialog(QDialog):
         close = QPushButton('Close'); close.clicked.connect(self.accept); layout.addWidget(close)
 
 
-class SettingsDialog(QDialog):
-    def __init__(self,window):
-        from .instances import current_name
-        super().__init__(window);self.owner=window
-        self.setWindowTitle('Settings · '+('First agent' if current_name()=='main' else 'Second agent'));scaled(self).setMinimumWidth(400)
-        outer=QVBoxLayout(self);scroll=QScrollArea();scroll.setWidgetResizable(True);scroll.setFrameShape(QScrollArea.Shape.NoFrame)
-        content=QWidget();layout=QVBoxLayout(content);scroll.setWidget(content);content.setAutoFillBackground(False);outer.addWidget(scroll)
-        self.resize(px(self,460),min(820,self.screen().availableGeometry().height()-80))
-        from .settings_icons import settings_icon,settings_label
-        from .voice_settings import VoiceSettingsDialog
-        voice=QPushButton('Resonant Voice')
-        voice.clicked.connect(lambda:VoiceSettingsDialog(window).exec())
-        layout.addWidget(voice)
-        layout.addWidget(settings_label('Harness','harness',window.accent))
-        engine=QComboBox();engine.addItem('Pi','pi');engine.addItem('DSH','dsh');engine.addItem('Codex (development)','codex')
-        engine.setCurrentIndex(engine.findData(getattr(window.controller,'harness','pi')))
-        engine.setAccessibleName('Harness')
-        engine.activated.connect(lambda _:window.switch_harness(engine.currentData()))
-        layout.addWidget(engine)
-        dsh=QPushButton('Connect Codex model' if getattr(window.controller,'harness',None)=='codex' else 'Connect DSH')
-        def connect_dsh():
-            self.accept()
-            window.open_setup()
-        dsh.clicked.connect(connect_dsh);layout.addWidget(dsh)
-        from .home_settings import HomeDialog
-        home=QPushButton('Connect Home');home.clicked.connect(lambda:HomeDialog(window).exec());layout.addWidget(home)
-        from .recovery import RecoveryDialog
-        recovery=QPushButton('Recover connection');recovery.clicked.connect(lambda:RecoveryDialog(window).exec());layout.addWidget(recovery)
-        from .shortcut_settings import ShortcutSettings
-        layout.addWidget(settings_label('Window shortcuts','keyboard',window.accent))
-        self.shortcuts=ShortcutSettings(window);layout.addWidget(self.shortcuts)
-        note=QLabel('Appearance, skins and voice settings are saved for this agent window. The second agent starts with a copy of the first agent’s settings.');note.setWordWrap(True);layout.addWidget(note)
-        appearance=QPushButton('Colours && visual effects');appearance.clicked.connect(window.open_appearance);layout.addWidget(appearance)
-        prompts=QPushButton('Prompt library');prompts.clicked.connect(window.open_prompt_library);layout.addWidget(prompts)
-        from .memory import MemoryDialog
-        memory=QPushButton('Memory');memory.clicked.connect(lambda:MemoryDialog(window).exec());layout.addWidget(memory)
-        from .support import SupportDialog
-        support=QPushButton('Support report');support.clicked.connect(lambda:SupportDialog(window).exec());layout.addWidget(support)
-        done=QPushButton('Done');done.clicked.connect(self.accept);outer.addWidget(done)
-        for button,name in [(voice,'voice'),(dsh,'connect'),(recovery,'recover'),(appearance,'appearance'),(prompts,'prompts'),(memory,'memory'),(support,'support'),(done,'done')]:
-            button.setIcon(settings_icon(name,window.accent))
-
-    def capture_current(self):
-        return self.shortcuts.capture_current()
+from .agent_settings import SettingsDialog
 
 
 class PromptLibraryDialog(QDialog):

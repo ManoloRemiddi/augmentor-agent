@@ -17,6 +17,7 @@ import {chatEvents, type ChatEvent} from './events.js';
 import type {ProfileStore} from './profiles.js';
 import type {ChatGptLogin} from './chatgpt-login.js';
 import {instructionSnapshot, validateInstructions, type InstructionSnapshot} from './instructions.js';
+import {AccessSettings, nativePolicy, actionNeedsApproval, accessValues, type Access} from './permissions.js';
 import {CodexInteractions} from './interactions.js';
 import {checkProvider} from './provider-check.js';
 import {checkAgent} from './agent-check.js';
@@ -48,6 +49,7 @@ function observe<T>(pending: Promise<T>, signal: AbortSignal): Promise<T> {
   return result.finally(() => signal.removeEventListener('abort', abort));
 }
 interface SessionMeta {
+  access?: Access;
   creationDispatched?: boolean;
   nativeOwner?: string;
   fork?: {sessionId: string; messageSeq: number; mode: 'reply' | 'edit'; boundary: BranchBoundary};
@@ -80,6 +82,7 @@ interface Worker {rpc: CodexRpc; session: CodexSession; journal: DisplayJournal;
 
 /** Shared local host. Initially uses one isolated worker per native thread authority. */
 export class CodexHost extends EventEmitter {
+  readonly access: AccessSettings;
   readonly approvals = new CodexInteractions();
   readonly browser = new CodexBrowser();
   readonly home = new CodexHome();
@@ -108,6 +111,7 @@ export class CodexHost extends EventEmitter {
   private forkCreators = new Set<CodexRpc>();
   constructor(readonly options: HostOptions) {
     super(); this.voice = new CodexVoice(options.voiceConnection, (id, message) => this.emit('attention', id, {reason: 'voice-unavailable', message})); this.desktop = new CodexDesktop(options.desktopControl); privateDirectory(options.root); privateDirectory(join(options.root, 'sessions'));
+    this.access = new AccessSettings(join(options.root, 'access.json'));
     installedRuntimeVersion();
     if (!Number.isSafeInteger(options.maxWorkers ?? 4) || (options.maxWorkers ?? 4) < 1 || (options.maxWorkers ?? 4) > 32) throw new Error('Codex worker capacity must be between 1 and 32.');
     for (const filename of readdirSync(join(options.root, 'sessions')).filter(name => name.endsWith('.json'))) {
@@ -122,6 +126,7 @@ export class CodexHost extends EventEmitter {
       if (meta.desktopTools !== undefined && (meta.desktopTools !== 1 || meta.imageInput !== true)) throw new Error('Unsupported Codex desktop tool contract.');
       if (meta.desktopTools === 1) this.desktop.register(meta.id, this.sessionRoot(meta.id));
       if (meta.browserTools !== undefined && meta.browserTools !== 1) throw new Error('Unsupported Codex browser tool contract.');
+      if (meta.access !== undefined && !accessValues.includes(meta.access)) throw new Error('Invalid Codex session access.');
       if (meta.instructions !== undefined) validateInstructions(meta.instructions);
       identifier(meta.profileId); this.metadata.set(meta.id, meta);
     }
@@ -239,7 +244,7 @@ export class CodexHost extends EventEmitter {
     if (this.metadata.has(id)) return this.create(params);
     const desktop = profile.connection.imageInput === true && desktopCapabilities().available;
     const memory = Boolean(this.options.memoryCall);
-    const meta: SessionMeta = {schema: 1, browserTools: 1, homeTools: 1, ...(memory ? {memoryTools: 1} : {}), ...(desktop ? {desktopTools: 1} : {}), ...(profile.connection.imageInput ? {imageInput: true} : {}), instructions: instructionSnapshot(undefined, true, profile.connection.imageInput === true, desktop, true, memory), id, profileId, profileRevision: profile.revision, model: profile.connection.model,
+    const meta: SessionMeta = {access: this.access.read().defaultPreset, schema: 1, browserTools: 1, homeTools: 1, ...(memory ? {memoryTools: 1} : {}), ...(desktop ? {desktopTools: 1} : {}), ...(profile.connection.imageInput ? {imageInput: true} : {}), instructions: instructionSnapshot(undefined, true, profile.connection.imageInput === true, desktop, true, memory), id, profileId, profileRevision: profile.revision, model: profile.connection.model,
       surface: params.surface === 'browser' ? 'browser' : 'linux', cwd, title: '', status: 'creating', creationDispatched: false, createdAt: Date.now(), updatedAt: Date.now()};
     this.save(meta);
     await this.open(meta, profile);
@@ -377,10 +382,10 @@ export class CodexHost extends EventEmitter {
     let memory: CodexMemory | undefined;
     try {
       await rpc.initialize();
-      if (meta.threadId) await rpc.call('thread/resume', {threadId: meta.threadId, cwd: meta.cwd, excludeTurns: true, ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
+      if (meta.threadId) await rpc.call('thread/resume', {threadId: meta.threadId, cwd: meta.cwd, excludeTurns: true, ...(meta.access ? nativePolicy(meta.access) : {}), ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
       else {
         meta.creationDispatched = true; this.save(meta);
-        const result = await rpc.call('thread/start', {cwd: meta.cwd, approvalPolicy: 'on-request', sandbox: 'workspace-write', ...(meta.browserTools ? {dynamicTools: [...browserToolsFor(meta.imageInput === true), ...(meta.desktopTools ? desktopTools : []), ...(meta.homeTools ? homeTools : []), ...(meta.memoryTools ? memoryTools : [])]} : {}), ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
+        const result = await rpc.call('thread/start', {cwd: meta.cwd, ...(meta.access ? nativePolicy(meta.access) : {approvalPolicy: 'on-request', sandbox: 'workspace-write'}), ...(meta.browserTools ? {dynamicTools: [...browserToolsFor(meta.imageInput === true), ...(meta.desktopTools ? desktopTools : []), ...(meta.homeTools ? homeTools : []), ...(meta.memoryTools ? memoryTools : [])]} : {}), ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
         meta.threadId = result.thread.id; meta.status = 'ready'; this.save(meta);
       }
       this.assertOpen();
@@ -476,6 +481,14 @@ export class CodexHost extends EventEmitter {
             if (request.method === 'item/tool/call' && meta.browserTools) {
               this.assertAccepting();
               const abort = new AbortController(); toolCalls.set(request.id, {turnId: request.params.turnId, abort});
+              if (meta.access && actionNeedsApproval(String(request.params.tool))) {
+                if (meta.access === 'read-only') {rpc.respond(request.id, {success: false, contentItems: [{type: 'inputText', text: 'Read-only chat: actions that can change state are disabled.'}]}); return;}
+                if (meta.access === 'workspace-write') {
+                  const reply = await this.approvals.tool(meta.id, request);
+                  if (!('decision' in reply) || reply.decision !== 'accept') {rpc.respond(request.id, {success: false, contentItems: [{type: 'inputText', text: 'Action was not approved.'}]}); return;}
+                  abort.signal.throwIfAborted();
+                }
+              }
               const desktopTool = desktopTools.some(tool => tool.name === request.params.tool);
               rpc.respond(request.id, meta.memoryTools && memoryTools.some(tool => tool.name === request.params.tool) ? memory ? await memory.tool(request.params, abort.signal) : {success: false, contentItems: [{type: 'inputText', text: 'Memory is unavailable in this host.'}]} : meta.homeTools && homeTools.some(tool => tool.name === request.params.tool) ? await this.home.call(meta.id, join(root, 'home-calls'), request.params, abort.signal) : desktopTool && meta.desktopTools ? await this.desktop.call(meta.id, root, request.params, abort.signal) : await this.browser.call(meta.id, join(root, 'browser-calls'), request.params, abort.signal, meta.imageInput === true));
             } else rpc.respond(request.id, await this.approvals.request(meta.id, request, fileChanges.get(String(request.params.itemId))));
@@ -647,7 +660,8 @@ export class CodexHost extends EventEmitter {
         else if (params.action && params.action !== 'state') throw new Error('Unsupported saved-chat action.');
         return {saved: [...this.metadata.values()].filter(meta => meta.saved).map(meta => meta.id)};
       }
-      case 'settings.describe': return {namespaces: []};
+      case 'settings.describe': return {namespaces: [this.access.describe()]};
+      case 'settings.mutate': return this.access.mutate(params);
       case 'session.describe': return this.meta(params.sessionId);
       case 'session.rename': {
         const meta = this.meta(params.sessionId); meta.title = text(params.title, 200); meta.updatedAt = Date.now(); this.save(meta); return {title: meta.title};

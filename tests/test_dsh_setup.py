@@ -70,9 +70,9 @@ class SharedPersonalAgentTests(unittest.TestCase):
         ids={row['id'] for row in entries}
         self.assertTrue({'tool-bash','tool-fs','tool-ask-user','augmentor-desktop','augmentor-memory','augmentor-execution','augmentor-response-metrics'} <= ids)
         self.assertNotIn('augmentor-browser-policy',ids)
-        persona=next(row for row in entries if row['id']=='persona')['config']['prefix']
-        self.assertIn('one personal assistant',persona)
-        self.assertNotIn('Operate only',persona)
+        persona=next(row for row in entries if row['id']=='persona')
+        self.assertTrue(persona['name'].endswith('/adapters/dsh-identity/index.mjs'))
+        self.assertTrue(Path(persona['name']).is_file())
 
 
 class ContextBudgetCompositionTests(unittest.TestCase):

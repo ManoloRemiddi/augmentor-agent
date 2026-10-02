@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Agent settings: `test_agent_settings.py` uses real Qt interactions with synthetic identity/memory state. `agent-identity.test.mjs` checks shared Soul snapshots and optimistic access settings. `codex-app-server.test.mjs` uses the pinned real Codex binary against a synthetic provider to verify full/read-only/approval execution. All identity writes in these checks use temporary directories.
+
 Codex runtime tests: build first, then run `node --test tests/codex-*.test.mjs`.
 They cover real app-server operation against a synthetic Responses provider,
 the native wire adapter, durable recovery, private IPC and profile contracts.

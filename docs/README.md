@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+- [Desktop identity, Soul, Memory and settings](AGENT-SETTINGS.md): approved narrow panel, prompt snapshots, access defaults and qualification.
+
 
 - [Immediate composer feedback and regression evidence](COMPOSER-SEND-FEEDBACK.md)
 # Documentation index

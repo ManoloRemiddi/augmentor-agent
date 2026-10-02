@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Desktop [agent settings](AGENT-SETTINGS.md) own a shared private identity and authoritative `soul.md`. Harnesses snapshot personal instructions per conversation; Memory displays existing scoped projections rather than maintaining another memory file.
+
 # Current architecture
 
 See [embedded Browser and specialist workspaces](WORKSPACE-EMBEDDING.md) for product-owned embedding, scoped tools and memory.

@@ -60,6 +60,6 @@ class CodexAdapter:
     def session_rows(self): return self.call('session.list')['items']
     def running_state(self, session): return next((row['running'] for row in self.session_rows() if row['sessionId'] == session), None)
     def saved_chats(self, action='state', session=None): return self.call('chats.saved', {'action': action, 'sessionId': session})['saved']
-    def setting(self, namespace): return None
+    def setting(self, namespace): return next((s for s in self.call('settings.describe')['namespaces'] if s['ns']==namespace),None)
     def profiles(self): return self.call('profiles.list')['profiles']
     def configure_profile(self, profile): return self.call('profiles.configure', profile)

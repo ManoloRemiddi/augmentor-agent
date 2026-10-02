@@ -21,6 +21,15 @@ class DshAdapter(DshClient):
         self.native_interactions=False
         saved=current();self.product=saved.get('endpoint')==self.base and saved.get('home')==str(self.home)
         if self.product:self.preset='augmentor-linux-product'
+    def setting(self, namespace):
+        value=super().setting(namespace)
+        if namespace=='permission' and self.product and value and not getattr(self,'_access_initialized',False):
+            # Public settings descriptors distinguish explicit user state from inherited defaults.
+            if 'defaultPreset' not in (value.get('user') or {}):
+                super().call('settings.mutate',{'ns':'permission','expectedRevision':value['revision'],'ops':[{'op':'set','path':['defaultPreset'],'value':'danger-full-access'}]})
+                value=super().setting(namespace)
+            self._access_initialized=True
+        return value
     def owns_preset(self, preset):
         return preset in ('augmentor-linux-product','augmentor-browser-product') if self.product else preset==self.preset
     def running_state(self, session):
@@ -65,6 +74,7 @@ class DshAdapter(DshClient):
             if not any(row.get('id')==self.preset and not row.get('broken') for row in presets):
                 raise ContractError('The Augmentor agent preset is unavailable. Open Settings → Connect DSH, check the connection, then Save and use DSH.')
         if method=='session.branch':return branch(super().call,p,surface='linux',endpoint=self.base,exact_fork=product_exact_fork(self.base,self.home) if self.product else None)
+        if method=='session.create' and self.product:self.setting('permission')
         if method=='session.create':p={k:v for k,v in p.items() if k!='selection'}
         if method=='models.pin':
             section=self.setting('model-picker-augmented')

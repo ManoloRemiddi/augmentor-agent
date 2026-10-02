@@ -82,7 +82,7 @@ class MarkdownTests(unittest.TestCase):
 
     def test_thinking_expands_streams_and_restores_from_history(self):
         from PySide6.QtCore import QUrl
-        w=Window()
+        w=Window(); w.preferences.values['expand_thinking']=False
         w.fold_event({'type':'assistant/chunk','data':{'chunk':{'type':'reasoning-delta','text':'Checking the supplied details.'}}})
         w.render_messages()
         self.assertIn('Thinking',w.transcript.toPlainText())

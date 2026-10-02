@@ -25,12 +25,11 @@ HEADER='# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRe
 
 def personal_agent_entries():
     """Both legacy preset IDs are aliases for one maintained personal agent."""
-    persona=(ROOT/'config/agent-persona.md').read_text()+'\n\n'+(ROOT/'config/browser-recovery.md').read_text()
     capabilities=json.loads((ROOT/'release/dsh/desktop-capabilities.json').read_text())
     compaction=next(row for row in capabilities if row['id']=='compaction')
     compaction['config'].append({'id':'augmentor-context-budget','name':str(ROOT/'adapters/dsh-context-budget/index.mjs')})
     return [
-        {'id':'persona','name':'@deepseek-ai/dsh-persona','config':{'prefix':persona,'complete':True,'includeRuntimeContext':False}},
+        {'id':'persona','name':str(ROOT/'adapters/dsh-identity/index.mjs')},
         {'id':'augmentor-memory','name':str(ROOT/'adapters/dsh-memory/index.mjs')},
         {'id':'augmentor-home-client','name':str(ROOT/'adapters/dsh-home-client/index.mjs')},
         {'id':'augmentor-execution','name':str(ROOT/'adapters/dsh-execution/index.mjs')},

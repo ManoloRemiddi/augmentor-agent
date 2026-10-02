@@ -39,3 +39,20 @@ class DshReadinessTests(unittest.TestCase):
             return {'version':'0.1.5-rc.1'}
         with patch.object(DshClient, 'call', side_effect=reply):
             self.assertEqual(adapter.call('host.describe'), {'version':'0.1.5-rc.1'})
+
+
+class DshAccessDefaultsTests(unittest.TestCase):
+    def adapter(self):
+        with patch('augmentor_linux.adapters.dsh.current',return_value={}):
+            adapter=DshAdapter(base='http://127.0.0.1:3080',home=Path(tempfile.gettempdir()))
+        adapter.product=True
+        return adapter
+    def test_preserves_explicit_user_policy(self):
+        adapter=self.adapter(); descriptor={'ns':'permission','revision':2,'user':{'defaultPreset':'read-only'},'value':{'defaultPreset':'read-only'}}
+        with patch.object(DshClient,'setting',return_value=descriptor),patch.object(DshClient,'call') as call:
+            self.assertEqual(adapter.setting('permission'),descriptor); call.assert_not_called()
+    def test_fresh_permission_uses_full_with_optimistic_revision(self):
+        adapter=self.adapter(); fresh={'ns':'permission','revision':0,'value':{'defaultPreset':'workspace-write'}}; saved={**fresh,'revision':1,'user':{'defaultPreset':'danger-full-access'},'value':{'defaultPreset':'danger-full-access'}}
+        with patch.object(DshClient,'setting',side_effect=[fresh,saved]),patch.object(DshClient,'call') as call:
+            self.assertEqual(adapter.setting('permission'),saved)
+            self.assertEqual(call.call_args.args[1]['expectedRevision'],0); self.assertEqual(call.call_args.args[1]['ops'][0]['value'],'danger-full-access')

@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {soulText} from '../../identity/src/index.js';
 import {desktopCapabilities} from '../../desktop/src/capabilities.js';
 import {desktopPackage,control as desktopControl} from '../../desktop/src/index.js';
 import {DualMemoryClient} from '../../memory/src/dual.js';
@@ -24,7 +25,7 @@ import {historyPage} from '../../protocol/src/history.js';
 import {DesktopSpecialist,DESKTOP_DELEGATION_GUIDANCE} from './desktop-specialist.js';
 import {linuxDesktopExecutor} from '../../pi-linux/src/desktop-executor.js';
 const browserRecovery = readFileSync(new URL('../../../config/browser-recovery.md', import.meta.url), 'utf8');
-interface Meta {memoryStartSeq?:number;surface?:"linux"|"browser";id:string;cwd:string;file?:string;selection:Data;title:string;saved:boolean;policy:string;updatedAt:number;requests:string[];running:boolean;fork?:{sessionId:string;messageSeq:number;mode:'reply'|'edit'}}
+interface Meta {soul?:string;memoryStartSeq?:number;surface?:"linux"|"browser";id:string;cwd:string;file?:string;selection:Data;title:string;saved:boolean;policy:string;updatedAt:number;requests:string[];running:boolean;fork?:{sessionId:string;messageSeq:number;mode:'reply'|'edit'}}
 interface Loaded {memory:DualMemoryClient;meta:Meta;session:AgentSession;manager:SessionManager;events:DisplayEvent[];turnId?:string;cancelled:boolean;task?:Promise<void>}
 export class Host {
   readonly dirs=paths();
@@ -39,7 +40,7 @@ export class Host {
   readonly backend=process.env.AUGMENTOR_PI_DESKTOP_HELPER || fileURLToPath(new URL('../../../apps/native/augmentor_linux/desktop.py',import.meta.url));
   readonly desktopSpecialist=new DesktopSpecialist(join(this.dirs.state,'desktop-runs'),linuxDesktopExecutor(this.backend));
   constructor(readonly publish:(sid:string,frame:Data)=>void,readonly connected:(sid:string)=>boolean){
-    this.settings=readJson(join(this.dirs.config,'settings.json'),{revision:0,defaultPreset:'workspace-write',pinned:[],hidden:[],defaultModel:null});
+    this.settings=readJson(join(this.dirs.config,'settings.json'),{revision:0,defaultPreset:'danger-full-access',pinned:[],hidden:[],defaultModel:null});
     this.interactions=new Interactions(publish,connected,Number(process.env.AUGMENTOR_PI_INTERACTION_TIMEOUT||120000));
     for(const file of readdirSync(this.dirs.sessions).filter(f=>f.endsWith('.meta.json'))){const m=readJson<Meta>(join(this.dirs.sessions,file),null as any);identifier(m.id);this.metadata.set(m.id,m);}
   }
@@ -90,7 +91,7 @@ export class Host {
     const resourceLoader=new DefaultResourceLoader({cwd:m.cwd,agentDir:this.dirs.agent,settingsManager,noExtensions:true,noSkills:true,noContextFiles:true,noThemes:true,
       additionalExtensionPaths:m.surface==='browser'?[]:resources.sources,additionalSkillPaths:m.surface==='browser'?[]:resources.skills,additionalPromptTemplatePaths:[privateDir(join(this.dirs.agent,'prompts'))],
       extensionFactories:[this.policy(m),homePackage('pi:'+m.id),pi=>memoryPackage(pi,m.fork?undefined:'pi:'+m.id),piMemoryContext(memory,!m.fork),...(m.surface==='browser'?[this.browser.package(m.id)]:process.env.AUGMENTOR_PI_LINUX_TOOLS==='0'?[]:[linuxPackage(this.backend),desktopPackage('pi:'+m.id),this.desktopSpecialist.package({owner:'pi:'+m.id,cwd:m.cwd,agentDir:this.dirs.agent,modelRuntime:this.modelRuntime,policy:m.policy,approve:(name,args)=>this.interactions.approve(m.id,name,args),cancelInteractions:()=>this.interactions.cancel(m.id),progress:info=>this.append(m,'desktop/progress',info)})])],
-      appendSystemPrompt:[browserRecovery,m.surface==='browser'?'You are Augmentor Agent for Browser, powered by Pi. Use the browser tools to inspect and act in the connected visible browser. Read a fresh snapshot before actions. Stop on stale targets or denied actions. Report unknown outcomes honestly; do not replay actions.': `You are Augmentor Agent Desktop, powered by Pi. The operating system is ${process.platform}. Use tools to check actual facts. Keep the user informed. Use linux_browser_open for visible Chromium; never claim dispatch proves a page loaded. Use the platform accessibility observations for desktop structure. Stop on stale targets or denied actions. Use linux_desktop_connect and the user’s OS consent for desktop control. Use fresh screenshots before each action, then verify the result. A model must support image input. Stop on focus changes; never replay an unknown input outcome. Ask the user only when required information is missing.`,...(m.surface!=='browser'&&process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0'?[DESKTOP_DELEGATION_GUIDANCE]:[])],
+      appendSystemPrompt:[m.soul??soulText(),browserRecovery,m.surface==='browser'?'You are Augmentor Agent for Browser, powered by Pi. Use the browser tools to inspect and act in the connected visible browser. Read a fresh snapshot before actions. Stop on stale targets or denied actions. Report unknown outcomes honestly; do not replay actions.': `You are Augmentor Agent Desktop, powered by Pi. The operating system is ${process.platform}. Use tools to check actual facts. Keep the user informed. Use linux_browser_open for visible Chromium; never claim dispatch proves a page loaded. Use the platform accessibility observations for desktop structure. Stop on stale targets or denied actions. Use linux_desktop_connect and the user’s OS consent for desktop control. Use fresh screenshots before each action, then verify the result. A model must support image input. Stop on focus changes; never replay an unknown input outcome. Ask the user only when required information is missing.`,...(m.surface!=='browser'&&process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0'?[DESKTOP_DELEGATION_GUIDANCE]:[])],
     });await resourceLoader.reload();
     const errors=resourceLoader.getExtensions().errors;if(errors.length)throw new Error('Pi extension loading failed: '+errors.map(e=>e.error).join('; '));
     const manager=branchManager??(m.file&&existsSync(m.file)?SessionManager.open(m.file):SessionManager.create(m.cwd,join(this.dirs.sessions,m.id)));
@@ -129,7 +130,7 @@ export class Host {
     if(!source.file||!existsSync(source.file))throw new Error('This conversation has no persisted Pi history yet.');
     const directory=privateDir(join(this.dirs.sessions,sid));
     const context=branchContext(source.file,directory,this.loaded.get(source.id)?.events??this.events(source),p.messageSeq,p.mode);
-    const m:Meta={memoryStartSeq:context.events.at(-1)?.seq??0,surface:source.surface,id:sid,cwd:source.cwd,file:context.file,selection:{...source.selection},title:((p.mode==='edit'?'Edit · ':'Branch · ')+source.title).slice(0,200),saved:false,policy:source.policy,updatedAt:Date.now(),requests:[],running:false,fork};
+    const m:Meta={memoryStartSeq:context.events.at(-1)?.seq??0,surface:source.surface,id:sid,cwd:source.cwd,file:context.file,selection:{...source.selection},title:((p.mode==='edit'?'Edit · ':'Branch · ')+source.title).slice(0,200),saved:false,soul:source.soul??soulText(),policy:source.policy,updatedAt:Date.now(),requests:[],running:false,fork};
     writeFileSync(join(this.dirs.sessions,sid+'.events.jsonl'),context.events.map(e=>JSON.stringify(e)+'\n').join(''),{mode:0o600});
     // Pi defers writing branches with no assistant messages until a reply.
     if(context.manager&&context.file&&!existsSync(context.file))await this.load(m,context.manager);
@@ -174,7 +175,7 @@ export class Host {
     case 'models.pin':{await this.selected(p);const key=p.provider+'/'+p.model;this.settings.pinned=this.settings.pinned.map((m:any)=>typeof m==='string'?m:m.provider+'/'+m.model).filter((m:string)=>m!==key);if(p.pinned)this.settings.pinned.push(key);this.persistSettings();return this.catalog();}
     case 'models.configure':{if(!p.config||typeof p.config.providers!=='object'||Array.isArray(p.config.providers))throw new Error('Invalid providers configuration');if([...this.metadata.values()].some(m=>m.running))throw new Error('Stop active chats before changing providers');const file=join(this.dirs.agent,'models.json');const old=existsSync(file)?readFileSync(file,'utf8'):null;atomicJson(file,p.config);try{await this.modelRuntime.refresh({allowNetwork:false,signal:AbortSignal.timeout(10000)});if(this.modelRuntime.getError())throw new Error(this.modelRuntime.getError());}catch(error){if(old===null)unlinkSync(file);else writeFileSync(file,old,{mode:0o600});await this.modelRuntime.refresh({allowNetwork:false});throw error;}return this.catalog();}
     case 'models.reload':await this.modelRuntime.refresh({allowNetwork:false,signal:AbortSignal.timeout(10000)});return this.catalog();
-    case 'session.create':{const sid=identifier(p.sessionId);let m=this.metadata.get(sid);if(!m){await this.selected(p.selection);const cwd=resolve(text(p.cwd,4096));m={surface:p.surface==='browser'?'browser':'linux',id:sid,cwd,selection:p.selection,title:'',saved:false,policy:this.settings.defaultPreset,updatedAt:Date.now(),requests:[],running:false};this.metadata.set(sid,m);this.save(m);await this.load(m);}return {sessionId:sid};}
+    case 'session.create':{const sid=identifier(p.sessionId);let m=this.metadata.get(sid);if(!m){await this.selected(p.selection);const cwd=resolve(text(p.cwd,4096));m={surface:p.surface==='browser'?'browser':'linux',id:sid,cwd,selection:p.selection,title:'',saved:false,soul:soulText(),policy:this.settings.defaultPreset,updatedAt:Date.now(),requests:[],running:false};this.metadata.set(sid,m);this.save(m);await this.load(m);}return {sessionId:sid};}
     case 'session.list':return {items:[...this.metadata.values()].sort((a,b)=>b.updatedAt-a.updatedAt).map(m=>({sessionId:m.id,cwd:m.cwd,agentPreset:m.surface==='browser'?'augmentor-browser-pi':'augmentor-linux-pi',title:m.title,updatedAt:m.updatedAt,saved:m.saved,running:m.running,blank:!m.title}))};
     case 'session.history':{const m=this.getMeta(p.sessionId);return historyPage(this.loaded.get(m.id)?.events??this.events(m),p.maxMessages,p.beforeSeq);}
     case 'session.models':return {current:this.getMeta(p.sessionId).selection};

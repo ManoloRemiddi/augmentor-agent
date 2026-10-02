@@ -733,6 +733,7 @@ class Window(QWidget):
         if not text:return
         if self.reasoning_index is None:
             self.reasoning_index=len(self.messages);self.messages.append(('Thinking',text))
+            if self.preferences.values.get('expand_thinking',True):self.expanded_thinking.add(self.reasoning_index)
         else:
             previous=self.messages[self.reasoning_index][1]
             self.messages[self.reasoning_index]=('Thinking',text if replace else previous+text)
@@ -854,6 +855,13 @@ class Window(QWidget):
         self.cancel_inline_title()
         if title and self.controller and session==self.controller.session and title!=self.title_text:
             self.controller.rename(title)
+
+    def set_thinking_visibility(self, expanded):
+        self.preferences.values['expand_thinking']=bool(expanded)
+        self.preferences.save()
+        self.expanded_thinking={i for i,(role,_) in enumerate(self.messages) if role=='Thinking'} if expanded else set()
+        self.rendered_messages=None
+        self.render_messages()
 
     def open_access(self):
         if self.controller:AccessDialog(self).exec()

@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Agent identity and Soul](AGENT-SETTINGS.md) are stored privately in `augmentor-pi/identity/`: profile metadata/PNG, authoritative `soul.md`, and DSH per-conversation prompt snapshots. Codex/Pi snapshots remain in conversation metadata. Saving Soul sends those instructions to the chosen provider on new chats; identity images remain local. Resetting Soul preserves memory and permissions.
+
 # Data, permissions and support
 
 Augmentor runs under your Linux account. Pi is bundled; DSH is optional. The Linux

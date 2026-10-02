@@ -1,5 +1,9 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## 2 October: Desktop settings feature branch, awaiting owner acceptance
+
+See [Desktop agent settings](AGENT-SETTINGS.md). Work is isolated in `feat/desktop-agent-settings` from `d91c520`; the original checkout and its unrelated edits are preserved. Source build, 483 Node and 610 native tests pass with two skips in each suite. Compatible 0.2.11 candidate qualification is recorded in that guide. No merge is authorized until the owner tests it and gives the green light.
+
 # Start here: agent handoff
 
 ## October 1 merge blockers: current main and separate Codex prerequisite

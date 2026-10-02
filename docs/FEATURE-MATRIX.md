@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Desktop [identity-first settings](AGENT-SETTINGS.md) include rename/image, a voice energy ring, stacked Soul/Memory cards and More → All settings. Shared source applies on Linux/macOS; installed Mac acceptance remains unverified.
+
 Current OS parity direction and verified gaps: [one-product architecture audit](PLATFORM-PARITY-AUDIT.md).
 The tables below compare harnesses and presentation surfaces; they do not establish
 Linux/macOS parity. The [Mac recovery record](MACOS-RECOVERY-2026-09-26.md) now

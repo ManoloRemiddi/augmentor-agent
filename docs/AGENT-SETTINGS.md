@@ -1,0 +1,98 @@
+<!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
+
+# Desktop agent settings
+
+The narrow Desktop panel starts with Agent, Look, Voice and More. Agent contains
+an editable name, an image picker and the existing voice energy ring, followed
+by rectangular Soul and Memory cards stacked vertically, and access for new chats.
+More opens All settings inside the same panel. There is no duplicate bottom
+entry. Appearance, Voice, Conversation, Connections and Advanced lead to the
+existing editors; shortcuts, memory maintenance, recovery, versions, support and
+licenses remain available. Theme, animation and voice enablement have direct controls.
+
+This change implements the Desktop direction approved on 2 October 2026.
+The spacious Browser redesign is a later presentation step; Browser conversations
+use the same backend Soul snapshots. Existing setup and conversation state remain.
+The Agent page is available after setup through Settings; there is no extra blocking
+personalization wizard.
+
+## Identity and Soul
+
+Identity lives in `identity/` under `AUGMENTOR_PI_CONFIG`, otherwise
+`$XDG_CONFIG_HOME/augmentor-pi` (default `~/.config/augmentor-pi`).
+`AUGMENTOR_IDENTITY_DIR` overrides that directory for isolated tests.
+`profile.json` stores the name and a copied PNG avatar. Images are decoded locally,
+bounded to 10 MB and 8192 pixels per dimension, and resized to at most 256 pixels.
+The image remains available after its source file is removed. Identity images
+are not sent as model input. Reset image restores the voice energy ring; its
+animation runs while visible and enabled by Appearance and stops when hidden.
+Appearance and voice preferences retain their existing per-window ownership.
+
+`soul.md` is authoritative personal Markdown. Before the first save, it inherits
+`config/agent-persona.md`. Soul writes use an atomic, durable private file replacement,
+a file lock and optimistic content revisions. Empty, NUL-containing and over-32-KiB
+instructions are rejected. Conflicting edits retain the draft and the other writer.
+Reset Soul loads the packaged default into the editor. Save applies it; Cancel
+retains the saved version. Closing an unsaved draft asks before discarding it.
+Reset affects no other identity, access or memory data.
+
+Pi captures Soul in new conversation metadata; forks inherit the source snapshot.
+Codex captures it in its existing immutable developer-instruction snapshot and
+preserves its base instructions and capability guidance. DSH uses a scoped prompt
+registry section and per-conversation `identity/dsh-sessions/<hashed-id>.md` snapshots:
+its preset mount is shared, but conversation instructions are not. Historical DSH
+chats without a snapshot inherit the original packaged persona, and branches inherit
+the parent's snapshot. Updating an existing installation requires upgrading its
+owned DSH presets to the new identity adapter and restarting the idle host.
+No new journal event type or extra user message is introduced.
+
+## Memory and access
+
+Memory reads `memory.dual.recall` for the current harness-qualified conversation.
+About you and Your project show the existing relationship/work projections,
+including cached pages and pending-update state. They are derived stored knowledge,
+not an editable `memory.md` file and not a claim of a complete or freshly processed
+record. An unbound conversation, paused recall or unavailable service is shown
+honestly. Memory setup still provides separate capture/recall and processing controls
+and the existing manual-library controls; viewing knowledge does not resume processing.
+
+Fresh Pi/Codex permission settings default to Full access. The Desktop DSH adapter
+initializes an inherited permission default to Full access only when the public
+settings descriptor has no explicit user `defaultPreset`; explicit saved choices
+are preserved. All writes use the harness's optimistic revision. Changes affect
+new chats; existing chats and historical branches keep their policy.
+
+Codex Full access uses native `never` approval plus `danger-full-access`.
+Ask before actions uses `on-request` approval with a read-only filesystem sandbox,
+requiring escalation for native writes, and an explicit one-time approval for
+changing Augmentor browser/desktop/Home tools. Read only uses `never` plus
+`read-only` and blocks changing custom tools before dispatch. Observations,
+memory reads and cancellation remain available. OS desktop sharing and paired
+Home permissions still apply. Existing Codex chats without new policy metadata
+retain their previous native policy and custom-tool behavior.
+
+## Qualification — 2 October 2026
+
+Source: `feat/desktop-agent-settings`, based on `d91c520`. Implementation has not
+been merged and awaits the owner's local acceptance.
+
+- Build and TypeScript checks pass.
+- Node suite: 483 tests, 481 passed, two explicit platform/fixture skips.
+- Native suite: 610 tests, 608 passed, two explicit skips, with PySide6 6.8.2.1.
+- Ten new Qt checks cover navigation, scoped Memory, name/avatar persistence,
+  animation lifecycle, reset/cancel/save and optimistic Soul conflicts.
+- Real pinned Codex with a synthetic Responses server proves developer snapshots,
+  native approvals, custom-tool denial in Read only/Ask, and existing full-access
+  Browser and Home behavior. DSH prompt hooks are separately synthetic contract checks.
+- Dark/light and 320-pixel narrow native renders were inspected on Linux.
+- The compatible candidate copied installed product 0.2.11 artifact
+  `3e89dedc3d701fe66a41bfd0b7ff2558d0aaeb70b76750a9409eac7b0fbf30be`, overlaid
+  reviewed modules, and passed its ten Qt tests plus four Node/real-Codex checks.
+  Its product manifest, installed dependencies, speech contract and unrelated
+  native behavior remain from that artifact. Source product 0.2.13 is not claimed
+  as a new installed 0.2.13 release.
+
+Linux and macOS share the UI, file persistence and harness adapters. Both use
+POSIX file locks and atomic writes; no new OS adapter is required. No installed
+Mac app or real Mac desktop interaction was tested in this turn. Packaging and
+native dependency qualification on macOS remain acceptance work.
