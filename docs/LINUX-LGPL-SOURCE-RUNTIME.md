@@ -18,6 +18,19 @@ the distribution conditions; this recipe is engineering work, not legal approval
 
 ## Intended dependency closure
 
+The [marked Noble source-builder recipe](../release/linux-lgpl-source-builder.Dockerfile)
+and [build driver](../release/build-linux-lgpl-runtime.py) now run in an isolated
+offline container with two CPUs,8GiB and no host mounts/devices. Exact signed
+distro build package inventory is hashed. The first Qt configuration disabled
+AT-SPI/TLS/Fontconfig; its partial tree/logs are preserved and the container was
+intentionally stopped, not promoted. The corrected empty-tree build requires all
+nineteen tested cache features ON before compilation. QtBase,ShaderTools,Svg and
+ImageFormats compile/install; QtDeclarative is still compiling at the
+[checked boundary](../release/qualification/next-targets/20261002-qt-source-build-checkpoint.json).
+The full Qt/PySide build remains incomplete and downstream gates remain false.
+Actual PySide/shiboken .cmake.conf uses MICRO_VERSION2.1, producing6.8.2.1 despite
+the archive's6.8.2 directory suffix. No selected runtime or owner packages changed.
+
 The actual application uses Core/Gui/Widgets/Network/DBus, Svg, Quick/QuickWidgets
 and QtTest qualification fixtures. PySide bindings also need Qml/OpenGL.
 plasma.qml's ShaderEffect needs ShaderTools/qsb during the build. The source set

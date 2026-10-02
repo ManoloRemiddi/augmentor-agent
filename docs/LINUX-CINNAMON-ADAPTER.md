@@ -21,6 +21,28 @@ remain explicit. No administrative unlock was used for these password tests.
 
 ## Separate versioned implementation
 
+The first [bridge candidate](../services/desktop/cinnamon-extension/README.md)
+is now implemented with Status/RefreshLock/ShortcutBindings only, no scene/input
+methods. It pins the exact running6.6.4/X11 API and exports on Cinnamon's native
+unique connection. Ten protocol cases pass; actual Mint returns76 bounded
+callback-free registry entries. Actual disable removes its object, re-enable
+creates a new initially unknown epoch and preserves foreign extension IDs/order.
+Natural idle screensaver owner exit invalidates cached inactivity; explicit fresh
+discovery verifies a new owner/generation. Read the
+[checked artifact/helper evidence](../release/qualification/next-targets/20261002-cinnamon-shortcut-bridge.json).
+
+The first expected-inactive inspection correctly refused the actual default idle
+lock. The earlier candidate then stayed unknown during cold service startup;
+those refusals are preserved. The revised bridge uses bounded async activation/
+query waits and rechecks a startup negative signal through a new pinned query.
+Negative signals never directly grant inactivity. An earlier input-driver step
+ran before screenshot inspection and landed on the already unlocked Update Manager
+welcome; it is explicitly excluded from authentication evidence. Actual v2
+password-lock repetition, production stale-epoch consumer, registry-spice mutation,
+shortcut Save/delivery and the full scene/consent/Stop cases remain open. No app
+is installed. The normal source-helper inspector requests service query activation
+but changes no settings, grabs or screen lock state.
+
 Use a separate Cinnamon backend, not a GNOME observer alias. Research pins are
 [Cinnamon 6.6.4](https://github.com/linuxmint/cinnamon/tree/8842b16921bb6984f1e14658bf56132163fc094d),
 [Muffin 6.6.1](https://github.com/linuxmint/muffin/tree/7f8302f7953ca5a3cb88223f21d646a011e24844)

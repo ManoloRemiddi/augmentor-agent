@@ -1,0 +1,311 @@
+{
+  "format": "augmentor-linux-source-runtime-build-checkpoint/1",
+  "sourceBase": "f815c23cc6f74926413a2ce14c084433701fcd67",
+  "infrastructure": {
+    "sourceBase": "f815c23cc6f74926413a2ce14c084433701fcd67",
+    "imageId": "sha256:35812bfce750cad82a9332db15c5bf358cd48ad8870fb72e99e5d70887cfe59a",
+    "containerId": "8bcaeaba4086c4f9b63a9bb69b7a4e2d2c8c1fc0a7b215b63db3429706d11bca",
+    "containerName": "augmentor-noble-qt-source-20261002-b",
+    "basePin": "docker.io/library/ubuntu@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3",
+    "dockerfileSha256": "fce11668a15f48afeaade0ed88601a190f877933f45caf7a8e61934f63b38f9d",
+    "toolSha256": "8f270c2f8c455048c2b84fbf53f561a5714dd42e9a3122bdbf84041ae565890b",
+    "policySha256": "969dca5093394282eef5517ade6e0bcb31d1a9ceb1b22513d213aa9ef434196e",
+    "recipeUncommitted": true,
+    "cpuLimit": 2,
+    "memoryLimitBytes": 8589934592,
+    "pidsLimit": 512,
+    "hostMounts": false,
+    "hostDevices": false,
+    "buildNetwork": "none",
+    "firstSourceBuildPreservedUnqualified": true,
+    "ownerStateChanged": false
+  },
+  "policySha256": "969dca5093394282eef5517ade6e0bcb31d1a9ceb1b22513d213aa9ef434196e",
+  "toolSha256": "8f270c2f8c455048c2b84fbf53f561a5714dd42e9a3122bdbf84041ae565890b",
+  "dependencyInventorySha256": "bfb0b37db80d53add4c89825ec14ce0b81940072a72f5a5360942fa7955b503f",
+  "qtbaseRequiredFeatures": {
+    "testlib": "ON",
+    "dbus": "ON",
+    "wayland": "ON",
+    "accessibility": "ON",
+    "accessibility_atspi_bridge": "ON",
+    "icu": "ON",
+    "xcb": "ON",
+    "xcb_glx": "ON",
+    "egl": "ON",
+    "openssl": "ON",
+    "openssl_linked": "ON",
+    "fontconfig": "ON",
+    "system_zlib": "ON",
+    "system_pcre2": "ON",
+    "system_doubleconversion": "ON",
+    "system_freetype": "ON",
+    "system_harfbuzz": "ON",
+    "system_png": "ON",
+    "system_jpeg": "ON"
+  },
+  "completedSteps": [
+    {
+      "module": "qtbase",
+      "phase": "configure",
+      "argv": [
+        "/work/runtime-build/sources/qtbase-everywhere-src-6.8.2/configure",
+        "-prefix",
+        "/work/runtime-build/qt-prefix",
+        "-shared",
+        "-release",
+        "-nomake",
+        "tests",
+        "-nomake",
+        "examples",
+        "-feature-testlib",
+        "-feature-dbus",
+        "-feature-wayland",
+        "-feature-accessibility",
+        "-feature-accessibility-atspi-bridge",
+        "-icu",
+        "-xcb",
+        "-opengl",
+        "desktop",
+        "-egl",
+        "-openssl-linked",
+        "-fontconfig",
+        "-system-zlib",
+        "-system-pcre",
+        "-system-doubleconversion",
+        "-system-freetype",
+        "-system-harfbuzz",
+        "-system-libpng",
+        "-system-libjpeg",
+        "--",
+        "-GNinja"
+      ],
+      "cwd": "/work/runtime-build/builds/qtbase",
+      "completed": true,
+      "exit": 0,
+      "logSha256": "0f460db2f292e2f3d4759ab2cb5ae46f4997ab3447eff5e22639390e5ef1580f"
+    },
+    {
+      "module": "qtbase",
+      "phase": "compile",
+      "argv": [
+        "cmake",
+        "--build",
+        ".",
+        "--parallel",
+        "2"
+      ],
+      "cwd": "/work/runtime-build/builds/qtbase",
+      "completed": true,
+      "exit": 0,
+      "logSha256": "4a28d4e2bfe8e69ddfc71848c3f8479ca52fcd0235d7bd3e18e2c711ec2fe51b"
+    },
+    {
+      "module": "qtbase",
+      "phase": "install",
+      "argv": [
+        "cmake",
+        "--install",
+        "."
+      ],
+      "cwd": "/work/runtime-build/builds/qtbase",
+      "completed": true,
+      "exit": 0,
+      "logSha256": "98508c2fc93798ed915142478809d7361d0d4c6d0d7ae6de38bde29b93734475"
+    },
+    {
+      "module": "qtshadertools",
+      "phase": "configure",
+      "argv": [
+        "/work/runtime-build/qt-prefix/bin/qt-configure-module",
+        "/work/runtime-build/sources/qtshadertools-everywhere-src-6.8.2",
+        "--",
+        "-GNinja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DQT_BUILD_TESTS=OFF",
+        "-DQT_BUILD_EXAMPLES=OFF"
+      ],
+      "cwd": "/work/runtime-build/builds/qtshadertools",
+      "completed": true,
+      "exit": 0,
+      "logSha256": "ec5f1fa3aa0628c9b560cdfa3f5ef70ce259fe33c448e839612c9e6b9299dc00"
+    },
+    {
+      "module": "qtshadertools",
+      "phase": "compile",
+      "argv": [
+        "cmake",
+        "--build",
+        ".",
+        "--parallel",
+        "2"
+      ],
+      "cwd": "/work/runtime-build/builds/qtshadertools",
+      "completed": true,
+      "exit": 0,
+      "logSha256": "8cf68605ad55452b5c0d51577d3efea8ec6b9a732962c94ca404e1c2fc7ce24e"
+    },
+    {
+      "module": "qtshadertools",
+      "phase": "install",
+      "argv": [
+        "cmake",
+        "--install",
+        "."
+      ],
+      "cwd": "/work/runtime-build/builds/qtshadertools",
+      "completed": true,
+      "exit": 0,
+      "logSha256": "fdf9b231113d51f80f87f8f9c42a0075948d3aefcfb19679981e9dd4f2e577f6"
+    },
+    {
+      "module": "qtsvg",
+      "phase": "configure",
+      "argv": [
+        "/work/runtime-build/qt-prefix/bin/qt-configure-module",
+        "/work/runtime-build/sources/qtsvg-everywhere-src-6.8.2",
+        "--",
+        "-GNinja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DQT_BUILD_TESTS=OFF",
+        "-DQT_BUILD_EXAMPLES=OFF"
+      ],
+      "cwd": "/work/runtime-build/builds/qtsvg",
+      "completed": true,
+      "exit": 0,
+      "logSha256": "3e537fafbc20212000c7eb7f1dcfff831eab1103c9e89397e9915ef54ed5248f"
+    },
+    {
+      "module": "qtsvg",
+      "phase": "compile",
+      "argv": [
+        "cmake",
+        "--build",
+        ".",
+        "--parallel",
+        "2"
+      ],
+      "cwd": "/work/runtime-build/builds/qtsvg",
+      "completed": true,
+      "exit": 0,
+      "logSha256": "4130e4eabea11bf785a8e6e39e16b55c046365d9ee14405514b704dece116106"
+    },
+    {
+      "module": "qtsvg",
+      "phase": "install",
+      "argv": [
+        "cmake",
+        "--install",
+        "."
+      ],
+      "cwd": "/work/runtime-build/builds/qtsvg",
+      "completed": true,
+      "exit": 0,
+      "logSha256": "8fb308a936bb9c050064a0fe4e5051f395288dde35f8b41da34b67a5bc944aab"
+    },
+    {
+      "module": "qtimageformats",
+      "phase": "configure",
+      "argv": [
+        "/work/runtime-build/qt-prefix/bin/qt-configure-module",
+        "/work/runtime-build/sources/qtimageformats-everywhere-src-6.8.2",
+        "-system-tiff",
+        "-system-webp",
+        "--",
+        "-GNinja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DQT_BUILD_TESTS=OFF",
+        "-DQT_BUILD_EXAMPLES=OFF"
+      ],
+      "cwd": "/work/runtime-build/builds/qtimageformats",
+      "completed": true,
+      "exit": 0,
+      "logSha256": "16c35b714da618c1c5d9e9d5f40336ba80c403271018e33c90c62745453fbd65"
+    },
+    {
+      "module": "qtimageformats",
+      "phase": "compile",
+      "argv": [
+        "cmake",
+        "--build",
+        ".",
+        "--parallel",
+        "2"
+      ],
+      "cwd": "/work/runtime-build/builds/qtimageformats",
+      "completed": true,
+      "exit": 0,
+      "logSha256": "a646d81744d4714e579c7abb2ced6316cc462aac8752c849bc677cb593ab6c9d"
+    },
+    {
+      "module": "qtimageformats",
+      "phase": "install",
+      "argv": [
+        "cmake",
+        "--install",
+        "."
+      ],
+      "cwd": "/work/runtime-build/builds/qtimageformats",
+      "completed": true,
+      "exit": 0,
+      "logSha256": "9454595d56cd75e6014cc1418f7cdc1f6fe0f9a9354d0ad2a5a7637bc1db04c6"
+    },
+    {
+      "module": "qtdeclarative",
+      "phase": "configure",
+      "argv": [
+        "/work/runtime-build/qt-prefix/bin/qt-configure-module",
+        "/work/runtime-build/sources/qtdeclarative-everywhere-src-6.8.2",
+        "--",
+        "-GNinja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DQT_BUILD_TESTS=OFF",
+        "-DQT_BUILD_EXAMPLES=OFF"
+      ],
+      "cwd": "/work/runtime-build/builds/qtdeclarative",
+      "completed": true,
+      "exit": 0,
+      "logSha256": "4f11cbd7850e8544016040304f93e8ac2a130eba302a0940792b1b414cd672d4"
+    }
+  ],
+  "unfinishedSteps": [
+    {
+      "module": "qtdeclarative",
+      "phase": "compile",
+      "argv": [
+        "cmake",
+        "--build",
+        ".",
+        "--parallel",
+        "2"
+      ],
+      "cwd": "/work/runtime-build/builds/qtdeclarative",
+      "completed": false
+    }
+  ],
+  "pysideArchiveVersionMetadataVerified": {
+    "directorySuffix": "6.8.2",
+    "pysideMajor": "6",
+    "pysideMinor": "8",
+    "pysideMicro": "2.1",
+    "shibokenMicro": "2.1",
+    "actualBuildVersion": "6.8.2.1"
+  },
+  "firstBuilderStoppedIntentionally": true,
+  "firstBuilderDisabledAccessibilityTlsFontconfig": true,
+  "firstPartialTreeAndLogsPreserved": true,
+  "runtimeBuilt": false,
+  "runtimeClosureTested": false,
+  "licenseReviewComplete": false,
+  "correspondingSourceRebuildTested": false,
+  "recipientReplacementTested": false,
+  "publicReleaseQualified": false,
+  "ownerStateChanged": false,
+  "privateEvidenceSha256": {
+    "infrastructure.json": "db9e93d854f39dca867078d9b6bb41e7973b6205e7fa28a25b80dcd9789e2431",
+    "build-package-versions.txt": "bfb0b37db80d53add4c89825ec14ce0b81940072a72f5a5360942fa7955b503f",
+    "checkpoint-build.json": "7703e66730e07e46ede4d3ee467a8e32f6778d6420c4190ec5cbeed28237e4ed",
+    "first-build.json": "6c5fb8ae9384559a584746ed45cee72797dff191a750077db1cc44ef7bf9857c",
+    "first-qtbase-config.summary": "ab64ebd0994979b4723564aae8f5f8d77337e1a3ef54f055d92d497839c98ee2"
+  }
+}

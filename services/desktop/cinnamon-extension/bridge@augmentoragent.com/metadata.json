@@ -1,0 +1,6 @@
+{
+  "uuid": "bridge@augmentoragent.com",
+  "name": "Augmentor Cinnamon bridge",
+  "description": "Read-only shortcut inventory and password-lock state. Desktop input remains disabled.",
+  "cinnamon-version": ["6.6"]
+}

@@ -2,6 +2,24 @@
 
 # Start here: agent handoff
 
+## October 2 actual Cinnamon bridge and source build checkpoint
+
+The [first Cinnamon bridge](LINUX-CINNAMON-ADAPTER.md) is read-only/input-disabled,
+strict6.6.4/X11 and native-owner-pinned. Ten protocol cases and actual Mint76-record
+bounded inventory, natural idle screensaver loss/fresh owner recovery and actual
+disable/re-enable/new unknown epoch pass. Default-lock and earlier cold-query
+refusals are retained; v2 password-lock, production stale-epoch consumer, foreign/
+spice mutation, Save/delivery and full scene/control still need acceptance. The
+input-driver issue is excluded from authentication evidence. No app is installed.
+
+The [source builder](LINUX-LGPL-SOURCE-RUNTIME.md) is offline/two-CPU/8GiB, no host
+mounts/devices. First disabled-feature build is stopped/preserved. Corrected
+nineteen required features pass; four modules build/install and QtDeclarative
+is compiling at this checked boundary. Full PySide/runtime/licensing/closure/
+independent rebuild/replacement/public release remain false. Both f815c23 hosted
+workflows pass. Continue all five original rollout points. Owner state and selected
+application artifacts remain untouched; source publication does not deploy them.
+
 ## October 2 Mint reboot/password and source runtime checkpoint
 
 Actual standard-ISO Mint22.3 passes installed X11/password login, wrong/correct

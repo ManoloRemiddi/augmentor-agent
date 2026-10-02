@@ -2,6 +2,25 @@
 
 # Linux distribution rollout
 
+## October 2 actual Cinnamon bridge and partial Qt build
+
+The new source-only [Cinnamon bridge](LINUX-CINNAMON-ADAPTER.md) passes ten protocol
+cases and actual Mint native-owner/X11 status,76 bounded callback-free registry
+entries, natural screensaver idle owner loss/fresh owner recovery and disable/
+re-enable with a new unknown epoch and preserved foreign IDs. Input and scene
+qualification remain false. First default-lock and cold-query refusals are
+preserved; the revised artifact matches exact reviewed JS bytes. Shortcut Save/
+delivery, v2 password-lock repetition and production stale-epoch consumer are open.
+The input-driver issue is explicitly excluded from authentication evidence.
+
+The isolated two-CPU offline Qt source build now compiles/installs four modules
+and is compiling QtDeclarative. The corrected profile requires nineteen features,
+including AT-SPI/TLS/fontconfig/xcb/Wayland/system ICU; the first disabled-feature
+partial build was intentionally stopped and preserved. [Source-build checkpoint](LINUX-LGPL-SOURCE-RUNTIME.md)
+is not full runtime, licensing, rebuild, replacement or public release acceptance.
+Both f815c23 Linux and Mac workflows pass. All five original rollout points remain
+active; no owner services/devices/settings or selected application artifacts changed.
+
 ## October 2 Mint password/reboot and source acquisition checkpoint
 
 The [checked installed Mint report](../release/qualification/next-targets/20261002-mint223-installed-session.json)
