@@ -19,6 +19,7 @@ from PySide6.QtGui import QColor, QPainter, QKeySequence, QShortcut, QRegion, QD
 from PySide6.QtWidgets import (QApplication,QWidget,QFrame,QLabel,QPushButton,QVBoxLayout,QHBoxLayout,
     QStackedLayout,QTextEdit,QTextBrowser,QMessageBox,QInputDialog,QMenu,QSizePolicy,QLayout,QDialog,QSystemTrayIcon)
 from .controller import Controller
+from .maintenance import WindowMaintenance
 from .voice_button import VoiceButton
 from .design import COPY_FEEDBACK_MS
 from .queue_panel import QueuePanel
@@ -49,6 +50,7 @@ class Window(QWidget):
         scaled(self).setMinimumSize(364,364);self.resize(424,484)
         self.preferences=Preferences(not preview)
         if preview:self.preferences.values['ui_scale']=self.ui_scale.base
+        initialize_voice_profile = None
         if not preview and current_name()!='main':
             # Materialize the independent voice profile at first open, not
             # when the user eventually visits Voice settings. No microphone.
@@ -56,10 +58,11 @@ class Window(QWidget):
             def initialize_voice_profile():
                 try:voice_request('preferences')
                 except Exception:pass  # Optional offline voice must not prevent chat.
-            threading.Thread(target=initialize_voice_profile,daemon=True).start()
         if harness in ('pi','dsh'):
             self.preferences.values['harness']=harness;self.preferences.save()
         self.controller=None if preview else Controller(self,harness=self.preferences.values['harness'])
+        self.maintenance = WindowMaintenance(self)
+        if initialize_voice_profile:self.controller.task(initialize_voice_profile)
         self.setup_dialog=None;self.appearance_dialog=None;self.setup_offered=False
         self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.expanded_thinking=set();self.editing=None
         self.rendered_messages=None;self.rendered_partial=''
@@ -183,6 +186,7 @@ class Window(QWidget):
                 'No OpenCode conversation has been transferred or replayed.'))
 
     def switch_harness(self,harness,reconnect=False):
+        if self.maintenance.phase()!='ready':return
         if self.voice_dialog or self.voice_input or self.voice_opening:self.close_voice_panel()
         if harness not in ('pi','dsh','codex') or not self.controller:return
         if self.controller.harness==harness and not reconnect:return
@@ -215,8 +219,8 @@ class Window(QWidget):
         self.start_connection()
 
     def start_connection(self):
-        from .macos_setup import needed as mac_setup_needed
-        if self.controller.harness=='dsh' and not self.controller.session and mac_setup_needed():
+        from .managed_setup import needed as managed_setup_needed
+        if self.controller.harness=='dsh' and not self.controller.session and managed_setup_needed():
             self.setup_offered=True
             self.set_status('Set up DSH from the three-dot menu → Agent setup')
             QTimer.singleShot(0,self.open_setup)
@@ -233,26 +237,27 @@ class Window(QWidget):
             if not available and not self.controller.session:QTimer.singleShot(0,self.open_setup)
 
     def open_setup(self):
+        if getattr(self,'maintenance',None) and self.maintenance.phase()!='ready':return
         if not self.controller:return
         if self.controller.running or self.controller.navigating:
             self.set_status('Finish the current action before configuring a model.');return
         if self.setup_dialog and self.setup_dialog.isVisible():self.setup_dialog.raise_();return
         from .setup import SetupDialog
         from .dsh_setup import DshSetupDialog
-        from .macos_setup import (MacRuntimeIncompleteDialog, MacSetupDialog,
-                                  needed as mac_setup_needed,
-                                  available as mac_setup_available,
+        from .managed_setup import (RuntimeIncompleteDialog, ManagedSetupDialog,
+                                  needed as managed_setup_needed,
+                                  available as managed_setup_available,
                                   runtime_problem)
         # Order matters. An incomplete app copy is told about itself; otherwise
         # it would silently fall through to the external-DSH form and read as a
         # demand for a DSH the user does not have.
-        problem=runtime_problem() if mac_setup_needed() else ''
+        problem=runtime_problem() if managed_setup_needed() else ''
         if self.controller.harness=='pi':self.setup_dialog=SetupDialog(self)
         elif self.controller.harness=='codex':
             from .codex_setup import CodexSetupDialog
             self.setup_dialog=CodexSetupDialog(self)
-        elif problem:self.setup_dialog=MacRuntimeIncompleteDialog(self,problem)
-        elif mac_setup_available():self.setup_dialog=MacSetupDialog(self)
+        elif problem:self.setup_dialog=RuntimeIncompleteDialog(self,problem)
+        elif managed_setup_available():self.setup_dialog=ManagedSetupDialog(self)
         else:self.setup_dialog=DshSetupDialog(self)
         self.setup_dialog.show()
 
@@ -515,7 +520,7 @@ class Window(QWidget):
             except Exception as exc:error=str(exc)
             try:self.composer.improvement_result.emit(identity,result,error)
             except RuntimeError:pass
-        threading.Thread(target=work,daemon=True,name='augmentor-improve-prompt').start()
+        self.controller.task(work)
 
     def send(self):
         if self.composer.improving:return
@@ -819,7 +824,7 @@ class Window(QWidget):
 
     def open_pi(self):
         if self.controller and getattr(self.controller,'harness','pi')=='dsh':
-            from .macos_setup import needed, available, runtime_state
+            from .managed_setup import needed, available, runtime_state
             if needed():self.open_setup();return
             if self.opening_dsh:return
             self.opening_dsh=True
@@ -833,7 +838,7 @@ class Window(QWidget):
                 self.opening_dsh=False
                 if result.get('ok') and result.get('browserUrl'):
                     if not QDesktopServices.openUrl(QUrl(result['browserUrl'])):
-                        self.set_status('The default browser could not open. Check macOS browser settings.')
+                        self.set_status('The default browser could not open. Check your default browser settings.')
                 else:
                     self.set_status('DSH could not connect. Open Agent setup to start it.')
                     self.open_setup()
@@ -873,9 +878,12 @@ class Window(QWidget):
         is_dsh=bool(self.controller and self.controller.harness=='dsh')
         menu.addAction('Agent setup' if is_dsh else 'Connect a model',self.open_setup).setEnabled(bool(self.controller))
         menu.addAction('Open DSH in browser' if is_dsh else 'Models & providers',self.open_pi).setEnabled(bool(self.controller))
-        from .macos_browser_setup import available, MacBrowserSetupDialog
+        if sys.platform == 'win32':
+            from .windows_browser_setup import available, WindowsBrowserSetupDialog as BrowserSetupDialog
+        else:
+            from .macos_browser_setup import available, MacBrowserSetupDialog as BrowserSetupDialog
         if available():
-            menu.addAction('Set up browser extension',lambda:MacBrowserSetupDialog(self).exec())
+            menu.addAction('Set up browser extension',lambda:BrowserSetupDialog(self).exec())
         menu.addAction('Versions & updates',self.open_updates).setEnabled(bool(self.controller))
         menu.addAction('Approval mode',self.open_access).setEnabled(bool(self.controller))
         menu.addAction('About & licenses',lambda:LicensesDialog(self).exec())
@@ -1195,6 +1203,9 @@ class Window(QWidget):
 
     def setup_dictation_tray(self):
         if current_name()!='main' or not self.controller:return
+        # The Windows preview does not yet bundle the native dictation component.
+        # Avoid starting an unavailable companion or creating a second tray owner.
+        if sys.platform=='win32' and not (Path(__file__).resolve().parents[3]/'components/handy/runtime/bin/handy.exe').is_file():return
         from .dictation import request,theme
         value=theme(self.preferences.values)
         def boot():
@@ -1237,6 +1248,9 @@ class Window(QWidget):
         self.quit_requested=True;self.close()
 
     def closeEvent(self, event):
+        phase = self.maintenance.phase()
+        if phase=='prepared' or phase=='closing' and self.maintenance_state(include_reservation=False)['busy']:
+            event.ignore();return
         if hasattr(self,'app_tray') and not getattr(self,'quit_requested',False):
             if self.voice_dialog or self.voice_input or self.voice_opening:self.close_voice_panel()
             self.remember_placement();self.hide();event.ignore();return
@@ -1316,12 +1330,17 @@ class Window(QWidget):
         if self.isVisible() and not self.isMinimized():self.hide()
         else:self.bring_forward()
 
-    def maintenance_state(self):
+    def maintenance_state(self, include_reservation=True):
+        admission = self.maintenance.gate.control('host.maintenance.status', {})
         running = bool(self.controller and self.controller.running)
         draft = bool(self.composer.toPlainText() or self.submitted_draft or self.editing)
         busy = (running or draft or self.composer.improving or self.voice_opening
-                or self.voice_input is not None or bool(self.voice_dialog and self.voice_dialog.capture)
+                or self.voice_input is not None or self.voice_dialog is not None
+                or bool(self.controller and (any(getattr(self.controller,name,False)
+                    for name in ('navigating','preparing','repairing','loading_page'))
+                    or bool(getattr(self.controller,'recovery_lock',None) and self.controller.recovery_lock.locked())))
                 or any(dialog.isVisible() for dialog in self.findChildren(QDialog)))
+        if admission['active'] or include_reservation and admission['phase']!='ready':busy=True
         return {'running': running, 'busy': busy, 'draftPresent': draft, 'accepted': not busy}
 
     def focus_composer(self):
@@ -1346,6 +1365,15 @@ class Window(QWidget):
 
 
 def main():
+    if sys.platform=='win32':
+        sys.path.insert(0,str(Path(__file__).resolve().parents[3]/'services'))
+        from lifecycle.windows_startup import Startup
+        with Startup() as startup:
+            return _main(startup)
+    return _main()
+
+
+def _main(startup=None):
     sys.path.insert(0,str(Path(__file__).resolve().parents[3]/'services/lifecycle'))
     from lease import hold
     hold('desktop')
@@ -1375,26 +1403,45 @@ def main():
     from .shortcuts import COMPONENT
     app.setDesktopFileName(COMPONENT.removesuffix('.desktop'))
     if (not args.preview or args.ui_test_control) and not args.screenshot:
-        runtime = Path(os.environ.get('XDG_RUNTIME_DIR', f'/tmp/augmentor-linux-pi-{os.getuid()}'))
+        if sys.platform == 'win32':
+            from .windows_instance import Client, Lock, Server
+            from .platform_runtime import runtime_directory
+            runtime = runtime_directory()
+        else:
+            Client, Lock, Server = QLocalSocket, QLockFile, QLocalServer
+            runtime = Path(os.environ.get('XDG_RUNTIME_DIR', f'/tmp/augmentor-linux-pi-{os.getuid()}'))
         runtime.mkdir(mode=0o700, exist_ok=True)
         socket_name = str(runtime / (ipc_basename()+'.sock'))
-        client = QLocalSocket()
+        client = Client()
         client.connectToServer(socket_name)
         if client.waitForConnected(300):
-            client.write(b'maintenance.status' if args.onboarding_host or args.ensure_running else b'voice' if args.voice else ('harness:'+args.harness).encode() if args.harness else b'show' if sys.platform=='darwin' else b'toggle')
+            client.write(b'maintenance.status' if args.onboarding_host or args.ensure_running else b'voice' if args.voice else ('harness:'+args.harness).encode() if args.harness else b'show' if sys.platform in ('darwin','win32') else b'toggle')
             client.waitForBytesWritten(500)
+            if sys.platform == 'win32': client.close()
             return 0
-        app.instance_lock = QLockFile(str(runtime / (ipc_basename()+'.lock')))
+        app.instance_lock = Lock(str(runtime / (ipc_basename()+'.lock')))
         if not app.instance_lock.tryLock(200):
             return 1
-        QLocalServer.removeServer(socket_name)
-        app.instance_server = QLocalServer()
-        app.instance_server.setSocketOptions(QLocalServer.SocketOption.UserAccessOption)
+        if sys.platform != 'win32': QLocalServer.removeServer(socket_name)
+        app.instance_server = Server()
+        if sys.platform != 'win32': app.instance_server.setSocketOptions(QLocalServer.SocketOption.UserAccessOption)
         if not app.instance_server.listen(socket_name):
             return 1
+        if sys.platform == 'win32':
+            app.aboutToQuit.connect(app.instance_server.close)
+            app.aboutToQuit.connect(app.instance_lock.close)
     window = Window(preview=args.preview or bool(args.screenshot),harness=args.harness)
     if not args.preview and not args.screenshot:window.setup_dictation_tray()
     if hasattr(app, 'instance_server'):
+        def finish_maintenance():
+            # Reply/disconnect first, then recheck work before closing. Preview
+            # has no controller, and last-window-close intentionally does not
+            # quit this app (shortcut hiding must keep a conversation alive).
+            if not window.maintenance_state(include_reservation=False)['busy']:
+                # A tray-enabled window otherwise hides instead of exiting.
+                window.quit_requested=True
+                if window.close():app.quit()
+                else:window.quit_requested=False
         def activate():
             client = app.instance_server.nextPendingConnection()
             if client:
@@ -1407,13 +1454,23 @@ def main():
                         response={'ok':True,'result':result}
                     except Exception as error:response={'ok':False,'error':str(error)}
                     client.write(json.dumps(response).encode()+b'\n');client.waitForBytesWritten(500)
+                elif command.startswith('maintenance:'):
+                    try:
+                        request=json.loads(command[len('maintenance:'):])
+                        if not isinstance(request,dict) or set(request)!={'method','params'}:raise ValueError('Unsupported maintenance request fields.')
+                        result=window.maintenance.control(request['method'],request['params'])
+                        response={'ok':True,'result':result,'pid':os.getpid(),'buildRoot':str(Path(__file__).resolve().parents[3])}
+                    except Exception as error:response={'ok':False,'error':str(error)}
+                    client.write(json.dumps(response).encode()+b'\n');client.waitForBytesWritten(500)
+                    if response.get('ok') and result['phase']=='closing':
+                        QTimer.singleShot(0,finish_maintenance)
                 elif command in ('maintenance.status','maintenance.close','maintenance.recover'):
                     state=window.maintenance_state()
                     busy=state['busy']
                     controller = window.controller
                     if command == 'maintenance.recover':
                         state['accepted'] = bool(controller and controller.repair_connection())
-                    client.write(json.dumps({'pid':os.getpid(),**state,'onboardingProtocol':1,'modelReady':bool(window.model_picker.currentData()),
+                    client.write(json.dumps({'pid':os.getpid(),**state,'onboardingProtocol':1,'maintenanceAdmission':1,'modelReady':bool(window.model_picker.currentData()),
                         'online':bool(controller and controller.online), 'repairing':bool(controller and controller.repairing),
                         'lastError':controller.last_connection_error if controller else '',
                         'sessionRestoreError':controller.session_restore_error if controller else '',
@@ -1425,8 +1482,10 @@ def main():
                         'voiceOutputUnderflows':window.voice_dialog.output_underflows if window.voice_dialog else 0}).encode()+b'\n')
                     client.waitForBytesWritten(500)
                     if command=='maintenance.close' and not busy:
-                        window.quit_requested=True
-                        window.close()
+                        QTimer.singleShot(0,finish_maintenance)
+                elif window.maintenance.phase()!='ready':
+                    client.write(json.dumps({'ok':False,'error':'Augmentor maintenance is in progress. This request was not started.'}).encode()+b'\n')
+                    client.waitForBytesWritten(500)
                 elif command.startswith('onboarding:'):
                     try:
                         from .onboarding import start
@@ -1443,7 +1502,12 @@ def main():
                 else:window.toggle_visibility()
                 client.disconnectFromServer()
                 client.deleteLater()
+                QTimer.singleShot(0,activate)
         app.instance_server.newConnection.connect(activate)
+        # The server listens before Window construction. Qt may process an
+        # arrival during initialization, before this callback exists. Drain any
+        # already queued connection as soon as the window is ready.
+        QTimer.singleShot(0,activate)
     window.bring_forward()
     if sys.platform=='darwin':
         # Finder/Dock reopen an existing application without another main().
@@ -1459,4 +1523,6 @@ def main():
             ok = window.grab().save(str(args.screenshot))
             app.exit(0 if ok else 1)
         QTimer.singleShot(200, capture)
+    if startup is not None and hasattr(app,'instance_server'):
+        startup.ready()
     return app.exec()

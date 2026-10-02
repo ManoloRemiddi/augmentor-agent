@@ -10,7 +10,7 @@ function fixture(){
  agent.inbox.splice=(target,index,count,items)=>agent.inbox[target==='next-turn'?'nextTurn':'nextStep'].splice(index,count,...items)
  agent.inbox.prepend=(target,item)=>{agent.inbox[target==='next-turn'?'nextTurn':'nextStep'].unshift(item);handlers['agent/inbox/inserted']({agent,message:item})}
  agent.steer=item=>{agent.inbox[aborted?'nextTurn':'nextStep'].push(item);handlers['agent/inbox/inserted']({agent,message:item})}
- applyResponsiveSteering({on:(name,fn)=>{handlers[name]=fn}})
+ applyResponsiveSteering({on:(name,fn)=>{handlers[name]=fn},effect:setup=>{handlers.dispose=setup()}})
  handlers['agent/assistant-stream']({agent,frame:{type:'start'}})
  return {agent,handlers,cancel}
 }

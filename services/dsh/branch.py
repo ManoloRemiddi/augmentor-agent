@@ -4,7 +4,7 @@
 Only closed turn boundaries are supported by DSH's public fork API. The journal
 is written before mutation: an acknowledgement lost in transit is never retried.
 """
-import fcntl
+from platform_adapters import locks as fcntl
 import hashlib
 import ipaddress
 import json

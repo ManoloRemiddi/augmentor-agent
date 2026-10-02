@@ -33,7 +33,8 @@ def load(name, relative):
 
 
 install = load('mac_install_preflight', 'scripts/install-macos.py')
-from augmentor_linux import macos_setup as first_run
+from augmentor_linux import managed_setup as first_run
+from augmentor_linux.adapters import dsh  # Import OS-sensitive urllib before platform fixtures.
 
 
 def incomplete_bundle(directory, version='0.2.8'):
@@ -99,8 +100,9 @@ class PreflightTests(unittest.TestCase):
 
     def test_installer_and_first_run_manifests_cannot_drift(self):
         self.assertEqual(tuple(install.RUNTIME_PAYLOAD),
-                         tuple(first_run.RUNTIME_PAYLOAD))
-        self.assertEqual(install.GUIDE_URL, first_run.GUIDE_URL)
+                         tuple(first_run.MAC_RUNTIME_PAYLOAD))
+        with patch.object(sys, 'platform', 'darwin'):
+            self.assertEqual(install.GUIDE_URL, first_run.guide_url())
 
 
 class FirstRunDiagnosisTests(unittest.TestCase):
@@ -110,15 +112,15 @@ class FirstRunDiagnosisTests(unittest.TestCase):
         self.resources = Path(self.tmp.name)
 
     def test_missing_runtime_lists_every_absent_piece(self):
-        self.assertEqual(first_run.missing_runtime(self.resources),
-                         [label for _, label in first_run.RUNTIME_PAYLOAD])
+        self.assertEqual(first_run.missing_runtime(self.resources, platform='darwin'),
+                         [label for _, label in first_run.MAC_RUNTIME_PAYLOAD])
 
     def test_complete_runtime_reports_nothing(self):
-        for path, _ in first_run.RUNTIME_PAYLOAD:
+        for path, _ in first_run.MAC_RUNTIME_PAYLOAD:
             target = self.resources/path
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_text('# payload\n')
-        self.assertEqual(first_run.missing_runtime(self.resources), [])
+        self.assertEqual(first_run.missing_runtime(self.resources, platform='darwin'), [])
         with patch.object(sys, 'platform', 'darwin'):
             self.assertEqual(first_run.runtime_problem(self.resources), '')
 
@@ -161,7 +163,7 @@ class SetupDialogChoiceTests(unittest.TestCase):
     def _chosen(self, harness, problem, managed):
         from unittest.mock import MagicMock
         import augmentor_linux.window as window
-        import augmentor_linux.macos_setup as macos_setup
+        import augmentor_linux.managed_setup as managed_setup
         import augmentor_linux.dsh_setup as dsh_setup
         import augmentor_linux.setup as setup_module
 
@@ -178,11 +180,11 @@ class SetupDialogChoiceTests(unittest.TestCase):
         owner = SimpleNamespace(
             controller=SimpleNamespace(harness=harness, running=False, navigating=False),
             setup_dialog=None, set_status=lambda text: None)
-        with patch.object(macos_setup, 'runtime_problem', return_value=problem), \
-             patch.object(macos_setup, 'needed', return_value=True), \
-             patch.object(macos_setup, 'available', return_value=managed), \
-             patch.object(macos_setup, 'MacRuntimeIncompleteDialog', factory('incomplete')), \
-             patch.object(macos_setup, 'MacSetupDialog', factory('managed')), \
+        with patch.object(managed_setup, 'runtime_problem', return_value=problem), \
+             patch.object(managed_setup, 'needed', return_value=True), \
+             patch.object(managed_setup, 'available', return_value=managed), \
+             patch.object(managed_setup, 'RuntimeIncompleteDialog', factory('incomplete')), \
+             patch.object(managed_setup, 'ManagedSetupDialog', factory('managed')), \
              patch.object(dsh_setup, 'DshSetupDialog', factory('external')), \
              patch.object(setup_module, 'SetupDialog', factory('pi')):
             window.Window.open_setup(owner)
@@ -224,7 +226,7 @@ class IncompleteDialogTests(unittest.TestCase):
 
     def test_dialog_explains_the_gap_and_offers_the_download_page(self):
         owner = self._owner()
-        dialog = first_run.MacRuntimeIncompleteDialog(
+        dialog = first_run.RuntimeIncompleteDialog(
             owner,
             'This copy of Augmentor is missing its own built-in runtime: '
             'the bundled DSH runtime.')
@@ -238,12 +240,12 @@ class IncompleteDialogTests(unittest.TestCase):
 
     def test_open_guide_uses_the_documented_page(self):
         owner = self._owner()
-        dialog = first_run.MacRuntimeIncompleteDialog(owner, 'incomplete.')
+        dialog = first_run.RuntimeIncompleteDialog(owner, 'incomplete.')
         try:
             with patch.object(first_run.QDesktopServices, 'openUrl') as opened:
                 dialog.open_guide()
             self.assertEqual(opened.call_args.args[0].toString(),
-                             first_run.GUIDE_URL)
+                             first_run.guide_url())
         finally:
             self._dispose(owner)
 

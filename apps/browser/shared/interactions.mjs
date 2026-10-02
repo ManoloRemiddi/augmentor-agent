@@ -42,5 +42,5 @@ export class BrowserInteractions {
     this.pending.clear()
     if(session)await this.request('release',{},session)
   }
-  close(){this.closed=true;void this.release().catch(()=>{})}
+  close(){this.closed=true;return this.release().catch(()=>{})}
 }

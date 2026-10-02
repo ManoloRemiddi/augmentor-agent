@@ -12,14 +12,16 @@ import {dshSetupDialog} from './dsh-setup.mjs'
 import {memoryDialog} from './memory.mjs'
 import {promptEditor} from './prompt-editor.mjs'
 import {supportDialog} from './support.mjs'
+import {attachPageMaintenance, registerMaintenanceState} from './maintenance-page.mjs'
 import {dictationSettings} from './dictation-settings.mjs'
 
-const send=(type,payload={})=>chrome.runtime.sendMessage({type,...payload})
+const maintenance=attachPageMaintenance({document,runtime:chrome.runtime,busy:()=>checking||mounting>0})
+const send=(type,payload={})=>maintenance.work(()=>chrome.runtime.sendMessage({type,...payload}))
 const make=(tag,text)=>{const e=document.createElement(tag);if(text)e.textContent=text;return e}
 const error=document.querySelector('#page-error')
 const fail=e=>{error.hidden=false;error.textContent=e.message||String(e)}
-const button=(parent,label,fn)=>{const b=make('button',label);b.type='button';b.onclick=()=>Promise.resolve().then(fn).catch(fail);parent.append(b);return b}
-let state={},checking=false,closed=false
+const button=(parent,label,fn)=>{const b=make('button',label);b.type='button';b.onclick=()=>maintenance.work(fn).catch(fail);parent.append(b);return b}
+let state={},checking=false,closed=false,mounting=0
 const sections=new Map()
 const definitions=[
   ['dictation','System dictation','Powered by Handy · Available in every application.','M9 3h6v10H9zM5 10v3a7 7 0 0 0 14 0v-3M12 20v3'],
@@ -123,9 +125,13 @@ async function showVoice(container){
   const mode=add('mode','Conversation mode',make('select'))
   for(const [value,label] of [['manual','Hold or slide to lock'],['hands-free','Hands-free conversation']]){const option=make('option',label);option.value=value;mode.append(option)}mode.value=data.mode
   const note=make('p','Hold to record · Slide left to lock · Slide right for hands-free · Escape cancels. Changes apply when Voice next opens.');container.append(note)
+  const values=()=>({voiceId:voices.value,enabled:enabled.checked,mode:mode.value,speed:Number(fields.speed.value),volume:Number(fields.volume.value),pauseMs:Number(fields.pauseMs.value)})
+  let baseline=JSON.stringify(values())
+  registerMaintenanceState(container,()=>JSON.stringify(values())!==baseline)
   button(container,'Save',async()=>{
-    const settings={voiceId:voices.value,enabled:enabled.checked,mode:mode.value,speed:Number(fields.speed.value),volume:Number(fields.volume.value),pauseMs:Number(fields.pauseMs.value)}
+    const settings=values()
     const reply=await send('voice/preferences',{action:'save',settings});if(!reply?.ok)throw Error(reply?.error||'Could not save voice settings')
+    baseline=JSON.stringify(settings)
     note.textContent='Saved for both interfaces. Changes apply when Voice next opens.'
   })
 }
@@ -136,17 +142,19 @@ function mount(id){
     return
   }
   row.body.replaceChildren();row.mounted=true
-  if(id==='appearance')void appearance(row.body).catch(fail)
+  const mountAsync=async fn=>{mounting++;try{await fn()}catch(e){fail(e)}finally{mounting--}}
+  if(id==='appearance')void mountAsync(()=>appearance(row.body))
   if(id==='models')showModels(row.body)
   if(id==='harnesses')showHarnesses(row.body)
   if(id==='prompts')promptEditor(document,async request=>{const r=await send('prompts',{request});if(!r?.ok)throw Error(r?.error||'Prompt library unavailable');return r.library},()=>{},row.body)
   if(id==='home')homeSettings(document,send,row.body)
   if(id==='memory')showMemory(row.body)
+  if(id==='voice')void mountAsync(()=>showVoice(row.body))
   if(id==='voice')void showVoice(row.body).catch(fail)
   if(id==='dictation')void dictationSettings(row.body,send).catch(fail)
   if(id==='support'){
     const version=make('div');version.className='card';version.append(make('h2','Augmentor '+chrome.runtime.getManifest().version),make('p','This preview is updated with the Augmentor installer. The companion and extension must use matching versions.'));row.body.append(version)
-    void supportDialog(document,send,row.body).catch(fail)
+    void mountAsync(()=>supportDialog(document,send,row.body))
   }
 }
 function navigate(){
@@ -155,7 +163,7 @@ function navigate(){
   mount(id)
 }
 async function refresh(){
-  if(checking||closed)return;checking=true
+  if(checking||closed||maintenance.paused)return;checking=true
   try{
     state=await send('connect')
     document.querySelector('#connection').textContent=({dsh:'DSH',pi:'Pi',codex:'Codex'}[state.harness]||'Harness')+' · '+({ready:'Connected','needs-setup':'Setup needed',connecting:'Connecting…'}[state.phase]||state.phase||'Connecting…')

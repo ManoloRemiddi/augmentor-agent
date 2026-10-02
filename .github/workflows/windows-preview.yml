@@ -1,0 +1,86 @@
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+name: Windows public preview build
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/windows]
+    paths:
+      - '.github/workflows/windows-preview.yml'
+      - 'release/windows/public-preview.json'
+      - 'scripts/windows-preview-health.py'
+      - 'scripts/stage-windows-application.py'
+      - 'scripts/package-windows.py'
+      - 'scripts/windows-application.iss'
+permissions:
+  contents: read
+concurrency:
+  group: windows-preview-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  package:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2025
+            arch: x64
+          - os: windows-11-arm
+            arch: arm64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.19.0'
+          architecture: ${{ matrix.arch }}
+      - name: Stage hash-locked private runtimes
+        run: python -Xutf8 scripts/bootstrap-windows.py --arch ${{ matrix.arch }} --out outputs/payload
+      - name: Build the shared application
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          npm run check
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          npm run build
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Stage bundled DSH and explicit public preview
+        run: |
+          $env:AUGMENTOR_PWSH = "$PWD/outputs/payload/powershell/pwsh.exe"
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-dsh.py --out outputs/payload/dsh --node "$PWD/outputs/payload/node/node.exe"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-windows-application.py --root outputs/payload --arch ${{ matrix.arch }} --public-preview
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Verify complete sealed files and native public launcher rendering
+        run: |
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/windows-preview-health.py --root outputs/payload --out outputs/package/health.json
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Package normal customer folders without development switches
+        run: |
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/package-windows.py --root outputs/payload --arch ${{ matrix.arch }} --out outputs/installer --public-preview
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          Copy-Item outputs/installer/Augmentor-*.exe outputs/package/
+          Copy-Item outputs/installer/package.json outputs/package/
+          Copy-Item docs/WINDOWS-PREVIEW.md outputs/package/
+          Get-ChildItem outputs/package/Augmentor-*.exe | ForEach-Object {
+            $hash = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+            "$hash  $($_.Name)" | Out-File outputs/package/SHA256SUMS -Encoding ascii
+          }
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: windows-public-preview-${{ matrix.arch }}
+          path: outputs/package/**
+          retention-days: 14
+          if-no-files-found: error
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: failure()
+        with:
+          name: windows-public-preview-diagnostics-${{ matrix.arch }}
+          path: |
+            outputs/installer/compile.log
+            outputs/package/health.json
+          retention-days: 7
+          if-no-files-found: warn

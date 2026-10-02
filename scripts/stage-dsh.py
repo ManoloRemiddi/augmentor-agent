@@ -15,6 +15,8 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT/'services'))
+from build_support import npm_command
 PREPARE_SCRIPT = 'node_modules/@deepseek-ai/dsh-subprocess-local/scripts/ensure-spawn-helper.mjs'
 PREPARE_SHA256 = 'ca5509febf1e6ec1356df121835ebe5ed2f9cace4bdc2ba6d83d41c7e45e0f1b'
 
@@ -23,11 +25,11 @@ def inventory(target):
     spec = importlib.util.spec_from_file_location('npm_notices', ROOT/'scripts/third-party-notices.py')
     notices = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(notices)
-    lock = json.loads((target/'package-lock.json').read_text())['packages']
+    lock = json.loads((target/'package-lock.json').read_text(encoding="utf-8"))['packages']
     packages = []
     for path in notices.package_dirs(target/'node_modules'):
         relative = path.relative_to(target).as_posix()
-        meta = json.loads((path/'package.json').read_text())
+        meta = json.loads((path/'package.json').read_text(encoding="utf-8"))
         entry = lock.get(relative, {})
         if entry.get('version') != meta.get('version') or entry.get('dev'):
             raise ValueError('DSH dependency differs from production lock: '+relative)
@@ -47,10 +49,13 @@ def prepare(target, node):
     if hashlib.sha256(script.read_bytes()).hexdigest() != PREPARE_SHA256:
         raise ValueError('DSH spawn-helper preparation changed; review before executing')
     packages = inventory(target)
+    spec = importlib.util.spec_from_file_location('windows_dsh_preparation', ROOT/'scripts/prepare-windows-dsh.py')
+    windows = importlib.util.module_from_spec(spec); spec.loader.exec_module(windows)
+    patches = windows.prepare(target)
     subprocess.run([node, str(script)], check=True, cwd=target)
     report = {'schema':'augmentor-dsh-payload/1',
         'lockSha256':hashlib.sha256((target/'package-lock.json').read_bytes()).hexdigest(),
-        'preparedScripts':{PREPARE_SCRIPT:PREPARE_SHA256}, 'packages':packages,
+        'preparedScripts':{PREPARE_SCRIPT:PREPARE_SHA256}, 'sourcePatches': patches, 'packages':packages,
         'licenseReviewComplete':False}
     (target/'payload.json').write_text(json.dumps(report, indent=2)+'\n')
     return report
@@ -68,8 +73,8 @@ def main():
     for name in ('package.json', 'package-lock.json'):
         shutil.copy2(ROOT/'release/dsh'/name, target/name)
     shutil.copytree(ROOT/'release/dsh/plugins', target/'plugins')
-    subprocess.run(['npm', 'ci', '--ignore-scripts', '--omit=dev', '--no-audit', '--no-fund'],
-        cwd=target, check=True)
+    subprocess.run([*npm_command(), 'ci', '--ignore-scripts', '--omit=dev', '--no-audit', '--no-fund'],
+        cwd=target, check=True, timeout=600)
     # The ARM64 Mac uses the native sharp/libvips pair qualified below. npm also
     # installs the optional wasm fallback there; it contains a separate native
     # source graph and is not a dependency of this target's working image path.

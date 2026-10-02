@@ -1,6 +1,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Private stdio transport for the same VoiceSession used by the floating UI."""
 import json
+import os
 import sys
 import threading
 import time
@@ -109,19 +110,41 @@ def main():
     def emit(value):
         print(json.dumps(value, separators=(',', ':')), flush=True)
     client = Client(emit)
+    stopped = threading.Event()
+    input_fd = sys.stdin.fileno()
+    if sys.platform == 'win32':
+        import msvcrt
+        msvcrt.setmode(input_fd, os.O_BINARY)
     def read():
+        pending = bytearray()
+        closed = False
         try:
-            while True:
-                line = sys.stdin.buffer.readline(65537)
-                if not line or len(line) > 65536: break
-                value = json.loads(line)
-                if not isinstance(value, dict): break
-                client.command.emit(value)
-        except (ValueError, OSError): pass
-        finally: client.command.emit({'action': 'close'})
-    threading.Thread(target=read, daemon=True).start()
+            # Raw descriptor I/O holds no Python buffered-stream lock while
+            # waiting for the browser. Quit must not depend on browser EOF.
+            while not stopped.is_set():
+                chunk = os.read(input_fd, 16384)
+                if not chunk: break
+                pending.extend(chunk)
+                while b'\n' in pending:
+                    line, _, rest = pending.partition(b'\n'); pending = bytearray(rest)
+                    if len(line) > 65535: return
+                    value = json.loads(line)
+                    if not isinstance(value, dict) or stopped.is_set(): return
+                    closed = value.get('action') == 'close'
+                    client.command.emit(value)
+                    if closed: return
+                if len(pending) > 65535: break
+        except (ValueError, OSError, RuntimeError): pass
+        finally:
+            if not closed and not stopped.is_set():
+                try: client.command.emit({'action': 'close'})
+                except RuntimeError: pass  # Qt can already have finished Quit.
+    reader = threading.Thread(target=read, daemon=True); reader.start()
+    app.aboutToQuit.connect(stopped.set)
     app.aboutToQuit.connect(lambda: client.voice.shutdown() if client.voice else None)
-    return app.exec()
+    result = app.exec()
+    stopped.set(); reader.join(timeout=.2)
+    return result
 
 
 if __name__ == '__main__':

@@ -26,5 +26,11 @@ def peer_uid(connection):
 
 
 def require_same_user(connection):
+    if sys.platform == 'win32':
+        from platform_adapters.windows_pipe import PipeSocket
+        if not isinstance(connection, PipeSocket):
+            raise PermissionError('A private Windows pipe is required.')
+        connection.verify_peer()
+        return
     if peer_uid(connection) != os.getuid():
         raise PermissionError('This companion belongs to a different user.')

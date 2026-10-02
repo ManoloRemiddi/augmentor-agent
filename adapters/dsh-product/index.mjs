@@ -11,10 +11,11 @@ import {fileURLToPath} from 'node:url'
 import {improvePrompt} from './improve-prompt.mjs'
 import {exactFork} from './exact-fork.mjs'
 import {InteractionBroker,interactionOperation,registerInteractions} from './interactions.mjs'
+import {DshMaintenance} from './maintenance.mjs'
 import {RELEASE} from '../../dist/contracts/src/release.js'
 import {pythonExecutable,componentEnvironment} from '../../dist/platform/src/index.js'
 export const name='augmentor-product'
-export const inject=['webServer','workspaceRegistry','sessionPersistence','llm','sessionQuery','sessionController','agents','agentDefaultModel']
+export const inject=['webServer','workspaceRegistry','sessionPersistence','llm','sessionQuery','sessionController','agents','agentDefaultModel','typertGateway','jobs']
 export async function apply(ctx){
  const token=readFileSync(join(process.env.DSH_HOME??join(homedir(),'.dsh'),'augmentor-product-token'),'utf8').trim()
  if(!/^[a-f0-9]{64}$/.test(token))throw Error('Run Augmentor DSH setup to create the integration token.')
@@ -36,10 +37,15 @@ export async function apply(ctx){
   lease.stdout.once('data',value=>finish(String(value).trim()==='READY'?null:Error('Invalid runtime lease response.')))
  }).catch(error=>{disposing=true;lease.stdin.end();throw error})
  ready=true
- ctx.on('dispose',()=>{disposing=true;lease.stdin.end()})
+ ctx.effect(()=>()=>new Promise(resolve=>{
+  disposing=true
+  if(lease.exitCode!==null||lease.signalCode!==null){resolve();return}
+  lease.once('exit',resolve);lease.stdin.end()
+ }),'augmentor-product: runtime lease')
  const interactions=new InteractionBroker()
+ const maintenance=new DshMaintenance(ctx)
  registerInteractions(ctx,interactions)
- ctx.on('dispose',()=>interactions.close())
+ ctx.effect(()=>()=>interactions.close(),'augmentor-product: native interactions')
  const hash=value=>createHash('sha256').update(value).digest()
  const homeId=hash(token).toString('hex')
  const allowed=new Set(['augmentor-linux-product','augmentor-browser-product',...profiles().map(p=>p.preset)])
@@ -49,11 +55,27 @@ export async function apply(ctx){
   try{url=new URL('http://'+req.headers.host)}catch{answer(403,{ok:false,error:'Host not allowed'});return}
   const host=url.hostname.replace(/^\[|\]$/g,'')
   if(!isIP(host)||!(host==='::1'||host.startsWith('127.'))||req.headers.origin&&req.headers.origin!==url.origin){answer(403,{ok:false,error:'Origin not allowed'});return}
-  if(req.method==='GET'){answer(200,{protocol:'augmentor-dsh/1',version:RELEASE.version,homeId,presets:[...allowed],exactFork:1,nativeInteractions:1});return}
+  if(req.method==='GET'){answer(200,{protocol:'augmentor-dsh/1',version:RELEASE.version,homeId,presets:[...allowed],exactFork:1,nativeInteractions:1,maintenanceAdmission:1});return}
   if(req.method!=='POST'||!req.headers['content-type']?.startsWith('application/json')||!timingSafeEqual(hash(String(req.headers['x-augmentor-product-token']??'')),hash(token))){answer(403,{ok:false,error:'Authorized JSON request required'});return}
   try{
    let raw='';for await(const chunk of req){raw+=chunk;if(Buffer.byteLength(raw)>16384)throw Error('Request too large')}
    const p=JSON.parse(raw),surface=p.surface==='browser'?'browser':p.surface==='linux'?'linux':null
+   if(p.action==='maintenance'){
+    try{
+     if(Object.keys(p).some(key=>!['action','method','params'].includes(key)))throw Error('Unsupported maintenance request fields.')
+     const exit=ctx.get('appExit')
+     if(p.method==='host.maintenance.commit'&&typeof exit!=='function')throw Error('This DSH host does not support normal application shutdown.')
+     const result=maintenance.control(p.method,p.params)
+     if(result.phase==='closing'){
+      let exiting=false
+      const finish=()=>{if(!exiting){exiting=true;exit(0)}}
+      res.once('finish',finish);res.once('close',finish)
+     }
+     answer(200,{ok:true,...result})
+    }catch(error){answer(409,{ok:false,error:String(error.message)})}
+    return
+   }
+   await maintenance.work(async()=>{
    if(p.action==='interaction'){
     const result=await interactionOperation(ctx,interactions,p);answer(200,{ok:true,...result});return
    }
@@ -75,6 +97,7 @@ export async function apply(ctx){
    }
    const ids=new Set(sessions.map(row=>row.id))
    answer(200,{ok:true,saved:ctx.workspaceRegistry.list().flatMap(w=>w.sessionIds).filter(id=>ids.has(id))})
+   })
   }catch{answer(400,{ok:false,error:'DSH could not complete this Augmentor chat operation.'})}
  }}))
 }

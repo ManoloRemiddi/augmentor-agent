@@ -1,0 +1,174 @@
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+name: Windows qualification
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/windows.yml'
+      - 'apps/**'
+      - 'services/**'
+      - 'adapters/**'
+      - 'packages/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'release/**'
+      - 'licenses/**'
+      - 'package*.json'
+permissions:
+  contents: read
+concurrency:
+  group: windows-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  native-runtime:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2025
+            arch: x64
+          - os: windows-11-arm
+            arch: arm64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 50
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.19.0'
+          architecture: ${{ matrix.arch }}
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            release/dsh/package-lock.json
+      - name: Stage private hash-locked Python, Node and PowerShell
+        id: bootstrap
+        run: python -Xutf8 scripts/bootstrap-windows.py --arch ${{ matrix.arch }} --out outputs/payload
+      - name: Exercise native wheels, Qt, PortAudio, Node and PowerShell
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/windows-runtime-proof.py --root outputs/payload --arch ${{ matrix.arch }} --out outputs/evidence/runtime.json
+      - name: Verify process leases on the real Windows kernel
+        if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
+        run: |
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_platform_locks.py -v
+      - name: Verify private paths, ACLs and junction refusal
+        if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
+        env:
+          AUGMENTOR_EPHEMERAL_WINDOWS_RUNNER: '1'
+        run: |
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_identity.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_platform_paths.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_private_files.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_cross_user.py -v
+      - name: Verify supervisor crash cannot orphan detached child processes
+        if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
+        run: |
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_processes.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_supervisor.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_voice.py -v
+      - name: Verify private named-pipe framing, peers and cancellation
+        if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
+        run: |
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_pipe.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_browser.py -v
+      - name: Build the shared TypeScript application
+        id: build
+        if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          npm run check
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          npm run build
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Exercise Python and Node shared prompt clients and durable restart
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PYTHONPATH: apps/native
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_local_services.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_dsh_setup.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_managed_dsh.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_dsh_session_lease.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_browser_voice.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_recovery.py -v
+      - name: Stage and exercise actual pinned DSH native dependencies
+        id: dsh
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          $env:AUGMENTOR_PWSH = "$PWD/outputs/payload/powershell/pwsh.exe"
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-dsh.py --out outputs/payload/dsh --node "$PWD/outputs/payload/node/node.exe"
+      - name: Assemble shared Windows application and native launcher
+        id: application
+        if: ${{ !cancelled() && steps.dsh.outcome == 'success' }}
+        run: |
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-windows-application.py --root outputs/payload --arch ${{ matrix.arch }}
+      - name: Exercise managed Windows DSH setup and conversation restart
+        if: ${{ !cancelled() && steps.application.outcome == 'success' }}
+        run: |
+          $env:DSH_INSTALL_ROOT = "$PWD/outputs/payload/dsh/node_modules/@deepseek-ai/dsh"
+          & outputs/payload/node/node.exe --test tests/dsh-maintenance.test.mjs
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/windows-managed-setup-proof.py --root outputs/payload --out outputs/evidence
+      - name: Exercise the assembled native executable and two desktop windows
+        if: ${{ !cancelled() && steps.application.outcome == 'success' }}
+        env:
+          QT_QPA_PLATFORM: windows
+          QSG_RHI_PREFER_SOFTWARE_RENDERER: '1'
+        run: |
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/windows-window-proof.py --launcher outputs/payload/Augmentor.exe --out outputs/evidence/bundled-desktop
+      - name: Install, repair and remove the actual shared application candidate
+        if: ${{ !cancelled() && steps.application.outcome == 'success' }}
+        run: |
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/windows-application-install-proof.py --root outputs/payload --arch ${{ matrix.arch }} --out outputs/installed-application
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: windows-evidence-${{ matrix.arch }}
+          path: |
+            outputs/evidence/**
+            outputs/payload/dsh/payload.json
+            outputs/installed-application/*.json
+            outputs/installed-application/*.log
+            outputs/installed-application/package/compile.log
+            outputs/installed-application/package/package.json
+          retention-days: 14
+          if-no-files-found: warn
+  shared-qt-candidate:
+    runs-on: macos-26
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9
+        with:
+          version: '0.11.16'
+          enable-cache: false
+      - name: Qualify common GUI behavior on the ARM-capable Qt candidate
+        env:
+          QT_QPA_PLATFORM: offscreen
+          PYTHONPATH: apps/native
+        run: |
+          uv venv --python 3.12.13 .venv
+          uv pip install --python .venv/bin/python PySide6-Essentials==6.11.2 shiboken6==6.11.2 Pygments==2.18.0 numpy==2.5.1 PyYAML==6.0.3 websocket-client==1.8.0
+          .venv/bin/python -m unittest discover -s tests -p test_ui_scale.py -v
+          .venv/bin/python -m unittest discover -s tests -p test_fluid.py -v
+          .venv/bin/python -m unittest discover -s tests -p test_window.py -v
+          .venv/bin/python -m unittest discover -s tests -p test_local_health.py -v
+          .venv/bin/python -m unittest discover -s tests -p test_macos_desktop.py -v
