@@ -2,6 +2,34 @@
 
 # Linux distribution rollout
 
+## October 2 native read-only accessibility checkpoint
+
+The [isolated Fedora helper proof](../release/qualification/next-targets/20261002-gnome-native-accessibility.json)
+now verifies actual GTK Wayland and XWayland display types, discovery after helper
+startup, A → B → A focus serial changes, callback execution on its owning thread
+and password-role detection. The parent imports no libatspi and pins process start
+identity, session/accessibility buses, launcher/registry owners, helper epoch,
+request nonce/generation and complete focus replies. It rejects duplicate JSON,
+malformed identities and incomplete targets. Cancelling a deliberately paused
+child closes in0.289 seconds; a0.3-second deadline closes in0.516 seconds including
+child disposal. Target exit retires the helper in both display cases; that proves
+process-disappearance refusal, not registry/launcher replacement with a live target.
+
+All14 synthetic protocol tests pass separately from native proof. The updated
+Arch native suite runs756 tests:754 successes and two Mac-only skips. The first
+unexplained incomplete query and a later XWayland incomplete tree query remain
+recorded. GTK4.22.5 exports SENSITIVE but omits ENABLED in its state collector;
+these raw facts remain separate. Neither focused/showing state nor listener
+registration alone authorizes input. Production GNOME discovery/keyboard/pointer
+remain disabled until shell identity, helper tokens, inaccessible trees,
+owner replacement, lock/Stop and actual per-action widget outcomes are qualified.
+
+The prior authenticated-toolchain source commit2aac600 passes both hosted checks:
+[Linux37041089753](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37041089753),
+[Mac37041089691](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37041089691).
+The new helper source still needs its own hosted validation. All five authorized
+rollout points remain active; no selected app, owner service or binary release changes.
+
 ## October 2 authenticated toolchain reconstruction checkpoint
 
 [The new locked410-package policy](../release/qualification/next-targets/20261002-ubuntu-source-toolchain-lock.json)
@@ -27,7 +55,7 @@ Both ee8dbdd native-capture hosted workflows pass:
 [Mac37038972337](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37038972337).
 The application source's742 native cases/740 successes/two platform skips are
 unchanged; new kit tools have actual signature/acquisition/reconstruction evidence
-and still need their own hosted validation. All five authorized rollout points
+and subsequently pass as recorded in the newer accessibility checkpoint. All five authorized rollout points
 remain active. Source publication does not select an app, change owner state or
 publish a binary release.
 

@@ -136,10 +136,22 @@ widget click or settled hover popup.
 Inherited libatspi uses a global default context; Gio's thread-default context
 alone does not migrate it. See the exact
 [libatspi context implementation](https://github.com/GNOME/at-spi2-core/blob/2.60.0/atspi/atspi-misc.c).
-This candidate returns no cached accessibility focus and refuses keyboard/type
-until an isolated helper proves event-thread identity, focus-away/back, password
-and inaccessible controls, new-app discovery and a11y owner invalidation. It does
-not move the GUI process's singleton or claim per-character focus delivery.
+The separate [read-only helper proof](../release/qualification/next-targets/20261002-gnome-native-accessibility.json)
+now verifies ordinary-user GTK Wayland and XWayland targets, real callback-thread
+identity, focus-away/back serial changes, password roles, discovery after helper
+startup and process-disappearance refusal. Its parent hard deadline and cancellation
+dispose a stalled child; all14 synthetic socket/protocol tests are separate evidence.
+The original incomplete query and a later transient XWayland tree refusal remain
+preserved. Production discovery still returns no focus and keyboard/type refuses.
+
+[GTK4.22.5 collect_states](https://github.com/GNOME/gtk/blob/4.22.5/gtk/a11y/gtkatspicontext.c)
+exports SENSITIVE from disabled state and omits ENABLED. The helper retains both raw
+flags. Focus/showing may survive while another application covers the target; the
+future controller must independently bind the shell's selected/active window and
+geometry to the same PID, owner, epoch and fresh event serial. These facts are not
+permission to type. Registry/launcher replacement with a live target, inaccessible
+and ambiguous native trees, per-character/Stop/lock guards and matching GNOME/KDE
+regressions remain open. The GUI process's singleton is untouched.
 
 Next native proof: GTK Wayland/XWayland pointer/widget outcomes; all
 stale/focus/cover/hover fences; mid-capture Stop/native revocation/terminal stream
