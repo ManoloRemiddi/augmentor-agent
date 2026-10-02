@@ -455,3 +455,19 @@ and bounds package-network waits. Native compiler/toolchain/build/lint still run
 on a miss; every cache hit still runs the actual component lifecycle proof. No
 compiled code, runtime inventory or installed owner settings change in this CI
 follow-up. Hosted Linux/package completion remains required.
+
+### Complete native/Mac/installer checkpoint and Browser sidebar fix
+
+At source `4420b08`, [the hosted validation run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37033939428)
+passes all three actual native component jobs, shared SDK/application contracts,
+Debian package build and clean installation/lifecycle/upgrade/interrupted setup/
+rollback/removal qualification. [Mac development product qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37033939427)
+passes on both macOS 14 and 26, including signed Desktop and Browser helper proofs.
+
+The actual packaged Chromium proof catches one navigation regression: adding
+System dictation can push the last Support entry outside a short fixed sidebar.
+The existing navigation now permits vertical scrolling (`min-height: 0` and
+`overflow-y: auto`); its layout and responsive mobile override are preserved.
+The same actual Chromium/Pi/fresh-user flow passes locally with this correction,
+including prompt revision conflict/draft retention and Support report download.
+Final packaged Browser qualification must confirm the rebuilt extension.
