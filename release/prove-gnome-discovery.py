@@ -9,7 +9,9 @@ parser.add_argument('--exercise-custom-shortcuts',action='store_true',help='Exer
 parser.add_argument('--exercise-augmentor-shortcuts',action='store_true',help='Exercise Augmentor shared Qt Save rows and native GNOME adapter in this private compositor.')
 parser.add_argument('--exercise-gnome-observer',action='store_true',help='Install/read the observer only inside the private compositor fixture.')
 parser.add_argument('--exercise-native-ui',choices=('wayland','xcb'),help='Exercise existing actual Augmentor windows through canonical GSD launchers in this private compositor.')
+parser.add_argument('--exercise-workspace-follow',action='store_true',help='Test existing XWayland pin/unpin and independent workspace following in this private compositor.')
 args=parser.parse_args()
+if args.exercise_workspace_follow and args.exercise_native_ui!='xcb':parser.error('Workspace follow proof requires --exercise-native-ui xcb.')
 production=args.exercise_augmentor_shortcuts
 observer=args.exercise_gnome_observer or bool(args.exercise_native_ui)
 exercise=args.exercise_custom_shortcuts or production or observer
@@ -75,7 +77,8 @@ try:
  if args.exercise_native_ui:
   subprocess.run(['python3',str(Path(__file__).with_name('prove-gnome-native-ui.py')),
                   '--compositor-pid',str(processes[-1][0].pid),'--out',str(out),
-                  '--platform',args.exercise_native_ui],check=True,timeout=120)
+                  '--platform',args.exercise_native_ui,
+                  *(['--workspace-follow'] if args.exercise_workspace_follow else [])],check=True,timeout=120)
 finally:
  for process,log in reversed(processes):
   if process.poll() is None:

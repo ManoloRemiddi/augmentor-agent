@@ -812,3 +812,46 @@ checks. The tool is available in [Fedora 43/44](https://packages.fedoraproject.o
 [Debian 13](https://packages.debian.org/trixie/wmctrl). Next test actual pin/unpin
 and independent workspace following in private GNOME, then provision the native
 dependency. Native Wayland workspace following remains a separate adapter gap.
+
+### GNOME XWayland workspace following and first-use unpin
+
+The [new private actual-window report](../release/qualification/gnome50/fedora44-native-workspaces.json)
+passes both initial sticky windows, workspace switches, independent first-window
+unpin onto the current workspace, second-window following, first-window repin
+and return across three fixed private workspaces. It uses the actual existing
+pin button, compositor-owned stable identities and public-display EWMH state;
+no new compositor writer or managed-display connection is added. Existing
+canonical shortcut/focus/composer checks also pass. Native Wayland following,
+real login, transient dialogs, monitor policy and full capture/input remain open.
+
+The fixture first reproduced an additional bug after installing `wmctrl`:
+before any workspace switch, `wmctrl -d` cannot read `_NET_CURRENT_DESKTOP`.
+The original unpin code fails before removing sticky state, leaving the window
+on all workspaces while its preference says unpinned. Tagged Mutter source
+explains the on-demand XWayland [initialization path](https://github.com/GNOME/mutter/blob/50.5/src/core/display.c#L687)
+and [active-workspace hint callback](https://github.com/GNOME/mutter/blob/50.5/src/x11/meta-x11-display.c#L1386).
+The corrected GNOME path sends `remove,sticky` to Augmentor's own XID;
+Mutter's [request handler](https://github.com/GNOME/mutter/blob/50.5/src/x11/window-x11.c#L3422)
+and [unstick transition](https://github.com/GNOME/mutter/blob/50.5/src/core/window.c#L5201)
+place it on the active workspace without guessing an index. The real proof
+passes first unpin while the hint is absent, then unpin on workspace 1; after
+the first switch the root desktop query succeeds. GNOME routing also avoids
+probing KWin for this operation. KDE, generic X11 and the early macOS branch
+retain their existing behavior.
+
+Native Debian/Ubuntu and Fedora packages now declare `wmctrl`; the ordinary-user
+package proof checks its actual binary version. Fresh packages from this changed
+source still need hosted confirmation. The explicit UI-test interface adds
+read-only pin state and an expected-state pin-button operation; normal launches
+reject it. It requires a visible pin button and no dialogs. Five focused UI-test
+cases pass, including stale/hidden refusal. The full native source suite passes
+643 cases (641 pass, two Mac-only skips) using the existing compiled JavaScript
+and bundled Node fixture. New-source Mac and package/complete qualification
+remain pending after publication.
+
+Reproduce with the test-only `release/gnome-workspaces.Dockerfile` over the native
+UI image and `--exercise-native-ui xcb --exercise-workspace-follow` in the private
+discovery command. The report records exact image/source hashes, the initially
+missing root hint and actual `wmctrl` package. The full Fedora VM's GNOME group
+installation has separately completed; graphical login/startup acceptance is
+still next. No installed owner release, UI layout, model or audio settings changed.

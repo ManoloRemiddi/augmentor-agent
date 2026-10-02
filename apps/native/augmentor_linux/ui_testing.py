@@ -24,9 +24,21 @@ def dispatch(window, request, *, enabled=False):
                 'draft':window.composer.toPlainText(),
                 'transcript':window.transcript.toPlainText(),
                 'status':window.status.text(),
+                'pinned':bool(window.preferences.values['pinned']),
                 'uiScale':window.ui_scale.percent,'width':window.width(),
                 'fontPixels':window.brand.font().pixelSize(),'buttonWidth':window.send_button.width(),
                 'dialogs':[d.windowTitle() for d in window.findChildren(QDialog) if d.isVisible()]}
+    if action=='pin':
+        expected=request.get('expected');pinned=request.get('pinned')
+        if (type(expected) is not bool or type(pinned) is not bool
+                or window.preferences.values['pinned'] is not expected
+                or not window.isVisible() or not window.pin_button.isVisible() or not window.pin_button.isEnabled()
+                or any(d.isVisible() for d in window.findChildren(QDialog))):
+            raise ValueError('Pin proof requires a visible window, exact expected state and no dialogs.')
+        if expected!=pinned:
+            from PySide6.QtTest import QTest
+            QTest.mouseClick(window.pin_button,Qt.MouseButton.LeftButton)
+        return {'pinned':bool(window.preferences.values['pinned'])}
     if action=='zoom':
         from .ui_scale import MINIMUM,MAXIMUM,STEP
         percent=request.get('percent')

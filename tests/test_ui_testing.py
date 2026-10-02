@@ -14,7 +14,7 @@ class UiTestingTests(unittest.TestCase):
     def setUpClass(cls):cls.app=QApplication.instance() or QApplication([])
 
     def test_disabled_launch_rejects_every_operation_without_touching_window(self):
-        for action in ['inspect','send','capture','draft','zoom']:
+        for action in ['inspect','send','capture','draft','zoom','pin']:
             with self.assertRaisesRegex(ValueError,'disabled'):
                 dispatch(None,{'action':action})
 
@@ -54,4 +54,16 @@ class UiTestingTests(unittest.TestCase):
                 with self.assertRaises(FileExistsError):
                     dispatch(window,{'action':'capture','path':str(path)},enabled=True)
                 self.assertEqual(path.read_bytes(),b'preserve')
+        finally:window.close()
+
+    def test_pin_control_refuses_stale_state_and_hidden_window(self):
+        window=Window(preview=True);window.show()
+        try:
+            with self.assertRaisesRegex(ValueError,'exact expected state'):
+                dispatch(window,{'action':'pin','expected':False,'pinned':False},enabled=True)
+            self.assertIs(window.preferences.values['pinned'],True)
+            window.hide()
+            with self.assertRaisesRegex(ValueError,'visible window'):
+                dispatch(window,{'action':'pin','expected':True,'pinned':False},enabled=True)
+            self.assertIs(window.preferences.values['pinned'],True)
         finally:window.close()

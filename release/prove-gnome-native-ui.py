@@ -21,7 +21,9 @@ p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--compositor-pid',type=int,required=True)
 p.add_argument('--out',type=Path,required=True)
 p.add_argument('--platform',choices=('wayland','xcb'),required=True)
+p.add_argument('--workspace-follow',action='store_true')
 a=p.parse_args()
+if a.workspace_follow and a.platform!='xcb':p.error('Workspace follow proof requires xcb.')
 ROOT=Path(__file__).resolve().parents[1]
 if os.geteuid()==0 or not Path('/.dockerenv').exists() or Path('/run/systemd/seats').exists() or os.environ.get('WAYLAND_DISPLAY')!='wayland-augmentor':
     raise SystemExit('Only the ordinary private GNOME container fixture may run this proof.')
@@ -41,10 +43,12 @@ observer=GnomeObserver(bus)
 a.out.mkdir(parents=True,exist_ok=True)
 source_paths=('release/prove-gnome-native-ui.py','release/prove-gnome-discovery.py',
               'scripts/install-desktop-startup.py','scripts/desktop-launch.py',
-              'apps/native/augmentor_linux/window.py','services/desktop/gnome_shortcuts.py',
+              'apps/native/augmentor_linux/window.py','apps/native/augmentor_linux/ui_testing.py',
+              'services/desktop/gnome_shortcuts.py',
               'services/desktop/gnome.py','services/desktop/gnome-extension/observer@augmentoragent.com/extension.js',
               'services/desktop/gnome-extension/observer@augmentoragent.com/metadata.json',
-              'release/gnome-native-ui.Dockerfile')
+              'release/gnome-native-ui.Dockerfile',
+              *(['release/gnome-workspaces.Dockerfile'] if a.workspace_follow else []))
 hashes={name:hashlib.sha256((ROOT/name).read_bytes()).hexdigest() for name in source_paths}
 for name in ('extension.js','metadata.json'):
     copied=Path.home()/'.local/share/gnome-shell/extensions/observer@augmentoragent.com'/name
@@ -77,6 +81,10 @@ processes=[];logs=[];session=None;held=[];report=None
 try:
     call('org.gnome.Shell','/org/gnome/Shell','org.freedesktop.DBus.Properties','Set',
          GLib.Variant('(ssv)',('org.gnome.Shell','OverviewActive',GLib.Variant('b',False))))
+    if a.workspace_follow:
+        # Fixed topology belongs only to this fresh private user's test profile.
+        subprocess.run(['gsettings','set','org.gnome.mutter','dynamic-workspaces','false'],check=True,timeout=5)
+        subprocess.run(['gsettings','set','org.gnome.desktop.wm.preferences','num-workspaces','3'],check=True,timeout=5)
     environment={**os.environ,'PYTHONPATH':str(ROOT/'apps/native'),'QT_QPA_PLATFORM':a.platform}
     if a.platform=='xcb':
         auth=list(Path(os.environ['XDG_RUNTIME_DIR']).glob('.mutter-Xwaylandauth.*'))
@@ -103,6 +111,10 @@ try:
         processes.append(process)
         wait(lambda:inspect(name),'actual '+name+' UI socket')
         wait(lambda:((observer.read().get('window') or {}).get('pid')==process.pid),'actual '+name+' compositor focus')
+    if a.workspace_follow:
+        # On-demand XWayland can lack the current-desktop root hint until a
+        # workspace switch. Record this; never infer an active index from it.
+        initial_desktop_query=subprocess.run(['wmctrl','-d'],text=True,capture_output=True,timeout=3)
     session=call('org.gnome.Mutter.RemoteDesktop','/org/gnome/Mutter/RemoteDesktop','org.gnome.Mutter.RemoteDesktop','CreateSession')[0]
     def input_call(method,params=None):return call('org.gnome.Mutter.RemoteDesktop',session,'org.gnome.Mutter.RemoteDesktop.Session',method,params)
     def key(code,pressed):
@@ -137,6 +149,52 @@ try:
             'secondaryRestoreFocus':(secondary_restored['focused'] or {}).get('pid')==initial['secondary']['pid'],
             'mainComposerReceivesKey':main_typed['main']['draft']=='a' and main_typed['secondary']['draft']=='',
             'secondaryComposerReceivesKey':secondary_typed['secondary']['draft']=='b' and secondary_typed['main']['draft']=='a'}
+    workspace_checks=None
+    if a.workspace_follow:
+        def desktops():
+            records=subprocess.check_output(['wmctrl','-lp'],text=True).splitlines()
+            return {name:[int(row.split()[1]) for row in records if len(row.split())>=4 and int(row.split()[2])==initial[name]['pid']]
+                    for name in ('main','secondary')}
+        wait(lambda:desktops()=={'main':[-1],'secondary':[-1]},'actual initial both-window pin')
+        identities={name:next(w['id'] for w in observer.read()['windows'] if w['pid']==initial[name]['pid']) for name in ('main','secondary')}
+        initial_workspace=observer.read()['workspace']['index']
+        first_unpin=exchange('main','ui-test:{"action":"pin","expected":true,"pinned":false}')
+        assert first_unpin=={'ok':True,'result':{'pinned':False}},first_unpin
+        preflight={'format':'augmentor-gnome-workspace-preflight/1',
+            'initialDesktopQueryReturnCode':initial_desktop_query.returncode,
+            'initialDesktopQueryError':initial_desktop_query.stderr.strip(),
+            'initialWorkspace':initial_workspace,'afterInitialUnpinDesktops':desktops(),
+            'afterInitialUnpinUiStatus':inspect('main')['status'],'sourceSha256':hashes}
+        (a.out/'workspace-preflight.json').write_text(json.dumps(preflight,indent=2)+'\n')
+        wait(lambda:desktops()=={'main':[initial_workspace],'secondary':[-1]},'first unpin before any workspace switch')
+        first_repin=exchange('main','ui-test:{"action":"pin","expected":false,"pinned":true}')
+        assert first_repin=={'ok':True,'result':{'pinned':True}},first_repin
+        wait(lambda:desktops()=={'main':[-1],'secondary':[-1]},'first repin before workspace switch')
+        def switch(index):
+            subprocess.run(['wmctrl','-s',str(index)],check=True,timeout=3)
+            wait(lambda:observer.read()['workspace']['index']==index,'actual private workspace switch')
+        def present(name):return any(w['id']==identities[name] for w in observer.read()['windows'])
+        switch(1)
+        wait(lambda:len(subprocess.check_output(['wmctrl','-d'],text=True).splitlines())==3,'actual root hints after workspace switch')
+        wait(lambda:present('main') and present('secondary'),'both pinned windows follow')
+        # This uses the actual existing pin button; no compositor writer API.
+        result=exchange('main','ui-test:{"action":"pin","expected":true,"pinned":false}')
+        assert result=={'ok':True,'result':{'pinned':False}},result
+        wait(lambda:desktops()=={'main':[1],'secondary':[-1]},'independent first unpin')
+        switch(2)
+        wait(lambda:not present('main') and present('secondary'),'only the pinned second window follows')
+        switch(1)
+        wait(lambda:present('main') and present('secondary'),'first window retained on its assigned workspace')
+        result=exchange('main','ui-test:{"action":"pin","expected":false,"pinned":true}')
+        assert result=={'ok':True,'result':{'pinned':True}},result
+        wait(lambda:desktops()=={'main':[-1],'secondary':[-1]},'first repin')
+        switch(0)
+        wait(lambda:present('main') and present('secondary'),'both repinned windows follow back')
+        workspace_checks={'initialBothSticky':True,'bothFollowWorkspaceSwitch':True,
+            'unpinRetainsFirstOnCurrentWorkspace':True,'secondIndependentlyKeepsFollowing':True,
+            'firstRepinFollowsAgain':True,'actualSharedPinButtonTested':True,'fixedPrivateWorkspaceCount':3,
+            'initialUnpinBeforeWorkspaceSwitch':True,
+            'initialCurrentDesktopHintAvailable':initial_desktop_query.returncode==0}
     assert hashes=={name:hashlib.sha256((ROOT/name).read_bytes()).hexdigest() for name in source_paths},'Source changed during proof'
     report={'format':'augmentor-gnome-existing-native-ui-proof/1','shellVersion':'50.5','platform':a.platform,
             'privateCompositorOwnerMatches':True,'syntheticInput':True,'hostInputDevicesMounted':False,
@@ -145,6 +203,9 @@ try:
             'packages':subprocess.check_output(['rpm','-q','gnome-shell','mutter','gnome-settings-daemon','python3-pyside6','qt6-qtbase','python3-gobject','gtk4'],text=True).splitlines(),
             'serviceStartupTested':False,'closedAppLaunchTested':False,'actualLoginRebootTested':False,
             'modelRequestsTested':False,'inputQualified':False,'checks':checks,'snapshots':snapshots,'sourceSha256':hashes}
+    if workspace_checks:
+        report['workspaceChecks']=workspace_checks
+        report['wmctrlPackage']=subprocess.check_output(['rpm','-q','wmctrl'],text=True).strip()
     (a.out/'native-ui.json').write_text(json.dumps(report,indent=2)+'\n')
     if not all(checks.values()):raise RuntimeError('Native GNOME activation failed: '+json.dumps(checks))
     print('PRIVATE GNOME EXISTING AUGMENTOR UI ACTIVATION VERIFIED')

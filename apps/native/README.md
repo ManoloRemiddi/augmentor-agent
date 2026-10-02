@@ -28,5 +28,10 @@ The existing two shortcut rows select KDE KGlobalAccel, macOS or the native GNOM
 50 settings adapter. GNOME requires GTK 4 GI in the selected interpreter and a
 live Shell/MediaKeys graphical session; failures stay explicit in those rows.
 See [distro qualification and limits](../../docs/LINUX-DISTRO-ROLLOUT.md#october-2-native-gnome-save-adapter):
-the real private GNOME daemon proof covers Save/conflicts and synthetic launcher
-delivery, while actual application focus, login and physical keys remain open.
+the private daemon proof covers Save/conflicts. Separate actual Augmentor preview
+window proofs pass canonical shortcut hide/restore, compositor focus and composer
+typing for XWayland/native Wayland. Initial launch, login and physical keys remain
+open. The GNOME XWayland workspace proof also passes independent pin/unpin/follow
+through the existing controls. Native packages declare `wmctrl`; GNOME unpin
+uses its own window's sticky-removal request without needing an initially absent
+root-desktop hint. Native Wayland following remains a separate adapter gap.

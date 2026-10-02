@@ -104,6 +104,18 @@ dependency in the existing workspace-following fallback. Its actual pin/unpin
 proof and package dependency correction are the next source tasks; native
 Wayland following remains an adapter gap. Private VM keys/seed/logs stay ignored.
 
+The workspace stage now qualifies actual GNOME 50.5 XWayland first-use unpin and
+independent pin/follow/unpin/repin across three private workspaces. Installing
+`wmctrl` alone exposed a missing initial root-desktop hint; GNOME now unpins its
+own XID through Mutter's supported sticky-removal transition. Other WM/Mac
+branches are preserved. Native package dependencies now declare `wmctrl`, with
+an ordinary-user binary check in package qualification. Five UI-test cases and
+643 full native source cases (two skips) pass; the checked compositor report and
+rollout guide record exact limits. Fresh-source package/Mac confirmation and
+complete artifacts remain open. The full private VM's GNOME group is installed;
+its graphical login/startup is still untested. Continue full-session startup,
+window/transient/native-Wayland and consent/input/Stop gates autonomously.
+
 ## October 1 merge blockers: current main and separate Codex prerequisite
 
 The feature branch integrates canonical main `8c3be5a` at merge `338dbc5`.

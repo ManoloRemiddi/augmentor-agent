@@ -1025,7 +1025,9 @@ class Window(QWidget):
             try:pin_spaces(self,self.preferences.values['pinned'])
             except (OSError,RuntimeError):self.set_status('Workspace pin could not be applied')
             return
-        if QApplication.platformName() not in ('offscreen','minimal') and pin_kwin(self.preferences.values['pinned']):return
+        from .gnome_shortcuts import active as gnome_active
+        gnome=gnome_active()
+        if not gnome and QApplication.platformName() not in ('offscreen','minimal') and pin_kwin(self.preferences.values['pinned']):return
         if QApplication.platformName() not in ('xcb','x11'):
             return
         pinned=self.preferences.values['pinned'];wid=hex(int(self.winId()))
@@ -1034,6 +1036,12 @@ class Window(QWidget):
                 subprocess.run(['wmctrl','-ir',wid,'-t','-1'],check=True,timeout=2,capture_output=True)
                 subprocess.run(['wmctrl','-ir',wid,'-b','add,sticky'],check=True,timeout=2,capture_output=True)
             else:
+                if gnome:
+                    # Mutter unstick places this own window on the active
+                    # workspace. On-demand XWayland can lack the root's current
+                    # desktop hint before the first workspace switch.
+                    subprocess.run(['wmctrl','-ir',wid,'-b','remove,sticky'],check=True,timeout=2,capture_output=True)
+                    return
                 desktops=subprocess.run(['wmctrl','-d'],check=True,timeout=2,capture_output=True,text=True).stdout
                 current=next(line.split()[0] for line in desktops.splitlines() if '*' in line.split()[:2])
                 subprocess.run(['wmctrl','-ir',wid,'-b','remove,sticky'],check=True,timeout=2,capture_output=True)
