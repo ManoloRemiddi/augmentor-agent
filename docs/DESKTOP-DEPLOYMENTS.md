@@ -2,14 +2,20 @@
 
 # Consistent installed desktop releases
 
-## October 2: Desktop identity settings acceptance branch
+## October 2: Compact Desktop settings acceptance branch
 
-[Agent settings and installed evidence](AGENT-SETTINGS.md#installed-linux-acceptance-candidate)
-records implementation `eef21cf`, compatible selected/running release
-`20261002-111240-1618d51b`, artifact identity, candidate checks, narrow backed-up
-DSH preset migration and restored Desktop/mobile. Both are online with voice
-available and no pending update. This is an unmerged local acceptance candidate;
-the owner must give the green light before merging the feature branch.
+[Current settings installation](AGENT-SETTINGS.md#installed-compact-layout-candidate)
+records implementation `abc62ef`, compatible selected/running release
+`20261002-124301-57f19808`, exact artifact identity, 628 shared native cases and
+28 compatible candidate cases. The actual installed-interpreter proof covers
+same-frame adaptive sizing, short-page fit and retained geometry/drafts.
+Desktop/mobile adopted it through idle maintenance guards and are online with
+voice available and no pending update. Product 0.2.11 dependencies, backends,
+speech and unrelated deployed improvements are preserved. DSH/speech services
+were not restarted. Earlier identity/preset and overlay evidence is historical
+in that guide. This remains an unmerged local acceptance candidate; the owner
+must give the green light before merging. Rollback selects the preceding
+`20261002-115054-5eb68ad8` overlay release.
 
 ## October 1: browser evidence recovery
 

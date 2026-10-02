@@ -10,8 +10,14 @@ sizes only the active page, widens large editors and wraps actions on narrow
 screens. Appearance uses one outer scrollbar at the frame edge; selected SVGs
 match their text in both themes. Shared native qualification: 628 cases, 626 pass,
 two Mac-only skips. Compatible product 0.2.11 candidate: 28 focused cases, 26 pass,
-two source-only sizing skips. The previous installed release below is the baseline;
-installation/ref identity follows after immutable activation. Draft PR #29 remains
+two source-only sizing skips. Tested source `abc62ef` is installed as compatible product 0.2.11 release
+`20261002-124301-57f19808`, artifact
+`5e3be8861171b303f923b204c4bf7035fd20f7880136a13be7549be66efba37e`.
+Stage/activation and an actual installed-interpreter layout/geometry proof pass.
+Desktop/mobile adopted it after idle maintenance guards and report online with
+voice available, no pending update. DSH/speech services, GPU/model settings,
+private user state and unrelated canonical edits are preserved. Rollback returns
+to `20261002-115054-5eb68ad8`. Installed Mac acceptance remains unverified. Draft PR #29 remains
 unmerged pending the owner's local acceptance.
 
 ## Previous frame-overlay checkpoint (historical)

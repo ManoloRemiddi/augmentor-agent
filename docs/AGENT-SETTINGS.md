@@ -230,3 +230,24 @@ cases (26 passed, two explicit source-only app-sizing skips). Installed dependen
 backends, speech and unrelated native improvements are preserved. Common Mac UI
 checks run on Linux; installed Mac acceptance remains unverified. The feature
 continues in draft PR #29 pending owner acceptance.
+
+
+### Installed compact-layout candidate
+
+Tested implementation: `abc62ef`. Selected and running Linux release:
+`20261002-124301-57f19808`, compatible product 0.2.11, artifact
+`5e3be8861171b303f923b204c4bf7035fd20f7880136a13be7549be66efba37e`.
+Immutable staging and activation passed inventory, imports and authenticated product
+checks. A separate synthetic proof using the actual installed interpreter verifies
+one native window, zero scroll ranges on short pages, a wider Prompt library with
+visible actions, return to narrow Agent, retained draft and exact geometry restoration.
+Main Desktop and mobile both accepted idle maintenance closure before their
+supervisors restarted. Both report this root, online with voice available and no
+pending update; secondary is not running. DSH and speech services were not
+restarted; model/GPU configuration and user data were preserved.
+
+Rollback through `augmentor-update rollback` returns to the preceding overlay
+release `20261002-115054-5eb68ad8`, with no persona/preset migration needed. Test
+Agent → More → Prompt library → Agent, then Back to chat; the editor gets more
+space while the chat returns to its latest user-chosen dimensions. PR #29 remains
+draft and unmerged until owner acceptance.
