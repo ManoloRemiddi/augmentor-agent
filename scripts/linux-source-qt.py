@@ -152,3 +152,21 @@ def environment(root, inherited):
     for key in ('QT_QPA_PLATFORMTHEME','QT_QPA_GENERIC_PLUGINS'):
         env.pop(key, None)
     return env
+
+
+def package_permissions(metadata, links, prefix):
+    """A root-owned package must allow an ordinary user to read its Qt inputs."""
+    base=prefix.rstrip('/')
+    if base not in metadata or metadata[base][3] is not True:
+        raise ValueError('Packaged source Qt input directory is missing.')
+    for name,(uid,gid,mode,directory) in metadata.items():
+        if name!=base and not name.startswith(base+'/'):continue
+        if (uid,gid)!=(0,0):
+            raise ValueError('Invalid packaged source Qt ownership: '+name)
+        # Linux symlink mode bits do not control access; the finite verifier
+        # owns link targets and the protected parent directory owns replacement.
+        if name in links:continue
+        required=0o005 if directory else 0o004
+        if mode&0o002 or mode&required!=required:
+            raise ValueError('Packaged source Qt input is writable or unreadable to the desktop user: '+name)
+    return True

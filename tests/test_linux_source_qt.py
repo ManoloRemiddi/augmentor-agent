@@ -169,5 +169,19 @@ class SourceQtTests(unittest.TestCase):
         (app/runtime.POLICY_FILE).write_text(json.dumps(altered))
         with self.assertRaisesRegex(ValueError,'cannot declare source Qt'):runtime.policy(app/runtime.POLICY_FILE)
 
+    def test_root_owned_package_is_readable_without_interpreting_symlink_mode_as_write_permission(self):
+        prefix='python-wheels/source-qt';link=prefix+'/lib/libQt6Core.so.6'
+        metadata={prefix:(0,0,0o755,True),prefix+'/lib':(0,0,0o755,True),
+                  prefix+'/lib/libQt6Core.so.6.8.2':(0,0,0o644,False),link:(0,0,0o777,False)}
+        self.assertTrue(qt.package_permissions(metadata,{link:'libQt6Core.so.6.8.2'},prefix+'/'))
+        for name,record in ((prefix,(0,0,0o700,True)),
+                            (prefix+'/lib/libQt6Core.so.6.8.2',(0,0,0o640,False)),
+                            (prefix+'/lib/libQt6Core.so.6.8.2',(0,0,0o666,False))):
+            changed=dict(metadata);changed[name]=record
+            with self.subTest(name=name,mode=record[2]),self.assertRaisesRegex(ValueError,'unreadable'):
+                qt.package_permissions(changed,{link:'libQt6Core.so.6.8.2'},prefix)
+        metadata[prefix]=(1001,1001,0o755,True)
+        with self.assertRaisesRegex(ValueError,'ownership'):qt.package_permissions(metadata,{link:'libQt6Core.so.6.8.2'},prefix)
+
 
 if __name__=='__main__':unittest.main()

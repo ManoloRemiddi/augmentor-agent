@@ -173,6 +173,12 @@ def build(output,target='debian13-amd64',wheelhouse=None,*,source_qt=False):
                 # Copy a finite validated tree, never a source SDK or builder.
                 qt=wheel_tool.runtime.source_qt()
                 qt.stage(value,wheelhouse,app/'python-wheels/source-qt')
+                # The immutable user runtime is private; package inputs become
+                # root-owned and must remain readable by the preparing user.
+                native_inputs=app/'python-wheels/source-qt'
+                native_inputs.chmod(0o755)
+                for member in native_inputs.rglob('*'):
+                    if not member.is_symlink():member.chmod(0o755 if member.is_dir() else 0o644)
                 record=value['sourceQt']['derivationReceipt']
                 copy(Path(wheelhouse)/record['file'],app/'python-wheels'/record['file'])
             wheel_tool.stage(value,wheelhouse,app)

@@ -28,10 +28,11 @@ if browser:
 results=[]
 for artifact in deb['artifacts']:
     path=a.debian/artifact['file'];process=subprocess.Popen(['dpkg-deb','--fsys-tarfile',str(path)],stdout=subprocess.PIPE)
-    included={};hashes={};links={};count=0
+    included={};hashes={};links={};metadata={};count=0
     with tarfile.open(fileobj=process.stdout,mode='r|') as archive:
         for member in archive:
             name=member.name.removeprefix('./');parts=PurePosixPath(name).parts;count+=1
+            metadata[name.removeprefix('usr/lib/augmentor/').rstrip('/')]=(member.uid,member.gid,member.mode,member.isdir())
             assert not name.startswith('/') and '..' not in parts,name
             assert not any(part in ('.git','.dsh','.pi','outputs','__pycache__') for part in parts),name
             assert PurePosixPath(name).name not in ('auth.json','models.json','harnesses.json','appearance.json','memory.sqlite3','prompts.sqlite3','.env'),name
@@ -96,6 +97,7 @@ for artifact in deb['artifacts']:
                     prefix+row['path']:row['target'] for row in native['symlinks']}
                 receipt=policy['sourceQt']['derivationReceipt'];content=included['python-wheels/'+receipt['file']]
                 assert len(content)==receipt['bytes'] and hashlib.sha256(content).hexdigest()==receipt['sha256']
+                qt.package_permissions(metadata,links,prefix)
                 # Reconstruct only validated relative regular-file/link names;
                 # the shared finite verifier also checks types and link targets.
                 with tempfile.TemporaryDirectory(prefix='review-source-qt-') as folder:
@@ -109,7 +111,8 @@ for artifact in deb['artifacts']:
                         (root/str(relative)).symlink_to(str(target))
                     qt.manifest(root,policy['sourceQt']['manifestSha256'])
                 result.update(verifiedSourceQtFiles=len(native['files']),verifiedSourceQtLinks=len(native['symlinks']),
-                              sourceQtManifestMatches=True,compiledContentNoticeMappingComplete=False)
+                              sourceQtManifestMatches=True,sourceQtInputsReadableByDesktopUser=True,
+                              compiledContentNoticeMappingComplete=False)
             result.update(verifiedWheelArchives=len(wheels['wheels']), verifiedWheelElfMembers=sum(len(w['elfBinaries']) for w in wheels['wheels']),
                           originalWheelNoticeBytesMatch=True, supplementaryNoticeCollectionsMatch=True,
                           licenseReviewComplete=False, embeddedSourceCoverageComplete=False)

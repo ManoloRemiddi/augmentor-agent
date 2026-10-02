@@ -2,6 +2,19 @@
 
 # Start here: agent handoff
 
+## October 2 source package permission correction
+
+The first42f065a source-runtime Debian candidate builds and verifies its67 native
+files/18 links, seven wheels/19 wheel ELF members and original notices. Actual
+archive metadata exposes a root-owned0700 Qt input directory, so ordinary-user
+preparation is unqualified. The new guard refuses that artifact. The builder now
+normalizes only packaged Qt inputs to0755/0644; private user runtimes remain0700.
+Fourteen synthetic source/native-path/permission cases pass. See [the owning guide](LINUX-SOURCE-RUNTIME-ENTRYPOINTS.md#root-owned-package-input-permission-correction)
+and [preserved report](../release/qualification/next-targets/20261002-noble-source-package-permission-failure.json).
+A new clean artifact/ordinary-user installed proof is required; original source
+entrypoint results remain historical actual evidence. All five points remain
+active, license decision pending and no owner selection changes.
+
 ## October 2 Noble source-runtime entrypoints
 
 [The source-profile guide](LINUX-SOURCE-RUNTIME-ENTRYPOINTS.md) and

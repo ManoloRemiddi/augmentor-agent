@@ -140,3 +140,23 @@ acceptance remain open. All source/runtime/release flags stay false. The
 [22-file license proposal](RECIPIENT-SOURCE-CONTROLS-LICENSE-PROPOSAL.md) remains
 pending; no license grant changed. See [source/rebuild evidence](LINUX-LGPL-SOURCE-RUNTIME.md)
 and [the full five-point rollout](LINUX-DISTRO-ROLLOUT.md).
+
+## Root-owned package input permission correction
+
+The first clean42f065a private source-runtime package builds and verifies67
+native files/18 links, seven wheels/19 wheel ELF members and original notice
+bytes. The byte/notice review did not establish installed-user readability:
+actual Debian metadata shows the source-Qt input directory owned by root with
+mode0700. That candidate is explicitly unqualified for ordinary-user preparation;
+[the preserved failure](../release/qualification/next-targets/20261002-noble-source-package-permission-failure.json)
+records exact artifact/metadata/refusal identities.
+
+The builder now normalizes only the finite verified **packaged inputs** to
+0755 directories/0644 files. Private immutable user runtimes remain0700. Artifact
+review checks root ownership, user read/traversal permissions and absence of
+world-writable regular files/directories; Linux symlink mode bits do not control
+access, while the finite verifier owns their exact local targets. Fourteen source
+payload/path/permission synthetic cases pass. A new clean artifact and actual
+ordinary-user package installation proof are still required. No failed candidate
+was activated or promoted; source entrypoint evidence above retains its original
+actual tool/source hashes.
