@@ -70,7 +70,7 @@ async function request(method, params = {}, id) {
   if (method === 'augmentor/memory') return memoryRequest(params);
   if (method === 'augmentor/diagnostics') return supportReport();
   if (method === 'augmentor/surface') {
-    if (params.action === 'appearance') return surfaceRequest(params);
+    if (['appearance','dictation'].includes(params.action)) return surfaceRequest(params);
     if (params.action !== 'improve') throw new Error('Unsupported Codex surface operation.');
     const saved = await promptLibrary({action: 'list'});
     if (!saved.ok || !saved.library?.improvement) throw new Error('Prompt improvement settings are unavailable.');

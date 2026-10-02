@@ -1,0 +1,563 @@
+diff --git a/src-tauri/Cargo.toml b/src-tauri/Cargo.toml
+index d0b02b3..93573ea 100644
+--- a/src-tauri/Cargo.toml
++++ b/src-tauri/Cargo.toml
+@@ -144,7 +144,6 @@ winreg = "0.55"
+ [target.'cfg(all(windows, target_arch = "x86_64"))'.dependencies]
+ transcribe-cpp = { version = "0.2.3", default-features = false, features = [
+   "dynamic-backends",
+-  "vulkan",
+ ] }
+ 
+ [target.'cfg(all(windows, target_arch = "aarch64"))'.dependencies]
+diff --git a/src-tauri/src/lib.rs b/src-tauri/src/lib.rs
+index facc978..bf4715f 100644
+--- a/src-tauri/src/lib.rs
++++ b/src-tauri/src/lib.rs
+@@ -8,6 +8,7 @@ mod catalog;
+ pub mod cli;
+ mod clipboard;
+ mod commands;
++mod embedding;
+ mod helpers;
+ mod input;
+ mod llm_client;
+@@ -95,6 +96,9 @@ fn build_console_filter() -> env_filter::Filter {
+ }
+ 
+ fn show_main_window(app: &AppHandle) {
++    if embedding::active() {
++        return;
++    }
+     if let Some(main_window) = app.get_webview_window("main") {
+         if let Err(e) = main_window.unminimize() {
+             log::error!("Failed to unminimize webview window: {}", e);
+@@ -151,7 +155,7 @@ fn apply_startup_activation_policy(app: &mut tauri::App, headless_mode: bool) {
+     let should_hide = settings.start_hidden || cli_args.start_hidden;
+     let tray_available = settings.show_tray_icon && !cli_args.no_tray;
+ 
+-    if should_hide && tray_available {
++    if should_hide && (tray_available || embedding::active()) {
+         log::info!("Starting hidden with tray available: launching as Accessory (no Dock icon)");
+         app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+     }
+@@ -228,143 +232,148 @@ fn initialize_core_logic(app_handle: &AppHandle) {
+     // deliberately not handled — it belongs to WebKitGTK's garbage collector
+     // (#1660) — see signal_handle.rs.
+     #[cfg(unix)]
+-    signal_handle::setup_signal_handler(app_handle.clone());
++    if !embedding::active() {
++        signal_handle::setup_signal_handler(app_handle.clone());
++    }
+ 
+     // The macOS activation policy for a start-hidden launch is applied before
+     // the event loop runs (see `apply_startup_activation_policy`), not here:
+     // by the time `setup` runs the app has already launched as a Regular
+     // (Dock) app, and demoting it at runtime is unreliable (#1787).
+ 
+-    // Get the current theme to set the appropriate initial icon
+-    let initial_theme = tray::get_current_theme(app_handle);
+-
+-    // Choose the appropriate initial icon based on theme
+-    let initial_icon_path = tray::get_icon_path(initial_theme, tray::TrayIconState::Idle, false);
+-
+-    let mut tray_builder = TrayIconBuilder::new()
+-        .icon(
+-            Image::from_path(
+-                app_handle
+-                    .path()
+-                    .resolve(initial_icon_path, tauri::path::BaseDirectory::Resource)
+-                    .unwrap(),
++    if !embedding::active() {
++        // Get the current theme to set the appropriate initial icon
++        let initial_theme = tray::get_current_theme(app_handle);
++
++        // Choose the appropriate initial icon based on theme
++        let initial_icon_path =
++            tray::get_icon_path(initial_theme, tray::TrayIconState::Idle, false);
++
++        let mut tray_builder = TrayIconBuilder::new()
++            .icon(
++                Image::from_path(
++                    app_handle
++                        .path()
++                        .resolve(initial_icon_path, tauri::path::BaseDirectory::Resource)
++                        .unwrap(),
++                )
++                .unwrap(),
+             )
+-            .unwrap(),
+-        )
+-        .tooltip(tray::tray_tooltip())
+-        .icon_as_template(true);
++            .tooltip(tray::tray_tooltip())
++            .icon_as_template(true);
+ 
+-    // Windows notification-area convention: left click opens the app, right click
+-    // shows the menu. Elsewhere (macOS menu bar, Linux) the menu stays on left click.
+-    #[cfg(target_os = "windows")]
+-    {
+-        tray_builder = tray_builder
+-            .show_menu_on_left_click(false)
+-            .on_tray_icon_event(|tray, event| {
+-                use tauri::tray::{MouseButton, MouseButtonState, TrayIconEvent};
+-                let opens_window = matches!(
+-                    event,
+-                    TrayIconEvent::Click {
+-                        button: MouseButton::Left,
+-                        button_state: MouseButtonState::Up,
+-                        ..
+-                    } | TrayIconEvent::DoubleClick {
+-                        button: MouseButton::Left,
+-                        ..
++        // Windows notification-area convention: left click opens the app, right click
++        // shows the menu. Elsewhere (macOS menu bar, Linux) the menu stays on left click.
++        #[cfg(target_os = "windows")]
++        {
++            tray_builder = tray_builder
++                .show_menu_on_left_click(false)
++                .on_tray_icon_event(|tray, event| {
++                    use tauri::tray::{MouseButton, MouseButtonState, TrayIconEvent};
++                    let opens_window = matches!(
++                        event,
++                        TrayIconEvent::Click {
++                            button: MouseButton::Left,
++                            button_state: MouseButtonState::Up,
++                            ..
++                        } | TrayIconEvent::DoubleClick {
++                            button: MouseButton::Left,
++                            ..
++                        }
++                    );
++                    if opens_window {
++                        show_main_window(tray.app_handle());
+                     }
+-                );
+-                if opens_window {
+-                    show_main_window(tray.app_handle());
+-                }
+-            });
+-    }
+-    #[cfg(not(target_os = "windows"))]
+-    {
+-        tray_builder = tray_builder.show_menu_on_left_click(true);
+-    }
++                });
++        }
++        #[cfg(not(target_os = "windows"))]
++        {
++            tray_builder = tray_builder.show_menu_on_left_click(true);
++        }
+ 
+-    let tray = tray_builder
+-        .on_menu_event(|app, event| match event.id.as_ref() {
+-            "settings" => {
+-                show_main_window(app);
+-            }
+-            "secure_input_warning" => {
+-                // Full explanation lives in the settings-window banner
+-                show_main_window(app);
+-            }
+-            "check_updates" => {
+-                let settings = settings::get_settings(app);
+-                if settings::update_checks_effectively_enabled(&settings) {
++        let tray = tray_builder
++            .on_menu_event(|app, event| match event.id.as_ref() {
++                "settings" => {
+                     show_main_window(app);
+-                    let _ = app.emit("check-for-updates", ());
+                 }
+-            }
+-            "copy_last_transcript" => {
+-                tray::copy_last_transcript(app);
+-            }
+-            "unload_model" => {
+-                let transcription_manager = app.state::<Arc<TranscriptionManager>>();
+-                if !transcription_manager.is_model_loaded() {
+-                    log::warn!("No model is currently loaded.");
+-                    return;
++                "secure_input_warning" => {
++                    // Full explanation lives in the settings-window banner
++                    show_main_window(app);
+                 }
+-                match transcription_manager.unload_model() {
+-                    Ok(()) => log::info!("Model unloaded via tray."),
+-                    Err(e) => log::error!("Failed to unload model via tray: {}", e),
++                "check_updates" => {
++                    let settings = settings::get_settings(app);
++                    if settings::update_checks_effectively_enabled(&settings) {
++                        show_main_window(app);
++                        let _ = app.emit("check-for-updates", ());
++                    }
+                 }
+-            }
+-            "cancel" => {
+-                use crate::utils::cancel_current_operation;
++                "copy_last_transcript" => {
++                    tray::copy_last_transcript(app);
++                }
++                "unload_model" => {
++                    let transcription_manager = app.state::<Arc<TranscriptionManager>>();
++                    if !transcription_manager.is_model_loaded() {
++                        log::warn!("No model is currently loaded.");
++                        return;
++                    }
++                    match transcription_manager.unload_model() {
++                        Ok(()) => log::info!("Model unloaded via tray."),
++                        Err(e) => log::error!("Failed to unload model via tray: {}", e),
++                    }
++                }
++                "cancel" => {
++                    use crate::utils::cancel_current_operation;
+ 
+-                // Use centralized cancellation that handles all operations
+-                cancel_current_operation(app);
+-            }
+-            "quit" => {
+-                app.exit(0);
+-            }
+-            id if id.starts_with("model_select:") => {
+-                let model_id = id.strip_prefix("model_select:").unwrap().to_string();
+-                let current_model = settings::get_settings(app).selected_model;
+-                if model_id == current_model {
+-                    return;
++                    // Use centralized cancellation that handles all operations
++                    cancel_current_operation(app);
+                 }
+-                let app_clone = app.clone();
+-                std::thread::spawn(move || {
+-                    match commands::models::switch_active_model(&app_clone, &model_id) {
+-                        Ok(()) => {
+-                            log::info!("Model switched to {} via tray.", model_id);
+-                        }
+-                        Err(e) => {
+-                            log::error!("Failed to switch model via tray: {}", e);
+-                        }
++                "quit" => {
++                    app.exit(0);
++                }
++                id if id.starts_with("model_select:") => {
++                    let model_id = id.strip_prefix("model_select:").unwrap().to_string();
++                    let current_model = settings::get_settings(app).selected_model;
++                    if model_id == current_model {
++                        return;
+                     }
+-                    tray::update_tray_menu(&app_clone);
+-                });
+-            }
+-            _ => {}
+-        })
+-        .build(app_handle)
+-        .unwrap();
+-    app_handle.manage(tray);
++                    let app_clone = app.clone();
++                    std::thread::spawn(move || {
++                        match commands::models::switch_active_model(&app_clone, &model_id) {
++                            Ok(()) => {
++                                log::info!("Model switched to {} via tray.", model_id);
++                            }
++                            Err(e) => {
++                                log::error!("Failed to switch model via tray: {}", e);
++                            }
++                        }
++                        tray::update_tray_menu(&app_clone);
++                    });
++                }
++                _ => {}
++            })
++            .build(app_handle)
++            .unwrap();
++        app_handle.manage(tray);
+ 
+-    // Initialize tray menu with idle state
+-    tray::update_tray_menu(app_handle);
++        // Initialize tray menu with idle state
++        tray::update_tray_menu(app_handle);
+ 
+-    // Apply show_tray_icon setting
+-    let settings = settings::get_settings(app_handle);
+-    if !settings.show_tray_icon {
+-        tray::set_tray_visibility(app_handle, false);
+-    }
++        // Apply show_tray_icon setting
++        let settings = settings::get_settings(app_handle);
++        if !settings.show_tray_icon {
++            tray::set_tray_visibility(app_handle, false);
++        }
+ 
+-    // Refresh tray menu when model state changes
+-    let app_handle_for_listener = app_handle.clone();
+-    app_handle.listen("model-state-changed", move |_| {
+-        tray::update_tray_menu(&app_handle_for_listener);
+-    });
++        // Refresh tray menu when model state changes
++        let app_handle_for_listener = app_handle.clone();
++        app_handle.listen("model-state-changed", move |_| {
++            tray::update_tray_menu(&app_handle_for_listener);
++        });
+ 
+-    // Apply the autostart preference (SMAppService login item on macOS 13+,
+-    // tauri-plugin-autostart elsewhere)
+-    autostart::apply_autostart(app_handle, settings.autostart_enabled);
++        // Apply the autostart preference (SMAppService login item on macOS 13+,
++        // tauri-plugin-autostart elsewhere)
++        autostart::apply_autostart(app_handle, settings.autostart_enabled);
++    }
+ 
+     // Create the recording overlay window (hidden by default)
+     utils::create_recording_overlay(app_handle);
+@@ -648,6 +657,7 @@ pub fn run(cli_args: CliArgs) {
+ 
+     let specta_builder = Builder::<tauri::Wry>::new()
+         .commands(collect_commands![
++            embedding::overlay_theme,
+             shortcut::change_binding,
+             shortcut::reset_binding,
+             shortcut::change_shortcut_activation_setting,
+@@ -801,7 +811,7 @@ pub fn run(cli_args: CliArgs) {
+                     // headless mode (--transcribe-file/--list-devices/--list-models)
+                     // stdout carries only the result (JSON or plain), so send console
+                     // logs to stderr instead to keep stdout clean for CI parsing.
+-                    Target::new(if headless_mode {
++                    Target::new(if headless_mode || embedding::active() {
+                         TargetKind::Stderr
+                     } else {
+                         TargetKind::Stdout
+@@ -848,7 +858,7 @@ pub fn run(cli_args: CliArgs) {
+     // (--transcribe-file/--list-devices/--list-models) a silent no-op whenever the
+     // app is already open, so skip it in headless mode and run a standalone
+     // instance instead.
+-    if !headless_mode {
++    if !headless_mode && !embedding::active() {
+         builder = builder.plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
+             if args.iter().any(|a| a == "--toggle-transcription") {
+                 signal_handle::send_transcription_input(app, "transcribe", "CLI");
+@@ -941,7 +951,7 @@ pub fn run(cli_args: CliArgs) {
+             // Create main window programmatically so we can set data_directory
+             // for portable mode (redirects WebView2 cache to portable Data dir)
+             let mut win_builder =
+-                tauri::WebviewWindowBuilder::new(app, "main", tauri::WebviewUrl::App("/".into()))
++                tauri::WebviewWindowBuilder::new(app, "main", tauri::WebviewUrl::App(if embedding::active() { "src/overlay/index.html" } else { "/" }.into()))
+                     .title("Handy")
+                     .inner_size(680.0, 570.0)
+                     .min_inner_size(680.0, 570.0)
+@@ -981,6 +991,7 @@ pub fn run(cli_args: CliArgs) {
+                 });
+             }
+ 
++            if embedding::active() { embedding::configure(app.handle()); }
+             let mut settings = get_settings(app.handle());
+ 
+             // Apply the persisted appearance theme to the native title bar before
+@@ -1008,6 +1019,7 @@ pub fn run(cli_args: CliArgs) {
+             app.manage(TranscriptionCoordinator::new(app_handle.clone()));
+ 
+             initialize_core_logic(&app_handle);
++            if embedding::active() { embedding::start(&app_handle); }
+ 
+             // Secure Input monitor (macOS): detects stuck secure input that
+             // silently blocks keyed shortcuts, warns the user, and activates
+@@ -1102,7 +1114,7 @@ pub fn run(cli_args: CliArgs) {
+                 .get_webview_window("main")
+                 .and_then(|w| w.is_visible().ok())
+                 .unwrap_or(false);
+-            if !window_visible {
++            if !window_visible && !embedding::active() {
+                 tray::recreate_tray_icon(app);
+             }
+             show_main_window(app);
+diff --git a/src-tauri/src/settings.rs b/src-tauri/src/settings.rs
+index 44363d4..bc954ae 100644
+--- a/src-tauri/src/settings.rs
++++ b/src-tauri/src/settings.rs
+@@ -907,7 +907,7 @@ pub fn get_default_settings() -> AppSettings {
+         },
+     );
+ 
+-    AppSettings {
++    let mut defaults = AppSettings {
+         settings_schema_version: default_settings_schema_version(),
+         bindings,
+         shortcut_activation: ShortcutActivation::default(),
+@@ -970,7 +970,33 @@ pub fn get_default_settings() -> AppSettings {
+         vad_enabled: default_vad_enabled(),
+         vad_backend: VadBackend::default(),
+         overlay_style: default_overlay_style(),
++    };
++    if crate::embedding::active() {
++        defaults.shortcut_activation = ShortcutActivation::PushToTalk;
++        defaults.show_tray_icon = false;
++        defaults.start_hidden = true;
++        defaults.autostart_enabled = false;
++        defaults.selected_model =
++            "handy-computer/parakeet-unified-en-0.6b-gguf/parakeet-unified-en-0.6b-Q8_0.gguf"
++                .into();
++        defaults.transcribe_accelerator = TranscribeAcceleratorSetting::Cpu;
++        defaults.ort_accelerator = OrtAcceleratorSetting::Cpu;
++        defaults.paste_method = PasteMethod::CtrlV;
++        #[cfg(target_os = "linux")]
++        {
++            defaults.typing_tool = TypingTool::Ydotool;
++        }
++        defaults.clipboard_handling = ClipboardHandling::CopyToClipboard;
++        defaults.history_limit = 5;
++        defaults.recording_retention_period = RecordingRetentionPeriod::PreserveLimit;
++        defaults.overlay_position = OverlayPosition::Bottom;
++        defaults.overlay_style = OverlayStyle::Minimal;
++        if let Some(binding) = defaults.bindings.get_mut("transcribe") {
++            binding.current_binding = "ctrl+space".into();
++            binding.default_binding = "ctrl+space".into();
++        }
+     }
++    defaults
+ }
+ 
+ impl Default for AppSettings {
+diff --git a/src-tauri/src/shortcut/handler.rs b/src-tauri/src/shortcut/handler.rs
+index 3365b3f..f2433da 100644
+--- a/src-tauri/src/shortcut/handler.rs
++++ b/src-tauri/src/shortcut/handler.rs
+@@ -36,6 +36,9 @@ pub fn handle_shortcut_event(
+ 
+     // Transcribe bindings are handled by the coordinator.
+     if is_transcribe_binding(binding_id) {
++        if !crate::embedding::admit(app, is_pressed) {
++            return;
++        }
+         if let Some(coordinator) = app.try_state::<TranscriptionCoordinator>() {
+             coordinator.send_input(
+                 binding_id,
+diff --git a/src-tauri/src/shortcut/mod.rs b/src-tauri/src/shortcut/mod.rs
+index 8a603f4..aeec477 100644
+--- a/src-tauri/src/shortcut/mod.rs
++++ b/src-tauri/src/shortcut/mod.rs
+@@ -97,15 +97,19 @@ pub fn unregister_shortcut(app: &AppHandle, binding: ShortcutBinding) -> Result<
+     }
+ }
+ 
++pub(crate) fn embedded_event(app: &AppHandle, key: &str, pressed: bool) {
++    handler::handle_shortcut_event(app, "transcribe", key, pressed);
++}
++
+ // ============================================================================
+ // Binding Management Commands
+ // ============================================================================
+ 
+ #[derive(Serialize, Type)]
+ pub struct BindingResponse {
+-    success: bool,
++    pub(crate) success: bool,
+     binding: Option<ShortcutBinding>,
+-    error: Option<String>,
++    pub(crate) error: Option<String>,
+ }
+ 
+ #[tauri::command]
+@@ -382,7 +386,7 @@ pub fn get_keyboard_implementation(app: AppHandle) -> String {
+ // ============================================================================
+ 
+ /// Validate a shortcut for a specific implementation
+-fn validate_shortcut_for_implementation(
++pub(crate) fn validate_shortcut_for_implementation(
+     raw: &str,
+     implementation: KeyboardImplementation,
+ ) -> Result<(), String> {
+diff --git a/src-tauri/tauri.conf.json b/src-tauri/tauri.conf.json
+index 7481c0f..87b85a7 100644
+--- a/src-tauri/tauri.conf.json
++++ b/src-tauri/tauri.conf.json
+@@ -2,11 +2,11 @@
+   "$schema": "https://schema.tauri.app/config/2",
+   "productName": "Handy",
+   "version": "0.9.7",
+-  "identifier": "com.pais.handy",
++  "identifier": "com.augmentor.agent.dictation",
+   "build": {
+     "beforeDevCommand": "bun run dev",
+     "devUrl": "http://localhost:1420",
+-    "beforeBuildCommand": "bun run build",
++    "beforeBuildCommand": "",
+     "frontendDist": "../dist"
+   },
+   "app": {
+@@ -17,17 +17,21 @@
+       "assetProtocol": {
+         "enable": true,
+         "scope": {
+-          "allow": ["**"],
++          "allow": [
++            "**"
++          ],
+           "requireLiteralLeadingDot": false
+         }
+       }
+     }
+   },
+   "bundle": {
+-    "active": true,
+-    "createUpdaterArtifacts": true,
++    "active": false,
++    "createUpdaterArtifacts": false,
+     "targets": "all",
+-    "resources": ["resources/**/*"],
++    "resources": [
++      "resources/**/*"
++    ],
+     "license": "MIT",
+     "icon": [
+       "icons/32x32.png",
+@@ -45,7 +49,10 @@
+     },
+     "linux": {
+       "deb": {
+-        "depends": ["libgtk-layer-shell0", "libopenblas0"],
++        "depends": [
++          "libgtk-layer-shell0",
++          "libopenblas0"
++        ],
+         "files": {
+           "/usr/lib/Handy": "transcribe-libs"
+         }
+diff --git a/src/overlay/RecordingOverlay.css b/src/overlay/RecordingOverlay.css
+index eb40068..228cca9 100644
+--- a/src/overlay/RecordingOverlay.css
++++ b/src/overlay/RecordingOverlay.css
+@@ -466,3 +466,9 @@
+   overflow: hidden;
+   text-overflow: ellipsis;
+ }
++
++/* Augmentor's appearance controls disable decoration, never live audio levels. */
++:root[data-augmentor-animation="false"] .scard,
++:root[data-augmentor-animation="false"] .ov-fade,
++:root[data-augmentor-animation="false"] .sspinner { animation: none; transition: none; }
++.augmentor-orb { display: block; flex: none; }
+diff --git a/src/overlay/RecordingOverlay.tsx b/src/overlay/RecordingOverlay.tsx
+index dbab41e..8143f3c 100644
+--- a/src/overlay/RecordingOverlay.tsx
++++ b/src/overlay/RecordingOverlay.tsx
+@@ -2,6 +2,7 @@ import { listen } from "@tauri-apps/api/event";
+ import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+ import { useTranslation } from "react-i18next";
+ import "./RecordingOverlay.css";
++import { useAugmentorTheme, AugmentorOrb } from "./AugmentorOverlay";
+ import { commands, events } from "@/bindings";
+ import type {
+   StreamPhase,
+@@ -20,6 +21,7 @@ const WAVE_BARS = 9;
+ 
+ const RecordingOverlay: React.FC = () => {
+   const { t } = useTranslation();
++  const augmentorTheme = useAugmentorTheme();
+   const [isVisible, setIsVisible] = useState(false);
+   const [state, setState] = useState<OverlayState>("recording");
+   // `Stream::play()` returning does not mean hardware callbacks are flowing.
+@@ -205,7 +207,7 @@ const RecordingOverlay: React.FC = () => {
+   const listeningRow = (showTimer: boolean, showCancel: boolean) => (
+     <div className="sbase">
+       <div className="sbase-l">
+-        <span className={`sdot ${captureReady ? "ready" : "arming"}`} />
++        {augmentorTheme ? <AugmentorOrb animated={augmentorTheme.animated} colour={augmentorTheme.accent} /> : <span className={`sdot ${captureReady ? "ready" : "arming"}`} />}
+       </div>
+       {waveform}
+       <div className="sbase-r">

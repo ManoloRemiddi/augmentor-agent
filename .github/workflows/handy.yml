@@ -1,0 +1,60 @@
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+name: Bundled Handy component
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      platforms:
+        type: string
+        default: '["ubuntu-24.04", "macos-14", "windows-2022"]'
+permissions:
+  contents: read
+jobs:
+  component:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJSON(inputs.platforms || '["ubuntu-24.04", "macos-14", "windows-2022"]') }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.19.0'
+      - name: Install Linux native build libraries
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends build-essential pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libasound2-dev libgtk-layer-shell-dev libopenblas-dev cmake clang libclang-dev libevdev-dev libvulkan-dev glslc spirv-headers glslang-tools libssl-dev xvfb xauth
+      - name: Install the tested Rust toolchain
+        shell: bash
+        run: |
+          rustup toolchain install 1.97.1 --profile minimal --component rustfmt,clippy,rust-docs
+          rustup default 1.97.1
+      - name: Build the private component and complete source notices
+        run: python scripts/build-handy.py
+      - name: Check formatting and lint the component
+        shell: bash
+        env:
+          ORT_PREFER_DYNAMIC_LINK: '1'
+        run: |
+          cd build/handy/src-tauri
+          cargo fmt --all -- --check
+          cargo clippy --release --locked --features tauri/custom-protocol
+      - name: Verify the embedded lifecycle (Linux)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a python3 scripts/proof-handy-component.py
+      - name: Verify the embedded lifecycle (Mac and Windows)
+        if: runner.os != 'Linux'
+        run: python scripts/proof-handy-component.py
+      - name: Name the platform artifact
+        id: target
+        shell: bash
+        run: python -c "import os,platform,sys;open(os.environ['GITHUB_OUTPUT'],'a').write('target='+sys.platform+'-'+platform.machine()+'\n')"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: handy-${{ steps.target.outputs.target }}
+          path: components/handy/runtime/**
+          retention-days: 14
+          if-no-files-found: error

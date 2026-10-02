@@ -148,6 +148,7 @@ def main():
     project = resources/'app'
     for name in ('dist','apps/native','apps/browser','scripts','services','adapters','config','docs','licenses','LICENSE','README.md','release/product.json','release/macos.json','release/macos-requirements.txt','release/dsh'):
         copy(ROOT/name, project/name)
+    subprocess.run([sys.executable,str(ROOT/'scripts/stage-handy.py'),str(project)],check=True)
     if args.source_notices:
         source_report = json.loads((args.source_notices/'manifest.json').read_text())
         for name, sha in source_report['notices'].items():
@@ -186,7 +187,7 @@ def main():
         shutil.rmtree(project/'apps/native')
         # Pure socket clients also serve CLI integrations and acceptance tools;
         # retain them without any Qt presentation modules or desktop entrypoint.
-        for name in ('__init__.py','pi_client.py','prompt_client.py','runtime_start.py','preferences.py'):
+        for name in ('__init__.py','pi_client.py','prompt_client.py','runtime_start.py','preferences.py','dictation.py'):
             relative=Path('apps/native/augmentor_linux')/name
             copy(ROOT/relative,project/relative)
         shutil.rmtree(project/'services/desktop')

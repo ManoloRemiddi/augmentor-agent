@@ -12,6 +12,7 @@ import {dshSetupDialog} from './dsh-setup.mjs'
 import {memoryDialog} from './memory.mjs'
 import {promptEditor} from './prompt-editor.mjs'
 import {supportDialog} from './support.mjs'
+import {dictationSettings} from './dictation-settings.mjs'
 
 const send=(type,payload={})=>chrome.runtime.sendMessage({type,...payload})
 const make=(tag,text)=>{const e=document.createElement(tag);if(text)e.textContent=text;return e}
@@ -21,6 +22,7 @@ const button=(parent,label,fn)=>{const b=make('button',label);b.type='button';b.
 let state={},checking=false,closed=false
 const sections=new Map()
 const definitions=[
+  ['dictation','System dictation','Powered by Handy · Available in every application.','M9 3h6v10H9zM5 10v3a7 7 0 0 0 14 0v-3M12 20v3'],
   ['voice','Voice',chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol?'Optional experimental speech for this application.':'Shared with the floating Augmentor window.','M9 3h6v10H9zM5 10v3a7 7 0 0 0 14 0v-3M12 20v3'],
   ['appearance','Colours','Changes apply immediately.','M12 3a9 9 0 1 0 0 18h1a2 2 0 0 0 1-4 2 2 0 0 1 1-4h2a4 4 0 0 0 4-4c0-3-4-6-9-6ZM7 10h.01M10 6h.01M15 6h.01'],
   ['models','Models','Choose the model Augmentor uses.','M9 3v6m6-6v6M6 9h12v2a6 6 0 0 1-12 0ZM12 17v4'],
@@ -129,7 +131,7 @@ async function showVoice(container){
 }
 function mount(id){
   const row=sections.get(id);if(row.mounted)return
-  if(id!=='appearance'&&!['ready','needs-setup'].includes(state.phase)){
+  if(!['appearance','dictation'].includes(id)&&!['ready','needs-setup'].includes(state.phase)){
     row.body.textContent=state.error||'Connecting to the Augmentor companion… Settings will appear here when it is available.'
     return
   }
@@ -141,6 +143,7 @@ function mount(id){
   if(id==='home')homeSettings(document,send,row.body)
   if(id==='memory')showMemory(row.body)
   if(id==='voice')void showVoice(row.body).catch(fail)
+  if(id==='dictation')void dictationSettings(row.body,send).catch(fail)
   if(id==='support'){
     const version=make('div');version.className='card';version.append(make('h2','Augmentor '+chrome.runtime.getManifest().version),make('p','This preview is updated with the Augmentor installer. The companion and extension must use matching versions.'));row.body.append(version)
     void supportDialog(document,send,row.body).catch(fail)

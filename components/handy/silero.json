@@ -1,0 +1,7 @@
+{
+  "component": "Silero VAD v4",
+  "commit": "915dd3d639b8333a52e001af095f87c5b7f1e0ac",
+  "licenseUrl": "https://raw.githubusercontent.com/snakers4/silero-vad/915dd3d639b8333a52e001af095f87c5b7f1e0ac/LICENSE",
+  "licenseSha256": "2e63e9a38b6e8fc0c7bc37ce174caca1862870856c6daf5697cfb785e925520b",
+  "modelSha256": "a35ebf52fd3ce5f1469b2a36158dba761bc47b973ea3382b3186ca15b1f5af28"
+}

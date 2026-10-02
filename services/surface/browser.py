@@ -1,7 +1,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """The sidebar reads Desktop appearance and uses its prompt improvement operation."""
 from pathlib import Path
-import sys,json
+import sys,json,time
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]/'apps/native'))
 from augmentor_linux.preferences import Preferences
 from PySide6.QtGui import QColor
@@ -9,6 +9,7 @@ from PySide6.QtGui import QColor
 def appearance(settings=None):
     preferences=Preferences()
     if settings is not None:
+        edited_at=time.time_ns()
         if not isinstance(settings,dict):raise ValueError('Invalid appearance')
         updates={}
         for external,internal,low,high in [('neutHue','hue',0,359),('neutBright','brightness',-15,15),('accentHue','accent_hue',0,359),('accentBright','accent_brightness',-15,15)]:
@@ -21,6 +22,8 @@ def appearance(settings=None):
         if not isinstance(colours,dict) or any(not isinstance(v,str) or not re.fullmatch('#[0-9a-fA-F]{6}',v) for v in colours.values()):raise ValueError('Invalid formatting colour')
         updates.update(theme=settings['theme'],format_colours=colours)
         preferences.values.update(updates);preferences.save()
+        from augmentor_linux.dictation import request,theme
+        request('theme',{**theme(preferences.values),'edited_at':edited_at})
     v=preferences.values;dark=v['theme']=='dark'
     light=(.12 if dark else .92)+v['brightness']/150
     saturation=v.get('saturation',48)/100
@@ -31,6 +34,9 @@ def appearance(settings=None):
     return {'theme':v['theme'],'animation':v['animation'],'values':{'theme':v['theme'],'neutHue':v['hue'],'neutBright':v['brightness'],'accentHue':v['accent_hue'],'accentBright':v['accent_brightness'],'formatColours':v['format_colours']},'tokens':{'--bg':bg.name(),'--field':field.name(),'--layer1':field.name(),'--layer2':field.name(),'--text':'#edf3f3' if dark else '#152b2c','--brand':accent.name(),'--accent':accent.name(),'--user-bubble':bubble.name(),'--format-heading':v['format_colours'].get('heading',accent.name()),'--format-link':v['format_colours'].get('link',accent.name())}}
 
 def request(value):
+    if value.get('action')=='dictation':
+        from augmentor_linux.dictation import request as dictation_request
+        return dictation_request(value.get('method','status'),value.get('params'),timeout=75)
     if value.get('action')=='appearance':return appearance(value.get('settings'))
     if value.get('action')=='improve':
         text=value.get('text');selection=value.get('selection')

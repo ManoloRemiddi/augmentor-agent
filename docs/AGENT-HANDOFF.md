@@ -2,6 +2,16 @@
 
 # Start here: agent handoff
 
+## October 2 embedded Handy candidate
+
+`feat/handy-integration` starts from public main `d91c520` and implements the
+owner-approved system-wide dictation and themed Handy overlay. Read
+[the implementation guide](HANDY-INTEGRATION.md) for supplier pins, settings,
+microphone ownership, OS adapters, packaging, reproducible proofs and explicit
+qualification boundaries. The canonical dirty checkout and existing installed
+settings work are preserved. This source candidate must not be presented as an
+installed update or a qualified Windows installer solely from component CI.
+
 ## October 1 merge blockers: current main and separate Codex prerequisite
 
 The feature branch integrates canonical main `8c3be5a` at merge `338dbc5`.
