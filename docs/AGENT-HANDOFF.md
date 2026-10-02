@@ -2,7 +2,34 @@
 
 # Start here: agent handoff
 
-## October 2 GNOME input-free consent and PySide dependency checkpoint
+## October 2 completed source runtime and GNOME candidate checkpoint
+
+The fifth offline Qt/PySide source build completes all19 commands. A separately
+identified PySide derivative excludes the unused GPL/exception example extension;
+all original artifacts are preserved. The staged candidate has18 Qt libraries,
+explicit desktop/image/TLS/client plugins and a finite QML scope. Its fresh
+runtime-only container has no producer tree and passes11 binding imports,
+offscreen synthetic text, SVG rendering and QtQuick/plasma component construction.
+See [source runtime evidence and limits](LINUX-LGPL-SOURCE-RUNTIME.md). Shader
+rendering, native platforms, full product, notices/closure, full recipient source
+kit, recipient modification and release remain open. The independent sixth build
+and11 imports pass;161/207 Qt ELF payloads agree, while46 differ. All wheel native
+member payloads agree; this is a functional rebuild, not binary reproducibility.
+
+The input-free Fedora consent probe also passes GNOME's native sharing Stop.
+The separate [execution candidate](LINUX-GNOME-CONTROL-PLAN.md#guarded-execution-candidate-not-enabled)
+adds scale1-only mapping, frame-cap validation, private-context cancellation,
+terminal cleanup and idle lock/epoch monitoring. Keyboard refuses until isolated
+AT-SPI event delivery is proved. Its tests are synthetic; production GNOME input
+remains disabled. Current isolated Arch source suite runs739 cases:737 pass and
+2 Mac-only skips. The initial context-mocking test failure is preserved alongside
+the corrected callback-delivery proof. Both40de37b hosted workflows pass:
+[Linux37025441987](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37025441987),
+[Mac37025441815](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37025441815).
+New candidate source still needs hosted validation. All five original rollout
+points remain active; no owner state or selected app changed.
+
+## October 2 GNOME input-free consent and PySide dependency checkpoint (historical)
 
 The [checked GNOME report](../release/qualification/next-targets/20261002-gnome-native-consent.json)
 and [owning plan](LINUX-GNOME-CONTROL-PLAN.md) now record a separate real Fedora50

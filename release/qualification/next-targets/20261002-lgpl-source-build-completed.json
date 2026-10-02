@@ -1,0 +1,226 @@
+{
+  "format": "augmentor-linux-source-runtime-build-completed/1",
+  "sourceBase": "40de37b72d03fef1bdf75a2a55d2dc4302a5f734",
+  "infrastructure": {
+    "sourceBase": "bedd7bd11ac4434c514f0010dbca679aeabf4de3",
+    "imageId": "sha256:f1a028f702c9dd57596440ea4bfb2e75406029d931e206f255d8ae4dfdf1b856",
+    "containerId": "f93cdff4177f759449dd0cd8c735e9649987d2c6afeb29d60d3b5e6cb529832c",
+    "containerName": "augmentor-noble-qt-source-20261002-e",
+    "basePin": "docker.io/library/ubuntu@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3",
+    "dockerfileSha256": "7891409bc183c09653a5d340b8e98f363c2f3dbbd6e11d0d7ed57c9d13a10fd2",
+    "toolSha256": "c20446543b469472db29f56a34a9305b4fcc5e22c5678779b9d8f290ff61092a",
+    "policySha256": "969dca5093394282eef5517ade6e0bcb31d1a9ceb1b22513d213aa9ef434196e",
+    "recipeUncommitted": true,
+    "cpuLimit": 2,
+    "memoryLimitBytes": 8589934592,
+    "pidsLimit": 512,
+    "hostMounts": false,
+    "hostDevices": false,
+    "buildNetwork": "none",
+    "previousBuildPreservedUnqualified": true,
+    "freshRootAndSources": true,
+    "pythonPreflight": {
+      "executable": "/work/build-python/bin/python3.12",
+      "prefix": "/work/build-python",
+      "basePrefix": "/usr",
+      "default": {
+        "purelib": "/work/build-python/lib/python3.12/site-packages",
+        "data": "/work/build-python"
+      },
+      "posixPrefix": {
+        "purelib": "/work/build-python/lib/python3.12/site-packages",
+        "data": "/work/build-python"
+      }
+    },
+    "ownerStateChanged": false,
+    "pysideModuleDependencyOrder": "OpenGL before Qml and Quick; upstream CMake per-module generated-header variables"
+  },
+  "actualBuildToolSha256": "c20446543b469472db29f56a34a9305b4fcc5e22c5678779b9d8f290ff61092a",
+  "actualToolDiffersFromCurrentPublishedRecipeOnlyByExplanatoryComment": true,
+  "dockerfileSha256": "7891409bc183c09653a5d340b8e98f363c2f3dbbd6e11d0d7ed57c9d13a10fd2",
+  "dependencyInventorySha256": "bc6cd4560d3d984dc11e2b2faceb1b1b2fcf73440fad5a4d9c6a8f76a594b7b3",
+  "finalBuildReportSha256": "61c6929ba7bb3bf02bbe49090dd1d48d853363e0b8b4eced7d1af9c5737f3f8a",
+  "pysideLogSha256": "beec7bb135314b3fee7ae275f4eb30b9d45a9a247bc1fb1d110a13d89701b874",
+  "qtbaseRequiredFeatures": {
+    "testlib": "ON",
+    "dbus": "ON",
+    "wayland": "ON",
+    "accessibility": "ON",
+    "accessibility_atspi_bridge": "ON",
+    "icu": "ON",
+    "xcb": "ON",
+    "xcb_glx": "ON",
+    "egl": "ON",
+    "openssl": "ON",
+    "openssl_linked": "ON",
+    "fontconfig": "ON",
+    "system_zlib": "ON",
+    "system_pcre2": "ON",
+    "system_doubleconversion": "ON",
+    "system_freetype": "ON",
+    "system_harfbuzz": "ON",
+    "system_png": "ON",
+    "system_jpeg": "ON"
+  },
+  "completedCommands": 19,
+  "compiledAndInstalledQtModules": [
+    "qtbase",
+    "qtshadertools",
+    "qtsvg",
+    "qtimageformats",
+    "qtdeclarative",
+    "qtwayland"
+  ],
+  "wheels": [
+    {
+      "file": "PySide6-6.8.2.1-6.8.2-cp37-abi3-manylinux_2_39_x86_64.whl",
+      "bytes": 10533736,
+      "sha256": "fa2562ceee1e9af89a805876a52f6872be8d0792b7f41be43937051ea94a580b",
+      "wheelMetadata": "Wheel-Version: 1.0\nGenerator: bdist_wheel (0.42.0)\nRoot-Is-Purelib: false\nTag: cp37-abi3-manylinux_2_39_x86_64\n\n",
+      "elfEntries": [
+        "PySide6/QtCore.abi3.so",
+        "PySide6/QtDBus.abi3.so",
+        "PySide6/QtExampleIcons.abi3.so",
+        "PySide6/QtGui.abi3.so",
+        "PySide6/QtNetwork.abi3.so",
+        "PySide6/QtOpenGL.abi3.so",
+        "PySide6/QtQml.abi3.so",
+        "PySide6/QtQuick.abi3.so",
+        "PySide6/QtQuickWidgets.abi3.so",
+        "PySide6/QtSvg.abi3.so",
+        "PySide6/QtTest.abi3.so",
+        "PySide6/QtWidgets.abi3.so",
+        "PySide6/libpyside6.abi3.so.6.8",
+        "PySide6/libpyside6qml.abi3.so.6.8"
+      ],
+      "generatorIsDevelopmentOnly": false,
+      "elfIdentification": "ZIP member leading bytes equal ELF magic"
+    },
+    {
+      "file": "shiboken6-6.8.2.1-6.8.2-cp37-abi3-manylinux_2_39_x86_64.whl",
+      "bytes": 205747,
+      "sha256": "aa0309c680f1ea3ef445a3bce8177ebfea7825008b9761763d434ff44ecec5db",
+      "wheelMetadata": "Wheel-Version: 1.0\nGenerator: bdist_wheel (0.42.0)\nRoot-Is-Purelib: false\nTag: cp37-abi3-manylinux_2_39_x86_64\n\n",
+      "elfEntries": [
+        "shiboken6/Shiboken.abi3.so",
+        "shiboken6/libshiboken6.abi3.so.6.8"
+      ],
+      "generatorIsDevelopmentOnly": false,
+      "elfIdentification": "ZIP member leading bytes equal ELF magic"
+    },
+    {
+      "file": "shiboken6_generator-6.8.2.1-6.8.2-cp37-abi3-manylinux_2_39_x86_64.whl",
+      "bytes": 1463823,
+      "sha256": "dd70b6c252f3194c12a73d78d57b79f02b4a9800042d1cc2f7f5559ba5da7eb4",
+      "wheelMetadata": "Wheel-Version: 1.0\nGenerator: bdist_wheel (0.42.0)\nRoot-Is-Purelib: false\nTag: cp37-abi3-manylinux_2_39_x86_64\n\n",
+      "elfEntries": [
+        "shiboken6_generator/shiboken6"
+      ],
+      "generatorIsDevelopmentOnly": true,
+      "elfIdentification": "ZIP member leading bytes equal ELF magic"
+    }
+  ],
+  "sourceRuntimeBuilt": true,
+  "importProbe": {
+    "python": "3.12.3",
+    "pyside": "6.8.2.1",
+    "qt": "6.8.2",
+    "shiboken": "6.8.2.1",
+    "wheelRecordFilesVerified": true,
+    "allElevenRequestedBindingModulesImported": true,
+    "qtLibrariesMappedOnlyFromOwnedBuildPrefix": true,
+    "defaultAndExplicitPrefixImportsPassed": true,
+    "logSha256": "606f1feaa7e2582a8a401d74052e81435391ea056df408a6fabec4f2203512f0",
+    "initialCopiedScriptPermissionRefusalRetained": true
+  },
+  "prefixElfDiscovery": {
+    "elfFiles": 207,
+    "inventorySha256": "91bdca7998c681ee2362882e54044ba55d7a471b27a764e9cc503aff69778f0a",
+    "qmlCompilerDependents": [
+      "bin/qmllint",
+      "bin/qmlformat",
+      "bin/qmldom",
+      "bin/qmltc",
+      "libexec/qmlimportscanner",
+      "libexec/qmlaotstats",
+      "libexec/qmlcachegen",
+      "plugins/qmllint/libquicklintplugin.so"
+    ],
+    "completePrefixMustNotBeShippedAsRuntime": true
+  },
+  "independentRebuild": {
+    "infrastructure": {
+      "sourceBase": "40de37b72d03fef1bdf75a2a55d2dc4302a5f734",
+      "imageId": "sha256:f1a028f702c9dd57596440ea4bfb2e75406029d931e206f255d8ae4dfdf1b856",
+      "containerId": "acd066c110a8413acf4670f52aed409598554ffe488e85822c5cb13da0ee0f64",
+      "containerName": "augmentor-noble-qt-source-20261002-f",
+      "basePin": "docker.io/library/ubuntu@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3",
+      "dockerfileSha256": "7891409bc183c09653a5d340b8e98f363c2f3dbbd6e11d0d7ed57c9d13a10fd2",
+      "toolSha256": "c20446543b469472db29f56a34a9305b4fcc5e22c5678779b9d8f290ff61092a",
+      "policySha256": "969dca5093394282eef5517ade6e0bcb31d1a9ceb1b22513d213aa9ef434196e",
+      "recipeUncommitted": true,
+      "cpuLimit": 2,
+      "memoryLimitBytes": 8589934592,
+      "pidsLimit": 512,
+      "hostMounts": false,
+      "hostDevices": false,
+      "buildNetwork": "none",
+      "previousBuildPreservedUnqualified": true,
+      "freshRootAndSources": true,
+      "pythonPreflight": {
+        "executable": "/work/build-python/bin/python3.12",
+        "prefix": "/work/build-python",
+        "basePrefix": "/usr",
+        "default": {
+          "purelib": "/work/build-python/lib/python3.12/site-packages",
+          "data": "/work/build-python"
+        },
+        "posixPrefix": {
+          "purelib": "/work/build-python/lib/python3.12/site-packages",
+          "data": "/work/build-python"
+        }
+      },
+      "ownerStateChanged": false,
+      "pysideModuleDependencyOrder": "OpenGL before Qml and Quick; upstream CMake per-module generated-header variables",
+      "exactPreviousBuildRecipeAndSources": true,
+      "freshContainerAndSourceTree": true,
+      "previousIntermediateBinariesReused": false,
+      "correspondingSourceRebuildQualified": false
+    },
+    "exactProducerRecipeAndSourceArchives": true,
+    "previousIntermediateBinariesReused": false,
+    "runningAtCheckpoint": false,
+    "qualified": false,
+    "completedCommands": 19,
+    "allElevenRequestedBindingModulesImported": true,
+    "producerWheelNativePayloadsMatch": true,
+    "qtElfPayloadsMatching": 161,
+    "qtElfPayloadsDifferent": 46,
+    "bitForBitReproducible": false,
+    "functionalSourceRecipeRebuildVerified": true,
+    "fullCorrespondingSourceKitQualified": false,
+    "comparisonReport": "20261002-independent-qt-source-rebuild.json",
+    "finalBuildReportSha256": "8040f98c22ec7f14c52fd3d7b5ddd30ecfa5b61552b58967feb20ad0488c647d",
+    "importLogSha256": "1d0e8690e74f962a2761f4bc3ccff87f9b9489073bd8ac72270f1115135503a7"
+  },
+  "limits": {
+    "manylinuxTagUnchanged": "cp37-abi3-manylinux_2_39_x86_64",
+    "noblePython312BuildOnly": true,
+    "runtimeRelocationTested": false,
+    "runtimeClosureTested": false,
+    "licenseReviewComplete": false,
+    "correspondingSourceRebuildTested": false,
+    "recipientReplacementTested": false,
+    "fullProductRuntimeTested": false,
+    "publicReleaseQualified": false,
+    "selectedApplicationChanged": false,
+    "ownerStateChanged": false
+  },
+  "wheelElfMagicInventorySha256": "11b76a5ab2cd8a71b8785831b76268b14dd65700dcf7e290dd4f136f2a164e93",
+  "excludedComponentsRequired": [
+    "PySide6/QtExampleIcons.abi3.so",
+    "qml/Qt/test/controls",
+    "QmlCompiler and its dependent build/lint tools",
+    "shiboken6_generator wheel (development only)"
+  ]
+}

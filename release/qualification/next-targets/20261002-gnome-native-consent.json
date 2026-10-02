@@ -76,6 +76,19 @@
       },
       "inputSent": false,
       "rawReportSha256": "35ef9d93237218d666560ac278fcadca09169d2fa69e38774a380865cfdeb9f1"
+    },
+    "nativeSharingStopRevocation": {
+      "resourcesClosed": true,
+      "probeExited": true,
+      "inputSent": false,
+      "stopClicked": false,
+      "consentViaActualNativeGtkAccessibilityActions": true,
+      "revocationViaActualGnomeOrangeSharingStopButton": true,
+      "rawReportSha256": "be4bfa2a61a3ba5216096b3faf0d717fbcc9eb055f564b9083c97028c4bf3c38",
+      "fixtureAccessibilityDriverSha256": "01b6edfcc5a654ea81280c28dc8c2a6f9c94bd7df45f928e23bb639e84c01f46",
+      "toggleLogSha256": "b6657c874a40f90b91df79d7c3a01f427ef637c933095c6509de3088a7cca6fa",
+      "shareLogSha256": "7cc5a1b7eb40ba7ac77e464fad7b0386ac5d6aa09e9c439c0da60ce911696ed9",
+      "revokeLogSha256": "d2ae36b263e65e1c990787c2d469eb64a8616426a147fc453f92b6b5ed22ad88"
     }
   },
   "historicalProbeResults": [
@@ -266,7 +279,7 @@
     "inputQualified": false,
     "streamGeometryValidated": false,
     "targetGuardsQualified": false,
-    "nativeRevocationQualified": false,
+    "nativeRevocationQualified": true,
     "ownerRestartQualified": false,
     "passwordLockQualified": false,
     "kdeThreadingRegressionQualified": false,
@@ -275,5 +288,11 @@
     "publicReleaseQualified": false,
     "selectedApplicationChanged": false,
     "ownerStateChanged": false
+  },
+  "nativeRevocationScope": "Input-free standalone consent candidate only; production control remains disabled",
+  "additionalExpiredNativeControlAttemptRetained": {
+    "probeReportSha256": "efc0166b9c6c80ee9f4f49a2c8fda9bd3966912a465778067d0d98fdf8048693",
+    "accessibilityDriverRefusedAfterDialogExpiry": true,
+    "refusalLogSha256": "98cde26b7c5b0b360b87779c00d5aa0eb9c5b532137c8d2c0d46ff30ef21b5c4"
   }
 }

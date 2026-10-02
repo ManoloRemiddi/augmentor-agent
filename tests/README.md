@@ -478,3 +478,22 @@ separately staged as documented in the [GNOME plan](../docs/LINUX-GNOME-CONTROL-
 The [checked evidence](../release/qualification/next-targets/20261002-gnome-native-consent.json)
 keeps first failures, exact candidates and source721-case regression separate from
 production GNOME control, capture, lock/restart and public release qualification.
+
+### Source runtime derivative and GNOME execution candidate
+
+`test_source_pyside_derivation.py` checks producer preservation, member-byte/tag
+preservation, new RECORD, deterministic derivation, hash/RECORD tampering,
+unsafe/signed input refusal and overwrite refusal. The runtime stager is separately
+executed against actual source-produced ELF/plugin/QML files; its fresh-container
+import/widget/SVG/QML probe is recorded in [runtime work](../docs/LINUX-LGPL-SOURCE-RUNTIME.md).
+It is not full graphics, audio, licensing or product qualification.
+
+`test_gnome_control.py` covers logical source geometry/negative origin, scale1-only
+refusal, owner/cancellation, fresh-scene and compositor point checks, terminal
+observer/topology cleanup, idle lock/epoch watch and unqualified keyboard refusal.
+`test_capture_stream.py` now proves private-context cancellation without actual
+GUI/default-source delivery and checkpoint rejection of an arriving frame.
+The full isolated Arch source suite runs739 cases:737 pass/two Mac-only skips.
+The initial test-mocking failure is retained; no actual candidate pointer/keyboard
+input, native capture, password/restart, production discovery or KDE service
+threading acceptance is claimed. See the [checked source report](../release/qualification/next-targets/20261002-gnome-runtime-candidate-source-tests.json).

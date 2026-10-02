@@ -8,7 +8,7 @@ gi.require_version('Gst', '1.0')
 from gi.repository import GLib, Gst
 
 
-def receive_frame(pipeline, cancel, timeout=10):
+def receive_frame(pipeline, cancel, timeout=10, *, context=None, checkpoint=None):
     """Read one frame; callers own pipeline teardown and observation invalidation."""
     if cancel.is_set():
         raise RuntimeError('Desktop control stopped.')
@@ -17,10 +17,13 @@ def receive_frame(pipeline, cancel, timeout=10):
     sink = pipeline.get_by_name('capture')
     bus = pipeline.get_bus()
     deadline = time.monotonic() + timeout
+    context = context if context is not None else GLib.MainContext.default()
     while time.monotonic() < deadline:
+        if checkpoint is not None:checkpoint()
         if cancel.is_set():
             raise RuntimeError('Desktop control stopped.')
         sample = sink.emit('try-pull-sample', 100 * Gst.MSECOND)
+        if checkpoint is not None:checkpoint()
         if cancel.is_set():
             raise RuntimeError('Desktop control stopped.')
         failure = bus.pop_filtered(Gst.MessageType.ERROR)
@@ -35,8 +38,9 @@ def receive_frame(pipeline, cancel, timeout=10):
             return sample
         if sink.get_property('eos'):
             raise RuntimeError('The screen capture stream ended without a frame. No input was sent.')
-        while GLib.MainContext.default().pending():
-            GLib.MainContext.default().iteration(False)
+        for _ in range(64):
+            if not context.pending():break
+            context.iteration(False)
     raise RuntimeError('No screen frame was received before the capture timeout. No input was sent.')
 
 

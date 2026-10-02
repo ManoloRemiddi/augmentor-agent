@@ -104,7 +104,7 @@ class Portal:
         # retain the returned image in its model/tool conversation history.
         pipeline=Gst.parse_launch(f'pipewiresrc fd={self.fd} path={self.node} do-timestamp=true ! videoconvert ! video/x-raw,format=RGB ! appsink name=capture emit-signals=false max-buffers=1 drop=true sync=false')
         try:
-            sample=receive_frame(pipeline,self.cancel)
+            sample=self.receive_capture_frame(pipeline)
             buffer=sample.get_buffer();ok,mapping=buffer.map(Gst.MapFlags.READ)
             if not ok:raise RuntimeError('The screen frame could not be read.')
             try:
@@ -123,6 +123,8 @@ class Portal:
         if not same_scene(before,after):raise RuntimeError('The active window changed during capture. Observe again.')
         token=uuid.uuid4().hex;self.snapshot={'token':token,'created':time.monotonic(),'scene':after,'width':image['width'],'height':image['height'],'focus':self.focus_info(after['window']['pid']),'focusSerial':self.focus_serial}
         return {'token':token,'window':after['window'],'screen':after['screens'][0],'imageSize':{'width':image['width'],'height':image['height']},'image':image,'expiresInSeconds':30,'instructions':'Coordinates use the returned image pixels. One action consumes this observation; observe again to verify the result.'}
+    def receive_capture_frame(self,pipeline):
+        return receive_frame(pipeline,self.cancel)
     def target(self,owner,token):
         self.verify(owner);snapshot=self.snapshot;self.snapshot=None
         if not snapshot or token!=snapshot['token'] or time.monotonic()-snapshot['created']>30:raise RuntimeError('Observation is stale or already used. Observe again; no action was replayed.')

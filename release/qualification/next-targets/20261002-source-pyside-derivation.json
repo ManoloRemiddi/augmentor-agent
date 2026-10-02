@@ -1,0 +1,23 @@
+{
+  "format": "augmentor-source-pyside-derivation/1",
+  "producerSha256": "fa2562ceee1e9af89a805876a52f6872be8d0792b7f41be43937051ea94a580b",
+  "removed": [
+    {
+      "path": "PySide6/QtExampleIcons.abi3.so",
+      "sha256": "cd054b6d5f82d718774d660d82de8b9829f889cfc40a9143c3502ddb4cbc8ce3"
+    }
+  ],
+  "reason": "Unused unconditional example resource target; GPL-3.0-only WITH Qt-GPL-exception-1.0 OR commercial.",
+  "correspondingSource": "sources/pyside6/qtexampleicons/module.c",
+  "pinnedCommit": "f62088b4cd516a3080a6b2e68bc79903da8b67ce",
+  "wheelTagsAndMetadataUnchanged": true,
+  "licenseReviewComplete": false,
+  "producerFile": "PySide6-6.8.2.1-6.8.2-cp37-abi3-manylinux_2_39_x86_64.whl",
+  "derivedFile": "PySide6-6.8.2.1-6.8.2augmentor1-cp37-abi3-manylinux_2_39_x86_64.whl",
+  "derivedSha256": "36c806a397b06a8c98e64cd0820ba03cc5c27271046d7c86b1a5dfd5d663254e",
+  "derivedBytes": 10312882,
+  "producerUnchanged": true,
+  "retainedProducerBytesUnchanged": true,
+  "toolSha256": "f7a89ed99f36b69ecdbc3a6af582136eb598a22fc84e952f82aeebd4254629ba",
+  "sourceBase": "40de37b72d03fef1bdf75a2a55d2dc4302a5f734"
+}

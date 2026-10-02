@@ -62,9 +62,53 @@ excluded from acceptance. Revised cleanup and current xcb runs are separately
 recorded. QEMU captures also include partial redraws and the selected app can
 cover the native portal; complete graphical rendering is not qualified. Dismissing
 only the fixture DSH dialog's Later button changes no provider or configuration.
-Native revocation, service/extension restart, password lock, scaled/topology cases,
+Native GNOME sharing Stop also closes this input-free probe with no Augmentor
+Stop click. Execution-controller revocation, service/extension restart, password
+lock, scaled/topology cases,
 Ubuntu consent, input/scene/AT-SPI integration and KDE threading regression remain
 open. All five original rollout points remain active.
+
+## Guarded execution candidate; not enabled
+
+[GnomeControl](../services/desktop/gnome_control.py) is a separate worker-owned
+candidate; production discovery still rejects GNOME input. It owns independent
+consent, pins the observer epoch, consumes one-use target tokens, checks the
+current scene before each dispatch and uses compositor InspectPoint before
+pointer motion/button press. Monitor source/position/size must match exactly one
+compositor monitor at scale1. Frame caps must also match the logical monitor
+before issuing a token. Observer/epoch/topology/capture failure closes resources;
+a worker-context250ms watcher invalidates idle locked/replaced sessions.
+These mechanisms currently have synthetic tests, not native execution acceptance.
+
+Pinned [frontend1.22.1](https://github.com/flatpak/xdg-desktop-portal/blob/1.22.1/src/remote-desktop.c),
+[GNOME backend50.0](https://github.com/GNOME/xdg-desktop-portal-gnome/blob/50.0/src/remotedesktop.c)
+and [Mutter50.5](https://github.com/GNOME/mutter/blob/50.5/src/backends/meta-screen-cast-monitor-stream.c)
+show a scale-dependent transform/bounds discrepancy: portal metadata is logical,
+while scaled stream capture/pointer transforms use monitor scale. Scale2/fractional
+input is refused until actual caps, far-edge coordinates and widget outcomes are
+proved. A metadata-only scale2 unit fixture is not coordinate qualification.
+
+Capture now has a virtual frame-acquisition hook; the KDE implementation retains
+its existing default-context route. The GNOME candidate passes only its worker
+context and cancellation checkpoints, including after a sample arrives. Tests
+attach real sources to both contexts and prove private cancellation without
+GUI-source callback delivery. Native Session.Closed during capture still needs
+live acceptance. Portal Notify ACK is asynchronous and cannot prove an actual
+widget click or settled hover popup.
+
+Inherited libatspi uses a global default context; Gio's thread-default context
+alone does not migrate it. See the exact
+[libatspi context implementation](https://github.com/GNOME/at-spi2-core/blob/2.60.0/atspi/atspi-misc.c).
+This candidate returns no cached accessibility focus and refuses keyboard/type
+until an isolated helper proves event-thread identity, focus-away/back, password
+and inaccessible controls, new-app discovery and a11y owner invalidation. It does
+not move the GUI process's singleton or claim per-character focus delivery.
+
+Next native proof: scale1 capture and GTK Wayland/XWayland widget outcomes; all
+stale/focus/cover/hover fences; mid-capture Stop/native revocation/terminal stream
+failures; isolated AT-SPI helper keyboard and partial-action Stop; normal password
+lock and independent service/observer restarts. Repeat supported46/48/49 profiles
+and real KDE threading regression before production integration.
 
 ## Portal negotiation and identity
 

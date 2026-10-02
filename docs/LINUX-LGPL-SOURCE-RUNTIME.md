@@ -8,8 +8,9 @@ bytes and the official checksum records pass the
 [acquisition report](../release/qualification/next-targets/20261002-lgpl-source-acquisition.json).
 The acquisition tool saves partials on failure and refuses an unvalidated resume.
 No detached archive signature or archive-to-Git equality is claimed. This is
-source acquisition with the measured partial builds below; full runtime, closure/
-license review, independent rebuild, replacement and public release remain false.
+source acquisition and the completed source build below; full product runtime,
+closure/license review, independent rebuild, replacement and public release remain
+false.
 
 The [later PySide failure/checkpoint](../release/qualification/next-targets/20261002-qt-source-pyside-failure.json)
 records all six Qt modules compiled/installed, Wayland client ON/server OFF and
@@ -28,15 +29,84 @@ subset configured OpenGL after Quick. Pinned upstream `collect_module_if_found`,
 `HAS_QT_MODULE` and `check_qt_opengl` establish the ordering dependency; no upstream
 source is patched. That fourth tree/log is stopped and preserved. A fifth fresh
 root extracts the same verified archives, uses the same signed dependency image
-and orders OpenGL before Qml/Quick. It is compiling QtDeclarative at this checkpoint;
-no intermediate binaries are reused. Runtime completion and every downstream
-qualification gate remain false. Historical checkpoints and all failures remain
-in the report; a started build is not completion.
+and orders OpenGL before Qml/Quick. The fifth build now completes all19 commands
+and three wheels. No intermediate binaries were reused. The
+[completion report](../release/qualification/next-targets/20261002-lgpl-source-build-completed.json)
+binds actual recipe, image, package inventory, logs, features and ELF discovery.
+An [independent sixth container](../release/qualification/next-targets/20261002-independent-qt-source-rebuild.json)
+also completes19 commands and all11 binding imports from fresh sources. All
+producer/rebuilt wheel native member bytes agree. Of207 Qt ELF files,161 agree
+and46 differ; generated Python config/cache/RECORD members and ZIP hashes differ.
+This is a functional recipe rebuild, not bit-for-bit reproducibility or complete
+recipient source-kit qualification. Historical failures remain preserved.
 
 Build a separate artifact. Do not relabel the current vendor PyPI wheels, delete
 their GPL-only libraries without closure review or assume a commercial license.
 No owner runtime or selected desktop has changed. [Licensing](LICENSING.md) owns
 the distribution conditions; this recipe is engineering work, not legal approval.
+
+## Completed build and separate runtime candidate
+
+The [exact producer image recipe](../release/qt-source-runtime-builder.Dockerfile)
+and [signed-package inventory](../release/qualification/next-targets/20261002-qt-source-build-packages.tsv)
+identify the successful Noble x86_64/Python3.12 build. All11 requested binding
+modules import with Qt6.8.2/PySide6.8.2.1. The actual build script differs from the
+published driver only by two explanatory comments; an exact byte comparison
+verified that claim. ELF inventory uses ZIP member magic bytes, including the
+generator executable, rather than `.so` filenames. The generator wheel is for
+building only.
+
+Exact-source review found the unconditional PySide `QtExampleIcons` target offers
+[GPL3 with Qt exception or commercial terms](https://github.com/pyside/pyside-setup/blob/f62088b4cd516a3080a6b2e68bc79903da8b67ce/sources/pyside6/qtexampleicons/module.c).
+The module-subset/no-qt-tools options do not exclude it. The
+[derivation tool](../release/derive-source-pyside-wheel.py) therefore verifies the
+reviewed producer hash and every RECORD entry, writes a new build-tagged wheel,
+removes only that unused extension/stub, regenerates RECORD and records provenance.
+All other producer member bytes and wheel ABI/platform tags remain identical.
+The original wheel remains unchanged. The
+[receipt](../release/qualification/next-targets/20261002-source-pyside-derivation.json)
+identifies both artifacts; this is a source-built derivative, not a relabelled
+vendor wheel or a complete license approval. The generated distribution is
+`PySide6`, not the existing managed profile's `PySide6-Essentials`; a distinct
+runtime profile/lock is still required.
+
+The [runtime stager](../release/stage-source-qt-runtime.py) follows actual SONAME
+closure from the app's11 modules and explicit desktop/image/TLS/input/client
+plugins. It copies only immediate members of QML, QtQuick, QtQml, Models and
+WorkerScript modules. The
+[full manifest](../release/qualification/next-targets/20261002-source-qt-runtime-stage.json)
+records18 Qt libraries, every file/link and external SONAME. It excludes the SDK,
+QmlCompiler and its tools, lint/debug plugins, unrelated QML trees and
+[QuickControls test utilities](https://github.com/qt/qtdeclarative/blob/75534f3e7fff24ed7ccb364e2ed9950a73da879f/src/quickcontrolstestutils/CMakeLists.txt),
+which build despite QT_BUILD_TESTS=OFF. Client Wayland plugins with `-server` in
+the filename are retained according to their actual client source terms.
+
+A [fresh runtime-only container probe](../release/qualification/next-targets/20261002-source-runtime-only-probe.json)
+has no producer build tree and loads every mapped Qt library from the candidate.
+The [probe source](../release/probe-source-qt-runtime.py) requires a fresh ordinary
+UID1001 container built from the marked source image: copy the candidate as
+`/work/qt`, the derived PySide/original shiboken wheels as `/work/wheels`, the
+derivation tool as `/inputs/derive-source-pyside-wheel.py` and app effects as
+`/work/effects`; run with Python3.12. It refuses an existing probe directory.
+It verifies11 imports, offscreen widget synthetic text, an SVG red pixel, all
+reported image decoder formats and QtQuick/plasma component construction with
+QtExampleIcons absent. Explicit library/plugin/QML environment paths are required.
+Software/offscreen Qt reports an unsupported size-hint warning, and the plasma
+image provider is deliberately absent. Component construction is not ShaderEffect
+rendering. Native Wayland/xcb, full app, accessibility, Browser, credentials,
+physical speech, licensing closure, source rebuild and recipient-modified library
+acceptance remain open. No selected artifact or owner runtime changed.
+
+The exact sources identify additional embedded notice requirements: Core crypto,
+Unicode/CLDR and MIME data; Network public suffix data; QML JavaScriptCore; Svg;
+Wayland protocol copyrights; and PySide/shiboken PSF support. System-linked ICU74,
+TLS, fonts and image libraries remain distro-owned providers. Their linkage does
+not remove notices for embedded code. The [notice collector](../release/collect-source-qt-notices.py) verifies all seven
+archive hashes and preserves146 original notice/attribution members (434226 bytes),
+with [complete member hashes](../release/qualification/next-targets/20261002-source-notice-collection.json).
+This conservative set includes unshipped modules/build tools and is not an exact
+compiled-content mapping. Full archive/source kits and that mapping remain required; previous vendor ICU73 notice collections
+must not be copied into this profile by assumption.
 
 ## Build profile and dependency closure
 
@@ -50,7 +120,7 @@ nineteen tested cache features ON before compilation. QtBase,ShaderTools,Svg and
 ImageFormats compile/install; QtDeclarative was still compiling at the
 [checked boundary](../release/qualification/next-targets/20261002-qt-source-build-checkpoint.json).
 That historical report is superseded by the later measured PySide failure above;
-full Qt/PySide build and downstream qualification remain incomplete.
+the fifth completed build supersedes it; downstream qualification remains open.
 Actual PySide/shiboken .cmake.conf uses MICRO_VERSION2.1, producing6.8.2.1 despite
 the archive's6.8.2 directory suffix. No selected runtime or owner packages changed.
 

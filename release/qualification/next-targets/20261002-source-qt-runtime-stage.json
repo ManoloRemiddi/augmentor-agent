@@ -1,0 +1,1360 @@
+{
+  "format": "augmentor-source-qt-runtime-stage/1",
+  "qtVersion": "6.8.2",
+  "toolSha256": "3dc1cd88387cdb0afa49ef9a68f44e4a0591fac80860a4f5c78adf6c27fd9049",
+  "qtSonames": [
+    "libQt6Core.so.6",
+    "libQt6DBus.so.6",
+    "libQt6Gui.so.6",
+    "libQt6Network.so.6",
+    "libQt6OpenGL.so.6",
+    "libQt6Qml.so.6",
+    "libQt6QmlMeta.so.6",
+    "libQt6QmlModels.so.6",
+    "libQt6QmlWorkerScript.so.6",
+    "libQt6Quick.so.6",
+    "libQt6QuickWidgets.so.6",
+    "libQt6Svg.so.6",
+    "libQt6Test.so.6",
+    "libQt6WaylandClient.so.6",
+    "libQt6WaylandEglClientHwIntegration.so.6",
+    "libQt6Widgets.so.6",
+    "libQt6WlShellIntegration.so.6",
+    "libQt6XcbQpa.so.6"
+  ],
+  "externalSonames": [
+    "ld-linux-x86-64.so.2",
+    "libEGL.so.1",
+    "libGLX.so.0",
+    "libOpenGL.so.0",
+    "libX11-xcb.so.1",
+    "libX11.so.6",
+    "libbrotlidec.so.1",
+    "libc.so.6",
+    "libcrypto.so.3",
+    "libdbus-1.so.3",
+    "libdouble-conversion.so.3",
+    "libfontconfig.so.1",
+    "libfreetype.so.6",
+    "libgcc_s.so.1",
+    "libgio-2.0.so.0",
+    "libglib-2.0.so.0",
+    "libgobject-2.0.so.0",
+    "libharfbuzz.so.0",
+    "libicui18n.so.74",
+    "libicuuc.so.74",
+    "libjpeg.so.8",
+    "libm.so.6",
+    "libpcre2-16.so.0",
+    "libpng16.so.16",
+    "libssl.so.3",
+    "libstdc++.so.6",
+    "libtiff.so.6",
+    "libwayland-client.so.0",
+    "libwayland-cursor.so.0",
+    "libwayland-egl.so.1",
+    "libwebp.so.7",
+    "libwebpdemux.so.2",
+    "libwebpmux.so.3",
+    "libxcb-cursor.so.0",
+    "libxcb-glx.so.0",
+    "libxcb-icccm.so.4",
+    "libxcb-image.so.0",
+    "libxcb-keysyms.so.1",
+    "libxcb-randr.so.0",
+    "libxcb-render-util.so.0",
+    "libxcb-render.so.0",
+    "libxcb-shape.so.0",
+    "libxcb-shm.so.0",
+    "libxcb-sync.so.1",
+    "libxcb-xfixes.so.0",
+    "libxcb-xkb.so.1",
+    "libxcb.so.1",
+    "libxkbcommon-x11.so.0",
+    "libxkbcommon.so.0",
+    "libz.so.1",
+    "libzstd.so.1"
+  ],
+  "files": [
+    {
+      "path": "lib/libQt6Core.so.6.8.2",
+      "bytes": 8256392,
+      "sha256": "386f7b49232dfd7929660ddeb4a6c726b0a5da2cbc8f5f827791453959f2a58e",
+      "dynamic": {
+        "needed": [
+          "libicui18n.so.74",
+          "libicuuc.so.74",
+          "libglib-2.0.so.0",
+          "libz.so.1",
+          "libdouble-conversion.so.3",
+          "libpcre2-16.so.0",
+          "libzstd.so.1",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6",
+          "ld-linux-x86-64.so.2"
+        ],
+        "soname": [
+          "libQt6Core.so.6"
+        ],
+        "paths": [
+          "$ORIGIN"
+        ]
+      }
+    },
+    {
+      "path": "lib/libQt6DBus.so.6.8.2",
+      "bytes": 1147456,
+      "sha256": "5cf9e75df390175fcd2af14e0b027679734b9779a829b553376b28de114cdaee",
+      "dynamic": {
+        "needed": [
+          "libdbus-1.so.3",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [
+          "libQt6DBus.so.6"
+        ],
+        "paths": [
+          "$ORIGIN"
+        ]
+      }
+    },
+    {
+      "path": "lib/libQt6Gui.so.6.8.2",
+      "bytes": 11799128,
+      "sha256": "a2250091f2cfbcf0e6d63d6d466773f6001244f427624bb04a75d3311dde9091",
+      "dynamic": {
+        "needed": [
+          "libEGL.so.1",
+          "libfontconfig.so.1",
+          "libX11.so.6",
+          "libglib-2.0.so.0",
+          "libQt6DBus.so.6",
+          "libxkbcommon.so.0",
+          "libGLX.so.0",
+          "libOpenGL.so.0",
+          "libpng16.so.16",
+          "libharfbuzz.so.0",
+          "libfreetype.so.6",
+          "libz.so.1",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6"
+        ],
+        "soname": [
+          "libQt6Gui.so.6"
+        ],
+        "paths": [
+          "$ORIGIN"
+        ]
+      }
+    },
+    {
+      "path": "lib/libQt6Network.so.6.8.2",
+      "bytes": 2754688,
+      "sha256": "a046175353a66fa05323ad760aeed371b91ebccbd3dd9f712f3266b95138973d",
+      "dynamic": {
+        "needed": [
+          "libQt6Core.so.6",
+          "libbrotlidec.so.1",
+          "libzstd.so.1",
+          "libz.so.1",
+          "libcrypto.so.3",
+          "libstdc++.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6"
+        ],
+        "soname": [
+          "libQt6Network.so.6"
+        ],
+        "paths": [
+          "$ORIGIN"
+        ]
+      }
+    },
+    {
+      "path": "lib/libQt6OpenGL.so.6.8.2",
+      "bytes": 886488,
+      "sha256": "e4df3ac13a09f0b58ac9b5b6ffc713818416359ef9c3f0afac49ec5fa6aeb184",
+      "dynamic": {
+        "needed": [
+          "libQt6Gui.so.6",
+          "libOpenGL.so.0",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libc.so.6"
+        ],
+        "soname": [
+          "libQt6OpenGL.so.6"
+        ],
+        "paths": [
+          "$ORIGIN"
+        ]
+      }
+    },
+    {
+      "path": "lib/libQt6Qml.so.6.8.2",
+      "bytes": 8353480,
+      "sha256": "aedf3cd8500083edddabacbdc9e992ce786a2e16955c3e7df1a38445a580f571",
+      "dynamic": {
+        "needed": [
+          "libQt6Network.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6",
+          "ld-linux-x86-64.so.2"
+        ],
+        "soname": [
+          "libQt6Qml.so.6"
+        ],
+        "paths": [
+          "$ORIGIN"
+        ]
+      }
+    },
+    {
+      "path": "lib/libQt6QmlMeta.so.6.8.2",
+      "bytes": 229240,
+      "sha256": "fdb8d2ee695e0139d0d0ef8fed8fed317bdc614700ff33fac8b3d6d431da6690",
+      "dynamic": {
+        "needed": [
+          "libQt6QmlModels.so.6",
+          "libQt6QmlWorkerScript.so.6",
+          "libQt6Qml.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [
+          "libQt6QmlMeta.so.6"
+        ],
+        "paths": [
+          "$ORIGIN"
+        ]
+      }
+    },
+    {
+      "path": "lib/libQt6QmlModels.so.6.8.2",
+      "bytes": 1219792,
+      "sha256": "6ad5ef3d642659aab149eadc11f4ed79493c0256441d56df53cd7e131c358aeb",
+      "dynamic": {
+        "needed": [
+          "libQt6Qml.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libc.so.6"
+        ],
+        "soname": [
+          "libQt6QmlModels.so.6"
+        ],
+        "paths": [
+          "$ORIGIN"
+        ]
+      }
+    },
+    {
+      "path": "lib/libQt6QmlWorkerScript.so.6.8.2",
+      "bytes": 112240,
+      "sha256": "3832e5dfb16785d3d08e6c612af73bb65506cb801de67eb98dcdaaa61fe0830b",
+      "dynamic": {
+        "needed": [
+          "libQt6Qml.so.6",
+          "libQt6Network.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [
+          "libQt6QmlWorkerScript.so.6"
+        ],
+        "paths": [
+          "$ORIGIN"
+        ]
+      }
+    },
+    {
+      "path": "lib/libQt6Quick.so.6.8.2",
+      "bytes": 10311256,
+      "sha256": "570c1bd1d1cfd7d36e8a395fb3a94ced96a63b2292eed41f6f940e962a134f83",
+      "dynamic": {
+        "needed": [
+          "libQt6QmlMeta.so.6",
+          "libQt6QmlModels.so.6",
+          "libQt6Qml.so.6",
+          "libQt6Network.so.6",
+          "libQt6OpenGL.so.6",
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libc.so.6"
+        ],
+        "soname": [
+          "libQt6Quick.so.6"
+        ],
+        "paths": [
+          "$ORIGIN"
+        ]
+      }
+    },
+    {
+      "path": "lib/libQt6QuickWidgets.so.6.8.2",
+      "bytes": 189712,
+      "sha256": "5e36a14bcff33827a777bad0d10988c0ebe0c25e9a3491da452f6ca825499027",
+      "dynamic": {
+        "needed": [
+          "libQt6Quick.so.6",
+          "libQt6Qml.so.6",
+          "libQt6Widgets.so.6",
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [
+          "libQt6QuickWidgets.so.6"
+        ],
+        "paths": [
+          "$ORIGIN"
+        ]
+      }
+    },
+    {
+      "path": "lib/libQt6Svg.so.6.8.2",
+      "bytes": 666288,
+      "sha256": "8d3aa8b980b270037f20735eb15d53a465bdd27959b390bb4bae2da876777a49",
+      "dynamic": {
+        "needed": [
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libz.so.1",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libc.so.6"
+        ],
+        "soname": [
+          "libQt6Svg.so.6"
+        ],
+        "paths": [
+          "$ORIGIN"
+        ]
+      }
+    },
+    {
+      "path": "lib/libQt6Test.so.6.8.2",
+      "bytes": 592192,
+      "sha256": "14651da043b65e7a5ac17569b9ff35e775dba88a97f677cb543965e2d10e386e",
+      "dynamic": {
+        "needed": [
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6",
+          "ld-linux-x86-64.so.2"
+        ],
+        "soname": [
+          "libQt6Test.so.6"
+        ],
+        "paths": [
+          "$ORIGIN"
+        ]
+      }
+    },
+    {
+      "path": "lib/libQt6WaylandClient.so.6.8.2",
+      "bytes": 1515584,
+      "sha256": "ea4b269ccf0ac3bf641c650b2b36fa235ece21f4bfb67f5c6d5f64bed6f7c3c5",
+      "dynamic": {
+        "needed": [
+          "libwayland-client.so.0",
+          "libwayland-cursor.so.0",
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libxkbcommon.so.0",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [
+          "libQt6WaylandClient.so.6"
+        ],
+        "paths": [
+          "$ORIGIN"
+        ]
+      }
+    },
+    {
+      "path": "lib/libQt6WaylandEglClientHwIntegration.so.6.8.2",
+      "bytes": 92088,
+      "sha256": "2d8e0aa2f605c07ec6ada8ba07aaa3d7c561d6ca76c2b4c4c30c76974e4afff3",
+      "dynamic": {
+        "needed": [
+          "libEGL.so.1",
+          "libwayland-client.so.0",
+          "libwayland-egl.so.1",
+          "libQt6OpenGL.so.6",
+          "libQt6WaylandClient.so.6",
+          "libQt6Gui.so.6",
+          "libOpenGL.so.0",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [
+          "libQt6WaylandEglClientHwIntegration.so.6"
+        ],
+        "paths": [
+          "$ORIGIN"
+        ]
+      }
+    },
+    {
+      "path": "lib/libQt6Widgets.so.6.8.2",
+      "bytes": 9851872,
+      "sha256": "f0d2fb86ef55eb90dd739dd85d7ff9cd7d2eb190ff0bc1602f98a7618a082754",
+      "dynamic": {
+        "needed": [
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6"
+        ],
+        "soname": [
+          "libQt6Widgets.so.6"
+        ],
+        "paths": [
+          "$ORIGIN"
+        ]
+      }
+    },
+    {
+      "path": "lib/libQt6WlShellIntegration.so.6.8.2",
+      "bytes": 207416,
+      "sha256": "d9649a8dd5c31bccd2185c461230dc9ebbe0ee6d08ef3983157637b16ce6c79d",
+      "dynamic": {
+        "needed": [
+          "libwayland-client.so.0",
+          "libQt6WaylandClient.so.6",
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [
+          "libQt6WlShellIntegration.so.6"
+        ],
+        "paths": [
+          "$ORIGIN"
+        ]
+      }
+    },
+    {
+      "path": "lib/libQt6XcbQpa.so.6.8.2",
+      "bytes": 982160,
+      "sha256": "f44fd909dc4d3cddcd68b6c2ac8f22e82cf574038751bb76b19c61193a2b0b49",
+      "dynamic": {
+        "needed": [
+          "libxcb-cursor.so.0",
+          "libxcb-icccm.so.4",
+          "libxcb-image.so.0",
+          "libxcb-keysyms.so.1",
+          "libxcb-randr.so.0",
+          "libxcb-render.so.0",
+          "libxcb-render-util.so.0",
+          "libxcb-shape.so.0",
+          "libxcb-shm.so.0",
+          "libxcb-sync.so.1",
+          "libxcb.so.1",
+          "libxcb-xfixes.so.0",
+          "libxcb-xkb.so.1",
+          "libxkbcommon.so.0",
+          "libglib-2.0.so.0",
+          "libX11-xcb.so.1",
+          "libX11.so.6",
+          "libxkbcommon-x11.so.0",
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6"
+        ],
+        "soname": [
+          "libQt6XcbQpa.so.6"
+        ],
+        "paths": [
+          "$ORIGIN"
+        ]
+      }
+    },
+    {
+      "path": "plugins/iconengines/libqsvgicon.so",
+      "bytes": 89160,
+      "sha256": "89921bbb16568fd5d6d766e62c3a9048b3a0db655d8c9c37a501ce48d5e627a0",
+      "dynamic": {
+        "needed": [
+          "libQt6Svg.so.6",
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/imageformats/libqgif.so",
+      "bytes": 49008,
+      "sha256": "010b0043a78cd80513d1712405fb89c4ec26d1e5c43f9b98ecacedcc68c9f22d",
+      "dynamic": {
+        "needed": [
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/imageformats/libqicns.so",
+      "bytes": 54928,
+      "sha256": "7aa6cfb0c31a000cb82b68d7bb10a533099d8442d61865061244405cf7f2ca34",
+      "dynamic": {
+        "needed": [
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/imageformats/libqico.so",
+      "bytes": 50600,
+      "sha256": "79275a10e1809f4d7f277ec71e9030b9c8df28861601906b03424d527e09632e",
+      "dynamic": {
+        "needed": [
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/imageformats/libqjpeg.so",
+      "bytes": 67000,
+      "sha256": "8995f1f584a234e9a7689c34e5925985785d727e88ba53bccb2e232162a7d5f8",
+      "dynamic": {
+        "needed": [
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libjpeg.so.8",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/imageformats/libqsvg.so",
+      "bytes": 37272,
+      "sha256": "8bc683d2074d76f00c49bf562d159b1969f6f6db040fc2f7514944e40f6b2a19",
+      "dynamic": {
+        "needed": [
+          "libQt6Svg.so.6",
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/imageformats/libqtga.so",
+      "bytes": 32136,
+      "sha256": "a37e980f0e310dd073dd29eabac761f0b2c5f7ce159ddce2bfa88a00079c9d53",
+      "dynamic": {
+        "needed": [
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/imageformats/libqtiff.so",
+      "bytes": 61976,
+      "sha256": "d540c4a518954ec020fd3bcec87fb24b84b0602eb77b73efab44b155c33f2c58",
+      "dynamic": {
+        "needed": [
+          "libQt6Gui.so.6",
+          "libtiff.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/imageformats/libqwbmp.so",
+      "bytes": 31512,
+      "sha256": "66e73bb3aa881730446c1ba9a745831a93e776c65c959dfee688e60a01c04c30",
+      "dynamic": {
+        "needed": [
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/imageformats/libqwebp.so",
+      "bytes": 46568,
+      "sha256": "10bfcced4d6a500ef0134235a7e8baa27de648e92fd33108e318fd953470bc67",
+      "dynamic": {
+        "needed": [
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libwebpdemux.so.2",
+          "libwebpmux.so.3",
+          "libwebp.so.7",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/networkinformation/libqglib.so",
+      "bytes": 28888,
+      "sha256": "d62f0fde65d3442185e2b696e33468152aeef64691ab1e54883b63f4d13d5a4a",
+      "dynamic": {
+        "needed": [
+          "libgobject-2.0.so.0",
+          "libgio-2.0.so.0",
+          "libQt6Network.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/networkinformation/libqnetworkmanager.so",
+      "bytes": 116552,
+      "sha256": "c6e9a67c45cb69d4fdd7021e6a685bb24ced09874d26ab8bdf842957f32b90b7",
+      "dynamic": {
+        "needed": [
+          "libQt6DBus.so.6",
+          "libQt6Network.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/platforminputcontexts/libcomposeplatforminputcontextplugin.so",
+      "bytes": 38736,
+      "sha256": "f351d6995404d7bab49fe149c23ffce649cc3c89b68ee53008cfe772e39d88b9",
+      "dynamic": {
+        "needed": [
+          "libxkbcommon.so.0",
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/platforminputcontexts/libibusplatforminputcontextplugin.so",
+      "bytes": 227376,
+      "sha256": "ca84ef36bdc3c09e018f599aac26923b92b898b39f221c09555a5f8f8ae2e587",
+      "dynamic": {
+        "needed": [
+          "libQt6Gui.so.6",
+          "libQt6DBus.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/platforms/libqminimal.so",
+      "bytes": 52944,
+      "sha256": "6885bbb540b5be8f846825d4eda86d765ef6eca5b308efbe31c46a3c7a1cb473",
+      "dynamic": {
+        "needed": [
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/platforms/libqoffscreen.so",
+      "bytes": 163152,
+      "sha256": "ef9fbf03ab888d4f259262306c8db600a16352b07b89e9e1af4868e4c7c487df",
+      "dynamic": {
+        "needed": [
+          "libX11.so.6",
+          "libQt6Gui.so.6",
+          "libGLX.so.0",
+          "libOpenGL.so.0",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/platforms/libqwayland-egl.so",
+      "bytes": 34272,
+      "sha256": "54d7b85b01225b2f3c4958c343fef8fb4f9984273ff9f3304d9901af8b89926f",
+      "dynamic": {
+        "needed": [
+          "libQt6WaylandEglClientHwIntegration.so.6",
+          "libQt6WaylandClient.so.6",
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/platforms/libqwayland-generic.so",
+      "bytes": 24608,
+      "sha256": "cbf96cabdf525479abe05d0a9933a9193e4a78926b89c198675c3cb97567b97f",
+      "dynamic": {
+        "needed": [
+          "libQt6WaylandClient.so.6",
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/platforms/libqxcb.so",
+      "bytes": 24184,
+      "sha256": "7c2272fc3098b2ba1c7657d2764b53fbaf9406a60822ec6b897eb54500636669",
+      "dynamic": {
+        "needed": [
+          "libQt6XcbQpa.so.6",
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/platformthemes/libqxdgdesktopportal.so",
+      "bytes": 175120,
+      "sha256": "fffc4e5f83028215e122e2e5f6df3bbc242e22d3923ec8e8b512b54d057f957f",
+      "dynamic": {
+        "needed": [
+          "libQt6Gui.so.6",
+          "libQt6DBus.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/tls/libqcertonlybackend.so",
+      "bytes": 116000,
+      "sha256": "c5e93c0aaecee124b5493d103f31f288b7dd41ccddc68d3a7c825f462a6fef01",
+      "dynamic": {
+        "needed": [
+          "libQt6Network.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/tls/libqopensslbackend.so",
+      "bytes": 430200,
+      "sha256": "bafb42fdec954db50ee61b947f0c0f15c48c6a17ae683361419fd4679da137d0",
+      "dynamic": {
+        "needed": [
+          "libQt6Network.so.6",
+          "libQt6Core.so.6",
+          "libssl.so.3",
+          "libcrypto.so.3",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/wayland-decoration-client/libadwaita.so",
+      "bytes": 165144,
+      "sha256": "cdf72675610256d2fcb4aee5510763a0a208a6288f24b02c64b716eb60d022b7",
+      "dynamic": {
+        "needed": [
+          "libQt6Svg.so.6",
+          "libQt6WaylandClient.so.6",
+          "libQt6Gui.so.6",
+          "libQt6DBus.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/wayland-decoration-client/libbradient.so",
+      "bytes": 53280,
+      "sha256": "a31d436f96c1c795f5bc3dedc96f05a83032f1db45bc29a2b189a738bdab6035",
+      "dynamic": {
+        "needed": [
+          "libQt6WaylandClient.so.6",
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/wayland-graphics-integration-client/libdrm-egl-server.so",
+      "bytes": 39640,
+      "sha256": "65ba8e55b968587978c7d05324aef8616f28b2594830970bfbcd973fcee099c6",
+      "dynamic": {
+        "needed": [
+          "libEGL.so.1",
+          "libQt6OpenGL.so.6",
+          "libwayland-client.so.0",
+          "libQt6WaylandClient.so.6",
+          "libQt6Gui.so.6",
+          "libOpenGL.so.0",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/wayland-graphics-integration-client/libqt-plugin-wayland-egl.so",
+      "bytes": 24680,
+      "sha256": "658514c98e6d657f81937e8ee4837d130447a3e9c30fd6a69835bc277edd421d",
+      "dynamic": {
+        "needed": [
+          "libQt6WaylandEglClientHwIntegration.so.6",
+          "libQt6WaylandClient.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/wayland-graphics-integration-client/libshm-emulation-server.so",
+      "bytes": 43920,
+      "sha256": "ee4a087d57ef187ff92ac834b0be7e96100d0a61416ec515f42de9659cf65045",
+      "dynamic": {
+        "needed": [
+          "libQt6OpenGL.so.6",
+          "libwayland-client.so.0",
+          "libQt6WaylandClient.so.6",
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/wayland-graphics-integration-client/libvulkan-server.so",
+      "bytes": 44648,
+      "sha256": "908fe2ad41d149bce8a1da25e5e902ca754534858648434e33aba0614e1cb621",
+      "dynamic": {
+        "needed": [
+          "libQt6OpenGL.so.6",
+          "libwayland-client.so.0",
+          "libQt6WaylandClient.so.6",
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/wayland-shell-integration/libfullscreen-shell-v1.so",
+      "bytes": 55856,
+      "sha256": "061b608921fb3f6be7bb6832e1d1033437df6e172c9bafb6e3e4ca730ccc77a6",
+      "dynamic": {
+        "needed": [
+          "libwayland-client.so.0",
+          "libQt6WaylandClient.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/wayland-shell-integration/libivi-shell.so",
+      "bytes": 95480,
+      "sha256": "fbf82784eb521b9456aa7e21194a8e93d81aac18106a5c30774a7fcbbf6ad7d7",
+      "dynamic": {
+        "needed": [
+          "libwayland-client.so.0",
+          "libQt6WaylandClient.so.6",
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/wayland-shell-integration/libqt-shell.so",
+      "bytes": 70656,
+      "sha256": "7982d43e9b5f490b85acfe7fe2ef6d8a211ddbea0ed370c7d67ae13ec3aa9033",
+      "dynamic": {
+        "needed": [
+          "libwayland-client.so.0",
+          "libQt6WaylandClient.so.6",
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/wayland-shell-integration/libwl-shell-plugin.so",
+      "bytes": 24688,
+      "sha256": "a493719c5c281a2eaff6df1a97ed13e7ef3c4813eb619377efe93cc997406ae9",
+      "dynamic": {
+        "needed": [
+          "libQt6WlShellIntegration.so.6",
+          "libQt6WaylandClient.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/wayland-shell-integration/libxdg-shell.so",
+      "bytes": 191040,
+      "sha256": "17abed56c1115252fe8820069a3ee70ab13d6080835a42510cad28bb12bfb8dd",
+      "dynamic": {
+        "needed": [
+          "libwayland-client.so.0",
+          "libQt6WaylandClient.so.6",
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/xcbglintegrations/libqxcb-egl-integration.so",
+      "bytes": 77864,
+      "sha256": "26cdc7aa62ca7bd5f8b97b57fcd3bb20827f3a59156ab10808d05543bfcd0856",
+      "dynamic": {
+        "needed": [
+          "libQt6XcbQpa.so.6",
+          "libEGL.so.1",
+          "libQt6Gui.so.6",
+          "libQt6Core.so.6",
+          "libxcb.so.1",
+          "libstdc++.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "plugins/xcbglintegrations/libqxcb-glx-integration.so",
+      "bytes": 107608,
+      "sha256": "319cf24b6a850e7d16d0b63eb45a1d236d6eb86ac1608ae04755777628528d7c",
+      "dynamic": {
+        "needed": [
+          "libQt6XcbQpa.so.6",
+          "libxcb-glx.so.0",
+          "libQt6Gui.so.6",
+          "libGLX.so.0",
+          "libOpenGL.so.0",
+          "libQt6Core.so.6",
+          "libX11.so.6",
+          "libxcb.so.1",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "qml/QML/plugins.qmltypes",
+      "bytes": 138291,
+      "sha256": "80c32dca52b07de7437194d90642099def5e7e83c3f4aefdae147006def3785f"
+    },
+    {
+      "path": "qml/QML/qmldir",
+      "bytes": 100,
+      "sha256": "96090a8781ef602ca87d3c99fb2519c8e25bf20919c70db25c9df36c9e17f30c"
+    },
+    {
+      "path": "qml/QtQml/Models/libmodelsplugin.so",
+      "bytes": 24040,
+      "sha256": "9859411f9b5861fcaaa5724ed498bdeaf353a4c7afc7baee6dd397dbf5289c6c",
+      "dynamic": {
+        "needed": [
+          "libQt6QmlModels.so.6",
+          "libQt6Qml.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../../lib"
+        ]
+      }
+    },
+    {
+      "path": "qml/QtQml/Models/plugins.qmltypes",
+      "bytes": 51139,
+      "sha256": "a0a87ccf2c06643299890c47a4ff66b355c6664fcafe5662c7a0561a997946b2"
+    },
+    {
+      "path": "qml/QtQml/Models/qmldir",
+      "bytes": 213,
+      "sha256": "4abed3b5d84d4252f6bb292998a566b09a21ae4f2a435e6807cf7047fe14c58a"
+    },
+    {
+      "path": "qml/QtQml/WorkerScript/libworkerscriptplugin.so",
+      "bytes": 24192,
+      "sha256": "a4064181b4bc064e214ca0a7eecfcb66e303fb3c53b08aeabfacc9c27e6fe650",
+      "dynamic": {
+        "needed": [
+          "libQt6QmlWorkerScript.so.6",
+          "libQt6Qml.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../../lib"
+        ]
+      }
+    },
+    {
+      "path": "qml/QtQml/WorkerScript/plugins.qmltypes",
+      "bytes": 1358,
+      "sha256": "520febb8b3efd6a08ca58620a3406ec8e59b186e855af2508cdd905a38d97e77"
+    },
+    {
+      "path": "qml/QtQml/WorkerScript/qmldir",
+      "bytes": 243,
+      "sha256": "4ed1b6b0ad3980ae5c882f5c0a4eea8a84bcca35c300f0eec430b89cd30ff768"
+    },
+    {
+      "path": "qml/QtQml/libqmlplugin.so",
+      "bytes": 23896,
+      "sha256": "7856056e774d4eaf2ab2aa8aaf2d25bd63b3170cf4f4d84d52ee45ee93325d3b",
+      "dynamic": {
+        "needed": [
+          "libQt6QmlMeta.so.6",
+          "libQt6Qml.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "qml/QtQml/plugins.qmltypes",
+      "bytes": 6197,
+      "sha256": "8b63b9eb3c6af020315f297f92092c28948a1dca3016e15ab30a25d770c63123"
+    },
+    {
+      "path": "qml/QtQml/qmldir",
+      "bytes": 249,
+      "sha256": "bacf7bc68db8619ba528dd957479e47505530283833678f1725200d354cceaf7"
+    },
+    {
+      "path": "qml/QtQuick/libqtquick2plugin.so",
+      "bytes": 24008,
+      "sha256": "ecc47f6526ea4eef8debed592f65c0992662df87a3fc323bcef25f6d72a55930",
+      "dynamic": {
+        "needed": [
+          "libQt6Quick.so.6",
+          "libQt6Qml.so.6",
+          "libQt6Core.so.6",
+          "libstdc++.so.6",
+          "libc.so.6"
+        ],
+        "soname": [],
+        "paths": [
+          "$ORIGIN/../../lib"
+        ]
+      }
+    },
+    {
+      "path": "qml/QtQuick/plugins.qmltypes",
+      "bytes": 540141,
+      "sha256": "6d1b3b5fc3219fba1a18fb01005262eb98fae2cb7d4925ede42f3cb94f375fe7"
+    },
+    {
+      "path": "qml/QtQuick/qmldir",
+      "bytes": 206,
+      "sha256": "c2fa2b26d9f8094c6eeb6ff924b18088ddcd512e133524e55b13fa3e5e70350b"
+    }
+  ],
+  "symlinks": [
+    {
+      "path": "lib/libQt6Core.so.6",
+      "target": "libQt6Core.so.6.8.2"
+    },
+    {
+      "path": "lib/libQt6DBus.so.6",
+      "target": "libQt6DBus.so.6.8.2"
+    },
+    {
+      "path": "lib/libQt6Gui.so.6",
+      "target": "libQt6Gui.so.6.8.2"
+    },
+    {
+      "path": "lib/libQt6Network.so.6",
+      "target": "libQt6Network.so.6.8.2"
+    },
+    {
+      "path": "lib/libQt6OpenGL.so.6",
+      "target": "libQt6OpenGL.so.6.8.2"
+    },
+    {
+      "path": "lib/libQt6Qml.so.6",
+      "target": "libQt6Qml.so.6.8.2"
+    },
+    {
+      "path": "lib/libQt6QmlMeta.so.6",
+      "target": "libQt6QmlMeta.so.6.8.2"
+    },
+    {
+      "path": "lib/libQt6QmlModels.so.6",
+      "target": "libQt6QmlModels.so.6.8.2"
+    },
+    {
+      "path": "lib/libQt6QmlWorkerScript.so.6",
+      "target": "libQt6QmlWorkerScript.so.6.8.2"
+    },
+    {
+      "path": "lib/libQt6Quick.so.6",
+      "target": "libQt6Quick.so.6.8.2"
+    },
+    {
+      "path": "lib/libQt6QuickWidgets.so.6",
+      "target": "libQt6QuickWidgets.so.6.8.2"
+    },
+    {
+      "path": "lib/libQt6Svg.so.6",
+      "target": "libQt6Svg.so.6.8.2"
+    },
+    {
+      "path": "lib/libQt6Test.so.6",
+      "target": "libQt6Test.so.6.8.2"
+    },
+    {
+      "path": "lib/libQt6WaylandClient.so.6",
+      "target": "libQt6WaylandClient.so.6.8.2"
+    },
+    {
+      "path": "lib/libQt6WaylandEglClientHwIntegration.so.6",
+      "target": "libQt6WaylandEglClientHwIntegration.so.6.8.2"
+    },
+    {
+      "path": "lib/libQt6Widgets.so.6",
+      "target": "libQt6Widgets.so.6.8.2"
+    },
+    {
+      "path": "lib/libQt6WlShellIntegration.so.6",
+      "target": "libQt6WlShellIntegration.so.6.8.2"
+    },
+    {
+      "path": "lib/libQt6XcbQpa.so.6",
+      "target": "libQt6XcbQpa.so.6.8.2"
+    }
+  ],
+  "qmlModuleScope": [
+    "QML",
+    "QtQuick",
+    "QtQml",
+    "QtQml/Models",
+    "QtQml/WorkerScript"
+  ],
+  "producerBytesChanged": false,
+  "dynamicClosureQualified": false,
+  "licenseReviewComplete": false,
+  "publicReleaseQualified": false
+}
