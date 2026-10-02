@@ -7,8 +7,8 @@
 `release/linux-package-guard.py` is the standalone root guard foundation for
 explicit Leap 16.0/RPM and dated Arch/ALPM candidates. It imports no application
 code and reads no user homes. Existing Debian and Fedora packages keep their
-current hooks. New builders, guard bootstrap, real package transactions and
-interrupted-reboot recovery remain required before either new adapter is admitted
+current hooks. Full product builders, installer guard bootstrap, actual product
+transactions and interrupted-reboot recovery remain required before either adapter is admitted
 to the complete installer matrix.
 
 The [checked source proof](../release/qualification/next-targets/20261002-joint-package-guard-source.json)
@@ -87,6 +87,35 @@ cancels the plugin rather than the commit. The
 [Leap zypper manual](https://manpages.opensuse.org/Leap-16.0/zypper/zypper.8.en.html)
 records exit 107 for a script failure with packages already registered; inspect
 both the command result and actual finalized Augmentor state.
+
+### Actual Leap mechanism checkpoint
+
+The [checked real RPM proof](../release/qualification/next-targets/20261002-leap-rpm-guard.json)
+uses ordinary-user rpmbuild and embedded standalone guards with the real
+versioned `/usr/bin/python3.13` interpreter. The synthetic receipt/text packages
+pass first installation/reinstall, active runtime/desktop and joint UID1000/
+UID1001 lease refusal with unchanged payload, failed pre-script after durable
+intent, exact old-state recovery, upgrade/downgrade and final `%postuntrans`
+removal. Volatile-mirror loss is simulated; no real reboot is claimed.
+
+Actual zypper installs a local unsigned synthetic RPM whose `%posttrans`
+inventory validation fails. It returns **107**, while the new package is
+registered and persistent intent remains. Completion and unchanged-old recovery
+both refuse. Removing only the exact known empty synthetic injection, then
+verifying complete actual state, resolves intent. Official repository signature
+checks remain enabled; `--allow-unsigned-rpm` applies only to that local fixture
+archive, as the [zypper manual](https://manpages.opensuse.org/Leap-16.0/zypper/zypper.8.en.html)
+documents. This controlled injection cleanup is not a production repair method.
+
+Embedded Python query strings must escape percent signs during spec authoring;
+otherwise RPM expands `%{NAME}`/`%{VERSION}`/`%{RELEASE}`/`%{ARCH}` prematurely.
+The proof preserves literal runtime query fields and verifies different actual
+registered version-release identities. The initial proof run used an incorrect
+driver source identifier; its successful cleanup and raw log remain preserved
+as invalid provenance. The passing run repeats from a clean fixture using the
+git-resolved `a18b465` ref and independently checked guard blob. Full application
+RPM/runtime/desktop/browser, real multiuser applications, data retention and
+interrupted-reboot acceptance remain required.
 
 ## Arch bootstrap and hook ownership
 

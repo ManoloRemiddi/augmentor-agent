@@ -2,6 +2,28 @@
 
 # Linux distribution rollout
 
+## October 2 actual Leap RPM guard mechanism
+
+Actual Leap ordinary-user rpmbuild and root RPM/zypper pass the
+[synthetic receipt/text proof](../release/qualification/next-targets/20261002-leap-rpm-guard.json).
+The embedded standalone guard uses `/usr/bin/python3.13`; RPM spec percent
+escaping preserves its runtime database query fields. First/reinstall, runtime/
+desktop and joint UID1000/1001 lease refusal with unchanged payload, later
+pre-script failure with durable intent and verified old recovery, upgrade/
+downgrade and final self-contained `%postuntrans` removal pass. Volatile-mirror
+loss is a simulation, not actual reboot acceptance.
+
+Zypper returns **107** for the deliberately failing posttrans inventory check;
+the new package is nevertheless registered. Persistent intent remains, startup
+stays fenced, and unverified completion/old recovery refuse. Removal of only the
+known empty synthetic injection followed by complete-state verification allows
+explicit completion. Official repository signature checks remain enabled; only
+the locally built synthetic RPM uses the documented unsigned-command-line option.
+The first driver's incorrect source identifier is preserved as invalid
+provenance; the clean repeat uses git-resolved `a18b465` and checked guard bytes.
+Read the [transaction contract](LINUX-PACKAGE-TRANSACTIONS.md) before implementing
+full product packages. All original rollout gates remain active.
+
 ## October 2 actual Arch ALPM guard mechanism
 
 Ordinary makepkg now builds a SHA256-pinned independent guard package from

@@ -2,6 +2,20 @@
 
 # Start here: agent handoff
 
+## October 2 real Leap RPM scriptlet mechanism
+
+Ordinary rpmbuild and actual Leap RPM/zypper pass the synthetic receipt/text
+mechanism proof: first/reinstall, separate and joint UID1000/1001 component
+leases with unchanged payload on refusal, later pre-script failure with durable
+old recovery, upgrade/downgrade and self-contained final `%postuntrans` removal.
+Real zypper returns **107** after posttrans inventory refusal, with the new
+package registered and durable intent retained. Both unverified completion and
+changed-old recovery refuse. Read the [checked evidence](../release/qualification/next-targets/20261002-leap-rpm-guard.json)
+and [transaction limits](LINUX-PACKAGE-TRANSACTIONS.md). The initial source-ID
+driver error is preserved separately; the passing repeat uses git-resolved
+`a18b465` and verified guard bytes. Full product/package/runtime/desktop/reboot
+and all five original rollout points remain active. No owner state was changed.
+
 ## October 2 real Arch package-hook mechanism
 
 The separate [Arch guard recipe](../release/arch/README.md) pins clean `daf35a3`
