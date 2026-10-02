@@ -13,7 +13,8 @@ import uuid
 import threading
 from pathlib import Path
 from .ui_scale import factor, scaled, LiveScale, px, normalize
-from PySide6.QtCore import Qt, QTimer, QLockFile, QUrl, Signal, QSize, QPoint, QRect, QVariantAnimation, QEasingCurve
+from shiboken6 import isValid
+from PySide6.QtCore import QObject, Qt, QTimer, QLockFile, QUrl, Signal, QSize, QPoint, QRect, QVariantAnimation, QEasingCurve
 from PySide6.QtNetwork import QLocalServer, QLocalSocket
 from PySide6.QtGui import QColor, QPainter, QKeySequence, QShortcut, QRegion, QDesktopServices, QPalette, QIcon
 from PySide6.QtWidgets import (QApplication,QWidget,QFrame,QLabel,QPushButton,QVBoxLayout,QHBoxLayout,
@@ -32,6 +33,16 @@ from .resize import ResizeBorders
 from .workspaces import pin_kwin, release_kwin
 from .surfaces import Orb, ModelPicker, AppearanceDialog, TitleEditor
 from .panels import HistoryDialog, AccessDialog, UpdatesDialog, SettingsDialog, PromptLibraryDialog, ModelsDialog, LicensesDialog
+
+
+def deliver_background(callback, value):
+    """A retired embedded form must not receive a late worker UI update."""
+    targets=[getattr(callback,'__self__',None)]
+    for cell in getattr(callback,'__closure__',None) or ():
+        try: targets.append(cell.cell_contents)
+        except ValueError: pass
+    if any(isinstance(target,QObject) and not isValid(target) for target in targets):return
+    callback(value)
 
 
 class Window(QWidget):
@@ -65,7 +76,7 @@ class Window(QWidget):
         self.expanded_size=self.size();self.follow_tail=True;self.rendering=False
         self.title_text='Augmentor Agent'
         self.hidden_geometry=None;self.hidden_layout=None;self.hidden_dialogs=[];self.shortcut_dialog=None;self.settings_panel=None;self.chat_geometry=None
-        self.completed.connect(lambda callback,value:callback(value))
+        self.completed.connect(deliver_background)
         self.render_timer=QTimer(self);self.render_timer.setSingleShot(True);self.render_timer.setInterval(33);self.render_timer.timeout.connect(self.render_messages)
         self.copied_message=None;self.copied_code=None
         self.copy_feedback_timer=QTimer(self);self.copy_feedback_timer.setSingleShot(True);self.copy_feedback_timer.setInterval(COPY_FEEDBACK_MS)

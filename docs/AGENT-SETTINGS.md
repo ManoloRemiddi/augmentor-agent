@@ -158,12 +158,13 @@ Review: [draft PR #29](https://github.com/ManoloRemiddi/augmentor-agent/pull/29)
 
 The owner requested direct three-dot entry, all former menu actions in the new UI,
 and resizing/restoration of the same agent frame. Shared source qualification:
-622 native tests, 620 passed and two Mac-only skips, using PySide6 6.8.2.1.
-Twelve new real-window Qt checks cover same-window entry, latest geometry and
+623 native tests, 621 passed and two Mac-only skips, using PySide6 6.8.2.1.
+Thirteen new real-window Qt checks cover same-window entry, latest geometry and
 chat draft preservation, hide/reopen placement, direct Look/Voice forms and voice
 cleanup, old menu coverage, inline Soul decisions/conflicts, busy-form refusal,
 Stop and hidden-chat shortcut protection, compact mode, 320-pixel/light navigation,
-and both ordinary and non-default startup app scales. An existing butterfly fixture
+both ordinary and non-default startup app scales, and safe dismissal before a
+late worker result. Destroyed forms cannot receive worker UI updates. An existing butterfly fixture
 now waits for an actual animation tick within a bounded interval instead of
 assuming it has occurred after a fixed 60 ms. Dark/light/narrow renders were inspected.
 The unchanged runtime’s Node/build evidence above remains historical; this follow-up
@@ -171,7 +172,7 @@ changes native presentation/lifecycle only.
 
 The separate compatible candidate copies initial installed artifact `7419f27525a67101b03d35f1a6d11471c7d7491567d855d75d5acc0b08276b77`,
 replaces the reviewed settings component and applies only the authored window and
-touch patches. Its 22 focused cases pass (20 passed, two source app-sizing checks
+touch patches. Its 23 focused cases pass (21 passed, two source app-sizing checks
 explicitly skipped because the retained installed Appearance has no live-scale
 slider). Product 0.2.11, speech dependencies, DSH/Pi/Codex runtimes and other deployed
 native improvements are preserved. No DSH preset migration or host restart is

@@ -5,7 +5,7 @@ import tempfile
 from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
-from PySide6.QtCore import Qt, QRect
+from PySide6.QtCore import Qt, QRect, QCoreApplication, QEvent
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QDialog, QPushButton
 from augmentor_linux.window import Window
@@ -143,3 +143,17 @@ class OverlayTests(unittest.TestCase):
             self.app.processEvents();w.settings_panel.accept()
             self.assertEqual((w.width(),w.height()),(round(original.width()*100/125),round(original.height()*100/125)))
         finally:w.close();w.deleteLater();self.app.processEvents()
+
+    def test_late_worker_result_cannot_update_a_retired_embedded_form(self):
+        from augmentor_linux.panels import UpdatesDialog
+        w=self.window;p=self.open();callbacks=[];errors=[]
+        w.call_in_background=lambda work,callback:callbacks.append(callback)
+        w.controller=SimpleNamespace(harness='pi',running=False)
+        p.open_editor('Versions & updates',lambda:UpdatesDialog(w))
+        editor=p.editor;self.assertEqual(len(callbacks),1)
+        w.completed.emit(callbacks[0],{'version':'Synthetic still-open result'})
+        self.assertIn('Synthetic still-open result',editor.info.text())
+        p.show_page('agent');QCoreApplication.sendPostedEvents(None,QEvent.Type.DeferredDelete)
+        with patch('sys.excepthook',lambda *error:errors.append(error)):
+            w.completed.emit(callbacks[0],{'version':'Synthetic late result'})
+        self.assertEqual(errors,[]);w.controller=None
