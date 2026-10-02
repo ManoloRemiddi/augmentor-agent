@@ -422,3 +422,14 @@ requires clean installed Noble packages, AppArmor, the prepared verified Python
 runtime and actual Ubuntu Wayland session; it refuses an existing user seat0
 session. Its provisioning report does not prove login or application startup.
 Actual GNOME shortcut/control/lock acceptance must be recorded independently.
+
+`release/inspect-noble-gnome-vm.py --source FULL_COMMIT` is a read-only real guest
+inspection using the selected verified Python. It requires the marked ordinary
+QEMU user, pristine clean packages, canonical selection/service ownership,
+AppArmor, actual seat0/session environment, Ubuntu/user observer and active
+default extensions. It expects Wayland by default; `--session-type x11` explicitly
+inspects fallback and cannot claim a Wayland pass. It observes the three-field
+GSD profile without Save/delivery or input authorization. The checked
+`release/qualification/ubuntu24.04/gnome-x11-a7ee9c5.json` additionally binds real
+guest screenshots and focused idle readback; fixture timer/unlock controls and
+connected/shortcut/physical limits remain explicit.

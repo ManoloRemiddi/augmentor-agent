@@ -1,0 +1,76 @@
+{
+  "format": "augmentor-noble-wayland-mesa-diagnostic/1",
+  "target": "ubuntu24.04-amd64",
+  "source": {
+    "commit": "a7ee9c55586b6a131524a8c53489463e45f6d515",
+    "dirty": false
+  },
+  "candidateOnly": true,
+  "fixture": {
+    "imageBuild": "20260926",
+    "acceleration": "tcg",
+    "cpuModel": "Nehalem",
+    "virtualGpu": "virtio_gpu; software kms_swrast fallback",
+    "requestedSession": "Ubuntu Wayland",
+    "actualFallback": "Ubuntu X11",
+    "hostMounts": false,
+    "hostDevicesAttached": false
+  },
+  "installedMesa": {
+    "libegl-mesa0": "25.2.8-0ubuntu0.24.04.3",
+    "libgbm1": "25.2.8-0ubuntu0.24.04.3",
+    "mesa-libgallium": "25.2.8-0ubuntu0.24.04.3",
+    "eglBuildId": "56ba556954f45fbe7d2c402546d3ad74f3279e66",
+    "eglSha256": "9359ec191822b0fe5b71472d7440f275d1ef1fe8f34b2dc9088b84cb633519ea"
+  },
+  "actualDebugger": {
+    "symbolizedCrashCount": 6,
+    "signal": "SIGSEGV",
+    "mainThreadStack": [
+      "libc null string access",
+      "strdup",
+      "dri2_bind_wayland_display_wl at ../src/egl/drivers/dri2/egl_dri2.c:2658",
+      "eglBindWaylandDisplayWL at ../src/egl/main/eglapi.c:2260",
+      "meta_context_start"
+    ],
+    "locals": {
+      "device_name": "0x0"
+    },
+    "renderFdValueDirectlyObserved": false,
+    "symbolServer": "https://debuginfod.ubuntu.com",
+    "diagnosticShellDropinRemoved": true,
+    "canonicalApplicationClosedNormallyBeforeGdmRestarts": true,
+    "packageVerificationAfterDebugPassed": true,
+    "distroGraphicsLibrariesPatched": false,
+    "selectedAugmentorPayloadPatched": false
+  },
+  "evidenceSha256": {
+    "gnome-wayland-gdb.log": "6ace4fdf9b5d79484064cdd3659282c7d99801fe68b879f90b8d43c326f2b5cb",
+    "gnome-wayland-gdb-symbols.log": "b2a13249d1c5f284d605c58e0c946e36ff362e1932f9a21182ea64bca45eb4b0",
+    "capture-wayland-stack.py": "24f0fbd0e325ac6963c98f15531b4d90d39434794bba96cae53e5f2f4ff070d0",
+    "wayland-debug-before.json": "c706bfa334a2c5fe08644e0d4ef1befca9c2b8d31dfbefb4bf8844e6affee7ad",
+    "mesa-mr-41527.json": "f92eb669985e164821b04fe226bd22615dac40850041cee1287497f1c5fd42fd",
+    "mesa-fix-diff.json": "aac1b1240a48e9e0f3969075444f3919d02bc2121304afa503308ee61e940223"
+  },
+  "upstream": {
+    "mergeRequest": "https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/41527",
+    "metadata": "https://gitlab.freedesktop.org/api/v4/projects/176/merge_requests/41527",
+    "mergedAt": "2026-05-13T17:00:01.009Z",
+    "commit": "fb0123f42ed099e348ca2ec7a55f20ba3570c9d4",
+    "diff": "https://gitlab.freedesktop.org/api/v4/projects/176/repository/commits/fb0123f42ed099e348ca2ec7a55f20ba3570c9d4/diff",
+    "guard": "Require valid render fd before advertising EGL_WL_bind_wayland_display",
+    "matchingFailurePath": true,
+    "upstreamFixAppliedInGuest": false
+  },
+  "scope": {
+    "waylandLoginQualified": false,
+    "waylandApplicationStartupQualified": false,
+    "physicalUbuntuDesktopFailureEstablished": false,
+    "compositorCrashCausedByAugmentorEstablished": false,
+    "shortcutDeliveryTested": false,
+    "inputToolsQualified": false,
+    "physicalAudioTested": false,
+    "releaseApproved": false
+  },
+  "next": "Preserve .3 failure; compare a separately cloned fixture using coherent official previous Mesa packages only after verifying exact package identities. Do not patch product or use unsupported EGL environment overrides."
+}

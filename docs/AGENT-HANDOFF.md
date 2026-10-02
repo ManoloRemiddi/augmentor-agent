@@ -2,6 +2,38 @@
 
 # Start here: agent handoff
 
+## October 2 Noble graphical X11 and Wayland crash checkpoint
+
+Clean candidate `a7ee9c5` now passes real canonical startup in the marked Ubuntu
+24.04.5 guest's **X11 fallback**: pristine installed packages, immutable seven-wheel
+Python, active AppArmor, actual service/MainPID and `/usr/lib/augmentor` selection,
+Ubuntu/user observer mode and all four Ubuntu default extensions plus observer.
+Actual guest screen captures render the approved application and DSH setup dialog;
+the idle snapshot observes the focused application with no task or draft. The
+read-only `release/inspect-noble-gnome-vm.py` requires an explicit matching session
+type; its default Wayland check refuses this fallback. The checked
+[X11 report](../release/qualification/ubuntu24.04/gnome-x11-a7ee9c5.json) binds
+package, helper, runtime and private capture hashes. This does not qualify
+shortcut delivery, connected DSH/Browser, input or physical voice. The fixture
+idle timer was set to zero after an administrative unlock; password/default idle
+lock acceptance remains open. QEMU screendump was inactive; the verified pictures
+come from the actual guest's X11 screen.
+
+Requested Wayland login repeatedly crashes before registration. A fixture-only
+GDB run now identifies Mesa `dri2_bind_wayland_display_wl`, `egl_dri2.c:2658`, with
+`device_name=NULL` passed to `strdup`. Exact Ubuntu Mesa is
+`25.2.8-0ubuntu0.24.04.3`; this matches upstream Mesa's software-only-display fix.
+Record the [diagnostic scope](LINUX-DISTRO-ROLLOUT.md#noble-graphical-x11-and-wayland-crash-checkpoint)
+and continue a finite, source-informed fixture comparison. The app was closed
+through its accepted maintenance protocol before GDM restarts. The diagnostic
+Shell drop-in has been removed; no Augmentor payload or distro graphics library
+was patched. This is a compositor/fixture finding, not a general Ubuntu failure.
+
+All `a7ee9c5` Linux and Mac 14/26 CI jobs now pass. Mac 26's first attempt timed
+out at the native memory refresh fixture; its one failed-job rerun passed on
+unchanged source. Keep both attempts explicit. Continue the original rollout's
+full remaining gates; the draft PR and goal remain in progress.
+
 ## October 2 Noble GNOME 46 preparation checkpoint
 
 The autonomous rollout continues with explicit GNOME 46 and 50 source profiles.

@@ -1596,16 +1596,80 @@ prepared Debian container passes 683 native cases (two skips); the subsequently
 added strict Noble provisioning guard passes separately. The Chromium-equipped
 prepared container passes all 497 JavaScript cases (two skips). Host Qt Essentials
 does not include QtTest; its failed full-suite attempt is an environment gap,
-not counted as acceptance. Latest published `51c4855`
+not counted as acceptance. Historical `51c4855`
 [Linux CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36969871602)
 and [Mac 14/26 CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36969871581)
-pass all jobs; new-profile clean hosted/package qualification remains pending.
+pass all jobs. New-profile clean hosted/package results follow below.
 
-Next: clean candidate package, ordinary-user runtime on the guest's emulated
-Nehalem CPU, actual Ubuntu Wayland login/canonical startup, live shortcut Save/
+At that preparation checkpoint, clean candidate package and ordinary-user runtime
+on the guest's emulated Nehalem CPU were pending; those now pass below. Continue
+actual Ubuntu Wayland login, live shortcut Save/
 conflict/delivery/closed-launch/two-instance/lock recovery, observer lifecycle and
 default-extension composition. Keep all other rollout gates open: connected UI,
 graphical/sandboxed Browser, GNOME consent/control/Stop, native Wayland workspaces,
 coordinated DSH updates, physical voice/CPU floor, Mint/openSUSE/Arch and complete
 native-library source/licensing/rebuild coverage. No private VM keys/seeds, wheels,
 candidate binaries or source archives are published with this checkpoint.
+
+### Noble graphical X11 and Wayland crash checkpoint
+
+Separate clean `a7ee9c55586b6a131524a8c53489463e45f6d515` Noble packages were built,
+their whole-file hashes verified and installed for the first time in the private
+guest. The seven-wheel runtime prepares and fully verifies under its emulated
+Nehalem CPU; this is not physical minimum-CPU qualification. The package payload
+remains pristine and selected at `/usr/lib/augmentor`. Actual canonical startup
+passes in Ubuntu's **X11 fallback**, with the real systemd MainPID matching the
+application's maintenance socket and no preview flag. AppArmor remains active.
+The observer reads Shell 46, normal Ubuntu mode inherited from user, unlocked
+guards and the application's focused window; all four Ubuntu default extensions
+and the observer are active. The actual three-field GSD profile reads correctly
+and confirms absent saved-portal schemas. Save/delivery remains untested.
+
+The [checked X11 checkpoint](../release/qualification/ubuntu24.04/gnome-x11-a7ee9c5.json)
+binds exact clean packages, runtime contract, inspection helper and private
+snapshot/screen hashes. `release/inspect-noble-gnome-vm.py` is strictly read-only
+and guest-restricted. Its default expects Wayland; `--session-type x11` requires
+actual X11 in both the seat0 session and environment, so fallback cannot be
+reported as Wayland. It uses the real Shell 46 Extensions interface exported at
+`/org/gnome/Shell`, as documented by
+[Shell's actual implementation](https://github.com/GNOME/gnome-shell/blob/46.0/js/ui/shellDBus.js#L398).
+
+Actual guest QScreen captures, independently inspected, show the approved UI and
+the Connect DSH dialog. The idle capture after normal dialog dismissal has no
+running task, draft or saved model connection. QEMU's separate screendump shows
+inactive output despite connected XRandR Virtual-1/monitor-on; no screenshot
+acceptance is inferred from that channel. The fixture's idle delay was explicitly
+set from 300 seconds to zero after an administrative unlock. Password unlock,
+default idle lock, shortcut lock fencing and full observer recovery remain open.
+No actual provider credential or model task has been configured in this guest.
+
+Requested Wayland login crashes before registration, then GDM falls back to X11.
+Six symbolized GDB captures identify `dri2_bind_wayland_display_wl` at
+`egl_dri2.c:2658`, called through `eglBindWaylandDisplayWL`, with
+`device_name=NULL` passed to `strdup`. The installed Ubuntu EGL library is
+`25.2.8-0ubuntu0.24.04.3`, build ID
+`56ba556954f45fbe7d2c402546d3ad74f3279e66`. This matches the failure described by
+[Mesa MR 41527](https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/41527)
+and its [exact upstream guard](https://gitlab.freedesktop.org/mesa/mesa/-/commit/fb0123f42ed099e348ca2ec7a55f20ba3570c9d4),
+merged May 13: require a valid render fd before advertising the legacy Wayland
+binding extension. The checked diagnostic preserves actual stack/local values
+and primary-source hashes; no fix has yet been applied or accepted in this guest.
+Software fallback and earlier warning messages alone did not establish the cause.
+Ubuntu's official .3 source re-enabled that extension compared with .2. Research
+an explicitly separate, coherent official .2 fixture comparison; it cannot turn
+the current .3 failure into a passing result. A compositor failure under this
+software-only virtual GPU does not establish failure on physical Ubuntu desktops.
+
+Before debugger restarts, the app was closed through `maintenance.close` only
+after idle acceptance, with no task or draft. The fixture-only GNOME Shell GDB
+drop-in has been removed. Ubuntu graphics packages and Augmentor's selected
+payload were not patched. The [Wayland diagnostic](../release/qualification/ubuntu24.04/gnome-wayland-mesa-a7ee9c5.json)
+is a failure report, separate from the X11 checkpoint.
+
+All `a7ee9c5` [Linux CI jobs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36972329070)
+and [Mac 14/26 jobs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36972329055)
+now pass. Mac 26's first attempt timed out waiting for native memory refresh; the
+failed job rerun passes on unchanged source. Keep the failed attempt explicit.
+Next: the finite Mesa fixture comparison, actual GNOME 46 shortcut delivery,
+closed launch/two-instance/lock fencing, connected UI/Browser and the complete
+remaining distro, voice, control, coordinated-update and redistribution gates.

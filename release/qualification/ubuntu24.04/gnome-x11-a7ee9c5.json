@@ -1,0 +1,187 @@
+{
+  "format": "augmentor-noble-gnome-x11-checkpoint/1",
+  "target": "ubuntu24.04-amd64",
+  "source": {
+    "commit": "a7ee9c55586b6a131524a8c53489463e45f6d515",
+    "dirty": false
+  },
+  "version": "0.2.13",
+  "candidateOnly": true,
+  "packageArtifacts": [
+    {
+      "file": "augmentor-runtime_0.2.13_amd64.deb",
+      "sha256": "2d011160e9442db151e831055d246865bb1cc5f1788e570bcd22307ad9fa7f42",
+      "bytes": 171112568
+    },
+    {
+      "file": "augmentor-desktop_0.2.13_amd64.deb",
+      "sha256": "2eca6a893b5c06df0b21fe3279acc58c78a4a4f0627584dcbfca9cf4b1096e24",
+      "bytes": 4984
+    }
+  ],
+  "pythonRuntime": {
+    "format": "augmentor-linux-python-runtime-contract/1",
+    "target": "ubuntu24.04-amd64",
+    "profile": "noble-cp312-x86_64-voice",
+    "pythonAbi": [
+      3,
+      12
+    ],
+    "architecture": "x86_64",
+    "lockIdentity": "81b66921d3a2eb01518845f06e9cee177a533f780214bc6e020a1e44f66290b0",
+    "policySha256": "2c58df0f7538526963bd44beb075965c4a339bf36ddae6db41b1ebc70133026b",
+    "licenseReviewComplete": false,
+    "embeddedSourceCoverageComplete": false
+  },
+  "fixture": {
+    "imageBuild": "20260926",
+    "actualOs": "Ubuntu 24.04.5 LTS",
+    "cpuModel": "Nehalem",
+    "acceleration": "tcg",
+    "cpus": 4,
+    "memoryMiB": 6144,
+    "hostMounts": false,
+    "hostDevicesAttached": false,
+    "standardDesktopInstallerTested": false,
+    "desktopInstall": "ubuntu-desktop-minimal --no-install-recommends",
+    "idleDelayBefore": 300,
+    "controlledIdleDelay": 0,
+    "administrativeUnlockPerformed": true,
+    "passwordUnlockTested": false
+  },
+  "observed": {
+    "sessionType": "x11",
+    "ubuntuMode": "ubuntu",
+    "parentMode": "user",
+    "graphicalSessions": [
+      {
+        "Seat": "seat0",
+        "Type": "x11",
+        "Class": "user",
+        "Active": "yes",
+        "State": "active"
+      }
+    ],
+    "packageVerified": true,
+    "pythonRuntimeVerified": true,
+    "apparmorEnabled": true,
+    "apparmorServiceActive": true,
+    "canonicalRoot": "/usr/lib/augmentor",
+    "selectedPython": "/home/augmentor-proof/.local/share/augmentor/python-runtimes/noble-cp312-x86_64-voice-81b66921d3a2eb01/bin/python3",
+    "service": {
+      "MainPID": "12760",
+      "ActiveState": "active",
+      "SubState": "running"
+    },
+    "applicationPid": 12760,
+    "previewLaunch": false,
+    "modelReady": false,
+    "online": false,
+    "taskRunning": false,
+    "draftPresent": false,
+    "maintenanceAcceptedAfterDialogDismissal": true,
+    "focusedWindow": {
+      "id": "2fa68982-95ec-473b-b2f3-e130b6ca9a54:3",
+      "pid": 12760,
+      "application": "com.augmentor.Agent",
+      "title": "Augmentor Agent",
+      "geometry": {
+        "x": 248,
+        "y": 126,
+        "width": 424,
+        "height": 484
+      },
+      "overrideRedirect": false,
+      "unmanaging": false
+    },
+    "guards": {
+      "locked": false,
+      "greeter": false,
+      "sessionMode": "ubuntu",
+      "parentSessionMode": "user",
+      "actionMode": 1,
+      "modalCount": 0,
+      "overview": false,
+      "overviewTarget": false,
+      "stageGrabbed": false,
+      "overviewAnimation": false,
+      "screenShieldAvailable": true,
+      "screenShieldActive": false,
+      "screenShieldLocked": false,
+      "stageGrabActor": null,
+      "stageKeyFocus": 2,
+      "windowDragging": false
+    },
+    "blockedReasons": [],
+    "inputQualified": false,
+    "ubuntuDefaultExtensionsActive": {
+      "ubuntu-dock@ubuntu.com": 1.0,
+      "ubuntu-appindicators@ubuntu.com": 1.0,
+      "ding@rastersoft.com": 1.0,
+      "tiling-assistant@ubuntu.com": 1.0,
+      "observer@augmentoragent.com": 1.0
+    },
+    "shortcutProfile": {
+      "fields": [
+        "name",
+        "binding",
+        "command"
+      ],
+      "savedPortalSchemasAvailable": false,
+      "functionalTested": false
+    },
+    "installedPackages": [
+      "gdm3\t46.2-1ubuntu1~24.04.9",
+      "gnome-settings-daemon\t46.0-1ubuntu1.24.04.1",
+      "gnome-shell\t46.0-0ubuntu6~24.04.15",
+      "libmutter-14-0\t46.2-1ubuntu0.24.04.16",
+      "ubuntu-desktop-minimal\t1.539.2",
+      "ubuntu-session\t46.0-1ubuntu4",
+      "xdg-desktop-portal\t1.18.4-1ubuntu2.24.04.3",
+      "xdg-desktop-portal-gnome\t46.2-0ubuntu1"
+    ]
+  },
+  "evidenceSha256": {
+    "gnome-inspection-x11.json": "a3f17653ca25950ad3865dcad78de0a15486dcf53a3260db64e7e192b739b181",
+    "gnome-inspection-x11-idle.json": "cb593ab32e6d4d1e536d790354cba62d8f370c1d519ed4302c1ec984258d4e9c",
+    "x11-screen.png": "0a614e43ce818d600bb9ced461ff9c5c857ac2d7a28e7a5108d77e568e7757b7",
+    "x11-app.png": "215bf70a6ea54544b0bbc4664b3fd6894eb8b1fdb9200da79264985751e73260"
+  },
+  "inspectionSha256": "b191a43032b64adbc5dface206abd74b4e82fc5a584c32cbe325dcea2d877d5f",
+  "visualReview": {
+    "actualGuestX11Capture": true,
+    "resolution": [
+      1280,
+      800
+    ],
+    "approvedApplicationUiRendered": true,
+    "connectionDialogRendered": true,
+    "qemuScreendumpActive": false,
+    "note": "Guest QScreen capture verified visible application/dialog. QEMU screendump separately showed inactive output; XRandR reported connected Virtual-1 and monitor on."
+  },
+  "scope": {
+    "waylandSessionTested": false,
+    "shortcutDeliveryTested": false,
+    "shortcutLockRecoveryTested": false,
+    "connectedHarnessTested": false,
+    "modelTurnTested": false,
+    "graphicalBrowserTested": false,
+    "gnomeInputToolsEnabled": false,
+    "physicalAudioTested": false,
+    "minimumPhysicalCpuQualified": false,
+    "nativeLibraryRedistributionApproved": false
+  },
+  "ci": {
+    "linux": {
+      "run": 36972329070,
+      "conclusion": "success"
+    },
+    "macos": {
+      "run": 36972329055,
+      "finalAttempt": 2,
+      "conclusion": "success",
+      "attempt1": "macOS 14 passed; macOS 26 timed out waiting for native memory refresh; failed job rerun passed on unchanged source."
+    }
+  },
+  "next": "Diagnose the distinct Wayland compositor crash, then perform real delivery/lock/two-instance and connected UI acceptance. This is explicit X11 fallback evidence only."
+}
