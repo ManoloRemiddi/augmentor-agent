@@ -1,0 +1,67 @@
+{
+  "format": "augmentor-gnome-vm-infrastructure/1",
+  "base": {
+    "target": "ubuntu24.04-amd64",
+    "image": "https://cloud-images.ubuntu.com/releases/noble/release-20260926/ubuntu-24.04-server-cloudimg-amd64.img",
+    "checksum": "https://cloud-images.ubuntu.com/releases/noble/release-20260926/SHA256SUMS",
+    "signature": "https://cloud-images.ubuntu.com/releases/noble/release-20260926/SHA256SUMS.gpg",
+    "keyring": "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xD2EB44626FDDC30B513D5BB71A5D6C4C7DB87C81",
+    "keyringFile": "ubuntu-cloud-key.gpg",
+    "keyringFormat": "armored",
+    "signingFingerprint": "D2EB44626FDDC30B513D5BB71A5D6C4C7DB87C81",
+    "sha256": "6a81c37564db9b1ee84e141922625e1d7c5b389b99bb3c572e0243607d5bb4d2",
+    "imageBuild": "20260926",
+    "architecture": "x86_64",
+    "imageBytes": 625612288,
+    "vmName": "augmentor-gnome-ubuntu24",
+    "guestMarker": "Isolated Augmentor Ubuntu 24.04 GNOME qualification VM\n",
+    "sudoGroup": "sudo",
+    "desktopProvisioning": "Cloud-derived Ubuntu GNOME; standard Desktop installation and Snap Chromium require separate qualification",
+    "acceleration": "tcg",
+    "cpuModel": "Nehalem",
+    "memoryMiB": 6144,
+    "cpus": 4,
+    "diskGiB": 32
+  },
+  "signedChecksumVerified": true,
+  "baseHashVerified": true,
+  "hostUser": 1000,
+  "guestUser": "augmentor-proof",
+  "sshPort": 22490,
+  "hostMounts": false,
+  "hostDevicesAttached": false,
+  "outboundGuestNat": true,
+  "gnomeProvisioningPerformedByThisTool": false,
+  "desktopAcceptanceTested": false,
+  "qemuVersion": "QEMU emulator version 10.0.13 (Debian 1:10.0.13+ds-0+deb13u1)",
+  "sourceSha256": {
+    "scripts/prepare-gnome-vm.py": "dd84eab2ab9928516e0cf4cc46c6aa5b2cd1b838bd8ccba97e380946d3308864",
+    "release/ubuntu24-gnome-vm.json": "c78cbb7f82cc0372b033fc16317db537aadb07dc0ca421fe44176596ec14ef66"
+  },
+  "sourceBase": "51c48555eebfa6e2fd8af927e73bf6776a598edd",
+  "sourceScope": "Reviewed working-tree preparation script; exact sourceSha256 below, not a clean product artifact.",
+  "actualBoot": {
+    "guestUser": "augmentor-proof",
+    "virtualization": "qemu",
+    "ID": "ubuntu",
+    "VERSION_ID": "24.04",
+    "PRETTY_NAME": "Ubuntu 24.04.5 LTS",
+    "cloudInitStatus": "done",
+    "dedicatedSshSucceeded": true
+  },
+  "signedFilesSha256": {
+    "SHA256SUMS": "cd8934d937d1509d047798e6a5acfb839c0a2d29f3e5fc87b8ec7096ffe587ca",
+    "SHA256SUMS.gpg": "1fc4b72f025f2e89f4484a196fffe5a3412e77bf9a8c78f8f13763f8056a0950",
+    "ubuntu-cloud-key.asc": "927138de292fac4d861105a052cf56e9c5921987da385c844d88f34d19b39ab0",
+    "ubuntu-cloud-key.gpg": "80347fcd3a3de83cff782b9de657b48394b49ad83887268445a54d5beee69b4e"
+  },
+  "scope": {
+    "graphicalLoginTested": false,
+    "applicationStartupTested": false,
+    "shortcutsDeliveryTested": false,
+    "observerSessionTested": false,
+    "standardDesktopInstallerTested": false,
+    "physicalAudioTested": false,
+    "minimumCpuQualified": false
+  }
+}

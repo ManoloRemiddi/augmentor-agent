@@ -1,5 +1,5 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-"""Bounded, compositor-authenticated access to the read-only GNOME 50 observer."""
+"""Bounded, compositor-authenticated access to GNOME 46/50 read-only observers."""
 import json
 import math
 import re
@@ -21,7 +21,7 @@ def parsed(value):
 def valid_status(value):
     if (value.get('schema')!=1 or value.get('backend')!='gnome-shell-observer'
             or value.get('inputQualified') is not False
-            or not re.fullmatch(r'50\.\d+(?:\.\d+)?',str(value.get('shellVersion','')))
+            or not re.fullmatch(r'(?:46|50)\.\d+(?:\.\d+)?',str(value.get('shellVersion','')))
             or not re.fullmatch(r'[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}',str(value.get('epoch','')))
             or type(value.get('serial')) is not int or not 0<=value['serial']<2**53):
         raise RuntimeError('GNOME returned an invalid observer status.')
@@ -80,6 +80,11 @@ def valid_scene(value):
         raise RuntimeError('GNOME returned invalid input guards.')
     if not isinstance(guards.get('sessionMode'),str) or not 1<=len(guards['sessionMode'])<=100:
         raise RuntimeError('GNOME returned an invalid session mode.')
+    if 'parentSessionMode' in guards and guards['parentSessionMode'] is not None and (
+            not isinstance(guards['parentSessionMode'],str) or not 1<=len(guards['parentSessionMode'])<=100):
+        raise RuntimeError('GNOME returned an invalid parent session mode.')
+    if value['shellVersion'].startswith('46.') and 'parentSessionMode' not in guards:
+        raise RuntimeError('GNOME 46 returned an incomplete session mode profile.')
     for key in ('locked','greeter','overview','overviewTarget','overviewAnimation','stageGrabbed','windowDragging','screenShieldAvailable'):
         if type(guards.get(key)) is not bool:raise RuntimeError('GNOME returned incomplete input guards.')
     for key in ('screenShieldActive','screenShieldLocked'):

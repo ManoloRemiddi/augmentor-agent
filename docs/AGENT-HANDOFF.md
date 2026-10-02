@@ -2,6 +2,33 @@
 
 # Start here: agent handoff
 
+## October 2 Noble GNOME 46 preparation checkpoint
+
+The autonomous rollout continues with explicit GNOME 46 and 50 source profiles.
+Noble's legacy three-field GSD bindings and absent saved-portal schemas no longer
+cause automatic refusal; 50 retains both checks. The read-only observer accepts
+46, avoids its absent window properties and admits only Ubuntu's explicit normal
+user-derived mode. Input remains unqualified. Six shortcut transaction/profile
+tests, four VM guard tests, four executing extension tests and the added observer
+case pass. The full prepared Debian suite passes 683 native cases (two skips) and
+497 JavaScript cases (two skips); the subsequently added Noble guest guard passes
+separately. The host's Qt Essentials lacks QtTest; use the prepared container for
+full suites. The container with Chromium is required by the JavaScript suite.
+
+The signed dated Noble Cloud image has booted under the dedicated QEMU fixture;
+its actual OS is Ubuntu 24.04.5, cloud-init done. The checked infrastructure report
+contains exact signed/base/source hashes and explicit false desktop gates.
+`ubuntu-desktop-minimal` and its default Ubuntu extensions have installed in this
+private guest. Graphical login/startup, delivery/lock/observer and connected UI
+acceptance are still pending. Build a separate clean candidate with these source
+profiles before using `release/provision-noble-gnome-vm.py`; do not patch installed
+package files. Prepare its seven-wheel ordinary-user runtime first. The helper
+checks package/runtime identities and AppArmor, requests Ubuntu Wayland using
+AccountsService, preserves GDM configuration and refuses an existing guest seat0
+user session. Do not use the Fedora-only acceptance helpers as Noble proofs.
+See [scope, primary sources and next work](LINUX-DISTRO-ROLLOUT.md#noble-gnome-46-source-profile-and-owned-vm).
+Latest published `51c4855` Linux and Mac 14/26 CI now passes every job.
+
 ## October 2 Noble package implementation checkpoint
 
 Clean implementation `1c670c0` now passes the fresh official Ubuntu 24.04 package

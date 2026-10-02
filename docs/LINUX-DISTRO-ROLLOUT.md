@@ -1522,3 +1522,90 @@ cases (670 pass, two Mac-only skips) per target. Next work
 retains the complete scope: coordinated managed DSH/runtime updates, actual Noble
 GNOME 46/Cinnamon, graphical Browser, physical audio/CPU floor, native-library
 release gates, Mint/openSUSE/Arch and GNOME control consent/input/Stop.
+
+## Noble GNOME 46 source profile and owned VM
+
+The next implementation admits explicit GNOME 46 and 50 profiles, keeping
+47–49 and other unreviewed generations refused. This is candidate source work;
+the earlier real GNOME 50 reports retain their original source scope.
+
+GSD 46's [custom-binding schema](https://github.com/GNOME/gnome-settings-daemon/blob/46.0/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in#L675)
+contains name/binding/command, without `enable-in-lockscreen`. Its
+[custom-binding implementation](https://github.com/GNOME/gnome-settings-daemon/blob/46.0/plugins/media-keys/gsd-media-keys-manager.c#L795)
+uses [LAUNCHER = NORMAL | OVERVIEW](https://github.com/GNOME/gnome-settings-daemon/blob/46.0/plugins/media-keys/shortcuts-list.h#L27),
+excluding lock/unlock. The adapter now selects those actual fields. It continues
+to set `enable-in-lockscreen=false` wherever supplied, and requires it for 50.
+The legacy profile permits both saved global-shortcut schemas to be absent;
+partial schemas, missing keys or wrong types refuse operation. Both schemas
+remain mandatory for 50. System, WM, media and other custom-binding conflict
+checks and rollback/foreign ownership protections are retained. Save readback
+still reports `functionalTested=false`; actual GSD delivery must be tested.
+
+Mutter 46 lacks the Meta.Window mapped/main-monitor properties used on 50.
+Its observer profile relies on actor mapping and existing display monitor-enter/
+leave events, preserving bounded compositor-authenticated epoch observations.
+Ubuntu's installed mode file explicitly inherits user mode and enables Ubuntu
+Dock, AppIndicators, Desktop Icons NG and Tiling Assistant. The extension admits
+only that specific `ubuntu` + `user` combination on 46, alongside normal `user`;
+lock, ScreenShield, overview, modal and input-grab guards still apply. Other
+derived modes remain blocked. Parent mode is reported and required by the 46
+Python protocol. Input and complete actor-composition qualification remain false.
+See the [reviewed Ubuntu Shell source archive](https://archive.ubuntu.com/ubuntu/pool/main/g/gnome-shell/gnome-shell_46.0-0ubuntu6~24.04.15.debian.tar.xz),
+[Shell parent-mode loading](https://github.com/GNOME/gnome-shell/blob/46.0/js/ui/extensionSystem.js#L175)
+and [Mutter 46 window properties](https://github.com/GNOME/mutter/blob/46.0/src/core/window.c#L482).
+
+`scripts/prepare-gnome-vm.py --target ubuntu24 --directory
+outputs/linux-rollout/ubuntu24-gnome-vm --ssh-port 22490 --boot` uses the exact
+[dated 20260926 Noble image](https://cloud-images.ubuntu.com/releases/noble/release-20260926/ubuntu-24.04-server-cloudimg-amd64.img)
+pinned in `release/ubuntu24-gnome-vm.json`. The official detached SHA256SUMS
+signature is verified with Canonical's
+[documented UEC key fingerprint](https://ubuntu.com/docs/public-images/public-images-how-to/verify-image-checksum/)
+`D2EB44626FDDC30B513D5BB71A5D6C4C7DB87C81`, in a dedicated keyring.
+The downloaded 625,612,288-byte image matches SHA-256
+`6a81c37564db9b1ee84e141922625e1d7c5b389b99bb3c572e0243607d5bb4d2`.
+Detached checksum entries must match uniquely. Existing fixture target identity
+and qcow2 backing-file checks prevent cross-target reuse. Fedora remains the
+default with its existing clear-signed checksum/keyring behavior. No host mounts,
+devices or owner credentials are attached; NAT and loopback guest SSH only.
+
+The [checked infrastructure report](../release/qualification/ubuntu24.04/gnome-vm-infrastructure.json)
+records successful dedicated-user SSH boot, Ubuntu 24.04.5 and completed
+cloud-init, plus exact preparation/manifest/signed-file hashes. It records the
+working-source preparation scope separately from clean product artifacts.
+The private guest has now installed `ubuntu-desktop-minimal` 1.539.2,
+ubuntu-session 46.0-1ubuntu4, Shell 46.0-0ubuntu6~24.04.15,
+Mutter 46.2-1ubuntu0.24.04.16, GSD 46.0-1ubuntu1.24.04.1,
+GDM 46.2-1ubuntu1~24.04.9, portal 1.18.4-1ubuntu2.24.04.3 and
+GNOME backend 46.2-0ubuntu1. Actual Ubuntu mode/default-extension packages and
+kernel AppArmor `Y` were inspected. These are installed package observations,
+not graphical session acceptance or the standard Desktop installer.
+
+`release/provision-noble-gnome-vm.py` is restricted to the exact marked QEMU guest
+and ordinary `augmentor-proof` user. It requires clean matching installed Noble
+packages, verifies their immutable selected Python, retains AppArmor, installs
+the exact packaged read-only observer/startup and requests Ubuntu Wayland through
+AccountsService. [GDM 46 reads those session properties](https://github.com/GNOME/gdm/blob/46.2/daemon/gdm-session-settings.c#L298).
+It preserves original GDM configuration and refuses an existing user seat0
+session before changing startup. Its report explicitly leaves actual login,
+application startup and model requests untested. Prepare the seven-wheel runtime
+first; system Python alone cannot launch the Noble UI.
+
+Source checks: six new shortcut schema/transaction tests, four VM guards, four
+executing extension policy/event tests and the new observer case pass. The full
+prepared Debian container passes 683 native cases (two skips); the subsequently
+added strict Noble provisioning guard passes separately. The Chromium-equipped
+prepared container passes all 497 JavaScript cases (two skips). Host Qt Essentials
+does not include QtTest; its failed full-suite attempt is an environment gap,
+not counted as acceptance. Latest published `51c4855`
+[Linux CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36969871602)
+and [Mac 14/26 CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36969871581)
+pass all jobs; new-profile clean hosted/package qualification remains pending.
+
+Next: clean candidate package, ordinary-user runtime on the guest's emulated
+Nehalem CPU, actual Ubuntu Wayland login/canonical startup, live shortcut Save/
+conflict/delivery/closed-launch/two-instance/lock recovery, observer lifecycle and
+default-extension composition. Keep all other rollout gates open: connected UI,
+graphical/sandboxed Browser, GNOME consent/control/Stop, native Wayland workspaces,
+coordinated DSH updates, physical voice/CPU floor, Mint/openSUSE/Arch and complete
+native-library source/licensing/rebuild coverage. No private VM keys/seeds, wheels,
+candidate binaries or source archives are published with this checkpoint.

@@ -403,3 +403,22 @@ cache as the ordinary user before rendering and exercising both package leases.
 descriptor interpreter. The artifact review verifies whole wheel and embedded ELF
 hashes, original notice bytes and pinned supplementary collections; its license
 and corresponding-source completeness flags remain false.
+
+### GNOME 46 profiles and signed guest preparation
+
+`test_gnome_shortcut_settings.py` checks both GSD generations, partial/malformed
+portal schemas, Save failures and rollback with foreign entries retained.
+`gnome-observer-extension.test.mjs` executes the actual extension with synthetic
+Shell objects: only 46's explicit Ubuntu/user inheritance is admitted; lock,
+overview and modal guards remain; actor mapping and display monitor events bump
+the serial without subscribing to nonexistent 46 window properties. Observer
+protocol tests retain the compositor-owner/epoch fence and false input gate.
+
+`test_gnome_vm_preparation.py` covers detached/clear-signed checksum matching,
+duplicate lines, wrong signer/image, cross-fixture reuse and wrong backing image
+refusal before boot. `test_noble_gnome_provisioning.py` checks the strict guest/
+ordinary-user marker guard. `release/provision-noble-gnome-vm.py` additionally
+requires clean installed Noble packages, AppArmor, the prepared verified Python
+runtime and actual Ubuntu Wayland session; it refuses an existing user seat0
+session. Its provisioning report does not prove login or application startup.
+Actual GNOME shortcut/control/lock acceptance must be recorded independently.

@@ -25,8 +25,15 @@ Hiding a window must not cancel its task; Stop must remain explicit. Do not
 restart an active installed window to verify a source-only documentation change.
 
 The existing two shortcut rows select KDE KGlobalAccel, macOS or the native GNOME
-50 settings adapter. GNOME requires GTK 4 GI in the selected interpreter and a
+46/50 settings profiles. GNOME requires GTK 4 GI in the selected interpreter and a
 live Shell/MediaKeys graphical session; failures stay explicit in those rows.
+The 46 profile uses the older three-field custom-binding schema and checks saved
+portal bindings only when both portal schemas exist. Malformed present schemas
+refuse Save; 50 retains its explicit lock-screen false setting and portal checks.
+The read-only observer also admits 46 and Ubuntu's specific user-derived normal
+mode. These source profiles have fixture coverage; real Noble shortcut delivery,
+lock recovery and default-extension composition remain separate qualification.
+See [the Noble GNOME checkpoint](../../docs/LINUX-DISTRO-ROLLOUT.md#noble-gnome-46-source-profile-and-owned-vm).
 See [distro qualification and limits](../../docs/LINUX-DISTRO-ROLLOUT.md#october-2-native-gnome-save-adapter):
 the private daemon proof covers Save/conflicts. Separate actual Augmentor preview
 window proofs pass canonical shortcut hide/restore, compositor focus and composer

@@ -17,8 +17,9 @@ const rect = r => ({x:r.x, y:r.y, width:r.width, height:r.height});
 
 export default class Observer extends Extension {
     enable() {
-        if (!/^50\.\d+(?:\.\d+)?$/.test(Config.PACKAGE_VERSION))
-            throw new Error('The Augmentor observer requires qualified GNOME 50.');
+        if (!/^(?:46|50)\.\d+(?:\.\d+)?$/.test(Config.PACKAGE_VERSION))
+            throw new Error('The Augmentor observer supports GNOME 46 and 50 profiles.');
+        this.legacyWindowProperties = Config.PACKAGE_VERSION.startsWith('46.');
         this.epoch = GLib.uuid_string_random();
         this.serial = 0;
         this.connections = [];
@@ -65,8 +66,10 @@ export default class Observer extends Extension {
             this.bump();
             const signals = ['position-changed','size-changed','workspace-changed','raised',
                 'notify::minimized','notify::on-all-workspaces','highest-scale-monitor-changed',
-                'shown','notify::mapped','notify::fullscreen','notify::above','notify::window-type',
-                'notify::decorated','notify::main-monitor'];
+                'shown','notify::fullscreen','notify::above','notify::window-type','notify::decorated'];
+            // Mutter 46 lacks these Meta.Window properties. Actor mapped and
+            // display monitor-enter/leave signals provide the legacy tracking.
+            if (!this.legacyWindowProperties) signals.push('notify::mapped','notify::main-monitor');
             const connections = [];
             this.windows.set(window,connections);
             for (const signal of signals) connections.push([window,window.connect(signal,() => this.bump())]);
@@ -138,6 +141,7 @@ export default class Observer extends Extension {
         const above = order.filter((window,i) => window !== focus && (i > index || window.is_override_redirect()));
         const reasons = [];
         const guards = {locked:Main.sessionMode.isLocked,greeter:Main.sessionMode.isGreeter,sessionMode:Main.sessionMode.currentMode,
+            parentSessionMode:Main.sessionMode.parentMode ?? null,
             actionMode:Main.actionMode,modalCount:Main.modalCount,overview:Main.overview.visible,
             overviewTarget:Main.overview.visibleTarget,stageGrabbed:global.stage.is_grabbed,
             overviewAnimation:Main.overview.animationInProgress,
@@ -146,7 +150,11 @@ export default class Observer extends Extension {
             stageGrabActor:this.actorId(global.stage.get_grab_actor()),
             stageKeyFocus:this.actorId(global.stage.get_key_focus()),windowDragging:global.display.is_grabbed()};
         if (guards.locked || guards.greeter) reasons.push('locked-or-greeter');
-        if (guards.sessionMode !== 'user') reasons.push('non-user-session-mode');
+        // Ubuntu 24.04 supplies this specific user-derived normal mode. Do not
+        // treat arbitrary session inheritance as an unlocked desktop.
+        const normalSession = guards.sessionMode === 'user' || (this.legacyWindowProperties &&
+            guards.sessionMode === 'ubuntu' && guards.parentSessionMode === 'user');
+        if (!normalSession) reasons.push('non-user-session-mode');
         if (!guards.screenShieldAvailable) reasons.push('screen-shield-unavailable');
         if (guards.screenShieldActive || guards.screenShieldLocked) reasons.push('screen-shield-active');
         if (guards.actionMode !== Shell.ActionMode.NORMAL || guards.modalCount || guards.overview || guards.overviewTarget || guards.overviewAnimation)

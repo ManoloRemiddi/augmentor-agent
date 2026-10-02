@@ -27,6 +27,16 @@ def fixture():
 
 
 class GnomeObserverTests(unittest.TestCase):
+    def test_46_profile_requires_parent_mode_and_remains_read_only(self):
+        value=fixture();value['shellVersion']='46.0';value['guards']['sessionMode']='ubuntu'
+        with self.assertRaisesRegex(RuntimeError,'incomplete session mode'):gnome.valid_scene(value)
+        value['guards']['parentSessionMode']='user'
+        self.assertEqual(gnome.valid_scene(value),value)
+        value['inputQualified']=True
+        with self.assertRaises(RuntimeError):gnome.valid_scene(value)
+        value['inputQualified']=False;value['guards']['parentSessionMode']=True
+        with self.assertRaisesRegex(RuntimeError,'parent session mode'):gnome.valid_scene(value)
+
     def test_real_schema_preserves_negative_coordinates_and_unavailable_provider(self):
         value=fixture();self.assertEqual(gnome.valid_scene(value),value)
         value['window']['pid']=0;self.assertEqual(gnome.valid_scene(value),value)

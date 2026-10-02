@@ -14,10 +14,39 @@ MEDIA='org.gnome.settings-daemon.plugins.media-keys'
 CUSTOM=MEDIA+'.custom-keybinding'
 PORTAL='org.gnome.settings-daemon.global-shortcuts'
 PREFIX='/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/com-augmentor-agent-'
-FIELDS=('name','binding','command','enable-in-lockscreen')
+FIELDS=('name','binding','command')
 SYSTEM_SCHEMAS=('org.gnome.desktop.wm.keybindings','org.gnome.mutter.keybindings',
                 'org.gnome.mutter.wayland.keybindings','org.gnome.shell.keybindings',MEDIA)
 MODIFIERS=('Shift','Control','Alt','Super')
+
+
+def settings_profile(version,source):
+    """Explicit schema generations; readback never proves shortcut delivery.
+
+    GSD 46 assigns custom bindings NORMAL|OVERVIEW (LAUNCHER), excluding
+    lock/unlock. GSD 50 additionally exposes enable-in-lockscreen.
+    """
+    if not isinstance(version,str) or not re.fullmatch(r'(?:46|50)\.\d+(?:\.\d+)?',version):
+        raise RuntimeError('The native GNOME shortcut adapter supports GNOME 46 and 50 profiles.')
+    custom=source.lookup(CUSTOM,True)
+    if not custom or any(not custom.has_key(key) for key in FIELDS):
+        raise RuntimeError('Required GNOME custom shortcut settings are unavailable.')
+    fields=FIELDS
+    if custom.has_key('enable-in-lockscreen'):fields+=('enable-in-lockscreen',)
+    elif version.startswith('50.'):
+        raise RuntimeError('Required GNOME lock-screen shortcut setting is unavailable.')
+    if any(custom.get_key(key).get_value_type().dup_string()!=('b' if key=='enable-in-lockscreen' else 's') for key in fields):
+        raise RuntimeError('GNOME custom shortcut settings have unexpected types.')
+    portal=source.lookup(PORTAL,True)
+    application=source.lookup(PORTAL+'.application',True)
+    if bool(portal)!=bool(application) or (version.startswith('50.') and not portal):
+        raise RuntimeError('Required GNOME portal shortcut settings are unavailable.')
+    if portal and (not portal.has_key('applications') or not application.has_key('shortcuts')):
+        raise RuntimeError('GNOME portal shortcut settings are incomplete.')
+    if portal and (portal.get_key('applications').get_value_type().dup_string()!='as' or
+                   application.get_key('shortcuts').get_value_type().dup_string()!='a(sa{sv})'):
+        raise RuntimeError('GNOME portal shortcut settings have unexpected types.')
+    return fields,bool(portal)
 
 
 def instance_name(value):
@@ -63,11 +92,10 @@ class NativeShortcuts:
         version=self.bus.call_sync(shell,'/org/gnome/Shell','org.freedesktop.DBus.Properties','Get',
             GLib.Variant('(ss)',('org.gnome.Shell','ShellVersion')),None,
             Gio.DBusCallFlags.NO_AUTO_START,500,None).unpack()[0]
-        if not re.fullmatch(r'50\.\d+(?:\.\d+)?',version):
-            raise RuntimeError('The native GNOME shortcut adapter is currently qualified for GNOME 50.')
+        self.fields,self.portal_available=settings_profile(version,self.source)
         if not Gtk.init_check():raise RuntimeError('GNOME shortcut conversion requires the current graphical display.')
         self.display=Gdk.Display.get_default()
-        for schema in (MEDIA,CUSTOM,*SYSTEM_SCHEMAS,'org.gnome.mutter',PORTAL,PORTAL+'.application'):
+        for schema in (MEDIA,CUSTOM,*SYSTEM_SCHEMAS,'org.gnome.mutter'):
             if not self.source.lookup(schema,True):
                 raise RuntimeError('Required GNOME shortcut settings are unavailable.')
         self.parent=Gio.Settings.new(MEDIA)
@@ -158,6 +186,7 @@ class NativeShortcuts:
         for other in self.parent.get_strv('custom-keybindings'):
             if other!=path and self.overlaps(self.normalize(self.custom(other).get_string('binding')),requested):
                 raise ValueError('That shortcut is already assigned to another launcher. Choose another combination.')
+        if not self.portal_available:return
         portal=self.Gio.Settings.new(PORTAL)
         for app in portal.get_strv('applications'):
             if not re.fullmatch(r'[A-Za-z0-9_.-]{1,255}',app):
@@ -184,12 +213,13 @@ class NativeShortcuts:
         binding=self.encode(request);command=self.launcher(name,required=True)
         with locked():
             entry=self.custom(path);self.owned(name,entry);self.conflicts(binding,path)
-            if not self.parent.is_writable('custom-keybindings') or not all(entry.is_writable(key) for key in FIELDS):
+            if not self.parent.is_writable('custom-keybindings') or not all(entry.is_writable(key) for key in self.fields):
                 raise RuntimeError('GNOME shortcut settings are locked; no assignment was changed.')
-            before={key:entry.get_value(key) for key in FIELDS}
+            before={key:entry.get_value(key) for key in self.fields}
             added=path not in self.parent.get_strv('custom-keybindings')
             desired={'name':'Augmentor Agent'+(' — Second window' if name=='secondary' else ''),
-                     'binding':binding,'command':command,'enable-in-lockscreen':False}
+                     'binding':binding,'command':command}
+            if 'enable-in-lockscreen' in self.fields:desired['enable-in-lockscreen']=False
             try:
                 entry.delay()
                 for key,value in desired.items():
