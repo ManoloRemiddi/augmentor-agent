@@ -72,5 +72,22 @@
     "physicalAudioTested": false,
     "releaseApproved": false
   },
-  "next": "Preserve .3 failure; compare a separately cloned fixture using coherent official previous Mesa packages only after verifying exact package identities. Do not patch product or use unsupported EGL environment overrides."
+  "next": "Preserve .3 failure; compare a separately cloned fixture using coherent official previous Mesa packages only after verifying exact package identities. Do not patch product or use unsupported EGL environment overrides.",
+  "ubuntuPackagingComparison": {
+    "officialArchive": "https://archive.ubuntu.com/ubuntu/pool/main/m/mesa/",
+    "versions": [
+      "25.2.8-0ubuntu0.24.04.2",
+      "25.2.8-0ubuntu0.24.04.3"
+    ],
+    "changedFiles": [
+      "debian/changelog",
+      "debian/rules"
+    ],
+    "patchesAndControlIdentical": true,
+    "onlyBuildFlagAddedIn3": "-Dlegacy-wayland=bind-wayland-display",
+    "archiveSha256": {
+      "mesa_25.2.8-0ubuntu0.24.04.2.debian.tar.xz": "0a9571bb53628d9fb934e8f02bbbe7e7fb411fece5f46f3cc50a7aa7f2615e5b",
+      "mesa_25.2.8-0ubuntu0.24.04.3.debian.tar.xz": "fbfc96994db7efe6918310486c9201b0e312d38afff2da8e7b37d9e9598a671d"
+    }
+  }
 }

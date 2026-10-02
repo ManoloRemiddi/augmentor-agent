@@ -1655,8 +1655,13 @@ merged May 13: require a valid render fd before advertising the legacy Wayland
 binding extension. The checked diagnostic preserves actual stack/local values
 and primary-source hashes; no fix has yet been applied or accepted in this guest.
 Software fallback and earlier warning messages alone did not establish the cause.
-Ubuntu's official .3 source re-enabled that extension compared with .2. Research
-an explicitly separate, coherent official .2 fixture comparison; it cannot turn
+An independent full-file comparison of Ubuntu's official
+[.2 packaging archive](https://archive.ubuntu.com/ubuntu/pool/main/m/mesa/mesa_25.2.8-0ubuntu0.24.04.2.debian.tar.xz)
+and [.3 archive](https://archive.ubuntu.com/ubuntu/pool/main/m/mesa/mesa_25.2.8-0ubuntu0.24.04.3.debian.tar.xz)
+finds only changelog and build-rule differences: .3 adds the legacy Wayland binding
+flag; patches and package control are identical. Their exact hashes are now in
+the diagnostic. Research an explicitly separate, coherent official .2 fixture
+comparison; it cannot turn
 the current .3 failure into a passing result. A compositor failure under this
 software-only virtual GPU does not establish failure on physical Ubuntu desktops.
 
