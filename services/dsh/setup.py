@@ -15,7 +15,9 @@ import urllib.request
 from urllib.parse import urlsplit, parse_qs, urlunsplit
 import sys
 sys.path.insert(0,str(Path(__file__).resolve().parent))
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from remote import client as remote_client
+from platform_adapters.paths import link_directory
 import uuid
 
 ROOT=Path(__file__).resolve().parents[2]
@@ -36,7 +38,8 @@ def personal_agent_entries():
         {'id':'augmentor-execution','name':str(ROOT/'adapters/dsh-execution/index.mjs')},
         {'id':'augmentor-response-metrics','name':str(ROOT/'adapters/dsh-response-metrics/index.mjs')},
         {'id':'command-goal','name':'@deepseek-ai/dsh-command-goal'},
-        {'id':'tool-bash','name':'@deepseek-ai/dsh-tool-bash'},
+        {'id':'tool-pwsh' if sys.platform=='win32' else 'tool-bash',
+         'name':'@deepseek-ai/dsh-tool-pwsh' if sys.platform=='win32' else '@deepseek-ai/dsh-tool-bash'},
         {'id':'tool-fs','name':'@deepseek-ai/dsh-tool-fs'},
         {'id':'tool-ask-user','name':'@deepseek-ai/dsh-tool-ask-user'},
         {'id':'augmentor-desktop','name':str(ROOT/'adapters/dsh-desktop/index.mjs')},
@@ -78,6 +81,29 @@ def atomic(path,value):
         temporary.chmod(0o600);temporary.replace(path)
     finally:
         if temporary:temporary.unlink(missing_ok=True)
+
+def product_token(path, *, create=False):
+    """Protect the token itself, without changing an external DSH directory ACL.
+
+    chmod(0600) does not establish Windows ownership or a protected DACL. The
+    explicit kernel descriptor does, including when setup runs elevated. Existing
+    files are validated before reading; creation never replaces another token.
+    """
+    from platform_adapters.private_files import descriptor
+    if sys.platform == 'win32':
+        from platform_adapters.windows_identity import private_file_descriptor
+        fd = private_file_descriptor(path, writable=create, exclusive=create, private_parent=False)
+    else:
+        fd = descriptor(path, writable=create, exclusive=create)
+    with os.fdopen(fd, 'w' if create else 'r', encoding='utf-8') as stream:
+        if create:
+            value = secrets.token_hex(32)
+            stream.write(value+'\n'); stream.flush(); os.fsync(stream.fileno())
+        else:
+            value = stream.read(128).strip()
+        if not re.fullmatch('[a-f0-9]{64}',value):
+            raise ValueError('An existing integration token needs manual review.')
+        return value
 def describe():
     saved=current()
     return {'endpoint':saved.get('endpoint','http://127.0.0.1:3080'),'home':saved.get('home',os.environ.get('DSH_HOME',str(Path.home()/'.dsh'))),'configured':bool(saved),'supportedDsh':'0.1.5-rc.1','version':VERSION}
@@ -93,6 +119,33 @@ def modules_directory(cli):
                 return modules,required
         except (OSError,ValueError):pass
     raise ValueError('Install the supported DSH 0.1.5-rc.1 CLI before connecting it.')
+
+
+def cli_directory():
+    selected = os.environ.get('AUGMENTOR_DSH_CLI')
+    binary = selected or shutil.which('dsh')
+    if not binary:
+        raise ValueError('Make the installed DSH command available before connecting it.')
+    path = Path(binary).resolve(strict=True)
+    if selected and not Path(selected).is_absolute():
+        raise ValueError('The selected DSH entrypoint must be an absolute installed path.')
+    if sys.platform == 'win32' or selected:
+        # npm's Windows .cmd shim is not executable JavaScript and is never
+        # parsed or passed to a shell. Locate and validate its package manifest.
+        candidates = []
+        for parent in path.parents:
+            candidates.extend((parent, parent/'node_modules/@deepseek-ai/dsh'))
+    else:
+        candidates = [path.parent.parent]
+    for candidate in candidates:
+        manifest = candidate/'package.json'
+        try:
+            meta = json.loads(manifest.read_text(encoding='utf-8'))
+        except (OSError, ValueError):
+            continue
+        if meta.get('name') == '@deepseek-ai/dsh' and meta.get('version') == '0.1.5-rc.1':
+            return candidate
+    raise ValueError('Use the supported Node DSH 0.1.5-rc.1 CLI installation.')
 
 def existing_prompt_plugin(remote,base):
     rows=remote.invoke('pluginInventory/list').get('entries',[])
@@ -112,15 +165,19 @@ class Setup:
         self.pending=None;raw=urlsplit(p.get('endpoint',''));query=parse_qs(raw.query)
         if raw.query and (set(query)!={'token'} or len(query['token'])!=1):raise ValueError('Use the local DSH launch URL.')
         base=endpoint(urlunsplit(raw._replace(query='')));home=Path(p.get('home','')).expanduser()
-        if not home.is_absolute() or home.is_symlink() or not home.is_dir() or home.stat().st_uid!=os.getuid():raise ValueError('Choose this user’s existing DSH data folder.')
+        if not home.is_absolute() or home.is_symlink() or not home.is_dir():raise ValueError('Choose this user’s existing DSH data folder.')
+        if sys.platform == 'win32':
+            from platform_adapters.windows_identity import reject_reparse_ancestors, current_sid
+            import win32security
+            reject_reparse_ancestors(home)
+            owner=win32security.GetFileSecurity(str(home),win32security.OWNER_SECURITY_INFORMATION).GetSecurityDescriptorOwner()
+            if owner!=current_sid():raise ValueError('Choose this user’s existing DSH data folder.')
+        elif home.stat().st_uid!=os.getuid():raise ValueError('Choose this user’s existing DSH data folder.')
         home=home.resolve();profile=home/'profiles/web'
         # DSH's first-party bundles belong to the CLI installation, not the
         # user's profile node_modules. Reuse that checked SDK; do not install
         # or copy a second DSH runtime into the profile.
-        binary=shutil.which('dsh')
-        if not binary:raise ValueError('Make the installed DSH command available on PATH before connecting it.')
-        cli=Path(binary).resolve().parent.parent
-        if not (cli/'package.json').is_file() or any(json.loads((cli/'package.json').read_text()).get(k)!=v for k,v in [('name','@deepseek-ai/dsh'),('version','0.1.5-rc.1')]):raise ValueError('Use the supported Node DSH 0.1.5-rc.1 CLI installation.')
+        cli=cli_directory()
         modules,packages=modules_directory(cli)
         remote=remote_client(base,home,query.get('token',[None])[0]);remote.authorize()
         host=remote.call('host.describe')
@@ -184,8 +241,8 @@ class Setup:
             shutil.copy2(ROOT/'apps/browser/plugin/dist/index.js',plugin/'dist/index.js')
             shutil.copy2(ROOT/'apps/browser/plugin/package.json',plugin/'package.json')
             dependency=plugin/'node_modules';(dependency/'@deepseek-ai').mkdir(parents=True)
-            for name in ('dsh-tools','schemastery'):(dependency/'@deepseek-ai'/name).symlink_to(Path(p['modules'])/'@deepseek-ai'/name,target_is_directory=True)
-            (dependency/'ws').symlink_to(ROOT/'node_modules/ws',target_is_directory=True)
+            for name in ('dsh-tools','schemastery'):link_directory(dependency/'@deepseek-ai'/name,Path(p['modules'])/'@deepseek-ai'/name)
+            link_directory(dependency/'ws',ROOT/'node_modules/ws')
             if previous:
                 old_target=profile/('augmentor-product.before-'+uuid.uuid4().hex);target.rename(old_target)
                 for old_path,value in old_presets.items():atomic(old_target/'presets'/old_path.parent.name/old_path.name,value)
@@ -199,10 +256,8 @@ class Setup:
                 atomic(directory/'preset.yml',HEADER+json.dumps({'name':'Augmentor '+surface.title(),'description':'Augmentor product integration '+VERSION})+'\n')
                 atomic(directory/'agent.cordis.yml',HEADER+json.dumps(entries,indent=2)+'\n')
             secret=home/'augmentor-product-token'
-            if secret.exists():
-                value=secret.read_text().strip()
-                if secret.is_symlink() or not re.fullmatch('[a-f0-9]{64}',value):raise ValueError('An existing integration token needs manual review.')
-            else:atomic(secret,secrets.token_hex(32)+'\n');made.append(secret)
+            if secret.exists() or secret.is_symlink():product_token(secret)
+            else:product_token(secret,create=True);made.append(secret)
             backup=profile/('cordis.patch.yml.before-augmentor-'+uuid.uuid4().hex)
             if patch.exists():shutil.copy2(patch,backup)
             additions=[{'id':'augmentor-product','name':str(ROOT/'adapters/dsh-product/index.mjs')},{'id':'augmentor-product-browser','name':str(target/'browser/dist/index.js'),'config':{'agentPreset':PRESETS['browser'],'chatDir':str(Path(os.environ.get('AUGMENTOR_DSH_WORKSPACE_ROOT',Path.home()))/'Augmentor Browser DSH'),'deleteAfterDays':0}},{'id':'augmentor-product-prompts','name':str(ROOT/'adapters/dsh-prompt-library/lib/index.js')}]

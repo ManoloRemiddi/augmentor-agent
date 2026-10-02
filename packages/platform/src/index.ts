@@ -12,13 +12,13 @@ export function pythonExecutable(){
   const declared=declaredLinuxPython(root);
   if(declared)return declared;
   if(process.env.AUGMENTOR_PYTHON)return process.env.AUGMENTOR_PYTHON;
-  const bundled=join(root,'python/bin/python3');
-  return existsSync(bundled)?bundled:process.platform==='linux'?'/usr/bin/python3':'python3';
+  const bundled=join(root,process.platform==='win32'?'python/python.exe':'python/bin/python3');
+  return existsSync(bundled)?bundled:process.platform==='linux'?'/usr/bin/python3':process.platform==='win32'?'python.exe':'python3';
 }
 export function componentEnvironment():NodeJS.ProcessEnv {
   const python=pythonExecutable();
-  const env:NodeJS.ProcessEnv={...process.env,AUGMENTOR_PYTHON:python,PYTHONDONTWRITEBYTECODE:'1'};
-  const node=join(root,'node/bin/node');
+  const env:NodeJS.ProcessEnv={...process.env,AUGMENTOR_PYTHON:python,PYTHONDONTWRITEBYTECODE:'1',PYTHONUTF8:'1'};
+  const node=join(root,process.platform==='win32'?'node/node.exe':'node/bin/node');
   if(existsSync(node))env.AUGMENTOR_PI_NODE??=node;
   env.PATH=[...(existsSync(node)?[dirname(node)]:[]),dirname(python),env.PATH??''].join(delimiter);
   if(process.platform==='darwin'){

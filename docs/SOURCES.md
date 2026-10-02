@@ -307,6 +307,45 @@ value omits internal failures. Streaming gateway assembly was tested against the
 existing Qwen endpoint, including real cancellation. DSH surface replacement and
 Pi lifecycle hooks retain their pinned versions. See [contract and evidence](CONTROLLED-MEMORY.md).
 
+### Windows voice configuration candidate (28 September 2026)
+
+The shared DSH graph now selects Resonant Voice 0.1.17 from source `aae6a51`
+([dependency PR #2](https://github.com/ManoloRemiddi/resonant-voice/pull/2)).
+Its native Windows ACL adapter fixes the 0.1.16 Unix-mode-bit rejection without
+relaxing token privacy. Configuration tests pass on x64/ARM64 at `22fd869`;
+Augmentor integration remains under qualification. Koffi 3.2.1 was already in the
+locked DSH graph and is now also an explicit voice dependency. See the
+[Windows evidence ledger](WINDOWS-IMPLEMENTATION-STATUS.md) and
+[archive provenance](../release/dsh/plugins/README.md). No installed speech
+runtime, GPU placement or public release is changed by this candidate.
+
+The next shared candidate is **0.1.18**, exact source `7a6645e`. It adds reversible
+private maintenance admission, actual idle CLI natural exit and correct Cordis
+cleanup. Native private-config and five maintenance tests pass on both CPUs in
+[run 36371851225](https://github.com/ManoloRemiddi/resonant-voice/actions/runs/36371851225).
+The archive and integrity lock are updated together for Linux/macOS/Windows; see
+the archive provenance above. Complete product coordination and physical speech
+acceptance remain separate gates; existing deployed speech placement is unchanged.
+
+## September 28 voice preference replacement qualification
+
+Current shared dependency is **Resonant Voice 0.1.19**, exact source
+`7d0fd6d677ea4bbbca0183a6bb3a3d3f24a8147a`. Its native x64/ARM64 configuration and
+maintenance checks pass in [36389214161](https://github.com/ManoloRemiddi/resonant-voice/actions/runs/36389214161),
+and the packed archive passes disposable DSH install/compose/remove. This fixes
+Windows ownership during automatic profile cloning/preferences. The shared lock
+and complete package select this same archive on all OSs. Assembled native graph
+drain/restart remains to be qualified with it; physical audio remains open.
+
+## Windows selected updater runtime, September 28
+
+The Windows candidate now bundles hash-pinned WinSparkle 0.9.4 from
+`release/windows/installer-candidates.json`, including x64/ARM64 DLLs and license
+notices. The previously rejected Velopack 1.2.158 Python package is removed from
+both runtime locks; historical characterization uses the archived `805664f` lock.
+The selected Inno 7.1.0/WinSparkle fixtures were qualified earlier; this actual
+application payload addition still requires native qualification. Customer update
+checks remain disabled. See [signed update delivery](WINDOWS-UPDATE-DELIVERY.md).
 
 ### Codex voice development contract
 

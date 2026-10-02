@@ -6,7 +6,8 @@ Current-main integration additionally preserves the bundled dictation component
 and its Debian dependencies alongside these runtime contracts. See
 [the actual working-merge report](../release/qualification/next-targets/20261002-main-dictation-distro-integration.json).
 The earlier runtime-only proofs below do not qualify that combined product;
-matching dictation/native-library ABI and complete packages remain required.
+matching dictation now has [actual native loader/startup evidence](LINUX-HANDY-NATIVE-CLOSURE.md).
+Complete packages and full product/native-session/audio acceptance remain required.
 
 The two existing system-Qt voice profiles now bind a separately reviewed distro
 Python/Qt inventory into their immutable runtime identity. An existing runtime

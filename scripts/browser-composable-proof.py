@@ -55,7 +55,23 @@ env.update(XDG_RUNTIME_DIR=str(temp/'runtime'),AUGMENTOR_PI_SOCKET=str(temp/'pi.
 config=temp/'pi-config';(config/'agent').mkdir(parents=True)
 if not os.environ.get('AUGMENTOR_PROOF_FRESH'):(config/'agent/models.json').write_text(json.dumps({'providers':{'test':{'baseUrl':f'http://127.0.0.1:{server.server_port}/v1','api':'openai-completions','apiKey':'test','models':[{'id':'test','name':'Test','reasoning':False,'input':['text'],'contextWindow':32000,'maxTokens':2048}]}}}))
 if not os.environ.get('AUGMENTOR_PROOF_FRESH'):(config/'settings.json').write_text(json.dumps({'revision':0,'defaultPreset':'danger-full-access','pinned':[],'hidden':[],'defaultModel':{'provider':'test','model':'test'}}))
-launcher=temp/'native-host';launcher.write_text('#!/bin/sh\nexec '+shlex.quote(str(app_root/'node/bin/node') if (app_root/'node/bin/node').exists() else subprocess.check_output(['which','node'],text=True).strip())+' '+shlex.quote(str(app_root/'apps/browser/native-host.mjs'))+' "$@"\n');launcher.chmod(0o700)
+native_node=str(app_root/'node/bin/node') if (app_root/'node/bin/node').exists() else subprocess.check_output(['which','node'],text=True).strip()
+launcher=temp/'native-host';launcher.write_text('#!/bin/sh\nexec '+shlex.quote(native_node)+' '+shlex.quote(str(app_root/'apps/browser/native-host.mjs'))+' "$@"\n');launcher.chmod(0o700)
+proof_control=None
+if os.environ.get('AUGMENTOR_PROOF_MAINTENANCE'):
+    (temp/'home').mkdir(mode=0o700)
+    env.update(HOME=str(temp/'home'),XDG_STATE_HOME=str(temp/'xdg-state'),
+               AUGMENTOR_SHARED_CONFIG=str(temp/'shared-config'),DSH_HOME=str(temp/'dsh'),
+               DSH_AUGMENTOR_URL='http://127.0.0.1:1',DSH_AUGMENTOR_WS_TOKEN='disposable-maintenance-proof',
+               AUGMENTOR_DSH_WORKSPACE_ROOT=str(temp/'workspace'))
+    if sys.platform!='linux':raise RuntimeError('This private-owner Chromium proof uses the Linux qualification adapter; Windows has a separate compiled owner proof.')
+    sys.path.insert(0,str(root/'services'))
+    # Each native host has its own real private owner, as on Windows. One shared
+    # endpoint races when Chromium replaces its initial DSH host with Pi while
+    # the former host is still naturally draining.
+    launcher.write_text('#!/bin/sh\nexec '+shlex.join([sys.executable,str(root/'scripts/browser-maintenance-host-proof.py'),
+        str(app_root),native_node])+' "$@"\n')
+    proof_control=temp/'runtime'
 if os.environ.get('AUGMENTOR_PROOF_NATIVE_HOST'):launcher=Path(os.environ['AUGMENTOR_PROOF_NATIVE_HOST'])
 manifest=temp/'profile/NativeMessagingHosts/com.augmentor.agent.json';manifest.parent.mkdir(parents=True)
 # Public manifest key gives a stable extension ID in all test profiles.
@@ -159,6 +175,12 @@ try:
     def back_to_chat():
         global panel
         panel=chat_panel;cdp('Target.activateTarget',{'targetId':target})
+    if os.environ.get('AUGMENTOR_PROOF_MAINTENANCE'):
+        from proof_browser_maintenance import prove
+        evidence=prove(proof_control,cdp,evaluate,until,send,open_settings,chat_panel,ext_id)
+        (root/'outputs').mkdir(exist_ok=True)
+        (root/'outputs/browser-maintenance-proof.json').write_text(json.dumps(evidence,indent=2)+'\n');print(json.dumps(evidence),flush=True)
+        raise SystemExit(0)
     if os.environ.get('AUGMENTOR_PROOF_SETTINGS'):
         from proof_browser_settings import prove
         evidence=prove(root,temp,cdp,evaluate,click,fill,until,send,open_settings,back_to_chat,chat_panel)

@@ -83,7 +83,7 @@ graphical Browser, physical audio, upgrade and legal/release acceptance.
   Execution recovery is enabled once in both Augmentor presets; no separate plugin installation is needed.
   It bounds empty/truncated-response recovery, preserves Stop and user handoffs, and prevents
   exact duplicate changes during recovery. It does not certify that a model answer is correct.
-- Model Picker Augmented 1.1.2, Adaptive Reasoning 0.2.3 and Resonant Voice 0.1.16.
+- Model Picker Augmented 1.1.2, Adaptive Reasoning 0.2.3 and Resonant Voice 0.1.19.
 - Desktop login startup, connection recovery, consistent release selection and
   a separate second-window menu entry. On KDE, available defaults are
   **Super+Alt+Space** for the main window and **Super+Alt+Shift+Space** for the

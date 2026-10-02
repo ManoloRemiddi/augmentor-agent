@@ -8,6 +8,8 @@ import platform
 import re
 import shutil
 import socket
+from platform_adapters.paths import runtime_directory
+from platform_adapters.transport import LocalSocket
 
 ROOT=Path(__file__).resolve().parents[2]
 
@@ -21,9 +23,9 @@ def report():
             if key in ('ID','VERSION_ID') and re.fullmatch(r'[A-Za-z0-9._-]{1,40}',value):distro[key]=value
     except OSError:pass
     desktop={'reachable':False}
-    path=Path(os.environ.get('XDG_RUNTIME_DIR',f'/run/user/{os.getuid()}'))/'augmentor-desktop.sock'
+    path=runtime_directory()/'augmentor-desktop.sock'
     try:
-        with socket.socket(socket.AF_UNIX) as client:
+        with LocalSocket() as client:
             client.settimeout(1);client.connect(str(path));client.sendall(b'{"protocol":"augmentor-desktop/1","method":"status"}\n')
             with client.makefile('rb') as reader:response=json.loads(reader.readline(8193))
             if response.get('ok'):

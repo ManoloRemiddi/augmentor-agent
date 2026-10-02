@@ -35,5 +35,5 @@ export function applyWithCapabilities(ctx,capabilities){
     }})
   ctx.on('agent/turn-stopping',async({agent})=>{const owner='dsh:'+agent.id;if(owners.has(owner)){await control('stop',owner).catch(()=>{});owners.delete(owner)}})
   ctx.on('agent/status',({agent,status})=>{if(status==='idle'){const owner='dsh:'+agent.id;if(owners.has(owner)){void control('stop',owner).catch(()=>{});owners.delete(owner)}}})
-  ctx.on('dispose',async()=>{await Promise.all([...owners].map(owner=>control('stop',owner).catch(()=>{})))})
+  ctx.effect(()=>async()=>{await Promise.all([...owners].map(owner=>control('stop',owner).catch(()=>{})))},'augmentor-desktop: owned control')
 }

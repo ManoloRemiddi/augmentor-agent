@@ -10,12 +10,27 @@ import tempfile
 import unittest
 from types import SimpleNamespace
 from unittest.mock import patch
+import sys
 
 ROOT=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('complete_setup',ROOT/'scripts/setup-complete.py')
 setup=importlib.util.module_from_spec(spec);spec.loader.exec_module(setup)
 
 class CompleteSetupTests(unittest.TestCase):
+    def test_bootstrap_token_is_private_and_reused_after_failed_start(self):
+        sys.path.insert(0,str(ROOT/'services'))
+        from dsh.setup import product_token
+        from platform_adapters.paths import private_directory
+        with tempfile.TemporaryDirectory() as directory:
+            home=private_directory(Path(directory)/'home');state=private_directory(Path(directory)/'state')
+            with patch('platform_adapters.processes.OwnedProcess',side_effect=RuntimeError('fixture startup failure')):
+                with self.assertRaisesRegex(RuntimeError,'fixture startup failure'):
+                    setup.configure_product(ROOT,ROOT/'fixture-cli',home,'http://127.0.0.1:3080',{},state)
+                token=product_token(home/'augmentor-product-token')
+                with self.assertRaisesRegex(RuntimeError,'fixture startup failure'):
+                    setup.configure_product(ROOT,ROOT/'fixture-cli',home,'http://127.0.0.1:3080',{},state)
+                self.assertEqual(product_token(home/'augmentor-product-token'),token)
+
     def test_local_and_secure_remote_model_settings(self):
         for url in ('http://127.0.0.1:8080/v1','https://example.test/v1'):
             value=setup.model_settings(url,'chosen-model',32768)

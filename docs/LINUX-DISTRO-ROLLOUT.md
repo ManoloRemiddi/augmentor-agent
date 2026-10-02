@@ -2,6 +2,30 @@
 
 # Linux distribution rollout
 
+## October 3 shared lifecycle and actual dictation candidate
+
+Current main`9baf711` is integrated with rollout`cb1e470`. Declared Linux runtime,
+Browser pending-work fences, graphical environment, Linux/Mac/Windows shortcut
+activation and checked public source reuse all survive the merge; current source
+reuse requires Resonant Voice0.1.19 archives. The
+[working-merge report](../release/qualification/next-targets/20261003-main-shared-lifecycle-integration.json)
+records1,025 native cases/989 passes/36 platform skips,529 SDK cases/527 passes/
+two skips,83 Browser and two separate private portal cases, all passing. Earlier
+fixture/dependency failures are retained. Both new system runtime discovery proofs
+pass again. Hosted checks for this merge still need execution; the external
+GitGuardian digest findings remain failed and unwaived.
+
+The checksum-pinned public dictation candidate also passes all25 native loader
+lists and actual disabled component protocol/theme/ownership/EOF startup on Arch
+and Leap after distro-native dependencies. See
+[the native candidate guide](LINUX-HANDY-NATIVE-CLOSURE.md) and
+[actual artifact/fixture report](../release/qualification/next-targets/20261003-handy-arch-leap-native-candidate.json).
+This is neither complete installed-product nor physical audio/native input
+acceptance. Full packages/installers, real sessions/Browser/audio/lifecycle and
+source/legal/release gates remain open; all five rollout points stay active. The
+22-file license proposal, owner selection/services/models/devices stay unchanged.
+
+
 ## October 2 Arch/Leap Node admission
 
 The compiled selector now admits only the exact Arch/Leap system-Qt profiles.

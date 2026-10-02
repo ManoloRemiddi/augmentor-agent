@@ -9,6 +9,22 @@ the split-launcher and adaptive-event failures, managed startup, saved-chat
 recovery, the standalone `augmentor-recover` command and current verification.
 The September 16 evidence below is historical and did not cover those failures.
 
+The active Windows branch routes managed DSH recovery through the same per-user
+supervisor that retains its provider environment. Augmentor startup/recovery
+locks use the platform lease adapter. History mutation uses a separate,
+version-specific DSH lease: `flock(session.lock)` on Unix and the pinned DSH
+path-derived Windows semaphore. A Windows file lock would not protect against
+the harness writer. Native qualification must prove contention with the actual
+DSH process, Stop and release after owner exit before claiming Windows recovery
+support. See [Windows implementation evidence](WINDOWS-IMPLEMENTATION-STATUS.md).
+
+Private repair backups remain outside the active session tree. Atomic
+replacement uses Windows write-through rename or Unix rename plus directory
+flush. Windows external DSH profiles keep their external lifecycle: if stopped,
+recovery asks for their own launcher rather than taking over an unknown service
+or dropping its private environment. Managed Windows profiles can be restarted
+through Augmentor. No existing installed profile was changed by this port.
+
 ## Incident: 16 September 2026 (historical)
 
 The native desktop was configured for DSH at `http://127.0.0.1:3080`.
@@ -85,3 +101,11 @@ active leases, symlinks, startup routing and occupied-port protection.
 stops and recovers a real DSH fixture profile without sending model requests.
 The DSH fixture deliberately omits the product integration; the live installation
 was separately verified through its existing product adapter in the incident.
+
+Windows recovery creates backups and manifests with protected user/SYSTEM ACLs
+and the current user's SID as owner. It prepares replacement history in a private
+temporary directory on the same volume, verifies the original and backup, then
+uses an atomic Windows replacement with write-through. Existing foreign-owned,
+linked or changing histories remain untouched. No Unix `chmod` claim is used as
+Windows privacy evidence. Native Windows qualification is tracked separately in
+the [implementation ledger](WINDOWS-IMPLEMENTATION-STATUS.md).

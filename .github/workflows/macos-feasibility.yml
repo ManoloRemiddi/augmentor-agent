@@ -72,10 +72,16 @@ jobs:
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_instances.py -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_dsh_payload_staging.py -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_prompt_client_startup.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_managed_dsh.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_private_files.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_dsh_session_lease.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_browser_voice.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_recovery.py -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_activity.py -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_ui_scale.py -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_fluid.py -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_window.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_local_health.py -v
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: handy-darwin-arm64

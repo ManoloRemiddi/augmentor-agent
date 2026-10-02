@@ -7,14 +7,14 @@ import {setTimeout as delay} from 'node:timers/promises'
 import {BrowserVoice} from '../apps/browser/shared/voice-client.mjs'
 import {BrowserInteractions} from '../apps/browser/shared/interactions.mjs'
 const id='11111111-1111-4111-8111-111111111111'
-function fixture(t,{submit=async()=>({accepted:true}),ticket=async sessionId=>({protocol:'resonant-voice/1',url:'ws://127.0.0.1:9999/voice',sessionId,ticket:'private'})}={}){
+function fixture(t,{submit=async()=>({accepted:true}),closeOnEnd=true,ticket=async sessionId=>({protocol:'resonant-voice/1',url:'ws://127.0.0.1:9999/voice',sessionId,ticket:'private'})}={}){
  const commands=[],events=[];let worker
  const voice=new BrowserVoice({ticket,submit,notify:e=>events.push(e),spawnWorker:()=>{
-  worker=new EventEmitter();worker.stdout=new PassThrough();worker.stdin=new PassThrough();worker.kill=()=>worker.emit('exit');
-  worker.stdin.on('data',data=>commands.push(JSON.parse(data)));worker.stdin.on('end',()=>worker.emit('exit'));return worker
+  worker=new EventEmitter();worker.stdout=new PassThrough();worker.stdin=new PassThrough();worker.kill=()=>assert.fail('Ordinary voice close must not kill a worker');
+  worker.stdin.on('data',data=>commands.push(JSON.parse(data)));worker.stdin.on('end',()=>{if(closeOnEnd){worker.emit('exit');worker.emit('close')}});return worker
  }})
  t.after(()=>voice.close())
- return {voice,commands,events,event:value=>worker.stdout.write(JSON.stringify(value)+'\n')}
+ return {voice,commands,events,exit:()=>worker.emit('exit'),closed:()=>worker.emit('close'),event:value=>worker.stdout.write(JSON.stringify(value)+'\n')}
 }
 test('shared voice submits final transcript exactly once and never replays unknown outcomes',async t=>{
  const calls=[];const f=fixture(t,{submit:async(...args)=>{calls.push(args);throw Error('lost acknowledgement')}})
@@ -40,6 +40,25 @@ test('voice endpoint validation fails closed',async t=>{
  await f.voice.start({id,sessionId:'personal'});await delay(0)
  assert.equal(f.voice.active,null);assert.equal(f.commands.some(c=>c.action==='start'),false)
  assert.equal(f.events.some(e=>e.params.type==='error'),true)
+})
+test('closed browser voice remains busy until the worker actually closes and accepted submission settles',async t=>{
+ let release;const f=fixture(t,{closeOnEnd:false,submit:()=>new Promise(resolve=>release=resolve)})
+ await f.voice.start({id,sessionId:'personal'});await delay(0)
+ f.event({type:'transcript',sessionId:'personal',requestId:id,text:'An accepted voice request'})
+ await delay(0);assert.equal(typeof release,'function')
+ const closing=f.voice.close();assert.equal(f.voice.active,null);assert.equal(f.voice.busy,true)
+ await assert.rejects(f.voice.start({id,sessionId:'personal'}),/still finishing/)
+ f.exit();assert.equal(f.voice.busy,true,'exit does not prove stdio/resource closure')
+ f.closed();await closing;assert.equal(f.voice.busy,true,'accepted submission outlives the UI worker')
+ release({accepted:true});await f.voice.settled();assert.equal(f.voice.busy,false)
+ assert.equal(f.commands.some(command=>command.action==='submission'),false,'closed worker receives no late result')
+})
+test('a closing worker outlives the former force-kill deadline without losing its busy state',async t=>{
+ const f=fixture(t,{closeOnEnd:false})
+ await f.voice.start({id,sessionId:'personal'});await delay(0)
+ let done=false;const closing=f.voice.close().then(()=>done=true)
+ await delay(2100);assert.equal(done,false);assert.equal(f.voice.busy,true)
+ f.exit();f.closed();await closing;assert.equal(f.voice.busy,false)
 })
 test('browser interaction client never retries a lost decision acknowledgement',async t=>{
  const calls=[],events=[],rows=[{id,kind:'approval',payload:{toolName:'bash'}}]

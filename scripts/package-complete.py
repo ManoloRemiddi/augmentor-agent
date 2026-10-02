@@ -37,7 +37,7 @@ def reuse_sources(bundle, destination):
     manifest=json.loads((bundle/'bundle.json').read_text())
     if manifest.get('format')!='augmentor-complete/1':raise ValueError('Unknown source bundle format.')
     refs={}
-    for role,name,version in [('voice','resonant-voice','0.1.16'),('adaptive','adaptive-reasoning','0.2.3')]:
+    for role,name,version in [('voice','resonant-voice','0.1.19'),('adaptive','adaptive-reasoning','0.2.3')]:
         key='sources/'+name+'-'+version+'-source.tar.gz'
         path=bundle/key
         if sha(path)!=manifest['sha256'].get(key):raise ValueError('Source archive checksum differs: '+key)
@@ -87,12 +87,12 @@ def main():
     if sha(path)!=browser['sha256']:raise ValueError('Browser artifact hash differs.')
     shutil.copy2(path,out/path.name)
     plugins=[]
-    components={'dsh':'0.1.5-rc.1','modelPicker':'1.1.2','adaptiveReasoning':'0.2.3','resonantVoice':'0.1.16',
+    components={'dsh':'0.1.5-rc.1','modelPicker':'1.1.2','adaptiveReasoning':'0.2.3','resonantVoice':'0.1.19',
                 'executionRecovery':'bundled action-aware DSH adapter',
                 'automaticMemory':'Hindsight 0.10.0 (explicit optional provisioning)'}
     prerequisite=ROOT/'release/codex/runtime-prerequisite.json'
     if prerequisite.exists():components['codexPrerequisite']=json.loads(prerequisite.read_text())
-    for source,name,ver in [(a.voice,'dsh-resonant-voice','0.1.16'),(a.adaptive,'dsh-adaptive-reasoning','0.2.3'),
+    for source,name,ver in [(a.voice,'dsh-resonant-voice','0.1.19'),(a.adaptive,'dsh-adaptive-reasoning','0.2.3'),
                             (a.model_picker,'dsh-model-picker-augmented','1.1.2')]:
         plugin(source,name,ver);target=out/'plugins'/source.name;target.parent.mkdir(exist_ok=True)
         shutil.copy2(source,target);plugins.append(str(target.relative_to(out)))
@@ -110,7 +110,7 @@ def main():
     if a.source_bundle:
         shared_refs,source_bundle=reuse_sources(a.source_bundle,sources);refs.update(shared_refs)
     else:
-        refs.update(voice=source_archive(a.voice_source,sources/'resonant-voice-0.1.16-source.tar.gz'),
+        refs.update(voice=source_archive(a.voice_source,sources/'resonant-voice-0.1.19-source.tar.gz'),
                     adaptive=source_archive(a.adaptive_source,sources/'adaptive-reasoning-0.2.3-source.tar.gz'))
     script='#!/bin/sh\n# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0\nset -eu\ncd -- "$(dirname -- "$0")"\nsha256sum -c SHA256SUMS\nexec /usr/bin/python3 ./setup.py --bundle "$PWD" "$@"\n'
     (out/'install.sh').write_text(script);(out/'install.sh').chmod(0o755)

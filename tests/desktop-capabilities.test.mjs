@@ -31,7 +31,7 @@ for(const reason of ['unsupported-session','dependencies-missing','window-observ
 test('unavailable Pi and DSH backends keep Stop without advertising input tools',()=>{
  const pi=[];desktopPackage('pi:fixture',false)({registerTool:tool=>pi.push(tool.name)});
  assert.deepEqual(pi,['linux_desktop_stop']);
- const dsh=[];const ctx={tools:{register:tool=>dsh.push(tool.name),guard:()=>{}},on:()=>{}};
+ const dsh=[];const ctx={tools:{register:tool=>dsh.push(tool.name),guard:()=>{}},on:()=>{},effect:()=>{}};
  applyWithCapabilities(ctx,{available:false});
  assert.ok(dsh.includes('linux_desktop_stop'));assert.ok(!dsh.includes('linux_desktop_connect'));
  assert.ok(!dsh.includes('linux_desktop_snapshot'));assert.ok(!dsh.includes('linux_desktop_action'));

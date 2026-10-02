@@ -10,6 +10,8 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT/'services'))
+from build_support import npm_command
 
 
 def codex_prerequisite(target, root=ROOT):
@@ -42,11 +44,11 @@ def main():
         'JSON.stringify({os:process.platform,cpu:process.arch})'],text=True))
     for name in ('package.json', 'package-lock.json'):
         shutil.copy2(ROOT / name, target / name)
-    subprocess.run(['npm', 'ci', '--ignore-scripts', '--omit=dev', '--no-audit', '--no-fund'], cwd=target, check=True)
+    subprocess.run([*npm_command(), 'ci', '--ignore-scripts', '--omit=dev', '--no-audit', '--no-fund'], cwd=target, check=True)
     codex_prerequisite(target)
     subprocess.run(['node', str(ROOT / 'scripts/prepare-ws.mjs'), str(target)], check=True)
     sdk = target / 'node_modules/@earendil-works/pi-coding-agent'
-    metadata = json.loads((sdk / 'package.json').read_text())
+    metadata = json.loads((sdk / 'package.json').read_text(encoding="utf-8"))
     if metadata.get('optionalDependencies', {}).get('@mariozechner/clipboard') != '0.3.9':
         raise SystemExit('Pi optional clipboard dependency changed; review the distribution exclusion.')
     # Pi's public loader handles absence. Augmentor uses its own Qt/browser
@@ -62,14 +64,14 @@ def main():
     # that portable path instead of ABI-specific prebuilt native addons.
     msgpackr = target / 'node_modules/msgpackr'
     if msgpackr.exists():
-        meta = json.loads((msgpackr / 'package.json').read_text())
+        meta = json.loads((msgpackr / 'package.json').read_text(encoding="utf-8"))
         if meta['version'] != '2.1.0' or meta.get('optionalDependencies', {}).get('msgpackr-extract') != '^3.0.4':
             raise SystemExit('msgpackr optional accelerator changed; review the distribution exclusion.')
         paths = [target / 'node_modules/msgpackr-extract']
         paths.extend((target / 'node_modules/@msgpackr-extract').glob('*'))
         for item in paths:
             if not item.exists(): continue
-            accelerator = json.loads((item / 'package.json').read_text())
+            accelerator = json.loads((item / 'package.json').read_text(encoding="utf-8"))
             if accelerator['version'] != '3.0.4':
                 raise SystemExit('Unexpected msgpackr accelerator version.')
             excluded.append({'name': accelerator['name'], 'version': accelerator['version'],
@@ -102,7 +104,7 @@ def main():
         if not scope.exists():
             continue
         for item in sorted(scope.glob('clipboard*')):
-            meta = json.loads((item / 'package.json').read_text())
+            meta = json.loads((item / 'package.json').read_text(encoding="utf-8"))
             if meta['version'] != '0.3.9' or not (meta['name'] == '@mariozechner/clipboard' or meta['name'].startswith('@mariozechner/clipboard-')):
                 raise SystemExit('Unexpected clipboard package; review exclusion: ' + str(item))
             excluded.append({'name': meta['name'], 'version': meta['version']})
@@ -113,9 +115,9 @@ def main():
         scope = modules / '@esbuild'
         if not scope.exists():
             continue
-        owner = json.loads((modules / 'esbuild/package.json').read_text())
+        owner = json.loads((modules / 'esbuild/package.json').read_text(encoding="utf-8"))
         for item in sorted(scope.iterdir()):
-            meta = json.loads((item / 'package.json').read_text())
+            meta = json.loads((item / 'package.json').read_text(encoding="utf-8"))
             if owner.get('optionalDependencies', {}).get(meta['name']) != meta['version']:
                 raise SystemExit('Unexpected esbuild platform dependency: ' + str(item))
             if meta.get('os') == [node_target['os']] and meta.get('cpu') == [node_target['cpu']]:
@@ -125,8 +127,8 @@ def main():
     vendor = ROOT / 'vendor/photon-node'
     if not (vendor / 'BUILD.json').exists():
         raise SystemExit('The reviewed Photon image module is missing. Run scripts/build-photon.py.')
-    record = json.loads((vendor / 'BUILD.json').read_text())
-    config = json.loads((ROOT / 'release/photon/build.json').read_text())
+    record = json.loads((vendor / 'BUILD.json').read_text(encoding="utf-8"))
+    config = json.loads((ROOT / 'release/photon/build.json').read_text(encoding="utf-8"))
     if any(record.get(key) != value for key, value in config.items()):
         raise SystemExit('Photon source/toolchain configuration changed. Rebuild and review its notices.')
     if hashlib.sha256((ROOT / 'release/photon/Cargo.lock').read_bytes()).hexdigest() != record['cargoLockSha256']:
@@ -135,7 +137,7 @@ def main():
         if hashlib.sha256((vendor / name).read_bytes()).hexdigest() != expected:
             raise SystemExit('Photon artifact differs from its build record: ' + name)
     photon = sdk / 'node_modules/@silvia-odwyer/photon-node'
-    if json.loads((photon / 'package.json').read_text())['version'] != record['npmVersion']:
+    if json.loads((photon / 'package.json').read_text(encoding="utf-8"))['version'] != record['npmVersion']:
         raise SystemExit('Pi Photon version changed; review compatibility before packaging.')
     shutil.rmtree(photon); shutil.copytree(vendor, photon)
     shutil.copytree(vendor / 'third-party', target / 'licenses/photon')

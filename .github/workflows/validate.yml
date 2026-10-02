@@ -83,11 +83,17 @@ jobs:
           export DSH_TEST_MODULES="$PWD/release/dsh/node_modules"
           python3 scripts/dsh-setup-proof.py
           DSH_INSTALL_ROOT="$PWD/release/dsh/node_modules/@deepseek-ai/dsh" node --test tests/dual-memory-integration.test.mjs
+      - name: Reserve actual Chromium pages without losing drafts or Settings
+        env:
+          AUGMENTOR_PROOF_MAINTENANCE: '1'
+        run: python3 scripts/browser-composable-proof.py
       - name: Verify stopped-runtime recovery without model requests
         run: |
           export PATH="$PWD/release/dsh/node_modules/.bin:$PATH"
           python3 scripts/proof-recovery.py
       - name: Verify Qt interactions and licensing failures
+        env:
+          PYTHONFAULTHANDLER: '1'
         run: npm run test:native
       - name: Verify Wayland shortcut wire protocol on a private D-Bus
         run: PYTHONPATH=. AUGMENTOR_PORTAL_PROOF=1 dbus-run-session -- python3 -m unittest discover -s tests -p test_dictation_portal.py -v

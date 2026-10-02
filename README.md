@@ -3,8 +3,9 @@
 # Augmentor Agent — Desktop & Browser
 
 Augmentor Agent Desktop and Augmentor Agent Browser share a local Prompt Library
-and support DSH and Pi. Linux and macOS are the first release targets; Windows is
-deferred. This repository maintains both interfaces and their harness adapters.
+and support DSH and Pi. Linux and macOS are the first release targets; the
+[Windows x64/ARM64 edition is in development](docs/WINDOWS-IMPLEMENTATION-STATUS.md).
+This repository maintains both interfaces and their harness adapters.
 
 DSH is the full-featured release target. Pi supports a declared subset; extensions
 for features that currently require DSH plugins are future work. OpenCode support

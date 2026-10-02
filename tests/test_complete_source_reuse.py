@@ -20,7 +20,7 @@ class PublishedSourceReuse(unittest.TestCase):
         (bundle/'sources').mkdir()
         manifest={'format':'augmentor-complete/1','artifactId':'synthetic-published-bundle',
                   'sourceRefs':{'voice':'a'*40,'adaptive':'b'*40},'sha256':{}}
-        for name in ('resonant-voice-0.1.16','adaptive-reasoning-0.2.3'):
+        for name in ('resonant-voice-0.1.19','adaptive-reasoning-0.2.3'):
             key='sources/'+name+'-source.tar.gz'
             content=('Synthetic public snapshot '+name).encode()
             (bundle/key).write_bytes(content)

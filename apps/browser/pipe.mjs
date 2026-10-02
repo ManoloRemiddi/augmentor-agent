@@ -88,6 +88,7 @@ import {createDshClient} from './shared/dsh-auth.mjs'
 import {createRemoteAdapter} from './shared/dsh-remote.mjs'
 import {BrowserVoice,voicePreferences} from './shared/voice-client.mjs'
 import {BrowserInteractions} from './shared/interactions.mjs'
+import {AcceptedWork} from './shared/accepted-work.mjs'
 
 const AUGMENTOR_DIR = path.dirname(fileURLToPath(import.meta.url))
 
@@ -214,6 +215,8 @@ async function dshRespond() {throw Error('Complete DSH approvals and questions i
 // flushes on 'drain' and never loses one.
 let outQueue = []
 let outPumping = false
+let outputClosed = false
+const outputWaiters = []
 // 0.1.21: Chrome's native-messaging channel caps host→extension messages at
 // 1 MiB. A bigger frame doesn't error — Chrome KILLS the connection and the
 // extension only sees "Error when communicating with the native messaging
@@ -230,6 +233,7 @@ function pushFrame(obj) {
   pumpOut()
 }
 function sendToExt(obj) {
+  if(outputClosed||process.stdout.destroyed)return
   const json = Buffer.from(wireEncode(obj), 'utf8')
   if (json.length + 4 > NMH_FRAME_MAX) {
     log('oversized frame suppressed', obj.id ?? obj.method ?? '?', `${json.length} bytes (>1 MiB)`)
@@ -252,6 +256,7 @@ function pumpOut() {
       }
     }
     outPumping = false
+    for(const resolve of outputWaiters.splice(0))resolve()
   }
   step()
 }
@@ -335,8 +340,9 @@ async function fetchPluginHandshake() {
 }
 
 async function openPluginWs() {
-  if (pluginWs) return
+  if (pluginWs||shuttingDown) return
   const info = await fetchPluginHandshake()
+  if(shuttingDown)return
   if(UNIFIED&&!info){scheduleReconnect(openPluginWs,'plugin');return}
   if (info?.protocol && info.protocol !== PROTOCOL_EXPECTED) {
     log(`PROTOCOL MISMATCH: pipe expects ${PROTOCOL_EXPECTED}, plugin reports ${info.protocol} — frames may not interoperate`)
@@ -376,6 +382,7 @@ async function openPluginWs() {
       return
     }
     if (frame.type !== 'request' || frame.id === undefined) return
+    if(shuttingDown){pluginSend({type:'reply',id:frame.id,error:{message:'The browser connection is closing; the action was not started.'}});return}
     if (frame.method !== 'browser/execute') {
       pluginSend({ type: 'reply', id: frame.id, error: { message: `unsupported method: ${frame.method}` } })
       return
@@ -460,7 +467,7 @@ async function onDownlinkFrame(stream, frame) {
 }
 
 function openDownlink(stream) {
-  if (downlinks.get(stream)?.open) return
+  if (shuttingDown||downlinks.get(stream)?.open) return
   const ws = new WebSocket(`${DSH_BASE.replace(/^http/, 'ws')}${DOWNLINK_PATHS[stream]}`)
   downlinks.set(stream, { ws, open: true })
   ws.on('open', () => log('downlink open', stream))
@@ -480,10 +487,11 @@ function openDownlink(stream) {
 // ------------------------------------------------------------- reconnect
 const retryTimers = new Map()
 function scheduleReconnect(open, key) {
-  if (retryTimers.has(key)) return
+  if (shuttingDown||retryTimers.has(key)) return
   const delay = Math.min(10000, 1000 * 2 ** (retryTimers.size % 4))
   const timer = setTimeout(() => {
     retryTimers.delete(key)
+    if(shuttingDown)return
     try {
       const r = open()
       // F5 (audit): retry targets may be async (openPluginWs, boot) — a
@@ -758,13 +766,15 @@ const localMethods = {
   },
   shutdown() {
     log('shutdown requested by extension')
-    setTimeout(() => cleanup(0), 50)
+    queueMicrotask(() => void cleanup(0))
     return { ok: true }
   },
 }
 
 // --------------------------------------------------------- dispatch (ext)
 let shuttingDown = false
+const acceptedWork = new AcceptedWork()
+let closing
 // --------------------------------------------------- history byte shaping
 // Chrome's native messaging limit is **1 MiB per host->extension message**
 // (developer.chrome.com, native-messaging: "The maximum size of a single
@@ -926,6 +936,7 @@ async function boot() {
     scheduleReconnect(boot, 'boot')
     return
   }
+  if(shuttingDown)return
   remoteDsh.start()
   log('action-channel token source:', WS_TOKEN.source)
   if(!workspaceProfile)void openPluginWs() // Embedded panels do not take the extension browser executor.
@@ -933,9 +944,11 @@ async function boot() {
 
 // --------------------------------------------------------------- lifecycle
 process.stdin.on('data', (chunk) => {
+  if(shuttingDown)return
   stdinBuf = Buffer.concat([stdinBuf, chunk])
   while (stdinBuf.length >= 4) {
     const len = stdinBuf.readUInt32LE(0)
+    if(len>1024*1024){void cleanup(1);return}
     if (stdinBuf.length < 4 + len) break
     const raw = stdinBuf.subarray(4, 4 + len)
     stdinBuf = stdinBuf.subarray(4 + len)
@@ -944,21 +957,33 @@ process.stdin.on('data', (chunk) => {
       log('bad frame from extension')
       continue
     }
-    void handleExtMessage(msg)
+    void acceptedWork.run(()=>handleExtMessage(msg)).catch(()=>void cleanup(1))
   }
 })
 
 function cleanup(code) {
-  if (shuttingDown) return
+  if(code)process.exitCode=code
+  else process.exitCode??=0
+  if (shuttingDown) return closing
   shuttingDown = true
+  acceptedWork.close();process.stdin.destroy()
+  clearInterval(pluginHb)
+  for(const timer of retryTimers.values())clearTimeout(timer)
+  retryTimers.clear()
   voice.close()
-  interactions.close()
-  remoteDsh.close()
-  for (const d of downlinks.values()) {
-    try { d.ws.terminate() } catch { /* already dead */ }
-  }
-  try { pluginWs?.terminate() } catch { /* already dead */ }
-  process.exit(code)
+  closing=(async()=>{
+    await acceptedWork.drained()
+    // A start accepted immediately before EOF may finish during draining.
+    voice.close();await voice.settled()
+    await interactions.close()
+    remoteDsh.close()
+    for(const d of downlinks.values()){try{d.ws.terminate()}catch{/* already dead */}}
+    try{pluginWs?.terminate()}catch{/* already dead */}
+    await downlinkQueue.catch(()=>{})
+    if(outPumping||outQueue.length)await new Promise(resolve=>outputWaiters.push(resolve))
+    outputClosed=true;process.stdout.end()
+  })()
+  return closing
 }
 
 process.stdin.on('end', () => {
@@ -968,6 +993,11 @@ process.stdin.on('end', () => {
 process.stdin.resume()
 process.on('SIGTERM', () => cleanup(0))
 process.on('SIGINT', () => cleanup(130))
+process.stdout.on('error',()=>{
+  outputClosed=true;outQueue=[];outPumping=false
+  for(const resolve of outputWaiters.splice(0))resolve()
+  void cleanup(1)
+})
 
 log(`pipe ${VERSION} starting; DSH base ${DSH_BASE}`)
 void boot()

@@ -1,0 +1,1108 @@
+{
+  "format": "augmentor-handy-arch-leap-native-candidate/1",
+  "date": "2026-10-03",
+  "timezone": "Europe/Rome",
+  "producer": {
+    "sourceCommit": "81a2bba34cd88b34f9f76023e04782af2df74e82",
+    "runId": 37036303734,
+    "jobId": 110935314700,
+    "artifactId": 11239857075,
+    "artifactZipBytes": 169211434,
+    "artifactZipSha256": "8d1b22b99b1f4c4a9dc451a7904e4eb794a175bd9c23c2fde3f99846d7b5cb2d",
+    "buildReceiptSha256": "ea1a5a3defdb8d60c8a0d442dbd9f2169f6a110d291f390438e3624c92f031c2",
+    "restoredCachedRuntime": true,
+    "freshCompilationClaimed": false
+  },
+  "staticElf": {
+    "format": "augmentor-handy-static-elf-inspection/1",
+    "buildReceiptSha256": "ea1a5a3defdb8d60c8a0d442dbd9f2169f6a110d291f390438e3624c92f031c2",
+    "allBuildFileHashesVerified": true,
+    "nativeFiles": [
+      {
+        "file": "bin/handy",
+        "sha256": "aba7640d55c90c0dbebba801490d464ca95d18e51f24d5d53388fadbad6ac770",
+        "needed": [
+          "libgtk-layer-shell.so.0",
+          "libtranscribe.so.0.2",
+          "libssl.so.3",
+          "libcrypto.so.3",
+          "libonnxruntime.so.1",
+          "libasound.so.2",
+          "libgdk-3.so.0",
+          "libgdk_pixbuf-2.0.so.0",
+          "libcairo.so.2",
+          "libgobject-2.0.so.0",
+          "libglib-2.0.so.0",
+          "libdbus-1.so.3",
+          "libwebkit2gtk-4.1.so.0",
+          "libgtk-3.so.0",
+          "libsoup-3.0.so.0",
+          "libgio-2.0.so.0",
+          "libjavascriptcoregtk-4.1.so.0",
+          "libgcc_s.so.1",
+          "libm.so.6",
+          "libc.so.6"
+        ],
+        "runpath": [
+          "$ORIGIN/../lib/Handy:$ORIGIN/../lib"
+        ],
+        "interpreter": [
+          "/lib64/ld-linux-x86-64.so.2"
+        ],
+        "requiredSymbolVersions": [
+          "ALSA_0.9",
+          "ALSA_0.9.0rc4",
+          "ALSA_0.9.0rc8",
+          "GCC_3.0",
+          "GCC_3.3",
+          "GCC_4.2.0",
+          "GLIBC_2.14",
+          "GLIBC_2.15",
+          "GLIBC_2.16",
+          "GLIBC_2.17",
+          "GLIBC_2.18",
+          "GLIBC_2.2.5",
+          "GLIBC_2.25",
+          "GLIBC_2.27",
+          "GLIBC_2.28",
+          "GLIBC_2.29",
+          "GLIBC_2.3",
+          "GLIBC_2.3.2",
+          "GLIBC_2.3.4",
+          "GLIBC_2.30",
+          "GLIBC_2.32",
+          "GLIBC_2.33",
+          "GLIBC_2.34",
+          "GLIBC_2.35",
+          "GLIBC_2.39",
+          "GLIBC_2.4",
+          "GLIBC_2.6",
+          "GLIBC_2.7",
+          "GLIBC_2.9",
+          "LIBDBUS_1_3",
+          "OPENSSL_3.0.0",
+          "VERS_1.24.2"
+        ],
+        "machine": "Advanced Micro Devices X86-64"
+      },
+      {
+        "file": "bin/ydotool",
+        "sha256": "766aa96f59a475931fce7e292d4e692b2d34a98d0f3ea9158131d957576a80a4",
+        "needed": [
+          "libc.so.6"
+        ],
+        "runpath": [],
+        "interpreter": [
+          "/lib64/ld-linux-x86-64.so.2"
+        ],
+        "requiredSymbolVersions": [
+          "GLIBC_2.2.5",
+          "GLIBC_2.3.4",
+          "GLIBC_2.34",
+          "GLIBC_2.4"
+        ],
+        "machine": "Advanced Micro Devices X86-64"
+      },
+      {
+        "file": "bin/ydotoold",
+        "sha256": "577e3a5a8505fcd95534297d2a2cad6e2b303da88de02c78e83eb41a4bc39965",
+        "needed": [
+          "libc.so.6"
+        ],
+        "runpath": [],
+        "interpreter": [
+          "/lib64/ld-linux-x86-64.so.2"
+        ],
+        "requiredSymbolVersions": [
+          "GLIBC_2.2.5",
+          "GLIBC_2.3.4",
+          "GLIBC_2.33",
+          "GLIBC_2.34"
+        ],
+        "machine": "Advanced Micro Devices X86-64"
+      },
+      {
+        "file": "lib/Handy/libggml-base.so.0",
+        "sha256": "af1841837cd11c51f6f5b03977b1b1bb446494950b93309942e7026fa4fef9d6",
+        "needed": [
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6"
+        ],
+        "runpath": [
+          "$ORIGIN"
+        ],
+        "interpreter": [],
+        "requiredSymbolVersions": [
+          "CXXABI_1.3",
+          "CXXABI_1.3.9",
+          "GCC_3.0",
+          "GLIBCXX_3.4",
+          "GLIBCXX_3.4.11",
+          "GLIBCXX_3.4.20",
+          "GLIBCXX_3.4.21",
+          "GLIBCXX_3.4.29",
+          "GLIBC_2.14",
+          "GLIBC_2.17",
+          "GLIBC_2.2.5",
+          "GLIBC_2.27",
+          "GLIBC_2.29",
+          "GLIBC_2.3.4",
+          "GLIBC_2.38",
+          "GLIBC_2.4"
+        ],
+        "machine": "Advanced Micro Devices X86-64"
+      },
+      {
+        "file": "lib/Handy/libggml-cpu-alderlake.so",
+        "sha256": "c136a1a47724ea3535d387733685fc0e570e6bb794cc5c11ee41cad93fc880f7",
+        "needed": [
+          "libggml-base.so.0",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6"
+        ],
+        "runpath": [
+          "$ORIGIN"
+        ],
+        "interpreter": [],
+        "requiredSymbolVersions": [
+          "CXXABI_1.3",
+          "CXXABI_1.3.9",
+          "GCC_3.0",
+          "GLIBCXX_3.4",
+          "GLIBCXX_3.4.21",
+          "GLIBCXX_3.4.29",
+          "GLIBC_2.14",
+          "GLIBC_2.2.5",
+          "GLIBC_2.27",
+          "GLIBC_2.29",
+          "GLIBC_2.3.2",
+          "GLIBC_2.3.4",
+          "GLIBC_2.32",
+          "GLIBC_2.33",
+          "GLIBC_2.34",
+          "GLIBC_2.38",
+          "GLIBC_2.4",
+          "GLIBC_2.7"
+        ],
+        "machine": "Advanced Micro Devices X86-64"
+      },
+      {
+        "file": "lib/Handy/libggml-cpu-cannonlake.so",
+        "sha256": "28a6d3d4ec1f57ad72d997f6e885a170c5ccbaab460b687303a9bf00c3f90535",
+        "needed": [
+          "libggml-base.so.0",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6"
+        ],
+        "runpath": [
+          "$ORIGIN"
+        ],
+        "interpreter": [],
+        "requiredSymbolVersions": [
+          "CXXABI_1.3",
+          "CXXABI_1.3.9",
+          "GCC_3.0",
+          "GLIBCXX_3.4",
+          "GLIBCXX_3.4.21",
+          "GLIBCXX_3.4.29",
+          "GLIBC_2.14",
+          "GLIBC_2.2.5",
+          "GLIBC_2.27",
+          "GLIBC_2.29",
+          "GLIBC_2.3.2",
+          "GLIBC_2.3.4",
+          "GLIBC_2.32",
+          "GLIBC_2.33",
+          "GLIBC_2.34",
+          "GLIBC_2.38",
+          "GLIBC_2.4",
+          "GLIBC_2.7"
+        ],
+        "machine": "Advanced Micro Devices X86-64"
+      },
+      {
+        "file": "lib/Handy/libggml-cpu-cascadelake.so",
+        "sha256": "b1ea8bca108398fdc9227b726d68da5538c849a3a34f164a380495f4ec3bcd3e",
+        "needed": [
+          "libggml-base.so.0",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6"
+        ],
+        "runpath": [
+          "$ORIGIN"
+        ],
+        "interpreter": [],
+        "requiredSymbolVersions": [
+          "CXXABI_1.3",
+          "CXXABI_1.3.9",
+          "GCC_3.0",
+          "GLIBCXX_3.4",
+          "GLIBCXX_3.4.21",
+          "GLIBCXX_3.4.29",
+          "GLIBC_2.14",
+          "GLIBC_2.2.5",
+          "GLIBC_2.27",
+          "GLIBC_2.29",
+          "GLIBC_2.3.2",
+          "GLIBC_2.3.4",
+          "GLIBC_2.32",
+          "GLIBC_2.33",
+          "GLIBC_2.34",
+          "GLIBC_2.38",
+          "GLIBC_2.4",
+          "GLIBC_2.7"
+        ],
+        "machine": "Advanced Micro Devices X86-64"
+      },
+      {
+        "file": "lib/Handy/libggml-cpu-cooperlake.so",
+        "sha256": "34ce8ebbffc07e4c48247367a22aecccc4a52f7b7b1a4cd6062aae1861558df2",
+        "needed": [
+          "libggml-base.so.0",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6"
+        ],
+        "runpath": [
+          "$ORIGIN"
+        ],
+        "interpreter": [],
+        "requiredSymbolVersions": [
+          "CXXABI_1.3",
+          "CXXABI_1.3.9",
+          "GCC_3.0",
+          "GLIBCXX_3.4",
+          "GLIBCXX_3.4.21",
+          "GLIBCXX_3.4.29",
+          "GLIBC_2.14",
+          "GLIBC_2.2.5",
+          "GLIBC_2.27",
+          "GLIBC_2.29",
+          "GLIBC_2.3.2",
+          "GLIBC_2.3.4",
+          "GLIBC_2.32",
+          "GLIBC_2.33",
+          "GLIBC_2.34",
+          "GLIBC_2.38",
+          "GLIBC_2.4",
+          "GLIBC_2.7"
+        ],
+        "machine": "Advanced Micro Devices X86-64"
+      },
+      {
+        "file": "lib/Handy/libggml-cpu-haswell.so",
+        "sha256": "8f59bc65859aaed931f2d6189c264e7d5413b026293a41b616be8b899770f176",
+        "needed": [
+          "libggml-base.so.0",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6"
+        ],
+        "runpath": [
+          "$ORIGIN"
+        ],
+        "interpreter": [],
+        "requiredSymbolVersions": [
+          "CXXABI_1.3",
+          "CXXABI_1.3.9",
+          "GCC_3.0",
+          "GLIBCXX_3.4",
+          "GLIBCXX_3.4.21",
+          "GLIBCXX_3.4.29",
+          "GLIBC_2.14",
+          "GLIBC_2.2.5",
+          "GLIBC_2.27",
+          "GLIBC_2.29",
+          "GLIBC_2.3.2",
+          "GLIBC_2.3.4",
+          "GLIBC_2.32",
+          "GLIBC_2.33",
+          "GLIBC_2.34",
+          "GLIBC_2.38",
+          "GLIBC_2.4",
+          "GLIBC_2.7"
+        ],
+        "machine": "Advanced Micro Devices X86-64"
+      },
+      {
+        "file": "lib/Handy/libggml-cpu-icelake.so",
+        "sha256": "230e810cbe25d601dbf31a065e260b08e9241d3ea760d80c01c930c1d241e423",
+        "needed": [
+          "libggml-base.so.0",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6"
+        ],
+        "runpath": [
+          "$ORIGIN"
+        ],
+        "interpreter": [],
+        "requiredSymbolVersions": [
+          "CXXABI_1.3",
+          "CXXABI_1.3.9",
+          "GCC_3.0",
+          "GLIBCXX_3.4",
+          "GLIBCXX_3.4.21",
+          "GLIBCXX_3.4.29",
+          "GLIBC_2.14",
+          "GLIBC_2.2.5",
+          "GLIBC_2.27",
+          "GLIBC_2.29",
+          "GLIBC_2.3.2",
+          "GLIBC_2.3.4",
+          "GLIBC_2.32",
+          "GLIBC_2.33",
+          "GLIBC_2.34",
+          "GLIBC_2.38",
+          "GLIBC_2.4",
+          "GLIBC_2.7"
+        ],
+        "machine": "Advanced Micro Devices X86-64"
+      },
+      {
+        "file": "lib/Handy/libggml-cpu-ivybridge.so",
+        "sha256": "167e35f24231d9119c39bc71be39f39538b7f27329eb35ba2b81ecbe6daec9ef",
+        "needed": [
+          "libggml-base.so.0",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6"
+        ],
+        "runpath": [
+          "$ORIGIN"
+        ],
+        "interpreter": [],
+        "requiredSymbolVersions": [
+          "CXXABI_1.3",
+          "CXXABI_1.3.9",
+          "GCC_3.0",
+          "GLIBCXX_3.4",
+          "GLIBCXX_3.4.21",
+          "GLIBCXX_3.4.29",
+          "GLIBC_2.14",
+          "GLIBC_2.2.5",
+          "GLIBC_2.27",
+          "GLIBC_2.29",
+          "GLIBC_2.3.2",
+          "GLIBC_2.3.4",
+          "GLIBC_2.32",
+          "GLIBC_2.33",
+          "GLIBC_2.34",
+          "GLIBC_2.38",
+          "GLIBC_2.4",
+          "GLIBC_2.7"
+        ],
+        "machine": "Advanced Micro Devices X86-64"
+      },
+      {
+        "file": "lib/Handy/libggml-cpu-piledriver.so",
+        "sha256": "9906945b84527a45f835e4331b4ce9944b1be77ae29924cc6b54362f6a533ebf",
+        "needed": [
+          "libggml-base.so.0",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6"
+        ],
+        "runpath": [
+          "$ORIGIN"
+        ],
+        "interpreter": [],
+        "requiredSymbolVersions": [
+          "CXXABI_1.3",
+          "CXXABI_1.3.9",
+          "GCC_3.0",
+          "GLIBCXX_3.4",
+          "GLIBCXX_3.4.21",
+          "GLIBCXX_3.4.29",
+          "GLIBC_2.14",
+          "GLIBC_2.2.5",
+          "GLIBC_2.27",
+          "GLIBC_2.29",
+          "GLIBC_2.3.2",
+          "GLIBC_2.3.4",
+          "GLIBC_2.32",
+          "GLIBC_2.33",
+          "GLIBC_2.34",
+          "GLIBC_2.38",
+          "GLIBC_2.4",
+          "GLIBC_2.7"
+        ],
+        "machine": "Advanced Micro Devices X86-64"
+      },
+      {
+        "file": "lib/Handy/libggml-cpu-sandybridge.so",
+        "sha256": "73e2f3c1956189d67897422a180a948d912300cd3755e5240fb0818cd1c081de",
+        "needed": [
+          "libggml-base.so.0",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6"
+        ],
+        "runpath": [
+          "$ORIGIN"
+        ],
+        "interpreter": [],
+        "requiredSymbolVersions": [
+          "CXXABI_1.3",
+          "CXXABI_1.3.9",
+          "GCC_3.0",
+          "GLIBCXX_3.4",
+          "GLIBCXX_3.4.21",
+          "GLIBCXX_3.4.29",
+          "GLIBC_2.14",
+          "GLIBC_2.2.5",
+          "GLIBC_2.27",
+          "GLIBC_2.29",
+          "GLIBC_2.3.2",
+          "GLIBC_2.3.4",
+          "GLIBC_2.32",
+          "GLIBC_2.33",
+          "GLIBC_2.34",
+          "GLIBC_2.38",
+          "GLIBC_2.4",
+          "GLIBC_2.7"
+        ],
+        "machine": "Advanced Micro Devices X86-64"
+      },
+      {
+        "file": "lib/Handy/libggml-cpu-sapphirerapids.so",
+        "sha256": "465b5f2121016fed6920c74471f7831f12d127b9073075be3c2f9ffe81952d64",
+        "needed": [
+          "libggml-base.so.0",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6",
+          "ld-linux-x86-64.so.2"
+        ],
+        "runpath": [
+          "$ORIGIN"
+        ],
+        "interpreter": [],
+        "requiredSymbolVersions": [
+          "CXXABI_1.3",
+          "CXXABI_1.3.9",
+          "GCC_3.0",
+          "GLIBCXX_3.4",
+          "GLIBCXX_3.4.11",
+          "GLIBCXX_3.4.17",
+          "GLIBCXX_3.4.21",
+          "GLIBCXX_3.4.22",
+          "GLIBCXX_3.4.29",
+          "GLIBC_2.14",
+          "GLIBC_2.2.5",
+          "GLIBC_2.27",
+          "GLIBC_2.29",
+          "GLIBC_2.3",
+          "GLIBC_2.3.2",
+          "GLIBC_2.3.4",
+          "GLIBC_2.32",
+          "GLIBC_2.33",
+          "GLIBC_2.34",
+          "GLIBC_2.38",
+          "GLIBC_2.4",
+          "GLIBC_2.7"
+        ],
+        "machine": "Advanced Micro Devices X86-64"
+      },
+      {
+        "file": "lib/Handy/libggml-cpu-skylakex.so",
+        "sha256": "0d0cc611a438e91d179a67e9f42c24fb4031cd0c26583ee6312915e41c3725e4",
+        "needed": [
+          "libggml-base.so.0",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6"
+        ],
+        "runpath": [
+          "$ORIGIN"
+        ],
+        "interpreter": [],
+        "requiredSymbolVersions": [
+          "CXXABI_1.3",
+          "CXXABI_1.3.9",
+          "GCC_3.0",
+          "GLIBCXX_3.4",
+          "GLIBCXX_3.4.21",
+          "GLIBCXX_3.4.29",
+          "GLIBC_2.14",
+          "GLIBC_2.2.5",
+          "GLIBC_2.27",
+          "GLIBC_2.29",
+          "GLIBC_2.3.2",
+          "GLIBC_2.3.4",
+          "GLIBC_2.32",
+          "GLIBC_2.33",
+          "GLIBC_2.34",
+          "GLIBC_2.38",
+          "GLIBC_2.4",
+          "GLIBC_2.7"
+        ],
+        "machine": "Advanced Micro Devices X86-64"
+      },
+      {
+        "file": "lib/Handy/libggml-cpu-sse42.so",
+        "sha256": "4eb6ae0fdaca19faf995e7e9f64046b79d0d52937e14df035e8ec9e6ac9e22e3",
+        "needed": [
+          "libggml-base.so.0",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6"
+        ],
+        "runpath": [
+          "$ORIGIN"
+        ],
+        "interpreter": [],
+        "requiredSymbolVersions": [
+          "CXXABI_1.3",
+          "CXXABI_1.3.9",
+          "GCC_3.0",
+          "GLIBCXX_3.4",
+          "GLIBCXX_3.4.21",
+          "GLIBCXX_3.4.29",
+          "GLIBC_2.14",
+          "GLIBC_2.2.5",
+          "GLIBC_2.27",
+          "GLIBC_2.29",
+          "GLIBC_2.3.2",
+          "GLIBC_2.3.4",
+          "GLIBC_2.32",
+          "GLIBC_2.33",
+          "GLIBC_2.34",
+          "GLIBC_2.38",
+          "GLIBC_2.4",
+          "GLIBC_2.7"
+        ],
+        "machine": "Advanced Micro Devices X86-64"
+      },
+      {
+        "file": "lib/Handy/libggml-cpu-x64.so",
+        "sha256": "e4ec73170f4aac5f62fea80a26de3cd16386c28cf0c721d5e2c920469ceae1f3",
+        "needed": [
+          "libggml-base.so.0",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6"
+        ],
+        "runpath": [
+          "$ORIGIN"
+        ],
+        "interpreter": [],
+        "requiredSymbolVersions": [
+          "CXXABI_1.3",
+          "CXXABI_1.3.9",
+          "GCC_3.0",
+          "GLIBCXX_3.4",
+          "GLIBCXX_3.4.21",
+          "GLIBCXX_3.4.29",
+          "GLIBC_2.14",
+          "GLIBC_2.2.5",
+          "GLIBC_2.27",
+          "GLIBC_2.29",
+          "GLIBC_2.3.2",
+          "GLIBC_2.3.4",
+          "GLIBC_2.32",
+          "GLIBC_2.33",
+          "GLIBC_2.34",
+          "GLIBC_2.38",
+          "GLIBC_2.4",
+          "GLIBC_2.7"
+        ],
+        "machine": "Advanced Micro Devices X86-64"
+      },
+      {
+        "file": "lib/Handy/libggml-cpu-zen4.so",
+        "sha256": "eae42e1874659d4ee533a1573c923d6a6f38e6eec4048c2354dc1aeb12a039c4",
+        "needed": [
+          "libggml-base.so.0",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6"
+        ],
+        "runpath": [
+          "$ORIGIN"
+        ],
+        "interpreter": [],
+        "requiredSymbolVersions": [
+          "CXXABI_1.3",
+          "CXXABI_1.3.9",
+          "GCC_3.0",
+          "GLIBCXX_3.4",
+          "GLIBCXX_3.4.21",
+          "GLIBCXX_3.4.29",
+          "GLIBC_2.14",
+          "GLIBC_2.2.5",
+          "GLIBC_2.27",
+          "GLIBC_2.29",
+          "GLIBC_2.3.2",
+          "GLIBC_2.3.4",
+          "GLIBC_2.32",
+          "GLIBC_2.33",
+          "GLIBC_2.34",
+          "GLIBC_2.38",
+          "GLIBC_2.4",
+          "GLIBC_2.7"
+        ],
+        "machine": "Advanced Micro Devices X86-64"
+      },
+      {
+        "file": "lib/Handy/libggml-vulkan.so",
+        "sha256": "1cd25861bf433afd5df42bcfe995467a483524c472e11b502c2a3239c6308c2e",
+        "needed": [
+          "libggml-base.so.0",
+          "libvulkan.so.1",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6"
+        ],
+        "runpath": [
+          "$ORIGIN"
+        ],
+        "interpreter": [],
+        "requiredSymbolVersions": [
+          "CXXABI_1.3",
+          "CXXABI_1.3.5",
+          "CXXABI_1.3.9",
+          "GCC_3.0",
+          "GLIBCXX_3.4",
+          "GLIBCXX_3.4.11",
+          "GLIBCXX_3.4.18",
+          "GLIBCXX_3.4.21",
+          "GLIBCXX_3.4.26",
+          "GLIBCXX_3.4.29",
+          "GLIBCXX_3.4.30",
+          "GLIBCXX_3.4.32",
+          "GLIBCXX_3.4.9",
+          "GLIBC_2.14",
+          "GLIBC_2.2.5",
+          "GLIBC_2.27",
+          "GLIBC_2.3.4",
+          "GLIBC_2.32",
+          "GLIBC_2.34",
+          "GLIBC_2.38",
+          "GLIBC_2.4"
+        ],
+        "machine": "Advanced Micro Devices X86-64"
+      },
+      {
+        "file": "lib/Handy/libggml.so.0",
+        "sha256": "9fbe07c3eb80fb1f7a2fda2c5cfab00feeb47fb9d51988c24f44e4225842fdf5",
+        "needed": [
+          "libggml-base.so.0",
+          "libstdc++.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6"
+        ],
+        "runpath": [
+          "$ORIGIN"
+        ],
+        "interpreter": [],
+        "requiredSymbolVersions": [
+          "CXXABI_1.3",
+          "CXXABI_1.3.9",
+          "GCC_3.0",
+          "GLIBCXX_3.4",
+          "GLIBCXX_3.4.20",
+          "GLIBCXX_3.4.21",
+          "GLIBCXX_3.4.26",
+          "GLIBC_2.14",
+          "GLIBC_2.2.5",
+          "GLIBC_2.32",
+          "GLIBC_2.34",
+          "GLIBC_2.4"
+        ],
+        "machine": "Advanced Micro Devices X86-64"
+      },
+      {
+        "file": "lib/Handy/libonnxruntime.so",
+        "sha256": "ffc84d48e845cf0b562ba4ea5ca32aaafc0d4069019fef4f63095b307d0270ad",
+        "needed": [
+          "libdl.so.2",
+          "librt.so.1",
+          "libpthread.so.0",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6",
+          "ld-linux-x86-64.so.2"
+        ],
+        "runpath": [
+          "$ORIGIN"
+        ],
+        "interpreter": [],
+        "requiredSymbolVersions": [
+          "CXXABI_1.3",
+          "CXXABI_1.3.11",
+          "CXXABI_1.3.2",
+          "CXXABI_1.3.5",
+          "CXXABI_1.3.7",
+          "CXXABI_1.3.8",
+          "CXXABI_1.3.9",
+          "GCC_3.0",
+          "GCC_3.3.1",
+          "GCC_3.4",
+          "GCC_4.0.0",
+          "GLIBCXX_3.4",
+          "GLIBCXX_3.4.11",
+          "GLIBCXX_3.4.14",
+          "GLIBCXX_3.4.15",
+          "GLIBCXX_3.4.17",
+          "GLIBCXX_3.4.18",
+          "GLIBCXX_3.4.19",
+          "GLIBCXX_3.4.20",
+          "GLIBCXX_3.4.21",
+          "GLIBCXX_3.4.22",
+          "GLIBCXX_3.4.9",
+          "GLIBC_2.14",
+          "GLIBC_2.16",
+          "GLIBC_2.17",
+          "GLIBC_2.2.5",
+          "GLIBC_2.27",
+          "GLIBC_2.3",
+          "GLIBC_2.3.3",
+          "GLIBC_2.3.4",
+          "GLIBC_2.4",
+          "GLIBC_2.6"
+        ],
+        "machine": "Advanced Micro Devices X86-64"
+      },
+      {
+        "file": "lib/Handy/libonnxruntime.so.1",
+        "sha256": "ffc84d48e845cf0b562ba4ea5ca32aaafc0d4069019fef4f63095b307d0270ad",
+        "needed": [
+          "libdl.so.2",
+          "librt.so.1",
+          "libpthread.so.0",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6",
+          "ld-linux-x86-64.so.2"
+        ],
+        "runpath": [
+          "$ORIGIN"
+        ],
+        "interpreter": [],
+        "requiredSymbolVersions": [
+          "CXXABI_1.3",
+          "CXXABI_1.3.11",
+          "CXXABI_1.3.2",
+          "CXXABI_1.3.5",
+          "CXXABI_1.3.7",
+          "CXXABI_1.3.8",
+          "CXXABI_1.3.9",
+          "GCC_3.0",
+          "GCC_3.3.1",
+          "GCC_3.4",
+          "GCC_4.0.0",
+          "GLIBCXX_3.4",
+          "GLIBCXX_3.4.11",
+          "GLIBCXX_3.4.14",
+          "GLIBCXX_3.4.15",
+          "GLIBCXX_3.4.17",
+          "GLIBCXX_3.4.18",
+          "GLIBCXX_3.4.19",
+          "GLIBCXX_3.4.20",
+          "GLIBCXX_3.4.21",
+          "GLIBCXX_3.4.22",
+          "GLIBCXX_3.4.9",
+          "GLIBC_2.14",
+          "GLIBC_2.16",
+          "GLIBC_2.17",
+          "GLIBC_2.2.5",
+          "GLIBC_2.27",
+          "GLIBC_2.3",
+          "GLIBC_2.3.3",
+          "GLIBC_2.3.4",
+          "GLIBC_2.4",
+          "GLIBC_2.6"
+        ],
+        "machine": "Advanced Micro Devices X86-64"
+      },
+      {
+        "file": "lib/Handy/libonnxruntime.so.1.24.2",
+        "sha256": "ffc84d48e845cf0b562ba4ea5ca32aaafc0d4069019fef4f63095b307d0270ad",
+        "needed": [
+          "libdl.so.2",
+          "librt.so.1",
+          "libpthread.so.0",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6",
+          "ld-linux-x86-64.so.2"
+        ],
+        "runpath": [
+          "$ORIGIN"
+        ],
+        "interpreter": [],
+        "requiredSymbolVersions": [
+          "CXXABI_1.3",
+          "CXXABI_1.3.11",
+          "CXXABI_1.3.2",
+          "CXXABI_1.3.5",
+          "CXXABI_1.3.7",
+          "CXXABI_1.3.8",
+          "CXXABI_1.3.9",
+          "GCC_3.0",
+          "GCC_3.3.1",
+          "GCC_3.4",
+          "GCC_4.0.0",
+          "GLIBCXX_3.4",
+          "GLIBCXX_3.4.11",
+          "GLIBCXX_3.4.14",
+          "GLIBCXX_3.4.15",
+          "GLIBCXX_3.4.17",
+          "GLIBCXX_3.4.18",
+          "GLIBCXX_3.4.19",
+          "GLIBCXX_3.4.20",
+          "GLIBCXX_3.4.21",
+          "GLIBCXX_3.4.22",
+          "GLIBCXX_3.4.9",
+          "GLIBC_2.14",
+          "GLIBC_2.16",
+          "GLIBC_2.17",
+          "GLIBC_2.2.5",
+          "GLIBC_2.27",
+          "GLIBC_2.3",
+          "GLIBC_2.3.3",
+          "GLIBC_2.3.4",
+          "GLIBC_2.4",
+          "GLIBC_2.6"
+        ],
+        "machine": "Advanced Micro Devices X86-64"
+      },
+      {
+        "file": "lib/Handy/libonnxruntime_providers_shared.so",
+        "sha256": "086ec1d5388f64153d9c63470d126693db9a182c8ce236d3a1119068471b8a0d",
+        "needed": [
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6"
+        ],
+        "runpath": [],
+        "interpreter": [],
+        "requiredSymbolVersions": [
+          "GLIBC_2.2.5"
+        ],
+        "machine": "Advanced Micro Devices X86-64"
+      },
+      {
+        "file": "lib/Handy/libtranscribe.so.0.2",
+        "sha256": "b0f4d95e62fc05c847f81fc200f3ca59b605dd27f6148130035ac7438ebe8f46",
+        "needed": [
+          "libggml.so.0",
+          "libopenblas.so.0",
+          "libggml-base.so.0",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6",
+          "ld-linux-x86-64.so.2"
+        ],
+        "runpath": [
+          "$ORIGIN"
+        ],
+        "interpreter": [],
+        "requiredSymbolVersions": [
+          "CXXABI_1.3",
+          "CXXABI_1.3.5",
+          "CXXABI_1.3.9",
+          "GCC_3.0",
+          "GLIBCXX_3.4",
+          "GLIBCXX_3.4.11",
+          "GLIBCXX_3.4.14",
+          "GLIBCXX_3.4.17",
+          "GLIBCXX_3.4.18",
+          "GLIBCXX_3.4.20",
+          "GLIBCXX_3.4.21",
+          "GLIBCXX_3.4.22",
+          "GLIBCXX_3.4.26",
+          "GLIBCXX_3.4.29",
+          "GLIBCXX_3.4.9",
+          "GLIBC_2.14",
+          "GLIBC_2.2.5",
+          "GLIBC_2.27",
+          "GLIBC_2.29",
+          "GLIBC_2.3",
+          "GLIBC_2.3.4",
+          "GLIBC_2.34",
+          "GLIBC_2.38",
+          "GLIBC_2.4",
+          "GLIBC_2.6"
+        ],
+        "machine": "Advanced Micro Devices X86-64"
+      }
+    ],
+    "nativeExecutionTested": false,
+    "targetLibraryClosureQualified": false,
+    "physicalAudioTested": false,
+    "publicReleaseQualified": false
+  },
+  "maximumRequiredVersions": {
+    "GLIBC": "2.39",
+    "GLIBCXX": "3.4.32",
+    "CXXABI": "1.3.11"
+  },
+  "staticProbeSourceSha256": "ac72e5b7276ab4255e9078ae4f2703a47b2b93a634c6780fb16caed71040138a",
+  "actualTargetFixtures": [
+    {
+      "format": "augmentor-handy-target-loader-checkpoint/1",
+      "distro": "arch",
+      "artifactZipSha256": "8d1b22b99b1f4c4a9dc451a7904e4eb794a175bd9c23c2fde3f99846d7b5cb2d",
+      "buildReceiptSha256": "ea1a5a3defdb8d60c8a0d442dbd9f2169f6a110d291f390438e3624c92f031c2",
+      "staticElfInspectionSha256": "71d0b066fd314c929a004ce84eb5a5298d34320dcfd56aeef1ad3f7f2b729c3f",
+      "explicitPackages": [
+        "gtk-layer-shell",
+        "webkit2gtk-4.1",
+        "openblas",
+        "libayatana-appindicator"
+      ],
+      "packageInstallerReturnedZero": true,
+      "nativeFiles": 25,
+      "failedLoaderFiles": [],
+      "allLoaderListsPassed": true,
+      "applicationExecutionTested": true,
+      "dynamicTrayProviderTested": false,
+      "completeNativeRelocationTested": false,
+      "installedProductTested": false,
+      "physicalAudioTested": false,
+      "publicReleaseQualified": false,
+      "registeredSystemProviders": 153,
+      "bundledLoaderPaths": 6,
+      "allObservedSystemPathsRegistered": true,
+      "actualComponentProtocol": {
+        "protocol": true,
+        "tray": false,
+        "modelDownload": false,
+        "microphoneCapture": false,
+        "theme": true,
+        "staleSettingsRejected": true,
+        "ownerExclusion": true,
+        "parentExit": true
+      },
+      "componentProbeSourceSha256": "f32f1a4dff0b818fc9d04a83985aae058eb94ddf75e2f7ba2065326cb4754018",
+      "zipExecutableModesRestoredExactly": true,
+      "privateBusAndXvfb": true,
+      "systemQtVerificationAfterDependencies": "passed",
+      "microphoneCaptureRequested": false,
+      "modelDownloadRequested": false
+    },
+    {
+      "format": "augmentor-handy-target-loader-checkpoint/1",
+      "distro": "leap",
+      "artifactZipSha256": "8d1b22b99b1f4c4a9dc451a7904e4eb794a175bd9c23c2fde3f99846d7b5cb2d",
+      "buildReceiptSha256": "ea1a5a3defdb8d60c8a0d442dbd9f2169f6a110d291f390438e3624c92f031c2",
+      "staticElfInspectionSha256": "71d0b066fd314c929a004ce84eb5a5298d34320dcfd56aeef1ad3f7f2b729c3f",
+      "explicitPackages": [
+        "libgtk-layer-shell0",
+        "libwebkit2gtk-4_1-0",
+        "libopenblas_serial0",
+        "libappindicator3-1"
+      ],
+      "packageInstallerReturnedZero": true,
+      "nativeFiles": 25,
+      "failedLoaderFiles": [],
+      "allLoaderListsPassed": true,
+      "applicationExecutionTested": true,
+      "dynamicTrayProviderTested": false,
+      "completeNativeRelocationTested": false,
+      "installedProductTested": false,
+      "physicalAudioTested": false,
+      "publicReleaseQualified": false,
+      "registeredSystemProviders": 147,
+      "bundledLoaderPaths": 6,
+      "allObservedSystemPathsRegistered": true,
+      "actualComponentProtocol": {
+        "protocol": true,
+        "tray": false,
+        "modelDownload": false,
+        "microphoneCapture": false,
+        "theme": true,
+        "staleSettingsRejected": true,
+        "ownerExclusion": true,
+        "parentExit": true
+      },
+      "componentProbeSourceSha256": "f32f1a4dff0b818fc9d04a83985aae058eb94ddf75e2f7ba2065326cb4754018",
+      "zipExecutableModesRestoredExactly": true,
+      "privateBusAndXvfb": true,
+      "systemQtVerificationAfterDependencies": "passed",
+      "microphoneCaptureRequested": false,
+      "modelDownloadRequested": false
+    }
+  ],
+  "completeNativeRelocationQualified": false,
+  "completeDependencyByteInventoryQualified": false,
+  "minimumCpuQualified": false,
+  "fullInstalledProductQualified": false,
+  "physicalAudioQualified": false,
+  "graphicalBrowserProductQualified": false,
+  "nativeWaylandInputQualified": false,
+  "sourceAndLegalAcceptanceComplete": false,
+  "publicReleaseQualified": false,
+  "ownerSelectionOrDevicesChanged": false,
+  "preservedFailures": [
+    "Before dependency installation, two native objects in each fixture fail loader listing.",
+    "Leap first attempt cannot execute dbus-run-session; dbus-1 is installed but does not provide it. Actual file provider dbus-1-daemon is then installed and the fresh private-bus proof passes.",
+    "Initial registration diagnostic parses four bundled path suffixes incorrectly; original retained. Exact whitespace-delimited paths show153/147 registered system providers and six bundled paths."
+  ],
+  "rawEvidence": {
+    "handy-public-producer35/inspect-elf.py": "f372e8a77318880220d9176860719e579fe75b4325f66692c68e2b40c413aac9",
+    "handy-public-producer35/artifact.zip": "8d1b22b99b1f4c4a9dc451a7904e4eb794a175bd9c23c2fde3f99846d7b5cb2d",
+    "handy-public-producer35/public-probe-elf-inspection.json": "fb399365934d3a37a5e465b7169894e370c249bffa5fb81eade341746a373fdb",
+    "handy-public-producer35/elf-inspection.json": "71d0b066fd314c929a004ce84eb5a5298d34320dcfd56aeef1ad3f7f2b729c3f",
+    "handy-closure40/leap-result.json": "1b865ed71430c5ab255ed2aa01c899186e95c9169e62c48382851db0d04b331e",
+    "handy-closure40/arch-install.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "handy-closure40/leap-loaded-provider-registration.json": "d00e65e7a0260f968c31500fb0b7901dc6e9468bee304528ccdd917d1153cfdd",
+    "handy-closure40/arch-install.stdout": "e83dc0d59f299c9c470619b1f199e08abf30d3b6bdf2a6e434694d0a5f848dd2",
+    "handy-closure40/arch-before-loader.json": "f464345531ddc777cd3c9abf36f3753a350e146a927adc604bb655d451344dc4",
+    "handy-closure40/arch-loaded-provider-registration.json": "64183e4f92c9d265ec913e3784a74be41f2fa6ff8d3cfe176f5ed4324e995948",
+    "handy-closure40/arch-result.json": "c6e14cd1ea9d7a9fb3d6ed360b1aefa47684b4d88f0277dcf643e5fbb1781ac3",
+    "handy-closure40/leap-system-qt-after-dependencies.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "handy-closure40/leap-install.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "handy-closure40/leap-installed-packages.txt": "07ddafe27216cafaaf01ec27e8d07f971370cb890e9c42dccaec8e81969732ef",
+    "handy-closure40/leap-loaded-provider-registration-exact.json": "0fdc33a4d6d8166082d710380a90ddd918ddc756e7259fa88290b302bb2ce433",
+    "handy-closure40/leap-system-qt-after-dependencies.stdout": "062a484106a7eec039fd3063ede5b2a48f49cadb5effbc652451912b3543449b",
+    "handy-closure40/arch-installed-packages.txt": "a3fc8aca3992d0bf659e166bc921e5a720368f0a6bc20d2b4b71be6eeb4ae0fd",
+    "handy-closure40/leap-before-loader.json": "7950cd1a4f79075b40717aa7d5f1ae166a9a7592b7c674700ee3df713579e70e",
+    "handy-closure40/leap-install.stdout": "8950fb25046c4b4a4569ac654c7c7296fefbda25ccfd6f581328237ed55d2ea0",
+    "handy-closure40/arch-after-loader.json": "4722d2138d2735c1f53ead05e5bc0e3ad0ec6611ee093b9eded54e6bac734ab3",
+    "handy-closure40/arch-system-qt-after-dependencies.stdout": "e17291444077da8d48b6dd12408e061e5809a88ddbb0aa4a92e0ddc118f7c917",
+    "handy-closure40/arch-loaded-provider-registration-exact.json": "0bc8e9155fae73e8ca7471f1c4f42e40e6507ce03af191c457441ab7d57ee422",
+    "handy-closure40/arch-system-qt-after-dependencies.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "handy-closure40/leap-after-loader.json": "22f95c828ddd65cbcdcf2b3361e7f3c8e4c2f0a427baa0b68166fc9df14c8111",
+    "handy-closure40/driver.py": "085d1e0d262385b4756000ffb72cdd6d970ec4aeb8608817f8256e175ce6d4eb",
+    "handy-component41/leap.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "handy-component41/leap-dbus-daemon-install.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "handy-component41/arch.stdout": "e0e42dadf91db6f423cfc1b124fd2d4d079e68977621e4be59ef587e3e4595d7",
+    "handy-component41/leap-dbus-install.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "handy-component41/leap-dbus-install.stdout": "5f2e267dc81a3aeead74cf299aa6b14a965b4a31aa8f21a375f2858ae5cd797b",
+    "handy-component41/leap-dbus-provider.log": "ed91396f9c99b3d0dc1f92b9f67833fdd0fd1f4646fe8c18523f4eed23e36492",
+    "handy-component41/restored-original-zip-modes.json": "a45c025e17c55cab6628c41820c239e35093049da154e4a93a9614b0c651588a",
+    "handy-component41/leap-dbus-daemon-install.stdout": "9f6f581373df0b24ccacf631be545c75cdcb23a6fa3f880bcf3d2b9f0a6bf75b",
+    "handy-component41/leap-with-private-bus.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "handy-component41/arch.stderr": "14a6d29f6c40bc35ec0d22bd868f10a41c123b80bb98d20064d725f99691bc63",
+    "handy-component41/leap-with-private-bus.stdout": "a2362d1f8efedb0aaab89a6b8deec5147c1a87f6f255f697f177788e21d75213",
+    "handy-component41/leap.stdout": "f08f57975a625bc02053bb20ed9ba4db0c57d0f1d38735b714d5e30f25822a93"
+  }
+}

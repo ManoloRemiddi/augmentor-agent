@@ -28,6 +28,9 @@ import {approvalPresenters} from './approval-presenters.mjs'
 chrome.runtime.onConnect.addListener(port=>{if(port.name==='augmentor-approval-presenter')approvalPresenters.connect(port)})
 import { ensurePort } from './port.mjs'
 import { handlePanelMessage } from './panel-api.mjs'
+import { browserMaintenance } from './maintenance-worker.mjs'
+
+browserMaintenance.install()
 
 // Use the explicit toolbar action: Chromium's automatic side-panel action skips
 // the activeTab grant needed for screenshots. The user still opens the same panel.

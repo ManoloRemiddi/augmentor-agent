@@ -28,6 +28,13 @@ of this repository; include reproducible commands and sanitized evidence summari
 
 Current cross-platform direction: [one product, Linux/Mac parity audit and correction sequence](PLATFORM-PARITY-AUDIT.md).
 
+Windows: [detailed x64/ARM64 implementation plan, including RTX Spark](WINDOWS-IMPLEMENTATION-PLAN.md), [corrected research](WINDOWS-RTX-SPARK-RESEARCH.md) and [active implementation evidence](WINDOWS-IMPLEMENTATION-STATUS.md). See [Windows preview installation and delivery limits](WINDOWS-PREVIEW.md); physical acceptance and signed/stable delivery remain pending.
+
+Windows mechanisms: [desktop and background shortcut ownership](WINDOWS-SHELL.md),
+[native browser companion and remaining integration](WINDOWS-BROWSER.md),
+[installer safety findings and replacement qualification](WINDOWS-INSTALLER-DECISION.md),
+[signed Windows update delivery](WINDOWS-UPDATE-DELIVERY.md).
+
 ## Start and understand the product
 
 - [Codex integration build plan: Desktop, Browser and connection profiles](CODEX-INTEGRATION-PLAN.md) — full C0–C9 scope and acceptance gates.
@@ -79,6 +86,7 @@ Current cross-platform direction: [one product, Linux/Mac parity audit and corre
 
 - [Linux distribution rollout: implementation order and qualification gates](LINUX-DISTRO-ROLLOUT.md)
 - [Arch/Leap system Python/Qt drift boundary and actual CPU VAD evidence](LINUX-SYSTEM-QT-STACK.md)
+- [Dictation native candidate](LINUX-HANDY-NATIVE-CLOSURE.md): checksum-pinned ELF and actual Arch/Leap component startup; complete product/audio/input gates remain open.
 - [Cinnamon adapter: installed Mint evidence and pinned implementation contract](LINUX-CINNAMON-ADAPTER.md)
 - [GNOME native consent/capture evidence and disabled guarded execution candidate](LINUX-GNOME-CONTROL-PLAN.md)
 - [Linux Qt/PySide source build, rebuild and replacement gates](LINUX-LGPL-SOURCE-RUNTIME.md)

@@ -14,8 +14,10 @@ def dispatch(window, request, *, enabled=False):
     from PySide6.QtWidgets import QDialog
     controller=window.controller
     action=request.get('action')
+    if action not in ('inspect','capture') and window.maintenance.phase()!='ready':
+        raise ValueError('Augmentor maintenance is in progress. This request was not started.')
     if action=='inspect':
-        return {'pid':os.getpid(),'visible':window.isVisible(),
+        return {'pid':os.getpid(),'visible':window.isVisible(),'active':window.isActiveWindow(),
                 'online':bool(controller and controller.online),
                 'session':controller.session if controller else None,
                 'preset':controller.preset if controller else None,

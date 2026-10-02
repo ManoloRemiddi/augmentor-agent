@@ -15,6 +15,16 @@ instance-targeted activation. Main defaults to Fn+Space; secondary remains unass
 until saved. See [implementation and qualification](MACOS-RECOVERY-2026-09-26.md).
 The earlier [parity audit](PLATFORM-PARITY-AUDIT.md) records why this was required.
 
+The Windows implementation branch connects this same instance command handler
+to SID-authenticated named pipes and protected per-window owner locks. Pipe
+commands cross to Qt's main thread; the shared UI still decides whether drafts
+or active work block maintenance. Clicking the Windows application focuses an
+existing window. Explicit toggle commands remain available for shortcuts.
+Native CI adds two actual Windows-QPA preview processes, duplicate launch, draft
+isolation, busy-close refusal and live zoom checks. Those checks are pending;
+they do not establish installed launchers, global shortcuts or full chat parity.
+See the [Windows evidence ledger](WINDOWS-IMPLEMENTATION-STATUS.md).
+
 ## Settings
 
 Either window's Settings → Window shortcuts has separate capture fields and Save

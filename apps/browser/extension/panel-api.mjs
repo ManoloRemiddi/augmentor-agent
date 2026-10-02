@@ -31,6 +31,7 @@ import {
 import { openSettingsTab } from './settings-tab.mjs'
 import {approvalPresenters} from './approval-presenters.mjs'
 import { overlayFade } from './overlay.mjs'
+import { browserMaintenance } from './maintenance-worker.mjs'
 import {prepareBranch,finishBranch} from './branch-request.mjs'
 
 // The DSH picker's curation rides every catalog reply: the panel's picker
@@ -42,6 +43,19 @@ const curationOf = (c) => ({
 })
 
 export function handlePanelMessage(msg, sender, sendResponse) {
+  if (sender?.id !== chrome.runtime.id || !sender.url?.startsWith(`chrome-extension://${chrome.runtime.id}/`)) return
+  let finish
+  try { finish=browserMaintenance.begin() }
+  catch (error) { sendResponse({ok:false,error:error.message}); return }
+  const respond = result => { try { sendResponse(result) } finally { finish() } }
+  try {
+    const asynchronous=dispatchPanelMessage(msg, sender, respond)
+    if (asynchronous !== true) finish()
+    return asynchronous
+  } catch (error) { finish(); throw error }
+}
+
+function dispatchPanelMessage(msg, sender, sendResponse) {
   // S5 (audit): accept messages only from this extension's own pages.
   // chrome.runtime.onMessage is unreachable from other extensions or the
   // web, but the panel renders content from OTHER DSH sessions — a hostile

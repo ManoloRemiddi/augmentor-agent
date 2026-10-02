@@ -39,5 +39,5 @@ export function applyResponsiveSteering(ctx) {
   })
   ctx.on('agent/status',({agent,status})=>{if(status==='idle')streaming.delete(agent.id)})
   ctx.on('agent/disposed',({agent})=>{streaming.delete(agent.id);tools.delete(agent.id);moving.delete(agent.id)})
-  ctx.on('dispose',()=>{streaming.clear();tools.clear();moving.clear()})
+  ctx.effect(()=>()=>{streaming.clear();tools.clear();moving.clear()},'augmentor-steering: stream state')
 }
