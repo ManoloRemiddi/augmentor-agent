@@ -1,0 +1,64 @@
+{
+  "format": "augmentor-linux-next-target-dependency-probes/1",
+  "checkpointDate": "2026-10-02",
+  "testedSourceBase": "c4f3b1fbd49d1fdf04c06ece48dd0fd5c3a90786",
+  "targets": {
+    "leap": {
+      "image": "docker.io/opensuse/leap@sha256:0ca61694582b062a49b5f79154bff363ebe7ce28d5542fb6c5f63306f222695f",
+      "versions": {
+        "python": "3.13.14",
+        "pyside": "6.9.1",
+        "qt": "6.9.1",
+        "numpy": "2.2.2"
+      },
+      "dependencyInstallPassed": true,
+      "qtCoreTestQuickWidgetsSvgWidgetsImportsPassed": true,
+      "giKeyringNumpyImportsPassed": true,
+      "installationLogSha256": "db83544e949189260a297d185e51329ae853fa9179c60980c466e892f81227c4",
+      "packageInventorySha256": "40098c4e06e706d9db99d494242ae67ad619346ab1a96cd4eb5fcdc7cbb2cf42",
+      "packageManagerSignatureChecksEnabled": true,
+      "everyPackageSignatureIndependentlyVerified": false,
+      "augmentorInstalled": false,
+      "fullNativeSuitePassed": false,
+      "realDesktopTested": false,
+      "voiceTested": false,
+      "ossRepository": "https://download.opensuse.org/distribution/leap/16.0/repo/oss/x86_64/",
+      "otherRepositoriesDisabledInFixture": true,
+      "repoServiceDisabledInFixture": true,
+      "keyringVersionBelowProductContract": true,
+      "previousResearchedDockerDigestUnavailable": true,
+      "zyppHistorySha256": "5ed976bbc54c0a820ac5849b26403d1d9f39a44446d1a1cf7cf616fd08642a66"
+    },
+    "arch": {
+      "image": "docker.io/library/archlinux@sha256:eb8f6dcc89a38977c9735f10fcf6ae4afe496283e7008eb7a3420cdba31fbd04",
+      "versions": {
+        "python": "3.14.7",
+        "pyside": "6.11.2",
+        "qt": "6.11.2",
+        "numpy": "2.5.3"
+      },
+      "dependencyInstallPassed": true,
+      "qtCoreTestQuickWidgetsSvgWidgetsImportsPassed": true,
+      "giKeyringNumpyImportsPassed": true,
+      "installationLogSha256": "f5b9f8020360550bff440221659a4c1fd1676f3185c76b1e396054dac0798a6d",
+      "packageInventorySha256": "f4c6b481aa9b1e33ac7e95b5978ddb2b69ab93920934ee6a56c9c6e2e8046285",
+      "packageManagerSignatureChecksEnabled": true,
+      "everyPackageSignatureIndependentlyVerified": false,
+      "augmentorInstalled": false,
+      "fullNativeSuitePassed": false,
+      "realDesktopTested": false,
+      "voiceTested": false,
+      "repositorySnapshot": "2026-10-01",
+      "fullPacmanSyu": true,
+      "mirrorlistSha256": "71772959647829fdcdd3dc6f7b5ca070f1e8047dd781ec60af25ee81274ec59b",
+      "pacmanConfSha256": "1b1c6195b21865a660480f41a29a172f103b1aa3e846d1db877e04cd6220e454"
+    }
+  },
+  "publicCompatibilityExpanded": false,
+  "packageAdaptersImplemented": false,
+  "limits": [
+    "Dependency solver and import probes are not app installation, full desktop, ABI overlay, secret store lifecycle, voice or release acceptance.",
+    "Leap current OSS repository versions are recorded, not immutable package repositories.",
+    "Arch uses a complete dated snapshot upgrade with required package signatures and optional repository database signatures."
+  ]
+}

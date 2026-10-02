@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The October 2 [Noble lifecycle/shortcut checkpoint](../docs/LINUX-DISTRO-ROLLOUT.md#noble-lifecycle-shortcut-defect-and-next-target-probes)
+records actual Wayland lock/cold-launch acceptance separately from the failed
+complete QMP shortcut proof. Extension regression covers visible focus outside
+the actor inventory: it stays blocked with a null eligible target. The installed
+fixture needs a separately staged fixed artifact before actual acceptance.
+
 Codex runtime tests: build first, then run `node --test tests/codex-*.test.mjs`.
 They cover real app-server operation against a synthetic Responses provider,
 the native wire adapter, durable recovery, private IPC and profile contracts.

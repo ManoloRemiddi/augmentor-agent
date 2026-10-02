@@ -2,6 +2,32 @@
 
 # Start here: agent handoff
 
+## October 2 remaining rollout and Noble lifecycle checkpoint
+
+The owner explicitly authorized completing all five remaining rollout points
+autonomously. Preserve that full scope. The previous goal turn published the
+authenticated Mesa comparison; this turn adds actual lifecycle evidence and
+identifies an observer defect. Latest `c4f3b1f` Linux and Mac CI both pass.
+
+Pristine `a7ee9c5` Noble/Mesa .2 Wayland passes three duplicate autostarts,
+observer suspension on lock, fresh epoch and old-reader refusal after fixture
+unlock, accepted idle close and canonical service-owned cold launch. The
+[checked lifecycle report](../release/qualification/ubuntu24.04/gnome-wayland-lifecycle-a7ee9c5.json)
+retains its exact source/helper scope. Actual Qt Save and foreign/second-instance
+conflict checks pass in a separate rendered component fixture. The complete QMP
+keyboard proof stops after its first key: Desktop Icons focus is outside the actor
+inventory, producing an inconsistent scene. Source now reports null focus while
+retaining `no-visible-live-focus`; five extension and eight Python observer cases
+pass. Build/stage a separate artifact through `augmentor-update`, let the observer
+reload normally and rerun full keyboard/lifecycle/reboot acceptance. Do not patch
+the selected guest payload or bypass the strict consumer inventory check.
+
+Arch dated-snapshot and Leap OSS dependency installs/imports now pass. Their
+[checked probe](../release/qualification/next-targets/20261002-dependency-probes.json)
+records exact OCI pins and inventories. Package adapters/managed ABI overlays,
+full native suites and desktops remain open. Continue all five points through the
+[current checkpoint](LINUX-DISTRO-ROLLOUT.md#noble-lifecycle-shortcut-defect-and-next-target-probes).
+
 ## October 2 official Mesa .2 Wayland comparison checkpoint
 
 A separate clone now passes its first actual Ubuntu GNOME 46 **Wayland** login

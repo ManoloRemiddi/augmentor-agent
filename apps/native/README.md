@@ -2,6 +2,12 @@
 
 # Native desktop surface
 
+See the [October 2 Noble lifecycle checkpoint](../../docs/LINUX-DISTRO-ROLLOUT.md#noble-lifecycle-shortcut-defect-and-next-target-probes)
+for actual Wayland lock/cold-launch and Qt Save/conflict evidence. A real Desktop
+Icons focus outside the actor inventory exposed an observer inconsistency; the
+source fix preserves its refusal guard and requires separate artifact/session
+qualification. Full keyboard delivery and the remaining distro rollout stay open.
+
 The maintained Python surface uses **PySide6 / Qt**, not the historical PyQt6
 implementation. `augmentor_linux/window.py` owns composition; `controller.py`
 coordinates the selected Pi or DSH adapter. Model execution remains in that

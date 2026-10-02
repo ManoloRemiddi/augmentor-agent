@@ -2,6 +2,54 @@
 
 # Linux distribution rollout
 
+## Noble lifecycle, shortcut defect and next-target probes
+
+On October 2 the owner explicitly authorized completing all five remaining
+points independently. The complete ordered scope below remains required.
+Latest `c4f3b1f` Linux validation and Mac 14/26 feasibility both pass.
+
+Actual pristine `a7ee9c5` on the official Mesa .2 Noble clone passes three
+duplicate autostarts without process/state changes, lock suspension of the user
+observer, fresh epoch with stale-reader refusal after fixture unlock, idle close
+and canonical service-owned cold launch. Updated
+`release/prove-gnome-vm-lifecycle.py --target ubuntu24 --source <exact commit>`
+requires pristine Noble packages, the full managed runtime and AppArmor; its
+default Fedora guard remains explicit. Cold-start status timeout is repeatable
+only for read-only inspection, never an uncertain close. The
+[checked report](../release/qualification/ubuntu24.04/gnome-wayland-lifecycle-a7ee9c5.json)
+retains exact helper/source identities. Administrative unlock is not password
+authentication; the fixture retains explicit autologin/idle timer/Mesa controls.
+
+`release/prove-noble-gnome-shortcuts.py` sends keys only through the exact owned
+comparison VM's QMP keyboard. Its guest helper uses pristine installed components
+and backs up bindings. Actual rendered Qt Save mouse events pass two assignments
+and foreign/second-instance conflict refusal. Qt/GTK remain in separate processes.
+Complete delivery is **not yet passing**: the first QMP shortcut leaves Desktop
+Icons focused outside `global.get_window_actors()`; the extension reports that
+focus with an empty inventory. The strict consumer correctly refuses this scene.
+Source now returns null focus when it is outside the inventory, retaining the
+existing refusal reason and false input qualification. Regression executes both
+46/50 and the corresponding listed-focus case; five extension and eight Python
+observer cases pass. The [checked checkpoint](../release/qualification/ubuntu24.04/gnome-shortcut-checkpoint-a7ee9c5.json)
+records the failed complete proof separately. Settings were restored by an
+independent guarded action and the canonical app is shown/idle. Stage a separate
+clean tested artifact through `augmentor-update`, reload the observer normally,
+then repeat delivery, two-instance, lock, three startups and reboot. Never patch
+the selected installation or bypass consumer validation.
+
+Actual dependency solvers pass in private stock containers: Arch performs full
+`pacman -Syu` against 2026-10-01 with required package signatures; Leap uses only
+HTTPS OSS with GPG checking and its repository service disabled in the fixture.
+Qt Core/Test/QuickWidgets/SvgWidgets and GI/keyring/NumPy imports pass. The
+[probe report](../release/qualification/next-targets/20261002-dependency-probes.json)
+binds logs/inventories and versions. The earlier researched Leap digest was not
+available in Docker Hub; the actual inspected/pulled amd64 16.0 image is
+`docker.io/opensuse/leap@sha256:0ca61694582b062a49b5f79154bff363ebe7ce28d5542fb6c5f63306f222695f`.
+These probes do not qualify Augmentor packages or independently check every
+archive signature. Continue package receipts/transaction guards and managed
+keyring/sounddevice/ONNX ABI overlays. Connected desktop/Browser, consent/Stop,
+physical speech and source/license/rebuild/release gates remain required.
+
 ## Objective and preserved contracts
 
 Owner-authorized implementation, 1 October 2026: extend the same Augmentor

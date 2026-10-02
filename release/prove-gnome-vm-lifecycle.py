@@ -5,9 +5,12 @@
 This test changes only its marked QEMU guest session. It requires an idle main
 window, refuses active work, and makes no model or portal input request.
 """
+import argparse
 import hashlib
+import importlib.util
 import json
 import os
+import re
 from pathlib import Path
 import socket
 import subprocess
@@ -29,21 +32,58 @@ def wait(predicate, label, seconds=30):
     raise RuntimeError('Timed out waiting for ' + label)
 
 
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--target', choices=('fedora44', 'ubuntu24'), default='fedora44')
+parser.add_argument('--source', help='Exact pristine installed source; required for Noble.')
+args = parser.parse_args()
+if args.source:assert re.fullmatch('[a-f0-9]{40}', args.source)
+if args.target == 'ubuntu24':assert args.source
 assert os.geteuid() != 0 and os.environ.get('USER') == 'augmentor-proof'
-assert Path('/etc/augmentor-test-vm').read_text() == 'Isolated Augmentor Fedora GNOME qualification VM\n'
+marker = ('Isolated Augmentor Ubuntu 24.04 GNOME qualification VM\n' if args.target == 'ubuntu24'
+          else 'Isolated Augmentor Fedora GNOME qualification VM\n')
+assert Path('/etc/augmentor-test-vm').read_text() == marker
 assert command(['systemd-detect-virt']) == 'qemu'
-assert command(['getenforce']) == 'Enforcing'
 root = Path('/usr/lib/augmentor')
+managed_inventory_verified = False
+if args.target == 'ubuntu24':
+    data = Path.home()/'.local/share/augmentor'
+    selection = json.loads((data/'desktop.json').read_text())
+    root = Path(selection['root'])
+    if root != Path('/usr/lib/augmentor'):
+        assert root.is_relative_to(data/'releases') and selection['sourceRef'] == args.source
+        spec = importlib.util.spec_from_file_location('lifecycle_deployment', data/'desktop-deployment.py')
+        deployment = importlib.util.module_from_spec(spec);spec.loader.exec_module(deployment)
+        deployment.verify(root);managed_inventory_verified = True
 release = json.loads((root/'release.json').read_text())
 assert release['source']['dirty'] is False
-subprocess.run(['rpm', '-V', 'augmentor-agent'], check=True, timeout=30)
+if args.source:assert release['source']['commit'] == args.source
+
+
+def verify_package():
+    if args.target == 'fedora44':
+        assert command(['getenforce']) == 'Enforcing'
+        subprocess.run(['rpm', '-V', 'augmentor-agent'], check=True, timeout=30)
+    else:
+        assert release['target'] == 'ubuntu24.04-amd64'
+        assert not command(['dpkg', '--verify', 'augmentor-runtime', 'augmentor-desktop'])
+        assert Path('/sys/module/apparmor/parameters/enabled').read_text().strip() == 'Y'
+        assert command(['systemctl', 'is-active', 'apparmor']) == 'active'
+        selection = json.loads((Path.home()/'.local/share/augmentor/desktop.json').read_text())
+        assert selection['root'] == str(root)
+        spec = importlib.util.spec_from_file_location('lifecycle_python', root/'scripts/linux-python-runtime.py')
+        runtime = importlib.util.module_from_spec(spec);spec.loader.exec_module(runtime)
+        assert runtime.resolve(root, selection['python']) == selection['python']
+
+
+verify_package()
 environment = dict(row.split('=', 1) for row in command(
     ['systemctl', '--user', 'show-environment']).splitlines() if '=' in row)
 for key in ('DISPLAY', 'WAYLAND_DISPLAY', 'XAUTHORITY', 'XDG_CURRENT_DESKTOP',
             'XDG_RUNTIME_DIR', 'XDG_SESSION_TYPE', 'DBUS_SESSION_BUS_ADDRESS'):
     if key in environment:
         os.environ[key] = environment[key]
-assert environment['XDG_SESSION_TYPE'] == 'wayland' and environment['XDG_CURRENT_DESKTOP'] == 'GNOME'
+assert environment['XDG_SESSION_TYPE'] == 'wayland'
+assert environment['XDG_CURRENT_DESKTOP'] == ('ubuntu:GNOME' if args.target == 'ubuntu24' else 'GNOME')
 sessions = [row.split()[0] for row in command(['loginctl', 'list-sessions', '--no-legend']).splitlines()
             if len(row.split()) > 3 and row.split()[2:4] == ['augmentor-proof', 'seat0']]
 assert len(sessions) == 1
@@ -63,8 +103,11 @@ def exchange(action='maintenance.status'):
             with client.makefile('rb') as stream:
                 raw = stream.readline(16384)
                 return json.loads(raw) if raw else None
-        except (ConnectionResetError, BrokenPipeError):
-            return None
+        except (ConnectionResetError, BrokenPipeError, socket.timeout):
+            # A cold start can bind IPC before Qt services its first read.
+            # Only status is repeatable; an uncertain close must surface.
+            if action == 'maintenance.status':return None
+            raise
 
 
 def owner(status):
@@ -141,8 +184,10 @@ subprocess.run([str(launcher)], check=True, timeout=30)
 reopened = wait(exchange, 'canonical closed-app launch', seconds=60)
 assert reopened['pid'] != initial['pid'] and owner(reopened)
 assert reopened['buildRoot'] == str(root) and not reopened['running'] and not reopened['draftPresent']
-subprocess.run(['rpm', '-V', 'augmentor-agent'], check=True, timeout=30)
+verify_package()
 report = {'format': 'augmentor-gnome-full-vm-lifecycle/1', 'source': release['source'],
+    'target': args.target,
+    'managedInventoryVerified': managed_inventory_verified,
     'version': release['version'], 'proofSha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
     'duplicateAutostartPreservesProcessAndState': True, 'duplicateAutostartCount': 3,
     'lockSuspendsUserObserver': True, 'lockedError': locked_error,
@@ -150,7 +195,8 @@ report = {'format': 'augmentor-gnome-full-vm-lifecycle/1', 'source': release['so
     'oldObserverRefusedAfterUnlock': True, 'lockPreservesApplicationProcessAndState': True,
     'idleCloseAccepted': True, 'cleanServiceExit': True, 'canonicalClosedLaunch': True,
     'reopenedServiceOwnsNewProcess': True, 'packageVerifiedAfterLifecycle': True,
-    'selinuxEnforcing': command(['getenforce']) == 'Enforcing',
+    'selinuxEnforcing': args.target == 'fedora44',
+    'apparmorEnabled': args.target == 'ubuntu24',
     'initial': initial, 'reopened': reopened, 'before': before, 'after': after,
     'positiveLockedSceneTested': False, 'loginAuthenticationTested': False,
     'harnessConnectionTested': False, 'modelTurnTested': False, 'crashRecoveryTested': False,

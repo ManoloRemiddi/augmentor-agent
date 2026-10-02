@@ -167,7 +167,9 @@ export default class Observer extends Extension {
             screens.push({name:'monitor:'+i,geometry:rect(global.display.get_monitor_geometry(i)),scale:global.display.get_monitor_scale(i)});
         return {schema:1,backend:'gnome-shell-observer',shellVersion:Config.PACKAGE_VERSION,
             epoch:this.epoch,serial:this.serial,inputQualified:false,
-            window:focus && visible(focus) ? describe(focus) : null,
+            // Ubuntu Desktop Icons can retain visible focus outside the actor
+            // inventory. A blocked, unlisted focus is never an eligible target.
+            window:index >= 0 ? describe(focus) : null,
             windows:order.map(describe),above:above.map(describe),screens,
             workspace:{id:this.workspaceIds.get(active),index:active.index()},guards,blockedReasons:reasons};
     }

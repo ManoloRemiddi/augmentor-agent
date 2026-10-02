@@ -26,8 +26,26 @@ function fixture(version='46.0',mode='ubuntu',parent='user') {
     Gio:{DBus:{session:{}},DBusExportedObject:{wrapJSObject:()=>({export(){},unexport(){}})}}});
   new vm.Script(source).runInContext(context);
   const observer=new context.Observer();
-  return {observer,Main,display,emitter};
+  return {observer,Main,display,emitter,global};
 }
+
+test('visible focus outside the actor inventory remains blocked without an invalid scene',()=>{
+  for(const version of ['46.0','50.5']) {
+    const {observer,display,emitter,global}=fixture(version,'user',null);observer.enable();
+    const actor=emitter({is_visible:()=>true,is_mapped:()=>true});
+    const window=emitter({get_compositor_private:()=>actor,minimized:false,located_on_workspace:()=>true,
+      showing_on_its_workspace:()=>true,get_stable_sequence:()=>13,get_pid:()=>104,
+      get_gtk_application_id:()=> 'com.rastersoft.ding',get_wm_class:()=>null,get_title:()=> 'Desktop Icons 1',
+      get_frame_rect:()=>({x:0,y:0,width:1280,height:800}),is_override_redirect:()=>false});
+    display.get_focus_window=()=>window;
+    const unlisted=observer.snapshot();assert.equal(unlisted.window,null);
+    assert.equal(unlisted.windows.length,0);assert(unlisted.blockedReasons.includes('no-visible-live-focus'));
+    assert.equal(unlisted.inputQualified,false);
+    global.get_window_actors=()=>[{get_meta_window:()=>window}];
+    const listed=observer.snapshot();assert.deepEqual(listed.window,listed.windows[0]);
+    assert(!listed.blockedReasons.includes('no-visible-live-focus'));observer.disable();
+  }
+});
 
 test('Ubuntu normal mode requires GNOME 46 and the explicit user parent',()=>{
   for(const [version,mode,parent,blocked] of [['46.0','ubuntu','user',false],['46.2','user',null,false],
