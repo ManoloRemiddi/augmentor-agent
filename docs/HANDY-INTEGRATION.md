@@ -7,6 +7,17 @@ Implementation branch: `feat/handy-integration`, based on public main
 contract; [the approved plan](HANDY-INTEGRATION-PLAN.md) retains its rationale.
 Source, component qualification and installed promotion are separate evidence.
 
+Current implementation qualification: source `81a2bba` passes all hosted native
+component jobs (Linux x64, Mac ARM64, Windows x64), shared SDK/application checks,
+Debian build and clean installation/update/rollback/removal, actual packaged
+Chromium acceptance, and both macOS 14/26 signed development product jobs.
+[Validation](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37036303734)
+and [Mac product qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37036303739)
+record the exact completed runs. The owner's Linux installation is enabled and
+ready, with Desktop/Mobile online and the standalone tray/startup retired.
+Full Windows installer convergence with PR #20, Developer ID/notarization and
+physical OS/microphone/compositor acceptance remain customer-release gates.
+
 ## User experience
 
 Augmentor owns the tray and exposes **Voice dictation — Powered by Handy**
@@ -471,3 +482,23 @@ The existing navigation now permits vertical scrolling (`min-height: 0` and
 The same actual Chromium/Pi/fresh-user flow passes locally with this correction,
 including prompt revision conflict/draft retention and Support report download.
 Final packaged Browser qualification must confirm the rebuilt extension.
+
+### Final implementation qualification
+
+All jobs complete successfully at source `81a2bba` in the runs linked above.
+The packaged Browser proof confirms the scrollable settings navigation and
+Support report download; fresh-user installer lifecycle covers actual first run,
+global launch shortcut/service restart, active-task refusal, upgrade, interrupted
+configuration, rollback and owned removal with user state preserved. These
+results supersede the pending hosted qualifications in historical checkpoints.
+
+No additional installed cutover is needed for later Mac/Windows build tooling,
+fixture cleanup, CI or Browser stylesheet refinements. The separately composed
+compatible installed 0.2.11 artifact remains
+`20261002-160803-407ce464`, SHA-256
+`ac681aadeea466f7ce280f5641e8c89ba01e216a299702de3f1de134886240b9`,
+source `85034ac` over its documented original UI/DSH/speech base. Both named
+windows are online with voice available; embedded Ctrl+Space is enabled/ready,
+CPU, current animated palette, no tray and no standalone autostart. Source
+qualification, this installed composition and customer-release gates remain
+explicitly distinct. Documentation-only follow-ups retain tested source `81a2bba`.

@@ -4,6 +4,18 @@
 
 ## October 2 embedded Handy candidate
 
+Current implementation qualification: source `81a2bba` passes all hosted native
+component jobs (Linux x64, Mac ARM64, Windows x64), shared SDK/application checks,
+Debian build and clean installation/update/rollback/removal, actual packaged
+Chromium acceptance, and both macOS 14/26 signed development product jobs.
+[Validation](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37036303734)
+and [Mac product qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37036303739)
+record the exact completed runs. The owner's Linux installation is enabled and
+ready, with Desktop/Mobile online and the standalone tray/startup retired.
+Full Windows installer convergence with PR #20, Developer ID/notarization and
+physical OS/microphone/compositor acceptance remain customer-release gates.
+
+
 `feat/handy-integration` starts from public main `d91c520` and implements the
 owner-approved system-wide dictation and themed Handy overlay. Read
 [the implementation guide](HANDY-INTEGRATION.md) for supplier pins, settings,

@@ -5,6 +5,17 @@
 Prepared on 2 October 2026. The owner approved implementation on 2 October 2026, including the overlay
 customization below. Release qualification remains separate from implementation.
 
+Current implementation qualification: source `81a2bba` passes all hosted native
+component jobs (Linux x64, Mac ARM64, Windows x64), shared SDK/application checks,
+Debian build and clean installation/update/rollback/removal, actual packaged
+Chromium acceptance, and both macOS 14/26 signed development product jobs.
+[Validation](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37036303734)
+and [Mac product qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37036303739)
+record the exact completed runs. The owner's Linux installation is enabled and
+ready, with Desktop/Mobile online and the standalone tray/startup retired.
+Full Windows installer convergence with PR #20, Developer ID/notarization and
+physical OS/microphone/compositor acceptance remain customer-release gates.
+
 Implementation checkpoint: the maintained adaptation, shared settings/broker,
 animated themed pill, capture arbitration and platform component build pipelines
 now exist on `feat/handy-integration`. [The implementation guide](HANDY-INTEGRATION.md)
