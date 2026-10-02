@@ -58,5 +58,24 @@ class GnomeVmPreparation(unittest.TestCase):
                 vm.prepare(root,manifest,22490,True)
             self.assertEqual(len(run.call_args_list),2);self.assertFalse((root/'id_ed25519').exists())
 
+    def test_uefi_firmware_hash_and_links_refuse_before_credentials_or_boot(self):
+        for corruption in ('hash','link'):
+            with tempfile.TemporaryDirectory() as temp,patch.object(vm,'ROOT',Path(temp)),patch.object(vm.os,'geteuid',return_value=1000):
+                root=Path(temp)/'outputs/leap';manifest=self.prepare_fixture(root)
+                code=Path(temp)/'code.fd';code.write_bytes(b'fixture firmware')
+                variables=Path(temp)/'vars.fd';variables.write_bytes(b'private variable template')
+                firmware={'mode':'uefi','code':str(code),'varsTemplate':str(variables),
+                          'codeSha256':hashlib.sha256(code.read_bytes()).hexdigest(),
+                          'varsTemplateSha256':hashlib.sha256(variables.read_bytes()).hexdigest()}
+                if corruption=='hash':firmware['codeSha256']='0'*64
+                else:
+                    link=Path(temp)/'code-link.fd';link.symlink_to(code);firmware['code']=str(link)
+                manifest['firmware']=firmware
+                with patch.object(vm,'run',side_effect=['[GNUPG:] VALIDSIG '+'A'*40+' details',
+                        json.dumps({'format':'qcow2','full-backing-filename':str(root/'ubuntu.img')})]) as run:
+                    with self.assertRaisesRegex(ValueError,'firmware'):vm.prepare(root,manifest,22492,True)
+                self.assertEqual(len(run.call_args_list),2)
+                self.assertFalse((root/'id_ed25519').exists());self.assertFalse((root/'seed.iso').exists())
+
 
 if __name__=='__main__':unittest.main()

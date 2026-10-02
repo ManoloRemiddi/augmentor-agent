@@ -30,7 +30,7 @@ function fixture(version='46.0',mode='ubuntu',parent='user') {
 }
 
 test('visible focus outside the actor inventory remains blocked without an invalid scene',()=>{
-  for(const version of ['46.0','48.4','50.5']) {
+  for(const version of ['46.0','48.4','49.5','50.5']) {
     const {observer,display,emitter,global}=fixture(version,'user',null);observer.enable();
     const actor=emitter({is_visible:()=>true,is_mapped:()=>true});
     const window=emitter({get_compositor_private:()=>actor,minimized:false,located_on_workspace:()=>true,
@@ -49,7 +49,7 @@ test('visible focus outside the actor inventory remains blocked without an inval
 
 test('Ubuntu normal mode requires GNOME 46 and the explicit user parent',()=>{
   for(const [version,mode,parent,blocked] of [['46.0','ubuntu','user',false],['46.2','user',null,false],
-    ['48.4','user',null,false],['48.4','ubuntu','user',true],['50.5','user',null,false],['50.5','ubuntu','user',true],['46.0','ubuntu','greeter',true],
+    ['48.4','user',null,false],['48.4','ubuntu','user',true],['49.5','user',null,false],['49.5','ubuntu','user',true],['50.5','user',null,false],['50.5','ubuntu','user',true],['46.0','ubuntu','greeter',true],
     ['46.0','arbitrary','user',true],['46.0','unlock-dialog','user',true]]) {
     const {observer}=fixture(version,mode,parent);observer.enable();
     const value=observer.snapshot();assert.equal(value.blockedReasons.includes('non-user-session-mode'),blocked);
@@ -70,7 +70,7 @@ test('Ubuntu inheritance never bypasses lock, overview or modal guards',()=>{
 });
 
 test('46 tracks actor mapping and display monitor changes without nonexistent window properties',()=>{
-  for(const version of ['46.0','48.4','50.5']) {
+  for(const version of ['46.0','48.4','49.5','50.5']) {
     const {observer,emitter,display}=fixture(version,'user',null);observer.enable();
     const actor=emitter();const window=emitter({get_compositor_private:()=>actor});observer.track(window);
     const signals=[...window.callbacks.values()].map(item=>item.signal);
@@ -83,6 +83,6 @@ test('46 tracks actor mapping and display monitor changes without nonexistent wi
 });
 
 test('unreviewed Shell generations refuse before bridge export',()=>{
-  for(const version of ['45.9','47.0','49.5','51.0','46.0-foreign'])
-    assert.throws(()=>fixture(version).observer.enable(),/46, 48 and 50/);
+  for(const version of ['45.9','47.0','51.0','46.0-foreign'])
+    assert.throws(()=>fixture(version).observer.enable(),/46, 48, 49 and 50/);
 });

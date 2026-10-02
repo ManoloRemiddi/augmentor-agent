@@ -2,6 +2,66 @@
 
 # Linux distribution rollout
 
+## October 2 reboot, versioned startup and Leap Cloud boot
+
+The clean selected Noble `c4b885e` candidate now passes a normal reboot in the
+owned Mesa .2 comparison VM. The before/after boot IDs differ, the selected
+descriptor is identical and a fresh actual service-owned PID starts in Wayland.
+The read-only inspector verifies the complete managed inventory, seven-wheel
+runtime, pristine original dpkg payload, active AppArmor and the four default
+Ubuntu extensions plus observer. Fixture NAT networking returns. The
+[checked reboot report](../release/qualification/ubuntu24.04/gnome-reboot-c4b885e.json)
+binds source, artifact, helper and logs. Reboot was requested once after accepted
+idle close; no uncertain mutation was retried. Mesa .3, password unlock, shortcut
+lock fencing, connected harness, input and physical audio are still separate.
+
+Actual Leap testing exposed that `/usr/bin/python3` is absent while the reviewed
+system interpreter is `/usr/bin/python3.13`. Startup installation now validates
+and records the policy's base interpreter for canonical launcher/recovery/update
+wrappers and systemd, preserving the selected virtual environment for the app.
+A missing bootstrap refuses before creating startup state. Both owned containers
+execute generated service commands and secondary/updater wrappers using their
+real verified runtime and a synthetic app. Leap passes with no alias; Arch uses
+its real `python3`. Six startup cases and the full native suites pass: **689
+tests, two Mac-only skips, each**. The
+[checked interpreter proof](../release/qualification/next-targets/20261002-startup-interpreters.json)
+records exact working-source and raw-evidence hashes. No actual user service,
+recovery connection, package or graphical acceptance is inferred.
+
+GNOME 49 is now explicitly admitted alongside 46/48/50, after review of pinned
+Shell 49.5, Mutter 49.5 and GSD 49.1. Modern saved-portal schemas and boolean
+lockscreen exclusion remain required; Save writes false. Only 46 uses legacy
+window properties or the Ubuntu normal-mode exception. Both input and complete
+composition remain unqualified. The
+[11-file pinned source review](../release/qualification/next-targets/20261002-gnome49-source-profile.json)
+records source URLs/hashes. See the exact
+[GSD schema](https://github.com/GNOME/gnome-settings-daemon/blob/bed5961805b55b361fa5a291d943e1e7aa3efdab/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in),
+[Mutter window properties](https://github.com/GNOME/mutter/blob/658f672cc49eb9c8069d6f0c89d218d311d6de3c/src/core/window.c)
+and [Shell lifecycle](https://github.com/GNOME/gnome-shell/blob/7c3185a8d5be2cd5904d52c30f499151194b4009/js/ui/extensionSystem.js).
+Five executing JS, six settings/transaction and nine observer cases pass.
+Actual Fedora 43 desktop qualification remains open.
+
+The signed official Leap 16 Minimal Cloud Build 18.72 image is fully downloaded,
+337,581,568 bytes with SHA256 `8267490632e380890cfea663b5dba5cd828161af3e8cf562a73d6eb04898c4a1`.
+Its exact detached checksum signature verifies to the pinned openSUSE image key.
+The preparation helper now accepts an explicit Leap manifest and optional pinned
+UEFI code/variable template, copies only private writable variables and uses a
+private GPG home. Hash/link failures refuse before creating guest credentials or
+booting; five infrastructure tests pass. Actual UEFI QEMU boot reaches ordinary
+UID 1000 in `opensuse-leap` 16.0 on XFS. Cloud-init reports done, external
+`DataSourceNoCloud [seed=/dev/sr0]`, zero errors. The
+[checked Cloud boot receipt](../release/qualification/next-targets/20261002-leap16-cloud-boot.json)
+retains image/firmware/helper identities and explicit false desktop gates.
+GNOME, package adoption, Browser, consent/input/Stop and speech still need actual
+acceptance. Mint 22.3's detached checksum signature is authenticated; full ISO
+download remains in progress. No owner services/devices/state are changed.
+
+All hosted Linux and Mac jobs for preceding `fc3102a` pass. These are new source
+changes and fixture proofs; the Noble installed candidate remains `c4b885e`.
+The full five-point autonomous rollout stays active, including coordinated
+upgrade/rollback, matching package adapters, real consent and visible Stop,
+physical audio, dependency rebuild/replacement and release gating.
+
 ## October 2 actual Noble keyboard and next-runtime acceptance
 
 The clean managed `c4b885e` Noble/Mesa .2 Wayland candidate passes actual Qt

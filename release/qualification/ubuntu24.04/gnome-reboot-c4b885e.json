@@ -1,0 +1,74 @@
+{
+  "format": "augmentor-noble-managed-reboot-qualification/1",
+  "source": {
+    "commit": "c4b885e035f2a87966a222b6df7621467bd87e89",
+    "dirty": false
+  },
+  "version": "0.2.13",
+  "target": "ubuntu24.04-amd64",
+  "inspection": {
+    "selection": {
+      "root": "/home/augmentor-proof/.local/share/augmentor/releases/20261002-091808-11cadd22",
+      "python": "/home/augmentor-proof/.local/share/augmentor/python-runtimes/noble-cp312-x86_64-voice-81b66921d3a2eb01/bin/python3",
+      "node": "/home/augmentor-proof/.local/share/augmentor/releases/20261002-091808-11cadd22/node/bin/node",
+      "dshService": null,
+      "version": "0.2.13",
+      "releaseId": "20261002-091808-11cadd22",
+      "sourceRef": "c4b885e035f2a87966a222b6df7621467bd87e89",
+      "artifactSha256": "0fa0e4e05ce4b038c25e0872f8db452d7ed8377ff6b39a58c451a6894e6b7909"
+    },
+    "pythonRuntimeVerified": true,
+    "packageVerified": true,
+    "apparmorEnabled": true,
+    "apparmorServiceActive": true,
+    "graphicalSessions": [
+      {
+        "Seat": "seat0",
+        "Type": "wayland",
+        "Class": "user",
+        "Active": "yes",
+        "State": "active"
+      }
+    ],
+    "service": {
+      "MainPID": "1440",
+      "ActiveState": "active",
+      "SubState": "running"
+    },
+    "ubuntuDefaultExtensionsActive": {
+      "ubuntu-dock@ubuntu.com": 1.0,
+      "ubuntu-appindicators@ubuntu.com": 1.0,
+      "ding@rastersoft.com": 1.0,
+      "tiling-assistant@ubuntu.com": 1.0,
+      "observer@augmentoragent.com": 1.0
+    },
+    "canonicalSelection": true,
+    "managedInventoryVerified": true,
+    "serviceOwnsActualApplication": true
+  },
+  "bootIdBefore": "519772b3-0905-444e-a68f-7cd1e71f0b3f",
+  "bootIdAfter": "4e0b7860-d554-4433-a5d8-f345c66b0926",
+  "oldPid": 16360,
+  "newPid": 1440,
+  "idleCloseAccepted": true,
+  "rebootRequestedOnce": true,
+  "realGuestRebootTested": true,
+  "waylandSessionReturned": true,
+  "canonicalSelectionPreserved": true,
+  "natNetworkingReturned": true,
+  "mesaVersion": "25.2.8-0ubuntu0.24.04.2",
+  "latestMesaDot3Qualified": false,
+  "dedicatedQemuFixture": true,
+  "standardDesktopInstallerTested": false,
+  "passwordUnlockTested": false,
+  "shortcutLockFencingTested": false,
+  "harnessConnectionTested": false,
+  "desktopInputTested": false,
+  "physicalAudioTested": false,
+  "privateLogSha256": {
+    "noble-post-reboot-status.log": "1021fd9620c1972eac766a9c817250222d34fc0b61bf19e366a251187929c634",
+    "noble-reboot-inspection-c4b885e.json": "a475e1cf2883ff65e0817122e13098f9331ebfc3ff2cadc7f0ddfb6efb506cd4",
+    "noble-reboot-request-c4b885e.log": "caf14ccd1eaeb17c0822e393df8dad56f9f634a2b2b02e15ddb5bd14e85ea155"
+  },
+  "inspectionHelperSha256": "e2d1839285e217eb5f2fad00b1b8f7c5e3f7aa6e97b6108f8728e63c8182ed94"
+}

@@ -11,6 +11,7 @@ from pathlib import Path
 import shlex
 import shutil
 import subprocess
+import sys
 import tempfile
 import time
 
@@ -18,19 +19,22 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def install(root, python, node, dsh_service=None, enable=True):
+    bootstrap=Path(sys._base_executable)
     marker=Path(root)/'linux-python-runtime.json'
     if marker.exists() or marker.is_symlink():
         spec=importlib.util.spec_from_file_location('startup_linux_python',Path(root)/'scripts/linux-python-runtime.py')
         runtime=importlib.util.module_from_spec(spec);spec.loader.exec_module(runtime)
         runtime.resolve(root,python)
+        bootstrap=Path(runtime.policy(marker)['python'])
+    if not bootstrap.is_file():raise ValueError('Missing deployment bootstrap Python: '+str(bootstrap))
     data = Path(os.environ.get('XDG_DATA_HOME', Path.home()/'.local/share'))/'augmentor'
     data.mkdir(parents=True, exist_ok=True, mode=0o700)
     with (data/'deployment.lock').open('a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        return _install(root, python, node, dsh_service, enable)
+        return _install(root, python, node, dsh_service, enable, bootstrap)
 
 
-def _install(root, python, node, dsh_service=None, enable=True):
+def _install(root, python, node, dsh_service=None, enable=True, bootstrap=None):
     root = Path(root).resolve()
     # A venv interpreter is often a symlink; resolving it loses that environment.
     python, node = (Path(p).absolute() for p in (python, node))
@@ -41,6 +45,8 @@ def _install(root, python, node, dsh_service=None, enable=True):
     data = Path(os.environ.get('XDG_DATA_HOME', Path.home()/'.local/share'))
     config = Path(os.environ.get('XDG_CONFIG_HOME', Path.home()/'.config'))
     state = Path(os.environ.get('XDG_STATE_HOME', Path.home()/'.local/state'))
+    bootstrap=Path(bootstrap or sys._base_executable).absolute()
+    if not bootstrap.is_file():raise ValueError('Missing deployment bootstrap Python: '+str(bootstrap))
     binary = Path.home()/'.local/bin'
     launch = data/'augmentor/desktop-launch.py'
     entry = binary/'augmentor-agent'
@@ -52,7 +58,7 @@ def _install(root, python, node, dsh_service=None, enable=True):
     shortcuts = ''.join(line+'\n' for line in old.read_text().splitlines() if line.startswith('X-KDE-Shortcuts=')) if old.exists() else ''
     secondary = data/'applications/com.augmentor.Agent.secondary.desktop'
     secondary_keys = ''.join(line+'\n' for line in secondary.read_text().splitlines() if line.startswith('X-KDE-Shortcuts=')) if secondary.exists() else ''
-    manifest = {'root':str(root), 'python':str(python), 'node':str(node), 'dshService':dsh_service,
+    manifest = {'root':str(root), 'python':str(python), 'node':str(node), 'bootstrapPython':str(bootstrap), 'dshService':dsh_service,
                 'version':json.loads((root/'release/product.json').read_text())['version'],
                 'windowSha256':hashlib.sha256((root/'apps/native/augmentor_linux/window.py').read_bytes()).hexdigest()}
     manifest['files'] = {name:hashlib.sha256((root/name).read_bytes()).hexdigest() for name in (
@@ -74,21 +80,21 @@ def _install(root, python, node, dsh_service=None, enable=True):
         launch:(ROOT/'scripts/desktop-launch.py').read_text(),
         data/'augmentor/desktop-deployment.py':(ROOT/'scripts/desktop-deployment.py').read_text(),
         data/'augmentor/desktop.json':json.dumps(manifest, indent=2)+'\n',
-        entry:'#!/bin/sh\nexec /usr/bin/python3 '+shlex.quote(str(launch))+' "$@"\n',
-        binary/'augmentor-recover':'#!/bin/sh\nexec /usr/bin/python3 '+shlex.quote(str(launch))+' --recover\n',
-        binary/'augmentor-update':'#!/bin/sh\nexec /usr/bin/python3 '+shlex.quote(str(data/'augmentor/desktop-deployment.py'))+' "$@"\n',
+        entry:'#!/bin/sh\nexec '+shlex.quote(str(bootstrap))+' '+shlex.quote(str(launch))+' "$@"\n',
+        binary/'augmentor-recover':'#!/bin/sh\nexec '+shlex.quote(str(bootstrap))+' '+shlex.quote(str(launch))+' --recover\n',
+        binary/'augmentor-update':'#!/bin/sh\nexec '+shlex.quote(str(bootstrap))+' '+shlex.quote(str(data/'augmentor/desktop-deployment.py'))+' "$@"\n',
         old:desktop(field(entry), 'Augmentor Agent', extra=shortcuts),
         secondary:desktop(field(entry)+' --instance secondary', 'Augmentor Agent — Second window', extra=secondary_keys),
         data/'applications/com.augmentor.Agent.recover.desktop':desktop(field(entry)+' --recover-window', 'Augmentor Agent — Recover connection', terminal=True),
         config/'autostart/com.augmentor.Agent.desktop':desktop(field(entry)+' --autostart', 'Augmentor Agent', extra='X-KDE-autostart-phase=2\n'),
         config/'systemd/user/augmentor-desktop.service':
             '[Unit]\nDescription=Augmentor Agent desktop\nPartOf=graphical-session.target\nAfter=graphical-session.target\nStartLimitIntervalSec=0\n\n'
-            '[Service]\nType=exec\nExecStart=/usr/bin/python3 '+field(launch)+' --service-run\nRestart=on-failure\nRestartSec=5\nTimeoutStopSec=15\nUMask=0077\n\n'
+            '[Service]\nType=exec\nExecStart='+field(bootstrap)+' '+field(launch)+' --service-run\nRestart=on-failure\nRestartSec=5\nTimeoutStopSec=15\nUMask=0077\n\n'
             '[Install]\nWantedBy=graphical-session.target\n',
     }
     # Retire the hard-coded login script and old voice shortcut as aliases so
     # cached KDE launch paths cannot select another build.
-    files[data/'augmentor/autostart.py'] = '#!/usr/bin/python3\nimport os\nos.execv('+repr(str(entry))+', ['+repr(str(entry))+', "--autostart"])\n'
+    files[data/'augmentor/autostart.py'] = '#!'+str(bootstrap)+'\nimport os\nos.execv('+repr(str(entry))+', ['+repr(str(entry))+', "--autostart"])\n'
     files[binary/'augmentor-voice-preview'] = '#!/bin/sh\nexec '+shlex.quote(str(entry))+' "$@"\n'
     global_entry = data/'kglobalaccel/com.augmentor.Agent.desktop'
     if global_entry.exists(): files[global_entry] = files[old]

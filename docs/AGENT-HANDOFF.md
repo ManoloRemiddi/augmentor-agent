@@ -2,6 +2,22 @@
 
 # Start here: agent handoff
 
+## October 2 reboot, versioned startup and Leap boot checkpoint
+
+The clean managed Noble `c4b885e` passes actual normal guest reboot: changed boot
+ID, selected descriptor preserved, fresh service-owned app PID, real Wayland,
+verified runtime/inventory, AppArmor and all default Ubuntu extensions. The
+separate Mesa .3 failure remains unqualified. Versioned bootstrap source passes
+actual Arch/Leap synthetic startup commands, including Leap without `python3`;
+both complete native suites pass **689 tests, two Mac-only skips**. Reviewed
+GNOME 49 now has an explicit source profile; actual Fedora 43 graphical acceptance
+remains open. Signed Leap 16 Cloud bytes boot using pinned UEFI firmware and the
+external NoCloud seed completes without errors. This proves Cloud infrastructure,
+not a GNOME/product/package pass. Continue all five original remaining points
+through the [current evidence](LINUX-DISTRO-ROLLOUT.md#october-2-reboot-versioned-startup-and-leap-cloud-boot).
+Hosted Linux/Mac jobs for preceding `fc3102a` both pass; this checkpoint is new
+source, distinct from the unchanged installed Noble candidate.
+
 ## October 2 actual keyboard and ABI runtime checkpoint
 
 Clean managed `c4b885e` now passes the full owned-QMP two-instance shortcut test

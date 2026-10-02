@@ -20,7 +20,7 @@ class Schema:
 
 def schemas(version,portal=False):
     fields={'name':'s','binding':'s','command':'s'}
-    if version in (48,50):fields['enable-in-lockscreen']='b'
+    if version in (48,49,50):fields['enable-in-lockscreen']='b'
     result={backend.CUSTOM:Schema(fields)}
     if portal:
         result[backend.PORTAL]=Schema({'applications':'as'})
@@ -56,14 +56,14 @@ class GnomeSettingsProfiles(unittest.TestCase):
         self.assertEqual(self.profile('46.0',schemas(46)),(backend.FIELDS,False))
         self.assertEqual(self.profile('46.2',schemas(46,True)),(backend.FIELDS,True))
 
-    def test_48_and_50_keep_explicit_lock_exclusion_and_portal_checks(self):
-        for version in ('48.4','50.5'):
+    def test_48_49_and_50_keep_explicit_lock_exclusion_and_portal_checks(self):
+        for version in ('48.4','49.5','50.5'):
             self.assertEqual(self.profile(version,schemas(48,True)),(backend.FIELDS+('enable-in-lockscreen',),True))
             for rows in (schemas(46,True),schemas(48)):
                 with self.subTest(version=version),self.assertRaises(RuntimeError):self.profile(version,rows)
 
     def test_unreviewed_versions_partial_portal_and_malformed_present_schemas_refuse(self):
-        for version in ('45.9','47.0','49.5','51.0','46.0-foreign',None):
+        for version in ('45.9','47.0','51.0','46.0-foreign',None):
             with self.subTest(version=version),self.assertRaises(RuntimeError):self.profile(version,schemas(46))
         rows=schemas(46);rows[backend.PORTAL]=Schema({'applications':'as'})
         with self.assertRaises(RuntimeError):self.profile('46.0',rows)
@@ -74,7 +74,7 @@ class GnomeSettingsProfiles(unittest.TestCase):
 
     def transaction(self,version):
         obj=backend.NativeShortcuts.__new__(backend.NativeShortcuts)
-        obj.fields,obj.portal_available=self.profile(version,schemas(int(version.split('.')[0]),version.startswith(('48.','50.'))))
+        obj.fields,obj.portal_available=self.profile(version,schemas(int(version.split('.')[0]),version.startswith(('48.','49.','50.'))))
         old={'name':'Augmentor Agent','binding':'<Super>F8','command':'canonical'}
         if 'enable-in-lockscreen' in obj.fields:old['enable-in-lockscreen']=False
         entry=Entry(old);parent=Mock();paths=[backend.PREFIX+'main/','/foreign/']
@@ -88,17 +88,17 @@ class GnomeSettingsProfiles(unittest.TestCase):
         return obj,entry,paths,old
 
     def test_save_46_never_writes_nonexistent_key_and_modern_profiles_clear_lock_enable(self):
-        for version in ('46.0','48.4','50.5'):
+        for version in ('46.0','48.4','49.5','50.5'):
             obj,entry,paths,old=self.transaction(version)
-            if version.startswith(('48.','50.')):entry.values['enable-in-lockscreen']=True
+            if version.startswith(('48.','49.','50.')):entry.values['enable-in-lockscreen']=True
             with patch.object(backend,'locked',return_value=nullcontext()):
                 self.assertEqual(obj.save('main',{}),{'functionalTested':False})
             self.assertEqual(entry.values['binding'],'<Super>F9');self.assertIn('/foreign/',paths)
-            if version.startswith(('48.','50.')):self.assertIs(entry.values['enable-in-lockscreen'],False)
+            if version.startswith(('48.','49.','50.')):self.assertIs(entry.values['enable-in-lockscreen'],False)
             else:self.assertNotIn('enable-in-lockscreen',entry.values)
 
     def test_registration_failure_rolls_back_only_own_values_and_preserves_foreign_entry(self):
-        for version in ('46.0','48.4','50.5'):
+        for version in ('46.0','48.4','49.5','50.5'):
             obj,entry,paths,old=self.transaction(version);paths.remove(backend.PREFIX+'main/')
             obj.parent.set_strv.return_value=False;obj.parent.set_strv.side_effect=None
             with patch.object(backend,'locked',return_value=nullcontext()),self.assertRaisesRegex(RuntimeError,'registration'):
@@ -106,7 +106,7 @@ class GnomeSettingsProfiles(unittest.TestCase):
             self.assertEqual(entry.values,old);self.assertEqual(paths,['/foreign/']);obj.read.assert_not_called()
 
     def test_conflict_refuses_before_mutation_for_all_profiles(self):
-        for version in ('46.0','48.4','50.5'):
+        for version in ('46.0','48.4','49.5','50.5'):
             obj,entry,paths,old=self.transaction(version);obj.conflicts.side_effect=ValueError('already assigned')
             with patch.object(backend,'locked',return_value=nullcontext()),self.assertRaises(ValueError):obj.save('main',{})
             self.assertEqual(entry.values,old);self.assertIsNone(entry.pending);obj.parent.set_strv.assert_not_called()

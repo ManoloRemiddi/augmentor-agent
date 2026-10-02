@@ -37,11 +37,12 @@ class GnomeObserverTests(unittest.TestCase):
         value['inputQualified']=False;value['guards']['parentSessionMode']=True
         with self.assertRaisesRegex(RuntimeError,'parent session mode'):gnome.valid_scene(value)
 
-    def test_48_modern_profile_retains_epoch_and_read_only_fences(self):
-        value=fixture();value['shellVersion']='48.4'
-        self.assertEqual(gnome.valid_scene(value),value)
-        value['inputQualified']=True
-        with self.assertRaises(RuntimeError):gnome.valid_scene(value)
+    def test_48_49_modern_profiles_retains_epoch_and_read_only_fences(self):
+        for version in ('48.4','49.5'):
+            value=fixture();value['shellVersion']=version
+            self.assertEqual(gnome.valid_scene(value),value)
+            value['inputQualified']=True
+            with self.assertRaises(RuntimeError):gnome.valid_scene(value)
 
     def test_real_schema_preserves_negative_coordinates_and_unavailable_provider(self):
         value=fixture();self.assertEqual(gnome.valid_scene(value),value)
@@ -52,7 +53,7 @@ class GnomeObserverTests(unittest.TestCase):
             with self.subTest(value=value[:20]),self.assertRaises(RuntimeError):gnome.parsed(value)
 
     def test_false_input_qualification_and_valid_epoch_serial_are_required(self):
-        for field,value in [('inputQualified',True),('serial',True),('serial',2**53),('epoch','old-session'),('shellVersion','49.5')]:
+        for field,value in [('inputQualified',True),('serial',True),('serial',2**53),('epoch','old-session'),('shellVersion','47.0')]:
             status=fixture();status[field]=value
             with self.subTest(field=field),self.assertRaises(RuntimeError):gnome.valid_status(status)
 

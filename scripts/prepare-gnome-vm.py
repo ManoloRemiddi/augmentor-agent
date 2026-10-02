@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-"""Prepare a signed Fedora/Ubuntu Cloud overlay and owned QEMU GNOME test VM.
+"""Prepare a signed distro Cloud overlay and owned QEMU GNOME test VM.
 
 Writes only an ignored outputs directory, with dedicated SSH credentials. Does
 not install host packages, attach host filesystems/devices or provision GNOME.
@@ -69,12 +69,13 @@ def prepare(vm,manifest,port,boot,manifest_path=None):
                 run(['curl','--fail','--location','--retry','2','--max-time','900','--output',str(temporary),url],timeout=930)
                 temporary.replace(path)
             if path.is_symlink() or not path.is_file():raise ValueError('Fixture download must be a regular file.')
+        gpg_home=vm/'gpg-home';gpg_home.mkdir(exist_ok=True,mode=0o700);gpg_home.chmod(0o700)
         if armored and not keyring.exists():
             temporary=keyring.with_suffix('.dearmor')
-            run(['gpg','--no-options','--batch','--dearmor','--output',str(temporary),str(key_source)],timeout=15)
+            run(['gpg','--no-options','--homedir',str(gpg_home),'--batch','--dearmor','--output',str(temporary),str(key_source)],timeout=15)
             temporary.replace(keyring)
         if keyring.is_symlink() or not keyring.is_file():raise ValueError('Use a regular fixture keyring.')
-        status=run(['gpgv','--keyring',str(keyring),'--status-fd','1',str(signature or checksum)]+
+        status=run(['gpgv','--homedir',str(gpg_home),'--keyring',str(keyring),'--status-fd','1',str(signature or checksum)]+
                    ([str(checksum)] if signature else []),timeout=30)
         if not any(line.startswith('[GNUPG:] VALIDSIG '+manifest['signingFingerprint']+' ') for line in status.splitlines()):
             raise ValueError('Checksum signer differs from the pinned official image fingerprint.')
@@ -92,6 +93,23 @@ def prepare(vm,manifest,port,boot,manifest_path=None):
         if info.get('format')!='qcow2' or info.get('full-backing-filename')!=str(image):
             raise ValueError('The guest overlay does not use this verified pinned image.')
         overlay.chmod(0o600)
+        firmware_arguments=[]
+        firmware=manifest.get('firmware')
+        if firmware:
+            if firmware.get('mode')!='uefi':raise ValueError('Only an explicitly pinned UEFI fixture is supported.')
+            for key in ('code','varsTemplate'):
+                path=Path(firmware[key])
+                if not path.is_absolute() or path.is_symlink() or not path.is_file():
+                    raise ValueError('Use regular, absolute fixture firmware files.')
+                if hashlib.sha256(path.read_bytes()).hexdigest()!=firmware[key+'Sha256']:
+                    raise ValueError('Fixture firmware differs from the recorded bytes.')
+            variables=vm/'firmware-vars.fd'
+            if not variables.exists():
+                with variables.open('xb') as stream:stream.write(Path(firmware['varsTemplate']).read_bytes())
+                variables.chmod(0o600)
+            if variables.is_symlink() or not variables.is_file():raise ValueError('Use private regular firmware variables.')
+            firmware_arguments=['-drive','if=pflash,format=raw,unit=0,readonly=on,file='+firmware['code'],
+                                '-drive','if=pflash,format=raw,unit=1,file=firmware-vars.fd']
         identity=vm/'id_ed25519'
         if not identity.exists():
             run(['ssh-keygen','-q','-t','ed25519','-N','','-C',name,'-f',str(identity)],timeout=15)
@@ -125,7 +143,7 @@ def prepare(vm,manifest,port,boot,manifest_path=None):
             with socket.socket() as probe:probe.bind(('127.0.0.1',port))
             run(['qemu-system-x86_64','-name',name,'-machine','q35,accel='+manifest['acceleration'],
                 '-cpu',manifest['cpuModel'],'-smp',str(manifest['cpus']),'-m',str(manifest['memoryMiB']),
-                '-drive','file=guest.qcow2,format=qcow2,if=virtio','-drive','file=seed.iso,format=raw,media=cdrom,readonly=on',
+                *firmware_arguments,'-drive','file=guest.qcow2,format=qcow2,if=virtio','-drive','file=seed.iso,format=raw,media=cdrom,readonly=on',
                 '-device','virtio-vga','-display','none','-usb','-device','usb-tablet',
                 '-netdev','user,id=net0,hostfwd=tcp:127.0.0.1:'+str(port)+'-:22','-device','virtio-net-pci,netdev=net0',
                 '-serial','file:serial.log','-monitor','none','-qmp','unix:qmp.sock,server=on,wait=off',
@@ -137,8 +155,8 @@ if __name__=='__main__':
     p.add_argument('--directory',type=Path,required=True)
     p.add_argument('--ssh-port',type=int,default=22489)
     p.add_argument('--boot',action='store_true')
-    p.add_argument('--target',choices=('fedora44','ubuntu24'),default='fedora44')
+    p.add_argument('--target',choices=('fedora44','ubuntu24','leap16'),default='fedora44')
     a=p.parse_args()
-    manifest_path=ROOT/'release'/('fedora-gnome-vm.json' if a.target=='fedora44' else 'ubuntu24-gnome-vm.json')
+    manifest_path=ROOT/'release'/({'fedora44':'fedora-gnome-vm.json','ubuntu24':'ubuntu24-gnome-vm.json','leap16':'opensuse-leap16-gnome-vm.json'}[a.target])
     result=prepare(a.directory,json.loads(manifest_path.read_text()),a.ssh_port,a.boot,manifest_path)
     print(json.dumps({'prepared':True,'bootRequested':a.boot,'sshPort':result['sshPort'],'desktopAcceptanceTested':False}))

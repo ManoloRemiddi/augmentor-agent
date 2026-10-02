@@ -27,6 +27,10 @@ class DesktopStartupTests(unittest.TestCase):
             with patch.dict(os.environ,{'XDG_DATA_HOME':str(data),'XDG_CONFIG_HOME':str(config),'XDG_STATE_HOME':str(state)}),patch.object(Path,'home',return_value=home),patch.object(installer.subprocess,'run',return_value=Mock(returncode=0)):
                 manifest=installer.install(root,python,Path(sys.executable),'dsh-web.service')
             self.assertEqual(manifest['python'],str(python))
+            self.assertEqual(manifest['bootstrapPython'],sys._base_executable)
+            for name in ('augmentor-agent','augmentor-recover','augmentor-update'):
+                self.assertIn(sys._base_executable,(home/'.local/bin'/name).read_text())
+            self.assertIn(sys._base_executable,(config/'systemd/user/augmentor-desktop.service').read_text())
             for path in (data/'applications/com.augmentor.Agent.desktop',data/'applications/com.augmentor.Agent.secondary.desktop',config/'autostart/com.augmentor.Agent.desktop'):
                 self.assertIn(str(home/'.local/bin/augmentor-agent'),path.read_text())
                 self.assertNotIn('/usr/bin/augmentor-agent',path.read_text())
@@ -37,6 +41,15 @@ class DesktopStartupTests(unittest.TestCase):
         with patch.object(launch,'start_service') as start,patch.object(launch.os,'execve') as execute:
             self.assertEqual(launch.main(['--autostart']),0)
         start.assert_called_once();execute.assert_not_called()
+
+    def test_missing_bootstrap_refuses_before_creating_startup_state(self):
+        installer=load('install-desktop-startup')
+        with tempfile.TemporaryDirectory() as folder:
+            home=Path(folder);data=home/'data'
+            with patch.dict(os.environ,{'XDG_DATA_HOME':str(data)}),patch.object(installer.sys,'_base_executable',str(home/'absent-python')):
+                with self.assertRaisesRegex(ValueError,'bootstrap Python'):
+                    installer.install(home/'candidate',Path(sys.executable),Path(sys.executable),enable=False)
+            self.assertFalse(data.exists())
 
     def test_pending_update_does_not_disable_recovery_of_running_window(self):
         launch=load('desktop-launch')

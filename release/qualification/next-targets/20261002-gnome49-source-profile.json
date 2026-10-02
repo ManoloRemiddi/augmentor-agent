@@ -1,0 +1,108 @@
+{
+  "format": "augmentor-gnome-source-profile-review/1",
+  "shellVersion": "49.5",
+  "mutterVersion": "49.5",
+  "gsdVersion": "49.1",
+  "files": [
+    {
+      "repo": "gnome-shell",
+      "commit": "7c3185a8d5be2cd5904d52c30f499151194b4009",
+      "path": "js/ui/extensionSystem.js",
+      "url": "https://github.com/GNOME/gnome-shell/blob/7c3185a8d5be2cd5904d52c30f499151194b4009/js/ui/extensionSystem.js",
+      "bytes": 27955,
+      "sha256": "4c15ac73a1b4f46b89a22c2890f531f0b1f36cd6463d0857d331332596adac92"
+    },
+    {
+      "repo": "gnome-shell",
+      "commit": "7c3185a8d5be2cd5904d52c30f499151194b4009",
+      "path": "js/ui/screenShield.js",
+      "url": "https://github.com/GNOME/gnome-shell/blob/7c3185a8d5be2cd5904d52c30f499151194b4009/js/ui/screenShield.js",
+      "bytes": 24281,
+      "sha256": "7188b6538be10db3ef494cb66cbbf003d02e19e1e7855c7404458cb2f548eb66"
+    },
+    {
+      "repo": "gnome-shell",
+      "commit": "7c3185a8d5be2cd5904d52c30f499151194b4009",
+      "path": "js/ui/sessionMode.js",
+      "url": "https://github.com/GNOME/gnome-shell/blob/7c3185a8d5be2cd5904d52c30f499151194b4009/js/ui/sessionMode.js",
+      "bytes": 5810,
+      "sha256": "a5fe8403b9a424cf40bd96c4cd05e3e6d1a23f5ae72f26676481b34991116030"
+    },
+    {
+      "repo": "mutter",
+      "commit": "658f672cc49eb9c8069d6f0c89d218d311d6de3c",
+      "path": "src/core/window.c",
+      "url": "https://github.com/GNOME/mutter/blob/658f672cc49eb9c8069d6f0c89d218d311d6de3c/src/core/window.c",
+      "bytes": 269297,
+      "sha256": "ebf59739b6e1414d3237a9d19ad69cd30d0ee721806d78260f78ed43f7f11730"
+    },
+    {
+      "repo": "mutter",
+      "commit": "658f672cc49eb9c8069d6f0c89d218d311d6de3c",
+      "path": "src/core/display.c",
+      "url": "https://github.com/GNOME/mutter/blob/658f672cc49eb9c8069d6f0c89d218d311d6de3c/src/core/display.c",
+      "bytes": 116060,
+      "sha256": "bd459c88e4b12874f2913bd4c786da18894fcf0c923aa28c3d1f9ebe55a6ddf6"
+    },
+    {
+      "repo": "mutter",
+      "commit": "658f672cc49eb9c8069d6f0c89d218d311d6de3c",
+      "path": "src/core/meta-workspace-manager.c",
+      "url": "https://github.com/GNOME/mutter/blob/658f672cc49eb9c8069d6f0c89d218d311d6de3c/src/core/meta-workspace-manager.c",
+      "bytes": 32552,
+      "sha256": "5a101a2aa2c8e40d468c91da58bc28a9edb8067f0278adab004c41b1afcb08f1"
+    },
+    {
+      "repo": "mutter",
+      "commit": "658f672cc49eb9c8069d6f0c89d218d311d6de3c",
+      "path": "clutter/clutter/clutter-stage.c",
+      "url": "https://github.com/GNOME/mutter/blob/658f672cc49eb9c8069d6f0c89d218d311d6de3c/clutter/clutter/clutter-stage.c",
+      "bytes": 115685,
+      "sha256": "420c7a944889729069c7f9742d8e59a30ae1aef976b01ad87f6d2e9571bf80ed"
+    },
+    {
+      "repo": "mutter",
+      "commit": "658f672cc49eb9c8069d6f0c89d218d311d6de3c",
+      "path": "meson.options",
+      "url": "https://github.com/GNOME/mutter/blob/658f672cc49eb9c8069d6f0c89d218d311d6de3c/meson.options",
+      "bytes": 4529,
+      "sha256": "3fa4c94b763f5673a55dfbdee9336a5c22e6806d7f589491fd1623f3a58c456d"
+    },
+    {
+      "repo": "gnome-settings-daemon",
+      "commit": "bed5961805b55b361fa5a291d943e1e7aa3efdab",
+      "path": "data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in",
+      "url": "https://github.com/GNOME/gnome-settings-daemon/blob/bed5961805b55b361fa5a291d943e1e7aa3efdab/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in",
+      "bytes": 27614,
+      "sha256": "e2d1473ed23523dfdb503572b0178ea410a64bacfa7e1ea973125df639981be1"
+    },
+    {
+      "repo": "gnome-settings-daemon",
+      "commit": "bed5961805b55b361fa5a291d943e1e7aa3efdab",
+      "path": "data/org.gnome.settings-daemon.global-shortcuts.gschema.xml.in",
+      "url": "https://github.com/GNOME/gnome-settings-daemon/blob/bed5961805b55b361fa5a291d943e1e7aa3efdab/data/org.gnome.settings-daemon.global-shortcuts.gschema.xml.in",
+      "bytes": 721,
+      "sha256": "a48953e2b2c766e00748b2f81a726f78ff56fe6ebb3713d6043b390acf591134"
+    },
+    {
+      "repo": "gnome-settings-daemon",
+      "commit": "bed5961805b55b361fa5a291d943e1e7aa3efdab",
+      "path": "plugins/media-keys/gsd-media-keys-manager.c",
+      "url": "https://github.com/GNOME/gnome-settings-daemon/blob/bed5961805b55b361fa5a291d943e1e7aa3efdab/plugins/media-keys/gsd-media-keys-manager.c",
+      "bytes": 129506,
+      "sha256": "e337877d4def4230a6f17c52090cfeae632cfd438df95beb119351d6d0fc106c"
+    }
+  ],
+  "sourceProfile": {
+    "lockscreenBooleanRequired": true,
+    "bothSavedPortalSchemasRequired": true,
+    "saveDisablesLockscreenBinding": true,
+    "legacyWindowProperties": false,
+    "ubuntuModeException": false,
+    "readOnlyObserver": true,
+    "inputQualified": false
+  },
+  "actualFedora43SessionTested": false,
+  "desktopInputQualified": false,
+  "releaseQualified": false
+}

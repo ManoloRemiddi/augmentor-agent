@@ -83,6 +83,17 @@ installs `augmentor-update`. Once a managed release is selected, the installer
 refuses to replace it with another root or interpreter: use the update command.
 Installer and updater share a kernel lock so simultaneous promotions cannot race.
 
+Canonical wrappers and the user service use the declared runtime policy's base
+interpreter as `bootstrapPython`; deployments without a policy use the installing
+interpreter's base executable. The separately selected Python environment is
+preserved when starting the app. No `/usr/bin/python3` alias is required on Leap
+16, whose reviewed runtime uses `/usr/bin/python3.13`. A missing bootstrap is
+refused before startup state is created. The
+[actual Arch/Leap interpreter proof](../release/qualification/next-targets/20261002-startup-interpreters.json)
+executes the generated service command, secondary wrapper and updater in private
+synthetic application fixtures. It does not enable a service or qualify graphical
+login, recovery connection or package installation.
+
 ## Required development and update workflow
 
 1. Implement and test the change in source. Build a complete runnable candidate
