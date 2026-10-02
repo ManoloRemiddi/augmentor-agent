@@ -898,24 +898,16 @@ class Window(QWidget):
         self.chat_minimum=(self.minimumWidth()/factor(self),self.minimumHeight()/factor(self))
         self.chat_maximum=(self.maximumWidth()/factor(self),self.maximumHeight()/factor(self))
         panel=SettingsDialog(self);self.settings_panel=panel;self.shortcut_dialog=panel
-        panel.closed.connect(self.close_settings);panel.size_requested.connect(self.resize_settings)
+        panel.closed.connect(self.close_settings)
         self.stack.addWidget(panel);self.stack.setCurrentWidget(panel)
         area=self.screen().availableGeometry()
-        scaled(self).setMinimumSize(320,364)
+        self.setFixedSize(panel.frame_size())
         target=QRect(self.chat_geometry)
-        target.setSize(QSize(min(px(self,450),area.width()),min(px(self,620),area.height())))
+        target.setSize(panel.frame_size())
         target.moveLeft(max(area.left(),min(target.x(),area.right()-target.width()+1)))
         target.moveTop(max(area.top(),min(target.y(),area.bottom()-target.height()+1)))
         self.setGeometry(target);self.hidden_geometry=None;self.resize_borders.update();self.update()
         QTimer.singleShot(0,panel.request_fit)
-
-    def resize_settings(self,width,height):
-        if not self.settings_panel:return
-        area=self.screen().availableGeometry();target=QRect(self.geometry())
-        target.setSize(QSize(min(width,area.width()),min(height,area.height())))
-        target.moveLeft(max(area.left(),min(target.x(),area.right()-target.width()+1)))
-        target.moveTop(max(area.top(),min(target.y(),area.bottom()-target.height()+1)))
-        self.setGeometry(target);self.hidden_geometry=None;self.resize_borders.update();self.update()
 
     def close_settings(self):
         panel=self.settings_panel

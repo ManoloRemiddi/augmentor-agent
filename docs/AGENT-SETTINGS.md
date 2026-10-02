@@ -21,16 +21,22 @@ Versions/updates, Advanced, About/licenses and Quit. Mac browser extension setup
 is retained when available. Look and Voice use their top tabs; access lives on
 Agent, so these are not repeated in More. There is no duplicate bottom Settings entry.
 
-The active page determines the temporary frame size; hidden editors cannot impose
-minimum dimensions on Agent, More or Connections. The Agent avatar and stacked
-Soul/Memory cards are compact. Larger forms such as Prompt library widen the same
-frame to fit their fields and actions, then returning to a short page narrows it.
-Available screen/touch bounds cap the frame, with button rows wrapping on narrow
-screens. Text editors soft-wrap without changing their stored text. Settings use
-one outer vertical scrollbar at the frame edge when the body genuinely needs it;
-Appearance's former nested scrollbar is flattened. Horizontal settings scrolling
-is disabled. Navigation SVGs follow the text foreground in normal and selected
-states, including theme changes.
+Settings open at one fixed size: 700 × 760 design units, capped once to the
+available screen or touch viewport. Navigating between pages does not resize or
+move the frame. Settings resize handles cannot change those dimensions; returning
+to chat restores its latest user-chosen geometry and normal resizing behavior.
+
+Fields use at least 40 design units of height, grow across the available form
+width, and retain readable text areas. Wrapped descriptions contribute their
+full height to the scrollable body, including asynchronous status updates; long
+forms scroll vertically instead of squeezing labels or inputs. Embedded forms
+remove redundant inner margins. Prompt library uses a browse/editor split on
+standard Desktop widths, with a tall text editor and visible action row; narrow
+screens retain a vertical arrangement and wrap button rows. Editors soft-wrap
+without changing stored text. One outer vertical scrollbar sits at the frame
+edge when needed; Appearance's former nested scrollbar is flattened. Horizontal
+settings scrolling remains disabled. Navigation SVGs follow the text foreground
+in normal and selected states, including theme changes.
 
 Settings forms are embedded child widgets, with their existing save/cancel and
 worker cleanup preserved. Busy operations that already refused dismissal still
@@ -282,3 +288,24 @@ the selected root, with voice available and no pending update. No backend/speech
 restart or user-data migration was needed. Installed Mac GUI remains unverified;
 the shared source rename applies on both native platforms. Rollback selects
 `20261002-124301-57f19808`. PR #29 remains draft and unmerged.
+
+
+## Fixed frame and readable fields — 2 October 2026
+
+This owner-requested revision supersedes the previous per-page adaptive frame.
+Every settings destination shares the size chosen at entry, while the body uses
+that space and scrolls vertically as needed. Field minima and width growth are
+shared across Linux/macOS native forms, including DSH/Pi/Codex connections and
+Memory configuration. Prompt library browses beside its editor at standard widths;
+short/narrow screens preserve field readability and wrap action rows. Return to
+chat retains exact latest chat placement/drafts and restores resize constraints.
+
+Twenty-one real-window overlay cases include new checks for the short-screen
+connection screenshot regression (text rectangle/font metrics, wrapped labels,
+long asynchronous status), field heights across model/memory forms and tabs,
+and a frame lock that releases on return to chat. Existing page/Prompt checks
+now assert stable geometry instead of page-dependent growth. Dark/light synthetic
+renders were inspected. Runtime/backend behavior remains unchanged. Prior full
+suite and artifact evidence above remains historical; shared source qualification passes 631 native cases (629 pass, two Mac-only
+skips); the final focused overlay suite passes all 21 cases. Installed identity
+follows below. Installed Mac GUI acceptance remains unverified.

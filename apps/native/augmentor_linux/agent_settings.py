@@ -4,12 +4,12 @@ import base64
 import importlib.util
 import sys
 from pathlib import Path
-from PySide6.QtCore import Signal, Qt, QTimer, QSize, QRectF, QByteArray, QBuffer, QIODevice
+from PySide6.QtCore import Signal, Qt, QTimer, QEvent, QSize, QRectF, QByteArray, QBuffer, QIODevice
 from PySide6.QtGui import QColor, QIcon, QPalette, QPainter, QPainterPath, QImageReader, QPixmap
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
     QPushButton, QLineEdit, QComboBox, QPlainTextEdit, QTextBrowser, QTabWidget,
-    QScrollArea, QStackedLayout, QFileDialog, QCheckBox, QSizePolicy, QLayout, QGridLayout, QBoxLayout, QTextEdit)
-from .ui_scale import scaled, px
+    QScrollArea, QStackedLayout, QFileDialog, QCheckBox, QSizePolicy, QLayout, QGridLayout, QBoxLayout, QTextEdit, QAbstractSpinBox, QFormLayout, QListWidget)
+from .ui_scale import scaled, px, factor
 from .voice_button import paint_energy_ring
 from .settings_icons import settings_icon
 
@@ -103,10 +103,10 @@ class AgentAvatar(QPushButton):
 
 class SettingsPanel(QWidget):
     closed = Signal()
-    size_requested = Signal(int,int)
     def __init__(self, window):
         super().__init__(window); self.owner = window; self.store = identity_store(); self.pages = {}; self.shortcuts = None; self.closing = False
-        self.editor = None; self.editor_page = None; self.editor_return = 'all'; self.leaving_editor = False; self.editor_width = 0; self.editor_height = 0
+        self.editor = None; self.editor_page = None; self.editor_return = 'all'; self.leaving_editor = False
+        self.fit_timer=QTimer(self);self.fit_timer.setSingleShot(True);self.fit_timer.timeout.connect(self.request_fit)
         self.setObjectName('agentSettings'); self.setAccessibleName('Your agent settings')
         outer = QVBoxLayout(self); scaled(outer).setContentsMargins(6,12,6,12); scaled(outer).setSpacing(8)
         header = QHBoxLayout(); scaled(header).setContentsMargins(12,0,12,0)
@@ -133,7 +133,7 @@ class SettingsPanel(QWidget):
         self.show_page('agent')
 
     def resizeEvent(self,event):
-        super().resizeEvent(event);self.sync_navigation()
+        super().resizeEvent(event);self.sync_navigation();QTimer.singleShot(0,self.request_fit)
 
     def sync_navigation(self):
         for button in getattr(self,'nav',{}).values():
@@ -141,34 +141,47 @@ class SettingsPanel(QWidget):
             icon=settings_icon(button.property('settingsIconName'),colour)
             button.setIcon(QIcon() if self.isVisible() and self.width()<px(self,300) else icon)
 
+    def eventFilter(self,widget,event):
+        if event.type()==QEvent.Type.LayoutRequest and not self.closing:
+            self.fit_timer.start(0)
+        return super().eventFilter(widget,event)
+
+    def frame_size(self):
+        area=self.owner.screen().availableGeometry()
+        width,height=area.width(),area.height()-px(self,24)
+        if getattr(self.owner,'touch_layout',None):
+            width=min(width,self.owner.touch_layout.viewport[0])
+            height=min(height,self.owner.touch_layout.viewport[1])
+        return QSize(min(px(self,700),width),min(px(self,760),height))
+
     def request_fit(self):
-        # SetNoConstraint prevents hidden QStackedWidget pages from imposing their
-        # minimum sizes on short views. Only the active page determines the frame.
+        # Keep the frame stable. Wrapped text and fields determine the body’s
+        # minimum height; long forms scroll instead of compressing their rows.
         page=self.stack.currentWidget()
         if not page or self.closing:return
-        page.ensurePolished();page.layout().activate()
-        margin=2*self.owner.activity.margin if hasattr(self.owner,'activity') else 0
-        chrome=self.layout().contentsMargins();gutter=px(self,12)
-        width=max(px(self,450),page.minimumSizeHint().width()+chrome.left()+chrome.right()+gutter+margin)
-        if self.editor:width=max(width,self.editor_width+px(self,24)+chrome.left()+chrome.right()+gutter+margin)
-        area=self.owner.screen().availableGeometry()
-        available_width=min(area.width(),self.owner.touch_layout.viewport[0]) if getattr(self.owner,'touch_layout',None) else area.width()
-        width=min(width,available_width)
-        content_width=width-margin-chrome.left()-chrome.right()-gutter
-        height=page.layout().totalHeightForWidth(content_width)
-        if height<0:height=page.sizeHint().height()
-        if self.editor:
-            height=max(page.minimumSizeHint().height(),self.editor_height)
-        # Header and tabs stay visible while the body gets one vertical scrollbar.
-        extras=chrome.top()+chrome.bottom()+margin
-        for i in range(self.layout().count()):
-            item=self.layout().itemAt(i)
-            if item.widget() is self.scroll:continue
-            widget=item.widget()
-            if widget and widget.isHidden():continue
-            extras+=item.sizeHint().height()+self.layout().spacing()
-        self.size_requested.emit(width,max(px(self,364),min(height+extras+px(self,8),px(self,760),area.height()-px(self,24))))
-        self.scroll.verticalScrollBar().setValue(0)
+        width=self.scroll.viewport().width()
+        margins=page.layout().contentsMargins()
+        if self.editor and self.editor.layout():
+            layout=self.editor.layout();layout.activate()
+            content_width=max(1,width-margins.left()-margins.right())
+            height=layout.minimumHeightForWidth(content_width)
+            self.editor.setMinimumHeight(max(layout.minimumSize().height(),height))
+        page.layout().activate()
+        height=page.layout().minimumHeightForWidth(width)
+        page.setMinimumHeight(max(page.layout().minimumSize().height(),height))
+        self.stack.updateGeometry()
+
+    def prepare_inputs(self,widget):
+        for field in widget.findChildren(QLineEdit)+widget.findChildren(QComboBox)+widget.findChildren(QAbstractSpinBox):
+            if isinstance(field,QLineEdit) and isinstance(field.parent(),(QComboBox,QAbstractSpinBox)):continue
+            scaled(field).setMinimumHeight(40)
+            field.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
+        for form in widget.findChildren(QFormLayout):
+            form.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.AllNonFixedFieldsGrow)
+            form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapLongRows)
+            scaled(form).setVerticalSpacing(10)
+        for label in widget.findChildren(QLabel):
+            if label.wordWrap():label.setSizePolicy(QSizePolicy.Policy.Preferred,QSizePolicy.Policy.Fixed)
 
     def background(self, work, callback):
         self.owner.call_in_background(work,lambda result:callback(result) if not self.closing else None)
@@ -179,6 +192,7 @@ class SettingsPanel(QWidget):
             heading = QLabel(title); scaled(heading).setStyleSheet('font-size:22px;font-weight:600;'); layout.addWidget(heading)
         if subtitle:
             note = QLabel(subtitle); note.setWordWrap(True); layout.addWidget(note)
+        page.installEventFilter(self)
         return page, layout
 
     def action(self, layout, text, callback, object_name=None):
@@ -191,7 +205,7 @@ class SettingsPanel(QWidget):
         if name not in self.pages:
             try: page = getattr(self,'page_'+name)()
             except Exception as error: self.feedback.setText(str(error)); return
-            self.pages[name]=page; self.stack.addWidget(page)
+            self.prepare_inputs(page); self.pages[name]=page; self.stack.addWidget(page)
         self.stack.setCurrentWidget(self.pages[name]); self.feedback.clear()
         for key,button in self.nav.items(): button.setChecked(key==name or (key=='all' and name in ('conversation','connections','advanced')))
         self.avatar.sync_motion();self.sync_navigation();QTimer.singleShot(0,self.request_fit)
@@ -375,13 +389,12 @@ class SettingsPanel(QWidget):
         page,layout=self.make_page(title,back=back)
         # Reuse the established form and its lifecycle as a child widget. Never
         # show/exec a top-level settings dialog or run a nested modal loop.
-        self.editor_width=max(dialog.width(),dialog.minimumSizeHint().width()); self.editor_height=dialog.height()+px(self,40)
         dialog.setParent(page,Qt.WindowType.Widget)
         dialog.setWindowModality(Qt.WindowModality.NonModal)
         dialog.setModal(False)
-        self.prepare_editor(dialog)
+        self.prepare_editor(dialog);dialog.installEventFilter(self)
         scaled(dialog).setMinimumSize(0,0)
-        layout.addWidget(dialog)
+        layout.addWidget(dialog,1)
         self.editor=dialog; self.editor_page=page; self.editor_return=back
         dialog.finished.connect(self.editor_finished)
         self.stack.addWidget(page); self.stack.setCurrentWidget(page); dialog.show()
@@ -390,11 +403,34 @@ class SettingsPanel(QWidget):
         self.avatar.sync_motion();self.sync_navigation();QTimer.singleShot(0,self.request_fit)
 
     def prepare_editor(self,dialog):
+        if dialog.layout():
+            scaled(dialog.layout()).setContentsMargins(0,0,0,0)
+            if not (dialog.findChildren(QTextEdit)+dialog.findChildren(QPlainTextEdit)+dialog.findChildren(QListWidget)):
+                dialog.layout().setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.prepare_inputs(dialog)
+        dialog.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Expanding)
         for button in dialog.findChildren(QPushButton):
             if button.text().replace('&','') in ('Done','Close'):button.hide()
         if dialog.__class__.__name__=='PromptLibraryDialog':
-            scaled(dialog.list).setMinimumHeight(96)
-            scaled(dialog.content).setMinimumHeight(128)
+            scaled(dialog.list).setMinimumHeight(112)
+            scaled(dialog.content).setMinimumHeight(180)
+            if self.frame_size().width()>=px(self,600):
+                # Browse beside the editor, keeping the action row visible while
+                # giving reusable prompt text most of the available height.
+                layout=dialog.tabs.widget(0).layout()
+                items=[layout.takeAt(0) for _ in range(layout.count())]
+                columns=QHBoxLayout();scaled(columns).setSpacing(12)
+                browser=QWidget();left=QVBoxLayout(browser);scaled(left).setContentsMargins(0,0,0,0)
+                scaled(browser).setMaximumWidth(210)
+                left.addWidget(items[0].widget());left.addWidget(items[1].widget(),1)
+                editor=QWidget();right=QVBoxLayout(editor);scaled(right).setContentsMargins(0,0,0,0)
+                for item in items[2:-2]:
+                    if item.widget():right.addWidget(item.widget(),1 if isinstance(item.widget(),QTabWidget) else 0)
+                    else:right.addLayout(item.layout())
+                columns.addWidget(browser,1);columns.addWidget(editor,2);layout.addLayout(columns,1)
+                layout.addWidget(items[-2].widget());layout.addLayout(items[-1].layout())
+            else:
+                scaled(dialog.list).setMaximumHeight(112)
         # Appearance's legacy nested scroll area becomes part of the single
         # settings body; text editors retain their own vertical content scrolling.
         if dialog.__class__.__name__=='AppearanceDialog':
@@ -404,13 +440,13 @@ class SettingsPanel(QWidget):
                 if isinstance(scroll,QScrollArea):
                     content=scroll.takeWidget();layout.removeWidget(scroll);layout.insertWidget(i,content);scroll.hide();scroll.deleteLater();break
         for widget in dialog.findChildren(QTextEdit)+dialog.findChildren(QPlainTextEdit):
+            scaled(widget).setMinimumHeight(max(120,round(widget.minimumHeight()/factor(widget))))
             widget.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
             widget.setLineWrapMode(widget.LineWrapMode.WidgetWidth)
         # On screens narrower than a form's action row, wrap its existing buttons
         # without changing actions, keyboard focus or editor contents.
-        width=self.owner.screen().availableGeometry().width()
-        if getattr(self.owner,'touch_layout',None):width=min(width,self.owner.touch_layout.viewport[0])
-        available=max(px(self,128),width-px(self,160))
+        margin=2*self.owner.activity.margin if hasattr(self.owner,'activity') else 0
+        available=max(px(self,128),self.frame_size().width()-margin-px(self,136))
         for row in dialog.findChildren(QHBoxLayout):
             buttons=[row.itemAt(i).widget() for i in range(row.count())]
             parent=row.parent()
@@ -422,7 +458,6 @@ class SettingsPanel(QWidget):
             scaled(grid).setContentsMargins(0,0,0,0)
             for i,button in enumerate(buttons):row.removeWidget(button);grid.addWidget(button,i//columns,i%columns)
             parent.takeAt(index);parent.insertWidget(index,holder);row.deleteLater()
-        self.editor_width=min(self.editor_width,max(available,dialog.minimumSizeHint().width()))
 
     def editor_finished(self,*_):
         if self.leaving_editor: return
@@ -434,7 +469,7 @@ class SettingsPanel(QWidget):
         if self.editor_page:
             self.stack.removeWidget(self.editor_page)
             self.editor_page.deleteLater()
-        self.editor=None; self.editor_page=None; self.editor_width=0; self.editor_height=0
+        self.editor=None; self.editor_page=None
 
     def leave_editor(self):
         if not self.editor: return True

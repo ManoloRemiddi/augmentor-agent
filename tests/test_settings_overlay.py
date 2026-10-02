@@ -7,7 +7,7 @@ import unittest
 from unittest.mock import patch
 from PySide6.QtCore import Qt, QRect, QCoreApplication, QEvent
 from PySide6.QtTest import QTest
-from PySide6.QtWidgets import QApplication, QDialog, QPushButton, QScrollArea
+from PySide6.QtWidgets import QApplication, QDialog, QPushButton, QScrollArea, QLineEdit, QComboBox, QAbstractSpinBox, QLabel, QTabWidget
 from augmentor_linux.window import Window
 from augmentor_linux.agent_settings import identity_store
 from augmentor_linux.voice_settings import VoiceSettingsDialog
@@ -163,21 +163,21 @@ class OverlayTests(unittest.TestCase):
         for _ in range(5):self.app.processEvents()
 
     def test_compact_root_pages_fit_without_scrolling_after_larger_pages(self):
-        p=self.open()
+        p=self.open();geometry=QRect(self.window.geometry())
         for theme in ('dark','light'):
             self.window.apply_appearance({'theme':theme});p.open_appearance();self.settle()
             for name in ('connections','agent','all','soul','connections','agent'):
                 p.show_page(name);self.settle()
                 self.assertEqual(p.scroll.horizontalScrollBar().maximum(),0,name)
                 self.assertEqual(p.scroll.verticalScrollBar().maximum(),0,name)
-                if name in ('agent','all','connections'):self.assertLess(self.window.height(),650)
+                self.assertEqual(self.window.geometry(),geometry)
             p.receive_access(({'revision':1,'value':{'defaultPreset':'danger-full-access'}},None));self.settle()
             self.assertEqual(p.scroll.verticalScrollBar().maximum(),0)
             self.assertTrue(p.access.isVisible());self.assertLessEqual(p.access.mapTo(p.scroll.viewport(),p.access.rect().bottomRight()).y(),p.scroll.viewport().height())
 
-    def test_prompt_library_grows_wider_with_visible_actions_and_restores_narrow_pages(self):
-        p=self.open();narrow=self.window.width();p.open_prompts();self.settle()
-        self.assertIsNotNone(p.editor);self.assertGreater(self.window.width(),narrow)
+    def test_prompt_library_uses_stable_frame_with_visible_actions(self):
+        p=self.open();geometry=QRect(self.window.geometry());p.open_prompts();self.settle()
+        self.assertIsNotNone(p.editor);self.assertEqual(self.window.geometry(),geometry)
         self.assertEqual(p.scroll.horizontalScrollBar().maximum(),0);self.assertEqual(p.scroll.verticalScrollBar().maximum(),0)
         for button in p.editor.findChildren(QPushButton):
             if button.isVisible():
@@ -187,7 +187,7 @@ class OverlayTests(unittest.TestCase):
         p.editor.content.setPlainText('Synthetic long unbroken text '+('x'*2000));self.settle()
         self.assertEqual(p.editor.content.horizontalScrollBar().maximum(),0)
         p.editor.tabs.setCurrentIndex(1);self.settle();self.assertEqual(p.scroll.horizontalScrollBar().maximum(),0)
-        p.show_page('connections');self.settle();self.assertEqual(self.window.width(),narrow)
+        p.show_page('connections');self.settle();self.assertEqual(self.window.geometry(),geometry)
         self.assertEqual(p.scroll.verticalScrollBar().maximum(),0)
 
     def test_scroll_gutter_is_at_frame_edge_and_appearance_has_no_nested_scroll_area(self):
@@ -223,3 +223,59 @@ class OverlayTests(unittest.TestCase):
             self.assertLessEqual(self.window.width(),420);self.assertEqual(p.scroll.horizontalScrollBar().maximum(),0)
             for button in p.editor.findChildren(QPushButton):
                 if button.isVisible():self.assertLess(button.mapTo(p.scroll.viewport(),button.rect().bottomRight()).x(),p.scroll.viewport().width(),button.text())
+
+
+    def test_setup_fields_and_wrapped_notes_are_readable_in_a_short_stable_frame(self):
+        from augmentor_linux.dsh_setup import DshSetupDialog
+        from PySide6.QtGui import QFontMetrics
+        from PySide6.QtWidgets import QStyle, QStyleOptionFrame
+        screen=SimpleNamespace(availableGeometry=lambda:QRect(0,0,960,560))
+        with patch.object(self.window,'screen',return_value=screen),patch.object(DshSetupDialog,'run',lambda *args:None):
+            p=self.open();geometry=QRect(self.window.geometry())
+            for theme in ('dark','light'):
+                self.window.apply_appearance({'theme':theme})
+                p.open_editor('Model connection & setup',lambda:DshSetupDialog(self.window));self.settle()
+                p.editor.endpoint.setText('http://127.0.0.1:3000');p.editor.home.setText('/synthetic/dsh-profile')
+                for field in (p.editor.endpoint,p.editor.home):
+                    self.assertGreaterEqual(field.height(),40);self.assertGreater(field.width(),250)
+                    option=QStyleOptionFrame();field.initStyleOption(option)
+                    text=field.style().subElementRect(QStyle.SubElement.SE_LineEditContents,option,field)
+                    self.assertGreaterEqual(text.height(),QFontMetrics(field.font()).height())
+                for label in p.editor.findChildren(QLabel):
+                    if label.wordWrap():self.assertGreaterEqual(label.height(),label.heightForWidth(label.width()),label.text())
+                p.editor.note.setText('Synthetic long status message. '*40);self.settle()
+                self.assertGreaterEqual(p.editor.note.height(),p.editor.note.heightForWidth(p.editor.note.width()))
+                self.assertGreaterEqual(p.editor.endpoint.height(),40)
+                self.assertEqual(self.window.geometry(),geometry);self.assertEqual(p.scroll.horizontalScrollBar().maximum(),0)
+                p.show_page('connections');self.settle();self.assertEqual(self.window.geometry(),geometry)
+
+    def test_fields_remain_usable_across_model_and_memory_forms(self):
+        from augmentor_linux.dsh_setup import DshSetupDialog
+        from augmentor_linux.setup import SetupDialog
+        from augmentor_linux.codex_setup import CodexSetupDialog
+        from augmentor_linux.memory import MemoryDialog
+        from augmentor_linux.dual_memory import DualMemoryPanel
+        p=self.open();geometry=QRect(self.window.geometry())
+        self.window.controller=SimpleNamespace(client=SimpleNamespace(),harness='pi',running=False,navigating=False,task=lambda *args:None)
+        with patch.object(DshSetupDialog,'run',lambda *args:None),patch.object(CodexSetupDialog,'request',lambda *args:None),patch.object(MemoryDialog,'run',lambda *args:None),patch.object(DualMemoryPanel,'run',lambda *args:None):
+            for factory in (DshSetupDialog,SetupDialog,CodexSetupDialog,MemoryDialog):
+                p.open_editor('Synthetic form',lambda:factory(self.window));self.settle()
+                for tab in p.editor.findChildren(QTabWidget):
+                    for index in range(tab.count()):
+                        tab.setCurrentIndex(index);self.settle()
+                        for field in p.editor.findChildren(QLineEdit)+p.editor.findChildren(QComboBox)+p.editor.findChildren(QAbstractSpinBox):
+                            if field.isVisible() and not isinstance(field.parent(),(QComboBox,QAbstractSpinBox)):
+                                self.assertGreaterEqual(field.height(),40,(factory.__name__,field.accessibleName()))
+                for field in p.editor.findChildren(QLineEdit):
+                    if field.isVisible() and not isinstance(field.parent(),(QComboBox,QAbstractSpinBox)):self.assertGreaterEqual(field.height(),40)
+                self.assertEqual(self.window.geometry(),geometry)
+                self.assertEqual(p.scroll.horizontalScrollBar().maximum(),0,factory.__name__)
+                p.show_page('agent');self.settle()
+
+    def test_frame_dimensions_are_locked_until_returning_to_chat(self):
+        p=self.open();geometry=QRect(self.window.geometry())
+        self.window.resize(350,400);self.settle();self.assertEqual(self.window.geometry(),geometry)
+        for page in ('agent','all','connections','advanced','conversation','soul'):
+            p.show_page(page);self.settle();self.assertEqual(self.window.geometry(),geometry)
+        p.cancel_soul();p.accept();self.window.resize(510,540);self.settle()
+        self.assertEqual((self.window.width(),self.window.height()),(510,540))

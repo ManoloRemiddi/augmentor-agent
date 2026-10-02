@@ -2,7 +2,22 @@
 
 # Start here: agent handoff
 
-## 2 October: Agent Identity and Agent Memory naming
+## 2 October: Fixed settings frame and readable inputs
+
+The owner requested stable settings dimensions and readable fields after the
+model setup screenshot showed squashed inputs and clipped descriptions. All
+pages now share one 700 × 760 design-unit frame, capped to the screen/touch
+viewport at entry. Forms use readable minimum heights and full available width;
+wrapped notes increase body height instead of compressing inputs. Long forms
+scroll vertically. Prompt library browses beside its editor at standard widths.
+Back to chat restores its latest geometry and resize constraints. Shared source
+passes 631 native cases (629 pass, two Mac-only skips); all 21 overlay cases pass,
+including short-screen font/field/status checks, model/memory forms and frame lock.
+The latest installed naming release below is the baseline; final installed
+identity follows after immutable activation. PR #29 remains draft/unmerged.
+See [fixed frame guide](AGENT-SETTINGS.md#fixed-frame-and-readable-fields--2-october-2026).
+
+## Agent Identity and Agent Memory naming checkpoint (historical)
 
 The Desktop cards and destination headings now read Agent Identity and Agent
 Memory; identity messages and its accessible editor name follow the rename.
