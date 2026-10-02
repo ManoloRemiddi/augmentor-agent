@@ -1305,6 +1305,10 @@ def main():
     refresh_accessibility_bus()
     from .ui_scale import startup_scale
     ui_scale = Preferences(not args.preview and not args.screenshot).values['ui_scale']
+    from .shortcuts import COMPONENT
+    # Unix platform services can contact the portal during QApplication
+    # construction. Supply the instance's desktop identity before that happens.
+    QApplication.setDesktopFileName(COMPONENT.removesuffix('.desktop'))
     with startup_scale(ui_scale):
         app = QApplication(sys.argv[:1])
     app.setProperty('augmentorUiScale', ui_scale)
@@ -1312,8 +1316,6 @@ def main():
     app.setQuitOnLastWindowClosed(False)
     app.setApplicationName('Augmentor Agent')
     app.setWindowIcon(QIcon(str(Path(__file__).parent/'assets/augmentor.svg')))
-    from .shortcuts import COMPONENT
-    app.setDesktopFileName(COMPONENT.removesuffix('.desktop'))
     if (not args.preview or args.ui_test_control) and not args.screenshot:
         runtime = Path(os.environ.get('XDG_RUNTIME_DIR', f'/tmp/augmentor-linux-pi-{os.getuid()}'))
         runtime.mkdir(mode=0o700, exist_ok=True)

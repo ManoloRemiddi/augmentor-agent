@@ -138,6 +138,32 @@ report and reproducible guest-only helper are in the rollout guide. Installed
 source remains `f7d7585`; no newer-source, crash/reboot, connected harness or
 portal-lock termination claim follows. Continue those remaining gates.
 
+The owned full Fedora VM now also passes idle PID-fenced crash recovery and one
+kernel reboot through actual GDM/Wayland login, non-preview user-service startup,
+rendered onboarding, package/source preservation and SELinux enforcing. Reusable
+guest/host proof helpers and checked reports are in the rollout guide. Installed
+source remains earlier `f7d7585`, not newer workspace code; connected harness and
+active-task recovery remain open. Clean `837bef1` now passes all Linux and Mac
+14/26 CI; each distro passes fresh package lifecycle, GTK, ordinary-user wmctrl
+and 643 native cases (two skips). Actual artifact merge `9df0f80` has the exact
+branch tree; preserve its source identity for complete candidates. The guide
+also records fresh Noble/Mint/openSUSE/Arch dependency research and clarifies
+GNOME observation limits against the actual KDE baseline, without adding a new
+atomic/history guarantee solely for GNOME. Continue managed current-artifact
+qualification, full control/Stop and other distro work; the goal is not complete.
+
+The working Qt startup fix now supplies the existing desktop identity before
+`QApplication` construction. Exact-sender D-Bus traces in the full Fedora guest
+reproduce a cached-identity registration error with late assignment and successful
+early registration for both xcb and Wayland. Standalone fixture stderr is quiet;
+do not claim a warning-string reproduction or that the earlier installed product
+was fixed. The checked identity report and helper are in the rollout guide.
+Changed source passes 643 native cases (two Mac-only skips), real private
+two-instance shortcut/focus/typing checks on both platforms and the xcb initial
+unpin/three-workspace checks. Initial processes are previews. Current-source
+hosted package/Mac and installed normal-startup checks follow publication; the
+separate control helper's identity, consent and portal restart remain open.
+
 ## October 1 merge blockers: current main and separate Codex prerequisite
 
 The feature branch integrates canonical main `8c3be5a` at merge `338dbc5`.

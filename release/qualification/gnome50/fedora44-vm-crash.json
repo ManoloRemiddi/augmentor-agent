@@ -1,0 +1,36 @@
+{
+  "format": "augmentor-gnome-full-vm-idle-crash/1",
+  "source": {
+    "commit": "f7d75859f5bd88fd99bec2b4904aae5fd3423ed7",
+    "dirty": false
+  },
+  "version": "0.2.13",
+  "proofSha256": "f81fcab049179f73580f2515567e0d42801eb1bb3bd0aaf8016511925ce5562a",
+  "idleDraftFreePreflight": true,
+  "pidfdFencedSingleKill": true,
+  "automaticServiceRestart": true,
+  "serviceRestartCountIncreasedOnce": true,
+  "serviceOwnsNewProcess": true,
+  "sameInstalledRoot": true,
+  "packageVerifiedAfterRestart": true,
+  "selinuxEnforcing": true,
+  "connectedHarnessRecoveryTested": false,
+  "modelTurnTested": false,
+  "busyTaskCrashTested": false,
+  "rebootTested": false,
+  "gnomeInputToolsEnabled": false,
+  "checkpointDate": "2026-10-02",
+  "fixture": "Fedora Cloud 44-1.7 plus gnome-desktop; actual GDM Wayland fixture autologin",
+  "rpmSha256": "831c1715e94305fa3d1ab4a0ad202fa92371c59cbea7517155f8b4ee51d51a57",
+  "rawReportSha256": "f1ed7ab6d2ca4345ccdaa11f1c05babcdc7ecfcdfcfbda8641ecdf372e387516",
+  "testedBase": "837bef172c3ec6fe8df86cf4331c3a035088394b",
+  "workingProofChanges": [
+    "release/prove-gnome-vm-crash.py"
+  ],
+  "limits": [
+    "Earlier clean f7d7585 installed artifact with supplemental fixture wmctrl; later workspace source is not installed.",
+    "Only idle, draft-free, unconnected application state is used. No model/harness request, active-task crash or connected-history recovery is qualified.",
+    "Dedicated Cloud-derived VM with fixture GDM autologin, not password authentication or standard Workstation installer acceptance.",
+    "No owner session, selected release, private model/audio settings or GNOME product input capability changes."
+  ]
+}

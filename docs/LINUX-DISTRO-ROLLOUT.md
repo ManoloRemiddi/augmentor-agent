@@ -919,3 +919,162 @@ privately, to make the explicit lock test deterministic. GNOME documents this
 This report still qualifies the earlier `f7d7585` installed payload, not current
 source artifacts. Crash, reboot, connected-harness recovery and portal-session
 termination at lock remain separate gates.
+
+### October 2 primary-source research for remaining adapters
+
+Researchers rechecked current distribution catalogs rather than assuming common
+package names. Noble's [PySide6 search](https://packages.ubuntu.com/search?keywords=pyside6&searchon=names&suite=noble&section=all)
+has no native package; [Pygments](https://packages.ubuntu.com/noble/python3-pygments)
+is 2.17.2 and [keyring](https://packages.ubuntu.com/search?keywords=keyring) is 24.3.1,
+below this product's 2.18/25.6 package minimums. Mint 22.x uses the
+[Noble base](https://linuxmint.com/download_all.php). The managed runtime must
+include all three gaps, not just PySide6. Official PyPI metadata for
+[Essentials](https://pypi.org/pypi/PySide6-Essentials/6.8.2.1/json) and
+[shiboken](https://pypi.org/pypi/shiboken6/6.8.2.1/json) supplies x64
+manylinux_2_28 wheels compatible with Noble's Python 3.12; Qt documents that
+[the wheels include Qt libraries](https://doc.qt.io/qtforpython-6.8/package_details.html).
+Next implement a hash-locked application-owned environment, deliberate system-GI
+bridge, dependency/notice inventory and interpreter propagation through Desktop,
+Browser, credential helpers and audio. Preserve explicit SecretService; no
+plaintext backend or global pip installation. Wheel metadata is not an ABI or
+installed-product test.
+
+The official [Leap 16 repository](https://download.opensuse.org/distribution/leap/16.0/repo/oss/repodata/repomd.xml)
+and [Tumbleweed repository](https://download.opensuse.org/tumbleweed/repo/oss/repodata/repomd.xml)
+metadata currently map PySide6 to `python313-pyside6` and Python ABI 3.13, even
+where Python 3.14 is also available. Use `/usr/bin/python3.13` and matching
+`python313-*` packages. Leap supplies Qt/PySide 6.9.1 and keyring 25.2.1; the
+latter needs a pinned overlay. Snapshot 20260930 Tumbleweed supplies PySide
+6.11.2/keyring 25.7.0. Other verified names include `python313-PyYAML`,
+`python313-websocket-client`, `python313-Pygments`, `python313-numpy`,
+`python313-SecretStorage`, `python313-gobject`, `typelib-1_0-Gtk-4_0`,
+`typelib-1_0-Atspi-2_0`, `typelib-1_0-Gst-1_0`, `libQt6Svg6`, `qt6-wayland`,
+`gstreamer-plugin-pipewire`, `libportaudio2` and `alsa-plugins-pulse`.
+Setup `nodejs24`/`npm24` remains separate from bundled Node 24.19. Leap requires
+[x86-64-v2](https://get.opensuse.org/leap/16.0/) and its
+[fresh-install SELinux policy](https://doc.opensuse.org/release-notes/x86_64/openSUSE/Leap/16.0/html/release-notes-leap-160/)
+must remain enforcing during acceptance. Arch's
+[official package API](https://archlinux.org/packages/search/json/?name=pyside6)
+currently supplies PySide6 6.11.2; it needs an explicit dated pacman/PKGBUILD
+adapter and the same lifecycle qualification. These are researched plans;
+no openSUSE/Arch runtime or installed acceptance is claimed.
+
+GNOME research identifies an observation boundary that prevents enabling input.
+Mutter's [surface pick implementation](https://github.com/GNOME/mutter/blob/50.5/src/compositor/meta-surface-actor.c#L184)
+applies the input region even for Clutter ALL picking. The current
+`paintedWindowMatches` field therefore establishes another actor pick, not
+independent painted-pixel coverage. Its
+[input-region setter](https://github.com/GNOME/mutter/blob/50.5/src/compositor/meta-surface-actor.c#L601)
+has no complete public change notification, while
+[Wayland scheduling](https://github.com/GNOME/mutter/blob/50.5/src/wayland/meta-wayland-actor-surface.c#L316)
+is conditional on frame callbacks/FIFO state. Region-only commits need not
+advance the currently tracked serial. Actor-tree subscriptions, polling and
+damage tracking cannot by themselves prove the required change-away/back history.
+Additionally, [portal input calls](https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.RemoteDesktop.html#input-methods)
+do not compare an expected compositor/window/scene guard atomically. An audit of
+the approved KDE baseline confirms it also reads a current KWin snapshot before
+a separate portal dispatch; it does not promise compositor-atomic dispatch or
+complete routing change history. Do not impose a new stronger guarantee only on
+GNOME. Preserve the actual existing single-use token, current focus/identity/
+cover/geometry checks, accessibility focus/password refusal, checks before each
+typed character, Stop and no-replay behavior. Complete actor history is an
+additional hardening goal, not evidence that KDE already has it. Both GNOME
+qualification flags stay false pending finite full-session baseline tests. First
+reproduce region-only full→empty→full and a visibly painted click-through cover;
+verify point-cover refusal and record the limits of history tracking rather than
+inferring independent visual coverage from final matching picks.
+
+The full-session lock transport also needs its own proof. Non-headless Shell
+[inhibits remote access when screencasting is disallowed](https://github.com/GNOME/gnome-shell/blob/50.5/js/ui/main.js#L138);
+Mutter's [first inhibition closes existing sessions](https://github.com/GNOME/mutter/blob/50.5/src/backends/meta-dbus-session-manager.c#L491),
+and the [GNOME portal forwards closure](https://github.com/GNOME/xdg-desktop-portal-gnome/blob/50.0/src/remotedesktop.c#L342).
+The headless exception prevents inheriting that acceptance from the container
+fixture. Next run private real consent/denial, lock during active and pending
+sessions, capture termination, held-input release, actual Stop and sharing-indicator
+revocation. Unlock must require a fresh observer epoch and fresh session/consent;
+no input registration is enabled by this research or by startup tests.
+
+### Full Fedora idle crash/reboot and corrected package CI
+
+The [idle-crash report](../release/qualification/gnome50/fedora44-vm-crash.json)
+now passes a PID-fenced single SIGKILL of only the dedicated guest's idle,
+draft-free, unconnected application. Its real user service restarts automatically,
+increments its restart counter once and owns a new process from the same verified
+installed root. `release/prove-gnome-vm-crash.py` refuses active work and uses pidfd
+to prevent PID recycling. The first run exposed a read-only readiness timeout
+while the new process initialized; the final proof handles unavailable reads
+without replaying the kill. Connected-history/active-task recovery is untested.
+
+The [reboot report](../release/qualification/gnome50/fedora44-vm-reboot.json)
+passes one owned-guest reboot after idle preflight, a changed kernel boot identity,
+actual GDM Wayland login, a new non-preview service-owned app, exact package/source
+preservation and SELinux enforcing. The real onboarding renders in GNOME's initial
+overview; after dismissing the overview, the compositor focuses that dialog.
+`release/prove-gnome-vm-reboot.py` guards the host user's ignored VM directory,
+QEMU name and actually opened overlay, then uses only the dedicated SSH channel.
+QEMU daemonization changes its cwd to `/`, so the guard verifies open disk identity
+instead of assuming its original working directory. Reconnect polling never
+replays reboot. Both reports qualify the earlier clean `f7d7585` package, with
+supplemental fixture `wmctrl`, not later source or a standard Workstation installer.
+
+Clean `837bef172c3ec6fe8df86cf4331c3a035088394b` now passes all
+[Linux CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36952468277)
+and [Mac 14/26 CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36952468276).
+All three distro package jobs verify fresh installation, GTK API, actual ordinary
+user `wmctrl -V` on private Xvfb, maintenance/removal retention and 643 native cases
+(641 pass, two Mac-only skips). The actual artifact source is merge
+`9df0f80d3ee3f0871ed10781be59e0aac7f6a734`, parents `d91c520` and `837bef1`, tree
+`62431b0422cabb846d9c190757d2f5385ab06304`, verified equal to the branch. The checked
+[Ubuntu](../release/qualification/9df0f80/ubuntu26.04-amd64.json),
+[Fedora 43](../release/qualification/9df0f80/fedora43-x86_64.json) and
+[Fedora 44](../release/qualification/9df0f80/fedora44-x86_64.json) records contain
+actual package/proof hashes and versions. Preserve this merge identity when
+assembling complete candidates. The intervening `5fd30b3` run was superseded and
+cancelled by the later push; it is not a separate passed checkpoint.
+
+Next use current clean tested artifacts in the owned full VM through managed
+staging/selection, retaining earlier running/selected evidence. Finish actual
+GSD closed launches/two instances, current workspace/window/transient checks,
+real harness fixture and Browser, portal consent/target/Stop/lock, then the
+researched Noble/Mint/openSUSE/Arch runtime and release gates. The full authorized
+rollout remains active and incomplete.
+
+### Early Qt desktop identity
+
+The full VM's earlier installed app journal reports a portal registration failure:
+its D-Bus connection already has a cached application identity. Qt's
+[Unix services constructor](https://github.com/qt/qtbase/blob/v6.11.2/src/gui/platform/unix/qdesktopunixservices.cpp#L439)
+registers immediately when a desktop file name is available; otherwise it queues
+registration until the event loop. Platform/theme construction can make Settings
+calls first. The portal's
+[Registry implementation](https://github.com/flatpak/xdg-desktop-portal/blob/1.22.1/src/registry.c#L72)
+rejects a sender whose identity was already resolved. Qt's
+[static setter](https://github.com/qt/qtbase/blob/v6.11.2/src/gui/kernel/qguiapplication.cpp#L813)
+works before the application object exists.
+
+`window.py` now sets the existing instance desktop identity before constructing
+`QApplication`. Names, icons, independent instance identities and approved UI stay
+unchanged. The [real Qt identity report](../release/qualification/gnome50/fedora44-qt-portal-identity.json)
+and `release/prove-gnome-qt-identity.py` compare standalone Qt 6.11.2 windows in
+the marked full Fedora guest. The trace correlates the exact Qt sender and each
+Registry request serial with its reply. With late identity, both xcb and Wayland
+make Settings calls first and receive one cached-identity registration error.
+With early identity, both register successfully before Settings, without that
+error. Fixture stderr remains quiet; the actual bus error establishes the
+reproduction, not a reproduced warning string. Guest `dbus-tools` is test-only.
+
+The changed product source passes 643 native cases (641 pass, two Mac-only skips).
+Actual private compositor checks also pass canonical shortcut hide/restore,
+focus and composer typing for both independent instances on
+[xcb](../release/qualification/gnome50/fedora44-native-early-identity-xcb.json)
+and [Wayland](../release/qualification/gnome50/fedora44-native-early-identity-wayland.json).
+The xcb fixture additionally passes initial unpin and three-workspace independent
+follow/repin checks. Initial processes remain preview fixtures, so these are
+behavior regressions rather than full normal-startup registration qualification.
+The installed VM payload remains earlier `f7d7585`; it was not patched. Current
+source hosted package/Mac checks and installed startup follow clean publication.
+
+Identity belongs to each D-Bus connection. This UI fix does not register the
+separate Python/GIO control helper or qualify its consent label. Portal restart
+re-registration and actual input consent/Stop/lock tests remain open. GNOME input
+registration and both qualification flags remain disabled.

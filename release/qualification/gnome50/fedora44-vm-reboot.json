@@ -1,0 +1,52 @@
+{
+  "format": "augmentor-gnome-full-vm-reboot/1",
+  "source": {
+    "commit": "f7d75859f5bd88fd99bec2b4904aae5fd3423ed7",
+    "dirty": false
+  },
+  "version": "0.2.13",
+  "proofSha256": "5c49204831a11a02111987797871a4e4555a7b828603e8ea512be8fce3944e3f",
+  "singleRebootRequest": true,
+  "idleDraftFreeUnconnectedPreflight": true,
+  "kernelBootIdentityChanged": true,
+  "sameInstalledSourceAfterReboot": true,
+  "realGdmWaylandLoginAfterReboot": true,
+  "serviceOwnsActualAppAfterReboot": true,
+  "selinuxEnforcingAfterReboot": true,
+  "packageVerifiedAfterReboot": true,
+  "harnessConnectionTested": false,
+  "modelTurnTested": false,
+  "loginAuthenticationTested": false,
+  "standardWorkstationInstallerTested": false,
+  "gnomeInputToolsEnabled": false,
+  "checkpointDate": "2026-10-02",
+  "fixture": "Fedora Cloud 44-1.7 plus gnome-desktop; actual GDM Wayland fixture autologin",
+  "rpmSha256": "831c1715e94305fa3d1ab4a0ad202fa92371c59cbea7517155f8b4ee51d51a57",
+  "rawReportSha256": "d8b58d87604e967647c0f7021fb8095b5f372e4785cc1dff8e669b50b53190ae",
+  "testedBase": "837bef172c3ec6fe8df86cf4331c3a035088394b",
+  "workingProofChanges": [
+    "release/prove-gnome-vm-reboot.py"
+  ],
+  "graphicalSessionAfterReboot": {
+    "Seat": "seat0",
+    "Type": "wayland",
+    "Class": "user",
+    "Active": "yes",
+    "State": "active"
+  },
+  "realScreenShieldAvailableAfterReboot": true,
+  "observerShellVersion": "50.5",
+  "previewLaunchAfterReboot": false,
+  "inspectionSha256": "02051e5e0712eac36c9ecc9b71f4d6436b97e462f15bb255af1de894c17b4c07",
+  "onboardingVisibleAfterReboot": false,
+  "limits": [
+    "Earlier clean f7d7585 installed artifact with supplemental fixture wmctrl; later workspace source is not installed.",
+    "Only idle, draft-free, unconnected application state is used. No model/harness request, active-task crash or connected-history recovery is qualified.",
+    "Dedicated Cloud-derived VM with fixture GDM autologin, not password authentication or standard Workstation installer acceptance.",
+    "No owner session, selected release, private model/audio settings or GNOME product input capability changes."
+  ],
+  "onboardingRenderedInOverviewAfterReboot": true,
+  "onboardingRenderScreenshotSha256": "3ba73f7a530b0aeba7a5a4cc53ade2ec986d0fff153270ed1668d90287eb44d9",
+  "postOverviewInspectionSha256": "26cf96ae37d8fee22cd71106a042a44d9c912ec93569361bc63cc9cf530a95d0",
+  "onboardingFocusedAfterOverviewDismissal": true
+}

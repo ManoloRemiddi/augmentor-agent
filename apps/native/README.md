@@ -30,8 +30,19 @@ live Shell/MediaKeys graphical session; failures stay explicit in those rows.
 See [distro qualification and limits](../../docs/LINUX-DISTRO-ROLLOUT.md#october-2-native-gnome-save-adapter):
 the private daemon proof covers Save/conflicts. Separate actual Augmentor preview
 window proofs pass canonical shortcut hide/restore, compositor focus and composer
-typing for XWayland/native Wayland. Initial launch, login and physical keys remain
-open. The GNOME XWayland workspace proof also passes independent pin/unpin/follow
+typing for XWayland/native Wayland. Separate full Fedora VM proofs cover canonical
+closed launch, duplicate autostarts, lock recovery, idle crash and reboot for the
+earlier clean `f7d7585` installed package. Current-source full startup, connected
+tasks and physical keys remain open. The GNOME XWayland workspace proof also passes independent pin/unpin/follow
 through the existing controls. Native packages declare `wmctrl`; GNOME unpin
 uses its own window's sticky-removal request without needing an initially absent
 root-desktop hint. Native Wayland following remains a separate adapter gap.
+
+The desktop identity is supplied before constructing `QApplication`, because Qt's
+Unix platform services can call the portal during construction. A full-session
+standalone Qt 6.11.2 fixture reproduces late registration's cached-identity D-Bus
+error and verifies successful early registration on both xcb and Wayland. Working
+source passes 643 native cases (two Mac-only skips) and the separate private
+shortcut/focus/typing/workspace checks. This does not qualify the separate control
+helper's consent identity or portal restart registration; see the
+[identity report and limits](../../docs/LINUX-DISTRO-ROLLOUT.md#early-qt-desktop-identity).
