@@ -54,7 +54,9 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
           key: handy-compiler-1.97.1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('components/handy/upstream.json') }}-${{ hashFiles('components/handy/**', 'scripts/build-handy.py', 'scripts/prepare-handy.py') }}
-          restore-keys: handy-compiler-1.97.1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('components/handy/upstream.json') }}-
+          restore-keys: |
+            handy-compiler-1.97.1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('components/handy/upstream.json') }}-
+            handy-compiler-1.97.1-${{ runner.os }}-${{ runner.arch }}-
       - name: Build the private component and complete source notices
         if: steps.component-cache.outputs.cache-hit != 'true'
         run: python scripts/build-handy.py
