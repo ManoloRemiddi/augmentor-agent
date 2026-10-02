@@ -8,6 +8,7 @@ import io
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 import zipfile
 
 spec=importlib.util.spec_from_file_location('source_derivation',Path(__file__).resolve().parents[1]/'release/derive-source-pyside-wheel.py')
@@ -31,6 +32,14 @@ def wheel(path,*,tamper=False,unsafe=False,signed=False):
 
 
 class DerivationTests(unittest.TestCase):
+    def test_cli_refuses_unreviewed_producer_even_with_valid_record(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary);source=root/module.PRODUCER;wheel(source)
+            with patch('sys.argv',['derive',str(source),str(root)]),patch('sys.stderr',io.StringIO()):
+                with self.assertRaises(SystemExit) as error:module.main()
+            self.assertEqual(error.exception.code,2)
+            self.assertEqual(list(root.iterdir()),[source])
+
     def test_separate_wheel_preserves_producer_and_all_other_bytes_and_tags(self):
         with tempfile.TemporaryDirectory() as temporary:
             root=Path(temporary);source=root/'source.whl';expected=wheel(source);raw=source.read_bytes()

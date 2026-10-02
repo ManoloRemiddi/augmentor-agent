@@ -2,6 +2,33 @@
 
 # Start here: agent handoff
 
+## October 2 authenticated source runtime completion
+
+[The completed recipient proof](../release/qualification/next-targets/20261002-authenticated-source-runtime-completion.json)
+now extends the earlier authenticated-toolchain checkpoint: all19 source-build
+commands finish from seven verified archives in the reconstructed public-base plus
+410-package image. All three wheels verify RECORD; both default and explicit SDK
+environments import all11 requested bindings. Native wheel members match the first
+producer. Qt's207 ELF inventory has161 identical files and46 differences; ZIP,
+configuration/cache/RECORD bytes also differ. This is functional reconstruction,
+not binary reproducibility.
+
+A separately identified augmentor2 wheel excludes only the reviewed unused
+QtExampleIcons extension and retains other producer bytes/tags. The CLI accepts
+only the two exact reviewed producer hashes; six derivation refusal/preservation
+tests pass. The fresh runtime-only container uses the reconstructed image and a
+finite18-library candidate, without a producer SDK/tree. It passes11 imports,
+offscreen synthetic text, SVG pixel and QtQuick/plasma component creation. A fresh
+source rebuild of deliberately modified QtSvg completes three commands; a separate
+runtime executes its changed isValid result. The published replacement probe
+verifies the original runtime inventory before/after and that only Svg differs.
+
+These tools require explicit runtime paths. Full product entrypoints, native
+Wayland/xcb rendering, shader rendering, matching other-distro profiles, complete
+offered source/control-script/notice scope and legal acceptance remain open.
+Historical build, APT and fixture permission failures remain preserved. All five
+authorized rollout points are active; no selected installation or binary release changes.
+
 ## October 2 native read-only accessibility checkpoint
 
 The [isolated Fedora helper proof](../release/qualification/next-targets/20261002-gnome-native-accessibility.json)

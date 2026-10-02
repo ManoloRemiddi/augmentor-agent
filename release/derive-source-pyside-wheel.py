@@ -18,6 +18,11 @@ REMOVED={'PySide6/QtExampleIcons.abi3.so','PySide6/QtExampleIcons.pyi'}
 PRODUCER='PySide6-6.8.2.1-6.8.2-cp37-abi3-manylinux_2_39_x86_64.whl'
 PRODUCER_HASH='fa2562ceee1e9af89a805876a52f6872be8d0792b7f41be43937051ea94a580b'
 DERIVED=PRODUCER.replace('-6.8.2-cp37','-6.8.2augmentor1-cp37')
+# The second exact input was rebuilt from the authenticated410-package kit,
+# never from the first producer image. Keep its derivative identity distinct.
+RECIPIENT_HASH='afb72cf50e336108afbb36a6b7704a9342ffc898130b628b661d5c874e5afd06'
+REVIEWED_PRODUCERS={PRODUCER_HASH:DERIVED,
+    RECIPIENT_HASH:PRODUCER.replace('-6.8.2-cp37','-6.8.2augmentor2-cp37')}
 
 
 def digest(data):return hashlib.sha256(data).hexdigest()
@@ -95,7 +100,9 @@ def main():
     parser.add_argument('output_directory',type=Path);args=parser.parse_args()
     if args.producer.name!=PRODUCER:parser.error('Only the reviewed exact source-build producer is accepted.')
     if not args.output_directory.is_dir():parser.error('Use an existing separate output directory.')
-    receipt=derive(args.producer,args.output_directory/DERIVED,PRODUCER_HASH)
+    expected=digest(args.producer.read_bytes())
+    if expected not in REVIEWED_PRODUCERS:parser.error('Producer bytes are not a reviewed exact source-build output.')
+    receipt=derive(args.producer,args.output_directory/REVIEWED_PRODUCERS[expected],expected)
     with (args.output_directory/'derivation-receipt.json').open('x') as handle:
         json.dump(receipt,handle,indent=2);handle.write('\n')
     print(json.dumps(receipt,indent=2))

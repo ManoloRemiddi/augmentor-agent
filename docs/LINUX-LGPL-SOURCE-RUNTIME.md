@@ -89,10 +89,29 @@ The image derives only from the pinned public base plus authenticated package
 objects, not the previous producer image. Normal UID1001, two CPUs,8GiB,512 PIDs,
 no network/devices/host mounts/privileged mode then starts seven unchanged official
 source archives with the published source-build driver; its dependency inventory
-matches exactly. Fresh QtBase configure passes and compile runs at this checkpoint.
-No compiled producer intermediates are copied. Full source rebuild/runtime imports,
-rendering/replacement via product entrypoints and source-kit/license qualification
-remain false until executed.
+matches exactly. The earlier checkpoint observed one completed configure command;
+[the later completion proof](../release/qualification/next-targets/20261002-authenticated-source-runtime-completion.json)
+now records all19 commands and three produced wheels. No compiled producer
+intermediates were copied. [Build verifier](../release/probe-source-qt-build.py)
+checks all three RECORD inventories and imports all11 modules in both default and
+explicit SDK environments. All native wheel members match the first producer;
+161/207 Qt ELF files match and46 differ. A private probe copy initially refused
+normal-user reading because it retained600 mode/root ownership; changing only
+that fixture file's owner allowed its repeat, then the published verifier passed.
+No source/build failure is inferred from that preflight permission error.
+
+The second exact reviewed PySide producer hash is accepted by the derivation CLI
+and gets the distinct6.8.2augmentor2 build tag. Its derivative has SHA256
+5cb05190ddf1db3e2915662b8c744f56922f40bd03b84683b6651742cfb1c951.
+A fresh runtime-only container from the reconstructed image has no producer tree
+and passes11 imports, synthetic widget text, SVG red-pixel and QtQuick/plasma
+component construction using the finite18-library scope. A fresh QtSvg recipient
+source build finishes all three commands. The
+[published replacement verifier](../release/probe-source-qt-replacement.py)
+executes originalTrue/modifiedFalse results in fresh processes and checks every
+original runtime file/symlink before and after; only Svg differs in the separate
+candidate. These are explicit-path container probes, not product-entrypoint,
+native graphics, complete source-kit or legal qualification.
 
 [Ubuntu's snapshot service](https://snapshot.ubuntu.com/) supports historical
 acquisition; the locally retained authentic objects/metadata make this finite
