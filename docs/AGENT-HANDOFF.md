@@ -2,6 +2,28 @@
 
 # Start here: agent handoff
 
+## October 2 installed Noble source-package startup
+
+Clean7b6df59 private source-runtime packages pass byte/notice/readability review,
+configure Runtime then Desktop in a fresh image, and prepare root-owned inputs as
+ordinary UID1001 offline. Actual installed cold runtime/Browser selection and
+package leases, desktop offscreen screenshot, synthetic text/SVG/plasma component
+and64-frame single-thread CPU VAD pass. All14 mapped Qt libraries stay in the
+verified runtime. See [the actual report](../release/qualification/next-targets/20261002-noble-source-package-startup.json)
+and [owning guide](LINUX-SOURCE-RUNTIME-ENTRYPOINTS.md#installed-ordinary-user-acceptance-of-clean7b6df59).
+The image-reference, pre-dependency order and first incorrect-QML-path probe failures
+are preserved; no failed candidate is relabelled or installed app source patched.
+
+The7b6df59 [Mac hosted check](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37060945741)
+passes on both macOS14/26. Its [Linux hosted check](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37060945796)
+also passes: source/Home/Debian, installed-packages, Browser, Ubuntu26.04 and
+Fedora43/44 jobs all succeed. Each native suite runs787 tests:785 pass and
+two Mac-only skips. The Node SDK suite runs517 cases:515 pass/two skips. Both42f065a checks were superseded/cancelled.
+The new installed evidence/recipe/probe require publication and their own hosted
+checks. All five rollout points, full product/native-session/Browser/audio/upgrades,
+other-distro and source/legal work remain active.22-file license decision pending;
+owner selections/services/models/GPU/audio remain unchanged.
+
 ## October 2 source package permission correction
 
 The first42f065a source-runtime Debian candidate builds and verifies its67 native

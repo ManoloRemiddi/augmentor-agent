@@ -2,6 +2,20 @@
 
 # Linux distribution rollout
 
+## October 2 installed Noble source-package startup
+
+The [new report](../release/qualification/next-targets/20261002-noble-source-package-startup.json)
+now proves actual clean7b6df59 source-runtime package installation and root-owned
+input preparation by ordinary UID1001 in a separate offline fixture. Cold installed
+runtime/Browser identity and leases, Desktop offscreen preview, synthetic text/SVG/
+plasma component and64-frame single-thread CPU VAD pass. Original private source
+proofs and the first root-only package-input defect remain separate. Fixture image
+reference, Pre-Depends order and incorrect QML-path failures are preserved; corrected
+repeats do not change those records. See [scope and repeat instructions](LINUX-SOURCE-RUNTIME-ENTRYPOINTS.md#installed-ordinary-user-acceptance-of-clean7b6df59).
+Full native sessions/input, matching live product/speech, graphical Browser/audio,
+upgrades/removal, other-distro/source/legal/public-release acceptance remain open.
+The license proposal is pending; all five rollout points remain active.
+
 ## October 2 source-runtime entrypoint contract
 
 The distinct Noble source-Qt voice profile now binds the reviewed native payload,

@@ -160,3 +160,44 @@ payload/path/permission synthetic cases pass. A new clean artifact and actual
 ordinary-user package installation proof are still required. No failed candidate
 was activated or promoted; source entrypoint evidence above retains its original
 actual tool/source hashes.
+
+## Installed ordinary-user acceptance of clean7b6df59
+
+[The installed-package report](../release/qualification/next-targets/20261002-noble-source-package-startup.json)
+records matching clean7b6df59 runtime/desktop packages and their exact hashes,
+source/native contract and notice review. The corrected package input permissions
+pass artifact review, then an actual fresh image configures Runtime before Desktop
+and satisfies both package identities. A separate normal-user, offline container
+runs the installed `/usr/lib/augmentor` code with no host devices or mounts.
+
+Actual setup prepares the root-owned inputs as UID1001 into the private immutable
+runtime; repeat preparation preserves its receipt. The cold component wrapper
+checks the installed package lifetime lease and selects the same Python in runtime,
+platform and Browser. The installed desktop launcher captures an offscreen preview.
+All eleven source bindings import; owned synthetic text, SVG red pixels and plasma
+component creation pass, with all fourteen mapped Qt libraries inside the runtime.
+The real installed CPU VAD processes64 synthetic frames with deterministic reset,
+finite probabilities and one intra/inter thread; no microphone, TTS or live model
+service is used. This does not establish minimum CPU or complete speech acceptance.
+
+The [exact installed probe](../release/probe-installed-noble-source.py) intentionally
+requires the dated clean7b6df59 package identity and marked UID1001 fixture. The
+[recipe](../release/noble-source-package-fixture.Dockerfile) uses the previously
+verified local runtime-fixture image; verify its image identity against the report
+before building. It is an installed-package fixture, distinct from the source-only
+fixture above. The local image-ID registry-reference failure, combined `dpkg`
+Pre-Depends refusal and first probe's incorrect QML path are retained. The QML path
+was corrected in a separate probe/output; no installed app source was patched.
+
+Upgrade/removal, matching live DSH/model/full speech, native Wayland/xcb and
+GNOME/KDE sessions, graphical Browser, physical audio, compiled-content notices,
+recipient source/replacement delivery and license/public-release acceptance remain
+open. All five rollout points remain active. Existing owner/guest selections and
+model/GPU/audio settings remain unchanged; the22-file license proposal is pending.
+
+Both tested7b6df59 hosted checks pass: [Linux37060945796](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37060945796)
+and [Mac37060945741](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37060945741).
+Debian13, Ubuntu26.04 and Fedora43/44 each run787 native tests:785 pass and two
+Mac-only skips. The Node SDK suite runs517 cases:515 pass/two skips. These are
+configured hosted source checks; they do not replace the separate installed Noble
+fixture or establish its remaining native-session/product/license gates.

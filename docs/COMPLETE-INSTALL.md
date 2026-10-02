@@ -65,6 +65,12 @@ Its system recipe supplies ICU74. Declared-runtime DSH services now enter throug
 the verified component wrapper before Node/speech children start. Neither this
 source candidate nor its entrypoint fixture is a public compatibility release.
 
+The clean7b6df59 source-runtime runtime/desktop packages now have actual
+[ordinary-user offline installed startup evidence](LINUX-SOURCE-RUNTIME-ENTRYPOINTS.md#installed-ordinary-user-acceptance-of-clean7b6df59),
+including cold Browser selection, offscreen Desktop, synthetic Qt and CPU VAD.
+The source candidate still lacks complete connected-product, native-session,
+graphical Browser, physical audio, upgrade and legal/release acceptance.
+
 ## Included and configured
 
 - Matching Augmentor Desktop and Chromium Browser 0.2.13 surfaces and companion.
