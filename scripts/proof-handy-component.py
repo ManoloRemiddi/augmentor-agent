@@ -19,7 +19,8 @@ ROOT=Path(__file__).resolve().parents[1]
 
 @contextmanager
 def private_directory():
-    base=Path(tempfile.mkdtemp(prefix='augmentor-component-proof-'))
+    directory=tempfile.TemporaryDirectory(prefix='augmentor-component-proof-')
+    base=Path(directory.name)
     try:
         yield base
     finally:
@@ -28,7 +29,7 @@ def private_directory():
         deadline=time.monotonic()+30
         while True:
             try:
-                shutil.rmtree(base)
+                directory.cleanup()
                 break
             except OSError:
                 if not base.exists():break
