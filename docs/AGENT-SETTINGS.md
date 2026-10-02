@@ -388,3 +388,22 @@ selected update and live mobile adoption, not a claim of Desktop adoption.
 Rollback selects `20261002-130745-7e74c395`. DSH and speech services were not
 restarted; installed Mac GUI acceptance remains unverified. Draft PR #29 is
 unmerged until the owner gives the green light.
+
+
+### Desktop adoption followup — 2 October 2026
+
+On the owner's request to implement the approved Desktop design, both windows
+accepted idle maintenance closure and restarted onto the latest compatible
+selection `20261002-141437-663e6383`, artifact
+`a47433db434bf446d8001c18182d85b8318c0e78f92fd72f14f8131f75cfd308`.
+That selection adds the independently installed Handy integration (`c8f67a3`)
+over the profile/activity artifact above. The reviewed Agent profile is preserved;
+the usage widget/helper match the tested implementation byte for byte. Neither
+the selection nor its immutable files were rewritten for this adoption.
+Desktop/mobile now report the selected root, online, voice available and no
+pending update. Actual Desktop accessibility actions opened Settings and verified
+Agent Identity, Agent Memory, the recorded token calendar and Back to chat.
+The Agent page was left open for the owner's testing. No private text or usage
+screenshot was published. Existing source/candidate tests above remain the
+qualification evidence; no new implementation change or model request was made.
+PR #29 remains draft and unmerged pending explicit merge approval.

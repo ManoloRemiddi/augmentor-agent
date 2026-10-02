@@ -2,7 +2,18 @@
 
 # Consistent installed desktop releases
 
-## October 2: Agent profile and recorded token activity
+## October 2: Desktop profile adoption followup
+
+[Desktop profile adoption](AGENT-SETTINGS.md#desktop-adoption-followup--2-october-2026)
+now qualifies actual running Desktop/mobile on latest compatible selection
+`20261002-141437-663e6383`, with voice available, online and no pending update.
+Both accepted idle maintenance closure. This selection preserves the reviewed
+profile/calendar and includes the independently installed Handy integration;
+no immutable artifact was edited or selection rolled back. Actual Desktop
+Settings controls were verified and its Agent page left open for owner testing.
+No model or backend/speech configuration change; PR #29 remains draft/unmerged.
+
+## Agent profile and recorded token activity initial selection (historical)
 
 [Installed profile/activity update](AGENT-SETTINGS.md#installed-profileactivity-update)
 records source `41e0441`, compatible selected release `20261002-135127-a99dafb5`,
