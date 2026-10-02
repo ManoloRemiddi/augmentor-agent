@@ -33,6 +33,7 @@ class AgentSettingsTests(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory(); self.addCleanup(self.temp.cleanup)
         environment=patch.dict(os.environ,{'AUGMENTOR_IDENTITY_DIR':self.temp.name}); environment.start(); self.addCleanup(environment.stop)
+        usage=patch('augmentor_linux.token_usage.read_usage',return_value={'start':'2025-10-03','end':'2026-10-02','days':[],'total':0,'records':0,'sources':[],'incomplete':0});usage.start();self.addCleanup(usage.stop)
         self.owner=Owner(); self.owner.show(); self.dialog=SettingsDialog(self.owner); self.dialog.show(); self.app.processEvents()
         self.addCleanup(self.dialog.deleteLater); self.addCleanup(self.owner.deleteLater)
     def click(self, name):

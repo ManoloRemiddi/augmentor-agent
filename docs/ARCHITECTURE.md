@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+
+[Recorded token activity and Agent profile](TOKEN-USAGE.md): larger animated identity, proportional actions and a bottom daily calendar of local provider-reported usage, with explicit coverage and accessible day selection.
 Desktop [agent settings](AGENT-SETTINGS.md) replace chat content in the same native window, preserve chat placement/drafts, and embed existing editors without modal settings loops. Settings use one fixed screen-bounded frame across pages, restoring chat geometry on exit. Forms reserve readable field/label heights, grow inputs across available width and scroll vertically at the frame edge; Prompt library browses beside its editor on standard widths. Top tabs own Look/Voice, Agent owns access, and More avoids those duplicates. They own a shared private identity and authoritative `soul.md`. Harnesses snapshot personal instructions per conversation; Memory displays existing scoped projections rather than maintaining another memory file.
 
 # Current architecture

@@ -279,3 +279,34 @@ class OverlayTests(unittest.TestCase):
             p.show_page(page);self.settle();self.assertEqual(self.window.geometry(),geometry)
         p.cancel_soul();p.accept();self.window.resize(510,540);self.settle()
         self.assertEqual((self.window.width(),self.window.height()),(510,540))
+
+
+    def test_profile_loaded_usage_and_custom_image_fit_fixed_frame(self):
+        from test_token_usage import SUMMARY
+        from PySide6.QtCore import QByteArray, QBuffer, QIODevice
+        from PySide6.QtGui import QImage, QColor
+        import base64
+        p=self.open();geometry=QRect(self.window.geometry())
+        p.usage.receive(({**SUMMARY,'incomplete':1},None));p.receive_access(({'revision':1,'value':{'defaultPreset':'danger-full-access'}},None))
+        image=QImage(100,100,QImage.Format.Format_ARGB32);image.fill(QColor('#748aaf'))
+        data=QByteArray();buffer=QBuffer(data);buffer.open(QIODevice.OpenModeFlag.WriteOnly);image.save(buffer,'PNG')
+        p.avatar.set_image(base64.b64encode(bytes(data)).decode());p.default_image.show()
+        for theme in ('dark','light'):
+            self.window.apply_appearance({'theme':theme});self.settle()
+            self.assertEqual(p.scroll.verticalScrollBar().maximum(),0);self.assertEqual(p.scroll.horizontalScrollBar().maximum(),0)
+            self.assertEqual(p.avatar.width(),148);self.assertFalse(p.avatar.motion.isActive());self.assertEqual(self.window.geometry(),geometry)
+            bottom=p.usage.mapTo(p.scroll.viewport(),p.usage.rect().bottomRight()).y()
+            self.assertLessEqual(bottom,p.scroll.viewport().height());self.assertLess(p.scroll.viewport().height()-bottom,16)
+            for action in p.profile_actions:
+                self.assertGreater(action.heading.width(),250);self.assertGreater(action.description.width(),250)
+
+    def test_narrow_agent_profile_uses_available_width_with_no_horizontal_overflow(self):
+        from test_token_usage import SUMMARY
+        screen=SimpleNamespace(availableGeometry=lambda:QRect(0,0,420,780))
+        with patch.object(self.window,'screen',return_value=screen):
+            p=self.open();p.name.setText('Synthetic long agent name '*4);p.usage.receive((SUMMARY,None));self.settle()
+            self.assertEqual(p.scroll.horizontalScrollBar().maximum(),0)
+            self.assertLessEqual(p.stack.width(),p.scroll.viewport().width());self.assertEqual(p.avatar.width(),112)
+            for widget in [p.name,p.access,p.usage,*p.profile_actions]:
+                self.assertLessEqual(widget.mapTo(p.scroll.viewport(),widget.rect().bottomRight()).x(),p.scroll.viewport().width())
+            p.usage.calendar.grab();self.assertEqual(len(p.usage.calendar.cells),365)

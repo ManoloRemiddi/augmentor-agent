@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+
+[Recorded token activity and Agent profile](TOKEN-USAGE.md): larger animated identity, proportional actions and a bottom daily calendar of local provider-reported usage, with explicit coverage and accessible day selection.
 Desktop [identity-first settings](AGENT-SETTINGS.md) open directly from the three dots inside the existing agent frame, restore the latest chat size, and include rename/image, a voice energy ring, compact stacked Agent Identity/Agent Memory cards and More → All settings without repeated Look/Voice/access links. All pages share one fixed screen-bounded frame; readable inputs fill form width, long forms scroll vertically, Prompt library uses a browse/editor split, and selected icons match text. Shared source applies on Linux/macOS; installed Mac acceptance remains unverified.
 
 Current OS parity direction and verified gaps: [one-product architecture audit](PLATFORM-PARITY-AUDIT.md).

@@ -5,10 +5,10 @@ import importlib.util
 import sys
 from pathlib import Path
 from PySide6.QtCore import Signal, Qt, QTimer, QEvent, QSize, QRectF, QByteArray, QBuffer, QIODevice
-from PySide6.QtGui import QColor, QIcon, QPalette, QPainter, QPainterPath, QImageReader, QPixmap
+from PySide6.QtGui import QColor, QIcon, QPalette, QPainter, QPainterPath, QImageReader, QPixmap, QRadialGradient
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
     QPushButton, QLineEdit, QComboBox, QPlainTextEdit, QTextBrowser, QTabWidget,
-    QScrollArea, QStackedLayout, QFileDialog, QCheckBox, QSizePolicy, QLayout, QGridLayout, QBoxLayout, QTextEdit, QAbstractSpinBox, QFormLayout, QListWidget)
+    QScrollArea, QStackedLayout, QFileDialog, QCheckBox, QSizePolicy, QLayout, QGridLayout, QBoxLayout, QTextEdit, QAbstractSpinBox, QFormLayout, QListWidget, QStyle, QStyleOptionButton)
 from .ui_scale import scaled, px, factor
 from .voice_button import paint_energy_ring
 from .settings_icons import settings_icon
@@ -63,7 +63,7 @@ class AgentAvatar(QPushButton):
         super().__init__()
         self.setAutoDefault(False)
         self.owner = owner; self.phase = 0.; self.image = QPixmap()
-        scaled(self).setFixedSize(64,64)
+        scaled(self).setFixedSize(148,148)
         self.setAccessibleName('Change agent image'); self.setToolTip('Change agent image')
         self.setStyleSheet('border:0;background:transparent;')
         self.motion = QTimer(self); self.motion.setInterval(40); self.motion.timeout.connect(self.advance)
@@ -89,6 +89,9 @@ class AgentAvatar(QPushButton):
     def paintEvent(self, event):
         painter = QPainter(self); painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         if self.image.isNull():
+            glow=QRadialGradient(self.rect().center(),self.width()/2)
+            colour=QColor(self.owner.accent);colour.setAlpha(32);glow.setColorAt(0,colour);colour.setAlpha(0);glow.setColorAt(1,colour)
+            painter.setPen(Qt.PenStyle.NoPen);painter.setBrush(glow);painter.drawEllipse(QRectF(self.rect()))
             painter.translate(self.width()/2,self.height()/2)
             painter.scale(self.width()/28,self.height()/28)
             paint_energy_ring(painter,QColor(self.owner.accent),self.phase)
@@ -99,6 +102,31 @@ class AgentAvatar(QPushButton):
         if self.hasFocus():
             painter.resetTransform(); painter.setClipping(False); painter.setPen(QColor(self.owner.accent)); painter.setBrush(Qt.BrushStyle.NoBrush)
             painter.drawEllipse(self.rect().adjusted(2,2,-2,-2))
+
+
+class AgentAction(QPushButton):
+    def __init__(self,owner,title,description,icon,colour):
+        super().__init__(title);self.owner=owner;self.colour=QColor(colour)
+        self.setAccessibleName(title+' · '+description);self.setToolTip(description);self.setAutoDefault(False)
+        self.setSizePolicy(QSizePolicy.Policy.Ignored,QSizePolicy.Policy.Fixed)
+        scaled(self).setFixedHeight(60)
+        row=QHBoxLayout(self);scaled(row).setContentsMargins(16,8,16,8);scaled(row).setSpacing(12)
+        self.glyph=QLabel();self.glyph.setPixmap(settings_icon(icon,self.colour).pixmap(px(self,26),px(self,26)));row.addWidget(self.glyph)
+        text=QVBoxLayout();scaled(text).setSpacing(2)
+        self.heading=QLabel(title);self.heading.setSizePolicy(QSizePolicy.Policy.Ignored,QSizePolicy.Policy.Preferred);scaled(self.heading).setStyleSheet('font-size:15px;font-weight:600;');text.addWidget(self.heading)
+        self.description=QLabel(description);self.description.setSizePolicy(QSizePolicy.Policy.Ignored,QSizePolicy.Policy.Preferred);scaled(self.description).setStyleSheet('font-size:11px;');text.addWidget(self.description)
+        row.addLayout(text,1);self.arrow=QLabel('›');scaled(self.arrow).setStyleSheet('font-size:23px;');row.addWidget(self.arrow)
+        for label in self.findChildren(QLabel):label.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        self.restyle()
+
+    def restyle(self):
+        colour=self.colour;ink=self.owner.palette().color(QPalette.ColorRole.WindowText).name()
+        scaled(self).setStyleSheet(f'QPushButton {{background:rgba({colour.red()},{colour.green()},{colour.blue()},24);border:1px solid rgba({colour.red()},{colour.green()},{colour.blue()},65);border-radius:14px;}} QPushButton:hover {{background:rgba({colour.red()},{colour.green()},{colour.blue()},48);}} QPushButton:focus {{border:2px solid {QColor(self.owner.accent).name()};}} QLabel {{color:{ink};background:transparent;border:0;}}')
+        self.description.setStyleSheet(f'font-size:{px(self,11)}px;color:{ink};')
+
+    def paintEvent(self,event):
+        option=QStyleOptionButton();self.initStyleOption(option);option.text=''
+        painter=QPainter(self);self.style().drawControl(QStyle.ControlElement.CE_PushButton,option,painter,self)
 
 
 class SettingsPanel(QWidget):
@@ -133,13 +161,20 @@ class SettingsPanel(QWidget):
         self.show_page('agent')
 
     def resizeEvent(self,event):
-        super().resizeEvent(event);self.sync_navigation();QTimer.singleShot(0,self.request_fit)
+        super().resizeEvent(event);self.sync_navigation()
+        if hasattr(self,'hero'):
+            narrow=self.width()<px(self,450)
+            self.hero.setDirection(QBoxLayout.Direction.TopToBottom if narrow else QBoxLayout.Direction.LeftToRight)
+            scaled(self.avatar).setFixedSize(112 if narrow else 148,112 if narrow else 148)
+        QTimer.singleShot(0,self.request_fit)
 
     def sync_navigation(self):
         for button in getattr(self,'nav',{}).values():
             colour=QColor(self.owner.background) if button.isChecked() and hasattr(self.owner,'background') else self.owner.palette().color(QPalette.ColorRole.WindowText)
             icon=settings_icon(button.property('settingsIconName'),colour)
             button.setIcon(QIcon() if self.isVisible() and self.width()<px(self,300) else icon)
+        for action in getattr(self,'profile_actions',[]):action.restyle()
+        if hasattr(self,'usage'):self.usage.calendar.update()
 
     def eventFilter(self,widget,event):
         if event.type()==QEvent.Type.LayoutRequest and not self.closing:
@@ -174,7 +209,7 @@ class SettingsPanel(QWidget):
     def prepare_inputs(self,widget):
         for field in widget.findChildren(QLineEdit)+widget.findChildren(QComboBox)+widget.findChildren(QAbstractSpinBox):
             if isinstance(field,QLineEdit) and isinstance(field.parent(),(QComboBox,QAbstractSpinBox)):continue
-            scaled(field).setMinimumHeight(40)
+            scaled(field).setMinimumHeight(max(40,round(field.minimumHeight()/factor(field))))
             field.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         for form in widget.findChildren(QFormLayout):
             form.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.AllNonFixedFieldsGrow)
@@ -211,28 +246,33 @@ class SettingsPanel(QWidget):
         self.avatar.sync_motion();self.sync_navigation();QTimer.singleShot(0,self.request_fit)
 
     def page_agent(self):
-        page, layout = self.make_page()
-        self.avatar = AgentAvatar(self.owner); self.avatar.clicked.connect(self.change_image); layout.addWidget(self.avatar,0,Qt.AlignmentFlag.AlignHCenter)
-        self.name = QLineEdit((self.identity or {}).get('name','Augmentor')); self.name.setAccessibleName('Agent name'); self.name.setMaxLength(80); self.name.setAlignment(Qt.AlignmentFlag.AlignCenter); self.name.setSizePolicy(QSizePolicy.Policy.Ignored,QSizePolicy.Policy.Fixed)
-        scaled(self.name).setStyleSheet('font-size:20px;font-weight:600;padding:6px;'); layout.addWidget(self.name)
-        self.name.editingFinished.connect(self.save_name)
+        page,layout=self.make_page();scaled(layout).setSpacing(8)
+        self.hero=QBoxLayout(QBoxLayout.Direction.LeftToRight);scaled(self.hero).setSpacing(20)
+        self.avatar=AgentAvatar(self.owner);self.avatar.clicked.connect(self.change_image);self.hero.addWidget(self.avatar,0,Qt.AlignmentFlag.AlignHCenter)
+        details=QVBoxLayout();scaled(details).setSpacing(4);details.addStretch()
+        caption_row=QHBoxLayout();caption=QLabel('YOUR AGENT');scaled(caption).setStyleSheet('font-size:11px;font-weight:600;');caption_row.addWidget(caption,1)
+        self.default_image=self.action(caption_row,'Reset image',self.reset_image,'reset-avatar');scaled(self.default_image).setStyleSheet('font-size:11px;padding:2px;border:0;text-align:left;');self.default_image.setVisible(bool((self.identity or {}).get('avatar')));details.addLayout(caption_row)
+        self.name=QLineEdit((self.identity or {}).get('name','Augmentor'));self.name.setAccessibleName('Agent name');self.name.setMaxLength(80)
+        self.name.setSizePolicy(QSizePolicy.Policy.Ignored,QSizePolicy.Policy.Fixed);scaled(self.name).setMinimumHeight(52)
+        scaled(self.name).setStyleSheet('QLineEdit {font-size:27px;font-weight:600;padding:6px 0;border:0;background:transparent;} QLineEdit:focus {border-bottom:1px solid palette(highlight);}')
+        details.addWidget(self.name);self.name.editingFinished.connect(self.save_name)
+        self.connection=QLabel();details.addWidget(self.connection)
+        hint=QLabel('Edit your name or tap the image to make it yours.');hint.setWordWrap(True);scaled(hint).setStyleSheet('font-size:11px;');details.addWidget(hint)
+        details.addStretch();self.hero.addLayout(details,1);layout.addLayout(self.hero)
         self.avatar.set_image((self.identity or {}).get('avatar',''))
-        self.default_image=self.action(layout,'Reset image',self.reset_image,'reset-avatar'); self.default_image.setVisible(bool((self.identity or {}).get('avatar')))
-        connection=QLabel('Connected' if getattr(self.owner.controller,'online',False) else 'Not connected'); connection.setAlignment(Qt.AlignmentFlag.AlignCenter); layout.addWidget(connection)
-        for title,sub,link,destination,color in [('Agent Identity','How I behave','Edit instructions  ↗','soul','#9d234f'),('Agent Memory','What I know about you','View memory  ↗','memory','#235d82')]:
-            button = self.action(layout,title+'\n'+sub+'   ›',lambda _=False,p=destination:self.show_page(p),destination+'-card')
-            button.setSizePolicy(QSizePolicy.Policy.Ignored,QSizePolicy.Policy.Preferred)
-            scaled(button).setFixedHeight(72)
-            scaled(button).setStyleSheet(f'QPushButton {{text-align:left;padding:10px 16px;border:0;border-radius:14px;background:{color};color:#ffffff;font-size:15px;}} QPushButton:hover {{background:{QColor(color).lighter(115).name()};}} QPushButton:focus {{border:2px solid {QColor(self.owner.accent).name()};}}')
-        layout.addWidget(QLabel('Agent access'))
-        self.access = QComboBox(); self.access.setAccessibleName('Agent access')
-        for text,value in [('Full access','danger-full-access'),('Ask before actions','workspace-write'),('Read only','read-only')]: self.access.addItem(text,value)
-        self.access.setEnabled(False); layout.addWidget(self.access)
-        self.access_note = QLabel('Loading access settings…'); self.access_note.setWordWrap(True); layout.addWidget(self.access_note)
-        self.permission = None
-        self.background(self.read_access,self.receive_access)
-        self.access.activated.connect(self.save_access)
-        layout.addStretch(); return page
+        self.profile_actions=[]
+        for title,description,icon,destination,colour in [('Agent Identity','How I behave · Personality and instructions','prompts','soul','#ae5677'),('Agent Memory','What I know · About you and your projects','memory','memory','#4d91ac')]:
+            button=AgentAction(self.owner,title,description,icon,colour);button.setObjectName(destination+'-card');button.clicked.connect(lambda _=False,p=destination:self.show_page(p));self.profile_actions.append(button);layout.addWidget(button)
+        access_row=QHBoxLayout();label=QLabel('Agent access');scaled(label).setStyleSheet('font-size:13px;font-weight:600;');access_row.addWidget(label)
+        self.access=QComboBox();self.access.setAccessibleName('Agent access')
+        for text,value in [('Full access','danger-full-access'),('Ask before actions','workspace-write'),('Read only','read-only')]:self.access.addItem(text,value)
+        self.access.setEnabled(False);access_row.addWidget(self.access,1);layout.addLayout(access_row)
+        self.access_note=QLabel('Loading access settings…');self.access_note.setWordWrap(True);scaled(self.access_note).setStyleSheet('font-size:11px;');layout.addWidget(self.access_note)
+        self.permission=None;self.background(self.read_access,self.receive_access);self.access.activated.connect(self.save_access)
+        layout.addStretch(1)
+        from .token_usage import TokenUsage
+        self.usage=TokenUsage(self);layout.addWidget(self.usage)
+        self.update_activity();return page
 
     def read_access(self):
         try: return self.owner.controller.client.setting('permission'),None
@@ -539,6 +579,8 @@ class SettingsPanel(QWidget):
     def update_activity(self):
         running=bool(self.owner.controller and getattr(self.owner.controller,'running',False))
         self.stop.setVisible(running); self.stop.setEnabled(running)
+        if hasattr(self,'connection'):
+            self.connection.setText('●  Connected' if getattr(self.owner.controller,'online',False) else '○  Not connected')
 
     def capture_current(self):
         return self.shortcuts.capture_current() if self.shortcuts else False

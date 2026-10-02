@@ -2,7 +2,21 @@
 
 # Start here: agent handoff
 
-## 2 October: Fixed settings frame and readable inputs
+## 2 October: Agent profile and recorded token activity
+
+The larger animated profile, subtle stacked Identity/Memory actions and access
+row now balance the fixed frame with a daily token calendar at the bottom.
+[Recorded token activity](TOKEN-USAGE.md) specifies the independently authored
+read-only DSH/Pi/Codex journal aggregator, deduplication, provider-total semantics,
+coverage and accessible selection. Native source passes 637 cases (635 pass,
+two Mac-only skips), with standard frame/theme/custom-image and narrow width
+checks. Seven Node aggregation fixtures pass. The full root Node suite passes 491 cases
+(489 pass, two opt-in memory proof skips). Synthetic renders are separate
+from a read-only local stored-count proof; no private history is published.
+Linux installation evidence and tested source follow after candidate qualification.
+Mac installed GUI acceptance remains unverified. PR #29 remains draft/unmerged.
+
+## Fixed settings frame and readable inputs checkpoint (historical)
 
 The owner requested stable settings dimensions and readable fields after the
 model setup screenshot showed squashed inputs and clipped descriptions. All

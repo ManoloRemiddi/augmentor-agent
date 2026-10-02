@@ -12,8 +12,9 @@ Hiding/reopening retains the settings page while restart placement retains the
 chat size. Source accessibility scaling also scales the saved chat dimensions.
 
 Agent, Look, Voice and More remain the main navigation. Agent contains an editable
-name, image picker and the existing voice energy ring, vertically stacked rectangular
-Agent Identity/Agent Memory cards, and access for new chats. Look and Voice immediately open their
+name, image picker and a larger existing voice energy ring, softer vertically stacked
+Agent Identity/Agent Memory actions, access for new chats and a daily recorded token
+calendar anchored at the bottom. See [token activity and coverage](TOKEN-USAGE.md). Look and Voice immediately open their
 complete existing forms inside the frame, with no intermediate landing page.
 More opens All settings with direct links for Prompt library, Conversation,
 model/agent setup, DSH browser access or model providers, Connections/Home,
@@ -339,3 +340,32 @@ Rollback selects naming release `20261002-124829-c8553509`. Test Agent → More 
 model setup → Prompt library → Agent: the frame stays still, longer pages scroll
 vertically and fields retain their height. Back to chat restores your chosen
 chat dimensions. PR #29 remains draft and unmerged pending owner acceptance.
+
+
+## Agent profile and token activity — 2 October 2026
+
+The owner requested better proportions and a GitHub-style token usage calendar.
+A larger animated hero sits beside the editable name; Identity/Memory use subtle
+accent rows with icon/title/subtitle/action hierarchy, and access shares one row.
+Usage anchors the bottom of the existing fixed frame. Custom photos retain the
+same profile space. No previous settings routes or frame restoration change.
+[Recorded token activity](TOKEN-USAGE.md) owns the local read-only journal contract,
+coverage, accessible day selection and fixture/live evidence. The 637-case native suite
+passes with two Mac-only skips (635 pass); standard-width profile pages with loaded
+usage and a custom image have no scrollbars in both themes. Narrow layouts use
+vertical scrolling and have no horizontal overflow. Seven Node aggregation
+fixtures pass. The implementation remains on the draft feature PR for local
+acceptance before merging; installation evidence follows after qualification.
+
+
+The separate compatible product 0.2.11 candidate passes 37 focused native cases
+(35 pass, two source-only sizing skips) and all seven aggregation fixtures using
+the installed Node 24.19.0. An actual installed-interpreter proof reads local
+provider counters and confirms same-window identity, zero standard-width scroll
+ranges in both themes, calendar selection, preserved chat draft and exact geometry
+restoration. The candidate copies immutable baseline artifact
+`14134df91f3a049834ef94da95a5a156b1ce02760115a141ea7c80fb4fa9f92d`,
+replacing only the authored Agent settings module, adding the usage widget/helper
+and updating owning documentation. The deployed Window and existing product,
+dependency, backend and speech contracts are retained unchanged. No user history,
+configuration, DSH/speech service or GPU/model settings are changed.
