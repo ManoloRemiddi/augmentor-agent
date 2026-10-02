@@ -58,7 +58,8 @@ def main():
             assert 'error' not in call('theme',palette)
             assert call('status')['result']['theme']==palette
             assert 'error' in call('theme',{**palette,'accent':'arbitrary'})
-            assert 'error' not in call('conversation.acquire',{'token':'a'*32})
+            assert 'error' in call('conversation.acquire',{'token':'c'*32,'expires_at':time.time_ns()-1})
+            assert 'error' not in call('conversation.acquire',{'token':'a'*32,'expires_at':time.time_ns()+5_000_000_000})
             assert 'error' in call('conversation.acquire',{'token':'b'*32})
             assert 'error' not in call('conversation.release',{'token':'a'*32})
             assert 'error' not in call('enable',{'enabled':False})

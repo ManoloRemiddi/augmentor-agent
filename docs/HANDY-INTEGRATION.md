@@ -46,7 +46,9 @@ chat automatically, and no Enter key is sent by default.
 
 `services/dictation/server.py` owns one child per user/graphical session and
 provides authenticated local JSON messages through Unix sockets or Windows
-named pipes. `apps/native/augmentor_linux/dictation.py` is the client shared by
+named pipes. Long Unix state paths use a separate short, owner-only socket
+directory without moving settings or authentication material.
+`apps/native/augmentor_linux/dictation.py` is the client shared by
 native settings, the Browser native host and capture coordination. It creates
 private owner-only state/authentication material and bounds messages. The Handy
 child accepts correlated JSON lines through its parent's private pipes; EOF
@@ -58,7 +60,8 @@ capture owns it, and conversation capture cannot interrupt dictation. A lost
 acquire acknowledgement releases its token; dead process owners are reaped.
 Acquire requests also carry an admission deadline: work queued behind a slow
 model change cannot reserve the microphone after the caller has timed out.
-The deadline applies before and after native admission, never to active capture.
+The deadline is checked by the broker and native component before admission,
+then by the broker after acknowledgement; it never expires active capture.
 Maintenance refuses active capture and retires an idle broker before promotion.
 
 | Platform | Shortcut / insertion adapter | Qualification boundary |
@@ -158,7 +161,7 @@ separate QTextEdit, live light/dark theme without focus changes, cancellation
 through the actual close button, microphone exclusion, disable, no Handy tray
 and parent-exit cleanup. It does not listen to the physical microphone.
 The same proof also passes through the authenticated broker (`--broker`). Broad
-local regression suites pass: 612 native cases (609 pass, 3 platform/opt-in
+local regression suites pass: 614 native cases (611 pass, 3 platform/opt-in
 skips), 480 Node cases (478 pass, 2 opt-in skips), and 66 Browser cases. The native
 settings visual proof exposed and corrected white scroll content under a dark
 label palette; model-card links now use the accent colour. Both Debian packages
@@ -225,3 +228,46 @@ Windows Vulkan in CMake and retains checked builds for repeat proof.
 Mac/Windows installer/compositor/permission acceptance remains open until those
 jobs and the product package proofs pass. No physical microphone acceptance is
 claimed from virtual input tests or successful enable/status alone.
+
+### Verified source and installed follow-up
+
+Source `f60148b8ccb7bfac49c4a8c02e7bd2c20978b513` fixes parent-checkout patch
+skipping and adds deadline-fenced microphone admission. Fresh supplier preparation
+inside a parent Git repository passes the regression fixture and the complete
+actual reverse-patch/owned-source checks. Existing Linux runtime source already
+contained the correct patch; its verified binaries were re-staged with current
+build-input provenance. The authenticated virtual-microphone recording/paste
+proof passes again. All 614 native cases pass (611 pass, 3 expected skips).
+
+Both 0.2.13 Debian packages build from that clean source. The runtime package
+SHA-256 is `53f1275b4b510c43b78f88b4bcad2697df747bc84e740402a09652374ebd7d3c`;
+the Desktop package is `8a51cc02a21cea567ed33e3c0fcf8a99481eae035805a18b31f0bbf4c6e8d4b3`.
+The extracted actual component passes lifecycle, theme, revision rejection,
+exact-token ownership, no tray and parent EOF cleanup without microphone access.
+
+The installed follow-up is separately composed over the preceding adoption,
+retaining its newer UI and matching 0.2.11 dependencies. Managed stage/activation
+selected `20261002-154843-0eedcd1a`, artifact
+`eee72c10f9ad9268dc66c69de819536f033e3b6edd30b27366880526f8f5a478`.
+Both idle windows closed through acknowledged maintenance and reopened through
+the selected launcher; Desktop and Mobile now report that exact root, online,
+voice available and no pending update. The idle broker was retired before
+selection and restarted from the selected root. Ready/enabled Ctrl+Space,
+CPU/current owner palette/no Handy tray and absent standalone autostart were
+rechecked. Source qualification remains distinct from this mixed installed
+0.2.11 artifact and physical microphone acceptance.
+
+### Hosted source-preparation and voice checkpoint
+
+At source `f60148b`, [Mac component lifecycle](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37015394290/job/110864893055)
+passes the actual compiled embedded protocol, no-tray, theme, settings revision,
+ownership and EOF proof. The Mac 14/26 product jobs then expose long Unix
+socket names in private voice fixtures; a short owner-only endpoint fixes this
+without changing audio/provider configuration. Actual long-path broker startup
+and microphone lease round-trip pass in a regression fixture. Windows preparation
+exposes Git's CRLF checkout against LF archive context; the patch stream is now
+normalized and the independent source repository disables automatic conversion.
+The regression fixture combines a nested parent checkout, Windows automatic
+conversion and a CRLF patch. Native admission also rejects expired tokens before
+reserving the microphone. Final hosted component/product proofs must qualify
+these follow-up inputs before their complete platform artifacts are claimed.

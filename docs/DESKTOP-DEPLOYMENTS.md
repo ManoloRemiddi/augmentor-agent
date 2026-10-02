@@ -321,3 +321,14 @@ native canvas correction over the prior selected build. Running main/mobile and
 secondary windows remain on their earlier artifacts until reopened; active work
 and drafts were preserved. The staged candidate passed isolated two-process
 X11/KWin workspace and stacking checks plus authenticated activation preflight.
+
+## October 2 dictation admission follow-up
+
+The [Handy adoption follow-up](HANDY-INTEGRATION.md#verified-source-and-installed-follow-up)
+records `f60148b` composed over the preceding immutable artifact. Current selected
+and running Desktop/Mobile build is `20261002-154843-0eedcd1a`, artifact
+`eee72c10f9ad9268dc66c69de819536f033e3b6edd30b27366880526f8f5a478`.
+The compatible installed 0.2.11 UI/DSH/speech contracts are preserved. Both idle
+windows closed through acknowledged maintenance and reopened through the selected
+launcher. The owned broker also restarted from that root. Dictation remains ready
+on Ctrl+Space with the owner's palette and no Handy tray/startup owner.

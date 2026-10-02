@@ -4,6 +4,7 @@ import hashlib
 import importlib.util
 import io
 import json
+import os
 from pathlib import Path
 import subprocess
 import tarfile
@@ -27,11 +28,12 @@ class HandyPreparationTests(unittest.TestCase):
                     entry=tarfile.TarInfo('Handy-fixture/'+name);entry.size=len(content);archive.addfile(entry,io.BytesIO(content))
             data=payload.getvalue()
             (component/'upstream.json').write_text(json.dumps({'url':'https://supplier.invalid/fixture','commit':'fixture','sha256':hashlib.sha256(data).hexdigest()}))
-            (component/'augmentor.patch').write_text('diff --git a/src-tauri/src/lib.rs b/src-tauri/src/lib.rs\n--- a/src-tauri/src/lib.rs\n+++ b/src-tauri/src/lib.rs\n@@ -1 +1 @@\n-original\n+embedded\n')
+            (component/'augmentor.patch').write_bytes('diff --git a/src-tauri/src/lib.rs b/src-tauri/src/lib.rs\n--- a/src-tauri/src/lib.rs\n+++ b/src-tauri/src/lib.rs\n@@ -1 +1 @@\n-original\n+embedded\n'.replace('\n','\r\n').encode())
             (component/'embedding.rs').write_text('owned embedding fixture\n')
             (component/'AugmentorOverlay.tsx').write_text('owned overlay fixture\n')
             target=base/'build/handy'
-            with patch.object(prepare,'ROOT',base),patch.object(prepare.urllib.request,'urlopen',return_value=io.BytesIO(data)):
+            configuration=base/'global.gitconfig';configuration.write_text('[core]\n autocrlf = true\n')
+            with patch.dict(os.environ,{'GIT_CONFIG_GLOBAL':str(configuration)}),patch.object(prepare,'ROOT',base),patch.object(prepare.urllib.request,'urlopen',return_value=io.BytesIO(data)):
                 prepare.prepare(target)
             self.assertEqual((target/'src-tauri/src/lib.rs').read_text(),'embedded\n')
             self.assertEqual((target/'src-tauri/src/embedding.rs').read_text(),'owned embedding fixture\n')

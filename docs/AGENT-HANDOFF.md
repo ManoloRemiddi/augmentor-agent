@@ -16,6 +16,15 @@ installed 0.2.11 contracts retained. Standalone Handy startup/process ownership
 was reversibly retired and embedded Ctrl+Space dictation enabled on CPU with the
 owner's actual palette. [The adoption record](HANDY-INTEGRATION.md#owners-installed-adoption--2-october-2026)
 separates that Linux evidence from open hosted lifecycle/platform package gates.
+Follow-up source `f60148b` verifies patch application in a separate build Git root
+and fences delayed microphone admission. Current selected/running adoption is
+`20261002-154843-0eedcd1a`, artifact
+`eee72c10f9ad9268dc66c69de819536f033e3b6edd30b27366880526f8f5a478`;
+both idle windows adopted through acknowledged maintenance. The original cutover
+above remains historical evidence. All 614 native cases pass (3 expected skips),
+both clean-source Debian packages build and their extracted component passes
+actual lifecycle/theme/ownership/EOF proof. Hosted platform results are recorded
+in the owning guide as they qualify.
 Do not claim a qualified Windows installer or physical microphone acceptance
 solely from a native build or successful component enable.
 

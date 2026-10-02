@@ -37,7 +37,17 @@ def location():
         raise RuntimeError('Invalid dictation authentication file.')
     key = keyfile.read_bytes()
     if len(key) != 32: raise RuntimeError('Invalid dictation authentication key.')
-    address = str(base/('session-'+session+'.sock')) if os.name != 'nt' else r'\\.\pipe\augmentor-dictation-'+hashlib.sha256(str(base).encode()).hexdigest()[:12]+'-'+session
+    if os.name!='nt':
+        socket_base=base
+        # macOS limits AF_UNIX names to 104 bytes. Long homes or private test
+        # roots retain their state/auth key but use a short owner-only endpoint.
+        if len(os.fsencode(base/('session-'+session+'.sock')))>=100:
+            socket_base=Path('/tmp')/('augmentor-dictation-'+str(os.getuid())+'-'+hashlib.sha256(str(base.resolve()).encode()).hexdigest()[:16])
+            socket_base.mkdir(mode=0o700,exist_ok=True)
+            info=socket_base.lstat()
+            if not stat.S_ISDIR(info.st_mode) or info.st_mode&0o077 or info.st_uid!=os.getuid():raise RuntimeError('Dictation socket directory must be private and owned by this user.')
+        address=str(socket_base/('session-'+session+'.sock'))
+    else:address=r'\\.\pipe\augmentor-dictation-'+hashlib.sha256(str(base).encode()).hexdigest()[:12]+'-'+session
     return base, address, key
 
 

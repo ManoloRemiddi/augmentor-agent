@@ -99,6 +99,7 @@ class DictationTests(unittest.TestCase):
         with patch.object(broker.time,'time_ns',side_effect=[99,101]),patch.object(self.backend,'call') as native:
             with self.assertRaisesRegex(RuntimeError,'expired'):self.backend.request('conversation.acquire',value)
             self.assertEqual([entry.args[0] for entry in native.call_args_list],['conversation.acquire','conversation.release'])
+            self.assertEqual(native.call_args_list[0].args[1]['expires_at'],100)
             self.assertEqual(native.call_args.args[1]['token'],value['token']);self.assertIsNone(self.backend.owner)
 
     def test_private_authenticated_ipc_and_single_owner(self):
@@ -115,6 +116,26 @@ class DictationTests(unittest.TestCase):
                 lease=dictation.MicrophoneLease();lease.acquire();self.assertIsNotNone(lease.token);lease.release();self.assertIsNone(lease.token)
                 self.assertEqual((self.base/'auth.key').stat().st_mode&0o777,0o600)
             finally:dictation.request('shutdown',start=False)
+
+    @unittest.skipIf(os.name=='nt','Unix socket path limit')
+    def test_long_state_path_uses_private_short_socket_and_preserves_capture_ownership(self):
+        long_base=self.base/('long-home-'+'a'*110)
+        with patch.dict(os.environ,{'AUGMENTOR_DICTATION_STATE':str(long_base)}):
+            _,address,_=dictation.location();socket_base=Path(address).parent
+            self.addCleanup(socket_base.rmdir)
+            self.assertLess(len(os.fsencode(address)),100)
+            self.assertEqual(socket_base.stat().st_mode&0o777,0o700)
+            try:
+                state=dictation.request('status');self.assertFalse(state['enabled'])
+                lease=dictation.MicrophoneLease();lease.acquire();self.assertIsNotNone(lease.token);lease.release()
+                self.assertEqual((long_base/'auth.key').stat().st_mode&0o777,0o600)
+            finally:
+                dictation.request('shutdown',start=False)
+                import time
+                for _ in range(100):
+                    if not Path(address).exists():break
+                    time.sleep(.01)
+                Path(address).unlink(missing_ok=True)
 
     def test_theme_matches_native_colour_math(self):
         from PySide6.QtGui import QColor

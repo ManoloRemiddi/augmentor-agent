@@ -32,10 +32,13 @@ def prepare(target):
     # discovers Augmentor's parent checkout and silently skips supplier paths.
     # Establish a local build root before checking and applying the exact patch.
     subprocess.run(['git','init','--quiet'],cwd=target,check=True)
-    patch=str(ROOT/'components/handy/augmentor.patch')
-    subprocess.run(['git','apply','--check',patch],cwd=target,check=True)
-    subprocess.run(['git','apply',patch],cwd=target,check=True)
-    subprocess.run(['git','apply','--reverse','--check',patch],cwd=target,check=True)
+    subprocess.run(['git','config','core.autocrlf','false'],cwd=target,check=True)
+    # Windows checkout may convert the patch to CRLF. Its archive context is LF;
+    # normalize the patch stream without modifying the verified supplier files.
+    patch=(ROOT/'components/handy/augmentor.patch').read_text().encode()
+    subprocess.run(['git','apply','--check','-'],input=patch,cwd=target,check=True)
+    subprocess.run(['git','apply','-'],input=patch,cwd=target,check=True)
+    subprocess.run(['git','apply','--reverse','--check','-'],input=patch,cwd=target,check=True)
     shutil.copy2(ROOT/'components/handy/embedding.rs',target/'src-tauri/src/embedding.rs')
     shutil.copy2(ROOT/'components/handy/AugmentorOverlay.tsx',target/'src/overlay/AugmentorOverlay.tsx')
     return spec

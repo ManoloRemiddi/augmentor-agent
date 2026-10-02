@@ -404,6 +404,15 @@ async fn dispatch(app: &AppHandle, request: &Value) -> Result<Value, String> {
         }
         "conversation.acquire" => {
             let token = text("token")?;
+            if let Some(expires) = p.get("expires_at").and_then(Value::as_u64) {
+                let now = std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .map_err(|_| "System clock unavailable")?
+                    .as_nanos();
+                if now >= u128::from(expires) {
+                    return Err("Voice input request expired; start voice again.".into());
+                }
+            }
             let mut owner = state.conversation.lock().map_err(|_| "State unavailable")?;
             if owner.as_ref() != Some(&token) {
                 state
