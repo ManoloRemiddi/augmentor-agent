@@ -4,7 +4,7 @@
 
 ## October 2 Noble runtime selection and CPU VAD checkpoint
 
-The autonomous Linux rollout continues. Working source based on `217c0c7` now
+The autonomous Linux rollout continues. Published implementation `1c1c1ef` now
 connects declared immutable Noble runtimes to setup before DSH configuration,
 DSH service environment, native startup, Browser/runtime cold launch, shared
 Node selection and managed staging/rollback. The separate seven-wheel profile
@@ -19,6 +19,11 @@ complete setup proofs. Full compatibility is not complete; continue the existing
 GNOME/control, other-distro, installed product and release gates. Owner services,
 model/GPU settings, the modified original checkout and installed selections remain
 preserved. Historical five-wheel evidence and Fedora VM reports remain separate.
+Local final checks pass 661 native cases (two skips), 493 JavaScript cases
+(two skips) and source build/typecheck. Previous `217c0c7` Mac 14/26 and all
+Linux jobs except Fedora 44 pass; Fedora 44 times out during mirror downloads
+before package/native acceptance, with Cisco's codec download successful.
+New-source hosted confirmation remains open.
 
 ## October 1 Linux distribution rollout in progress
 

@@ -198,7 +198,8 @@
   "sourceScope": {
     "kind": "working-source-file-hashes",
     "baseCommit": "217c0c776a36820d401f80b12cfa2c16f1c8a28d",
-    "cleanFinalPackage": false
+    "cleanFinalPackage": false,
+    "publishedImplementationCommit": "1c1c1ef9ef777fd1159ecc6e263fa8beca95210c"
   },
   "fixture": {
     "ordinaryUser": true,
@@ -224,5 +225,30 @@
     },
     "typescriptCheckAndBuild": true,
     "fixtureScope": "Common source checks use separate Fedora/Debian test dependencies; not Noble installed-product evidence."
+  },
+  "previousCheckpointHostedCI": {
+    "sourceCommit": "217c0c776a36820d401f80b12cfa2c16f1c8a28d",
+    "linuxRun": 36963626838,
+    "linuxConclusion": "cancelled",
+    "passed": [
+      "source-boundary",
+      "debian",
+      "home-runtime",
+      "browser-package",
+      "installed-packages",
+      "ubuntu26.04-amd64",
+      "fedora43-x86_64"
+    ],
+    "fedora44-x86_64": {
+      "conclusion": "cancelled",
+      "scope": "30-minute job deadline during dependency downloads; GTK mirror slow-transfer errors; Cisco OpenH264 downloaded successfully; package/native acceptance not reached.",
+      "logSha256": "d60e1ab79e990048890f4f57caff4ad5517c562d68c329707dfab3c08e7e7387"
+    },
+    "macRun": 36963626880,
+    "macConclusion": "success",
+    "macTargets": [
+      "macos-14",
+      "macos-26"
+    ]
   }
 }

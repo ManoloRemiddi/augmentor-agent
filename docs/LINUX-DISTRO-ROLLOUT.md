@@ -1384,7 +1384,12 @@ component-launch hardening and the added maintenance-order case passes 661
 native cases (659 passes/two skips). The checked report records log hashes.
 Hosted CI confirmation of this new source remains separate. At the previous
 clean `217c0c7` checkpoint, Mac 14/26, Debian, Home, Browser, installed lifecycle,
-Ubuntu 26.04 and Fedora 43 are confirmed passing; Fedora 44 is still running.
+Ubuntu 26.04 and Fedora 43 are confirmed passing. Fedora 44 reaches the job's
+30-minute limit while its dependency transaction is still downloading; the log
+records GTK 4 slow-transfer retries from a Fedora mirror. Cisco OpenH264 itself
+downloads successfully in this run. The job/workflow is cancelled, so no Fedora
+44 package/native pass is claimed for `217c0c7`; this is not an application test
+failure. Qualify the new source in hosted CI before using its artifacts.
 
 Native redistribution review remains separate: ONNX's
 [ThirdPartyNotices](https://github.com/microsoft/onnxruntime/blob/v1.28.0/ThirdPartyNotices.txt)
