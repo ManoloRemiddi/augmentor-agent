@@ -18,6 +18,21 @@ prepare=importlib.util.module_from_spec(spec);spec.loader.exec_module(prepare)
 
 
 class HandyPreparationTests(unittest.TestCase):
+    def test_windows_checkout_preserves_pinned_notice_bytes(self):
+        with tempfile.TemporaryDirectory(prefix='augmentor-notice-fixture-') as temporary:
+            base=Path(temporary);source=base/'source';source.mkdir()
+            subprocess.run(['git','init','--quiet',str(source)],check=True)
+            (source/'.gitattributes').write_bytes((ROOT/'.gitattributes').read_bytes())
+            notice=Path('components/handy/licenses/Silero-v4.txt')
+            (source/notice).parent.mkdir(parents=True)
+            (source/notice).write_bytes((ROOT/notice).read_bytes())
+            subprocess.run(['git','add','.'],cwd=source,check=True)
+            subprocess.run(['git','-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','--quiet','-m','Fixture'],cwd=source,check=True)
+            checkout=base/'windows-checkout'
+            subprocess.run(['git','-c','core.autocrlf=true','clone','--quiet',str(source),str(checkout)],check=True)
+            expected=json.loads((ROOT/'components/handy/silero.json').read_text())['licenseSha256']
+            self.assertEqual(hashlib.sha256((checkout/notice).read_bytes()).hexdigest(),expected)
+
     def test_patch_applies_inside_an_existing_application_checkout(self):
         with tempfile.TemporaryDirectory(prefix='augmentor-supplier-fixture-') as temporary:
             base=Path(temporary);component=base/'components/handy';component.mkdir(parents=True)

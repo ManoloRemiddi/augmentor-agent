@@ -47,7 +47,7 @@ def bundle_dictation(project, minimum_macos):
     (contents/'Info.plist').write_bytes(plistlib.dumps(info))
     (runtime/'bin').mkdir()
     launcher=runtime/'bin/handy'
-    launcher.write_text('#!/bin/sh\nexec "$(dirname "$0")/../Augmentor Dictation.app/Contents/MacOS/handy" "$@"\n')
+    launcher.write_text('#!/bin/sh\n'+HEADER+'exec "$(dirname "$0")/../Augmentor Dictation.app/Contents/MacOS/handy" "$@"\n')
     launcher.chmod(0o755)
     return app
 

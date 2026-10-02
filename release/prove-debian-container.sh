@@ -8,6 +8,18 @@ version="$1"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update > /tmp/apt-update.log
 apt-get install -y --no-install-recommends "/artifacts/augmentor-runtime_${version}_amd64.deb" > /tmp/apt-runtime.log
+# Check native component dependencies before adding test-only GUI packages.
+python3 - <<'PY'
+from pathlib import Path
+import subprocess
+for path in Path('/usr/lib/augmentor/components/handy/runtime').rglob('*'):
+    if not path.is_file():continue
+    with path.open('rb') as stream:magic=stream.read(4)
+    if magic!=b'\x7fELF':continue
+    result=subprocess.run(['ldd',str(path)],capture_output=True,text=True,check=True)
+    assert 'not found' not in result.stdout,result.stdout
+print('All bundled dictation native dependencies resolve after runtime-only installation.')
+PY
 useradd --create-home beta
 runuser -u beta -- python3 /proof/installed-runtime-proof.py
 apt-get install -y --no-install-recommends "/artifacts/augmentor-desktop_${version}_amd64.deb" > /tmp/apt-desktop.log
@@ -16,6 +28,7 @@ test -s /home/beta/preview.png
 # Test-only GUI driver dependencies are added after the runtime/desktop install
 # assertions so they cannot hide an undeclared application dependency.
 apt-get install -y --no-install-recommends python3-pyside6.qttest xvfb xauth dbus-x11 kwin-x11 kglobalacceld xdotool x11-utils > /tmp/apt-ui-proof.log
+runuser -u beta -- dbus-run-session -- xvfb-run -a python3 /usr/lib/augmentor/scripts/proof-handy-component.py --runtime /usr/lib/augmentor/components/handy/runtime
 runuser -u beta -- mkdir /home/beta/first-run-evidence
 runuser -u beta -- env AUGMENTOR_PROOF_OUTPUT=/home/beta/first-run-evidence QT_QPA_PLATFORM=xcb python3 /usr/lib/augmentor/scripts/x11-session.py dbus-run-session -- python3 /usr/lib/augmentor/scripts/first-run-proof.py /usr/lib/augmentor
 test -s /home/beta/first-run-evidence/first-run-proof.json

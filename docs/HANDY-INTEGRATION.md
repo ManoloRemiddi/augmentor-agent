@@ -81,7 +81,10 @@ requires a compositor portal supporting GlobalShortcuts and host app Registry;
 accepted shortcut descriptions are displayed rather than pretending a denied
 binding succeeded. The close button always cancels; global Escape requires the
 upstream/native shortcut path and is not promised across portal-only compositors.
-macOS still requires Microphone and Accessibility consent, and Windows still
+On macOS, explicit Enable requests Accessibility consent for Augmentor Dictation
+and explains how to enable again after granting it. Startup/status/disable do
+not request that permission. The first capture uses the helper bundle’s
+Microphone usage description. macOS still requires Microphone and Accessibility consent, and Windows still
 requires the product's reviewed WebView2/VC runtime installation prerequisites.
 
 ## Pinned suppliers, models and notices
@@ -313,3 +316,40 @@ build-input inventory. Compiler caches accelerate source corrections but never
 replace source validation or artifact qualification. Public application source
 and the original canonical checkout's unrelated working files remain separate;
 Mac-only packaging work does not change the installed Linux UI or model setup.
+
+### Debian installation dependency proof
+
+The clean Debian container installs the candidate runtime before any test-only
+GUI dependencies, then checks every shipped dictation ELF with the actual dynamic
+loader. All dependencies resolve. The package now declares the bundled Vulkan
+backend's loader and ALSA's PulseAudio plugin explicitly; CPU remains the default.
+After Desktop installation, a fresh non-root user runs the actual component
+lifecycle/theme/revision/native-expiry/ownership/EOF proof under a private X11
+session without microphone access or model downloads. Existing first-run/file-task
+and real global launch shortcut proofs also pass; package removal retains user
+state and removes owned registration. This is installer and lifecycle evidence,
+not physical Wayland/uinput/microphone or every-compositor acceptance.
+
+This fixture candidate uses source `44b13ee` plus the package dependency and
+clean-container proof changes. Runtime artifact SHA-256 is
+`e132c15aa93385a595642d595076a0206aa4553327ffa4babc8ff20f821d7d50`;
+Desktop artifact is `bb4b99d9b48d987e01c8c7773119e396b2e566e7d181dcb8476aca962f99c12d`.
+Final clean-commit package identities and hosted results follow qualification.
+
+### Final platform follow-up
+
+At source `44b13ee`, actual macOS 14 and 26 development product bundles pass
+shared voice integration, signing, copied Handy component lifecycle, credentials,
+DSH/Qt and managed first-run qualification in
+[the hosted feasibility run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37019571725).
+The Windows native binary compiles, but notice verification rejects automatic
+CRLF conversion of the checksum-pinned Silero license. Repository attributes now
+preserve exact Handy supplier bytes; an actual Git checkout with Windows
+automatic conversion verifies the original notice hash. The compiler cache is
+retained for this correction, and final hosted checks must pass before the
+Windows component is qualified.
+
+macOS Accessibility consent is requested only after explicit Enable. A denied
+request leaves dictation disabled and identifies the System Settings permission
+and retry action. Startup, status and Disable never request consent. Physical
+microphone and Accessibility grant/revocation acceptance remains a release gate.

@@ -1,0 +1,3 @@
+# Preserve reviewed supplier bytes and checksum-pinned notices on every OS.
+components/handy/** -text
+LICENSE -text

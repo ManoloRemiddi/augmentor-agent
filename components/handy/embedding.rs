@@ -232,12 +232,16 @@ async fn dispatch(app: &AppHandle, request: &Value) -> Result<Value, String> {
             )
         }
         "enable" => {
-            enable(
-                app,
-                p.get("enabled")
-                    .and_then(Value::as_bool)
-                    .ok_or("Invalid enabled")?,
-            )?;
+            let enabled = p
+                .get("enabled")
+                .and_then(Value::as_bool)
+                .ok_or("Invalid enabled")?;
+            #[cfg(target_os = "macos")]
+            if enabled && !tauri_plugin_macos_permissions::check_accessibility_permission().await {
+                tauri_plugin_macos_permissions::request_accessibility_permission().await;
+                return Err("Allow Augmentor Dictation in System Settings > Privacy & Security > Accessibility, then enable dictation again.".into());
+            }
+            enable(app, enabled)?;
             Ok(json!({}))
         }
         "theme" => {
