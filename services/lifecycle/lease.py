@@ -3,6 +3,7 @@
 import fcntl
 import json
 import os
+import re
 import stat
 import subprocess
 import sys
@@ -30,16 +31,21 @@ def configured(component):
             command=['rpm','-q','--qf','%{NAME}\n%{VERSION}-%{RELEASE}\n%{ARCH}','augmentor-agent']
             expected='augmentor-agent\n'+package['versionRelease']+'\nx86_64'
         else:
-            command=['pacman','-Q','augmentor-agent']
-            expected='augmentor-agent '+package['versionRelease']+'\n'
+            command=['pacman','-Qi','augmentor-agent']
+            expected={'Name':'augmentor-agent','Version':package['versionRelease'],'Architecture':'x86_64'}
     elif (ROOT/'fedora-package.json').is_file():
         command=['rpm','-q','--qf','%{VERSION}','augmentor-agent']
         expected=json.loads((ROOT/'release.json').read_text())['version']
     else:
         command=['dpkg-query','-W','-f=${db:Status-Status}','augmentor-'+component]
         expected='installed'
-    result=subprocess.run(command,capture_output=True,text=True,timeout=5)
-    if result.returncode or result.stdout!=expected:
+    options={'env':{**os.environ,'LC_ALL':'C'}} if isinstance(expected,dict) else {}
+    result=subprocess.run(command,capture_output=True,text=True,timeout=5,**options)
+    if isinstance(expected,dict):
+        fields=re.findall(r'^(Name|Version|Architecture)\s*:\s*(\S+)\s*$',result.stdout,re.M)
+        matches=len(fields)==3 and dict(fields)==expected
+    else:matches=result.stdout==expected
+    if result.returncode or not matches:
         raise RuntimeError('Augmentor package configuration is incomplete. Finish the installation before reopening it.')
 
 

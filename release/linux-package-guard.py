@@ -117,7 +117,11 @@ def installed(manager):
         return {'name':fields[0],'versionRelease':fields[1],'architecture':fields[2]}
     fields=result.stdout.split()
     if len(fields)!=2 or fields[0]!='augmentor-agent':raise RuntimeError('Unexpected ALPM package identity.')
-    return {'name':fields[0],'versionRelease':fields[1],'architecture':'x86_64'}
+    details=subprocess.run(['pacman','-Qi','augmentor-agent'],text=True,capture_output=True,
+                           timeout=15,env={**os.environ,'LC_ALL':'C'})
+    architecture=re.findall(r'^Architecture\s*:\s*(\S+)\s*$',details.stdout,re.M)
+    if details.returncode or architecture!=['x86_64']:raise RuntimeError('Unexpected ALPM package architecture.')
+    return {'name':fields[0],'versionRelease':fields[1],'architecture':architecture[0]}
 
 
 def receipt(target,manager):
@@ -176,9 +180,16 @@ def begin(target,operation,incoming=None):
         active=legacy_processes()
         if active:raise RuntimeError('Augmentor is still open: '+', '.join(map(str,active)))
         old=installed(manager)
+        old_receipt=None
+        old_path=APP/'linux-package.json'
+        if old is not None and (old_path.exists() or old_path.is_symlink()):
+            info=old_path.lstat()
+            if not stat.S_ISREG(info.st_mode) or info.st_uid!=OWNER or info.st_mode & 0o022 or info.st_nlink!=1:
+                raise RuntimeError('Invalid previous package receipt.')
+            old_receipt=hashlib.sha256(old_path.read_bytes()).hexdigest()
         record={'format':'augmentor-linux-package-maintenance/1','transactionId':str(uuid.uuid4()),
                 'target':target,'manager':manager,'operation':operation,'oldPackage':old,'incomingPackage':incoming,
-                'components':['runtime','desktop']}
+                'oldReceiptSha256':old_receipt,'components':['runtime','desktop']}
         # Persistent intent is the commit point. A partial later /run mirror
         # cannot permit startup because the lifetime lease also checks this.
         atomic(path,record)
@@ -202,18 +213,39 @@ def complete(target):
             value=receipt(target,manager)
             if record['incomingPackage'] is not None and value['package']!=record['incomingPackage']:
                 raise RuntimeError('The requested new package did not complete.')
-        # Remove ephemeral mirrors first. The persistent record still fences
-        # a crash between these writes and the final durable unlink.
-        for component in ('runtime','desktop'):
-            (RUN/('augmentor-'+component+'.pending')).unlink(missing_ok=True)
-        sync_directory(RUN)
-        (STATE/'pending.json').unlink();sync_directory(STATE)
+        finalize()
         return {'verifiedComplete':True,'transactionId':record['transactionId'],'registeredPackage':current}
+
+
+def finalize():
+    # Called only under all exclusive locks after outcome validation.
+    for component in ('runtime','desktop'):
+        (RUN/('augmentor-'+component+'.pending')).unlink(missing_ok=True)
+    sync_directory(RUN)
+    (STATE/'pending.json').unlink();sync_directory(STATE)
+
+
+def recover_unchanged(target):
+    manager=host(target)
+    with locked():
+        record=pending()
+        if (record['target'],record['manager'])!=(target,manager):raise RuntimeError('Maintenance target differs.')
+        current=installed(manager)
+        if current!=record['oldPackage']:raise RuntimeError('The previous registered package is not unchanged.')
+        if current is None:
+            if APP.exists() or APP.is_symlink() or DESKTOP.exists() or DESKTOP.is_symlink():
+                raise RuntimeError('The previously absent app has partial installed files.')
+        else:
+            value=receipt(target,manager)
+            if not record.get('oldReceiptSha256') or hashlib.sha256((APP/'linux-package.json').read_bytes()).hexdigest()!=record['oldReceiptSha256']:
+                raise RuntimeError('The previous reviewed receipt is not unchanged.')
+        finalize()
+        return {'verifiedUnchangedRecovery':True,'transactionId':record['transactionId'],'registeredPackage':current}
 
 
 def main():
     if os.geteuid()!=0:raise SystemExit('Package guards run only as root; use the ordinary-user maintenance command to close your applications.')
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=('begin','complete'))
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=('begin','complete','recover-unchanged'))
     parser.add_argument('--target',required=True,choices=tuple(TARGETS))
     parser.add_argument('--operation',choices=('install','upgrade','remove','alpm'),default='upgrade')
     parser.add_argument('--incoming-version-release')
@@ -222,7 +254,9 @@ def main():
     if args.incoming_version_release:
         if not re.fullmatch('[A-Za-z0-9.+:_-]+',args.incoming_version_release):raise ValueError('Invalid package version-release.')
         incoming={'name':'augmentor-agent','versionRelease':args.incoming_version_release,'architecture':'x86_64'}
-    result=begin(args.target,args.operation,incoming) if args.action=='begin' else complete(args.target)
+    if args.action=='begin':result=begin(args.target,args.operation,incoming)
+    elif args.action=='complete':result=complete(args.target)
+    else:result=recover_unchanged(args.target)
     print(json.dumps(result,sort_keys=True))
 
 

@@ -46,15 +46,26 @@ refuse. Removal requires the package to be explicitly absent and its app root
 and Desktop marker gone. A query/database failure is not proof of removal.
 Completion clears mirrors first and unlinks/flushed persistent intent last.
 Any validation failure retains the record; no timer, reboot or post-hook alone
-clears it. Recovery of an unchanged old payload still needs an explicit verified
-recovery path, rather than deleting a marker.
+clears it. `recover-unchanged` verifies the recorded old package identity,
+complete old payload inventory and exact old receipt hash before resolving
+intent under all three exclusive locks. A previously absent app must still have
+no partial app root or Desktop marker. A changed receipt, payload, package query
+or identity refuses recovery and retains intent.
 
 `services/lifecycle/lease.py` accepts the explicit receipt only for the two
 reviewed target/manager pairs. RPM checks full name/version-release/architecture;
-ALPM checks exact name/version-release. Source, target and product must match
+ALPM checks exact name/version-release and registered x86_64 architecture from
+the locale-stable `pacman -Qi` database query. Source, target and product must match
 the selected release. `desktop-deployment.py` retains the receipt in the immutable
 managed artifact. The existing Fedora receipt and Debian component checks remain
 separate and tested.
+
+The [recovery source checkpoint](../release/qualification/next-targets/20261002-joint-package-recovery-source.json)
+adds two focused cases, for nine guard cases in total. Both actual Arch/Leap
+native suites pass **701 tests, two Mac-only skips**. The first attempt exposed
+a strict legacy Fedora query mock rejecting a new environment argument; that
+failure is retained, and the locale override is limited to the new Arch query.
+These are source/synthetic-root results; real ALPM/RPM transactions remain open.
 
 ## Leap RPM adapter design
 

@@ -28,7 +28,7 @@ class PackageConfiguration(unittest.TestCase):
 
     def test_explicit_next_targets_require_full_version_release_and_source(self):
         for target,manager,version,stdout in [('opensuse-leap16.0-x86_64','rpm','0.2.13-1.leap16','augmentor-agent\n0.2.13-1.leap16\nx86_64'),
-                ('arch20261001-x86_64','pacman','0.2.13-1','augmentor-agent 0.2.13-1\n')]:
+                ('arch20261001-x86_64','pacman','0.2.13-1','Name : augmentor-agent\nVersion : 0.2.13-1\nArchitecture : x86_64\n')]:
             with self.subTest(target=target),tempfile.TemporaryDirectory() as d,patch.object(lease,'ROOT',Path(d)):
                 source={'commit':'a'*40,'dirty':False}
                 release={'version':'0.2.13','target':target,'source':source}

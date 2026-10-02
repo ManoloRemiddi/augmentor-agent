@@ -1,0 +1,38 @@
+{
+  "format": "augmentor-next-linux-package-recovery-source-fixture/1",
+  "sourceBase": "2c9130baa31f00e4905edbdfe01164acbf18ced2",
+  "workingFiles": {
+    "release/linux-package-guard.py": "4bb8a18a41e68a98c5f7816940f8e55bfa2f1a66e5d34ca42cfcb4155c7a9947",
+    "services/lifecycle/lease.py": "eade773b773ca89fd530bc94e4c98bb8e74257486f07462ab50cdc57ee5492e3",
+    "tests/test_linux_package_guard.py": "3bbb859d7a28c836fa932540b1839406700471c718eb9f8cc6098feda69ae8d2",
+    "tests/test_fedora_lifecycle.py": "29d516e97e0cd1683d95bad023ea10e451ad16bf279fc0a1ce3cba262c9e4e47"
+  },
+  "syntheticJointFlockAndInterruptionTests": 9,
+  "unchangedOldReceiptRecoveryTested": true,
+  "alpmArchitectureQueryTested": true,
+  "nativeSuites": {
+    "arch": {
+      "testsRun": 701,
+      "skipped": 2,
+      "exitCode": 0,
+      "logSha256": "b48c78ec2c4a215ac2fb36bcc2460f5609ae88e4804f0048e69e210ca9868d40",
+      "firstFailureRetained": true,
+      "firstFailureLogSha256": "b95fed9d73f3fef10e8298de10bac5372d51579398a31eae1e15905415ca12a3",
+      "firstFailureCause": "Legacy Fedora query mock rejected a new env keyword. LC_ALL=C is now limited to the new structured Arch query."
+    },
+    "leap": {
+      "testsRun": 701,
+      "skipped": 2,
+      "exitCode": 0,
+      "logSha256": "ee417b978d7c80e05a696ae74ae9d6101d96192b2f12a1c4b333e0daf63548c0",
+      "firstFailureRetained": true,
+      "firstFailureLogSha256": "78469e920f46980601ce5b44473a76dd5a2b7372044f043e35a7976c4a7a722b",
+      "firstFailureCause": "Legacy Fedora query mock rejected a new env keyword. LC_ALL=C is now limited to the new structured Arch query."
+    }
+  },
+  "realPackageManagerTransactionsTested": false,
+  "realMultiuserLeasesTested": false,
+  "realInterruptedRebootTested": false,
+  "publicReleaseQualified": false,
+  "ownerStateChanged": false
+}

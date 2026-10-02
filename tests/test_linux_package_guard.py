@@ -93,6 +93,15 @@ class NextPackageGuards(unittest.TestCase):
         (guard.RUN/'augmentor-runtime.lock').unlink();guard.STATE.chmod(0o777)
         with self.assertRaisesRegex(RuntimeError,'directories'):guard.begin(TARGET,'upgrade',PACKAGE)
 
+    def test_explicit_unchanged_recovery_checks_previous_receipt_and_complete_payload(self):
+        self.payload();guard.begin(TARGET,'upgrade',{**PACKAGE,'versionRelease':'0.2.14-1.leap16'})
+        receipt=guard.APP/'linux-package.json';original=receipt.read_bytes()
+        receipt.write_bytes(original+b'\n')
+        with self.assertRaisesRegex(RuntimeError,'previous reviewed receipt'):guard.recover_unchanged(TARGET)
+        self.assertTrue((guard.STATE/'pending.json').exists());receipt.write_bytes(original)
+        self.assertTrue(guard.recover_unchanged(TARGET)['verifiedUnchangedRecovery'])
+        self.assertFalse((guard.STATE/'pending.json').exists())
+
     def test_query_errors_are_not_successful_package_removal(self):
         # Use the real query parser, rather than the fixture's installed stub.
         spec=importlib.util.spec_from_file_location('package_query_guard',ROOT/'release/linux-package-guard.py')
@@ -103,6 +112,17 @@ class NextPackageGuards(unittest.TestCase):
         for manager,message in [('rpm','package augmentor-agent is not installed'),('pacman',"error: package 'augmentor-agent' was not found")]:
             with patch.object(query.subprocess,'run',return_value=SimpleNamespace(returncode=1,stdout='',stderr=message)):
                 self.assertIsNone(query.installed(manager))
+
+    def test_alpm_architecture_is_read_from_database_and_wrong_architecture_refuses(self):
+        spec=importlib.util.spec_from_file_location('package_arch_query_guard',ROOT/'release/linux-package-guard.py')
+        query=importlib.util.module_from_spec(spec);spec.loader.exec_module(query)
+        for arch in ('x86_64','any','aarch64'):
+            responses=[SimpleNamespace(returncode=0,stdout='augmentor-agent 0.2.13-1\n'),
+                       SimpleNamespace(returncode=0,stdout='Architecture    : '+arch+'\n')]
+            with patch.object(query.subprocess,'run',side_effect=responses):
+                if arch=='x86_64':self.assertEqual(query.installed('pacman')['architecture'],'x86_64')
+                else:
+                    with self.assertRaisesRegex(RuntimeError,'architecture'):query.installed('pacman')
 
 
 if __name__=='__main__':unittest.main()

@@ -2,6 +2,29 @@
 
 # Linux distribution rollout
 
+## October 2 Leap GNOME48 session and verified package recovery
+
+The actual signed Cloud-derived Leap session is GNOME Shell 48.4/Mutter48.4/
+GSD48.1 on Wayland with SELinux enforcing. The independently installed observer
+and Python readers match clean `2c9130b` bytes and the strict read reports
+user mode, available ScreenShield, unlocked state and input qualification false.
+Actual custom shortcut schemas have all four fields and both saved portal
+schemas. The [checked inspection](../release/qualification/next-targets/20261002-leap16-gnome48-source-session.json)
+records installed packages and exact hashes. An earlier read correctly failed
+while the default 300-second idle lock suspended the user-only extension. One
+explicit fixture administrative unlock and setting idle delay to zero preceded
+the passing inspection. This is not password authentication or application,
+shortcut delivery, consent, input, Stop, Browser or speech acceptance.
+
+The [new package recovery checkpoint](../release/qualification/next-targets/20261002-joint-package-recovery-source.json)
+verifies the exact old receipt plus full payload and package identity before
+clearing persistent intent. Arch checks registered architecture through `pacman
+-Qi`. Nine guard cases and both full native suites pass **701 tests, two Mac-only
+skips**; the first legacy mock failure is preserved and corrected narrowly.
+Actual RPM/ALPM transactions and full payload builders remain required.
+The original five rollout points remain active, and the complete installer
+target matrix remains unchanged.
+
 ## October 2 joint package guard source foundation
 
 Primary RPM/ALPM research identifies different refusal boundaries: failing RPM

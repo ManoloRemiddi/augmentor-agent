@@ -1,0 +1,127 @@
+{
+  "format": "augmentor-leap-gnome48-source-session-inspection/1",
+  "target": "opensuse-leap16.0-x86_64",
+  "source": {
+    "commit": "2c9130baa31f00e4905edbdfe01164acbf18ced2",
+    "dirty": false
+  },
+  "realWaylandSessionTested": true,
+  "graphicalSessions": [
+    {
+      "Seat": "seat0",
+      "Type": "wayland",
+      "Class": "user",
+      "Active": "yes",
+      "State": "active"
+    }
+  ],
+  "selinuxEnforcing": true,
+  "observerInstalledSourceMatches": true,
+  "observerSourceSha256": {
+    "extension.js": "ec8543ab1ed23d04e5efc3d7485256ca8907d81252250d074e464cc843ca4db8",
+    "metadata.json": "af41dbdb4a109e02371c68c3e5d99f96177544cb9f6a7b8bcbf10733c469ba96"
+  },
+  "observerOwner": ":1.11",
+  "observerEpoch": "f47247ca-07a4-4ab9-bb83-1985e0d50bf3",
+  "scene": {
+    "schema": 1,
+    "backend": "gnome-shell-observer",
+    "shellVersion": "48.4",
+    "epoch": "f47247ca-07a4-4ab9-bb83-1985e0d50bf3",
+    "serial": 0,
+    "inputQualified": false,
+    "window": null,
+    "windows": [],
+    "above": [],
+    "screens": [
+      {
+        "name": "monitor:0",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 800
+        },
+        "scale": 1
+      }
+    ],
+    "workspace": {
+      "id": 1,
+      "index": 0
+    },
+    "guards": {
+      "locked": false,
+      "greeter": false,
+      "sessionMode": "user",
+      "parentSessionMode": null,
+      "actionMode": 1,
+      "modalCount": 0,
+      "overview": false,
+      "overviewTarget": false,
+      "stageGrabbed": false,
+      "overviewAnimation": false,
+      "screenShieldAvailable": true,
+      "screenShieldActive": false,
+      "screenShieldLocked": false,
+      "stageGrabActor": null,
+      "stageKeyFocus": null,
+      "windowDragging": false
+    },
+    "blockedReasons": [
+      "no-visible-live-focus"
+    ],
+    "compositorOwner": ":1.11"
+  },
+  "observerExtensionState": 1.0,
+  "actualShortcutProfile": {
+    "fields": [
+      "name",
+      "binding",
+      "command",
+      "enable-in-lockscreen"
+    ],
+    "savedPortalSchemasAvailable": true,
+    "functionalTested": false
+  },
+  "installedPackages": [
+    "gnome-shell-48.4-160000.2.1.x86_64",
+    "mutter-48.4-160000.2.2.x86_64",
+    "gnome-settings-daemon-48.1-160000.2.2.x86_64",
+    "gdm-48.0+leap-lp160.1.1.x86_64",
+    "xdg-desktop-portal-1.20.3-160000.2.2.x86_64",
+    "xdg-desktop-portal-gnome-48.0-160000.2.2.x86_64",
+    "python313-pyside6-6.9.1-bp160.1.9.x86_64",
+    "python313-gst-1.26.2-bp160.1.2.x86_64"
+  ],
+  "inspectionSha256": "7d8165abeed130eb5a76bcef3d26c336370f8e4af6a3c0d4a62119e719f5941a",
+  "readerSourceSha256": {
+    "gnome.py": "968532f622b04be2f3c84955e8d9e2d3ae34437e3c62f17695713344170c09e1",
+    "gnome_shortcuts.py": "e67666120f874f4eb7348b0d8d3ef4fa7a79f84a2de73454fa1ceaea87cc4d5f"
+  },
+  "applicationPackageInstalled": false,
+  "standardDesktopInstallerTested": false,
+  "shortcutDeliveryTested": false,
+  "lockRecoveryTested": false,
+  "passwordAuthenticationTested": false,
+  "inputToolsEnabled": false,
+  "visibleStopTested": false,
+  "harnessConnectionTested": false,
+  "physicalAudioTested": false,
+  "fullDistroReleaseQualified": false,
+  "privateReportSha256": "24856e6ac24eb1bfc881bd072b5c2a87d0543933ee376132ac261b72dae87d4e",
+  "lockFixturePreparation": {
+    "defaultIdleDelaySeconds": 300,
+    "initialInspectionRefusedWhileLocked": true,
+    "initialExtensionState": 2,
+    "initialLockedHint": "yes",
+    "initialError": "UnknownMethod: observer path absent during locked session",
+    "ordinaryFixtureAdministrativeUnlockUsed": true,
+    "fixtureIdleDelayChangedToSeconds": 0,
+    "passwordUnlockTested": false
+  },
+  "privateEvidenceSha256": {
+    "source-session-inspection.err": "ba2f40e7dba1e9e13c17acd05701bafb5c4720b245eed84a3a6ec635747f1594",
+    "observer-extension-diagnostic.log": "8b29ec721f05b359b6535b8eab88170ef4cca37767d07e477e197c89668482c1",
+    "fixture-administrative-unlock.log": "e3ffc26d20745f977c6f84ec195473ea831185dde81957280421847a77557d2d"
+  }
+}

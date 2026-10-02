@@ -2,6 +2,24 @@
 
 # Start here: agent handoff
 
+## October 2 Leap GNOME session and verified package recovery
+
+Actual Leap 16 GNOME 48.4 Wayland passes the source-only observer inspector
+with SELinux enforcing and exact installed extension/reader byte identity.
+The initial default idle lock suspended the user-only extension and correctly
+refused inspection; one explicit fixture administrative unlock and idle-delay
+change preceded the passing read. Password authentication, shortcuts, consent,
+input, Stop and the application itself remain unqualified on this guest. Read
+the [checked session report](../release/qualification/next-targets/20261002-leap16-gnome48-source-session.json).
+
+Package guard recovery now verifies unchanged old package, full inventory and
+exact old receipt before clearing durable intent; ALPM architecture is queried
+from its database. Nine guard cases and both actual Arch/Leap full native suites
+pass **701 tests, two Mac-only skips**. The first legacy query-mock failure is
+retained. [Transaction contract](LINUX-PACKAGE-TRANSACTIONS.md) owns the limits.
+Hosted Linux and Mac jobs for prior `2c9130b` both pass. The complete installer
+matrix remains unchanged. Continue all five authorized rollout points.
+
 ## October 2 joint package guard foundation
 
 New trusted standalone Leap/Arch guard checks both leases before durable intent,
