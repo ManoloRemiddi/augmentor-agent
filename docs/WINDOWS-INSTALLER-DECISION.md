@@ -2,6 +2,8 @@
 
 # Windows installer qualification: active-work removal
 
+**October 2 delivery update:** the owner authorizes the [unsigned public preview](WINDOWS-PREVIEW.md) before physical PC acceptance. Its native builds/rendering are qualified separately from signed/stable delivery; automatic updates are disabled. The record below preserves historical backend decisions and their evidence.
+
 September 28, 2026. **The stock Velopack EXE is not selected for production.**
 Its successful disposable install/update fixture did not test the ordinary
 Windows Settings uninstall path while work was active. W1 is reopened for that

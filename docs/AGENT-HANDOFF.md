@@ -3,6 +3,38 @@
 # Start here: agent handoff
 
 
+
+## Windows 0.2.13 public preview — release record, October 2
+
+Windows support is merged in [PR 20](https://github.com/ManoloRemiddi/augmentor-agent/pull/20),
+main merge `9baf711440c104d645494b07758c7c1e8ef125a2`.
+[The public preview](https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/v0.2.13-windows-preview.1)
+contains native x64/ARM64 installers, SHA256SUMS, a simple guide and per-architecture
+package/health reports. Both architectures pass the [public build](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37064707283)
+at exact source `f8afb844e8073e2f36674e8684094d95155a14e2` (the reviewed PR head).
+Each complete payload is verified before and after actual public-launcher rendering
+with native Windows Qt, readable fonts and 424×484 UI output. Installer packages
+use ordinary per-user folders and no compiled development qualification switches.
+The public x64 Setup is not installed on the hosted Server build runner, whose
+OS is below the advertised Windows 11 25H2 minimum. Earlier development-candidate
+installation/recovery evidence remains separately scoped below.
+
+
+Installer digests verified locally and against GitHub's stored-asset digest:
+
+- x64: 363,568,540 bytes, SHA256 `fef5902c5fd7222fe4f59c2777e5b8ae7bb0cab80d2e5edf736bf75e83d3e7cd`.
+- ARM64: 331,549,976 bytes, SHA256 `b5b2c8a79987c44bc4da10b1893bc9459af5797d96deef18fa0e2f7d20867e5d`.
+
+The owner explicitly chooses first physical installation through this public
+download and subsequent feedback. No physical Windows, RTX Spark or every-provider
+acceptance is claimed. This is unsigned preview delivery, not signed/stable
+qualification. Automatic updates, cross-version upgrades, full local voice/memory,
+desktop automation and Windows Pi/Codex remain pending; Handy is not bundled.
+[The preview guide](WINDOWS-PREVIEW.md) is the current installation/update/removal
+contract. Linux/Mac installed applications and their existing release assets have
+not been replaced by this Windows publication.
+
+
 ## Windows public preview — October 2, current direction
 
 The owner explicitly authorizes merging and publishing the Windows preview now,
