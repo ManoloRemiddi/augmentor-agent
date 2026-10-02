@@ -261,6 +261,24 @@ use the same terminology. Its controls remain concise: Reset to default, Cancel
 and Save. This is a presentation-only rename: the authoritative `soul.md`,
 internal routes, prompt snapshots, reset semantics and memory projections retain
 their existing contracts. Shared native Linux/macOS source is changed; the
-Browser presentation remains deferred. The existing 28 focused settings cases
-are the relevant regression qualification; prior full-suite evidence above is
+Browser presentation remains deferred. All 42 focused source settings cases pass; the compatible candidate passes 28
+cases (26 pass, two source-only sizing skips). Prior full-suite evidence above is
 historical for the compact-layout implementation.
+
+
+### Installed naming update
+
+Implementation `14e5783` is selected and running as Linux release
+`20261002-124829-c8553509`, compatible product 0.2.11, artifact
+`dd35e134a9973beab85acf00800d70c94a1e205e791044799f06e3f03397d0c4`.
+The separate candidate copied compact-layout artifact
+`5e3be8861171b303f923b204c4bf7035fd20f7880136a13be7549be66efba37e`
+and replaced only the reviewed settings component. Stage/activation passed.
+An actual installed-interpreter synthetic UI preview verifies both card and page
+labels, the accessible editor name, reset control, compact fit and exact chat
+geometry restoration; scoped recall remains covered by the focused fixture suite.
+Desktop/mobile accepted guarded idle closure before supervisor restart and adopted
+the selected root, with voice available and no pending update. No backend/speech
+restart or user-data migration was needed. Installed Mac GUI remains unverified;
+the shared source rename applies on both native platforms. Rollback selects
+`20261002-124301-57f19808`. PR #29 remains draft and unmerged.

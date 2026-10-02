@@ -2,7 +2,24 @@
 
 # Start here: agent handoff
 
-## 2 October: Compact Desktop settings refinement
+## 2 October: Agent Identity and Agent Memory naming
+
+The Desktop cards and destination headings now read Agent Identity and Agent
+Memory; identity messages and its accessible editor name follow the rename.
+Stored `soul.md`, internal routes, reset behavior and memory contracts are unchanged.
+Tested source `14e5783`: 42 focused source settings cases pass. The compatible
+candidate passes 28 cases (26 pass, two source-only sizing skips), plus an actual
+installed-interpreter synthetic label/layout/geometry preview. Linux release
+`20261002-124829-c8553509`, artifact
+`dd35e134a9973beab85acf00800d70c94a1e205e791044799f06e3f03397d0c4`, is
+selected/running on Desktop/mobile after idle maintenance guards; voice is available
+and no update is pending. Existing product 0.2.11 dependencies/backends/speech
+and private data are preserved. Shared Mac source changes apply; installed Mac
+GUI remains unverified. Rollback selects `20261002-124301-57f19808`.
+[Draft PR #29](https://github.com/ManoloRemiddi/augmentor-agent/pull/29) remains
+unmerged pending owner acceptance. See [naming evidence](AGENT-SETTINGS.md#installed-naming-update).
+
+## Compact Desktop settings checkpoint (historical)
 
 The latest [settings layout](AGENT-SETTINGS.md#compact-layout-revision--2-october-2026)
 shrinks Agent/Soul/Memory, removes repeated Look/Voice/access entries from More,

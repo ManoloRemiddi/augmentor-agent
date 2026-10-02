@@ -2,7 +2,18 @@
 
 # Consistent installed desktop releases
 
-## October 2: Compact Desktop settings acceptance branch
+## October 2: Agent Identity and Agent Memory naming
+
+[Installed naming update](AGENT-SETTINGS.md#installed-naming-update) records
+source `14e5783`, compatible release `20261002-124829-c8553509`, exact artifact
+identity, 42 passing focused source cases and 28 compatible candidate cases
+(26 pass, two explicit source-only skips). Stage/activation and installed-interpreter
+synthetic labels/layout/geometry checks passed. Desktop/mobile adopted the root
+through idle maintenance guards; voice is available and no update is pending.
+The component-only overlay retains product 0.2.11 dependencies/backends/speech and
+user data. Rollback selects `20261002-124301-57f19808`. PR #29 is draft/unmerged.
+
+## Compact Desktop settings checkpoint (historical)
 
 [Current settings installation](AGENT-SETTINGS.md#installed-compact-layout-candidate)
 records implementation `abc62ef`, compatible selected/running release
