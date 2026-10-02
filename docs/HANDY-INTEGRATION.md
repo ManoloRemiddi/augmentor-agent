@@ -417,3 +417,23 @@ history/input assertions. All three actual Qt/Codex fork cases pass locally.
 Both source-preparation/Windows automatic-conversion cases pass. This follow-up
 changes build text decoding and a fixture synchronization point, not product
 behavior. Final hosted lifecycle/product/package results remain required.
+
+### All native protocol checks and Windows cleanup checkpoint
+
+At source `14c3937`, the actual Windows component passes protocol, no tray,
+no unsolicited model download or microphone capture, theme, settings revision,
+expired admission/owner exclusion and clean main-process EOF exit. Release
+compilation, complete notices, formatting and Clippy also pass. The job then
+fails during private fixture cleanup: WebView2 still maps its metrics file
+immediately after the main process exits. The proof now requires complete
+cleanup with a bounded 30-second Windows grace period; it neither ignores cleanup
+failures nor terminates any unrelated browser process. Final hosted completion
+still requires this cleanup to succeed. Linux's actual component proof passes
+with the same updated fixture. Compiled component/source inventories are unchanged.
+
+The current clean Linux installer proof also passes at `14c3937`. Runtime
+SHA-256 is `1c36e921f6ecf3069e4e9b130e430eb16498338c8576e9f6bcc846de333f9b9a`;
+Desktop is `728aeb7782d2286c37c3f92c77cac39aaa3c610ec9aaa79658efa6304196c274`.
+Linux and Mac native component jobs pass. Both macOS product jobs pass the shared
+contracts and corrected Branch/Edit fixture and proceed to package qualification.
+The complete installer and physical acceptance boundaries above remain in force.

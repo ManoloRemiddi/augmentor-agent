@@ -2,6 +2,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Exercise the actual packaged component without a microphone or model download."""
 import argparse
+from contextlib import contextmanager
 import json
 import os
 from pathlib import Path
@@ -16,12 +17,31 @@ import time
 ROOT=Path(__file__).resolve().parents[1]
 
 
+@contextmanager
+def private_directory():
+    base=Path(tempfile.mkdtemp(prefix='augmentor-component-proof-'))
+    try:
+        yield base
+    finally:
+        # WebView2 can release mapped metrics after the main process exits.
+        # Require complete cleanup, allowing a bounded grace period on Windows.
+        deadline=time.monotonic()+30
+        while True:
+            try:
+                shutil.rmtree(base)
+                break
+            except OSError:
+                if not base.exists():break
+                if os.name!='nt' or time.monotonic()>=deadline:raise
+                time.sleep(.1)
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--runtime',type=Path,default=ROOT/'components/handy/runtime')
     options=parser.parse_args()
-    with tempfile.TemporaryDirectory(prefix='augmentor-component-proof-') as temporary:
-        base=Path(temporary);runtime=base/'runtime'
+    with private_directory() as base:
+        runtime=base/'runtime'
         shutil.copytree(options.runtime,runtime)
         binary=runtime/'bin'/('handy.exe' if os.name=='nt' else 'handy')
         if sys.platform=='darwin':
