@@ -497,3 +497,10 @@ The full isolated Arch source suite runs739 cases:737 pass/two Mac-only skips.
 The initial test-mocking failure is retained; no actual candidate pointer/keyboard
 input, native capture, password/restart, production discovery or KDE service
 threading acceptance is claimed. See the [checked source report](../release/qualification/next-targets/20261002-gnome-runtime-candidate-source-tests.json).
+
+The separately executed recipient QtSvg proof validates archive/patch/library hashes,
+rebuilds from fresh Svg source using the unchanged matching Qt SDK, and compares
+actual native behavior in fresh processes. It requires explicitly marked owned
+fixtures and two separate runtime candidates; it never swaps the selected app's
+libraries. Final product entrypoint/complete legal/source-kit qualification remains
+separate. [Evidence](../release/qualification/next-targets/20261002-source-qt-recipient-replacement.json).

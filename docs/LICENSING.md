@@ -35,11 +35,19 @@ licenses and notices.
 
 ## Native UI
 
-The [Linux source-runtime work](LINUX-LGPL-SOURCE-RUNTIME.md) now pins and acquires
-the actual Qt/PySide archives for a separate build with client-only Wayland and
-the application's Quick/Test closure. This does not qualify the existing vendor
-wheel bundle or complete source correspondence, rebuilding, replacement or release
-review. Those gates remain explicit and false in the checked acquisition report.
+The [Linux source-runtime work](LINUX-LGPL-SOURCE-RUNTIME.md) now completes two
+independent source builds and a separately identified runtime candidate. Exact
+source review excludes the unused PySide QtExampleIcons extension and Qt's
+QuickControls test utilities alongside QmlCompiler/build-only tools. Original
+producer bytes remain preserved; filtered artifacts have their own hashes,
+RECORD and provenance. A fresh runtime-only probe loads the candidate, and a
+recipient fixture rebuilds/modifies QtSvg and proves its changed behavior executes.
+These engineering results do not qualify the existing vendor wheel bundle or
+complete the final product's legal review. All seven source archives,146 original
+notice/attribution members and exact recipes are recorded; compiled-content notice
+mapping, complete offered source/toolchain kit and normal product entrypoint
+replacement acceptance remain release gates. Do not collapse per-file license
+alternatives/exceptions into the wheel METADATA's generic LGPL label.
 
 PyQt is GPLv3/commercial, whereas Qt for Python offers LGPL licensing. Imports and
 signals have been migrated to PySide6. Development is pinned to PySide6 Essentials

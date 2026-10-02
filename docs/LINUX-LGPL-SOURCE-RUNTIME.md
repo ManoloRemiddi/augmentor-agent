@@ -108,6 +108,26 @@ This conservative set includes unshipped modules/build tools and is not an exact
 compiled-content mapping. Full archive/source kits and that mapping remain required; previous vendor ICU73 notice collections
 must not be copied into this profile by assumption.
 
+## Executed recipient library replacement fixture
+
+The [recipient builder](../release/probe-source-qt-recipient-build.py) validates the
+same official QtSvg archive, extracts fresh source/build roots and applies a
+recorded one-function patch: `QSvgRenderer.isValid()` deliberately returns false.
+It compiles/installs in a separate proof prefix using the unchanged matching Qt
+SDK as a dependency; no compiled Svg intermediates are reused. Source before/after,
+patch, recipe and library hashes are in the
+[checked replacement report](../release/qualification/next-targets/20261002-source-qt-recipient-replacement.json).
+
+A second runtime candidate preserves every original library except that deliberately
+rebuilt Svg. The [execution probe](../release/probe-source-qt-recipient-execution.py)
+runs fresh ordinary-user Python processes with each candidate's explicit runtime
+environment. The original returns true for a valid synthetic SVG; the modified
+one returns false. `/proc/self/maps` and hashes prove the changed library executes
+from the recipient candidate, with no producer tree present. Original producer/
+runtime and selected application remain unchanged. This verifies replacement in
+the isolated source-runtime candidate. The final product's normal entrypoints,
+complete offered source/toolchain kit and legal review still need acceptance.
+
 ## Build profile and dependency closure
 
 The [marked Noble source-builder recipe](../release/linux-lgpl-source-builder.Dockerfile)

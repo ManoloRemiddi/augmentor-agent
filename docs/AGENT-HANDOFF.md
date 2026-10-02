@@ -4,6 +4,13 @@
 
 ## October 2 completed source runtime and GNOME candidate checkpoint
 
+A separate recipient fixture now rebuilds QtSvg from the verified archive with a
+recorded behavior change and proves the modified library executes from a separate
+runtime candidate; original behavior and all original artifacts are preserved.
+[Replacement evidence](LINUX-LGPL-SOURCE-RUNTIME.md#executed-recipient-library-replacement-fixture)
+is specific to this runtime candidate. Product entrypoints, full source/toolchain
+kit and legal review remain open.
+
 The fifth offline Qt/PySide source build completes all19 commands. A separately
 identified PySide derivative excludes the unused GPL/exception example extension;
 all original artifacts are preserved. The staged candidate has18 Qt libraries,
