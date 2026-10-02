@@ -191,9 +191,10 @@ if __name__=='__main__':
         run(['npx','--yes','bun@1.3.10','install','--frozen-lockfile'],source)
         run(['npx','--yes','bun@1.3.10','run','build'],source)
         ort,_=ort_runtime(source)
+        cmake_args='-DGGML_NATIVE=OFF'+(' -DTRANSCRIBE_VULKAN=OFF -DGGML_VULKAN=OFF' if os.name=='nt' else '')
         if os.environ.get('GITHUB_ENV'):
-            with open(os.environ['GITHUB_ENV'],'a') as ci:ci.write('ORT_LIB_LOCATION='+str(ort/'lib')+'\nORT_PREFER_DYNAMIC_LINK=1\nTRANSCRIBE_CMAKE_ARGS=-DGGML_NATIVE=OFF\n')
-        env={**os.environ,'ORT_LIB_LOCATION':str(ort/'lib'),'ORT_PREFER_DYNAMIC_LINK':'1','CARGO_BUILD_JOBS':'2','TRANSCRIBE_CMAKE_ARGS':'-DGGML_NATIVE=OFF'}
+            with open(os.environ['GITHUB_ENV'],'a') as ci:ci.write('ORT_LIB_LOCATION='+str(ort/'lib')+'\nORT_PREFER_DYNAMIC_LINK=1\nTRANSCRIBE_CMAKE_ARGS='+cmake_args+'\n')
+        env={**os.environ,'ORT_LIB_LOCATION':str(ort/'lib'),'ORT_PREFER_DYNAMIC_LINK':'1','CARGO_BUILD_JOBS':'2','TRANSCRIBE_CMAKE_ARGS':cmake_args}
         subprocess.run(['cargo','build','--release','--locked','--features','tauri/custom-protocol'],cwd=source/'src-tauri',env=env,check=True)
     metadata=json.loads(args.metadata.read_text()) if args.metadata else json.loads(subprocess.check_output(['cargo','metadata','--locked','--features','tauri/custom-protocol','--format-version','1','--filter-platform',subprocess.check_output(['rustc','-vV'],text=True).split('host: ')[1].splitlines()[0]],cwd=source/'src-tauri'))
     stage(source,args.out.resolve(),metadata,args.cargo_home)

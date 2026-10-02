@@ -7,8 +7,10 @@ from pathlib import Path
 import queue
 import shutil
 import subprocess
+import sys
 import tempfile
 import threading
+import time
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -19,7 +21,10 @@ def main():
         shutil.copytree(ROOT/'components/handy/runtime',runtime)
         binary=runtime/'bin'/('handy.exe' if os.name=='nt' else 'handy')
         (binary.parent/'portable').write_text('Handy Portable Mode\n')
-        environment={**os.environ,'AUGMENTOR_HANDY_EMBEDDED':'1','HANDY_DISABLE_UPDATER':'1','WEBKIT_DISABLE_DMABUF_RENDERER':'1','WEBKIT_DISABLE_COMPOSITING_MODE':'1'}
+        environment={**os.environ,'AUGMENTOR_HANDY_EMBEDDED':'1','HANDY_DISABLE_UPDATER':'1','WEBKIT_DISABLE_DMABUF_RENDERER':'1','WEBKIT_DISABLE_COMPOSITING_MODE':'1','RUST_BACKTRACE':'1'}
+        if sys.platform.startswith('linux'):
+            environment.update(GDK_BACKEND='x11',LIBGL_ALWAYS_SOFTWARE='1',NO_AT_BRIDGE='1')
+            environment.pop('WAYLAND_DISPLAY',None)
         child=subprocess.Popen([str(binary)],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=environment)
         replies=queue.Queue();errors=[]
         def read():
@@ -33,8 +38,12 @@ def main():
         def call(method,params=None):
             nonlocal ident
             ident+=1;child.stdin.write((json.dumps({'id':ident,'method':method,'params':params or {}})+'\n').encode());child.stdin.flush()
-            try:reply=replies.get(timeout=30)
-            except queue.Empty:raise RuntimeError('No component reply; startup log: '+''.join(errors[-10:]))
+            deadline=time.monotonic()+90
+            while True:
+                try:reply=replies.get(timeout=.5);break
+                except queue.Empty:
+                    if child.poll() is not None or time.monotonic()>deadline:
+                        raise RuntimeError('No component reply; exit='+str(child.poll())+'; startup log: '+''.join(errors[-200:]))
             assert reply['id']==ident,reply
             return reply
         try:

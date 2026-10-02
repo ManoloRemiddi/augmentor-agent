@@ -134,9 +134,11 @@ bytes. The component build inventory identifies the original pre-signing bytes.
 checks Rust formatting/Clippy and runs the actual component protocol/lifecycle
 proof on each runner. Linux/Mac product packaging consumes the matching artifact
 from that run. A component build alone is not a complete installer qualification.
-The workflow can reuse a previously successful component with an exact
+The workflow can reuse a compiled/formatted/linted component with an exact
 OS/architecture/source/build-input cache key. Intake rechecks its full inventory,
 and the actual lifecycle proof still runs; no partial-key restoration is allowed.
+A cached build or a diagnostic artifact from a failed lifecycle job is not
+qualified. Product packaging waits for successful component jobs.
 
 Local verification on 2 October 2026 includes actual release compilation,
 Clippy, TypeScript frontend/build checks, the broker authentication/revision/theme/
@@ -180,6 +182,37 @@ Installed promotion must use a separate artifact and `augmentor-update`. Preserv
 the selected product version and matching DSH/speech dependencies, plus newer
 settings/layout work on this owner's machine; do not replace those files with an
 older feature-base version. Record the exact source ref, artifact digest, selected
-build and running windows after promotion. At this guide's initial checkpoint,
-the integration remains a source/build candidate: no installed feature, standalone
-Handy cutover, physical microphone test or public all-platform release is claimed.
+build and running windows after promotion.
+
+## Owner's installed adoption — 2 October 2026
+
+Feature source `c8f67a3391570c6a24f1502a9344da12e2c07846` was adapted narrowly
+over the existing installed artifact
+`b72b7f883e65c7b27d0e077892a9cdbf2744d56348d132796532b3efab62a29d`, preserving
+the newer embedded settings frame and matching 0.2.11 product/DSH/speech contracts.
+It was staged and activated through `augmentor-update`; selected build
+`20261002-141437-663e6383` has artifact SHA-256
+`a47433db434bf446d8001c18182d85b8318c0e78f92fd72f14f8131f75cfd308`.
+Desktop and Mobile subsequently adopted that exact build and both reported
+online, voice available and no pending update. The owner authorized the final
+cutover after the UI became idle.
+
+The existing standalone Handy process exited cleanly, its autostart entry was
+moved to a private migration backup and the embedded broker enabled successfully.
+Status reports ready, Ctrl+Space/hold, Parakeet Q8, default microphone, ydotool
+insertion, no component tray and the owner's actual current palette. Saved
+component settings confirm CPU for both accelerators, bottom/minimal overlay,
+five-minute unload, no always-on microphone and no automatic submission.
+Standalone software/model caches/history were not uninstalled or deleted.
+The separate root input service remains independently owned; Augmentor uses its
+own non-root daemon/private socket instead.
+
+This is an installed Linux adoption, not public all-platform release qualification.
+The first remote component run compiled/linted Linux and Mac, but their lifecycle
+proofs failed on the hosted environments; Windows compilation exposed a Vulkan
+CMake dependency despite the CPU Cargo configuration. Follow-up source improves
+full startup diagnostics, isolated software-rendered X11 testing, explicitly
+disables Windows Vulkan in CMake and retains checked builds for repeat proof.
+Mac/Windows installer/compositor/permission acceptance remains open until those
+jobs and the product package proofs pass. No physical microphone acceptance is
+claimed from virtual input tests or successful enable/status alone.

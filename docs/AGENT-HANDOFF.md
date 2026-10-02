@@ -9,8 +9,15 @@ owner-approved system-wide dictation and themed Handy overlay. Read
 [the implementation guide](HANDY-INTEGRATION.md) for supplier pins, settings,
 microphone ownership, OS adapters, packaging, reproducible proofs and explicit
 qualification boundaries. The canonical dirty checkout and existing installed
-settings work are preserved. This source candidate must not be presented as an
-installed update or a qualified Windows installer solely from component CI.
+settings work are preserved. Feature source `c8f67a3` now has an installed Linux
+adoption: selected/running build `20261002-141437-663e6383`, artifact
+`a47433db434bf446d8001c18182d85b8318c0e78f92fd72f14f8131f75cfd308`, compatible
+installed 0.2.11 contracts retained. Standalone Handy startup/process ownership
+was reversibly retired and embedded Ctrl+Space dictation enabled on CPU with the
+owner's actual palette. [The adoption record](HANDY-INTEGRATION.md#owners-installed-adoption--2-october-2026)
+separates that Linux evidence from open hosted lifecycle/platform package gates.
+Do not claim a qualified Windows installer or physical microphone acceptance
+solely from a native build or successful component enable.
 
 ## October 1 merge blockers: current main and separate Codex prerequisite
 

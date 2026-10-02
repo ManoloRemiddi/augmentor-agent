@@ -32,9 +32,9 @@ jobs:
         run: |
           rustup toolchain install 1.97.1 --profile minimal --component rustfmt,clippy,rust-docs
           rustup default 1.97.1
-      - name: Restore an exactly qualified component
+      - name: Restore an exact component build
         id: component-cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: components/handy/runtime
           key: handy-1.97.1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('components/handy/**', 'scripts/build-handy.py', 'scripts/prepare-handy.py', 'scripts/stage-handy.py') }}
@@ -53,17 +53,25 @@ jobs:
           cd build/handy/src-tauri
           cargo fmt --all -- --check
           cargo clippy --release --locked --features tauri/custom-protocol
+      - name: Retain the checked build for repeat lifecycle qualification
+        if: steps.component-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830
+        with:
+          path: components/handy/runtime
+          key: ${{ steps.component-cache.outputs.cache-primary-key }}
       - name: Verify the embedded lifecycle (Linux)
         if: runner.os == 'Linux'
-        run: xvfb-run -a python3 scripts/proof-handy-component.py
+        run: dbus-run-session -- xvfb-run -a python3 scripts/proof-handy-component.py
       - name: Verify the embedded lifecycle (Mac and Windows)
         if: runner.os != 'Linux'
         run: python scripts/proof-handy-component.py
       - name: Name the platform artifact
+        if: always()
         id: target
         shell: bash
         run: python -c "import os,platform,sys;open(os.environ['GITHUB_OUTPUT'],'a').write('target='+sys.platform+'-'+platform.machine()+'\n')"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always() && hashFiles('components/handy/runtime/BUILD.json') != ''
         with:
           name: handy-${{ steps.target.outputs.target }}
           path: components/handy/runtime/**

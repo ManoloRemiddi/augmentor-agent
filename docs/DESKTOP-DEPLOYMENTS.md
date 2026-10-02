@@ -85,6 +85,16 @@ Installer and updater share a kernel lock so simultaneous promotions cannot race
 
 ## Required development and update workflow
 
+The October 2 [embedded Handy adoption](HANDY-INTEGRATION.md#owners-installed-adoption--2-october-2026)
+uses this workflow: public feature source `c8f67a3` was composed with the existing
+0.2.11 artifact using narrow patches so the newer settings frame, DSH integration
+and speech dependencies remain intact. Selected/running build
+`20261002-141437-663e6383` is inventoried as
+`a47433db434bf446d8001c18182d85b8318c0e78f92fd72f14f8131f75cfd308`.
+Both Desktop and Mobile adopted it before the owner-authorized standalone Handy
+cutover. Startup backup and enable/status checks are recorded in the owning guide;
+broader cross-platform installer acceptance remains separate.
+
 1. Implement and test the change in source. Build a complete runnable candidate
    separate from the selected release. For an incremental preview patch, first
    copy the current artifact to a separate candidate and apply the reviewed
