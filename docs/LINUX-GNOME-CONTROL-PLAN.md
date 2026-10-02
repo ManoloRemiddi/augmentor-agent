@@ -71,8 +71,56 @@ and [Socket](https://github.com/GNOME/at-spi2-core/blob/66707c370bef824ed4edb08a
 contracts: actual two-word state bitmasks, private bus unique-name references,
 one Embed per connection and empty P2P bus address. This is selected-application
 owner loss, not launcher/registry replacement or full accessibility-tree fidelity.
-A separate isolated native-daemon fixture is being prepared for global service
+The separate isolated native-daemon fixture below now proves global service
 fences; existing owner/guest services are not restarted for this proof. Production
+GNOME discovery/keyboard/pointer remain disabled.
+
+## Isolated native launcher, registry and bus replacement
+
+[The executed service-fence report](../release/qualification/next-targets/20261002-isolated-native-a11y-services.json)
+adds three cases in a separate Fedora44 container using shipped native binaries:
+registry replacement with the exporter process and selected owner still alive;
+launcher termination with coupled accessibility-bus loss; and accessibility-bus
+termination with coupled launcher loss. Each retired helper refuses reuse. After
+native services are restored, a fresh helper pins the replacement identities and
+reads the synthetic two-node exporter. Registry-only replacement keeps session/
+accessibility bus IDs and launcher identity unchanged. The coupled cases preserve
+the private session bus while changing launcher owner and accessibility bus ID.
+
+The native launcher/registry hashes exactly match the original Fedora GNOME guest.
+Recorded package headers identify at-spi2-core2.60.7-1.fc44, dbus-daemon1:1.16.2-1,
+gsettings-desktop-schemas50.1-1, gobject-introspection1.86.0-3 and PyGObject3.56.3-1
+with Fedora44 key signatures. DNF installs use GPG checks in the separate image.
+The [published fixture recipe](../release/fedora-a11y-service-fixture.Dockerfile)
+differs from the executed recipe only by its added copyright comment; both hashes
+are recorded. [The bounded probe](../release/probe-a11y-service-replacement.py)
+requires the exact owned marker, ordinary UID1000 and native binary hashes.
+
+Run in a NEW owned container with Docker --init, networknone, no host mounts/
+devices/privileged mode, all capabilities dropped, no-new-privileges, two CPUs,
+2GiB and256 PIDs. Stage the exact probe, probe-gnome-a11y-owner.py and helper/service
+files together under /work. The CLI requires a new /work proof root and --case
+registry, launcher-bus or accessibility-bus. Each creates a separate native
+DBus session/private0700 runtime directory, unsets inherited display/a11y/startup
+bus variables and uses the memory GSettings backend. It starts native daemons
+manually, without GNOME-session registration, and terminates only recorded owned
+PID/start identities. Exported roles/states are synthetic; no focus events, UI
+input, real GNOME compositor or product service restart is exercised.
+
+The first image refused missing GSettings schemas. The second started daemons but
+refused the missing DBus1.0 typelib; an actual Fedora package-provider query
+identified gobject-introspection. The third passed native owner fences but left
+exited forked bus children as zombies under sleep PID1. These failures/observations
+remain retained. The fourth uses Docker init to reap orphans and passes all three
+cases, with every recorded native-bus, launcher, registry, exporter and helper PID
+confirmed absent afterwards. Source/native-library/package/recipe identities and
+raw report hashes bind the evidence. Closure durations after native loss are
+0.0034s/0.0013s/0.0014s for registry/launcher/bus requests, not physical-input latency.
+
+The existing GNOME guest and owner services/devices/models/audio are unchanged.
+This proves native helper fences in isolated sessions. Real GNOME service restart,
+shell/controller integration, inaccessible/ambiguous trees, native per-action
+widget/lock/Stop outcomes and other supported profiles remain open. Production
 GNOME discovery/keyboard/pointer remain disabled.
 
 ## October 2 native consent and worker checkpoint
@@ -180,7 +228,8 @@ flags. Focus/showing may survive while another application covers the target; th
 future controller must independently bind the shell's selected/active window and
 geometry to the same PID, owner, epoch and fresh event serial. These facts are not
 permission to type. Selected application owner loss now passes the separate
-synthetic native-bus proof above. Registry/launcher replacement, inaccessible
+synthetic native-bus proof above. Isolated native-service replacement now passes the proof above; real GNOME
+service restart, inaccessible
 and ambiguous native trees, per-character/Stop/lock guards and matching GNOME/KDE
 regressions remain open. The GUI process's singleton is untouched.
 

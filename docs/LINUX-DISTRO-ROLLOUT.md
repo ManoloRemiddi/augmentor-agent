@@ -2354,3 +2354,17 @@ service-restart acceptance is claimed. Both5df6fa5 source-kit hosted workflows p
 The [recipient-control permission proposal](RECIPIENT-SOURCE-CONTROLS-LICENSE-PROPOSAL.md)
 is awaiting an owner decision; no license changed and all five rollout points remain
 active. See [GNOME scope and remaining native guards](LINUX-GNOME-CONTROL-PLAN.md#native-selected-application-owner-loss-with-a-live-process).
+
+
+## October2 isolated native accessibility service fences
+
+The [three executed native-service cases](../release/qualification/next-targets/20261002-isolated-native-a11y-services.json)
+now retire helpers for registry replacement and coupled launcher/accessibility-bus
+loss, reject old-helper reuse and pin restored identities with fresh helpers.
+They run in a separate bounded Fedora container/private DBus sessions with a
+synthetic exporter; all final proof/native-bus PIDs disappear under Docker init.
+Missing-schema/typelib failures and prior orphan-zombie observations remain
+preserved. [The GNOME plan](LINUX-GNOME-CONTROL-PLAN.md#isolated-native-launcher-registry-and-bus-replacement)
+keeps real GNOME restart, compositor/widget/controller/lock/Stop and supported-
+profile repetition open. Both3f52af2 hosted checks pass; this checkpoint needs its
+own checks. All five rollout points remain active; license/owner state is unchanged.

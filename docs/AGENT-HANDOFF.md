@@ -2,6 +2,27 @@
 
 # Start here: agent handoff
 
+## October2 isolated native accessibility service fences
+
+[The new report](../release/qualification/next-targets/20261002-isolated-native-a11y-services.json)
+proves registry replacement, coupled launcher/bus loss and coupled bus/launcher
+loss in a separate Fedora44 container. Native daemon hashes match the GNOME guest;
+private DBus sessions and a synthetic exporter isolate the cases. Old helpers
+retire/refuse reuse; fresh helpers accept restored native identities. All recorded
+native-bus/probe/helper PIDs are absent after the final Docker-init cases. Actual
+missing-schema/typelib failures and prior orphan-zombie observations are preserved;
+none is relabelled as full fixture qualification. See [the owning GNOME plan](LINUX-GNOME-CONTROL-PLAN.md#isolated-native-launcher-registry-and-bus-replacement).
+
+Both3f52af2 selected-owner hosted checks pass:
+[Linux37053560570](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37053560570)
+and [Mac37053560550](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37053560550).
+The isolated-service proof needs its own hosted checks. The 22-file license
+proposal still awaits an owner decision; no license grant changed. Real GNOME
+restart/controller/input, product source-runtime entrypoints/other ABIs,
+compiled-content/source-kit legal acceptance and full packages/Browser/audio/
+lifecycle remain open. All five rollout points remain active. Existing selected
+artifacts and owner/guest services/devices/models/audio are unchanged.
+
 ## October2 native selected accessibility owner loss
 
 [The native owner-loss report](../release/qualification/next-targets/20261002-gnome-native-selected-owner-loss.json)
@@ -19,7 +40,7 @@ per-action/lock/Stop and other-profile/KDE qualification remain open.
 Both5df6fa5 source-kit hosted checks pass:
 [Linux37051754737](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37051754737)
 and [Mac37051754750](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37051754750).
-The owner proof needs its own source checks. The
+Both selected-owner source checks subsequently pass; see the newer isolated-service checkpoint above. The
 [22-file recipient-control license proposal](RECIPIENT-SOURCE-CONTROLS-LICENSE-PROPOSAL.md)
 is prepared for the owner's explicit decision; no license grant/headers have
 changed. All five authorized rollout points remain active. Selected artifacts and
