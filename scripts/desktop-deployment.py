@@ -75,15 +75,15 @@ def verify(root):
 
 def check(config, connected=False):
     root = Path(config['root'])
-    if (root/'linux-python-runtime.json').exists() or (root/'linux-python-runtime.json').is_symlink():
-        spec = importlib.util.spec_from_file_location('candidate_linux_python', root/'scripts/linux-python-runtime.py')
-        runtime = importlib.util.module_from_spec(spec); spec.loader.exec_module(runtime)
-        runtime.resolve(root, config['python'])
     if '--ensure-running' not in (root/'apps/native/augmentor_linux/window.py').read_text():
         raise ValueError('This build lacks the supervised startup protocol.')
     env = {**os.environ, 'PYTHONPATH':str(root/'apps/native'),
            'PYTHONDONTWRITEBYTECODE':'1', 'QT_QPA_PLATFORM':'offscreen',
            'AUGMENTOR_PI_NODE':config['node'], 'AUGMENTOR_PYTHON':config['python']}
+    if (root/'linux-python-runtime.json').exists() or (root/'linux-python-runtime.json').is_symlink():
+        spec = importlib.util.spec_from_file_location('candidate_linux_python', root/'scripts/linux-python-runtime.py')
+        runtime = importlib.util.module_from_spec(spec); spec.loader.exec_module(runtime)
+        env = runtime.environment(root, config['python'], env)
     code = 'from augmentor_linux import window, controller\n'
     if connected and config.get('dshService'):
         # This reads the matching product identity and model catalog. No prompts,
@@ -113,7 +113,7 @@ def stage(source, source_ref, python=None, node=None):
     temporary.mkdir(mode=0o700)
     try:
         # Copy the runnable artifact, never an entire checkout or user data.
-        for part in ('apps', 'services', 'adapters', 'dist', 'config', 'licenses', 'scripts', 'node', 'node_modules', 'release', 'docs'):
+        for part in ('apps', 'services', 'adapters', 'dist', 'config', 'licenses', 'scripts', 'node', 'node_modules', 'release', 'docs', 'python-wheels'):
             if (source/part).is_dir():
                 shutil.copytree(source/part, temporary/part, symlinks=True,
                                 ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '.git', '.env', 'outputs'))
@@ -127,6 +127,10 @@ def stage(source, source_ref, python=None, node=None):
             spec = importlib.util.spec_from_file_location('staged_linux_python', source/'scripts/linux-python-runtime.py')
             runtime = importlib.util.module_from_spec(spec); spec.loader.exec_module(runtime)
             config['python'] = runtime.resolve(source, python)
+            value = runtime.policy(source/'linux-python-runtime.json')
+            if value['profile'] == runtime.SOURCE_PROFILE:
+                runtime.verify_wheels(value, temporary/'python-wheels')
+                runtime.source_qt().inputs(value, temporary/'python-wheels')
         # A bundled interpreter follows the copy; venv symlinks must not resolve.
         for key in ('python', 'node'):
             path = Path(config[key])

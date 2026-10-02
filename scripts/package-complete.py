@@ -101,6 +101,7 @@ def main():
     shutil.copytree(ROOT/'release/dsh/plugins',out/'dsh/plugins')
     shutil.copy2(ROOT/'scripts/setup-complete.py',out/'setup.py')
     shutil.copy2(ROOT/'scripts/linux_distribution.py',out/'linux_distribution.py')
+    shutil.copy2(ROOT/'scripts/linux-source-qt.py',out/'linux-source-qt.py')
     shutil.copy2(ROOT/'docs/COMPLETE-INSTALL.md',out/'INSTALL.md')
     shutil.copy2(ROOT/'LICENSE',out/'LICENSE')
     sources=out/'sources';sources.mkdir()

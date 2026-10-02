@@ -59,6 +59,12 @@ architectures. A Noble payload cannot be relabeled as a Fedora or system-Qt
 complete bundle. This candidate is not a public compatibility release; native
 binary license/source review, desktop and physical speech acceptance remain open.
 
+The separately opt-in [Noble source-Qt candidate](LINUX-SOURCE-RUNTIME-ENTRYPOINTS.md)
+adds a reviewed native payload and derivation receipt to that runtime contract.
+Its system recipe supplies ICU74. Declared-runtime DSH services now enter through
+the verified component wrapper before Node/speech children start. Neither this
+source candidate nor its entrypoint fixture is a public compatibility release.
+
 ## Included and configured
 
 - Matching Augmentor Desktop and Chromium Browser 0.2.13 surfaces and companion.

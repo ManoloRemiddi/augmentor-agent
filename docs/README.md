@@ -35,6 +35,7 @@ Current cross-platform direction: [one product, Linux/Mac parity audit and corre
 - [Codex ChatGPT accounts, shared Desktop/Browser login controls and remaining inference integration](CODEX-ACCOUNTS.md)
 - [Private speech-source cleanup and current synthetic voice test boundaries](CODEX-SOURCE-CLEANUP.md)
 - [Start here: agent handoff](AGENT-HANDOFF.md)
+- [Noble source-runtime identity, native payload and product entrypoint evidence](LINUX-SOURCE-RUNTIME-ENTRYPOINTS.md)
 - [Current architecture](ARCHITECTURE.md)
 - [One personal agent, two presentations](SHARED-SURFACES-2026-09-24.md)
 

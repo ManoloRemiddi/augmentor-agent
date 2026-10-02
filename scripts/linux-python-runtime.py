@@ -9,6 +9,7 @@ import argparse
 from contextlib import contextmanager
 import fcntl
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -25,15 +26,24 @@ RECEIPT = 'augmentor-python-runtime.json'
 MANAGED = {'pyside6-essentials', 'shiboken6', 'pygments', 'keyring', 'sounddevice'}
 PROFILES = {'noble-cp312-x86_64': MANAGED,
             'noble-cp312-x86_64-voice': MANAGED | {'onnxruntime', 'protobuf'},
+            'noble-cp312-x86_64-source-qt-voice': (MANAGED-{'pyside6-essentials'}) | {'pyside6','onnxruntime','protobuf'},
             'leap16-cp313-x86_64-voice': {'keyring','sounddevice','onnxruntime','protobuf'},
             'arch20261001-cp314-x86_64-voice': {'sounddevice','onnxruntime','protobuf'}}
 HOST_PROFILES = {
     'noble-cp312-x86_64': ('ubuntu24.04-amd64','/usr/bin/python3.12',[3,12],'ubuntu','24.04'),
     'noble-cp312-x86_64-voice': ('ubuntu24.04-amd64','/usr/bin/python3.12',[3,12],'ubuntu','24.04'),
+    'noble-cp312-x86_64-source-qt-voice': ('ubuntu24.04-amd64','/usr/bin/python3.12',[3,12],'ubuntu','24.04'),
     'leap16-cp313-x86_64-voice': ('opensuse-leap16.0-x86_64','/usr/bin/python3.13',[3,13],'opensuse-leap','16.0'),
     'arch20261001-cp314-x86_64-voice': ('arch20261001-x86_64','/usr/bin/python3',[3,14],'arch',None),
 }
 POLICY_FILE = 'linux-python-runtime.json'
+SOURCE_PROFILE = 'noble-cp312-x86_64-source-qt-voice'
+
+
+def source_qt():
+    spec = importlib.util.spec_from_file_location('linux_source_qt', Path(__file__).with_name('linux-source-qt.py'))
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    return module
 
 
 def digest(path):
@@ -56,11 +66,25 @@ def policy(path):
     expected = PROFILES[value['profile']]
     if len(rows) != len(expected) or {normalized(r['name']) for r in rows} != expected:
         raise ValueError('The complete reviewed wheel set for this profile is required.')
+    source = source_qt() if value['profile'] == SOURCE_PROFILE else None
+    if source:
+        source.contract(value)
+        if value.get('qualified') is not False or value.get('licenseReviewComplete') is not False or value.get('embeddedSourceCoverageComplete') is not False:
+            raise ValueError('The source Qt profile remains an unqualified review candidate.')
+    elif 'sourceQt' in value:
+        raise ValueError('A vendor/system profile cannot declare source Qt.')
     for row in rows:
         if (Path(row['file']).name != row['file'] or not row['file'].endswith('.whl')
                 or not re.fullmatch('[0-9a-f]{64}', row['sha256'])
-                or not isinstance(row['bytes'], int) or row['bytes'] <= 0
-                or not row['url'].startswith('https://files.pythonhosted.org/packages/')):
+                or type(row['bytes']) is not int or row['bytes'] <= 0):
+            raise ValueError('Invalid locked wheel record.')
+        name = normalized(row['name'])
+        if source and name in source.SOURCE_WHEELS:
+            if ((row['file'], row['sha256'], row['bytes']) != source.SOURCE_WHEELS[name]
+                    or row.get('version') != '6.8.2.1' or row.get('source') != 'reviewed-offline'
+                    or 'url' in row):
+                raise ValueError('Source bindings require their exact reviewed offline wheel identities.')
+        elif not row.get('url','').startswith('https://files.pythonhosted.org/packages/') or 'source' in row:
             raise ValueError('Invalid locked wheel record.')
     return value
 
@@ -69,14 +93,19 @@ def identity(value):
     contract = {key: value[key] for key in ('profile', 'target', 'python', 'pythonAbi', 'architecture', 'systemSitePackages')}
     contract['wheels'] = [{key: row[key] for key in ('name', 'version', 'file', 'sha256', 'bytes')}
                           for row in sorted(value['wheels'], key=lambda r: normalized(r['name']))]
+    if value['profile'] == SOURCE_PROFILE:
+        contract['sourceQt'] = value['sourceQt']
     return hashlib.sha256(json.dumps(contract, sort_keys=True).encode()).hexdigest()
 
 
 def contract(value,policy_sha256):
-    return {'format':'augmentor-linux-python-runtime-contract/1','target':value['target'],
+    result = {'format':'augmentor-linux-python-runtime-contract/1','target':value['target'],
             'profile':value['profile'],'pythonAbi':value['pythonAbi'],'architecture':value['architecture'],
             'lockIdentity':identity(value),'policySha256':policy_sha256,
             'licenseReviewComplete':False,'embeddedSourceCoverageComplete':False}
+    if value['profile'] == SOURCE_PROFILE:
+        result['sourceQt'] = source_qt().contract(value)
+    return result
 
 
 def verify_wheels(value, wheelhouse):
@@ -87,6 +116,14 @@ def verify_wheels(value, wheelhouse):
 
 
 def download(value, wheelhouse):
+    if value['profile'] == SOURCE_PROFILE:
+        # Source binaries are reviewed local inputs, never substituted from PyPI
+        # or fetched through a newly weakened URL rule.
+        for row in value['wheels']:
+            if row.get('source') == 'reviewed-offline':
+                path = Path(wheelhouse)/row['file']
+                source_qt().regular(path, row['bytes'], row['sha256'])
+        source_qt().inputs(value, wheelhouse)
     wheelhouse = Path(wheelhouse)
     wheelhouse.mkdir(parents=True, exist_ok=True)
     for row in value['wheels']:
@@ -117,6 +154,8 @@ def host(value):
         raise ValueError('This runtime policy requires '+expected[3]+(' '+expected[4] if expected[4] else '')+'.')
     if platform.machine() != value['architecture']:
         raise ValueError('This wheel set requires x86-64.')
+    if value['profile'] == SOURCE_PROFILE:
+        source_qt().environment(Path('/unused-host-check'), os.environ)
     result = subprocess.check_output([value['python'], '-I', '-c',
         'import json,sys;print(json.dumps(list(sys.version_info[:2])))'], text=True, timeout=10)
     if json.loads(result) != value['pythonAbi']:
@@ -172,7 +211,7 @@ for row in value['wheels']:
 import PySide6,shiboken6,pygments,keyring,sounddevice,gi,numpy,yaml,websocket,cffi,secretstorage,jeepney
 from PySide6 import QtCore,QtGui,QtWidgets,QtNetwork,QtDBus,QtSvg,QtQuick,QtQuickWidgets
 from keyring.backends.SecretService import Keyring
-modules={'pyside6-essentials':PySide6,'shiboken6':shiboken6,'pygments':pygments,'keyring':keyring,'sounddevice':sounddevice}
+modules={'pyside6-essentials':PySide6,'pyside6':PySide6,'shiboken6':shiboken6,'pygments':pygments,'keyring':keyring,'sounddevice':sounddevice}
 managed=[modules[r['name'].lower().replace('_','-')] for r in value['wheels'] if r['name'].lower().replace('_','-') in modules]
 assert Version(PySide6.__version__)>=Version('6.8.2.1'),PySide6.__version__
 speech={}
@@ -188,9 +227,35 @@ for module in managed:
 gi.require_version('Gtk','4.0');gi.require_version('Gst','1.0');gi.require_version('Atspi','2.0')
 from gi.repository import Gtk,Gst,Atspi
 assert not pathlib.Path(gi.__file__).resolve().is_relative_to(root)
+native={}
+if 'sourceQt' in value:
+ from PySide6 import QtQml,QtOpenGL,QtTest
+ if PySide6.__version__!='6.8.2.1' or shiboken6.__version__!='6.8.2.1' or QtCore.qVersion()!=value['sourceQt']['qtVersion']:
+  raise RuntimeError('Source Qt/binding versions differ from the reviewed candidate.')
+ qt=root/'qt'
+ app=QtWidgets.QApplication([])
+ QtCore.QCoreApplication.setLibraryPaths([str(qt/'plugins')])
+ engine=QtQml.QQmlEngine();engine.setImportPathList([str(qt/'qml'),'qrc:/qt/qml'])
+ component=QtQml.QQmlComponent(engine)
+ component.setData(b'import QtQuick; Rectangle { width: 32; height: 32; color: "red" }',QtCore.QUrl())
+ item=component.create()
+ if item is None:raise RuntimeError('Source Qt QML runtime failed: '+str(component.errors()))
+ mapped=set()
+ for line in pathlib.Path('/proc/self/maps').read_text().splitlines():
+  parts=line.split(maxsplit=5)
+  if len(parts)!=6 or not parts[5].startswith('/'):continue
+  path=pathlib.Path(parts[5])
+  if path.name.startswith('libQt6') or path.name.endswith('.so') and any(p in path.parts for p in ('plugins','qml')):
+   if not path.resolve().is_relative_to(qt):raise RuntimeError('Source Qt loaded an external native Qt/plugin/QML library: '+str(path))
+   mapped.add(str(path.resolve()))
+ if not mapped:raise RuntimeError('No source Qt native libraries were observed.')
+ native={'root':str(qt),'mappedNativeLibraries':sorted(mapped),
+  'pluginPaths':QtCore.QCoreApplication.libraryPaths(),'qmlImportPaths':engine.importPathList(),
+  'qmlComponentCreated':True,'fullProductTested':False,'nativeDesktopTested':False,'plasmaShaderRenderTested':False}
 print(json.dumps({'pythonAbi':list(sys.version_info[:2]),'qtVersion':QtCore.qVersion(),
  'managedVersions':{r['name']:md.version(r['name']) for r in value['wheels']},
- 'systemQt':not any(r['name'].lower().replace('_','-')=='pyside6-essentials' for r in value['wheels']),
+ 'systemQt':not any(r['name'].lower().replace('_','-') in ('pyside6-essentials','pyside6') for r in value['wheels']),
+ 'sourceQt':native,
  'systemVersions':{n:md.version(n) for n in ['SecretStorage','jeepney','cryptography','cffi','numpy','PyYAML','websocket-client','jaraco.classes','jaraco.context','jaraco.functools','more-itertools']},
  'origins':{m.__name__:str(pathlib.Path(m.__file__).resolve()) for m in [PySide6,shiboken6,pygments,keyring,sounddevice,gi,numpy,yaml,websocket,cffi,secretstorage,jeepney]},
  'gtkVersion':[Gtk.get_major_version(),Gtk.get_minor_version(),Gtk.get_micro_version()],
@@ -203,6 +268,10 @@ print(json.dumps({'pythonAbi':list(sys.version_info[:2]),'qtVersion':QtCore.qVer
 
 def probe(value, root):
     env = {key: val for key, val in os.environ.items() if key not in ('PYTHONHOME', 'PYTHONPATH')}
+    if value['profile'] == SOURCE_PROFILE:
+        source_qt().manifest(root/'qt', value['sourceQt']['manifestSha256'])
+        env = source_qt().environment(root, env)
+        env.update(QT_QPA_PLATFORM='offscreen', QT_QUICK_BACKEND='software')
     env['PYTHONDONTWRITEBYTECODE'] = '1'
     result = subprocess.run([str(root/'bin/python3'), '-I', '-B', '-c', PROBE, json.dumps(value)],
                             env=env, text=True, capture_output=True, timeout=60)
@@ -226,6 +295,10 @@ def verify(value, root):
             or receipt.get('target') != value['target'] or receipt.get('profile') != value['profile']
             or receipt.get('wheels') != value['wheels']):
         raise ValueError('Runtime receipt differs from its path or wheel contract.')
+    if value['profile'] == SOURCE_PROFILE:
+        if receipt.get('sourceQt') != value['sourceQt']:
+            raise ValueError('Runtime source Qt receipt differs from the native payload contract.')
+        source_qt().manifest(root/'qt', value['sourceQt']['manifestSha256'])
     files = inventory(root)
     if (receipt.get('files') != files or receipt.get('artifactSha256') !=
             hashlib.sha256(json.dumps(files, sort_keys=True).encode()).hexdigest()):
@@ -237,6 +310,8 @@ def verify(value, root):
 
 def prepare(value, wheelhouse, store):
     verify_wheels(value, wheelhouse)
+    if value['profile'] == SOURCE_PROFILE:
+        source_qt().inputs(value, wheelhouse)
     host(value)
     with locked(store) as store:
         root = store/(value['profile']+'-'+identity(value)[:16])
@@ -252,6 +327,8 @@ def prepare(value, wheelhouse, store):
             subprocess.run([str(root/'bin/python3'), '-I', '-m', 'pip', 'install', '--no-index',
                 '--find-links', str(Path(wheelhouse).resolve()), '--require-hashes', '--only-binary', ':all:',
                 '--no-deps', '--disable-pip-version-check', '-r', str(root/'wheel-lock.txt')], check=True, timeout=120)
+            if value['profile'] == SOURCE_PROFILE:
+                source_qt().stage(value, wheelhouse, root/'qt')
             imports = probe(value, root)
             files = inventory(root)
             receipt = {'format': 'augmentor-linux-python-runtime/1', 'root': str(root),
@@ -260,6 +337,8 @@ def prepare(value, wheelhouse, store):
                 'files': files, 'artifactSha256': hashlib.sha256(json.dumps(files, sort_keys=True).encode()).hexdigest(),
                 'licenseReviewComplete': False, 'embeddedSourceCoverageComplete': False,
                 'installedProductTested': False, 'selectedDesktopChanged': False}
+            if value['profile'] == SOURCE_PROFILE:
+                receipt['sourceQt'] = value['sourceQt']
             with os.fdopen(os.open(root/RECEIPT, os.O_WRONLY|os.O_CREAT|os.O_EXCL, 0o600), 'w') as stream:
                 json.dump(receipt, stream, indent=2); stream.write('\n'); stream.flush(); os.fsync(stream.fileno())
             return receipt
@@ -296,6 +375,19 @@ def resolve(app, python=None):
         chosen = root/'bin/python3'
     verify(value, root)
     return str(chosen)
+
+
+def environment(app, python=None, inherited=None):
+    """Verify the selected runtime and return the environment for its next exec."""
+    chosen = resolve(app, python)
+    env = dict(os.environ if inherited is None else inherited)
+    marker = Path(app)/POLICY_FILE
+    if marker.exists():
+        value = policy(marker)
+        env['AUGMENTOR_PYTHON'] = chosen
+        if value['profile'] == SOURCE_PROFILE:
+            env = source_qt().environment(Path(chosen).parent.parent, env)
+    return env
 
 
 def main():

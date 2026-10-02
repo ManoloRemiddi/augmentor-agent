@@ -82,10 +82,19 @@ def python_runtime_contract(manifest,target):
         if value is not None:raise ValueError('This bundle target cannot use a Noble Python runtime.')
         return None
     if (not isinstance(value,dict) or value.get('format')!='augmentor-linux-python-runtime-contract/1'
-            or value.get('target')!=NOBLE or value.get('profile')!='noble-cp312-x86_64-voice'
+            or value.get('target')!=NOBLE or value.get('profile') not in ('noble-cp312-x86_64-voice','noble-cp312-x86_64-source-qt-voice')
             or value.get('pythonAbi')!=[3,12] or value.get('architecture')!='x86_64'
             or not all(isinstance(value.get(key),str) and re.fullmatch('[a-f0-9]{64}',value[key]) for key in ('policySha256','lockIdentity'))):
         raise ValueError('The Noble bundle requires its complete verified Python runtime contract.')
+    if value['profile']=='noble-cp312-x86_64-source-qt-voice':
+        import importlib.util
+        spec=importlib.util.spec_from_file_location('distribution_source_qt',Path(__file__).with_name('linux-source-qt.py'))
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        module.contract(value)
+        if value.get('licenseReviewComplete') is not False or value.get('embeddedSourceCoverageComplete') is not False:
+            raise ValueError('The source Qt contract remains an unqualified candidate.')
+    elif 'sourceQt' in value:
+        raise ValueError('The vendor runtime cannot declare a source Qt payload.')
     return value
 
 

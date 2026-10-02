@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The [Noble source-Qt profile](LINUX-SOURCE-RUNTIME-ENTRYPOINTS.md) now has actual
+offline runtime, cold Desktop/Browser entrypoint and isolated rollback evidence.
+Full product/native session/package/audio and source/legal acceptance remain open;
+this distinct Ubuntu24.04/Python3.12 profile does not widen other-distro support.
+
 Current OS parity direction and verified gaps: [one-product architecture audit](PLATFORM-PARITY-AUDIT.md).
 The tables below compare harnesses and presentation surfaces; they do not establish
 Linux/macOS parity. The [Mac recovery record](MACOS-RECOVERY-2026-09-26.md) now

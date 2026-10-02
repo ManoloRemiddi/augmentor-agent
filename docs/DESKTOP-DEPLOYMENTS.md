@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The new [Noble source-runtime contract](LINUX-SOURCE-RUNTIME-ENTRYPOINTS.md) verifies
+the finite native Qt payload before cold launch, supplies its library/plugin/QML
+paths before exec, and preserves/validates those inputs during staging. Its owned
+offscreen entrypoint/rollback proof passes; installed complete-product and native
+desktop-session acceptance remain open. Vendor/system profile identities remain separate.
+
 # Consistent installed desktop releases
 
 ## October 2 source shell bootstrap correction

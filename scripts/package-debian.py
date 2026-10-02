@@ -125,16 +125,18 @@ Description: {description}
           'Complete component notices: /usr/lib/augmentor/licenses/\n\n' + (ROOT / 'LICENSE').read_text())
 
 
-def build(output,target='debian13-amd64',wheelhouse=None):
+def build(output,target='debian13-amd64',wheelhouse=None,*,source_qt=False):
     if target not in TARGETS:raise ValueError('Unsupported Debian package target.')
+    if source_qt and target!=NOBLE:raise ValueError('Source Qt packaging requires the Noble target.')
     python_runtime=None;wheel_tool=None;value=None
     if target==NOBLE:
         if wheelhouse is None:raise ValueError('Noble requires its verified seven-wheel cache.')
         spec=importlib.util.spec_from_file_location('packaged_linux_wheels',ROOT/'scripts/linux-wheel-inventory.py')
         wheel_tool=importlib.util.module_from_spec(spec);spec.loader.exec_module(wheel_tool)
-        policy_path=ROOT/'release/ubuntu24.04-python-voice.json'
+        policy_path=ROOT/'release'/('ubuntu24.04-python-source-qt-voice.json' if source_qt else 'ubuntu24.04-python-voice.json')
         value=wheel_tool.runtime.policy(policy_path)
         wheel_tool.runtime.verify_wheels(value,wheelhouse)
+        if source_qt:wheel_tool.runtime.source_qt().inputs(value,wheelhouse)
         python_runtime=wheel_tool.runtime.contract(value,wheel_tool.runtime.digest(policy_path))
     elif wheelhouse is not None:raise ValueError('This system-Qt target cannot embed the Noble wheel cache.')
     subprocess.run([sys.executable,str(ROOT/'scripts/sync-version.py'),'--check'],check=True)
@@ -167,6 +169,12 @@ def build(output,target='debian13-amd64',wheelhouse=None):
             copy(policy_path,app/'linux-python-runtime.json')
             # Store only the exact checked wheel files, never a builder venv.
             for row in value['wheels']:copy(Path(wheelhouse)/row['file'],app/'python-wheels'/row['file'])
+            if source_qt:
+                # Copy a finite validated tree, never a source SDK or builder.
+                qt=wheel_tool.runtime.source_qt()
+                qt.stage(value,wheelhouse,app/'python-wheels/source-qt')
+                record=value['sourceQt']['derivationReceipt']
+                copy(Path(wheelhouse)/record['file'],app/'python-wheels'/record['file'])
             wheel_tool.stage(value,wheelhouse,app)
         write(app / 'release.json', json.dumps({**product,'source':source,'target': configuration['target'],
                                                'node': configuration['node'], 'pi': configuration['pi'],
@@ -183,7 +191,7 @@ def build(output,target='debian13-amd64',wheelhouse=None):
                     'type': 'stdio', 'allowed_origins': ['chrome-extension://' + identity + '/']}
         for directory in ('etc/chromium/native-messaging-hosts', 'etc/opt/chrome/native-messaging-hosts'):
             write(runtime / directory / 'com.augmentor.agent.json', json.dumps(manifest, indent=2) + '\n')
-        runtime_depends,desktop_depends=dependencies(target,version)
+        runtime_depends,desktop_depends=dependencies(target,version,source_qt=source_qt)
         control(runtime, 'augmentor-runtime', version, runtime_depends, 'Augmentor runtime and Chromium companion',target)
         write(desktop / 'usr/bin/augmentor-agent', launcher + 'exec /usr/lib/augmentor/scripts/augmentor-linux "$@"\n', True)
         write(desktop / 'usr/share/augmentor/desktop-version',version+'\n')
@@ -221,5 +229,6 @@ if __name__ == '__main__':
     parser.add_argument('--out', type=Path, default=ROOT / 'outputs/debian')
     parser.add_argument('--target',choices=TARGETS,default='debian13-amd64')
     parser.add_argument('--wheelhouse',type=Path,help='Exact verified Noble wheel cache; builds an unqualified candidate.')
+    parser.add_argument('--source-qt',action='store_true',help='Use the separately reviewed offline Noble source runtime; candidate only.')
     args = parser.parse_args()
-    build(args.out.resolve(),args.target,args.wheelhouse.resolve() if args.wheelhouse else None)
+    build(args.out.resolve(),args.target,args.wheelhouse.resolve() if args.wheelhouse else None,source_qt=args.source_qt)

@@ -75,20 +75,26 @@ def stage(value,wheelhouse,app):
                             'verifiedNoticeFiles':len(record['files']),'binaryCoverageVerified':False})
     # ICU's exact upstream tag/license is independent of the unproven wheel
     # build configuration. Preserve its entire third-party/data notice file.
-    base=app/'licenses/icu-73.2';path=base/'provenance.json';record=json.loads(path.read_text())
-    if record['tag']!='release-73-2' or record['sourceUrl']!='https://raw.githubusercontent.com/unicode-org/icu/release-73-2/icu4c/LICENSE':
-        raise ValueError('ICU notice provenance differs from the reviewed source.')
-    expected=[{'file':'LICENSE','sha256':'f3005e195ff74d8812cc1f182a1c446fab678d70a10e3dada497585befee5416'}]
-    if record['files']!=expected or (base/'LICENSE').is_symlink() or hashlib.sha256((base/'LICENSE').read_bytes()).hexdigest()!=expected[0]['sha256']:
-        raise ValueError('ICU complete upstream license changed or is absent.')
-    collections.append({'component':'icu4c','sourceTag':record['tag'],'record':'licenses/icu-73.2/provenance.json',
-                        'recordSha256':hashlib.sha256(path.read_bytes()).hexdigest(),
-                        'verifiedNoticeFiles':1,'binaryCoverageVerified':False})
+    if value['profile']!=runtime.SOURCE_PROFILE:
+        base=app/'licenses/icu-73.2';path=base/'provenance.json';record=json.loads(path.read_text())
+        if record['tag']!='release-73-2' or record['sourceUrl']!='https://raw.githubusercontent.com/unicode-org/icu/release-73-2/icu4c/LICENSE':
+            raise ValueError('ICU notice provenance differs from the reviewed source.')
+        expected=[{'file':'LICENSE','sha256':'f3005e195ff74d8812cc1f182a1c446fab678d70a10e3dada497585befee5416'}]
+        if record['files']!=expected or (base/'LICENSE').is_symlink() or hashlib.sha256((base/'LICENSE').read_bytes()).hexdigest()!=expected[0]['sha256']:
+            raise ValueError('ICU complete upstream license changed or is absent.')
+        collections.append({'component':'icu4c','sourceTag':record['tag'],'record':'licenses/icu-73.2/provenance.json',
+                            'recordSha256':hashlib.sha256(path.read_bytes()).hexdigest(),
+                            'verifiedNoticeFiles':1,'binaryCoverageVerified':False})
     report['supplementaryNoticeCollections']=collections
     report['remaining']=['Exact source/build/license mapping for all shipped ELF tools/libraries/plugins',
                          'QtWayland and ICU native-source/build provenance',
                          'GPL-or-commercial QtWaylandCompositor/QtQuickTimeline/BlendTrees and other tool/module license assessment',
                          'Corresponding source delivery and proven recipient replacement/rebuild instructions']
+    if value['profile']==runtime.SOURCE_PROFILE:
+        native=runtime.source_qt().inputs(value,app/'python-wheels')
+        report['sourceQt']={'contract':value['sourceQt'],'manifest':native,
+                            'systemIcu':'libicu74; supplied by the Noble package manager',
+                            'compiledContentNoticeMappingComplete':False}
     for name,content in texts.items():
         path=app/'licenses/linux-wheels'/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(content)
     path=app/'licenses/linux-wheel-inventory.json';path.parent.mkdir(parents=True,exist_ok=True)

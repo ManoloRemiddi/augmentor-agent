@@ -103,12 +103,12 @@ def main(args):
         root = Path(config['root'])
         if not (root/'apps/native/augmentor_linux/window.py').is_file():
             raise RuntimeError('The selected desktop release is missing.')
+    env = {**os.environ, 'PYTHONPATH':str(root/'apps/native'), 'AUGMENTOR_PYTHON':config['python'], 'AUGMENTOR_PI_NODE':config['node'],
+           'PI_TELEMETRY':'0', 'PI_SKIP_VERSION_CHECK':'1'}
     if (root/'linux-python-runtime.json').exists() or (root/'linux-python-runtime.json').is_symlink():
         spec = importlib.util.spec_from_file_location('selected_linux_python', root/'scripts/linux-python-runtime.py')
         runtime = importlib.util.module_from_spec(spec); spec.loader.exec_module(runtime)
-        runtime.resolve(root, config['python'])
-    env = {**os.environ, 'PYTHONPATH':str(root/'apps/native'), 'AUGMENTOR_PYTHON':config['python'], 'AUGMENTOR_PI_NODE':config['node'],
-           'PI_TELEMETRY':'0', 'PI_SKIP_VERSION_CHECK':'1'}
+        env = runtime.environment(root, config['python'], env)
     if config.get('dshService'): env['AUGMENTOR_DSH_SERVICE'] = config['dshService']
     if not env.get('QT_QPA_PLATFORM') and env.get('XDG_SESSION_TYPE') == 'wayland' and env.get('DISPLAY'):
         env['QT_QPA_PLATFORM'] = 'xcb'

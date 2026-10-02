@@ -2,6 +2,26 @@
 
 # Start here: agent handoff
 
+## October 2 Noble source-runtime entrypoints
+
+[The source-profile guide](LINUX-SOURCE-RUNTIME-ENTRYPOINTS.md) and
+[actual report](../release/qualification/next-targets/20261002-noble-source-runtime-entrypoints.json)
+record a strict Ubuntu24.04/Python3.12 source-Qt candidate. Native payload/wheels
+share an immutable identity and verified pre-exec paths across Desktop, Browser,
+setup and DSH service startup. Offline preparation, clean57-object closure, cold
+Browser selection, offscreen desktop screenshot and isolated stage/activate/rollback
+pass; a corrupted Qt library is refused before exec without repairing selection.
+Full native session/product/packages/Browser/audio and legal qualification remain
+false; the22-file license decision is pending. All five rollout points remain active.
+
+Both5f5d7d8 hosted service-fixture checks pass:
+[Linux37055981988](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37055981988)
+and [Mac37055981975](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37055981975).
+The prior3f52af2 hosted native suites each run771 tests:769pass and two Mac-only skips
+on Debian13, Ubuntu26.04 and Fedora43/44. The current source-profile change needs
+its own hosted results. Existing selected owner/guest artifacts, models, GPUs and
+physical audio remain unchanged. Historical failed fixture/dependency runs are retained.
+
 ## October2 isolated native accessibility service fences
 
 [The new report](../release/qualification/next-targets/20261002-isolated-native-a11y-services.json)

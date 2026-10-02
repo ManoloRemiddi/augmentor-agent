@@ -47,5 +47,19 @@ class DebianTargetTests(unittest.TestCase):
                 run.assert_not_called()
             self.assertFalse(root.exists())
 
+    def test_source_qt_recipe_explicitly_supplies_icu74_and_native_closure(self):
+        runtime,_=debian.dependencies(debian.NOBLE,'0.2.13',source_qt=True)
+        for name in ('libicu74','libdouble-conversion3','libssl3t64','libwebpdemux2','libwayland-client0','libxcb-glx0','libpcre2-16-0'):
+            self.assertIn(name,runtime)
+        self.assertNotIn('libicu74',debian.dependencies(debian.NOBLE,'0.2.13')[0])
+        with self.assertRaisesRegex(ValueError,'limited to Noble'):
+            debian.dependencies('debian13-amd64','0.2.13',source_qt=True)
+
+    def test_source_qt_cannot_package_another_distro_before_any_build_step(self):
+        with tempfile.TemporaryDirectory() as directory,patch.object(debian.subprocess,'run') as run:
+            with self.assertRaisesRegex(ValueError,'requires the Noble target'):
+                debian.build(Path(directory)/'out','ubuntu26.04-amd64',source_qt=True)
+            run.assert_not_called();self.assertFalse((Path(directory)/'out').exists())
+
 
 if __name__=='__main__':unittest.main()

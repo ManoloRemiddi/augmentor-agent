@@ -2,6 +2,27 @@
 
 # Linux distribution rollout
 
+## October 2 source-runtime entrypoint contract
+
+The distinct Noble source-Qt voice profile now binds the reviewed native payload,
+derived PySide6 and source-built shiboken6 to the same immutable runtime identity.
+It verifies67 files/18 SONAME links, supplies pre-exec native paths through actual
+Desktop/Browser/setup/DSH entrypoints, and keeps vendor/system profiles separate.
+The opt-in Noble package recipe includes systemICU74 and explicit native closure.
+See [implementation, actual evidence and open gates](LINUX-SOURCE-RUNTIME-ENTRYPOINTS.md)
+and [the report](../release/qualification/next-targets/20261002-noble-source-runtime-entrypoints.json).
+Offline preparation, all11 bindings,57 native dependency closures, cold Browser
+selection, offscreen desktop preview and isolated stage/activate/rollback pass.
+Corrupted native bytes are refused before exec and previous receipt/selection
+remain intact. Native Wayland/xcb, complete packages/product/graphical Browser/
+physical audio/other profiles/source-legal qualification remain open.
+
+Both5f5d7d8 Linux/Mac hosted service-fixture checks pass. The prior3f52af2 hosted
+native suites each run771 tests with769 passes and two Mac-only skips across
+Debian13, Ubuntu26.04 and Fedora43/44. Current source-profile hosted checks are
+required separately. All five points remain active; no owner selection or license
+grant changed.
+
 ## October 2 authenticated source runtime completion
 
 [The completed recipient proof](../release/qualification/next-targets/20261002-authenticated-source-runtime-completion.json)

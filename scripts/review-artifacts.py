@@ -4,10 +4,12 @@
 import argparse
 import hashlib
 import io
+import importlib.util
 import json
 from pathlib import Path,PurePosixPath
 import subprocess
 import tarfile
+import tempfile
 import zipfile
 p=argparse.ArgumentParser(description=__doc__);p.add_argument('--debian',type=Path,required=True);p.add_argument('--browser',type=Path,help='Include extension review when distributing a browser ZIP');p.add_argument('--output',type=Path,required=True);a=p.parse_args()
 deb=json.loads((a.debian/'artifacts.json').read_text());browser=json.loads((a.browser/'artifacts.json').read_text()) if a.browser else None
@@ -26,13 +28,14 @@ if browser:
 results=[]
 for artifact in deb['artifacts']:
     path=a.debian/artifact['file'];process=subprocess.Popen(['dpkg-deb','--fsys-tarfile',str(path)],stdout=subprocess.PIPE)
-    included={};hashes={};count=0
+    included={};hashes={};links={};count=0
     with tarfile.open(fileobj=process.stdout,mode='r|') as archive:
         for member in archive:
             name=member.name.removeprefix('./');parts=PurePosixPath(name).parts;count+=1
             assert not name.startswith('/') and '..' not in parts,name
             assert not any(part in ('.git','.dsh','.pi','outputs','__pycache__') for part in parts),name
             assert PurePosixPath(name).name not in ('auth.json','models.json','harnesses.json','appearance.json','memory.sqlite3','prompts.sqlite3','.env'),name
+            if member.issym():links[name.removeprefix('usr/lib/augmentor/')]=member.linkname
             if member.isfile():
                 data=archive.extractfile(member).read();relative=name.removeprefix('usr/lib/augmentor/')
                 hashes[relative]=hashlib.sha256(data).hexdigest()
@@ -79,6 +82,34 @@ for artifact in deb['artifacts']:
                 base=str(PurePosixPath(collection['record']).parent)+'/'
                 for row in notice_record['files']:
                     assert hashes[base+row.get('path',row.get('file'))]==row['sha256']
+            if 'sourceQt' in policy:
+                spec=importlib.util.spec_from_file_location('artifact_source_qt',Path(__file__).with_name('linux-source-qt.py'))
+                qt=importlib.util.module_from_spec(spec);spec.loader.exec_module(qt)
+                assert contract['sourceQt']==qt.contract(policy)==wheels['sourceQt']['contract']
+                prefix='python-wheels/'+policy['sourceQt']['directory']+'/'
+                manifest_path=prefix+'stage-inventory.json'
+                assert hashes[manifest_path]==policy['sourceQt']['manifestSha256']
+                native=json.loads(included[manifest_path]);assert native==wheels['sourceQt']['manifest']
+                expected_files={prefix+row['path'] for row in native['files']}|{manifest_path}
+                assert {name for name in included if name.startswith(prefix)}==expected_files
+                assert {name:target for name,target in links.items() if name.startswith(prefix)}=={
+                    prefix+row['path']:row['target'] for row in native['symlinks']}
+                receipt=policy['sourceQt']['derivationReceipt'];content=included['python-wheels/'+receipt['file']]
+                assert len(content)==receipt['bytes'] and hashlib.sha256(content).hexdigest()==receipt['sha256']
+                # Reconstruct only validated relative regular-file/link names;
+                # the shared finite verifier also checks types and link targets.
+                with tempfile.TemporaryDirectory(prefix='review-source-qt-') as folder:
+                    root=Path(folder)
+                    for name in expected_files:
+                        relative=qt.relative(name.removeprefix(prefix));dest=root/str(relative)
+                        dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(included[name])
+                    for row in native['symlinks']:
+                        relative=qt.relative(row['path']);target=qt.relative(row['target'])
+                        assert len(target.parts)==1
+                        (root/str(relative)).symlink_to(str(target))
+                    qt.manifest(root,policy['sourceQt']['manifestSha256'])
+                result.update(verifiedSourceQtFiles=len(native['files']),verifiedSourceQtLinks=len(native['symlinks']),
+                              sourceQtManifestMatches=True,compiledContentNoticeMappingComplete=False)
             result.update(verifiedWheelArchives=len(wheels['wheels']), verifiedWheelElfMembers=sum(len(w['elfBinaries']) for w in wheels['wheels']),
                           originalWheelNoticeBytesMatch=True, supplementaryNoticeCollectionsMatch=True,
                           licenseReviewComplete=False, embeddedSourceCoverageComplete=False)

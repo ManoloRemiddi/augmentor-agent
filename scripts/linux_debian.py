@@ -16,12 +16,23 @@ NOBLE_DEPENDENCIES=[
     'libxcb-render-util0', 'libxcb-shape0', 'libxcb-xinerama0', 'libxcb-xkb1',
     'libxkbcommon-x11-0', 'libx11-xcb1', 'fonts-dejavu-core', 'libc6 (>= 2.39)', 'libstdc++6',
 ]
+NOBLE_SOURCE_QT_DEPENDENCIES = [
+    'libicu74', 'libdouble-conversion3', 'libfontconfig1', 'libfreetype6',
+    'libharfbuzz0b', 'libpcre2-16-0', 'libjpeg-turbo8', 'libpng16-16t64',
+    'libtiff6', 'libwebp7', 'libwebpdemux2', 'libwebpmux3', 'libssl3t64',
+    'libdbus-1-3', 'libbrotli1', 'libwayland-client0', 'libwayland-cursor0',
+    'libwayland-egl1', 'libxcb-glx0', 'libxcb-randr0', 'libxcb-render0',
+    'libxcb-shm0', 'libxcb-sync1', 'libxcb-xfixes0', 'libxkbcommon0',
+    'libzstd1', 'zlib1g', 'libgcc-s1', 'libx11-6', 'libxcb1', 'libglx0',
+]
 
 
-def dependencies(target,version):
+def dependencies(target,version, *, source_qt=False):
     if target not in TARGETS:raise ValueError('Unsupported Debian artifact target.')
+    if source_qt and target!=NOBLE:
+        raise ValueError('The source Qt dependency recipe is limited to Noble.')
     if target==NOBLE:
-        return ', '.join(NOBLE_DEPENDENCIES),f'augmentor-runtime (= {version}), libglib2.0-bin, wmctrl'
+        return ', '.join(NOBLE_DEPENDENCIES+(NOBLE_SOURCE_QT_DEPENDENCIES if source_qt else [])),f'augmentor-runtime (= {version}), libglib2.0-bin, wmctrl'
     runtime='python3 (>= 3.11), python3-yaml, python3-websocket, python3-keyring (>= 25.6), python3-secretstorage, gnome-keyring, libc6 (>= 2.36), libstdc++6'
     desktop=f'augmentor-runtime (= {version}), python3-pyside6.qtcore (>= 6.8.2.1), python3-pyside6.qtgui, python3-pyside6.qtwidgets, python3-pyside6.qtnetwork, python3-pyside6.qtdbus, python3-pyside6.qtquick, python3-pyside6.qtquickwidgets, qml6-module-qtquick, qml6-module-qtqml, qml6-module-qtqml-models, qml6-module-qtqml-workerscript, libqt6svg6, qt6-svg-plugins, python3-gi, gir1.2-gtk-4.0, gir1.2-atspi-2.0, at-spi2-core, gir1.2-gstreamer-1.0, gstreamer1.0-pipewire, gstreamer1.0-plugins-base, python3-yaml, python3-websocket, python3-pygments (>= 2.18), python3-numpy (>= 1.24), fonts-dejavu-core, libglib2.0-bin, wmctrl'
     return runtime,desktop

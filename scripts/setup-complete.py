@@ -215,6 +215,9 @@ def install(args):
     runtime=data/'dsh-runtime';runtime.mkdir(parents=True,exist_ok=True)
     env={**os.environ,'AUGMENTOR_PYTHON':str(python),
          'PATH':str(node.parent)+':'+str(python.parent)+':'+os.environ.get('PATH','')}
+    if (app/'linux-python-runtime.json').exists() or (app/'linux-python-runtime.json').is_symlink():
+        python_runtime=load(app/'scripts/linux-python-runtime.py')
+        env=python_runtime.environment(app,str(python),env)
     for name in ('package.json','package-lock.json'):shutil.copy2(bundle/'dsh'/name,runtime/name)
     # New bundles carry the exact unpublished plugin tarballs referenced by the
     # shared lock. Older published bundles retain their registry-only graph.
@@ -227,6 +230,13 @@ def install(args):
     # Setup's supported-CLI discovery must use this exact freshly installed DSH.
     os.environ['PATH']=env['PATH']
     os.environ['AUGMENTOR_PYTHON']=str(python)
+    # Product setup also spawns Python children from this process. Give them
+    # the same verified native paths as its explicit subprocess environment.
+    if (app/'linux-python-runtime.json').exists() and python_runtime.policy(app/'linux-python-runtime.json')['profile']==python_runtime.SOURCE_PROFILE:
+        for key in ('LD_LIBRARY_PATH','QT_PLUGIN_PATH','QT_QPA_PLATFORM_PLUGIN_PATH','QML_IMPORT_PATH','QML2_IMPORT_PATH'):
+            os.environ[key]=env[key]
+        for key in ('QT_QPA_PLATFORMTHEME','QT_QPA_GENERIC_PLUGINS'):
+            os.environ.pop(key,None)
     config_home=Path(os.environ.get('AUGMENTOR_SHARED_CONFIG',config/'augmentor'))
     if (config_home/'harnesses.json').exists():
         saved=json.loads((config_home/'harnesses.json').read_text()).get('dsh',{})
@@ -249,13 +259,18 @@ def install(args):
     configure_product(app,cli,home,endpoint,env,state)
     units=config/'systemd/user';units.mkdir(parents=True,exist_ok=True)
     unit=units/'augmentor-dsh.service'
-    content=service([node,cli.resolve(),'web','--no-open','--host','127.0.0.1','--port',str(args.port)],home,state/'model.env',python)
+    command=[node,cli.resolve(),'web','--no-open','--host','127.0.0.1','--port',str(args.port)]
+    if (app/'linux-python-runtime.json').exists():
+        # System Python validates the immutable runtime before Node and its
+        # speech children start; also hold the package lifetime lease.
+        command=['/usr/bin/python3',app/'scripts/run-component.py','runtime',*command]
+    content=service(command,home,state/'model.env',python)
     if unit.exists() and unit.read_text()!=content:raise ValueError('Existing Augmentor DSH service differs.')
     write(unit,content)
     startup=load(app/'scripts/install-desktop-startup.py')
     startup.install(app,python,node,'augmentor-dsh.service',enable=not args.no_services)
     if not args.no_services:
-        run(python,app/'scripts/setup-default-shortcuts.py')
+        run(python,app/'scripts/setup-default-shortcuts.py',env=env)
     extension=data/'browser'/manifest['version']
     if extension.exists():shutil.rmtree(extension)
     extension.mkdir(parents=True)

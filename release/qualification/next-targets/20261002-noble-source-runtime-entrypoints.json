@@ -1,0 +1,206 @@
+{
+  "format": "augmentor-noble-source-runtime-entrypoints/1",
+  "profile": "noble-cp312-x86_64-source-qt-voice",
+  "lockIdentity": "2976a17cdfaee164cb01a7ce5f6e16afd5688403c48cc275cf2e7d68b1ad1c01",
+  "policySha256": "b24129c0b9c3ff8d864b492a39863246ddf56768e6b4c0df0f41e9b51e3f17a7",
+  "proofSha256": "e231045d57ec6b8a90ee48685f6eab38001f9bf5eb8cd7e006d4719f732af591",
+  "runtimeArtifactSha256": "77511cd9c047e3548cbdaa0cdb01b5380b2c994ba90b49929c8ea70cc8cc963b",
+  "runtimeFileCount": 1768,
+  "sourceFileSha256": {
+    "scripts/linux-python-runtime.py": "ba2a54daafdd2fc5104ce4e66996f5947d84abc02b7e14f1901b87ab6cdd79d7",
+    "scripts/linux-source-qt.py": "b7438c4427bc58b3c02fe0b08c25b4d0686b11e9a90eab2f8c92f6a3c03ae1ab",
+    "scripts/setup-complete.py": "f74bc785b9afd5158f7395fc7080345b9fba9210577bbb08a5ccac77227d2f95",
+    "scripts/run-component.py": "fbc4c3490ced219b0debb089438c9adcd5e3ed14b73f83ee62ac1a80535ae857",
+    "scripts/desktop-deployment.py": "9e7554dc55627318791e1c801c8d5fbd5286ca54b438214ab4ea864ced2ed3de",
+    "scripts/desktop-launch.py": "ad3692d104e44ae24fab902ab0c0d9c67a1590f649b8cf856c3fa11719d9a300",
+    "scripts/install-desktop-startup.py": "fe8fb81a3b364e5cd5abd74ab16e647af61c6e65c821a07d73874fb2929ac8e1",
+    "packages/platform/src/python.ts": "409e84a4872c7b88a4a44189c35c9ab3f70ab1ec75e9927dd02beac18b832f6e",
+    "apps/browser/shared/voice-client.mjs": "bf058b4ad7cb7d3e8c55313077d635b3109121654b2a50e2ea964841b4821d78",
+    "dist/platform/src/python.js": "851c55a94d9a8bc7ebbf6fc126887598fe46bb754ebfbf50a4be8e878b5cf6d6"
+  },
+  "offlineSourceRuntimePrepared": true,
+  "exactReuseWithoutReceiptRewrite": true,
+  "setupPreparedSameSourceProfile": true,
+  "deploymentNativeInputsPreserved": true,
+  "stagingPreservedPriorSelection": true,
+  "isolatedActivateAndRollbackPassed": true,
+  "desktopLaunchScreenshot": {
+    "bytes": 19607,
+    "sha256": "05a6db0f03d8399564b6f64e38d0c42342b8ecfc6dc86ecd67c05b14fe91aeee"
+  },
+  "corruptNativeRefusedBeforeExec": true,
+  "priorReceiptAndSelectionPreserved": true,
+  "restoredNativeInventoryVerified": true,
+  "noProducerBuildTree": true,
+  "fullProductTested": false,
+  "nativeDesktopSessionTested": false,
+  "graphicalBrowserTested": false,
+  "physicalAudioTested": false,
+  "fullPlasmaShaderRenderTested": false,
+  "cleanPackageInstallTested": false,
+  "licenseReviewComplete": false,
+  "embeddedSourceCoverageComplete": false,
+  "scope": "Ordinary-user source runtime and product entrypoint fixture in an offline disposable container; not an installed complete product, GNOME/KDE session, graphical Browser, physical audio or release qualification.",
+  "fixture": {
+    "base": "docker.io/library/ubuntu@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3",
+    "image": "sha256:471b0e897903f9396693c09864f7b1a67830ec9d56149d10fd02985de7bfc22b",
+    "uid": 1001,
+    "network": "none",
+    "init": true,
+    "cpuLimit": 2,
+    "memoryBytes": 2147483648,
+    "pidLimit": 256,
+    "capabilitiesDropped": [
+      "ALL"
+    ],
+    "noNewPrivileges": true,
+    "hostMounts": [],
+    "buildPackageRows": 374,
+    "compilerPresent": false,
+    "cmakePresent": false,
+    "dockerfileSha256": "2fd257d63aed560f0da8afb36c8af648325be1044be03979bbc4b2b40eed5d1b",
+    "buildLogSha256": "cf3eebc87ce32a046a69013ea723d3e6bbd365f489e89478ea5fd9c53a316f45"
+  },
+  "imports": {
+    "pythonAbi": [
+      3,
+      12
+    ],
+    "qtVersion": "6.8.2",
+    "managedVersions": {
+      "PySide6": "6.8.2.1",
+      "shiboken6": "6.8.2.1",
+      "Pygments": "2.18.0",
+      "keyring": "25.6.0",
+      "sounddevice": "0.5.2",
+      "onnxruntime": "1.28.0",
+      "protobuf": "7.35.1"
+    },
+    "systemQt": false,
+    "systemVersions": {
+      "SecretStorage": "3.3.3",
+      "jeepney": "0.8.0",
+      "cryptography": "41.0.7",
+      "cffi": "1.16.0",
+      "numpy": "1.26.4",
+      "PyYAML": "6.0.1",
+      "websocket-client": "1.7.0",
+      "jaraco.classes": "3.2.1",
+      "jaraco.context": "4.3.0",
+      "jaraco.functools": "4.0.0",
+      "more-itertools": "10.2.0"
+    },
+    "gtkVersion": [
+      4,
+      14,
+      5
+    ],
+    "portaudioVersion": [
+      1246720,
+      "PortAudio V19.6.0-devel, revision 396fe4b6699ae929d3a685b3ef8a7e97396139a4"
+    ],
+    "explicitCredentialBackend": "keyring.backends.SecretService.Keyring",
+    "secretServiceLifecycleTested": false,
+    "physicalAudioTested": false,
+    "handsFreeTested": false
+  },
+  "nativeImports": {
+    "mappedNativeLibraryCount": 15,
+    "allMappedQtLibrariesInsideVerifiedRuntime": true,
+    "offscreenPlatform": true,
+    "qmlComponentCreated": true,
+    "managedOriginsInsideVenv": true,
+    "systemGiOutsideVenv": true,
+    "qtVersion": "6.8.2",
+    "requestedBindingModulesImported": 11
+  },
+  "speech": {
+    "onnxruntime": "1.28.0",
+    "protobuf": "7.35.1",
+    "availableProviders": [
+      "AzureExecutionProvider",
+      "CPUExecutionProvider"
+    ],
+    "cpuVadExecutionTestedInThisFixture": false
+  },
+  "coldBrowserSelection": {
+    "desktopRuntimeBrowserSelectedSameInterpreter": true,
+    "wrongNativeEnvironmentRefused": true,
+    "realBrowserWindowTested": false
+  },
+  "cleanNativeClosure": {
+    "nativeObjects": 57,
+    "missingDependencies": false,
+    "systemIcu74": "74.2-1ubuntu3.1",
+    "rawReportSha256": "d659b0e628565e0b3ac9d53102d1a454b3d25ffc9181d9841b0b32acb38579ed",
+    "compiledContentNoticeMappingComplete": false
+  },
+  "rawProofSha256": "dd90e03624f33973403dfcd3388ac0018dd48946b0086ef81edfbd60073d7f64",
+  "initialPreparation": {
+    "executedRuntimeToolSha256": "2dd40002c773ead40787199d93387a1425baeec599fab19b0b111256361adaca",
+    "stdoutSha256": "3cd12f6503921c42705f467414845b370df717fe5eb4b1a1a6e4911e35996b9c",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "laterProofRuntimeToolSha256": "ba2a54daafdd2fc5104ce4e66996f5947d84abc02b7e14f1901b87ab6cdd79d7",
+    "difference": "Later runtime tool adds source preload/audit refusal before the system-Python ABI subprocess; initial preparation had no preload/audit and is preserved."
+  },
+  "observedSetupFailure": {
+    "operation": "Root chown after Docker cp",
+    "result": "Operation not permitted with cap-drop ALL",
+    "nativeProbeHadNotStarted": true,
+    "recovery": "Same inputs extracted into a fresh home location by UID1001; no capability was added",
+    "recordSha256": "f841189944c07eaf75baad3399e5048d982f688aac9d08c6db096d04be4bd5b3"
+  },
+  "validation": {
+    "syntheticNativePayloadTests": 13,
+    "syntheticNativePayloadTestsPassed": 13,
+    "nativePayloadTestLogSha256": "e972af4649331fac01a9c1e6a48c281554bd26586faed027bd02b3ec4484a3b4",
+    "targetedNodeIdentityTests": 3,
+    "targetedNodeIdentityTestsPassed": 3,
+    "archNativeSuite": {
+      "tests": 782,
+      "passed": 780,
+      "skipped": 2,
+      "logSha256": "a9b52f289f15d9cc3935d34494cf7a84cd9a073e2796234328ec38e55d19e005",
+      "scope": "Current public implementation with the first11 native-payload tests; two later source tests are separately verified and require new hosted suite results."
+    },
+    "hostNodeSuite": {
+      "tests": 509,
+      "passed": 503,
+      "failed": 4,
+      "skipped": 2,
+      "failure": "Four native Qt fixtures lack the host PySide6.QtTest dependency; no host dependency was installed.",
+      "logSha256": "03229d21ec40484e0e9dc5f494cbfe28321af5366ae4246ae990bea999363b30"
+    },
+    "archNodeAttempt": {
+      "tests": 505,
+      "passed": 451,
+      "failed": 51,
+      "skipped": 3,
+      "failure": "Fixture lacks the DSH qualification host and Chromium prerequisites; retained as an incomplete environment run.",
+      "logSha256": "ca4c33ca0082de678a6ddf0ea0e53ec4aa2ee83e67480e8494589d3eb29cc462"
+    },
+    "sourcePackageRecipeTests": {
+      "tests": 5,
+      "passed": 5,
+      "logSha256": "e9a7f96d80e75748bdb081b62de4ac49c58bf031d01b2118200ae29fe2332519"
+    },
+    "targetedNodeIdentityLogSha256": "b32a7fdecdd6cafb8af97a33b75e5e300cbd4b30c35a73ca0840566a46d5cc59"
+  },
+  "historicalFirstProof": {
+    "rawProofSha256": "2a6c7e826605882e1fcbe1ba9b20881d689090cb16d4636e89b972a4c635bb05",
+    "sourceFileSha256": {
+      "scripts/linux-python-runtime.py": "ba2a54daafdd2fc5104ce4e66996f5947d84abc02b7e14f1901b87ab6cdd79d7",
+      "scripts/linux-source-qt.py": "b7438c4427bc58b3c02fe0b08c25b4d0686b11e9a90eab2f8c92f6a3c03ae1ab",
+      "scripts/setup-complete.py": "f74bc785b9afd5158f7395fc7080345b9fba9210577bbb08a5ccac77227d2f95",
+      "scripts/run-component.py": "fbc4c3490ced219b0debb089438c9adcd5e3ed14b73f83ee62ac1a80535ae857",
+      "scripts/desktop-deployment.py": "c4be2c556bcd18a0834c9fa95049ce1f2a422c47a9671d547d6742ad373950c9",
+      "scripts/desktop-launch.py": "ad3692d104e44ae24fab902ab0c0d9c67a1590f649b8cf856c3fa11719d9a300",
+      "scripts/install-desktop-startup.py": "fe8fb81a3b364e5cd5abd74ab16e647af61c6e65c821a07d73874fb2929ac8e1",
+      "packages/platform/src/python.ts": "409e84a4872c7b88a4a44189c35c9ab3f70ab1ec75e9927dd02beac18b832f6e",
+      "apps/browser/shared/voice-client.mjs": "bf058b4ad7cb7d3e8c55313077d635b3109121654b2a50e2ea964841b4821d78",
+      "dist/platform/src/python.js": "851c55a94d9a8bc7ebbf6fc126887598fe46bb754ebfbf50a4be8e878b5cf6d6"
+    },
+    "scope": "First actual entrypoint pass, before source staging explicitly reverified the copied wheel/native inputs; preserved, not relabelled."
+  },
+  "currentProofScope": "Repeat in the same owned offline fixture using a new source candidate, the previously verified runtime and a fresh proof-output directory; original source candidate and first outputs preserved. Staging now explicitly verifies copied wheels/native payload before candidate checks."
+}

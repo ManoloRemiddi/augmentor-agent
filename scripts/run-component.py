@@ -15,8 +15,8 @@ def component_environment(root):
     if marker.exists() or marker.is_symlink():
         spec=importlib.util.spec_from_file_location('component_linux_python',root/'scripts/linux-python-runtime.py')
         runtime=importlib.util.module_from_spec(spec);spec.loader.exec_module(runtime)
-        python=runtime.resolve(root,env.get('AUGMENTOR_PYTHON'))
-        env['AUGMENTOR_PYTHON']=python
+        env=runtime.environment(root,env.get('AUGMENTOR_PYTHON'),env)
+        python=env['AUGMENTOR_PYTHON']
         env['PATH']=str(Path(python).parent)+os.pathsep+env.get('PATH','')
     return env
 
