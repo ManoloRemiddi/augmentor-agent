@@ -2,12 +2,69 @@
 
 # GNOME consent and control implementation plan
 
-This is pinned source research, not executed control qualification. Existing
-GNOME observers are read-only and inputQualified stays false. Actual GNOME48/46/
-50 observer sessions do not grant control consent, input or visible Stop passes.
-Current portal.py constructs KWin and rejects non-KDE sessions; service.py runs
-backend calls on the GUI GLib loop. Both need explicit adaptation and regression
-qualification before enabling GNOME input.
+Production GNOME observers remain read-only and inputQualified stays false.
+The separate input-free consent candidate below now exercises real Fedora50
+portal consent and Stop; it does not enable production GNOME control. Current
+portal.py constructs KWin and rejects non-KDE sessions; service.py runs backend
+calls on the GUI GLib loop. Both still need integration and KDE regression before
+enabling GNOME input.
+
+## October 2 native consent and worker checkpoint
+
+The [checked report](../release/qualification/next-targets/20261002-gnome-native-consent.json)
+binds exact candidate bytes separately from the unchanged selected Fedora44
+application. [ConsentSession](../services/desktop/portal_session.py) owns an
+independent bus on a private GLib context. It pins frontend/backend/Shell owners,
+registers the app only if advertised, subscribes before dispatch and validates
+precomputed request/session identities. Cancellation advances a generation and
+cancels the RPC immediately; an unanswered request or late session grant is
+closed through its already retained owned identity. Cleanup detaches and closes
+the PipeWire FD, session and request, with separate bounded uncancelled cleanup
+calls. No input method is implemented or sent by this component.
+
+[Worker](../services/desktop/worker.py) serializes tasks even while portal response
+waits pump its private context. A second cleanup task cannot reenter a pending
+connect operation. Qt stays on its own GUI thread; futures retain failures and
+close checks worker termination. Eleven focused tests cover real nested GLib
+scheduling, Qt timer/Stop responsiveness, owner/identity fences, late grants and
+FD cleanup. Full isolated Arch source regression passes721 cases:719 pass/two
+Mac-only skips. The initial invocation omitted Node/PYTHONPATH and is retained;
+the corrected invocation uses the existing pinned Node24.19.0, compiled source
+and exact production lock dependencies. Linux-only GLib tests skip where the
+runtime is absent; hosted Mac remains an independent regression gate.
+
+The [probe](../release/probe-gnome-portal-consent.py) requires the owned ordinary-user
+Fedora QEMU marker, SELinux enforcing, GNOME Wayland and the exact unchanged
+selected artifact. Separately stage its three hashed files in a private candidate
+directory and run with `--candidate gnome-control-probe-vN --qt-platform xcb`
+and `--source <exact selected source>`. It reuses only the installed unchanged
+Banner class; the production client/launcher already selects xcb on Wayland.
+The qualification probe allows180 seconds for manually inspected consent; the
+component default is80 and all timeouts are bounded. Reports include the actual
+platform, request phases, GUI ticks, source hashes and unchanged selection checks.
+Never use this disposable fixture driver on an owner's desktop.
+
+Actual Fedora50 RemoteDesktop2/ScreenCast5 advertises device/source/cursor masks7
+and Registry. Native Cancel closes resources without input on the exact current
+180-second probe, alongside separately hashed earlier candidates. Sharing with
+remote interaction OFF is refused.
+Explicit interaction ON and Share grants devices3 and one monitor node, logical
+position(0,0), size1280×800, source_type1 and mapping_id. These observed values
+still require strict geometry/topology validation before execution. Actual visible
+Stop during consent discards the late result; Stop after successful consent closes
+all resources and exits the probe. Qt ticks continue throughout cleanup. No
+pointer/typing/capture, target selection or production integration is claimed.
+
+The first probe timed out but left its banner/process alive due an error-cleanup
+bug; it was terminated only after confirming the exact owned process. Its native
+Qt Wayland Tool banner was unavailable on the normal desktop, so that run is
+excluded from acceptance. Revised cleanup and current xcb runs are separately
+recorded. QEMU captures also include partial redraws and the selected app can
+cover the native portal; complete graphical rendering is not qualified. Dismissing
+only the fixture DSH dialog's Later button changes no provider or configuration.
+Native revocation, service/extension restart, password lock, scaled/topology cases,
+Ubuntu consent, input/scene/AT-SPI integration and KDE threading regression remain
+open. All five original rollout points remain active.
 
 ## Portal negotiation and identity
 

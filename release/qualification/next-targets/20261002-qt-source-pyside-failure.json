@@ -195,5 +195,64 @@
     "initialQtConfigurationStarted": true,
     "buildStillRunningAtCheckpoint": true,
     "fullRuntimeBuilt": false
+  },
+  "fourthFinalFailure": {
+    "finalBuildReportSha256": "5c77b7161ea1a219386915e4e5aba30bdb4ec8998cfaa860c5fe3eacd431f94c",
+    "pysideLogSha256": "3c38610817ac89888e156bc22dff323487c10fcd4600ffd5997386a6dbddb112",
+    "completedInstallModules": [
+      "qtbase",
+      "qtshadertools",
+      "qtsvg",
+      "qtimageformats",
+      "qtdeclarative",
+      "qtwayland"
+    ],
+    "pysideStepExit": 1,
+    "observedFailure": "QtQuick generated binding requires pyside6_qtopengl_python.h, but supplied module subset configures OpenGL after Quick; its generated include directory is missing",
+    "upstreamSourcesVerified": "Pinned PySide6.8.2.1 PySideHelpers.cmake collect_module_if_found lines184-186/264; PySide6/CMakeLists.txt lines56-62; PySideModules.cmake check_qt_opengl lines26-37 and HAS_QT_MODULE lines389-395",
+    "stoppedAndPreserved": true,
+    "runtimeBuilt": false
+  },
+  "fifthBuild": {
+    "infrastructure": {
+      "sourceBase": "bedd7bd11ac4434c514f0010dbca679aeabf4de3",
+      "imageId": "sha256:f1a028f702c9dd57596440ea4bfb2e75406029d931e206f255d8ae4dfdf1b856",
+      "containerId": "f93cdff4177f759449dd0cd8c735e9649987d2c6afeb29d60d3b5e6cb529832c",
+      "containerName": "augmentor-noble-qt-source-20261002-e",
+      "basePin": "docker.io/library/ubuntu@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3",
+      "dockerfileSha256": "7891409bc183c09653a5d340b8e98f363c2f3dbbd6e11d0d7ed57c9d13a10fd2",
+      "toolSha256": "c20446543b469472db29f56a34a9305b4fcc5e22c5678779b9d8f290ff61092a",
+      "policySha256": "969dca5093394282eef5517ade6e0bcb31d1a9ceb1b22513d213aa9ef434196e",
+      "recipeUncommitted": true,
+      "cpuLimit": 2,
+      "memoryLimitBytes": 8589934592,
+      "pidsLimit": 512,
+      "hostMounts": false,
+      "hostDevices": false,
+      "buildNetwork": "none",
+      "previousBuildPreservedUnqualified": true,
+      "freshRootAndSources": true,
+      "pythonPreflight": {
+        "executable": "/work/build-python/bin/python3.12",
+        "prefix": "/work/build-python",
+        "basePrefix": "/usr",
+        "default": {
+          "purelib": "/work/build-python/lib/python3.12/site-packages",
+          "data": "/work/build-python"
+        },
+        "posixPrefix": {
+          "purelib": "/work/build-python/lib/python3.12/site-packages",
+          "data": "/work/build-python"
+        }
+      },
+      "ownerStateChanged": false,
+      "pysideModuleDependencyOrder": "OpenGL before Qml and Quick; upstream CMake per-module generated-header variables"
+    },
+    "freshRootAndSources": true,
+    "sameSignedDependencyImage": true,
+    "noIntermediateBuildReuse": true,
+    "orderedSubset": "Core,Gui,Widgets,Network,DBus,Svg,OpenGL,Qml,Quick,QuickWidgets,Test",
+    "buildStillRunningAtCheckpoint": true,
+    "fullRuntimeBuilt": false
   }
 }

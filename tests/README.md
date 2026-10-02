@@ -466,3 +466,15 @@ The inert spice under `tests/fixtures/cinnamon-shortcut-spice` is test-only and
 must remain disabled after the owned VM conflict test.710 native cases/708 pass/
 two platform skips is source evidence; physical keyboard and full Mint product
 acceptance remain separate.
+
+
+`test_desktop_worker.py` uses a real private GLib context and Qt event loop to
+verify nested response waits cannot execute queued cleanup and GUI Stop/timers
+remain responsive. `test_desktop_consent_session.py` uses synthetic bus replies
+for unique-owner, expected-identity, generation/late grant and FD cleanup fences.
+Eleven cases pass; these Linux GLib cases skip where that runtime is absent.
+`release/probe-gnome-portal-consent.py` is an input-free actual Fedora QEMU probe,
+separately staged as documented in the [GNOME plan](../docs/LINUX-GNOME-CONTROL-PLAN.md).
+The [checked evidence](../release/qualification/next-targets/20261002-gnome-native-consent.json)
+keeps first failures, exact candidates and source721-case regression separate from
+production GNOME control, capture, lock/restart and public release qualification.

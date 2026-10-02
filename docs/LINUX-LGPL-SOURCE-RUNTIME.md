@@ -22,9 +22,16 @@ upstream build_info_collector/ShibokenHelpers and actual sysconfig probes verify
 the mismatch. The [official Linux venv workflow](https://doc.qt.io/qtforpython-6.8/building_from_source/linux.html)
 makes both schemes agree. The fourth clean image creates a system-site-package
 venv without pip/network; its driver verifies equal scheme suffixes and patchelf
-before Qt compilation. Actual preflight passes and initial configuration starts.
-No intermediate binaries were reused. Runtime completion and every downstream qualification gate remain
-false. The original checkpoint below remains historical.
+before Qt compilation. All six Qt modules finish, but PySide QtQuick compilation
+fails because its generated OpenGL header directory is absent. The supplied
+subset configured OpenGL after Quick. Pinned upstream `collect_module_if_found`,
+`HAS_QT_MODULE` and `check_qt_opengl` establish the ordering dependency; no upstream
+source is patched. That fourth tree/log is stopped and preserved. A fifth fresh
+root extracts the same verified archives, uses the same signed dependency image
+and orders OpenGL before Qml/Quick. It is compiling QtDeclarative at this checkpoint;
+no intermediate binaries are reused. Runtime completion and every downstream
+qualification gate remain false. Historical checkpoints and all failures remain
+in the report; a started build is not completion.
 
 Build a separate artifact. Do not relabel the current vendor PyPI wheels, delete
 their GPL-only libraries without closure review or assume a commercial license.
@@ -96,7 +103,7 @@ Build PySide using Python 3.12 and the reviewed setup.py options:
 
 ```sh
 /work/build-python/bin/python3.12 setup.py bdist_wheel --qtpaths=<prefix>/bin/qtpaths \
-  --module-subset=Core,Gui,Widgets,Network,DBus,Svg,Qml,Quick,QuickWidgets,OpenGL,Test \
+  --module-subset=Core,Gui,Widgets,Network,DBus,Svg,OpenGL,Qml,Quick,QuickWidgets,Test \
   --no-qt-tools --limited-api=yes --parallel=2
 ```
 

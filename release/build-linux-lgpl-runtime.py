@@ -109,8 +109,10 @@ def main():
             run(module,'compile',['cmake','--build','.', '--parallel','2'],build)
             run(module,'install',['cmake','--install','.'],build)
         source=Path(report['sources']['pyside-setup']['sourceDirectory'])
+        # Upstream processes this subset in the supplied order. QtQuick's
+        # check_qt_opengl consumes QtOpenGL_GEN_DIR during configuration.
         run('pyside-setup','wheel',[sys.executable,'setup.py','bdist_wheel','--qtpaths='+str(prefix/'bin/qtpaths'),
-            '--module-subset=Core,Gui,Widgets,Network,DBus,Svg,Qml,Quick,QuickWidgets,OpenGL,Test',
+            '--module-subset=Core,Gui,Widgets,Network,DBus,Svg,OpenGL,Qml,Quick,QuickWidgets,Test',
             '--no-qt-tools','--limited-api=yes','--parallel=2'],source)
         report['runtimeBuilt']=True;save();print('Build completed; all downstream qualification gates remain open.',flush=True)
     except Exception as error:

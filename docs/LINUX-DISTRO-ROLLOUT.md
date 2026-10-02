@@ -2,7 +2,28 @@
 
 # Linux distribution rollout
 
-## October 2 native Cinnamon shortcut/recovery checkpoint
+## October 2 native GNOME consent and source dependency checkpoint
+
+The separate [GNOME consent candidate](LINUX-GNOME-CONTROL-PLAN.md#october-2-native-consent-and-worker-checkpoint)
+now passes actual Fedora50 native Cancel, incomplete interaction grant refusal,
+explicit keyboard/pointer/one-monitor consent and visible Stop both during consent
+and after activation. It sends no input and leaves the selected app unchanged.
+The dedicated worker prevents nested-response cleanup reentry and keeps Qt
+responsive. The first timeout/banner failure is preserved and excluded; subsequent
+timeouts close resources. Current xcb banner matches the production launch choice;
+native Qt Wayland/complete rendering remains unqualified. Full isolated native
+source regression:721 cases,719 pass/two platform skips. Eleven focused worker/
+consent cases pass. Production GNOME input stays disabled; target/geometry/AT-SPI,
+revocation/restart/lock, Ubuntu and KDE regression remain open.
+
+Fourth fresh Qt source build finishes all six modules but PySide compilation
+fails on a verified OpenGL generated-header dependency. Its exact stopped tree/
+log is retained. The fifth fresh offline build orders OpenGL before Quick and
+is compiling QtDeclarative. Runtime completion/license/closure/rebuild/replacement
+and release remain false. Both bedd7bd hosted Linux/Mac workflows pass. Continue
+all five original rollout points; source publication does not install a candidate.
+
+## October 2 native Cinnamon shortcut/recovery checkpoint (historical)
 
 The [Cinnamon helper](LINUX-CINNAMON-ADAPTER.md#native-shortcut-helper-and-interruption-recovery)
 now uses native numeric rows, bounded GTK3 worker and a durable pre-mutation

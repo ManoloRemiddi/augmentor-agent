@@ -2,6 +2,27 @@
 
 # Start here: agent handoff
 
+## October 2 GNOME input-free consent and PySide dependency checkpoint
+
+The [checked GNOME report](../release/qualification/next-targets/20261002-gnome-native-consent.json)
+and [owning plan](LINUX-GNOME-CONTROL-PLAN.md) now record a separate real Fedora50
+consent probe: native Cancel, remote-interaction-disabled refusal, explicit device3
+and one monitor, visible Stop during consent and after activation. No portal input
+is sent, production GNOME input remains disabled and the selected app is unchanged.
+The private GLib worker serializes nested waits; eleven focused cases and all721
+native cases (719 pass/two Mac-only skips) pass in owned Arch. First probe timeout/
+Wayland banner failure and initial bad test environment are retained. Finish live
+revocation/restart/password/scaling, guarded GNOME input/scene/AT-SPI integration,
+Ubuntu acceptance and actual KDE threading regression before enabling control.
+
+Fourth source build completes Qt but fails PySide QtQuick's missing generated
+OpenGL header path. Upstream CMake confirms subset ordering; fifth fresh offline
+build places OpenGL before Qml/Quick and is compiling QtDeclarative. Read
+[source runtime work](LINUX-LGPL-SOURCE-RUNTIME.md); full runtime/license/closure/
+independent rebuild/replacement/release gates remain false. Both bedd7bd hosted
+workflows pass. All five original remaining rollout points stay active; no owner
+services/devices/settings or selected application artifacts changed.
+
 ## October 2 native Cinnamon shortcut/recovery checkpoint
 
 The [Cinnamon helper](LINUX-CINNAMON-ADAPTER.md#native-shortcut-helper-and-interruption-recovery)
