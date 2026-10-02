@@ -5,11 +5,14 @@
 Run through the dedicated guest user's SSH session. Prints private fixture
 metadata; a successful inspection is not connected-harness or input acceptance.
 """
+import argparse
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
 import socket
+import re
 import subprocess
 import sys
 
@@ -27,8 +30,22 @@ if (os.geteuid() == 0 or os.environ.get('USER') != 'augmentor-proof'
         or output(['systemd-detect-virt']) != 'qemu'):
     raise SystemExit('Run only as the dedicated ordinary user in the owned Fedora GNOME guest.')
 
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--managed-source')
+args = parser.parse_args()
+selection = json.loads((Path.home()/'.local/share/augmentor/desktop.json').read_text())
 root = Path('/usr/lib/augmentor')
+if args.managed_source:
+    assert re.fullmatch('[0-9a-f]{40}', args.managed_source)
+    data = Path.home()/'.local/share/augmentor'
+    root = Path(selection['root'])
+    assert root.is_relative_to(data/'releases') and selection['sourceRef'] == args.managed_source
+    spec = importlib.util.spec_from_file_location('owned_managed_deployment', data/'desktop-deployment.py')
+    deployment = importlib.util.module_from_spec(spec); spec.loader.exec_module(deployment)
+    deployment.verify(root)
 release = json.loads((root/'release.json').read_text())
+if args.managed_source:
+    assert release['source'] == {'commit': args.managed_source, 'dirty': False}
 subprocess.run(['rpm', '-V', 'augmentor-agent'], check=True, timeout=30)
 environment = properties(['systemctl', '--user', 'show-environment'])
 for name in ('DISPLAY', 'WAYLAND_DISPLAY', 'XAUTHORITY', 'XDG_CURRENT_DESKTOP',
@@ -59,7 +76,6 @@ assert int(service['MainPID']) == desktop['pid'] and desktop['buildRoot'] == str
 command = Path('/proc')/str(desktop['pid'])/'cmdline'
 arguments = command.read_bytes().split(b'\0')
 assert b'--ensure-running' in arguments and b'--preview' not in arguments
-selection = json.loads((Path.home()/'.local/share/augmentor/desktop.json').read_text())
 assert selection['root'] == str(root)
 sys.path.insert(0, str(root/'services/desktop'))
 from gnome import GnomeObserver
@@ -68,6 +84,8 @@ scene = GnomeObserver(Gio.bus_get_sync(Gio.BusType.SESSION, None)).read()
 assert scene['guards']['screenShieldAvailable'] is True
 report = {'format': 'augmentor-gnome-full-vm-inspection/1',
     'source': release['source'], 'version': release['version'],
+    'selectedRoot': str(root), 'selection': selection,
+    'managedInventoryVerified': bool(args.managed_source),
     'inspectionSha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
     'packageVerified': True, 'selinuxEnforcing': True, 'graphicalSessions': sessions,
     'service': service, 'desktop': desktop, 'scene': scene,

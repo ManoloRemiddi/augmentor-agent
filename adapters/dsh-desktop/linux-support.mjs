@@ -2,10 +2,11 @@
 // Carried forward from the working native Linux integration.
 import {spawn} from "node:child_process"
 import {fileURLToPath} from "node:url"
+import {pythonExecutable,componentEnvironment} from '../../dist/platform/src/index.js'
 const backend=fileURLToPath(new URL("../../services/desktop/linux-support/desktop.py",import.meta.url))
 export function runDesktop(request, signal) {
   return new Promise((resolve, reject) => {
-    const child = spawn('/usr/bin/python3', [backend], {stdio: ['pipe', 'pipe', 'pipe'], signal})
+    const child = spawn(pythonExecutable(), [backend], {stdio: ['pipe', 'pipe', 'pipe'], signal, env: componentEnvironment()})
     let out = '', error = '', settled = false
     const finish = (err, value) => {
       if (settled) return

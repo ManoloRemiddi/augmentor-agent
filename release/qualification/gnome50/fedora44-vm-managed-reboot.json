@@ -1,0 +1,138 @@
+{
+  "format": "augmentor-gnome-full-vm-reboot/1",
+  "source": {
+    "commit": "aef93bb04520a003c5c48536aa6d4210105fc8ad",
+    "dirty": false
+  },
+  "version": "0.2.13",
+  "proofSha256": "9fd2dc0e31383ba985b9d00a22bc64d01ca6d3dbe2d6a8339dc8b02314bd9749",
+  "singleRebootRequest": true,
+  "idleDraftFreeUnconnectedPreflight": true,
+  "kernelBootIdentityChanged": true,
+  "sameInstalledSourceAfterReboot": true,
+  "managedSource": "aef93bb04520a003c5c48536aa6d4210105fc8ad",
+  "sameSelectedArtifactAfterReboot": true,
+  "realGdmWaylandLoginAfterReboot": true,
+  "serviceOwnsActualAppAfterReboot": true,
+  "selinuxEnforcingAfterReboot": true,
+  "packageVerifiedAfterReboot": true,
+  "after": {
+    "format": "augmentor-gnome-full-vm-inspection/1",
+    "source": {
+      "commit": "aef93bb04520a003c5c48536aa6d4210105fc8ad",
+      "dirty": false
+    },
+    "version": "0.2.13",
+    "selectedRoot": "/home/augmentor-proof/.local/share/augmentor/releases/20261002-034818-fe596dbe",
+    "selection": {
+      "root": "/home/augmentor-proof/.local/share/augmentor/releases/20261002-034818-fe596dbe",
+      "python": "/usr/bin/python3",
+      "node": "/home/augmentor-proof/.local/share/augmentor/releases/20261002-034818-fe596dbe/node/bin/node",
+      "dshService": null,
+      "version": "0.2.13",
+      "releaseId": "20261002-034818-fe596dbe",
+      "sourceRef": "aef93bb04520a003c5c48536aa6d4210105fc8ad",
+      "artifactSha256": "f7d5962720e959a2624752e8b49a64ed7efb6ced5d4cc1e0c12d6e536c52008f"
+    },
+    "managedInventoryVerified": true,
+    "inspectionSha256": "14cae723effb04b3a8c815e10e76e00fb30149eaddd958a17fd7b5a8c13b65aa",
+    "packageVerified": true,
+    "selinuxEnforcing": true,
+    "graphicalSessions": [
+      {
+        "Seat": "seat0",
+        "Type": "wayland",
+        "Class": "user",
+        "Active": "yes",
+        "State": "active"
+      }
+    ],
+    "service": {
+      "ActiveState": "active",
+      "SubState": "running",
+      "MainPID": "1757"
+    },
+    "desktop": {
+      "pid": 1757,
+      "running": false,
+      "busy": true,
+      "draftPresent": false,
+      "accepted": false,
+      "onboardingProtocol": 1,
+      "modelReady": false,
+      "online": false,
+      "repairing": false,
+      "lastError": "Use Connect DSH to save the matching local connection before automatic startup.",
+      "sessionRestoreError": "",
+      "buildRoot": "/home/augmentor-proof/.local/share/augmentor/releases/20261002-034818-fe596dbe",
+      "uiScale": 100,
+      "uiMetricFactor": 1.0,
+      "devicePixelRatio": 1.0,
+      "voiceAvailable": true,
+      "voiceTiming": null,
+      "voiceBufferStarvations": 0,
+      "voiceOutputUnderflows": 0
+    },
+    "scene": {
+      "schema": 1,
+      "backend": "gnome-shell-observer",
+      "shellVersion": "50.5",
+      "epoch": "6eef8640-96ff-45c0-b46c-08ca3584091e",
+      "serial": 237,
+      "inputQualified": false,
+      "window": null,
+      "windows": [],
+      "above": [],
+      "screens": [
+        {
+          "name": "monitor:0",
+          "geometry": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 800
+          },
+          "scale": 1
+        }
+      ],
+      "workspace": {
+        "id": 1,
+        "index": 0
+      },
+      "guards": {
+        "locked": false,
+        "greeter": false,
+        "sessionMode": "user",
+        "actionMode": 2,
+        "modalCount": 1,
+        "overview": true,
+        "overviewTarget": true,
+        "stageGrabbed": true,
+        "overviewAnimation": false,
+        "screenShieldAvailable": true,
+        "screenShieldActive": false,
+        "screenShieldLocked": false,
+        "stageGrabActor": 2,
+        "stageKeyFocus": null,
+        "windowDragging": false
+      },
+      "blockedReasons": [
+        "shell-mode-or-modal",
+        "input-grab",
+        "no-visible-live-focus"
+      ],
+      "compositorOwner": ":1.7"
+    },
+    "canonicalSelection": true,
+    "serviceOwnsActualApplication": true,
+    "previewLaunch": false,
+    "harnessConnectionTested": false,
+    "modelTurnTested": false,
+    "gnomeInputToolsEnabled": false
+  },
+  "harnessConnectionTested": false,
+  "modelTurnTested": false,
+  "loginAuthenticationTested": false,
+  "standardWorkstationInstallerTested": false,
+  "gnomeInputToolsEnabled": false
+}

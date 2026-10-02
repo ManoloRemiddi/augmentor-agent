@@ -1087,12 +1087,14 @@ and matching shiboken 6.8.2.1, Pygments 2.18.0, keyring 25.6.0 and sounddevice
 [sounddevice](https://pypi.org/pypi/sounddevice/0.5.2/json) requirements can use
 Noble's declared SecretStorage/jeepney, jaraco, CFFI and cryptography packages;
 NumPy/YAML/websocket-client and GI can likewise remain distro dependencies.
-This is a metadata-compatible plan, not a tested runtime. Generate and verify the
+This was the metadata-compatible plan at the early identity checkpoint. The
+Noble runtime fixture below now verifies these exact Linux wheels. Generate and verify the
 exact Linux wheel/hash lock from PyPI metadata before installation. Create each
 environment at its final immutable path: Python documents
 [venvs as non-portable](https://docs.python.org/3.12/library/venv.html).
-Current desktop staging does not copy a `python` directory, and current
-`qt-library-inventory.py` scans Mac dylibs/frameworks rather than Linux ELF.
+Current desktop staging does not copy a `python` directory. At that checkpoint,
+`qt-library-inventory.py` scanned Mac dylibs/frameworks rather than Linux ELF;
+the fixture below adds Linux inventory without changing the Mac report.
 Runtime placement/receipt, ELF/plugin/symlink inventory, explicit system bridge,
 notices and interpreter propagation must be implemented together. The five-wheel
 layer does not supply `SileroVad`'s separate ONNX/model prerequisites; preserve
@@ -1172,3 +1174,135 @@ that combined artifact through managed update, plus selected-release reboot,
 connected harness/Browser and the other full desktop/consent gates. The tested
 actual app uses canonical xcb inside GDM Wayland; full native-Wayland startup
 remains open. GNOME input and both qualification flags remain disabled.
+
+
+### Ubuntu 24.04 offline runtime foundation
+
+The [Noble runtime report](../release/qualification/ubuntu24.04/python-runtime.json)
+and [actual ELF inventory](../release/qualification/ubuntu24.04/qt-binaries.json)
+record an ordinary UID 1001 fixture based on the pinned official Ubuntu image
+`sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3`.
+The fixture Dockerfile is `release/ubuntu24-runtime.Dockerfile`; use Docker's
+`--init` when running Xvfb. Direct PID-1 Xvfb startup stalled before Python and
+is not counted as a render pass.
+
+`release/ubuntu24.04-python.json` and its matching requirements file pin five
+Linux wheels against fetched primary PyPI metadata, size and SHA-256.
+`scripts/linux-python-runtime.py download` verifies the cached/downloaded bytes;
+`prepare` verifies every wheel before creating state, requires Noble/x86-64/
+Python 3.12 and an ordinary user, and creates a private environment at its final
+path under an exclusive preparation lock. Pip installs offline with hashes,
+no dependency downloads and no system Python writes. The environment includes
+system site packages deliberately: GI/GTK, SecretStorage/jeepney, CFFI,
+cryptography, jaraco, NumPy, YAML and websocket-client remain declared apt
+prerequisites. The probe checks active wheel requirements and module origins.
+This bridge is a dependency on the installed OS packages, not a hermetic image.
+
+The actual offline installation/import proof verifies Qt 6.8.2 and all five
+managed versions, GI outside the overlay, GTK 4.14.5, system dependency versions
+and the explicit Secret Service backend. The runtime receipt covers 3,237 files
+and symlinks. Verification checks receipt/path/wheel identity, inventory and
+artifact digest before executing the interpreter, then rechecks the host and
+imports. An existing environment is verified and reused; partial or changed
+ones are refused without an upgrade or repair. In the disposable fixture,
+config tampering is refused by both verification and repeated preparation;
+original config bytes are restored only by the test fixture itself.
+
+`release/prove-linux-python-runtime.py` additionally renders real Qt Widgets,
+SVG and Qt Quick through private Xvfb/xcb with software rendering. Linux Qt
+inventory uses ELF magic, including bindings, executable tools, versioned
+libraries, QML/platform plugins and shiboken. It records internal symlinks and
+rejects links outside each package. There are 262 ELF binaries in these wheels.
+Mac dylib/framework inventory retains its existing shape and behavior.
+Nine runtime failure/identity cases and two ELF inventory cases pass. The
+canonical Desktop launcher now exports its selected Python interpreter to
+children, and DSH's Linux helpers use the shared executable/environment adapter;
+a real child-process regression verifies selection and missing-interpreter
+refusal. Five startup cases and the TypeScript check pass.
+
+This foundation does not enable a Noble package target or declare Ubuntu/Mint
+supported. Target-specific Debian dependencies, setup integration, Browser-only
+interpreter selection, canonical managed update/rollback, real credentials,
+approved UI and full GNOME/Cinnamon sessions remain next. Wheel notices,
+embedded third-party review and matching source/relinking coverage remain
+explicitly incomplete. The existing `release/native-sources.json` false gates
+are preserved; the new ELF inventory does not waive them. PortAudio import is
+not microphone/playback acceptance. The complete speech contract still needs
+its separately pinned ONNX/model prerequisites and physical acceptance.
+
+### Fedora 43 codec download investigation
+
+Linux CI `36959238873` attempt 1 failed before installation/native tests while
+fetching `openh264-2.6.0-2.fc43` from Cisco; Fedora 44, Ubuntu 26.04 and the
+other Linux jobs passed, as did both Mac jobs in `36959238866` for clean branch
+`83932a9`. A single failed-job retry completed successfully. All Linux jobs now pass,
+with 644 native cases (642 passes/two Mac-only skips) per distro. Checked
+reports are under `release/qualification/aef93bb/`; the Fedora 43 report records
+attempt 2 and the other distro reports attempt 1. The downloaded Debian artifact is
+clean actual merge `aef93bb04520a003c5c48536aa6d4210105fc8ad`, parents `d91c520`
+and `83932a9`, with tree `bd7d18026bcbcb70ea00bdc15ce1fb1f3bce6e9b`
+identical to the branch.
+
+Primary Fedora metadata confirms PySide6's QtMultimedia/QtWebEngine dependency
+chain reaches a hard `libopenh264.so.8` requirement. Cisco's OpenH264 and Fedora's
+[noopenh264](https://packages.fedoraproject.org/pkgs/noopenh264/noopenh264/fedora-43.html)
+stub both provide that SONAME; Cisco's package obsoletes the stub. This is not
+proven to be a purely weak dependency. [DNF5 weak-dependency configuration](https://dnf5.readthedocs.io/en/latest/dnf5.conf.5.html#install-weak-deps)
+controls Recommends/Supplements and cannot guarantee provider selection.
+Blanket weak-dependency removal can also omit PipeWire, Qt Wayland and Mesa
+because their Fedora packages currently recommend those components. No such
+product installer change was made. A targeted, command-only Cisco repository
+exclusion is a candidate for a fresh solver/package proof if the retry fails;
+qualify rendering, audio and credentials before adopting it, preserving any
+existing codec installation and ordinary repository configuration.
+
+
+### Clean Fedora artifact containing both fixes
+
+The [combined managed-update report](../release/qualification/gnome50/fedora44-vm-managed-combined-update.json)
+now qualifies pristine `aef93bb04520a003c5c48536aa6d4210105fc8ad` in the
+same dedicated full Fedora/GDM guest. Its branch tree equals clean `83932a9`.
+The local Fedora 44 RPM is built from the verified hosted Debian payload;
+report provenance retains distinct RPM/archive hashes. The selected artifact's
+updater bytes now exactly match the registered canonical updater, unlike the
+historical `8244c9c` adoption above. The generalized proof verifies its previous
+managed selection/inventory before staging; no selected payload is patched.
+
+Staging retains the RPM marker and passes the real Fedora runtime lease and
+bundled Node 24.19.0 check before selection. Activation preserves the previous
+running PID and reports a pending update. One accepted idle close and one
+canonical launch adopt selected release `20261002-034818-fe596dbe`, artifact
+`f7d5962720e959a2624752e8b49a64ed7efb6ced5d4cc1e0c12d6e536c52008f`.
+The previous managed selection remains available for rollback. The service owns
+new PID 5478; the actual app's Qt registration succeeds before its Settings
+calls. Later compositor inspection observes that PID's Connect DSH dialog,
+and the following reboot screenshot visually verifies its real main window/dialog
+in GNOME overview. SELinux remains enforcing
+and the immutable original RPM verifies.
+
+This proof is unconfigured/offline onboarding through canonical xcb in a GDM
+Wayland session. Full native-Wayland startup, connected harness/Browser and
+speech/input consent/Stop acceptance remain open. The inspection/reboot helpers
+now accept an explicit managed source and verify the selected inventory/source
+and service root, retaining the original package-only default. A selected
+release reboot proof follows; do not reuse the earlier package-baseline reboot
+report as evidence for this artifact.
+
+
+### Working-source JavaScript fixture correction
+
+Broad local JavaScript verification initially lacked QtTest on the host and
+then lacked Chromium and the locked DSH qualification root in the container.
+These runs are not counted as passes. Provisioning the declared test-only
+prerequisites and isolating HOME yields 488 passes/two skips and one 30-second
+Codex fork/recovery timeout. A separately instrumented copy runs the unchanged
+assertions to completion in 30.864 seconds: synthetic prompts finish promptly,
+while deliberately failed recovery checks repeatedly start/retire native clients.
+Each client retains the existing two-second shutdown grace; multiple clients
+consume the rest of the case. The case's overall allowance is now 60 seconds;
+its assertions, RPC deadlines, production code and no-replay behavior remain
+unchanged. The corrected complete suite passes 491 cases: 489 passes/two skips, with
+no failures or cancellations. The source build and TypeScript check also pass.
+The Noble checked report records the distinct common-source fixture and log
+hashes; these JavaScript/native checks are not a Noble installed-product proof.
+Hosted confirmation follows clean publication.

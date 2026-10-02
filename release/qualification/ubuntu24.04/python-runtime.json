@@ -1,0 +1,117 @@
+{
+  "format": "augmentor-linux-python-runtime-fixture/1",
+  "target": "ubuntu24.04-amd64",
+  "policySha256": "4d788aff4fae29aa284e7d56fd94d0415e9aabe93e387270eb9140cc9075129e",
+  "proofSha256": "ea020aa51c72ff736db54b7ba639cbbd14c520575b7cda93eac30e8d0cb41939",
+  "runtimeToolSha256": "d7bb40706a3fff715e7c878c904eeb06ccfd1b3620dffc2ecd1cb9202bfeb950",
+  "qtInventoryToolSha256": "e2e59773aab64604dc5322ac1608d78d732ee58771d37d1ba298af593eb1fba0",
+  "lockIdentity": "48f27d2c7dcef7856538aa199cbdfe51202444e2422724f11dd6312912d600cd",
+  "runtimeArtifactSha256": "270a6892c922c93d5616e0562dd57dc0e8a3c4cccc90715fc50037261168bed9",
+  "runtimeFileCount": 3237,
+  "imports": {
+    "pythonAbi": [
+      3,
+      12
+    ],
+    "qtVersion": "6.8.2",
+    "managedVersions": {
+      "PySide6-Essentials": "6.8.2.1",
+      "shiboken6": "6.8.2.1",
+      "Pygments": "2.18.0",
+      "keyring": "25.6.0",
+      "sounddevice": "0.5.2"
+    },
+    "systemVersions": {
+      "SecretStorage": "3.3.3",
+      "jeepney": "0.8.0",
+      "cryptography": "41.0.7",
+      "cffi": "1.16.0",
+      "numpy": "1.26.4",
+      "PyYAML": "6.0.1",
+      "websocket-client": "1.7.0",
+      "jaraco.classes": "3.2.1",
+      "jaraco.context": "4.3.0",
+      "jaraco.functools": "4.0.0",
+      "more-itertools": "10.2.0"
+    },
+    "origins": {
+      "PySide6": "/home/augmentor-proof/runtimes/noble-cp312-x86_64-48f27d2c7dcef785/lib/python3.12/site-packages/PySide6/__init__.py",
+      "shiboken6": "/home/augmentor-proof/runtimes/noble-cp312-x86_64-48f27d2c7dcef785/lib/python3.12/site-packages/shiboken6/__init__.py",
+      "pygments": "/home/augmentor-proof/runtimes/noble-cp312-x86_64-48f27d2c7dcef785/lib/python3.12/site-packages/pygments/__init__.py",
+      "keyring": "/home/augmentor-proof/runtimes/noble-cp312-x86_64-48f27d2c7dcef785/lib/python3.12/site-packages/keyring/__init__.py",
+      "sounddevice": "/home/augmentor-proof/runtimes/noble-cp312-x86_64-48f27d2c7dcef785/lib/python3.12/site-packages/sounddevice.py",
+      "gi": "/usr/lib/python3/dist-packages/gi/__init__.py",
+      "numpy": "/usr/lib/python3/dist-packages/numpy/__init__.py",
+      "yaml": "/usr/lib/python3/dist-packages/yaml/__init__.py",
+      "websocket": "/usr/lib/python3/dist-packages/websocket/__init__.py",
+      "cffi": "/usr/lib/python3/dist-packages/cffi/__init__.py",
+      "secretstorage": "/usr/lib/python3/dist-packages/secretstorage/__init__.py",
+      "jeepney": "/usr/lib/python3/dist-packages/jeepney/__init__.py"
+    },
+    "gtkVersion": [
+      4,
+      14,
+      5
+    ],
+    "portaudioVersion": [
+      1246720,
+      "PortAudio V19.6.0-devel, revision 396fe4b6699ae929d3a685b3ef8a7e97396139a4"
+    ],
+    "explicitCredentialBackend": "keyring.backends.SecretService.Keyring",
+    "secretServiceLifecycleTested": false,
+    "physicalAudioTested": false,
+    "handsFreeTested": false
+  },
+  "offlineFiveWheelPrepare": true,
+  "exactRuntimeReusedWithoutRewrite": true,
+  "tamperedRuntimeRefusedWithoutRepair": true,
+  "qtWidgetsXcbRendered": true,
+  "qtSvgRendered": true,
+  "qtQuickSoftwareRendered": true,
+  "qtBinaryCount": 262,
+  "qtSymlinkCount": 0,
+  "qtInventorySha256": "f1a9e382639722aa4a4033809bf3ec5096f824f78e3f52eed833c5ffd51bad84",
+  "installedProductTested": false,
+  "approvedUiTested": false,
+  "gnomeLoginTested": false,
+  "secretServiceLifecycleTested": false,
+  "physicalAudioTested": false,
+  "handsFreeTested": false,
+  "licenseReviewComplete": false,
+  "embeddedSourceCoverageComplete": false,
+  "sourceScope": {
+    "baseCommit": "83932a9a1a87a8cf88c894285c6c68bb513045de",
+    "workingFilesIdentifiedBySha256": true
+  },
+  "fixture": {
+    "baseImage": "docker.io/library/ubuntu@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3",
+    "dockerfileSha256": "2c4927834aafd16cd69759eac6a5b1d5e12bdd9c09c12c7b79976a9dc1099136",
+    "networkDuringRuntimePrepareAndRender": "none",
+    "ordinaryUserUid": 1001,
+    "usesInitProcessForXvfb": true,
+    "disposableConfigCorruptionRestoredAfterRefusal": true
+  },
+  "commonSourceChecks": {
+    "nativeCases": 655,
+    "nativePassed": 653,
+    "nativeSkipped": 2,
+    "nativeFixture": "augmentor-rollout-gnome-native-ui plus test-only git",
+    "nativeNetwork": "none",
+    "nativeLogSha256": "688f8344d93cd095a19ac9911bba5b8f3e4f2521bb048fd1148dc99111fc464e",
+    "nativeIsNobleInstalledProductProof": false,
+    "dshSelectedInterpreterChildProcess": true,
+    "desktopStartupCasesPassed": 5,
+    "typescriptCheckPassed": true,
+    "javascriptCases": 491,
+    "javascriptPassed": 489,
+    "javascriptSkipped": 2,
+    "javascriptCancelled": 0,
+    "javascriptFailed": 0,
+    "javascriptLogSha256": "8aef4bbf2f235a4f5648b9379c6a153e4d6e58423daaa404d07f76d23850600a",
+    "javascriptFixture": "Debian dependency cache plus declared test-only Chromium and locked public DSH, isolated HOME, Node 24.19.0",
+    "javascriptIsNobleInstalledProductProof": false,
+    "sourceBuildPassed": true,
+    "codexForkOverallTestTimeoutMs": 60000,
+    "productionRpcAndShutdownDeadlinesChanged": false
+  }
+}

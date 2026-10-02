@@ -1,0 +1,110 @@
+{
+  "format": "augmentor-linux-python-wheels/1",
+  "profile": "noble-cp312-x86_64",
+  "target": "ubuntu24.04-amd64",
+  "python": "/usr/bin/python3.12",
+  "pythonAbi": [
+    3,
+    12
+  ],
+  "architecture": "x86_64",
+  "systemSitePackages": true,
+  "wheels": [
+    {
+      "name": "PySide6-Essentials",
+      "version": "6.8.2.1",
+      "file": "PySide6_Essentials-6.8.2.1-cp39-abi3-manylinux_2_28_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/d2/f9/aa4ff511ff1f3dd177f7e8f5a635e03fe578fa2045c8d6be4577e7db3b28/PySide6_Essentials-6.8.2.1-cp39-abi3-manylinux_2_28_x86_64.whl",
+      "sha256": "5ab31e5395a4724102edd6e8ff980fa3f7cde2aa79050763a1dcc30bb914195a",
+      "bytes": 95331575,
+      "metadataUrl": "https://pypi.org/pypi/PySide6-Essentials/6.8.2.1/json",
+      "metadataSha256": "f5965f777175d041382bdff6a15886a9fb6e3a107b0726f139d12d5c3fcfbeba",
+      "requiresPython": "<3.14,>=3.9",
+      "requiresDist": [
+        "shiboken6==6.8.2.1"
+      ]
+    },
+    {
+      "name": "shiboken6",
+      "version": "6.8.2.1",
+      "file": "shiboken6-6.8.2.1-cp39-abi3-manylinux_2_28_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/7b/ff/ab4f287b9573e50b5a47c10e2af8feb5abecc3c7431bd5deec135efc969e/shiboken6-6.8.2.1-cp39-abi3-manylinux_2_28_x86_64.whl",
+      "sha256": "c83e90056f13d0872cc4d2b7bf60b6d6e3b1b172f1f91910c0ba5b641af01758",
+      "bytes": 204273,
+      "metadataUrl": "https://pypi.org/pypi/shiboken6/6.8.2.1/json",
+      "metadataSha256": "13cbdf67e8f1cc3c91c1672852824637175769691a3768e29fffa7514993da36",
+      "requiresPython": "<3.14,>=3.9",
+      "requiresDist": []
+    },
+    {
+      "name": "Pygments",
+      "version": "2.18.0",
+      "file": "pygments-2.18.0-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/f7/3f/01c8b82017c199075f8f788d0d906b9ffbbc5a47dc9918a945e13d5a2bda/pygments-2.18.0-py3-none-any.whl",
+      "sha256": "b8e6aca0523f3ab76fee51799c488e38782ac06eafcf95e7ba832985c8e7b13a",
+      "bytes": 1205513,
+      "metadataUrl": "https://pypi.org/pypi/Pygments/2.18.0/json",
+      "metadataSha256": "9b3bfb18c1bc18767fdcd53a5df20d9b4d4d8f8c41c49555e79b7fc9db15d089",
+      "requiresPython": ">=3.8",
+      "requiresDist": [
+        "colorama>=0.4.6; extra == \"windows-terminal\""
+      ]
+    },
+    {
+      "name": "keyring",
+      "version": "25.6.0",
+      "file": "keyring-25.6.0-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/d3/32/da7f44bcb1105d3e88a0b74ebdca50c59121d2ddf71c9e34ba47df7f3a56/keyring-25.6.0-py3-none-any.whl",
+      "sha256": "552a3f7af126ece7ed5c89753650eec89c7eaae8617d0aa4d9ad2b75111266bd",
+      "bytes": 39085,
+      "metadataUrl": "https://pypi.org/pypi/keyring/25.6.0/json",
+      "metadataSha256": "d501efa53b77789321fd2fed18402fb7cd98989075d40d9cedfbc320a7ab2d64",
+      "requiresPython": ">=3.9",
+      "requiresDist": [
+        "pywin32-ctypes>=0.2.0; sys_platform == \"win32\"",
+        "SecretStorage>=3.2; sys_platform == \"linux\"",
+        "jeepney>=0.4.2; sys_platform == \"linux\"",
+        "importlib_metadata>=4.11.4; python_version < \"3.12\"",
+        "jaraco.classes",
+        "importlib_resources; python_version < \"3.9\"",
+        "jaraco.functools",
+        "jaraco.context",
+        "pytest!=8.1.*,>=6; extra == \"test\"",
+        "pyfakefs; extra == \"test\"",
+        "sphinx>=3.5; extra == \"doc\"",
+        "jaraco.packaging>=9.3; extra == \"doc\"",
+        "rst.linker>=1.9; extra == \"doc\"",
+        "furo; extra == \"doc\"",
+        "sphinx-lint; extra == \"doc\"",
+        "jaraco.tidelift>=1.4; extra == \"doc\"",
+        "pytest-checkdocs>=2.4; extra == \"check\"",
+        "pytest-ruff>=0.2.1; sys_platform != \"cygwin\" and extra == \"check\"",
+        "pytest-cov; extra == \"cover\"",
+        "pytest-enabler>=2.2; extra == \"enabler\"",
+        "pytest-mypy; extra == \"type\"",
+        "pygobject-stubs; extra == \"type\"",
+        "shtab; extra == \"type\"",
+        "types-pywin32; extra == \"type\"",
+        "shtab>=1.1.0; extra == \"completion\""
+      ]
+    },
+    {
+      "name": "sounddevice",
+      "version": "0.5.2",
+      "file": "sounddevice-0.5.2-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/75/2d/582738fc01352a5bc20acac9221e58538365cecb3bb264838f66419df219/sounddevice-0.5.2-py3-none-any.whl",
+      "sha256": "82375859fac2e73295a4ab3fc60bd4782743157adc339561c1f1142af472f505",
+      "bytes": 32450,
+      "metadataUrl": "https://pypi.org/pypi/sounddevice/0.5.2/json",
+      "metadataSha256": "35bc90510386b908fc7248784dc6f8f2f72bd2cf101e85fb56ba137121c275db",
+      "requiresPython": ">=3.7",
+      "requiresDist": [
+        "CFFI>=1.0",
+        "NumPy; extra == \"numpy\""
+      ]
+    }
+  ],
+  "qualified": false,
+  "licenseReviewComplete": false,
+  "embeddedSourceCoverageComplete": false
+}

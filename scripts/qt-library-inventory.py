@@ -5,12 +5,51 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
-import PySide6
-from PySide6.QtCore import qVersion
+import os
+import sys
+
+
+def elf_inventory(roots):
+    """Include bindings, tools and plugins by ELF magic, including versioned .so.
+
+    Links are recorded separately and must stay inside their package. Host
+    libraries resolved by the loader are dependencies, not shipped wheel files.
+    """
+    binaries = []
+    links = []
+    for package, root in roots.items():
+        root = Path(root).resolve()
+        for path in sorted(root.rglob('*')):
+            relative = package+'/'+str(path.relative_to(root))
+            if path.is_symlink():
+                target = path.resolve(strict=True)
+                if not target.is_relative_to(root):
+                    raise RuntimeError('Qt package link escapes its root: '+relative)
+                links.append({'path': relative, 'target': os.readlink(path)})
+                continue
+            if not path.is_file():
+                continue
+            with path.open('rb') as stream:
+                if stream.read(4) != b'\x7fELF':
+                    continue
+                stream.seek(0)
+                digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+            binaries.append({'path': relative, 'bytes': path.stat().st_size, 'sha256': digest})
+    return binaries, links
 
 
 def inventory():
+    import PySide6
+    from PySide6.QtCore import qVersion
     root=Path(PySide6.__file__).resolve().parent
+    if sys.platform == 'linux':
+        import shiboken6
+        rows, links = elf_inventory({'PySide6': root, 'shiboken6': Path(shiboken6.__file__).resolve().parent})
+        if not rows:
+            raise RuntimeError('No Linux Qt ELF binaries found.')
+        return {'qtVersion': qVersion(), 'pysideVersion': PySide6.__version__,
+                'binaryFormat': 'ELF', 'frameworks': [], 'binaries': rows, 'symlinks': links,
+                'embeddedThirdPartyNoticeReviewComplete': False}
     binaries=set(root.rglob('*.dylib'))
     frameworks=sorted(root.rglob('*.framework'))
     for framework in frameworks:

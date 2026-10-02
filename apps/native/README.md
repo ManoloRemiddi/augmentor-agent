@@ -49,3 +49,9 @@ source at the identity stage passes 643 native cases (two Mac-only skips) and th
 shortcut/focus/typing/workspace checks. This does not qualify the separate control
 helper's consent identity or portal restart registration; see the
 [identity report and limits](../../docs/LINUX-DISTRO-ROLLOUT.md#early-qt-desktop-identity).
+
+The canonical Linux launcher exports the selected Python interpreter to child
+helpers. DSH's Linux support uses the same shared executable/environment
+adapter. The Ubuntu 24.04 managed-runtime foundation and its explicit system
+GI bridge are tracked in [the distro rollout](../../docs/LINUX-DISTRO-ROLLOUT.md);
+its import/render fixture does not yet qualify a Noble installation.

@@ -1,0 +1,260 @@
+#!/usr/bin/env python3
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+"""Prepare an offline, immutable Noble Python overlay at its final user path.
+
+This builds a candidate runtime; it does not select a desktop, configure a
+harness, replace system Python or claim full distro/package qualification.
+"""
+import argparse
+from contextlib import contextmanager
+import fcntl
+import hashlib
+import json
+import os
+from pathlib import Path
+import platform
+import re
+import shutil
+import stat
+import subprocess
+import tempfile
+import urllib.request
+
+FORMAT = 'augmentor-linux-python-wheels/1'
+RECEIPT = 'augmentor-python-runtime.json'
+MANAGED = {'pyside6-essentials', 'shiboken6', 'pygments', 'keyring', 'sounddevice'}
+
+
+def digest(path):
+    with path.open('rb') as stream:
+        return hashlib.file_digest(stream, 'sha256').hexdigest()
+
+
+def normalized(name):
+    return re.sub('[-_.]+', '-', name).lower()
+
+
+def policy(path):
+    value = json.loads(Path(path).read_text())
+    if (value.get('format') != FORMAT or value.get('target') != 'ubuntu24.04-amd64'
+            or value.get('profile') != 'noble-cp312-x86_64'
+            or value.get('python') != '/usr/bin/python3.12'
+            or value.get('pythonAbi') != [3, 12] or value.get('architecture') != 'x86_64'
+            or value.get('systemSitePackages') is not True):
+        raise ValueError('Unsupported Linux Python runtime policy.')
+    rows = value.get('wheels', [])
+    if len(rows) != len(MANAGED) or {normalized(r['name']) for r in rows} != MANAGED:
+        raise ValueError('The complete reviewed five-wheel overlay is required.')
+    for row in rows:
+        if (Path(row['file']).name != row['file'] or not row['file'].endswith('.whl')
+                or not re.fullmatch('[0-9a-f]{64}', row['sha256'])
+                or not isinstance(row['bytes'], int) or row['bytes'] <= 0
+                or not row['url'].startswith('https://files.pythonhosted.org/packages/')):
+            raise ValueError('Invalid locked wheel record.')
+    return value
+
+
+def identity(value):
+    contract = {key: value[key] for key in ('profile', 'target', 'python', 'pythonAbi', 'architecture', 'systemSitePackages')}
+    contract['wheels'] = [{key: row[key] for key in ('name', 'version', 'file', 'sha256', 'bytes')}
+                          for row in sorted(value['wheels'], key=lambda r: normalized(r['name']))]
+    return hashlib.sha256(json.dumps(contract, sort_keys=True).encode()).hexdigest()
+
+
+def verify_wheels(value, wheelhouse):
+    for row in value['wheels']:
+        path = Path(wheelhouse)/row['file']
+        if path.is_symlink() or not path.is_file() or path.stat().st_size != row['bytes'] or digest(path) != row['sha256']:
+            raise ValueError('Locked wheel checksum/size failed: ' + row['file'])
+
+
+def download(value, wheelhouse):
+    wheelhouse = Path(wheelhouse)
+    wheelhouse.mkdir(parents=True, exist_ok=True)
+    for row in value['wheels']:
+        final = wheelhouse/row['file']
+        if final.exists():
+            if final.is_symlink() or final.stat().st_size != row['bytes'] or digest(final) != row['sha256']:
+                raise ValueError('Existing wheel differs from the lock: ' + row['file'])
+            continue
+        fd, name = tempfile.mkstemp(prefix='.wheel-', dir=wheelhouse)
+        temporary = Path(name)
+        try:
+            with os.fdopen(fd, 'wb') as out, urllib.request.urlopen(row['url'], timeout=60) as response:
+                shutil.copyfileobj(response, out)
+            if temporary.stat().st_size != row['bytes'] or digest(temporary) != row['sha256']:
+                raise ValueError('Downloaded wheel differs from the lock: ' + row['file'])
+            temporary.chmod(0o644)
+            temporary.replace(final)
+        finally:
+            temporary.unlink(missing_ok=True)
+    verify_wheels(value, wheelhouse)
+
+
+def host(value):
+    release = dict(row.split('=', 1) for row in Path('/etc/os-release').read_text().splitlines() if '=' in row)
+    if (release.get('ID', '').strip('"'), release.get('VERSION_ID', '').strip('"')) != ('ubuntu', '24.04'):
+        raise ValueError('This runtime policy requires Ubuntu 24.04.')
+    if platform.machine() != value['architecture']:
+        raise ValueError('This wheel set requires x86-64.')
+    result = subprocess.check_output([value['python'], '-I', '-c',
+        'import json,sys;print(json.dumps(list(sys.version_info[:2])))'], text=True, timeout=10)
+    if json.loads(result) != value['pythonAbi']:
+        raise ValueError('The system Python ABI differs from the runtime policy.')
+
+
+@contextmanager
+def locked(store):
+    if os.geteuid() == 0:
+        raise ValueError('Prepare this application runtime as the ordinary desktop user.')
+    store = Path(store).absolute()
+    if store.is_symlink():
+        raise ValueError('Runtime store must not be a symlink.')
+    store.mkdir(parents=True, exist_ok=True, mode=0o700)
+    info = store.stat()
+    if info.st_uid != os.getuid() or not stat.S_ISDIR(info.st_mode) or info.st_mode & 0o077:
+        raise ValueError('Runtime store must be private and owned by this user.')
+    fd = os.open(store/'.prepare.lock', os.O_RDWR|os.O_CREAT|os.O_NOFOLLOW, 0o600)
+    try:
+        info = os.fstat(fd)
+        if info.st_uid != os.getuid() or not stat.S_ISREG(info.st_mode) or info.st_mode & 0o077 or info.st_nlink != 1:
+            raise ValueError('Invalid runtime preparation lock.')
+        fcntl.flock(fd, fcntl.LOCK_EX|fcntl.LOCK_NB)
+        yield store
+    finally:
+        os.close(fd)
+
+
+def inventory(root):
+    result = {}
+    for path in sorted(root.rglob('*')):
+        relative = path.relative_to(root)
+        if '__pycache__' in relative.parts or path.suffix == '.pyc' or str(relative) == RECEIPT:
+            continue
+        if path.is_symlink():
+            result[str(relative)] = 'link:' + os.readlink(path)
+        elif path.is_file():
+            result[str(relative)] = digest(path)
+    return result
+
+
+PROBE = '''import importlib,importlib.metadata as md,json,pathlib,sys
+from packaging.requirements import Requirement
+from packaging.version import Version
+value=json.loads(sys.argv[1]); root=pathlib.Path(sys.prefix).resolve()
+assert list(sys.version_info[:2])==value['pythonAbi'] and sys.prefix!=sys.base_prefix
+for row in value['wheels']:
+ assert md.version(row['name'])==row['version'],row['name']
+ for raw in row.get('requiresDist',[]):
+  req=Requirement(raw)
+  if req.marker and not req.marker.evaluate({'extra':''}):continue
+  assert Version(md.version(req.name)) in req.specifier,(row['name'],req.name)
+import PySide6,shiboken6,pygments,keyring,sounddevice,gi,numpy,yaml,websocket,cffi,secretstorage,jeepney
+from PySide6 import QtCore,QtGui,QtWidgets,QtNetwork,QtDBus,QtSvg,QtQuick,QtQuickWidgets
+from keyring.backends.SecretService import Keyring
+for module in [PySide6,shiboken6,pygments,keyring,sounddevice]:
+ assert pathlib.Path(module.__file__).resolve().is_relative_to(root),module.__name__
+gi.require_version('Gtk','4.0');gi.require_version('Gst','1.0');gi.require_version('Atspi','2.0')
+from gi.repository import Gtk,Gst,Atspi
+assert not pathlib.Path(gi.__file__).resolve().is_relative_to(root)
+print(json.dumps({'pythonAbi':list(sys.version_info[:2]),'qtVersion':QtCore.qVersion(),
+ 'managedVersions':{r['name']:md.version(r['name']) for r in value['wheels']},
+ 'systemVersions':{n:md.version(n) for n in ['SecretStorage','jeepney','cryptography','cffi','numpy','PyYAML','websocket-client','jaraco.classes','jaraco.context','jaraco.functools','more-itertools']},
+ 'origins':{m.__name__:str(pathlib.Path(m.__file__).resolve()) for m in [PySide6,shiboken6,pygments,keyring,sounddevice,gi,numpy,yaml,websocket,cffi,secretstorage,jeepney]},
+ 'gtkVersion':[Gtk.get_major_version(),Gtk.get_minor_version(),Gtk.get_micro_version()],
+ 'portaudioVersion':sounddevice.get_portaudio_version(),
+ 'explicitCredentialBackend':Keyring.__module__+'.'+Keyring.__name__,
+ 'secretServiceLifecycleTested':False,'physicalAudioTested':False,'handsFreeTested':False}))
+'''
+
+
+def probe(value, root):
+    env = {key: val for key, val in os.environ.items() if key not in ('PYTHONHOME', 'PYTHONPATH')}
+    env['PYTHONDONTWRITEBYTECODE'] = '1'
+    result = subprocess.run([str(root/'bin/python3'), '-I', '-B', '-c', PROBE, json.dumps(value)],
+                            env=env, text=True, capture_output=True, timeout=60)
+    if result.returncode:
+        raise RuntimeError('Managed runtime import/dependency probe failed:\n' + result.stderr[-4000:])
+    return json.loads(result.stdout)
+
+
+def verify(value, root):
+    root = Path(root).absolute()
+    if root.is_symlink() or root.stat().st_uid != os.getuid() or root.stat().st_mode & 0o077:
+        raise ValueError('Runtime directory identity is invalid.')
+    receipt_path = root/RECEIPT
+    info = receipt_path.lstat()
+    if not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid() or info.st_nlink != 1:
+        raise ValueError('Runtime receipt identity is invalid.')
+    receipt = json.loads(receipt_path.read_text())
+    if (receipt.get('format') != 'augmentor-linux-python-runtime/1'
+            or receipt.get('lockIdentity') != identity(value) or receipt.get('root') != str(root)
+            or receipt.get('python') != str(root/'bin/python3')
+            or receipt.get('target') != value['target'] or receipt.get('profile') != value['profile']
+            or receipt.get('wheels') != value['wheels']):
+        raise ValueError('Runtime receipt differs from its path or wheel contract.')
+    files = inventory(root)
+    if (receipt.get('files') != files or receipt.get('artifactSha256') !=
+            hashlib.sha256(json.dumps(files, sort_keys=True).encode()).hexdigest()):
+        raise ValueError('Managed runtime files changed; prepare a new runtime.')
+    host(value)
+    probe(value, root)
+    return receipt
+
+
+def prepare(value, wheelhouse, store):
+    verify_wheels(value, wheelhouse)
+    host(value)
+    with locked(store) as store:
+        root = store/(value['profile']+'-'+identity(value)[:16])
+        if root.exists():
+            return verify(value, root)
+        root.mkdir(mode=0o700)
+        try:
+            # Creation at the final path keeps entrypoint shebangs and pyvenv.cfg
+            # valid. Never rename an environment or upgrade a prior release's one.
+            subprocess.run([value['python'], '-m', 'venv', '--system-site-packages', str(root)], check=True, timeout=90)
+            requirements = '\n'.join(row['name']+'=='+row['version']+' --hash=sha256:'+row['sha256'] for row in value['wheels'])+'\n'
+            (root/'wheel-lock.txt').write_text(requirements)
+            subprocess.run([str(root/'bin/python3'), '-I', '-m', 'pip', 'install', '--no-index',
+                '--find-links', str(Path(wheelhouse).resolve()), '--require-hashes', '--only-binary', ':all:',
+                '--no-deps', '--disable-pip-version-check', '-r', str(root/'wheel-lock.txt')], check=True, timeout=120)
+            imports = probe(value, root)
+            files = inventory(root)
+            receipt = {'format': 'augmentor-linux-python-runtime/1', 'root': str(root),
+                'python': str(root/'bin/python3'), 'target': value['target'], 'profile': value['profile'],
+                'lockIdentity': identity(value), 'wheels': value['wheels'], 'imports': imports,
+                'files': files, 'artifactSha256': hashlib.sha256(json.dumps(files, sort_keys=True).encode()).hexdigest(),
+                'licenseReviewComplete': False, 'embeddedSourceCoverageComplete': False,
+                'installedProductTested': False, 'selectedDesktopChanged': False}
+            with os.fdopen(os.open(root/RECEIPT, os.O_WRONLY|os.O_CREAT|os.O_EXCL, 0o600), 'w') as stream:
+                json.dump(receipt, stream, indent=2); stream.write('\n'); stream.flush(); os.fsync(stream.fileno())
+            return receipt
+        except BaseException:
+            # Only this invocation's newly created directory can be discarded.
+            shutil.rmtree(root)
+            raise
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('command', choices=('download', 'prepare', 'verify'))
+    parser.add_argument('--policy', type=Path, required=True)
+    parser.add_argument('--wheelhouse', type=Path)
+    parser.add_argument('--store', type=Path)
+    parser.add_argument('--runtime', type=Path)
+    args = parser.parse_args()
+    value = policy(args.policy)
+    if args.command == 'download':
+        if args.wheelhouse is None:parser.error('--wheelhouse is required')
+        download(value, args.wheelhouse); print(json.dumps({'downloadedVerifiedWheels': len(value['wheels'])}))
+    elif args.command == 'prepare':
+        if args.wheelhouse is None or args.store is None:parser.error('--wheelhouse and --store are required')
+        print(json.dumps(prepare(value, args.wheelhouse, args.store)))
+    else:
+        if args.runtime is None:parser.error('--runtime is required')
+        print(json.dumps(verify(value, args.runtime)))
+
+
+if __name__ == '__main__':
+    main()

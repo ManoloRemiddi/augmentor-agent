@@ -39,9 +39,11 @@ assert command(['getenforce']) == 'Enforcing'
 p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--candidate', type=Path, required=True)
 p.add_argument('--source', required=True)
+p.add_argument('--previous-source', required=True)
 p.add_argument('--window-sha256', required=True)
 a = p.parse_args()
 assert re.fullmatch('[0-9a-f]{40}', a.source)
+assert re.fullmatch('[0-9a-f]{40}', a.previous_source)
 assert re.fullmatch('[0-9a-f]{64}', a.window_sha256)
 candidate = a.candidate.resolve()
 assert candidate.is_relative_to(Path.home()/'managed-update-candidates')
@@ -65,7 +67,16 @@ session = dict(row.split('=', 1) for row in command(['loginctl', 'show-session',
 assert session == {'Type': 'wayland', 'Class': 'user', 'Active': 'yes', 'State': 'active', 'Seat': 'seat0'}
 data = Path.home()/'.local/share/augmentor'
 initial_selection = json.loads((data/'desktop.json').read_text())
-assert initial_selection['root'] == '/usr/lib/augmentor'
+previous_root = Path(initial_selection['root'])
+assert previous_root == Path('/usr/lib/augmentor') or previous_root.is_relative_to(data/'releases')
+assert json.loads((previous_root/'release.json').read_text())['source'] == {'commit': a.previous_source, 'dirty': False}
+if previous_root != Path('/usr/lib/augmentor'):
+    assert initial_selection['sourceRef'] == a.previous_source
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('owned_previous_deployment', data/'desktop-deployment.py')
+    deployment = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(deployment)
+    deployment.verify(previous_root)
 assert initial_selection['dshService'] is None
 updater = Path.home()/'.local/bin/augmentor-update'
 launcher = Path.home()/'.local/bin/augmentor-agent'
@@ -177,6 +188,7 @@ assert scene['guards']['screenShieldAvailable'] is True and not scene['guards'][
 subprocess.run(['rpm', '-V', 'augmentor-agent'], check=True, timeout=30)
 report = {'format': 'augmentor-gnome-full-vm-managed-update/1',
     'source': release['source'], 'version': release['version'],
+    'previousSource': a.previous_source,
     'proofSha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
     'registeredUpdaterSha256': hashlib.sha256((data/'desktop-deployment.py').read_bytes()).hexdigest(),
     'selectedArtifactContainsRegisteredUpdater': (staged/'scripts/desktop-deployment.py').read_bytes() == (data/'desktop-deployment.py').read_bytes(),

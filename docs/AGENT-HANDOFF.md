@@ -180,8 +180,36 @@ rollout guide/report for exact app, package and updater hashes. Selected pristin
 app `8244c9c` still embeds the older updater; do not bootstrap again from it or
 claim a clean combined artifact. Current fixer-source hosted CI and a combined
 artifact remain next, followed by current-release reboot/connected work/control.
-Fresh Noble overlay/runtime-placement/ELF inventory and separate control-helper
-identity research are recorded in the guide; those adapters remain unimplemented.
+The next working Noble foundation now installs five hash-pinned wheels offline
+at a final private path, validates the system GI/Secret Service bridge and
+records immutable runtime receipts. Its actual ordinary-user Ubuntu 24.04
+fixture passes imports, reuse/tamper refusal and Qt Widgets/SVG/Quick xcb
+rendering; Linux ELF/plugin/shiboken inventory records 262 binaries. Nine
+runtime and two inventory cases, the selected-interpreter DSH child-process
+case, five startup cases and TypeScript checks pass. The rollout guide owns
+exact working-file/report hashes. Noble package/setup/Browser selection,
+license/source coverage and full desktop/audio remain open; no new supported
+target is enabled. Separate control-helper identity remains unimplemented.
+A clean combined `aef93bb` artifact (tree identical to `83932a9`) now passes
+actual managed update in the owned Fedora guest, preserving previous selection,
+running process, RPM identity and rollback before canonical cold adoption.
+Its embedded updater matches the canonical fixed updater; Qt registration,
+actual onboarding focus and SELinux pass. Selected release is
+`20261002-034818-fe596dbe`; checked report retains exact provenance.
+Managed inspection/reboot now explicitly verifies selected source/inventory;
+The selected-release reboot now passes exact descriptor/inventory retention,
+new kernel boot identity, real GDM Wayland seat and service ownership (PID 1757),
+with original RPM verification and SELinux enforcing. Actual onboarding renders
+in GNOME overview after reboot; post-login focused composer/manual authentication
+and connected work remain open. All Linux and Mac CI for clean `83932a9` now
+passes; Fedora 43's one retry succeeds after the initial codec download failure.
+Checked distro reports record actual merge `aef93bb` and 644 native cases (two
+skips), independently from the 655 working-source native cases. See the guide
+for exact hashes and the new Noble implementation limits. The declared local
+JavaScript fixture passes 489 cases/two skips after allowing the measured
+Codex multi-client recovery case 60 seconds overall; its production RPC/exit
+deadlines and no-replay assertions are unchanged. Source build/typecheck pass.
+New checkpoint hosted confirmation follows publication.
 
 ## October 1 merge blockers: current main and separate Codex prerequisite
 

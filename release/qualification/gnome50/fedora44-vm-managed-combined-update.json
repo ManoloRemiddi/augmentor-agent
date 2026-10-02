@@ -1,0 +1,200 @@
+{
+  "format": "augmentor-gnome-full-vm-managed-update/1",
+  "source": {
+    "commit": "aef93bb04520a003c5c48536aa6d4210105fc8ad",
+    "dirty": false
+  },
+  "version": "0.2.13",
+  "previousSource": "8244c9c15a0cfa818a5fe89c01f85d56cb085f8f",
+  "proofSha256": "36914bb04dc8eb9967dfaf3509e6fab73dbfd911a3ba197994bbc33ae3e4b99d",
+  "registeredUpdaterSha256": "7bb6552335a28cea554c20b562dbd8121c763d77e0984acdbcc9163ab38292bf",
+  "selectedArtifactContainsRegisteredUpdater": true,
+  "canonicalLauncherSha256": "6a628bd50fec2039ef3c21ea9494adf83899560e539be88ea61a05303583efb8",
+  "windowSha256": "ae755a18e130749d50e0013e27500bbc3e89b2935e3794c6d360f2d27d45d221",
+  "selected": {
+    "root": "/home/augmentor-proof/.local/share/augmentor/releases/20261002-034818-fe596dbe",
+    "python": "/usr/bin/python3",
+    "node": "/home/augmentor-proof/.local/share/augmentor/releases/20261002-034818-fe596dbe/node/bin/node",
+    "dshService": null,
+    "version": "0.2.13",
+    "releaseId": "20261002-034818-fe596dbe",
+    "sourceRef": "aef93bb04520a003c5c48536aa6d4210105fc8ad",
+    "artifactSha256": "f7d5962720e959a2624752e8b49a64ed7efb6ced5d4cc1e0c12d6e536c52008f"
+  },
+  "previous": {
+    "root": "/home/augmentor-proof/.local/share/augmentor/releases/20261002-030519-d8c3a9a5",
+    "python": "/usr/bin/python3",
+    "node": "/home/augmentor-proof/.local/share/augmentor/releases/20261002-030519-d8c3a9a5/node/bin/node",
+    "dshService": null,
+    "version": "0.2.13",
+    "releaseId": "20261002-030519-d8c3a9a5",
+    "sourceRef": "8244c9c15a0cfa818a5fe89c01f85d56cb085f8f",
+    "artifactSha256": "1620987e91eda17b1d866e45d91e903693dba474c672998c99f43a68065afe42"
+  },
+  "initial": {
+    "pid": 4954,
+    "running": false,
+    "busy": false,
+    "draftPresent": false,
+    "accepted": true,
+    "onboardingProtocol": 1,
+    "modelReady": false,
+    "online": false,
+    "repairing": false,
+    "lastError": "Use Connect DSH to save the matching local connection before automatic startup.",
+    "sessionRestoreError": "",
+    "buildRoot": "/home/augmentor-proof/.local/share/augmentor/releases/20261002-030519-d8c3a9a5",
+    "uiScale": 100,
+    "uiMetricFactor": 1.0,
+    "devicePixelRatio": 1.0,
+    "voiceAvailable": true,
+    "voiceTiming": null,
+    "voiceBufferStarvations": 0,
+    "voiceOutputUnderflows": 0
+  },
+  "reopened": {
+    "pid": 5478,
+    "running": false,
+    "busy": true,
+    "draftPresent": false,
+    "accepted": false,
+    "onboardingProtocol": 1,
+    "modelReady": false,
+    "online": false,
+    "repairing": false,
+    "lastError": "Use Connect DSH to save the matching local connection before automatic startup.",
+    "sessionRestoreError": "",
+    "buildRoot": "/home/augmentor-proof/.local/share/augmentor/releases/20261002-034818-fe596dbe",
+    "uiScale": 100,
+    "uiMetricFactor": 1.0,
+    "devicePixelRatio": 1.0,
+    "voiceAvailable": true,
+    "voiceTiming": null,
+    "voiceBufferStarvations": 0,
+    "voiceOutputUnderflows": 0
+  },
+  "stagingPreservesSelectionAndRunningProcess": true,
+  "stagedPackageBackendPreserved": true,
+  "stagedActualRuntimeLeasePassed": true,
+  "activationPreservesRunningProcess": true,
+  "selectedVsRunningPendingReported": true,
+  "previousSelectionRetained": true,
+  "idleCloseAccepted": true,
+  "cleanServiceExit": true,
+  "canonicalServiceOwnsNewRelease": true,
+  "adoptionClearsPending": true,
+  "actualQtRegistrationSucceeded": true,
+  "actualQtRegisterBeforeSettings": true,
+  "portalTraceSha256": "9f80fc18b1834dac1d217636070e7a01ef7580b391206e543a747fc92743148f",
+  "graphicalSession": {
+    "Seat": "seat0",
+    "Type": "wayland",
+    "Class": "user",
+    "Active": "yes",
+    "State": "active"
+  },
+  "scene": {
+    "schema": 1,
+    "backend": "gnome-shell-observer",
+    "shellVersion": "50.5",
+    "epoch": "52741935-6f5d-48be-8000-2e63bcd87b22",
+    "serial": 3254,
+    "inputQualified": false,
+    "window": null,
+    "windows": [
+      {
+        "id": "52741935-6f5d-48be-8000-2e63bcd87b22:34",
+        "pid": 5478,
+        "application": "com.augmentor.Agent",
+        "title": "Augmentor Agent",
+        "geometry": {
+          "x": 428,
+          "y": 174,
+          "width": 424,
+          "height": 484
+        },
+        "overrideRedirect": false,
+        "unmanaging": false
+      }
+    ],
+    "above": [
+      {
+        "id": "52741935-6f5d-48be-8000-2e63bcd87b22:34",
+        "pid": 5478,
+        "application": "com.augmentor.Agent",
+        "title": "Augmentor Agent",
+        "geometry": {
+          "x": 428,
+          "y": 174,
+          "width": 424,
+          "height": 484
+        },
+        "overrideRedirect": false,
+        "unmanaging": false
+      }
+    ],
+    "screens": [
+      {
+        "name": "monitor:0",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 800
+        },
+        "scale": 1
+      }
+    ],
+    "workspace": {
+      "id": 1,
+      "index": 0
+    },
+    "guards": {
+      "locked": false,
+      "greeter": false,
+      "sessionMode": "user",
+      "actionMode": 1,
+      "modalCount": 0,
+      "overview": false,
+      "overviewTarget": false,
+      "stageGrabbed": false,
+      "overviewAnimation": false,
+      "screenShieldAvailable": true,
+      "screenShieldActive": false,
+      "screenShieldLocked": false,
+      "stageGrabActor": null,
+      "stageKeyFocus": null,
+      "windowDragging": false
+    },
+    "blockedReasons": [
+      "no-visible-live-focus"
+    ],
+    "compositorOwner": ":1.7"
+  },
+  "originalPackageVerified": true,
+  "selinuxEnforcing": true,
+  "connectedHarnessTested": false,
+  "modelTurnTested": false,
+  "newReleaseLoginRebootTested": false,
+  "gnomeInputToolsEnabled": false,
+  "candidateProvenance": {
+    "source": {
+      "commit": "aef93bb04520a003c5c48536aa6d4210105fc8ad",
+      "dirty": false
+    },
+    "tree": "bd7d18026bcbcb70ea00bdc15ce1fb1f3bce6e9b",
+    "branch": "83932a9a1a87a8cf88c894285c6c68bb513045de",
+    "rpmSha256": "4e431c94e4038044d8530ba3d42fb914e66bbaa84850beaa1a5607aac97926a7",
+    "archiveSha256": "77868812494cf8c34504fd840079227b8ce487fba719f8cfb20e7b01b15bdf62",
+    "archiveBytes": 107578897,
+    "windowSha256": "ae755a18e130749d50e0013e27500bbc3e89b2935e3794c6d360f2d27d45d221",
+    "updaterSha256": "7bb6552335a28cea554c20b562dbd8121c763d77e0984acdbcc9163ab38292bf"
+  },
+  "fixtureScope": {
+    "cloudDerivedGdm": true,
+    "standardWorkstationIso": false,
+    "manualPasswordLogin": false,
+    "physicalKeyboard": false,
+    "ownerInstallationChanged": false
+  }
+}

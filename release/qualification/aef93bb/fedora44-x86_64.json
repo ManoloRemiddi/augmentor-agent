@@ -1,0 +1,48 @@
+{
+  "target": "fedora44-x86_64",
+  "imageDigest": "docker.io/library/fedora@sha256:43b29f65a41eb9c35e1cd5323e3bdf3b655c2357a9f4f1ff2f9c2798e5045d80",
+  "source": {
+    "commit": "aef93bb04520a003c5c48536aa6d4210105fc8ad",
+    "dirty": false
+  },
+  "artifacts": {
+    "augmentor-agent-0.2.13-1.fc44.x86_64.rpm": "7e8316c34d94921621e4c92746757271131a458b221b0d43839e8e47c8822c48"
+  },
+  "proofScriptSha256": "d51e830c3e5c83a179d0ac94ecee9aeb9da97e4bbd9c7075e5110dd065f00306",
+  "versions": {
+    "python": "3.14.7",
+    "pyside": "6.11.2",
+    "qt": "6.11.2",
+    "node": "v24.19.0"
+  },
+  "gtk4Version": "4.22.5",
+  "gtk4ShortcutApiImportTested": true,
+  "wmctrlVersion": "1.07",
+  "wmctrlBinaryTested": true,
+  "freshInstall": true,
+  "nonRootRuntimeLease": true,
+  "nonRootQtRender": true,
+  "activeRuntimeAndDesktopReinstallBlocked": true,
+  "activeComponentRemovalBlocked": true,
+  "idleReinstall": true,
+  "removePreservesPrivateFiles": true,
+  "reinstallAfterRemove": true,
+  "realDesktopSessionTested": false,
+  "physicalAudioTested": false,
+  "selinuxEnforcingTested": false,
+  "dshModelTurnTested": false,
+  "hostedQualification": {
+    "run": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36959238873",
+    "runAttempt": 1,
+    "branchHead": "83932a9a1a87a8cf88c894285c6c68bb513045de",
+    "mergedSource": "aef93bb04520a003c5c48536aa6d4210105fc8ad",
+    "verifiedBranchAndMergeTree": "bd7d18026bcbcb70ea00bdc15ce1fb1f3bce6e9b",
+    "nativeTests": 644,
+    "nativePassed": 642,
+    "nativeSkipped": 2,
+    "completeInstallerTested": false,
+    "gnomeDesktopSessionTested": false
+  },
+  "rawReportSha256": "0c7ffb2e90769978916463986783a7ccec021fe9956df722b56d12186f76d640",
+  "rawTestLogSha256": "39fbd46e3e80b3c86cb99ad3a0532c3960c2fcadbc41bb4002dd892d868da131"
+}

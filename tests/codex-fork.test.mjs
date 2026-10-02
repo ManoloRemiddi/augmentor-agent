@@ -95,7 +95,10 @@ test('pinned forks retain exact turn boundaries and tools across independent wor
   assert.equal((await nativeHistory(restarted,fork.thread.id)).length,2);
 });
 
-test('host branches preserve native ownership, retry identity and independent histories after restart', {timeout:30000}, async t=>{
+// Failed recovery attempts start and retire multiple native CLI processes,
+// each retaining the two-second shutdown grace. The complete case was measured
+// above 30 seconds; keep its assertions and individual deadlines intact.
+test('host branches preserve native ownership, retry identity and independent histories after restart', {timeout:60000}, async t=>{
   const {CodexHost}=await import('../dist/codex-runtime/src/host.js');
   const root=mkdtempSync(join(tmpdir(),'codex-host-fork-')),hosts=[],requests=[];
   let forkCalls=0,loseForkReply=false,corruptForkHistory=false,failRecoveryRead=false,profileRevision=1;const forkedIds=new Set();

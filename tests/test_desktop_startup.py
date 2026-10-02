@@ -53,6 +53,7 @@ class DesktopStartupTests(unittest.TestCase):
         self.assertEqual(args[0],'/venv/bin/python');self.assertIn('--ensure-running',args[1])
         self.assertEqual(args[2]['AUGMENTOR_DSH_SERVICE'],'dsh-web.service')
         self.assertEqual(args[2]['PYTHONPATH'],str(ROOT/'apps/native'))
+        self.assertEqual(args[2]['AUGMENTOR_PYTHON'],config['python'])
 
     def test_session_restore_cannot_keep_an_idle_old_build_in_charge(self):
         launch=load('desktop-launch')

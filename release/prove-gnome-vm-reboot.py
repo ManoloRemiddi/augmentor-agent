@@ -9,6 +9,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import time
@@ -16,7 +17,9 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--directory', type=Path, required=True)
+p.add_argument('--managed-source')
 a = p.parse_args()
+if a.managed_source:assert re.fullmatch('[0-9a-f]{40}', a.managed_source)
 vm = a.directory.resolve()
 assert os.geteuid() != 0 and vm.is_relative_to(ROOT/'outputs')
 pid = int((vm/'qemu.pid').read_text())
@@ -31,7 +34,7 @@ ssh = ['ssh', '-i', str(vm/'id_ed25519'), '-o', 'BatchMode=yes', '-o', 'Identiti
        '-o', 'UserKnownHostsFile='+str(vm/'known_hosts'), '-p', '22489',
        'augmentor-proof@127.0.0.1']
 preflight = '''from pathlib import Path
-import json,subprocess,socket,os
+import json,subprocess,socket,os,importlib.util
 assert os.geteuid()!=0 and os.environ.get('USER')=='augmentor-proof'
 assert Path('/etc/augmentor-test-vm').read_text()=="Isolated Augmentor Fedora GNOME qualification VM\\n"
 assert subprocess.check_output(['systemd-detect-virt'],text=True).strip()=='qemu'
@@ -41,11 +44,19 @@ with socket.socket(socket.AF_UNIX,socket.SOCK_STREAM) as s:
  s.settimeout(3);s.connect('/run/user/'+str(os.getuid())+'/augmentor-linux-pi.sock');s.sendall(b'maintenance.status')
  with s.makefile('rb') as stream:status=json.loads(stream.readline(16384))
 assert status['accepted'] and not status['busy'] and not status['running'] and not status['draftPresent'] and not status['online']
-assert status['buildRoot']=='/usr/lib/augmentor'
+root=Path('/usr/lib/augmentor')
+selection=json.loads((Path.home()/'.local/share/augmentor/desktop.json').read_text())
+if expected_source:
+ root=Path(selection['root']);data=Path.home()/'.local/share/augmentor'
+ assert root.is_relative_to(data/'releases') and selection['sourceRef']==expected_source
+ spec=importlib.util.spec_from_file_location('owned_reboot_deployment',data/'desktop-deployment.py')
+ deployment=importlib.util.module_from_spec(spec);spec.loader.exec_module(deployment);deployment.verify(root)
+ assert json.loads((root/'release.json').read_text())['source']=={'commit':expected_source,'dirty':False}
+assert status['buildRoot']==str(root)
 assert int(subprocess.check_output(['systemctl','--user','show','augmentor-desktop.service','--value','-p','MainPID'],text=True))==status['pid']
-print(json.dumps({'bootId':Path('/proc/sys/kernel/random/boot_id').read_text().strip(),'status':status,'release':json.loads(Path('/usr/lib/augmentor/release.json').read_text())}))
+print(json.dumps({'bootId':Path('/proc/sys/kernel/random/boot_id').read_text().strip(),'status':status,'selection':selection,'release':json.loads((root/'release.json').read_text())}))
 '''
-r = subprocess.run(ssh+['python3 -'], input=preflight, text=True, capture_output=True, timeout=40)
+r = subprocess.run(ssh+['python3 -'], input='expected_source='+repr(a.managed_source)+'\n'+preflight, text=True, capture_output=True, timeout=90)
 assert r.returncode == 0, r.stderr
 before = json.loads(r.stdout)
 reboot = '''from pathlib import Path
@@ -63,12 +74,14 @@ while time.monotonic() < deadline:
     r = subprocess.run(ssh+['cat /proc/sys/kernel/random/boot_id'], text=True,
                        capture_output=True, timeout=12)
     if r.returncode == 0 and r.stdout.strip() != before['bootId']:
-        result = subprocess.run(ssh+['python3 ~/inspect-gnome-vm.py'], text=True,
-                                capture_output=True, timeout=35)
+        inspection = 'python3 ~/inspect-gnome-vm.py'+(' --managed-source '+a.managed_source if a.managed_source else '')
+        result = subprocess.run(ssh+[inspection], text=True,
+                                capture_output=True, timeout=90)
         if result.returncode == 0:
             after = json.loads(result.stdout)
             assert after['source'] == before['release']['source']
             assert after['version'] == before['release']['version']
+            if a.managed_source:assert after['selection'] == before['selection'] and after['managedInventoryVerified']
             break
         last_error = result.stderr
     time.sleep(2)
@@ -79,11 +92,12 @@ report = {'format': 'augmentor-gnome-full-vm-reboot/1',
     'proofSha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
     'singleRebootRequest': True, 'idleDraftFreeUnconnectedPreflight': True,
     'kernelBootIdentityChanged': True, 'sameInstalledSourceAfterReboot': True,
+    'managedSource': a.managed_source, 'sameSelectedArtifactAfterReboot': bool(a.managed_source),
     'realGdmWaylandLoginAfterReboot': True, 'serviceOwnsActualAppAfterReboot': True,
     'selinuxEnforcingAfterReboot': after['selinuxEnforcing'],
     'packageVerifiedAfterReboot': after['packageVerified'], 'after': after,
     'harnessConnectionTested': False, 'modelTurnTested': False,
     'loginAuthenticationTested': False, 'standardWorkstationInstallerTested': False,
     'gnomeInputToolsEnabled': False}
-(vm/'reboot.json').write_text(json.dumps(report, indent=2)+'\n')
+(vm/('managed-reboot.json' if a.managed_source else 'reboot.json')).write_text(json.dumps(report, indent=2)+'\n')
 print(json.dumps({k:v for k,v in report.items() if k != 'after'}))
