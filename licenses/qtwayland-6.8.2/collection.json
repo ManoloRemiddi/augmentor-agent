@@ -1,0 +1,478 @@
+{
+  "commit": "4261629005d174311045a44914d599ad67d2b7a3",
+  "records": [
+    {
+      "attributionFile": "src/3rdparty/protocol/fractional-scale/qt_attribution.json",
+      "Id": "fractional-scale-v1",
+      "Name": "Wayland Fractional Scale Protocol",
+      "QDocModule": "qtwaylandcompositor",
+      "QtUsage": "Used in the Qt Wayland platform plugin",
+      "Files": "fractional-scale-v1.xml",
+      "Description": "Send a preferred scale to different clients",
+      "Homepage": "https://wayland.freedesktop.org",
+      "Version": "1",
+      "DownloadLocation": "https://gitlab.freedesktop.org/wayland/wayland-protocols/-/raw/1.31/unstable/fractional-scale/fractional-scale-v1.xml",
+      "LicenseId": "MIT",
+      "License": "MIT License",
+      "LicenseFile": "../MIT_LICENSE.txt",
+      "Copyright": "Copyright \u00a9 2022 Kenny Levinsen"
+    },
+    {
+      "attributionFile": "src/3rdparty/protocol/fullscreen-shell/qt_attribution.json",
+      "Id": "wayland-fullscreen-protocol",
+      "Name": "Wayland Fullscreen Shell Protocol",
+      "QDocModule": "qtwaylandcompositor",
+      "QtUsage": "Used in the Qt Wayland platform plugin.",
+      "Files": "fullscreen-shell-unstable-v1.xml",
+      "Description": "A Wayland shell for displaying a single surface per output",
+      "Homepage": "https://wayland.freedesktop.org",
+      "Version": "unstable v1",
+      "DownloadLocation": "https://gitlab.freedesktop.org/wayland/wayland-protocols/raw/1.18/unstable/fullscreen-shell/fullscreen-shell-unstable-v1.xml",
+      "LicenseId": "MIT",
+      "License": "MIT License",
+      "LicenseFile": "../MIT_LICENSE.txt",
+      "Copyright": "Copyright \u00a9 2016 Yong Bakos\nCopyright \u00a9 2015 Jason Ekstrand\nCopyright \u00a9 2015 Jonas \u00c5dahl"
+    },
+    {
+      "attributionFile": "src/3rdparty/protocol/ivi/qt_attribution.json",
+      "Id": "wayland-ivi-extension-protocol",
+      "Name": "Wayland IVI Extension Protocol",
+      "QDocModule": "qtwaylandcompositor",
+      "QtUsage": "Used in the Qt Wayland Compositor, and the Qt Wayland platform plugin.",
+      "Files": "ivi-controller.xml ivi-application.xml",
+      "Description": "\"Wayland IVI Extension\" is forked from IVI Layer Management to define a common set of APIs by wayland style protocol and provide reference implementation which can be loaded on Weston.",
+      "Homepage": "https://at.projects.genivi.org/wiki/display/WIE/Wayland+IVI+Extension+Home",
+      "Version": "1.9.1",
+      "DownloadLocation": "https://github.com/GENIVI/wayland-ivi-extension/releases/tag/1.9.1",
+      "LicenseId": "MIT",
+      "License": "MIT License",
+      "LicenseFile": "../MIT_LICENSE.txt",
+      "Copyright": "Copyright (C) 2013 DENSO CORPORATION\nCopyright (c) 2013 BMW Car IT GmbH"
+    },
+    {
+      "attributionFile": "src/3rdparty/protocol/linux-dmabuf/qt_attribution.json",
+      "Id": "wayland-linux-dmabuf-unstable-v1",
+      "Name": "Wayland Linux Dmabuf Unstable V1 Protocol",
+      "QDocModule": "qtwaylandcompositor",
+      "QtUsage": "Used in the Qt Wayland Compositor",
+      "Files": "linux-dmabuf-unstable-v1.xml",
+      "Description": "The linux dmabuf protocol is a way to create dmabuf-based wl_buffers",
+      "Homepage": "https://wayland.freedesktop.org",
+      "Version": "unstable v1, version 3",
+      "DownloadLocation": "https://gitlab.freedesktop.org/wayland/wayland-protocols/raw/1.18/unstable/linux-dmabuf/linux-dmabuf-unstable-v1.xml",
+      "LicenseId": "MIT",
+      "License": "MIT License",
+      "LicenseFile": "../MIT_LICENSE.txt",
+      "Copyright": "Copyright \u00a9 2014, 2015 Collabora, Ltd."
+    },
+    {
+      "attributionFile": "src/3rdparty/protocol/pointer-gestures/qt_attribution.json",
+      "Id": "wayland-pointer-gestures-protocol",
+      "Name": "Wayland Pointer Gestures Protocol",
+      "QDocModule": "qtwaylandcompositor",
+      "QtUsage": "Used in the Qt Wayland platform plugin",
+      "Files": "pointer-gestures-unstable-v1.xml",
+      "Description": "",
+      "Homepage": "https://wayland.freedesktop.org",
+      "Version": "unstable v1, version 2",
+      "DownloadLocation": "https://cgit.freedesktop.org/wayland/wayland-protocols/plain/unstable/pointer-gestures/pointer-gestures-unstable-v1.xml",
+      "LicenseId": "MIT",
+      "License": "MIT License",
+      "LicenseFile": "../MIT_LICENSE.txt",
+      "Copyright": "Copyright \u00a9 2015, 2016 Red Hat"
+    },
+    {
+      "attributionFile": "src/3rdparty/protocol/presentation-time/qt_attribution.json",
+      "Id": "presentation-time.xml",
+      "Name": "Presentation Time Protocol",
+      "QDocModule": "qtwaylandcompositor",
+      "QtUsage": "Used in the Qt Wayland Compositor",
+      "Files": "presentation-time.xml",
+      "Description": "The presentaton time protocol is a way to get presentation timing feedback.",
+      "Homepage": "https://wayland.freedesktop.org",
+      "Version": "1",
+      "DownloadLocation": "https://gitlab.freedesktop.org/wayland/wayland-protocols/raw/1.18/stable/presentation-time/presentation-time.xml",
+      "LicenseId": "MIT",
+      "License": "MIT License",
+      "LicenseFile": "../MIT_LICENSE.txt",
+      "Copyright": "Copyright \u00a9 2013, 2014 Collabora, Ltd."
+    },
+    {
+      "attributionFile": "src/3rdparty/protocol/scaler/qt_attribution.json",
+      "Id": "wayland-scaler-protocol",
+      "Name": "Wayland Scaler Protocol",
+      "QDocModule": "qtwaylandcompositor",
+      "QtUsage": "Used in the Qt Wayland Compositor API",
+      "Files": "scaler.xml",
+      "Description": "The Wayland scaler extension allows a client to scale or crop a surface without modifying the buffer",
+      "Homepage": "https://wayland.freedesktop.org",
+      "Version": "2",
+      "DownloadLocation": "https://gitlab.freedesktop.org/wayland/weston/raw/1.11/protocol/scaler.xml",
+      "LicenseId": "MIT",
+      "License": "MIT License",
+      "LicenseFile": "../MIT_LICENSE.txt",
+      "Copyright": "Copyright \u00a9 2013-2014 Collabora, Ltd."
+    },
+    {
+      "attributionFile": "src/3rdparty/protocol/tablet/qt_attribution.json",
+      "Id": "wayland-tablet-protocol",
+      "Name": "Wayland Tablet Protocol",
+      "QDocModule": "qtwaylandcompositor",
+      "QtUsage": "Used in the Qt Wayland platform plugin",
+      "Files": "tablet-unstable-v2.xml",
+      "Description": "",
+      "Homepage": "https://wayland.freedesktop.org",
+      "Version": "unstable v2, version 1",
+      "DownloadLocation": "https://cgit.freedesktop.org/wayland/wayland-protocols/plain/unstable/tablet/tablet-unstable-v2.xml",
+      "LicenseId": "MIT",
+      "License": "MIT License",
+      "LicenseFile": "../MIT_LICENSE.txt",
+      "Copyright": "Copyright 2014 \u00a9 Stephen \"Lyude\" Chandler Paul\nCopyright 2015-2016 \u00a9 Red Hat, Inc."
+    },
+    {
+      "attributionFile": "src/3rdparty/protocol/text-input/v1/qt_attribution.json",
+      "Id": "wayland-text-input-unstable-v1",
+      "Name": "Wayland Text Input Protocol v1",
+      "QDocModule": "qtwaylandcompositor",
+      "QtUsage": "Used in the Qt Wayland platform plugin",
+      "Files": "text-input-unstable-v1.xml",
+      "Description": "Adds support for text input and input methods to applications running on Wayland servers that only support text-input-unstable-v1.",
+      "Homepage": "https://wayland.freedesktop.org",
+      "Version": "unstable v1",
+      "DownloadLocation": "https://gitlab.freedesktop.org/wayland/wayland-protocols/-/blob/main/unstable/text-input/text-input-unstable-v1.xml",
+      "LicenseId": "MIT",
+      "License": "MIT License",
+      "LicenseFile": "../../MIT_LICENSE.txt",
+      "Copyright": "Copyright \u00a9 2012, 2013 Intel Corporation"
+    },
+    {
+      "attributionFile": "src/3rdparty/protocol/text-input/v2/qt_attribution.json",
+      "Id": "wayland-text-input-unstable-v2",
+      "Name": "Wayland Text Input Protocol v2",
+      "QDocModule": "qtwaylandcompositor",
+      "QtUsage": "Used in the Qt Wayland Compositor, and the Qt Wayland platform plugin.",
+      "Files": "text-input-unstable-v2.xml",
+      "Description": "Adds support for text input and input methods to applications.",
+      "Homepage": "https://wayland.freedesktop.org",
+      "Version": "unstable v2",
+      "LicenseId": "HPND",
+      "License": "HPND License",
+      "LicenseFile": "HPND_LICENSE.txt",
+      "Copyright": "Copyright \u00a9 2012, 2013 Intel Corporation\nCopyright \u00a9 2015, 2016 Jan Arne Petersen"
+    },
+    {
+      "attributionFile": "src/3rdparty/protocol/text-input/v3/qt_attribution.json",
+      "Id": "wayland-text-input-unstable-v3",
+      "Name": "Wayland Text Input Protocol",
+      "QDocModule": "qtwaylandcompositor",
+      "QtUsage": "Used in the Qt Wayland Compositor, and the Qt Wayland platform plugin.",
+      "Files": "text-input-unstable-v3.xml",
+      "Description": "Adds support for compositors to act as input methods and send text to applications.",
+      "Homepage": "https://wayland.freedesktop.org",
+      "Version": "unstable v3",
+      "DownloadLocation": "https://cgit.freedesktop.org/wayland/wayland-protocols/plain/unstable/text-input/text-input-unstable-v3.xml",
+      "LicenseId": "MIT",
+      "License": "MIT License",
+      "LicenseFile": "../../MIT_LICENSE.txt",
+      "Copyright": "Copyright \u00a9 2012, 2013 Intel Corporation\nCopyright \u00a9 2015, 2016 Jan Arne Petersen\nCopyright \u00a9 2017, 2018 Red Hat, Inc.\nCopyright \u00a9 2018       Purism SPC"
+    },
+    {
+      "attributionFile": "src/3rdparty/protocol/viewporter/qt_attribution.json",
+      "Id": "wayland-viewporter-protocol",
+      "Name": "Wayland Viewporter Protocol",
+      "QDocModule": "qtwaylandcompositor",
+      "QtUsage": "Used in the Qt Wayland Compositor API",
+      "Files": "viewporter.xml",
+      "Description": "The Wayland viewporter extension allows a client to scale or crop a surface without modifying the buffer",
+      "Homepage": "https://wayland.freedesktop.org",
+      "Version": "1",
+      "DownloadLocation": "https://gitlab.freedesktop.org/wayland/wayland-protocols/raw/1.18/stable/viewporter/viewporter.xml",
+      "LicenseId": "MIT",
+      "License": "MIT License",
+      "LicenseFile": "../MIT_LICENSE.txt",
+      "Copyright": "Copyright \u00a9 2013-2016 Collabora, Ltd."
+    },
+    {
+      "attributionFile": "src/3rdparty/protocol/wayland/qt_attribution.json",
+      "Id": "wayland-protocol",
+      "Name": "Wayland Protocol",
+      "QDocModule": "qtwaylandcompositor",
+      "QtUsage": "Used in the Qt Wayland Compositor, and the Qt Wayland platform plugin.",
+      "Files": "wayland.xml",
+      "Description": "Wayland is a protocol for a compositor to talk to its clients.",
+      "Homepage": "https://wayland.freedesktop.org",
+      "Version": "1.19.0",
+      "DownloadLocation": "https://gitlab.freedesktop.org/wayland/wayland/raw/1.19.0/protocol/wayland.xml",
+      "LicenseId": "MIT",
+      "License": "MIT License",
+      "LicenseFile": "../MIT_LICENSE.txt",
+      "Copyright": "Copyright \u00a9 2008-2011 Kristian H\u00f8gsberg\nCopyright \u00a9 2010-2011 Intel Corporation\nCopyright \u00a9 2012-2013 Collabora, Ltd."
+    },
+    {
+      "attributionFile": "src/3rdparty/protocol/wl-eglstream/qt_attribution.json",
+      "Id": "wayland-eglstream-controller",
+      "Name": "Wayland EGLStream Controller Protocol",
+      "QDocModule": "qtwaylandcompositor",
+      "QtUsage": "Used in the Qt Wayland Compositor",
+      "Files": "wl-eglstream-controller.xml",
+      "Description": "Allows clients to request that the compositor creates its EGLStream.",
+      "Homepage": "https://github.com/NVIDIA/egl-wayland",
+      "Version": "1.1.1",
+      "DownloadLocation": "https://raw.githubusercontent.com/NVIDIA/egl-wayland/1.1.1/wayland-eglstream/wayland-eglstream-controller.xml",
+      "LicenseId": "MIT",
+      "License": "MIT License",
+      "LicenseFile": "../MIT_LICENSE.txt",
+      "Copyright": "Copyright (c) 2017, NVIDIA CORPORATION. All rights reserved."
+    },
+    {
+      "attributionFile": "src/3rdparty/protocol/wp-primary-selection/qt_attribution.json",
+      "Id": "wayland-primary-selection-protocol",
+      "Name": "Wayland Primary Selection Protocol",
+      "QDocModule": "qtwaylandcompositor",
+      "QtUsage": "Used in the Qt Wayland platform plugin",
+      "Files": "wp-primary-selection-unstable-v1.xml",
+      "Description": "The primary selection extension allows copying text by selecting it and pasting it with the middle mouse button.",
+      "Homepage": "https://wayland.freedesktop.org",
+      "Version": "1",
+      "DownloadLocation": "https://gitlab.freedesktop.org/wayland/wayland-protocols/raw/1.18/unstable/primary-selection/primary-selection-unstable-v1.xml",
+      "LicenseId": "MIT",
+      "License": "MIT License",
+      "LicenseFile": "../MIT_LICENSE.txt",
+      "Copyright": "Copyright \u00a9 2015, 2016 Red Hat"
+    },
+    {
+      "attributionFile": "src/3rdparty/protocol/xdg-activation/qt_attribution.json",
+      "Id": "wayland-xdg-activation",
+      "Name": "Wayland xdg-activation Protocol",
+      "QDocModule": "qtwaylandcompositor",
+      "QtUsage": "Used in the Qt Wayland platform plugin",
+      "Files": "xdg-activation-v1.xml",
+      "Description": "The xdg-activation protocol provides a way for one client to pass focus to another.",
+      "Homepage": "https://wayland.freedesktop.org",
+      "Version": "unstable v1, version 1",
+      "DownloadLocation": "https://gitlab.freedesktop.org/wayland/wayland-protocols/-/blob/main/staging/xdg-activation/xdg-activation-v1.xml",
+      "LicenseId": "MIT",
+      "License": "MIT License",
+      "LicenseFile": "../MIT_LICENSE.txt",
+      "Copyright": "Copyright \u00a9 2020 Aleix Pol Gonzalez &lt;aleixpol@kde.org&gt;\nCopyright \u00a9 2020 Carlos Garnacho &lt;carlosg@gnome.org&gt;"
+    },
+    {
+      "attributionFile": "src/3rdparty/protocol/xdg-decoration/qt_attribution.json",
+      "Id": "wayland-xdg-decoration-protocol",
+      "Name": "Wayland xdg-decoration Protocol",
+      "QDocModule": "qtwaylandcompositor",
+      "QtUsage": "Used in the Qt Wayland Compositor API, and the Qt Wayland platform plugin.",
+      "Files": "xdg-decoration-unstable-v1.xml",
+      "Description": "The xdg-decoration protocol allows a compositor to announce support for server-side decorations.",
+      "Homepage": "https://wayland.freedesktop.org",
+      "Version": "unstable v1, version 1",
+      "DownloadLocation": "https://gitlab.freedesktop.org/wayland/wayland-protocols/raw/1.18/unstable/xdg-decoration/xdg-decoration-unstable-v1.xml",
+      "LicenseId": "MIT",
+      "License": "MIT License",
+      "LicenseFile": "../MIT_LICENSE.txt",
+      "Copyright": "Copyright \u00a9 2018 Simon Ser"
+    },
+    {
+      "attributionFile": "src/3rdparty/protocol/xdg-dialog/qt_attribution.json",
+      "Id": "xdg-dialog-v1",
+      "Name": "Wayland Dialog Protocol",
+      "QDocModule": "qtwaylandcompositor",
+      "QtUsage": "Used in the Qt Wayland platform plugin",
+      "Files": "xdg-dialog-v1.xml",
+      "Description": "Register toplevel as dialogs",
+      "Homepage": "https://wayland.freedesktop.org",
+      "Version": "1",
+      "DownloadLocation": "",
+      "LicenseId": "MIT",
+      "License": "MIT License",
+      "LicenseFile": "../MIT_LICENSE.txt",
+      "Copyright": "Copyright \u00a9 2023 Carlos Garnacho"
+    },
+    {
+      "attributionFile": "src/3rdparty/protocol/xdg-foreign/qt_attribution.json",
+      "Id": "xdg-foreign-unstable-v2",
+      "Name": "Wayland XDG Foreign Protocol",
+      "QDocModule": "qtwaylandcompositor",
+      "QtUsage": "Used in the Qt Wayland platform plugin",
+      "Files": "xdg-foreign-unstable-v2.xml",
+      "Description": "Allows referencing surfaces of different clients",
+      "Homepage": "https://wayland.freedesktop.org",
+      "Version": "1",
+      "DownloadLocation": "https://gitlab.freedesktop.org/wayland/wayland-protocols/-/raw/1.25/unstable/xdg-foreign/xdg-foreign-unstable-v2.xml",
+      "LicenseId": "MIT",
+      "License": "MIT License",
+      "LicenseFile": "../MIT_LICENSE.txt",
+      "Copyright": "Copyright \u00a9 2015-2016 Red Hat Inc."
+    },
+    {
+      "attributionFile": "src/3rdparty/protocol/xdg-output/qt_attribution.json",
+      "Id": "wayland-xdg-output-protocol",
+      "Name": "Wayland XDG Output Protocol",
+      "QDocModule": "qtwaylandcompositor",
+      "QtUsage": "Used in the Qt Wayland Compositor API, and the Qt Wayland platform plugin.",
+      "Files": "xdg-output-unstable-v1.xml",
+      "Description": "The XDG Output protocol is an extended way to describe output regions under Wayland",
+      "Homepage": "https://wayland.freedesktop.org",
+      "Version": "unstable v1, version 3",
+      "DownloadLocation": "https://gitlab.freedesktop.org/wayland/wayland-protocols/raw/1.18/unstable/xdg-output/xdg-output-unstable-v1.xml",
+      "LicenseId": "MIT",
+      "License": "MIT License",
+      "LicenseFile": "../MIT_LICENSE.txt",
+      "Copyright": "Copyright \u00a9 2017 Red Hat Inc."
+    },
+    {
+      "attributionFile": "src/3rdparty/protocol/xdg-shell/qt_attribution.json",
+      "Id": "wayland-xdg-shell-protocol",
+      "Name": "Wayland XDG Shell Protocol",
+      "QDocModule": "qtwaylandcompositor",
+      "QtUsage": "Used in the Qt Wayland Compositor, and the Qt Wayland platform plugin.",
+      "Files": "xdg-shell.xml",
+      "Description": "The XDG-Shell protocol is an extended way to manage surfaces under Wayland compositors.",
+      "Homepage": "https://gitlab.freedesktop.org/wayland/wayland-protocols/",
+      "Version": "1.18",
+      "DownloadLocation": "https://gitlab.freedesktop.org/wayland/wayland-protocols/tree/1.18/",
+      "LicenseId": "MIT",
+      "License": "MIT License",
+      "LicenseFile": "../MIT_LICENSE.txt",
+      "Copyright": "Copyright \u00a9 2008-2013 Kristian H\u00f8gsberg\nCopyright \u00a9 2013      Rafael Antognolli\nCopyright \u00a9 2013      Jasper St. Pierre\nCopyright \u00a9 2010-2013 Intel Corporation\nCopyright \u00a9 2015-2017 Samsung Electronics Co., Ltd\nCopyright \u00a9 2015-2017 Red Hat Inc.\n"
+    }
+  ],
+  "files": [
+    {
+      "path": "LICENSES/BSD-3-Clause.txt",
+      "sha256": "9f0490f18656c6f2435bd14f603ef0c96434d1825615363dce43abb42ed1dcce"
+    },
+    {
+      "path": "LICENSES/CC0-1.0.txt",
+      "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+    },
+    {
+      "path": "LICENSES/GFDL-1.3-no-invariants-only.txt",
+      "sha256": "110535522396708cea37c72a802c5e7e81391139f5f7985631c93ef242b206a4"
+    },
+    {
+      "path": "LICENSES/GPL-2.0-only.txt",
+      "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643"
+    },
+    {
+      "path": "LICENSES/GPL-3.0-only.txt",
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
+    },
+    {
+      "path": "LICENSES/HPND.txt",
+      "sha256": "5716e5cd198ed5c4ca2c39de067e89d9f4ac7537c88bfaff661820ef1fe0722d"
+    },
+    {
+      "path": "LICENSES/LGPL-3.0-only.txt",
+      "sha256": "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768"
+    },
+    {
+      "path": "LICENSES/LicenseRef-Qt-Commercial.txt",
+      "sha256": "9b1f50aae6267f9d5e0ceb6775ee86450262c25ec7c0573e151fe5d3f18a4700"
+    },
+    {
+      "path": "LICENSES/MIT.txt",
+      "sha256": "d040359701c01996a017d5c515678929cd1b0625e64cb86db44025fbb6cdf1fc"
+    },
+    {
+      "path": "LICENSES/Qt-GPL-exception-1.0.txt",
+      "sha256": "40678d338ce53cd93f8b22b281a2ecbcaa3ee65ce60b25ffb0c462b0530846b2"
+    },
+    {
+      "path": "src/3rdparty/protocol/MIT_LICENSE.txt",
+      "sha256": "a8341b9c90ef447a77f55d550e6691e370d3ac15d60edb584def356e348ab828"
+    },
+    {
+      "path": "src/3rdparty/protocol/fractional-scale/qt_attribution.json",
+      "sha256": "bf87b7dc5bf42e91c9d98ad2a109d197141aaebffe563ab247dd771e0b9b07c8"
+    },
+    {
+      "path": "src/3rdparty/protocol/fullscreen-shell/qt_attribution.json",
+      "sha256": "24ebba6014034dcf2c9a23a5b1085dc9708eaa81c021dfe51ba3f6b51ba788a7"
+    },
+    {
+      "path": "src/3rdparty/protocol/ivi/qt_attribution.json",
+      "sha256": "6dcd14eab3d78a8d11429b87aa5bda752332060f22158524b81ed26dbd2c5f6b"
+    },
+    {
+      "path": "src/3rdparty/protocol/linux-dmabuf/qt_attribution.json",
+      "sha256": "64ea0d933ff0d0868e820b443c14feda5208f90bd02032cdc9a1b6881a05f446"
+    },
+    {
+      "path": "src/3rdparty/protocol/pointer-gestures/qt_attribution.json",
+      "sha256": "3c85ce329ccb30c469aa3f3c71596eb915c9cccd645ac1192d94a8fe548556b7"
+    },
+    {
+      "path": "src/3rdparty/protocol/presentation-time/qt_attribution.json",
+      "sha256": "c3af7f51726c7584d5e8ad74a29813d66cac6a215a9675da7cfc9a42f15c2d0a"
+    },
+    {
+      "path": "src/3rdparty/protocol/scaler/qt_attribution.json",
+      "sha256": "8b7751412fc26d70f641d6bad9c6aadd406317cbf17359ffcc58651f58aa2fca"
+    },
+    {
+      "path": "src/3rdparty/protocol/tablet/qt_attribution.json",
+      "sha256": "a46626dbac8fc1f57d5b34eb077425fc402fc0767b75ec06578e1465502883b5"
+    },
+    {
+      "path": "src/3rdparty/protocol/text-input/v1/qt_attribution.json",
+      "sha256": "882ac88020f0ecaea6d991f7e8d292542c9422592ede0396c4d217f040ef6a54"
+    },
+    {
+      "path": "src/3rdparty/protocol/text-input/v2/HPND_LICENSE.txt",
+      "sha256": "8172d52f3b7bba7d10af2f9134c63d0f699ba6b20a47e35f5ac45654c500bfd7"
+    },
+    {
+      "path": "src/3rdparty/protocol/text-input/v2/qt_attribution.json",
+      "sha256": "197d9edcc6fb17d7bc2b230f7061ce0d2ef90fa4291c86e87ae2817e8f2809fe"
+    },
+    {
+      "path": "src/3rdparty/protocol/text-input/v3/qt_attribution.json",
+      "sha256": "476225d10cb5789d993c38335c6cc442fdc19a8d91f1ceb7a3ddb50414a8e68a"
+    },
+    {
+      "path": "src/3rdparty/protocol/viewporter/qt_attribution.json",
+      "sha256": "95139e441967bc289d174078f1ca0485363e8405bd8d06eb9946356c09c0a5e4"
+    },
+    {
+      "path": "src/3rdparty/protocol/wayland/qt_attribution.json",
+      "sha256": "1c315ea4f2d4ff4067384e6ff0e554b9ecf1194e2aedf0dd0faa4bfe03cfa709"
+    },
+    {
+      "path": "src/3rdparty/protocol/wl-eglstream/qt_attribution.json",
+      "sha256": "2432510e17446887decd1fc58770aeeef060aff5331a8bfec7fb668555f3b347"
+    },
+    {
+      "path": "src/3rdparty/protocol/wp-primary-selection/qt_attribution.json",
+      "sha256": "14586c06e09439e9c2b7719766f68e219d0ff0231811e13e44f4587dabf52707"
+    },
+    {
+      "path": "src/3rdparty/protocol/xdg-activation/qt_attribution.json",
+      "sha256": "8f13cfd4c78a2f116d3e674c329d3d211b647d80190e7a95493528cd6dedbd89"
+    },
+    {
+      "path": "src/3rdparty/protocol/xdg-decoration/qt_attribution.json",
+      "sha256": "b8d9102ff3c7eccd840f7d5332d072e41e95eb055a8a9f2e3719a83005879c86"
+    },
+    {
+      "path": "src/3rdparty/protocol/xdg-dialog/qt_attribution.json",
+      "sha256": "c7918fb63ad5be29e9a95db3464a7832224c7d904d21617ccfc689e6b0ab04c0"
+    },
+    {
+      "path": "src/3rdparty/protocol/xdg-foreign/qt_attribution.json",
+      "sha256": "0ed6fbddba411b647bbe895b6e7a842c2a884905206888c0b4df6b6cd3bb9f79"
+    },
+    {
+      "path": "src/3rdparty/protocol/xdg-output/qt_attribution.json",
+      "sha256": "c5e4f132de8d08a75af02682bba3a9349a00f49b773e23ef5543648209b76658"
+    },
+    {
+      "path": "src/3rdparty/protocol/xdg-shell/qt_attribution.json",
+      "sha256": "e1367b44fe28fce2eee7656cda75203f4102662bb6aa370b3c9f3eb5a2cc3f82"
+    }
+  ],
+  "unresolved": [],
+  "parsingNotes": [],
+  "licenseIdResolutions": [],
+  "binaryCoverageVerified": false
+}

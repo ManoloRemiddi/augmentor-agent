@@ -1,5 +1,5 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-"""Bounded, compositor-authenticated access to GNOME 46/50 read-only observers."""
+"""Bounded, compositor-authenticated access to GNOME 46/48/50 read-only observers."""
 import json
 import math
 import re
@@ -21,7 +21,7 @@ def parsed(value):
 def valid_status(value):
     if (value.get('schema')!=1 or value.get('backend')!='gnome-shell-observer'
             or value.get('inputQualified') is not False
-            or not re.fullmatch(r'(?:46|50)\.\d+(?:\.\d+)?',str(value.get('shellVersion','')))
+            or not re.fullmatch(r'(?:46|48|50)\.\d+(?:\.\d+)?',str(value.get('shellVersion','')))
             or not re.fullmatch(r'[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}',str(value.get('epoch','')))
             or type(value.get('serial')) is not int or not 0<=value['serial']<2**53):
         raise RuntimeError('GNOME returned an invalid observer status.')

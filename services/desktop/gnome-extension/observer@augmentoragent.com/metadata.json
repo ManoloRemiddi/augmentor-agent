@@ -2,7 +2,7 @@
   "uuid": "observer@augmentoragent.com",
   "name": "Augmentor window observer",
   "description": "Read-only compositor observations for Augmentor desktop qualification.",
-  "shell-version": ["46", "50"],
+  "shell-version": ["46", "48", "50"],
   "session-modes": ["user"],
   "url": "https://github.com/ManoloRemiddi/augmentor-agent"
 }

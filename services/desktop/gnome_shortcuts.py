@@ -24,22 +24,22 @@ def settings_profile(version,source):
     """Explicit schema generations; readback never proves shortcut delivery.
 
     GSD 46 assigns custom bindings NORMAL|OVERVIEW (LAUNCHER), excluding
-    lock/unlock. GSD 50 additionally exposes enable-in-lockscreen.
+    lock/unlock. GSD 48/50 additionally expose enable-in-lockscreen.
     """
-    if not isinstance(version,str) or not re.fullmatch(r'(?:46|50)\.\d+(?:\.\d+)?',version):
-        raise RuntimeError('The native GNOME shortcut adapter supports GNOME 46 and 50 profiles.')
+    if not isinstance(version,str) or not re.fullmatch(r'(?:46|48|50)\.\d+(?:\.\d+)?',version):
+        raise RuntimeError('The native GNOME shortcut adapter supports GNOME 46, 48 and 50 profiles.')
     custom=source.lookup(CUSTOM,True)
     if not custom or any(not custom.has_key(key) for key in FIELDS):
         raise RuntimeError('Required GNOME custom shortcut settings are unavailable.')
     fields=FIELDS
     if custom.has_key('enable-in-lockscreen'):fields+=('enable-in-lockscreen',)
-    elif version.startswith('50.'):
+    elif version.startswith(('48.','50.')):
         raise RuntimeError('Required GNOME lock-screen shortcut setting is unavailable.')
     if any(custom.get_key(key).get_value_type().dup_string()!=('b' if key=='enable-in-lockscreen' else 's') for key in fields):
         raise RuntimeError('GNOME custom shortcut settings have unexpected types.')
     portal=source.lookup(PORTAL,True)
     application=source.lookup(PORTAL+'.application',True)
-    if bool(portal)!=bool(application) or (version.startswith('50.') and not portal):
+    if bool(portal)!=bool(application) or (version.startswith(('48.','50.')) and not portal):
         raise RuntimeError('Required GNOME portal shortcut settings are unavailable.')
     if portal and (not portal.has_key('applications') or not application.has_key('shortcuts')):
         raise RuntimeError('GNOME portal shortcut settings are incomplete.')

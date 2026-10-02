@@ -62,7 +62,7 @@ def stage(value,wheelhouse,app):
     collections=[]
     for name,folder,record_file,key in [('pyside-setup','pyside-6.8.2.1','provenance.json','file')]+[
             (name,name+'-6.8.2','collection.json','path') for name in
-            ('qtbase','qtsvg','qtimageformats','qtdeclarative','qttools','qtquicktimeline')]:
+            ('qtbase','qtsvg','qtimageformats','qtdeclarative','qttools','qtquicktimeline','qtwayland')]:
         base=app/'licenses'/folder;path=base/record_file;record=json.loads(path.read_text())
         if record['commit']!=pins[name]['commit'] or record.get('unresolved'):
             raise ValueError('Upstream notice collection differs from the pinned source: '+folder)
@@ -73,10 +73,21 @@ def stage(value,wheelhouse,app):
         collections.append({'component':name,'commit':record['commit'],'record':'licenses/'+folder+'/'+record_file,
                             'recordSha256':hashlib.sha256(path.read_bytes()).hexdigest(),
                             'verifiedNoticeFiles':len(record['files']),'binaryCoverageVerified':False})
+    # ICU's exact upstream tag/license is independent of the unproven wheel
+    # build configuration. Preserve its entire third-party/data notice file.
+    base=app/'licenses/icu-73.2';path=base/'provenance.json';record=json.loads(path.read_text())
+    if record['tag']!='release-73-2' or record['sourceUrl']!='https://raw.githubusercontent.com/unicode-org/icu/release-73-2/icu4c/LICENSE':
+        raise ValueError('ICU notice provenance differs from the reviewed source.')
+    expected=[{'file':'LICENSE','sha256':'f3005e195ff74d8812cc1f182a1c446fab678d70a10e3dada497585befee5416'}]
+    if record['files']!=expected or (base/'LICENSE').is_symlink() or hashlib.sha256((base/'LICENSE').read_bytes()).hexdigest()!=expected[0]['sha256']:
+        raise ValueError('ICU complete upstream license changed or is absent.')
+    collections.append({'component':'icu4c','sourceTag':record['tag'],'record':'licenses/icu-73.2/provenance.json',
+                        'recordSha256':hashlib.sha256(path.read_bytes()).hexdigest(),
+                        'verifiedNoticeFiles':1,'binaryCoverageVerified':False})
     report['supplementaryNoticeCollections']=collections
     report['remaining']=['Exact source/build/license mapping for all shipped ELF tools/libraries/plugins',
                          'QtWayland and ICU native-source/build provenance',
-                         'GPL-only QtQuickTimeline/BlendTrees and other tool/module license assessment',
+                         'GPL-or-commercial QtWaylandCompositor/QtQuickTimeline/BlendTrees and other tool/module license assessment',
                          'Corresponding source delivery and proven recipient replacement/rebuild instructions']
     for name,content in texts.items():
         path=app/'licenses/linux-wheels'/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(content)

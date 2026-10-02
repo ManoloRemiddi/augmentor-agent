@@ -74,7 +74,8 @@ for artifact in deb['artifacts']:
             for collection in wheels['supplementaryNoticeCollections']:
                 assert hashes[collection['record']]==collection['recordSha256']
                 notice_record=json.loads(included[collection['record']])
-                assert notice_record['commit']==collection['commit']
+                if 'commit' in collection:assert notice_record['commit']==collection['commit']
+                else:assert collection['component']=='icu4c' and notice_record['tag']==collection['sourceTag']=='release-73-2'
                 base=str(PurePosixPath(collection['record']).parent)+'/'
                 for row in notice_record['files']:
                     assert hashes[base+row.get('path',row.get('file'))]==row['sha256']

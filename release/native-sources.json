@@ -95,6 +95,18 @@
         "QtQuickTimelineBlendTrees"
       ],
       "binaryBuildProvenanceVerified": false
+    },
+    {
+      "name": "qtwayland",
+      "version": "6.8.2",
+      "repository": "https://code.qt.io/qt/qtwayland.git",
+      "commit": "4261629005d174311045a44914d599ad67d2b7a3",
+      "artifact": "qtwayland-6.8.2-source.tar.gz",
+      "coverage": [
+        "QtWaylandClient and client plugins",
+        "QtWaylandCompositor and compositor plugins/QML (GPL-or-commercial; license route remains open)"
+      ],
+      "binaryBuildProvenanceVerified": false
     }
   ],
   "complete": false,
@@ -103,5 +115,15 @@
     "wheel build provenance and configuration",
     "replacement/relinking instructions",
     "public source artifact hosting"
+  ],
+  "upstreamArchives": [
+    {
+      "name": "icu4c",
+      "version": "73.2",
+      "url": "https://github.com/unicode-org/icu/releases/download/release-73-2/icu4c-73_2-src.tgz",
+      "sha256": "818a80712ed3caacd9b652305e01afc7fa167e6f2e94996da44b90c2ab604ce1",
+      "identityEvidence": "uvernum.h 73.2; wheel library version string 73.2; build options/patches/postprocessing remain unverified",
+      "binaryBuildProvenanceVerified": false
+    }
   ]
 }

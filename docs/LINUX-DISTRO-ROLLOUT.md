@@ -2,6 +2,45 @@
 
 # Linux distribution rollout
 
+## October 2 GNOME 48 source profile and dependency audit
+
+Explicit source profiles now admit GNOME 46, 48 and 50. Upstream GNOME Shell
+48.4 (`79e9cc46e0ef5d595457f0766a1e372f05bd460b`), Mutter 48.4
+(`d7dc2308e095f4267c7e5994b4d66b5f991b7afc`) and GSD 48.1
+(`306e33d135cdced34c8ed4e2bf257727a079c75a`) were reviewed. GSD 48 requires
+both saved-portal schemas and the boolean `enable-in-lockscreen`, and Save
+explicitly writes false. See the [exact media-key schema](https://github.com/GNOME/gnome-settings-daemon/blob/306e33d135cdced34c8ed4e2bf257727a079c75a/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in)
+and [portal schema](https://github.com/GNOME/gnome-settings-daemon/blob/306e33d135cdced34c8ed4e2bf257727a079c75a/data/org.gnome.settings-daemon.global-shortcuts.gschema.xml.in).
+Mutter 48 already supplies modern mapped/main-monitor window properties;
+only 46 uses the legacy fallback. [Pinned window implementation](https://github.com/GNOME/mutter/blob/d7dc2308e095f4267c7e5994b4d66b5f991b7afc/src/core/window.c).
+The Ubuntu session-mode exception stays restricted to 46. Five executing
+extension tests, six shortcut profile/transaction cases and nine observer
+protocol cases pass. Synthetic checks establish source behavior; installed
+Leap packages, actual GNOME 48 sessions and full consent/input/Stop are still
+unqualified. Both input and complete composition flags remain false.
+
+Cinnamon must use a separate adapter. Its binding is an array, and official
+Keyboard settings allocate numeric `custom<N>` IDs. Named GNOME-style IDs
+would break that editor. Save must perform the official reserved `__dummy__`
+custom-list refresh while preserving foreign entries and validating ownership.
+[Official allocation and refresh](https://github.com/linuxmint/cinnamon/blob/806c1a4e8cd23e528d3446b9e3cf5a3c7a3ddf18/files/usr/share/cinnamon/cinnamon-settings/bin/KeybindingTable.py).
+Active Spice shortcuts must be included in conflict checks. Its separate
+screensaver owner and overview/expo/modal guards require separate observation
+qualification. Xapp/GTK portal defaults advertise no ScreenCast/RemoteDesktop;
+private Muffin input APIs are not a consent-preserving replacement. Mint 22.3
+X11 and exact installed Cinnamon/Muffin versions are the next finite fixture;
+other Mint versions require their own real-session runs.
+
+The wheel audit additionally identifies Qt Wayland **Compositor** alongside
+Timeline/BlendTrees as GPL-or-commercial components. The locked Essentials
+wheel contains both client and compositor libraries/plugins/QML; ICU strings
+identify 73.2. The precise [compositor source](https://github.com/qt/qtwayland/blob/4261629005d174311045a44914d599ad67d2b7a3/src/compositor/compositor_api/qwaylandcompositor.cpp)
+and [ICU 73.2 complete license](https://github.com/unicode-org/icu/blob/release-73-2/icu4c/LICENSE)
+now enter the catalog/notice coverage. The [checked source audit](../release/qualification/next-targets/20261002-source-audit.json) records a verified 1,070-entry Git source export, 21 Wayland attribution records/33 files, and the complete 25,505-byte ICU license. Actual seven-wheel staging verifies 266 ELF members and nine supplementary collections/240 notice files; a changed ICU license is refused. This is a private source candidate, not published corresponding-source delivery. Their presence does not by itself prove
+Augmentor is a combined GPL work. Actual dependencies/plugin loading, complete
+corresponding sources, build options and a recipient replacement proof remain
+required. Do not silently change Augmentor's license or mark release gates true.
+
 ## Noble lifecycle, shortcut defect and next-target probes
 
 On October 2 the owner explicitly authorized completing all five remaining

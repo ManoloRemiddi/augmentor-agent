@@ -47,7 +47,7 @@ assert python.startswith('/home/augmentor-proof/.local/share/augmentor/python-ru
 def run(action,name='main'):
     command=shlex.join([python,'-B','/home/augmentor-proof/noble-gnome-shortcut-session.py',
                        action,'--instance',name,'--source',args.source])
-    result=subprocess.run(ssh+[command],text=True,capture_output=True,timeout=100)
+    result=subprocess.run(ssh+[command],text=True,capture_output=True,timeout=220)
     if result.returncode:raise RuntimeError(action+' failed: '+result.stderr)
     return json.loads(result.stdout)
 
@@ -135,10 +135,13 @@ finally:
             state=run('states')
             if state['states']['secondary']:
                 run('dismiss','secondary');cleanup.append(run('close','secondary'))
-            cleanup.append(run('restore'))
         except Exception as error:
             cleanup.append({'error':str(error)})
             if failure is None:failure='Cleanup failed: '+str(error)
+        try:cleanup.append(run('restore'))
+        except Exception as error:
+            cleanup.append({'settingsRestoreError':str(error)})
+            if failure is None:failure='Settings restore failed: '+str(error)
 report={'format':'augmentor-noble-gnome-real-shortcut-proof/1','source':{'commit':args.source,'dirty':False},
         'proofSha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'guestProofSha256':guest_hash,
         'inputTransport':'owned QEMU QMP send-key; auto-release after 50ms','events':events,'cleanup':cleanup,

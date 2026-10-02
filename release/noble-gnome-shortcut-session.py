@@ -32,7 +32,9 @@ def exchange(name='main', action='maintenance.status'):
         try:client.connect(str(Path(os.environ['XDG_RUNTIME_DIR'])/('augmentor-linux-pi'+suffix+'.sock')))
         except (FileNotFoundError, ConnectionRefusedError):return None
         client.sendall(action.encode())
-        with client.makefile('rb') as stream:return json.loads(stream.readline(16384))
+        with client.makefile('rb') as stream:status=json.loads(stream.readline(16384))
+        assert status['buildRoot']==str(ROOT), 'Running app has not adopted the selected artifact.'
+        return status
 
 
 def idle(status):
@@ -196,7 +198,7 @@ def main():
     saved['registeredAfter']=paths+[FOREIGN];STATE.write_text(json.dumps(saved))
     try:
         result=subprocess.run([sys.executable,'-B',str(Path(__file__).resolve()),'qt-save','--source',args.source],
-                              capture_output=True,text=True,timeout=65)
+                              capture_output=True,text=True,timeout=120)
         assert result.returncode==0,result.stderr
         reply=json.loads(result.stdout)
         unrelated=[p for p in paths if p not in own]

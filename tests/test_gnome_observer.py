@@ -37,6 +37,12 @@ class GnomeObserverTests(unittest.TestCase):
         value['inputQualified']=False;value['guards']['parentSessionMode']=True
         with self.assertRaisesRegex(RuntimeError,'parent session mode'):gnome.valid_scene(value)
 
+    def test_48_modern_profile_retains_epoch_and_read_only_fences(self):
+        value=fixture();value['shellVersion']='48.4'
+        self.assertEqual(gnome.valid_scene(value),value)
+        value['inputQualified']=True
+        with self.assertRaises(RuntimeError):gnome.valid_scene(value)
+
     def test_real_schema_preserves_negative_coordinates_and_unavailable_provider(self):
         value=fixture();self.assertEqual(gnome.valid_scene(value),value)
         value['window']['pid']=0;self.assertEqual(gnome.valid_scene(value),value)

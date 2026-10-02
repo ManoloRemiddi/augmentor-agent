@@ -1,0 +1,12 @@
+{
+  "repository": "https://github.com/unicode-org/icu",
+  "tag": "release-73-2",
+  "sourceUrl": "https://raw.githubusercontent.com/unicode-org/icu/release-73-2/icu4c/LICENSE",
+  "files": [
+    {
+      "file": "LICENSE",
+      "sha256": "f3005e195ff74d8812cc1f182a1c446fab678d70a10e3dada497585befee5416"
+    }
+  ],
+  "binaryBuildProvenanceVerified": false
+}

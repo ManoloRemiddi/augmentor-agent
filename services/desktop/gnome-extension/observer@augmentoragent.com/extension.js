@@ -17,8 +17,8 @@ const rect = r => ({x:r.x, y:r.y, width:r.width, height:r.height});
 
 export default class Observer extends Extension {
     enable() {
-        if (!/^(?:46|50)\.\d+(?:\.\d+)?$/.test(Config.PACKAGE_VERSION))
-            throw new Error('The Augmentor observer supports GNOME 46 and 50 profiles.');
+        if (!/^(?:46|48|50)\.\d+(?:\.\d+)?$/.test(Config.PACKAGE_VERSION))
+            throw new Error('The Augmentor observer supports GNOME 46, 48 and 50 profiles.');
         this.legacyWindowProperties = Config.PACKAGE_VERSION.startsWith('46.');
         this.epoch = GLib.uuid_string_random();
         this.serial = 0;

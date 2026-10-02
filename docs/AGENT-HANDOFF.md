@@ -2,6 +2,24 @@
 
 # Start here: agent handoff
 
+## October 2 clean candidate activation and GNOME 48 source checkpoint
+
+Clean `c4b885e` passes all hosted Linux and Mac 14/26 jobs. A separately staged
+Noble/Mesa .2 clone candidate is selected through `augmentor-update`; old PID
+survives activation, previous descriptor is retained and normal idle close passes.
+The verified observer is installed using GNOME's pack/install CLI and the owned
+GDM session reloads normally. Full keyboard delivery rerun is in progress; do
+not infer its result. The host activation transport timed out during final
+inventory hashing; the guest subsequently finished and its complete activation
+receipt was retrieved. No mutation was replayed.
+
+GNOME 48 is now an explicit **source** profile, grounded in pinned Shell/Mutter/
+GSD sources. Modern lock and portal-schema checks stay strict, the Ubuntu mode
+exception remains 46-only and input remains false. Five JS, six shortcut and
+nine observer protocol tests pass. Continue real GNOME 48/Leap acceptance,
+Cinnamon's separate adapter and every original remaining gate through the
+[current rollout checkpoint](LINUX-DISTRO-ROLLOUT.md#october-2-gnome-48-source-profile-and-dependency-audit).
+
 ## October 2 remaining rollout and Noble lifecycle checkpoint
 
 The owner explicitly authorized completing all five remaining rollout points
