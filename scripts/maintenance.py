@@ -138,6 +138,14 @@ def prepare(component):
     ui=ui_call('maintenance.status')
     if ui and ui.get('busy'):
         raise RuntimeError('Finish or stop the active chat and close open dialogs before maintenance.')
+    from augmentor_linux.dictation import request as dictation_request
+    try:dictation_status=dictation_request('status',start=False,timeout=3)
+    except RuntimeError as error:
+        if str(error)!='System dictation is not running.':raise
+        dictation_status=None
+    if dictation_status and dictation_status.get('phase') in ('recording','transcribing'):
+        raise RuntimeError('Finish or cancel system dictation before maintenance. Nothing was cancelled.')
+    if dictation_status:dictation_request('shutdown',start=False)
     runtimes=[]
     prepared=[]
     try:

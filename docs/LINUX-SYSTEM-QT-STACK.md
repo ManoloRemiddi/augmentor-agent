@@ -2,6 +2,12 @@
 
 # Arch and Leap candidate Python/Qt drift boundary
 
+Current-main integration additionally preserves the bundled dictation component
+and its Debian dependencies alongside these runtime contracts. See
+[the actual working-merge report](../release/qualification/next-targets/20261002-main-dictation-distro-integration.json).
+The earlier runtime-only proofs below do not qualify that combined product;
+matching dictation/native-library ABI and complete packages remain required.
+
 The two existing system-Qt voice profiles now bind a separately reviewed distro
 Python/Qt inventory into their immutable runtime identity. An existing runtime
 refuses changed registered package versions, inventory, bytes or fresh import

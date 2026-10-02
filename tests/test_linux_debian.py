@@ -11,6 +11,13 @@ debian=importlib.util.module_from_spec(spec);spec.loader.exec_module(debian)
 
 
 class DebianTargetTests(unittest.TestCase):
+    def test_merged_handy_dependencies_preserve_all_explicit_qt_recipes(self):
+        for target in debian.TARGETS:
+            runtime, desktop = debian.dependencies(target, '0.2.13')
+            for name in ('udev', 'kmod', 'libwebkit2gtk-4.1-0', 'libopenblas0', 'libxdo3', 'wl-clipboard', 'xwayland'):
+                with self.subTest(target=target,name=name): self.assertIn(name, runtime.split(', '))
+            self.assertIn('augmentor-runtime (= 0.2.13)', desktop)
+
     def test_noble_dependencies_use_system_gi_and_managed_pyside(self):
         runtime,desktop=debian.dependencies(debian.NOBLE,'0.2.13')
         self.assertIn('python3.12-venv',runtime);self.assertIn('python3-gi',runtime)

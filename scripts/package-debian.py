@@ -76,6 +76,12 @@ def native_notices(app, configuration):
         if magic not in (b'\x7fELF', b'\x00asm', b'\xcf\xfa\xed\xfe', b'\xfe\xed\xfa\xcf') and not magic.startswith(b'MZ'):
             continue
         relative = path.relative_to(app).as_posix()
+        if relative.startswith('components/handy/runtime/'):
+            record=json.loads((app/'components/handy/runtime/BUILD.json').read_text())
+            item=relative.removeprefix('components/handy/runtime/')
+            if hashlib.sha256(path.read_bytes()).hexdigest()!=record['files'].get(item):raise ValueError('Unverified dictation binary: '+relative)
+            components.append({'component':'Handy','version':record['upstream']['version'],'path':relative,'sha256':record['files'][item],'notices':['handy/components.json','handy/Handy-MIT.txt','handy/ydotool/LICENSE','handy/ydotool/source.tar.gz']})
+            continue
         if relative not in expected:
             raise ValueError('Unreviewed native executable in distribution: ' + relative)
         component = expected[relative]
@@ -99,7 +105,7 @@ def native_notices(app, configuration):
             notices = ['node.txt']
         components.append({'component': component, 'version': version, 'path': relative,
                            'sha256': hashlib.sha256(content).hexdigest(), 'notices': notices})
-    if {item['path'] for item in components} != set(expected):
+    if {item['path'] for item in components if item['component']!='Handy'} != set(expected):
         raise ValueError('Expected packaged native executables are missing')
     write(app / 'licenses/native-components.json', json.dumps(components, indent=2) + '\n')
 
@@ -162,6 +168,7 @@ def build(output,target='debian13-amd64',wheelhouse=None,*,source_qt=False):
             else:copy(ROOT / name, app / name)
         for name in ('desktop-capabilities.json', 'desktop-capabilities.LICENSE'):
             copy(ROOT / 'release/dsh' / name, app / 'release/dsh' / name)
+        subprocess.run([sys.executable,str(ROOT/'scripts/stage-handy.py'),str(app)],check=True)
         node_runtime(app, configuration, cache)
         native_notices(app, configuration)
         write(app/'release/runtime.json',json.dumps(configuration,indent=2)+'\n')
@@ -190,6 +197,8 @@ def build(output,target='debian13-amd64',wheelhouse=None,*,source_qt=False):
         write(runtime / 'usr/bin/augmentor-browser-host', launcher + lease + '/usr/lib/augmentor/apps/browser/native-host.mjs "$@"\n', True)
         write(runtime / 'usr/bin/augmentor-runtime', launcher + lease + '/usr/lib/augmentor/dist/runtime/src/main.js "$@"\n', True)
         write(runtime / 'usr/bin/augmentor-maintenance', '#!/bin/sh\n'+HEADER+'exec /usr/bin/python3 /usr/lib/augmentor/scripts/maintenance.py "$@"\n',True)
+        write(runtime/'usr/lib/udev/rules.d/70-augmentor-dictation.rules',HEADER+'KERNEL=="uinput", SUBSYSTEM=="misc", TAG+="uaccess", OPTIONS+="static_node=uinput"\n')
+        write(runtime/'usr/lib/modules-load.d/augmentor-dictation.conf',HEADER+'uinput\n')
         write(runtime/'usr/lib/tmpfiles.d/augmentor.conf',HEADER+'d /run/augmentor 0755 root root -\nf /run/augmentor/augmentor-runtime.lock 0644 root root -\nf /run/augmentor/augmentor-desktop.lock 0644 root root -\n')
         key = json.loads((app / 'apps/browser/extension/manifest.json').read_text())['key']
         identity = ''.join(chr(ord('a') + int(n, 16)) for n in hashlib.sha256(base64.b64decode(key)).hexdigest()[:32])

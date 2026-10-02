@@ -7,6 +7,8 @@ import os
 from pathlib import Path
 import sys
 import platform
+import shutil
+import subprocess
 
 COMPONENT = '@COMPONENT@'
 HOOK = '@HOOK@'
@@ -77,4 +79,9 @@ elif HOOK == 'prerm' and action in ('remove', 'upgrade', 'deconfigure'):
     begin()
 elif HOOK == 'postinst' or (HOOK == 'postrm' and action in ('remove', 'purge', 'abort-install', 'abort-upgrade')):
     pending.unlink(missing_ok=True)
+    if COMPONENT=='runtime' and HOOK=='postinst' and action=='configure':
+        # logind grants the active local user access; no world-writable device
+        # or shared input socket. Containers may have no udev/kernel module.
+        for arguments in (['modprobe','-q','uinput'],['udevadm','control','--reload-rules'],['udevadm','trigger','--subsystem-match=misc','--sysname-match=uinput']):
+            if shutil.which(arguments[0]):subprocess.run(arguments,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,timeout=10,check=False)
 # Retain the inode used for leases across remove/reinstall and package upgrades.

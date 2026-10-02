@@ -113,7 +113,7 @@ def stage(source, source_ref, python=None, node=None):
     temporary.mkdir(mode=0o700)
     try:
         # Copy the runnable artifact, never an entire checkout or user data.
-        for part in ('apps', 'services', 'adapters', 'dist', 'config', 'licenses', 'scripts', 'node', 'node_modules', 'release', 'docs', 'python-wheels'):
+        for part in ('apps', 'services', 'adapters', 'components', 'dist', 'config', 'licenses', 'scripts', 'node', 'node_modules', 'release', 'docs', 'python-wheels'):
             if (source/part).is_dir():
                 shutil.copytree(source/part, temporary/part, symlinks=True,
                                 ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '.git', '.env', 'outputs'))

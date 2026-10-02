@@ -19,6 +19,9 @@ jobs:
         with:
           fetch-depth: 0
       - run: python3 scripts/check-private-source-boundary.py
+  handy:
+    needs: source-boundary
+    uses: ./.github/workflows/handy.yml
   home-runtime:
     needs: source-boundary
     runs-on: ubuntu-24.04
@@ -38,10 +41,10 @@ jobs:
           -e AUGMENTOR_SHARED_DATA=/tmp/data augmentor-home:ci
           node --input-type=module -e 'import {promptCall} from "../../dist/prompt-library/src/client.js"; const r=await promptCall("prompts.list"); if(!Array.isArray(r.prompts))process.exit(1);'
   debian:
-    needs: source-boundary
+    needs: [source-boundary, handy]
     runs-on: ubuntu-24.04
     container: debian@sha256:abc9cb88a5587630d7f915f47b23b0668fe250fbfc6457aa4d52b534c1bbf73f
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - name: Install declared build and test dependencies
         run: |
@@ -86,6 +89,8 @@ jobs:
           python3 scripts/proof-recovery.py
       - name: Verify Qt interactions and licensing failures
         run: npm run test:native
+      - name: Verify Wayland shortcut wire protocol on a private D-Bus
+        run: PYTHONPATH=. AUGMENTOR_PORTAL_PROOF=1 dbus-run-session -- python3 -m unittest discover -s tests -p test_dictation_portal.py -v
       - name: Verify prompt editor against the real shared service
         run: python3 scripts/prompt-editor-proof.py
       - name: Verify real mouse events and external clipboard
@@ -115,6 +120,12 @@ jobs:
           path: outputs/browser/*
           retention-days: 14
           if-no-files-found: error
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: handy-linux-x86_64
+          path: components/handy/runtime
+      - name: Restore component executable modes
+        run: chmod +x components/handy/runtime/bin/*
       - name: Build Debian packages with binary notices
         run: python3 scripts/package-debian.py
       - name: Verify packaged Codex with a separate supplier prerequisite

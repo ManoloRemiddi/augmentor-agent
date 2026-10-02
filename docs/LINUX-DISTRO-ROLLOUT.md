@@ -2,6 +2,20 @@
 
 # Linux distribution rollout
 
+## October 2 canonical main integration
+
+Current main3c1dddf's dictation component is retained alongside distro runtime
+contracts: staging copies components and Python wheels, Debian-format recipes
+retain both dependency sets and Codex fixtures wait for actual receipts/rendered
+child pages. [The working-merge report](../release/qualification/next-targets/20261002-main-dictation-distro-integration.json)
+records passing native818/815/three skips, two private portal cases,11 focused
+Node and66 Browser cases. Initial missing test-dependency failures are retained.
+The original patch/notices and frozen license proposal remain unchanged. Matching
+component ABI/full distro packages and new hosted source checks remain next;
+old candidate package/runtime evidence is not new combined-product acceptance.
+GitGuardian's12 prior script/log hash findings remain explicitly unresolved as an
+external check. All five rollout points and the pending license decision stay active.
+
 ## October 2 Arch/Leap system Qt drift boundary
 
 The two voice profiles now bind exact registered Python/Qt versions and file
