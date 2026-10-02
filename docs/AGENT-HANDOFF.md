@@ -84,6 +84,17 @@ Full actor composition, actual application startup/focus, login/reboot, XWayland
 consent/input/Stop and current observer-source artifacts remain open. See the
 rollout guide for exact source/report scope and next steps.
 
+Clean observer source `43618ea` now passes hosted Linux and Mac 14/26 CI. Each
+Ubuntu/Fedora native job passes 642 cases (two Mac-only skips); checked artifact
+reports record the actual merge `f7d7585`, whose tree equals the branch. A new
+private actual-Augmentor proof passes existing-window canonical shortcut
+hide/restore, compositor focus and composer typing for both XWayland and native
+Wayland, retaining both original independent processes. Initial launches are
+preview fixtures; user-systemd/closed-app startup and login/reboot remain open.
+This adds evidence without changing production toggle behavior. The rollout
+guide owns exact image/source hashes and remaining workspace/control/other-distro
+gates. Continue with full private GNOME login sessions; do not mark the goal done.
+
 ## October 1 merge blockers: current main and separate Codex prerequisite
 
 The feature branch integrates canonical main `8c3be5a` at merge `338dbc5`.

@@ -39,3 +39,14 @@ the extension into the disposable user's home before starting the owned Shell.
 The proof verifies loaded/source hashes and refuses source changes during a run.
 Real login/reboot, XWayland, modal/popups, full animation/chrome/lock handling,
 capture-coordinate mapping and consent/input/Stop remain open qualification work.
+
+The separate actual-Augmentor [XWayland](../../../release/qualification/gnome50/fedora44-native-ui-xcb.json)
+and [Wayland](../../../release/qualification/gnome50/fedora44-native-ui-wayland.json)
+proofs now use the read-only observer to verify compositor focus after canonical
+launcher hide/restore, with a real letter reaching each independent composer's
+preview window. This narrower XWayland focus observation does not qualify the
+full XWayland identity/occlusion/input contract. Initial preview launches, dummy
+login and no model requests still exclude full startup and desktop acceptance.
+Use `--exercise-native-ui xcb` or `--exercise-native-ui wayland` in the native UI
+fixture described in the rollout guide; the observer remains inactive in normal
+product sessions.

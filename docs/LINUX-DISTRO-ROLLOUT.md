@@ -712,3 +712,65 @@ GNOME capture/input/Stop integration. Continue the remaining older Ubuntu/Mint,
 openSUSE/Arch, Browser channel, physical voice, SELinux and release gates. No
 installed owner application, graphical environment, model or audio configuration
 changed.
+
+### Existing Augmentor windows in private GNOME and observer-source CI
+
+Clean branch `43618ea100058d1dbcd0d5782c8f6d02f3c8a81f` passes
+[Linux CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36945980802)
+and [Mac 14/26 CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36945980796).
+All Linux source/Home/root, Debian/installed lifecycle, Browser and three distro
+jobs pass. Each distro runs 642 native cases (640 pass, two Mac-only skips).
+The actual artifact source is merge `f7d75859f5bd88fd99bec2b4904aae5fd3423ed7`
+(parents `d91c520`, `43618ea`), tree `34330856d358cfe9ea64e666313e54df29b9f299`,
+verified equal to the branch tree. Preserve that merge source identity when
+assembling complete bundles. The checked [Ubuntu](../release/qualification/f7d7585/ubuntu26.04-amd64.json),
+[Fedora 43](../release/qualification/f7d7585/fedora43-x86_64.json) and
+[Fedora 44](../release/qualification/f7d7585/fedora44-x86_64.json) reports replace
+the earlier hosted package checkpoint for this source. Complete setup and full
+desktop acceptance remain separate gates.
+
+The new private proof exercises actual Augmentor preview windows, their real
+singleton sockets and the unchanged canonical launcher installed by
+`install-desktop-startup.py` into the disposable user's HOME. GSD delivers the
+configured shortcuts to both existing processes. In both
+[XWayland/xcb](../release/qualification/gnome50/fedora44-native-ui-xcb.json) and
+[native Wayland](../release/qualification/gnome50/fedora44-native-ui-wayland.json),
+each window hides, restores, receives compositor focus and accepts a synthetic
+letter in its own composer; the two original process IDs remain independent.
+The observer is read-only and verifies actual compositor focus. XWayland uses
+only the private Mutter authority file. No owner bus, display, devices or GPU are
+mounted; input uses the already qualified owned Shell 50.5 fixture session and
+releases held keys in cleanup. Loaded observer and exercised source hashes are
+verified before/after each run.
+
+This qualifies existing-window toggle behavior, not closed-app or user-systemd
+startup. Initial processes use `--preview --ui-test-control`; repeat GSD commands
+use the production canonical launcher without those flags. The test-only native
+image adds distro Python imports and the existing bundled Node 24.19.0 binary.
+It makes no harness/model request. Its selected source root is fixture metadata,
+not an owner's installed deployment or a release promotion. The dummy login
+manager still excludes login/logout/reboot, SELinux and physical keys. GNOME input
+capability and complete observer composition remain unqualified.
+
+Reproduce by building `release/gnome-native-ui.Dockerfile` with
+`GNOME_BASE=augmentor-rollout-gnome-qt-fixture` and
+`NODE_BASE=augmentor-rollout-fedora-node-cache`, using the existing disposable
+discovery command with `--exercise-native-ui xcb` or
+`--exercise-native-ui wayland`. The checked reports identify the exact base/test
+image and source hashes; retain the older observer-only report's original
+discovery hash as historical evidence.
+
+Primary source research explains why shortcut delivery is a separate focus gate.
+[Shell 50.5 supplies an activation token](https://github.com/GNOME/gnome-shell/blob/50.5/js/ui/shellDBus.js#L283),
+but [GSD 50.1's handler](https://github.com/GNOME/gnome-settings-daemon/blob/50.1/plugins/media-keys/gsd-media-keys-manager.c#L2580)
+does not consume it. Its [custom-command launcher](https://github.com/GNOME/gnome-settings-daemon/blob/50.1/plugins/media-keys/gsd-media-keys-manager.c#L999)
+uses plain `GAppLaunchContext` and ignores its timestamp argument. GLib's
+[plain context](https://github.com/GNOME/glib/blob/2.88.0/gio/gappinfo.c#L1841)
+does not generate a startup ID. Qt's [Wayland show/activation path](https://github.com/qt/qtbase/blob/v6.11.0/src/plugins/platforms/wayland/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp#L567)
+differs from activating an old, already visible surface. The tested hide/remap
+path passes with actual Qt 6.11.2; do not infer universal visible-window focus or
+replace the current implementation based solely on missing launch tokens.
+
+Next: full private GNOME login/user-systemd and closed-app startup, duplicate
+owner/crash/reboot checks; workspace following/placement; full observer guards;
+consented capture/input/Stop; older distro and release qualification.
