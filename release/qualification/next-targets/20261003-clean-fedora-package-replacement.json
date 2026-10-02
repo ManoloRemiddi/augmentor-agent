@@ -1,0 +1,279 @@
+{
+  "format": "augmentor-clean-fedora-package-source-replacement/1",
+  "date": "2026-10-03",
+  "timezone": "Europe/Rome",
+  "cleanSource": {
+    "commit": "536fc7561a7b81ab90e806925652e446f438050a",
+    "dirty": false
+  },
+  "debianPayload": {
+    "version": "0.2.13",
+    "source": {
+      "commit": "536fc7561a7b81ab90e806925652e446f438050a",
+      "dirty": false
+    },
+    "target": "debian13-amd64",
+    "artifacts": [
+      {
+        "file": "augmentor-runtime_0.2.13_amd64.deb",
+        "sha256": "cec7e549343b17ed67151d0bc9973413c8fd4d14be6e4581d991c01cff70d027",
+        "bytes": 306572208
+      },
+      {
+        "file": "augmentor-desktop_0.2.13_amd64.deb",
+        "sha256": "090f99b6e8f070e950cd698e5b93fbed9172b90c7ef6de9fc1d22577749aef8b",
+        "bytes": 5500
+      }
+    ]
+  },
+  "fedoraBuilds": [
+    {
+      "target": "fedora43-x86_64",
+      "rpm": {
+        "file": "augmentor-agent-0.2.13-1.fc43.x86_64.rpm",
+        "sha256": "3409aac6e5bbcc23bac21068c2efe62db999f1c05fc02fc42e74ec432947bb9f",
+        "bytes": 371251082
+      },
+      "maintainerSourceSha256": "df5a77f1e625111038393e0ed32de1808f05fdf83b7b084619525e42a0a3a8a5",
+      "packagingRecipeSha256": "05edd262c9d29fcda43d853d0d00b593844a4fae74153361304c4fa48e3eb706",
+      "inputDebs": {
+        "augmentor-runtime_0.2.13_amd64.deb": "cec7e549343b17ed67151d0bc9973413c8fd4d14be6e4581d991c01cff70d027",
+        "augmentor-desktop_0.2.13_amd64.deb": "090f99b6e8f070e950cd698e5b93fbed9172b90c7ef6de9fc1d22577749aef8b"
+      }
+    },
+    {
+      "target": "fedora44-x86_64",
+      "rpm": {
+        "file": "augmentor-agent-0.2.13-1.fc44.x86_64.rpm",
+        "sha256": "4855c819cb04dd99c287af946269d1738ae141fca845dba3bb12ab37da1094fb",
+        "bytes": 371251082
+      },
+      "maintainerSourceSha256": "df5a77f1e625111038393e0ed32de1808f05fdf83b7b084619525e42a0a3a8a5",
+      "packagingRecipeSha256": "05edd262c9d29fcda43d853d0d00b593844a4fae74153361304c4fa48e3eb706",
+      "inputDebs": {
+        "augmentor-runtime_0.2.13_amd64.deb": "cec7e549343b17ed67151d0bc9973413c8fd4d14be6e4581d991c01cff70d027",
+        "augmentor-desktop_0.2.13_amd64.deb": "090f99b6e8f070e950cd698e5b93fbed9172b90c7ef6de9fc1d22577749aef8b"
+      }
+    }
+  ],
+  "newlyCompletedWorkingRecipeFedora43": {
+    "source": {
+      "commit": "4f996969fca000dbf2e91f64170d072d407c4133",
+      "dirty": false
+    },
+    "packageProof": {
+      "target": "fedora43-x86_64",
+      "imageDigest": "sha256:a651ddf48ea28a06ed4e1e6519f51c9f47e7a5a138722ade87369b8fbb7e5b42",
+      "source": {
+        "commit": "4f996969fca000dbf2e91f64170d072d407c4133",
+        "dirty": false
+      },
+      "artifacts": {
+        "augmentor-agent-0.2.13-1.fc43.x86_64.rpm": "ca300237dd9d2a314704a36a13227754f4f1cdb32b6caf11197a8ec58c858dfe"
+      },
+      "proofScriptSha256": "ff5c3e65466ad0481769b7e3cba48c46c07a609f103ace6391eba87193262c97",
+      "versions": {
+        "python": "3.14.7",
+        "pyside": "6.10.3",
+        "qt": "6.10.3",
+        "node": "v24.19.0"
+      },
+      "gtk4Version": "4.20.4",
+      "gtk4ShortcutApiImportTested": true,
+      "wmctrlVersion": "1.07",
+      "wmctrlBinaryTested": true,
+      "freshInstall": true,
+      "nonRootRuntimeLease": true,
+      "nonRootQtRender": true,
+      "activeRuntimeAndDesktopReinstallBlocked": true,
+      "activeComponentRemovalBlocked": true,
+      "idleReinstall": true,
+      "removePreservesPrivateFiles": true,
+      "reinstallAfterRemove": true,
+      "realDesktopSessionTested": false,
+      "physicalAudioTested": false,
+      "selinuxEnforcingTested": false,
+      "dshModelTurnTested": false
+    },
+    "componentProtocol": {
+      "protocol": true,
+      "tray": false,
+      "modelDownload": false,
+      "microphoneCapture": false,
+      "theme": true,
+      "staleSettingsRejected": true,
+      "ownerExclusion": true,
+      "parentExit": true
+    },
+    "coldRuntimeLeaseUsed": true,
+    "registeredPackageInventoryUnchangedAfterComponent": true,
+    "networkDisconnectedBeforeNativeProof": true,
+    "physicalDevicesAttached": false
+  },
+  "cleanReplacements": [
+    {
+      "target": "fedora43-x86_64",
+      "imageDigest": "sha256:a651ddf48ea28a06ed4e1e6519f51c9f47e7a5a138722ade87369b8fbb7e5b42",
+      "fromSource": {
+        "commit": "4f996969fca000dbf2e91f64170d072d407c4133",
+        "dirty": false
+      },
+      "toSource": {
+        "commit": "536fc7561a7b81ab90e806925652e446f438050a",
+        "dirty": false
+      },
+      "rpm": {
+        "file": "augmentor-agent-0.2.13-1.fc43.x86_64.rpm",
+        "sha256": "3409aac6e5bbcc23bac21068c2efe62db999f1c05fc02fc42e74ec432947bb9f",
+        "bytes": 371251082
+      },
+      "busyReplacementRefused": [
+        {
+          "component": "runtime",
+          "managerExit": 1,
+          "explicitBusyRefusal": true,
+          "oldPayloadUnchanged": true
+        },
+        {
+          "component": "desktop",
+          "managerExit": 1,
+          "explicitBusyRefusal": true,
+          "oldPayloadUnchanged": true
+        }
+      ],
+      "idleCleanSourceReinstall": true,
+      "ordinaryUserRender": true,
+      "privateSentinelPreserved": true,
+      "registeredPackageInventoryPassed": true,
+      "differentSourceSameProductAndPackageVersion": true,
+      "nToNPlusOneVersionUpgrade": false,
+      "networkDisconnected": true,
+      "physicalDevicesAttached": false,
+      "realSessionOrPhysicalAudio": false
+    },
+    {
+      "target": "fedora44-x86_64",
+      "imageDigest": "sha256:43b29f65a41eb9c35e1cd5323e3bdf3b655c2357a9f4f1ff2f9c2798e5045d80",
+      "fromSource": {
+        "commit": "4f996969fca000dbf2e91f64170d072d407c4133",
+        "dirty": false
+      },
+      "toSource": {
+        "commit": "536fc7561a7b81ab90e806925652e446f438050a",
+        "dirty": false
+      },
+      "rpm": {
+        "file": "augmentor-agent-0.2.13-1.fc44.x86_64.rpm",
+        "sha256": "4855c819cb04dd99c287af946269d1738ae141fca845dba3bb12ab37da1094fb",
+        "bytes": 371251082
+      },
+      "busyReplacementRefused": [
+        {
+          "component": "runtime",
+          "managerExit": 1,
+          "explicitBusyRefusal": true,
+          "oldPayloadUnchanged": true
+        },
+        {
+          "component": "desktop",
+          "managerExit": 1,
+          "explicitBusyRefusal": true,
+          "oldPayloadUnchanged": true
+        }
+      ],
+      "idleCleanSourceReinstall": true,
+      "ordinaryUserRender": true,
+      "privateSentinelPreserved": true,
+      "registeredPackageInventoryPassed": true,
+      "differentSourceSameProductAndPackageVersion": true,
+      "nToNPlusOneVersionUpgrade": false,
+      "networkDisconnected": true,
+      "physicalDevicesAttached": false,
+      "realSessionOrPhysicalAudio": false
+    }
+  ],
+  "scope": {
+    "cleanMatchingDebianAndRpmSourceAndRecipe": true,
+    "freshInstallOfClean536Artifacts": false,
+    "differentSourceSameProductAndPackageVersionTested": true,
+    "nToNPlusOneVersionUpgrade": false,
+    "rollback": false,
+    "wholeProductInstallerOrDshSetup": false,
+    "realDesktopOrPhysicalAudio": false,
+    "selinuxEnforcing": false,
+    "graphicalBrowser": false,
+    "allFiveRolloutPointsComplete": false,
+    "sourceLegalAcceptance": false,
+    "publicBinaryReleased": false
+  },
+  "hosted536Checkpoint": {
+    "linuxRun": 37075160234,
+    "linux": "in progress; source/Home/Handy/Debian passed; installed/Browser/distro jobs running",
+    "macRun": 37075160186,
+    "mac": "in progress; Handy passed; bundles still require final confirmation",
+    "windowsDesktopRun": 37075159889,
+    "windowsDesktop": "success; both native CPUs",
+    "windowsQualificationRun": 37075159857,
+    "windowsQualification": "in progress; shared Qt passed; both native CPUs require final confirmation",
+    "gitGuardianCheck": 111063275897,
+    "gitGuardian": "failure, unwaived; twelve same historical digest findings across59 commits"
+  },
+  "ownerState": {
+    "selectedInstallationsChanged": false,
+    "servicesModelsDevicesAudioSettingsChanged": false,
+    "rootLicenseOr22ProposedFilesChanged": false
+  },
+  "privateEvidence": {
+    "outputs/linux-rollout/debian53656/artifacts.json": "d1853336c5c7d4d99aa5caf71c270c5f74309a991921504aa767d59bdf29c7e7",
+    "outputs/linux-rollout/debian53656/check.log": "1610da847770d7bfc5df0fafc711c61f2272073092908ad282e8f264c1549864",
+    "outputs/linux-rollout/debian53656/build.log": "9db115e58da3e6ea679a26c953ce95542bcd67e26fff204a9d407d860e89b5f4",
+    "outputs/linux-rollout/debian53656/package.stdout": "b0de9c0fe8f6a8f7f289375253363232146f49ef11428cbaa44d6842582a8d2e",
+    "outputs/linux-rollout/debian53656/package.stderr": "586d928df3fe89ec184a21c45a8a50d4200ba0a962c3475c3ad489c83fb65d76",
+    "outputs/linux-rollout/fedora53657/artifacts.json": "3802754e69be1eb2328b62c0d39a0ee7970ff36602183c0543a57e81bd4d7002",
+    "outputs/linux-rollout/fedora53657/build.stdout": "67870bf60a0d5c83dbfa0238873f2981607697a2f32d597b3be64c6a0d9de640",
+    "outputs/linux-rollout/fedora53657/build.stderr": "fa18db7ad340f3033c1393912f70a4d87f120b8f49a86b20ebac999636bc6a29",
+    "outputs/linux-rollout/fedora53658/artifacts.json": "83dc3f31f6595734ba5fcff82659fffed6217db1035cb09adc00db049ea029fa",
+    "outputs/linux-rollout/fedora53658/build.stdout": "b904412c4a4a34c3b5f72aa49347de5e5e45cb3d06f0a185c1881dd6bdeceb7b",
+    "outputs/linux-rollout/fedora53658/build.stderr": "625309cf51515d40f3f9ab349e4eb6740f2ce7db7f2582f93491a50aabb21d8b",
+    "outputs/linux-rollout/fedora-package55/prepare-and-prove.py": "b04d127f28c7411f8e7c38295b645d3dc0e282f024542091ad2287f1f0a91e94",
+    "outputs/linux-rollout/fedora-package55/package-proof.json": "2f2a9f48be0506af78fe9eb4478a4eb877a837fc1857dd503aa5b3fb56121336",
+    "outputs/linux-rollout/fedora-package55/proof.stdout": "8c16edf1df77d0199fd39b9c70a2d52f114ad4fd96259a95205e749b43a5d740",
+    "outputs/linux-rollout/fedora-package55/proof.stderr": "9f0cea38ef8b3b39c89e70a9c7d216c369d827a35411493b68e7fde4452bace9",
+    "outputs/linux-rollout/fedora-package55/component-repeat/component.stdout": "e0e42dadf91db6f423cfc1b124fd2d4d079e68977621e4be59ef587e3e4595d7",
+    "outputs/linux-rollout/fedora-package55/component-repeat/component.stderr": "680508aadaec1409bcff3e2438e8f90ca9f4d561aea8f71eaa4db322210b1c2c",
+    "outputs/linux-rollout/fedora-package55/component-repeat/rpm-verify.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/linux-rollout/fedora-clean-reinstall59/prove.py": "0621d53bef98d39d062c18deb0bd81b3ff1cd1bf7a9b9d28ade61ff421ef919f",
+    "outputs/linux-rollout/fedora-clean-reinstall59/result.json": "1174e56f38f85d0027e1691023273428be030234bbfbe9934209ad76531854d4",
+    "outputs/linux-rollout/hosted4f47/gitguardian536.json": "b98f36a5be4fc949e9c9f481b1ac2f0c50a354963a06815f1ff473e1c92fac86",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora43/clean-idle-reinstall.stderr": "62938fe4b049c3bbd1e6867f8fb1b31aa898e2e1b985938242633cea83f708f3",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora43/clean-idle-reinstall.stdout": "2bfcd9eb0a96bb961269eafb1910b39b980dc5b172b8b664084bc028d1b71ceb",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora43/desktop-busy.stderr": "f9fb2a13eee60ec778f97df57fa963aebf79afa7618bf80bece6a135cbf5683b",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora43/desktop-busy.stdout": "2bfcd9eb0a96bb961269eafb1910b39b980dc5b172b8b664084bc028d1b71ceb",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora43/desktop-holder.stderr": "b4a6c06672677cf0e25ec72bec83beae33305cee4b8087f168962014373b02bb",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora43/desktop-idle-recovery.stderr": "7e6e6370ab6ea25b155e3c30f0152c3d8be9aa28a11f708d85f8343b433fd24b",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora43/desktop-idle-recovery.stdout": "9be32cb9c874af87c1f5545c5bec7dc4f94714d2c7b7b47c56d58c21921d469e",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora43/render.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora43/render.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora43/result.json": "b86b1bdf273527a34c77312c143cbd8c164db61dd2678b095a86ccbf968f227a",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora43/runtime-busy.stderr": "e0442d502e7324408a1c3f7991cdf32a3607779cedc1d6a8255318318d177c30",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora43/runtime-busy.stdout": "2bfcd9eb0a96bb961269eafb1910b39b980dc5b172b8b664084bc028d1b71ceb",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora43/runtime-holder.stderr": "b4a6c06672677cf0e25ec72bec83beae33305cee4b8087f168962014373b02bb",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora43/runtime-idle-recovery.stderr": "22f997ccc29752f9410fc1e1f302be270654cb10bfec54dc33cb0b160a2f5ccb",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora43/runtime-idle-recovery.stdout": "9be32cb9c874af87c1f5545c5bec7dc4f94714d2c7b7b47c56d58c21921d469e",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora44/clean-idle-reinstall.stderr": "6a6cffa9c79275849b5794f82138d3e20e4cd053e822ad470c889c2e2ad68389",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora44/clean-idle-reinstall.stdout": "c2d9027a2fa0d6efa49f0e6dd629b5cb2b0800839b86b395042ead0d663bf881",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora44/desktop-busy.stderr": "7f67b7d9b0b98ffe60d4a623af2655cb3222cb9e792b92b2f3fb443ffa66c2a6",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora44/desktop-busy.stdout": "c2d9027a2fa0d6efa49f0e6dd629b5cb2b0800839b86b395042ead0d663bf881",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora44/desktop-holder.stderr": "b4a6c06672677cf0e25ec72bec83beae33305cee4b8087f168962014373b02bb",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora44/desktop-idle-recovery.stderr": "5975349bfe33dd064c0e826ecf7ba4b21d6a15ff760dd90e6b7b6e3dc7b82c9d",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora44/desktop-idle-recovery.stdout": "86cce0d319596dd49113aa93182ea3c9e01ad6eea5aa396c38bca9fb4c809461",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora44/render.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora44/render.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora44/result.json": "f040cf287dd3d4a6fe595f31b33d7265c2ddaccfce493bf37ed2c423c51a6499",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora44/runtime-busy.stderr": "42a71a27be9f8f08ea41186768ad2eae2a7b2f1e96fe655e2a2de94365bad9b2",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora44/runtime-busy.stdout": "c2d9027a2fa0d6efa49f0e6dd629b5cb2b0800839b86b395042ead0d663bf881",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora44/runtime-holder.stderr": "b4a6c06672677cf0e25ec72bec83beae33305cee4b8087f168962014373b02bb",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora44/runtime-idle-recovery.stderr": "954b80337432806a3769320419c3ce03f53318915e68fe0830d672deaa675a4e",
+    "outputs/linux-rollout/fedora-clean-reinstall59/fedora44/runtime-idle-recovery.stdout": "86cce0d319596dd49113aa93182ea3c9e01ad6eea5aa396c38bca9fb4c809461"
+  }
+}

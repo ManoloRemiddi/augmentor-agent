@@ -2,17 +2,22 @@
 
 # Fedora dictation packaging candidate
 
-The corrected Fedora 44 RPM passes fresh installation, ordinary-user Desktop
+The corrected Fedora 43/44 RPMs pass fresh installation, ordinary-user Desktop
 rendering, active runtime and Desktop refusal for reinstall/removal, idle
 reinstall, removal preserving private files, and reinstall after removal in a
-fresh owned container. The installed Handy component also passes its actual
+fresh owned containers. The installed Handy component also passes its actual
 disabled protocol/theme/ownership/EOF check through the cold runtime lease.
 See [the qualification report](../release/qualification/next-targets/20261003-fedora-dictation-packaging.json).
 
-This checkpoint combines the clean public `4f99696` application payload with
-explicitly hashed working packaging and maintainer recipes. It is not a clean
-new combined product qualification. Both Fedora 43 and 44 RPMs build; the new
-43 artifact still needs installation and lifecycle execution. Complete installers,
+The original working-recipe checkpoint combines clean public `4f99696` payload
+with separately hashed packaging/maintainer recipes. A newer
+[clean-source package record](../release/qualification/next-targets/20261003-clean-fedora-package-replacement.json)
+builds both RPMs from the clean `536fc75` Debian-format payload and matching
+committed recipes. In both fixtures, actual installed cold runtime and Desktop
+leases refuse replacement, idle reinstall adopts the clean source, private files
+remain and ordinary-user rendering passes. This is different-source replacement
+at the same product/package version, not a version-to-version upgrade or rollback.
+Fresh clean-536 installation is still running in hosted CI. Complete installers,
 native GNOME/KDE sessions, graphical Browser, physical audio/input, enforcing
 SELinux, upgrades/rollback and source/legal/release acceptance remain open.
 
@@ -57,13 +62,14 @@ and executes the public disabled component probe as UID1000 under private
 D-Bus/Xvfb. It installs native packages from normal signed Fedora repositories,
 then disconnects networking before execution.
 
-The separate complete-package fixture starts from the exact pinned official
-Fedora 44 image with no application or proof user. It installs explicit distro
+Separate complete-package fixtures start from the exact pinned official
+Fedora 43/44 images with no application or proof user. They install explicit distro
 dependencies from normal repositories, disconnects networking, then executes
 the unchanged public [package probe](../release/prove-linux-package.py).
 The local candidate RPM is unsigned; that private command-line artifact has
 its exact checksum verified, while ordinary repository checks remain enabled.
-Observed versions are Python 3.14.7, PySide/Qt 6.11.2, Node 24.19.0 and GTK4 4.22.5.
+Observed versions are Python 3.14.7 and Node 24.19.0 on both; Fedora 43 uses
+PySide/Qt 6.10.3 and GTK4 4.20.4, while Fedora 44 uses 6.11.2 and GTK4 4.22.5.
 The package's final `rpm -V` also passes after the component probe.
 
 The first installed-component attempt lacked `dbus-run-session`. Adding its
@@ -99,9 +105,11 @@ platform decorators here. The [full Windows run](https://github.com/ManoloRemidd
 has a separate x64 actual desktop teardown access violation; ARM64 passes.
 Its recorded payload checkout `a3ec589` differs
 from `4f99696` only in four documentation files. No Qt teardown repair is
-claimed from this record.
+claimed from this record. Both new `536fc75` Windows Desktop jobs now pass
+after explicit Linux adapter scoping. Its complete Linux/Mac/Windows
+qualification is still running at the clean-package checkpoint.
 
-GitGuardian check `111048837418` remains failed and unwaived with the same
+GitGuardian checks `111048837418` and new `111063275897` remain failed and unwaived with the same
 twelve historical script/log digest findings. Fresh hosted checks for the
 corrected source are required. All five rollout points remain active. The
 22-file license proposal remains exact and pending; owner installations,

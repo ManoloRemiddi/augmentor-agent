@@ -6,12 +6,18 @@
 
 The original Fedora 43/44 builds fail on the two omitted dictation permission
 files. Corrected, separately hashed packaging recipes build both RPMs; a fresh
-Fedora 44 fixture passes installed rendering and busy/idle package lifecycle,
+Fedora 43/44 fixtures pass installed rendering and busy/idle package lifecycle,
 then actual disabled Handy protocol through the cold runtime lease with
 unchanged registered payload. See [the owning guide](LINUX-FEDORA-DICTATION-PACKAGING.md)
 and [working-recipe evidence](../release/qualification/next-targets/20261003-fedora-dictation-packaging.json).
 The payload is clean `4f99696`; these working recipes are not a new clean complete
-product qualification. Twenty-one focused Linux cases pass.
+product qualification. Twenty-one focused Linux cases pass. The newer
+[clean-package/replacement record](../release/qualification/next-targets/20261003-clean-fedora-package-replacement.json)
+builds matching Debian/Fedora artifacts from clean `536fc75`, refuses actual
+busy runtime/Desktop replacement in both targets, then verifies idle same-version
+source replacement, ordinary-user rendering and preserved private files. Actual
+version-to-version upgrades, rollback and complete installer acceptance stay open.
+Both `536fc75` Windows Desktop jobs pass; broader hosted checks remain running.
 
 Hosted `4f99696` Linux source/Home/Handy/Debian/installed/Browser jobs and both Mac
 versions pass; the distro matrix fails on the Fedora omission and an Ubuntu
