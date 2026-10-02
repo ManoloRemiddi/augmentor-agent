@@ -71,3 +71,53 @@ Independent hardware/users and model quality remain beta gates. The VM uses a
 consistent Nehalem CPU model: `release/vm-avx-mask-proof.c` reproduces a masked
 AVX2 load fault in QEMU 10.0.11 TCG that also crashed Qt/Breeze. The test avoids
 that emulator defect without changing Qt or the user's system.
+
+## October 2: browser capability discovery and input dispatch
+
+The local Desktop chat audit confirmed browser navigation, snapshots, clicks and
+text input were available and used. The agent nevertheless handed routine form
+creation back to the user and asserted a background-tab limitation without tool
+evidence. Later native input dispatch acknowledgements did not establish saved
+values. Private conversation content and document identifiers are excluded here.
+
+`config/browser-recovery.md` now explicitly maps browser and Linux discovery
+routes, requires checking real tool availability before claiming inability,
+distinguishes screenshot visibility from DOM input, and forbids arbitrary test
+text in live user documents. The persona adds ownership through completion.
+These instructions do not grant tools or override OS consent. Existing identity
+snapshots preserve historical persona text; the installed identity adapter reads
+browser recovery separately. Adoption must update the actual adapter's referenced
+immutable artifact/configuration, rather than assuming the selected UI release
+also owns its running DSH plugins.
+
+Browser input uses the native input/textarea value setter before an input event,
+so an application-owned instance setter cannot prematurely update its value
+tracker. Disabled, read-only and noneditable controls fail explicitly. An action
+acknowledgement still requires fresh observation of the saved result; synthetic
+input is not guaranteed to work in every web application.
+
+Validation on current main base `d91c520`: five input regression tests exercise
+actual injected handlers, including framework-owned value tracking and stale
+observations; all 70 Browser cases and nine browser-policy/desktop-capability/
+Codex-instruction cases pass. All 480 root cases (478 passed, two opt-in skips), TypeScript checks/build and six DSH composition
+checks pass. A real Chromium-based in-app-browser fixture ran the actual handler
+against React 18 controlled input/textarea fields: their rendered saved state
+updated and a read-only field stayed unchanged. This is synthetic application
+evidence, not a live Google Forms acceptance claim.
+
+The changes apply to the shared extension on Linux and macOS. Backend capability
+checks retain Linux single-monitor/ASCII restrictions, Mac helper and consent
+requirements, and unavailable Windows GUI input. No new universal desktop backend
+or permission bypass is introduced. Ordinary GUI execution continues through the
+existing supported desktop tools; browser DOM input does not require a vision
+model, while screenshots/desktop observations do.
+
+Installed Linux adoption uses a separately staged copy of the selected 0.2.11
+artifact with only these prompt patches. The running DSH identity adapter owns
+its own immutable artifact reference; change that reference to the staged copy
+while preserving existing identity snapshots, then reload only while no task is
+running. The unpacked extension upgrade retains its installed version/identity
+and all unrelated code, with a complete directory backup before replacement.
+The loaded extension must be reloaded before its cached executor adopts changes.
+Public source is 0.2.13; do not copy that full extension over a 0.2.11 companion.
+Source publication, installed selection and running adoption are separate checks.
