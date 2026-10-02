@@ -4,7 +4,24 @@
 
 ## 2 October: Desktop settings feature branch, awaiting owner acceptance
 
-See [Desktop agent settings](AGENT-SETTINGS.md). The follow-up now uses direct three-dot entry, embedded forms in the same frame, and restoration of the latest chat geometry. Shared source passes 623 native cases (621 pass, two skips); the compatible candidate passes 21 focused cases with two explicit source-only app-sizing skips. Final installation is recorded in that guide. Work is isolated in `feat/desktop-agent-settings` from `d91c520`; the original checkout and its unrelated edits are preserved. Source build, 484 Node and 610 native tests pass with two skips in each suite. Compatible 0.2.11 release `20261002-111240-1618d51b` is selected and running on Desktop/mobile, online with voice available. Candidate qualification, the narrow backed-up DSH migration and rollback are recorded in that guide. No merge is authorized until the owner tests it and gives the green light.
+See [Desktop agent settings](AGENT-SETTINGS.md). Tested source `3f2837b` plus
+`0481143` on `feat/desktop-agent-settings` uses direct three-dot entry, embedded
+forms in the same native frame, and restoration of the latest chat geometry.
+Identity, stacked Soul/Memory cards and all previous menu actions remain available.
+Unsaved Soul choices are inline; Stop, chat drafts and form lifecycle are preserved.
+Shared source passes 623 native cases (621 pass, two Mac-only skips). The compatible
+candidate passes 23 focused cases (21 pass, two source-only app-sizing skips), plus
+a synthetic same-window/geometry proof using the actual installed interpreter.
+
+Compatible Linux release `20261002-115054-5eb68ad8`, artifact
+`f077cb698826852028a4828aae012aa38e85d8f6750d94c319924a538fbf951e`, is selected
+and running on Desktop/mobile, online with voice available and no pending update.
+It preserves installed product 0.2.11 dependencies, speech, backends and prior native
+improvements. DSH/speech services and GPU/model settings were not changed. Source
+is based on `d91c520`; the original checkout’s unrelated edits remain preserved.
+Mac installed GUI acceptance is unverified. Rollback and initial identity/runtime
+qualification are in the guide. [Draft PR #29](https://github.com/ManoloRemiddi/augmentor-agent/pull/29)
+must remain unmerged until the owner tests locally and gives the green light.
 
 ## October 1 merge blockers: current main and separate Codex prerequisite
 

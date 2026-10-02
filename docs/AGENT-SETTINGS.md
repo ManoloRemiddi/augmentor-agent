@@ -177,5 +177,24 @@ explicitly skipped because the retained installed Appearance has no live-scale
 slider). Product 0.2.11, speech dependencies, DSH/Pi/Codex runtimes and other deployed
 native improvements are preserved. No DSH preset migration or host restart is
 required for this UI follow-up. Shared Mac source/setup-choice tests pass on Linux;
-installed Mac GUI acceptance remains unverified. Installed release identity follows
-in the deployment record after staging.
+installed Mac GUI acceptance remains unverified.
+
+### Installed frame-overlay candidate
+
+Tested source: `3f2837b` plus worker-dismissal fix `0481143`. Selected and running
+Linux release: `20261002-115054-5eb68ad8`, compatible product 0.2.11, artifact
+`f077cb698826852028a4828aae012aa38e85d8f6750d94c319924a538fbf951e`.
+Stage and activation passed immutable inventory, installed import and authenticated
+product checks. A separate synthetic proof using the actual installed interpreter
+and staged Window confirms one native window, embedded Look/More, retained chat
+draft and exact geometry restoration. Desktop and mobile both accepted guarded
+idle closure before supervisor restart and now report this root, online with
+voice available and no pending update. Secondary is not running. No DSH or speech
+service restart, model request or GPU/model/configuration change was needed.
+
+Test the installed Desktop by clicking the three dots, then Agent/Look/Voice/More.
+Back to chat restores the size you chose before opening settings. Changing the
+chat size and reopening settings captures that new size for the next restoration.
+The PR remains draft and unmerged pending the owner’s green light. Rollback through
+`augmentor-update rollback` now returns to initial settings release
+`20261002-111240-1618d51b`; no persona/preset rollback is needed for this UI revision.
