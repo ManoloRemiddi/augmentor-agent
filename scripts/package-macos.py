@@ -261,10 +261,22 @@ def main():
     inventory=json.dumps(application_inventory(project),sort_keys=True,indent=2)+'\n'
     (project/'application-inventory.json').write_text(inventory)
     inventory_hash=hashlib.sha256(inventory.encode()).hexdigest()
+    # These executables live in the owned component, outside conventional nested
+    # .app/Frameworks locations. Sign every Mach-O explicitly before sealing the app.
+    handy=project/'components/handy/runtime'
+    macho_magic={b'\xcf\xfa\xed\xfe',b'\xce\xfa\xed\xfe',b'\xfe\xed\xfa\xcf',b'\xfe\xed\xfa\xce',b'\xca\xfe\xba\xbe',b'\xbe\xba\xfe\xca'}
+    for file in sorted(handy.rglob('*')):
+        if not file.is_file():continue
+        with file.open('rb') as source:magic=source.read(4)
+        if magic in macho_magic:
+            subprocess.run(['codesign','--force','--sign','-',str(file)],check=True)
+            subprocess.run(['codesign','--verify','--strict',str(file)],check=True)
     # Ad-hoc integrity signature. Preview users must explicitly approve this app
     # in macOS; no Apple distribution identity or notarization is claimed.
     subprocess.run(['codesign','--force','--deep','--sign','-',str(app)],check=True)
     subprocess.run(['codesign','--verify','--deep','--strict',str(app)],check=True)
+    handy_inventory={file.relative_to(handy).as_posix():hashlib.sha256(file.read_bytes()).hexdigest() for file in sorted(handy.rglob('*')) if file.is_file()}
+    (out/'handy-signed-inventory.json').write_text(json.dumps({'schema':'augmentor-handy-signed/1','files':handy_inventory,'sourceCommit':args.source_commit},indent=2)+'\n')
     # Keep binary hashes outside the sealed bundle: code signing changes Mach-O bytes.
     if desktop:
         subprocess.run([str(python/'bin/python3'),'-I','-B',str(ROOT/'scripts/qt-library-inventory.py'),

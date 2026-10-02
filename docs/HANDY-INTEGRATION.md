@@ -61,7 +61,7 @@ Maintenance refuses active capture and retires an idle broker before promotion.
 | Platform | Shortcut / insertion adapter | Qualification boundary |
 | --- | --- | --- |
 | Linux X11 | Handy/Tauri global shortcut; standard X11 clipboard/paste | Actual component, separate Qt target, synthetic audio, live theme and real close-button click passed locally under KWin/Xvfb |
-| KDE Wayland | Handy/Tauri shortcut; private non-root ydotool daemon for native Wayland insertion | Matches the inspected compositor; clean packaged-system/manual acceptance remains a release gate |
+| KDE Wayland | Handy/Tauri shortcut; private non-root ydotool daemon for native Wayland insertion | Staged real component enabled with a separate shortcut and verified its private `0600` input socket/disable cleanup; physical capture and clean-system acceptance remain a release gate |
 | Other Linux Wayland | XDG GlobalShortcuts portal; XWayland bottom pill; private ydotool daemon | Actual private D-Bus consent/press/release/denial fixture passes; compositor-specific physical acceptance is separate |
 | macOS Apple Silicon | Handy native keyboard/accessibility/clipboard adapter; app-bundled component | Shared source and packaging wired; GitHub native build/lifecycle and existing Mac bundle qualification must pass |
 | Windows | Handy native keyboard/insertion adapter; `.exe` component and named-pipe broker | Native component CI added; complete Windows app packaging belongs to the existing public Windows work and must converge before a supported installer is claimed |
@@ -126,11 +126,17 @@ is `components/handy/runtime`; `scripts/stage-handy.py` rejects mismatched OS,
 source pins, patch/owned-source hashes, build inputs or altered file inventories.
 Existing Debian, Mac and release packagers require and include this component.
 The immutable desktop deployment copier carries `components/` into staged builds.
+Mac packaging explicitly signs each component Mach-O before sealing the enclosing
+bundle, verifies those signatures and writes an external inventory of the signed
+bytes. The component build inventory identifies the original pre-signing bytes.
 
 `.github/workflows/handy.yml` builds Linux x86-64, Mac ARM64 and Windows AMD64,
 checks Rust formatting/Clippy and runs the actual component protocol/lifecycle
 proof on each runner. Linux/Mac product packaging consumes the matching artifact
 from that run. A component build alone is not a complete installer qualification.
+The workflow can reuse a previously successful component with an exact
+OS/architecture/source/build-input cache key. Intake rechecks its full inventory,
+and the actual lifecycle proof still runs; no partial-key restoration is allowed.
 
 Local verification on 2 October 2026 includes actual release compilation,
 Clippy, TypeScript frontend/build checks, the broker authentication/revision/theme/
@@ -142,6 +148,12 @@ default Ctrl+Space, editable shortcut, exactly one transcript inserted into a
 separate QTextEdit, live light/dark theme without focus changes, cancellation
 through the actual close button, microphone exclusion, disable, no Handy tray
 and parent-exit cleanup. It does not listen to the physical microphone.
+The same proof also passes through the authenticated broker (`--broker`). Broad
+local regression suites pass: 612 native cases (609 pass, 3 platform/opt-in
+skips), 480 Node cases (478 pass, 2 opt-in skips), and 66 Browser cases. The native
+settings visual proof exposed and corrected white scroll content under a dark
+label palette; model-card links now use the accent colour. Both Debian packages
+build with the runtime's checked native inventory and complete notices.
 
 ```sh
 PYTHONPATH=apps/native QT_QPA_PLATFORM=offscreen python3 -m unittest discover -s tests -v
