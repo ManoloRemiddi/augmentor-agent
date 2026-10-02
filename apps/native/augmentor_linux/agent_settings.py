@@ -2,12 +2,13 @@
 """The desktop's narrow identity-first settings surface, shared on Linux and macOS."""
 import base64
 import importlib.util
+import sys
 from pathlib import Path
-from PySide6.QtCore import Qt, QTimer, QRectF, QByteArray, QBuffer, QIODevice
-from PySide6.QtGui import QColor, QPainter, QPainterPath, QImageReader, QPixmap
-from PySide6.QtWidgets import (QDialog, QWidget, QVBoxLayout, QHBoxLayout, QLabel,
+from PySide6.QtCore import Signal, Qt, QTimer, QSize, QRectF, QByteArray, QBuffer, QIODevice
+from PySide6.QtGui import QColor, QIcon, QPainter, QPainterPath, QImageReader, QPixmap
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
     QPushButton, QLineEdit, QComboBox, QPlainTextEdit, QTextBrowser, QTabWidget,
-    QScrollArea, QStackedWidget, QFileDialog, QCheckBox, QMessageBox)
+    QScrollArea, QStackedWidget, QFileDialog, QCheckBox, QSizePolicy)
 from .ui_scale import scaled, px
 from .voice_button import paint_energy_ring
 from .settings_icons import settings_icon
@@ -71,25 +72,40 @@ class AgentAvatar(QPushButton):
             painter.drawEllipse(self.rect().adjusted(2,2,-2,-2))
 
 
-class SettingsDialog(QDialog):
+class SettingsPanel(QWidget):
+    closed = Signal()
     def __init__(self, window):
         super().__init__(window); self.owner = window; self.store = identity_store(); self.pages = {}; self.shortcuts = None; self.closing = False
-        self.finished.connect(lambda _:setattr(self,'closing',True))
-        self.setWindowTitle('Your agent · Settings'); self.resize(px(self,450),min(px(self,780),self.screen().availableGeometry().height()-60))
-        scaled(self).setMinimumWidth(320)
+        self.editor = None; self.editor_page = None; self.editor_return = 'all'; self.leaving_editor = False
+        self.setObjectName('agentSettings'); self.setAccessibleName('Your agent settings')
         outer = QVBoxLayout(self); outer.setContentsMargins(px(self,18),px(self,14),px(self,18),px(self,14)); outer.setSpacing(px(self,12))
-        navigation = QHBoxLayout(); self.nav = {}
+        header = QHBoxLayout()
+        back = QPushButton('‹  Back to chat'); back.setObjectName('settings-back'); back.clicked.connect(self.accept); header.addWidget(back)
+        self.stop = QPushButton('Stop'); self.stop.clicked.connect(lambda:self.owner.controller.stop()); header.addWidget(self.stop)
+        hide = QPushButton('Hide'); hide.clicked.connect(self.owner.hide); header.addWidget(hide); outer.addLayout(header)
+        self.update_activity()
+        navigation = QHBoxLayout(); scaled(navigation).setSpacing(4); self.nav = {}
         for text, page in [('Agent','agent'),('Look','appearance'),('Voice','voice'),('More','all')]:
             button = QPushButton(text); button.setAutoDefault(False); button.setIcon(settings_icon({'agent':'memory','appearance':'appearance','voice':'voice','all':'harness'}[page],window.accent)); button.setCheckable(True); button.setAccessibleName(text+' settings')
-            button.clicked.connect(lambda _=False,p=page:self.show_page(p)); navigation.addWidget(button); self.nav[page]=button
+            scaled(button).setStyleSheet('padding:7px 4px;font-size:12px;'); scaled(button).setIconSize(QSize(14,14))
+            button.setProperty('settingsIcon',button.icon())
+            button.clicked.connect(lambda _=False,p=page:self.open_appearance() if p=='appearance' else self.open_voice() if p=='voice' else self.show_page(p)); navigation.addWidget(button); self.nav[page]=button
         outer.addLayout(navigation)
-        scroll = QScrollArea(); scroll.setWidgetResizable(True); scroll.setFrameShape(QScrollArea.Shape.NoFrame)
+        scroll = QScrollArea(); self.scroll = scroll; scroll.setWidgetResizable(True); scroll.setFrameShape(QScrollArea.Shape.NoFrame)
         self.stack = PageStack(); self.stack.currentChanged.connect(self.stack.updateGeometry); scroll.setWidget(self.stack); outer.addWidget(scroll)
         self.feedback = QLabel(); self.feedback.setWordWrap(True); self.feedback.setAccessibleName('Settings status'); outer.addWidget(self.feedback)
-        done = QPushButton('Done'); done.clicked.connect(self.accept); outer.addWidget(done)
+        self.exit_choices = QWidget(); choices = QHBoxLayout(self.exit_choices); choices.setContentsMargins(0,0,0,0)
+        for text,callback in [('Save & return',self.save_and_return),('Discard & return',self.discard_and_return),('Keep editing',self.keep_editing)]:
+            button = QPushButton(text.replace('&','&&')); button.clicked.connect(callback); choices.addWidget(button)
+        outer.addWidget(self.exit_choices); self.exit_choices.hide()
         try: self.identity = self.store.profile()
         except Exception as error: self.identity = None; self.feedback.setText(str(error))
         self.show_page('agent')
+
+    def resizeEvent(self,event):
+        super().resizeEvent(event)
+        for button in getattr(self,'nav',{}).values():
+            button.setIcon(QIcon() if self.width()<px(self,300) else button.property('settingsIcon'))
 
     def background(self, work, callback):
         self.owner.call_in_background(work,lambda result:callback(result) if not self.closing else None)
@@ -109,6 +125,7 @@ class SettingsDialog(QDialog):
         layout.addWidget(button); return button
 
     def show_page(self, name):
+        if not self.leave_editor(): return
         if name not in self.pages:
             try: page = getattr(self,'page_'+name)()
             except Exception as error: self.feedback.setText(str(error)); return
@@ -120,7 +137,7 @@ class SettingsDialog(QDialog):
     def page_agent(self):
         page, layout = self.make_page()
         self.avatar = AgentAvatar(self.owner); self.avatar.clicked.connect(self.change_image); layout.addWidget(self.avatar,0,Qt.AlignmentFlag.AlignHCenter)
-        self.name = QLineEdit((self.identity or {}).get('name','Augmentor')); self.name.setAccessibleName('Agent name'); self.name.setMaxLength(80); self.name.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.name = QLineEdit((self.identity or {}).get('name','Augmentor')); self.name.setAccessibleName('Agent name'); self.name.setMaxLength(80); self.name.setAlignment(Qt.AlignmentFlag.AlignCenter); self.name.setSizePolicy(QSizePolicy.Policy.Ignored,QSizePolicy.Policy.Fixed)
         scaled(self.name).setStyleSheet('font-size:22px;font-weight:600;padding:8px;'); layout.addWidget(self.name)
         self.name.editingFinished.connect(self.save_name)
         self.avatar.set_image((self.identity or {}).get('avatar',''))
@@ -130,6 +147,7 @@ class SettingsDialog(QDialog):
         note = QLabel('Choose how your agent behaves and see what it remembers.'); note.setWordWrap(True); layout.addWidget(note)
         for title,sub,link,destination,color in [('Soul','How I behave','Edit instructions  ↗','soul','#9d234f'),('Memory','What I know about you','View memory  ↗','memory','#235d82')]:
             button = self.action(layout,title+'\n'+sub+'\n\n'+link,lambda _=False,p=destination:self.show_page(p),destination+'-card')
+            button.setSizePolicy(QSizePolicy.Policy.Ignored,QSizePolicy.Policy.Preferred)
             scaled(button).setMinimumHeight(120)
             scaled(button).setStyleSheet(f'QPushButton {{text-align:left;padding:16px 20px;border:0;border-radius:18px;background:{color};color:#ffffff;font-size:15px;}} QPushButton:hover {{background:{QColor(color).lighter(115).name()};}} QPushButton:focus {{border:2px solid {QColor(self.owner.accent).name()};}}')
         layout.addWidget(QLabel('Agent access'))
@@ -253,53 +271,129 @@ class SettingsDialog(QDialog):
 
     def page_all(self):
         page,layout=self.make_page('All settings','Choose what you’d like to adjust.','agent')
-        for title,description,name in [('Appearance','Theme, colours, skins & visual effects','appearance'),('Voice','Speaking voice, speed & recording','voice'),('Conversation','Thinking display & reusable prompts','conversation'),('Connections','Models, agent engine & Home','connections'),('Advanced','Shortcuts, memory setup, updates & support','advanced')]:
-            button=self.action(layout,title+'\n'+description.replace('&','&&')+'    ›',lambda _=False,p=name:self.show_page(p)); scaled(button).setMinimumHeight(70); scaled(button).setStyleSheet('text-align:left;padding:14px;border-radius:12px;')
+        from .panels import UpdatesDialog, LicensesDialog
+        entries=[('Appearance',self.open_appearance),('Voice',self.open_voice),
+                 ('Prompt library',self.open_prompts),('Conversation',lambda:self.show_page('conversation')),
+                 ('Agent setup' if getattr(self.owner.controller,'harness','dsh')=='dsh' else 'Connect a model',self.open_setup),
+                 ('Open DSH in browser' if getattr(self.owner.controller,'harness','dsh')=='dsh' else 'Models && providers',self.open_models),
+                 ('Connections && Home',lambda:self.show_page('connections')),
+                 ('Approval mode',self.open_access),
+                 ('Versions && updates',lambda:self.open_editor('Versions & updates',lambda:UpdatesDialog(self.owner))),
+                 ('Advanced',lambda:self.show_page('advanced')),
+                 ('About && licenses',lambda:self.open_editor('About & licenses',lambda:LicensesDialog(self.owner)))]
+        if sys.platform=='darwin':
+            from .macos_browser_setup import available, MacBrowserSetupDialog
+            if available(): entries.append(('Set up browser extension',lambda:self.open_editor('Browser extension',lambda:MacBrowserSetupDialog(self.owner))))
+        for text,callback in entries:
+            self.action(layout,text+'    ›',callback)
+        self.action(layout,'Quit Augmentor',self.quit_agent,'quit-agent')
         layout.addStretch(); return page
 
-    def page_appearance(self):
-        page,layout=self.make_page('Appearance','Make your agent window feel like yours.')
-        theme=QComboBox(); theme.setAccessibleName('Theme'); theme.addItems(['Dark','Light']); theme.setCurrentIndex(0 if self.owner.preferences.values['theme']=='dark' else 1)
-        theme.activated.connect(lambda index:self.owner.apply_appearance({'theme':'dark' if index==0 else 'light'})); layout.addWidget(QLabel('Theme')); layout.addWidget(theme)
-        animate=QCheckBox('Animate the energy ring and visual effects'); animate.setChecked(self.owner.preferences.values.get('animation',True))
-        animate.toggled.connect(lambda enabled:(self.owner.apply_appearance({'animation':enabled}),self.avatar.sync_motion())); layout.addWidget(animate)
-        def appearance():
-            from .surfaces import AppearanceDialog
-            dialog=AppearanceDialog(self.owner.preferences.values,self); dialog.changed.connect(self.owner.apply_appearance); dialog.exec(); self.avatar.sync_motion()
-        self.action(layout,'Colours, skins && visual effects',appearance)
-        layout.addWidget(QLabel('Your existing colours, effects, image backgrounds and saved skins are available in the appearance editor.'))
-        layout.itemAt(layout.count()-1).widget().setWordWrap(True); layout.addStretch(); return page
+    def open_access(self):
+        self.show_page('agent')
+        self.access.setFocus()
+        self.access.ensurePolished()
+        self.scroll.ensureWidgetVisible(self.access)
 
-    def page_voice(self):
-        page,layout=self.make_page('Voice','Choose how your agent speaks and listens.')
+    def quit_agent(self):
+        if self.accept(): self.owner.close()
+
+    def open_appearance(self):
+        from .surfaces import AppearanceDialog
+        def create():
+            dialog=AppearanceDialog(self.owner.preferences.values,self.owner)
+            dialog.changed.connect(self.owner.apply_appearance)
+            return dialog
+        self.open_editor('Appearance',create)
+
+    def open_voice(self):
         from .voice_settings import VoiceSettingsDialog
-        enabled=QCheckBox('Enable Resonant Voice'); enabled.setChecked(self.owner.preferences.values.get('resonant_voice',True)); enabled.toggled.connect(self.owner.set_voice_enabled); layout.addWidget(enabled)
-        self.action(layout,'Resonant Voice settings',lambda:VoiceSettingsDialog(self.owner).exec())
-        note=QLabel('Speaking voice, speed, playback and hands-free recording use your existing voice controls.'); note.setWordWrap(True); layout.addWidget(note); layout.addStretch(); return page
+        self.open_editor('Voice',lambda:VoiceSettingsDialog(self.owner))
+
+    def open_editor(self,title,factory,back='all'):
+        if not self.leave_editor(): return
+        try: dialog=factory()
+        except Exception as error: self.feedback.setText(str(error)); return
+        page,layout=self.make_page(title,back=back)
+        # Reuse the established form and its lifecycle as a child widget. Never
+        # show/exec a top-level settings dialog or run a nested modal loop.
+        dialog.setParent(page,Qt.WindowType.Widget)
+        dialog.setWindowModality(Qt.WindowModality.NonModal)
+        dialog.setModal(False)
+        scaled(dialog).setMinimumSize(0,0)
+        layout.addWidget(dialog)
+        self.editor=dialog; self.editor_page=page; self.editor_return=back
+        dialog.finished.connect(self.editor_finished)
+        self.stack.addWidget(page); self.stack.setCurrentWidget(page); dialog.show()
+        self.feedback.clear()
+        for key,button in self.nav.items():button.setChecked(key==('appearance' if title=='Appearance' else 'voice' if title=='Voice' else 'all'))
+        self.avatar.sync_motion()
+
+    def editor_finished(self,*_):
+        if self.leaving_editor: return
+        back=self.editor_return
+        self.retire_editor()
+        self.show_page(back)
+
+    def retire_editor(self):
+        if self.editor_page:
+            self.stack.removeWidget(self.editor_page)
+            self.editor_page.deleteLater()
+        self.editor=None; self.editor_page=None
+
+    def leave_editor(self):
+        if not self.editor: return True
+        dialog=self.editor; finished=[]
+        def closed(*_): finished.append(True)
+        dialog.finished.connect(closed)
+        self.leaving_editor=True
+        try: dialog.reject()
+        finally:
+            self.leaving_editor=False; dialog.finished.disconnect(closed)
+        if not finished:
+            self.feedback.setText('Wait for the current settings operation to finish.'); return False
+        self.retire_editor(); return True
 
     def page_conversation(self):
         page,layout=self.make_page('Conversation','Choose how you see and compose conversations.')
         thinking=QCheckBox('Expand thinking by default'); thinking.setChecked(self.owner.preferences.values.get('expand_thinking',True)); thinking.toggled.connect(self.set_thinking); layout.addWidget(thinking)
-        self.action(layout,'Prompt library && prompt improvement',self.owner.open_prompt_library)
+        self.action(layout,'Prompt library && prompt improvement',self.open_prompts)
         layout.addStretch(); return page
 
     def set_thinking(self, enabled):
         if hasattr(self.owner,'set_thinking_visibility'): self.owner.set_thinking_visibility(enabled)
         else: self.owner.preferences.values['expand_thinking']=enabled; self.owner.preferences.save()
 
+    def open_prompts(self):
+        from .panels import PromptLibraryDialog
+        self.open_editor('Prompt library',lambda:PromptLibraryDialog(self.owner))
+
+    def open_setup(self):
+        controller=self.owner.controller
+        if not controller: return
+        if controller.running or controller.navigating:
+            self.feedback.setText('Finish the current action before configuring a model.'); return
+        self.open_editor('Model connection & setup',self.owner.make_setup_dialog)
+
+    def open_models(self):
+        if self.owner.controller.harness=='dsh': self.owner.open_pi()
+        else:
+            from .panels import ModelsDialog
+            self.open_editor('Models & providers',lambda:ModelsDialog(self.owner))
+
     def page_connections(self):
         page,layout=self.make_page('Connections','Choose the models and services your agent uses.')
         layout.addWidget(QLabel('Agent engine')); engine=QComboBox()
         for text,value in [('DSH','dsh'),('Pi','pi'),('Codex (development)','codex')]: engine.addItem(text,value)
-        engine.setCurrentIndex(engine.findData(self.owner.controller.harness)); engine.setAccessibleName('Agent engine'); engine.activated.connect(lambda _:self.owner.switch_harness(engine.currentData())); layout.addWidget(engine)
-        def setup(): self.accept(); self.owner.open_setup()
-        self.action(layout,'Model connection && setup',setup)
+        engine.setCurrentIndex(engine.findData(getattr(self.owner.controller,'harness','dsh'))); engine.setAccessibleName('Agent engine')
+        engine.setEnabled(bool(self.owner.controller)); engine.activated.connect(lambda _:self.owner.switch_harness(engine.currentData())); layout.addWidget(engine)
+        self.action(layout,'Model connection && setup',self.open_setup)
         from .home_settings import HomeDialog
-        self.action(layout,'Connect Home',lambda:HomeDialog(self.owner).exec()); layout.addStretch(); return page
+        self.action(layout,'Connect Home',lambda:self.open_editor('Home',lambda:HomeDialog(self.owner))); layout.addStretch(); return page
 
     def open_memory_settings(self):
         from .memory import MemoryDialog
-        MemoryDialog(self.owner).exec()
+        self.open_editor('Memory setup & processing',lambda:MemoryDialog(self.owner),back='memory' if self.stack.currentWidget()==self.pages.get('memory') else 'all')
 
     def page_advanced(self):
         page,layout=self.make_page('Advanced','Additional controls and diagnostics.')
@@ -307,18 +401,34 @@ class SettingsDialog(QDialog):
         layout.addWidget(QLabel('Window shortcuts')); self.shortcuts=ShortcutSettings(self.owner); layout.addWidget(self.shortcuts)
         self.action(layout,'Memory setup && processing',self.open_memory_settings)
         from .recovery import RecoveryDialog
-        self.action(layout,'Recover connection',lambda:RecoveryDialog(self.owner).exec())
-        from .panels import UpdatesDialog, LicensesDialog
-        self.action(layout,'Versions && updates',lambda:UpdatesDialog(self.owner).exec())
+        self.action(layout,'Recover connection',lambda:self.open_editor('Recover connection',lambda:RecoveryDialog(self.owner)))
         from .support import SupportDialog
-        self.action(layout,'Support report',lambda:SupportDialog(self.owner).exec())
-        self.action(layout,'About && licenses',lambda:LicensesDialog(self.owner).exec()); layout.addStretch(); return page
+        self.action(layout,'Support report',lambda:self.open_editor('Support',lambda:SupportDialog(self.owner)))
+        layout.addStretch(); return page
+
+    def update_activity(self):
+        running=bool(self.owner.controller and getattr(self.owner.controller,'running',False))
+        self.stop.setVisible(running); self.stop.setEnabled(running)
 
     def capture_current(self):
         return self.shortcuts.capture_current() if self.shortcuts else False
 
-    def done(self, result):
+    def accept(self):
+        if not self.leave_editor(): return False
         if hasattr(self,'soul_editor') and self.soul_editor.toPlainText()!=self.soul['text']:
-            answer=QMessageBox.question(self,'Unsaved Soul','Discard your unsaved Soul draft?',QMessageBox.StandardButton.Discard|QMessageBox.StandardButton.Cancel,QMessageBox.StandardButton.Cancel)
-            if answer!=QMessageBox.StandardButton.Discard: return
-        super().done(result)
+            self.show_page('soul'); self.feedback.setText('Your Soul draft has unsaved changes.'); self.exit_choices.show(); return False
+        self.save_name(); self.closing=True; self.closed.emit(); return True
+
+    def keep_editing(self):
+        self.exit_choices.hide(); self.feedback.clear(); self.soul_editor.setFocus()
+
+    def discard_and_return(self):
+        self.cancel_soul(); self.exit_choices.hide(); self.accept()
+
+    def save_and_return(self):
+        self.save_soul()
+        if self.soul_editor.toPlainText()==self.soul['text']:
+            self.exit_choices.hide(); self.accept()
+
+
+SettingsDialog = SettingsPanel

@@ -1,6 +1,6 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Agent identity and Soul](AGENT-SETTINGS.md) are stored privately in `augmentor-pi/identity/`: profile metadata/PNG, authoritative `soul.md`, and DSH per-conversation prompt snapshots. Codex/Pi snapshots remain in conversation metadata. Saving Soul sends those instructions to the chosen provider on new chats; identity images remain local. Resetting Soul preserves memory and permissions.
+[Agent identity and Soul](AGENT-SETTINGS.md) are stored privately in `augmentor-pi/identity/`: profile metadata/PNG, authoritative `soul.md`, and DSH per-conversation prompt snapshots. Codex/Pi snapshots remain in conversation metadata. Saving Soul sends those instructions to the chosen provider on new chats; identity images remain local. Resetting Soul preserves memory and permissions. Temporary settings-frame geometry is excluded from saved chat placement; hiding retains the current settings view, and open settings block unattended maintenance closure.
 
 # Data, permissions and support
 

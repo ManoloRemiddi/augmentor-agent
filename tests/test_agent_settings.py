@@ -33,7 +33,7 @@ class AgentSettingsTests(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory(); self.addCleanup(self.temp.cleanup)
         environment=patch.dict(os.environ,{'AUGMENTOR_IDENTITY_DIR':self.temp.name}); environment.start(); self.addCleanup(environment.stop)
-        self.owner=Owner(); self.dialog=SettingsDialog(self.owner); self.dialog.show(); self.app.processEvents()
+        self.owner=Owner(); self.owner.show(); self.dialog=SettingsDialog(self.owner); self.dialog.show(); self.app.processEvents()
         self.addCleanup(self.dialog.deleteLater); self.addCleanup(self.owner.deleteLater)
     def click(self, name):
         button=self.dialog.findChild(QPushButton,name); self.assertIsNotNone(button); QTest.mouseClick(button,Qt.MouseButton.LeftButton); self.app.processEvents()
@@ -42,7 +42,7 @@ class AgentSettingsTests(unittest.TestCase):
         self.assertIs(self.dialog.stack.currentWidget(),self.dialog.pages['all'])
         self.assertEqual([b.text() for b in self.dialog.nav.values()],['Agent','Look','Voice','More'])
         self.assertFalse(any(b.text()=='All settings' for b in self.dialog.findChildren(QPushButton)))
-        for page in ['appearance','voice','conversation','connections','advanced']:
+        for page in ['conversation','connections','advanced']:
             self.dialog.show_page(page); self.assertIs(self.dialog.stack.currentWidget(),self.dialog.pages[page])
     def test_soul_reset_is_a_draft_and_cancel_preserves_saved_personality(self):
         store=identity_store(); store.save_soul('Synthetic custom personality',store.soul()['revision'])

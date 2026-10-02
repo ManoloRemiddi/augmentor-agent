@@ -177,7 +177,8 @@ class SetupDialogChoiceTests(unittest.TestCase):
 
         owner = SimpleNamespace(
             controller=SimpleNamespace(harness=harness, running=False, navigating=False),
-            setup_dialog=None, set_status=lambda text: None)
+            setup_dialog=None, settings_panel=None, set_status=lambda text: None)
+        owner.make_setup_dialog=lambda:window.Window.make_setup_dialog(owner)
         with patch.object(macos_setup, 'runtime_problem', return_value=problem), \
              patch.object(macos_setup, 'needed', return_value=True), \
              patch.object(macos_setup, 'available', return_value=managed), \

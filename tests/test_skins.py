@@ -105,7 +105,11 @@ class SkinTests(unittest.TestCase):
                 prefs=Preferences();prefs.values.update(dialog.values);prefs.save()
                 self.assertEqual(Preferences().values['effect'],effect)
                 window=Window();window.apply_appearance(document['appearance']);window.show();window.set_busy(True)
-                QTest.qWait(60)
+                # Wait for an actual animation tick under the full-suite load.
+                # A fixed 60 ms delay occasionally observes an empty first frame.
+                for _ in range(25):
+                    if window.activity.butterflies.butterflies:break
+                    QTest.qWait(20)
                 self.assertEqual(window.activity.effect,effect)
                 self.assertEqual(len(window.activity.butterflies.butterflies),420)
                 self.assertFalse(window.activity.canvas.grab().isNull())

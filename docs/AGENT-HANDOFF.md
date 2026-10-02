@@ -4,7 +4,7 @@
 
 ## 2 October: Desktop settings feature branch, awaiting owner acceptance
 
-See [Desktop agent settings](AGENT-SETTINGS.md). Work is isolated in `feat/desktop-agent-settings` from `d91c520`; the original checkout and its unrelated edits are preserved. Source build, 484 Node and 610 native tests pass with two skips in each suite. Compatible 0.2.11 release `20261002-111240-1618d51b` is selected and running on Desktop/mobile, online with voice available. Candidate qualification, the narrow backed-up DSH migration and rollback are recorded in that guide. No merge is authorized until the owner tests it and gives the green light.
+See [Desktop agent settings](AGENT-SETTINGS.md). The follow-up now uses direct three-dot entry, embedded forms in the same frame, and restoration of the latest chat geometry. Shared source passes 622 native cases (620 pass, two skips); the compatible candidate passes 20 focused cases with two explicit source-only app-sizing skips. Final installation is recorded in that guide. Work is isolated in `feat/desktop-agent-settings` from `d91c520`; the original checkout and its unrelated edits are preserved. Source build, 484 Node and 610 native tests pass with two skips in each suite. Compatible 0.2.11 release `20261002-111240-1618d51b` is selected and running on Desktop/mobile, online with voice available. Candidate qualification, the narrow backed-up DSH migration and rollback are recorded in that guide. No merge is authorized until the owner tests it and gives the green light.
 
 ## October 1 merge blockers: current main and separate Codex prerequisite
 

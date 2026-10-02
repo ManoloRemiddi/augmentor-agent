@@ -12,7 +12,7 @@ import subprocess
 import uuid
 import threading
 from pathlib import Path
-from .ui_scale import scaled, LiveScale, px, normalize
+from .ui_scale import factor, scaled, LiveScale, px, normalize
 from PySide6.QtCore import Qt, QTimer, QLockFile, QUrl, Signal, QSize, QPoint, QRect, QVariantAnimation, QEasingCurve
 from PySide6.QtNetwork import QLocalServer, QLocalSocket
 from PySide6.QtGui import QColor, QPainter, QKeySequence, QShortcut, QRegion, QDesktopServices, QPalette, QIcon
@@ -64,7 +64,7 @@ class Window(QWidget):
         self.pending_prompt=None;self.submitted_draft=None;self.morphing=False;self.compact=False;self.close_pending=False;self.read_only=False;self.is_saved=False
         self.expanded_size=self.size();self.follow_tail=True;self.rendering=False
         self.title_text='Augmentor Agent'
-        self.hidden_geometry=None;self.hidden_layout=None;self.hidden_dialogs=[];self.shortcut_dialog=None
+        self.hidden_geometry=None;self.hidden_layout=None;self.hidden_dialogs=[];self.shortcut_dialog=None;self.settings_panel=None;self.chat_geometry=None
         self.completed.connect(lambda callback,value:callback(value))
         self.render_timer=QTimer(self);self.render_timer.setSingleShot(True);self.render_timer.setInterval(33);self.render_timer.timeout.connect(self.render_messages)
         self.copied_message=None;self.copied_code=None
@@ -104,7 +104,7 @@ class Window(QWidget):
         self.pin_button=self.icon_button(SURFACE['glyphs']['pin'],'Follow me across all desktops',self.toggle_pin,checkable=True)
         self.pin_button.setChecked(self.preferences.values['pinned'])
         self.compact_button=self.icon_button(SURFACE['glyphs']['compact'],'Circular activity view',self.toggle_compact)
-        self.more_button=self.icon_button(SURFACE['glyphs']['more'],'More options',self.open_menu)
+        self.more_button=self.icon_button(SURFACE['glyphs']['more'],'Settings',self.open_settings)
         self.hide_button=self.icon_button(SURFACE['glyphs']['hide'],'Hide Augmentor',self.hide)
         for button in (self.new_button,self.save_button,self.history_button,self.pin_button,self.compact_button,self.more_button,self.hide_button):header.addWidget(button,0,Qt.AlignmentFlag.AlignVCenter)
         layout.addLayout(header)
@@ -235,6 +235,12 @@ class Window(QWidget):
         if self.controller.running or self.controller.navigating:
             self.set_status('Finish the current action before configuring a model.');return
         if self.setup_dialog and self.setup_dialog.isVisible():self.setup_dialog.raise_();return
+        if self.settings_panel:
+            self.settings_panel.open_setup();return
+        self.setup_dialog=self.make_setup_dialog()
+        self.setup_dialog.show()
+
+    def make_setup_dialog(self):
         from .setup import SetupDialog
         from .dsh_setup import DshSetupDialog
         from .macos_setup import (MacRuntimeIncompleteDialog, MacSetupDialog,
@@ -245,14 +251,14 @@ class Window(QWidget):
         # it would silently fall through to the external-DSH form and read as a
         # demand for a DSH the user does not have.
         problem=runtime_problem() if mac_setup_needed() else ''
-        if self.controller.harness=='pi':self.setup_dialog=SetupDialog(self)
+        if self.controller.harness=='pi':dialog=SetupDialog(self)
         elif self.controller.harness=='codex':
             from .codex_setup import CodexSetupDialog
-            self.setup_dialog=CodexSetupDialog(self)
-        elif problem:self.setup_dialog=MacRuntimeIncompleteDialog(self,problem)
-        elif mac_setup_available():self.setup_dialog=MacSetupDialog(self)
-        else:self.setup_dialog=DshSetupDialog(self)
-        self.setup_dialog.show()
+            dialog=CodexSetupDialog(self)
+        elif problem:dialog=MacRuntimeIncompleteDialog(self,problem)
+        elif mac_setup_available():dialog=MacSetupDialog(self)
+        else:dialog=DshSetupDialog(self)
+        return dialog
 
     def icon_button(self,text,tooltip,callback,checkable=False):
         button=QPushButton(text);scaled(button).setFixedSize(SURFACE['iconSize'],SURFACE['iconSize']);scaled(button).setStyleSheet('QPushButton {padding:0;font-size:15px;border:0;background:transparent;} QPushButton:hover {background:rgba(127,150,150,55);color:palette(window-text);}')
@@ -479,6 +485,7 @@ class Window(QWidget):
         self.history_button.setEnabled(bool(self.controller) and not running)
         self.save_button.setEnabled(bool(self.controller and self.controller.session) and not self.read_only)
         working=bool(self.controller and self.controller.running)
+        if self.settings_panel:self.settings_panel.update_activity()
         self.stop_button.setVisible(working);self.stop_button.setEnabled(working);self.send_button.setVisible(not working or can_queue)
         self.send_button.setToolTip('Queue prompt · Enter' if working and can_queue else 'Send · Enter (Shift+Enter for a new line)')
         self.queue_panel.online=bool(self.controller and getattr(self.controller,'online',False));self.queue_panel.running=working;self.queue_panel.render()
@@ -516,6 +523,7 @@ class Window(QWidget):
         threading.Thread(target=work,daemon=True,name='augmentor-improve-prompt').start()
 
     def send(self):
+        if self.settings_panel:return
         if self.composer.improving:return
         text=self.composer.toPlainText().strip()
         if self.controller and self.send_button.isEnabled() and text:
@@ -867,26 +875,43 @@ class Window(QWidget):
         if self.controller:AccessDialog(self).exec()
 
     def open_settings(self):
-        self.shortcut_dialog=SettingsDialog(self)
-        self.shortcut_dialog.exec()
-        self.shortcut_dialog=None
+        if self.settings_panel: return
+        if self.morphing: return
+        if self.compact:
+            self.toggle_compact()
+            if self.morphing:
+                self.morph_animation.finished.connect(self.open_settings,Qt.ConnectionType.SingleShotConnection); return
+        if self.voice_dialog or self.voice_opening:self.close_voice_panel()
+        self.chat_geometry=QRect(self.geometry())
+        self.chat_design_size=(self.width()/factor(self),self.height()/factor(self))
+        self.chat_minimum=(self.minimumWidth()/factor(self),self.minimumHeight()/factor(self))
+        self.chat_maximum=(self.maximumWidth()/factor(self),self.maximumHeight()/factor(self))
+        panel=SettingsDialog(self);self.settings_panel=panel;self.shortcut_dialog=panel
+        panel.closed.connect(self.close_settings)
+        self.stack.addWidget(panel);self.stack.setCurrentWidget(panel)
+        area=self.screen().availableGeometry()
+        scaled(self).setMinimumSize(320,364)
+        target=QRect(self.chat_geometry)
+        target.setSize(QSize(min(px(self,450),area.width()),min(px(self,820),area.height())))
+        target.moveLeft(max(area.left(),min(target.x(),area.right()-target.width()+1)))
+        target.moveTop(max(area.top(),min(target.y(),area.bottom()-target.height()+1)))
+        self.setGeometry(target);self.hidden_geometry=None;self.resize_borders.update();self.update()
+
+    def close_settings(self):
+        panel=self.settings_panel
+        if not panel:return
+        target=QRect(self.chat_geometry)
+        self.settings_panel=None;self.shortcut_dialog=None;self.chat_geometry=None
+        self.stack.setCurrentWidget(self.expanded);self.stack.removeWidget(panel);panel.deleteLater()
+        scaled(self).setMinimumSize(*self.chat_minimum)
+        scaled(self).setMaximumSize(*self.chat_maximum)
+        self.setGeometry(target);self.expanded_size=self.size();self.hidden_geometry=None
+        self.design_size=(self.width()/factor(self),self.height()/factor(self))
+        self.last_scaled_size=self.size()
+        self.remember_placement();self.resize_borders.update();self.update();self.focus_composer()
 
     def open_menu(self):
-        menu=QMenu(self)
-        menu.addAction('Settings',self.open_settings).setEnabled(bool(self.controller))
-        menu.addAction('Colors & skins',self.open_appearance)
-        menu.addAction('Prompt library',self.open_prompt_library).setEnabled(bool(self.controller))
-        is_dsh=bool(self.controller and self.controller.harness=='dsh')
-        menu.addAction('Agent setup' if is_dsh else 'Connect a model',self.open_setup).setEnabled(bool(self.controller))
-        menu.addAction('Open DSH in browser' if is_dsh else 'Models & providers',self.open_pi).setEnabled(bool(self.controller))
-        from .macos_browser_setup import available, MacBrowserSetupDialog
-        if available():
-            menu.addAction('Set up browser extension',lambda:MacBrowserSetupDialog(self).exec())
-        menu.addAction('Versions & updates',self.open_updates).setEnabled(bool(self.controller))
-        menu.addAction('Approval mode',self.open_access).setEnabled(bool(self.controller))
-        menu.addAction('About & licenses',lambda:LicensesDialog(self).exec())
-        menu.addSeparator();menu.addAction('Quit Augmentor',self.close)
-        menu.exec(self.more_button.mapToGlobal(self.more_button.rect().bottomLeft()))
+        self.open_settings()
 
     def open_updates(self):
         if self.controller:UpdatesDialog(self).exec()
@@ -989,6 +1014,8 @@ class Window(QWidget):
         if percent==self.ui_scale.percent:return
         # Keep live widgets, document cursors, undo, controller and response intact.
         ratio=percent/self.ui_scale.percent
+        if self.chat_geometry:
+            self.chat_geometry.setSize(QSize(round(self.chat_design_size[0]*percent/self.ui_scale.base),round(self.chat_design_size[1]*percent/self.ui_scale.base)))
         if self.morphing:self.morph_animation.stop();self.morph_animation.finished.emit()
         size=self.size();expanded=self.expanded_size
         if size!=getattr(self,'last_scaled_size',None):
@@ -1055,6 +1082,8 @@ class Window(QWidget):
         if self.hidden_geometry is not None:QTimer.singleShot(100,self.restore_saved_position)
 
     def toggle_compact(self):
+        if self.settings_panel:
+            if not self.settings_panel.accept():return
         if self.voice_dialog or self.voice_opening:self.close_voice_panel()
         if self.morphing:return
         start=QRect(self.geometry());was_compact=self.compact
@@ -1170,6 +1199,8 @@ class Window(QWidget):
             self.controller.answer(frame, {'sessionId': payload['sessionId'], 'answer': {'answers': answers}})
 
     def escape(self):
+        if self.settings_panel:
+            self.settings_panel.accept();return
         if (self.voice_dialog or self.voice_opening) and self.voice_is_hands_free():
             self.close_voice_panel();return
         if self.voice_button.isDown() or (self.voice_dialog and self.voice_dialog.capture):
@@ -1180,6 +1211,8 @@ class Window(QWidget):
             self.close()
 
     def closeEvent(self, event):
+        if self.settings_panel and not self.settings_panel.accept():
+            event.ignore();return
         if self.voice_dialog or self.voice_input or self.voice_opening:self.close_voice_panel()
         if self.controller and getattr(self.controller,'repairing',False):
             event.ignore();return
@@ -1203,8 +1236,8 @@ class Window(QWidget):
     def remember_placement(self):
         self.hidden_layout=self.screen_layout()
         self.hidden_geometry=QRect(self.geometry())
-        rect=self.hidden_geometry
-        expanded=self.expanded_size if self.compact else self.size()
+        rect=self.chat_geometry if self.settings_panel else self.hidden_geometry
+        expanded=rect.size() if self.settings_panel else self.expanded_size if self.compact else self.size()
         self.preferences.values['placement']={'x':rect.x(),'y':rect.y(),'width':rect.width(),'height':rect.height(),'compact':self.compact,'expanded_width':expanded.width(),'expanded_height':expanded.height(),'screen_layout':self.hidden_layout,'halo_margin':self.activity.margin}
         for key in ('width','height','expanded_width','expanded_height'):
             self.preferences.values['placement'][key]=round(self.preferences.values['placement'][key]/self.ui_scale.factor)
@@ -1247,7 +1280,7 @@ class Window(QWidget):
         if getattr(self,'voice_dialog',None) or getattr(self,'voice_opening',False):self.close_voice_panel()
         self.activity.timer.stop()
         self.remember_placement()
-        self.hidden_dialogs=[d for d in self.findChildren(QDialog) if d.isVisible()]
+        self.hidden_dialogs=[d for d in self.findChildren(QDialog) if d.isVisible() and d.isWindow()]
         for dialog in self.hidden_dialogs:dialog.hide()
         super().hideEvent(event)
 
@@ -1261,11 +1294,11 @@ class Window(QWidget):
         draft = bool(self.composer.toPlainText() or self.submitted_draft or self.editing)
         busy = (running or draft or self.composer.improving or self.voice_opening
                 or self.voice_input is not None or bool(self.voice_dialog and self.voice_dialog.capture)
-                or any(dialog.isVisible() for dialog in self.findChildren(QDialog)))
+                or self.settings_panel is not None or any(dialog.isVisible() for dialog in self.findChildren(QDialog)))
         return {'running': running, 'busy': busy, 'draftPresent': draft, 'accepted': not busy}
 
     def focus_composer(self):
-        if not self.isVisible() or self.compact:return
+        if not self.isVisible() or self.compact or self.settings_panel:return
         if QApplication.activeModalWidget() or QApplication.activePopupWidget():return
         if any(dialog.isVisible() for dialog in self.findChildren(QDialog)):return
         self.composer.setFocus(Qt.FocusReason.ShortcutFocusReason)

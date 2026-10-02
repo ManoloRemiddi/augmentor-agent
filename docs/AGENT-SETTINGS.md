@@ -2,13 +2,33 @@
 
 # Desktop agent settings
 
-The narrow Desktop panel starts with Agent, Look, Voice and More. Agent contains
-an editable name, an image picker and the existing voice energy ring, followed
-by rectangular Soul and Memory cards stacked vertically, and access for new chats.
-More opens All settings inside the same panel. There is no duplicate bottom
-entry. Appearance, Voice, Conversation, Connections and Advanced lead to the
-existing editors; shortcuts, memory maintenance, recovery, versions, support and
-licenses remain available. Theme, animation and voice enablement have direct controls.
+Clicking the Desktop’s three dots opens Agent settings in one click, replacing
+the chat content inside the existing frameless window. It uses the same native
+window and frame; no menu, separate settings window or modal loop is created.
+Back to chat (or Escape) restores the exact latest chat geometry, including user
+resizes before entry. The temporary settings size is not saved as chat placement.
+Drafts, conversation widgets, streaming state and the visible Stop action survive.
+Hiding/reopening retains the settings page while restart placement retains the
+chat size. Source accessibility scaling also scales the saved chat dimensions.
+
+Agent, Look, Voice and More remain the main navigation. Agent contains an editable
+name, image picker and the existing voice energy ring, vertically stacked rectangular
+Soul/Memory cards, and access for new chats. Look and Voice immediately open their
+complete existing forms inside the frame, with no intermediate landing page.
+More opens All settings with direct links for every old menu action: Appearance
+(colours/skins), Prompt library, model/agent setup, DSH browser access or model
+providers, Approval mode, Versions/updates, About/licenses and Quit. Mac browser
+extension setup is retained when available. Conversation, Connections/Home and
+Advanced keep the additional controls. There is no duplicate bottom Settings entry.
+Approval mode takes the user directly to the Agent access control.
+
+Settings forms are embedded child widgets, with their existing save/cancel and
+worker cleanup preserved. Busy operations that already refused dismissal still
+refuse navigation. An open settings page makes guarded maintenance unavailable.
+An unsaved Soul offers inline Save & return, Discard & return and Keep editing;
+conflicts leave the draft open. Normal file/image selectors retain their native
+chooser behavior. First-run setup retains its existing flow; subsequent setup
+from Settings stays in this frame.
 
 This change implements the Desktop direction approved on 2 October 2026.
 The spacious Browser redesign is a later presentation step; Browser conversations
@@ -33,7 +53,7 @@ Appearance and voice preferences retain their existing per-window ownership.
 a file lock and optimistic content revisions. Empty, NUL-containing and over-32-KiB
 instructions are rejected. Conflicting edits retain the draft and the other writer.
 Reset Soul loads the packaged default into the editor. Save applies it; Cancel
-retains the saved version. Closing an unsaved draft asks before discarding it.
+retains the saved version. Leaving an unsaved draft shows inline save/discard/keep-editing choices.
 Reset affects no other identity, access or memory data.
 
 Pi captures Soul in new conversation metadata; forks inherit the source snapshot.
@@ -72,7 +92,7 @@ memory reads and cancellation remain available. OS desktop sharing and paired
 Home permissions still apply. Existing Codex chats without new policy metadata
 retain their previous native policy and custom-tool behavior.
 
-## Qualification — 2 October 2026
+## Initial identity qualification — 2 October 2026 (historical)
 
 Implementation: `eef21cf` plus legacy Pi compatibility `fa5d3cf` on `feat/desktop-agent-settings`, based on `d91c520`. Implementation has not
 been merged and awaits the owner's local acceptance.
@@ -98,7 +118,7 @@ POSIX file locks and atomic writes; no new OS adapter is required. No installed
 Mac app or real Mac desktop interaction was tested in this turn. Packaging and
 native dependency qualification on macOS remain acceptance work.
 
-## Installed Linux acceptance candidate
+## Initial installed Linux identity candidate (historical)
 
 Selected and running release: `20261002-111240-1618d51b`, compatible product
 0.2.11, artifact `7419f27525a67101b03d35f1a6d11471c7d7491567d855d75d5acc0b08276b77`.
@@ -119,7 +139,7 @@ Other rows, the Browser plugin and global composition were preserved. The idle
 full installer still requires a separately reviewed migration of the already edited
 global composition; this feature does not silently normalize it.
 
-Open the installed Desktop's menu → Settings to test Agent, Soul, Memory and More.
+That initial candidate used menu → Settings; the frame-overlay revision below supersedes that navigation.
 Identity and Soul are shared by the two personal surfaces; access choices affect
 future chats. Live-provider responses to a customized Soul remain the owner's
 acceptance test. No merge has been performed.
@@ -133,3 +153,28 @@ UI does not delete them. Keep the local test candidate and preset backups until
 acceptance is complete.
 
 Review: [draft PR #29](https://github.com/ManoloRemiddi/augmentor-agent/pull/29), awaiting the owner’s green light.
+
+## Frame overlay revision — 2 October 2026
+
+The owner requested direct three-dot entry, all former menu actions in the new UI,
+and resizing/restoration of the same agent frame. Shared source qualification:
+622 native tests, 620 passed and two Mac-only skips, using PySide6 6.8.2.1.
+Twelve new real-window Qt checks cover same-window entry, latest geometry and
+chat draft preservation, hide/reopen placement, direct Look/Voice forms and voice
+cleanup, old menu coverage, inline Soul decisions/conflicts, busy-form refusal,
+Stop and hidden-chat shortcut protection, compact mode, 320-pixel/light navigation,
+and both ordinary and non-default startup app scales. An existing butterfly fixture
+now waits for an actual animation tick within a bounded interval instead of
+assuming it has occurred after a fixed 60 ms. Dark/light/narrow renders were inspected.
+The unchanged runtime’s Node/build evidence above remains historical; this follow-up
+changes native presentation/lifecycle only.
+
+The separate compatible candidate copies initial installed artifact `7419f27525a67101b03d35f1a6d11471c7d7491567d855d75d5acc0b08276b77`,
+replaces the reviewed settings component and applies only the authored window and
+touch patches. Its 22 focused cases pass (20 passed, two source app-sizing checks
+explicitly skipped because the retained installed Appearance has no live-scale
+slider). Product 0.2.11, speech dependencies, DSH/Pi/Codex runtimes and other deployed
+native improvements are preserved. No DSH preset migration or host restart is
+required for this UI follow-up. Shared Mac source/setup-choice tests pass on Linux;
+installed Mac GUI acceptance remains unverified. Installed release identity follows
+in the deployment record after staging.
