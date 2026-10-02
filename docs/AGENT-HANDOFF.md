@@ -1,10 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+# Start here: agent handoff
+
 ## 2 October: Desktop settings feature branch, awaiting owner acceptance
 
-See [Desktop agent settings](AGENT-SETTINGS.md). Work is isolated in `feat/desktop-agent-settings` from `d91c520`; the original checkout and its unrelated edits are preserved. Source build, 484 Node and 610 native tests pass with two skips in each suite. Compatible 0.2.11 release `20261002-105319-5bfc98af` is selected and running on Desktop/mobile, online with voice available. Candidate qualification, the narrow backed-up DSH migration and rollback are recorded in that guide. No merge is authorized until the owner tests it and gives the green light.
-
-# Start here: agent handoff
+See [Desktop agent settings](AGENT-SETTINGS.md). Work is isolated in `feat/desktop-agent-settings` from `d91c520`; the original checkout and its unrelated edits are preserved. Source build, 484 Node and 610 native tests pass with two skips in each suite. Compatible 0.2.11 release `20261002-111240-1618d51b` is selected and running on Desktop/mobile, online with voice available. Candidate qualification, the narrow backed-up DSH migration and rollback are recorded in that guide. No merge is authorized until the owner tests it and gives the green light.
 
 ## October 1 merge blockers: current main and separate Codex prerequisite
 

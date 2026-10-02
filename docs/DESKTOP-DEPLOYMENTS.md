@@ -6,7 +6,7 @@
 
 [Agent settings and installed evidence](AGENT-SETTINGS.md#installed-linux-acceptance-candidate)
 records implementation `eef21cf`, compatible selected/running release
-`20261002-105319-5bfc98af`, artifact identity, candidate checks, narrow backed-up
+`20261002-111240-1618d51b`, artifact identity, candidate checks, narrow backed-up
 DSH preset migration and restored Desktop/mobile. Both are online with voice
 available and no pending update. This is an unmerged local acceptance candidate;
 the owner must give the green light before merging the feature branch.

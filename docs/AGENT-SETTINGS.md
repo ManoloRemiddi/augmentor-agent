@@ -74,7 +74,7 @@ retain their previous native policy and custom-tool behavior.
 
 ## Qualification — 2 October 2026
 
-Implementation: `eef21cf` on `feat/desktop-agent-settings`, based on `d91c520`. Implementation has not
+Implementation: `eef21cf` plus legacy Pi compatibility `fa5d3cf` on `feat/desktop-agent-settings`, based on `d91c520`. Implementation has not
 been merged and awaits the owner's local acceptance.
 
 - Build and TypeScript checks pass.
@@ -88,7 +88,7 @@ been merged and awaits the owner's local acceptance.
 - Dark/light and 320-pixel narrow native renders were inspected on Linux.
 - The compatible candidate copied installed product 0.2.11 artifact
   `3e89dedc3d701fe66a41bfd0b7ff2558d0aaeb70b76750a9409eac7b0fbf30be`, overlaid
-  reviewed modules, and passed its ten Qt tests plus four Node/real-Codex checks.
+  reviewed modules, and passed its ten Qt tests plus four Node/real-Codex checks and 27 real-Pi fixture checks.
   Its product manifest, installed dependencies, speech contract and unrelated
   native behavior remain from that artifact. Source product 0.2.13 is not claimed
   as a new installed 0.2.13 release.
@@ -100,8 +100,8 @@ native dependency qualification on macOS remain acceptance work.
 
 ## Installed Linux acceptance candidate
 
-Selected and running release: `20261002-105319-5bfc98af`, compatible product
-0.2.11, artifact `873d200b12f4b2d9cc4fe872e0a5c50d9364c44670010fdaa5f383410eae7f2e`.
+Selected and running release: `20261002-111240-1618d51b`, compatible product
+0.2.11, artifact `7419f27525a67101b03d35f1a6d11471c7d7491567d855d75d5acc0b08276b77`.
 `augmentor-update stage` and `activate` passed the installed identity/import checks.
 Main Desktop and mobile were idle, with no drafts, and closed through their guarded
 maintenance calls before restarting their supervisors. Both now report this
@@ -113,7 +113,7 @@ The existing DSH global composition contains earlier customizations, so the full
 installer refused replacement before writing files. A narrow migration checked the
 ownership checksum of each personal `agent.cordis.yml`, backed up both files and
 `ownership.json` under the private DSH profile, replaced only its `persona` row
-with this release's identity adapter, and updated those two ownership hashes.
+with the first immutable settings candidate's identity adapter (the same identity code in the final candidate), and updated those two ownership hashes.
 Other rows, the Browser plugin and global composition were preserved. The idle
 `dsh-web.service` was restarted, and both product presets remain available. The
 full installer still requires a separately reviewed migration of the already edited
@@ -124,8 +124,12 @@ Identity and Soul are shared by the two personal surfaces; access choices affect
 future chats. Live-provider responses to a customized Soul remain the owner's
 acceptance test. No merge has been performed.
 
-Rollback: select the prior artifact with `augmentor-update rollback`, restore the
+Rollback: `augmentor-update rollback` returns to the first settings candidate.
+To undo the whole feature, activate original release `20261002-004606-8f44c801`,
+restore the
 backed-up personal preset files and ownership metadata, and restart idle DSH and
 Desktop supervisors. New identity files remain private user data; rolling back the
 UI does not delete them. Keep the local test candidate and preset backups until
 acceptance is complete.
+
+Review: [draft PR #29](https://github.com/ManoloRemiddi/augmentor-agent/pull/29), awaiting the owner’s green light.
