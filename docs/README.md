@@ -87,6 +87,8 @@ Windows mechanisms: [desktop and background shortcut ownership](WINDOWS-SHELL.md
 - [Linux distribution rollout: implementation order and qualification gates](LINUX-DISTRO-ROLLOUT.md)
 - [Arch/Leap system Python/Qt drift boundary and actual CPU VAD evidence](LINUX-SYSTEM-QT-STACK.md)
 - [Dictation native candidate](LINUX-HANDY-NATIVE-CLOSURE.md): checksum-pinned ELF and actual Arch/Leap component startup; complete product/audio/input gates remain open.
+- [Fedora dictation packaging candidate](LINUX-FEDORA-DICTATION-PACKAGING.md): corrected RPMs, actual Fedora 44 installed lifecycle/component checks and remaining hosted failures.
+- [Ubuntu Qt fixture compatibility](LINUX-QT-FIXTURE-COMPATIBILITY.md): isolated signal-registration failure and a real registrar override preserving both UI cases.
 - [Cinnamon adapter: installed Mint evidence and pinned implementation contract](LINUX-CINNAMON-ADAPTER.md)
 - [GNOME native consent/capture evidence and disabled guarded execution candidate](LINUX-GNOME-CONTROL-PLAN.md)
 - [Linux Qt/PySide source build, rebuild and replacement gates](LINUX-LGPL-SOURCE-RUNTIME.md)

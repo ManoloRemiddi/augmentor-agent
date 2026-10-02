@@ -19,6 +19,11 @@ if PACKAGE_TARGET=='ubuntu24.04-amd64' and HOOK=='preinst' and action in ('insta
     fields=dict(row.split('=',1) for row in Path('/etc/os-release').read_text().splitlines() if '=' in row)
     if (fields.get('ID','').strip('"'),fields.get('VERSION_ID','').strip('"'),platform.machine())!=('ubuntu','24.04','x86_64'):
         raise SystemExit('This Augmentor candidate requires Ubuntu 24.04 x86-64; use the matching distro artifact.')
+if HOOK=='rpm-pre' and PACKAGE_TARGET in ('fedora43-x86_64','fedora44-x86_64'):
+    fields=dict(row.split('=',1) for row in Path('/etc/os-release').read_text().splitlines() if '=' in row)
+    expected=PACKAGE_TARGET.removeprefix('fedora').split('-')[0]
+    if (fields.get('ID','').strip('"'),fields.get('VERSION_ID','').strip('"'),platform.machine())!=('fedora',expected,'x86_64'):
+        raise SystemExit('This Augmentor candidate requires Fedora '+expected+' x86-64; use the matching distro artifact.')
 directory=Path('/run/augmentor')
 directory.mkdir(mode=0o755,exist_ok=True)
 if directory.is_symlink() or not directory.is_dir() or directory.stat().st_uid!=0 or directory.stat().st_mode & 0o022:

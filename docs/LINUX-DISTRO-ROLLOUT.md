@@ -2,6 +2,30 @@
 
 # Linux distribution rollout
 
+## October 3 Fedora RPM correction and hosted results
+
+The original Fedora 43/44 builds fail on the two omitted dictation permission
+files. Corrected, separately hashed packaging recipes build both RPMs; a fresh
+Fedora 44 fixture passes installed rendering and busy/idle package lifecycle,
+then actual disabled Handy protocol through the cold runtime lease with
+unchanged registered payload. See [the owning guide](LINUX-FEDORA-DICTATION-PACKAGING.md)
+and [working-recipe evidence](../release/qualification/next-targets/20261003-fedora-dictation-packaging.json).
+The payload is clean `4f99696`; these working recipes are not a new clean complete
+product qualification. Twenty-one focused Linux cases pass.
+
+Hosted `4f99696` Linux source/Home/Handy/Debian/installed/Browser jobs and both Mac
+versions pass; the distro matrix fails on the Fedora omission and an Ubuntu
+native Qt signal-connection crash after passing installed lifecycle. Windows
+exposes four Linux-only tests, now scoped explicitly, plus a distinct x64 native
+teardown failure; ARM64 passes. The [Ubuntu fixture correction](LINUX-QT-FIXTURE-COMPATIBILITY.md)
+replaces its class-level MagicMock with a real override and passes both unchanged
+UI cases and the 31-case Window sequence. Faulthandler is enabled for the next
+native distro suite. Full hosted success and a Windows teardown repair are not
+claimed. GitGuardian remains failed/unwaived. All five rollout points, clean
+matching installers/sessions/audio/Browser/upgrades/source/legal/release gates
+and the exact 22-file license decision stay open. Owner selection/services/models/
+devices remain unchanged.
+
 ## October 3 shared lifecycle and actual dictation candidate
 
 Current main`9baf711` is integrated with rollout`cb1e470`. Declared Linux runtime,
@@ -12,8 +36,8 @@ reuse requires Resonant Voice0.1.19 archives. The
 records1,025 native cases/989 passes/36 platform skips,529 SDK cases/527 passes/
 two skips,83 Browser and two separate private portal cases, all passing. Earlier
 fixture/dependency failures are retained. Both new system runtime discovery proofs
-pass again. Hosted checks for this merge still need execution; the external
-GitGuardian digest findings remain failed and unwaived.
+pass again. Hosted execution and remaining failures are recorded in the newer
+Fedora packaging checkpoint above; GitGuardian remains failed and unwaived.
 
 The checksum-pinned public dictation candidate also passes all25 native loader
 lists and actual disabled component protocol/theme/ownership/EOF startup on Arch

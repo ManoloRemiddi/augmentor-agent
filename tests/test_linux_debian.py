@@ -14,7 +14,7 @@ class DebianTargetTests(unittest.TestCase):
     def test_merged_handy_dependencies_preserve_all_explicit_qt_recipes(self):
         for target in debian.TARGETS:
             runtime, desktop = debian.dependencies(target, '0.2.13')
-            for name in ('udev', 'kmod', 'libwebkit2gtk-4.1-0', 'libopenblas0', 'libxdo3', 'wl-clipboard', 'xwayland'):
+            for name in ('debianutils', 'udev', 'kmod', 'libwebkit2gtk-4.1-0', 'libopenblas0', 'libxdo3', 'wl-clipboard', 'xwayland', 'libc6 (>= 2.39)'):
                 with self.subTest(target=target,name=name): self.assertIn(name, runtime.split(', '))
             self.assertIn('augmentor-runtime (= 0.2.13)', desktop)
 

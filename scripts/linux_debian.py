@@ -4,7 +4,7 @@ from linux_distribution import NOBLE
 
 TARGETS=('debian13-amd64','ubuntu26.04-amd64',NOBLE)
 HANDY_DEPENDENCIES = [
-    'python3-gi', 'udev', 'kmod', 'libgtk-3-0t64', 'libwebkit2gtk-4.1-0',
+    'python3-gi', 'debianutils', 'udev', 'kmod', 'libgtk-3-0t64', 'libwebkit2gtk-4.1-0',
     'libayatana-appindicator3-1', 'libgtk-layer-shell0', 'libopenblas0',
     'libvulkan1', 'libasound2t64', 'libasound2-plugins', 'libxdo3',
     'wl-clipboard', 'xdotool', 'xwayland',
@@ -40,6 +40,6 @@ def dependencies(target,version, *, source_qt=False):
     if target==NOBLE:
         names = NOBLE_DEPENDENCIES+(NOBLE_SOURCE_QT_DEPENDENCIES if source_qt else [])+HANDY_DEPENDENCIES
         return ', '.join(dict.fromkeys(names)),f'augmentor-runtime (= {version}), libglib2.0-bin, wmctrl'
-    runtime='python3 (>= 3.11), python3-yaml, python3-websocket, python3-keyring (>= 25.6), python3-secretstorage, gnome-keyring, libc6 (>= 2.36), libstdc++6'
+    runtime='python3 (>= 3.11), python3-yaml, python3-websocket, python3-keyring (>= 25.6), python3-secretstorage, gnome-keyring, libc6 (>= 2.39), libstdc++6'
     desktop=f'augmentor-runtime (= {version}), python3-pyside6.qtcore (>= 6.8.2.1), python3-pyside6.qtgui, python3-pyside6.qtwidgets, python3-pyside6.qtnetwork, python3-pyside6.qtdbus, python3-pyside6.qtquick, python3-pyside6.qtquickwidgets, qml6-module-qtquick, qml6-module-qtqml, qml6-module-qtqml-models, qml6-module-qtqml-workerscript, libqt6svg6, qt6-svg-plugins, python3-gi, gir1.2-gtk-4.0, gir1.2-atspi-2.0, at-spi2-core, gir1.2-gstreamer-1.0, gstreamer1.0-pipewire, gstreamer1.0-plugins-base, python3-yaml, python3-websocket, python3-pygments (>= 2.18), python3-numpy (>= 1.24), fonts-dejavu-core, libglib2.0-bin, wmctrl'
     return runtime+', '+', '.join(HANDY_DEPENDENCIES),desktop

@@ -1,0 +1,289 @@
+{
+  "format": "augmentor-fedora-dictation-packaging/1",
+  "date": "2026-10-03",
+  "timezone": "Europe/Rome",
+  "payloadSource": {
+    "commit": "4f996969fca000dbf2e91f64170d072d407c4133",
+    "dirty": false
+  },
+  "workingPackagingRecipeCheckpoint": true,
+  "cleanNewCombinedSourceQualification": false,
+  "recipes": {
+    "scripts/package-fedora.py": "05edd262c9d29fcda43d853d0d00b593844a4fae74153361304c4fa48e3eb706",
+    "release/debian-maintainer.py": "df5a77f1e625111038393e0ed32de1808f05fdf83b7b084619525e42a0a3a8a5",
+    "scripts/linux_debian.py": "961ed3b78cfabecab385d8dbf90172e98ac9a2aab583b67c111b4ab91ba78ec3",
+    "tests/test_fedora_packaging.py": "517edeb074c388d1cb36226afedec35c71fc408a7e5ff0afc7af8ed8c107d3c9",
+    "tests/test_complete_setup.py": "71cf2c15cbaf2b2ec61111affc151869e5ab42b7880daac7f14fb7670b4e80b6",
+    ".github/workflows/validate.yml": "a6e858ae602b3dc39d8e492f049ee4a8988aae1ca57ebe682163fdf61253daac"
+  },
+  "baseline": {
+    "source": "4f996969fca000dbf2e91f64170d072d407c4133",
+    "rpmBuildPassed": false,
+    "failure": "Installed but unpackaged udev rule and module-load configuration",
+    "hostedFedora43And44SameFailure": true
+  },
+  "builds": [
+    {
+      "target": "fedora44-x86_64",
+      "rpm": {
+        "file": "augmentor-agent-0.2.13-1.fc44.x86_64.rpm",
+        "sha256": "6605f84f97aa07b65d901b44348b522faa738906f4ea5a3c322db641c56753fd",
+        "bytes": 371244294
+      },
+      "maintainerSourceSha256": "df5a77f1e625111038393e0ed32de1808f05fdf83b7b084619525e42a0a3a8a5",
+      "packagingRecipeSha256": "05edd262c9d29fcda43d853d0d00b593844a4fae74153361304c4fa48e3eb706",
+      "inputDebs": {
+        "augmentor-runtime_0.2.13_amd64.deb": "cb589bc27eb0bc7ed5fcaa8c004685286713c5bfd8b9ffd36149b081805be6b0",
+        "augmentor-desktop_0.2.13_amd64.deb": "9a3483039dba238d209952c28df8607abd22b7f329d9d1c765b990b635f112b9"
+      }
+    },
+    {
+      "target": "fedora43-x86_64",
+      "rpm": {
+        "file": "augmentor-agent-0.2.13-1.fc43.x86_64.rpm",
+        "sha256": "ca300237dd9d2a314704a36a13227754f4f1cdb32b6caf11197a8ec58c858dfe",
+        "bytes": 371244341
+      },
+      "maintainerSourceSha256": "df5a77f1e625111038393e0ed32de1808f05fdf83b7b084619525e42a0a3a8a5",
+      "packagingRecipeSha256": "05edd262c9d29fcda43d853d0d00b593844a4fae74153361304c4fa48e3eb706",
+      "inputDebs": {
+        "augmentor-runtime_0.2.13_amd64.deb": "cb589bc27eb0bc7ed5fcaa8c004685286713c5bfd8b9ffd36149b081805be6b0",
+        "augmentor-desktop_0.2.13_amd64.deb": "9a3483039dba238d209952c28df8607abd22b7f329d9d1c765b990b635f112b9"
+      }
+    }
+  ],
+  "nativeDependencyContract": {
+    "glibcMinimum": "2.39",
+    "libstdcxxRequiredSymbol": "GLIBCXX_3.4.32",
+    "explicitRequires": [
+      "/bin/sh",
+      "/bin/sh",
+      "/bin/sh",
+      "/bin/sh",
+      "alsa-lib",
+      "alsa-plugins-pulseaudio",
+      "at-spi2-core",
+      "dejavu-sans-fonts",
+      "glib2",
+      "glibc >= 2.39",
+      "gnome-keyring",
+      "gstreamer1",
+      "gstreamer1-plugins-base",
+      "gtk-layer-shell",
+      "gtk3",
+      "gtk4",
+      "javascriptcoregtk4.1",
+      "kmod",
+      "libappindicator-gtk3",
+      "libstdc++",
+      "libstdc++.so.6(GLIBCXX_3.4.32)(64bit)",
+      "openblas-serial",
+      "pipewire-gstreamer",
+      "python3",
+      "python3",
+      "python3",
+      "python3",
+      "python3 >= 3.11",
+      "python3-gobject",
+      "python3-keyring >= 25.6",
+      "python3-numpy >= 1.24",
+      "python3-pygments >= 2.18",
+      "python3-pyside6 >= 6.8.2",
+      "python3-pyyaml",
+      "python3-secretstorage",
+      "python3-websocket-client",
+      "qt6-qtdeclarative",
+      "qt6-qtsvg",
+      "rpm",
+      "rpmlib(CompressedFileNames) <= 3.0.4-1",
+      "rpmlib(FileDigests) <= 4.6.0-1",
+      "rpmlib(PayloadFilesHavePrefix) <= 4.0-1",
+      "systemd-udev",
+      "vulkan-loader",
+      "webkit2gtk4.1",
+      "which",
+      "wl-clipboard",
+      "wmctrl",
+      "xdotool",
+      "xorg-x11-server-Xwayland"
+    ],
+    "udevAndModuleLoadFilesPackaged": true,
+    "installRequiresExactDistroVersionAndMachine": true,
+    "oldTargetRemovalAfterDistroUpgradeNotBlockedByInstallAdmission": true,
+    "physicalUinputProvisioningTested": false
+  },
+  "fedora44ComponentOnlyFixture": {
+    "fixtureImage": "sha256:3e1199377b8cf6b181020ddb02ff2446bd0be384700e242b6ea5cf423582ec7e",
+    "nativeLoaderListsPassed": 25,
+    "componentProof": {
+      "protocol": true,
+      "tray": false,
+      "modelDownload": false,
+      "microphoneCapture": false,
+      "theme": true,
+      "staleSettingsRejected": true,
+      "ownerExclusion": true,
+      "parentExit": true
+    },
+    "productInstalled": false,
+    "networkDisconnectedBeforeProof": true,
+    "physicalDevicesAttached": false
+  },
+  "fedora44InstalledFixture": {
+    "imageDigest": "sha256:43b29f65a41eb9c35e1cd5323e3bdf3b655c2357a9f4f1ff2f9c2798e5045d80",
+    "networkDisconnectedBeforePackageProof": true,
+    "physicalDevicesAttached": false,
+    "packageProof": {
+      "target": "fedora44-x86_64",
+      "imageDigest": "sha256:43b29f65a41eb9c35e1cd5323e3bdf3b655c2357a9f4f1ff2f9c2798e5045d80",
+      "source": {
+        "commit": "4f996969fca000dbf2e91f64170d072d407c4133",
+        "dirty": false
+      },
+      "artifacts": {
+        "augmentor-agent-0.2.13-1.fc44.x86_64.rpm": "6605f84f97aa07b65d901b44348b522faa738906f4ea5a3c322db641c56753fd"
+      },
+      "proofScriptSha256": "ff5c3e65466ad0481769b7e3cba48c46c07a609f103ace6391eba87193262c97",
+      "versions": {
+        "python": "3.14.7",
+        "pyside": "6.11.2",
+        "qt": "6.11.2",
+        "node": "v24.19.0"
+      },
+      "gtk4Version": "4.22.5",
+      "gtk4ShortcutApiImportTested": true,
+      "wmctrlVersion": "1.07",
+      "wmctrlBinaryTested": true,
+      "freshInstall": true,
+      "nonRootRuntimeLease": true,
+      "nonRootQtRender": true,
+      "activeRuntimeAndDesktopReinstallBlocked": true,
+      "activeComponentRemovalBlocked": true,
+      "idleReinstall": true,
+      "removePreservesPrivateFiles": true,
+      "reinstallAfterRemove": true,
+      "realDesktopSessionTested": false,
+      "physicalAudioTested": false,
+      "selinuxEnforcingTested": false,
+      "dshModelTurnTested": false
+    },
+    "installedRelease": {
+      "version": "0.2.13",
+      "channel": "preview",
+      "protocols": {
+        "product": "augmentor/1",
+        "pi": "augmentor-pi/1",
+        "prompts": "augmentor-prompts/1",
+        "memory": "augmentor-memory/1",
+        "desktop": "augmentor-desktop/1"
+      },
+      "dataSchema": 1,
+      "readableDataSchemas": [
+        1
+      ],
+      "source": {
+        "commit": "4f996969fca000dbf2e91f64170d072d407c4133",
+        "dirty": false
+      },
+      "target": "fedora44-x86_64",
+      "node": {
+        "version": "24.19.0",
+        "url": "https://nodejs.org/dist/v24.19.0/node-v24.19.0-linux-x64.tar.xz",
+        "sha256": "14b342e71204f811bde6153be8e04b62aef63c236fef92b55f9c83154b409647"
+      },
+      "pi": "0.85.1"
+    },
+    "installedComponentColdRuntimeLeaseUsed": true,
+    "componentProof": {
+      "protocol": true,
+      "tray": false,
+      "modelDownload": false,
+      "microphoneCapture": false,
+      "theme": true,
+      "staleSettingsRejected": true,
+      "ownerExclusion": true,
+      "parentExit": true
+    },
+    "registeredProductInventoryUnchanged": true,
+    "qualificationDependency": "dbus-daemon supplies dbus-run-session; ordinary desktop session support is separate",
+    "retainedFailedComponentAttempt": "Missing qualification bus tool before fixture dependency installation",
+    "portalWarningsRetained": true,
+    "realPortalSessionPassed": false
+  },
+  "focusedTests": {
+    "completeSetupCases": 12,
+    "fedoraHookCases": 3,
+    "debianTargetCases": 6,
+    "allPassedOnLinux": true,
+    "linuxAdapterCasesExplicitlySkippedOnOtherPlatforms": 4
+  },
+  "hostedPriorHead": {
+    "head": "4f996969fca000dbf2e91f64170d072d407c4133",
+    "linuxRun": 37070593276,
+    "linuxConclusion": "failure",
+    "passingLinuxJobs": [
+      "source-boundary",
+      "home-runtime",
+      "Handy Linux/Mac/Windows",
+      "debian",
+      "installed-packages",
+      "browser-package"
+    ],
+    "failedLinuxJobs": {
+      "fedora43-x86_64": "unpackaged files",
+      "fedora44-x86_64": "unpackaged files",
+      "ubuntu26.04-amd64": "SIGSEGV139 in native suite after installed lifecycle proof"
+    },
+    "macRun": 37070593430,
+    "macConclusion": "success",
+    "windowsDesktopRun": 37070593066,
+    "windowsDesktopConclusion": "failure; four Linux-only fixture entrypoints ran without fcntl/geteuid",
+    "windowsQualificationRun": 37070593079,
+    "windowsX64Conclusion": "failure; actual desktop teardown access violation",
+    "windowsArm64Conclusion": "success",
+    "windowsPayloadCheckout": "a3ec58909cfbe889e757079dbe6f1864f2a35f9d",
+    "windowsPayloadOnlyDocumentationDiffersFrom4f": true,
+    "gitGuardianCheck": 111048837418,
+    "gitGuardianConclusion": "failed and unwaived; same twelve historical digest findings"
+  },
+  "remaining": {
+    "fedora43InstalledCandidate": false,
+    "cleanMatchingProductAndCompleteInstaller": false,
+    "gnomeKdeSessionsAndShortcuts": false,
+    "physicalAudioAndNativeInput": false,
+    "graphicalBrowser": false,
+    "selinuxEnforcing": false,
+    "upgradesAndRollback": false,
+    "allOfferedSourcesAndLicensesAccepted": false,
+    "publicBinaryRelease": false,
+    "allFiveRolloutPointsComplete": false
+  },
+  "privateEvidence": {
+    "outputs/linux-rollout/fedora4f44-baseline/build.stderr": "b55979f0bc9cf1958b0deb4c36134e43f9c9e356858406227eb1ee0884a03cf1",
+    "outputs/linux-rollout/fedora-dictation-fix46/build.stdout": "3b494b3c2177f045dcb60216eff81dbe2d3d46ad2ba771d55c1a2a1cfff9b71c",
+    "outputs/linux-rollout/fedora-dictation-fix46/build.stderr": "4299ba726d5e1fdc31b1268926dfbabb1df43e0d3d87c613292266f6bb8c7c26",
+    "outputs/linux-rollout/fedora-dictation-fix46/rpm-requires.txt": "6489b4e1f13eb3398fc2989cf0343b16b1126bc78fe832818041088a3a0b8a12",
+    "outputs/linux-rollout/fedora-dictation-fix46/rpm-files.txt": "724119db661939831d3a2b018d8335afda31026b9190c3bf8470929335e36865",
+    "outputs/linux-rollout/fedora-dictation-fix46/rpm-scripts.txt": "75cef194b51af2610c884fc7410cc7241c3043a2018cb3a96f1b6c95751a8870",
+    "outputs/linux-rollout/fedora-dictation-fix51-build.stdout": "1ab6a6a948d2fcdd4e436dc072eea67945555f09e631927990a874d9648f177d",
+    "outputs/linux-rollout/fedora-dictation-fix51-build.stderr": "9beb43bfdd96a2567823e105d5146370a5e7b5cba524a7dd4acbb1ba58291ed6",
+    "outputs/linux-rollout/fedora-handy42/loader.json": "61abf8fda5d2f08c4c77653ce344de585bcd88889ccf689dd944f30be5cdf637",
+    "outputs/linux-rollout/fedora-handy42/component.stdout": "e0e42dadf91db6f423cfc1b124fd2d4d079e68977621e4be59ef587e3e4595d7",
+    "outputs/linux-rollout/fedora-package48/prepare-and-prove.py": "10959a1de3140c0367911baca64e450e2cf46c1cb7203612f560e6d591b35360",
+    "outputs/linux-rollout/fedora-package49/driver.stderr": "559568a27f974cb8be2d328c9f8cae93c03f80a1e18522673d1444e25bf317a6",
+    "outputs/linux-rollout/fedora-package50/prepare-and-prove.py": "6dba59a45233f9fc89e7b4f3389ce28ea2eeb9cdeabfb0085b88c128651f9560",
+    "outputs/linux-rollout/fedora-package50/package-proof.json": "56d30b5380272c9d37c21ce6b44c8747e1d3edb1b6dd470bd5ccef86b46496e7",
+    "outputs/linux-rollout/fedora-package50/proof.stdout": "7a5a81f1c705dccc35ea047476d5b2957eafce482bbad0033a827d7eaf1cf814",
+    "outputs/linux-rollout/fedora-package50/proof.stderr": "d68df85186d9256cd46b41c4617e34fd561b72524f2b43cdc159599f92da29ac",
+    "outputs/linux-rollout/fedora-package50/installed-component.stderr": "22d8e4b716888e2610413922f3b9a72b4ac24534f8df8701e10fcdcab03b1442",
+    "outputs/linux-rollout/fedora-package50/component-repeat/component.stdout": "e0e42dadf91db6f423cfc1b124fd2d4d079e68977621e4be59ef587e3e4595d7",
+    "outputs/linux-rollout/fedora-package50/component-repeat/component.stderr": "47a0ee1b2a3a856025c22fd951e9d486a7728a7f449e4863ffbb9ba7d85eb267",
+    "outputs/linux-rollout/fedora-package50/component-repeat/rpm-verify.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/linux-rollout/fedora-dictation-tests53/complete-setup.stderr": "e5083027456cc8bd092e3e53e27d1ab5e434c90d17f3b464394d940addabb09b",
+    "outputs/linux-rollout/fedora-dictation-tests53/fedora.stderr": "2ff790c7c8be3c063c607f56cbfd654cf81f98d83973421eec1ab71b7890b832",
+    "outputs/linux-rollout/fedora-dictation-tests53/debian.stderr": "c1652ce8b6530792f715ae6a23f26bf0192a2101ecc709339c95cf81f5e67b66",
+    "outputs/linux-rollout/hosted4f47/linux-failed.log": "d6425656dd2f80a8da12bfb8fb2744431475dec99414ecff28a342585e78eda1",
+    "outputs/linux-rollout/hosted4f47/windows-desktop-failed.log": "cec6e8212cb08e02f24ccb4f403561378053da05312bf6b557a09af33c4071d2",
+    "outputs/linux-rollout/hosted4f47/windows-native-x64-job.log": "d2c8c8b9b3917ae75c7ef036be9f6b127c69ff5c9250041563f53ae9ce9798d7"
+  }
+}

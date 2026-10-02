@@ -12,8 +12,12 @@ class WindowsBrowserSetupUiTests(unittest.TestCase):
 
     def setUp(self):
         self.registrar = SimpleNamespace(installed_browsers=lambda:[], browser_application=Mock())
-        with patch.object(setup.WindowsBrowserSetupDialog,'load_registrar',return_value=self.registrar):
-            self.dialog = setup.WindowsBrowserSetupDialog(None)
+        registrar = self.registrar
+        # PySide inspects QObject class methods when connecting signals. A
+        # MagicMock class method crashes Ubuntu's 6.10.2 binding at that boundary.
+        class FixtureDialog(setup.WindowsBrowserSetupDialog):
+            def load_registrar(self): return registrar
+        self.dialog = FixtureDialog(None)
         self.addCleanup(self.dialog.close)
 
     def test_unlisted_executable_choice_prepare_and_exact_browser_launch(self):

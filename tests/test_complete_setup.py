@@ -74,6 +74,7 @@ class CompleteSetupTests(unittest.TestCase):
                 setup.prepare_python(app,app/'data','ubuntu24.04-amd64')
             run.assert_not_called()
 
+    @unittest.skipUnless(sys.platform.startswith('linux'), 'Linux installed-runtime adapter')
     def test_declared_runtime_must_match_bundle_before_preparation(self):
         with tempfile.TemporaryDirectory() as directory,patch.object(setup,'run') as run:
             app=Path(directory);(app/'scripts').mkdir()
@@ -83,6 +84,7 @@ class CompleteSetupTests(unittest.TestCase):
                 setup.prepare_python(app,app/'data','fedora44-x86_64')
             run.assert_not_called()
 
+    @unittest.skipUnless(sys.platform.startswith('linux'), 'Linux installed-runtime adapter')
     def test_noble_policy_hash_mismatch_cannot_prepare_runtime(self):
         with tempfile.TemporaryDirectory() as directory:
             app=Path(directory);marker=app/'linux-python-runtime.json'
@@ -96,6 +98,7 @@ class CompleteSetupTests(unittest.TestCase):
                 prepare.assert_not_called()
             self.assertFalse((app/'data').exists())
 
+    @unittest.skipUnless(sys.platform.startswith('linux'), 'Linux installed-runtime adapter')
     def test_noble_installed_receipt_still_verifies_runtime_without_repair(self):
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory);app=root/'app';app.mkdir();state=root/'state/augmentor-install';state.mkdir(parents=True)
@@ -136,6 +139,7 @@ class CompleteSetupTests(unittest.TestCase):
             identity.unlink()
             with self.assertRaisesRegex(ValueError,'identity is missing'):setup.verify_installed_payload(app,manifest)
 
+    @unittest.skipUnless(sys.platform.startswith('linux'), 'Linux installed-package setup entrypoint')
     def test_skip_packages_mismatch_stops_before_private_runtime_and_secrets(self):
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory);app=root/'app';app.mkdir()

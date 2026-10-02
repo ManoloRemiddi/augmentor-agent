@@ -19,14 +19,31 @@ ROOT = Path(__file__).resolve().parents[1]
 def digest(path):
     with path.open('rb') as f: return hashlib.file_digest(f, 'sha256').hexdigest()
 
-def guard(version):
+def guard(version,fedora='44',*,removal=False):
+    if fedora not in ('43','44'):raise ValueError('Use an explicit Fedora 43 or 44 target.')
     source=(ROOT/'release/debian-maintainer.py').read_text()
-    source=source.replace('@HOOK@','rpm-pre').replace('@VERSION@',version).replace('@TARGET@','fedora')
+    source=source.replace('@HOOK@','rpm-preun' if removal else 'rpm-pre').replace('@VERSION@',version).replace('@TARGET@',f'fedora{fedora}-x86_64')
     source=source.replace('Run dpkg --configure -a after an interrupted upgrade.','Complete or retry the interrupted DNF transaction before starting Augmentor.')
     parts=[]
     for component in ('runtime','desktop'):
-        parts.append("/usr/bin/python3 -I <<'AUGMENTOR_HOOK'\n"+source.replace('@COMPONENT@',component)+"\naction='upgrade'\nbegin()\nAUGMENTOR_HOOK\n")
+        parts.append("/usr/bin/python3 -I <<'AUGMENTOR_HOOK'\n"+source.replace('@COMPONENT@',component)+"\naction="+repr('remove' if removal else 'upgrade')+"\nbegin()\nAUGMENTOR_HOOK\n")
     return 'set -e\n'+''.join(parts)
+
+
+def post_transaction():
+    # Match Debian's active-user uinput setup. Missing udev/kernel tools in a
+    # container do not establish real input permission or a passing product.
+    return """/usr/bin/python3 -I <<'AUGMENTOR_POST'
+from pathlib import Path
+import shutil
+import subprocess
+for c in ('runtime','desktop'):
+    Path('/run/augmentor/augmentor-'+c+'.pending').unlink(missing_ok=True)
+for arguments in (['modprobe','-q','uinput'],['udevadm','control','--reload-rules'],['udevadm','trigger','--subsystem-match=misc','--sysname-match=uinput']):
+    if shutil.which(arguments[0]):
+        subprocess.run(arguments,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,timeout=10,check=False)
+AUGMENTOR_POST
+"""
 
 def payload_manifest(bundle):
     if (bundle/'artifacts.json').exists():
@@ -63,6 +80,8 @@ def build(bundle,out,fedora='44'):
         if release['version']!=version:raise ValueError('Runtime product version differs from the input manifest.')
         if 'source' in verification and verification['source']!=release['source']:
             raise ValueError('Runtime source differs from the input manifest.')
+        release['target']=f'fedora{fedora}-x86_64'
+        (app/'release.json').write_text(json.dumps(release,indent=2)+'\n')
         desktop=(payload/'usr/share/augmentor/desktop-version').read_text().strip()
         if desktop!=version:raise ValueError('Desktop and runtime package versions differ.')
         # Current source already contains RPM-aware leases. Never silently replace
@@ -71,6 +90,7 @@ def build(bundle,out,fedora='44'):
             raise ValueError('The payload lacks RPM-aware lifecycle support; rebuild it from current source.')
         record={'overrides':{},'target':f'fedora{fedora}-x86_64','version':version,'source':release['source'],
                 'maintainerSourceSha256':digest(ROOT/'release/debian-maintainer.py'),
+                'packagingRecipeSha256':digest(ROOT/'scripts/package-fedora.py'),
                 'payloadSource':verification,'inputDebs':{p.name:digest(p) for p in inputs}}
         (payload/'usr/lib/augmentor/fedora-package.json').write_text(json.dumps(record,indent=2)+'\n')
         # Fedora Chromium also accepts this distro-specific system host directory.
@@ -98,7 +118,11 @@ Requires: python3-pyyaml, python3-websocket-client, python3-pygments >= 2.18, py
 Requires: python3-gobject, gtk4, qt6-qtsvg, at-spi2-core, gstreamer1, pipewire-gstreamer, gstreamer1-plugins-base
 Requires: qt6-qtdeclarative
 Requires: wmctrl
-Requires: dejavu-sans-fonts, glib2, glibc >= 2.36, libstdc++
+Requires: dejavu-sans-fonts, glib2, glibc >= 2.39, libstdc++
+Requires: libstdc++.so.6(GLIBCXX_3.4.32)(64bit)
+Requires: gtk3, webkit2gtk4.1, javascriptcoregtk4.1, gtk-layer-shell, libappindicator-gtk3
+Requires: openblas-serial, vulkan-loader, alsa-lib, alsa-plugins-pulseaudio
+Requires: which, xdotool, wl-clipboard, xorg-x11-server-Xwayland, systemd-udev, kmod
 Requires(pre): python3
 Requires(preun): python3
 Requires(postun): python3
@@ -118,12 +142,12 @@ mkdir -p %{{buildroot}}
 cp -a {shlex.quote(str(payload))}/. %{{buildroot}}/
 
 %pre
-{guard(version)}
+{guard(version,fedora)}
 %posttrans
-{clean}
+{post_transaction()}
 %preun
 if [ "$1" -eq 0 ]; then
-{guard(version)}
+{guard(version,fedora,removal=True)}
 fi
 
 %postun
@@ -134,6 +158,8 @@ fi
 %files
 /usr/lib/augmentor
 /usr/lib/tmpfiles.d/augmentor.conf
+/usr/lib/udev/rules.d/70-augmentor-dictation.rules
+/usr/lib/modules-load.d/augmentor-dictation.conf
 /usr/lib64/chromium/native-messaging-hosts/com.augmentor.agent.json
 /usr/bin/augmentor-agent
 /usr/bin/augmentor-runtime

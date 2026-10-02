@@ -1,0 +1,118 @@
+{
+  "format": "augmentor-ubuntu-qt-fixture-correction/1",
+  "date": "2026-10-03",
+  "timezone": "Europe/Rome",
+  "baseSourceCommit": "4f996969fca000dbf2e91f64170d072d407c4133",
+  "fixtureImage": "sha256:87bcde8e72903fb0e3c9cbe76949baaddeed6fc1c5885c9e07f142def8397885",
+  "runtime": {
+    "pythonActual": "3.14.4",
+    "pythonCi": "3.14.3",
+    "pyside6": "6.10.2",
+    "qt": "6.10.2",
+    "pythonBinaryPackage": "3.14.4-1ubuntu0.2",
+    "pythonMetapackage": "3.14.3-0ubuntu2",
+    "pysideBinaryPackage": "6.10.2-6ubuntu1"
+  },
+  "scope": "Original public-source failures and finite synthetic diagnosis; corrected public test bodies executed on isolated ordinary-user profiles. No product Qt/UI or dependency change.",
+  "original": {
+    "moduleAloneExitCode": 139,
+    "windowThenBrowserExitCode": 139,
+    "precedingWindowCasesPassed": 29,
+    "pythonFrame": {
+      "file": "apps/native/augmentor_linux/browser_setup.py",
+      "line": 28,
+      "sha256": "682d41a0d167c9631186db6208d01ecac7789aa39572c4a3680cbcee82015d05",
+      "operation": "choose_button.clicked.connect(self.choose_browser)"
+    },
+    "nativeFrame": "PySide::qobjectConnectCallback",
+    "exactFaultingInstructionSymbolized": false
+  },
+  "synthetic": {
+    "connectionCases": [
+      {
+        "mode": "plain",
+        "exitCode": 0
+      },
+      {
+        "mode": "decorated",
+        "exitCode": 0
+      },
+      {
+        "mode": "derived-plain",
+        "exitCode": 0
+      },
+      {
+        "mode": "derived-decorated",
+        "exitCode": 0
+      },
+      {
+        "mode": "derived-mock-plain",
+        "exitCode": 139
+      },
+      {
+        "mode": "derived-mock-decorated",
+        "exitCode": 0
+      }
+    ],
+    "realFixtureOverrideUnchangedTestBodies": {
+      "cases": 2,
+      "exitCode": 0
+    },
+    "mockSlotsAttributeObserved": true,
+    "sourceSupportedInference": "PySide6.10.2 dynamic metaobject scanning treats callable._slots as capsule metadata; MagicMock advertises that attribute with a non-capsule value, and the capsule decoder returns null. The source does not establish the precise faulting instruction.",
+    "relatedChangelogIssuePYSIDE3266Established": false
+  },
+  "correction": {
+    "file": "tests/test_windows_browser_setup_ui.py",
+    "sha256": "5492f5399356bd43c3a27c9696f68ac5b117868ebc5de6f363604996c900f98d",
+    "change": "Replace class-level MagicMock registrar method with a real subclass override; preserve both existing UI test bodies.",
+    "productUiSourceChanged": false,
+    "platformTestsSkippedForThisCrash": false,
+    "newRuntimeDependencyOrVersionBump": false,
+    "correctedModuleAloneCases": 2,
+    "correctedModuleAloneExit": 0,
+    "correctedWindowThenBrowserCases": 31,
+    "correctedWindowThenBrowserExit": 0,
+    "network": "none",
+    "freshOrdinaryUserProfiles": true,
+    "completeSuitePassed": false,
+    "freshHostedProofPassed": false
+  },
+  "qualificationPrerequisite": {
+    "simulation": "0 upgraded, 2 newly installed, 0 to remove",
+    "added": {
+      "libqt6test6": "6.10.2+dfsg-7",
+      "python3-pyside6.qttest": "6.10.2-6ubuntu1"
+    },
+    "source": "official Ubuntu resolute APT sources; existing indexes; Signed-By ubuntu-archive-keyring.gpg; insecure repository options false",
+    "aptListsUpdated": false,
+    "temporaryNetwork": "bridge only for exact two-package acquisition; restored none",
+    "failedFirstAttempt": "Docker rejects bridge connection while none attached; preserved offline APT DNS failure exit100; no package installation during that failed attempt"
+  },
+  "primarySources": [
+    "https://raw.githubusercontent.com/pyside/pyside-setup/v6.10.2/sources/pyside6/libpyside/dynamicqmetaobject.cpp",
+    "https://raw.githubusercontent.com/pyside/pyside-setup/v6.10.2/sources/pyside6/libpyside/pysideslot.cpp",
+    "https://doc.qt.io/qtforpython-6.10/release_notes/pyside6_release_notes.html",
+    "https://docs.python.org/3/library/faulthandler.html"
+  ],
+  "sourceAndLegalReleaseAccepted": false,
+  "allFiveRolloutPointsComplete": false,
+  "privateEvidence": {
+    "outputs/linux-rollout/ubuntu-qt52/research-report.json": "eddf3708d6ee57f65a321b413013c9165f6215c0d970cb02875c1fa7eefe4b52",
+    "outputs/linux-rollout/ubuntu-qt52/provenance.json": "c07a724ea5ba0e62b5f190c8f6e8cec86a600449d671af8473d03930e45a1215",
+    "outputs/linux-rollout/ubuntu-qt52/alone.stderr.log": "0ad44ea776617cb0160f732d1645867817e503b99dea7508edbab97d945cb779",
+    "outputs/linux-rollout/ubuntu-qt52/sequence.stderr.log": "7d849667c25e5149f4eaf2f6347ef59d8fbdaf02472a3b82352887535964c63d",
+    "outputs/linux-rollout/ubuntu-qt52/synthetic-connect.py": "36247bbf058903bca3bb3d404bdbd699d52173b06d1fece59528baeaaed217ef",
+    "outputs/linux-rollout/ubuntu-qt52/synthetic-connect.results.json": "dcaec86caa46c3e932c9d877e474c09ae77b419b7992fd1e4646d7b444fd27f3",
+    "outputs/linux-rollout/ubuntu-qt52/synthetic-ui-tests-real-registrar.py": "acfd9182598741a5b112f689cab634302c584a67629f59dc0cb3424ef12b4cfe",
+    "outputs/linux-rollout/ubuntu-qt52/real-registrar-tests.stderr.log": "7d03b644f7095e4d96ed39f501ecbba8e8259c27f4544bee4b4818c93429c923",
+    "outputs/linux-rollout/ubuntu-qt52/qttest-simulation.stdout.log": "4777a13d1fa0fb8ffa4d2372ad8d3ce7c114dc5ad5320f1b8b44321f3874fa3d",
+    "outputs/linux-rollout/ubuntu-qt52/qttest-install.stdout.log": "667e082c50a2d7844cfca03705f949278364529881d291edb9a65a2eb4d11b01",
+    "outputs/linux-rollout/ubuntu-qt54/run-corrected-first.py": "01ccf5136337a34d9a297e71266746faea2cab1dc1e386db778606263c70fee7",
+    "outputs/linux-rollout/ubuntu-qt54/preflight.stderr": "50f61dffe6b49b23e02f8f48eb13832fdd07808f41be60898f6eea454a7de26e",
+    "outputs/linux-rollout/ubuntu-qt54/run-corrected.py": "ad710420c070930fb77e4793dd9a582e6baa3f24d9bc29f97a8bfe217a9800c7",
+    "outputs/linux-rollout/ubuntu-qt54/result.json": "736e99bde81e5517bb0086263c62a073dfb47f97e2f621ac35d3c39d062c8784",
+    "outputs/linux-rollout/ubuntu-qt54/alone.stderr": "429c5c034d7f3992872e3e394f975692ce9b1f33ff6bd4f115be85e51433a8c2",
+    "outputs/linux-rollout/ubuntu-qt54/window-then-browser.stderr": "dae912f4058211f20093255f2bca0244cd02398e086e6f9fb51b6c6225b160f4"
+  }
+}

@@ -54,8 +54,10 @@ Fedora metadata explicitly lists the libraries in
 [AppIndicator](https://packages.fedoraproject.org/pkgs/libappindicator/libappindicator-gtk3/fedora-44.html)
 and [OpenBLAS serial](https://packages.fedoraproject.org/pkgs/openblas/openblas-serial/fedora-44.html).
 The Fedora `openblas` package itself contains docs, so its name alone is insufficient.
-Those provider facts do not qualify a new Fedora artifact; its builder still needs
-the matching dictation dependency and udev-rule contract.
+The [Fedora packaging checkpoint](LINUX-FEDORA-DICTATION-PACKAGING.md) now implements
+the matching dependency and udev-rule contract, builds both RPMs and executes the
+new Fedora 44 installed lifecycle/component checks. Complete session, audio,
+input, clean combined product and release qualification remain separate.
 
 The official [Leap repository](https://download.opensuse.org/distribution/leap/16.0/repo/oss/repodata/repomd.xml)
 and dated [Arch file index](https://archive.archlinux.org/repos/2026/10/01/extra/os/x86_64/extra.files)
