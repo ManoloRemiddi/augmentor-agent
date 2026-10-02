@@ -2,6 +2,24 @@
 
 # Start here: agent handoff
 
+## October 2 Arch/Leap system Qt drift boundary
+
+The two voice profiles now bind exact distro Python/Qt inventories. Actual new
+UID1000 offline runtimes pass reuse, registered-version/byte/import drift refusal,
+synthetic text/SVG/QML and the pinned Silero CPU VAD model; old runtime bytes remain
+unchanged. See [the owning guide](LINUX-SYSTEM-QT-STACK.md) and
+[working-source checkpoint](../release/qualification/next-targets/20261002-system-qt-stack-runtime.json).
+This is not a complete dependency closure or whole Arch snapshot/maintenance proof.
+Full Arch/Leap application packages, installer/Node admission and real session/
+Browser/audio/lifecycle acceptance remain next; all five rollout points stay active.
+The 22-file license proposal and frozen source-runtime guide are unchanged.
+
+Both 42c8c51 hosted checks pass:
+[Linux37062970356](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37062970356)
+and [Mac37062970276](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37062970276).
+The new system-stack source needs its own hosted checks. Owner services, selected
+artifacts, GPUs/models/physical audio remain unchanged; no binary release is made.
+
 ## October 2 installed Noble source-package startup
 
 Clean7b6df59 private source-runtime packages pass byte/notice/readability review,

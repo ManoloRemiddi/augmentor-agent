@@ -8,8 +8,8 @@ import {execFileSync} from 'node:child_process'
 import {declaredLinuxPython,pythonRuntimeIdentity} from '../dist/platform/src/index.js'
 import {voicePython} from '../apps/browser/shared/voice-client.mjs'
 
-test('Python and Node select the same immutable identity for each Noble policy',()=>{
-  for(const file of ['ubuntu24.04-python.json','ubuntu24.04-python-voice.json','ubuntu24.04-python-source-qt-voice.json']){
+test('Python and Node select the same immutable identity for each declared policy',()=>{
+  for(const file of ['ubuntu24.04-python.json','ubuntu24.04-python-voice.json','ubuntu24.04-python-source-qt-voice.json','opensuse-leap16.0-python-voice.json','arch20261001-python-voice.json']){
     const policy=JSON.parse(readFileSync(new URL('../release/'+file,import.meta.url),'utf8'))
     const expected=execFileSync('/usr/bin/python3',['-c',`import importlib.util,json,sys
 spec=importlib.util.spec_from_file_location('runtime','scripts/linux-python-runtime.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
@@ -17,6 +17,14 @@ print(m.identity(json.loads(sys.stdin.read())))`],{input:JSON.stringify(policy),
     assert.equal(pythonRuntimeIdentity(policy),expected)
     policy.wheels.reverse()
     assert.equal(pythonRuntimeIdentity(policy),expected)
+  }
+})
+test('system Qt identity binds the qualified package inventory independently of wheel bytes',()=>{
+  for(const file of ['opensuse-leap16.0-python-voice.json','arch20261001-python-voice.json']){
+    const policy=JSON.parse(readFileSync(new URL('../release/'+file,import.meta.url),'utf8'))
+    const before=pythonRuntimeIdentity(policy)
+    policy.systemQtStack.sha256='0'.repeat(64)
+    assert.notEqual(pythonRuntimeIdentity(policy),before)
   }
 })
 test('source runtime identity binds native payload independently of wheel bytes',()=>{

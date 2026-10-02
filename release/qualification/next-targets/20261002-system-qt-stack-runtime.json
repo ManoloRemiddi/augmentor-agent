@@ -1,0 +1,333 @@
+{
+  "format": "augmentor-system-qt-stack-qualification-checkpoint/1",
+  "source": {
+    "baseCommit": "42c8c51be8dee97443ed8d7e4d567c60d801e4a5",
+    "workingSourceTested": true,
+    "cleanArtifactTested": false
+  },
+  "fixtures": {
+    "arch": {
+      "container": "augmentor-arch-runtime-20261002-b",
+      "proofSha256": "c05f8e779e504926ddf08003befaec3dea623d30e2b0a7ab0689440f0111a29c",
+      "rawProof": {
+        "format": "augmentor-system-qt-stack-runtime-proof/1",
+        "target": "arch20261001-x86_64",
+        "profile": "arch20261001-cp314-x86_64-voice",
+        "systemQtStack": {
+          "format": "augmentor-system-qt-stack-contract/1",
+          "file": "system-qt-inventory.json",
+          "sha256": "05d28a3a15c20ce8fb4734f204f01414c19f28b52bbf7951a54056f6c417a007",
+          "bytes": 1584771,
+          "qtVersion": "6.11.2",
+          "packageManager": "pacman"
+        },
+        "lockIdentity": "3f7167c59f5eed9fe7d24b51cc807219d57c85414bd8a1ca545d2860e94d6659",
+        "runtimeArtifactSha256": "a6a0d6e5a277340147176cba4228bab282bb63e1fbad7e73305b8450132b661e",
+        "runtimeReceiptSha256": "82f5be8063029cdf26d548e7332026430e6c6c1eaa833ebb3e28fea636977455",
+        "runtimeMembers": 890,
+        "sourceFileSha256": {
+          "scripts/linux-python-runtime.py": "b5fa4f67f54f85ce9ef9e0a5292d018a1dddf1c807b475596b0ad7480cd560a6",
+          "scripts/linux-system-qt.py": "4f53e4f5cbc403679e763e946b5ebf8eb87b08731b3a4fda3f30918127e12389",
+          "probe.py": "3f87c05b91d9627290c6283d79b193aef196b5b124a4ff5a3db14dd630d4ef82",
+          "voice_vad.py": "62dbeb4f2eb95a568528da9a268f8db8d500a9fab94beb3962da31eb6bd0a8f0",
+          "policy.json": "b62239f134f08ae2952141587c98f5912a29e1d3c887219e1929f0e23a549780"
+        },
+        "ordinaryUid": 1000,
+        "prepareSeconds": 3.0228856810135767,
+        "reuseSeconds": 1.1591606230067555,
+        "offlinePrepared": true,
+        "reusedByteIdenticalReceipt": true,
+        "priorRuntimeBytesPreserved": true,
+        "systemPackagesChanged": false,
+        "refusals": {
+          "package-version": "Distro Python/Qt package versions changed; qualify a new runtime.",
+          "same-version-file-bytes": "Distro Python/Qt member changed; qualify a new runtime: /usr/bin/idle3.14",
+          "import-drift": "Distro runtime imports changed; qualify a new runtime without repairing the prior receipt."
+        },
+        "gui": {
+          "syntheticTextPassed": true,
+          "syntheticSvgPixelPassed": true,
+          "qmlComponentCreated": true,
+          "qtVersion": "6.11.2",
+          "mappedQtLibraries": [
+            "/usr/lib/libQt6Core.so.6.11.2",
+            "/usr/lib/libQt6DBus.so.6.11.2",
+            "/usr/lib/libQt6Gui.so.6.11.2",
+            "/usr/lib/libQt6Network.so.6.11.2",
+            "/usr/lib/libQt6OpenGL.so.6.11.2",
+            "/usr/lib/libQt6Qml.so.6.11.2",
+            "/usr/lib/libQt6QmlMeta.so.6.11.2",
+            "/usr/lib/libQt6QmlModels.so.6.11.2",
+            "/usr/lib/libQt6QmlWorkerScript.so.6.11.2",
+            "/usr/lib/libQt6Quick.so.6.11.2",
+            "/usr/lib/libQt6QuickWidgets.so.6.11.2",
+            "/usr/lib/libQt6Svg.so.6.11.2",
+            "/usr/lib/libQt6Test.so.6.11.2",
+            "/usr/lib/libQt6Widgets.so.6.11.2"
+          ],
+          "nativeDesktopTested": false,
+          "plasmaShaderRenderTested": false
+        },
+        "vad": {
+          "speechModelTested": true,
+          "modelSha256": "1a153a22f4509e292a94e67d6f9b85e8deb25b4988682b7e174c65279d8788e3",
+          "frames": 64,
+          "deterministicReset": true,
+          "providers": [
+            "CPUExecutionProvider"
+          ],
+          "threads": 1,
+          "stateShape": [
+            2,
+            1,
+            128
+          ],
+          "contextShape": [
+            1,
+            64
+          ],
+          "minimumCpuQualified": false,
+          "physicalAudioTested": false,
+          "asrTtsTested": false
+        },
+        "installedProductTested": false,
+        "dependencyMaintenanceQualified": false,
+        "wholeDistroSnapshotQualified": false,
+        "graphicalBrowserTested": false,
+        "physicalAudioTested": false,
+        "publicReleaseQualified": false,
+        "licenseReviewComplete": false,
+        "embeddedSourceCoverageComplete": false,
+        "ownerStateChanged": false
+      },
+      "registeredPackages": {
+        "pyside6": "6.11.2-2",
+        "python": "3.14.7-1",
+        "qt6-base": "6.11.2-3",
+        "qt6-declarative": "6.11.2-2",
+        "qt6-svg": "6.11.2-1",
+        "qt6-wayland": "6.11.2-1",
+        "shiboken6": "6.11.2-2"
+      },
+      "manifestMemberCounts": {
+        "file": 6434,
+        "directory": 498,
+        "link": 170
+      },
+      "manifestFileBytes": 271911126,
+      "repositoryAuthenticationPerformedByThisProbe": false,
+      "systemDependencyClosureTested": false,
+      "privateEvidenceSha256": {
+        "arch-proof.stdout": "415795739de503b95e3c06388d9e6bc7afe1d82b2fb2960997d345906be81dea",
+        "arch-proof.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-results/gui.stdout": "1e5483a57ab321c1cdfdd55bf99859bde11174122c97c2886d9b2c915d6440b4",
+        "arch-results/gui.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-results/vad.stdout": "e9df2131b84dad0102e3472499f1c42ae5f26b0d76ba234635350edd189f0979",
+        "arch-results/vad.stderr": "4f231b8772d257293203be418c1c23aa6ef351bfdceb57f7111d7444a366c597"
+      }
+    },
+    "leap": {
+      "container": "augmentor-leap-runtime-20261002-b",
+      "proofSha256": "8b7b5c98d90f5d47794369de4d7572a7c6d80011d56c7ee5a317e91b1d98011b",
+      "rawProof": {
+        "format": "augmentor-system-qt-stack-runtime-proof/1",
+        "target": "opensuse-leap16.0-x86_64",
+        "profile": "leap16-cp313-x86_64-voice",
+        "systemQtStack": {
+          "format": "augmentor-system-qt-stack-contract/1",
+          "file": "system-qt-inventory.json",
+          "sha256": "485b8dca973e7ca58efd3d2e2d9e416dc4b3f324f5cf1a055ea74475f45ccd56",
+          "bytes": 557497,
+          "qtVersion": "6.9.1",
+          "packageManager": "rpm"
+        },
+        "lockIdentity": "7991a5ef322dfa02aa228bbb36a4cde5ddc0673b02645d7ba4f0a5c3f5782bed",
+        "runtimeArtifactSha256": "af080581e252c4f721dcd2ccf4553e8639001d8b17c247335b1f296158a15017",
+        "runtimeReceiptSha256": "f8d1b267681e5685258185c3b85fca1bb74008acb03eab67aee490f6e44f27a7",
+        "runtimeMembers": 919,
+        "sourceFileSha256": {
+          "scripts/linux-python-runtime.py": "b5fa4f67f54f85ce9ef9e0a5292d018a1dddf1c807b475596b0ad7480cd560a6",
+          "scripts/linux-system-qt.py": "4f53e4f5cbc403679e763e946b5ebf8eb87b08731b3a4fda3f30918127e12389",
+          "probe.py": "3f87c05b91d9627290c6283d79b193aef196b5b124a4ff5a3db14dd630d4ef82",
+          "voice_vad.py": "62dbeb4f2eb95a568528da9a268f8db8d500a9fab94beb3962da31eb6bd0a8f0",
+          "policy.json": "86f6a9856dcca7bb26597299cbfe997a78de690681b1ca1b3aaad1861962018e"
+        },
+        "ordinaryUid": 1000,
+        "prepareSeconds": 2.8033007490012096,
+        "reuseSeconds": 0.7805031159950886,
+        "offlinePrepared": true,
+        "reusedByteIdenticalReceipt": true,
+        "priorRuntimeBytesPreserved": true,
+        "systemPackagesChanged": false,
+        "refusals": {
+          "package-version": "Distro Python/Qt package versions changed; qualify a new runtime.",
+          "same-version-file-bytes": "Distro Python/Qt member changed; qualify a new runtime: /usr/bin/pydoc3.13",
+          "import-drift": "Distro runtime imports changed; qualify a new runtime without repairing the prior receipt."
+        },
+        "gui": {
+          "syntheticTextPassed": true,
+          "syntheticSvgPixelPassed": true,
+          "qmlComponentCreated": true,
+          "qtVersion": "6.9.1",
+          "mappedQtLibraries": [
+            "/usr/lib64/libQt6Core.so.6.9.1",
+            "/usr/lib64/libQt6DBus.so.6.9.1",
+            "/usr/lib64/libQt6Gui.so.6.9.1",
+            "/usr/lib64/libQt6Network.so.6.9.1",
+            "/usr/lib64/libQt6OpenGL.so.6.9.1",
+            "/usr/lib64/libQt6Qml.so.6.9.1",
+            "/usr/lib64/libQt6QmlMeta.so.6.9.1",
+            "/usr/lib64/libQt6QmlModels.so.6.9.1",
+            "/usr/lib64/libQt6QmlWorkerScript.so.6.9.1",
+            "/usr/lib64/libQt6Quick.so.6.9.1",
+            "/usr/lib64/libQt6QuickWidgets.so.6.9.1",
+            "/usr/lib64/libQt6Svg.so.6.9.1",
+            "/usr/lib64/libQt6Test.so.6.9.1",
+            "/usr/lib64/libQt6Widgets.so.6.9.1"
+          ],
+          "nativeDesktopTested": false,
+          "plasmaShaderRenderTested": false
+        },
+        "vad": {
+          "speechModelTested": true,
+          "modelSha256": "1a153a22f4509e292a94e67d6f9b85e8deb25b4988682b7e174c65279d8788e3",
+          "frames": 64,
+          "deterministicReset": true,
+          "providers": [
+            "CPUExecutionProvider"
+          ],
+          "threads": 1,
+          "stateShape": [
+            2,
+            1,
+            128
+          ],
+          "contextShape": [
+            1,
+            64
+          ],
+          "minimumCpuQualified": false,
+          "physicalAudioTested": false,
+          "asrTtsTested": false
+        },
+        "installedProductTested": false,
+        "dependencyMaintenanceQualified": false,
+        "wholeDistroSnapshotQualified": false,
+        "graphicalBrowserTested": false,
+        "physicalAudioTested": false,
+        "publicReleaseQualified": false,
+        "licenseReviewComplete": false,
+        "embeddedSourceCoverageComplete": false,
+        "ownerStateChanged": false
+      },
+      "registeredPackages": {
+        "libQt6Core6": "0:6.9.1-160000.2.2.x86_64",
+        "libQt6DBus6": "0:6.9.1-160000.2.2.x86_64",
+        "libQt6Gui6": "0:6.9.1-160000.2.2.x86_64",
+        "libQt6Network6": "0:6.9.1-160000.2.2.x86_64",
+        "libQt6OpenGL6": "0:6.9.1-160000.2.2.x86_64",
+        "libQt6Qml6": "0:6.9.1-160000.2.2.x86_64",
+        "libQt6QmlMeta6": "0:6.9.1-160000.2.2.x86_64",
+        "libQt6QmlModels6": "0:6.9.1-160000.2.2.x86_64",
+        "libQt6QmlWorkerScript6": "0:6.9.1-160000.2.2.x86_64",
+        "libQt6Quick6": "0:6.9.1-160000.2.2.x86_64",
+        "libQt6QuickWidgets6": "0:6.9.1-160000.2.2.x86_64",
+        "libQt6Svg6": "0:6.9.1-160000.3.1.x86_64",
+        "libQt6Test6": "0:6.9.1-160000.2.2.x86_64",
+        "libQt6WaylandClient6": "0:6.9.1-160000.2.2.x86_64",
+        "libQt6WaylandEglClientHwIntegration6": "0:6.9.1-160000.2.2.x86_64",
+        "libQt6Widgets6": "0:6.9.1-160000.2.2.x86_64",
+        "libQt6WlShellIntegration6": "0:6.9.1-160000.2.2.x86_64",
+        "python313": "0:3.13.14-160000.2.1.x86_64",
+        "python313-base": "0:3.13.14-160000.2.1.x86_64",
+        "python313-pyside6": "0:6.9.1-bp160.1.9.x86_64",
+        "python313-shiboken6": "0:6.9.1-bp160.1.2.x86_64",
+        "qt6-declarative-imports": "0:6.9.1-160000.2.2.x86_64",
+        "qt6-wayland": "0:6.9.1-160000.2.2.x86_64"
+      },
+      "manifestMemberCounts": {
+        "file": 2305,
+        "directory": 139,
+        "link": 24
+      },
+      "manifestFileBytes": 139646467,
+      "repositoryAuthenticationPerformedByThisProbe": false,
+      "systemDependencyClosureTested": false,
+      "privateEvidenceSha256": {
+        "leap-proof.stdout": "9b012c4fe2e901d8b80d108ec61d05968f4b75db06d685d1f31ee5ec9620e8f0",
+        "leap-proof.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-results/gui.stdout": "172565e3ed9207ff90c7e459865eb0b5960690582f20f9b9972f888f0a527abb",
+        "leap-results/gui.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-results/vad.stdout": "e9df2131b84dad0102e3472499f1c42ae5f26b0d76ba234635350edd189f0979",
+        "leap-results/vad.stderr": "ba4f4cc6f6799dea13cefa82dbe185b8f5b90eb9ef95c34ae47436942a7cf2db"
+      }
+    }
+  },
+  "sourceFileSha256": {
+    "scripts/linux-python-runtime.py": "b5fa4f67f54f85ce9ef9e0a5292d018a1dddf1c807b475596b0ad7480cd560a6",
+    "scripts/linux-system-qt.py": "4f53e4f5cbc403679e763e946b5ebf8eb87b08731b3a4fda3f30918127e12389",
+    "release/prove-system-qt-stack.py": "3f87c05b91d9627290c6283d79b193aef196b5b124a4ff5a3db14dd630d4ef82",
+    "packages/platform/src/python.ts": "ddd8232732200501a541705fb2507890a4710b110656c7dfc17a7bfb213fd5dc",
+    "tests/test_linux_system_qt.py": "083452b1c2e465eb0a8aa677521984bdab16a7773b1445523b7d294a6001936b",
+    "tests/linux-python-selection.test.mjs": "9fc5b7c72b284610c07047cc66345ba9a0b41ad29c5f00397d16b0ba70e6788c"
+  },
+  "focusedTests": {
+    "systemQt": 11,
+    "runtime": 14,
+    "sourceQt": 14,
+    "nodeIdentityAndSelection": 4,
+    "typescriptCheck": true,
+    "build": true
+  },
+  "nativeSuite": {
+    "target": "arch20261001-x86_64",
+    "testsRun": 798,
+    "passed": 796,
+    "skippedMacOnly": 2,
+    "failed": 0,
+    "seconds": 45.376,
+    "logSha256": "34f2d129b3ed3229c979dfc721d99329d0ad1d1329197868a6a2c866c540e730"
+  },
+  "publicReleaseQualified": false,
+  "ownerStateChanged": false,
+  "licenseReviewComplete": false,
+  "embeddedSourceCoverageComplete": false,
+  "priorNativeAttempts": [
+    {
+      "testsRun": 795,
+      "errors": 1,
+      "skips": 2,
+      "reason": "Mutable source fixture retained old linux-source-qt.py without package_permissions; no production failure established. Copied current reviewed helper and Debian recipe/tests before retry.",
+      "logSha256": "23dda6edee94fe0f6e8335b8f7c57b9a71f318b2a425fd36d1d298a8311b3e14"
+    },
+    {
+      "testsRun": 797,
+      "passed": 795,
+      "skips": 2,
+      "scope": "Corrected prior working snapshot before the additional special-file refusal guard/test.",
+      "logSha256": "0525f95addd0d72b87b246d1cdc399166e683303097d96523f03e50c6336484a"
+    }
+  ],
+  "priorActualProofs": {
+    "arch": "dceb7daff4d0f3d20149d1e9589eb780825b9041d85659cd7e16f28f48994c39",
+    "leap": "7bad18e2c846b8f222b4ca6aee7dcddf8662a6ce5742bda1ef228a7e8ee57588"
+  },
+  "nativeFixtureCleanup": {
+    "reportSha256": "e22fc60701898012dde92d369d78070fb5d2a43f67ad85c0f6eb52c75e47ac10",
+    "report": {
+      "terminatedOnlyMatchingOwnedNativeTestServices": [
+        {
+          "pid": 31443,
+          "command": "/tmp/cinnamon-shortcuts-source-test/services/prompt-library/service.py"
+        },
+        {
+          "pid": 31969,
+          "command": "/tmp/cinnamon-shortcuts-source-test/services/memory/service.py"
+        }
+      ],
+      "remainingLiveMatches": [],
+      "containerWithoutInitRetained": true,
+      "priorDefunctProcessesRetained": true
+    }
+  }
+}

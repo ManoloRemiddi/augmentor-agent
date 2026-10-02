@@ -6,7 +6,7 @@ import {homedir,userInfo} from 'node:os';
 import {dirname,isAbsolute,join,resolve,basename} from 'node:path';
 
 type Wheel={name:string,version:string,file:string,sha256:string,bytes:number,source?:string,url?:string};
-type Policy={format:string,profile:string,target:string,python:string,pythonAbi:number[],architecture:string,systemSitePackages:boolean,wheels:Wheel[],sourceQt?:Record<string,unknown>,qualified?:boolean,licenseReviewComplete?:boolean,embeddedSourceCoverageComplete?:boolean};
+type Policy={format:string,profile:string,target:string,python:string,pythonAbi:number[],architecture:string,systemSitePackages:boolean,wheels:Wheel[],sourceQt?:Record<string,unknown>,systemQtStack?:Record<string,unknown>,qualified?:boolean,licenseReviewComplete?:boolean,embeddedSourceCoverageComplete?:boolean};
 const SOURCE_PROFILE='noble-cp312-x86_64-source-qt-voice';
 const SOURCE_QT={format:'augmentor-source-qt-runtime-input/1',directory:'source-qt',qtVersion:'6.8.2',
   manifestSha256:'c49faf50a992daca825c51929715c6114017e6b29ac54af17f9656db41e73364',
@@ -27,6 +27,7 @@ export function pythonRuntimeIdentity(value:Policy):string {
   for(const key of ['profile','target','python','pythonAbi','architecture','systemSitePackages'] as const)contract[key]=value[key];
   contract.wheels=[...value.wheels].sort((a,b)=>normalized(a.name).localeCompare(normalized(b.name))).map(row=>({name:row.name,version:row.version,file:row.file,sha256:row.sha256,bytes:row.bytes}));
   if(value.profile===SOURCE_PROFILE)contract.sourceQt=value.sourceQt;
+  if(value.systemQtStack!==undefined)contract.systemQtStack=value.systemQtStack;
   return sha(pythonJson(contract));
 }
 export function declaredLinuxPython(app:string,env:NodeJS.ProcessEnv=process.env):string|undefined {
@@ -48,6 +49,7 @@ export function declaredLinuxPython(app:string,env:NodeJS.ProcessEnv=process.env
     }
   }
   else if(value.profile!=='noble-cp312-x86_64')throw Error('Unsupported Linux Python runtime policy.');
+  if(value.systemQtStack!==undefined)throw Error('This profile cannot declare a distro Qt stack.');
   if(value.profile!==SOURCE_PROFILE&&value.sourceQt!==undefined)throw Error('A vendor profile cannot declare source Qt.');
   if(value.format!=='augmentor-linux-python-wheels/1'||value.target!=='ubuntu24.04-amd64'||value.python!=='/usr/bin/python3.12'||pythonJson(value.pythonAbi)!=='[3, 12]'||value.architecture!=='x86_64'||process.arch!=='x64'||value.systemSitePackages!==true||!Array.isArray(value.wheels)||value.wheels.length!==names.length||names.some(name=>value.wheels.filter(row=>normalized(row.name)===name).length!==1))throw Error('Unsupported Linux Python runtime policy.');
   for(const row of value.wheels)if(basename(row.file)!==row.file||!row.file.endsWith('.whl')||!/^\w[\w.+-]*$/.test(row.version)||!/^[a-f0-9]{64}$/.test(row.sha256)||!Number.isSafeInteger(row.bytes)||row.bytes<=0)throw Error('Invalid locked wheel record.');

@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The [Arch/Leap system-Qt boundary](LINUX-SYSTEM-QT-STACK.md) now binds distro
+Python/Qt inventories and passes fresh offline runtimes, drift refusal and actual
+CPU Silero VAD in owned containers. Full packages/installer/Node admission, native
+sessions, graphical Browser, physical audio and dependency maintenance remain open;
+this Linux-only candidate does not change Mac runtime selection or declare parity.
+
 The [Noble source-Qt profile](LINUX-SOURCE-RUNTIME-ENTRYPOINTS.md) now has actual
 offline runtime, cold Desktop/Browser entrypoint and isolated rollback evidence.
 Full product/native session/package/audio and source/legal acceptance remain open;

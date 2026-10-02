@@ -75,6 +75,7 @@ Current cross-platform direction: [one product, Linux/Mac parity audit and corre
 ## Setup, operations and distribution
 
 - [Linux distribution rollout: implementation order and qualification gates](LINUX-DISTRO-ROLLOUT.md)
+- [Arch/Leap system Python/Qt drift boundary and actual CPU VAD evidence](LINUX-SYSTEM-QT-STACK.md)
 - [Cinnamon adapter: installed Mint evidence and pinned implementation contract](LINUX-CINNAMON-ADAPTER.md)
 - [GNOME native consent/capture evidence and disabled guarded execution candidate](LINUX-GNOME-CONTROL-PLAN.md)
 - [Linux Qt/PySide source build, rebuild and replacement gates](LINUX-LGPL-SOURCE-RUNTIME.md)

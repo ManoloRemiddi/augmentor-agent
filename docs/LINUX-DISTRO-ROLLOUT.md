@@ -2,6 +2,20 @@
 
 # Linux distribution rollout
 
+## October 2 Arch/Leap system Qt drift boundary
+
+The two voice profiles now bind exact registered Python/Qt versions and file
+inventories. Fresh ordinary-user offline runtimes pass reuse, actual query/hash
+refusals against changed synthetic expectations, receipt import-drift refusal,
+synthetic text/SVG/QML and 64-frame pinned Silero CPU VAD. Prior runtime bytes stay
+unchanged. See [the owning contract and scope](LINUX-SYSTEM-QT-STACK.md) and
+[working-source report](../release/qualification/next-targets/20261002-system-qt-stack-runtime.json).
+Cold verification is separate from live dependency-update protection, full native
+closure and a whole Arch snapshot. Full application packages/installer/Node
+admission, sessions/Browser/audio/lifecycle and legal acceptance remain open.
+Both 42c8c51 hosted Linux/Mac checks pass; this new source needs its own checks.
+All five rollout points remain active; the pending 22-file license scope is unchanged.
+
 ## October 2 installed Noble source-package startup
 
 The [new report](../release/qualification/next-targets/20261002-noble-source-package-startup.json)

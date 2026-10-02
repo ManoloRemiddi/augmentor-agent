@@ -38,10 +38,17 @@ HOST_PROFILES = {
 }
 POLICY_FILE = 'linux-python-runtime.json'
 SOURCE_PROFILE = 'noble-cp312-x86_64-source-qt-voice'
+SYSTEM_PROFILES = {'leap16-cp313-x86_64-voice', 'arch20261001-cp314-x86_64-voice'}
 
 
 def source_qt():
     spec = importlib.util.spec_from_file_location('linux_source_qt', Path(__file__).with_name('linux-source-qt.py'))
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    return module
+
+
+def system_qt():
+    spec = importlib.util.spec_from_file_location('linux_system_qt', Path(__file__).with_name('linux-system-qt.py'))
     module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
     return module
 
@@ -73,6 +80,10 @@ def policy(path):
             raise ValueError('The source Qt profile remains an unqualified review candidate.')
     elif 'sourceQt' in value:
         raise ValueError('A vendor/system profile cannot declare source Qt.')
+    if value['profile'] in SYSTEM_PROFILES:
+        system_qt().contract(value)
+    elif 'systemQtStack' in value:
+        raise ValueError('This profile cannot declare a distro Qt stack.')
     for row in rows:
         if (Path(row['file']).name != row['file'] or not row['file'].endswith('.whl')
                 or not re.fullmatch('[0-9a-f]{64}', row['sha256'])
@@ -95,6 +106,8 @@ def identity(value):
                           for row in sorted(value['wheels'], key=lambda r: normalized(r['name']))]
     if value['profile'] == SOURCE_PROFILE:
         contract['sourceQt'] = value['sourceQt']
+    if 'systemQtStack' in value:
+        contract['systemQtStack'] = value['systemQtStack']
     return hashlib.sha256(json.dumps(contract, sort_keys=True).encode()).hexdigest()
 
 
@@ -105,6 +118,8 @@ def contract(value,policy_sha256):
             'licenseReviewComplete':False,'embeddedSourceCoverageComplete':False}
     if value['profile'] == SOURCE_PROFILE:
         result['sourceQt'] = source_qt().contract(value)
+    if 'systemQtStack' in value:
+        result['systemQtStack'] = system_qt().contract(value)
     return result
 
 
@@ -146,7 +161,7 @@ def download(value, wheelhouse):
     verify_wheels(value, wheelhouse)
 
 
-def host(value):
+def host(value, system_manifest=None):
     release = dict(row.split('=', 1) for row in Path('/etc/os-release').read_text().splitlines() if '=' in row)
     expected=HOST_PROFILES[value['profile']]
     if (release.get('ID','').strip('"')!=expected[3] or
@@ -156,6 +171,10 @@ def host(value):
         raise ValueError('This wheel set requires x86-64.')
     if value['profile'] == SOURCE_PROFILE:
         source_qt().environment(Path('/unused-host-check'), os.environ)
+    if value['profile'] in SYSTEM_PROFILES:
+        if system_manifest is None:
+            raise ValueError('Distro Qt verification requires the pinned system manifest before Python executes.')
+        system_qt().verify(value, system_manifest)
     result = subprocess.check_output([value['python'], '-I', '-c',
         'import json,sys;print(json.dumps(list(sys.version_info[:2])))'], text=True, timeout=10)
     if json.loads(result) != value['pythonAbi']:
@@ -253,6 +272,7 @@ if 'sourceQt' in value:
   'pluginPaths':QtCore.QCoreApplication.libraryPaths(),'qmlImportPaths':engine.importPathList(),
   'qmlComponentCreated':True,'fullProductTested':False,'nativeDesktopTested':False,'plasmaShaderRenderTested':False}
 print(json.dumps({'pythonAbi':list(sys.version_info[:2]),'qtVersion':QtCore.qVersion(),
+ 'pysideVersion':PySide6.__version__,'shibokenVersion':shiboken6.__version__,
  'managedVersions':{r['name']:md.version(r['name']) for r in value['wheels']},
  'systemQt':not any(r['name'].lower().replace('_','-') in ('pyside6-essentials','pyside6') for r in value['wheels']),
  'sourceQt':native,
@@ -277,7 +297,13 @@ def probe(value, root):
                             env=env, text=True, capture_output=True, timeout=60)
     if result.returncode:
         raise RuntimeError('Managed runtime import/dependency probe failed:\n' + result.stderr[-4000:])
-    return json.loads(result.stdout)
+    imports = json.loads(result.stdout)
+    if 'systemQtStack' in value:
+        qt = value['systemQtStack']['qtVersion']
+        if (imports.get('systemQt') is not True or imports.get('qtVersion') != qt
+                or imports.get('pysideVersion') != qt or imports.get('shibokenVersion') != qt):
+            raise ValueError('Distro Qt/binding versions differ from the candidate contract.')
+    return imports
 
 
 def verify(value, root):
@@ -299,12 +325,19 @@ def verify(value, root):
         if receipt.get('sourceQt') != value['sourceQt']:
             raise ValueError('Runtime source Qt receipt differs from the native payload contract.')
         source_qt().manifest(root/'qt', value['sourceQt']['manifestSha256'])
+    if 'systemQtStack' in value and receipt.get('systemQtStack') != value['systemQtStack']:
+        raise ValueError('Runtime distro Qt receipt differs from the system package contract.')
     files = inventory(root)
     if (receipt.get('files') != files or receipt.get('artifactSha256') !=
             hashlib.sha256(json.dumps(files, sort_keys=True).encode()).hexdigest()):
         raise ValueError('Managed runtime files changed; prepare a new runtime.')
-    host(value)
-    probe(value, root)
+    if 'systemQtStack' in value:
+        host(value, root/system_qt().MANIFEST)
+    else:
+        host(value)
+    imports = probe(value, root)
+    if 'systemQtStack' in value and imports != receipt.get('imports'):
+        raise ValueError('Distro runtime imports changed; qualify a new runtime without repairing the prior receipt.')
     return receipt
 
 
@@ -312,7 +345,10 @@ def prepare(value, wheelhouse, store):
     verify_wheels(value, wheelhouse)
     if value['profile'] == SOURCE_PROFILE:
         source_qt().inputs(value, wheelhouse)
-    host(value)
+    if 'systemQtStack' in value:
+        host(value, Path(wheelhouse)/system_qt().MANIFEST)
+    else:
+        host(value)
     with locked(store) as store:
         root = store/(value['profile']+'-'+identity(value)[:16])
         if root.exists():
@@ -329,6 +365,10 @@ def prepare(value, wheelhouse, store):
                 '--no-deps', '--disable-pip-version-check', '-r', str(root/'wheel-lock.txt')], check=True, timeout=120)
             if value['profile'] == SOURCE_PROFILE:
                 source_qt().stage(value, wheelhouse, root/'qt')
+            if 'systemQtStack' in value:
+                shutil.copyfile(Path(wheelhouse)/system_qt().MANIFEST, root/system_qt().MANIFEST)
+                # Refuse an input or package change across venv preparation.
+                system_qt().verify(value, root/system_qt().MANIFEST)
             imports = probe(value, root)
             files = inventory(root)
             receipt = {'format': 'augmentor-linux-python-runtime/1', 'root': str(root),
@@ -339,6 +379,8 @@ def prepare(value, wheelhouse, store):
                 'installedProductTested': False, 'selectedDesktopChanged': False}
             if value['profile'] == SOURCE_PROFILE:
                 receipt['sourceQt'] = value['sourceQt']
+            if 'systemQtStack' in value:
+                receipt['systemQtStack'] = value['systemQtStack']
             with os.fdopen(os.open(root/RECEIPT, os.O_WRONLY|os.O_CREAT|os.O_EXCL, 0o600), 'w') as stream:
                 json.dump(receipt, stream, indent=2); stream.write('\n'); stream.flush(); os.fsync(stream.fileno())
             return receipt

@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+`test_linux_system_qt.py` covers 11 synthetic cold-launch boundaries: pinned
+manifest/profile scope, package-version/member/import drift, concurrent query
+changes, loader injection and refusal before the ABI child executes. The
+[actual Arch/Leap proof](../docs/LINUX-SYSTEM-QT-STACK.md) separately prepares fresh
+runtimes, renders synthetic controls and executes CPU Silero VAD. Full product,
+physical sessions/audio and live dependency maintenance remain unqualified.
+
 The October 2 [Noble lifecycle/shortcut checkpoint](../docs/LINUX-DISTRO-ROLLOUT.md#noble-lifecycle-shortcut-defect-and-next-target-probes)
 records actual Wayland lock/cold-launch acceptance separately from the failed
 complete QMP shortcut proof. Extension regression covers visible focus outside

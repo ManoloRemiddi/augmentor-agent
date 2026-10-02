@@ -59,5 +59,13 @@
   ],
   "qualified": false,
   "licenseReviewComplete": false,
-  "embeddedSourceCoverageComplete": false
+  "embeddedSourceCoverageComplete": false,
+  "systemQtStack": {
+    "format": "augmentor-system-qt-stack-contract/1",
+    "file": "system-qt-inventory.json",
+    "sha256": "05d28a3a15c20ce8fb4734f204f01414c19f28b52bbf7951a54056f6c417a007",
+    "bytes": 1584771,
+    "qtVersion": "6.11.2",
+    "packageManager": "pacman"
+  }
 }

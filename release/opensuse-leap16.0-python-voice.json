@@ -97,5 +97,13 @@
   ],
   "qualified": false,
   "licenseReviewComplete": false,
-  "embeddedSourceCoverageComplete": false
+  "embeddedSourceCoverageComplete": false,
+  "systemQtStack": {
+    "format": "augmentor-system-qt-stack-contract/1",
+    "file": "system-qt-inventory.json",
+    "sha256": "485b8dca973e7ca58efd3d2e2d9e416dc4b3f324f5cf1a055ea74475f45ccd56",
+    "bytes": 557497,
+    "qtVersion": "6.9.1",
+    "packageManager": "rpm"
+  }
 }
