@@ -24,7 +24,9 @@ independent source restoration/completion and actual native UI reopening, with n
 inventory differences (x64 65,946 files; ARM64 65,930). These reports concern 0.2.12
 development candidates, deterministic provider chat and same-build updates, not
 this new public distribution profile, real-provider acceptance or N-to-N+1 updates.
-The public build rebases delivery on shared 0.2.13 source and records fresh native
+The public build integrates current 0.2.13 main including the Handy shared controls;
+the Windows preview does not bundle Handy and avoids starting its unavailable companion.
+Delivery uses the reviewed merged source and records fresh native
 rendering, sealed inventory and installer digests separately.
 
 ### Historical September 28 implementation record
@@ -217,6 +219,62 @@ Windows build, CI configuration, installation or release changed in this plannin
 work. Implementation awaits the next instruction to build; start with W0 and W1,
 then follow their exit criteria. The existing Mac activation checkpoint below
 remains separate and unchanged.
+## October 2 embedded Handy candidate
+
+The owner has now accepted the installed Linux dictation through real use and
+authorized PR #30's merge after successful checks. The merge review fixes an
+existing Codex cancellation fixture to wait for actual provider request receipt
+within a bounded deadline, preserving all cancellation/fencing/no-replay
+assertions. Await that follow-up's hosted checks before merging; no new installed
+cutover is needed. See [the owning guide](HANDY-INTEGRATION.md).
+
+Current implementation qualification: source `81a2bba` passes all hosted native
+component jobs (Linux x64, Mac ARM64, Windows x64), shared SDK/application checks,
+Debian build and clean installation/update/rollback/removal, actual packaged
+Chromium acceptance, and both macOS 14/26 signed development product jobs.
+[Validation](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37036303734)
+and [Mac product qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37036303739)
+record the exact completed runs. The owner's Linux installation is enabled and
+ready, with Desktop/Mobile online and the standalone tray/startup retired.
+Full Windows installer convergence with PR #20, Developer ID/notarization and
+physical OS/microphone/compositor acceptance remain customer-release gates.
+
+
+`feat/handy-integration` starts from public main `d91c520` and implements the
+owner-approved system-wide dictation and themed Handy overlay. Read
+[the implementation guide](HANDY-INTEGRATION.md) for supplier pins, settings,
+microphone ownership, OS adapters, packaging, reproducible proofs and explicit
+qualification boundaries. The canonical dirty checkout and existing installed
+settings work are preserved. Feature source `c8f67a3` now has an installed Linux
+adoption: selected/running build `20261002-141437-663e6383`, artifact
+`a47433db434bf446d8001c18182d85b8318c0e78f92fd72f14f8131f75cfd308`, compatible
+installed 0.2.11 contracts retained. Standalone Handy startup/process ownership
+was reversibly retired and embedded Ctrl+Space dictation enabled on CPU with the
+owner's actual palette. [The adoption record](HANDY-INTEGRATION.md#owners-installed-adoption--2-october-2026)
+separates that Linux evidence from open hosted lifecycle/platform package gates.
+Follow-up source `f60148b` verifies patch application in a separate build Git root
+and fences delayed microphone admission. Current selected/running adoption is
+`20261002-160803-407ce464`, artifact
+`ac681aadeea466f7ce280f5641e8c89ba01e216a299702de3f1de134886240b9`;
+both idle windows adopted through acknowledged maintenance. The original cutover
+above remains historical evidence. Source `85034ac` includes native admission
+expiry and the short Unix socket path. All 615 native cases pass (3 expected skips),
+both clean-source Debian packages build and their extracted component passes
+actual lifecycle/theme/ownership/EOF proof. Hosted platform results are recorded
+in the owning guide as they qualify.
+Final feature source `c40e53b` passes 617 shared native cases (3 expected skips)
+and a fresh-user clean Debian install/component/shortcut/uninstall proof.
+CI follow-up `0e7a19a` prepares reviewed source before restoring compiler files;
+Windows checksum-pinned notices retain exact bytes under automatic conversion.
+The current installed Linux root above stays enabled and ready; Mac-only
+permission/package refinements do not require another Linux cutover.
+At `0e7a19a`, macOS 14/26 signed Desktop/Browser development product jobs
+pass, including actual copied-helper proofs. The Windows notice-only follow-up
+preserves the original missing clipboard dependency license and passes the full
+target-filtered notice audit. Final hosted results are recorded in the guide.
+Do not claim a qualified Windows installer or physical microphone acceptance
+solely from a native build or successful component enable.
+
 ## October 1 merge blockers: current main and separate Codex prerequisite
 
 The feature branch integrates canonical main `8c3be5a` at merge `338dbc5`.

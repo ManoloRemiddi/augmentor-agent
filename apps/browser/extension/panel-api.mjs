@@ -64,6 +64,9 @@ function dispatchPanelMessage(msg, sender, sendResponse) {
   // the sender is one of our own chrome-extension:// pages.
   if (!sender || sender.id !== chrome.runtime.id) return
   if (!sender.url || !sender.url.startsWith('chrome-extension://' + chrome.runtime.id)) return
+  if(msg?.type==='surface/dictation'){
+    request('augmentor/surface',{action:'dictation',method:msg.method,params:msg.params}).then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}));return true
+  }
   if(msg?.type==='surface/appearance'||msg?.type==='prompt/improve'){
     if(msg.type==='prompt/improve'&&(!['dsh','codex'].includes(state.harness)||state.phase!=='ready'||state.running||state.panelViewSession)){sendResponse({ok:false,error:'Open an idle DSH or Codex conversation first.'});return}
     request('augmentor/surface',msg.type==='surface/appearance'?{action:'appearance',settings:msg.settings}:{action:'improve',text:msg.text,selection:state.selection})

@@ -59,7 +59,7 @@ work, then use Installed apps → Augmentor Agent → Modify or rerun this same 
 Do not delete conversations or settings to bypass a refused repair.
 
 Local voice and memory engine provisioning, desktop automation, Pi and Codex
-integration are not qualified for Windows. The source contains shared controls and
+integration are not qualified for Windows. Handy dictation is not bundled in this preview. The source contains shared controls and
 adapters; their presence does not establish that those features are ready here.
 No account from the developer's machines is included.
 

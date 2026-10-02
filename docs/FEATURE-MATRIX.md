@@ -3,6 +3,12 @@
 Windows public preview scope: [installation and explicit parity limits](WINDOWS-PREVIEW.md). Physical acceptance is pending; shared source does not imply complete Windows feature qualification.
 
 Current OS parity direction and verified gaps: [one-product architecture audit](PLATFORM-PARITY-AUDIT.md).
+
+The [embedded Handy candidate](HANDY-INTEGRATION.md) adds harness-independent
+global dictation, shared Desktop/Browser controls, model/shortcut selection and
+the owner-approved themed recording pill with Augmentor's animated circle.
+Linux virtual-microphone/separate-app acceptance is recorded separately from
+Mac/Windows component CI and complete installer/compositor qualification.
 The tables below compare harnesses and presentation surfaces; they do not establish
 Linux/macOS parity. The [Mac recovery record](MACOS-RECOVERY-2026-09-26.md) now
 qualifies both Mac shortcuts and the shared Metal/OpenGL renderer, with explicit

@@ -12,6 +12,7 @@
     "No automatic updates or cross-version manual upgrades.",
     "Local voice and memory engines, desktop automation, Pi and Codex integration are not qualified on Windows.",
     "Browser extension requires manual Load unpacked.",
-    "RTX Spark hardware has not been tested."
+    "RTX Spark hardware has not been tested.",
+    "The new Handy dictation component is not bundled in this Windows preview."
   ]
 }

@@ -43,6 +43,8 @@ class VoiceSession(QObject):
         self.speak_turn = False
         self.waiting_request = None
         self.ws = None
+        from .dictation import MicrophoneLease
+        self.dictation_lease=MicrophoneLease()
         self.capture = None
         self.closed = False
         self.generation = 0
@@ -214,6 +216,7 @@ class VoiceSession(QObject):
             return
         self.interrupt()
         try:
+            self.dictation_lease.acquire()
             self.control({'type': 'begin'})
             self.recorded_bytes = 0
             self.recording_started = time.monotonic()
@@ -231,6 +234,7 @@ class VoiceSession(QObject):
     def start_hands_free(self):
         if self.closed or self.capture:return
         try:
+            if not self.early_input:self.dictation_lease.acquire()
             self.capture = self.early_input.stream if self.early_input else self.echo_route.open_input(self.sd, samplerate=16000, channels=1,
                 dtype='int16', blocksize=512, callback=self.hands_free_microphone, latency='low')
             self.vad_enabled.set()
@@ -355,6 +359,7 @@ class VoiceSession(QObject):
             self.capture.stop()
             self.capture.close()
             self.capture = None
+            self.dictation_lease.release()
             self.recognizing=True
             if send:self.control({'type': 'end'})
             self.set_status('Recording limit reached · transcribing…' if automatic else 'Transcribing…', 'recognizing')
@@ -488,6 +493,7 @@ class VoiceSession(QObject):
         if self.capture:
             self.capture.close()
             self.capture = None
+        self.dictation_lease.release()
         if self.output:
             self.output.close()
             self.output = None

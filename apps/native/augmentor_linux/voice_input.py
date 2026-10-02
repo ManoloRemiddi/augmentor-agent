@@ -14,6 +14,8 @@ class EarlyVoiceInput(QObject):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.closed=False;self.receiving=False;self.error=None;self.last_frame=0.
+        from .dictation import MicrophoneLease
+        self.dictation_lease=MicrophoneLease()
         self.stream=None;self.route=None;self.sd=None;self.consumer=None
         self.frames=deque();self.lock=threading.RLock();self.opened=threading.Event()
         self.watchdog=QTimer(self);self.watchdog.setInterval(100)
@@ -27,6 +29,7 @@ class EarlyVoiceInput(QObject):
 
     def _open(self):
         try:
+            self.dictation_lease.acquire()
             import sounddevice as sd
             from .voice_echo import EchoRoute
             self.sd=sd
@@ -43,7 +46,9 @@ class EarlyVoiceInput(QObject):
         except Exception as error:
             if not self.closed:
                 self.error=str(error);self.failed.emit('Microphone unavailable: '+str(error));self.close()
-        finally:self.opened.set()
+        finally:
+            if self.closed:self.dictation_lease.release()
+            self.opened.set()
 
     def _frame(self,data,frames,timing,status):
         with self.lock:
@@ -81,4 +86,5 @@ class EarlyVoiceInput(QObject):
             stream,self.stream=self.stream,None;route,self.route=self.route,None
         if stream:stream.close()
         if route:route.close()
+        self.dictation_lease.release()
         self.opened.set()

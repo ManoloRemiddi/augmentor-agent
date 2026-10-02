@@ -6,13 +6,15 @@ from augmentor_linux.preferences import Preferences
 spec=importlib.util.spec_from_file_location('surface',Path(__file__).resolve().parents[1]/'services/surface/browser.py');surface=importlib.util.module_from_spec(spec);spec.loader.exec_module(surface)
 class SurfacePreferences(unittest.TestCase):
     def test_shared_colours_preserve_model_voice_and_placement(self):
-        with tempfile.TemporaryDirectory() as temp,patch.dict(os.environ,{'AUGMENTOR_PI_CONFIG':temp,'AUGMENTOR_WINDOW_ID':'main'}):
+        with tempfile.TemporaryDirectory() as temp,patch.dict(os.environ,{'AUGMENTOR_PI_CONFIG':temp,'AUGMENTOR_WINDOW_ID':'main','AUGMENTOR_DICTATION_STATE':temp+'/dictation'}):
             prefs=Preferences();prefs.values.update(harness='pi',voice_pause_ms=1100,placement={'sentinel':True});prefs.save()
             before=surface.appearance();values={**before['values'],'theme':'light','accentHue':32,'neutBright':-3}
             after=surface.appearance(values);self.assertEqual(after['values']['accentHue'],32);self.assertEqual(after['tokens']['--text'],'#152b2c')
             loaded=Preferences().values;self.assertEqual(loaded['harness'],'pi');self.assertEqual(loaded['voice_pause_ms'],1100);self.assertEqual(loaded['placement'],{'sentinel':True})
             with self.assertRaises(ValueError):surface.appearance({**values,'neutBright':999})
             self.assertEqual(Preferences().values,loaded)
+            from augmentor_linux.dictation import request
+            request('shutdown',start=False)
     def test_improvement_uses_native_adapter_and_shared_template_without_submission(self):
         with patch('augmentor_linux.adapters.dsh.DshAdapter') as adapter,patch('augmentor_linux.prompt_client.PromptClient') as prompts:
             prompts.return_value.call.return_value={'improvement':{'content':'Shared template'}}

@@ -28,6 +28,30 @@ COMPANION_PYTHON_PACKAGES = ('PyYAML', 'websocket-client', 'keyring',
                             'jaraco.classes', 'jaraco.context', 'jaraco.functools', 'more-itertools')
 
 
+def bundle_dictation(project, minimum_macos):
+    """Give the hidden microphone helper its own stable macOS bundle identity."""
+    runtime=project/'components/handy/runtime'
+    app=runtime/'Augmentor Dictation.app';contents=app/'Contents'
+    contents.mkdir(parents=True)
+    # Preserve the executable's existing ../Resources and ../lib/Handy lookups.
+    shutil.move(str(runtime/'bin'),contents/'MacOS')
+    shutil.move(str(runtime/'Resources'),contents/'Resources')
+    shutil.move(str(runtime/'lib'),contents/'lib')
+    info={'CFBundleIdentifier':'com.augmentor.agent.dictation',
+          'CFBundleName':'Augmentor Dictation','CFBundleDisplayName':'Augmentor Dictation — Handy',
+          'CFBundleExecutable':'handy','CFBundlePackageType':'APPL',
+          'CFBundleVersion':json.loads((runtime/'BUILD.json').read_text())['upstream']['version'].lstrip('v'),
+          'LSUIElement':True,'LSMinimumSystemVersion':minimum_macos,'NSHighResolutionCapable':True,
+          'NSMicrophoneUsageDescription':'Augmentor uses Handy to transcribe your voice when you activate dictation.',
+          'NSAppleEventsUsageDescription':'Insert your transcribed text into the application you selected.'}
+    (contents/'Info.plist').write_bytes(plistlib.dumps(info))
+    (runtime/'bin').mkdir()
+    launcher=runtime/'bin/handy'
+    launcher.write_text('#!/bin/sh\n'+HEADER+'exec "$(dirname "$0")/../Augmentor Dictation.app/Contents/MacOS/handy" "$@"\n')
+    launcher.chmod(0o755)
+    return app
+
+
 def build_launcher(destination, component, minimum_macos):
     """Embed the pinned Python without changing the native desktop process identity."""
     if component not in ('desktop', 'browser', 'runtime'):
@@ -148,6 +172,7 @@ def main():
     project = resources/'app'
     for name in ('dist','apps/native','apps/browser','scripts','services','adapters','config','docs','licenses','LICENSE','README.md','release/product.json','release/macos.json','release/macos-requirements.txt','release/dsh'):
         copy(ROOT/name, project/name)
+    subprocess.run([sys.executable,str(ROOT/'scripts/stage-handy.py'),str(project)],check=True)
     if args.source_notices:
         source_report = json.loads((args.source_notices/'manifest.json').read_text())
         for name, sha in source_report['notices'].items():
@@ -186,7 +211,7 @@ def main():
         shutil.rmtree(project/'apps/native')
         # Pure socket clients also serve CLI integrations and acceptance tools;
         # retain them without any Qt presentation modules or desktop entrypoint.
-        for name in ('__init__.py','pi_client.py','prompt_client.py','runtime_start.py','preferences.py'):
+        for name in ('__init__.py','pi_client.py','prompt_client.py','runtime_start.py','preferences.py','dictation.py'):
             relative=Path('apps/native/augmentor_linux')/name
             copy(ROOT/relative,project/relative)
         shutil.rmtree(project/'services/desktop')
@@ -257,13 +282,28 @@ def main():
         'NSScreenCaptureUsageDescription':'Augmentor observes the desktop when you request computer control.',
         'NSAppleEventsUsageDescription':'Augmentor interacts with applications when you request computer control.'}
     (contents/'Info.plist').write_bytes(plistlib.dumps(info))
+    dictation_app=bundle_dictation(project,config['minimumMacOS'])
     inventory=json.dumps(application_inventory(project),sort_keys=True,indent=2)+'\n'
     (project/'application-inventory.json').write_text(inventory)
     inventory_hash=hashlib.sha256(inventory.encode()).hexdigest()
+    # These executables live in the owned component, outside conventional nested
+    # .app/Frameworks locations. Sign every Mach-O explicitly before sealing the app.
+    handy=project/'components/handy/runtime'
+    macho_magic={b'\xcf\xfa\xed\xfe',b'\xce\xfa\xed\xfe',b'\xfe\xed\xfa\xcf',b'\xfe\xed\xfa\xce',b'\xca\xfe\xba\xbe',b'\xbe\xba\xfe\xca'}
+    for file in sorted(handy.rglob('*')):
+        if not file.is_file():continue
+        with file.open('rb') as source:magic=source.read(4)
+        if magic in macho_magic:
+            subprocess.run(['codesign','--force','--sign','-',str(file)],check=True)
+            subprocess.run(['codesign','--verify','--strict',str(file)],check=True)
+    subprocess.run(['codesign','--force','--sign','-',str(dictation_app)],check=True)
+    subprocess.run(['codesign','--verify','--deep','--strict',str(dictation_app)],check=True)
     # Ad-hoc integrity signature. Preview users must explicitly approve this app
     # in macOS; no Apple distribution identity or notarization is claimed.
     subprocess.run(['codesign','--force','--deep','--sign','-',str(app)],check=True)
     subprocess.run(['codesign','--verify','--deep','--strict',str(app)],check=True)
+    handy_inventory={file.relative_to(handy).as_posix():hashlib.sha256(file.read_bytes()).hexdigest() for file in sorted(handy.rglob('*')) if file.is_file()}
+    (out/'handy-signed-inventory.json').write_text(json.dumps({'schema':'augmentor-handy-signed/1','files':handy_inventory,'sourceCommit':args.source_commit},indent=2)+'\n')
     # Keep binary hashes outside the sealed bundle: code signing changes Mach-O bytes.
     if desktop:
         subprocess.run([str(python/'bin/python3'),'-I','-B',str(ROOT/'scripts/qt-library-inventory.py'),

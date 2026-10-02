@@ -39,7 +39,7 @@ async function request(method,p={},id){
   if(method==='augmentor/dsh')return dshSetup(p)
   if(method==='augmentor/diagnostics')return supportReport()
   if(method==='augmentor/onboarding')return startOnboarding(p)
-  if(method==='augmentor/surface'){if(p.action!=='appearance')throw Error('Prompt improvement requires DSH');return surfaceRequest(p)}
+  if(method==='augmentor/surface'){if(!['appearance','dictation'].includes(p.action))throw Error('Prompt improvement requires DSH');return surfaceRequest(p)}
   if(method==='augmentor/home')return homeConnection(p)
   if(method==='augmentor/memory')return memoryRequest(p)
   if(method==='augmentor/prompts')return promptLibrary(p)

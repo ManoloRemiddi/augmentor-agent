@@ -2,6 +2,13 @@
 
 # Browser Settings
 
+**Voice dictation — Powered by Handy** configures the same bundled service as
+Desktop, through the existing authenticated native bridge. It is available
+before connecting an agent harness. Enable/disable, editable shortcut/activation,
+model selection/download/cancellation, publisher terms, devices and retention
+controls are shared. Polling keeps unfinished edits; a stale saved revision
+requires Reload. See [the implementation and OS boundaries](HANDY-INTEGRATION.md).
+
 The browser toolbar keeps New chat, Save, History and Settings, with harness selection available only in Settings. The quick model picker remains below the composer. Colour sliders show their full hue or brightness gradients.
 Settings opens an extension-owned browser tab with Colours, Models, Harnesses,
 Prompt library, Memories and Support. Repeated and concurrent requests reuse

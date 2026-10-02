@@ -11,6 +11,17 @@ class WindowTests(unittest.TestCase):
     def setUpClass(cls):
         cls.app = QApplication.instance() or QApplication([])
 
+    def test_windows_preview_without_handy_starts_no_dictation_or_tray(self):
+        from unittest.mock import Mock, patch
+        owner=SimpleNamespace(controller=object())
+        with patch('augmentor_linux.window.sys.platform','win32'), \
+             patch('augmentor_linux.window.current_name',return_value='main'), \
+             patch('pathlib.Path.is_file',return_value=False), \
+             patch('augmentor_linux.window.threading.Thread') as thread:
+            Window.setup_dictation_tray(owner)
+        thread.assert_not_called()
+        self.assertFalse(hasattr(owner,'app_tray'))
+
     def test_mac_first_run_offers_installation_without_starting_recovery(self):
         from unittest.mock import Mock, patch
         owner=SimpleNamespace(controller=SimpleNamespace(harness='dsh',session=None,start_monitor=Mock()),

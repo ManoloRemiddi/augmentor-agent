@@ -1,0 +1,336 @@
+[
+  {
+    "packages": [
+      [
+        "Inflector",
+        "0.11.4"
+      ]
+    ],
+    "url": "https://raw.githubusercontent.com/whatisinternet/inflector/a4a95eac75043f4bffb127c7c8ec886b5b106053/LICENSE.md",
+    "sha256": "03d1bd5bfbee8d44651e7f57faf9e5b4eda4233f0d4eda36a716f2f0533d230b"
+  },
+  {
+    "packages": [
+      [
+        "alloc-stdlib",
+        "0.2.2"
+      ]
+    ],
+    "url": "https://raw.githubusercontent.com/dropbox/rust-alloc-no-stdlib/6032b6a9b20e03737135c55a0270ccffcc1438ef/LICENSE",
+    "sha256": "c0c56f26d9c051cac4d200c34c84e7ae9aaa853e01a982a1df08b09931e518ae"
+  },
+  {
+    "packages": [
+      [
+        "dasp_sample",
+        "0.11.0"
+      ]
+    ],
+    "url": "https://raw.githubusercontent.com/rustaudio/sample/97c3bb9b2363c0b46ac1633858bf1054fd02a980/LICENSE-MIT",
+    "sha256": "b1d6df41ed3aa96806e74c729444d7c121d90e6660a6aed01d298e03fde475a0"
+  },
+  {
+    "packages": [
+      [
+        "dlopen2",
+        "0.8.2"
+      ],
+      [
+        "dlopen2_derive",
+        "0.4.3"
+      ]
+    ],
+    "url": "https://raw.githubusercontent.com/OpenByteDev/dlopen2/cc80e4a0a90d499b677fdf7743699b4b3a43a989/LICENSE",
+    "sha256": "39fa265207450e77c62e90c5594a06c085b655d8374c7ced4bf7894b6bd95dd2"
+  },
+  {
+    "packages": [
+      [
+        "earshot",
+        "1.2.2"
+      ]
+    ],
+    "url": "https://raw.githubusercontent.com/pykeio/earshot/c400f15bd232dda30a297eec90235bd09066cab7/LICENSE-MIT",
+    "sha256": "e5f6595150dbac6fc41562928efd16df2786c000ee55614647249705d8746703"
+  },
+  {
+    "packages": [
+      [
+        "gtk-layer-shell",
+        "0.8.2"
+      ]
+    ],
+    "url": "https://raw.githubusercontent.com/pentamassiv/gtk-layer-shell-gir/67edd0df984e2d86a952ef9fd7bfeeb6c3b7440f/LICENSE.txt",
+    "sha256": "78897bbc947a5a8dff455448766dd7409a2be47a39cb73e30bc19d689c143653"
+  },
+  {
+    "packages": [
+      [
+        "gtk-layer-shell-sys",
+        "0.7.2"
+      ]
+    ],
+    "url": "https://raw.githubusercontent.com/pentamassiv/gtk-layer-shell-gir/9931b887a80bc8a9f59c3dbab96cbf17881758c7/LICENSE.txt",
+    "sha256": "78897bbc947a5a8dff455448766dd7409a2be47a39cb73e30bc19d689c143653"
+  },
+  {
+    "packages": [
+      [
+        "match_token",
+        "0.1.0"
+      ]
+    ],
+    "url": "https://raw.githubusercontent.com/servo/html5ever/0e4e125b8672abad4ff14d1e0043d3be9305af6a/LICENSE-MIT",
+    "sha256": "86dd7f026f916daf7511e39951ad8ea8cf55a8db67ae64060dacf829761c18f3"
+  },
+  {
+    "packages": [
+      [
+        "phf",
+        "0.8.0"
+      ],
+      [
+        "phf_codegen",
+        "0.8.0"
+      ],
+      [
+        "phf_generator",
+        "0.8.0"
+      ],
+      [
+        "phf_shared",
+        "0.8.0"
+      ]
+    ],
+    "url": "https://raw.githubusercontent.com/sfackler/rust-phf/81c7cc5b48649108428671d3b8ad151f6fbdb359/LICENSE",
+    "sha256": "d8870d5e2ab20fc50915b711c5aa7588131c9abcc1bcb980da1efd7486522a46"
+  },
+  {
+    "packages": [
+      [
+        "phf",
+        "0.10.1"
+      ]
+    ],
+    "url": "https://raw.githubusercontent.com/sfackler/rust-phf/bed01538ae576876f11189d541875d228acef9e8/LICENSE",
+    "sha256": "d8870d5e2ab20fc50915b711c5aa7588131c9abcc1bcb980da1efd7486522a46"
+  },
+  {
+    "packages": [
+      [
+        "phf_generator",
+        "0.10.0"
+      ],
+      [
+        "phf_shared",
+        "0.10.0"
+      ]
+    ],
+    "url": "https://raw.githubusercontent.com/sfackler/rust-phf/3ea14b2166553ad6e7b9afe7244144f5d661b6c6/LICENSE",
+    "sha256": "d8870d5e2ab20fc50915b711c5aa7588131c9abcc1bcb980da1efd7486522a46"
+  },
+  {
+    "packages": [
+      [
+        "phf_macros",
+        "0.10.0"
+      ]
+    ],
+    "url": "https://raw.githubusercontent.com/sfackler/rust-phf/3cc6f05cb07933af4cf886645d1170bdcb306b6b/LICENSE",
+    "sha256": "d8870d5e2ab20fc50915b711c5aa7588131c9abcc1bcb980da1efd7486522a46"
+  },
+  {
+    "packages": [
+      [
+        "rusqlite_migration",
+        "2.3.0"
+      ]
+    ],
+    "url": "https://raw.githubusercontent.com/cljoly/rusqlite_migration/10aca820577fc3c2fe1d54eb3dca07ab7e4e08bf/LICENSE.txt",
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "packages": [
+      [
+        "selectors",
+        "0.24.0"
+      ]
+    ],
+    "url": "https://raw.githubusercontent.com/servo/servo/e82d7868d999d84f6d59719e4c397e5252aecb85/LICENSE",
+    "sha256": "1af2d2b02d9c86030d29ed77117ca7a1b0e4b6ff35bcf8eeb124867d0f5cb59e"
+  },
+  {
+    "packages": [
+      [
+        "specta",
+        "2.0.0-rc.22"
+      ],
+      [
+        "specta-serde",
+        "0.0.9"
+      ],
+      [
+        "specta-typescript",
+        "0.0.9"
+      ]
+    ],
+    "url": "https://raw.githubusercontent.com/oscartbeaumont/specta/42ca9e89216848f3582e90bf961b12be4a33685e/LICENSE",
+    "sha256": "9ec86f39e235fcd35e6d91ef3fd4d6b88e5763f3ce1e296c222969986b6f6475"
+  },
+  {
+    "packages": [
+      [
+        "specta-macros",
+        "2.0.0-rc.18"
+      ]
+    ],
+    "url": "https://raw.githubusercontent.com/oscartbeaumont/specta/60ffc274e4d83134d4f57ea6df7dec8f5d72ecb6/LICENSE",
+    "sha256": "9ec86f39e235fcd35e6d91ef3fd4d6b88e5763f3ce1e296c222969986b6f6475"
+  },
+  {
+    "packages": [
+      [
+        "symphonia",
+        "0.5.5"
+      ],
+      [
+        "symphonia-bundle-flac",
+        "0.5.5"
+      ],
+      [
+        "symphonia-bundle-mp3",
+        "0.5.5"
+      ],
+      [
+        "symphonia-codec-aac",
+        "0.5.5"
+      ],
+      [
+        "symphonia-codec-pcm",
+        "0.5.5"
+      ],
+      [
+        "symphonia-codec-vorbis",
+        "0.5.5"
+      ],
+      [
+        "symphonia-core",
+        "0.5.5"
+      ],
+      [
+        "symphonia-format-isomp4",
+        "0.5.5"
+      ],
+      [
+        "symphonia-format-ogg",
+        "0.5.5"
+      ],
+      [
+        "symphonia-format-riff",
+        "0.5.5"
+      ],
+      [
+        "symphonia-metadata",
+        "0.5.5"
+      ],
+      [
+        "symphonia-utils-xiph",
+        "0.5.5"
+      ]
+    ],
+    "url": "https://raw.githubusercontent.com/pdeljanov/Symphonia/6d533f26150953a882a6a111ebd13f0abf7129d5/LICENSE",
+    "sha256": "c76f740d1521b9bed9ca7a04ad526c310493c62621b1341d623b431736533b30"
+  },
+  {
+    "packages": [
+      [
+        "tauri-specta",
+        "2.0.0-rc.21"
+      ]
+    ],
+    "url": "https://raw.githubusercontent.com/oscartbeaumont/tauri-specta/5cd56fe8a8d681ba5b649dc7fd4e2e2b001e4e57/LICENSE",
+    "sha256": "79b0c7d284efc4c2dc8da73c01a6d10c19caf61e70fca813e642dc010049eee7"
+  },
+  {
+    "packages": [
+      [
+        "tauri-specta-macros",
+        "2.0.0-rc.16"
+      ]
+    ],
+    "url": "https://raw.githubusercontent.com/oscartbeaumont/tauri-specta/6cb4dfbb7d58ff72c83f1b4bdc8471ffd4609c24/LICENSE",
+    "sha256": "79b0c7d284efc4c2dc8da73c01a6d10c19caf61e70fca813e642dc010049eee7"
+  },
+  {
+    "packages": [
+      [
+        "unic-char-property",
+        "0.9.0"
+      ],
+      [
+        "unic-char-range",
+        "0.9.0"
+      ],
+      [
+        "unic-common",
+        "0.9.0"
+      ],
+      [
+        "unic-ucd-version",
+        "0.9.0"
+      ]
+    ],
+    "url": "https://raw.githubusercontent.com/open-i18n/rust-unic/5878605364af97a3358368a6eaef02104af2e016/LICENSE-MIT",
+    "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "packages": [
+      [
+        "unic-ucd-ident",
+        "0.9.0"
+      ]
+    ],
+    "url": "https://raw.githubusercontent.com/open-i18n/rust-unic/8a6ce83063d90b91ae2ce59eddb803edd393fca9/LICENSE-MIT",
+    "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "packages": [
+      [
+        "whatlang",
+        "0.16.4"
+      ]
+    ],
+    "url": "https://raw.githubusercontent.com/greyblake/whatlang-rs/e599339cf9ad5fc29fc9d46dd4ad8d3f851c3143/LICENSE",
+    "sha256": "9fb62b415784b27e358a03677cac6b56de73425f4fdbb5f4ecf19650af5dfe0c"
+  },
+  {
+    "packages": [
+      [
+        "zune-jpeg",
+        "0.4.21"
+      ]
+    ],
+    "url": "https://raw.githubusercontent.com/etemesi254/zune-image/fa2c767a01d7d9373911d0bf63e0588553d67e0e/LICENSE.md",
+    "sha256": "c6dff146a9f31848ac296faa5a08a4253caf2c384c86f906dc99e7fc0a39cc8c"
+  },
+  {
+    "packages": [
+      [
+        "tauri-plugin",
+        "2.5.3"
+      ]
+    ],
+    "url": "https://raw.githubusercontent.com/tauri-apps/tauri/8d67af37b6d3fc0aedaab58549b1bca5b34fda19/LICENSE_MIT",
+    "sha256": "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d"
+  },
+  {
+    "packages": [
+      [
+        "clipboard-win",
+        "5.4.1"
+      ]
+    ],
+    "url": "https://raw.githubusercontent.com/DoumanAsh/clipboard-win/3b27cf2bfd1adcfa6e0264eb51c1025ddaf0f342/LICENSE",
+    "sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566"
+  }
+]
