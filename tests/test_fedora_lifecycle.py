@@ -25,4 +25,23 @@ class PackageConfiguration(unittest.TestCase):
             lease.configured('desktop')
             self.assertEqual(run.call_args.args[0][-1],'augmentor-desktop')
             self.assertEqual(run.call_args.args[0][0],'dpkg-query')
+
+    def test_explicit_next_targets_require_full_version_release_and_source(self):
+        for target,manager,version,stdout in [('opensuse-leap16.0-x86_64','rpm','0.2.13-1.leap16','augmentor-agent\n0.2.13-1.leap16\nx86_64'),
+                ('arch20261001-x86_64','pacman','0.2.13-1','augmentor-agent 0.2.13-1\n')]:
+            with self.subTest(target=target),tempfile.TemporaryDirectory() as d,patch.object(lease,'ROOT',Path(d)):
+                source={'commit':'a'*40,'dirty':False}
+                release={'version':'0.2.13','target':target,'source':source}
+                value={'format':'augmentor-linux-package-receipt/1','target':target,'manager':manager,
+                       'version':'0.2.13','source':source,'package':{'name':'augmentor-agent','versionRelease':version,'architecture':'x86_64'}}
+                (Path(d)/'release.json').write_text(json.dumps(release));receipt=Path(d)/'linux-package.json'
+                receipt.write_text(json.dumps(value))
+                with patch.object(lease.subprocess,'run',return_value=SimpleNamespace(returncode=0,stdout=stdout)) as run:
+                    lease.configured('desktop');self.assertEqual(run.call_args.args[0][0],manager)
+                with patch.object(lease.subprocess,'run',return_value=SimpleNamespace(returncode=0,stdout=stdout.replace(version,'0.2.13-99'))):
+                    with self.assertRaises(RuntimeError):lease.configured('desktop')
+                value['source']={'commit':'b'*40,'dirty':False};receipt.write_text(json.dumps(value))
+                with patch.object(lease.subprocess,'run') as run:
+                    with self.assertRaisesRegex(RuntimeError,'identity'):lease.configured('desktop')
+                    run.assert_not_called()
 if __name__=='__main__':unittest.main()

@@ -94,6 +94,13 @@ executes the generated service command, secondary wrapper and updater in private
 synthetic application fixtures. It does not enable a service or qualify graphical
 login, recovery connection or package installation.
 
+Next distro candidate source also retains `linux-package.json` in managed
+inventories and checks its explicit target/manager, product/source and full
+registered version-release. The
+[transaction contract](LINUX-PACKAGE-TRANSACTIONS.md) describes persistent
+maintenance fencing and remaining real RPM/ALPM acceptance; these targets are
+not yet enabled in the complete installer matrix.
+
 ## Required development and update workflow
 
 1. Implement and test the change in source. Build a complete runnable candidate

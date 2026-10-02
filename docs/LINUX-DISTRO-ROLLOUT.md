@@ -2,6 +2,51 @@
 
 # Linux distribution rollout
 
+## October 2 joint package guard source foundation
+
+Primary RPM/ALPM research identifies different refusal boundaries: failing RPM
+pre/preun protects its own package but other transaction elements can continue;
+ordinary ALPM pre-scriptlet return values are ignored. Arch needs an already
+installed PreTransaction hook with AbortOnFail, whose helper survives app
+removal. The [transaction contract and primary sources](LINUX-PACKAGE-TRANSACTIONS.md)
+record the separate guard bootstrap and verified post-transaction requirements.
+
+`release/linux-package-guard.py` now checks both stable lifetime leases together,
+then writes and flushes persistent intent before its ephemeral mirrors. Startup
+checks that persistent record. Finalization checks actual registered full package
+identity, matching Desktop/runtime/target/source and complete receipt inventory,
+or explicit completed removal. Query failure, wrong incoming identity, changed
+or extra payload and an incomplete transaction preserve the marker. It imports
+no application and reads no user homes. Explicit Leap/Arch receipt selection and
+managed staging retention are added; current Debian/Fedora behavior stays tested.
+The [checked source proof](../release/qualification/next-targets/20261002-joint-package-guard-source.json)
+binds exact working files, seven synthetic-root cases using real flocks and both
+actual native suites: **699 tests, two Mac-only skips, each**. Missing ephemeral
+mirrors are a synthetic reboot-state comparison; no downstream package-manager
+or actual interrupted-reboot pass is inferred. Matching builders, Arch guard
+bootstrap, explicit unchanged-old-state recovery and complete transaction tests
+remain required. New targets are not yet admitted to the complete installer.
+
+Mint's full 3,091,660,800-byte ISO now matches its authenticated SHA256. The first
+download process ended with SIGTERM; the retained partial was resumed only after
+an exact 206 Content-Range check, then the complete file was hashed. The ISO was
+not modified. Its actual Casper 1.498 script confirms the standard `url=` loader;
+actual Ubiquity 24.04.3+mint19 uses the normal automatic installer. A dedicated
+loopback answer server and blank 48 GiB UEFI disk have booted through an edited
+guest GRUB entry, and the real loader fetched the seed. The installer is copying
+files. Completion, installed Cinnamon, password authentication, product/runtime
+and graphical acceptance remain unverified. All credentials/logs remain private.
+
+Leap's GNOME 48.4/Mutter 48.4/GSD 48.1 signed pattern install completed while the
+actual SELinux enforce file stayed 1. Its minimal pattern omitted desktop portals,
+so the initial final package query exits 2 and is retained. A separate explicit
+dependency transaction passes, including portals 1.20.3/48.0, PySide 6.9.1 and
+gst-python 1.26.2. Actual GDM login/observer/application acceptance remains open.
+Hosted Linux/Mac for preceding `8ad9fdc` both pass. Current source and this new
+foundation remain separate from the unchanged installed Noble `c4b885e` artifact.
+Continue the complete original five-point scope; no owner services, devices,
+models, settings or selected release were changed.
+
 ## October 2 reboot, versioned startup and Leap Cloud boot
 
 The clean selected Noble `c4b885e` candidate now passes a normal reboot in the

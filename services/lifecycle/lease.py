@@ -10,11 +10,29 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 LOCK_ROOT = Path('/run/augmentor')
+PERSISTENT_PENDING = Path('/var/lib/augmentor-package-maintenance/pending.json')
 _leases = []
 
 
 def configured(component):
-    if (ROOT/'fedora-package.json').is_file():
+    receipt=ROOT/'linux-package.json'
+    if receipt.exists() or receipt.is_symlink():
+        value=json.loads(receipt.read_text());release=json.loads((ROOT/'release.json').read_text())
+        manager={'opensuse-leap16.0-x86_64':'rpm','arch20261001-x86_64':'pacman'}.get(value.get('target'))
+        package=value.get('package',{})
+        if (receipt.is_symlink() or value.get('format')!='augmentor-linux-package-receipt/1' or not manager
+                or value.get('manager')!=manager or value.get('target')!=release.get('target')
+                or value.get('source')!=release.get('source') or value.get('version')!=release.get('version')
+                or package.get('name')!='augmentor-agent' or package.get('architecture')!='x86_64'
+                or not isinstance(package.get('versionRelease'),str)):
+            raise RuntimeError('Invalid explicit Linux package identity.')
+        if manager=='rpm':
+            command=['rpm','-q','--qf','%{NAME}\n%{VERSION}-%{RELEASE}\n%{ARCH}','augmentor-agent']
+            expected='augmentor-agent\n'+package['versionRelease']+'\nx86_64'
+        else:
+            command=['pacman','-Q','augmentor-agent']
+            expected='augmentor-agent '+package['versionRelease']+'\n'
+    elif (ROOT/'fedora-package.json').is_file():
         command=['rpm','-q','--qf','%{VERSION}','augmentor-agent']
         expected=json.loads((ROOT/'release.json').read_text())['version']
     else:
@@ -56,7 +74,8 @@ def hold(component):
         try:
             descriptor = os.open(str(path) + '.lock', os.O_RDONLY | os.O_NOFOLLOW)
             fcntl.flock(descriptor, fcntl.LOCK_SH | fcntl.LOCK_NB)
-            if Path(str(path) + '.pending').exists():
+            if (PERSISTENT_PENDING.exists() or PERSISTENT_PENDING.is_symlink()
+                    or Path(str(path) + '.pending').exists()):
                 raise RuntimeError('Augmentor is being updated. Finish package configuration before reopening it.')
             configured(name)
         except (OSError, RuntimeError) as error:

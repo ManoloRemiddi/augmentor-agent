@@ -2,6 +2,28 @@
 
 # Start here: agent handoff
 
+## October 2 joint package guard foundation
+
+New trusted standalone Leap/Arch guard checks both leases before durable intent,
+retains interrupted state across lost `/run` mirrors and verifies complete
+registered package/payload identity before finalization. Linux startup checks
+the persistent marker, explicit target receipts check full version-release and
+managed staging retains that receipt. Seven real-flock/synthetic-root cases pass;
+both full native suites pass **699 tests, two Mac-only skips**. This is source
+foundation, not real RPM/ALPM transaction acceptance. Read the
+[candidate transaction contract](LINUX-PACKAGE-TRANSACTIONS.md) and continue the
+separate Arch guard bootstrap, matching builders, verified old-state recovery
+and downstream transaction/reboot tests. The complete installer matrix remains
+unchanged until actual acceptance. Hosted Linux/Mac `8ad9fdc` both pass.
+
+The signed Mint ISO is now complete and hashed after one validated Range resume.
+Its actual Casper 1.498/Ubiquity 24.04.3+mint19 fetched the external seed and normal
+installation is copying files; completion is unverified. Leap's signed GNOME 48.4
+pattern and explicit native/portal dependencies installed with SELinux enforcing.
+The minimal pattern omitted portals, so the initial final package query failed;
+that receipt remains preserved. Actual Leap login/observer/app and all five
+original rollout points remain active. No owner services/devices were changed.
+
 ## October 2 reboot, versioned startup and Leap boot checkpoint
 
 The clean managed Noble `c4b885e` passes actual normal guest reboot: changed boot

@@ -1,0 +1,38 @@
+{
+  "format": "augmentor-next-linux-package-guard-source-fixture/1",
+  "sourceBase": "8ad9fdc9824dfc57f6f010db18c12e96681038f7",
+  "workingFiles": {
+    "release/linux-package-guard.py": "80ac8a08edb6506810587518678996c14a42160df8db9ea7c983f538e64dd357",
+    "services/lifecycle/lease.py": "7d716a41b24b47e233fadeb27a862395fbbf67cb4fc7b6c992bc10fcfc121a2a",
+    "scripts/desktop-deployment.py": "ff7c5df6ab18637c216cea2e092fe90097de9641a16e3a5d69e77eed5dc46412",
+    "tests/test_linux_package_guard.py": "adbabf967b618d7f442b7b113e6c63c5435d43d2690ac2833ff029b95e62a36a",
+    "tests/test_lifecycle.py": "e82e25a8ae14c157685696dfc87b0d6f3c8024455c91a8f5f2295513b3f07fc9",
+    "tests/test_fedora_lifecycle.py": "f86d231dd3203b8eb6b78a999ea60aa4ce687a1522ed5ac46d892261fe30ceb5",
+    "tests/test_desktop_deployment.py": "e6a037917e0706278f248834013d5145b8ab2db8166f862d465c3a140ebbc282"
+  },
+  "syntheticJointFlockAndInterruptionTests": 7,
+  "persistentStartupFenceTest": true,
+  "explicitPackageIdentityTests": true,
+  "managedReceiptInventoryTest": true,
+  "nativeSuites": {
+    "arch": {
+      "testsRun": 699,
+      "skipped": 2,
+      "exitCode": 0,
+      "logSha256": "2ede2ee7ea70278065385044a357a67ece2ed615f19171ce7587d4c0d277c518"
+    },
+    "leap": {
+      "testsRun": 699,
+      "skipped": 2,
+      "exitCode": 0,
+      "logSha256": "b0f9539167d3dcbe567c42b61c333ee044bf5cbcf20904ae002242fa04b9880a"
+    }
+  },
+  "realPackageManagerTransactionsTested": false,
+  "realMultiuserLeasesTested": false,
+  "realInterruptedRebootTested": false,
+  "suseRpmBuilderImplemented": false,
+  "archPkgbuilderImplemented": false,
+  "publicReleaseQualified": false,
+  "ownerStateChanged": false
+}

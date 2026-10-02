@@ -89,6 +89,15 @@ class LifecycleTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError,'no integrations were changed'):maintenance.owned_integrations('desktop')
             self.assertTrue(owned.exists())
 
+    def test_persistent_maintenance_survives_missing_run_mirrors(self):
+        with tempfile.TemporaryDirectory() as name:
+            root=Path(name);(root/'release.json').write_text('{}')
+            (root/'augmentor-runtime.lock').touch();pending=root/'persistent-pending.json';pending.write_text('{}')
+            with patch.object(lease,'ROOT',root),patch.object(lease,'LOCK_ROOT',root),\
+                    patch.object(lease,'PERSISTENT_PENDING',pending),patch.object(lease,'configured') as configured:
+                with self.assertRaisesRegex(RuntimeError,'maintenance'):lease.hold('runtime')
+                configured.assert_not_called();self.assertFalse(lease._leases)
+
     def test_backup_obeys_configured_paths_and_preserves_private_data(self):
         with tempfile.TemporaryDirectory() as name:
             root=Path(name);config=root/'custom-config';config.mkdir();(config/'secret.json').write_text('fixture credential')

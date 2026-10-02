@@ -53,6 +53,14 @@ class DeploymentTests(unittest.TestCase):
         self.assertEqual(self.tool.read(self.tool.DATA/'desktop.previous.json'),updated)
         self.assertTrue(release.exists())
 
+    def test_staging_keeps_explicit_next_distro_package_receipt_immutable(self):
+        marker={'format':'augmentor-linux-package-receipt/1','target':'opensuse-leap16.0-x86_64','manager':'rpm'}
+        (self.source/'linux-package.json').write_text(json.dumps(marker))
+        release=self.stage();self.assertEqual(self.tool.read(release/'linux-package.json'),marker)
+        (release/'linux-package.json').write_text(json.dumps({**marker,'manager':'dpkg'}))
+        with self.assertRaisesRegex(ValueError,'changed after staging'):self.tool.activate(release)
+        self.assertEqual(self.tool.read(self.tool.DATA/'desktop.json'),self.selected)
+
     def test_staged_fedora_artifact_keeps_its_package_backend(self):
         lifecycle=self.source/'services/lifecycle';lifecycle.mkdir(parents=True)
         shutil.copy2(ROOT/'services/lifecycle/lease.py',lifecycle/'lease.py')
