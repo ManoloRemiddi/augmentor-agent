@@ -46,8 +46,11 @@ the query tools execute. The two finite package sets are explicit in the module.
 Each policy's `systemQtStack` contract records the published inventory's exact
 SHA256/size, manager and expected Qt version. The policy identity includes that
 contract in both Python and Node. Noble vendor and source-Qt identities and
-their loader behavior retain their existing contracts. Node's fast selector
-still refuses Arch/Leap; its complete target admission remains next work.
+their loader behavior retain their existing contracts. Node now admits only the
+two exact system profiles, host identities, ABI, wheel sets and native manifest
+contracts. Its fast selector checks the private runtime receipt and import
+versions, rejects loader overrides and leaves the full installed-package/byte
+verification to the cold Python wrapper before exec.
 
 Preparation verifies the pinned system inventory before the ABI/import child
 Python executes, then creates a separate private runtime at its final path and
@@ -118,10 +121,29 @@ left the old Qt permission helper and failed; that795-case attempt and corrected
 797-case prior snapshot are retained separately. All release, installed-product,
 dependency maintenance, licensing and embedded-source gates remain false.
 
+## Actual Node and Browser selection
+
+[The additional checkpoint](../release/qualification/next-targets/20261002-system-qt-node-admission.json)
+records new UID1000 source-only fixtures based on `cbcce18`. Both execute the
+actual cold Python wrapper and checksum-pinned Node24.19.0, then agree across
+explicit/implicit runtime discovery, component environment and Browser voice
+Python selection. Both refuse an explicit system interpreter, three loader
+overrides and a modified native manifest; `finally` restores the manifest and
+the runtime receipt stays byte-identical. This is discovery/verification evidence,
+not Browser rendering, a microphone, installed product or package-lifetime lease.
+
+Five focused Node cases include20 malformed policy variants across the two
+profiles. TypeScript checking and compilation pass. An earlier private driver
+used the wrong receipt key after successful Arch preparation; that attempt is
+retained separately and the corrected proof uses fresh app/runtime paths.
+[`probe-system-qt-node.mjs`](../release/probe-system-qt-node.mjs) records exact
+compiled/source hashes and accepts only marked UID1000 source fixtures. Complete
+installer/package/maintenance and recipient-source qualification remain open.
+
 ## Next complete-package work
 
 Add explicit target contracts and generic declared-runtime checks to the complete
-installer; extend Node's selector using the same host/ABI/profile rules; use
+installer; use
 Leap's `/usr/bin/python3.13` bootstrap in every generated wrapper. Build a
 distinct Leap RPM and Arch application PKGBUILD with full target receipts and
 matching policies/wheels/system inventory. Keep Arch's guard installed in its

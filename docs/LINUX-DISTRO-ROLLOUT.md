@@ -2,6 +2,20 @@
 
 # Linux distribution rollout
 
+## October 2 Arch/Leap Node admission
+
+The compiled selector now admits only the exact Arch/Leap system-Qt profiles.
+New UID1000 fixtures execute full cold Python verification before pinned Node,
+then prove explicit/implicit Desktop/component/Browser voice discovery and six
+refusals with restored manifests and byte-identical receipts. See
+[the owning guide](LINUX-SYSTEM-QT-STACK.md#actual-node-and-browser-selection) and
+[working-source report](../release/qualification/next-targets/20261002-system-qt-node-admission.json).
+Five focused Node cases cover20 malformed policies. Complete target installers,
+packages, installed lifetime leases, graphical Browser/audio/maintenance and
+legal acceptance remain open; all five rollout points stay active. Current main
+has advanced again; these proofs qualify the recorded files, not that later merge.
+
+
 ## October 2 canonical main integration
 
 Current main3c1dddf's dictation component is retained alongside distro runtime
