@@ -11,6 +11,7 @@ import json
 import os
 from pathlib import Path
 import select
+import sys
 import subprocess
 import tempfile
 import time
@@ -22,6 +23,9 @@ OUT=ROOT/'outputs/handy-proof'
 def command(args):return subprocess.check_output(args,text=True).strip()
 
 def main():
+    broker_mode='--broker' in sys.argv
+    sys.path.insert(0,str(ROOT/'apps/native'))
+    from augmentor_linux import dictation
     OUT.mkdir(parents=True,exist_ok=True)
     app=QApplication([]);target=QTextEdit();target.setWindowTitle('External application · Dictation proof');target.resize(620,180);target.show();target.setFocus()
     time.sleep(.2);app.processEvents()
@@ -35,12 +39,14 @@ def main():
         env={**os.environ,'AUGMENTOR_HANDY_EMBEDDED':'1','HANDY_DISABLE_UPDATER':'1','XDG_DATA_HOME':str(workspace/'data'),'XDG_CONFIG_HOME':str(workspace/'config'),
              'ALSA_CONFIG_PATH':str(workspace/'alsa.conf'),'WEBKIT_DISABLE_COMPOSITING_MODE':'1','GDK_BACKEND':'x11','XDG_SESSION_TYPE':'x11','PULSE_SOURCE':sink+'.monitor','WEBKIT_DISABLE_DMABUF_RENDERER':'1'}
         env.pop('WAYLAND_DISPLAY',None);env['LANG']='C.UTF-8';env['LC_ALL']='C.UTF-8'
+        env['AUGMENTOR_DICTATION_STATE']=str(workspace/'broker')
         sequence=0
         def pause(seconds):
             end=time.monotonic()+seconds
             while time.monotonic()<end:app.processEvents();time.sleep(.01)
         def call(method,params=None):
             nonlocal sequence
+            if broker_mode:return dictation.request(method,params or {},start=False,timeout=35)
             sequence+=1;ident=sequence
             child.stdin.write((json.dumps({'id':ident,'method':method,'params':params or {}})+'\n').encode());child.stdin.flush()
             deadline=time.monotonic()+30
@@ -61,7 +67,13 @@ def main():
             raise RuntimeError('Expected '+phase+', got '+str(state))
         try:
             with open(OUT/'component.log','w') as log:
-                child=subprocess.Popen([str(ROOT/'components/handy/runtime/bin/handy')],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=log,env=env)
+                if broker_mode:
+                    os.environ.clear();os.environ.update(env)
+                    child=subprocess.Popen([sys.executable,str(ROOT/'services/dictation/server.py')],stderr=log,env=env)
+                    for _ in range(100):
+                        try:call('status');break
+                        except RuntimeError:pause(.05)
+                else:child=subprocess.Popen([str(ROOT/'components/handy/runtime/bin/handy')],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=log,env=env)
                 state=call('status');assert state['enabled'] is False and state['tray'] is False
                 call('enable',{'enabled':True});ready('ready')
                 subprocess.run(['espeak-ng','-w',str(workspace/'speech.wav'),'Voice dictation works inside this separate application.'],check=True)
@@ -71,7 +83,8 @@ def main():
                 sources=json.loads(command(['pactl','--format=json','list','sources']))
                 index=next(source['index'] for source in sources if source['name']==sink+'.monitor')
                 captures=json.loads(command(['pactl','--format=json','list','source-outputs']))
-                ours=[source for source in captures if source.get('properties',{}).get('application.process.id')==str(child.pid)]
+                native_pid=command(['cat','/proc/'+str(child.pid)+'/task/'+str(child.pid)+'/children']).split()[0] if broker_mode else str(child.pid)
+                ours=[source for source in captures if source.get('properties',{}).get('application.process.id')==native_pid]
                 assert ours and all(str(source['source'])==str(index) for source in ours),repr({'expected':index,'captures':[{'source':v.get('source'),'pid':v.get('properties',{}).get('application.process.id')} for v in captures]})
                 audio=subprocess.Popen(['paplay','--device='+sink,str(workspace/'input.wav')])
                 pause(.5)
@@ -93,15 +106,17 @@ def main():
                 command(['xdotool','mousemove','--window',str(overlay),str(int(bounds['WIDTH'])//2+66),str(int(bounds['HEIGHT'])-20),'click','1'])
                 ready('ready');command(['xdotool','keyup','space','shift','ctrl']);pause(.3)
                 assert target.toPlainText()==original,'Cancelled recording inserted text'
-                token='proof-conversation'
-                call('conversation.acquire',{'token':token});command(['xdotool','keydown','ctrl+shift+space']);pause(.2)
+                token='a'*32
+                call('conversation.acquire',{'token':token,'pid':os.getpid()});command(['xdotool','keydown','ctrl+shift+space']);pause(.2)
                 assert call('status')['phase']!='recording','Two microphone owners admitted'
                 command(['xdotool','keyup','space','shift','ctrl']);call('conversation.release',{'token':token})
                 call('enable',{'enabled':False});state=call('status');assert state['enabled'] is False and state['phase']=='disabled'
-                child.stdin.close();child.wait(timeout=5);assert child.returncode==0
+                if broker_mode:call('shutdown')
+                else:child.stdin.close()
+                child.wait(timeout=5);assert child.returncode==0
                 result={'schema':'augmentor-handy-proof/1','transcript':text,'virtualMicrophone':True,'physicalMicrophoneUsed':False,
-                        'defaultCtrlSpace':True,'shortcutCustomisation':True,'liveThemeChanged':True,'focusPreserved':True,'closeButtonCancelled':True,'cancelPreservedText':True,'microphoneOwnership':True,'disabled':True,'parentExit':True,'tray':False}
-                (OUT/'result.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result))
+                        'defaultCtrlSpace':True,'shortcutCustomisation':True,'liveThemeChanged':True,'focusPreserved':True,'closeButtonCancelled':True,'cancelPreservedText':True,'microphoneOwnership':True,'disabled':True,'parentExit':True,'tray':False,'authenticatedBroker':broker_mode}
+                (OUT/('broker-result.json' if broker_mode else 'result.json')).write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result))
         finally:
             if child and child.poll() is None:
                 child.terminate()

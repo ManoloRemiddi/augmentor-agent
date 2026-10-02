@@ -13,6 +13,12 @@ class DictationSettingsDialog(QDialog):
         super().__init__(window);self.busy=False;self.snapshot={};self.closed=False;self.dirty=False;self.saved_revision=None;self.model_rows={}
         self.setWindowTitle('System dictation · Powered by Handy');self.resize(460,480)
         self.completed.connect(self.receive);outer=QVBoxLayout(self);scroll=QScrollArea();scroll.setWidgetResizable(True);body=QWidget();layout=QVBoxLayout(body);scroll.setWidget(body);outer.addWidget(scroll)
+        # QScrollArea otherwise paints the system's white viewport beneath a
+        # dark inherited label palette. Keep the hosted form on the app surface.
+        body.setObjectName('dictationBody')
+        background=dictation.theme(window.preferences.values)['background']
+        self.link_colour=dictation.theme(window.preferences.values)['accent']
+        scroll.setStyleSheet(f'QScrollArea {{background:{background};border:0;}} QWidget#dictationBody {{background:{background};}}')
         identity=QHBoxLayout();orb=VoiceButton(self);orb.configure(window.accent,window.preferences.values['animation']);orb.setEnabled(False)
         identity.addWidget(orb);identity.addWidget(QLabel('Handy\nLocal speech-to-text, built into Augmentor'));layout.addLayout(identity)
         self.enabled=QCheckBox('Enable system dictation');layout.addWidget(self.enabled)
@@ -63,7 +69,8 @@ class DictationSettingsDialog(QDialog):
         import html
         row=self.model_rows.get(self.models.currentData(),{})
         url=row.get('model_card','https://handy.computer')
-        self.terms.setText(html.escape(row.get('license','Publisher terms'))+' · <a href="'+html.escape(url,quote=True)+'">Model card and terms</a>'+('<br><a href="'+html.escape(row['base_model_card'],quote=True)+'">Original model terms</a>' if row.get('base_model_card') else ''))
+        link_style=' style="color:'+self.link_colour+'"'
+        self.terms.setText(html.escape(row.get('license','Publisher terms'))+' · <a'+link_style+' href="'+html.escape(url,quote=True)+'">Model card and terms</a>'+('<br><a'+link_style+' href="'+html.escape(row['base_model_card'],quote=True)+'">Original model terms</a>' if row.get('base_model_card') else ''))
 
     def download_model(self):
         row=self.model_rows.get(self.models.currentData(),{})
