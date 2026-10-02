@@ -2,6 +2,22 @@
 
 # Start here: agent handoff
 
+## October 2 browser and computer capability correction
+
+[Desktop control](DESKTOP-CONTROL.md#october-2-browser-capability-discovery-and-input-dispatch)
+records task ownership/capability discovery guidance and framework-managed browser
+input dispatch. Five input regressions, all 70 Browser cases, nine related
+capability/policy cases, six DSH composition checks, all 480 root cases (478 passed, two opt-in skips), and type/build checks pass.
+Real-browser React input/textarea saved-state verification passed. This does not
+establish every application's GUI support or live Google Forms acceptance.
+Existing desktop consent, Stop, platform limits and document-target checks remain.
+Installed adoption must preserve compatible artifact versions and saved identity
+snapshots; the guide distinguishes extension reload from source publication.
+Implementation `dffa45c` is pushed in PR #31; the compatible installed Linux
+release is selected and DSH guidance reloaded with idle/readiness checks.
+Primary retains its draft and original UI process; extension file replacement
+is complete but loaded-worker reload remains pending. See the installed checkpoint.
+
 ## October 1 merge blockers: current main and separate Codex prerequisite
 
 The feature branch integrates canonical main `8c3be5a` at merge `338dbc5`.
