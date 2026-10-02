@@ -89,6 +89,18 @@ class DictationTests(unittest.TestCase):
             self.backend.request('settings',{'revision':'42/0','values':{'shortcut':'ctrl+space'}})
             self.assertEqual(calls.call_args.args[1]['revision'],0)
 
+    def test_timed_out_voice_request_cannot_be_admitted_after_slow_model_work(self):
+        from unittest.mock import Mock
+        value={'token':'a'*32,'pid':os.getpid(),'expires_at':100}
+        with patch.object(broker.time,'time_ns',return_value=101),patch.object(self.backend,'call') as native:
+            with self.assertRaisesRegex(RuntimeError,'expired'):self.backend.request('conversation.acquire',value)
+            native.assert_not_called();self.assertIsNone(self.backend.owner)
+        self.backend.child=Mock();self.backend.child.poll.return_value=None
+        with patch.object(broker.time,'time_ns',side_effect=[99,101]),patch.object(self.backend,'call') as native:
+            with self.assertRaisesRegex(RuntimeError,'expired'):self.backend.request('conversation.acquire',value)
+            self.assertEqual([entry.args[0] for entry in native.call_args_list],['conversation.acquire','conversation.release'])
+            self.assertEqual(native.call_args.args[1]['token'],value['token']);self.assertIsNone(self.backend.owner)
+
     def test_private_authenticated_ipc_and_single_owner(self):
         with patch.dict(os.environ,{'AUGMENTOR_DICTATION_STATE':str(self.base)}):
             state=dictation.request('status');self.assertFalse(state['enabled']);self.assertFalse(state['tray'])

@@ -28,7 +28,14 @@ def prepare(target):
         source = Path(temp)/('Handy-'+spec['commit'])
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copytree(source, target)
-    subprocess.run(['git','apply',str(ROOT/'components/handy/augmentor.patch')],cwd=target,check=True)
+    # An extracted archive has no .git. Without its own repository, git apply
+    # discovers Augmentor's parent checkout and silently skips supplier paths.
+    # Establish a local build root before checking and applying the exact patch.
+    subprocess.run(['git','init','--quiet'],cwd=target,check=True)
+    patch=str(ROOT/'components/handy/augmentor.patch')
+    subprocess.run(['git','apply','--check',patch],cwd=target,check=True)
+    subprocess.run(['git','apply',patch],cwd=target,check=True)
+    subprocess.run(['git','apply','--reverse','--check',patch],cwd=target,check=True)
     shutil.copy2(ROOT/'components/handy/embedding.rs',target/'src-tauri/src/embedding.rs')
     shutil.copy2(ROOT/'components/handy/AugmentorOverlay.tsx',target/'src/overlay/AugmentorOverlay.tsx')
     return spec

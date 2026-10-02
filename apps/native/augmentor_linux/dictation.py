@@ -82,7 +82,7 @@ class MicrophoneLease:
         if self.token: return
         token=secrets.token_hex(16)
         self.token=token
-        try:request('conversation.acquire',{'token':token,'pid':os.getpid()},timeout=2)
+        try:request('conversation.acquire',{'token':token,'pid':os.getpid(),'expires_at':time.time_ns()+2_000_000_000},timeout=2)
         except Exception:
             # The acknowledgement may be lost after admission. Release that
             # exact token; an unknown result must not strand microphone ownership.

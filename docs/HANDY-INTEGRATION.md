@@ -56,6 +56,9 @@ Resonant Voice acquires a token before opening its microphone and releases that
 exact token when capture closes. Dictation cannot record while conversation
 capture owns it, and conversation capture cannot interrupt dictation. A lost
 acquire acknowledgement releases its token; dead process owners are reaped.
+Acquire requests also carry an admission deadline: work queued behind a slow
+model change cannot reserve the microphone after the caller has timed out.
+The deadline applies before and after native admission, never to active capture.
 Maintenance refuses active capture and retires an idle broker before promotion.
 
 | Platform | Shortcut / insertion adapter | Qualification boundary |
@@ -139,6 +142,10 @@ OS/architecture/source/build-input cache key. Intake rechecks its full inventory
 and the actual lifecycle proof still runs; no partial-key restoration is allowed.
 A cached build or a diagnostic artifact from a failed lifecycle job is not
 qualified. Product packaging waits for successful component jobs.
+Source preparation creates its own local build repository before applying the
+patch; build and staging verify the reverse patch and owned source hashes.
+This prevents Git from discovering the parent Augmentor checkout and silently
+skipping Handy paths when preparing an extracted supplier archive.
 
 Local verification on 2 October 2026 includes actual release compilation,
 Clippy, TypeScript frontend/build checks, the broker authentication/revision/theme/
@@ -208,11 +215,13 @@ The separate root input service remains independently owned; Augmentor uses its
 own non-root daemon/private socket instead.
 
 This is an installed Linux adoption, not public all-platform release qualification.
-The first remote component run compiled/linted Linux and Mac, but their lifecycle
-proofs failed on the hosted environments; Windows compilation exposed a Vulkan
-CMake dependency despite the CPU Cargo configuration. Follow-up source improves
-full startup diagnostics, isolated software-rendered X11 testing, explicitly
-disables Windows Vulkan in CMake and retains checked builds for repeat proof.
+The first remote runs exposed source preparation discovering Augmentor's parent
+Git checkout and silently skipping the supplier patch. Those compiled/linted
+artifacts were standalone Handy, not qualified embedded components. Source now
+establishes an independent build root and verifies all patch/source inputs before
+compilation and staging. Full startup diagnostics identified the failure; the
+workflow also uses isolated software-rendered X11 testing, explicitly disables
+Windows Vulkan in CMake and retains checked builds for repeat proof.
 Mac/Windows installer/compositor/permission acceptance remains open until those
 jobs and the product package proofs pass. No physical microphone acceptance is
 claimed from virtual input tests or successful enable/status alone.

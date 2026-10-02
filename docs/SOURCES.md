@@ -2,6 +2,24 @@
 
 # Source baselines and migration inventory
 
+## Embedded Handy — 2 October 2026
+
+[Handy v0.9.7](https://github.com/cjpais/Handy/tree/05e0aedd2906f0d82722735f930465950c476b90)
+is pinned to `05e0aedd2906f0d82722735f930465950c476b90`; its source archive
+SHA-256 is `3e21340416d3c46ca4497329d5d0a17b5ef1bb12fe1f2ade35dec36fad71470b`.
+The original MIT notice is retained with the independently authored embedding
+patch. Rust 1.97.1, Bun 1.3.10, ONNX Runtime 1.24.2 and transcribe-cpp 0.2.3
+are the tested build inputs. The checked runtime includes original dependency
+notices, the Silero VAD notice and complete source/build instructions for the
+independent AGPL-3.0 ydotool helper. Model weights are separate downloads with
+their own disclosed publisher licenses; code licensing does not cover them.
+
+Actual Linux component, broker, virtual-microphone recording/paste and installed
+ownership cutover pass. Read [the integration guide](HANDY-INTEGRATION.md) for
+exact artifact/source identities and qualification limits. Mac and Windows
+hosted lifecycle and complete installer acceptance remain separate gates;
+compiled artifacts or cached builds do not establish those gates.
+
 ## Codex foundation — 30 September 2026
 
 `@openai/codex` 0.159.2 is pinned as a **development dependency** in the root

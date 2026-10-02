@@ -30,6 +30,13 @@ def run(args,cwd):
     if os.name=='nt' and args[0]=='npx':args=['cmd.exe','/d','/c',*args]
     return subprocess.run(args,cwd=cwd,check=True)
 
+def verify_source(source):
+    top=Path(subprocess.check_output(['git','rev-parse','--show-toplevel'],cwd=source,text=True).strip())
+    if top.resolve()!=source.resolve():raise ValueError('Handy source must have its own build repository; refusing parent-checkout patch discovery.')
+    subprocess.run(['git','apply','--reverse','--check',str(ROOT/'components/handy/augmentor.patch')],cwd=source,check=True)
+    for name,target in (('embedding.rs','src-tauri/src/embedding.rs'),('AugmentorOverlay.tsx','src/overlay/AugmentorOverlay.tsx')):
+        if sha(ROOT/'components/handy'/name)!=sha(source/target):raise ValueError('Handy source does not contain the reviewed '+name)
+
 def ort_runtime(source):
     config=json.loads((ROOT/'components/handy/onnxruntime.json').read_text())
     target=sys.platform+'-'+platform.machine()
@@ -148,6 +155,7 @@ def notices(source,metadata,output,cargo_home=None):
     (destination/'components.json').write_text(json.dumps({'rust':rows,'frontend':frontend,'resources':silero,'rustStandardLibrary':'Rust-standard-library.html','frontendScope':'Runtime dependency closure; compiler/build tools are excluded.'},indent=2)+'\n')
 
 def stage(source,output,metadata,cargo_home=None):
+    verify_source(source)
     if output.exists():raise ValueError('Choose a new component output directory.')
     output.mkdir(parents=True);(output/'bin').mkdir()
     executable='handy.exe' if os.name=='nt' else 'handy'
@@ -178,7 +186,7 @@ def stage(source,output,metadata,cargo_home=None):
     if sys.platform.startswith('linux'):helper(output)
     record={'schema':'augmentor-handy-build/1','target':sys.platform+'-'+platform.machine(),'upstream':json.loads((ROOT/'components/handy/upstream.json').read_text()),
         'patchSha256':sha(ROOT/'components/handy/augmentor.patch'),'embeddedSources':{name:sha(ROOT/'components/handy'/name) for name in ('embedding.rs','AugmentorOverlay.tsx')},
-        'onnxruntime':item,'buildInputs':{name:sha(ROOT/name) for name in ('scripts/build-handy.py','components/handy/onnxruntime.json','components/handy/ydotool.json','components/handy/silero.json','components/handy/notice-supplements.json')},'files':{file.relative_to(output).as_posix():sha(file) for file in sorted(output.rglob('*')) if file.is_file()},'modelsBundled':False}
+        'onnxruntime':item,'buildInputs':{name:sha(ROOT/name) for name in ('scripts/build-handy.py','scripts/prepare-handy.py','components/handy/onnxruntime.json','components/handy/ydotool.json','components/handy/silero.json','components/handy/notice-supplements.json')},'files':{file.relative_to(output).as_posix():sha(file) for file in sorted(output.rglob('*')) if file.is_file()},'modelsBundled':False}
     (output/'BUILD.json').write_text(json.dumps(record,indent=2)+'\n')
     print(output)
 
@@ -187,6 +195,7 @@ if __name__=='__main__':
     args=parser.parse_args();source=args.source.resolve()
     if not source.exists():
         spec=importlib.util.spec_from_file_location('prepare',ROOT/'scripts/prepare-handy.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.prepare(source)
+    verify_source(source)
     if not args.stage_only:
         run(['npx','--yes','bun@1.3.10','install','--frozen-lockfile'],source)
         run(['npx','--yes','bun@1.3.10','run','build'],source)

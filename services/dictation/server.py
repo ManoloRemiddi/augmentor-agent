@@ -192,9 +192,14 @@ class Backend:
                     self.stop()
                 self.preferences['enabled']=params['enabled'];self.save();return {}
             if method=='conversation.acquire':
+                expires=params.get('expires_at')
+                if expires is not None and (type(expires) is not int or expires<=time.time_ns()):raise RuntimeError('Voice input request expired; start voice again.')
                 if self.owner and self.owner['token']!=params.get('token'):raise RuntimeError('Microphone is busy in another Augmentor conversation.')
                 if not isinstance(params.get('token'),str) or len(params['token'])!=32 or type(params.get('pid')) is not int or params['pid']<=0:raise ValueError('Invalid microphone owner.')
                 if self.child and self.child.poll() is None:self.call(method,{'token':params['token']})
+                if expires is not None and expires<=time.time_ns():
+                    if self.child and self.child.poll() is None:self.call('conversation.release',{'token':params['token']})
+                    raise RuntimeError('Voice input request expired; start voice again.')
                 self.owner=params.copy();return {}
             if method=='conversation.release':
                 if self.owner and self.owner['token']==params.get('token'):
