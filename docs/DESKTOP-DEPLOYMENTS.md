@@ -133,6 +133,18 @@ external symlinks are refused because they could silently change a release.
 Python bytecode caches are excluded. Python and an external Node runtime remain
 explicit external dependencies and must be upgraded deliberately with validation.
 
+For a Linux artifact declaring `linux-python-runtime.json`, staging selects the
+runtime belonging to that candidate's policy rather than inheriting a previous
+profile. The policy is retained in the immutable artifact inventory. Setup,
+startup registration, cold launch and promotion verify the external environment's
+complete receipt/files/imports. The environment stays at its original private
+path; it is never copied, renamed or upgraded in place. Rollback retains both
+environments. Active Node helpers use receipt/configuration validation without
+blocking their event loop on Python imports. The
+[Noble selection proof](LINUX-DISTRO-ROLLOUT.md#noble-runtime-selection-and-cpu-vad)
+qualifies this in an offline ordinary-user container; actual Noble package/DSH
+service upgrade coordination and full desktop acceptance remain open.
+
 Promotion verifies the complete staged inventory, repeats import checks and,
 for this registered DSH installation, verifies the candidate's authenticated
 product identity and model catalog against the running integration. It makes no

@@ -1,0 +1,228 @@
+{
+  "format": "augmentor-noble-runtime-selection-fixture/1",
+  "target": "ubuntu24.04-amd64",
+  "proofSha256": "b182adcdab190f2bbe85871e0dbe6b8f85fc03120290a854a38476bfc1b65ec9",
+  "sourceFileSha256": {
+    "scripts/linux-python-runtime.py": "afe3684e0dc75f2c15853a403c5d726bc72f08213933f4fa1d7758807d16386f",
+    "scripts/setup-complete.py": "91e26c06535be93909e1b074cc1bacd2782c096e9539be0719edcf468ae64e53",
+    "scripts/desktop-deployment.py": "85db3e0e7bf180f7c130d21acad9e103352a2b14f4c3fa76e25f3c31543adb2d",
+    "scripts/install-desktop-startup.py": "edc88b646ffb344d9dc322cf896ec68041b7799be4289e33e996f12a20f4eb41",
+    "scripts/desktop-launch.py": "fae87462a12f3ebc07b801c38054d7fc5459eed86ac082a9e51bc00ab73dd9e6",
+    "scripts/run-component.py": "a6f2a65c40e918b9e6a32bde2174322d22c7e80e265275a606016388b32746dc",
+    "scripts/qt-library-inventory.py": "e2e59773aab64604dc5322ac1608d78d732ee58771d37d1ba298af593eb1fba0",
+    "packages/platform/src/python.ts": "1a3dff52f5c69f73cc811bba63e77730aa8a3724b675d66dd0a2c5c888b18cb3",
+    "packages/platform/src/index.ts": "a753474a50afd46850eb5af811413b69ac9f771e173093ed8f35843f727a1c42",
+    "apps/browser/shared/voice-client.mjs": "bf058b4ad7cb7d3e8c55313077d635b3109121654b2a50e2ea964841b4821d78",
+    "apps/native/augmentor_linux/voice_vad.py": "62dbeb4f2eb95a568528da9a268f8db8d500a9fab94beb3962da31eb6bd0a8f0"
+  },
+  "policySha256": "2c58df0f7538526963bd44beb075965c4a339bf36ddae6db41b1ebc70133026b",
+  "basicLockIdentity": "48f27d2c7dcef7856538aa199cbdfe51202444e2422724f11dd6312912d600cd",
+  "speechLockIdentity": "81b66921d3a2eb01518845f06e9cee177a533f780214bc6e020a1e44f66290b0",
+  "speechArtifactSha256": "90b4c986248f2796e5e7c11cf20046dfc4070aebdcc1aa5fcb6839eb5bd94948",
+  "imports": {
+    "pythonAbi": [
+      3,
+      12
+    ],
+    "qtVersion": "6.8.2",
+    "managedVersions": {
+      "PySide6-Essentials": "6.8.2.1",
+      "shiboken6": "6.8.2.1",
+      "Pygments": "2.18.0",
+      "keyring": "25.6.0",
+      "sounddevice": "0.5.2",
+      "onnxruntime": "1.28.0",
+      "protobuf": "7.35.1"
+    },
+    "systemVersions": {
+      "SecretStorage": "3.3.3",
+      "jeepney": "0.8.0",
+      "cryptography": "41.0.7",
+      "cffi": "1.16.0",
+      "numpy": "1.26.4",
+      "PyYAML": "6.0.1",
+      "websocket-client": "1.7.0",
+      "jaraco.classes": "3.2.1",
+      "jaraco.context": "4.3.0",
+      "jaraco.functools": "4.0.0",
+      "more-itertools": "10.2.0"
+    },
+    "origins": {
+      "PySide6": "/home/augmentor-proof/.local/share/augmentor/python-runtimes/noble-cp312-x86_64-voice-81b66921d3a2eb01/lib/python3.12/site-packages/PySide6/__init__.py",
+      "shiboken6": "/home/augmentor-proof/.local/share/augmentor/python-runtimes/noble-cp312-x86_64-voice-81b66921d3a2eb01/lib/python3.12/site-packages/shiboken6/__init__.py",
+      "pygments": "/home/augmentor-proof/.local/share/augmentor/python-runtimes/noble-cp312-x86_64-voice-81b66921d3a2eb01/lib/python3.12/site-packages/pygments/__init__.py",
+      "keyring": "/home/augmentor-proof/.local/share/augmentor/python-runtimes/noble-cp312-x86_64-voice-81b66921d3a2eb01/lib/python3.12/site-packages/keyring/__init__.py",
+      "sounddevice": "/home/augmentor-proof/.local/share/augmentor/python-runtimes/noble-cp312-x86_64-voice-81b66921d3a2eb01/lib/python3.12/site-packages/sounddevice.py",
+      "gi": "/usr/lib/python3/dist-packages/gi/__init__.py",
+      "numpy": "/usr/lib/python3/dist-packages/numpy/__init__.py",
+      "yaml": "/usr/lib/python3/dist-packages/yaml/__init__.py",
+      "websocket": "/usr/lib/python3/dist-packages/websocket/__init__.py",
+      "cffi": "/usr/lib/python3/dist-packages/cffi/__init__.py",
+      "secretstorage": "/usr/lib/python3/dist-packages/secretstorage/__init__.py",
+      "jeepney": "/usr/lib/python3/dist-packages/jeepney/__init__.py"
+    },
+    "gtkVersion": [
+      4,
+      14,
+      5
+    ],
+    "portaudioVersion": [
+      1246720,
+      "PortAudio V19.6.0-devel, revision 396fe4b6699ae929d3a685b3ef8a7e97396139a4"
+    ],
+    "explicitCredentialBackend": "keyring.backends.SecretService.Keyring",
+    "speechDependencies": {
+      "onnxruntime": "1.28.0",
+      "protobuf": "7.35.1",
+      "flatbuffers": "2.0.8+dfsg1",
+      "packaging": "24.0",
+      "availableProviders": [
+        "AzureExecutionProvider",
+        "CPUExecutionProvider"
+      ],
+      "origins": {
+        "onnxruntime": "/home/augmentor-proof/.local/share/augmentor/python-runtimes/noble-cp312-x86_64-voice-81b66921d3a2eb01/lib/python3.12/site-packages/onnxruntime/__init__.py",
+        "google.protobuf": "/home/augmentor-proof/.local/share/augmentor/python-runtimes/noble-cp312-x86_64-voice-81b66921d3a2eb01/lib/python3.12/site-packages/google/protobuf/__init__.py",
+        "flatbuffers": "/usr/lib/python3/dist-packages/flatbuffers/__init__.py",
+        "packaging": "/usr/lib/python3/dist-packages/packaging/__init__.py"
+      }
+    },
+    "secretServiceLifecycleTested": false,
+    "physicalAudioTested": false,
+    "handsFreeTested": false
+  },
+  "node": {
+    "selected": [
+      "/home/augmentor-proof/.local/share/augmentor/python-runtimes/noble-cp312-x86_64-voice-81b66921d3a2eb01/bin/python3",
+      "/home/augmentor-proof/.local/share/augmentor/python-runtimes/noble-cp312-x86_64-voice-81b66921d3a2eb01/bin/python3",
+      "/home/augmentor-proof/.local/share/augmentor/python-runtimes/noble-cp312-x86_64-voice-81b66921d3a2eb01/bin/python3"
+    ],
+    "wrongInterpreterRefused": true,
+    "missingRuntimeRefused": true
+  },
+  "offlineSevenWheelPrepare": true,
+  "setupReusedVerifiedRuntime": true,
+  "stagePreservedSelection": true,
+  "stagedPolicyInventoryCovered": true,
+  "newArtifactSelectedOwnRuntime": true,
+  "rollbackPreservedBothRuntimes": true,
+  "componentColdEnvironmentFullyVerified": true,
+  "packageLifetimeLeaseTested": false,
+  "tamperedConfigurationRefusedWithoutRepair": true,
+  "vad": {
+    "providers": [
+      "CPUExecutionProvider"
+    ],
+    "frames": 64,
+    "resetDeterministic": true,
+    "finiteProbabilities": true,
+    "stateShape": [
+      2,
+      1,
+      128
+    ],
+    "alteredModelRefused": true,
+    "numpyVersion": "1.26.4",
+    "nativeBinaries": [
+      {
+        "path": "onnxruntime/capi/libonnxruntime.so.1.28.0",
+        "bytes": 24272944,
+        "sha256": "aa4079d18f4ea7a5f3a94d80cd4bbe0f2740436626622d64d793803a20381083",
+        "resolvedDependencies": [
+          "linux-vdso.so.1 (0x00007fe12992d000)",
+          "\tlibdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007fe1281ef000)",
+          "\tlibrt.so.1 => /lib/x86_64-linux-gnu/librt.so.1 (0x00007fe1281ea000)",
+          "\tlibpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007fe1281e5000)",
+          "\tlibstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007fe127f67000)",
+          "\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fe127e7e000)",
+          "\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fe127e4e000)",
+          "\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fe127c3b000)",
+          "\t/lib64/ld-linux-x86-64.so.2 (0x00007fe12992f000)"
+        ]
+      },
+      {
+        "path": "onnxruntime/capi/libonnxruntime_providers_shared.so",
+        "bytes": 14632,
+        "sha256": "086ec1d5388f64153d9c63470d126693db9a182c8ce236d3a1119068471b8a0d",
+        "resolvedDependencies": [
+          "linux-vdso.so.1 (0x00007fe165e47000)",
+          "\tlibstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007fe165bb9000)",
+          "\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fe165ad0000)",
+          "\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fe165aa2000)",
+          "\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fe16588f000)",
+          "\t/lib64/ld-linux-x86-64.so.2 (0x00007fe165e49000)"
+        ]
+      },
+      {
+        "path": "onnxruntime/capi/onnxruntime_pybind11_state.cpython-312-x86_64-linux-gnu.so",
+        "bytes": 25887664,
+        "sha256": "6a31ea840051445c5176aface4c7474e09f40dd22d3e2d1106a52ef86d55fd83",
+        "resolvedDependencies": [
+          "linux-vdso.so.1 (0x00007fd1362d5000)",
+          "\tlibdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007fd134a0b000)",
+          "\tlibrt.so.1 => /lib/x86_64-linux-gnu/librt.so.1 (0x00007fd134a06000)",
+          "\tlibpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007fd134a01000)",
+          "\tlibstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007fd134783000)",
+          "\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fd134698000)",
+          "\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fd13466a000)",
+          "\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fd134457000)",
+          "\t/lib64/ld-linux-x86-64.so.2 (0x00007fd1362d7000)"
+        ]
+      },
+      {
+        "path": "google/_upb/_message.abi3.so",
+        "bytes": 406232,
+        "sha256": "685c76567dcef743e9a404bc201598c31c0a21013ec9e2e402fa47091b11e650",
+        "resolvedDependencies": [
+          "linux-vdso.so.1 (0x00007f35a5fa7000)",
+          "\tlibstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f35a5ccc000)",
+          "\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f35a5be3000)",
+          "\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f35a59d0000)",
+          "\t/lib64/ld-linux-x86-64.so.2 (0x00007f35a5fa9000)",
+          "\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f35a59a2000)"
+        ]
+      }
+    ],
+    "nativeSymlinks": [],
+    "minimumCpuQualified": false
+  },
+  "modelSha256": "1a153a22f4509e292a94e67d6f9b85e8deb25b4988682b7e174c65279d8788e3",
+  "modelSource": "https://raw.githubusercontent.com/snakers4/silero-vad/v6.2.1/src/silero_vad/data/silero_vad.onnx",
+  "installedProductTested": false,
+  "connectedHarnessTested": false,
+  "gnomeLoginTested": false,
+  "physicalAudioTested": false,
+  "handsFreeAcceptanceTested": false,
+  "licenseReviewComplete": false,
+  "embeddedSourceCoverageComplete": false,
+  "sourceScope": {
+    "kind": "working-source-file-hashes",
+    "baseCommit": "217c0c776a36820d401f80b12cfa2c16f1c8a28d",
+    "cleanFinalPackage": false
+  },
+  "fixture": {
+    "ordinaryUser": true,
+    "network": "none",
+    "imageId": "sha256:da899f741facd8a70640030ade129af9945c74d2b60aba188667a0a37cb6dd45",
+    "dockerfileSha256": "ed80c713644207f5b7a378193c13dc962f87dc436e9d501d1492b72bc2268b5e",
+    "nodeVersion": "v24.19.0"
+  },
+  "commonSourceChecks": {
+    "native": {
+      "cases": 661,
+      "passed": 659,
+      "skipped": 2,
+      "logSha256": "e917bf3d688a30704c898cfee91d9d0ffd654942f33f6609492ef700b02b350e"
+    },
+    "javascript": {
+      "cases": 493,
+      "passed": 491,
+      "skipped": 2,
+      "failed": 0,
+      "cancelled": 0,
+      "logSha256": "778fca54471c580480d74ebf9a5f28b05aa4a9d63519ba7ef65087631275b860"
+    },
+    "typescriptCheckAndBuild": true,
+    "fixtureScope": "Common source checks use separate Fedora/Debian test dependencies; not Noble installed-product evidence."
+  }
+}

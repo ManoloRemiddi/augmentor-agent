@@ -4,6 +4,7 @@
 import argparse
 import fcntl
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -17,6 +18,11 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def install(root, python, node, dsh_service=None, enable=True):
+    marker=Path(root)/'linux-python-runtime.json'
+    if marker.exists() or marker.is_symlink():
+        spec=importlib.util.spec_from_file_location('startup_linux_python',Path(root)/'scripts/linux-python-runtime.py')
+        runtime=importlib.util.module_from_spec(spec);spec.loader.exec_module(runtime)
+        runtime.resolve(root,python)
     data = Path(os.environ.get('XDG_DATA_HOME', Path.home()/'.local/share'))/'augmentor'
     data.mkdir(parents=True, exist_ok=True, mode=0o700)
     with (data/'deployment.lock').open('a') as lock:

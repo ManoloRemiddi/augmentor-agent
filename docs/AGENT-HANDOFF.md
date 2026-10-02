@@ -2,6 +2,24 @@
 
 # Start here: agent handoff
 
+## October 2 Noble runtime selection and CPU VAD checkpoint
+
+The autonomous Linux rollout continues. Working source based on `217c0c7` now
+connects declared immutable Noble runtimes to setup before DSH configuration,
+DSH service environment, native startup, Browser/runtime cold launch, shared
+Node selection and managed staging/rollback. The separate seven-wheel profile
+adds verified ONNX Runtime/protobuf while retaining system NumPy and GI. Its
+actual offline ordinary-user proof passes both-profile preparation/reuse,
+candidate selection/rollback, Node/Browser agreement, corruption refusal and
+unchanged CPU-only Silero inference. The checked report records exact file hashes
+and explicit package/harness/physical/CPU-floor/license gaps.
+See [the current checkpoint and next steps](LINUX-DISTRO-ROLLOUT.md#noble-runtime-selection-and-cpu-vad).
+The Noble package target remains disabled pending real target-specific package/
+complete setup proofs. Full compatibility is not complete; continue the existing
+GNOME/control, other-distro, installed product and release gates. Owner services,
+model/GPU settings, the modified original checkout and installed selections remain
+preserved. Historical five-wheel evidence and Fedora VM reports remain separate.
+
 ## October 1 Linux distribution rollout in progress
 
 The owner authorized autonomous Fedora/Ubuntu and major Linux distro implementation.

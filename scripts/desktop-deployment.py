@@ -75,11 +75,15 @@ def verify(root):
 
 def check(config, connected=False):
     root = Path(config['root'])
+    if (root/'linux-python-runtime.json').exists() or (root/'linux-python-runtime.json').is_symlink():
+        spec = importlib.util.spec_from_file_location('candidate_linux_python', root/'scripts/linux-python-runtime.py')
+        runtime = importlib.util.module_from_spec(spec); spec.loader.exec_module(runtime)
+        runtime.resolve(root, config['python'])
     if '--ensure-running' not in (root/'apps/native/augmentor_linux/window.py').read_text():
         raise ValueError('This build lacks the supervised startup protocol.')
     env = {**os.environ, 'PYTHONPATH':str(root/'apps/native'),
            'PYTHONDONTWRITEBYTECODE':'1', 'QT_QPA_PLATFORM':'offscreen',
-           'AUGMENTOR_PI_NODE':config['node']}
+           'AUGMENTOR_PI_NODE':config['node'], 'AUGMENTOR_PYTHON':config['python']}
     code = 'from augmentor_linux import window, controller\n'
     if connected and config.get('dshService'):
         # This reads the matching product identity and model catalog. No prompts,
@@ -113,12 +117,16 @@ def stage(source, source_ref, python=None, node=None):
             if (source/part).is_dir():
                 shutil.copytree(source/part, temporary/part, symlinks=True,
                                 ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '.git', '.env', 'outputs'))
-        for part in ('package.json', 'package-lock.json', 'release.json', 'fedora-package.json', 'LICENSE', 'README.md', 'distribution-exclusions.json', 'distribution-overrides.json'):
+        for part in ('package.json', 'package-lock.json', 'release.json', 'fedora-package.json', 'linux-python-runtime.json', 'LICENSE', 'README.md', 'distribution-exclusions.json', 'distribution-overrides.json'):
             if (source/part).is_file():
                 target = temporary/part; target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(source/part, target)
         config = dict(current, root=str(temporary), python=str(Path(python or current['python']).absolute()),
                       node=str(Path(node or current['node']).absolute()))
+        if (source/'linux-python-runtime.json').exists() or (source/'linux-python-runtime.json').is_symlink():
+            spec = importlib.util.spec_from_file_location('staged_linux_python', source/'scripts/linux-python-runtime.py')
+            runtime = importlib.util.module_from_spec(spec); spec.loader.exec_module(runtime)
+            config['python'] = runtime.resolve(source, python)
         # A bundled interpreter follows the copy; venv symlinks must not resolve.
         for key in ('python', 'node'):
             path = Path(config[key])

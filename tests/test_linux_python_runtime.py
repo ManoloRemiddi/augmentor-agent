@@ -117,6 +117,28 @@ class RuntimeTests(unittest.TestCase):
         other['wheels'][0]['sha256'] = '1'*64
         self.assertNotEqual(runtime.identity(other), runtime.identity(self.value))
 
+    def test_declared_artifact_cannot_fall_back_to_another_interpreter(self):
+        app=self.home/'app';app.mkdir()
+        (app/runtime.POLICY_FILE).write_text(json.dumps(self.value))
+        with patch.object(runtime,'verify') as verify:
+            with self.assertRaisesRegex(ValueError,'does not match'):
+                runtime.resolve(app,'/usr/bin/python3')
+        verify.assert_not_called()
+
+    def test_artifact_selects_its_own_profile_instead_of_prior_selection(self):
+        app=self.home/'app';app.mkdir()
+        (app/runtime.POLICY_FILE).write_text(json.dumps(self.value))
+        with patch.dict(runtime.os.environ,{'XDG_DATA_HOME':str(self.home/'data')}),patch.object(runtime,'verify') as verify:
+            chosen=runtime.resolve(app)
+        expected=self.home/'data/augmentor/python-runtimes'/(self.value['profile']+'-'+runtime.identity(self.value)[:16])
+        self.assertEqual(chosen,str(expected/'bin/python3'))
+        verify.assert_called_once_with(self.value,expected)
+
+    def test_broken_policy_symlink_cannot_be_treated_as_absent(self):
+        (self.home/runtime.POLICY_FILE).symlink_to(self.home/'missing')
+        with self.assertRaisesRegex(ValueError,'regular artifact'):
+            runtime.resolve(self.home)
+
 
 if __name__ == '__main__':
     unittest.main()

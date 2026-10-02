@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-secretstorage python3-jeepney python3-cryptography \
     python3-jaraco.classes python3-jaraco.context python3-jaraco.functools \
     python3-more-itertools python3-cffi python3-cffi-backend \
-    python3-numpy python3-yaml python3-websocket \
+    python3-numpy python3-yaml python3-websocket python3-flatbuffers \
     gir1.2-gtk-4.0 gir1.2-atspi-2.0 gir1.2-gstreamer-1.0 \
     at-spi2-core gstreamer1.0-plugins-base gstreamer1.0-pipewire \
     libportaudio2 libgl1 libegl1 libopengl0 libglib2.0-0t64 \

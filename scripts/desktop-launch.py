@@ -2,6 +2,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """One installed build for login, menu, shortcuts, secondary windows and recovery."""
 import json
+import importlib.util
 import os
 from pathlib import Path
 import socket
@@ -102,6 +103,10 @@ def main(args):
         root = Path(config['root'])
         if not (root/'apps/native/augmentor_linux/window.py').is_file():
             raise RuntimeError('The selected desktop release is missing.')
+    if (root/'linux-python-runtime.json').exists() or (root/'linux-python-runtime.json').is_symlink():
+        spec = importlib.util.spec_from_file_location('selected_linux_python', root/'scripts/linux-python-runtime.py')
+        runtime = importlib.util.module_from_spec(spec); spec.loader.exec_module(runtime)
+        runtime.resolve(root, config['python'])
     env = {**os.environ, 'PYTHONPATH':str(root/'apps/native'), 'AUGMENTOR_PYTHON':config['python'], 'AUGMENTOR_PI_NODE':config['node'],
            'PI_TELEMETRY':'0', 'PI_SKIP_VERSION_CHECK':'1'}
     if config.get('dshService'): env['AUGMENTOR_DSH_SERVICE'] = config['dshService']

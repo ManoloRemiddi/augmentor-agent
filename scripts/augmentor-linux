@@ -6,6 +6,10 @@ set -euo pipefail
 project_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 export PYTHONPATH="$project_dir/apps/native${PYTHONPATH:+:$PYTHONPATH}"
 augmentor_python="${AUGMENTOR_PYTHON:-/usr/bin/python3}"
+if [[ -e "$project_dir/linux-python-runtime.json" || -L "$project_dir/linux-python-runtime.json" ]]; then
+  augmentor_python="$(/usr/bin/python3 "$project_dir/scripts/linux-python-runtime.py" resolve --app-root "$project_dir")"
+fi
+export AUGMENTOR_PYTHON="$augmentor_python"
 # KWin honors the X11 keep-above request through XWayland. Native Wayland
 # keep-above is compositor-specific; retain an explicit platform override.
 if [[ -z "${QT_QPA_PLATFORM:-}" && "${XDG_SESSION_TYPE:-}" == wayland && -n "${DISPLAY:-}" ]]; then

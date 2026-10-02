@@ -52,6 +52,12 @@ helper's consent identity or portal restart registration; see the
 
 The canonical Linux launcher exports the selected Python interpreter to child
 helpers. DSH's Linux support uses the same shared executable/environment
-adapter. The Ubuntu 24.04 managed-runtime foundation and its explicit system
-GI bridge are tracked in [the distro rollout](../../docs/LINUX-DISTRO-ROLLOUT.md);
-its import/render fixture does not yet qualify a Noble installation.
+adapter. Artifacts declaring `linux-python-runtime.json` select an immutable
+ordinary-user runtime. Setup prepares it before DSH configuration and passes
+the selected interpreter to DSH's service. Desktop and Browser/runtime cold
+launch perform full verification; active Node helpers use bounded receipt and
+configuration checks. Browser voice shares this selection. The Ubuntu 24.04
+proof includes offline preparation, managed selection/rollback and actual CPU
+Silero inference; its system GI bridge and remaining package/desktop/voice gates
+are tracked in [the distro rollout](../../docs/LINUX-DISTRO-ROLLOUT.md#noble-runtime-selection-and-cpu-vad).
+This does not yet qualify a Noble installation.

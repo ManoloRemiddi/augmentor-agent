@@ -23,6 +23,9 @@ import urllib.request
 FORMAT = 'augmentor-linux-python-wheels/1'
 RECEIPT = 'augmentor-python-runtime.json'
 MANAGED = {'pyside6-essentials', 'shiboken6', 'pygments', 'keyring', 'sounddevice'}
+PROFILES = {'noble-cp312-x86_64': MANAGED,
+            'noble-cp312-x86_64-voice': MANAGED | {'onnxruntime', 'protobuf'}}
+POLICY_FILE = 'linux-python-runtime.json'
 
 
 def digest(path):
@@ -37,14 +40,15 @@ def normalized(name):
 def policy(path):
     value = json.loads(Path(path).read_text())
     if (value.get('format') != FORMAT or value.get('target') != 'ubuntu24.04-amd64'
-            or value.get('profile') != 'noble-cp312-x86_64'
+            or value.get('profile') not in PROFILES
             or value.get('python') != '/usr/bin/python3.12'
             or value.get('pythonAbi') != [3, 12] or value.get('architecture') != 'x86_64'
             or value.get('systemSitePackages') is not True):
         raise ValueError('Unsupported Linux Python runtime policy.')
     rows = value.get('wheels', [])
-    if len(rows) != len(MANAGED) or {normalized(r['name']) for r in rows} != MANAGED:
-        raise ValueError('The complete reviewed five-wheel overlay is required.')
+    expected = PROFILES[value['profile']]
+    if len(rows) != len(expected) or {normalized(r['name']) for r in rows} != expected:
+        raise ValueError('The complete reviewed wheel set for this profile is required.')
     for row in rows:
         if (Path(row['file']).name != row['file'] or not row['file'].endswith('.whl')
                 or not re.fullmatch('[0-9a-f]{64}', row['sha256'])
@@ -152,7 +156,16 @@ for row in value['wheels']:
 import PySide6,shiboken6,pygments,keyring,sounddevice,gi,numpy,yaml,websocket,cffi,secretstorage,jeepney
 from PySide6 import QtCore,QtGui,QtWidgets,QtNetwork,QtDBus,QtSvg,QtQuick,QtQuickWidgets
 from keyring.backends.SecretService import Keyring
-for module in [PySide6,shiboken6,pygments,keyring,sounddevice]:
+managed=[PySide6,shiboken6,pygments,keyring,sounddevice]
+speech={}
+if any(r['name']=='onnxruntime' for r in value['wheels']):
+ import onnxruntime,google.protobuf,flatbuffers,packaging
+ managed.extend([onnxruntime,google.protobuf])
+ speech={'onnxruntime':md.version('onnxruntime'),'protobuf':md.version('protobuf'),
+  'flatbuffers':md.version('flatbuffers'),'packaging':md.version('packaging'),
+  'availableProviders':onnxruntime.get_available_providers(),
+  'origins':{m.__name__:str(pathlib.Path(m.__file__).resolve()) for m in [onnxruntime,google.protobuf,flatbuffers,packaging]}}
+for module in managed:
  assert pathlib.Path(module.__file__).resolve().is_relative_to(root),module.__name__
 gi.require_version('Gtk','4.0');gi.require_version('Gst','1.0');gi.require_version('Atspi','2.0')
 from gi.repository import Gtk,Gst,Atspi
@@ -164,6 +177,7 @@ print(json.dumps({'pythonAbi':list(sys.version_info[:2]),'qtVersion':QtCore.qVer
  'gtkVersion':[Gtk.get_major_version(),Gtk.get_minor_version(),Gtk.get_micro_version()],
  'portaudioVersion':sounddevice.get_portaudio_version(),
  'explicitCredentialBackend':Keyring.__module__+'.'+Keyring.__name__,
+ 'speechDependencies':speech,
  'secretServiceLifecycleTested':False,'physicalAudioTested':False,'handsFreeTested':False}))
 '''
 
@@ -236,14 +250,50 @@ def prepare(value, wheelhouse, store):
             raise
 
 
+def runtime_store():
+    data = Path(os.environ.get('XDG_DATA_HOME', Path.home()/'.local/share'))
+    if not data.is_absolute():
+        raise ValueError('XDG_DATA_HOME must be an absolute path.')
+    return data/'augmentor/python-runtimes'
+
+
+def resolve(app, python=None):
+    """Validate a declared runtime without preparing or changing selection."""
+    app = Path(app).absolute()
+    marker = app/POLICY_FILE
+    if marker.is_symlink():
+        raise ValueError('Linux Python policy must be a regular artifact file.')
+    if not marker.exists():
+        return str(python or '/usr/bin/python3')
+    value = policy(marker)
+    name = value['profile']+'-'+identity(value)[:16]
+    if python:
+        chosen = Path(python).absolute()
+        root = chosen.parent.parent
+        if chosen != root/'bin/python3' or root.name != name:
+            raise ValueError('The selected Python does not match this artifact runtime policy.')
+    else:
+        root = runtime_store()/name
+        chosen = root/'bin/python3'
+    verify(value, root)
+    return str(chosen)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=('download', 'prepare', 'verify'))
-    parser.add_argument('--policy', type=Path, required=True)
+    parser.add_argument('command', choices=('download', 'prepare', 'verify', 'resolve'))
+    parser.add_argument('--policy', type=Path)
     parser.add_argument('--wheelhouse', type=Path)
     parser.add_argument('--store', type=Path)
     parser.add_argument('--runtime', type=Path)
+    parser.add_argument('--app-root', type=Path)
+    parser.add_argument('--python', type=Path)
     args = parser.parse_args()
+    if args.command == 'resolve':
+        if args.app_root is None:parser.error('--app-root is required')
+        print(resolve(args.app_root, args.python or os.environ.get('AUGMENTOR_PYTHON')))
+        return
+    if args.policy is None:parser.error('--policy is required')
     value = policy(args.policy)
     if args.command == 'download':
         if args.wheelhouse is None:parser.error('--wheelhouse is required')

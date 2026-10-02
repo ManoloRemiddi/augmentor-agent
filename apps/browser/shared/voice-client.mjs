@@ -5,8 +5,11 @@ import {readFileSync} from 'node:fs'
 import {fileURLToPath} from 'node:url'
 import path from 'node:path'
 import os from 'node:os'
+import {declaredLinuxPython} from '../../../dist/platform/src/index.js'
 
 export function voicePython(root, env=process.env){
+  const declared=declaredLinuxPython(root,env)
+  if(declared)return declared
   if(env.AUGMENTOR_PYTHON)return env.AUGMENTOR_PYTHON
   try{
     const descriptor=JSON.parse(readFileSync(path.join(env.XDG_DATA_HOME??path.join(os.homedir(),'.local/share'),'augmentor/desktop.json'),'utf8'))
@@ -21,8 +24,9 @@ export class BrowserVoice {
   async start({sessionId,id,handsFree=false}){
     if(!/^[a-f0-9-]{36}$/.test(id??'')||typeof sessionId!=='string')throw Error('Invalid voice identity')
     if(this.active)throw Error('Voice is already open. Close it before opening another voice session.')
-    const worker=this.spawnWorker(voicePython(this.root),['-u',path.join(this.root,'services/voice/browser-client.py')],{
-      stdio:['pipe','pipe','ignore'],env:{...process.env,AUGMENTOR_WINDOW_ID:'main'},
+    const python=voicePython(this.root)
+    const worker=this.spawnWorker(python,['-u',path.join(this.root,'services/voice/browser-client.py')],{
+      stdio:['pipe','pipe','ignore'],env:{...process.env,AUGMENTOR_PYTHON:python,AUGMENTOR_WINDOW_ID:'main'},
     })
     const active={id,sessionId,worker,submitted:new Set(),buffer:''};this.active=active
     const emit=event=>{if(this.active===active)this.notify({method:'voice.event',params:{id,sessionId,...event}})}
@@ -82,7 +86,8 @@ export class BrowserVoice {
 
 export function voicePreferences(value,root=fileURLToPath(new URL('../../../',import.meta.url))){
   return new Promise((resolve,reject)=>{
-    const child=spawn(voicePython(root),[path.join(root,'services/voice/preferences.py')],{stdio:['pipe','pipe','ignore'],env:{...process.env,AUGMENTOR_WINDOW_ID:'main'}})
+    const python=voicePython(root)
+    const child=spawn(python,[path.join(root,'services/voice/preferences.py')],{stdio:['pipe','pipe','ignore'],env:{...process.env,AUGMENTOR_PYTHON:python,AUGMENTOR_WINDOW_ID:'main'}})
     let output='';const timer=setTimeout(()=>{child.kill();reject(Error('Voice settings did not respond.'))},25000)
     child.on('error',error=>{clearTimeout(timer);reject(error)})
     child.stdin.on('error',()=>{})

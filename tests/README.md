@@ -378,3 +378,17 @@ Task reliability: `tests/dsh-context-budget.test.mjs`, `tests/dsh-execution.test
 `tests/test_reply_completion.py` and `tests/test_desktop_profile.py` exercise
 deterministic evidence/recovery, UI and Linux capability-discovery contracts. The opt-in `scripts/task-reliability-proof.mjs` checks a real local
 model with restricted read-only tools; see [scope and limits](../docs/TASK-RELIABILITY.md).
+
+### Noble runtime selection
+
+`test_linux_python_runtime.py`, `test_complete_setup.py` and
+`linux-python-selection.test.mjs` cover runtime identity, checksum/path refusal,
+bundle-target mismatch, service interpreter propagation and broken-policy
+refusal. Python and Node calculate the same identity for both locked profiles.
+`release/prove-noble-runtime-selection.py` requires a fresh ordinary-user Ubuntu
+24.04 fixture, the verified seven-wheel cache, exact Silero v6.2.1 model and
+bundled Node. Run it offline against the built source. It prepares both profiles,
+reuses the runtime through setup, verifies selection/stage/rollback, executes
+Node/Browser selection and the actual CPU VAD, and checks corruption refusal.
+The [checked report and limits](../docs/LINUX-DISTRO-ROLLOUT.md#noble-runtime-selection-and-cpu-vad)
+remain distinct from a package, connected harness, GNOME or physical audio proof.

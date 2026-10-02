@@ -4,18 +4,23 @@ import {existsSync,lstatSync,mkdirSync} from 'node:fs';
 import {homedir,userInfo} from 'node:os';
 import {dirname,join,delimiter} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {declaredLinuxPython} from './python.js';
+export {declaredLinuxPython,pythonRuntimeIdentity} from './python.js';
 
 const root=fileURLToPath(new URL('../../../',import.meta.url));
 export function pythonExecutable(){
+  const declared=declaredLinuxPython(root);
+  if(declared)return declared;
   if(process.env.AUGMENTOR_PYTHON)return process.env.AUGMENTOR_PYTHON;
   const bundled=join(root,'python/bin/python3');
   return existsSync(bundled)?bundled:process.platform==='linux'?'/usr/bin/python3':'python3';
 }
 export function componentEnvironment():NodeJS.ProcessEnv {
-  const env:NodeJS.ProcessEnv={...process.env,AUGMENTOR_PYTHON:pythonExecutable(),PYTHONDONTWRITEBYTECODE:'1'};
+  const python=pythonExecutable();
+  const env:NodeJS.ProcessEnv={...process.env,AUGMENTOR_PYTHON:python,PYTHONDONTWRITEBYTECODE:'1'};
   const node=join(root,'node/bin/node');
   if(existsSync(node))env.AUGMENTOR_PI_NODE??=node;
-  env.PATH=[...(existsSync(node)?[dirname(node)]:[]),dirname(pythonExecutable()),env.PATH??''].join(delimiter);
+  env.PATH=[...(existsSync(node)?[dirname(node)]:[]),dirname(python),env.PATH??''].join(delimiter);
   if(process.platform==='darwin'){
     const base=join(homedir(),'Library/Application Support/Augmentor');
     env.XDG_CONFIG_HOME??=join(base,'config');env.XDG_DATA_HOME??=join(base,'data');env.XDG_STATE_HOME??=join(base,'state');

@@ -1306,3 +1306,93 @@ no failures or cancellations. The source build and TypeScript check also pass.
 The Noble checked report records the distinct common-source fixture and log
 hashes; these JavaScript/native checks are not a Noble installed-product proof.
 Hosted confirmation follows clean publication.
+
+### Noble runtime selection and CPU VAD
+
+The next working-source stage connects the Noble runtime to product entrypoints.
+An artifact declares its full wheel policy as `linux-python-runtime.json`.
+Setup verifies the bundle/payload identity, prepares the declared environment at
+its final ordinary-user path **before** DSH configuration and carries
+`AUGMENTOR_PYTHON` through temporary setup, the DSH service and native startup.
+The candidate package must provide its verified `python-wheels` cache. Existing
+non-Noble targets retain their system-site-packages/sounddevice setup. Noble
+without a policy, a policy for a different bundle target, a broken policy link,
+an incorrect interpreter and a missing/changed runtime fail without fallback.
+The Noble package target itself remains disabled until its package proof exists.
+
+Startup registration, Desktop cold launch, Browser/runtime component cold launch
+and update preflight verify the complete runtime receipt, file inventory and
+imports before using the interpreter. Managed staging copies and inventories
+the policy and chooses the candidate's profile, retaining earlier environments
+for rollback. It does not rename/copy/upgrade a venv. Active Node helpers use the
+same lock identity with private receipt/configuration/interpreter checks, without
+running synchronous Python/import subprocesses on their event loop. This is
+selection validation; it is not continuous verification of every imported file.
+Browser voice selection uses this shared adapter and exports its chosen Python
+to the worker. Artifacts without a declared Linux policy retain their existing
+Linux/macOS selection behavior.
+
+The existing five-wheel profile/report remains a distinct historical foundation.
+The additional `noble-cp312-x86_64-voice` profile locks exactly seven wheels,
+adding [ONNX Runtime 1.28.0](https://pypi.org/pypi/onnxruntime/1.28.0/json) and
+[protobuf 7.35.1](https://pypi.org/pypi/protobuf/7.35.1/json) from primary PyPI
+metadata. Actual downloaded bytes match those metadata hashes. ONNX Runtime
+requires protobuf >=4.25.8, beyond Noble's 3.21.12. The actual fixture retains
+system NumPy 1.26.4, packaging 24.0 and explicitly installs system flatbuffers
+2.0.8; no Torch/CUDA or NumPy upgrade is introduced. GI remains supplied by system
+Python 3.12. The real CPU VAD proof succeeds with this dependency combination;
+metadata eligibility alone is not counted as inference evidence.
+
+[The checked selection report](../release/qualification/ubuntu24.04/runtime-selection.json)
+comes from `release/prove-noble-runtime-selection.py` in a fresh, offline,
+ordinary-user Ubuntu 24.04 container using the pinned official base in
+`release/ubuntu24-runtime.Dockerfile`. Source scope is working files based on
+clean `217c0c7`, with exact behavior/proof hashes. It prepares both environments
+offline, reuses the seven-wheel environment through the real setup function,
+registers startup without enabling services, and performs actual staged
+import/Node validation, selection and rollback. The selected candidate chooses
+the seven-wheel interpreter despite the prior five-wheel selection, and both
+environments remain present. Actual Node platform/environment and Browser voice
+selection agree; incorrect/missing interpreters and deliberately changed
+configuration are refused without repair. Cold component environment verification
+also passes. This does not exercise an installed package lifetime lease or a
+connected DSH service upgrade.
+
+The speech profile identity is
+`81b66921d3a2eb01518845f06e9cee177a533f780214bc6e020a1e44f66290b0`.
+The unchanged desktop `voice_vad.py` runs the exact upstream
+[Silero v6.2.1 model](https://github.com/snakers4/silero-vad/tree/v6.2.1), checksum
+`1a153a22f4509e292a94e67d6f9b85e8deb25b4988682b7e174c65279d8788e3`.
+The independently downloaded model matches that checksum. Its actual session
+uses only CPUExecutionProvider, retains one inter/intra-op thread, processes 64
+synthetic 512-sample frames, returns finite probabilities, maintains float32
+state `(2,1,128)`, resets deterministically and rejects a changed model. Four
+ONNX/protobuf ELF binaries are hashed and their actual linked system libraries
+resolve without missing dependencies. Minimum CPU qualification remains false.
+No physical capture, playback, echo, interruption, external ASR or hands-free
+acceptance is claimed.
+
+The first selection fixture omitted the candidate's wheel cache and correctly
+failed setup's wheel verification; it is not a pass. Adding the actual verified
+cache yields the recorded proof. The initial common native fixture omitted Node
+and failed 13 existing recovery/lifecycle tests; it is not a pass. With the
+declared bundled Node prerequisite, the common suite initially passes 660 cases (658
+passes/two Mac-only skips). The complete JavaScript suite passes 493 cases (491
+passes/two skips), with no failures/cancellations; TypeScript check/build and
+runtime/setup/staging/startup focused checks pass. Final source after
+component-launch hardening and the added maintenance-order case passes 661
+native cases (659 passes/two skips). The checked report records log hashes.
+Hosted CI confirmation of this new source remains separate. At the previous
+clean `217c0c7` checkpoint, Mac 14/26, Debian, Home, Browser, installed lifecycle,
+Ubuntu 26.04 and Fedora 43 are confirmed passing; Fedora 44 is still running.
+
+Native redistribution review remains separate: ONNX's
+[ThirdPartyNotices](https://github.com/microsoft/onnxruntime/blob/v1.28.0/ThirdPartyNotices.txt)
+and [embedded dependency pins](https://github.com/microsoft/onnxruntime/blob/v1.28.0/cmake/deps.txt)
+include components beyond Python wheel metadata. Preserve Qt replacement/source
+obligations, ONNX/protobuf notices and the [Silero MIT notice](https://github.com/snakers4/silero-vad/blob/v6.2.1/LICENSE).
+The policy/receipt/report license and embedded-source gates remain false.
+Next: Noble target-specific package dependencies and complete wheel-cache bundle,
+fresh-user/resume/native/Browser/credentials proofs, matching managed DSH/runtime
+upgrades, actual GNOME 46/Cinnamon and physical speech acceptance. Mint, openSUSE,
+Arch and GNOME control consent/input/Stop work remain in the full objective.

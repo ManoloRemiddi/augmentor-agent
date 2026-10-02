@@ -43,12 +43,29 @@ class CompleteSetupTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'Unsafe'):setup.verify_bundle(root)
 
     def test_service_keeps_credentials_out_of_command_and_restarts(self):
-        text=setup.service(['/path with spaces/node','/runtime/dsh','web'],'/private dsh/home','/private/model.env')
+        text=setup.service(['/path with spaces/node','/runtime/dsh','web'],'/private dsh/home','/private/model.env','/private runtime/bin/python3')
         self.assertIn('Restart=on-failure',text)
         self.assertIn('EnvironmentFile="/private/model.env"',text)
         self.assertIn('"/path with spaces/node"',text)
         self.assertNotIn('apiKey',text)
         self.assertIn('UMask=0077',text)
+        self.assertIn('Environment="AUGMENTOR_PYTHON=/private runtime/bin/python3"',text)
+
+    def test_noble_without_declared_runtime_cannot_use_legacy_pip_fallback(self):
+        with tempfile.TemporaryDirectory() as directory,patch.object(setup,'run') as run:
+            app=Path(directory)
+            with self.assertRaisesRegex(ValueError,'required Python runtime policy'):
+                setup.prepare_python(app,app/'data','ubuntu24.04-amd64')
+            run.assert_not_called()
+
+    def test_declared_runtime_must_match_bundle_before_preparation(self):
+        with tempfile.TemporaryDirectory() as directory,patch.object(setup,'run') as run:
+            app=Path(directory);(app/'scripts').mkdir()
+            (app/'linux-python-runtime.json').write_bytes((ROOT/'release/ubuntu24.04-python.json').read_bytes())
+            (app/'scripts/linux-python-runtime.py').write_bytes((ROOT/'scripts/linux-python-runtime.py').read_bytes())
+            with self.assertRaisesRegex(ValueError,'differs from the bundle target'):
+                setup.prepare_python(app,app/'data','fedora44-x86_64')
+            run.assert_not_called()
 
     def test_same_version_old_or_dirty_payload_cannot_configure_new_bundle(self):
         manifest={'version':'0.2.13','sourceCommit':'a'*40}

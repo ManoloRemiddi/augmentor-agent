@@ -76,12 +76,29 @@ def environment_value(value):
     return '"'+value.replace('\\','\\\\').replace('"','\\"')+'"'
 
 
-def service(command, home, credentials):
+def service(command, home, credentials, python=None):
     def field(value):return '"'+str(value).replace('\\','\\\\').replace('"','\\"').replace('%','%%')+'"'
     return ('[Unit]\nDescription=Augmentor DSH runtime\nAfter=network-online.target\n\n[Service]\nType=exec\n'+
             'Environment='+field('DSH_HOME='+str(home))+'\nEnvironment=DSH_TELEMETRY_MODE=DISABLED\n'+
+            ('Environment='+field('AUGMENTOR_PYTHON='+str(python))+'\n' if python else '')+
             'EnvironmentFile='+field(credentials)+'\nExecStart='+' '.join(field(v) for v in command)+
             '\nRestart=on-failure\nRestartSec=5\nUMask=0077\n\n[Install]\nWantedBy=default.target\n')
+
+
+def prepare_python(app, data, target):
+    marker=app/'linux-python-runtime.json'
+    if marker.exists() or marker.is_symlink():
+        if marker.is_symlink():raise ValueError('Linux Python policy must be a regular artifact file.')
+        runtime=load(app/'scripts/linux-python-runtime.py')
+        value=runtime.policy(marker)
+        if value['target']!=target:raise ValueError('The Python runtime policy differs from the bundle target.')
+        receipt=runtime.prepare(value,app/'python-wheels',runtime.runtime_store())
+        return Path(receipt['python'])
+    if target=='ubuntu24.04-amd64':raise ValueError('The Noble package lacks its required Python runtime policy.')
+    python=data/'python/bin/python'
+    if not python.exists():run('/usr/bin/python3','-m','venv','--system-site-packages',data/'python')
+    run(python,'-m','pip','install','--disable-pip-version-check','sounddevice==0.5.2')
+    return python
 
 
 def configure_product(app, cli, home, endpoint, env, state, *, save=True):
@@ -178,8 +195,10 @@ def install(args):
         run(*package_plan['command'])
     app=args.app_root.resolve();node=app/'node/bin/node'
     verify_installed_payload(app,manifest)
+    python=prepare_python(app,data,manifest.get('target'))
     runtime=data/'dsh-runtime';runtime.mkdir(parents=True,exist_ok=True)
-    env={**os.environ,'PATH':str(node.parent)+':'+os.environ.get('PATH','')}
+    env={**os.environ,'AUGMENTOR_PYTHON':str(python),
+         'PATH':str(node.parent)+':'+str(python.parent)+':'+os.environ.get('PATH','')}
     for name in ('package.json','package-lock.json'):shutil.copy2(bundle/'dsh'/name,runtime/name)
     # New bundles carry the exact unpublished plugin tarballs referenced by the
     # shared lock. Older published bundles retain their registry-only graph.
@@ -191,6 +210,7 @@ def install(args):
     env['PATH']=str(cli.parent)+':'+env['PATH']
     # Setup's supported-CLI discovery must use this exact freshly installed DSH.
     os.environ['PATH']=env['PATH']
+    os.environ['AUGMENTOR_PYTHON']=str(python)
     config_home=Path(os.environ.get('AUGMENTOR_SHARED_CONFIG',config/'augmentor'))
     if (config_home/'harnesses.json').exists():
         saved=json.loads((config_home/'harnesses.json').read_text()).get('dsh',{})
@@ -211,12 +231,9 @@ def install(args):
     run(node,voice/'bin/resonant-voice.js','init',env=env)
     endpoint='http://127.0.0.1:'+str(args.port)
     configure_product(app,cli,home,endpoint,env,state)
-    python=data/'python/bin/python'
-    if not python.exists():run('/usr/bin/python3','-m','venv','--system-site-packages',data/'python')
-    run(python,'-m','pip','install','--disable-pip-version-check','sounddevice==0.5.2')
     units=config/'systemd/user';units.mkdir(parents=True,exist_ok=True)
     unit=units/'augmentor-dsh.service'
-    content=service([node,cli.resolve(),'web','--no-open','--host','127.0.0.1','--port',str(args.port)],home,state/'model.env')
+    content=service([node,cli.resolve(),'web','--no-open','--host','127.0.0.1','--port',str(args.port)],home,state/'model.env',python)
     if unit.exists() and unit.read_text()!=content:raise ValueError('Existing Augmentor DSH service differs.')
     write(unit,content)
     startup=load(app/'scripts/install-desktop-startup.py')
