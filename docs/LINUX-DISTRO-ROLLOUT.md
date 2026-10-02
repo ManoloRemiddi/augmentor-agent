@@ -633,3 +633,82 @@ Only after those observer and point-guard proofs may capability discovery admit
 GNOME control. Actual application launch/focus and full login/reboot remain the
 preceding startup acceptance gates. All input fixtures remain in the private
 compositor; never use Shell Eval or the owner's desktop to obtain this evidence.
+
+### Hosted installer/shortcut checkpoint and first GNOME observer
+
+Branch `6108a640c5590d4feb13e453ce529d466a56fe2c` passes
+[Linux hosted CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36942865107)
+and [Mac 14/26 hosted CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36942865099).
+Linux passes source/Home/root checks, Debian package and installed lifecycle,
+Browser acceptance, and all three Ubuntu/Fedora package/native jobs. Each distro
+passes 626 native cases (624 pass, two Mac-only skips). The actual package source
+is GitHub's clean merge `ff8f8a29c9bd4c763e60cf39001568f78b254d61`, with parents
+`d91c520` and `6108a64`. Its verified tree
+`6aad74fa6846db8ea62b09e9d94c4801b9783950` equals the branch tree; retain the actual
+merge identity for artifact/setup matching. Checked reports for
+[Ubuntu 26.04](../release/qualification/ff8f8a2/ubuntu26.04-amd64.json),
+[Fedora 43](../release/qualification/ff8f8a2/fedora43-x86_64.json) and
+[Fedora 44](../release/qualification/ff8f8a2/fedora44-x86_64.json) include package
+hashes, image/proof/source hashes, runtime/GTK versions and ordinary-user API
+imports. These package/native proofs do not replace the earlier `a5d27c3` complete
+installer/harness/credential checkpoint or qualify full GNOME desktops.
+
+The first [GNOME 50 observer bridge](../services/desktop/gnome-extension/README.md)
+implements read-only Status/Read/InspectPoint on Shell's session-bus connection.
+The Python client pins the unique Shell owner, bounds requests, validates metadata
+and fences enable epochs. Fresh snapshots include stable-sequence window IDs,
+frame geometry, managed stacking, visible workspaces/monitors and Shell/stage
+guards. Tracked events advance a serial even when final state returns to its
+earlier value. Newly discovered actors attach handlers when their compositor
+actor becomes available; actor destruction releases those handlers before
+disposal. Unsupported/malformed replies fail explicitly. No observer method
+captures, inputs, evaluates arbitrary code or changes windows.
+
+The [checked observer report](../release/qualification/gnome50/fedora44-observer.json)
+passes in the same owned Shell/Mutter 50.5 software compositor, using real GTK
+Wayland windows. It proves distinct same-process identities, focus away/back
+serial advance, frame resize, reactive/painted window versus chrome picks,
+close/reopen fresh identity and disable/re-enable epoch invalidation. The proof
+verifies the loaded extension files against source and rejects source changes
+during the run. The fresh fixture's overview/modal/grab values and missing screen
+shield provider are recorded explicitly. Reproduce with
+`--exercise-gnome-observer` in the existing discovery/Qt container command.
+
+An initial fixture tried restoring focus with an untokened GTK `present()` call;
+Wayland correctly refused. The proof now changes focus using synthetic
+Alt+Escape through one owned, version-pinned private Mutter session, releasing
+all held keys in cleanup. This does not qualify Augmentor's real canonical
+launcher or focus behavior. A second issue accessed already-disposed actor
+handlers; lifecycle cleanup now passes without GJS/GLib critical errors. Initial
+point inspection immediately after resize observed an unsettled painted scene;
+the fixture waits for a fresh matching read-only pick before asserting success.
+There is no input action retry or portal-consent bypass in the product.
+
+The bridge is packaged as inactive source and installed/enabled only in the
+disposable fixture. GNOME capability registration remains unavailable;
+`inputQualified` and complete actor-composition qualification remain false.
+Fresh metadata and selected point picks are not universal occlusion/history
+proofs. Public stage-grab notifications cover no-grab/any-grab transitions, not
+every nested grab-owner change; any current grab blocks a candidate. Plain Shell
+mode/modal variables and surface input-region changes also lack universal event
+coverage. Keep the researched animation/chrome/lock/input-region tests open.
+
+The shared Linux scene/action guard now includes same-PID covering windows in
+freshness comparisons and point refusal. Six toolkit-independent scene cases and
+three real Portal action-code tests prove same-process appearance/move/removal,
+pre-dispatch refusal, token consumption and no replay; the transport peer in these
+tests is synthetic. Seven observer protocol/fencing cases pass. The native Python
+source suite, using its existing compiled JavaScript and cached bundled Node,
+passes 642 cases (640 pass, two Mac-only skips) before the final observer
+tracking/provenance hardening; final focused and real compositor proofs pass.
+The first local broad run lacked Node on PATH; rerunning with the existing private
+bundled Node path passes without production changes. Current observer-source
+hosted/package/complete qualification remains pending after clean publication.
+
+Next: actual application/canonical-launcher activation and single-owner startup
+in full private login sessions; XWayland and independent window placement/
+workspace following; complete observer/point-guard qualification; then consented
+GNOME capture/input/Stop integration. Continue the remaining older Ubuntu/Mint,
+openSUSE/Arch, Browser channel, physical voice, SELinux and release gates. No
+installed owner application, graphical environment, model or audio configuration
+changed.

@@ -68,6 +68,22 @@ Before GNOME input, qualify same-PID occlusion, Shell chrome/modal/lock/transiti
 guards and point picking as well as the existing portal/focus/Stop contracts.
 Do not enable GNOME tools solely because portal interfaces or shortcuts work.
 
+The `6108a64` checkpoint now passes hosted Linux and Mac 14/26 CI. Linux package
+reports identify the actual GitHub merge `ff8f8a2` (parents `d91c520` and `6108a64`);
+its tree hash matches the branch exactly. Checked Ubuntu/Fedora reports record
+626 native cases (two Mac-only skips), GTK API imports and package lifecycle.
+The current working observer stage adds the read-only GNOME 50 Shell extension,
+bounded owner/epoch-fenced client and real private compositor proof. Focus away/
+back, resize, window/chrome picking, fresh close/reopen identities and extension
+restart fencing pass. The shared portal now refuses same-PID covers/changes;
+six scene and three action-dispatch tests pass. Seven observer protocol cases
+pass, and the native source suite passes 642 cases (two skips) before final
+observer tracking/provenance hardening, which passes its focused and real proofs.
+No GNOME input registration or owner-session extension installation is enabled.
+Full actor composition, actual application startup/focus, login/reboot, XWayland,
+consent/input/Stop and current observer-source artifacts remain open. See the
+rollout guide for exact source/report scope and next steps.
+
 ## October 1 merge blockers: current main and separate Codex prerequisite
 
 The feature branch integrates canonical main `8c3be5a` at merge `338dbc5`.

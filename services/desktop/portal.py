@@ -11,21 +11,12 @@ gi.require_version('Gst','1.0')
 from gi.repository import Gio,GLib,Gst
 from kwin import KWin
 from capture_stream import receive_frame,rgb_frame_layout
+from scene import same_scene,inside,covered
 
 NAME='org.freedesktop.portal.Desktop';PATH='/org/freedesktop/portal/desktop'
 RD='org.freedesktop.portal.RemoteDesktop';SC='org.freedesktop.portal.ScreenCast'
 KEYS={'CTRL':29,'SHIFT':42,'ALT':56,'ENTER':28,'TAB':15,'ESC':1,'BACKSPACE':14,'DELETE':111,'LEFT':105,'RIGHT':106,'UP':103,'DOWN':108,'HOME':102,'END':107,'PAGEUP':104,'PAGEDOWN':109,
       **dict(zip('QWERTYUIOP',range(16,26))),**dict(zip('ASDFGHJKL',range(30,39))),**dict(zip('ZXCVBNM',range(44,51))),'SPACE':57}
-
-
-def same_scene(a,b):
-    def identity(scene):
-        window=scene.get('window') or {}
-        return {**scene,'window':{k:v for k,v in window.items() if k!='title'},'above':[a for a in scene.get('above',[]) if a['pid']!=window.get('pid')]}
-    return identity(a)==identity(b)
-
-
-def inside(rect,x,y):return rect['x']<=x<rect['x']+rect['width'] and rect['y']<=y<rect['y']+rect['height']
 
 
 class Portal:
@@ -185,7 +176,7 @@ class Portal:
                 if any(type(n) not in (int,float) or not math.isfinite(n) for n in (x,y)) or not 0<=x<snapshot['width'] or not 0<=y<snapshot['height']:raise RuntimeError('Point is outside the observed image.')
                 screen=scene['screens'][0]['geometry'];x=x*screen['width']/snapshot['width'];y=y*screen['height']/snapshot['height']
                 if not inside(window['geometry'],x+screen['x'],y+screen['y']):raise RuntimeError('Point is outside the observed active window.')
-                if any(a['pid']!=window['pid'] and inside(a['geometry'],x+screen['x'],y+screen['y']) for a in scene.get('above',[])):raise RuntimeError('Another window covers that point. Observe an unobstructed target.')
+                if covered(scene,x+screen['x'],y+screen['y']):raise RuntimeError('Another window covers that point. Observe an unobstructed target.')
                 self.send('NotifyPointerMotionAbsolute','(oa{sv}udd)',(self.session,{},self.node,float(x),float(y)))
                 if self.cancel.is_set() or not same_scene(self.kwin.read(self.cancel),scene):raise RuntimeError('Target changed before the click. No button was pressed.')
                 self.button=272;self.send('NotifyPointerButton','(oa{sv}iu)',(self.session,{},272,1));self.send('NotifyPointerButton','(oa{sv}iu)',(self.session,{},272,0));self.button=None

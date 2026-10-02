@@ -42,6 +42,13 @@ actions. The executor rejects a changed or covered target, changed monitor
 geometry, inaccessible keyboard focus and another chat's ownership. These checks
 reduce accidental input; they are not an operating-system sandbox.
 
+Covering windows from the same process now participate in scene invalidation and
+click refusal. A dialog appearing after capture consumes the stale target without
+dispatching input; a stable dialog only blocks points it covers. The
+[Linux rollout](LINUX-DISTRO-ROLLOUT.md) also adds a read-only GNOME 50 observer
+with a private compositor proof. Its tracked-scene/point checks remain separate
+from input qualification; the current GNOME control registration stays gated.
+
 Screenshots go to the selected model and may remain in the harness conversation
 history. The executor itself writes no screenshot file and does not use the
 clipboard to type. See DATA-AND-SUPPORT.md for data locations and deletion limits.

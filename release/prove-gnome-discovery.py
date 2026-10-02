@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-import argparse,json,os,subprocess,time,re
+import argparse,json,os,subprocess,time,re,shutil
 import hashlib
 from pathlib import Path
 parser=argparse.ArgumentParser(description='Read-only compositor-interface discovery in an isolated GNOME fixture. Does not qualify login or input.')
 parser.add_argument('--out',type=Path,required=True)
 parser.add_argument('--exercise-custom-shortcuts',action='store_true',help='Exercise native GSD with synthetic input in this private compositor only.')
 parser.add_argument('--exercise-augmentor-shortcuts',action='store_true',help='Exercise Augmentor shared Qt Save rows and native GNOME adapter in this private compositor.')
+parser.add_argument('--exercise-gnome-observer',action='store_true',help='Install/read the observer only inside the private compositor fixture.')
 args=parser.parse_args()
 production=args.exercise_augmentor_shortcuts
-exercise=args.exercise_custom_shortcuts or production
+observer=args.exercise_gnome_observer
+exercise=args.exercise_custom_shortcuts or production or observer
 if os.geteuid()==0 or not any(Path(p).exists() for p in ('/.dockerenv','/run/.containerenv')):
  raise SystemExit('Use an ordinary user in a disposable Docker/Podman container.')
 if Path('/run/systemd/seats').exists():
@@ -28,8 +30,14 @@ try:
   # The fresh private user would otherwise receive a modal welcome tour,
   # which correctly prevents ordinary launcher shortcut delivery.
   subprocess.run(['gsettings','set','org.gnome.shell','welcome-dialog-last-shown-version','50.5'],check=True,timeout=5)
- for name,args in [('pipewire',['pipewire']),('wireplumber',['wireplumber']),('shell',['gnome-shell','--headless','--wayland','--virtual-monitor','1280x800','--wayland-display','wayland-augmentor'])]:
-  log=(out/(name+'.log')).open('w');processes.append((subprocess.Popen(args,stdout=log,stderr=log),log))
+ if observer:
+  uuid='observer@augmentoragent.com'
+  source=Path(__file__).resolve().parents[1]/'services/desktop/gnome-extension'/uuid
+  destination=root/'.local/share/gnome-shell/extensions'/uuid
+  shutil.copytree(source,destination)
+  subprocess.run(['gsettings','set','org.gnome.shell','enabled-extensions',"['"+uuid+"']"],check=True,timeout=5)
+ for name,command in [('pipewire',['pipewire']),('wireplumber',['wireplumber']),('shell',['gnome-shell','--headless','--wayland','--virtual-monitor','1280x800','--wayland-display','wayland-augmentor'])]:
+  log=(out/(name+'.log')).open('w');processes.append((subprocess.Popen(command,stdout=log,stderr=log),log))
  deadline=time.monotonic()+45
  while time.monotonic()<deadline:
   if processes[-1][0].poll() is not None:raise RuntimeError('GNOME shell exited before readiness')
@@ -56,10 +64,13 @@ try:
  report={'portalVersions':portal_versions,'proofScriptSha256':proof,'shell':version,'virtualMonitor':'1280x800','waylandSocket':True,'privateBus':True,'compositorOwnerMatchesChild':True,'softwareRendering':True,'loginManager':'GNOME built-in dummy (headless fixture)','interfaces':{label:hashlib.sha256((out/(label+'-interfaces.txt')).read_bytes()).hexdigest() for label in ('shell','display','input','portal')},'actualInputTested':False,'portalConsentTested':False,'actualLoginRebootTested':False}
  (out/'session.json').write_text(json.dumps(report,indent=2)+'\n')
  print('ISOLATED GNOME SESSION READY')
- if exercise:
+ if args.exercise_custom_shortcuts or production:
   subprocess.run(['python3',str(Path(__file__).with_name('prove-gnome-custom-shortcuts.py')),
                   '--compositor-pid',str(processes[-1][0].pid),'--out',str(out),
                   *(['--production-adapter'] if production else [])],check=True,timeout=90)
+ if observer:
+  subprocess.run(['python3',str(Path(__file__).with_name('prove-gnome-observer.py')),
+                  '--compositor-pid',str(processes[-1][0].pid),'--out',str(out)],check=True,timeout=90)
 finally:
  for process,log in reversed(processes):
   if process.poll() is None:

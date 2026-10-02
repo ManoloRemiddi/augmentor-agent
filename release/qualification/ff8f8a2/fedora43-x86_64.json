@@ -1,0 +1,43 @@
+{
+  "target": "fedora43-x86_64",
+  "imageDigest": "docker.io/library/fedora@sha256:a651ddf48ea28a06ed4e1e6519f51c9f47e7a5a138722ade87369b8fbb7e5b42",
+  "source": {
+    "commit": "ff8f8a29c9bd4c763e60cf39001568f78b254d61",
+    "dirty": false
+  },
+  "artifacts": {
+    "augmentor-agent-0.2.13-1.fc43.x86_64.rpm": "09aa093f4446d9a86536f46bbabdcbd9053aa2b768a9c145d380f3396f420bbd"
+  },
+  "proofScriptSha256": "5e331726dd8f5d683715700741de6ddb4d8767b267f144b0323f62a2c7e57c8b",
+  "versions": {
+    "python": "3.14.7",
+    "pyside": "6.10.3",
+    "qt": "6.10.3",
+    "node": "v24.19.0"
+  },
+  "gtk4Version": "4.20.4",
+  "gtk4ShortcutApiImportTested": true,
+  "freshInstall": true,
+  "nonRootRuntimeLease": true,
+  "nonRootQtRender": true,
+  "activeRuntimeAndDesktopReinstallBlocked": true,
+  "activeComponentRemovalBlocked": true,
+  "idleReinstall": true,
+  "removePreservesPrivateFiles": true,
+  "reinstallAfterRemove": true,
+  "realDesktopSessionTested": false,
+  "physicalAudioTested": false,
+  "selinuxEnforcingTested": false,
+  "dshModelTurnTested": false,
+  "hostedQualification": {
+    "run": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36942865107",
+    "branchHead": "6108a640c5590d4feb13e453ce529d466a56fe2c",
+    "mergedSource": "ff8f8a29c9bd4c763e60cf39001568f78b254d61",
+    "verifiedBranchAndMergeTree": "6aad74fa6846db8ea62b09e9d94c4801b9783950",
+    "nativeTests": 626,
+    "nativePassed": 624,
+    "nativeSkipped": 2,
+    "completeInstallerTested": false,
+    "gnomeDesktopSessionTested": false
+  }
+}
