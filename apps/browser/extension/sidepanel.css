@@ -1,3 +1,4 @@
+/* Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 */
 
 /* Voice is one control in either surface; audio is owned by the shared engine. */
 .voice-orb { touch-action: none; flex-shrink: 0; transition: transform 150ms ease, box-shadow 150ms ease; }
@@ -8,3 +9,11 @@
 .voice-orb[data-limit="red"] { outline-color: #ee6666; }
 .voice-status { font-size: 11px; max-width: 130px; align-self: center; color: var(--muted,#aaa); }
 @media (prefers-reduced-motion: reduce) { .voice-orb { transition: none; } }
+
+
+/* Shared Codex waiting-input controls; transcript and composer keep their layout. */
+#prompt-queue {max-height:100px;overflow-y:auto;padding:0 12px}
+.queue-row {display:flex;align-items:center;gap:5px;min-height:30px;padding:3px 6px 3px 9px;margin-top:2px;border:1px solid rgba(127,160,155,.22);border-radius:8px 8px 0 0;background:rgba(127,150,150,.05);font-size:12px}
+.queue-text {flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.queue-row button {background:transparent;border:0;color:inherit;font:inherit;cursor:pointer;padding:2px 3px}
+.queue-row button:disabled {opacity:.4;cursor:default}

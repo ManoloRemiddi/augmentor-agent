@@ -24,6 +24,7 @@ export function componentEnvironment():NodeJS.ProcessEnv {
     const info=lstatSync(env.XDG_RUNTIME_DIR);
     if(!info.isDirectory()||info.uid!==userInfo().uid||(info.mode&0o077))throw new Error('Augmentor needs a private runtime directory owned by this user.');
     env.AUGMENTOR_PI_SOCKET??=join(env.XDG_RUNTIME_DIR,'pi.sock');
+    env.AUGMENTOR_CODEX_SOCKET??=join(env.XDG_RUNTIME_DIR,'codex.sock');
     env.AUGMENTOR_SHARED_STATE??=join(env.XDG_RUNTIME_DIR,'shared');
   }
   return env;

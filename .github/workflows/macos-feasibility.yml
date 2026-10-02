@@ -30,6 +30,10 @@ jobs:
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - name: Reject private source in the tree or branch history
+        run: python3 scripts/check-private-source-boundary.py
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '24.19.0'
@@ -51,6 +55,11 @@ jobs:
           npm ci --ignore-scripts --no-audit --no-fund
           npm run check
           npm run build
+          AUGMENTOR_PYTHON="$PWD/.macos-build-env/bin/python3" node --test tests/codex-*.test.mjs
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_codex_credentials.py -v
+          AUGMENTOR_PYTHON="$PWD/.macos-build-env/bin/python3" node scripts/proof-codex-credentials.mjs
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_codex_desktop.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_codex_setup.py -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p 'test_macos*.py' -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p '*shortcut*.py' -v
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_instances.py -v
@@ -72,6 +81,7 @@ jobs:
           .macos-build-env/bin/python3 scripts/verify-macos-application-inventory.py outputs/macos
           app="$PWD/outputs/macos/Augmentor Agent Desktop.app"
           project="$app/Contents/Resources/app"
+          "$project/node/bin/node" scripts/proof-codex-prerequisite.mjs "$project" node_modules/@openai/codex
           "$project/node/bin/node" scripts/dsh-payload-proof.mjs "$project/dsh"
           codesign --verify --deep --strict "$app"
       - name: Exercise bundled DSH and Qt with an isolated model fixture
@@ -89,6 +99,7 @@ jobs:
           export AUGMENTOR_PI_NODE="$project/node/bin/node"
           export DSH_TEST_MODULES="$project/dsh/node_modules"
           export PATH="$project/dsh/node_modules/.bin:$project/node/bin:$PATH"
+          AUGMENTOR_PYTHON="$project/python/bin/python3" "$project/node/bin/node" "$project/scripts/proof-codex-credentials.mjs"
           "$project/python/bin/python3" -I -B scripts/dsh-setup-proof.py
           codesign --verify --deep --strict "$app"
       - name: Verify managed first run and service restart with an isolated model
@@ -98,12 +109,22 @@ jobs:
           "$project/python/bin/python3" -I -B scripts/macos-managed-setup-proof.py --app-root "$project" --out outputs/macos-managed
           "$project/python/bin/python3" -I -B scripts/macos-managed-setup-proof.py --app-root "$project" --out outputs/macos-engine-first --engine-first
           codesign --verify --deep --strict "$app"
+      - name: Verify Browser companion credentials with its isolated packaged interpreter
+        run: |
+          .macos-build-env/bin/python3 scripts/package-macos.py --component companion --out outputs/macos-companion
+          .macos-build-env/bin/python3 scripts/verify-macos-application-inventory.py outputs/macos-companion
+          app="$PWD/outputs/macos-companion/Augmentor Agent Browser Companion.app"
+          project="$app/Contents/Resources/app"
+          "$project/node/bin/node" scripts/proof-codex-prerequisite.mjs "$project" node_modules/@openai/codex
+          AUGMENTOR_PYTHON="$project/python/bin/python3" "$project/node/bin/node" "$project/scripts/proof-codex-credentials.mjs"
+          codesign --verify --deep --strict "$app"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: macos-feasibility-${{ matrix.os }}
           path: |
             outputs/macos/*.json
+            outputs/macos-companion/*.json
             outputs/macos-managed/report.json
             outputs/macos-engine-first/report.json
           retention-days: 7

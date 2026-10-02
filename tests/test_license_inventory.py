@@ -105,6 +105,20 @@ class LicenseInventoryTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'missing reviewed package notice'):
             licensing.inventory(self.root, self.catalog)
 
+    def test_reviewed_additional_notice_is_preserved_with_its_source(self):
+        content = b'Upstream notice omitted from the npm archive\n'
+        (self.catalog / 'notice.txt').write_bytes(content)
+        catalog = {'sources': {'notice': {'file': 'notice.txt', 'url': 'https://example.invalid/pinned-notice',
+                                         'sha256': hashlib.sha256(content).hexdigest()}},
+                   'overrides': {}, 'additionalNotices': {'example@1.0.0': ['notice']}}
+        (self.catalog / 'catalog.json').write_text(json.dumps(catalog))
+        report, texts = licensing.inventory(self.root, self.catalog)
+        self.assertIn(content, texts.values())
+        self.assertEqual(report['components'][0]['notices'][-1]['url'], 'https://example.invalid/pinned-notice')
+        (self.catalog / 'notice.txt').write_text('Modified')
+        with self.assertRaisesRegex(ValueError, 'hash changed'):
+            licensing.inventory(self.root, self.catalog)
+
 
 if __name__ == '__main__':
     unittest.main()

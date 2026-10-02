@@ -1,5 +1,8 @@
 ; Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-; Actual shared application payload. Public delivery requires signing/release gates.
+; Shared payload. Unsigned public preview is an explicit distribution profile.
+#ifndef PackageSuffix
+  #define PackageSuffix "candidate"
+#endif
 [Setup]
 AppId={#ApplicationId}
 AppName=Augmentor Agent
@@ -12,7 +15,7 @@ UsePreviousAppDir=no
 DisableDirPage=yes
 DisableProgramGroupPage=yes
 OutputDir={#OutputDirectory}
-OutputBaseFilename=Augmentor-{#ProductVersion}-windows-{#TargetArchitecture}-candidate
+OutputBaseFilename=Augmentor-{#ProductVersion}-windows-{#TargetArchitecture}-{#PackageSuffix}
 PrivilegesRequired=lowest
 SetupArchitecture=x64
 ArchitecturesAllowed={#AllowedArchitecture}

@@ -2,15 +2,23 @@
 
 # Linux desktop control preview
 
-Pi and DSH use the same per-user desktop executor. It captures a consented screen
+Pi, DSH and opt-in Codex development source use the same per-user desktop executor. It captures a consented screen
 and can click, send a short key chord or type up to 256 ASCII characters into an
-accessible focused control. The browser role has no desktop input tools.
+accessible focused control. DSH and Codex personal Browser chats can use this executor; the Pi Browser role
+retains its separate tool scope.
 
 The current target is Debian 13, KDE Plasma Wayland, one active monitor and a
 model configured for image input. The desktop package supplies the capture/input
 dependencies. The Augmentor window and independent Stop control use XWayland;
 the tested target application, Kate, uses native Wayland. Other desktops,
 multiple monitors, password fields and non-ASCII typing are not supported.
+
+Codex setup first requires an explicit successful **Check image response**, then
+a new conversation. Its consent, target-token, durable-call and cleanup behavior
+and actual disposable-VM evidence are described in the
+[Codex desktop checkpoint](CODEX-INTEGRATION.md#consented-desktop-tools-and-plasma-vm-evidence).
+This is development source; Codex packaging, macOS/device and complete product
+qualification remain separate gates.
 
 ## Using it
 

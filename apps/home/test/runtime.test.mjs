@@ -24,7 +24,7 @@ async function fixture(t,replies,{failWrite=false,writeResult,onWrite,requestTim
     const server=new Server({name:'fixture',version:'1'},{capabilities:{tools:{}}});
     server.setRequestHandler(ListToolsRequestSchema,async()=>({tools:['homeassistant__GetLiveContext','intent__HassTurnOn','intent__HassTurnOff','intent__HassLightSet','intent__HassUnlock'].map(name=>({name,description:name,inputSchema:{type:'object',properties:{name:{type:'string'},domain:{type:'array',items:{type:'string'}}}}}))}));
     server.setRequestHandler(CallToolRequestSchema,async r=>{
-      if(r.params.name!=='homeassistant__GetLiveContext'){writes++;await onWrite?.();if(failWrite)return {isError:true,content:[{type:'text',text:'Connection lost after dispatch'}]};}
+      if(r.params.name!=='homeassistant__GetLiveContext'){writes++;if(onWrite)await onWrite();if(failWrite)return {isError:true,content:[{type:'text',text:'Connection lost after dispatch'}]};}
       return {content:[{type:'text',text:JSON.stringify(r.params.name==='homeassistant__GetLiveContext'?{success:true,result:writes?'Test Lamp on':'Test Lamp off'}:writeResult??{response_type:'action_done',data:{success:[{name:'Test Lamp',type:'entity',id:'input_boolean.test_lamp'}],failed:[]}})}]};
     });
     const transport=new StreamableHTTPServerTransport({sessionIdGenerator:undefined});peers.add(server);
@@ -71,25 +71,28 @@ test('unadvertised administrative tools and unsafe domains are denied before MCP
   await h.runtime.ask('one','household','Unlock the door');assert.equal(h.writes(),0);
 });
 
- test('deadline cancellation after dispatch latches uncertainty and does not replay',{timeout:10000},async t=>{
-  const dispatched=Promise.withResolvers(),response=Promise.withResolvers();
-  const h=await fixture(t,n=>n===1?tool(turnOn,args,'slow'):n===2?tool(turnOn,args,'must-not-repeat'):answer('Inspect the previous action.'),{
-    onWrite:()=>{dispatched.resolve();return response.promise;},requestTimeoutMs:100
+ test('deadline cancellation after dispatch latches uncertainty and does not replay', {timeout:10000}, async t=>{
+  // Hold the MCP write and fire the real deadline callback only after dispatch.
+  // A 100 ms wall-clock race also timed out before dispatch on loaded CI hosts.
+  const dispatched=Promise.withResolvers(),release=Promise.withResolvers();
+  let deadline;
+  const originalSetTimeout=globalThis.setTimeout;
+  t.mock.method(globalThis,'setTimeout',(callback,delay,...args)=>{
+    if(delay===30001)deadline=callback;
+    return originalSetTimeout(callback,delay,...args);
   });
-  // Advance the deadline only after the real MCP server receives the mutation.
-  // Wall-clock speed must not turn this into a before-dispatch cancellation test.
-  t.mock.timers.enable({apis:['setTimeout']});
-  try {
-    const request=h.runtime.ask('deadline','home','Turn on test');
-    await dispatched.promise;
-    t.mock.timers.tick(100);
-    const result=await request;
-    assert.equal(result.status,'incomplete');assert.equal(result.reason,'Request deadline exceeded');
-    assert.equal(h.writes(),1);assert.equal(h.ledger.pending()[0].status,'unknown');
-  } finally {response.resolve();t.mock.timers.reset();}
-  h.config.requestTimeoutMs=10000;
-  const retry=await h.runtime.ask('retry','home','Try again');
-  assert.ok(retry.tool_calls.some(call=>call.tool===turnOn&&call.status==='denied'));
+  t.after(()=>release.resolve());
+  const h=await fixture(t,n=>n<=2?tool(turnOn,args,'write-'+n):answer('Stopped.'),{
+    onWrite:()=>{dispatched.resolve();return release.promise;},requestTimeoutMs:30001,
+  });
+  const pending=h.runtime.ask('deadline','home','Turn on test');
+  await dispatched.promise;
+  assert.equal(typeof deadline,'function');deadline();
+  const result=await pending;
+  assert.equal(result.status,'incomplete');assert.equal(result.reason,'Request deadline exceeded');
+  assert.equal(h.writes(),1);assert.equal(h.ledger.pending()[0].status,'unknown');
+  release.resolve();
+  await h.runtime.ask('after-deadline','home','Try again');
   assert.equal(h.writes(),1);assert.equal(h.ledger.pending()[0].status,'unknown');
 });
 

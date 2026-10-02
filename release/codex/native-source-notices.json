@@ -1,0 +1,876 @@
+{
+  "schema": "augmentor-codex-native-source-notices/1",
+  "codexVersion": "0.159.2",
+  "sourceCommit": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+  "nativeCatalogSha256": "22183a794ec034624c5ffc89d1c126c8e07466623743d3abe4972d3b77aeaf73",
+  "recipes": {
+    "codex-rs/Cargo.toml": "71396507bfea65c2b34c91dfcf38798aabb3ebf3e544d02dab7c45a3d1f5bd6b",
+    "codex-rs/Cargo.lock": "4fab6fe99180e2b8f305bd4b33c1b4bd825e3fa4cdef1045be750843bd3d431e",
+    ".github/workflows/rust-release.yml": "150b407712ea66d4310d0286ca4054323586ef578c898092032ca205b4c55059",
+    ".github/workflows/rust-release-zsh.yml": "3a972c675740ea6378ae6320a0f49b6dbb360e13a381fc29f6536ccb7918e849",
+    "third_party/voice/sources.json": "e2f6b124f6277e7c3c4f5c7cc8830c66190f671ad65e972bb2cc9507dbfcb937",
+    "LICENSE": "d17f227e4df5da1600391338865ce0f3055211760a36688f816941d58232d8dc",
+    "NOTICE": "9d71575ecfd9a843fc1677b0efb08053c6ba9fd686a0de1a6f5382fd3c220915",
+    "MODULE.bazel": "a00f5bf29f9a5978fedf1446d5ab1dde219ecd6dec3e247bba0207148b571bb2",
+    "MODULE.bazel.lock": "be65892b2bdb12c0867dabfcaaf7ca4ee7a9ae4915e0d0de9c99448158777d31",
+    "third_party/v8/README.md": "b37e2b8db6821453337d9d590d7e2b9a32cb491037b850c0d09f54a9073fd2a9",
+    "third_party/v8/BUILD.bazel": "50b874701edde0b24166680f0ac22463661eebe55216d60e879acbb779382bc2",
+    "third_party/v8/libcxx.BUILD.bazel": "25e537d364b6e465f20e3f9ecd5168481ece3728796b137a9811273303e184d1",
+    "third_party/v8/libcxxabi.BUILD.bazel": "22fcb5a8a969a6b358ef64fdd72dcf01418fba3e047f07acd5bd34decc0b3fb2",
+    "third_party/v8/llvm_libc.BUILD.bazel": "15158ca2fcc1db8412fd64e47706f4af267ec01b82053dc5bba1b1627f7861ad",
+    "third_party/v8/rusty_v8_150_4_0_release_manifests.sha256": "7036a86ed062f4edd81667e161e5e94eade669c69362b136ccba9a1508fecc4b",
+    ".github/actions/setup-rusty-v8/action.yml": "868afbbbd5612b61f17d780ab073da70e7489af0b50da000e4f87fd19cbcd193",
+    ".github/scripts/install-musl-build-tools.sh": "ba729818732a5dd8c1aefce157871afa084016ae37566034f3d09899dc7fa46f",
+    ".github/scripts/install-musl-openssl.sh": "d55f9f295726ffd4408d194ea536a4e083ccf5e2a94f29d68281b163d9df9610",
+    "patches/v8_module_deps.patch": "ae064039eeba7a97b0f161e0ece8ae03212266face9068e61d31f75569f6bf8e",
+    "patches/v8_bazel_rules.patch": "a32713f3b5d70f43694ab06d6b62a1128dbf443799a2073346613b9b90ae5cbb",
+    "patches/v8_source_portability.patch": "0491c08e2a58cf187ff674c3837850530c8e415441757750e62f113342752573",
+    "patches/llvm_rusty_v8_custom_libcxx.patch": "4f4796e03e5334f711d53a862c7f7c3be99a1b97adfc0ef9ff99ed82d12ebee2",
+    "patches/rules_cc_rusty_v8_custom_libcxx.patch": "41e1bd894ca90e79c241fd4cbda80c13be17ff6db48ae7b7947c57804c919fcb",
+    "patches/rusty_v8_prebuilt_out_dir.patch": "aef7ba7f5609eadec0702330bfe5a54175fa4d242ef063e7135d74ee529c007a",
+    "patches/abseil_windows_gnullvm_thread_identity.patch": "8399ecd7f7bd1ba4fb9c6e543b3452d57b7e85934a98b8f0fdd502327fdbf421"
+  },
+  "binaryCoverageVerified": false,
+  "releaseApproval": false,
+  "coverage": "Pinned native source inputs and original notice files; does not certify license applicability or complete linked-binary coverage.",
+  "archives": [
+    {
+      "name": "meson",
+      "version": "1.12.0",
+      "file": "meson-1.12.0.tar.gz",
+      "sourceSha256": "88afe0c20e52030218924ac37d0c81c59b4b5f3ae3752c8c6d7470c7d365886c",
+      "noticeFileCount": 6,
+      "noticeBytes": 33377,
+      "noticeEvidenceSha256": "659327afa8fdae95c909b8ac9b255a4b25f38f57a5d4b8c71cad4912c4f003f6",
+      "topLevelNotices": [
+        {
+          "path": "meson-1.12.0/COPYING",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "bytes": 11358
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "ninja",
+      "version": "1.13.2",
+      "file": "ninja-1.13.2.tar.gz",
+      "sourceSha256": "bccc6197cd8c3ac2a439e26d6bf41506fe49c430cf3d593269a15379f24266ee",
+      "noticeFileCount": 1,
+      "noticeBytes": 11358,
+      "noticeEvidenceSha256": "882621e6ae6ac0f819320991a82af3d5cb4a25fed270dced59d4f1dd92821cc7",
+      "topLevelNotices": [
+        {
+          "path": "ninja-3441b633c2fe2c494e958780ba0f4227b1327634/COPYING",
+          "sha256": "eb7e9ab9690124c5c9f42bdc81383d886a3dede26345b6ed15bbad7caf81f7ea",
+          "bytes": 11358
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "libffi",
+      "version": "3.8.0",
+      "file": "libffi-3.8.0.tar.gz",
+      "sourceSha256": "7da3e2d9a171eb0a038f592ecad3ff2bb2550f3496d87b3b29ad0cf4430c0db4",
+      "noticeFileCount": 2,
+      "noticeBytes": 19830,
+      "noticeEvidenceSha256": "1a53ea57e1230fb2a434a30ae898f7322011d366e3a3437641b1d7ec50e40581",
+      "topLevelNotices": [
+        {
+          "path": "libffi-3.8.0/LICENSE-BUILDTOOLS",
+          "sha256": "e67978cd18816c0cb7d29aaaacde7b7447402c2fb321a051698890a8eaedda94",
+          "bytes": 18698
+        },
+        {
+          "path": "libffi-3.8.0/LICENSE",
+          "sha256": "17b64dc60f3b6897a60f971e288b973f655c2edcdf08b25f3c3dd5549857881c",
+          "bytes": 1132
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "pcre2",
+      "version": "10.47",
+      "file": "pcre2-10.47.tar.gz",
+      "sourceSha256": "c08ae2388ef333e8403e670ad70c0a11f1eed021fd88308d7e02f596fcd9dc16",
+      "noticeFileCount": 5,
+      "noticeBytes": 10891,
+      "noticeEvidenceSha256": "c624e5ca5bf726e48af68f44c8671ceebb6a412527181f3185174d7b52ec280a",
+      "topLevelNotices": [
+        {
+          "path": "pcre2-10.47/LICENCE.md",
+          "sha256": "197d8a73ffee0d6b09adba2f9c677b5f5aede24edf89258a68e48248d010d811",
+          "bytes": 4011
+        },
+        {
+          "path": "pcre2-10.47/AUTHORS.md",
+          "sha256": "66d9adef4d4bcb7c2dd99a499a89a52033375785edaa8a35ada0f2db7d05a1a4",
+          "bytes": 4013
+        },
+        {
+          "path": "pcre2-10.47/COPYING",
+          "sha256": "99272c55f3dcfa07a8a7e15a5c1a33096e4727de74241d65fa049fccfdd59507",
+          "bytes": 97
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "zlib",
+      "version": "1.3.2",
+      "file": "zlib-1.3.2.tar.gz",
+      "sourceSha256": "bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16",
+      "noticeFileCount": 3,
+      "noticeBytes": 5870,
+      "noticeEvidenceSha256": "190cbf2332943ae7172c5edac3c440f755fad1f43c1c8c5e7a82e21d6b558fa8",
+      "topLevelNotices": [
+        {
+          "path": "zlib-1.3.2/LICENSE",
+          "sha256": "e32ff4e00d9d94930537635291da39e7e612703334bf6fde8c7f1686fe8a45a2",
+          "bytes": 1002
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "opus",
+      "version": "1.6.1",
+      "file": "opus-1.6.1.tar.gz",
+      "sourceSha256": "6ffcb593207be92584df15b32466ed64bbec99109f007c82205f0194572411a1",
+      "noticeFileCount": 2,
+      "noticeBytes": 2184,
+      "noticeEvidenceSha256": "46cc1046c3b5f209a3a1f1db3868f13f18294bc9b3beaa02eeaf8f54f93697f9",
+      "topLevelNotices": [
+        {
+          "path": "opus-1.6.1/AUTHORS",
+          "sha256": "f9fd849e652219ce98e008303370b352d37663d0ffb27b8dc514ad93c9c7438b",
+          "bytes": 239
+        },
+        {
+          "path": "opus-1.6.1/COPYING",
+          "sha256": "01e1167d54a096d123cf6dfbbeb19587278845c6481d2d66d545669846079551",
+          "bytes": 1945
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "glib",
+      "version": "2.88.3",
+      "file": "glib-2.88.3.tar.xz",
+      "sourceSha256": "ab24d24e698dfa1e408b7bcdb508f4aafc906185a8b8ce72fdf79bbbdc9b383b",
+      "noticeFileCount": 16,
+      "noticeBytes": 198624,
+      "noticeEvidenceSha256": "4f3479cd780ab296e629e69314de1e20f2619f1b4d889ab938a9dc79c04be909",
+      "topLevelNotices": [],
+      "aliases": [
+        {
+          "path": "glib-2.88.3/COPYING",
+          "target": "glib-2.88.3/LICENSES/LGPL-2.1-or-later.txt",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "fa6f36630bb1e0c571d34b2bbdf188d08495c9dbf58f28cac112f303fc1f58fb"
+        },
+        {
+          "path": "glib-2.88.3/gmodule/COPYING",
+          "target": "glib-2.88.3/LICENSES/LGPL-2.1-or-later.txt",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "fa6f36630bb1e0c571d34b2bbdf188d08495c9dbf58f28cac112f303fc1f58fb"
+        }
+      ]
+    },
+    {
+      "name": "proxy-libintl",
+      "version": "0.5",
+      "file": "proxy-libintl-0.5.tar.gz",
+      "sourceSha256": "f7a1cbd7579baaf575c66f9d99fb6295e9b0684a28b095967cfda17857595303",
+      "noticeFileCount": 1,
+      "noticeBytes": 25292,
+      "noticeEvidenceSha256": "0fc13ec0edac921891a8eed9ac24be8be54dffac245983fad0b31958e0308806",
+      "topLevelNotices": [
+        {
+          "path": "proxy-libintl-0.5/COPYING",
+          "sha256": "d245807f90032872d1438d741ed21e2490e1175dc8aa3afa5ddb6c8e529b58e5",
+          "bytes": 25292
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "gstreamer",
+      "version": "1.28.6",
+      "file": "gstreamer-1.28.6.tar.xz",
+      "sourceSha256": "62b6b9f0ad3147a6dd6420ac64a91180b14e990695bddd353b96041611d052ca",
+      "noticeFileCount": 1,
+      "noticeBytes": 26431,
+      "noticeEvidenceSha256": "328dc363be8fd44b027abba080775edfc38d0c1c3cdc9dd4960ee9e3a597e4e5",
+      "topLevelNotices": [
+        {
+          "path": "gstreamer-1.28.6/COPYING",
+          "sha256": "ad2eec519ebd4b5df86ea84dff24ae3bfa2edea846a703b58902dd221ae375db",
+          "bytes": 26431
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "gst-plugins-base",
+      "version": "1.28.6",
+      "file": "gst-plugins-base-1.28.6.tar.xz",
+      "sourceSha256": "0ba699c7c6c66f4ba640be78cb38a24715add9683f3e3a199f5369dc5a4f04ac",
+      "noticeFileCount": 6,
+      "noticeBytes": 159910,
+      "noticeEvidenceSha256": "d0a4aa3f3d376d524f07415a39d532a1ffde7eaba4406a30e2e1d2c679a75733",
+      "topLevelNotices": [
+        {
+          "path": "gst-plugins-base-1.28.6/COPYING",
+          "sha256": "ad2eec519ebd4b5df86ea84dff24ae3bfa2edea846a703b58902dd221ae375db",
+          "bytes": 26431
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "gst-plugins-good",
+      "version": "1.28.6",
+      "file": "gst-plugins-good-1.28.6.tar.xz",
+      "sourceSha256": "b0c620a4b18b6ee931b4c43bbf1760d308666dc37f730a7e7f1ad327e59ce2df",
+      "noticeFileCount": 3,
+      "noticeBytes": 29083,
+      "noticeEvidenceSha256": "3558d36ac48cf8794644a24cf4c9dd82c76d6b602be4285096d4fa5bbf242159",
+      "topLevelNotices": [
+        {
+          "path": "gst-plugins-good-1.28.6/COPYING",
+          "sha256": "6095e9ffa777dd22839f7801aa845b31c9ed07f3d6bf8a26dc5d2dec8ccc0ef3",
+          "bytes": 26432
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "codex",
+      "version": "0.159.2",
+      "file": "codex-0.159.2.tar.gz",
+      "sourceSha256": "8cfd92ccc784603d0ef94165f5a70bb99fd3de6e8b4bccda58580fc3f5f4961d",
+      "noticeFileCount": 46,
+      "noticeBytes": 217366,
+      "noticeEvidenceSha256": "d162fe3274a9adda9834ed892d828b564c4dc30d23a2f180c3154dd1ac3ecc2c",
+      "topLevelNotices": [
+        {
+          "path": "codex-ff6aec96948b70d94983af2641a6b67c94faeff5/LICENSE",
+          "sha256": "d17f227e4df5da1600391338865ce0f3055211760a36688f816941d58232d8dc",
+          "bytes": 10926
+        },
+        {
+          "path": "codex-ff6aec96948b70d94983af2641a6b67c94faeff5/NOTICE",
+          "sha256": "9d71575ecfd9a843fc1677b0efb08053c6ba9fd686a0de1a6f5382fd3c220915",
+          "bytes": 242
+        }
+      ],
+      "aliases": [
+        {
+          "path": "codex-ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/vendor/bubblewrap/LICENSE",
+          "target": "codex-ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/vendor/bubblewrap/COPYING",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "b7993225104d90ddd8024fd838faf300bea5e83d91203eab98e29512acebd69c"
+        }
+      ]
+    },
+    {
+      "name": "libcap",
+      "version": "2.75",
+      "file": "libcap-2.75.tar.xz",
+      "sourceSha256": "de4e7e064c9ba451d5234dd46e897d7c71c96a9ebf9a0c445bc04f4742d83632",
+      "noticeFileCount": 4,
+      "noticeBytes": 63357,
+      "noticeEvidenceSha256": "33e7732228d1487bd2a8639a9a82939db229cc11492a7aca17c91009b4f5f46e",
+      "topLevelNotices": [
+        {
+          "path": "libcap-2.75/License",
+          "sha256": "68467e731f4744bd6e0bb69e8df9c3a994e09cd6b203d0c41327ac6d079c581d",
+          "bytes": 20318
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "openssl",
+      "version": "3.6.4",
+      "file": "openssl-3.6.4.tar.gz",
+      "sourceSha256": "9bffaa1ad1e07b354c21bd3324ec02fa15579f45a7d0494b3e74bc449b7333ef",
+      "noticeFileCount": 6,
+      "noticeBytes": 34327,
+      "noticeEvidenceSha256": "65b721d56723a2ccb541dab5070661f30605ccb6b0f1efb2a19f854e219a2920",
+      "topLevelNotices": [
+        {
+          "path": "openssl-3.6.4/AUTHORS.md",
+          "sha256": "b9f638dfc06b59c2d3b808186c3b30f713805a5db390f5b77b1703ac58acb83e",
+          "bytes": 1022
+        },
+        {
+          "path": "openssl-3.6.4/LICENSE.txt",
+          "sha256": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a",
+          "bytes": 10175
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "zsh",
+      "version": "77045ef899e53b9598bebc5a41db93a548a40ca6",
+      "file": "zsh-77045ef899e53b9598bebc5a41db93a548a40ca6.tar.gz",
+      "sourceSha256": "4dbbd45e64b4afa03d7cb363c2b1583619187f3d1508707fc532e4a77d5e6597",
+      "noticeFileCount": 1,
+      "noticeBytes": 1963,
+      "noticeEvidenceSha256": "5ed9ba8e1da9fc3fd5c5c38b205a9c2e0b63f99377963965bb8d5e809d10cfba",
+      "topLevelNotices": [
+        {
+          "path": "zsh-77045ef899e53b9598bebc5a41db93a548a40ca6/LICENCE",
+          "sha256": "d06fdf3ef9b1ec69d6b9e170b0a9516fbad3523261ff1668bde3bfea6e0ef5f5",
+          "bytes": 1963
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "ripgrep",
+      "version": "15.2.0",
+      "file": "ripgrep-15.2.0.tar.gz",
+      "sourceSha256": "7605249d3eb0d5f170e3414498e3344e26b1e7a147aec518b57090b80036a562",
+      "noticeFileCount": 24,
+      "noticeBytes": 23424,
+      "noticeEvidenceSha256": "14fe4bd79fb90b6cbdba22ee0e7c248cfde0ec619d673fb40a8633a8b11ce965",
+      "topLevelNotices": [
+        {
+          "path": "ripgrep-15.2.0/COPYING",
+          "sha256": "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f",
+          "bytes": 126
+        },
+        {
+          "path": "ripgrep-15.2.0/LICENSE-MIT",
+          "sha256": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f",
+          "bytes": 1081
+        },
+        {
+          "path": "ripgrep-15.2.0/UNLICENSE",
+          "sha256": "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c",
+          "bytes": 1211
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "rust",
+      "version": "1.95.0",
+      "file": "rustc-1.95.0-src.tar.xz",
+      "sourceSha256": "62b67230754da642a264ca0cb9fc08820c54e2ed7b3baba0289876d4cdb48c08",
+      "noticeFileCount": 3634,
+      "noticeBytes": 19223312,
+      "noticeEvidenceSha256": "9706513900e8cc978fd4dcc04878cd5019915ceeda548d389329e72301921f01",
+      "topLevelNotices": [
+        {
+          "path": "rustc-1.95.0-src/LICENSE-APACHE",
+          "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+          "bytes": 9723
+        },
+        {
+          "path": "rustc-1.95.0-src/COPYRIGHT",
+          "sha256": "172020dbfd5b53a226dfde77616190a48dcff519b0bc0e6deb91a8450782c4af",
+          "bytes": 1571
+        },
+        {
+          "path": "rustc-1.95.0-src/LICENSE-MIT",
+          "sha256": "b71bd43a069ca0641a9ecfe585ca7b3c53b5cc1608f8b68321168698e28b5ea1",
+          "bytes": 1068
+        },
+        {
+          "path": "rustc-1.95.0-src/license-metadata.json",
+          "sha256": "7c693ea746d879a27c3db8ae26131090d0cd89c36f79550ea6674b97e2da9a03",
+          "bytes": 8842
+        }
+      ],
+      "aliases": [
+        {
+          "path": "rustc-1.95.0-src/src/tools/cargo/credential/cargo-credential-wincred/LICENSE-APACHE",
+          "target": "rustc-1.95.0-src/src/tools/cargo/LICENSE-APACHE",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/cargo/credential/cargo-credential-1password/LICENSE-APACHE",
+          "target": "rustc-1.95.0-src/src/tools/cargo/LICENSE-APACHE",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/cargo/crates/home/LICENSE-APACHE",
+          "target": "rustc-1.95.0-src/src/tools/cargo/LICENSE-APACHE",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/cargo/credential/cargo-credential/LICENSE-APACHE",
+          "target": "rustc-1.95.0-src/src/tools/cargo/LICENSE-APACHE",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/cargo/crates/cargo-util/LICENSE-APACHE",
+          "target": "rustc-1.95.0-src/src/tools/cargo/LICENSE-APACHE",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/clippy/rustc_tools_util/LICENSE-APACHE",
+          "target": "rustc-1.95.0-src/src/tools/clippy/LICENSE-APACHE",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "d8b56cd45661bfc7ccf4ce5722388cab275f9dabb9e471c922cc80e36bbf9caa"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/rustc-perf/collector/compile-benchmarks/syn/synom/LICENSE-APACHE",
+          "target": "rustc-1.95.0-src/src/tools/rustc-perf/collector/compile-benchmarks/syn/LICENSE-APACHE",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/cargo/crates/cargo-platform/LICENSE-APACHE",
+          "target": "rustc-1.95.0-src/src/tools/cargo/LICENSE-APACHE",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/cargo/credential/cargo-credential-macos-keychain/LICENSE-APACHE",
+          "target": "rustc-1.95.0-src/src/tools/cargo/LICENSE-APACHE",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/cargo/crates/crates-io/LICENSE-APACHE",
+          "target": "rustc-1.95.0-src/src/tools/cargo/LICENSE-APACHE",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/cargo/crates/cargo-test-macro/LICENSE-APACHE",
+          "target": "rustc-1.95.0-src/src/tools/cargo/LICENSE-APACHE",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/rust-analyzer/lib/lsp-server/LICENSE-APACHE",
+          "target": "rustc-1.95.0-src/src/tools/rust-analyzer/LICENSE-APACHE",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/cargo/crates/cargo-util-schemas/LICENSE-APACHE",
+          "target": "rustc-1.95.0-src/src/tools/cargo/LICENSE-APACHE",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/cargo/credential/cargo-credential-libsecret/LICENSE-APACHE",
+          "target": "rustc-1.95.0-src/src/tools/cargo/LICENSE-APACHE",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/cargo/crates/cargo-test-support/LICENSE-APACHE",
+          "target": "rustc-1.95.0-src/src/tools/cargo/LICENSE-APACHE",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/cargo/crates/rustfix/LICENSE-APACHE",
+          "target": "rustc-1.95.0-src/src/tools/cargo/LICENSE-APACHE",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/cargo/credential/cargo-credential-wincred/LICENSE-MIT",
+          "target": "rustc-1.95.0-src/src/tools/cargo/LICENSE-MIT",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/cargo/credential/cargo-credential-1password/LICENSE-MIT",
+          "target": "rustc-1.95.0-src/src/tools/cargo/LICENSE-MIT",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/cargo/crates/home/LICENSE-MIT",
+          "target": "rustc-1.95.0-src/src/tools/cargo/LICENSE-MIT",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/cargo/credential/cargo-credential/LICENSE-MIT",
+          "target": "rustc-1.95.0-src/src/tools/cargo/LICENSE-MIT",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/cargo/crates/cargo-util/LICENSE-MIT",
+          "target": "rustc-1.95.0-src/src/tools/cargo/LICENSE-MIT",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/clippy/rustc_tools_util/LICENSE-MIT",
+          "target": "rustc-1.95.0-src/src/tools/clippy/LICENSE-MIT",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "8d07f0c9c9966be0aaec4196d7863b56ade114e9714dbc31ebba576c0446d2fc"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/rustc-perf/collector/compile-benchmarks/syn/synom/LICENSE-MIT",
+          "target": "rustc-1.95.0-src/src/tools/rustc-perf/collector/compile-benchmarks/syn/LICENSE-MIT",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "c9a75f18b9ab2927829a208fc6aa2cf4e63b8420887ba29cdb265d6619ae82d5"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/cargo/crates/cargo-platform/LICENSE-MIT",
+          "target": "rustc-1.95.0-src/src/tools/cargo/LICENSE-MIT",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/cargo/credential/cargo-credential-macos-keychain/LICENSE-MIT",
+          "target": "rustc-1.95.0-src/src/tools/cargo/LICENSE-MIT",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/cargo/crates/crates-io/LICENSE-MIT",
+          "target": "rustc-1.95.0-src/src/tools/cargo/LICENSE-MIT",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/cargo/crates/cargo-test-macro/LICENSE-MIT",
+          "target": "rustc-1.95.0-src/src/tools/cargo/LICENSE-MIT",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/rust-analyzer/lib/lsp-server/LICENSE-MIT",
+          "target": "rustc-1.95.0-src/src/tools/rust-analyzer/LICENSE-MIT",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/cargo/crates/cargo-util-schemas/LICENSE-MIT",
+          "target": "rustc-1.95.0-src/src/tools/cargo/LICENSE-MIT",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/cargo/credential/cargo-credential-libsecret/LICENSE-MIT",
+          "target": "rustc-1.95.0-src/src/tools/cargo/LICENSE-MIT",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/cargo/crates/cargo-test-support/LICENSE-MIT",
+          "target": "rustc-1.95.0-src/src/tools/cargo/LICENSE-MIT",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        {
+          "path": "rustc-1.95.0-src/src/tools/cargo/crates/rustfix/LICENSE-MIT",
+          "target": "rustc-1.95.0-src/src/tools/cargo/LICENSE-MIT",
+          "kind": "symlink",
+          "targetNoticeRetained": true,
+          "targetSha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        }
+      ]
+    },
+    {
+      "name": "v8",
+      "version": "15.0.245.2",
+      "file": "v8-15.0.245.2.tar.gz",
+      "sourceSha256": "164f3d3e0a8b4c02a386d3a88d1b1133d37e5c20be0239fecdcdde414a4340d5",
+      "noticeFileCount": 27,
+      "noticeBytes": 163340,
+      "noticeEvidenceSha256": "647797f6525286f0f1bdc2a236cd2a6b3060d22a90ab844152ebbbb6287b80e3",
+      "topLevelNotices": [
+        {
+          "path": "v8-15.0.245.2/AUTHORS",
+          "sha256": "fa60d5a34dff8985ccee2bbd9702cac4ce8712e1c0d7521ce00879403b0fcc27",
+          "bytes": 13546
+        },
+        {
+          "path": "v8-15.0.245.2/LICENSE",
+          "sha256": "6ab33af8774a0f396ee3aeeb761e3229057682d6f9fa7f572e390c2cb3a6e509",
+          "bytes": 3093
+        },
+        {
+          "path": "v8-15.0.245.2/LICENSE.fdlibm",
+          "sha256": "e7115e18444dae09d17f361ddc365fb1d342640fe500796209c63f7c80dfae10",
+          "bytes": 250
+        },
+        {
+          "path": "v8-15.0.245.2/LICENSE.strongtalk",
+          "sha256": "6a585a9f466654abc8fc0829d56b1bc987e3a073d31faa03bba37d33640a23cd",
+          "bytes": 1482
+        },
+        {
+          "path": "v8-15.0.245.2/LICENSE.v8",
+          "sha256": "4af93c12062c58058378de2397dc1c92bbff9ddfb1d583a01c84127557ce97ca",
+          "bytes": 1527
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "highway",
+      "version": "1.2.0",
+      "file": "highway-1.2.0.tar.gz",
+      "sourceSha256": "7e0be78b8318e8bdbf6fa545d2ecb4c90f947df03f7aadc42c1967f019e63343",
+      "noticeFileCount": 3,
+      "noticeBytes": 13696,
+      "noticeEvidenceSha256": "382a7a5b4cefcc27cccad867ba1d0665e3bdf62e0270949a7073f6b03268dac4",
+      "topLevelNotices": [
+        {
+          "path": "highway-1.2.0/LICENSE",
+          "sha256": "43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1",
+          "bytes": 11356
+        },
+        {
+          "path": "highway-1.2.0/LICENSE-BSD3",
+          "sha256": "d25e82e26acd42ca3ccc9993622631163425b869b9e16284226d534cff6470f2",
+          "bytes": 1515
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "fast_float",
+      "version": "8.0.2",
+      "file": "fast_float-8.0.2.tar.gz",
+      "sourceSha256": "e14a33089712b681d74d94e2a11362643bd7d769ae8f7e7caefe955f57f7eacd",
+      "noticeFileCount": 4,
+      "noticeBytes": 13219,
+      "noticeEvidenceSha256": "aca387c5ab0f4e7fcde7a325009499edfd77c6513d090398b4a6f664c706da8c",
+      "topLevelNotices": [
+        {
+          "path": "fast_float-8.0.2/AUTHORS",
+          "sha256": "ed249424bce4e318fa190dd6d8becf60cfc37287132ad3f89e16e0f28d878dcf",
+          "bytes": 36
+        },
+        {
+          "path": "fast_float-8.0.2/LICENSE-APACHE",
+          "sha256": "097a889aa954d04e088b790b10a4014d6189561d0a6013935a73ce3d4ddaaf06",
+          "bytes": 10767
+        },
+        {
+          "path": "fast_float-8.0.2/LICENSE-BOOST",
+          "sha256": "8d8291caf1cee26d23acf3eb67c9f9a2d58f1c681b16a4fbe8cbfb9e3c0b5a9b",
+          "bytes": 1337
+        },
+        {
+          "path": "fast_float-8.0.2/LICENSE-MIT",
+          "sha256": "e562f3f974ced7e69dd1db77b820b36bcf8f30377f1aa105723fba449c53c4e6",
+          "bytes": 1079
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "simdutf",
+      "version": "7.7.0",
+      "file": "simdutf-7.7.0.tar.gz",
+      "sourceSha256": "0180de81a1dd48a87b8c0442ffa81734f3db91a7350914107a449935124e3c6f",
+      "noticeFileCount": 6,
+      "noticeBytes": 15613,
+      "noticeEvidenceSha256": "676a48da064cd2c0853caf1966955543655f2b17abe090aad4c0476801226d80",
+      "topLevelNotices": [
+        {
+          "path": "simdutf-7.7.0/AUTHORS",
+          "sha256": "e9e4ace22b5bb79c2fdf3e94c139ea1a18e47fc17a30e8d977f99d95d697a1f7",
+          "bytes": 88
+        },
+        {
+          "path": "simdutf-7.7.0/LICENSE-APACHE",
+          "sha256": "3d34610fc6b5e1b0bfe4e2f36171c2d62c28ef05cb8d704f5a0073be41a43b3d",
+          "bytes": 11330
+        },
+        {
+          "path": "simdutf-7.7.0/LICENSE-MIT",
+          "sha256": "fc8dbc04e03ad4efc08a647ffe7f995b811a95bc04c0e85a56d5277c6593fa5f",
+          "bytes": 1059
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "v8-libcxx",
+      "version": "5abc7f839700f0f17338434e1c1c6a8c87c00c11",
+      "file": "v8-libcxx-5abc7f839700f0f17338434e1c1c6a8c87c00c11.tar.gz",
+      "sourceSha256": "ae3bb17d77a20f131af95486d0faa1716c1f69867f150120e81dfc39d0008815",
+      "noticeFileCount": 5,
+      "noticeBytes": 70902,
+      "noticeEvidenceSha256": "1d20e06050cf5e5d5453e01ea80d6e788f772d4eefebf49431af8d66b0dd0a3f",
+      "topLevelNotices": [
+        {
+          "path": "LICENSE.TXT",
+          "sha256": "539dd7aed86e8a4f12cbdd0e6c50c189c7d74847e4fecc64ce2c6ee3a01da38b",
+          "bytes": 16703
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "v8-libcxxabi",
+      "version": "8f11bb1d4438d0239d0dfc1bd9456a9f31629dda",
+      "file": "v8-libcxxabi-8f11bb1d4438d0239d0dfc1bd9456a9f31629dda.tar.gz",
+      "sourceSha256": "5348ed0e89093e97f375190250fb4a9c8306088ce7a27ead956f4762f6a39ef5",
+      "noticeFileCount": 1,
+      "noticeBytes": 16706,
+      "noticeEvidenceSha256": "756a85b63642f71ec2ec66bd14e5047a6e0e60d201f1c41d872b151c337d2fc7",
+      "topLevelNotices": [
+        {
+          "path": "LICENSE.TXT",
+          "sha256": "e2b35be49f7284a45b7baca8fc7b3ab7440e7902392b2528a457816b5bb2a15c",
+          "bytes": 16706
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "v8-llvm-libc",
+      "version": "9309c117ebae84dd2f9df1ef99de4782162527d5",
+      "file": "v8-llvm-libc-9309c117ebae84dd2f9df1ef99de4782162527d5.tar.gz",
+      "sourceSha256": "897ce2dca1038529b40075feaa63867fd7839f42b0809cdb2ac645caaa35fdd1",
+      "noticeFileCount": 1,
+      "noticeBytes": 15140,
+      "noticeEvidenceSha256": "78ec053ccc3166f47b68975c189b9c3002c5c62d009714244b7061f407dda5d8",
+      "topLevelNotices": [
+        {
+          "path": "LICENSE.TXT",
+          "sha256": "ebcd9bbf783a73d05c53ba4d586b8d5813dcdf3bbec50265860ccc885e606f47",
+          "bytes": 15140
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "v8-icu",
+      "version": "a86a32e67b8d1384b33f8fa48c83a6079b86f8cd",
+      "file": "v8-icu-a86a32e67b8d1384b33f8fa48c83a6079b86f8cd.tar.gz",
+      "sourceSha256": "b3e9408ebb2c6cd19db7e903fad34b41c91e4935e500ca6bd5fc03354b12e471",
+      "noticeFileCount": 3,
+      "noticeBytes": 28668,
+      "noticeEvidenceSha256": "bfe803816242b07bfde75a7c574d813aa21ba0568e99fb586406a18e1428f13f",
+      "topLevelNotices": [
+        {
+          "path": "LICENSE",
+          "sha256": "451167c55c0fa447cc2d5632714f5e3c567fe4f1e1badefab2c1333852198aca",
+          "bytes": 26487
+        },
+        {
+          "path": "license.html",
+          "sha256": "c62d7697c03979f5056d28b338fafc7a1152820f7b379adf4a9d88cd37160f96",
+          "bytes": 622
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "v8-dragonbox",
+      "version": "beeeef91cf6fef89a4d4ba5e95d47ca64ccb3a44",
+      "file": "v8-dragonbox-beeeef91cf6fef89a4d4ba5e95d47ca64ccb3a44.tar.gz",
+      "sourceSha256": "41b73a1e7e6ac3bf7e97513f5102336d8a82f82eee61aa4057973cf3c8a2a238",
+      "noticeFileCount": 3,
+      "noticeBytes": 15084,
+      "noticeEvidenceSha256": "b9bf593be0e6014542ae697963909b5824c5dff3fedc1edabd796173d406c767",
+      "topLevelNotices": [
+        {
+          "path": "LICENSE-Apache2-LLVM",
+          "sha256": "9e45e856bedccee9f67254082ca11851d954de2fed7448c4bed19ad9aab99a91",
+          "bytes": 12262
+        },
+        {
+          "path": "LICENSE-Boost",
+          "sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+          "bytes": 1338
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "v8-fp16",
+      "version": "3d2de1816307bac63c16a297e8c4dc501b4076df",
+      "file": "v8-fp16-3d2de1816307bac63c16a297e8c4dc501b4076df.tar.gz",
+      "sourceSha256": "8adc05d3f3178734a25af9b1318c8f07800d8b4cf9d6e928a35594397011c60f",
+      "noticeFileCount": 1,
+      "noticeBytes": 1157,
+      "noticeEvidenceSha256": "3847b4e2b0ea161b11da5943edebd2f2e7d27b8a89af569238e1b4eceeb3870b",
+      "topLevelNotices": [
+        {
+          "path": "LICENSE",
+          "sha256": "17e4f539024be2749ee729d1e2f01d24cef12ece8c9bf18e91a4349be29c80bf",
+          "bytes": 1157
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "abseil-cpp",
+      "version": "20250814.1",
+      "file": "abseil-cpp-20250814.1.tar.gz",
+      "sourceSha256": "1692f77d1739bacf3f94337188b78583cf09bab7e420d2dc6c5605a4f86785a1",
+      "noticeFileCount": 2,
+      "noticeBytes": 11656,
+      "noticeEvidenceSha256": "46b18852f61e3466923ef88b9cc63f4111f96f27e2d60a2acade673fa74d6250",
+      "topLevelNotices": [
+        {
+          "path": "abseil-cpp-20250814.1/AUTHORS",
+          "sha256": "1fd39030c119b4c97014f59e0ad0ed65f23475bbdf55a52740f31eb82b34b4ee",
+          "bytes": 295
+        },
+        {
+          "path": "abseil-cpp-20250814.1/LICENSE",
+          "sha256": "c79a7fea0e3cac04cd43f20e7b648e5a0ff8fa5344e644b0ee09ca1162b62747",
+          "bytes": 11361
+        }
+      ],
+      "aliases": []
+    }
+  ]
+}

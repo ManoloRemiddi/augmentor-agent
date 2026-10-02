@@ -114,7 +114,7 @@ def browser_processes():
         try:
             if path.stat().st_uid!=os.getuid():continue
             args=(path/'cmdline').read_bytes().split(b'\0')
-            if any(arg==str(ROOT/'apps/browser'/name).encode() for arg in args for name in ('native-host.mjs','pi-bridge.mjs','pipe.mjs')):
+            if any(arg==str(ROOT/'apps/browser'/name).encode() for arg in args for name in ('native-host.mjs','pi-bridge.mjs','codex-bridge.mjs','pipe.mjs')):
                 result.append(int(path.name))
         except FileNotFoundError:pass
     return result
@@ -139,15 +139,21 @@ def prepare(component):
     if ui and ui.get('busy'):
         raise RuntimeError('Finish or stop the active chat and close open dialogs before maintenance.')
     runtimes=[]
+    prepared=[]
     try:
         if component=='all':
-            endpoints=[('Pi',socket_path(),'augmentor-pi/1')]
+            codex_state=Path(os.environ.get('AUGMENTOR_CODEX_STATE',location('STATE','.local/state')/'augmentor-codex'))
+            codex_socket=os.environ.get('AUGMENTOR_CODEX_SOCKET',str(codex_state/'runtime.sock'))
+            endpoints=[('Pi',socket_path(),'augmentor-pi/1'),('Codex',codex_socket,'augmentor-codex/1')]
             for label,endpoint,protocol in endpoints:
                 try:connection=Connection(endpoint,protocol)
                 except (FileNotFoundError,ConnectionRefusedError):continue
                 runtimes.append((connection,None))
                 status=connection.call('host.describe');runtimes[-1]=(connection,status)
                 if status.get('activeTurns'):raise RuntimeError('Finish or stop active '+label+' tasks before maintenance. Nothing was cancelled.')
+                if label=='Codex':
+                    prepared.append(connection)
+                    connection.call('host.prepareShutdown')
         if desktop:
             start=identity(desktop['pid']);desktop_call('shutdown');wait_exit(desktop['pid'],start)
         if ui:
@@ -156,9 +162,17 @@ def prepare(component):
                 raise RuntimeError('The app became busy. Nothing was cancelled.')
             wait_exit(ui['pid'],start)
         for connection,status in runtimes:
-            start=identity(status['pid']);connection.call('host.shutdown');wait_exit(status['pid'],start)
+            start=identity(status['pid']);connection.call('host.shutdown')
+            if connection in prepared:prepared.remove(connection)
+            wait_exit(status['pid'],start)
     finally:
+        cancellation_errors=[]
+        for connection in prepared:
+            try:connection.call('host.cancelShutdown')
+            except (OSError,RuntimeError) as error:cancellation_errors.append(error)
         for connection,_ in runtimes:connection.close()
+        if cancellation_errors:
+            raise RuntimeError('Maintenance did not finish and Codex admission could not be reopened. Reconnect and cancel shutdown preparation before resuming work.') from cancellation_errors[0]
     if component=='all':
         stop_companions()
 
@@ -169,7 +183,7 @@ def backup(include_data=True):
     destination.mkdir(parents=True,mode=0o700)
     sources=[(Path(os.environ.get('AUGMENTOR_PI_CONFIG',config/'augmentor-pi')),'config/pi'),(config/'augmentor-linux','config/dsh'),
              (Path(os.environ.get('AUGMENTOR_SHARED_CONFIG',config/'augmentor')),'config/shared'),
-             (Path(os.environ.get('AUGMENTOR_PI_STATE',state/'augmentor-pi')),'state/pi'),(state/'augmentor-linux','state/dsh'),(Path(os.environ.get('AUGMENTOR_OPENCODE_STATE',state/'augmentor-opencode')),'state/opencode'),
+             (Path(os.environ.get('AUGMENTOR_PI_STATE',state/'augmentor-pi')),'state/pi'),(Path(os.environ.get('AUGMENTOR_CODEX_STATE',state/'augmentor-codex')),'state/codex'),(state/'augmentor-linux','state/dsh'),(Path(os.environ.get('AUGMENTOR_OPENCODE_STATE',state/'augmentor-opencode')),'state/opencode'),
              (Path(os.environ.get('AUGMENTOR_SHARED_DATA',data/'augmentor')),'data/shared'),(Path(os.environ.get('AUGMENTOR_SHARED_STATE',state/'augmentor')),'state/shared')]
     for path,name in sources if include_data else []:
         if path.exists():

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-"""Build a private unsigned installation candidate from the real staged payload.
+"""Build a development candidate or explicitly opted-in unsigned public preview.
 
-This entrypoint refuses customer artifacts until publisher/recovery gates exist.
+Stable customer delivery still requires publisher and update qualification.
 Qualification locations are compiled into the candidate, never installer switches.
 """
 import argparse
@@ -25,15 +25,19 @@ def digest(path):
         return hashlib.file_digest(source, 'sha256').hexdigest()
 
 
-def candidate(root, arch):
+def candidate(root, arch, *, public_preview=False):
     root = Path(root)
     release = json.loads((root/'release.json').read_text(encoding='utf-8'))
-    if (release.get('customerDistribution') is not False or
-            release.get('qualificationStatus') != 'development-candidate' or
+    if public_preview:
+        profile = json.loads((ROOT/'release/windows/public-preview.json').read_text(encoding='utf-8'))
+        if any(release.get(key) != value for key, value in profile.items()):
+            raise ValueError('Public preview must retain its exact published limitations.')
+    if (release.get('customerDistribution') is not public_preview or
+            release.get('qualificationStatus') != ('public-preview' if public_preview else 'development-candidate') or
             release.get('target') != 'windows-'+arch or
             not re.fullmatch(r'\d+\.\d+\.\d+', release.get('version', '')) or
             not re.fullmatch('[a-f0-9]{40}', release.get('sourceCommit', ''))):
-        raise ValueError('Use a staged native development candidate. Public delivery is not enabled.')
+        raise ValueError('Use the matching explicitly staged native distribution profile.')
     for name in ('Augmentor.exe', 'AugmentorBrowserHost.exe', 'python/python.exe',
                  'node/node.exe', 'powershell/pwsh.exe', 'updater/WinSparkle.dll',
                  'dsh/payload.json', 'scripts/launch-windows.py', 'scripts/windows-local-health.py',
@@ -61,10 +65,12 @@ def compiler(out):
     return location/'ISCC.exe'
 
 
-def build(root, arch, out, *, qualification=None, compiler_path=None):
+def build(root, arch, out, *, qualification=None, compiler_path=None, public_preview=False):
     if sys.platform != 'win32': raise ValueError('Build the package on its native Windows target.')
     root, out = Path(root).resolve(), Path(out).resolve()
-    release = candidate(root, arch)
+    if public_preview and qualification:
+        raise ValueError('Public preview cannot use disposable qualification locations.')
+    release = candidate(root, arch, public_preview=public_preview)
     if out.exists() and any(out.iterdir()): raise ValueError('Use an empty package output directory.')
     out.mkdir(parents=True, exist_ok=True)
     spec = importlib.util.spec_from_file_location('windows_builder', ROOT/'scripts/build-windows-launcher.py')
@@ -72,6 +78,7 @@ def build(root, arch, out, *, qualification=None, compiler_path=None):
     helper = builder.build_installer_helper(out/'helper', development=bool(qualification))
     definitions = {'ApplicationId':'com.augmentor.Agent', 'ShortcutName':'Augmentor Agent',
         'ProductVersion':release['version'], 'TargetArchitecture':arch,
+        'PackageSuffix':'preview' if public_preview else 'candidate',
         'AllowedArchitecture':'arm64' if arch == 'arm64' else 'x64os',
         'InstallDirectory':r'{localappdata}\Programs\Augmentor Agent',
         'OutputDirectory':str(out), 'HandoffHelper':str(helper), 'PayloadDirectory':str(root),
@@ -119,10 +126,11 @@ def build(root, arch, out, *, qualification=None, compiler_path=None):
     if result.returncode:
         detail = (out/'compile.log').read_text(encoding='utf-8', errors='replace')[-8192:]
         raise RuntimeError('Inno compilation failed:\n'+detail)
-    installer = out/f'Augmentor-{release["version"]}-windows-{arch}-candidate.exe'
+    suffix = 'preview' if public_preview else 'candidate'
+    installer = out/f'Augmentor-{release["version"]}-windows-{arch}-{suffix}.exe'
     report = {'installer':str(installer), 'sha256':digest(installer), 'release':release,
         'installerBytes':installer.stat().st_size,
-        'customerDistribution':False, 'signed':False, 'applicationId':definitions['ApplicationId'],
+        'customerDistribution':public_preview, 'signed':False, 'applicationId':definitions['ApplicationId'],
         'installationDirectory':definitions['InstallDirectory'], 'qualificationBase':definitions['QualificationBase'],
         'installationKey':definitions['InstallationKey'], 'startupKey':definitions['StartupKey'],
         'browserKeys':[definitions[name] for name in ('BrowserChromeKey','BrowserChromiumKey','BrowserEdgeKey')],
@@ -138,6 +146,7 @@ if __name__ == '__main__':
     parser.add_argument('--out', required=True, type=Path)
     parser.add_argument('--qualification-root', type=Path)
     parser.add_argument('--compiler', type=Path)
+    parser.add_argument('--public-preview', action='store_true')
     args = parser.parse_args()
     print(json.dumps(build(args.root, args.arch, args.out,
-        qualification=args.qualification_root, compiler_path=args.compiler)))
+        qualification=args.qualification_root, compiler_path=args.compiler, public_preview=args.public_preview)))

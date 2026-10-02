@@ -12,6 +12,9 @@ import {supportReport} from './shared/support.mjs'
 import {startOnboarding} from './shared/onboarding.mjs'
 import {memoryRequest} from './shared/memory.mjs'
 import {spawn} from 'node:child_process'
+import {loadProfile} from '../../services/workspaces/profiles.mjs'
+const workspaceProfile=loadProfile()
+import {guardWorkspaceMethod,voiceEnabled,SDK_PROTOCOL} from '../../services/workspaces/policy.mjs'
 import {fileURLToPath} from 'node:url'
 import {NativeBrowserMaintenance,connectBrowserOwner} from './shared/native-maintenance.mjs'
 let child,childClosed=false,closing=false,compatible=false
@@ -63,24 +66,33 @@ readFrames(process.stdin,first=>{
       if(first.id!==undefined){if(first.method!==undefined)childRequests.add(first.id);else childActions.delete(first.id)}
       childSend(first);return
     }
+    if(first.method==='workspace.describe'){
+      if(!workspaceProfile?.sdkProtocol||first.params?.protocol!==SDK_PROTOCOL){reply({id:first.id,error:{code:'INCOMPATIBLE_RUNTIME',message:'Register an SDK v1 workspace profile before connecting'}});return}
+      reply({id:first.id,result:{protocol:SDK_PROTOCOL,profile:workspaceProfile.id,harness:'dsh',productProtocol:PRODUCT_PROTOCOL,productVersion:RELEASE.version,tools:workspaceProfile.policy.tools,voice:{experimental:true,enabled:voiceEnabled(workspaceProfile)}}});return
+    }
     if(first.method==='augmentor/handshake'){
       compatible=first.params?.protocol===PRODUCT_PROTOCOL&&first.params?.version===RELEASE.version
       reply(compatible?{id:first.id,result:{protocol:PRODUCT_PROTOCOL,version:RELEASE.version}}:{id:first.id,error:{message:'Extension and companion versions differ. Update both Augmentor components, reload the extension, then reconnect.'}});return
     }
     if(!compatible){reply({id:first.id,error:{message:'Check Augmentor component compatibility before connecting.'}});return}
+    try{guardWorkspaceMethod(workspaceProfile,first.method,first.params??{})}catch(error){reply({id:first.id,error:{code:'PERMISSION_DENIED',message:error.message}});return}
     // Shared prompts work even while harness discovery/connection is unavailable.
     if(first.method==='augmentor/surface'){shared(first.id,()=>surfaceRequest(first.params??{}));return}
     if(first.method==='augmentor/dsh'){shared(first.id,()=>dshSetup(first.params??{}));return}
     if(first.method==='augmentor/diagnostics'){shared(first.id,()=>supportReport());return}
+    if(workspaceProfile&&first.method==='augmentor/onboarding'){reply({id:first.id,error:{message:'This workspace is already configured. Use standalone Augmentor for personal setup.'}});return}
     if(first.method==='augmentor/onboarding'){shared(first.id,()=>startOnboarding(first.params));return}
     if(first.method==='augmentor/memory'){
+      if(workspaceProfile&&first.params?.action==='dual.recall'){reply({id:first.id,error:{message:'Connect the workspace harness before recalling memory.'}});return}
       shared(first.id,()=>memoryRequest(first.params??{}));return
     }
     if(first.method==='augmentor/prompts'){
       shared(first.id,()=>promptLibrary(first.params??{}));return
     }
-    if(first.method!=='harness.select'||!['pi','dsh'].includes(first.params?.harness)){reply({id:first.id,error:{message:'Choose DSH or Pi. Other harnesses are no longer supported; saved data is retained.'}});return}
-    child=spawn(process.execPath,[fileURLToPath(new URL(first.params.harness==='dsh'?'./pipe.mjs':'./pi-bridge.mjs',import.meta.url))],{stdio:['pipe','pipe','inherit'],windowsHide:true,env:{...process.env,AUGMENTOR_UNIFIED:'1',AUGMENTOR_BROWSER_HARNESS:first.params.harness}})
+    if(workspaceProfile&&first.method==='harness.select'&&first.params?.harness!=='dsh'){reply({id:first.id,error:{message:'This workspace uses its configured DSH specialist.'}});return}
+    if(first.method!=='harness.select'||!['pi','dsh','codex'].includes(first.params?.harness)){reply({id:first.id,error:{message:'Choose DSH, Pi or Codex. Other harnesses are no longer supported; saved data is retained.'}});return}
+    const bridge={dsh:'./pipe.mjs',pi:'./pi-bridge.mjs',codex:'./codex-bridge.mjs'}[first.params.harness]
+    child=spawn(process.execPath,[fileURLToPath(new URL(bridge,import.meta.url))],{stdio:['pipe','pipe','inherit'],windowsHide:true,env:{...process.env,AUGMENTOR_UNIFIED:'1',AUGMENTOR_BROWSER_HARNESS:first.params.harness}})
     readFrames(child.stdout,frame=>{
       if(frame.id!==undefined){
         if(frame.method!==undefined){

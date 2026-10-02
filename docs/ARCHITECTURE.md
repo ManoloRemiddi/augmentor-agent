@@ -2,6 +2,8 @@
 
 # Current architecture
 
+See [embedded Browser and specialist workspaces](WORKSPACE-EMBEDDING.md) for product-owned embedding, scoped tools and memory.
+
 Product version is defined by [the shared manifest](../release/product.json). Start with the
 [agent handoff](AGENT-HANDOFF.md) for the authoritative Git ref and evidence.
 The [documentation index](README.md) maps every subsystem to its detailed guide.
@@ -26,6 +28,15 @@ architecture; the audit itself does not implement the pending changes or update
 installed apps. The owner's approved UI remains the design baseline.
 
 ## Product and runtime ownership
+
+The [Codex integration build plan](CODEX-INTEGRATION-PLAN.md) defines the third
+harness for both surfaces. Its [development implementation](CODEX-INTEGRATION.md)
+uses the pinned native app-server as the agent engine and the same presentation,
+memory and tool companions. API/local setup and internal
+[OAuth/account lifecycle primitives](CODEX-ACCOUNTS.md) are implemented; subscription login wiring
+and full acceptance remain open. [Shared memory source activation](CODEX-INTEGRATION.md#codex-memory-launcher-and-existing-interface-controls)
+is qualified through isolated Qt/Chromium interfaces. This development source
+has not replaced the installed DSH/Pi applications or completed release gates.
 
 Augmentor is one product with native PySide6/Qt and Chromium surfaces in this
 repository. Both DSH presentations use [one personal-agent composition and voice engine](SHARED-SURFACES-2026-09-24.md); preset IDs are historical aliases. DSH is the full-featured conversational harness; Pi is a supported

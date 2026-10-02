@@ -14,6 +14,24 @@ sys.path.insert(0, str(ROOT/'services'))
 from build_support import npm_command
 
 
+def codex_prerequisite(target, root=ROOT):
+    """Keep the reviewed production tree separate from supplier CLI payloads."""
+    record = json.loads((root / 'release/codex/runtime-prerequisite.json').read_text())
+    package = json.loads((target / 'package.json').read_text())
+    lock = json.loads((target / 'package-lock.json').read_text())
+    if (record.get('schema') != 'augmentor-runtime-prerequisite/1' or
+            record.get('name') != '@openai/codex' or record.get('bundled') is not False or
+            package.get('devDependencies', {}).get('@openai/codex') != record.get('version') or
+            '@openai/codex' in package.get('dependencies', {}) or
+            lock.get('packages', {}).get('node_modules/@openai/codex', {}).get('dev') is not True):
+        raise ValueError('Codex prerequisite and development dependency differ; review packaging.')
+    for metadata in (target / 'node_modules').rglob('package.json'):
+        name = json.loads(metadata.read_text()).get('name', '')
+        if name == '@openai/codex' or name.startswith('@openai/codex-'):
+            raise ValueError('Codex supplier package must not be bundled: ' + name)
+    (target / 'distribution-prerequisites.json').write_text(json.dumps([record], indent=2) + '\n')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--out', type=Path, required=True)
@@ -27,6 +45,7 @@ def main():
     for name in ('package.json', 'package-lock.json'):
         shutil.copy2(ROOT / name, target / name)
     subprocess.run([*npm_command(), 'ci', '--ignore-scripts', '--omit=dev', '--no-audit', '--no-fund'], cwd=target, check=True)
+    codex_prerequisite(target)
     subprocess.run(['node', str(ROOT / 'scripts/prepare-ws.mjs'), str(target)], check=True)
     sdk = target / 'node_modules/@earendil-works/pi-coding-agent'
     metadata = json.loads((sdk / 'package.json').read_text(encoding="utf-8"))

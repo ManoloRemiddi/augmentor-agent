@@ -79,7 +79,7 @@ class QueuePanel(QScrollArea):
         while self.rows.count():
             widget=self.rows.takeAt(0).widget()
             if widget:widget.hide();widget.setParent(None);widget.deleteLater()
-        entries=[(row['id'],'Steering…' if row['placement']=='steering' else 'Queued',
+        entries=[(row['id'],row.get('stateLabel') or ('Steering…' if row['placement']=='steering' else 'Queued'),
                   '\n'.join(p.get('text','') for p in row['message']['content'] if p.get('type')=='text'),row) for row in self.items]
         entries += [(key,row['state'],row['text'],None) for key,row in self.pending.items()]
         for key,state,text,item in entries:
@@ -96,10 +96,10 @@ class QueuePanel(QScrollArea):
             if item:
                 steer=QPushButton('Steer');steer.setAccessibleName('Steer queued prompt')
                 steer.setToolTip('Use this prompt at the next step of the current response')
-                steer.setEnabled(self.online and self.running and item['placement']=='queued' and key not in self.changing)
+                steer.setEnabled(self.online and self.running and item['placement']=='queued' and key not in self.changing and item.get('canSteer',True))
                 steer.clicked.connect(lambda checked=False,k=key:self.act(k,'steer'));layout.addWidget(steer)
                 remove=QPushButton('×');remove.setAccessibleName('Remove queued prompt');scaled(remove).setFixedWidth(18);scaled(remove).setStyleSheet('padding:0;')
-                remove.setEnabled(self.online and key not in self.changing)
+                remove.setEnabled(self.online and key not in self.changing and item.get('canRemove',True))
                 remove.clicked.connect(lambda checked=False,k=key:self.act(k,'remove'));layout.addWidget(remove)
             elif self.pending[key].get('failed'):
                 copy=QPushButton('Copy');copy.clicked.connect(lambda checked=False,t=text:QApplication.clipboard().setText(t));layout.addWidget(copy)

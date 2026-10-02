@@ -11,7 +11,16 @@ concurrency:
   group: validation-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  source-boundary:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - run: python3 scripts/check-private-source-boundary.py
   home-runtime:
+    needs: source-boundary
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
@@ -29,6 +38,7 @@ jobs:
           -e AUGMENTOR_SHARED_DATA=/tmp/data augmentor-home:ci
           node --input-type=module -e 'import {promptCall} from "../../dist/prompt-library/src/client.js"; const r=await promptCall("prompts.list"); if(!Array.isArray(r.prompts))process.exit(1);'
   debian:
+    needs: source-boundary
     runs-on: ubuntu-24.04
     container: debian@sha256:abc9cb88a5587630d7f915f47b23b0668fe250fbfc6457aa4d52b534c1bbf73f
     timeout-minutes: 30
@@ -36,7 +46,7 @@ jobs:
       - name: Install declared build and test dependencies
         run: |
           apt-get update
-          apt-get install -y --no-install-recommends ca-certificates git python3 python3-pygments python3-yaml python3-numpy python3-websocket python3-gi gir1.2-atspi-2.0 gir1.2-gstreamer-1.0 gstreamer1.0-plugins-base python3-pyside6.qtcore python3-pyside6.qtgui python3-pyside6.qtwidgets python3-pyside6.qtnetwork python3-pyside6.qtdbus python3-pyside6.qtquick python3-pyside6.qtquickwidgets qml6-module-qtquick qml6-module-qtqml qml6-module-qtqml-models qml6-module-qtqml-workerscript python3-pyside6.qttest libqt6svg6 qt6-svg-plugins fonts-dejavu-core chromium xvfb xauth xclip xdotool wmctrl x11-utils kwin-x11 dbus-x11
+          apt-get install -y --no-install-recommends ca-certificates git python3 python3-keyring python3-secretstorage gnome-keyring python3-pygments python3-yaml python3-numpy python3-websocket python3-gi gir1.2-atspi-2.0 gir1.2-gstreamer-1.0 gstreamer1.0-plugins-base python3-pyside6.qtcore python3-pyside6.qtgui python3-pyside6.qtwidgets python3-pyside6.qtnetwork python3-pyside6.qtdbus python3-pyside6.qtquick python3-pyside6.qtquickwidgets qml6-module-qtquick qml6-module-qtqml qml6-module-qtqml-models qml6-module-qtqml-workerscript python3-pyside6.qttest libqt6svg6 qt6-svg-plugins fonts-dejavu-core chromium xvfb xauth xclip xdotool wmctrl x11-utils kwin-x11 dbus-x11
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
@@ -55,7 +65,9 @@ jobs:
           npm run build
           export DSH_INSTALL_ROOT="$PWD/release/dsh/node_modules/@deepseek-ai/dsh"
           npm test
+          node scripts/workspace-sdk-dsh-proof.mjs "$DSH_INSTALL_ROOT"
           node --test apps/browser/test/*.test.mjs
+          python3 scripts/proof-codex-secretservice.py
           npm --prefix apps/mobile run build
       - name: Verify DSH setup, approvals, questions and exact branching
         env:
@@ -111,6 +123,15 @@ jobs:
           if-no-files-found: error
       - name: Build Debian packages with binary notices
         run: python3 scripts/package-debian.py
+      - name: Verify packaged Codex with a separate supplier prerequisite
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, subprocess
+          directory = pathlib.Path('outputs/debian')
+          artifact = next(row['file'] for row in json.loads((directory/'artifacts.json').read_text())['artifacts'] if row['file'].startswith('augmentor-runtime_'))
+          subprocess.run(['dpkg-deb', '--extract', str(directory/artifact), 'outputs/codex-prerequisite-proof'], check=True)
+          PY
+          outputs/codex-prerequisite-proof/usr/lib/augmentor/node/bin/node scripts/proof-codex-prerequisite.mjs outputs/codex-prerequisite-proof/usr/lib/augmentor node_modules/@openai/codex
       - name: Review final package and extension identity, contents and notices
         run: python3 scripts/review-artifacts.py --debian outputs/debian --browser outputs/browser --output outputs/debian/review.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

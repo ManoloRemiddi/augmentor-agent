@@ -38,6 +38,17 @@ class PackageTests(unittest.TestCase):
         self.release['customerDistribution']=True;self.write_release()
         with self.assertRaises(ValueError):package.candidate(self.root,'arm64')
 
+    def test_public_preview_requires_opt_in_and_exact_limitations(self):
+        from lifecycle.payload_integrity import seal_payload
+        profile=json.loads((ROOT/'release/windows/public-preview.json').read_text())
+        (self.root/'payload-integrity.json').unlink();self.release.pop('payloadSHA256')
+        self.release.update(profile);self.write_release();self.release=seal_payload(self.root)
+        with self.assertRaises(ValueError):package.candidate(self.root,'arm64')
+        self.assertEqual(package.candidate(self.root,'arm64',public_preview=True),self.release)
+        self.release['automaticUpdates']=True;self.write_release()
+        with self.assertRaisesRegex(ValueError,'limitations'):
+            package.candidate(self.root,'arm64',public_preview=True)
+
     def test_partial_payload_refuses_before_build(self):
         (self.root/'node/node.exe').unlink()
         with self.assertRaisesRegex(ValueError,'Incomplete'):package.candidate(self.root,'arm64')

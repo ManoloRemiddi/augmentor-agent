@@ -34,13 +34,21 @@ export async function handleBrowserAction(id, params) {
   const t0 = Date.now()
   try {
     let out
-    // Explicit read targeting avoids silently reusing an older work tab after
-    // the user opens or selects another tab outside the extension chat.
+    // An explicit observation is a read of that tab, not a change to the target
+    // of subsequent navigation/click/type. A mistaken read must not hijack work.
+    let observationTab
     if (['snapshot', 'screenshot'].includes(params?.action) && params.tabId !== undefined) {
       if (!Number.isInteger(params.tabId)) throw new Error('tabId must be an observed browser tab ID')
       const selected = await chrome.tabs.get(params.tabId)
       if (!/^https?:\/\//i.test(selected.url ?? '') || isDshTab(selected)) throw new Error('Selected tab is not a readable web work tab')
-      state.workTabId = selected.id
+      observationTab = selected
+    }
+    if (['click', 'type'].includes(params?.action) && params.target !== undefined) {
+      const target = params.target
+      const current = await readableWorkTab()
+      if (!target || !Number.isInteger(target.tabId) || typeof target.url !== 'string' || !Number.isFinite(target.documentEpoch) || current.id !== target.tabId || current.url !== target.url) {
+        throw new Error('The observed work tab changed. Read a fresh snapshot before acting.')
+      }
     }
     switch (params?.action) {
       case 'tabs_list': {
@@ -93,13 +101,14 @@ export async function handleBrowserAction(id, params) {
         break
       }
       case 'snapshot': {
-        const tab = await readableWorkTab()
+        const tab = observationTab ?? await readableWorkTab()
         overlayShow(tab.id, overlayTextFor('snapshot', params))
-        out = await readSnapshot(tab, inject)
+        const {offset, controlOffset, linkOffset, scope} = params
+        out = await readSnapshot(tab, inject, {offset, controlOffset, linkOffset, scope})
         break
       }
       case 'screenshot': {
-        const tab = await readableWorkTab()
+        const tab = observationTab ?? await readableWorkTab()
         out = await captureWorkTab(tab, chrome, inject)
         break
       }
@@ -111,7 +120,8 @@ export async function handleBrowserAction(id, params) {
         await injectFiles(tab.id, ['dom-actions.js'])
         out = await inject(
           tab.id,
-          (selector, pulse) => {
+          (selector, pulse, target) => {
+            if (target && (location.href !== target.url || performance.timeOrigin !== target.documentEpoch)) return {ok: false, error: 'The observed document changed. Read a fresh snapshot before acting.'}
             const el = document.querySelector(selector)
             if (!el) return { ok: false, error: `no element matches selector: ${selector}; read a fresh snapshot before choosing another target` }
             if (el === document.body || el === document.documentElement) return {ok: false, error: 'Page-root actions are not an observation method. Use browser_snapshot or browser_screenshot.'}
@@ -125,7 +135,7 @@ export async function handleBrowserAction(id, params) {
               name: dom ? dom.humanName(el) : el.tagName.toLowerCase(),
             }
           },
-          [String(params.selector ?? ''), pulseRgba()],
+          [String(params.selector ?? ''), pulseRgba(), params.target ?? null],
         )
         if (typeof out?.ok !== 'boolean') throw new Error('No action acknowledgement returned. Outcome unknown; observe before retrying.')
         if (out?.ok) overlayShow(tab.id, overlayTextFor('click', params, 'after', out))
@@ -138,7 +148,8 @@ export async function handleBrowserAction(id, params) {
         await injectFiles(tab.id, ['dom-actions.js'])
         out = await inject(
           tab.id,
-          (selector, text, pulse) => {
+          (selector, text, pulse, target) => {
+            if (target && (location.href !== target.url || performance.timeOrigin !== target.documentEpoch)) return {ok: false, error: 'The observed document changed. Read a fresh snapshot before acting.'}
             const el = document.querySelector(selector)
             if (!el) return { ok: false, error: `no element matches selector: ${selector}; read a fresh snapshot before choosing another target` }
             if (el === document.body || el === document.documentElement) return {ok: false, error: 'Page-root actions are not an observation method. Use browser_snapshot or browser_screenshot.'}
@@ -155,7 +166,7 @@ export async function handleBrowserAction(id, params) {
               name: dom ? dom.humanName(el) : el.tagName.toLowerCase(),
             }
           },
-          [String(params.selector ?? ''), String(params.text ?? ''), pulseRgba()],
+          [String(params.selector ?? ''), String(params.text ?? ''), pulseRgba(), params.target ?? null],
         )
         if (typeof out?.ok !== 'boolean') throw new Error('No action acknowledgement returned. Outcome unknown; observe before retrying.')
         if (out?.ok) overlayShow(tab.id, overlayTextFor('type', params, 'after', out))

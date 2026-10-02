@@ -103,11 +103,11 @@ export function attachVoice({send,onError,isHistory}){
   document.addEventListener('visibilitychange',()=>{if(document.hidden)close()})
   document.getElementById('stop')?.addEventListener('click',close)
   return {get busy(){return !!(lease||opening||held||locked||handsFree||timer)},update(state,history){
-    if(state.harness==='dsh'&&state.phase==='ready'&&!lease&&!opening&&Date.now()>nextPreferences){
+    if((state.harness==='dsh'||state.capabilities?.voice===true)&&state.phase==='ready'&&!lease&&!opening&&Date.now()>nextPreferences){
       nextPreferences=Date.now()+15000
       void send('voice/preferences').then(result=>{if(result?.ok&&result.result){defaultHandsFree=result.result.mode==='hands-free';voiceEnabled=result.result.enabled;button.hidden=!voiceEnabled;status.hidden=!voiceEnabled}}).catch(()=>{})
     }
-    button.disabled=state.harness!=='dsh'||state.phase!=='ready'||history||!voiceEnabled
+    button.disabled=(state.harness!=='dsh'&&state.capabilities?.voice!==true)||state.phase!=='ready'||history||!voiceEnabled
     if((lease||opening)&&(button.disabled||lease&&state.sessionId&&lease.sessionId!==state.sessionId))close()
     if(button.disabled&&state.harness==='pi')button.title='Voice uses the shared DSH harness. Select DSH in Settings → Harnesses.'
   }}

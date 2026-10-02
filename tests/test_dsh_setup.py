@@ -116,3 +116,13 @@ class SharedPersonalAgentTests(unittest.TestCase):
         persona=next(row for row in entries if row['id']=='persona')['config']['prefix']
         self.assertIn('one personal assistant',persona)
         self.assertNotIn('Operate only',persona)
+
+
+class ContextBudgetCompositionTests(unittest.TestCase):
+    def test_context_budget_uses_the_isolated_pruner_in_both_personal_presets(self):
+        entries=setup.personal_agent_entries()
+        group=next(row for row in entries if row['id']=='compaction')
+        self.assertTrue(group['isolate']['toolResultPruner'])
+        guard=next(row for row in group['config'] if row['id']=='augmentor-context-budget')
+        self.assertTrue(Path(guard['name']).is_file())
+        self.assertNotIn('augmentor-context-budget', [row['id'] for row in entries])

@@ -186,7 +186,7 @@ class Window(QWidget):
     def switch_harness(self,harness,reconnect=False):
         if self.maintenance.phase()!='ready':return
         if self.voice_dialog or self.voice_input or self.voice_opening:self.close_voice_panel()
-        if harness not in ('pi','dsh') or not self.controller:return
+        if harness not in ('pi','dsh','codex') or not self.controller:return
         if self.controller.harness==harness and not reconnect:return
         if self.controller.running or self.controller.navigating or self.editing or getattr(self.controller,'repairing',False):
             self.set_status('Finish the current action before switching harness.');return
@@ -229,7 +229,7 @@ class Window(QWidget):
         if not self.setup_offered and self.controller and self.controller.harness=='dsh' and not self.controller.session and not getattr(self.controller.client,'product',False):
             self.setup_offered=True
             QTimer.singleShot(0,self.open_setup)
-        if online and not self.setup_offered and self.controller and self.controller.harness=='pi':
+        if online and not self.setup_offered and self.controller and self.controller.harness in ('pi','codex'):
             self.setup_offered=True
             available=any(model.get('available') for group in self.model_picker.catalog.get('groups',[]) for model in group.get('models',[]))
             if not available and not self.controller.session:QTimer.singleShot(0,self.open_setup)
@@ -251,6 +251,9 @@ class Window(QWidget):
         # demand for a DSH the user does not have.
         problem=runtime_problem() if managed_setup_needed() else ''
         if self.controller.harness=='pi':self.setup_dialog=SetupDialog(self)
+        elif self.controller.harness=='codex':
+            from .codex_setup import CodexSetupDialog
+            self.setup_dialog=CodexSetupDialog(self)
         elif problem:self.setup_dialog=RuntimeIncompleteDialog(self,problem)
         elif managed_setup_available():self.setup_dialog=ManagedSetupDialog(self)
         else:self.setup_dialog=DshSetupDialog(self)
@@ -307,7 +310,7 @@ class Window(QWidget):
                 self.open_voice();return
             remaining[0]-=1
             if remaining[0]>0:QTimer.singleShot(500,ready)
-            else:self.set_status('Voice could not connect. Check the DSH connection and try the voice button again.')
+            else:self.set_status('Voice could not connect. Check the conversation connection and try the voice button again.')
         ready()
 
     def voice_is_hands_free(self):
@@ -469,7 +472,7 @@ class Window(QWidget):
         self.voice_button.hands_free=self.voice_is_hands_free()
         self.voice_button.refresh_tip()
         self.voice_button.setVisible(self.preferences.values.get('resonant_voice',True))
-        self.voice_button.setEnabled(bool(self.controller and getattr(self.controller,'harness',None)=='dsh' and getattr(self.controller,'online',False) and not getattr(self.controller,'read_only',False) and (not getattr(self.controller,'navigating',False) or self.voice_opening)))
+        self.voice_button.setEnabled(bool(self.controller and (getattr(self.controller,'harness',None)=='dsh' or getattr(self.controller,'capabilities',{}).get('voice')) and getattr(self.controller,'online',False) and not getattr(self.controller,'read_only',False) and (not getattr(self.controller,'navigating',False) or self.voice_opening)))
         running=bool(self.controller and (self.controller.running or getattr(self.controller,'navigating',False)))
         can_queue=bool(self.controller and getattr(getattr(self.controller,'client',None),'supports_queue',False))
         self.send_button.setEnabled(bool(self.controller and self.model_picker.currentData()) and (not running or can_queue) and not getattr(self.controller,'navigating',False) and not self.read_only and getattr(self.controller,'online',True))
@@ -767,12 +770,8 @@ class Window(QWidget):
             if text==self.pending_prompt:self.pending_prompt=None
             self.messages.append(('You',text));return True
         if kind=='command/done':
-            # Hide only the routine opening policy notice, including history
-            # replay. Keep the DSH event and all other command/recovery notices.
-            if data.get('kind')=='success' and data.get('text')==(
-                'Harness: Saved reasoning: minimal; requested reasoning: xhigh '
-                '(request policy). Backend enforcement is provider-dependent.'
-            ):return False
+            # Effective policy may differ from the saved picker value. Keep its
+            # notice visible, including history replay, on every native platform.
             self.messages.append(('DSH',data.get('text') or ('Command completed.' if data.get('kind')=='success' else 'Command failed.')))
             return True
         if kind=='assistant/chunk':

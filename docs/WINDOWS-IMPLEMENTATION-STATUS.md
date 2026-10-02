@@ -2,6 +2,34 @@
 
 # Windows implementation status
 
+
+## Windows public preview — October 2, current direction
+
+The owner explicitly authorizes merging and publishing the Windows preview now,
+then installing the public download on a physical PC to provide feedback. They do
+not have a remotely accessible Windows test machine and waive that prerequisite.
+This supersedes the September 28 draft-only/publication restriction below.
+[Public installation guide and limits](WINDOWS-PREVIEW.md) own the current delivery
+scope. Windows 11 25H2+, native x64/ARM64, unsigned preview, DSH setup/chat and manual
+Chromium extension installation. Automatic updates, cross-version manual upgrades,
+local voice/memory engines, desktop automation and Windows Pi/Codex are unqualified.
+No physical Windows or RTX Spark acceptance is claimed.
+
+Latest completed development evidence at `14f7e57`, merge checkout
+`cede6c752b2aed964bf93136e655ea78adee266c`:
+[full Windows application](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36438724509)
+and [native installer](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36438724443)
+pass both native CPUs; shared Mac Qt also passes. Downloaded full reports confirm
+independent source restoration/completion and actual native UI reopening, with no
+inventory differences (x64 65,946 files; ARM64 65,930). These reports concern 0.2.12
+development candidates, deterministic provider chat and same-build updates, not
+this new public distribution profile, real-provider acceptance or N-to-N+1 updates.
+The public build rebases delivery on shared 0.2.13 source and records fresh native
+rendering, sealed inventory and installer digests separately.
+
+### Historical September 28 implementation record
+
+
 ## Windows implementation — active, September 28
 
 The owner authorizes autonomous implementation through the complete Windows app;

@@ -2,7 +2,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Assemble shared application sources into an isolated native runtime candidate.
 
-This is a build-tree qualification payload, not a signed/customer installer.
+Defaults to a development candidate. Public preview requires explicit opt-in.
 """
 import argparse
 import json
@@ -19,6 +19,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, required=True)
     parser.add_argument('--arch', choices=['x64', 'arm64'], required=True)
+    parser.add_argument('--public-preview', action='store_true')
     args = parser.parse_args()
     if sys.platform != 'win32': parser.error('Stage Windows dependencies on their native Windows target.')
     target = args.root.resolve()
@@ -47,9 +48,10 @@ def main():
         else: shutil.copy2(source, destination)
     product = json.loads((ROOT/'release/product.json').read_text(encoding='utf-8'))
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
-    (target/'release.json').write_text(json.dumps({**product, 'sourceCommit': revision,
-        'target': 'windows-'+args.arch, 'qualificationStatus': 'development-candidate',
-        'customerDistribution': False}, indent=2)+'\n', encoding='utf-8')
+    profile = json.loads((ROOT/'release/windows/public-preview.json').read_text(encoding='utf-8')) if args.public_preview else {
+        'qualificationStatus': 'development-candidate', 'customerDistribution': False}
+    (target/'release.json').write_text(json.dumps({**product, **profile, 'sourceCommit': revision,
+        'target': 'windows-'+args.arch}, indent=2)+'\n', encoding='utf-8')
     subprocess.run([sys.executable, '-Xutf8', '-B', str(ROOT/'scripts/build-windows-launcher.py'),
                     '--root', str(target), '--arch', args.arch], check=True)
     sys.path.insert(0,str(ROOT/'services'))

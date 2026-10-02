@@ -571,7 +571,8 @@ manual: dsh plugin --profile ${found.name} add dsh-augmentor@${version}
       render: (_args, value) => {
         if (!value.ok) return [{ type: "text", text: value.error ?? "no tabs" }];
         if (!value.tabs.length) return [{ type: "text", text: "0 tabs open in the user's browser" }];
-        return [{ type: "text", text: value.tabs.map((t) => `tab ${t.id ?? "?"}${t.workTab ? " [work tab]" : ""}${t.active ? " [active]" : ""}${t.focusedWindow ? " [focused window]" : ""}${t.dsh ? " [DSH session]" : ""}: ${t.title ?? "(untitled)"} \u2014 ${t.url ?? "(no url yet)"}`).join("\n") }];
+        const tabs = [...value.tabs].sort((a, b) => Number(Boolean(b.workTab)) - Number(Boolean(a.workTab)) || Number(Boolean(b.focusedWindow)) - Number(Boolean(a.focusedWindow)));
+        return [{ type: "text", text: tabs.map((t) => `tab ${t.id ?? "?"}${t.workTab ? " [work tab]" : ""}${t.active ? " [active]" : ""}${t.focusedWindow ? " [focused window]" : ""}${t.dsh ? " [DSH session]" : ""}: ${t.title ?? "(untitled)"} \u2014 ${t.url ?? "(no url yet)"}`).join("\n") }];
       }
     },
     async execute(_args, exec) {
@@ -598,11 +599,13 @@ manual: dsh plugin --profile ${found.name} add dsh-augmentor@${version}
           url: { type: "string" },
           title: { oneOf: [{ type: "string" }, { type: "null" }] },
           newTab: { type: "boolean" },
+          tabId: { type: "number" },
           error: { type: "string" }
         }
       },
       render: (_args, value) => [
-        { type: "text", text: value.ok ? `Opened ${value.url ?? "a page"}${value.title ? ` \u2014 \u201C${value.title}\u201D` : ""}${value.newTab ? " (new tab)" : ""}` : `navigate failed: ${value.error ?? "unknown error"}` }
+        { type: "text", text: value.ok ? `Opened ${value.url ?? "a page"}${value.title ? ` \u2014 \u201C${value.title}\u201D` : ""}${value.newTab ? " (new tab)" : ""}${value.tabId !== void 0 ? `
+Work tabId: ${value.tabId}. Use this ID for subsequent observations.` : ""}` : `navigate failed: ${value.error ?? "unknown error"}` }
       ]
     },
     async execute(args, exec) {
@@ -611,13 +614,19 @@ manual: dsh plugin --profile ${found.name} add dsh-augmentor@${version}
       if (!round.ok) throw new Error(`Real browser navigation failed: ${round.error}. No visible browser outcome was confirmed. Reconnect the Augmentor extension; an isolated Playwright browser is not the user's Chromium.`);
       const value = round.result;
       if (!value?.url || !/^https?:\/\//i.test(value.url)) throw new Error("The real browser did not confirm a loaded URL. Inspect its tabs before retrying; do not claim navigation succeeded.");
-      return { ok: true, url: value.url, title: value.title ?? null, newTab: Boolean(value.newTab) };
+      return { ok: true, tabId: value.tabId, url: value.url, title: value.title ?? null, newTab: Boolean(value.newTab) };
     }
   }));
   ctx.tools.register(defineTool({
     name: "browser_snapshot",
     description: "Read the current work tab with bounded read-only recovery for delayed content, visible controls, frames and open shadow roots. Confirm the returned URL matches the intended page. An inconclusive read is not evidence of an empty page; use browser_screenshot next. Do not guess routes or click the body to extract text. This is how you see a page after browser_navigate and before browser_click / browser_type. Fails when the work tab is not a readable http(s) page (e.g. the new-tab page) or when the user's tab is their DSH session \u2014 in that case call browser_navigate, which opens a dedicated tab.",
-    parameters: { tabId: { type: "number", description: "Optional exact tab ID from browser_tabs_list; selects the observation target without navigating or activating it." } },
+    parameters: {
+      tabId: { type: "number", description: "Exact tab ID from browser_navigate or browser_tabs_list. Reads that tab without changing the work target or activating it." },
+      offset: { type: "integer", description: "Nonnegative text offset from the preceding snapshot nextOffset; default 0." },
+      controlOffset: { type: "integer", description: "Nonnegative control offset from nextControlOffset; default 0." },
+      linkOffset: { type: "integer", description: "Nonnegative link offset from nextLinkOffset; default 0." },
+      scope: { type: "string", enum: ["main", "document"], description: "Default main prioritizes a visible main landmark, falling back to the document. document reads the entire page. Keep scope unchanged when paging." }
+    },
     output: {
       schema: {
         type: "object",
@@ -625,6 +634,7 @@ manual: dsh plugin --profile ${found.name} add dsh-augmentor@${version}
         properties: {
           ok: { type: "boolean", required: true },
           title: { type: "string" },
+          tabId: { type: "number" },
           url: { type: "string" },
           text: { type: "string" },
           links: {
@@ -643,7 +653,7 @@ manual: dsh plugin --profile ${found.name} add dsh-augmentor@${version}
       },
       render: (_args, value) => {
         if (!value.ok) return [{ type: "text", text: `snapshot failed: ${value.error ?? "unknown error"}` }];
-        const parts = [`Page: ${value.title}`, `URL: ${value.url}`, "", value.text || "(no visible text)"];
+        const parts = [`Page: ${value.title}`, `URL: ${value.url}`, `Tab: ${value.tabId ?? "(unknown)"}`, "", value.text || "(no visible text)"];
         if (value.links?.length) {
           parts.push("", `Links (${value.links.length}):`);
           for (const l of value.links) parts.push(`- [${l.text}](${l.href})`);
@@ -653,11 +663,14 @@ manual: dsh plugin --profile ${found.name} add dsh-augmentor@${version}
     },
     async execute(args, exec) {
       if (exec.signal.aborted) throw new Error("cancelled");
-      const round = await act({ action: "snapshot", ...args.tabId !== void 0 ? { tabId: args.tabId } : {} });
+      for (const key of ["offset", "controlOffset", "linkOffset"]) {
+        if (args[key] !== void 0 && (!Number.isSafeInteger(args[key]) || args[key] < 0)) throw new Error("Snapshot offsets must be nonnegative integers.");
+      }
+      const round = await act({ action: "snapshot", ...args });
       if (!round.ok) return { ok: false, error: round.error };
       const value = round.result;
       if (value?.ok === false || !value?.url) return { ok: false, error: value?.error ?? "No document observation returned. Inspect browser_tabs_list, then browser_screenshot; no page content was verified." };
-      return { ok: true, title: value.title ?? "", url: value.url, text: value.text ?? "", links: value.links ?? [] };
+      return { ok: true, tabId: value.tabId, title: value.title ?? "", url: value.url, text: value.text ?? "", links: value.links ?? [] };
     }
   }));
   ctx.tools.register({

@@ -1,8 +1,9 @@
-import {refreshDesktopAppearance} from './appearance.mjs'
 // Augmentor — dsh-augmentor plugin, pipe, and Chromium extension
 // Copyright © 2026 Manolo Remiddi
 // SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
+import {refreshDesktopAppearance} from './appearance.mjs'
+import {codexSetupDialog} from './codex-setup.mjs'
 import {homeSettings} from './home.mjs'
 
 import {formattingFields, formattingDefaults, appearanceFields, readAppearance, saveAppearance, resetAppearance, watchAppearance} from './appearance.mjs'
@@ -22,13 +23,13 @@ const button=(parent,label,fn)=>{const b=make('button',label);b.type='button';b.
 let state={},checking=false,closed=false,mounting=0
 const sections=new Map()
 const definitions=[
-  ['voice','Voice','Shared with the floating Augmentor window.','M9 3h6v10H9zM5 10v3a7 7 0 0 0 14 0v-3M12 20v3'],
+  ['voice','Voice',chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol?'Optional experimental speech for this application.':'Shared with the floating Augmentor window.','M9 3h6v10H9zM5 10v3a7 7 0 0 0 14 0v-3M12 20v3'],
   ['appearance','Colours','Changes apply immediately.','M12 3a9 9 0 1 0 0 18h1a2 2 0 0 0 1-4 2 2 0 0 1 1-4h2a4 4 0 0 0 4-4c0-3-4-6-9-6ZM7 10h.01M10 6h.01M15 6h.01'],
   ['models','Models','Choose the model Augmentor uses.','M9 3v6m6-6v6M6 9h12v2a6 6 0 0 1-12 0ZM12 17v4'],
   ['harnesses','Harnesses','Choose what powers your browser agent.','M4 7h16M4 17h16M8 4v6m8 4v6'],
   ['prompts','Prompt library','Reusable prompts, shared with Augmentor Agent and both harnesses. Type / in chat to use one.','M5 3h14v18H5zM8 8h8M8 12h8M8 16h4'],
   ['home','Home','Connect your NAS and use Home in your Augmentor conversations.','M3 10l9-7 9 7v11H3z'],
-  ['memory','Memories','Shared across your browser and Linux agents.','M4 5c0-4 16-4 16 0s-16 4-16 0v14c0 4 16 4 16 0V5M4 12c0 4 16 4 16 0'],
+  ['memory','Memories',chrome.runtime.getManifest().augmentorWorkspace?'Dedicated to '+chrome.runtime.getManifest().augmentorWorkspace.name+'.':'Shared across your browser and Linux agents.','M4 5c0-4 16-4 16 0s-16 4-16 0v14c0 4 16 4 16 0V5M4 12c0 4 16 4 16 0'],
   ['support','Support','Version information and a report you can review before sharing.','M12 11v6m0-10v1M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0'],
 ]
 for(const [id,label,description,path] of definitions){
@@ -71,17 +72,19 @@ function showModels(container){
   const active=make('p');active.id='active-model';container.append(active)
   const pi=make('div');pi.id='pi-model-settings';const dsh=make('div');dsh.id='dsh-model-settings';dsh.className='card';dsh.append(make('h2','DeepSeek Harness models'),make('p','DSH manages its model providers. Add or edit them in DSH, then refresh the model picker in Augmentor.'))
   button(dsh,'Open DSH model settings',async()=>{const r=await send('promptSettings');if(!r.ok)throw Error(r.error)})
-  container.append(pi,dsh)
+  const codex=make('div');codex.id='codex-model-settings'
+  container.append(pi,dsh,codex)
   const mountPi=()=>{const body=advanced(pi,'Connect another model');if(!state.model?.model)body.parentElement.open=true;const dialog=modelSetupDialog(document,send,body);dialog?.addEventListener('close',()=>{if(closed)return;const note=make('p','Model saved. Use the chat model picker to choose an existing model, or connect another below.');note.className='saved-note';pi.replaceChildren(note);mountPi()},{once:true})}
   container.update=()=>{
-    pi.hidden=state.harness!=='pi';dsh.hidden=state.harness!=='dsh'
+    pi.hidden=state.harness!=='pi';dsh.hidden=state.harness!=='dsh';codex.hidden=state.harness!=='codex'
+    if(state.harness==='codex'&&!codex.querySelector('.codex-setup'))codexSetupDialog(document,send,codex)
     active.textContent='Current model: '+(state.model?.model||'Not connected')
     if(state.harness==='pi'&&!pi.querySelector('.model-setup'))mountPi()
   };container.update()
 }
 function showHarnesses(container){
   const card=make('div');card.className='card';card.append(make('h2','Browser harness'))
-  const select=make('select');select.setAttribute('aria-label','Browser harness');for(const [value,label] of [['','Choose DSH or Pi'],['pi','Pi'],['dsh','DeepSeek Harness']]){const opt=make('option',label);opt.value=value;opt.disabled=!value;select.append(opt)}
+  const select=make('select');select.setAttribute('aria-label','Browser harness');for(const [value,label] of [['','Choose a harness'],['pi','Pi'],['dsh','DeepSeek Harness'],['codex','Codex (development)']]){const opt=make('option',label);opt.value=value;opt.disabled=!value;select.append(opt)}
   select.onchange=async()=>{select.disabled=true;try{const r=await send('harness/select',{harness:select.value});if(!r.ok)throw Error(r.error);await refresh()}catch(e){fail(e)}finally{select.disabled=!!state.running}}
   card.append(select);container.append(card)
   const connection=advanced(container,'DSH connection settings')
@@ -89,6 +92,8 @@ function showHarnesses(container){
   container.update=()=>{select.value=state.harness||'';select.disabled=!!state.running};container.update()
 }
 function showMemory(container){
+  if(chrome.runtime.getManifest().augmentorWorkspace){memoryDialog(document,send,()=>({surface:'browser',harness:state.harness,...(state.sessionId?{sessionId:state.sessionId}:{})}),container);return}
+
   const card=make('div');card.className='card onboarding-card';card.append(make('h2','Let Augmentor set up memory'),make('p','Start a guided conversation. Augmentor checks your computer and handles the setup, asking only for missing choices or credentials.'))
   const status=make('p');status.className='help';status.setAttribute('role','status')
   const start=button(card,'Set up with Augmentor',async()=>{
@@ -103,6 +108,9 @@ function showMemory(container){
   manual.parentElement.addEventListener('toggle',()=>{if(manual.parentElement.open&&!manual.querySelector('dialog'))memoryDialog(document,send,()=>({surface:'browser',harness:state.harness,...(state.sessionId?{sessionId:state.sessionId}:{})}),manual)})
 }
 async function showVoice(container){
+  if(chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol){
+    container.append(make('p','Experimental voice uses the Augmentor host audio hardware. Choose voices and audio settings in standalone Augmentor. Cloud voice providers will be added later.'));return
+  }
   const response=await send('voice/preferences');if(!response?.ok)throw Error(response?.error||'Voice is unavailable')
   const data=response.result,fields={}
   const add=(key,label,input)=>{const row=make('label',label);row.append(input);container.append(row);fields[key]=input;return input}
@@ -154,7 +162,7 @@ async function refresh(){
   if(checking||closed||maintenance.paused)return;checking=true
   try{
     state=await send('connect')
-    document.querySelector('#connection').textContent=({dsh:'DSH',pi:'Pi'}[state.harness]||'Harness')+' · '+({ready:'Connected','needs-setup':'Setup needed',connecting:'Connecting…'}[state.phase]||state.phase||'Connecting…')
+    document.querySelector('#connection').textContent=({dsh:'DSH',pi:'Pi',codex:'Codex'}[state.harness]||'Harness')+' · '+({ready:'Connected','needs-setup':'Setup needed',connecting:'Connecting…'}[state.phase]||state.phase||'Connecting…')
     for(const row of sections.values())row.body.update?.()
     navigate()
   }catch(e){document.querySelector('#connection').textContent='Companion unavailable';fail(e)}finally{checking=false}

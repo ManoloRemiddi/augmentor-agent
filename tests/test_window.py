@@ -324,6 +324,12 @@ class WindowTests(unittest.TestCase):
 
     def test_activity_lifecycle_and_outside_pixels(self):
         from PySide6.QtTest import QTest
+        import time
+        def finish_morph():
+            deadline=time.monotonic()+1.5
+            while window.morphing and time.monotonic()<deadline:QTest.qWait(10)
+            self.assertFalse(window.morphing, 'compact transition finishes within the bounded wait')
+            self.assertTrue(window.activity.timer.isActive())
         window=Window();window.show();QTest.qWait(20)
         idle=window.activity.canvas.grab().toImage()
         window.set_busy(True);QTest.qWait(180)
@@ -335,15 +341,8 @@ class WindowTests(unittest.TestCase):
                             for x in range(working.width()) for y in range(window.activity.extent)))
         window.hide();self.assertFalse(window.activity.timer.isActive())
         window.bring_forward();QTest.qWait(20);self.assertTrue(window.activity.timer.isActive())
-        for _ in range(2):
-            window.toggle_compact()
-            # Animation completion is scheduled by Qt's frame clock. A busy
-            # hosted renderer can exceed its nominal 240 ms duration.
-            for attempt in range(100):
-                if not window.morphing:break
-                QTest.qWait(20)
-            self.assertFalse(window.morphing,'The compact transition did not finish.')
-            self.assertTrue(window.activity.timer.isActive())
+        window.toggle_compact();finish_morph()
+        window.toggle_compact();finish_morph()
         window.apply_appearance({'animation':False})
         self.assertFalse(window.activity.timer.isActive())
         self.assertEqual(window.activity.strength,1)

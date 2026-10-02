@@ -2,9 +2,9 @@
 
 # Improve a draft
 
-In the Linux app with the Augmentor DSH integration selected, type a draft and click **✦ Improve prompt** inside the input. The selected model rewrites it using the separate **Prompt library → Improve prompt** instructions. Letters roll while the request runs, then settle into the replacement in 700 ms. The result remains an editable draft; it is not sent to the conversation. After a rewrite, the same ✦ button becomes ↶ Undo; clicking it restores the previous wording. Editing the draft returns the button to ✦.
+In Desktop with the Augmentor DSH integration or a Codex API/local profile selected, type a draft and click **✦ Improve prompt** inside the input. The selected model rewrites it using the separate **Prompt library → Improve prompt** instructions. Letters roll while the request runs, then settle into the replacement in 700 ms. The result remains an editable draft; it is not sent to the conversation. After a rewrite, the same ✦ button becomes ↶ Undo; clicking it restores the previous wording. Editing the draft returns the button to ✦.
 
-Click **×** or press Escape to dismiss the pending improvement. Editing the draft also discards the pending result. Dismissing the preview does not necessarily stop the already-started model request. A failed rewrite or a request for clarification leaves the original intact and displays its explanation on the button. The rewrite uses a separate, tool-free model call and cannot execute the draft's instructions. Other harnesses do not yet expose this button's model operation.
+Click **×** or press Escape to dismiss the pending improvement. Editing the draft also discards the pending result. Dismissing the preview does not necessarily stop the already-started model request. A failed rewrite or a request for clarification leaves the original intact and displays its explanation on the button. The rewrite uses a separate, tool-free model call and cannot execute the draft's instructions. Pi does not yet expose this model operation. Codex subscription profiles remain unavailable.
 
 The editor accepts drafts up to 6,000 characters, subject to the local request-size limit. Open **More → Prompt library → Improve prompt** to edit the instructions, preview their formatting, save changes, reload, or restore the default. The setting is shared with the browser library and DSH settings. Existing installations seed it once from `/prompt`; later edits or deletion of that shortcut do not change the setting. Concurrent saves are revision-checked. Only the approved improvement instructions ship as the default; personal saved prompts stay in the local database and are not bundled in source or releases.
 
@@ -38,3 +38,21 @@ Browser regression coverage in `apps/browser/test/surface.test.mjs` includes
 pending/settling draft protection, completion and Undo, Escape/Enter, failure,
 typing, session changes and page closure. These DOM tests establish behavior;
 they do not substitute for a visual acceptance check in the user's Chromium.
+
+
+## Codex development integration
+
+Desktop and Browser use the same Codex host's auxiliary Responses operation,
+with the selected API/local profile and the saved shared instructions. It sends
+only the draft and those instructions, with no tools, conversation history or
+memory, and returns an editable rewrite. It creates no Codex thread. The host
+limits input/output and request duration, rejects malformed/incomplete results,
+refuses redirects and performs no automatic retry or provider fallback.
+
+Only one rewrite runs at a time; profile changes and maintenance wait until it
+finishes. Closing the host aborts it. Cancel/Escape, typing and navigation discard
+the preview and late result; they do not guarantee stopping provider billing.
+The model operation is covered by `tests/codex-prompt-improvement.test.mjs`,
+including actual native/Browser bridges against a synthetic provider. Existing
+composer regression tests cover draft protection and Undo. See the
+[Codex evidence and limits](CODEX-INTEGRATION.md#apilocal-draft-improvement).

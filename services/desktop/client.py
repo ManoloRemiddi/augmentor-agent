@@ -21,6 +21,7 @@ def call(request,start=True):
         except (FileNotFoundError,ConnectionRefusedError):
             if not start or os.environ.get('AUGMENTOR_DESKTOP_NO_AUTOSTART')=='1' or request.get('method')!='connect':
                 if request.get('method')=='stop':return {'ok':True,'result':{'stopped':True}}
+                if request.get('method')=='status' and request.get('params',{}).get('allowAbsent') is True:return {'ok':True,'result':{'active':False,'sharing':False,'owner':None,'available':False}}
                 raise RuntimeError('Desktop control is not connected. Use linux_desktop_connect first.')
             # Retrieve only graphical session variables from the user's own manager.
             env=dict(os.environ)

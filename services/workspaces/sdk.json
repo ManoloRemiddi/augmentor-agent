@@ -1,0 +1,6 @@
+{
+  "protocol": "augmentor-app/1",
+  "harnesses": ["dsh"],
+  "capabilities": ["embed", "scoped-sessions", "tool-policy", "workspace-memory", "background-client"],
+  "voice": {"experimental": true, "providers": ["resonant-voice"], "defaultEnabled": false}
+}

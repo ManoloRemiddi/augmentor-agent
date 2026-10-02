@@ -13,7 +13,7 @@ from .platform_runtime import LocalSocket, private_directory
 
 
 def ensure_running(harness='pi'):
-    if harness != 'pi':raise ValueError('Only Pi uses the managed socket runtime.')
+    if harness not in ('pi', 'codex'):raise ValueError('This harness does not use the managed socket runtime.')
     prefix='AUGMENTOR_'+harness.upper()
     project=Path(__file__).resolve().parents[3]
     state=Path(os.environ.get(prefix+'_STATE',Path(os.environ.get('XDG_STATE_HOME',Path.home()/'.local/state'))/('augmentor-'+harness)))
@@ -28,8 +28,8 @@ def ensure_running(harness='pi'):
     with (state/'startup.lock').open('a') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX)
         if alive():return
-        node=os.environ.get('AUGMENTOR_PI_NODE') or shutil.which('node')
-        script=project/'dist/runtime/src/main.js'
+        node=os.environ.get(prefix+'_NODE') or os.environ.get('AUGMENTOR_PI_NODE') or shutil.which('node')
+        script=project/('dist/codex-runtime/src/main.js' if harness == 'codex' else 'dist/runtime/src/main.js')
         if not node or not script.exists():raise RuntimeError(harness+' runtime is not built. Run npm ci --ignore-scripts and npm run build in the app installation.')
         log=os.open(state/'runtime.log',os.O_WRONLY|os.O_CREAT|os.O_APPEND,0o600)
         try:child=subprocess.Popen([sys.executable,str(project/'scripts/run-component.py'),'runtime',node,str(script)],cwd=project,stdin=subprocess.DEVNULL,stdout=log,stderr=log,start_new_session=True,env={**os.environ,'PI_TELEMETRY':'0','PI_SKIP_VERSION_CHECK':'1'})
