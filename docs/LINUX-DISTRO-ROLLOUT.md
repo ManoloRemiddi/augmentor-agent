@@ -902,3 +902,20 @@ ordinary-user read-only check. Xvfb is a test dependency, not a product dependen
 Actual corrected binary checks return `1.07` on Fedora 43, Fedora 44 and Ubuntu
 26.04. Fresh complete package/native hosted confirmation follows this correction;
 do not treat the failed matrix as a passed package qualification.
+
+The [full-session lifecycle report](../release/qualification/gnome50/fedora44-vm-lifecycle.json)
+now passes three repeated production `--autostart` requests preserving the same
+process and maintenance state; explicit fixture lock/unlock preserving that
+process, suspending the user-only observer and replacing its epoch; refusal by
+the old observer after unlock; an accepted idle close with a clean inactive
+service; and one canonical closed-app launch into a new service-owned process.
+`release/prove-gnome-vm-lifecycle.py` requires the dedicated marked guest and an
+idle, draft-free app. An open onboarding dialog correctly fails its preflight.
+The initial test exposed a socket reset during read-only close polling; the
+proof handles it as absence, without replaying the accepted close. Automatic
+idle blanking is disabled only in this fixture, with its original setting saved
+privately, to make the explicit lock test deterministic. GNOME documents this
+[extension enable/disable lifecycle](https://gjs.guide/extensions/topics/session-modes.html).
+This report still qualifies the earlier `f7d7585` installed payload, not current
+source artifacts. Crash, reboot, connected-harness recovery and portal-session
+termination at lock remain separate gates.

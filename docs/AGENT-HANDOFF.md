@@ -130,6 +130,14 @@ actual ordinary-user binary checks pass on Fedora 43/44 and Ubuntu 26.04. Hosted
 confirmation, duplicate startup/crash/reboot, latest artifacts and the remaining
 full desktop/other-distro gates remain open. Continue the active rollout.
 
+The new owned full-VM lifecycle proof now passes three duplicate production
+autostarts, lock/unlock observer suspension and fresh-epoch/old-client refusal,
+accepted idle close, clean service exit and canonical closed launch into a new
+service-owned process. Its busy-dialog preflight refuses correctly. The checked
+report and reproducible guest-only helper are in the rollout guide. Installed
+source remains `f7d7585`; no newer-source, crash/reboot, connected harness or
+portal-lock termination claim follows. Continue those remaining gates.
+
 ## October 1 merge blockers: current main and separate Codex prerequisite
 
 The feature branch integrates canonical main `8c3be5a` at merge `338dbc5`.
