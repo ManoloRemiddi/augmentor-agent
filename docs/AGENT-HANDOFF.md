@@ -2,7 +2,30 @@
 
 # Start here: agent handoff
 
-## October 2 actual Cinnamon bridge and source build checkpoint
+## October 2 native Cinnamon shortcut/recovery checkpoint
+
+The [Cinnamon helper](LINUX-CINNAMON-ADAPTER.md#native-shortcut-helper-and-interruption-recovery)
+now uses native numeric rows, bounded GTK3 worker and a durable pre-mutation
+intent. Actual Mint Save/registration, both synthetic launcher QEMU key events,
+WM/custom/other-row/spice conflicts, ownership tampering, rollback/durability
+failure and production disabled-object/stale-epoch refusal pass. Six actual abrupt
+worker/recovery cases cover old/new rows and foreign takeover. Default idle lock
+and wrong/correct password remain real; earlier property/cold-query/locked-fixture
+refusals are preserved. Full source:710 native cases,708 pass/two platform skips
+in owned Arch. Graphical product UI/full app/reboot/physical keyboard, complete
+scene/control/Stop, Browser/audio and release remain open; no app is installed.
+
+All six Qt modules build/install in the second isolated image; PySide/shiboken
+wheel creation fails missing patchelf. That tree is stopped/preserved. The
+[source recipe](LINUX-LGPL-SOURCE-RUNTIME.md) adds signed patchelf; a third fresh
+root/image/source build completes Qt but refuses the verified Ubuntu Python
+package-scheme mismatch. Its tree is preserved. Fourth clean venv build passes
+early path/patchelf checks and starts configuration offline. No full
+runtime/license/closure/rebuild/replacement/release pass is claimed. Both3b8be6d
+hosted workflows pass. Continue all five original rollout points; no owner state
+or selected application changed. Source publication does not deploy an artifact.
+
+## October 2 actual Cinnamon bridge and source build checkpoint (historical)
 
 The [first Cinnamon bridge](LINUX-CINNAMON-ADAPTER.md) is read-only/input-disabled,
 strict6.6.4/X11 and native-owner-pinned. Ten protocol cases and actual Mint76-record

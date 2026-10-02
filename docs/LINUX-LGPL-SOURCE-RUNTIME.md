@@ -8,15 +8,30 @@ bytes and the official checksum records pass the
 [acquisition report](../release/qualification/next-targets/20261002-lgpl-source-acquisition.json).
 The acquisition tool saves partials on failure and refuses an unvalidated resume.
 No detached archive signature or archive-to-Git equality is claimed. This is
-source acquisition only; compilation, closure/license review, independent rebuild,
-recipient replacement and public release remain false.
+source acquisition with the measured partial builds below; full runtime, closure/
+license review, independent rebuild, replacement and public release remain false.
+
+The [later PySide failure/checkpoint](../release/qualification/next-targets/20261002-qt-source-pyside-failure.json)
+records all six Qt modules compiled/installed, Wayland client ON/server OFF and
+actual shiboken library compilation before wheel creation refused missing
+patchelf. That second image/tree/log is stopped and preserved. The recipe now
+includes signed distro patchelf. The third fresh build also finishes all six
+Qt modules, but wheel packaging refuses Ubuntu system Python's dist-packages
+versus CMake's site-packages path. Its stopped tree/log is preserved. Pinned
+upstream build_info_collector/ShibokenHelpers and actual sysconfig probes verify
+the mismatch. The [official Linux venv workflow](https://doc.qt.io/qtforpython-6.8/building_from_source/linux.html)
+makes both schemes agree. The fourth clean image creates a system-site-package
+venv without pip/network; its driver verifies equal scheme suffixes and patchelf
+before Qt compilation. Actual preflight passes and initial configuration starts.
+No intermediate binaries were reused. Runtime completion and every downstream qualification gate remain
+false. The original checkpoint below remains historical.
 
 Build a separate artifact. Do not relabel the current vendor PyPI wheels, delete
 their GPL-only libraries without closure review or assume a commercial license.
 No owner runtime or selected desktop has changed. [Licensing](LICENSING.md) owns
 the distribution conditions; this recipe is engineering work, not legal approval.
 
-## Intended dependency closure
+## Build profile and dependency closure
 
 The [marked Noble source-builder recipe](../release/linux-lgpl-source-builder.Dockerfile)
 and [build driver](../release/build-linux-lgpl-runtime.py) now run in an isolated
@@ -25,9 +40,10 @@ distro build package inventory is hashed. The first Qt configuration disabled
 AT-SPI/TLS/Fontconfig; its partial tree/logs are preserved and the container was
 intentionally stopped, not promoted. The corrected empty-tree build requires all
 nineteen tested cache features ON before compilation. QtBase,ShaderTools,Svg and
-ImageFormats compile/install; QtDeclarative is still compiling at the
+ImageFormats compile/install; QtDeclarative was still compiling at the
 [checked boundary](../release/qualification/next-targets/20261002-qt-source-build-checkpoint.json).
-The full Qt/PySide build remains incomplete and downstream gates remain false.
+That historical report is superseded by the later measured PySide failure above;
+full Qt/PySide build and downstream qualification remain incomplete.
 Actual PySide/shiboken .cmake.conf uses MICRO_VERSION2.1, producing6.8.2.1 despite
 the archive's6.8.2 directory suffix. No selected runtime or owner packages changed.
 
@@ -46,7 +62,7 @@ ELF and dynamic-plugin closure proof; a few DT_NEEDED checks are insufficient.
 QuickVectorImageGenerator is LGPL-capable, so do not blanket-label every vector
 tool GPL-only. Preserve build tools needed by later modules until staging review.
 
-## Source-informed build commands, not executed qualification
+## Executed recipe; downstream qualification still open
 
 For Noble x86_64/Python 3.12, install matching signed distro build dependencies in
 an isolated bounded builder and save their exact versions. Start qtbase with:
@@ -54,7 +70,8 @@ an isolated bounded builder and save their exact versions. Start qtbase with:
 ```sh
 <qtbase-src>/configure -prefix <shared-prefix> -shared -release \
   -nomake tests -nomake examples -feature-testlib -feature-dbus \
-  -feature-wayland -icu -xcb -opengl desktop -egl \
+  -feature-wayland -feature-accessibility -feature-accessibility-atspi-bridge \
+  -icu -xcb -opengl desktop -egl -openssl-linked -fontconfig \
   -system-zlib -system-pcre -system-doubleconversion -system-freetype \
   -system-harfbuzz -system-libpng -system-libjpeg
 cmake --build . --parallel 2
@@ -78,7 +95,7 @@ Configure other modules with `<prefix>/bin/qt-configure-module <source>`, then
 Build PySide using Python 3.12 and the reviewed setup.py options:
 
 ```sh
-python3.12 setup.py bdist_wheel --qtpaths=<prefix>/bin/qtpaths \
+/work/build-python/bin/python3.12 setup.py bdist_wheel --qtpaths=<prefix>/bin/qtpaths \
   --module-subset=Core,Gui,Widgets,Network,DBus,Svg,Qml,Quick,QuickWidgets,OpenGL,Test \
   --no-qt-tools --limited-api=yes --parallel=2
 ```

@@ -3,7 +3,7 @@
 FROM docker.io/library/ubuntu@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential cmake ninja-build pkg-config ca-certificates \
+    build-essential cmake ninja-build pkg-config ca-certificates patchelf \
     python3.12-dev python3.12-venv python3-setuptools python3-wheel python3-packaging \
     libclang-18-dev llvm-18-dev clang-18 \
     libgl1-mesa-dev libegl1-mesa-dev libopengl-dev libvulkan-dev \
@@ -23,4 +23,5 @@ RUN useradd --create-home --uid 1001 augmentor-proof && chown augmentor-proof:au
 USER augmentor-proof
 ENV HOME=/home/augmentor-proof USER=augmentor-proof LLVM_INSTALL_DIR=/usr/lib/llvm-18
 WORKDIR /work
+RUN python3.12 -m venv --system-site-packages --without-pip /work/build-python
 CMD ["sleep", "infinity"]

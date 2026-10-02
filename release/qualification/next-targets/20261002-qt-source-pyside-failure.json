@@ -1,0 +1,199 @@
+{
+  "format": "augmentor-linux-source-runtime-pyside-failure/1",
+  "sourceBase": "3b8be6d372ca656b7e369bfe51083f1a8bd57d1c",
+  "secondBuild": {
+    "infrastructure": {
+      "sourceBase": "f815c23cc6f74926413a2ce14c084433701fcd67",
+      "imageId": "sha256:35812bfce750cad82a9332db15c5bf358cd48ad8870fb72e99e5d70887cfe59a",
+      "containerId": "8bcaeaba4086c4f9b63a9bb69b7a4e2d2c8c1fc0a7b215b63db3429706d11bca",
+      "containerName": "augmentor-noble-qt-source-20261002-b",
+      "basePin": "docker.io/library/ubuntu@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3",
+      "dockerfileSha256": "fce11668a15f48afeaade0ed88601a190f877933f45caf7a8e61934f63b38f9d",
+      "toolSha256": "8f270c2f8c455048c2b84fbf53f561a5714dd42e9a3122bdbf84041ae565890b",
+      "policySha256": "969dca5093394282eef5517ade6e0bcb31d1a9ceb1b22513d213aa9ef434196e",
+      "recipeUncommitted": true,
+      "cpuLimit": 2,
+      "memoryLimitBytes": 8589934592,
+      "pidsLimit": 512,
+      "hostMounts": false,
+      "hostDevices": false,
+      "buildNetwork": "none",
+      "firstSourceBuildPreservedUnqualified": true,
+      "ownerStateChanged": false
+    },
+    "finalBuildReportSha256": "7f583f34110e693da6e96cb40a5b3a234f74aa88f2922428f9b7c1ea535319d0",
+    "completedInstallModules": [
+      "qtbase",
+      "qtshadertools",
+      "qtsvg",
+      "qtimageformats",
+      "qtdeclarative",
+      "qtwayland"
+    ],
+    "qtbaseRequiredFeatures": {
+      "testlib": "ON",
+      "dbus": "ON",
+      "wayland": "ON",
+      "accessibility": "ON",
+      "accessibility_atspi_bridge": "ON",
+      "icu": "ON",
+      "xcb": "ON",
+      "xcb_glx": "ON",
+      "egl": "ON",
+      "openssl": "ON",
+      "openssl_linked": "ON",
+      "fontconfig": "ON",
+      "system_zlib": "ON",
+      "system_pcre2": "ON",
+      "system_doubleconversion": "ON",
+      "system_freetype": "ON",
+      "system_harfbuzz": "ON",
+      "system_png": "ON",
+      "system_jpeg": "ON"
+    },
+    "qtwaylandClientEnabled": true,
+    "qtwaylandServerDisabled": true,
+    "pysideStepExit": 1,
+    "observedFailure": "patchelf not found",
+    "pysideLogSha256": "62b9faa4d41eb40b6a58c17ad9c5209cc3ad8c3bd33e134eb8fa005dcbc6e096",
+    "shibokenLibraryBuiltBeforeWheelFailure": true,
+    "stoppedAndPreserved": true,
+    "runtimeBuilt": false
+  },
+  "thirdBuild": {
+    "infrastructure": {
+      "sourceBase": "3b8be6d372ca656b7e369bfe51083f1a8bd57d1c",
+      "imageId": "sha256:1c9be67b6af57369463593a34c2f17792ae814b26dd9517ca2090c3da14dc147",
+      "containerId": "a48f170df10f15358b63434986ac6ce797f1c27ee447564afdb5982d7e9f7062",
+      "containerName": "augmentor-noble-qt-source-20261002-c",
+      "basePin": "docker.io/library/ubuntu@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3",
+      "dockerfileSha256": "b4357f239144b9f5c9b04984b066276f65a8980de038fcdb1f5894c83d4675a6",
+      "toolSha256": "8f270c2f8c455048c2b84fbf53f561a5714dd42e9a3122bdbf84041ae565890b",
+      "policySha256": "969dca5093394282eef5517ade6e0bcb31d1a9ceb1b22513d213aa9ef434196e",
+      "recipeUncommitted": true,
+      "cpuLimit": 2,
+      "memoryLimitBytes": 8589934592,
+      "pidsLimit": 512,
+      "hostMounts": false,
+      "hostDevices": false,
+      "buildNetwork": "none",
+      "previousBuildPreservedUnqualified": true,
+      "freshRootAndSources": true,
+      "ownerStateChanged": false
+    },
+    "checkpointBuildReportSha256": "de6b9b8e1ef6e781f608ce64b41e153bc327e13aa879216cf757f42a77980707",
+    "dependencyInventorySha256": "bc6cd4560d3d984dc11e2b2faceb1b1b2fcf73440fad5a4d9c6a8f76a594b7b3",
+    "patchelfDependencyDeclared": true,
+    "freshSourcesAndRoot": true,
+    "qtbaseRequiredFeatures": {
+      "testlib": "ON",
+      "dbus": "ON",
+      "wayland": "ON",
+      "accessibility": "ON",
+      "accessibility_atspi_bridge": "ON",
+      "icu": "ON",
+      "xcb": "ON",
+      "xcb_glx": "ON",
+      "egl": "ON",
+      "openssl": "ON",
+      "openssl_linked": "ON",
+      "fontconfig": "ON",
+      "system_zlib": "ON",
+      "system_pcre2": "ON",
+      "system_doubleconversion": "ON",
+      "system_freetype": "ON",
+      "system_harfbuzz": "ON",
+      "system_png": "ON",
+      "system_jpeg": "ON"
+    },
+    "completedInstallModules": [
+      "qtbase",
+      "qtshadertools",
+      "qtsvg",
+      "qtimageformats"
+    ],
+    "incompleteSteps": [
+      {
+        "module": "qtdeclarative",
+        "phase": "compile"
+      }
+    ],
+    "buildStillRunning": true,
+    "historicalCompilingCheckpoint": true
+  },
+  "fullQtPysideRuntimeBuilt": false,
+  "runtimeClosureTested": false,
+  "licenseReviewComplete": false,
+  "correspondingSourceRebuildTested": false,
+  "recipientReplacementTested": false,
+  "publicReleaseQualified": false,
+  "ownerStateChanged": false,
+  "thirdFinalFailure": {
+    "finalBuildReportSha256": "568fac62197528ea2ab994fb5fe7bb22d716f2721e488a2a06e5a3cc4a52d275",
+    "pysideLogSha256": "7d8ce231512d18acd40a0085aa1df096b9cac1efd07ca8da6148d37f091f327a",
+    "completedInstallModules": [
+      "qtbase",
+      "qtshadertools",
+      "qtsvg",
+      "qtimageformats",
+      "qtdeclarative",
+      "qtwayland"
+    ],
+    "pysideStepExit": 1,
+    "observedFailure": "CMake installed shiboken under lib/python3.12/site-packages; setuptools expected lib/python3.12/dist-packages",
+    "upstreamSourcesVerified": "PySide6.8.2.1 build_info_collector.py lines304-307, ShibokenHelpers.cmake lines97-143; actual Ubuntu sysconfig path probe",
+    "systemPythonSchemeSuffixes": [
+      "lib/python3.12/dist-packages",
+      "lib/python3.12/site-packages"
+    ],
+    "venvSchemeSuffixes": [
+      "lib/python3.12/site-packages",
+      "lib/python3.12/site-packages"
+    ],
+    "stoppedAndPreserved": true,
+    "runtimeBuilt": false
+  },
+  "fourthBuild": {
+    "infrastructure": {
+      "sourceBase": "3b8be6d372ca656b7e369bfe51083f1a8bd57d1c",
+      "imageId": "sha256:f1a028f702c9dd57596440ea4bfb2e75406029d931e206f255d8ae4dfdf1b856",
+      "containerId": "aa3451a12a6effba3fcceee2800bbe5513ce39e99c6d40a80b453659f6999cf7",
+      "containerName": "augmentor-noble-qt-source-20261002-d",
+      "basePin": "docker.io/library/ubuntu@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3",
+      "dockerfileSha256": "7891409bc183c09653a5d340b8e98f363c2f3dbbd6e11d0d7ed57c9d13a10fd2",
+      "toolSha256": "bf284d655f81ed7aa9198c454f60a2e07b6f6d3b5ad1d69fb50e629c469debc3",
+      "policySha256": "969dca5093394282eef5517ade6e0bcb31d1a9ceb1b22513d213aa9ef434196e",
+      "recipeUncommitted": true,
+      "cpuLimit": 2,
+      "memoryLimitBytes": 8589934592,
+      "pidsLimit": 512,
+      "hostMounts": false,
+      "hostDevices": false,
+      "buildNetwork": "none",
+      "previousBuildPreservedUnqualified": true,
+      "freshRootAndSources": true,
+      "pythonPreflight": {
+        "executable": "/work/build-python/bin/python3.12",
+        "prefix": "/work/build-python",
+        "basePrefix": "/usr",
+        "default": {
+          "purelib": "/work/build-python/lib/python3.12/site-packages",
+          "data": "/work/build-python"
+        },
+        "posixPrefix": {
+          "purelib": "/work/build-python/lib/python3.12/site-packages",
+          "data": "/work/build-python"
+        }
+      },
+      "ownerStateChanged": false
+    },
+    "dependencyInventorySha256": "bc6cd4560d3d984dc11e2b2faceb1b1b2fcf73440fad5a4d9c6a8f76a594b7b3",
+    "systemSitePackageBuildVenvWithoutPip": true,
+    "sysconfigPreflightPassed": true,
+    "patchelfPreflightAdded": true,
+    "freshSourcesAndRoot": true,
+    "initialQtConfigurationStarted": true,
+    "buildStillRunningAtCheckpoint": true,
+    "fullRuntimeBuilt": false
+  }
+}

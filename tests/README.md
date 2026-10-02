@@ -446,3 +446,23 @@ independently verified archive signature/index/package hashes and controlled
 networkd fixture recovery. The application uses XWayland. Latest .3 failure,
 native Qt Wayland, repeated startup, delivery/lock and connected/physical tests
 remain separate; neither checkpoint enables GNOME input tools.
+
+### Cinnamon native shortcut and interrupted-worker proof
+
+`test_cinnamon_shortcuts.py` covers desktop/Mac routing, shared machine key
+identities, typed/bounded replies, private ownership, atomic pre/postcommit
+failures and pending-intent refusal/shape boundaries. GNOME's seven adapter
+regressions remain. `release/prove-cinnamon-shortcut-interruption.py` runs only in
+the marked ordinary-user Mint ISO VM with the exact synthetic canonical launcher,
+actual Cinnamon6.6.4/X11 and no app installation. Separately stage reviewed helper
+and driver in that owned fixture, unlock through normal password authentication,
+and run `/usr/bin/python3 ~/cinnamon-shortcuts-proof/prove-cinnamon-shortcut-interruption.py`.
+It sends no keyboard events or lock commands. Four abrupt worker phases, a newly
+allocated row and foreign takeover verify real DConf/ownership recovery. Do not
+run its synthetic fixture on an owner's desktop. The
+[checked report](../release/qualification/next-targets/20261002-cinnamon-native-shortcuts.json)
+keeps initial timeout/default-lock/dependency refusals and current source hashes.
+The inert spice under `tests/fixtures/cinnamon-shortcut-spice` is test-only and
+must remain disabled after the owned VM conflict test.710 native cases/708 pass/
+two platform skips is source evidence; physical keyboard and full Mint product
+acceptance remain separate.

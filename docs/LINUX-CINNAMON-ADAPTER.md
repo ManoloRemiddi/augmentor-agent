@@ -19,7 +19,46 @@ The reboot driver initially submitted before typing and produced two refused
 authentication attempts. Separate typing/submission then passed; both failures
 remain explicit. No administrative unlock was used for these password tests.
 
-## Separate versioned implementation
+## Native shortcut helper and interruption recovery
+
+The [Qt adapter](../apps/native/augmentor_linux/cinnamon_shortcuts.py) now routes
+Cinnamon before an inherited GNOME environment, while Mac retains priority.
+It shares key identities with GNOME and runs GTK3 in a separate bounded worker;
+the approved two-row settings UI stays unchanged. The
+[native helper](../services/desktop/cinnamon_shortcuts.py) owns numeric custom<N>
+rows through a private mapping, quoted canonical launcher commands and fresh
+native-owner/epoch/lock/registry checks. It checks WM/media, foreign custom,
+other owned and live spice bindings; dummy-list refresh preserves foreign IDs
+and order. Native registration is separate from functional application delivery.
+
+Before mutation, a private durable intent records the exact old/new ownership,
+user values and candidate row. Pending reads refuse a saved-status claim. Retry
+Save recovers only exact owned desired/previous fields: precommit interruption
+restores the previous row/defaults and removes only its newly added ID; completed
+ownership is retained. Foreign takeover refuses recovery and retains intent.
+The [marked VM proof](../release/prove-cinnamon-shortcut-interruption.py) abruptly
+exits real workers after intent, fields, registration and ownership, also testing
+new-row interruption and foreign takeover. All six real cases pass.
+
+The [checked helper report](../release/qualification/next-targets/20261002-cinnamon-native-shortcuts.json)
+binds actual two-row Save/native registration and two QEMU key events to the
+current helper. Both synthetic launcher argument sets pass; no Augmentor is
+installed. Actual WM/custom/other-row/spice conflicts, tampering, precommit
+rollback, postcommit durability refusal/recovery and production disabled-object/
+stale-epoch refusal pass. The same v2 bridge remains active after a wrong password
+and normal inspected password unlock recovers; default idle locking remains on.
+The first 500ms native-property timeout and shorter cold discovery refusal are
+retained. Reviewed calls allow2s, bridge discovery10s and the worker25s. A first
+cold Save passed in about6s; later worker loss is covered by durable intent.
+
+Nine native adapter/ownership tests, seven GNOME regressions and ten bridge
+protocol cases pass. Full current source runs710 native cases in the owned Arch
+fixture:708 pass, two platform skips. Earlier host QtTest, fixture Node and build
+dependency failures remain explicit. Graphical product settings, full app/two
+instances/reboot, physical keyboard, complete scene/control/Stop, Browser/audio
+and release remain unqualified; the source helper does not widen the matrix.
+
+## First bridge checkpoint (historical)
 
 The first [bridge candidate](../services/desktop/cinnamon-extension/README.md)
 is now implemented with Status/RefreshLock/ShortcutBindings only, no scene/input

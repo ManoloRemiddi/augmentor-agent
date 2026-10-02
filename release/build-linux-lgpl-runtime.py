@@ -13,6 +13,8 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import sysconfig
+import shutil
 import tarfile
 
 
@@ -31,6 +33,12 @@ def main():
     release=dict(line.split('=',1) for line in Path('/etc/os-release').read_text().splitlines() if '=' in line)
     assert release['ID'].strip('"')=='ubuntu' and release['VERSION_ID'].strip('"')=='24.04'
     assert sys.version_info[:2]==(3,12) and not Path('/usr/lib/augmentor').exists()
+    assert sys.prefix=='/work/build-python' and sys.base_prefix=='/usr'
+    paths={scheme:{key:sysconfig.get_path(key,scheme=scheme) for key in ('purelib','data')}
+        for scheme in (sysconfig.get_default_scheme(),'posix_prefix')}
+    suffixes={str(Path(value['purelib']).relative_to(value['data'])) for value in paths.values()}
+    assert suffixes=={'lib/python3.12/site-packages'}, 'PySide setuptools/CMake installation schemes disagree.'
+    assert shutil.which('patchelf')=='/usr/bin/patchelf', 'PySide requires the declared signed patchelf build dependency.'
     inputs=args.inputs.resolve();assert inputs==Path('/inputs')
     root=args.root.absolute();assert root.parent==Path('/work') and not root.exists() and not root.is_symlink()
     policy=inputs/'linux-lgpl-runtime-sources.json';value=json.loads(policy.read_text())
@@ -44,6 +52,9 @@ def main():
     prefix=root/'qt-prefix';logs=root/'logs';logs.mkdir()
     report={'format':'augmentor-linux-source-runtime-build/1','policySha256':sha(policy),
         'toolSha256':sha(Path(__file__)),'dependencyInventorySha256':sha(inputs/'build-package-versions.txt'),
+        'pythonEnvironment':{'executable':sys.executable,'prefix':sys.prefix,'basePrefix':sys.base_prefix,
+            'sysconfigPaths':paths,'packageSuffix':next(iter(suffixes)),
+            'patchelfVersion':subprocess.check_output(['patchelf','--version'],text=True).strip()},
         'sources':{},'commands':[],'runtimeBuilt':False,'runtimeClosureTested':False,
         'licenseReviewComplete':False,'correspondingSourceRebuildTested':False,
         'recipientReplacementTested':False,'publicReleaseQualified':False,'ownerStateChanged':False}
