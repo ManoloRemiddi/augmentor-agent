@@ -75,7 +75,7 @@ Current cross-platform direction: [one product, Linux/Mac parity audit and corre
 
 - [Linux distribution rollout: implementation order and qualification gates](LINUX-DISTRO-ROLLOUT.md)
 - [Cinnamon adapter: installed Mint evidence and pinned implementation contract](LINUX-CINNAMON-ADAPTER.md)
-- [GNOME native consent evidence and disabled guarded execution candidate](LINUX-GNOME-CONTROL-PLAN.md)
+- [GNOME native consent/capture evidence and disabled guarded execution candidate](LINUX-GNOME-CONTROL-PLAN.md)
 - [Linux Qt/PySide source build, rebuild and replacement gates](LINUX-LGPL-SOURCE-RUNTIME.md)
 - [Linux candidate package transactions: joint leases, durable intent and RPM/ALPM boundaries](LINUX-PACKAGE-TRANSACTIONS.md)
 

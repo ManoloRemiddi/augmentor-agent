@@ -27,6 +27,7 @@ def scene():
 
 def controller():
     value=module.GnomeControl.__new__(module.GnomeControl)
+    value.last_failure=None
     value.checkpoint=Mock()
     value.owner='codex:fixture';value.fd=7;value.cancel=threading.Event();value.consent=Mock(generation=3)
     value.stream={'source_type':1,'position':[-1280,0],'size':[1280,800]};value.dispatch_scene=scene();value.pointer_args=None
@@ -36,6 +37,27 @@ def controller():
 
 @unittest.skipIf(Gst is None,'Linux GStreamer runtime required.')
 class GnomeControlTests(unittest.TestCase):
+    def test_shared_cancel_keeps_first_reason_through_repeated_stop(self):
+        value=controller();value.generation=0
+        consent=module.ConsentSession.__new__(module.ConsentSession)
+        consent.cancel=value.cancel;consent.mutex=threading.Lock();consent.generation=0
+        consent.rpc_cancel=module.Gio.Cancellable();consent.stop_reason=None;consent.on_stopped=Mock()
+        value.consent=consent
+        value.request_stop();value.request_stop()
+        self.assertTrue(value.cancel.is_set());self.assertTrue(consent.rpc_cancel.is_cancelled())
+        self.assertEqual(consent.stop_reason,'requested');consent.on_stopped.assert_called_once()
+        consent.request_stop('native-session-closed')
+        self.assertEqual(consent.stop_reason,'requested')
+
+    def test_constructor_timeout_is_bounded_and_default_remains_eighty_seconds(self):
+        context=module.GLib.MainContext.new();context.push_thread_default()
+        try:
+            for timeout in (0,181,True,None,1.5):
+                with self.subTest(timeout=timeout),self.assertRaisesRegex(RuntimeError,'consent timeout'):
+                    module.GnomeControl(context,Mock(),request_timeout=timeout)
+            value=module.GnomeControl(context,Mock());self.assertEqual(value.request_timeout,80);value.stop()
+        finally:context.pop_thread_default()
+
     def test_monitor_uses_logical_geometry_and_retains_negative_origin(self):
         value=controller();self.assertEqual(module.monitor_mapping(value.stream,scene()),scene()['screens'][0]['geometry'])
 

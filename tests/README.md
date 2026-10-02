@@ -504,3 +504,15 @@ actual native behavior in fresh processes. It requires explicitly marked owned
 fixtures and two separate runtime candidates; it never swaps the selected app's
 libraries. Final product entrypoint/complete legal/source-kit qualification remains
 separate. [Evidence](../release/qualification/next-targets/20261002-source-qt-recipient-replacement.json).
+
+### Native GNOME capture and first Stop reason
+
+`test_gnome_control.py` now includes bounded consent timeout and shared-Event
+first-cause preservation through repeated user/native Stop; the consent tests
+also constrain reason enumeration. The exact source runs742 native cases in owned
+Arch:740 successes/two Mac-only skips. The separately staged capture/GTK probes
+pass real Fedora scale1 frame/token creation, visible Stop after capture, visible
+Stop during a synthetic stalled frame and native sharing revocation after capture.
+[Checked source hashes, failed candidates and limits](../release/qualification/next-targets/20261002-gnome-native-capture.json)
+keep source tests, native capture and future input qualification distinct. No
+Notify/action is invoked; production GNOME input remains disabled.

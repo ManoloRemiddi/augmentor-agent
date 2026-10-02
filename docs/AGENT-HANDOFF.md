@@ -2,7 +2,33 @@
 
 # Start here: agent handoff
 
-## October 2 completed source runtime and GNOME candidate checkpoint
+## October 2 native GNOME capture and cancellation checkpoint
+
+The separate [Fedora candidate report](../release/qualification/next-targets/20261002-gnome-native-capture.json)
+now binds actual scale1 single-monitor PipeWire capture to exact candidate bytes.
+It observes the owned GTK target, validates1280×800 RGB frame/monitor geometry
+and creates a fresh one-use token without sending input. Actual Augmentor Stop
+closes after capture in0.300 seconds; a real-consent/synthetic stalled-frame run
+closes in0.063 seconds. GNOME's native sharing Stop after real capture also closes
+with `native-session-closed`, without an Augmentor Stop click. Timings start at
+the Qt callback and measure candidate cleanup, not physical/input end-to-end latency.
+The first unexplained capture failure, consent timeouts and Overview refusal are
+preserved; later capture passes do not establish the earlier failure's cause.
+
+Diagnostics retain the first native/user Stop reason before shared cancellation.
+The probe's consent wait is180 seconds while the component default stays80.
+All742 native source cases pass in owned Arch, with740 successes/two Mac-only
+skips. Both prior83bcb6c hosted workflows pass:
+[Linux37033230709](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37033230709),
+[Mac37033230525](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37033230525).
+000c10e workflows were superseded/cancelled; this new candidate still needs its
+own hosted validation. Production GNOME input remains disabled. Keyboard/pointer,
+mid-PipeWire revocation, lock/restart/scaling, supported profile repetition, KDE
+threading, full product/Browser/audio/packages/source-kit/legal/release gates
+remain active. All five original rollout points continue; selected artifacts and
+owner services/devices/settings are unchanged.
+
+## October 2 completed source runtime and GNOME candidate checkpoint (historical)
 
 A separate recipient fixture now rebuilds QtSvg from the verified archive with a
 recorded behavior change and proves the modified library executes from a separate
@@ -33,8 +59,9 @@ remains disabled. Current isolated Arch source suite runs739 cases:737 pass and
 the corrected callback-delivery proof. Both40de37b hosted workflows pass:
 [Linux37025441987](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37025441987),
 [Mac37025441815](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37025441815).
-New candidate source still needs hosted validation. All five original rollout
-points remain active; no owner state or selected app changed.
+Both83bcb6c hosted workflows subsequently passed; see the newer native capture
+checkpoint above. All five original rollout points remain active; no owner state
+or selected app changed.
 
 ## October 2 GNOME input-free consent and PySide dependency checkpoint (historical)
 

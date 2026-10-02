@@ -49,22 +49,33 @@ class GuardedObserver:
                 raise RuntimeError('GNOME input is blocked. Fresh desktop consent is required.')
             if controller.stream is not None:monitor_mapping(controller.stream,value)
             return value
-        except Exception:controller.stop();raise
+        except Exception as error:controller.record_failure('observer',error);controller.stop();raise
 
 
 class GnomeControl(Portal):
-    def __init__(self,context,notify):
+    def __init__(self,context,notify,request_timeout=80,on_request=None):
         # Do not construct Portal/KWin or reuse a shared bus connection.
         if GLib.MainContext.get_thread_default()!=context:raise RuntimeError('GNOME control requires its owning worker context.')
+        if type(request_timeout) is not int or not 1<=request_timeout<=180:raise RuntimeError('Invalid desktop consent timeout.')
         Gst.init(None);self.context=context;self.notify=notify;self.consent=None;self.kwin=None
+        self.request_timeout=request_timeout;self.on_request=on_request
+        self.last_failure=None;self.last_stop_reason=None
         self.owner=None;self.session=None;self.fd=None;self.node=None;self.stream=None;self.snapshot=None
         self.cancel=threading.Event();self.keys=[];self.button=None;self.symbol=None;self.focus_serial=0
         self.focus_listener=None;self.generation=0;self.busy=threading.Lock();self.last_used=time.monotonic();self.dispatch_scene=None;self.pointer_args=None
         self.watch_source=None
 
     def request_stop(self):
-        self.generation+=1;self.cancel.set()
+        self.generation+=1
+        # The session shares this Event. Let it record the first cause before
+        # setting it; pre-setting here hides both user Stop and native loss.
         if self.consent:self.consent.request_stop()
+        else:self.cancel.set()
+
+    def record_failure(self,phase,error):
+        if self.last_failure is None:
+            self.last_failure={'phase':phase,'kind':type(error).__name__,
+                'message':str(error) if isinstance(error,RuntimeError) else 'Native operation failed.'}
 
     def checkpoint(self):
         # Deliver only this worker's native signals. Worker.busy prevents a
@@ -87,9 +98,9 @@ class GnomeControl(Portal):
 
     def capture(self,owner):
         try:return super().capture(owner)
-        except Exception:
+        except Exception as error:
             # Capture failure never leaves a stream or an old target usable.
-            self.stop();raise
+            self.record_failure('capture',error);self.stop();raise
 
     def focus_info(self,pid):
         # libatspi uses a process-global context. Moving the GUI singleton to
@@ -104,7 +115,9 @@ class GnomeControl(Portal):
             raise RuntimeError('A harness conversation must own desktop control.')
         if self.owner and self.owner!=owner and not self.cancel.is_set():raise RuntimeError('Another Augmentor chat owns desktop control. Stop it first.')
         if self.consent and not self.cancel.is_set():self.verify(owner);return self.status()
-        self.stop();self.consent=ConsentSession(self.context);self.bus=self.consent.bus;self.cancel=self.consent.cancel
+        self.stop();self.last_failure=None;self.last_stop_reason=None
+        self.consent=ConsentSession(self.context,request_timeout=self.request_timeout);self.bus=self.consent.bus;self.cancel=self.consent.cancel
+        self.consent.on_request=self.on_request
         self.consent.on_stopped=lambda:self.notify(False,'Desktop control stopped')
         self.owner=owner;self.notify(True,'Waiting for GNOME desktop consent')
         try:
@@ -130,7 +143,7 @@ class GnomeControl(Portal):
             if scene['blockedReasons']:raise RuntimeError('GNOME input is blocked.')
             monitor_mapping(self.stream,scene)
             return GLib.SOURCE_CONTINUE
-        except Exception:self.stop();return GLib.SOURCE_REMOVE
+        except Exception as error:self.record_failure('idle-watch',error);self.stop();return GLib.SOURCE_REMOVE
 
     def status(self):
         active=bool(self.owner) and not self.cancel.is_set()
@@ -180,6 +193,7 @@ class GnomeControl(Portal):
         keys,self.keys=self.keys,[];button,self.button=self.button,None;symbol,self.symbol=self.symbol,None
         self.fd=None;self.node=None;self.stream=None;self.owner=None
         if consent:
+            self.last_stop_reason=consent.stop_reason
             # Release only this session's held input on the pinned unique owner.
             # Canceled RPCs cannot perform cleanup, so use separate bounded calls.
             releases=[('NotifyKeyboardKeycode',code) for code in reversed(keys)]

@@ -27,12 +27,12 @@ class ConsentSession:
             raise RuntimeError('Portal consent requires its own worker context.')
         self.context=context;self.thread=threading.get_ident();self.cancel=threading.Event();self.mutex=threading.Lock()
         self.generation=0;self.rpc_cancel=Gio.Cancellable();self.session=None;self.request_path=None;self.fd=None
-        self.owners={};self.subscriptions=[];self.closed=False;self.stream=None;self.interfaces=None;self.on_stopped=None;self.on_request=None
+        self.owners={};self.subscriptions=[];self.closed=False;self.stream=None;self.interfaces=None;self.on_stopped=None;self.on_request=None;self.stop_reason=None
         address=Gio.dbus_address_get_for_bus_sync(Gio.BusType.SESSION,None)
         self.bus=Gio.DBusConnection.new_for_address_sync(address,
             Gio.DBusConnectionFlags.AUTHENTICATION_CLIENT|Gio.DBusConnectionFlags.MESSAGE_BUS_CONNECTION,None,None)
         self.bus.set_exit_on_close(False)
-        self.closed_signal=self.bus.connect('closed',lambda *_:self.request_stop())
+        self.closed_signal=self.bus.connect('closed',lambda *_:self.request_stop('bus-closed'))
         for name in OWNERS:
             self.subscriptions.append(self.bus.signal_subscribe('org.freedesktop.DBus','org.freedesktop.DBus',
                 'NameOwnerChanged','/org/freedesktop/DBus',name,Gio.DBusSignalFlags.NONE,self.owner_changed))
@@ -48,11 +48,13 @@ class ConsentSession:
 
     def owner_changed(self,_bus,_sender,_path,_interface,_method,args):
         name,_old,next_owner=args.unpack()
-        if name in self.owners and next_owner!=self.owners[name]:self.request_stop();self.close()
+        if name in self.owners and next_owner!=self.owners[name]:self.request_stop('owner-changed');self.close()
 
-    def request_stop(self):
+    def request_stop(self,reason='requested'):
+        if reason not in ('requested','bus-closed','owner-changed','owner-check-changed','native-session-closed'):reason='requested'
         with self.mutex:
             first=not self.cancel.is_set();self.generation+=1;self.cancel.set();self.rpc_cancel.cancel()
+            if first:self.stop_reason=reason
         if first and self.on_stopped:self.on_stopped()
 
     def verify(self,generation):
@@ -60,7 +62,7 @@ class ConsentSession:
         if self.cancel.is_set() or generation!=self.generation or self.closed:
             raise RuntimeError('Desktop sharing stopped. No action is replayed.')
         if any(self.owner(name)!=owner for name,owner in self.owners.items()):
-            self.request_stop();raise RuntimeError('Desktop service changed. Fresh consent is required.')
+            self.request_stop('owner-check-changed');raise RuntimeError('Desktop service changed. Fresh consent is required.')
 
     def call(self,interface,method,signature,args,generation):
         self.verify(generation)
@@ -144,7 +146,7 @@ class ConsentSession:
         except Exception:self.close();raise
 
     def revoked(self,_bus,_sender,path,_i,_m,_args):
-        if path==self.session:self.request_stop();self.close()
+        if path==self.session:self.request_stop('native-session-closed');self.close()
 
     def close_path(self,path,interface):
         if not path or not self.owners.get(NAME):return

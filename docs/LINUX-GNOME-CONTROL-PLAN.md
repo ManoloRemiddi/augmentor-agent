@@ -9,6 +9,42 @@ portal.py constructs KWin and rejects non-KDE sessions; service.py runs backend
 calls on the GUI GLib loop. Both still need integration and KDE regression before
 enabling GNOME input.
 
+## Native capture candidate and cancellation evidence
+
+The [checked Fedora report](../release/qualification/next-targets/20261002-gnome-native-capture.json)
+qualifies only separately staged scale1 single-monitor capture, plus cleanup after
+actual visible Stop and native GNOME sharing Stop. The normal UID1000 Fedora44
+GNOME50.5 Wayland guest retains SELinux enforcing and its unchanged selected app.
+[Capture probe](../release/probe-gnome-capture.py) and [GTK4 target](../release/probe-gnome-target.py)
+require the exact owned marker, private candidate path and target PID/start-time;
+they must never run on an owner's desktop. Stage peer worker/consent/control/
+observer/portal/capture/scene modules with the two scripts. Start the GTK fixture,
+run the capture probe with `--candidate gnome-execution-probe-vN`, exact selected
+`--source` and `--target-pid`, visibly consent, activate only the owned target,
+then create private0600 `trigger.capture`. The probe never calls action/Notify.
+Its target fields remain empty and both button counts zero. JPEG bytes are not
+saved or published; the report keeps dimensions and an encoded-image digest.
+
+Current v7/v9 capture real1280×800 PipeWire RGB frames, validate the compositor's
+logical scale1 monitor and issue fresh tokens. v7 visible Stop detaches resources
+in0.300 seconds; six50ms Qt ticks continue through cleanup. v8 uses real native
+consent but an empty synthetic GStreamer pipeline with30-second frame wait;
+visible Stop cancels it and detaches in0.063 seconds. v9 native orange sharing
+Stop after a real capture closes with `native-session-closed`, no Augmentor Stop
+click. Its cleanup after the Qt notification takes0.010 seconds; this is not total
+revocation latency. No active PipeWire failure/revocation-during-acquisition claim.
+
+v1/v4 consent timeouts, v2 Overview guard refusal and v3 unexplained capture
+cancellation are preserved. Later successful captures do not diagnose v3. v5/v6
+passed capture/cancellation but lost Stop reason when the controller set the
+shared Event before the session; v7/v8/v9 correct and retain first cause. v7's
+idle-watch diagnostic records expected cancellation during cleanup. The optional
+request observer/timeout serve fixture diagnostics; production default remains80
+seconds, fixture180. Source742 cases pass:740 successes/two Mac-only skips.
+Pointer/widget/keyboard, full AT-SPI delivery, normal password lock, owner/epoch
+restart, scaled/far-edge/hover cases, Ubuntu/Leap/profile repetition and KDE service
+threading remain open. Production discovery and inputQualified remain false.
+
 ## October 2 native consent and worker checkpoint
 
 The [checked report](../release/qualification/next-targets/20261002-gnome-native-consent.json)
@@ -78,7 +114,8 @@ pointer motion/button press. Monitor source/position/size must match exactly one
 compositor monitor at scale1. Frame caps must also match the logical monitor
 before issuing a token. Observer/epoch/topology/capture failure closes resources;
 a worker-context250ms watcher invalidates idle locked/replaced sessions.
-These mechanisms currently have synthetic tests, not native execution acceptance.
+Native scale1 capture/cancellation evidence is recorded above; dispatch guards
+still have synthetic tests only. No native pointer/keyboard acceptance is claimed.
 
 Pinned [frontend1.22.1](https://github.com/flatpak/xdg-desktop-portal/blob/1.22.1/src/remote-desktop.c),
 [GNOME backend50.0](https://github.com/GNOME/xdg-desktop-portal-gnome/blob/50.0/src/remotedesktop.c)
@@ -104,7 +141,7 @@ until an isolated helper proves event-thread identity, focus-away/back, password
 and inaccessible controls, new-app discovery and a11y owner invalidation. It does
 not move the GUI process's singleton or claim per-character focus delivery.
 
-Next native proof: scale1 capture and GTK Wayland/XWayland widget outcomes; all
+Next native proof: GTK Wayland/XWayland pointer/widget outcomes; all
 stale/focus/cover/hover fences; mid-capture Stop/native revocation/terminal stream
 failures; isolated AT-SPI helper keyboard and partial-action Stop; normal password
 lock and independent service/observer restarts. Repeat supported46/48/49 profiles

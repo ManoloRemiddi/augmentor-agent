@@ -25,6 +25,12 @@ def fixture():
 
 @unittest.skipIf(GLib is None,'Linux GLib runtime required.')
 class DesktopConsentTests(unittest.TestCase):
+    def test_first_stop_reason_survives_cleanup_and_invalid_reason_is_restricted(self):
+        value=fixture();value.request_stop('native-session-closed');value.request_stop()
+        self.assertEqual(value.stop_reason,'native-session-closed')
+        value=fixture();value.request_stop('untrusted diagnostic text')
+        self.assertEqual(value.stop_reason,'requested')
+
     def test_stop_is_immediate_cross_thread_and_notification_once(self):
         value=fixture();value.on_stopped=Mock();thread=threading.Thread(target=value.request_stop);thread.start();thread.join(1)
         self.assertTrue(value.cancel.is_set());self.assertTrue(value.rpc_cancel.is_cancelled());self.assertEqual(value.generation,1)
