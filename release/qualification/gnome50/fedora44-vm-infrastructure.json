@@ -1,0 +1,46 @@
+{
+  "format": "augmentor-gnome-vm-infrastructure/1",
+  "base": {
+    "image": "https://download.fedoraproject.org/pub/fedora/linux/releases/44/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-44-1.7.x86_64.qcow2",
+    "checksum": "https://dl.fedoraproject.org/pub/fedora/linux/releases/44/Cloud/x86_64/images/Fedora-Cloud-44-1.7-x86_64-CHECKSUM",
+    "keyring": "https://fedoraproject.org/fedora.gpg",
+    "signingFingerprint": "36F612DCF27F7D1A48A835E4DBFCF71C6D9F90A6",
+    "sha256": "28680fe5b371a5a82ebf43a31926e086a168e59949d03969c5093e7071f90b7f",
+    "imageBuild": "44-1.7",
+    "architecture": "x86_64",
+    "imageBytes": 583729152,
+    "desktopProvisioning": "Cloud-derived GNOME; standard Workstation installation requires separate qualification",
+    "acceleration": "tcg",
+    "cpuModel": "Nehalem",
+    "memoryMiB": 6144,
+    "cpus": 4,
+    "diskGiB": 32
+  },
+  "signedChecksumVerified": true,
+  "baseHashVerified": true,
+  "guestUser": "augmentor-proof",
+  "sshPort": 22489,
+  "hostMounts": false,
+  "hostDevicesAttached": false,
+  "outboundGuestNat": true,
+  "gnomeProvisioningPerformedByThisTool": false,
+  "desktopAcceptanceTested": false,
+  "qemuVersion": "QEMU emulator version 10.0.13 (Debian 1:10.0.13+ds-0+deb13u1)",
+  "sourceSha256": {
+    "scripts/prepare-gnome-vm.py": "b35dced3ff66990a66ef2bff0b0d5e7801804f42bceca797507b8c25339ff0e7",
+    "release/fedora-gnome-vm.json": "ac051d3fb64279f1dd4d887ee78a89419abfb1e635b98947ba3cfe9a3d9ebe4e"
+  },
+  "checkpointDate": "2026-10-02",
+  "baseSource": "fda914e2a5265b4a80f9b0b6c8bba4df989f5963",
+  "workingInfrastructureChanges": [
+    "scripts/prepare-gnome-vm.py",
+    "release/fedora-gnome-vm.json"
+  ],
+  "cloudBootReachedDedicatedSshUser": true,
+  "selinuxEnforcingAtCloudBoot": true,
+  "duplicateBootRefused": true,
+  "outsideWorktreeOutputRefused": true,
+  "fullGnomeLoginTested": false,
+  "applicationStartupTested": false,
+  "standardWorkstationImageTested": false
+}

@@ -95,6 +95,15 @@ This adds evidence without changing production toggle behavior. The rollout
 guide owns exact image/source hashes and remaining workspace/control/other-distro
 gates. Continue with full private GNOME login sessions; do not mark the goal done.
 
+The full Fedora fixture now boots a signature/hash-verified Cloud 44-1.7 overlay
+with dedicated-user SSH and SELinux enforcing. The new preparation tool and
+checked infrastructure report are in the rollout guide. GNOME group provisioning
+is in progress inside that VM; this is Cloud-derived, not standard Workstation or
+full graphical acceptance. The xcb window proof exposes a missing `wmctrl`
+dependency in the existing workspace-following fallback. Its actual pin/unpin
+proof and package dependency correction are the next source tasks; native
+Wayland following remains an adapter gap. Private VM keys/seed/logs stay ignored.
+
 ## October 1 merge blockers: current main and separate Codex prerequisite
 
 The feature branch integrates canonical main `8c3be5a` at merge `338dbc5`.

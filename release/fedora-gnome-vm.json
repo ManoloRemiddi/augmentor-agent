@@ -1,0 +1,16 @@
+{
+  "image": "https://download.fedoraproject.org/pub/fedora/linux/releases/44/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-44-1.7.x86_64.qcow2",
+  "checksum": "https://dl.fedoraproject.org/pub/fedora/linux/releases/44/Cloud/x86_64/images/Fedora-Cloud-44-1.7-x86_64-CHECKSUM",
+  "keyring": "https://fedoraproject.org/fedora.gpg",
+  "signingFingerprint": "36F612DCF27F7D1A48A835E4DBFCF71C6D9F90A6",
+  "sha256": "28680fe5b371a5a82ebf43a31926e086a168e59949d03969c5093e7071f90b7f",
+  "imageBuild": "44-1.7",
+  "architecture": "x86_64",
+  "imageBytes": 583729152,
+  "desktopProvisioning": "Cloud-derived GNOME; standard Workstation installation requires separate qualification",
+  "acceleration": "tcg",
+  "cpuModel": "Nehalem",
+  "memoryMiB": 6144,
+  "cpus": 4,
+  "diskGiB": 32
+}

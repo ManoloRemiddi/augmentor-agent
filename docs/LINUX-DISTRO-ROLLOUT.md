@@ -774,3 +774,41 @@ replace the current implementation based solely on missing launch tokens.
 Next: full private GNOME login/user-systemd and closed-app startup, duplicate
 owner/crash/reboot checks; workspace following/placement; full observer guards;
 consented capture/input/Stop; older distro and release qualification.
+
+### Full Fedora GNOME VM infrastructure prepared
+
+The next full-system fixture now boots the pinned
+[Fedora Cloud Base Generic 44-1.7 x86_64 image](https://download.fedoraproject.org/pub/fedora/linux/releases/44/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-44-1.7.x86_64.qcow2).
+`scripts/prepare-gnome-vm.py` verifies its signed checksum using the pinned
+[Fedora 44 fingerprint](https://fedoraproject.org/security/) and
+[official keyring](https://fedoraproject.org/fedora.gpg), then verifies all image
+bytes. It creates a separate 32 GiB backing overlay, dedicated SSH key and
+NoCloud seed beneath ignored `outputs/`, never attaching host filesystems,
+devices or owner credentials. QEMU 10.0.13 uses TCG/Nehalem, four virtual CPUs
+and 6 GiB RAM; only guest SSH is forwarded on loopback. Guest NAT is enabled for
+package provisioning. The [checked infrastructure report](../release/qualification/gnome50/fedora44-vm-infrastructure.json)
+records the signed/hash-verified base, successful dedicated-user SSH boot,
+SELinux enforcing at initial Cloud boot, duplicate-running-PID refusal and
+outside-worktree-output refusal. None is GNOME application acceptance.
+
+Reproduce with `python3 scripts/prepare-gnome-vm.py --directory
+outputs/linux-rollout/fedora44-gnome-vm --boot`. SSH uses that directory's
+dedicated `id_ed25519`, `known_hosts`, port 22489 and `augmentor-proof` user;
+credentials and seed remain private ignored files. The guest contains
+`/etc/augmentor-test-vm`; verify it before guest changes. Repository metadata
+confirms `gnome-desktop` and `workstation-product-environment`. GNOME group
+provisioning is in progress; GDM login, graphical user-systemd, application
+startup, reboot and desktop SELinux acceptance remain open. This is a
+Cloud-derived GNOME system, not a qualification of the standard Workstation
+installer. Fedora documents the [backing-overlay/cloud-init method](https://fedoraproject.org/wiki/QA%3ALocal_cloud_testing_with_virt-install)
+and cloud-init documents the [NoCloud seed](https://docs.cloud-init.io/en/latest/reference/datasources/nocloud.html).
+
+The actual existing-window xcb proof also exposes missing `wmctrl`: its status
+reports that workspace pin could not be applied. The existing native surface
+already uses `wmctrl` for its XWayland fallback, but current native package
+dependencies omit it. The focus report qualifies only its stated toggle/typing
+checks. The tool is available in [Fedora 43/44](https://packages.fedoraproject.org/pkgs/wmctrl/wmctrl/),
+[Ubuntu 26.04](https://packages.ubuntu.com/resolute/wmctrl) and
+[Debian 13](https://packages.debian.org/trixie/wmctrl). Next test actual pin/unpin
+and independent workspace following in private GNOME, then provision the native
+dependency. Native Wayland workspace following remains a separate adapter gap.
