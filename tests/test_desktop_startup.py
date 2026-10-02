@@ -2,6 +2,7 @@
 import importlib.util
 import json
 import os
+import sys
 from pathlib import Path
 import tempfile
 import unittest
@@ -19,12 +20,12 @@ class DesktopStartupTests(unittest.TestCase):
             home=Path(folder);root=home/'preview';native=root/'apps/native/augmentor_linux';native.mkdir(parents=True)
             (native/'window.py').write_text('--ensure-running')
             (root/'release').mkdir();(root/'release/product.json').write_text('{"version":"test"}')
-            python=home/'venv/bin/python';python.parent.mkdir(parents=True);python.symlink_to('/usr/bin/python3')
+            python=home/'venv/bin/python';python.parent.mkdir(parents=True);python.symlink_to(sys.executable)
             data=home/'data';config=home/'config';state=home/'state'
             (config/'augmentor').mkdir(parents=True)
             (config/'augmentor/harnesses.json').write_text(json.dumps({'dsh':{'endpoint':'http://127.0.0.1:3080','home':str(home/'.dsh')}}))
             with patch.dict(os.environ,{'XDG_DATA_HOME':str(data),'XDG_CONFIG_HOME':str(config),'XDG_STATE_HOME':str(state)}),patch.object(Path,'home',return_value=home),patch.object(installer.subprocess,'run',return_value=Mock(returncode=0)):
-                manifest=installer.install(root,python,Path('/usr/bin/python3'),'dsh-web.service')
+                manifest=installer.install(root,python,Path(sys.executable),'dsh-web.service')
             self.assertEqual(manifest['python'],str(python))
             for path in (data/'applications/com.augmentor.Agent.desktop',data/'applications/com.augmentor.Agent.secondary.desktop',config/'autostart/com.augmentor.Agent.desktop'):
                 self.assertIn(str(home/'.local/bin/augmentor-agent'),path.read_text())

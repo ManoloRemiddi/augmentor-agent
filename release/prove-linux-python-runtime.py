@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-"""Verify the Noble overlay in a disposable ordinary-user, offline fixture.
+"""Verify a locked Linux overlay in a disposable ordinary-user, offline fixture.
 
 Run under the prepared interpreter and a private Xvfb session. This is an
 import/render/immutability proof, not installed product or GNOME qualification.
@@ -26,6 +26,7 @@ def load(name, path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--runtime', type=Path, required=True)
+    parser.add_argument('--policy', type=Path, default=ROOT/'release/ubuntu24.04-python.json')
     parser.add_argument('--wheelhouse', type=Path, required=True)
     parser.add_argument('--out', type=Path, required=True)
     args = parser.parse_args()
@@ -34,7 +35,9 @@ def main():
     assert args.out.absolute().is_relative_to(Path.home())
     assert Path(sys.prefix) == args.runtime.absolute() and sys.prefix != sys.base_prefix
     tool = load('owned_linux_runtime', ROOT/'scripts/linux-python-runtime.py')
-    value = tool.policy(ROOT/'release/ubuntu24.04-python.json')
+    policy_path=args.policy.resolve()
+    assert policy_path.is_relative_to(ROOT/'release')
+    value = tool.policy(policy_path)
     receipt = tool.verify(value, args.runtime)
     previous = (args.runtime/tool.RECEIPT).read_bytes()
     reused = tool.prepare(value, args.wheelhouse, args.runtime.parent)
@@ -92,13 +95,14 @@ def main():
     inventory_path = args.out.parent/'qt-binaries.json'
     inventory_path.write_text(json.dumps(inventory, indent=2)+'\n')
     report = {'format': 'augmentor-linux-python-runtime-fixture/1', 'target': value['target'],
-              'policySha256': tool.digest(ROOT/'release/ubuntu24.04-python.json'),
+              'policySha256': tool.digest(policy_path),
               'proofSha256': tool.digest(Path(__file__)),
               'runtimeToolSha256': tool.digest(ROOT/'scripts/linux-python-runtime.py'),
               'qtInventoryToolSha256': tool.digest(ROOT/'scripts/qt-library-inventory.py'),
               'lockIdentity': receipt['lockIdentity'], 'runtimeArtifactSha256': receipt['artifactSha256'],
               'runtimeFileCount': len(receipt['files']), 'imports': receipt['imports'],
-              'offlineFiveWheelPrepare': True, 'exactRuntimeReusedWithoutRewrite': True,
+              'offlineLockedWheelPrepare':True, 'verifiedWheelCount':len(value['wheels']),
+              'offlineFiveWheelPrepare':len(value['wheels'])==5, 'exactRuntimeReusedWithoutRewrite': True,
               'tamperedRuntimeRefusedWithoutRepair': True,
               'qtWidgetsXcbRendered': True, 'qtSvgRendered': True, 'qtQuickSoftwareRendered': True,
               'qtBinaryCount': len(inventory['binaries']), 'qtSymlinkCount': len(inventory['symlinks']),

@@ -20,6 +20,18 @@ and actual disposable-VM evidence are described in the
 This is development source; Codex packaging, macOS/device and complete product
 qualification remain separate gates.
 
+## October 2 capture compatibility checkpoint
+
+Actual Leap 16/Python 3.13 native tests exposed gst-python's context-managed
+`StructureWrapper`. RGB-frame validation now keeps its parent caps alive through
+that context, while retaining exact RGB format, integer positive dimensions and
+complete padded-row checks. Direct Structure APIs remain supported. Real Arch
+and Leap suites run 687 tests with 2 Mac-only skips, including incomplete-buffer
+and wrong-type refusal. See the [distro proof scope](LINUX-DISTRO-ROLLOUT.md#october-2-actual-noble-keyboard-and-next-runtime-acceptance).
+This change does not alter consent, target identity, cancellation or visible Stop.
+GNOME 48 source compatibility and Noble keyboard/lifecycle acceptance still leave
+full GNOME capture/input qualification open.
+
 ## Using it
 
 1. Open the intended application and a harmless test document. Enable

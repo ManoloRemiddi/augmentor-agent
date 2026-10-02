@@ -21,6 +21,25 @@ class RuntimeTests(unittest.TestCase):
         self.home = Path(self.folder.name)
         self.value = runtime.policy(ROOT/'release/ubuntu24.04-python.json')
 
+    def test_new_profiles_require_their_own_target_abi_and_complete_modules(self):
+        for file in ('opensuse-leap16.0-python-voice.json','arch20261001-python-voice.json'):
+            value=runtime.policy(ROOT/'release'/file)
+            self.assertNotIn('pyside6-essentials',{runtime.normalized(row['name']) for row in value['wheels']})
+            for key,wrong in (('target','ubuntu24.04-amd64'),('pythonAbi',[3,12]),('python','/usr/bin/python3.12')):
+                changed=copy.deepcopy(value);changed[key]=wrong
+                path=self.home/'invalid.json';path.write_text(json.dumps(changed))
+                with self.subTest(file=file,key=key),self.assertRaisesRegex(ValueError,'Unsupported'):runtime.policy(path)
+            changed=copy.deepcopy(value);changed['wheels'].pop();path.write_text(json.dumps(changed))
+            with self.assertRaisesRegex(ValueError,'complete reviewed wheel set'):runtime.policy(path)
+
+    def test_new_host_profiles_refuse_a_derivative_or_wrong_release_before_python(self):
+        for file,os_release in (('opensuse-leap16.0-python-voice.json','ID=opensuse-tumbleweed\nVERSION_ID=20261001\n'),
+                                ('arch20261001-python-voice.json','ID=manjaro\n')):
+            value=runtime.policy(ROOT/'release'/file)
+            with patch.object(runtime.Path,'read_text',return_value=os_release),patch.object(runtime.subprocess,'check_output') as python:
+                with self.assertRaisesRegex(ValueError,'runtime policy requires'):runtime.host(value)
+                python.assert_not_called()
+
     def receipt(self):
         root = self.home/'runtime'
         root.mkdir(mode=0o700)

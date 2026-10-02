@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-"""Prepare an offline, immutable Noble Python overlay at its final user path.
+"""Prepare an offline, immutable distribution-specific Python overlay at its final user path.
 
 This builds a candidate runtime; it does not select a desktop, configure a
 harness, replace system Python or claim full distro/package qualification.
@@ -24,7 +24,15 @@ FORMAT = 'augmentor-linux-python-wheels/1'
 RECEIPT = 'augmentor-python-runtime.json'
 MANAGED = {'pyside6-essentials', 'shiboken6', 'pygments', 'keyring', 'sounddevice'}
 PROFILES = {'noble-cp312-x86_64': MANAGED,
-            'noble-cp312-x86_64-voice': MANAGED | {'onnxruntime', 'protobuf'}}
+            'noble-cp312-x86_64-voice': MANAGED | {'onnxruntime', 'protobuf'},
+            'leap16-cp313-x86_64-voice': {'keyring','sounddevice','onnxruntime','protobuf'},
+            'arch20261001-cp314-x86_64-voice': {'sounddevice','onnxruntime','protobuf'}}
+HOST_PROFILES = {
+    'noble-cp312-x86_64': ('ubuntu24.04-amd64','/usr/bin/python3.12',[3,12],'ubuntu','24.04'),
+    'noble-cp312-x86_64-voice': ('ubuntu24.04-amd64','/usr/bin/python3.12',[3,12],'ubuntu','24.04'),
+    'leap16-cp313-x86_64-voice': ('opensuse-leap16.0-x86_64','/usr/bin/python3.13',[3,13],'opensuse-leap','16.0'),
+    'arch20261001-cp314-x86_64-voice': ('arch20261001-x86_64','/usr/bin/python3',[3,14],'arch',None),
+}
 POLICY_FILE = 'linux-python-runtime.json'
 
 
@@ -39,11 +47,10 @@ def normalized(name):
 
 def policy(path):
     value = json.loads(Path(path).read_text())
-    if (value.get('format') != FORMAT or value.get('target') != 'ubuntu24.04-amd64'
-            or value.get('profile') not in PROFILES
-            or value.get('python') != '/usr/bin/python3.12'
-            or value.get('pythonAbi') != [3, 12] or value.get('architecture') != 'x86_64'
-            or value.get('systemSitePackages') is not True):
+    expected_host=HOST_PROFILES.get(value.get('profile'))
+    if (not expected_host or value.get('format') != FORMAT
+            or (value.get('target'),value.get('python'),value.get('pythonAbi')) != expected_host[:3]
+            or value.get('architecture') != 'x86_64' or value.get('systemSitePackages') is not True):
         raise ValueError('Unsupported Linux Python runtime policy.')
     rows = value.get('wheels', [])
     expected = PROFILES[value['profile']]
@@ -104,8 +111,10 @@ def download(value, wheelhouse):
 
 def host(value):
     release = dict(row.split('=', 1) for row in Path('/etc/os-release').read_text().splitlines() if '=' in row)
-    if (release.get('ID', '').strip('"'), release.get('VERSION_ID', '').strip('"')) != ('ubuntu', '24.04'):
-        raise ValueError('This runtime policy requires Ubuntu 24.04.')
+    expected=HOST_PROFILES[value['profile']]
+    if (release.get('ID','').strip('"')!=expected[3] or
+            (expected[4] is not None and release.get('VERSION_ID','').strip('"')!=expected[4])):
+        raise ValueError('This runtime policy requires '+expected[3]+(' '+expected[4] if expected[4] else '')+'.')
     if platform.machine() != value['architecture']:
         raise ValueError('This wheel set requires x86-64.')
     result = subprocess.check_output([value['python'], '-I', '-c',
@@ -163,7 +172,9 @@ for row in value['wheels']:
 import PySide6,shiboken6,pygments,keyring,sounddevice,gi,numpy,yaml,websocket,cffi,secretstorage,jeepney
 from PySide6 import QtCore,QtGui,QtWidgets,QtNetwork,QtDBus,QtSvg,QtQuick,QtQuickWidgets
 from keyring.backends.SecretService import Keyring
-managed=[PySide6,shiboken6,pygments,keyring,sounddevice]
+modules={'pyside6-essentials':PySide6,'shiboken6':shiboken6,'pygments':pygments,'keyring':keyring,'sounddevice':sounddevice}
+managed=[modules[r['name'].lower().replace('_','-')] for r in value['wheels'] if r['name'].lower().replace('_','-') in modules]
+assert Version(PySide6.__version__)>=Version('6.8.2.1'),PySide6.__version__
 speech={}
 if any(r['name']=='onnxruntime' for r in value['wheels']):
  import onnxruntime,google.protobuf,flatbuffers,packaging
@@ -179,6 +190,7 @@ from gi.repository import Gtk,Gst,Atspi
 assert not pathlib.Path(gi.__file__).resolve().is_relative_to(root)
 print(json.dumps({'pythonAbi':list(sys.version_info[:2]),'qtVersion':QtCore.qVersion(),
  'managedVersions':{r['name']:md.version(r['name']) for r in value['wheels']},
+ 'systemQt':not any(r['name'].lower().replace('_','-')=='pyside6-essentials' for r in value['wheels']),
  'systemVersions':{n:md.version(n) for n in ['SecretStorage','jeepney','cryptography','cffi','numpy','PyYAML','websocket-client','jaraco.classes','jaraco.context','jaraco.functools','more-itertools']},
  'origins':{m.__name__:str(pathlib.Path(m.__file__).resolve()) for m in [PySide6,shiboken6,pygments,keyring,sounddevice,gi,numpy,yaml,websocket,cffi,secretstorage,jeepney]},
  'gtkVersion':[Gtk.get_major_version(),Gtk.get_minor_version(),Gtk.get_micro_version()],

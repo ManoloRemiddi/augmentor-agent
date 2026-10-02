@@ -67,7 +67,9 @@ class CaptureStreamTests(unittest.TestCase):
     def test_invalid_rgb_layout(self):
         for caps in (None, Gst.Caps.from_string('video/x-raw,format=I420,width=2,height=2'),
                      Gst.Caps.from_string('video/x-raw,format=RGB,width=0,height=2'),
-                     Gst.Caps.from_string('video/x-raw,format=RGB,width=2')):
+                     Gst.Caps.from_string('video/x-raw,format=RGB,width=2'),
+                     Gst.Caps.from_string('video/x-raw,format=RGB,width=(string)2,height=2'),
+                     Gst.Caps.from_string('video/x-raw,format=RGB,width=2,height=(boolean)true')):
             with self.subTest(caps=caps), self.assertRaisesRegex(RuntimeError, 'invalid dimensions'):
                 rgb_frame_layout(caps, 1024)
 

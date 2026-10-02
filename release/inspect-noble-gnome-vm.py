@@ -34,12 +34,21 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--source',required=True)
     parser.add_argument('--session-type',choices=('wayland','x11'),default='wayland');args=parser.parse_args()
     if not re.fullmatch('[a-f0-9]{40}',args.source):raise ValueError('Supply the exact clean installed source identity.')
-    root=Path('/usr/lib/augmentor');release=json.loads((root/'release.json').read_text())
+    data=Path.home()/'.local/share/augmentor'
+    selection=json.loads((data/'desktop.json').read_text())
+    root=Path(selection['root']);managed=False
+    if root!=Path('/usr/lib/augmentor'):
+        assert root.is_relative_to(data/'releases') and selection['sourceRef']==args.source
+        spec=importlib.util.spec_from_file_location('inspection_deployment',data/'desktop-deployment.py')
+        deployment=importlib.util.module_from_spec(spec);spec.loader.exec_module(deployment)
+        manifest=deployment.verify(root)
+        assert manifest['artifactSha256']==selection['artifactSha256']
+        managed=True
+    release=json.loads((root/'release.json').read_text())
     assert release['target']=='ubuntu24.04-amd64' and release['source']=={'commit':args.source,'dirty':False}
     assert not output(['dpkg','--verify','augmentor-runtime','augmentor-desktop'])
     assert Path('/sys/module/apparmor/parameters/enabled').read_text().strip()=='Y'
     assert output(['systemctl','is-active','apparmor'])=='active'
-    selection=json.loads((Path.home()/'.local/share/augmentor/desktop.json').read_text())
     assert selection['root']==str(root)
     spec=importlib.util.spec_from_file_location('noble_python',root/'scripts/linux-python-runtime.py')
     runtime=importlib.util.module_from_spec(spec);spec.loader.exec_module(runtime)
@@ -88,7 +97,7 @@ def main():
             'shortcutProfile':{'fields':list(shortcuts.fields),'savedPortalSchemasAvailable':shortcuts.portal_available,
                                'functionalTested':False},'installedPackages':packages.splitlines(),
             'inspectionSha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
-            'canonicalSelection':True,'serviceOwnsActualApplication':True,'previewLaunch':False,
+            'canonicalSelection':True,'managedInventoryVerified':managed,'serviceOwnsActualApplication':True,'previewLaunch':False,
             'focusedWindowTested':False,'harnessConnectionTested':False,'modelTurnTested':False,
             'shortcutDeliveryTested':False,'lockRecoveryTested':False,'gnomeInputToolsEnabled':False,
             'standardDesktopInstallerTested':False,'physicalAudioTested':False}

@@ -1,0 +1,63 @@
+{
+  "format": "augmentor-linux-python-wheels/1",
+  "profile": "arch20261001-cp314-x86_64-voice",
+  "target": "arch20261001-x86_64",
+  "python": "/usr/bin/python3",
+  "pythonAbi": [
+    3,
+    14
+  ],
+  "architecture": "x86_64",
+  "systemSitePackages": true,
+  "wheels": [
+    {
+      "name": "sounddevice",
+      "version": "0.5.2",
+      "file": "sounddevice-0.5.2-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/75/2d/582738fc01352a5bc20acac9221e58538365cecb3bb264838f66419df219/sounddevice-0.5.2-py3-none-any.whl",
+      "sha256": "82375859fac2e73295a4ab3fc60bd4782743157adc339561c1f1142af472f505",
+      "bytes": 32450,
+      "metadataUrl": "https://pypi.org/pypi/sounddevice/0.5.2/json",
+      "metadataSha256": "35bc90510386b908fc7248784dc6f8f2f72bd2cf101e85fb56ba137121c275db",
+      "requiresPython": ">=3.7",
+      "requiresDist": [
+        "CFFI>=1.0",
+        "NumPy; extra == \"numpy\""
+      ]
+    },
+    {
+      "name": "onnxruntime",
+      "version": "1.28.0",
+      "file": "onnxruntime-1.28.0-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/03/88/9432428273356ad3c8aa01f52c1b3e7f53c4c0192748f41ad983872b436b/onnxruntime-1.28.0-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+      "sha256": "6afdc83f1317c136e92fc29f5ee9f058de59d87c0b22cee3fdbfbaa0ccc2098a",
+      "bytes": 19214924,
+      "metadataUrl": "https://pypi.org/pypi/onnxruntime/1.28.0/json",
+      "metadataSha256": "9f69dedbc44cdfe9026172eddc5faa677d7146202deb20163393346c547aa7ee",
+      "requiresPython": ">=3.11",
+      "requiresDist": [
+        "flatbuffers",
+        "numpy>=1.21.6",
+        "packaging",
+        "protobuf>=4.25.8",
+        "sympy; extra == \"symbolic\"",
+        "ml_dtypes; extra == \"quantization\""
+      ]
+    },
+    {
+      "name": "protobuf",
+      "version": "7.35.1",
+      "file": "protobuf-7.35.1-cp310-abi3-manylinux2014_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/e4/be/5b3cfe508bfab6761414ff944e3366eb13be4fd71efcd69450f89ba39f43/protobuf-7.35.1-cp310-abi3-manylinux2014_x86_64.whl",
+      "sha256": "74758715c53d7158fb76caf4f0cfdacc5329a4b1bb994f865d6cf302d413a1c4",
+      "bytes": 327130,
+      "metadataUrl": "https://pypi.org/pypi/protobuf/7.35.1/json",
+      "metadataSha256": "d271f8dd8a3a67b1204dc6cf93b0937ee61d6f128093b03c36492ee0a26ae84e",
+      "requiresPython": ">=3.10",
+      "requiresDist": []
+    }
+  ],
+  "qualified": false,
+  "licenseReviewComplete": false,
+  "embeddedSourceCoverageComplete": false
+}

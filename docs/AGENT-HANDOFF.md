@@ -2,6 +2,19 @@
 
 # Start here: agent handoff
 
+## October 2 actual keyboard and ABI runtime checkpoint
+
+Clean managed `c4b885e` now passes the full owned-QMP two-instance shortcut test
+and separate lock/lifecycle proof in actual Noble/Mesa .2 Wayland. New source
+`c5564bc` passes every hosted Linux and Mac job. Arch/Leap ABI-specific overlays
+retain distro Qt, pass actual render/reuse/tamper and CPU ONNX computation, and
+both full native suites run 687 tests with 2 Mac-only skips successfully. The Leap
+GStreamer StructureWrapper fix preserves strict RGB checks. Read the
+[checked evidence and exact limits](LINUX-DISTRO-ROLLOUT.md#october-2-actual-noble-keyboard-and-next-runtime-acceptance).
+Continue actual Noble reboot/shortcut-lock checks, SUSE/Arch package adapters,
+Mint/49/48 sessions and all five original rollout points; input, physical speech,
+source/rebuild/replacement and public release gates remain open. The goal is active.
+
 ## October 2 clean candidate activation and GNOME 48 source checkpoint
 
 Clean `c4b885e` passes all hosted Linux and Mac 14/26 jobs. A separately staged

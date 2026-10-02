@@ -2,6 +2,58 @@
 
 # Linux distribution rollout
 
+## October 2 actual Noble keyboard and next-runtime acceptance
+
+The clean managed `c4b885e` Noble/Mesa .2 Wayland candidate passes actual Qt
+Save/conflict refusal and QMP keyboard delivery. Both windows hide/show with
+stable distinct PIDs, secondary toggles preserve main visibility/process, and
+main toggles preserve secondary. After accepted idle close the main shortcut
+cold-launches a new service-owned process while secondary survives. Cleanup
+closes only idle secondary and restores settings, preserving foreign entries.
+The [checked keyboard report](../release/qualification/ubuntu24.04/gnome-shortcuts-c4b885e.json)
+binds the pristine source, immutable artifact and both helper hashes. Normal
+GNOME pack/install and GDM session reload loaded the observer fix; no selected
+payload was patched. The prior failure remains linked. This proves delivery
+inside the owned virtual keyboard fixture; it does not prove lock fencing,
+password authentication, connected tasks or GNOME desktop input tools.
+
+The same selected candidate separately passes three duplicate autostarts,
+lock suspension, fresh enable epoch after administrative unlock, refusal of an
+old reader, stable app process/state, clean idle close and service-owned cold
+launch. [Managed lifecycle report](../release/qualification/ubuntu24.04/gnome-lifecycle-c4b885e.json).
+The unchanged official Mesa .3 failure baseline remains separate. Reboot and
+shortcut lock fencing remain the next actual checks.
+
+Separate ordinary-user ABI-specific runtimes now pass in actual Arch and Leap
+containers: three locked wheels on Python 3.14 and four on Python 3.13, retaining
+system Qt 6.11.2 and 6.9.1 respectively. Leap additionally overlays keyring25.6.
+Both pass offline preparation, exact reuse without receipt rewriting, deliberate
+corruption refusal without repair, rendered xcb Widgets/SVG/software QtQuick and
+an actual CPU-only ONNX Identity computation. The exact upstream Apache-2.0 test
+model is 115 bytes and matches a recorded SHA256; this is not speech inference.
+Each full native suite runs **687 tests, with two Mac-only skips**, successfully.
+[Checked runtime proofs and limitations](../release/qualification/next-targets/20261002-runtime-overlays.json).
+The 59-binary Qt inventories cover PySide/shiboken package roots; system Qt
+libraries outside those roots are dependencies and are not included in that
+inventory. No package adapter, desktop session or physical audio pass is inferred.
+
+First suite attempts exposed a real Leap gst-python API difference:
+`get_structure()` returns a context-managed `StructureWrapper`. RGB validation
+now enters that lifetime while preserving format/type/dimension/padded-buffer
+checks; older direct Structure APIs remain supported. Actual tests reject string
+width and boolean height. Other initial failures came from missing Git, a missing
+fixture passwd entry, a test assuming `/usr/bin/python3`, and the separately
+pinned Codex prerequisite absent from the production payload. Those fixture
+prerequisites were supplied; no test was disabled and Codex was not added to the
+product artifact. Both failed attempts and all raw hashes remain recorded.
+
+Initial containers with every capability removed could not perform normal
+package-manager chown/archive operations. They are stopped and preserved;
+ordinary container capabilities without host mounts/devices completed the signed
+package installs. All target policies, source/build/license review flags and
+physical-audio gates remain explicit. Upstream Qt notice files retain their exact
+bytes, including an existing trailing blank line flagged by diff whitespace QA.
+
 ## October 2 GNOME 48 source profile and dependency audit
 
 Explicit source profiles now admit GNOME 46, 48 and 50. Upstream GNOME Shell
