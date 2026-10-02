@@ -120,6 +120,13 @@ Installer and updater share a kernel lock so simultaneous promotions cannot race
 The stage operation copies the native surface, services, adapters, built runtime,
 configuration defaults, licenses, scripts and dependencies into a unique release
 folder. It does not copy an entire checkout or user conversations/configuration.
+Fedora artifacts also retain `fedora-package.json` in the immutable inventory,
+so startup selects RPM package-state checks. The
+[October 2 isolated Fedora update proof](LINUX-DISTRO-ROLLOUT.md#fedora-managed-adoption-and-metadata-staging-correction)
+reproduces the previous omission, verifies canonical rollback and qualifies the
+corrected stage using an actual runtime lease before adoption. Its app payload
+and separately refreshed canonical updater are recorded independently; this is
+fixture evidence, not an update of the owner's selected desktop.
 It imports the actual Qt window/controller and checks the Node executable. Its
 inventory hashes every regular artifact file and records internal symlinks;
 external symlinks are refused because they could silently change a release.

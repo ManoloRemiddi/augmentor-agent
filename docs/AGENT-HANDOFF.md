@@ -164,6 +164,25 @@ unpin/three-workspace checks. Initial processes are previews. Current-source
 hosted package/Mac and installed normal-startup checks follow publication; the
 separate control helper's identity, consent and portal restart remain open.
 
+Clean `4d65749` now passes all Linux/Mac CI; actual clean artifact merge `8244c9c`
+has the identical branch tree, with checked Ubuntu/Fedora reports and 643 native
+cases (two skips). Its full Fedora managed adoption exposed a real updater bug:
+staging dropped the RPM marker, and cold launch incorrectly ran `dpkg-query`.
+Canonical rollback restored the immutable `f7d7585` baseline. The staging fix
+passes a regression that first reproduced the failure, all 11 deployment cases
+and 644 native cases (two skips). In the owned VM, a separately recorded canonical
+bootstrap preserves baseline selection/PID and installs only the corrected
+updater. A fresh stage passes an actual Fedora runtime lease before selection,
+preserves the running app through activation, then adopts through idle close and
+canonical launch. The actual app's Qt registration succeeds before Settings, and
+focused/rendered onboarding plus selected inventory and SELinux pass. See the
+rollout guide/report for exact app, package and updater hashes. Selected pristine
+app `8244c9c` still embeds the older updater; do not bootstrap again from it or
+claim a clean combined artifact. Current fixer-source hosted CI and a combined
+artifact remain next, followed by current-release reboot/connected work/control.
+Fresh Noble overlay/runtime-placement/ELF inventory and separate control-helper
+identity research are recorded in the guide; those adapters remain unimplemented.
+
 ## October 1 merge blockers: current main and separate Codex prerequisite
 
 The feature branch integrates canonical main `8c3be5a` at merge `338dbc5`.

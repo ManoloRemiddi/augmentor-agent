@@ -1078,3 +1078,97 @@ Identity belongs to each D-Bus connection. This UI fix does not register the
 separate Python/GIO control helper or qualify its consent label. Portal restart
 re-registration and actual input consent/Stop/lock tests remain open. GNOME input
 registration and both qualification flags remain disabled.
+
+### Remaining runtime and control identity research
+
+Fresh Noble metadata narrows the proposed managed overlay to PySide6 Essentials
+and matching shiboken 6.8.2.1, Pygments 2.18.0, keyring 25.6.0 and sounddevice
+0.5.2. Primary [keyring](https://pypi.org/pypi/keyring/25.6.0/json) and
+[sounddevice](https://pypi.org/pypi/sounddevice/0.5.2/json) requirements can use
+Noble's declared SecretStorage/jeepney, jaraco, CFFI and cryptography packages;
+NumPy/YAML/websocket-client and GI can likewise remain distro dependencies.
+This is a metadata-compatible plan, not a tested runtime. Generate and verify the
+exact Linux wheel/hash lock from PyPI metadata before installation. Create each
+environment at its final immutable path: Python documents
+[venvs as non-portable](https://docs.python.org/3.12/library/venv.html).
+Current desktop staging does not copy a `python` directory, and current
+`qt-library-inventory.py` scans Mac dylibs/frameworks rather than Linux ELF.
+Runtime placement/receipt, ELF/plugin/symlink inventory, explicit system bridge,
+notices and interpreter propagation must be implemented together. The five-wheel
+layer does not supply `SileroVad`'s separate ONNX/model prerequisites; preserve
+and qualify the speech contract rather than silently substituting a model.
+
+The control helper's GIO connection needs its own identity before any portal
+method. The [Registry contract](https://github.com/flatpak/xdg-desktop-portal/blob/1.22.1/data/org.freedesktop.host.portal.Registry.xml#L43)
+requires registration once per portal lifetime and re-registration when its name
+reappears. A dedicated connection avoids another module caching a shared sender
+first. Use the existing discoverable `com.augmentor.Agent.desktop` identity;
+reject failed or already-associated registration, and invalidate sessions/tokens
+on owner replacement. Restoring identity must not restore old consent or replay
+input. Current product control code has not yet implemented this lifecycle.
+
+Consent text is a separate concern: GNOME 50's
+[dialog constructor](https://github.com/GNOME/xdg-desktop-portal-gnome/blob/50.0/src/remotedesktopdialog.c#L150)
+receives but does not use the app ID, and its
+[template](https://github.com/GNOME/xdg-desktop-portal-gnome/blob/50.0/src/remotedesktopdialog.ui#L7)
+uses a generic Remote Desktop title. Test the frontend/backend request's actual
+app ID, consent denial/acceptance and session ownership; do not require an app
+label this pinned backend does not render. Qualified private tests must also
+cover repeated connect/Stop/connect, cached and invalid identity refusal, owner
+restart, capture termination and held-input release. These research findings do
+not enable GNOME control tools.
+
+### Fedora managed adoption and metadata staging correction
+
+Clean `4d65749073c0007dccfabec9ef8edd0a6a044fd7` passes all
+[Linux](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36956338128)
+and [Mac 14/26](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36956338078)
+CI. Actual hosted artifacts identify merge
+`8244c9c15a0cfa818a5fe89c01f85d56cb085f8f`, parents `d91c520` and `4d65749`,
+tree `d61176996b8057951e42641454b909c75297e0e6`, verified equal to the branch.
+Checked [Ubuntu](../release/qualification/8244c9c/ubuntu26.04-amd64.json),
+[Fedora 43](../release/qualification/8244c9c/fedora43-x86_64.json) and
+[Fedora 44](../release/qualification/8244c9c/fedora44-x86_64.json) reports record
+fresh package lifecycle, GTK/wmctrl and 643 native cases (two Mac-only skips).
+These qualify the Qt fix; they precede the following updater correction.
+
+The [full-VM managed update report](../release/qualification/gnome50/fedora44-vm-managed-update.json)
+uses a local Fedora 44 RPM built from those checksum-verified hosted runtime and
+Desktop artifacts. Its local RPM hash differs from the hosted RPM and is recorded
+separately. Only its application payload is extracted into an ordinary-user
+candidate; the original installed `f7d7585` package remains immutable. The first
+canonical stage omitted `fedora-package.json` despite its presence in that RPM.
+Activation succeeded because its import preflight did not acquire a package
+lease. Cold startup then incorrectly selected `dpkg-query`, which is absent on
+Fedora, and refused. Canonical rollback restored the original baseline and its
+actual app; the failed staged artifact was not repaired in place.
+
+`desktop-deployment.py` now copies the Fedora marker into the staged inventory.
+The regression executes the real staged lifecycle backend with a synthetic RPM
+result, fails before the fix, then passes and verifies tampering blocks promotion.
+All 11 deployment cases and 644 full native cases (642 pass, two Mac-only skips)
+pass. Common Mac/Debian behavior retains the same optional-file semantics; fresh
+hosted confirmation of the updater correction follows its publication.
+
+The dedicated VM's canonical updater was refreshed from a separate recorded
+bootstrap, using the actual startup installer's unchanged baseline root/Python/
+Node and `enable=False`. Selection and the running process stayed unchanged;
+no installed package files were patched. A fresh stage then retained the exact
+marker and passed its actual ordinary-user runtime lease with bundled Node 24.19
+before activation. Activation preserved the running process and reported pending
+adoption. One accepted idle close and one canonical launch produced a new
+service-owned app from the selection, cleared pending state and retained rollback.
+Its exact Qt sender registers successfully before Settings calls. Later read-only
+inspection verifies the selected inventory and compositor-focused onboarding;
+the actual dialog and main window are visually rendered with SELinux enforcing.
+
+Selection `20261002-030519-d8c3a9a5` has artifact hash
+`1620987e91eda17b1d866e45d91e903693dba474c672998c99f43a68065afe42`.
+The app payload is pristine clean `8244c9c`; its canonical updater uses the
+separately tested working correction. The selected artifact still embeds the
+older updater: refreshing bootstrap files from it would reintroduce the bug.
+Do not call this a clean artifact containing the final updater fix. Next qualify
+that combined artifact through managed update, plus selected-release reboot,
+connected harness/Browser and the other full desktop/consent gates. The tested
+actual app uses canonical xcb inside GDM Wayland; full native-Wayland startup
+remains open. GNOME input and both qualification flags remain disabled.

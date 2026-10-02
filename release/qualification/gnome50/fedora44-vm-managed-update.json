@@ -1,0 +1,96 @@
+{
+  "format": "augmentor-gnome-full-vm-managed-update/1",
+  "source": {
+    "commit": "8244c9c15a0cfa818a5fe89c01f85d56cb085f8f",
+    "dirty": false
+  },
+  "version": "0.2.13",
+  "proofSha256": "c7b857a3c3ca3aa4b0454c7ad459f0e1b43223bef2b5e2beba17d02130ce0968",
+  "registeredUpdaterSha256": "7bb6552335a28cea554c20b562dbd8121c763d77e0984acdbcc9163ab38292bf",
+  "selectedArtifactContainsRegisteredUpdater": false,
+  "canonicalLauncherSha256": "6a628bd50fec2039ef3c21ea9494adf83899560e539be88ea61a05303583efb8",
+  "windowSha256": "ae755a18e130749d50e0013e27500bbc3e89b2935e3794c6d360f2d27d45d221",
+  "stagingPreservesSelectionAndRunningProcess": true,
+  "stagedPackageBackendPreserved": true,
+  "stagedActualRuntimeLeasePassed": true,
+  "activationPreservesRunningProcess": true,
+  "selectedVsRunningPendingReported": true,
+  "previousSelectionRetained": true,
+  "idleCloseAccepted": true,
+  "cleanServiceExit": true,
+  "canonicalServiceOwnsNewRelease": true,
+  "adoptionClearsPending": true,
+  "actualQtRegistrationSucceeded": true,
+  "actualQtRegisterBeforeSettings": true,
+  "portalTraceSha256": "6f7bb45a22c725448e05fcf3e31a5b7e9655c02016c31f208366dba780cf8ea0",
+  "graphicalSession": {
+    "Seat": "seat0",
+    "Type": "wayland",
+    "Class": "user",
+    "Active": "yes",
+    "State": "active"
+  },
+  "originalPackageVerified": true,
+  "selinuxEnforcing": true,
+  "connectedHarnessTested": false,
+  "modelTurnTested": false,
+  "newReleaseLoginRebootTested": false,
+  "gnomeInputToolsEnabled": false,
+  "checkpointDate": "2026-10-02",
+  "testedBase": "4d65749073c0007dccfabec9ef8edd0a6a044fd7",
+  "workingSourceChanges": [
+    "scripts/desktop-deployment.py",
+    "tests/test_desktop_deployment.py",
+    "release/prove-gnome-vm-update.py"
+  ],
+  "fixture": "Fedora Cloud 44-1.7 plus gnome-desktop; actual GDM Wayland fixture autologin, default canonical xcb app",
+  "previousPackageSource": "f7d75859f5bd88fd99bec2b4904aae5fd3423ed7",
+  "previousPackageRpmSha256": "831c1715e94305fa3d1ab4a0ad202fa92371c59cbea7517155f8b4ee51d51a57",
+  "candidateProvenance": {
+    "source": {
+      "commit": "8244c9c15a0cfa818a5fe89c01f85d56cb085f8f",
+      "dirty": false
+    },
+    "branch": "4d65749073c0007dccfabec9ef8edd0a6a044fd7",
+    "tree": "d61176996b8057951e42641454b909c75297e0e6",
+    "inputRuntime": {
+      "file": "augmentor-runtime_0.2.13_amd64.deb",
+      "sha256": "ab3e80701de3056bbb4cae37dc89fbac8adc034a3987e7db07874ead43e1d829",
+      "bytes": 56617584
+    },
+    "inputFedoraRpm": {
+      "file": "augmentor-agent-0.2.13-1.fc44.x86_64.rpm",
+      "sha256": "1003df22dcac363efb69fc47bd84a3b33e1129bd4adcf9bed159b9a0791172d0",
+      "bytes": 93777461
+    },
+    "fedoraMaintainerSourceSha256": "a0d3afdbaf12864fcb629a0ac82cc17dc7f0f03f348fd6e33a1effe5774cc4a6",
+    "archiveSha256": "7925e8cb6ece386bc74ce4f696f80697433211ef4d7ebe2995eee1d4ed520e00",
+    "archiveBytes": 107589279,
+    "windowSha256": "ae755a18e130749d50e0013e27500bbc3e89b2935e3794c6d360f2d27d45d221",
+    "scope": "Verified local Fedora44 RPM built from hosted clean runtime/Desktop artifacts; extracted application-owned managed candidate, not a package transaction."
+  },
+  "selectedArtifactSha256": "1620987e91eda17b1d866e45d91e903693dba474c672998c99f43a68065afe42",
+  "selectedReleaseId": "20261002-030519-d8c3a9a5",
+  "rawReportSha256": "928191bdafe6b9ed09713332f6266d8615419a8d5dd51b678dc5ac3651ede89c",
+  "failedPriorRunSha256": "ea14dd0b2b93b6d86ca4b046539c40965f8d2a1c07000be865b7b31be44a62db",
+  "rollbackLogSha256": "ebc0cff6b3e24e4fb7710d93d672c5ff19351b046efad796cc0408a48402b4ea",
+  "priorFailureReproducedMissingStagedFedoraMarker": true,
+  "canonicalRollbackRestoredBaseline": true,
+  "bootstrapPreservedBaselineSelectionAndProcess": true,
+  "postStartupInspectionSha256": "497511b7ae1035e91d1a0795605b7976f16fdb63172d66b648323f9c0b56f640",
+  "actualFocusedOnboardingAfterStartup": true,
+  "selectedInventoryVerifiedAfterStartup": true,
+  "onboardingVisuallyRendered": true,
+  "onboardingScreenshotSha256": "1d3639538b6af2798485ded194d6be143f35f74f7e07bc0bee43eb8fcb66053f",
+  "nativeSourceCases": 644,
+  "nativeSourcePassed": 642,
+  "nativeSourceMacOnlySkipped": 2,
+  "nativeSourceLogSha256": "a62489170bf660228e0022333f048422fa32656179f48a9f8eac7789c80c296f",
+  "limits": [
+    "Pristine selected application payload is the local Fedora44 RPM built from exact clean hosted merge 8244c9c (tree equal to 4d65749), not an RPM package replacement. Original f7d7585 package and its supplemental fixture wmctrl remain verified.",
+    "The canonical updater was refreshed from a separate checksum-recorded bootstrap containing the working metadata-copy fix. The selected 8244c9c artifact still embeds the older updater; refreshing from that old artifact would reintroduce the bug. A clean artifact including the final fix remains to be qualified.",
+    "The first failed staged artifact was left immutable. Canonical rollback restored the original baseline; a fresh stage with the fixed updater passed real runtime-lease preflight before a separate activation and idle cold launch.",
+    "Actual main app portal registration and focused/rendered onboarding are qualified on canonical xcb within a real GDM Wayland session. Full native-Wayland normal startup, connected harness/history/Browser, current selected release reboot and active-task recovery remain open.",
+    "No owner installation, desktop, credentials, model/audio settings, GNOME product input capability or private dependency source was changed."
+  ]
+}
