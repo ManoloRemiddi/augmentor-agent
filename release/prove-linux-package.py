@@ -10,6 +10,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import select
 import signal
 import subprocess
 import sys
@@ -28,6 +29,35 @@ def digest(path):
 
 def run(command, **kwargs):
     return subprocess.run(command, check=True, text=True, **kwargs)
+
+
+def wmctrl_version(user):
+    # wmctrl opens X before parsing even -V. Give this read-only binary check
+    # its own local display; neither an owner display nor a window manager is
+    # needed. Xvfb is a qualification dependency, not a product dependency.
+    read_fd, write_fd = os.pipe()
+    server = None
+    try:
+        with tempfile.TemporaryFile() as log:
+            server = subprocess.Popen(['Xvfb', '-displayfd', str(write_fd),
+                '-nolisten', 'tcp', '-screen', '0', '640x480x24'],
+                pass_fds=(write_fd,), stdout=log, stderr=log)
+            os.close(write_fd)
+            write_fd = None
+            if not select.select([read_fd], [], [], 15)[0]:
+                raise RuntimeError('Private package-check display did not become ready.')
+            number = os.read(read_fd, 32).decode().strip()
+            if not number.isdigit() or server.poll() is not None:
+                raise RuntimeError('Private package-check display failed.')
+            return subprocess.check_output(['runuser', '-u', user, '--', 'env',
+                'DISPLAY=:' + number, 'wmctrl', '-V'], text=True, timeout=10).strip()
+    finally:
+        os.close(read_fd)
+        if write_fd is not None:
+            os.close(write_fd)
+        if server is not None and server.poll() is None:
+            server.terminate()
+            server.wait(timeout=10)
 
 
 def main():
@@ -64,9 +94,9 @@ def main():
 
     if not rpm:
         run(['apt-get', 'update', '-qq'])
-        run(['apt-get', '-y', 'install', '--no-install-recommends', 'passwd', 'util-linux'])
+        run(['apt-get', '-y', 'install', '--no-install-recommends', 'passwd', 'util-linux', 'xvfb'])
     else:
-        run(['dnf', '-y', 'install', 'shadow-utils', 'util-linux'])
+        run(['dnf', '-y', 'install', 'shadow-utils', 'util-linux', 'xorg-x11-server-Xvfb'])
     app = Path('/usr/lib/augmentor')
     fresh = not (app/'release.json').exists()
     install()
@@ -84,7 +114,7 @@ def main():
         'import gi; gi.require_version("Gtk", "4.0"); from gi.repository import Gtk; '
         'assert callable(Gtk.accelerator_parse_with_keycode); '
         'print(str(Gtk.get_major_version())+"."+str(Gtk.get_minor_version())+"."+str(Gtk.get_micro_version()))'],text=True).strip()
-    wmctrl = subprocess.check_output(['runuser','-u',user,'--','wmctrl','-V'],text=True).strip()
+    wmctrl = wmctrl_version(user)
     run(['runuser', '-u', user, '--', '/usr/bin/python3', str(app/'scripts/run-component.py'), 'runtime', str(app/'node/bin/node'), '--version'])
     run(['runuser', '-u', user, '--', 'env', 'QT_QPA_PLATFORM=offscreen', 'augmentor-agent', '--preview', '--screenshot', str(home/'window.png')])
     assert (home/'window.png').stat().st_size > 1000

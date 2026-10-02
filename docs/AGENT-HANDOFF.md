@@ -116,6 +116,20 @@ complete artifacts remain open. The full private VM's GNOME group is installed;
 its graphical login/startup is still untested. Continue full-session startup,
 window/transient/native-Wayland and consent/input/Stop gates autonomously.
 
+The full private VM now reaches actual GDM/Wayland seat0 login with SELinux
+enforcing. Its verified earlier `f7d7585` package starts a non-preview Augmentor
+process owned by the user service; the real onboarding dialog and main window
+render with compositor focus. Connection is deliberately unconfigured. New
+guest-only provisioning/inspection helpers and the checked startup report are
+documented in the rollout guide. The real ScreenShield suspends the user-only
+observer while locked; it fails closed and returns with a fresh epoch after unlock.
+No positive locked scene or input qualification is claimed. `8413c2c` Mac and
+non-matrix Linux checks pass, but all three distro jobs stop at `wmctrl -V` opening
+X without a display. Its corrected proof now uses a private disposable Xvfb;
+actual ordinary-user binary checks pass on Fedora 43/44 and Ubuntu 26.04. Hosted
+confirmation, duplicate startup/crash/reboot, latest artifacts and the remaining
+full desktop/other-distro gates remain open. Continue the active rollout.
+
 ## October 1 merge blockers: current main and separate Codex prerequisite
 
 The feature branch integrates canonical main `8c3be5a` at merge `338dbc5`.

@@ -855,3 +855,50 @@ discovery command. The report records exact image/source hashes, the initially
 missing root hint and actual `wmctrl` package. The full Fedora VM's GNOME group
 installation has separately completed; graphical login/startup acceptance is
 still next. No installed owner release, UI layout, model or audio settings changed.
+
+### Full Fedora GNOME login and packaged startup checkpoint
+
+The owned Cloud-derived Fedora 44 VM has completed distro `gnome-desktop`
+installation and actual GDM autologin into an active seat0 Wayland user session.
+The [checked startup report](../release/qualification/gnome50/fedora44-vm-startup.json)
+records GNOME Shell 50.5, SELinux enforcing, package verification and the actual
+user service owning Augmentor's non-preview process. Its canonical selection is
+`/usr/lib/augmentor`; the initial Connect DSH dialog renders and receives compositor
+focus above the main window in the same process. Connection remains intentionally
+unconfigured, so this is startup/onboarding evidence without a harness/model turn.
+After dismissing the setup dialog in the owned VM, the main window remains focused
+and maintenance reports idle. No owner desktop or installed release is changed.
+
+This guest contains the earlier clean artifact source `f7d7585`, RPM SHA-256
+`831c1715e94305fa3d1ab4a0ad202fa92371c59cbea7517155f8b4ee51d51a57`, plus explicit
+fixture `wmctrl`. It does not contain the later `8413c2c` workspace correction or
+its declared dependency. Do not relabel this evidence as latest-source release
+qualification or patch its installed package to imitate a newer artifact.
+
+`release/provision-gnome-vm.py` runs only as the dedicated ordinary user in the
+marked QEMU guest, verifies its clean installed package and SELinux, copies the
+package's exact read-only observer into that user's extension directory, invokes
+the package's real startup installer, and configures fixture-only GDM autologin.
+The privileged guest change checks the marker again and preserves the original
+GDM configuration. `release/inspect-gnome-vm.py` performs read-only inspection of
+the actual session, service, singleton status, selection and compositor. Copy
+these helpers through the fixture's dedicated SSH channel and run them inside
+the guest. Their hashes and limits are recorded in the checked report. GDM's
+[documented automatic-login settings](https://help.gnome.org/system-admin-guide/login-automatic.html)
+are fixture provisioning, not manual authentication acceptance.
+
+Unlike the headless compositor fixture, the full session has a real ScreenShield.
+GNOME suspends this user-only extension while locked: the observer object becomes
+unavailable, so observation fails closed. After unlock it returns with a new epoch;
+old window identities must be discarded. The report does not claim a positive
+locked scene or qualified input. Duplicate startup, crash/reboot, consented input,
+complete actor guards and a standard Workstation installation remain open.
+
+Clean `8413c2c` passes Mac 14/26, Linux Debian/root/Home/source, installed lifecycle
+and Browser hosted checks. All three distro jobs stop after successful installation
+because the newly added `wmctrl -V` check opens X before processing its version
+option. The proof now starts and cleans up a private Xvfb display solely for that
+ordinary-user read-only check. Xvfb is a test dependency, not a product dependency.
+Actual corrected binary checks return `1.07` on Fedora 43, Fedora 44 and Ubuntu
+26.04. Fresh complete package/native hosted confirmation follows this correction;
+do not treat the failed matrix as a passed package qualification.
