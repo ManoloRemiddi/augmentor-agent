@@ -2,6 +2,33 @@
 
 # Linux distribution rollout
 
+## October 3 complete Arch/Leap native package builds
+
+The [new native package guide](LINUX-SYSTEM-QT-PACKAGES.md) and
+[artifact/inspection checkpoint](../release/qualification/next-targets/20261003-system-qt-native-packages.json)
+record actual ordinary-user full application `makepkg`/`rpmbuild` success from
+clean536 payload bytes with separately hashed working recipes. Exact offline
+profile/wheels/frozen system inventory, target metadata, explicit bootstrap
+wrappers, Handy bytes/modes and all29,244 Arch/29,246 Leap application-root
+members pass inspection. Both include the dictation permission files. Leap's
+corrected repeat records isolated Python3.13 arguments in all four embedded
+standalone guard phases; the predecessor remains separate. Three focused input/
+output-preservation/guard composition cases pass. No application was installed
+by these builds. Native dependency installation, full installed lifecycle and
+complete installer/resume still require actual acceptance; Arch's independent
+hook guard must be installed in its own prior transaction.
+
+[Fresh corrected Mac14/26 reports](../release/qualification/next-targets/20261003-mac-hosted-source-provenance.json)
+now pass and name actual clean merge480212b in both Desktop/Companion manifests;
+its difference from headbbd76c8 is four documentation files only. Old null-source
+reports remain unchanged. Full536 Windows also finishes successfully on both
+native CPUs, without establishing the older x64 teardown failure's cause.
+GitGuardian remains failed/unwaived. All five rollout points, real sessions/
+Browser/audio, upgrades/rollback and source/legal/release gates remain open.
+Owner installations/services/models/devices and all22 license-scope files stay
+unchanged.
+
+
 ## October 3 hosted Ubuntu/Fedora qualification
 
 [Linux run37075160234](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37075160234)

@@ -11,8 +11,13 @@ the workflow omitted the existing package builder's `--source-commit` argument.
 These remain passing functional fixtures with incomplete artifact provenance.
 The workflow now passes `git rev-parse HEAD` to both Desktop and Companion builds,
 recording the actual checked-out revision, including a PR merge checkout when used.
-This does not retroactively change the old reports. The corrected workflow still
-needs a fresh Mac execution before its source-bound reports can be accepted.
+This does not retroactively change the old reports. The corrected
+[Mac14/26 run37077473331](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37077473331)
+now passes; both downloaded Desktop/Companion reports name actual checked-out
+merge `480212b`, differing from head `bbd76c8` only in four documentation files.
+Managed/engine-first first-run/restart also pass. The
+[new source-bound checkpoint](../release/qualification/next-targets/20261003-mac-hosted-source-provenance.json)
+records exact report ZIP hashes and keeps the old null-source results separate.
 See [the matching Linux/hosted checkpoint](../release/qualification/next-targets/20261003-hosted-linux-package-qualification.json)
 for exact artifact identities and scope. No installed app or published binary changed.
 

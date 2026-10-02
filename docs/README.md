@@ -4,6 +4,9 @@
 - [Immediate composer feedback and regression evidence](COMPOSER-SEND-FEEDBACK.md)
 # Documentation index
 
+- [Arch/Leap complete native package candidates and remaining gates](LINUX-SYSTEM-QT-PACKAGES.md).
+- [Corrected Mac source-bound hosted reports](../release/qualification/next-targets/20261003-mac-hosted-source-provenance.json).
+
 - [October3 hosted Ubuntu/Fedora reports and Mac provenance limit](../release/qualification/next-targets/20261003-hosted-linux-package-qualification.json).
 
 - [Embedded Handy dictation](HANDY-INTEGRATION.md): implementation, themed recording pill, settings, OS adapters, licensing, build and qualification boundaries.

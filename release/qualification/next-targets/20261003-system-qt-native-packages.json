@@ -1,0 +1,161 @@
+{
+  "format": "augmentor-system-qt-native-packages-checkpoint/1",
+  "date": "2026-10-03",
+  "inputCleanSource": {
+    "commit": "536fc7561a7b81ab90e806925652e446f438050a",
+    "dirty": false
+  },
+  "scope": "Full application/Node/Handy payload native builds and complete inventory inspection; working packaging recipes are separately hashed. No installed target or complete installer acceptance.",
+  "targets": [
+    {
+      "format": "augmentor-system-qt-native-package-inspection/1",
+      "source": {
+        "commit": "536fc7561a7b81ab90e806925652e446f438050a",
+        "dirty": false
+      },
+      "target": "arch20261001-x86_64",
+      "artifact": {
+        "file": "augmentor-agent-0.2.13-1-x86_64.pkg.tar.zst",
+        "sha256": "0ebabc58503b650a84b8791c0957dd4e25e7d01e1fae57670d365c5bd8a63abb",
+        "bytes": 368599211
+      },
+      "preparationSha256": "b3403fcf6f0e157c47fe95514c8f19353f48b793969b735770c6120af531235c",
+      "workingProducerSha256": "e8bd65fad2242e27c8d62e975d6c6aefc9c4428a068bc74407fb4418e97ae375",
+      "nativeBuildPassed": true,
+      "completeAppInventoryVerified": true,
+      "appInventoryMembers": 29244,
+      "matchingRuntimeAndDesktopMetadata": true,
+      "offlineWheelsAndSystemManifestVerified": true,
+      "actualHandyInventoryAndExecutableModesVerified": true,
+      "explicitBootstrapWrappersSyntaxAndPresenceVerified": true,
+      "udevModuleLoadTmpfilesIncluded": true,
+      "installedLifecycleTested": false,
+      "dependenciesInstalledOrQualified": false,
+      "coldInstalledRuntimeTested": false,
+      "realSessionAudioInputTested": false,
+      "releaseAcceptance": false
+    },
+    {
+      "format": "augmentor-system-qt-native-package-inspection/1",
+      "source": {
+        "commit": "536fc7561a7b81ab90e806925652e446f438050a",
+        "dirty": false
+      },
+      "target": "opensuse-leap16.0-x86_64",
+      "artifact": {
+        "file": "augmentor-agent-0.2.13-1.leap16.x86_64.rpm",
+        "sha256": "bc4d9d2ad4901120e9883e819f7b513ccbfbbd25311a0ab5988bd5030ac628d6",
+        "bytes": 337424942
+      },
+      "preparationSha256": "bda9e017ec5241ce7919f9d0fc04fb734127a8f462db96450c00ee684d6c56eb",
+      "workingProducerSha256": "16876fcbf6f3449847cc0e50ba02eda59b0bd6f2cb754facb8b23e645714dae2",
+      "nativeBuildPassed": true,
+      "completeAppInventoryVerified": true,
+      "appInventoryMembers": 29246,
+      "matchingRuntimeAndDesktopMetadata": true,
+      "offlineWheelsAndSystemManifestVerified": true,
+      "actualHandyInventoryAndExecutableModesVerified": true,
+      "explicitBootstrapWrappersSyntaxAndPresenceVerified": true,
+      "udevModuleLoadTmpfilesIncluded": true,
+      "installedLifecycleTested": false,
+      "dependenciesInstalledOrQualified": false,
+      "coldInstalledRuntimeTested": false,
+      "realSessionAudioInputTested": false,
+      "releaseAcceptance": false,
+      "fourIsolatedScriptletInterpretersRecorded": true,
+      "previousUnisolatedArtifactPreserved": true
+    }
+  ],
+  "historicalLeapPredecessor": {
+    "format": "augmentor-system-qt-native-package-inspection/1",
+    "source": {
+      "commit": "536fc7561a7b81ab90e806925652e446f438050a",
+      "dirty": false
+    },
+    "target": "opensuse-leap16.0-x86_64",
+    "artifact": {
+      "file": "augmentor-agent-0.2.13-1.leap16.x86_64.rpm",
+      "sha256": "fe31b444dce6d280b70f1d9bc6f4c292ba3ed11a43ffe8c303c97d1bd7e563ba",
+      "bytes": 337413629
+    },
+    "preparationSha256": "6cabd507e3dc847343aa4e293e9ee578ccd55ff5044be3f90e11d9ef29257082",
+    "workingProducerSha256": "e8bd65fad2242e27c8d62e975d6c6aefc9c4428a068bc74407fb4418e97ae375",
+    "nativeBuildPassed": true,
+    "completeAppInventoryVerified": true,
+    "appInventoryMembers": 29246,
+    "matchingRuntimeAndDesktopMetadata": true,
+    "offlineWheelsAndSystemManifestVerified": true,
+    "actualHandyInventoryAndExecutableModesVerified": true,
+    "explicitBootstrapWrappersSyntaxAndPresenceVerified": true,
+    "udevModuleLoadTmpfilesIncluded": true,
+    "installedLifecycleTested": false,
+    "dependenciesInstalledOrQualified": false,
+    "coldInstalledRuntimeTested": false,
+    "realSessionAudioInputTested": false,
+    "releaseAcceptance": false
+  },
+  "focusedTests": {
+    "total": 3,
+    "passed": 3,
+    "scope": "Foreign/dirty/runtime/package-pair and checksum/output-preservation refusals; standalone RPM-macro-safe guard composition"
+  },
+  "nativeBuild": {
+    "ordinaryUserUid": 1000,
+    "arch": "makepkg --nodeps --noconfirm; runtime dependency checks skipped for build only, not for installation",
+    "leap": "rpmbuild -bb; current Requires metadata and actual scriptlet argv inspected",
+    "containersHadNoHostMountsDevicesOrPrivileges": true,
+    "containersNetworkAttached": true,
+    "sourcesWereLocalChecksumVerifiedInputs": true,
+    "applicationInstalled": false
+  },
+  "sources": [
+    "https://archive.archlinux.org/repos/2026/10/01/core/os/x86_64/core.db",
+    "https://archive.archlinux.org/repos/2026/10/01/extra/os/x86_64/extra.db",
+    "https://download.opensuse.org/distribution/leap/16.0/repo/oss/repodata/repomd.xml",
+    "https://rpm.org/docs/4.20.x/manual/spec.html",
+    "https://rpm.org/docs/4.20.x/manual/tags.html",
+    "https://raw.githubusercontent.com/rpm-software-management/rpm/master/build/parseScript.cc"
+  ],
+  "remaining": [
+    "Complete candidate bundle target/runtime/guard admission",
+    "Separately installed verified Arch guard and effective hooks",
+    "Full native dependency solve/install without moving frozen Qt/Python identities",
+    "Installed lifecycle, ordinary-user cold runtime and complete installer/resume",
+    "Real GNOME/KDE/Mint sessions, graphical Browser and physical audio",
+    "Version upgrades/rollback and coherent system dependency maintenance",
+    "Source/legal/release acceptance; owner22-file license decision remains pending"
+  ],
+  "allFiveRolloutPointsComplete": false,
+  "ownerInstallationServicesModelsDevicesChanged": false,
+  "privateEvidence": {
+    "outputs/linux-rollout/system-qt-package61-arch/PKGBUILD": "d9febc41d0b51e6554b9f4bcaf9cda52037fe72e9ae98af6cb318139e860dd63",
+    "outputs/linux-rollout/system-qt-package61-arch/build-preflight.json": "d4009e2acf5b332d3e26bef9173611dfda6671f294f32254ea3a929eb086e8f6",
+    "outputs/linux-rollout/system-qt-package61-arch/build.stderr": "7563680d80d94fdf58a70b630edaaa57318815e8227f70eda6838793d71654b2",
+    "outputs/linux-rollout/system-qt-package61-arch/build.stdout": "882310a5dd1a8c3c9d114d3cc1ad94def8d35a450b88ce5235661c1c2adbb643",
+    "outputs/linux-rollout/system-qt-package61-arch/inspection.json": "0fd94691d9e8fd996c4443f3ceb93094b4bd41cb3a3f6339614a7b722900a8c6",
+    "outputs/linux-rollout/system-qt-package61-arch/native-metadata.txt": "7a7d8c265421715a91f8fd9b6516d67b79e8b31d5855647c9f792324ad63a0ea",
+    "outputs/linux-rollout/system-qt-package61-arch/preparation.json": "b3403fcf6f0e157c47fe95514c8f19353f48b793969b735770c6120af531235c",
+    "outputs/linux-rollout/system-qt-package61-arch/producer-source.py": "e8bd65fad2242e27c8d62e975d6c6aefc9c4428a068bc74407fb4418e97ae375",
+    "outputs/linux-rollout/system-qt-package62-leap/augmentor-agent.spec": "63f2b5190ff16df9ec985090151245b03ca62256da7ecefb964656f0a6aa6cf0",
+    "outputs/linux-rollout/system-qt-package62-leap/build-preflight.json": "113a2f04deb3f28b5678a8ef035d629b8546aefb8cb01e184830050b3e521a32",
+    "outputs/linux-rollout/system-qt-package62-leap/build.stderr": "83c5c5437f38a63e85f7ef1b605d462e20a4493de4360c47e880b109e8789413",
+    "outputs/linux-rollout/system-qt-package62-leap/build.stdout": "e3f8f4e08019004a612ca883c0197de34ad5ca1598a487a5ec06ea1d178b8e93",
+    "outputs/linux-rollout/system-qt-package62-leap/inspection.json": "4b882378d78c12fce08d4b2362b99e195fafa6a971d8bc941457f699b5dd182c",
+    "outputs/linux-rollout/system-qt-package62-leap/isolated-argument-probe.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/linux-rollout/system-qt-package62-leap/isolated-argument-probe.stdout": "e2202b400500c7f7df8b40d29bb9b2aa79c16f6f8b11408cbd1939ad254bbc6f",
+    "outputs/linux-rollout/system-qt-package62-leap/native-metadata.txt": "facb64b39d34c037d69d3898807de0eacfd5e6b455634d1f837cc02d3515061d",
+    "outputs/linux-rollout/system-qt-package62-leap/preparation.json": "6cabd507e3dc847343aa4e293e9ee578ccd55ff5044be3f90e11d9ef29257082",
+    "outputs/linux-rollout/system-qt-package62-leap/producer-source.py": "e8bd65fad2242e27c8d62e975d6c6aefc9c4428a068bc74407fb4418e97ae375",
+    "outputs/linux-rollout/system-qt-package62-leap/requires.txt": "c54089e28fb2b46bec696aa0646ea7513800811e5539721f2eb926bcec7caab4",
+    "outputs/linux-rollout/system-qt-package62-leap/scripts.txt": "f9d2180b6a46b776fcdfbb2229c3ac1100f9e891dd38ce09942b6039966ac672",
+    "outputs/linux-rollout/system-qt-package63-leap/augmentor-agent.spec": "fd25ccf40e500d576ac3abb4ec30879152659a07fd5d595244adf5669e59034c",
+    "outputs/linux-rollout/system-qt-package63-leap/build-preflight.json": "21e60a85a6f4c38a0dee16e5789bf17cff29f8a7c4cd4c7a5d0350cba27a765e",
+    "outputs/linux-rollout/system-qt-package63-leap/build.stderr": "0a90c229a2011a2240ca0b0e5578d39c9f82b19856eb4054cd49c9328e7ae9b0",
+    "outputs/linux-rollout/system-qt-package63-leap/build.stdout": "36e228baef73adc321b57176ead285a5cc32373979ee6f4df53123cce06d1810",
+    "outputs/linux-rollout/system-qt-package63-leap/inspection.json": "e23cb93a0a84081f19d05b94faa3f5a3617b6564e925a066aa8fdf0fa43a924a",
+    "outputs/linux-rollout/system-qt-package63-leap/interpreters.txt": "23f18cdb9d6b361d861447e6a709033fe0b8c3f8be699e6ffb82dedbe6257cc0",
+    "outputs/linux-rollout/system-qt-package63-leap/preparation.json": "bda9e017ec5241ce7919f9d0fc04fb734127a8f462db96450c00ee684d6c56eb",
+    "outputs/linux-rollout/system-qt-package63-leap/producer-source.py": "16876fcbf6f3449847cc0e50ba02eda59b0bd6f2cb754facb8b23e645714dae2",
+    "outputs/linux-rollout/system-qt-package63-leap/scripts.txt": "ded97dadac742d608f14d438a411a632d3b86e5c60cdd405bfb3fe3867d47682"
+  }
+}

@@ -10,8 +10,12 @@ transaction does not establish the pre-hook boundary. Keep the guard installed
 through application removal and unresolved recovery; remove it afterward in a
 separate completed transaction.
 
-This directory does not yet contain the full application PKGBUILD. Neither the
-guard nor the synthetic proof payload is a public application release. The
+The [full application preparer](../../scripts/package-system-qt.py) now generates
+an independent PKGBUILD and checksum-checked complete payload. Its ordinary-user
+native build and complete application inventory inspection pass; see
+[exact scope and remaining installation/installer gates](../../docs/LINUX-SYSTEM-QT-PACKAGES.md).
+Neither these private candidates, the guard nor the synthetic proof payload is a
+public application release. The
 reviewed target is the coherent Arch snapshot dated 2026-10-01, x86_64; rolling
 updates and derivatives require their own actual acceptance.
 

@@ -1,0 +1,65 @@
+{
+  "format": "augmentor-mac-source-bound-hosted-checkpoint/1",
+  "date": "2026-10-03",
+  "pullRequestHead": "bbd76c800d00f2e8e7403b5fd094abf4444f1fc2",
+  "testedMergeCommit": "480212b66cee4bf29dea3f6c6b51d21271b38859",
+  "diffFromHead": [
+    "README.md",
+    "docs/AGENT-HANDOFF.md",
+    "docs/WINDOWS-IMPLEMENTATION-STATUS.md",
+    "docs/WINDOWS-INSTALLER-DECISION.md"
+  ],
+  "differenceIsDocumentationOnly": true,
+  "run": 37077473331,
+  "url": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37077473331",
+  "conclusion": "success",
+  "targets": [
+    {
+      "os": "mac14",
+      "artifactId": 11258195325,
+      "zipSha256": "d00fcadd1bb29baaaf513475727e7b8f8c0d6f21813476bdaafbbc9405fe4ba4",
+      "zipBytes": 102178,
+      "desktopSourceCommit": "480212b66cee4bf29dea3f6c6b51d21271b38859",
+      "companionSourceCommit": "480212b66cee4bf29dea3f6c6b51d21271b38859",
+      "managedFirstRun": true,
+      "engineFirstRestart": true,
+      "memberSha256": {
+        "macos/artifacts.json": "c491b995458cc38514a48b62acaf891b2d87ade43db1c12b54b26255f184fbeb",
+        "macos/qt-library-inventory.json": "c13195286357794ea47eb64db993314abf1c8e9d5b20bcc210c5304f40e5cd02",
+        "macos-companion/artifacts.json": "9d370f0065abc4a0ee8f5e8326f905a7af1260991f00174e0dd3592023f0791c",
+        "macos/handy-signed-inventory.json": "e3c8f11cca42cfb4809a9c92ee2768f66bf9fca75fff696a1ccc06be547becfa",
+        "macos-companion/handy-signed-inventory.json": "e3c8f11cca42cfb4809a9c92ee2768f66bf9fca75fff696a1ccc06be547becfa",
+        "macos-managed/report.json": "741f4feb47509e2c35bfa78acc6444ccd90d2be7e3779b59af5dee1f5c7f2318",
+        "macos-engine-first/report.json": "c37a7239d0e4abc0f3dcff6d739ccf150fe03786765da54dbdcece71556a48f7"
+      }
+    },
+    {
+      "os": "mac26",
+      "artifactId": 11257357887,
+      "zipSha256": "11c4ce6989f12a95cc838ff8466033eccaee71235e764217ac53ae806afe96a0",
+      "zipBytes": 102181,
+      "desktopSourceCommit": "480212b66cee4bf29dea3f6c6b51d21271b38859",
+      "companionSourceCommit": "480212b66cee4bf29dea3f6c6b51d21271b38859",
+      "managedFirstRun": true,
+      "engineFirstRestart": true,
+      "memberSha256": {
+        "macos/handy-signed-inventory.json": "dbc11ccfb0897ceaa26571f1435745b23f5313c9cf88072b3de74a5ff0507057",
+        "macos/qt-library-inventory.json": "c13195286357794ea47eb64db993314abf1c8e9d5b20bcc210c5304f40e5cd02",
+        "macos/artifacts.json": "dadcad46d5ed7b4d66da84327259b7194b80e90b4b10401a1a60531420ff2836",
+        "macos-companion/artifacts.json": "ba597761d50a3b1dc1d19fe828bf83f8ad08035df49e0bb976d7d7be474806d2",
+        "macos-companion/handy-signed-inventory.json": "dbc11ccfb0897ceaa26571f1435745b23f5313c9cf88072b3de74a5ff0507057",
+        "macos-engine-first/report.json": "80d5cda6f1f28b5445266cce78152d1cff0ca36d7ec3ed097eedc0f8fb6fba73",
+        "macos-managed/report.json": "5d1cc5c59b613387375b9bb54cb025a5e11a4b6c13ac6fbb2bb5e44d4ca7a818"
+      }
+    }
+  ],
+  "previousNullSourceReportsChanged": false,
+  "actualOwnerAppOrBinaryReleaseChanged": false,
+  "allFiveRolloutPointsComplete": false,
+  "windows536": {
+    "run": 37075159857,
+    "conclusion": "success",
+    "bothNativeCpus": true,
+    "olderX64TeardownFailureCauseEstablished": false
+  }
+}
