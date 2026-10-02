@@ -85,6 +85,16 @@ Installer and updater share a kernel lock so simultaneous promotions cannot race
 
 ## Required development and update workflow
 
+The October 2 [embedded Handy adoption](HANDY-INTEGRATION.md#owners-installed-adoption--2-october-2026)
+uses this workflow: public feature source `c8f67a3` was composed with the existing
+0.2.11 artifact using narrow patches so the newer settings frame, DSH integration
+and speech dependencies remain intact. Selected/running build
+`20261002-141437-663e6383` is inventoried as
+`a47433db434bf446d8001c18182d85b8318c0e78f92fd72f14f8131f75cfd308`.
+Both Desktop and Mobile adopted it before the owner-authorized standalone Handy
+cutover. Startup backup and enable/status checks are recorded in the owning guide;
+broader cross-platform installer acceptance remains separate.
+
 1. Implement and test the change in source. Build a complete runnable candidate
    separate from the selected release. For an incremental preview patch, first
    copy the current artifact to a separate candidate and apply the reviewed
@@ -311,3 +321,22 @@ native canvas correction over the prior selected build. Running main/mobile and
 secondary windows remain on their earlier artifacts until reopened; active work
 and drafts were preserved. The staged candidate passed isolated two-process
 X11/KWin workspace and stacking checks plus authenticated activation preflight.
+
+## October 2 dictation admission follow-up
+
+The [Handy adoption follow-up](HANDY-INTEGRATION.md#verified-source-and-installed-follow-up)
+records `f60148b` composed over the preceding immutable artifact. Current selected
+and running Desktop/Mobile build is `20261002-154843-0eedcd1a`, artifact
+`eee72c10f9ad9268dc66c69de819536f033e3b6edd30b27366880526f8f5a478`.
+The compatible installed 0.2.11 UI/DSH/speech contracts are preserved. Both idle
+windows closed through acknowledged maintenance and reopened through the selected
+launcher. The owned broker also restarted from that root. Dictation remains ready
+on Ctrl+Space with the owner's palette and no Handy tray/startup owner.
+
+The later native-admission build in the same [adoption guide](HANDY-INTEGRATION.md#current-installed-admission-build)
+is now selected and running: `20261002-160803-407ce464`, artifact
+`ac681aadeea466f7ce280f5641e8c89ba01e216a299702de3f1de134886240b9`,
+source `85034ac`. Both windows closed only while idle; the primary launcher was
+invoked after its old service had exited. Desktop/Mobile report online and no
+pending update. This supersedes the preceding installed root without altering
+its preserved product, DSH or speech contract.

@@ -25,3 +25,6 @@ credentials.json
 
 # Private speech-source archives must not return to the public application.
 /vendor/testing/resonant-voice-service-*.tgz
+
+# Platform dictation runtimes are generated, verified release artifacts.
+/components/handy/runtime/

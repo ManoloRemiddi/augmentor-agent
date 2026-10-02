@@ -17,7 +17,7 @@ from PySide6.QtCore import Qt, QTimer, QLockFile, QUrl, Signal, QSize, QPoint, Q
 from PySide6.QtNetwork import QLocalServer, QLocalSocket
 from PySide6.QtGui import QColor, QPainter, QKeySequence, QShortcut, QRegion, QDesktopServices, QPalette, QIcon
 from PySide6.QtWidgets import (QApplication,QWidget,QFrame,QLabel,QPushButton,QVBoxLayout,QHBoxLayout,
-    QStackedLayout,QTextEdit,QTextBrowser,QMessageBox,QInputDialog,QMenu,QSizePolicy,QLayout,QDialog)
+    QStackedLayout,QTextEdit,QTextBrowser,QMessageBox,QInputDialog,QMenu,QSizePolicy,QLayout,QDialog,QSystemTrayIcon)
 from .controller import Controller
 from .voice_button import VoiceButton
 from .design import COPY_FEEDBACK_MS
@@ -36,9 +36,11 @@ from .panels import HistoryDialog, AccessDialog, UpdatesDialog, SettingsDialog, 
 
 class Window(QWidget):
     completed = Signal(object, object)
+    dictation_stopped = Signal(object)
 
     def __init__(self, preview=True, harness=None):
         super().__init__()
+        self.dictation_stopped.connect(self.finish_dictation_quit)
         self.ui_scale=LiveScale(self, QApplication.instance().property('augmentorUiBaseScale') or 100)
         self.setWindowTitle(window_label())
         self.setWindowIcon(QIcon(str(Path(__file__).parent/'assets/augmentor.svg')))
@@ -877,7 +879,7 @@ class Window(QWidget):
         menu.addAction('Versions & updates',self.open_updates).setEnabled(bool(self.controller))
         menu.addAction('Approval mode',self.open_access).setEnabled(bool(self.controller))
         menu.addAction('About & licenses',lambda:LicensesDialog(self).exec())
-        menu.addSeparator();menu.addAction('Quit Augmentor',self.close)
+        menu.addSeparator();menu.addAction('Quit Augmentor',self.quit_augmentor)
         menu.exec(self.more_button.mapToGlobal(self.more_button.rect().bottomLeft()))
 
     def open_updates(self):
@@ -892,6 +894,7 @@ class Window(QWidget):
         dialog.setWindowModality(Qt.WindowModality.NonModal)
         dialog.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         dialog.changed.connect(self.apply_appearance)
+        dialog.changed.connect(self.publish_dictation_appearance)
         dialog.finished.connect(lambda _:setattr(self,'appearance_dialog',None))
         self.appearance_dialog=dialog
         area=self.screen().availableGeometry()
@@ -908,6 +911,25 @@ class Window(QWidget):
         keys=('theme','hue','brightness','accent_hue','accent_brightness','format_colours')
         changed={key:latest[key] for key in keys if latest[key]!=self.preferences.values[key]}
         if changed:self.apply_appearance(changed)
+
+    def publish_dictation_appearance(self,_):
+        # Only explicit edits publish; opening another window never wins the theme.
+        from . import dictation
+        value=dictation.theme(self.preferences.values)
+        import time
+        value["edited_at"]=time.time_ns()
+        if not hasattr(self,'dictation_theme_timer'):
+            self.dictation_theme_timer=QTimer(self);self.dictation_theme_timer.setSingleShot(True)
+            self.dictation_theme_timer.timeout.connect(self.flush_dictation_appearance)
+        self.dictation_theme_pending=value;self.dictation_theme_timer.start(60)
+
+    def flush_dictation_appearance(self):
+        value=self.dictation_theme_pending
+        def work():
+            try:dictation_request('theme',value)
+            except Exception:pass  # Colour edits must remain usable if dictation is off.
+        from .dictation import request as dictation_request
+        threading.Thread(target=work,daemon=True).start()
 
     def apply_appearance(self,values):
         self.preferences.values.update(values);v=self.preferences.values
@@ -1171,7 +1193,53 @@ class Window(QWidget):
         else:
             self.close()
 
+    def setup_dictation_tray(self):
+        if current_name()!='main' or not self.controller:return
+        from .dictation import request,theme
+        value=theme(self.preferences.values)
+        def boot():
+            try:request('initialize',{'theme':value})
+            except Exception:pass
+        threading.Thread(target=boot,daemon=True).start()
+        if not QSystemTrayIcon.isSystemTrayAvailable():return
+        self.app_tray=QSystemTrayIcon(self.windowIcon(),self)
+        self.app_tray.setToolTip('Augmentor Agent')
+        menu=QMenu(self)
+        menu.addAction('Open Augmentor',self.bring_forward)
+        from .dictation_settings import DictationSettingsDialog
+        menu.addAction('System dictation · Handy',lambda:DictationSettingsDialog(self).exec())
+        menu.addAction('Settings',self.open_settings)
+        menu.addSeparator();menu.addAction('Quit Augmentor',self.quit_augmentor)
+        self.app_tray.setContextMenu(menu)
+        self.app_tray.activated.connect(lambda reason:self.bring_forward() if reason==QSystemTrayIcon.ActivationReason.Trigger else None)
+        self.app_tray.show()
+
+    def quit_augmentor(self):
+        if getattr(self,'quitting_dictation',False):return
+        if self.voice_dialog or self.voice_input or self.voice_opening:self.close_voice_panel()
+        if current_name()=='main':
+            from .dictation import request
+            self.quitting_dictation=True
+            def stop():
+                error=None
+                try:
+                    request('cancel',start=False,timeout=3)
+                    request('shutdown',start=False,timeout=8)
+                except Exception as problem:
+                    if 'not running' not in str(problem):error=str(problem)
+                self.dictation_stopped.emit(error)
+            threading.Thread(target=stop,daemon=True).start()
+        else:self.quit_requested=True;self.close()
+
+    def finish_dictation_quit(self,error):
+        self.quitting_dictation=False
+        if error:self.set_status('System dictation could not stop: '+error);return
+        self.quit_requested=True;self.close()
+
     def closeEvent(self, event):
+        if hasattr(self,'app_tray') and not getattr(self,'quit_requested',False):
+            if self.voice_dialog or self.voice_input or self.voice_opening:self.close_voice_panel()
+            self.remember_placement();self.hide();event.ignore();return
         if self.voice_dialog or self.voice_input or self.voice_opening:self.close_voice_panel()
         if self.controller and getattr(self.controller,'repairing',False):
             event.ignore();return
@@ -1325,6 +1393,7 @@ def main():
         if not app.instance_server.listen(socket_name):
             return 1
     window = Window(preview=args.preview or bool(args.screenshot),harness=args.harness)
+    if not args.preview and not args.screenshot:window.setup_dictation_tray()
     if hasattr(app, 'instance_server'):
         def activate():
             client = app.instance_server.nextPendingConnection()
@@ -1356,6 +1425,7 @@ def main():
                         'voiceOutputUnderflows':window.voice_dialog.output_underflows if window.voice_dialog else 0}).encode()+b'\n')
                     client.waitForBytesWritten(500)
                     if command=='maintenance.close' and not busy:
+                        window.quit_requested=True
                         window.close()
                 elif command.startswith('onboarding:'):
                     try:
