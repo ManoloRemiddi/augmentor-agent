@@ -60,10 +60,11 @@ configuration checks. Browser voice shares this selection. The Ubuntu 24.04
 proof includes offline preparation, managed selection/rollback and actual CPU
 Silero inference; its system GI bridge and remaining package/desktop/voice gates
 are tracked in [the distro rollout](../../docs/LINUX-DISTRO-ROLLOUT.md#noble-runtime-selection-and-cpu-vad).
-This does not yet qualify a Noble installation.
+That runtime-only proof does not establish installed-product acceptance.
 
 The separate Noble Debian candidate now carries the exact seven-wheel policy and
 cache with distro-specific system dependencies. Complete setup checks matching
 package/bundle runtime contracts before preparation and verifies repeat runs.
-Its package and complete proof tools use the selected interpreter. Public release,
+Its clean package and complete container proofs use the selected interpreter and
+pass fresh setup/lifecycle, offscreen preview and fixture role turns. Public release,
 GNOME 46/Cinnamon and physical voice acceptance remain separate rollout gates.

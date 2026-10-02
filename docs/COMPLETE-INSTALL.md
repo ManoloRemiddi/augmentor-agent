@@ -7,8 +7,9 @@ acceptance is scoped to KDE Plasma Wayland. The
 [Linux distribution rollout](LINUX-DISTRO-ROLLOUT.md) adds separate Ubuntu 26.04
 and Fedora 43/44 candidate bundles; their package adapters do not establish full
 desktop compatibility. Ubuntu 24.04 now has a separate private qualification
-candidate with a verified managed Qt/Python runtime; its package/complete and
-native-library release gates are tracked in the rollout. Mint remains separate.
+candidate with a verified managed Qt/Python runtime. Its fresh container package
+and complete proofs pass; desktop and native-library release gates are tracked in
+the rollout. Mint remains separate.
 macOS uses its own matched release artifacts and qualification.
 
 The active project is [augmentor-agent](https://github.com/ManoloRemiddi/augmentor-agent).

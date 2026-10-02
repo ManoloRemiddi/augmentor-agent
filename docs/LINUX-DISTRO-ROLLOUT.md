@@ -1420,7 +1420,8 @@ the ordinary user's immutable environment. Even an already completed setup
 receipt requires verification on repeat, without repair. Package qualification
 prepares the installed cache offline as that user; complete qualification reads
 the actual desktop descriptor interpreter for native render and DSH helpers.
-Fresh clean package/complete acceptance is still pending at this checkpoint.
+At the initial implementation checkpoint, clean package/complete acceptance was
+pending; the subsequent clean-source results are recorded below.
 
 `linux-wheel-inventory.py` verifies every archive and records 266 ELF members:
 262 from PySide/shiboken and four ONNX/protobuf binaries. Six original wheel
@@ -1460,3 +1461,64 @@ for actual page delivery in Branch/Edit passes three repeated real Qt/host runs.
 passes. New-source hosted confirmation remains open. Keep all GNOME input/Stop,
 full desktop, Mint/openSUSE/Arch, coordinated upgrades and physical speech/memory
 acceptance in the complete autonomous objective.
+
+Clean implementation `1c670c0694254bf401099b5365157a01c6e7943f` now passes:
+
+- [Fresh Noble package qualification](../release/qualification/ubuntu24.04/package-1c670c0.json)
+  from official base digest `008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3`:
+  normal-user offline runtime preparation, offscreen preview render, system GTK
+  accelerator API and private-Xvfb wmctrl check; both component leases block
+  reinstall/removal, idle retry succeeds, removal retains private data and a
+  fresh reinstall succeeds. The report records 389 installed package versions,
+  artifact/proof/log/screenshot hashes and the clean source identity.
+- [Complete fresh-user qualification](../release/qualification/ubuntu24.04/complete-1c670c0.json)
+  in another fresh official container: exact package/bundle runtime contracts,
+  private installed DSH/plugins, offscreen native preview, independent second
+  entry, registered native host, repeat setup preserving settings, deterministic
+  Desktop/Browser role turns and history after restart without replay. Exactly
+  four synthetic model requests occur. The complete archive is 188,056,591 bytes,
+  SHA-256 `aa9736f80f7216ce2001b2c27586bf0d7a54e031f707f15ec7246dcea7bc6af7`;
+  published dependency source snapshots retain their exact prior identities.
+- [Artifact review](../release/qualification/ubuntu24.04/artifact-review-1c670c0.json)
+  independently verifies whole package/extension bytes, all seven wheel archives,
+  all 266 embedded ELF hashes, original wheel notices and supplementary upstream
+  notice collections. Private state is absent; source/license gates stay false.
+- [Installed Secret Service proof](../release/qualification/ubuntu24.04/credentials-1c670c0.json)
+  runs actual installed helpers under the selected Python, ordinary user and a
+  temporary encrypted keyring/private bus with network disabled. Synthetic
+  round-trip/update/reference isolation/idempotent removal, account token
+  replacement/restart/logout and cleanup pass. OAuth/renewal replies are synthetic;
+  no account eligibility or real login keyring claim follows.
+- [Rerun runtime selection/CPU VAD](../release/qualification/ubuntu24.04/runtime-selection-1c670c0.json)
+  passes offline at this clean source with proof SHA-256
+  `b8d021940b6ce14b7f9a4c083bb4a7950d50031dbb3cd757bbb0efd33f67c1aa`.
+  Both prior-profile rollback and unchanged Silero CPU inference remain qualified
+  at their fixture scope; historical reports are preserved separately.
+
+The clean runtime Debian artifact is 171,103,652 bytes, SHA-256
+`79709d42f16e5a5ed1c39f7c7cec26880c7a7e3304a453c49546c3839982eb23`;
+the desktop artifact is 4,984 bytes, SHA-256
+`98b40ff9c83c035874c418df5ea23d5ba72622dd0c2d647378eabe36fe38ca65`.
+Both screenshots have identical SHA-256
+`4f3f0d2d20ec678446aa362b0331df9fd391bc4a20e3a3214c4ba5fe6af45a1e`;
+the package screenshot is visually inspected as the approved main window.
+The previews and role-adapter turns are distinct checks; graphical Browser and
+connected full-session UI acceptance remain open. No candidate binaries, private
+container images or dependency source archives are committed/uploaded.
+
+Hosted [implementation Linux CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36968751508)
+now passes all jobs: source boundary, Debian/Home, installed lifecycle, Browser
+and Ubuntu 26.04/Fedora 43/44 package/native qualification.
+[Mac 14/26 CI](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36968751491)
+also passes. Preserve the hosted packages' actual PR merge identity separately
+from the branch-built Noble artifacts. Their actual source is clean merge
+`d278bcf94fac5b93eed16f58a394f5e0d17d1af1`, parents `d91c520` and `1c670c0`;
+its tree `4eb6771f07a9f064247fbe283698715eeb2320a6` exactly matches the branch.
+Checked [Ubuntu 26.04](../release/qualification/d278bcf/ubuntu26.04-amd64.json),
+[Fedora 43](../release/qualification/d278bcf/fedora43-x86_64.json) and
+[Fedora 44](../release/qualification/d278bcf/fedora44-x86_64.json) reports preserve
+that identity, the original report/test log hashes, actual versions and 672 native
+cases (670 pass, two Mac-only skips) per target. Next work
+retains the complete scope: coordinated managed DSH/runtime updates, actual Noble
+GNOME 46/Cinnamon, graphical Browser, physical audio/CPU floor, native-library
+release gates, Mint/openSUSE/Arch and GNOME control consent/input/Stop.

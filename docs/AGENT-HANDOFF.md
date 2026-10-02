@@ -4,6 +4,24 @@
 
 ## October 2 Noble package implementation checkpoint
 
+Clean implementation `1c670c0` now passes the fresh official Ubuntu 24.04 package
+and complete-bundle proofs: ordinary-user offline runtime/render, active-component
+reinstall/removal refusal, idle lifecycle/data retention, actual installed DSH/
+plugins and deterministic Desktop/Browser role turns, repeat setup and restart
+history without replay. Its installed helpers/selected Python pass a private
+encrypted Secret Service lifecycle/account-storage proof. Artifact review and
+the rerun CPU selection/VAD proof also pass. Five exact-source reports are checked
+under `release/qualification/ubuntu24.04/*-1c670c0.json`; no wheels or private test
+archives are published. These are container/fixture results, not real GNOME,
+graphical Browser, physical audio, coordinated upgrade or release acceptance.
+Hosted implementation `1c670c0` CI now passes all Linux jobs, including Ubuntu
+26.04/Fedora 43/44 package/native qualification, Browser and installed lifecycle;
+Mac 14/26 also passes. Preserve the hosted artifacts' actual PR merge identity
+separately from this clean branch's private Noble artifacts. The actual hosted
+merge is `d278bcf` (parents main `d91c520` and implementation `1c670c0`); its tree
+matches exactly. Three checked hosted reports under `release/qualification/d278bcf`
+record 672 native cases (two skips) each and exact package/proof/log identities.
+
 The rollout now adds an explicit private `ubuntu24.04-amd64` Debian/complete
 candidate. Its seven-wheel policy/cache and runtime contract are bound to both
 manifests; setup verifies the installed policy and completed repeat runs. The
@@ -12,7 +30,7 @@ refuses wrong hosts before maintenance writes, preserves upstream notice paths,
 and inventories all 266 wheel ELF members. Artifact review checks their bytes and
 supplementary notice collections without approving redistribution. Package and
 complete proofs now use the selected interpreter. A working-source package builds
-and the wrong-host refusal passes; fresh clean package/complete acceptance follows.
+and the wrong-host refusal passes; clean package/complete acceptance is above.
 Final source checks pass 672 native cases (two skips), 493 JavaScript cases
 (two skips), private-source boundary, version consistency and diff checks.
 Full compatibility and native-library release gates remain open. See
