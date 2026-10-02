@@ -205,7 +205,7 @@ class SettingsPanel(QWidget):
         self.avatar.set_image((self.identity or {}).get('avatar',''))
         self.default_image=self.action(layout,'Reset image',self.reset_image,'reset-avatar'); self.default_image.setVisible(bool((self.identity or {}).get('avatar')))
         connection=QLabel('Connected' if getattr(self.owner.controller,'online',False) else 'Not connected'); connection.setAlignment(Qt.AlignmentFlag.AlignCenter); layout.addWidget(connection)
-        for title,sub,link,destination,color in [('Soul','How I behave','Edit instructions  ↗','soul','#9d234f'),('Memory','What I know about you','View memory  ↗','memory','#235d82')]:
+        for title,sub,link,destination,color in [('Agent Identity','How I behave','Edit instructions  ↗','soul','#9d234f'),('Agent Memory','What I know about you','View memory  ↗','memory','#235d82')]:
             button = self.action(layout,title+'\n'+sub+'   ›',lambda _=False,p=destination:self.show_page(p),destination+'-card')
             button.setSizePolicy(QSizePolicy.Policy.Ignored,QSizePolicy.Policy.Preferred)
             scaled(button).setFixedHeight(72)
@@ -272,15 +272,15 @@ class SettingsPanel(QWidget):
         except Exception as error: self.feedback.setText(str(error))
 
     def page_soul(self):
-        page, layout = self.make_page('Soul','How I behave · Your personal instructions, saved in soul.md. Changes apply to new chats; existing conversations keep their saved instructions.','agent')
+        page, layout = self.make_page('Agent Identity','How I behave · Your personal instructions, saved in soul.md. Changes apply to new chats; existing conversations keep their saved instructions.','agent')
         self.soul = self.store.soul()
-        self.soul_editor = QPlainTextEdit(self.soul['text']); self.soul_editor.setAccessibleName('Agent Soul instructions'); scaled(self.soul_editor).setMinimumHeight(280); layout.addWidget(self.soul_editor)
-        self.action(layout,'Reset Soul to default',self.reset_soul,'reset-soul')
+        self.soul_editor = QPlainTextEdit(self.soul['text']); self.soul_editor.setAccessibleName('Agent Identity instructions'); scaled(self.soul_editor).setMinimumHeight(280); layout.addWidget(self.soul_editor)
+        self.action(layout,'Reset to default',self.reset_soul,'reset-soul')
         row=QHBoxLayout(); cancel=QPushButton('Cancel'); cancel.clicked.connect(self.cancel_soul); row.addWidget(cancel)
-        save=QPushButton('Save Soul'); save.setObjectName('save-soul'); save.clicked.connect(self.save_soul); row.addWidget(save); layout.addLayout(row); layout.addStretch(); return page
+        save=QPushButton('Save'); save.setObjectName('save-soul'); save.clicked.connect(self.save_soul); row.addWidget(save); layout.addLayout(row); layout.addStretch(); return page
 
     def reset_soul(self):
-        self.soul_editor.setPlainText(self.soul['default']); self.feedback.setText('Default loaded into the draft. Save Soul to apply it, or Cancel to keep your saved Soul.')
+        self.soul_editor.setPlainText(self.soul['default']); self.feedback.setText('Default loaded into the draft. Save to apply it, or Cancel to keep your saved instructions.')
 
     def cancel_soul(self):
         self.soul=self.store.soul(); self.soul_editor.setPlainText(self.soul['text']); self.show_page('agent')
@@ -288,10 +288,10 @@ class SettingsPanel(QWidget):
     def save_soul(self):
         try: self.soul=self.store.save_soul(self.soul_editor.toPlainText(),self.soul['revision'])
         except Exception as error: self.feedback.setText(str(error)); return
-        self.show_page('agent'); self.feedback.setText('Soul saved for new chats.')
+        self.show_page('agent'); self.feedback.setText('Agent Identity saved for new chats.')
 
     def page_memory(self):
-        page, layout = self.make_page('Memory','What I know about you · Stored knowledge for this conversation’s person and project.','agent')
+        page, layout = self.make_page('Agent Memory','What I know about you · Stored knowledge for this conversation’s person and project.','agent')
         self.memory_tabs = QTabWidget(); self.memory_views={}
         for key,title in [('relationship','About you'),('work','Your project')]:
             text=QTextBrowser(); text.setOpenLinks(False); text.setAccessibleName(title+' remembered knowledge'); self.memory_tabs.addTab(text,title); self.memory_views[key]=text
@@ -511,7 +511,7 @@ class SettingsPanel(QWidget):
     def accept(self):
         if not self.leave_editor(): return False
         if hasattr(self,'soul_editor') and self.soul_editor.toPlainText()!=self.soul['text']:
-            self.show_page('soul'); self.feedback.setText('Your Soul draft has unsaved changes.'); self.exit_choices.show(); return False
+            self.show_page('soul'); self.feedback.setText('Your Agent Identity draft has unsaved changes.'); self.exit_choices.show(); return False
         self.save_name(); self.closing=True; self.closed.emit(); return True
 
     def keep_editing(self):

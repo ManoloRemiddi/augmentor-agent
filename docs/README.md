@@ -1,6 +1,6 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-- [Desktop identity, Soul, Memory and settings](AGENT-SETTINGS.md): direct same-frame entry, adaptive widths, compact pages and size restoration, prompt snapshots, access defaults and qualification.
+- [Desktop Agent Identity, Agent Memory and settings](AGENT-SETTINGS.md): direct same-frame entry, adaptive widths, compact pages and size restoration, prompt snapshots, access defaults and qualification.
 
 
 - [Immediate composer feedback and regression evidence](COMPOSER-SEND-FEEDBACK.md)

@@ -1,6 +1,6 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-Desktop [identity-first settings](AGENT-SETTINGS.md) open directly from the three dots inside the existing agent frame, restore the latest chat size, and include rename/image, a voice energy ring, compact stacked Soul/Memory cards and More → All settings without repeated Look/Voice/access links. Active pages resize the frame within screen bounds; editors wrap text/actions, short pages fit without scrolling, and selected icons match text. Shared source applies on Linux/macOS; installed Mac acceptance remains unverified.
+Desktop [identity-first settings](AGENT-SETTINGS.md) open directly from the three dots inside the existing agent frame, restore the latest chat size, and include rename/image, a voice energy ring, compact stacked Agent Identity/Agent Memory cards and More → All settings without repeated Look/Voice/access links. Active pages resize the frame within screen bounds; editors wrap text/actions, short pages fit without scrolling, and selected icons match text. Shared source applies on Linux/macOS; installed Mac acceptance remains unverified.
 
 Current OS parity direction and verified gaps: [one-product architecture audit](PLATFORM-PARITY-AUDIT.md).
 The tables below compare harnesses and presentation surfaces; they do not establish

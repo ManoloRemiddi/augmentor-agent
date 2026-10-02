@@ -13,7 +13,7 @@ chat size. Source accessibility scaling also scales the saved chat dimensions.
 
 Agent, Look, Voice and More remain the main navigation. Agent contains an editable
 name, image picker and the existing voice energy ring, vertically stacked rectangular
-Soul/Memory cards, and access for new chats. Look and Voice immediately open their
+Agent Identity/Agent Memory cards, and access for new chats. Look and Voice immediately open their
 complete existing forms inside the frame, with no intermediate landing page.
 More opens All settings with direct links for Prompt library, Conversation,
 model/agent setup, DSH browser access or model providers, Connections/Home,
@@ -46,7 +46,7 @@ use the same backend Soul snapshots. Existing setup and conversation state remai
 The Agent page is available after setup through Settings; there is no extra blocking
 personalization wizard.
 
-## Identity and Soul
+## Agent Identity and Soul storage
 
 Identity lives in `identity/` under `AUGMENTOR_PI_CONFIG`, otherwise
 `$XDG_CONFIG_HOME/augmentor-pi` (default `~/.config/augmentor-pi`).
@@ -77,7 +77,7 @@ the parent's snapshot. Updating an existing installation requires upgrading its
 owned DSH presets to the new identity adapter and restarting the idle host.
 No new journal event type or extra user message is introduced.
 
-## Memory and access
+## Agent Memory and access
 
 Memory reads `memory.dual.recall` for the current harness-qualified conversation.
 About you and Your project show the existing relationship/work projections,
@@ -251,3 +251,16 @@ release `20261002-115054-5eb68ad8`, with no persona/preset migration needed. Tes
 Agent → More → Prompt library → Agent, then Back to chat; the editor gets more
 space while the chat returns to its latest user-chosen dimensions. PR #29 remains
 draft and unmerged until owner acceptance.
+
+
+## Naming refinement — 2 October 2026
+
+The Desktop cards and destination headings now say **Agent Identity** and
+**Agent Memory**. The identity editor, save feedback and unsaved-draft message
+use the same terminology. Its controls remain concise: Reset to default, Cancel
+and Save. This is a presentation-only rename: the authoritative `soul.md`,
+internal routes, prompt snapshots, reset semantics and memory projections retain
+their existing contracts. Shared native Linux/macOS source is changed; the
+Browser presentation remains deferred. The existing 28 focused settings cases
+are the relevant regression qualification; prior full-suite evidence above is
+historical for the compact-layout implementation.
