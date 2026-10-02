@@ -2,6 +2,29 @@
 
 # Linux distribution rollout
 
+## October 3 hosted Ubuntu/Fedora qualification
+
+[Linux run37075160234](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37075160234)
+now passes all jobs, including fresh Ubuntu26.04/Fedora43/Fedora44 installed
+package lifecycle and ordinary-user rendering. Each target runs1,028 native
+cases:992 successes and36 platform skips. Downloaded, checksum-verified reports
+record clean checkout `4eb7217`; its difference from PR head `536fc75` is four
+documentation files only. The earlier Fedora omission and Ubuntu fixture failure
+stay preserved. [Exact reports and artifact identities](../release/qualification/next-targets/20261003-hosted-linux-package-qualification.json)
+qualify these bytes rather than unrelated older candidates.
+
+[Mac14/26 run37075160186](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37075160186)
+also passes managed first-run/restart and shared behavior, but both package reports
+omit their source commit. [The workflow correction](MACOS-DISTRIBUTION.md#october-3-development-provenance-correction)
+binds future Desktop/Companion reports to the actual checkout; new execution is
+required. Windows Desktop passes both CPUs; full Windows x64 now passes, while
+ARM64 remains running at this checkpoint. The older x64 teardown failure remains
+unexplained. GitGuardian is failed/unwaived. Actual sessions, graphical Browser,
+physical audio, full Arch/Leap installers, version upgrades/rollback and source/
+legal/release acceptance remain open. All five rollout points stay active; owner
+installations, services, models, devices and the22-file license scope stay unchanged.
+
+
 ## October 3 Fedora RPM correction and hosted results
 
 The original Fedora 43/44 builds fail on the two omitted dictation permission

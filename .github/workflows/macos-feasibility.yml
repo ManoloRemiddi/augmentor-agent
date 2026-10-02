@@ -90,7 +90,7 @@ jobs:
         run: chmod +x components/handy/runtime/bin/handy
       - name: Package and verify development bundle
         run: |
-          .macos-build-env/bin/python3 scripts/package-macos.py --out outputs/macos
+          .macos-build-env/bin/python3 scripts/package-macos.py --source-commit "$(git rev-parse HEAD)" --out outputs/macos
           .macos-build-env/bin/python3 scripts/verify-macos-application-inventory.py outputs/macos
           app="$PWD/outputs/macos/Augmentor Agent Desktop.app"
           project="$app/Contents/Resources/app"
@@ -126,7 +126,7 @@ jobs:
           codesign --verify --deep --strict "$app"
       - name: Verify Browser companion credentials with its isolated packaged interpreter
         run: |
-          .macos-build-env/bin/python3 scripts/package-macos.py --component companion --out outputs/macos-companion
+          .macos-build-env/bin/python3 scripts/package-macos.py --source-commit "$(git rev-parse HEAD)" --component companion --out outputs/macos-companion
           .macos-build-env/bin/python3 scripts/verify-macos-application-inventory.py outputs/macos-companion
           app="$PWD/outputs/macos-companion/Augmentor Agent Browser Companion.app"
           project="$app/Contents/Resources/app"

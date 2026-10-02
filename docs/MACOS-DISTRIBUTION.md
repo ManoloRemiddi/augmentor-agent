@@ -2,6 +2,20 @@
 
 # macOS distribution implementation
 
+## October 3 development provenance correction
+
+The [536fc75 feasibility run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37075160186)
+passes on Mac 14 and 26, including managed first run and engine-first restart.
+Both downloaded artifact reports nevertheless contain `sourceCommit: null`:
+the workflow omitted the existing package builder's `--source-commit` argument.
+These remain passing functional fixtures with incomplete artifact provenance.
+The workflow now passes `git rev-parse HEAD` to both Desktop and Companion builds,
+recording the actual checked-out revision, including a PR merge checkout when used.
+This does not retroactively change the old reports. The corrected workflow still
+needs a fresh Mac execution before its source-bound reports can be accepted.
+See [the matching Linux/hosted checkpoint](../release/qualification/next-targets/20261003-hosted-linux-package-qualification.json)
+for exact artifact identities and scope. No installed app or published binary changed.
+
 **Current preview direction:** The owner approved distribution without Apple
 Developer ID after enrollment failed. See [the preview release record](MACOS-PREVIEW-RELEASE.md)
 and [customer guide](MACOS-PREVIEW.html). Earlier Apple gates below describe the
@@ -123,7 +137,7 @@ uv pip install --python .macos-build-env/bin/python3 --require-hashes \
 # Run npm with Node 24.19.0, matching release/macos.json.
 npm ci --ignore-scripts --no-audit --no-fund
 npm run build
-.macos-build-env/bin/python3 scripts/package-macos.py --dmg --out outputs/macos
+.macos-build-env/bin/python3 scripts/package-macos.py --source-commit "$(git rev-parse HEAD)" --dmg --out outputs/macos
 .macos-build-env/bin/python3 scripts/verify-macos-application-inventory.py outputs/macos
 .macos-build-env/bin/python3 scripts/macos-bundle-proof.py \
   --artifacts outputs/macos --out outputs/macos-installed-proof

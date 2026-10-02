@@ -4,6 +4,8 @@
 - [Immediate composer feedback and regression evidence](COMPOSER-SEND-FEEDBACK.md)
 # Documentation index
 
+- [October3 hosted Ubuntu/Fedora reports and Mac provenance limit](../release/qualification/next-targets/20261003-hosted-linux-package-qualification.json).
+
 - [Embedded Handy dictation](HANDY-INTEGRATION.md): implementation, themed recording pill, settings, OS adapters, licensing, build and qualification boundaries.
 - [Approved Handy integration plan](HANDY-INTEGRATION-PLAN.md).
 
