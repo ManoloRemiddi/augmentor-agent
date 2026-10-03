@@ -4,6 +4,12 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+Native Mac 14/26 at `000fb62` passes compiled launcher lock/export and Unix graph
+cases, then fails packaged SDK native-description qualification. SDK hosts now
+retain their busy registration without the Browser document control endpoint;
+source Linux SDK proof passes and bounded native diagnostics are preserved. Fresh
+combined Mac qualification is required; no customer flag/app is deployed.
+
 Unix source now has startup exclusion, SDK registration surviving exec, and
 private installed DSH/Browser endpoints bound to their original kernel-observed
 Node processes. `PosixPreparation` reserves and normally drains exact-source

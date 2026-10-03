@@ -28,7 +28,9 @@ const childRequests=new Set(),childActions=new Set()
 const reply=value=>{if(process.stdout.destroyed||process.stdout.writableEnded)return;const b=Buffer.from(JSON.stringify(value)),h=Buffer.alloc(4);h.writeUInt32LE(b.length);process.stdout.write(Buffer.concat([h,b]))}
 const maintenance=new NativeBrowserMaintenance({send:reply,busy:()=>pending.size+childRequests.size+childActions.size,onCommit:()=>close(0)})
 const root=fileURLToPath(new URL('../../',import.meta.url))
-const unixOwner=process.platform!=='win32'&&existsSync(join(root,'release.json'))?await (async()=>{
+// SDK servers retain their busy registration; their application owns shutdown.
+// Only the ordinary Browser native host participates in document maintenance.
+const unixOwner=!workspaceProfile&&process.platform!=='win32'&&existsSync(join(root,'release.json'))?await (async()=>{
  const env=componentEnvironment(),runtime=env.XDG_RUNTIME_DIR??`/tmp/augmentor-linux-pi-${process.getuid()}`
  const control=await unixControl({runtime,root,component:'browser',control:(method,params)=>maintenance.control(method,params),
   onCommitted:()=>maintenance.finishCommit()})

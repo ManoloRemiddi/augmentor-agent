@@ -108,6 +108,15 @@ Linux must use its package manager; managed Linux must preserve the immutable
 unowned speech/runtime components need explicit installation-plan handling.
 Automatic flags remain disabled on all customer/source records.
 
+At `000fb62`, both native Mac jobs pass the Unix updater cases, real Node graph
+checks and compiled Mach-O startup/lifetime/export tests. The workflows fail later
+in packaged SDK native-description qualification. SDK hosts now retain their
+blocking registration without joining Browser document maintenance, and fixture
+errors retain bounded native diagnostics. The Linux SDK registration/native protocol
+proof passes; fresh combined native Mac workflows must qualify the correction.
+SDK app owners remain responsible for normal shutdown and are never automatically
+committed through Browser maintenance.
+
 ## Ownership and data
 
 `services/updates/manager.py` belongs to the per-user shared prompt service, rather
