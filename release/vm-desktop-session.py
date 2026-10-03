@@ -2,6 +2,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Disposable-VM helper for actual compositor, portal and saved-file assertions."""
 import json
+import importlib.util
 import os
 from pathlib import Path
 import signal
@@ -9,8 +10,56 @@ import subprocess
 import sys
 import time
 
+
+def package_query(target):
+    """Native names for the maintained RPM/dpkg proof; no desktop pass implied."""
+    if target in ('fedora43-x86_64','fedora44-x86_64'):
+        return ['rpm','-q','--qf','%{NAME} %{VERSION}-%{RELEASE} %{ARCH}\n',
+                'augmentor-agent','kwin','plasma-workspace','xdg-desktop-portal-kde','kate']
+    if target in ('debian13-amd64','debian13-arm64','ubuntu24.04-amd64','ubuntu26.04-amd64','linuxmint22.3-amd64'):
+        return ['dpkg-query','-W','-f=${Package} ${Version}\n',
+                'augmentor-runtime','augmentor-desktop','kwin-wayland','plasma-workspace','xdg-desktop-portal-kde','kate']
+    raise ValueError('No qualified KDE package-query adapter for target: '+str(target))
+
+
+def selected_identity(root, selected, release, installed, deployment, source, target, store):
+    """Bind a proof to the selected clean build and its native package payload."""
+    root=Path(root);store=Path(store)
+    if not root.is_absolute() or '..' in root.parts or not root.is_relative_to(store) or root==store:
+        raise ValueError('The proof requires a selected managed release.')
+    if not isinstance(source,str) or len(source)!=40 or any(c not in '0123456789abcdef' for c in source):
+        raise ValueError('Use an exact clean source commit.')
+    if selected.get('root')!=str(root) or selected.get('sourceRef')!=source:
+        raise ValueError('The selected root/source differs from the requested proof.')
+    expected={'commit':source,'dirty':False}
+    if any(v.get('source')!=expected or v.get('target')!=target for v in (release,installed)):
+        raise ValueError('Selected/native clean source or target differs.')
+    if selected.get('version')!=release.get('version') or installed.get('version')!=release.get('version'):
+        raise ValueError('Selected/native product version differs.')
+    if deployment.get('deployment')!=selected or deployment.get('artifactSha256')!=selected.get('artifactSha256'):
+        raise ValueError('The selected deployment receipt differs.')
+    if (not isinstance(selected.get('artifactSha256'),str) or len(selected['artifactSha256'])!=64 or
+            any(c not in '0123456789abcdef' for c in selected['artifactSha256'])):
+        raise ValueError('The selected artifact identity is absent.')
+    return {'root':str(root),'source':source,'target':target,'artifactSha256':selected['artifactSha256']}
+
+
 assert Path('/etc/augmentor-test-vm').read_text().startswith('Isolated Augmentor')
+if os.environ.get('AUGMENTOR_PROOF_UID') or os.environ.get('AUGMENTOR_PROOF_USER'):
+    assert os.getuid()==int(os.environ['AUGMENTOR_PROOF_UID']) and os.environ.get('USER')==os.environ['AUGMENTOR_PROOF_USER']
 root=Path(sys.argv[1]);action=sys.argv[2]
+identity=None
+expected_source=os.environ.get('AUGMENTOR_PROOF_SOURCE')
+expected_target=os.environ.get('AUGMENTOR_PROOF_TARGET')
+if expected_source or expected_target:
+    assert expected_source and expected_target and len(expected_source)==40
+    assert os.getuid()!=0 and not root.is_symlink()
+    selected=json.loads((Path.home()/'.local/share/augmentor/desktop.json').read_text())
+    release=json.loads((root/'release.json').read_text())
+    installed=json.loads(Path('/usr/lib/augmentor/release.json').read_text())
+    deployment=json.loads((root/'desktop-release.json').read_text())
+    identity=selected_identity(root,selected,release,installed,deployment,expected_source,expected_target,
+                               Path.home()/'.local/share/augmentor/releases')
 for line in subprocess.check_output(['systemctl','--user','show-environment'],text=True).splitlines():
     key,_,value=line.partition('=');os.environ[key]=value
 os.environ['QT_QPA_PLATFORM']='xcb'
@@ -46,6 +95,12 @@ elif action in ('scene','windows'):
     from gi.repository import Gio
     from kwin import KWin
     print(json.dumps(KWin(Gio.bus_get_sync(Gio.BusType.SESSION,None)).read(windows=action=='windows')))
+elif action=='portal-owner':
+    from gi.repository import Gio,GLib
+    bus=Gio.bus_get_sync(Gio.BusType.SESSION,None)
+    pid=bus.call_sync('org.freedesktop.DBus','/org/freedesktop/DBus','org.freedesktop.DBus',
+                      'GetConnectionUnixProcessID',GLib.Variant('(s)',('org.freedesktop.impl.portal.desktop.kde',)),None,0,5000,None).unpack()[0]
+    print(json.dumps({'pid':pid,'exe':os.readlink('/proc/'+str(pid)+'/exe')}))
 elif action=='editor':
     os.environ['QT_QPA_PLATFORM']='wayland';os.environ['QT_LINUX_ACCESSIBILITY_ALWAYS_ON']='1'
     output=Path.home()/'augmentor-desktop-acceptance.txt'
@@ -99,9 +154,23 @@ elif action=='file':
 elif action=='remove-output':
     (Path.home()/'augmentor-desktop-acceptance-saved.txt').unlink(missing_ok=True)
 elif action=='versions':
+    target=expected_target or os.environ.get('AUGMENTOR_PROOF_PACKAGE_TARGET') or json.loads((root/'release.json').read_text()).get('target')
+    if identity:
+        spec=importlib.util.spec_from_file_location('verified_selected_deployment',root/'scripts/desktop-deployment.py')
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        module.verify(root)
+        audit=['rpm','-V','augmentor-agent'] if target.startswith('fedora') else ['dpkg','--verify','augmentor-runtime','augmentor-desktop']
+        result=subprocess.run(audit,capture_output=True,text=True,timeout=90)
+        if result.returncode or result.stdout.strip() or result.stderr.strip():
+            raise ValueError('Native package file audit failed: '+result.stdout+result.stderr)
+    packages=subprocess.check_output(package_query(target),text=True)
+    portal=[line for line in packages.splitlines() if line.startswith('xdg-desktop-portal-kde ')]
+    assert len(portal)==1
     print(json.dumps({'root':str(root),'session':os.environ.get('XDG_SESSION_TYPE'),
+        'selectedIdentity':identity,
+        'portalPackage':portal[0],
         'cpu':subprocess.check_output(['lscpu'],text=True),
-        'packages':subprocess.check_output(['dpkg-query','-W','-f=${Package} ${Version}\n','kwin-wayland','xdg-desktop-portal-kde','kate'],text=True)}))
+        'packages':packages}))
 elif action=='scale':
     scale=float(sys.argv[3]);assert scale in (1,1.25,1.5)
     from gi.repository import Gio

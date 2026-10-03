@@ -143,9 +143,11 @@ path as `WAYLAND_DISPLAY`, and removes `DISPLAY`/`XAUTHORITY`. The fixture keeps
 its own separate runtime and state paths, and uses `wl-copy`/`wl-paste` for real
 clipboard checks. This follows the [Wayland client API](https://wayland.freedesktop.org/docs/html/apb.html),
 which accepts an absolute compositor socket path independently of `XDG_RUNTIME_DIR`.
-Successful XWayland runs do not qualify this mode; actual native Wayland Browser
-acceptance remains pending. The latest installed package/reconnect limits are
-recorded in [the rollout checkpoint](../release/qualification/next-targets/20261003-leap-browser-loader-upgrade.json).
+Successful XWayland runs do not qualify this mode. The exact installed Leap/Pi
+localhost fixture now passes native Wayland with observed ordinary input and
+unchanged real clipboard assertions, as recorded in [the maintained checkpoint](../release/qualification/next-targets/20261003-native-wayland-browser-maintained-proof.json).
+DSH Browser, other distro/display combinations, fresh onboarding and physical
+hardware remain separate acceptance gates.
 
 The default reconnect proof waits30seconds. `AUGMENTOR_PROOF_RECONNECT_SECONDS=90`
 is an explicit emulated-VM measurement mode; reports record both the budget and

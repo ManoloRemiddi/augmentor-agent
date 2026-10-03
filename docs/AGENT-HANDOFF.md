@@ -1,5 +1,22 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 current KDE proof guards
+
+[The proof guard checkpoint](../release/qualification/next-targets/20261003-kde-native-consent-proof-guards.json)
+adds explicit RPM/dpkg queries and verifies the selected managed inventory,
+native source/target/version and package audit before starting the executor.
+The driver requires the exact owned VM marker/name and dedicated account.
+Native consent must belong to the live portal process and be its sole focused
+window. Allow/deny labels and points come from an actual screenshot whose hash
+is retained; changed geometry refuses input. `--observe-consent` captures the
+pending dialog and presses Stop without granting sharing. Fifteen focused guard
+tests pass. Fedora44 KDE native clean368 installation passed with SELinux
+Enforcing, but its original60-second complete bootstrap failed. A separate
+51.009-second readiness measurement does not establish that failure's cause.
+Fresh matching2035 installation and consent/input/visible Stop acceptance remain
+open; these proof changes do not qualify another desktop or enable GNOME input.
+
+
 
 ## October 3 maintained native Wayland Browser acceptance
 

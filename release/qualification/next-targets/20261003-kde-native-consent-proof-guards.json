@@ -1,0 +1,64 @@
+{
+  "format": "augmentor-linux-rollout-checkpoint/1",
+  "sourceHead": "2035af99b46bb013e81de9766216da820ab4a325",
+  "scope": "Owned disposable Fedora44 Cloud-derived minimal KDE Wayland VM; no standard KDE ISO/owner desktop/legal/release approval",
+  "installedSource": "3688a095ffa4221e8ea919c331e6eff6d35cb25d",
+  "nativePackageInstall": "PASS; checksum-verified local unsigned app RPM, normal signed repository dependencies",
+  "completeUserPhase": "FAIL first configure_product bootstrap with actual60s clean368 deadline; empty normal log and cleanup retained; no selected desktop",
+  "diagnostic": {
+    "scope": "Independent exact CLI/env readiness; not installer acceptance",
+    "launchURLSeconds": 50.726,
+    "authenticatedReadonlyHostDescribeSeconds": 51.009,
+    "budgetSeconds": 240,
+    "originalFailureCauseEstablished": false
+  },
+  "freshAccount": {
+    "name": "augmentor-complete-proof",
+    "uid": 1001,
+    "gid": 1001,
+    "homeMode": "0700",
+    "passwordLocked": true,
+    "groups": [
+      1001
+    ],
+    "strictSSH": "PASS",
+    "betaProtectedStateUnchanged": true,
+    "autologinStillBeta": true
+  },
+  "changedFiles": [
+    {
+      "path": "release/vm-desktop-session.py",
+      "sha256": "64c0b710688c607006a70271a20efbe21f0898d83548b0798bef3684cce9da04"
+    },
+    {
+      "path": "scripts/vm-desktop-proof.py",
+      "sha256": "77dc7ee86c28cc2e654debb248e94b989378059ec35febee15d0e5e8c4af6325"
+    },
+    {
+      "path": "tests/test_kde_vm_proof_guards.py",
+      "sha256": "f29239606fb6ebff3facd88773983a06d4a043f7dcb8cb6063b65cfeb2ffc484"
+    }
+  ],
+  "tests": {
+    "command": "python3 -B -m unittest discover -s tests -p test_kde_vm_proof_guards.py",
+    "cases": 15,
+    "result": "PASS",
+    "diffCheck": "PASS",
+    "syntaxAST": "PASS",
+    "runtimeQualification": false
+  },
+  "date": "2026-10-03",
+  "maintainedProofChanges": [
+    "Explicit RPM and dpkg package queries",
+    "Exact selected and native clean source/target/version and inventory guards before service startup",
+    "Exact dedicated account, SSH marker and QMP name guards",
+    "Fresh portal process owner and unique focused native dialog",
+    "Screenshot hash-bound observed allow/deny labels and coordinates; no guessed consent geometry",
+    "Observe-only pending consent capture and Stop without grant",
+    "No cleanup RPC after metadata refusal"
+  ],
+  "freshMatching2035InstalledAcceptance": "pending",
+  "desktopConsentInputStopAcceptance": false,
+  "publicRelease": false,
+  "allFiveRolloutPointsComplete": false
+}
