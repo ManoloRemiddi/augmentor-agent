@@ -134,3 +134,9 @@ source snapshots. Public snapshots exclude repository histories, local outputs,
 configuration, credentials, conversations, memory databases, model weights and
 microphone recordings. Downloadable synthetic voice references have the separate
 speech-model terms described above.
+
+The Handy preview being prepared includes exact source copies of the distributed
+Voice and Adaptive Reasoning plugins, identified by package SHA-256 and explicit
+source scope in `bundle.json`. External service source repositories are separate.
+It requires no separately installed Handy application. This preparation has not
+yet replaced the public download linked above.

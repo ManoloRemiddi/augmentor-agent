@@ -22,7 +22,14 @@ def plugin(path, name, version):
         if (value['name'],value['version'])!=(name,version):raise ValueError('Unexpected plugin artifact: '+str(path))
 
 
-def source_archive(repository, target):
+def source_archive(repository, target, published_package=None):
+    if repository.is_file():
+        if published_package is None or sha(repository)!=sha(published_package):
+            raise ValueError('Plugin source must be the exact reviewed distributed package.')
+        # The published plugins contain their authored JavaScript and notices.
+        # Reuse those exact sources, without reading private service repositories.
+        shutil.copy2(repository,target)
+        return 'package-sha256:'+sha(repository)
     if subprocess.check_output(['git','status','--porcelain'],cwd=repository,text=True).strip():
         raise ValueError('Commit and review source before creating a public source snapshot: '+str(repository))
     ref=subprocess.check_output(['git','rev-parse','HEAD'],cwd=repository,text=True).strip()
@@ -68,13 +75,15 @@ def main():
     shutil.copy2(ROOT/'LICENSE',out/'LICENSE')
     sources=out/'sources';sources.mkdir()
     refs={'augmentor':source_archive(ROOT,sources/('augmentor-'+version+'-source.tar.gz')),
-          'voice':source_archive(a.voice_source,sources/'resonant-voice-0.1.19-source.tar.gz'),
-          'adaptive':source_archive(a.adaptive_source,sources/'adaptive-reasoning-0.2.3-source.tar.gz')}
+          'voice':source_archive(a.voice_source,sources/'resonant-voice-0.1.19-source.tar.gz',a.voice),
+          'adaptive':source_archive(a.adaptive_source,sources/'adaptive-reasoning-0.2.3-source.tar.gz',a.adaptive)}
     script='#!/bin/sh\n# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0\nset -eu\ncd -- "$(dirname -- "$0")"\nsha256sum -c SHA256SUMS\nexec /usr/bin/python3 ./setup.py --bundle "$PWD" "$@"\n'
     (out/'install.sh').write_text(script);(out/'install.sh').chmod(0o755)
     hashes={str(f.relative_to(out)):sha(f) for f in sorted(out.rglob('*')) if f.is_file()}
     manifest={'format':'augmentor-complete/1','artifactId':version+'-complete-preview.'+str(a.preview_number)+'-'+ref[:12],
-              'version':version,'sourceCommit':ref,'sourceRefs':refs,'target':'debian13-amd64','components':components,
+              'version':version,'sourceCommit':ref,'sourceRefs':refs,
+              'sourceScopes':{name:'Distributed plugin source only; external services are separate.' if path.is_file() else 'Reviewed repository snapshot.' for name,path in [('voice',a.voice_source),('adaptive',a.adaptive_source)]},
+              'target':'debian13-amd64','components':components,
               'plugins':plugins,'browser':browser['artifact'],'extensionId':browser['extensionId'],'sha256':hashes}
     (out/'bundle.json').write_text(json.dumps(manifest,indent=2)+'\n');hashes['bundle.json']=sha(out/'bundle.json')
     (out/'SHA256SUMS').write_text(''.join(value+'  '+name+'\n' for name,value in sorted(hashes.items())))

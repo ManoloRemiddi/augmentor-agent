@@ -111,6 +111,22 @@ broker, the selected installed broker was restarted with a private startup log
 and again reported ready/unchanged Ctrl+Space. The precise cause of that latest
 exit was not captured; the earlier incomplete/offscreen takeover was confirmed.
 
+The native ARM compiler now succeeds. Packaging found that Microsoft's ARM
+browser CAB omits a CRT file present in its x64 browser CAB; retain the complete
+verified vendor tree and validate its native entry point. Inference uses its
+own separately pinned native VC libraries. Supplier hashes/signatures remain
+mandatory. Hosted startup checks are still required before distribution.
+
+Complete-bundle source inputs now reuse the already published plugin packages,
+with byte-for-byte source copies and package-digest references. Their manifest
+explicitly scopes these archives to distributed plugin source; external service
+repositories are separate and are never fetched by CI. Mac preparation reuses
+all native notices from the immutable public 0.2.13 licensing snapshot, validates
+every notice and the unchanged source graph, and retains the existing public
+corresponding-source links. The previous application is mounted read-only and
+never executed. This avoids removed upstream archive URLs without substituting
+unverified notices or introducing private source.
+
 Implementation branch: `feat/handy-integration`, based on public main
 `d91c52037d7bc26c82c702c25e1a779b0fca1f39`. This guide owns the implemented
 contract; [the approved plan](HANDY-INTEGRATION-PLAN.md) retains its rationale.

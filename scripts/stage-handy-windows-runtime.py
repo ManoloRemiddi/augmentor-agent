@@ -15,8 +15,6 @@ import tempfile
 from urllib.request import urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
-CRT = ('concrt140.dll', 'msvcp140.dll', 'msvcp140_codecvt_ids.dll',
-       'vcruntime140.dll', 'vcruntime140_1.dll')
 
 
 def digest(path):
@@ -56,7 +54,10 @@ def stage(output):
         subprocess.run([str(expand), '-F:*', str(cabinet), str(destination)],
                        check=True, stdout=subprocess.DEVNULL, timeout=180)
     vendor = destination/item['folder']
-    required = [vendor/'msedgewebview2.exe', *(vendor/name for name in CRT)]
+    # Microsoft supplies different internal CRT sets for its browser CPUs.
+    # Validate the native entry point and keep the entire hash-verified vendor
+    # tree. Our inference CRT is independently checked from the pinned VC CAB.
+    required = [vendor/'msedgewebview2.exe']
     allowed = {0x8664} if arch == 'x64' else {0xaa64, 0xa641, 0xa64e}
     for file in required:
         if not file.is_file() or machine(file) not in allowed:

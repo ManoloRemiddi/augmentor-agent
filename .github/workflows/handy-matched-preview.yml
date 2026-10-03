@@ -46,22 +46,13 @@ jobs:
           npm ci --ignore-scripts --no-audit --no-fund
           npm run check
           npm run build
+          python3 -m unittest discover -s tests -p test_complete_sources.py -v
           python3 scripts/package-browser.py
           python3 scripts/package-debian.py
           python3 scripts/review-artifacts.py --debian outputs/debian --browser outputs/browser --output outputs/debian/review.json
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with:
-          repository: ManoloRemiddi/resonant-voice
-          ref: 7d0fd6d677ea4bbbca0183a6bb3a3d3f24a8147a
-          path: outputs/sources/voice
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with:
-          repository: ManoloRemiddi/dsh-adaptive-reasoning
-          ref: 64a1ef82e3d69f57a69809d530c1b9ed0bc67480
-          path: outputs/sources/adaptive
       - name: Assemble the complete fresh-user bundle
         run: |
-          python3 scripts/package-complete.py --preview-number 2 --debian outputs/debian --browser outputs/browser --voice release/dsh/plugins/dsh-resonant-voice-0.1.19.tgz --adaptive release/dsh/plugins/dsh-adaptive-reasoning-0.2.3.tgz --model-picker release/dsh/plugins/dsh-model-picker-augmented-1.1.2.tgz --voice-source outputs/sources/voice --adaptive-source outputs/sources/adaptive --out outputs/augmentor-0.2.13-complete-preview.2
+          python3 scripts/package-complete.py --preview-number 2 --debian outputs/debian --browser outputs/browser --voice release/dsh/plugins/dsh-resonant-voice-0.1.19.tgz --adaptive release/dsh/plugins/dsh-adaptive-reasoning-0.2.3.tgz --model-picker release/dsh/plugins/dsh-model-picker-augmented-1.1.2.tgz --voice-source release/dsh/plugins/dsh-resonant-voice-0.1.19.tgz --adaptive-source release/dsh/plugins/dsh-adaptive-reasoning-0.2.3.tgz --out outputs/augmentor-0.2.13-complete-preview.2
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: handy-linux-complete-preview
@@ -122,8 +113,7 @@ jobs:
       - name: Prepare and verify the existing corresponding sources and notices
         run: |
           chmod +x components/handy/runtime/bin/handy
-          python3 scripts/fetch-macos-release-sources.py --out outputs/source-archives
-          python3 scripts/prepare-macos-sources.py --archives outputs/source-archives --out outputs/macos-sources
+          python3 scripts/fetch-macos-release-sources.py --out outputs/macos-sources
       - name: Build the exact ad-hoc preview app and DMG
         run: |
           ref=$(git rev-parse HEAD)
@@ -142,5 +132,6 @@ jobs:
             outputs/macos-preview/*.zip
             outputs/macos-preview/*.json
             outputs/macos-preview-acceptance/report.json
+            outputs/macos-sources/published-sources.json
           retention-days: 14
           if-no-files-found: error
