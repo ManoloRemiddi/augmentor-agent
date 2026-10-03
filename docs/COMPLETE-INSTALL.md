@@ -340,3 +340,24 @@ one idle prepare/commit and normal exit without signals. Final native audits,
 four prior journals, failed v3 journal, current five settings, old-account hashes,
 runtime leases and no-process/socket/listener checks pass. This cleanup preserves
 the overall v3 failure; connected-product/history acceptance remains open.
+
+The maintained fresh/post-install proof now includes a separately hash-pinned
+`release/owned-memory-companion-proof.py` helper. External proof staging must
+carry that adjacent file with the published proof; a missing, linked or altered
+helper refuses before the first DSH launch. Admission requires an absent private
+endpoint and no matching process. Cleanup binds a newly created companion to the
+selected interpreter executable, immutable source, exact arguments, UID/PID/start,
+DSH home and Unix socket inode/peer. It requires idle status and durably journals
+one prepare and one commit before dispatch. Busy services, owner/source changes,
+lost replies or a preexisting journal are terminal; finally cannot retry them.
+Normal exit/socket closure is bounded at20seconds without signals. Native lease
+verification occurs in the external wrapper after the proof process exits,
+because that process also holds the installed runtime's lifetime lease.
+
+Nine actual synthetic Unix-server cases and26 proof cases pass, covering live
+owner/inode replacement, active and preexisting peers, lost commit and refusal
+before binding the model server or dispatching SDK requests. These test the
+cleanup protocol and source integration. The combined correction has not been
+executed against a fresh installed artifact; review/publication precede a new
+clean bundle and fresh-account qualification. Existing2035 settings and failed
+journals remain untouched, and all public/default60-second bounds remain.

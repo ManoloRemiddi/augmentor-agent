@@ -167,6 +167,12 @@ class CompletePostInstallProof(unittest.TestCase):
             return {}
         adapter=SimpleNamespace(product=True,call=call)
         server=Mock()
+        companion=SimpleNamespace(attempted=False,record={})
+        def finish_companion():
+            self.assertFalse(companion.attempted)
+            companion.attempted=True;companion.record={'status':'pass','companionStarted':False}
+            return dict(companion.record)
+        companion.finish=Mock(side_effect=finish_companion);server.companion=companion
         def model_server(values,port):
             self.assertEqual(port,34187)
             def proxy_call(method,payload=None):
@@ -183,6 +189,7 @@ class CompletePostInstallProof(unittest.TestCase):
         stack.enter_context(patch.object(proof,'POST_HOME',home));stack.enter_context(patch.object(proof,'POST_APP',app))
         stack.enter_context(patch.object(proof,'validate_post_fixture',return_value=({'artifactId':fixture['artifactId']},desktop,{'PATH':os.defpath})))
         stack.enter_context(patch.object(proof,'fixture_model_server',side_effect=model_server))
+        stack.enter_context(patch.object(proof,'memory_companion',return_value=companion))
         stack.enter_context(patch.object(proof,'run',side_effect=render))
         stack.enter_context(patch.object(proof.threading,'Thread',return_value=Mock()))
         stack.enter_context(patch.object(proof.time,'monotonic',side_effect=lambda:clock.now))
@@ -204,6 +211,36 @@ class CompletePostInstallProof(unittest.TestCase):
             record=json.loads((state/'post-install-proof/run.json').read_text());self.assertEqual(record['status'],'complete')
             self.assertIsNone(record['pendingRequest']);self.assertTrue(record['settingsPreserved'])
             server.shutdown.assert_called_once();server.server_close.assert_called_once()
+            server.companion.finish.assert_called_once()
+
+    def test_companion_admission_refuses_before_server_bind_or_sdk_dispatch(self):
+        with tempfile.TemporaryDirectory() as directory:
+            stack,home,state,fixture,desktop,clock,processes,mutations,server=self.execution(directory)
+            with stack,patch.object(proof,'memory_companion',side_effect=ValueError('preexisting companion')):
+                with self.assertRaisesRegex(ValueError,'preexisting companion'):
+                    proof.post_install_proof(Path(directory),fixture)
+                proof.fixture_model_server.assert_not_called()
+            self.assertEqual(processes,[]);self.assertEqual(mutations,[])
+            record=json.loads((state/'post-install-proof/run.json').read_text())
+            self.assertEqual(record['status'],'failed');self.assertIsNone(record['pendingRequest'])
+            server.companion.finish.assert_not_called()
+
+    def test_unknown_companion_shutdown_cannot_claim_success_or_be_retried_by_finally(self):
+        with tempfile.TemporaryDirectory() as directory:
+            stack,home,state,fixture,desktop,clock,processes,mutations,server=self.execution(directory)
+            def lost_commit():
+                server.companion.attempted=True
+                server.companion.record={'status':'failed','pending':'commit','unknownOutcome':True}
+                raise OSError('owned maintenance commit response lost')
+            server.companion.finish.side_effect=lost_commit
+            with stack,self.assertRaisesRegex(OSError,'commit response lost'):
+                proof.post_install_proof(Path(directory),fixture)
+            server.companion.finish.assert_called_once()
+            record=json.loads((state/'post-install-proof/run.json').read_text())
+            self.assertEqual(record['status'],'failed');self.assertTrue(record['companionCleanup']['unknownOutcome'])
+            self.assertEqual(record['companionCleanup']['pending'],'commit')
+            self.assertEqual([method for method,sid in mutations].count('session.prompt'),2)
+            self.assertFalse((state/'post-install-proof/report.json').exists())
 
     def test_unknown_prompt_outcome_is_dispatched_once_and_owned_process_closed(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -214,6 +251,7 @@ class CompletePostInstallProof(unittest.TestCase):
             record=json.loads((state/'post-install-proof/run.json').read_text())
             self.assertTrue(record['unknownRequestOutcome']);self.assertEqual(record['pendingRequest']['method'],'session.prompt')
             self.assertEqual(record['status'],'failed');self.assertTrue(record['settingsPreserved'])
+            server.companion.finish.assert_called_once()
             with self.assertRaisesRegex(ValueError,'previous post-install proof'):proof.begin_post_run(state,fixture)
 
     def test_public60_second_readiness_limit_cleanup_and_no_request_retry(self):

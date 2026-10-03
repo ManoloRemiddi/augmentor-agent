@@ -25,6 +25,7 @@ import time
 from urllib.parse import urlsplit
 
 PROOF_SHA256 = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+COMPANION_PROOF_SHA256 = '70543782f9d26bae72bf0a4396e649c646017de7ee55a7f9af84075daf29368b'
 
 
 def run(command, **kwargs):
@@ -46,6 +47,16 @@ def selected_python_environment(app, python):
     os.environ.clear()
     os.environ.update(env)
     return env
+
+
+def memory_companion(app, python, home, dsh_home, env, journal_root):
+    path = Path(__file__).with_name('owned-memory-companion-proof.py')
+    info = path.lstat()
+    if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1 or hashlib.sha256(path.read_bytes()).hexdigest() != COMPANION_PROOF_SHA256:
+        raise ValueError('The maintained companion proof helper is missing or changed.')
+    spec = importlib.util.spec_from_file_location('owned_memory_companion_proof', path)
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    return module.OwnedMemoryCompanion(app, python, home, dsh_home, env, journal_root)
 
 
 def fixture_model_server(requests, port):
@@ -92,6 +103,7 @@ def user_proof(bundle, setup_script=None):
                '--non-interactive', '--model-url', f'http://127.0.0.1:{server.server_port}/v1', '--model', 'fixture',
                '--api-key-env', 'AUGMENTOR_FIXTURE_KEY', '--port', str(port)]
     process = None
+    companion = None
     log = (home/'qualification-dsh.log').open('w')
     try:
         run(command)
@@ -122,6 +134,7 @@ def user_proof(bundle, setup_script=None):
         cli = data/'dsh-runtime/node_modules/.bin/dsh'
         env = {**os.environ, 'DSH_HOME': str(dsh_home), 'DSH_TELEMETRY_MODE': 'DISABLED',
                'AUGMENTOR_MODEL_API_KEY': 'qualification-fixture'}
+        companion = memory_companion(app, python, home, dsh_home, env, state)
 
         def stop():
             nonlocal process
@@ -179,6 +192,7 @@ def user_proof(bundle, setup_script=None):
         assert reopened == histories, 'Restart history differs; inspect history-before.json and history-after.json'
         assert len(requests) == count, 'Restart replayed a model request'
         stop()
+        companion_cleanup = companion.finish()
         report = {'target': manifest['target'], 'sourceCommit': manifest['sourceCommit'], 'bundle': manifest['artifactId'],
                   'proofScriptSha256': PROOF_SHA256,
                   'setupScriptSha256':setup_sha,'bundleSetupScriptSha256':bundle_setup_sha,
@@ -188,19 +202,24 @@ def user_proof(bundle, setup_script=None):
                   'secondWindowEntry': True, 'nativeHostRegistered': True, 'repeatPreservesSettings': True,
                   'linuxAndBrowserRoleFixtureTurns': True, 'restartPreservesHistoryWithoutReplay': True,
                   'modelRequests': count, 'realDesktopSessionTested': False, 'graphicalBrowserTested': False,
-                  'physicalVoiceTested': False, 'memoryEngineTested': False}
+                  'physicalVoiceTested': False, 'memoryEngineTested': False,
+                  'companionProofSha256': COMPANION_PROOF_SHA256, 'companionCleanup': companion_cleanup}
         if manifest.get('pythonRuntime'):
             report.update(pythonRuntime=manifest['pythonRuntime'], selectedPython=str(python),
                           licenseReviewComplete=False, embeddedSourceCoverageComplete=False)
         (home/'complete-proof.json').write_text(json.dumps(report, indent=2)+'\n')
         print(json.dumps(report))
     finally:
-        if process is not None and process.poll() is None:
-            os.killpg(process.pid, signal.SIGTERM)
-            process.wait(timeout=15)
-        server.shutdown()
-        server.server_close()
-        log.close()
+        try:
+            if process is not None and process.poll() is None:
+                os.killpg(process.pid, signal.SIGTERM)
+                process.wait(timeout=15)
+            if companion is not None and not companion.attempted:
+                companion.finish()
+        finally:
+            server.shutdown()
+            server.server_close()
+            log.close()
 
 
 # This entry is deliberately scoped to one explicitly owned installed Mint VM.
@@ -513,7 +532,7 @@ def post_install_proof(bundle, fixture):
     from platform_adapters.private_files import atomic_json, require_directory
     from platform_adapters.processes import OwnedProcess
     root, record = begin_post_run(POST_HOME/'.local/state/augmentor-install', fixture)
-    requests = []; process = None; server = None; thread = None; log = None
+    requests = []; process = None; server = None; thread = None; log = None; companion = None
     startup_budget = post_startup_budget(fixture); startup_observations = []
     baseline = None; history_preserved = False
     home = POST_HOME/'.local/share/augmentor/dsh-home'
@@ -575,6 +594,7 @@ def post_install_proof(bundle, fixture):
         return {session: adapter.call('session.history', {'sessionId': session}) for session in sessions}
 
     try:
+        companion = memory_companion(POST_APP, desktop['python'], POST_HOME, home, env, root)
         server = fixture_model_server(requests, fixture['modelApiPort'])
         thread = threading.Thread(target=server.serve_forever, daemon=True); thread.start()
         log = (root/'dsh.log').open('x'); (root/'dsh.log').chmod(0o600)
@@ -615,6 +635,7 @@ def post_install_proof(bundle, fixture):
         if normalized_histories(after) != normalized_histories(before): raise ValueError('Restart changed a preserved history.')
         if len(requests) != count: raise ValueError('Restart replayed a model request.')
         history_preserved = True; stop()
+        companion_cleanup = companion.finish()
         settings_snapshot(POST_HOME, fixture['settings'])
         report = {'format': 'augmentor-owned-post-install-proof/1', 'status': 'pass', 'sourceCommit': POST_SOURCE,
                   'artifactId': manifest['artifactId'], 'proofScriptSha256': PROOF_SHA256,
@@ -629,6 +650,7 @@ def post_install_proof(bundle, fixture):
                       all(row['ready'] and row['elapsedSeconds'] <= 60 for row in startup_observations),
                   'priorRecordHashes': fixture.get('priorFailures', {}), 'startupObservations': startup_observations,
                   'graphicalBrowserTested': False, 'physicalVoiceTested': False,
+                  'companionProofSha256': COMPANION_PROOF_SHA256, 'companionCleanup': companion_cleanup,
                   'licenseReviewComplete': False, 'embeddedSourceCoverageComplete': False}
         atomic_json(root/'report.json', report); record.update(status='complete', phase='complete',
             public60SecondStartupProofPass=report['public60SecondStartupProofPass'])
@@ -639,6 +661,15 @@ def post_install_proof(bundle, fixture):
     finally:
         try:
             stop()
+            if companion is not None and not companion.attempted:
+                record['companionCleanup'] = companion.finish()
+            elif companion is not None:
+                record['companionCleanup'] = dict(companion.record)
+        except BaseException:
+            record['status'] = 'failed'
+            if companion is not None:
+                record['companionCleanup'] = dict(companion.record)
+            raise
         finally:
             if server is not None:
                 if thread is not None: server.shutdown(); thread.join(timeout=5)

@@ -1045,5 +1045,43 @@
     "priorFixtureFormatRestored": false,
     "freshCleanBundleAndFreshOrdinaryAccountRequired": true,
     "futureAcceptancePending": true
+  },
+  "maintainedOwnedCompanionCleanupSource": {
+    "implemented": true,
+    "executedInVM": false,
+    "scope": [
+      "fresh user_proof",
+      "owned post_install_proof"
+    ],
+    "helperPath": "release/owned-memory-companion-proof.py",
+    "helperSha256": "70543782f9d26bae72bf0a4396e649c646017de7ee55a7f9af84075daf29368b",
+    "proofScriptSha256": "16bd157c38654acb599ec2b74d272cc8b338d14871aa59b5d333933424ee2c2a",
+    "adjacentHelperMustBeStagedAndHashVerified": true,
+    "absenceBeforeFirstDshLaunch": true,
+    "identityFences": [
+      "selected interpreter executable inode",
+      "immutable service source identity and hash",
+      "exact argv including -Xutf8 and -B",
+      "same UID and primary GID",
+      "new PID/start after entry fence",
+      "dedicated DSH_HOME",
+      "private state path and socket inode",
+      "Unix SO_PEERCRED"
+    ],
+    "exclusivePrivateJournal": true,
+    "fileAndDirectoryFsyncBeforeMutation": true,
+    "maintenanceStatusActiveRequired": 0,
+    "maintenancePrepareAndCommitEachSentAtMostOnce": true,
+    "unknownOrBusyOrForeignOrPreexistingIsTerminal": true,
+    "noSignalsOrForcedTermination": true,
+    "normalExitBudgetSeconds": 20,
+    "externalNativeLeaseReadbackAfterProofExitRequired": true,
+    "actualSyntheticUnixServerCases": 9,
+    "maintainedProofCases": 26,
+    "sourceTestsPass": true,
+    "newArtifactOrVmRunExecuted": false,
+    "freshCleanBundleAndFreshOrdinaryAccountRequired": true,
+    "existingFailedFixtureNotReusable": true,
+    "rootLicenseAndFrozen22Unchanged": true
   }
 }

@@ -204,3 +204,20 @@ without signals. Both earlier guard refusals precede socket creation/RPC and rem
 recorded. Final native audit, leases, old-account hashes, five current settings,
 all prior/failed journals and no-process/socket/listener checks pass. Overall v3
 remains FAIL; the original full proof and public60-second claims remain false.
+
+The source-only fresh/post-install proof correction now arms companion ownership
+before its first DSH launch, refusing an existing socket/process. Its adjacent
+`release/owned-memory-companion-proof.py` is bound by a fixed source checksum and
+must accompany any external proof staging. A new idle service can receive only
+one journaled maintenance prepare/commit after exact executable/source/argv,
+UID/PID/start, DSH home and private Unix socket/peer checks. Active, foreign,
+replacement or unknown outcomes stop the proof; attempted cleanup is never
+repeated or escalated with signals. It waits at most20seconds for normal process
+and socket closure. External after-proof checks establish native lease closure;
+the running proof itself holds a runtime lease.
+
+Nine synthetic real Unix-server tests and26 maintained proof cases pass. They
+include live owner/inode replacement after status, busy/preexisting peers, lost
+commit replies, source/start mismatches and refusal before model binding or SDK
+dispatch. This is source/protocol qualification, with fresh installed acceptance
+pending. No new bundle, installation, VM run or settings normalization is made.
