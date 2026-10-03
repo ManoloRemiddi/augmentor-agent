@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 published initial SDK formatting refusal
+
+[The initial published baseline checkpoint](../release/qualification/next-targets/20261003-published-baseline-history-source.json)
+retains Linux-role completion with two fixture requests, then a strict settings
+failure before Browser/restart. Only YAML formatting changes; parsed values equal.
+Normal cleanup and independent native/lease/process/socket/port audits pass.
+A separate exact hash-bound post-first-use profile has new journals/sessions and
+23 focused source checks; it writes no settings, preserves the failure and cannot
+replay any pending outcome. Actual post-first-use/history/upgrade remains pending.
+
 ## October 3 published baseline companion acceptance and history source
 
 [Published product-version qualification](LINUX-PRODUCT-UPGRADE-PROOF.md)

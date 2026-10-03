@@ -6,6 +6,7 @@ No installer, integration update, package operation, real provider, speech devic
 or memory engine is used. A failure is retained and must never be resumed.
 """
 import copy
+import argparse
 import hashlib
 import http.server
 import importlib.util
@@ -30,6 +31,14 @@ SETTINGS = ('.config/augmentor/harnesses.json', '.local/state/augmentor-install/
             '.local/state/augmentor-install/model.env', '.local/share/augmentor/desktop.json',
             '.local/share/augmentor/dsh-home/settings.yaml')
 ANSWER = 'PUBLISHED LINUX BASELINE FIXTURE VERIFIED'
+FIRST_USE_JOURNAL_SHA = 'a5f4250e098a084aecf560d13bf18a8069a2168ed38a5a3f0e01bbbe30105557'
+FIRST_USE_SETTINGS = {
+    '.config/augmentor/harnesses.json': '55f6dcaa34c3aae24bc79a8650d9df9b456489151bef6f0d1e7154c3f92075a6',
+    '.local/state/augmentor-install/installation.json': 'ca01b57f3209c6558b516af04c24df33ee4572c4e0eeb03bdf115a1100c40565',
+    '.local/state/augmentor-install/model.env': 'f20487bf2a4fe61323ed0c0216e2efa2a7d2bd7fe17beb5892d001b0f32c4e46',
+    '.local/share/augmentor/desktop.json': '44dc272924e44b613fed40c59dc9ec09647abe0fb05e02d74a574c7c55b87bae',
+    '.local/share/augmentor/dsh-home/settings.yaml': 'aad67c7c9bc29ae310cbb4c9eea2e420805e5bf8c2d66b038bee77909d2c365b',
+}
 
 
 def sha(path):
@@ -90,6 +99,37 @@ def check_provider(settings, saved):
             or saved.get('home') != str(HOME/'.local/share/augmentor/dsh-home')
             or saved.get('version') != '0.2.12'):
         raise ValueError('The saved numeric loopback fixture model or product connection differs.')
+
+
+def check_first_use_record(record):
+    methods = [row['method'] for row in record.get('completedRequests', [])]
+    if (record.get('phase') != 'failed-do-not-resume' or record.get('sourceCommit') != SOURCE
+            or record.get('pendingRequest') is not None or record.get('pendingLifecycle') is not None
+            or record.get('unknownOutcome') is not False or record.get('modelRequests') != 2
+            or record.get('companionCleanup', {}).get('phase') != 'pass'
+            or methods != ['session.create', 'session.selectModel', 'session.prompt']
+            or any(row.get('payload', {}).get('sessionId') != 'published012-init154-linux' for row in record.get('completedRequests', []))):
+        raise ValueError('The historical first-use outcome is not the exact known completed fixture turn.')
+
+
+def admit_first_use(helper, yaml):
+    path = HOME/'.local/state/published-product-baseline-history154/run.json'
+    helper.private_parents(path.parent); info = path.lstat()
+    if (not stat.S_ISREG(info.st_mode) or info.st_uid != 1000 or info.st_nlink != 1
+            or info.st_mode & 0o077 or info.st_size > 1048576 or sha(path) != FIRST_USE_JOURNAL_SHA):
+        raise ValueError('The retained initial first-use failure differs; it cannot be resumed.')
+    record = json.loads(path.read_text()); check_first_use_record(record)
+    if capture_settings(helper) != FIRST_USE_SETTINGS:
+        raise ValueError('The exact retained post-first-use settings differ.')
+    original = Path('/opt/augmentor-version-proof150/published012-initial-settings.yaml')
+    helper.root_input(original)
+    if sha(original) != '8ddd40e97c20d225c90cbbe80658826083e3da0b5ccf123c03427c60ec167add':
+        raise ValueError('The immutable original public fixture YAML differs.')
+    if yaml.safe_load(original.read_text()) != yaml.safe_load((HOME/SETTINGS[-1]).read_text()):
+        raise ValueError('A semantic setting changed during first use.')
+    return {'historicalInitialProof': 'FAIL-settings-formatting', 'historicalJournalSha256': FIRST_USE_JOURNAL_SHA,
+            'historicalKnownCompletedLinuxTurn': True, 'historicalOriginalSettingsSemanticallyEqual': True,
+            'historicalFailureRelabelled': False, 'historicalActionReplayed': False}
 
 
 class OwnedNode:
@@ -163,7 +203,7 @@ def model_server(requests):
     return http.server.ThreadingHTTPServer(('127.0.0.1', MODEL_PORT), Model)
 
 
-def prove():
+def prove(*, first_use=False):
     os.umask(0o077)
     if os.getuid() != 1000 or Path.home() != HOME:
         raise ValueError('Only the dedicated ordinary published fixture is supported.')
@@ -205,14 +245,18 @@ def prove():
     from dsh.setup import current
     import yaml
     check_provider(yaml.safe_load((HOME/'.local/share/augmentor/dsh-home/settings.yaml').read_text()), current())
+    first_use_admission = admit_first_use(helper, yaml) if first_use else None
     env.update(DSH_AUGMENTOR_URL='http://127.0.0.1:35599',
                PATH=str(APP/'node/bin')+':/usr/bin:/bin')
     os.environ.update(env)
-    folder = HOME/'.local/state/published-product-baseline-history154'
+    run_name = 'published-product-first-use-history157' if first_use else 'published-product-baseline-history154'
+    session_prefix = 'published012-first-use157-' if first_use else 'published012-init154-'
+    folder = HOME/'.local/state'/run_name
     helper.private_parents(folder.parent); folder.mkdir(mode=0o700, exist_ok=False)
     record = {'format': 'augmentor-published-baseline-history/1', 'phase': 'admitted', 'sourceCommit': SOURCE,
               'proofSha256': sha(Path(__file__)), 'helperSha256': HELPER_SHA, 'pendingRequest': None,
               'pendingLifecycle': None, 'upgradeRollbackQualified': False, 'startedAt': time.time()}
+    if first_use: record['firstUseAdmission'] = first_use_admission
     atomic(folder/'run.json', record)
     settings = capture_settings(helper); record['settings'] = settings; atomic(folder/'run.json', record)
     companion = None; node = None; server = None; thread = None; log = None; requests = []; failure = None
@@ -228,7 +272,7 @@ def prove():
         sessions = []
         for role in ('linux', 'browser'):
             if capture_settings(helper) != settings: raise ValueError('Saved settings changed before a role turn.')
-            session = 'published012-init154-'+role
+            session = session_prefix+role
             if session in prior: raise ValueError('A fixture session already exists; it cannot be resumed.')
             sessions.append(session)
             for method, payload in (
@@ -285,4 +329,7 @@ def prove():
 
 
 if __name__ == '__main__':
-    prove()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--owned-published-first-use-history', action='store_true',
+                        help='Separate known post-first-use fixture; preserves the initial formatting failure.')
+    prove(first_use=parser.parse_args().owned_published_first_use_history)

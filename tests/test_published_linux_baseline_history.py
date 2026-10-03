@@ -93,5 +93,31 @@ class PublishedBaselineHistoryTests(unittest.TestCase):
         changed = dict(saved, endpoint='http://127.0.0.1:3080')
         with self.assertRaises(ValueError): module.check_provider(settings, changed)
 
+    def first_use(self):
+        return {'phase': 'failed-do-not-resume', 'sourceCommit': module.SOURCE,
+                'pendingRequest': None, 'pendingLifecycle': None, 'unknownOutcome': False,
+                'modelRequests': 2, 'companionCleanup': {'phase': 'pass'},
+                'completedRequests': [{'method': method, 'payload': {'sessionId': 'published012-init154-linux'}}
+                                      for method in ('session.create', 'session.selectModel', 'session.prompt')]}
+
+    def test_known_first_use_admission_preserves_failure_and_never_dispatches(self):
+        record = self.first_use(); module.check_first_use_record(record)
+        self.assertEqual(record['phase'], 'failed-do-not-resume')
+
+    def test_first_use_unknown_request_or_lifecycle_never_admitted(self):
+        for key,value in (('pendingRequest', {'method': 'session.prompt'}), ('pendingLifecycle','SIGTERM-owned-dsh'), ('unknownOutcome',True)):
+            record = self.first_use(); record[key] = value
+            with self.subTest(key=key), self.assertRaises(ValueError): module.check_first_use_record(record)
+
+    def test_wrong_first_use_source_turn_count_session_or_cleanup_refuses(self):
+        for change in ('source','requests','session','cleanup','methods'):
+            record = self.first_use()
+            if change == 'source': record['sourceCommit'] = 'other'
+            elif change == 'requests': record['modelRequests'] = 3
+            elif change == 'session': record['completedRequests'][0]['payload']['sessionId'] = 'other'
+            elif change == 'cleanup': record['companionCleanup']['phase'] = 'unknown'
+            else: record['completedRequests'].pop()
+            with self.subTest(change=change), self.assertRaises(ValueError): module.check_first_use_record(record)
+
 
 if __name__ == '__main__': unittest.main()

@@ -1,7 +1,7 @@
 {
   "format": "augmentor-published-baseline-history-source/1",
   "date": "2026-10-03",
-  "status": "source-only reviewed; actual SDK history pending",
+  "status": "actual initial baseline FAIL at first-use YAML formatting; cleanup PASS",
   "sourceBase": "3119ff4",
   "worker": {
     "path": "release/prove-published-linux-baseline-history.py",
@@ -22,7 +22,28 @@
   },
   "newSyntheticPassed": 8,
   "focusedSyntheticPassed": 20,
-  "actualSdkRoleHistoriesExecuted": false,
+  "actualSdkRoleHistoriesExecuted": true,
   "upgradeRollbackQualified": false,
-  "publicReleaseQualified": false
+  "publicReleaseQualified": false,
+  "actualInitialSdk": {
+    "proofSource": "4675008",
+    "proofSha256": "7859bfff793eb1319bd1c037049b36e20473f7baa6b20b98d07cac10f3bcbcd6",
+    "elapsedSeconds": 5.348626650986262,
+    "startupSeconds": 3.4071888889884576,
+    "linuxRoleComplete": true,
+    "modelRequests": 2,
+    "browserRoleDispatched": false,
+    "restartReached": false,
+    "changedSettings": [
+      "dsh-home/settings.yaml"
+    ],
+    "changedLineCount": 14,
+    "parsedYamlValuesExactlyEqual": true,
+    "strictSettingsPreserved": false,
+    "pendingRequest": null,
+    "pendingLifecycle": null,
+    "unknownOutcome": false,
+    "normalDshAndCompanionCleanup": "PASS",
+    "independentNativeLeaseProcessSocketPortAudit": "PASS"
+  }
 }

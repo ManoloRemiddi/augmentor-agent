@@ -118,3 +118,26 @@ SDK outcomes, one-shot owned shutdown and foreign model/product refusal. Togethe
 with the existing helper/preparer cases,20 focused tests pass. Actual SDK history
 acceptance is pending. Graphical desktop, real providers, physical speech, memory
 engines and product-version upgrade/rollback are not qualified by source tests.
+
+
+## October 3 initial SDK result and separate post-first-use source
+
+The exact4675008 initial worker fails in5.35seconds after the Linux role completes
+(two fixture requests, including its title). Startup takes3.41seconds. Before the
+Browser role, the strict five-setting guard detects YAML formatting changed in14
+diff lines; independently parsed values are exactly equal. Browser and restart
+are not reached. There is no pending request/lifecycle or unknown outcome. Normal
+DSH/companion cleanup and independent native, exclusive-lease, ordinary-process,
+socket and port audits pass. The original journal/log and failure remain intact.
+This older published setup does not contain the current YAML producer correction.
+
+The same maintained worker now has an explicit separate post-first-use profile,
+`--owned-published-first-use-history`. It admits only that exact hash-pinned known
+completed Linux turn, successful cleanup and all five exact resulting settings.
+An immutable root-owned original YAML must retain its initial checksum and equal
+all current parsed values. It writes no settings and never repeats setup. New
+exclusive journals and distinct SDK sessions preserve every prior history; the
+strict settings/event comparison and no-replay requirement remain unchanged.
+The initial fresh-install result remains FAIL. Three new refusal cases pass,23
+with helper/preparer/history checks. Actual post-first-use acceptance is pending;
+it cannot qualify the failed initial-settings check or product-version rollback.
