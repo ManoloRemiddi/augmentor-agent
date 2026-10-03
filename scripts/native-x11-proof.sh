@@ -13,6 +13,9 @@ export XDG_CONFIG_HOME="$proof_workspace/config" XDG_DATA_HOME="$proof_workspace
 export AUGMENTOR_PI_CONFIG="$proof_workspace/config/augmentor-pi" AUGMENTOR_PI_STATE="$proof_workspace/state/augmentor-pi"
 export AUGMENTOR_SHARED_DATA="$proof_workspace/data/shared" AUGMENTOR_SHARED_STATE="$proof_workspace/state/shared"
 export XDG_RUNTIME_DIR="$proof_workspace/runtime"
+export AUGMENTOR_DICTATION_STATE="$proof_workspace/dictation"
+unset WAYLAND_DISPLAY
+export XDG_SESSION_TYPE=x11
 # Xvfb needs window management, not compositing. KWin 6's X11 backend does
 # not support QPainter compositing and exits if KWIN_COMPOSE=Q is forced.
 export KWIN_COMPOSE=N QT_QPA_PLATFORM=xcb LANG=C.UTF-8

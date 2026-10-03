@@ -271,6 +271,10 @@ def main():
         Path(address).unlink(missing_ok=True)
     import hashlib
     backend=Backend(base,'session-'+hashlib.sha256(address.encode()).hexdigest()[:12])
+    # An incomplete source checkout must not claim an enabled user's endpoint
+    # and leave the installed app talking to a broker without its component.
+    # Disabled private test brokers can still coordinate conversation capture.
+    if backend.preferences.get('enabled'):backend.binary()
     def reap():
         while not getattr(backend,'shutting_down',False):
             time.sleep(1)

@@ -2,6 +2,24 @@
 
 # Start here: agent handoff
 
+## October 3 Handy alignment, test separation and download preparation
+
+PR #30 is merged; PR #33 adds the four-pixel leftward orb adjustment and protects
+the live dictation session from incomplete/offscreen development brokers. The
+owner's dictation broker now runs separately staged compatible release
+`20261003-105718-c8fb185f`, artifact
+`7296f4917721c601e0949588a97053c947db8eeda62ab0fd3f7dea66cb7f2d9a`,
+enabled/ready on Ctrl+Space with no error and unchanged saved broker preferences.
+Existing conversation windows were preserved. Read [the owning evidence](HANDY-INTEGRATION.md#october-3-alignment-and-matched-downloads)
+for isolated CPU recognition, deployment scope, the shortcut fixture race and
+pending final source checks. Do not run UI proofs on the owner's real display.
+
+The owner directs preparation of **Linux, macOS and Windows before publishing**.
+Existing public 0.2.13 downloads predate or explicitly exclude Handy. Preparing a
+component or merging a source PR does not replace those assets. Native Windows
+ARM64, complete per-user payload/prerequisites and matched customer installer
+qualification remain part of that preparation.
+
 
 
 ## Windows 0.2.13 public preview — release record, October 2

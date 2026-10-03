@@ -531,7 +531,7 @@ index eb40068..228cca9 100644
 +:root[data-augmentor-animation="false"] .scard,
 +:root[data-augmentor-animation="false"] .ov-fade,
 +:root[data-augmentor-animation="false"] .sspinner { animation: none; transition: none; }
-+.augmentor-orb { display: block; flex: none; }
++.augmentor-orb { display: block; flex: none; transform: translateX(-4px); }
 diff --git a/src/overlay/RecordingOverlay.tsx b/src/overlay/RecordingOverlay.tsx
 index dbab41e..8143f3c 100644
 --- a/src/overlay/RecordingOverlay.tsx
