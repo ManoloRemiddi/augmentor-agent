@@ -45,6 +45,9 @@ def candidate(root, arch, *, public_preview=False):
                  'services/lifecycle/source_restoration.py', 'services/lifecycle/payload_integrity.py',
                  'services/lifecycle/recovery_source.py', 'services/lifecycle/health_report.py',
                  'services/lifecycle/update_journal.py',
+                 'components/handy/runtime/bin/handy.exe',
+                 'components/handy/runtime/BUILD.json',
+                 'licenses/Windows-installation-terms.txt',
                  'services/platform_adapters/private_files.py', 'services/platform_adapters/locks.py'):
         if not (root/name).is_file(): raise ValueError('Incomplete shared application payload: '+name)
     # Includes aliases/redirects and stale build output. Never reseal here: a

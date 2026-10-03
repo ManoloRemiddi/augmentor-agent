@@ -19,7 +19,11 @@ broker=importlib.util.module_from_spec(spec);spec.loader.exec_module(broker)
 class DictationTests(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory(prefix='augmentor-dictation-test-');self.addCleanup(self.temp.cleanup)
-        self.base=Path(self.temp.name);self.backend=broker.Backend(self.base)
+        self.base=Path(self.temp.name)
+        if os.name=='nt':
+            from platform_adapters.windows_identity import private_directory
+            self.base=private_directory(self.base/'private')
+        self.backend=broker.Backend(self.base)
 
     def test_theme_round_trip_while_disabled_never_starts_microphone(self):
         value=dictation.theme({'theme':'light','accent_hue':32,'opacity':70,'animation':False})
@@ -112,12 +116,15 @@ class DictationTests(unittest.TestCase):
                 _,address,key=dictation.location()
                 from multiprocessing.connection import Client
                 from multiprocessing import AuthenticationError
-                with self.assertRaises(AuthenticationError):Client(address,family='AF_UNIX',authkey=b'x'*32)
+                with self.assertRaises(AuthenticationError):Client(address,family='AF_PIPE' if os.name=='nt' else 'AF_UNIX',authkey=b'x'*32)
                 value=dictation.theme({'accent_hue':280,'animation':False})
                 dictation.request('theme',value)
                 self.assertEqual(dictation.request('status')['theme'],value)
                 lease=dictation.MicrophoneLease();lease.acquire();self.assertIsNotNone(lease.token);lease.release();self.assertIsNone(lease.token)
-                self.assertEqual((self.base/'auth.key').stat().st_mode&0o777,0o600)
+                if os.name=='nt':
+                    from platform_adapters.windows_identity import private_file_descriptor
+                    os.close(private_file_descriptor(self.base/'auth.key'))
+                else:self.assertEqual((self.base/'auth.key').stat().st_mode&0o777,0o600)
             finally:dictation.request('shutdown',start=False)
 
     def test_incomplete_checkout_cannot_own_an_enabled_session(self):
@@ -125,7 +132,11 @@ class DictationTests(unittest.TestCase):
         for relative in ('services/dictation/server.py','services/dictation/portal.py','apps/native/augmentor_linux/dictation.py'):
             target=checkout/relative;target.parent.mkdir(parents=True,exist_ok=True)
             shutil.copy2(ROOT/relative,target)
-        state=self.base/'state';state.mkdir(mode=0o700)
+        state=self.base/'state'
+        if os.name=='nt':
+            from platform_adapters.windows_identity import private_directory
+            private_directory(state)
+        else:state.mkdir(mode=0o700)
         original=b'{"enabled": true}\n';(state/'preferences.json').write_bytes(original)
         env={**os.environ,'AUGMENTOR_DICTATION_STATE':str(state),'PYTHONPATH':str(checkout/'apps/native')}
         result=subprocess.run([sys.executable,str(checkout/'services/dictation/server.py')],env=env,capture_output=True,timeout=8)
@@ -143,7 +154,10 @@ class DictationTests(unittest.TestCase):
             try:
                 self.assertNotEqual(state,home/'.local/share/augmentor/dictation')
                 self.assertEqual(os.environ['AUGMENTOR_DICTATION_STATE'],str(state))
-                self.assertEqual(state.stat().st_mode&0o777,0o700)
+                if os.name=='nt':
+                    from platform_adapters.windows_identity import require_private_directory
+                    require_private_directory(state)
+                else:self.assertEqual(state.stat().st_mode&0o777,0o700)
                 self.assertFalse((home/'.local/share/augmentor/dictation').exists())
                 self.assertEqual(dictation.location(),(state,address,key))
                 lease=dictation.MicrophoneLease();lease.acquire();lease.release()

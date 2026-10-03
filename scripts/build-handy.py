@@ -184,9 +184,17 @@ def stage(source,output,metadata,cargo_home=None):
             if file.suffix=='.dylib':run(['install_name_tool','-id','@rpath/'+file.name,str(file)],output)
     notices(source,metadata,output,cargo_home)
     if sys.platform.startswith('linux'):helper(output)
+    windows_runtime=None
+    if sys.platform=='win32':
+        spec=importlib.util.spec_from_file_location('windows_supplier',ROOT/'scripts/stage-handy-windows-runtime.py')
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        windows_runtime=module.stage(output)
     record={'schema':'augmentor-handy-build/1','target':sys.platform+'-'+platform.machine(),'upstream':json.loads((ROOT/'components/handy/upstream.json').read_text(encoding='utf-8')),
         'patchSha256':sha(ROOT/'components/handy/augmentor.patch'),'embeddedSources':{name:sha(ROOT/'components/handy'/name) for name in ('embedding.rs','AugmentorOverlay.tsx')},
         'onnxruntime':item,'buildInputs':{name:sha(ROOT/name) for name in ('scripts/build-handy.py','scripts/prepare-handy.py','components/handy/onnxruntime.json','components/handy/ydotool.json','components/handy/silero.json','components/handy/notice-supplements.json')},'files':{file.relative_to(output).as_posix():sha(file) for file in sorted(output.rglob('*')) if file.is_file()},'modelsBundled':False}
+    if windows_runtime:
+        record['windowsRuntime']=windows_runtime
+        record['buildInputs'].update({name:sha(ROOT/name) for name in ('scripts/stage-handy-windows-runtime.py','components/handy/webview2.json','components/handy/licenses/WebView2-fixed.txt')})
     (output/'BUILD.json').write_text(json.dumps(record,indent=2)+'\n')
     print(output)
 

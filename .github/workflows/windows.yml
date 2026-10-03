@@ -20,7 +20,12 @@ concurrency:
   group: windows-${{ github.ref }}
   cancel-in-progress: false
 jobs:
+  handy:
+    uses: ./.github/workflows/handy.yml
+    with:
+      platforms: '["windows-2022", "windows-11-arm"]'
   native-runtime:
+    needs: handy
     strategy:
       fail-fast: false
       matrix:
@@ -115,11 +120,26 @@ jobs:
         run: |
           $env:AUGMENTOR_PWSH = "$PWD/outputs/payload/powershell/pwsh.exe"
           & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-dsh.py --out outputs/payload/dsh --node "$PWD/outputs/payload/node/node.exe"
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        if: ${{ !cancelled() && steps.dsh.outcome == 'success' }}
+        with:
+          name: handy-win32-${{ matrix.arch == 'x64' && 'AMD64' || 'ARM64' }}
+          path: components/handy/runtime
       - name: Assemble shared Windows application and native launcher
         id: application
         if: ${{ !cancelled() && steps.dsh.outcome == 'success' }}
         run: |
           & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-windows-application.py --root outputs/payload --arch ${{ matrix.arch }}
+      - name: Exercise the actual bundled dictation broker and private state
+        if: ${{ !cancelled() && steps.application.outcome == 'success' }}
+        env:
+          QT_QPA_PLATFORM: offscreen
+          PYTHONPATH: apps/native
+        run: |
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_dictation.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/proof-handy-windows-broker.py --project outputs/payload --out outputs/evidence/dictation.json
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Exercise managed Windows DSH setup and conversation restart
         if: ${{ !cancelled() && steps.application.outcome == 'success' }}
         run: |

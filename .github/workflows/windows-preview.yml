@@ -2,6 +2,18 @@
 name: Windows public preview build
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/windows-preview.yml'
+      - 'components/handy/**'
+      - 'services/dictation/**'
+      - 'scripts/stage-handy*'
+      - 'scripts/build-handy.py'
+      - 'scripts/proof-handy*'
+      - 'scripts/stage-windows-application.py'
+      - 'scripts/package-windows.py'
+      - 'scripts/windows-application.iss'
+      - 'release/windows/public-preview.json'
   push:
     branches: [feat/windows]
     paths:
@@ -17,7 +29,12 @@ concurrency:
   group: windows-preview-${{ github.ref }}
   cancel-in-progress: false
 jobs:
+  handy:
+    uses: ./.github/workflows/handy.yml
+    with:
+      platforms: '["windows-2022", "windows-11-arm"]'
   package:
+    needs: handy
     strategy:
       fail-fast: false
       matrix:
@@ -27,7 +44,7 @@ jobs:
           - os: windows-11-arm
             arch: arm64
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 35
+    timeout-minutes: 50
     defaults:
       run:
         shell: pwsh
@@ -39,6 +56,10 @@ jobs:
           architecture: ${{ matrix.arch }}
       - name: Stage hash-locked private runtimes
         run: python -Xutf8 scripts/bootstrap-windows.py --arch ${{ matrix.arch }} --out outputs/payload
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: handy-win32-${{ matrix.arch == 'x64' && 'AMD64' || 'ARM64' }}
+          path: components/handy/runtime
       - name: Build the shared application
         run: |
           npm ci --ignore-scripts --no-audit --no-fund
@@ -57,6 +78,10 @@ jobs:
       - name: Verify complete sealed files and native public launcher rendering
         run: |
           & outputs/payload/python/python.exe -I -Xutf8 -B scripts/windows-preview-health.py --root outputs/payload --out outputs/package/health.json
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Verify packaged Windows dictation without a global browser or Handy installation
+        run: |
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/proof-handy-windows-broker.py --project outputs/payload --out outputs/package/dictation.json
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Package normal customer folders without development switches
         run: |

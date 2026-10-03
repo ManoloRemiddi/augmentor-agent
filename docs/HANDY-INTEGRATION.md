@@ -56,6 +56,27 @@ CPUs, matched complete installers, fresh-user dictation lifecycle acceptance,
 source/notices review, and exact anonymous-download checks after publication.
 This preparation is ongoing; do not claim the existing downloads include Handy.
 
+Matched-download preparation now wires the complete Windows component into both
+native x64/ARM64 payloads before sealing. Its fixed Microsoft WebView2 runtime
+and matching CRT are app-local; no browser/Handy/global runtime installer runs.
+Supplier archives are downloaded directly from Microsoft, pinned by bytes and
+SHA-256, checked for the target PE architecture and native publisher signature,
+and kept complete with their original terms/notices. The normal per-user Setup
+shows the separately licensed vendor terms. See [Microsoft's distribution guide](https://learn.microsoft.com/en-us/microsoft-edge/webview2/concepts/distribution)
+and the reviewed supplier record in `components/handy/webview2.json`.
+The component selects that exact browser even when the parent inherits a stale
+global WebView2 path. Windows broker authentication state uses protected private
+user paths and files; enabled components hold the installation lifecycle lease.
+
+The Windows preview workflow builds both native components and creates complete
+customer installers from one source revision. Its copied-payload broker proof
+checks startup, shortcut defaults/editing, appearance, microphone exclusion,
+disable and shutdown without downloading a model or recording a microphone.
+The full Windows qualification continues to check actual Setup/repair/removal.
+These new Windows gates are pending native CI; they are not evidence that the
+existing public Windows preview has dictation or that physical transcription has
+been tested on either Windows CPU. No download has been published by this work.
+
 Implementation branch: `feat/handy-integration`, based on public main
 `d91c52037d7bc26c82c702c25e1a779b0fca1f39`. This guide owns the implemented
 contract; [the approved plan](HANDY-INTEGRATION-PLAN.md) retains its rationale.

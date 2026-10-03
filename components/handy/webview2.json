@@ -1,0 +1,20 @@
+{
+  "version": "154.0.4258.53",
+  "targets": {
+    "x64": {
+      "url": "https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/0b89c3a3-0043-4746-b39e-65830da7744d/Microsoft.WebView2.FixedVersionRuntime.154.0.4258.53.x64.cab",
+      "sha256": "ec12b2db6423d127fb8e1935d34e2e68abc70fe8ecb1f6162ba1c1ccc2825f6d",
+      "size": 307996323,
+      "folder": "Microsoft.WebView2.FixedVersionRuntime.154.0.4258.53.x64"
+    },
+    "arm64": {
+      "url": "https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/dc564291-b964-4df6-82ac-3079d17698cb/Microsoft.WebView2.FixedVersionRuntime.154.0.4258.53.arm64.cab",
+      "sha256": "bbceb9135193f9b407eb96d72c30147761553415484af3d07de7f2674aadecef",
+      "size": 294049642,
+      "folder": "Microsoft.WebView2.FixedVersionRuntime.154.0.4258.53.arm64"
+    }
+  },
+  "source": "https://developer.microsoft.com/en-us/microsoft-edge/webview2/",
+  "licenseUrl": "https://developer.microsoft.com/microsoft-edge/api/eula/webview2?locale=en-us&fixed=true",
+  "licenseSha256": "831c3d3fd8497e1a0c846877eee995b392377cf16a5df0a24f436152bf002b0f"
+}

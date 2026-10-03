@@ -2,6 +2,14 @@
 
 # Augmentor Agent for Windows — 0.2.13 preview
 
+The published `v0.2.13-windows-preview.1` below does not include Handy dictation.
+The next matched Linux/macOS/Windows candidate is being prepared with native
+x64/ARM64 Handy, a bundled browser/CRT and the shared Augmentor settings/tray.
+Its supplier terms appear in normal Setup; a separate Handy installation is not
+required. Native component, broker and full installer qualification must pass
+before publishing that candidate. Physical microphone/transcription acceptance
+remains separate. See [the preparation and exact evidence](HANDY-INTEGRATION.md#october-3-alignment-and-matched-downloads).
+
 First public Windows preview. Windows 11 **25H2 or later**, build 26200 or later.
 Choose **x64** for Intel/AMD PCs or **ARM64** for Windows on ARM.
 Find your processor type in Settings → System → About → System type.

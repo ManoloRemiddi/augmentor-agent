@@ -62,6 +62,9 @@ class Backend:
     def start(self):
         if self.child and self.child.poll() is None:return
         env=os.environ.copy();env.update(AUGMENTOR_HANDY_EMBEDDED='1',HANDY_DISABLE_UPDATER='1')
+        if sys.platform=='win32':
+            from services.dictation.windows_runtime import environment
+            env=environment(ROOT/'components/handy/runtime',env)
         if sys.platform.startswith('linux') and portal.required():
             env['AUGMENTOR_HANDY_EXTERNAL_SHORTCUT']='1'
             # GNOME has no layer-shell protocol for a bottom-edge overlay.
@@ -71,9 +74,8 @@ class Backend:
         env['PATH']=str(self.binary().parent)+os.pathsep+env.get('PATH','')
         env['YDOTOOL_SOCKET']=str(self.inputdir/'input.sock')
         sys.path.insert(0,str(ROOT/'services/lifecycle'))
-        if os.name!='nt':
-            from lease import hold
-            hold('runtime')
+        from lease import hold
+        hold('runtime')
         self.generation=time.monotonic_ns()
         self.child=subprocess.Popen([str(self.binary())],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,env=env,**({'umask':0o077} if os.name!='nt' else {'creationflags':0x08000000}))
         threading.Thread(target=self.read,args=(self.child,),daemon=True).start()
