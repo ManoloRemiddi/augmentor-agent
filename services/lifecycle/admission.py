@@ -66,6 +66,15 @@ class Admission:
         finally:
             with self.lock: self.active -= 1
 
+    def retire_idle(self):
+        """Atomically retire only when no worker or maintenance owner is active."""
+        with self.lock:
+            self._expire()
+            if self.active or self.token or self.closing:
+                return False
+            self.closing = True
+            return True
+
     def control(self, method, params):
         if method not in METHODS or not isinstance(params,dict): raise ValueError('Unsupported maintenance request.')
         action = method.removeprefix('host.maintenance.')

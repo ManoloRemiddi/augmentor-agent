@@ -14,6 +14,7 @@ ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'apps/native'));sys.path.insert(0,str(ROOT))
 from augmentor_linux.dictation import location
 from services.dictation import portal
+from services.lifecycle.idle import Lifetime
 
 
 def process_alive(pid):
@@ -167,6 +168,19 @@ class Backend:
             for descriptor in module._leases:os.close(descriptor)
             module._leases.clear()
 
+    def idle_ready(self):
+        with self.lock:
+            if self.preferences.get('enabled') or self.owner:return False
+            if not self.child or self.child.poll() is not None:return True
+            # A disabled settings read can have started Handy. Keep asynchronous
+            # downloads/capture alive; retire only after explicit native evidence.
+            try:
+                status=self.call('status',{})
+                models=self.call('models',{})
+                return (status.get('enabled') is False and status.get('phase') in ('disabled','ready','setup-needed')
+                        and isinstance(models,list) and all(isinstance(row,dict) and row.get('downloading') is False for row in models))
+            except (OSError,RuntimeError,TimeoutError):return False
+
     def request(self, method, params):
         with self.lock:
             if self.owner:
@@ -277,35 +291,52 @@ def main():
     # and leave the installed app talking to a broker without its component.
     # Disabled private test brokers can still coordinate conversation capture.
     if backend.preferences.get('enabled'):backend.binary()
-    def reap():
-        while not getattr(backend,'shutting_down',False):
-            time.sleep(1)
-            with backend.lock:
-                if not backend.owner:continue
-                alive=process_alive(backend.owner['pid'])
-                if not alive:
-                    try:
-                        if backend.child and backend.child.poll() is None:backend.call('conversation.release',{'token':backend.owner['token']})
-                    except (OSError,RuntimeError,TimeoutError):pass
-                    backend.owner=None
-    threading.Thread(target=reap,daemon=True).start()
+    stopped=threading.Event()
     with Listener(address,family='AF_PIPE' if os.name=='nt' else 'AF_UNIX',authkey=key) as listener:
         if os.name!='nt':os.chmod(address,0o600)
+        lifetime=Lifetime(lock,address)
+        # multiprocessing otherwise unlinks blindly when closing the listener,
+        # even if a deleted test directory has been recreated by a new broker.
+        finalizer=getattr(listener._listener,'_unlink',None)
+        if finalizer is not None:finalizer.cancel()
         def serve(connection):
-            with connection:
-                try:
-                    value=json.loads(connection.recv_bytes(65536))
-                    reply={'result':backend.request(value['method'],value.get('params',{}))}
-                except Exception as error:reply={'error':str(error)}
-                try:connection.send_bytes(json.dumps(reply).encode())
-                except (OSError,EOFError):pass
-                if getattr(backend,'shutting_down',False):os._exit(0)
-        try:
-            while True:
-                from multiprocessing import AuthenticationError
+            try:
+                with connection:
+                    try:
+                        if not connection.poll(20):raise TimeoutError('Dictation request timed out.')
+                        value=json.loads(connection.recv_bytes(65536))
+                        reply={'result':backend.request(value['method'],value.get('params',{}))}
+                    except Exception as error:reply={'error':str(error)}
+                    try:connection.send_bytes(json.dumps(reply).encode())
+                    except (OSError,EOFError):pass
+            finally:
+                lifetime.leave()
+                if getattr(backend,'shutting_down',False):stopped.set()
+        def accept():
+            from multiprocessing import AuthenticationError
+            while not stopped.is_set():
                 try:connection=listener.accept()
                 except (AuthenticationError,EOFError):continue
-                threading.Thread(target=serve,args=(connection,),daemon=True).start()
-        finally:backend.stop()
+                except OSError:
+                    if stopped.is_set():return
+                    stopped.set();return
+                if not lifetime.enter():connection.close();continue
+                try:threading.Thread(target=serve,args=(connection,),daemon=False).start()
+                except BaseException:lifetime.leave();connection.close();raise
+        threading.Thread(target=accept,daemon=True).start()
+        try:
+            while not stopped.wait(1):
+                with backend.lock:
+                    if backend.owner and not process_alive(backend.owner['pid']):
+                        try:
+                            if backend.child and backend.child.poll() is None:backend.call('conversation.release',{'token':backend.owner['token']})
+                        except (OSError,RuntimeError,TimeoutError):pass
+                        backend.owner=None
+                if lifetime.retire(backend.idle_ready):break
+        finally:
+            stopped.set()
+            with lifetime.lock:lifetime.closing=True
+            backend.stop()
+            lifetime.cleanup(address)
 
 if __name__=='__main__':main()

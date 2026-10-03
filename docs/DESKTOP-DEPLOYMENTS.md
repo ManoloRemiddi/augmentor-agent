@@ -2,6 +2,38 @@
 
 # Consistent installed desktop releases
 
+## October 3: bounded companion lifetimes
+
+[Companion retirement and cleanup](LIFECYCLE.md#detached-companion-retirement--october-3)
+records source implementation `441009b`, initialization correction `8d148d5`,
+source qualification and the 139-process abandoned-fixture cleanup.
+
+A separate candidate copied immutable product 0.2.11 artifact
+`ea4204f8d4f746e270df7c64b86ca486a9f814b41bd40eee22da541b2d4b330f` and backported
+only shared lifetime/admission helpers, memory/prompt retirement, dictation
+retirement/cleanup and optional compatibility-watchdog scripts. It preserves the
+older component call contract, DSH integration, speech/Handy dependencies,
+preferences and native UI; it does not replace them with source product 0.2.13.
+Prompt and memory SQLite setup finish before publishing their socket. Five real
+candidate process cases pass, including preserved journals, long watches,
+replacement endpoints and live microphone ownership. The earlier unselected
+startup-race candidate was discarded before activation.
+
+Installed staging, full inventory verification and authenticated product/catalog
+promotion passed. Selected release `20261003-215828-45a8a2d4`, artifact SHA-256:
+`ee648609533909b614be9345f2efb78eeb87f7fe9124a0e990e1ba383dfc9d7a`.
+The previous selection remains available for rollback.
+
+Primary, secondary and mobile retain running release
+`20261003-144055-0fa10098`; all reported online with voice available and
+`updatePending: true` after activation. No windows, backend tasks or enabled
+system dictation were restarted. They adopt the new code when naturally reopened.
+The Linux test-only compatibility timer is already enabled and active, checking
+older disposable test namespaces without touching production components.
+
+Source is published in [draft PR #38](https://github.com/ManoloRemiddi/augmentor-agent/pull/38).
+Merge, public downloads and installed Mac/Windows adoption remain separate.
+
 ## October 1: browser evidence recovery
 
 [Browser observation repair](BROWSER-OBSERVATION-REPAIR.md#installed-linux-evidence--1-october-2026)
