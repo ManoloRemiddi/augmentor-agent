@@ -24,6 +24,29 @@ was traced to an incomplete development broker owning the graphical-session
 endpoint; graceful idle shutdown and startup from the complete selected installed
 release restored readiness without restarting a chat or changing settings.
 
+The four-pixel component is now separately staged and selected in compatible
+installed release `20261003-105718-c8fb185f`, artifact SHA-256
+`7296f4917721c601e0949588a97053c947db8eeda62ab0fd3f7dea66cb7f2d9a`.
+It copies the previous selected 0.2.11 artifact
+`6394c68a74b45ba1f3a2acdb416594e9aca60a108f76f14f17b3938730ff2abc`
+and applies `e28dc90`'s dictation client/broker and the rebuilt component only.
+The running broker uses this selected release, enabled and ready on Ctrl+Space,
+with no error/tray; saved broker preferences were byte-compared unchanged.
+Open Desktop/Mobile windows retain their earlier running code and were not
+restarted. This does not claim a new owner microphone acceptance after adoption.
+
+The rebuilt Linux component passed actual isolated CPU recognition/paste into a
+separate Qt application, focus preservation, shortcut editing, live appearance,
+cancel-without-paste, conversation microphone exclusion, disable and parent exit.
+Only a virtual microphone was used. The orb shifts four pixels in the actual
+recording screenshots. Fourteen broker tests pass locally. Hosted source and
+component jobs pass at `e28dc90`; its installed Debian shortcut fixture exposed
+an existing race after restoring the parent before the first-run dialog mapped.
+The follow-up waits for both windows before indexing the dialog, preserving all
+real key-event/maintenance/removal assertions. The X11 proof wrapper now explicitly
+isolates dictation state and clears inherited Wayland state. Await final hosted
+checks before merging PR #33; matched public download preparation stays separate.
+
 Publication direction: prepare Linux, macOS and Windows downloads before
 publishing. Existing Linux/Mac 0.2.13 preview downloads predate Handy; the Windows
 0.2.13 preview explicitly excludes it. Merging source does not update those
