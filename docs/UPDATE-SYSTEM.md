@@ -1257,3 +1257,13 @@ provider or real conversation, and connected/import/offline UI health are mocked
 Native execution is pending. Public Linux eligibility stays disabled; normal GUI,
 real DSH, signed forward releases and remaining platform/package paths still need
 qualification.
+
+
+At source `10fdece`, full local Python passes 1007 total (965 passed, 42 skips)
+in 65.802 seconds; focused updater passes 228 (225 passed, three skips).
+Broad validation 37160189535 and Mac 14/26 37160188044 are running at that source.
+Focused native 37160143263 was canceled by the reusable native workflow's
+ref-only concurrency group when broad validation started. Its canceled job is
+not a qualification result. The reusable group now includes run ID, allowing
+separate focused/full parent runs on independently isolated runners to coexist.
+No live broad run was manually canceled; native/broad outcomes remain pending.

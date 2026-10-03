@@ -6,7 +6,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: linux-update-service-${{ github.ref }}
+  group: linux-update-service-${{ github.ref }}-${{ github.run_id }}
   cancel-in-progress: true
 jobs:
   owned-service:

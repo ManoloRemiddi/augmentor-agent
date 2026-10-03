@@ -5,6 +5,15 @@
 ## Automatic updates implementation — October 3, in progress
 
 
+
+Source `10fdece` passes full local Python: 1007 total, 965 passed, 42 skips,
+in 65.802 seconds, including focused updater 228/225/three. Broad validation
+37160189535 and Mac 14/26 validation 37160188044 are running at this exact source.
+The earlier focused 37160143263 was canceled when broad validation reused the
+native workflow's ref-only concurrency group. The reusable group now includes
+run ID; parent focused/full separation alone was insufficient. Cancellation is
+not a native test result. Keep the live broad run and record actual outcomes.
+
 October 4 checkpoint adds exact installed Linux desktop launcher/unit ownership,
 original reserved main-window process binding, normal-exit migration and one-shot
 captured main/secondary reopening after healthy completion and DSH reopening.
