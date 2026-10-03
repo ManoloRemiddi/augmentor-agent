@@ -22,6 +22,9 @@ jobs:
   handy:
     needs: source-boundary
     uses: ./.github/workflows/handy.yml
+  linux-owned-service:
+    needs: source-boundary
+    uses: ./.github/workflows/linux-update-service.yml
   home-runtime:
     needs: source-boundary
     runs-on: ubuntu-24.04

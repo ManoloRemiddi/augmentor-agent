@@ -1104,3 +1104,24 @@ Fresh service-source checkpoint `8bc5bfb` is running in
 [37154936597](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37154936597);
 its results are pending. Neither workflow constitutes actual user-systemd or
 signed forward qualification of this service controller.
+
+### Native user-service qualification
+
+The reusable [Linux user-service workflow](../.github/workflows/linux-update-service.yml)
+is also called by validation. It creates a dedicated disposable `augupdatefixture`
+account on a hosted Ubuntu runner, starts its actual user manager, runs the test
+under that account and removes only that created account afterward. The test
+requires both the explicit qualification flag and dedicated CI identity; ordinary
+local/shared test discovery skips it and never writes a real user service.
+
+`test_update_linux_service_native.py` runs the exact owned unit with an actual
+copied Node executable and the shipped Unix control server. Its independently
+authored inert maintenance component refuses a busy prepare, then accepts normal
+reserve/drain and closes its socket to exit normally. The updater uses actual
+systemd reports, socket peer pidfd, startup exclusion, graph reservations,
+version-changing file/selection migration, daemon reload and completion archive.
+It checks unchanged credential bytes, other harness settings and disabled service
+enablement. Connected/import checks and offline UI health remain explicitly
+mocked. This is a native OS/service composition fixture, not a real DSH/provider,
+signed published forward update, normal GUI or reopening proof. Native execution
+is pending; the local case skips because its disposable CI account is absent.

@@ -861,6 +861,15 @@ reload refusal and a version-changing controller composition. Graph drain, impor
 and offline health are mocked in that composition. This is not an installed
 user-systemd or reopening proof.
 
+`test_update_linux_service_native.py` is the separate actual user-systemd fixture.
+Run through `.github/workflows/linux-update-service.yml` (also called by validation),
+which provisions and removes its disposable CI account. It checks actual service
+ownership, original socket pidfd, busy deferral, normal drain, file/selection
+migration, reload and completion while preserving synthetic credentials/settings.
+The Node participant is an inert maintenance fixture; connected/import and UI
+health actions are mocked. Native qualification is pending. Ordinary discovery
+skips this test without its dedicated CI user and explicit qualification flag.
+
 Managed Linux updates: `test_update_linux_managed.py` covers real isolated locks,
 journals and immutable selections, compatibility before drain, changed content/
 modes/selection, live authority revocation, lifetime contention, failed health and

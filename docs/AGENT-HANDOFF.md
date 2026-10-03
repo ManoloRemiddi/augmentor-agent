@@ -4,6 +4,15 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+Native Linux user-service qualification is now authored in
+`test_update_linux_service_native.py` and the reusable `linux-update-service.yml`
+workflow, called from validation. It creates only a disposable CI account, runs
+the exact user unit with a copied Node executable and inert real control socket,
+and tests busy deferral plus observed normal exit/migration/reload/completion.
+Imports/connection and UI health are explicitly mocked. Local execution skips
+without its dedicated CI prerequisites; native results are pending. No owner
+service/profile or production update flag is changed.
+
 Managed Linux now attaches the exact `augmentor-dsh.service` and shared
 `harnesses.json` to the same flushed registration backups. Source service ownership
 must agree with the live reserved socket peer; only original normal exit allows
