@@ -2,6 +2,60 @@
 
 # Embedded Handy dictation
 
+## October 3 alignment and matched downloads
+
+The owner requested a small leftward correction of the recording icon. The
+28-pixel orb is translated four CSS pixels left; waveform, cancel button, orb
+size, animation and appearance synchronization retain their existing geometry.
+An enabled broker now checks for its bundled executable before accepting any
+session connections. An incomplete development checkout cannot take ownership
+of an enabled installed session and serve only component-unavailable errors.
+Disabled isolated test brokers continue to coordinate conversation capture.
+Offscreen Qt clients without an explicit dictation state now create and propagate
+a private temporary test state. They cannot connect to, change, or shut down the
+actual login-session broker even when tests inherit the real HOME and display.
+Explicit fixture state is preserved. The isolated actual IPC regression exercises
+conversation admission/release and broker shutdown without creating home state.
+The regression starts an actual incomplete checkout against private synthetic
+enabled state, verifies refusal to listen, and preserves that state unchanged.
+
+The owner confirmed restored physical Linux dictation on October 3. Its outage
+was traced to an incomplete development broker owning the graphical-session
+endpoint; graceful idle shutdown and startup from the complete selected installed
+release restored readiness without restarting a chat or changing settings.
+
+The four-pixel component is now separately staged and selected in compatible
+installed release `20261003-105718-c8fb185f`, artifact SHA-256
+`7296f4917721c601e0949588a97053c947db8eeda62ab0fd3f7dea66cb7f2d9a`.
+It copies the previous selected 0.2.11 artifact
+`6394c68a74b45ba1f3a2acdb416594e9aca60a108f76f14f17b3938730ff2abc`
+and applies `e28dc90`'s dictation client/broker and the rebuilt component only.
+The running broker uses this selected release, enabled and ready on Ctrl+Space,
+with no error/tray; saved broker preferences were byte-compared unchanged.
+Open Desktop/Mobile windows retain their earlier running code and were not
+restarted. This does not claim a new owner microphone acceptance after adoption.
+
+The rebuilt Linux component passed actual isolated CPU recognition/paste into a
+separate Qt application, focus preservation, shortcut editing, live appearance,
+cancel-without-paste, conversation microphone exclusion, disable and parent exit.
+Only a virtual microphone was used. The orb shifts four pixels in the actual
+recording screenshots. Fourteen broker tests pass locally. Hosted source and
+component jobs pass at `e28dc90`; its installed Debian shortcut fixture exposed
+an existing race after restoring the parent before the first-run dialog mapped.
+The follow-up waits for both windows before indexing the dialog, preserving all
+real key-event/maintenance/removal assertions. The X11 proof wrapper now explicitly
+isolates dictation state and clears inherited Wayland state. Await final hosted
+checks before merging PR #33; matched public download preparation stays separate.
+
+Publication direction: prepare Linux, macOS and Windows downloads before
+publishing. Existing Linux/Mac 0.2.13 preview downloads predate Handy; the Windows
+0.2.13 preview explicitly excludes it. Merging source does not update those
+assets. Required work: shared alignment/recovery checks, actual rebuilt
+component proofs, Windows payload/prerequisite integration on both advertised
+CPUs, matched complete installers, fresh-user dictation lifecycle acceptance,
+source/notices review, and exact anonymous-download checks after publication.
+This preparation is ongoing; do not claim the existing downloads include Handy.
+
 Implementation branch: `feat/handy-integration`, based on public main
 `d91c52037d7bc26c82c702c25e1a779b0fca1f39`. This guide owns the implemented
 contract; [the approved plan](HANDY-INTEGRATION-PLAN.md) retains its rationale.

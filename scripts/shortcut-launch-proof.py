@@ -70,7 +70,7 @@ try:
     until(shortcuts_ready)
     # Do not re-register: the desktop files and KDE settings must restore it.
     press();until(lambda:not windows())
-    press();until(lambda:windows()==[wid])
+    press();until(lambda:windows()==[wid] and len(windows('^Connect DSH'))==1)
     # Close the first-run dialog using real input, then exercise the shipped
     # maintenance command. It must remove both live and persisted shortcuts.
     setup=windows('^Connect DSH')[0]
