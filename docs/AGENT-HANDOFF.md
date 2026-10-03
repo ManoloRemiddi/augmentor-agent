@@ -1,5 +1,23 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 current Ubuntu selected reboot acceptance
+
+[The current reboot checkpoint](../release/qualification/next-targets/20261003-noble-selected-reboot-pass-shortcut-runner-timeout.json)
+passes normal command exit0 on immutable clean368 with maintained3df5c19 proof
+bytes. One reboot changes the kernel boot identity; identical selected
+source/artifact/runtime/inventory returns with the actual service-owned Wayland
+app and GNOME observer. Native audit and active AppArmor pass. The offline
+Connect DSH first-run modal remains expected; no connection/model is introduced.
+This verifies automatic graphical login/recovery, not password authentication.
+
+The preceding global shortcut run remains an outer1600-second runner timeout
+without a final report. Independent readback finds no journal/helper/secondary
+and a normal idle main. A fresh maintained run after reboot retains existing
+per-operation bounds without that additional outer limit. Native shortcut and
+password-lock acceptance remain pending; actual application Settings PASS is
+separate. No selected payload is modified or uncertain action replayed.
+
+
 ## October 3 Mint readiness observations and Ubuntu runner timeout
 
 The [Mint checkpoint](../release/qualification/next-targets/20261003-mint2035-installed-setup-proof-loader.json)

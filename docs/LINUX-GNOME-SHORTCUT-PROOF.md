@@ -150,3 +150,13 @@ python3 release/prove-gnome-selected-reboot.py \
   --source <exact-selected-source> --artifact <exact-selected-inventory-sha256> \
   --output outputs/linux-rollout/<fresh-run>/reboot.json
 ```
+
+## Current Ubuntu selected reboot acceptance
+
+[The installed reboot proof](../release/qualification/next-targets/20261003-noble-selected-reboot-pass-shortcut-runner-timeout.json)
+passes with command exit0: one request, changed boot identity, identical selected
+clean368 source/artifact/runtime/inventory, clean native audit/active AppArmor and
+an actual service-owned Wayland app/observer. The fixture uses automatic login
+and remains offline with its normal Connect DSH modal. Password authentication
+and locked shortcut delivery are not tested. The interrupted outer-bounded
+shortcut run is retained separately and cannot establish native key acceptance.
