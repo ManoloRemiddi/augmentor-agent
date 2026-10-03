@@ -15,6 +15,8 @@ from lifecycle.admission import Admission, MaintenanceBusy
 from platform_adapters.private_files import atomic_json, descriptor
 from platform_adapters.paths import private_directory
 import os
+from unittest.mock import Mock,patch
+from updates.attempt import write_result
 
 
 class UpdateManagerTests(unittest.TestCase):
@@ -163,6 +165,115 @@ class UpdateManagerTests(unittest.TestCase):
         self.assertIsNone(other.snapshot()['candidate'])
         self.assertEqual(other.snapshot()['phase'],'idle')
         self.assertEqual(other.snapshot()['nextCheck'],0)
+
+
+class InstallationControllerTests(unittest.TestCase):
+    """Service orchestration with an inert adapter; native/TUF proofs are separate."""
+    def setUp(self):
+        temporary=tempfile.TemporaryDirectory();self.addCleanup(temporary.cleanup)
+        self.base=Path(temporary.name).resolve();root=private_directory(self.base/'app')
+        (root/'release').mkdir()
+        (root/'release/product.json').write_text(json.dumps({'version':'1.0.0','channel':'preview',
+            'protocols':{'product':'augmentor/1'},'dataSchema':1,'readableDataSchemas':[1]}))
+        self.now=1000000;self.admission=Admission()
+        self.manager=UpdateManager(self.base/'state',root=root,admission=self.admission,clock=lambda:self.now)
+        self.addCleanup(self.manager.close)
+        self.receipts=private_directory(self.base/'receipts')
+        self.manager.installation_directory=lambda:self.receipts
+        # This adapter never launches an executable or grants install authority.
+        self.manager.automatic_capability=Mock(return_value=True)
+        self.id='a'*48
+        self.manager.launch_installer=Mock(return_value={'started':True,'attempt':self.id})
+        payload=b'Independently authored inert installer controller fixture.'
+        digest=hashlib.sha256(payload).hexdigest()
+        artifact={'role':'installer','targetPath':'releases/download/v1.1.0/app.exe','bytes':len(payload),'sha256':digest}
+        self.candidate={'version':'1.1.0','build':2,'sourceCommit':'b'*40,'channel':'preview','target':'windows-x64',
+            'installType':'windows-inno','releaseUrl':'https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/v1.1.0',
+            'protocols':{'product':'augmentor/1'},'dataSchema':1,'readableDataSchemas':[1],'minimumOS':'26200',
+            'automaticInstallQualified':True,'artifacts':[artifact]}
+        folder=private_directory(self.manager.base/'repository');file=folder/(digest+'.download')
+        file.write_bytes(payload)
+        self.manager.state.update(phase='ready',candidate=deepcopy(self.candidate),authenticated=True,
+            downloads=[{**artifact,'file':str(file)}])
+        self.manager.state['preferences'].update(automaticDownload=True,automaticInstall=True)
+        self.manager.save()
+
+    def test_download_work_ends_before_install_launch_and_close_does_not_stop_it(self):
+        def operation():self.assertEqual(self.admission.active,1)
+        def launch():
+            self.assertEqual(self.admission.active,0)
+            self.assertEqual(self.manager.state['phase'],'installing')
+            return {'started':True,'attempt':self.id}
+        self.manager.launch_installer.side_effect=launch
+        self.manager.work(operation)
+        self.assertEqual(self.manager.state['installAttempt'],self.id)
+        self.assertTrue(self.manager.snapshot()['busy'])
+        self.assertIsNone(self.manager.process)
+        with self.assertRaises(ValueError):self.manager.call('updates.cancel',{})
+        with self.assertRaises(ValueError):self.manager.call('updates.check',{})
+        self.manager.close();self.manager.launch_installer.assert_called_once()
+
+    def test_current_local_work_defers_launch_without_shutdown_or_busy_polling(self):
+        with self.admission.work():self.assertFalse(self.manager.attempt_install())
+        self.assertEqual(self.manager.state['phase'],'ready')
+        self.assertEqual(self.manager.state['nextInstallAttempt'],self.now+300)
+        self.manager.launch_installer.assert_not_called()
+        self.assertFalse(self.manager.attempt_install())
+        self.now+=300;self.assertTrue(self.manager.attempt_install())
+
+    def test_no_launch_without_consent_downloads_qualification_or_when_skipped(self):
+        original=deepcopy(self.manager.state)
+        changes=[('automaticInstall',False),('automaticDownload',False),('authenticated',False),
+                 ('downloads',[]),('qualified',False),('postponedUntil',self.now+1),
+                 ('skippedRelease',self.manager.release_id()),('installationBlocked',True)]
+        for field,value in changes:
+            with self.subTest(field=field):
+                self.manager.state=deepcopy(original)
+                if field in ('automaticInstall','automaticDownload'):self.manager.state['preferences'][field]=value
+                elif field=='qualified':self.manager.state['candidate']['automaticInstallQualified']=value
+                else:self.manager.state[field]=value
+                self.assertFalse(self.manager.attempt_install())
+        self.manager.launch_installer.assert_not_called()
+
+    def test_live_deferred_result_can_schedule_a_fresh_attempt_after_delay(self):
+        self.assertTrue(self.manager.attempt_install())
+        write_result(self.receipts,self.id,'deferred',candidate=self.candidate,transaction='c'*48,error='Busy fixture')
+        self.manager.collect_installation_result()
+        self.assertEqual(self.manager.state['phase'],'ready')
+        self.assertFalse(self.manager.state['installationBlocked'])
+        self.assertIsNone(self.manager.state['installAttempt'])
+        self.assertFalse(self.manager.attempt_install())
+        self.now+=300;self.manager.launch_installer.return_value={'started':True,'attempt':'d'*48}
+        self.assertTrue(self.manager.attempt_install())
+        self.assertEqual(self.manager.launch_installer.call_count,2)
+
+    def test_unknown_launch_or_failed_result_blocks_automatic_resubmission(self):
+        self.manager.launch_installer.side_effect=TimeoutError('Lost launch reply')
+        self.assertFalse(self.manager.attempt_install())
+        self.assertTrue(self.manager.state['installationBlocked'])
+        self.manager.state['phase']='ready';self.now+=3600
+        self.assertFalse(self.manager.attempt_install());self.manager.launch_installer.assert_called_once()
+        self.manager.launch_installer.side_effect=None;self.manager.state['installationBlocked']=False
+        self.assertTrue(self.manager.attempt_install())
+        write_result(self.receipts,self.id,'failed',error='Unknown installer outcome')
+        self.manager.collect_installation_result()
+        self.assertEqual(self.manager.state['phase'],'failed');self.assertTrue(self.manager.state['installationBlocked'])
+
+    def test_receipt_never_changes_running_identity_or_executes_recovery_reopen(self):
+        original=deepcopy(self.manager.current)
+        self.assertTrue(self.manager.attempt_install())
+        write_result(self.receipts,self.id,'target-healthy',candidate=self.candidate,transaction='e'*48,reopened=True)
+        value=self.manager.snapshot()
+        self.assertEqual(value['phase'],'installed');self.assertEqual(value['installed'],original)
+        self.manager.launch_installer.assert_called_once()
+
+    def test_invalid_result_and_invalid_persisted_launch_id_are_preserved(self):
+        self.assertTrue(self.manager.attempt_install())
+        file=self.receipts/('attempt-'+self.id+'.json');file.write_bytes(b'{"command":"untrusted"}')
+        self.manager.collect_installation_result()
+        self.assertTrue(self.manager.state['installationBlocked']);self.assertEqual(file.read_bytes(),b'{"command":"untrusted"}')
+        self.manager.state['installAttempt']='../../untrusted';self.manager.save()
+        with self.assertRaises(ValueError):UpdateManager(self.manager.base,root=self.manager.root)
 
 
 if __name__ == '__main__': unittest.main()

@@ -23,6 +23,7 @@ def main():
     parser.add_argument('--observer-endpoint',type=Path,required=True)
     parser.add_argument('--observer-parent',type=int,required=True)
     parser.add_argument('--observer-nonce',required=True)
+    parser.add_argument('--expect-deferred',action='store_true')
     args=parser.parse_args()
     if sys.platform!='win32':parser.error('Requires the native Windows kernel.')
     root=args.root.resolve();data=args.data.resolve()
@@ -57,10 +58,21 @@ def main():
         def backend(gate):
             selected=WindowsApply(gate,args.installer,args.sha256,transaction/'setup.log',qualification_outer_job=True)
             return ObservedWindowsApply(selected,peer)
-        result=authorize_update(journal,
-            lambda:WindowsPreparation(root,data/'run',data/'run/shared',owner.managed_directory()),
-            backend)
-        peer.finish(journal)
+        graph=WindowsPreparation(root,data/'run',data/'run/shared',owner.managed_directory())
+        plan=None
+        def checked(stage):
+            nonlocal plan
+            peer.live()
+            if stage=='prepared':plan=graph.reopen_plan()
+            return True
+        try:result=authorize_update(journal,lambda:graph,backend,revalidate=checked)
+        except Exception as error:
+            if not args.expect_deferred or not getattr(error,'augmentor_preparation_cancelled',None):raise
+            peer.deferred(journal,error)
+            atomic_json(transaction/'coordinator-result.json',{'deferred':True})
+            return
+        assert not args.expect_deferred, 'Busy preparation unexpectedly authorized installation.'
+        peer.finish(journal,reopen_plan=plan)
         result['independentObservationTransfer']=True
         atomic_json(transaction/'coordinator-result.json',result)
     # Return normally. Extracted Setup waits on this actual process before

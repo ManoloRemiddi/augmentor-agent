@@ -130,6 +130,8 @@ def complete_observed(observer, root, base, source, candidate, *, qualification=
                 raise ValueError('Only disposable development candidates accept qualification completion.')
             validate_target_report(raw_report,record_bytes,release,inventory,candidate)
             current=installed_identity(root)
+            if not qualification and (candidate.get('automaticInstallQualified') is not True or not current['automaticInstallQualified']):
+                raise ValueError('The installed target does not qualify the original automatic update.')
             keys=('version','build','sourceCommit','target','channel','protocols','dataSchema','readableDataSchemas','installType')
             if any(current[key]!=candidate[key] for key in keys) or current['component']!=candidate.get('component','desktop'):
                 raise ValueError('The installed build differs from the original publisher-verified candidate.')

@@ -132,6 +132,25 @@ class CoordinatorTests(unittest.TestCase):
         self.assertEqual(recovery_action(read_json(self.journal.path)),'inspect-stopped-components')
         with self.assertRaises(ValueError):self.run_update()
 
+    def test_original_cancellation_witness_requires_live_reservation_release_and_archival(self):
+        peer=self.peer
+        class Prepared:
+            def __init__(self):self.reservations=Reservations(keepalive=False);self.closed=False
+            def __enter__(self):self.reservations.prepare(peer);return self
+            def check(self):self.reservations.check()
+            def __exit__(self,*_):self.reservations.close();self.closed=True
+            @property
+            def preparation_released(self):return self.closed and self.reservations.cancelled is True
+        graph=Prepared()
+        with self.assertRaisesRegex(ValueError,'authorization changed') as caught:
+            authorize_update(self.journal,lambda:graph,self.installer,revalidate=lambda stage:stage!='prepared')
+        archive=self.journal.directory/('cancelled-'+self.journal.record['id']+'.json')
+        self.assertEqual(caught.exception.augmentor_preparation_cancelled,archive.name)
+        self.assertEqual(read_json(archive)['phase'],'cancelled')
+        self.assertFalse(self.journal.path.exists());self.assertIsNone(self.journal.fd)
+        self.assertEqual(peer.calls,['prepare','cancel']);self.assertNotIn('launch',self.order)
+        with peer.admission.work():self.assertEqual(peer.admission.active,1)
+
     def test_authority_checks_are_explicit_and_never_accept_a_truthy_result(self):
         with self.assertRaisesRegex(ValueError,'authorization changed'):
             authorize_update(self.journal,self.preparation,self.installer,revalidate=lambda _stage:{'approved':True})

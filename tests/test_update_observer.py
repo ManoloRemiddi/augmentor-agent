@@ -13,7 +13,8 @@ import unittest
 from unittest.mock import Mock
 
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'services'))
-from lifecycle.windows_update_observer import ObservedWindowsApply,CoordinatorObserver,RECORD,WRITTEN,PINNED
+from lifecycle.windows_update_observer import (ObservedWindowsApply,CoordinatorObserver,RECORD,WRITTEN,PINNED,
+                                             DEFER,DEFERRED,PLAN,validate_reopen_plan)
 from lifecycle.update_journal import UpdateJournal
 from platform_adapters.paths import private_directory
 
@@ -76,9 +77,13 @@ class ObserverJournalBindingTests(unittest.TestCase):
 
     def test_bind_only_exact_acknowledged_bytes_once(self):
         self.advance();raw=self.journal.path.read_bytes();self.peer.finish(self.journal)
-        tag,id_,digest=RECORD.unpack(self.peer.connection.sendall.call_args.args[0])
+        packet=self.peer.connection.sendall.call_args.args[0]
+        tag,id_,digest=RECORD.unpack(packet[:RECORD.size])
         self.assertEqual(tag,WRITTEN);self.assertEqual(id_.hex(),self.journal.record['id'])
         self.assertEqual(digest,hashlib.sha256(raw).digest())
+        tag,length=PLAN.unpack(packet[RECORD.size:RECORD.size+PLAN.size])
+        self.assertEqual(tag,b'PLAN')
+        self.assertEqual(json.loads(packet[-length:]),{'instances':[],'hadBrowser':False})
         with self.assertRaises(ValueError):self.peer.finish(self.journal)
         self.peer.connection.sendall.assert_called_once()
 
@@ -91,6 +96,26 @@ class ObserverJournalBindingTests(unittest.TestCase):
         with self.journal.path.open('wb') as stream:stream.write(json.dumps(changed).encode())
         with self.assertRaises(ValueError):self.peer.finish(self.journal)
         self.peer.connection.sendall.assert_not_called()
+
+    def test_live_cancellation_requires_original_exception_witness_and_exact_archive(self):
+        error=ValueError('Inert busy component')
+        archive=self.journal.cancel_preparation(lambda:True)
+        self.peer.offered=False;self.peer.connection.recv.return_value=DEFERRED
+        with self.assertRaises(ValueError):self.peer.deferred(self.journal,error)
+        self.peer.connection.sendall.assert_not_called()
+        error.augmentor_preparation_cancelled=archive.name
+        self.peer.deferred(self.journal,error)
+        tag,id_,digest=DEFER.unpack(self.peer.connection.sendall.call_args.args[0])
+        self.assertEqual(tag,b'CANC');self.assertEqual(id_.hex(),self.journal.record['id'])
+        self.assertEqual(digest,hashlib.sha256(archive.read_bytes()).digest())
+        with self.assertRaises(ValueError):self.peer.deferred(self.journal,error)
+
+    def test_reopen_plan_cannot_carry_commands_paths_or_duplicate_windows(self):
+        valid={'instances':['main','secondary'],'hadBrowser':True}
+        self.assertEqual(validate_reopen_plan(valid),valid)
+        for changes in ({'instances':['../../app']},{'instances':['main','main']},
+                        {'instances':['main --command']},{'hadBrowser':1},{'command':'shell'}):
+            with self.subTest(changes=changes),self.assertRaises(ValueError):validate_reopen_plan({**valid,**changes})
 
 
 if __name__=='__main__':unittest.main()

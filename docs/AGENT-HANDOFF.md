@@ -4,6 +4,23 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+Latest controller integration connects qualified Windows downloads to the fixed
+supervisor/bootstrap, outside the shared service's work admission. Fresh launch
+identifiers/results report status only; actual cancelled preparation can defer
+five minutes, while uncertain outcomes block replay. The original live observer
+captures instance names and reopens the health-verified target/background owner.
+SDK server kernel leases defer preparation before desktop shutdown. Completed
+temporary runtimes are cleaned only after actual holders exit; unknown attempts
+are preserved. Focused updater checks pass 134 cases (one OS skip). New full
+Windows fixtures cover busy-draft deferral and reopening and await native CI.
+Read [current controller evidence and remaining work](UPDATE-SYSTEM.md#live-installation-controller-deferral-and-reopening).
+The prior combined source `4327ffd` passes all six hosted workflows, including
+full Windows installation on both CPUs and Mac 14/26. Those passes qualify the
+earlier completion/log/exit-fence changes, not this newer controller or signed
+N-to-N+1. Automatic flags/public feed remain disabled; Linux/Mac adapters, SDK
+graceful maintenance, verified controller recovery reset and signing/publication
+remain unfinished. Nothing has been deployed to installed apps.
+
 `feat/automatic-updates` starts from main `c7f895d416e6b94ca601b66a09caf4846a64b907`.
 The branch now incorporates main `550e274d9f0c01f35c0e3b4d7d3743fed4899971`
 (dictation isolation/readiness, approved Handy and SDK alignment). All owning records

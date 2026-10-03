@@ -61,8 +61,22 @@ def coordinate(root, base, updates, shared, managed, peer, release_bytes, invent
             authority.check(stage)
             peer.live()
             return True
-        result=authorize_update(journal,
-            lambda:WindowsPreparation(root,runtime,require_directory(Path(shared)),Path(managed)),
-            backend,revalidate=revalidate)
-        peer.finish(journal)
+        graph=WindowsPreparation(root,runtime,require_directory(Path(shared)),Path(managed))
+        plan=None
+        def preparation():
+            # Capture while live, after actual discovery/reservation. Capture
+            # runs at prepared authority before any shutdown is requested.
+            return graph
+        def checked(stage):
+            nonlocal plan
+            result=revalidate(stage)
+            if stage=='prepared':plan=graph.reopen_plan()
+            return result
+        try:result=authorize_update(journal,preparation,backend,revalidate=checked)
+        except Exception as error:
+            if getattr(error,'augmentor_preparation_cancelled',None):
+                peer.deferred(journal,error)
+                return {'deferred':True}
+            raise
+        peer.finish(journal,reopen_plan=plan)
         return result

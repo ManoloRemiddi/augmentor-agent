@@ -15,7 +15,25 @@ import re
 import sys
 
 
-def run(runtime, release_digest, inventory_digest, *, bootstrap):
+def run(runtime, release_digest, inventory_digest, *, bootstrap, attempt):
+    from .attempt import attempt_id,write_result
+    attempt_id(attempt)
+    if sys.platform!='win32':raise RuntimeError('The independent Windows updater requires Windows.')
+    from platform_adapters.paths import private_directory
+    from platform_adapters.windows_identity import local_app_data
+    transaction=private_directory(local_app_data()/'Augmentor/updates')
+    progress={'coordinatorStarted':False,'candidate':None,'confirmedOutcome':None,'transactionId':None}
+    try:return _run(runtime,release_digest,inventory_digest,bootstrap=bootstrap,attempt=attempt,progress=progress)
+    except Exception as error:
+        pending=transaction/'active.json'
+        # Once a coordinator may have run, only its live confirmed cancellation
+        # can permit another attempt. Unknown outcomes are never retried.
+        outcome=progress['confirmedOutcome'] or ('failed' if progress['coordinatorStarted'] or pending.exists() or pending.is_symlink() else 'deferred')
+        write_result(transaction,attempt,outcome,error=error,candidate=progress['candidate'],transaction=progress['transactionId'])
+        raise
+
+
+def _run(runtime, release_digest, inventory_digest, *, bootstrap, attempt, progress):
     if sys.platform!='win32':raise RuntimeError('The independent Windows updater requires Windows.')
     if any(not isinstance(value,str) or not re.fullmatch('[a-f0-9]{64}',value) for value in (release_digest,inventory_digest)):
         raise ValueError('Use independently identified source digests from this fresh launch.')
@@ -30,6 +48,9 @@ def run(runtime, release_digest, inventory_digest, *, bootstrap):
     from lifecycle.windows_update_observer import ObservationServer,CoordinatorProcess
     from .installation import AutomaticInstallAuthority
     from .windows_completion import complete_observed,target_identity
+    from .windows_reopen import reopen_windows
+    from .attempt import write_result
+    from lifecycle.observer_retention import eligible
     environment=windows_environment();os.environ.update(environment)
     base=local_app_data()/'Augmentor';root=local_app_data()/'Programs/Augmentor Agent/current'
     runtime=require_directory(Path(runtime).absolute())
@@ -44,6 +65,8 @@ def run(runtime, release_digest, inventory_digest, *, bootstrap):
         # No source read, authority refresh, coordinator or drain until the
         # authenticated source bootstrap has actually exited successfully.
         bootstrap.wait_bootstrap()
+        if (transaction/'active.json').exists() or (transaction/'active.json').is_symlink():
+            raise ValueError('An earlier update needs recovery before another automatic installation.')
         # This short source scope must end before the coordinator requests the
         # startup writer or Setup seeks final exclusive installation admission.
         with ExitStack() as source_admission:
@@ -61,17 +84,37 @@ def run(runtime, release_digest, inventory_digest, *, bootstrap):
             authority=held.enter_context(AutomaticInstallAuthority(root,updates,os_version=str(sys.getwindowsversion().build)))
             source=held.enter_context(open_installed_source(base/'recovery',release,target=authority.current['target']))
             candidate=deepcopy(authority.selected);target=target_identity(candidate)
+            progress['candidate']=candidate
             installer=next(item for item in candidate['artifacts'] if item['role']=='installer')
         observer=held.enter_context(ObservationServer(transaction,target['sha256'],installer['bytes']))
+        progress['coordinatorStarted']=True
         worker=held.enter_context(CoordinatorProcess(runtime,release,inventory,observer))
-        observer.receive();observer.receive_apply()
+        if observer.receive() is None:
+            id_=observer.verify_deferred(transaction,source.identity,target)
+            progress.update(confirmedOutcome='deferred',transactionId=id_)
+            try:eligible(runtime,'deferred')
+            except (OSError,ValueError):pass  # Cleanup hints cannot invalidate observed cancellation.
+            return write_result(transaction,attempt,'deferred',candidate=candidate,transaction=id_,
+                                error='Augmentor was busy. The update will wait until it is idle.')
+        observer.receive_apply()
         if observer.wait_installer(timeout=900)!=0:
             raise RuntimeError('The installer failed. The unresolved update was preserved for inspection.')
         completion=complete_observed(observer,root,base,source.identity,candidate)
+        progress.update(confirmedOutcome='target-healthy',transactionId=observer.transaction_id)
         outcome={'schema':'augmentor-observed-update-result/1','transactionId':observer.transaction_id,
             'outcome':'target-healthy','archive':completion['archive'],'version':candidate['version'],
             'build':candidate['build'],'sourceCommit':candidate['sourceCommit'],'target':candidate['target']}
         # Completion/archival is already durable; this receipt communicates a
         # result and can never authorize install, restoration or replay.
         atomic_json(transaction/('result-'+observer.transaction_id+'.json'),outcome)
-        return outcome
+        write_result(transaction,attempt,'target-healthy',candidate=candidate,transaction=observer.transaction_id)
+        try:eligible(runtime,'target-healthy')
+        except (OSError,ValueError):pass  # Preserve installed success if temporary cleanup is unavailable.
+        # Completion is already durable. Reopening failure cannot erase that
+        # success or turn it into permission to rerun the installer.
+        try:reopen_windows(observer,root,base,candidate,completion)
+        except Exception as error:
+            return write_result(transaction,attempt,'target-healthy',candidate=candidate,
+                transaction=observer.transaction_id,error='The update is installed. Reopen Augmentor normally. '+str(error))
+        return write_result(transaction,attempt,'target-healthy',candidate=candidate,
+                            transaction=observer.transaction_id,reopened=True)

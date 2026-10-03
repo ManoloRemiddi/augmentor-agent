@@ -33,6 +33,8 @@ class AutomaticInstallAuthority:
         state=read_json(self.base/'state.json')
         if not isinstance(state,dict) or state.get('schema')!=SCHEMA or state.get('authenticated') is not True:
             raise ValueError('Automatic installation requires publisher-verified selection.')
+        if state.get('installationBlocked',False) is not False:
+            raise ValueError('Recover the earlier unknown installation before authorizing another update.')
         prefs=state.get('preferences')
         if not isinstance(prefs,dict):raise ValueError('The update consent record is invalid.')
         UpdateManager.validate_preferences(prefs)

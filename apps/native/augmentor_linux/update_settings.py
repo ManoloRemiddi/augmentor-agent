@@ -122,7 +122,7 @@ class UpdatesDialog(QDialog):
         for control in self.controls: control.setEnabled(not busy)
         self.installs.setEnabled(value['automaticInstallAvailable'] and not busy)
         self.check_button.setEnabled(not busy and not self.dirty); self.download_button.setEnabled(bool(candidate) and not busy and not self.dirty)
-        self.cancel_button.setEnabled(busy); self.release_button.setEnabled(bool(candidate))
+        self.cancel_button.setEnabled(busy and value['phase'] in ('checking','downloading')); self.release_button.setEnabled(bool(candidate))
         self.folder_button.setEnabled(value['phase'] == 'ready')
         self.remind_button.setEnabled(bool(candidate)); self.skip_button.setEnabled(bool(candidate))
         self.save_button.setEnabled(self.dirty and not busy)

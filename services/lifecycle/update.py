@@ -63,7 +63,11 @@ def authorize_update(journal, preparation, installer, *, revalidate=None):
         try:
             if (journal.record['phase'] in PREPARATION_PHASES and not journal.record['steps']
                     and not journal.uncertain and getattr(context,'preparation_released',False) is True):
-                journal.cancel_preparation(lambda: context.preparation_released)
+                archive=journal.cancel_preparation(lambda: context.preparation_released)
+                # Ephemeral evidence on this original exception, after live
+                # reservation release and successful archival. A saved phase
+                # or error message cannot synthesize this execution boundary.
+                error.augmentor_preparation_cancelled=archive.name
         except Exception:
             error.add_note('Preparation cancellation was not durably archived; retain the update record for recovery.')
         raise

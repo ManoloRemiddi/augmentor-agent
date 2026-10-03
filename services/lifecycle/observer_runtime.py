@@ -23,6 +23,8 @@ REQUIRED={'python/python.exe','services/lifecycle/windows_installer_process.py',
           'services/lifecycle/windows_update_observer.py','scripts/windows-update-coordinator.py',
           'scripts/windows-update-observer.py','services/updates/windows_driver.py',
           'scripts/windows-update-bootstrap.py','services/updates/windows_bootstrap.py',
+          'services/updates/attempt.py','services/updates/windows_reopen.py',
+          'services/lifecycle/observer_retention.py','services/lifecycle/sdk_launch_lease.py',
           'services/updates/windows_coordinator.py','services/updates/installation.py'}
 
 

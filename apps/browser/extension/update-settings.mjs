@@ -55,7 +55,7 @@ export async function updateSettings(container,send,{registerDirty=()=>{}}={}){
     save.disabled=!state||busy||working||!dirty;reload.disabled=busy
     check.disabled=!state||busy||working||dirty
     download.disabled=check.disabled||!state?.candidate
-    cancel.disabled=busy||!working
+    cancel.disabled=busy||!working||!['checking','downloading'].includes(state?.phase)
     folder.disabled=busy||state?.phase!=='ready'
     remind.disabled=skip.disabled=busy||!state?.candidate
   }

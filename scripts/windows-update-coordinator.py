@@ -28,6 +28,7 @@ def main():
     args=parser.parse_args()
     if sys.platform!='win32':parser.error('Requires the native Windows kernel.')
     from lifecycle.observer_runtime import verify_observer_runtime
+    from lifecycle.observer_retention import retain
     from lifecycle.payload_integrity import _read,MAX_INVENTORY
     from lifecycle.windows_update_observer import CoordinatorObserver
     from platform_adapters.paths import windows_environment,private_directory
@@ -44,6 +45,7 @@ def main():
         if not re.fullmatch('[a-f0-9]{64}',expected) or hashlib.sha256(raw).hexdigest()!=expected:
             raise ValueError('The source changed after independent observer launch.')
     verify_observer_runtime(ROOT,release,inventory)
+    retain(ROOT)
     shared=Path(environment['AUGMENTOR_SHARED_STATE'])
     data=Path(os.environ.get('AUGMENTOR_SHARED_DATA',Path(environment['XDG_DATA_HOME'])/'augmentor'))
     # Shared update settings/cache are distinct from the native install journal.

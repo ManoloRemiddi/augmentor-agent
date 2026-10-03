@@ -70,6 +70,11 @@ class InstallationAuthorityTests(unittest.TestCase):
                 with self.assertRaises(ValueError):self.authority().__enter__()
                 self.assertEqual(self.calls,0)
 
+    def test_unknown_prior_installation_blocks_fresh_authority_even_after_a_check(self):
+        self.state['installationBlocked']=True;self.save()
+        with self.assertRaisesRegex(ValueError,'unknown installation'):self.authority().__enter__()
+        self.assertEqual(self.calls,0)
+
     def test_unqualified_source_unsigned_selection_incomplete_or_corrupt_download_cannot_enter(self):
         self.receipt['update']['automaticInstallQualified']=False;self.write_receipt()
         with self.assertRaisesRegex(ValueError,'qualify'):self.authority().__enter__()

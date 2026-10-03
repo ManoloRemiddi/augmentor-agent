@@ -78,7 +78,7 @@ def main():
     def ready():
         deadline = time.monotonic()+30
         while time.monotonic()<deadline:
-            assert child.poll() is None, 'Installed Augmentor exited before readiness.'
+            if child is not None:assert child.poll() is None, 'Installed Augmentor exited before readiness.'
             try:
                 state = inspect()
                 if state['visible']: return state
@@ -90,9 +90,14 @@ def main():
             env={**os.environ,'QT_QPA_PLATFORM':'windows','QSG_RHI_PREFER_SOFTWARE_RENDERER':'1'},
             stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     def close_preview():
-        result = command('maintenance.close')
-        assert result.get('accepted'), result
-        assert child.wait(timeout=20)==0
+        from lifecycle.windows_components import WindowParticipant
+        observed=WindowParticipant(data/'run'/(ipc_basename('main')+'.sock'),install/'current')
+        try:
+            result = command('maintenance.close')
+            assert result.get('accepted'), result
+            assert observed.exited(timeout=20), 'The observed installed window did not exit.'
+            if child is not None:assert child.wait(timeout=20)==0
+        finally:observed.close()
     try:
         setup('initial')
         cached_installer = data/'recovery'/(report['sha256']+'.exe')
@@ -220,6 +225,22 @@ def main():
         verify_observer_runtime(staged_observer,source_release,source_inventory)
         python_digest=json.loads(source_inventory)['files']['python/python.exe']['sha256']
         transaction=data/'updates';result_path=transaction/'coordinator-result.json'
+        command('ui-test:'+json.dumps({'action':'draft','expected':'','text':'Preserve this deferred update draft'}))
+        with ObservationServer(private_directory(data/'update-observation'),report['sha256'],artifact.stat().st_size) as deferred:
+            with InstallerProcess(staged_observer/'python/python.exe',python_digest,
+                ['-I','-Xutf8','-B',str(staged_observer/'scripts/windows-application-update-proof.py'),
+                 '--root',str(install/'current'),'--data',str(data),'--installer',str(artifact),
+                 '--sha256',report['sha256'],'--expect-deferred',*deferred.arguments()],
+                    qualification_outer_job=True,allow_child_breakaway=True) as busy_worker:
+                deferred.bind(busy_worker)
+                assert deferred.receive(timeout=120) is None
+                cancelled=deferred.verify_deferred(transaction,source_identity,source_identity)
+                assert read_json(transaction/('cancelled-'+cancelled+'.json'))['phase']=='cancelled'
+        assert not (transaction/'active.json').exists()
+        assert child.poll() is None and inspect()['draft']=='Preserve this deferred update draft'
+        assert sentinel.read_bytes()==sentinel_bytes
+        command('ui-test:'+json.dumps({'action':'draft','expected':'Preserve this deferred update draft','text':''}))
+        stages.append('live-busy-update-deferral-with-cancelled-reservations-and-draft-preserved')
         live_observer=ObservationServer(private_directory(data/'update-observation'),report['sha256'],artifact.stat().st_size)
         coordinator=InstallerProcess(staged_observer/'python/python.exe',python_digest,
             ['-I','-Xutf8','-B',str(staged_observer/'scripts/windows-application-update-proof.py'),
@@ -321,9 +342,29 @@ def main():
         assert report['payloadIntegrity']['complete'] and sentinel.read_bytes()==sentinel_bytes
         assert read_json(archive)['phase']=='complete' and not (transaction/'active.json').exists()
         report['archivedUpdate']=archive.name
-        live_observer.close();coordinator.close()
         stages.append('live-independent-target-inventory-health-and-exact-build-completion')
-        child=open_preview();ready();close_preview();child=None
+        from updates.windows_reopen import reopen_windows
+        reopened=reopen_windows(live_observer,install/'current',data,candidate,completion,qualification=True)
+        assert reopened=={'instances':['main'],'browserReloadRequired':False}, reopened
+        ready();close_preview()
+        # Close the newly restored idle owner normally before the later damage
+        # fixture. These are live reservations, never saved commands or PIDs.
+        from lifecycle.windows_preparation import WindowsPreparation
+        from lifecycle.admission import MaintenanceBusy
+        deadline=time.monotonic()+60
+        while True:
+            reopened_graph=WindowsPreparation(install/'current',data/'run',data/'run/shared',data/'data/augmentor/managed-dsh')
+            try:reopened_graph.__enter__()
+            except MaintenanceBusy:
+                if not reopened_graph.preparation_released or time.monotonic()>=deadline:raise
+                time.sleep(.1)
+            else:break
+        try:
+            reopened_graph.drain(checkpoint=lambda phase,participant:atomic_json(out/'reopened-drain.json',
+                {'phase':phase,'kind':type(participant).__name__}))
+        finally:reopened_graph.close()
+        live_observer.close();coordinator.close()
+        stages.append('live-completed-target-reopens-captured-window-and-background-owner')
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER,report['startupKey'],0,winreg.KEY_READ|winreg.KEY_SET_VALUE) as key:
             try: winreg.QueryValueEx(key,'Augmentor Agent')
             except FileNotFoundError: pass

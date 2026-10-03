@@ -8,6 +8,7 @@ channel retains observation, never supplies publisher/consent/apply authority.
 The caller must keep the parent runtime outside the replaceable installation.
 """
 import math
+import json
 import os
 from pathlib import Path
 import re
@@ -31,6 +32,19 @@ PINNED=b'PINNED\0\0'
 RELEASED=b'RELEASED'
 TRANSFER=struct.Struct('<4sQQQ')
 RECORD=struct.Struct('<8s24s32s')
+DEFER=struct.Struct('<4s24s32s')
+DEFERRED=b'DEFERRED'
+PLAN=struct.Struct('<4sH')
+
+
+def validate_reopen_plan(plan):
+    if (not isinstance(plan,dict) or set(plan)!={'instances','hadBrowser'} or
+            type(plan['hadBrowser']) is not bool or not isinstance(plan['instances'],list) or
+            len(plan['instances'])>64 or
+            any(not isinstance(name,str) or not re.fullmatch('[a-z][a-z0-9-]{0,31}',name) for name in plan['instances']) or
+            len(set(plan['instances']))!=len(plan['instances'])):
+        raise ValueError('Reopen only the bounded names of actually observed instances.')
+    return {'instances':list(plan['instances']),'hadBrowser':plan['hadBrowser']}
 
 
 def _windows():
@@ -58,6 +72,8 @@ class ObservationServer:
         self.listener=PipeListener(self.endpoint)
         self.worker=self.connection=self.observation=None
         self.transaction_id=self.record_sha256=None
+        self.cancelled=None
+        self.reopen_plan={'instances':[],'hadBrowser':False}
         self.claimed=self.acknowledged=self.closed=False
 
     def arguments(self):
@@ -112,7 +128,13 @@ class ObservationServer:
         # the graph before Setup even launches. This wait is separate from the
         # subsequent short native READY/APPLY lifetime and remains bounded.
         self.connection.settimeout(max(.001,deadline-time.monotonic()))
-        packet=read_exact(self.connection,TRANSFER.size)
+        tag=read_exact(self.connection,4)
+        if tag==b'CANC':
+            _,id_,digest=DEFER.unpack(tag+read_exact(self.connection,DEFER.size-4))
+            self.cancelled={'id':id_.hex(),'sha256':digest.hex()}
+            self.connection.sendall(DEFERRED)
+            return None
+        packet=tag+read_exact(self.connection,TRANSFER.size-4)
         tag,job,process,file=TRANSFER.unpack(packet)
         if tag!=b'CAPS':raise ValueError('Unsupported live installer observation.')
         # These handle values exist only in this recipient's kernel table and
@@ -141,8 +163,28 @@ class ObservationServer:
         tag,id_,digest=RECORD.unpack(read_exact(self.connection,RECORD.size))
         if tag!=WRITTEN:raise ValueError('The coordinator did not bind its durable acknowledged update.')
         self.transaction_id=id_.hex();self.record_sha256=digest.hex()
+        tag,length=PLAN.unpack(read_exact(self.connection,PLAN.size))
+        if tag!=b'PLAN' or not 0<length<=4096:raise ValueError('Unsupported live reopen plan.')
+        self.reopen_plan=validate_reopen_plan(json.loads(read_exact(self.connection,length)))
         self.connection.sendall(PINNED)
         self.acknowledged=True
+
+    def verify_deferred(self, directory, source, target, timeout=30):
+        """A live cancelled preparation is a result, never apply authority."""
+        if self.closed or self.cancelled is None or self.observation is not None:
+            raise ValueError('No live cancellation observation was received.')
+        if not math.isfinite(timeout) or not 0<timeout<=60:raise ValueError('Use a bounded coordinator exit observation.')
+        if self.worker.wait(timeout=timeout)!=0:raise ValueError('The cancellation coordinator did not exit successfully.')
+        from .payload_integrity import _read,_json
+        from .update_journal import validate
+        import hashlib
+        raw=_read(Path(directory)/('cancelled-'+self.cancelled['id']+'.json'),65536)
+        record=validate(_json(raw,65536))
+        if (hashlib.sha256(raw).hexdigest()!=self.cancelled['sha256'] or
+                record['id']!=self.cancelled['id'] or record['source']!=source or record['target']!=target or
+                record['phase']!='cancelled' or record['steps']):
+            raise ValueError('The cancellation archive differs from this live preparation.')
+        return record['id']
 
     def wait_installer(self, timeout=900):
         if self.closed or self.observation is None:raise ValueError('No live installer observation is held.')
@@ -250,7 +292,7 @@ class CoordinatorObserver:
         self.acknowledged=True
         self.connection.sendall(ACKED)
 
-    def finish(self, journal):
+    def finish(self, journal, *, reopen_plan=None):
         if (self.closed or not self.acknowledged or self.finished or journal.fd is None or
                 journal.uncertain or journal.record['phase']!='apply-acknowledged'):
             raise ValueError('Bind only this live writer\'s durably acknowledged update.')
@@ -261,9 +303,28 @@ class CoordinatorObserver:
         raw=_read(journal.path,65536)
         record=validate(_json(raw,65536))
         if record!=journal.record:raise ValueError('The active update changed before observer handoff.')
-        self.connection.sendall(RECORD.pack(WRITTEN,bytes.fromhex(record['id']),hashlib.sha256(raw).digest()))
+        plan=validate_reopen_plan(reopen_plan if reopen_plan is not None else {'instances':[],'hadBrowser':False})
+        encoded=json.dumps(plan,separators=(',',':')).encode('ascii')
+        self.connection.sendall(RECORD.pack(WRITTEN,bytes.fromhex(record['id']),hashlib.sha256(raw).digest())+
+                                PLAN.pack(b'PLAN',len(encoded))+encoded)
         if read_exact(self.connection,len(PINNED))!=PINNED:
             raise ValueError('The independent observer did not retain this exact update record.')
+
+    def deferred(self, journal, error):
+        if (self.closed or self.offered or self.finished or journal.uncertain or journal.fd is not None or
+                journal.record['phase']!='cancelled' or journal.record['steps'] or
+                getattr(error,'augmentor_preparation_cancelled',None)!='cancelled-'+journal.record['id']+'.json'):
+            raise ValueError('Report only this live attempt\'s confirmed pre-drain cancellation.')
+        from .payload_integrity import _read,_json
+        from .update_journal import validate
+        import hashlib
+        raw=_read(journal.directory/getattr(error,'augmentor_preparation_cancelled'),65536)
+        if validate(_json(raw,65536))!=journal.record:
+            raise ValueError('The cancellation archive changed before handoff.')
+        self.finished=True
+        self.connection.sendall(DEFER.pack(b'CANC',bytes.fromhex(journal.record['id']),hashlib.sha256(raw).digest()))
+        if read_exact(self.connection,len(DEFERRED))!=DEFERRED:
+            raise ValueError('The independent parent did not observe cancellation.')
 
     def close(self):
         if self.closed:return

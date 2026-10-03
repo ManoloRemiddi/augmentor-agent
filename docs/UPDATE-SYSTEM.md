@@ -135,6 +135,69 @@ off, including after restart.
 
 ## Installation authority integration in progress
 
+### Live installation controller, deferral and reopening
+
+The Windows controller now connects the shared download service to the fixed
+supervisor launch. It dispatches only after leaving its own maintenance work
+admission, with both download/install consent, a fully downloaded authenticated
+candidate and qualified source/target. The external bootstrap and coordinator
+still independently recheck publisher authority and consent. Canonical per-user
+installation/data locations are required; custom locations retain manual delivery.
+No customer build or feed is enabled by this integration.
+
+Each launch has a fresh identifier and a bounded private result. Results report
+status only: they cannot run commands or change the cached running identity.
+Confirmed pre-drain cancellation requires live reservation release, durable
+cancellation archival, the original coordinator's private handoff and its actual
+whole-process-range exit. Busy work then waits five minutes. Lost launch replies,
+invalid results and uncertain post-shutdown failures block automatic retries and
+preserve recovery records. Cancelling a download never terminates Setup. Skipping,
+postponing or revoking consent remains checked before APPLY.
+
+The original observer receives instance names from the actual reserved graph.
+After exact target completion, it rechecks current inventory/identity and launches
+only the fixed installed executable for those instances and the background owner.
+Browser pages keep their normal native reconnection/reload path. Reopening failure
+does not erase successful installation or authorize rerunning Setup. Local cleanup
+failures likewise cannot reclassify an observed completion as failed installation.
+
+Windows SDK launchers register a kernel lease while embedded servers run.
+Preparation checks this lease before closing any desktop component and defers
+until those servers close normally. This preserves work but does not yet implement
+automatic graceful maintenance/reopening of SDK servers. Temporary observer code
+has a separate lease retained until actual process exit. The next bootstrap cleans
+only marked, completed/deferred public-code runtimes after obtaining their exclusive
+lease; unknown attempts and linked trees remain preserved.
+
+The focused portable suite passes 134 cases (133 passed, one OS skip), including
+live child-process lease/cleanup tests and the real reservation cancellation
+witness. Controller launch tests use an inert adapter and prove scheduling/status
+boundaries, not publisher or native installation acceptance. The full Windows
+fixture now exercises actual busy-draft deferral and actual completed-target
+reopening; fresh native x64/ARM64 results are required for this revision.
+Broader isolated source checks pass 908 Python/Qt cases (869 passed, 39 skips),
+529 Node cases (527 passed, two skips), all 92 Browser cases and type checks.
+These runs use locked DSH dependencies and separate dictation fixture state;
+they do not touch the owner's display, tasks or installed application.
+
+Earlier source `4327ffd6f2cc24a5ae0f7c07f704fb1f1af27078` passes
+[full Windows qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37126091855),
+[installer feasibility](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37126091832),
+[Windows Desktop](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37126091824),
+[Mac 14/26](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37126091975),
+[shared validation](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37126092000)
+and [SDK platform contracts](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37126091829).
+This confirms the prior log-reader correction and actual bootstrap-exit fence,
+including nonzero refusal. Full installation remains an unpublished same-build
+fixture; these passes do not qualify signed N-to-N+1 or the newer controller.
+
+Linux/Mac automatic installation adapters, signed N-to-N+1 health/recovery,
+signing-key custody/root rotation and public feed provisioning remain open.
+Same-build source restoration also needs a verified controller recovery/reset
+path; a saved receipt alone must never restart installation. The subsequent
+subsections retain earlier implementation checkpoints and pending evidence as
+history; this subsection is the current controller status.
+
 The shared coordinator now accepts an explicit `revalidate(stage)` guard before
 preparation, before any reserved peer drains, and after independent installer
 readiness immediately before the durable apply intent. Only literal `True`
