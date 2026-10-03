@@ -253,13 +253,21 @@ class VoiceSettingsDialog(QDialog):
         provider=self.provider.currentData()
         self.work(lambda:select_provider(provider),self.loaded)
 
+    def show_configuration(self,dialog_type):
+        panel=getattr(self.owner,'settings_panel',None)
+        if panel is not None and hasattr(panel,'open_editor'):
+            panel.open_editor('Voice',lambda:dialog_type(self.owner))
+            return True
+        dialog_type(self.owner).exec()
+        return False
+
     def configure_local(self):
         self.owner.close_voice_panel()
         from .voice_provider import select_provider
         def show(result):
             self.loaded(result)
             if result[1]:return
-            LocalVoiceSettingsDialog(self.owner).exec()
+            if self.show_configuration(LocalVoiceSettingsDialog):return
             self.mode.setCurrentIndex(self.mode.findData(self.owner.preferences.values['voice_mode']))
             self.pause.setValue(self.owner.preferences.values['voice_pause_ms'])
             self.work(self.read_status,self.loaded)
@@ -271,7 +279,7 @@ class VoiceSettingsDialog(QDialog):
         def show(result):
             self.loaded(result)
             if result[1]:return
-            CloudVoiceSettingsDialog(self.owner).exec()
+            if self.show_configuration(CloudVoiceSettingsDialog):return
             self.work(self.read_status,self.loaded)
         self.work(lambda:select_provider('openai-live'),show)
 

@@ -151,6 +151,19 @@ class ProviderUiTests(unittest.TestCase):
             self.assertIn('needs setup',window.voice_button.accessibleName())
             window.preferences.persistent=False;dialog.close();window.close()
 
+    def test_configuration_stays_inside_an_existing_settings_frame(self):
+        window=Window(preview=True)
+        opened=[]
+        window.settings_panel=SimpleNamespace(open_editor=lambda title,factory:opened.append((title,factory)),update_activity=lambda:None)
+        with patch.object(VoiceSettingsDialog,'work',lambda *args:None):
+            dialog=VoiceSettingsDialog(window)
+            with patch.object(CloudVoiceSettingsDialog,'exec',side_effect=AssertionError('nested modal loop')):
+                self.assertTrue(dialog.show_configuration(CloudVoiceSettingsDialog))
+                self.assertEqual(opened[0][0],'Voice')
+                child=opened[0][1]();self.assertIsInstance(child,CloudVoiceSettingsDialog);child.close()
+            dialog.close()
+        window.settings_panel=None;window.close()
+
     def test_cloud_setup_masks_key_and_clears_it_when_closed(self):
         from PySide6.QtWidgets import QLineEdit
         window=Window(preview=True);dialog=CloudVoiceSettingsDialog(window)

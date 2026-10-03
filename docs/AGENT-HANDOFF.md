@@ -4,6 +4,17 @@
 
 
 
+## October 3 voice build compatibility
+
+The Voice provider hub now keeps local/cloud configuration inside an existing
+embedded settings frame when the installed application has one. It falls back to
+the established dialog lifecycle on builds without that frame. Both paths keep
+the active app model unchanged. Focused voice qualification: 103 native cases
+passed, including an embedded configuration proof. The Linux package CI now
+installs sounddevice/PortAudio before audio-readiness tests; pure configuration
+unit cases mock device readiness explicitly. See [Voice providers](VOICE-PROVIDERS.md)
+for deployment evidence and live API limitations.
+
 ## Voice provider implementation — October 3
 
 The owner requested Voice On/Off with local Resonant Voice and OpenAI GPT-Live
