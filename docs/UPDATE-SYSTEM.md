@@ -226,6 +226,36 @@ updater set now passes 109 cases (108 passed, one OS skip). Supervisor/service
 launch integration, independent target completion and actual signed N-to-N+1
 qualification remain open; no build's automatic-install flag is enabled.
 
+The separate-process exact-template cases now pass both CPUs at PR head `5d9c0ef`
+([run 37119738791](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37119738791)),
+with sixteen recorded template stages. This uses native private Python/bootstrap
+and inert application components, not full application or cross-version evidence.
+That workflow still fails overall on x64: a separate WinSparkle negative-metadata
+case correctly recorded `callbackFailed`/no handled download, then hung joining its
+modal error UI. The disposable fixture now dismisses only its own windows throughout
+bounded native cleanup; fresh qualification is required. macOS 14/26 and Windows
+Desktop x64/ARM64 both pass the same head (37119738882 and 37119738796).
+
+The newer `windows_completion.py` now observes the same trusted target installer's
+read-only target-health mode after actual coordinator/Setup Jobs exit. Native reports
+include the independently extracted inventory digest as well as the release digest.
+The parent requires exact original candidate build/protocol/component identity,
+retained installer selection, all inventory bytes and local Qt health. It reacquires
+startup/installation read admission and the journal writer before completing.
+The live coordinator also sends its exact acknowledged transaction ID and record
+digest before exit; neither a later same-pair journal nor a changed snapshot can
+complete this original attempt. The journal pin closes before durable archival,
+while writer/read admission stays held. Failed/unknown inspections preserve the
+active record and cannot launch normal application work or restore/replay.
+
+Four portable report-binding cases and three live-writer snapshot cases pass;
+the focused updater total is now 116 (115 passed, one OS skip). The full native
+same-build fixture now calls this completion path using a numbered **unpublished
+development fixture** (sequence 1, customer distribution/automatic qualification
+false). It needs fresh native qualification and is never a public build sequence
+or signed feed input. Full forward signed N-to-N+1, supervisor launch and appropriate
+instance reopen remain unfinished; the manager still cannot offer installation.
+
 Shared repository-helper operations now hold one private kernel cache-writer lock
 across the entire child operation. This prevents service/coordinator concurrency
 from overwriting a newer observed TUF rollback floor with older metadata. Waiting

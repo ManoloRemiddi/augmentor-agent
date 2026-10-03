@@ -673,6 +673,27 @@ kill-on-close. Five portable refusal/unknown-acknowledgment wrapper cases pass.
 The owning service/supervisor launch, target-health completion, restart and signed
 cross-version qualification remain pending; no qualified automatic flag is set.
 
+Separate-process template observation now passes both CPUs at PR head `5d9c0ef`
+(37119738791, sixteen template stages), with inert app components. The overall x64
+workflow fails in a separate rejected-metadata WinSparkle fixture's modal cleanup;
+its progress confirms refusal and the own-process dismissal race is corrected.
+Mac 14/26 and Windows Desktop checks pass that head. Full installed-app observation
+requires fresh qualification and is still distinct from a signed forward update.
+
+`updates/windows_completion.py` now composes the original live Setup/coordinator
+exit observations with a separate exact-target installer's read-only target health.
+The native report binds release and inventory digests; fresh parent read/writer
+admission compares the full installed inventory, selection and original candidate
+build/protocol/component before archival. The coordinator forwards its exact
+acknowledged transaction ID/snapshot digest over live IPC; a replacement journal,
+even with the same release pair, cannot be completed by this observer. Failed
+or unknown health preserves the active record. A deny-delete journal pin is closed
+before durable archival while writer/startup/installation admission remains held.
+Four portable report and three snapshot fault tests pass (focused updater total
+116, one OS skip). The full native same-build fixture uses this path with an
+explicitly unpublished numbered development artifact; new native qualification,
+product launch/reopen and signed N-to-N+1 remain required.
+
 An actual ARM64 full-application recovery at `97837de` crossed its former five-minute
 Setup observation deadline; its inner log records successful installation afterward.
 The observer preserves the recovery and never restarts that Setup. It now observes

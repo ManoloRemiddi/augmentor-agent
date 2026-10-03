@@ -64,6 +64,21 @@ Its worker Job permits separately observed Setup breakaway without kill-on-close
 Five portable fault cases and the focused updater set pass (109 tests, one skip).
 The service/supervisor still must launch the independent parent and complete target
 health/restart; the fixed worker is not a complete production update controller.
+At `5d9c0ef`, separate-process template observation passes both CPUs (sixteen
+recorded stages in 37119738791); the overall x64 workflow fails later in a separate
+negative WinSparkle callback's modal cleanup. Recorded progress confirms refusal;
+continuous own-process-only dismissal now addresses that fixture race. macOS 14/26
+and Windows Desktop both CPUs pass that head (37119738882/37119738796).
+The newer target completion composes actual live Setup/coordinator exit with
+independent exact-target inventory/Qt health, current candidate build/selection and
+fresh admission/writer. Native reports now bind inventory digest, and the live
+coordinator forwards its acknowledged journal ID/hash to prevent completing a
+replacement same-pair record. Focused updater tests pass 116 cases (one skip),
+including four target report and three snapshot failures. The full native fixture
+now uses this path with sequence 1 only for an unpublished development artifact;
+customer distribution/automatic qualification stay false. Do not publish its
+number or treat it as signed N-to-N+1. Fresh native completion qualification,
+supervisor/service launch, appropriate reopen and the other platforms remain open.
 Root
 rotation/CI custody, public feed provisioning, external installation adapters,
 final consent/revocation and N-to-N+1 health/recovery remain open. Do not narrow the goal to

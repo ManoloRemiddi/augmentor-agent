@@ -61,6 +61,8 @@ def coordinate(root, base, updates, shared, managed, peer, release_bytes, invent
             authority.check(stage)
             peer.live()
             return True
-        return authorize_update(journal,
+        result=authorize_update(journal,
             lambda:WindowsPreparation(root,runtime,require_directory(Path(shared)),Path(managed)),
             backend,revalidate=revalidate)
+        peer.finish(journal)
+        return result

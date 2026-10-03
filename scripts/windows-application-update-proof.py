@@ -60,6 +60,7 @@ def main():
         result=authorize_update(journal,
             lambda:WindowsPreparation(root,data/'run',data/'run/shared',owner.managed_directory()),
             backend)
+        peer.finish(journal)
         result['independentObservationTransfer']=True
         atomic_json(transaction/'coordinator-result.json',result)
     # Return normally. Extracted Setup waits on this actual process before

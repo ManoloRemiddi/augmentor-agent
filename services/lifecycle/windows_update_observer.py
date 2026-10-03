@@ -26,7 +26,10 @@ RETAINED=b'RETAINED'
 CHECK=b'CHECK\0\0\0'
 ACTIVE=b'ACTIVE\0\0'
 ACKED=b'ACKED\0\0\0'
+WRITTEN=b'WRITTEN\0'
+PINNED=b'PINNED\0\0'
 TRANSFER=struct.Struct('<4sQQQ')
+RECORD=struct.Struct('<8s24s32s')
 
 
 def _windows():
@@ -53,6 +56,7 @@ class ObservationServer:
         self.sha256,self.length=sha256,length
         self.listener=PipeListener(self.endpoint)
         self.worker=self.connection=self.observation=None
+        self.transaction_id=self.record_sha256=None
         self.claimed=self.acknowledged=self.closed=False
 
     def arguments(self):
@@ -122,6 +126,11 @@ class ObservationServer:
         self.connection.settimeout(12)
         if read_exact(self.connection,len(ACKED))!=ACKED:
             raise ValueError('The native APPLY acknowledgment was not delivered. Preserve the transaction.')
+        self.connection.settimeout(60)
+        tag,id_,digest=RECORD.unpack(read_exact(self.connection,RECORD.size))
+        if tag!=WRITTEN:raise ValueError('The coordinator did not bind its durable acknowledged update.')
+        self.transaction_id=id_.hex();self.record_sha256=digest.hex()
+        self.connection.sendall(PINNED)
         self.acknowledged=True
 
     def wait_installer(self, timeout=900):
@@ -168,6 +177,7 @@ class CoordinatorObserver:
         from platform_adapters.windows_pipe import PipeSocket
         self.parent=None;self.connection=PipeSocket()
         self.offered=self.retained=self.checked=self.acknowledged=self.closed=False
+        self.finished=False
         try:
             self.connection.settimeout(5);self.connection.connect(endpoint)
             if self.connection.verify_peer()!=parent:raise PermissionError('The live observer belongs to a different process.')
@@ -184,10 +194,12 @@ class CoordinatorObserver:
         self.offered=True
         _alive(self.parent)
         packet=installer.transfer_observation(self.parent)
+        self.connection.settimeout(20)
         self.connection.sendall(TRANSFER.pack(b'CAPS',packet['job'],packet['process'],packet['file']))
         if read_exact(self.connection,len(RETAINED))!=RETAINED:
             raise ValueError('Independent Setup observation was not confirmed. No APPLY was authorized.')
         self.retained=True
+        self.connection.settimeout(5)
 
     def live(self):
         if self.closed:raise ConnectionError('The live update observer is closed.')
@@ -205,6 +217,21 @@ class CoordinatorObserver:
         if self.closed or not self.checked or self.acknowledged:raise ValueError('The observation acknowledgment is one-shot.')
         self.acknowledged=True
         self.connection.sendall(ACKED)
+
+    def finish(self, journal):
+        if (self.closed or not self.acknowledged or self.finished or journal.fd is None or
+                journal.uncertain or journal.record['phase']!='apply-acknowledged'):
+            raise ValueError('Bind only this live writer\'s durably acknowledged update.')
+        self.finished=True
+        from .payload_integrity import _read,_json
+        from .update_journal import validate
+        import hashlib
+        raw=_read(journal.path,65536)
+        record=validate(_json(raw,65536))
+        if record!=journal.record:raise ValueError('The active update changed before observer handoff.')
+        self.connection.sendall(RECORD.pack(WRITTEN,bytes.fromhex(record['id']),hashlib.sha256(raw).digest()))
+        if read_exact(self.connection,len(PINNED))!=PINNED:
+            raise ValueError('The independent observer did not retain this exact update record.')
 
     def close(self):
         if self.closed:return

@@ -41,6 +41,7 @@ def main():
     # Never log arbitrary full filenames from a damaged tree. Counts suffice
     # for this independent observer; detailed repair policy stays separate.
     report={'schema':'augmentor-payload-inspection/1','releaseSHA256':digest,
+        'inventorySHA256':hashlib.sha256(inventory).hexdigest(),
         'complete':result['complete'],'files':result['files'],'bytes':result['bytes'],
         'differences':{name:len(result[name]) for name in
             ('missing','changed','unexpected','missingDirectories','unexpectedDirectories')}}

@@ -52,6 +52,7 @@ def main():
         backend.wait_ready()
         journal.advance('installer-ready');journal.advance('apply-intent')
         backend.authorize();journal.advance('apply-acknowledged')
+        peer.finish(journal)
         atomic_json(observation/'ready.json',{'coordinatorPid':os.getpid(),
             'independentObservationTransfer':True})
     # Setup requires this actual process exit before acquiring final admission.

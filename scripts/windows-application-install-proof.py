@@ -41,7 +41,7 @@ def main():
     sentinel_bytes = sentinel.read_bytes()
     registry = 'Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\'+report['applicationId']+'_is1'
     flags = ['/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-']
-    child = None; removal = None; stages = []
+    child = None; removal = None; stages = [];live_observer=None;coordinator=None
     def run(command, *, success=True, timeout=900):
         argv = list(map(str,command))
         process = OwnedProcess(argv, stdin=subprocess.DEVNULL)
@@ -220,20 +220,18 @@ def main():
         verify_observer_runtime(staged_observer,source_release,source_inventory)
         python_digest=json.loads(source_inventory)['files']['python/python.exe']['sha256']
         transaction=data/'updates';result_path=transaction/'coordinator-result.json'
-        with ObservationServer(private_directory(data/'update-observation'),report['sha256'],artifact.stat().st_size) as observer:
-            coordinator=InstallerProcess(staged_observer/'python/python.exe',python_digest,
-                ['-I','-Xutf8','-B',str(staged_observer/'scripts/windows-application-update-proof.py'),
-                 '--root',str(install/'current'),'--data',str(data),'--installer',str(artifact),
-                 '--sha256',report['sha256'],*observer.arguments()],qualification_outer_job=True,allow_child_breakaway=True)
-            try:
-                observer.bind(coordinator)
-                setup_observation=observer.receive(timeout=120)
-                try:setup_observation.wait(timeout=.01)
-                except TimeoutError:pass
-                else:raise AssertionError('The real Setup exited before native APPLY.')
-                observer.receive_apply()
-                assert observer.wait_installer(timeout=900)==0
-            finally:coordinator.close()
+        live_observer=ObservationServer(private_directory(data/'update-observation'),report['sha256'],artifact.stat().st_size)
+        coordinator=InstallerProcess(staged_observer/'python/python.exe',python_digest,
+            ['-I','-Xutf8','-B',str(staged_observer/'scripts/windows-application-update-proof.py'),
+             '--root',str(install/'current'),'--data',str(data),'--installer',str(artifact),
+             '--sha256',report['sha256'],*live_observer.arguments()],qualification_outer_job=True,allow_child_breakaway=True)
+        live_observer.bind(coordinator)
+        setup_observation=live_observer.receive(timeout=120)
+        try:setup_observation.wait(timeout=.01)
+        except TimeoutError:pass
+        else:raise AssertionError('The real Setup exited before native APPLY.')
+        live_observer.receive_apply()
+        assert live_observer.wait_installer(timeout=900)==0
         result=read_json(result_path)
         assert result['coordinatorMustExit'] and not result['installationComplete']
         assert result['independentObservationTransfer'] is True
@@ -305,19 +303,26 @@ def main():
         from lifecycle.update_journal import UpdateJournal
         from lifecycle.payload_integrity import inspect_payload
         inventory=(args.root/'payload-integrity.json').read_bytes()
-        def local_health(_record):
-            assert package.digest(artifact)==report['sha256']
-            integrity=inspect_payload(install/'current',metadata,inventory)
-            assert integrity['complete'],integrity
-            report['payloadIntegrity']=integrity
-            health=verify_local_health(install/'current',metadata,qualification=data)
-            assert (transaction/'active.json').read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
-            assert not list((data/'health-probes').iterdir())
-            report['localHealth']=health
-            return True
-        archive=UpdateJournal.complete_verified(transaction,source_identity,source_identity,local_health)
+        from updates.windows_completion import complete_observed
+        # This same-build catalog is synthetic and never signed/published. Only
+        # the read-only completion boundary is qualified here; forward publisher
+        # authority and N-to-N+1 are separate remaining proofs.
+        fixture_release=json.loads(metadata)
+        candidate={key:fixture_release[key] for key in
+            ('version','sourceCommit','target','channel','protocols','dataSchema','readableDataSchemas')}
+        candidate.update({'build':fixture_release['update']['build'],'installType':'windows-inno',
+            'releaseUrl':'https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/development-completion-fixture',
+            'minimumOS':'26200','artifacts':[{'role':'installer',
+                'targetPath':'releases/download/development-completion-fixture/installer.exe',
+                'bytes':artifact.stat().st_size,'sha256':report['sha256']}]})
+        completion=complete_observed(live_observer,install/'current',data,source_identity,candidate,qualification=True)
+        archive=transaction/completion['archive'];report['localHealth']=completion['localHealth']
+        report['payloadIntegrity']=inspect_payload(install/'current',metadata,inventory)
+        assert report['payloadIntegrity']['complete'] and sentinel.read_bytes()==sentinel_bytes
         assert read_json(archive)['phase']=='complete' and not (transaction/'active.json').exists()
         report['archivedUpdate']=archive.name
+        live_observer.close();coordinator.close()
+        stages.append('live-independent-target-inventory-health-and-exact-build-completion')
         child=open_preview();ready();close_preview();child=None
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER,report['startupKey'],0,winreg.KEY_READ|winreg.KEY_SET_VALUE) as key:
             try: winreg.QueryValueEx(key,'Augmentor Agent')
@@ -426,6 +431,8 @@ def main():
         for key_path in report['browserKeys']:winreg.DeleteKey(winreg.HKEY_CURRENT_USER,key_path)
         report.update(passed=True,stages=stages,scope='Full installed payload and native Qt preview; no model, physical input, signed update or rollback claim.')
     finally:
+        if live_observer is not None:live_observer.close()
+        if coordinator is not None:coordinator.close()
         # Only this disposable preview may be closed on failure. Never clean a
         # personal app or force-stop a test whose accepted work is unknown.
         if child is not None and child.poll() is None:
