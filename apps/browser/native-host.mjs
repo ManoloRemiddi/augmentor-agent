@@ -29,7 +29,7 @@ const reply=value=>{if(process.stdout.destroyed||process.stdout.writableEnded)re
 const maintenance=new NativeBrowserMaintenance({send:reply,busy:()=>pending.size+childRequests.size+childActions.size,onCommit:()=>close(0)})
 const root=fileURLToPath(new URL('../../',import.meta.url))
 const unixOwner=process.platform!=='win32'&&existsSync(join(root,'release.json'))?await (async()=>{
- const env=componentEnvironment(),runtime=env.XDG_RUNTIME_DIR??`/run/user/${process.getuid()}`
+ const env=componentEnvironment(),runtime=env.XDG_RUNTIME_DIR??`/tmp/augmentor-linux-pi-${process.getuid()}`
  const control=await unixControl({runtime,root,component:'browser',control:(method,params)=>maintenance.control(method,params),
   onCommitted:()=>maintenance.finishCommit()})
  releaseStartup(runtime)

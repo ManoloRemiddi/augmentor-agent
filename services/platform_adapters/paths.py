@@ -59,5 +59,7 @@ def runtime_directory():
     if sys.platform == 'darwin':
         return Path(f'/tmp/augmentor-{os.getuid()}')
     if sys.platform == 'linux':
-        return Path(f'/run/user/{os.getuid()}')
+        # Preserve the desktop's standalone fallback when no login runtime is
+        # supplied. A headless/package test user cannot create /run/user/UID.
+        return Path(f'/tmp/augmentor-linux-pi-{os.getuid()}')
     raise RuntimeError('This operating system has no Augmentor runtime path adapter.')

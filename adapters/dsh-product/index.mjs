@@ -48,13 +48,14 @@ export async function apply(ctx){
  const root=fileURLToPath(new URL('../../',import.meta.url))
  if(process.platform!=='win32'&&existsSync(join(root,'release.json'))){
   const environment=componentEnvironment(),exit=ctx.get('appExit')
-  const control=await unixControl({runtime:environment.XDG_RUNTIME_DIR??`/run/user/${process.getuid()}`,root,component:'dsh',
+  const runtime=environment.XDG_RUNTIME_DIR??`/tmp/augmentor-linux-pi-${process.getuid()}`
+  const control=await unixControl({runtime,root,component:'dsh',
    control:(method,params)=>{
     if(method==='host.maintenance.commit'&&typeof exit!=='function')throw Error('Normal DSH shutdown is unavailable.')
     return maintenance.control(method,params)
    },onCommitted:()=>exit(0)})
   ctx.effect(()=>()=>control.close(),'augmentor-product: Unix maintenance control')
-  releaseStartup(environment.XDG_RUNTIME_DIR??`/run/user/${process.getuid()}`)
+  releaseStartup(runtime)
  }
  if(process.platform!=='win32')lease.stdin.write('READY\n')
  registerInteractions(ctx,interactions)

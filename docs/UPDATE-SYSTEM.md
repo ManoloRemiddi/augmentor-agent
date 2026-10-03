@@ -68,7 +68,10 @@ must qualify all later stages; the failed run is not an overall passing proof.
 `posix_startup.Startup` holds a shared kernel reader until control registration
 is discoverable; maintenance holds its exclusive writer through discovery,
 reservations and observed drain. Desktop, shortcut, shared prompt/memory helpers,
-and SDK launches participate. SDK registration leases survive Unix exec into the
+and SDK launches participate. Without a supplied Linux login runtime, these
+components retain the desktop’s private `/tmp/augmentor-linux-pi-<uid>` fallback;
+they do not require a headless user to create `/run/user/<uid>`.
+SDK registration leases survive Unix exec into the
 actual Node server and defer preparation before any component shutdown.
 The compiled Mac launcher now takes startup/lifetime leases before resolving
 resources or initializing Python. Desktop readiness releases its native startup
