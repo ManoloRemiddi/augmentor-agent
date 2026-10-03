@@ -4,14 +4,18 @@
 The separate `augmentor-app-sdk` repository supplies the developer package.
 This repository owns the runtime contract `augmentor-app/1`, the maintained
 Browser interface, workspace permissions, memory binding and installation.
-The initial target is trusted single-owner applications on Linux using DSH.
-Pi, Codex, multi-tenant hosting and cloud voice are excluded from this preview.
+The released baseline targets trusted single-owner applications on Linux using DSH.
+[The October alignment source](SDK-ALIGNMENT.md) adds capability discovery, an
+experimental Codex workspace adapter and platform startup/private-path adapters.
+Its exact evidence and remaining release gates are owned by that guide. Pi,
+multi-tenant hosting and cloud voice remain excluded.
 
 ## Connection and authority
 
 An installed SDK profile declares `schemaVersion: 1`, `sdkProtocol:
 "augmentor-app/1"` and an explicit policy. `workspace.describe` negotiates
-the protocol, workspace and DSH before the existing product handshake. The
+the protocol, workspace and explicitly selected harness before the existing
+product handshake. DSH remains the released default. The
 product manifest `services/workspaces/sdk.json` is the discovery boundary;
 clients must reject older runtimes instead of importing their internal code.
 

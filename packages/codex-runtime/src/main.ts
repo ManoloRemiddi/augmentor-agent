@@ -7,6 +7,7 @@ import {CodexIpcServer} from './ipc.js';
 import {ProfileStore} from './profiles.js';
 import {OsCredentialStore} from './credentials.js';
 import {privateDirectory} from './storage.js';
+import {CodexWorkspaces} from './workspaces.js';
 import {promptCall} from '../../prompt-library/src/client.js';
 import {ChatGptAuthorization, chatGptHostId} from './chatgpt-auth.js';
 import {ChatGptAccounts} from './chatgpt-accounts.js';
@@ -40,7 +41,7 @@ const profiles = new ProfileStore(join(root, 'profiles.json'), credentials, {
     return {credential: grant.accessToken, revision};
   },
 });
-const host = new CodexHost({root, profiles, memoryCall: promptCall, resolveProfile: (id, signal) => profiles.resolve(id, signal),
+const host = new CodexHost({root, profiles,workspaces:new CodexWorkspaces(), memoryCall: promptCall, resolveProfile: (id, signal) => profiles.resolve(id, signal),
   createChatGptLogin: commit => {
     // No environment/RPC switch enables distribution before eligibility review.
     // This factory runs on the first owned-host RPC, never before listen().

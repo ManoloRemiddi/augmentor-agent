@@ -12,13 +12,14 @@ import {spawn} from 'node:child_process'
 import {WebSocketServer,WebSocket} from 'ws'
 import {loadProfile,preferences} from '../../../services/workspaces/profiles.mjs'
 import {SDK_PROTOCOL,voiceEnabled} from '../../../services/workspaces/policy.mjs'
+import {describeWorkspace} from '../../../services/workspaces/capabilities.mjs'
 import {RELEASE} from '../../../dist/contracts/src/release.js'
 export const MAX_FRAME=20*1024*1024
 const root=fileURLToPath(new URL('../extension/',import.meta.url))
 const types={'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.woff2':'font/woff2'}
 const digest=v=>createHash('sha256').update(String(v)).digest()
 export function nativeConnection(ws,profile,{start=spawn}={}){
- const child=start(process.execPath,[fileURLToPath(new URL('../native-host.mjs',import.meta.url))],{stdio:['pipe','pipe','ignore'],env:{...process.env,AUGMENTOR_WORKSPACE_PROFILE:profile.id}})
+ const child=start(process.execPath,[fileURLToPath(new URL('../native-host.mjs',import.meta.url))],{stdio:['pipe','pipe','ignore'],windowsHide:true,env:{...process.env,AUGMENTOR_WORKSPACE_PROFILE:profile.id}})
  let buffer=Buffer.alloc(0),alive=true,closed=false
  const end=()=>{if(closed)return;closed=true;clearInterval(timer);child.stdin.end();child.kill();setTimeout(()=>child.kill('SIGKILL'),2000).unref();ws.terminate()}
  const timer=setInterval(()=>{if(!alive)return end();alive=false;ws.ping()},15000);timer.unref()
@@ -52,7 +53,7 @@ export function createEmbedServer({profileLoader=loadProfile,startNative=nativeC
    const {p,file}=await authorize(req)
    res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer')
    res.setHeader('Content-Security-Policy',`default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors ${p.parentOrigin}; base-uri 'self'; form-action 'self'`)
-   if(file==='config.json'&&req.method==='GET')return json(200,{id:p.id,name:p.name,version:RELEASE.version,parentOrigin:p.parentOrigin,publicPath:p.publicPath,harness:'dsh',preset:p.preset,sdkProtocol:p.sdkProtocol||null,voice:{experimental:true,enabled:voiceEnabled(p)}})
+   if(file==='config.json'&&req.method==='GET')return json(200,{id:p.id,name:p.name,version:RELEASE.version,parentOrigin:p.parentOrigin,publicPath:p.publicPath,harness:p.harness??'dsh',preset:p.preset,sdkProtocol:p.sdkProtocol||null,voice:{experimental:true,enabled:voiceEnabled(p)},...(p.sdkProtocol?{capabilities:describeWorkspace(p)}:{})})
    if(file==='preferences'){
     if(req.method==='GET')return json(200,preferences(p))
     if(req.method!=='POST'||req.headers.origin!==p.parentOrigin||!req.headers['content-type']?.startsWith('application/json'))return json(403,{error:'Same-origin JSON required'})

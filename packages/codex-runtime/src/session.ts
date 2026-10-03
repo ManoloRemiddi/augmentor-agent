@@ -5,6 +5,7 @@ import {CodexRpc, CodexRemoteError, type RpcNotification} from './rpc.js';
 import {OperationLedger, type Operation} from './operations.js';
 import {chatEvents} from './events.js';
 import {inputContext} from './input-context.js';
+import {workspaceContext} from './workspace-context.js';
 import {nativeHistory, type NativeTurn} from './history.js';
 import type {ContinuityContext} from './memory-context.js';
 
@@ -33,23 +34,23 @@ export class CodexSession extends EventEmitter {
     if (!value) this.schedulePump();
   }
   get threadId(): string {return this.ledger.threadId;}
-  async submit(id: string, text: string, resumeQueue = false): Promise<Operation> {
+  async submit(id: string, text: string, resumeQueue = false, context?: unknown): Promise<Operation> {
     if (this.closed) throw new Error('Codex session is closed.');
     if (resumeQueue) {
       if (this.ledger.list().some(operation => ['unconfirmed', 'accepted'].includes(operation.status))) throw new Error('Reconcile active work before resuming the queue.');
     }
-    this.ledger.enqueue(id, text);
+    this.ledger.enqueue(id, text, undefined, context);
     if (resumeQueue) this.paused = false;
     if (!this.paused) await this.pump();
     return this.ledger.get(id);
   }
-  async steer(id: string, input: string, expectedTurnId: string): Promise<Operation> {
+  async steer(id: string, input: string, expectedTurnId: string, context?: unknown): Promise<Operation> {
     if (this.closed) throw new Error('Codex session is closed.');
     const operations = this.ledger.list();
     const existing = operations.find(operation => operation.id === id);
-    if (existing) return this.ledger.enqueue(id, input, expectedTurnId).operation;
+    if (existing) return this.ledger.enqueue(id, input, expectedTurnId, context).operation;
     this.assertSteering(expectedTurnId);
-    this.ledger.enqueue(id, input, expectedTurnId);
+    this.ledger.enqueue(id, input, expectedTurnId, context);
     return this.dispatchSteer(id, input, expectedTurnId);
   }
   async promote(id: string, expectedTurnId: string): Promise<Operation> {
@@ -70,7 +71,7 @@ export class CodexSession extends EventEmitter {
   }
   private async dispatchSteer(id: string, input: string, expectedTurnId: string): Promise<Operation> {
     try {
-      const result = await this.rpc.call('turn/steer', {threadId: this.threadId, expectedTurnId, clientUserMessageId: id, additionalContext: inputContext(id), input: [{type: 'text', text: input}]});
+      const result = await this.rpc.call('turn/steer', {threadId: this.threadId, expectedTurnId, clientUserMessageId: id, additionalContext: {...inputContext(id), ...workspaceContext(id, this.ledger.get(id).workspaceContext)}, input: [{type: 'text', text: input}]});
       this.ledger.acknowledge(id, result.turnId);
       // The root can finish before the acknowledgment arrives.
       const root = this.ledger.list().find(operation => !operation.steerTurnId && operation.turnId === expectedTurnId);
@@ -98,7 +99,7 @@ export class CodexSession extends EventEmitter {
       this.preparing = undefined;
       this.dispatchId = queued.id;
       this.ledger.dispatch(queued.id);
-      const result = await this.rpc.call('turn/start', {threadId: this.threadId, clientUserMessageId: queued.id, additionalContext: {...context, ...inputContext(queued.id)}, input: [{type: 'text', text: queued.input}]});
+      const result = await this.rpc.call('turn/start', {threadId: this.threadId, clientUserMessageId: queued.id, additionalContext: {...context, ...inputContext(queued.id), ...workspaceContext(queued.id, queued.workspaceContext)}, input: [{type: 'text', text: queued.input}]});
       this.ledger.acknowledge(queued.id, result.turn.id);
     } catch (error) {
       if (preparing.signal.aborted && this.ledger.get(queued.id).status === 'queued') return;
