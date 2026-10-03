@@ -130,7 +130,8 @@ Implemented on `feat/voice-providers`, based on
 `c7f895d416e6b94ca601b66a09caf4846a64b907` in a separate checkout. The existing
 canonical checkout’s uncommitted work and installed applications were preserved.
 
-Validation on the review source:
+Validation covers implementation commit `5127253`; the subsequent documentation-only
+commit records this identity. Validation on the review source:
 
 - TypeScript check and shared production build pass.
 - Main Node suite: 503 pass, 2 platform skips; browser UI suite: 88 pass.
