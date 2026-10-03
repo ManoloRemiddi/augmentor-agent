@@ -34,45 +34,19 @@ def wait(predicate, label, seconds=30):
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--target', choices=('fedora44', 'ubuntu24'), default='fedora44')
-parser.add_argument('--source', help='Exact pristine installed source; required for Noble.')
+parser.add_argument('--source', required=True, help='Exact clean selected artifact source on either target.')
 args = parser.parse_args()
-if args.source:assert re.fullmatch('[a-f0-9]{40}', args.source)
-if args.target == 'ubuntu24':assert args.source
-assert os.geteuid() != 0 and os.environ.get('USER') == 'augmentor-proof'
-marker = ('Isolated Augmentor Ubuntu 24.04 GNOME qualification VM\n' if args.target == 'ubuntu24'
-          else 'Isolated Augmentor Fedora GNOME qualification VM\n')
-assert Path('/etc/augmentor-test-vm').read_text() == marker
-assert command(['systemd-detect-virt']) == 'qemu'
-root = Path('/usr/lib/augmentor')
-managed_inventory_verified = False
-if args.target == 'ubuntu24':
-    data = Path.home()/'.local/share/augmentor'
-    selection = json.loads((data/'desktop.json').read_text())
-    root = Path(selection['root'])
-    if root != Path('/usr/lib/augmentor'):
-        assert root.is_relative_to(data/'releases') and selection['sourceRef'] == args.source
-        spec = importlib.util.spec_from_file_location('lifecycle_deployment', data/'desktop-deployment.py')
-        deployment = importlib.util.module_from_spec(spec);spec.loader.exec_module(deployment)
-        deployment.verify(root);managed_inventory_verified = True
-release = json.loads((root/'release.json').read_text())
-assert release['source']['dirty'] is False
-if args.source:assert release['source']['commit'] == args.source
+spec = importlib.util.spec_from_file_location('owned_gnome_qualification',
+    Path(__file__).with_name('gnome-vm-qualification.py'))
+qualification = importlib.util.module_from_spec(spec);spec.loader.exec_module(qualification)
+contract = qualification.verified_profile(args.target, args.source)
+root = Path(contract['root']);release = contract['release']
+selection = contract['selection'];managed_inventory_verified = contract['managedInventoryVerified']
+assert sys.executable == contract['python'], 'Run with the actual verified selected interpreter.'
 
 
 def verify_package():
-    if args.target == 'fedora44':
-        assert command(['getenforce']) == 'Enforcing'
-        subprocess.run(['rpm', '-V', 'augmentor-agent'], check=True, timeout=30)
-    else:
-        assert release['target'] == 'ubuntu24.04-amd64'
-        assert not command(['dpkg', '--verify', 'augmentor-runtime', 'augmentor-desktop'])
-        assert Path('/sys/module/apparmor/parameters/enabled').read_text().strip() == 'Y'
-        assert command(['systemctl', 'is-active', 'apparmor']) == 'active'
-        selection = json.loads((Path.home()/'.local/share/augmentor/desktop.json').read_text())
-        assert selection['root'] == str(root)
-        spec = importlib.util.spec_from_file_location('lifecycle_python', root/'scripts/linux-python-runtime.py')
-        runtime = importlib.util.module_from_spec(spec);spec.loader.exec_module(runtime)
-        assert runtime.resolve(root, selection['python']) == selection['python']
+    assert qualification.verified_profile(args.target, args.source) == contract, 'Selection changed during proof.'
 
 
 verify_package()
@@ -188,6 +162,8 @@ verify_package()
 report = {'format': 'augmentor-gnome-full-vm-lifecycle/1', 'source': release['source'],
     'target': args.target,
     'managedInventoryVerified': managed_inventory_verified,
+    'qualificationHelperSha256': hashlib.sha256(Path(__file__).with_name('gnome-vm-qualification.py').read_bytes()).hexdigest(),
+    'verifiedSelectedContract': contract,
     'version': release['version'], 'proofSha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
     'duplicateAutostartPreservesProcessAndState': True, 'duplicateAutostartCount': 3,
     'lockSuspendsUserObserver': True, 'lockedError': locked_error,

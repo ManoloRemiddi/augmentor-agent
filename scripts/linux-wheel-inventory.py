@@ -75,7 +75,7 @@ def stage(value,wheelhouse,app):
                             'verifiedNoticeFiles':len(record['files']),'binaryCoverageVerified':False})
     # ICU's exact upstream tag/license is independent of the unproven wheel
     # build configuration. Preserve its entire third-party/data notice file.
-    if value['profile']!=runtime.SOURCE_PROFILE:
+    if value['profile'] not in runtime.SOURCE_PROFILES:
         base=app/'licenses/icu-73.2';path=base/'provenance.json';record=json.loads(path.read_text())
         if record['tag']!='release-73-2' or record['sourceUrl']!='https://raw.githubusercontent.com/unicode-org/icu/release-73-2/icu4c/LICENSE':
             raise ValueError('ICU notice provenance differs from the reviewed source.')
@@ -90,10 +90,10 @@ def stage(value,wheelhouse,app):
                          'QtWayland and ICU native-source/build provenance',
                          'GPL-or-commercial QtWaylandCompositor/QtQuickTimeline/BlendTrees and other tool/module license assessment',
                          'Corresponding source delivery and proven recipient replacement/rebuild instructions']
-    if value['profile']==runtime.SOURCE_PROFILE:
+    if value['profile'] in runtime.SOURCE_PROFILES:
         native=runtime.source_qt().inputs(value,app/'python-wheels')
         report['sourceQt']={'contract':value['sourceQt'],'manifest':native,
-                            'systemIcu':'libicu74; supplied by the Noble package manager',
+                            'systemIcu':'libicu74; supplied by the '+value['target']+' package manager',
                             'compiledContentNoticeMappingComplete':False}
     for name,content in texts.items():
         path=app/'licenses/linux-wheels'/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(content)

@@ -2,6 +2,9 @@
 """Fail closed when browser diagnostics and actual renderer evidence disagree."""
 import importlib.util
 from pathlib import Path
+import os
+import socket
+import tempfile
 import unittest
 
 spec = importlib.util.spec_from_file_location('sandbox_proof', Path(__file__).resolve().parents[1] / 'scripts/proof_browser_sandbox.py')
@@ -10,6 +13,32 @@ spec.loader.exec_module(proof)
 
 
 class SandboxEvidenceTests(unittest.TestCase):
+    def test_wayland_uses_owned_socket_with_private_fixture_runtime_and_no_x_fallback(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'wayland-test'
+            with socket.socket(socket.AF_UNIX) as server:
+                server.bind(str(path))
+                original = {'XDG_SESSION_TYPE': 'wayland', 'XDG_RUNTIME_DIR': directory,
+                            'WAYLAND_DISPLAY': 'wayland-test', 'DISPLAY': ':7', 'XAUTHORITY': 'fixture'}
+                env, evidence = proof.display_environment(original, 'wayland')
+                self.assertEqual(env['WAYLAND_DISPLAY'], str(path))
+                self.assertNotIn('DISPLAY', env)
+                self.assertNotIn('XAUTHORITY', env)
+                self.assertEqual(original['DISPLAY'], ':7')
+                self.assertEqual(evidence['socketUid'], os.getuid())
+                original['WAYLAND_DISPLAY'] = '../other-socket'
+                with self.assertRaises(AssertionError): proof.display_environment(original, 'wayland')
+
+    def test_wayland_rejects_regular_file_and_public_runtime_directory(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'wayland-test'; path.write_text('not a compositor')
+            env = {'XDG_SESSION_TYPE': 'wayland', 'XDG_RUNTIME_DIR': directory, 'WAYLAND_DISPLAY': path.name}
+            with self.assertRaises(AssertionError): proof.display_environment(env, 'wayland')
+            path.unlink()
+            with socket.socket(socket.AF_UNIX) as server:
+                server.bind(str(path)); Path(directory).chmod(0o755)
+                with self.assertRaises(AssertionError): proof.display_environment(env, 'wayland')
+
     def test_actual_chromium_title_and_original_arguments(self):
         for raw, source in [(b'/usr/lib64/chromium/chrome --type=renderer --no-sandbox\0', 'chromium-process-title-tokens'),
                             (b'/usr/lib64/chromium/chrome\0--type=renderer\0--no-sandbox\0', 'nul-separated-argv')]:

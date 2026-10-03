@@ -79,3 +79,25 @@ arguments, and requires a whitespace-free fixture profile.
 
 This proof remains separate from manual Load unpacked, branded Chrome,
 Snap/Flatpak native messaging, audio and desktop consent/input acceptance.
+
+### Explicit native Wayland qualification
+
+`AUGMENTOR_PROOF_OZONE_PLATFORM=wayland` requires a headed ordinary-user normal
+sandbox run in an observed Wayland session. The proof verifies a real socket
+owned by that UID in its private session runtime directory, passes its absolute
+path as `WAYLAND_DISPLAY`, and removes `DISPLAY`/`XAUTHORITY`. The fixture keeps
+its own separate runtime and state paths, and uses `wl-copy`/`wl-paste` for real
+clipboard checks. This follows the [Wayland client API](https://wayland.freedesktop.org/docs/html/apb.html),
+which accepts an absolute compositor socket path independently of `XDG_RUNTIME_DIR`.
+Successful XWayland runs do not qualify this mode; actual native Wayland Browser
+acceptance remains pending. The latest installed package/reconnect limits are
+recorded in [the rollout checkpoint](../release/qualification/next-targets/20261003-leap-browser-loader-upgrade.json).
+
+The default reconnect proof waits30seconds. `AUGMENTOR_PROOF_RECONNECT_SECONDS=90`
+is an explicit emulated-VM measurement mode; reports record both the budget and
+elapsed time. Product timeouts are unchanged. The Leap diagnostic restored its
+edited session after55.51seconds without replay, while its original30-second
+failures remain. Its clipboard fixture held SSH stdout after the assertions;
+clipboard providers now use detached output and exact private-state cleanup.
+This diagnostic alone does not qualify full Browser acceptance or customer
+recovery latency.

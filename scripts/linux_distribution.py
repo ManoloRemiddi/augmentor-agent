@@ -11,14 +11,17 @@ import shlex
 import re
 
 NOBLE='ubuntu24.04-amd64'
+MINT='linuxmint22.3-amd64'
 ARCH='arch20261001-x86_64'
 LEAP='opensuse-leap16.0-x86_64'
-MANAGED_TARGETS=(NOBLE,ARCH,LEAP)
+MANAGED_TARGETS=(NOBLE,MINT,ARCH,LEAP)
+SOURCE_PROFILES=frozenset(('noble-cp312-x86_64-source-qt-voice','mint223-cp312-x86_64-source-qt-voice'))
 
 TARGETS = {
     'debian13-amd64': ('debian', '13', 'apt', '.deb'),
     'ubuntu26.04-amd64': ('ubuntu', '26.04', 'apt', '.deb'),
     NOBLE: ('ubuntu', '24.04', 'apt', '.deb'),
+    MINT: ('linuxmint', '22.3', 'apt', '.deb'),
     'fedora43-x86_64': ('fedora', '43', 'dnf', '.rpm'),
     'fedora44-x86_64': ('fedora', '44', 'dnf', '.rpm'),
     ARCH: ('arch', None, 'pacman', '.pkg.tar.zst'),
@@ -96,6 +99,7 @@ def python_runtime_contract(manifest,target):
         if value is not None:raise ValueError('This bundle target cannot declare a managed Python runtime.')
         return None
     profiles={NOBLE:(('noble-cp312-x86_64-voice','noble-cp312-x86_64-source-qt-voice'),[3,12]),
+              MINT:(('mint223-cp312-x86_64-source-qt-voice',),[3,12]),
               ARCH:(('arch20261001-cp314-x86_64-voice',),[3,14]),
               LEAP:(('leap16-cp313-x86_64-voice',),[3,13])}
     allowed,abi=profiles[target]
@@ -110,13 +114,13 @@ def python_runtime_contract(manifest,target):
         module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
         module.contract(value)
         if 'sourceQt' in value:raise ValueError('A distro Qt runtime cannot declare a source Qt payload.')
-    elif value['profile']=='noble-cp312-x86_64-source-qt-voice':
+    elif value['profile'] in SOURCE_PROFILES:
         spec=importlib.util.spec_from_file_location('distribution_source_qt',Path(__file__).with_name('linux-source-qt.py'))
         module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
         module.contract(value)
     elif 'sourceQt' in value or 'systemQtStack' in value:
         raise ValueError('The vendor runtime cannot declare another native Qt payload.')
-    if (target in (ARCH,LEAP) or value['profile']=='noble-cp312-x86_64-source-qt-voice') and (
+    if (target in (ARCH,LEAP) or value['profile'] in SOURCE_PROFILES) and (
             value.get('licenseReviewComplete') is not False or value.get('embeddedSourceCoverageComplete') is not False):
         raise ValueError('The native runtime contract remains an unqualified candidate.')
     return value

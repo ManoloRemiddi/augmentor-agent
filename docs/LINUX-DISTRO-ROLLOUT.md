@@ -2,6 +2,50 @@
 
 # Linux distribution rollout
 
+The [current-selection/Settings harness checkpoint](../release/qualification/next-targets/20261003-gnome-selection-settings-harness.json)
+passes36 focused native Qt cases in an owned offscreen container. Both target
+proofs resolve the verified selection and security mode; Settings controls stay
+explicitly opt-in at process startup. A private per-run token prevents stale
+cleanup from restoring another run's settings journal. Matching installed
+Ubuntu/Fedora artifacts, actual two-dialog saves, normal shortcut delivery and
+password-lock/reboot acceptance remain open. See the [proof guide](LINUX-GNOME-SHORTCUT-PROOF.md).
+
+## October 3 installed Browser launcher correction and Mint target
+
+[The installed launcher checkpoint](../release/qualification/next-targets/20261003-leap-browser-loader-upgrade.json)
+records the normal Leap RPM upgrade from release3 to clean `423f071` release5.
+Only Augmentor changes; native file audit, all23 frozen package registrations and
+all2468 Python/Qt members pass. Synthetic settings, selected runtime and saved
+histories remain unchanged, and SELinux stays enforcing. The new canonical
+Browser host clears Chromium's inherited loader variables before Python/Node.
+
+The previous navigation timeout is traced to GNOME's normal encrypted new-keyring
+prompt. Dedicated synthetic input completes it and an actual Chromium HTTP load
+passes, without keyring weakening flags or exposing secret contents. Earlier
+input refusals and confirmation mismatch remain failed evidence. The new package's
+headed XWayland Browser run passes actual navigation, snapshot, type/click,
+clipboard, branch and edit assertions, then fails its30-second session recovery
+wait after runtime shutdown. A separate90-second diagnostic restores the same
+edited session after55.51seconds with exactly8 fixture model requests and completes
+the remaining assertions. Its SSH command still times out because a fixture
+clipboard provider retains stdout; that harness boundary/cleanup is now fixed.
+The original failures remain and full acceptance awaits a normal command exit.
+The default wait stays30seconds; emulated-VM runs can explicitly select90seconds,
+record both budget/elapsed time, and do not change product timeouts. Fixture cleanup now also stops its own memory daemon;
+Wayland qualification uses the verified compositor socket, removes X display
+fallback and keeps runtime/state sockets private. Eight sandbox/display checks
+pass; native Wayland runtime acceptance is still pending.
+
+[Mint's explicit adapter checkpoint](../release/qualification/next-targets/20261003-mint-source-profile-adapter.json)
+and [package guide](LINUX-MINT-PACKAGES.md) add exact Mint22.3 host/ABI/target guards,
+a distinct immutable source-Qt runtime identity and native dependencies. Exact
+reviewed Noble-built inputs retain their provenance; no existing runtime is
+relabelled. Focused Python/Node and build checks pass. Matching Mint artifacts and
+installed Cinnamon/product acceptance remain required. All five rollout points,
+source/legal gates and public release remain open; the22 proposed-license files
+and root license are unchanged. Owner installations/services/models/devices are
+untouched and the PR remains a draft.
+
 ## October 3 booted Leap setup and normal Browser sandbox
 
 [The new checkpoint](../release/qualification/next-targets/20261003-leap-gui-browser-sandbox.json)

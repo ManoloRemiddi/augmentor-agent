@@ -27,17 +27,20 @@ MANAGED = {'pyside6-essentials', 'shiboken6', 'pygments', 'keyring', 'sounddevic
 PROFILES = {'noble-cp312-x86_64': MANAGED,
             'noble-cp312-x86_64-voice': MANAGED | {'onnxruntime', 'protobuf'},
             'noble-cp312-x86_64-source-qt-voice': (MANAGED-{'pyside6-essentials'}) | {'pyside6','onnxruntime','protobuf'},
+            'mint223-cp312-x86_64-source-qt-voice': (MANAGED-{'pyside6-essentials'}) | {'pyside6','onnxruntime','protobuf'},
             'leap16-cp313-x86_64-voice': {'keyring','sounddevice','onnxruntime','protobuf'},
             'arch20261001-cp314-x86_64-voice': {'sounddevice','onnxruntime','protobuf'}}
 HOST_PROFILES = {
     'noble-cp312-x86_64': ('ubuntu24.04-amd64','/usr/bin/python3.12',[3,12],'ubuntu','24.04'),
     'noble-cp312-x86_64-voice': ('ubuntu24.04-amd64','/usr/bin/python3.12',[3,12],'ubuntu','24.04'),
     'noble-cp312-x86_64-source-qt-voice': ('ubuntu24.04-amd64','/usr/bin/python3.12',[3,12],'ubuntu','24.04'),
+    'mint223-cp312-x86_64-source-qt-voice': ('linuxmint22.3-amd64','/usr/bin/python3.12',[3,12],'linuxmint','22.3'),
     'leap16-cp313-x86_64-voice': ('opensuse-leap16.0-x86_64','/usr/bin/python3.13',[3,13],'opensuse-leap','16.0'),
     'arch20261001-cp314-x86_64-voice': ('arch20261001-x86_64','/usr/bin/python3',[3,14],'arch',None),
 }
 POLICY_FILE = 'linux-python-runtime.json'
 SOURCE_PROFILE = 'noble-cp312-x86_64-source-qt-voice'
+SOURCE_PROFILES = frozenset((SOURCE_PROFILE, 'mint223-cp312-x86_64-source-qt-voice'))
 SYSTEM_PROFILES = {'leap16-cp313-x86_64-voice', 'arch20261001-cp314-x86_64-voice'}
 
 
@@ -73,7 +76,7 @@ def policy(path):
     expected = PROFILES[value['profile']]
     if len(rows) != len(expected) or {normalized(r['name']) for r in rows} != expected:
         raise ValueError('The complete reviewed wheel set for this profile is required.')
-    source = source_qt() if value['profile'] == SOURCE_PROFILE else None
+    source = source_qt() if value['profile'] in SOURCE_PROFILES else None
     if source:
         source.contract(value)
         if value.get('qualified') is not False or value.get('licenseReviewComplete') is not False or value.get('embeddedSourceCoverageComplete') is not False:
@@ -104,7 +107,7 @@ def identity(value):
     contract = {key: value[key] for key in ('profile', 'target', 'python', 'pythonAbi', 'architecture', 'systemSitePackages')}
     contract['wheels'] = [{key: row[key] for key in ('name', 'version', 'file', 'sha256', 'bytes')}
                           for row in sorted(value['wheels'], key=lambda r: normalized(r['name']))]
-    if value['profile'] == SOURCE_PROFILE:
+    if value['profile'] in SOURCE_PROFILES:
         contract['sourceQt'] = value['sourceQt']
     if 'systemQtStack' in value:
         contract['systemQtStack'] = value['systemQtStack']
@@ -116,7 +119,7 @@ def contract(value,policy_sha256):
             'profile':value['profile'],'pythonAbi':value['pythonAbi'],'architecture':value['architecture'],
             'lockIdentity':identity(value),'policySha256':policy_sha256,
             'licenseReviewComplete':False,'embeddedSourceCoverageComplete':False}
-    if value['profile'] == SOURCE_PROFILE:
+    if value['profile'] in SOURCE_PROFILES:
         result['sourceQt'] = source_qt().contract(value)
     if 'systemQtStack' in value:
         result['systemQtStack'] = system_qt().contract(value)
@@ -131,7 +134,7 @@ def verify_wheels(value, wheelhouse):
 
 
 def download(value, wheelhouse):
-    if value['profile'] == SOURCE_PROFILE:
+    if value['profile'] in SOURCE_PROFILES:
         # Source binaries are reviewed local inputs, never substituted from PyPI
         # or fetched through a newly weakened URL rule.
         for row in value['wheels']:
@@ -169,7 +172,7 @@ def host(value, system_manifest=None):
         raise ValueError('This runtime policy requires '+expected[3]+(' '+expected[4] if expected[4] else '')+'.')
     if platform.machine() != value['architecture']:
         raise ValueError('This wheel set requires x86-64.')
-    if value['profile'] == SOURCE_PROFILE:
+    if value['profile'] in SOURCE_PROFILES:
         source_qt().environment(Path('/unused-host-check'), os.environ)
     if value['profile'] in SYSTEM_PROFILES:
         if system_manifest is None:
@@ -288,7 +291,7 @@ print(json.dumps({'pythonAbi':list(sys.version_info[:2]),'qtVersion':QtCore.qVer
 
 def probe(value, root):
     env = {key: val for key, val in os.environ.items() if key not in ('PYTHONHOME', 'PYTHONPATH')}
-    if value['profile'] == SOURCE_PROFILE:
+    if value['profile'] in SOURCE_PROFILES:
         source_qt().manifest(root/'qt', value['sourceQt']['manifestSha256'])
         env = source_qt().environment(root, env)
         env.update(QT_QPA_PLATFORM='offscreen', QT_QUICK_BACKEND='software')
@@ -321,7 +324,7 @@ def verify(value, root):
             or receipt.get('target') != value['target'] or receipt.get('profile') != value['profile']
             or receipt.get('wheels') != value['wheels']):
         raise ValueError('Runtime receipt differs from its path or wheel contract.')
-    if value['profile'] == SOURCE_PROFILE:
+    if value['profile'] in SOURCE_PROFILES:
         if receipt.get('sourceQt') != value['sourceQt']:
             raise ValueError('Runtime source Qt receipt differs from the native payload contract.')
         source_qt().manifest(root/'qt', value['sourceQt']['manifestSha256'])
@@ -343,7 +346,7 @@ def verify(value, root):
 
 def prepare(value, wheelhouse, store):
     verify_wheels(value, wheelhouse)
-    if value['profile'] == SOURCE_PROFILE:
+    if value['profile'] in SOURCE_PROFILES:
         source_qt().inputs(value, wheelhouse)
     if 'systemQtStack' in value:
         host(value, Path(wheelhouse)/system_qt().MANIFEST)
@@ -363,7 +366,7 @@ def prepare(value, wheelhouse, store):
             subprocess.run([str(root/'bin/python3'), '-I', '-m', 'pip', 'install', '--no-index',
                 '--find-links', str(Path(wheelhouse).resolve()), '--require-hashes', '--only-binary', ':all:',
                 '--no-deps', '--disable-pip-version-check', '-r', str(root/'wheel-lock.txt')], check=True, timeout=120)
-            if value['profile'] == SOURCE_PROFILE:
+            if value['profile'] in SOURCE_PROFILES:
                 source_qt().stage(value, wheelhouse, root/'qt')
             if 'systemQtStack' in value:
                 shutil.copyfile(Path(wheelhouse)/system_qt().MANIFEST, root/system_qt().MANIFEST)
@@ -377,7 +380,7 @@ def prepare(value, wheelhouse, store):
                 'files': files, 'artifactSha256': hashlib.sha256(json.dumps(files, sort_keys=True).encode()).hexdigest(),
                 'licenseReviewComplete': False, 'embeddedSourceCoverageComplete': False,
                 'installedProductTested': False, 'selectedDesktopChanged': False}
-            if value['profile'] == SOURCE_PROFILE:
+            if value['profile'] in SOURCE_PROFILES:
                 receipt['sourceQt'] = value['sourceQt']
             if 'systemQtStack' in value:
                 receipt['systemQtStack'] = value['systemQtStack']
@@ -427,7 +430,7 @@ def environment(app, python=None, inherited=None):
     if marker.exists():
         value = policy(marker)
         env['AUGMENTOR_PYTHON'] = chosen
-        if value['profile'] == SOURCE_PROFILE:
+        if value['profile'] in SOURCE_PROFILES:
             env = source_qt().environment(Path(chosen).parent.parent, env)
     return env
 

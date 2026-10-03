@@ -22,6 +22,9 @@ app_root=Path(os.environ.get('AUGMENTOR_PROOF_APP_ROOT',str(root)))
 extension=Path(os.environ.get('AUGMENTOR_PROOF_EXTENSION',str(root/'apps/browser/extension')))
 harness=os.environ.get('AUGMENTOR_PROOF_HARNESS','pi')
 assert harness == 'pi'
+reconnect_budget=os.environ.get('AUGMENTOR_PROOF_RECONNECT_SECONDS','30')
+assert reconnect_budget in ('30','90'), 'Use the ordinary30s or explicitly recorded90s emulated-VM reconnect budget.'
+reconnect_budget=int(reconnect_budget)
 requests=[];setup_requests=[]
 class Model(http.server.BaseHTTPRequestHandler):
     def log_message(self,*_):pass
@@ -48,6 +51,13 @@ class Model(http.server.BaseHTTPRequestHandler):
         self.wfile.write(b'data: [DONE]\n\n')
 server=http.server.ThreadingHTTPServer(('127.0.0.1',0),Model);threading.Thread(target=server.serve_forever,daemon=True).start()
 env={**os.environ,'XDG_CONFIG_HOME':str(temp/'xdg'),'AUGMENTOR_PI_CONFIG':str(temp/'pi-config'),'AUGMENTOR_PI_STATE':str(temp/'pi-state'),'AUGMENTOR_SHARED_DATA':str(temp/'shared-data'),'AUGMENTOR_SHARED_STATE':str(temp/'shared-state')}
+ozone_platform=os.environ.get('AUGMENTOR_PROOF_OZONE_PLATFORM','x11')
+display_evidence=None
+if sys.platform=='linux':
+    from proof_browser_sandbox import display_environment
+    if ozone_platform=='wayland':
+        assert os.environ.get('AUGMENTOR_PROOF_NORMAL_SANDBOX')=='1' and os.environ.get('AUGMENTOR_PROOF_HEADED')
+    env,display_evidence=display_environment(env,ozone_platform)
 if os.environ.get('AUGMENTOR_PROOF_ONBOARDING'):
     (temp/'runtime').mkdir(mode=0o700);env.update(XDG_RUNTIME_DIR=str(temp/'runtime'),QT_QPA_PLATFORM='offscreen',AUGMENTOR_PYTHON=str(root/'.venv/bin/python'))
 (temp/'runtime').mkdir(mode=0o700,exist_ok=True)
@@ -81,7 +91,7 @@ ext_id=''.join(chr(ord('a')+int(n,16)) for n in hashlib.sha256(base64.b64decode(
 manifest.write_text(json.dumps({'name':'com.augmentor.agent','description':'Augmentor proof','path':str(launcher),'type':'stdio','allowed_origins':['chrome-extension://'+ext_id+'/']}))
 normal_sandbox=os.environ.get('AUGMENTOR_PROOF_NORMAL_SANDBOX')=='1'
 if normal_sandbox:assert sys.platform=='linux' and os.geteuid()!=0,'Normal Linux sandbox qualification requires an ordinary user.'
-linux_flags=([] if normal_sandbox else ['--no-sandbox'])+['--disable-gpu','--ozone-platform=x11'] if sys.platform=='linux' else []
+linux_flags=([] if normal_sandbox else ['--no-sandbox'])+['--disable-gpu','--ozone-platform='+ozone_platform] if sys.platform=='linux' else []
 chrome_command=[os.environ.get('AUGMENTOR_PROOF_BROWSER_BINARY','chromium'),*([] if os.environ.get('AUGMENTOR_PROOF_HEADED') else ['--headless=new']),*linux_flags,'--no-first-run','--remote-allow-origins=*','--remote-debugging-port=0','--enable-unsafe-extension-debugging','--user-data-dir='+str(temp/'profile'),'about:blank']
 log=(temp/'chrome.log').open('w');chrome=subprocess.Popen(chrome_command,env=env,stdout=log,stderr=log)
 ws=None;seq=0
@@ -164,6 +174,12 @@ try:
             value=fn()
             if value:return value
             time.sleep(.1)
+        status=send('log')
+        (root/'outputs').mkdir(exist_ok=True)
+        (root/'outputs/browser-condition-failure.json').write_text(json.dumps({
+            'waitSeconds':seconds,'status':{k:status.get(k) for k in ('phase','harness','sessionId','running','error','lastError')},
+            'modelRequests':len(requests),'isolatedState':str(temp)},indent=2)+'\n')
+        (root/'outputs/browser-condition-failure.png').write_bytes(base64.b64decode(cdp('Page.captureScreenshot',{},panel)['data']))
         raise AssertionError('Timed out waiting for browser condition: '+str(evaluate('document.body.innerText.slice(-1600)',panel)))
     def button(label):
         evaluate('Array.from(document.querySelectorAll("section:not([hidden]) dialog button")).find(b=>b.textContent==='+json.dumps(label)+').id="proof-action"',panel);click('#proof-action');evaluate('document.querySelector("#proof-action")?.removeAttribute("id")',panel)
@@ -238,7 +254,7 @@ try:
     assert len(requests)==6,len(requests)
     assert not evaluate("!!document.querySelector('#harness-picker')",panel)
     cdp('Target.activateTarget',{'targetId':target})
-    # Real mouse actions, real OS clipboard in a separate X session.
+    # Real mouse actions and the clipboard of the explicit display backend.
     until(lambda:evaluate("document.querySelectorAll('.msg-branch').length > 0 && document.querySelectorAll('.msg-edit').length === 1",panel))
     for selector,expected in [(".user .msgaction",'Test the browser fixture.'),(".assistant .msgaction",'VERIFIED BROWSER')]:
         # Renderer's message blocks use role classes; do not invoke handlers.
@@ -249,7 +265,7 @@ try:
         click(selector,False)
         until(lambda:evaluate('!!document.querySelector("button.copied")',panel))
         if os.environ.get('AUGMENTOR_PROOF_HEADED'):
-            actual=subprocess.check_output(['pbpaste'] if sys.platform=='darwin' else ['xclip','-selection','clipboard','-o'],text=True,timeout=5)
+            actual=subprocess.check_output(['pbpaste'] if sys.platform=='darwin' else (['wl-paste','--no-newline'] if ozone_platform=='wayland' else ['xclip','-selection','clipboard','-o']),env=env,text=True,timeout=5)
         else:actual=evaluate('navigator.clipboard.readText()',panel)
         assert actual==expected,(actual,expected)
         assert evaluate('document.querySelector("#log").scrollTop',panel)==before
@@ -288,7 +304,9 @@ try:
     # Minimal container PID 1 may not reap the detached runtime. A zombie has
     # exited and released its files/leases; it cannot replay an action.
     until(previous_exited,10)
-    until(lambda:(v:=send('log')).get('phase')=='ready' and v.get('sessionId')==edited,30)
+    reconnect_started=time.monotonic()
+    until(lambda:(v:=send('log')).get('phase')=='ready' and v.get('sessionId')==edited,reconnect_budget)
+    reconnect_elapsed=time.monotonic()-reconnect_started
     assert runtime.call('host.describe')['pid']!=previous_pid
     assert len(requests)==8
     # Prompt editor writes literals; an independent Python client observes edits.
@@ -309,7 +327,7 @@ try:
     assert evaluate('document.querySelector("section:not([hidden]) dialog textarea").value',panel)=='My unsaved draft'
     back_to_chat()
     copied='Literal [clipboard] inside clipboard'
-    if os.environ.get('AUGMENTOR_PROOF_HEADED'):subprocess.run(['pbcopy'] if sys.platform=='darwin' else ['xclip','-selection','clipboard'],input=copied,text=True,check=True)
+    if os.environ.get('AUGMENTOR_PROOF_HEADED'):subprocess.run(['pbcopy'] if sys.platform=='darwin' else (['wl-copy'] if ozone_platform=='wayland' else ['xclip','-selection','clipboard']),env=env,input=copied,text=True,check=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
     else:evaluate('navigator.clipboard.writeText('+json.dumps(copied)+')',panel)
     evaluate('window.promptPointerEvents=[];for(const type of ["mousedown","mouseup","click","blur"]){document.addEventListener(type,event=>{const e=event.target;if(window.promptPointerEvents.length<30)window.promptPointerEvents.push({type,tag:e.tagName,id:e.id,classes:typeof e.className==="string"?e.className:"",x:event.clientX,y:event.clientY})},true)}',panel)
     fill('#input','/proof-renamed')
@@ -389,7 +407,7 @@ try:
         sandbox_evidence=prove_sandbox(cdp,sandbox_evaluate,chrome.pid,temp/'profile',os.environ.get('AUGMENTOR_PROOF_SANDBOX_SUDO_PROC')=='1')
     shot=cdp('Page.captureScreenshot' ,{},panel)['data'];(root/'outputs').mkdir(exist_ok=True);(root/'outputs/browser-composable.png').write_bytes(base64.b64decode(shot))
     proof={'engine':'real Pi SDK','model':'deterministic local fixture','browser':info['Browser'],'navigateSnapshotTypeClick':True,'actualPageResultVerified':True,'dshRealLocalModelBrowser':dsh_verified,'copyClipboardAndScroll':True,'reconnectWithoutReplay':True,'branchToolContext':True,'editResubmitsOnce':True,'sharedPromptsConflictAndClipboard':True,'memory':memory_verified,'appRoot':str(app_root),'extensionRoot':str(extension),'supportReportDownloadedAndPrivate':True,'promptRefreshDuringClick':bool(os.environ.get('AUGMENTOR_PROOF_PROMPT_REFRESH')),'freshBrowserSetup':bool(os.environ.get('AUGMENTOR_PROOF_FRESH')),'setupRequests':len(setup_requests),'modelRequests':len(requests),'isolatedState':str(temp)}
-    proof.update(normalLinuxSandboxRequested=normal_sandbox,linuxBrowserFlags=linux_flags,rendererSandbox=sandbox_evidence)
+    proof.update(normalLinuxSandboxRequested=normal_sandbox,linuxBrowserFlags=linux_flags,rendererSandbox=sandbox_evidence,displayBackend=display_evidence,reconnectBudgetSeconds=reconnect_budget,reconnectElapsedSeconds=reconnect_elapsed)
     (root/'outputs/browser-composable-proof.json').write_text(json.dumps(proof,indent=2));print(json.dumps(proof),flush=True)
 finally:
     if os.environ.get('AUGMENTOR_PROOF_ONBOARDING'):
@@ -435,6 +453,10 @@ finally:
             process_env=dict(item.split(b'=',1) for item in (process/'environ').read_bytes().split(b'\0') if b'=' in item)
             if process_env.get(b'AUGMENTOR_SHARED_STATE')!=str(temp/'shared-state').encode():continue
             arguments=(process/'cmdline').read_bytes().split(b'\0')
-            owned=any(arg.endswith((b'/dist/runtime/src/main.js',b'/services/prompt-library/service.py')) for arg in arguments)
+            owned=any(arg.endswith((b'/dist/runtime/src/main.js',b'/services/prompt-library/service.py',b'/services/memory/service.py')) for arg in arguments)
+            # Clipboard providers fork to serve the fixture selection. They
+            # must neither retain the SSH stdout channel nor outlive this run.
+            owned=owned or ((process/'comm').read_text().strip() in ('xclip','wl-copy') and
+                            (process/'exe').resolve().name in ('xclip','wl-copy'))
             if owned:os.kill(int(process.name),signal.SIGTERM)
         except (OSError,ValueError):pass

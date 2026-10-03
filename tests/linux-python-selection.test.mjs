@@ -9,7 +9,7 @@ import {declaredLinuxPython,pythonRuntimeIdentity} from '../dist/platform/src/in
 import {voicePython} from '../apps/browser/shared/voice-client.mjs'
 
 test('Python and Node select the same immutable identity for each declared policy',()=>{
-  for(const file of ['ubuntu24.04-python.json','ubuntu24.04-python-voice.json','ubuntu24.04-python-source-qt-voice.json','opensuse-leap16.0-python-voice.json','arch20261001-python-voice.json']){
+  for(const file of ['ubuntu24.04-python.json','ubuntu24.04-python-voice.json','ubuntu24.04-python-source-qt-voice.json','linuxmint22.3-python-source-qt-voice.json','opensuse-leap16.0-python-voice.json','arch20261001-python-voice.json']){
     const policy=JSON.parse(readFileSync(new URL('../release/'+file,import.meta.url),'utf8'))
     const expected=execFileSync('/usr/bin/python3',['-c',`import importlib.util,json,sys
 spec=importlib.util.spec_from_file_location('runtime','scripts/linux-python-runtime.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
@@ -28,10 +28,27 @@ test('system Qt identity binds the qualified package inventory independently of 
   }
 })
 test('source runtime identity binds native payload independently of wheel bytes',()=>{
-  const policy=JSON.parse(readFileSync(new URL('../release/ubuntu24.04-python-source-qt-voice.json',import.meta.url),'utf8'))
-  const before=pythonRuntimeIdentity(policy)
-  policy.sourceQt.manifestSha256='0'.repeat(64)
-  assert.notEqual(pythonRuntimeIdentity(policy),before)
+  for(const file of ['ubuntu24.04-python-source-qt-voice.json','linuxmint22.3-python-source-qt-voice.json']){
+    const policy=JSON.parse(readFileSync(new URL('../release/'+file,import.meta.url),'utf8'))
+    const before=pythonRuntimeIdentity(policy)
+    policy.sourceQt.manifestSha256='0'.repeat(64)
+    assert.notEqual(pythonRuntimeIdentity(policy),before)
+  }
+})
+test('Mint source policy cannot borrow another target, native payload or qualification claim',{skip:process.platform!=='linux'},()=>{
+  const folder=mkdtempSync(join(tmpdir(),'augmentor-mint-policy-'))
+  try{
+    const original=JSON.parse(readFileSync(new URL('../release/linuxmint22.3-python-source-qt-voice.json',import.meta.url),'utf8'))
+    for(const alter of [value=>value.target='ubuntu24.04-amd64',value=>value.pythonAbi=[3,13],
+      value=>value.profile='mint222-cp312-x86_64-source-qt-voice',value=>delete value.sourceQt,
+      value=>value.sourceQt.manifestSha256='0'.repeat(64),value=>value.licenseReviewComplete=true,
+      value=>value.wheels[0].sha256='0'.repeat(64),value=>value.wheels.pop()]){
+      const value=structuredClone(original);alter(value)
+      writeFileSync(join(folder,'linux-python-runtime.json'),JSON.stringify(value))
+      assert.throws(()=>declaredLinuxPython(folder),/policy|source Qt|Source Qt|bindings/)
+      assert.throws(()=>voicePython(folder,{AUGMENTOR_PYTHON:'/usr/bin/python3'}),/policy|source Qt|Source Qt|bindings/)
+    }
+  }finally{rmSync(folder,{recursive:true,force:true})}
 })
 test('broken declared policy cannot silently select system Python or an explicit override',{skip:process.platform!=='linux'},()=>{
   const folder=mkdtempSync(join(tmpdir(),'augmentor-python-selection-'))

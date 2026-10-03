@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-"""Bounded guest actions for the marked Noble shortcut qualification fixture.
+"""Bounded guest actions for the marked Noble/Fedora shortcut fixtures.
 
 This does not synthesize compositor input. The host proof sends keys through
 the owned virtual machine's QMP keyboard and observes the production app.
@@ -33,6 +33,9 @@ def exchange(name='main', action='maintenance.status'):
         except (FileNotFoundError, ConnectionRefusedError):return None
         client.sendall(action.encode())
         with client.makefile('rb') as stream:status=json.loads(stream.readline(16384))
+        if action.startswith('ui-test:'):
+            assert status.get('ok'), status.get('error', 'UI test request failed.')
+            status=status['result']
         assert status['buildRoot']==str(ROOT), 'Running app has not adopted the selected artifact.'
         return status
 
@@ -116,38 +119,85 @@ def qt_save():
         form.close();owner.close();app.processEvents()
 
 
+def app_settings_save():
+    """Both already opted-in real windows; no standalone form or UI monkeypatch."""
+    from augmentor_linux.gnome_shortcuts import request
+    def ui(name, operation, **values):
+        result=exchange(name,'ui-test:'+json.dumps({'action':'shortcut-settings','operation':operation,**values}))
+        assert result and result['pid']==exchange(name)['pid']
+        return result
+    def wait(name, predicate, label):
+        end=time.monotonic()+15
+        while time.monotonic()<end:
+            state=ui(name,'inspect')
+            if predicate(state):return state
+            time.sleep(.05)
+        raise RuntimeError('Timed out waiting for actual application '+label)
+    def save(window, name, text, conflict=False):
+        state=ui(window,'inspect');before=state['rows'][name]['current']
+        selected=ui(window,'choose',instance=name,sequence=text,expectedCurrent=before)
+        sequence=selected['rows'][name]['sequence'];assert sequence
+        ui(window,'save',instance=name,expectedSequence=sequence,expectedCurrent=before)
+        state=wait(window,lambda s:not s['rows'][name]['saving'],'asynchronous Save')
+        row=state['rows'][name]
+        if conflict:
+            assert 'already assigned' in row['note'] and row['current']==before,row
+        else:assert row['note'].startswith('Saved.'),row
+    completed=[]
+    try:
+        for name in ('main','secondary'):
+            assert idle(exchange(name)), 'Both actual windows must be idle and explicitly opted in.'
+            assert not ui(name,'inspect')['open'], 'Close existing Settings before the proof.'
+        for window in ('main','secondary'):
+            ui(window,'open')
+            wait(window,lambda s:s['open'] and all(r['ready'] for r in s['rows'].values()),'Settings readback')
+            save(window,'main','Ctrl+Alt+Shift+F9');save(window,'secondary','Ctrl+Alt+Shift+F10')
+            before={n:request('read',n) for n in ('main','secondary')}
+            save(window,'main','Ctrl+Alt+Shift+F12',True)
+            save(window,'main','Ctrl+Alt+Shift+F10',True)
+            assert {n:request('read',n) for n in before}==before
+            ui(window,'close');wait(window,lambda s:not s['open'],'Settings close')
+            completed.append(window)
+        return {'actualApplicationSettingsWindows':completed,'asyncSaveTested':True,
+                'qtSaveMouseClicks':4,'qtConflictMouseClicks':4,'realNativeSettingsReadback':True,
+                'foreignConflictRefusedWithoutWrites':True,'instanceConflictRefused':True,
+                'bothApplicationProcessesOptedIntoUiTestControl':True}
+    finally:
+        for name in completed+([window] if 'window' in locals() and window not in completed else []):
+            state=ui(name,'inspect')
+            if state['open'] and not any(r['saving'] for r in state['rows'].values()):ui(name,'close')
+
+
 def main():
     global ROOT
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=('prepare','snapshot','states','dismiss','close','restore','qt-save'))
+    parser.add_argument('action', choices=('journal-check','prepare','prepare-app-settings','snapshot','states','dismiss','close','restore','qt-save','app-settings-save'))
     parser.add_argument('--instance', choices=('main','secondary'), default='main')
+    parser.add_argument('--target', choices=('ubuntu24','fedora44'), default='ubuntu24')
     parser.add_argument('--source', required=True)
+    parser.add_argument('--proof-token', required=True)
     args=parser.parse_args()
     assert re.fullmatch('[a-f0-9]{40}',args.source)
-    assert os.geteuid()==1000 and os.environ.get('USER')=='augmentor-proof'
-    assert Path('/etc/augmentor-test-vm').read_text()=='Isolated Augmentor Ubuntu 24.04 GNOME qualification VM\n'
-    assert command(['systemd-detect-virt'])=='qemu'
-    assert command(['hostname'])=='augmentor-gnome-ubuntu24-mesa2'
-    data=Path.home()/'.local/share/augmentor'
-    selection=json.loads((data/'desktop.json').read_text())
-    ROOT=Path(selection['root'])
-    if ROOT!=Path('/usr/lib/augmentor'):
-        assert ROOT.is_relative_to(data/'releases') and selection['sourceRef']==args.source
-        spec=importlib.util.spec_from_file_location('shortcut_deployment',data/'desktop-deployment.py')
-        deployment=importlib.util.module_from_spec(spec);spec.loader.exec_module(deployment)
-        deployment.verify(ROOT)
-    release=json.loads((ROOT/'release.json').read_text())
-    assert release['target']=='ubuntu24.04-amd64' and release['source']=={'commit':args.source,'dirty':False}
-    assert not command(['dpkg','--verify','augmentor-runtime','augmentor-desktop'])
-    assert selection['root']==str(ROOT)
-    spec=importlib.util.spec_from_file_location('shortcut_python',ROOT/'scripts/linux-python-runtime.py')
-    runtime=importlib.util.module_from_spec(spec);spec.loader.exec_module(runtime)
-    assert runtime.resolve(ROOT,selection['python'])==selection['python']==sys.executable
+    spec=importlib.util.spec_from_file_location('shortcut_qualification',Path(__file__).with_name('gnome-vm-qualification.py'))
+    qualification=importlib.util.module_from_spec(spec);spec.loader.exec_module(qualification)
+    qualification.proof_identity(args.source,args.proof_token)
+    contract=qualification.verified_profile(args.target,args.source)
+    ROOT=Path(contract['root']);selection=contract['selection']
+    assert contract['python']==sys.executable, 'Use the verified selected interpreter.'
+    if args.action=='journal-check':
+        qualification.require_new_journal(STATE)
+        return {'journalAbsent':True}
+    if args.action in ('prepare','prepare-app-settings'):
+        qualification.require_new_journal(STATE)
+    saved=None
+    if args.action=='restore' and os.path.lexists(STATE):
+        saved=qualification.read_journal(STATE,args.source,args.proof_token)
     environment=dict(row.split('=',1) for row in command(['systemctl','--user','show-environment']).splitlines() if '=' in row)
-    assert environment['XDG_SESSION_TYPE']=='wayland' and environment['XDG_CURRENT_DESKTOP']=='ubuntu:GNOME'
+    assert environment['XDG_SESSION_TYPE']=='wayland' and environment['XDG_CURRENT_DESKTOP']==qualification.PROFILES[args.target]['desktop']
     for key in ('DISPLAY','WAYLAND_DISPLAY','XAUTHORITY','XDG_RUNTIME_DIR','XDG_CURRENT_DESKTOP','XDG_SESSION_TYPE','DBUS_SESSION_BUS_ADDRESS'):
         if key in environment:os.environ[key]=environment[key]
     sys.path.insert(0,str(ROOT/'services/desktop'))
+    sys.path.insert(0,str(ROOT/'apps/native'))
     if args.action=='states':return {'states':{n:exchange(n) for n in ('main','secondary')}}
     if args.action=='snapshot':return snapshot()
     if args.action=='dismiss':return {'dismissed':dismiss(args.instance)}
@@ -157,13 +207,12 @@ def main():
         return {'closeAccepted':True,'before':before}
     # Qt and GTK live in separate processes, matching the production adapter.
     if args.action=='qt-save':return qt_save()
+    if args.action=='app-settings-save':return app_settings_save()
     from gnome_shortcuts import NativeShortcuts,PREFIX
     backend=NativeShortcuts()
     own=[PREFIX+name+'/' for name in ('main','secondary')]
     if args.action=='restore':
-        if not STATE.exists():return {'settingsRestored':False,'noPendingSettingsBackup':True}
-        saved=json.loads(STATE.read_text())
-        assert saved['source']==args.source
+        if saved is None:return {'settingsRestored':False,'noPendingSettingsBackup':True}
         for p in own:backend.owned(p.removeprefix(PREFIX).strip('/'),backend.custom(p))
         current=backend.parent.get_strv('custom-keybindings')
         assert current==saved['registeredAfter'], 'Do not overwrite concurrent settings changes.'
@@ -179,25 +228,33 @@ def main():
         backend.parent.set_strv('custom-keybindings',saved['pathsBefore']);backend.Gio.Settings.sync()
         assert backend.parent.get_strv('custom-keybindings')==saved['pathsBefore']
         assert records(backend,saved['pathsBefore'])==saved['foreignBefore']
+        qualification.read_journal(STATE,args.source,args.proof_token)
         STATE.unlink()
-        return {'settingsRestored':True,'foreignEntriesPreserved':True}
-    assert not STATE.exists(), 'Restore the previous proof before beginning another.'
-    assert idle(exchange()) and exchange('secondary') is None
+        return {'settingsRestored':True,'foreignEntriesPreserved':True,'proofToken':args.proof_token}
+    qualification.require_new_journal(STATE)
+    assert idle(exchange())
+    actual=args.action=='prepare-app-settings'
+    if actual:
+        assert idle(exchange('secondary'))
+        for name in ('main','secondary'):
+            assert not exchange(name,'ui-test:'+json.dumps({'action':'shortcut-settings','operation':'inspect'}))['open']
+    else:assert exchange('secondary') is None
     paths=backend.parent.get_strv('custom-keybindings')
-    assert FOREIGN not in paths and all(backend.custom(FOREIGN).get_string(k)=='' for k in backend.fields)
+    assert FOREIGN not in paths and all((not backend.custom(FOREIGN).get_boolean(k)) if k=='enable-in-lockscreen'
+                                       else backend.custom(FOREIGN).get_string(k)=='' for k in backend.fields)
     for name,path in zip(('main','secondary'),own):backend.owned(name,backend.custom(path))
-    saved={'source':args.source,'pathsBefore':paths,'foreignBefore':records(backend,paths),
+    saved={'source':args.source,'proofToken':args.proof_token,'pathsBefore':paths,'foreignBefore':records(backend,paths),
            'userValues':{p:{k:(v.print_(True) if (v:=backend.custom(p).get_user_value(k)) is not None else None)
                             for k in backend.fields} for p in [*own,FOREIGN]},
            'registeredAfter':paths}
-    descriptor=os.open(STATE,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
-    with os.fdopen(descriptor,'w') as stream:json.dump(saved,stream)
+    qualification.create_journal(STATE,saved,args.source,args.proof_token)
     foreign=backend.custom(FOREIGN);foreign.delay()
     for k,v in {'name':'Augmentor qualification conflict','binding':'<Shift><Control><Alt>F12','command':'/usr/bin/true'}.items():foreign.set_string(k,v)
     foreign.apply();backend.parent.set_strv('custom-keybindings',paths+[FOREIGN]);backend.Gio.Settings.sync()
-    saved['registeredAfter']=paths+[FOREIGN];STATE.write_text(json.dumps(saved))
+    saved['registeredAfter']=paths+[FOREIGN];qualification.write_journal(STATE,saved,args.source,args.proof_token)
     try:
-        result=subprocess.run([sys.executable,'-B',str(Path(__file__).resolve()),'qt-save','--source',args.source],
+        result=subprocess.run([sys.executable,'-B',str(Path(__file__).resolve()),'app-settings-save' if actual else 'qt-save',
+                              '--target',args.target,'--source',args.source,'--proof-token',args.proof_token],
                               capture_output=True,text=True,timeout=120)
         assert result.returncode==0,result.stderr
         reply=json.loads(result.stdout)
@@ -207,7 +264,8 @@ def main():
         return {**reply,'fields':list(backend.fields),'functionalTested':False,
                 'main':backend.read('main'),'secondary':backend.read('secondary')}
     finally:
-        saved['registeredAfter']=backend.parent.get_strv('custom-keybindings');STATE.write_text(json.dumps(saved))
+        saved['registeredAfter']=backend.parent.get_strv('custom-keybindings')
+        qualification.write_journal(STATE,saved,args.source,args.proof_token)
 
 
 if __name__=='__main__':print(json.dumps(main()))

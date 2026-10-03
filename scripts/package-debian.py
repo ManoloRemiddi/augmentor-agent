@@ -21,7 +21,7 @@ import tempfile
 import urllib.request
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'scripts'))
-from linux_distribution import NOBLE
+from linux_distribution import NOBLE,MINT
 from linux_debian import TARGETS,dependencies
 
 HEADER = '# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0\n'
@@ -133,14 +133,17 @@ Description: {description}
 
 def build(output,target='debian13-amd64',wheelhouse=None,*,source_qt=False):
     if target not in TARGETS:raise ValueError('Unsupported Debian package target.')
-    if source_qt and target!=NOBLE:raise ValueError('Source Qt packaging requires the Noble target.')
+    if target==MINT and not source_qt:raise ValueError('Mint 22.3 packaging requires its explicit source Qt profile.')
+    if source_qt and target not in (NOBLE,MINT):raise ValueError('Source Qt packaging requires the Noble target or Mint 22.3.')
     python_runtime=None;wheel_tool=None;value=None
-    if target==NOBLE:
-        if wheelhouse is None:raise ValueError('Noble requires its verified seven-wheel cache.')
+    if target in (NOBLE,MINT):
+        if wheelhouse is None:raise ValueError('This managed target requires its verified seven-wheel cache.')
         spec=importlib.util.spec_from_file_location('packaged_linux_wheels',ROOT/'scripts/linux-wheel-inventory.py')
         wheel_tool=importlib.util.module_from_spec(spec);spec.loader.exec_module(wheel_tool)
-        policy_path=ROOT/'release'/('ubuntu24.04-python-source-qt-voice.json' if source_qt else 'ubuntu24.04-python-voice.json')
+        policy_path=ROOT/'release'/('linuxmint22.3-python-source-qt-voice.json' if target==MINT else
+                                  'ubuntu24.04-python-source-qt-voice.json' if source_qt else 'ubuntu24.04-python-voice.json')
         value=wheel_tool.runtime.policy(policy_path)
+        if value['target']!=target:raise ValueError('The managed runtime policy differs from the package target.')
         wheel_tool.runtime.verify_wheels(value,wheelhouse)
         if source_qt:wheel_tool.runtime.source_qt().inputs(value,wheelhouse)
         python_runtime=wheel_tool.runtime.contract(value,wheel_tool.runtime.digest(policy_path))
@@ -161,7 +164,7 @@ def build(output,target='debian13-amd64',wheelhouse=None,*,source_qt=False):
         app = runtime / 'usr/lib/augmentor'
         subprocess.run([sys.executable, str(ROOT / 'scripts/stage-production.py'), '--out', str(app)], check=True)
         for name in ('dist', 'apps/native', 'apps/browser', 'scripts', 'services', 'adapters', 'config', 'docs', 'licenses', 'LICENSE', 'README.md', 'release/runtime.json', 'release/product.json'):
-            if target==NOBLE and name=='licenses':
+            if target in (NOBLE,MINT) and name=='licenses':
                 # Preserve recorded upstream notice paths, including test/tool
                 # attribution texts; application source exclusions do not apply.
                 shutil.copytree(ROOT/name,app/name,dirs_exist_ok=True)
@@ -245,7 +248,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--out', type=Path, default=ROOT / 'outputs/debian')
     parser.add_argument('--target',choices=TARGETS,default='debian13-amd64')
-    parser.add_argument('--wheelhouse',type=Path,help='Exact verified Noble wheel cache; builds an unqualified candidate.')
-    parser.add_argument('--source-qt',action='store_true',help='Use the separately reviewed offline Noble source runtime; candidate only.')
+    parser.add_argument('--wheelhouse',type=Path,help='Exact verified managed-runtime wheel cache; builds an unqualified candidate.')
+    parser.add_argument('--source-qt',action='store_true',help='Use the reviewed Noble-built source Qt inputs for explicit Noble/Mint targets; candidate only.')
     args = parser.parse_args()
     build(args.out.resolve(),args.target,args.wheelhouse.resolve() if args.wheelhouse else None,source_qt=args.source_qt)

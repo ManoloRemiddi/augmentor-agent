@@ -1,0 +1,148 @@
+{
+  "format": "augmentor-linux-python-wheels/1",
+  "profile": "mint223-cp312-x86_64-source-qt-voice",
+  "target": "linuxmint22.3-amd64",
+  "python": "/usr/bin/python3.12",
+  "pythonAbi": [
+    3,
+    12
+  ],
+  "architecture": "x86_64",
+  "systemSitePackages": true,
+  "wheels": [
+    {
+      "name": "PySide6",
+      "version": "6.8.2.1",
+      "file": "PySide6-6.8.2.1-6.8.2augmentor2-cp37-abi3-manylinux_2_39_x86_64.whl",
+      "sha256": "5cb05190ddf1db3e2915662b8c744f56922f40bd03b84683b6651742cfb1c951",
+      "bytes": 10312884,
+      "source": "reviewed-offline",
+      "requiresPython": ">=3.9,<3.14",
+      "requiresDist": [
+        "shiboken6==6.8.2.1"
+      ]
+    },
+    {
+      "name": "shiboken6",
+      "version": "6.8.2.1",
+      "file": "shiboken6-6.8.2.1-6.8.2-cp37-abi3-manylinux_2_39_x86_64.whl",
+      "sha256": "a908c5696e620b4390ecd12267d28dbe6f759547df84fffd3745e85e59492c92",
+      "bytes": 205749,
+      "source": "reviewed-offline",
+      "requiresPython": ">=3.9,<3.14",
+      "requiresDist": []
+    },
+    {
+      "name": "Pygments",
+      "version": "2.18.0",
+      "file": "pygments-2.18.0-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/f7/3f/01c8b82017c199075f8f788d0d906b9ffbbc5a47dc9918a945e13d5a2bda/pygments-2.18.0-py3-none-any.whl",
+      "sha256": "b8e6aca0523f3ab76fee51799c488e38782ac06eafcf95e7ba832985c8e7b13a",
+      "bytes": 1205513,
+      "metadataUrl": "https://pypi.org/pypi/Pygments/2.18.0/json",
+      "metadataSha256": "9b3bfb18c1bc18767fdcd53a5df20d9b4d4d8f8c41c49555e79b7fc9db15d089",
+      "requiresPython": ">=3.8",
+      "requiresDist": [
+        "colorama>=0.4.6; extra == \"windows-terminal\""
+      ]
+    },
+    {
+      "name": "keyring",
+      "version": "25.6.0",
+      "file": "keyring-25.6.0-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/d3/32/da7f44bcb1105d3e88a0b74ebdca50c59121d2ddf71c9e34ba47df7f3a56/keyring-25.6.0-py3-none-any.whl",
+      "sha256": "552a3f7af126ece7ed5c89753650eec89c7eaae8617d0aa4d9ad2b75111266bd",
+      "bytes": 39085,
+      "metadataUrl": "https://pypi.org/pypi/keyring/25.6.0/json",
+      "metadataSha256": "d501efa53b77789321fd2fed18402fb7cd98989075d40d9cedfbc320a7ab2d64",
+      "requiresPython": ">=3.9",
+      "requiresDist": [
+        "pywin32-ctypes>=0.2.0; sys_platform == \"win32\"",
+        "SecretStorage>=3.2; sys_platform == \"linux\"",
+        "jeepney>=0.4.2; sys_platform == \"linux\"",
+        "importlib_metadata>=4.11.4; python_version < \"3.12\"",
+        "jaraco.classes",
+        "importlib_resources; python_version < \"3.9\"",
+        "jaraco.functools",
+        "jaraco.context",
+        "pytest!=8.1.*,>=6; extra == \"test\"",
+        "pyfakefs; extra == \"test\"",
+        "sphinx>=3.5; extra == \"doc\"",
+        "jaraco.packaging>=9.3; extra == \"doc\"",
+        "rst.linker>=1.9; extra == \"doc\"",
+        "furo; extra == \"doc\"",
+        "sphinx-lint; extra == \"doc\"",
+        "jaraco.tidelift>=1.4; extra == \"doc\"",
+        "pytest-checkdocs>=2.4; extra == \"check\"",
+        "pytest-ruff>=0.2.1; sys_platform != \"cygwin\" and extra == \"check\"",
+        "pytest-cov; extra == \"cover\"",
+        "pytest-enabler>=2.2; extra == \"enabler\"",
+        "pytest-mypy; extra == \"type\"",
+        "pygobject-stubs; extra == \"type\"",
+        "shtab; extra == \"type\"",
+        "types-pywin32; extra == \"type\"",
+        "shtab>=1.1.0; extra == \"completion\""
+      ]
+    },
+    {
+      "name": "sounddevice",
+      "version": "0.5.2",
+      "file": "sounddevice-0.5.2-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/75/2d/582738fc01352a5bc20acac9221e58538365cecb3bb264838f66419df219/sounddevice-0.5.2-py3-none-any.whl",
+      "sha256": "82375859fac2e73295a4ab3fc60bd4782743157adc339561c1f1142af472f505",
+      "bytes": 32450,
+      "metadataUrl": "https://pypi.org/pypi/sounddevice/0.5.2/json",
+      "metadataSha256": "35bc90510386b908fc7248784dc6f8f2f72bd2cf101e85fb56ba137121c275db",
+      "requiresPython": ">=3.7",
+      "requiresDist": [
+        "CFFI>=1.0",
+        "NumPy; extra == \"numpy\""
+      ]
+    },
+    {
+      "name": "onnxruntime",
+      "version": "1.28.0",
+      "file": "onnxruntime-1.28.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/95/df/5486ab03e9be288d5268867054c8b04bebcf95bfd12e801c05cc67703dab/onnxruntime-1.28.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+      "sha256": "0a83bdb70d143cede762b677789bf2a7acca54b3fb82565601d5c30695aa933c",
+      "bytes": 19214257,
+      "metadataUrl": "https://pypi.org/pypi/onnxruntime/1.28.0/json",
+      "metadataSha256": "9f69dedbc44cdfe9026172eddc5faa677d7146202deb20163393346c547aa7ee",
+      "requiresPython": ">=3.11",
+      "requiresDist": [
+        "flatbuffers",
+        "numpy>=1.21.6",
+        "packaging",
+        "protobuf>=4.25.8",
+        "sympy; extra == \"symbolic\"",
+        "ml_dtypes; extra == \"quantization\""
+      ]
+    },
+    {
+      "name": "protobuf",
+      "version": "7.35.1",
+      "file": "protobuf-7.35.1-cp310-abi3-manylinux2014_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/e4/be/5b3cfe508bfab6761414ff944e3366eb13be4fd71efcd69450f89ba39f43/protobuf-7.35.1-cp310-abi3-manylinux2014_x86_64.whl",
+      "sha256": "74758715c53d7158fb76caf4f0cfdacc5329a4b1bb994f865d6cf302d413a1c4",
+      "bytes": 327130,
+      "metadataUrl": "https://pypi.org/pypi/protobuf/7.35.1/json",
+      "metadataSha256": "d271f8dd8a3a67b1204dc6cf93b0937ee61d6f128093b03c36492ee0a26ae84e",
+      "requiresPython": ">=3.10",
+      "requiresDist": []
+    }
+  ],
+  "qualified": false,
+  "licenseReviewComplete": false,
+  "embeddedSourceCoverageComplete": false,
+  "sourceQt": {
+    "format": "augmentor-source-qt-runtime-input/1",
+    "directory": "source-qt",
+    "qtVersion": "6.8.2",
+    "manifestSha256": "c49faf50a992daca825c51929715c6114017e6b29ac54af17f9656db41e73364",
+    "derivationReceipt": {
+      "file": "source-pyside-derivation.json",
+      "sha256": "de6edc207b0ce7279de6972b5694d3063161f4fd9c46b865245ca0c471d2990c",
+      "bytes": 1063
+    }
+  }
+}

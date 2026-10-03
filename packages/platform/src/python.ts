@@ -8,6 +8,11 @@ import {dirname,isAbsolute,join,resolve,basename} from 'node:path';
 type Wheel={name:string,version:string,file:string,sha256:string,bytes:number,source?:string,url?:string};
 type Policy={format:string,profile:string,target:string,python:string,pythonAbi:number[],architecture:string,systemSitePackages:boolean,wheels:Wheel[],sourceQt?:Record<string,unknown>,systemQtStack?:Record<string,unknown>,qualified?:boolean,licenseReviewComplete?:boolean,embeddedSourceCoverageComplete?:boolean};
 const SOURCE_PROFILE='noble-cp312-x86_64-source-qt-voice';
+const SOURCE_HOSTS:Record<string,{target:string,python:string,abi:number[],id:string,version:string}>={
+  [SOURCE_PROFILE]:{target:'ubuntu24.04-amd64',python:'/usr/bin/python3.12',abi:[3,12],id:'ubuntu',version:'24.04'},
+  'mint223-cp312-x86_64-source-qt-voice':{target:'linuxmint22.3-amd64',python:'/usr/bin/python3.12',abi:[3,12],id:'linuxmint',version:'22.3'}
+};
+const SOURCE_PROFILES=new Set(Object.keys(SOURCE_HOSTS));
 const SOURCE_QT={format:'augmentor-source-qt-runtime-input/1',directory:'source-qt',qtVersion:'6.8.2',
   manifestSha256:'c49faf50a992daca825c51929715c6114017e6b29ac54af17f9656db41e73364',
   derivationReceipt:{file:'source-pyside-derivation.json',sha256:'de6edc207b0ce7279de6972b5694d3063161f4fd9c46b865245ca0c471d2990c',bytes:1063}};
@@ -30,7 +35,7 @@ export function pythonRuntimeIdentity(value:Policy):string {
   const contract:Record<string,unknown>={};
   for(const key of ['profile','target','python','pythonAbi','architecture','systemSitePackages'] as const)contract[key]=value[key];
   contract.wheels=[...value.wheels].sort((a,b)=>normalized(a.name).localeCompare(normalized(b.name))).map(row=>({name:row.name,version:row.version,file:row.file,sha256:row.sha256,bytes:row.bytes}));
-  if(value.profile===SOURCE_PROFILE)contract.sourceQt=value.sourceQt;
+  if(SOURCE_PROFILES.has(value.profile))contract.sourceQt=value.sourceQt;
   if(value.systemQtStack!==undefined)contract.systemQtStack=value.systemQtStack;
   return sha(pythonJson(contract));
 }
@@ -43,15 +48,16 @@ export function declaredLinuxPython(app:string,env:NodeJS.ProcessEnv=process.env
   const value=JSON.parse(readFileSync(marker,'utf8')) as Policy;
   if(!Array.isArray(value.wheels))throw Error('Unsupported Linux Python runtime policy.');
   const system=SYSTEM_PROFILES[value.profile];
+  const selected=system??SOURCE_HOSTS[value.profile];
   const names=system?[...system.names]:['pyside6-essentials','shiboken6','pygments','keyring','sounddevice'];
   if(system){
     const stack=value.systemQtStack;
     if(!stack||pythonJson(Object.keys(stack).sort())!==pythonJson(['bytes','file','format','packageManager','qtVersion','sha256'])||stack.format!=='augmentor-system-qt-stack-contract/1'||stack.file!=='system-qt-inventory.json'||stack.packageManager!==system.manager||stack.qtVersion!==system.qt||typeof stack.sha256!=='string'||!/^[a-f0-9]{64}$/.test(stack.sha256)||!Number.isSafeInteger(stack.bytes)||Number(stack.bytes)<=0||Number(stack.bytes)>8*1024*1024)throw Error('This candidate requires its exact distro Python/Qt stack contract.');
   }
   else if(value.profile==='noble-cp312-x86_64-voice')names.push('onnxruntime','protobuf');
-  else if(value.profile===SOURCE_PROFILE){
+  else if(SOURCE_PROFILES.has(value.profile)){
     names[0]='pyside6';names.push('onnxruntime','protobuf');
-    if(pythonJson(value.sourceQt)!==pythonJson(SOURCE_QT)||value.qualified!==false||value.licenseReviewComplete!==false||value.embeddedSourceCoverageComplete!==false)throw Error('Source Qt requires its exact unqualified native payload contract.');
+    if(!value.sourceQt||pythonJson(value.sourceQt)!==pythonJson(SOURCE_QT)||value.qualified!==false||value.licenseReviewComplete!==false||value.embeddedSourceCoverageComplete!==false)throw Error('Source Qt requires its exact unqualified native payload contract.');
     for(const row of value.wheels){
       const source=SOURCE_WHEELS[normalized(row.name)];
       if(source&&(pythonJson([row.file,row.sha256,row.bytes])!==pythonJson(source)||row.version!=='6.8.2.1'||row.source!=='reviewed-offline'||row.url!==undefined))throw Error('Source bindings require their exact reviewed offline wheel identities.');
@@ -60,13 +66,13 @@ export function declaredLinuxPython(app:string,env:NodeJS.ProcessEnv=process.env
   }
   else if(value.profile!=='noble-cp312-x86_64')throw Error('Unsupported Linux Python runtime policy.');
   if(!system&&value.systemQtStack!==undefined)throw Error('This profile cannot declare a distro Qt stack.');
-  if(value.profile!==SOURCE_PROFILE&&value.sourceQt!==undefined)throw Error('A vendor profile cannot declare source Qt.');
-  if(value.format!=='augmentor-linux-python-wheels/1'||value.target!==(system?.target??'ubuntu24.04-amd64')||value.python!==(system?.python??'/usr/bin/python3.12')||pythonJson(value.pythonAbi)!==pythonJson(system?.abi??[3,12])||value.architecture!=='x86_64'||process.arch!=='x64'||value.systemSitePackages!==true||value.wheels.length!==names.length||names.some(name=>value.wheels.filter(row=>normalized(row.name)===name).length!==1))throw Error('Unsupported Linux Python runtime policy.');
+  if(!SOURCE_PROFILES.has(value.profile)&&value.sourceQt!==undefined)throw Error('A vendor profile cannot declare source Qt.');
+  if(value.format!=='augmentor-linux-python-wheels/1'||value.target!==(selected?.target??'ubuntu24.04-amd64')||value.python!==(selected?.python??'/usr/bin/python3.12')||pythonJson(value.pythonAbi)!==pythonJson(selected?.abi??[3,12])||value.architecture!=='x86_64'||process.arch!=='x64'||value.systemSitePackages!==true||value.wheels.length!==names.length||names.some(name=>value.wheels.filter(row=>normalized(row.name)===name).length!==1))throw Error('Unsupported Linux Python runtime policy.');
   for(const row of value.wheels)if(basename(row.file)!==row.file||!row.file.endsWith('.whl')||!/^\w[\w.+-]*$/.test(row.version)||!/^[a-f0-9]{64}$/.test(row.sha256)||!Number.isSafeInteger(row.bytes)||row.bytes<=0)throw Error('Invalid locked wheel record.');
   if(system&&value.wheels.some(row=>!row.url?.startsWith('https://files.pythonhosted.org/packages/')||row.source!==undefined))throw Error('Invalid locked wheel record.');
   const release=readFileSync('/etc/os-release','utf8');
   const field=(name:string)=>release.split('\n').find(line=>line.startsWith(name+'='))?.slice(name.length+1).replace(/^"|"$/g,'');
-  const hostId=system?.id??'ubuntu',hostVersion=system?system.version:'24.04';
+  const hostId=selected?.id??'ubuntu',hostVersion=selected?selected.version:'24.04';
   if(field('ID')!==hostId||(hostVersion!==undefined&&field('VERSION_ID')!==hostVersion))throw Error('This runtime policy requires '+hostId+(hostVersion?' '+hostVersion:'')+'.');
   const data=env.XDG_DATA_HOME??join(env.HOME??homedir(),'.local/share');
   if(!isAbsolute(data))throw Error('XDG_DATA_HOME must be an absolute path.');
@@ -78,7 +84,7 @@ export function declaredLinuxPython(app:string,env:NodeJS.ProcessEnv=process.env
   if(!info.isDirectory()||info.uid!==uid||(info.mode&0o077)||!receiptInfo.isFile()||receiptInfo.uid!==uid||receiptInfo.nlink!==1)throw Error('Runtime directory/receipt identity is invalid.');
   const receipt=JSON.parse(readFileSync(receiptPath,'utf8'));
   if(receipt.format!=='augmentor-linux-python-runtime/1'||receipt.lockIdentity!==identity||receipt.root!==root||receipt.python!==python||receipt.target!==value.target||receipt.profile!==value.profile||pythonJson(receipt.wheels)!==pythonJson(value.wheels)||!receipt.files||receipt.artifactSha256!==sha(pythonJson(receipt.files)))throw Error('Runtime receipt differs from its path or wheel contract.');
-  if(value.profile===SOURCE_PROFILE){
+  if(SOURCE_PROFILES.has(value.profile)){
     const manifest=join(root,'qt/stage-inventory.json');
     if(pythonJson(receipt.sourceQt)!==pythonJson(SOURCE_QT)||!lstatSync(manifest).isFile()||sha(readFileSync(manifest))!==SOURCE_QT.manifestSha256||receipt.files['qt/stage-inventory.json']!==SOURCE_QT.manifestSha256)throw Error('Source Qt native manifest changed; prepare a new runtime.');
     const paths={LD_LIBRARY_PATH:'lib',QT_PLUGIN_PATH:'plugins',QT_QPA_PLATFORM_PLUGIN_PATH:'plugins/platforms',QML_IMPORT_PATH:'qml',QML2_IMPORT_PATH:'qml'};

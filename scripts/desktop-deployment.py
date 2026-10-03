@@ -128,7 +128,7 @@ def stage(source, source_ref, python=None, node=None):
             runtime = importlib.util.module_from_spec(spec); spec.loader.exec_module(runtime)
             config['python'] = runtime.resolve(source, python)
             value = runtime.policy(source/'linux-python-runtime.json')
-            if value['profile'] == runtime.SOURCE_PROFILE:
+            if value['profile'] in runtime.SOURCE_PROFILES:
                 runtime.verify_wheels(value, temporary/'python-wheels')
                 runtime.source_qt().inputs(value, temporary/'python-wheels')
         # A bundled interpreter follows the copy; venv symlinks must not resolve.

@@ -90,11 +90,13 @@ Windows mechanisms: [desktop and background shortcut ownership](WINDOWS-SHELL.md
 ## Setup, operations and distribution
 
 - [Linux distribution rollout: implementation order and qualification gates](LINUX-DISTRO-ROLLOUT.md)
+- [Owned GNOME shortcut qualification](LINUX-GNOME-SHORTCUT-PROOF.md): selected-runtime guards, actual two-window Settings and separate native-delivery phases.
 - [Arch/Leap system Python/Qt drift boundary and actual CPU VAD evidence](LINUX-SYSTEM-QT-STACK.md)
 - [Dictation native candidate](LINUX-HANDY-NATIVE-CLOSURE.md): checksum-pinned ELF and actual Arch/Leap component startup; complete product/audio/input gates remain open.
 - [Fedora dictation packaging candidate](LINUX-FEDORA-DICTATION-PACKAGING.md): both installed targets, clean-source RPMs and busy/idle source replacement; complete acceptance remains open.
 - [Ubuntu Qt fixture compatibility](LINUX-QT-FIXTURE-COMPATIBILITY.md): isolated signal-registration failure and a real registrar override preserving both UI cases.
 - [Cinnamon adapter: installed Mint evidence and pinned implementation contract](LINUX-CINNAMON-ADAPTER.md)
+- [Mint 22.3 source-runtime package candidate and remaining installed acceptance](LINUX-MINT-PACKAGES.md)
 - [GNOME native consent/capture evidence and disabled guarded execution candidate](LINUX-GNOME-CONTROL-PLAN.md)
 - [Linux Qt/PySide source build, rebuild and replacement gates](LINUX-LGPL-SOURCE-RUNTIME.md)
 - [Proposed recipient-control MIT scope; awaiting owner decision](RECIPIENT-SOURCE-CONTROLS-LICENSE-PROPOSAL.md)

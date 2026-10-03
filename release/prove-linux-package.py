@@ -73,8 +73,8 @@ def main():
     artifacts = a.artifacts.resolve()
     manifest = json.loads((artifacts/'artifacts.json').read_text())
     runtime_contract = python_runtime_contract(manifest, target)
-    if target == NOBLE and manifest.get('target') != target:
-        raise ValueError('The Noble package target differs from this container.')
+    if manifest.get('target') != target:
+        raise ValueError('The package target differs from this qualification host.')
     hashes = {item['file']: item['sha256'] for item in manifest['artifacts']}
     names = package_files({'version': manifest['version'], 'sha256': hashes}, target)
     if target.startswith('fedora') and manifest.get('target') != target:

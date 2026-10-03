@@ -5,6 +5,7 @@ import argparse
 import json
 import os
 from pathlib import Path
+import stat
 import subprocess
 import sys
 import time
@@ -12,6 +13,32 @@ import time
 KEYS = ('suid', 'userNs', 'pidNs', 'netNs', 'seccompBpf', 'seccompTsync', 'sandboxGood')
 DISABLED = ('--no-sandbox', '--disable-setuid-sandbox', '--disable-namespace-sandbox',
             '--disable-seccomp-filter-sandbox')
+
+
+def display_environment(environment, platform):
+    """Keep fixture runtime sockets private while using the observed compositor."""
+    assert platform in ('x11', 'wayland'), 'Unsupported qualification Ozone platform'
+    env = dict(environment)
+    report = {'requestedPlatform': platform, 'xDisplayRemoved': False}
+    if platform == 'wayland':
+        assert env.get('XDG_SESSION_TYPE') == 'wayland'
+        runtime = Path(env['XDG_RUNTIME_DIR'])
+        assert runtime.is_absolute() and not runtime.is_symlink()
+        state = runtime.stat()
+        assert stat.S_ISDIR(state.st_mode) and state.st_uid == os.getuid() and not state.st_mode & 0o077
+        name = Path(env['WAYLAND_DISPLAY'])
+        socket = name if name.is_absolute() else runtime / name
+        assert socket.parent == runtime and not socket.is_symlink()
+        state = socket.stat()
+        assert stat.S_ISSOCK(state.st_mode) and state.st_uid == os.getuid()
+        # wl_display_connect accepts an absolute socket path, independently of
+        # the fixture's subsequently isolated XDG_RUNTIME_DIR.
+        env['WAYLAND_DISPLAY'] = str(socket)
+        env.pop('DISPLAY', None)
+        env.pop('XAUTHORITY', None)
+        report.update(waylandSocket=str(socket), socketUid=state.st_uid,
+                      socketInode=state.st_ino, xDisplayRemoved=True)
+    return env, report
 
 
 def command_arguments(data):

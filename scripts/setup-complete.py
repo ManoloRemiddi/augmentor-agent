@@ -280,7 +280,7 @@ def install(args):
     os.environ['AUGMENTOR_PYTHON']=str(python)
     # Product setup also spawns Python children from this process. Give them
     # the same verified native paths as its explicit subprocess environment.
-    if (app/'linux-python-runtime.json').exists() and python_runtime.policy(app/'linux-python-runtime.json')['profile']==python_runtime.SOURCE_PROFILE:
+    if (app/'linux-python-runtime.json').exists() and python_runtime.policy(app/'linux-python-runtime.json')['profile'] in python_runtime.SOURCE_PROFILES:
         for key in ('LD_LIBRARY_PATH','QT_PLUGIN_PATH','QT_QPA_PLATFORM_PLUGIN_PATH','QML_IMPORT_PATH','QML2_IMPORT_PATH'):
             os.environ[key]=env[key]
         for key in ('QT_QPA_PLATFORMTHEME','QT_QPA_GENERIC_PLUGINS'):

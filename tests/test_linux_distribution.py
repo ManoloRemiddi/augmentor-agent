@@ -38,6 +38,10 @@ def manifest(target):
         value['pythonRuntime']={'format':'augmentor-linux-python-runtime-contract/1','target':target,
             'profile':'noble-cp312-x86_64-voice','pythonAbi':[3,12],'architecture':'x86_64',
             'policySha256':'a'*64,'lockIdentity':'b'*64}
+    if target==distro.MINT:
+        runtime=module('linux-python-runtime')
+        policy=ROOT/'release/linuxmint22.3-python-source-qt-voice.json'
+        value['pythonRuntime']=runtime.contract(runtime.policy(policy),runtime.digest(policy))
     if target in (distro.ARCH,distro.LEAP):
         value['nativePackage']={'name':'augmentor-agent','versionRelease':version+'-1'+('.leap16' if target==distro.LEAP else ''),'architecture':'x86_64'}
         runtime=module('linux-python-runtime')
@@ -71,7 +75,7 @@ class DistributionPlans(unittest.TestCase):
             for name in value['packages']:self.assertIn('/bundle with spaces/'+name,value['command'])
 
     def test_derivatives_older_releases_and_other_architectures_fail_closed(self):
-        for info in ({'ID':'linuxmint','VERSION_ID':'22.3','ID_LIKE':'ubuntu debian'},
+        for info in ({'ID':'linuxmint','VERSION_ID':'22.2','ID_LIKE':'ubuntu debian'},
                      {'ID':'ubuntu','VERSION_ID':'22.04'},{'ID':'debian','VERSION_ID':'12'},
                      {'ID':'unknown','VERSION_ID':'44','ID_LIKE':'fedora'}):
             with self.subTest(info=info),self.assertRaises(ValueError):distro.host_target(info,'x86_64')

@@ -170,8 +170,8 @@ def main():
         raise ValueError('Only Arch requires its separately checked guard artifact.')
     guard=checked_arch_guard(a.arch_guard.absolute()) if a.arch_guard else None
     runtime_contract=python_runtime_contract(deb,a.target)
-    if a.target==NOBLE and deb.get('target')!=NOBLE:
-        raise ValueError('The Noble complete bundle requires its matching Noble packages.')
+    if a.debian and deb.get('target')!=a.target:
+        raise ValueError('The complete bundle requires its matching Debian-format target packages.')
     package_names=[item['file'] for item in deb['artifacts']]
     package_files({'version':version,'packages':package_names,'sha256':{name:'checked below' for name in package_names}},a.target)
     for item in deb['artifacts']:

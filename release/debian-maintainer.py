@@ -15,10 +15,13 @@ HOOK = '@HOOK@'
 VERSION = '@VERSION@'
 PACKAGE_TARGET = '@TARGET@'
 action = sys.argv[1] if len(sys.argv) > 1 else ''
-if PACKAGE_TARGET=='ubuntu24.04-amd64' and HOOK=='preinst' and action in ('install','upgrade'):
+SOURCE_HOSTS={'ubuntu24.04-amd64':('ubuntu','24.04','Ubuntu 24.04'),
+              'linuxmint22.3-amd64':('linuxmint','22.3','Linux Mint 22.3')}
+if PACKAGE_TARGET in SOURCE_HOSTS and HOOK=='preinst' and action in ('install','upgrade'):
     fields=dict(row.split('=',1) for row in Path('/etc/os-release').read_text().splitlines() if '=' in row)
-    if (fields.get('ID','').strip('"'),fields.get('VERSION_ID','').strip('"'),platform.machine())!=('ubuntu','24.04','x86_64'):
-        raise SystemExit('This Augmentor candidate requires Ubuntu 24.04 x86-64; use the matching distro artifact.')
+    expected=SOURCE_HOSTS[PACKAGE_TARGET]
+    if (fields.get('ID','').strip('"'),fields.get('VERSION_ID','').strip('"'),platform.machine())!=(*expected[:2],'x86_64'):
+        raise SystemExit('This Augmentor candidate requires '+expected[2]+' x86-64; use the matching distro artifact.')
 if HOOK=='rpm-pre' and PACKAGE_TARGET in ('fedora43-x86_64','fedora44-x86_64'):
     fields=dict(row.split('=',1) for row in Path('/etc/os-release').read_text().splitlines() if '=' in row)
     expected=PACKAGE_TARGET.removeprefix('fedora').split('-')[0]
@@ -53,7 +56,8 @@ def legacy_processes():
 def begin():
     if COMPONENT=='desktop' and HOOK=='preinst':
         release=Path('/usr/lib/augmentor/release.json')
-        if not release.is_file() or json.loads(release.read_text()).get('version')!=VERSION:
+        installed=json.loads(release.read_text()) if release.is_file() else {}
+        if installed.get('version')!=VERSION or (PACKAGE_TARGET in SOURCE_HOSTS and installed.get('target')!=PACKAGE_TARGET):
             raise SystemExit('Configure the matching Augmentor runtime package before the desktop package.')
     runtime_descriptor=None
     if COMPONENT=='desktop' and action=='upgrade':

@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
-from unittest.mock import Mock
+from unittest.mock import Mock,patch
 from PySide6.QtWidgets import QApplication,QDialog
 from augmentor_linux.window import Window
 from augmentor_linux.ui_testing import dispatch
@@ -14,7 +14,7 @@ class UiTestingTests(unittest.TestCase):
     def setUpClass(cls):cls.app=QApplication.instance() or QApplication([])
 
     def test_disabled_launch_rejects_every_operation_without_touching_window(self):
-        for action in ['inspect','send','capture','draft','zoom','pin']:
+        for action in ['inspect','send','capture','draft','zoom','pin','shortcut-settings']:
             with self.assertRaisesRegex(ValueError,'disabled'):
                 dispatch(None,{'action':action})
 
@@ -67,3 +67,74 @@ class UiTestingTests(unittest.TestCase):
                 dispatch(window,{'action':'pin','expected':True,'pinned':False},enabled=True)
             self.assertIs(window.preferences.values['pinned'],True)
         finally:window.close()
+
+    def test_shortcut_settings_uses_real_widgets_and_async_save_with_stale_state_refusal(self):
+        from concurrent.futures import ThreadPoolExecutor
+        from PySide6.QtTest import QTest
+        from augmentor_linux.panels import SettingsDialog
+        window=Window(preview=True);window.show()
+        executor=ThreadPoolExecutor(max_workers=1)
+        window.controller=SimpleNamespace(closed=False,running=False,navigating=False,
+            repairing=False,task=executor.submit)
+        dialog=None
+        def request(operation,**values):
+            return dispatch(window,{'action':'shortcut-settings','operation':operation,**values},enabled=True)
+        def wait(predicate):
+            for _ in range(100):
+                QTest.qWait(10)
+                if predicate():return
+            self.fail('Actual asynchronous shortcut callback did not finish.')
+        with patch('augmentor_linux.shortcut_settings.current_keys',return_value=[]),\
+             patch('augmentor_linux.shortcut_settings.save_shortcut',side_effect=lambda sequence,name:sequence[0].toCombined()) as save:
+            try:
+                dialog=SettingsDialog(window);window.shortcut_dialog=dialog;dialog.show()
+                wait(lambda:all(r['ready'] for r in request('inspect')['rows'].values()))
+                before=request('inspect')['rows']['secondary']['current']
+                with self.assertRaisesRegex(ValueError,'changed'):
+                    request('choose',instance='secondary',sequence='Ctrl+Alt+F10',expectedCurrent='stale')
+                save.assert_not_called()
+                chosen=request('choose',instance='secondary',sequence='Ctrl+Alt+F10',expectedCurrent=before)
+                self.assertEqual(chosen['rows']['secondary']['sequence'],'Ctrl+Alt+F10')
+                with self.assertRaisesRegex(ValueError,'exact selected'):
+                    request('save',instance='secondary',expectedSequence='Ctrl+Alt+F9',expectedCurrent=before)
+                save.assert_not_called()
+                request('save',instance='secondary',expectedSequence='Ctrl+Alt+F10',expectedCurrent=before)
+                wait(lambda:not request('inspect')['rows']['secondary']['saving'])
+                self.assertTrue(request('inspect')['rows']['secondary']['note'].startswith('Saved.'))
+                self.assertEqual(save.call_args.args[1],'secondary')
+                current=request('inspect')['rows']['secondary']['current']
+                save.side_effect=ValueError('already assigned to another launcher')
+                request('choose',instance='secondary',sequence='Ctrl+Alt+F12',expectedCurrent=current)
+                request('save',instance='secondary',expectedSequence='Ctrl+Alt+F12',expectedCurrent=current)
+                wait(lambda:not request('inspect')['rows']['secondary']['saving'])
+                row=request('inspect')['rows']['secondary']
+                self.assertEqual(row['current'],current);self.assertIn('already assigned',row['note'])
+                request('close');self.assertFalse(dialog.isVisible())
+            finally:
+                if dialog:dialog.close()
+                executor.shutdown(wait=True)
+                window.shortcut_dialog=None;window.controller=None;window.close()
+
+    def test_shortcut_settings_open_is_deferred_and_rechecks_visibility(self):
+        window=Window(preview=True);window.show()
+        try:
+            with patch.object(window,'open_settings') as opened:
+                dispatch(window,{'action':'shortcut-settings','operation':'open'},enabled=True)
+                opened.assert_not_called();window.hide();self.app.processEvents()
+                opened.assert_not_called();self.assertFalse(window._shortcut_proof_opening)
+        finally:window.close()
+
+    def test_shortcut_settings_refuses_foreign_dialog_draft_and_extra_fields(self):
+        window=Window(preview=True);window.show();dialog=QDialog(window)
+        try:
+            dialog.show()
+            with self.assertRaisesRegex(ValueError,'another dialog'):
+                dispatch(window,{'action':'shortcut-settings','operation':'inspect'},enabled=True)
+            dialog.close();window.composer.setPlainText('retain this draft')
+            with self.assertRaisesRegex(ValueError,'no draft'):
+                dispatch(window,{'action':'shortcut-settings','operation':'open'},enabled=True)
+            self.assertEqual(window.composer.toPlainText(),'retain this draft')
+            window.composer.clear()
+            with self.assertRaisesRegex(ValueError,'bounded'):
+                dispatch(window,{'action':'shortcut-settings','operation':'inspect','widget':'arbitrary'},enabled=True)
+        finally:dialog.close();window.close()
