@@ -5,6 +5,8 @@ import importlib.util
 import json
 import os
 import socket
+import shutil
+import subprocess
 from pathlib import Path
 import tempfile
 import unittest
@@ -17,6 +19,43 @@ spec=importlib.util.spec_from_file_location('complete_setup',ROOT/'scripts/setup
 setup=importlib.util.module_from_spec(spec);spec.loader.exec_module(setup)
 
 class CompleteSetupTests(unittest.TestCase):
+    def test_initial_settings_indent_sequences_without_changing_safe_dump_values(self):
+        import yaml
+        settings=setup.model_settings('http://127.0.0.1:34187/v1','fixture',8192)
+        before=yaml.safe_dump(settings);after=setup.settings_yaml(settings)
+        self.assertEqual(yaml.safe_load(after),yaml.safe_load(before))
+        self.assertIn('      models:\n        - contextWindow: 8192\n',after)
+        self.assertIn('          input:\n            - text\n',after)
+        # Scalar, key-order and trailing-newline defaults stay unchanged.
+        self.assertEqual(setup.settings_yaml({'z':False,'a':'café','n':None}),
+                         yaml.safe_dump({'z':False,'a':'café','n':None}))
+
+    @unittest.skipUnless(shutil.which('node'), 'Real Node YAML serializer required')
+    def test_initial_settings_survive_exact_pinned_node_yaml_document_reserialization(self):
+        module=Path(os.environ.get('AUGMENTOR_TEST_YAML_MODULE',ROOT/'node_modules/yaml')).resolve()
+        metadata=module/'package.json'
+        if not metadata.exists() or json.loads(metadata.read_text()).get('version')!='2.9.1':
+            self.skipTest('Provide the locked yaml2.9.1 package with AUGMENTOR_TEST_YAML_MODULE.')
+        probe="""const fs=require('node:fs');const root=process.argv[1];
+const version=require(root+'/package.json').version;if(version!=='2.9.1')throw Error('Unpinned YAML');
+const {parseDocument}=require(root);const input=fs.readFileSync(0,'utf8');
+const document=parseDocument(input);if(document.errors.length)throw document.errors[0];
+// DSH replaces the unchanged default-model namespace through a leaf diff,
+// then calls Document.toString() even when no leaf value changed.
+process.stdout.write(document.toString());"""
+        settings=setup.model_settings('http://127.0.0.1:34187/v1','fixture',8192)
+        before=setup.settings_yaml(settings)
+        result=subprocess.run([shutil.which('node'),'-e',probe,str(module)],input=before,
+                              text=True,capture_output=True,check=True,timeout=10)
+        self.assertEqual(result.stdout,before)
+        # A real regression: the former indentless output changes on first Save.
+        import yaml
+        old=yaml.safe_dump(settings)
+        old_roundtrip=subprocess.run([shutil.which('node'),'-e',probe,str(module)],input=old,
+                                    text=True,capture_output=True,check=True,timeout=10)
+        self.assertNotEqual(old_roundtrip.stdout,old)
+        self.assertEqual(old_roundtrip.stdout,before)
+
     def startup_fixture(self, directory, *, ready_at=None, exit_code=None):
         sys.path.insert(0,str(ROOT/'services'))
         from platform_adapters.paths import private_directory

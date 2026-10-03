@@ -690,6 +690,38 @@
     "outputs/linux-rollout/mint-fresh-account2035/post-install-fixture-v3-planned.json": {
       "sha256": "77a67f5b0f50309ac411156ed7b254ced925dca8cae038337040c73655ffd2b9",
       "bytes": 2043
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v3-run-host.json": {
+      "sha256": "b90dd37676478df9132de73fd89ea9b1ff522b8ae74ecc451f3db9e4e39409fd",
+      "bytes": 735
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v3-capture.json": {
+      "sha256": "fb79f87b0ccce835acc5344a70dea83b5d37b8b605732f1575ab6eb75a8af6a3",
+      "bytes": 3061
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v3-settings-semantic-diff.json": {
+      "sha256": "8ad3887703545661fdfd0644cd7f18f0b20489e8c02edb30027487a7e7232ce3",
+      "bytes": 652
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v3-history-readonly-summary.json": {
+      "sha256": "5b93e89af5e36edeef2d9fc31131b53a117efea8c7197aa0a00fafd943e18521",
+      "bytes": 3843
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v3-final-readonly-research.json": {
+      "sha256": "1949fcfee3de4aba3b3145f0cf090ba8ba37bef237fd502a746c68c6e52f3ff1",
+      "bytes": 7864
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v3-memory-cleanup-v3-run.json": {
+      "sha256": "f56987fc106051608dfee7822f187fc10faa6d8435dee526a47e7ae89d380093",
+      "bytes": 1480
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v3-final-idle-readback.json": {
+      "sha256": "d8e2bf1f2102b1988ac6527c67ff368117cc1e7cd013e9e80acc217f4ea12027",
+      "bytes": 490
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/yaml291-pinned-public-test/provenance.json": {
+      "sha256": "7436f674cb17ca406bc8eb351a4333c12095c29237f2479ab5f0c9aad5eb9093",
+      "bytes": 391
     }
   },
   "maintainedPostInstallEntry": {
@@ -901,7 +933,7 @@
   },
   "emulatedStartupV3Source": {
     "implemented": true,
-    "executedInVM": false,
+    "executedInVM": true,
     "runDirectory": "post-install-proof-emulated-startup-v3",
     "startupBudgetSeconds": 120,
     "defaultStartupSeconds": 60,
@@ -926,5 +958,92 @@
     "successfulLateV3ReadinessRefusedBeforeFurtherRoleMutation": true,
     "default60PassRequiresBothMeasuredStartsWithin60": true,
     "pollingReadsRemainBounded": true
+  },
+  "emulatedStartupV3Execution": {
+    "status": "fail",
+    "publishedProofCommit": "7cbbc139397826f6c6ca2bec713c4ecaa5974f94",
+    "proofScriptSha256": "b3251d48d21f93255a36bd2e4d0e4ae5bf3535327ab46a3ea15c5706bea43aa3",
+    "runId": "7e011605409b2fead75c0ed57ef9de5e",
+    "journalSha256": "1dd1c91daa29fb80e7966b0f057d2e26a4996d94c925896c1c7fd5fc71eb8d7d",
+    "startupBudgetSeconds": 120,
+    "turnBudgetSeconds": 60,
+    "firstAuthenticatedStartupSeconds": 75.34530545301095,
+    "measuredStartupWithin120": true,
+    "linuxSessionCreatedOnce": true,
+    "linuxModelSelectedOnce": true,
+    "linuxPromptDispatchedOnce": true,
+    "linuxTurnCompleted": true,
+    "linuxReply": "LINUX DISTRO FIXTURE VERIFIED",
+    "modelRequests": 2,
+    "modelRequestsExplainedBy": "One main response and one first-prompt title request; both are retained in the single Linux session history.",
+    "pendingRequest": null,
+    "unknownRequestOutcome": false,
+    "browserRoleReached": false,
+    "restartReached": false,
+    "strictHistoryComparisonReached": false,
+    "failure": "Byte-bound settings.yaml changed after session.selectModel; its default-model save reserializes the YAML document even when parsed values match.",
+    "settingsPreserved": false,
+    "changedSettingsOnly": "dsh-home/settings.yaml",
+    "before": {
+      "bytes": 387,
+      "sha256": "fbae7864772e6719372c752fce343e5f2f5804ea973c2ca28911b165f1b956e9"
+    },
+    "after": {
+      "bytes": 403,
+      "sha256": "c31321dbedbe77c7e312f6a91415bda7139dde3ff3ded7ad0824c9befdbf0274"
+    },
+    "semanticValuesIdentical": true,
+    "byteDifference": "Eight list-related lines gain two indentation spaces.",
+    "otherFourSettingsUnchanged": true,
+    "settingsRestoredOrNormalized": false,
+    "workspaceJsonStillInitialEmpty": true,
+    "linuxHistory": {
+      "compressedSha256": "0d5517c442e68bff0b86457f3f1890538b9a775250e64023eb7d33181760df2b",
+      "decodedSha256": "183e3fba097bcd80c74e60034498813294251b20651a8640f815a2e0fd806eea",
+      "rows": 20,
+      "completedUserTurns": 1,
+      "completedAssistantMessages": 1
+    },
+    "originalFreshFullProofPass": false,
+    "public60SecondStartupProofPass": false,
+    "setupReplayed": false,
+    "newRunOrMutationRetried": false,
+    "allFourPriorJournalsPreserved": true,
+    "nativeAuditClean": true,
+    "oldUid1000TenHashesPreserved": true,
+    "ownedCleanup": {
+      "automaticMemoryCompanionInitiallyRemained": true,
+      "runCreatedAndExactPidStartSocketPeerVerified": true,
+      "readOnlyStatusActive": 0,
+      "retainedMemoryEvents": 2,
+      "inferenceJobs": 0,
+      "configuredBackend": false,
+      "guardedRefusalsBeforeSocketOrRPC": 2,
+      "refusalCause": "Observed Python argv includes -Xutf8 and -B; both attempts required the wrong service argument position.",
+      "nulEncodingWasNotTheCause": true,
+      "normalMaintenancePrepareAndCommitOnce": true,
+      "normalExitAfterCommitSeconds": 0.2511838119971799,
+      "signalOrForcedTermination": false,
+      "finalProductProcessesIdle": true,
+      "finalSocketRemoved": true,
+      "finalRuntimeAndDesktopLeaseReadback": true,
+      "finalTargetKernelPortEntries": []
+    }
+  },
+  "initialSettingsIndentationCorrection": {
+    "implementedInMaintainedSource": true,
+    "executedInInstalledArtifact": false,
+    "path": "scripts/setup-complete.py",
+    "scope": "Only initial settings.yaml serialization uses a SafeDumper subclass with indentless=False; scalar/key-order defaults and model values stay unchanged.",
+    "sourceTests": 18,
+    "realNodeYamlVersion": "2.9.1",
+    "realNodeVersion": "24.19.0",
+    "legacyOutputChangesOnDocumentToString": true,
+    "correctedOutputByteStable": true,
+    "semanticValuesIdentical": true,
+    "pinnedPublicSource": "https://github.com/eemeli/yaml/blob/v2.9.1/src/stringify/stringify.ts",
+    "priorFixtureFormatRestored": false,
+    "freshCleanBundleAndFreshOrdinaryAccountRequired": true,
+    "futureAcceptancePending": true
   }
 }

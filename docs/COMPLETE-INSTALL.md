@@ -314,6 +314,29 @@ original/full and public60 proof flags false. Polling checks between bounded
 reads may observe readiness after a budget; v3 then rejects it outside the
 retry catch before further role mutation. Default behavior is retained, but
 its 60-second pass label requires both measured starts to finish within 60
-seconds. It is not yet executed in the VM;
-review and published source precede execution. No setup or configuration is
-replayed, and no prior journal is deleted/adopted.
+seconds. The published v3 run fails after its first Linux turn: authenticated
+startup takes75.35seconds within120, and one Linux prompt completes. Two model
+requests comprise the response and its first-prompt title. Browser and restart
+checks are not reached. `session.selectModel` saves the default through shipped
+DSH0.1.5-rc.1's YAML writer, changing only eight sequence indentation lines in
+`settings.yaml` (387 to403bytes); parsed values are identical. The strict byte
+guard refuses. The failure and changed fixture bytes remain preserved, with no
+settings restoration, setup replay or new prompt.
+
+The maintained installer now indents YAML block sequences through a SafeDumper
+subclass, preserving its other defaults and model values. Eighteen setup cases
+pass, including a real pinned
+[YAML2.9.1 Document serializer](https://github.com/eemeli/yaml/blob/v2.9.1/src/stringify/stringify.ts)
+roundtrip: the old output changes, while the corrected output stays byte-identical.
+To run that case, supply the lock-integrity-verified package directory through
+`AUGMENTOR_TEST_YAML_MODULE`; it explicitly skips when that exact dependency is
+unavailable. No selected payload is patched. Acceptance requires a reviewed fresh
+clean bundle and fresh ordinary account; the failed v3 session is not reusable.
+
+The Linux turn also starts the normal detached memory companion. Read-only
+inspection binds it to this run and finds two completed transcript events, no
+inference jobs or configured backend. Approved exact-process maintenance performs
+one idle prepare/commit and normal exit without signals. Final native audits,
+four prior journals, failed v3 journal, current five settings, old-account hashes,
+runtime leases and no-process/socket/listener checks pass. This cleanup preserves
+the overall v3 failure; connected-product/history acceptance remains open.

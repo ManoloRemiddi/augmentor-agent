@@ -71,6 +71,17 @@ def model_settings(url, model, context):
              'agent-default-model':{'provider':'augmentor-model','model':model}}
 
 
+def settings_yaml(settings):
+    """Match DSH's indented block sequences without changing model values."""
+    import yaml
+
+    class SettingsDumper(yaml.SafeDumper):
+        def increase_indent(self, flow=False, indentless=False):
+            return super().increase_indent(flow, indentless=False)
+
+    return yaml.dump(settings, Dumper=SettingsDumper)
+
+
 def verify_installed_payload(app, manifest, bundle=None):
     """Package managers may retain an older payload with the same version."""
     try:
@@ -292,8 +303,7 @@ def install(args):
     if (config_home/'harnesses.json').exists():
         saved=json.loads((config_home/'harnesses.json').read_text()).get('dsh',{})
         if not resumable or saved.get('home')!=str(home):raise ValueError('Existing harness settings need a reviewed migration.')
-    import yaml
-    write(home/'settings.yaml',yaml.safe_dump(settings))
+    write(home/'settings.yaml',settings_yaml(settings))
     write(state/'model.env','AUGMENTOR_MODEL_API_KEY='+environment_value(secret)+'\n')
     for name in manifest['plugins']:
         run(cli,'plugin','--profile','web','add',bundle/name,'--ignore-scripts','--config.auto-install-peers=false',env=env,stdout=subprocess.DEVNULL)

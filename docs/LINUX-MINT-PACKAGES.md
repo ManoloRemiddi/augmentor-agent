@@ -178,6 +178,29 @@ read observed after 120 seconds before any further role mutation. Default
 behavior is retained, but a 60-second pass label requires both actual measured
 starts to be ready within 60 seconds. Seven added cases cover the v3 bounds,
 late successful reads, preservation, single-dispatch unknown outcomes and
-prior-record refusal; all 24 proof cases pass. This source
-change has not run in the VM and requires review/publication first. No selected
-installer/configuration/model/runtime files are changed.
+prior-record refusal; all 24 proof cases pass. Published v3 execution then fails:
+first authenticated startup takes75.35seconds within120, and the Linux role's
+single prompt completes with its expected reply. The two model requests cover
+the response and first-prompt title. Browser and restart/history checks are not
+reached. Only `settings.yaml` changes, from387 to403bytes, because shipped
+DSH0.1.5-rc.1 saves the model selection and YAML2.9.1 reserializes eight sequence
+indentation lines. Parsed values remain exact; the maintained byte guard refuses.
+No run, prompt, setup, settings restoration or normalization follows that failure.
+
+The source-only installer correction uses SafeDumper with `indentless=False`
+for initial settings. It preserves model values and other serializer defaults.
+All18 setup tests pass, including a real lock-integrity-verified Node/YAML2.9.1
+Document roundtrip that reproduces the old formatting change and proves the new
+output byte-stable. This dependency is explicit in
+`AUGMENTOR_TEST_YAML_MODULE`; the case skips if that exact version is unavailable.
+The selected2035 bundle remains unchanged. Qualification needs a reviewed fresh
+clean artifact and fresh ordinary account, with all prior failures retained.
+
+The run-created detached memory service initially survives Node cleanup.
+Exact PID/start/argv/private socket/Unix peer binding and read-only state show two
+completed transcript events, no inference jobs and no configured backend.
+Approved one-shot idle maintenance prepare/commit closes it normally in0.25seconds,
+without signals. Both earlier guard refusals precede socket creation/RPC and remain
+recorded. Final native audit, leases, old-account hashes, five current settings,
+all prior/failed journals and no-process/socket/listener checks pass. Overall v3
+remains FAIL; the original full proof and public60-second claims remain false.
