@@ -1,0 +1,79 @@
+{
+  "format": "augmentor-linux-qualification-checkpoint/1",
+  "date": "2026-10-03",
+  "scope": "Actual application Settings only in owned Ubuntu 24.04 GNOME46 Wayland VM",
+  "selectedSource": {
+    "commit": "3688a095ffa4221e8ea919c331e6eff6d35cb25d",
+    "dirty": false
+  },
+  "selectedArtifactSha256": "161ce1e7395f6018b049011c0ae6d57f908a7fd2000e351a885a672c44609fac",
+  "proofSource": "073c429",
+  "proofSha256": "860ac07abad0f31599e161478a86abedf3d8c6cea1c37c15a99595ed1341f2df",
+  "guestProofSha256": "dad63ec88502eb7c24d5b84ddfe6a311a6fd8e4f7504a45609d39a42246527d8",
+  "qualificationHelperSha256": "11f22a7cb3dc162b66ca4c256036b8e235643fa4d32727d16b9ab89024046e6c",
+  "commandExitCode": 0,
+  "passed": true,
+  "result": {
+    "actualApplicationSettingsWindows": [
+      "main",
+      "secondary"
+    ],
+    "asyncSaveTested": true,
+    "qtSaveMouseClicks": 4,
+    "qtConflictMouseClicks": 4,
+    "realNativeSettingsReadback": true,
+    "foreignConflictRefusedWithoutWrites": true,
+    "instanceConflictRefused": true,
+    "bothApplicationProcessesOptedIntoUiTestControl": true,
+    "fields": [
+      "name",
+      "binding",
+      "command"
+    ],
+    "functionalTested": false,
+    "main": {
+      "schema": 1,
+      "configured": true,
+      "key": {
+        "symbol": "F9",
+        "character": null,
+        "modifiers": [
+          "Shift",
+          "Control",
+          "Alt"
+        ],
+        "binding": "<Shift><Control><Alt>F9"
+      },
+      "functionalTested": false
+    },
+    "secondary": {
+      "schema": 1,
+      "configured": true,
+      "key": {
+        "symbol": "F10",
+        "character": null,
+        "modifiers": [
+          "Shift",
+          "Control",
+          "Alt"
+        ],
+        "binding": "<Shift><Control><Alt>F10"
+      },
+      "functionalTested": false
+    }
+  },
+  "cleanup": {
+    "settingsRestored": true,
+    "foreignEntriesPreserved": true
+  },
+  "historicalFailure": "20261003-noble-settings-source-qt-proof-child.json",
+  "limits": {
+    "inputTransport": "app-local Qt test events only",
+    "nativeShortcutDeliveryTested": false,
+    "loginAuthenticationTested": false,
+    "shortcutLockFencingTested": false,
+    "gnomeInputToolsEnabled": false,
+    "connectedHarnessTested": false,
+    "selectedPayloadModified": false
+  }
+}

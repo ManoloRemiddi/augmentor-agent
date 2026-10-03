@@ -3,11 +3,97 @@
 # GNOME consent and control implementation plan
 
 Production GNOME observers remain read-only and inputQualified stays false.
-The separate input-free consent candidate below now exercises real Fedora50
-portal consent and Stop; it does not enable production GNOME control. Current
+The separate input-free consent/capture candidates below exercise real Fedora50
+portal consent and Stop. The source-only input candidate described next does not
+enable production GNOME control. Current
 portal.py constructs KWin and rejects non-KDE sessions; service.py runs backend
 calls on the GUI GLib loop. Both still need integration and KDE regression before
 enabling GNOME input.
+
+## October 3 isolated-helper input candidate; native acceptance pending
+
+[GnomeControl](../services/desktop/gnome_control.py) now binds a separately owned
+[AccessibilityHelper](../services/desktop/a11y_helper.py) to the captured active
+window PID and its native process start time. The consumed observation retains
+the helper epoch, session/accessibility bus IDs, launcher/registry owners,
+selected application owner, accessible path, raw state and event serial. Each
+keyboard press, including every chord modifier and every ASCII character, asks
+the helper for a fresh complete focus and then rechecks the compositor scene.
+A cached serial alone cannot deliver the child's focus events to this worker.
+Capture also rechecks its scene after the bounded accessibility walk.
+
+The initial keyboard candidate requires focused, showing, nondefunct, sensitive,
+editable, nonpassword controls. GTK4.22.5's raw ENABLED=false is preserved rather
+than treated as disabled: its [pinned state collector](https://github.com/GNOME/gtk/blob/4.22.5/gtk/a11y/gtkatspicontext.c)
+exports SENSITIVE from the disabled state and omits ENABLED. A valid incomplete
+tree returns no keyboard target; a pointer observation can still be captured.
+That incomplete helper is retired and cannot be replaced to authorize the old
+keyboard token. A fresh capture can construct a new helper. Native identity or
+transport failure invalidates sharing; password, insensitive, noneditable,
+changed-focus/serial and scene refusal stop keyboard dispatch and detach state.
+Stop also disposes the isolated helper. Helper cleanup failure is recorded and
+cannot skip bounded held-input release against the pinned portal session.
+The first native/user Stop cause remains retained across repeated cleanup.
+
+A failed or cancelled Notify RPC is reported as an unknown outcome, with the
+observation consumed, sharing stopped and no retry. A successful dispatch still
+returns verified=false. This matches the [pinned frontend's asynchronous backend
+call and immediate client reply](https://github.com/flatpak/xdg-desktop-portal/blob/1.22.1/src/remote-desktop.c);
+actual widget state or saved bytes must establish the outcome independently.
+Production service.py, capability discovery, the banner and historical probes
+are unchanged; inputQualified remains false.
+
+The new [owned input probe](../release/probe-gnome-input.py) and [GTK target](../release/probe-gnome-input-target.py)
+require the dedicated Fedora GNOME QEMU marker, ordinary augmentor-proof UID1000,
+SELinux Enforcing, unchanged exact clean managed selection and a fresh private
+gnome-execution-probe-input-vN directory. Stage both files plus worker,
+gnome_control, gnome, portal, portal_session, capture_stream, scene, a11y_helper
+and a11y_service together; all module hashes are recorded. Run the target with
+`--candidate gnome-execution-probe-input-vN --backend wayland` (repeat separately
+with x11), then the probe with that candidate, `--source <selected commit>` and
+`--selected-artifact <verified selected inventory SHA256>`,
+`--native-source <audited native package commit>` and
+`--target-pid <actual target PID>`. Before importing the candidate, Qt or banner,
+the input probe uses the normal owned per-user desktop-deployment.py verifier
+to verify every managed file and inventory digest. Its complete deployment
+receipt must equal the exact selected configuration and explicitly requested
+artifact hash. Selected/native release metadata must be clean Fedora44 builds
+at the explicitly requested sources with matching product versions; distinct
+reviewed selected/native sources are recorded separately. The selected and
+executing interpreter must be /usr/bin/python3 with no virtual environment or
+managed/source-Qt Python policy. Inherited loader/Qt/Python overrides are refused
+and the native augmentor-agent RPM must pass a clean read-only rpm -V audit.
+The Qt banner retains the previously observed
+xcb route. Consent and target activation must be actual inspected operations;
+the probe never forces focus or infers input permission from readiness.
+
+Only a private0600 trigger.input.json explicitly requests an operation:
+`{"operation":"capture"}`, `{"operation":"action","params":{"token":"<fresh token>","kind":"type","text":"synthetic"}}`,
+`{"operation":"inspect"}` or `{"operation":"finish"}`. Action params use the
+existing click/key/type contract. Every action requires the owned fixture to be
+the actual foreground target. Real multiline text-buffer changes and center/edge
+button callbacks write private receipts; an actual Ctrl+S callback writes
+input-target-saved.json from current widget buffers. It is a fixture save action,
+not an assertion that another application supports that shortcut. Inspect the
+receipt and fresh capture after dispatch; an immediate receipt may precede
+asynchronous native delivery. The probe keeps capture dimensions/digests rather
+than image bytes. Its recorded-helper absence check covers only recorded PIDs;
+the external owned-VM driver must independently check for helpers after failed
+reads and retain process/start identities. Visible Stop remains the banner's
+actual button; a finish trigger is cleanup, not visible Stop evidence.
+
+Eighty-five focused source cases pass: GNOME guards/keyboard, helper protocol,
+worker/consent cancellation, portal targets, scene/capture and private-trigger
+and selected-artifact refusals. The latter exercise the normal maintained
+inventory verifier against synthetic managed releases, including changed or
+added payload, stale receipt, wrong source/target/hash/version/interpreter,
+managed policy and inherited loader/native-audit refusals. These are synthetic
+contracts and real isolated GLib scheduling, not
+native pointer/chord/typing qualification. No VM input has been sent by this new
+candidate. Fresh Fedora50 native widget/file outcomes, per-character focus and
+password/Stop/lock/restart cases, terminal capture loss, other GNOME profiles and
+actual KDE threading regression remain open. Scale2/fractional and multi-monitor
+input remain refused. Promote production routing only after those gates pass.
 
 ## Native capture candidate and cancellation evidence
 

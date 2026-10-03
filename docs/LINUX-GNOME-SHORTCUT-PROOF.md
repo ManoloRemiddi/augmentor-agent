@@ -114,3 +114,12 @@ and no-retry behavior remain unchanged. Six focused cases include a real ELF
 loader regression and failed/uncertain child handling; eleven existing selection
 and journal cases pass. Actual installed rerun and ordinary shortcut delivery
 remain separate gates. Neither selected payload nor visible UI is changed.
+
+## Actual Ubuntu application Settings acceptance
+
+[The maintained installed rerun](../release/qualification/next-targets/20261003-noble-actual-settings-pass.json)
+passes on selected clean368 with073c429 proof source: both real opted-in windows,
+four Save clicks, four collision clicks, native readback and conflict refusals.
+Settings and foreign bindings restore successfully. No selected payload is
+patched. Normal global shortcut delivery and authenticated password-lock/reboot
+acceptance remain separate; the original pre-Save loader failure is preserved.

@@ -1,0 +1,39 @@
+{
+  "format": "augmentor-linux-qualification-checkpoint/1",
+  "date": "2026-10-03",
+  "scope": "Source-only disabled GNOME input candidate and owned Fedora GNOME proof instrumentation",
+  "baseSource": "073c429",
+  "files": {
+    "services/desktop/gnome_control.py": "1be68fc8758850bbb57e05bf04f8f8bcd8b3101a01d651a89899cf8f353c6ea0",
+    "release/probe-gnome-input.py": "89ca77206dd959bf27d269ad629a9a40c5b2ad0fe3d949a786c7d8684fb54ad4",
+    "release/probe-gnome-input-target.py": "19ad6dec4f7849e77315eaca59d6b00006b8e92fb98e72bfa02094a626e1c5f4",
+    "tests/test_gnome_control.py": "cd3f176a6928db01daa2f84bdd8bd309bc4702c6cb491d268f0be7a04f47d989",
+    "tests/test_gnome_input_probe.py": "616b587491a0ff45656ef52398e21b6dda63af25b52ca67c33c41819121135b7",
+    "docs/LINUX-GNOME-CONTROL-PLAN.md": "b45191a48a89e91adb2ba9be403636e384c927375db9e4bbafb3d2ba5949bbe4"
+  },
+  "validation": {
+    "focusedPythonCases": 85,
+    "nodeObserverCases": 5,
+    "rootIndependentlyRepeatedControllerCases": 25,
+    "rootIndependentlyRepeatedProbeCases": 13,
+    "frozenRecipientControlsFilesUnchanged": 22
+  },
+  "behavior": [
+    "Fresh helper/focus/identity verification before every key press and ASCII character",
+    "Incomplete sensitive/editable state refuses keyboard actions",
+    "Raw GTK enabled=false preserved; sensitivity and editability checked separately",
+    "Unknown Notify outcome consumes token, stops sharing and is never retried",
+    "Held input cleanup runs even if helper shutdown fails",
+    "Proof requires exact native and selected sources, target/version, native audit and immutable deployment inventory",
+    "Private bounded triggers and actual target buffer receipts distinguish IPC acknowledgement from outcome"
+  ],
+  "limits": {
+    "actualNativeInputTested": false,
+    "actualConsentTested": false,
+    "visibleStopTested": false,
+    "lockRecoveryTested": false,
+    "productionInputQualified": false,
+    "productionDiscoveryChanged": false,
+    "selectedArtifactModified": false
+  }
+}

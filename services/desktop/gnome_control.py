@@ -16,6 +16,7 @@ from gnome import GnomeObserver
 from portal import Portal,RD
 from portal_session import ConsentSession,NAME,PATH
 from scene import same_scene
+from a11y_helper import AccessibilityHelper
 
 
 def monitor_mapping(metadata,scene):
@@ -63,6 +64,7 @@ class GnomeControl(Portal):
         self.owner=None;self.session=None;self.fd=None;self.node=None;self.stream=None;self.snapshot=None
         self.cancel=threading.Event();self.keys=[];self.button=None;self.symbol=None;self.focus_serial=0
         self.focus_listener=None;self.generation=0;self.busy=threading.Lock();self.last_used=time.monotonic();self.dispatch_scene=None;self.pointer_args=None
+        self.a11y=None;self.dispatch_snapshot=None
         self.watch_source=None
 
     def request_stop(self):
@@ -97,18 +99,51 @@ class GnomeControl(Portal):
         return sample
 
     def capture(self,owner):
-        try:return super().capture(owner)
+        try:
+            result=super().capture(owner)
+            # The isolated focus walk can take time. It cannot make the scene
+            # checked before that walk into a fresh keyboard observation.
+            if not self.snapshot or not same_scene(self.kwin.read(self.cancel),self.snapshot['scene']):
+                raise RuntimeError('The target changed during accessibility inspection. Observe again.')
+            return result
         except Exception as error:
             # Capture failure never leaves a stream or an old target usable.
             self.record_failure('capture',error);self.stop();raise
 
     def focus_info(self,pid):
-        # libatspi uses a process-global context. Moving the GUI singleton to
-        # this worker is unsafe; keyboard awaits an isolated a11y helper proof.
-        return []
+        # The child owns libatspi's process-global context. Never import Atspi
+        # or migrate the GUI singleton onto this worker.
+        self.checkpoint()
+        if self.a11y is not None and (self.a11y.closed or self.a11y.pid!=pid):
+            self.a11y.close();self.a11y=None
+        if self.a11y is None:self.a11y=AccessibilityHelper(pid)
+        value=self.a11y.request('focus',generation=self.generation,cancel=self.cancel,checkpoint=self.checkpoint)
+        self.focus_serial=value['serial']
+        if not value['complete']:
+            # A pointer observation does not require an accessible widget.
+            # This empty result never authorizes a later keyboard action.
+            self.a11y.close();return []
+        return [{key:value[key] for key in ('targetPid','targetStart','epoch','pins','selectedOwner','serial','focus')}]
 
     def keyboard_target(self,snapshot):
-        raise RuntimeError('GNOME keyboard control requires qualified accessibility event delivery.')
+        try:
+            recorded=snapshot.get('focus')
+            if (not isinstance(recorded,list) or len(recorded)!=1 or self.a11y is None or self.a11y.closed
+                    or self.a11y.pid!=snapshot['scene']['window']['pid']):
+                raise RuntimeError('GNOME keyboard control requires a complete fresh accessibility observation.')
+            current=self.focus_info(self.a11y.pid)
+            if current!=recorded or self.focus_serial!=snapshot['focusSerial']:
+                raise RuntimeError('Accessibility focus or native owner changed. Text may be partial; no action is replayed.')
+            focus=current[0]['focus']
+            # GTK4 exports SENSITIVE while omitting ENABLED. Preserve both raw
+            # flags; the initial candidate restricts keys and text to editable,
+            # sensitive, nonpassword controls with helper-validated focus.
+            if focus['password'] or not focus['sensitive'] or not focus['editable']:
+                raise RuntimeError('GNOME keyboard control requires a sensitive editable nonpassword control.')
+            if not same_scene(self.kwin.read(self.cancel),snapshot['scene']):
+                raise RuntimeError('GNOME target changed during accessibility inspection. No action is replayed.')
+        except Exception as error:
+            self.record_failure('keyboard-target',error);self.stop();raise
 
     def connect(self,owner):
         if not isinstance(owner,str) or not re.fullmatch(r'(pi|dsh|codex):[A-Za-z0-9_.:-]{1,180}',owner):
@@ -156,7 +191,7 @@ class GnomeControl(Portal):
         self.consent.verify(self.consent.generation);self.last_used=time.monotonic()
 
     def target(self,owner,token):
-        snapshot=super().target(owner,token);self.dispatch_scene=snapshot['scene'];return snapshot
+        snapshot=super().target(owner,token);self.dispatch_scene=snapshot['scene'];self.dispatch_snapshot=snapshot;return snapshot
 
     def point_guard(self,args):
         scene=self.dispatch_scene
@@ -173,27 +208,38 @@ class GnomeControl(Portal):
         current=self.kwin.read(self.cancel)
         if not self.dispatch_scene or not same_scene(current,self.dispatch_scene):
             raise RuntimeError('GNOME target changed before dispatch. No action is replayed.')
+        if method in ('NotifyKeyboardKeycode','NotifyKeyboardKeysym') and args[-1]==1:
+            # Every press, including each ASCII character and chord modifier,
+            # gets a fresh child query. Merely comparing a cached serial would
+            # miss events delivered only in the child's default context.
+            self.keyboard_target(self.dispatch_snapshot or {})
         if method=='NotifyPointerMotionAbsolute':self.point_guard(args);self.pointer_args=args
         elif method=='NotifyPointerButton' and args[-1]==1:
             if self.pointer_args is None:raise RuntimeError('A guarded pointer movement is required before pressing a button.')
             self.point_guard(self.pointer_args)
         try:return self.consent.call(RD,method,signature,args,self.consent.generation)
-        except Exception:self.stop();raise
+        except Exception as error:
+            self.record_failure('dispatch',error);self.stop()
+            raise RuntimeError('Desktop dispatch failed or was cancelled. Its outcome is unknown; inspect the target before continuing. No action is replayed.') from None
 
     def action(self,owner,params):
-        self.dispatch_scene=None;self.pointer_args=None
+        self.dispatch_scene=None;self.dispatch_snapshot=None;self.pointer_args=None
         try:return super().action(owner,params)
-        finally:self.dispatch_scene=None;self.pointer_args=None
+        finally:self.dispatch_scene=None;self.dispatch_snapshot=None;self.pointer_args=None
 
     def stop(self):
-        self.request_stop();self.snapshot=None;self.dispatch_scene=None;self.pointer_args=None
+        self.request_stop();self.snapshot=None;self.dispatch_scene=None;self.dispatch_snapshot=None;self.pointer_args=None
+        helper,self.a11y=self.a11y,None
+        if helper is not None:
+            try:helper.close()
+            except Exception as error:self.record_failure('accessibility-cleanup',error)
         source,self.watch_source=self.watch_source,None
         if source is not None:source.destroy()
         consent,self.consent=self.consent,None;session,self.session=self.session,None
         keys,self.keys=self.keys,[];button,self.button=self.button,None;symbol,self.symbol=self.symbol,None
         self.fd=None;self.node=None;self.stream=None;self.owner=None
         if consent:
-            self.last_stop_reason=consent.stop_reason
+            if self.last_stop_reason is None:self.last_stop_reason=consent.stop_reason
             # Release only this session's held input on the pinned unique owner.
             # Canceled RPCs cannot perform cleanup, so use separate bounded calls.
             releases=[('NotifyKeyboardKeycode',code) for code in reversed(keys)]

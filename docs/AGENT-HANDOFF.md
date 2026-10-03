@@ -1,5 +1,23 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 actual Ubuntu Settings acceptance and disabled GNOME candidate
+
+[The actual Settings checkpoint](../release/qualification/next-targets/20261003-noble-actual-settings-pass.json)
+passes both real application windows on the immutable clean368 Noble source-Qt
+selection with the maintained073c429 helper. Four Save clicks and four collision
+checks confirm native readback and refuse foreign/other-instance conflicts.
+The run-owned journal restores settings and preserves foreign entries. This is
+app-local Qt input; normal global shortcuts and password-lock/reboot remain
+separate gates. The earlier loader failure is retained.
+
+[The disabled GNOME candidate checkpoint](../release/qualification/next-targets/20261003-gnome-disabled-input-candidate.json)
+records85 focused Python and five Node observer cases, fresh per-key helper
+identity/focus checks, sensitivity/editability guards and unknown-outcome
+no-retry cleanup. Owned native-input proof admission verifies distinct exact
+native/selected artifacts and immutable inventory. Source tests qualify no
+actual consent, typing or visible Stop; production input remains disabled.
+
+
 ## October 3 Ubuntu Settings helper loader correction
 
 [The exact installed checkpoint](../release/qualification/next-targets/20261003-noble-settings-source-qt-proof-child.json)
