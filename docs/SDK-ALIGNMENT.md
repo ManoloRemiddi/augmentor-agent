@@ -7,6 +7,13 @@ contract. It pairs with SDK `0.1.0-preview.4` source in the separate public
 source publication nor a passing fixture deploys a customer installation.
 The two recorded live apps retain their reviewed preview 2 package and runtime.
 
+The owner has authorized integrating this already-qualified product/SDK source
+update. The paired SDK's [compatibility maintenance guide](https://github.com/ManoloRemiddi/augmentor-app-sdk/blob/main/docs/MAINTENANCE.md)
+defines future harness, OS, UI and settings impact reviews. Fresh local product
+check/build/privacy, all 88 Browser cases, four platform contracts and the 27-case
+packed SDK/runtime proof pass. Source integration does not publish a package,
+replace installed artifacts or migrate the live apps.
+
 ## Capability and settings ownership
 
 `services/workspaces/sdk.json` advertises available adapters. Before initialization,
@@ -198,10 +205,11 @@ separate from installed app, model or provider acceptance.
 | Preserve live apps and independent adoption | Candidate work stays in development branches; no app/database/profile/model/deployment changes; owner's third application is neither built nor inspected |
 
 The requirement audit and every required source/package workflow are complete
-for this exact functional pair. This completes the development source candidate;
+for this exact functional pair. At the qualification checkpoint,
 [product PR #34](https://github.com/ManoloRemiddi/augmentor-agent/pull/34) and
-[SDK PR #2](https://github.com/ManoloRemiddi/augmentor-app-sdk/pull/2) remain open
-drafts. No merge, release archive or live app migration is included.
+[SDK PR #2](https://github.com/ManoloRemiddi/augmentor-app-sdk/pull/2) were open
+drafts. The later owner-authorized source integration preserves this functional
+pair; release archives and live app migration remain separate.
 Customer SDK install/login-service, OS consent, physical audio, real Codex
 account/provider and installed SDK upgrade/rollback acceptance remain separate
 release gates. Windows Codex, Pi, cloud voice and multi-tenant/untrusted-plugin

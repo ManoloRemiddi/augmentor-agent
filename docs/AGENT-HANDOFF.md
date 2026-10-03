@@ -4,6 +4,13 @@
 
 ## Application SDK alignment source — October 3
 
+The owner has authorized source integration of the qualified SDK/product pair.
+The developer maintenance guide now defines how future product updates reach
+the SDK. Fresh packed/runtime, Browser and platform checks pass; see
+[the source update record](SDK-ALIGNMENT.md). No release or installed app update
+is performed by source integration. Preserve the separate unfinished canonical
+settings work and the owner's live applications.
+
 [SDK alignment](SDK-ALIGNMENT.md) owns the paired preview 4 candidate, feature
 states, shared-settings boundaries, Codex role/tools/session/memory isolation,
 platform bootstrap/private files and per-OS startup adapters. Source and fixture
