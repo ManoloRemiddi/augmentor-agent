@@ -1369,3 +1369,13 @@ not qualify the full bundle. Native managed run 37161745635 remains live: x64
 Handy passes, while ARM64 Handy is building before the full bundle jobs can start.
 The source copier excludes local dotenv files, outputs and traces as well as
 bytecode and dependency/test trees; these are never candidate inputs.
+
+
+Candidate application sources are now exported from the exact tracked Git commit
+before copying; ignored local files with arbitrary names cannot enter that source
+snapshot. Generated JavaScript and verified native/dependency artifacts remain
+separate build inputs. The checkout/ref is checked again before final export.
+A ninth boundary case uses a real synthetic Git repository to prove an ignored
+private-state file and Git metadata are excluded while tracked code is preserved.
+These checks do not establish complete clean-build or upstream-binary provenance;
+those review gates remain explicit.

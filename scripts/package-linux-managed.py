@@ -91,6 +91,16 @@ def copy(source,target):
     else:shutil.copy2(source,target)
 
 
+def tracked_source(repository,commit,directory):
+    """Freeze tracked application inputs; ignored local files never enter them."""
+    directory.mkdir(mode=0o700)
+    archive=directory.parent/'tracked-application.tar'
+    subprocess.run(['git','-C',str(repository),'archive','--format=tar','--output='+str(archive),commit],
+        check=True,timeout=30)
+    with tarfile.open(archive) as bundle:bundle.extractall(directory,filter='data')
+    return directory
+
+
 def python_packages(project,configuration):
     runtime=project/'python';interpreter=runtime/'bin/python3'
     site=runtime/'lib/python3.12/site-packages'
@@ -151,11 +161,13 @@ def build(out,*,channel='development',build=0,declared=None):
     subprocess.run([sys.executable,str(ROOT/'scripts/check-private-source-boundary.py')],check=True)
     if out.exists():raise ValueError('Choose a new output directory.')
     out.mkdir(parents=True,mode=0o700);cache=out/'inputs';cache.mkdir(mode=0o700)
+    public_source=tracked_source(ROOT,source['commit'],cache/'application')
     project=out/NAME
     subprocess.run([sys.executable,str(ROOT/'scripts/stage-production.py'),'--out',str(project)],check=True)
-    for name in ('dist','apps/native','apps/browser','services','adapters','scripts','config','docs','licenses',
+    copy(ROOT/'dist',project/'dist')  # Reviewed generated JS is a separate build input.
+    for name in ('apps/native','apps/browser','services','adapters','scripts','config','docs','licenses',
             'LICENSE','README.md','release/product.json','release/linux-managed.json','release/linux-managed-requirements.txt','release/dsh'):
-        copy(ROOT/name,project/name)
+        copy(public_source/name,project/name)
     subprocess.run([sys.executable,str(ROOT/'scripts/stage-handy.py'),str(project)],check=True)
     archive=download(pins['python'],cache/'python.tar.gz');extract_python(archive,project);python_packages(project,configuration)
     node_archive=download(pins['node'],cache/'node.tar.xz');extract_node(node_archive,project,pins['node'],arch)
@@ -163,8 +175,8 @@ def build(out,*,channel='development',build=0,declared=None):
         raise ValueError('The staged Node version differs from its pinned runtime.')
     subprocess.run([sys.executable,str(ROOT/'scripts/stage-dsh.py'),'--out',str(project/'dsh'),
         '--node',str(project/'node/bin/node')],check=True)
-    stage_repository(ROOT,project,node=project/'node/bin/node')
-    product=json.loads((ROOT/'release/product.json').read_text())
+    stage_repository(public_source,project,node=project/'node/bin/node')
+    product=json.loads((public_source/'release/product.json').read_text())
     receipt=build_receipt(version=product['version'],source_commit=source['commit'],target=pins['target'],
         channel=channel,build=build)
     (project/'release.json').write_text(json.dumps({**product,'target':pins['target'],'channel':channel,
@@ -179,6 +191,8 @@ def build(out,*,channel='development',build=0,declared=None):
             or report.get('fontCoverage') is not True or report.get('releaseSHA256')!=sha(project/'release.json')
             or any(report.get(key)!=value for key,value in (('version',product['version']),('sourceCommit',source['commit']),('target',pins['target'])))
             or snapshot(project)!=before):raise ValueError('The exact bundled target failed immutable offline UI health.')
+    if source_revision(ROOT,build=build,declared=source['commit'])!=source:
+        raise ValueError('The reviewed checkout changed during candidate assembly.')
     result=export(project,out/'augmentor-desktop-'+pins['target']+'.zip')
     manifest={'schema':'augmentor-linux-managed-artifact/1','source':source,'target':pins['target'],
         'version':product['version'],'build':build,'channel':channel,'artifact':result,'offlineHealth':report,

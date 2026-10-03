@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import stat
 import sys
+import subprocess
 import tarfile
 import tempfile
 import unittest
@@ -101,3 +102,17 @@ class ProducerTests(unittest.TestCase):
         for arch,pins in config['targets'].items():
             self.assertFalse(pins['distributionsQualified']);self.assertEqual(pins['target'],'linux-'+arch)
             self.assertRegex(pins['python']['sha256'],r'^[a-f0-9]{64}$');self.assertRegex(pins['node']['sha256'],r'^[a-f0-9]{64}$')
+
+    def test_only_tracked_application_inputs_enter_source_snapshot(self):
+        repository=self.base/'repository';repository.mkdir()
+        subprocess.run(['git','init','-q',str(repository)],check=True)
+        (repository/'.gitignore').write_text('private-state.json\n')
+        (repository/'public.py').write_text('# Synthetic reviewed code\n')
+        (repository/'private-state.json').write_text('{"token":"synthetic-private-value"}')
+        subprocess.run(['git','-C',str(repository),'add','.gitignore','public.py'],check=True)
+        subprocess.run(['git','-C',str(repository),'-c','user.name=Augmentor Fixture',
+            '-c','user.email=fixture@example.invalid','commit','-qm','Synthetic public inputs'],check=True)
+        commit=subprocess.check_output(['git','-C',str(repository),'rev-parse','HEAD'],text=True).strip()
+        root=producer.tracked_source(repository,commit,self.base/'reviewed-source')
+        self.assertEqual((root/'public.py').read_text(),'# Synthetic reviewed code\n')
+        self.assertFalse((root/'private-state.json').exists());self.assertFalse((root/'.git').exists())

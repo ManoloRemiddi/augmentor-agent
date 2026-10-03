@@ -7,6 +7,15 @@
 
 
 
+
+Producer source privacy now freezes only exact tracked Git application files;
+ignored state with arbitrary names cannot enter the application snapshot. Native
+and generated JS inputs remain separate. A real synthetic Git boundary test passes,
+bringing producer cases to nine. The checkout is rechecked before final export;
+full clean-build/upstream provenance remains an explicit review gate. Preserve
+managed run 37161745635 while its ARM64 component builds; do not cancel it to
+qualify this source privacy refinement.
+
 At `10fdece`, both complete Mac 14/26 jobs pass in 37160188044. All broad jobs
 (Debian source/build/tests, installed packages, Browser package, Home, Handy
 Linux/Mac/Windows and privacy) pass in 37160189535; its overall failure is only
