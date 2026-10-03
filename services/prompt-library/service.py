@@ -177,6 +177,8 @@ class Handler(socketserver.StreamRequestHandler):
                 with self.server.admission.work():
                     result=self.server.library.call(method,params,identity)
             response={'id':identity,'result':result}
+            if isinstance(method,str) and method in MAINTENANCE_METHODS:
+                response.update({'pid':os.getpid(),'buildRoot':str(Path(__file__).resolve().parents[2]),'maintenanceAdmission':1})
         except Exception as error:
             response={'id':identity,'error':{'code':'maintenance' if isinstance(error,MaintenanceBusy) else 'conflict' if isinstance(error,Conflict) else 'invalid','message':str(error)}}
         raw=(json.dumps(response,ensure_ascii=False)+'\n').encode()
@@ -194,6 +196,10 @@ class Server(ThreadingLocalServer):
         super().__init__(*args,**kwargs)
 
 if __name__=='__main__':
+    startup=None
+    if sys.platform in ('linux','darwin'):
+        from lifecycle.posix_startup import Startup
+        startup=Startup()
     sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'lifecycle'))
     from lease import hold
     hold('runtime')
@@ -205,6 +211,7 @@ if __name__=='__main__':
     endpoint=state/'prompts.sock'
     prepare_endpoint(endpoint)
     server=Server(str(endpoint),Handler);server.library=Library(data/'prompts.sqlite3',admission=server.admission)
+    if startup is not None:startup.ready()
     try:server.library.update_manager().start_scheduler()
     except Exception as error:
         # An updater recovery error cannot take conversations or prompts offline.

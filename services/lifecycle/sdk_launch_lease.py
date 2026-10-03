@@ -2,7 +2,7 @@
 """Live SDK launch inventory; unavailable shutdown protocols defer replacement.
 
 These servers belong to their application owners. No saved PID or command grants
-permission to close/restart them. A kernel-held registration blocks Windows
+permission to close/restart them. A kernel-held registration blocks platform
 preparation before any desktop/companion shutdown; exited registrations do not.
 """
 import os
@@ -32,6 +32,7 @@ def retain(runtime, root, component):
     try:
         locks.flock(fd,locks.LOCK_EX|locks.LOCK_NB)
         atomic_json(directory/(name+'.json'),{'schema':'augmentor-sdk-launch/1','root':str(Path(root).absolute()),'component':component})
+        if sys.platform!='win32':os.set_inheritable(fd,True)
     except BaseException:os.close(fd);raise
     _held.append(fd)
 

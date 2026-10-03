@@ -22,6 +22,7 @@ spec.loader.exec_module(builder)
 @unittest.skipUnless(sys.platform == 'darwin' and platform.machine() == 'arm64', 'requires ARM64 macOS')
 class NativeLauncherTests(unittest.TestCase):
     def test_native_identity_relocation_isolation_arguments_and_exit(self):
+        import fcntl
         with tempfile.TemporaryDirectory(prefix='augmentor-launcher-') as temporary:
             root = Path(temporary)
             app = root/'Build.app'
@@ -29,14 +30,27 @@ class NativeLauncherTests(unittest.TestCase):
             (project/'scripts').mkdir(parents=True)
             (project/'python').symlink_to(sys.base_prefix, target_is_directory=True)
             (project/'scripts/launch-component.py').write_text('''
-import ctypes, json, os, subprocess, sys
+import ctypes, fcntl, json, os, subprocess, sys
 lib = ctypes.CDLL('/usr/lib/libproc.dylib')
 buf = ctypes.create_string_buffer(4096)
 assert lib.proc_pidpath(os.getpid(), buf, len(buf)) > 0
 child = subprocess.check_output([sys.executable, '-I', '-c', 'print("child-ok")'], text=True).strip()
+runtime=os.environ['XDG_RUNTIME_DIR']
+with open(runtime+'/startup.lock','r+') as gate:
+ try:fcntl.flock(gate,fcntl.LOCK_EX|fcntl.LOCK_NB)
+ except BlockingIOError:startupHeld=True
+ else:raise AssertionError('Native startup protection is missing.')
+ assert ctypes.CDLL(None).AugmentorStartupReady()==1
+ fcntl.flock(gate,fcntl.LOCK_EX|fcntl.LOCK_NB)
+ fcntl.flock(gate,fcntl.LOCK_UN)
+with open(runtime+'/installation.lock','r+') as gate:
+ try:fcntl.flock(gate,fcntl.LOCK_EX|fcntl.LOCK_NB)
+ except BlockingIOError:installationHeld=True
+ else:raise AssertionError('Native lifetime protection is missing.')
 print(json.dumps({'argv':sys.argv[1:], 'nativeExecutable':buf.value.decode(),
     'isolated':sys.flags.isolated, 'bytecode':sys.dont_write_bytecode,
-    'child':child, 'path':sys.path, 'prefix':sys.prefix}))
+    'child':child, 'path':sys.path, 'prefix':sys.prefix,
+    'startupHeld':startupHeld,'installationHeld':installationHeld}))
 raise SystemExit(23)
 ''')
             launcher = app/'Contents/MacOS/Augmentor'
@@ -52,8 +66,9 @@ raise SystemExit(23)
             malicious.mkdir()
             (malicious/'sitecustomize.py').write_text('raise RuntimeError("environment injection")')
             args = ['a b', 'quote"', 'dollar$()', '日本語', '-c', 'raise SystemExit(99)']
+            runtime=root/'runtime';runtime.mkdir(mode=0o700)
             result = subprocess.run([str(launcher), *args], cwd='/', text=True, capture_output=True,
-                env={**os.environ, 'PYTHONHOME':'/does-not-exist', 'PYTHONPATH':str(malicious)}, timeout=30)
+                env={**os.environ, 'PYTHONHOME':'/does-not-exist', 'PYTHONPATH':str(malicious),'XDG_RUNTIME_DIR':str(runtime)}, timeout=30)
             self.assertEqual(result.returncode, 23, result.stderr)
             report = json.loads(result.stdout)
             self.assertEqual(report['argv'], ['desktop', *args])
@@ -61,8 +76,17 @@ raise SystemExit(23)
             self.assertEqual(report['isolated'], 1)
             self.assertTrue(report['bytecode'])
             self.assertEqual(report['child'], 'child-ok')
+            self.assertTrue(report['startupHeld']);self.assertTrue(report['installationHeld'])
             self.assertNotIn(str(malicious), report['path'])
             self.assertFalse(list(relocated.rglob('*.pyc')))
+            for name in ('startup.lock','installation.lock'):
+                with (runtime/name).open('r+') as gate:
+                    fcntl.flock(gate,fcntl.LOCK_EX|fcntl.LOCK_NB)
+                    refused=subprocess.run([str(launcher)],capture_output=True,text=True,timeout=30,
+                        env={**os.environ,'XDG_RUNTIME_DIR':str(runtime)})
+                    self.assertNotEqual(refused.returncode,0)
+                    self.assertIn('installation maintenance',refused.stderr)
+                    self.assertFalse(refused.stdout)
 
 
 if __name__ == '__main__':

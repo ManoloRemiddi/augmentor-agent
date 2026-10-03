@@ -10,6 +10,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/file.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
 
 #ifndef AUGMENTOR_COMPONENT
 #error "Build with an explicit Augmentor component"
@@ -26,7 +31,56 @@ static char *join(const char *root, const char *suffix) {
     return result;
 }
 
+static int startup_descriptor = -1;
+static int installation_descriptor = -1;
+
+/* Called by the embedded desktop after its control endpoint is discoverable. */
+int AugmentorStartupReady(void) {
+    if (startup_descriptor >= 0) {
+        int descriptor = startup_descriptor;
+        startup_descriptor = -1;
+        if (close(descriptor) != 0) return 0;
+    }
+    return 1;
+}
+
+static int read_lease(const char *runtime, const char *name) {
+    char *path = join(runtime, name);
+    int descriptor = open(path, O_RDWR | O_CREAT | O_NOFOLLOW, 0600);
+    free(path);
+    struct stat info;
+    if (descriptor < 0 || fstat(descriptor, &info) != 0 || !S_ISREG(info.st_mode) ||
+        info.st_uid != getuid() || (info.st_mode & 0077) || info.st_nlink != 1)
+        fail("invalid private maintenance lock");
+    if (flock(descriptor, LOCK_SH | LOCK_NB) != 0)
+        fail("installation maintenance is in progress");
+    return descriptor;
+}
+
+static void retain_launch_leases(void) {
+    const char *runtime = getenv("XDG_RUNTIME_DIR");
+    char *default_runtime = NULL;
+    if (!runtime || !*runtime) {
+        if (asprintf(&default_runtime, "/tmp/augmentor-%u", (unsigned)getuid()) < 0)
+            fail("out of memory");
+        runtime = default_runtime;
+    }
+    if (*runtime != '/') fail("runtime directory must be absolute");
+    if (mkdir(runtime, 0700) != 0 && errno != EEXIST) fail("cannot create runtime directory");
+    struct stat info;
+    if (lstat(runtime, &info) != 0 || !S_ISDIR(info.st_mode) ||
+        info.st_uid != getuid() || (info.st_mode & 0077))
+        fail("runtime directory must be private and owned by this user");
+    if (strcmp(AUGMENTOR_COMPONENT, "desktop") == 0)
+        startup_descriptor = read_lease(runtime, "startup.lock");
+    /* Hold before resolving resources or initializing Python. No child inherits
+     * through subprocess; the fixed browser exec retains this lifetime lease. */
+    installation_descriptor = read_lease(runtime, "installation.lock");
+    free(default_runtime);
+}
+
 int main(int argc, char **argv) {
+    retain_launch_leases();
     uint32_t size = 0;
     _NSGetExecutablePath(NULL, &size);
     char *buffer = malloc(size);

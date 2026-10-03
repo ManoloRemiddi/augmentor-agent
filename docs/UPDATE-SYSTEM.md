@@ -63,6 +63,48 @@ checkpoint because its public evidence folder is not private. The fixture now
 writes that checkpoint in its existing private runtime folder. A fresh full run
 must qualify all later stages; the failed run is not an overall passing proof.
 
+## Unix startup and graph preparation
+
+`posix_startup.Startup` holds a shared kernel reader until control registration
+is discoverable; maintenance holds its exclusive writer through discovery,
+reservations and observed drain. Desktop, shortcut, shared prompt/memory helpers,
+and SDK launches participate. SDK registration leases survive Unix exec into the
+actual Node server and defer preparation before any component shutdown.
+The compiled Mac launcher now takes startup/lifetime leases before resolving
+resources or initializing Python. Desktop readiness releases its native startup
+reader; its installation lease remains until OS exit. Native compilation and
+lock-export qualification are pending for this newer source.
+
+Installed DSH and Browser native hosts expose private Unix maintenance endpoints
+for their existing admission protocols. DSH uses the same accepted-agent/job
+checks and normal `appExit` callback; Browser uses the existing document/native
+reservation and shutdown flow. The original kernel-observed Node process is
+verified before each request. Private endpoints have bounded one-shot messages;
+a committed shutdown follows reply delivery or a lost connection and is never
+replayed. Developer DSH/native hosts do not register installed update endpoints.
+Prompt/memory maintenance replies add actual build-root/process identity while
+ordinary RPC results retain their previous shape.
+
+`posix_preparation.PosixPreparation` discovers those exact-source endpoints,
+reserves shortcut activation before windows/downstream services, and records each
+normal shutdown before observing that original process exit. Busy discovery
+releases reservations and startup exclusion; unconfirmed replies retain exclusion
+until transport cleanup actually finishes. Source checks cover five real Node
+endpoint/graph cases, three kernel startup/exec cases and eleven shortcut cases.
+The earlier peer-observation source `9bce979` passes hosted Mac 14/26. New combined
+Linux/source checks pass 922 Python cases (40 skips), 531 Node cases (two skips),
+92 Browser cases, build and type checks; newly added graph cases also pass focused
+checks. These are isolated fixtures, not installed automatic-update qualification.
+
+This graph alone cannot authorize replacement. The Unix external observer,
+exact-source recovery retention, final package/bundle lease, launchd/systemd
+registration coordination, fresh publisher authority, independent target health
+and reopening still need complete installation qualification. Package-managed
+Linux must use its package manager; managed Linux must preserve the immutable
+`augmentor-update` selection contract. Mac Desktop/Companion coexistence and
+unowned speech/runtime components need explicit installation-plan handling.
+Automatic flags remain disabled on all customer/source records.
+
 ## Ownership and data
 
 `services/updates/manager.py` belongs to the per-user shared prompt service, rather

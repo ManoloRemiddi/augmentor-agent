@@ -1365,9 +1365,10 @@ class Window(QWidget):
 
 
 def main():
-    if sys.platform=='win32':
+    if sys.platform in ('win32','linux','darwin'):
         sys.path.insert(0,str(Path(__file__).resolve().parents[3]/'services'))
-        from lifecycle.windows_startup import Startup
+        if sys.platform=='win32':from lifecycle.windows_startup import Startup
+        else:from lifecycle.posix_startup import Startup
         with Startup() as startup:
             return _main(startup)
     return _main()

@@ -25,6 +25,15 @@ required. Kernel peer/process observation is added separately. Read the
 [shared update checkpoint](UPDATE-SYSTEM.md#unix-coordination-checkpoint) before
 enabling any automatic installation flag. No installed Mac app is changed.
 
+New source adds startup exclusion to Desktop/helpers/SDK launches and holds native
+Mach-O installation/startup leases before Python initialization. Installed DSH and
+Browser expose private Unix control for the existing graceful maintenance protocol;
+Python discovers and reserves only exact-root/kernel-executable peers. Eight real
+Node graph/startup/exec cases pass locally. Mac 14/26 qualifies the preceding
+`9bce979` peer/shortcut checkpoint, not this newer native launcher. launchd pause,
+independent bundle replacement/health and reopen still need complete qualification.
+See [the current graph contract](UPDATE-SYSTEM.md#unix-startup-and-graph-preparation).
+
 ## Delivery contract and sequencing
 
 ### September 26 publication audit

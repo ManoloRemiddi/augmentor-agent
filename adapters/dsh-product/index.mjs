@@ -1,7 +1,7 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {ownsProductSession,profileForSession,profiles} from '../../services/workspaces/profiles.mjs'
 // Shared product integration, mounted on DSH's host plane by guided setup.
-import {readFileSync} from 'node:fs'
+import {readFileSync,existsSync} from 'node:fs'
 import {createHash,timingSafeEqual} from 'node:crypto'
 import {isIP} from 'node:net'
 import {join} from 'node:path'
@@ -12,6 +12,7 @@ import {improvePrompt} from './improve-prompt.mjs'
 import {exactFork} from './exact-fork.mjs'
 import {InteractionBroker,interactionOperation,registerInteractions} from './interactions.mjs'
 import {DshMaintenance} from './maintenance.mjs'
+import {unixControl,releaseStartup} from '../../services/lifecycle/unix-control.mjs'
 import {RELEASE} from '../../dist/contracts/src/release.js'
 import {pythonExecutable,componentEnvironment} from '../../dist/platform/src/index.js'
 export const name='augmentor-product'
@@ -44,6 +45,18 @@ export async function apply(ctx){
  }),'augmentor-product: runtime lease')
  const interactions=new InteractionBroker()
  const maintenance=new DshMaintenance(ctx)
+ const root=fileURLToPath(new URL('../../',import.meta.url))
+ if(process.platform!=='win32'&&existsSync(join(root,'release.json'))){
+  const environment=componentEnvironment(),exit=ctx.get('appExit')
+  const control=await unixControl({runtime:environment.XDG_RUNTIME_DIR??`/run/user/${process.getuid()}`,root,component:'dsh',
+   control:(method,params)=>{
+    if(method==='host.maintenance.commit'&&typeof exit!=='function')throw Error('Normal DSH shutdown is unavailable.')
+    return maintenance.control(method,params)
+   },onCommitted:()=>exit(0)})
+  ctx.effect(()=>()=>control.close(),'augmentor-product: Unix maintenance control')
+  releaseStartup(environment.XDG_RUNTIME_DIR??`/run/user/${process.getuid()}`)
+ }
+ if(process.platform!=='win32')lease.stdin.write('READY\n')
  registerInteractions(ctx,interactions)
  ctx.effect(()=>()=>interactions.close(),'augmentor-product: native interactions')
  const hash=value=>createHash('sha256').update(value).digest()

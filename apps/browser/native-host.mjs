@@ -18,11 +18,23 @@ import {describeWorkspace} from '../../services/workspaces/capabilities.mjs'
 import {guardWorkspaceMethod,voiceEnabled,SDK_PROTOCOL} from '../../services/workspaces/policy.mjs'
 import {fileURLToPath} from 'node:url'
 import {NativeBrowserMaintenance,connectBrowserOwner} from './shared/native-maintenance.mjs'
+import {existsSync} from 'node:fs'
+import {join} from 'node:path'
+import {unixControl,releaseStartup} from '../../services/lifecycle/unix-control.mjs'
+import {componentEnvironment} from '../../dist/platform/src/index.js'
 let child,childClosed=false,closing=false,compatible=false
 const pending=new Set()
 const childRequests=new Set(),childActions=new Set()
 const reply=value=>{if(process.stdout.destroyed||process.stdout.writableEnded)return;const b=Buffer.from(JSON.stringify(value)),h=Buffer.alloc(4);h.writeUInt32LE(b.length);process.stdout.write(Buffer.concat([h,b]))}
 const maintenance=new NativeBrowserMaintenance({send:reply,busy:()=>pending.size+childRequests.size+childActions.size,onCommit:()=>close(0)})
+const root=fileURLToPath(new URL('../../',import.meta.url))
+const unixOwner=process.platform!=='win32'&&existsSync(join(root,'release.json'))?await (async()=>{
+ const env=componentEnvironment(),runtime=env.XDG_RUNTIME_DIR??`/run/user/${process.getuid()}`
+ const control=await unixControl({runtime,root,component:'browser',control:(method,params)=>maintenance.control(method,params),
+  onCommitted:()=>maintenance.finishCommit()})
+ releaseStartup(runtime)
+ return control
+})():null
 const owner=process.env.AUGMENTOR_BROWSER_OWNER_ENDPOINT?connectBrowserOwner({
   endpoint:process.env.AUGMENTOR_BROWSER_OWNER_ENDPOINT,nonce:process.env.AUGMENTOR_BROWSER_OWNER_NONCE,
   pid:Number(process.env.AUGMENTOR_BROWSER_OWNER_PID),root:process.env.AUGMENTOR_BROWSER_OWNER_ROOT,maintenance,
@@ -30,7 +42,7 @@ const owner=process.env.AUGMENTOR_BROWSER_OWNER_ENDPOINT?connectBrowserOwner({
 // Harness children do not receive the private bridge-registration capability.
 for(const key of ['AUGMENTOR_BROWSER_OWNER_ENDPOINT','AUGMENTOR_BROWSER_OWNER_NONCE','AUGMENTOR_BROWSER_OWNER_PID','AUGMENTOR_BROWSER_OWNER_ROOT'])delete process.env[key]
 function finish(){
-  if(closing&&!pending.size&&(!child||childClosed)&&!process.stdout.writableEnded){owner?.close();process.stdout.end()}
+  if(closing&&!pending.size&&(!child||childClosed)&&!process.stdout.writableEnded){owner?.close();void unixOwner?.close();process.stdout.end()}
 }
 function close(code=0){
   if(code)process.exitCode=code

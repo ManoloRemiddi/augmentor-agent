@@ -22,9 +22,10 @@ def main():
     launcher.configure()
     sys.path.insert(0, str(ROOT/'services/lifecycle'))
     from lease import hold
-    if sys.platform=='win32':
+    if sys.platform in ('win32','linux','darwin'):
         sys.path.insert(0,str(ROOT/'services'))
-        from lifecycle.windows_startup import Startup
+        if sys.platform=='win32':from lifecycle.windows_startup import Startup
+        else:from lifecycle.posix_startup import Startup
         from lifecycle.sdk_launch_lease import retain
         from platform_adapters.paths import runtime_directory
         # Reader covers lease registration. A maintenance writer cannot miss

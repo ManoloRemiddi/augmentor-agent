@@ -206,7 +206,10 @@ class ShortcutService:
 def main():
     app = QCoreApplication([])
     service = ShortcutService()
-    service.start()
+    from lifecycle.posix_startup import Startup
+    with Startup() as startup:
+        service.start()
+        startup.ready()
     stopping = threading.Event()
     for number in (signal.SIGINT, signal.SIGTERM):
         signal.signal(number, lambda *_: stopping.set())

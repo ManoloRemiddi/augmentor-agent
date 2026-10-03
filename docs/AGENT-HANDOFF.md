@@ -4,6 +4,16 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+Unix source now has startup exclusion, SDK registration surviving exec, and
+private installed DSH/Browser endpoints bound to their original kernel-observed
+Node processes. `PosixPreparation` reserves and normally drains exact-source
+components with durable checkpoints; five real Node/graph and three startup/exec
+fixtures pass. Broad source checks pass 922 Python/40 skips, 531 Node/two skips,
+92 Browser, type/build. Mac 14/26 passes earlier `9bce979` peer/shortcut changes;
+new compiled-launcher leases and combined graph code require native CI. Complete
+Unix external apply/health/reopen and registration coordination remain open.
+Read [Unix graph contract](UPDATE-SYSTEM.md#unix-startup-and-graph-preparation).
+
 Mac shortcut admission and kernel-bound Unix peer observation are now added;
 Linux real-peer checks pass three cases and focused Mac shortcut checks pass eleven.
 Native Mac qualification and the complete Unix installation adapter remain open.
