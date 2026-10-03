@@ -4,6 +4,22 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+Latest qualification record: `faca8b5` passes the entire Mac 14/26 workflow,
+including packaged offline target health, in 37141250126. Newer persistent Unix
+barrier, live Mac completion and managed Linux changes are pushed through code
+checkpoint `b285823`; native Mac qualification is queued in 37143117713.
+`56a8f17` SDK contracts pass in 37142662043 and shared/Linux validation is running
+in 37142662036. Local focused updater checks pass 155 cases (154 passed, one
+OS skip), all eleven deployment checks pass, and the preceding broad Python
+checkpoint passes 929 cases (889 passed, 40 skips). These source/native fixtures
+are not signed N-to-N+1 or installed owner adoption. Independent Mac bootstrap,
+registration/reopen coordination, complete Linux controllers/recovery, signing
+custody and public feed/bridge delivery remain in the authorized full scope.
+An asynchronous question about existing Apple/Windows production signing accounts
+is pending in addition to the earlier online-key custody preference; do not
+repeat these questions or infer account availability from elapsed time.
+
+
 Packaged offline target health at `faca8b5` now passes on both Mac 14/26 in
 37141250126: the package/retention/apply/health step succeeds on both, Mac 14's
 complete job succeeds, and Mac 26's remaining distribution checks are running.

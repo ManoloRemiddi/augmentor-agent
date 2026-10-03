@@ -799,3 +799,14 @@ retention/same-build apply/offline target-health step on Mac 14 and Mac 26 in
 Mac 14's complete workflow job passes; remaining Mac 26 distribution checks are
 running. This precedes the persistent startup barrier/completion and managed
 Linux additions, which require their own newer native qualification.
+
+
+The complete Mac 14/26 run at `faca8b5` now succeeds in 37141250126, including
+target health and later distribution checks. Newer code checkpoint `b285823`
+(persistent barrier, live Mac completion and managed Linux lifetime) awaits
+[37143117713](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37143117713).
+SDK contracts at `56a8f17` pass
+[37142662043](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37142662043);
+shared/Linux packaging remains running in
+[37142662036](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37142662036).
+No owner application or public automatic-install flag is changed.
