@@ -27,8 +27,8 @@ identifier contract as SDK planning and the pinned host, before registry writes.
 
 Current functional pair: product `8a085be` / SDK `925b72e`. All six SDK jobs,
 all three platform contracts, Mac 14/26 bundles and Windows x64/ARM64 desktop
-checks pass. Full Linux/package/Browser and Windows packaged installation
-workflows remain live pending/running gates. The alignment guide records their
+checks pass. Full Linux/package/Browser validation also passes; Windows packaged
+installation remains a live running gate. The alignment guide records their
 exact run URLs, the requirement audit and four inspected Chromium component
 renders. These source checks do not promote a release or migrate an app.
 

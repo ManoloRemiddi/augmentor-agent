@@ -158,8 +158,15 @@ commits do not change the functional source under qualification.
 | Product platform contracts | All three platforms pass in [37116596807](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37116596807) |
 | macOS 14/26 bundled runtime and shipped SDK-helper proof | Pass in [37116596912](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37116596912) |
 | Windows x64/ARM64 desktop | Pass in [37116596991](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37116596991) |
-| Full Linux/source/native/package/Browser regression | Running in [37116596924](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37116596924) |
-| Windows x64/ARM64 bundled runtime and install/repair/removal | Pending in [37116596824](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37116596824) |
+| Full Linux/source/native/package/Browser regression | All jobs pass in [37116596924](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37116596924) |
+| Windows x64/ARM64 bundled runtime and install/repair/removal | Running in [37116596824](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37116596824) |
+
+The exact Linux run passes 522 root cases (520 passing/two opt-in skips), all
+88 Browser cases, the real DSH tool guard, and 830 native cases (36
+platform/optional skips). Installed-package and packaged-browser jobs pass,
+including active-task refusal, interrupted configuration, upgrade, rollback
+and removal. These lifecycle fixtures do not certify a customer SDK embedding
+service's installed upgrade acceptance on another OS.
 
 Four actual isolated Chromium renders of this Settings source were inspected:
 light/dark at 1100×760 and 400×780. The scoped navigation, thinking preference
