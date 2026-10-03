@@ -25,6 +25,9 @@ const button=(parent,label,fn)=>{const b=make('button',label);b.type='button';b.
 let state={},checking=false,closed=false,mounting=0
 const sections=new Map()
 const definitions=[
+  ...(chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol?[
+    ['conversation','Conversation','Choose how responses appear.','M4 4h16v12H9l-5 4z'],
+  ]:[]),
   ['dictation','System dictation','Powered by Handy · Available in every application.','M9 3h6v10H9zM5 10v3a7 7 0 0 0 14 0v-3M12 20v3'],
   ['voice','Voice',chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol?'Optional experimental speech for this application.':'Shared with the floating Augmentor window.','M9 3h6v10H9zM5 10v3a7 7 0 0 0 14 0v-3M12 20v3'],
   ['appearance','Colours','Changes apply immediately.','M12 3a9 9 0 1 0 0 18h1a2 2 0 0 0 1-4 2 2 0 0 1 1-4h2a4 4 0 0 0 4-4c0-3-4-6-9-6ZM7 10h.01M10 6h.01M15 6h.01'],
@@ -45,6 +48,21 @@ for(const [id,label,description,path] of settingsSections(definitions,chrome.run
   sections.set(id,{section,body,link,mounted:false})
 }
 document.querySelector('#version').textContent='Version '+chrome.runtime.getManifest().version
+function showConversation(container){
+  const card=make('div');card.className='card'
+  card.append(make('h2','Thinking display'),make('p','Choose what you see while the agent is thinking. Thinking always collapses when finished, and you can still expand or collapse it manually.'))
+  const label=make('label','While thinking'),select=make('select');select.setAttribute('aria-label','While thinking')
+  for(const [value,text] of [['open','Open — show live thinking'],['collapsed','Collapsed']]){const option=make('option',text);option.value=value;select.append(option)}
+  const sync=()=>{select.value=readAppearance().expandThinking===false?'collapsed':'open'};sync()
+  const note=make('p','Saves immediately for this application workspace.');note.className='help';note.setAttribute('role','status')
+  select.onchange=async()=>{
+    select.disabled=true
+    try{await saveAppearance({...readAppearance(),expandThinking:select.value==='open'});note.textContent='Saved for this application workspace.'}
+    catch(error){sync();fail(error)}
+    finally{select.disabled=false}
+  }
+  label.append(select);card.append(label,note);container.append(card);watchAppearance(sync)
+}
 async function appearance(container){
   await refreshDesktopAppearance()
   const theme=make('div');theme.className='card';theme.append(make('h2','Theme'));const choices=make('div');choices.className='theme-choices';theme.append(choices)
@@ -158,6 +176,7 @@ function mount(id){
   }
   row.body.replaceChildren();row.mounted=true
   const mountAsync=async fn=>{mounting++;try{await fn()}catch(e){fail(e)}finally{mounting--}}
+  if(id==='conversation')showConversation(row.body)
   if(id==='appearance')void mountAsync(()=>appearance(row.body))
   if(id==='models')showModels(row.body)
   if(id==='harnesses')showHarnesses(row.body)
@@ -175,7 +194,7 @@ function mount(id){
   }
 }
 function navigate(){
-  const id=sections.has(location.hash.slice(1))?location.hash.slice(1):'appearance'
+  const id=sections.has(location.hash.slice(1))?location.hash.slice(1):sections.has('conversation')?'conversation':'appearance'
   for(const [key,row] of sections){row.section.hidden=key!==id;if(key===id)row.link.setAttribute('aria-current','page');else row.link.removeAttribute('aria-current')}
   mount(id)
 }

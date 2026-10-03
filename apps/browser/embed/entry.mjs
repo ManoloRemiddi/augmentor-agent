@@ -6,8 +6,12 @@
 // stays in extension modules; this module supplies the host's platform APIs.
 const base=new URL('./',location.href)
 import {snapshotWorkspaceContext} from './workspace-context.mjs'
+import {restoreWorkspaceAppearance} from './workspace-settings.mjs'
 async function api(path,value){const res=await fetch(new URL(path,base),{method:value?'POST':'GET',headers:value?{'Content-Type':'application/json'}:{},body:value?JSON.stringify(value):undefined,signal:AbortSignal.timeout(8000)});const data=await res.json();if(!res.ok)throw Error(data.error||'Augmentor unavailable');return data}
 const profile=await api('config.json')
+if(profile.sdkProtocol){
+ restoreWorkspaceAppearance(localStorage,profile,await api('preferences'))
+}
 const eventSet=()=>{const listeners=new Set();return {addListener:f=>listeners.add(f),removeListener:f=>listeners.delete(f),emit:(...args)=>{for(const f of listeners)f(...args)}}}
 const runtimeEvents=eventSet(),storageEvents=eventSet();let handler,closed=false,workspaceContext=null
 const tell=value=>parent.postMessage(value,profile.parentOrigin)

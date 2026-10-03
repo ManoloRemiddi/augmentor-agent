@@ -2,6 +2,15 @@
 
 # Browser Settings
 
+SDK workspaces use the [scoped settings contract](SDK-ALIGNMENT.md#capability-and-settings-ownership).
+Their Conversation page offers the approved Open/Collapsed thinking preference,
+saved per workspace; appearance and experimental voice opt-in are also scoped.
+The embed restores preferences from its authenticated store before rendering,
+with profile-specific browser cache keys even on a shared website origin.
+Shared installation, model/provider, Handy and memory administration stays in
+standalone Augmentor. The standalone settings redesign has a separate lifecycle;
+the SDK candidate does not deploy or overwrite that work.
+
 **Voice dictation — Powered by Handy** configures the same bundled service as
 Desktop, through the existing authenticated native bridge. It is available
 before connecting an agent harness. Enable/disable, editable shortcut/activation,

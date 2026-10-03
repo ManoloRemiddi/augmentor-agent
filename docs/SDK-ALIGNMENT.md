@@ -31,6 +31,14 @@ Augmentor. The shared prompt-improvement action is unavailable in app workspaces
 Model settings show the current model and refer to the chat picker; shared
 connection editors and provider checks remain in standalone Augmentor. Appearance
 help reflects workspace-local storage rather than promising a desktop-wide change.
+SDK Settings includes Conversation → Thinking display, with the approved Open /
+Collapsed choice, defaulting to Open. It controls active/future thinking and
+collapses it when the phase finishes; manual expansion and finished history
+remain available. Colour resets preserve the choice. The embed restores these
+preferences from the authenticated workspace store before rendering and caches
+them under that profile's ID. Two workspaces on the same origin cannot overwrite
+each other's appearance or the standalone browser's settings. Shared desktop
+preferences and the owner's developing standalone settings files are unchanged.
 Standalone settings behavior and the developing native settings redesign are
 separate. New shared management routes must be assessed against the workspace
 policy before exposing them through the embed.
@@ -216,3 +224,22 @@ passes its packaged workflow; ARM64 is still running in
 [37111918324](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37111918324).
 These runs do not qualify the later selection changes or a customer app
 conversation. Fresh paired/platform/package checks are required for this follow-up.
+
+## Workspace settings follow-up
+
+The Conversation/Thinking integration passes all 88 Browser checks, including
+the actual settings module and live reasoning renderer, plus 11 workspace
+embedding/SDK contracts. Tests verify acknowledged persistence, restoration,
+same-origin profile separation, retained colours, colour reset, manual controls,
+phase completion and historical thinking. TypeScript and source-boundary checks
+pass. These are local source/DOM fixtures; fresh packaged Browser and platform
+checks qualify the subsequent source independently. Standalone settings remain
+under their separate development/adoption contract.
+
+At the preceding product `6c3b1ca`, full Linux/package/Browser validation and
+Mac 14/26 bundles pass. Its Windows x64 qualification passes; ARM64 remains in
+the same [qualification run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37113710240).
+SDK `b91b908` passes all six source/packed/paired jobs in
+[37114441418](https://github.com/ManoloRemiddi/augmentor-app-sdk/actions/runs/37114441418).
+These refs qualify the preceding runtime/context/preflight changes, not the
+newer workspace preference integration or a customer deployment.

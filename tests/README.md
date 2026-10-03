@@ -778,7 +778,11 @@ Application SDK alignment: `tests/codex-workspaces.test.mjs` exercises the actua
 pinned engine and application restrictions; `workspace-capabilities.test.mjs`
 separates support, grants and opt-in; `test_app_sdk_platform.py` checks read-only
 discovery, private credentials and per-platform startup plans. Browser
-`workspace-ui.test.mjs` loads the actual settings module. Run the SDK repository
+`workspace-ui.test.mjs` loads the actual settings module.
+Browser `workspace-settings.test.mjs` additionally checks same-origin profile
+cache separation/restoration; `chat-render.test.mjs` checks scoped live thinking,
+manual controls and phase/history behavior. These do not certify installed UI.
+Run the SDK repository
 `npm run test:runtime -- /absolute/paired/product/source` to additionally qualify
 the packed SDK client/tools through the real native host. These are synthetic
 provider/record fixtures. `scripts/app-sdk-bundle-proof.mjs /absolute/runtime`

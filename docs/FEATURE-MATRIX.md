@@ -2,6 +2,10 @@
 
 Windows public preview scope: [installation and explicit parity limits](WINDOWS-PREVIEW.md). Physical acceptance is pending; shared source does not imply complete Windows feature qualification.
 
+The [SDK source candidate](SDK-ALIGNMENT.md) scopes Conversation/Thinking and
+appearance preferences per application, including apps sharing a website origin;
+it does not deploy the developing standalone settings redesign.
+
 Current OS parity direction and verified gaps: [one-product architecture audit](PLATFORM-PARITY-AUDIT.md).
 
 The [embedded Handy candidate](HANDY-INTEGRATION.md) adds harness-independent

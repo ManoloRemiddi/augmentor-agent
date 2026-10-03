@@ -18,6 +18,11 @@ DSH retains latest-session context; the capability snapshot reports this
 difference. See the alignment guide's exact tests, initial failures and remaining
 hosted/package gates before claiming release readiness.
 
+The workspace settings follow-up integrates the approved thinking-display choice
+with profile-specific persistence/cache keys, including same-origin app isolation.
+Its 88 Browser and 11 workspace contracts pass locally; hosted package validation
+remains separate. The canonical owner's settings/dictation edits are preserved.
+
 
 
 

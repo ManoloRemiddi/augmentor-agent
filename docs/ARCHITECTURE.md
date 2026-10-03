@@ -9,6 +9,8 @@ experimental Codex application workers and product-owned platform launch adapter
 Application selection is untrusted evidence; Codex persists it with its operation
 identity, while DSH retains the existing session-selection contract. Application
 records, authorization and receipts remain owned by the application's backend.
+Embedded appearance/thinking preferences use the authenticated profile store
+and profile-specific browser caches; shared desktop settings remain standalone.
 
 Product version is defined by [the shared manifest](../release/product.json). Start with the
 [agent handoff](AGENT-HANDOFF.md) for the authoritative Git ref and evidence.

@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
 
+import {appearanceStorageKey} from './workspace-settings.mjs'
+const storageKey=key=>appearanceStorageKey(key,chrome.runtime.getManifest?.().augmentorWorkspace)
 let desktopAppearance=null
 export function applyDesktopAppearance(result){
   if(!result?.tokens)return
@@ -29,12 +31,13 @@ export function formattingDefaults(theme='dark'){
   return Object.fromEntries(formattingFields.map(([key],i)=>[key,i===2?(theme==='light'?'#152b2c':'#edf3f3'):i<2?(theme==='light'?'#4176e6':'#5686fe'):code[i-3]]))
 }
 export function readAppearance() {
-  const values = {theme:localStorage.getItem('augmentor-theme') === 'light' ? 'light' : 'dark'}
+  const values = {theme:localStorage.getItem(storageKey('augmentor-theme')) === 'light' ? 'light' : 'dark'}
+  if(chrome.runtime.getManifest?.().augmentorWorkspace?.sdkProtocol)values.expandThinking=localStorage.getItem(storageKey('augmentor-expand-thinking')) !== 'false'
   for(const [key,storage,,min,max] of appearanceFields){
-    const raw=localStorage.getItem(storage),value=raw===null?T.DEFAULTS[key]:Number(raw)
+    const raw=localStorage.getItem(storageKey(storage)),value=raw===null?T.DEFAULTS[key]:Number(raw)
     values[key]=Number.isFinite(value)?Math.max(min,Math.min(max,value)):T.DEFAULTS[key]
   }
-  try {values.formatColours=JSON.parse(localStorage.getItem('augmentor-format-colours')||'{}')} catch {values.formatColours={}}
+  try {values.formatColours=JSON.parse(localStorage.getItem(storageKey('augmentor-format-colours'))||'{}')} catch {values.formatColours={}}
   if(!values.formatColours||typeof values.formatColours!=='object')values.formatColours={}
   return desktopAppearance?.values?{...values,...desktopAppearance.values}:values
 }
@@ -57,11 +60,13 @@ export async function saveAppearance(value) {
     desktopAppearance=reply.result
   }
   const stored={'augmentor-theme':value.theme,'augmentor-format-colours':JSON.stringify(value.formatColours||{})}
+  if(chrome.runtime.getManifest?.().augmentorWorkspace?.sdkProtocol)stored['augmentor-expand-thinking']=String(typeof value.expandThinking==='boolean'?value.expandThinking:readAppearance().expandThinking)
   for(const [key,storage] of appearanceFields)stored[storage]=value[key]
-  for(const [key,v] of Object.entries(stored))localStorage.setItem(key,String(v))
+  if(chrome.runtime.getManifest?.().augmentorWorkspace?.sdkProtocol)await chrome.storage.local.set(stored)
+  for(const [key,v] of Object.entries(stored))localStorage.setItem(storageKey(key),String(v))
   applyAppearance()
   // The service worker uses these values for browser-control overlays.
-  return chrome.storage.local.set(stored)
+  if(!chrome.runtime.getManifest?.().augmentorWorkspace?.sdkProtocol)return chrome.storage.local.set(stored)
 }
 export function watchAppearance(onChange=()=>{}) {
   const refresh=()=>onChange(applyAppearance())
