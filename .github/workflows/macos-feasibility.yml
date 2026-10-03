@@ -98,6 +98,7 @@ jobs:
           "$project/node/bin/node" scripts/dsh-payload-proof.mjs "$project/dsh"
           codesign --verify --deep --strict "$app"
           "$project/python/bin/python3" -I -B scripts/proof-handy-component.py --runtime "$project/components/handy/runtime"
+          "$project/node/bin/node" scripts/app-sdk-bundle-proof.mjs "$project"
           codesign --verify --deep --strict "$app"
       - name: Exercise bundled DSH and Qt with an isolated model fixture
         env:

@@ -120,6 +120,12 @@ jobs:
         if: ${{ !cancelled() && steps.dsh.outcome == 'success' }}
         run: |
           & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-windows-application.py --root outputs/payload --arch ${{ matrix.arch }}
+      - name: Qualify packaged SDK registration and owned native bridge
+        if: ${{ !cancelled() && steps.application.outcome == 'success' }}
+        env:
+          AUGMENTOR_EPHEMERAL_WINDOWS_RUNNER: '1'
+        run: |
+          & outputs/payload/node/node.exe scripts/app-sdk-bundle-proof.mjs outputs/payload
       - name: Exercise managed Windows DSH setup and conversation restart
         if: ${{ !cancelled() && steps.application.outcome == 'success' }}
         run: |

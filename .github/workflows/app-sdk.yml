@@ -39,3 +39,6 @@ jobs:
       - name: Verify actual pinned Codex workspace engine
         if: runner.os != 'Windows'
         run: node --test tests/codex-workspaces.test.mjs
+      - name: Verify source registration and native frame boundary
+        if: runner.os == 'Linux'
+        run: node scripts/app-sdk-bundle-proof.mjs .

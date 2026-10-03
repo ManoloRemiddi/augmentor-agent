@@ -781,4 +781,10 @@ discovery, private credentials and per-platform startup plans. Browser
 `workspace-ui.test.mjs` loads the actual settings module. Run the SDK repository
 `npm run test:runtime -- /absolute/paired/product/source` to additionally qualify
 the packed SDK client/tools through the real native host. These are synthetic
-contracts, not independent app adoption or installed customer qualification.
+provider/record fixtures. `scripts/app-sdk-bundle-proof.mjs /absolute/runtime`
+verifies packaged bootstrap, private token, profile registration and the native
+description/administration boundary without starting a harness. Mac/Windows
+bundle workflows run it with their managed binaries; Windows requires
+`AUGMENTOR_EPHEMERAL_WINDOWS_RUNNER=1` on a disposable runner. Linux source can
+run `node scripts/app-sdk-bundle-proof.mjs .`. These checks do not establish
+independent app adoption or installed customer qualification.

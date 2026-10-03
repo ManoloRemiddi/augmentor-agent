@@ -131,6 +131,15 @@ The assertions remain enabled on every platform. Passing local reruns do not
 replace fresh hosted qualification. The SDK's Windows database cleanup ordering
 is corrected separately in its owning repository.
 
+`scripts/app-sdk-bundle-proof.mjs` checks the actual packaged Mac/Windows bootstrap, private token,
+transactional DSH workspace registration/role composition, native frame
+description, shared-administration denial, explicit harness and natural owned
+bridge exit. It uses synthetic files with no running harness/model or login
+registration. Windows requires a disposable-runner opt-in; Linux can exercise
+the source path locally. The normal bundle workflows run it before installed
+application proofs and retain their seal/signature checks. This proves shipped
+adapter presence and startup, not an app conversation or installed login service.
+
 Customer Mac/Windows SDK installation, actual login/background-service behavior,
 OS consent, physical voice, Codex account/provider acceptance and installed
 upgrade/rollback remain qualification gates. The current public Windows preview
