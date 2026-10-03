@@ -12,6 +12,7 @@ export function applyDesktopAppearance(result){
   for(const [key,value] of Object.entries(result.tokens))document.documentElement.style.setProperty(key,value)
 }
 export async function refreshDesktopAppearance(){
+  if(chrome.runtime.getManifest?.().augmentorWorkspace?.sdkProtocol)return
   const reply=await chrome.runtime.sendMessage({type:'surface/appearance'})
   if(reply?.ok){applyDesktopAppearance(reply.result);return reply.result}
 }
@@ -50,9 +51,11 @@ export function applyAppearance() {
   return value
 }
 export async function saveAppearance(value) {
-  const reply=await chrome.runtime.sendMessage({type:'surface/appearance',settings:value})
-  if(!reply?.ok)throw Error(reply?.error||'Could not save shared appearance')
-  desktopAppearance=reply.result
+  if(!chrome.runtime.getManifest?.().augmentorWorkspace?.sdkProtocol){
+    const reply=await chrome.runtime.sendMessage({type:'surface/appearance',settings:value})
+    if(!reply?.ok)throw Error(reply?.error||'Could not save shared appearance')
+    desktopAppearance=reply.result
+  }
   const stored={'augmentor-theme':value.theme,'augmentor-format-colours':JSON.stringify(value.formatColours||{})}
   for(const [key,storage] of appearanceFields)stored[storage]=value[key]
   for(const [key,v] of Object.entries(stored))localStorage.setItem(key,String(v))

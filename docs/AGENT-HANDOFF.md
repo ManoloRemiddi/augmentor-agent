@@ -2,6 +2,17 @@
 
 # Start here: agent handoff
 
+## Application SDK alignment source — October 3
+
+[SDK alignment](SDK-ALIGNMENT.md) owns the paired preview 4 candidate, feature
+states, shared-settings boundaries, Codex role/tools/session/memory isolation,
+platform bootstrap/private files and per-OS startup adapters. Source and fixture
+qualification do not deploy the live YouTube/Sponsor apps or certify a fresh
+Mac/Windows SDK install. Hosted platform/paired-package checks and installed
+acceptance remain distinct. Preserve the owner's dirty canonical checkout and
+independent third-app test.
+
+
 
 
 ## Windows 0.2.13 public preview — release record, October 2

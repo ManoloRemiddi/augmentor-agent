@@ -14,9 +14,13 @@ import {surfaceRequest} from './shared/surface.mjs';
 import {supportReport} from './shared/support.mjs';
 import {randomUUID} from 'node:crypto';
 import {BrowserVoice, voicePreferences} from './shared/voice-client.mjs';
+import {loadProfile} from '../../services/workspaces/profiles.mjs';
+import {CodexWorkspaceBoundary} from './shared/codex-workspace.mjs';
+const workspaceProfile=loadProfile();
+const boundary=workspaceProfile?new CodexWorkspaceBoundary(async(method,params)=>(await client()).call(method,params)):null;
 
-const preset = 'augmentor-browser-codex';
-const workspace = process.env.AUGMENTOR_CODEX_BROWSER_WORKSPACE ?? join(homedir(), 'Augmentor Browser Codex');
+const preset = workspaceProfile?.preset??'augmentor-browser-codex';
+const workspace = workspaceProfile?.cwd??process.env.AUGMENTOR_CODEX_BROWSER_WORKSPACE ?? join(homedir(), 'Augmentor Browser Codex');
 const MAX_FRAME = 1024 * 1024;
 let connection, opening, selection, currentSession;
 const browserCalls = new Map();
@@ -55,13 +59,16 @@ async function client() {
   return opening;
 }
 async function attach(sessionId) {
+  if(boundary)await boundary.owns(sessionId);
   if (currentSession !== sessionId) voice.close();
   const c = await client(); await c.call('events.subscribe', {sessionId});
   const meta = await c.call('session.describe', {sessionId});
-  if (meta.browserTools === 1) await c.call('browser.attach', {sessionId});
+  if (!boundary&&meta.browserTools === 1) await c.call('browser.attach', {sessionId});
   currentSession = sessionId;
 }
 async function request(method, params = {}, id) {
+  if(boundary){const guarded=await boundary.guard(method,params);if(guarded)params=guarded;}
+  if(method==='workspace.describe')return boundary?.describe();
   if (method === 'augmentor/voice/preferences') {if (params.action === 'save') voice.close(); return voicePreferences(params);}
   if (method === 'augmentor/voice/start') {if (params.sessionId !== currentSession) throw new Error('Open the current Codex conversation first.'); return voice.start(params);}
   if (method === 'augmentor/voice/control') return voice.control(params);
@@ -78,7 +85,10 @@ async function request(method, params = {}, id) {
   }
   const c = await client();
   if (method === 'augmentor/interaction') return c.call('interaction.respond', {rpcId: params.id, sessionId: params.sessionId, value: params.value});
-  if (method === 'augmentor/models') return c.call('models.list');
+  if (method === 'augmentor/models') {
+    const catalog=await c.call('models.list');if(!boundary)return catalog;
+    const selected=await boundary.selection();return {...catalog,groups:catalog.groups.filter(group=>group.provider===selected.provider),default:selected};
+  }
   if (method === 'augmentor/codex') {
     if (params.action === 'profiles') return c.call('profiles.list');
     if (params.action === 'test') return c.call('profiles.test', {id: params.id, capability: params.capability ?? 'text'});
@@ -92,11 +102,11 @@ async function request(method, params = {}, id) {
     throw new Error('Unsupported Codex setup action.');
   }
   if (method === 'initialize') {
-    selection = {provider: params.provider, model: params.model}; await c.call('models.validate', selection);
+    selection = boundary?await boundary.selection():{provider: params.provider, model: params.model}; await c.call('models.validate', selection);
     await mkdir(workspace, {recursive: true, mode: 0o700});
-    const saved = await c.call('chats.saved');
+    const saved = boundary?boundary.saved('augmentor/state'):await c.call('chats.saved');
     const host = await c.call('host.describe');
-    return {serverInfo: {home: homedir(), harness: 'codex', capabilities: {branch: true, edit: true, memory: host.capabilities?.memory === true, voice: true, browserTools: true, homeTools: true, queue: true}, augmentor: {chatCwd: workspace, agentPreset: preset, saved: saved.saved}}};
+    return {serverInfo: {home: homedir(), harness: 'codex', capabilities: {branch: true, edit: true, memory: host.capabilities?.memory === true, voice: true, browserTools: !boundary, homeTools: !boundary, queue: true}, augmentor: {chatCwd: workspace, agentPreset: preset, saved: saved.saved}}};
   }
   if (method === 'session.create') {
     if (!selection) throw new Error('Select a Codex connection before starting a chat.');
@@ -108,7 +118,7 @@ async function request(method, params = {}, id) {
     const row = items.find(value => value.sessionId === params.sessionId);
     if (!row) throw new Error('Codex conversation not found.');
     // Explicit attachment may share an existing native conversation; account binding stays in the host.
-    await c.call('session.create', {sessionId: row.sessionId, cwd: row.cwd});
+    await c.call('session.create', {sessionId: row.sessionId, cwd: row.cwd,...(boundary?{workspaceId:workspaceProfile.id,profileId:workspaceProfile.connection}:{})});
     await attach(params.sessionId); selection = row.selection;
     return {attached: true, running: row.running === true};
   }
@@ -120,9 +130,9 @@ async function request(method, params = {}, id) {
   if (method === 'session.prompt') {if (currentSession !== params.sessionId) await attach(params.sessionId); return c.call(method, {...params, requestId: params.requestId ?? randomUUID()});}
   if (method === 'session.selectModel') {const result = await c.call(method, params); selection = result.current; return result;}
   if (method === 'session.list') {
-    const {items} = await c.call(method); return {items: items.map(row => ({...row, projections: {values: {title: row.title}}})), total: items.length};
+    const result=await c.call(method),items=boundary?boundary.filter(result.items):result.items.filter(row=>!row.workspaceId); return {items: items.map(row => ({...row, projections: {values: {title: row.title}}})), total: items.length};
   }
-  if (['augmentor/save', 'augmentor/unsave', 'augmentor/state'].includes(method)) return {ok: true, ...await c.call('chats.saved', {action: method.split('/')[1], sessionId: params.sessionId})};
+  if (['augmentor/save', 'augmentor/unsave', 'augmentor/state'].includes(method)) return boundary?boundary.saved(method,params):{ok: true, ...await c.call('chats.saved', {action: method.split('/')[1], sessionId: params.sessionId})};
   if (['session.branchStatus', 'session.queue', 'session.updateQueue', 'session.cancel', 'session.rename', 'session.models', 'session.history', 'settings.describe'].includes(method)) return c.call(method, params);
   if (method === 'shutdown') {voice.close(); connection?.close(); setTimeout(() => process.exit(0), 30); return {ok: true};}
   throw new Error('This Codex browser capability is not yet available: ' + method);

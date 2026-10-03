@@ -14,6 +14,7 @@ import {promptEditor} from './prompt-editor.mjs'
 import {supportDialog} from './support.mjs'
 import {attachPageMaintenance, registerMaintenanceState} from './maintenance-page.mjs'
 import {dictationSettings} from './dictation-settings.mjs'
+import {settingsSections} from './workspace-settings.mjs'
 
 const maintenance=attachPageMaintenance({document,runtime:chrome.runtime,busy:()=>checking||mounting>0})
 const send=(type,payload={})=>maintenance.work(()=>chrome.runtime.sendMessage({type,...payload}))
@@ -34,7 +35,7 @@ const definitions=[
   ['memory','Memories',chrome.runtime.getManifest().augmentorWorkspace?'Dedicated to '+chrome.runtime.getManifest().augmentorWorkspace.name+'.':'Shared across your browser and Linux agents.','M4 5c0-4 16-4 16 0s-16 4-16 0v14c0 4 16 4 16 0V5M4 12c0 4 16 4 16 0'],
   ['support','Support','Version information and a report you can review before sharing.','M12 11v6m0-10v1M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0'],
 ]
-for(const [id,label,description,path] of definitions){
+for(const [id,label,description,path] of settingsSections(definitions,chrome.runtime.getManifest().augmentorWorkspace)){
   const link=make('a');link.href='#'+id;link.id='nav-'+id
   const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');svg.setAttribute('stroke-width','1.6');svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round');svg.setAttribute('aria-hidden','true')
   const shape=document.createElementNS(svg.namespaceURI,'path');shape.setAttribute('d',path);svg.append(shape);link.append(svg,document.createTextNode(label));document.querySelector('nav').append(link)
@@ -94,6 +95,16 @@ function showHarnesses(container){
   container.update=()=>{select.value=state.harness||'';select.disabled=!!state.running};container.update()
 }
 function showMemory(container){
+  if(chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol){
+    container.append(make('p','Memory belongs to this application workspace. Configure the shared memory service in standalone Augmentor.'))
+    const context=make('pre');context.style.whiteSpace='pre-wrap';container.append(context)
+    if(!state.sessionId){context.textContent='Open an application conversation to inspect its remembered context.';return}
+    void send('memory',{request:{action:'dual.recall',session:state.harness+':'+state.sessionId}}).then(reply=>{
+      if(!reply?.ok)throw Error(reply?.error||'Remembered context is unavailable')
+      context.textContent=['relationship','work'].map(kind=>kind+': '+(reply.result?.[kind]?.summary||'No distilled picture yet.')).join('\n\n')
+    }).catch(error=>{context.textContent=error.message})
+    return
+  }
   if(chrome.runtime.getManifest().augmentorWorkspace){memoryDialog(document,send,()=>({surface:'browser',harness:state.harness,...(state.sessionId?{sessionId:state.sessionId}:{})}),container);return}
 
   const card=make('div');card.className='card onboarding-card';card.append(make('h2','Let Augmentor set up memory'),make('p','Start a guided conversation. Augmentor checks your computer and handles the setup, asking only for missing choices or credentials.'))
@@ -146,11 +157,13 @@ function mount(id){
   if(id==='appearance')void mountAsync(()=>appearance(row.body))
   if(id==='models')showModels(row.body)
   if(id==='harnesses')showHarnesses(row.body)
-  if(id==='prompts')promptEditor(document,async request=>{const r=await send('prompts',{request});if(!r?.ok)throw Error(r?.error||'Prompt library unavailable');return r.library},()=>{},row.body)
+  if(id==='prompts'){
+    if(chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol)row.body.append(make('p','Use saved prompts through / in the chat. Manage the shared prompt library in standalone Augmentor.'))
+    else promptEditor(document,async request=>{const r=await send('prompts',{request});if(!r?.ok)throw Error(r?.error||'Prompt library unavailable');return r.library},()=>{},row.body)
+  }
   if(id==='home')homeSettings(document,send,row.body)
   if(id==='memory')showMemory(row.body)
   if(id==='voice')void mountAsync(()=>showVoice(row.body))
-  if(id==='voice')void showVoice(row.body).catch(fail)
   if(id==='dictation')void dictationSettings(row.body,send).catch(fail)
   if(id==='support'){
     const version=make('div');version.className='card';version.append(make('h2','Augmentor '+chrome.runtime.getManifest().version),make('p','This preview is updated with the Augmentor installer. The companion and extension must use matching versions.'));row.body.append(version)

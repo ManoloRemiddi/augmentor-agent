@@ -2,6 +2,8 @@
 import {EventEmitter} from 'node:events';
 import {existsSync, readdirSync, realpathSync, statSync} from 'node:fs';
 import {join, isAbsolute} from 'node:path';
+import {createHash} from 'node:crypto';
+import {restrictWorkspaceRuntime,type CodexWorkspaces,type WorkspaceIdentity,type WorkspaceBinding} from './workspaces.js';
 import {identifier, text, type Data} from '../../protocol/src/index.js';
 import {RELEASE} from '../../contracts/src/release.js';
 import {runtimeOptions, installedRuntimeVersion, type CodexConnection} from './config.js';
@@ -48,6 +50,8 @@ function observe<T>(pending: Promise<T>, signal: AbortSignal): Promise<T> {
   return result.finally(() => signal.removeEventListener('abort', abort));
 }
 interface SessionMeta {
+  workspace?:WorkspaceIdentity;
+  applicationTools?:{name:string;description:string;inputSchema:Record<string,unknown>}[];
   creationDispatched?: boolean;
   nativeOwner?: string;
   fork?: {sessionId: string; messageSeq: number; mode: 'reply' | 'edit'; boundary: BranchBoundary};
@@ -65,6 +69,7 @@ interface SessionMeta {
 }
 export interface ResolvedProfile {id: string; revision: number; connection: CodexConnection; accountId?: string; credentialRevision?: number}
 export interface HostOptions {
+  workspaces?:CodexWorkspaces;
   root: string;
   resolveProfile: (id: string, signal?: AbortSignal) => Promise<ResolvedProfile>;
   maxWorkers?: number;
@@ -123,6 +128,7 @@ export class CodexHost extends EventEmitter {
       if (meta.desktopTools === 1) this.desktop.register(meta.id, this.sessionRoot(meta.id));
       if (meta.browserTools !== undefined && meta.browserTools !== 1) throw new Error('Unsupported Codex browser tool contract.');
       if (meta.instructions !== undefined) validateInstructions(meta.instructions);
+      if(meta.workspace&&(!this.options.workspaces||meta.workspace.cwd!==meta.cwd||meta.workspace.connection!==meta.profileId||!Array.isArray(meta.applicationTools)))throw Error('Unsupported Codex application workspace contract');
       identifier(meta.profileId); this.metadata.set(meta.id, meta);
     }
     for (const meta of this.metadata.values()) {
@@ -178,7 +184,8 @@ export class CodexHost extends EventEmitter {
     const ledgerPath = join(this.sessionRoot(meta.id), 'operations.json');
     const operations = worker?.session.ledger.list() ?? (meta.threadId && existsSync(ledgerPath) ? new OperationLedger(ledgerPath, meta.threadId).list() : []);
     return {sessionId: meta.id, harness: 'codex', cwd: meta.cwd, title: meta.title,
-      agentPreset: meta.surface === 'browser' ? 'augmentor-browser-codex' : 'augmentor-linux-codex',
+      agentPreset: meta.workspace?.preset??(meta.surface === 'browser' ? 'augmentor-browser-codex' : 'augmentor-linux-codex'),
+      ...(meta.workspace?{workspaceId:meta.workspace.id}:{}),
       running: operations.some(operation => ['accepted', 'unconfirmed'].includes(operation.status)),
       saved: meta.saved ?? false, createdAt: meta.createdAt, updatedAt: meta.updatedAt,
       selection: {provider: meta.profileId, model: meta.model}, profileRevision: meta.profileRevision};
@@ -220,8 +227,13 @@ export class CodexHost extends EventEmitter {
     if (this.configuring) throw new Error('Codex connection setup is in progress.');
     const id = identifier(params.sessionId);
     const profileId = identifier(params.profileId ?? params.selection?.provider ?? this.metadata.get(id)?.profileId);
+    const workspace:WorkspaceBinding|undefined=params.workspaceId!==undefined
+      ?await this.options.workspaces?.load(identifier(params.workspaceId)):undefined;
+    if(params.workspaceId!==undefined&&!workspace)throw Error('Codex application workspaces are unavailable in this host');
+    if(workspace&&(workspace.identity.cwd!==realpathSync(params.cwd)||workspace.identity.connection!==profileId))throw Error('Use the registered application workspace and connection');
     if (this.metadata.has(id)) {
       const existing = this.meta(id);
+      if(existing.workspace?.id!==workspace?.identity.id)throw Error('Conversation belongs to another Augmentor application role');
       if (existing.profileId !== profileId || existing.cwd !== realpathSync(params.cwd)) throw new Error('Conversation identity is already bound to a different profile or workspace.');
       if (existing.status !== 'ready') {
         if (existing.creationDispatched !== false || existing.fork) throw new Error('Conversation creation has an unknown outcome. Reconcile it before creating a replacement.');
@@ -241,6 +253,13 @@ export class CodexHost extends EventEmitter {
     const memory = Boolean(this.options.memoryCall);
     const meta: SessionMeta = {schema: 1, browserTools: 1, homeTools: 1, ...(memory ? {memoryTools: 1} : {}), ...(desktop ? {desktopTools: 1} : {}), ...(profile.connection.imageInput ? {imageInput: true} : {}), instructions: instructionSnapshot(undefined, true, profile.connection.imageInput === true, desktop, true, memory), id, profileId, profileRevision: profile.revision, model: profile.connection.model,
       surface: params.surface === 'browser' ? 'browser' : 'linux', cwd, title: '', status: 'creating', creationDispatched: false, createdAt: Date.now(), updatedAt: Date.now()};
+    if(workspace){
+      meta.workspace=workspace.identity;meta.applicationTools=workspace.tools;
+      const reserved=new Set([...browserToolsFor(true),...desktopTools,...homeTools,...memoryTools].map(tool=>tool.name));
+      if(workspace.tools.some(tool=>reserved.has(tool.name)))throw Error('Application tool name collides with an Augmentor tool');
+      const text=meta.instructions!.text+'\n\n# Assigned application workspace role\n'+workspace.instructions+'\nUse only the explicitly registered application tools. Native shell, filesystem edits and unrelated agent tools are disabled.';
+      meta.instructions={...meta.instructions!,text,sha256:createHash('sha256').update(text).digest('hex')};validateInstructions(meta.instructions);
+    }
     this.save(meta);
     await this.open(meta, profile);
     return this.meta(id);
@@ -294,7 +313,7 @@ export class CodexHost extends EventEmitter {
         fork: {sessionId: sourceId, messageSeq, mode, boundary}, title: '', saved: false, status: 'creating', createdAt: Date.now(), updatedAt: Date.now()};
       // Durable admission precedes the non-idempotent native fork RPC.
       this.save(meta);
-      const options = {...runtimeOptions(profile.connection, join(this.sessionRoot(meta.nativeOwner!), 'runtime'), meta.cwd), experimentalApi: true};
+      const options = {...(meta.workspace?restrictWorkspaceRuntime(runtimeOptions(profile.connection,join(this.sessionRoot(meta.nativeOwner!), 'runtime'),meta.cwd)):runtimeOptions(profile.connection,join(this.sessionRoot(meta.nativeOwner!), 'runtime'),meta.cwd)), experimentalApi:true};
       creator = this.options.createRpc?.(options) ?? new CodexRpc(options); this.forkCreators.add(creator);
       creator.on('request', request => creator!.reject(request.id, 'Branch creation cannot execute tools or request approvals.'));
       await creator.initialize(); this.assertAccepting();
@@ -320,7 +339,7 @@ export class CodexHost extends EventEmitter {
     const profile = await this.options.resolveProfile(meta.profileId);
     this.assertAccepting();
     if (profile.id !== meta.profileId || profile.revision !== meta.profileRevision) throw new Error('The source profile changed. Reconcile it before recovering the branch.');
-    const options = {...runtimeOptions(profile.connection, join(this.sessionRoot(meta.nativeOwner), 'runtime'), meta.cwd), experimentalApi: true};
+    const options = {...(meta.workspace?restrictWorkspaceRuntime(runtimeOptions(profile.connection,join(this.sessionRoot(meta.nativeOwner), 'runtime'),meta.cwd)):runtimeOptions(profile.connection,join(this.sessionRoot(meta.nativeOwner), 'runtime'),meta.cwd)), experimentalApi:true};
     const reader = this.options.createRpc?.(options) ?? new CodexRpc(options);
     this.forkCreators.add(reader);
     reader.on('request', request => reader.reject(request.id, 'Branch recovery cannot execute tools or request approvals.'));
@@ -370,24 +389,27 @@ export class CodexHost extends EventEmitter {
     this.assertOpen();
     const root = this.sessionRoot(meta.id); privateDirectory(root);
     const state = join(this.sessionRoot(meta.nativeOwner ?? meta.id), 'runtime'); privateDirectory(state);
-    const options = {...runtimeOptions(profile.connection, state, meta.cwd), experimentalApi: true};
+    const workspace=meta.workspace?await this.options.workspaces!.load(meta.workspace.id,meta.workspace):undefined;
+    const options = {...(workspace?restrictWorkspaceRuntime(runtimeOptions(profile.connection,state,meta.cwd)):runtimeOptions(profile.connection, state, meta.cwd)), experimentalApi: true};
     const rpc = this.options.createRpc?.(options) ?? new CodexRpc(options);
     const activity = new NativeActivity(rpc);
     let credentialRevision = profile.credentialRevision;
     let memory: CodexMemory | undefined;
     try {
       await rpc.initialize();
-      if (meta.threadId) await rpc.call('thread/resume', {threadId: meta.threadId, cwd: meta.cwd, excludeTurns: true, ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
+      if (meta.threadId) await rpc.call('thread/resume', {threadId: meta.threadId, cwd: meta.cwd, excludeTurns: true, ...(workspace?{sandbox:'read-only'}:{}), ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
       else {
         meta.creationDispatched = true; this.save(meta);
-        const result = await rpc.call('thread/start', {cwd: meta.cwd, approvalPolicy: 'on-request', sandbox: 'workspace-write', ...(meta.browserTools ? {dynamicTools: [...browserToolsFor(meta.imageInput === true), ...(meta.desktopTools ? desktopTools : []), ...(meta.homeTools ? homeTools : []), ...(meta.memoryTools ? memoryTools : [])]} : {}), ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
+        const builtinTools=[...browserToolsFor(meta.imageInput === true), ...(meta.desktopTools ? desktopTools : []), ...(meta.homeTools ? homeTools : []), ...(meta.memoryTools ? memoryTools : [])];
+        const dynamicTools=workspace?[...(meta.applicationTools??[]),...builtinTools.filter(tool=>!browserToolsFor(true).some(browser=>browser.name===tool.name)&&workspace.grants.includes(tool.name))]:builtinTools;
+        const result = await rpc.call('thread/start', {cwd: meta.cwd, approvalPolicy: 'on-request', sandbox: workspace?'read-only':'workspace-write', ...(meta.browserTools ? {dynamicTools} : {}), ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})});
         meta.threadId = result.thread.id; meta.status = 'ready'; this.save(meta);
       }
       this.assertOpen();
       const ledger = new OperationLedger(join(root, 'operations.json'), meta.threadId!); ledger.recover();
       let lastMemoryWarning = '';
       let memorySpareAllowed = false;
-      if (meta.memoryTools && this.options.memoryCall) memory = new CodexMemory(meta.id, meta.cwd, this.options.memoryCall, message => {
+      if (meta.memoryTools && this.options.memoryCall) memory = new CodexMemory(meta.id, meta.cwd, workspace?workspace.memoryCall(this.options.memoryCall):this.options.memoryCall, message => {
         if (message !== lastMemoryWarning) {lastMemoryWarning = message; this.emit('attention', meta.id, {reason: 'memory-degraded', message});}
       });
       const session = new CodexSession(rpc, ledger, memory || profile.accountId ? async (operation, signal) => {
@@ -409,7 +431,7 @@ export class CodexHost extends EventEmitter {
           }
           if (activity.revision !== revision || ledger.list().some(item => ['accepted', 'unconfirmed'].includes(item.status))) throw new Error('Codex activity changed during credential preflight.');
           if (current.credentialRevision !== credentialRevision) {
-            await rpc.renew({...runtimeOptions(current.connection, state, meta.cwd), experimentalApi: true},
+            await rpc.renew({...(meta.workspace?restrictWorkspaceRuntime(runtimeOptions(current.connection,state,meta.cwd)):runtimeOptions(current.connection,state,meta.cwd)),experimentalApi:true},
               {threadId: meta.threadId!, cwd: meta.cwd, excludeTurns: true, ...(meta.instructions ? {developerInstructions: meta.instructions.text} : {})}, signal);
             credentialRevision = current.credentialRevision;
           }
@@ -476,6 +498,17 @@ export class CodexHost extends EventEmitter {
             if (request.method === 'item/tool/call' && meta.browserTools) {
               this.assertAccepting();
               const abort = new AbortController(); toolCalls.set(request.id, {turnId: request.params.turnId, abort});
+              if(meta.workspace){
+                await this.options.workspaces!.guard(meta.workspace,String(request.params.tool));
+                if(request.params.namespace)throw Error('Application tool namespaces are unsupported');
+                if(meta.applicationTools?.some(tool=>tool.name===request.params.tool)){
+                  if(typeof request.params.callId!=='string'||!request.params.callId)throw Error('Application tool call requires its durable native identity');
+                  const value=await workspace!.execute(String(request.params.tool),request.params.arguments,{sessionId:meta.id,callId:request.params.callId,signal:abort.signal});
+                  const text=JSON.stringify(value);if(typeof text!=='string'||Buffer.byteLength(text)>4*1024*1024)throw Error('Application result exceeds the tool bound');
+                  rpc.respond(request.id,{success:true,contentItems:[{type:'inputText',text}]});return;
+                }
+                if(browserToolsFor(true).some(tool=>tool.name===request.params.tool))throw Error('Embedded apps do not own the Browser extension executor');
+              }
               const desktopTool = desktopTools.some(tool => tool.name === request.params.tool);
               rpc.respond(request.id, meta.memoryTools && memoryTools.some(tool => tool.name === request.params.tool) ? memory ? await memory.tool(request.params, abort.signal) : {success: false, contentItems: [{type: 'inputText', text: 'Memory is unavailable in this host.'}]} : meta.homeTools && homeTools.some(tool => tool.name === request.params.tool) ? await this.home.call(meta.id, join(root, 'home-calls'), request.params, abort.signal) : desktopTool && meta.desktopTools ? await this.desktop.call(meta.id, root, request.params, abort.signal) : await this.browser.call(meta.id, join(root, 'browser-calls'), request.params, abort.signal, meta.imageInput === true));
             } else rpc.respond(request.id, await this.approvals.request(meta.id, request, fileChanges.get(String(request.params.itemId))));
