@@ -1,5 +1,23 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 clean2035 builds and Ubuntu managed adoption
+
+[The artifact/adoption checkpoint](../release/qualification/next-targets/20261003-clean2035-artifacts-noble-managed-adoption.json)
+records exact clean2035 Mint/Fedora native packages, Browser ZIP and complete
+bundles. Their clean builds pass; fresh installed acceptance is separate. Linux,
+macOS and Windows Desktop hosted2035 runs pass; full Windows is still running.
+Ubuntu's clean368 source-Qt preparation passes in57.20seconds after normal APT
+admission of only two missing declared libraries. Its older canonical updater
+then refused staging for a missing Qt library path. A normal maintained helper
+refresh preserves selection/window; its outer post-verification timed out and
+is retained as such. Read-only checks confirm refreshed helper bytes and no
+remaining refresh process. Canonical staging subsequently passes in124.04seconds
+without selecting the candidate. Activation then passes, verifies the complete
+inventory and retains the old selection and old running window. Cold launch,
+actual Settings, normal shortcuts and password-lock/reboot acceptance remain
+open. No selected payload was patched; no binary release is claimed.
+
+
 The new [Noble source-runtime contract](LINUX-SOURCE-RUNTIME-ENTRYPOINTS.md) verifies
 the finite native Qt payload before cold launch, supplies its library/plugin/QML
 paths before exec, and preserves/validates those inputs during staging. Its owned

@@ -1,0 +1,138 @@
+{
+  "format": "augmentor-linux-rollout-checkpoint/1",
+  "date": "2026-10-03",
+  "scope": "Exact clean private qualification artifacts and owned Ubuntu24 GNOME comparison VM managed adoption; no owner installation or binary publication",
+  "artifactSource": {
+    "commit": "2035af99b46bb013e81de9766216da820ab4a325",
+    "dirty": false
+  },
+  "nativeArtifacts": {
+    "mint": {
+      "version": "0.2.13",
+      "source": {
+        "commit": "2035af99b46bb013e81de9766216da820ab4a325",
+        "dirty": false
+      },
+      "target": "linuxmint22.3-amd64",
+      "artifacts": [
+        {
+          "file": "augmentor-runtime_0.2.13_amd64.deb",
+          "sha256": "1ff753719e8760ff8d5692bad2ac0c8122518812449bda9a49a498d40e912245",
+          "bytes": 352927860
+        },
+        {
+          "file": "augmentor-desktop_0.2.13_amd64.deb",
+          "sha256": "7557b7cfb2365cc8829bf4f6fa8b6f0206d72b469e491d0ba2a73cb24364bc5d",
+          "bytes": 5396
+        }
+      ]
+    },
+    "fedora": {
+      "version": "0.2.13",
+      "source": {
+        "commit": "2035af99b46bb013e81de9766216da820ab4a325",
+        "dirty": false
+      },
+      "target": "fedora44-x86_64",
+      "artifacts": [
+        {
+          "file": "augmentor-agent-0.2.13-1.fc44.x86_64.rpm",
+          "sha256": "b7b9b5cdbd5aef84f6db5940e2ed519102d7cc38d37c466db3104525e5dcfdd5",
+          "bytes": 371302870
+        }
+      ]
+    },
+    "browser": {
+      "version": "0.2.13",
+      "source": {
+        "commit": "2035af99b46bb013e81de9766216da820ab4a325",
+        "dirty": false
+      }
+    }
+  },
+  "completeArtifacts": [
+    {
+      "target": "linuxmint22.3-amd64",
+      "bytes": 371542822,
+      "sha256": "687a2e4a8f19b127bf5e6ae3f29ee0d3645976de26a17bc851192791e321a74d",
+      "buildPassed": true
+    },
+    {
+      "target": "fedora44-x86_64",
+      "bytes": 385846514,
+      "sha256": "06ccb4f2ec6ca431ba1f8af2dd120a941e2b6249abad2a24f8eb71944ad505c7",
+      "buildPassed": true
+    }
+  ],
+  "matchingArtifactInstalledAcceptance": "In progress; build success alone is not acceptance",
+  "hostedSource2035": {
+    "linux": {
+      "run": 37095930956,
+      "result": "success"
+    },
+    "macos": {
+      "run": 37095930958,
+      "result": "success"
+    },
+    "windowsDesktop": {
+      "run": 37095930698,
+      "result": "success"
+    },
+    "fullWindows": {
+      "run": 37095930693,
+      "result": "in_progress_at_checkpoint"
+    }
+  },
+  "noble": {
+    "source": "3688a095ffa4221e8ea919c331e6eff6d35cb25d",
+    "initialPreparationFailure": "Missing declared libdouble-conversion.so.3; selected release unchanged",
+    "nativeDependencyAdmission": {
+      "packages": [
+        "libdouble-conversion3",
+        "libpcre2-16-0"
+      ],
+      "normalApt": true,
+      "upgraded": 0,
+      "new": 2,
+      "removed": 0,
+      "auditPassed": true
+    },
+    "sourceQtPreparation": {
+      "passed": true,
+      "seconds": 57.196037621,
+      "members": 1768,
+      "selectionUnchanged": true
+    },
+    "initialCanonicalStageFailure": "Old updater omitted verified sourceQt loader environment; original selection unchanged",
+    "startupHelperRefresh": {
+      "maintainedInstallerUsed": true,
+      "enableFalse": true,
+      "hostPostVerificationTimedOut": true,
+      "postTimeoutReadOnlyConfirmed": [
+        "selection unchanged",
+        "main PID unchanged",
+        "both canonical helper bytes match clean368",
+        "no refresh process remains"
+      ],
+      "normalCommandExitNotClaimed": true
+    },
+    "canonicalStage": {
+      "passed": true,
+      "seconds": 124.04034840600798,
+      "selectionUnchanged": true
+    },
+    "activation": {
+      "passed": true,
+      "seconds": 173.2166353359935,
+      "selectedSource": "3688a095ffa4221e8ea919c331e6eff6d35cb25d",
+      "selectedArtifactSha256": "161ce1e7395f6018b049011c0ae6d57f908a7fd2000e351a885a672c44609fac",
+      "previousSelectionRetained": true,
+      "existingOldWindowRetained": true
+    },
+    "coldLaunchAndSettingsAcceptance": false,
+    "normalShortcutPasswordLockRebootAcceptance": false
+  },
+  "licenseReviewComplete": false,
+  "publicRelease": false,
+  "allFiveRolloutPointsComplete": false
+}
