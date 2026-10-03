@@ -1,7 +1,7 @@
 {
   "format": "augmentor-mint-fresh-emulated-proof-source-checkpoint/1",
   "date": "2026-10-03",
-  "status": "reviewed-source-tests-pass-fd-anchored-peer-correction-awaiting-owned-fixture-transaction",
+  "status": "actual-native-and-unchanged-setup-idempotence-pass-full-proof-refuses-package-mode-reviewed-correction-published-awaiting-clean-artifacts",
   "artifactSource": {
     "commit": "16bcb797cc5e84b6a4807d1b88229afebed2c5bf",
     "dirty": false
@@ -58,13 +58,16 @@
   "admission": {
     "scope": "Exact installed isolated Mint22.3 QEMU fixture and fresh locked ordinary account UID/GID1002",
     "unusedAccountReadOnlyVerified": true,
-    "freshAccountCreated": false,
-    "nativeAdoptionExecuted": false,
-    "existingNativeSource": "2035af99b46bb013e81de9766216da820ab4a325",
+    "freshAccountCreated": true,
+    "nativeAdoptionExecuted": true,
+    "existingNativeSource": "16bcb797cc5e84b6a4807d1b88229afebed2c5bf",
     "oldUid1000TenProtectedFilesPreserved": true,
     "oldUid1001ThirtyProtectedFilesPreserved": true,
     "noPriorSettingsJournalSessionReceiptAdoption": true,
-    "noOwnerServicesModelsHardwareInput": true
+    "noOwnerServicesModelsHardwareInput": true,
+    "previousNativeSource": "2035af99b46bb013e81de9766216da820ab4a325",
+    "unusedAccountReadOnlyVerifiedBeforeCreation": true,
+    "currentAccountUnused": false
   },
   "proofContract": {
     "entry": "fresh_emulated_proof(bundle, fixture)",
@@ -109,9 +112,10 @@
     "shortcutLockReboot": false,
     "physicalAudio": false,
     "licenseReviewComplete": false,
-    "embeddedSourceCoverageComplete": false
+    "embeddedSourceCoverageComplete": false,
+    "freshInstalledProofExecuted": true
   },
-  "next": "Reviewed proof and source checkpoint are published together; repeat exact native/account guards before the newly authorized one-shot fresh account run.",
+  "next": "Review/publish source-only staged package permission correction; then build new clean native/complete artifacts and separately review a new ordinary-account proof. Preserve failed installed16bcb UID1002 and all earlier accounts, with no resume or SDK replay.",
   "rootLicenseAndFrozen22Unchanged": true,
   "initialPublishedHostAdmission": {
     "proofCommit": "9f43b4e80bb6b7ab15532e83b167a585fce14748",
@@ -139,7 +143,7 @@
     "qmpCommandsCapabilitiesGreetingReadsInput": false,
     "socketAlwaysClosed": true,
     "pidStartBeforeAndAfterRequired": true,
-    "actualVmPeerAttributionExecuted": false,
+    "actualVmPeerAttributionExecuted": true,
     "peerConnectionPath": "Only /proc/self/fd/<localDirectoryFD>/qmp.sock",
     "directoryOpenFlags": [
       "O_DIRECTORY",
@@ -167,5 +171,94 @@
     "guestSSHDispatched": false,
     "APTAccountSetupSDKMutations": false,
     "originalRefusalRetained": true
+  },
+  "actualFreshExecution": {
+    "artifactSource": "16bcb797cc5e84b6a4807d1b88229afebed2c5bf",
+    "proofScriptSha256": "201c1173445ac63dbacfc8dd980193fa02dbc0732ba1727c7c5836edd3327bb6",
+    "normalSignedAptReinstall": "pass",
+    "onlyTwoSameVersionAugmentorPackages": true,
+    "osPackageInventoryUnchanged": true,
+    "nativeSourceRuntimeAudit": "pass",
+    "ordinaryLockedUidGid": 1002,
+    "privateHomeMode": "0700",
+    "administratorGroups": false,
+    "unchangedCompleteInstaller": "pass",
+    "sameReceiptInstalledIdempotence": "pass",
+    "fullFreshEmulatedProof": "fail",
+    "elapsedSeconds": 390.54148765500577,
+    "failure": "Installed services/memory/service.py mode0664 fails mode&0022 immutable-source predicate before preview or SDK dispatch.",
+    "sourceMetadata": {
+      "sha256": "aa857ac80b8441de0aa09797178562f7dedc1530c2f6844e8419cc4f923453d2",
+      "mode": "0664",
+      "uid": 0,
+      "gid": 0,
+      "nlink": 1,
+      "ordinaryRegularFile": true,
+      "symlink": false,
+      "originalExactDebMode": "0664",
+      "cleanBuilderCheckoutMode": "0664",
+      "gitTreeMode": "100644",
+      "ancestorsMode": "0775"
+    },
+    "nativePayloadMetadata": {
+      "entries": 32313,
+      "allOwners": "0:0",
+      "directories0775": 2949,
+      "regular0664": 26888,
+      "regular0775": 31,
+      "regularNlinkOne": 29313,
+      "symlinks": 31
+    },
+    "fiveSettingsHashesPreserved": true,
+    "settingsYamlBytes": 403,
+    "SDKPending": null,
+    "unknownRequestOutcome": false,
+    "modelRequests": 0,
+    "startupObservations": [],
+    "turnObservations": [],
+    "journalSha256": "0de0f8e8407dec01cedf433bc51849d51e055cc75582b9392ef0af7cabbf76fe",
+    "externalAudit": "pass",
+    "externalAuditProofOutcome": "failed",
+    "externalSameProofAndFullFixtureBinding": true,
+    "bothExclusiveNativeLeasesIdle": true,
+    "noOwnedProcessSocketListener": true,
+    "uid1000TenHashesPreserved": true,
+    "uid1001ThirtyHashesPreserved": true,
+    "installedPermissionChanges": false,
+    "nativeUpdateOrAccountResume": false,
+    "originalPublic60FullProofPass": false,
+    "emulated120StartupPass": false,
+    "realDesktopSessionTested": false,
+    "graphicalBrowserTested": false,
+    "physicalVoiceTested": false,
+    "legalQualification": false,
+    "proofCommit": "175fe994680638a3ae4aad18410e97955788336a",
+    "fiveSettingsSha256": {
+      ".local/share/augmentor/dsh-home/settings.yaml": "1f6d292f7a06b949f036715bb357de037361d3fae4e4316d8a1c019114aa2e31",
+      ".local/state/augmentor-install/installation.json": "d5cc633e54b60631a338950f843d5f137bcc1648dd5064280c7e43c34e2117b4",
+      ".config/augmentor/harnesses.json": "f10cb425e73789ae178e46e4bd6b9ea3ef59079a190b0e0418c4283826dd3174",
+      ".local/share/augmentor/desktop.json": "fcb5b51bf42a868f8bb71b363193944ec601934f398ba5647a498db8f46129c1",
+      ".local/state/augmentor-install/model.env": "c39a994152bbded50974b84452496b220892315e0851ce41669616099ff035b8"
+    }
+  },
+  "packagePermissionCorrection": {
+    "scope": "source-only scripts/package-debian.py archive staging, no installed changes",
+    "directories": "0755",
+    "regularNonexecutables": "0644",
+    "regularExecutables": "0755 from existing lstat execute bits",
+    "symlinkFollowedOrChanged": false,
+    "bytesOrOwnersChanged": false,
+    "unsupportedPathsRefusedBeforeChanges": true,
+    "focusedTests": 6,
+    "totalDebianTests": 12,
+    "tests": "pass",
+    "correctedFullNativeArtifactsBuilt": false,
+    "correctedNativeAdoption": false,
+    "freshAccountAcceptanceRequired": true,
+    "guardRelaxation": false,
+    "frozenLicenseSourceEdits": false,
+    "sourceReviewed": true,
+    "publishedWithCheckpoint": true,
+    "scriptSha256": "98285b66f0c4a84350afec42daa3375963e64c0fbcb73f87efb64a87904f8a5b"
   }
 }

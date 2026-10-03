@@ -1,5 +1,20 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 Mint installed setup passes; native permission metadata fails
+
+[The Mint16bcb checkpoint](../release/qualification/next-targets/20261003-mint16bcb-fresh-emulated-proof.json)
+passes normal signed native reinstall, exact source/runtime audit and the
+unchanged ordinary-user installer plus installed-receipt idempotence. Full proof
+fails at390.54seconds before preview/SDK: packaged memory source is root-owned
+0664 under0775 directories, inherited from the clean checkout's filesystem modes.
+All five settings and40 earlier-account files remain unchanged; external native,
+both exclusive idle leases and process/socket/listener absence pass. There is no
+pending/unknown SDK action or model request. The reviewed Debian producer now
+normalizes only its staged archive modes to0755/0644/0755, preserving bytes and
+symlink targets.12 Debian checks pass, including actual archive metadata. New
+clean artifacts and fresh account acceptance are required; the failed account
+is preserved without installed chmod, guard relaxation or replay.
+
 ## October 3 Fedora GNOME exact release-phase refusal
 
 [The v5 checkpoint](../release/qualification/next-targets/20261003-fedora-gnome-v5-release-serial-partial-failure.json)

@@ -280,3 +280,42 @@ before/after, immediate socket+directory closure and no cwd/alias changes.
 peer refusal with zero bytes and no descriptor leak;26 baseline proof and9 Unix
 companion cases also pass. The revised source is published; all guest transactions remain
 pending, with the4GiB allocation floor retained.
+
+
+## Executed clean16bcb installation and package-mode refusal
+
+The [updated checkpoint](../release/qualification/next-targets/20261003-mint16bcb-fresh-emulated-proof.json)
+supersedes the pending-transaction statements above. The authenticated normal
+APT transaction reinstalls only the two exact clean16bcb Augmentor packages;
+the complete OS package version/status inventory remains unchanged. Native
+source/target/runtime inventories and package audits pass. The new locked
+ordinary UID/GID1002 has a private home and no administrator membership.
+UID1000's ten and UID1001's thirty protected files remain byte-identical.
+
+The unchanged complete installer and its installed-receipt idempotent repeat
+both pass. The full fresh emulated proof fails after390.54seconds, before the
+preview or either SDK role: its companion cleanup guard refuses installed
+`services/memory/service.py` because the regular root-owned file has mode0664.
+The exact original runtime DEB contains that mode; the clean builder checkout
+also has0664, and the staging copy preserves it. All source bytes match. This
+is a package metadata failure, with no120-second startup observation or SDK
+mutation, not a successful connected-product qualification.
+
+The terminal journal has no pending/unknown SDK action and records zero model
+requests. All five settings hashes, including the403-byte indented YAML, remain
+unchanged through installer idempotence and final readback. The separate
+same-fixture root audit passes native verification, both exclusive idle leases,
+process/socket/listener absence and those settings hashes. No installed chmod,
+guard relaxation, journal adoption, account resume or replay is performed.
+The older clean2035 failures remain preserved separately.
+
+The source-only Debian package correction normalizes staged directories to0755,
+regular nonexecutables to0644 and existing executables to0755 before archiving.
+It uses `lstat`, preserves bytes, ownership handling and executable intent, and
+never follows or changes symlinks. Unsupported path types refuse before any
+staged permission change. Six focused tests include a real native DEB archive,
+group-writable source checkout, immutable file bytes/root archive ownership,
+executable flags and symlink target preservation; all12 Debian cases pass.
+New clean artifact builds and a separately reviewed fresh account are required
+before another full proof. The failed installed16bcb account remains untouched;
+desktop/input, graphical Browser, physical audio and legal gates remain open.

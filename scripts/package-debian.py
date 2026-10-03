@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import tarfile
@@ -40,6 +41,28 @@ def copy(source, target):
             '__pycache__', '*.pyc', 'node_modules', '.git', '.github', 'test', 'tests', 'trace'))
     else:
         shutil.copy2(source, target)
+
+
+def normalize_staging_permissions(root):
+    """Package modes must not inherit a group-writable source checkout."""
+    root = Path(root)
+    if not stat.S_ISDIR(root.lstat().st_mode):
+        raise ValueError('Package staging root must be an ordinary directory.')
+    pending = [root]; modes = []
+    while pending:
+        path = pending.pop(); info = path.lstat()
+        if stat.S_ISLNK(info.st_mode):
+            continue
+        if stat.S_ISDIR(info.st_mode):
+            modes.append((path, 0o755)); pending.extend(path.iterdir())
+        elif stat.S_ISREG(info.st_mode):
+            modes.append((path, 0o755 if info.st_mode & 0o111 else 0o644))
+        else:
+            raise ValueError('Unsupported package staging path type: '+str(path))
+    # Validate the complete tree before changing any staged metadata. Symlink
+    # targets, source files and payload bytes are never changed here.
+    for path, mode in modes:
+        path.chmod(mode, follow_symlinks=False)
 
 
 def node_runtime(app, configuration, cache):
@@ -232,6 +255,7 @@ StartupWMClass=Augmentor Agent
         epoch = int(subprocess.check_output(['git', '-c', f'safe.directory={ROOT}', 'log', '-1', '--format=%ct'], cwd=ROOT, text=True).strip())
         results = []
         for name, directory in [('augmentor-runtime', runtime), ('augmentor-desktop', desktop)]:
+            normalize_staging_permissions(directory)
             for path in directory.rglob('*'):
                 os.utime(path, (epoch, epoch), follow_symlinks=False)
             artifact = output / f'{name}_{version}_amd64.deb'

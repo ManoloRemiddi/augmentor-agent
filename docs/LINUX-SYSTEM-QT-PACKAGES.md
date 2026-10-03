@@ -313,3 +313,29 @@ sessions, consent/input/lock/reboot, graphical Browser, physical audio, version
 upgrades/rollback and source/legal/release acceptance stay open. All five rollout
 points remain active. Owner installations, services, models, audio devices and the
 22-file license proposal remain unchanged.
+
+
+## Debian input archive permission contract
+
+The Debian producer now normalizes both staged package trees immediately before
+archiving: directories0755, regular nonexecutables0644, and files with any
+existing execute bit0755. It determines type and executable intent with `lstat`,
+skips symlinks without traversing them, and rejects unsupported path types before
+changing staged modes. Payload bytes, source-Qt input inventories, target and
+`dpkg-deb --root-owner-group` ownership handling remain unchanged. It does not
+chmod the source checkout or an installed application.
+
+The triggering [actual Mint16bcb evidence](../release/qualification/next-targets/20261003-mint16bcb-fresh-emulated-proof.json)
+is distinct from source tests: normal signed native reinstall and unchanged
+installer idempotence pass, while the full proof refuses root-owned mode0664
+memory source before SDK activity. The original DEB preserves0664/0775 from the
+clean group-writable build checkout; resetting archive ownership alone does not
+normalize modes. Final native/exclusive-lease/process/socket/settings/old-account
+readback passes, with zero model requests and no pending SDK action.
+
+Six focused tests cover copied group-writable directories/files, unchanged bytes
+and owners, executable intent, internal/external/dangling symlinks, unsupported
+path refusal and real DEB member metadata. All12 Debian tests pass. Corrected
+large application artifacts and native installation have not been executed;
+new builds and fresh installed acceptance remain required. Existing Arch/Leap
+artifact qualifications remain bound to their earlier exact input bytes.
