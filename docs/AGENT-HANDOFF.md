@@ -9,13 +9,15 @@
 The Voice provider hub now keeps local/cloud configuration inside an existing
 embedded settings frame when the installed application has one. It falls back to
 the established dialog lifecycle on builds without that frame. Both paths keep
-the active app model unchanged. Focused voice qualification: 103 native cases
+the active app model unchanged. Focused voice qualification: 105 native cases
 passed, including an embedded configuration proof. The Linux package CI now
 installs sounddevice/PortAudio before audio-readiness tests; pure configuration
 unit cases mock device readiness explicitly. See [Voice providers](VOICE-PROVIDERS.md)
 for deployment evidence and live API limitations. Browser embedding now drains
 accepted native-host work on page/service closure, allowing the billed voice
-session to finalize normally; no ordinary force-kill timer is used. Full current
+session to finalize normally; no ordinary force-kill timer is used. Readiness
+also accepts the established protocol-only DSH speech health response, while
+harness-specific ticket scope checks retain their existing enforcement. Full baseline
 validation: 858 native cases (36 skipped), 506 Node cases (504 pass, 2 skipped).
 
 ## Voice provider implementation — October 3

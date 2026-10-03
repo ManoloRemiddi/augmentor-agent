@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, MagicMock, patch
 from augmentor_linux import voice_provider as provider
 from augmentor_linux.live_dialogue import LiveDialogue
 
@@ -99,6 +99,27 @@ class ProviderTests(unittest.TestCase):
             opener.return_value.open.side_effect=OSError('offline')
             self.assertFalse(provider.local_configured())
         self.assertEqual(json.loads((home/'config.json').read_text()),{'tts':{'url':'http://127.0.0.1:8878'}})
+
+    def test_existing_local_health_contract_is_ready_without_codex_scope_capabilities(self):
+        home=Path(os.environ['RESONANT_VOICE_HOME']);home.mkdir()
+        (home/'config.json').write_text(json.dumps({'tts':{'url':'http://127.0.0.1:8878'}}));(home/'token').write_text('a'*64)
+        replies=[]
+        for data in [{'status':'ok','sample_rate':24000},{'protocol':'resonant-voice/1','active':False}]:
+            response=MagicMock();response.__enter__.return_value.read.return_value=json.dumps(data).encode();replies.append(response)
+        with patch.object(provider.urllib.request,'build_opener') as opener:
+            opener.return_value.open.side_effect=replies
+            self.assertTrue(provider.local_configured())
+        self.assertEqual(opener.return_value.open.call_count,2)
+
+    def test_incompatible_local_protocol_is_not_ready_even_with_healthy_tts(self):
+        home=Path(os.environ['RESONANT_VOICE_HOME']);home.mkdir()
+        (home/'config.json').write_text('{}');(home/'token').write_text('a'*64)
+        replies=[]
+        for data in [{'status':'ok','sample_rate':24000},{'protocol':'unrelated/1'}]:
+            response=MagicMock();response.__enter__.return_value.read.return_value=json.dumps(data).encode();replies.append(response)
+        with patch.object(provider.urllib.request,'build_opener') as opener:
+            opener.return_value.open.side_effect=replies
+            self.assertFalse(provider.local_configured())
 
     def test_cloud_can_be_selected_and_removed_without_touching_local_models(self):
         store=Mock();store.get_password.return_value='synthetic-key-123456'

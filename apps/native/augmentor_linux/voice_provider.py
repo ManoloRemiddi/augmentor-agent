@@ -113,7 +113,9 @@ def local_configured():
         if type(port) is not int or not 1024<=port<=65535:return False
         with urllib.request.build_opener(NoRedirect).open(f'http://127.0.0.1:{port}/health',timeout=1) as response:
             companion=json.loads(response.read(8192))
-        return isinstance(companion,dict) and companion.get('protocol')=='resonant-voice/1' and isinstance(companion.get('capabilities'),dict) and companion['capabilities'].get('scopedHarnessBridge',0)>=1
+        # Existing DSH installations expose the protocol-only health contract.
+        # Harness-specific scope requirements remain enforced by voice.ticket.
+        return isinstance(companion,dict) and companion.get('protocol')=='resonant-voice/1'
     except (OSError, ValueError, TypeError):
         return False
 

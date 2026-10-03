@@ -158,12 +158,19 @@ existing lifecycle. Browser embedding allows its native host to finish accepted
 work and billed-session closure on EOF, instead of terminating it early.
 
 Validation after these compatibility corrections: 858 native cases (36 platform
-skips), 506 Node cases (504 pass, 2 platform skips), 103 focused voice cases.
+skips), 506 Node cases (504 pass, 2 platform skips), 105 focused voice cases.
 The separate compatible 0.2.11 candidate preserves the installed app's chat
-runtime, model integration, settings and Handy fixes: 103 focused candidate
-cases pass, including its actual settings frame; 89 pass under the installed
+runtime, model integration, settings and Handy fixes: 105 focused candidate
+cases pass, including its actual settings frame; 91 pass under the installed
 Python and the 14 QtTest gesture cases pass under the isolated test interpreter.
 Candidate browser voice cases: 20 pass; native-host/embedding cases: 5 pass.
 The new form screenshots were inspected. These remain synthetic audio/socket
 proofs; a real OpenAI trial requires the owner's project key and setup consent.
 Selected versus running deployment identity is recorded after guarded activation.
+
+The owner-local post-install check also verified the older Resonant Voice health
+contract (`resonant-voice/1`, with no capabilities advertisement) plus healthy
+24 kHz TTS. Local readiness accepts this established DSH contract; stricter
+harness-specific scope checks remain in the existing `voice.ticket` operation.
+Two added fixtures prove legacy readiness and refusal of unrelated protocols.
+This preserves working local installations without upgrading their speech models.
