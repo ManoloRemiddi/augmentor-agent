@@ -5,7 +5,7 @@
   "sourceBase": "3119ff4",
   "worker": {
     "path": "release/prove-published-linux-baseline-history.py",
-    "sha256": "fe219b9ad0b760dd86aeb31bbafd62b7c2043429f4c1b1c6c85da0a8b16ca952",
+    "sha256": "7859bfff793eb1319bd1c037049b36e20473f7baa6b20b98d07cac10f3bcbcd6",
     "nativeSource": "e02731023153e3b2e1440e50b8c14b64ad0a82e5",
     "helperSha256": "89a147101055f2efd4e7b852d94f72cd0d1864b5caad9458541ddb591c582ec9",
     "fixtureOnly": true,
@@ -17,7 +17,8 @@
     "onlyOmittedHeaderDepthDefaultZero": true,
     "savedFiveSettingsByteEquality": true,
     "normalOwnedTermOnly": true,
-    "setupOrNativePackageMutation": false
+    "setupOrNativePackageMutation": false,
+    "normalNativeSharedLifetimeLeases": true
   },
   "newSyntheticPassed": 8,
   "focusedSyntheticPassed": 20,

@@ -173,7 +173,7 @@ def prove():
         raise ValueError('The reviewed immutable legacy helper differs.')
     spec = importlib.util.spec_from_file_location('published_legacy', path)
     helper = importlib.util.module_from_spec(spec); spec.loader.exec_module(helper)
-    helper.root_input(path); helper.private_parents(HOME)
+    helper.root_input(path); helper.root_input(Path(__file__)); helper.private_parents(HOME)
     marker = Path('/etc/augmentor-upgrade-init-fixture'); helper.root_input(marker)
     if marker.read_text() != helper.MARKER or Path('/proc/1/cmdline').read_bytes() != b'/usr/bin/tini\0--\0sleep\0infinity\0':
         raise ValueError('The independently admitted init154 namespace is required.')
@@ -200,6 +200,8 @@ def prove():
     os.environ.update(env); sys.dont_write_bytecode = True
     sys.path.insert(0, str(APP/'apps/native'))
     from augmentor_linux.adapters.dsh import DshAdapter
+    from lifecycle.lease import hold
+    hold('desktop')
     from dsh.setup import current
     import yaml
     check_provider(yaml.safe_load((HOME/'.local/share/augmentor/dsh-home/settings.yaml').read_text()), current())

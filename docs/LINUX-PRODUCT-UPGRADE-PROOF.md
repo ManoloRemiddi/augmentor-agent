@@ -102,7 +102,8 @@ provisioned, and this is not a production lifecycle adapter.
 
 [The baseline history worker](../release/prove-published-linux-baseline-history.py)
 accepts only the prepared published0.2.12 native identity in the admitted init154
-namespace. It verifies the saved numeric loopback provider/ports, uses the exact
+namespace. Its normal native shared lifetime leases prevent package replacement
+while proof code is running. It verifies the saved numeric loopback provider/ports, uses the exact
 reviewed legacy companion helper and retains all five original settings hashes.
 It never runs setup, an integration update or a package operation. Each SDK
 mutation has durable intent before dispatch; an unknown outcome remains pending
