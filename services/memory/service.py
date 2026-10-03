@@ -13,8 +13,9 @@ from memory.hindsight import HindsightMemory
 from platform_support import require_same_user
 from platform_adapters import locks as fcntl
 from platform_adapters.paths import private_directory
-from platform_adapters.transport import ThreadingLocalServer, prepare_endpoint, cleanup_endpoint
+from platform_adapters.transport import ThreadingLocalServer, prepare_endpoint
 from lifecycle.admission import Admission, MaintenanceBusy, METHODS as MAINTENANCE_METHODS
+from lifecycle.idle import IdleServerMixin
 
 
 class Handler(socketserver.StreamRequestHandler):
@@ -54,7 +55,7 @@ class Handler(socketserver.StreamRequestHandler):
             if shutdown: self.server.stop()
 
 
-class Server(ThreadingLocalServer):
+class Server(IdleServerMixin, ThreadingLocalServer):
     daemon_threads = False
 
     def __init__(self, *args, **kwargs):
@@ -108,15 +109,17 @@ if __name__ == '__main__':
         server.memory.processing.budget.paused = True
         threading.Thread(target=server.shutdown, daemon=True).start()
     server.stop = stop
+    server.watch_idle(lock, endpoint, stop, server.admission.retire_idle)
     signal.signal(signal.SIGTERM, stop)
     signal.signal(signal.SIGINT, stop)
     try:
         server.serve_forever(poll_interval=.2)
     finally:
+        server.idle_stopped.set()
         stopped.set()
         worker.join(timeout=130)  # The controlled stage already bounds its HTTP request to 125 seconds.
         if gateway:
             gateway.shutdown()
             gateway.server_close()
         server.server_close()
-        cleanup_endpoint(endpoint)
+        server.lifetime.cleanup(endpoint)

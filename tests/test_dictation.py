@@ -40,6 +40,28 @@ class DictationTests(unittest.TestCase):
             finally:
                 for child in children:self.assertEqual(child.wait(timeout=10),0)
 
+    def test_enabled_or_owned_dictation_never_retires(self):
+        self.backend.preferences['enabled']=True
+        self.assertFalse(self.backend.idle_ready())
+        self.backend.preferences['enabled']=False
+        self.backend.owner={'token':'a'*32,'pid':os.getpid()}
+        self.assertFalse(self.backend.idle_ready())
+        self.backend.owner=None
+        self.assertTrue(self.backend.idle_ready())
+
+    def test_disabled_native_child_needs_idle_and_no_download_evidence(self):
+        from unittest.mock import Mock
+        self.backend.child=Mock();self.backend.child.poll.return_value=None
+        idle={'enabled':False,'phase':'disabled'}
+        for status,models,expected in ((idle,[{'downloading':False}],True),
+                                      (idle,[{'downloading':True}],False),
+                                      (idle,[{}],False),
+                                      ({'enabled':False,'phase':'transcribing'},[],False)):
+            with patch.object(self.backend,'call',side_effect=[status,models]):
+                self.assertEqual(self.backend.idle_ready(),expected)
+        with patch.object(self.backend,'call',side_effect=TimeoutError):
+            self.assertFalse(self.backend.idle_ready())
+
     def test_theme_round_trip_while_disabled_never_starts_microphone(self):
         value=dictation.theme({'theme':'light','accent_hue':32,'opacity':70,'animation':False})
         with patch.object(self.backend,'start',side_effect=AssertionError('Started capture')):
@@ -157,7 +179,7 @@ class DictationTests(unittest.TestCase):
 
     def test_incomplete_checkout_cannot_own_an_enabled_session(self):
         checkout=self.base/'checkout'
-        for relative in ('services/dictation/server.py','services/dictation/portal.py','apps/native/augmentor_linux/dictation.py'):
+        for relative in ('services/dictation/server.py','services/dictation/portal.py','services/lifecycle/idle.py','apps/native/augmentor_linux/dictation.py'):
             target=checkout/relative;target.parent.mkdir(parents=True,exist_ok=True)
             shutil.copy2(ROOT/relative,target)
         if os.name=='nt':

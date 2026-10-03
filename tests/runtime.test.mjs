@@ -5,7 +5,7 @@ import http from 'node:http';
 import net from 'node:net';
 import {spawn} from 'node:child_process';
 import {once} from 'node:events';
-import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,existsSync,statSync,appendFileSync} from 'node:fs';
+import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,existsSync,statSync,appendFileSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
 import {randomUUID} from 'node:crypto';
@@ -45,10 +45,16 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
  const modelConfig={providers:{test:{baseUrl:`http://127.0.0.1:${mock.address().port}/v1`,api:'openai-completions',apiKey:'dummy',models:[{id:'test',name:'Test',reasoning:false,input:['text'],contextWindow:32000,maxTokens:2048}]}}};
  writeFileSync(join(config,'agent/models.json'),JSON.stringify(modelConfig));
  const env={...process.env,AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_SHARED_STATE:join(root,'shared-state'),AUGMENTOR_SHARED_DATA:join(root,'shared-data'),AUGMENTOR_PI_INTERACTION_TIMEOUT:'300',PI_OFFLINE:'1'};
- let child;let stderr='';
+ let child,client;let stderr='';
  const start=async()=>{child=spawn(process.execPath,['dist/runtime/src/main.js'],{cwd:resolve('.'),env,stdio:['ignore','pipe','pipe']});child.stderr.on('data',b=>stderr+=b);await until(async()=>{assert.equal(child.exitCode,null,stderr);if(!existsSync(join(state,'runtime.sock')))return false;try{const c=await Client.open(join(state,'runtime.sock'));c.close();return true;}catch{return false;}},20000);};
  const stop=async(signal='SIGTERM')=>{if(child&&child.exitCode===null){child.kill(signal);await once(child,'exit');}};
- t.after(()=>{child?.kill('SIGKILL');});await start();let client=await Client.open(join(state,'runtime.sock'));t.after(()=>client.close());
+ t.after(async()=>{
+  client?.close();
+  await stop();
+  // Removing isolated state retires its detached companions as well.
+  rmSync(root,{recursive:true,force:true});
+ });
+ await start();client=await Client.open(join(state,'runtime.sock'));
  const selection={provider:'test',model:'test'};
  const create=async(id,policy='workspace-write')=>{const settings=await client.call('settings.describe');await client.call('settings.mutate',{ns:'permission',expectedRevision:settings.namespaces[0].revision,ops:[{op:'set',path:['defaultPreset'],value:policy}]});await client.call('session.create',{sessionId:id,cwd,selection});await client.call('events.subscribe',{sessionId:id});};
  const prompt=(id,content,requestId)=>client.call('session.prompt',{sessionId:id,content:[{type:'text',text:content}]},requestId);
