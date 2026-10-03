@@ -148,6 +148,13 @@ Windows guide explicitly forbids replacing preview 1 with a different build;
 manual repair is for the exact recorded installer. Package workflows also track
 those embedded guide inputs, so a guide correction produces matching candidates.
 
+The final-source validation found a separate Codex browser voice fixture ordering
+race: audio arrived before the model's durable completion receipt. The fixture
+now waits for the exact completed operation before closing voice and shutting
+down. Provider count, request identity, PCM and terminal assertions are preserved;
+installed dictation/runtime behavior is unchanged. Matching candidates and source
+gates are rerun after this test-only synchronization correction.
+
 Implementation branch: `feat/handy-integration`, based on public main
 `d91c52037d7bc26c82c702c25e1a779b0fca1f39`. This guide owns the implemented
 contract; [the approved plan](HANDY-INTEGRATION-PLAN.md) retains its rationale.

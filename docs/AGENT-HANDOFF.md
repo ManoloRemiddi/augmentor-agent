@@ -1751,3 +1751,11 @@ now includes preview 2 Linux/Mac/Windows first-time dictation instructions and a
 Windows prohibition on replacing preview 1 with another build. Embedded guide
 changes trigger the matching package workflows. Qualification/publication are
 pending; physical microphone acceptance remains separate.
+
+## October 3 voice fixture completion ordering
+
+[Codex voice qualification](CODEX-INTEGRATION.md#october-3-browser-voice-fixture-synchronization)
+now waits for the durable completion receipt after PCM before closing its private
+browser fixture. This fixes the ordering failure in run 37119919501 without
+changing product behavior or weakening identity/playback/completion assertions.
+Matched Handy candidates are rerun from the resulting source; publication is pending.
