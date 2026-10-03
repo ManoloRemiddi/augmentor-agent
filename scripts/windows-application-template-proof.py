@@ -117,6 +117,7 @@ def prove(out, arch, compiler, fixture_executable, runtime):
                     if time.monotonic()>=deadline:raise TimeoutError('The placement coordinator did not authorize Setup.')
                     time.sleep(.05)
                 ready=read_json(observation/'ready.json');assert ready['coordinatorPid']==child.pid
+                assert ready['readOnlyObservationTransfer'] is True
                 setup=win32api.OpenProcess(win32con.SYNCHRONIZE|win32con.PROCESS_QUERY_INFORMATION,False,ready['setupPid'])
                 assert win32event.WaitForSingleObject(setup,0)==win32event.WAIT_TIMEOUT
                 atomic_json(observation/'observed',{'observed':True})
@@ -371,6 +372,7 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         assert sentinel.read_bytes()==sentinel_bytes
         pending.unlink()  # Only this test's deliberately failed synthetic update.
         coordinated('clean-payload-placement')
+        stages.append('live-read-only-installer-observation-survives-sender-close')
         succeeded=[p for p in backups.iterdir() if p!=failed[0]];assert len(succeeded)==1
         retained=succeeded[0];intent=json.loads((retained/'intent.json').read_text())
         assert json.loads((retained/'prepared.json').read_text())==intent

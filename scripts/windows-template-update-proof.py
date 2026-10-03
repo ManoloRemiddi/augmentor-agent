@@ -28,6 +28,7 @@ def main():
     from lifecycle.installed_source import open_installed_source
     from lifecycle.update_journal import UpdateJournal
     from lifecycle.windows_apply import WindowsApply
+    from lifecycle.windows_installer_process import InstallerObservation
     from lifecycle.windows_startup import Startup
     from platform_adapters.windows_identity import private_directory,private_lock_descriptor
     from platform_adapters.private_files import atomic_json
@@ -44,9 +45,23 @@ def main():
         for phase in ('preparing','prepared','drained'):journal.advance(phase)
         backend=held.enter_context(WindowsApply(gate,source.installer,source.identity['sha256'],
             observation/'setup.log',qualification_outer_job=True))
-        backend.wait_ready();journal.advance('installer-ready');journal.advance('apply-intent')
+        backend.wait_ready()
+        # Exercise kernel handle transfer while real Setup waits for APPLY.
+        # This fixture adopts in the same actual process; production must bind
+        # an independent observer peer and deliver only over its live IPC.
+        import win32api
+        transferred=backend.installer.transfer_observation(win32api.GetCurrentProcess())
+        observer=held.enter_context(InstallerObservation(transferred,source.identity['sha256'],os.fstat(source.fd).st_size))
+        assert observer.poll() is None
+        backend.installer.close()
+        assert observer.poll() is None, 'Closing the sender ended the independent Setup.'
+        try:observer.wait(timeout=.01)
+        except TimeoutError:pass  # Same actual Job still waits for coordinator exit.
+        else:raise AssertionError('The waiting Setup was declared complete.')
+        journal.advance('installer-ready');journal.advance('apply-intent')
         backend.authorize();journal.advance('apply-acknowledged')
-        atomic_json(observation/'ready.json',{'setupPid':backend.handoff.pid,'coordinatorPid':os.getpid()})
+        atomic_json(observation/'ready.json',{'setupPid':backend.handoff.pid,'coordinatorPid':os.getpid(),
+            'readOnlyObservationTransfer':True})
         deadline=time.monotonic()+20
         while not (observation/'observed').exists():
             if time.monotonic()>=deadline:raise TimeoutError('The fixture did not observe actual Setup.')

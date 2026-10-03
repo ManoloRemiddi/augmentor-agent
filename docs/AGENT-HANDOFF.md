@@ -41,6 +41,11 @@ bounded cancellable kernel writer; focused updater tests pass 104 cases (one OS
 skip). `97837de` full Windows qualification passes x64, but ARM64 recovery exceeded
 its five-minute observer limit despite Setup finishing immediately afterward.
 Inner/outer observation bounds are corrected; fresh native recovery is required.
+Read-only actual installer process/Job/artifact transfer and receiver validation
+now support an external observer. A new native template case adopts live handles,
+closes the sender while Setup waits for APPLY and requires Setup to survive;
+that source change still needs native CI. The case adopts within one fixture
+process, and does not establish the separate production observer IPC/completion.
 Root
 rotation/CI custody, public feed provisioning, external installation adapters,
 final consent/revocation and N-to-N+1 health/recovery remain open. Do not narrow the goal to

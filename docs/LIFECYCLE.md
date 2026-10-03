@@ -640,7 +640,21 @@ whole source inventory and the exact staged subset. Verification after source
 displacement, partial-write refusal and tampered-runtime refusal pass five inert
 tests; new native relocation/identity-import proofs remain pending. No copied code
 is executed by staging, and neither a staging receipt nor saved process identifiers
-authorize apply or completion. Live process-handle transfer remains to compose.
+authorize apply or completion. Live observer IPC and completion remain to compose.
+
+`InstallerProcess.transfer_observation` now duplicates query/synchronize-only
+process/Job handles and the retained read-only artifact into a caller-bound live
+same-user observer. The numbers belong to that other process and must be delivered
+once over its authenticated live IPC; they are never journal fields or a saved-PID
+recovery instruction. `InstallerObservation` checks private artifact identity/hash,
+the actual primary image's kernel file identity, same-user process membership and
+the non-killing Job, then observes full Job exit without a terminate/authorize API.
+Closing either observation scope preserves Setup. Native template qualification
+now adopts live duplicates, closes the sending scope while Setup awaits APPLY,
+and verifies Setup remains running. That test is still pending; it adopts within
+the same actual fixture process, not a complete independent product observer.
+Production orchestration still must bind the separate launched observer peer and
+deliver over that live channel before allowing the coordinator to exit.
 
 An actual ARM64 full-application recovery at `97837de` crossed its former five-minute
 Setup observation deadline; its inner log records successful installation afterward.

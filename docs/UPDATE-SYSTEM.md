@@ -186,7 +186,15 @@ remain private and cannot be launched through verification. Five inert portable
 tests include actual source-directory displacement, corruption and partial writes.
 Native template/full-runtime relocation and identity-import proofs are added but
 still pending. Staging itself executes no code and grants no install authority;
-the live coordinator/observer handle transfer and completion path remain to compose.
+the live coordinator/observer IPC and completion path remain to compose.
+
+The Windows installer now exposes read-only live observation transfer to a bound
+same-user external process. The receiver validates the actual primary image and
+Job relationship, exact private retained artifact and non-killing Job before
+observing exit. It cannot forward the transfer or authorize/terminate Setup.
+The native template proof now closes the sender after adoption and requires the
+real waiting Setup to survive. That pending proof adopts in the same fixture
+process; complete independent observer IPC and target completion remain to wire.
 
 Shared repository-helper operations now hold one private kernel cache-writer lock
 across the entire child operation. This prevents service/coordinator concurrency
