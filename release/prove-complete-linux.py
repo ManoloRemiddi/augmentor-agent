@@ -27,7 +27,7 @@ def run(command, **kwargs):
     return subprocess.run([str(v) for v in command], check=True, text=True, **kwargs)
 
 
-def user_proof(bundle):
+def user_proof(bundle, setup_script=None):
     assert os.geteuid() != 0
     requests = []
     class Model(http.server.BaseHTTPRequestHandler):
@@ -59,7 +59,11 @@ def user_proof(bundle):
     Path(os.environ['XDG_RUNTIME_DIR']).mkdir(mode=0o700, exist_ok=True)
     manifest=json.loads((bundle/'bundle.json').read_text())
     bootstrap='/usr/bin/python3.13' if manifest['target']=='opensuse-leap16.0-x86_64' else '/usr/bin/python3'
-    command = [bootstrap, '-B', bundle/'setup.py', '--bundle', bundle, '--skip-packages', '--no-services',
+    setup_script=(setup_script or bundle/'setup.py').resolve()
+    override_used=setup_script!=(bundle/'setup.py').resolve()
+    setup_sha=hashlib.sha256(setup_script.read_bytes()).hexdigest()
+    bundle_setup_sha=hashlib.sha256((bundle/'setup.py').read_bytes()).hexdigest()
+    command = [bootstrap, '-B', setup_script, '--bundle', bundle, '--skip-packages', '--no-services',
                '--non-interactive', '--model-url', f'http://127.0.0.1:{server.server_port}/v1', '--model', 'fixture',
                '--api-key-env', 'AUGMENTOR_FIXTURE_KEY', '--port', str(port)]
     process = None
@@ -152,6 +156,9 @@ def user_proof(bundle):
         stop()
         report = {'target': manifest['target'], 'sourceCommit': manifest['sourceCommit'], 'bundle': manifest['artifactId'],
                   'proofScriptSha256': PROOF_SHA256,
+                  'setupScriptSha256':setup_sha,'bundleSetupScriptSha256':bundle_setup_sha,
+                  'setupScriptMatchesBundle':not override_used and setup_sha==bundle_setup_sha,
+                  'installerOverlayUsed':override_used,
                   'ordinaryUserSetup': True, 'realInstalledDshAndPlugins': True, 'offscreenNativeRender': True,
                   'secondWindowEntry': True, 'nativeHostRegistered': True, 'repeatPreservesSettings': True,
                   'linuxAndBrowserRoleFixtureTurns': True, 'restartPreservesHistoryWithoutReplay': True,
@@ -176,12 +183,14 @@ def main():
     p.add_argument('--bundle', type=Path, required=True)
     p.add_argument('--out', type=Path, default=Path('/tmp/complete-linux-proof.json'))
     p.add_argument('--user-phase', action='store_true', help=argparse.SUPPRESS)
+    p.add_argument('--setup-script', type=Path,
+                   help='Explicit diagnostic installer override; records its hash and cannot count as matching-bundle acceptance.')
     a = p.parse_args()
     if not any(Path(marker).exists() for marker in ('/.dockerenv', '/run/.containerenv')):
         raise SystemExit('This proof requires a disposable Docker/Podman container.')
     bundle = a.bundle.resolve()
     if a.user_phase:
-        user_proof(bundle)
+        user_proof(bundle, a.setup_script)
         return
     assert os.geteuid() == 0
     if Path('/usr/lib/augmentor/release.json').exists():
@@ -218,7 +227,9 @@ def main():
     assert release['source'] == {'commit': manifest['sourceCommit'], 'dirty': False}
     assert release['version'] == manifest['version']
     run(['useradd', '-m', '-s', '/bin/sh', 'augmentor-complete-proof'])
-    run(['runuser', '-u', 'augmentor-complete-proof', '--', bootstrap, '-B', Path(__file__).resolve(), '--bundle', bundle, '--user-phase'])
+    command=['runuser', '-u', 'augmentor-complete-proof', '--', bootstrap, '-B', Path(__file__).resolve(), '--bundle', bundle, '--user-phase']
+    if a.setup_script:command+=['--setup-script',a.setup_script.resolve()]
+    run(command)
     report = json.loads(Path('/home/augmentor-complete-proof/complete-proof.json').read_text())
     report['systemPlan'] = plan['system']
     a.out.write_text(json.dumps(report, indent=2)+'\n')

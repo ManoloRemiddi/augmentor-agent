@@ -6,6 +6,8 @@ import io
 import json
 import os
 from pathlib import Path
+import shutil
+import subprocess
 import sys
 import tarfile
 import tempfile
@@ -25,9 +27,28 @@ def module(name):
 setup=module('setup-complete')
 builder=module('package-complete')
 verifier=module('linux-package-verification')
+SEMVER=next((path for path in (ROOT/'node_modules/semver',
+    ROOT/'node_modules/@earendil-works/pi-coding-agent/node_modules/semver')
+    if (path/'package.json').is_file()),ROOT/'node_modules/semver')
 
 
 class NativeCompleteSetup(unittest.TestCase):
+    @unittest.skipUnless(shutil.which('node') and (SEMVER/'package.json').is_file(),
+                         'Node and the locked development semver dependency are required')
+    def test_real_node_resolves_nested_and_flattened_npm_dependencies_and_checks_engine(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)
+            for layout,engine,accepted in [('nested','>=18',True),('flattened','>=18',True),('unsupported','>=999',False)]:
+                modules=root/layout/'node_modules';npm=modules/'npm';npm.mkdir(parents=True)
+                (npm/'package.json').write_text(json.dumps({'name':'independent-npm-layout-fixture','version':'1.0.0','engines':{'node':engine}}))
+                dependency=(npm/'node_modules/semver' if layout=='nested' else modules/'semver')
+                dependency.parent.mkdir(parents=True,exist_ok=True);dependency.symlink_to(SEMVER,target_is_directory=True)
+                result=subprocess.run([shutil.which('node'),'-e',setup.NPM_ENGINE_PROBE,str(npm)],capture_output=True,text=True)
+                with self.subTest(layout=layout):
+                    self.assertEqual(result.returncode==0,accepted,result.stderr)
+                    if accepted:self.assertEqual(json.loads(result.stdout)['npm'],'1.0.0')
+                    else:self.assertIn('does not support this bundled Node',result.stderr)
+
     def test_public_voice_package_source_keeps_bytes_and_truthful_coverage(self):
         package=ROOT/'release/dsh/plugins/dsh-resonant-voice-0.1.19.tgz'
         with tempfile.TemporaryDirectory() as directory:

@@ -216,6 +216,12 @@ workflows and history. The declared upstream Voice commit comes from public
 release provenance and is not independently bound to the private repository
 tree. This mode does not complete legal/source-kit or public-release acceptance.
 See [the exact coverage](../release/dsh/voice-distributed-source.json).
+The [Arch/Leap execution checkpoint](../release/qualification/next-targets/20261003-system-qt-complete-and-release-upgrade.json)
+records full native and ordinary-user success for the exact clean8ad Leap bundle.
+Arch's initial bundle stops at native npm's flattened semver layout. The corrected
+helper passes explicit diagnostic resume, pending a fresh matching fixed bundle.
+The qualification driver's `--setup-script` option records any external installer
+override and its hash; that result cannot establish matching-bundle acceptance.
 Public snapshots exclude repository histories, local outputs,
 configuration, credentials, conversations, memory databases, model weights and
 microphone recordings. Downloadable synthetic voice references have the separate

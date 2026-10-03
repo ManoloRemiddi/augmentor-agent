@@ -192,7 +192,35 @@ the generated spec in `SPECS`, then use ordinary-user `rpmbuild -bb --define
 native metadata and complete payload after each new build; do not relabel an old
 inspection as qualification of new bytes.
 
-## Complete installer adapters; fresh execution pending
+## Complete installer adapters and recorded execution
+
+[The complete/install/rollback checkpoint](../release/qualification/next-targets/20261003-system-qt-complete-and-release-upgrade.json)
+supersedes the pending-execution scope below for its exact clean8adb633 release3
+bytes. Both new native packages and full bundles build/inspect/assemble. Leap's
+native root plan and ordinary-user complete setup pass actual DSH/plugins, both
+fixture model roles, offscreen native rendering, repeat settings and restart
+history without replay. Native npm11.16 executes under bundled Node24.19.
+
+Arch's native root plan completes and verifies, but its original user setup
+refuses at a hardcoded nested semver import: native npm12.2 uses the flattened
+/usr/lib/node_modules/semver provider. The corrected adapter anchors Node
+createRequire at npm's package.json. Actual engine probes pass both native
+layouts; three actual Node regression cases exercise nested/flattened resolution
+and an unsupported engine. An explicitly hashed external corrected helper then
+resumes Arch's partial setup and passes the full user/DSH/model/history proof.
+The report records installerOverlayUsed:true and setupScriptMatchesBundle:false;
+the original bundle stays unchanged. New clean matching fixed Arch assembly and
+root/user qualification remains required. Initial failures and diagnostic-driver
+omissions are retained. Both installed release3 packages pass final native file
+audits and actual font shaping; both complete fixtures are now offline.
+
+[The distinct release probe](../release/prove-system-qt-upgrade.py) also passes
+offline release1→3→1 transactions with536→8ad→536 source. Desktop and real
+bundled-Node leases refuse upgrade and rollback while busy. Idle transactions,
+full inventories, native audits and cold rendering pass, with original packages,
+synthetic user files and immutable runtime receipts restored/preserved. This is
+package-release qualification only, not product-version or managed DSH/history
+upgrade/rollback, graphical sessions or interrupted/reboot recovery.
 
 [The complete installer checkpoint](../release/qualification/next-targets/20261003-system-qt-installer-adapters.json)
 records explicit Arch/Leap package and managed-runtime contracts, target-specific
@@ -224,7 +252,8 @@ on Arch and /usr/lib64/node_modules/npm24/bin/npm-cli.js on Leap. Bundled Node
 executes that CLI and its actual semver engine check before npm ci. A generic npm
 wrapper exists only in the fresh private install for nested DSH plugin commands;
 no system npm alias or owner PATH is changed. The dependency research verifies
-Arch npm12.2.0 supports Node24.19. Leap's actual installed npm check is still pending.
+Arch npm12.2.0 supports Node24.19. Actual installed checks above also establish
+Leap npm11.16.0 accepts bundled Node24.19 (engine ^20.17.0 or >=22.9.0).
 
 Base and optional native providers come from dated official metadata and read-only
 native solver plans. Leap explicitly needs ca-certificates-mozilla for public CA
@@ -252,14 +281,17 @@ actual assembly/execution with new matching clean artifacts remains pending.
 
 Arch/Leap source adapters now provide target/runtime contracts, checked guard
 ordering, explicit bootstrap and native npm selection. Matching new clean bundle
-assembly and actual installed/resumed complete setup checks remain required.
+assembly and actual installed/resumed complete setup checks remain required for
+the corrected Arch helper. Leap's exact clean8ad bundle has passed those recorded
+container checks; no later source inherits that artifact acceptance.
 Inspect native dependency solver plans before
 changing owned fixtures; preserve frozen Qt/Python manifests and runtime receipts.
 Any drift needs a new candidate rather than refreshing old inventory.
 
 Fresh native installation, cold ordinary-user runtime/rendering and busy/idle
-replacement/removal now pass within their recorded container scope. Next build
-new font-dependent artifacts and execute full installer/resume. Real GNOME/KDE/Mint
+replacement/removal now pass within their recorded container scope. New font
+artifacts and the exact Leap full installer now pass; Arch's corrected helper
+passes diagnostic resume, pending a matching clean bundle. Real GNOME/KDE/Mint
 sessions, consent/input/lock/reboot, graphical Browser, physical audio, version
 upgrades/rollback and source/legal/release acceptance stay open. All five rollout
 points remain active. Owner installations, services, models, audio devices and the

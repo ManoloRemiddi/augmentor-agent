@@ -2635,3 +2635,33 @@ full repository-source claim is made. Twenty-one focused source/setup cases pass
 Matching clean new artifacts, actual assembler/root/user/npm/repeat execution and
 all five rollout acceptance points remain open. Owner state, root license and all
 22 proposed-license file hashes are unchanged. No candidate binary is published.
+
+## October 3 complete native setup and distinct package-release rollback
+
+[Actual clean8ad execution](../release/qualification/next-targets/20261003-system-qt-complete-and-release-upgrade.json)
+now includes new release3 native packages and complete bundles. Leap passes full
+native root admission plus ordinary-user setup, actual DSH/plugins, both fixture
+roles, offscreen rendering, repeat settings and restart history without replay.
+Arch native packages/guards complete, but its original setup refuses at a
+hardcoded nested semver import. Native Arch npm12.2 flattens semver beside npm.
+The corrected helper uses Node createRequire rooted at npm's package.json;
+actual native engine checks pass Arch12.2/Leap11.16 with bundled Node24.19.
+An explicitly hashed external Arch helper resumes the partial install and passes
+the full ordinary-user/model/history proof. It remains diagnostic overlay evidence;
+fresh clean matching fixed Arch assembly/root/user checks are still required.
+Nineteen focused setup methods pass, including three actual Node layout/engine
+cases. Initial failures remain retained. Both new installed packages pass native
+audits and every approved font glyph; completed setup fixtures are now offline.
+
+Separate offline fixtures also pass distinct clean536 release1→clean8ad release3
+upgrade and3→1 rollback. Actual Desktop and Node leases refuse each busy
+transaction. Idle native transactions, full inventories, package audits and cold
+rendering pass; original packages, synthetic user files and immutable runtime
+receipts are restored/preserved. Product-version and managed DSH/history rollback,
+interrupted/reboot recovery and real graphical sessions remain separate.
+
+All five rollout points stay active. Current Ubuntu/Fedora/Mint sessions,
+GNOME/KDE consent/Stop/input, graphical Browser, physical audio, coherent native
+dependency updates and source/legal/public release gates remain open. No owner
+installation/model/service/device, root license or22 proposed-license source
+files changed. Candidate archives stay private; no binary release or PR merge.

@@ -21,6 +21,12 @@ from urllib.parse import urlsplit
 import zipfile
 
 ROOT=Path(__file__).resolve().parents[1]
+NPM_ENGINE_PROBE="""const root=process.argv[1];
+const fromNpm=require('node:module').createRequire(root+'/package.json');
+const p=fromNpm('./package.json');const semver=fromNpm('semver');
+if(!p.engines||!semver.satisfies(process.versions.node,p.engines.node))
+  throw new Error('The distro npm CLI does not support this bundled Node version.');
+console.log(JSON.stringify({npm:p.version,node:process.versions.node,engines:p.engines.node,cli:root+'/bin/npm-cli.js'}));"""
 
 
 def run(*args, **kwargs):return subprocess.run([str(a) for a in args],check=True,**kwargs)
@@ -133,12 +139,7 @@ def npm_environment(target, app, data, env):
     content='#!/bin/sh\nexec '+' '.join(shlex.quote(value) for value in command)+' "$@"\n'
     if path.is_symlink() or (path.exists() and path.read_text()!=content):
         raise ValueError('The private installer npm command differs; review the partial installation.')
-    probe="""const root=process.argv[1];
-const p=require(root+'/package.json');const semver=require(root+'/node_modules/semver');
-if(!p.engines||!semver.satisfies(process.versions.node,p.engines.node))
-  throw new Error('The distro npm CLI does not support this bundled Node version.');
-console.log(JSON.stringify({npm:p.version,node:process.versions.node,engines:p.engines.node,cli:root+'/bin/npm-cli.js'}));"""
-    result=run(node,'-e',probe,cli.parent.parent,env=env,capture_output=True,text=True)
+    result=run(node,'-e',NPM_ENGINE_PROBE,cli.parent.parent,env=env,capture_output=True,text=True)
     info=json.loads(result.stdout)
     if not path.exists():write(path,content,0o700)
     write(directory/'npm-runtime.json',json.dumps(info,indent=2)+'\n')

@@ -2,6 +2,33 @@
 
 # Start here: agent handoff
 
+## October 3 complete Leap installer, Arch correction and release rollback
+
+[Actual qualification](../release/qualification/next-targets/20261003-system-qt-complete-and-release-upgrade.json)
+records new clean8adb633 release3 native packages and assembled matching bundles.
+Leap passes its full native root plan and ordinary-user setup, real DSH/plugins,
+both fixture model roles, offscreen rendering, repeat settings and restart history
+without replay. Its native npm11.16 executes with bundled Node24.19. Both new
+installed packages pass native file audits, frozen runtimes and every approved
+font glyph; the completed fixtures are now disconnected from Docker networks.
+
+Arch's initial full run installs/verifies native packages but refuses at an
+incorrect nested semver import. Arch installs semver beside npm. Setup now uses
+Node createRequire anchored at npm's package.json; actual ordinary native engine
+checks pass on Arch npm12.2 and Leap11.16. An explicitly hashed external corrected
+Arch helper resumes setup and passes the full user/DSH/model/history proof. That
+overlay is diagnostic evidence, not matching-bundle promotion. Fresh clean fixed
+Arch assembly/root/user acceptance remains required. Nineteen focused setup
+methods pass, including actual Node nested/flattened/rejected-engine cases.
+
+Separate offline fixtures also pass distinct release1→3 upgrade and3→1 rollback
+with clean536→8ad→536 payloads. Both real native Desktop and Node leases refuse
+each busy transaction; idle replacement, cold rendering, full inventories,
+native audits and unchanged synthetic user/runtime receipts pass. Original
+packages are restored. This qualifies package-release changes only: product
+version, DSH history, managed selection, power-loss and real sessions are separate.
+All five rollout points stay active; owner state and22 licensing files unchanged.
+
 ## October 3 clean release2 native builds and explicit Voice source coverage
 
 [This checkpoint](../release/qualification/next-targets/20261003-system-qt-release2-and-source-scope.json)
