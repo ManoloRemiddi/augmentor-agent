@@ -2,7 +2,25 @@
 
 # Embedded Handy dictation
 
-## October 3 alignment and matched downloads
+## Current matched download publication — October 3
+
+[The preview-2 release ledger](HANDY-DOWNLOADS-2026-10-03.md) records the
+published Linux, Mac and Windows x64/ARM64 downloads, exact source/checksums,
+eight passing qualification workflows and anonymous full-download verification.
+PR #35 is merged as `5d4ab848e2d8e1e49a030fa2c139e6b7d65ce009`; customer
+source and tags retain `6f001fd395a4575ea58d1899f7b68aa1d5283004`.
+All four customer packages bundle native Handy without its separate tray.
+Settings remain off after refresh and release the installation lease when disabled.
+The four-pixel recording-icon correction is merged in PR #33 and included.
+
+Preview-1 assets remain historical and omit Handy. The preparation statements
+below retain their dated evidence; their pending source/package gates are
+superseded by the ledger. Physical microphone/input/permission acceptance on
+Mac and Windows remains pending. The owner's compatible 0.2.11 installation
+is separate and was not replaced by the 0.2.13 release tests. Selected and
+running artifacts can differ; inspect each before any installed update.
+
+## Historical October 3 alignment and matched download preparation
 
 The owner requested a small leftward correction of the recording icon. The
 28-pixel orb is translated four CSS pixels left; waveform, cancel button, orb

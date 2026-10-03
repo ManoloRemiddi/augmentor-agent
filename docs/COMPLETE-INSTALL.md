@@ -7,8 +7,9 @@ is scoped to KDE Plasma Wayland. Mac and Windows use their own
 platform installers; this Linux installer does not establish Fedora feature parity.
 
 The active project is [augmentor-agent](https://github.com/ManoloRemiddi/augmentor-agent).
-This guide describes the **0.2.13 Handy preview 2** candidate being qualified.
-After publication, use these matching assets:
+This guide describes the published **0.2.13 Handy preview 2**.
+[Exact source, checksums and qualification](HANDY-DOWNLOADS-2026-10-03.md)
+are recorded separately from historical preview-1 downloads. Use these matching assets:
 [download the archive](https://github.com/ManoloRemiddi/augmentor-agent/releases/download/v0.2.13-complete-preview.2/augmentor-0.2.13-complete-preview.2.tar.gz),
 [verify SHA256SUMS](https://github.com/ManoloRemiddi/augmentor-agent/releases/download/v0.2.13-complete-preview.2/SHA256SUMS),
 and read its [release record](https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/v0.2.13-complete-preview.2).

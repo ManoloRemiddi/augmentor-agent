@@ -2,10 +2,10 @@
 
 # Augmentor Agent for Windows — 0.2.13 preview
 
-The Handy preview 2 candidate includes native x64/ARM64 dictation and its bundled
-browser/runtime. It is being qualified before publication; preview 1 downloads
-remain historical and do not include Handy. See [the preparation and exact
-evidence](HANDY-INTEGRATION.md#october-3-alignment-and-matched-downloads).
+The published Handy preview 2 includes native x64/ARM64 dictation and its bundled
+private browser/runtime. Preview 1 remains historical and does not include Handy.
+See [the published source, checksums and qualification](HANDY-DOWNLOADS-2026-10-03.md).
+Physical microphone and cross-application typing acceptance remain separate.
 
 Windows preview 2. Windows 11 **25H2 or later**, build 26200 or later.
 Choose **x64** for Intel/AMD PCs or **ARM64** for Windows on ARM.

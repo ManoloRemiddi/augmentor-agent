@@ -45,34 +45,35 @@ this pair. The alignment guide records exact run URLs, the requirement audit
 and four inspected Chromium component
 renders. These source checks do not promote a release or migrate an app.
 
-## October 3 Handy alignment, test separation and download preparation
+## October 3 Handy publication — current
 
-PR #30 is merged; PR #33 is merged as `f738a73f6f2d44fde111108df72dbf1cd94b562b`
-after all gates passed. It adds the four-pixel leftward orb adjustment and protects
-the live dictation session from incomplete/offscreen development brokers. The
-owner's dictation broker now runs separately staged compatible release
-`20261003-105718-c8fb185f`, artifact
-`7296f4917721c601e0949588a97053c947db8eeda62ab0fd3f7dea66cb7f2d9a`,
-enabled/ready on Ctrl+Space with no error and unchanged saved broker preferences.
-Existing conversation windows were preserved. Read [the owning evidence](HANDY-INTEGRATION.md#october-3-alignment-and-matched-downloads)
-for isolated CPU recognition, deployment scope, the shortcut fixture race and
-pending final source checks. Do not run UI proofs on the owner's real display.
+PR #30, icon/session-isolation PR #33 and matched packaging/lifecycle PR #35
+are merged. PR #35 squash is `5d4ab848e2d8e1e49a030fa2c139e6b7d65ce009`;
+all customer preview-2 packages and tags use exact qualified source
+`6f001fd395a4575ea58d1899f7b68aa1d5283004`. Linux, Apple-silicon Mac and
+Windows x64/ARM64 releases include native Handy, the themed recording pill
+and requested four-pixel orb correction. No separate Handy tray is needed.
+All eight final-source workflows pass, including both Windows CPUs' fourteen
+installation/repair/restoration/removal stages and strict inventories.
 
-The owner directs preparation of **Linux, macOS and Windows before publishing**.
-Existing public 0.2.13 downloads predate or explicitly exclude Handy. Preparing a
-component or merging a source PR does not replace those assets. Native Windows
-ARM64, complete per-user payload/prerequisites and matched customer installer
-qualification remain part of that preparation.
+[The published download ledger](HANDY-DOWNLOADS-2026-10-03.md) owns exact
+public URLs, checksums, anonymous full-byte verification, source/merge scope,
+supplier notices and remaining physical microphone/permission/input acceptance.
+[The integration guide](HANDY-INTEGRATION.md) retains historical failures and
+fixes. Disabled settings refresh preserves off-state and releases maintenance
+leases. Preview-1 assets stay immutable and do not include Handy.
 
-PR #35 prepares complete Windows x64/ARM64 Handy payloads and a matched Linux/
-Mac build workflow. App-local Microsoft browser/CRT, exact supplier notices and
-fresh-user/component proofs are required. Initial Windows CI caught native ARM
-compiler selection and inherited PowerShell module-path issues; follow-up
-source corrects both without relaxing supplier checks. These new packages are
-not yet public. [The Handy guide](HANDY-INTEGRATION.md) owns exact evidence and
-remaining physical microphone/permission acceptance limits.
+The owner's compatible 0.2.11 installation is separate from these customer
+previews. It was not replaced or restarted during publication. The selected
+build changed independently during qualification, while the dictation broker
+was observed ready from its earlier compatible staged build. Inspect selected
+and running identities before any future update, preserve matching DSH/speech
+and active conversations, and keep tests off the owner's display/audio session.
+Do not infer physical acceptance on every PC from hosted package proofs.
 
-
+The October 2 Windows preview-1 record below is historical; preview 2 and its
+bundled guide supersede the no-Handy delivery scope. Repair only the exact build;
+do not overlay preview 2 onto preview 1 or a different product contract.
 
 ## Windows 0.2.13 public preview — release record, October 2
 
