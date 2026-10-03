@@ -13,10 +13,10 @@ import {CodexWorkspaces} from '../dist/codex-runtime/src/workspaces.js'
 import {CodexWorkspaceBoundary} from '../apps/browser/shared/codex-workspace.mjs'
 import {installProfile} from '../services/workspaces/install.mjs'
 
-function fixture(t){
+function fixture(t,close=async()=>{}){
  const root=realpathSync(mkdtempSync(join(tmpdir(),'codex-sdk-'))),profilesDir=join(root,'profiles'),prior=process.env.AUGMENTOR_WORKSPACE_PROFILES
  mkdirSync(profilesDir,{mode:0o700});process.env.AUGMENTOR_WORKSPACE_PROFILES=profilesDir
- t.after(()=>{if(prior===undefined)delete process.env.AUGMENTOR_WORKSPACE_PROFILES;else process.env.AUGMENTOR_WORKSPACE_PROFILES=prior;rmSync(root,{recursive:true,force:true})})
+ t.after(async()=>{try{await close()}finally{if(prior===undefined)delete process.env.AUGMENTOR_WORKSPACE_PROFILES;else process.env.AUGMENTOR_WORKSPACE_PROFILES=prior;rmSync(root,{recursive:true,force:true})}})
  const module=join(root,'tools.mjs');writeFileSync(module,process.env.AUGMENTOR_SDK_TOOLS_ENTRY?
   `import {createApplicationTools} from ${JSON.stringify(pathToFileURL(process.env.AUGMENTOR_SDK_TOOLS_ENTRY).href)};export function applicationTools(){return createApplicationTools({definitions:[['fixture_read','Read a synthetic record',{}, {type:'object',required:['id','version'],properties:{id:{type:'string'},version:{type:'integer'}}}]],async execute(name,args,execution){globalThis.__codexSdkExecutions??=[];globalThis.__codexSdkExecutions.push(execution.callId);return {id:'synthetic-record',version:1}}})}`:
   `export function applicationTools(){return {tools:[{name:'fixture_read',description:'Read a synthetic record',inputSchema:{type:'object',properties:{},additionalProperties:false}}],async execute(name,args,execution){globalThis.__codexSdkExecutions??=[];globalThis.__codexSdkExecutions.push(execution.callId);return {id:'synthetic-record',version:1}}}}`)
@@ -54,9 +54,12 @@ test('Codex boundary filters history and rejects other app operations and shared
  assert.deepEqual(boundary.filter([row,{...row,workspaceId:'other'},{...row,cwd:'/foreign'},{...row,selection:{provider:'other'}}]),[row])
 })
 test('real pinned Codex app workspace advertises granted tools and native denial prevents shell execution',{timeout:30000},async t=>{
- const f=fixture(t),requests=[],executions=[];globalThis.__codexSdkExecutions=executions
- let host,ipc,client,phase='granted'
- const server=createServer(async(req,res)=>{
+ let host,ipc,client,server,phase='granted'
+ const f=fixture(t,async()=>{
+  try{client?.close();await ipc?.close();await host?.close()}
+  finally{if(server){server.closeAllConnections();await new Promise(resolve=>server.close(resolve))}delete globalThis.__codexSdkExecutions}
+ }),requests=[],executions=[];globalThis.__codexSdkExecutions=executions
+ server=createServer(async(req,res)=>{
   let raw='';for await(const chunk of req)raw+=chunk;const body=JSON.parse(raw);requests.push(body)
   const outputs=body.input.filter(item=>item.type==='function_call_output')
   const callId=phase==='granted'?'fixture-native-call':phase==='revoked'?'fixture-revoked-call':'fixture-shell-call'
@@ -68,7 +71,6 @@ test('real pinned Codex app workspace advertises granted tools and native denial
   res.end()
  })
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve))
- t.after(async()=>{client?.close();await ipc?.close();await host?.close();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));delete globalThis.__codexSdkExecutions})
  const profiles=new ProfileStore(join(f.root,'connections.json'),{get:async()=>{throw Error('No credentials in this fixture')},set:async()=>{throw Error('No credential writes in this fixture')},delete:async()=>{}})
  await profiles.upsert({id:'local',name:'Synthetic local provider',kind:'local',model:'gpt-5.4',endpoint:`http://127.0.0.1:${server.address().port}/v1`})
  const options={root:join(f.root,'host'),profiles,workspaces:new CodexWorkspaces(),resolveProfile:id=>profiles.resolve(id)}

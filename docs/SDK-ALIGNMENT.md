@@ -131,6 +131,13 @@ The assertions remain enabled on every platform. Passing local reruns do not
 replace fresh hosted qualification. The SDK's Windows database cleanup ordering
 is corrected separately in its owning repository.
 
+The Mac follow-up reached all three registry/boundary checks, then failed its
+engine case and retained an open local fixture server until the job deadline.
+Fixture teardown now closes the owned host before removing its state and always
+closes the provider server even if host cleanup rejects. This preserves the
+original engine assertions and makes failure details observable; the cancelled
+run is not passing Mac evidence. Fresh hosted engine/bundle checks remain required.
+
 `scripts/app-sdk-bundle-proof.mjs` checks the actual packaged Mac/Windows bootstrap, private token,
 transactional DSH workspace registration/role composition, native frame
 description, shared-administration denial, explicit harness and natural owned
