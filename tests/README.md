@@ -843,6 +843,16 @@ parser allocates them. Hosted output reports the actual/end counts and ZIP64
 format; fixture compatibility is not native produced-archive qualification.
 
 
+Managed Linux owned registration: `test_update_linux_registration.py` exercises
+actual preset/browser/composition files, bundled module links and flushed private
+backups. Cases preserve model/token/chat/voice settings, refuse edits, ambiguous
+composition and unrelated journal pairs, and retain partial unknown writes. Its
+1.0.0→2.0.0 controller composition uses actual selection/journal/archive operations
+with mocked imports/connection and health; it does not prove installed DSH service
+migration or reopening. Run with `python3 -B -m unittest discover -s tests -p
+test_update_linux_registration.py`. Nine cases pass; the complete focused updater
+set passes 200 cases (199 passed, one OS skip).
+
 Managed Linux updates: `test_update_linux_managed.py` covers real isolated locks,
 journals and immutable selections, compatibility before drain, changed content/
 modes/selection, live authority revocation, lifetime contention, failed health and

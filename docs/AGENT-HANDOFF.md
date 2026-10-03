@@ -4,6 +4,18 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+Owned Linux DSH preset/browser/host registration migration now composes with the
+original managed selection and offline completion. Nine isolated migration cases
+pass, including a 1.0.0→2.0.0 registration/selection transaction and preserved
+model/token/conversation/voice settings. Focused updater checks pass 200 cases
+(199 passed, one skip); full Python passes 979 cases (939 passed, 40 skips) with
+isolated dictation/Qt state. Owned service units, shared harness registration and
+observed background/window reopening remain required before public eligibility.
+The fresh native workflows at `3374580` all pass: Mac 14/26 37151926643,
+Linux/shared 37151929120 and Windows Desktop both CPUs 37151931306. This supersedes
+their pending status below. Newer Linux dependency/registration changes still
+need their own qualification. See [owned migration](UPDATE-SYSTEM.md#managed-linux-owned-registration-migration).
+
 The latest Linux correction preserves the complete `dsh/` and speech payload in
 immutable staging, and requires those public dependency entrypoints before
 candidate imports. Twelve deployment and nine archive cases pass. DSH profile/

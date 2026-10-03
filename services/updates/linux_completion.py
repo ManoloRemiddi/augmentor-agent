@@ -54,8 +54,10 @@ def complete_observed(backend):
                         or plan.tool.verify(plan.source)!=plan.source_manifest or plan.tool.verify(plan.target)!=plan.target_manifest):
                     raise ValueError('The retained managed source or target changed.')
             immutable()
+            if plan.registration is not None:plan.registration.verify_applied()
             if verify_health(plan) is not True:raise ValueError('Offline managed target health was not verified.')
             immutable()
+            if plan.registration is not None:plan.registration.verify_applied()
             return True
         archive=UpdateJournal.complete_verified(journal.directory,source,target,health)
     return {'transactionId':record['id'],'archive':str(archive),'installationComplete':True,

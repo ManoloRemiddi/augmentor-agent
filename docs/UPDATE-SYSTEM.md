@@ -1021,3 +1021,44 @@ and Windows Desktop
 [37151931306](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37151931306).
 The subsequent Linux DSH allowlist/completeness correction passes twelve focused
 deployment and nine archive cases and needs its newer Linux qualification.
+
+## Managed Linux owned registration migration
+
+`linux_registration.RegistrationPlan` migrates only the known installer-owned DSH
+Browser files, default preset aliases, literal owned host-composition entry and
+bundled module links between the original inspected immutable releases. Current
+file hashes, source defaults, link targets and ownership version must agree.
+Edited presets, ambiguous composition entries, copied/external dependencies and
+unfamiliar ownership records require an explicit migration. Other composition
+entries, Browser chat configuration, model settings, tokens, conversations and
+speech settings are preserved.
+
+Managed preflight checks the original live DSH against its source version and
+imports the target offline. The registration plan binds once to the complete
+inspected source/target artifact pair; another journal cannot authorize writes.
+Apply requires the original live startup writer and matching apply intent. It
+flushes exact private before-file backups and a manifest before any registration
+mutation, writes owned files/links, then switches the managed desktop selection.
+Completion checks the applied registrations and retained backups before and after
+the fixed offline target render. Failed writes or namespace acknowledgements keep
+the pending barrier and backups; saved manifests do not grant retry or rollback.
+
+Nine actual-file/link/journal fixtures pass, including a version-changing full
+registration/selection/completion composition with mocked connected/import and
+health actions. These fixtures preserve synthetic model, token, conversation and
+voice settings, refuse modified ownership/defaults and unrelated release pairs,
+and retain unknown post-replace outcomes. They do not restart an installed DSH or
+prove target live compatibility. Focused updater checks pass 200 cases (199 passed,
+one platform skip). Full Python passes 979 cases (939 passed, 40 explicit skips)
+using isolated dictation/Qt state. Owned service-unit and shared harness-registration migration,
+actual target DSH health, captured reopening, retention and producer/forward
+qualification remain required; automatic managed Linux eligibility stays disabled.
+
+The newer shared/native checkpoint `3374580` passes both complete Mac 14/26 jobs
+in [37151926643](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37151926643),
+all Linux/shared packaging jobs in
+[37151929120](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37151929120)
+and Windows Desktop both CPUs in
+[37151931306](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37151931306).
+It qualifies the shared ZIP/discovery/authority changes preceding the newer Linux
+dependency-retention and owned-registration work, which require fresh validation.

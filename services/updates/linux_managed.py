@@ -3,7 +3,8 @@
 
 Compatibility is checked while the original DSH integration is still running.
 After drain only exact immutable artifacts, selection and offline imports are
-checked. This never edits package-manager trees, presets or service definitions.
+checked. Owned presets are migrated through their separately bound backup plan;
+package-manager trees and service definitions remain outside this controller.
 """
 from copy import deepcopy
 import hashlib
@@ -37,13 +38,14 @@ def load_deployment(data):
 
 
 class ManagedPlan:
-    def __init__(self,data,source,target,*,development=False):
+    def __init__(self,data,source,target,*,development=False,registration=None):
         if sys.platform!='linux':raise RuntimeError('Managed selection requires Linux.')
         if type(development) is not bool:raise ValueError('Choose an explicit qualification policy.')
         self.data=require_directory(Path(data).absolute())
         self.source,self.target=Path(source).absolute(),Path(target).absolute()
         self.development=development;self.fd=None;self.entered=False;self.closed=False
         self.applied=False;self.started=False;self.backend=None
+        self.registration=registration
 
     def __enter__(self):
         if self.entered or self.closed:raise ValueError('Use a fresh managed selection plan.')
@@ -96,9 +98,25 @@ class ManagedPlan:
                 self.identities.append(identity)
             if any(self.identities[0][key]!=self.identities[1][key] for key in ('target','channel','protocols')):
                 raise ValueError('This update needs a coordinated product integration migration.')
+            from .linux_registration import RegistrationPlan
+            if self.registration is None and not self.development and self.previous.get('dshService'):
+                if not self.previous.get('dshHome'):raise ValueError('The owned DSH home is missing from this deployment.')
+                self.registration=RegistrationPlan(self.previous['dshHome'],self.source,self.target,
+                    self.identities[0]['version'],self.identities[1]['version'])
+            if self.registration is not None:
+                if (not isinstance(self.registration,RegistrationPlan) or self.registration.source!=self.source
+                        or self.registration.target!=self.target or str(self.registration.home)!=self.previous.get('dshHome')
+                        or self.registration.source_version!=self.identities[0]['version']
+                        or self.registration.target_version!=self.identities[1]['version']):
+                    raise ValueError('Use the original registration plan for this exact managed release pair.')
+                self.registration.validate()
+                self.registration.bind_artifacts(*self.pair())
             # Crucially this check precedes preparation/shutdown. Existing
             # DshAdapter enforces exact product identity against the live server.
-            self.tool.check(self.proposed,connected=True)
+            if self.registration is not None:
+                self.tool.check(self.previous,connected=True)
+                self.tool.check(self.proposed,connected=False)
+            else:self.tool.check(self.proposed,connected=True)
             self.validate(offline=False)
             return self
         except BaseException:self.close();raise
@@ -112,6 +130,7 @@ class ManagedPlan:
             raise ValueError('The original managed preflight is no longer live.')
         if selection_bytes(self.data/'desktop.json')[0]!=self.raw:
             raise ValueError('The original selected bytes changed before promotion.')
+        if self.registration is not None:self.registration.validate()
         for root,expected,manifest in ((self.source,self.source_payload,self.source_manifest),
                 (self.target,self.target_payload,self.target_manifest)):
             if self.tool.verify(root)!=manifest or snapshot(root)!=expected:
@@ -160,6 +179,7 @@ class ManagedBackend:
             raise ValueError('The live apply intent differs from the original managed pair.')
         self.plan.validate()
         self.plan.started=True  # A failed namespace flush must never permit retry.
+        if self.plan.registration is not None:self.plan.registration.apply(self.gate,journal)
         atomic_json(self.plan.data/'desktop.previous.json',self.plan.previous)
         atomic_json(self.plan.data/'desktop.json',self.plan.proposed)
         self.plan.applied=True
