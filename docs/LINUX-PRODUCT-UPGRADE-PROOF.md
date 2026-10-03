@@ -141,3 +141,34 @@ strict settings/event comparison and no-replay requirement remain unchanged.
 The initial fresh-install result remains FAIL. Three new refusal cases pass,23
 with helper/preparer/history checks. Actual post-first-use acceptance is pending;
 it cannot qualify the failed initial-settings check or product-version rollback.
+
+
+## October 3 post-first-use result and cold-history source
+
+Actual1168937 post-first-use completes both roles (four model requests) and keeps
+all five settings bytes. It fails in5.24seconds before restart because the prior
+Linux history gains exactly one empty `session/end-seed` at sequence19; its full
+previous19-event prefix remains identical. Native, leases, process/socket/port
+absence and normal cleanup pass. All five initial-failure files are unchanged.
+There is no pending or unknown action. Strict history equality remains FAIL.
+
+The shipped DSH0.1.5-rc.1 source explains the observation:
+[Session restoration](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.1.5-rc.1/packages/core/session/src/index.ts)
+appends a lifecycle marker when the restored tail does not already have one.
+[Follow and Page](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.1.5-rc.1/packages/api/session-controller/src/history.ts)
+differ: Follow delivers a snapshot then activates a cold Agent; Page reads without
+activation. Augmentor's existing history adapter opens Follow. The retained
+shipped Session/controller hashes match the inspected contract. No existing
+history normalization, adapter or installed DSH code is changed.
+
+[A separate cold-history worker](../release/prove-published-linux-cold-history.py)
+uses only authenticated `session/page`, exact dense retained fixture events and
+complete compressed persistence-file byte/metadata equality across normal DSH
+restart. Its exact three completed synthetic histories and known terminal journal
+are pinned; it never creates a session, prompts, opens Follow or patches saved
+history. A numeric loopback provider rejects every model request. The reviewed
+ordinary companion, native shared lifetime leases, one-shot normal cleanup and
+settings guards remain. Four source cases reject missing/reordered/extra/changed
+or partial events and unknown replay, passing27 with the related checks. Actual
+cold-history execution is pending. This separate scope cannot relabel either
+historical failure or establish product-version upgrade/rollback by itself.

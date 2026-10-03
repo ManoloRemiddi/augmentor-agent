@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 researched cold-history acceptance source
+
+[Published history qualification](LINUX-PRODUCT-UPGRADE-PROOF.md)
+retains the post-first-use strict FAIL: both roles and five unchanged settings
+pass, but Follow activates a prior cold Agent and appends one lifecycle marker.
+Pinned shipped and official DSH0.1.5-rc.1 source confirms that behavior. A separate
+cold Page worker compares every retained event and all compressed persistence
+bytes/metadata across normal restart, with no session/model mutation or Follow.
+27 focused source checks pass; actual cold acceptance/upgrade remain pending.
+Historical failures and journals remain unchanged.
+
 ## October 3 published initial SDK formatting refusal
 
 [The initial published baseline checkpoint](../release/qualification/next-targets/20261003-published-baseline-history-source.json)

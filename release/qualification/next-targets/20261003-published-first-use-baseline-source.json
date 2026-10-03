@@ -1,7 +1,7 @@
 {
   "format": "augmentor-published-first-use-baseline-source/1",
   "date": "2026-10-03",
-  "status": "source-only reviewed; separate post-first-use history pending",
+  "status": "actual post-first-use FAIL at prior cold Follow history change; cleanup PASS",
   "sourceBase": "4675008",
   "workerSha256": "119be053b8af0d6923276e570254f3a24ed8d30fedb64081f9c0928bd3988f86",
   "historicalInitialProof": "FAIL-settings-formatting",
@@ -18,7 +18,31 @@
   "turnSeconds": 60,
   "newSyntheticPassed": 3,
   "allFocusedSyntheticPassed": 23,
-  "actualPostFirstUseExecuted": false,
+  "actualPostFirstUseExecuted": true,
   "upgradeRollbackQualified": false,
-  "publicReleaseQualified": false
+  "publicReleaseQualified": false,
+  "actualResult": {
+    "sourceCommit": "1168937",
+    "elapsedSeconds": 5.236193200020352,
+    "startupSeconds": 3.246978674986167,
+    "linuxAndBrowserRoleComplete": true,
+    "modelRequests": 4,
+    "fiveSavedSettingsByteEquality": true,
+    "priorHistoryCountBefore": 19,
+    "priorHistoryCountAfter": 20,
+    "soleAdditionalEvent": {
+      "type": "session/end-seed",
+      "seq": 19,
+      "data": {}
+    },
+    "allPriorEventsExactlyPreserved": true,
+    "strictHistoryEquality": false,
+    "restartReached": false,
+    "normalCleanup": "PASS",
+    "independentNativeLeasesProcessesSocketsPorts": "PASS",
+    "initialFailureAllFiveFilesPreserved": true,
+    "pendingRequest": null,
+    "pendingLifecycle": null,
+    "unknownOutcome": false
+  }
 }

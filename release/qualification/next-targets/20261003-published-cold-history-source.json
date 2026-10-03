@@ -1,0 +1,33 @@
+{
+  "format": "augmentor-published-cold-history-source/1",
+  "date": "2026-10-03",
+  "status": "source-only reviewed; actual cold-history pending",
+  "sourceBase": "1168937",
+  "workerSha256": "c3ce83bf4cb3b77eb21fb1306e0c11535d3e7e74f2b2049587bacb985d64484d",
+  "baseWorkerSha256": "119be053b8af0d6923276e570254f3a24ed8d30fedb64081f9c0928bd3988f86",
+  "historicalFirstUseProof": "FAIL-exact-history-equality",
+  "historyRoute": "session/page",
+  "followOpened": false,
+  "sessionOrModelMutation": false,
+  "allRetainedEventsExactlyEqual": true,
+  "compressedPersistenceBytesAndMetadataExactlyEqual": true,
+  "savedFiveSettingsExactlyEqual": true,
+  "historicalFailureRelabelled": false,
+  "newSyntheticPassed": 4,
+  "focusedSyntheticPassed": 27,
+  "actualColdHistoryExecuted": false,
+  "upgradeRollbackQualified": false,
+  "sources": [
+    {
+      "url": "https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.1.5-rc.1/packages/core/session/src/index.ts",
+      "gitBlob": "9db83274097372c2ad2e79e10b3add1ee63a3980",
+      "shippedJsSha256": "05e94f57d96e7979670a5b51024c8591572eb0051ce793613dbdec35cf2c47bf"
+    },
+    {
+      "url": "https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.1.5-rc.1/packages/api/session-controller/src/history.ts",
+      "gitBlob": "cfaf00421eb3104505866ce1cd3075700a8792e0",
+      "shippedControllerJsSha256": "16ecb48f33996efe72868f1603223214430634c5ac4c3e8fe9060bf240e990ff"
+    }
+  ],
+  "publicReleaseQualified": false
+}
