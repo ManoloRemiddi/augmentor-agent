@@ -4,6 +4,14 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+Whole Mac bundle inspection and one-shot final-lease native replacement are now
+added. Two inert whole-bundle/link cases pass; 147 focused updater cases pass
+with one OS skip. A new hosted same-build retained-copy/journal/graph apply proof
+is pending and does not claim health/reopen or signed forward installation.
+Full Windows x64 at `9bce979` passes actual busy deferral, complete target health
+and captured-instance reopen (37134219949); ARM64 remains pending. See
+[Mac native apply checkpoint](UPDATE-SYSTEM.md#mac-retained-bundle-and-native-apply-checkpoint).
+
 Native Mac 14/26 at `000fb62` passes compiled launcher lock/export and Unix graph
 cases, then fails packaged SDK native-description qualification. SDK hosts now
 retain their busy registration without the Browser document control endpoint;

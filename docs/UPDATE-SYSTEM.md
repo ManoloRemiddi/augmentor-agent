@@ -117,6 +117,35 @@ proof passes; fresh combined native Mac workflows must qualify the correction.
 SDK app owners remain responsible for normal shutdown and are never automatically
 committed through Browser maintenance.
 
+## Mac retained bundle and native apply checkpoint
+
+`macos_payload` inspects the entire bundle, including native executables, Python,
+Node, DSH, framework links and signatures. Relative links must resolve inside the
+bundle; external/dangling/hard links, special or privileged files, changing bytes
+and oversized trees refuse inspection. Native inspection compares independently
+identified release bytes and bundle identity/version, verifies signatures before
+and after hashing, and requires Developer ID/team and Gatekeeper assessment for
+public signed/notarized releases. Explicit development fixtures remain separate.
+Two inert relocation/link-boundary tests pass on Linux.
+
+`MacInstallerBackend` requires the live Unix startup writer, exact previously
+inspected source/candidate snapshots and same-volume staging. Readiness acquires
+the final exclusive installation lease; APPLY is one-shot and rechecks both
+bundles. The existing native replacement keeps an exact old bundle and restores
+it on a confirmed failed promotion rename. It does not edit user state, replay
+native journals, complete the shared transaction or resume a launchd registration.
+Fresh publisher authority, graph drain and owned registration coordination belong
+to the external controller and remain required.
+
+The new hosted `macos-update-payload-proof.py` qualifies whole development-bundle
+retention, signature-damage refusal, kernel reader refusal and the actual shared
+journal/graph/backend same-build replacement into a disposable retained copy.
+It preserves the original artifact, source backup, pending shared record and
+synthetic settings. Native execution is pending. It does not qualify signed
+N-to-N+1, independent target UI health/reopen or any installed user application.
+The source has 147 focused updater cases (one OS skip); production flags remain
+false until the complete observer/controller and distribution gates pass.
+
 ## Ownership and data
 
 `services/updates/manager.py` belongs to the per-user shared prompt service, rather

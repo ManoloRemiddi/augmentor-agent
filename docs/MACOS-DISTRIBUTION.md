@@ -34,6 +34,14 @@ Node graph/startup/exec cases pass locally. Mac 14/26 qualifies the preceding
 independent bundle replacement/health and reopen still need complete qualification.
 See [the current graph contract](UPDATE-SYSTEM.md#unix-startup-and-graph-preparation).
 
+Whole-bundle signature/content inspection and a final-lease, one-shot native
+replacement backend are now source-ready. The hosted payload proof retains the
+complete development bundle, refuses native signature damage and executes an
+isolated same-build shared-journal replacement with the old bundle/user sentinel
+preserved. Native execution is pending. This backend does not supply automatic
+publisher authority, target health/reopen or launchd recovery. Read the
+[Mac checkpoint](UPDATE-SYSTEM.md#mac-retained-bundle-and-native-apply-checkpoint).
+
 ## Delivery contract and sequencing
 
 ### September 26 publication audit

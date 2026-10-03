@@ -1,0 +1,100 @@
+#!/usr/bin/env python3
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+"""Retain/inspect a whole development bundle outside its original path.
+
+Only disposable retained-copy replacement; no user installation, app launch,
+login registration, model or user data is involved.
+"""
+import argparse
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
+import plistlib
+
+ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'services'))
+from lifecycle.macos_payload import verify_bundle
+from lifecycle.macos_apply import MacInstallerBackend
+from lifecycle.posix_preparation import PosixPreparation
+from lifecycle.posix_startup import Startup
+from lifecycle.update import authorize_update
+from lifecycle.update_journal import UpdateJournal
+from platform_adapters import locks
+from platform_adapters.paths import private_directory
+from platform_adapters.private_files import atomic_json,require_directory,descriptor
+
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--app',type=Path,required=True)
+    parser.add_argument('--out',type=Path,required=True)
+    args=parser.parse_args()
+    if sys.platform!='darwin':parser.error('This proof requires native macOS signatures.')
+    if args.app.is_symlink():raise ValueError('Use the original ordinary bundle directory.')
+    original=args.app.resolve(strict=True)
+    if args.out.is_symlink() or args.out.exists() and any(args.out.iterdir()):raise ValueError('Use a new empty evidence directory.')
+    out=require_directory(private_directory(args.out.resolve()))
+    release=(original/'Contents/Resources/app/release.json').read_bytes()
+    source=verify_bundle(original,release,development=True)
+    retained=out/'Retained source.app'
+    subprocess.run(['/usr/bin/ditto',str(original),str(retained)],check=True,timeout=180)
+    copy=verify_bundle(retained,release,development=True)
+    if source!=copy:raise ValueError('The retained whole bundle differs from the original.')
+    info=plistlib.loads((retained/'Contents/Info.plist').read_bytes())
+    executable=retained/'Contents/MacOS'/info['CFBundleExecutable']
+    before=executable.read_bytes()
+    if not before:raise ValueError('The retained native executable is empty.')
+    try:
+        executable.write_bytes(bytes([before[0]^255])+before[1:])
+        try:verify_bundle(retained,release,development=True)
+        except subprocess.CalledProcessError:pass
+        else:raise AssertionError('Mac signature inspection accepted a damaged native executable.')
+    finally:executable.write_bytes(before)
+    if verify_bundle(original,release,development=True)!=source or verify_bundle(retained,release,development=True)!=copy:
+        raise ValueError('The original or restored development bundle changed.')
+    candidate=out/'Candidate.app'
+    subprocess.run(['/usr/bin/ditto',str(original),str(candidate)],check=True,timeout=180)
+    target=verify_bundle(candidate,release,development=True)
+    sentinel=out/'retained-user-fixture.txt';sentinel.write_bytes(b'Preserve fixture settings and history.')
+    # Short private runtime, independent of any graphical/login registration.
+    with tempfile.TemporaryDirectory(prefix='ag-mac-update-',dir='/tmp') as temporary:
+        runtime=require_directory(Path(temporary))
+        with Startup(runtime,maintenance=True) as gate:
+            holder=descriptor(runtime/'installation.lock',writable=True,create=True)
+            try:
+                locks.flock(holder,locks.LOCK_SH|locks.LOCK_NB)
+                with MacInstallerBackend(gate,retained,candidate,release,release,copy,target,development=True) as backend:
+                    try:backend.wait_ready()
+                    except BlockingIOError:pass
+                    else:raise AssertionError('A live installation reader did not block Mac apply readiness.')
+            finally:os.close(holder)
+        metadata=json.loads(release)
+        identity={key:metadata[key] for key in ('version','sourceCommit','target','channel','dataSchema','readableDataSchemas')}
+        identity['sha256']=source['sha256']  # Whole retained-bundle fixture identity; never published.
+        transaction=require_directory(private_directory(out/'transaction'))
+        created=[]
+        def installer(gate):
+            backend=MacInstallerBackend(gate,retained,candidate,release,release,copy,target,development=True)
+            created.append(backend);return backend
+        with UpdateJournal(transaction,identity,identity) as journal:
+            result=authorize_update(journal,lambda:PosixPreparation(retained/'Contents/Resources/app',runtime,runtime/'shared'),installer)
+            if journal.record['phase']!='apply-acknowledged' or result['installationComplete'] is not False:
+                raise AssertionError('The fixture confused apply with completed installation.')
+        backup=created[0].backup
+        if not backup or verify_bundle(backup,release,development=True)!=copy or verify_bundle(retained,release,development=True)!=target:
+            raise ValueError('Atomic replacement did not retain the source and exact target.')
+        if verify_bundle(original,release,development=True)!=source or sentinel.read_bytes()!=b'Preserve fixture settings and history.':
+            raise ValueError('The original bundle or synthetic user state changed.')
+    report={'passed':True,'schema':'augmentor-macos-source-proof/1','payloadSHA256':source['sha256'],
+        'releaseSHA256':source['releaseSHA256'],'entries':len(source['entries']),'bytes':source['bytes'],
+        'relocatedWholeBundle':True,'nativeSignatureDamageRefused':True,'originalPreserved':True,
+        'installationReaderRefusesReady':True,'atomicSameBuildFixtureApply':True,'sourceBackupRetained':True,
+        'pendingRecordRetained':True,'syntheticUserStatePreserved':True,
+        'scope':'Development whole-bundle retention and same-build isolated apply only; no signed forward update, target health/reopen, login/user install or automatic publisher authority.'}
+    atomic_json(out/'report.json',report)
+    print(json.dumps(report))
+
+
+if __name__=='__main__':main()
