@@ -134,6 +134,14 @@ assembler uses the same narrowly scoped Git safe-directory setting as its Debian
 packager, supporting the hosted container's checkout ownership while retaining
 clean-source and exact-commit checks. Both follow-ups await hosted qualification.
 
+Inspection of the exact Microsoft ARM VC payload found its `vcruntime140_1`
+support member has an x64 PE header. Native ARM inference now receives the native
+CRT members; staging reads each actual inference executable/DLL's PE imports and
+rejects missing C++ dependencies or wrong native architectures before packaging.
+The retained import report distinguishes x64's additional runtime from ARM's
+dependency set. The parser was checked against all existing x64 inference DLLs;
+final ARM intake and startup gates remain pending.
+
 Implementation branch: `feat/handy-integration`, based on public main
 `d91c52037d7bc26c82c702c25e1a779b0fca1f39`. This guide owns the implemented
 contract; [the approved plan](HANDY-INTEGRATION-PLAN.md) retains its rationale.

@@ -33,6 +33,33 @@ def machine(path):
         return struct.unpack_from('<H', pe, 4)[0]
 
 
+def imports(path):
+    """Read native PE import names as data; do not load the inference DLLs."""
+    data=path.read_bytes();pe=struct.unpack_from('<I',data,60)[0]
+    optional=pe+24;magic=struct.unpack_from('<H',data,optional)[0]
+    if data[pe:pe+4]!=b'PE\0\0' or magic!=0x20b:raise ValueError('Expected a 64-bit PE file.')
+    count=struct.unpack_from('<H',data,pe+6)[0]
+    section=optional+struct.unpack_from('<H',data,pe+20)[0]
+    def offset(rva):
+        for index in range(count):
+            size,address,raw_size,raw=struct.unpack_from('<IIII',data,section+40*index+8)
+            if address<=rva<address+max(size,raw_size):
+                result=raw+rva-address
+                if result>=len(data):break
+                return result
+        raise ValueError('Invalid PE import address.')
+    directory,size=struct.unpack_from('<II',data,optional+112+8)
+    if not directory:return []
+    result=[];position=offset(directory)
+    for index in range(size//20):
+        row=struct.unpack_from('<IIIII',data,position+index*20)
+        if not any(row):break
+        start=offset(row[3]);end=data.find(b'\0',start,start+260)
+        if end<0:raise ValueError('Invalid PE import name.')
+        result.append(data[start:end].decode('ascii').lower())
+    return result
+
+
 def stage(output):
     if sys.platform != 'win32': raise ValueError('Stage this supplier on native Windows.')
     arch = {'AMD64': 'x64', 'ARM64': 'arm64'}.get(platform.machine())
@@ -89,6 +116,13 @@ def stage(output):
     # execute its per-machine installer on a build host or customer computer.
     vc=json.loads((ROOT/'components/handy/visual-c-runtime.json').read_text(encoding='utf-8'))
     supplier=vc['targets'][arch]
+    binaries=[output/'bin/handy.exe',*sorted((output/'bin').glob('*.dll'))]
+    for file in binaries:
+        if machine(file) not in allowed:raise ValueError('Wrong native inference architecture: '+file.name)
+    crt_imports=sorted({name for file in binaries for name in imports(file)
+                        if re.fullmatch(r'(?:msvcp|vcruntime|concrt)\w*\.dll',name)})
+    missing=set(crt_imports)-supplier['libraries'].keys()
+    if missing:raise ValueError('Unbundled native C++ imports: '+', '.join(sorted(missing)))
     vc_terms=ROOT/'components/handy/licenses/Visual-C-runtime.txt'
     if digest(vc_terms)!=vc['licenseSha256']:raise ValueError('Visual C++ terms changed.')
     with tempfile.TemporaryDirectory(prefix='augmentor-vc-runtime-') as temporary:
@@ -111,6 +145,7 @@ def stage(output):
                 raise ValueError('Wrong Visual C++ library bytes or target: '+name)
             shutil.copy2(dll,output/'bin'/name)
     vc_notice=output/'notices/visual-c';vc_notice.mkdir()
+    (vc_notice/'imports.json').write_text(json.dumps({'nativeCrtImports':crt_imports},indent=2)+'\n',encoding='utf-8')
     shutil.copy2(vc_terms,vc_notice/'LICENSE.txt')
     vc_record={'version':vc['version'],'arch':arch,**supplier,'licenseUrl':vc['licenseUrl'],'licenseSha256':vc['licenseSha256']}
     (vc_notice/'supplier.json').write_text(json.dumps(vc_record,indent=2)+'\n',encoding='utf-8')

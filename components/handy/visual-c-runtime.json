@@ -65,10 +65,6 @@
         "vcruntime140.dll": {
           "member": "vcruntime140.dll_arm64",
           "sha256": "3c56f4167e2b3d8e6338497731e6aae8cd7ec46bd6789f9423a8d9cf9a630310"
-        },
-        "vcruntime140_1.dll": {
-          "member": "vcruntime140_1.dll_arm64",
-          "sha256": "60c70e34e2e156f8bd214b92c2125c252e17d86ac8a25799ea1a4ecabde1d97c"
         }
       }
     }
