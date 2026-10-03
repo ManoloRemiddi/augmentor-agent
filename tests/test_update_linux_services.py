@@ -153,6 +153,9 @@ class ServiceTests(unittest.TestCase):
             module.service(command,self.fixture.home,self.credentials).encode())
 
     def test_service_migration_composes_with_original_managed_pointer_and_completion(self):
+        self.completed_scene()
+
+    def completed_scene(self,exercise=None):
         f=self.fixture;data=f.base/'data';data.mkdir(mode=0o700);tool=load_deployment(data);tool.check=Mock()
         configs=[]
         for root,config,version,commit in ((f.source,self.previous,'1.0.0','a'*40),
@@ -195,10 +198,12 @@ class ServiceTests(unittest.TestCase):
                 service,'query',side_effect=lambda:state.copy()),patch('updates.linux_services.subprocess.run') as run:
             with ManagedPlan(data,f.source,f.target,development=True,registration=registration) as plan:
                 plan.services=service
-                result=LinuxCoordinator(plan,f.runtime,f.runtime/'shared',f.transactions).run(lambda stage:True)
+                coordinator=LinuxCoordinator(plan,f.runtime,f.runtime/'shared',f.transactions)
+                result=coordinator.run(lambda stage:True)
                 self.assertTrue(result['installationComplete']);self.assertTrue(service.verify_applied())
                 self.assertEqual(read_json(data/'desktop.json'),configs[1])
                 self.assertEqual(read_json(data/'desktop.previous.json'),configs[0])
                 self.assertEqual(read_json(Path(result['archive']))['phase'],'complete')
                 self.assertFalse((f.transactions/'active.json').exists());self.assertEqual(run.call_count,1)
+                if exercise is not None:exercise(coordinator,result,state,run)
         f.sentinels_preserved();self.assertEqual(self.credentials.read_bytes(),b'FIXTURE_SECRET=preserve-exactly\n')

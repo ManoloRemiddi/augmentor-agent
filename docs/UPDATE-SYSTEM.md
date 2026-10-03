@@ -1134,3 +1134,36 @@ there. It copies no Git metadata or credentials. New native qualification is
 required. The separate `8bc5bfb` broad validation 37154936597 fails an unchanged
 dual-memory prompt-service startup after its simulated restart, before Python
 updater checks; that failure remains unqualified pending a fresh complete run.
+
+### Observed DSH reopening
+
+`linux_reopen.reopen_dsh_observed` is called by the retained Linux driver after
+independent completion. It requires the original live successful backend and
+closed journal, exact completed archive/steps/revision, current managed selection,
+both retained artifact inventories and snapshots, original registration backups
+and inactive successfully migrated/reloaded service. Startup and installation
+readers exclude another maintenance writer; any new pending attempt blocks reopening.
+The fixed migrated unit receives one normal start, preserving user enablement.
+A fresh target socket peer must match its live service MainPID and actual bundled
+executable/root. Connected target health and immutable files are rechecked before
+success. Observations are released without stopping target work. A failed or
+uncertain start never grants a retry, saved archive or PID never reconstructs
+authority, and an installed update remains installed when reopening fails.
+
+Six portable cases use actual original backend, managed selection, registration
+backups and completion archive with explicitly simulated graph/systemd/peer and
+connected/offline health actions. They cover changed archive/target, another pending
+attempt, failed start without retry, wrong target peer and changed target during
+connected health. Focused updater checks before the final pending case pass 216
+(214 passed, two OS/CI skips); full Python passes 995 (954 passed, 41 skips). The
+final added case passes separately. Service queries explicitly include empty
+properties using `show --all` with the fixed property filter.
+
+The native fixture is extended to actual target-service reopening and fresh target
+peer observation, plus wrong-completion/changed-target refusal before start. Its
+provider/import/UI health remain mocked, and native execution is pending the
+corrected isolated-source run. It does not reopen desktop windows or their
+background owner. Those steps, real DSH/target health, signed forward producer,
+retention/recovery and public feed/bridge qualification remain required. Linux
+automatic eligibility remains disabled. Status observation of the remaining
+37155477755 jobs timed out; a timeout is not a terminal result or restart authority.

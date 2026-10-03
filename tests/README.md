@@ -870,6 +870,14 @@ The Node participant is an inert maintenance fixture; connected/import and UI
 health actions are mocked. Native qualification is pending. Ordinary discovery
 skips this test without its dedicated CI user and explicit qualification flag.
 
+`test_update_linux_reopen.py` checks original-backend/archive/selection authority
+and one-shot migrated DSH start. Six cases cover successful target health with
+preserved settings, changed archive/target, new pending attempt, uncertain start,
+wrong peer and changed target during health. Graph/systemd/peer/health actions are
+explicitly simulated; actual files/journal/completion are composed. The native
+fixture is separately extended to target-service reopening with real OS/kernel
+observations, pending execution. Neither set qualifies desktop/window reopening.
+
 Managed Linux updates: `test_update_linux_managed.py` covers real isolated locks,
 journals and immutable selections, compatibility before drain, changed content/
 modes/selection, live authority revocation, lifetime contention, failed health and

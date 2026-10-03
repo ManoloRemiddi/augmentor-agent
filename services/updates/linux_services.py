@@ -87,7 +87,7 @@ class OwnedServicePlan:
         registration.add_external_file('shared-config',shared,self.harnesses,before,(json.dumps(after,indent=2)+'\n').encode())
 
     def query(self):
-        result=subprocess.run(['/usr/bin/systemctl','--user','show','--no-pager',
+        result=subprocess.run(['/usr/bin/systemctl','--user','show','--all','--no-pager',
             '--property='+','.join(PROPERTIES),UNIT],stdin=subprocess.DEVNULL,capture_output=True,timeout=10)
         if result.returncode or len(result.stdout)>65536:raise RuntimeError('The owned user service could not be inspected.')
         fields={}

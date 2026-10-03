@@ -4,6 +4,19 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+Linux DSH reopening now requires the original live healthy backend/completed
+archive, unchanged selection/artifacts/registrations and inactive migrated unit.
+It starts that fixed unit once, binds the fresh actual target socket peer to its
+live service report and checks target connected health. Unknown start outcomes
+cannot replay. Six local cases pass with actual backend/archives/files and explicit
+graph/systemd/peer/health mocks. Focused checks before the final case pass 216
+(214 passed, two skips); full Python passes 995 (954 passed, 41 skips). The final
+pending-attempt case also passes. Native fixture is extended to service reopening
+but needs the corrected isolated-source workflow run. Desktop/background-owner
+and captured-window reopening remain open; Linux public eligibility stays disabled.
+GitHub status observation of 37155477755 is timing out; keep its still-unverified
+remaining jobs intact, do not restart based on an observation timeout.
+
 The first native user-service job at `76462aa` (111297907075 in 37155477755)
 fails before test import: the disposable account cannot access the runner's
 checkout. The workflow now archives only privacy-checked tracked source and copies

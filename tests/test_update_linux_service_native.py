@@ -21,6 +21,7 @@ from updates.linux_registration import RegistrationPlan
 from updates.linux_services import OwnedServicePlan,render,UNIT
 from updates.linux_managed import ManagedPlan,load_deployment
 from updates.linux_coordinator import LinuxCoordinator
+from updates.linux_reopen import reopen_dsh_observed
 from platform_adapters.private_files import atomic_json,read_json
 
 CONTROL="""// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
@@ -142,7 +143,8 @@ class NativeServiceTests(unittest.TestCase):
             (f.runtime/'busy').unlink()
             plan,service=self.plan()
             try:
-                result=LinuxCoordinator(plan,f.runtime,f.runtime/'shared',f.transactions).run(lambda stage:True)
+                coordinator=LinuxCoordinator(plan,f.runtime,f.runtime/'shared',f.transactions)
+                result=coordinator.run(lambda stage:True)
                 self.assertTrue(result['installationComplete']);self.assertTrue(service.bound)
                 self.assertEqual(service.process.pid,int(original_pid))
                 self.assertTrue(service.drained);self.assertTrue(service.verify_applied())
@@ -155,10 +157,23 @@ class NativeServiceTests(unittest.TestCase):
                 self.assertEqual(self.credentials.read_bytes(),self.secret)
                 self.assertEqual(read_json(Path(result['archive']))['phase'],'complete')
                 self.assertFalse((f.transactions/'active.json').exists());f.sentinels_preserved()
+                with self.assertRaisesRegex(ValueError,'one-shot reopening'):
+                    reopen_dsh_observed(coordinator.backend,{**result,'transactionId':'f'*48})
+                before=plan.target/'apps/browser/plugin/dist/index.js';payload=before.read_bytes()
+                before.write_bytes(b'Changed target before reopening.')
+                with self.assertRaisesRegex(ValueError,'artifacts changed'):
+                    reopen_dsh_observed(coordinator.backend,result)
+                self.assertFalse(getattr(coordinator.backend,'service_reopening_started',False));before.write_bytes(payload)
+                self.assertTrue(reopen_dsh_observed(coordinator.backend,result))
+                current=service.query();service.verify_state(current,running=True)
+                self.assertEqual(current['ActiveState'],'active')
+                self.assertEqual(current['UnitFileState'],'disabled')
+                with self.assertRaisesRegex(ValueError,'one-shot reopening'):reopen_dsh_observed(coordinator.backend,result)
+                self.assertEqual(self.credentials.read_bytes(),self.secret);f.sentinels_preserved()
                 print(json.dumps({'schema':'augmentor-native-linux-service-proof/1','busyDeferred':True,
                     'originalPeerBound':True,'normalExit':True,'unitMigrated':True,'daemonReloaded':True,
                     'selectionCompleted':True,'credentialsPreserved':True,'enablementPreserved':True,
-                    'providerAndUiMocked':True,'reopened':False}))
+                    'providerAndUiMocked':True,'serviceReopened':True,'windowsReopened':False}))
             finally:plan.close()
 
 
