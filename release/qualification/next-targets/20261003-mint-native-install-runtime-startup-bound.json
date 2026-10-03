@@ -106,7 +106,9 @@
     "completeSetupCasesPassed": 16,
     "nativeCompleteCasesPassed": 7,
     "newMatchingArtifactsAndSafePartialRecoveryAcceptancePending": true,
-    "notAFedoraNativeSetup120TimeoutFix": true
+    "fedoraClean368AlsoUses60SecondBootstrap": true,
+    "priorSeparateFedora120DeadlineInterpretationIncorrect": true,
+    "newDeadlineNotYetInstalledOrAcceptedOnFedora": true
   },
   "privateReportReceipt": {
     "bytes": 18037,

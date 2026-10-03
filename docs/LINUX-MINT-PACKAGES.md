@@ -71,5 +71,6 @@ but does not establish the exact earlier cause. The maintained setup deadline
 now allows120seconds for each owned start. Early exit, token/host verification,
 identity/integrity, cleanup and no replay remain intact;16 setup and7 native
 complete cases pass. New matching artifacts and safe explicit partial recovery
-remain required. This does not fix Fedora native setup's separate120-second
-readiness failure or qualify Cinnamon input/shortcuts/audio.
+remain required. The exact Fedora clean368 bundle also uses60seconds; the earlier separate120-second
+interpretation was incorrect. New Fedora artifact acceptance and Cinnamon
+input/shortcuts/audio remain open.
