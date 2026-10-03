@@ -4,6 +4,10 @@ Update implementation checkpoint: [shared discovery, notifications and downloads
 use the same service and controls across surfaces. Signed feed publication and
 optional automatic installation remain in progress; no installed OS qualification
 is inferred from this shared source.
+The signed publisher now has explicit interrupted-publication recovery and a
+permanent artifact ledger. Shared receipt/trust staging and Mac Desktop/Companion
+selection are implemented, with fresh native packaging qualification pending.
+The earlier Windows ACL fix passes both native CPU desktop workflows at `632c2f3`.
 
 Windows public preview scope: [installation and explicit parity limits](WINDOWS-PREVIEW.md). Physical acceptance is pending; shared source does not imply complete Windows feature qualification.
 

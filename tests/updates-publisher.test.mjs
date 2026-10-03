@@ -8,7 +8,7 @@ import path from 'node:path'
 import http from 'node:http'
 import {createHash} from 'node:crypto'
 import {Metadata} from '@tufjs/models'
-import {initializeRepository,publishRepository} from '../scripts/update-repository.mjs'
+import {initializeRepository,publishRepository,recoverRepository} from '../scripts/update-repository.mjs'
 import {UpdateRepository,BoundedFetcher} from '../services/updates/repository.mjs'
 
 const digest=bytes=>createHash('sha256').update(bytes).digest('hex')
@@ -97,4 +97,72 @@ test('publisher serializes concurrent signing owners and never overwrites earlie
  const directory=results[0].status==='fulfilled'?f.stage(1):f.stage(2)
  await assert.rejects(publishRepository({keys:f.keys,output:directory,refresh:true}),/EEXIST/)
  assert.equal(JSON.parse(await fs.readFile(path.join(f.keys,'publisher.json'),'utf8')).sequence,1)
+})
+
+test('completed output after a failed private checkpoint requires exact explicit recovery and verified signatures',async t=>{
+ const f=await fixture(t),stateFile=path.join(f.keys,'publisher.json')
+ await publishRepository({keys:f.keys,output:f.stage(1),catalogs:f.catalogs,artifacts:f.artifacts})
+ const rename=fs.rename
+ const failure=t.mock.method(fs,'rename',async(source,target)=>{
+  if(target===stateFile&&!JSON.parse(await fs.readFile(source,'utf8')).pending)throw Error('synthetic lost publisher checkpoint')
+  return rename(source,target)
+ })
+ await assert.rejects(publishRepository({keys:f.keys,output:f.stage(2),refresh:true}),/lost publisher checkpoint/)
+ failure.mock.restore()
+ assert.equal(JSON.parse(await fs.readFile(stateFile,'utf8')).pending.sequence,2)
+ const recovery={keys:f.keys,output:f.stage(2),sequence:2,decision:'finalize'}
+ await assert.rejects(recoverRepository({...recovery,sequence:3}),/exact pending/)
+ await assert.rejects(recoverRepository({...recovery,output:f.stage(3)}),/exact pending/)
+ const file=path.join(f.stage(2),'metadata/2.snapshot.json'),original=await fs.readFile(file)
+ const altered=JSON.parse(original);altered.signed.expires='2099-01-01T00:00:00Z'
+ await fs.writeFile(file,JSON.stringify(altered))
+ const manifestFile=path.join(f.stage(2),'publication.json'),manifestBytes=await fs.readFile(manifestFile)
+ const manifest=JSON.parse(manifestBytes);manifest.files['metadata/2.snapshot.json']=digest(await fs.readFile(file))
+ await fs.writeFile(manifestFile,JSON.stringify(manifest))
+ await assert.rejects(recoverRepository(recovery),/signature|threshold|signed by 0/i)
+ assert.equal(JSON.parse(await fs.readFile(stateFile,'utf8')).pending.sequence,2)
+ await fs.writeFile(file,original);await fs.writeFile(manifestFile,manifestBytes)
+ const audit=await recoverRepository(recovery)
+ assert.equal(audit.decision,'finalize')
+ assert.equal(JSON.parse(await fs.readFile(stateFile,'utf8')).publication.sequence,2)
+ await assert.rejects(recoverRepository(recovery),/exact pending/)
+ assert.equal((await publishRepository({keys:f.keys,output:f.stage(3),refresh:true})).sequence,3)
+})
+
+test('partial publication stays preserved, abandonment burns its version and stale locks cannot be evicted automatically',async t=>{
+ const f=await fixture(t),stateFile=path.join(f.keys,'publisher.json')
+ await publishRepository({keys:f.keys,output:f.stage(1),catalogs:f.catalogs,artifacts:f.artifacts})
+ const link=fs.link
+ const failure=t.mock.method(fs,'link',async(source,target)=>{
+  if(target===path.join(f.stage(2),'metadata/timestamp.json'))throw Error('synthetic interrupted timestamp')
+  return link(source,target)
+ })
+ await assert.rejects(publishRepository({keys:f.keys,output:f.stage(2),refresh:true}),/interrupted timestamp/)
+ failure.mock.restore()
+ const partial=await fs.readFile(path.join(f.stage(2),'metadata/2.targets.json'))
+ const recovery={keys:f.keys,output:f.stage(2),sequence:2,decision:'finalize'}
+ await assert.rejects(recoverRepository(recovery),/ENOENT/)
+ assert.equal(JSON.parse(await fs.readFile(stateFile,'utf8')).pending.sequence,2)
+ const lock=path.join(f.keys,'publisher.lock')
+ await fs.writeFile(lock,'preserved stale or live owner',{mode:0o600})
+ await assert.rejects(recoverRepository({...recovery,decision:'abandon'}),/EEXIST/)
+ assert.equal(await fs.readFile(lock,'utf8'),'preserved stale or live owner')
+ await fs.unlink(lock) // Fixture owner explicitly releases its inert lock.
+ await recoverRepository({...recovery,decision:'abandon'})
+ const state=JSON.parse(await fs.readFile(stateFile,'utf8'))
+ assert.equal(state.sequence,2);assert.equal(state.publication.sequence,1);assert.equal(state.pending,null)
+ assert.deepEqual(await fs.readFile(path.join(f.stage(2),'metadata/2.targets.json')),partial)
+ assert.equal((await publishRepository({keys:f.keys,output:f.stage(3),refresh:true})).sequence,3)
+ assert.equal(await fs.stat(path.join(f.stage(3),'metadata/3.targets.json')).then(stat=>stat.isFile()),true)
+})
+
+test('withdrawing a release never frees its immutable URL for different bytes',async t=>{
+ const f=await fixture(t)
+ await publishRepository({keys:f.keys,output:f.stage(1),catalogs:f.catalogs,artifacts:f.artifacts})
+ await publishRepository({keys:f.keys,output:f.stage(2),catalogs:{stable:empty(),preview:empty()}})
+ const replacement=Buffer.from('different synthetic installer')
+ await fs.writeFile(path.join(f.artifacts,f.targetPath),replacement)
+ f.release.artifacts[0]={...f.release.artifacts[0],bytes:replacement.length,sha256:digest(replacement)}
+ await assert.rejects(publishRepository({keys:f.keys,output:f.stage(3),catalogs:f.catalogs,artifacts:f.artifacts}),/relabeled/)
+ assert.equal(JSON.parse(await fs.readFile(path.join(f.keys,'publisher.json'),'utf8')).sequence,2)
 })

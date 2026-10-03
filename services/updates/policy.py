@@ -59,7 +59,7 @@ def _schemas(value):
 def validate_release(value):
     _keys(value, ('version', 'build', 'sourceCommit', 'channel', 'target', 'installType', 'releaseUrl',
                   'protocols', 'dataSchema', 'readableDataSchemas', 'minimumOS', 'artifacts'),
-          ('revoked', 'notes', 'minimumUpdater', 'distributions'))
+          ('revoked', 'notes', 'minimumUpdater', 'distributions', 'component'))
     version(value['version'])
     if type(value['build']) is not int or not 1 <= value['build'] <= 2**31 - 1:
         raise ValueError('Invalid release build sequence.')
@@ -73,6 +73,9 @@ def validate_release(value):
                    'macos-app': 'macos', 'windows-inno': 'windows'}[value['installType']]
     if not value['target'].startswith(expected_os + '-'):
         raise ValueError('Release installation method and target disagree.')
+    component=value.get('component','desktop')
+    if component not in ('desktop','companion') or (component=='companion' and value['installType']!='macos-app'):
+        raise ValueError('Unsupported installed application component.')
     distributions = value.get('distributions')
     if expected_os == 'linux':
         if (not isinstance(distributions, dict) or not 1 <= len(distributions) <= 8
@@ -104,6 +107,8 @@ def validate_release(value):
     roles = set(); paths = set()
     for item in artifacts:
         _keys(item, ('role', 'targetPath', 'bytes', 'sha256'))
+        if not isinstance(item['role'], str) or not isinstance(item['targetPath'], str):
+            raise ValueError('Invalid update component identity.')
         if item['role'] not in ROLES or item['role'] in roles or item['targetPath'] in paths:
             raise ValueError('Duplicate or unsupported update component.')
         roles.add(item['role'])
@@ -127,7 +132,7 @@ def validate_catalog(value):
     identities = set()
     for item in value['releases']:
         validate_release(item)
-        identity = (item['channel'], item['target'], item['installType'], item['version'], item['build'])
+        identity = (item['channel'], item['target'], item['installType'], item.get('component','desktop'), item['version'], item['build'])
         if identity in identities:
             raise ValueError('The update catalog has ambiguous release identities.')
         identities.add(identity)
@@ -161,14 +166,26 @@ def installed_identity(root, *, target=None):
     elif raw_target.startswith('windows-'):
         method = 'windows-inno'
     stamp = receipt.get('update', {})
+    component=receipt.get('component','desktop')
+    if component not in ('desktop','companion') or (component=='companion' and method!='macos-app'):
+        raise ValueError('The installed application component is invalid. Repair the installed application.')
     if not isinstance(stamp, dict) or type(stamp.get('build', 0)) is not int or not 0 <= stamp.get('build', 0) <= 2**31-1:
         raise ValueError('The installed release build identity is invalid. Repair the installed application.')
+    if 'schema' in stamp:
+        from .packaging import SCHEMA as RECEIPT_SCHEMA, build_receipt
+        expected=build_receipt(version=receipt.get('version',product['version']),
+            source_commit=receipt.get('sourceCommit',receipt.get('source',{}).get('commit')),
+            target=target,channel=receipt.get('channel',product['channel']),build=stamp.get('build',0),component=component)
+        if (set(stamp)!=set(expected) or stamp['schema']!=RECEIPT_SCHEMA or stamp['releaseId']!=expected['releaseId']
+                or type(stamp['automaticInstallQualified']) is not bool
+                or (stamp['build']==0 and stamp['automaticInstallQualified'])):
+            raise ValueError('The installed release stamp differs from its payload identity. Repair the installed application.')
     # Legacy managed overlays do not assert that their compatible product version
     # is an unmodified public build. They need an explicit migration before auto.
     return {'version': receipt.get('version', product['version']), 'build': stamp.get('build', 0),
             'buildKnown': stamp.get('build', 0) > 0,
             'sourceCommit': receipt.get('sourceCommit', receipt.get('source', {}).get('commit')),
-            'target': target, 'installType': method, 'channel': receipt.get('channel', product['channel']),
+            'target': target, 'installType': method, 'component':component, 'channel': receipt.get('channel', product['channel']),
             'protocols': receipt.get('protocols', product['protocols']),
             'dataSchema': receipt.get('dataSchema', product['dataSchema']),
             'readableDataSchemas': receipt.get('readableDataSchemas', product['readableDataSchemas']),
@@ -185,6 +202,8 @@ def eligibility(current, release, channel, *, os_version=None, distribution=None
         return 'This release targets another channel or processor.'
     if release['installType'] != current['installType']:
         return 'This release uses another installation method.'
+    if release.get('component','desktop') != current.get('component','desktop'):
+        return 'This release is for another installed application component.'
     if release['version'] == current['version'] and not current.get('buildKnown', True):
         return 'The installed build identity is missing. Install the supported updater bridge first.'
     if (version(release['version']), release['build']) <= (version(current['version']), current['build']):

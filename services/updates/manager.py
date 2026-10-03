@@ -47,13 +47,13 @@ class UpdateManager:
                 self.state.update(phase='interrupted', error='The previous update operation was interrupted. Check again to continue.')
         else:
             self.state = {'schema': SCHEMA, 'revision': 0, 'preferences': {
-                'automaticChecks': self.current['installType'] != 'development', 'intervalHours': 24,
-                'automaticDownload': False, 'automaticInstall': False, 'channel': self.current['channel']},
+                'automaticChecks': self.current['installType'] != 'development' and self.current['channel'] in CHANNELS, 'intervalHours': 24,
+                'automaticDownload': False, 'automaticInstall': False, 'channel': self.current['channel'] if self.current['channel'] in CHANNELS else 'preview'},
                 'phase': 'idle', 'candidate': None, 'authenticated': False, 'error': None,
                 'lastAttempt': None, 'lastSuccessfulCheck': None, 'nextCheck': 0,
                 'notifiedRelease': None, 'skippedRelease': None, 'postponedUntil': 0, 'downloads': []}
         self.state['revision'] = self.state.get('revision', 0)
-        identity = {k: self.current[k] for k in ('version', 'build', 'target', 'installType', 'sourceCommit')}
+        identity = {k: self.current[k] for k in ('version', 'build', 'target', 'installType', 'sourceCommit', 'component', 'releaseId')}
         observed = self.state.get('observedInstallation')
         if observed is not None and observed != identity:
             # A new running payload starts a new observation, never replays the
@@ -225,7 +225,7 @@ class UpdateManager:
     def check(self):
         with self.lock:
             channel = self.state['preferences']['channel']; self.state['lastAttempt'] = self.clock(); self.save()
-        result = self.runner({'operation': 'discover', 'channel': channel, 'target': self.current['target']})
+        result = self.runner({'operation': 'discover', 'channel': channel, 'target': self.current['target'], 'component':self.current['component']})
         authenticated = result.get('authenticated') is True
         if authenticated:
             os_version = self.os_version()
@@ -256,7 +256,7 @@ class UpdateManager:
 
     def validate_public_release(self, value, channel):
         if (not isinstance(value, dict) or set(value) != {'version', 'build', 'channel', 'target', 'releaseUrl', 'artifacts', 'authenticated'}
-                or value['authenticated'] is not False or value['channel'] != channel or value['target'] != self.current['target']
+                or value['authenticated'] is not False or value['channel'] != channel or value['target'] != self.current['target'] or self.current['component']!='desktop'
                 or type(value['build']) is not int or not 1 <= value['build'] <= 2**31 - 1):
             raise ValueError('Invalid public release discovery.')
         version(value['version']); canonical_release_url(value['releaseUrl'])

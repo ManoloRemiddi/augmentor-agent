@@ -20,8 +20,14 @@ def main():
     parser.add_argument('--root', type=Path, required=True)
     parser.add_argument('--arch', choices=['x64', 'arm64'], required=True)
     parser.add_argument('--public-preview', action='store_true')
+    parser.add_argument('--update-build', type=int, default=0, help='Reviewed per-version build sequence; required for public previews')
     args = parser.parse_args()
     if sys.platform != 'win32': parser.error('Stage Windows dependencies on their native Windows target.')
+    if args.public_preview and args.update_build < 1:
+        parser.error('A public preview requires its reviewed positive --update-build.')
+    sys.path.insert(0,str(ROOT/'services'))
+    from updates.packaging import build_receipt, stage_repository, source_revision
+    source=source_revision(ROOT,build=args.update_build)
     target = args.root.resolve()
     for path in ('python/python.exe', 'node/node.exe', 'powershell/pwsh.exe', 'dsh/payload.json'):
         if not (target/path).is_file(): raise ValueError('Stage the pinned Windows runtimes first: '+path)
@@ -47,11 +53,13 @@ def main():
                 ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '.git', 'node_modules', 'test', 'tests'))
         else: shutil.copy2(source, destination)
     product = json.loads((ROOT/'release/product.json').read_text(encoding='utf-8'))
-    revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
+    revision = source['commit']
     profile = json.loads((ROOT/'release/windows/public-preview.json').read_text(encoding='utf-8')) if args.public_preview else {
         'qualificationStatus': 'development-candidate', 'customerDistribution': False}
+    update=build_receipt(version=product['version'],source_commit=revision,target='windows-'+args.arch,channel=product['channel'],build=args.update_build)
+    stage_repository(ROOT,target,node=target/'node/node.exe')
     (target/'release.json').write_text(json.dumps({**product, **profile, 'sourceCommit': revision,
-        'target': 'windows-'+args.arch}, indent=2)+'\n', encoding='utf-8')
+        'target': 'windows-'+args.arch, 'update':update}, indent=2)+'\n', encoding='utf-8')
     subprocess.run([sys.executable, '-Xutf8', '-B', str(ROOT/'scripts/build-windows-launcher.py'),
                     '--root', str(target), '--arch', args.arch], check=True)
     sys.path.insert(0,str(ROOT/'services'))

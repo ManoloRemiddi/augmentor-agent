@@ -92,6 +92,10 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           npm run build
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/node/node.exe --test tests/updates-repository.test.mjs
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_update_packaging.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Exercise Python and Node shared prompt clients and durable restart
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         env:

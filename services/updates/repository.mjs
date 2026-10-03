@@ -203,8 +203,9 @@ export class UpdateRepository {
   }
 }
 
-export async function publicReleases({channel, target, fetcher = new BoundedFetcher()} = {}) {
+export async function publicReleases({channel, target, component='desktop', fetcher = new BoundedFetcher()} = {}) {
   if (!['preview', 'stable'].includes(channel)) throw Error('Unsupported update channel.')
+  if(component!=='desktop')return [] // Legacy public lookup has no qualified companion asset mapping.
   const raw = await fetcher.downloadBytes(`https://api.github.com/repos/${REPOSITORY}/releases?per_page=100`, MAX_METADATA)
   const records = JSON.parse(raw)
   if (!Array.isArray(records)) throw Error('The release server returned an invalid list.')

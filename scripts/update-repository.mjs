@@ -15,6 +15,7 @@ const ROOT=fileURLToPath(new URL('../',import.meta.url))
 const ROLES=['targets','snapshot','timestamp']
 const STATE='augmentor-update-publisher/1'
 const LIMIT=2*1024**2
+const STATE_LIMIT=16*1024**2
 const digest=bytes=>createHash('sha256').update(bytes).digest('hex')
 const expiration=(now,days)=>new Date(now+days*86400000).toISOString()
 const serialize=metadata=>Buffer.from(JSON.stringify(metadata.toJSON()))
@@ -30,13 +31,14 @@ async function directory(folder,{privateFolder=false,create=false}={}){
  const info=await fs.lstat(folder)
  if(!info.isDirectory()||info.isSymbolicLink()||(process.platform!=='win32'&&(info.uid!==process.getuid()||(privateFolder&&(info.mode&0o077)))))throw Error('Unsafe publisher directory.')
 }
-async function write(file,bytes,{privateFile=false,exclusive=false}={}){
+async function write(file,bytes,{privateFile=false,exclusive=false,maximum=LIMIT}={}){
+ if(Buffer.byteLength(bytes)>maximum)throw Error('Publisher output exceeds its supported size limit.')
  const stage=file+'.'+randomUUID()+'.tmp'
  const handle=await fs.open(stage,'wx',privateFile?0o600:0o644)
  try{
   await handle.writeFile(bytes);await handle.sync();await handle.close()
   if(exclusive){await fs.link(stage,file);await fs.unlink(stage)}else{
-   try{await ordinary(file,{privateFile})}catch(error){if(error.code!=='ENOENT')throw error}
+   try{await ordinary(file,{privateFile,maximum})}catch(error){if(error.code!=='ENOENT')throw error}
    await fs.rename(stage,file)
   }
   if(process.platform!=='win32'){const folder=await fs.open(path.dirname(file),'r');try{await folder.sync()}finally{await folder.close()}}
@@ -86,18 +88,24 @@ export async function initializeRepository({keys,output,now=Date.now()}){
  }
  const rootBytes=serialize(signed(root,roots.slice(0,2)))
  await write(path.join(folder,'root.json'),rootBytes,{privateFile:true,exclusive:true})
- await write(path.join(folder,'publisher.json'),JSON.stringify({schema:STATE,sequence:0,rootSha256:digest(rootBytes),publication:null,pending:null}),{privateFile:true,exclusive:true})
+ await write(path.join(folder,'publisher.json'),JSON.stringify({schema:STATE,sequence:0,rootSha256:digest(rootBytes),publication:null,pending:null,artifactIdentities:{}}),{privateFile:true,exclusive:true})
  await write(path.join(destination,'root.json'),rootBytes,{exclusive:true})
  await write(path.join(destination,'1.root.json'),rootBytes,{exclusive:true})
  return {root:path.join(destination,'root.json'),rootSha256:digest(rootBytes),rootThreshold:2,rootKeys:3}
 }
 
-async function owner(keys){
+async function owner(keys,{allowPending=false}={}){
  const folder=await keysFolder(keys)
- for(const name of ['root.json','publisher.json',...ROLES.map(role=>role+'.pem')])await ordinary(path.join(folder,name),{privateFile:true})
+ for(const name of ['root.json','publisher.json',...ROLES.map(role=>role+'.pem')])await ordinary(path.join(folder,name),{privateFile:true,maximum:name==='publisher.json'?STATE_LIMIT:LIMIT})
  const rootBytes=await fs.readFile(path.join(folder,'root.json'))
  const state=JSON.parse(await fs.readFile(path.join(folder,'publisher.json'),'utf8'))
- if(state.schema!==STATE||!Number.isSafeInteger(state.sequence)||state.sequence<0||state.rootSha256!==digest(rootBytes)||state.pending)throw Error('Publisher state needs explicit recovery; never repeat an uncertain publication.')
+ if(state.schema!==STATE||!Number.isSafeInteger(state.sequence)||state.sequence<0||state.rootSha256!==digest(rootBytes)||(!allowPending&&state.pending))throw Error('Publisher state needs explicit recovery; never repeat an uncertain publication.')
+ if(state.pending&&(!Number.isSafeInteger(state.pending.sequence)||state.pending.sequence!==state.sequence+1||typeof state.pending.directory!=='string'||!path.isAbsolute(state.pending.directory)))throw Error('Invalid pending publisher claim.')
+ if(!state.artifactIdentities||typeof state.artifactIdentities!=='object'||Array.isArray(state.artifactIdentities))throw Error('The permanent artifact identity ledger is missing.')
+ for(const [targetPath,identity] of Object.entries(state.artifactIdentities)){
+  if(!identity||Object.keys(identity).sort().join(',')!=='bytes,sha256')throw Error('Invalid permanent artifact identity ledger.')
+  validateArtifact({targetPath,...identity})
+ }
  const root=Metadata.fromJSON('root',JSON.parse(rootBytes));root.verifyDelegate('root',root)
  const selected={}
  for(const role of ROLES){
@@ -117,11 +125,9 @@ function validateCatalogs(catalogs){
  return JSON.parse(result.stdout)
 }
 
-async function previousPublication(publisher){
- const {state,root}=publisher
- if(!state.publication){if(state.sequence!==0)throw Error('The previous publication is missing.');return null}
- const prior=state.publication
- if(prior.sequence!==state.sequence||!path.isAbsolute(prior.directory))throw Error('Invalid publisher history.')
+async function verifiedPublication(publisher,prior){
+ const {root}=publisher
+ if(!Number.isSafeInteger(prior.sequence)||prior.sequence<1||typeof prior.directory!=='string'||!path.isAbsolute(prior.directory)||!prior.files||Object.keys(prior.files).length!==5)throw Error('Invalid publisher history.')
  await directory(prior.directory)
  const bytes={}
  for(const [name,expected] of Object.entries(prior.files)){
@@ -130,9 +136,17 @@ async function previousPublication(publisher){
   await ordinary(file);bytes[name]=await fs.readFile(file)
   if(digest(bytes[name])!==expected)throw Error('The previous publication changed. Preserve it for recovery.')
  }
- const targets=Metadata.fromJSON('targets',JSON.parse(bytes[`metadata/${state.sequence}.targets.json`]))
+ const targets=Metadata.fromJSON('targets',JSON.parse(bytes[`metadata/${prior.sequence}.targets.json`]))
+ const snapshot=Metadata.fromJSON('snapshot',JSON.parse(bytes[`metadata/${prior.sequence}.snapshot.json`]))
+ const timestamp=Metadata.fromJSON('timestamp',JSON.parse(bytes['metadata/timestamp.json']))
  root.verifyDelegate('targets',targets)
- if(targets.signed.version!==state.sequence)throw Error('Publisher history has an old target sequence.')
+ root.verifyDelegate('snapshot',snapshot);root.verifyDelegate('timestamp',timestamp)
+ if([targets,snapshot,timestamp].some(metadata=>metadata.signed.version!==prior.sequence))throw Error('Publisher history has an old metadata sequence.')
+ const checkReference=(reference,content)=>{
+  if(!reference||reference.version!==prior.sequence||reference.length!==content.length||reference.hashes.sha256!==digest(content))throw Error('Publisher metadata references differ from retained bytes.')
+ }
+ checkReference(snapshot.signed.meta['targets.json'],bytes[`metadata/${prior.sequence}.targets.json`])
+ checkReference(timestamp.signed.snapshotMeta,bytes[`metadata/${prior.sequence}.snapshot.json`])
  const catalogs={}
  for(const channel of ['stable','preview']){
   const target=targets.signed.targets['catalog/'+channel+'.json']
@@ -141,7 +155,26 @@ async function previousPublication(publisher){
   if(!file||file.length!==target.length||digest(file)!==target.hashes.sha256)throw Error('The retained catalog identity differs.')
   catalogs[channel]=JSON.parse(file)
  }
- return {targets,catalogs}
+ const values=validateCatalogs(catalogs),expected=new Set(['catalog/stable.json','catalog/preview.json'])
+ for(const channel of ['stable','preview'])for(const release of values[channel].releases)for(const artifact of release.artifacts){
+  validateArtifact(artifact);expected.add(artifact.targetPath)
+  const target=targets.signed.targets[artifact.targetPath]
+  if(!target||target.length!==artifact.bytes||target.hashes.sha256!==artifact.sha256)throw Error('A retained artifact differs from its signed catalog.')
+ }
+ if(Object.keys(targets.signed.targets).length!==expected.size)throw Error('Publisher history contains undeclared targets.')
+ return {targets,catalogs:values}
+}
+
+async function previousPublication(publisher){
+ const {state}=publisher
+ if((state.publication?.sequence||0)<state.sequence){
+  const file=path.join(publisher.folder,`recovery-${state.sequence}.json`);await ordinary(file,{privateFile:true})
+  const audit=JSON.parse(await fs.readFile(file,'utf8'))
+  if(audit.schema!=='augmentor-update-publisher-recovery/1'||audit.sequence!==state.sequence||audit.decision!=='abandon'||audit.rootSha256!==state.rootSha256)throw Error('The skipped publisher sequence lacks a matching recovery record.')
+ }
+ if(!state.publication)return null
+ if(state.publication.sequence>state.sequence)throw Error('Invalid publisher history sequence.')
+ return verifiedPublication(publisher,state.publication)
 }
 
 async function buildPublication({keys,output,catalogs,artifacts,refresh=false,now=Date.now()}){
@@ -157,8 +190,8 @@ async function buildPublication({keys,output,catalogs,artifacts,refresh=false,no
   files[`targets/catalog/${sha256}.${channel}.json`]=bytes
   for(const release of values[channel].releases)for(const artifact of release.artifacts){
    validateArtifact(artifact)
-   const old=previous?.targets.signed.targets[artifact.targetPath]
-   if(old&&(old.length!==artifact.bytes||old.hashes.sha256!==artifact.sha256))throw Error('An immutable published artifact was relabeled.')
+   const old=previous?.targets.signed.targets[artifact.targetPath],permanent=state.artifactIdentities[artifact.targetPath]
+   if((old&&(old.length!==artifact.bytes||old.hashes.sha256!==artifact.sha256))||(permanent&&(permanent.bytes!==artifact.bytes||permanent.sha256!==artifact.sha256)))throw Error('An immutable published artifact was relabeled.')
    if(!old){
     if(!artifacts)throw Error('New releases need their actual reviewed artifact bytes.')
     const base=path.resolve(artifacts),file=path.join(base,artifact.targetPath)
@@ -179,7 +212,10 @@ async function buildPublication({keys,output,catalogs,artifacts,refresh=false,no
  const sequence=state.sequence+1
  await fs.mkdir(destination,{mode:0o755})
  state.pending={sequence,directory:destination}
- await write(path.join(folder,'publisher.json'),JSON.stringify(state),{privateFile:true})
+ // Reserve names before any signature can escape, retaining withdrawn releases
+ // and failed attempts so no later catalog can reuse a URL for different bytes.
+ for(const [name,target] of Object.entries(targets))if(!name.startsWith('catalog/'))state.artifactIdentities[name]={bytes:target.length,sha256:target.hashes.sha256}
+ await write(path.join(folder,'publisher.json'),JSON.stringify(state),{privateFile:true,maximum:STATE_LIMIT})
  const targetBytes=serialize(signed(new Targets({version:sequence,expires:expiration(now,90),targets}),[selected.targets]))
  const snapshotBytes=serialize(signed(new Snapshot({version:sequence,expires:expiration(now,30),meta:{
   'targets.json':new MetaFile({version:sequence,length:targetBytes.length,hashes:{sha256:digest(targetBytes)}})}}),[selected.snapshot]))
@@ -198,27 +234,72 @@ async function buildPublication({keys,output,catalogs,artifacts,refresh=false,no
  const manifest={schema:'augmentor-update-publication/1',sequence,rootSha256:state.rootSha256,files:hashes,createdAt:new Date(now).toISOString()}
  await write(path.join(destination,'publication.json'),JSON.stringify(manifest,null,2),{exclusive:true})
  state.sequence=sequence;state.publication={directory:destination,sequence,files:hashes};state.pending=null
- await write(path.join(folder,'publisher.json'),JSON.stringify(state),{privateFile:true})
+ await write(path.join(folder,'publisher.json'),JSON.stringify(state),{privateFile:true,maximum:STATE_LIMIT})
  return manifest
 }
 
-export async function publishRepository(options){
- const folder=await keysFolder(options.keys),lock=path.join(folder,'publisher.lock')
+async function exclusivePublisher(keys,operation){
+ const folder=await keysFolder(keys),lock=path.join(folder,'publisher.lock')
  // A killed owner leaves this lock and its durable pending claim for deliberate
  // recovery. Concurrent writers must never sign the same role version twice.
  const handle=await fs.open(lock,'wx',0o600)
  try{
   await handle.writeFile(JSON.stringify({pid:process.pid,createdAt:new Date().toISOString()}));await handle.sync()
-  return await buildPublication(options)
+  return await operation()
  }finally{await handle.close();await fs.unlink(lock)}
+}
+
+export async function publishRepository(options){
+ return exclusivePublisher(options.keys,()=>buildPublication(options))
+}
+
+export async function recoverRepository({keys,output,sequence,decision}){
+ if(!['finalize','abandon'].includes(decision)||!Number.isSafeInteger(sequence)||sequence<1)throw Error('Recovery needs an explicit finalize/abandon decision and exact sequence.')
+ return exclusivePublisher(keys,async()=>{
+  const publisher=await owner(keys,{allowPending:true}),{state,folder,rootBytes}=publisher,pending=state.pending
+  if(!pending||pending.sequence!==sequence||pending.directory!==path.resolve(output))throw Error('Recovery must match the exact pending publication sequence and directory.')
+  await previousPublication(publisher)
+  let publication=null
+  if(decision==='finalize'){
+   const manifestFile=path.join(pending.directory,'publication.json')
+   await ordinary(manifestFile)
+   const manifest=JSON.parse(await fs.readFile(manifestFile,'utf8'))
+   if(manifest.schema!=='augmentor-update-publication/1'||manifest.sequence!==sequence||manifest.rootSha256!==state.rootSha256)throw Error('Recovery manifest differs from the pending publisher claim.')
+   for(const name of ['root.json',`${publisher.root.signed.version}.root.json`]){
+    const file=path.join(pending.directory,'metadata',name);await ordinary(file)
+    if(!(await fs.readFile(file)).equals(rootBytes))throw Error('Recovery root differs from the private publisher trust anchor.')
+   }
+   publication={directory:pending.directory,sequence,files:manifest.files}
+   const recovered=await verifiedPublication(publisher,publication),previous=await previousPublication(publisher)
+   for(const [name,target] of Object.entries(recovered.targets.signed.targets)){
+    if(name.startsWith('catalog/'))continue
+    const old=previous?.targets.signed.targets[name]
+    if(old&&(old.length!==target.length||old.hashes.sha256!==target.hashes.sha256))throw Error('Recovery attempted to relabel an immutable artifact.')
+    const permanent=state.artifactIdentities[name]
+    if(!permanent||permanent.bytes!==target.length||permanent.sha256!==target.hashes.sha256)throw Error('Recovery differs from the permanent artifact identity ledger.')
+   }
+  }
+  const audit={schema:'augmentor-update-publisher-recovery/1',sequence,directory:pending.directory,decision,rootSha256:state.rootSha256}
+  const auditFile=path.join(folder,`recovery-${sequence}.json`),auditBytes=Buffer.from(JSON.stringify(audit))
+  try{
+   await ordinary(auditFile,{privateFile:true})
+   if(!(await fs.readFile(auditFile)).equals(auditBytes))throw Error('A prior recovery decision differs; preserve the uncertain state.')
+  }catch(error){if(error.code!=='ENOENT')throw error;await write(auditFile,auditBytes,{privateFile:true,exclusive:true})}
+  // Even abandoned signatures may have escaped: consume their version forever.
+  state.sequence=sequence;state.pending=null
+  if(publication)state.publication=publication
+  await write(path.join(folder,'publisher.json'),JSON.stringify(state),{privateFile:true,maximum:STATE_LIMIT})
+  return audit
+ })
 }
 
 async function main(){
  const [operation,...arguments_]=process.argv.slice(2),options={}
- for(let i=0;i<arguments_.length;i+=2){const name=arguments_[i],value=arguments_[i+1];if(!['--keys','--out','--catalogs','--artifacts'].includes(name)||!value||options[name])throw Error('Use explicit keys/output/catalog/artifact options.');options[name]=value}
+ for(let i=0;i<arguments_.length;i+=2){const name=arguments_[i],value=arguments_[i+1];if(!['--keys','--out','--catalogs','--artifacts','--sequence','--decision'].includes(name)||!value||options[name])throw Error('Use explicit keys/output/catalog/artifact/recovery options.');options[name]=value}
  if(!options['--keys']||!options['--out'])throw Error('Provide --keys outside Git and a new --out directory.')
  if(operation==='init')return initializeRepository({keys:options['--keys'],output:options['--out']})
- if(!['publish','refresh'].includes(operation))throw Error('Choose init, publish or refresh.')
+ if(operation==='recover')return recoverRepository({keys:options['--keys'],output:options['--out'],sequence:/^[1-9][0-9]*$/.test(options['--sequence']||'')?Number(options['--sequence']):NaN,decision:options['--decision']})
+ if(!['publish','refresh'].includes(operation))throw Error('Choose init, publish, refresh or recover.')
  let catalogs
  if(operation==='publish'){
   if(!options['--catalogs'])throw Error('Provide both reviewed catalogs.')

@@ -42,6 +42,29 @@ class UpdateManagerTests(unittest.TestCase):
         with os.fdopen(descriptor(file,writable=True,create=True),'wb') as output:output.write(b'x'*100)
         return {'authenticated': False, 'file': str(file)}
 
+    def test_unnumbered_development_bundle_uses_valid_preferences_after_restart(self):
+        from updates.packaging import build_receipt
+        receipt={**self.product,'channel':'development','target':'macos-arm64','sourceCommit':'a'*40,'component':'companion'}
+        receipt['update']=build_receipt(version=receipt['version'],source_commit='a'*40,target=receipt['target'],
+            channel=receipt['channel'],component='companion')
+        (self.root/'release.json').write_text(json.dumps(receipt))
+        from unittest.mock import patch
+        with patch('updates.policy.machine_target',return_value='macos-arm64'):
+            for _ in range(2):
+                manager=UpdateManager(self.base/'development',root=self.root,runner=lambda _: {'authenticated':False,'releases':[]})
+                try:
+                    self.assertEqual(manager.snapshot()['preferences']['channel'],'preview')
+                    self.assertFalse(manager.snapshot()['preferences']['automaticChecks'])
+                    self.assertFalse(manager.current['buildKnown'])
+                    manager.check()
+                finally:manager.close()
+
+    def test_unsigned_desktop_discovery_cannot_offer_a_companion_replacement(self):
+        self.manager.current['component']='companion'
+        with self.assertRaisesRegex(ValueError,'public release discovery'):
+            self.manager.check()
+        self.assertEqual(self.calls[-1]['component'],'companion')
+
     def wait(self):
         self.manager.job.join(timeout=3)
         self.assertFalse(self.manager.job.is_alive())

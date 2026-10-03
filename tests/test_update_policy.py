@@ -76,6 +76,16 @@ class UpdatePolicyTests(unittest.TestCase):
             with self.subTest(distribution=distribution):
                 self.assertIsNotNone(eligibility(current,release,'preview',os_version=operating_system,distribution=distribution))
 
+    def test_mac_desktop_and_browser_companion_have_distinct_release_selection(self):
+        desktop={**self.release,'component':'desktop'}
+        companion={**self.release,'component':'companion'}
+        catalog=validate_catalog({'schema':SCHEMA,'releases':[desktop,companion]})
+        self.assertEqual(select_release(catalog,self.current,'preview',os_version='14')['component'],'desktop')
+        current={**self.current,'component':'companion'}
+        self.assertEqual(select_release(catalog,current,'preview',os_version='14')['component'],'companion')
+        self.assertIsNotNone(eligibility(current,self.release,'preview',os_version='14'))
+        with self.assertRaises(ValueError):validate_release({**companion,'target':'windows-x64','installType':'windows-inno'})
+
 
 if __name__ == '__main__':
     unittest.main()

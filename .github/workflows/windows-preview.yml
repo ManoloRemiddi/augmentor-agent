@@ -2,15 +2,11 @@
 name: Windows public preview build
 on:
   workflow_dispatch:
-  push:
-    branches: [feat/windows]
-    paths:
-      - '.github/workflows/windows-preview.yml'
-      - 'release/windows/public-preview.json'
-      - 'scripts/windows-preview-health.py'
-      - 'scripts/stage-windows-application.py'
-      - 'scripts/package-windows.py'
-      - 'scripts/windows-application.iss'
+    inputs:
+      update_build:
+        description: 'Reviewed positive build sequence for this product version (shared by both CPUs)'
+        required: true
+        type: string
 permissions:
   contents: read
 concurrency:
@@ -31,8 +27,15 @@ jobs:
     defaults:
       run:
         shell: pwsh
+    env:
+      AUGMENTOR_RELEASE_BUILD: ${{ inputs.update_build }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Require an explicit reviewed release build
+        run: |
+          if ($env:AUGMENTOR_RELEASE_BUILD -notmatch '^[1-9][0-9]*$' -or [long]$env:AUGMENTOR_RELEASE_BUILD -gt 2147483647) {
+            throw 'Choose a reviewed positive build sequence; do not reuse a published version/build for different bytes.'
+          }
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '24.19.0'
@@ -52,7 +55,7 @@ jobs:
           $env:AUGMENTOR_PWSH = "$PWD/outputs/payload/powershell/pwsh.exe"
           & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-dsh.py --out outputs/payload/dsh --node "$PWD/outputs/payload/node/node.exe"
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-windows-application.py --root outputs/payload --arch ${{ matrix.arch }} --public-preview
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-windows-application.py --root outputs/payload --arch ${{ matrix.arch }} --public-preview --update-build $env:AUGMENTOR_RELEASE_BUILD
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Verify complete sealed files and native public launcher rendering
         run: |

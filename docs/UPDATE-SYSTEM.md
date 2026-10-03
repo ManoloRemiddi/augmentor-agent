@@ -94,14 +94,65 @@ and root history. The installed TUF client verifies catalog-prefixed paths; GitH
 installer filenames retain their public names and pass the maintained model’s
 exact target verification.
 
+## Release-build receipts and packaging
+
+The Debian, Mac and Windows stage builders now use
+`services/updates/packaging.py`. Every newly staged payload includes
+`release/updates.json`; an enabled configuration requires a bounded, self-signed,
+unexpired two-of-three public root, verified with the pinned TUF model before
+copying. Only that public JSON file is copied from `release/updates/`; private
+signing keys are never copied. Inherited Node preload options are removed during
+the build-time verification. These files enter the Mac application inventory and
+signature, Windows sealed inventory, and Debian runtime package before delivery.
+
+`release.json.update` carries schema `augmentor-update-receipt/1`, the reviewed
+build sequence and a deterministic release ID covering product version, source
+commit, CPU, channel and application component. The installed service rechecks
+that ID against its receipt. A zero build is an explicitly unnumbered test
+candidate, not a public ordered build; packagers default to zero for CI/dev use.
+Public Mac/Windows previews require a positive `--update-build N`. The Windows
+preview workflow is now explicitly dispatched with a reviewed build input shared
+by both CPU jobs. Do not derive this number independently per CPU, use a timestamp
+as ordering, or reuse a published version/build for another payload. Debian
+release creation likewise supplies `--update-build N` explicitly. All current
+receipts retain `automaticInstallQualified: false`; a counter or a successful
+package build does not qualify installation.
+Numbered staging requires a clean source checkout, and any explicitly declared
+source commit must match its actual HEAD. Unnumbered candidates may record dirty
+source but cannot use that to claim an ordered public build.
+
+Mac `desktop` and `companion` receipts and signed catalog entries have distinct
+identities. Catalog entries without `component` mean `desktop`, preserving the
+schema's initial desktop interpretation. Only Mac supports a separate companion
+entry; selection cannot change the installed component. The legacy public asset
+lookup currently offers desktop bundles only and returns no companion candidate.
+Development-channel bundles use valid preview preferences with scheduled checks
+off, including after restart.
+
 A private exclusive publisher lock and durable pending claim prevent simultaneous
-or uncertain publication from reusing a role version. Interrupted initialization
-or publication fails closed for explicit owner recovery; root rotation/recovery
-commands and portable CI provisioning are still in progress. No real publisher
+or uncertain publication from reusing a role version. A permanent private artifact
+ledger retains identities even after withdrawal or an abandoned attempt.
+`recover --keys <private-folder> --out <exact-pending-output> --sequence <N>
+--decision finalize` rechecks all role signatures, snapshot/timestamp references,
+both catalog schemas, the exact root and permanent artifact identities before
+advancing the private checkpoint. `--decision abandon` preserves the partial
+directory and consumes that version forever; the next publication uses N+1 and
+retains the last confirmed catalogs. Either decision leaves a private immutable
+audit record. An uncertain audit/checkpoint write cannot be replaced with a
+different recovery decision.
+
+Recovery never evicts a publisher lock automatically. After a killed process, the
+release owner must first verify that every signing process using that key folder
+has stopped and explicitly quarantine its stale lock. A surviving or possibly
+live writer blocks recovery. A lost/corrupted private checkpoint or ledger is not
+recreated from unauthenticated public metadata. Interrupted initial key generation
+still requires offline owner recovery; root rotation and portable CI provisioning
+remain in progress. No real publisher
 keys have been generated or public feed uploaded by this checkpoint. Synthetic
 publisher tests exercise the complete producer → HTTP → installed TUF-client
 path, independent root custody, online-only refresh, immutable asset refusal,
-tampered history, private permissions and concurrent-writer exclusion.
+tampered history, private permissions, concurrent-writer exclusion, interrupted
+checkpoint/output writes, exact recovery, skipped versions and withdrawn URLs.
 
 ## Discovery and signed delivery
 
@@ -154,6 +205,26 @@ provide that dependency. Native control layout was checked in a 480×500 offscre
 render without clipping. These are Linux/synthetic source checks, not installed
 Mac/Windows or cross-version package acceptance.
 
+Native Windows download/owner sealing and shared Desktop regression checks pass
+both x64 and ARM64 at head `632c2f394b0b0ccd21be202873d37208f6353a31` in
+[37110601272](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37110601272).
+[Shared validation](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37110601416)
+also passes that head, including Debian staging/proofs. The existing Windows
+full-application/installer fixture workflow passes at earlier head `ae8595f` in
+[37108901638](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37108901638);
+its same-build installer exercise does not qualify N-to-N+1 or physical devices.
+Downloaded x64/ARM64 package reports identify their actual merge checkout as
+`91dfb15abb3b5898438666b5182387452fe4e5f7`.
+These runs predate the receipt/producer-recovery changes above; those packaging
+changes need fresh native qualification and do not inherit an earlier artifact's
+seal or result.
+The later Linux source verification snapshot passes 521 JavaScript cases
+(519 passed, two explicit skips) and 850 Python/Qt cases (811 passed, 39 explicit
+OS/integration skips), plus source build/type checks. Subsequent isolated packaging
+tests additionally verify clean source binding and real native Node root signatures
+without creating private signing-key files. The focused updater suites are the
+current smaller regression set; native package workflows now run them explicitly.
+
 Focused tests use temporary private state and independently authored inert payloads.
 Repository tests use real Ed25519 metadata and local HTTP transfer through the
 maintained client: valid catalog/payload, corrupt cache, altered catalog/payload,
@@ -177,8 +248,9 @@ Required remaining work, retained in the authorized full implementation scope:
 
 - Provision a publisher-controlled trust root, separated signing roles, monotonic
   publication tooling and expiry refresh; publish/monitor the signed repository.
-- Stamp exact build identities in every artifact and ship a manual bridge release
-  for legacy installations; distinguish source, selected and running identities.
+- Qualify the new build receipt/trust inputs in native packages and ship a manual
+  bridge release for legacy installations; distinguish source, selected and
+  running identities.
 - Compose each installation adapter with the existing admission/drain coordinator,
   an external installer, durable one-shot journal and independent health/recovery.
   Recheck freshness, consent and revocation immediately before authorizing apply.

@@ -138,9 +138,15 @@ def main():
     parser.add_argument('--preview', action='store_true', help='Label an ad-hoc public preview candidate accurately')
     parser.add_argument('--source-commit', help='Exact canonical source commit used for this candidate')
     parser.add_argument('--source-notices', type=Path, help='Verified output of prepare-macos-sources.py')
+    parser.add_argument('--update-build', type=int, default=0, help='Reviewed per-version build sequence; required for public previews')
     args = parser.parse_args()
+    sys.path.insert(0,str(ROOT/'services'))
+    from updates.packaging import build_receipt, stage_repository, source_revision
     if args.preview and (not args.source_commit or not re.fullmatch('[0-9a-f]{40}', args.source_commit) or not args.source_notices):
         parser.error('A preview requires an exact source commit and prepared source notices.')
+    if args.preview and args.update_build < 1:
+        parser.error('A public preview requires its reviewed positive --update-build.')
+    source=source_revision(ROOT,build=args.update_build,declared=args.source_commit)
     channel = 'preview' if args.preview else 'development'
     desktop = args.component == 'desktop'
     if sys.platform!='darwin' or platform.machine()!='arm64':
@@ -242,6 +248,9 @@ def main():
     subprocess.run([sys.executable, str(ROOT/'scripts/stage-dsh.py'),
         '--out', str(project/'dsh'), '--node', str(project/'node/bin/node')], check=True)
     product = json.loads((ROOT/'release/product.json').read_text())
+    revision=source['commit']
+    update=build_receipt(version=product['version'],source_commit=revision,target=config['target'],channel=channel,build=args.update_build,component=args.component)
+    stage_repository(ROOT,project,node=project/'node/bin/node')
     packaged_config=dict(config)
     dsh_payload = json.loads((project/'dsh/payload.json').read_text())
     packaged_config['dsh'] = {
@@ -251,7 +260,7 @@ def main():
     if not desktop:
         packaged_config.pop('qt',None);packaged_config.pop('pythonBindings',None)
         packaged_config['pythonPackages']={name:config['pythonPackages'][name] for name in COMPANION_PYTHON_PACKAGES}
-    (project/'release.json').write_text(json.dumps({**product,**packaged_config,'channel':channel,'component':args.component,'sourceCommit':args.source_commit,'signedForDistribution':False,'notarized':False},indent=2)+'\n')
+    (project/'release.json').write_text(json.dumps({**product,**packaged_config,'channel':channel,'component':args.component,'sourceCommit':revision,'signedForDistribution':False,'notarized':False,'update':update},indent=2)+'\n')
     if desktop:
         native=project/'native';native.mkdir(exist_ok=True)
         helper_info=native/'helper-info.plist'
@@ -303,14 +312,14 @@ def main():
     subprocess.run(['codesign','--force','--deep','--sign','-',str(app)],check=True)
     subprocess.run(['codesign','--verify','--deep','--strict',str(app)],check=True)
     handy_inventory={file.relative_to(handy).as_posix():hashlib.sha256(file.read_bytes()).hexdigest() for file in sorted(handy.rglob('*')) if file.is_file()}
-    (out/'handy-signed-inventory.json').write_text(json.dumps({'schema':'augmentor-handy-signed/1','files':handy_inventory,'sourceCommit':args.source_commit},indent=2)+'\n')
+    (out/'handy-signed-inventory.json').write_text(json.dumps({'schema':'augmentor-handy-signed/1','files':handy_inventory,'sourceCommit':revision},indent=2)+'\n')
     # Keep binary hashes outside the sealed bundle: code signing changes Mach-O bytes.
     if desktop:
         subprocess.run([str(python/'bin/python3'),'-I','-B',str(ROOT/'scripts/qt-library-inventory.py'),
             '--qt-version',config['qt'],'--out',str(out/'qt-library-inventory.json')],check=True)
     artifact = out/f'augmentor-{args.component}-{product["version"]}-macos-arm64-{channel}.zip'
     subprocess.run(['ditto','-c','-k','--sequesterRsrc','--keepParent',str(app),str(artifact)],check=True)
-    report = {'component':args.component,'version':product['version'],'target':config['target'],'channel':channel,'sourceCommit':args.source_commit,
+    report = {'component':args.component,'version':product['version'],'target':config['target'],'channel':channel,'sourceCommit':revision,'update':update,
         'artifact':artifact.name,'sha256':hashlib.sha256(artifact.read_bytes()).hexdigest(),
         'bytes':artifact.stat().st_size,'signature':'ad-hoc','notarized':False,
         'publicReleaseReady':False,'applicationInventorySha256':inventory_hash,'python':config['python'],'node':item['version'],

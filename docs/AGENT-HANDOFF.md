@@ -13,7 +13,15 @@ controls, manual downloads and TUF client integration. Automatic installation
 and public signed-feed provisioning are unfinished. The publisher now has
 two-of-three root initialization, online-only refresh and a real producer/client
 transfer proof. Initial Mac bundled-runtime checks pass; Windows desktop CI found
-a download fixture/ACL boundary issue being corrected and requalified. Do not narrow the goal to
+a download fixture/ACL boundary issue now corrected and passing native x64/ARM64
+desktop CI at `632c2f3` (shared validation also passes; existing full Windows
+same-build installer fixtures pass earlier `ae8595f`). New producer recovery
+preserves partial attempts, burns uncertain versions and retains withdrawn asset
+identities. Debian/Mac/Windows builders now stamp reviewed build/component
+identities and public trust inputs; these newer packaging changes require fresh
+native CI. Mac companion selection cannot receive a desktop bundle. Root
+rotation/CI custody, public feed provisioning, external installation adapters,
+final consent/revocation and N-to-N+1 health/recovery remain open. Do not narrow the goal to
 notification/downloads or mark it complete based on this checkpoint. Nothing
 has been deployed into existing installed apps. Preserve the canonical checkout’s
 existing dirty work; implementation is in a separate feature checkout.
