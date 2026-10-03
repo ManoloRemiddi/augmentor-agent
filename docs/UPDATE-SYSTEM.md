@@ -129,6 +129,23 @@ lookup currently offers desktop bundles only and returns no companion candidate.
 Development-channel bundles use valid preview preferences with scheduled checks
 off, including after restart.
 
+## Installation authority integration in progress
+
+The shared coordinator now accepts an explicit `revalidate(stage)` guard before
+preparation, before any reserved peer drains, and after independent installer
+readiness immediately before the durable apply intent. Only literal `True`
+permits progress; changed consent/selection, withdrawal, unavailable fresh
+authority or an exception cannot send APPLY. Before shutdown, live reservation
+cleanup preserves work. After shutdown, the original drained record remains for
+independent source inspection/recovery and cannot be replayed. Fixed-artifact
+legacy qualification callers can omit this hook; omission does not establish
+publisher authority for a downloaded artifact. The production guard and external
+installer entrypoints remain to be composed; this hook alone enables no installation.
+The updated focused Python suite passes 89 cases (88 passed, one explicit OS skip),
+including changed pre-drain consent, failed final freshness after installer
+readiness, no APPLY/intent on refusal, preserved work/journals and strict guard
+results. This is source fault-ordering evidence, not an installed upgrade proof.
+
 A private exclusive publisher lock and durable pending claim prevent simultaneous
 or uncertain publication from reusing a role version. A permanent private artifact
 ledger retains identities even after withdrawal or an abandoned attempt.
@@ -218,6 +235,12 @@ Downloaded x64/ARM64 package reports identify their actual merge checkout as
 These runs predate the receipt/producer-recovery changes above; those packaging
 changes need fresh native qualification and do not inherit an earlier artifact's
 seal or result.
+Fresh Windows Desktop checks also pass both CPUs at `8d7f500` in
+[37112146918](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37112146918).
+Mac updater/publisher tests pass that head, but its bundle staging caught a
+source-record variable overwritten by an existing archive stream. Both Mac and
+Windows stage builders now use a distinct receipt-source name; native packaging
+is being rerun. No successful bundle is inferred from the passing source tests.
 The later Linux source verification snapshot passes 521 JavaScript cases
 (519 passed, two explicit skips) and 850 Python/Qt cases (811 passed, 39 explicit
 OS/integration skips), plus source build/type checks. Subsequent isolated packaging

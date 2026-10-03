@@ -146,7 +146,7 @@ def main():
         parser.error('A preview requires an exact source commit and prepared source notices.')
     if args.preview and args.update_build < 1:
         parser.error('A public preview requires its reviewed positive --update-build.')
-    source=source_revision(ROOT,build=args.update_build,declared=args.source_commit)
+    release_source=source_revision(ROOT,build=args.update_build,declared=args.source_commit)
     channel = 'preview' if args.preview else 'development'
     desktop = args.component == 'desktop'
     if sys.platform!='darwin' or platform.machine()!='arm64':
@@ -248,7 +248,7 @@ def main():
     subprocess.run([sys.executable, str(ROOT/'scripts/stage-dsh.py'),
         '--out', str(project/'dsh'), '--node', str(project/'node/bin/node')], check=True)
     product = json.loads((ROOT/'release/product.json').read_text())
-    revision=source['commit']
+    revision=release_source['commit']
     update=build_receipt(version=product['version'],source_commit=revision,target=config['target'],channel=channel,build=args.update_build,component=args.component)
     stage_repository(ROOT,project,node=project/'node/bin/node')
     packaged_config=dict(config)

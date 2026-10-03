@@ -7,7 +7,7 @@ publisher trust, complete installation, reopen components or replay recovery.
 """
 
 
-def authorize_update(journal, preparation, installer):
+def authorize_update(journal, preparation, installer, *, revalidate=None):
     """Transfer apply authority once, after durable intent and observed drain.
 
     preparation() returns the platform graph context. installer(gate) returns
@@ -16,16 +16,28 @@ def authorize_update(journal, preparation, installer):
     check deliberately prevents replacing this still-running interpreter.
     A reversibly released preparation can be archived before any shutdown.
     Later or uncertain failures retain the record for independent recovery.
+    Customer orchestration supplies revalidate(stage), which must return exactly
+    True after checking fresh publisher authority, the selected bytes and current
+    consent. Legacy fixed-artifact qualification callers omit this hook; omission
+    does not authorize a downloaded release or qualify automatic installation.
     """
     if journal.record['phase'] != 'verified':
         raise ValueError('Use a fresh verified update attempt; never resume commands from a saved phase.')
+    def authority(stage):
+        if revalidate is not None and revalidate(stage) is not True:
+            raise ValueError('Update authorization changed. Preserve this attempt for inspection.')
     context = None
     try:
+        authority('verified')
         journal.advance('preparing')
         context = preparation()
         with context as graph:
             graph.check()
             journal.advance('prepared')
+            # Refuse stale selection/withdrawal or revoked consent before any
+            # owned peer is asked to shut down; reservation cleanup stays live.
+            authority('prepared')
+            graph.check()
             graph.drain(checkpoint=journal.checkpoint)
             graph.check()
             journal.advance('drained')
@@ -33,6 +45,10 @@ def authorize_update(journal, preparation, installer):
             # deadline, independent of how many live components needed draining.
             with installer(graph.gate) as backend:
                 backend.wait_ready()
+                graph.check()
+                # The independent installer still has no apply authority. Check
+                # again after drain/readiness, before the durable APPLY intent.
+                authority('installer-ready')
                 graph.check()
                 journal.advance('installer-ready')
                 journal.advance('apply-intent')

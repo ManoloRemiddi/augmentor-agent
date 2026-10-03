@@ -27,7 +27,7 @@ def main():
         parser.error('A public preview requires its reviewed positive --update-build.')
     sys.path.insert(0,str(ROOT/'services'))
     from updates.packaging import build_receipt, stage_repository, source_revision
-    source=source_revision(ROOT,build=args.update_build)
+    release_source=source_revision(ROOT,build=args.update_build)
     target = args.root.resolve()
     for path in ('python/python.exe', 'node/node.exe', 'powershell/pwsh.exe', 'dsh/payload.json'):
         if not (target/path).is_file(): raise ValueError('Stage the pinned Windows runtimes first: '+path)
@@ -53,7 +53,7 @@ def main():
                 ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '.git', 'node_modules', 'test', 'tests'))
         else: shutil.copy2(source, destination)
     product = json.loads((ROOT/'release/product.json').read_text(encoding='utf-8'))
-    revision = source['commit']
+    revision = release_source['commit']
     profile = json.loads((ROOT/'release/windows/public-preview.json').read_text(encoding='utf-8')) if args.public_preview else {
         'qualificationStatus': 'development-candidate', 'customerDistribution': False}
     update=build_receipt(version=product['version'],source_commit=revision,target='windows-'+args.arch,channel=product['channel'],build=args.update_build)

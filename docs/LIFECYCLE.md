@@ -603,6 +603,15 @@ remains in qualification; these results do not establish public N-to-N+1 updates
 
 ### Independently verified completion
 
+Current customer-updater integration adds explicit authority revalidation to
+`authorize_update`: before preparation, before any shutdown, and after installer
+readiness before APPLY intent. A false or failed customer authority check cannot
+grant apply. Existing fixed-artifact qualification callers omit the optional
+hook; that does not authenticate downloaded releases. Post-drain failure preserves
+the journal for independent inspection without command replay. See
+[shared updater integration](UPDATE-SYSTEM.md#installation-authority-integration-in-progress)
+for implementation scope and the still-unwired production guard/adapters.
+
 Update journals now support independent completion after the caller has observed
 installer exit, reverified the release pair/installed selection and passed a local
 health callback. Completed records are durably archived; failed health, an

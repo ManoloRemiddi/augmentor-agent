@@ -105,5 +105,44 @@ class CoordinatorTests(unittest.TestCase):
         self.assertEqual(self.order, [])
         self.assertEqual(read_json(self.journal.path)['phase'], 'preparing')
 
+    def test_changed_consent_or_withdrawal_before_drain_preserves_work(self):
+        stages=[]
+        def check(stage):
+            stages.append(stage)
+            return stage!='prepared'
+        with self.assertRaisesRegex(ValueError,'authorization changed'):
+            authorize_update(self.journal,self.preparation,self.installer,revalidate=check)
+        self.assertEqual(stages,['verified','prepared'])
+        self.assertNotIn('commit',self.peer.calls)
+        self.assertNotIn('launch',self.order)
+        self.assertFalse(self.peer.admission.closing)
+        with self.peer.admission.work():self.assertEqual(self.peer.admission.active,1)
+
+    def test_final_authority_failure_never_sends_apply_and_preserves_drained_record(self):
+        stages=[]
+        def check(stage):
+            stages.append(stage)
+            if stage=='installer-ready':raise TimeoutError('Fixture could not verify fresh authority.')
+            return True
+        with self.assertRaises(TimeoutError):
+            authorize_update(self.journal,self.preparation,self.installer,revalidate=check)
+        self.assertEqual(stages,['verified','prepared','installer-ready'])
+        self.assertNotIn('apply',self.order)
+        self.assertEqual(read_json(self.journal.path)['phase'],'drained')
+        self.assertEqual(recovery_action(read_json(self.journal.path)),'inspect-stopped-components')
+        with self.assertRaises(ValueError):self.run_update()
+
+    def test_authority_checks_are_explicit_and_never_accept_a_truthy_result(self):
+        with self.assertRaisesRegex(ValueError,'authorization changed'):
+            authorize_update(self.journal,self.preparation,self.installer,revalidate=lambda _stage:{'approved':True})
+        self.assertEqual(self.peer.calls,[])
+        self.assertEqual(self.order,[])
+        self.assertEqual(read_json(self.journal.path)['phase'],'verified')
+        stages=[]
+        def check(stage):stages.append(stage);return True
+        result=authorize_update(self.journal,self.preparation,self.installer,revalidate=check)
+        self.assertEqual(stages,['verified','prepared','installer-ready'])
+        self.assertTrue(result['coordinatorMustExit'])
+
 
 if __name__ == '__main__': unittest.main()
