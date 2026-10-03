@@ -388,7 +388,12 @@ QEMU is daemonized and its current cwd is `/`, so that cwd cannot resolve its
 original relative launch arguments. The socket must have a listening kernel
 inode held by that PID. One Unix connect with a3-second bound reads only kernel
 `SO_PEERCRED`, requiring the host UID and QEMU PID with unchanged start identity
-before/after. It immediately closes in finally, without reading a greeting or
+before/after. The exact owned startup directory is opened with
+`O_DIRECTORY|O_NOFOLLOW`, and the connection uses only the short local
+`/proc/self/fd/<fd>/qmp.sock` path. Directory device/inode/UID/mode and socket
+device/inode/UID/mode/link-count are pinned against both descriptor-relative and
+actual pathname metadata before/after. Replacement refuses. Both descriptors
+close in finally, without changing cwd, creating an alias, reading a greeting or
 sending QMP JSON, capabilities, commands or input. Guest admission verifies the
 receipt's same proof/run/boot/startup-directory/boot-argv identity and its age of at most300seconds. The guest
 cannot inspect the host's QEMU descriptors itself.
@@ -448,3 +453,13 @@ preserved; it did not reach APT, account creation, setup or SDK calls. The narro
 path/peer correction has source tests, including a real private Unix listener
 that receives zero protocol bytes on both matching and foreign-PID refusal.
 The corrected proof still requires review/publication before any VM transaction.
+
+The next published26860df4 host check verifies relative launch paths and the
+open disk/kernel listener, then refuses before SSH with `AF_UNIX path too long`:
+the actual absolute socket pathname is148bytes. No connection succeeds or QMP
+message is sent. Its receipt remains separate from the initial absolute-substring
+refusal. The reviewed descriptor-anchor correction is published with this checkpoint; a real private Unix listener under a parent longer than108bytes
+verifies matching/foreign peers, zero protocol bytes, no cwd change and closure
+of both descriptors. Directory, socket and mode replacement remain terminal.
+Native staging/account/runtime allocations must preserve the4GiB free floor;
+no retained build inputs or earlier evidence are deleted to make room.

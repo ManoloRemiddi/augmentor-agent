@@ -146,9 +146,62 @@ class FreshAdmission(unittest.TestCase):
             self.assertEqual(result['protocolBytesSent'], 0); self.assertEqual(result['uid'], os.getuid())
             peer, _ = server.accept()
             with peer: peer.settimeout(2); self.assertEqual(peer.recv(1), b'')
-            with self.assertRaisesRegex(ValueError, 'foreign peer'): proof.fresh_qmp_peer(endpoint, os.getpid()+1)
+            captured = []; real_open = os.open
+            def opened(*args, **kwargs):
+                fd = real_open(*args, **kwargs); captured.append(fd); return fd
+            with patch.object(proof.os, 'open', side_effect=opened), self.assertRaisesRegex(ValueError, 'foreign peer'):
+                proof.fresh_qmp_peer(endpoint, os.getpid()+1)
+            self.assertEqual(len(captured),1)
+            with self.assertRaises(OSError): os.fstat(captured[0])
             peer, _ = server.accept()
             with peer: peer.settimeout(2); self.assertEqual(peer.recv(1), b'')
+
+    def test_real_long_parent_uses_local_fd_anchor_without_chdir_or_fd_leak(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)/('a'*70)/('b'*70); root.mkdir(parents=True, mode=0o700)
+            endpoint = root/'qmp.sock'; self.assertGreater(len(str(endpoint).encode()), 108)
+            before = Path.cwd(); bind_directory = os.open(root, os.O_RDONLY|os.O_DIRECTORY)
+            with socket.socket(socket.AF_UNIX) as server:
+                try: server.bind('/proc/self/fd/'+str(bind_directory)+'/qmp.sock')
+                finally: os.close(bind_directory)
+                server.listen(2); server.settimeout(2); captured = []; real_open = os.open
+                def opened(*args, **kwargs):
+                    fd = real_open(*args, **kwargs); captured.append(fd); return fd
+                with patch.object(proof.os, 'open', side_effect=opened): result = proof.fresh_qmp_peer(endpoint,os.getpid())
+                self.assertEqual(Path.cwd(), before); self.assertEqual(result['protocolBytesSent'], 0)
+                self.assertEqual(len(captured), 1)
+                with self.assertRaises(OSError): os.fstat(captured[0])
+                peer, _ = server.accept()
+                with peer: peer.settimeout(2); self.assertEqual(peer.recv(1), b'')
+
+    def test_directory_socket_or_mode_replacement_refuses_and_closes_both_descriptors(self):
+        for replacement in ('directory', 'socket', 'mode'):
+            with self.subTest(replacement=replacement), tempfile.TemporaryDirectory() as directory:
+                base = Path(directory); root = base/'startup'; root.mkdir(mode=0o700); endpoint = root/'qmp.sock'
+                with socket.socket(socket.AF_UNIX) as server, socket.socket(socket.AF_UNIX) as other:
+                    server.bind(str(endpoint)); server.listen(2); server.settimeout(2)
+                    real_socket = socket.socket; real_open = os.open; captured = []; clients = []
+                    class Peer:
+                        def __init__(self, *args, **kwargs): self.inner=real_socket(*args,**kwargs); clients.append(self.inner)
+                        def settimeout(self, value): self.inner.settimeout(value)
+                        def connect(self, value): self.inner.connect(value)
+                        def getsockopt(self, *args):
+                            value = self.inner.getsockopt(*args)
+                            if replacement == 'directory': root.rename(base/'retired'); root.mkdir(mode=0o700)
+                            elif replacement == 'socket': endpoint.rename(root/'retired.sock'); other.bind(str(endpoint))
+                            else: endpoint.chmod(0o700)
+                            return value
+                        def close(self): self.inner.close()
+                    def opened(*args, **kwargs):
+                        fd = real_open(*args, **kwargs); captured.append(fd); return fd
+                    with patch.object(proof.os, 'open', side_effect=opened), patch.object(proof.socket, 'socket', side_effect=Peer), \
+                         self.assertRaisesRegex(ValueError, 'replaced or changed'):
+                        proof.fresh_qmp_peer(endpoint,os.getpid())
+                    self.assertEqual(len(captured),1)
+                    with self.assertRaises(OSError): os.fstat(captured[0])
+                    self.assertEqual(clients[0].fileno(), -1)
+                    peer, _ = server.accept()
+                    with peer: peer.settimeout(2); self.assertEqual(peer.recv(1), b'')
 
     def test_native_manifest_substitution_refuses_before_import_or_package_audit(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -1,7 +1,7 @@
 {
   "format": "augmentor-mint-fresh-emulated-proof-source-checkpoint/1",
   "date": "2026-10-03",
-  "status": "reviewed-source-tests-pass-host-path-correction-awaiting-owned-fixture-transaction",
+  "status": "reviewed-source-tests-pass-fd-anchored-peer-correction-awaiting-owned-fixture-transaction",
   "artifactSource": {
     "commit": "16bcb797cc5e84b6a4807d1b88229afebed2c5bf",
     "dirty": false
@@ -39,18 +39,19 @@
     "privateSourceExport": false
   },
   "proofSource": {
-    "baseCommit": "7f65e9d5d74c8ada422e1a870c281c1cb7ee6c21",
+    "baseCommit": "7d4afe5164afa44bae98eea360822c638c4d7973",
     "uncommittedImplementation": false,
     "file": "release/prove-complete-linux.py",
-    "sha256": "26860df4408780e87ad1a203f042e0a333e4cf052ac45f7eeedd6d4e00ef8f29",
+    "sha256": "201c1173445ac63dbacfc8dd980193fa02dbc0732ba1727c7c5836edd3327bb6",
     "companionHelperSha256": "70543782f9d26bae72bf0a4396e649c646017de7ee55a7f9af84075daf29368b",
-    "publishedWithCheckpoint": true
+    "publishedWithCheckpoint": true,
+    "published": true
   },
   "syntheticSourceTests": {
-    "freshProof": 24,
+    "freshProof": 26,
     "existingCompleteProof": 26,
     "realUnixCompanion": 9,
-    "total": 59,
+    "total": 61,
     "status": "pass",
     "VMProductEvidence": false
   },
@@ -138,6 +139,33 @@
     "qmpCommandsCapabilitiesGreetingReadsInput": false,
     "socketAlwaysClosed": true,
     "pidStartBeforeAndAfterRequired": true,
-    "actualVmPeerAttributionExecuted": false
+    "actualVmPeerAttributionExecuted": false,
+    "peerConnectionPath": "Only /proc/self/fd/<localDirectoryFD>/qmp.sock",
+    "directoryOpenFlags": [
+      "O_DIRECTORY",
+      "O_NOFOLLOW"
+    ],
+    "directoryDevInodeUidModePinnedBeforeAfter": true,
+    "socketDevInodeUidModeNlinkPinnedBeforeAfter": true,
+    "descriptorRelativeAndActualPathCompared": true,
+    "directorySocketModeReplacementTerminal": true,
+    "bothDescriptorsClosedInFinally": true,
+    "globalCwdChange": false,
+    "newAliasFile": false,
+    "actualLongParentUnixTest": true
+  },
+  "secondPublishedHostAdmission": {
+    "proofCommit": "4e0aecca7ee1ed8ed89aa0f669fd7ce773729acf",
+    "proofSha256": "26860df4408780e87ad1a203f042e0a333e4cf052ac45f7eeedd6d4e00ef8f29",
+    "status": "refused-before-SSH",
+    "reason": "Absolute QMP Unix pathname exceeds sockaddr_un length.",
+    "socketPathBytes": 148,
+    "retainedBootAndDiskFdAndKernelListenerPassed": true,
+    "peerConnectionSucceeded": false,
+    "QMPProtocolBytesSent": 0,
+    "socketClosedInFinally": true,
+    "guestSSHDispatched": false,
+    "APTAccountSetupSDKMutations": false,
+    "originalRefusalRetained": true
   }
 }

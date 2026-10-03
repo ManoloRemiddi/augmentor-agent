@@ -268,3 +268,15 @@ It sends zero QMP protocol bytes and requires unchanged PID/start. Original
 pre-SSH refusal stays recorded.24 fresh source tests,26 existing proof tests and
 9 real Unix-companion tests pass; corrected publication and the actual native/
 account/installer/connected-product run remain pending.
+
+The published path-parser attempt also stops before SSH, this time at kernel
+peer connection: the absolute socket pathname is148bytes and raises
+`AF_UNIX path too long`. Disk/open-FD/listener checks had passed; no connection,
+QMP protocol, APT, account, setup or SDK mutation occurred. That second refusal
+is preserved separately. The maintained source now connects via a short local
+owned-directory descriptor, with directory/socket identity and metadata checks
+before/after, immediate socket+directory closure and no cwd/alias changes.
+26 fresh cases include a real long-parent Unix listener, replacement and foreign
+peer refusal with zero bytes and no descriptor leak;26 baseline proof and9 Unix
+companion cases also pass. The revised source is published; all guest transactions remain
+pending, with the4GiB allocation floor retained.

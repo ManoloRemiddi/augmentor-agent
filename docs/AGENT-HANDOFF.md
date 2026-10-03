@@ -19,6 +19,17 @@ cleanup are traced once with sanitized identities, bounded records and retained
 first refusal. No extra RPC, replay, timeout or scene-fence change occurs.
 Actual diagnostic input remains unexecuted; production input stays disabled.
 
+## October 3 Mint descriptor-bound host admission correction
+
+The [fresh Mint checkpoint](../release/qualification/next-targets/20261003-mint16bcb-fresh-emulated-proof.json)
+retains both pre-SSH host refusals: relative daemon paths, then the actual148-byte
+Unix socket path. The maintained proof now pins the owned startup directory and
+socket metadata and connects through its local directory descriptor without
+changing cwd or sending protocol bytes. Both descriptors close on every path;
+replacement and foreign peers refuse.61 focused checks pass, including26 fresh
+proof,26 baseline proof and9 real Unix companion cases. Actual fresh native/account/
+installer/SDK acceptance remains pending and must preserve the4GiB allocation floor.
+
 ## October 3 clean Mint correction and fresh proof
 
 [The clean Mint checkpoint](../release/qualification/next-targets/20261003-mint16bcb-fresh-emulated-proof.json)

@@ -769,15 +769,46 @@ def fresh_qemu_paths(args, fixture):
 def fresh_qmp_peer(qmp, expected_pid):
     """Kernel peer attribution only: no greeting read, QMP writes or commands."""
     import struct
-    peer = socket.socket(socket.AF_UNIX)
+    qmp = Path(qmp); directory = None; peer = None
+    def directory_identity(info):
+        return info.st_dev, info.st_ino, info.st_uid, info.st_mode
+    def socket_identity(info):
+        return info.st_dev, info.st_ino, info.st_uid, info.st_mode, info.st_nlink
     try:
-        peer.settimeout(3); peer.connect(str(qmp))
+        if not qmp.is_absolute() or qmp.name != 'qmp.sock':
+            raise ValueError('The peer attribution needs the exact absolute owned QMP path.')
+        directory = os.open(qmp.parent, os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
+        initial_directory = os.fstat(directory)
+        if (not stat.S_ISDIR(initial_directory.st_mode) or initial_directory.st_uid != os.getuid() or
+            initial_directory.st_mode & 0o022 or directory_identity(qmp.parent.lstat()) != directory_identity(initial_directory)):
+            raise ValueError('The QMP startup directory is not the same owned immutable directory.')
+        initial_socket = os.stat(qmp.name, dir_fd=directory, follow_symlinks=False)
+        if (not stat.S_ISSOCK(initial_socket.st_mode) or initial_socket.st_uid != os.getuid() or
+            initial_socket.st_nlink != 1 or socket_identity(qmp.lstat()) != socket_identity(initial_socket)):
+            raise ValueError('The QMP socket is not the same owned ordinary endpoint.')
+        def still_bound():
+            if (directory_identity(os.fstat(directory)) != directory_identity(initial_directory) or
+                directory_identity(qmp.parent.lstat()) != directory_identity(initial_directory)):
+                raise ValueError('The QMP startup directory was replaced or changed.')
+            if (socket_identity(os.stat(qmp.name, dir_fd=directory, follow_symlinks=False)) != socket_identity(initial_socket) or
+                socket_identity(qmp.lstat()) != socket_identity(initial_socket)):
+                raise ValueError('The QMP socket was replaced or changed.')
+        still_bound()
+        peer = socket.socket(socket.AF_UNIX)
+        # A daemon can bind a relative address in a directory whose full path is
+        # longer than sockaddr_un. This local descriptor refers to that same
+        # pinned directory, without changing cwd or creating an alias file.
+        peer.settimeout(3); peer.connect('/proc/self/fd/'+str(directory)+'/qmp.sock')
         pid, uid, gid = struct.unpack('3i', peer.getsockopt(socket.SOL_SOCKET, socket.SO_PEERCRED, 12))
         if pid != expected_pid or uid != os.getuid():
             raise ValueError('The QMP filesystem endpoint has a foreign peer.')
+        still_bound()
         return {'pid': pid, 'uid': uid, 'gid': gid, 'protocolBytesSent': 0}
     finally:
-        peer.close()
+        try:
+            if peer is not None: peer.close()
+        finally:
+            if directory is not None: os.close(directory)
 
 
 def fresh_host_preflight(fixture):
