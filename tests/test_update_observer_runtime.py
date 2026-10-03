@@ -16,7 +16,9 @@ from platform_adapters.paths import private_directory
 class ObserverRuntimeTests(unittest.TestCase):
     def setUp(self):
         temporary=tempfile.TemporaryDirectory();self.addCleanup(temporary.cleanup)
-        self.base=Path(temporary.name);self.root=private_directory(self.base/'payload')
+        # macOS /var aliases /private/var. Resolve this test-owned temporary
+        # root before exercising the production no-link ancestor boundary.
+        self.base=Path(temporary.name).resolve();self.root=private_directory(self.base/'payload')
         self.parent=private_directory(self.base/'observers')
         for name in sorted(REQUIRED|{'scripts/fixed-observer.py','services/public.json','data/inert.fixture'}):
             file=self.root/name;file.parent.mkdir(parents=True,exist_ok=True)

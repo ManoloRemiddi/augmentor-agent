@@ -12,7 +12,6 @@ import json
 import os
 from pathlib import Path
 import sys
-import time
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'services'))
@@ -23,12 +22,15 @@ def main():
     parser.add_argument('--data',type=Path,required=True)
     parser.add_argument('--release',type=Path,required=True)
     parser.add_argument('--observation',type=Path,required=True)
+    parser.add_argument('--observer-endpoint',type=Path,required=True)
+    parser.add_argument('--observer-parent',type=int,required=True)
+    parser.add_argument('--observer-nonce',required=True)
     args=parser.parse_args()
     if sys.platform!='win32':parser.error('Requires native Windows qualification.')
     from lifecycle.installed_source import open_installed_source
     from lifecycle.update_journal import UpdateJournal
     from lifecycle.windows_apply import WindowsApply
-    from lifecycle.windows_installer_process import InstallerObservation
+    from lifecycle.windows_update_observer import CoordinatorObserver,ObservedWindowsApply
     from lifecycle.windows_startup import Startup
     from platform_adapters.windows_identity import private_directory,private_lock_descriptor
     from platform_adapters.private_files import atomic_json
@@ -37,35 +39,21 @@ def main():
     metadata=args.release.read_bytes();release=json.loads(metadata)
     assert release.get('customerDistribution') is False and release.get('qualificationStatus')=='development-candidate'
     with ExitStack() as held:
+        peer=held.enter_context(CoordinatorObserver(args.observer_endpoint,args.observer_parent,args.observer_nonce))
         lifetime=private_lock_descriptor(data/'run/installation.lock');held.callback(os.close,lifetime)
         locks.flock(lifetime,locks.LOCK_SH|locks.LOCK_NB)
         gate=held.enter_context(Startup(data/'run',maintenance=True))
         source=held.enter_context(open_installed_source(data/'recovery',metadata,target=release['target']))
         journal=held.enter_context(UpdateJournal(data/'updates',source.identity,source.identity))
         for phase in ('preparing','prepared','drained'):journal.advance(phase)
-        backend=held.enter_context(WindowsApply(gate,source.installer,source.identity['sha256'],
-            observation/'setup.log',qualification_outer_job=True))
+        native=WindowsApply(gate,source.installer,source.identity['sha256'],
+            observation/'setup.log',qualification_outer_job=True)
+        backend=held.enter_context(ObservedWindowsApply(native,peer))
         backend.wait_ready()
-        # Exercise kernel handle transfer while real Setup waits for APPLY.
-        # This fixture adopts in the same actual process; production must bind
-        # an independent observer peer and deliver only over its live IPC.
-        import win32api
-        transferred=backend.installer.transfer_observation(win32api.GetCurrentProcess())
-        observer=held.enter_context(InstallerObservation(transferred,source.identity['sha256'],os.fstat(source.fd).st_size))
-        assert observer.poll() is None
-        backend.installer.close()
-        assert observer.poll() is None, 'Closing the sender ended the independent Setup.'
-        try:observer.wait(timeout=.01)
-        except TimeoutError:pass  # Same actual Job still waits for coordinator exit.
-        else:raise AssertionError('The waiting Setup was declared complete.')
         journal.advance('installer-ready');journal.advance('apply-intent')
         backend.authorize();journal.advance('apply-acknowledged')
-        atomic_json(observation/'ready.json',{'setupPid':backend.handoff.pid,'coordinatorPid':os.getpid(),
-            'readOnlyObservationTransfer':True})
-        deadline=time.monotonic()+20
-        while not (observation/'observed').exists():
-            if time.monotonic()>=deadline:raise TimeoutError('The fixture did not observe actual Setup.')
-            time.sleep(.02)
+        atomic_json(observation/'ready.json',{'coordinatorPid':os.getpid(),
+            'independentObservationTransfer':True})
     # Setup requires this actual process exit before acquiring final admission.
 
 

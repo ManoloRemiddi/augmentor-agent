@@ -18,13 +18,14 @@ import sys
 
 
 class InstallerProcess:
-    def __init__(self,artifact,sha256,arguments,*,environment=None,qualification_outer_job=False):
+    def __init__(self,artifact,sha256,arguments,*,environment=None,qualification_outer_job=False,allow_child_breakaway=False):
         if sys.platform!='win32':raise RuntimeError('Installer process ownership requires Windows.')
         if not isinstance(sha256,str) or not re.fullmatch('[a-f0-9]{64}',sha256):
             raise ValueError('A verified installer digest is required.')
         if not isinstance(arguments,(list,tuple)) or any(not isinstance(item,str) or '\0' in item for item in arguments):
             raise ValueError('Use explicit installer arguments without a command shell.')
         if type(qualification_outer_job) is not bool:raise ValueError('Invalid qualification process boundary.')
+        if type(allow_child_breakaway) is not bool:raise ValueError('Invalid independent coordinator process boundary.')
         import pywintypes,win32api,win32con,win32job,win32process,win32security
         from platform_adapters.windows_identity import private_file_descriptor,sid_string
         self.artifact=Path(artifact).absolute()
@@ -42,6 +43,13 @@ class InstallerProcess:
             if not self.job:
                 self.job=None
                 raise ctypes.WinError(ctypes.get_last_error())
+            if allow_child_breakaway:
+                # A verified external update worker must permit its separately
+                # observed Setup to leave this worker's Job. This is explicit;
+                # normal installers do not grant child breakaway or kill-on-close.
+                limits=win32job.QueryInformationJobObject(self.job,win32job.JobObjectExtendedLimitInformation)
+                limits['BasicLimitInformation']['LimitFlags']|=win32job.JOB_OBJECT_LIMIT_BREAKAWAY_OK
+                win32job.SetInformationJobObject(self.job,win32job.JobObjectExtendedLimitInformation,limits)
             flags=(win32con.CREATE_SUSPENDED|win32con.CREATE_UNICODE_ENVIRONMENT|
                 win32con.CREATE_NO_WINDOW)
             # Hosted qualification runs inside the runner's non-breakaway Job.

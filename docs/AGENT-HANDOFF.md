@@ -47,10 +47,23 @@ skip). `97837de` full Windows qualification passes x64, but ARM64 recovery excee
 its five-minute observer limit despite Setup finishing immediately afterward.
 Inner/outer observation bounds are corrected; fresh native recovery is required.
 Read-only actual installer process/Job/artifact transfer and receiver validation
-now support an external observer. A new native template case adopts live handles,
-closes the sender while Setup waits for APPLY and requires Setup to survive;
-that source change still needs native CI. The case adopts within one fixture
-process, and does not establish the separate production observer IPC/completion.
+now support an external observer. Native template relocation and same-process
+sender-close proofs pass both CPUs at `536e875` (37118685817); Windows Desktop also
+passes both CPUs (37118685782). Combined Linux/source checks at that head pass
+519 JavaScript tests/2 skips and 834 Python/Qt tests/39 skips, plus build/type checks.
+Mac checks failed only the new observer fixture's unnormalized `/var` alias;
+that fixture is corrected without relaxing production ancestor validation.
+The newer private live observer channel binds the actual separately launched
+coordinator process/Job, transfers read-only Setup observations, requires parent
+retention/liveness before APPLY, and observes complete actual Jobs after child
+exit. Both template/full-application fixtures now use this real separate-process
+channel; those newer native checks remain pending. A fixed external production
+coordinator composes fresh TUF/consent authority, exact current source/recovery,
+journal, graph drain and observed native APPLY with no arbitrary installer/command.
+Its worker Job permits separately observed Setup breakaway without kill-on-close.
+Five portable fault cases and the focused updater set pass (109 tests, one skip).
+The service/supervisor still must launch the independent parent and complete target
+health/restart; the fixed worker is not a complete production update controller.
 Root
 rotation/CI custody, public feed provisioning, external installation adapters,
 final consent/revocation and N-to-N+1 health/recovery remain open. Do not narrow the goal to

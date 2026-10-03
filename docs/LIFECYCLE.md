@@ -638,9 +638,11 @@ The external observer can now stage its exact source Python/services/scripts thr
 directory outside the replacement tree. Independently supplied metadata binds the
 whole source inventory and the exact staged subset. Verification after source
 displacement, partial-write refusal and tampered-runtime refusal pass five inert
-tests; new native relocation/identity-import proofs remain pending. No copied code
+tests; native template relocation/identity-import checks pass both CPUs at
+`536e875` (run 37118685817), while full-runtime checks remain pending. No copied code
 is executed by staging, and neither a staging receipt nor saved process identifiers
-authorize apply or completion. Live observer IPC and completion remain to compose.
+authorize apply or completion. Live observer IPC is now composed below; completion
+and product launch integration remain pending.
 
 `InstallerProcess.transfer_observation` now duplicates query/synchronize-only
 process/Job handles and the retained read-only artifact into a caller-bound live
@@ -650,11 +652,26 @@ recovery instruction. `InstallerObservation` checks private artifact identity/ha
 the actual primary image's kernel file identity, same-user process membership and
 the non-killing Job, then observes full Job exit without a terminate/authorize API.
 Closing either observation scope preserves Setup. Native template qualification
-now adopts live duplicates, closes the sending scope while Setup awaits APPLY,
-and verifies Setup remains running. That test is still pending; it adopts within
-the same actual fixture process, not a complete independent product observer.
-Production orchestration still must bind the separate launched observer peer and
-deliver over that live channel before allowing the coordinator to exit.
+at `536e875` passes same-process adoption/sender-close on both CPUs. The subsequent
+`windows_update_observer.py` uses a live private pipe, fresh launch nonce and exact
+kernel primary-process/Job binding to transfer observations to the separate parent.
+The child requires confirmed retention and parent liveness before native APPLY;
+no saved PID/handle/nonce authorizes any operation. The observer awaits complete
+coordinator and Setup Job exit, preserving either on timeout. Native exact-template
+and full-application fixtures now exercise this separate-process channel; those
+newer checks remain pending and the full fixture still applies identical artifacts.
+
+The fixed external `windows-update-coordinator.py` now composes the qualified
+current source, complete payload integrity, exact retained recovery selection,
+fresh TUF/consent authority and shared durable coordinator with graph preparation
+and `ObservedWindowsApply`. Only fixed OS-derived production paths are accepted;
+the production entrypoint has no fixture/trust fallback or arbitrary command.
+Source startup read admission ends before requesting the graph writer; installation
+read admission stays until this actual coordinator exits. External coordinator Jobs
+explicitly permit the independently observed Setup's breakaway without enabling
+kill-on-close. Five portable refusal/unknown-acknowledgment wrapper cases pass.
+The owning service/supervisor launch, target-health completion, restart and signed
+cross-version qualification remain pending; no qualified automatic flag is set.
 
 An actual ARM64 full-application recovery at `97837de` crossed its former five-minute
 Setup observation deadline; its inner log records successful installation afterward.

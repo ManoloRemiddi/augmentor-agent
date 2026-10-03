@@ -5,7 +5,8 @@
 ## Implementation checkpoint — October 3, 2026
 
 This feature is under implementation on `feat/automatic-updates`, based on
-`c7f895d416e6b94ca601b66a09caf4846a64b907`. It has not replaced an installed
+`c7f895d416e6b94ca601b66a09caf4846a64b907`, now integrated with main
+`f738a73f6f2d44fde111108df72dbf1cd94b562b`. It has not replaced an installed
 application, published a signed repository, or qualified automatic installation.
 The complete intended scope includes optional automatic installation, independent
 health observation and recovery across supported installation methods. The
@@ -184,17 +185,46 @@ tree is copied. A final receipt binds both source metadata digests, and verifica
 requires the exact copied subset without missing or extra entries. Partial attempts
 remain private and cannot be launched through verification. Five inert portable
 tests include actual source-directory displacement, corruption and partial writes.
-Native template/full-runtime relocation and identity-import proofs are added but
-still pending. Staging itself executes no code and grants no install authority;
-the live coordinator/observer IPC and completion path remain to compose.
+Native template relocation and identity-import checks pass both CPUs at `536e875`
+([run 37118685817](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37118685817));
+the full-runtime checks remain in progress at that head. Staging itself executes no
+code and grants no install authority. The macOS temporary fixture now resolves its
+test-owned `/var` alias before exercising the unchanged no-link production boundary;
+the corrected native Mac checks are still required.
 
 The Windows installer now exposes read-only live observation transfer to a bound
 same-user external process. The receiver validates the actual primary image and
 Job relationship, exact private retained artifact and non-killing Job before
 observing exit. It cannot forward the transfer or authorize/terminate Setup.
-The native template proof now closes the sender after adoption and requires the
-real waiting Setup to survive. That pending proof adopts in the same fixture
-process; complete independent observer IPC and target completion remain to wire.
+Native template qualification at `536e875` passes the same-process adoption and
+sender-close case on both CPUs. The newer `windows_update_observer.py` connects a
+separately launched coordinator to its actual parent over a fresh private pipe.
+The parent binds the exact live primary process/Job and launch nonce; it adopts
+read-only Setup capabilities against its independently verified target digest and
+length. No raw handles/nonce or Setup PID is saved to authorize recovery. The
+coordinator requires confirmed retention and a live parent again at APPLY. Loss
+of a transfer or acknowledgment causes refusal/unknown outcome, never replay.
+The parent observes actual coordinator and complete Setup Job exit; observation
+alone neither completes the journal nor verifies installed target health.
+
+`updates/windows_coordinator.py` now composes actual source integrity/selection,
+fresh TUF/consent authority, journal, Windows graph preparation and observed native
+APPLY. Its fixed external `windows-update-coordinator.py` entrypoint accepts no
+arbitrary installer/command and uses the compiled per-user installation. Source
+startup readers are released before acquiring the graph writer; the lifetime
+reader stays until coordinator exit. External worker Jobs explicitly allow the
+separately observed Setup to break away, without kill-on-close. The fixed launch
+wrapper verifies the entire staged source subset before starting that worker.
+
+Both exact-template and full-application native fixtures now use separate-process
+observation and whole Job exit instead of polling a saved Setup PID. These newer
+fixtures and the fixed production coordinator require fresh native qualification;
+the full fixture remains same-build, uses disposable data and omits publisher
+authorization. Five portable wrapper fault cases pass (unready Setup, missing
+observer, departed parent and lost native/parent acknowledgments). The focused
+updater set now passes 109 cases (108 passed, one OS skip). Supervisor/service
+launch integration, independent target completion and actual signed N-to-N+1
+qualification remain open; no build's automatic-install flag is enabled.
 
 Shared repository-helper operations now hold one private kernel cache-writer lock
 across the entire child operation. This prevents service/coordinator concurrency

@@ -57,10 +57,11 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         if source.is_file():
             target=payload/'python/Lib/site-packages'/entry
             target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source,target)
-    for name in ('scripts/windows-inspect-payload.py','scripts/windows-recover-source.py'):
+    for name in ('scripts/windows-inspect-payload.py','scripts/windows-recover-source.py',
+                 'scripts/windows-template-update-proof.py','scripts/windows-update-coordinator.py'):
         target=payload/name;target.parent.mkdir(parents=True,exist_ok=True)
         shutil.copy2(ROOT/name,target)
-    for folder in ('services/lifecycle','services/platform_adapters'):
+    for folder in ('services/lifecycle','services/platform_adapters','services/updates'):
         shutil.copytree(ROOT/folder,payload/folder,ignore=shutil.ignore_patterns('__pycache__','*.pyc'))
     build_spec = importlib.util.spec_from_file_location('template_launcher', ROOT/'scripts/build-windows-launcher.py')
     builder = importlib.util.module_from_spec(build_spec); build_spec.loader.exec_module(builder)
@@ -102,33 +103,36 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         return result
     def coordinated(label, *, success=True):
         """Actual READY/APPLY and Setup exit; no running product graph in this fixture."""
-        import sys,win32api,win32con,win32event,win32process
+        import win32event
+        from lifecycle.observer_runtime import verify_observer_runtime
+        from lifecycle.windows_installer_process import InstallerProcess
+        from lifecycle.windows_update_observer import ObservationServer
         from platform_adapters.private_files import read_json
         observation=private_directory(Path(report['qualificationBase'])/'placement-proofs'/label)
-        setup=None
-        with (out/('application-template-'+label+'-coordinator.log')).open('wb') as log:
-            child=subprocess.Popen([sys.executable,'-I','-Xutf8','-B',str(ROOT/'scripts/windows-template-update-proof.py'),
-                '--data',report['qualificationBase'],'--release',str(payload/'release.json'),
-                '--observation',str(observation)],stdin=subprocess.DEVNULL,stdout=log,stderr=subprocess.STDOUT)
+        metadata=(payload/'release.json').read_bytes();inventory=(payload/'payload-integrity.json').read_bytes()
+        verify_observer_runtime(staged_observer,metadata,inventory)
+        python_digest=json.loads(inventory)['files']['python/python.exe']['sha256']
+        with ObservationServer(observation,report['sha256'],cached.stat().st_size) as observer:
+            child=InstallerProcess(staged_observer/'python/python.exe',python_digest,
+                ['-I','-Xutf8','-B',str(staged_observer/'scripts/windows-template-update-proof.py'),
+                 '--data',report['qualificationBase'],'--release',str(payload/'release.json'),
+                 '--observation',str(observation),*observer.arguments()],qualification_outer_job=True,
+                allow_child_breakaway=True)
             try:
-                deadline=time.monotonic()+40
-                while not (observation/'ready.json').exists():
-                    assert child.poll() is None, 'The disposable placement coordinator failed; inspect its log.'
-                    if time.monotonic()>=deadline:raise TimeoutError('The placement coordinator did not authorize Setup.')
-                    time.sleep(.05)
+                observer.bind(child)
+                setup=observer.receive(timeout=40)
+                assert win32event.WaitForSingleObject(setup.process,0)==win32event.WAIT_TIMEOUT
+                try:setup.wait(timeout=.01)
+                except TimeoutError:pass
+                else:raise AssertionError('The waiting Setup was declared complete before APPLY.')
+                observer.receive_apply()
+                code=observer.wait_installer(timeout=90)
                 ready=read_json(observation/'ready.json');assert ready['coordinatorPid']==child.pid
-                assert ready['readOnlyObservationTransfer'] is True
-                setup=win32api.OpenProcess(win32con.SYNCHRONIZE|win32con.PROCESS_QUERY_INFORMATION,False,ready['setupPid'])
-                assert win32event.WaitForSingleObject(setup,0)==win32event.WAIT_TIMEOUT
-                atomic_json(observation/'observed',{'observed':True})
-                assert child.wait(timeout=30)==0
-                assert win32event.WaitForSingleObject(setup,90000)==win32event.WAIT_OBJECT_0
-                code=win32process.GetExitCodeProcess(setup)
+                assert ready['independentObservationTransfer'] is True
+                assert child.poll()==0
                 assert (code==0)==success, (label,code)
             finally:
-                if setup is not None:setup.Close()
-                if child.poll() is None:
-                    child.terminate();child.wait(timeout=10)  # Only this disposable qualification coordinator.
+                child.close()  # Observation close cannot kill either real Job.
                 if (observation/'setup.log').exists():
                     shutil.copy2(observation/'setup.log',out/('application-template-'+label+'.log'))
     try:
@@ -372,7 +376,7 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         assert sentinel.read_bytes()==sentinel_bytes
         pending.unlink()  # Only this test's deliberately failed synthetic update.
         coordinated('clean-payload-placement')
-        stages.append('live-read-only-installer-observation-survives-sender-close')
+        stages.append('separate-live-observer-retains-setup-through-coordinator-exit')
         succeeded=[p for p in backups.iterdir() if p!=failed[0]];assert len(succeeded)==1
         retained=succeeded[0];intent=json.loads((retained/'intent.json').read_text())
         assert json.loads((retained/'prepared.json').read_text())==intent

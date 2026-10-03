@@ -19,7 +19,9 @@ from .payload_integrity import (validate_inventory, inspect_payload, _root, _pla
 
 SCHEMA='augmentor-update-observer-runtime/1'
 REQUIRED={'python/python.exe','services/lifecycle/windows_installer_process.py',
-          'services/lifecycle/windows_apply.py','services/lifecycle/update_journal.py'}
+          'services/lifecycle/windows_apply.py','services/lifecycle/update_journal.py',
+          'services/lifecycle/windows_update_observer.py','scripts/windows-update-coordinator.py',
+          'services/updates/windows_coordinator.py','services/updates/installation.py'}
 
 
 def contents(release_bytes, inventory_bytes):

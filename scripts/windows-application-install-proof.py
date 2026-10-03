@@ -213,34 +213,36 @@ def main():
         # Exercise the exact installer-created command without a command shell.
         subprocess.run(startup_command,check=True,timeout=30)
         child=open_preview();ready()
-        coordinator_log=(out/'coordinator.log').open('w',encoding='utf-8')
-        coordinator=subprocess.Popen([str(install/'current/python/python.exe'),'-I','-Xutf8','-B',
-            str(ROOT/'scripts/windows-application-update-proof.py'),'--root',str(install/'current'),
-            '--data',str(data),'--installer',str(artifact),'--sha256',report['sha256']],
-            stdout=subprocess.DEVNULL,stderr=coordinator_log)
-        coordinator_log.close()
+        from lifecycle.observer_runtime import verify_observer_runtime
+        from lifecycle.windows_installer_process import InstallerProcess
+        from lifecycle.windows_update_observer import ObservationServer
+        source_release=(args.root/'release.json').read_bytes();source_inventory=(args.root/'payload-integrity.json').read_bytes()
+        verify_observer_runtime(staged_observer,source_release,source_inventory)
+        python_digest=json.loads(source_inventory)['files']['python/python.exe']['sha256']
         transaction=data/'updates';result_path=transaction/'coordinator-result.json'
-        deadline=time.monotonic()+90
-        while not result_path.exists():
-            assert coordinator.poll() is None, 'The installed coordinator failed; inspect coordinator.log.'
-            if time.monotonic()>=deadline:raise TimeoutError('The installed coordinator did not authorize Setup.')
-            time.sleep(.05)
+        with ObservationServer(private_directory(data/'update-observation'),report['sha256'],artifact.stat().st_size) as observer:
+            coordinator=InstallerProcess(staged_observer/'python/python.exe',python_digest,
+                ['-I','-Xutf8','-B',str(staged_observer/'scripts/windows-application-update-proof.py'),
+                 '--root',str(install/'current'),'--data',str(data),'--installer',str(artifact),
+                 '--sha256',report['sha256'],*observer.arguments()],qualification_outer_job=True,allow_child_breakaway=True)
+            try:
+                observer.bind(coordinator)
+                setup_observation=observer.receive(timeout=120)
+                try:setup_observation.wait(timeout=.01)
+                except TimeoutError:pass
+                else:raise AssertionError('The real Setup exited before native APPLY.')
+                observer.receive_apply()
+                assert observer.wait_installer(timeout=900)==0
+            finally:coordinator.close()
         result=read_json(result_path)
         assert result['coordinatorMustExit'] and not result['installationComplete']
+        assert result['independentObservationTransfer'] is True
         assert child.wait(timeout=10)==0;child=None
         journal=read_json(transaction/'active.json')
         assert journal['phase']=='apply-acknowledged'
         assert {'WindowParticipant','OwnerParticipant'} <= {step['kind'] for step in journal['steps']}, journal['steps']
         assert journal['steps'][-1]['kind']=='OwnerParticipant' and journal['steps'][-1]['phase']=='exited'
-        import win32api,win32con,win32event,win32process
-        setup_process=win32api.OpenProcess(win32con.SYNCHRONIZE|win32con.PROCESS_QUERY_INFORMATION,False,result['setupPid'])
-        try:
-            assert win32event.WaitForSingleObject(setup_process,0)==win32event.WAIT_TIMEOUT
-            (transaction/'observer-ready').touch()
-            assert coordinator.wait(timeout=30)==0
-            assert win32event.WaitForSingleObject(setup_process,900000)==win32event.WAIT_OBJECT_0
-            assert win32process.GetExitCodeProcess(setup_process)==0
-        finally:setup_process.Close()
+        stages.append('full-graph-apply-with-separate-live-observer-and-whole-setup-job-exit')
         assert (install/'current/release.json').read_bytes()==(args.root/'release.json').read_bytes()
         assert sentinel.read_bytes()==sentinel_bytes
         pending_bytes=(transaction/'active.json').read_bytes()
