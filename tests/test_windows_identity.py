@@ -76,8 +76,9 @@ class WindowsIdentityTests(unittest.TestCase):
                 os.rmdir(link)
 
     def test_node_download_inherits_only_private_grants_then_receives_protected_acl(self):
-        from platform_adapters.windows_identity import private_directory,protect_inherited_download,private_file_descriptor
+        from platform_adapters.windows_identity import private_directory,protect_inherited_download,private_file_descriptor,current_sid,default_owner_sid
         import shutil
+        import win32security
         root=Path(__file__).resolve().parents[1]
         candidate=root/'outputs/payload/node/node.exe'
         node=str(candidate) if candidate.is_file() else shutil.which('node')
@@ -85,7 +86,11 @@ class WindowsIdentityTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             folder=private_directory(Path(temporary)/'private');file=folder/'download'
             subprocess.run([node,'-e',"require('node:fs').writeFileSync(process.argv[1],'fixture')",str(file)],check=True)
+            observed=win32security.GetFileSecurity(str(file),win32security.OWNER_SECURITY_INFORMATION)
+            self.assertEqual(observed.GetSecurityDescriptorOwner(),default_owner_sid())
             protect_inherited_download(file)
+            observed=win32security.GetFileSecurity(str(file),win32security.OWNER_SECURITY_INFORMATION)
+            self.assertEqual(observed.GetSecurityDescriptorOwner(),current_sid())
             fd=private_file_descriptor(file)
             try:self.assertEqual(os.read(fd,7),b'fixture')
             finally:os.close(fd)
@@ -107,6 +112,15 @@ class WindowsIdentityTests(unittest.TestCase):
             before=stringify()
             with self.assertRaises(PermissionError):protect_inherited_download(file)
             self.assertEqual(stringify(),before);self.assertEqual(file.read_bytes(),b'preserved')
+
+    def test_download_sealing_refuses_an_unrelated_owner_even_with_private_grants(self):
+        from platform_adapters.windows_identity import security_attributes,require_private_grants
+        import win32security
+        descriptor=security_attributes().SECURITY_DESCRIPTOR
+        foreign=win32security.ConvertStringSidToSid('S-1-5-21-987654321-123456789-135792468-1001')
+        descriptor.SetSecurityDescriptorOwner(foreign,False)
+        with self.assertRaises(PermissionError):
+            require_private_grants(descriptor,download_default_owner=True)
 
 
 if __name__ == '__main__':

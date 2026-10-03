@@ -44,8 +44,12 @@ An updater initialization/recovery error cannot disable conversations or prompts
 
 Windows transfers create new cache bytes instead of preserving public temporary
 file ACLs. The Python owner verifies the file’s existing user/SYSTEM allow-list
-through an opened kernel handle before setting its protected flag. Foreign/public
-grants and linked files are refused without changing their permissions. Hosted
+through an opened kernel handle before setting its protected flag. Windows may
+assign the OS token's default Administrators owner to elevated Node creations;
+this exact token identity is normalized to the user only after validating the
+private grants. Unrelated owners, public grants and linked files are refused
+without changing their permissions. See Microsoft's [default object owner](https://learn.microsoft.com/en-us/windows/win32/secauthz/owner-of-a-new-object).
+Hosted
 Windows tests must verify this producer boundary on both CPUs.
 
 Private data lives under `<AUGMENTOR_SHARED_DATA>/updates` (or the existing shared

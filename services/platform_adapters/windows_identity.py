@@ -23,6 +23,15 @@ def current_sid():
         token.Close()
 
 
+def default_owner_sid():
+    """The OS token's default owner can be Administrators for elevated Node."""
+    token = win32security.OpenProcessToken(win32api.GetCurrentProcess(), win32con.TOKEN_QUERY)
+    try:
+        return win32security.GetTokenInformation(token, win32security.TokenOwner)
+    finally:
+        token.Close()
+
+
 def sid_string():
     return win32security.ConvertSidToStringSid(current_sid())
 
@@ -80,9 +89,10 @@ def require_private_descriptor(descriptor):
         raise PermissionError('The Augmentor directory must not inherit broader access from its parent.')
 
 
-def require_private_grants(descriptor):
+def require_private_grants(descriptor, *, download_default_owner=False):
     """Validate the exact owner/user/SYSTEM allow-list without changing an ACL."""
-    if descriptor.GetSecurityDescriptorOwner() != current_sid():
+    owner = descriptor.GetSecurityDescriptorOwner()
+    if owner != current_sid() and not (download_default_owner and owner == default_owner_sid()):
         raise PermissionError('The Augmentor directory belongs to another Windows identity.')
     acl = descriptor.GetSecurityDescriptorDacl()
     if acl is None:
@@ -158,11 +168,13 @@ def protect_inherited_download(path):
     The known private download parent and opened single-link file are verified
     first. This cannot repair a public/foreign ACL or follow a reparse object.
     Windows Node inherits safe grants but does not set SE_DACL_PROTECTED on files.
+    Elevated Node can use the token's default group owner; only that exact OS
+    identity may be normalized to the current user, after the grants check.
     """
     path=reject_reparse_ancestors(path)
     require_private_directory(path.parent)
     try:
-        handle=win32file.CreateFile(str(path),win32con.GENERIC_READ|win32con.READ_CONTROL|win32con.WRITE_DAC,
+        handle=win32file.CreateFile(str(path),win32con.GENERIC_READ|win32con.READ_CONTROL|win32con.WRITE_DAC|win32con.WRITE_OWNER,
             win32con.FILE_SHARE_READ,None,win32con.OPEN_EXISTING,win32file.FILE_FLAG_OPEN_REPARSE_POINT,None)
     except pywintypes.error as error:
         raise ctypes.WinError(error.winerror) from None
@@ -172,13 +184,13 @@ def protect_inherited_download(path):
             raise PermissionError('The download must be an ordinary single-link file.')
         observed=win32security.GetSecurityInfo(handle,win32security.SE_FILE_OBJECT,
             win32security.OWNER_SECURITY_INFORMATION|win32security.DACL_SECURITY_INFORMATION)
-        require_private_grants(observed)
+        require_private_grants(observed, download_default_owner=True)
         control,_=observed.GetSecurityDescriptorControl()
-        if not control & win32security.SE_DACL_PROTECTED:
+        if observed.GetSecurityDescriptorOwner() != current_sid() or not control & win32security.SE_DACL_PROTECTED:
             selected=security_attributes().SECURITY_DESCRIPTOR
             win32security.SetSecurityInfo(handle,win32security.SE_FILE_OBJECT,
-                win32security.DACL_SECURITY_INFORMATION|win32security.PROTECTED_DACL_SECURITY_INFORMATION,
-                None,None,selected.GetSecurityDescriptorDacl(),None)
+                win32security.OWNER_SECURITY_INFORMATION|win32security.DACL_SECURITY_INFORMATION|win32security.PROTECTED_DACL_SECURITY_INFORMATION,
+                current_sid(),None,selected.GetSecurityDescriptorDacl(),None)
         require_private_descriptor(win32security.GetSecurityInfo(handle,win32security.SE_FILE_OBJECT,
             win32security.OWNER_SECURITY_INFORMATION|win32security.DACL_SECURITY_INFORMATION))
     except pywintypes.error as error:
