@@ -1,0 +1,36 @@
+{
+  "format": "augmentor-published-legacy-companion-checkpoint/1",
+  "date": "2026-10-03",
+  "status": "source-only reviewed; native smoke pending",
+  "sourceBase": "e178cfb",
+  "namespace": {
+    "actualInit": "tini0.19.0",
+    "originalFailedNamespacePreserved": true,
+    "snapshotHomeRegularFiles": 28695,
+    "snapshotHomeLinks": 507,
+    "snapshotHomeDirectories": 5499,
+    "bytesAndMetadataPreserved": true,
+    "ordinaryUserProcessEntriesAbsent": true,
+    "installerReplayed": false,
+    "ownerMountsDevices": false
+  },
+  "helper": {
+    "path": "release/published-linux-legacy-companion.py",
+    "sha256": "89a147101055f2efd4e7b852d94f72cd0d1864b5caad9458541ddb591c582ec9",
+    "publicMemorySourceSha256": "3cc550e2250d80a8fabb19562e0a32c1eefc019e215af6a501b01539739f588c",
+    "ordinaryAccount": true,
+    "actualNonRootGroupMembershipRequired": true,
+    "rootOwnedHistoricalMetadataCannotBeCallerWritable": true,
+    "nativeAuditRequired": true,
+    "preexistingCompanionAdoption": false,
+    "currentCompanion705Modified": false,
+    "readOnlyEngineInactiveGuard": true,
+    "oneNewChildNormalTermOnly": true,
+    "unknownRetryOrEscalation": false
+  },
+  "syntheticTestsPassed": 8,
+  "nativeStartReadStopExecuted": false,
+  "sdkRoleHistoriesOrUpgradeRollbackExecuted": false,
+  "physicalSpeechOrMemoryEngineProvisioned": false,
+  "publicReleaseQualified": false
+}

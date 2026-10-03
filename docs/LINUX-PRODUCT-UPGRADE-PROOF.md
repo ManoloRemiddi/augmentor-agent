@@ -39,7 +39,7 @@ admission/durability tests pass. One actual ordinary-user run of reviewed4e090
 passes in28.28seconds: unchanged published installer exit0, matching installed
 receipt/selection/harness, and zero model requests. No SDK turn has run.
 
-Strict independent process-absence postflight refuses two UID1000 defunct Node
+Strict independent process-absence postflight refuses two UID1000 defunct child
 entries (StateZ, PPid1, empty argv). Native package and product identity checks
 pass; the preparation result remains PASS while complete postflight remains FAIL.
 Both fixture ports are bindable and no live user process remains. One normal
@@ -64,3 +64,33 @@ Legacy memory companions lack the newer maintenance API and require an explicitl
 attributed, idle, fixture-owned normal shutdown plan before SDK execution.
 Product upgrade/rollback, graphical Browser, physical speech, legal and release
 acceptance remain open.
+
+## October 3 admitted init namespace and legacy companion source
+
+A separately admitted local snapshot preserves all28,695 regular home files,
+507 symbolic links and5,499 directories with identical bytes and metadata. Its
+new process namespace runs verified tini0.19.0 as PID1 and contains no ordinary
+user process entries. The original namespace and its failed process-absence
+result remain preserved. The installer was not repeated; no SDK turn has run.
+Only public packages and synthetic fixture state enter this local snapshot.
+
+[The separate legacy companion helper](../release/published-linux-legacy-companion.py)
+is restricted to that exact init154 namespace, ordinary UID1000/private home,
+matching published Debian0.2.12 or0.2.13 native identities and the exact common
+memory source checksum. Native package audits must pass. Unlike the current
+maintenance helper, it explicitly checks that historical root:root0664 files and
+root:root0775 parents cannot be written by this non-root-group fixture account.
+Links, foreign owners/groups, world-write, hardlinked source and root/root-group
+callers refuse. It does not alter installed permissions or current705 guards.
+
+The helper refuses a pre-existing companion, socket or memory-engine
+configuration, then journals one fresh owned spawn before starting the unchanged
+public source. It binds the direct child, UID, start time, argv, source and Unix
+socket peer/inode. Only read-only memory description is used: configured engine
+and active processing refuse. After the fixture DSH Node host is absent, normal
+cleanup journals one SIGTERM to that exact direct child and waits for its normal
+exit/endpoint removal. Unknown signal/wait never retries or escalates. State,
+logs and journals remain private; eight synthetic ownership and failure cases
+pass. This source helper still needs actual start/read/normal-stop acceptance
+before different-version SDK execution. No physical speech or memory engine is
+provisioned, and this is not a production lifecycle adapter.
