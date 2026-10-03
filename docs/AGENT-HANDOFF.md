@@ -12,8 +12,12 @@ pass, as do both full frozen backing hashes and unchanged selection/settings.
 The enabled observer retains an older exact GNOME50-only extension; it differs
 from the selected2035 expanded-profile bytes and is not established as cause.
 The changing field/Notify phase is unknown; the original dispatch guard does not
-record that exception. Probe-only bounded diagnostics are being developed without
-extra RPC, replay, timeout or scene-fence changes. Production input stays disabled.
+record that exception. [Probe-only bounded diagnostics](../release/qualification/next-targets/20261003-fedora-gnome-dispatch-trace-source-only.json)
+now pass129 focused Python cases, including48 probe cases, and five unchanged
+observer Node cases. Existing comparisons/RPCs/helper queries and held-input
+cleanup are traced once with sanitized identities, bounded records and retained
+first refusal. No extra RPC, replay, timeout or scene-fence change occurs.
+Actual diagnostic input remains unexecuted; production input stays disabled.
 
 ## October 3 clean Mint correction and fresh proof
 

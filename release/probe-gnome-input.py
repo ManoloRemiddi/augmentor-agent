@@ -13,6 +13,7 @@ from copy import deepcopy
 import hashlib
 import importlib.util
 import json
+import math
 import os
 from pathlib import Path
 import re
@@ -230,11 +231,288 @@ def traced_controller(base,trace):
     return TracedControl
 
 
+class DispatchTrace(IdleWatchTrace):
+    """Proof-only existing-call trace; no payloads and no additional native reads."""
+    def __init__(self,limit=128):
+        if type(limit) is not int or not 1<=limit<=128:raise ValueError('Dispatch diagnostics retain at most 128 records.')
+        super().__init__(limit);self.first_comparison=None;self.first_refusal=None
+
+    def record(self,value):
+        with self.mutex:
+            self.total+=1;value={**value,'sequence':self.total};self.calls.append(value)
+            if value['outcome']=='error' and self.first_error is None:self.first_error=value
+            if value.get('event')=='same-scene':
+                if self.first_comparison is None:self.first_comparison=value
+                if value.get('matches') is False and self.first_refusal is None:self.first_refusal=value
+
+    def snapshot(self):
+        with self.mutex:
+            return deepcopy({'limit':self.limit,'totalCalls':self.total,'droppedCalls':self.total-len(self.calls),
+                'recordingFailures':self.recording_failures,'calls':list(self.calls),'firstError':self.first_error,
+                'firstComparison':self.first_comparison,'firstRefusedComparison':self.first_refusal})
+
+
+def dispatch_record(trace,value):
+    # Construct diagnostics inside the protected sink, so malformed diagnostic
+    # metadata cannot change cancellation, native results or exceptions.
+    try:trace.record(value())
+    except Exception:
+        try:trace.lost()
+        except Exception:pass
+
+
+def dispatch_error(error):
+    # Error messages may contain native paths or user content. Existing probe
+    # failure reports remain unchanged; this extra trace retains only types.
+    value={'kind':type(error).__name__}
+    domain=getattr(error,'domain',None);code=getattr(error,'code',None)
+    if domain=='g-io-error-quark':value['domain']=domain
+    if type(code) is int:value['code']=code
+    return value
+
+
+def dispatch_identity(value):
+    """Allowlisted scene/helper metadata; never titles, applications or text."""
+    if not isinstance(value,dict):return None
+    result={}
+    numeric={'schema','serial','pid','targetPid','helperPid','role','focusSerial','observedSerial',
+        'generation','id','index','x','y','width','height','scale','actionMode','modalCount','stageGrabActor','stageKeyFocus'}
+    boolean={'inputQualified','readOnly','overrideRedirect','unmanaging','locked','greeter','overview','overviewTarget',
+        'overviewAnimation','stageGrabbed','windowDragging','screenShieldAvailable','screenShieldActive','screenShieldLocked',
+        'complete','valid','password','focused','showing','defunct','editable','enabled','sensitive'}
+    owners={'owner','selectedOwner','launcherOwner','registryOwner'}
+    for key,item in value.items():
+        if key in numeric and type(item) in (int,float) and math.isfinite(item) and abs(item)<2**53:result[key]=item
+        elif key in boolean and (type(item) is bool or item is None):result[key]=item
+        elif key in owners and isinstance(item,str) and re.fullmatch(r':\d+\.\d+',item):result[key]=item
+        elif key in ('epoch','sessionBusId','accessibilityBusId') and isinstance(item,str) and re.fullmatch('[a-f0-9-]{32,36}',item):result[key]=item
+        elif key in ('targetStart','helperStart') and isinstance(item,str) and re.fullmatch('[0-9]{1,20}',item):result[key]=item
+        elif key=='id' and isinstance(item,str) and re.fullmatch('[a-f0-9-]{36}:[0-9]{1,16}',item):result[key]=item
+        elif key in ('window','geometry','workspace','guards','focus','pins'):
+            result[key]=dispatch_identity(item)
+        elif key in ('windows','above','screens') and isinstance(item,list):
+            result[key]=[dispatch_identity(record) for record in item[:200]];result[key+'Count']=len(item)
+        elif key=='blockedReasons' and isinstance(item,list):result['blockedReasonCount']=len(item)
+    return result
+
+
+def dispatch_changed_fields(first,second):
+    """Bounded names from the actual compared objects, including omitted titles.
+
+    same_scene ignores the focused window title only. Do not normalize other
+    titles away here: a title change in windows/above can explain a refusal,
+    but its content must never enter the diagnostic.
+    """
+    known={'schema','backend','shellVersion','inputQualified','readOnly','epoch','serial','window','windows','above','screens',
+        'workspace','guards','blockedReasons','id','index','pid','application','title','geometry','x','y','width','height','scale',
+        'name','overrideRedirect','unmanaging','sessionMode','parentSessionMode','locked','greeter','overview','overviewTarget',
+        'overviewAnimation','stageGrabbed','windowDragging','screenShieldAvailable','screenShieldActive','screenShieldLocked',
+        'actionMode','modalCount','stageGrabActor','stageKeyFocus','targetPid','targetStart','pins','sessionBusId',
+        'launcherOwner','accessibilityBusId','registryOwner','selectedOwner','focus','owner','path','role','password',
+        'focused','showing','defunct','editable','sensitive','enabled'}
+    paths=[];maximum=64
+    def walk(a,b,path,depth=0):
+        if len(paths)>=maximum or a==b:return
+        if depth>=6:paths.append(path or '<scene>');return
+        if isinstance(a,dict) and isinstance(b,dict):
+            for key in sorted(set(a)|set(b)):
+                if path=='window' and key=='title':continue
+                label=key if key in known else '<other-field>'
+                child=(path+'.' if path else '')+label
+                if key not in a or key not in b:paths.append(child)
+                else:walk(a[key],b[key],child,depth+1)
+                if len(paths)>=maximum:break
+        elif isinstance(a,list) and isinstance(b,list):
+            if len(a)!=len(b):paths.append(path+'.length')
+            for index,(left,right) in enumerate(zip(a,b)):
+                walk(left,right,path+'['+str(index)+']',depth+1)
+                if len(paths)>=maximum:break
+        else:paths.append(path or '<scene>')
+    walk(first,second,'');return {'fields':paths,'limit':maximum,'atLimit':len(paths)>=maximum}
+
+
+def dispatch_focus_comparison(reply,snapshot):
+    # Derived diagnostics from the one existing validated reply, using the
+    # same complete observation shape as GnomeControl.focus_info. No query and
+    # no extra authority: keyboard-guard.allowed records the actual decision.
+    current=[]
+    if isinstance(reply,dict) and reply.get('complete'):
+        current=[{key:reply[key] for key in ('targetPid','targetStart','epoch','pins','selectedOwner','serial','focus')}]
+    recorded=(snapshot or {}).get('focus')
+    return {'observationMatches':current==recorded,
+        'serialMatches':isinstance(reply,dict) and reply.get('serial')==(snapshot or {}).get('focusSerial'),
+        'changedFields':dispatch_changed_fields(current,recorded)}
+
+
+class DispatchBus:
+    """Forward only existing RPCs once, recording their actual bounds/flags."""
+    def __init__(self,bus,trace,context,thread):self.bus=bus;self.trace=trace;self.context=context;self.thread=thread
+    def __getattr__(self,name):return getattr(self.bus,name)
+    def call_sync(self,name,path,interface,method,parameters,reply_type,flags,timeout_msec,cancellable):
+        traced=threading.get_ident()==self.thread and (
+            interface=='org.freedesktop.DBus' and method=='GetNameOwner'
+            or interface=='com.augmentor.GnomeObserver' and method in ('Read','InspectPoint')
+            or interface=='org.freedesktop.portal.RemoteDesktop' and method in (
+                'NotifyPointerMotionAbsolute','NotifyPointerButton','NotifyKeyboardKeycode','NotifyKeyboardKeysym')
+            or interface in ('org.freedesktop.portal.Session','org.freedesktop.portal.Request') and method=='Close')
+        state=None
+        if traced:
+            try:
+                if method=='Close':state='close'
+                elif method=='NotifyPointerMotionAbsolute':state='motion'
+                elif method.startswith('Notify'):
+                    pressed=parameters.unpack()[-1]
+                    if type(pressed) is int and pressed in (0,1):state='press' if pressed else 'release'
+            except Exception:pass
+        started=time.monotonic() if traced else None;error=None
+        try:return self.bus.call_sync(name,path,interface,method,parameters,reply_type,flags,timeout_msec,cancellable)
+        except BaseException as failure:error=failure;raise
+        finally:
+            if traced:
+                def row():
+                    value={**self.context(),'event':'rpc','interface':interface,'method':method,'timeoutMs':timeout_msec,
+                        'flags':int(flags),'cancellablePresent':cancellable is not None,'elapsedSeconds':time.monotonic()-started,
+                        'outcome':'error' if error is not None else 'reply'}
+                    if state is not None:value['dispatchState']=state
+                    if isinstance(name,str) and re.fullmatch(r':\d+\.\d+',name):value['destinationOwner']=name
+                    if error is not None:value['error']=dispatch_error(error)
+                    return value
+                dispatch_record(self.trace,row)
+
+
+def dispatch_traced_controller(base,trace):
+    """Temporary instrumentation only on this controller's owning Worker.
+
+    Functions/buses are restored even when normal Stop detaches them. Captured
+    disposed objects are never reattached and no call is repeated by tracing.
+    """
+    from contextlib import contextmanager
+    namespaces=[]
+    for cls in base.__mro__:
+        for name in ('send','action'):
+            method=cls.__dict__.get(name);space=getattr(method,'__globals__',{})
+            if 'same_scene' in space and all(space is not other for other in namespaces):namespaces.append(space)
+    class DispatchControl(base):
+        def __init__(self,*args,**kwargs):
+            self._dispatch_thread=threading.get_ident();self._dispatch_depth=0;self._dispatch_phase={}
+            super().__init__(*args,**kwargs)
+
+        def trace_context(self):
+            consent=self.consent
+            return {**self._dispatch_phase,'controllerGeneration':self.generation,
+                'consentGeneration':getattr(consent,'generation',None),'cancelled':self.cancel.is_set(),
+                'heldButton':self.button is not None,'heldKeyCount':len(self.keys),'heldSymbol':self.symbol is not None}
+
+        @contextmanager
+        def trace_scope(self,phase):
+            if threading.get_ident()!=self._dispatch_thread:
+                yield;return
+            prior=self._dispatch_phase;self._dispatch_phase=phase;self._dispatch_depth+=1
+            originals=[];buses=[]
+            try:
+                if self._dispatch_depth==1:
+                    for space in namespaces:
+                        original=space['same_scene'];originals.append((space,original))
+                        def compared(first,second,original=original):
+                            # The actual original predicate is the sole authority.
+                            matches=original(first,second)
+                            if threading.get_ident()==self._dispatch_thread:
+                                dispatch_record(trace,lambda:{**self.trace_context(),'event':'same-scene','outcome':'reply',
+                                    'matches':matches,'changedFields':dispatch_changed_fields(first,second),
+                                    'current':dispatch_identity(first),'recorded':dispatch_identity(second)})
+                            return matches
+                        space['same_scene']=compared
+                    consent=self.consent;native=getattr(self.kwin,'native',None)
+                    for value in (consent,native):
+                        if value is not None:
+                            bus=value.bus;buses.append((value,bus))
+                            value.bus=DispatchBus(bus,trace,self.trace_context,self._dispatch_thread)
+                yield
+            finally:
+                for value,bus in reversed(buses):value.bus=bus
+                for space,original in reversed(originals):space['same_scene']=original
+                self._dispatch_depth-=1;self._dispatch_phase=prior
+
+        def action(self,owner,params):
+            if threading.get_ident()!=self._dispatch_thread:return super().action(owner,params)
+            kind=params.get('kind') if isinstance(params,dict) else None
+            with self.trace_scope({'operation':kind if kind in ('click','key','type') else 'other','phase':'action'}):
+                return super().action(owner,params)
+
+        def send(self,method,signature,args):
+            if threading.get_ident()!=self._dispatch_thread:return super().send(method,signature,args)
+            state='other'
+            try:state='motion' if method=='NotifyPointerMotionAbsolute' else 'press' if args[-1]==1 else 'release' if args[-1]==0 else 'other'
+            except Exception:pass
+            public_method=method if method in ('NotifyPointerMotionAbsolute','NotifyPointerButton','NotifyKeyboardKeycode','NotifyKeyboardKeysym') else 'other'
+            with self.trace_scope({**self._dispatch_phase,'phase':'send','method':public_method,'dispatchState':state}):
+                started=time.monotonic();error=None
+                try:return super().send(method,signature,args)
+                except Exception as failure:
+                    error=failure
+                    # Existing scene/point/verify refusals occur outside the
+                    # sender's Notify catch. Record the same failure without
+                    # another Stop; the original action owns held-input cleanup.
+                    self.record_failure('dispatch-guard',failure);raise
+                finally:
+                    dispatch_record(trace,lambda:{**self.trace_context(),'event':'send','outcome':'error' if error else 'reply',
+                        'elapsedSeconds':time.monotonic()-started,**({'error':dispatch_error(error)} if error else {})})
+
+        def focus_info(self,pid):
+            if threading.get_ident()!=self._dispatch_thread or not self._dispatch_depth:return super().focus_info(pid)
+            helper=self.a11y;original=getattr(helper,'request',None);had_request=helper is not None and 'request' in vars(helper)
+            prior_request=vars(helper).get('request') if helper is not None else None
+            if original is not None and threading.get_ident()==self._dispatch_thread:
+                def requested(*args,**kwargs):
+                    started=time.monotonic();error=None;result=None
+                    try:
+                        result=original(*args,**kwargs);return result
+                    except BaseException as failure:error=failure;raise
+                    finally:
+                        dispatch_record(trace,lambda:{**self.trace_context(),'event':'helper-request','method':'focus',
+                            'timeoutSeconds':getattr(helper,'timeout',None),'elapsedSeconds':time.monotonic()-started,
+                            'outcome':'error' if error else 'reply','identity':dispatch_identity(result),
+                            'recorded':dispatch_identity(((getattr(self,'_dispatch_keyboard_snapshot',None) or {}).get('focus') or [{}])[0]),
+                            'focusComparison':dispatch_focus_comparison(result,getattr(self,'_dispatch_keyboard_snapshot',None)),
+                            **({'error':dispatch_error(error)} if error else {})})
+                helper.request=requested
+            try:return super().focus_info(pid)
+            finally:
+                if original is not None and threading.get_ident()==self._dispatch_thread:
+                    if had_request:helper.request=prior_request
+                    else:del helper.request
+
+        def keyboard_target(self,snapshot):
+            if threading.get_ident()!=self._dispatch_thread:return super().keyboard_target(snapshot)
+            prior_snapshot=getattr(self,'_dispatch_keyboard_snapshot',None);self._dispatch_keyboard_snapshot=snapshot
+            with self.trace_scope({**self._dispatch_phase,'phase':'keyboard-target'}):
+                error=None
+                try:return super().keyboard_target(snapshot)
+                except BaseException as failure:error=failure;raise
+                finally:
+                    dispatch_record(trace,lambda:{**self.trace_context(),'event':'keyboard-guard','outcome':'error' if error else 'reply',
+                        'allowed':error is None,**({'error':dispatch_error(error)} if error else {})})
+                    self._dispatch_keyboard_snapshot=prior_snapshot
+
+        def stop(self):
+            if threading.get_ident()!=self._dispatch_thread:return super().stop()
+            # Capture this original consent's metadata before normal Stop
+            # detaches it. Its actual release/Close RPCs retain original bounds.
+            consent=self.consent;generation=getattr(consent,'generation',None)
+            owners=getattr(consent,'owners',{}) if consent is not None else {}
+            pinned={key:value for key,value in owners.items() if key in ('org.freedesktop.portal.Desktop',
+                'org.freedesktop.impl.portal.desktop.gnome','org.gnome.Shell') and isinstance(value,str) and re.fullmatch(r':\d+\.\d+',value)}
+            with self.trace_scope({**self._dispatch_phase,'phase':'cleanup','pinnedOwners':pinned,'pinnedGeneration':generation}):
+                return super().stop()
+    return DispatchControl
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--candidate',required=True);parser.add_argument('--source',required=True)
     parser.add_argument('--selected-artifact',required=True);parser.add_argument('--native-source',required=True)
     parser.add_argument('--target-pid',type=int,required=True)
+    parser.add_argument('--trace-dispatch',action='store_true',help='Record bounded existing dispatch comparisons/RPCs/helper guards and cleanup privately; no extra operation or replay.')
     parser.add_argument('--trace-idle-watch',action='store_true',help='Record bounded private method/bound/elapsed diagnostics; guards stay unchanged.')
     parser.add_argument('--retain-capture-image',action='store_true',help='Retain original validated JPEG bytes privately after an explicit capture; never capture automatically.')
     args=parser.parse_args()
@@ -290,6 +568,8 @@ def main():
     delivery=Delivery();delivery.notice.connect(banner.update.emit)
     trace=IdleWatchTrace() if args.trace_idle_watch else None
     Control=traced_controller(GnomeControl,trace) if trace is not None else GnomeControl
+    dispatch_trace=DispatchTrace() if args.trace_dispatch else None
+    if dispatch_trace is not None:Control=dispatch_traced_controller(Control,dispatch_trace)
     worker=Worker(lambda context:Control(context,delivery.notice.emit,request_timeout=180,on_request=delivery.request.emit))
     controller=worker.backend;owner='codex:owned-gnome-input-fixture'
     report={'format':'augmentor-owned-gnome-input-probe/1','selectedSource':args.source,'targetPid':args.target_pid,
@@ -298,10 +578,11 @@ def main():
         'probeConsentTimeoutSeconds':180,'guiTimerTicks':0,'records':[],'closed':False,'stopClicked':False,
         'sourceSha256':{name:hashlib.sha256((candidate/name).read_bytes()).hexdigest() for name in sources},
         'initialTarget':target_receipt(),'helperPids':[],'selectedApplicationChanged':False,'idleWatchTraceEnabled':trace is not None,
-        'captureImageRetentionEnabled':args.retain_capture_image}
+        'captureImageRetentionEnabled':args.retain_capture_image,'dispatchTraceEnabled':dispatch_trace is not None}
     def save():
         if selection.read_bytes()!=original:raise RuntimeError('Selected application bytes changed during the candidate proof.')
         if trace is not None:report['idleWatchRpcTrace']=trace.snapshot()
+        if dispatch_trace is not None:report['dispatchTrace']=dispatch_trace.snapshot()
         temporary=report_path.with_suffix('.json.tmp');temporary.write_text(json.dumps(report,indent=2)+'\n');temporary.replace(report_path)
     pending=False;stopping=False
     def execute(operation,function):

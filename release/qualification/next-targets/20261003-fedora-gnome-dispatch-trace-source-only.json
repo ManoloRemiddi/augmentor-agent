@@ -1,0 +1,102 @@
+{
+  "format": "augmentor-linux-qualification-checkpoint/1",
+  "date": "2026-10-03",
+  "target": "fedora44-gnome-wayland-owned-candidate",
+  "status": "reviewed source-only diagnostics published with checkpoint; fresh guest execution pending",
+  "reason": "v4 center callback delivered once while API refused scene change; exact changing field/Notify phase was not retained",
+  "priorEvidence": {
+    "path": "release/qualification/next-targets/20261003-fedora-gnome-v4-visual-capture-center-partial-failure.json",
+    "sha256": "373fbaadf47aa1fe76ee385b54d2d4d32b75c36a63c13dc59aa76fcc9bd2defe",
+    "consentAndVisualCapture": "PASS",
+    "centerOutcome": "partial delivery/API FAIL",
+    "centerCallbackCount": 1,
+    "exactFailureCause": "unresolved",
+    "v2Timeout": "unexplained",
+    "additionalInputAfterCenterFailure": false
+  },
+  "probe": {
+    "path": "release/probe-gnome-input.py",
+    "sha256": "3d719011e0ef50e90ad63278fdd5ce4dd55e58d168d4e6d24f9a4cad1a7f8351",
+    "optionalArgument": "--trace-dispatch",
+    "defaultEnabled": false,
+    "latestRecordLimit": 128,
+    "changedFieldLimit": 64,
+    "firstComparisonAndRefusalAndErrorRetainedIndependently": true,
+    "privateOnly": true,
+    "ownedWorkerScope": true,
+    "foreignThreadDelegationUntraced": true,
+    "originalComparisonsAndNativeCallsDelegatedOnce": true,
+    "temporaryFunctionsBusAndHelperMethodsRestored": true,
+    "noDisposedObjectsReattached": true,
+    "sanitizedSceneIdentityAndChangedFieldNames": true,
+    "validatedExistingHelperFocusMetadataOnly": true,
+    "helperConstructorStatusInstrumentation": false,
+    "excluded": [
+      "titles",
+      "application names",
+      "accessible text",
+      "password or secret payloads",
+      "input text/chords",
+      "keycodes/keysyms",
+      "native object paths",
+      "RPC parameters/replies",
+      "free-form native error messages"
+    ],
+    "existingGuardExceptionRecordedThenRethrownUnchanged": true,
+    "firstFailureAndStopCausePreserved": true,
+    "nativeNotifyTimeoutMs": 5000,
+    "nativeCleanupTimeoutMs": 1000,
+    "nativeFlagsAndCancellableUnchanged": true,
+    "extraStopReleaseCloseRpcQueryCaptureActionRetryOrKeepalive": false,
+    "diagnosticSinkFailureChangesNativeOutcome": false
+  },
+  "immutableCandidateRuntime": {
+    "sourceCommit": "0ab022a6a26ae0165b57e1662203e71f544aab9a",
+    "filesSha256": {
+      "services/desktop/worker.py": "795d16c85fdc358158038463980ec89c124005e08d5b9d0cf72f7b9d05482eff",
+      "services/desktop/gnome_control.py": "1be68fc8758850bbb57e05bf04f8f8bcd8b3101a01d651a89899cf8f353c6ea0",
+      "services/desktop/gnome.py": "968532f622b04be2f3c84955e8d9e2d3ae34437e3c62f17695713344170c09e1",
+      "services/desktop/portal.py": "0339d7d3220fa0988c3dda81b148743cbf060ca6000c653999e4ba04cccafca8",
+      "services/desktop/portal_session.py": "fc7abe0bbdc22d679d2df7ad6c83b024611a524418b546106f1ecd2b9c8b7e3d",
+      "services/desktop/capture_stream.py": "66fb68873c9ac7ba9d54b04729aab74a25e4cddb4f41b327b50b507c29cc633c",
+      "services/desktop/scene.py": "0b583fe11aa9f6b1e26d029f5bf6705c4a45f57bef2db3210c11ddf9b7dd67a4",
+      "services/desktop/a11y_helper.py": "4b6fc94396ca3f3282d1fd59d0484e8680d5e548584e08fb4084892d4841e788",
+      "services/desktop/a11y_service.py": "e6547181f01f44b67f0468fda001a50df0c619f71324282009b2a1b38de423ba",
+      "release/probe-gnome-input-target.py": "19ad6dec4f7849e77315eaca59d6b00006b8e92fb98e72bfa02094a626e1c5f4"
+    },
+    "currentBytesMatchPinnedCommit": true
+  },
+  "tests": {
+    "probeCasesPassed": 48,
+    "focusedPythonCasesPassed": 129,
+    "observerNodeCasesPassed": 5,
+    "nativeGuestUiOrInputExercised": false,
+    "path": "tests/test_gnome_input_probe.py",
+    "sha256": "cd6879dcc2bb21d4335ae9945398e4677c03768b099c74dc05d03489b6af6dbe",
+    "covered": [
+      "actual sender serial-only refusal before release",
+      "actual original predicate once",
+      "scene guards and native owner refusal",
+      "password/raw GTK sensitivity and focus path refusal",
+      "existing helper timeout identity",
+      "unchanged per-character helper and press/release counts",
+      "verified false and no replay",
+      "first failure/comparison retention and bounded rollover",
+      "actual native 5000ms Notify timeout then one original 1000ms Close",
+      "actual held-input reverse release order/1000ms flags/pinned owner/first Stop cause",
+      "sink failure forwarding unchanged native result or exception",
+      "floating variant read before native consumption",
+      "foreign-thread delegation and temporary scope restoration"
+    ],
+    "simulatedNonLinux": {
+      "discovered": 48,
+      "portablePassed": 11,
+      "nativeCasesSkipped": 37
+    }
+  },
+  "selectedNativePayloadChanges": false,
+  "vmPackageExtensionOrEnvironmentChanges": false,
+  "productionGnomeInputQualified": false,
+  "productionGnomeInputEnabled": false,
+  "next": "Fresh owned diagnostic candidate needs exact eleven files, original-off/read-only full backing hashes, current native/selection/source admission, disk floor, observed consent and retained image review before one center action."
+}

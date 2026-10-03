@@ -193,6 +193,276 @@ class GnomeInputIdleWatchTraceTests(unittest.TestCase):
         self.assertIs(consent.bus,original[0]);self.assertIs(native.bus,original[1])
 
 
+class GnomeInputDispatchTraceTests(unittest.TestCase):
+    def test_bounded_first_error_and_failed_comparison_survive_rollover(self):
+        trace=module.DispatchTrace(limit=2)
+        trace.record({'event':'same-scene','outcome':'reply','matches':True})
+        trace.record({'event':'same-scene','outcome':'reply','matches':False,'changedFields':{'fields':['serial']}})
+        trace.record({'event':'send','outcome':'error','error':{'kind':'RuntimeError'}})
+        for _ in range(4):trace.record({'event':'rpc','outcome':'reply'})
+        value=trace.snapshot();self.assertEqual(value['totalCalls'],7);self.assertEqual(value['droppedCalls'],5)
+        self.assertEqual(value['firstComparison']['sequence'],1);self.assertEqual(value['firstRefusedComparison']['sequence'],2)
+        self.assertEqual(value['firstError']['sequence'],3);value['firstRefusedComparison']['changedFields']['fields'].clear()
+        self.assertEqual(trace.snapshot()['firstRefusedComparison']['changedFields']['fields'],['serial'])
+
+    def test_identity_and_changed_fields_exclude_titles_text_and_arbitrary_names(self):
+        from copy import deepcopy
+        first={'serial':5,'window':{'title':'PRIVATE ROOT TITLE','pid':12,'application':'PRIVATE APP'},
+            'windows':[{'title':'PRIVATE LIST TITLE','pid':12}], 'focus':{'text':'PRIVATE TEXT','password':True},
+            'PRIVATE KEY':'PRIVATE VALUE','guards':{'stageKeyFocus':9}}
+        second=deepcopy(first);second['serial']=6;second['window']['title']='NEW PRIVATE ROOT TITLE'
+        second['windows'][0]['title']='NEW PRIVATE LIST TITLE';second['PRIVATE KEY']='NEW PRIVATE VALUE'
+        changed=module.dispatch_changed_fields(first,second)
+        self.assertEqual(changed['fields'],['<other-field>','serial','windows[0].title'])
+        value=json.dumps({'identity':module.dispatch_identity(first),'changed':changed,
+            'error':module.dispatch_error(RuntimeError('PRIVATE ERROR'))})
+        self.assertNotIn('PRIVATE',value);self.assertNotIn('application',value)
+        self.assertEqual(module.dispatch_identity(first)['focus'],{'password':True})
+        many={str(i):i for i in range(100)};self.assertEqual(len(module.dispatch_changed_fields(many,{})['fields']),64)
+
+    def test_rpc_bound_flags_cancellable_arguments_and_original_error_are_unchanged(self):
+        bus=Mock();trace=module.DispatchTrace();context=lambda:{'phase':'send'}
+        proxy=module.DispatchBus(bus,trace,context,threading.get_ident())
+        parameters=SimpleNamespace(unpack=lambda:('/session',{},65,1));error=NativeTimeout('PRIVATE NATIVE ERROR')
+        arguments=(':1.54','/owned/private/path','org.freedesktop.portal.RemoteDesktop','NotifyKeyboardKeysym',parameters,None,4,5000,object())
+        bus.call_sync.side_effect=error
+        with self.assertRaises(NativeTimeout) as caught:proxy.call_sync(*arguments)
+        self.assertIs(caught.exception,error);bus.call_sync.assert_called_once_with(*arguments)
+        row=trace.snapshot()['firstError'];self.assertEqual((row['timeoutMs'],row['flags'],row['dispatchState']),(5000,4,'press'))
+        self.assertTrue(row['cancellablePresent']);self.assertNotIn('PRIVATE',json.dumps(row));self.assertNotIn('parameters',row)
+        self.assertNotIn('path',row);self.assertNotIn('65',json.dumps(row))
+
+
+    def test_rpc_sink_failure_and_consumed_variant_never_mask_native_result_or_error(self):
+        class Parameters:
+            consumed=False
+            def unpack(self):
+                if self.consumed:raise AssertionError('Native call consumed the floating variant.')
+                return ('/session',{},272,0)
+        for failure in (None,NativeTimeout('Native timeout')):
+            parameters=Parameters();reply=object();bus=Mock();trace=Mock();trace.record.side_effect=RuntimeError('Broken sink')
+            def called(*args):
+                self.assertIs(args[4],parameters);parameters.consumed=True
+                if failure is not None:raise failure
+                return reply
+            bus.call_sync.side_effect=called;proxy=module.DispatchBus(bus,trace,lambda:{},threading.get_ident())
+            args=(':1.20','/session','org.freedesktop.portal.RemoteDesktop','NotifyPointerButton',parameters,None,4,1000,None)
+            if failure is None:self.assertIs(proxy.call_sync(*args),reply)
+            else:
+                with self.assertRaises(NativeTimeout) as caught:proxy.call_sync(*args)
+                self.assertIs(caught.exception,failure)
+            bus.call_sync.assert_called_once_with(*args);trace.lost.assert_called_once()
+            self.assertEqual(trace.record.call_args.args[0]['dispatchState'],'release')
+
+
+
+@unittest.skipUnless(sys.platform.startswith('linux') and Gst is not None,
+    'Actual maintained dispatch sender requires Linux GStreamer introspection.')
+class GnomeInputActualDispatchTraceTests(unittest.TestCase):
+    def setUp(self):
+        import test_gnome_control as fixture
+        self.fixture=fixture;self.native=fixture.module
+        self.trace=module.DispatchTrace();self.Control=module.dispatch_traced_controller(self.native.GnomeControl,self.trace)
+        self.value=self.Control.__new__(self.Control);self.value.__dict__.update(fixture.controller().__dict__)
+        self.value._dispatch_thread=threading.get_ident();self.value._dispatch_depth=0;self.value._dispatch_phase={}
+        self.originals=[(cls.__dict__[name].__globals__,cls.__dict__[name].__globals__['same_scene'])
+            for cls in self.native.GnomeControl.__mro__ for name in ('send','action')
+            if name in cls.__dict__ and 'same_scene' in cls.__dict__[name].__globals__]
+        self.consent=self.value.consent;self.bus=self.consent.bus;self.observer=self.value.kwin;self.native_bus=self.observer.native.bus
+
+    def restored(self):
+        for namespace,original in self.originals:self.assertIs(namespace['same_scene'],original)
+        self.assertIs(self.consent.bus,self.bus);self.assertIs(self.observer.native.bus,self.native_bus)
+        self.assertEqual(self.value._dispatch_depth,0);self.assertEqual(self.value._dispatch_phase,{})
+
+    def snapshot(self,focus=None):
+        return {'token':'PRIVATE TOKEN','created':module.time.monotonic(),'scene':self.fixture.scene(),
+            'width':1280,'height':800,'focus':focus or [],'focusSerial':self.value.focus_serial}
+
+    def keyboard(self,reply=None):
+        from copy import deepcopy
+        helper=SimpleNamespace(pid=123,closed=False,timeout=3,request=Mock(return_value=deepcopy(reply or self.fixture.focus_reply())),close=Mock())
+        self.value.a11y=helper;recorded=self.value.focus_info(123);helper.request.reset_mock()
+        self.value.snapshot=self.snapshot(recorded);self.value.dispatch_snapshot=self.value.snapshot
+        return helper
+
+    def test_actual_send_serial_refusal_is_recorded_before_notify_and_restores_scope(self):
+        self.observer.read.return_value={**self.fixture.scene(),'serial':9}
+        with self.assertRaisesRegex(RuntimeError,'GNOME target changed before dispatch'):
+            self.value.send('NotifyPointerMotionAbsolute','(oa{sv}udd)',('/session',{},7,100.,50.))
+        self.observer.read.assert_called_once_with(self.value.cancel);self.consent.call.assert_not_called()
+        first=self.trace.snapshot()['firstRefusedComparison'];self.assertEqual(first['changedFields']['fields'],['serial'])
+        self.assertEqual((first['current']['serial'],first['recorded']['serial']),(9,8))
+        self.assertEqual(self.value.last_failure['phase'],'dispatch-guard');self.assertFalse(self.value.cancel.is_set())
+        self.restored()
+
+    def test_original_scene_predicate_is_called_once_and_foreign_comparison_is_untraced(self):
+        namespace=self.native.GnomeControl.send.__globals__;original=namespace['same_scene'];compared=Mock(wraps=original)
+        self.observer.read.return_value={**self.fixture.scene(),'serial':9}
+        with patch.dict(namespace,{'same_scene':compared}):
+            with self.assertRaisesRegex(RuntimeError,'target changed'):
+                self.value.send('NotifyPointerMotionAbsolute','(oa{sv}udd)',('/session',{},7,100.,50.))
+            compared.assert_called_once();self.assertIs(namespace['same_scene'],compared)
+        before=self.trace.snapshot()['totalCalls'];outcomes=[]
+        with self.value.trace_scope({'phase':'action'}):
+            thread=threading.Thread(target=lambda:outcomes.append(namespace['same_scene'](self.fixture.scene(),self.fixture.scene())))
+            thread.start();thread.join()
+        self.assertEqual(outcomes,[True]);self.assertEqual(self.trace.snapshot()['totalCalls'],before);self.restored()
+
+    def test_actual_click_release_change_preserves_partial_delivery_and_only_original_cleanup(self):
+        self.value.snapshot=self.snapshot()
+        self.observer.read.side_effect=[self.fixture.scene() for _ in range(4)]+[{**self.fixture.scene(),'serial':9}]
+        with self.assertRaisesRegex(RuntimeError,'GNOME target changed before dispatch'):
+            self.value.action(self.value.owner,{'token':'PRIVATE TOKEN','kind':'click','x':100,'y':50})
+        self.assertEqual(self.observer.read.call_count,5)
+        self.assertEqual([call.args[1] for call in self.consent.call.call_args_list],['NotifyPointerMotionAbsolute','NotifyPointerButton'])
+        self.assertEqual(self.consent.call.call_args_list[-1].args[3][-1],1)
+        self.bus.call_sync.assert_called_once();args=self.bus.call_sync.call_args.args
+        self.assertEqual((args[0],args[3],args[7],args[8]),(':1.20','NotifyPointerButton',1000,None))
+        self.assertEqual(args[4].unpack()[-1],0);self.consent.dispose.assert_called_once()
+        first=self.trace.snapshot()['firstRefusedComparison'];self.assertEqual((first['method'],first['dispatchState']),('NotifyPointerButton','release'))
+        self.assertEqual(first['changedFields']['fields'],['serial']);self.assertTrue(first['heldButton'])
+        cleanup=[row for row in self.trace.snapshot()['calls'] if row['event']=='rpc' and row['phase']=='cleanup']
+        self.assertEqual(len(cleanup),1);self.assertEqual(cleanup[0]['dispatchState'],'release')
+        self.assertEqual(cleanup[0]['pinnedOwners'],{self.native.NAME:':1.20'});self.assertEqual(cleanup[0]['pinnedGeneration'],3)
+        self.assertEqual(self.value.last_failure['phase'],'dispatch-guard');self.assertTrue(self.value.cancel.is_set())
+        self.assertIsNone(self.value.consent);self.assertIsNone(self.value.kwin);self.assertIsNone(self.value.snapshot)
+        self.restored()
+
+    def test_actual_scene_guard_difference_and_owner_refusal_remain_pre_dispatch(self):
+        current={**self.fixture.scene(),'guards':{'stageKeyFocus':2,'locked':True}}
+        self.value.dispatch_scene={**self.fixture.scene(),'guards':{'stageKeyFocus':1,'locked':False}}
+        self.observer.read.return_value=current
+        with self.assertRaisesRegex(RuntimeError,'target changed'):self.value.send('NotifyPointerButton','(oa{sv}iu)',('/session',{},272,0))
+        fields=self.trace.snapshot()['firstRefusedComparison']['changedFields']['fields']
+        self.assertEqual(fields,['guards.locked','guards.stageKeyFocus']);self.consent.call.assert_not_called();self.restored()
+        original=RuntimeError('Desktop service changed. Fresh consent is required.')
+        self.consent.verify.side_effect=original;self.value.last_failure={'phase':'earlier-native-loss'};self.observer.read.reset_mock()
+        with self.assertRaises(RuntimeError) as caught:self.value.send('NotifyPointerButton','(oa{sv}iu)',('/session',{},272,0))
+        self.assertIs(caught.exception,original);self.observer.read.assert_not_called();self.consent.call.assert_not_called()
+        self.assertEqual(self.value.last_failure,{'phase':'earlier-native-loss'});self.restored()
+
+    def test_actual_password_guard_retains_raw_flags_and_original_helper_disposal_once(self):
+        reply=self.fixture.focus_reply();reply['focus']['password']=True;helper=self.keyboard(reply);original=helper.request
+        with self.assertRaisesRegex(RuntimeError,'sensitive editable nonpassword'):
+            self.value.send('NotifyKeyboardKeysym','(oa{sv}iu)',('/session',{},65,1))
+        helper.request.assert_called_once_with('focus',generation=3,cancel=self.value.cancel,checkpoint=self.value.checkpoint)
+        self.assertIs(helper.request,original);helper.close.assert_called_once();self.consent.call.assert_not_called()
+        self.assertEqual(self.value.last_failure['phase'],'keyboard-target');self.assertIsNone(self.value.a11y)
+        records=self.trace.snapshot()['calls'];query=next(row for row in records if row['event']=='helper-request')
+        self.assertTrue(query['identity']['complete']);self.assertEqual(query['timeoutSeconds'],3)
+        self.assertEqual((query['identity']['focus']['password'],query['identity']['focus']['sensitive'],query['identity']['focus']['enabled']),(True,True,False))
+        self.assertFalse(next(row for row in records if row['event']=='keyboard-guard')['allowed']);self.restored()
+
+    def test_actual_focus_path_change_and_helper_error_refuse_without_extra_query(self):
+        helper=self.keyboard();reply=self.fixture.focus_reply();reply['focus']['path']='/changed_private_control'
+        helper.request.return_value=reply;original=helper.request
+        with self.assertRaisesRegex(RuntimeError,'focus or native owner changed'):
+            self.value.send('NotifyKeyboardKeysym','(oa{sv}iu)',('/session',{},65,1))
+        helper.request.assert_called_once();self.assertIs(helper.request,original);self.consent.call.assert_not_called()
+        query=next(row for row in self.trace.snapshot()['calls'] if row['event']=='helper-request')
+        self.assertEqual(query['focusComparison']['changedFields']['fields'],['[0].focus.path'])
+        self.assertFalse(query['focusComparison']['observationMatches']);self.assertTrue(query['focusComparison']['serialMatches'])
+        self.assertNotIn('changed_private_control',json.dumps(self.trace.snapshot()));self.restored()
+
+    def test_existing_helper_timeout_and_scope_restore_preserve_original_exception(self):
+        helper=self.keyboard();error=NativeTimeout('PRIVATE HELPER ERROR');helper.request.side_effect=error;original=helper.request
+        with self.assertRaises(NativeTimeout) as caught:
+            self.value.send('NotifyKeyboardKeysym','(oa{sv}iu)',('/session',{},65,1))
+        self.assertIs(caught.exception,error);helper.request.assert_called_once();helper.close.assert_called_once()
+        self.assertIs(helper.request,original);self.consent.call.assert_not_called()
+        first=self.trace.snapshot()['firstError'];self.assertEqual((first['event'],first['method'],first['timeoutSeconds']),('helper-request','focus',3))
+        self.assertEqual(first['error']['code'],24);self.assertNotIn('PRIVATE HELPER ERROR',json.dumps(self.trace.snapshot()))
+        self.assertEqual(self.value.last_failure['phase'],'keyboard-target');self.restored()
+
+    def test_actual_ascii_query_press_release_counts_and_verified_false_are_unchanged(self):
+        helper=self.keyboard();original=helper.request
+        result=self.value.action(self.value.owner,{'token':'PRIVATE TOKEN','kind':'type','text':'XYZ'})
+        self.assertEqual(result['verified'],False);self.assertTrue(result['dispatched'])
+        self.assertEqual(helper.request.call_count,4);self.assertEqual(self.consent.call.call_count,6)
+        self.assertIs(helper.request,original);self.assertFalse(self.value.cancel.is_set())
+        rows=self.trace.snapshot()['calls'];self.assertEqual(len([row for row in rows if row['event']=='helper-request']),4)
+        self.assertEqual([row['dispatchState'] for row in rows if row['event']=='send'],['press','release']*3)
+        serialized=json.dumps(self.trace.snapshot());self.assertNotIn('PRIVATE TOKEN',serialized);self.assertNotIn('XYZ',serialized)
+        self.assertNotIn('path',next(row for row in rows if row['event']=='helper-request')['identity']['focus'])
+        self.restored()
+
+    def test_actual_notify_failure_preserves_unknown_outcome_and_first_failure(self):
+        original=NativeTimeout('Native timeout');self.consent.call.side_effect=original
+        with self.assertRaisesRegex(RuntimeError,'outcome is unknown'):
+            self.value.send('NotifyPointerMotionAbsolute','(oa{sv}udd)',('/session',{},7,100.,50.))
+        self.consent.call.assert_called_once();self.assertEqual(self.value.last_failure['phase'],'dispatch')
+        self.assertTrue(self.value.cancel.is_set());self.consent.dispose.assert_called_once();self.restored()
+
+    def test_sink_failure_does_not_change_success_refusal_or_call_counts(self):
+        self.trace.record=Mock(side_effect=RuntimeError('Failed diagnostic sink'))
+        self.value.send('NotifyPointerMotionAbsolute','(oa{sv}udd)',('/session',{},7,100.,50.))
+        self.consent.call.assert_called_once();self.assertFalse(self.value.cancel.is_set());self.restored()
+        self.observer.read.return_value={**self.fixture.scene(),'serial':9};self.consent.call.reset_mock()
+        with self.assertRaisesRegex(RuntimeError,'target changed'):
+            self.value.send('NotifyPointerMotionAbsolute','(oa{sv}udd)',('/session',{},7,100.,50.))
+        self.consent.call.assert_not_called();self.assertFalse(self.value.cancel.is_set())
+        self.assertGreater(self.trace.snapshot()['recordingFailures'],0);self.restored()
+
+    def test_foreign_thread_has_no_trace_or_global_scope_and_preserves_original_sender(self):
+        outcomes=[]
+        def called():outcomes.append(self.value.send('NotifyPointerMotionAbsolute','(oa{sv}udd)',('/session',{},7,100.,50.)))
+        thread=threading.Thread(target=called);thread.start();thread.join()
+        self.assertEqual(outcomes,[self.consent.call.return_value]);self.consent.call.assert_called_once()
+        self.assertEqual(self.trace.snapshot()['totalCalls'],0);self.restored()
+
+    def test_actual_native_notify_timeout_keeps_5000ms_then_one_1000ms_close(self):
+        from gi.repository import Gio,GLib
+        desktop=Path(__file__).resolve().parents[1]/'services/desktop';sys.path.insert(0,str(desktop))
+        try:from portal_session import ConsentSession
+        finally:sys.path.pop(0)
+        session=ConsentSession.__new__(ConsentSession);session.thread=threading.get_ident();session.bus=self.bus
+        session.cancel=self.value.cancel;session.rpc_cancel=Gio.Cancellable();session.mutex=threading.Lock()
+        session.generation=3;session.closed=False;session.stop_reason=None;session.on_stopped=Mock()
+        session.owners=dict(zip(('org.freedesktop.portal.Desktop','org.freedesktop.impl.portal.desktop.gnome','org.gnome.Shell'),(':1.20',':1.21',':1.7')))
+        session.session='/session';session.request_path=None;session.fd=None;session.subscriptions=[];session.closed_signal=17
+        error=NativeTimeout('PRIVATE NATIVE TIMEOUT')
+        def called(*args):
+            if args[3]=='GetNameOwner':return GLib.Variant('(s)',(session.owners[args[4].unpack()[0]],))
+            if args[3]=='NotifyPointerMotionAbsolute':raise error
+            return GLib.Variant('()',())
+        self.bus.call_sync.side_effect=called;self.value.consent=session;self.consent=session
+        with self.assertRaisesRegex(RuntimeError,'outcome is unknown'):
+            self.value.send('NotifyPointerMotionAbsolute','(oa{sv}udd)',('/session',{},7,100.,50.))
+        calls=self.bus.call_sync.call_args_list;notify=[call for call in calls if call.args[3]=='NotifyPointerMotionAbsolute']
+        self.assertEqual(len(notify),1);self.assertEqual((notify[0].args[7],notify[0].args[8]),(5000,session.rpc_cancel))
+        self.assertEqual([call.args[3] for call in calls],['GetNameOwner']*6+['NotifyPointerMotionAbsolute','Close'])
+        self.assertEqual((calls[-1].args[7],calls[-1].args[8]),(1000,None));self.assertTrue(session.rpc_cancel.is_cancelled())
+        first=self.trace.snapshot()['firstError'];self.assertEqual((first['event'],first['method'],first['timeoutMs']),('rpc','NotifyPointerMotionAbsolute',5000))
+        self.assertEqual(first['error']['code'],24);self.assertEqual(self.value.last_failure['phase'],'dispatch')
+        self.bus.close_sync.assert_called_once_with(None);self.assertTrue(session.closed);self.restored()
+
+    def test_original_native_session_releases_close_bounds_and_cancellation_are_preserved(self):
+        from gi.repository import Gio,GLib
+        desktop=Path(__file__).resolve().parents[1]/'services/desktop';sys.path.insert(0,str(desktop))
+        try:from portal_session import ConsentSession
+        finally:sys.path.pop(0)
+        session=ConsentSession.__new__(ConsentSession);session.thread=threading.get_ident();session.bus=self.bus
+        session.cancel=self.value.cancel;session.rpc_cancel=Gio.Cancellable();session.mutex=threading.Lock()
+        session.generation=3;session.closed=False;session.stop_reason=None;session.on_stopped=Mock()
+        session.owners={self.native.NAME:':1.20'};session.session='/session';session.request_path=None;session.fd=None
+        session.subscriptions=[];session.closed_signal=17
+        self.value.consent=session;self.consent=session;self.value.keys=[29,31];self.value.button=272;self.value.symbol=65
+        session.request_stop('native-session-closed')
+        result=self.value.stop();self.assertTrue(result['stopped']);self.assertEqual(self.value.last_stop_reason,'native-session-closed')
+        calls=self.bus.call_sync.call_args_list
+        self.assertEqual([call.args[3] for call in calls],['NotifyKeyboardKeycode','NotifyKeyboardKeycode','NotifyPointerButton','NotifyKeyboardKeysym','Close'])
+        self.assertEqual([call.args[4].unpack()[2] for call in calls[:-1]],[31,29,272,65])
+        for call in calls:self.assertEqual((call.args[0],call.args[6],call.args[7],call.args[8]),(':1.20',Gio.DBusCallFlags.NO_AUTO_START,1000,None))
+        self.assertTrue(session.closed);self.assertTrue(session.rpc_cancel.is_cancelled());self.bus.close_sync.assert_called_once_with(None)
+        rows=[row for row in self.trace.snapshot()['calls'] if row['event']=='rpc']
+        self.assertEqual(len(rows),5);self.assertEqual([row['dispatchState'] for row in rows],['release']*4+['close'])
+        self.assertTrue(all(row['phase']=='cleanup' and row['pinnedGeneration']==4 for row in rows))
+        self.assertTrue(all(row['destinationOwner']==':1.20' and row['timeoutMs']==1000 and not row['cancellablePresent'] for row in rows))
+        self.assertIsNone(self.value.consent);self.assertIsNone(self.value.kwin);self.restored()
+        self.value.stop();self.assertEqual(self.bus.call_sync.call_count,5);self.assertEqual(self.value.last_stop_reason,'native-session-closed')
+
+
 @unittest.skipUnless(sys.platform.startswith('linux') and Gst is not None,
     'Candidate import regression requires Linux GStreamer introspection.')
 class GnomeInputCandidateImportTests(unittest.TestCase):

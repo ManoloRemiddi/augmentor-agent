@@ -626,3 +626,55 @@ keyboard refusal, first-error retention, sink failure, scope restoration and
 the existing1000ms pinned cleanup once. Source review/publication precedes any
 new action run. No serial/scene fence or timeout relaxation is justified by the
 current evidence.
+
+The October 3 [dispatch-trace source checkpoint](../release/qualification/next-targets/20261003-fedora-gnome-dispatch-trace-source-only.json)
+implements that diagnostic in the owned probe only, awaiting parent source
+review/publication. Optional `--trace-dispatch` defaults off. It composes with
+`--trace-idle-watch` and `--retain-capture-image`, but requests no operation.
+Temporary wrappers on the owning Worker call each original `same_scene`
+predicate once, forward the existing observer/owner/Notify RPCs once, and
+restore module functions and captured bus objects in `finally`. Foreign-thread
+calls delegate without dispatch instrumentation. No disposed object is
+reattached. The trace keeps the latest128 records plus the first comparison,
+first refused comparison and first error independently. Changed-field names
+are capped at64; identities allow only bounded compositor/native numeric,
+boolean and owner metadata. Titles, application names, accessible text, input
+payloads, keycodes/keysyms, native object paths and free-form error messages
+are omitted. A changed title in windows/above is represented by its field name
+only; the actual predicate still ignores only the focused window's title.
+
+Each existing send has operation/method/press-release phase, tracked held-input
+state, controller/consent generation and cancellation metadata. A scene, point
+or owner guard exception outside the original Notify catch is recorded through
+the existing first-failure recorder as `dispatch-guard` and rethrown unchanged.
+It adds no Stop: the original action retains responsibility for held-input
+cleanup. Existing observer, keyboard-target and Notify failure causes still
+win when already recorded. The raw complete/sensitive/editable/password/enabled
+flags and sanitized current/recorded owner/serial identity come from the one
+existing validated helper focus reply, with no additional query. Focus-path
+changes appear only as a changed field name. Constructor/status calls made
+before an existing helper is available are not instrumented by this scoped
+focus wrapper; ordinary failure reporting and disposal still apply.
+
+Actual original Stop releases and Session/Request.Close calls carry pinned
+owners/generation, original flags, cancellable presence, timeout and elapsed
+outcome. Native Notify remains5000ms with its original cancellable; pinned
+cleanup remains1000ms without it. No release, Close, owner lookup, helper query,
+connection, consent, action, capture, retry or keepalive is added. Diagnostic
+sink failures count separately and preserve native replies/exceptions.
+Controller, portal, consent session, observer, helper, capture/scene/Worker and
+target fixture bytes remain exactly0ab. Selected/native artifacts and production
+GNOME discovery/input flags are unchanged. The v4 center partial delivery/API
+refusal and the unexplained v2 native timeout remain failures.
+
+The48 probe cases and129 focused Python cases pass, alongside the previously
+unchanged five observer Node cases. New cases exercise the actual maintained
+sender, original comparison delegation once, serial-only release refusal,
+scene guard/owner loss, sensitive/password and focus-path refusal, unchanged
+per-character helper/press/release counts and verified false, first-failure
+retention, actual native5000ms timeout followed by one1000ms Close, original
+held-input release order and Stop cause, sink failures, foreign-thread scope,
+and restoration after refusal/disposal. These are source checks with synthetic
+native endpoints, not a new guest execution or input acceptance. A distinct
+fresh11-file candidate with the reviewed probe and ten exact0ab files must be
+published and explicitly authorized before another owned VM run.
