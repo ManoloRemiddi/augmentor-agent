@@ -9,9 +9,10 @@ explicit Leap 16.0/RPM and dated Arch/ALPM candidates. It imports no application
 code and reads no user homes. Existing Debian and Fedora packages keep their
 current hooks. [Full native application candidates and installed lifecycle](LINUX-SYSTEM-QT-PACKAGES.md)
 now pass in fresh disposable fixtures, including actual Desktop/runtime leases,
-reinstall/removal and complete inventory checks. Installer guard bootstrap,
-coherent dependency maintenance and interrupted real-reboot recovery remain
-required before either adapter enters the complete installer matrix.
+reinstall/removal and complete inventory checks. Complete installer guard bootstrap and read-only outcome verification now have
+[source adapters](LINUX-SYSTEM-QT-PACKAGES.md#complete-installer-adapters-fresh-execution-pending).
+Fresh matching whole-bundle execution, coherent dependency maintenance and
+interrupted real-reboot recovery remain required for release acceptance.
 
 The [checked source proof](../release/qualification/next-targets/20261002-joint-package-guard-source.json)
 records exact working files and actual Arch/Leap native suites: **699 tests,

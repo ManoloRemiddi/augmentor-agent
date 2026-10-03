@@ -8,10 +8,12 @@ Offscreen rendering and adapter turns do not qualify a graphical browser/session
 import argparse
 import hashlib
 import http.server
+import importlib.util
 import json
 import os
 from pathlib import Path
 import signal
+import shutil
 import socket
 import subprocess
 import sys
@@ -55,7 +57,9 @@ def user_proof(bundle):
     os.environ.update(AUGMENTOR_FIXTURE_KEY='qualification-fixture', QT_QPA_PLATFORM='offscreen',
                       XDG_RUNTIME_DIR=str(home/'runtime'), PATH=str(node.parent)+':'+os.environ['PATH'])
     Path(os.environ['XDG_RUNTIME_DIR']).mkdir(mode=0o700, exist_ok=True)
-    command = ['/usr/bin/python3', bundle/'setup.py', '--bundle', bundle, '--skip-packages', '--no-services',
+    manifest=json.loads((bundle/'bundle.json').read_text())
+    bootstrap='/usr/bin/python3.13' if manifest['target']=='opensuse-leap16.0-x86_64' else '/usr/bin/python3'
+    command = [bootstrap, '-B', bundle/'setup.py', '--bundle', bundle, '--skip-packages', '--no-services',
                '--non-interactive', '--model-url', f'http://127.0.0.1:{server.server_port}/v1', '--model', 'fixture',
                '--api-key-env', 'AUGMENTOR_FIXTURE_KEY', '--port', str(port)]
     process = None
@@ -182,23 +186,39 @@ def main():
     assert os.geteuid() == 0
     if Path('/usr/lib/augmentor/release.json').exists():
         raise ValueError('Use a fresh container without an installed Augmentor payload; equal package versions can mask another source revision.')
-    plan = json.loads(subprocess.check_output(['/usr/bin/python3', str(bundle/'setup.py'), '--bundle', str(bundle), '--plan'], text=True))
+    manifest=json.loads((bundle/'bundle.json').read_text())
+    bootstrap='/usr/bin/python3.13' if manifest['target']=='opensuse-leap16.0-x86_64' else '/usr/bin/python3'
+    plan = json.loads(subprocess.check_output([bootstrap, '-B', str(bundle/'setup.py'), '--bundle', str(bundle), '--plan'], text=True))
     command = plan['system']['command']
-    assert command[:2] in (['sudo', 'apt'], ['sudo', 'dnf'])
+    assert command[:2] in (['sudo', 'apt'], ['sudo', 'dnf'], ['sudo','pacman'],['sudo','zypper'])
     if command[1] == 'apt':
         run(['apt-get', 'update', '-qq'])
         run(['apt-get', 'install', '-y', '--no-install-recommends', 'passwd', 'util-linux'])
-    else:
+    elif command[1]=='dnf':
         run(['dnf', 'install', '-y', 'shadow-utils', 'util-linux'])
+    elif not shutil.which('useradd') or not shutil.which('runuser'):
+        helpers=(['pacman','-S','--needed','--noconfirm','shadow','util-linux'] if command[1]=='pacman'
+                 else ['zypper','--non-interactive','install','--no-recommends','shadow','util-linux'])
+        run(helpers)
     # The actual installer runs as a fresh ordinary user below; root performs
     # only the exact package plan, avoiding a sudo dependency in minimal images.
-    run(command[1:])
+    for index,command in enumerate(plan['system']['commands']):
+        if plan['system']['guardVerificationBeforeApplication'] and index==len(plan['system']['commands'])-1:
+            spec=importlib.util.spec_from_file_location('fixture_independent_verifier',bundle/'linux-package-verification.py')
+            verifier=importlib.util.module_from_spec(spec);spec.loader.exec_module(verifier)
+            verifier.verify_guard(manifest,bundle)
+        native=command[1:]
+        if native[0]=='zypper':
+            # Own checksum-verified private candidate RPM only; upstream repo
+            # signature policy remains intact. This flag is fixture-only.
+            native=native[:3]+['--allow-unsigned-rpm']+native[3:]
+        run(native)
     manifest = json.loads((bundle/'bundle.json').read_text())
     release = json.loads(Path('/usr/lib/augmentor/release.json').read_text())
     assert release['source'] == {'commit': manifest['sourceCommit'], 'dirty': False}
     assert release['version'] == manifest['version']
     run(['useradd', '-m', '-s', '/bin/sh', 'augmentor-complete-proof'])
-    run(['runuser', '-u', 'augmentor-complete-proof', '--', '/usr/bin/python3', Path(__file__).resolve(), '--bundle', bundle, '--user-phase'])
+    run(['runuser', '-u', 'augmentor-complete-proof', '--', bootstrap, '-B', Path(__file__).resolve(), '--bundle', bundle, '--user-phase'])
     report = json.loads(Path('/home/augmentor-complete-proof/complete-proof.json').read_text())
     report['systemPlan'] = plan['system']
     a.out.write_text(json.dumps(report, indent=2)+'\n')

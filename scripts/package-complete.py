@@ -3,12 +3,14 @@
 """Assemble a target-specific fresh-user Linux bundle from reviewed artifacts."""
 import argparse
 import hashlib
+import importlib.util
 import json
 from pathlib import Path
 import shutil
 import subprocess
 import tarfile
-from linux_distribution import TARGETS,package_files,python_runtime_contract,NOBLE
+import tempfile
+from linux_distribution import TARGETS,package_files,python_runtime_contract,bootstrap_python,NOBLE,ARCH,LEAP,arch_guard_package
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -48,11 +50,64 @@ def reuse_sources(bundle, destination):
     return refs,{'artifactId':manifest['artifactId'],'manifestSha256':sha(bundle/'bundle.json')}
 
 
+def load(path):
+    spec=importlib.util.spec_from_file_location(path.stem.replace('-','_'),path)
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
+
+
+def checked_native_artifacts(package_root):
+    declared=json.loads((package_root/'artifacts.json').read_text())
+    if declared.get('format')!='augmentor-system-qt-native-artifacts/1' or len(declared.get('artifacts',[]))!=1:
+        raise ValueError('Use the complete streaming-verified native package manifest.')
+    row=declared['artifacts'][0]
+    if not isinstance(row.get('file'),str) or Path(row['file']).name!=row['file']:
+        raise ValueError('Unsafe native package filename.')
+    inspector=load(ROOT/'scripts/inspect-system-qt-package.py')
+    with tempfile.TemporaryDirectory(prefix='augmentor-native-bundle-check-') as directory:
+        actual=inspector.inspect(package_root,package_root/row['file'],Path(directory)/'artifacts.json')
+    if actual!=declared:
+        raise ValueError('The native manifest or inspector/preparation identity differs; re-inspect this exact artifact.')
+    preparation=json.loads((package_root/'preparation.json').read_text())
+    if preparation.get('packagingRecipeSha256')!=sha(ROOT/'scripts/package-system-qt.py'):
+        raise ValueError('Rebuild native recipe inputs with the current reviewed package preparer.')
+    return actual
+
+
+def checked_arch_guard(path):
+    if path.name!='augmentor-package-guard-0.2.13-2-any.pkg.tar.zst' or path.is_symlink():
+        raise ValueError('Use the exact independent Arch guard candidate.')
+    inspector=load(ROOT/'scripts/inspect-system-qt-package.py')
+    verifier=load(ROOT/'scripts/linux-package-verification.py')
+    references={key:ROOT/('release/linux-package-guard.py' if relative=='linux-package-guard.py'
+                              else 'release/arch/guard/'+Path(relative).name) for key,relative in verifier.GUARD_FILES.items()}
+    references['/usr/share/licenses/augmentor-package-guard/LICENSE']=ROOT/'LICENSE'
+    expected={key.lstrip('/'):{'type':'file','sha256':sha(source),'mode':0o644} for key,source in references.items()}
+    before=sha(path)
+    with subprocess.Popen(['zstd','-dc',str(path)],stdout=subprocess.PIPE,stderr=subprocess.PIPE) as process:
+        try:records,captured=inspector.tar_records(process.stdout)
+        except BaseException:
+            process.kill();process.communicate();raise
+        _,errors=process.communicate()
+        if process.returncode:raise ValueError('Cannot read the native guard artifact: '+errors.decode(errors='replace')[-1000:])
+    fields={}
+    for row in captured['.PKGINFO'].decode().splitlines():
+        if ' = ' in row:
+            name,value=row.split(' = ',1);fields.setdefault(name,[]).append(value)
+    if fields.get('pkgname')!=['augmentor-package-guard'] or fields.get('pkgver')!=['0.2.13-2'] or fields.get('arch')!=['any']:
+        raise ValueError('Independent guard native metadata differs.')
+    for name in ('.PKGINFO','.BUILDINFO','.MTREE'):records.pop(name,None)
+    if records!=expected or sha(path)!=before:
+        raise ValueError('Independent guard artifact bytes/modes/members differ from the reviewed public controls.')
+    return {'file':path.name,'name':'augmentor-package-guard','versionRelease':'0.2.13-2','architecture':'any'}
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     packages=p.add_mutually_exclusive_group(required=True)
     packages.add_argument('--debian',type=Path,help='Debian/Ubuntu package artifacts.')
     packages.add_argument('--fedora',type=Path,help='Fedora RPM artifacts.')
+    packages.add_argument('--system-qt',type=Path,help='Prepared native build directory and streaming-verified artifacts.json.')
+    p.add_argument('--arch-guard',type=Path,help='Separately built and checked independent Arch guard package.')
     p.add_argument('--target',choices=tuple(TARGETS),default='debian13-amd64')
     for name in ('browser','voice','adaptive','model-picker','out'):
         p.add_argument('--'+name,type=Path,required=True)
@@ -65,15 +120,21 @@ def main():
     if out.exists() and any(out.iterdir()):raise ValueError('Use an empty output directory.')
     out.mkdir(parents=True)
     product=json.loads((ROOT/'release/product.json').read_text());version=product['version']
-    package_root=a.debian or a.fedora
-    deb=json.loads((package_root/'artifacts.json').read_text());browser=json.loads((a.browser/'artifacts.json').read_text())
+    package_root=(a.debian or a.fedora or a.system_qt).resolve()
+    deb=checked_native_artifacts(package_root) if a.system_qt else json.loads((package_root/'artifacts.json').read_text())
+    browser=json.loads((a.browser/'artifacts.json').read_text())
     ref=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
     if any(m['source']['dirty'] or m['source']['commit']!=ref or m['version']!=version for m in (deb,browser)):
         raise ValueError('Desktop and browser artifacts must come from this clean source commit.')
-    if a.fedora and deb['target']!=a.target:
-        raise ValueError('The RPM target differs from the requested complete bundle target.')
+    if (a.fedora or a.system_qt) and deb['target']!=a.target:
+        raise ValueError('The native artifact target differs from the requested complete bundle target.')
     if a.debian and TARGETS[a.target][2]!='apt':
-        raise ValueError('A Fedora complete bundle requires its matching RPM artifacts.')
+        raise ValueError('This native complete bundle requires its matching native package artifacts.')
+    if bool(a.system_qt)!=(a.target in (ARCH,LEAP)):
+        raise ValueError('Arch/Leap require their exact streaming-inspected native artifact inputs.')
+    if bool(a.arch_guard)!=(a.target==ARCH):
+        raise ValueError('Only Arch requires its separately checked guard artifact.')
+    guard=checked_arch_guard(a.arch_guard.absolute()) if a.arch_guard else None
     runtime_contract=python_runtime_contract(deb,a.target)
     if a.target==NOBLE and deb.get('target')!=NOBLE:
         raise ValueError('The Noble complete bundle requires its matching Noble packages.')
@@ -83,6 +144,7 @@ def main():
         path=package_root/item['file']
         if sha(path)!=item['sha256']:raise ValueError('Debian artifact hash differs.')
         shutil.copy2(path,out/path.name)
+    if guard is not None:shutil.copy2(a.arch_guard,out/guard['file'])
     path=a.browser/browser['artifact']
     if sha(path)!=browser['sha256']:raise ValueError('Browser artifact hash differs.')
     shutil.copy2(path,out/path.name)
@@ -102,6 +164,12 @@ def main():
     shutil.copy2(ROOT/'scripts/setup-complete.py',out/'setup.py')
     shutil.copy2(ROOT/'scripts/linux_distribution.py',out/'linux_distribution.py')
     shutil.copy2(ROOT/'scripts/linux-source-qt.py',out/'linux-source-qt.py')
+    shutil.copy2(ROOT/'scripts/linux-system-qt.py',out/'linux-system-qt.py')
+    shutil.copy2(ROOT/'scripts/linux-package-verification.py',out/'linux-package-verification.py')
+    shutil.copy2(ROOT/'release/linux-package-guard.py',out/'linux-package-guard.py')
+    (out/'arch-guard').mkdir()
+    for name in ('PKGBUILD','can-remove.py','augmentor-agent-pre.hook','augmentor-agent-post.hook','augmentor-guard-remove.hook'):
+        shutil.copy2(ROOT/'release/arch/guard'/name,out/'arch-guard'/name)
     shutil.copy2(ROOT/'docs/COMPLETE-INSTALL.md',out/'INSTALL.md')
     shutil.copy2(ROOT/'LICENSE',out/'LICENSE')
     sources=out/'sources';sources.mkdir()
@@ -112,13 +180,18 @@ def main():
     else:
         refs.update(voice=source_archive(a.voice_source,sources/'resonant-voice-0.1.19-source.tar.gz'),
                     adaptive=source_archive(a.adaptive_source,sources/'adaptive-reasoning-0.2.3-source.tar.gz'))
-    script='#!/bin/sh\n# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0\nset -eu\ncd -- "$(dirname -- "$0")"\nsha256sum -c SHA256SUMS\nexec /usr/bin/python3 ./setup.py --bundle "$PWD" "$@"\n'
+    bootstrap=bootstrap_python(a.target)
+    script='#!/bin/sh\n# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0\nset -eu\ncd -- "$(dirname -- "$0")"\nsha256sum -c SHA256SUMS\nexec '+bootstrap+' ./setup.py --bundle "$PWD" "$@"\n'
     (out/'install.sh').write_text(script);(out/'install.sh').chmod(0o755)
     hashes={str(f.relative_to(out)):sha(f) for f in sorted(out.rglob('*')) if f.is_file()}
     manifest={'format':'augmentor-complete/1','artifactId':version+'-'+a.target+'-complete-preview.1-'+ref[:12],
               'version':version,'sourceCommit':ref,'sourceRefs':refs,'target':a.target,'components':components,'packages':package_names,
               'plugins':plugins,'browser':browser['artifact'],'extensionId':browser['extensionId'],'sha256':hashes}
     if runtime_contract is not None:manifest.update(pythonRuntime=runtime_contract,candidateOnly=True)
+    if a.system_qt:manifest['nativePackage']=deb['package']
+    if guard is not None:
+        manifest['guardPackage']=guard
+        arch_guard_package(manifest)
     if source_bundle is not None:manifest['sourceSnapshotBundle']=source_bundle
     (out/'bundle.json').write_text(json.dumps(manifest,indent=2)+'\n');hashes['bundle.json']=sha(out/'bundle.json')
     (out/'SHA256SUMS').write_text(''.join(value+'  '+name+'\n' for name,value in sorted(hashes.items())))

@@ -3,7 +3,8 @@
 Arch/Leap remain runtime candidates, with a new [pinned system Python/Qt inventory](LINUX-SYSTEM-QT-STACK.md).
 Their [full native application packages and installed lifecycle](LINUX-SYSTEM-QT-PACKAGES.md)
 now have private container acceptance, including cold Node admission. Complete
-target installers and real desktop acceptance remain open; these candidates are
+target installer adapters are implemented, with fresh matching complete bundle
+execution and real desktop acceptance still open; these candidates are
 not downloadable compatibility releases.
 
 # Install Desktop, Browser and their shared components
@@ -76,6 +77,29 @@ The clean7b6df59 source-runtime runtime/desktop packages now have actual
 including cold Browser selection, offscreen Desktop, synthetic Qt and CPU VAD.
 The source candidate still lacks complete connected-product, native-session,
 graphical Browser, physical audio, upgrade and legal/release acceptance.
+
+## Arch and Leap private installer candidates
+
+The [native package/installer guide](LINUX-SYSTEM-QT-PACKAGES.md#complete-installer-adapters-fresh-execution-pending)
+and [exact adapter checkpoint](../release/qualification/next-targets/20261003-system-qt-installer-adapters.json)
+record source implementation and ordinary-user read-only outcome verification.
+Matching new complete artifacts and fresh full installer/resume execution remain
+required. No Arch/Leap compatibility download is published.
+
+Candidate plans use pacman on the dated Arch snapshot and zypper on Leap16.0.
+Arch's independent guard is installed and verified in its own prior transaction;
+application installation follows only after its hooks and controls pass. Package
+manager success alone is insufficient: both targets require matching registered
+payload identity, complete application inventory, native audit and settled
+maintenance before private configuration. Completed setup repeats those checks.
+
+Leap bootstrap is explicitly Python3.13. Native npm runs under bundled Node,
+with an actual engine-range check and a wrapper confined to the fresh private
+installation. Base certificates and optional voice/GPU/Docker providers remain
+separate per distro. Leap audio utility dependencies can add a server provider
+through the solver even with no-recommends; graphical/physical audio acceptance
+remains a separate gate. These source candidates preserve the approved UI and
+leave owner deployments/services/models/devices unchanged.
 
 ## Included and configured
 

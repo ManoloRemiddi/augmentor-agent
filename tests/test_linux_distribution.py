@@ -23,7 +23,11 @@ setup=module('setup-complete')
 
 def manifest(target):
     version='0.2.13'
-    if target.startswith('fedora'):
+    if target==distro.ARCH:
+        names=[f'augmentor-agent-{version}-1-x86_64.pkg.tar.zst']
+    elif target==distro.LEAP:
+        names=[f'augmentor-agent-{version}-1.leap16.x86_64.rpm']
+    elif target.startswith('fedora'):
         release=target.split('-')[0].removeprefix('fedora')
         names=[f'augmentor-agent-{version}-1.fc{release}.x86_64.rpm']
     else:
@@ -34,6 +38,14 @@ def manifest(target):
         value['pythonRuntime']={'format':'augmentor-linux-python-runtime-contract/1','target':target,
             'profile':'noble-cp312-x86_64-voice','pythonAbi':[3,12],'architecture':'x86_64',
             'policySha256':'a'*64,'lockIdentity':'b'*64}
+    if target in (distro.ARCH,distro.LEAP):
+        value['nativePackage']={'name':'augmentor-agent','versionRelease':version+'-1'+('.leap16' if target==distro.LEAP else ''),'architecture':'x86_64'}
+        runtime=module('linux-python-runtime')
+        policy=ROOT/'release'/('arch20261001-python-voice.json' if target==distro.ARCH else 'opensuse-leap16.0-python-voice.json')
+        value['pythonRuntime']=runtime.contract(runtime.policy(policy),runtime.digest(policy))
+    if target==distro.ARCH:
+        value['guardPackage']={'file':'augmentor-package-guard-0.2.13-2-any.pkg.tar.zst','name':'augmentor-package-guard','versionRelease':'0.2.13-2','architecture':'any'}
+        value['sha256'][value['guardPackage']['file']]=hashlib.sha256(b'guard fixture').hexdigest()
     return value
 
 
@@ -47,8 +59,15 @@ class DistributionPlans(unittest.TestCase):
         for target,(name,version,manager,_) in distro.TARGETS.items():
             value=distro.install_plan(manifest(target),'/bundle with spaces',info={'ID':name,'VERSION_ID':version},machine='x86_64')
             self.assertEqual(value['target'],target)
-            self.assertEqual(value['command'][:4],['sudo',manager,'install','-y'])
-            self.assertEqual(len(value['packages']),1 if manager=='dnf' else 2)
+            if manager=='pacman':
+                self.assertEqual(value['command'][:4],['sudo','pacman','-U','--noconfirm'])
+                self.assertEqual(len(value['commands']),3)
+                self.assertTrue(value['guardVerificationBeforeApplication'])
+            elif manager=='zypper':
+                self.assertEqual(value['command'][:5],['sudo','zypper','--non-interactive','install','--no-recommends'])
+                self.assertEqual(value['bootstrapPython'],'/usr/bin/python3.13')
+            else:self.assertEqual(value['command'][:4],['sudo',manager,'install','-y'])
+            self.assertEqual(len(value['packages']),2 if manager=='apt' else 1)
             for name in value['packages']:self.assertIn('/bundle with spaces/'+name,value['command'])
 
     def test_derivatives_older_releases_and_other_architectures_fail_closed(self):
@@ -71,6 +90,34 @@ class DistributionPlans(unittest.TestCase):
                 with self.assertRaises(ValueError):distro.python_runtime_contract(broken,distro.NOBLE)
         with self.assertRaises(ValueError):distro.python_runtime_contract({},distro.NOBLE)
         with self.assertRaises(ValueError):distro.python_runtime_contract(value,'debian13-amd64')
+
+    def test_arch_and_leap_contract_cannot_borrow_another_abi_stack_or_license_claim(self):
+        for target in (distro.ARCH,distro.LEAP):
+            value=manifest(target)
+            for key,replacement in [('target',distro.NOBLE),('profile','noble-cp312-x86_64-voice'),
+                                    ('pythonAbi',[3,12]),('licenseReviewComplete',True),
+                                    ('embeddedSourceCoverageComplete',True)]:
+                broken={**value,'pythonRuntime':{**value['pythonRuntime'],key:replacement}}
+                with self.subTest(target=target,key=key),self.assertRaises(ValueError):
+                    distro.python_runtime_contract(broken,target)
+            broken={**value,'pythonRuntime':{**value['pythonRuntime'],'systemQtStack':
+                     {**value['pythonRuntime']['systemQtStack'],'qtVersion':'unqualified'}}}
+            with self.assertRaises(ValueError):distro.python_runtime_contract(broken,target)
+
+    def test_native_package_or_independent_guard_identity_cannot_be_omitted_or_mixed(self):
+        for target in (distro.ARCH,distro.LEAP):
+            value=manifest(target)
+            for package in (None,{**value['nativePackage'],'architecture':'aarch64'},
+                            {**value['nativePackage'],'versionRelease':'0.2.12-1'}):
+                with self.subTest(target=target,package=package),self.assertRaises(ValueError):
+                    distro.native_package_contract({**value,'nativePackage':package},target)
+        value=manifest(distro.ARCH)
+        for guard in (None,{**value['guardPackage'],'architecture':'x86_64'},
+                      {**value['guardPackage'],'versionRelease':'0.2.13-1'}):
+            with self.subTest(guard=guard),self.assertRaises(ValueError):
+                distro.arch_guard_package({**value,'guardPackage':guard})
+        broken={**value,'sha256':{name:sha for name,sha in value['sha256'].items() if name!=value['guardPackage']['file']}}
+        with self.assertRaises(ValueError):distro.arch_guard_package(broken)
 
     def test_legacy_debian_bundle_without_explicit_package_list_is_supported(self):
         value=manifest('debian13-amd64');value.pop('packages')

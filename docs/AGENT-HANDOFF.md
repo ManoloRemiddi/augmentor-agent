@@ -2,6 +2,26 @@
 
 # Start here: agent handoff
 
+## October 3 Arch/Leap complete installer source adapters
+
+[The adapter checkpoint](../release/qualification/next-targets/20261003-system-qt-installer-adapters.json)
+records explicit native package/runtime contracts, separate verified Arch guard
+installation, full post-manager/repeat outcome checks, exact Python3.13 bootstrap,
+bundled-Node native npm/engine checks and checked native artifact/guard bundle
+inputs. The independent read-only verifier passes as ordinary UID1002 on both
+exact installed release1 candidates, without importing installed application code
+or beginning/finalizing maintenance. Thirty-three focused contract/setup/guard/npm
+failure/packaging cases pass. [The owning guide](LINUX-SYSTEM-QT-PACKAGES.md)
+distinguishes those checks from a fresh complete installer run.
+
+Official provider/file research supplies base and optional packages; native solver
+plans are read-only. Leap explicitly adds the Mozilla CA trust package and uses
+versioned npm/Python paths. Its audio utility can select a server provider even
+with no-recommends. Actual Leap npm engine execution, matching new clean Desktop/
+Browser/native bundles, full root/user setup/resume and other release gates remain
+open. All five rollout points stay active; owner state and22 license files remain
+unchanged.
+
 ## October 3 complete native artifact inspection
 
 [The streaming inspection checkpoint](../release/qualification/next-targets/20261003-system-qt-streaming-inspection.json)

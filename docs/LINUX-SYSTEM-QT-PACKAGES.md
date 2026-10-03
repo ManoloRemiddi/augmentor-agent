@@ -192,11 +192,53 @@ the generated spec in `SPECS`, then use ordinary-user `rpmbuild -bb --define
 native metadata and complete payload after each new build; do not relabel an old
 inspection as qualification of new bytes.
 
+## Complete installer adapters; fresh execution pending
+
+[The complete installer checkpoint](../release/qualification/next-targets/20261003-system-qt-installer-adapters.json)
+records explicit Arch/Leap package and managed-runtime contracts, target-specific
+native dependency commands and full bundle assembly inputs. The native producer
+requires a fresh streaming inspection and current preparer identity, then matching
+clean Desktop/Browser source. Arch additionally checks the guard archive's exact
+public controls, modes and native identity; no install script or extra member is
+admitted. Only five named public reference files are copied into the bundle.
+
+Arch installs dependencies, then its guard in a separate transaction. The
+[read-only verifier](../scripts/linux-package-verification.py) checks registered
+guard identity, exact root-owned files, effective default HookDir, absence of
+masked hooks and native package audit before application installation. It never
+begins maintenance: application hooks must acquire their own intent. After either
+native package manager runs, setup requires settled durable/volatile state,
+registered package/source/target/product identity, full app inventory and native
+file audit. Completed user stamps also repeat these checks and immutable runtime
+verification, rather than bypassing an unresolved or changed installation.
+
+That independent verifier actually passes as ordinary UID1002 on both recorded
+installed release1 candidates. It imports only the separate checked public guard;
+no installed application code is imported during outcome verification. Thirty-three
+focused distribution/setup/guard/npm failure and Debian regression cases pass.
+These checks are not execution of a newly assembled complete bundle.
+
+Leap uses /usr/bin/python3.13 in install.sh, optional voice bootstrap and leased
+DSH service. Native npm CLI paths are explicit: /usr/lib/node_modules/npm/bin/npm-cli.js
+on Arch and /usr/lib64/node_modules/npm24/bin/npm-cli.js on Leap. Bundled Node
+executes that CLI and its actual semver engine check before npm ci. A generic npm
+wrapper exists only in the fresh private install for nested DSH plugin commands;
+no system npm alias or owner PATH is changed. The dependency research verifies
+Arch npm12.2.0 supports Node24.19. Leap's actual installed npm check is still pending.
+
+Base and optional native providers come from dated official metadata and read-only
+native solver plans. Leap explicitly needs ca-certificates-mozilla for public CA
+trust. Its pulseaudio-utils hard dependency can select PipeWire/Pulse and
+WirePlumber even with --no-recommends; that solver behavior is recorded, not
+qualified physical audio. Optional voice/GPU/Docker tools remain explicit choices.
+Their installation, compiler/model/service/device acceptance is separate.
+
 ## Remaining acceptance
 
-The complete bundle still needs Arch/Leap target/runtime contracts, verified guard
-installation order, explicit bootstrap propagation, matching npm24 selection and
-installed/resumed setup checks. Inspect native dependency solver plans before
+Arch/Leap source adapters now provide target/runtime contracts, checked guard
+ordering, explicit bootstrap and native npm selection. Matching new clean bundle
+assembly and actual installed/resumed complete setup checks remain required.
+Inspect native dependency solver plans before
 changing owned fixtures; preserve frozen Qt/Python manifests and runtime receipts.
 Any drift needs a new candidate rather than refreshing old inventory.
 

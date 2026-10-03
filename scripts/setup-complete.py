@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 import re
 import secrets
+import shlex
 import shutil
 import signal
 import socket
@@ -61,7 +62,7 @@ def model_settings(url, model, context):
              'agent-default-model':{'provider':'augmentor-model','model':model}}
 
 
-def verify_installed_payload(app, manifest):
+def verify_installed_payload(app, manifest, bundle=None):
     """Package managers may retain an older payload with the same version."""
     try:
         release=json.loads((app/'release.json').read_text())
@@ -69,9 +70,16 @@ def verify_installed_payload(app, manifest):
         raise ValueError('The installed Augmentor release identity is missing or invalid. Install the matching bundle package before continuing.') from None
     if not isinstance(release,dict) or release.get('version')!=manifest['version'] or release.get('source')!={'commit':manifest['sourceCommit'],'dirty':False}:
         raise ValueError('The installed Augmentor package does not match this bundle source and version. Use the documented package/update workflow to install its matching payload before continuing; a same-version package may have been retained.')
-    if manifest.get('target')==distribution.NOBLE:
-        if release.get('target')!=distribution.NOBLE or release.get('pythonRuntime')!=manifest.get('pythonRuntime'):
-            raise ValueError('The installed Noble package differs from this complete bundle runtime contract.')
+    target=manifest.get('target')
+    if target in distribution.MANAGED_TARGETS:
+        distribution.python_runtime_contract(manifest,target)
+        if release.get('target')!=target or release.get('pythonRuntime')!=manifest.get('pythonRuntime'):
+            raise ValueError('The installed package differs from this complete bundle runtime contract.')
+    if target in (distribution.ARCH,distribution.LEAP):
+        distribution.native_package_contract(manifest,target)
+        if target==distribution.ARCH:distribution.arch_guard_package(manifest)
+        verifier=load(Path(__file__).with_name('linux-package-verification.py'))
+        verifier.verify_payload(manifest,app,bundle)
 
 
 def environment_value(value):
@@ -95,17 +103,46 @@ def prepare_python(app, data, target, runtime_contract=None):
         runtime=load(app/'scripts/linux-python-runtime.py')
         value=runtime.policy(marker)
         if value['target']!=target:raise ValueError('The Python runtime policy differs from the bundle target.')
-        if target==distribution.NOBLE:
+        if target in distribution.MANAGED_TARGETS:
             distribution.python_runtime_contract({'pythonRuntime':runtime_contract},target)
             if runtime_contract!=runtime.contract(value,runtime.digest(marker)):
                 raise ValueError('The installed Python runtime policy differs from the complete bundle contract.')
         receipt=runtime.prepare(value,app/'python-wheels',runtime.runtime_store())
         return Path(receipt['python'])
-    if target=='ubuntu24.04-amd64':raise ValueError('The Noble package lacks its required Python runtime policy.')
+    if target in distribution.MANAGED_TARGETS:raise ValueError('This target lacks its required Python runtime policy.')
     python=data/'python/bin/python'
-    if not python.exists():run('/usr/bin/python3','-m','venv','--system-site-packages',data/'python')
+    if not python.exists():run(distribution.bootstrap_python(target),'-m','venv','--system-site-packages',data/'python')
     run(python,'-m','pip','install','--disable-pip-version-check','sounddevice==0.5.2')
     return python
+
+
+def npm_environment(target, app, data, env):
+    """Keep bundled Node authoritative even for versioned distro npm commands."""
+    paths={distribution.ARCH:'/usr/lib/node_modules/npm/bin/npm-cli.js',
+           distribution.LEAP:'/usr/lib64/node_modules/npm24/bin/npm-cli.js'}
+    if target not in paths:return env,['npm']
+    cli=Path(paths[target])
+    info=cli.stat()
+    if not cli.is_file() or info.st_uid!=0 or info.st_mode & 0o022:
+        raise ValueError('Install the matching checked distro npm CLI before setup.')
+    node=app/'node/bin/node'
+    command=[str(node),str(cli)]
+    # DSH plugin installation may itself spawn generic npm. Scope this wrapper
+    # to the fresh private install; never write a system npm or alter a user PATH.
+    directory=data/'installer-bin';path=directory/'npm'
+    content='#!/bin/sh\nexec '+' '.join(shlex.quote(value) for value in command)+' "$@"\n'
+    if path.is_symlink() or (path.exists() and path.read_text()!=content):
+        raise ValueError('The private installer npm command differs; review the partial installation.')
+    probe="""const root=process.argv[1];
+const p=require(root+'/package.json');const semver=require(root+'/node_modules/semver');
+if(!p.engines||!semver.satisfies(process.versions.node,p.engines.node))
+  throw new Error('The distro npm CLI does not support this bundled Node version.');
+console.log(JSON.stringify({npm:p.version,node:process.versions.node,engines:p.engines.node,cli:root+'/bin/npm-cli.js'}));"""
+    result=run(node,'-e',probe,cli.parent.parent,env=env,capture_output=True,text=True)
+    info=json.loads(result.stdout)
+    if not path.exists():write(path,content,0o700)
+    write(directory/'npm-runtime.json',json.dumps(info,indent=2)+'\n')
+    return {**env,'PATH':str(directory)+os.pathsep+env['PATH']},command
 
 
 def configure_product(app, cli, home, endpoint, env, state, *, save=True):
@@ -170,9 +207,9 @@ def install(args):
     record=json.loads(stamp.read_text()) if stamp.exists() else {}
     resumable=record.get('bundle')==manifest['artifactId'] and record.get('status')=='preparing'
     if record.get('bundle')==manifest['artifactId'] and record.get('status')=='installed':
-        if manifest.get('target')==distribution.NOBLE:
-            app=args.app_root.resolve()
-            verify_installed_payload(app,manifest)
+        app=args.app_root.resolve()
+        verify_installed_payload(app,manifest,bundle)
+        if manifest.get('target') in distribution.MANAGED_TARGETS:
             runtime=load(app/'scripts/linux-python-runtime.py')
             marker=app/'linux-python-runtime.json';value=runtime.policy(marker)
             if manifest.get('pythonRuntime')!=runtime.contract(value,runtime.digest(marker)):
@@ -211,9 +248,15 @@ def install(args):
     state.mkdir(parents=True,exist_ok=True,mode=0o700)
     write(stamp,json.dumps({'bundle':manifest['artifactId'],'status':'preparing'})+'\n')
     if not args.skip_packages:
-        run(*package_plan['command'])
+        for index,command in enumerate(package_plan['commands']):
+            # The app must not share the guard's first installation transaction.
+            # Read-only verification after that transaction precedes app hooks.
+            if package_plan['guardVerificationBeforeApplication'] and index==len(package_plan['commands'])-1:
+                verifier=load(Path(__file__).with_name('linux-package-verification.py'))
+                verifier.verify_guard(manifest,bundle)
+            run(*command)
     app=args.app_root.resolve();node=app/'node/bin/node'
-    verify_installed_payload(app,manifest)
+    verify_installed_payload(app,manifest,bundle)
     python=prepare_python(app,data,manifest.get('target'),manifest.get('pythonRuntime'))
     runtime=data/'dsh-runtime';runtime.mkdir(parents=True,exist_ok=True)
     env={**os.environ,'AUGMENTOR_PYTHON':str(python),
@@ -226,7 +269,8 @@ def install(args):
     # shared lock. Older published bundles retain their registry-only graph.
     if (bundle/'dsh/plugins').is_dir():
         shutil.copytree(bundle/'dsh/plugins',runtime/'plugins',dirs_exist_ok=True)
-    run('npm','ci','--prefix',runtime,'--ignore-scripts','--omit=dev','--no-audit','--no-fund',env=env)
+    env,npm=npm_environment(manifest.get('target'),app,data,env)
+    run(*npm,'ci','--prefix',runtime,'--ignore-scripts','--omit=dev','--no-audit','--no-fund',env=env)
     cli=runtime/'node_modules/.bin/dsh';home=data/'dsh-home';home.mkdir(parents=True,exist_ok=True,mode=0o700)
     env.update(DSH_HOME=str(home),DSH_TELEMETRY_MODE='DISABLED',AUGMENTOR_MODEL_API_KEY=secret)
     env['PATH']=str(cli.parent)+':'+env['PATH']
@@ -251,7 +295,7 @@ def install(args):
         run(cli,'plugin','--profile','web','add',bundle/name,'--ignore-scripts','--config.auto-install-peers=false',env=env,stdout=subprocess.DEVNULL)
     voice=home/'profiles/web/node_modules/dsh-resonant-voice'
     if args.voice:
-        command=['/usr/bin/python3',voice/'bin/setup-linux.py','--node',node,'--accept-model-license']
+        command=[distribution.bootstrap_python(manifest['target']),voice/'bin/setup-linux.py','--node',node,'--accept-model-license']
         if args.gpu:
             command+=['--gpu',args.gpu]
         else:command+=['--cpu']
@@ -266,7 +310,7 @@ def install(args):
     if (app/'linux-python-runtime.json').exists():
         # System Python validates the immutable runtime before Node and its
         # speech children start; also hold the package lifetime lease.
-        command=['/usr/bin/python3',app/'scripts/run-component.py','runtime',*command]
+        command=[distribution.bootstrap_python(manifest['target']),app/'scripts/run-component.py','runtime',*command]
     content=service(command,home,state/'model.env',python)
     if unit.exists() and unit.read_text()!=content:raise ValueError('Existing Augmentor DSH service differs.')
     write(unit,content)
