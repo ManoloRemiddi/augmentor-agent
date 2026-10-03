@@ -91,6 +91,9 @@ Mac qualification preserves all existing hash-locked corresponding sources and
 notices, verifies the sealed archive and signature, and exercises its packaged
 component and managed first-run service. Preparation gates remain pending;
 physical microphone/OS-permission acceptance is separate from these proofs.
+Candidate workflows explicitly check out the reviewed pull-request head, so all
+three artifacts record the same durable source commit rather than a temporary
+GitHub test merge. No publication step is included in these preparation jobs.
 
 The first native ARM64 build exposed ggml's requirement for Clang. The Windows
 ARM lane now uses Visual Studio's ARM SDK with Clang/Ninja and the native Rust
