@@ -162,6 +162,17 @@ enables automatic installation. Synthetic catalog-reader tests establish guard
 ordering/refusal, not public-feed or installed upgrade acceptance; the separate
 Node suite exercises real publisher/client cryptography and transfers.
 
+Windows independent inspection now also identifies the proposed target, using
+metadata and inventory extracted from that exact installer outside the replaced
+payload. `target-health` requires a matching apply-authorized journal, retained
+native writer/record pins, complete inventory and fixed isolated native health.
+It cannot turn target metadata into previous-source recovery authority or archive
+the journal. Actual installer-exit observation, installed selection verification
+and external completion remain required. Eight portable source/target assessment
+tests pass; the new native template/full-application target-health checks are
+pending. The template uses a different synthetic previous-source identity for
+read-only binding, and does not establish an actual cross-version application.
+
 A private exclusive publisher lock and durable pending claim prevent simultaneous
 or uncertain publication from reusing a role version. A permanent private artifact
 ledger retains identities even after withdrawal or an abandoned attempt.

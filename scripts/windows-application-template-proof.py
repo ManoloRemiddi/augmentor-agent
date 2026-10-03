@@ -88,10 +88,11 @@ def prove(out, arch, compiler, fixture_executable, runtime):
                 child.kill(); child.wait(timeout=10)  # Failed fixture cleanup only.
         assert (code == 0) == success, (label,code)
         assert not launch_record.exists(), 'Silent maintenance launched the application.'
-    def inspect(executable,label,*,source=False,health=False):
+    def inspect(executable,label,*,source=False,health=False,target=False):
         # InitializeSetup deliberately refuses installation after inspection.
         # A nonzero Setup exit alone is not an inspection-success assertion.
-        run(executable,label,success=False,arguments=['/augmentorinspect='+('health' if health else 'source' if source else '1')])
+        mode=('target-health' if health else 'target') if target else ('health' if health else 'source' if source else '1')
+        run(executable,label,success=False,arguments=['/augmentorinspect='+mode])
         log=(out/('application-template-'+label+'.log')).read_text(encoding='utf-8-sig')
         marker='Augmentor independent health result: ' if health else 'Augmentor independent inspection result: '
         rows=[line.split(marker,1)[1] for line in log.splitlines() if marker in line]
@@ -312,6 +313,34 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         assert all(observed[key] for key in ('writerHeld','recordPinned','installationHeld','ordinaryStartupRefused'))
         pending.unlink();admission.unlink()  # Only this disposable proof's state.
         stages.append('independent-synthetic-health-with-live-record-and-installation-admission')
+        # Read-only target binding uses the actual embedded target metadata and
+        # complete installed payload, with a different synthetic previous source.
+        # No N-to-N+1 application claim follows from this inspection fixture.
+        previous={**source_identity,'version':'0.0.0','sourceCommit':'a'*40,'sha256':'b'*64}
+        with UpdateJournal(updates,previous,source_identity) as journal:
+            for phase in ('preparing','prepared','drained','installer-ready'):journal.advance(phase)
+        before_target=pending.read_bytes()
+        run(cached,'target-before-apply-refusal',success=False,arguments=['/augmentorinspect=target'])
+        refused=(out/'application-template-target-before-apply-refusal.log').read_text(encoding='utf-8-sig')
+        assert 'Augmentor independent inspection result:' not in refused
+        assert pending.read_bytes()==before_target
+        value=json.loads(before_target);value['phase']='apply-intent';value['revision']+=1
+        atomic_json(pending,value);before_target=pending.read_bytes()
+        target_health=inspect(cached,'independent-target-health',health=True,target=True)
+        assert target_health['complete'] and target_health['updateTarget']['recordedTargetMatches']
+        assert target_health['updateTarget']['applyAuthorized'] is False
+        assert target_health['updateTarget']['installerSHA256']==report['sha256']
+        assert target_health['updateTarget']['recordSHA256']==hashlib.sha256(before_target).hexdigest()
+        assert target_health['localHealth']['releaseSHA256']==release_digest.decode('ascii')
+        assert pending.read_bytes()==before_target and sentinel.read_bytes()==sentinel_bytes
+        target_admission=json.loads(admission.read_text())
+        assert all(target_admission[key] for key in ('writerHeld','recordPinned','installationHeld','ordinaryStartupRefused'))
+        run(cached,'target-cannot-become-source',success=False,arguments=['/augmentorinspect=source'])
+        refused=(out/'application-template-target-cannot-become-source.log').read_text(encoding='utf-8-sig')
+        assert 'Augmentor independent inspection result:' not in refused
+        assert pending.read_bytes()==before_target
+        pending.unlink();admission.unlink()  # Dispose only this synthetic assessment.
+        stages.append('independent-target-health-and-source-separation-with-pinned-journal')
         # A coordinated update must move the old tree before copying, preserving
         # unknown old files outside the newly selected executable search path.
         # A handle that prevents directory rename must refuse without deletion.

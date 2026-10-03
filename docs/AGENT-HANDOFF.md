@@ -28,7 +28,11 @@ requires qualified source, fresh publisher verification, live consent/selection
 and retained exact downloads, with bounded shared helper transport. External
 apply/target-observer composition and fresh native qualification of these additions
 remain required. Mac companion
-selection cannot receive a desktop bundle. Root
+selection cannot receive a desktop bundle. Windows independent inspection now
+has exact proposed-target assessment and isolated target health, kept separate
+from source restoration. Eight portable assessment tests pass; new native
+template/full-application target-health checks still need CI. These read-only
+actions preserve the active journal and grant no apply/completion authority. Root
 rotation/CI custody, public feed provisioning, external installation adapters,
 final consent/revocation and N-to-N+1 health/recovery remain open. Do not narrow the goal to
 notification/downloads or mark it complete based on this checkpoint. Nothing

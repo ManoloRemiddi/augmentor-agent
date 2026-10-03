@@ -616,6 +616,21 @@ downloads. Production OS entrypoints and independent target completion still nee
 to compose that guard with the existing preparation/apply adapters; no current
 installed receipt qualifies automatic installation.
 
+Independent Windows inspection now separates recorded source and recorded target.
+The exact retained target installer accepts read-only `/augmentorinspect=target`
+and `target-health` actions. Its extracted metadata/worker/runtime operate outside
+the replaceable app, under native maintenance admission, a live journal writer
+and a pinned private active record. Target assessment binds version, source,
+OS/CPU, channel, data compatibility and installer digest to the exact proposed
+target, and requires an apply-authorized phase. Target health additionally checks
+the complete embedded inventory and runs only the isolated native health action
+under read admission. It preserves the journal and cannot grant apply, become
+source-recovery authority or complete a transaction by itself. The external
+observer still must observe actual Setup exit and verify selected target before
+archival. The portable assessment suite passes eight cases; new native template
+and full-application target-health checks are pending and remain distinct from
+N-to-N+1 or physical-device acceptance.
+
 Update journals now support independent completion after the caller has observed
 installer exit, reverified the release pair/installed selection and passed a local
 health callback. Completed records are durably archived; failed health, an

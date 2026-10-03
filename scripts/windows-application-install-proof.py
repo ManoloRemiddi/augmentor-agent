@@ -57,10 +57,10 @@ def main():
         return result
     def setup(label, *extra, success=True):
         return run([report['installer'],*flags,'/LOG='+str(out/(label+'.log')),*extra], success=success)
-    def independent_inspection(label,*,source=False,health=False):
+    def independent_inspection(label,*,source=False,health=False,target=False):
         log=out/(label+'.log')
-        run([cached_installer,*flags,'/LOG='+str(log),
-             '/augmentorinspect='+('health' if health else 'source' if source else '1')],success=False)
+        mode=('target-health' if health else 'target') if target else ('health' if health else 'source' if source else '1')
+        run([cached_installer,*flags,'/LOG='+str(log),'/augmentorinspect='+mode],success=False)
         marker='Augmentor independent health result: ' if health else 'Augmentor independent inspection result: '
         rows=[line.split(marker,1)[1] for line in log.read_text(encoding='utf-8-sig').splitlines() if marker in line]
         assert len(rows)==1, log.read_text(encoding='utf-8-sig')[-8192:]
@@ -260,6 +260,15 @@ def main():
         report['independentLocalHealth']=assessed['localHealth']
         assert (transaction/'active.json').read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
         stages.append('independent-source-health-with-pending-record-preserved')
+        target_assessed=independent_inspection('independent-pending-target-health',health=True,target=True)
+        assert target_assessed['complete'] and target_assessed['updateTarget']['recordedTargetMatches']
+        assert target_assessed['updateTarget']['applyAuthorized'] is False
+        assert target_assessed['updateTarget']['recordSHA256']==package.digest(transaction/'active.json')
+        assert target_assessed['updateTarget']['installerSHA256']==report['sha256']
+        assert target_assessed['localHealth']['releaseSHA256']==package.digest(args.root/'release.json')
+        assert (transaction/'active.json').read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
+        report['independentTargetHealth']=target_assessed['localHealth']
+        stages.append('independent-target-payload-health-with-pending-record-preserved')
         for application in (executable, install/'current/AugmentorBrowserHost.exe'):
             blocked = subprocess.run([str(application),'--qualification-root',str(data),'--preview'],
                 stdin=subprocess.DEVNULL, capture_output=True, timeout=10,
