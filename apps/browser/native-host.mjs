@@ -62,6 +62,15 @@ readFrames(process.stdin,first=>{
     if(closing)return
     if(maintenance.receive(first))return
     if(first.method!==undefined&&maintenance.paused){reply({id:first.id,error:{message:'Augmentor maintenance is in progress. This request was not started.'}});return}
+    // Update status and manual delivery remain available to repair mismatched
+    // components. Configuration still requires the normal product handshake.
+    if(first.method==='augmentor/surface'&&first.params?.action==='updates'){
+      try{
+        guardWorkspaceMethod(workspaceProfile,first.method,first.params)
+        if(!compatible&&!['status','check','download','cancel','reveal'].includes(first.params.method??'status'))throw Error('Reload matching Augmentor components before changing update preferences.')
+      }catch(error){reply({id:first.id,error:{code:'PERMISSION_DENIED',message:error.message}});return}
+      shared(first.id,()=>surfaceRequest(first.params));return
+    }
     if(child){
       if(first.id!==undefined){if(first.method!==undefined)childRequests.add(first.id);else childActions.delete(first.id)}
       childSend(first);return

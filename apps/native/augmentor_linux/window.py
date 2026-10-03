@@ -884,14 +884,14 @@ class Window(QWidget):
             from .macos_browser_setup import available, MacBrowserSetupDialog as BrowserSetupDialog
         if available():
             menu.addAction('Set up browser extension',lambda:BrowserSetupDialog(self).exec())
-        menu.addAction('Versions & updates',self.open_updates).setEnabled(bool(self.controller))
+        menu.addAction('Versions & updates',self.open_updates)
         menu.addAction('Approval mode',self.open_access).setEnabled(bool(self.controller))
         menu.addAction('About & licenses',lambda:LicensesDialog(self).exec())
         menu.addSeparator();menu.addAction('Quit Augmentor',self.quit_augmentor)
         menu.exec(self.more_button.mapToGlobal(self.more_button.rect().bottomLeft()))
 
     def open_updates(self):
-        if self.controller:UpdatesDialog(self).exec()
+        UpdatesDialog(self).exec()
 
     def open_appearance(self):
         if self.appearance_dialog is not None:
@@ -1431,7 +1431,10 @@ def _main(startup=None):
             app.aboutToQuit.connect(app.instance_server.close)
             app.aboutToQuit.connect(app.instance_lock.close)
     window = Window(preview=args.preview or bool(args.screenshot),harness=args.harness)
-    if not args.preview and not args.screenshot:window.setup_dictation_tray()
+    if not args.preview and not args.screenshot:
+        window.setup_dictation_tray()
+        from .update_settings import UpdateMonitor
+        window.update_monitor=UpdateMonitor(window)
     if hasattr(app, 'instance_server'):
         def finish_maintenance():
             # Reply/disconnect first, then recheck work before closing. Preview

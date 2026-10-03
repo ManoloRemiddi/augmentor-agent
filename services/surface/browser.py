@@ -3,10 +3,10 @@
 from pathlib import Path
 import sys,json,time
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]/'apps/native'))
-from augmentor_linux.preferences import Preferences
-from PySide6.QtGui import QColor
 
 def appearance(settings=None):
+    from augmentor_linux.preferences import Preferences
+    from PySide6.QtGui import QColor
     preferences=Preferences()
     if settings is not None:
         edited_at=time.time_ns()
@@ -34,6 +34,22 @@ def appearance(settings=None):
     return {'theme':v['theme'],'animation':v['animation'],'values':{'theme':v['theme'],'neutHue':v['hue'],'neutBright':v['brightness'],'accentHue':v['accent_hue'],'accentBright':v['accent_brightness'],'formatColours':v['format_colours']},'tokens':{'--bg':bg.name(),'--field':field.name(),'--layer1':field.name(),'--layer2':field.name(),'--text':'#edf3f3' if dark else '#152b2c','--brand':accent.name(),'--accent':accent.name(),'--user-bubble':bubble.name(),'--format-heading':v['format_colours'].get('heading',accent.name()),'--format-link':v['format_colours'].get('link',accent.name())}}
 
 def request(value):
+    if value.get('action')=='updates':
+        from augmentor_linux.prompt_client import PromptClient
+        method=value.get('method','status')
+        if method not in ('status','check','download','cancel','configure','notification','skip','postpone','reveal'):
+            raise ValueError('Unsupported update operation')
+        result=PromptClient().call('updates.'+method,value.get('params'))
+        if method=='reveal':
+            import os,subprocess
+            if sys.platform=='win32':os.startfile(result['folder'])
+            else:
+                opener='/usr/bin/open' if sys.platform=='darwin' else 'xdg-open'
+                child=subprocess.Popen([opener,result['folder']],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+                import threading
+                threading.Thread(target=child.wait,daemon=True).start()
+            return {'opened':True}
+        return result
     if value.get('action')=='dictation':
         from augmentor_linux.dictation import request as dictation_request
         return dictation_request(value.get('method','status'),value.get('params'),timeout=75)

@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Update implementation checkpoint: [shared discovery, notifications and downloads](UPDATE-SYSTEM.md)
+use the same service and controls across surfaces. Signed feed publication and
+optional automatic installation remain in progress; no installed OS qualification
+is inferred from this shared source.
+
 Windows public preview scope: [installation and explicit parity limits](WINDOWS-PREVIEW.md). Physical acceptance is pending; shared source does not imply complete Windows feature qualification.
 
 Current OS parity direction and verified gaps: [one-product architecture audit](PLATFORM-PARITY-AUDIT.md).
