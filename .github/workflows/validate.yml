@@ -134,6 +134,19 @@ jobs:
         run: chmod +x components/handy/runtime/bin/*
       - name: Build Debian packages with binary notices
         run: python3 scripts/package-debian.py
+      - name: Build the separate Ubuntu 26.04 target packages
+        run: |
+          mkdir -p outputs/ubuntu26/cache
+          cp outputs/debian/cache/node-v24.19.0-linux-x64.tar.xz outputs/ubuntu26/cache/
+          python3 scripts/package-debian.py --target ubuntu26.04-amd64 --out outputs/ubuntu26
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ubuntu26-packages
+          path: |
+            outputs/ubuntu26/*.deb
+            outputs/ubuntu26/artifacts.json
+          retention-days: 14
+          if-no-files-found: error
       - name: Verify packaged Codex with a separate supplier prerequisite
         run: |
           python3 - <<'PY'
@@ -194,11 +207,94 @@ jobs:
           path: /artifacts/browser
       - name: Exercise packaged companion and ZIP as an ordinary user
         run: |
-          cp scripts/browser-composable-proof.py /proof/scripts/
+          cp scripts/browser-composable-proof.py scripts/proof_browser_sandbox.py /proof/scripts/
           bash release/prove-browser-package.sh
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: browser-acceptance
           path: /proof/outputs/*
+          retention-days: 14
+
+  linux-distributions:
+    needs: debian
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [ubuntu26.04-amd64, fedora43-x86_64, fedora44-x86_64]
+    env:
+      AUGMENTOR_TEST_TARGET: ${{ matrix.target }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: debian-packages
+          path: outputs/debian
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        if: matrix.target == 'ubuntu26.04-amd64'
+        with:
+          name: ubuntu26-packages
+          path: outputs/ubuntu26
+      - name: Select pinned distro image and produce its package
+        run: |
+          mkdir -p outputs/linux-qualification
+          python3 -c 'import json,os; print("AUGMENTOR_TEST_IMAGE="+json.load(open("release/linux-images.json"))[os.environ["AUGMENTOR_TEST_TARGET"]])' >> "$GITHUB_ENV"
+          if [[ "$AUGMENTOR_TEST_TARGET" == fedora* ]]; then
+            sudo apt-get update -qq
+            sudo apt-get install -y --no-install-recommends rpm
+            distro_release="${AUGMENTOR_TEST_TARGET#fedora}"
+            distro_release="${distro_release%-x86_64}"
+            python3 scripts/package-fedora.py --debian outputs/debian --fedora "$distro_release" --out outputs/linux-rpm
+            echo "AUGMENTOR_TEST_ARTIFACTS=outputs/linux-rpm" >> "$GITHUB_ENV"
+          else
+            echo "AUGMENTOR_TEST_ARTIFACTS=outputs/ubuntu26" >> "$GITHUB_ENV"
+          fi
+      - name: Verify actual package lifecycle and complete native suite
+        run: |
+          set -euo pipefail
+          git archive --format=tar HEAD > outputs/linux-qualification/source-fixture.tar
+          docker run --rm --cpus 2 --memory 4g \
+            -v "$PWD:/work:ro" -v "$PWD/$AUGMENTOR_TEST_ARTIFACTS:/artifacts:ro" \
+            -v "$PWD/outputs/linux-qualification:/reports" \
+            -e AUGMENTOR_TEST_IMAGE "$AUGMENTOR_TEST_IMAGE" sh -c '
+              set -eu
+              if command -v dnf >/dev/null; then
+                dnf install -y python3
+              else
+                apt-get update -qq
+                apt-get install -y --no-install-recommends python3
+              fi
+              python3 /work/release/prove-linux-package.py --artifacts /artifacts --image-digest "$AUGMENTOR_TEST_IMAGE" --out /reports/package-proof.json
+              if command -v dnf >/dev/null; then
+                . /etc/os-release
+                if [ "$VERSION_ID" = 43 ]; then
+                  dnf install -y git nodejs-npm
+                else
+                  dnf install -y git nodejs24-npm
+                fi
+              else
+                apt-get install -y --no-install-recommends git npm python3-pyside6.qttest
+              fi
+              mkdir /tmp/augmentor-native-fixture
+              tar -xf /reports/source-fixture.tar -C /tmp/augmentor-native-fixture
+              ln -s /usr/lib/augmentor/dist /tmp/augmentor-native-fixture/dist
+              ln -s /usr/lib/augmentor/node_modules /tmp/augmentor-native-fixture/node_modules
+              cd /tmp/augmentor-native-fixture
+              export PATH=/usr/lib/augmentor/node/bin:$PATH
+              mkdir /tmp/augmentor-native-prerequisite
+              cp package.json package-lock.json /tmp/augmentor-native-prerequisite/
+              npm ci --prefix /tmp/augmentor-native-prerequisite --ignore-scripts --no-audit --no-fund
+              export AUGMENTOR_CODEX_CLI=/tmp/augmentor-native-prerequisite/node_modules/@openai/codex/bin/codex.js
+              export PYTHONPATH=apps/native QT_QPA_PLATFORM=offscreen
+              python3 -X faulthandler -m unittest discover -s tests -v
+            ' 2>&1 | tee outputs/linux-qualification/test.log
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: linux-${{ matrix.target }}-qualification
+          path: |
+            outputs/linux-qualification/*
+            outputs/linux-rpm/artifacts.json
           retention-days: 14

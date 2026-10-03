@@ -2,6 +2,7 @@
 """Shared lifetime leases prevent package replacement underneath running code."""
 import json
 import os
+import re
 import stat
 import subprocess
 import sys
@@ -11,18 +12,41 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT/'services'))
 from platform_adapters import locks as fcntl
 LOCK_ROOT = Path('/run/augmentor')
+PERSISTENT_PENDING = Path('/var/lib/augmentor-package-maintenance/pending.json')
 _leases = []
 
 
 def configured(component):
-    if (ROOT/'fedora-package.json').is_file():
+    receipt=ROOT/'linux-package.json'
+    if receipt.exists() or receipt.is_symlink():
+        value=json.loads(receipt.read_text());release=json.loads((ROOT/'release.json').read_text())
+        manager={'opensuse-leap16.0-x86_64':'rpm','arch20261001-x86_64':'pacman'}.get(value.get('target'))
+        package=value.get('package',{})
+        if (receipt.is_symlink() or value.get('format')!='augmentor-linux-package-receipt/1' or not manager
+                or value.get('manager')!=manager or value.get('target')!=release.get('target')
+                or value.get('source')!=release.get('source') or value.get('version')!=release.get('version')
+                or package.get('name')!='augmentor-agent' or package.get('architecture')!='x86_64'
+                or not isinstance(package.get('versionRelease'),str)):
+            raise RuntimeError('Invalid explicit Linux package identity.')
+        if manager=='rpm':
+            command=['rpm','-q','--qf','%{NAME}\n%{VERSION}-%{RELEASE}\n%{ARCH}','augmentor-agent']
+            expected='augmentor-agent\n'+package['versionRelease']+'\nx86_64'
+        else:
+            command=['pacman','-Qi','augmentor-agent']
+            expected={'Name':'augmentor-agent','Version':package['versionRelease'],'Architecture':'x86_64'}
+    elif (ROOT/'fedora-package.json').is_file():
         command=['rpm','-q','--qf','%{VERSION}','augmentor-agent']
         expected=json.loads((ROOT/'release.json').read_text())['version']
     else:
         command=['dpkg-query','-W','-f=${db:Status-Status}','augmentor-'+component]
         expected='installed'
-    result=subprocess.run(command,capture_output=True,text=True,timeout=5)
-    if result.returncode or result.stdout!=expected:
+    options={'env':{**os.environ,'LC_ALL':'C'}} if isinstance(expected,dict) else {}
+    result=subprocess.run(command,capture_output=True,text=True,timeout=5,**options)
+    if isinstance(expected,dict):
+        fields=re.findall(r'^(Name|Version|Architecture)\s*:\s*(\S+)\s*$',result.stdout,re.M)
+        matches=len(fields)==3 and dict(fields)==expected
+    else:matches=result.stdout==expected
+    if result.returncode or not matches:
         raise RuntimeError('Augmentor package configuration is incomplete. Finish the installation before reopening it.')
 
 
@@ -73,7 +97,8 @@ def hold(component):
         try:
             descriptor = os.open(str(path) + '.lock', os.O_RDONLY | os.O_NOFOLLOW)
             fcntl.flock(descriptor, fcntl.LOCK_SH | fcntl.LOCK_NB)
-            if Path(str(path) + '.pending').exists():
+            if (PERSISTENT_PENDING.exists() or PERSISTENT_PENDING.is_symlink()
+                    or Path(str(path) + '.pending').exists()):
                 raise RuntimeError('Augmentor is being updated. Finish package configuration before reopening it.')
             configured(name)
         except (OSError, RuntimeError) as error:

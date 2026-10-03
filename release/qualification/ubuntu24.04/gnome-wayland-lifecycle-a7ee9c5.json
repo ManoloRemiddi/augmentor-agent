@@ -1,0 +1,44 @@
+{
+  "format": "augmentor-gnome-full-vm-lifecycle/1",
+  "source": {
+    "commit": "a7ee9c55586b6a131524a8c53489463e45f6d515",
+    "dirty": false
+  },
+  "target": "ubuntu24",
+  "version": "0.2.13",
+  "proofSha256": "9c8be7a219e3872ddf80d778d8f0c0e6f728ce2c044263779a0e142c51158c08",
+  "duplicateAutostartPreservesProcessAndState": true,
+  "duplicateAutostartCount": 3,
+  "lockSuspendsUserObserver": true,
+  "sameCompositorOwnerAfterUnlock": true,
+  "freshEpochAfterUnlock": true,
+  "oldObserverRefusedAfterUnlock": true,
+  "lockPreservesApplicationProcessAndState": true,
+  "idleCloseAccepted": true,
+  "cleanServiceExit": true,
+  "canonicalClosedLaunch": true,
+  "reopenedServiceOwnsNewProcess": true,
+  "packageVerifiedAfterLifecycle": true,
+  "selinuxEnforcing": false,
+  "apparmorEnabled": true,
+  "positiveLockedSceneTested": false,
+  "loginAuthenticationTested": false,
+  "harnessConnectionTested": false,
+  "modelTurnTested": false,
+  "crashRecoveryTested": false,
+  "rebootTested": false,
+  "gnomeInputToolsEnabled": false,
+  "checkpointDate": "2026-10-02",
+  "fixture": "Separate signed Noble Cloud clone, official coherent Mesa 25.2.8-0ubuntu0.24.04.2, GNOME 46 Ubuntu Wayland, xcb application",
+  "rawReportSha256": "00944a029cc1a38818a6e9232d01eb5f6ae0fe754963b8ecd0f401baef7848ee",
+  "testedBase": "c4f3b1fbd49d1fdf04c06ece48dd0fd5c3a90786",
+  "workingProofChanges": [
+    "release/prove-gnome-vm-lifecycle.py"
+  ],
+  "lockedObservationOutcome": "org.freedesktop.DBus.Error.UnknownMethod; user observer object absent",
+  "limits": [
+    "The pristine installed application is a7ee9c5; the updated proof is separately uploaded to the ordinary fixture user home.",
+    "The dedicated fixture uses autologin and idle-delay zero; administrative loginctl unlock is not password authentication.",
+    "Latest Mesa .3, repeated reboot, native Qt Wayland, shortcut lock fencing, connected tasks and portal input remain separate."
+  ]
+}

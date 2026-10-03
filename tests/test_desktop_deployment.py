@@ -3,7 +3,9 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import shutil
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -50,6 +52,31 @@ class DeploymentTests(unittest.TestCase):
         self.assertEqual(self.tool.rollback(),self.selected)
         self.assertEqual(self.tool.read(self.tool.DATA/'desktop.previous.json'),updated)
         self.assertTrue(release.exists())
+
+    def test_staging_keeps_explicit_next_distro_package_receipt_immutable(self):
+        marker={'format':'augmentor-linux-package-receipt/1','target':'opensuse-leap16.0-x86_64','manager':'rpm'}
+        (self.source/'linux-package.json').write_text(json.dumps(marker))
+        release=self.stage();self.assertEqual(self.tool.read(release/'linux-package.json'),marker)
+        (release/'linux-package.json').write_text(json.dumps({**marker,'manager':'dpkg'}))
+        with self.assertRaisesRegex(ValueError,'changed after staging'):self.tool.activate(release)
+        self.assertEqual(self.tool.read(self.tool.DATA/'desktop.json'),self.selected)
+
+    def test_staged_fedora_artifact_keeps_its_package_backend(self):
+        lifecycle=self.source/'services/lifecycle';lifecycle.mkdir(parents=True)
+        shutil.copy2(ROOT/'services/lifecycle/lease.py',lifecycle/'lease.py')
+        (self.source/'release.json').write_text('{"version":"test"}')
+        (self.source/'fedora-package.json').write_text('{"target":"fedora44-x86_64"}')
+        release=self.stage()
+        lease=load(release/'services/lifecycle/lease.py')
+        with patch.object(lease.subprocess,'run',return_value=SimpleNamespace(returncode=0,stdout='test')) as probe:
+            lease.configured('desktop')
+        probe.assert_called_once_with(['rpm','-q','--qf','%{VERSION}','augmentor-agent'],
+                                     capture_output=True,text=True,timeout=5)
+        self.assertEqual(self.tool.read(self.tool.DATA/'desktop.json'),self.selected)
+        # Package identity affects startup and belongs to the immutable inventory.
+        (release/'fedora-package.json').write_text('{"target":"changed"}')
+        with self.assertRaisesRegex(ValueError,'changed after staging'):self.tool.activate(release)
+        self.assertEqual(self.tool.read(self.tool.DATA/'desktop.json'),self.selected)
 
     def test_changed_release_cannot_replace_working_selection(self):
         release=self.stage();(release/'apps/native/augmentor_linux/window.py').write_text('broken')

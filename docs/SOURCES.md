@@ -20,6 +20,17 @@ exact artifact/source identities and qualification limits. Mac and Windows
 hosted lifecycle and complete installer acceptance remain separate gates;
 compiled artifacts or cached builds do not establish those gates.
 
+## Linux rollout source profiles — October 2, 2026
+
+The explicit GNOME 49 source profile reviews Shell/Mutter 49.5 and GSD 49.1.
+[Exact commits, 11 primary-source files and hashes](../release/qualification/next-targets/20261002-gnome49-source-profile.json)
+retain modern lock exclusion and portal-schema checks. Source tests pass;
+actual Fedora 43 session and input qualification remain separate.
+The [official Leap 16 Cloud build and pinned UEFI proof](../release/qualification/next-targets/20261002-leap16-cloud-boot.json)
+records authenticated Build 18.72 bytes and successful external NoCloud boot;
+GNOME/package acceptance is not inferred. Actual Arch/Leap versioned bootstrap
+and native-suite evidence is [recorded separately](../release/qualification/next-targets/20261002-startup-interpreters.json).
+
 ## Codex foundation — 30 September 2026
 
 `@openai/codex` 0.159.2 is pinned as a **development dependency** in the root

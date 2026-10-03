@@ -1,0 +1,330 @@
+{
+  "format": "augmentor-hosted-linux-package-qualification/1",
+  "date": "2026-10-03",
+  "source": {
+    "pullRequestHead": "536fc7561a7b81ab90e806925652e446f438050a",
+    "testedMergeCommit": "4eb7217be15108641829e927f99f621e16019342",
+    "dirty": false,
+    "mergeParents": [
+      "c7f895d416e6b94ca601b66a09caf4846a64b907",
+      "536fc7561a7b81ab90e806925652e446f438050a"
+    ],
+    "diffFromHead": [
+      "README.md",
+      "docs/AGENT-HANDOFF.md",
+      "docs/WINDOWS-IMPLEMENTATION-STATUS.md",
+      "docs/WINDOWS-INSTALLER-DECISION.md"
+    ],
+    "differenceIsDocumentationOnly": true
+  },
+  "linux": {
+    "run": 37075160234,
+    "url": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37075160234",
+    "conclusion": "success",
+    "targets": [
+      {
+        "packageProof": {
+          "target": "ubuntu26.04-amd64",
+          "imageDigest": "docker.io/library/ubuntu@sha256:da6fc2be547864451aa253836dd926da33623312df4a9a243e35dc877c378a78",
+          "source": {
+            "commit": "4eb7217be15108641829e927f99f621e16019342",
+            "dirty": false
+          },
+          "artifacts": {
+            "augmentor-runtime_0.2.13_amd64.deb": "37956b143344460f675078c8b7042be78475a8c3cbb456d573ec4f1f42eac20e",
+            "augmentor-desktop_0.2.13_amd64.deb": "a9e2e70f5b6d3611cadbd0cffe3a63beff1f2a692540454f727c40fa8d597aa6"
+          },
+          "proofScriptSha256": "ff5c3e65466ad0481769b7e3cba48c46c07a609f103ace6391eba87193262c97",
+          "versions": {
+            "python": "3.14.4",
+            "pyside": "6.10.2",
+            "qt": "6.10.2",
+            "node": "v24.19.0"
+          },
+          "gtk4Version": "4.22.4",
+          "gtk4ShortcutApiImportTested": true,
+          "wmctrlVersion": "1.07",
+          "wmctrlBinaryTested": true,
+          "freshInstall": true,
+          "nonRootRuntimeLease": true,
+          "nonRootQtRender": true,
+          "activeRuntimeAndDesktopReinstallBlocked": true,
+          "activeComponentRemovalBlocked": true,
+          "idleReinstall": true,
+          "removePreservesPrivateFiles": true,
+          "reinstallAfterRemove": true,
+          "realDesktopSessionTested": false,
+          "physicalAudioTested": false,
+          "selinuxEnforcingTested": false,
+          "dshModelTurnTested": false
+        },
+        "downloadedArtifact": {
+          "id": 11257001794,
+          "zipSha256": "128d51f47aa1127e0cc6bd0fa9284d8b3d78ca358d9df8be2c08a9167b5cb8e5",
+          "zipBytes": 10190242
+        },
+        "nativeTests": {
+          "total": 1028,
+          "skipped": 36,
+          "passed": 992,
+          "seconds": 62.889
+        },
+        "members": {
+          "linux-qualification/package-proof.json": {
+            "sha256": "775eaaec52c0fece927ffcc7590567284f87f99192f65f74848b18bd8f5cfac1",
+            "bytes": 1221
+          },
+          "linux-qualification/source-fixture.tar": {
+            "sha256": "2ab22fd4426bc506c14ca72f47b5b274db11a351d6eccb79146d0f48fc6cb8f8",
+            "bytes": 27217920
+          },
+          "linux-qualification/test.log": {
+            "sha256": "234baa80122156baa0896d32c5c0aeadd7409a2810e81e9699c997f6b45ceb16",
+            "bytes": 523968
+          }
+        }
+      },
+      {
+        "packageProof": {
+          "target": "fedora43-x86_64",
+          "imageDigest": "docker.io/library/fedora@sha256:a651ddf48ea28a06ed4e1e6519f51c9f47e7a5a138722ade87369b8fbb7e5b42",
+          "source": {
+            "commit": "4eb7217be15108641829e927f99f621e16019342",
+            "dirty": false
+          },
+          "artifacts": {
+            "augmentor-agent-0.2.13-1.fc43.x86_64.rpm": "2c6d136311a56bf4cc6789ace61f7201963aa775248635f31e22ed25313da6d5"
+          },
+          "proofScriptSha256": "ff5c3e65466ad0481769b7e3cba48c46c07a609f103ace6391eba87193262c97",
+          "versions": {
+            "python": "3.14.7",
+            "pyside": "6.10.3",
+            "qt": "6.10.3",
+            "node": "v24.19.0"
+          },
+          "gtk4Version": "4.20.4",
+          "gtk4ShortcutApiImportTested": true,
+          "wmctrlVersion": "1.07",
+          "wmctrlBinaryTested": true,
+          "freshInstall": true,
+          "nonRootRuntimeLease": true,
+          "nonRootQtRender": true,
+          "activeRuntimeAndDesktopReinstallBlocked": true,
+          "activeComponentRemovalBlocked": true,
+          "idleReinstall": true,
+          "removePreservesPrivateFiles": true,
+          "reinstallAfterRemove": true,
+          "realDesktopSessionTested": false,
+          "physicalAudioTested": false,
+          "selinuxEnforcingTested": false,
+          "dshModelTurnTested": false
+        },
+        "downloadedArtifact": {
+          "id": 11256997180,
+          "zipSha256": "71fd13e858696e5a561731f6ff15a44d09cded99db6b44710c38ee338f97e469",
+          "zipBytes": 10170498
+        },
+        "nativeTests": {
+          "total": 1028,
+          "skipped": 36,
+          "passed": 992,
+          "seconds": 79.805
+        },
+        "members": {
+          "linux-qualification/package-proof.json": {
+            "sha256": "0efe624c58ca2ba910ff0f20dca445f13cbab9debb6f64ffe56129d113e21ec9",
+            "bytes": 1115
+          },
+          "linux-qualification/test.log": {
+            "sha256": "7182cdebd557193a27df55e9b7164656b295dded1da40dbf88f7456a562fad0a",
+            "bytes": 351668
+          },
+          "linux-qualification/source-fixture.tar": {
+            "sha256": "2ab22fd4426bc506c14ca72f47b5b274db11a351d6eccb79146d0f48fc6cb8f8",
+            "bytes": 27217920
+          },
+          "linux-rpm/artifacts.json": {
+            "sha256": "94659529029be30f2fe5c4e7e71a91dd1128e981dddd7c2fb76c87840a9d9957",
+            "bytes": 1556
+          }
+        }
+      },
+      {
+        "packageProof": {
+          "target": "fedora44-x86_64",
+          "imageDigest": "docker.io/library/fedora@sha256:43b29f65a41eb9c35e1cd5323e3bdf3b655c2357a9f4f1ff2f9c2798e5045d80",
+          "source": {
+            "commit": "4eb7217be15108641829e927f99f621e16019342",
+            "dirty": false
+          },
+          "artifacts": {
+            "augmentor-agent-0.2.13-1.fc44.x86_64.rpm": "00a219717eee9acdc7340e470336dae9bdc5d335ad9218ea72f692552d883dec"
+          },
+          "proofScriptSha256": "ff5c3e65466ad0481769b7e3cba48c46c07a609f103ace6391eba87193262c97",
+          "versions": {
+            "python": "3.14.7",
+            "pyside": "6.11.2",
+            "qt": "6.11.2",
+            "node": "v24.19.0"
+          },
+          "gtk4Version": "4.22.5",
+          "gtk4ShortcutApiImportTested": true,
+          "wmctrlVersion": "1.07",
+          "wmctrlBinaryTested": true,
+          "freshInstall": true,
+          "nonRootRuntimeLease": true,
+          "nonRootQtRender": true,
+          "activeRuntimeAndDesktopReinstallBlocked": true,
+          "activeComponentRemovalBlocked": true,
+          "idleReinstall": true,
+          "removePreservesPrivateFiles": true,
+          "reinstallAfterRemove": true,
+          "realDesktopSessionTested": false,
+          "physicalAudioTested": false,
+          "selinuxEnforcingTested": false,
+          "dshModelTurnTested": false
+        },
+        "downloadedArtifact": {
+          "id": 11256373088,
+          "zipSha256": "f0b0fe232e6b26a24327266bb8275bb1806ce510c20a720b10071fa5fb980ed8",
+          "zipBytes": 10170306
+        },
+        "nativeTests": {
+          "total": 1028,
+          "skipped": 36,
+          "passed": 992,
+          "seconds": 84.177
+        },
+        "members": {
+          "linux-qualification/package-proof.json": {
+            "sha256": "3c36c08cc501d12e0b17dd1fd6a1f569dfb34a045d8307bc72f7d9b4f961b774",
+            "bytes": 1115
+          },
+          "linux-qualification/test.log": {
+            "sha256": "c461177092b649b20b68fb3aec037d145c58a42750322ef925549d4c320e0fc7",
+            "bytes": 353925
+          },
+          "linux-qualification/source-fixture.tar": {
+            "sha256": "2ab22fd4426bc506c14ca72f47b5b274db11a351d6eccb79146d0f48fc6cb8f8",
+            "bytes": 27217920
+          },
+          "linux-rpm/artifacts.json": {
+            "sha256": "0edbd1876cfe4e847502c7b63cc47869e5981f97bbfb740c2c7cd2ea63693ff6",
+            "bytes": 1556
+          }
+        }
+      }
+    ]
+  },
+  "mac": {
+    "run": 37075160186,
+    "url": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37075160186",
+    "conclusion": "success",
+    "targets": [
+      {
+        "os": "mac14",
+        "downloadedArtifact": {
+          "id": 11257155391,
+          "zipSha256": "196c545d2091ee8766074d6575a1bfbf9c12aa0b8ca1bfcf904f7d3d18d33ccf",
+          "zipBytes": 102095
+        },
+        "desktopSourceCommit": null,
+        "companionSourceCommit": null,
+        "managedFirstRun": true,
+        "engineFirst": true,
+        "reports": {
+          "macos/artifacts.json": {
+            "sha256": "c5084d4192799250ae57f7034a358d89bcf64fd130bfb692a42237866b17ad65",
+            "bytes": 1011
+          },
+          "macos/handy-signed-inventory.json": {
+            "sha256": "51461b1857cba68afc1ed36b02ff4437603d093339e79332245f41448b955979",
+            "bytes": 142484
+          },
+          "macos/qt-library-inventory.json": {
+            "sha256": "c13195286357794ea47eb64db993314abf1c8e9d5b20bcc210c5304f40e5cd02",
+            "bytes": 7947
+          },
+          "macos-companion/artifacts.json": {
+            "sha256": "4236e8e7c5cec8a2dad31901ed1aee2b8f482e72e275694e7f16882115f6191b",
+            "bytes": 962
+          },
+          "macos-companion/handy-signed-inventory.json": {
+            "sha256": "51461b1857cba68afc1ed36b02ff4437603d093339e79332245f41448b955979",
+            "bytes": 142484
+          },
+          "macos-managed/report.json": {
+            "sha256": "4a89eadb7c2f41c23d3d40d588a7735acc2d9e98a7c256b8912eaa118321d7fa",
+            "bytes": 845
+          },
+          "macos-engine-first/report.json": {
+            "sha256": "4531308e4b21f71a0e19d46a64a31c910f9a803c879469c6e5b26baa0fd4b024",
+            "bytes": 883
+          }
+        }
+      },
+      {
+        "os": "mac26",
+        "downloadedArtifact": {
+          "id": 11255604983,
+          "zipSha256": "5aab8cb4404e41de5ab9cc897a2b559e782ec791107b8683b9751eb88620eefc",
+          "zipBytes": 102094
+        },
+        "desktopSourceCommit": null,
+        "companionSourceCommit": null,
+        "managedFirstRun": true,
+        "engineFirst": true,
+        "reports": {
+          "macos/handy-signed-inventory.json": {
+            "sha256": "f0f7537316e14bf24d61cd45601e280f4e625a0fa609e182b69672cf6a5afb3b",
+            "bytes": 142484
+          },
+          "macos-companion/artifacts.json": {
+            "sha256": "17836ae78004ad63cb3ae84b56577b6d48feafe2e4a99614795a7d57193e9fc4",
+            "bytes": 962
+          },
+          "macos/qt-library-inventory.json": {
+            "sha256": "c13195286357794ea47eb64db993314abf1c8e9d5b20bcc210c5304f40e5cd02",
+            "bytes": 7947
+          },
+          "macos/artifacts.json": {
+            "sha256": "672a1255fde6408a75fe0168cf03095e667a3f692866a5dd08557c9e685eee7f",
+            "bytes": 1011
+          },
+          "macos-companion/handy-signed-inventory.json": {
+            "sha256": "f0f7537316e14bf24d61cd45601e280f4e625a0fa609e182b69672cf6a5afb3b",
+            "bytes": 142484
+          },
+          "macos-managed/report.json": {
+            "sha256": "c6cc6c725615879e067083447c867481185d0ee4425b4c874293792839538edd",
+            "bytes": 845
+          },
+          "macos-engine-first/report.json": {
+            "sha256": "438063565d0a7e7add902e3295a815392b888400e7541b885d066c092b95ba02",
+            "bytes": 883
+          }
+        }
+      }
+    ]
+  },
+  "scope": {
+    "freshInstalledPackageLifecycle": true,
+    "ordinaryUserRenderingAndRuntimeLease": true,
+    "actualDesktopSession": false,
+    "physicalAudio": false,
+    "selinuxEnforcing": false,
+    "nToNPlusOneUpgradeOrRollback": false,
+    "macArtifactSourceProvenanceComplete": false,
+    "wholeArchLeapInstallers": false,
+    "allFiveRolloutPointsComplete": false,
+    "legalAcceptance": false,
+    "binaryRelease": false
+  },
+  "retainedLimitations": [
+    "Mac development artifact reports have sourceCommit null; future workflow supplies actual checkout commit to both package commands. Old reports stay unchanged.",
+    "The old4f Windows x64 native teardown access violation remains unexplained; a subsequent pass is not a proven repair.",
+    "GitGuardian111063275897 remains failed and unwaived on12 historical script/log digest findings.",
+    "These new hosted Handy producer bytes have not inherited the older producer35 Arch/Leap native-closure qualification.",
+    "All22 proposed license files and root LICENSE remain unchanged; owner decision pending."
+  ]
+}

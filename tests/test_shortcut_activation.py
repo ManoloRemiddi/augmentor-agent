@@ -11,6 +11,10 @@ from augmentor_linux.shortcut_activation import DesktopActivation
 
 
 class ShortcutActivationTests(unittest.TestCase):
+    def test_linux_launch_works_from_a_shallow_installation_path(self):
+        with patch('augmentor_linux.shortcut_activation.ROOT', Path('/work')), patch('augmentor_linux.shortcut_activation.sys.platform', 'linux'):
+            self.assertEqual(DesktopActivation('/unused').command[-2:], ['/work/scripts/launch-component.py', 'desktop'])
+
     def test_windows_cold_launch_names_main_even_if_caller_was_secondary(self):
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory)/'app';root.mkdir();native=root/'Augmentor.exe';native.touch()

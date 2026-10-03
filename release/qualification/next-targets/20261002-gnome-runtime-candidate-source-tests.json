@@ -1,0 +1,37 @@
+{
+  "format": "augmentor-gnome-runtime-candidate-source-tests/1",
+  "sourceBase": "40de37b72d03fef1bdf75a2a55d2dc4302a5f734",
+  "candidateUncommittedAtExecution": true,
+  "files": {
+    "services/desktop/gnome_control.py": "fe6186e15f35e2c3bf648dbe115bc538fc6e86b9babefdec34a4216f705e8b55",
+    "services/desktop/capture_stream.py": "66fb68873c9ac7ba9d54b04729aab74a25e4cddb4f41b327b50b507c29cc633c",
+    "services/desktop/portal.py": "0339d7d3220fa0988c3dda81b148743cbf060ca6000c653999e4ba04cccafca8",
+    "release/derive-source-pyside-wheel.py": "f7a89ed99f36b69ecdbc3a6af582136eb598a22fc84e952f82aeebd4254629ba",
+    "release/stage-source-qt-runtime.py": "3dc1cd88387cdb0afa49ef9a68f44e4a0591fac80860a4f5c78adf6c27fd9049",
+    "tests/test_gnome_control.py": "f03baa1a48baaa286dad52a36709bf86993c117548d68f2921a0f4a0c5a4e7ca",
+    "tests/test_capture_stream.py": "e16ddf1e3cc7cfbc84da6a89579b1a3c8187fb54dd506071617dc6d8a70d3bd4",
+    "tests/test_source_pyside_derivation.py": "9e6fae06059b64cb7b2ab1276a7f4d08f5f67b4b137741b802bd57eb8c1cb89e"
+  },
+  "isolatedArchNativeSourceSuite": {
+    "cases": 739,
+    "passed": 737,
+    "platformSkips": 2,
+    "logSha256": "46ced133624fc275386bd0bad8f156c07bf178f77efa33af6e323a783331b056",
+    "node": "24.19.0",
+    "python": "3.14.7",
+    "qt": "6.11.2"
+  },
+  "initialRegressionFailure": {
+    "preserved": true,
+    "logSha256": "a792cd7ad8c4bfec05a26cfce8d72228998bd7f54b0eeda3257409c1a8d0b90c",
+    "cause": "Test mocked all default-context lookups; newer PyGObject privately looks it up during private-context iteration. Corrected test asserts actual callback delivery instead."
+  },
+  "syntheticGuardsOnly": true,
+  "nativeCandidateInputSent": false,
+  "nativeCandidateCaptureQualified": false,
+  "keyboardQualified": false,
+  "scaleAboveOneQualified": false,
+  "productionGnomeInputEnabled": false,
+  "ownerStateChanged": false,
+  "selectedApplicationChanged": false
+}

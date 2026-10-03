@@ -1,0 +1,234 @@
+{
+  "format": "augmentor-cinnamon-native-shortcuts-qualification/1",
+  "sourceBase": "3b8be6d372ca656b7e369bfe51083f1a8bd57d1c",
+  "target": "linuxmint22.3-x86_64",
+  "session": "Cinnamon6.6.4/X11, Muffin/screensaver6.6.1, stock installed ISO, AppArmor enabled",
+  "sourceFilesSha256": {
+    "apps/native/augmentor_linux/cinnamon_shortcuts.py": "eca51ed053c8f2103bf94afac0e44e214f10229330ffabd8aeda8b312ec70863",
+    "apps/native/augmentor_linux/shortcut_key_codec.py": "572e3480e1559a99de0adea9231a050e25435f36d9f6de9ec38d439e50e71eb8",
+    "apps/native/augmentor_linux/gnome_shortcuts.py": "6c6dee4f27eca08539cb5fb3b56081f8235f73c148a7e6f463c7d373a1d36c06",
+    "apps/native/augmentor_linux/shortcuts.py": "ac24780989e633aca82d1c0795f85c19a293d08fae9c621f7d5e7ba764bce48a",
+    "services/desktop/cinnamon_shortcuts.py": "f58f9352d562792752cfdd7ab73cefb450a7e732512ff0c36fb7daf5be892626",
+    "release/prove-cinnamon-shortcut-interruption.py": "33d3db2eac2e6e481cb560797040a46a409ede60d429f29c8e44b7fad82100ce",
+    "tests/test_cinnamon_shortcuts.py": "a0471c77b1367a00bee969610c8ed54d3ca944d61bb75896db4e95587dc15fdf",
+    "tests/fixtures/cinnamon-shortcut-spice/shortcut-proof@augmentoragent.com/extension.js": "b601479aba5f5cf792674bfd9fe88b1358690d772ae1e8b6926ae26825c07ebe"
+  },
+  "bridgeJsSha256": "1d9e70fbf8bebfb4410eb76fd49166d7d4cee2929635a0ba9794ba487ca04ede",
+  "syntheticLauncherSha256": "381452671cdd64f8ed7cddd933279a99b9c265d250ef694acd7595643d0df849",
+  "candidateOnly": true,
+  "actualSaveAndRegistryReadbackTested": true,
+  "twoSyntheticLauncherKeyEventsDelivered": true,
+  "deliveredArguments": [
+    [],
+    [
+      "--instance",
+      "secondary"
+    ]
+  ],
+  "keyEventMechanism": "Owned QEMU virtual keyboard, native Cinnamon grabs; no physical keyboard or Augmentor application",
+  "wrongPasswordBridgeRemainedActive": true,
+  "normalPasswordUnlockTested": true,
+  "lockedSaveRefused": true,
+  "lockDefaultsRetained": true,
+  "systemWmConflict": {
+    "nativeWmSchemaBindingVerified": true,
+    "actualWmConflictRefused": true,
+    "ownedFieldsAndForeignOrderPreserved": true,
+    "applicationInstalled": false
+  },
+  "settingsAndRollback": {
+    "syntheticComponentOnly": true,
+    "applicationInstalled": false,
+    "checks": [
+      {
+        "name": "foreign-custom",
+        "pass": true
+      },
+      {
+        "name": "other-owned-row",
+        "pass": true
+      },
+      {
+        "name": "tampered-ownership",
+        "pass": true
+      },
+      {
+        "name": "real-gsettings-rollback-after-precommit-failure",
+        "pass": true
+      },
+      {
+        "name": "real-gsettings-postcommit-durability-refusal-keeps-ownership",
+        "pass": true
+      },
+      {
+        "name": "restore-original-owned-row-and-preserve-foreign-data-order",
+        "pass": true
+      }
+    ],
+    "syntheticForeignRowRemoved": true
+  },
+  "actualSpiceConflict": {
+    "syntheticComponentOnly": true,
+    "applicationInstalled": false,
+    "spiceInstalledSourceSha256": "b601479aba5f5cf792674bfd9fe88b1358690d772ae1e8b6926ae26825c07ebe",
+    "beforeRegistrySerial": 1,
+    "checks": [
+      {
+        "name": "real-xlet-registration-and-fresh-signature",
+        "pass": true
+      },
+      {
+        "name": "real-spice-conflict-refusal-preserves-ownership-and-extension-order",
+        "pass": true
+      },
+      {
+        "name": "normal-disable-removes-live-grab-and-preserves-foreign-order",
+        "pass": true
+      },
+      {
+        "name": "fresh-consumer-accepts-freed-binding-and-restores-owned-row",
+        "pass": true
+      }
+    ],
+    "afterRegistrySerial": 5
+  },
+  "actualProductionEpochRefusal": {
+    "syntheticComponentOnly": true,
+    "applicationInstalled": false,
+    "sourceSha256": "f58f9352d562792752cfdd7ab73cefb450a7e732512ff0c36fb7daf5be892626",
+    "oldEpoch": "0bc17b84-5ea5-41d9-b69f-0a9ec09c1cd3",
+    "checks": [
+      {
+        "name": "production-read-save-refuse-disabled-object",
+        "pass": true
+      },
+      {
+        "name": "production-read-save-refuse-old-epoch-after-reenable",
+        "pass": true
+      },
+      {
+        "name": "fresh-read-recovers-preserves-all-rows-and-extension-order",
+        "pass": true
+      }
+    ],
+    "newEpoch": "3ace59a3-2927-4b93-b705-e155d8863893"
+  },
+  "actualAbruptInterruptionRecovery": {
+    "format": "augmentor-cinnamon-shortcut-interruption-proof/1",
+    "target": "linuxmint22.3-x86_64",
+    "helperSha256": "f58f9352d562792752cfdd7ab73cefb450a7e732512ff0c36fb7daf5be892626",
+    "driverSha256": "33d3db2eac2e6e481cb560797040a46a409ede60d429f29c8e44b7fad82100ce",
+    "checks": [
+      {
+        "phase": "intent",
+        "actualAbruptExit": 71,
+        "pendingReadRefused": true,
+        "nativeOwnedRecoveryVerified": true
+      },
+      {
+        "phase": "fields",
+        "actualAbruptExit": 72,
+        "pendingReadRefused": true,
+        "nativeOwnedRecoveryVerified": true
+      },
+      {
+        "phase": "registered",
+        "actualAbruptExit": 73,
+        "pendingReadRefused": true,
+        "nativeOwnedRecoveryVerified": true
+      },
+      {
+        "phase": "committed",
+        "actualAbruptExit": 74,
+        "pendingReadRefused": true,
+        "nativeOwnedRecoveryVerified": true
+      },
+      {
+        "phase": "new-row-registration",
+        "actualAbruptExit": 73,
+        "unregisteredRowRemoved": true,
+        "defaultUserValuesRestored": true,
+        "fixtureThenRecreated": true
+      },
+      {
+        "phase": "foreign-after-interruption",
+        "foreignFieldPreserved": true,
+        "intentRetained": true,
+        "fixtureThenRecovered": true
+      }
+    ],
+    "syntheticLauncherOnly": true,
+    "applicationInstalled": false,
+    "physicalShortcutDeliveryTested": false,
+    "inputQualified": false,
+    "sceneObserverTested": false,
+    "publicReleaseQualified": false,
+    "ownerStateChanged": false
+  },
+  "nativeSuite": {
+    "target": "Owned Arch fixture, Python3.14.7/Qt6.11.2, pinned Node24.19.0 and matching locked dependencies, freshly host-compiled reviewed source",
+    "testsRun": 710,
+    "passed": 708,
+    "skipped": 2,
+    "result": "PASS",
+    "logSha256": "ecba5e4e1c08d90311220bbf727549cc6a5e509536089e66507e622d9f334679",
+    "earlierHostAttempt": "653 tests; 36 QtTest dependency errors, 2 skips; not a pass",
+    "earlierArchAttempt": "708 tests; 13 missing Node errors, 2 skips; not a pass",
+    "earlierBuildAttempts": "npm absent in fixture; TypeScript dev dependency absent in production-only cache; final host build passed with pinned Node24.19.0"
+  },
+  "focusedChecks": {
+    "cinnamonNativeUnitCases": 9,
+    "gnomeNativeRegressionCases": 7,
+    "bridgeProtocolCases": 10,
+    "syntaxAndSourceBoundary": "PASS"
+  },
+  "retainedRefusals": [
+    "Initial 500ms version-property timeout after Gtk3 init; traced successful response took about482ms; reviewed waits now2s",
+    "Earlier3.5s cold lock query timed out before mutation; reviewed10s bridge wait passed a first Save in about5.99s",
+    "First interruption fixture refused normal default idle lock before intent or settings mutation; normal inspected password unlock preceded pass"
+  ],
+  "privateEvidenceSha256": {
+    "locked-with-synthetic-launcher.json": "793c1fb04a73a67ac35737fec8ffe6dd1f42352d123cd05dee38c73d51248373",
+    "wrong-password-bridge-status.json": "3e87dcba5f2b1abf9b7c9ba3fe9a1bacf4452375e79892dd5e62c24740546044",
+    "two-saves-first.jsonl": "787302a18318a244e33e6ca7c01f12a4b49ef2240fd9e280c0ce390586edc55e",
+    "two-native-key-delivery.json": "91e2ff07f243d1deb7fdc1776776ee69b7c1303198f049aef9ee0d2b4316ba28",
+    "cold-save-with-reviewed-wait.json": "79a54a2466502171b8067f16571cd89d415f9b624ccb9dc80b1b25ccf3f8e17f",
+    "interruption-proof-first.err": "067efa1fd84d6f7d586cadf0f3fa637b2dee1cb551535ee25b5003397c4b2bb4",
+    "interruption-proof-new-row.json": "3e8ce9b31d73d2498029e9c7fbe413f723e88635b72f9e5596e1c55f62ee70fa",
+    "settings-conflicts-and-rollback-journal.json": "af41f78b5b7626e571c200b4cb38dd31c1e61ea54c9554cc69fc7d1af61d80f9",
+    "real-spice-conflict-journal.json": "80642abc9f1b45f37e28ac6fcf055aa4cc144b0973287b3337518eb6d87cc475",
+    "production-epoch-refusal-journal.json": "eeecd5d3f348243e0bf39bcd1bcb46d8ca412c80f11bcbb7221f434cc42ac796",
+    "actual-wm-conflict.json": "e0d37029a49eeeaf649af6ec11493b4be0c9d22af632494dcc08d4664551cb00",
+    "first-read.json": "d4c178f60352ed1bedcb9065486fffff767ef84977277110ffff7d8d6fd02736",
+    "gtk3-dbus-trace.log": "e50751937a562ae625fa632fc5c2b458c68956e821194a54acefdcc02acae83f",
+    "settings-conflicts-and-rollback-v2.json": "702d9e946609b045684248c8ad9f6303c61f4dee1f9ff142c851bd44acfb887a",
+    "journal-native-key-delivery.json": "2de9cccc20f4eda89b35fe0104dbef396290657ca09534b09492404cdf02fdb6"
+  },
+  "gtk3WorkerSeparatedFromNativeQtProcess": true,
+  "sourceQtRoutingTested": true,
+  "graphicalProductSettingsTested": false,
+  "applicationInstalled": false,
+  "productTwoInstanceLaunchTested": false,
+  "physicalShortcutDeliveryTested": false,
+  "productRebootRecoveryTested": false,
+  "sceneObserverTested": false,
+  "inputQualified": false,
+  "visibleStopTested": false,
+  "browserTested": false,
+  "physicalAudioTested": false,
+  "publicReleaseQualified": false,
+  "ownerStateChanged": false,
+  "currentHelperNativeKeyDelivery": {
+    "totalRecords": 4,
+    "lastTwoArguments": [
+      [],
+      [
+        "--instance",
+        "secondary"
+      ]
+    ],
+    "helperSha256": "f58f9352d562792752cfdd7ab73cefb450a7e732512ff0c36fb7daf5be892626",
+    "applicationInstalled": false,
+    "physicalHardwareTested": false
+  }
+}

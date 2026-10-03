@@ -2,6 +2,17 @@
 
 Windows public preview scope: [installation and explicit parity limits](WINDOWS-PREVIEW.md). Physical acceptance is pending; shared source does not imply complete Windows feature qualification.
 
+The [Arch/Leap system-Qt boundary](LINUX-SYSTEM-QT-STACK.md) now binds distro
+Python/Qt inventories and passes fresh offline runtimes, drift refusal and actual
+CPU Silero VAD in owned containers. Node/Browser runtime discovery also passes; full packages/installer, native
+sessions, graphical Browser, physical audio and dependency maintenance remain open;
+this Linux-only candidate does not change Mac runtime selection or declare parity.
+
+The [Noble source-Qt profile](LINUX-SOURCE-RUNTIME-ENTRYPOINTS.md) now has actual
+offline runtime, cold Desktop/Browser entrypoint and isolated rollback evidence.
+Full product/native session/package/audio and source/legal acceptance remain open;
+this distinct Ubuntu24.04/Python3.12 profile does not widen other-distro support.
+
 Current OS parity direction and verified gaps: [one-product architecture audit](PLATFORM-PARITY-AUDIT.md).
 
 The [embedded Handy candidate](HANDY-INTEGRATION.md) adds harness-independent

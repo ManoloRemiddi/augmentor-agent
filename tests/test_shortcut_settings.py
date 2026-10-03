@@ -49,7 +49,7 @@ class ShortcutSettingsTests(unittest.TestCase):
 
     def test_creating_second_launcher_targets_second_process_and_preserves_primary(self):
         sequence=QKeySequence('Meta+Hangul');key=sequence[0].toCombined()
-        with tempfile.TemporaryDirectory() as directory,patch.dict(os.environ,{'XDG_DATA_HOME':directory,'AUGMENTOR_WINDOW_ID':'main'}):
+        with tempfile.TemporaryDirectory() as directory,patch.dict(os.environ,{'XDG_DATA_HOME':directory,'AUGMENTOR_WINDOW_ID':'main','XDG_CURRENT_DESKTOP':'KDE'}):
             primary=Path(directory)/'applications'/target('main')[0];primary.parent.mkdir();primary.write_text('[Desktop Entry]\nExec=/opt/augmentor-launch\nX-KDE-Shortcuts=Hangul\n');original=primary.read_bytes()
             def reply(method,*args):return '(true,)' if method=='isGlobalShortcutAvailable' else f'([{key}],)'
             with patch('augmentor_linux.shortcuts.sys.platform','linux'),patch('augmentor_linux.shortcuts.current_keys',return_value=[]),patch('augmentor_linux.shortcuts.call',side_effect=reply),patch('augmentor_linux.shortcuts.PACKAGED',True),patch('augmentor_linux.shortcuts.SYSTEM_DESKTOP',primary):

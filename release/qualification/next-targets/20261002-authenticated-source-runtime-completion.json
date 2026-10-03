@@ -1,0 +1,933 @@
+{
+  "format": "augmentor-authenticated-toolchain-source-runtime-completion/1",
+  "date": "2026-10-02",
+  "predecessor": "20261002-ubuntu-source-toolchain-reconstruction.json",
+  "predecessorSha256": "63aea92dca38a5bbb3a03121bd796e5591b5a5bfb32171c88bc9ad986f8c296d",
+  "recipientBuilder": "augmentor-noble-qt-source-20261002-j",
+  "recipientImage": "sha256:5840c8b27f1fa63ca78618206403beb2fdb4c212ca0d17ce36bc701c4bb9c63c",
+  "publicBase": "docker.io/library/ubuntu@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3",
+  "previousProducerImageReused": false,
+  "packageCount": 410,
+  "sourceArchiveCount": 7,
+  "packageInventorySha256": "bc6cd4560d3d984dc11e2b2faceb1b1b2fcf73440fad5a4d9c6a8f76a594b7b3",
+  "normalUid": 1001,
+  "networkDisabled": true,
+  "producerSourcesOrCompiledIntermediatesCopied": false,
+  "freshSourceAndBuildRoots": true,
+  "buildReportSha256": "8127441e2a84f44ccdc7671c086f469c74b421e222ad4457071e6894f4bcebdc",
+  "completedBuild": {
+    "format": "augmentor-linux-source-runtime-build/1",
+    "policySha256": "969dca5093394282eef5517ade6e0bcb31d1a9ceb1b22513d213aa9ef434196e",
+    "toolSha256": "9594c4439638cccb8f3bb91b34848cb95169d075aa61ab614171fd066c41dac7",
+    "dependencyInventorySha256": "bc6cd4560d3d984dc11e2b2faceb1b1b2fcf73440fad5a4d9c6a8f76a594b7b3",
+    "pythonEnvironment": {
+      "executable": "/work/build-python/bin/python",
+      "prefix": "/work/build-python",
+      "basePrefix": "/usr",
+      "sysconfigPaths": {
+        "venv": {
+          "purelib": "/work/build-python/lib/python3.12/site-packages",
+          "data": "/work/build-python"
+        },
+        "posix_prefix": {
+          "purelib": "/work/build-python/lib/python3.12/site-packages",
+          "data": "/work/build-python"
+        }
+      },
+      "packageSuffix": "lib/python3.12/site-packages",
+      "patchelfVersion": "patchelf 0.18.0"
+    },
+    "sources": {
+      "qtbase": {
+        "sourceDirectory": "/work/runtime-build/sources/qtbase-everywhere-src-6.8.2",
+        "archiveSha256": "012043ce6d411e6e8a91fdc4e05e6bedcfa10fcb1347d3c33908f7fdd10dfe05",
+        "reviewedGitCommit": "f1136de66638060b8a1ab9bc0cdf1a91dcb5ec01",
+        "archiveToGitTreeEqualityVerified": false
+      },
+      "qtshadertools": {
+        "sourceDirectory": "/work/runtime-build/sources/qtshadertools-everywhere-src-6.8.2",
+        "archiveSha256": "d1d5f90e8885fc70d63ac55a4ce4d9a2688562033a000bc4aff9320f5f551871",
+        "reviewedGitCommit": "9b81996cea92b13d9f896504516d920976a77a86",
+        "archiveToGitTreeEqualityVerified": false
+      },
+      "qtsvg": {
+        "sourceDirectory": "/work/runtime-build/sources/qtsvg-everywhere-src-6.8.2",
+        "archiveSha256": "aa2579f21ca66d19cbcf31d87e9067e07932635d36869c8239d4decd0a9dc1fa",
+        "reviewedGitCommit": "e59eaa7dbc09fbf885b1c5a69d93b7e2fb1c7ce3",
+        "archiveToGitTreeEqualityVerified": false
+      },
+      "qtimageformats": {
+        "sourceDirectory": "/work/runtime-build/sources/qtimageformats-everywhere-src-6.8.2",
+        "archiveSha256": "d2a1bbb84707b8a0aec29227b170be00f04383fbf2361943596d09e7e443c8e1",
+        "reviewedGitCommit": "20d46d1fa669191d8f855ba8ac1c35719bace83a",
+        "archiveToGitTreeEqualityVerified": false
+      },
+      "qtdeclarative": {
+        "sourceDirectory": "/work/runtime-build/sources/qtdeclarative-everywhere-src-6.8.2",
+        "archiveSha256": "144d876adc8bb55909735143e678d1e24eadcd0a380a0186792d88b731346d56",
+        "reviewedGitCommit": "75534f3e7fff24ed7ccb364e2ed9950a73da879f",
+        "archiveToGitTreeEqualityVerified": false
+      },
+      "qtwayland": {
+        "sourceDirectory": "/work/runtime-build/sources/qtwayland-everywhere-src-6.8.2",
+        "archiveSha256": "5e46157908295f2bf924462d8c0855b0508ba338ced9e810891fefa295dc9647",
+        "reviewedGitCommit": "4261629005d174311045a44914d599ad67d2b7a3",
+        "archiveToGitTreeEqualityVerified": false
+      },
+      "pyside-setup": {
+        "sourceDirectory": "/work/runtime-build/sources/pyside-setup-everywhere-src-6.8.2",
+        "archiveSha256": "13f7a00b360a5869084fcc085c48ba236915a200bb5a13c1548ed8ab7a8b606b",
+        "reviewedGitCommit": "f62088b4cd516a3080a6b2e68bc79903da8b67ce",
+        "archiveToGitTreeEqualityVerified": false
+      }
+    },
+    "commands": [
+      {
+        "module": "qtbase",
+        "phase": "configure",
+        "argv": [
+          "/work/runtime-build/sources/qtbase-everywhere-src-6.8.2/configure",
+          "-prefix",
+          "/work/runtime-build/qt-prefix",
+          "-shared",
+          "-release",
+          "-nomake",
+          "tests",
+          "-nomake",
+          "examples",
+          "-feature-testlib",
+          "-feature-dbus",
+          "-feature-wayland",
+          "-feature-accessibility",
+          "-feature-accessibility-atspi-bridge",
+          "-icu",
+          "-xcb",
+          "-opengl",
+          "desktop",
+          "-egl",
+          "-openssl-linked",
+          "-fontconfig",
+          "-system-zlib",
+          "-system-pcre",
+          "-system-doubleconversion",
+          "-system-freetype",
+          "-system-harfbuzz",
+          "-system-libpng",
+          "-system-libjpeg",
+          "--",
+          "-GNinja"
+        ],
+        "cwd": "/work/runtime-build/builds/qtbase",
+        "completed": true,
+        "exit": 0,
+        "logSha256": "154e1a83d6575d75a1886111046c09afb9456a137c5e189c8b715db5fb708f88"
+      },
+      {
+        "module": "qtbase",
+        "phase": "compile",
+        "argv": [
+          "cmake",
+          "--build",
+          ".",
+          "--parallel",
+          "2"
+        ],
+        "cwd": "/work/runtime-build/builds/qtbase",
+        "completed": true,
+        "exit": 0,
+        "logSha256": "1eff5e6eb9f1d65d0d39de30445f528f4e5066ad673a3243ebf5fc70fec7cb77"
+      },
+      {
+        "module": "qtbase",
+        "phase": "install",
+        "argv": [
+          "cmake",
+          "--install",
+          "."
+        ],
+        "cwd": "/work/runtime-build/builds/qtbase",
+        "completed": true,
+        "exit": 0,
+        "logSha256": "98508c2fc93798ed915142478809d7361d0d4c6d0d7ae6de38bde29b93734475"
+      },
+      {
+        "module": "qtshadertools",
+        "phase": "configure",
+        "argv": [
+          "/work/runtime-build/qt-prefix/bin/qt-configure-module",
+          "/work/runtime-build/sources/qtshadertools-everywhere-src-6.8.2",
+          "--",
+          "-GNinja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DQT_BUILD_TESTS=OFF",
+          "-DQT_BUILD_EXAMPLES=OFF"
+        ],
+        "cwd": "/work/runtime-build/builds/qtshadertools",
+        "completed": true,
+        "exit": 0,
+        "logSha256": "ec5f1fa3aa0628c9b560cdfa3f5ef70ce259fe33c448e839612c9e6b9299dc00"
+      },
+      {
+        "module": "qtshadertools",
+        "phase": "compile",
+        "argv": [
+          "cmake",
+          "--build",
+          ".",
+          "--parallel",
+          "2"
+        ],
+        "cwd": "/work/runtime-build/builds/qtshadertools",
+        "completed": true,
+        "exit": 0,
+        "logSha256": "429ad86558622d72b6b809e9286aae2cf7515cec597d249891b91bd1ad611bd5"
+      },
+      {
+        "module": "qtshadertools",
+        "phase": "install",
+        "argv": [
+          "cmake",
+          "--install",
+          "."
+        ],
+        "cwd": "/work/runtime-build/builds/qtshadertools",
+        "completed": true,
+        "exit": 0,
+        "logSha256": "fdf9b231113d51f80f87f8f9c42a0075948d3aefcfb19679981e9dd4f2e577f6"
+      },
+      {
+        "module": "qtsvg",
+        "phase": "configure",
+        "argv": [
+          "/work/runtime-build/qt-prefix/bin/qt-configure-module",
+          "/work/runtime-build/sources/qtsvg-everywhere-src-6.8.2",
+          "--",
+          "-GNinja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DQT_BUILD_TESTS=OFF",
+          "-DQT_BUILD_EXAMPLES=OFF"
+        ],
+        "cwd": "/work/runtime-build/builds/qtsvg",
+        "completed": true,
+        "exit": 0,
+        "logSha256": "3e537fafbc20212000c7eb7f1dcfff831eab1103c9e89397e9915ef54ed5248f"
+      },
+      {
+        "module": "qtsvg",
+        "phase": "compile",
+        "argv": [
+          "cmake",
+          "--build",
+          ".",
+          "--parallel",
+          "2"
+        ],
+        "cwd": "/work/runtime-build/builds/qtsvg",
+        "completed": true,
+        "exit": 0,
+        "logSha256": "0c44591e885613b6c83203036130b356ceed765c62a41b1421f79b6085b186a2"
+      },
+      {
+        "module": "qtsvg",
+        "phase": "install",
+        "argv": [
+          "cmake",
+          "--install",
+          "."
+        ],
+        "cwd": "/work/runtime-build/builds/qtsvg",
+        "completed": true,
+        "exit": 0,
+        "logSha256": "8fb308a936bb9c050064a0fe4e5051f395288dde35f8b41da34b67a5bc944aab"
+      },
+      {
+        "module": "qtimageformats",
+        "phase": "configure",
+        "argv": [
+          "/work/runtime-build/qt-prefix/bin/qt-configure-module",
+          "/work/runtime-build/sources/qtimageformats-everywhere-src-6.8.2",
+          "-system-tiff",
+          "-system-webp",
+          "--",
+          "-GNinja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DQT_BUILD_TESTS=OFF",
+          "-DQT_BUILD_EXAMPLES=OFF"
+        ],
+        "cwd": "/work/runtime-build/builds/qtimageformats",
+        "completed": true,
+        "exit": 0,
+        "logSha256": "16c35b714da618c1c5d9e9d5f40336ba80c403271018e33c90c62745453fbd65"
+      },
+      {
+        "module": "qtimageformats",
+        "phase": "compile",
+        "argv": [
+          "cmake",
+          "--build",
+          ".",
+          "--parallel",
+          "2"
+        ],
+        "cwd": "/work/runtime-build/builds/qtimageformats",
+        "completed": true,
+        "exit": 0,
+        "logSha256": "64aacac74bcabb26189dea02c111e3078d4cfbbd7c7bf04de0723fbf782b4935"
+      },
+      {
+        "module": "qtimageformats",
+        "phase": "install",
+        "argv": [
+          "cmake",
+          "--install",
+          "."
+        ],
+        "cwd": "/work/runtime-build/builds/qtimageformats",
+        "completed": true,
+        "exit": 0,
+        "logSha256": "9454595d56cd75e6014cc1418f7cdc1f6fe0f9a9354d0ad2a5a7637bc1db04c6"
+      },
+      {
+        "module": "qtdeclarative",
+        "phase": "configure",
+        "argv": [
+          "/work/runtime-build/qt-prefix/bin/qt-configure-module",
+          "/work/runtime-build/sources/qtdeclarative-everywhere-src-6.8.2",
+          "--",
+          "-GNinja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DQT_BUILD_TESTS=OFF",
+          "-DQT_BUILD_EXAMPLES=OFF"
+        ],
+        "cwd": "/work/runtime-build/builds/qtdeclarative",
+        "completed": true,
+        "exit": 0,
+        "logSha256": "3c099bb22f556423ca68028dcacbacde821361962d09f6a5928c1432b80025c3"
+      },
+      {
+        "module": "qtdeclarative",
+        "phase": "compile",
+        "argv": [
+          "cmake",
+          "--build",
+          ".",
+          "--parallel",
+          "2"
+        ],
+        "cwd": "/work/runtime-build/builds/qtdeclarative",
+        "completed": true,
+        "exit": 0,
+        "logSha256": "0ddd147bd28c557c9df4e550fcd009ffcf2dd4770a41e4c9b86a24ae2e1f1f37"
+      },
+      {
+        "module": "qtdeclarative",
+        "phase": "install",
+        "argv": [
+          "cmake",
+          "--install",
+          "."
+        ],
+        "cwd": "/work/runtime-build/builds/qtdeclarative",
+        "completed": true,
+        "exit": 0,
+        "logSha256": "a652312b35d225b69677a4133835e7db820609710ed4d361bc96caad0b2140a6"
+      },
+      {
+        "module": "qtwayland",
+        "phase": "configure",
+        "argv": [
+          "/work/runtime-build/qt-prefix/bin/qt-configure-module",
+          "/work/runtime-build/sources/qtwayland-everywhere-src-6.8.2",
+          "-feature-wayland-client",
+          "-no-feature-wayland-server",
+          "--",
+          "-GNinja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DQT_BUILD_TESTS=OFF",
+          "-DQT_BUILD_EXAMPLES=OFF"
+        ],
+        "cwd": "/work/runtime-build/builds/qtwayland",
+        "completed": true,
+        "exit": 0,
+        "logSha256": "bd6af7bfaae7cec8e0907d007de20296d7fd6664cd1eeaf3d860e80aae4d216c"
+      },
+      {
+        "module": "qtwayland",
+        "phase": "compile",
+        "argv": [
+          "cmake",
+          "--build",
+          ".",
+          "--parallel",
+          "2"
+        ],
+        "cwd": "/work/runtime-build/builds/qtwayland",
+        "completed": true,
+        "exit": 0,
+        "logSha256": "ed401c422a3167b146ded61061a72ac502a384453497b8d2b144ba1dcc5237e7"
+      },
+      {
+        "module": "qtwayland",
+        "phase": "install",
+        "argv": [
+          "cmake",
+          "--install",
+          "."
+        ],
+        "cwd": "/work/runtime-build/builds/qtwayland",
+        "completed": true,
+        "exit": 0,
+        "logSha256": "5081b77d40f96b7c21bb5b07514633db556f4aa9d5294ad5a4d1d03743154707"
+      },
+      {
+        "module": "pyside-setup",
+        "phase": "wheel",
+        "argv": [
+          "/work/build-python/bin/python",
+          "setup.py",
+          "bdist_wheel",
+          "--qtpaths=/work/runtime-build/qt-prefix/bin/qtpaths",
+          "--module-subset=Core,Gui,Widgets,Network,DBus,Svg,OpenGL,Qml,Quick,QuickWidgets,Test",
+          "--no-qt-tools",
+          "--limited-api=yes",
+          "--parallel=2"
+        ],
+        "cwd": "/work/runtime-build/sources/pyside-setup-everywhere-src-6.8.2",
+        "completed": true,
+        "exit": 0,
+        "logSha256": "5a03bccfb12799eca4b4ef98bf07d1e723f320b48fed23b6a09feea56532d55c"
+      }
+    ],
+    "runtimeBuilt": true,
+    "runtimeClosureTested": false,
+    "licenseReviewComplete": false,
+    "correspondingSourceRebuildTested": false,
+    "recipientReplacementTested": false,
+    "publicReleaseQualified": false,
+    "ownerStateChanged": false,
+    "qtbaseRequiredFeatures": {
+      "testlib": "ON",
+      "dbus": "ON",
+      "wayland": "ON",
+      "accessibility": "ON",
+      "accessibility_atspi_bridge": "ON",
+      "icu": "ON",
+      "xcb": "ON",
+      "xcb_glx": "ON",
+      "egl": "ON",
+      "openssl": "ON",
+      "openssl_linked": "ON",
+      "fontconfig": "ON",
+      "system_zlib": "ON",
+      "system_pcre2": "ON",
+      "system_doubleconversion": "ON",
+      "system_freetype": "ON",
+      "system_harfbuzz": "ON",
+      "system_png": "ON",
+      "system_jpeg": "ON"
+    }
+  },
+  "bindingProbe": {
+    "format": "augmentor-source-build-binding-proof/1",
+    "toolSha256": "fd4fe26ca5a056484e1c80a1d369f16bdce7093a022f722336254ee6c29e601c",
+    "buildReportSha256": "8127441e2a84f44ccdc7671c086f469c74b421e222ad4457071e6894f4bcebdc",
+    "wheelRecords": [
+      {
+        "file": "PySide6-6.8.2.1-6.8.2-cp37-abi3-manylinux_2_39_x86_64.whl",
+        "sha256": "afb72cf50e336108afbb36a6b7704a9342ffc898130b628b661d5c874e5afd06",
+        "bytes": 10533737,
+        "recordVerified": true,
+        "nativeMembers": [
+          {
+            "path": "PySide6/QtCore.abi3.so",
+            "sha256": "e90eb32db55149f447c701ee1e35aa0b8d108f6204903a601d74cf9c0efb4e54"
+          },
+          {
+            "path": "PySide6/QtDBus.abi3.so",
+            "sha256": "ff3af5b5dcc908f7f49ed6a7c972a687ead2912540aaf97d90cba7fa028f020a"
+          },
+          {
+            "path": "PySide6/QtExampleIcons.abi3.so",
+            "sha256": "cd054b6d5f82d718774d660d82de8b9829f889cfc40a9143c3502ddb4cbc8ce3"
+          },
+          {
+            "path": "PySide6/QtGui.abi3.so",
+            "sha256": "ca0ecc7d07ed75ad0ab6774930f3b082b2affb1f0ae68bb9dab469c38521cfa1"
+          },
+          {
+            "path": "PySide6/QtNetwork.abi3.so",
+            "sha256": "0bea7e8db5a356f66622f6860f63d666d9930c59ba1d7adcba399bb671cf5add"
+          },
+          {
+            "path": "PySide6/QtOpenGL.abi3.so",
+            "sha256": "983449807f257542133bc5450c95f606839fb37f76b49dc9c4cb14a55bd0a325"
+          },
+          {
+            "path": "PySide6/QtQml.abi3.so",
+            "sha256": "2a0e9d71990e1f3f76b0b92a5d002c30a11c04f3751b6a15e900606b33290067"
+          },
+          {
+            "path": "PySide6/QtQuick.abi3.so",
+            "sha256": "9325ff593ac4ff4f1a2cfb70e4d9ff30d6802badeca0e6804bfe4f93b84d62d6"
+          },
+          {
+            "path": "PySide6/QtQuickWidgets.abi3.so",
+            "sha256": "23da4a660f6f940a4897c2672802245b596cf3a13ec518d2cebb5256be4d94aa"
+          },
+          {
+            "path": "PySide6/QtSvg.abi3.so",
+            "sha256": "e9b14dffc3b7294660d6a56abce5a21bdac45c6b8c9d19bc9da3366180e20bf3"
+          },
+          {
+            "path": "PySide6/QtTest.abi3.so",
+            "sha256": "a6123be967e8734551eeaa9489ea385791e08498066b9a67beca5f79bdcf000d"
+          },
+          {
+            "path": "PySide6/QtWidgets.abi3.so",
+            "sha256": "7a22f26ac69c966e7d9f16150758c102815ad4a6001b89c17a43cdb0c3869661"
+          },
+          {
+            "path": "PySide6/libpyside6.abi3.so.6.8",
+            "sha256": "731f0d70fe4ab3c9d87e2d3582d97e0fbd4f0a62ff136b6984d689f17892bfe8"
+          },
+          {
+            "path": "PySide6/libpyside6qml.abi3.so.6.8",
+            "sha256": "672a4e6320c10060feb946ecf9a8efe359f1c9359082253d5b13886e006bbcf6"
+          }
+        ]
+      },
+      {
+        "file": "shiboken6-6.8.2.1-6.8.2-cp37-abi3-manylinux_2_39_x86_64.whl",
+        "sha256": "a908c5696e620b4390ecd12267d28dbe6f759547df84fffd3745e85e59492c92",
+        "bytes": 205749,
+        "recordVerified": true,
+        "nativeMembers": [
+          {
+            "path": "shiboken6/Shiboken.abi3.so",
+            "sha256": "9fb60d8a262df73c589395aa1a890d9d46a341a3a0ede81764198a004cf78431"
+          },
+          {
+            "path": "shiboken6/libshiboken6.abi3.so.6.8",
+            "sha256": "1db433697e8c0d8223e5a8f2f3c242e8379f3a11e7123b1d20a3e8e1d0729000"
+          }
+        ]
+      },
+      {
+        "file": "shiboken6_generator-6.8.2.1-6.8.2-cp37-abi3-manylinux_2_39_x86_64.whl",
+        "sha256": "c85af24287c50c7cf01afe4f1d9ee028520b2acc93a661292f86b8f16218b2d3",
+        "bytes": 1463824,
+        "recordVerified": true,
+        "nativeMembers": [
+          {
+            "path": "shiboken6_generator/shiboken6",
+            "sha256": "a09d16c2780a13fe17ec258a23447b5cf83348e31770188094367b741bc71246"
+          }
+        ]
+      }
+    ],
+    "imports": [
+      {
+        "environment": "default",
+        "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+        "pyside": "6.8.2.1",
+        "qt": "6.8.2",
+        "shiboken": "6.8.2.1",
+        "bindingPath": "/work/source-runtime-build-proof/lib/python3.12/site-packages/PySide6/__init__.py",
+        "requestedBindingModulesImported": 11,
+        "qtMappedFiles": [
+          "/work/runtime-build/qt-prefix/lib/libQt6Core.so.6.8.2",
+          "/work/runtime-build/qt-prefix/lib/libQt6DBus.so.6.8.2",
+          "/work/runtime-build/qt-prefix/lib/libQt6Gui.so.6.8.2",
+          "/work/runtime-build/qt-prefix/lib/libQt6Network.so.6.8.2",
+          "/work/runtime-build/qt-prefix/lib/libQt6OpenGL.so.6.8.2",
+          "/work/runtime-build/qt-prefix/lib/libQt6Qml.so.6.8.2",
+          "/work/runtime-build/qt-prefix/lib/libQt6QmlMeta.so.6.8.2",
+          "/work/runtime-build/qt-prefix/lib/libQt6QmlModels.so.6.8.2",
+          "/work/runtime-build/qt-prefix/lib/libQt6QmlWorkerScript.so.6.8.2",
+          "/work/runtime-build/qt-prefix/lib/libQt6Quick.so.6.8.2",
+          "/work/runtime-build/qt-prefix/lib/libQt6QuickWidgets.so.6.8.2",
+          "/work/runtime-build/qt-prefix/lib/libQt6Svg.so.6.8.2",
+          "/work/runtime-build/qt-prefix/lib/libQt6Test.so.6.8.2",
+          "/work/runtime-build/qt-prefix/lib/libQt6Widgets.so.6.8.2"
+        ]
+      },
+      {
+        "environment": "explicit-prefix",
+        "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+        "pyside": "6.8.2.1",
+        "qt": "6.8.2",
+        "shiboken": "6.8.2.1",
+        "bindingPath": "/work/source-runtime-build-proof/lib/python3.12/site-packages/PySide6/__init__.py",
+        "requestedBindingModulesImported": 11,
+        "qtMappedFiles": [
+          "/work/runtime-build/qt-prefix/lib/libQt6Core.so.6.8.2",
+          "/work/runtime-build/qt-prefix/lib/libQt6DBus.so.6.8.2",
+          "/work/runtime-build/qt-prefix/lib/libQt6Gui.so.6.8.2",
+          "/work/runtime-build/qt-prefix/lib/libQt6Network.so.6.8.2",
+          "/work/runtime-build/qt-prefix/lib/libQt6OpenGL.so.6.8.2",
+          "/work/runtime-build/qt-prefix/lib/libQt6Qml.so.6.8.2",
+          "/work/runtime-build/qt-prefix/lib/libQt6QmlMeta.so.6.8.2",
+          "/work/runtime-build/qt-prefix/lib/libQt6QmlModels.so.6.8.2",
+          "/work/runtime-build/qt-prefix/lib/libQt6QmlWorkerScript.so.6.8.2",
+          "/work/runtime-build/qt-prefix/lib/libQt6Quick.so.6.8.2",
+          "/work/runtime-build/qt-prefix/lib/libQt6QuickWidgets.so.6.8.2",
+          "/work/runtime-build/qt-prefix/lib/libQt6Svg.so.6.8.2",
+          "/work/runtime-build/qt-prefix/lib/libQt6Test.so.6.8.2",
+          "/work/runtime-build/qt-prefix/lib/libQt6Widgets.so.6.8.2"
+        ]
+      }
+    ],
+    "fullRuntimeClosureQualified": false,
+    "licenseReviewComplete": false,
+    "publicReleaseQualified": false
+  },
+  "nativeByteComparison": {
+    "qtElfCount": 207,
+    "qtElfIdentical": 161,
+    "qtElfDifferent": [
+      "bin/qml",
+      "bin/qmltime",
+      "lib/libQt6LabsAnimation.so.6.8.2",
+      "lib/libQt6LabsFolderListModel.so.6.8.2",
+      "lib/libQt6LabsPlatform.so.6.8.2",
+      "lib/libQt6LabsQmlModels.so.6.8.2",
+      "lib/libQt6LabsSettings.so.6.8.2",
+      "lib/libQt6LabsSharedImage.so.6.8.2",
+      "lib/libQt6LabsWavefrontMesh.so.6.8.2",
+      "lib/libQt6Qml.so.6.8.2",
+      "lib/libQt6QmlCompiler.so.6.8.2",
+      "lib/libQt6QmlCore.so.6.8.2",
+      "lib/libQt6QmlLocalStorage.so.6.8.2",
+      "lib/libQt6QmlMeta.so.6.8.2",
+      "lib/libQt6QmlModels.so.6.8.2",
+      "lib/libQt6QmlNetwork.so.6.8.2",
+      "lib/libQt6QmlWorkerScript.so.6.8.2",
+      "lib/libQt6QmlXmlListModel.so.6.8.2",
+      "lib/libQt6Quick.so.6.8.2",
+      "lib/libQt6QuickControls2.so.6.8.2",
+      "lib/libQt6QuickControls2Basic.so.6.8.2",
+      "lib/libQt6QuickControls2BasicStyleImpl.so.6.8.2",
+      "lib/libQt6QuickControls2FluentWinUI3StyleImpl.so.6.8.2",
+      "lib/libQt6QuickControls2Fusion.so.6.8.2",
+      "lib/libQt6QuickControls2FusionStyleImpl.so.6.8.2",
+      "lib/libQt6QuickControls2Imagine.so.6.8.2",
+      "lib/libQt6QuickControls2ImagineStyleImpl.so.6.8.2",
+      "lib/libQt6QuickControls2Impl.so.6.8.2",
+      "lib/libQt6QuickControls2Material.so.6.8.2",
+      "lib/libQt6QuickControls2MaterialStyleImpl.so.6.8.2",
+      "lib/libQt6QuickControls2Universal.so.6.8.2",
+      "lib/libQt6QuickControls2UniversalStyleImpl.so.6.8.2",
+      "lib/libQt6QuickDialogs2.so.6.8.2",
+      "lib/libQt6QuickDialogs2QuickImpl.so.6.8.2",
+      "lib/libQt6QuickEffects.so.6.8.2",
+      "lib/libQt6QuickLayouts.so.6.8.2",
+      "lib/libQt6QuickParticles.so.6.8.2",
+      "lib/libQt6QuickShapes.so.6.8.2",
+      "lib/libQt6QuickTemplates2.so.6.8.2",
+      "lib/libQt6QuickTest.so.6.8.2",
+      "lib/libQt6QuickVectorImage.so.6.8.2",
+      "qml/Qt/test/controls/libquickcontrolstestutilsprivateplugin.so",
+      "qml/QtQuick/Controls/FluentWinUI3/libqtquickcontrols2fluentwinui3styleplugin.so",
+      "qml/QtQuick/NativeStyle/libqtquickcontrols2nativestyleplugin.so",
+      "qml/QtQuick/Window/libquickwindowplugin.so",
+      "qml/QtQuick/tooling/libquicktoolingplugin.so"
+    ],
+    "wheels": {
+      "PySide6-6.8.2.1-6.8.2-cp37-abi3-manylinux_2_39_x86_64.whl": {
+        "elfMembers": 14,
+        "nativeMembersIdentical": true,
+        "originalSha256": "fa2562ceee1e9af89a805876a52f6872be8d0792b7f41be43937051ea94a580b",
+        "recipientSha256": "afb72cf50e336108afbb36a6b7704a9342ffc898130b628b661d5c874e5afd06",
+        "nonNativeDiffering": [
+          "PySide6-6.8.2.1.dist-info/RECORD",
+          "PySide6/_config.py",
+          "PySide6/support/__pycache__/__init__.cpython-312.pyc",
+          "PySide6/support/__pycache__/deprecated.cpython-312.pyc"
+        ]
+      },
+      "shiboken6-6.8.2.1-6.8.2-cp37-abi3-manylinux_2_39_x86_64.whl": {
+        "elfMembers": 2,
+        "nativeMembersIdentical": true,
+        "originalSha256": "aa0309c680f1ea3ef445a3bce8177ebfea7825008b9761763d434ff44ecec5db",
+        "recipientSha256": "a908c5696e620b4390ecd12267d28dbe6f759547df84fffd3745e85e59492c92",
+        "nonNativeDiffering": [
+          "shiboken6-6.8.2.1.dist-info/RECORD",
+          "shiboken6/_config.py"
+        ]
+      },
+      "shiboken6_generator-6.8.2.1-6.8.2-cp37-abi3-manylinux_2_39_x86_64.whl": {
+        "elfMembers": 1,
+        "nativeMembersIdentical": true,
+        "originalSha256": "dd70b6c252f3194c12a73d78d57b79f02b4a9800042d1cc2f7f5559ba5da7eb4",
+        "recipientSha256": "c85af24287c50c7cf01afe4f1d9ee028520b2acc93a661292f86b8f16218b2d3",
+        "nonNativeDiffering": [
+          "shiboken6_generator-6.8.2.1.dist-info/RECORD",
+          "shiboken6_generator/_config.py"
+        ]
+      }
+    }
+  },
+  "derivedWheel": {
+    "format": "augmentor-source-pyside-derivation/1",
+    "producerSha256": "afb72cf50e336108afbb36a6b7704a9342ffc898130b628b661d5c874e5afd06",
+    "removed": [
+      {
+        "path": "PySide6/QtExampleIcons.abi3.so",
+        "sha256": "cd054b6d5f82d718774d660d82de8b9829f889cfc40a9143c3502ddb4cbc8ce3"
+      }
+    ],
+    "reason": "Unused unconditional example resource target; GPL-3.0-only WITH Qt-GPL-exception-1.0 OR commercial.",
+    "correspondingSource": "sources/pyside6/qtexampleicons/module.c",
+    "pinnedCommit": "f62088b4cd516a3080a6b2e68bc79903da8b67ce",
+    "wheelTagsAndMetadataUnchanged": true,
+    "licenseReviewComplete": false,
+    "producerFile": "PySide6-6.8.2.1-6.8.2-cp37-abi3-manylinux_2_39_x86_64.whl",
+    "derivedFile": "PySide6-6.8.2.1-6.8.2augmentor2-cp37-abi3-manylinux_2_39_x86_64.whl",
+    "derivedSha256": "5cb05190ddf1db3e2915662b8c744f56922f40bd03b84683b6651742cfb1c951",
+    "derivedBytes": 10312884,
+    "producerUnchanged": true,
+    "retainedProducerBytesUnchanged": true,
+    "toolSha256": "50c2ec4720dd784a0a408845a934bc622ed679c7404a6668d997e0710cf7b7eb"
+  },
+  "finiteRuntime": {
+    "stageInventorySha256": "c49faf50a992daca825c51929715c6114017e6b29ac54af17f9656db41e73364",
+    "toolSha256": "3dc1cd88387cdb0afa49ef9a68f44e4a0591fac80860a4f5c78adf6c27fd9049",
+    "qtSonames": [
+      "libQt6Core.so.6",
+      "libQt6DBus.so.6",
+      "libQt6Gui.so.6",
+      "libQt6Network.so.6",
+      "libQt6OpenGL.so.6",
+      "libQt6Qml.so.6",
+      "libQt6QmlMeta.so.6",
+      "libQt6QmlModels.so.6",
+      "libQt6QmlWorkerScript.so.6",
+      "libQt6Quick.so.6",
+      "libQt6QuickWidgets.so.6",
+      "libQt6Svg.so.6",
+      "libQt6Test.so.6",
+      "libQt6WaylandClient.so.6",
+      "libQt6WaylandEglClientHwIntegration.so.6",
+      "libQt6Widgets.so.6",
+      "libQt6WlShellIntegration.so.6",
+      "libQt6XcbQpa.so.6"
+    ],
+    "externalSonames": [
+      "ld-linux-x86-64.so.2",
+      "libEGL.so.1",
+      "libGLX.so.0",
+      "libOpenGL.so.0",
+      "libX11-xcb.so.1",
+      "libX11.so.6",
+      "libbrotlidec.so.1",
+      "libc.so.6",
+      "libcrypto.so.3",
+      "libdbus-1.so.3",
+      "libdouble-conversion.so.3",
+      "libfontconfig.so.1",
+      "libfreetype.so.6",
+      "libgcc_s.so.1",
+      "libgio-2.0.so.0",
+      "libglib-2.0.so.0",
+      "libgobject-2.0.so.0",
+      "libharfbuzz.so.0",
+      "libicui18n.so.74",
+      "libicuuc.so.74",
+      "libjpeg.so.8",
+      "libm.so.6",
+      "libpcre2-16.so.0",
+      "libpng16.so.16",
+      "libssl.so.3",
+      "libstdc++.so.6",
+      "libtiff.so.6",
+      "libwayland-client.so.0",
+      "libwayland-cursor.so.0",
+      "libwayland-egl.so.1",
+      "libwebp.so.7",
+      "libwebpdemux.so.2",
+      "libwebpmux.so.3",
+      "libxcb-cursor.so.0",
+      "libxcb-glx.so.0",
+      "libxcb-icccm.so.4",
+      "libxcb-image.so.0",
+      "libxcb-keysyms.so.1",
+      "libxcb-randr.so.0",
+      "libxcb-render-util.so.0",
+      "libxcb-render.so.0",
+      "libxcb-shape.so.0",
+      "libxcb-shm.so.0",
+      "libxcb-sync.so.1",
+      "libxcb-xfixes.so.0",
+      "libxcb-xkb.so.1",
+      "libxcb.so.1",
+      "libxkbcommon-x11.so.0",
+      "libxkbcommon.so.0",
+      "libz.so.1",
+      "libzstd.so.1"
+    ],
+    "files": 67,
+    "symlinks": 18,
+    "entireSdkShipped": false,
+    "dynamicClosureQualified": false
+  },
+  "runtimeOnlyFixture": {
+    "name": "augmentor-noble-recipient-runtime-20261002-k",
+    "image": "sha256:5840c8b27f1fa63ca78618206403beb2fdb4c212ca0d17ce36bc701c4bb9c63c",
+    "hostConfig": {
+      "NetworkMode": "none",
+      "NanoCpus": 2000000000,
+      "Memory": 2147483648,
+      "PidsLimit": 256,
+      "Privileged": false,
+      "Devices": []
+    },
+    "mounts": [],
+    "probeToolSha256": "860cc78cbedd875907ce04b165c640d1b2f152614eaaf074433b364a40570b4d",
+    "result": {
+      "format": "augmentor-source-runtime-only-probe/1",
+      "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+      "pyside": "6.8.2.1",
+      "qt": "6.8.2",
+      "shiboken": "6.8.2.1",
+      "requestedBindingModulesImported": 11,
+      "qtMappedFiles": [
+        "/work/qt/lib/libQt6Core.so.6.8.2",
+        "/work/qt/lib/libQt6DBus.so.6.8.2",
+        "/work/qt/lib/libQt6Gui.so.6.8.2",
+        "/work/qt/lib/libQt6Network.so.6.8.2",
+        "/work/qt/lib/libQt6OpenGL.so.6.8.2",
+        "/work/qt/lib/libQt6Qml.so.6.8.2",
+        "/work/qt/lib/libQt6QmlMeta.so.6.8.2",
+        "/work/qt/lib/libQt6QmlModels.so.6.8.2",
+        "/work/qt/lib/libQt6QmlWorkerScript.so.6.8.2",
+        "/work/qt/lib/libQt6Quick.so.6.8.2",
+        "/work/qt/lib/libQt6QuickWidgets.so.6.8.2",
+        "/work/qt/lib/libQt6Svg.so.6.8.2",
+        "/work/qt/lib/libQt6Test.so.6.8.2",
+        "/work/qt/lib/libQt6Widgets.so.6.8.2"
+      ],
+      "noProducerBuildTree": true,
+      "qtExampleIconsAbsent": true,
+      "offscreenWidgetSyntheticTextPassed": true,
+      "svgRedPixelPassed": true,
+      "qtQuickModuleAndPlasmaComponentCreated": true,
+      "imageFormats": [
+        "bmp",
+        "cur",
+        "gif",
+        "icns",
+        "ico",
+        "jfif",
+        "jpeg",
+        "jpg",
+        "pbm",
+        "pgm",
+        "png",
+        "ppm",
+        "svg",
+        "svgz",
+        "tga",
+        "tif",
+        "tiff",
+        "wbmp",
+        "webp",
+        "xbm",
+        "xpm"
+      ],
+      "fullPlasmaShaderRenderQualified": false,
+      "nativeDesktopQualified": false,
+      "fullProductQualified": false
+    }
+  },
+  "modifiedSvgBuild": {
+    "format": "augmentor-qt-recipient-modified-library-build/1",
+    "archiveSha256": "aa2579f21ca66d19cbcf31d87e9067e07932635d36869c8239d4decd0a9dc1fa",
+    "toolSha256": "440b4cfe57a516d519d75585365f109b2842e6ffb182b96fc7a3819c2d970591",
+    "sourceFile": "src/svg/qsvgrenderer.cpp",
+    "sourceBeforeSha256": "40f5a00d34126d1b9781896370da2225565581acf5912e093a346d8e973626a9",
+    "sourceAfterSha256": "301548f4a5537ac2c78cadcea03cdced56bad8f959ef3a5f3ce6b732e5ae72c7",
+    "patchSha256": "cd5ed96fd32588530943814f0f8b0d288b4ec178e02d1ed20054a6bb902b8d2d",
+    "changedLibrarySha256": "a985e33587010af0fc4a7dbea3b3f36082b6f04488f37255da36e3fd4218047f",
+    "change": "QSvgRenderer.isValid deliberately returns false for the synthetic replacement proof",
+    "freshSvgSourceAndBuild": true,
+    "matchingSourceBuiltQtSdkReusedAsDependency": true,
+    "producerSdkChanged": false,
+    "completedCommands": 3,
+    "actualRecipientExecutionQualified": false,
+    "fullProductQualified": false,
+    "licenseReviewComplete": false
+  },
+  "replacementExecution": {
+    "format": "augmentor-source-qt-recipient-execution-proof/1",
+    "toolSha256": "c738520682361840110dd4584777c4b80d587690c181da4b0fdfb95a1d7badad",
+    "results": [
+      {
+        "qt": "6.8.2",
+        "isValid": true,
+        "svgLibrary": "/work/qt/lib/libQt6Svg.so.6.8.2",
+        "svgSha256": "8d3aa8b980b270037f20735eb15d53a465bdd27959b390bb4bae2da876777a49",
+        "qtMappedFiles": [
+          "/work/qt/lib/libQt6Core.so.6.8.2",
+          "/work/qt/lib/libQt6DBus.so.6.8.2",
+          "/work/qt/lib/libQt6Gui.so.6.8.2",
+          "/work/qt/lib/libQt6Svg.so.6.8.2",
+          "/work/qt/lib/libQt6Widgets.so.6.8.2"
+        ]
+      },
+      {
+        "qt": "6.8.2",
+        "isValid": false,
+        "svgLibrary": "/work/qt-recipient-candidate/lib/libQt6Svg.so.6.8.2",
+        "svgSha256": "a985e33587010af0fc4a7dbea3b3f36082b6f04488f37255da36e3fd4218047f",
+        "qtMappedFiles": [
+          "/work/qt-recipient-candidate/lib/libQt6Core.so.6.8.2",
+          "/work/qt-recipient-candidate/lib/libQt6DBus.so.6.8.2",
+          "/work/qt-recipient-candidate/lib/libQt6Gui.so.6.8.2",
+          "/work/qt-recipient-candidate/lib/libQt6Svg.so.6.8.2",
+          "/work/qt-recipient-candidate/lib/libQt6Widgets.so.6.8.2"
+        ]
+      }
+    ],
+    "originalRuntimeInventoryVerifiedBeforeAndAfter": true,
+    "onlySvgFileReplaced": true,
+    "actualModifiedSvgBehaviorExecuted": true,
+    "explicitRuntimeEnvironmentRequired": true,
+    "producerTreeAbsent": true,
+    "selectedApplicationChanged": false,
+    "ownerStateChanged": false,
+    "fullProductReplacementQualified": false,
+    "licenseReviewComplete": false
+  },
+  "preservedPreflightFailures": [
+    {
+      "operation": "Private binding-probe copy",
+      "result": "Copied600-mode script was owned by root and refused normalUID reading.",
+      "logSha256": "aea09bc8d3bb1601cccd8586e3bdfc3d52bae6a57c9592105efdaf4eb281bb1a",
+      "correction": "Change ownership only of that exact fixture script; repeat succeeded, then the published verifier ran independently."
+    },
+    {
+      "operation": "Create runtime fixture directories",
+      "result": "/inputs already existed in the fresh image; mkdir reported that fact.",
+      "correction": "/work/wheels was created; later runtime assertions and probes passed."
+    }
+  ],
+  "functionalRecipientRebuildPassed": true,
+  "byteForByteReproducible": false,
+  "explicitRuntimeEnvironmentRequired": true,
+  "fullProductEntrypointsQualified": false,
+  "nativeDesktopGraphicsQualified": false,
+  "fullPlasmaShaderRenderQualified": false,
+  "fullSourceKitQualified": false,
+  "compiledFileNoticeMappingComplete": false,
+  "legalReviewComplete": false,
+  "otherDistroAbiQualified": false,
+  "publicReleaseQualified": false,
+  "ownerStateChanged": false,
+  "selectedApplicationChanged": false,
+  "remaining": [
+    "Offer complete authenticated base/package/source/generated-shader/notice/control-script kit and recipient instructions with suitable script permissions.",
+    "Review exact compiled-file notice mapping and distribution conditions.",
+    "Implement separate source-runtime profile and qualify all relevant product entrypoints, native graphics and modified-library replacement through those entrypoints.",
+    "Provide matching runtime/package profiles for Mint, Arch and SUSE and finish desktop, Browser/audio, update/rollback acceptance."
+  ]
+}

@@ -1,0 +1,499 @@
+{
+  "format": "augmentor-gnome-native-capture/1",
+  "sourceBase": "83bcb6c3a44ed21b34a3c1166a41223b71b81a04",
+  "candidateUncommittedAtExecution": true,
+  "target": "fedora44-x86_64",
+  "nativeSession": {
+    "shellVersion": "50.5",
+    "sessionType": "wayland",
+    "pythonVersion": "3.14.3",
+    "selinux": "Enforcing",
+    "uid": 1000,
+    "virtualMachine": true,
+    "selectedSourceUnchanged": "aef93bb04520a003c5c48536aa6d4210105fc8ad",
+    "selectedArtifactUnchanged": "f7d5962720e959a2624752e8b49a64ed7efb6ced5d4cc1e0c12d6e536c52008f"
+  },
+  "candidateSourceSha256": {
+    "worker.py": "795d16c85fdc358158038463980ec89c124005e08d5b9d0cf72f7b9d05482eff",
+    "portal_session.py": "fc7abe0bbdc22d679d2df7ad6c83b024611a524418b546106f1ecd2b9c8b7e3d",
+    "gnome_control.py": "d760259794750504dbb146980a348c9cde272c3ec5b63d2e76b4995ad2099737",
+    "gnome.py": "968532f622b04be2f3c84955e8d9e2d3ae34437e3c62f17695713344170c09e1",
+    "portal.py": "0339d7d3220fa0988c3dda81b148743cbf060ca6000c653999e4ba04cccafca8",
+    "kwin.py": "fb23c1615f598cbde8d0e2436c778bc2480bb07f70e451ed837cb5973d2229a6",
+    "capture_stream.py": "66fb68873c9ac7ba9d54b04729aab74a25e4cddb4f41b327b50b507c29cc633c",
+    "scene.py": "0b583fe11aa9f6b1e26d029f5bf6705c4a45f57bef2db3210c11ddf9b7dd67a4",
+    "probe-gnome-target.py": "aba8786b436db6fb031f7d62478cecd18da8bee1d954ec86fbd48991a3bf60b9",
+    "probe-gnome-capture.py": "28de02a43905bb3637a6ba01dbaf32bf81a5d5f4d3bd1b1ae2f141ea91a9b309"
+  },
+  "checks": {
+    "realScaleOneCaptureAndVisibleStop": {
+      "probe": "gnome-execution-probe-v7",
+      "rawReportSha256": "86a3d6addac0e78cc305e9e8e3a131d274871d08c5c3a201629ea572f3d32683",
+      "candidateSourceSha256": {
+        "worker.py": "795d16c85fdc358158038463980ec89c124005e08d5b9d0cf72f7b9d05482eff",
+        "portal_session.py": "fc7abe0bbdc22d679d2df7ad6c83b024611a524418b546106f1ecd2b9c8b7e3d",
+        "gnome_control.py": "d760259794750504dbb146980a348c9cde272c3ec5b63d2e76b4995ad2099737",
+        "gnome.py": "968532f622b04be2f3c84955e8d9e2d3ae34437e3c62f17695713344170c09e1",
+        "portal.py": "0339d7d3220fa0988c3dda81b148743cbf060ca6000c653999e4ba04cccafca8",
+        "kwin.py": "fb23c1615f598cbde8d0e2436c778bc2480bb07f70e451ed837cb5973d2229a6",
+        "capture_stream.py": "66fb68873c9ac7ba9d54b04729aab74a25e4cddb4f41b327b50b507c29cc633c",
+        "scene.py": "0b583fe11aa9f6b1e26d029f5bf6705c4a45f57bef2db3210c11ddf9b7dd67a4",
+        "probe-gnome-target.py": "aba8786b436db6fb031f7d62478cecd18da8bee1d954ec86fbd48991a3bf60b9",
+        "probe-gnome-capture.py": "28de02a43905bb3637a6ba01dbaf32bf81a5d5f4d3bd1b1ae2f141ea91a9b309"
+      },
+      "connect": {
+        "pid": 8069,
+        "busy": false,
+        "active": true,
+        "sharing": true,
+        "owner": "codex:owned-gnome-capture-fixture",
+        "backend": "gnome-wayland-portal-candidate",
+        "monitors": "single",
+        "inputQualified": false
+      },
+      "capture": {
+        "imageSize": {
+          "width": 1280,
+          "height": 800
+        },
+        "screen": {
+          "name": "monitor:0",
+          "geometry": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 800
+          },
+          "scale": 1
+        },
+        "targetPid": 8019,
+        "encodedImageSha256": "22931ccf4a5f7b752acc5b3869f1a75f32acc73fc5ecd2cd6037c13856ed039d",
+        "freshTokenCreated": true
+      },
+      "resourcesDetached": true,
+      "stopClicked": true,
+      "stopReason": "requested",
+      "diagnostic": {
+        "phase": "idle-watch",
+        "kind": "RuntimeError",
+        "message": "Desktop control stopped."
+      },
+      "syntheticStalledPipeline": false,
+      "cleanupAfterStopSeconds": 0.2995547720056493,
+      "guiTicksDuringCleanup": 6,
+      "targetState": {
+        "format": "augmentor-owned-gtk-target/1",
+        "pid": 8019,
+        "clicks": {
+          "center": 0,
+          "edge": 0
+        },
+        "textA": "",
+        "textB": ""
+      }
+    },
+    "syntheticStalledFrameVisibleStop": {
+      "probe": "gnome-execution-probe-v8",
+      "rawReportSha256": "d27e17e55700efcc5c719f4d92401f43f41c79c94155a91e43c663228b42940f",
+      "candidateSourceSha256": {
+        "worker.py": "795d16c85fdc358158038463980ec89c124005e08d5b9d0cf72f7b9d05482eff",
+        "portal_session.py": "fc7abe0bbdc22d679d2df7ad6c83b024611a524418b546106f1ecd2b9c8b7e3d",
+        "gnome_control.py": "d760259794750504dbb146980a348c9cde272c3ec5b63d2e76b4995ad2099737",
+        "gnome.py": "968532f622b04be2f3c84955e8d9e2d3ae34437e3c62f17695713344170c09e1",
+        "portal.py": "0339d7d3220fa0988c3dda81b148743cbf060ca6000c653999e4ba04cccafca8",
+        "kwin.py": "fb23c1615f598cbde8d0e2436c778bc2480bb07f70e451ed837cb5973d2229a6",
+        "capture_stream.py": "66fb68873c9ac7ba9d54b04729aab74a25e4cddb4f41b327b50b507c29cc633c",
+        "scene.py": "0b583fe11aa9f6b1e26d029f5bf6705c4a45f57bef2db3210c11ddf9b7dd67a4",
+        "probe-gnome-target.py": "aba8786b436db6fb031f7d62478cecd18da8bee1d954ec86fbd48991a3bf60b9",
+        "probe-gnome-capture.py": "28de02a43905bb3637a6ba01dbaf32bf81a5d5f4d3bd1b1ae2f141ea91a9b309"
+      },
+      "connect": {
+        "pid": 8405,
+        "busy": false,
+        "active": true,
+        "sharing": true,
+        "owner": "codex:owned-gnome-capture-fixture",
+        "backend": "gnome-wayland-portal-candidate",
+        "monitors": "single",
+        "inputQualified": false
+      },
+      "capture": {
+        "error": "Desktop control stopped. No action is replayed."
+      },
+      "resourcesDetached": true,
+      "stopClicked": true,
+      "stopReason": "requested",
+      "diagnostic": null,
+      "syntheticStalledPipeline": true,
+      "cleanupAfterStopSeconds": 0.06334014699677937,
+      "guiTicksDuringCleanup": 2,
+      "targetState": {
+        "format": "augmentor-owned-gtk-target/1",
+        "pid": 8372,
+        "clicks": {
+          "center": 0,
+          "edge": 0
+        },
+        "textA": "",
+        "textB": ""
+      }
+    },
+    "realCaptureThenNativeSharingStop": {
+      "probe": "gnome-execution-probe-v9",
+      "rawReportSha256": "01142ca673913e35316e81455275270e7176803be0c5147440f13994839605cd",
+      "candidateSourceSha256": {
+        "worker.py": "795d16c85fdc358158038463980ec89c124005e08d5b9d0cf72f7b9d05482eff",
+        "portal_session.py": "fc7abe0bbdc22d679d2df7ad6c83b024611a524418b546106f1ecd2b9c8b7e3d",
+        "gnome_control.py": "d760259794750504dbb146980a348c9cde272c3ec5b63d2e76b4995ad2099737",
+        "gnome.py": "968532f622b04be2f3c84955e8d9e2d3ae34437e3c62f17695713344170c09e1",
+        "portal.py": "0339d7d3220fa0988c3dda81b148743cbf060ca6000c653999e4ba04cccafca8",
+        "kwin.py": "fb23c1615f598cbde8d0e2436c778bc2480bb07f70e451ed837cb5973d2229a6",
+        "capture_stream.py": "66fb68873c9ac7ba9d54b04729aab74a25e4cddb4f41b327b50b507c29cc633c",
+        "scene.py": "0b583fe11aa9f6b1e26d029f5bf6705c4a45f57bef2db3210c11ddf9b7dd67a4",
+        "probe-gnome-target.py": "aba8786b436db6fb031f7d62478cecd18da8bee1d954ec86fbd48991a3bf60b9",
+        "probe-gnome-capture.py": "28de02a43905bb3637a6ba01dbaf32bf81a5d5f4d3bd1b1ae2f141ea91a9b309"
+      },
+      "connect": {
+        "pid": 8621,
+        "busy": false,
+        "active": true,
+        "sharing": true,
+        "owner": "codex:owned-gnome-capture-fixture",
+        "backend": "gnome-wayland-portal-candidate",
+        "monitors": "single",
+        "inputQualified": false
+      },
+      "capture": {
+        "imageSize": {
+          "width": 1280,
+          "height": 800
+        },
+        "screen": {
+          "name": "monitor:0",
+          "geometry": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 800
+          },
+          "scale": 1
+        },
+        "targetPid": 8595,
+        "encodedImageSha256": "bc7e443c60fe02e31900773c12a4be2a3aea50738ae98643b8503a0af8566a1b",
+        "freshTokenCreated": true
+      },
+      "resourcesDetached": true,
+      "stopClicked": false,
+      "stopReason": "native-session-closed",
+      "diagnostic": null,
+      "syntheticStalledPipeline": false,
+      "cleanupAfterStopSeconds": 0.009951387997716665,
+      "guiTicksDuringCleanup": 0,
+      "targetState": {
+        "format": "augmentor-owned-gtk-target/1",
+        "pid": 8595,
+        "clicks": {
+          "center": 0,
+          "edge": 0
+        },
+        "textA": "",
+        "textB": ""
+      }
+    }
+  },
+  "historicalCandidates": [
+    {
+      "probe": "gnome-execution-probe-v1",
+      "rawReportSha256": "cedaad2e577ac1df074a2da414a1cdb6488a6c3dc755cb64b9390b631f340873",
+      "candidateSourceSha256": {
+        "worker.py": "795d16c85fdc358158038463980ec89c124005e08d5b9d0cf72f7b9d05482eff",
+        "portal_session.py": "3af1c3a458e64669b92ad32229b42d1fcd64d0de260d15114ece9be219500483",
+        "gnome_control.py": "fe6186e15f35e2c3bf648dbe115bc538fc6e86b9babefdec34a4216f705e8b55",
+        "gnome.py": "968532f622b04be2f3c84955e8d9e2d3ae34437e3c62f17695713344170c09e1",
+        "portal.py": "0339d7d3220fa0988c3dda81b148743cbf060ca6000c653999e4ba04cccafca8",
+        "kwin.py": "fb23c1615f598cbde8d0e2436c778bc2480bb07f70e451ed837cb5973d2229a6",
+        "capture_stream.py": "66fb68873c9ac7ba9d54b04729aab74a25e4cddb4f41b327b50b507c29cc633c",
+        "scene.py": "0b583fe11aa9f6b1e26d029f5bf6705c4a45f57bef2db3210c11ddf9b7dd67a4",
+        "probe-gnome-target.py": "aba8786b436db6fb031f7d62478cecd18da8bee1d954ec86fbd48991a3bf60b9",
+        "probe-gnome-capture.py": "1fa0e6b56dd5673670460fb0379229351d944f4dbcc919110d1904b5d8a4ce55"
+      },
+      "connect": {
+        "error": "Late consent discarded after cancellation."
+      },
+      "capture": null,
+      "resourcesDetached": true,
+      "stopClicked": false,
+      "stopReason": null,
+      "diagnostic": null,
+      "syntheticStalledPipeline": false,
+      "cleanupAfterStopSeconds": null,
+      "guiTicksDuringCleanup": 0,
+      "targetState": {
+        "format": "augmentor-owned-gtk-target/1",
+        "pid": 6407,
+        "clicks": {
+          "center": 0,
+          "edge": 0
+        },
+        "textA": "",
+        "textB": ""
+      }
+    },
+    {
+      "probe": "gnome-execution-probe-v2",
+      "rawReportSha256": "3ff0c23dba4253cc6af011855fab284c07a75b8a934e73bd52ce903725818bba",
+      "candidateSourceSha256": {
+        "worker.py": "795d16c85fdc358158038463980ec89c124005e08d5b9d0cf72f7b9d05482eff",
+        "portal_session.py": "3af1c3a458e64669b92ad32229b42d1fcd64d0de260d15114ece9be219500483",
+        "gnome_control.py": "4d847364765883cb0bcc0624e1eeae3a0d38cc38cccd786e3836705767efff83",
+        "gnome.py": "968532f622b04be2f3c84955e8d9e2d3ae34437e3c62f17695713344170c09e1",
+        "portal.py": "0339d7d3220fa0988c3dda81b148743cbf060ca6000c653999e4ba04cccafca8",
+        "kwin.py": "fb23c1615f598cbde8d0e2436c778bc2480bb07f70e451ed837cb5973d2229a6",
+        "capture_stream.py": "66fb68873c9ac7ba9d54b04729aab74a25e4cddb4f41b327b50b507c29cc633c",
+        "scene.py": "0b583fe11aa9f6b1e26d029f5bf6705c4a45f57bef2db3210c11ddf9b7dd67a4",
+        "probe-gnome-target.py": "aba8786b436db6fb031f7d62478cecd18da8bee1d954ec86fbd48991a3bf60b9",
+        "probe-gnome-capture.py": "6575984c3ff98db886b3e1b4baabd052dbfe8c834f853d68ec36998e01ba3983"
+      },
+      "connect": {
+        "error": "GNOME input is blocked. Fresh desktop consent is required."
+      },
+      "capture": null,
+      "resourcesDetached": true,
+      "stopClicked": false,
+      "stopReason": null,
+      "diagnostic": null,
+      "syntheticStalledPipeline": false,
+      "cleanupAfterStopSeconds": null,
+      "guiTicksDuringCleanup": 0,
+      "targetState": {
+        "format": "augmentor-owned-gtk-target/1",
+        "pid": 6813,
+        "clicks": {
+          "center": 0,
+          "edge": 0
+        },
+        "textA": "",
+        "textB": ""
+      }
+    },
+    {
+      "probe": "gnome-execution-probe-v3",
+      "rawReportSha256": "f09a6236f1537893e7443b341282394eb5489fa2aa439bcbc426ca633fab7f05",
+      "candidateSourceSha256": {
+        "worker.py": "795d16c85fdc358158038463980ec89c124005e08d5b9d0cf72f7b9d05482eff",
+        "portal_session.py": "3af1c3a458e64669b92ad32229b42d1fcd64d0de260d15114ece9be219500483",
+        "gnome_control.py": "4d847364765883cb0bcc0624e1eeae3a0d38cc38cccd786e3836705767efff83",
+        "gnome.py": "968532f622b04be2f3c84955e8d9e2d3ae34437e3c62f17695713344170c09e1",
+        "portal.py": "0339d7d3220fa0988c3dda81b148743cbf060ca6000c653999e4ba04cccafca8",
+        "kwin.py": "fb23c1615f598cbde8d0e2436c778bc2480bb07f70e451ed837cb5973d2229a6",
+        "capture_stream.py": "66fb68873c9ac7ba9d54b04729aab74a25e4cddb4f41b327b50b507c29cc633c",
+        "scene.py": "0b583fe11aa9f6b1e26d029f5bf6705c4a45f57bef2db3210c11ddf9b7dd67a4",
+        "probe-gnome-target.py": "aba8786b436db6fb031f7d62478cecd18da8bee1d954ec86fbd48991a3bf60b9",
+        "probe-gnome-capture.py": "6575984c3ff98db886b3e1b4baabd052dbfe8c834f853d68ec36998e01ba3983"
+      },
+      "connect": {
+        "pid": 7015,
+        "busy": false,
+        "active": true,
+        "sharing": true,
+        "owner": "codex:owned-gnome-capture-fixture",
+        "backend": "gnome-wayland-portal-candidate",
+        "monitors": "single",
+        "inputQualified": false
+      },
+      "capture": {
+        "error": "Desktop control stopped. No action is replayed."
+      },
+      "resourcesDetached": true,
+      "stopClicked": false,
+      "stopReason": null,
+      "diagnostic": null,
+      "syntheticStalledPipeline": false,
+      "cleanupAfterStopSeconds": null,
+      "guiTicksDuringCleanup": 1,
+      "targetState": {
+        "format": "augmentor-owned-gtk-target/1",
+        "pid": 6982,
+        "clicks": {
+          "center": 0,
+          "edge": 0
+        },
+        "textA": "",
+        "textB": ""
+      }
+    },
+    {
+      "probe": "gnome-execution-probe-v4",
+      "rawReportSha256": "e026159a8f788dd7bed029fc88459dde75f64d34a8a6c8815e6c45444b7c7b8a",
+      "candidateSourceSha256": {
+        "worker.py": "795d16c85fdc358158038463980ec89c124005e08d5b9d0cf72f7b9d05482eff",
+        "portal_session.py": "fc7abe0bbdc22d679d2df7ad6c83b024611a524418b546106f1ecd2b9c8b7e3d",
+        "gnome_control.py": "f8e2e61c04338549d91701f7e1a53aada1959663cefbc7ea0cc025c66fc8c1ee",
+        "gnome.py": "968532f622b04be2f3c84955e8d9e2d3ae34437e3c62f17695713344170c09e1",
+        "portal.py": "0339d7d3220fa0988c3dda81b148743cbf060ca6000c653999e4ba04cccafca8",
+        "kwin.py": "fb23c1615f598cbde8d0e2436c778bc2480bb07f70e451ed837cb5973d2229a6",
+        "capture_stream.py": "66fb68873c9ac7ba9d54b04729aab74a25e4cddb4f41b327b50b507c29cc633c",
+        "scene.py": "0b583fe11aa9f6b1e26d029f5bf6705c4a45f57bef2db3210c11ddf9b7dd67a4",
+        "probe-gnome-target.py": "aba8786b436db6fb031f7d62478cecd18da8bee1d954ec86fbd48991a3bf60b9",
+        "probe-gnome-capture.py": "5f640464e12c6ee72f9454e44ea51808b011fed98a70e552d8d6324030a0096e"
+      },
+      "connect": {
+        "error": "Desktop sharing request timed out. No input was sent."
+      },
+      "capture": null,
+      "resourcesDetached": true,
+      "stopClicked": false,
+      "stopReason": "requested",
+      "diagnostic": null,
+      "syntheticStalledPipeline": false,
+      "cleanupAfterStopSeconds": null,
+      "guiTicksDuringCleanup": 0,
+      "targetState": {
+        "format": "augmentor-owned-gtk-target/1",
+        "pid": 7350,
+        "clicks": {
+          "center": 0,
+          "edge": 0
+        },
+        "textA": "",
+        "textB": ""
+      }
+    },
+    {
+      "probe": "gnome-execution-probe-v5",
+      "rawReportSha256": "5e4370c024953b712ea465f09514cc7f7cecdfd7a1519b29cd4f849b99b27e8c",
+      "candidateSourceSha256": {
+        "worker.py": "795d16c85fdc358158038463980ec89c124005e08d5b9d0cf72f7b9d05482eff",
+        "portal_session.py": "fc7abe0bbdc22d679d2df7ad6c83b024611a524418b546106f1ecd2b9c8b7e3d",
+        "gnome_control.py": "f8e2e61c04338549d91701f7e1a53aada1959663cefbc7ea0cc025c66fc8c1ee",
+        "gnome.py": "968532f622b04be2f3c84955e8d9e2d3ae34437e3c62f17695713344170c09e1",
+        "portal.py": "0339d7d3220fa0988c3dda81b148743cbf060ca6000c653999e4ba04cccafca8",
+        "kwin.py": "fb23c1615f598cbde8d0e2436c778bc2480bb07f70e451ed837cb5973d2229a6",
+        "capture_stream.py": "66fb68873c9ac7ba9d54b04729aab74a25e4cddb4f41b327b50b507c29cc633c",
+        "scene.py": "0b583fe11aa9f6b1e26d029f5bf6705c4a45f57bef2db3210c11ddf9b7dd67a4",
+        "probe-gnome-target.py": "aba8786b436db6fb031f7d62478cecd18da8bee1d954ec86fbd48991a3bf60b9",
+        "probe-gnome-capture.py": "5f640464e12c6ee72f9454e44ea51808b011fed98a70e552d8d6324030a0096e"
+      },
+      "connect": {
+        "pid": 7625,
+        "busy": false,
+        "active": true,
+        "sharing": true,
+        "owner": "codex:owned-gnome-capture-fixture",
+        "backend": "gnome-wayland-portal-candidate",
+        "monitors": "single",
+        "inputQualified": false
+      },
+      "capture": {
+        "imageSize": {
+          "width": 1280,
+          "height": 800
+        },
+        "screen": {
+          "name": "monitor:0",
+          "geometry": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 800
+          },
+          "scale": 1
+        },
+        "targetPid": 7592,
+        "encodedImageSha256": "f8bd7a66a463824aa489baea21c97206af96453c034645975cc7d3523de51afa",
+        "freshTokenCreated": true
+      },
+      "resourcesDetached": true,
+      "stopClicked": true,
+      "stopReason": null,
+      "diagnostic": null,
+      "syntheticStalledPipeline": false,
+      "cleanupAfterStopSeconds": null,
+      "guiTicksDuringCleanup": 5,
+      "targetState": {
+        "format": "augmentor-owned-gtk-target/1",
+        "pid": 7592,
+        "clicks": {
+          "center": 0,
+          "edge": 0
+        },
+        "textA": "",
+        "textB": ""
+      }
+    },
+    {
+      "probe": "gnome-execution-probe-v6",
+      "rawReportSha256": "d77108e6a759ffe5e09040efd55480ce9a5b88646732e84e26e1f8b08f323a5d",
+      "candidateSourceSha256": {
+        "worker.py": "795d16c85fdc358158038463980ec89c124005e08d5b9d0cf72f7b9d05482eff",
+        "portal_session.py": "fc7abe0bbdc22d679d2df7ad6c83b024611a524418b546106f1ecd2b9c8b7e3d",
+        "gnome_control.py": "f8e2e61c04338549d91701f7e1a53aada1959663cefbc7ea0cc025c66fc8c1ee",
+        "gnome.py": "968532f622b04be2f3c84955e8d9e2d3ae34437e3c62f17695713344170c09e1",
+        "portal.py": "0339d7d3220fa0988c3dda81b148743cbf060ca6000c653999e4ba04cccafca8",
+        "kwin.py": "fb23c1615f598cbde8d0e2436c778bc2480bb07f70e451ed837cb5973d2229a6",
+        "capture_stream.py": "66fb68873c9ac7ba9d54b04729aab74a25e4cddb4f41b327b50b507c29cc633c",
+        "scene.py": "0b583fe11aa9f6b1e26d029f5bf6705c4a45f57bef2db3210c11ddf9b7dd67a4",
+        "probe-gnome-target.py": "aba8786b436db6fb031f7d62478cecd18da8bee1d954ec86fbd48991a3bf60b9",
+        "probe-gnome-capture.py": "5f640464e12c6ee72f9454e44ea51808b011fed98a70e552d8d6324030a0096e"
+      },
+      "connect": {
+        "pid": 7828,
+        "busy": false,
+        "active": true,
+        "sharing": true,
+        "owner": "codex:owned-gnome-capture-fixture",
+        "backend": "gnome-wayland-portal-candidate",
+        "monitors": "single",
+        "inputQualified": false
+      },
+      "capture": {
+        "error": "Desktop control stopped. No action is replayed."
+      },
+      "resourcesDetached": true,
+      "stopClicked": true,
+      "stopReason": null,
+      "diagnostic": null,
+      "syntheticStalledPipeline": true,
+      "cleanupAfterStopSeconds": null,
+      "guiTicksDuringCleanup": 7,
+      "targetState": {
+        "format": "augmentor-owned-gtk-target/1",
+        "pid": 7802,
+        "clicks": {
+          "center": 0,
+          "edge": 0
+        },
+        "textA": "",
+        "textB": ""
+      }
+    }
+  ],
+  "sourceSuite": {
+    "cases": 742,
+    "passed": 740,
+    "platformSkips": 2,
+    "logSha256": "11846b2d1ffb40a4244cbeb0cc0687dc034fd70371ebba2365b2f9be585e8837",
+    "files": {
+      "tests/test_gnome_control.py": "b20aa94d981e9c05fb7e167edfc817b3fb5ab66120506fb54d205aa969028e75",
+      "tests/test_desktop_consent_session.py": "e206e4b27099ea5f532d4ccf9e80d1d3419038efebca141af679cd807363abf3"
+    },
+    "python": "3.14.7",
+    "qt": "6.11.2",
+    "node": "24.19.0"
+  },
+  "limits": [
+    "No Notify input method or action is invoked. GTK fields stay empty and click counts zero.",
+    "v3 capture failure has no established cause; subsequent passes do not diagnose it.",
+    "v1 and v4 consent timeouts are not native Cancel acceptance; v2 GNOME Overview refusal is expected.",
+    "v5/v6 Stop reason missing because controller pre-set shared cancel Event; v7/v8/v9 preserve first reason.",
+    "v7 idle-watch diagnostic records expected cancellation during cleanup, not spontaneous capture failure.",
+    "Stalled acquisition uses an empty synthetic GStreamer pipeline with real native consent; it does not prove PipeWire failure behavior.",
+    "Native sharing revocation is after capture, not during acquisition.",
+    "Candidate-only scale1 single-monitor capture; no keyboard/pointer/scaling/lock/restart/full product or KDE threading qualification."
+  ],
+  "inputSent": false,
+  "inputQualified": false,
+  "productionGnomeInputEnabled": false,
+  "ownerStateChanged": false,
+  "selectedApplicationChanged": false
+}

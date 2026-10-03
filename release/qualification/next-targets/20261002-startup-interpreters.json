@@ -1,0 +1,79 @@
+{
+  "format": "augmentor-linux-startup-interpreters-qualification/1",
+  "sourceBase": "fc3102ab4e92f1c25813ec963a9bc583ed36b499",
+  "workingSourceFiles": {
+    "scripts/install-desktop-startup.py": "fe8fb81a3b364e5cd5abd74ab16e647af61c6e65c821a07d73874fb2929ac8e1",
+    "release/prove-linux-startup-interpreter.py": "26d6181b4734141b11b838918ce4eb24bf2bf4ff87799998339b74d5b9cf0d9a",
+    "tests/test_desktop_startup.py": "eb64018f14ea877904a6b2fca709b9ac3036ef320cbea4c507c58e58763e34eb",
+    "scripts/prepare-gnome-vm.py": "b0016a0540a2a24e285f18c5f71c92b24237ac69381cf4ffe830e6fa2309d976",
+    "services/desktop/gnome.py": "968532f622b04be2f3c84955e8d9e2d3ae34437e3c62f17695713344170c09e1",
+    "services/desktop/gnome_shortcuts.py": "e67666120f874f4eb7348b0d8d3ef4fa7a79f84a2de73454fa1ceaea87cc4d5f",
+    "services/desktop/gnome-extension/observer@augmentoragent.com/extension.js": "ec8543ab1ed23d04e5efc3d7485256ca8907d81252250d074e464cc843ca4db8",
+    "services/desktop/gnome-extension/observer@augmentoragent.com/metadata.json": "af41dbdb4a109e02371c68c3e5d99f96177544cb9f6a7b8bcbf10733c469ba96",
+    "tests/test_gnome_observer.py": "d030b662cc21ec54c589316ef57dee566c048b183a1292d3a913f73e0f427991",
+    "tests/test_gnome_shortcut_settings.py": "24a9c215ccf47cb31a595df6ad655a6b6e31737c9be7a44577e983c1988c11a9",
+    "tests/gnome-observer-extension.test.mjs": "4d21804ddeac6bf9273f523fd92981f7cb22d339c4f9e0a789c51559fb06208c",
+    "tests/test_gnome_vm_preparation.py": "78d92a704ce0bcf15e7901dbcb2e8b58981a9428207929c7a63b1a300fe0e855"
+  },
+  "targets": [
+    {
+      "format": "augmentor-linux-startup-interpreter-fixture/1",
+      "target": "arch20261001-x86_64",
+      "policySha256": "2d6c2d943d089531840eb29fa6c7a7e1ce7d3a2c378439893b4d6273294d1fa7",
+      "runtimeArtifactSha256": "0c2fd3217377d863b2697c12770d7bd12a3fb7a4b15eb1431936186f9c7964d0",
+      "bootstrapPython": "/usr/bin/python3",
+      "selectedPythonPreserved": true,
+      "actualServiceExecStartTested": true,
+      "actualSecondaryWrapperTested": true,
+      "actualUpdateStatusWrapperTested": true,
+      "systemPython3AliasPresent": true,
+      "proofSha256": "26d6181b4734141b11b838918ce4eb24bf2bf4ff87799998339b74d5b9cf0d9a",
+      "installerSha256": "fe8fb81a3b364e5cd5abd74ab16e647af61c6e65c821a07d73874fb2929ac8e1",
+      "syntheticApplication": true,
+      "userServiceEnabled": false,
+      "graphicalLoginTested": false,
+      "recoveryConnectionTested": false,
+      "installedProductTested": false,
+      "ownerStateChanged": false,
+      "rawReceiptSha256": "1e1d2b094042c92542012ff1e13e34e34115a14c023a188db7f8222a1360d1ba",
+      "fullNativeSuite": {
+        "testsRun": 689,
+        "skipped": 2,
+        "exitCode": 0,
+        "logSha256": "33df74b04e1003ee8b4df73d2999073c373110479614a4307e81261cc978e571",
+        "skips": "Mac-only tests"
+      }
+    },
+    {
+      "format": "augmentor-linux-startup-interpreter-fixture/1",
+      "target": "opensuse-leap16.0-x86_64",
+      "policySha256": "559fb7e0338c055aa10982b2a7fbbdea7b94e4f4cba45921afa49ab7c0328820",
+      "runtimeArtifactSha256": "f4d310175b0b6dc4e6d110cf4dad6f3a11e34a981b0a984a2f1088034fbdd4fa",
+      "bootstrapPython": "/usr/bin/python3.13",
+      "selectedPythonPreserved": true,
+      "actualServiceExecStartTested": true,
+      "actualSecondaryWrapperTested": true,
+      "actualUpdateStatusWrapperTested": true,
+      "systemPython3AliasPresent": false,
+      "proofSha256": "26d6181b4734141b11b838918ce4eb24bf2bf4ff87799998339b74d5b9cf0d9a",
+      "installerSha256": "fe8fb81a3b364e5cd5abd74ab16e647af61c6e65c821a07d73874fb2929ac8e1",
+      "syntheticApplication": true,
+      "userServiceEnabled": false,
+      "graphicalLoginTested": false,
+      "recoveryConnectionTested": false,
+      "installedProductTested": false,
+      "ownerStateChanged": false,
+      "rawReceiptSha256": "be0bd34b39ff6b823cf0742e093044bec7d41d641731aad8fb00d0735e5211ee",
+      "fullNativeSuite": {
+        "testsRun": 689,
+        "skipped": 2,
+        "exitCode": 0,
+        "logSha256": "0046c65b5d442883395ddc25bf557968ee71efefaf208323a5cf8df9ef290d37",
+        "skips": "Mac-only tests"
+      }
+    }
+  ],
+  "syntheticApplication": true,
+  "desktopSessionQualified": false,
+  "packageAdapterQualified": false
+}

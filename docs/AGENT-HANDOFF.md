@@ -1,6 +1,687 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 GNOME held-input cleanup source review
+
+[The held-input ledger checkpoint](../release/qualification/next-targets/20261003-fedora-gnome-held-input-ledger-source-only.json)
+passes independent138 Python checks plus five original observer Node checks from
+clean365 source. Each admitted press pins its original consent/session/owners and
+generations; releases record intent before RPC. An unknown normal release makes
+cleanup Close-only, and a press refused before RPC authorizes no cleanup release.
+Full scene/serial and per-character guards remain unchanged. No installed payload
+or input is updated; v5 remains partial delivery/FAIL. The separate observer
+candidate needs its own source/profile review and fresh artifact admission.
+Production GNOME input remains disabled.
+
+## October 3 Mint installed setup passes; native permission metadata fails
+
+[The Mint16bcb checkpoint](../release/qualification/next-targets/20261003-mint16bcb-fresh-emulated-proof.json)
+passes normal signed native reinstall, exact source/runtime audit and the
+unchanged ordinary-user installer plus installed-receipt idempotence. Full proof
+fails at390.54seconds before preview/SDK: packaged memory source is root-owned
+0664 under0775 directories, inherited from the clean checkout's filesystem modes.
+All five settings and40 earlier-account files remain unchanged; external native,
+both exclusive idle leases and process/socket/listener absence pass. There is no
+pending/unknown SDK action or model request. The reviewed Debian producer now
+normalizes only its staged archive modes to0755/0644/0755, preserving bytes and
+symlink targets.12 Debian checks pass, including actual archive metadata. New
+clean artifacts and fresh account acceptance are required; the failed account
+is preserved without installed chmod, guard relaxation or replay.
+
+## October 3 Fedora GNOME exact release-phase refusal
+
+[The v5 checkpoint](../release/qualification/next-targets/20261003-fedora-gnome-v5-release-serial-partial-failure.json)
+passes actual observed consent and two retained original visual captures on the
+unchanged clone/native2035 selection. One diagnostic center click delivers one
+callback, then refuses the normal button release: serial3405→3406 is the only
+changed compared field. Motion and press RPCs replied; original cleanup balances
+the held button and closes the pinned session. This remains partial delivery/FAIL,
+with no later input. Independent probe/helper/target absence, complete native/
+managed inventories, protected20 and full frozen backing hashes pass. A Mutter
+raise-on-click/observer-raised pulse is supported by pinned source and settings;
+its exact signal origin is unrecorded. Production input remains disabled.
+
+## October 3 separate published product-version preparation
+
+[The product-version preparation checkpoint](../release/qualification/next-targets/20261003-published-product-upgrade-preparation.json)
+verifies both published0.2.12/0.2.13 complete manifests and native source/target
+identities. A separate rootless, mount/device-free Debian fixture on secondary
+storage passes one signed normal0.2.12 native install and both package file audits.
+The maintained one-shot ordinary-user baseline preparer passes four synthetic
+admission/durability cases. Actual ordinary-user unchanged012 setup passes in
+28.28seconds with zero model requests. Strict process-absence postflight refuses
+two defunct Node entries; no live user process remains, and one normal namespace
+TERM request leaves PID1 sleep running. No repeat or forced stop follows.
+Role histories, different-version managed DSH/selection upgrade and coordinated
+rollback remain pending. This older
+Debian/Voice0.1.16 pair does not qualify current source-Qt/Voice0.1.19 artifacts.
+[The owning guide](LINUX-PRODUCT-UPGRADE-PROOF.md) records the execution boundaries.
+
+## October 3 Fedora GNOME visual capture and partial click failure
+
+[The exact v4 checkpoint](../release/qualification/next-targets/20261003-fedora-gnome-v4-visual-capture-center-partial-failure.json)
+passes actual observed consent and two distinct retained original JPEG captures.
+Both images are visually reviewed before the single authorized center click.
+That click delivers one native callback, then the API refuses changed scene
+before dispatch. This is partial delivery with failure: no edge, typing or save
+follows. Automatic control cleanup and independent helper/probe/target absence
+pass, as do both full frozen backing hashes and unchanged selection/settings.
+The enabled observer retains an older exact GNOME50-only extension; it differs
+from the selected2035 expanded-profile bytes and is not established as cause.
+The changing field/Notify phase is unknown; the original dispatch guard does not
+record that exception. [Probe-only bounded diagnostics](../release/qualification/next-targets/20261003-fedora-gnome-dispatch-trace-source-only.json)
+now pass129 focused Python cases, including48 probe cases, and five unchanged
+observer Node cases. Existing comparisons/RPCs/helper queries and held-input
+cleanup are traced once with sanitized identities, bounded records and retained
+first refusal. No extra RPC, replay, timeout or scene-fence change occurs.
+Actual diagnostic input remains unexecuted; production input stays disabled.
+
+## October 3 Mint descriptor-bound host admission correction
+
+The [fresh Mint checkpoint](../release/qualification/next-targets/20261003-mint16bcb-fresh-emulated-proof.json)
+retains both pre-SSH host refusals: relative daemon paths, then the actual148-byte
+Unix socket path. The maintained proof now pins the owned startup directory and
+socket metadata and connects through its local directory descriptor without
+changing cwd or sending protocol bytes. Both descriptors close on every path;
+replacement and foreign peers refuse.61 focused checks pass, including26 fresh
+proof,26 baseline proof and9 real Unix companion cases. Actual fresh native/account/
+installer/SDK acceptance remains pending and must preserve the4GiB allocation floor.
+
+## October 3 clean Mint correction and fresh proof
+
+[The clean Mint checkpoint](../release/qualification/next-targets/20261003-mint16bcb-fresh-emulated-proof.json)
+records exact clean16bcb native/Browser/complete builds and streamed inspection
+PASS. The maintained fresh proof passes59 focused checks independently reviewed:
+24 fresh admission/execution,26 existing complete-proof and9 real Unix-companion
+cases. Its exact new ordinary Mint account and native adoption remain unexecuted.
+The unchanged installer, byte-identical settings, both roles, strict restart
+history/no replay and one-shot normal companion cleanup are required. Only this
+explicit emulated entry measures startup120seconds; turns stay60seconds, and
+successful reads after either deadline refuse before further mutation. Defaults
+and the old2035 proof remain unchanged. A separate root readback checks exact
+proof/fixture/run, native inventory, both exclusive leases and absence of owned
+processes/listeners/socket. The two earlier accounts and failures are preserved.
+Fresh installed acceptance and graphical/hardware/legal gates remain open.
+
+The first published host admission refuses before SSH: QEMU retains relative
+disk/socket arguments while its daemon current cwd is `/`. The reviewed parser
+binds the observed startup directory and exact retained boot argv, disk FD/inode,
+listening kernel socket and bounded zero-message Unix peer attribution. Duplicate
+fields, traversal and foreign/start-replaced peers refuse. The initial receipt
+is preserved; this source correction has not yet executed guest setup or SDK.
+
+## October 3 Ubuntu registered shortcuts and password-lock recovery
+
+[The registered lock checkpoint](../release/qualification/next-targets/20261003-noble-registered-password-lock-pass.json)
+passes on unchanged selected368 source-Qt Ubuntu24.04/GNOME46 with nativec4b.
+Both exact registered F9/F10 chords are sent once while locked; main5599 and
+secondary8492 stay mapped, accepted offline idle and draft-free. The observer
+refuses while locked. One normal correct-password entry unlocks; the same
+retained observer rejects its stale epoch, and a fresh observer admits the new
+epoch under the same Shell owner. Both processes/windows and selection survive.
+Full native/managed/runtime audits pass before and after (67.94/70.62seconds).
+The complete original account database/age and PAM/GDM configuration are verified
+restored/preserved, temporary credentials removed, secondary closed normally,
+and the owned shortcut journal restores original bindings and foreign entries.
+
+Earlier preparatory refusals and wrong-password partial evidence remain intact.
+No administrative unlock, input replay, installed payload patch or production
+GNOME input enablement occurs. This closes the exact Ubuntu offline two-window
+registered-lock/password-recovery case alongside current Settings, shortcuts and
+reboot evidence; connected control, Fedora/KDE/Mint and hardware remain separate.
+
+## October 3 current Ubuntu selected reboot acceptance
+
+[The current reboot checkpoint](../release/qualification/next-targets/20261003-noble-selected-reboot-pass-shortcut-runner-timeout.json)
+passes normal command exit0 on immutable clean368 with maintained3df5c19 proof
+bytes. One reboot changes the kernel boot identity; identical selected
+source/artifact/runtime/inventory returns with the actual service-owned Wayland
+app and GNOME observer. Native audit and active AppArmor pass. The offline
+Connect DSH first-run modal remains expected; no connection/model is introduced.
+This verifies automatic graphical login/recovery, not password authentication.
+
+The preceding global shortcut run remains an outer1600-second runner timeout
+without a final report. Independent readback finds no journal/helper/secondary
+and a normal idle main. A fresh maintained run after reboot retains existing
+per-operation bounds without that additional outer limit. Native shortcut and
+password-lock acceptance remain pending; actual application Settings PASS is
+separate. No selected payload is modified or uncertain action replayed.
+
+
+## October 3 Mint readiness observations and Ubuntu runner timeout
+
+The [Mint checkpoint](../release/qualification/next-targets/20261003-mint2035-installed-setup-proof-loader.json)
+retains the corrected-cwd60-second failure with unchanged settings, native audit,
+empty workspace and both accounts' protected state. A separate read-only
+diagnostic observes matching product HTTP identity at56.43seconds and counts
+zero provider/model requests; it does not test full preset/authenticated adapter
+readiness. Its immediate cleanup port-bind refusal remains a failed diagnostic;
+later checks find no listener or owned process. No failed result is relabelled.
+
+The ordinary Ubuntu shortcut run reaches an outer host runner timeout before
+its final report. It cannot establish native shortcut acceptance. Independent
+readback finds its journal absent, no helper/secondary process and a normal
+idle main on the same immutable selection. Its original private receipt and
+logs are preserved; no uncertain Save/input is replayed. Actual Settings PASS
+remains separate. Current selected-artifact reboot proof is running.
+
+
+## October 3 Fedora GNOME historical payload metadata refusal
+
+[The initial candidate admission](../release/qualification/next-targets/20261003-fedora-gnome-old-payload-target-refusal.json)
+refuses before staging, closure, consent or input. The existing exact native
+f7d7585 and selectedaef93bb artifacts both identify their release payload as
+Debian13, although their Fedora package records declare Fedora44. Historical
+packaging reused that payload without rewriting the target; the current packager
+corrects it. Native audit and existing inventory pass, but the strict target
+guard remains unchanged. Matching2035 native/managed adoption is being reviewed,
+including eleven missing declared dependencies and an existing pending offline
+transaction. The normal app and production input state remain unchanged.
+
+
+## October 3 Mint installed setup and post-install proof
+
+[The exact Mint checkpoint](../release/qualification/next-targets/20261003-mint2035-installed-setup-proof-loader.json)
+records normal signed native2035 reinstall/audit and exact unchanged complete
+installer setup PASS in a fresh ordinary account. Its original full proof fails
+before rendering because the proof omitted the verified source-Qt environment.
+The maintained environment correction renders successfully in a separate
+post-install run, which then fails the unchanged60-second DSH readiness bound
+before any SDK mutation. Both accounts' settings, empty workspace, native audit
+and owned cleanup pass. A logged inherited-cwd dotenv permission warning is
+nonfatal in the shipped DSH source; the readiness cause remains unresolved.
+
+The external proof now sets each child's cwd to the dedicated fixture home.
+A narrow second-run entry requires the exact retained failed journal hash/run,
+failed starting phase, no pending/unknown request, preserved settings and the
+initial empty workspace before binding ports. It preserves the original journal
+and refuses a pre-existing second run. Seventeen focused proof cases, sixteen
+setup and seven native cases pass; actual second-run acceptance remains pending.
+No installer, selected payload, saved port or production timeout is changed.
+
+
+## October 3 selected GNOME reboot instrumentation
+
+[The selected-artifact reboot proof](LINUX-GNOME-SHORTCUT-PROOF.md#selected-gnome-artifact-reboot-proof)
+adds explicit Ubuntu24/Fedora44 source/artifact and owned-host/guest admission.
+An exclusive private pending receipt precedes exactly one reboot request;
+transport timeout or loss never retries it. Read-only recovery needs a new
+kernel boot ID, identical selection/runtime/inventory and actual Wayland
+service-owned app/observer. Three source cases pass, including real child
+transport timeout. Current installed reboot acceptance is pending and password
+authentication remains separate.
+
+
+## October 3 Fedora KDE proof child correction
+
+[The helper correction checkpoint](../release/qualification/next-targets/20261003-kde-wayland-proof-helper-correction.json)
+retains the current2035 selected/native Fedora KDE observe-only failure before
+consent: its display child inheritedxcb and exceeded the120-second SSH bound.
+The normal Wayland query returns in0.276seconds. Only the display-settings child
+now uses Wayland with its own20-second bound; the executor remainsxcb. Proof
+window observations include compositor-authenticated PID/application metadata
+needed for the native portal owner/focus guard. Eighteen focused cases pass.
+Exact owned orphan cleanup is verified separately; consent/input/Stop remain
+open. Product controller and selected payload are unchanged.
+
+
+## October 3 actual Ubuntu Settings acceptance and disabled GNOME candidate
+
+[The actual Settings checkpoint](../release/qualification/next-targets/20261003-noble-actual-settings-pass.json)
+passes both real application windows on the immutable clean368 Noble source-Qt
+selection with the maintained073c429 helper. Four Save clicks and four collision
+checks confirm native readback and refuse foreign/other-instance conflicts.
+The run-owned journal restores settings and preserves foreign entries. This is
+app-local Qt input; normal global shortcuts and password-lock/reboot remain
+separate gates. The earlier loader failure is retained.
+
+[The disabled GNOME candidate checkpoint](../release/qualification/next-targets/20261003-gnome-disabled-input-candidate.json)
+records85 focused Python and five Node observer cases, fresh per-key helper
+identity/focus checks, sensitivity/editability guards and unknown-outcome
+no-retry cleanup. Owned native-input proof admission verifies distinct exact
+native/selected artifacts and immutable inventory. Source tests qualify no
+actual consent, typing or visible Stop; production input remains disabled.
+
+
+## October 3 Ubuntu Settings helper loader correction
+
+[The exact installed checkpoint](../release/qualification/next-targets/20261003-noble-settings-source-qt-proof-child.json)
+records a failed actual Settings run on selected clean368 before any Save:
+its helper omitted the source-Qt pre-exec environment. Its own journal restored
+settings and foreign bindings. The maintained helper now delegates its two
+bounded Qt operations to the verified selected runtime environment, retaining
+strict entry, source/security/inventory/interpreter and per-run journal guards.
+Six child cases and eleven qualification cases pass. Installed rerun, normal
+shortcut delivery and lock/reboot remain open; no selected root is patched.
+
+
+## October 3 clean2035 builds and Ubuntu managed adoption
+
+[The artifact/adoption checkpoint](../release/qualification/next-targets/20261003-clean2035-artifacts-noble-managed-adoption.json)
+records exact clean2035 Mint/Fedora native packages, Browser ZIP and complete
+bundles. Their clean builds pass; fresh installed acceptance is separate. Linux,
+macOS and Windows Desktop hosted2035 runs pass; full Windows is still running.
+Ubuntu's clean368 source-Qt preparation passes in57.20seconds after normal APT
+admission of only two missing declared libraries. Its older canonical updater
+then refused staging for a missing Qt library path. A normal maintained helper
+refresh preserves selection/window; its outer post-verification timed out and
+is retained as such. Read-only checks confirm refreshed helper bytes and no
+remaining refresh process. Canonical staging subsequently passes in124.04seconds
+without selecting the candidate. Activation then passes, verifies the complete
+inventory and retains the old selection and old running window. Cold launch,
+actual Settings, normal shortcuts and password-lock/reboot acceptance remain
+open. No selected payload was patched; no binary release is claimed.
+
+
+## October 3 current KDE proof guards
+
+[The proof guard checkpoint](../release/qualification/next-targets/20261003-kde-native-consent-proof-guards.json)
+adds explicit RPM/dpkg queries and verifies the selected managed inventory,
+native source/target/version and package audit before starting the executor.
+The driver requires the exact owned VM marker/name and dedicated account.
+Native consent must belong to the live portal process and be its sole focused
+window. Allow/deny labels and points come from an actual screenshot whose hash
+is retained; changed geometry refuses input. `--observe-consent` captures the
+pending dialog and presses Stop without granting sharing. Fifteen focused guard
+tests pass. Fedora44 KDE native clean368 installation passed with SELinux
+Enforcing, but its original60-second complete bootstrap failed. A separate
+51.009-second readiness measurement does not establish that failure's cause.
+Fresh matching2035 installation and consent/input/visible Stop acceptance remain
+open; these proof changes do not qualify another desktop or enable GNOME input.
+
+
+
+## October 3 maintained native Wayland Browser acceptance
+
+[The maintained proof checkpoint](../release/qualification/next-targets/20261003-native-wayland-browser-maintained-proof.json)
+passes headed Chromium154 native Wayland through the installed clean423 Leap
+release5 host with exact publicbf939af proof bytes and its explicit60-second
+observation pause. An actual observed Copy button/tooltip and guarded owned-VM
+tablet input are retained separately, matched to browser PID, private fixture
+and proof hash. All real page/OS clipboard/branch/edit/prompt/report assertions
+pass with normal command exit0. Six renderers retain sandbox isolation, X
+fallback is removed and recovery takes57.67seconds under the90-second VM budget,
+with exactly8 fixture model requests and no replay. No private driver or installed
+payload overlay is used. Earlier failures remain retained. This closes this
+exact Leap/Pi/local-fixture native Wayland Browser case; DSH Browser, fresh shared
+onboarding/manual extension setup, other distros and hardware remain separate.
+
+Mint's failed complete setup is identified as the second DSH restart after its
+integration presets/ownership were written. An unchanged independent startup
+measures55.86seconds, making the60-second deadline tight under TCG; it does not
+prove the exact original timeout cause. The [maintained bounded120-second startup fix](../release/qualification/next-targets/20261003-mint-native-install-runtime-startup-bound.json)
+passes16 setup and7 native complete cases; fresh matching installation acceptance
+and explicit partial recovery remain required. Ubuntu's dedicated
+comparison guest remains on its oldc4b selection; its observed Connect DSH
+modal was dismissed with Later, without saving connection. A separately hashed
+clean368 candidate is extracted and its new source runtime is being prepared;
+no activation/restart or current shortcut acceptance is yet claimed.
+
+
+## October 3 native Wayland real-input Browser diagnostic
+
+[The real-input checkpoint](../release/qualification/next-targets/20261003-native-wayland-browser-real-input-diagnostic.json)
+records an observed Copy button click through the owned VM tablet before the
+unchanged public Browser actions/assertions. Native Wayland then passes the full
+Pi fixture with command exit0: OS clipboard/scroll, page actions, branch/edit,
+prompt conflicts/clipboard expansion, private report and recovery without replay.
+X fallback stays removed, six renderers retain sandbox isolation, exactly8 fixture
+model requests occur and recovery takes57.10seconds under the90-second VM budget.
+The installed artifact remains clean423; the private diagnostic is based on
+clean368 and changes only a bounded input pause. This is diagnostic scope; fresh
+maintained proof acceptance is still required. Earlier114/122 failures are retained.
+
+The maintained Browser proof now offers an explicit30/60-second native Wayland
+observation pause, restricted to headed normal-sandbox runs. It records its exact
+run/source and never treats the pause as evidence of physical input. External
+observed input must be retained separately; all real OS clipboard assertions stay
+unchanged. No product permission/input path changes. Mint native install/audit
+passes but complete setup currently fails its60-second DSH readiness bound;
+independent prepared source-Qt inventory/import/QML/23-library closure passes,
+without adopting a Desktop selection or retrying uncertain setup.
+
+
+## October 3 installed XWayland Browser and matching clean artifacts
+
+[The current checkpoint](../release/qualification/next-targets/20261003-installed-browser-xwayland-and-clean-artifacts.json)
+records a successful normal command exit through the installed clean423 Leap
+release5 Browser host, with clean368 qualification scripts. Headed Chromium154
+on XWayland passes actual page actions, OS clipboard/scroll, branch/edit,
+shared prompt conflicts/clipboard expansion, private support-report download and
+reconnection without replay. Recovery takes59.00seconds under an explicit90-second
+emulated-VM proof budget, with exactly8 fixture model requests. Six actual
+renderers pass seccomp2, no-new-privileges and distinct PID/network namespace
+checks. Product timeouts stay unchanged; earlier30-second failures and the
+clipboard-provider SSH hang remain historical evidence. This scope covers Pi
+with a deterministic localhost model, not DSH Browser/onboarding or hardware.
+
+Native Wayland with X fallback removed passes sandbox and page actions but its
+CDP-driven OS clipboard assertion fails. An observed Copy button click through
+the owned VM tablet writes the correct native clipboard; that diagnostic later
+misses the transient confirmation tick and is not full acceptance. A real-input
+priming diagnostic is continuing. Native Wayland remains an open gate.
+
+Matching clean368 Mint, Ubuntu24 and Fedora44 runtime/Desktop packages and
+complete bundles now build successfully. Installed acceptance remains separate.
+Mint normal signed APT and fresh Fedora KDE signed native installation are in
+progress in dedicated VMs. Hosted368 Linux fails because the packaged Browser
+proof omitted its sibling helper and Ubuntu26 received an explicit Debian13
+artifact. The workflow now stages the helper and builds/transfers a distinct
+Ubuntu26 artifact, retaining the exact target guard; corrected hosted acceptance
+is pending. No binary publication, owner deployment or completed rollout is claimed.
+
 # Start here: agent handoff
+
+The [current-selection/Settings harness checkpoint](../release/qualification/next-targets/20261003-gnome-selection-settings-harness.json)
+passes36 focused native Qt cases in an owned offscreen container. Both target
+proofs resolve the verified selection and security mode; Settings controls stay
+explicitly opt-in at process startup. A private per-run token prevents stale
+cleanup from restoring another run's settings journal. Matching installed
+Ubuntu/Fedora artifacts, actual two-dialog saves, normal shortcut delivery and
+password-lock/reboot acceptance remain open. See the [proof guide](LINUX-GNOME-SHORTCUT-PROOF.md).
+
+## October 3 installed Browser launcher correction and Mint target
+
+[The installed launcher checkpoint](../release/qualification/next-targets/20261003-leap-browser-loader-upgrade.json)
+records the normal Leap RPM upgrade from release3 to clean `423f071` release5.
+Only Augmentor changes; native file audit, all23 frozen package registrations and
+all2468 Python/Qt members pass. Synthetic settings, selected runtime and saved
+histories remain unchanged, and SELinux stays enforcing. The new canonical
+Browser host clears Chromium's inherited loader variables before Python/Node.
+
+The previous navigation timeout is traced to GNOME's normal encrypted new-keyring
+prompt. Dedicated synthetic input completes it and an actual Chromium HTTP load
+passes, without keyring weakening flags or exposing secret contents. Earlier
+input refusals and confirmation mismatch remain failed evidence. The new package's
+headed XWayland Browser run passes actual navigation, snapshot, type/click,
+clipboard, branch and edit assertions, then fails its30-second session recovery
+wait after runtime shutdown. A separate90-second diagnostic restores the same
+edited session after55.51seconds with exactly8 fixture model requests and completes
+the remaining assertions. Its SSH command still times out because a fixture
+clipboard provider retains stdout; that harness boundary/cleanup is now fixed.
+The original failures remain and full acceptance awaits a normal command exit.
+The default wait stays30seconds; emulated-VM runs can explicitly select90seconds,
+record both budget/elapsed time, and do not change product timeouts. Fixture cleanup now also stops its own memory daemon;
+Wayland qualification uses the verified compositor socket, removes X display
+fallback and keeps runtime/state sockets private. Eight sandbox/display checks
+pass; native Wayland runtime acceptance is still pending.
+
+[Mint's explicit adapter checkpoint](../release/qualification/next-targets/20261003-mint-source-profile-adapter.json)
+and [package guide](LINUX-MINT-PACKAGES.md) add exact Mint22.3 host/ABI/target guards,
+a distinct immutable source-Qt runtime identity and native dependencies. Exact
+reviewed Noble-built inputs retain their provenance; no existing runtime is
+relabelled. Focused Python/Node and build checks pass. Matching Mint artifacts and
+installed Cinnamon/product acceptance remain required. All five rollout points,
+source/legal gates and public release remain open; the22 proposed-license files
+and root license are unchanged. Owner installations/services/models/devices are
+untouched and the PR remains a draft.
+
+## October 3 Leap graphical sandbox and Browser loader boundary
+
+[The booted VM checkpoint](../release/qualification/next-targets/20261003-leap-gui-browser-sandbox.json)
+records actual signed Chromium/dependency admission and the immutable clean8ad
+Leap release3 package. All2468 frozen Python/Qt members remain exact, native
+audit passes and SELinux stays enforcing. The matching complete installer passes
+ordinary-user setup/repeat, native offscreen render, both real DSH/plugin fixture
+roles and restart history without replay. The reused container proof's user phase
+is invoked with an explicit owned-VM marker wrapper; its container main is not run.
+
+Headed Chromium154 on XWayland passes real sandbox diagnostics and five renderer
+seccomp/no-new-privileges/distinct PID/network namespace checks. Initial argument
+parsing refusals remain retained; Chromium's actual process-title rewriting is
+verified against its exact upstream source. The canonical host then exposes a
+real launcher defect: Chromium exports its private library path, which the runtime
+correctly refuses. Browser-host generators now clear inherited loader variables
+before Python/Node; direct runtime/desktop refusal stays intact. Twenty-one focused
+cases pass, including executing the generated Browser/runtime wrappers.
+
+An explicit diagnostic boundary admits the native host, but full actual Browser
+navigation/page acceptance still fails and is being investigated. Matching clean
+rebuilt/installed corrected launchers, native Wayland/manual extension setup and
+other rollout gates remain open. [Browser qualification](BROWSER-DISTRIBUTION.md)
+owns the opt-in normal-sandbox proof and scope. Owner installation/services/models/
+devices, root license and22 proposed-license file hashes stay unchanged. No binary
+publication, PR merge or completed five-point rollout is claimed.
+
+## October 3 fresh matching corrected Arch complete installer
+
+[Cleanf85 qualification](../release/qualification/next-targets/20261003-arch-clean-complete-installer.json)
+now replaces the corrected Arch overlay's pending matching-bundle gate for its
+exact new release4 bytes. Desktop/Browser/native package and full bundle build
+from cleanf85e376. A fresh owned fixture executes normal signed native dependency
+admission, separate verified guard installation, application transaction and
+ordinary-user setup. Actual DSH/plugins, both fixture model roles, offscreen
+native rendering, repeat settings and restart history without replay pass.
+The report has setupScriptMatchesBundle:true and installerOverlayUsed:false.
+Arch npm12.2 runs under bundled Node24.19 with native flattened semver resolution.
+Final native audit, frozen runtime and every approved font glyph pass; the new
+complete fixture is now offline. Only public native archive/signature cache files
+are reused, with normal signature re-verification; no user state or keys are copied.
+
+The exact Archf85 and earlier Leap8ad complete container installers now pass.
+Their source identities remain separate, and the failed8ad Arch run/diagnostic
+resume remain intact. Non-booted kmod/systemd hook limits remain explicit; actual
+boot/input/audio is not inferred. The Node regression uses portable copied public
+dependency fixtures. All five rollout points, current graphical sessions/Browser,
+physical audio, coherent native maintenance, product/DSH-history updates and
+source/legal/release acceptance remain active. Owner state and22 license files
+remain unchanged.
+
+## October 3 complete Leap installer, Arch correction and release rollback
+
+[Actual qualification](../release/qualification/next-targets/20261003-system-qt-complete-and-release-upgrade.json)
+records new clean8adb633 release3 native packages and assembled matching bundles.
+Leap passes its full native root plan and ordinary-user setup, real DSH/plugins,
+both fixture model roles, offscreen rendering, repeat settings and restart history
+without replay. Its native npm11.16 executes with bundled Node24.19. Both new
+installed packages pass native file audits, frozen runtimes and every approved
+font glyph; the completed fixtures are now disconnected from Docker networks.
+
+Arch's initial full run installs/verifies native packages but refuses at an
+incorrect nested semver import. Arch installs semver beside npm. Setup now uses
+Node createRequire anchored at npm's package.json; actual ordinary native engine
+checks pass on Arch npm12.2 and Leap11.16. An explicitly hashed external corrected
+Arch helper resumes setup and passes the full user/DSH/model/history proof. That
+overlay is diagnostic evidence, not matching-bundle promotion. Fresh clean fixed
+Arch assembly/root/user acceptance remains required. Nineteen focused setup
+methods pass, including actual Node nested/flattened/rejected-engine cases.
+
+Separate offline fixtures also pass distinct release1→3 upgrade and3→1 rollback
+with clean536→8ad→536 payloads. Both real native Desktop and Node leases refuse
+each busy transaction; idle replacement, cold rendering, full inventories,
+native audits and unchanged synthetic user/runtime receipts pass. Original
+packages are restored. This qualifies package-release changes only: product
+version, DSH history, managed selection, power-loss and real sessions are separate.
+All five rollout points stay active; owner state and22 licensing files unchanged.
+
+## October 3 clean release2 native builds and explicit Voice source coverage
+
+[This checkpoint](../release/qualification/next-targets/20261003-system-qt-release2-and-source-scope.json)
+records fresh clean f1c3975 Desktop/Browser bytes and actual ordinary-user Arch/
+Leap release2 native builds. Both complete streaming inspections pass with no
+prepared mode reductions, including new font dependencies. Arch verifies29,263
+native members/29,248 app members; Leap29,266/29,250. These bytes have not yet
+passed an installed complete setup or release/version upgrade/rollback.
+
+Public research finds no full Voice0.1.19 repository snapshot. The exact public
+npm archive contains shipped runtime source and MIT notice. The assembler's
+explicit `--voice-distribution-source` mode retains those original bytes and
+[records coverage and omitted files](../release/dsh/voice-distributed-source.json),
+while separately reusing checked public Adaptive0.2.3 source. It never exports a
+private repository tree or calls the package a full repository snapshot; its
+upstream ref is declared public provenance, not independent private-tree proof.
+Twenty-one focused source/setup cases pass. Fresh matching artifacts with this
+assembler mode, full root/user setup/npm acceptance and all five rollout gates
+remain open. Owner state, root license and22 proposed-license files are unchanged.
+
+## October 3 Arch/Leap complete installer source adapters
+
+[The adapter checkpoint](../release/qualification/next-targets/20261003-system-qt-installer-adapters.json)
+records explicit native package/runtime contracts, separate verified Arch guard
+installation, full post-manager/repeat outcome checks, exact Python3.13 bootstrap,
+bundled-Node native npm/engine checks and checked native artifact/guard bundle
+inputs. The independent read-only verifier passes as ordinary UID1002 on both
+exact installed release1 candidates, without importing installed application code
+or beginning/finalizing maintenance. Thirty-three focused contract/setup/guard/npm
+failure/packaging cases pass. [The owning guide](LINUX-SYSTEM-QT-PACKAGES.md)
+distinguishes those checks from a fresh complete installer run.
+
+Official provider/file research supplies base and optional packages; native solver
+plans are read-only. Leap explicitly adds the Mozilla CA trust package and uses
+versioned npm/Python paths. Its audio utility can select a server provider even
+with no-recommends. Actual Leap npm engine execution, matching new clean Desktop/
+Browser/native bundles, full root/user setup/resume and other release gates remain
+open. All five rollout points stay active; owner state and22 license files remain
+unchanged.
+
+## October 3 complete native artifact inspection
+
+[The streaming inspection checkpoint](../release/qualification/next-targets/20261003-system-qt-streaming-inspection.json)
+adds an independently authored native manifest producer. It reads Arch tar/RPM
+newc without extraction or product/scriptlet execution, verifies package identity
+and every prepared file/link byte/mode plus matching runtime/source receipts,
+then checks the artifact stayed unchanged. Exact prior release1 candidates pass
+29,259 Arch/29,262 Leap complete payload members. The initial permission refusal
+is retained: native packages remove Debian-derived group-write bits. That is now
+the sole admitted mode reduction; future preparation canonicalizes permissions
+before archiving. Four corruption/path/duplicate/hard-link cases plus three
+existing preparation cases pass. [The owning guide](LINUX-SYSTEM-QT-PACKAGES.md)
+records commands and limits. This creates checked native inputs for subsequent
+bundle work; it does not establish full installers, new font-dependent builds,
+dependency closure/maintenance, real sessions/audio/Browser/upgrades or release.
+All five rollout points remain active; owner state and22 licensing files unchanged.
+
+## October 3 installed Arch/Leap lifecycle and native font correction
+
+[Fresh installed package evidence](../release/qualification/next-targets/20261003-system-qt-installed-packages.json)
+now passes on exact full Arch/Leap candidates with clean536 application bytes and
+separately hashed packaging/probes. Arch's verified independent guard is installed
+in its own prior transaction; Leap executes isolated Python3.13 scriptlets.
+Ordinary-user offline runtime, real native preview and bundled Node launch pass.
+After network disconnection, both targets refuse replacement/removal under actual
+Desktop/runtime leases, then pass idle same-artifact reinstall, removal and
+reinstall after removal. Complete application inventories, native package file
+audits, frozen Python/Qt identities and synthetic user/runtime receipts pass.
+Retained Arch missing-build-tool and documentation-exclusion failures have exact
+fixture-only corrections; neither becomes a product change or initial pass.
+
+A real missing-glyph defect is also corrected through native font dependencies,
+with the approved design unchanged. Official package/font inspection establishes
+separate Symbols2/CJK providers; actual fresh Qt fallback and unchanged screenshots
+pass on Arch/Leap. [Font research and Qt results](../release/qualification/next-targets/20261003-linux-surface-fonts.json)
+cover every approved glyph. New recipes declare those dependencies on all explicit
+Linux targets; matching rebuilt artifacts and Debian/Ubuntu/Fedora installed
+fallback acceptance remain required. [The owning guide](LINUX-SYSTEM-QT-PACKAGES.md)
+distinguishes the installed release1 packages from future recipe artifacts.
+
+Full Arch/Leap installers/resume, coherent native dependency maintenance, real
+GNOME/KDE/Mint sessions and consent/input/lock/reboot, graphical Browser, physical
+audio, version upgrades/rollback and source/legal/public release remain open.
+All five rollout points stay active. Owner installations/services/models/devices,
+root license and all22 proposed-license file hashes remain unchanged.
+
+## Historical October 3 Arch/Leap build checkpoint; installed evidence above
+
+The [new native package guide](LINUX-SYSTEM-QT-PACKAGES.md) and
+[artifact/inspection checkpoint](../release/qualification/next-targets/20261003-system-qt-native-packages.json)
+record actual ordinary-user full application `makepkg`/`rpmbuild` success from
+clean536 payload bytes with separately hashed working recipes. Exact offline
+profile/wheels/frozen system inventory, target metadata, explicit bootstrap
+wrappers, Handy bytes/modes and all29,244 Arch/29,246 Leap application-root
+members pass inspection. Both include the dictation permission files. Leap's
+corrected repeat records isolated Python3.13 arguments in all four embedded
+standalone guard phases; the predecessor remains separate. Three focused input/
+output-preservation/guard composition cases pass. No application was installed
+by these builds. Native dependency installation, full installed lifecycle and
+complete installer/resume still require actual acceptance; Arch's independent
+hook guard must be installed in its own prior transaction.
+
+[Fresh corrected Mac14/26 reports](../release/qualification/next-targets/20261003-mac-hosted-source-provenance.json)
+now pass and name actual clean merge480212b in both Desktop/Companion manifests;
+its difference from headbbd76c8 is four documentation files only. Old null-source
+reports remain unchanged. Full536 Windows also finishes successfully on both
+native CPUs, without establishing the older x64 teardown failure's cause.
+GitGuardian remains failed/unwaived. All five rollout points, real sessions/
+Browser/audio, upgrades/rollback and source/legal/release gates remain open.
+Owner installations/services/models/devices and all22 license-scope files stay
+unchanged.
+
+
+## October 3 hosted Ubuntu/Fedora qualification
+
+[Linux run37075160234](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37075160234)
+now passes all jobs, including fresh Ubuntu26.04/Fedora43/Fedora44 installed
+package lifecycle and ordinary-user rendering. Each target runs1,028 native
+cases:992 successes and36 platform skips. Downloaded, checksum-verified reports
+record clean checkout `4eb7217`; its difference from PR head `536fc75` is four
+documentation files only. The earlier Fedora omission and Ubuntu fixture failure
+stay preserved. [Exact reports and artifact identities](../release/qualification/next-targets/20261003-hosted-linux-package-qualification.json)
+qualify these bytes rather than unrelated older candidates.
+
+[Mac14/26 run37075160186](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37075160186)
+also passes managed first-run/restart and shared behavior, but both package reports
+omit their source commit. [The workflow correction](MACOS-DISTRIBUTION.md#october-3-development-provenance-correction)
+binds future Desktop/Companion reports to the actual checkout; new execution is
+required. Windows Desktop passes both CPUs; full Windows x64 now passes, while
+ARM64 remains running at this checkpoint. The older x64 teardown failure remains
+unexplained. GitGuardian is failed/unwaived. Actual sessions, graphical Browser,
+physical audio, full Arch/Leap installers, version upgrades/rollback and source/
+legal/release acceptance remain open. All five rollout points stay active; owner
+installations, services, models, devices and the22-file license scope stay unchanged.
+
+
+## October 3 Fedora RPM correction and hosted results
+
+The original Fedora 43/44 builds fail on the two omitted dictation permission
+files. Corrected, separately hashed packaging recipes build both RPMs; a fresh
+Fedora 43/44 fixtures pass installed rendering and busy/idle package lifecycle,
+then actual disabled Handy protocol through the cold runtime lease with
+unchanged registered payload. See [the owning guide](LINUX-FEDORA-DICTATION-PACKAGING.md)
+and [working-recipe evidence](../release/qualification/next-targets/20261003-fedora-dictation-packaging.json).
+The payload is clean `4f99696`; these working recipes are not a new clean complete
+product qualification. Twenty-one focused Linux cases pass. The newer
+[clean-package/replacement record](../release/qualification/next-targets/20261003-clean-fedora-package-replacement.json)
+builds matching Debian/Fedora artifacts from clean `536fc75`, refuses actual
+busy runtime/Desktop replacement in both targets, then verifies idle same-version
+source replacement, ordinary-user rendering and preserved private files. Actual
+version-to-version upgrades, rollback and complete installer acceptance stay open.
+Both `536fc75` Windows Desktop jobs pass; broader hosted checks remain running.
+
+Hosted `4f99696` Linux source/Home/Handy/Debian/installed/Browser jobs and both Mac
+versions pass; the distro matrix fails on the Fedora omission and an Ubuntu
+native Qt signal-connection crash after passing installed lifecycle. Windows
+exposes four Linux-only tests, now scoped explicitly, plus a distinct x64 native
+teardown failure; ARM64 passes. The [Ubuntu fixture correction](LINUX-QT-FIXTURE-COMPATIBILITY.md)
+replaces its class-level MagicMock with a real override and passes both unchanged
+UI cases and the 31-case Window sequence. Faulthandler is enabled for the next
+native distro suite. Full hosted success and a Windows teardown repair are not
+claimed. GitGuardian remains failed/unwaived. All five rollout points, clean
+matching installers/sessions/audio/Browser/upgrades/source/legal/release gates
+and the exact 22-file license decision stay open. Owner selection/services/models/
+devices remain unchanged.
+
+## October 3 shared lifecycle and actual dictation candidate
+
+Current main`9baf711` is integrated with rollout`cb1e470`. Declared Linux runtime,
+Browser pending-work fences, graphical environment, Linux/Mac/Windows shortcut
+activation and checked public source reuse all survive the merge; current source
+reuse requires Resonant Voice0.1.19 archives. The
+[working-merge report](../release/qualification/next-targets/20261003-main-shared-lifecycle-integration.json)
+records1,025 native cases/989 passes/36 platform skips,529 SDK cases/527 passes/
+two skips,83 Browser and two separate private portal cases, all passing. Earlier
+fixture/dependency failures are retained. Both new system runtime discovery proofs
+pass again. Hosted execution and remaining failures are recorded in the newer
+Fedora packaging checkpoint above; GitGuardian remains failed and unwaived.
+
+The checksum-pinned public dictation candidate also passes all25 native loader
+lists and actual disabled component protocol/theme/ownership/EOF startup on Arch
+and Leap after distro-native dependencies. See
+[the native candidate guide](LINUX-HANDY-NATIVE-CLOSURE.md) and
+[actual artifact/fixture report](../release/qualification/next-targets/20261003-handy-arch-leap-native-candidate.json).
+This is neither complete installed-product nor physical audio/native input
+acceptance. Full packages/installers, real sessions/Browser/audio/lifecycle and
+source/legal/release gates remain open; all five rollout points stay active. The
+22-file license proposal, owner selection/services/models/devices stay unchanged.
+
 
 
 
@@ -251,6 +932,41 @@ Windows build, CI configuration, installation or release changed in this plannin
 work. Implementation awaits the next instruction to build; start with W0 and W1,
 then follow their exit criteria. The existing Mac activation checkpoint below
 remains separate and unchanged.
+
+## October 2 Arch/Leap Node admission
+
+The compiled selector now admits only the exact Arch/Leap system-Qt profiles.
+New UID1000 fixtures execute full cold Python verification before pinned Node,
+then prove explicit/implicit Desktop/component/Browser voice discovery and six
+refusals with restored manifests and byte-identical receipts. See
+[the owning guide](LINUX-SYSTEM-QT-STACK.md#actual-node-and-browser-selection) and
+[working-source report](../release/qualification/next-targets/20261002-system-qt-node-admission.json).
+Five focused Node cases cover20 malformed policies. Complete target installers,
+packages, installed lifetime leases, graphical Browser/audio/maintenance and
+legal acceptance remain open; all five rollout points stay active. Current main
+has advanced again; these proofs qualify the recorded files, not that later merge.
+
+
+## October 2 current main and distro runtime integration
+
+Canonical main3c1dddf's dictation changes are integrated with rollout1f59283.
+Deployment staging preserves both components and Python wheels; target-specific
+Debian recipes retain dictation requirements and their existing Qt/host contracts.
+Codex cancellation/render waits preserve both branches' actual receipt conditions.
+The [working-merge report](../release/qualification/next-targets/20261002-main-dictation-distro-integration.json)
+records818 native cases/815 passes/three expected skips, two separate private
+portal cases,11 focused Node cases and66 Browser cases, all passing. Initial
+missing-jsdom test-dependency attempts are retained. Pinned upstream patches/
+notices and the22-file license proposal remain byte-identical; old runtime proofs
+do not qualify the newly combined product. The1f59283 PR conflict prevented its
+hosted checks; this merge needs fresh hosted qualification.
+
+GitGuardian flags12 earlier SHA256 script/log entries. Each inspected value is
+a digest; no external finding is waived and the failing check remains explicit.
+Full other-distro packages, matching dictation/native ABI, sessions/Browser/audio/
+upgrades and source/legal/release acceptance remain open. All five rollout points
+remain active. No owner selection, service, GPU/model setting or device is changed.
+
 ## October 2 embedded Handy candidate
 
 The owner has now accepted the installed Linux dictation through real use and
@@ -306,6 +1022,876 @@ preserves the original missing clipboard dependency license and passes the full
 target-filtered notice audit. Final hosted results are recorded in the guide.
 Do not claim a qualified Windows installer or physical microphone acceptance
 solely from a native build or successful component enable.
+
+## October 2 Arch/Leap system Qt drift boundary
+
+The two voice profiles now bind exact distro Python/Qt inventories. Actual new
+UID1000 offline runtimes pass reuse, registered-version/byte/import drift refusal,
+synthetic text/SVG/QML and the pinned Silero CPU VAD model; old runtime bytes remain
+unchanged. See [the owning guide](LINUX-SYSTEM-QT-STACK.md) and
+[working-source checkpoint](../release/qualification/next-targets/20261002-system-qt-stack-runtime.json).
+This is not a complete dependency closure or whole Arch snapshot/maintenance proof.
+Full Arch/Leap application packages, installer/Node admission and real session/
+Browser/audio/lifecycle acceptance remain next; all five rollout points stay active.
+The 22-file license proposal and frozen source-runtime guide are unchanged.
+
+Both 42c8c51 hosted checks pass:
+[Linux37062970356](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37062970356)
+and [Mac37062970276](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37062970276).
+The new system-stack source needs its own hosted checks. Owner services, selected
+artifacts, GPUs/models/physical audio remain unchanged; no binary release is made.
+
+## October 2 installed Noble source-package startup
+
+Clean7b6df59 private source-runtime packages pass byte/notice/readability review,
+configure Runtime then Desktop in a fresh image, and prepare root-owned inputs as
+ordinary UID1001 offline. Actual installed cold runtime/Browser selection and
+package leases, desktop offscreen screenshot, synthetic text/SVG/plasma component
+and64-frame single-thread CPU VAD pass. All14 mapped Qt libraries stay in the
+verified runtime. See [the actual report](../release/qualification/next-targets/20261002-noble-source-package-startup.json)
+and [owning guide](LINUX-SOURCE-RUNTIME-ENTRYPOINTS.md#installed-ordinary-user-acceptance-of-clean7b6df59).
+The image-reference, pre-dependency order and first incorrect-QML-path probe failures
+are preserved; no failed candidate is relabelled or installed app source patched.
+
+The7b6df59 [Mac hosted check](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37060945741)
+passes on both macOS14/26. Its [Linux hosted check](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37060945796)
+also passes: source/Home/Debian, installed-packages, Browser, Ubuntu26.04 and
+Fedora43/44 jobs all succeed. Each native suite runs787 tests:785 pass and
+two Mac-only skips. The Node SDK suite runs517 cases:515 pass/two skips. Both42f065a checks were superseded/cancelled.
+The new installed evidence/recipe/probe require publication and their own hosted
+checks. All five rollout points, full product/native-session/Browser/audio/upgrades,
+other-distro and source/legal work remain active.22-file license decision pending;
+owner selections/services/models/GPU/audio remain unchanged.
+
+## October 2 source package permission correction
+
+The first42f065a source-runtime Debian candidate builds and verifies its67 native
+files/18 links, seven wheels/19 wheel ELF members and original notices. Actual
+archive metadata exposes a root-owned0700 Qt input directory, so ordinary-user
+preparation is unqualified. The new guard refuses that artifact. The builder now
+normalizes only packaged Qt inputs to0755/0644; private user runtimes remain0700.
+Fourteen synthetic source/native-path/permission cases pass. See [the owning guide](LINUX-SOURCE-RUNTIME-ENTRYPOINTS.md#root-owned-package-input-permission-correction)
+and [preserved report](../release/qualification/next-targets/20261002-noble-source-package-permission-failure.json).
+A new clean artifact/ordinary-user installed proof is required; original source
+entrypoint results remain historical actual evidence. All five points remain
+active, license decision pending and no owner selection changes.
+
+## October 2 Noble source-runtime entrypoints
+
+[The source-profile guide](LINUX-SOURCE-RUNTIME-ENTRYPOINTS.md) and
+[actual report](../release/qualification/next-targets/20261002-noble-source-runtime-entrypoints.json)
+record a strict Ubuntu24.04/Python3.12 source-Qt candidate. Native payload/wheels
+share an immutable identity and verified pre-exec paths across Desktop, Browser,
+setup and DSH service startup. Offline preparation, clean57-object closure, cold
+Browser selection, offscreen desktop screenshot and isolated stage/activate/rollback
+pass; a corrupted Qt library is refused before exec without repairing selection.
+Full native session/product/packages/Browser/audio and legal qualification remain
+false; the22-file license decision is pending. All five rollout points remain active.
+
+Both5f5d7d8 hosted service-fixture checks pass:
+[Linux37055981988](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37055981988)
+and [Mac37055981975](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37055981975).
+The prior3f52af2 hosted native suites each run771 tests:769pass and two Mac-only skips
+on Debian13, Ubuntu26.04 and Fedora43/44. The current source-profile change needs
+its own hosted results. Existing selected owner/guest artifacts, models, GPUs and
+physical audio remain unchanged. Historical failed fixture/dependency runs are retained.
+
+## October2 isolated native accessibility service fences
+
+[The new report](../release/qualification/next-targets/20261002-isolated-native-a11y-services.json)
+proves registry replacement, coupled launcher/bus loss and coupled bus/launcher
+loss in a separate Fedora44 container. Native daemon hashes match the GNOME guest;
+private DBus sessions and a synthetic exporter isolate the cases. Old helpers
+retire/refuse reuse; fresh helpers accept restored native identities. All recorded
+native-bus/probe/helper PIDs are absent after the final Docker-init cases. Actual
+missing-schema/typelib failures and prior orphan-zombie observations are preserved;
+none is relabelled as full fixture qualification. See [the owning GNOME plan](LINUX-GNOME-CONTROL-PLAN.md#isolated-native-launcher-registry-and-bus-replacement).
+
+Both3f52af2 selected-owner hosted checks pass:
+[Linux37053560570](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37053560570)
+and [Mac37053560550](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37053560550).
+The isolated-service proof needs its own hosted checks. The 22-file license
+proposal still awaits an owner decision; no license grant changed. Real GNOME
+restart/controller/input, product source-runtime entrypoints/other ABIs,
+compiled-content/source-kit legal acceptance and full packages/Browser/audio/
+lifecycle remain open. All five rollout points remain active. Existing selected
+artifacts and owner/guest services/devices/models/audio are unchanged.
+
+## October2 native selected accessibility owner loss
+
+[The native owner-loss report](../release/qualification/next-targets/20261002-gnome-native-selected-owner-loss.json)
+and [probe](../release/probe-gnome-a11y-owner.py) prove retirement when a disposable
+exporter's accessibility connection closes while its PID/start identity stays
+alive. Both actual Fedora/GNOME cases answer supervisor pings, reconnect with a
+new unique owner in the same process, reject reuse of the old helper and accept
+the new owner only through a fresh helper. The current probe closes in0.059s;
+all eight owned proof PIDs are confirmed absent. Both native bus IDs and global
+launcher/registry owners remain unchanged. This uses a synthetic two-node tree,
+not GTK/input acceptance; zero focus events or input are sent. Global-service
+replacement, shell/controller integration, inaccessible/ambiguous native trees,
+per-action/lock/Stop and other-profile/KDE qualification remain open.
+
+Both5df6fa5 source-kit hosted checks pass:
+[Linux37051754737](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37051754737)
+and [Mac37051754750](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37051754750).
+Both selected-owner source checks subsequently pass; see the newer isolated-service checkpoint above. The
+[22-file recipient-control license proposal](RECIPIENT-SOURCE-CONTROLS-LICENSE-PROPOSAL.md)
+is prepared for the owner's explicit decision; no license grant/headers have
+changed. All five authorized rollout points remain active. Selected artifacts and
+owner services/devices/models/audio settings remain unchanged.
+
+## October2 authenticated sources, shader and private recipient kit
+
+[The new source-kit checkpoint](../release/qualification/next-targets/20261002-authenticated-recipient-source-kit.json)
+retains565 authenticated source objects/1,358,989,460 bytes for all180 builder/base
+source versions. Four original signed releases and six full Sources indexes verify;
+all180 .dsc identities/checksums agree, without uploader-signature claims. Twelve
+real altered-copy refusal probes and14 optimized Python source/OCI synthetic tests
+pass. The public base verifier proves blob/descriptor/decompressed-layer identity
+without importing an image. Actual source-built qsb reproduces the published shader
+package; native shader rendering remains open.
+
+A new private kit18 preserves1,712 manifest files/2,072,651,811 bytes and verifies
+all path/size/hash rows. All502 builder/base copyright paths resolve from485
+original notice files and263 archive link references. Its README keeps existing
+Augmentor-authored terms separate from upstream terms and does not exempt generated
+outputs from applicable source terms. Historical kit17 wording is preserved and
+corrected in kit18. Full compiled-file notice mapping, recipient permissions,
+fresh README/empty-daemon restoration, native/product/other-distro runtimes and
+legal/release conditions remain open. See [source-runtime scope and evidence](LINUX-LGPL-SOURCE-RUNTIME.md#authenticated-builderbase-sources-shader-and-private-kit-checkpoint).
+
+Both435eab2 helper hosted checks pass (Linux37045885191/Mac37045885183); both8b7abed
+runtime-completion checks pass (Linux37047133286/Mac37047133117). Both source-kit hosted checks subsequently pass; see the newer owner-loss checkpoint above. All five authorized rollout points remain
+active; selected artifacts, owner services/devices/models/audio settings and
+repository licenses are unchanged.
+
+## October 2 authenticated source runtime completion
+
+[The completed recipient proof](../release/qualification/next-targets/20261002-authenticated-source-runtime-completion.json)
+now extends the earlier authenticated-toolchain checkpoint: all19 source-build
+commands finish from seven verified archives in the reconstructed public-base plus
+410-package image. All three wheels verify RECORD; both default and explicit SDK
+environments import all11 requested bindings. Native wheel members match the first
+producer. Qt's207 ELF inventory has161 identical files and46 differences; ZIP,
+configuration/cache/RECORD bytes also differ. This is functional reconstruction,
+not binary reproducibility.
+
+A separately identified augmentor2 wheel excludes only the reviewed unused
+QtExampleIcons extension and retains other producer bytes/tags. The CLI accepts
+only the two exact reviewed producer hashes; six derivation refusal/preservation
+tests pass. The fresh runtime-only container uses the reconstructed image and a
+finite18-library candidate, without a producer SDK/tree. It passes11 imports,
+offscreen synthetic text, SVG pixel and QtQuick/plasma component creation. A fresh
+source rebuild of deliberately modified QtSvg completes three commands; a separate
+runtime executes its changed isValid result. The published replacement probe
+verifies the original runtime inventory before/after and that only Svg differs.
+
+These tools require explicit runtime paths. Full product entrypoints, native
+Wayland/xcb rendering, shader rendering, matching other-distro profiles, complete
+offered source/control-script/notice scope and legal acceptance remain open.
+Historical build, APT and fixture permission failures remain preserved. All five
+authorized rollout points are active; no selected installation or binary release changes.
+
+## October 2 native read-only accessibility checkpoint
+
+The [isolated Fedora helper proof](../release/qualification/next-targets/20261002-gnome-native-accessibility.json)
+now verifies actual GTK Wayland and XWayland display types, discovery after helper
+startup, A → B → A focus serial changes, callback execution on its owning thread
+and password-role detection. The parent imports no libatspi and pins process start
+identity, session/accessibility buses, launcher/registry owners, helper epoch,
+request nonce/generation and complete focus replies. It rejects duplicate JSON,
+malformed identities and incomplete targets. Cancelling a deliberately paused
+child closes in0.289 seconds; a0.3-second deadline closes in0.516 seconds including
+child disposal. Target exit retires the helper in both display cases; that proves
+process-disappearance refusal, not registry/launcher replacement with a live target.
+
+All14 synthetic protocol tests pass separately from native proof. The updated
+Arch native suite runs756 tests:754 successes and two Mac-only skips. The first
+unexplained incomplete query and a later XWayland incomplete tree query remain
+recorded. GTK4.22.5 exports SENSITIVE but omits ENABLED in its state collector;
+these raw facts remain separate. Neither focused/showing state nor listener
+registration alone authorizes input. Production GNOME discovery/keyboard/pointer
+remain disabled until shell identity, helper tokens, inaccessible trees,
+owner replacement, lock/Stop and actual per-action widget outcomes are qualified.
+
+The prior authenticated-toolchain source commit2aac600 passes both hosted checks:
+[Linux37041089753](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37041089753),
+[Mac37041089691](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37041089691).
+Both helper hosted checks subsequently pass; see the newer source-kit checkpoint above. All five authorized
+rollout points remain active; no selected app, owner service or binary release changes.
+
+## October 2 authenticated toolchain reconstruction checkpoint
+
+[The new locked410-package policy](../release/qualification/next-targets/20261002-ubuntu-source-toolchain-lock.json)
+and [executed report](../release/qualification/next-targets/20261002-ubuntu-source-toolchain-reconstruction.json)
+now preserve signed Ubuntu metadata and verified package objects.408 versions
+match retained original indexes;2 audit versions match an actual verified official
+20260825 snapshot. All5 release signatures and17 full indexes verify; all410
+.debs match signed hashes/sizes,395,555,966 bytes. Ten actual changed-key/signature/
+index/package/source/URL/path refusal probes pass without changing originals.
+
+A fresh offline image from the pinned public Noble base and these package files
+reconstructs the exact410-row inventory hash. No earlier derived producer image,
+Qt source tree or compiled intermediate is reused. Its normal UID1001, no-network,
+2-CPU/8GiB/512-PID container starts the original seven verified archives with the
+published recipe in fresh source/build roots; at this checkpoint QtBase configure
+passes and compilation runs. Full rebuilt runtime/recipient execution is still
+pending. The first local-APT --no-download pathname failure and corrected offline
+repeat remain distinct. Full source/control-script permissions, generated shader,
+notice mapping, native/product/other-ABI and release qualification remain open.
+
+Both ee8dbdd native-capture hosted workflows pass:
+[Linux37038972316](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37038972316),
+[Mac37038972337](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37038972337).
+The application source's742 native cases/740 successes/two platform skips are
+unchanged; new kit tools have actual signature/acquisition/reconstruction evidence
+and subsequently pass as recorded in the newer accessibility checkpoint. All five authorized rollout points
+remain active. Source publication does not select an app, change owner state or
+publish a binary release.
+
+## October 2 native GNOME capture and cancellation checkpoint
+
+The separate [Fedora candidate report](../release/qualification/next-targets/20261002-gnome-native-capture.json)
+now binds actual scale1 single-monitor PipeWire capture to exact candidate bytes.
+It observes the owned GTK target, validates1280×800 RGB frame/monitor geometry
+and creates a fresh one-use token without sending input. Actual Augmentor Stop
+closes after capture in0.300 seconds; a real-consent/synthetic stalled-frame run
+closes in0.063 seconds. GNOME's native sharing Stop after real capture also closes
+with `native-session-closed`, without an Augmentor Stop click. Timings start at
+the Qt callback and measure candidate cleanup, not physical/input end-to-end latency.
+The first unexplained capture failure, consent timeouts and Overview refusal are
+preserved; later capture passes do not establish the earlier failure's cause.
+
+Diagnostics retain the first native/user Stop reason before shared cancellation.
+The probe's consent wait is180 seconds while the component default stays80.
+All742 native source cases pass in owned Arch, with740 successes/two Mac-only
+skips. Both prior83bcb6c hosted workflows pass:
+[Linux37033230709](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37033230709),
+[Mac37033230525](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37033230525).
+000c10e workflows were superseded/cancelled; both ee8dbdd hosted workflows
+subsequently pass as recorded in the newer toolchain checkpoint above. Production GNOME input remains disabled. Keyboard/pointer,
+mid-PipeWire revocation, lock/restart/scaling, supported profile repetition, KDE
+threading, full product/Browser/audio/packages/source-kit/legal/release gates
+remain active. All five original rollout points continue; selected artifacts and
+owner services/devices/settings are unchanged.
+
+## October 2 completed source runtime and GNOME candidate checkpoint (historical)
+
+A separate recipient fixture now rebuilds QtSvg from the verified archive with a
+recorded behavior change and proves the modified library executes from a separate
+runtime candidate; original behavior and all original artifacts are preserved.
+[Replacement evidence](LINUX-LGPL-SOURCE-RUNTIME.md#executed-recipient-library-replacement-fixture)
+is specific to this runtime candidate. Product entrypoints, full source/toolchain
+kit and legal review remain open.
+
+The fifth offline Qt/PySide source build completes all19 commands. A separately
+identified PySide derivative excludes the unused GPL/exception example extension;
+all original artifacts are preserved. The staged candidate has18 Qt libraries,
+explicit desktop/image/TLS/client plugins and a finite QML scope. Its fresh
+runtime-only container has no producer tree and passes11 binding imports,
+offscreen synthetic text, SVG rendering and QtQuick/plasma component construction.
+See [source runtime evidence and limits](LINUX-LGPL-SOURCE-RUNTIME.md). Shader
+rendering, native platforms, full product, notices/closure, full recipient source
+kit, recipient modification and release remain open. The independent sixth build
+and11 imports pass;161/207 Qt ELF payloads agree, while46 differ. All wheel native
+member payloads agree; this is a functional rebuild, not binary reproducibility.
+
+The input-free Fedora consent probe also passes GNOME's native sharing Stop.
+The separate [execution candidate](LINUX-GNOME-CONTROL-PLAN.md#guarded-execution-candidate-not-enabled)
+adds scale1-only mapping, frame-cap validation, private-context cancellation,
+terminal cleanup and idle lock/epoch monitoring. Keyboard refuses until isolated
+AT-SPI event delivery is proved. Its tests are synthetic; production GNOME input
+remains disabled. Current isolated Arch source suite runs739 cases:737 pass and
+2 Mac-only skips. The initial context-mocking test failure is preserved alongside
+the corrected callback-delivery proof. Both40de37b hosted workflows pass:
+[Linux37025441987](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37025441987),
+[Mac37025441815](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37025441815).
+Both83bcb6c hosted workflows subsequently passed; see the newer native capture
+checkpoint above. All five original rollout points remain active; no owner state
+or selected app changed.
+
+## October 2 GNOME input-free consent and PySide dependency checkpoint (historical)
+
+The [checked GNOME report](../release/qualification/next-targets/20261002-gnome-native-consent.json)
+and [owning plan](LINUX-GNOME-CONTROL-PLAN.md) now record a separate real Fedora50
+consent probe: native Cancel, remote-interaction-disabled refusal, explicit device3
+and one monitor, visible Stop during consent and after activation. No portal input
+is sent, production GNOME input remains disabled and the selected app is unchanged.
+The private GLib worker serializes nested waits; eleven focused cases and all721
+native cases (719 pass/two Mac-only skips) pass in owned Arch. First probe timeout/
+Wayland banner failure and initial bad test environment are retained. Finish live
+revocation/restart/password/scaling, guarded GNOME input/scene/AT-SPI integration,
+Ubuntu acceptance and actual KDE threading regression before enabling control.
+
+Fourth source build completes Qt but fails PySide QtQuick's missing generated
+OpenGL header path. Upstream CMake confirms subset ordering; fifth fresh offline
+build places OpenGL before Qml/Quick and is compiling QtDeclarative. Read
+[source runtime work](LINUX-LGPL-SOURCE-RUNTIME.md); full runtime/license/closure/
+independent rebuild/replacement/release gates remain false. Both bedd7bd hosted
+workflows pass. All five original remaining rollout points stay active; no owner
+services/devices/settings or selected application artifacts changed.
+
+## October 2 native Cinnamon shortcut/recovery checkpoint
+
+The [Cinnamon helper](LINUX-CINNAMON-ADAPTER.md#native-shortcut-helper-and-interruption-recovery)
+now uses native numeric rows, bounded GTK3 worker and a durable pre-mutation
+intent. Actual Mint Save/registration, both synthetic launcher QEMU key events,
+WM/custom/other-row/spice conflicts, ownership tampering, rollback/durability
+failure and production disabled-object/stale-epoch refusal pass. Six actual abrupt
+worker/recovery cases cover old/new rows and foreign takeover. Default idle lock
+and wrong/correct password remain real; earlier property/cold-query/locked-fixture
+refusals are preserved. Full source:710 native cases,708 pass/two platform skips
+in owned Arch. Graphical product UI/full app/reboot/physical keyboard, complete
+scene/control/Stop, Browser/audio and release remain open; no app is installed.
+
+All six Qt modules build/install in the second isolated image; PySide/shiboken
+wheel creation fails missing patchelf. That tree is stopped/preserved. The
+[source recipe](LINUX-LGPL-SOURCE-RUNTIME.md) adds signed patchelf; a third fresh
+root/image/source build completes Qt but refuses the verified Ubuntu Python
+package-scheme mismatch. Its tree is preserved. Fourth clean venv build passes
+early path/patchelf checks and starts configuration offline. No full
+runtime/license/closure/rebuild/replacement/release pass is claimed. Both3b8be6d
+hosted workflows pass. Continue all five original rollout points; no owner state
+or selected application changed. Source publication does not deploy an artifact.
+
+## October 2 actual Cinnamon bridge and source build checkpoint (historical)
+
+The [first Cinnamon bridge](LINUX-CINNAMON-ADAPTER.md) is read-only/input-disabled,
+strict6.6.4/X11 and native-owner-pinned. Ten protocol cases and actual Mint76-record
+bounded inventory, natural idle screensaver loss/fresh owner recovery and actual
+disable/re-enable/new unknown epoch pass. Default-lock and earlier cold-query
+refusals are retained; v2 password-lock, production stale-epoch consumer, foreign/
+spice mutation, Save/delivery and full scene/control still need acceptance. The
+input-driver issue is excluded from authentication evidence. No app is installed.
+
+The [source builder](LINUX-LGPL-SOURCE-RUNTIME.md) is offline/two-CPU/8GiB, no host
+mounts/devices. First disabled-feature build is stopped/preserved. Corrected
+nineteen required features pass; four modules build/install and QtDeclarative
+is compiling at this checked boundary. Full PySide/runtime/licensing/closure/
+independent rebuild/replacement/public release remain false. Both f815c23 hosted
+workflows pass. Continue all five original rollout points. Owner state and selected
+application artifacts remain untouched; source publication does not deploy them.
+
+## October 2 Mint reboot/password and source runtime checkpoint
+
+Actual standard-ISO Mint22.3 passes installed X11/password login, wrong/correct
+password lock and normal reboot/repeat with AppArmor and unchanged Cinnamon6.6.4/
+Muffin/screensaver6.6.1 packages. No Augmentor is installed. The missing installer
+hook and two reboot input-driver authentication refusals remain explicit.
+The inspector now owner-pins Cinnamon ScreenSaver and refuses actual lock and
+missing owner; logind falsely remained unlocked during active screensaver.
+Normal 30-second inactive exit and query activation are source-verified. Read
+[Cinnamon contract/evidence](LINUX-CINNAMON-ADAPTER.md) and the source-only
+[GNOME control plan](LINUX-GNOME-CONTROL-PLAN.md) before implementing adapters.
+
+Seven official Qt/PySide archives pass actual hashes/upstream checksum records;
+[source build/rebuild/replacement work](LINUX-LGPL-SOURCE-RUNTIME.md) remains
+unbuilt/unqualified. Actual shell entrypoint now supports Leap's versioned
+bootstrap with strict runtime validation: both real locked target runtimes,
+wrong-interpreter refusal and six startup regressions each pass. The explicit
+synthetic absent-alias test temporarily hides/restores the current Leap alias
+added by signed rpm-build dependencies. Both preceding fd7e6e4 hosted workflows
+pass. All five original rollout points remain active. No owner services/devices/
+models/settings or selected application artifacts were changed.
+
+## October 2 real Leap RPM scriptlet mechanism
+
+Ordinary rpmbuild and actual Leap RPM/zypper pass the synthetic receipt/text
+mechanism proof: first/reinstall, separate and joint UID1000/1001 component
+leases with unchanged payload on refusal, later pre-script failure with durable
+old recovery, upgrade/downgrade and self-contained final `%postuntrans` removal.
+Real zypper returns **107** after posttrans inventory refusal, with the new
+package registered and durable intent retained. Both unverified completion and
+changed-old recovery refuse. Read the [checked evidence](../release/qualification/next-targets/20261002-leap-rpm-guard.json)
+and [transaction limits](LINUX-PACKAGE-TRANSACTIONS.md). The initial source-ID
+driver error is preserved separately; the passing repeat uses git-resolved
+`a18b465` and verified guard bytes. Full product/package/runtime/desktop/reboot
+and all five original rollout points remain active. No owner state was changed.
+
+## October 2 real Arch package-hook mechanism
+
+The separate [Arch guard recipe](../release/arch/README.md) pins clean `daf35a3`
+source and builds through ordinary makepkg. Real pacman transactions pass the
+synthetic payload mechanism test: first/reinstall, two user/component leases,
+joint refusal with unchanged payload, guard removal refusal, later-hook abort
+with durable old recovery, upgrade/downgrade and separate app/guard removal.
+Actual post-hook inventory refusal leaves pending state even though pacman exits
+0; startup remains fenced. The [checked proof](../release/qualification/next-targets/20261002-arch-alpm-guard.json)
+retains three earlier driver failures and safe cleanup. No full application,
+actual multiuser application, reboot or public release pass is claimed.
+Continue full Arch/SUSE builders and all five original rollout points.
+
+## October 2 Leap GNOME session and verified package recovery
+
+Actual Leap 16 GNOME 48.4 Wayland passes the source-only observer inspector
+with SELinux enforcing and exact installed extension/reader byte identity.
+The initial default idle lock suspended the user-only extension and correctly
+refused inspection; one explicit fixture administrative unlock and idle-delay
+change preceded the passing read. Password authentication, shortcuts, consent,
+input, Stop and the application itself remain unqualified on this guest. Read
+the [checked session report](../release/qualification/next-targets/20261002-leap16-gnome48-source-session.json).
+
+Package guard recovery now verifies unchanged old package, full inventory and
+exact old receipt before clearing durable intent; ALPM architecture is queried
+from its database. Nine guard cases and both actual Arch/Leap full native suites
+pass **701 tests, two Mac-only skips**. The first legacy query-mock failure is
+retained. [Transaction contract](LINUX-PACKAGE-TRANSACTIONS.md) owns the limits.
+Hosted Linux and Mac jobs for prior `2c9130b` both pass. The complete installer
+matrix remains unchanged. Continue all five authorized rollout points.
+
+## October 2 joint package guard foundation
+
+New trusted standalone Leap/Arch guard checks both leases before durable intent,
+retains interrupted state across lost `/run` mirrors and verifies complete
+registered package/payload identity before finalization. Linux startup checks
+the persistent marker, explicit target receipts check full version-release and
+managed staging retains that receipt. Seven real-flock/synthetic-root cases pass;
+both full native suites pass **699 tests, two Mac-only skips**. This is source
+foundation, not real RPM/ALPM transaction acceptance. Read the
+[candidate transaction contract](LINUX-PACKAGE-TRANSACTIONS.md) and continue the
+separate Arch guard bootstrap, matching builders, verified old-state recovery
+and downstream transaction/reboot tests. The complete installer matrix remains
+unchanged until actual acceptance. Hosted Linux/Mac `8ad9fdc` both pass.
+
+The signed Mint ISO is now complete and hashed after one validated Range resume.
+Its actual Casper 1.498/Ubiquity 24.04.3+mint19 fetched the external seed and normal
+installation is copying files; completion is unverified. Leap's signed GNOME 48.4
+pattern and explicit native/portal dependencies installed with SELinux enforcing.
+The minimal pattern omitted portals, so the initial final package query failed;
+that receipt remains preserved. Actual Leap login/observer/app and all five
+original rollout points remain active. No owner services/devices were changed.
+
+## October 2 reboot, versioned startup and Leap boot checkpoint
+
+The clean managed Noble `c4b885e` passes actual normal guest reboot: changed boot
+ID, selected descriptor preserved, fresh service-owned app PID, real Wayland,
+verified runtime/inventory, AppArmor and all default Ubuntu extensions. The
+separate Mesa .3 failure remains unqualified. Versioned bootstrap source passes
+actual Arch/Leap synthetic startup commands, including Leap without `python3`;
+both complete native suites pass **689 tests, two Mac-only skips**. Reviewed
+GNOME 49 now has an explicit source profile; actual Fedora 43 graphical acceptance
+remains open. Signed Leap 16 Cloud bytes boot using pinned UEFI firmware and the
+external NoCloud seed completes without errors. This proves Cloud infrastructure,
+not a GNOME/product/package pass. Continue all five original remaining points
+through the [current evidence](LINUX-DISTRO-ROLLOUT.md#october-2-reboot-versioned-startup-and-leap-cloud-boot).
+Hosted Linux/Mac jobs for preceding `fc3102a` both pass; this checkpoint is new
+source, distinct from the unchanged installed Noble candidate.
+
+## October 2 actual keyboard and ABI runtime checkpoint
+
+Clean managed `c4b885e` now passes the full owned-QMP two-instance shortcut test
+and separate lock/lifecycle proof in actual Noble/Mesa .2 Wayland. New source
+`c5564bc` passes every hosted Linux and Mac job. Arch/Leap ABI-specific overlays
+retain distro Qt, pass actual render/reuse/tamper and CPU ONNX computation, and
+both full native suites run 687 tests with 2 Mac-only skips successfully. The Leap
+GStreamer StructureWrapper fix preserves strict RGB checks. Read the
+[checked evidence and exact limits](LINUX-DISTRO-ROLLOUT.md#october-2-actual-noble-keyboard-and-next-runtime-acceptance).
+Continue actual Noble reboot/shortcut-lock checks, SUSE/Arch package adapters,
+Mint/49/48 sessions and all five original rollout points; input, physical speech,
+source/rebuild/replacement and public release gates remain open. The goal is active.
+
+## October 2 clean candidate activation and GNOME 48 source checkpoint
+
+Clean `c4b885e` passes all hosted Linux and Mac 14/26 jobs. A separately staged
+Noble/Mesa .2 clone candidate is selected through `augmentor-update`; old PID
+survives activation, previous descriptor is retained and normal idle close passes.
+The verified observer is installed using GNOME's pack/install CLI and the owned
+GDM session reloads normally. Full keyboard delivery rerun is in progress; do
+not infer its result. The host activation transport timed out during final
+inventory hashing; the guest subsequently finished and its complete activation
+receipt was retrieved. No mutation was replayed.
+
+GNOME 48 is now an explicit **source** profile, grounded in pinned Shell/Mutter/
+GSD sources. Modern lock and portal-schema checks stay strict, the Ubuntu mode
+exception remains 46-only and input remains false. Five JS, six shortcut and
+nine observer protocol tests pass. Continue real GNOME 48/Leap acceptance,
+Cinnamon's separate adapter and every original remaining gate through the
+[current rollout checkpoint](LINUX-DISTRO-ROLLOUT.md#october-2-gnome-48-source-profile-and-dependency-audit).
+
+## October 2 remaining rollout and Noble lifecycle checkpoint
+
+The owner explicitly authorized completing all five remaining rollout points
+autonomously. Preserve that full scope. The previous goal turn published the
+authenticated Mesa comparison; this turn adds actual lifecycle evidence and
+identifies an observer defect. Latest `c4f3b1f` Linux and Mac CI both pass.
+
+Pristine `a7ee9c5` Noble/Mesa .2 Wayland passes three duplicate autostarts,
+observer suspension on lock, fresh epoch and old-reader refusal after fixture
+unlock, accepted idle close and canonical service-owned cold launch. The
+[checked lifecycle report](../release/qualification/ubuntu24.04/gnome-wayland-lifecycle-a7ee9c5.json)
+retains its exact source/helper scope. Actual Qt Save and foreign/second-instance
+conflict checks pass in a separate rendered component fixture. The complete QMP
+keyboard proof stops after its first key: Desktop Icons focus is outside the actor
+inventory, producing an inconsistent scene. Source now reports null focus while
+retaining `no-visible-live-focus`; five extension and eight Python observer cases
+pass. Build/stage a separate artifact through `augmentor-update`, let the observer
+reload normally and rerun full keyboard/lifecycle/reboot acceptance. Do not patch
+the selected guest payload or bypass the strict consumer inventory check.
+
+Arch dated-snapshot and Leap OSS dependency installs/imports now pass. Their
+[checked probe](../release/qualification/next-targets/20261002-dependency-probes.json)
+records exact OCI pins and inventories. Package adapters/managed ABI overlays,
+full native suites and desktops remain open. Continue all five points through the
+[current checkpoint](LINUX-DISTRO-ROLLOUT.md#noble-lifecycle-shortcut-defect-and-next-target-probes).
+
+## October 2 official Mesa .2 Wayland comparison checkpoint
+
+A separate clone now passes its first actual Ubuntu GNOME 46 **Wayland** login
+and canonical Augmentor startup using official Mesa `25.2.8-0ubuntu0.24.04.2`.
+The [checked report](../release/qualification/ubuntu24.04/gnome-wayland-mesa2-a7ee9c5.json)
+binds the exact `a7ee9c5` app, five coherent Mesa packages and authenticated APT
+metadata. Canonical's archive signature, complete binary Packages index and each
+package hash were independently verified; simulation adds/removes no packages.
+Pristine Augmentor payload, seven-wheel Python, AppArmor, actual service PID,
+Ubuntu/user observer and all default extensions pass. Actual QMP capture shows
+the approved UI/dialog. The application loads `libqxcb.so`: this is XWayland UI
+inside a real Wayland session, not native Qt Wayland qualification.
+
+Original latest-Mesa .3 failure baseline is preserved offline. The clone exposed
+a separate cloud/minimal-GNOME reboot issue: Ubuntu settings select NetworkManager
+but that service was absent under `--no-install-recommends`. A guarded one-time
+fixture configuration uses the already installed networkd; no new network package
+was added. Timer, renderer and cloud-init controls remain explicit. The initial
+offline APT local-URI attempt failed before changes; exact verified files staged
+in APT's cache then installed successfully offline. Do not recommend this private
+fixture pin as a general owner-machine downgrade or mark latest .3 passing.
+
+Continue repeated Wayland/reboot startup, real GSD Save/conflict/delivery,
+two-instance/closed launch/lock lifecycle and all connected/control/voice/distro/
+release gates. `7856c84` Linux and Mac 14/26 CI now passes all jobs; newer report
+publication CI remains separate. See [the comparison scope](LINUX-DISTRO-ROLLOUT.md#official-mesa-2-wayland-comparison).
+
+## October 2 Noble graphical X11 and Wayland crash checkpoint
+
+Clean candidate `a7ee9c5` now passes real canonical startup in the marked Ubuntu
+24.04.5 guest's **X11 fallback**: pristine installed packages, immutable seven-wheel
+Python, active AppArmor, actual service/MainPID and `/usr/lib/augmentor` selection,
+Ubuntu/user observer mode and all four Ubuntu default extensions plus observer.
+Actual guest screen captures render the approved application and DSH setup dialog;
+the idle snapshot observes the focused application with no task or draft. The
+read-only `release/inspect-noble-gnome-vm.py` requires an explicit matching session
+type; its default Wayland check refuses this fallback. The checked
+[X11 report](../release/qualification/ubuntu24.04/gnome-x11-a7ee9c5.json) binds
+package, helper, runtime and private capture hashes. This does not qualify
+shortcut delivery, connected DSH/Browser, input or physical voice. The fixture
+idle timer was set to zero after an administrative unlock; password/default idle
+lock acceptance remains open. QEMU screendump was inactive; the verified pictures
+come from the actual guest's X11 screen.
+
+Requested Wayland login repeatedly crashes before registration. A fixture-only
+GDB run now identifies Mesa `dri2_bind_wayland_display_wl`, `egl_dri2.c:2658`, with
+`device_name=NULL` passed to `strdup`. Exact Ubuntu Mesa is
+`25.2.8-0ubuntu0.24.04.3`; this matches upstream Mesa's software-only-display fix.
+Record the [diagnostic scope](LINUX-DISTRO-ROLLOUT.md#noble-graphical-x11-and-wayland-crash-checkpoint)
+and continue a finite, source-informed fixture comparison. The app was closed
+through its accepted maintenance protocol before GDM restarts. The diagnostic
+Shell drop-in has been removed; no Augmentor payload or distro graphics library
+was patched. This is a compositor/fixture finding, not a general Ubuntu failure.
+
+All `a7ee9c5` Linux and Mac 14/26 CI jobs now pass. Mac 26's first attempt timed
+out at the native memory refresh fixture; its one failed-job rerun passed on
+unchanged source. Keep both attempts explicit. Continue the original rollout's
+full remaining gates; the draft PR and goal remain in progress.
+
+## October 2 Noble GNOME 46 preparation checkpoint
+
+The autonomous rollout continues with explicit GNOME 46 and 50 source profiles.
+Noble's legacy three-field GSD bindings and absent saved-portal schemas no longer
+cause automatic refusal; 50 retains both checks. The read-only observer accepts
+46, avoids its absent window properties and admits only Ubuntu's explicit normal
+user-derived mode. Input remains unqualified. Six shortcut transaction/profile
+tests, four VM guard tests, four executing extension tests and the added observer
+case pass. The full prepared Debian suite passes 683 native cases (two skips) and
+497 JavaScript cases (two skips); the subsequently added Noble guest guard passes
+separately. The host's Qt Essentials lacks QtTest; use the prepared container for
+full suites. The container with Chromium is required by the JavaScript suite.
+
+The signed dated Noble Cloud image has booted under the dedicated QEMU fixture;
+its actual OS is Ubuntu 24.04.5, cloud-init done. The checked infrastructure report
+contains exact signed/base/source hashes and explicit false desktop gates.
+`ubuntu-desktop-minimal` and its default Ubuntu extensions have installed in this
+private guest. Graphical login/startup, delivery/lock/observer and connected UI
+acceptance are still pending. Build a separate clean candidate with these source
+profiles before using `release/provision-noble-gnome-vm.py`; do not patch installed
+package files. Prepare its seven-wheel ordinary-user runtime first. The helper
+checks package/runtime identities and AppArmor, requests Ubuntu Wayland using
+AccountsService, preserves GDM configuration and refuses an existing guest seat0
+user session. Do not use the Fedora-only acceptance helpers as Noble proofs.
+See [scope, primary sources and next work](LINUX-DISTRO-ROLLOUT.md#noble-gnome-46-source-profile-and-owned-vm).
+Latest published `51c4855` Linux and Mac 14/26 CI now passes every job.
+
+## October 2 Noble package implementation checkpoint
+
+Clean implementation `1c670c0` now passes the fresh official Ubuntu 24.04 package
+and complete-bundle proofs: ordinary-user offline runtime/render, active-component
+reinstall/removal refusal, idle lifecycle/data retention, actual installed DSH/
+plugins and deterministic Desktop/Browser role turns, repeat setup and restart
+history without replay. Its installed helpers/selected Python pass a private
+encrypted Secret Service lifecycle/account-storage proof. Artifact review and
+the rerun CPU selection/VAD proof also pass. Five exact-source reports are checked
+under `release/qualification/ubuntu24.04/*-1c670c0.json`; no wheels or private test
+archives are published. These are container/fixture results, not real GNOME,
+graphical Browser, physical audio, coordinated upgrade or release acceptance.
+Hosted implementation `1c670c0` CI now passes all Linux jobs, including Ubuntu
+26.04/Fedora 43/44 package/native qualification, Browser and installed lifecycle;
+Mac 14/26 also passes. Preserve the hosted artifacts' actual PR merge identity
+separately from this clean branch's private Noble artifacts. The actual hosted
+merge is `d278bcf` (parents main `d91c520` and implementation `1c670c0`); its tree
+matches exactly. Three checked hosted reports under `release/qualification/d278bcf`
+record 672 native cases (two skips) each and exact package/proof/log identities.
+
+The rollout now adds an explicit private `ubuntu24.04-amd64` Debian/complete
+candidate. Its seven-wheel policy/cache and runtime contract are bound to both
+manifests; setup verifies the installed policy and completed repeat runs. The
+package declares Noble's system GI/credential/NumPy/Qt platform dependencies,
+refuses wrong hosts before maintenance writes, preserves upstream notice paths,
+and inventories all 266 wheel ELF members. Artifact review checks their bytes and
+supplementary notice collections without approving redistribution. Package and
+complete proofs now use the selected interpreter. A working-source package builds
+and the wrong-host refusal passes; clean package/complete acceptance is above.
+Final source checks pass 672 native cases (two skips), 493 JavaScript cases
+(two skips), private-source boundary, version consistency and diff checks.
+Full compatibility and native-library release gates remain open. See
+[the checkpoint](LINUX-DISTRO-ROLLOUT.md#noble-package-and-complete-candidate).
+
+Hosted `547ac1d` macOS 14/26 passes. Linux stops in the SDK suite at the native Qt
+Branch fixture, before downstream packages: the fixture read old displayed
+messages before the queued child page arrived. Its correction waits for actual
+page delivery for Branch and Edit; three repeated real Qt/host tests pass. This
+does not turn the failed hosted run into a package or distro pass. Preserve the
+prior runtime proof/report's exact historical source scope.
+
+## October 2 Noble runtime selection and CPU VAD checkpoint
+
+The autonomous Linux rollout continues. Published implementation `1c1c1ef` now
+connects declared immutable Noble runtimes to setup before DSH configuration,
+DSH service environment, native startup, Browser/runtime cold launch, shared
+Node selection and managed staging/rollback. The separate seven-wheel profile
+adds verified ONNX Runtime/protobuf while retaining system NumPy and GI. Its
+actual offline ordinary-user proof passes both-profile preparation/reuse,
+candidate selection/rollback, Node/Browser agreement, corruption refusal and
+unchanged CPU-only Silero inference. The checked report records exact file hashes
+and explicit package/harness/physical/CPU-floor/license gaps.
+See [the current checkpoint and next steps](LINUX-DISTRO-ROLLOUT.md#noble-runtime-selection-and-cpu-vad).
+The Noble package target remains disabled pending real target-specific package/
+complete setup proofs. Full compatibility is not complete; continue the existing
+GNOME/control, other-distro, installed product and release gates. Owner services,
+model/GPU settings, the modified original checkout and installed selections remain
+preserved. Historical five-wheel evidence and Fedora VM reports remain separate.
+Local final checks pass 661 native cases (two skips), 493 JavaScript cases
+(two skips) and source build/typecheck. Previous `217c0c7` Mac 14/26 and all
+Linux jobs except Fedora 44 pass; Fedora 44 times out during mirror downloads
+before package/native acceptance, with Cisco's codec download successful.
+New-source hosted confirmation remains open.
+
+## October 1 Linux distribution rollout in progress
+
+The owner authorized autonomous Fedora/Ubuntu and major Linux distro implementation.
+[The rollout plan](LINUX-DISTRO-ROLLOUT.md) owns the complete scope, ordered work,
+preserved contracts and acceptance gates. Work starts from public 0.2.13 at
+`8c3be5a` in `feature/linux-distro-rollout`, an isolated canonical-repository
+worktree. Installer/package adapters are being implemented first; real GNOME/KDE
+and later Ubuntu 24.04/Mint/openSUSE/Arch qualification remain open. The modified
+original checkout and installed releases have not been replaced. Do not present
+an intermediate package/container pass as completion of the distro rollout.
+Current main `d91c520` is integrated at `4183895`; previous candidates are
+historical. Preserve Codex's external prerequisite and account eligibility gates.
+RPM credential dependencies and published-source snapshot reuse are included in
+clean candidate `a5d27c3`. All four package/complete proofs, 610 native cases
+(two skips) per target and isolated Secret Service lifecycle proofs pass. The
+rollout guide and checked reports record exact artifacts and remaining desktop/
+other-distro gates. Capability discovery now gates actual KDE session/dependency/interfaces in all
+three harnesses, with explicit unavailability and Stop retention. Its working
+regression checks pass and macOS 14/26 hosted CI passes source `89c7f50`.
+Linux CI passed root checks and exposed the setup proof's outdated unconditional
+capture-tool assertion; its correction passes the full isolated DSH/Qt proof.
+At `c964fd5`, Linux Debian/source/installed lifecycle/Browser CI passes; distro
+native tests expose missing source-build files, and Mac discovery uses the wrong
+application root. Both fixture paths are corrected; Mac 14/26 passes clean `5d97cf5`. Linux
+then exposes a voice PCM/queue completion timing race, now synchronized against
+the durable queue. The distro native fixture also provisions a separate locked
+Codex prerequisite; a reproduction passes 619 cases (two skips) using actual
+`c964fd5` installed JavaScript and `5d97cf5` source test instrumentation. Hosted
+Linux confirmation of the final corrections remains open. Fresh isolated GNOME
+50.5 discovery reports GlobalShortcuts 1 (existing
+bindings cannot be edited through portal v1), RemoteDesktop 2 and ScreenCast 5.
+The checked report and reproducible fixture are in the rollout guide. Complete
+setup now blocks stale same-version installed payloads before private runtime/
+credential writes. Private GSD MediaKeys tests now deliver both synthetic shortcuts, release an
+old binding after change, disable delivery, restore after daemon restart and
+preserve foreign settings. This qualifies the mechanism, not the production
+adapter, launch/focus, physical keys or real login. The next production GNOME 50
+adapter now implements both existing Save rows through native GSD settings, with
+canonical launchers, normalized conflict refusal and ownership-preserving
+rollback. Its real private compositor proof passes, including concurrent foreign
+addition/takeover preservation; a synthetic canonical launcher records activation.
+See the rollout guide's checked adapter report and exact test limits. Actual
+Augmentor closed launch/focus, physical keys, login/reboot, GNOME observation/
+control and current-source artifacts remain open. Clean `4764b6f` passes Mac 14/26
+CI and Linux root/Debian/lifecycle/Browser/package proofs; distro native jobs stop
+at missing npm. Test-only distro npm provisioning is corrected; new-source hosted
+confirmation remains open. Full compatibility is not complete.
+
+The GNOME adapter is published at `8931cd8`. Followup package prerequisites now
+install GTK 4 GI (`gir1.2-gtk-4.0` on Debian/Ubuntu, `gtk4` on Fedora); real imports
+pass on all four dependency fixtures. The package proof checks the installed
+ordinary user's accelerator API. These imports do not qualify fresh current-source
+packages, full GNOME desktop sessions or all keyboard layouts. Continue the
+rollout guide's remaining startup/window/control and release gates.
+
+The combined private GNOME fixture now sets its graphical D-Bus activation
+environment before Shell starts and requires all three GNOME portal interfaces.
+Its repeated production shortcut proof passes; the updated checked report records
+the new discovery hash and actual versions. Keep the older standalone mechanism
+report as historical evidence. GNOME 49/48/46 qualification remains open.
+Primary-source research for the next observer is recorded in the rollout guide:
+use a version-qualified read-only Shell extension and pinned compositor identity.
+Before GNOME input, qualify same-PID occlusion, Shell chrome/modal/lock/transition
+guards and point picking as well as the existing portal/focus/Stop contracts.
+Do not enable GNOME tools solely because portal interfaces or shortcuts work.
+
+The `6108a64` checkpoint now passes hosted Linux and Mac 14/26 CI. Linux package
+reports identify the actual GitHub merge `ff8f8a2` (parents `d91c520` and `6108a64`);
+its tree hash matches the branch exactly. Checked Ubuntu/Fedora reports record
+626 native cases (two Mac-only skips), GTK API imports and package lifecycle.
+The current working observer stage adds the read-only GNOME 50 Shell extension,
+bounded owner/epoch-fenced client and real private compositor proof. Focus away/
+back, resize, window/chrome picking, fresh close/reopen identities and extension
+restart fencing pass. The shared portal now refuses same-PID covers/changes;
+six scene and three action-dispatch tests pass. Seven observer protocol cases
+pass, and the native source suite passes 642 cases (two skips) before final
+observer tracking/provenance hardening, which passes its focused and real proofs.
+No GNOME input registration or owner-session extension installation is enabled.
+Full actor composition, actual application startup/focus, login/reboot, XWayland,
+consent/input/Stop and current observer-source artifacts remain open. See the
+rollout guide for exact source/report scope and next steps.
+
+Clean observer source `43618ea` now passes hosted Linux and Mac 14/26 CI. Each
+Ubuntu/Fedora native job passes 642 cases (two Mac-only skips); checked artifact
+reports record the actual merge `f7d7585`, whose tree equals the branch. A new
+private actual-Augmentor proof passes existing-window canonical shortcut
+hide/restore, compositor focus and composer typing for both XWayland and native
+Wayland, retaining both original independent processes. Initial launches are
+preview fixtures; user-systemd/closed-app startup and login/reboot remain open.
+This adds evidence without changing production toggle behavior. The rollout
+guide owns exact image/source hashes and remaining workspace/control/other-distro
+gates. Continue with full private GNOME login sessions; do not mark the goal done.
+
+The full Fedora fixture now boots a signature/hash-verified Cloud 44-1.7 overlay
+with dedicated-user SSH and SELinux enforcing. The new preparation tool and
+checked infrastructure report are in the rollout guide. GNOME group provisioning
+is in progress inside that VM; this is Cloud-derived, not standard Workstation or
+full graphical acceptance. The xcb window proof exposes a missing `wmctrl`
+dependency in the existing workspace-following fallback. Its actual pin/unpin
+proof and package dependency correction are the next source tasks; native
+Wayland following remains an adapter gap. Private VM keys/seed/logs stay ignored.
+
+The workspace stage now qualifies actual GNOME 50.5 XWayland first-use unpin and
+independent pin/follow/unpin/repin across three private workspaces. Installing
+`wmctrl` alone exposed a missing initial root-desktop hint; GNOME now unpins its
+own XID through Mutter's supported sticky-removal transition. Other WM/Mac
+branches are preserved. Native package dependencies now declare `wmctrl`, with
+an ordinary-user binary check in package qualification. Five UI-test cases and
+643 full native source cases (two skips) pass; the checked compositor report and
+rollout guide record exact limits. Fresh-source package/Mac confirmation and
+complete artifacts remain open. The full private VM's GNOME group is installed;
+its graphical login/startup is still untested. Continue full-session startup,
+window/transient/native-Wayland and consent/input/Stop gates autonomously.
+
+The full private VM now reaches actual GDM/Wayland seat0 login with SELinux
+enforcing. Its verified earlier `f7d7585` package starts a non-preview Augmentor
+process owned by the user service; the real onboarding dialog and main window
+render with compositor focus. Connection is deliberately unconfigured. New
+guest-only provisioning/inspection helpers and the checked startup report are
+documented in the rollout guide. The real ScreenShield suspends the user-only
+observer while locked; it fails closed and returns with a fresh epoch after unlock.
+No positive locked scene or input qualification is claimed. `8413c2c` Mac and
+non-matrix Linux checks pass, but all three distro jobs stop at `wmctrl -V` opening
+X without a display. Its corrected proof now uses a private disposable Xvfb;
+actual ordinary-user binary checks pass on Fedora 43/44 and Ubuntu 26.04. Hosted
+confirmation, duplicate startup/crash/reboot, latest artifacts and the remaining
+full desktop/other-distro gates remain open. Continue the active rollout.
+
+The new owned full-VM lifecycle proof now passes three duplicate production
+autostarts, lock/unlock observer suspension and fresh-epoch/old-client refusal,
+accepted idle close, clean service exit and canonical closed launch into a new
+service-owned process. Its busy-dialog preflight refuses correctly. The checked
+report and reproducible guest-only helper are in the rollout guide. Installed
+source remains `f7d7585`; no newer-source, crash/reboot, connected harness or
+portal-lock termination claim follows. Continue those remaining gates.
+
+The owned full Fedora VM now also passes idle PID-fenced crash recovery and one
+kernel reboot through actual GDM/Wayland login, non-preview user-service startup,
+rendered onboarding, package/source preservation and SELinux enforcing. Reusable
+guest/host proof helpers and checked reports are in the rollout guide. Installed
+source remains earlier `f7d7585`, not newer workspace code; connected harness and
+active-task recovery remain open. Clean `837bef1` now passes all Linux and Mac
+14/26 CI; each distro passes fresh package lifecycle, GTK, ordinary-user wmctrl
+and 643 native cases (two skips). Actual artifact merge `9df0f80` has the exact
+branch tree; preserve its source identity for complete candidates. The guide
+also records fresh Noble/Mint/openSUSE/Arch dependency research and clarifies
+GNOME observation limits against the actual KDE baseline, without adding a new
+atomic/history guarantee solely for GNOME. Continue managed current-artifact
+qualification, full control/Stop and other distro work; the goal is not complete.
+
+The working Qt startup fix now supplies the existing desktop identity before
+`QApplication` construction. Exact-sender D-Bus traces in the full Fedora guest
+reproduce a cached-identity registration error with late assignment and successful
+early registration for both xcb and Wayland. Standalone fixture stderr is quiet;
+do not claim a warning-string reproduction or that the earlier installed product
+was fixed. The checked identity report and helper are in the rollout guide.
+Changed source passes 643 native cases (two Mac-only skips), real private
+two-instance shortcut/focus/typing checks on both platforms and the xcb initial
+unpin/three-workspace checks. Initial processes are previews. Current-source
+hosted package/Mac and installed normal-startup checks follow publication; the
+separate control helper's identity, consent and portal restart remain open.
+
+Clean `4d65749` now passes all Linux/Mac CI; actual clean artifact merge `8244c9c`
+has the identical branch tree, with checked Ubuntu/Fedora reports and 643 native
+cases (two skips). Its full Fedora managed adoption exposed a real updater bug:
+staging dropped the RPM marker, and cold launch incorrectly ran `dpkg-query`.
+Canonical rollback restored the immutable `f7d7585` baseline. The staging fix
+passes a regression that first reproduced the failure, all 11 deployment cases
+and 644 native cases (two skips). In the owned VM, a separately recorded canonical
+bootstrap preserves baseline selection/PID and installs only the corrected
+updater. A fresh stage passes an actual Fedora runtime lease before selection,
+preserves the running app through activation, then adopts through idle close and
+canonical launch. The actual app's Qt registration succeeds before Settings, and
+focused/rendered onboarding plus selected inventory and SELinux pass. See the
+rollout guide/report for exact app, package and updater hashes. Selected pristine
+app `8244c9c` still embeds the older updater; do not bootstrap again from it or
+claim a clean combined artifact. Current fixer-source hosted CI and a combined
+artifact remain next, followed by current-release reboot/connected work/control.
+The next working Noble foundation now installs five hash-pinned wheels offline
+at a final private path, validates the system GI/Secret Service bridge and
+records immutable runtime receipts. Its actual ordinary-user Ubuntu 24.04
+fixture passes imports, reuse/tamper refusal and Qt Widgets/SVG/Quick xcb
+rendering; Linux ELF/plugin/shiboken inventory records 262 binaries. Nine
+runtime and two inventory cases, the selected-interpreter DSH child-process
+case, five startup cases and TypeScript checks pass. The rollout guide owns
+exact working-file/report hashes. Noble package/setup/Browser selection,
+license/source coverage and full desktop/audio remain open; no new supported
+target is enabled. Separate control-helper identity remains unimplemented.
+A clean combined `aef93bb` artifact (tree identical to `83932a9`) now passes
+actual managed update in the owned Fedora guest, preserving previous selection,
+running process, RPM identity and rollback before canonical cold adoption.
+Its embedded updater matches the canonical fixed updater; Qt registration,
+actual onboarding focus and SELinux pass. Selected release is
+`20261002-034818-fe596dbe`; checked report retains exact provenance.
+Managed inspection/reboot now explicitly verifies selected source/inventory;
+The selected-release reboot now passes exact descriptor/inventory retention,
+new kernel boot identity, real GDM Wayland seat and service ownership (PID 1757),
+with original RPM verification and SELinux enforcing. Actual onboarding renders
+in GNOME overview after reboot; post-login focused composer/manual authentication
+and connected work remain open. All Linux and Mac CI for clean `83932a9` now
+passes; Fedora 43's one retry succeeds after the initial codec download failure.
+Checked distro reports record actual merge `aef93bb` and 644 native cases (two
+skips), independently from the 655 working-source native cases. See the guide
+for exact hashes and the new Noble implementation limits. The declared local
+JavaScript fixture passes 489 cases/two skips after allowing the measured
+Codex multi-client recovery case 60 seconds overall; its production RPC/exit
+deadlines and no-replay assertions are unchanged. Source build/typecheck pass.
+New checkpoint hosted confirmation follows publication.
 
 ## October 1 merge blockers: current main and separate Codex prerequisite
 

@@ -1,0 +1,279 @@
+{
+  "format": "augmentor-ubuntu-source-toolchain-reconstruction/1",
+  "sourceBase": "ee8dbddc27f1ba51370b57f248d92715f724df87",
+  "candidateUncommittedAtExecution": true,
+  "files": {
+    "release/acquire-ubuntu-toolchain.py": "bafb64db71aa312c3e2f9e5bfe0d77e33640a886128ddbe2bfeb3fbc8c2dce40",
+    "release/probe-ubuntu-toolchain-auth.py": "e148fa5dc124607b15149b506a10babcc86d4b0c6162afb1bd93f2c5f8b9d93b",
+    "release/qt-source-runtime-recipient-builder.Dockerfile": "9f256bf7043c0c0d44e8bc5ff2208df5e2260ae8c903864d6fd80694de14c20a",
+    "release/qualification/next-targets/20261002-ubuntu-source-toolchain-lock.json": "ee6c3fb58c36563be35466ac6e8c0dfdef3889a7e4f9663d6483f60b623166d2"
+  },
+  "authentication": {
+    "signer": "F6ECB3762474EDA9D21B7022871920D1991BC93C",
+    "pinnedKeyringSha256": "80a36b0a6de2f69f49d2df75ef473ccde121e9e190b9ea01d20a4f63778d5c31",
+    "releases": [
+      {
+        "path": "metadata/archive.ubuntu.com_ubuntu_dists_noble-backports_InRelease",
+        "sha256": "dc4d31dc0a8897dbecfd0375a4041b4aeb4a6fae00c688cf923daec3c4a258f8"
+      },
+      {
+        "path": "metadata/archive.ubuntu.com_ubuntu_dists_noble-updates_InRelease",
+        "sha256": "6e43c5996bd6cf1d1fe7389a3d6ec383761635cdad2dfb58c020bded199235af"
+      },
+      {
+        "path": "metadata/archive.ubuntu.com_ubuntu_dists_noble_InRelease",
+        "sha256": "cdb2f31d809f589719a53c6ad15f255b27569c4059542ada282aaa21b8e164b0"
+      },
+      {
+        "path": "metadata/security.ubuntu.com_ubuntu_dists_noble-security_InRelease",
+        "sha256": "3b358f744efb789bab437ac77209ac20be2c8665197ce274f65c5f812bd4d519"
+      },
+      {
+        "path": "metadata/snapshot-20260825T120000Z-noble-updates-InRelease",
+        "sha256": "406b4544a4fc4835931a7895f21de16e853d6459a9c0cc383d83d02aa96c862e"
+      }
+    ],
+    "fullIndexes": [
+      {
+        "path": "metadata/archive.ubuntu.com_ubuntu_dists_noble-backports_main_binary-amd64_Packages",
+        "releasePath": "metadata/archive.ubuntu.com_ubuntu_dists_noble-backports_InRelease",
+        "signedPath": "main/binary-amd64/Packages",
+        "sha256": "f7315ae1be37da51a6323bf26282b170ddab80fa9266e99c7417a81970476e4d",
+        "size": 255999
+      },
+      {
+        "path": "metadata/archive.ubuntu.com_ubuntu_dists_noble-backports_multiverse_binary-amd64_Packages",
+        "releasePath": "metadata/archive.ubuntu.com_ubuntu_dists_noble-backports_InRelease",
+        "signedPath": "multiverse/binary-amd64/Packages",
+        "sha256": "a1dd7cb65d761bd495ee61ddaf24fa4be7a4faeed0dd74c2d86854fb17be3d7d",
+        "size": 1062
+      },
+      {
+        "path": "metadata/archive.ubuntu.com_ubuntu_dists_noble-backports_universe_binary-amd64_Packages",
+        "releasePath": "metadata/archive.ubuntu.com_ubuntu_dists_noble-backports_InRelease",
+        "signedPath": "universe/binary-amd64/Packages",
+        "sha256": "c4acb7ae70e5163799faa267e6d040025253db7d137168a03f8a8d89890268d2",
+        "size": 144274
+      },
+      {
+        "path": "metadata/archive.ubuntu.com_ubuntu_dists_noble-updates_main_binary-amd64_Packages",
+        "releasePath": "metadata/archive.ubuntu.com_ubuntu_dists_noble-updates_InRelease",
+        "signedPath": "main/binary-amd64/Packages",
+        "sha256": "2aa8a7fce060e648903ccde30974155191397db7e7b9335f54d5dc89e1319c96",
+        "size": 7375576
+      },
+      {
+        "path": "metadata/archive.ubuntu.com_ubuntu_dists_noble-updates_multiverse_binary-amd64_Packages",
+        "releasePath": "metadata/archive.ubuntu.com_ubuntu_dists_noble-updates_InRelease",
+        "signedPath": "multiverse/binary-amd64/Packages",
+        "sha256": "4879bf21b6216445a4c4fd9364d34c82bccb1a5f9b9b5273a765fc4ce85cf4ea",
+        "size": 392384
+      },
+      {
+        "path": "metadata/archive.ubuntu.com_ubuntu_dists_noble-updates_restricted_binary-amd64_Packages",
+        "releasePath": "metadata/archive.ubuntu.com_ubuntu_dists_noble-updates_InRelease",
+        "signedPath": "restricted/binary-amd64/Packages",
+        "sha256": "869dc85962a04096a28dbc9a71777af485f7e9b6ae02b9d45319927f13db8ff5",
+        "size": 10190922
+      },
+      {
+        "path": "metadata/archive.ubuntu.com_ubuntu_dists_noble-updates_universe_binary-amd64_Packages",
+        "releasePath": "metadata/archive.ubuntu.com_ubuntu_dists_noble-updates_InRelease",
+        "signedPath": "universe/binary-amd64/Packages",
+        "sha256": "b737feb04a18009cde3a70b402edc9a29429cb1aa0a97561584e180c813d432b",
+        "size": 10598995
+      },
+      {
+        "path": "metadata/archive.ubuntu.com_ubuntu_dists_noble_main_binary-amd64_Packages",
+        "releasePath": "metadata/archive.ubuntu.com_ubuntu_dists_noble_InRelease",
+        "signedPath": "main/binary-amd64/Packages",
+        "sha256": "8f6f71ae839c8cba390a7643fcbbdacddb0bc7d12c1583a2dd80a1f8443a30e5",
+        "size": 7165069
+      },
+      {
+        "path": "metadata/archive.ubuntu.com_ubuntu_dists_noble_multiverse_binary-amd64_Packages",
+        "releasePath": "metadata/archive.ubuntu.com_ubuntu_dists_noble_InRelease",
+        "signedPath": "multiverse/binary-amd64/Packages",
+        "sha256": "65765aa769593ed76ced26878dbdc5e4b8ae9c4046cd9d1af567bd231a72d98a",
+        "size": 1296005
+      },
+      {
+        "path": "metadata/archive.ubuntu.com_ubuntu_dists_noble_restricted_binary-amd64_Packages",
+        "releasePath": "metadata/archive.ubuntu.com_ubuntu_dists_noble_InRelease",
+        "signedPath": "restricted/binary-amd64/Packages",
+        "sha256": "f5620712a54076429190adbc8b3974250606ffb624c9b877bc240d8f2476118e",
+        "size": 669193
+      },
+      {
+        "path": "metadata/archive.ubuntu.com_ubuntu_dists_noble_universe_binary-amd64_Packages",
+        "releasePath": "metadata/archive.ubuntu.com_ubuntu_dists_noble_InRelease",
+        "signedPath": "universe/binary-amd64/Packages",
+        "sha256": "687ffc969e7700137677b9cfe2f614ee2d638052a91a7c9bf31f3f6a3040a99a",
+        "size": 73379142
+      },
+      {
+        "path": "metadata/security.ubuntu.com_ubuntu_dists_noble-security_main_binary-amd64_Packages",
+        "releasePath": "metadata/security.ubuntu.com_ubuntu_dists_noble-security_InRelease",
+        "signedPath": "main/binary-amd64/Packages",
+        "sha256": "96ebaa6dcfaa00ad04c5a56f26f7bdc104a6da15d0fdd22ae29c91c299c3f276",
+        "size": 5812460
+      },
+      {
+        "path": "metadata/security.ubuntu.com_ubuntu_dists_noble-security_multiverse_binary-amd64_Packages",
+        "releasePath": "metadata/security.ubuntu.com_ubuntu_dists_noble-security_InRelease",
+        "signedPath": "multiverse/binary-amd64/Packages",
+        "sha256": "f80797db55f4f60bff2923e1e5e3b9786a9a81ee3605e048eee482c9f6d0057e",
+        "size": 394466
+      },
+      {
+        "path": "metadata/security.ubuntu.com_ubuntu_dists_noble-security_restricted_binary-amd64_Packages",
+        "releasePath": "metadata/security.ubuntu.com_ubuntu_dists_noble-security_InRelease",
+        "signedPath": "restricted/binary-amd64/Packages",
+        "sha256": "e4a85590f6b6c112a486cc21bc27193e0993c752c9c262f095586ad68dcbf15a",
+        "size": 9325453
+      },
+      {
+        "path": "metadata/security.ubuntu.com_ubuntu_dists_noble-security_universe_binary-amd64_Packages",
+        "releasePath": "metadata/security.ubuntu.com_ubuntu_dists_noble-security_InRelease",
+        "signedPath": "universe/binary-amd64/Packages",
+        "sha256": "54fd4642a6f7a861cd5fa2297ff4614d9d81cba6eb389129ecb90b4b797ca435",
+        "size": 7642271
+      },
+      {
+        "path": "metadata/snapshot-20260825T120000Z-Packages",
+        "releasePath": "metadata/snapshot-20260825T120000Z-noble-updates-InRelease",
+        "signedPath": "main/binary-amd64/Packages",
+        "sha256": "7c4f93e95f5dd933d1652ae505158dbdbcc65caeb23fd8b4056d8ff4bce92e47",
+        "size": 6624422
+      },
+      {
+        "path": "metadata/snapshot-20260825T120000Z-Sources",
+        "releasePath": "metadata/snapshot-20260825T120000Z-noble-updates-InRelease",
+        "signedPath": "main/source/Sources",
+        "sha256": "f23869dda6476671eb3bce26e7fb0b486117d194a4696f7521badc1a31af4765",
+        "size": 2508051
+      }
+    ],
+    "retainedContainerExactVersions": 408,
+    "historicalAuditSnapshot": "20260825T120000Z",
+    "historicalAuditExactVersions": 2,
+    "allBinaryVersionRecordsAuthenticated": true,
+    "actualPackageObjectsVerified": 410,
+    "actualPackageBytes": 395555966,
+    "acquisitionReceiptSha256": "dd039459b34f366a14c22c279d35dd3c6a95c19a655412f832e0abc534ca0021",
+    "completeMetadataPreservedSeparately": true,
+    "uniqueSourcePackageVersionPairs": 178,
+    "allSourceIndexesVerified": false,
+    "historicalAuditSourceIndexVerified": true,
+    "allSourceObjectsAcquired": false,
+    "packageManifestSha256": "dd48878dac87bf715ded8614dd15172a94cea2f7ce947108d1fce3e0ec4eee84",
+    "latestToolReverifiedSamePackageObjects": true
+  },
+  "refusalProbe": {
+    "format": "augmentor-toolchain-authentication-refusal/1",
+    "toolSha256": "bafb64db71aa312c3e2f9e5bfe0d77e33640a886128ddbe2bfeb3fbc8c2dce40",
+    "probeSha256": "e148fa5dc124607b15149b506a10babcc86d4b0c6162afb1bd93f2c5f8b9d93b",
+    "policySha256": "ee6c3fb58c36563be35466ac6e8c0dfdef3889a7e4f9663d6483f60b623166d2",
+    "cases": {
+      "wrong-keyring": {
+        "refused": true,
+        "error": "Wrong pinned archive keyring."
+      },
+      "changed-signed-release": {
+        "refused": true,
+        "error": "Changed/duplicate signed release."
+      },
+      "changed-full-index": {
+        "refused": true,
+        "error": "Full index differs from signed release."
+      },
+      "wrong-binary-hash": {
+        "refused": true,
+        "error": "Package hash/path/size differs from signed index."
+      },
+      "wrong-source-version": {
+        "refused": true,
+        "error": "Source version differs from signed index."
+      },
+      "duplicate-package": {
+        "refused": true,
+        "error": "Duplicate locked package."
+      },
+      "unapproved-download": {
+        "refused": true,
+        "error": "Unapproved package acquisition URL."
+      },
+      "escaping-metadata": {
+        "refused": true,
+        "error": "Metadata path escapes kit."
+      },
+      "invalid-signature-with-updated-local-hash": {
+        "refused": true,
+        "error": "Ubuntu archive signature does not verify."
+      },
+      "changed-existing-package-body": {
+        "refused": true,
+        "error": "Existing package differs from signed bytes."
+      }
+    },
+    "signedMetadataMutated": false,
+    "packagesInstalled": false
+  },
+  "recipientBuilder": {
+    "container": "augmentor-noble-qt-source-20261002-j",
+    "image": "sha256:5840c8b27f1fa63ca78618206403beb2fdb4c212ca0d17ce36bc701c4bb9c63c",
+    "hostConfig": {
+      "NetworkMode": "none",
+      "NanoCpus": 2000000000,
+      "Memory": 8589934592,
+      "PidsLimit": 512,
+      "Privileged": false,
+      "Devices": []
+    },
+    "mounts": [],
+    "proof": {
+      "uid": 1001,
+      "python": "3.12.3",
+      "packageCount": 410,
+      "packageInventorySha256": "bc6cd4560d3d984dc11e2b2faceb1b1b2fcf73440fad5a4d9c6a8f76a594b7b3",
+      "noProducerTree": true,
+      "noApplication": true
+    },
+    "base": "docker.io/library/ubuntu@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3",
+    "producerImageNotReused": true,
+    "networkDisabledDuringImageBuild": true,
+    "toolchainVersionsReconstructed": true,
+    "buildLogSha256": "be0e659280ad15a71c2eb0f99b462cc3fdfc127712e90e78ac18ac244fb2a71b",
+    "initialFailure": {
+      "recipeSha256": "15abbe7e988db50e5373610b3c7e000602bb1dd5f77803d6019b6ce96d7ae6a1",
+      "logSha256": "504d5622a4941b04fee216019d4fb60658a17516fd091f8991256aaa1e7b83cb",
+      "exit": 100,
+      "error": "Internal Error, Pathname to install is not absolute 'perl-base_5.38.2-3.2ubuntu0.6_amd64.deb'",
+      "changeForSuccessfulRepeat": "Remove --no-download for absolute local .deb acquisition; Docker build network remains none.",
+      "preserved": true
+    }
+  },
+  "recipientSourceBuild": {
+    "started": true,
+    "completedAtCheckpoint": false,
+    "sourceRecipeSha256": "9594c4439638cccb8f3bb91b34848cb95169d075aa61ab614171fd066c41dac7",
+    "dependencyInventorySha256": "bc6cd4560d3d984dc11e2b2faceb1b1b2fcf73440fad5a4d9c6a8f76a594b7b3",
+    "archiveSourceCount": 7,
+    "originalProducerSourceOrCompiledIntermediatesCopied": false,
+    "freshSourceAndBuildRoots": true,
+    "checkpointCompletedCommands": 1,
+    "reportSha256AtCheckpoint": "cf30b069b8354d5df0d7bb9002069e768a541fa9bcf6649b5c9aa356890af435"
+  },
+  "remaining": [
+    "Wait for all19 source build commands, then bindings/finite closure/import/render/modified-library execution from the reconstructed toolchain.",
+    "Provide a concrete offered source/toolchain/archive/generated-shader/notice/control-script kit with suitable permissions and recipient instructions.",
+    "Verify relevant exact corresponding source objects and compiled-file notice mapping; audit source is metadata-only here.",
+    "Qualify full product entrypoints/native graphics and other distro ABI profiles.",
+    "Physical Browser/audio/desktop/package/lifecycle and release gates stay open."
+  ],
+  "fullSourceKitQualified": false,
+  "legalReviewComplete": false,
+  "publicReleaseQualified": false,
+  "ownerStateChanged": false,
+  "selectedApplicationChanged": false
+}

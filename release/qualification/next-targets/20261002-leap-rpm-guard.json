@@ -1,0 +1,81 @@
+{
+  "format": "augmentor-leap-real-rpm-synthetic-payload-proof/1",
+  "target": "opensuse-leap16.0-x86_64",
+  "source": {
+    "commit": "a18b4651e28c6e1da44bc572d5b848dc2a5bc2c2",
+    "dirty": false
+  },
+  "proofSha256": "918572164d8ba71096f487adec33bc4112b597c7e9d584cfd5ce17633e8f7770",
+  "guardSha256": "4bb8a18a41e68a98c5f7816940f8e55bfa2f1a66e5d34ca42cfcb4155c7a9947",
+  "syntheticPayloadArchives": {
+    "payload-1/RPMS/x86_64/augmentor-agent-0.2.13-1.leap16.x86_64.rpm": "d17936f1895a147c705a5ea18b875c51d1159cd7530e831a27b6a87349ceb87a",
+    "payload-2/RPMS/x86_64/augmentor-agent-0.2.13-2.leap16.x86_64.rpm": "254128a566f234811feb0867006a0899a3e2813a61f1ee3a78f732a5b3296ea1",
+    "payload-2-pre/RPMS/x86_64/augmentor-agent-0.2.13-2.leap16.x86_64.rpm": "dae3af970e136a25a8fdc73016d775359e0e000cd77b4b1fac20bd785ec2973e",
+    "payload-3-post/RPMS/x86_64/augmentor-agent-0.2.13-3.leap16.x86_64.rpm": "ee59de5e94e1c8f004709304d4e938e17b692bb808f06ec243239b3fabdc195a"
+  },
+  "packageManagerVersions": [
+    "rpm-4.20.1-160000.3.1.x86_64",
+    "zypper-1.14.101-160000.1.1.x86_64"
+  ],
+  "firstInstallTested": true,
+  "reinstallTested": true,
+  "activeLeaseRefusals": [
+    {
+      "component": "runtime",
+      "uid": 1000,
+      "operation": "upgrade",
+      "refused": true,
+      "payloadUnchanged": true
+    },
+    {
+      "component": "runtime",
+      "uid": 1000,
+      "operation": "remove",
+      "refused": true,
+      "payloadUnchanged": true
+    },
+    {
+      "component": "desktop",
+      "uid": 1001,
+      "operation": "upgrade",
+      "refused": true,
+      "payloadUnchanged": true
+    },
+    {
+      "component": "desktop",
+      "uid": 1001,
+      "operation": "remove",
+      "refused": true,
+      "payloadUnchanged": true
+    }
+  ],
+  "jointMultiuserLeaseRefusalTested": true,
+  "preScriptFailureRetainedDurableIntent": true,
+  "lostVolatileMirrorsSimulationStartupRefused": true,
+  "verifiedUnchangedOldRecoveryTested": true,
+  "upgradeTested": true,
+  "downgradeTested": true,
+  "posttransInventoryFailureRetainedDurableIntent": true,
+  "zypperPosttransFailureExitCode": 107,
+  "unverifiedNewStateRefused": true,
+  "verifiedSyntheticInjectionRemovalAndCompletionTested": true,
+  "finalRemovalPostuntransTested": true,
+  "locallyBuiltPackagesUnsigned": true,
+  "payloadScope": "synthetic receipts and text only; no application",
+  "fullApplicationPayloadTested": false,
+  "realMultiuserApplicationTested": false,
+  "realInterruptedRebootTested": false,
+  "realDesktopTested": false,
+  "browserTested": false,
+  "physicalAudioTested": false,
+  "publicReleaseQualified": false,
+  "ownerStateChanged": false,
+  "privateReportSha256": "ebd9c7d07eb59a790974147de8223384eb2c6dc9018ad436eb792b8a0d59e43b",
+  "privateEvidenceSha256": {
+    "real-rpm-synthetic-proof.log": "67f4991f51ab8d818f8931b4bb1258d7674c5f76fd3d0245bc396e6706f06fa0",
+    "rpm-build-prerequisites.log": "670c383aa198a5052a6f1fb8c8bc33de29aac5340cadd38108d16dfc07bc9594",
+    "real-rpm-first-provenance-driver-failure.log": "c62db273dcb830b6fc9920bf27c5ae69730730056ee47e07def4eeb7700866d5"
+  },
+  "firstRunInvalidProvenanceRetained": true,
+  "firstRunFailureCause": "Driver supplied an incorrect source identifier. Completed synthetic run and removal were observed; passing run repeats from a clean fixture with git-resolved source and verified guard blob."
+}

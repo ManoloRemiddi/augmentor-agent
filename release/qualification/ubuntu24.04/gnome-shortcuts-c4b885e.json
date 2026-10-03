@@ -1,0 +1,126 @@
+{
+  "format": "augmentor-noble-gnome-real-shortcut-proof/1",
+  "source": {
+    "commit": "c4b885e035f2a87966a222b6df7621467bd87e89",
+    "dirty": false
+  },
+  "proofSha256": "fad79859ee78ee0063d575bf206b8462cec9277fc40fc8ce2659056cad97ed6a",
+  "guestProofSha256": "3afc9da198cedbd0e344aacad4fe39e59edf60b6e865f40f0672292e47076fdd",
+  "inputTransport": "owned QEMU QMP send-key; auto-release after 50ms",
+  "passed": true,
+  "failure": null,
+  "gnomeInputToolsEnabled": false,
+  "connectedHarnessTested": false,
+  "loginAuthenticationTested": false,
+  "shortcutLockFencingTested": false,
+  "rawReportSha256": "a7d304df485a839c5aef938332c270f5fe5ac4073fe9131f8c557126857b4146",
+  "artifactSha256": "0fa0e4e05ce4b038c25e0872f8db452d7ed8377ff6b39a58c451a6894e6b7909",
+  "managedCandidateActivated": true,
+  "observerNormalInstallAndSessionReload": true,
+  "firstFailurePreserved": "gnome-shortcut-checkpoint-a7ee9c5.json",
+  "events": [
+    {
+      "event": "qt-save-and-conflicts",
+      "mainPid": null,
+      "secondaryPid": null,
+      "servicePid": null,
+      "result": {
+        "qtSaveMouseClicks": 2,
+        "qtConflictMouseClicks": 2,
+        "realNativeSettingsReadback": true,
+        "foreignConflictRefusedWithoutWrites": true,
+        "instanceConflictRefused": true,
+        "fields": [
+          "name",
+          "binding",
+          "command"
+        ],
+        "functionalTested": false,
+        "main": {
+          "schema": 1,
+          "configured": true,
+          "key": {
+            "symbol": "F9",
+            "character": null,
+            "modifiers": [
+              "Shift",
+              "Control",
+              "Alt"
+            ],
+            "binding": "<Shift><Control><Alt>F9"
+          },
+          "functionalTested": false
+        },
+        "secondary": {
+          "schema": 1,
+          "configured": true,
+          "key": {
+            "symbol": "F10",
+            "character": null,
+            "modifiers": [
+              "Shift",
+              "Control",
+              "Alt"
+            ],
+            "binding": "<Shift><Control><Alt>F10"
+          },
+          "functionalTested": false
+        }
+      }
+    },
+    {
+      "event": "main-hide",
+      "mainPid": 12286,
+      "secondaryPid": null,
+      "servicePid": 12286,
+      "result": null
+    },
+    {
+      "event": "main-show",
+      "mainPid": 12286,
+      "secondaryPid": null,
+      "servicePid": 12286,
+      "result": null
+    },
+    {
+      "event": "independent-secondary-hide",
+      "mainPid": 12286,
+      "secondaryPid": 13868,
+      "servicePid": 12286,
+      "result": null
+    },
+    {
+      "event": "independent-secondary-show",
+      "mainPid": 12286,
+      "secondaryPid": 13868,
+      "servicePid": 12286,
+      "result": null
+    },
+    {
+      "event": "independent-main-hide",
+      "mainPid": 12286,
+      "secondaryPid": 13868,
+      "servicePid": 12286,
+      "result": null
+    },
+    {
+      "event": "accepted-idle-main-close",
+      "mainPid": null,
+      "secondaryPid": null,
+      "servicePid": null,
+      "result": null
+    },
+    {
+      "event": "shortcut-canonical-main-cold-launch",
+      "mainPid": 15310,
+      "secondaryPid": 13868,
+      "servicePid": 15310,
+      "result": null
+    }
+  ],
+  "cleanup": {
+    "secondaryIdleCloseAccepted": true,
+    "settingsRestored": true,
+    "foreignEntriesPreserved": true
+  }
+}

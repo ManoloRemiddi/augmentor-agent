@@ -1,0 +1,128 @@
+{
+  "format": "augmentor-published-product-version-upgrade-preparation/1",
+  "date": "2026-10-03",
+  "status": "published-inputs-native-baseline-and-ordinary012-setup-pass; strict-process-postflight-refused; histories-upgrade-rollback-pending",
+  "sourceBase": "175fe994680638a3ae4aad18410e97955788336a",
+  "artifacts": [
+    {
+      "version": "0.2.12",
+      "source": "e02731023153e3b2e1440e50b8c14b64ad0a82e5",
+      "target": "debian13-amd64",
+      "artifactId": "0.2.12-complete-preview.1-e02731023153",
+      "completeArchiveBytes": 66361030,
+      "completeArchiveSha256": "2ce620233e9312db86a0dccac9d07257bd9f700a0d19326b96460463379d1fa4",
+      "manifestSha256": "753dd0136ebcfcb11b8c77f7c888db805f4a41f7a3cdb5efe884795747ad67dc",
+      "nativeSha256": {
+        "augmentor-desktop_0.2.12_amd64.deb": "91f30053b4b467022953600a6f4825ddd15a6899595b5b104735887ce497d676",
+        "augmentor-runtime_0.2.12_amd64.deb": "379a6ceefa4856783599eb19e5c05aff005533bf6d7fcb1f691b78e8d9f0a21e"
+      },
+      "components": {
+        "dsh": "0.1.5-rc.1",
+        "modelPicker": "1.1.2",
+        "adaptiveReasoning": "0.2.3",
+        "resonantVoice": "0.1.16",
+        "executionRecovery": "bundled action-aware DSH adapter",
+        "automaticMemory": "Hindsight 0.10.0 (explicit optional provisioning)"
+      },
+      "publicRelease": "https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/v0.2.12-complete-preview.1"
+    },
+    {
+      "version": "0.2.13",
+      "source": "0eb2ec112afa52b886b63606f80967198a7feb0c",
+      "target": "debian13-amd64",
+      "artifactId": "0.2.13-complete-preview.1-0eb2ec112afa",
+      "completeArchiveBytes": 72665721,
+      "completeArchiveSha256": "6c327d99b04796f2901850364670aa61015b17f739582c64126421858b56b65d",
+      "manifestSha256": "56ad1216a8ad0472b3cc981c05f342ae79689c4107a86b64f75eb7da17951a44",
+      "nativeSha256": {
+        "augmentor-desktop_0.2.13_amd64.deb": "031e0cb7f4f4b45f118aea11f9f8a049e979390c648038492d9dfa0e31ae5448",
+        "augmentor-runtime_0.2.13_amd64.deb": "59de1ed6063afc9ec7656da02473a689924e83a27e0864ce2ce2f5cd04445330"
+      },
+      "components": {
+        "dsh": "0.1.5-rc.1",
+        "modelPicker": "1.1.2",
+        "adaptiveReasoning": "0.2.3",
+        "resonantVoice": "0.1.16",
+        "executionRecovery": "bundled action-aware DSH adapter",
+        "automaticMemory": "Hindsight 0.10.0 (explicit optional provisioning)",
+        "contextBudget": "bounded fresh browser admission and original evidence recovery"
+      },
+      "publicRelease": "https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/v0.2.13-complete-preview.1"
+    }
+  ],
+  "completeMemberAndNativeMetadataChecks": "PASS",
+  "isolatedFixture": {
+    "rootless": true,
+    "ownerMountsDevicesPrivilegedHostNetwork": false,
+    "secondaryDiskStorage": true,
+    "sameBaseImageIdAndLayersVerified": true,
+    "baseImageId": "bef196c3450a126dde3fde9ad9b4094a939cae0c6e8d76bd1e31657d6c1b8d35",
+    "baseDebianFullVersion": "13.6",
+    "existingServiceStartPolicyPreserved": true,
+    "systemdAbsent": true
+  },
+  "signedNativeBaseline": {
+    "normalAPTExitCode": 0,
+    "sourceSigningFilesVerified": 11,
+    "keyringDocumentationMissing": 3,
+    "fullKeyringPackageAuditClaimed": false,
+    "signatureChecksDisabled": false,
+    "augmentorNativeAudits": "PASS",
+    "version": "0.2.12",
+    "python": "3.13.5",
+    "PySide": "6.8.2.1",
+    "Qt": "6.8.2",
+    "GI": "3.50.0"
+  },
+  "maintainedUserPreparer": {
+    "file": "release/prepare-published-linux-upgrade-fixture.py",
+    "sha256": "0b26c7db48c3d6e5ab1274a5112ce78d15cc201ecd62db29922021e13ab4ac95",
+    "syntheticAdmissionTests": 4,
+    "testStatus": "PASS",
+    "actualExecution": "PASS",
+    "publishedInstallerOverlay": false,
+    "noResumeNoModelTurnsNoSpeechMemoryProvisioning": true,
+    "actualElapsedSeconds": 28.279397,
+    "installerExitCode": 0,
+    "sourceCommit": "4e090101b7a800acecc9b01ab3bb0f31387c1f0d",
+    "actualJournalPhase": "prepared-published012-baseline",
+    "modelRequests": 0
+  },
+  "gates": {
+    "ordinaryUserPreparation": "PASS",
+    "bothRoleHistories": "PENDING",
+    "coordinatedDifferentProductVersionUpgrade": "PENDING",
+    "managedDSHHistoryRollback": "PENDING",
+    "currentSourceQtRolloutQualified": false,
+    "graphicalSessionBrowserPhysicalAudioQualified": false,
+    "legalReleaseAcceptance": false
+  },
+  "independentPostflight": {
+    "status": "FAIL process absence",
+    "nativePackageAudit": "PASS",
+    "selectionAndHarnessIdentity": "PASS",
+    "remainingEntries": 2,
+    "processState": "Z; PPid1; UID1000; empty argv",
+    "liveUserProcesses": 0,
+    "fixturePortsBindable": true,
+    "fullProcessAbsenceClaimed": false,
+    "sdkOrModelTurnExecuted": false
+  },
+  "fixtureCleanup": {
+    "oneNormalTermRequestExitCode": 0,
+    "containerRemainedRunning": true,
+    "forcedStop": false,
+    "repeatedStopOrRestart": false,
+    "historicalFailureRetained": true
+  },
+  "futureReapingInfrastructure": {
+    "normalSignedAPT": "PASS",
+    "package": "tini",
+    "version": "0.19.0-3+b8",
+    "nativeExecutableChecksumsRootMetadata": "PASS",
+    "absentDocumentationFiles": 2,
+    "fullPackageAuditClaimed": false,
+    "oldDefunctEntriesAdopted": false,
+    "productionProductChanged": false
+  }
+}

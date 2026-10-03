@@ -1,0 +1,917 @@
+<!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
+
+# GNOME consent and control implementation plan
+
+Production GNOME observers remain read-only and inputQualified stays false.
+The separate input-free consent/capture candidates below exercise real Fedora50
+portal consent and Stop. The source-only input candidate described next does not
+enable production GNOME control. Current
+portal.py constructs KWin and rejects non-KDE sessions; service.py runs backend
+calls on the GUI GLib loop. Both still need integration and KDE regression before
+enabling GNOME input.
+
+## October 3 isolated-helper input candidate; native acceptance pending
+
+[GnomeControl](../services/desktop/gnome_control.py) now binds a separately owned
+[AccessibilityHelper](../services/desktop/a11y_helper.py) to the captured active
+window PID and its native process start time. The consumed observation retains
+the helper epoch, session/accessibility bus IDs, launcher/registry owners,
+selected application owner, accessible path, raw state and event serial. Each
+keyboard press, including every chord modifier and every ASCII character, asks
+the helper for a fresh complete focus and then rechecks the compositor scene.
+A cached serial alone cannot deliver the child's focus events to this worker.
+Capture also rechecks its scene after the bounded accessibility walk.
+
+The initial keyboard candidate requires focused, showing, nondefunct, sensitive,
+editable, nonpassword controls. GTK4.22.5's raw ENABLED=false is preserved rather
+than treated as disabled: its [pinned state collector](https://github.com/GNOME/gtk/blob/4.22.5/gtk/a11y/gtkatspicontext.c)
+exports SENSITIVE from the disabled state and omits ENABLED. A valid incomplete
+tree returns no keyboard target; a pointer observation can still be captured.
+That incomplete helper is retired and cannot be replaced to authorize the old
+keyboard token. A fresh capture can construct a new helper. Native identity or
+transport failure invalidates sharing; password, insensitive, noneditable,
+changed-focus/serial and scene refusal stop keyboard dispatch and detach state.
+Stop also disposes the isolated helper. Helper cleanup failure is recorded and
+cannot skip bounded held-input release against the pinned portal session.
+The first native/user Stop cause remains retained across repeated cleanup.
+
+A failed or cancelled Notify RPC is reported as an unknown outcome, with the
+observation consumed, sharing stopped and no retry. A successful dispatch still
+returns verified=false. This matches the [pinned frontend's asynchronous backend
+call and immediate client reply](https://github.com/flatpak/xdg-desktop-portal/blob/1.22.1/src/remote-desktop.c);
+actual widget state or saved bytes must establish the outcome independently.
+Production service.py, capability discovery, the banner and historical probes
+are unchanged; inputQualified remains false.
+
+The new [owned input probe](../release/probe-gnome-input.py) and [GTK target](../release/probe-gnome-input-target.py)
+require the dedicated Fedora GNOME QEMU marker, ordinary augmentor-proof UID1000,
+SELinux Enforcing, unchanged exact clean managed selection and a fresh private
+gnome-execution-probe-input-vN directory. Stage both files plus worker,
+gnome_control, gnome, portal, portal_session, capture_stream, scene, a11y_helper
+and a11y_service together; all module hashes are recorded. Run the target with
+`--candidate gnome-execution-probe-input-vN --backend wayland` (repeat separately
+with x11), then the probe with that candidate, `--source <selected commit>` and
+`--selected-artifact <verified selected inventory SHA256>`,
+`--native-source <audited native package commit>` and
+`--target-pid <actual target PID>`. Before importing the candidate, Qt or banner,
+the input probe uses the normal owned per-user desktop-deployment.py verifier
+to verify every managed file and inventory digest. Its complete deployment
+receipt must equal the exact selected configuration and explicitly requested
+artifact hash. Selected/native release metadata must be clean Fedora44 builds
+at the explicitly requested sources with matching product versions; distinct
+reviewed selected/native sources are recorded separately. The selected and
+executing interpreter must be /usr/bin/python3 with no virtual environment or
+managed/source-Qt Python policy. Inherited loader/Qt/Python overrides are refused
+and the native augmentor-agent RPM must pass a clean read-only rpm -V audit.
+After this admission, candidate modules take precedence and the verified
+installed services/desktop directory supplies unchanged dependencies before
+Worker/GnomeControl import. In particular, candidate portal.py imports KWin even
+though GnomeControl never constructs it. The eleven-file candidate does not add
+a KWin source overlay or alter the selected payload.
+The Qt banner retains the previously observed
+xcb route. Consent and target activation must be actual inspected operations;
+the probe never forces focus or infers input permission from readiness.
+
+Only a private0600 trigger.input.json explicitly requests an operation:
+`{"operation":"capture"}`, `{"operation":"action","params":{"token":"<fresh token>","kind":"type","text":"synthetic"}}`,
+`{"operation":"inspect"}` or `{"operation":"finish"}`. Action params use the
+existing click/key/type contract. Every action requires the owned fixture to be
+the actual foreground target. Real multiline text-buffer changes and center/edge
+button callbacks write private receipts; an actual Ctrl+S callback writes
+input-target-saved.json from current widget buffers. It is a fixture save action,
+not an assertion that another application supports that shortcut. Inspect the
+receipt and fresh capture after dispatch; an immediate receipt may precede
+asynchronous native delivery. By default the probe keeps capture dimensions and
+digests. The optional proof-only `--retain-capture-image` also retains original
+validated JPEG bytes privately after an explicitly requested capture. Its
+recorded-helper absence check covers only recorded PIDs;
+the external owned-VM driver must independently check for helpers after failed
+reads and retain process/start identities. Visible Stop remains the banner's
+actual button; a finish trigger is cleanup, not visible Stop evidence.
+
+One hundred twelve focused source cases pass: GNOME guards/keyboard, helper protocol,
+worker/consent cancellation, portal targets, scene/capture and private-trigger
+and selected-artifact refusals. The latter exercise the normal maintained
+inventory verifier against synthetic managed releases, including changed or
+added payload, stale receipt, wrong source/target/hash/version/interpreter,
+managed policy and inherited loader/native-audit refusals. An isolated import
+regression copies the real eleven staged files, resolves the real installed
+kwin.py dependency, and rejects installed controller replacements without
+constructing GUI or opening consent. These are synthetic contracts, actual
+module imports, native Qt image decoding and real isolated GLib scheduling, not
+native pointer/chord/typing qualification. No VM input has been sent by this new
+candidate. Fresh Fedora50 native widget/file outcomes, per-character focus and
+password/Stop/lock/restart cases, terminal capture loss, other GNOME profiles and
+actual KDE threading regression remain open. Scale2/fractional and multi-monitor
+input remain refused. Promote production routing only after those gates pass.
+
+## Native capture candidate and cancellation evidence
+
+The [checked Fedora report](../release/qualification/next-targets/20261002-gnome-native-capture.json)
+qualifies only separately staged scale1 single-monitor capture, plus cleanup after
+actual visible Stop and native GNOME sharing Stop. The normal UID1000 Fedora44
+GNOME50.5 Wayland guest retains SELinux enforcing and its unchanged selected app.
+[Capture probe](../release/probe-gnome-capture.py) and [GTK4 target](../release/probe-gnome-target.py)
+require the exact owned marker, private candidate path and target PID/start-time;
+they must never run on an owner's desktop. Stage peer worker/consent/control/
+observer/portal/capture/scene modules with the two scripts. Start the GTK fixture,
+run the capture probe with `--candidate gnome-execution-probe-vN`, exact selected
+`--source` and `--target-pid`, visibly consent, activate only the owned target,
+then create private0600 `trigger.capture`. The probe never calls action/Notify.
+Its target fields remain empty and both button counts zero. JPEG bytes are not
+saved or published; the report keeps dimensions and an encoded-image digest.
+
+Current v7/v9 capture real1280×800 PipeWire RGB frames, validate the compositor's
+logical scale1 monitor and issue fresh tokens. v7 visible Stop detaches resources
+in0.300 seconds; six50ms Qt ticks continue through cleanup. v8 uses real native
+consent but an empty synthetic GStreamer pipeline with30-second frame wait;
+visible Stop cancels it and detaches in0.063 seconds. v9 native orange sharing
+Stop after a real capture closes with `native-session-closed`, no Augmentor Stop
+click. Its cleanup after the Qt notification takes0.010 seconds; this is not total
+revocation latency. No active PipeWire failure/revocation-during-acquisition claim.
+
+v1/v4 consent timeouts, v2 Overview guard refusal and v3 unexplained capture
+cancellation are preserved. Later successful captures do not diagnose v3. v5/v6
+passed capture/cancellation but lost Stop reason when the controller set the
+shared Event before the session; v7/v8/v9 correct and retain first cause. v7's
+idle-watch diagnostic records expected cancellation during cleanup. The optional
+request observer/timeout serve fixture diagnostics; production default remains80
+seconds, fixture180. Source742 cases pass:740 successes/two Mac-only skips.
+Pointer/widget/keyboard, full AT-SPI delivery, normal password lock, owner/epoch
+restart, scaled/far-edge/hover cases, Ubuntu/Leap/profile repetition and KDE service
+threading remain open. Production discovery and inputQualified remain false.
+
+## Native selected-application owner loss with a live process
+
+[The two executed owner-loss cases](../release/qualification/next-targets/20261002-gnome-native-selected-owner-loss.json)
+use the actual Fedora44/GNOME50 accessibility bus, registry and helper with a
+separate synthetic two-node Gio exporter. [The owned probe](../release/probe-gnome-a11y-owner.py)
+registers only its private exporter connection, closes that connection while its
+process/PID/start identity remains alive, and observes the helper's permanent
+native-owner refusal. The first case closes in0.023 seconds; the current probe
+with fresh-path/acknowledgment identity checks closes in0.059 seconds. These are
+request-to-child-disposal durations, not physical input latency.
+
+Both live exporters answer supervisor pings after disconnection. Reconnection
+creates a different unique accessibility owner in the same process. The retired
+helper refuses to resume; a fresh helper discovers/pins the new owner. Session
+and accessibility bus IDs, launcher and registry owners stay unchanged. All eight
+owned parent/exporter/helper PIDs subsequently disappear. Selection bytes remain
+unchanged and no keyboard/pointer input is sent. No GTK focus-event, widget or
+product input acceptance is inferred from the synthetic tree's role/state values;
+its serial stays zero and it emits no focus events.
+
+The exporter follows pinned upstream [Application](https://github.com/GNOME/at-spi2-core/blob/66707c370bef824ed4edb08a909fc6a61449c12c/xml/Application.xml),
+[Accessible](https://github.com/GNOME/at-spi2-core/blob/66707c370bef824ed4edb08a909fc6a61449c12c/xml/Accessible.xml)
+and [Socket](https://github.com/GNOME/at-spi2-core/blob/66707c370bef824ed4edb08a909fc6a61449c12c/xml/Socket.xml)
+contracts: actual two-word state bitmasks, private bus unique-name references,
+one Embed per connection and empty P2P bus address. This is selected-application
+owner loss, not launcher/registry replacement or full accessibility-tree fidelity.
+The separate isolated native-daemon fixture below now proves global service
+fences; existing owner/guest services are not restarted for this proof. Production
+GNOME discovery/keyboard/pointer remain disabled.
+
+## Isolated native launcher, registry and bus replacement
+
+[The executed service-fence report](../release/qualification/next-targets/20261002-isolated-native-a11y-services.json)
+adds three cases in a separate Fedora44 container using shipped native binaries:
+registry replacement with the exporter process and selected owner still alive;
+launcher termination with coupled accessibility-bus loss; and accessibility-bus
+termination with coupled launcher loss. Each retired helper refuses reuse. After
+native services are restored, a fresh helper pins the replacement identities and
+reads the synthetic two-node exporter. Registry-only replacement keeps session/
+accessibility bus IDs and launcher identity unchanged. The coupled cases preserve
+the private session bus while changing launcher owner and accessibility bus ID.
+
+The native launcher/registry hashes exactly match the original Fedora GNOME guest.
+Recorded package headers identify at-spi2-core2.60.7-1.fc44, dbus-daemon1:1.16.2-1,
+gsettings-desktop-schemas50.1-1, gobject-introspection1.86.0-3 and PyGObject3.56.3-1
+with Fedora44 key signatures. DNF installs use GPG checks in the separate image.
+The [published fixture recipe](../release/fedora-a11y-service-fixture.Dockerfile)
+differs from the executed recipe only by its added copyright comment; both hashes
+are recorded. [The bounded probe](../release/probe-a11y-service-replacement.py)
+requires the exact owned marker, ordinary UID1000 and native binary hashes.
+
+Run in a NEW owned container with Docker --init, networknone, no host mounts/
+devices/privileged mode, all capabilities dropped, no-new-privileges, two CPUs,
+2GiB and256 PIDs. Stage the exact probe, probe-gnome-a11y-owner.py and helper/service
+files together under /work. The CLI requires a new /work proof root and --case
+registry, launcher-bus or accessibility-bus. Each creates a separate native
+DBus session/private0700 runtime directory, unsets inherited display/a11y/startup
+bus variables and uses the memory GSettings backend. It starts native daemons
+manually, without GNOME-session registration, and terminates only recorded owned
+PID/start identities. Exported roles/states are synthetic; no focus events, UI
+input, real GNOME compositor or product service restart is exercised.
+
+The first image refused missing GSettings schemas. The second started daemons but
+refused the missing DBus1.0 typelib; an actual Fedora package-provider query
+identified gobject-introspection. The third passed native owner fences but left
+exited forked bus children as zombies under sleep PID1. These failures/observations
+remain retained. The fourth uses Docker init to reap orphans and passes all three
+cases, with every recorded native-bus, launcher, registry, exporter and helper PID
+confirmed absent afterwards. Source/native-library/package/recipe identities and
+raw report hashes bind the evidence. Closure durations after native loss are
+0.0034s/0.0013s/0.0014s for registry/launcher/bus requests, not physical-input latency.
+
+The existing GNOME guest and owner services/devices/models/audio are unchanged.
+This proves native helper fences in isolated sessions. Real GNOME service restart,
+shell/controller integration, inaccessible/ambiguous trees, native per-action
+widget/lock/Stop outcomes and other supported profiles remain open. Production
+GNOME discovery/keyboard/pointer remain disabled.
+
+## October 2 native consent and worker checkpoint
+
+The [checked report](../release/qualification/next-targets/20261002-gnome-native-consent.json)
+binds exact candidate bytes separately from the unchanged selected Fedora44
+application. [ConsentSession](../services/desktop/portal_session.py) owns an
+independent bus on a private GLib context. It pins frontend/backend/Shell owners,
+registers the app only if advertised, subscribes before dispatch and validates
+precomputed request/session identities. Cancellation advances a generation and
+cancels the RPC immediately; an unanswered request or late session grant is
+closed through its already retained owned identity. Cleanup detaches and closes
+the PipeWire FD, session and request, with separate bounded uncancelled cleanup
+calls. No input method is implemented or sent by this component.
+
+[Worker](../services/desktop/worker.py) serializes tasks even while portal response
+waits pump its private context. A second cleanup task cannot reenter a pending
+connect operation. Qt stays on its own GUI thread; futures retain failures and
+close checks worker termination. Eleven focused tests cover real nested GLib
+scheduling, Qt timer/Stop responsiveness, owner/identity fences, late grants and
+FD cleanup. Full isolated Arch source regression passes721 cases:719 pass/two
+Mac-only skips. The initial invocation omitted Node/PYTHONPATH and is retained;
+the corrected invocation uses the existing pinned Node24.19.0, compiled source
+and exact production lock dependencies. Linux-only GLib tests skip where the
+runtime is absent; hosted Mac remains an independent regression gate.
+
+The [probe](../release/probe-gnome-portal-consent.py) requires the owned ordinary-user
+Fedora QEMU marker, SELinux enforcing, GNOME Wayland and the exact unchanged
+selected artifact. Separately stage its three hashed files in a private candidate
+directory and run with `--candidate gnome-control-probe-vN --qt-platform xcb`
+and `--source <exact selected source>`. It reuses only the installed unchanged
+Banner class; the production client/launcher already selects xcb on Wayland.
+The qualification probe allows180 seconds for manually inspected consent; the
+component default is80 and all timeouts are bounded. Reports include the actual
+platform, request phases, GUI ticks, source hashes and unchanged selection checks.
+Never use this disposable fixture driver on an owner's desktop.
+
+Actual Fedora50 RemoteDesktop2/ScreenCast5 advertises device/source/cursor masks7
+and Registry. Native Cancel closes resources without input on the exact current
+180-second probe, alongside separately hashed earlier candidates. Sharing with
+remote interaction OFF is refused.
+Explicit interaction ON and Share grants devices3 and one monitor node, logical
+position(0,0), size1280×800, source_type1 and mapping_id. These observed values
+still require strict geometry/topology validation before execution. Actual visible
+Stop during consent discards the late result; Stop after successful consent closes
+all resources and exits the probe. Qt ticks continue throughout cleanup. No
+pointer/typing/capture, target selection or production integration is claimed.
+
+The first probe timed out but left its banner/process alive due an error-cleanup
+bug; it was terminated only after confirming the exact owned process. Its native
+Qt Wayland Tool banner was unavailable on the normal desktop, so that run is
+excluded from acceptance. Revised cleanup and current xcb runs are separately
+recorded. QEMU captures also include partial redraws and the selected app can
+cover the native portal; complete graphical rendering is not qualified. Dismissing
+only the fixture DSH dialog's Later button changes no provider or configuration.
+Native GNOME sharing Stop also closes this input-free probe with no Augmentor
+Stop click. Execution-controller revocation, service/extension restart, password
+lock, scaled/topology cases,
+Ubuntu consent, input/scene/AT-SPI integration and KDE threading regression remain
+open. All five original rollout points remain active.
+
+## Guarded execution candidate; not enabled
+
+[GnomeControl](../services/desktop/gnome_control.py) is a separate worker-owned
+candidate; production discovery still rejects GNOME input. It owns independent
+consent, pins the observer epoch, consumes one-use target tokens, checks the
+current scene before each dispatch and uses compositor InspectPoint before
+pointer motion/button press. Monitor source/position/size must match exactly one
+compositor monitor at scale1. Frame caps must also match the logical monitor
+before issuing a token. Observer/epoch/topology/capture failure closes resources;
+a worker-context250ms watcher invalidates idle locked/replaced sessions.
+Native scale1 capture/cancellation evidence is recorded above; dispatch guards
+still have synthetic tests only. No native pointer/keyboard acceptance is claimed.
+
+Pinned [frontend1.22.1](https://github.com/flatpak/xdg-desktop-portal/blob/1.22.1/src/remote-desktop.c),
+[GNOME backend50.0](https://github.com/GNOME/xdg-desktop-portal-gnome/blob/50.0/src/remotedesktop.c)
+and [Mutter50.5](https://github.com/GNOME/mutter/blob/50.5/src/backends/meta-screen-cast-monitor-stream.c)
+show a scale-dependent transform/bounds discrepancy: portal metadata is logical,
+while scaled stream capture/pointer transforms use monitor scale. Scale2/fractional
+input is refused until actual caps, far-edge coordinates and widget outcomes are
+proved. A metadata-only scale2 unit fixture is not coordinate qualification.
+
+Capture now has a virtual frame-acquisition hook; the KDE implementation retains
+its existing default-context route. The GNOME candidate passes only its worker
+context and cancellation checkpoints, including after a sample arrives. Tests
+attach real sources to both contexts and prove private cancellation without
+GUI-source callback delivery. Native Session.Closed during capture still needs
+live acceptance. Portal Notify ACK is asynchronous and cannot prove an actual
+widget click or settled hover popup.
+
+Inherited libatspi uses a global default context; Gio's thread-default context
+alone does not migrate it. See the exact
+[libatspi context implementation](https://github.com/GNOME/at-spi2-core/blob/2.60.0/atspi/atspi-misc.c).
+The separate [read-only helper proof](../release/qualification/next-targets/20261002-gnome-native-accessibility.json)
+now verifies ordinary-user GTK Wayland and XWayland targets, real callback-thread
+identity, focus-away/back serial changes, password roles, discovery after helper
+startup and process-disappearance refusal. Its parent hard deadline and cancellation
+dispose a stalled child; all14 synthetic socket/protocol tests are separate evidence.
+The original incomplete query and a later transient XWayland tree refusal remain
+preserved. Production discovery still returns no focus and keyboard/type refuses.
+
+[GTK4.22.5 collect_states](https://github.com/GNOME/gtk/blob/4.22.5/gtk/a11y/gtkatspicontext.c)
+exports SENSITIVE from disabled state and omits ENABLED. The helper retains both raw
+flags. Focus/showing may survive while another application covers the target; the
+future controller must independently bind the shell's selected/active window and
+geometry to the same PID, owner, epoch and fresh event serial. These facts are not
+permission to type. Selected application owner loss now passes the separate
+synthetic native-bus proof above. Isolated native-service replacement now passes the proof above; real GNOME
+service restart, inaccessible
+and ambiguous native trees, per-character/Stop/lock guards and matching GNOME/KDE
+regressions remain open. The GUI process's singleton is untouched.
+
+Next native proof: GTK Wayland/XWayland pointer/widget outcomes; all
+stale/focus/cover/hover fences; mid-capture Stop/native revocation/terminal stream
+failures; isolated AT-SPI helper keyboard and partial-action Stop; normal password
+lock and independent service/observer restarts. Repeat supported46/48/49 profiles
+and real KDE threading regression before production integration.
+
+## Portal negotiation and identity
+
+Pinned xdg-desktop-portal-gnome backends
+[46](https://github.com/GNOME/xdg-desktop-portal-gnome/tree/81c74e0a29537e1bb29a40554e9bf9c41a272148),
+[48](https://github.com/GNOME/xdg-desktop-portal-gnome/tree/357847a5f876947c7931d7fa2c68ce8b8d0d48ae),
+[49](https://github.com/GNOME/xdg-desktop-portal-gnome/tree/0a3499e0e04f4f9b657bf404f9266dd23d03d2ae)
+and [50](https://github.com/GNOME/xdg-desktop-portal-gnome/tree/c9a231d3a0c77b6b14f998653b7323858d559dd7)
+advertise RemoteDesktop2/ScreenCast5, NotifyKeyboardKeysym and ConnectToEIS.
+Inspect actual installed interfaces/version/bitmasks; Shell major does not prove
+portal capabilities. The 1.22.1 frontend clamps ScreenCast to backend capabilities,
+so GNOME50 does not provide its version6 pipewire-serial extension.
+
+For the initial Notify* transport, use RemoteDesktop.CreateSession then
+SelectDevices(types3,persist0), ScreenCast.SelectSources(types1,multiplefalse,
+hidden cursor only if advertised), RemoteDesktop.Start, and OpenPipeWireRemote.
+Require both keyboard/pointer device bits and exactly one monitor stream; decline,
+cancel or remote-interaction-disabled refusal closes everything. No restore token
+or clipboard. Preserve foreground selection after actual monitor consent, with
+no forced focus and the existing 30-second single-use owner token.
+
+[Stream position/size](https://github.com/flatpak/xdg-desktop-portal/blob/1.22.1/data/org.freedesktop.portal.ScreenCast.xml#L213)
+are compositor-logical coordinates, not JPEG pixels. Validate metadata and map
+captured image to stream logical/compositor geometry; refuse missing/ambiguous
+mapping. PipeWire node IDs are session-local. Topology/stream loss invalidates
+them. Version5 mapping_id is relevant to optional EIS regions, not version6
+serial guarantees.
+
+When advertised, register com.augmentor.Agent on a fresh independent helper bus
+connection through
+[org.freedesktop.host.portal.Registry](https://github.com/flatpak/xdg-desktop-portal/blob/1.22.1/data/org.freedesktop.host.portal.Registry.xml#L43)
+once per portal owner before requests. Noble frontend1.18.4 lacks that interface;
+1.20.3/1.22.1 provide it. A late failed Register is not identity proof. Retain the
+product's named visible control banner even where the GNOME consent dialog does
+not use the passed app_id as its display name.
+
+## Target guards and cancellation
+
+Use the GNOME observer's versioned live window/focus/geometry identity and
+InspectPoint checks, including before click and after pointer movement. Preserve
+AT-SPI focused-control/password checks and per-character verification. Cover
+refusal includes same-PID and override-redirect actors. PickMode.ALL does not
+prove complete painted coverage. Keep completeActorCompositionTracking false;
+do not invent a complete history or compositor-atomic dispatch requirement beyond
+the approved KDE check-then-dispatch contract.
+
+Watch unique owners of org.freedesktop.portal.Desktop,
+org.freedesktop.impl.portal.desktop.gnome, org.gnome.Shell and the helper connection.
+Stop on replacement/loss, Session.Closed, invalid observer epoch/UnknownMethod,
+PipeWire EOS/error, incompatible monitor metadata or transport loss. Increment
+the generation, discard snapshots, detach Session/FDs, close pending Requests,
+then perform idempotent held-input cleanup. Late consent callbacks cannot restore
+stopped state. Terminal capture error must close sharing, not just fail a read.
+
+Portal Notify replies acknowledge IPC dispatch, not application outcome. Keep
+verified false and no replay. Timeout/loss after dispatch is partial/unknown and
+non-retryable. Unlock requires a new selection/session/consent. Normal nonheadless
+[Shell lock](https://github.com/GNOME/gnome-shell/blob/50.5/js/ui/main.js#L138)
+inhibits remote access; [Mutter session closure](https://github.com/GNOME/mutter/blob/50.5/src/backends/meta-dbus-session-manager.c#L491)
+propagates to portal Session.Closed. Headless bypass is not desktop evidence.
+The [Shell sharing indicator](https://github.com/GNOME/gnome-shell/blob/50.5/js/ui/status/remoteAccess.js#L182)
+provides extra revocation, while Augmentor must retain its visible Stop.
+
+The GNOME observer uses synchronous D-Bus; merely swapping it into the GUI-loop
+executor risks delaying Stop. Keep GUI delivery responsive with explicit worker
+ownership and serialized cancellation. If using a dedicated GLib worker context,
+create an independent GIO connection and context there, adapt existing KWin's
+default-context pumping, and never iterate the GUI context from that worker.
+This is an identified source risk, not an executed Stop failure. Actual KDE
+regression is required after any shared threading change.
+
+## Finite graphical acceptance
+
+Start with full Fedora44/GNOME50, then repeat unchanged candidate on Noble46,
+Leap48 and Fedora43/GNOME49. Record exact artifact, runtime, backend/frontend and
+security state for each; do not infer pass from another Shell version.
+
+1. Actual decline, interaction disabled, cancellation and Stop during consent.
+2. Owned native GTK Wayland and XWayland applications: click/chord/ASCII typing,
+   exact saved file and fresh captured result, with token expiry/reuse/foreign
+   conversation refusal.
+3. Focus/popup/foreign/same-PID covers, input-region full/empty/full and painted
+   click-through Shell overlays with truthful coverage limits.
+4. Scales1/2 and monitor/topology invalidation with logical-coordinate checks.
+5. Actual QMP-clicked visible Stop while waiting, during partial typing and held
+   input; GUI remains responsive and cleanup completes.
+6. Actual Shell sharing-indicator revocation, not just a mocked session signal.
+7. Normal password lock during consent, active session and partial input; correct
+   unlock needs fresh consent and never replays the interrupted action.
+8. Distinct frontend/backend/Shell/helper loss and reply loss after dispatch:
+   partial unknown outcome, invalid generations, no automatic replay.
+
+EIS is optional after this bounded Notify path. ConnectToEIS may be called once
+after Start; Notify methods are then forbidden. Use a pinned native libei sender
+shim, actual device/seat capabilities and keymap/frame/region handling rather
+than inferred GI APIs. Pause/removal/disconnect cancels old actions. Neither EIS
+framing nor Mutter's accumulation code creates atomic target compare-and-dispatch.
+
+## Existing Fedora artifact admission
+
+[The first input-candidate admission](../release/qualification/next-targets/20261003-fedora-gnome-old-payload-target-refusal.json)
+refuses the preserved old native/selected payload metadata before any staging or
+input. Both old release records still declare Debian13 although Fedora package
+records declare Fedora44. Current packaging rewrites that target. The guard is
+retained; a matching native/managed update and exact dependency/pending-transaction
+review must complete before this candidate runs. No selected payload is patched.
+
+The [owned clone adoption and first import refusal](../release/qualification/next-targets/20261003-fedora-gnome-clone141-adoption-input-import-refusal.json)
+preserves the original VM's daemon-prepared offline update by normally powering
+it off and using a separate thin clone. Both original backing disks remain
+read-only with unchanged full SHA256; the original must stay off while any
+dependent overlay is reusable. The clone installs the exact clean2035 Fedora
+RPM through normal DNF, with eleven reviewed required dependencies and their
+verified Fedora signatures. Only the clone's copied pending transaction is
+invalidated. Native audit, protected settings and canonical managed
+stage/activate/cold launch pass. Both new release records declare Fedora44;
+the old selection is retained as previous, and strict candidate admission passes
+without changing any guard.
+
+The first exact0ab eleven-file candidate then fails before Qt/banner/portal
+creation: portal.py cannot import kwin because the probe appends the verified
+installed dependency path after GnomeControl import. The native GTK Wayland
+target remains empty, both click counts and its save count remain zero, no
+trigger or saved file exists, and independent cleanup confirms probe/target and
+candidate helpers are absent. No consent or input was sent. The maintained
+probe now resolves that dependency before controller import; its source-only
+fix and import regression are review evidence, not a corrected native pass.
+A fresh candidate directory and explicit reviewed probe revision/hash are
+required for the next run; controller/helper bytes remain the reviewed0ab
+candidate. Production GNOME discovery and input remain disabled.
+
+## Corrected-probe consent pass and first capture timeout
+
+The [fresh v2 checkpoint](../release/qualification/next-targets/20261003-fedora-gnome-v2-consent-pass-capture-timeout.json)
+stages only probe4abe16a with the other ten files still exact0ab. Strict native
+and selected source2035/Fedora44 admission passes against managed inventory
+SHA53813618. The corrected import reaches the installed xcb banner and actual
+Remote Desktop dialog. Its native portal PID/owner and foreground geometry are
+checked before the observed interaction and Share actions. Connect reports
+sharing=true after the existing keyboard/pointer/single-monitor checks; GUI
+ticks continue during consent. This is real consent evidence, not widget input.
+
+The first explicit capture fails after2.224seconds and closes sharing. Its
+retained first failure is idle-watch / Error / g-io-error-quark timeout24;
+cleanup completes in0.544seconds, with stopClicked=false. Both buffers remain
+empty, center/edge/save counters stay zero and no saved file exists. Independent
+checks find probe, target and candidate helpers absent; selected bytes and both
+frozen original backing hashes are unchanged. A post-target-exit cleanup scanner
+error on nonprocess /proc/dma is retained separately, followed by an independent
+numeric-process scan; no SIGTERM or failed capture is replayed.
+
+Fresh owner/scene readback remains valid. PipeWire logs target-not-found and
+Broken-pipe messages overlapping teardown; they do not identify the first
+failure's cause. Existing idle-watch reporting cannot distinguish its session
+verification from the observer's owner/read calls. The failed operation remains
+failed; pointer/chord/ASCII/save/visibleStop acceptance is still open.
+
+The maintained probe adds optional `--trace-idle-watch` for the next reviewed
+fresh diagnostic run. A probe-only subclass delegates the unchanged idle watcher
+and temporarily wraps only its existing session/observer connections. It records
+each synchronous GetNameOwner and observer Read method, verification/read stage,
+public lookup alias, configured timeout and elapsed time, plus native error
+kind/domain/code. It forwards the exact flags, parameters, cancellation object,
+reply and exception without another RPC. Cleanup methods delegate normally;
+captured connections are restored even after Stop detaches/disposes the objects,
+without restoring sharing. No controller, observer, session, helper, production
+guard or timeout is changed.
+
+The current [session owner check](../services/desktop/portal_session.py) uses
+1000ms; the [observer](../services/desktop/gnome.py) uses500ms for Shell owner
+checks and1000ms for Read. The [GIO API reference](https://docs.gtk.org/gio/method.DBusConnection.call_sync.html)
+documents milliseconds and synchronous blocking; the trace records the bounds
+actually passed by these staged modules. It keeps the latest128 calls plus the
+first error independently, recording rollover and diagnostic-sink failures.
+It exports no RPC reply/parameter payload, accessible text or screenshot bytes.
+Tracing defaults off. Synthetic tests exercise the actual maintained watcher,
+session verification and observer read, preserving terminal timeout cancellation,
+the original error, bounded history, detached cleanup and no retry. Those tests
+do not diagnose the v2 timeout or qualify native input. The diagnostic probe
+ran in a fresh private candidate only after parent review/publication; its actual
+result follows. This run changes no production capability qualification.
+
+The October 3 [v3 diagnostic checkpoint](../release/qualification/next-targets/20261003-fedora-gnome-v3-consent-capture-diagnostic.json)
+records probe2b2081f with ten unchanged0ab files, exact selected/native2035
+Fedora artifacts and complete managed inventory admission. Actual observed
+portal consent passed in65.715s. One explicitly requested capture passed in
+2.863s for the owned foreground GTK target, with a1280x800 image receipt and an
+isolated helper independently observed alive. The final watcher trace has1278
+RPCs, latest128 retained, no first error and no diagnostic recording failure.
+The original1000/500/1000ms bounds stayed unchanged. Normal finish cleanup took
+0.068s; helper, probe and target absence were checked independently. Both text
+buffers, both click counters and save count remained zero. Full frozen backing
+hashes, read-only FDs, original-off state and the4GiB floor passed again.
+
+This separate healthy run does not explain the v2 timeout. The exact executed
+probe discarded image bytes and retained only their encoded digest; visual
+capture acceptance and pointer/chord/ASCII/save/visibleStop remain open.
+No old image can be reconstructed from that digest and no new capture was
+attempted to fill the evidence gap.
+
+The next source-only optional `--retain-capture-image` validates the actual
+controller's `image/jpeg` contract; [portal capture](../services/desktop/portal.py)
+encodes JPEG, not PNG. It requires canonical strict base64 within900000 decoded
+bytes and1600x1200 bounds, JPEG signatures, and native Qt header/full decoding
+whose dimensions match the actual capture API imageSize receipt. It preserves
+the original decoded bytes without conversion or re-encoding. An exclusive,
+unique run-local .jpg file is written through a pinned private directory FD at
+0600, with raw-byte SHA/bytes/path/MIME/dimensions recorded privately. Existing
+files and symlinks refuse without overwrite; substituted directories refuse
+without writing their replacements. Retention defaults off and never requests
+a capture or another operation. There is no API/controller/timeout/guard change.
+
+The31 probe cases include nine actual image-retention/failure cases. The112
+focused Python cases and five observer Node cases pass; those totals are source
+checks, not another native run. The focused Python command is
+`PYTHONPATH=tests python3 -m unittest test_gnome_control test_gnome_input_probe test_a11y_helper test_desktop_worker test_desktop_consent_session test_desktop_scene test_capture_stream test_gnome_observer test_linux_portal_targets`.
+Image-retention source was then reviewed/published for the distinct v4 candidate
+below. Actual retained image inspection preceded its newly authorized input
+phase.
+
+The October 3 [v4 visual capture and partial-delivery checkpoint](../release/qualification/next-targets/20261003-fedora-gnome-v4-visual-capture-center-partial-failure.json)
+records probe8cb438a with ten unchanged0ab files and unchanged exact2035
+selected/native Fedora artifacts. Actual observed consent passed in67.162s.
+The first explicit capture passed in2.382s and retained the original53998-byte
+1280x800 JPEG privately at0600. Parent and child visually inspected that image:
+the empty GTK fixture, active-control banner and visible Stop were unobscured.
+A separate fresh capture for the approved center click passed in1.444s; its
+original53936-byte JPEG was inspected before the action. The API accepts image
+pixels and scales to compositor logical monitor dimensions; both were1280x800
+at scale1/origin0,0 here, so the observed point640,557 mapped directly.
+
+The single center action failed after0.960s with `GNOME target changed before
+dispatch. No action is replayed.` The actual GTK center callback count became1.
+Both observations are retained: this is partial native delivery with an API
+refusal, not successful action acceptance. No edge click, TextA focus, ASCII,
+Ctrl+S, password/focus/refusal or visible Stop phase followed. Buffers stayed
+empty, edge/save counters stayed zero, and no saved file appeared.
+
+Capture-pre and action-pre compositor serial were both3281, with identical
+target PID/start/window ID/geometry. After automatic Stop, serial was3295 and
+windows/above no longer contained the closed banner; other scene fields agreed.
+These post-Stop changes cannot identify the initial changing field. Final idle
+trace16218 calls has no first error and no recording failure, but it traces
+idle verify/read RPCs, not dispatch scene replies or Notify phases. The exact
+failing Notify method remains unrecorded. `GnomeControl.send()` checks
+`same_scene` before each Notify, including releases, and this refusal raises
+outside its Notify exception recorder. Consequently the action row has the
+error while controller `failure` is null. A separate read-only helper focus
+inspection failed at its unchanged3s constructor/status deadline and was not
+retried; current raw AT-SPI focus is unavailable.
+
+The enabled observer is the earlier GNOME50-only aef93bb extension,
+SHA48897dc5a9ce5be70f1a2affdfb686309e7b8f0b15d6e0692380f5c00100f6a2;
+the selected2035 package contains the expanded-profile extension,
+SHAec8543ab1ed23d04e5efc3d7485256ca8907d81252250d074e464cc843ca4db8.
+The enabled source was matched by exact bytes; portal/Shell owner identities
+remained unchanged. This enabled-versus-packaged boundary is concrete provenance
+and does not establish the action failure's cause. Neither extension was
+changed/restarted during the candidate.
+
+Automatic candidate cleanup took0.136s. Independent reads found the original
+helper and probe absent, then normal exact-owned target termination ran once.
+The separate failed read-only diagnostic child was also absent; no cleanup was
+replayed. Final full frozen backing hashes, read-only FDs, original-off state,
+unchanged selection/appearance/previous selection and4GiB floor passed.
+
+A first read-only JPEG export had refused a complete stat comparison before any
+host image write. Supported inference is ordinary first-read atime drift;
+original before-atime was not retained. A separately reviewed read-only export
+compared device/inode/UID/GID/mode/link-count/size/mtime/ctime plus exact retained
+SHA/bytes/signatures, excluding atime, and copied the same original bytes to an
+exclusive host0600 file. Both receipts remain preserved; there was no recapture
+or input retry to repair an evidence failure.
+
+The next proposed source-only diagnostic must observe the actual existing
+`same_scene` comparisons inside each Notify phase, without extra RPCs or
+changing their outcomes. An opt-in probe subclass can wrap the candidate
+module comparisons only during the owned action, retain bounded changed-field
+names and sanitized before/current serial, owner/PID/window/monitor/workspace/
+guard identities, and record click/key/type phase, Notify method, press/release
+state and tracked held-button/key state. Keyboard guard observations must report
+complete/sensitive/editable/nonpassword outcome from existing queries, without
+accessible text or another helper request. The guard exception must be recorded
+before it unwinds to existing held-input cleanup, preserving the original error
+and first failure. Normal Stop's actual pinned-owner release/Session.Close RPCs
+need bounded method/bound/outcome tracing through the original calls; no new
+release, retry, connection or consent is allowed. Tests must exercise the actual
+maintained sender, a serial-only change before release, blocked scene/owner and
+keyboard refusal, first-error retention, sink failure, scope restoration and
+the existing1000ms pinned cleanup once. Source review/publication precedes any
+new action run. No serial/scene fence or timeout relaxation is justified by the
+current evidence.
+
+The October 3 [dispatch-trace source checkpoint](../release/qualification/next-targets/20261003-fedora-gnome-dispatch-trace-source-only.json)
+implements that diagnostic in the owned probe only, awaiting parent source
+review/publication. Optional `--trace-dispatch` defaults off. It composes with
+`--trace-idle-watch` and `--retain-capture-image`, but requests no operation.
+Temporary wrappers on the owning Worker call each original `same_scene`
+predicate once, forward the existing observer/owner/Notify RPCs once, and
+restore module functions and captured bus objects in `finally`. Foreign-thread
+calls delegate without dispatch instrumentation. No disposed object is
+reattached. The trace keeps the latest128 records plus the first comparison,
+first refused comparison and first error independently. Changed-field names
+are capped at64; identities allow only bounded compositor/native numeric,
+boolean and owner metadata. Titles, application names, accessible text, input
+payloads, keycodes/keysyms, native object paths and free-form error messages
+are omitted. A changed title in windows/above is represented by its field name
+only; the actual predicate still ignores only the focused window's title.
+
+Each existing send has operation/method/press-release phase, tracked held-input
+state, controller/consent generation and cancellation metadata. A scene, point
+or owner guard exception outside the original Notify catch is recorded through
+the existing first-failure recorder as `dispatch-guard` and rethrown unchanged.
+It adds no Stop: the original action retains responsibility for held-input
+cleanup. Existing observer, keyboard-target and Notify failure causes still
+win when already recorded. The raw complete/sensitive/editable/password/enabled
+flags and sanitized current/recorded owner/serial identity come from the one
+existing validated helper focus reply, with no additional query. Focus-path
+changes appear only as a changed field name. Constructor/status calls made
+before an existing helper is available are not instrumented by this scoped
+focus wrapper; ordinary failure reporting and disposal still apply.
+
+Actual original Stop releases and Session/Request.Close calls carry pinned
+owners/generation, original flags, cancellable presence, timeout and elapsed
+outcome. Native Notify remains5000ms with its original cancellable; pinned
+cleanup remains1000ms without it. No release, Close, owner lookup, helper query,
+connection, consent, action, capture, retry or keepalive is added. Diagnostic
+sink failures count separately and preserve native replies/exceptions.
+Controller, portal, consent session, observer, helper, capture/scene/Worker and
+target fixture bytes remain exactly0ab. Selected/native artifacts and production
+GNOME discovery/input flags are unchanged. The v4 center partial delivery/API
+refusal and the unexplained v2 native timeout remain failures.
+
+The48 probe cases and129 focused Python cases pass, alongside the previously
+unchanged five observer Node cases. New cases exercise the actual maintained
+sender, original comparison delegation once, serial-only release refusal,
+scene guard/owner loss, sensitive/password and focus-path refusal, unchanged
+per-character helper/press/release counts and verified false, first-failure
+retention, actual native5000ms timeout followed by one1000ms Close, original
+held-input release order and Stop cause, sink failures, foreign-thread scope,
+and restoration after refusal/disposal. These are source checks with synthetic
+native endpoints, not a new guest execution or input acceptance. A distinct
+fresh11-file candidate with the reviewed probe and ten exact0ab files must be
+published and explicitly authorized before another owned VM run.
+
+## October 3 v5 diagnostic center release refusal; cleanup verified
+
+The [v5 checkpoint](../release/qualification/next-targets/20261003-fedora-gnome-v5-release-serial-partial-failure.json)
+retains a separate fresh run with probe7d4afe5/SHA3d719011 and the same ten
+0ab runtime/target files. Strict native/selected2035, artifact538136, managed
+inventory/deployment receipt, clean native RPM, normal environment and unchanged
+protected settings passed before execution and again after cleanup. The enabled
+observer remained the earlier aef93bb GNOME50-only extension; the expanded2035
+extension stayed packaged and was not enabled or restarted.
+
+Observed portal consent passed in174.123s within the unchanged180s probe bound.
+The initial explicit capture passed in2.420s. Its original53884-byte JPEG,
+SHA7cdf03e82352bd3f6864e23ad214c61a2121197e1defb34dd3ce8d1cb6f7b3b5,
+was exported without conversion under the approved stable inode/device/owner/
+mode/link-count/size/mtime/ctime and hash check, excluding ordinary atime. Child
+and parent actually viewed the empty native target, both text buffers, synthetic
+password control, center/far-edge buttons, active visible Stop, and unobstructed
+1280×800 desktop. A distinct authorized fresh observation passed in1.195s before
+the one approved center click. Its original54019-byte JPEG,
+SHA8817234ced3f34c6fcc23076ad34475643fd487f5ed38abdc8152a1e1d66e92d,
+was actually viewed by the child; layout/target/source/owner/geometry matched,
+with only the visible desktop clock changed. The old token was not reused.
+
+The click at image pixel640,557 failed in1.020s. The actual API mapping was
+1280×800 image to1280×800 logical monitor, scale1/origin0. Motion RPC sequence21
+and press RPC43 replied. At sequence60, immediately before the normal
+`NotifyPointerButton` release, the original `same_scene` predicate refused:
+**serial3405→3406 was the only changed field in the actual compared objects**.
+Target/window identity, geometry, windows/above, workspace/monitor, guards,
+compositor owner and all other compared fields stayed equal. The button was
+tracked as held and cancellation was false. No normal release RPC was sent.
+Sequence61 retains the original guard RuntimeError as the first
+`dispatch-guard` failure; neither the error nor its outcome was retried.
+
+Original automatic cleanup then sent one release at sequence62 and one
+Session.Close at63 to the pinned frontend owner. Both replied under the existing
+1000ms/NO_AUTO_START/no-cancellable bounds. Actual GTK center callback count was1;
+edge0, both text buffers empty, save count0 and saved file absent. This is partial
+delivery with an API refusal, not accepted input. Portal replies alone are not
+widget-delivery acknowledgements. No edge, focus, ASCII, chord, password or
+visible Stop phase ran. Idle trace recorded13368 calls without first error;
+dispatch trace retained all63 records with zero dropped records or sink failures.
+The unexplained v2 native timeout and uninstrumented v4 refusal remain separate
+failures; v5 does not retrospectively establish either cause.
+
+Automatic cleanup completed in0.320s, with GUI ticks continuing14674→14681.
+Independent process reads found the probe/helper absent, followed by one normal
+exact-owned target SIGTERM and independent target/helper/probe absence. Final
+source11/native/selected/full inventory, protected20/selection/appearance/
+previous selection, portal/Shell owners, both full frozen backing hashes,
+read-only backing FDs, original-off condition and4GiB floor passed. Host free
+space was8,797,278,208 bytes. Original VM boot remains forbidden while the
+reusable clone overlay depends on its frozen guest/cloud backing files.
+
+### Serial rationale and release lifecycle proposal; no controller change
+
+`scene.same_scene` deliberately includes the observer serial; its only exception
+is the focused window's title. This guards against transient events whose final
+snapshots happen to agree. The exact enabled observer increments one shared
+counter for display focus/restack/grab/visibility/workarea/monitor events,
+workspace/session/overview/stage/shield events, tracked window lifecycle/
+geometry/property/raised events, actor properties and new tracking. It retains
+no event name or object attribution. Consequently v5 establishes the changed
+field and release phase, but does not establish the signal that changed it.
+
+Pinned [Mutter50.5 button handling](https://github.com/GNOME/mutter/blob/50.5/src/core/window.c#L7155)
+provides a concrete supported inference: an unmodified button press can raise its
+window when raise-on-click is enabled, and `meta_window_raise` emits `raised`
+unconditionally after the raise attempt. A read-only guest settings query found
+raise-on-click true; the enabled observer connects `raised` to `bump`. This can
+produce a serial change even when the final stacking/focus/geometry is equal.
+V5 did not record the signal origin, so this is not a proven native cause.
+The enabled-versus-packaged diff adds profiles, GNOME46 compatibility, parent
+session mode and unlisted-focus handling; on GNOME50 it leaves the watched bump
+signals unchanged. That packaging difference does not explain this failure.
+
+A proposed maintained candidate change must distinguish admission of new input
+from balancing input already owned by the pinned session. Keep fresh consumed
+scene/serial/point guards for motion and every press; keep complete nonpassword
+helper identity/focus/serial gates for each key press and character. Explicitly
+track per-session press intent, native-call-started, reply/unknown outcome and
+release-attempted state. Record release intent before its one RPC. Never clear a
+held record merely because a frontend reply arrived without the existing
+post-call owner/generation checks. Never replay a press, a release whose outcome
+is already unknown, or a Close on an uncertain previous dispatch.
+
+A release admitted under an unchanged scene remains ordinary dispatch. If
+serial, actual window/focus/geometry/covering topology/workspace/monitor, any
+lock/modal/overview/stage guard, native owner, cancellation or generation
+invalidates the action, preserve that first cause and stop all new presses.
+Balancing a held input must use only the original pinned session/unique owner,
+never a newly focused window or reattached connection. A bounded cleanup release
+is damage limitation and may itself trigger a click; it must never convert the
+failed action into success or authorize further characters. Retire helper/token,
+then dispose the original session. Owner loss, cancellation and an unknown
+release require closure of that original session, without a normal-input retry.
+
+The current code already takes the conservative terminal cleanup route here;
+the proposed accounting makes its outcome explicit rather than accepting a
+serial-only release. Pinned [Mutter50.5 session closure](https://github.com/GNOME/mutter/blob/50.5/src/backends/meta-remote-desktop-session.c#L453)
+drops the virtual devices, and its [native device destruction](https://github.com/GNOME/mutter/blob/50.5/src/backends/native/meta-virtual-input-device-native.c#L147)
+releases outstanding keys/buttons before removing the device. This supports
+original-session disposal after uncertain Notify; it is source evidence, not a
+tested target-specific cancellation guarantee. The frontend's asynchronous
+backend call still requires real buffer/callback/save checks.
+
+If allowing successful completion after a benign self-induced serial event is
+later proposed, equal current fields alone are insufficient: focus or lock can
+change away and back between reads. A reviewed bounded observer event-origin/
+serial-history contract must establish complete coverage without gaps, attribute
+the event to the owned operation/window and exclude those transitions. Until
+then preserve serial refusals. Future tests must cover serial-only release,
+focus away/back, window destruction/movement/coverage, lock/overview/workspace,
+owner/generation loss, press/release reply loss, release intent once, first-cause
+retention and original helper/session disposal. Source review precedes controller
+implementation; publication and a fresh owned-run authorization precede another
+action. Production GNOME input remains disabled and unqualified.
+
+## October 3 reviewed held-input ledger; source only
+
+The [held-input source checkpoint](../release/qualification/next-targets/20261003-fedora-gnome-held-input-ledger-source-only.json)
+is a separate source change after the observed v5 failure. It does not change
+v5's staged0ab controller or claim a fresh native run. Only candidate
+`GnomeControl.__init__/send/stop` and focused controller/probe tests changed;
+shared Portal/KDE, consent session, helper/observer, production service/discovery
+and the published input probe remain unchanged.
+
+The candidate now keeps a private ledger for admitted button/keycode/keysym
+presses. Each entry pins its original consent object, native session, chat
+owner, unique native owners and both controller/consent generations. Entry and
+press-start intent are retained before the original `Consent.call`; it includes
+existing pre/post owner checks, so an exception remains conservatively unknown.
+A normal release requires that exact entry and binding, and records release-start
+intent before the call. A verified return retires the hold. Duplicate presses,
+unowned releases, changed bindings and malformed input state never authorize a
+Notify. The existing complete helper/per-character/press checks and full
+scene/serial/point checks, including releases, are preserved.
+
+A guard exception now enters the maintained first-failure recorder before being
+re-thrown unchanged. Earlier native/observer/keyboard failures still win. The
+sender adds no guard Stop: the original action or existing helper/observer
+failure owns terminal cleanup. Source outcomes remain partial/unknown and
+non-retryable, and successful dispatch remains verified=false.
+
+Stop detaches the ledger along with the legacy action fields. Those legacy
+fields can include a key whose helper guard refused before RPC; they cannot
+authorize a cleanup release. Only a started press on the original still-pinned
+session whose release has never started can receive one bounded balancing
+release. Intent is set before that original1000ms/NO_AUTO_START/no-cancellable
+call, followed by original session disposal. A failed/unknown normal release
+makes the entire session **Close-only**, including any remaining chord modifiers:
+no other cleanup Notify is sent. This avoids duplicate release after reply loss;
+native device destruction handles outstanding input under the source contract
+cited above. Disposal is not proof of a target's native outcome. Stop never
+reattaches or targets a replacement owner/session. Repeated Stop sees detached
+state and cannot replay cleanup.
+
+The34 controller cases and48 probe cases pass; the combined focused suite has
+138 Python cases, independently repeated by the parent. The parent also repeats
+the five original observer Node cases from a separate clean365 source copy,
+excluding the concurrent observer candidate. Nine new
+controller cases exercise pre-call intent/pins, known reply retirement,
+unstarted legacy fields, duplicate/unowned input refusal, unknown ASCII release,
+unknown chord release, serial-only release refusal with one original balancing
+release, session/owner/generation mismatch, unique-owner mutation and actual
+native owner loss after the release RPC replies. The last case uses the real
+`ConsentSession.call` and verifies exactly one press, one release and one1000ms
+Close while preserving owner-check-changed as the Stop cause. Existing unknown
+press, helper cancellation/password/focus, first-error, cleanup order and GUI
+worker tests remain checked. Two probe cleanup fixtures now establish actual
+ledger-backed presses before asserting release tracing; an unrelated numeric
+substring privacy assertion was replaced with structured absence of input-code
+fields, avoiding elapsed-time digits causing a false failure.
+
+No VM/installed/selected/native payload, extension, session, timeout, consent,
+production flag or product UI was changed by this source check. Source review passes; publication still precedes any new candidate staging/execution. This ledger makes
+terminal cleanup explicit; it does not accept v5's serial-only release refusal.
+
+### Proposed redundant-raised observer contract; design only
+
+A fix must classify a redundant `raised` pulse inside the observer; the
+controller must continue comparing its full serial-bearing scene. Pinned
+[Mutter50.5 stack raise](https://github.com/GNOME/mutter/blob/50.5/src/core/stack.c#L247)
+returns without emitting stack changed when already at the maximum position;
+a real raise canonicalizes stacking before the changed signal. Window.raise
+then emits raised even for the no-op case. [GObject signal emission](https://docs.gtk.org/gobject/func.signal_emit.html)
+is synchronous. These establish a concrete ordering to inspect, not native proof
+that v5's event was redundant or that every supported profile has the same
+ordering.
+
+Proposed minimum internal contract: a successful unblocked Read retains epoch,
+serial, a monotonic non-raised-event barrier, exact focused tracked native
+window/actor identity and a canonical fingerprint of every current scene safety
+field except serial. Keep titles/application/field contents private; fingerprint
+comparison must not silently omit unknown fields. Also bind the bounded window
+actor inventory and tracking completeness for that read. The raised handler can
+consider only that same alive already-focused native window. It must build the
+same fingerprint synchronously and refuse suppression if any epoch/serial/
+barrier, guard, native identity, topology/workspace/monitor/order/geometry or
+tracked inventory changed, or if collection/tracking increments the serial.
+Absent/stale cache, unknown profile/state, bounds, reentrancy, read failure or
+counter overflow takes the ordinary invalidating bump path. It must never
+reset/decrement a serial or replace an observation in the controller.
+
+Every non-raised callback remains an unconditional serial/barrier increment and
+cache invalidation, even if its final fields happen to agree. Raised pulses that
+change any fingerprint field also invalidate. Thus a watched focus, lock,
+geometry, workspace or stage transition away and back cannot regain an old
+observation's serial. A later Read may cache the new serial, but the old consumed
+scene still fails. An actual or deferred restack callback invalidates regardless
+of the raised classification. Getter-triggered new tracking or nested callbacks
+must be detected by before/after serial/barrier checks; no main-context pumping,
+permission, portal RPC or native input belongs in that handler.
+
+A bounded event-origin record (latest128 plus overflow/gap marker and first
+invalidating event) should retain reason, object identity, serial/barrier and
+classification without titles/text. It enables the next owned run to establish
+whether the failure was `raised`, `restacked` or another event. Missing/gapped
+history cannot prove suppression. Source tests must execute actual extension
+handlers: redundant same-window raised, actual stack/geometry/guard/inventory
+change, nonfocused/dead/untracked window, focus/lock/geometry away-back, new
+tracking/reentrancy, delayed restack, missing baseline, overflow/gap, collection
+failure and profile refusal. Preserve signal registration/disposal and all
+ordinary non-raised event increments.
+
+This is proposed classification within the existing approved check-then-dispatch
+coverage. It must not claim complete painted actor composition, native event
+history beyond subscribed signals, or compositor-atomic input; keep
+completeActorCompositionTracking=false. The current snapshot omits hidden actors
+from the visible window list, so a fingerprint of only that list is insufficient
+for the proposed inventory guarantee. Exact private inventory fields and their
+profile APIs/order still need source review; unknown collection must refuse
+suppression. Review each pinned46/48/49/50 profile before supporting it, or keep
+unreviewed profiles on their existing unconditional raised bump behavior. No
+observer implementation, installed extension replacement/restart, serial
+relaxation or native action is authorized by this design section.

@@ -1,0 +1,94 @@
+{
+  "format": "augmentor-arch-real-alpm-synthetic-payload-proof/1",
+  "target": "arch20261001-x86_64",
+  "source": {
+    "commit": "daf35a3994193b9bc9d4f1aefe74bb7268eb2201",
+    "dirty": false
+  },
+  "proofSha256": "d168cb3679f18d703c0b85f2a48b48d32544c158dbca27ed0fd45b6083f2cca3",
+  "guardSha256": "4bb8a18a41e68a98c5f7816940f8e55bfa2f1a66e5d34ca42cfcb4155c7a9947",
+  "guardPackageSha256": "4410ff6d89910cc83b16b580fd98c5747e518a3138eb46bffd5d5d49b0d23936",
+  "guardIdentity": "augmentor-package-guard 0.2.13-2",
+  "syntheticPayloadArchives": {
+    "augmentor-agent-0.2.13-1-x86_64.pkg.tar.zst": "2ccbcf7624597e8adde276194372de1238b4c02808d735839dc289c005f6559f",
+    "augmentor-agent-0.2.13-2-x86_64.pkg.tar.zst": "7f2e64b3c3b4993fa037e94855c3df973093d4cf97a14fa3c59197b5523973af"
+  },
+  "separateGuardBootstrapTested": true,
+  "firstInstallTested": true,
+  "reinstallTested": true,
+  "activeLeaseRefusals": [
+    {
+      "component": "runtime",
+      "uid": 1000,
+      "operation": "upgrade",
+      "refused": true,
+      "payloadUnchanged": true
+    },
+    {
+      "component": "runtime",
+      "uid": 1000,
+      "operation": "remove",
+      "refused": true,
+      "payloadUnchanged": true
+    },
+    {
+      "component": "desktop",
+      "uid": 1001,
+      "operation": "upgrade",
+      "refused": true,
+      "payloadUnchanged": true
+    },
+    {
+      "component": "desktop",
+      "uid": 1001,
+      "operation": "remove",
+      "refused": true,
+      "payloadUnchanged": true
+    }
+  ],
+  "jointMultiuserLeaseRefusalTested": true,
+  "guardRemovalRefusedWhileAppRegistered": true,
+  "laterPreHookAbortRetainedDurableIntent": true,
+  "lostVolatileMirrorsSimulationStartupRefused": true,
+  "verifiedUnchangedOldRecoveryTested": true,
+  "upgradeTested": true,
+  "downgradeTested": true,
+  "inventoryFailureRetainedDurableIntent": true,
+  "inventoryFailurePacmanExitCode": 0,
+  "unverifiedNewStateRefused": true,
+  "verifiedSyntheticInjectionRemovalAndCompletionTested": true,
+  "applicationRemovalTested": true,
+  "separateGuardRemovalTested": true,
+  "realPackageManagerUsed": "pacman/libalpm",
+  "locallyBuiltPackagesUnsigned": true,
+  "payloadScope": "synthetic receipts and text only; no application",
+  "fullApplicationPayloadTested": false,
+  "realMultiuserApplicationTested": false,
+  "realInterruptedRebootTested": false,
+  "realDesktopTested": false,
+  "browserTested": false,
+  "physicalAudioTested": false,
+  "publicReleaseQualified": false,
+  "ownerStateChanged": false,
+  "workingRecipeSha256": {
+    "release/arch/guard/PKGBUILD": "669ccea76cc62e1472534a64d3cf7067f4a892d61ac0e5ec25fed5a5b025b5bd",
+    "release/arch/guard/augmentor-agent-post.hook": "32d4f0bc7e35326f4f607ee2945026bfa92c69ca4d0d76cc6030419fbf2e9492",
+    "release/arch/guard/augmentor-agent-pre.hook": "c1de487776ee57f6d748a9c73286dccfe1cc835ce5d6dbb08bdfe11a3b6f5831",
+    "release/arch/guard/augmentor-guard-remove.hook": "2e33a6a9eef250a485fba920dd77791c1cc5fa593f4ffcc19a8f64d2217f81bb",
+    "release/arch/guard/can-remove.py": "286559616f9b794573964b8125d85c8c8aaf6050d2459e3c6a635b69009911ab"
+  },
+  "privateReportSha256": "13bac77bbaaa17ee85d5d8bbedf6f22bfda1a06ef17d1cc3891eb77e0a82036c",
+  "privateEvidenceSha256": {
+    "real-alpm-synthetic-proof.log": "68594cc5e2cdc32ce75f773955838e41705fd1bf865c098701c4a0690ca3e4b4",
+    "guard-v2-makepkg.log": "f6f8f524375d37776dbd46fb81b4ffcc54eca9536b7b53aaa076b21063dd8985",
+    "real-alpm-first-build-failure.log": "d2b73bc7c5bdec5e4a99ae71af2c537324c1b8e583670de62ec93eb240715d07",
+    "real-alpm-second-build-failure.log": "9a3ff0a3aa72a2d96e869edbbb2a544294b810bf3f08ae2eedd2b269d943d54a",
+    "real-alpm-third-driver-failure.log": "27fa72274a5639b89c4526e209ab670aff17f6b362a9ee75723994144fc311bf",
+    "guard-third-proof-verified-cleanup.log": "40bcd2fefdf383836c2ac62cb55a44c9a32d1e583c1dcee0472b169fb076317e"
+  },
+  "driverFailuresRetained": [
+    "Missing synthetic package dependency before guard bootstrap (makepkg refused before any app installation).",
+    "Fixture archive path construction TypeError after successful makepkg (guard removed normally before retry).",
+    "Fixture lease import path too shallow after deliberate later-hook abort (verified old recovery and ordinary removals before retry)."
+  ]
+}

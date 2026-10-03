@@ -1,17 +1,19 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // Shared personal-agent tools in both Augmentor surfaces. Use the same executor as Pi.
+import {desktopCapabilities} from '../../dist/desktop/src/capabilities.js'
 import {definitions,control} from '../../dist/desktop/src/index.js'
 import {applyBrowserPolicy} from './browser-policy.mjs'
 import {applyResponsiveSteering} from './steering.mjs'
 import {applyLinuxSupport} from './linux-support.mjs'
 export const name='augmentor-desktop'
 export const inject=['tools','llm','attachments']
-export function apply(ctx){
+export function apply(ctx){return applyWithCapabilities(ctx,desktopCapabilities())}
+export function applyWithCapabilities(ctx,capabilities){
   applyBrowserPolicy(ctx)
   applyResponsiveSteering(ctx)
   applyLinuxSupport(ctx)
   const owners=new Set()
-  for(const d of definitions)ctx.tools.register({name:d.name,description:d.description,parameters:d.parameters,
+  for(const d of definitions.filter(d=>d.method==='stop'||capabilities.available))ctx.tools.register({name:d.name,description:d.description,parameters:d.parameters,
     output:{schema:{type:'object'},render:(_args,value)=>value.content},
     execute:async(args,exec)=>{
       const id=exec.agent?.id;if(!id)throw Error('Desktop control requires an active Augmentor conversation.')

@@ -57,11 +57,16 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
  await t.test('protocol rejects incompatible clients and keeps socket private',async()=>{await assert.rejects(Client.open(join(state,'runtime.sock'),'wrong'),/Incompatible/);assert.equal(statSync(join(state,'runtime.sock')).mode&0o777,0o600);});
  await t.test('catalog pins use the native picker contract and missing models never fall back',async()=>{await client.call('models.pin',{...selection,pinned:true});const catalog=await client.call('models.list');assert.deepEqual(catalog.pinned,['test/test']);assert.equal(catalog.groups.find(g=>g.provider==='test').models[0].location,'Local');await assert.rejects(client.call('models.validate',{...selection,model:'missing'}),/unavailable/);assert.equal(requests,0);});
  await t.test('stream, persist, history, rename, save and repeat request deduplication',async()=>{await create('basic');const id=randomUUID();await prompt('basic','hello',id);await idle('basic');assert(client.events.some(e=>e.payload?.event?.type==='assistant/chunk'));const before=requests;await prompt('basic','hello',id);assert.equal(requests,before);await client.call('session.rename',{sessionId:'basic',title:'Renamed'});await client.call('chats.saved',{sessionId:'basic',action:'save'});const row=(await client.call('session.list')).items.find(m=>m.sessionId==='basic');assert.equal(row.title,'Renamed');assert(row.saved);const history=await client.call('session.history',{sessionId:'basic'});assert(history.events.some(e=>e.event.type==='assistant/message'));});
- await t.test('desktop specialist is advertised by Linux Pi and refuses a text-only route before worker inference',async()=>{
+ await t.test('desktop specialist follows backend availability and refuses ineligible routes without worker inference',async()=>{
   const description=await client.call('host.describe');assert.equal(description.desktopSpecialist.version,'augmentor-computer-use/1');assert.equal(description.desktopSpecialist.coreIntegration,false);
   await create('delegation-eligibility');const before=requests;await prompt('delegation-eligibility','DELEGATE_TEST');await idle('delegation-eligibility');
   const history=await client.call('session.history',{sessionId:'delegation-eligibility'});
-  assert(history.events.some(({event})=>event.type==='tool/result'&&event.data.name==='desktop_delegate'&&event.data.isError&&JSON.stringify(event.data).includes('image input')));
+  assert(history.events.some(({event})=>event.type==='tool/result'&&event.data.name==='desktop_delegate'&&event.data.isError));
+  if(description.desktopSpecialist.available)assert(JSON.stringify(history).includes('image input'));
+  else{
+    assert.equal(description.capabilities.desktopInput,false);
+    assert(received.slice(before).every(request=>!request.tools.some(tool=>tool.function.name==='desktop_delegate')),'An unavailable desktop worker was advertised');
+  }
   assert.equal(requests-before,2,'Only coordinator requests should run for an ineligible model');
  });
  await t.test('browser sessions use the SDK browser tools and only their attached executor can answer',async()=>{

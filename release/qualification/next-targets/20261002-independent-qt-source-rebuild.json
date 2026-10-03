@@ -1,0 +1,95 @@
+{
+  "format": "augmentor-independent-source-build-comparison/1",
+  "sourceArchivesAndRecipeIdentical": true,
+  "producerIntermediateBinariesReused": false,
+  "qtElfFiles": 207,
+  "qtElfPayloadsDifferent": [
+    "lib/libQt6QmlModels.so.6.8.2",
+    "lib/libQt6QuickControls2FluentWinUI3StyleImpl.so.6.8.2",
+    "lib/libQt6QmlXmlListModel.so.6.8.2",
+    "lib/libQt6QmlCore.so.6.8.2",
+    "lib/libQt6QuickDialogs2QuickImpl.so.6.8.2",
+    "lib/libQt6QuickShapes.so.6.8.2",
+    "lib/libQt6QmlNetwork.so.6.8.2",
+    "lib/libQt6Quick.so.6.8.2",
+    "lib/libQt6QuickControls2Basic.so.6.8.2",
+    "lib/libQt6QuickControls2FusionStyleImpl.so.6.8.2",
+    "lib/libQt6QuickControls2UniversalStyleImpl.so.6.8.2",
+    "lib/libQt6LabsFolderListModel.so.6.8.2",
+    "lib/libQt6QuickLayouts.so.6.8.2",
+    "lib/libQt6QuickControls2ImagineStyleImpl.so.6.8.2",
+    "lib/libQt6QuickControls2Fusion.so.6.8.2",
+    "lib/libQt6LabsAnimation.so.6.8.2",
+    "lib/libQt6QuickControls2Impl.so.6.8.2",
+    "lib/libQt6QuickControls2BasicStyleImpl.so.6.8.2",
+    "lib/libQt6QmlMeta.so.6.8.2",
+    "lib/libQt6QuickControls2Universal.so.6.8.2",
+    "lib/libQt6QmlLocalStorage.so.6.8.2",
+    "lib/libQt6LabsSharedImage.so.6.8.2",
+    "lib/libQt6QuickVectorImage.so.6.8.2",
+    "lib/libQt6QmlWorkerScript.so.6.8.2",
+    "lib/libQt6QuickParticles.so.6.8.2",
+    "lib/libQt6QuickControls2Material.so.6.8.2",
+    "lib/libQt6QuickControls2.so.6.8.2",
+    "lib/libQt6Qml.so.6.8.2",
+    "lib/libQt6QuickTemplates2.so.6.8.2",
+    "lib/libQt6QuickTest.so.6.8.2",
+    "lib/libQt6LabsWavefrontMesh.so.6.8.2",
+    "lib/libQt6QuickControls2Imagine.so.6.8.2",
+    "lib/libQt6QuickEffects.so.6.8.2",
+    "lib/libQt6LabsPlatform.so.6.8.2",
+    "lib/libQt6LabsQmlModels.so.6.8.2",
+    "lib/libQt6QmlCompiler.so.6.8.2",
+    "lib/libQt6QuickControls2MaterialStyleImpl.so.6.8.2",
+    "lib/libQt6QuickDialogs2.so.6.8.2",
+    "lib/libQt6LabsSettings.so.6.8.2",
+    "bin/qml",
+    "bin/qmltime",
+    "qml/QtQuick/NativeStyle/libqtquickcontrols2nativestyleplugin.so",
+    "qml/QtQuick/Window/libquickwindowplugin.so",
+    "qml/QtQuick/tooling/libquicktoolingplugin.so",
+    "qml/QtQuick/Controls/FluentWinUI3/libqtquickcontrols2fluentwinui3styleplugin.so",
+    "qml/Qt/test/controls/libquickcontrolstestutilsprivateplugin.so"
+  ],
+  "wheels": [
+    {
+      "file": "shiboken6_generator-6.8.2.1-6.8.2-cp37-abi3-manylinux_2_39_x86_64.whl",
+      "producerSha256": "dd70b6c252f3194c12a73d78d57b79f02b4a9800042d1cc2f7f5559ba5da7eb4",
+      "rebuiltSha256": "7f67340592af9360cb09d81fe4e33545632ccb19645aedb41b194113f93272fd",
+      "memberCount": 45,
+      "differentMemberPayloads": [
+        "shiboken6_generator/_config.py",
+        "shiboken6_generator-6.8.2.1.dist-info/RECORD"
+      ]
+    },
+    {
+      "file": "PySide6-6.8.2.1-6.8.2-cp37-abi3-manylinux_2_39_x86_64.whl",
+      "producerSha256": "fa2562ceee1e9af89a805876a52f6872be8d0792b7f41be43937051ea94a580b",
+      "rebuiltSha256": "c4475e59db45434c9990ae02b308d8cdb08f225eb40e9dc9279c7e5c0044e5f8",
+      "memberCount": 360,
+      "differentMemberPayloads": [
+        "PySide6/_config.py",
+        "PySide6/support/__pycache__/__init__.cpython-312.pyc",
+        "PySide6/support/__pycache__/deprecated.cpython-312.pyc",
+        "PySide6-6.8.2.1.dist-info/RECORD"
+      ]
+    },
+    {
+      "file": "shiboken6-6.8.2.1-6.8.2-cp37-abi3-manylinux_2_39_x86_64.whl",
+      "producerSha256": "aa0309c680f1ea3ef445a3bce8177ebfea7825008b9761763d434ff44ecec5db",
+      "rebuiltSha256": "75511cc1381aac891217da376ef899f9fd14423626ea2e60b2b6de7f862437d7",
+      "memberCount": 11,
+      "differentMemberPayloads": [
+        "shiboken6/_config.py",
+        "shiboken6-6.8.2.1.dist-info/RECORD"
+      ]
+    }
+  ],
+  "binaryReproducibilityRequiredForFunctionalRebuild": false,
+  "sourceBase": "40de37b72d03fef1bdf75a2a55d2dc4302a5f734",
+  "independentAllElevenImportsPassed": true,
+  "independentImportLogSha256": "1d0e8690e74f962a2761f4bc3ccff87f9b9489073bd8ac72270f1115135503a7",
+  "independentImportScriptSha256": "998b4e6c32a8a298a7c0fd72f32874e29d04c7a926bf9037d574929e4978bf98",
+  "bitForBitReproducible": false,
+  "fullRecipientSourceKitQualified": false
+}

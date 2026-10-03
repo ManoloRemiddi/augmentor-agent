@@ -1,6 +1,44 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 clean2035 builds and Ubuntu managed adoption
+
+[The artifact/adoption checkpoint](../release/qualification/next-targets/20261003-clean2035-artifacts-noble-managed-adoption.json)
+records exact clean2035 Mint/Fedora native packages, Browser ZIP and complete
+bundles. Their clean builds pass; fresh installed acceptance is separate. Linux,
+macOS and Windows Desktop hosted2035 runs pass; full Windows is still running.
+Ubuntu's clean368 source-Qt preparation passes in57.20seconds after normal APT
+admission of only two missing declared libraries. Its older canonical updater
+then refused staging for a missing Qt library path. A normal maintained helper
+refresh preserves selection/window; its outer post-verification timed out and
+is retained as such. Read-only checks confirm refreshed helper bytes and no
+remaining refresh process. Canonical staging subsequently passes in124.04seconds
+without selecting the candidate. Activation then passes, verifies the complete
+inventory and retains the old selection and old running window. Cold launch,
+actual Settings, normal shortcuts and password-lock/reboot acceptance remain
+open. No selected payload was patched; no binary release is claimed.
+
+
+The new [Noble source-runtime contract](LINUX-SOURCE-RUNTIME-ENTRYPOINTS.md) verifies
+the finite native Qt payload before cold launch, supplies its library/plugin/QML
+paths before exec, and preserves/validates those inputs during staging. Its owned
+offscreen entrypoint/rollback proof passes; installed complete-product and native
+desktop-session acceptance remain open. Vendor/system profile identities remain separate.
+
 # Consistent installed desktop releases
+
+## October 2 source shell bootstrap correction
+
+`scripts/augmentor-linux` now uses the system Python3.13 bootstrap when the generic
+alias is absent, then runs the same strict declared-runtime resolver. It does not
+retry or bypass policy/inventory refusal. The actual source shell entrypoint,
+selected runtime and wrong-interpreter refusal pass in owned Arch/Leap containers,
+as do six startup regressions on each. The
+[checked report](../release/qualification/next-targets/20261002-source-shell-bootstrap.json)
+distinguishes current Leap's alias, added by signed rpm-build dependencies, from
+the explicit temporary-hide synthetic test; the original alias was restored.
+Existing per-user service/secondary/update wrapper checks also pass. No full
+product/menu/graphical acceptance or installed update is claimed. The selected
+owner and Noble/Fedora desktop artifacts remain unchanged.
 
 ## October 1: browser evidence recovery
 
@@ -83,6 +121,24 @@ installs `augmentor-update`. Once a managed release is selected, the installer
 refuses to replace it with another root or interpreter: use the update command.
 Installer and updater share a kernel lock so simultaneous promotions cannot race.
 
+Canonical wrappers and the user service use the declared runtime policy's base
+interpreter as `bootstrapPython`; deployments without a policy use the installing
+interpreter's base executable. The separately selected Python environment is
+preserved when starting the app. No `/usr/bin/python3` alias is required on Leap
+16, whose reviewed runtime uses `/usr/bin/python3.13`. A missing bootstrap is
+refused before startup state is created. The
+[actual Arch/Leap interpreter proof](../release/qualification/next-targets/20261002-startup-interpreters.json)
+executes the generated service command, secondary wrapper and updater in private
+synthetic application fixtures. It does not enable a service or qualify graphical
+login, recovery connection or package installation.
+
+Next distro candidate source also retains `linux-package.json` in managed
+inventories and checks its explicit target/manager, product/source and full
+registered version-release. The
+[transaction contract](LINUX-PACKAGE-TRANSACTIONS.md) describes persistent
+maintenance fencing and remaining real RPM/ALPM acceptance; these targets are
+not yet enabled in the complete installer matrix.
+
 ## Required development and update workflow
 
 The October 2 [embedded Handy adoption](HANDY-INTEGRATION.md#owners-installed-adoption--2-october-2026)
@@ -130,11 +186,37 @@ broader cross-platform installer acceptance remains separate.
 The stage operation copies the native surface, services, adapters, built runtime,
 configuration defaults, licenses, scripts and dependencies into a unique release
 folder. It does not copy an entire checkout or user conversations/configuration.
+Fedora artifacts also retain `fedora-package.json` in the immutable inventory,
+so startup selects RPM package-state checks. The
+[October 2 isolated Fedora update proof](LINUX-DISTRO-ROLLOUT.md#fedora-managed-adoption-and-metadata-staging-correction)
+reproduces the previous omission, verifies canonical rollback and qualifies the
+corrected stage using an actual runtime lease before adoption. Its app payload
+and separately refreshed canonical updater are recorded independently; this is
+fixture evidence, not an update of the owner's selected desktop.
 It imports the actual Qt window/controller and checks the Node executable. Its
 inventory hashes every regular artifact file and records internal symlinks;
 external symlinks are refused because they could silently change a release.
 Python bytecode caches are excluded. Python and an external Node runtime remain
 explicit external dependencies and must be upgraded deliberately with validation.
+
+For a Linux artifact declaring `linux-python-runtime.json`, staging selects the
+runtime belonging to that candidate's policy rather than inheriting a previous
+profile. The policy is retained in the immutable artifact inventory.
+
+The Noble package and complete bundle also declare the policy file hash and lock
+identity in `pythonRuntime`. Setup checks both against the installed payload;
+even a completed installation receipt cannot bypass runtime verification.
+The package contains verified wheels, never a build-machine environment. This
+does not qualify coordinated DSH/runtime updates or clear release review gates.
+
+Setup, startup registration, cold launch and promotion verify the external environment's
+complete receipt/files/imports. The environment stays at its original private
+path; it is never copied, renamed or upgraded in place. Rollback retains both
+environments. Active Node helpers use receipt/configuration validation without
+blocking their event loop on Python imports. The
+[Noble selection proof](LINUX-DISTRO-ROLLOUT.md#noble-runtime-selection-and-cpu-vad)
+qualifies this in an offline ordinary-user container; actual Noble package/DSH
+service upgrade coordination and full desktop acceptance remain open.
 
 Promotion verifies the complete staged inventory, repeats import checks and,
 for this registered DSH installation, verifies the candidate's authenticated

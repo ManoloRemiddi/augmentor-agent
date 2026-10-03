@@ -1,0 +1,1087 @@
+{
+  "schema": "augmentor-mint-installed-setup-proof-checkpoint/1",
+  "date": "2026-10-03",
+  "candidateOnly": true,
+  "customerDistribution": false,
+  "source": {
+    "commit": "2035af99b46bb013e81de9766216da820ab4a325",
+    "dirty": false
+  },
+  "artifactId": "0.2.13-linuxmint22.3-amd64-complete-preview.1-2035af99b46b",
+  "bundleManifestSha256": "99db0336c2b266b502ed58d6ee5a87fcbd7a4b55b3e87a0f6931c691660ce13e",
+  "setupScriptSha256": "d3c2a93b344115a9859edb9855c0b137c9602b9471831d39a4e966d9bcc784f2",
+  "originalPublicProofSha256": "7327e2e6cb8b6f81e3782297998218f0afa8803b7cf88b4af75bb26e14b84fcf",
+  "ownedFixture": {
+    "name": "augmentor-mint223-cinnamon-iso",
+    "qemuPid": 2494740,
+    "sshPort": 22493,
+    "hostname": "augmentor-mint223-iso",
+    "marker": "Isolated Augmentor Linux Mint 22.3 Cinnamon ISO qualification VM\n",
+    "root": "/dev/vda2 ext4",
+    "ISOdetached": true,
+    "noHostDevicesOrMounts": true,
+    "freshUser": "augmentor-complete-proof",
+    "uid": 1001,
+    "privateHome": true,
+    "passwordLocked": true,
+    "adminGroups": false
+  },
+  "native": {
+    "signedRepositoriesVerified": true,
+    "gpgvStatusZeroCount": 5,
+    "reinstalledPackages": 2,
+    "dependencyUpgrades": 0,
+    "removedPackages": 0,
+    "nativeSourceMatchesBundle": true,
+    "dpkgAuditVerifyClean": true,
+    "runtimeContract": {
+      "format": "augmentor-linux-python-runtime-contract/1",
+      "target": "linuxmint22.3-amd64",
+      "profile": "mint223-cp312-x86_64-source-qt-voice",
+      "pythonAbi": [
+        3,
+        12
+      ],
+      "architecture": "x86_64",
+      "lockIdentity": "1288cb482b8db727b8cdf349a97cbcd4473a44fe6945862a1ac141d4a8b86c9a",
+      "policySha256": "2dc64e6d1c02579970a61cb0b200c79c8a36d84aa54e021dcb1cfafa9b3f2f16",
+      "licenseReviewComplete": false,
+      "embeddedSourceCoverageComplete": false,
+      "sourceQt": {
+        "format": "augmentor-source-qt-runtime-input/1",
+        "directory": "source-qt",
+        "qtVersion": "6.8.2",
+        "manifestSha256": "c49faf50a992daca825c51929715c6114017e6b29ac54af17f9656db41e73364",
+        "derivationReceipt": {
+          "file": "source-pyside-derivation.json",
+          "sha256": "de6edc207b0ce7279de6972b5694d3063161f4fd9c46b865245ca0c471d2990c",
+          "bytes": 1063
+        }
+      }
+    },
+    "unchangedPackages": {
+      "cinnamon": "6.6.4+zena",
+      "muffin": "6.6.1+zena",
+      "screensaver": "6.6.1+zena",
+      "libc": "2.39-0ubuntu8.6",
+      "pipewire": "1.0.5-1ubuntu3.2"
+    },
+    "python312Package": "3.12.3-1ubuntu0.17"
+  },
+  "originalExecution": {
+    "setup": "pass",
+    "installedReceipt": {
+      "bundle": "0.2.13-linuxmint22.3-amd64-complete-preview.1-2035af99b46b",
+      "status": "installed",
+      "desktop": true,
+      "browserExtension": "/home/augmentor-complete-proof/.local/share/augmentor/browser/0.2.13",
+      "target": "linuxmint22.3-amd64",
+      "system": null,
+      "browserAction": "Load this folder once in chrome://extensions (Developer mode).",
+      "voice": "plugin installed; speech engine setup deferred",
+      "memory": "adapter installed; memory engine setup deferred",
+      "model": "configured; verify a reply before relying on this setup"
+    },
+    "selectedPython": "/home/augmentor-complete-proof/.local/share/augmentor/python-runtimes/mint223-cp312-x86_64-source-qt-voice-1288cb482b8db727/bin/python3",
+    "fullProof": "fail",
+    "failurePhase": "direct offscreen preview invocation after completed installer",
+    "failure": "ImportError: libQt6Core.so.6: cannot open shared object file: No such file or directory",
+    "connectedRuntime60SecondChecksReached": false,
+    "installerOverlayUsed": false,
+    "setupTimeoutOverrideUsed": false,
+    "noServicesEnabled": true,
+    "noPhysicalModelsDevicesInput": true
+  },
+  "readOnlyAudit": {
+    "ownedSetupRuntimeProcessesIdle": true,
+    "runtimeResolveSeconds": 12.373354557996208,
+    "immutableSelectedRuntimeVerified": true,
+    "productionEnvironmentImports": {
+      "Qt": "6.8.2",
+      "PySide6": "6.8.2.1",
+      "mappedQtLibraryCount": 4
+    },
+    "nativeAuditClean": true,
+    "setupReplayed": false,
+    "oldUid1000TenFileHashesPreserved": true,
+    "privateDiagnosticTypeErrorCorrected": true,
+    "selectedDesktopDshService": "augmentor-dsh.service"
+  },
+  "maintainedCorrection": {
+    "implemented": true,
+    "executedInVM": true,
+    "path": "release/prove-complete-linux.py",
+    "sha256": "a1342ea000108c40c8138ca3439fb4eb6c2302c266af503401e500e2c250b766",
+    "delegatesToVerifiedInstalledRuntimeEnvironment": true,
+    "workerEnvironmentInherited": true,
+    "defaultNativeLoaderPreserved": true,
+    "public60SecondBoundsUnchanged": true,
+    "focusedTests": {
+      "cases": 6,
+      "pass": true,
+      "realChildElfLoader": true
+    },
+    "executedSha256": "a1342ea000108c40c8138ca3439fb4eb6c2302c266af503401e500e2c250b766",
+    "currentSha256": "36cdc46d6eb910b113ed9acb86fd0c68b84e350dbedcfe3b6139d0438dea7545"
+  },
+  "repeatRoute": {
+    "sameArtifactSetupIdempotent": true,
+    "fullFreshProofRepeatSafeForSavedEndpoints": false,
+    "reason": "A fresh proof allocates new model/DSH ports while completed setup preserves the old saved settings.",
+    "next": "Explicit bounded maintained post-install proof bound to existing synthetic endpoints; no setup replay or artifact adoption."
+  },
+  "releaseGates": {
+    "fullConnectedProduct": false,
+    "graphicalDesktopBrowser": false,
+    "CinnamonShortcutsLockReboot": false,
+    "physicalAudio": false,
+    "licenseReviewComplete": false,
+    "embeddedSourceCoverageComplete": false
+  },
+  "privateEvidence": {
+    "outputs/linux-rollout/mint-fresh-account2035/account-created-after-idle-refusal.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/account-created-after-idle-refusal.stdout": {
+      "sha256": "88bce0bb446e8182d81294593080544ee7cc1eaac585875e3fa25570b9b537bf",
+      "bytes": 4996
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/account-created.stderr": {
+      "sha256": "b01e93eed37164a7fa81dff68fb8fc1ef31c27f211dd405db32c91c4536a0bba",
+      "bytes": 507
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/account-created.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/account-creation-probe-root-process-read.py": {
+      "sha256": "f5eea6808150abeee20b7a8107a366cd48eaa47c1d4a0b0fdaecd840991ca2d1",
+      "bytes": 6369
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/account-creation-probe.py": {
+      "sha256": "8b08443067d5099acff07f001c0f448f7b470edd1f73b36eb007725117db706b",
+      "bytes": 6295
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/artifact-user-binding.json": {
+      "sha256": "236cb44c974aa5293927f8248750ebb9740b423a31de4b2e7017fd2c2751c2fa",
+      "bytes": 1678
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/artifact-user-proof-wrapper.py": {
+      "sha256": "79e864ff74829af3ebed2e8c85607854bf6f60bc168733827703a5edf0eccd5c",
+      "bytes": 13170
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/bound-user-proof.py": {
+      "sha256": "0d6c73fb668e558153daebb7796b7bb273b58e648e7c0e8dcfb802d13e88be89",
+      "bytes": 3289
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/live-progress.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/live-progress.stdout": {
+      "sha256": "87a14c520ecc941cbaf1289b426a5a1fdd8c7445bd527d2a0d72971c5b245a0e",
+      "bytes": 593
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/native-apt-plan-guest.py": {
+      "sha256": "44461841ab988f7a59115711cb6ad9cd6b6e82641e79af806c333d2c5cad4c75",
+      "bytes": 8202
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/native-apt-plan.stderr": {
+      "sha256": "570a29c0683d090e0bb15eda7fd8aa4a230739ae93902cc35dec508a94d279b5",
+      "bytes": 5113
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/native-apt-plan.stdout": {
+      "sha256": "2a94d2d2b3739c5f9febcbdb5a8180bc104c6ace2e64666d2a9693b0143d4b89",
+      "bytes": 819
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/native-apt-reinstall-guest.py": {
+      "sha256": "7759cf9acb5a78fa79115d2ead3cff8c8d2d749a4c5865f46818a3e9a5d93160",
+      "bytes": 8797
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/native-apt-reinstall.stderr": {
+      "sha256": "138c614516af04ea74c90a832bb74a29436139717a6e2869c8eb242a89bbbb9a",
+      "bytes": 401
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/native-apt-reinstall.stdout": {
+      "sha256": "a0b4c52b524a42a2700feacc1ea6d434490cbe8838e9935ccd7c3a0eb41af37b",
+      "bytes": 3641
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/old-state-after-public-proof.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/old-state-after-public-proof.stdout": {
+      "sha256": "26df5dba7508edf8da34ca7baa2ea52b330478ccf2b30171194ee9bc8a65b710",
+      "bytes": 49
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/old-state-before-public-proof.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/old-state-before-public-proof.stdout": {
+      "sha256": "26df5dba7508edf8da34ca7baa2ea52b330478ccf2b30171194ee9bc8a65b710",
+      "bytes": 49
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/ordinary-account-readback.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/ordinary-account-readback.stdout": {
+      "sha256": "37a40a22b5f27c7a4b5d712d6accd519182da0aaf016e58a44831df6ce77e3da",
+      "bytes": 235
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/owned-process-idle.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/owned-process-idle.stdout": {
+      "sha256": "a44d353190a835e8568387a7346fc0de8bd531a96da7e0066676649094cf4eba",
+      "bytes": 66
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-install-audit-corrected-guest.py": {
+      "sha256": "4a0e9e569666656f068c8ac5674a3888523bc20c070acdc7ef82f1f03e1a2b27",
+      "bytes": 3901
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-install-audit-corrected.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-install-audit-corrected.stdout": {
+      "sha256": "05a8f73869e62bce19c61a998550bbc7681abc87d81b339d47a139d58d102a2c",
+      "bytes": 3052
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-install-audit-guest.py": {
+      "sha256": "98d07f86c1003526dd3d6e728a118f871a9de84dfc9721999b9457001c12407a",
+      "bytes": 3754
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-install-audit.stderr": {
+      "sha256": "4eb5d4c476c731c5d077d1c3f5d9be30a8e1bc8609bd610a2109aac460ce8aec",
+      "bytes": 218
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-install-audit.stdout": {
+      "sha256": "a44d353190a835e8568387a7346fc0de8bd531a96da7e0066676649094cf4eba",
+      "bytes": 66
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/public-proof-exact-source.py": {
+      "sha256": "7327e2e6cb8b6f81e3782297998218f0afa8803b7cf88b4af75bb26e14b84fcf",
+      "bytes": 13625
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/report.json": {
+      "sha256": "e69be7c5a5cce40425c81a7d5ffdf0570f1dbebd7d5ea04544d94d6c09423d88",
+      "bytes": 1641
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/stage-and-native.py": {
+      "sha256": "a3b458c1516aed1fea44d3c35ead1094ad4ad894611a3fa5c06bab4182d6f0f7",
+      "bytes": 8564
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/stage-guest.py": {
+      "sha256": "14c2965ebf6a2fb39d901350aa003bffa17eae00551290da42e2376c9d625741",
+      "bytes": 16179
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/stage.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/stage.stdout": {
+      "sha256": "899f21047163b2d15773c01bee19643f62d8d139004245634a98635f716bae5c",
+      "bytes": 672
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/user-proof.stderr": {
+      "sha256": "1befbb09635bcabf17779e0778744de451133705002b1ff90b49791ae964197a",
+      "bytes": 2012
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/user-proof.stdout": {
+      "sha256": "ce7354e2bd15680b0fc8af9901332be6145cb8a49bbf8c27630068ee368a8102",
+      "bytes": 3232
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-run-host.json": {
+      "sha256": "88eb8736851bc78e6235d334b1a9a8560c82b1f51ca7b5c417aff422d4f265ad",
+      "bytes": 606
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-install-fixture-planned.json": {
+      "sha256": "e0eeee708ef6fd48472b32244c68847138036bc0a0245275a365720cc53669b8",
+      "bytes": 1508
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-readback-raw.stdout": {
+      "sha256": "3f89e45cfa71e55260a6914868a1443ebc9c602829d2907d3d5f22671b1d6ac6",
+      "bytes": 27719
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-old-account-finally.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-install-endpoint-research.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-current-preflight.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-readback.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-readback-initial-parser-refusal.json": {
+      "sha256": "2f82f6083e32f54f68ea190b13f3c723c92a2110fc46c8034ceeb5cff1b72481",
+      "bytes": 160
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-run-authorized.py": {
+      "sha256": "7bdbeebb164eecc56dd00e82cf773f52037d9eba8f6065f765401517160f3388",
+      "bytes": 5860
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-layered-env-source-research.json": {
+      "sha256": "bc685d4b6c953eea370e6bd525f2f107bcdc02e57290c91e69ef4c4438e360c2",
+      "bytes": 10228
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-cli-source-research.json": {
+      "sha256": "ab40f0c66ffcfd83677bb8274738c815216a9a737aac9a619300dfbf1aaf25af",
+      "bytes": 3944
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-install-endpoint-research.stdout": {
+      "sha256": "986a8b8b46a7a80480119ff7c23b1b0e2ffabb148b27bf9a1236c6982640d75c",
+      "bytes": 1134
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-live-progress.json": {
+      "sha256": "2e4f1d62fc4c0e033a75f8efe042f9a68742a4938c51cf3b8665d78c3bf29efe",
+      "bytes": 569
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-actual.stderr": {
+      "sha256": "3e187c7032184f3ea7aac185563780a1248e86b49fa8138f91b896c409dcd76f",
+      "bytes": 888
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-install-fixture-cwd-v2-planned.json": {
+      "sha256": "3b7d29ad3f7a89b11986f06c4636da262a3b834ebc88840af02a1a71e85aa12a",
+      "bytes": 1661
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-startup-source-research.json": {
+      "sha256": "7f3761da502404db9bfdec39339180951d02c917e60e2389e69a56f3134b10d3",
+      "bytes": 343
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-external-stage.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-readback-authorized.py": {
+      "sha256": "f2d35d16ea51df5df88e5dd0fcb190bf903b52b4e2101ff9a1b28bd8d269183e",
+      "bytes": 2604
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-install-design.json": {
+      "sha256": "32582ee02e356fdd1dc33629d394ec26cf7c448d656e9a758405b68880ce9200",
+      "bytes": 2953
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-readback-guest.py": {
+      "sha256": "6c585baa11703e9c61e536d755daf4ac6980404fe76edc8ac82be417956a6998",
+      "bytes": 10286
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-current-preflight-guest.py": {
+      "sha256": "9991b987edc9f4ec4de306fb23c49ea880040627e3321638ed22d60c3f7f2ac9",
+      "bytes": 10411
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-actual.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-current-preflight.stdout": {
+      "sha256": "a5c15813bc9a20fc35bd632e0cf957c5b6ef3db928f8a3ede106d4b34a3b1cf9",
+      "bytes": 301
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-external-stage.stdout": {
+      "sha256": "28492ac077bcad6fbf4d03c63a981af8d27924a48cb2f59ffcaa18b1908e5bc7",
+      "bytes": 542
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-readback.json": {
+      "sha256": "d4c2b8cb08a116e574f9444978bb3cde0a265eb1b50505d938a5d30ac4a79faf",
+      "bytes": 576
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-old-account-finally.stdout": {
+      "sha256": "5db1cf506ea3ca75b806bcb210b4a794c6c8ea6ebb669cea3d498ac0515aeb91",
+      "bytes": 1921
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-dotenv-source-research.json": {
+      "sha256": "1e554736e53760ad0eac38a7f52fa92e7557f8949561e4da40fa9d5838a30962",
+      "bytes": 61
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-run-evidence/run.json": {
+      "sha256": "cd7f502ff3d868257f81c9a248aa9f11223925dd91af57da37f12e23407418f2",
+      "bytes": 681
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-run-evidence/desktop.png": {
+      "sha256": "5347e6f84bb89cf7b0c9dfe952316bafb51e2faa8f6af04147203efdb1140fd2",
+      "bytes": 19796
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-run-evidence/dsh.log": {
+      "sha256": "f535dfccfed360504c9f34a1f98239d8376f0ee2498ece69a2103f1032dac68d",
+      "bytes": 94
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-old-account-finally.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-run-host.json": {
+      "sha256": "3cb4751625e1703c21188fc813b4f95c5f05bdf8fae13ac06ffd9cdae6576f4b",
+      "bytes": 735
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-external-stage.stdout": {
+      "sha256": "5fa1da6836c717255e67bfc1c976cec9b93f55f70b4be9eea6b6c2a220dd07ea",
+      "bytes": 542
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-readback-cwd-v2-authorized.py": {
+      "sha256": "02ea77d51ee869cc124c2c6b957ba9f00da8fb2341282de4d5b232ad2332a77e",
+      "bytes": 2822
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-readback.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-readback-guest.py": {
+      "sha256": "dec9f48dee09ccfa8b7eca1ebff1a11f38932333ecb339cea997c8eebb3bee10",
+      "bytes": 10623
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-live-readonly.jsonl": {
+      "sha256": "d9c5bbec09596774da57ace8c8923a2bcd62c5e46ba293db41922bbbd51617fc",
+      "bytes": 1787
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-run-cwd-v2-authorized.py": {
+      "sha256": "9e39fa514a406c3886200a30171dcf278b14469b274162cb818ac4066d9d139b",
+      "bytes": 6394
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-actual.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-old-account-finally.stdout": {
+      "sha256": "5db1cf506ea3ca75b806bcb210b4a794c6c8ea6ebb669cea3d498ac0515aeb91",
+      "bytes": 1921
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-live-readonly.py": {
+      "sha256": "db5b6e70bb9392e5fe86617f844a1a325f881ba9000a8302099f58b24580f764",
+      "bytes": 2050
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-current-preflight-guest.py": {
+      "sha256": "44444bad5afbc048d51233da85c74b19731c9041a8bbc3349d7211b5f473c141",
+      "bytes": 10730
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-current-preflight.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-readback.json": {
+      "sha256": "11d035750911cad3c1f8556b382e4f37dfb1244c2251a8f00996f3ef80c74cd1",
+      "bytes": 611
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-external-stage.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-actual.stderr": {
+      "sha256": "5f2aceb8be3aea03f9626e63ae56575547f0d60f6f45163e946ce96875cb1054",
+      "bytes": 916
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-readback-raw.stdout": {
+      "sha256": "a31ad06ae00e9bfde9071805134c73f4fafc9d6f4965080b14d659694ca896e1",
+      "bytes": 27625
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-current-preflight.stdout": {
+      "sha256": "a5c15813bc9a20fc35bd632e0cf957c5b6ef3db928f8a3ede106d4b34a3b1cf9",
+      "bytes": 301
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-live-initial-refusal.json": {
+      "sha256": "f0f587385908168b641057de3e3f36f5d581e35bce44a6b4ac324fabff0c1546",
+      "bytes": 125
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-run-evidence/run.json": {
+      "sha256": "72531cd9a3276236d4374d48f6a9785e93d2fcb0d068f914e9812efef8b3c441",
+      "bytes": 681
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-run-evidence/desktop.png": {
+      "sha256": "5347e6f84bb89cf7b0c9dfe952316bafb51e2faa8f6af04147203efdb1140fd2",
+      "bytes": 19796
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-run-evidence/dsh.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-old-account-finally.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-host-result.json": {
+      "sha256": "e063dcb6b3d1e38daff9f801cbc0935f0a961f1fb5c2a7121b47b10b2090468b",
+      "bytes": 602
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-current-preflight.stdout": {
+      "sha256": "151a3ff21d4605545d204b658a185e29f942197359e4b27f987c0ac90c435321",
+      "bytes": 238
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-stage.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness-only-180-host.py": {
+      "sha256": "f4de2cdca1909dbf49b6e41060eb9db09d79cb0d3957e89bd4f0a703168c0b76",
+      "bytes": 5088
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-old-account-finally.stdout": {
+      "sha256": "f4995aedc2ad3126678bbe72f97d8461e0fc67cb71d8f9a8f72fd07d62488626",
+      "bytes": 51
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-readback-authorized.py": {
+      "sha256": "87343d321fa0e545519d95c85f39dc0651fe40ada63c9c9370f1ff111677f24a",
+      "bytes": 3407
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-readback-guest.py": {
+      "sha256": "b92b3c8da31bfcc135293e60b49ed2c9811ff34edea17eae9feada814c5ebe29",
+      "bytes": 11183
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-actual.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-current-preflight.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-readback-raw.stdout": {
+      "sha256": "a0a3d265b868655a9d83faa5d706e970d6ca451be376dfce782410d067954f5a",
+      "bytes": 29418
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-dsh-log-redacted.txt": {
+      "sha256": "c1b2e6809c379b6a28b662ec3aa69a929703719954d4ac89d858cb893cdc2116",
+      "bytes": 359
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness-only-180-guest.py": {
+      "sha256": "b6b592df6d7554dfdd967b47de5c2ab1fb254e6f07f24dbc64ae1305503ce99f",
+      "bytes": 7517
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-stage.stdout": {
+      "sha256": "3ec720351196cb4a2f8e6b59942906aba560b0454b414aa0df4e0fc1623b4b79",
+      "bytes": 349
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-live.json": {
+      "sha256": "e2121404aef6c69dca1973232ab0e6be9ebea0396bfa5e3cd456a40db4c99cb0",
+      "bytes": 1178
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-readback.json": {
+      "sha256": "09fc9c888baddd72c6fd1356da882104d42b9ed941601993c247c52a860c7313",
+      "bytes": 683
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-actual.stderr": {
+      "sha256": "3c65b869b9296088ee1eead8af1161076889fab861f190284f7f325b03cfcafe",
+      "bytes": 849
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-readback.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-run-evidence/observations.json": {
+      "sha256": "badfd6c569f9fbfc9adc3394e1c99a4535cc3df1b50b6cf5bdb3e639024eb83e",
+      "bytes": 20347
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-run-evidence/run.json": {
+      "sha256": "a31419c04e561ccbd677be72114332fd224947c9578faff37952f4d4f242ef2e",
+      "bytes": 1038
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-run-evidence/dsh.log": {
+      "sha256": "4321b5b9a9d5f9f9a105287c116525596b0130677f36eb81d36985cb893605ea",
+      "bytes": 387
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-old-account-finally.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-actual.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-readback-guest.py": {
+      "sha256": "03ec50d97b424401031f5fa4e703d42fc21b179558b42641d0b0faf3e689e032",
+      "bytes": 11358
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-live.json": {
+      "sha256": "e624a49b9750d56698a25ed77e0031b77c0f168b9a4a2b66154b10b2ecec1965",
+      "bytes": 5344
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-readback.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-readiness-host.py": {
+      "sha256": "e47f8853e7ee16c66546b6de3df0b6c0af7a8f0ee73a84b5d75e7da162830521",
+      "bytes": 5397
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-current-preflight.stdout": {
+      "sha256": "151a3ff21d4605545d204b658a185e29f942197359e4b27f987c0ac90c435321",
+      "bytes": 238
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-stage.stdout": {
+      "sha256": "76a14d6eef1b9c415d0d53ff9e2161c580b3739a535abb54f46e4990baf2855f",
+      "bytes": 349
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-host-result.json": {
+      "sha256": "27b946521ae8eff6e3121f8ecb65ffafce761e6248e382f85968b355e56df855",
+      "bytes": 602
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-stage.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-worker.py": {
+      "sha256": "43d10d2ab6fe94ee60c09b20193a69ffffcbbfbe69b933acb27d4392099a7518",
+      "bytes": 2430
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-actual.stdout": {
+      "sha256": "618ddad1b05a70e626b28dacd2d033ea1267180373abb54039a29d6da2377767",
+      "bytes": 3153
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-old-account-finally.stdout": {
+      "sha256": "f4995aedc2ad3126678bbe72f97d8461e0fc67cb71d8f9a8f72fd07d62488626",
+      "bytes": 51
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-readback-authorized.py": {
+      "sha256": "5fffeb263b0549a220d92d2706d18213a95125cddb6d59db73db8b7a4eed6945",
+      "bytes": 3582
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-current-preflight.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-readback-raw.stdout": {
+      "sha256": "d42804fa709ae96b9ad0ba528f92d995557d8097f58cbe52b665e2b79e386dd9",
+      "bytes": 47888
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-readiness-guest.py": {
+      "sha256": "7b472e628bf22da43c8f2be9162eb5d9b2f178b553b6bf7e37f78436b4cb188d",
+      "bytes": 12222
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-readback.json": {
+      "sha256": "2eb95a51b54c098de736fff36691e4fd56504ce80d910846f305c9eb5bf0e2db",
+      "bytes": 1101
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-run-evidence/observations.json": {
+      "sha256": "b826cccc72bf1d81df2b99ee953464424dc809b2236dcc944714c89b2cbfe1cd",
+      "bytes": 25251
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-run-evidence/run.json": {
+      "sha256": "bbd56ffb699752d1f774a5353065dad0315070e1b3b7d6530d9bced6c611c8ab",
+      "bytes": 4593
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-run-evidence/adapter-worker.py": {
+      "sha256": "43d10d2ab6fe94ee60c09b20193a69ffffcbbfbe69b933acb27d4392099a7518",
+      "bytes": 2430
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-run-evidence/adapter-worker.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-run-evidence/dsh.log": {
+      "sha256": "5b1f72a3ee4837c8b52d7a6196aea1254aa2bbe3f2f2e6bccd6700926c33a44c",
+      "bytes": 387
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-run-evidence/adapter-result.json": {
+      "sha256": "92b922af4d2515d50c30cfd6712efc7bf98de2705b74d140609dd5611b5be7db",
+      "bytes": 2904
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v3-source-plan.json": {
+      "sha256": "515da90dd004428f34c4c5472b78918d33886e087f4fd90a302d799427116717",
+      "bytes": 2457
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-install-fixture-v3-planned.json": {
+      "sha256": "77a67f5b0f50309ac411156ed7b254ced925dca8cae038337040c73655ffd2b9",
+      "bytes": 2043
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v3-run-host.json": {
+      "sha256": "b90dd37676478df9132de73fd89ea9b1ff522b8ae74ecc451f3db9e4e39409fd",
+      "bytes": 735
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v3-capture.json": {
+      "sha256": "fb79f87b0ccce835acc5344a70dea83b5d37b8b605732f1575ab6eb75a8af6a3",
+      "bytes": 3061
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v3-settings-semantic-diff.json": {
+      "sha256": "8ad3887703545661fdfd0644cd7f18f0b20489e8c02edb30027487a7e7232ce3",
+      "bytes": 652
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v3-history-readonly-summary.json": {
+      "sha256": "5b93e89af5e36edeef2d9fc31131b53a117efea8c7197aa0a00fafd943e18521",
+      "bytes": 3843
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v3-final-readonly-research.json": {
+      "sha256": "1949fcfee3de4aba3b3145f0cf090ba8ba37bef237fd502a746c68c6e52f3ff1",
+      "bytes": 7864
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v3-memory-cleanup-v3-run.json": {
+      "sha256": "f56987fc106051608dfee7822f187fc10faa6d8435dee526a47e7ae89d380093",
+      "bytes": 1480
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v3-final-idle-readback.json": {
+      "sha256": "d8e2bf1f2102b1988ac6527c67ff368117cc1e7cd013e9e80acc217f4ea12027",
+      "bytes": 490
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/yaml291-pinned-public-test/provenance.json": {
+      "sha256": "7436f674cb17ca406bc8eb351a4333c12095c29237f2479ab5f0c9aad5eb9093",
+      "bytes": 391
+    }
+  },
+  "maintainedPostInstallEntry": {
+    "implemented": true,
+    "executedInVM": true,
+    "CLI": "--owned-vm-post-install-fixture PATH",
+    "target": "explicit owned clean2035 Mint VM UID1001 only",
+    "dshServiceActual": "augmentor-dsh.service",
+    "serviceEnabledByOriginalSetup": false,
+    "fiveSettingsHashesBound": true,
+    "workspaceStorageInitiallyEmptyAndHashBound": true,
+    "savedPortsBound": true,
+    "oneShotJournalNoAdoption": true,
+    "mutatingRequestsSingleDispatch": true,
+    "unknownOutcomeNoReplay": true,
+    "public60SecondBoundsUnchanged": true,
+    "setupOrModelSettingsReplayed": false,
+    "tests": {
+      "postInstallCases": 11,
+      "environmentCases": 6,
+      "allPass": true,
+      "VMQualification": false
+    }
+  },
+  "maintainedPostInstallExecution": {
+    "status": "fail",
+    "externalProofReviewedBase": "0ab022a6a26ae0165b57e1662203e71f544aab9a",
+    "externalProofCheckoutHead": "9ec506bb827229874bb285588d9249ff55c201d8",
+    "proofScriptSha256": "a1342ea000108c40c8138ca3439fb4eb6c2302c266af503401e500e2c250b766",
+    "phase": "starting",
+    "reason": "Owned DSH did not become ready within unchanged60seconds.",
+    "offscreenNativeRender": true,
+    "screenshotBytes": 19796,
+    "SDKMutationsSent": false,
+    "modelTurnsReached": false,
+    "setupReplayed": false,
+    "pendingRequest": null,
+    "unknownRequestOutcome": false,
+    "runJournalSha256": "cd7f502ff3d868257f81c9a248aa9f11223925dd91af57da37f12e23407418f2",
+    "fiveSettingsPreserved": true,
+    "oldUid1000TenHashesPreserved": true,
+    "workspaceUnchangedEmpty": true,
+    "nativeAuditClean": true,
+    "ownedApplicationSetupProcessesIdle": true,
+    "childLogBytes": 94,
+    "childLog": "dsh: failed to load .env: Error: EACCES: permission denied, open /home/augmentor-proof/.env",
+    "dotenvReadWarningFatal": false,
+    "timeoutCauseEstablished": false,
+    "dotenvEvidence": {
+      "package": "@deepseek-ai/dsh-app-boot",
+      "version": "0.1.5-rc.1",
+      "file": "lib/index.js",
+      "sha256": "d8fdfe41996a4fefcff63af4982787924b0ae651f24bb1402f775b70202529bb",
+      "warningThenReturnLine": 1047,
+      "defaultProcessCwdLine": 1074
+    },
+    "retryExecuted": false
+  },
+  "cwdCorrection": {
+    "implemented": true,
+    "executedInVM": true,
+    "previewAndOwnedProcessCwd": "verified POST_HOME",
+    "public60SecondBoundsUnchanged": true,
+    "explicitNextRunDirectory": "post-install-proof-cwd-v2",
+    "priorFailureSha256": "cd7f502ff3d868257f81c9a248aa9f11223925dd91af57da37f12e23407418f2",
+    "preservesInitialJournal": true,
+    "refusesPriorPendingOrUnknownOutcome": true,
+    "reviewRequiredBeforeVM": false,
+    "executionStatus": "fail"
+  },
+  "maintainedPostInstallCwdV2Execution": {
+    "status": "fail",
+    "externalProofSource": "b12af5e57462ac7d059bb82386e34d8d1d2b4df6",
+    "proofScriptSha256": "36cdc46d6eb910b113ed9acb86fd0c68b84e350dbedcfe3b6139d0438dea7545",
+    "run": "65e1c45704d9ac16775b98e55d3f7dd0",
+    "runJournalSha256": "72531cd9a3276236d4374d48f6a9785e93d2fcb0d068f914e9812efef8b3c441",
+    "phase": "starting",
+    "pendingRequest": null,
+    "unknownRequestOutcome": false,
+    "SDKMutationsSent": false,
+    "modelTurnsReached": false,
+    "modelRequests": null,
+    "observedSessionHistories": false,
+    "offscreenPreviewPass": true,
+    "originalFailureJournalPreserved": true,
+    "fiveSettingsPreserved": true,
+    "oldUid1000TenHashesPreserved": true,
+    "workspaceUnchangedEmpty": true,
+    "nativeAuditClean": true,
+    "ownedApplicationSetupProcessesIdle": true,
+    "explicitNodeCwd": "/home/augmentor-complete-proof",
+    "childLogBytes": 0,
+    "publicReadinessBudgetSeconds": 60,
+    "totalProofElapsedSeconds": 102.5082437992096,
+    "startupObservation": [
+      {
+        "nodeElapsedSeconds": 38.91,
+        "nodeCpuSeconds": 37.79,
+        "guestMemAvailableKiB": 2356300,
+        "guestSwapFreeKiB": 3997180
+      },
+      {
+        "nodeElapsedSeconds": 63.51,
+        "nodeCpuSeconds": 61.56,
+        "guestMemAvailableKiB": 2377196,
+        "guestSwapFreeKiB": 3997180
+      }
+    ],
+    "timingCaveat": "Configured startup budget checked between bounded adapter reads; total proof includes validation/render. No full startup completion observed.",
+    "timeoutCauseEstablished": false,
+    "setupReplay": false,
+    "retryExecuted": false,
+    "modelRequestCountRetained": false
+  },
+  "readinessOnlyDiagnostic": {
+    "executed": true,
+    "diagnosticScriptSha256": "b6b592df6d7554dfdd967b47de5c2ab1fb254e6f07f24dbc64ae1305503ce99f",
+    "installedSource": "2035af99b46bb013e81de9766216da820ab4a325",
+    "maintainedPublicProofSource": "b12af5e57462ac7d059bb82386e34d8d1d2b4df6",
+    "maintainedExecutableChanged": false,
+    "status": "fail",
+    "phase": "observed",
+    "journalSha256": "a31419c04e561ccbd677be72114332fd224947c9578faff37952f4d4f242ef2e",
+    "matchingProductHttpIdentityObserved": true,
+    "firstMatchingHttpSeconds": 56.4262504119979,
+    "diagnosticBudgetSeconds": 180,
+    "public60SecondProofPass": false,
+    "fullAdapterHostDescribeTested": false,
+    "presetAuthSDKReadinessEstablished": false,
+    "actualModelRequests": 0,
+    "actualProviderHttpRequests": [],
+    "SDKCalls": false,
+    "SDKMutations": false,
+    "historyOrSessionMutations": false,
+    "setupOrSettingsReplayed": false,
+    "sampleCount": 51,
+    "lastSample": {
+      "nodeElapsedSeconds": 56.328321840999706,
+      "cpuSeconds": 59.09,
+      "guestMemAvailableKiB": 2357200,
+      "guestSwapFreeKiB": 3997180
+    },
+    "childLogBytes": 387,
+    "failure": "Immediate post-cleanup port bind raised EADDRINUSE after process/server closure.",
+    "immediateBindRefusalCauseEstablished": false,
+    "subsequentReadOnlyCleanup": {
+      "bothJournalsPreserved": true,
+      "noTargetPortListener": true,
+      "settingsPreserved": true,
+      "oldAccountPreserved": true,
+      "nativeAuditClean": true,
+      "ownedApplicationSetupProcessesIdle": true,
+      "workspaceUnchangedEmpty": true
+    },
+    "subsequentTargetPortsKernelEntries": [],
+    "retryExecuted": false,
+    "originalFullProofAndBothPostInstallFailuresPreserved": true
+  },
+  "fullAdapterReadinessDiagnostic": {
+    "executed": true,
+    "status": "pass-read-only-diagnostic",
+    "installedSource": "2035af99b46bb013e81de9766216da820ab4a325",
+    "publicProofSource": "b12af5e57462ac7d059bb82386e34d8d1d2b4df6",
+    "publicProofSha256": "36cdc46d6eb910b113ed9acb86fd0c68b84e350dbedcfe3b6139d0438dea7545",
+    "diagnosticScriptSha256": "7b472e628bf22da43c8f2be9162eb5d9b2f178b553b6bf7e37f78436b4cb188d",
+    "journalSha256": "bbd56ffb699752d1f774a5353065dad0315070e1b3b7d6530d9bced6c611c8ab",
+    "budgetSeconds": 180,
+    "firstMatchingHttpSeconds": 60.406709116003185,
+    "fullAdapterReadySeconds": 62.94251394900493,
+    "actualHostDescribeSeconds": 0.8107880140014458,
+    "workerElapsedSeconds": 1.918399286994827,
+    "adapterInstantiations": 1,
+    "hostDescribeCalls": 1,
+    "normalAuthenticationObserved": true,
+    "authenticationOverridden": false,
+    "rpcReadMethods": [
+      "agentPresets/list",
+      "session/modelCatalog"
+    ],
+    "product": true,
+    "productPreset": "augmentor-linux-product",
+    "bothProductPresetsAvailableUnbroken": true,
+    "actualModelRequests": 0,
+    "providerHttpRequests": [],
+    "SDKMutations": false,
+    "sessionHistoryReads": false,
+    "modelTurnsOrSessionMutations": false,
+    "setupOrSettingsReplayed": false,
+    "sampleCount": 64,
+    "lastNodeSample": {
+      "elapsedSeconds": 62.665260002999275,
+      "cpuSeconds": 62.89,
+      "guestMemAvailableKiB": 2336948,
+      "guestSwapFreeKiB": 3997180
+    },
+    "observedLimit": "This run reaches HTTP after60seconds; authenticated presets/catalog then succeed in under1second. Exact prior-run cause and bootstrap loading stage are not established.",
+    "public60SecondProofPass": false,
+    "fullConnectedProductOrHistoryProof": false,
+    "nativeAuditClean": true,
+    "allThreePriorJournalsPreserved": true,
+    "fiveSettingsPreserved": true,
+    "oldUid1000TenHashesPreserved": true,
+    "workspaceUnchangedEmpty": true,
+    "ownedApplicationSetupProcessesIdle": true,
+    "noTargetPortListener": true,
+    "kernelTargetPortEntries": [],
+    "maintainedExecutableChanged": false,
+    "retryExecuted": false
+  },
+  "emulatedStartupV3Source": {
+    "implemented": true,
+    "executedInVM": true,
+    "runDirectory": "post-install-proof-emulated-startup-v3",
+    "startupBudgetSeconds": 120,
+    "defaultStartupSeconds": 60,
+    "turnBudgetSeconds": 60,
+    "priorRecordHashes": {
+      "post-install-proof": "cd7f502ff3d868257f81c9a248aa9f11223925dd91af57da37f12e23407418f2",
+      "post-install-proof-cwd-v2": "72531cd9a3276236d4374d48f6a9785e93d2fcb0d068f914e9812efef8b3c441",
+      "post-install-readiness-only-180-v1": "a31419c04e561ccbd677be72114332fd224947c9578faff37952f4d4f242ef2e",
+      "post-install-full-adapter-readiness-v1": "bbd56ffb699752d1f774a5353065dad0315070e1b3b7d6530d9bced6c611c8ab"
+    },
+    "proofScriptSha256": "b3251d48d21f93255a36bd2e4d0e4ae5bf3535327ab46a3ea15c5706bea43aa3",
+    "originalFreshFullProofPass": false,
+    "public60SecondStartupProofPass": false,
+    "setupOrSettingsReplayed": false,
+    "modelRuntimeInstallerFilesChanged": false,
+    "newRunRequestsSingleDispatch": true,
+    "strictRestartHistoryAndNoReplay": true,
+    "failureModelRequestCountsRetained": true,
+    "proofCases": 24,
+    "sourceTestsPass": true,
+    "reviewAndPublishedSourceRequiredBeforeVM": true,
+    "successfulLateV3ReadinessRefusedBeforeFurtherRoleMutation": true,
+    "default60PassRequiresBothMeasuredStartsWithin60": true,
+    "pollingReadsRemainBounded": true
+  },
+  "emulatedStartupV3Execution": {
+    "status": "fail",
+    "publishedProofCommit": "7cbbc139397826f6c6ca2bec713c4ecaa5974f94",
+    "proofScriptSha256": "b3251d48d21f93255a36bd2e4d0e4ae5bf3535327ab46a3ea15c5706bea43aa3",
+    "runId": "7e011605409b2fead75c0ed57ef9de5e",
+    "journalSha256": "1dd1c91daa29fb80e7966b0f057d2e26a4996d94c925896c1c7fd5fc71eb8d7d",
+    "startupBudgetSeconds": 120,
+    "turnBudgetSeconds": 60,
+    "firstAuthenticatedStartupSeconds": 75.34530545301095,
+    "measuredStartupWithin120": true,
+    "linuxSessionCreatedOnce": true,
+    "linuxModelSelectedOnce": true,
+    "linuxPromptDispatchedOnce": true,
+    "linuxTurnCompleted": true,
+    "linuxReply": "LINUX DISTRO FIXTURE VERIFIED",
+    "modelRequests": 2,
+    "modelRequestsExplainedBy": "One main response and one first-prompt title request; both are retained in the single Linux session history.",
+    "pendingRequest": null,
+    "unknownRequestOutcome": false,
+    "browserRoleReached": false,
+    "restartReached": false,
+    "strictHistoryComparisonReached": false,
+    "failure": "Byte-bound settings.yaml changed after session.selectModel; its default-model save reserializes the YAML document even when parsed values match.",
+    "settingsPreserved": false,
+    "changedSettingsOnly": "dsh-home/settings.yaml",
+    "before": {
+      "bytes": 387,
+      "sha256": "fbae7864772e6719372c752fce343e5f2f5804ea973c2ca28911b165f1b956e9"
+    },
+    "after": {
+      "bytes": 403,
+      "sha256": "c31321dbedbe77c7e312f6a91415bda7139dde3ff3ded7ad0824c9befdbf0274"
+    },
+    "semanticValuesIdentical": true,
+    "byteDifference": "Eight list-related lines gain two indentation spaces.",
+    "otherFourSettingsUnchanged": true,
+    "settingsRestoredOrNormalized": false,
+    "workspaceJsonStillInitialEmpty": true,
+    "linuxHistory": {
+      "compressedSha256": "0d5517c442e68bff0b86457f3f1890538b9a775250e64023eb7d33181760df2b",
+      "decodedSha256": "183e3fba097bcd80c74e60034498813294251b20651a8640f815a2e0fd806eea",
+      "rows": 20,
+      "completedUserTurns": 1,
+      "completedAssistantMessages": 1
+    },
+    "originalFreshFullProofPass": false,
+    "public60SecondStartupProofPass": false,
+    "setupReplayed": false,
+    "newRunOrMutationRetried": false,
+    "allFourPriorJournalsPreserved": true,
+    "nativeAuditClean": true,
+    "oldUid1000TenHashesPreserved": true,
+    "ownedCleanup": {
+      "automaticMemoryCompanionInitiallyRemained": true,
+      "runCreatedAndExactPidStartSocketPeerVerified": true,
+      "readOnlyStatusActive": 0,
+      "retainedMemoryEvents": 2,
+      "inferenceJobs": 0,
+      "configuredBackend": false,
+      "guardedRefusalsBeforeSocketOrRPC": 2,
+      "refusalCause": "Observed Python argv includes -Xutf8 and -B; both attempts required the wrong service argument position.",
+      "nulEncodingWasNotTheCause": true,
+      "normalMaintenancePrepareAndCommitOnce": true,
+      "normalExitAfterCommitSeconds": 0.2511838119971799,
+      "signalOrForcedTermination": false,
+      "finalProductProcessesIdle": true,
+      "finalSocketRemoved": true,
+      "finalRuntimeAndDesktopLeaseReadback": true,
+      "finalTargetKernelPortEntries": []
+    }
+  },
+  "initialSettingsIndentationCorrection": {
+    "implementedInMaintainedSource": true,
+    "executedInInstalledArtifact": false,
+    "path": "scripts/setup-complete.py",
+    "scope": "Only initial settings.yaml serialization uses a SafeDumper subclass with indentless=False; scalar/key-order defaults and model values stay unchanged.",
+    "sourceTests": 18,
+    "realNodeYamlVersion": "2.9.1",
+    "realNodeVersion": "24.19.0",
+    "legacyOutputChangesOnDocumentToString": true,
+    "correctedOutputByteStable": true,
+    "semanticValuesIdentical": true,
+    "pinnedPublicSource": "https://github.com/eemeli/yaml/blob/v2.9.1/src/stringify/stringify.ts",
+    "priorFixtureFormatRestored": false,
+    "freshCleanBundleAndFreshOrdinaryAccountRequired": true,
+    "futureAcceptancePending": true
+  },
+  "maintainedOwnedCompanionCleanupSource": {
+    "implemented": true,
+    "executedInVM": false,
+    "scope": [
+      "fresh user_proof",
+      "owned post_install_proof"
+    ],
+    "helperPath": "release/owned-memory-companion-proof.py",
+    "helperSha256": "70543782f9d26bae72bf0a4396e649c646017de7ee55a7f9af84075daf29368b",
+    "proofScriptSha256": "16bd157c38654acb599ec2b74d272cc8b338d14871aa59b5d333933424ee2c2a",
+    "adjacentHelperMustBeStagedAndHashVerified": true,
+    "absenceBeforeFirstDshLaunch": true,
+    "identityFences": [
+      "selected interpreter executable inode",
+      "immutable service source identity and hash",
+      "exact argv including -Xutf8 and -B",
+      "same UID and primary GID",
+      "new PID/start after entry fence",
+      "dedicated DSH_HOME",
+      "private state path and socket inode",
+      "Unix SO_PEERCRED"
+    ],
+    "exclusivePrivateJournal": true,
+    "fileAndDirectoryFsyncBeforeMutation": true,
+    "maintenanceStatusActiveRequired": 0,
+    "maintenancePrepareAndCommitEachSentAtMostOnce": true,
+    "unknownOrBusyOrForeignOrPreexistingIsTerminal": true,
+    "noSignalsOrForcedTermination": true,
+    "normalExitBudgetSeconds": 20,
+    "externalNativeLeaseReadbackAfterProofExitRequired": true,
+    "actualSyntheticUnixServerCases": 9,
+    "maintainedProofCases": 26,
+    "sourceTestsPass": true,
+    "newArtifactOrVmRunExecuted": false,
+    "freshCleanBundleAndFreshOrdinaryAccountRequired": true,
+    "existingFailedFixtureNotReusable": true,
+    "rootLicenseAndFrozen22Unchanged": true
+  }
+}

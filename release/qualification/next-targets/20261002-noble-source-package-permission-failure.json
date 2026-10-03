@@ -1,0 +1,57 @@
+{
+  "format": "augmentor-noble-source-package-permission-failure/1",
+  "source": {
+    "commit": "42f065a22436a3c47d35bc80eba70c6dc8f31956",
+    "dirty": false
+  },
+  "target": "ubuntu24.04-amd64",
+  "artifacts": [
+    {
+      "file": "augmentor-runtime_0.2.13_amd64.deb",
+      "sha256": "95ef648e65093d61ce55bde1f661686ee32ab29093afa0725970f7f5c2a6a73e",
+      "bytes": 103168332
+    },
+    {
+      "file": "augmentor-desktop_0.2.13_amd64.deb",
+      "sha256": "48edbbc9ddbba7df818f8dfde600b8287e6e36687ad36f32ca1a9e2a64643b2d",
+      "bytes": 4984
+    }
+  ],
+  "candidateOnly": true,
+  "firstArtifactReview": {
+    "nativeFiles": 67,
+    "sonameLinks": 18,
+    "wheelArchives": 7,
+    "wheelElfMembers": 19,
+    "originalWheelAndSupplementaryNoticeBytesMatch": true,
+    "artifactHashesMatch": true,
+    "ordinaryUserInputReadabilityChecked": false,
+    "reportSha256": "3bd5da23afe1083341e933c677b71abbdf46ebace7990a88c750ab44dd87af4a"
+  },
+  "actualMetadataInspection": [
+    {
+      "path": "./usr/lib/augmentor/python-wheels/source-qt",
+      "uid": 0,
+      "gid": 0,
+      "mode": "0o700",
+      "ordinaryUserTraversable": false
+    }
+  ],
+  "sourceQtInputPermissionQualified": false,
+  "cleanOrdinaryUserInstallTested": false,
+  "refusalWithNewPermissionGuard": {
+    "stderrSha256": "f20292fdcf7434f01211ae25f0a4a58cb6d6ffd60159bf87ac424c7e89d5e338",
+    "reason": "Root-owned source-Qt directory mode0700 is unreadable to the ordinary desktop user."
+  },
+  "correction": "Normalize only the verified packaged Qt directory/file permissions to0755/0644; preserve private0700 user runtime storage. Artifact review now rejects inaccessible input metadata; Linux symlink mode bits are not treated as file write permissions.",
+  "newPermissionContractTests": {
+    "tests": 14,
+    "passed": 14,
+    "logSha256": "b1cf7b5cccb89e6c211ba0c4cc84a08add9dad70e9f7bf763a4c67eb38c6ed8b",
+    "scope": "Synthetic finite source Qt/native-path and package metadata refusal cases, not native installation."
+  },
+  "newArtifactAndOrdinaryUserAcceptanceRequired": true,
+  "licenseReviewComplete": false,
+  "embeddedSourceCoverageComplete": false,
+  "publicReleaseQualified": false
+}

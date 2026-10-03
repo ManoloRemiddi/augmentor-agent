@@ -1055,7 +1055,9 @@ class Window(QWidget):
             try:pin_spaces(self,self.preferences.values['pinned'])
             except (OSError,RuntimeError):self.set_status('Workspace pin could not be applied')
             return
-        if QApplication.platformName() not in ('offscreen','minimal') and pin_kwin(self.preferences.values['pinned']):return
+        from .gnome_shortcuts import active as gnome_active
+        gnome=gnome_active()
+        if not gnome and QApplication.platformName() not in ('offscreen','minimal') and pin_kwin(self.preferences.values['pinned']):return
         if QApplication.platformName() not in ('xcb','x11'):
             return
         pinned=self.preferences.values['pinned'];wid=hex(int(self.winId()))
@@ -1064,6 +1066,12 @@ class Window(QWidget):
                 subprocess.run(['wmctrl','-ir',wid,'-t','-1'],check=True,timeout=2,capture_output=True)
                 subprocess.run(['wmctrl','-ir',wid,'-b','add,sticky'],check=True,timeout=2,capture_output=True)
             else:
+                if gnome:
+                    # Mutter unstick places this own window on the active
+                    # workspace. On-demand XWayland can lack the root's current
+                    # desktop hint before the first workspace switch.
+                    subprocess.run(['wmctrl','-ir',wid,'-b','remove,sticky'],check=True,timeout=2,capture_output=True)
+                    return
                 desktops=subprocess.run(['wmctrl','-d'],check=True,timeout=2,capture_output=True,text=True).stdout
                 current=next(line.split()[0] for line in desktops.splitlines() if '*' in line.split()[:2])
                 subprocess.run(['wmctrl','-ir',wid,'-b','remove,sticky'],check=True,timeout=2,capture_output=True)
@@ -1393,6 +1401,10 @@ def _main(startup=None):
     refresh_accessibility_bus()
     from .ui_scale import startup_scale
     ui_scale = Preferences(not args.preview and not args.screenshot).values['ui_scale']
+    from .shortcuts import COMPONENT
+    # Unix platform services can contact the portal during QApplication
+    # construction. Supply the instance's desktop identity before that happens.
+    QApplication.setDesktopFileName(COMPONENT.removesuffix('.desktop'))
     with startup_scale(ui_scale):
         app = QApplication(sys.argv[:1])
     app.setProperty('augmentorUiScale', ui_scale)
@@ -1400,8 +1412,6 @@ def _main(startup=None):
     app.setQuitOnLastWindowClosed(False)
     app.setApplicationName('Augmentor Agent')
     app.setWindowIcon(QIcon(str(Path(__file__).parent/'assets/augmentor.svg')))
-    from .shortcuts import COMPONENT
-    app.setDesktopFileName(COMPONENT.removesuffix('.desktop'))
     if (not args.preview or args.ui_test_control) and not args.screenshot:
         if sys.platform == 'win32':
             from .windows_instance import Client, Lock, Server

@@ -1,0 +1,478 @@
+{
+  "format": "augmentor-next-linux-runtime-qualification/1",
+  "targets": [
+    {
+      "target": "arch20261001-x86_64",
+      "officialBaseImage": "docker.io/library/archlinux@sha256:eb8f6dcc89a38977c9735f10fcf6ae4afe496283e7008eb7a3420cdba31fbd04",
+      "ownedDependencyImage": "sha256:31986996e159cc8d10eb32000196ce468ba5b961253e8df14037483a9c8bdca1",
+      "containerId": "5ea9e6eb7b6eed8d0fd67ae7799f5c2139e153e6794cb4d8e701fde9159e95aa",
+      "policy": "release/arch20261001-python-voice.json",
+      "policySha256": "2d6c2d943d089531840eb29fa6c7a7e1ce7d3a2c378439893b4d6273294d1fa7",
+      "lockIdentity": "87a32c16fd68e198b732d8e2cda5791986c6bf0682bc58f5e022e7f3939ff900",
+      "runtimeArtifactSha256": "0c2fd3217377d863b2697c12770d7bd12a3fb7a4b15eb1431936186f9c7964d0",
+      "runtimeFileCount": 889,
+      "imports": {
+        "pythonAbi": [
+          3,
+          14
+        ],
+        "qtVersion": "6.11.2",
+        "managedVersions": {
+          "sounddevice": "0.5.2",
+          "onnxruntime": "1.28.0",
+          "protobuf": "7.35.1"
+        },
+        "systemQt": true,
+        "systemVersions": {
+          "SecretStorage": "3.5.0",
+          "jeepney": "0.9.0",
+          "cryptography": "50.0.2",
+          "cffi": "2.1.1",
+          "numpy": "2.5.3",
+          "PyYAML": "6.0.3",
+          "websocket-client": "1.9.2",
+          "jaraco.classes": "3.4.0",
+          "jaraco.context": "6.1.3.dev0+g098f39c91.d20260403",
+          "jaraco.functools": "4.1.0",
+          "more-itertools": "11.1.0"
+        },
+        "origins": {
+          "PySide6": "/usr/lib/python3.14/site-packages/PySide6/__init__.py",
+          "shiboken6": "/usr/lib/python3.14/site-packages/shiboken6/__init__.py",
+          "pygments": "/usr/lib/python3.14/site-packages/pygments/__init__.py",
+          "keyring": "/usr/lib/python3.14/site-packages/keyring/__init__.py",
+          "sounddevice": "/tmp/augmentor-proof/python-runtimes/arch20261001-cp314-x86_64-voice-87a32c16fd68e198/lib/python3.14/site-packages/sounddevice.py",
+          "gi": "/usr/lib/python3.14/site-packages/gi/__init__.py",
+          "numpy": "/usr/lib/python3.14/site-packages/numpy/__init__.py",
+          "yaml": "/usr/lib/python3.14/site-packages/yaml/__init__.py",
+          "websocket": "/usr/lib/python3.14/site-packages/websocket/__init__.py",
+          "cffi": "/usr/lib/python3.14/site-packages/cffi/__init__.py",
+          "secretstorage": "/usr/lib/python3.14/site-packages/secretstorage/__init__.py",
+          "jeepney": "/usr/lib/python3.14/site-packages/jeepney/__init__.py"
+        },
+        "gtkVersion": [
+          4,
+          22,
+          5
+        ],
+        "portaudioVersion": [
+          1246976,
+          "PortAudio V19.7.0-devel, revision unknown"
+        ],
+        "explicitCredentialBackend": "keyring.backends.SecretService.Keyring",
+        "speechDependencies": {
+          "onnxruntime": "1.28.0",
+          "protobuf": "7.35.1",
+          "flatbuffers": "25.12.19",
+          "packaging": "26.3",
+          "availableProviders": [
+            "AzureExecutionProvider",
+            "CPUExecutionProvider"
+          ],
+          "origins": {
+            "onnxruntime": "/tmp/augmentor-proof/python-runtimes/arch20261001-cp314-x86_64-voice-87a32c16fd68e198/lib/python3.14/site-packages/onnxruntime/__init__.py",
+            "google.protobuf": "/tmp/augmentor-proof/python-runtimes/arch20261001-cp314-x86_64-voice-87a32c16fd68e198/lib/python3.14/site-packages/google/protobuf/__init__.py",
+            "flatbuffers": "/usr/lib/python3.14/site-packages/flatbuffers/__init__.py",
+            "packaging": "/usr/lib/python3.14/site-packages/packaging/__init__.py"
+          }
+        },
+        "secretServiceLifecycleTested": false,
+        "physicalAudioTested": false,
+        "handsFreeTested": false
+      },
+      "runtimeRenderAndIntegrityProof": {
+        "format": "augmentor-linux-python-runtime-fixture/1",
+        "target": "arch20261001-x86_64",
+        "policySha256": "2d6c2d943d089531840eb29fa6c7a7e1ce7d3a2c378439893b4d6273294d1fa7",
+        "proofSha256": "4ae51e6c14f29cdecc0e21d9a1f82b4a61caba6a31b2c4cd1605ab06887a287f",
+        "runtimeToolSha256": "e5e7ea171568553af17338d8915f96d940986667adb473cdf7195519b792d4e9",
+        "qtInventoryToolSha256": "e2e59773aab64604dc5322ac1608d78d732ee58771d37d1ba298af593eb1fba0",
+        "lockIdentity": "87a32c16fd68e198b732d8e2cda5791986c6bf0682bc58f5e022e7f3939ff900",
+        "runtimeArtifactSha256": "0c2fd3217377d863b2697c12770d7bd12a3fb7a4b15eb1431936186f9c7964d0",
+        "runtimeFileCount": 889,
+        "imports": {
+          "pythonAbi": [
+            3,
+            14
+          ],
+          "qtVersion": "6.11.2",
+          "managedVersions": {
+            "sounddevice": "0.5.2",
+            "onnxruntime": "1.28.0",
+            "protobuf": "7.35.1"
+          },
+          "systemQt": true,
+          "systemVersions": {
+            "SecretStorage": "3.5.0",
+            "jeepney": "0.9.0",
+            "cryptography": "50.0.2",
+            "cffi": "2.1.1",
+            "numpy": "2.5.3",
+            "PyYAML": "6.0.3",
+            "websocket-client": "1.9.2",
+            "jaraco.classes": "3.4.0",
+            "jaraco.context": "6.1.3.dev0+g098f39c91.d20260403",
+            "jaraco.functools": "4.1.0",
+            "more-itertools": "11.1.0"
+          },
+          "origins": {
+            "PySide6": "/usr/lib/python3.14/site-packages/PySide6/__init__.py",
+            "shiboken6": "/usr/lib/python3.14/site-packages/shiboken6/__init__.py",
+            "pygments": "/usr/lib/python3.14/site-packages/pygments/__init__.py",
+            "keyring": "/usr/lib/python3.14/site-packages/keyring/__init__.py",
+            "sounddevice": "/tmp/augmentor-proof/python-runtimes/arch20261001-cp314-x86_64-voice-87a32c16fd68e198/lib/python3.14/site-packages/sounddevice.py",
+            "gi": "/usr/lib/python3.14/site-packages/gi/__init__.py",
+            "numpy": "/usr/lib/python3.14/site-packages/numpy/__init__.py",
+            "yaml": "/usr/lib/python3.14/site-packages/yaml/__init__.py",
+            "websocket": "/usr/lib/python3.14/site-packages/websocket/__init__.py",
+            "cffi": "/usr/lib/python3.14/site-packages/cffi/__init__.py",
+            "secretstorage": "/usr/lib/python3.14/site-packages/secretstorage/__init__.py",
+            "jeepney": "/usr/lib/python3.14/site-packages/jeepney/__init__.py"
+          },
+          "gtkVersion": [
+            4,
+            22,
+            5
+          ],
+          "portaudioVersion": [
+            1246976,
+            "PortAudio V19.7.0-devel, revision unknown"
+          ],
+          "explicitCredentialBackend": "keyring.backends.SecretService.Keyring",
+          "speechDependencies": {
+            "onnxruntime": "1.28.0",
+            "protobuf": "7.35.1",
+            "flatbuffers": "25.12.19",
+            "packaging": "26.3",
+            "availableProviders": [
+              "AzureExecutionProvider",
+              "CPUExecutionProvider"
+            ],
+            "origins": {
+              "onnxruntime": "/tmp/augmentor-proof/python-runtimes/arch20261001-cp314-x86_64-voice-87a32c16fd68e198/lib/python3.14/site-packages/onnxruntime/__init__.py",
+              "google.protobuf": "/tmp/augmentor-proof/python-runtimes/arch20261001-cp314-x86_64-voice-87a32c16fd68e198/lib/python3.14/site-packages/google/protobuf/__init__.py",
+              "flatbuffers": "/usr/lib/python3.14/site-packages/flatbuffers/__init__.py",
+              "packaging": "/usr/lib/python3.14/site-packages/packaging/__init__.py"
+            }
+          },
+          "secretServiceLifecycleTested": false,
+          "physicalAudioTested": false,
+          "handsFreeTested": false
+        },
+        "offlineLockedWheelPrepare": true,
+        "verifiedWheelCount": 3,
+        "offlineFiveWheelPrepare": false,
+        "exactRuntimeReusedWithoutRewrite": true,
+        "tamperedRuntimeRefusedWithoutRepair": true,
+        "qtWidgetsXcbRendered": true,
+        "qtSvgRendered": true,
+        "qtQuickSoftwareRendered": true,
+        "qtBinaryCount": 59,
+        "qtSymlinkCount": 0,
+        "qtInventorySha256": "c70e6336ec92b0855db91697af3772cce1c26484fb0c3a4bae2312e673c662d9",
+        "installedProductTested": false,
+        "approvedUiTested": false,
+        "gnomeLoginTested": false,
+        "secretServiceLifecycleTested": false,
+        "physicalAudioTested": false,
+        "handsFreeTested": false,
+        "licenseReviewComplete": false,
+        "embeddedSourceCoverageComplete": false
+      },
+      "actualCpuComputation": {
+        "format": "augmentor-linux-cpu-onnx-fixture/1",
+        "target": "arch20261001-x86_64",
+        "proofSha256": "bbbd3a8bdbef56b64f420ef6df61432a81acfb40d8d8748b5f0a756eb133e4a2",
+        "runtimeToolSha256": "e5e7ea171568553af17338d8915f96d940986667adb473cdf7195519b792d4e9",
+        "policySha256": "2d6c2d943d089531840eb29fa6c7a7e1ce7d3a2c378439893b4d6273294d1fa7",
+        "runtimeArtifactSha256": "0c2fd3217377d863b2697c12770d7bd12a3fb7a4b15eb1431936186f9c7964d0",
+        "modelUrl": "https://raw.githubusercontent.com/onnx/onnx/v1.19.0/onnx/backend/test/data/node/test_identity/model.onnx",
+        "modelSha256": "cee798fc84cc4a49233de96443dd0990881a9a5e0beb8d3a9c3257884c84ceed",
+        "modelBytes": 115,
+        "providers": [
+          "CPUExecutionProvider"
+        ],
+        "identityOutputMatches": true,
+        "runtimeUnchanged": true,
+        "speechModelTested": false,
+        "physicalAudioTested": false,
+        "installedProductTested": false
+      },
+      "fullNativeSuite": {
+        "testsRun": 687,
+        "skipped": 2,
+        "passed": true,
+        "applicationSourceBase": "c5564bcff455db9e9633b9cab3af60f8f1b93a2c",
+        "compiledApplicationSource": "c4b885e035f2a87966a222b6df7621467bd87e89",
+        "workingSource": true,
+        "testUserHasPasswdEntry": true,
+        "gitAndPinnedSeparateCodexPrerequisiteAvailable": true,
+        "firstAndSecondFailureLogsPreserved": true
+      },
+      "privateEvidenceSha256": {
+        "runtime-dependencies.log": "c1358c29cd653ac908d7040e16658b8e700d61a80f5fe84be014667a1aad3876",
+        "runtime-proof.json": "a8af20524cad3b4b44cf69932f797a766c4c220824c864abdf5362f65ee6f2bd",
+        "native-suite-second-failure.log": "fc388716436dfa4a4835908d028c91cb77b4b2e11c7bef526bd861e71db8e6e0",
+        "runtime-dependencies-b.log": "76a4a29af4b5346303e6411c7f2a8bb52616dcc4f10f9f19bd44a7deccb756eb",
+        "runtime-prepare.log": "47fb2618884a74e7a098a5be9bbbcc08b1cd9404552fa3f79327cd0a0fa2eb91",
+        "xvfb-package.txt": "fa08ed64ffcb02723486c8825b7b135b1ab7a4edd7ad59307fa352c42568d958",
+        "cpu-onnx-proof.log": "7e96b9fc3df71f714a5e559612c04175b23e022342ed6e7d94f489523a414b97",
+        "runtime-receipt.json": "666fcf804bd4e74cd6bcdc9df89575c5d919c963ca691882ce365bb55c96c881",
+        "test-prerequisites.log": "7f13887cc39616a694d142fb609a7085281d3bdc559ac1088225f6518dc704d0",
+        "native-suite-first-failure.log": "3aebf01d53a9459f92a5e637c9ab1c0d20d844e43bacdcf41ee33cde9c22fc99",
+        "xvfb-install.log": "aaa56767b74e9b0b2c8ae692a70471e6ba913fe1557da98edb598ef6850956f1",
+        "cpu-onnx-proof.json": "244b9f36a19a90c6ac627d2f91e63c6f4642f28c808f93be38ba9f032e9de21d",
+        "native-suite.log": "dd2d98db566f8cac7ca96bd65917f4bf78e48814045d924f9488a40e78a02fc8",
+        "runtime-proof.log": "95989cb72a556f45ea5b37fff1b330200bb67310a067322e1298913d02e1b50a"
+      },
+      "noHostMountsOrPhysicalDevices": true,
+      "packageAdapterTested": false,
+      "realDesktopTested": false,
+      "physicalAudioTested": false,
+      "licenseReviewComplete": false,
+      "embeddedSourceCoverageComplete": false
+    },
+    {
+      "target": "opensuse-leap16.0-x86_64",
+      "officialBaseImage": "docker.io/opensuse/leap@sha256:0ca61694582b062a49b5f79154bff363ebe7ce28d5542fb6c5f63306f222695f",
+      "ownedDependencyImage": "sha256:36530140be46c1d70bf7ea248778b238d53bb32ec05b24ec996f9c77ef4070a2",
+      "containerId": "e71c50cb883e39bdc0a93b05ad06ca3e36a415408c8e4bf94ee1bf5464c7fddf",
+      "policy": "release/opensuse-leap16.0-python-voice.json",
+      "policySha256": "559fb7e0338c055aa10982b2a7fbbdea7b94e4f4cba45921afa49ab7c0328820",
+      "lockIdentity": "b716f324ba5f6c907fdb2d22565e4d0b39e5c122de098fca2fdaa85dcb28c8e6",
+      "runtimeArtifactSha256": "f4d310175b0b6dc4e6d110cf4dad6f3a11e34a981b0a984a2f1088034fbdd4fa",
+      "runtimeFileCount": 918,
+      "imports": {
+        "pythonAbi": [
+          3,
+          13
+        ],
+        "qtVersion": "6.9.1",
+        "managedVersions": {
+          "keyring": "25.6.0",
+          "sounddevice": "0.5.2",
+          "onnxruntime": "1.28.0",
+          "protobuf": "7.35.1"
+        },
+        "systemQt": true,
+        "systemVersions": {
+          "SecretStorage": "3.3.3",
+          "jeepney": "0.8.0",
+          "cryptography": "44.0.3",
+          "cffi": "1.17.1",
+          "numpy": "2.2.2",
+          "PyYAML": "6.0.2",
+          "websocket-client": "1.8.0",
+          "jaraco.classes": "3.4.0",
+          "jaraco.context": "5.3.0",
+          "jaraco.functools": "4.1.0",
+          "more-itertools": "10.7.0"
+        },
+        "origins": {
+          "PySide6": "/usr/lib64/python3.13/site-packages/PySide6/__init__.py",
+          "shiboken6": "/usr/lib64/python3.13/site-packages/shiboken6/__init__.py",
+          "pygments": "/usr/lib/python3.13/site-packages/pygments/__init__.py",
+          "keyring": "/tmp/augmentor-proof/python-runtimes/leap16-cp313-x86_64-voice-b716f324ba5f6c90/lib/python3.13/site-packages/keyring/__init__.py",
+          "sounddevice": "/tmp/augmentor-proof/python-runtimes/leap16-cp313-x86_64-voice-b716f324ba5f6c90/lib/python3.13/site-packages/sounddevice.py",
+          "gi": "/usr/lib64/python3.13/site-packages/gi/__init__.py",
+          "numpy": "/usr/lib64/python3.13/site-packages/numpy/__init__.py",
+          "yaml": "/usr/lib64/python3.13/site-packages/yaml/__init__.py",
+          "websocket": "/usr/lib/python3.13/site-packages/websocket/__init__.py",
+          "cffi": "/usr/lib64/python3.13/site-packages/cffi/__init__.py",
+          "secretstorage": "/usr/lib/python3.13/site-packages/secretstorage/__init__.py",
+          "jeepney": "/usr/lib/python3.13/site-packages/jeepney/__init__.py"
+        },
+        "gtkVersion": [
+          4,
+          18,
+          6
+        ],
+        "portaudioVersion": [
+          1246976,
+          "PortAudio V19.7.0-devel, revision 147dd722548358763a8b649b3e4b41dfffbcfbb6"
+        ],
+        "explicitCredentialBackend": "keyring.backends.SecretService.Keyring",
+        "speechDependencies": {
+          "onnxruntime": "1.28.0",
+          "protobuf": "7.35.1",
+          "flatbuffers": "25.2.10",
+          "packaging": "24.2",
+          "availableProviders": [
+            "AzureExecutionProvider",
+            "CPUExecutionProvider"
+          ],
+          "origins": {
+            "onnxruntime": "/tmp/augmentor-proof/python-runtimes/leap16-cp313-x86_64-voice-b716f324ba5f6c90/lib/python3.13/site-packages/onnxruntime/__init__.py",
+            "google.protobuf": "/tmp/augmentor-proof/python-runtimes/leap16-cp313-x86_64-voice-b716f324ba5f6c90/lib/python3.13/site-packages/google/protobuf/__init__.py",
+            "flatbuffers": "/usr/lib/python3.13/site-packages/flatbuffers/__init__.py",
+            "packaging": "/usr/lib/python3.13/site-packages/packaging/__init__.py"
+          }
+        },
+        "secretServiceLifecycleTested": false,
+        "physicalAudioTested": false,
+        "handsFreeTested": false
+      },
+      "runtimeRenderAndIntegrityProof": {
+        "format": "augmentor-linux-python-runtime-fixture/1",
+        "target": "opensuse-leap16.0-x86_64",
+        "policySha256": "559fb7e0338c055aa10982b2a7fbbdea7b94e4f4cba45921afa49ab7c0328820",
+        "proofSha256": "4ae51e6c14f29cdecc0e21d9a1f82b4a61caba6a31b2c4cd1605ab06887a287f",
+        "runtimeToolSha256": "e5e7ea171568553af17338d8915f96d940986667adb473cdf7195519b792d4e9",
+        "qtInventoryToolSha256": "e2e59773aab64604dc5322ac1608d78d732ee58771d37d1ba298af593eb1fba0",
+        "lockIdentity": "b716f324ba5f6c907fdb2d22565e4d0b39e5c122de098fca2fdaa85dcb28c8e6",
+        "runtimeArtifactSha256": "f4d310175b0b6dc4e6d110cf4dad6f3a11e34a981b0a984a2f1088034fbdd4fa",
+        "runtimeFileCount": 918,
+        "imports": {
+          "pythonAbi": [
+            3,
+            13
+          ],
+          "qtVersion": "6.9.1",
+          "managedVersions": {
+            "keyring": "25.6.0",
+            "sounddevice": "0.5.2",
+            "onnxruntime": "1.28.0",
+            "protobuf": "7.35.1"
+          },
+          "systemQt": true,
+          "systemVersions": {
+            "SecretStorage": "3.3.3",
+            "jeepney": "0.8.0",
+            "cryptography": "44.0.3",
+            "cffi": "1.17.1",
+            "numpy": "2.2.2",
+            "PyYAML": "6.0.2",
+            "websocket-client": "1.8.0",
+            "jaraco.classes": "3.4.0",
+            "jaraco.context": "5.3.0",
+            "jaraco.functools": "4.1.0",
+            "more-itertools": "10.7.0"
+          },
+          "origins": {
+            "PySide6": "/usr/lib64/python3.13/site-packages/PySide6/__init__.py",
+            "shiboken6": "/usr/lib64/python3.13/site-packages/shiboken6/__init__.py",
+            "pygments": "/usr/lib/python3.13/site-packages/pygments/__init__.py",
+            "keyring": "/tmp/augmentor-proof/python-runtimes/leap16-cp313-x86_64-voice-b716f324ba5f6c90/lib/python3.13/site-packages/keyring/__init__.py",
+            "sounddevice": "/tmp/augmentor-proof/python-runtimes/leap16-cp313-x86_64-voice-b716f324ba5f6c90/lib/python3.13/site-packages/sounddevice.py",
+            "gi": "/usr/lib64/python3.13/site-packages/gi/__init__.py",
+            "numpy": "/usr/lib64/python3.13/site-packages/numpy/__init__.py",
+            "yaml": "/usr/lib64/python3.13/site-packages/yaml/__init__.py",
+            "websocket": "/usr/lib/python3.13/site-packages/websocket/__init__.py",
+            "cffi": "/usr/lib64/python3.13/site-packages/cffi/__init__.py",
+            "secretstorage": "/usr/lib/python3.13/site-packages/secretstorage/__init__.py",
+            "jeepney": "/usr/lib/python3.13/site-packages/jeepney/__init__.py"
+          },
+          "gtkVersion": [
+            4,
+            18,
+            6
+          ],
+          "portaudioVersion": [
+            1246976,
+            "PortAudio V19.7.0-devel, revision 147dd722548358763a8b649b3e4b41dfffbcfbb6"
+          ],
+          "explicitCredentialBackend": "keyring.backends.SecretService.Keyring",
+          "speechDependencies": {
+            "onnxruntime": "1.28.0",
+            "protobuf": "7.35.1",
+            "flatbuffers": "25.2.10",
+            "packaging": "24.2",
+            "availableProviders": [
+              "AzureExecutionProvider",
+              "CPUExecutionProvider"
+            ],
+            "origins": {
+              "onnxruntime": "/tmp/augmentor-proof/python-runtimes/leap16-cp313-x86_64-voice-b716f324ba5f6c90/lib/python3.13/site-packages/onnxruntime/__init__.py",
+              "google.protobuf": "/tmp/augmentor-proof/python-runtimes/leap16-cp313-x86_64-voice-b716f324ba5f6c90/lib/python3.13/site-packages/google/protobuf/__init__.py",
+              "flatbuffers": "/usr/lib/python3.13/site-packages/flatbuffers/__init__.py",
+              "packaging": "/usr/lib/python3.13/site-packages/packaging/__init__.py"
+            }
+          },
+          "secretServiceLifecycleTested": false,
+          "physicalAudioTested": false,
+          "handsFreeTested": false
+        },
+        "offlineLockedWheelPrepare": true,
+        "verifiedWheelCount": 4,
+        "offlineFiveWheelPrepare": false,
+        "exactRuntimeReusedWithoutRewrite": true,
+        "tamperedRuntimeRefusedWithoutRepair": true,
+        "qtWidgetsXcbRendered": true,
+        "qtSvgRendered": true,
+        "qtQuickSoftwareRendered": true,
+        "qtBinaryCount": 59,
+        "qtSymlinkCount": 0,
+        "qtInventorySha256": "173d7e7568fe87dbc45c84002b545dc417d397cdee3dc831eca8e51e0d65ee89",
+        "installedProductTested": false,
+        "approvedUiTested": false,
+        "gnomeLoginTested": false,
+        "secretServiceLifecycleTested": false,
+        "physicalAudioTested": false,
+        "handsFreeTested": false,
+        "licenseReviewComplete": false,
+        "embeddedSourceCoverageComplete": false
+      },
+      "actualCpuComputation": {
+        "format": "augmentor-linux-cpu-onnx-fixture/1",
+        "target": "opensuse-leap16.0-x86_64",
+        "proofSha256": "bbbd3a8bdbef56b64f420ef6df61432a81acfb40d8d8748b5f0a756eb133e4a2",
+        "runtimeToolSha256": "e5e7ea171568553af17338d8915f96d940986667adb473cdf7195519b792d4e9",
+        "policySha256": "559fb7e0338c055aa10982b2a7fbbdea7b94e4f4cba45921afa49ab7c0328820",
+        "runtimeArtifactSha256": "f4d310175b0b6dc4e6d110cf4dad6f3a11e34a981b0a984a2f1088034fbdd4fa",
+        "modelUrl": "https://raw.githubusercontent.com/onnx/onnx/v1.19.0/onnx/backend/test/data/node/test_identity/model.onnx",
+        "modelSha256": "cee798fc84cc4a49233de96443dd0990881a9a5e0beb8d3a9c3257884c84ceed",
+        "modelBytes": 115,
+        "providers": [
+          "CPUExecutionProvider"
+        ],
+        "identityOutputMatches": true,
+        "runtimeUnchanged": true,
+        "speechModelTested": false,
+        "physicalAudioTested": false,
+        "installedProductTested": false
+      },
+      "fullNativeSuite": {
+        "testsRun": 687,
+        "skipped": 2,
+        "passed": true,
+        "applicationSourceBase": "c5564bcff455db9e9633b9cab3af60f8f1b93a2c",
+        "compiledApplicationSource": "c4b885e035f2a87966a222b6df7621467bd87e89",
+        "workingSource": true,
+        "testUserHasPasswdEntry": true,
+        "gitAndPinnedSeparateCodexPrerequisiteAvailable": true,
+        "firstAndSecondFailureLogsPreserved": true
+      },
+      "privateEvidenceSha256": {
+        "runtime-dependencies.log": "4d23091ea78a983906a12706cf5c4435ba7fd77d6ba06a9cde731c2f1b0c2100",
+        "runtime-proof.json": "fe2731f8002ce516e0a3116db0a2bf958b11576231a87129220516919a2a633c",
+        "native-suite-second-failure.log": "a1540c4366cb3a9f6d0ade96a0f53bab02d8b4c757955c79969b6ae03545f065",
+        "runtime-dependencies-b.log": "7ec3ab980cb0e2dfe0de78e413bf6ffbdc6567d2552a542434d7c167c71aea22",
+        "runtime-prepare.log": "81493dc504f3388efaffc6bf844ee8f6a2212aca866eb6d19ff833b97036dd6f",
+        "cpu-onnx-proof.log": "9e7bf3248b877d54578ea71e51b2c4127eb91bccbeff2089e86dc303cb41ea17",
+        "runtime-receipt.json": "89167d893c714770c93c96cd34b6192602a8fdaf6ec3aac0e39de3341e2aff06",
+        "test-prerequisites.log": "747e6bfe5e64f24c9027b934dba6dddda083062dd9a2f0f1664d0572e66243ff",
+        "native-suite-first-failure.log": "0a19005e541c1c111bba70713bfb6ee2c53390c6c187fde3f2618cffcb36c1dd",
+        "xvfb-install.log": "af9f161fff681d589c9be31d690fdec79279b904a9a38c605c05b8e0fb38f66b",
+        "cpu-onnx-proof.json": "d62c6f5f0d7c2943927ff4df663a1ea644141bc04bf6225a2cfe83432fef8f23",
+        "native-suite.log": "f8cb9082093b3097bad33944e41648fe18835e3ee7df921dfdac31ea027d156b",
+        "runtime-proof.log": "03ccb7430102865c4d06cb81e2ca4c2b79bc7517542098774e4f2d1090345bf4"
+      },
+      "noHostMountsOrPhysicalDevices": true,
+      "packageAdapterTested": false,
+      "realDesktopTested": false,
+      "physicalAudioTested": false,
+      "licenseReviewComplete": false,
+      "embeddedSourceCoverageComplete": false
+    }
+  ],
+  "testedWorkingFiles": {
+    "scripts/linux-python-runtime.py": "e5e7ea171568553af17338d8915f96d940986667adb473cdf7195519b792d4e9",
+    "services/desktop/capture_stream.py": "1791aa1ad8a1f6ad0c269adc441601228097f779bdd6c21737500718b4054d56",
+    "tests/test_desktop_startup.py": "ceae01a8ce8241691f799818ddd8a7ab026f16e28a2f9cb86fefca85bfe771d6",
+    "tests/test_capture_stream.py": "ad8f7416cb9a969f4ffad90afc8b6b5012ccd491707c0a98231761b244aa86a9",
+    "tests/test_linux_python_runtime.py": "46d7972dab6eae816355158a7231eece37f3e8e2a3ebeb4183586ff01dfde946",
+    "release/prove-linux-python-runtime.py": "4ae51e6c14f29cdecc0e21d9a1f82b4a61caba6a31b2c4cd1605ab06887a287f",
+    "release/prove-linux-cpu-onnx.py": "bbbd3a8bdbef56b64f420ef6df61432a81acfb40d8d8748b5f0a756eb133e4a2"
+  },
+  "failedExtraCapabilityReduction": "Initial cap-drop-ALL fixtures failed in package-manager chown/archive operations; stopped preserved fixtures, then used normal unprivileged-container capabilities with no host mounts/devices. No signature checks were disabled."
+}

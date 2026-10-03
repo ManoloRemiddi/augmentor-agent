@@ -1,0 +1,46 @@
+{
+  "format": "augmentor-gnome-full-vm-lifecycle/1",
+  "source": {
+    "commit": "f7d75859f5bd88fd99bec2b4904aae5fd3423ed7",
+    "dirty": false
+  },
+  "version": "0.2.13",
+  "proofSha256": "4dea53f43bddb4c59fb4823e58f16b1c6c7d549ad2001b6b7f31273b69bb00bf",
+  "duplicateAutostartPreservesProcessAndState": true,
+  "duplicateAutostartCount": 3,
+  "lockSuspendsUserObserver": true,
+  "sameCompositorOwnerAfterUnlock": true,
+  "freshEpochAfterUnlock": true,
+  "oldObserverRefusedAfterUnlock": true,
+  "lockPreservesApplicationProcessAndState": true,
+  "idleCloseAccepted": true,
+  "cleanServiceExit": true,
+  "canonicalClosedLaunch": true,
+  "reopenedServiceOwnsNewProcess": true,
+  "packageVerifiedAfterLifecycle": true,
+  "selinuxEnforcing": true,
+  "positiveLockedSceneTested": false,
+  "loginAuthenticationTested": false,
+  "harnessConnectionTested": false,
+  "modelTurnTested": false,
+  "crashRecoveryTested": false,
+  "rebootTested": false,
+  "gnomeInputToolsEnabled": false,
+  "checkpointDate": "2026-10-02",
+  "fixture": "Full Cloud-derived Fedora 44 GNOME/GDM Wayland; fixture idle-delay uint32 0",
+  "rpmSha256": "831c1715e94305fa3d1ab4a0ad202fa92371c59cbea7517155f8b4ee51d51a57",
+  "rawReportSha256": "fdae9d362afc08b13a641e8ee3909085f9462409595715a1f606cc238bf989e8",
+  "testedBase": "5fd30b33d6f4099a377b6d5bacf8e70240b20ca5",
+  "workingProofChanges": [
+    "release/prove-gnome-vm-lifecycle.py"
+  ],
+  "lockedObservationOutcome": "org.freedesktop.DBus.Error.UnknownMethod; user-only observer object is absent",
+  "busyOnboardingPreflightRefused": true,
+  "limits": [
+    "Installed source is the earlier clean f7d7585 package, with supplemental fixture wmctrl; later workspace source is not installed.",
+    "Three production autostart requests preserve the same idle app process and maintenance state. A clean accepted idle close is followed by one production canonical launch into a new service-owned process.",
+    "Lock/unlock uses loginctl only in the marked QEMU guest. This proves observer unavailability/fresh epoch; it does not test password authentication or a positive locked scene.",
+    "Fixture automatic idle blanking is disabled, with original value saved privately; explicit lock testing remains active.",
+    "No connected harness, model turn, crash/reboot or production GNOME input acceptance is established."
+  ]
+}

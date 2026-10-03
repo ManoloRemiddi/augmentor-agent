@@ -1,0 +1,57 @@
+{
+  "format": "augmentor-mint-source-profile-implementation/1",
+  "baselineCommit": "423f0714d1782ef105a5906b3fe6c6efb4573fe0",
+  "newTrackedFiles": [
+    "docs/LINUX-MINT-PACKAGES.md",
+    "release/linuxmint22.3-python-source-qt-voice.json",
+    "tests/test_mint_source_runtime.py"
+  ],
+  "MintLockIdentity": "1288cb482b8db727b8cdf349a97cbcd4473a44fe6945862a1ac141d4a8b86c9a",
+  "NobleLockIdentity": "2976a17cdfaee164cb01a7ce5f6e16afd5688403c48cc275cf2e7d68b1ad1c01",
+  "policySha256": "2dc64e6d1c02579970a61cb0b200c79c8a36d84aa54e021dcb1cfafa9b3f2f16",
+  "nativeInputBytesChanged": false,
+  "NoblePolicyBytesChanged": false,
+  "verification": [
+    {
+      "command": "PYTHONPATH=services python3 -B focused aggregate suite",
+      "cases": 92,
+      "passed": true,
+      "scope": "nine pure/synthetic distribution/runtime/deployment/setup files before final additional package policy-target refusal"
+    },
+    {
+      "command": "node --test tests/linux-python-selection.test.mjs",
+      "cases": 6,
+      "passed": true
+    },
+    {
+      "command": "npm run check",
+      "passed": true
+    },
+    {
+      "command": "npm run build",
+      "passed": true
+    },
+    {
+      "command": "git diff --check",
+      "passed": true
+    },
+    {
+      "command": "PYTHONPATH=services python3 -B -m unittest discover -s tests -p test_mint_source_runtime.py",
+      "cases": 12,
+      "passed": true,
+      "scope": "Final Mint suite after additional package-policy target refusal check"
+    }
+  ],
+  "VMCommandsOrPackageInstalls": false,
+  "ownerServicesModelsHardwareTouched": false,
+  "target": "linuxmint22.3-amd64",
+  "profile": "mint223-cp312-x86_64-source-qt-voice",
+  "nativeDependencyProvenance": "Exact reviewed Noble-built seven wheels plus67 Qt stage files and18 SONAME links; no Mint build claim",
+  "installedAcceptance": false,
+  "packageArtifactBuilt": false,
+  "sourceLicensingAcceptance": false,
+  "rootLicenseUnchanged": true,
+  "proposed22FileLicenseScopeUnchanged": true,
+  "publicRelease": false,
+  "allFiveRolloutPointsComplete": false
+}

@@ -1,0 +1,101 @@
+{
+  "target": "ubuntu24.04-amd64",
+  "sourceCommit": "1c670c0694254bf401099b5365157a01c6e7943f",
+  "bundle": "0.2.13-ubuntu24.04-amd64-complete-preview.1-1c670c069425",
+  "proofScriptSha256": "3b3a13de45f20f9ac81d2f54c2e151e70a163ae25e39b1ab4bc1b1e35d1a92b4",
+  "ordinaryUserSetup": true,
+  "realInstalledDshAndPlugins": true,
+  "offscreenNativeRender": true,
+  "secondWindowEntry": true,
+  "nativeHostRegistered": true,
+  "repeatPreservesSettings": true,
+  "linuxAndBrowserRoleFixtureTurns": true,
+  "restartPreservesHistoryWithoutReplay": true,
+  "modelRequests": 4,
+  "realDesktopSessionTested": false,
+  "graphicalBrowserTested": false,
+  "physicalVoiceTested": false,
+  "memoryEngineTested": false,
+  "pythonRuntime": {
+    "format": "augmentor-linux-python-runtime-contract/1",
+    "target": "ubuntu24.04-amd64",
+    "profile": "noble-cp312-x86_64-voice",
+    "pythonAbi": [
+      3,
+      12
+    ],
+    "architecture": "x86_64",
+    "lockIdentity": "81b66921d3a2eb01518845f06e9cee177a533f780214bc6e020a1e44f66290b0",
+    "policySha256": "2c58df0f7538526963bd44beb075965c4a339bf36ddae6db41b1ebc70133026b",
+    "licenseReviewComplete": false,
+    "embeddedSourceCoverageComplete": false
+  },
+  "selectedPython": "/home/augmentor-complete-proof/.local/share/augmentor/python-runtimes/noble-cp312-x86_64-voice-81b66921d3a2eb01/bin/python3",
+  "licenseReviewComplete": false,
+  "embeddedSourceCoverageComplete": false,
+  "systemPlan": {
+    "target": "ubuntu24.04-amd64",
+    "packageManager": "apt",
+    "packages": [
+      "augmentor-desktop_0.2.13_amd64.deb",
+      "augmentor-runtime_0.2.13_amd64.deb"
+    ],
+    "pythonRuntime": {
+      "format": "augmentor-linux-python-runtime-contract/1",
+      "target": "ubuntu24.04-amd64",
+      "profile": "noble-cp312-x86_64-voice",
+      "pythonAbi": [
+        3,
+        12
+      ],
+      "architecture": "x86_64",
+      "lockIdentity": "81b66921d3a2eb01518845f06e9cee177a533f780214bc6e020a1e44f66290b0",
+      "policySha256": "2c58df0f7538526963bd44beb075965c4a339bf36ddae6db41b1ebc70133026b",
+      "licenseReviewComplete": false,
+      "embeddedSourceCoverageComplete": false
+    },
+    "dependencies": [
+      "ca-certificates",
+      "python3-venv",
+      "npm",
+      "libportaudio2",
+      "libasound2-plugins",
+      "pulseaudio-utils"
+    ],
+    "command": [
+      "sudo",
+      "apt",
+      "install",
+      "-y",
+      "/work/outputs/linux-rollout/1c670c0-noble/complete/augmentor-desktop_0.2.13_amd64.deb",
+      "/work/outputs/linux-rollout/1c670c0-noble/complete/augmentor-runtime_0.2.13_amd64.deb",
+      "ca-certificates",
+      "python3-venv",
+      "npm",
+      "libportaudio2",
+      "libasound2-plugins",
+      "pulseaudio-utils"
+    ],
+    "memoryEngine": "deferred",
+    "installMemoryEngine": false,
+    "qualification": "Package adapter; real desktop/browser/voice acceptance is separate."
+  },
+  "completeArchive": {
+    "sha256": "aa9736f80f7216ce2001b2c27586bf0d7a54e031f707f15ec7246dcea7bc6af7",
+    "bytes": 188056591
+  },
+  "completeProofLogSha256": "23d426379fea3076cadeed5a3ccb2f6d39cc4b58ae56e2a9a41e676c27d8ed2b",
+  "baseImageDigest": "sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3",
+  "candidateOnly": true,
+  "sourceRefs": {
+    "augmentor": "1c670c0694254bf401099b5365157a01c6e7943f",
+    "voice": "936a721531bf69b9dd453c56f1c54f709f288419",
+    "adaptive": "64a1ef82e3d69f57a69809d530c1b9ed0bc67480"
+  },
+  "sourceSnapshotBundle": {
+    "artifactId": "0.2.13-complete-preview.1-0eb2ec112afa",
+    "manifestSha256": "56ad1216a8ad0472b3cc981c05f342ae79689c4107a86b64f75eb7da17951a44"
+  },
+  "screenshotSha256": "4f3f0d2d20ec678446aa362b0331df9fd391bc4a20e3a3214c4ba5fe6af45a1e",
+  "scope": "Fresh disposable official Ubuntu base; installed packages plus real DSH/plugins and synthetic localhost model through Desktop/Browser role adapters. Native screenshot uses preview/offscreen. No actual graphical Browser or GNOME login, physical speech or memory engine acceptance."
+}

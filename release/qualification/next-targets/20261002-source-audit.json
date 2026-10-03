@@ -1,0 +1,57 @@
+{
+  "format": "augmentor-source-audit-checkpoint/1",
+  "testedProductSource": "c4b885e035f2a87966a222b6df7621467bd87e89",
+  "qtwaylandSourceArchive": {
+    "name": "qtwayland",
+    "version": "6.8.2",
+    "repository": "https://code.qt.io/qt/qtwayland.git",
+    "commit": "4261629005d174311045a44914d599ad67d2b7a3",
+    "artifact": "qtwayland-6.8.2-source.tar.gz",
+    "coverage": [
+      "QtWaylandClient and client plugins",
+      "QtWaylandCompositor and compositor plugins/QML (GPL-or-commercial; license route remains open)"
+    ],
+    "binaryBuildProvenanceVerified": false,
+    "sha256": "04e8f08b714d1f96f3f7599ca0af5669623b6d06cfba0b01c893af519afa0beb",
+    "bytes": 1465799,
+    "published": false,
+    "submodules": []
+  },
+  "qtwaylandSourceVerification": {
+    "verifiedEntries": 1070,
+    "gitExportSubstitution": ".tag",
+    "unexplainedMissingSource": false,
+    "published": false
+  },
+  "newNoticeCollections": {
+    "qtwayland-6.8.2": {
+      "recordSha256": "21e9d7834e5ed55d91b457923403f7958a48dec47b439d6960e73548aade9e5b",
+      "files": 33,
+      "unresolved": 0,
+      "binaryCoverageVerified": false
+    },
+    "icu-73.2": {
+      "recordSha256": "6c5e62d4101ebd623dd05f9391a5dec6200058dbc7f5cd95b3029f5df09d3ae5",
+      "files": 1,
+      "unresolved": 0,
+      "binaryCoverageVerified": false
+    }
+  },
+  "actualLockedWheelInventory": {
+    "wheelArchives": 7,
+    "elfMembers": 266,
+    "supplementaryCollections": 9,
+    "supplementaryNoticeFiles": 240,
+    "changedIcuNoticeRefused": true
+  },
+  "confirmedExtraGplOrCommercialComponents": [
+    "QtWaylandCompositor",
+    "QtQuickTimeline",
+    "QtQuickTimelineBlendTrees"
+  ],
+  "licenseReviewComplete": false,
+  "embeddedSourceCoverageComplete": false,
+  "recipientReplacementTested": false,
+  "correspondingSourcePublished": false,
+  "completeVendorBuildCorrespondenceVerified": false
+}

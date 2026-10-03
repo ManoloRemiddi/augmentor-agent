@@ -15,6 +15,7 @@ def module(name,path):
     spec=importlib.util.spec_from_file_location(name,ROOT/path);value=importlib.util.module_from_spec(spec);spec.loader.exec_module(value);return value
 maintenance=module('maintenance','scripts/maintenance.py')
 lease=module('lease_test','services/lifecycle/lease.py')
+component=module('component_test','scripts/run-component.py')
 
 
 class ExitRaceTests(unittest.TestCase):
@@ -28,6 +29,14 @@ class ExitRaceTests(unittest.TestCase):
 
 
 class LifecycleTests(unittest.TestCase):
+    def test_maintenance_refusal_prevents_runtime_verification_and_execution(self):
+        with patch.object(component,'hold',side_effect=RuntimeError('maintenance')),\
+                patch.object(component,'component_environment') as environment,\
+                patch.object(component.os,'execvpe') as execute:
+            with self.assertRaisesRegex(RuntimeError,'maintenance'):
+                component.main(['runtime','node','component.mjs'])
+        environment.assert_not_called();execute.assert_not_called()
+
     def test_memory_companion_shutdown_preserves_journal(self):
         with tempfile.TemporaryDirectory() as name:
             root=Path(name)
@@ -79,6 +88,15 @@ class LifecycleTests(unittest.TestCase):
             alien.unlink();alien.symlink_to(owned)
             with self.assertRaisesRegex(RuntimeError,'no integrations were changed'):maintenance.owned_integrations('desktop')
             self.assertTrue(owned.exists())
+
+    def test_persistent_maintenance_survives_missing_run_mirrors(self):
+        with tempfile.TemporaryDirectory() as name:
+            root=Path(name);(root/'release.json').write_text('{}')
+            (root/'augmentor-runtime.lock').touch();pending=root/'persistent-pending.json';pending.write_text('{}')
+            with patch.object(lease,'ROOT',root),patch.object(lease,'LOCK_ROOT',root),\
+                    patch.object(lease,'PERSISTENT_PENDING',pending),patch.object(lease,'configured') as configured:
+                with self.assertRaisesRegex(RuntimeError,'maintenance'):lease.hold('runtime')
+                configured.assert_not_called();self.assertFalse(lease._leases)
 
     def test_backup_obeys_configured_paths_and_preserves_private_data(self):
         with tempfile.TemporaryDirectory() as name:

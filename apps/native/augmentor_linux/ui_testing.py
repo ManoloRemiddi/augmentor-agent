@@ -8,14 +8,104 @@ from pathlib import Path
 import os
 
 
+def shortcut_settings(window, request):
+    """Operate only the actual opted-in window's bounded Settings controls."""
+    from PySide6.QtCore import QTimer, Qt
+    from PySide6.QtGui import QKeySequence
+    from PySide6.QtWidgets import QDialog, QScrollArea
+    from .shortcut_key_codec import encode
+    operation = request.get('operation')
+    fields = {'open': set(), 'inspect': set(), 'close': set(),
+              'choose': {'instance', 'sequence', 'expectedCurrent'},
+              'save': {'instance', 'expectedSequence', 'expectedCurrent'}}
+    if (operation not in fields or set(request) != {'action', 'operation'} | fields[operation]):
+        raise ValueError('Use an explicit bounded shortcut Settings operation.')
+    controller = window.controller
+    if (not window.isVisible() or window.composer.toPlainText() or window.editing
+            or window.composer.improving or bool(controller and any(getattr(controller, key, False)
+                for key in ('running', 'navigating', 'repairing')))):
+        raise ValueError('Shortcut Settings proof requires a visible idle window with no draft.')
+    dialog = window.shortcut_dialog
+    visible = [d for d in window.findChildren(QDialog) if d.isVisible()]
+    if any(d is not dialog for d in visible):
+        raise ValueError('Shortcut Settings proof cannot operate behind another dialog.')
+    if dialog is not None and (dialog.owner is not window or dialog.shortcuts.owner is not window):
+        raise ValueError('Only the actual window Settings dialog may be inspected.')
+    if operation == 'open':
+        if dialog is not None or getattr(window, '_shortcut_proof_opening', False):
+            raise ValueError('Shortcut Settings is already open or opening.')
+        window._shortcut_proof_opening = True
+        def opened():
+            window._shortcut_proof_opening = False
+            # The IPC reply precedes the normal modal exec(), and this callback
+            # rechecks admission because another UI event can run in between.
+            if (window.maintenance.phase() == 'ready' and window.isVisible()
+                    and not window.composer.toPlainText() and not window.editing
+                    and not window.composer.improving and not window.shortcut_dialog
+                    and not any(d.isVisible() for d in window.findChildren(QDialog))
+                    and not bool(window.controller and any(getattr(window.controller, key, False)
+                        for key in ('running', 'navigating', 'repairing')))):
+                window.open_settings()
+        QTimer.singleShot(0, opened)
+    elif operation != 'inspect':
+        if (dialog is None or not dialog.isVisible() or dialog.owner is not window
+                or dialog.shortcuts.owner is not window):
+            raise ValueError('The actual window Settings dialog must be open.')
+        rows = dialog.shortcuts.rows
+        if any(row['saving'] for row in rows.values()):
+            raise ValueError('Wait for the actual asynchronous shortcut Save to finish.')
+        if operation == 'close':
+            dialog.reject()
+        else:
+            from PySide6.QtTest import QTest
+            name = request['instance']
+            if name not in ('main', 'secondary'):
+                raise ValueError('Choose one of the two shortcut rows.')
+            row = rows[name]
+            if (not isinstance(request['expectedCurrent'], str)
+                    or row['keys'] is None or row['current'].text() != request['expectedCurrent']):
+                raise ValueError('Shortcut Settings changed; inspect the current binding again.')
+            for scroll in dialog.findChildren(QScrollArea):
+                scroll.ensureWidgetVisible(row['editor'])
+            if operation == 'choose':
+                text = request['sequence']
+                if not isinstance(text, str) or not 1 <= len(text) <= 80 or not text.isascii():
+                    raise ValueError('Use one bounded shortcut combination.')
+                sequence = QKeySequence(text, QKeySequence.SequenceFormat.PortableText)
+                if sequence.count() != 1 or sequence.isEmpty():
+                    raise ValueError('Use one shortcut combination.')
+                encode(sequence)  # Same supported key contract as production Save.
+                row['editor'].clear();row['editor'].setFocus()
+                QTest.keyClick(row['editor'], sequence[0].key(), sequence[0].keyboardModifiers())
+            else:
+                expected = request['expectedSequence']
+                if (not isinstance(expected, str) or len(expected) > 80
+                        or row['editor'].keySequence().toString(QKeySequence.SequenceFormat.PortableText) != expected
+                        or not row['button'].isEnabled() or not row['button'].isVisible()):
+                    raise ValueError('Shortcut Save requires the exact selected combination and an enabled button.')
+                QTest.mouseClick(row['button'], Qt.MouseButton.LeftButton)
+    dialog = window.shortcut_dialog
+    return {'pid': os.getpid(), 'buildRoot': str(Path(__file__).resolve().parents[3]),
+            'open': bool(dialog and dialog.isVisible()),
+            'opening': bool(getattr(window, '_shortcut_proof_opening', False)),
+            'rows': {name: {'current': row['current'].text(), 'note': row['note'].text(),
+                            'sequence': row['editor'].keySequence().toString(QKeySequence.SequenceFormat.PortableText),
+                            'saving': row['saving'], 'ready': row['keys'] is not None,
+                            'saveEnabled': row['button'].isEnabled()}
+                     for name, row in dialog.shortcuts.rows.items()} if dialog and dialog.isVisible() else {}}
+
+
 def dispatch(window, request, *, enabled=False):
     if not enabled:raise ValueError('UI test control is disabled for this launch.')
+    if not isinstance(request, dict):raise ValueError('Use a UI test request object.')
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QDialog
     controller=window.controller
     action=request.get('action')
     if action not in ('inspect','capture') and window.maintenance.phase()!='ready':
         raise ValueError('Augmentor maintenance is in progress. This request was not started.')
+    if action == 'shortcut-settings':
+        return shortcut_settings(window, request)
     if action=='inspect':
         return {'pid':os.getpid(),'visible':window.isVisible(),'active':window.isActiveWindow(),
                 'online':bool(controller and controller.online),
@@ -26,9 +116,21 @@ def dispatch(window, request, *, enabled=False):
                 'draft':window.composer.toPlainText(),
                 'transcript':window.transcript.toPlainText(),
                 'status':window.status.text(),
+                'pinned':bool(window.preferences.values['pinned']),
                 'uiScale':window.ui_scale.percent,'width':window.width(),
                 'fontPixels':window.brand.font().pixelSize(),'buttonWidth':window.send_button.width(),
                 'dialogs':[d.windowTitle() for d in window.findChildren(QDialog) if d.isVisible()]}
+    if action=='pin':
+        expected=request.get('expected');pinned=request.get('pinned')
+        if (type(expected) is not bool or type(pinned) is not bool
+                or window.preferences.values['pinned'] is not expected
+                or not window.isVisible() or not window.pin_button.isVisible() or not window.pin_button.isEnabled()
+                or any(d.isVisible() for d in window.findChildren(QDialog))):
+            raise ValueError('Pin proof requires a visible window, exact expected state and no dialogs.')
+        if expected!=pinned:
+            from PySide6.QtTest import QTest
+            QTest.mouseClick(window.pin_button,Qt.MouseButton.LeftButton)
+        return {'pinned':bool(window.preferences.values['pinned'])}
     if action=='zoom':
         from .ui_scale import MINIMUM,MAXIMUM,STEP
         percent=request.get('percent')

@@ -1,0 +1,114 @@
+{
+  "format": "augmentor-linux-qualification/1",
+  "checkpointDate": "2026-10-02",
+  "environment": {
+    "sourceCommit": "a5d27c3053f3015dad27af3da8e39b53f63ccde7",
+    "baseImage": "docker.io/library/ubuntu@sha256:da6fc2be547864451aa253836dd926da33623312df4a9a243e35dc877c378a78",
+    "derivedDependencyCache": "augmentor-rollout-ubuntu-complete-cache",
+    "oldPayloadRemovedBeforeProof": true,
+    "exitCode": 0
+  },
+  "package": {
+    "target": "ubuntu26.04-amd64",
+    "imageDigest": "docker.io/library/ubuntu@sha256:da6fc2be547864451aa253836dd926da33623312df4a9a243e35dc877c378a78",
+    "source": {
+      "commit": "a5d27c3053f3015dad27af3da8e39b53f63ccde7",
+      "dirty": false
+    },
+    "artifacts": {
+      "augmentor-runtime_0.2.13_amd64.deb": "eb4a6bc5f7a5957a2b51d9000c26535c97367a3f7e883f7a2bd9444cf77ca6b7",
+      "augmentor-desktop_0.2.13_amd64.deb": "b2a7db3df009813d8bdc31d572945a4e113860f00e20b7e65761314968d7bfd0"
+    },
+    "proofScriptSha256": "5a98f411d116f3a0dfd855e58f6a1246f520bbc68729ca4bd53c7aab7da0711f",
+    "versions": {
+      "python": "3.14.4",
+      "pyside": "6.10.2",
+      "qt": "6.10.2",
+      "node": "v24.19.0"
+    },
+    "freshInstall": true,
+    "nonRootRuntimeLease": true,
+    "nonRootQtRender": true,
+    "activeRuntimeAndDesktopReinstallBlocked": true,
+    "activeComponentRemovalBlocked": true,
+    "idleReinstall": true,
+    "removePreservesPrivateFiles": true,
+    "reinstallAfterRemove": true,
+    "realDesktopSessionTested": false,
+    "physicalAudioTested": false,
+    "selinuxEnforcingTested": false,
+    "dshModelTurnTested": false
+  },
+  "complete": {
+    "target": "ubuntu26.04-amd64",
+    "sourceCommit": "a5d27c3053f3015dad27af3da8e39b53f63ccde7",
+    "bundle": "0.2.13-ubuntu26.04-amd64-complete-preview.1-a5d27c3053f3",
+    "proofScriptSha256": "7cffa5862f48668cf9136b83f95fb6b80e50686d6dcecf933ad146ee0c5db267",
+    "ordinaryUserSetup": true,
+    "realInstalledDshAndPlugins": true,
+    "offscreenNativeRender": true,
+    "secondWindowEntry": true,
+    "nativeHostRegistered": true,
+    "repeatPreservesSettings": true,
+    "linuxAndBrowserRoleFixtureTurns": true,
+    "restartPreservesHistoryWithoutReplay": true,
+    "modelRequests": 4,
+    "realDesktopSessionTested": false,
+    "graphicalBrowserTested": false,
+    "physicalVoiceTested": false,
+    "memoryEngineTested": false,
+    "systemPlan": {
+      "target": "ubuntu26.04-amd64",
+      "packageManager": "apt",
+      "packages": [
+        "augmentor-desktop_0.2.13_amd64.deb",
+        "augmentor-runtime_0.2.13_amd64.deb"
+      ],
+      "dependencies": [
+        "ca-certificates",
+        "python3-venv",
+        "npm",
+        "libportaudio2",
+        "libasound2-plugins",
+        "pulseaudio-utils"
+      ],
+      "command": [
+        "sudo",
+        "apt",
+        "install",
+        "-y",
+        "/bundle/augmentor-desktop_0.2.13_amd64.deb",
+        "/bundle/augmentor-runtime_0.2.13_amd64.deb",
+        "ca-certificates",
+        "python3-venv",
+        "npm",
+        "libportaudio2",
+        "libasound2-plugins",
+        "pulseaudio-utils"
+      ],
+      "memoryEngine": "deferred",
+      "installMemoryEngine": false,
+      "qualification": "Package adapter; real desktop/browser/voice acceptance is separate."
+    }
+  },
+  "credentials": {
+    "proof": "PASS",
+    "platform": "linux",
+    "backend": "Secret Service",
+    "roundTrip": true,
+    "update": true,
+    "referenceIsolation": true,
+    "idempotentRemoval": true,
+    "accountRoundTrip": true,
+    "rotatingTokenPersistence": true,
+    "accountRestart": true,
+    "accountLogout": true,
+    "cleanup": true
+  },
+  "native": {
+    "tests": 610,
+    "skipped": 2,
+    "failed": 0,
+    "seconds": 45.219
+  }
+}

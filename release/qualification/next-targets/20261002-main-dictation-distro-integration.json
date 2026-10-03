@@ -1,0 +1,97 @@
+{
+  "format": "augmentor-main-dictation-distro-integration/1",
+  "source": {
+    "rolloutParent": "1f5928309d1405c12107d0e17a5807b5a08711cc",
+    "mainParent": "3c1dddfc6ff5a60e7c64320d546229679f7b6201",
+    "workingMergeTested": true,
+    "cleanArtifactTested": false
+  },
+  "resolutions": [
+    "Preserve both current-main dictation and dated distro handoff/source records.",
+    "Desktop stage copies components and python-wheels.",
+    "All Debian-format recipes retain main dictation dependencies alongside their own managed/system Qt contracts.",
+    "Retain distro hook platform guard plus current-main uinput/udev bootstrap.",
+    "Codex cancellation waits for an actual provider request; native fork waits for both a new rendered page and current-main child transcript conditions."
+  ],
+  "tests": {
+    "nativeArch": {
+      "run": 818,
+      "passed": 815,
+      "skipped": 3,
+      "seconds": 46.779,
+      "skipScope": "Two Mac-only cases and private-portal proof not enabled in broad invocation."
+    },
+    "privateDbusPortal": {
+      "run": 2,
+      "passed": 2
+    },
+    "nodeFocused": {
+      "run": 11,
+      "passed": 11
+    },
+    "browser": {
+      "run": 66,
+      "passed": 66
+    },
+    "debianRecipes": {
+      "run": 6,
+      "passed": 6
+    },
+    "desktopDeployment": {
+      "run": 12,
+      "passed": 12
+    },
+    "handyPreparation": {
+      "run": 2,
+      "passed": 2
+    },
+    "typescriptCheck": true,
+    "build": true,
+    "privateSourceBoundary": true
+  },
+  "firstNodeFailuresRetained": [
+    "jsdom missing from separate apps/browser/test dependency directory; production prefix installation alone did not supply test dependencies. First two focused attempts and first Browser suite were not passes. Installed exact test lock with scripts disabled before final passing checks."
+  ],
+  "privateEvidenceSha256": {
+    "node-focused-final.log": "675b41d25af4511fc970e7a498b1ea43af63a2b249649fdc8748033126478531",
+    "browser-suite-final.log": "75b3b8bd6c5baa26d3a5d4fc689a5ec700db7700a137cfe6bdc8195c734b70f8",
+    "browser-test-dependencies.log": "89909582db0bb1b31810d83ba500689337169894a47dcc5b011b23929729134f",
+    "browser-dependencies.log": "814c70d00b5fb0bd3dec08bc235083ebae23e37d299f0b61324facce7fe4801b",
+    "private-portal.log": "0533bf5eebaf3434206517cbbdd9ba9b208e256dab80b4d223b7202614039caa",
+    "browser-suite.log": "42c8a675082906107164a2b438e00f9e65792a88a6aa48f7c9544f8c39771079",
+    "node-focused.log": "9fda20c3a0b9e79ccc4b7cc89bb5ba17fc92ad91d8451b07523687b015e5b52d",
+    "native-arch.log": "5ae6ae959fda1bdda67156b2ade9cc72fb169afdff375e4ca72d5ee99e6bae38",
+    "node-focused-corrected.log": "7107a0cbd76b5fc9148219463f1aa0896c73b05d707bedc13bca92df33426af7"
+  },
+  "resolvedSourceFileSha256": {
+    "release/debian-maintainer.py": "aa92fcdbc41f6a44ee63a19f0e58fee991a82e676918bfb7de4a46d0b415d89a",
+    "scripts/desktop-deployment.py": "5f8968a95ea8a03d696e1e23287719096f233d56cc9dcd96037cf8866a032949",
+    "scripts/package-debian.py": "8cd03817f8930aceef1a4f1a139d65ac2d26818adb11c370bb3b33e06fbe92a9",
+    "scripts/linux_debian.py": "23ae3e3db6f9e9cfe26cd6b281468003d009ce6809cfbb823ec188b091b5134c",
+    "tests/codex-agent-check.test.mjs": "0b814764fbe319b6fdcd067e21295bdf080d550b7ce3725a4695140124010236",
+    "tests/fixtures/codex/native-fork.py": "df2642d68470099292036decd3e5ec275162a905614f801b5336289ce1ac7be4",
+    "tests/test_linux_debian.py": "d3c18f6a870036fa824a5db0899752b8ff3baf54b0332bc843c20f6be35f17ef"
+  },
+  "upstreamPatchAndNoticeBytesPreserved": true,
+  "frozenSourceRuntimeGuideSha256": "2e26e2d736a6d2c793ee38aae40563415e14ef0bf0756b0e3f2037e180085d7b",
+  "gitGuardianCheck": {
+    "head": "1f5928309d1405c12107d0e17a5807b5a08711cc",
+    "checkRunId": 111033593687,
+    "conclusion": "failure",
+    "reportedEntries": 12,
+    "inspectedValuesAreScriptOrLogSha256Hex": true,
+    "externalFindingsStatusChanged": false
+  },
+  "ownerStateChanged": false,
+  "newReleaseQualified": false,
+  "allFiveRolloutPointsRemainActive": true,
+  "recipientLicenseDecisionPending": true,
+  "ownedNativeServiceCleanup": {
+    "sha256": "241ffd18ed7071064b37a70392f1b55d9316ebf8b22b1b8753b2995b5541a131",
+    "report": {
+      "terminatedOnlyMatchingOwnedNativeTestServices": [],
+      "remainingLiveMatches": [],
+      "priorDefunctProcessesRetained": true
+    }
+  }
+}

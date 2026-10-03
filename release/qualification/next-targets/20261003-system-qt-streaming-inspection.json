@@ -1,0 +1,155 @@
+{
+  "format": "augmentor-system-qt-native-streaming-inspection-qualification/1",
+  "date": "2026-10-03",
+  "applicationSource": "536fc7561a7b81ab90e806925652e446f438050a",
+  "workingInspectorSha256": "3bb85fbd6cd54efcd359ae587b119f772792ebc186697ea58740494876f75947",
+  "workingPreparerSha256": "243561acb746434454b5f7b2da8215bbda2632f159806aa42b4b45c71a7dbf22",
+  "targets": {
+    "arch": {
+      "format": "augmentor-system-qt-native-artifacts/1",
+      "version": "0.2.13",
+      "source": {
+        "commit": "536fc7561a7b81ab90e806925652e446f438050a",
+        "dirty": false
+      },
+      "target": "arch20261001-x86_64",
+      "pythonRuntime": {
+        "format": "augmentor-linux-python-runtime-contract/1",
+        "target": "arch20261001-x86_64",
+        "profile": "arch20261001-cp314-x86_64-voice",
+        "pythonAbi": [
+          3,
+          14
+        ],
+        "architecture": "x86_64",
+        "lockIdentity": "3f7167c59f5eed9fe7d24b51cc807219d57c85414bd8a1ca545d2860e94d6659",
+        "policySha256": "b62239f134f08ae2952141587c98f5912a29e1d3c887219e1929f0e23a549780",
+        "licenseReviewComplete": false,
+        "embeddedSourceCoverageComplete": false,
+        "systemQtStack": {
+          "format": "augmentor-system-qt-stack-contract/1",
+          "file": "system-qt-inventory.json",
+          "sha256": "05d28a3a15c20ce8fb4734f204f01414c19f28b52bbf7951a54056f6c417a007",
+          "bytes": 1584771,
+          "qtVersion": "6.11.2",
+          "packageManager": "pacman"
+        }
+      },
+      "package": {
+        "name": "augmentor-agent",
+        "versionRelease": "0.2.13-1",
+        "architecture": "x86_64"
+      },
+      "artifacts": [
+        {
+          "file": "augmentor-agent-0.2.13-1-x86_64.pkg.tar.zst",
+          "sha256": "0ebabc58503b650a84b8791c0957dd4e25e7d01e1fae57670d365c5bd8a63abb",
+          "bytes": 368599211
+        }
+      ],
+      "preparationSha256": "b3403fcf6f0e157c47fe95514c8f19353f48b793969b735770c6120af531235c",
+      "inspectionSha256": "3bb85fbd6cd54efcd359ae587b119f772792ebc186697ea58740494876f75947",
+      "completeNativePayloadVerified": true,
+      "payloadFileLinkMembers": 29259,
+      "regularFileModePolicy": "Remove group/world write; preserve every other mode bit.",
+      "preparedFileModesNormalized": 26902,
+      "appInventoryMembers": 29244,
+      "candidateOnly": true,
+      "installedAcceptance": false,
+      "legalAcceptance": false,
+      "publicRelease": false
+    },
+    "leap": {
+      "format": "augmentor-system-qt-native-artifacts/1",
+      "version": "0.2.13",
+      "source": {
+        "commit": "536fc7561a7b81ab90e806925652e446f438050a",
+        "dirty": false
+      },
+      "target": "opensuse-leap16.0-x86_64",
+      "pythonRuntime": {
+        "format": "augmentor-linux-python-runtime-contract/1",
+        "target": "opensuse-leap16.0-x86_64",
+        "profile": "leap16-cp313-x86_64-voice",
+        "pythonAbi": [
+          3,
+          13
+        ],
+        "architecture": "x86_64",
+        "lockIdentity": "7991a5ef322dfa02aa228bbb36a4cde5ddc0673b02645d7ba4f0a5c3f5782bed",
+        "policySha256": "86f6a9856dcca7bb26597299cbfe997a78de690681b1ca1b3aaad1861962018e",
+        "licenseReviewComplete": false,
+        "embeddedSourceCoverageComplete": false,
+        "systemQtStack": {
+          "format": "augmentor-system-qt-stack-contract/1",
+          "file": "system-qt-inventory.json",
+          "sha256": "485b8dca973e7ca58efd3d2e2d9e416dc4b3f324f5cf1a055ea74475f45ccd56",
+          "bytes": 557497,
+          "qtVersion": "6.9.1",
+          "packageManager": "rpm"
+        }
+      },
+      "package": {
+        "name": "augmentor-agent",
+        "versionRelease": "0.2.13-1.leap16",
+        "architecture": "x86_64"
+      },
+      "artifacts": [
+        {
+          "file": "augmentor-agent-0.2.13-1.leap16.x86_64.rpm",
+          "sha256": "bc4d9d2ad4901120e9883e819f7b513ccbfbbd25311a0ab5988bd5030ac628d6",
+          "bytes": 337424942
+        }
+      ],
+      "preparationSha256": "bda9e017ec5241ce7919f9d0fc04fb734127a8f462db96450c00ee684d6c56eb",
+      "inspectionSha256": "3bb85fbd6cd54efcd359ae587b119f772792ebc186697ea58740494876f75947",
+      "completeNativePayloadVerified": true,
+      "payloadFileLinkMembers": 29262,
+      "regularFileModePolicy": "Remove group/world write; preserve every other mode bit.",
+      "preparedFileModesNormalized": 26903,
+      "appInventoryMembers": 29246,
+      "candidateOnly": true,
+      "installedAcceptance": false,
+      "legalAcceptance": false,
+      "publicRelease": false
+    }
+  },
+  "retainedInitialRefusal": {
+    "initialInspectorSha256": "175ff3d4a4517867c81b6f5eaf85eedf97d874e35be721e79ca31ff86347a0d6",
+    "attempts": {
+      "arch": {
+        "exitCode": 1,
+        "missing": 0,
+        "extra": 0,
+        "changed": 26902
+      },
+      "leap": {
+        "exitCode": 1,
+        "missing": 0,
+        "extra": 0,
+        "changed": 26903
+      }
+    },
+    "scope": "Initial current inspector rejected the old native artifacts during exact mode+bytes comparison. No output manifest was written and no package changed. Detailed individual mode/byte diagnostic is running separately."
+  },
+  "resolution": "All initial differences are Debian-derived regular-file group-write bits. Native packages apply the explicit remove-group/world-write mask; current inspector permits only that mode reduction and verifies every byte, path, link and other mode bit. Future preparation removes those bits before archiving.",
+  "currentProbeLogHashes": {
+    "arch-identity-repeat.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "arch-identity-repeat.stdout": "682119d5fb5cc05eec86b05e1ca6fba5304bbb8ecc5184d9e04e3f1c184bb94e",
+    "leap-identity-repeat.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "leap-identity-repeat.stdout": "8e9d0c006b740dde2dbff8acc4a64339933b66ccbfd8f0434eb5a44e12089a0f"
+  },
+  "tests": {
+    "meaningfulNativeArchiveNegativeCases": 4,
+    "existingPreparationCases": 3,
+    "passed": true
+  },
+  "limits": [
+    "This new read-only streaming proof re-inspects exact previously built release1 artifacts. It is not a new native build or font-dependent package installation.",
+    "File/link payloads, native registered identity, complete preparation bytes/modes and runtime/source receipts are verified; this is not full native dependency closure or directory-owner/permission maintenance acceptance.",
+    "Full target installer/guard bootstrap, dependency maintenance, real sessions/audio/Browser/upgrades/rollback and legal/release gates remain open."
+  ],
+  "noExtractionOrProductExecution": true,
+  "ownerStateChanged": false,
+  "publicReleaseQualified": false
+}

@@ -1,0 +1,30 @@
+{
+  "target": "opensuse-leap16.0-x86_64",
+  "image": "https://download.opensuse.org/distribution/leap/16.0/appliances/Leap-16.0-Minimal-VM.x86_64-Cloud-Build18.72.qcow2",
+  "checksum": "https://download.opensuse.org/distribution/leap/16.0/appliances/Leap-16.0-Minimal-VM.x86_64-Cloud-Build18.72.qcow2.sha256",
+  "signature": "https://download.opensuse.org/distribution/leap/16.0/appliances/Leap-16.0-Minimal-VM.x86_64-Cloud-Build18.72.qcow2.sha256.asc",
+  "keyring": "https://download.opensuse.org/distribution/leap/16.0/repo/oss/repodata/repomd.xml.key",
+  "keyringFile": "opensuse-leap-key.gpg",
+  "keyringFormat": "armored",
+  "signingFingerprint": "AD485664E901B867051AB15F35A2F86E29B700A4",
+  "sha256": "8267490632e380890cfea663b5dba5cd828161af3e8cf562a73d6eb04898c4a1",
+  "imageBytes": 337581568,
+  "imageBuild": "18.72 (2026-10-01)",
+  "architecture": "x86_64",
+  "vmName": "augmentor-gnome-leap16",
+  "guestMarker": "Isolated Augmentor openSUSE Leap 16.0 GNOME qualification VM\n",
+  "sudoGroup": "wheel",
+  "desktopProvisioning": "Official Minimal Cloud image with external NoCloud seed; graphical desktop and installer qualification are separate",
+  "acceleration": "tcg",
+  "cpuModel": "Nehalem",
+  "memoryMiB": 6144,
+  "cpus": 4,
+  "diskGiB": 40,
+  "firmware": {
+    "mode": "uefi",
+    "code": "/usr/share/OVMF/OVMF_CODE_4M.fd",
+    "varsTemplate": "/usr/share/OVMF/OVMF_VARS_4M.fd",
+    "codeSha256": "624e06de18b4fa535e90db7160d00d3d07d206422b89999bf1e27d920264e4e0",
+    "varsTemplateSha256": "5d2ac383371b408398accee7ec27c8c09ea5b74a0de0ceea6513388b15be5d1e"
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "target": "ubuntu26.04-amd64",
+  "imageDigest": "docker.io/library/ubuntu@sha256:da6fc2be547864451aa253836dd926da33623312df4a9a243e35dc877c378a78",
+  "source": {
+    "commit": "d278bcf94fac5b93eed16f58a394f5e0d17d1af1",
+    "dirty": false
+  },
+  "artifacts": {
+    "augmentor-runtime_0.2.13_amd64.deb": "fec95e19764484f9fdaf54e74a5febb701e902ad57f8e30ab8843abeef8e3e17",
+    "augmentor-desktop_0.2.13_amd64.deb": "9aff58c382aaf1d69b3cdae7a61390810feb863285c82e20ede082be1de011bf"
+  },
+  "proofScriptSha256": "ff5c3e65466ad0481769b7e3cba48c46c07a609f103ace6391eba87193262c97",
+  "versions": {
+    "python": "3.14.4",
+    "pyside": "6.10.2",
+    "qt": "6.10.2",
+    "node": "v24.19.0"
+  },
+  "gtk4Version": "4.22.4",
+  "gtk4ShortcutApiImportTested": true,
+  "wmctrlVersion": "1.07",
+  "wmctrlBinaryTested": true,
+  "freshInstall": true,
+  "nonRootRuntimeLease": true,
+  "nonRootQtRender": true,
+  "activeRuntimeAndDesktopReinstallBlocked": true,
+  "activeComponentRemovalBlocked": true,
+  "idleReinstall": true,
+  "removePreservesPrivateFiles": true,
+  "reinstallAfterRemove": true,
+  "realDesktopSessionTested": false,
+  "physicalAudioTested": false,
+  "selinuxEnforcingTested": false,
+  "dshModelTurnTested": false,
+  "hostedQualification": {
+    "run": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36968751508",
+    "runAttempt": 1,
+    "branchHead": "1c670c0694254bf401099b5365157a01c6e7943f",
+    "mergedSource": "d278bcf94fac5b93eed16f58a394f5e0d17d1af1",
+    "verifiedBranchAndMergeTree": "4eb6771f07a9f064247fbe283698715eeb2320a6",
+    "nativeTests": 672,
+    "nativePassed": 670,
+    "nativeSkipped": 2,
+    "completeInstallerTested": false,
+    "gnomeDesktopSessionTested": false
+  },
+  "rawReportSha256": "b9eb095e9bc451bc0af5ff68d9f9df7baafc7fae26674e03406d20bc879ac052",
+  "rawTestLogSha256": "4fafb6744ae65f46a6952a2b785867559adb668be61836a0783bef601876e32f"
+}

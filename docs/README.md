@@ -4,6 +4,11 @@
 - [Immediate composer feedback and regression evidence](COMPOSER-SEND-FEEDBACK.md)
 # Documentation index
 
+- [Arch/Leap complete native package candidates and remaining gates](LINUX-SYSTEM-QT-PACKAGES.md).
+- [Corrected Mac source-bound hosted reports](../release/qualification/next-targets/20261003-mac-hosted-source-provenance.json).
+
+- [October3 hosted Ubuntu/Fedora reports and Mac provenance limit](../release/qualification/next-targets/20261003-hosted-linux-package-qualification.json).
+
 - [Embedded Handy dictation](HANDY-INTEGRATION.md): implementation, themed recording pill, settings, OS adapters, licensing, build and qualification boundaries.
 - [Approved Handy integration plan](HANDY-INTEGRATION-PLAN.md).
 
@@ -45,6 +50,7 @@ Windows mechanisms: [desktop and background shortcut ownership](WINDOWS-SHELL.md
 - [Codex ChatGPT accounts, shared Desktop/Browser login controls and remaining inference integration](CODEX-ACCOUNTS.md)
 - [Private speech-source cleanup and current synthetic voice test boundaries](CODEX-SOURCE-CLEANUP.md)
 - [Start here: agent handoff](AGENT-HANDOFF.md)
+- [Noble source-runtime identity, native payload and product entrypoint evidence](LINUX-SOURCE-RUNTIME-ENTRYPOINTS.md)
 - [Current architecture](ARCHITECTURE.md)
 - [One personal agent, two presentations](SHARED-SURFACES-2026-09-24.md)
 
@@ -83,6 +89,19 @@ Windows mechanisms: [desktop and background shortcut ownership](WINDOWS-SHELL.md
 
 ## Setup, operations and distribution
 
+- [Linux distribution rollout: implementation order and qualification gates](LINUX-DISTRO-ROLLOUT.md)
+- [Owned GNOME shortcut qualification](LINUX-GNOME-SHORTCUT-PROOF.md): selected-runtime guards, actual two-window Settings and separate native-delivery phases.
+- [Arch/Leap system Python/Qt drift boundary and actual CPU VAD evidence](LINUX-SYSTEM-QT-STACK.md)
+- [Dictation native candidate](LINUX-HANDY-NATIVE-CLOSURE.md): checksum-pinned ELF and actual Arch/Leap component startup; complete product/audio/input gates remain open.
+- [Fedora dictation packaging candidate](LINUX-FEDORA-DICTATION-PACKAGING.md): both installed targets, clean-source RPMs and busy/idle source replacement; complete acceptance remains open.
+- [Ubuntu Qt fixture compatibility](LINUX-QT-FIXTURE-COMPATIBILITY.md): isolated signal-registration failure and a real registrar override preserving both UI cases.
+- [Cinnamon adapter: installed Mint evidence and pinned implementation contract](LINUX-CINNAMON-ADAPTER.md)
+- [Mint 22.3 source-runtime package candidate and remaining installed acceptance](LINUX-MINT-PACKAGES.md)
+- [GNOME native consent/capture evidence and disabled guarded execution candidate](LINUX-GNOME-CONTROL-PLAN.md)
+- [Linux Qt/PySide source build, rebuild and replacement gates](LINUX-LGPL-SOURCE-RUNTIME.md)
+- [Proposed recipient-control MIT scope; awaiting owner decision](RECIPIENT-SOURCE-CONTROLS-LICENSE-PROPOSAL.md)
+- [Linux candidate package transactions: joint leases, durable intent and RPM/ALPM boundaries](LINUX-PACKAGE-TRANSACTIONS.md)
+
 - [Current Mac recovery and shared renderer qualification](MACOS-RECOVERY-2026-09-26.md)
 - [Mac effect transparency and shared App size slider](MACOS-APPEARANCE-2026-09-27.md)
 
@@ -98,6 +117,7 @@ Windows mechanisms: [desktop and background shortcut ownership](WINDOWS-SHELL.md
 - [0.2.10 artifact identity and completed qualification](RELEASE-QUALIFICATION-0.2.10.md)
 
 - [Complete guided Desktop + Browser installation](COMPLETE-INSTALL.md)
+- [Published Linux product-version upgrade qualification](LINUX-PRODUCT-UPGRADE-PROOF.md)
 - [Installed/GitHub/distribution audit — 20 September 2026](DISTRIBUTION-AUDIT-2026-09-20.md)
 
 - [Consistent desktop releases and update workflow](DESKTOP-DEPLOYMENTS.md)

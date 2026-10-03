@@ -11,6 +11,7 @@ import unittest
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'services/desktop'))
 spec = importlib.util.spec_from_file_location('codex_desktop_client', ROOT / 'services/desktop/client.py')
 client = importlib.util.module_from_spec(spec); spec.loader.exec_module(client)
 

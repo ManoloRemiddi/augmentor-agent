@@ -1,13 +1,14 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Bounded frame acquisition that distinguishes terminal stream failures."""
 import time
+from contextlib import nullcontext
 import gi
 
 gi.require_version('Gst', '1.0')
 from gi.repository import GLib, Gst
 
 
-def receive_frame(pipeline, cancel, timeout=10):
+def receive_frame(pipeline, cancel, timeout=10, *, context=None, checkpoint=None):
     """Read one frame; callers own pipeline teardown and observation invalidation."""
     if cancel.is_set():
         raise RuntimeError('Desktop control stopped.')
@@ -16,10 +17,13 @@ def receive_frame(pipeline, cancel, timeout=10):
     sink = pipeline.get_by_name('capture')
     bus = pipeline.get_bus()
     deadline = time.monotonic() + timeout
+    context = context if context is not None else GLib.MainContext.default()
     while time.monotonic() < deadline:
+        if checkpoint is not None:checkpoint()
         if cancel.is_set():
             raise RuntimeError('Desktop control stopped.')
         sample = sink.emit('try-pull-sample', 100 * Gst.MSECOND)
+        if checkpoint is not None:checkpoint()
         if cancel.is_set():
             raise RuntimeError('Desktop control stopped.')
         failure = bus.pop_filtered(Gst.MessageType.ERROR)
@@ -34,8 +38,9 @@ def receive_frame(pipeline, cancel, timeout=10):
             return sample
         if sink.get_property('eos'):
             raise RuntimeError('The screen capture stream ended without a frame. No input was sent.')
-        while GLib.MainContext.default().pending():
-            GLib.MainContext.default().iteration(False)
+        for _ in range(64):
+            if not context.pending():break
+            context.iteration(False)
     raise RuntimeError('No screen frame was received before the capture timeout. No input was sent.')
 
 
@@ -43,12 +48,15 @@ def rgb_frame_layout(caps, mapped_size):
     """Validate the complete padded RGB buffer before passing it to Qt."""
     if caps is None or not caps.is_fixed() or caps.get_size() != 1:
         raise RuntimeError('The screen frame has invalid dimensions. No input was sent.')
-    layout = caps.get_structure(0)
-    width, height = layout.get_value('width'), layout.get_value('height')
-    if (layout.get_name() != 'video/x-raw' or layout.get_value('format') != 'RGB'
-            or type(width) is not int or type(height) is not int
-            or width <= 0 or height <= 0):
-        raise RuntimeError('The screen frame has invalid dimensions or format. No input was sent.')
+    structure = caps.get_structure(0)
+    # gst-python may return a context-managed StructureWrapper to keep the
+    # parent caps alive. Older overrides return the Structure directly.
+    with structure if hasattr(structure, '__enter__') else nullcontext(structure) as layout:
+        width, height = layout.get_value('width'), layout.get_value('height')
+        if (layout.get_name() != 'video/x-raw' or layout.get_value('format') != 'RGB'
+                or type(width) is not int or type(height) is not int
+                or width <= 0 or height <= 0):
+            raise RuntimeError('The screen frame has invalid dimensions or format. No input was sent.')
     stride = (width * 3 + 3) & ~3
     if mapped_size < stride * height:
         raise RuntimeError('The screen capture stream returned an incomplete frame. No input was sent.')

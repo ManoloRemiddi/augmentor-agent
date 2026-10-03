@@ -1,0 +1,118 @@
+{
+  "format": "augmentor-linux-qualification-checkpoint/1",
+  "date": "2026-10-03",
+  "scope": "Owned Fedora44 GNOME powered-off backing clone native/managed adoption and first candidate import refusal; no owner installation or production enablement",
+  "artifactSource": {
+    "commit": "2035af99b46bb013e81de9766216da820ab4a325",
+    "dirty": false
+  },
+  "native": {
+    "file": "augmentor-agent-0.2.13-1.fc44.x86_64.rpm",
+    "sha256": "b7b9b5cdbd5aef84f6db5940e2ed519102d7cc38d37c466db3104525e5dcfdd5",
+    "bytes": 371302870,
+    "target": "fedora44-x86_64",
+    "version": "0.2.13",
+    "rpmAuditClean": true,
+    "normalDnfTransaction": {
+      "requiredDependencyAdditions": 11,
+      "appSameNevraReinstall": 1,
+      "otherUpgradesOrRemovals": 0,
+      "fedoraDependencySignaturesVerified": 11,
+      "localAppRpmUnsignedDigestOnlyPolicyReviewed": true,
+      "repoSignatureChecksEnabled": true
+    }
+  },
+  "selected": {
+    "source": "2035af99b46bb013e81de9766216da820ab4a325",
+    "releaseId": "20261003-063322-4cebb9a6",
+    "artifactSha256": "538136182ad7f7886b064b553d1154cb99b53c634da7e478d01f8bbaf4e4d639",
+    "target": "fedora44-x86_64",
+    "version": "0.2.13",
+    "python": "/usr/bin/python3",
+    "managedInventoryFiles": 28058,
+    "managedInventoryVerified": true,
+    "deploymentReceiptMatchesSelection": true,
+    "canonicalStageActivateColdLaunchPassed": true,
+    "previousSource": "aef93bb04520a003c5c48536aa6d4210105fc8ad",
+    "previousArtifactSha256": "f7d5962720e959a2624752e8b49a64ed7efb6ced5d4cc1e0c12d6e536c52008f",
+    "otherProtectedFilesUnchanged": 20,
+    "dshService": null
+  },
+  "originalPreservation": {
+    "normalIdleCloseAndPoweroff": true,
+    "originalRemainsOff": true,
+    "guestBackingSha256": "288f211693355adb382714211a1be6c53bfdd214d186855a26c4cddb2c905817",
+    "cloudBackingSha256": "28680fe5b371a5a82ebf43a31926e086a168e59949d03969c5093e7071f90b7f",
+    "fullSha256RecheckedUnchanged": true,
+    "bothBackingFdsReadOnly": true,
+    "originalPendingTransactionAndSettingsPreserved": true,
+    "copiedPendingTransactionInvalidatedOnlyInClone": true,
+    "originalBootForbiddenWhileDependentOverlayReusable": true,
+    "hostDiskFloorBytes": 4294967296,
+    "lastMeasuredHostFreeBytes": 10639884288
+  },
+  "candidate": {
+    "source": "0ab022a6a26ae0165b57e1662203e71f544aab9a",
+    "filesStaged": 11,
+    "controllerSha256": "1be68fc8758850bbb57e05bf04f8f8bcd8b3101a01d651a89899cf8f353c6ea0",
+    "probeSha256": "89ca77206dd959bf27d269ad629a9a40c5b2ad0fe3d949a786c7d8684fb54ad4",
+    "strictArtifactAdmissionPassed": true,
+    "guardRelaxed": false,
+    "result": "FAIL before Qt/banner/portal creation: ModuleNotFoundError: kwin",
+    "cause": "Verified installed dependency path appended after candidate GnomeControl imports portal.KWin",
+    "consentSent": false,
+    "inputSent": false,
+    "targetBackend": "GdkWaylandDisplay",
+    "textA": "",
+    "textB": "",
+    "clicks": {
+      "center": 0,
+      "edge": 0
+    },
+    "saveChordCount": 0,
+    "triggerOrSavedFileCreated": false,
+    "probeTargetAndCandidateHelpersAbsentAfterOwnedCleanup": true,
+    "selectedApplicationUnchangedDuringCandidate": true,
+    "uncertainActionReplayed": false
+  },
+  "maintainedProbeCorrection": {
+    "scope": "Append verified installed desktop dependency path before candidate controller imports, retaining candidate priority and unchanged artifact admission",
+    "probeSha256": "2d7bdc2005517af8ac8f2638b2337778d5d89c91a89dcc359cf4435ef4dc83f4",
+    "controllerAndHelperSourceRemains": "0ab022a6a26ae0165b57e1662203e71f544aab9a",
+    "freshElevenFileStageAndReviewedProbeRevisionRequired": true,
+    "focusedPythonCasesPassed": 86,
+    "observerNodeCasesPassed": 5,
+    "realModuleImportRegressionPassed": true,
+    "correctedNativeExecutionAttempted": false
+  },
+  "privateEvidenceDigests": [
+    {
+      "label": "native audit/dependencies/protected state",
+      "sha256": "cd512dc0f38106620b8bcd18ec793825acb543b3157d9e5154e1457b611cb27b",
+      "bytes": 4264153
+    },
+    {
+      "label": "canonical managed stage",
+      "sha256": "f5fee952cb9825afb3b93732190ca6cb4491e7cab8c775b1ed518d16eebfa0e8",
+      "bytes": 893
+    },
+    {
+      "label": "canonical managed activation",
+      "sha256": "cc36c4f857683571c30435b867da2f1fe2d126476105f3f2e00803bad0ddabac",
+      "bytes": 1406
+    },
+    {
+      "label": "strict candidate admission",
+      "sha256": "3232e3395dabc21afa7abe38c2af915c351519ab0c91bbad5f12bbdc2aee114f",
+      "bytes": 3001
+    },
+    {
+      "label": "first import refusal and owned cleanup",
+      "sha256": "938950fe0e15fd6d2f95c3527bc8736a34c42d1f23a2a225865f5147e72c823c",
+      "bytes": 627
+    }
+  ],
+  "productionGnomeInputQualified": false,
+  "productionGnomeInputEnabled": false,
+  "remaining": "Reviewed published corrected probe in fresh owned candidate, actual consent/pointer/chord/ASCII/save/visibleStop outcomes, then other documented failure/profile/KDE integration gates"
+}

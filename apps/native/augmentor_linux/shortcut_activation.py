@@ -18,10 +18,13 @@ class DesktopActivation:
     def __init__(self, runtime=None, command=None, instance='main'):
         self.instance = validate_name(instance)
         self.runtime = Path(runtime) if runtime is not None else runtime_directory()
-        native=ROOT.parents[1]/'MacOS/Augmentor Agent Desktop'
-        self.command = command or ([str(ROOT/'Augmentor.exe')] if sys.platform=='win32' and (ROOT/'Augmentor.exe').is_file() else
-                                  [str(native)] if sys.platform=='darwin' and native.is_file() else
-                                  [sys.executable, '-B', str(ROOT/'scripts/launch-component.py'), 'desktop'])
+        self.command = command or [sys.executable, '-B', str(ROOT/'scripts/launch-component.py'), 'desktop']
+        if command is None and sys.platform == 'win32' and (ROOT/'Augmentor.exe').is_file():
+            self.command = [str(ROOT/'Augmentor.exe')]
+        elif command is None and sys.platform == 'darwin' and len(ROOT.parents) > 1:
+            native = ROOT.parents[1]/'MacOS/Augmentor Agent Desktop'
+            if native.is_file():
+                self.command = [str(native)]
         if self.instance != 'main' or sys.platform == 'win32':
             self.command = [*self.command, '--instance', self.instance]
         self.child = None

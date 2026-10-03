@@ -1,0 +1,696 @@
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+"""Owned proof trigger boundary; no native GUI, consent or input is exercised."""
+import importlib.util
+import base64
+import hashlib
+import json
+import os
+import shutil
+import subprocess
+import sys
+import threading
+from types import SimpleNamespace
+from pathlib import Path
+import tempfile
+import unittest
+from unittest.mock import Mock,patch
+
+spec=importlib.util.spec_from_file_location('owned_gnome_input_probe',Path(__file__).resolve().parents[1]/'release/probe-gnome-input.py')
+module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+try:
+    import gi
+    gi.require_version('Gst','1.0')
+    from gi.repository import Gst
+except (ImportError,ValueError):Gst=None
+try:
+    from PySide6.QtCore import QByteArray,QBuffer,QIODevice
+    from PySide6.QtGui import QImage
+except ImportError:QImage=None
+
+
+@unittest.skipUnless(sys.platform.startswith('linux') and QImage is not None,
+    'Private image receipt requires Linux ownership and the native Qt decoder.')
+class GnomeInputCaptureRetentionTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary=tempfile.TemporaryDirectory();self.addCleanup(self.temporary.cleanup)
+        self.root=Path(self.temporary.name);self.candidate=self.root/'candidate';self.candidate.mkdir(mode=0o700)
+        image=QImage(8,6,QImage.Format.Format_RGB888);image.fill(0xff123456)
+        self.raw=self.encode(image,'JPEG');self.size={'width':8,'height':6}
+        self.image={**self.size,'mimeType':'image/jpeg','data':base64.b64encode(self.raw).decode()}
+
+    def encode(self,image,kind):
+        encoded=QByteArray();buffer=QBuffer(encoded);buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+        self.assertTrue(image.save(buffer,kind,80));return bytes(encoded)
+
+    def retain(self,image=None,size=None):
+        return module.retain_capture_image(self.candidate,self.image if image is None else image,self.size if size is None else size)
+
+    def test_actual_jpeg_bytes_are_retained_once_with_private_mode_and_exact_receipt(self):
+        receipt=self.retain();path=Path(receipt['path'])
+        self.assertEqual(path.parent,self.candidate);self.assertTrue(path.name.startswith('capture-'));self.assertEqual(path.suffix,'.jpg')
+        self.assertEqual(path.read_bytes(),self.raw);self.assertEqual(path.stat().st_mode&0o777,0o600)
+        self.assertEqual(receipt['sha256'],hashlib.sha256(self.raw).hexdigest());self.assertEqual(receipt['bytes'],len(self.raw))
+        self.assertEqual((receipt['mimeType'],receipt['width'],receipt['height']),('image/jpeg',8,6))
+        another=self.retain();self.assertNotEqual(another['path'],receipt['path']);self.assertEqual(len(list(self.candidate.iterdir())),2)
+
+    def test_malformed_noncanonical_and_nonstring_base64_refuse_without_artifact(self):
+        for encoded in ('%%%','é',self.image['data']+'\n',self.image['data']+'=',None):
+            with self.subTest(encoded=repr(encoded)[:30]),self.assertRaises(RuntimeError):self.retain({**self.image,'data':encoded})
+        self.assertEqual(list(self.candidate.iterdir()),[])
+
+    def test_oversized_encoded_and_decoded_contract_refuse_without_artifact(self):
+        for encoded in ('A'*1200004,base64.b64encode(b'\xff\xd8\xff'+b'x'*900000+b'\xff\xd9').decode()):
+            with self.subTest(length=len(encoded)),self.assertRaisesRegex(RuntimeError,'bounded'):self.retain({**self.image,'data':encoded})
+        self.assertEqual(list(self.candidate.iterdir()),[])
+
+    def test_wrong_mime_png_or_unreadable_jpeg_refuse_without_artifact(self):
+        png=self.encode(QImage(8,6,QImage.Format.Format_RGB888),'PNG')
+        for image in ({**self.image,'mimeType':'image/png'},
+                {**self.image,'data':base64.b64encode(png).decode()},
+                {**self.image,'data':base64.b64encode(b'\xff\xd8\xffinvalid\xff\xd9').decode()}):
+            with self.subTest(image=image['mimeType']),self.assertRaises(RuntimeError):self.retain(image)
+        self.assertEqual(list(self.candidate.iterdir()),[])
+
+    def test_api_receipt_header_or_unbounded_dimensions_refuse_without_artifact(self):
+        cases=((self.image,{'width':9,'height':6}),({**self.image,'width':7},{'width':7,'height':6}),
+            ({**self.image,'width':True},{'width':True,'height':6}),({**self.image,'height':1201},{'width':8,'height':1201}),
+            ({**self.image,'width':0},{'width':0,'height':6}))
+        for image,size in cases:
+            with self.subTest(size=size),self.assertRaisesRegex(RuntimeError,'dimensions'):self.retain(image,size)
+        self.assertEqual(list(self.candidate.iterdir()),[])
+
+    def test_existing_foreign_regular_file_is_preserved_without_overwrite(self):
+        path=self.candidate/('capture-'+'a'*32+'.jpg');path.write_bytes(b'foreign existing bytes');path.chmod(0o644);before=path.stat()
+        with patch.object(module.uuid,'uuid4',return_value=SimpleNamespace(hex='a'*32)):
+            with self.assertRaisesRegex(RuntimeError,'already exists'):self.retain()
+        self.assertEqual(path.read_bytes(),b'foreign existing bytes');self.assertEqual(path.stat(),before)
+
+    def test_existing_symlink_never_writes_its_foreign_target(self):
+        foreign=self.root/'foreign.jpg';foreign.write_bytes(b'foreign bytes');link=self.candidate/('capture-'+'b'*32+'.jpg');link.symlink_to(foreign)
+        with patch.object(module.uuid,'uuid4',return_value=SimpleNamespace(hex='b'*32)):
+            with self.assertRaisesRegex(RuntimeError,'already exists'):self.retain()
+        self.assertTrue(link.is_symlink());self.assertEqual(foreign.read_bytes(),b'foreign bytes')
+
+    def test_shared_or_symlink_candidate_directory_refuses(self):
+        self.candidate.chmod(0o755)
+        with self.assertRaisesRegex(RuntimeError,'fresh private'):self.retain()
+        self.candidate.chmod(0o700);link=self.root/'candidate-link';link.symlink_to(self.candidate)
+        with self.assertRaisesRegex(RuntimeError,'fresh private'):module.retain_capture_image(link,self.image,self.size)
+        self.assertEqual(list(self.candidate.iterdir()),[])
+
+    def test_directory_substitution_is_detected_and_replacement_is_not_written(self):
+        moved=self.root/'original-candidate'
+        def substituted():
+            self.candidate.rename(moved);self.candidate.mkdir(mode=0o700);return SimpleNamespace(hex='c'*32)
+        with patch.object(module.uuid,'uuid4',side_effect=substituted):
+            with self.assertRaisesRegex(RuntimeError,'directory changed'):self.retain()
+        self.assertEqual(list(self.candidate.iterdir()),[])
+        self.assertEqual((moved/('capture-'+'c'*32+'.jpg')).read_bytes(),self.raw)
+
+
+class NativeTimeout(RuntimeError):
+    domain='g-io-error-quark';code=24
+
+
+class GnomeInputIdleWatchTraceTests(unittest.TestCase):
+    def rpc(self,proxy,method='GetNameOwner',bound=1000):
+        parameters=Mock();parameters.unpack.return_value=('org.gnome.Shell',)
+        arguments=('org.freedesktop.DBus','/org/freedesktop/DBus','org.freedesktop.DBus',method,
+            parameters,object(),object(),bound,object())
+        return arguments,proxy.call_sync(*arguments)
+
+    def test_owner_rpc_arguments_return_and_bound_forward_once_with_elapsed(self):
+        bus=Mock();trace=module.IdleWatchTrace();proxy=module.IdleWatchBus(bus,'verify',trace)
+        with patch.object(module.time,'monotonic',side_effect=(5.0,5.125)):
+            arguments,result=self.rpc(proxy)
+        self.assertIs(result,bus.call_sync.return_value);bus.call_sync.assert_called_once_with(*arguments)
+        row=trace.snapshot()['calls'][0]
+        self.assertEqual((row['stage'],row['method'],row['lookupName'],row['timeoutMs'],row['elapsedSeconds']),
+            ('verify','GetNameOwner','org.gnome.Shell',1000,.125))
+        self.assertNotIn('parameters',row);self.assertNotIn('reply',row);self.assertIsNone(trace.snapshot()['firstError'])
+
+    def test_native_timeout_object_and_original_call_survive_trace(self):
+        error=NativeTimeout('Timeout was reached');bus=Mock();bus.call_sync.side_effect=error
+        trace=module.IdleWatchTrace();proxy=module.IdleWatchBus(bus,'read',trace)
+        arguments=(':1.7','/com/augmentor/GnomeObserver','com.augmentor.GnomeObserver','Read',None,None,4,1000,None)
+        with patch.object(module.time,'monotonic',side_effect=(5.0,6.01)):
+            with self.assertRaises(NativeTimeout) as caught:proxy.call_sync(*arguments)
+        self.assertIs(caught.exception,error);bus.call_sync.assert_called_once_with(*arguments)
+        first=trace.snapshot()['firstError'];self.assertEqual(first['error']['code'],24)
+        self.assertEqual(first['error']['domain'],'g-io-error-quark');self.assertAlmostEqual(first['elapsedSeconds'],1.01)
+
+    def test_public_alias_is_read_before_native_call_consumes_parameters(self):
+        class Parameters:
+            consumed=False
+            def unpack(self):
+                if self.consumed:raise RuntimeError('Native call consumed the parameters.')
+                return ('org.gnome.Shell',)
+        parameters=Parameters();bus=Mock();reply=object()
+        def called(*args):self.assertIs(args[4],parameters);parameters.consumed=True;return reply
+        bus.call_sync.side_effect=called;trace=module.IdleWatchTrace();proxy=module.IdleWatchBus(bus,'read',trace)
+        self.assertIs(proxy.call_sync('org.freedesktop.DBus','/org/freedesktop/DBus','org.freedesktop.DBus',
+            'GetNameOwner',parameters,None,4,500,None),reply)
+        self.assertEqual(trace.snapshot()['calls'][0]['lookupName'],'org.gnome.Shell')
+        self.assertEqual(trace.snapshot()['recordingFailures'],0);bus.call_sync.assert_called_once()
+
+    def test_first_error_is_retained_after_bounded_rollover_and_snapshot_is_detached(self):
+        trace=module.IdleWatchTrace(limit=2)
+        trace.record({'outcome':'error','error':{'code':24},'method':'Read'})
+        for _ in range(3):trace.record({'outcome':'reply','method':'GetNameOwner'})
+        trace.record({'outcome':'error','error':{'code':19},'method':'GetNameOwner'})
+        snapshot=trace.snapshot();self.assertEqual(len(snapshot['calls']),2);self.assertEqual(snapshot['droppedCalls'],3)
+        self.assertEqual(snapshot['firstError']['sequence'],1);self.assertEqual(snapshot['firstError']['error']['code'],24)
+        snapshot['firstError']['error']['code']=0;self.assertEqual(trace.snapshot()['firstError']['error']['code'],24)
+
+    def test_cleanup_and_other_connection_methods_delegate_without_tracing(self):
+        bus=Mock();trace=module.IdleWatchTrace();proxy=module.IdleWatchBus(bus,'verify',trace)
+        arguments=(':1.54','/owned/session','org.freedesktop.portal.Session','Close',None,None,4,1000,None)
+        self.assertIs(proxy.call_sync(*arguments),bus.call_sync.return_value)
+        bus.call_sync.assert_called_once_with(*arguments);proxy.close_sync(None);bus.close_sync.assert_called_once_with(None)
+        self.assertEqual(trace.snapshot()['totalCalls'],0)
+
+    def test_recording_failure_never_masks_reply_or_native_error_or_retries(self):
+        for native_error in (None,NativeTimeout('Timeout was reached')):
+            bus=Mock();bus.call_sync.side_effect=native_error;trace=Mock();trace.record.side_effect=RuntimeError('diagnostic sink failed')
+            proxy=module.IdleWatchBus(bus,'verify',trace)
+            if native_error is None:self.assertIs(self.rpc(proxy)[1],bus.call_sync.return_value)
+            else:
+                with self.assertRaises(NativeTimeout) as caught:self.rpc(proxy)
+                self.assertIs(caught.exception,native_error)
+            self.assertEqual(bus.call_sync.call_count,1);trace.lost.assert_called_once()
+
+    def test_delegate_terminal_result_restores_connections_without_reattaching_disposed_objects(self):
+        consent=SimpleNamespace(bus=Mock());native=SimpleNamespace(bus=Mock());original=(consent.bus,native.bus)
+        cancelled=threading.Event();terminal=object();argument=object()
+        class Base:
+            def watch_session(self,*args):
+                self.received=args
+                if not isinstance(consent.bus,module.IdleWatchBus) or not isinstance(native.bus,module.IdleWatchBus):raise AssertionError('Trace not scoped to delegate.')
+                cancelled.set();self.consent=None;self.kwin=None;return terminal
+        value=module.traced_controller(Base,module.IdleWatchTrace())();value.consent=consent;value.kwin=SimpleNamespace(native=native)
+        self.assertIs(value.watch_session(argument),terminal);self.assertEqual(value.received,(argument,))
+        self.assertTrue(cancelled.is_set());self.assertIsNone(value.consent);self.assertIsNone(value.kwin)
+        self.assertIs(consent.bus,original[0]);self.assertIs(native.bus,original[1])
+
+
+class GnomeInputDispatchTraceTests(unittest.TestCase):
+    def test_bounded_first_error_and_failed_comparison_survive_rollover(self):
+        trace=module.DispatchTrace(limit=2)
+        trace.record({'event':'same-scene','outcome':'reply','matches':True})
+        trace.record({'event':'same-scene','outcome':'reply','matches':False,'changedFields':{'fields':['serial']}})
+        trace.record({'event':'send','outcome':'error','error':{'kind':'RuntimeError'}})
+        for _ in range(4):trace.record({'event':'rpc','outcome':'reply'})
+        value=trace.snapshot();self.assertEqual(value['totalCalls'],7);self.assertEqual(value['droppedCalls'],5)
+        self.assertEqual(value['firstComparison']['sequence'],1);self.assertEqual(value['firstRefusedComparison']['sequence'],2)
+        self.assertEqual(value['firstError']['sequence'],3);value['firstRefusedComparison']['changedFields']['fields'].clear()
+        self.assertEqual(trace.snapshot()['firstRefusedComparison']['changedFields']['fields'],['serial'])
+
+    def test_identity_and_changed_fields_exclude_titles_text_and_arbitrary_names(self):
+        from copy import deepcopy
+        first={'serial':5,'window':{'title':'PRIVATE ROOT TITLE','pid':12,'application':'PRIVATE APP'},
+            'windows':[{'title':'PRIVATE LIST TITLE','pid':12}], 'focus':{'text':'PRIVATE TEXT','password':True},
+            'PRIVATE KEY':'PRIVATE VALUE','guards':{'stageKeyFocus':9}}
+        second=deepcopy(first);second['serial']=6;second['window']['title']='NEW PRIVATE ROOT TITLE'
+        second['windows'][0]['title']='NEW PRIVATE LIST TITLE';second['PRIVATE KEY']='NEW PRIVATE VALUE'
+        changed=module.dispatch_changed_fields(first,second)
+        self.assertEqual(changed['fields'],['<other-field>','serial','windows[0].title'])
+        value=json.dumps({'identity':module.dispatch_identity(first),'changed':changed,
+            'error':module.dispatch_error(RuntimeError('PRIVATE ERROR'))})
+        self.assertNotIn('PRIVATE',value);self.assertNotIn('application',value)
+        self.assertEqual(module.dispatch_identity(first)['focus'],{'password':True})
+        many={str(i):i for i in range(100)};self.assertEqual(len(module.dispatch_changed_fields(many,{})['fields']),64)
+
+    def test_rpc_bound_flags_cancellable_arguments_and_original_error_are_unchanged(self):
+        bus=Mock();trace=module.DispatchTrace();context=lambda:{'phase':'send'}
+        proxy=module.DispatchBus(bus,trace,context,threading.get_ident())
+        parameters=SimpleNamespace(unpack=lambda:('/session',{},65,1));error=NativeTimeout('PRIVATE NATIVE ERROR')
+        arguments=(':1.54','/owned/private/path','org.freedesktop.portal.RemoteDesktop','NotifyKeyboardKeysym',parameters,None,4,5000,object())
+        bus.call_sync.side_effect=error
+        with self.assertRaises(NativeTimeout) as caught:proxy.call_sync(*arguments)
+        self.assertIs(caught.exception,error);bus.call_sync.assert_called_once_with(*arguments)
+        row=trace.snapshot()['firstError'];self.assertEqual((row['timeoutMs'],row['flags'],row['dispatchState']),(5000,4,'press'))
+        self.assertTrue(row['cancellablePresent']);self.assertNotIn('PRIVATE',json.dumps(row));self.assertNotIn('parameters',row)
+        self.assertNotIn('path',row);self.assertNotIn('code',row);self.assertNotIn('keysym',row)
+
+
+    def test_rpc_sink_failure_and_consumed_variant_never_mask_native_result_or_error(self):
+        class Parameters:
+            consumed=False
+            def unpack(self):
+                if self.consumed:raise AssertionError('Native call consumed the floating variant.')
+                return ('/session',{},272,0)
+        for failure in (None,NativeTimeout('Native timeout')):
+            parameters=Parameters();reply=object();bus=Mock();trace=Mock();trace.record.side_effect=RuntimeError('Broken sink')
+            def called(*args):
+                self.assertIs(args[4],parameters);parameters.consumed=True
+                if failure is not None:raise failure
+                return reply
+            bus.call_sync.side_effect=called;proxy=module.DispatchBus(bus,trace,lambda:{},threading.get_ident())
+            args=(':1.20','/session','org.freedesktop.portal.RemoteDesktop','NotifyPointerButton',parameters,None,4,1000,None)
+            if failure is None:self.assertIs(proxy.call_sync(*args),reply)
+            else:
+                with self.assertRaises(NativeTimeout) as caught:proxy.call_sync(*args)
+                self.assertIs(caught.exception,failure)
+            bus.call_sync.assert_called_once_with(*args);trace.lost.assert_called_once()
+            self.assertEqual(trace.record.call_args.args[0]['dispatchState'],'release')
+
+
+
+@unittest.skipUnless(sys.platform.startswith('linux') and Gst is not None,
+    'Actual maintained dispatch sender requires Linux GStreamer introspection.')
+class GnomeInputActualDispatchTraceTests(unittest.TestCase):
+    def setUp(self):
+        import test_gnome_control as fixture
+        self.fixture=fixture;self.native=fixture.module
+        self.trace=module.DispatchTrace();self.Control=module.dispatch_traced_controller(self.native.GnomeControl,self.trace)
+        self.value=self.Control.__new__(self.Control);self.value.__dict__.update(fixture.controller().__dict__)
+        self.value._dispatch_thread=threading.get_ident();self.value._dispatch_depth=0;self.value._dispatch_phase={}
+        self.originals=[(cls.__dict__[name].__globals__,cls.__dict__[name].__globals__['same_scene'])
+            for cls in self.native.GnomeControl.__mro__ for name in ('send','action')
+            if name in cls.__dict__ and 'same_scene' in cls.__dict__[name].__globals__]
+        self.consent=self.value.consent;self.bus=self.consent.bus;self.observer=self.value.kwin;self.native_bus=self.observer.native.bus
+
+    def restored(self):
+        for namespace,original in self.originals:self.assertIs(namespace['same_scene'],original)
+        self.assertIs(self.consent.bus,self.bus);self.assertIs(self.observer.native.bus,self.native_bus)
+        self.assertEqual(self.value._dispatch_depth,0);self.assertEqual(self.value._dispatch_phase,{})
+
+    def snapshot(self,focus=None):
+        return {'token':'PRIVATE TOKEN','created':module.time.monotonic(),'scene':self.fixture.scene(),
+            'width':1280,'height':800,'focus':focus or [],'focusSerial':self.value.focus_serial}
+
+    def keyboard(self,reply=None):
+        from copy import deepcopy
+        helper=SimpleNamespace(pid=123,closed=False,timeout=3,request=Mock(return_value=deepcopy(reply or self.fixture.focus_reply())),close=Mock())
+        self.value.a11y=helper;recorded=self.value.focus_info(123);helper.request.reset_mock()
+        self.value.snapshot=self.snapshot(recorded);self.value.dispatch_snapshot=self.value.snapshot
+        return helper
+
+    def test_actual_send_serial_refusal_is_recorded_before_notify_and_restores_scope(self):
+        self.observer.read.return_value={**self.fixture.scene(),'serial':9}
+        with self.assertRaisesRegex(RuntimeError,'GNOME target changed before dispatch'):
+            self.value.send('NotifyPointerMotionAbsolute','(oa{sv}udd)',('/session',{},7,100.,50.))
+        self.observer.read.assert_called_once_with(self.value.cancel);self.consent.call.assert_not_called()
+        first=self.trace.snapshot()['firstRefusedComparison'];self.assertEqual(first['changedFields']['fields'],['serial'])
+        self.assertEqual((first['current']['serial'],first['recorded']['serial']),(9,8))
+        self.assertEqual(self.value.last_failure['phase'],'dispatch-guard');self.assertFalse(self.value.cancel.is_set())
+        self.restored()
+
+    def test_original_scene_predicate_is_called_once_and_foreign_comparison_is_untraced(self):
+        namespace=self.native.GnomeControl.send.__globals__;original=namespace['same_scene'];compared=Mock(wraps=original)
+        self.observer.read.return_value={**self.fixture.scene(),'serial':9}
+        with patch.dict(namespace,{'same_scene':compared}):
+            with self.assertRaisesRegex(RuntimeError,'target changed'):
+                self.value.send('NotifyPointerMotionAbsolute','(oa{sv}udd)',('/session',{},7,100.,50.))
+            compared.assert_called_once();self.assertIs(namespace['same_scene'],compared)
+        before=self.trace.snapshot()['totalCalls'];outcomes=[]
+        with self.value.trace_scope({'phase':'action'}):
+            thread=threading.Thread(target=lambda:outcomes.append(namespace['same_scene'](self.fixture.scene(),self.fixture.scene())))
+            thread.start();thread.join()
+        self.assertEqual(outcomes,[True]);self.assertEqual(self.trace.snapshot()['totalCalls'],before);self.restored()
+
+    def test_actual_click_release_change_preserves_partial_delivery_and_only_original_cleanup(self):
+        self.value.snapshot=self.snapshot()
+        self.observer.read.side_effect=[self.fixture.scene() for _ in range(4)]+[{**self.fixture.scene(),'serial':9}]
+        with self.assertRaisesRegex(RuntimeError,'GNOME target changed before dispatch'):
+            self.value.action(self.value.owner,{'token':'PRIVATE TOKEN','kind':'click','x':100,'y':50})
+        self.assertEqual(self.observer.read.call_count,5)
+        self.assertEqual([call.args[1] for call in self.consent.call.call_args_list],['NotifyPointerMotionAbsolute','NotifyPointerButton'])
+        self.assertEqual(self.consent.call.call_args_list[-1].args[3][-1],1)
+        self.bus.call_sync.assert_called_once();args=self.bus.call_sync.call_args.args
+        self.assertEqual((args[0],args[3],args[7],args[8]),(':1.20','NotifyPointerButton',1000,None))
+        self.assertEqual(args[4].unpack()[-1],0);self.consent.dispose.assert_called_once()
+        first=self.trace.snapshot()['firstRefusedComparison'];self.assertEqual((first['method'],first['dispatchState']),('NotifyPointerButton','release'))
+        self.assertEqual(first['changedFields']['fields'],['serial']);self.assertTrue(first['heldButton'])
+        cleanup=[row for row in self.trace.snapshot()['calls'] if row['event']=='rpc' and row['phase']=='cleanup']
+        self.assertEqual(len(cleanup),1);self.assertEqual(cleanup[0]['dispatchState'],'release')
+        self.assertEqual(cleanup[0]['pinnedOwners'],{self.native.NAME:':1.20'});self.assertEqual(cleanup[0]['pinnedGeneration'],3)
+        self.assertEqual(self.value.last_failure['phase'],'dispatch-guard');self.assertTrue(self.value.cancel.is_set())
+        self.assertIsNone(self.value.consent);self.assertIsNone(self.value.kwin);self.assertIsNone(self.value.snapshot)
+        self.restored()
+
+    def test_actual_scene_guard_difference_and_owner_refusal_remain_pre_dispatch(self):
+        self.value.pointer_args=('/session',{},7,100.,50.)
+        self.value.send('NotifyPointerButton','(oa{sv}iu)',('/session',{},272,1))
+        self.consent.call.reset_mock()
+        current={**self.fixture.scene(),'guards':{'stageKeyFocus':2,'locked':True}}
+        self.value.dispatch_scene={**self.fixture.scene(),'guards':{'stageKeyFocus':1,'locked':False}}
+        self.observer.read.return_value=current
+        with self.assertRaisesRegex(RuntimeError,'target changed'):self.value.send('NotifyPointerButton','(oa{sv}iu)',('/session',{},272,0))
+        fields=self.trace.snapshot()['firstRefusedComparison']['changedFields']['fields']
+        self.assertEqual(fields,['guards.locked','guards.stageKeyFocus']);self.consent.call.assert_not_called();self.restored()
+        original=RuntimeError('Desktop service changed. Fresh consent is required.')
+        self.consent.verify.side_effect=original;self.value.last_failure={'phase':'earlier-native-loss'};self.observer.read.reset_mock()
+        with self.assertRaises(RuntimeError) as caught:self.value.send('NotifyPointerButton','(oa{sv}iu)',('/session',{},272,0))
+        self.assertIs(caught.exception,original);self.observer.read.assert_not_called();self.consent.call.assert_not_called()
+        self.assertEqual(self.value.last_failure,{'phase':'earlier-native-loss'});self.restored()
+
+    def test_actual_password_guard_retains_raw_flags_and_original_helper_disposal_once(self):
+        reply=self.fixture.focus_reply();reply['focus']['password']=True;helper=self.keyboard(reply);original=helper.request
+        with self.assertRaisesRegex(RuntimeError,'sensitive editable nonpassword'):
+            self.value.send('NotifyKeyboardKeysym','(oa{sv}iu)',('/session',{},65,1))
+        helper.request.assert_called_once_with('focus',generation=3,cancel=self.value.cancel,checkpoint=self.value.checkpoint)
+        self.assertIs(helper.request,original);helper.close.assert_called_once();self.consent.call.assert_not_called()
+        self.assertEqual(self.value.last_failure['phase'],'keyboard-target');self.assertIsNone(self.value.a11y)
+        records=self.trace.snapshot()['calls'];query=next(row for row in records if row['event']=='helper-request')
+        self.assertTrue(query['identity']['complete']);self.assertEqual(query['timeoutSeconds'],3)
+        self.assertEqual((query['identity']['focus']['password'],query['identity']['focus']['sensitive'],query['identity']['focus']['enabled']),(True,True,False))
+        self.assertFalse(next(row for row in records if row['event']=='keyboard-guard')['allowed']);self.restored()
+
+    def test_actual_focus_path_change_and_helper_error_refuse_without_extra_query(self):
+        helper=self.keyboard();reply=self.fixture.focus_reply();reply['focus']['path']='/changed_private_control'
+        helper.request.return_value=reply;original=helper.request
+        with self.assertRaisesRegex(RuntimeError,'focus or native owner changed'):
+            self.value.send('NotifyKeyboardKeysym','(oa{sv}iu)',('/session',{},65,1))
+        helper.request.assert_called_once();self.assertIs(helper.request,original);self.consent.call.assert_not_called()
+        query=next(row for row in self.trace.snapshot()['calls'] if row['event']=='helper-request')
+        self.assertEqual(query['focusComparison']['changedFields']['fields'],['[0].focus.path'])
+        self.assertFalse(query['focusComparison']['observationMatches']);self.assertTrue(query['focusComparison']['serialMatches'])
+        self.assertNotIn('changed_private_control',json.dumps(self.trace.snapshot()));self.restored()
+
+    def test_existing_helper_timeout_and_scope_restore_preserve_original_exception(self):
+        helper=self.keyboard();error=NativeTimeout('PRIVATE HELPER ERROR');helper.request.side_effect=error;original=helper.request
+        with self.assertRaises(NativeTimeout) as caught:
+            self.value.send('NotifyKeyboardKeysym','(oa{sv}iu)',('/session',{},65,1))
+        self.assertIs(caught.exception,error);helper.request.assert_called_once();helper.close.assert_called_once()
+        self.assertIs(helper.request,original);self.consent.call.assert_not_called()
+        first=self.trace.snapshot()['firstError'];self.assertEqual((first['event'],first['method'],first['timeoutSeconds']),('helper-request','focus',3))
+        self.assertEqual(first['error']['code'],24);self.assertNotIn('PRIVATE HELPER ERROR',json.dumps(self.trace.snapshot()))
+        self.assertEqual(self.value.last_failure['phase'],'keyboard-target');self.restored()
+
+    def test_actual_ascii_query_press_release_counts_and_verified_false_are_unchanged(self):
+        helper=self.keyboard();original=helper.request
+        result=self.value.action(self.value.owner,{'token':'PRIVATE TOKEN','kind':'type','text':'XYZ'})
+        self.assertEqual(result['verified'],False);self.assertTrue(result['dispatched'])
+        self.assertEqual(helper.request.call_count,4);self.assertEqual(self.consent.call.call_count,6)
+        self.assertIs(helper.request,original);self.assertFalse(self.value.cancel.is_set())
+        rows=self.trace.snapshot()['calls'];self.assertEqual(len([row for row in rows if row['event']=='helper-request']),4)
+        self.assertEqual([row['dispatchState'] for row in rows if row['event']=='send'],['press','release']*3)
+        serialized=json.dumps(self.trace.snapshot());self.assertNotIn('PRIVATE TOKEN',serialized);self.assertNotIn('XYZ',serialized)
+        self.assertNotIn('path',next(row for row in rows if row['event']=='helper-request')['identity']['focus'])
+        self.restored()
+
+    def test_actual_notify_failure_preserves_unknown_outcome_and_first_failure(self):
+        original=NativeTimeout('Native timeout');self.consent.call.side_effect=original
+        with self.assertRaisesRegex(RuntimeError,'outcome is unknown'):
+            self.value.send('NotifyPointerMotionAbsolute','(oa{sv}udd)',('/session',{},7,100.,50.))
+        self.consent.call.assert_called_once();self.assertEqual(self.value.last_failure['phase'],'dispatch')
+        self.assertTrue(self.value.cancel.is_set());self.consent.dispose.assert_called_once();self.restored()
+
+    def test_sink_failure_does_not_change_success_refusal_or_call_counts(self):
+        self.trace.record=Mock(side_effect=RuntimeError('Failed diagnostic sink'))
+        self.value.send('NotifyPointerMotionAbsolute','(oa{sv}udd)',('/session',{},7,100.,50.))
+        self.consent.call.assert_called_once();self.assertFalse(self.value.cancel.is_set());self.restored()
+        self.observer.read.return_value={**self.fixture.scene(),'serial':9};self.consent.call.reset_mock()
+        with self.assertRaisesRegex(RuntimeError,'target changed'):
+            self.value.send('NotifyPointerMotionAbsolute','(oa{sv}udd)',('/session',{},7,100.,50.))
+        self.consent.call.assert_not_called();self.assertFalse(self.value.cancel.is_set())
+        self.assertGreater(self.trace.snapshot()['recordingFailures'],0);self.restored()
+
+    def test_foreign_thread_has_no_trace_or_global_scope_and_preserves_original_sender(self):
+        outcomes=[]
+        def called():outcomes.append(self.value.send('NotifyPointerMotionAbsolute','(oa{sv}udd)',('/session',{},7,100.,50.)))
+        thread=threading.Thread(target=called);thread.start();thread.join()
+        self.assertEqual(outcomes,[self.consent.call.return_value]);self.consent.call.assert_called_once()
+        self.assertEqual(self.trace.snapshot()['totalCalls'],0);self.restored()
+
+    def test_actual_native_notify_timeout_keeps_5000ms_then_one_1000ms_close(self):
+        from gi.repository import Gio,GLib
+        desktop=Path(__file__).resolve().parents[1]/'services/desktop';sys.path.insert(0,str(desktop))
+        try:from portal_session import ConsentSession
+        finally:sys.path.pop(0)
+        session=ConsentSession.__new__(ConsentSession);session.thread=threading.get_ident();session.bus=self.bus
+        session.cancel=self.value.cancel;session.rpc_cancel=Gio.Cancellable();session.mutex=threading.Lock()
+        session.generation=3;session.closed=False;session.stop_reason=None;session.on_stopped=Mock()
+        session.owners=dict(zip(('org.freedesktop.portal.Desktop','org.freedesktop.impl.portal.desktop.gnome','org.gnome.Shell'),(':1.20',':1.21',':1.7')))
+        session.session='/session';session.request_path=None;session.fd=None;session.subscriptions=[];session.closed_signal=17
+        error=NativeTimeout('PRIVATE NATIVE TIMEOUT')
+        def called(*args):
+            if args[3]=='GetNameOwner':return GLib.Variant('(s)',(session.owners[args[4].unpack()[0]],))
+            if args[3]=='NotifyPointerMotionAbsolute':raise error
+            return GLib.Variant('()',())
+        self.bus.call_sync.side_effect=called;self.value.consent=session;self.consent=session
+        with self.assertRaisesRegex(RuntimeError,'outcome is unknown'):
+            self.value.send('NotifyPointerMotionAbsolute','(oa{sv}udd)',('/session',{},7,100.,50.))
+        calls=self.bus.call_sync.call_args_list;notify=[call for call in calls if call.args[3]=='NotifyPointerMotionAbsolute']
+        self.assertEqual(len(notify),1);self.assertEqual((notify[0].args[7],notify[0].args[8]),(5000,session.rpc_cancel))
+        self.assertEqual([call.args[3] for call in calls],['GetNameOwner']*6+['NotifyPointerMotionAbsolute','Close'])
+        self.assertEqual((calls[-1].args[7],calls[-1].args[8]),(1000,None));self.assertTrue(session.rpc_cancel.is_cancelled())
+        first=self.trace.snapshot()['firstError'];self.assertEqual((first['event'],first['method'],first['timeoutMs']),('rpc','NotifyPointerMotionAbsolute',5000))
+        self.assertEqual(first['error']['code'],24);self.assertEqual(self.value.last_failure['phase'],'dispatch')
+        self.bus.close_sync.assert_called_once_with(None);self.assertTrue(session.closed);self.restored()
+
+    def test_original_native_session_releases_close_bounds_and_cancellation_are_preserved(self):
+        from gi.repository import Gio,GLib
+        desktop=Path(__file__).resolve().parents[1]/'services/desktop';sys.path.insert(0,str(desktop))
+        try:from portal_session import ConsentSession
+        finally:sys.path.pop(0)
+        session=ConsentSession.__new__(ConsentSession);session.thread=threading.get_ident();session.bus=self.bus
+        session.cancel=self.value.cancel;session.rpc_cancel=Gio.Cancellable();session.mutex=threading.Lock()
+        session.generation=3;session.closed=False;session.stop_reason=None;session.on_stopped=Mock()
+        session.owners={self.native.NAME:':1.20'};session.session='/session';session.request_path=None;session.fd=None
+        session.subscriptions=[];session.closed_signal=17
+        self.value.consent=session;self.consent=session
+        self.value.keyboard_target=Mock();self.value.pointer_args=('/session',{},7,100.,50.)
+        self.bus.call_sync.side_effect=lambda *args:GLib.Variant('(s)',(':1.20',)) if args[3]=='GetNameOwner' else GLib.Variant('()',())
+        for method,code in (('NotifyKeyboardKeycode',29),('NotifyKeyboardKeycode',31),('NotifyPointerButton',272),('NotifyKeyboardKeysym',65)):
+            self.value.send(method,'(oa{sv}iu)',('/session',{},code,1))
+        self.bus.reset_mock();self.trace.__dict__.update(module.DispatchTrace().__dict__)
+        self.value.keys=[29,31];self.value.button=272;self.value.symbol=65
+        session.request_stop('native-session-closed')
+        result=self.value.stop();self.assertTrue(result['stopped']);self.assertEqual(self.value.last_stop_reason,'native-session-closed')
+        calls=self.bus.call_sync.call_args_list
+        self.assertEqual([call.args[3] for call in calls],['NotifyKeyboardKeycode','NotifyKeyboardKeycode','NotifyPointerButton','NotifyKeyboardKeysym','Close'])
+        self.assertEqual([call.args[4].unpack()[2] for call in calls[:-1]],[31,29,272,65])
+        for call in calls:self.assertEqual((call.args[0],call.args[6],call.args[7],call.args[8]),(':1.20',Gio.DBusCallFlags.NO_AUTO_START,1000,None))
+        self.assertTrue(session.closed);self.assertTrue(session.rpc_cancel.is_cancelled());self.bus.close_sync.assert_called_once_with(None)
+        rows=[row for row in self.trace.snapshot()['calls'] if row['event']=='rpc']
+        self.assertEqual(len(rows),5);self.assertEqual([row['dispatchState'] for row in rows],['release']*4+['close'])
+        self.assertTrue(all(row['phase']=='cleanup' and row['pinnedGeneration']==4 for row in rows))
+        self.assertTrue(all(row['destinationOwner']==':1.20' and row['timeoutMs']==1000 and not row['cancellablePresent'] for row in rows))
+        self.assertIsNone(self.value.consent);self.assertIsNone(self.value.kwin);self.restored()
+        self.value.stop();self.assertEqual(self.bus.call_sync.call_count,5);self.assertEqual(self.value.last_stop_reason,'native-session-closed')
+
+
+@unittest.skipUnless(sys.platform.startswith('linux') and Gst is not None,
+    'Candidate import regression requires Linux GStreamer introspection.')
+class GnomeInputCandidateImportTests(unittest.TestCase):
+    def test_real_idle_watch_keeps_verify_and_read_timeouts_terminal_at_existing_bounds(self):
+        from gi.repository import Gio,GLib
+        desktop=Path(__file__).resolve().parents[1]/'services/desktop'
+        sys.path.insert(0,str(desktop))
+        try:
+            from gnome_control import GnomeControl
+            from gnome import GnomeObserver
+            from portal_session import ConsentSession,OWNERS
+        finally:sys.path.pop(0)
+        for phase in ('verify','read'):
+            with self.subTest(phase=phase):
+                trace=module.IdleWatchTrace();Control=module.traced_controller(GnomeControl,trace);value=Control.__new__(Control)
+                session=ConsentSession.__new__(ConsentSession);session.thread=threading.get_ident()
+                session.cancel=threading.Event();session.mutex=threading.Lock();session.generation=0;session.closed=False
+                session.rpc_cancel=Gio.Cancellable();session.stop_reason=None;session.on_stopped=None
+                session.owners=dict(zip(OWNERS,(':1.54',':1.63',':1.7')));session.bus=Mock()
+                error=NativeTimeout('Timeout was reached')
+                if phase=='verify':session.bus.call_sync.side_effect=error
+                else:session.bus.call_sync.side_effect=lambda *args:GLib.Variant('(s)',(session.owners[args[4].unpack()[0]],))
+                observer=GnomeObserver.__new__(GnomeObserver);observer.bus=Mock();observer.Gio=Gio;observer.GLib=GLib
+                observer.owner=':1.7';observer.epoch='01234567-89ab-cdef-0123-456789abcdef'
+                def observed(*args):
+                    if args[3]=='Read':raise error
+                    return GLib.Variant('(s)',(':1.7',))
+                observer.bus.call_sync.side_effect=observed;original=(session.bus,observer.bus)
+                value.consent=session;value.cancel=session.cancel;value.kwin=SimpleNamespace(native=observer);value.last_failure=None
+                def stopped():session.request_stop();value.consent=None;value.kwin=None
+                value.stop=Mock(side_effect=stopped)
+                self.assertEqual(value.watch_session(),GLib.SOURCE_REMOVE);value.stop.assert_called_once()
+                self.assertTrue(session.cancel.is_set());self.assertTrue(session.rpc_cancel.is_cancelled())
+                self.assertEqual(value.last_failure['phase'],'idle-watch');self.assertEqual(value.last_failure['message'],'Timeout was reached')
+                first=trace.snapshot()['firstError'];self.assertEqual(first['stage'],phase);self.assertEqual(first['timeoutMs'],1000)
+                self.assertEqual(first['method'],'GetNameOwner' if phase=='verify' else 'Read')
+                self.assertEqual(first['error']['code'],24);self.assertIs(session.bus,original[0]);self.assertIs(observer.bus,original[1])
+                if phase=='verify':observer.bus.call_sync.assert_not_called();self.assertEqual(session.bus.call_sync.call_count,1)
+                else:
+                    self.assertEqual([row['timeoutMs'] for row in trace.snapshot()['calls']],[1000,1000,1000,500,1000])
+                    self.assertEqual(observer.bus.call_sync.call_count,2)
+
+    def test_eleven_file_candidate_resolves_real_installed_dependency_before_controller_import(self):
+        repo=Path(__file__).resolve().parents[1]
+        with tempfile.TemporaryDirectory() as temporary:
+            candidate=Path(temporary)/'candidate';candidate.mkdir()
+            installed=Path(temporary)/'installed';desktop=installed/'services/desktop';desktop.mkdir(parents=True)
+            # Use actual maintained modules in the same eleven-file staging
+            # shape. KWin is deliberately installed only; no GUI is created.
+            for name in ('worker','gnome_control','gnome','portal','portal_session',
+                    'capture_stream','scene','a11y_helper','a11y_service'):
+                shutil.copy2(repo/'services/desktop'/(name+'.py'),candidate)
+            for name in ('probe-gnome-input.py','probe-gnome-input-target.py'):
+                shutil.copy2(repo/'release'/name,candidate)
+            shutil.copy2(repo/'services/desktop/kwin.py',desktop)
+            for name in ('worker','gnome_control','portal'):
+                (desktop/(name+'.py')).write_text('raise RuntimeError("Installed controller must not replace the candidate")\n')
+            code='''
+import importlib.util,json,sys
+from pathlib import Path
+candidate=Path(sys.argv[1]);installed=Path(sys.argv[2])
+spec=importlib.util.spec_from_file_location('import_only_probe',candidate/'probe-gnome-input.py')
+probe=importlib.util.module_from_spec(spec);spec.loader.exec_module(probe)
+Worker,GnomeControl=probe.candidate_controller(candidate,installed)
+import worker,gnome_control,portal,kwin
+assert Worker is worker.Worker and GnomeControl is gnome_control.GnomeControl
+assert Path(worker.__file__).parent==candidate and Path(gnome_control.__file__).parent==candidate
+assert Path(portal.__file__).parent==candidate and Path(kwin.__file__).parent==installed/'services/desktop'
+assert portal.KWin is kwin.KWin
+print(json.dumps({'realCandidateModules':True,'installedDependencyResolved':True}))
+'''
+            result=subprocess.run([sys.executable,'-I','-B','-c',code,str(candidate),str(installed)],
+                capture_output=True,text=True,timeout=20)
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertEqual(json.loads(result.stdout),{'realCandidateModules':True,'installedDependencyResolved':True})
+
+
+@unittest.skipUnless(sys.platform.startswith('linux'), 'Owned GNOME input proof requires Linux file ownership and native runtime paths.')
+class GnomeInputTriggerTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary=tempfile.TemporaryDirectory();self.addCleanup(self.temporary.cleanup)
+        self.root=Path(self.temporary.name);self.path=self.root/'trigger.input.json'
+
+    def write(self,text):self.path.write_text(text);self.path.chmod(0o600)
+
+    def test_private_explicit_synthetic_action_is_read_without_mutating_trigger(self):
+        text='{"operation":"action","params":{"kind":"type","text":"synthetic"}}'
+        self.write(text);value=module.private_json(self.path)
+        self.assertEqual(value['params']['text'],'synthetic');self.assertEqual(self.path.read_text(),text)
+
+    def test_public_permissions_symlink_and_oversized_trigger_refuse(self):
+        self.write('{}');self.path.chmod(0o644)
+        with self.assertRaisesRegex(RuntimeError,'private bounded'):module.private_json(self.path)
+        self.path.chmod(0o600);link=self.root/'link.json';link.symlink_to(self.path)
+        with self.assertRaisesRegex(RuntimeError,'private bounded'):module.private_json(link)
+        self.write('{"padding":"'+'x'*8192+'"}')
+        with self.assertRaisesRegex(RuntimeError,'private bounded'):module.private_json(self.path)
+
+    def test_duplicate_fields_nonfinite_and_nonobject_trigger_refuse(self):
+        for text in ('{"operation":"capture","operation":"action"}','{"value":NaN}','{"value":Infinity}','[]'):
+            self.write(text)
+            with self.subTest(text=text),self.assertRaises((RuntimeError,ValueError)):module.private_json(self.path)
+
+
+@unittest.skipUnless(sys.platform.startswith('linux'), 'Owned GNOME input proof requires Linux file ownership and native runtime paths.')
+class GnomeInputSelectedArtifactTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary=tempfile.TemporaryDirectory();self.addCleanup(self.temporary.cleanup)
+        self.home=Path(self.temporary.name)/'home';self.data=self.home/'.local/share/augmentor'
+        self.root=self.data/'releases'/'owned-release';self.root.mkdir(parents=True,mode=0o700)
+        self.native=Path(self.temporary.name)/'native';self.native.mkdir()
+        self.source='a'*40;self.native_source='b'*40
+        self.release={'source':{'commit':self.source,'dirty':False},'target':'fedora44-x86_64','version':'0.2.13'}
+        self.native_release={**self.release,'source':{'commit':self.native_source,'dirty':False}}
+        (self.root/'release.json').write_text(json.dumps(self.release))
+        (self.native/'release.json').write_text(json.dumps(self.native_release))
+        (self.root/'payload.py').write_text('synthetic payload\n')
+        self.files={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in self.root.iterdir()}
+        self.sha=hashlib.sha256(json.dumps(self.files,sort_keys=True).encode()).hexdigest()
+        self.selection={'root':str(self.root),'python':'/usr/bin/python3','node':str(self.root/'node/bin/node'),
+            'sourceRef':self.source,'artifactSha256':self.sha,'version':'0.2.13','releaseId':'owned-release'}
+        self.receipt={'deployment':dict(self.selection),'files':self.files,'artifactSha256':self.sha}
+        self.selection_path=self.data/'desktop.json';self.receipt_path=self.root/'desktop-release.json'
+        self.write_selection();self.write_receipt()
+        # Execute the normal maintained read-only inventory verifier, never a
+        # fake success verifier or selected application module.
+        self.verifier=self.data/'desktop-deployment.py'
+        self.verifier.write_bytes((Path(__file__).resolve().parents[1]/'scripts/desktop-deployment.py').read_bytes());self.verifier.chmod(0o700)
+        facade=Mock(side_effect=lambda value:self.native if str(value)=='/usr/lib/augmentor' else Path(value))
+        facade.home.return_value=self.home
+        patcher=patch.object(module,'Path',facade);patcher.start();self.addCleanup(patcher.stop)
+        for patcher in (patch.dict(module.os.environ,{},clear=True),patch.object(module.sys,'executable','/usr/bin/python3'),
+                patch.object(module.sys,'prefix','/usr'),patch.object(module.sys,'base_prefix','/usr')):
+            patcher.start();self.addCleanup(patcher.stop)
+        self.audit=Mock(returncode=0,stdout='',stderr='')
+        patcher=patch.object(module.subprocess,'run',return_value=self.audit)
+        self.run=patcher.start();self.addCleanup(patcher.stop)
+
+    def write_selection(self):self.selection_path.write_text(json.dumps(self.selection));self.selection_path.chmod(0o600)
+    def write_receipt(self):self.receipt_path.write_text(json.dumps(self.receipt));self.receipt_path.chmod(0o600)
+    def admitted(self):return module.selected_artifact(self.source,self.sha,self.native_source)
+
+    def test_real_inventory_verifier_admits_exact_distinct_selected_and_native_sources(self):
+        before=self.selection_path.read_bytes();result=self.admitted()
+        self.assertEqual(result['selection'],self.selection)
+        self.assertEqual(result['nativeSource'],self.native_source);self.assertNotEqual(self.source,self.native_source)
+        self.assertTrue(result['managedInventoryVerified']);self.assertTrue(result['deploymentReceiptMatchesSelection'])
+        self.assertEqual(result['deploymentVerifierSha256'],hashlib.sha256(self.verifier.read_bytes()).hexdigest())
+        self.assertEqual(self.selection_path.read_bytes(),before)
+        self.run.assert_called_once_with(['rpm','-V','augmentor-agent'],capture_output=True,text=True,timeout=30)
+
+    def test_selected_source_and_explicit_artifact_hash_mismatch_refuse_before_audit(self):
+        for key,bad in (('sourceRef','c'*40),('artifactSha256','c'*64)):
+            original=self.selection[key];self.selection[key]=bad;self.write_selection()
+            with self.subTest(key=key),self.assertRaisesRegex(RuntimeError,'source or artifact hash differs'):self.admitted()
+            self.run.assert_not_called();self.selection[key]=original
+
+    def test_selected_native_wrong_source_target_dirty_or_version_refuse(self):
+        cases=((self.root,self.release,'target','ubuntu24.04-amd64'),
+            (self.native,self.native_release,'target','fedora43-x86_64'),
+            (self.root,self.release,'source',{'commit':self.source,'dirty':True}),
+            (self.native,self.native_release,'source',{'commit':'c'*40,'dirty':False}),
+            (self.native,self.native_release,'version','0.2.14'))
+        for directory,original,key,bad in cases:
+            (directory/'release.json').write_text(json.dumps({**original,key:bad}))
+            with self.subTest(directory=directory,key=key),self.assertRaisesRegex(RuntimeError,'source/target|versions differ'):self.admitted()
+            self.run.assert_not_called();(directory/'release.json').write_text(json.dumps(original))
+
+    def test_changed_or_added_payload_refuses_real_normal_inventory(self):
+        (self.root/'payload.py').write_text('changed bytes\n')
+        with self.assertRaisesRegex(ValueError,'Release files changed after staging'):self.admitted()
+        (self.root/'payload.py').write_text('synthetic payload\n');(self.root/'extra.py').write_text('unrecorded bytes\n')
+        with self.assertRaisesRegex(ValueError,'Release files changed after staging'):self.admitted()
+
+    def test_forged_inventory_digest_or_stale_deployment_receipt_refuse(self):
+        self.receipt['artifactSha256']='c'*64;self.write_receipt()
+        with self.assertRaisesRegex(ValueError,'inventory identity does not match'):self.admitted()
+        self.receipt['artifactSha256']=self.sha;self.receipt['deployment']['node']='/unrelated/node';self.write_receipt()
+        with self.assertRaisesRegex(RuntimeError,'receipt differs from the exact selection'):self.admitted()
+
+    def test_selected_venv_and_managed_or_source_qt_policy_refuse(self):
+        self.selection['python']=str(self.root/'venv/bin/python');self.write_selection()
+        with self.assertRaisesRegex(RuntimeError,'selected interpreter differs'):self.admitted()
+        self.selection['python']='/usr/bin/python3';self.write_selection()
+        for directory in (self.root,self.native):
+            policy=directory/'linux-python-runtime.json';policy.symlink_to(directory/'missing-policy')
+            with self.subTest(directory=directory),self.assertRaisesRegex(RuntimeError,'managed or source Qt'):self.admitted()
+            policy.unlink()
+        self.run.assert_not_called()
+
+    def test_actual_interpreter_venv_and_inherited_loader_overrides_refuse(self):
+        with patch.object(module.sys,'executable','/unrelated/python'):
+            with self.assertRaisesRegex(RuntimeError,'approved native'):self.admitted()
+        with patch.object(module.sys,'prefix','/venv'):
+            with self.assertRaisesRegex(RuntimeError,'approved native'):self.admitted()
+        for name in ('LD_PRELOAD','LD_AUDIT','LD_LIBRARY_PATH','QT_PLUGIN_PATH','PYTHONPATH','PYTHONHOME','VIRTUAL_ENV'):
+            with self.subTest(name=name),patch.dict(module.os.environ,{name:'/unrelated'}):
+                with self.assertRaisesRegex(RuntimeError,'inherited loader'):self.admitted()
+        with patch.dict(module.os.environ,{'AUGMENTOR_PYTHON':'/unrelated/python'}):
+            with self.assertRaisesRegex(RuntimeError,'requested interpreter differs'):self.admitted()
+        self.run.assert_not_called()
+
+    def test_native_rpm_change_nonzero_or_diagnostic_output_refuse(self):
+        for code,stdout,stderr in ((1,'',''),(0,'changed native member',''),(0,'','warning')):
+            self.audit.returncode=code;self.audit.stdout=stdout;self.audit.stderr=stderr
+            with self.subTest(code=code,stdout=stdout,stderr=stderr),self.assertRaisesRegex(RuntimeError,'RPM audit is not clean'):self.admitted()
+
+    def test_public_selection_or_external_managed_root_refuse(self):
+        self.selection_path.chmod(0o644)
+        with self.assertRaisesRegex(RuntimeError,'private bounded'):self.admitted()
+        self.selection_path.chmod(0o600);self.selection['root']=str(self.native);self.write_selection()
+        with self.assertRaisesRegex(RuntimeError,'canonical managed release'):self.admitted()
+        self.run.assert_not_called()
+
+    def test_shared_writable_or_symlink_deployment_verifier_refuse(self):
+        self.verifier.chmod(0o722)
+        with self.assertRaisesRegex(RuntimeError,'normal owned deployment verifier'):self.admitted()
+        moved=self.verifier.with_suffix('.saved');self.verifier.rename(moved);self.verifier.symlink_to(moved)
+        with self.assertRaisesRegex(RuntimeError,'normal owned deployment verifier'):self.admitted()
+
+
+if __name__=='__main__':unittest.main()

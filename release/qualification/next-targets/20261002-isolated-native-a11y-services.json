@@ -1,0 +1,841 @@
+{
+  "format": "augmentor-isolated-fedora-native-service-replacement-qualification/1",
+  "date": "2026-10-02",
+  "scope": "Separate Fedora44 container; private native dbus-run-session plus shipped AT-SPI launcher/registry; synthetic two-node exporter, no GNOME compositor or application",
+  "containerImage": "sha256:3e1199377b8cf6b181020ddb02ff2446bd0be384700e242b6ea5cf423582ec7e",
+  "baseImage": "fedora@sha256:43b29f65a41eb9c35e1cd5323e3bdf3b655c2357a9f4f1ff2f9c2798e5045d80",
+  "recipeSha256": "91916c3ea77040df89020a3503f128680bc78b990400b67a2371091721e3605a",
+  "resourceBounds": {
+    "normalUid": 1000,
+    "network": "none",
+    "cpus": 2,
+    "memoryBytes": 2147483648,
+    "pids": 256,
+    "hostMounts": false,
+    "hostDevices": false,
+    "privileged": false,
+    "capabilitiesDropped": [
+      "ALL"
+    ],
+    "noNewPrivileges": true,
+    "dockerInitReapsOrphans": true
+  },
+  "cases": [
+    {
+      "case": "registry",
+      "result": {
+        "format": "augmentor-isolated-native-a11y-service-fence/1",
+        "case": "registry",
+        "treeSynthetic": true,
+        "realGnomeSession": false,
+        "inputSent": false,
+        "nativeServiceFenceQualified": true,
+        "sourceSha256": {
+          "probe-a11y-service-replacement.py": "b95c0ea60bbc2653e6b56dfc65be92450c1500dcea55120f261020c300a8d5a9",
+          "probe-gnome-a11y-owner.py": "53e5e36dbd48345568b581c91234438f9f9540aad62d76920041b83125f9923f",
+          "a11y_helper.py": "4b6fc94396ca3f3282d1fd59d0484e8680d5e548584e08fb4084892d4841e788",
+          "a11y_service.py": "e6547181f01f44b67f0468fda001a50df0c619f71324282009b2a1b38de423ba"
+        },
+        "nativeBinarySha256": {
+          "/usr/libexec/at-spi-bus-launcher": "9c14ce427c18c5dcfa303db57d22b6277deb48bb154e385b8cceb572fd309c24",
+          "/usr/libexec/at-spi2-registryd": "fba13406b5e8ebe67c6eea1aa99f61d2b67a2620ba01bac74ce2772261dd9324"
+        },
+        "parentAtspiImported": false,
+        "events": [
+          {
+            "operation": "spawn",
+            "label": "launcher-first",
+            "pid": 20,
+            "start": "9155843",
+            "argv": [
+              "/usr/libexec/at-spi-bus-launcher",
+              "--launch-immediately",
+              "--a11y=1",
+              "--screen-reader=0"
+            ]
+          },
+          {
+            "operation": "spawn",
+            "label": "registry-first",
+            "pid": 26,
+            "start": "9155848",
+            "argv": [
+              "/usr/libexec/at-spi2-registryd"
+            ]
+          },
+          {
+            "operation": "spawn",
+            "label": "exporter-first",
+            "pid": 27,
+            "start": "9155853",
+            "argv": [
+              "/usr/sbin/python3",
+              "-I",
+              "/work/probe-a11y-service-replacement.py",
+              "--exporter",
+              "--root",
+              "/work/registry-proof-v4/exporter-first",
+              "--case",
+              "registry"
+            ]
+          },
+          {
+            "operation": "focus",
+            "reply": {
+              "complete": true,
+              "focus": {
+                "owner": ":1.2",
+                "path": "/org/a11y/atspi/accessible/entry",
+                "role": 79,
+                "password": false,
+                "focused": true,
+                "showing": true,
+                "defunct": false,
+                "editable": true,
+                "enabled": true,
+                "sensitive": true
+              },
+              "visitedNodes": 2,
+              "observedSerial": 0,
+              "nonce": "9431220f4bbd485eac1f579055abb92c",
+              "generation": 0,
+              "helperPid": 31,
+              "targetPid": 27,
+              "targetStart": "9155853",
+              "epoch": "d1686666358a477a8346f9f5bd663d0d",
+              "pins": {
+                "sessionBusId": "176cc24a4db8e053d471fc016ac00801",
+                "launcherOwner": ":1.1",
+                "accessibilityBusId": "f3331e7ac6adaeccf1c90c4f6ac00801",
+                "registryOwner": ":1.1"
+              },
+              "valid": true,
+              "serial": 0,
+              "selectedOwner": ":1.2",
+              "lastEvent": null,
+              "stopReason": null,
+              "inputQualified": false
+            }
+          },
+          {
+            "operation": "spawn",
+            "label": "registry-second",
+            "pid": 35,
+            "start": "9155876",
+            "argv": [
+              "/usr/libexec/at-spi2-registryd"
+            ]
+          },
+          {
+            "operation": "focus",
+            "reply": {
+              "complete": true,
+              "focus": {
+                "owner": ":1.6",
+                "path": "/org/a11y/atspi/accessible/entry",
+                "role": 79,
+                "password": false,
+                "focused": true,
+                "showing": true,
+                "defunct": false,
+                "editable": true,
+                "enabled": true,
+                "sensitive": true
+              },
+              "visitedNodes": 2,
+              "observedSerial": 0,
+              "nonce": "faad041bd7df48f3952eb7d68d389876",
+              "generation": 0,
+              "helperPid": 36,
+              "targetPid": 27,
+              "targetStart": "9155853",
+              "epoch": "dd3371dbe71848dc83f9d18ddac33005",
+              "pins": {
+                "sessionBusId": "176cc24a4db8e053d471fc016ac00801",
+                "launcherOwner": ":1.1",
+                "accessibilityBusId": "f3331e7ac6adaeccf1c90c4f6ac00801",
+                "registryOwner": ":1.5"
+              },
+              "valid": true,
+              "serial": 0,
+              "selectedOwner": ":1.6",
+              "lastEvent": null,
+              "stopReason": null,
+              "inputQualified": false
+            }
+          }
+        ],
+        "before": {
+          "sessionBusId": "176cc24a4db8e053d471fc016ac00801",
+          "launcherOwner": ":1.1",
+          "accessibilityBusId": "f3331e7ac6adaeccf1c90c4f6ac00801",
+          "registryOwner": ":1.1",
+          "accessibilityBusPid": 25,
+          "accessibilityBusStart": "9155843"
+        },
+        "targetAliveImmediatelyAfterLoss": true,
+        "refusal": {
+          "kind": "RuntimeError",
+          "message": "Accessibility native owner changed; fresh helper required.",
+          "durationSeconds": 0.003355255990754813,
+          "helperClosed": true
+        },
+        "supervisorPingAfterLoss": {
+          "pid": 27,
+          "generation": 1,
+          "connectionOpen": true,
+          "applicationId": 0,
+          "sessionBusId": "176cc24a4db8e053d471fc016ac00801",
+          "launcherOwner": ":1.1",
+          "inputSent": false,
+          "gtkTarget": false,
+          "treeSynthetic": true,
+          "accessibilityBusId": "f3331e7ac6adaeccf1c90c4f6ac00801",
+          "registryOwner": ":1.1",
+          "owner": ":1.2",
+          "lastCommand": "6e0dd889781b4d5daaee8226d567b3c3"
+        },
+        "oldHelperRearmRefused": true,
+        "selectedOwnerUnchangedDuringRegistryLoss": true,
+        "restoredExporter": {
+          "pid": 27,
+          "generation": 2,
+          "connectionOpen": true,
+          "applicationId": 0,
+          "sessionBusId": "176cc24a4db8e053d471fc016ac00801",
+          "launcherOwner": ":1.1",
+          "inputSent": false,
+          "gtkTarget": false,
+          "treeSynthetic": true,
+          "accessibilityBusId": "f3331e7ac6adaeccf1c90c4f6ac00801",
+          "registryOwner": ":1.5",
+          "owner": ":1.6",
+          "lastCommand": "cd20c980f494454ebb4d97fa7abb53ae"
+        },
+        "ownedPids": [
+          {
+            "pid": 20,
+            "start": "9155843",
+            "label": "launcher-first",
+            "exit": 0
+          },
+          {
+            "pid": 26,
+            "start": "9155848",
+            "label": "registry-first",
+            "exit": -15
+          },
+          {
+            "pid": 27,
+            "start": "9155853",
+            "label": "exporter-first",
+            "exit": -15
+          },
+          {
+            "pid": 35,
+            "start": "9155876",
+            "label": "registry-second",
+            "exit": -15
+          }
+        ],
+        "allOwnedSpawnedProcessesReaped": true,
+        "allHelpersDisposed": true
+      },
+      "rawSha256": "ed1f7b1e82d5bf5750d496c910ac412373ffe226eba3578a77583796edaf19c5",
+      "proofPidsConfirmedAbsent": [
+        20,
+        25,
+        26,
+        27,
+        31,
+        35,
+        36
+      ]
+    },
+    {
+      "case": "launcher-bus",
+      "result": {
+        "format": "augmentor-isolated-native-a11y-service-fence/1",
+        "case": "launcher-bus",
+        "treeSynthetic": true,
+        "realGnomeSession": false,
+        "inputSent": false,
+        "nativeServiceFenceQualified": true,
+        "sourceSha256": {
+          "probe-a11y-service-replacement.py": "b95c0ea60bbc2653e6b56dfc65be92450c1500dcea55120f261020c300a8d5a9",
+          "probe-gnome-a11y-owner.py": "53e5e36dbd48345568b581c91234438f9f9540aad62d76920041b83125f9923f",
+          "a11y_helper.py": "4b6fc94396ca3f3282d1fd59d0484e8680d5e548584e08fb4084892d4841e788",
+          "a11y_service.py": "e6547181f01f44b67f0468fda001a50df0c619f71324282009b2a1b38de423ba"
+        },
+        "nativeBinarySha256": {
+          "/usr/libexec/at-spi-bus-launcher": "9c14ce427c18c5dcfa303db57d22b6277deb48bb154e385b8cceb572fd309c24",
+          "/usr/libexec/at-spi2-registryd": "fba13406b5e8ebe67c6eea1aa99f61d2b67a2620ba01bac74ce2772261dd9324"
+        },
+        "parentAtspiImported": false,
+        "events": [
+          {
+            "operation": "spawn",
+            "label": "launcher-first",
+            "pid": 65,
+            "start": "9157759",
+            "argv": [
+              "/usr/libexec/at-spi-bus-launcher",
+              "--launch-immediately",
+              "--a11y=1",
+              "--screen-reader=0"
+            ]
+          },
+          {
+            "operation": "spawn",
+            "label": "registry-first",
+            "pid": 76,
+            "start": "9157764",
+            "argv": [
+              "/usr/libexec/at-spi2-registryd"
+            ]
+          },
+          {
+            "operation": "spawn",
+            "label": "exporter-first",
+            "pid": 78,
+            "start": "9157770",
+            "argv": [
+              "/usr/sbin/python3",
+              "-I",
+              "/work/probe-a11y-service-replacement.py",
+              "--exporter",
+              "--root",
+              "/work/launcher-proof-v4/exporter-first",
+              "--case",
+              "launcher-bus"
+            ]
+          },
+          {
+            "operation": "focus",
+            "reply": {
+              "complete": true,
+              "focus": {
+                "owner": ":1.2",
+                "path": "/org/a11y/atspi/accessible/entry",
+                "role": 79,
+                "password": false,
+                "focused": true,
+                "showing": true,
+                "defunct": false,
+                "editable": true,
+                "enabled": true,
+                "sensitive": true
+              },
+              "visitedNodes": 2,
+              "observedSerial": 0,
+              "nonce": "e5c5108324e6414db83f9f35a4d16707",
+              "generation": 0,
+              "helperPid": 87,
+              "targetPid": 78,
+              "targetStart": "9157770",
+              "epoch": "f2f1621e12614d96b40f3ef050e0d954",
+              "pins": {
+                "sessionBusId": "f6bd0533e502287ecddefb596ac00814",
+                "launcherOwner": ":1.1",
+                "accessibilityBusId": "ff0379e3c243ed9ca79f05fd6ac00814",
+                "registryOwner": ":1.1"
+              },
+              "valid": true,
+              "serial": 0,
+              "selectedOwner": ":1.2",
+              "lastEvent": null,
+              "stopReason": null,
+              "inputQualified": false
+            }
+          },
+          {
+            "operation": "spawn",
+            "label": "launcher-second",
+            "pid": 100,
+            "start": "9157791",
+            "argv": [
+              "/usr/libexec/at-spi-bus-launcher",
+              "--launch-immediately",
+              "--a11y=1",
+              "--screen-reader=0"
+            ]
+          },
+          {
+            "operation": "spawn",
+            "label": "registry-second",
+            "pid": 107,
+            "start": "9157797",
+            "argv": [
+              "/usr/libexec/at-spi2-registryd"
+            ]
+          },
+          {
+            "operation": "spawn",
+            "label": "exporter-second",
+            "pid": 109,
+            "start": "9157802",
+            "argv": [
+              "/usr/sbin/python3",
+              "-I",
+              "/work/probe-a11y-service-replacement.py",
+              "--exporter",
+              "--root",
+              "/work/launcher-proof-v4/exporter-second",
+              "--case",
+              "launcher-bus"
+            ]
+          },
+          {
+            "operation": "focus",
+            "reply": {
+              "complete": true,
+              "focus": {
+                "owner": ":1.2",
+                "path": "/org/a11y/atspi/accessible/entry",
+                "role": 79,
+                "password": false,
+                "focused": true,
+                "showing": true,
+                "defunct": false,
+                "editable": true,
+                "enabled": true,
+                "sensitive": true
+              },
+              "visitedNodes": 2,
+              "observedSerial": 0,
+              "nonce": "01884756468f44e081ff7ee6cf289860",
+              "generation": 0,
+              "helperPid": 117,
+              "targetPid": 109,
+              "targetStart": "9157802",
+              "epoch": "8d5c385da445437b98667d463debe8fe",
+              "pins": {
+                "sessionBusId": "f6bd0533e502287ecddefb596ac00814",
+                "launcherOwner": ":1.4",
+                "accessibilityBusId": "7c53f724917fa008679fce9f6ac00814",
+                "registryOwner": ":1.1"
+              },
+              "valid": true,
+              "serial": 0,
+              "selectedOwner": ":1.2",
+              "lastEvent": null,
+              "stopReason": null,
+              "inputQualified": false
+            }
+          }
+        ],
+        "before": {
+          "sessionBusId": "f6bd0533e502287ecddefb596ac00814",
+          "launcherOwner": ":1.1",
+          "accessibilityBusId": "ff0379e3c243ed9ca79f05fd6ac00814",
+          "registryOwner": ":1.1",
+          "accessibilityBusPid": 74,
+          "accessibilityBusStart": "9157759"
+        },
+        "targetAliveImmediatelyAfterLoss": true,
+        "refusal": {
+          "kind": "RuntimeError",
+          "message": "Accessibility native owner changed; fresh helper required.",
+          "durationSeconds": 0.0012826109887100756,
+          "helperClosed": true
+        },
+        "supervisorPingAfterLoss": {
+          "pid": 78,
+          "generation": 1,
+          "connectionOpen": true,
+          "applicationId": 0,
+          "sessionBusId": "f6bd0533e502287ecddefb596ac00814",
+          "launcherOwner": ":1.1",
+          "inputSent": false,
+          "gtkTarget": false,
+          "treeSynthetic": true,
+          "accessibilityBusId": "ff0379e3c243ed9ca79f05fd6ac00814",
+          "registryOwner": ":1.1",
+          "owner": ":1.2",
+          "lastCommand": "604c6bb4cc6a430db404de5c2d1695f3"
+        },
+        "oldHelperRearmRefused": true,
+        "coupledLauncherAndAccessibilityBusLoss": true,
+        "after": {
+          "sessionBusId": "f6bd0533e502287ecddefb596ac00814",
+          "launcherOwner": ":1.4",
+          "accessibilityBusId": "7c53f724917fa008679fce9f6ac00814",
+          "registryOwner": ":1.1",
+          "accessibilityBusPid": 105,
+          "accessibilityBusStart": "9157792"
+        },
+        "ownedPids": [
+          {
+            "pid": 65,
+            "start": "9157759",
+            "label": "launcher-first",
+            "exit": 0
+          },
+          {
+            "pid": 76,
+            "start": "9157764",
+            "label": "registry-first",
+            "exit": -15
+          },
+          {
+            "pid": 78,
+            "start": "9157770",
+            "label": "exporter-first",
+            "exit": -15
+          },
+          {
+            "pid": 100,
+            "start": "9157791",
+            "label": "launcher-second",
+            "exit": 0
+          },
+          {
+            "pid": 107,
+            "start": "9157797",
+            "label": "registry-second",
+            "exit": -15
+          },
+          {
+            "pid": 109,
+            "start": "9157802",
+            "label": "exporter-second",
+            "exit": -15
+          }
+        ],
+        "allOwnedSpawnedProcessesReaped": true,
+        "allHelpersDisposed": true
+      },
+      "rawSha256": "ef168a47604c982d0ce7452190ff7209d897126ad3930cb68e52bbd1202e5fb1",
+      "proofPidsConfirmedAbsent": [
+        65,
+        74,
+        76,
+        78,
+        87,
+        100,
+        105,
+        107,
+        109,
+        117
+      ]
+    },
+    {
+      "case": "accessibility-bus",
+      "result": {
+        "format": "augmentor-isolated-native-a11y-service-fence/1",
+        "case": "accessibility-bus",
+        "treeSynthetic": true,
+        "realGnomeSession": false,
+        "inputSent": false,
+        "nativeServiceFenceQualified": true,
+        "sourceSha256": {
+          "probe-a11y-service-replacement.py": "b95c0ea60bbc2653e6b56dfc65be92450c1500dcea55120f261020c300a8d5a9",
+          "probe-gnome-a11y-owner.py": "53e5e36dbd48345568b581c91234438f9f9540aad62d76920041b83125f9923f",
+          "a11y_helper.py": "4b6fc94396ca3f3282d1fd59d0484e8680d5e548584e08fb4084892d4841e788",
+          "a11y_service.py": "e6547181f01f44b67f0468fda001a50df0c619f71324282009b2a1b38de423ba"
+        },
+        "nativeBinarySha256": {
+          "/usr/libexec/at-spi-bus-launcher": "9c14ce427c18c5dcfa303db57d22b6277deb48bb154e385b8cceb572fd309c24",
+          "/usr/libexec/at-spi2-registryd": "fba13406b5e8ebe67c6eea1aa99f61d2b67a2620ba01bac74ce2772261dd9324"
+        },
+        "parentAtspiImported": false,
+        "events": [
+          {
+            "operation": "spawn",
+            "label": "launcher-first",
+            "pid": 64,
+            "start": "9157759",
+            "argv": [
+              "/usr/libexec/at-spi-bus-launcher",
+              "--launch-immediately",
+              "--a11y=1",
+              "--screen-reader=0"
+            ]
+          },
+          {
+            "operation": "spawn",
+            "label": "registry-first",
+            "pid": 77,
+            "start": "9157764",
+            "argv": [
+              "/usr/libexec/at-spi2-registryd"
+            ]
+          },
+          {
+            "operation": "spawn",
+            "label": "exporter-first",
+            "pid": 79,
+            "start": "9157770",
+            "argv": [
+              "/usr/sbin/python3",
+              "-I",
+              "/work/probe-a11y-service-replacement.py",
+              "--exporter",
+              "--root",
+              "/work/bus-proof-v4/exporter-first",
+              "--case",
+              "accessibility-bus"
+            ]
+          },
+          {
+            "operation": "focus",
+            "reply": {
+              "complete": true,
+              "focus": {
+                "owner": ":1.2",
+                "path": "/org/a11y/atspi/accessible/entry",
+                "role": 79,
+                "password": false,
+                "focused": true,
+                "showing": true,
+                "defunct": false,
+                "editable": true,
+                "enabled": true,
+                "sensitive": true
+              },
+              "visitedNodes": 2,
+              "observedSerial": 0,
+              "nonce": "db1ca87921c343fd999e127f1b199943",
+              "generation": 0,
+              "helperPid": 86,
+              "targetPid": 79,
+              "targetStart": "9157770",
+              "epoch": "9199c908589e4270af6d4362bec50529",
+              "pins": {
+                "sessionBusId": "4794c8abab6c0f00edbcfe696ac00814",
+                "launcherOwner": ":1.1",
+                "accessibilityBusId": "baefb922471798943784631c6ac00814",
+                "registryOwner": ":1.1"
+              },
+              "valid": true,
+              "serial": 0,
+              "selectedOwner": ":1.2",
+              "lastEvent": null,
+              "stopReason": null,
+              "inputQualified": false
+            }
+          },
+          {
+            "operation": "spawn",
+            "label": "launcher-second",
+            "pid": 94,
+            "start": "9157791",
+            "argv": [
+              "/usr/libexec/at-spi-bus-launcher",
+              "--launch-immediately",
+              "--a11y=1",
+              "--screen-reader=0"
+            ]
+          },
+          {
+            "operation": "spawn",
+            "label": "registry-second",
+            "pid": 106,
+            "start": "9157796",
+            "argv": [
+              "/usr/libexec/at-spi2-registryd"
+            ]
+          },
+          {
+            "operation": "spawn",
+            "label": "exporter-second",
+            "pid": 108,
+            "start": "9157801",
+            "argv": [
+              "/usr/sbin/python3",
+              "-I",
+              "/work/probe-a11y-service-replacement.py",
+              "--exporter",
+              "--root",
+              "/work/bus-proof-v4/exporter-second",
+              "--case",
+              "accessibility-bus"
+            ]
+          },
+          {
+            "operation": "focus",
+            "reply": {
+              "complete": true,
+              "focus": {
+                "owner": ":1.2",
+                "path": "/org/a11y/atspi/accessible/entry",
+                "role": 79,
+                "password": false,
+                "focused": true,
+                "showing": true,
+                "defunct": false,
+                "editable": true,
+                "enabled": true,
+                "sensitive": true
+              },
+              "visitedNodes": 2,
+              "observedSerial": 0,
+              "nonce": "e2e7c2ece5de4177be522fc7801bf86c",
+              "generation": 0,
+              "helperPid": 116,
+              "targetPid": 108,
+              "targetStart": "9157801",
+              "epoch": "6303b9a808e74bc68c7898c5f0d7014c",
+              "pins": {
+                "sessionBusId": "4794c8abab6c0f00edbcfe696ac00814",
+                "launcherOwner": ":1.4",
+                "accessibilityBusId": "2276d926c2803fab525dd0af6ac00814",
+                "registryOwner": ":1.1"
+              },
+              "valid": true,
+              "serial": 0,
+              "selectedOwner": ":1.2",
+              "lastEvent": null,
+              "stopReason": null,
+              "inputQualified": false
+            }
+          }
+        ],
+        "before": {
+          "sessionBusId": "4794c8abab6c0f00edbcfe696ac00814",
+          "launcherOwner": ":1.1",
+          "accessibilityBusId": "baefb922471798943784631c6ac00814",
+          "registryOwner": ":1.1",
+          "accessibilityBusPid": 75,
+          "accessibilityBusStart": "9157759"
+        },
+        "targetAliveImmediatelyAfterLoss": true,
+        "refusal": {
+          "kind": "RuntimeError",
+          "message": "Accessibility native owner changed; fresh helper required.",
+          "durationSeconds": 0.0014069799944991246,
+          "helperClosed": true
+        },
+        "supervisorPingAfterLoss": {
+          "pid": 79,
+          "generation": 1,
+          "connectionOpen": true,
+          "applicationId": 0,
+          "sessionBusId": "4794c8abab6c0f00edbcfe696ac00814",
+          "launcherOwner": ":1.1",
+          "inputSent": false,
+          "gtkTarget": false,
+          "treeSynthetic": true,
+          "accessibilityBusId": "baefb922471798943784631c6ac00814",
+          "registryOwner": ":1.1",
+          "owner": ":1.2",
+          "lastCommand": "c22f1c4d8f9b482b90aa90df3554cca1"
+        },
+        "oldHelperRearmRefused": true,
+        "coupledLauncherAndAccessibilityBusLoss": true,
+        "after": {
+          "sessionBusId": "4794c8abab6c0f00edbcfe696ac00814",
+          "launcherOwner": ":1.4",
+          "accessibilityBusId": "2276d926c2803fab525dd0af6ac00814",
+          "registryOwner": ":1.1",
+          "accessibilityBusPid": 99,
+          "accessibilityBusStart": "9157791"
+        },
+        "ownedPids": [
+          {
+            "pid": 64,
+            "start": "9157759",
+            "label": "launcher-first",
+            "exit": 1
+          },
+          {
+            "pid": 77,
+            "start": "9157764",
+            "label": "registry-first",
+            "exit": -15
+          },
+          {
+            "pid": 79,
+            "start": "9157770",
+            "label": "exporter-first",
+            "exit": -15
+          },
+          {
+            "pid": 94,
+            "start": "9157791",
+            "label": "launcher-second",
+            "exit": 0
+          },
+          {
+            "pid": 106,
+            "start": "9157796",
+            "label": "registry-second",
+            "exit": -15
+          },
+          {
+            "pid": 108,
+            "start": "9157801",
+            "label": "exporter-second",
+            "exit": -15
+          }
+        ],
+        "allOwnedSpawnedProcessesReaped": true,
+        "allHelpersDisposed": true
+      },
+      "rawSha256": "0d8160cb0e8d12220f5704348252bb1c9492565c3a3879877e57f812c8cc1c17",
+      "proofPidsConfirmedAbsent": [
+        64,
+        75,
+        77,
+        79,
+        86,
+        94,
+        99,
+        106,
+        108,
+        116
+      ]
+    }
+  ],
+  "packageInventorySha256": "dcc117457dbf28500c65887972c777f7a4a3352c9a8c7ad57e3ce5797c8834ae",
+  "nativePackagesWithHeaderSignatures": [
+    "at-spi2-core\t0:2.60.7-1.fc44.x86_64\tRSA/SHA256, Wed Sep 16 19:21:21 2026, Key ID dbfcf71c6d9f90a6",
+    "dbus-daemon\t1:1.16.2-1.fc44.x86_64\tRSA/SHA256, Wed Feb 18 19:05:42 2026, Key ID dbfcf71c6d9f90a6",
+    "gsettings-desktop-schemas\t0:50.1-1.fc44.x86_64\tRSA/SHA256, Mon Apr 20 18:33:15 2026, Key ID dbfcf71c6d9f90a6",
+    "gobject-introspection\t0:1.86.0-3.fc44.x86_64\tRSA/SHA256, Sat Jan 17 07:16:37 2026, Key ID dbfcf71c6d9f90a6",
+    "python3-gobject-base\t0:3.56.3-1.fc44.x86_64\tRSA/SHA256, Mon May 11 10:28:05 2026, Key ID dbfcf71c6d9f90a6"
+  ],
+  "nativeLibrarySha256": {
+    "/usr/lib64/libatspi.so.0": "26a28d89b5aa13f23cc927882470d957344b86a5172f909eb657dc2ae6672c4c",
+    "/usr/bin/dbus-daemon": "cbb05276d0a322ddbfd71e58c135625117dfab72967ad743c60fdaf10970545e",
+    "/usr/bin/dbus-run-session": "8b6317a9c457093b96eb9d16f87b52e332d0314b659ea0b23f454494240d64e2"
+  },
+  "historicalFailures": [
+    {
+      "fixture": "20",
+      "stage": "launcher-startup",
+      "reason": "gsettings-desktop-schemas missing; actual launcher abort",
+      "nativeServiceFenceQualified": false,
+      "rawResultSha256": "5662c641ce57251e7c8701451a28e13f5e27f7ddf748601f79cbb96bb2ca9543"
+    },
+    {
+      "fixture": "21",
+      "stage": "synthetic-exporter-import",
+      "reason": "DBus1.0 typelib missing; actual Fedora provider query identifies gobject-introspection1.86.0-3.fc44",
+      "nativeServiceFenceQualified": false,
+      "rawResultSha256": "ba43ae9c94075bd7c7086eaf230413d37323ef11cb89bfc7e23af14b6eac942b"
+    }
+  ],
+  "orphanReapingAudit": {
+    "priorFixture23NativeFencesPassed": true,
+    "priorFixture23OrphanZombiesObserved": true,
+    "priorFixture23FullProcessCleanupQualified": false,
+    "currentFixture24UsesDockerInit": true,
+    "currentAllRecordedNativeBusAndProofPidsAbsent": true,
+    "historicalZombieObservationSha256": "5c29f1c3e4ac24362648f648c1ceca4aefddef7228ab500220479fa48bbc4299"
+  },
+  "allRecordedProofPidsConfirmedAbsent": true,
+  "realGnomeServiceRestartQualified": false,
+  "productionInputEnabled": false,
+  "keyboardPointerInputSent": false,
+  "selectedApplicationChanged": false,
+  "ownerServicesDevicesModelsAudioChanged": false,
+  "allFiveRolloutPointsRemainActive": true,
+  "primaryContractReferences": [
+    "https://github.com/GNOME/at-spi2-core/blob/66707c370bef824ed4edb08a909fc6a61449c12c/bus/at-spi-bus-launcher.c",
+    "https://github.com/GNOME/at-spi2-core/blob/66707c370bef824ed4edb08a909fc6a61449c12c/registryd/registry-main.c",
+    "https://dbus.freedesktop.org/doc/dbus-run-session.1.html"
+  ],
+  "publishedRecipeSha256": "5feec42557cc0745f200eeee2b8eea22ac554bf18df98920a0d530404746e874",
+  "executedRecipeDiffersOnlyByAddedCopyrightComment": true
+}

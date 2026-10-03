@@ -1,0 +1,800 @@
+{
+  "format": "augmentor-system-qt-complete-installer-adapter-qualification/1",
+  "date": "2026-10-03",
+  "workingSourceFileHashes": {
+    "scripts/linux_distribution.py": "b52b45e28c51bcf50ca29910eabf4aec20e690b13d0e4ad01388ca6be2824938",
+    "scripts/package-complete.py": "76344c42a7e14010ca8817ac523d2b45ad16f12d6191cde4c64f76a844ef712d",
+    "scripts/setup-complete.py": "c1ef496960376dce87aa67431879d835bcdc271f5ff709d2e25347a2efb32abf",
+    "scripts/linux-package-verification.py": "bf2b37ae4ff64c7e5e8eccbd9461ce86068d756c5fdc244759244df93539305d",
+    "release/prove-complete-linux.py": "a448cfdb7efce0a96bf4fc7c99a6b4539bacb2c5870bdeeee34e5fa2bf1ec11b",
+    "tests/test_linux_distribution.py": "48bc9cbc00f7c517338f2aeba9b4a8530ad377d86bfca222ffd47a759b80e247",
+    "tests/test_native_complete_setup.py": "6d1deed2c46dc2b3fddce7afce229fb69a22d77d063629c8a9a9828068b462af"
+  },
+  "adapterChanges": {
+    "explicitTargets": [
+      "arch20261001-x86_64",
+      "opensuse-leap16.0-x86_64"
+    ],
+    "requiredRuntimeProfiles": [
+      "arch20261001-cp314-x86_64-voice",
+      "leap16-cp313-x86_64-voice"
+    ],
+    "archGuardOwnPriorTransactionAndVerification": true,
+    "nativeOutcomeVerificationAfterManagerAndOnRepeat": true,
+    "verificationImportsCheckedIndependentGuardOnly": true,
+    "verificationNeverBeginsOrFinalizesMaintenance": true,
+    "explicitPythonBootstrapPropagatedToBundleVoiceSetupDshLease": true,
+    "nativeNpmCliUsesBundledNodeAndChecksActualEngineRangeBeforeCi": true,
+    "genericNpmWrapperScopedToFreshPrivateInstall": true,
+    "bundleAssemblyReinspectsNativeArtifactAndRequiresCurrentPreparerCleanSource": true,
+    "guardArchiveCompleteControlsAndModesCheckedBeforeCopy": true,
+    "guardReferenceCopyUsesFiveExactPublicFiles": true
+  },
+  "actualOrdinaryUserReadOnlyVerification": {
+    "arch": {
+      "verifiedNativeOutcome": true,
+      "pendingAbsent": true,
+      "completeAppInventoryPassed": true,
+      "nativePackageAuditPassed": true,
+      "package": {
+        "name": "augmentor-agent",
+        "versionRelease": "0.2.13-1",
+        "architecture": "x86_64"
+      }
+    },
+    "leap": {
+      "verifiedNativeOutcome": true,
+      "pendingAbsent": true,
+      "completeAppInventoryPassed": true,
+      "nativePackageAuditPassed": true,
+      "package": {
+        "name": "augmentor-agent",
+        "versionRelease": "0.2.13-1.leap16",
+        "architecture": "x86_64"
+      }
+    }
+  },
+  "verificationApplicationSource": "536fc7561a7b81ab90e806925652e446f438050a",
+  "verificationSourceHashes": {
+    "scripts/linux-package-verification.py": "bf2b37ae4ff64c7e5e8eccbd9461ce86068d756c5fdc244759244df93539305d",
+    "release/linux-package-guard.py": "4bb8a18a41e68a98c5f7816940f8e55bfa2f1a66e5d34ca42cfcb4155c7a9947"
+  },
+  "independentGuardArchiveChecked": {
+    "file": "augmentor-package-guard-0.2.13-2-any.pkg.tar.zst",
+    "sha256": "8ab66df2b830c40c51b588cd5ecec403bfefd59b687016c5ab743f639dc24016",
+    "actualFullNativeMembersAndMetadataPassed": true
+  },
+  "research": {
+    "format": "augmentor-linux-installer-dependency-research/1",
+    "sourceCommit": "3e47afb6e921c1cd72e478bc206ba72b41e9edc4",
+    "scope": {
+      "repositoryEdits": false,
+      "packagesInstalled": false,
+      "repositoryRefresh": false,
+      "productExecuted": false,
+      "ownerStateTouched": false,
+      "fixtureQueries": [
+        "pacman -Q/-Qo/-Sp/pacman-conf",
+        "rpm -q/-qf",
+        "target Python -B module metadata and pip --version",
+        "zypper --no-refresh repos and install --dry-run --no-recommends"
+      ],
+      "officialMetadataSignatureVerified": false,
+      "leapPrimaryCompressedHashVerifiedAgainstRepomd": true,
+      "dryRunDoesNotProveFileConflictsOrInstalledAcceptance": true
+    },
+    "arch": {
+      "target": "arch20261001-x86_64",
+      "basePackages": [
+        "ca-certificates",
+        "python-pip",
+        "npm",
+        "portaudio",
+        "alsa-lib",
+        "alsa-plugins",
+        "libpulse"
+      ],
+      "optionalPackages": {
+        "voice": [
+          "git",
+          "cmake",
+          "gcc",
+          "pkgconf"
+        ],
+        "gpu": [
+          "vulkan-icd-loader",
+          "vulkan-headers",
+          "shaderc",
+          "spirv-headers"
+        ],
+        "memory": [
+          "docker"
+        ]
+      },
+      "versions": {
+        "ca-certificates": "20240618-1",
+        "python-pip": "26.2.1-1",
+        "npm": "12.2.0-1",
+        "portaudio": "1:19.7.0-4",
+        "alsa-lib": "1.2.16.1-1",
+        "alsa-plugins": "1:1.2.12-6",
+        "libpulse": "17.0+r98+gb096704c0-1",
+        "git": "2.56.0-1",
+        "cmake": "4.4.3-2",
+        "gcc": "16.2.1+r23+gd564253eb6c8-1",
+        "pkgconf": "3.0.7-1",
+        "vulkan-icd-loader": "1.4.357.0-1",
+        "vulkan-headers": "1:1.4.357.0-1",
+        "shaderc": "2026.3-1",
+        "spirv-headers": "1:1.4.357.0-1",
+        "docker": "1:29.8.2-1"
+      },
+      "python": "/usr/bin/python3",
+      "venvOwner": "python 3.14.7-1",
+      "pipOwner": "python-pip 26.2.1-1",
+      "npmCli": "/usr/lib/node_modules/npm/bin/npm-cli.js",
+      "npmVersion": "12.2.0-1",
+      "npmOfficialEngineRange": "^22.22.2 || ^24.15.0 || >=26.0.0",
+      "bundledNode24_19InDeclaredEngineRange": true,
+      "audioUtilitiesPackage": "libpulse",
+      "dockerServicePath": "/usr/lib/systemd/system/docker.service",
+      "solverExit": 0
+    },
+    "leap": {
+      "target": "opensuse-leap16.0-x86_64",
+      "basePackages": [
+        "ca-certificates",
+        "ca-certificates-mozilla",
+        "python313-pip",
+        "npm24",
+        "libportaudio2",
+        "libasound2",
+        "alsa-plugins-pulse",
+        "pulseaudio-utils"
+      ],
+      "optionalPackages": {
+        "voice": [
+          "git",
+          "cmake",
+          "gcc-c++",
+          "pkgconf-pkg-config"
+        ],
+        "gpu": [
+          "vulkan-devel",
+          "shaderc",
+          "spirv-headers"
+        ],
+        "memory": [
+          "docker"
+        ]
+      },
+      "python": "/usr/bin/python3.13",
+      "venvOwner": "python313-base-3.13.14-160000.2.1.x86_64",
+      "pipOwner": "python313-pip-25.0.1-160000.6.1.noarch",
+      "npmCli": "/usr/lib64/node_modules/npm24/bin/npm-cli.js",
+      "npmNativePackageVersion": "24.18.1-160000.1.1",
+      "npmRequires": [
+        "/usr/bin/node24",
+        "nodejs24=24.18.1"
+      ],
+      "npmInternalCliVersionOrEnginesInspected": false,
+      "newlySelectedPackages": [
+        {
+          "type": "package",
+          "name": "alsa-plugins-pulse",
+          "edition": "1.2.12-bp160.1.13",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Pulseaudio Plug-In for ALSA Library"
+        },
+        {
+          "type": "package",
+          "name": "catatonit",
+          "edition": "0.2.0-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "A signal-forwarding process manager for containers"
+        },
+        {
+          "type": "package",
+          "name": "containerd",
+          "edition": "1.7.33-160000.1.1",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Standalone OCI Container Daemon"
+        },
+        {
+          "type": "package",
+          "name": "device-mapper",
+          "edition": "2.03.29_1.02.203-160000.3.1",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Device Mapper Tools"
+        },
+        {
+          "type": "package",
+          "name": "docker",
+          "edition": "29.4.0_ce-160000.7.1",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "The Moby-project Linux container runtime"
+        },
+        {
+          "type": "package",
+          "name": "docker-buildx",
+          "edition": "0.33.0-160000.7.1",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Docker CLI plugin for extended build capabilities with BuildKit"
+        },
+        {
+          "type": "package",
+          "name": "iproute2",
+          "edition": "6.12-160000.4.1",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Linux network configuration utilities"
+        },
+        {
+          "type": "package",
+          "name": "iptables",
+          "edition": "1.8.11-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "IP packet filter administration utilities"
+        },
+        {
+          "type": "package",
+          "name": "kmod",
+          "edition": "34.2-160000.3.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Utilities to load modules into the kernel"
+        },
+        {
+          "type": "package",
+          "name": "libX11-devel",
+          "edition": "1.8.10-160000.4.1",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Development files for the Core X11 protocol library"
+        },
+        {
+          "type": "package",
+          "name": "libXau-devel",
+          "edition": "1.0.12-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Development files for the X11 authorization protocol library"
+        },
+        {
+          "type": "package",
+          "name": "libXext-devel",
+          "edition": "1.3.6-160000.3.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Development files for the X11 Common Extensions library"
+        },
+        {
+          "type": "package",
+          "name": "libXrandr-devel",
+          "edition": "1.5.4-160000.3.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Development files for the X Resize-Rotate-Reflection library"
+        },
+        {
+          "type": "package",
+          "name": "libXrender-devel",
+          "edition": "0.9.11-160000.3.1",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Development files for the X11 Render Extension library"
+        },
+        {
+          "type": "package",
+          "name": "libbpf1",
+          "edition": "1.6.1-160000.1.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "C library for managing eBPF programs and maps"
+        },
+        {
+          "type": "package",
+          "name": "libcares2",
+          "edition": "1.34.8-160000.1.1",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Library for asynchronous name resolves"
+        },
+        {
+          "type": "package",
+          "name": "libcryptsetup12",
+          "edition": "2.8.4-160000.2.1",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Library for setting up dm-crypt Based Encrypted Block Devices"
+        },
+        {
+          "type": "package",
+          "name": "libdevmapper-event1_03",
+          "edition": "2.03.29_1.02.203-160000.3.1",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Event library for device-mapper"
+        },
+        {
+          "type": "package",
+          "name": "libdevmapper1_03",
+          "edition": "2.03.29_1.02.203-160000.3.1",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Library for device-mapper"
+        },
+        {
+          "type": "package",
+          "name": "libffi-devel",
+          "edition": "3.4.6-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Include files for development with libffi"
+        },
+        {
+          "type": "package",
+          "name": "libglslang15",
+          "edition": "15.2.0-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "OpenGL and OpenGL ES shader front end implementation"
+        },
+        {
+          "type": "package",
+          "name": "libjansson4",
+          "edition": "2.14-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "C library for encoding, decoding and manipulating JSON data"
+        },
+        {
+          "type": "package",
+          "name": "libjson-c5",
+          "edition": "0.17-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "JSON-C shared library"
+        },
+        {
+          "type": "package",
+          "name": "libkmod2",
+          "edition": "34.2-160000.3.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Library to interact with Linux kernel modules"
+        },
+        {
+          "type": "package",
+          "name": "libmnl0",
+          "edition": "1.0.5-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Minimalistic Netlink communication library"
+        },
+        {
+          "type": "package",
+          "name": "libnetfilter_conntrack3",
+          "edition": "1.1.0-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Userspace library for the in-kernel connection tracking state table"
+        },
+        {
+          "type": "package",
+          "name": "libnfnetlink0",
+          "edition": "1.0.2-160000.3.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Low-level library for Netfilter-related kernel/userspace communication"
+        },
+        {
+          "type": "package",
+          "name": "libnftables1",
+          "edition": "1.1.3-160000.3.1",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "nftables firewalling command interface"
+        },
+        {
+          "type": "package",
+          "name": "libnftnl11",
+          "edition": "1.2.9-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Userspace library to access the nftables Netlink interface"
+        },
+        {
+          "type": "package",
+          "name": "libpulse-mainloop-glib0",
+          "edition": "17.0-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "GLIB 2.0 Main Loop wrapper for PulseAudio"
+        },
+        {
+          "type": "package",
+          "name": "libwireplumber-0_5-0",
+          "edition": "0.5.10-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Session / policy manager implementation for PipeWire"
+        },
+        {
+          "type": "package",
+          "name": "libxcb-composite0",
+          "edition": "1.17.0-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "X11 Composite Extension C library"
+        },
+        {
+          "type": "package",
+          "name": "libxcb-damage0",
+          "edition": "1.17.0-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "X11 Damage Extension C library"
+        },
+        {
+          "type": "package",
+          "name": "libxcb-dbe0",
+          "edition": "1.17.0-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "X11 Dbe Extension C library"
+        },
+        {
+          "type": "package",
+          "name": "libxcb-devel",
+          "edition": "1.17.0-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Development files for the X11 protocol C library"
+        },
+        {
+          "type": "package",
+          "name": "libxcb-dpms0",
+          "edition": "1.17.0-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "X11 DPMS Extension C library"
+        },
+        {
+          "type": "package",
+          "name": "libxcb-dri2-0",
+          "edition": "1.17.0-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "X11 DRI2 Extension C library"
+        },
+        {
+          "type": "package",
+          "name": "libxcb-record0",
+          "edition": "1.17.0-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "X11 RECORD Extension C library"
+        },
+        {
+          "type": "package",
+          "name": "libxcb-res0",
+          "edition": "1.17.0-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "X11 Resource Extension C library"
+        },
+        {
+          "type": "package",
+          "name": "libxcb-screensaver0",
+          "edition": "1.17.0-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "X11 ScreenSaver Extension C library"
+        },
+        {
+          "type": "package",
+          "name": "libxcb-xf86dri0",
+          "edition": "1.17.0-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "X11 XFree86-DRI Extension C library"
+        },
+        {
+          "type": "package",
+          "name": "libxcb-xinerama0",
+          "edition": "1.17.0-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "X11 Xinerama Extension C library"
+        },
+        {
+          "type": "package",
+          "name": "libxcb-xtest0",
+          "edition": "1.17.0-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "X11 XTEST Extension C library"
+        },
+        {
+          "type": "package",
+          "name": "libxcb-xv0",
+          "edition": "1.17.0-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "X11 video Extension C library"
+        },
+        {
+          "type": "package",
+          "name": "libxcb-xvmc0",
+          "edition": "1.17.0-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "X11 Video Motion Compensation Extension C library"
+        },
+        {
+          "type": "package",
+          "name": "libxtables12",
+          "edition": "1.8.11-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "The iptables plugin interface"
+        },
+        {
+          "type": "package",
+          "name": "nodejs-common",
+          "edition": "6.1-160000.3.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Common files for the NodeJS ecosystem"
+        },
+        {
+          "type": "package",
+          "name": "nodejs24",
+          "edition": "24.18.1-160000.1.1",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Evented I/O for V8 JavaScript"
+        },
+        {
+          "type": "package",
+          "name": "npm24",
+          "edition": "24.18.1-160000.1.1",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Package manager for Node.js"
+        },
+        {
+          "type": "package",
+          "name": "pipewire",
+          "edition": "1.4.6-160000.3.1",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "A Multimedia Framework designed to be an audio and video server and more"
+        },
+        {
+          "type": "package",
+          "name": "pipewire-pulseaudio",
+          "edition": "1.4.6-160000.3.1",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "PipeWire PulseAudio implementation"
+        },
+        {
+          "type": "package",
+          "name": "pipewire-spa-tools",
+          "edition": "1.4.6-160000.3.1",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "The PipeWire SPA Tools"
+        },
+        {
+          "type": "package",
+          "name": "pipewire-tools",
+          "edition": "1.4.6-160000.3.1",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "The PipeWire Tools"
+        },
+        {
+          "type": "package",
+          "name": "pulseaudio-setup",
+          "edition": "17.0-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Set-up script for PulseAudio"
+        },
+        {
+          "type": "package",
+          "name": "pulseaudio-utils",
+          "edition": "17.0-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "PulseAudio utilities"
+        },
+        {
+          "type": "package",
+          "name": "rtkit",
+          "edition": "0.13-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Realtime Policy and Watchdog Daemon"
+        },
+        {
+          "type": "package",
+          "name": "runc",
+          "edition": "1.3.6-160000.1.1",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Tool for spawning and running OCI containers"
+        },
+        {
+          "type": "package",
+          "name": "shaderc",
+          "edition": "2025.1-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "A collection of tools, libraries and tests for shader compilation"
+        },
+        {
+          "type": "package",
+          "name": "spirv-headers",
+          "edition": "1.6.4+sdk309-160000.2.2",
+          "arch": "noarch",
+          "repository": "augmentor-oss-proof",
+          "summary": "Machine-readable files from the SPIR-V registry"
+        },
+        {
+          "type": "package",
+          "name": "suse-module-tools",
+          "edition": "16.0.65-160000.1.1",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Configuration for module loading and SUSE-specific utilities for KMPs"
+        },
+        {
+          "type": "package",
+          "name": "system-group-hardware",
+          "edition": "20170617-160000.2.2",
+          "arch": "noarch",
+          "repository": "augmentor-oss-proof",
+          "summary": "Hardware related system groups"
+        },
+        {
+          "type": "package",
+          "name": "system-group-kvm",
+          "edition": "20170617-160000.2.2",
+          "arch": "noarch",
+          "repository": "augmentor-oss-proof",
+          "summary": "System group kvm"
+        },
+        {
+          "type": "package",
+          "name": "thin-provisioning-tools",
+          "edition": "1.1.0-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Thin Provisioning Tools"
+        },
+        {
+          "type": "package",
+          "name": "udev",
+          "edition": "257.13-160000.4.1",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "A rule-based device node and kernel event manager"
+        },
+        {
+          "type": "package",
+          "name": "vulkan-devel",
+          "edition": "1.4.309-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Vulkan development package"
+        },
+        {
+          "type": "package",
+          "name": "vulkan-headers",
+          "edition": "1.4.309-160000.2.2",
+          "arch": "noarch",
+          "repository": "augmentor-oss-proof",
+          "summary": "Vulkan C and C++ API header files"
+        },
+        {
+          "type": "package",
+          "name": "wayland-devel",
+          "edition": "1.24.0-160000.1.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Development files for the Wayland Compositor Infrastructure"
+        },
+        {
+          "type": "package",
+          "name": "wireplumber",
+          "edition": "0.5.10-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Session / policy manager implementation for PipeWire"
+        },
+        {
+          "type": "package",
+          "name": "xorgproto-devel",
+          "edition": "2024.1-160000.2.2",
+          "arch": "noarch",
+          "repository": "augmentor-oss-proof",
+          "summary": "The X11 Protocol collection"
+        },
+        {
+          "type": "package",
+          "name": "xtables-plugins",
+          "edition": "1.8.11-160000.2.2",
+          "arch": "x86_64",
+          "repository": "augmentor-oss-proof",
+          "summary": "Match and target extension plugins for iptables"
+        }
+      ],
+      "dockerSelectedVersion": "29.4.0_ce-160000.7.1",
+      "solverExit": 0,
+      "caCertificatesMozillaMustBeExplicitIfPublicTrustRequired": true,
+      "pulseaudioUtilsHardRequires": "pulseaudio-daemon",
+      "pulseOnlyNativeDryRun": {
+        "command": [
+          "zypper",
+          "--non-interactive",
+          "--no-refresh",
+          "install",
+          "--dry-run",
+          "--no-recommends",
+          "pulseaudio-utils"
+        ],
+        "returncode": 0,
+        "stdout": "Loading repository data...\nReading installed packages...\nResolving package dependencies...\n\nThe following 10 NEW packages are going to be installed:\n  libpulse-mainloop-glib0 libwireplumber-0_5-0 pipewire pipewire-pulseaudio pipewire-spa-tools pipewire-tools pulseaudio-setup pulseaudio-utils rtkit wireplumber\n\n10 new packages to install.\n\nPackage download size:     3.1 MiB\n\nPackage install size change:\n              |       4.1 MiB  required by packages that will be installed\n     4.1 MiB  |  -      0 B    released by packages that will be removed\n\nBackend:  classic_rpmtrans --dry-run\nContinue? [y/n/v/...? shows all options] (y): y\n\nChecking for file conflicts: [...done]\nWarning: 10 packages had to be excluded from file conflicts check because they are not yet downloaded.\n\n    Note: Checking for file conflicts requires not installed packages to be downloaded in advance in\n    order to access their file lists. See option '--download-in-advance / --dry-run --download-only'\n    in the zypper manual page for details.\n\n",
+        "stderr": ""
+      }
+    },
+    "integrationRecommendations": [
+      "Invoke native npm-cli.js with explicit bundled Node24.19.0; confirm version/engines after native installation before npm ci. Do not rely on Leap npm/node aliases.",
+      "Use explicit target interpreter to prepare immutable --system-site-packages voice venv; no python3-venv package on these targets.",
+      "Declare Leap ca-certificates-mozilla explicitly: ca-certificates itself does not Require it.",
+      "Preserve existing audio server selection; Leap pulseaudio-utils solver can add a daemon provider even with --no-recommends.",
+      "Install optional native build and GPU tools only for selected voice/GPU setup. glslc is provided by shaderc on both targets.",
+      "Install docker only for explicitly chosen memory with no existing usable engine; do not require docker-compose. Service and container acceptance remain separate.",
+      "Do not refresh repository indexes or frozen Qt signatures while qualifying this exact target; inspect solver changes and reverify original target runtime after dependency installation."
+    ],
+    "primaryDocs": [
+      "https://man.archlinux.org/man/pacman.8.en",
+      "https://manpages.opensuse.org/Leap-16.0/zypper/zypper.8.en.html",
+      "https://docs.python.org/3.13/library/venv.html",
+      "https://docs.npmjs.com/cli/v12/configuring-npm/package-json/",
+      "https://registry.npmjs.org/npm/12.2.0",
+      "https://docs.docker.com/engine/install/linux-postinstall/"
+    ]
+  },
+  "researchPrivateIndexSha256": "a32a4b9bc4e7cbda3727a5b96636bd9e4e49dde1c32f876e056f5de9ab6f84a8",
+  "focusedTests": {
+    "distributionContracts": 11,
+    "existingCompleteSetup": 12,
+    "nativeOutcomeGuardAndNpmFailure": 4,
+    "debianPackagingRegression": 6,
+    "total": 33,
+    "passed": true
+  },
+  "limits": [
+    "Complete installer source adapters and read-only installed verification are implemented; fresh matching whole bundles and root/user installer execution have not yet passed.",
+    "Existing checked application artifacts name source536; new source requires newly built Desktop/Browser/native artifacts before bundle assembly.",
+    "Leap npm internal engine/version check is implemented but awaits actual native npm installation; provider metadata alone is not that execution.",
+    "No new voice/GPU/Docker provider was installed by the research or read-only verifier. Leap pulseaudio-utils solver can select a server provider even with no-recommends.",
+    "Native dependency updates, true upgrades/rollback, graphical sessions/Browser, physical audio and full source/legal/public release remain open."
+  ],
+  "ownerStateChanged": false,
+  "publicReleaseQualified": false,
+  "allFiveRolloutPointsRemainActive": true,
+  "licenseProposal22FilesUnchanged": true
+}

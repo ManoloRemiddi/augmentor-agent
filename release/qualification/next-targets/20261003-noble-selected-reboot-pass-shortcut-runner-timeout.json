@@ -1,0 +1,40 @@
+{
+  "format": "augmentor-owned-selected-reboot-proof/1",
+  "passed": true,
+  "target": "ubuntu24",
+  "source": "3688a095ffa4221e8ea919c331e6eff6d35cb25d",
+  "artifactSha256": "161ce1e7395f6018b049011c0ae6d57f908a7fd2000e351a885a672c44609fac",
+  "proofSha256": "1a2510206f4134df9537c49c0dd1d2b54aa37ecd6f3e039ff6eaf5319e14bb9e",
+  "qualificationHelperSha256": "11f22a7cb3dc162b66ca4c256036b8e235643fa4d32727d16b9ab89024046e6c",
+  "singleRebootRequest": true,
+  "kernelBootIdentityChanged": true,
+  "sameSelectedArtifactAfterReboot": true,
+  "serviceOwnsActualAppAfterReboot": true,
+  "realWaylandLoginAfterReboot": true,
+  "loginAuthenticationTested": false,
+  "shortcutDeliveryTested": false,
+  "connectedHarnessTested": false,
+  "gnomeInputToolsEnabled": false,
+  "date": "2026-10-03",
+  "scope": "Owned Ubuntu24.04 GNOME46 Wayland Mesa2 VM, immutable clean368 selection, maintained3df5c19 reboot driver",
+  "commandExitCode": 0,
+  "selectedContractUnchanged": true,
+  "postBootPackageAndSecurityVerified": true,
+  "postBootApp": "Normal service-owned offline first-run Connect DSH modal; no saved connection was introduced",
+  "nativeShortcutRun": {
+    "status": "outer host runner timeout before final report",
+    "outerTimeoutSeconds": 1600,
+    "privateFinalReportAbsent": true,
+    "acceptancePass": false,
+    "subsequentReadback": {
+      "ownJournalAbsent": true,
+      "helpersAbsent": true,
+      "secondaryAbsent": true,
+      "mainSameImmutableSelectedRoot": true,
+      "mainOfflineIdle": true
+    },
+    "originalReceiptPreserved": true,
+    "uncertainInputOrSaveReplayed": false,
+    "freshRun": "New maintained proof after verified reboot; per-operation bounds retained, no additional outer runner limit"
+  }
+}

@@ -11,6 +11,8 @@ import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {setTimeout as delay} from 'node:timers/promises';
 import {CodexHost} from '../dist/codex-runtime/src/host.js';
+import {desktopCapabilities} from '../dist/desktop/src/capabilities.js';
+const syntheticCapabilities=()=>desktopCapabilities('linux',{},()=>false,()=>({schema:1,available:true,backend:'kde-wayland-portal',reason:null,permission:'not-requested',functionalTested:false}));
 import {control} from '../dist/desktop/src/index.js';
 
 async function until(check, description) {
@@ -61,7 +63,7 @@ test('pinned Codex drives the actual desktop socket bridge, releases sharing and
   const ready = await Promise.race([once(desktop.stdout, 'data').then(([data]) => JSON.parse(data.toString())), once(desktop, 'exit').then(() => {throw Error('Desktop fixture failed: ' + stderr);})]);
   assert.equal(ready.ready, true);
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
-  host = new CodexHost({root: join(root, 'host'), resolveProfile: async id => ({id, revision: 1, connection: {kind: 'local', model: 'fixture-model', endpoint: `http://127.0.0.1:${server.address().port}/v1`, imageInput: true}})});
+  host = new CodexHost({root: join(root, 'host'), desktopCapabilities: syntheticCapabilities, resolveProfile: async id => ({id, revision: 1, connection: {kind: 'local', model: 'fixture-model', endpoint: `http://127.0.0.1:${server.address().port}/v1`, imageInput: true}})});
   const created = await host.dispatch('session.create', {sessionId: 'fixture', profileId: 'local', cwd});
   const meta = await host.dispatch('session.describe', {sessionId: 'fixture'});
   assert.equal(meta.desktopTools, 1, 'Synthetic backend declares availability; live OS permissions remain a separate gate');

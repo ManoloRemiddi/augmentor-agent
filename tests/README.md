@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+`test_linux_system_qt.py` covers 11 synthetic cold-launch boundaries: pinned
+manifest/profile scope, package-version/member/import drift, concurrent query
+changes, loader injection and refusal before the ABI child executes. The
+[actual Arch/Leap proof](../docs/LINUX-SYSTEM-QT-STACK.md) separately prepares fresh
+runtimes, renders synthetic controls and executes CPU Silero VAD. Full product,
+physical sessions/audio and live dependency maintenance remain unqualified.
+
+The October 2 [Noble lifecycle/shortcut checkpoint](../docs/LINUX-DISTRO-ROLLOUT.md#noble-lifecycle-shortcut-defect-and-next-target-probes)
+records actual Wayland lock/cold-launch acceptance separately from the failed
+complete QMP shortcut proof. Extension regression covers visible focus outside
+the actor inventory: it stays blocked with a null eligible target. The installed
+fixture needs a separately staged fixed artifact before actual acceptance.
+
 Codex runtime tests: build first, then run `node --test tests/codex-*.test.mjs`.
 They cover real app-server operation against a synthetic Responses provider,
 the native wire adapter, durable recovery, private IPC and profile contracts.
@@ -79,6 +92,18 @@ separates these from the physical capture/speaker probe and deployment scope.
 
 
 ## Restart reliability
+
+`test_gnome_selected_reboot.py` checks exclusive reboot receipts and a real
+transport timeout without a second request. `test_gnome_input_probe.py` checks
+private triggers and exact selected/native artifact admission. Both are Linux
+instrumentation and skip on other platforms; passing these checks does not
+establish native consent, input delivery or password authentication.
+
+`test_gnome_password_fixture.py` checks private synthetic account preparation
+and restoration, including concurrent account refusal and a real child timeout
+with one retained dispatch. It skips outside Linux. The seven source cases do
+not authenticate a desktop; the [GNOME proof guide](../docs/LINUX-GNOME-SHORTCUT-PROOF.md)
+owns the actual guest/password qualification boundary.
 
 `test_recovery.py` and `test_desktop_startup.py` cover saved-chat refusal, explicit
 managed-runtime startup, multi-frame legacy-history repair and canonical launchers.
@@ -773,3 +798,147 @@ Task reliability: `tests/dsh-context-budget.test.mjs`, `tests/dsh-execution.test
 `tests/test_reply_completion.py` and `tests/test_desktop_profile.py` exercise
 deterministic evidence/recovery, UI and Linux capability-discovery contracts. The opt-in `scripts/task-reliability-proof.mjs` checks a real local
 model with restricted read-only tools; see [scope and limits](../docs/TASK-RELIABILITY.md).
+
+### Noble runtime selection
+
+`test_linux_python_runtime.py`, `test_complete_setup.py` and
+`linux-python-selection.test.mjs` cover runtime identity, checksum/path refusal,
+bundle-target mismatch, service interpreter propagation and broken-policy
+refusal. Python and Node calculate the same identity for both locked profiles.
+`release/prove-noble-runtime-selection.py` requires a fresh ordinary-user Ubuntu
+24.04 fixture, the verified seven-wheel cache, exact Silero v6.2.1 model and
+bundled Node. Run it offline against the built source. It prepares both profiles,
+reuses the runtime through setup, verifies selection/stage/rollback, executes
+Node/Browser selection and the actual CPU VAD, and checks corruption refusal.
+The [checked report and limits](../docs/LINUX-DISTRO-ROLLOUT.md#noble-runtime-selection-and-cpu-vad)
+remain distinct from a package, connected harness, GNOME or physical audio proof.
+
+`test_linux_wheel_inventory.py` uses synthetic wheels to check notice byte
+preservation, versioned ELF/executable hashing, unsafe/duplicate archive members,
+metadata mismatch and changed archive refusal. Distribution/setup cases check
+the Noble contract, cross-target refusal and verification after completed setup.
+`release/prove-linux-package.py` additionally prepares Noble's installed offline
+cache as the ordinary user before rendering and exercising both package leases.
+`release/prove-complete-linux.py` renders and runs helpers with the actual desktop
+descriptor interpreter. The artifact review verifies whole wheel and embedded ELF
+hashes, original notice bytes and pinned supplementary collections; its license
+and corresponding-source completeness flags remain false.
+
+### GNOME 46 profiles and signed guest preparation
+
+`test_gnome_shortcut_settings.py` checks both GSD generations, partial/malformed
+portal schemas, Save failures and rollback with foreign entries retained.
+`gnome-observer-extension.test.mjs` executes the actual extension with synthetic
+Shell objects: only 46's explicit Ubuntu/user inheritance is admitted; lock,
+overview and modal guards remain; actor mapping and display monitor events bump
+the serial without subscribing to nonexistent 46 window properties. Observer
+protocol tests retain the compositor-owner/epoch fence and false input gate.
+
+`test_gnome_vm_preparation.py` covers detached/clear-signed checksum matching,
+duplicate lines, wrong signer/image, cross-fixture reuse and wrong backing image
+refusal before boot. `test_noble_gnome_provisioning.py` checks the strict guest/
+ordinary-user marker guard. `release/provision-noble-gnome-vm.py` additionally
+requires clean installed Noble packages, AppArmor, the prepared verified Python
+runtime and actual Ubuntu Wayland session; it refuses an existing user seat0
+session. Its provisioning report does not prove login or application startup.
+Actual GNOME shortcut/control/lock acceptance must be recorded independently.
+
+`release/inspect-noble-gnome-vm.py --source FULL_COMMIT` is a read-only real guest
+inspection using the selected verified Python. It requires the marked ordinary
+QEMU user, pristine clean packages, canonical selection/service ownership,
+AppArmor, actual seat0/session environment, Ubuntu/user observer and active
+default extensions. It expects Wayland by default; `--session-type x11` explicitly
+inspects fallback and cannot claim a Wayland pass. It observes the three-field
+GSD profile without Save/delivery or input authorization. The checked
+`release/qualification/ubuntu24.04/gnome-x11-a7ee9c5.json` additionally binds real
+guest screenshots and focused idle readback; fixture timer/unlock controls and
+connected/shortcut/physical limits remain explicit.
+
+The separate `gnome-wayland-mesa2-a7ee9c5.json` checkpoint records one actual
+Wayland login/startup/observer/UI pass with a coherent official Mesa .2 cohort,
+independently verified archive signature/index/package hashes and controlled
+networkd fixture recovery. The application uses XWayland. Latest .3 failure,
+native Qt Wayland, repeated startup, delivery/lock and connected/physical tests
+remain separate; neither checkpoint enables GNOME input tools.
+
+### Cinnamon native shortcut and interrupted-worker proof
+
+`test_cinnamon_shortcuts.py` covers desktop/Mac routing, shared machine key
+identities, typed/bounded replies, private ownership, atomic pre/postcommit
+failures and pending-intent refusal/shape boundaries. GNOME's seven adapter
+regressions remain. `release/prove-cinnamon-shortcut-interruption.py` runs only in
+the marked ordinary-user Mint ISO VM with the exact synthetic canonical launcher,
+actual Cinnamon6.6.4/X11 and no app installation. Separately stage reviewed helper
+and driver in that owned fixture, unlock through normal password authentication,
+and run `/usr/bin/python3 ~/cinnamon-shortcuts-proof/prove-cinnamon-shortcut-interruption.py`.
+It sends no keyboard events or lock commands. Four abrupt worker phases, a newly
+allocated row and foreign takeover verify real DConf/ownership recovery. Do not
+run its synthetic fixture on an owner's desktop. The
+[checked report](../release/qualification/next-targets/20261002-cinnamon-native-shortcuts.json)
+keeps initial timeout/default-lock/dependency refusals and current source hashes.
+The inert spice under `tests/fixtures/cinnamon-shortcut-spice` is test-only and
+must remain disabled after the owned VM conflict test.710 native cases/708 pass/
+two platform skips is source evidence; physical keyboard and full Mint product
+acceptance remain separate.
+
+
+`test_desktop_worker.py` uses a real private GLib context and Qt event loop to
+verify nested response waits cannot execute queued cleanup and GUI Stop/timers
+remain responsive. `test_desktop_consent_session.py` uses synthetic bus replies
+for unique-owner, expected-identity, generation/late grant and FD cleanup fences.
+Eleven cases pass; these Linux GLib cases skip where that runtime is absent.
+`release/probe-gnome-portal-consent.py` is an input-free actual Fedora QEMU probe,
+separately staged as documented in the [GNOME plan](../docs/LINUX-GNOME-CONTROL-PLAN.md).
+The [checked evidence](../release/qualification/next-targets/20261002-gnome-native-consent.json)
+keeps first failures, exact candidates and source721-case regression separate from
+production GNOME control, capture, lock/restart and public release qualification.
+
+### Source runtime derivative and GNOME execution candidate
+
+`test_source_pyside_derivation.py` checks producer preservation, member-byte/tag
+preservation, new RECORD, deterministic derivation, hash/RECORD tampering,
+unsafe/signed input refusal and overwrite refusal. The runtime stager is separately
+executed against actual source-produced ELF/plugin/QML files; its fresh-container
+import/widget/SVG/QML probe is recorded in [runtime work](../docs/LINUX-LGPL-SOURCE-RUNTIME.md).
+It is not full graphics, audio, licensing or product qualification.
+
+`test_gnome_control.py` covers logical source geometry/negative origin, scale1-only
+refusal, owner/cancellation, fresh-scene and compositor point checks, terminal
+observer/topology cleanup, idle lock/epoch watch and unqualified keyboard refusal.
+`test_capture_stream.py` now proves private-context cancellation without actual
+GUI/default-source delivery and checkpoint rejection of an arriving frame.
+The full isolated Arch source suite runs739 cases:737 pass/two Mac-only skips.
+The initial test-mocking failure is retained; no actual candidate pointer/keyboard
+input, native capture, password/restart, production discovery or KDE service
+threading acceptance is claimed. See the [checked source report](../release/qualification/next-targets/20261002-gnome-runtime-candidate-source-tests.json).
+
+The separately executed recipient QtSvg proof validates archive/patch/library hashes,
+rebuilds from fresh Svg source using the unchanged matching Qt SDK, and compares
+actual native behavior in fresh processes. It requires explicitly marked owned
+fixtures and two separate runtime candidates; it never swaps the selected app's
+libraries. Final product entrypoint/complete legal/source-kit qualification remains
+separate. [Evidence](../release/qualification/next-targets/20261002-source-qt-recipient-replacement.json).
+
+### Native GNOME capture and first Stop reason
+
+`test_gnome_control.py` now includes bounded consent timeout and shared-Event
+first-cause preservation through repeated user/native Stop; the consent tests
+also constrain reason enumeration. The exact source runs742 native cases in owned
+Arch:740 successes/two Mac-only skips. The separately staged capture/GTK probes
+pass real Fedora scale1 frame/token creation, visible Stop after capture, visible
+Stop during a synthetic stalled frame and native sharing revocation after capture.
+[Checked source hashes, failed candidates and limits](../release/qualification/next-targets/20261002-gnome-native-capture.json)
+keep source tests, native capture and future input qualification distinct. No
+Notify/action is invoked; production GNOME input remains disabled.
+
+### Authenticated source toolchain and fresh reconstruction
+
+`release/acquire-ubuntu-toolchain.py` executes real gpgv/full-index/package/source
+checks against complete preserved Ubuntu metadata before obtaining separate bytes.
+`release/probe-ubuntu-toolchain-auth.py` checks ten actual refusal paths against the
+owned kit, including corrupted signed content and altered package bodies. These
+require the separately retained complete metadata and acquired package objects;
+they are not synthetic passing package-install tests. The fresh no-network builder
+reconstructs the exact410-row inventory from the pinned public base and verified
+.debs. [Proof, first failure and ongoing source-build boundary](../release/qualification/next-targets/20261002-ubuntu-source-toolchain-reconstruction.json)
+remain separate from full recipient/runtime/license/release qualification.

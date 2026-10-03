@@ -1,0 +1,288 @@
+{
+  "format": "augmentor-voice-distributed-source/1",
+  "package": "dsh-resonant-voice",
+  "version": "0.1.19",
+  "archive": {
+    "file": "dsh-resonant-voice-0.1.19-distributed-source.tgz",
+    "sha256": "793730ae6da8addd05fa70d82a2fe7341c1d469dc9ff415be2879d165022d36e",
+    "bytes": 2620781,
+    "publicUrl": "https://raw.githubusercontent.com/ManoloRemiddi/augmentor-agent/f1c39752d34aa95d21aeb2ad02bc92298fcc9b20/release/dsh/plugins/dsh-resonant-voice-0.1.19.tgz"
+  },
+  "declaredUpstreamRef": "7d0fd6d677ea4bbbca0183a6bb3a3d3f24a8147a",
+  "upstreamRefBinding": "Declared by publicly tracked release/dsh/plugins/README.md; not independently verified against private repository commit contents.",
+  "publicProvenance": "release/dsh/plugins/README.md at f1c39752d34aa95d21aeb2ad02bc92298fcc9b20",
+  "packageMemberCount": 63,
+  "coverage": {
+    "packageMemberCount": 63,
+    "runtimeSourceFiles": [
+      {
+        "path": "package/bin/vulkan-devices.cpp",
+        "type": "file",
+        "size": 1270,
+        "mode": 420,
+        "sha256": "6648aa34be2a918498a62996c2869007f6fc47ace0ae946581ae3955157eb48f"
+      },
+      {
+        "path": "package/src/adapters.js",
+        "type": "file",
+        "size": 4326,
+        "mode": 420,
+        "sha256": "b4adf4da78ea49badf0577f6e9afc8c7744d9d8a843ad8bf943b1b49bf024a70"
+      },
+      {
+        "path": "package/src/audio.js",
+        "type": "file",
+        "size": 1963,
+        "mode": 420,
+        "sha256": "c64fd820caabfa647cb40dbb3645cbc68cae5bac886f4d1225d1a5261a024028"
+      },
+      {
+        "path": "package/src/config.js",
+        "type": "file",
+        "size": 3480,
+        "mode": 420,
+        "sha256": "a52ca25d72354c880c50878c5bfbd7d59903aff6cc34f42b597d012164fccdca"
+      },
+      {
+        "path": "package/src/delivery.js",
+        "type": "file",
+        "size": 4086,
+        "mode": 420,
+        "sha256": "a8f2536c3ff1f17daec7f0ac83730a8cacce8633fc6619d7f066589f050b2504"
+      },
+      {
+        "path": "package/src/maintenance.js",
+        "type": "file",
+        "size": 2641,
+        "mode": 420,
+        "sha256": "e4ecb497dee50fb97552e8381ef1857a310958b4a0a455fcb2ee3c123fcd4804"
+      },
+      {
+        "path": "package/src/plugin.js",
+        "type": "file",
+        "size": 9042,
+        "mode": 420,
+        "sha256": "09f25e0c08c96ce5c56d1e237f71c826b887668c68cc21d5458a5a63cf596b77"
+      },
+      {
+        "path": "package/src/preferences.js",
+        "type": "file",
+        "size": 4096,
+        "mode": 420,
+        "sha256": "b32b0451db0de99535fe8f677a801dfbecaf77f5256dbca8c198bb6d64bf8b83"
+      },
+      {
+        "path": "package/bin/resonant-voice.js",
+        "type": "file",
+        "size": 1032,
+        "mode": 493,
+        "sha256": "d3aadfe06d912d6b86e66ef133e2ff2edf8563d318e11f2e708032b3ee355603"
+      },
+      {
+        "path": "package/src/response-gate.js",
+        "type": "file",
+        "size": 867,
+        "mode": 420,
+        "sha256": "9b9146db896206235abbe50dbc0a50801ee9c7c0599c747643f1274ea3198128"
+      },
+      {
+        "path": "package/src/service.js",
+        "type": "file",
+        "size": 17187,
+        "mode": 420,
+        "sha256": "f810ea65805a26f054cb6da0ae7cc4c4b6a372036ab3379d8a065bac83b6f173"
+      },
+      {
+        "path": "package/src/text.js",
+        "type": "file",
+        "size": 1649,
+        "mode": 420,
+        "sha256": "50bc2b8e1097257198840c71af1d53c332bf24fb920ede611c78356bc732c1f7"
+      },
+      {
+        "path": "package/bin/warmup.js",
+        "type": "file",
+        "size": 728,
+        "mode": 420,
+        "sha256": "8f75ff74a7bedcc3429cee7da8b1095c45a89e997fc3b34c4bf9a0959fe7a163"
+      },
+      {
+        "path": "package/src/windows-config.js",
+        "type": "file",
+        "size": 9001,
+        "mode": 420,
+        "sha256": "38af50c5f15b928ae29bed7572ecbacd610992d0d18bd9b0a2e6c51c7adc7c1f"
+      },
+      {
+        "path": "package/workers/asr.py",
+        "type": "file",
+        "size": 6131,
+        "mode": 420,
+        "sha256": "3230c3b783acc702edb60c90d2ae1251c28dd37a5fc95ba3b3ceab6f2313206d"
+      },
+      {
+        "path": "package/bin/design-voices-expansion.py",
+        "type": "file",
+        "size": 8127,
+        "mode": 420,
+        "sha256": "adf5085b96e4b770c624eb78520a3571ad43c28a14934cb550200092de81e042"
+      },
+      {
+        "path": "package/bin/design-voices.py",
+        "type": "file",
+        "size": 5481,
+        "mode": 420,
+        "sha256": "0f5de3a11b48833225f3f58548014595b1d325c00fad3c4ee4522760cf2cc607"
+      },
+      {
+        "path": "package/bin/launch-breeze.py",
+        "type": "file",
+        "size": 4102,
+        "mode": 420,
+        "sha256": "5e38060dce17d6e2fc31bd371e892d7ba5be9d90583b67667c3cf8799bd8f4ee"
+      },
+      {
+        "path": "package/bin/setup-linux.py",
+        "type": "file",
+        "size": 7125,
+        "mode": 420,
+        "sha256": "0a359d38397267c5a08a4eed085e66ade74ed6e723d6a4be9cfe8cadf7e3eea3"
+      },
+      {
+        "path": "package/workers/streaming_asr.py",
+        "type": "file",
+        "size": 4102,
+        "mode": 420,
+        "sha256": "f23628ab4621859a16b3c8ddb286417680f0355b2a04090387d8c0819d9f8e8c"
+      }
+    ],
+    "relativeJavaScriptImports": [
+      {
+        "importer": "package/bin/resonant-voice.js",
+        "reference": "../src/config.js",
+        "target": "package/src/config.js",
+        "present": true
+      },
+      {
+        "importer": "package/bin/resonant-voice.js",
+        "reference": "../src/service.js",
+        "target": "package/src/service.js",
+        "present": true
+      },
+      {
+        "importer": "package/bin/resonant-voice.js",
+        "reference": "../src/adapters.js",
+        "target": "package/src/adapters.js",
+        "present": true
+      },
+      {
+        "importer": "package/bin/warmup.js",
+        "reference": "../src/config.js",
+        "target": "package/src/config.js",
+        "present": true
+      },
+      {
+        "importer": "package/bin/warmup.js",
+        "reference": "../src/adapters.js",
+        "target": "package/src/adapters.js",
+        "present": true
+      },
+      {
+        "importer": "package/src/adapters.js",
+        "reference": "./audio.js",
+        "target": "package/src/audio.js",
+        "present": true
+      },
+      {
+        "importer": "package/src/config.js",
+        "reference": "./windows-config.js",
+        "target": "package/src/windows-config.js",
+        "present": true
+      },
+      {
+        "importer": "package/src/plugin.js",
+        "reference": "./config.js",
+        "target": "package/src/config.js",
+        "present": true
+      },
+      {
+        "importer": "package/src/plugin.js",
+        "reference": "./delivery.js",
+        "target": "package/src/delivery.js",
+        "present": true
+      },
+      {
+        "importer": "package/src/plugin.js",
+        "reference": "./response-gate.js",
+        "target": "package/src/response-gate.js",
+        "present": true
+      },
+      {
+        "importer": "package/src/preferences.js",
+        "reference": "./audio.js",
+        "target": "package/src/audio.js",
+        "present": true
+      },
+      {
+        "importer": "package/src/preferences.js",
+        "reference": "./windows-config.js",
+        "target": "package/src/windows-config.js",
+        "present": true
+      },
+      {
+        "importer": "package/src/service.js",
+        "reference": "./config.js",
+        "target": "package/src/config.js",
+        "present": true
+      },
+      {
+        "importer": "package/src/service.js",
+        "reference": "./adapters.js",
+        "target": "package/src/adapters.js",
+        "present": true
+      },
+      {
+        "importer": "package/src/service.js",
+        "reference": "./preferences.js",
+        "target": "package/src/preferences.js",
+        "present": true
+      },
+      {
+        "importer": "package/src/service.js",
+        "reference": "./text.js",
+        "target": "package/src/text.js",
+        "present": true
+      },
+      {
+        "importer": "package/src/service.js",
+        "reference": "./delivery.js",
+        "target": "package/src/delivery.js",
+        "present": true
+      },
+      {
+        "importer": "package/src/service.js",
+        "reference": "./maintenance.js",
+        "target": "package/src/maintenance.js",
+        "present": true
+      }
+    ],
+    "allStaticallyMatchedRelativeJavaScriptImportsPresent": true,
+    "workersRequirements": "# Copyright \u00a9 2026 Manolo Remiddi \u00b7 SPDX-License-Identifier: MIT\nfaster-whisper==1.2.1\nctranslate2==4.8.1\nonnxruntime==1.28.0\nnumpy==2.5.1\n",
+    "license": "MIT; complete notice retained in distributed package",
+    "notPresent": [
+      "test/",
+      "package-lock.json",
+      ".github/",
+      "AGENTS.md",
+      "private repository history or complete tree"
+    ],
+    "externalDependenciesIncluded": false,
+    "modelWeightsIncluded": false,
+    "voiceLibraryAssetsIncluded": true,
+    "fullRepositorySnapshot": false
+  },
+  "privateSourceExported": false,
+  "licenseReviewComplete": false,
+  "fullRepositorySnapshot": false,
+  "publicReleaseQualified": false
+}

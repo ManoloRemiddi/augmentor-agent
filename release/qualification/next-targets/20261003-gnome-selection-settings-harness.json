@@ -1,0 +1,61 @@
+{
+  "format": "augmentor-owned-gnome-shortcut-harness-source-validation/1",
+  "baseCommit": "423f0714d1782ef105a5906b3fe6c6efb4573fe0",
+  "sourceFileSha256": {
+    "apps/native/augmentor_linux/ui_testing.py": "02cfcbf0e80edc35b5e49bfc9ca5c85239109203f4e55521f1dfb93e39325fe8",
+    "release/gnome-vm-qualification.py": "11f22a7cb3dc162b66ca4c256036b8e235643fa4d32727d16b9ab89024046e6c",
+    "release/prove-gnome-vm-lifecycle.py": "9767405fc0f0ebb9337120afbf16f1a6a9a98195c333b79c670a60b1cf852842",
+    "release/noble-gnome-shortcut-session.py": "c5a4395b8fa606437176641e43fceb6c44995a36130d9b4382c33339fe37e553",
+    "release/prove-noble-gnome-shortcuts.py": "860ac07abad0f31599e161478a86abedf3d8c6cea1c37c15a99595ed1341f2df",
+    "tests/test_gnome_vm_qualification.py": "632ef0f3f3cea7e89c8d70c2acb7e7530bc8ec65873d2bfcea47cd441779c234",
+    "tests/test_ui_testing.py": "071df3e1a91f3323f588c7dae573a27f0501fb9646df55d927aa739a5ad0b273",
+    "docs/LINUX-GNOME-SHORTCUT-PROOF.md": "1c795d063cc482b857c3aaee992af48e4f5e94269d4caf696a35d013f6592641"
+  },
+  "nativeFocusedTests": {
+    "passed": true,
+    "count": 36,
+    "python": "3.13.14",
+    "qt": "6.9.1",
+    "container": "augmentor-leap-package-20261003-67",
+    "image": "sha256:36530140be46c1d70bf7ea248778b238d53bb32ec05b24ec996f9c77ef4070a2",
+    "uid": 1002,
+    "offscreen": true,
+    "previewOnly": true,
+    "isolatedThreadPoolWorker": true,
+    "log": "offscreen-native-tests.log",
+    "logSha256": "789f38ebc6d1e2e423c13f7f5eb4ce42255989ba1fbb5dcafe10ac477593f22f",
+    "runner": "run-offscreen-tests.py",
+    "runnerSha256": "faf682847e711c8d319ecb410ac4d00701313997dc85ae58ff1cd6d4bc948b99"
+  },
+  "compilePassed": true,
+  "diffCheckPassed": true,
+  "hostQtTest": "unavailable; native owned offscreen stack used",
+  "vmExecutionPerformed": false,
+  "productInputEnabled": false,
+  "installedArtifactModified": false,
+  "installedServicesModified": false,
+  "trackedLicenseChanged": false,
+  "remaining": [
+    "matching clean Fedora/Ubuntu artifact build and selected activation",
+    "both actual owned processes explicitly UI-test opted in for Settings-only phase",
+    "separate normal-process QMP hide/show/cold-launch proof",
+    "lifecycle helper staged beside script and selected interpreter used",
+    "reboot and normal password unlock plus shortcut lock non-delivery"
+  ],
+  "journalOwnership": {
+    "perRunTokenBits": 256,
+    "sourceAndTokenRequired": true,
+    "privateReceiptBeforeGuestMutations": true,
+    "preExistingJournalRefusedBeforeHelperUpload": true,
+    "exclusiveJournalCreation": true,
+    "differentRunSameSourceRefusalPreservesBytesTested": true,
+    "guestRestoreRefusesBeforeSessionAccessTested": true,
+    "interruptedExactRunReadAndUpdateTested": true,
+    "legacyJournalAndSymlinkRefusalTested": true,
+    "vmExecutionPerformed": false
+  },
+  "installedAcceptance": false,
+  "allFiveRolloutPointsComplete": false,
+  "rootLicenseUnchanged": true,
+  "proposed22FileLicenseScopeUnchanged": true
+}

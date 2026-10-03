@@ -1,0 +1,35 @@
+{
+  "format": "augmentor-linux-qualification-checkpoint/1",
+  "date": "2026-10-03",
+  "scope": "Owned Fedora44 GNOME existing selected/native artifact admission before candidate staging",
+  "candidateSource": "0ab022a6a26ae0165b57e1662203e71f544aab9a",
+  "result": "refused before staging, process closure, consent or input",
+  "selected": {
+    "source": {
+      "commit": "aef93bb04520a003c5c48536aa6d4210105fc8ad",
+      "dirty": false
+    },
+    "target": "debian13-amd64",
+    "version": "0.2.13",
+    "artifactSha256": "f7d5962720e959a2624752e8b49a64ed7efb6ced5d4cc1e0c12d6e536c52008f",
+    "fedoraPackageTarget": "fedora44-x86_64",
+    "fedoraPackageSha256": "e6707b15b97c9c52f496d468389236d31603784e4f4fc5408a59da32902586ee"
+  },
+  "native": {
+    "source": {
+      "commit": "f7d75859f5bd88fd99bec2b4904aae5fd3423ed7",
+      "dirty": false
+    },
+    "target": "debian13-amd64",
+    "version": "0.2.13",
+    "fedoraPackageTarget": "fedora44-x86_64",
+    "fedoraPackageSha256": "f9bbc38e6e44f1fecc0d6ed65aa6d1658f5bf1b88f594191457febf5a77d45d4",
+    "rpmAuditClean": true
+  },
+  "cause": "Historical Fedora packager reused Debian payload without rewriting release.target; current packager rewrites it",
+  "guardRelaxed": false,
+  "selectedOrNativeArtifactChanged": false,
+  "normalApplicationUntouched": true,
+  "next": "Review exact matching2035 Fedora native transaction, preserve existing pending offline transaction and user state, then canonical managed stage/activate before candidate input",
+  "productionGnomeInputQualified": false
+}

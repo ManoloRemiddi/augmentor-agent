@@ -1,0 +1,298 @@
+{
+  "format": "augmentor-linux-gnome-native-consent/1",
+  "sourceBase": "bedd7bd11ac4434c514f0010dbca679aeabf4de3",
+  "candidateSourceSha256": {
+    "worker.py": "795d16c85fdc358158038463980ec89c124005e08d5b9d0cf72f7b9d05482eff",
+    "portal_session.py": "3af1c3a458e64669b92ad32229b42d1fcd64d0de260d15114ece9be219500483",
+    "probe-gnome-portal-consent.py": "30ada630d5b82d33fc1eacd2f1e366b2abcee2f6e4b3925ea0b368c78d290ea8"
+  },
+  "target": "fedora44-x86_64",
+  "nativeSession": {
+    "shellVersion": "50.5",
+    "sessionType": "wayland",
+    "pythonVersion": "3.14.3",
+    "selinux": "Enforcing",
+    "uid": 1000,
+    "virtualMachine": true,
+    "selectedSourceUnchanged": "aef93bb04520a003c5c48536aa6d4210105fc8ad",
+    "selectedArtifactUnchanged": "f7d5962720e959a2624752e8b49a64ed7efb6ced5d4cc1e0c12d6e536c52008f"
+  },
+  "banner": {
+    "reusedUnchangedSelectedClass": true,
+    "sourceSha256": "d375c55d2c34625b09ac54ab4fdbccf2934dc5bf6df123e7b7acc177e9e62469",
+    "qtPlatform": "xcb",
+    "waylandSessionWithXwaylandBanner": true,
+    "productionLauncherAlreadySelectsXcb": true
+  },
+  "currentInputFreeChecks": {
+    "interactionDisabledGrantRefused": {
+      "error": "Keyboard, pointer and one monitor must be shared together."
+    },
+    "explicitKeyboardPointerAndMonitorGranted": {
+      "interfaces": {
+        "org.freedesktop.portal.RemoteDesktop": {
+          "AvailableDeviceTypes": 7,
+          "version": 2
+        },
+        "org.freedesktop.portal.ScreenCast": {
+          "AvailableSourceTypes": 7,
+          "AvailableCursorModes": 7,
+          "version": 5
+        }
+      },
+      "registryRegistered": true,
+      "inputSent": false,
+      "devices": 3,
+      "streamNode": 56,
+      "streamMetadata": {
+        "id": "0",
+        "source_type": 1,
+        "position": [
+          0,
+          0
+        ],
+        "size": [
+          1280,
+          800
+        ],
+        "mapping_id": "d7af68d8-8427-448c-852b-1c91d7493814"
+      }
+    },
+    "stopActive": {
+      "clicked": true,
+      "resourcesClosed": true,
+      "guiTicksDuringCleanup": 10
+    },
+    "stopDuringConsent": {
+      "clicked": true,
+      "resourcesClosed": true,
+      "lateResultDiscarded": true,
+      "guiTicksDuringCleanup": 10
+    },
+    "nativeCancel": {
+      "resourcesClosed": true,
+      "result": {
+        "error": "Desktop sharing stopped. No action is replayed."
+      },
+      "inputSent": false,
+      "rawReportSha256": "35ef9d93237218d666560ac278fcadca09169d2fa69e38774a380865cfdeb9f1"
+    },
+    "nativeSharingStopRevocation": {
+      "resourcesClosed": true,
+      "probeExited": true,
+      "inputSent": false,
+      "stopClicked": false,
+      "consentViaActualNativeGtkAccessibilityActions": true,
+      "revocationViaActualGnomeOrangeSharingStopButton": true,
+      "rawReportSha256": "be4bfa2a61a3ba5216096b3faf0d717fbcc9eb055f564b9083c97028c4bf3c38",
+      "fixtureAccessibilityDriverSha256": "01b6edfcc5a654ea81280c28dc8c2a6f9c94bd7df45f928e23bb639e84c01f46",
+      "toggleLogSha256": "b6657c874a40f90b91df79d7c3a01f427ef637c933095c6509de3088a7cca6fa",
+      "shareLogSha256": "7cc5a1b7eb40ba7ac77e464fad7b0386ac5d6aa09e9c439c0da60ce911696ed9",
+      "revokeLogSha256": "d2ae36b263e65e1c990787c2d469eb64a8616426a147fc453f92b6b5ed22ad88"
+    }
+  },
+  "historicalProbeResults": [
+    {
+      "probe": "probe-v1",
+      "rawReportSha256": "38f9a57df20234479e28662d010883243e003f7ebd4f36788fe411dfa3f077ed",
+      "candidateSourceSha256": {
+        "worker.py": "2584d4cb23988b227b217235d0bd409366999fec2087f55a0c19dedebeb56735",
+        "portal_session.py": "8f263d47a6d243635cf3f6064aacf57ee61f547f346e4b9858cb4bdd251e4be2",
+        "probe-gnome-portal-consent.py": "530ebf01b232efa8128ce0eba108a0d7998e6db7ac3c5c3c0cee4d37231bca0b"
+      },
+      "result": {
+        "error": "Desktop sharing request timed out. No input was sent."
+      },
+      "closed": false,
+      "stopClicked": false
+    },
+    {
+      "probe": "probe-v10",
+      "rawReportSha256": "ed3df9c7d56d8b2ab1a9ea91797c62568cc301d8dc59ec99af429632b1d3dc35",
+      "candidateSourceSha256": {
+        "worker.py": "795d16c85fdc358158038463980ec89c124005e08d5b9d0cf72f7b9d05482eff",
+        "portal_session.py": "3af1c3a458e64669b92ad32229b42d1fcd64d0de260d15114ece9be219500483",
+        "probe-gnome-portal-consent.py": "30ada630d5b82d33fc1eacd2f1e366b2abcee2f6e4b3925ea0b368c78d290ea8"
+      },
+      "result": {
+        "error": "Desktop sharing stopped. No action is replayed."
+      },
+      "closed": true,
+      "stopClicked": true
+    },
+    {
+      "probe": "probe-v2",
+      "rawReportSha256": "7577c88f534d837857f3dab2504a9aa95cfd9f24f926f38cd5aff2d1e2e84622",
+      "candidateSourceSha256": {
+        "worker.py": "05e0d42fd05bf1aab1336ec33f2f1e7c79f389c215812c2fca97146593f047ae",
+        "portal_session.py": "c11343fef4f09e677b6e542540a0ff93596b682b4196768831ef2028372215bd",
+        "probe-gnome-portal-consent.py": "a7bb77078b3fd7c4e99e549398e2671e4b12006509871cf285fd09809f51ff8f"
+      },
+      "result": {
+        "error": "Desktop sharing stopped. No action is replayed."
+      },
+      "closed": true,
+      "stopClicked": true
+    },
+    {
+      "probe": "probe-v3",
+      "rawReportSha256": "26a8d05f86b94ffad62c409cc9b4e14fea111912fda3fefebe1658ac7c03fb1e",
+      "candidateSourceSha256": {
+        "worker.py": "05e0d42fd05bf1aab1336ec33f2f1e7c79f389c215812c2fca97146593f047ae",
+        "portal_session.py": "c11343fef4f09e677b6e542540a0ff93596b682b4196768831ef2028372215bd",
+        "probe-gnome-portal-consent.py": "a7bb77078b3fd7c4e99e549398e2671e4b12006509871cf285fd09809f51ff8f"
+      },
+      "result": null,
+      "closed": true,
+      "stopClicked": false
+    },
+    {
+      "probe": "probe-v4",
+      "rawReportSha256": "a883ab6ed3d59fe5e90444bf5ea337734ee631797d546365504e0c3c3cbfa9c7",
+      "candidateSourceSha256": {
+        "worker.py": "795d16c85fdc358158038463980ec89c124005e08d5b9d0cf72f7b9d05482eff",
+        "portal_session.py": "c11343fef4f09e677b6e542540a0ff93596b682b4196768831ef2028372215bd",
+        "probe-gnome-portal-consent.py": "a7bb77078b3fd7c4e99e549398e2671e4b12006509871cf285fd09809f51ff8f"
+      },
+      "result": {
+        "error": "Desktop sharing request timed out. No input was sent."
+      },
+      "closed": true,
+      "stopClicked": false
+    },
+    {
+      "probe": "probe-v5",
+      "rawReportSha256": "05d27c9627f812686e9f11635c9cbe010ec11b7c53a967b6e345d3b2dc29aca5",
+      "candidateSourceSha256": {
+        "worker.py": "795d16c85fdc358158038463980ec89c124005e08d5b9d0cf72f7b9d05482eff",
+        "portal_session.py": "c11343fef4f09e677b6e542540a0ff93596b682b4196768831ef2028372215bd",
+        "probe-gnome-portal-consent.py": "a7bb77078b3fd7c4e99e549398e2671e4b12006509871cf285fd09809f51ff8f"
+      },
+      "result": {
+        "error": "Desktop sharing request timed out. No input was sent."
+      },
+      "closed": true,
+      "stopClicked": false
+    },
+    {
+      "probe": "probe-v6",
+      "rawReportSha256": "71f1436c376d83bfd354713d60697aef79be182737ef5eea70e50683307b044d",
+      "candidateSourceSha256": {
+        "worker.py": "795d16c85fdc358158038463980ec89c124005e08d5b9d0cf72f7b9d05482eff",
+        "portal_session.py": "164f037214efa3f9ed045499f57e6e6b74f3ab832af403eafbe8d4793e5a80b0",
+        "probe-gnome-portal-consent.py": "6fa4afd60a603a157c873e03d709d7767920244d2cdb271ea654e16945c3d91b"
+      },
+      "result": {
+        "error": "Desktop sharing stopped. No action is replayed."
+      },
+      "closed": true,
+      "stopClicked": false
+    },
+    {
+      "probe": "probe-v7",
+      "rawReportSha256": "b9f1abf9b98d27c42d9665af9e86f4628ac7a9fcb1f8db6deccccbe5c3d34e6f",
+      "candidateSourceSha256": {
+        "worker.py": "795d16c85fdc358158038463980ec89c124005e08d5b9d0cf72f7b9d05482eff",
+        "portal_session.py": "164f037214efa3f9ed045499f57e6e6b74f3ab832af403eafbe8d4793e5a80b0",
+        "probe-gnome-portal-consent.py": "6fa4afd60a603a157c873e03d709d7767920244d2cdb271ea654e16945c3d91b"
+      },
+      "result": {
+        "error": "Desktop sharing request timed out. No input was sent."
+      },
+      "closed": true,
+      "stopClicked": false
+    },
+    {
+      "probe": "probe-v8",
+      "rawReportSha256": "324c082441fd1f4067fc245d62d93d93193431e15ef42259044e4053220150de",
+      "candidateSourceSha256": {
+        "worker.py": "795d16c85fdc358158038463980ec89c124005e08d5b9d0cf72f7b9d05482eff",
+        "portal_session.py": "3af1c3a458e64669b92ad32229b42d1fcd64d0de260d15114ece9be219500483",
+        "probe-gnome-portal-consent.py": "30ada630d5b82d33fc1eacd2f1e366b2abcee2f6e4b3925ea0b368c78d290ea8"
+      },
+      "result": {
+        "error": "Keyboard, pointer and one monitor must be shared together."
+      },
+      "closed": true,
+      "stopClicked": false
+    },
+    {
+      "probe": "probe-v9",
+      "rawReportSha256": "c7db6926e1312e46ceda309bb712b9ecd6e72146ddb6eb6d0ecd8007bb2e8a50",
+      "candidateSourceSha256": {
+        "worker.py": "795d16c85fdc358158038463980ec89c124005e08d5b9d0cf72f7b9d05482eff",
+        "portal_session.py": "3af1c3a458e64669b92ad32229b42d1fcd64d0de260d15114ece9be219500483",
+        "probe-gnome-portal-consent.py": "30ada630d5b82d33fc1eacd2f1e366b2abcee2f6e4b3925ea0b368c78d290ea8"
+      },
+      "result": {
+        "interfaces": {
+          "org.freedesktop.portal.RemoteDesktop": {
+            "AvailableDeviceTypes": 7,
+            "version": 2
+          },
+          "org.freedesktop.portal.ScreenCast": {
+            "AvailableSourceTypes": 7,
+            "AvailableCursorModes": 7,
+            "version": 5
+          }
+        },
+        "registryRegistered": true,
+        "inputSent": false,
+        "devices": 3,
+        "streamNode": 56,
+        "streamMetadata": {
+          "id": "0",
+          "source_type": 1,
+          "position": [
+            0,
+            0
+          ],
+          "size": [
+            1280,
+            800
+          ],
+          "mapping_id": "d7af68d8-8427-448c-852b-1c91d7493814"
+        }
+      },
+      "closed": true,
+      "stopClicked": true
+    }
+  ],
+  "firstProbeFailure": {
+    "timeoutBannerCleanupBug": true,
+    "qtWaylandBannerUnavailableOnNormalDesktop": true,
+    "ownedProbeTerminatedViaSigterm": true,
+    "excludedFromAcceptance": true
+  },
+  "sourceRegression": {
+    "focusedWorkerAndConsentCases": 11,
+    "nativeCasesRun": 721,
+    "nativePassed": 719,
+    "macOnlySkips": 2,
+    "archFullLogSha256": "06e1df319021000fea03bda0d39e53a69ee4b1c398f76749f6e821de66ec1beb",
+    "initialMissingNodeAndPythonPathInvocationRetained": true,
+    "initialLogSha256": "1978356c673f4c035fcfa94df867f5e4e15387ae19ae2e1d14194b5ca10d3eda"
+  },
+  "limits": {
+    "productionServiceIntegrated": false,
+    "inputSent": false,
+    "inputQualified": false,
+    "streamGeometryValidated": false,
+    "targetGuardsQualified": false,
+    "nativeRevocationQualified": true,
+    "ownerRestartQualified": false,
+    "passwordLockQualified": false,
+    "kdeThreadingRegressionQualified": false,
+    "fullGraphicalRenderingQualified": false,
+    "ubuntuConsentQualified": false,
+    "publicReleaseQualified": false,
+    "selectedApplicationChanged": false,
+    "ownerStateChanged": false
+  },
+  "nativeRevocationScope": "Input-free standalone consent candidate only; production control remains disabled",
+  "additionalExpiredNativeControlAttemptRetained": {
+    "probeReportSha256": "efc0166b9c6c80ee9f4f49a2c8fda9bd3966912a465778067d0d98fdf8048693",
+    "accessibilityDriverRefusedAfterDialogExpiry": true,
+    "refusalLogSha256": "98cde26b7c5b0b360b87779c00d5aa0eb9c5b532137c8d2c0d46ff30ef21b5c4"
+  }
+}

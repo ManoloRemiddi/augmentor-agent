@@ -1,0 +1,228 @@
+{
+  "format": "augmentor-noble-source-package-startup/1",
+  "source": {
+    "commit": "7b6df59966b9aa387e57a82afcc758a2648da47d",
+    "dirty": false
+  },
+  "target": "ubuntu24.04-amd64",
+  "profile": "noble-cp312-x86_64-source-qt-voice",
+  "policySha256": "b24129c0b9c3ff8d864b492a39863246ddf56768e6b4c0df0f41e9b51e3f17a7",
+  "lockIdentity": "2976a17cdfaee164cb01a7ce5f6e16afd5688403c48cc275cf2e7d68b1ad1c01",
+  "runtimeArtifactSha256": "77511cd9c047e3548cbdaa0cdb01b5380b2c994ba90b49929c8ea70cc8cc963b",
+  "runtimeFileCount": 1768,
+  "ordinaryUserPreparedRootOwnedInputs": true,
+  "repeatPreparationPreservedReceipt": true,
+  "rootOwnedPackageLeaseChecked": true,
+  "installedPackageRows": [
+    "augmentor-desktop\t0.2.13\tamd64\tinstalled",
+    "augmentor-runtime\t0.2.13\tamd64\tinstalled"
+  ],
+  "installedDesktopScreenshot": {
+    "sha256": "05a6db0f03d8399564b6f64e38d0c42342b8ecfc6dc86ecd67c05b14fe91aeee",
+    "bytes": 19607
+  },
+  "sourceFileSha256": {
+    "scripts/linux-python-runtime.py": "ba2a54daafdd2fc5104ce4e66996f5947d84abc02b7e14f1901b87ab6cdd79d7",
+    "scripts/linux-source-qt.py": "cc2850e9a62e2122be79fff2c38a4d72ba1960ff4a74b3db05e18015c61bfc9f",
+    "scripts/desktop-launch.py": "ad3692d104e44ae24fab902ab0c0d9c67a1590f649b8cf856c3fa11719d9a300",
+    "scripts/run-component.py": "fbc4c3490ced219b0debb089438c9adcd5e3ed14b73f83ee62ac1a80535ae857",
+    "scripts/setup-complete.py": "f74bc785b9afd5158f7395fc7080345b9fba9210577bbb08a5ccac77227d2f95",
+    "scripts/install-desktop-startup.py": "fe8fb81a3b364e5cd5abd74ab16e647af61c6e65c821a07d73874fb2929ac8e1",
+    "scripts/desktop-deployment.py": "9e7554dc55627318791e1c801c8d5fbd5286ca54b438214ab4ea864ced2ed3de"
+  },
+  "probeSha256": "f4562a27221b2ea7d8514ea6084c28d96589b1bde66c9ec8aae752fc4cbdf7d1",
+  "noProducerBuildTree": true,
+  "userServicesEnabled": false,
+  "liveHarnessTested": false,
+  "nativeDesktopSessionTested": false,
+  "graphicalBrowserTested": false,
+  "physicalAudioTested": false,
+  "fullProductQualified": false,
+  "upgradeAndRemovalTested": false,
+  "licenseReviewComplete": false,
+  "embeddedSourceCoverageComplete": false,
+  "publicReleaseQualified": false,
+  "scope": "Installed root-owned source-runtime packages in an ordinary-user offline disposable fixture. Includes cold runtime/Browser selection, offscreen desktop preview, synthetic QWidget/SVG/QML and CPU VAD; not a connected full product or native graphical session.",
+  "artifacts": [
+    {
+      "file": "augmentor-runtime_0.2.13_amd64.deb",
+      "sha256": "ca751a5e7b1a5c2bcd68f996915e20b604f9c2e201fe20991b00d27b14f61205",
+      "bytes": 103170228
+    },
+    {
+      "file": "augmentor-desktop_0.2.13_amd64.deb",
+      "sha256": "9ba6197cb8dbd10bb94a0fdd5af409dd4ca3c43f41b0f6bd27ff921cfc78bad6",
+      "bytes": 4984
+    }
+  ],
+  "artifactManifestSha256": "7f038c21bdb81053e039d5e34343e5473115f401e48457b3037ba78a4ca30766",
+  "artifactReview": {
+    "sha256": "4b4d06c28b1044b9b4dcb503af2c5b866432aed1985b641f511388bd65877064",
+    "nativeFiles": 67,
+    "sonameLinks": 18,
+    "wheelArchives": 7,
+    "wheelElfMembers": 19,
+    "rootOwnedQtInputsReadableToDesktopUser": true,
+    "originalWheelAndSupplementaryNoticeBytesMatch": true
+  },
+  "fixture": {
+    "image": "sha256:068a7ce82bf2ce496a0b42c948b33f3c877cc0ec6e49b7322110b4175dcae643",
+    "baseImage": "sha256:471b0e897903f9396693c09864f7b1a67830ec9d56149d10fd02985de7bfc22b",
+    "uid": 1001,
+    "init": true,
+    "network": "none",
+    "hostMounts": [],
+    "cpus": 2,
+    "memoryBytes": 2147483648,
+    "pidLimit": 256,
+    "capabilitiesDropped": [
+      "ALL"
+    ],
+    "noNewPrivileges": true,
+    "dockerfileSha256": "d5f4161fbdef16bdeaa1cf43fde91b998830ad035576932bc191aaf56a3530ae",
+    "buildLogSha256": "efb9f3b08a348cd0db453b76110b5a0be6f8c1791fbd2e0a64a7533170198921",
+    "installOrder": "Configure runtime before desktop to satisfy the exact Pre-Depends."
+  },
+  "coldBrowserSelection": {
+    "runtimePlatformBrowserSelectedSameInterpreter": true,
+    "verifiedPreExecPaths": true,
+    "graphicalBrowserWindowTested": false
+  },
+  "installedQtRender": {
+    "syntheticWidgetTextPassed": true,
+    "svgRedPixelPassed": true,
+    "plasmaComponentCreated": true,
+    "allMappedQtInsideRuntime": true,
+    "requestedBindingModules": 11,
+    "nativeSessionInputTested": false,
+    "fullPlasmaShaderRenderTested": false,
+    "mappedQtLibraryCount": 14
+  },
+  "runtimeImports": {
+    "pythonAbi": [
+      3,
+      12
+    ],
+    "qtVersion": "6.8.2",
+    "managedVersions": {
+      "PySide6": "6.8.2.1",
+      "shiboken6": "6.8.2.1",
+      "Pygments": "2.18.0",
+      "keyring": "25.6.0",
+      "sounddevice": "0.5.2",
+      "onnxruntime": "1.28.0",
+      "protobuf": "7.35.1"
+    },
+    "systemQt": false,
+    "systemVersions": {
+      "SecretStorage": "3.3.3",
+      "jeepney": "0.8.0",
+      "cryptography": "41.0.7",
+      "cffi": "1.16.0",
+      "numpy": "1.26.4",
+      "PyYAML": "6.0.1",
+      "websocket-client": "1.7.0",
+      "jaraco.classes": "3.2.1",
+      "jaraco.context": "4.3.0",
+      "jaraco.functools": "4.0.0",
+      "more-itertools": "10.2.0"
+    },
+    "gtkVersion": [
+      4,
+      14,
+      5
+    ],
+    "portaudioVersion": [
+      1246720,
+      "PortAudio V19.6.0-devel, revision 396fe4b6699ae929d3a685b3ef8a7e97396139a4"
+    ],
+    "explicitCredentialBackend": "keyring.backends.SecretService.Keyring",
+    "secretServiceLifecycleTested": false,
+    "physicalAudioTested": false,
+    "handsFreeTested": false
+  },
+  "cpuVad": {
+    "providers": [
+      "CPUExecutionProvider"
+    ],
+    "intraThreads": 1,
+    "interThreads": 1,
+    "frames": 64,
+    "resetDeterministic": true,
+    "finiteProbabilities": true,
+    "stateShape": [
+      2,
+      1,
+      128
+    ],
+    "numpy": "1.26.4",
+    "onnxruntime": "1.28.0",
+    "modelSha256": "1a153a22f4509e292a94e67d6f9b85e8deb25b4988682b7e174c65279d8788e3",
+    "physicalAudioTested": false,
+    "fullSpeechTested": false
+  },
+  "cpuVadRawSha256": "a95df42292a0ab4f78eb0386d1ead5fc61d9cde8a616c5b008992b50c856a3c8",
+  "rawResultSha256": "ab38db61279a7a511f5ac39d3145f0e2ac08794eb11bb7a877827b733508ee07",
+  "preservedFailures": [
+    {
+      "case": "First source package42f065a",
+      "result": "Byte/notice checks pass, but root-owned Qt input directory is0700 and normal-user readability is unqualified; new guard rejects it.",
+      "report": "20261002-noble-source-package-permission-failure.json"
+    },
+    {
+      "case": "Fixture27 local image reference",
+      "result": "BuildKit interprets FROM sha256:imageID as a registry repository; metadata pull rejected before package install.",
+      "dockerfileSha256": "a5e9ddac7aaa5aa73e1d46fdefb6243162a96e9ba2d772077df352412c1dd74d",
+      "logSha256": "f628a7a21f8482120dbdd824c68ad48e30b4a5b763009d42518d6e12077c95a0"
+    },
+    {
+      "case": "Fixture28 combined dpkg install",
+      "result": "Desktop Pre-Depends correctly refuses installation before Runtime configuration; fixture corrected to configure Runtime first.",
+      "dockerfileSha256": "2b9a51e19dcd88a95ec315a8eee6b5b758317e556deddf3ef6bf05481105ce2c",
+      "logSha256": "92621217447627f574ee437fea1315585c3716c57ae71f176ff31a93310cb6aa"
+    },
+    {
+      "case": "First installed probe29",
+      "result": "Normal-user preparation, cold Browser and Desktop screenshot pass; render probe uses nonexistent assets/effects/plasma.qml and refuses. Corrected to the actual effects/plasma.qml in separate probe30/output directory.",
+      "probeSha256": "5f793f3f019c8dbb40c9a02cd7e8b640c082c850837b25bcf61e9e4fff23675d",
+      "stderrSha256": "b837fb14daea8e5b3ed72c4e1c9556919dba22eae522c5a473ff01fb7878347b"
+    }
+  ],
+  "fullPlasmaShaderRenderTested": false,
+  "minimumCpuQualified": false,
+  "hostedSourceChecks": {
+    "sourceCommit": "7b6df59966b9aa387e57a82afcc758a2648da47d",
+    "linux": {
+      "run": 37060945796,
+      "conclusion": "success"
+    },
+    "mac": {
+      "run": 37060945741,
+      "conclusion": "success",
+      "platforms": [
+        "macos-14",
+        "macos-26"
+      ]
+    },
+    "superseded42fChecks": "Both cancelled; never relabelled as passes.",
+    "nativeSuites": {
+      "targets": [
+        "debian13-amd64",
+        "ubuntu26.04-amd64",
+        "fedora43-x86_64",
+        "fedora44-x86_64"
+      ],
+      "testsPerTarget": 787,
+      "passedPerTarget": 785,
+      "skippedPerTarget": 2,
+      "skipScope": "Mac-only tests",
+      "rawLogSha256": "28e59f51b486cca14800fc52a286d824da07beac3a729dbe324dafb5e72ed1ff"
+    },
+    "nodeSdkSuite": {
+      "tests": 517,
+      "passed": 515,
+      "failed": 0,
+      "skipped": 2
+    }
+  }
+}

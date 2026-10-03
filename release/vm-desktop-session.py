@@ -2,6 +2,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Disposable-VM helper for actual compositor, portal and saved-file assertions."""
 import json
+import importlib.util
 import os
 from pathlib import Path
 import signal
@@ -9,13 +10,153 @@ import subprocess
 import sys
 import time
 
+
+def package_query(target):
+    """Native names for the maintained RPM/dpkg proof; no desktop pass implied."""
+    if target in ('fedora43-x86_64','fedora44-x86_64'):
+        return ['rpm','-q','--qf','%{NAME} %{VERSION}-%{RELEASE} %{ARCH}\n',
+                'augmentor-agent','kwin','plasma-workspace','xdg-desktop-portal-kde','kate']
+    if target in ('debian13-amd64','debian13-arm64','ubuntu24.04-amd64','ubuntu26.04-amd64','linuxmint22.3-amd64'):
+        return ['dpkg-query','-W','-f=${Package} ${Version}\n',
+                'augmentor-runtime','augmentor-desktop','kwin-wayland','plasma-workspace','xdg-desktop-portal-kde','kate']
+    raise ValueError('No qualified KDE package-query adapter for target: '+str(target))
+
+
+def selected_identity(root, selected, release, installed, deployment, source, target, store):
+    """Bind a proof to the selected clean build and its native package payload."""
+    root=Path(root);store=Path(store)
+    if not root.is_absolute() or '..' in root.parts or not root.is_relative_to(store) or root==store:
+        raise ValueError('The proof requires a selected managed release.')
+    if not isinstance(source,str) or len(source)!=40 or any(c not in '0123456789abcdef' for c in source):
+        raise ValueError('Use an exact clean source commit.')
+    if selected.get('root')!=str(root) or selected.get('sourceRef')!=source:
+        raise ValueError('The selected root/source differs from the requested proof.')
+    expected={'commit':source,'dirty':False}
+    if any(v.get('source')!=expected or v.get('target')!=target for v in (release,installed)):
+        raise ValueError('Selected/native clean source or target differs.')
+    if selected.get('version')!=release.get('version') or installed.get('version')!=release.get('version'):
+        raise ValueError('Selected/native product version differs.')
+    if deployment.get('deployment')!=selected or deployment.get('artifactSha256')!=selected.get('artifactSha256'):
+        raise ValueError('The selected deployment receipt differs.')
+    if (not isinstance(selected.get('artifactSha256'),str) or len(selected['artifactSha256'])!=64 or
+            any(c not in '0123456789abcdef' for c in selected['artifactSha256'])):
+        raise ValueError('The selected artifact identity is absent.')
+    return {'root':str(root),'source':source,'target':target,'artifactSha256':selected['artifactSha256']}
+
+
+def window_observation_source():
+    """Complete compositor identities for the proof's native portal owner guard."""
+    return '''function rect(r){return {x:r.x,y:r.y,width:r.width,height:r.height}};
+function identity(w){return {id:String(w.internalId),pid:w.pid,application:w.resourceClass,title:w.caption,geometry:rect(w.frameGeometry)}};
+var w=workspace.activeWindow;var order=workspace.stackingOrder;
+callDBus(SERVICE,'/com/augmentor/Desktop','com.augmentor.Desktop','Report',TOKEN,JSON.stringify({window:w?identity(w):null,windows:order.map(identity),screens:workspace.screens.map(s=>({name:s.name,geometry:rect(s.geometry)}))}));
+'''
+
+
+def kscreen_environment(environment):
+    """The display-settings client needs the actual Wayland backend."""
+    display=environment.get('WAYLAND_DISPLAY')
+    if environment.get('XDG_SESSION_TYPE')!='wayland' or not isinstance(display,str) or not display:
+        raise ValueError('Display configuration requires a normal Wayland session/display.')
+    return {**environment,'QT_QPA_PLATFORM':'wayland'}
+
+
+def configure_scale(name,scale,environment):
+    # Bound the owned child too: an outer SSH timeout cannot reap that child.
+    subprocess.run(['kscreen-doctor','output.'+name+'.scale.'+str(scale)],
+                   env=kscreen_environment(environment),check=True,timeout=20,stdout=subprocess.DEVNULL)
+
+
+def admit_session_state(sessions,uid,session_id,screensaver):
+    """Admit one actual local user session, with both lock authorities clear."""
+    candidates=[row for row in sessions if row.get('User')==str(uid) and
+                row.get('Type')=='wayland' and row.get('Class')=='user' and
+                row.get('Seat')=='seat0' and row.get('Remote')=='no' and
+                row.get('Active')=='yes' and row.get('State')=='active']
+    if len(candidates)!=1 or candidates[0].get('Id')!=session_id:
+        raise ValueError('The ordinary active seat0 Wayland session is absent, changed, or ambiguous.')
+    session=candidates[0]
+    if session.get('LockedHint')!='no':
+        raise ValueError('The actual Wayland session is locked or its lock state is unknown.')
+    if (screensaver.get('active') is not False or screensaver.get('uid')!=uid or
+            not isinstance(screensaver.get('owner'),str) or not screensaver['owner'].startswith(':') or
+            type(screensaver.get('pid')) is not int or screensaver['pid']<=0):
+        raise ValueError('The actual session ScreenSaver is active or its owner/state is unverified.')
+    return {'admitted':True,'session':session,'screensaver':screensaver}
+
+
+def session_state(uid,environment):
+    """Read lock/session state without executing a payload or changing settings."""
+    from gi.repository import Gio,GLib
+    started=time.monotonic()
+    if (os.getuid()!=uid or environment.get('XDG_SESSION_TYPE')!='wayland' or
+            not environment.get('WAYLAND_DISPLAY') or not environment.get('DISPLAY')):
+        raise ValueError('The actual ordinary Wayland session environment is absent.')
+    def properties(command):
+        text=subprocess.check_output(command,text=True,timeout=5)
+        return dict(line.split('=',1) for line in text.splitlines() if '=' in line)
+    ids=properties(['loginctl','show-user',str(uid),'-p','Sessions']).get('Sessions','').split()
+    if not ids or len(ids)>32:
+        raise ValueError('The owned user session list is absent or exceeds its bound.')
+    sessions=[properties(['loginctl','show-session',name,'-p','Id','-p','User','-p','Type',
+                          '-p','Class','-p','Seat','-p','Remote','-p','Active','-p','State','-p','LockedHint'])
+              for name in ids]
+    bus=Gio.bus_get_sync(Gio.BusType.SESSION,None)
+    def call(destination,path,interface,method,parameters=None):
+        return bus.call_sync(destination,path,interface,method,parameters,None,0,3000,None).unpack()[0]
+    def bus_identity(method,value):
+        return call('org.freedesktop.DBus','/org/freedesktop/DBus','org.freedesktop.DBus',
+                    method,GLib.Variant('(s)',(value,)))
+    owner=bus_identity('GetNameOwner','org.freedesktop.ScreenSaver')
+    pid=bus_identity('GetConnectionUnixProcessID',owner)
+    owner_uid=bus_identity('GetConnectionUnixUser',owner)
+    process=Path('/proc')/str(pid)
+    start=(process/'stat').read_text().split(') ',1)[1].split()[19]
+    active=call(owner,'/org/freedesktop/ScreenSaver','org.freedesktop.ScreenSaver','GetActive')
+    if (bus_identity('GetNameOwner','org.freedesktop.ScreenSaver')!=owner or
+            (process/'stat').read_text().split(') ',1)[1].split()[19]!=start or process.stat().st_uid!=uid):
+        raise ValueError('The session ScreenSaver owner changed during its lock check.')
+    screensaver={'owner':owner,'pid':pid,'uid':owner_uid,'startTicks':start,'active':active}
+    latest_sessions=sessions
+    try:
+        result=admit_session_state(sessions,uid,environment.get('XDG_SESSION_ID'),screensaver)
+        # Check login1 again after the session-bus request; no stale unlocked hint.
+        current=properties(['loginctl','show-session',result['session']['Id'],'-p','Id','-p','User','-p','Type',
+                            '-p','Class','-p','Seat','-p','Remote','-p','Active','-p','State','-p','LockedHint'])
+        latest_sessions=[current]
+        screensaver['active']=call(owner,'/org/freedesktop/ScreenSaver','org.freedesktop.ScreenSaver','GetActive')
+        if (bus_identity('GetNameOwner','org.freedesktop.ScreenSaver')!=owner or
+                (process/'stat').read_text().split(') ',1)[1].split()[19]!=start):
+            raise ValueError('The session ScreenSaver owner changed during its final lock check.')
+        result=admit_session_state([current],uid,environment.get('XDG_SESSION_ID'),screensaver)
+    except ValueError as error:
+        result={'admitted':False,'sessions':latest_sessions,'screensaver':screensaver,'error':str(error)}
+    return {**result,'checkedAt':time.time(),'elapsedSeconds':round(time.monotonic()-started,6)}
+
+
 assert Path('/etc/augmentor-test-vm').read_text().startswith('Isolated Augmentor')
+if os.environ.get('AUGMENTOR_PROOF_UID') or os.environ.get('AUGMENTOR_PROOF_USER'):
+    assert os.getuid()==int(os.environ['AUGMENTOR_PROOF_UID']) and os.environ.get('USER')==os.environ['AUGMENTOR_PROOF_USER']
 root=Path(sys.argv[1]);action=sys.argv[2]
+identity=None
+expected_source=os.environ.get('AUGMENTOR_PROOF_SOURCE')
+expected_target=os.environ.get('AUGMENTOR_PROOF_TARGET')
+if expected_source or expected_target:
+    assert expected_source and expected_target and len(expected_source)==40
+    assert os.getuid()!=0 and not root.is_symlink()
+    selected=json.loads((Path.home()/'.local/share/augmentor/desktop.json').read_text())
+    release=json.loads((root/'release.json').read_text())
+    installed=json.loads(Path('/usr/lib/augmentor/release.json').read_text())
+    deployment=json.loads((root/'desktop-release.json').read_text())
+    identity=selected_identity(root,selected,release,installed,deployment,expected_source,expected_target,
+                               Path.home()/'.local/share/augmentor/releases')
 for line in subprocess.check_output(['systemctl','--user','show-environment'],text=True).splitlines():
     key,_,value=line.partition('=');os.environ[key]=value
 os.environ['QT_QPA_PLATFORM']='xcb'
 sys.path.insert(0,str(root/'services/desktop'))
-if action=='serve':
+if action=='session-state':
+    print(json.dumps(session_state(int(os.environ['AUGMENTOR_PROOF_UID']),os.environ)))
+elif action=='serve':
     if os.environ.get('AUGMENTOR_VM_FOCUS_DEBUG')=='1':
         from portal import Portal
         original_focus=Portal.focus_info
@@ -45,7 +186,14 @@ elif action=='rpc':
 elif action in ('scene','windows'):
     from gi.repository import Gio
     from kwin import KWin
-    print(json.dumps(KWin(Gio.bus_get_sync(Gio.BusType.SESSION,None)).read(windows=action=='windows')))
+    kwin=KWin(Gio.bus_get_sync(Gio.BusType.SESSION,None))
+    print(json.dumps(kwin.execute(window_observation_source()) if action=='windows' else kwin.read()))
+elif action=='portal-owner':
+    from gi.repository import Gio,GLib
+    bus=Gio.bus_get_sync(Gio.BusType.SESSION,None)
+    pid=bus.call_sync('org.freedesktop.DBus','/org/freedesktop/DBus','org.freedesktop.DBus',
+                      'GetConnectionUnixProcessID',GLib.Variant('(s)',('org.freedesktop.impl.portal.desktop.kde',)),None,0,5000,None).unpack()[0]
+    print(json.dumps({'pid':pid,'exe':os.readlink('/proc/'+str(pid)+'/exe')}))
 elif action=='editor':
     os.environ['QT_QPA_PLATFORM']='wayland';os.environ['QT_LINUX_ACCESSIBILITY_ALWAYS_ON']='1'
     output=Path.home()/'augmentor-desktop-acceptance.txt'
@@ -99,14 +247,28 @@ elif action=='file':
 elif action=='remove-output':
     (Path.home()/'augmentor-desktop-acceptance-saved.txt').unlink(missing_ok=True)
 elif action=='versions':
+    target=expected_target or os.environ.get('AUGMENTOR_PROOF_PACKAGE_TARGET') or json.loads((root/'release.json').read_text()).get('target')
+    if identity:
+        spec=importlib.util.spec_from_file_location('verified_selected_deployment',root/'scripts/desktop-deployment.py')
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        module.verify(root)
+        audit=['rpm','-V','augmentor-agent'] if target.startswith('fedora') else ['dpkg','--verify','augmentor-runtime','augmentor-desktop']
+        result=subprocess.run(audit,capture_output=True,text=True,timeout=90)
+        if result.returncode or result.stdout.strip() or result.stderr.strip():
+            raise ValueError('Native package file audit failed: '+result.stdout+result.stderr)
+    packages=subprocess.check_output(package_query(target),text=True)
+    portal=[line for line in packages.splitlines() if line.startswith('xdg-desktop-portal-kde ')]
+    assert len(portal)==1
     print(json.dumps({'root':str(root),'session':os.environ.get('XDG_SESSION_TYPE'),
+        'selectedIdentity':identity,
+        'portalPackage':portal[0],
         'cpu':subprocess.check_output(['lscpu'],text=True),
-        'packages':subprocess.check_output(['dpkg-query','-W','-f=${Package} ${Version}\n','kwin-wayland','xdg-desktop-portal-kde','kate'],text=True)}))
+        'packages':packages}))
 elif action=='scale':
     scale=float(sys.argv[3]);assert scale in (1,1.25,1.5)
     from gi.repository import Gio
     from kwin import KWin
     scene=KWin(Gio.bus_get_sync(Gio.BusType.SESSION,None)).read();assert len(scene['screens'])==1
-    subprocess.run(['kscreen-doctor','output.'+scene['screens'][0]['name']+'.scale.'+str(scale)],check=True,stdout=subprocess.DEVNULL)
+    configure_scale(scene['screens'][0]['name'],scale,os.environ)
     print(json.dumps({'scale':scale}))
 else:raise RuntimeError('Unknown VM proof operation')

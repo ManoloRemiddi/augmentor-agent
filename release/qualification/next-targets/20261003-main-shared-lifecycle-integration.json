@@ -1,0 +1,265 @@
+{
+  "format": "augmentor-main-shared-lifecycle-distro-integration/1",
+  "date": "2026-10-03",
+  "timezone": "Europe/Rome",
+  "workingSource": {
+    "parents": [
+      "cb1e470dcd234caf0914844a963cd453be4d9922",
+      "9baf711440c104d645494b07758c7c1e8ef125a2"
+    ],
+    "cleanInstalledArtifact": false
+  },
+  "mergeBehavior": [
+    "Keep declared Linux Python admission before explicit interpreter fallback, with Windows executable paths and UTF-8 environment.",
+    "Preserve Browser pending-worker/operation admission and settlement with the verified voice Python environment.",
+    "Preserve Windows cold main-instance naming, Linux shallow installation paths and macOS native activation.",
+    "Preserve graphical session environment with shared private transport.",
+    "Keep public checked-source reuse, align current Resonant Voice0.1.19 archive/plugin expectations and retain Codex prerequisite receipt.",
+    "Update existing DSH capability fixture for the current effect API without weakening Stop/input-tool assertions."
+  ],
+  "validation": {
+    "typeScriptCheck": "passed",
+    "build": "passed",
+    "native": {
+      "run": 1025,
+      "passed": 989,
+      "skipped": 36,
+      "result": "passed",
+      "scope": "ordinary UID1000 marked Arch source fixture; platform-specific skips explicit in raw log"
+    },
+    "nodeSdk": {
+      "run": 529,
+      "passed": 527,
+      "skipped": 2,
+      "result": "passed",
+      "scope": "actual pinned Node24.19.0, locked DSH qualification dependencies, offscreen native Qt and isolated Chromium extension fixtures"
+    },
+    "browser": {
+      "run": 83,
+      "passed": 83,
+      "result": "passed"
+    },
+    "privateDictationPortal": {
+      "run": 2,
+      "passed": 2,
+      "result": "passed"
+    },
+    "sourceOnlySystemRuntimeDiscovery": [
+      {
+        "format": "augmentor-system-qt-node-selection-proof/1",
+        "profile": "arch20261001-cp314-x86_64-voice",
+        "node": "v24.19.0",
+        "explicitAndImplicitSelectionPassed": true,
+        "platformAndBrowserAgree": true,
+        "refusals": [
+          "explicit system Python",
+          "LD_PRELOAD",
+          "LD_AUDIT",
+          "LD_LIBRARY_PATH",
+          "changed native manifest",
+          "Browser manifest refusal"
+        ],
+        "receiptBytesPreserved": true,
+        "manifestRestored": true,
+        "compiledPythonSelectorSha256": "277f61c4a55171b3592977e04aa4929fa607ee7ce6794f89684c3562c04b0420",
+        "compiledPlatformSha256": "508856a00c09c20ea54836fc21f1b4bdba040d635ca855f4c0953a672222f44f",
+        "browserVoiceSourceSha256": "82831ab0ab1843709900a3ef8a2f4fe3e6b595b0e4269c13ce9360758a611312",
+        "installedProductTested": false,
+        "graphicalBrowserTested": false,
+        "physicalAudioTested": false,
+        "dependencyMaintenanceQualified": false,
+        "publicReleaseQualified": false,
+        "elapsedSeconds": 4.069,
+        "runtimeIdentity": "3f7167c59f5eed9fe7d24b51cc807219d57c85414bd8a1ca545d2860e94d6659",
+        "nodeArchiveSha256": "14b342e71204f811bde6153be8e04b62aef63c236fef92b55f9c83154b409647",
+        "nodeBinarySha256": "bc17c508ffeed0ec622934f9b7fa72f8e78da65350e63c3eceb56fa688aa5e12",
+        "executedSources": {
+          "package.json": "f99dc79e1d10b2552dcbd18fbb8de1b8b7e3a6f096b10a7b1d001209c22ae134",
+          "scripts/linux-python-runtime.py": "b5fa4f67f54f85ce9ef9e0a5292d018a1dddf1c807b475596b0ad7480cd560a6",
+          "scripts/linux-system-qt.py": "4f53e4f5cbc403679e763e946b5ebf8eb87b08731b3a4fda3f30918127e12389",
+          "scripts/run-component.py": "fbc4c3490ced219b0debb089438c9adcd5e3ed14b73f83ee62ac1a80535ae857",
+          "services/lifecycle/lease.py": "21ee32bf84924c0769bffb7448f62a184b31bd31066dba32cd71272839ed3934",
+          "services/platform_adapters/__init__.py": "306b82fcad992ef0bf7c665b2281751f1cc5d188f802adf714ca699e806e8b64",
+          "services/platform_adapters/locks.py": "ae1e225698f615fa869791b573da43b857384820f2d18589be6b8baf2bc8391a",
+          "dist/platform/src/index.js": "508856a00c09c20ea54836fc21f1b4bdba040d635ca855f4c0953a672222f44f",
+          "dist/platform/src/python.js": "277f61c4a55171b3592977e04aa4929fa607ee7ce6794f89684c3562c04b0420",
+          "apps/browser/shared/voice-client.mjs": "82831ab0ab1843709900a3ef8a2f4fe3e6b595b0e4269c13ce9360758a611312",
+          "release/probe-system-qt-node.mjs": "cf1fd1959f45b7445ee26a5848ae2c553c52aa029e2b29c988c47d831d418812"
+        },
+        "coldPythonWrapperExecuted": true,
+        "packageLifetimeLeaseTested": false
+      },
+      {
+        "format": "augmentor-system-qt-node-selection-proof/1",
+        "profile": "leap16-cp313-x86_64-voice",
+        "node": "v24.19.0",
+        "explicitAndImplicitSelectionPassed": true,
+        "platformAndBrowserAgree": true,
+        "refusals": [
+          "explicit system Python",
+          "LD_PRELOAD",
+          "LD_AUDIT",
+          "LD_LIBRARY_PATH",
+          "changed native manifest",
+          "Browser manifest refusal"
+        ],
+        "receiptBytesPreserved": true,
+        "manifestRestored": true,
+        "compiledPythonSelectorSha256": "277f61c4a55171b3592977e04aa4929fa607ee7ce6794f89684c3562c04b0420",
+        "compiledPlatformSha256": "508856a00c09c20ea54836fc21f1b4bdba040d635ca855f4c0953a672222f44f",
+        "browserVoiceSourceSha256": "82831ab0ab1843709900a3ef8a2f4fe3e6b595b0e4269c13ce9360758a611312",
+        "installedProductTested": false,
+        "graphicalBrowserTested": false,
+        "physicalAudioTested": false,
+        "dependencyMaintenanceQualified": false,
+        "publicReleaseQualified": false,
+        "elapsedSeconds": 3.556,
+        "runtimeIdentity": "7991a5ef322dfa02aa228bbb36a4cde5ddc0673b02645d7ba4f0a5c3f5782bed",
+        "nodeArchiveSha256": "14b342e71204f811bde6153be8e04b62aef63c236fef92b55f9c83154b409647",
+        "nodeBinarySha256": "bc17c508ffeed0ec622934f9b7fa72f8e78da65350e63c3eceb56fa688aa5e12",
+        "executedSources": {
+          "package.json": "f99dc79e1d10b2552dcbd18fbb8de1b8b7e3a6f096b10a7b1d001209c22ae134",
+          "scripts/linux-python-runtime.py": "b5fa4f67f54f85ce9ef9e0a5292d018a1dddf1c807b475596b0ad7480cd560a6",
+          "scripts/linux-system-qt.py": "4f53e4f5cbc403679e763e946b5ebf8eb87b08731b3a4fda3f30918127e12389",
+          "scripts/run-component.py": "fbc4c3490ced219b0debb089438c9adcd5e3ed14b73f83ee62ac1a80535ae857",
+          "services/lifecycle/lease.py": "21ee32bf84924c0769bffb7448f62a184b31bd31066dba32cd71272839ed3934",
+          "services/platform_adapters/__init__.py": "306b82fcad992ef0bf7c665b2281751f1cc5d188f802adf714ca699e806e8b64",
+          "services/platform_adapters/locks.py": "ae1e225698f615fa869791b573da43b857384820f2d18589be6b8baf2bc8391a",
+          "dist/platform/src/index.js": "508856a00c09c20ea54836fc21f1b4bdba040d635ca855f4c0953a672222f44f",
+          "dist/platform/src/python.js": "277f61c4a55171b3592977e04aa4929fa607ee7ce6794f89684c3562c04b0420",
+          "apps/browser/shared/voice-client.mjs": "82831ab0ab1843709900a3ef8a2f4fe3e6b595b0e4269c13ce9360758a611312",
+          "release/probe-system-qt-node.mjs": "cf1fd1959f45b7445ee26a5848ae2c553c52aa029e2b29c988c47d831d418812"
+        },
+        "coldPythonWrapperExecuted": true,
+        "packageLifetimeLeaseTested": false
+      }
+    ],
+    "privateSourceBoundary": "passed"
+  },
+  "preservedEarlierAttempts": [
+    {
+      "name": "First source refresh",
+      "result": "Owned test-tree file ownership prevented full tar refresh; corrected only the mutable source-test fixture before executing tests."
+    },
+    {
+      "log": "native.log",
+      "result": "Missing Node PATH caused15 errors/one failure in1009 cases; final1025-case suite ran with pinned Node."
+    },
+    {
+      "log": "node-all.log",
+      "result": "Host lacks PySide QtTest for four integration cases; fifth failure was old DSH mock missing effect API, corrected without changing capability assertions."
+    },
+    {
+      "log": "node-arch-final.log",
+      "result": "Owned fixture lacked full DSH dependency tree; not a passing SDK run."
+    },
+    {
+      "log": "node-arch-with-dsh.log",
+      "result": "529 cases:525pass/two failures/two skips; failures lacked Chromium fixture. Final run installs distro-native Chromium153.0.8010.52-1 in the owned fixture."
+    }
+  ],
+  "executedSourceHashes": {
+    "packages/platform/src/index.ts": "afa1febbd492ad36270661502091d482a9aed669d9dfbc84f82f3b43040eff7c",
+    "packages/platform/src/python.ts": "49210ff40eb3ae138562c2d0112cf9d10778c8e202865e8436e8dab0f010fe2c",
+    "apps/browser/shared/voice-client.mjs": "82831ab0ab1843709900a3ef8a2f4fe3e6b595b0e4269c13ce9360758a611312",
+    "apps/native/augmentor_linux/shortcut_activation.py": "edd1863eefcd2e5c05b2a3a7510157cc9ee05afd1ca4f6a20c8e76917b9c2545",
+    "services/desktop/client.py": "caf92ee30b47fd6dbfa433992c59174fc8c986409dabfbfc3c96df098ef7f948",
+    "services/lifecycle/lease.py": "21ee32bf84924c0769bffb7448f62a184b31bd31066dba32cd71272839ed3934",
+    "services/platform_adapters/locks.py": "ae1e225698f615fa869791b573da43b857384820f2d18589be6b8baf2bc8391a",
+    "scripts/package-complete.py": "73a73dabac66058c8243de3181749f8804d55178c9e4eb1a0d23197230fac075",
+    "scripts/setup-complete.py": "f90cae8b7e4345c0f32955bcdb8183eb31872603bea42acc10686f529727cd17",
+    "tests/desktop-capabilities.test.mjs": "f2f4f650095aec62d929bd4e98709fd0ecba87ead836a312bb1f76eaa5a3668b",
+    "tests/test_complete_source_reuse.py": "368cb60eea5419f95da47aebed6208a1449b8ba909aa2c865820d6f92482fd85"
+  },
+  "rawEvidence": {
+    "dsh-test-inputs.tar": "a46deb14c8f2416caeee2d6fc2599d7435b67144cda99b0a9f5e557a9e4908f5",
+    "portal.log": "0dd0429b9701ada1dd38203e53c3d50a5f3cebe053a3924a209789a11404d588",
+    "browser.log": "315578f72b9db7fc12cf497bff5a21183052984cd7bcef7de079e3462b3fb8c1",
+    "build.log": "9db115e58da3e6ea679a26c953ce95542bcd67e26fff204a9d407d860e89b5f4",
+    "chromium-install.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "node-all.log": "0bba18d3dad95285c8b408304c070911ad00a36f7848a0a5e43d06d17205387b",
+    "node-arch-with-dsh.log": "c09a41befc4ddcdb7b1737e3779c349e74024fe272f5dbec5b5f3ca29ab1f7b7",
+    "resolve.py": "7f557424da01042e38767e83d434e08a87f81ac8710930c83f22b9273314b86f",
+    "whitespace.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-with-node.log": "09ec70147f8e5e4e9a48db1adebea25ad7930a90449c1d84bf115dcdd8b67ec6",
+    "owned-service-cleanup.json": "bcfe13c3ad7f79f5ed388b0cd888e55db96f887b47483b25e7f3c666bd08acab",
+    "native-source.tar": "dee32d342f82a12b395837b48cd13a8c5129661013a42aeb0d5d93f7fd4032a2",
+    "check.log": "1610da847770d7bfc5df0fafc711c61f2272073092908ad282e8f264c1549864",
+    "chromium-install.stdout": "d329430a7a8edcff66d70bc63ec5f6ab8eb51f4aa37536388d7c003140ea6433",
+    "dsh-install.log": "baea34e1f59a0192d1eea5f986c5e506c5dc783820afa23453726888406a2527",
+    "node-focused.log": "941ffe95cdcf860add2df3e1b51e53b8d3244dd83ec6197fd8122b2b1a27689a",
+    "node-arch-final.log": "1283e4aeaa54ab47a50c8d4a7733b1256aa78b635725be6baa4b4acc042c168d",
+    "node-arch-with-chromium.log": "31dab92e847e6562d193e090c325b0ffa9409d1fa79a819d5d5f43280af98ec4",
+    "native.log": "6fe2e40e4932ad4be95cb44839868c8ea1f8cd3088a6e938355ddf683b0ac610"
+  },
+  "ownedSourceTestServiceCleanup": {
+    "terminatedOnlyMatchingOwnedSourceTestServices": [
+      {
+        "pid": 50236,
+        "args": [
+          "/usr/bin/python3",
+          "/tmp/cinnamon-shortcuts-source-test/services/dictation/server.py"
+        ]
+      },
+      {
+        "pid": 52928,
+        "args": [
+          "/usr/sbin/python3",
+          "/tmp/cinnamon-shortcuts-source-test/services/dictation/server.py"
+        ]
+      },
+      {
+        "pid": 54120,
+        "args": [
+          "/usr/sbin/python3",
+          "/tmp/cinnamon-shortcuts-source-test/services/dictation/server.py"
+        ]
+      },
+      {
+        "pid": 66972,
+        "args": [
+          "/usr/sbin/python3",
+          "/tmp/cinnamon-shortcuts-source-test/services/dictation/server.py"
+        ]
+      },
+      {
+        "pid": 67966,
+        "args": [
+          "/usr/sbin/python3",
+          "/tmp/cinnamon-shortcuts-source-test/services/dictation/server.py"
+        ]
+      },
+      {
+        "pid": 81886,
+        "args": [
+          "/usr/sbin/python3",
+          "/tmp/cinnamon-shortcuts-source-test/services/dictation/server.py"
+        ]
+      },
+      {
+        "pid": 83150,
+        "args": [
+          "/usr/sbin/python3",
+          "/tmp/cinnamon-shortcuts-source-test/services/dictation/server.py"
+        ]
+      }
+    ],
+    "remainingLiveMatches": [],
+    "priorDefunctProcessesRetained": true,
+    "ownerServicesChanged": false
+  },
+  "externalSecurityCheck": {
+    "checkRunId": 111033593687,
+    "status": "failed-unwaived",
+    "inspectedFindingCount": 12,
+    "classification": "Reported values are64hex SHA256 script/log digests; no external waiver or bypass applied."
+  },
+  "hostedChecksForThisMerge": "pending",
+  "installedProductTested": false,
+  "physicalAudioTested": false,
+  "nativeSessionInputQualified": false,
+  "fullDistroInstallersQualified": false,
+  "licenseReviewComplete": false,
+  "publicReleaseQualified": false,
+  "ownerServicesOrSelectionChanged": false
+}

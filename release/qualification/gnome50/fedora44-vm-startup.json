@@ -1,0 +1,68 @@
+{
+  "format": "augmentor-gnome-full-vm-startup/1",
+  "checkpointDate": "2026-10-02",
+  "fixture": "Fedora Cloud 44-1.7 with distro gnome-desktop group; GDM fixture autologin",
+  "source": {
+    "commit": "f7d75859f5bd88fd99bec2b4904aae5fd3423ed7",
+    "dirty": false
+  },
+  "version": "0.2.13",
+  "rpmSha256": "831c1715e94305fa3d1ab4a0ad202fa92371c59cbea7517155f8b4ee51d51a57",
+  "supplementalFixturePackages": [
+    "wmctrl"
+  ],
+  "sourceSha256": {
+    "release/provision-gnome-vm.py": "2f43f8bd29ab3e3e78050d6585bda041e2ba1cd39a1f9e54843f298de0684849",
+    "release/inspect-gnome-vm.py": "02051e5e0712eac36c9ecc9b71f4d6436b97e462f15bb255af1de894c17b4c07"
+  },
+  "rawStartupReportSha256": "a64cc92405e263a675909596d85cf89131a1a5a2042ebad79b0d5d9f08dac7b0",
+  "packagePayloadVerificationPassed": true,
+  "selinuxEnforcing": true,
+  "gnomeShellVersion": "50.5",
+  "graphicalSession": {
+    "Seat": "seat0",
+    "Type": "wayland",
+    "Class": "user",
+    "Active": "yes",
+    "State": "active"
+  },
+  "userServiceOwnsActualApp": true,
+  "previewLaunch": false,
+  "canonicalInstalledRoot": "/usr/lib/augmentor",
+  "initialOnboardingDialogRenderedAndFocused": true,
+  "mainAndDialogSameProcess": true,
+  "realScreenShieldAvailable": true,
+  "unlockedObserverGuards": {
+    "locked": false,
+    "greeter": false,
+    "sessionMode": "user",
+    "actionMode": 1,
+    "modalCount": 0,
+    "overview": false,
+    "overviewTarget": false,
+    "stageGrabbed": false,
+    "overviewAnimation": false,
+    "screenShieldAvailable": true,
+    "screenShieldActive": false,
+    "screenShieldLocked": false,
+    "stageGrabActor": null,
+    "stageKeyFocus": null,
+    "windowDragging": false
+  },
+  "lockScreenObservation": "user-only extension is suspended by GNOME; unavailable observation fails closed; after unlock a fresh enable epoch replaces previous identities",
+  "observerEpochChangedAfterUnlock": true,
+  "harnessConnectionTested": false,
+  "modelTurnTested": false,
+  "gnomeInputToolsEnabled": false,
+  "duplicateStartupTested": false,
+  "crashRecoveryTested": false,
+  "rebootTested": false,
+  "standardWorkstationInstallerTested": false,
+  "latestWorkspaceSourceInstalled": false,
+  "limits": [
+    "Earlier verified f7d7585 payload; package does not contain the later 8413c2c workspace fix or declared wmctrl dependency.",
+    "Fresh-user connection is intentionally unconfigured; actual onboarding is offline, without harness/model requests.",
+    "Cloud-derived system and test GDM autologin; manual login authentication and standard Workstation installer are separate.",
+    "Lock observation is unavailable; no positive locked scene was measured. Full composition, consent/input/Stop and native Wayland following remain open."
+  ]
+}

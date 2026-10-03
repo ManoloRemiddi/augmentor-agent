@@ -1,0 +1,452 @@
+{
+  "format": "augmentor-linux-rollout-checkpoint/1",
+  "date": "2026-10-03",
+  "target": "opensuse-leap16.0-x86_64",
+  "scope": "Owned booted GNOME Wayland VM; headed Chromium on XWayland; deterministic local fixture only",
+  "artifact": {
+    "format": "augmentor-system-qt-native-artifacts/1",
+    "version": "0.2.13",
+    "source": {
+      "commit": "423f0714d1782ef105a5906b3fe6c6efb4573fe0",
+      "dirty": false
+    },
+    "target": "opensuse-leap16.0-x86_64",
+    "pythonRuntime": {
+      "format": "augmentor-linux-python-runtime-contract/1",
+      "target": "opensuse-leap16.0-x86_64",
+      "profile": "leap16-cp313-x86_64-voice",
+      "pythonAbi": [
+        3,
+        13
+      ],
+      "architecture": "x86_64",
+      "lockIdentity": "7991a5ef322dfa02aa228bbb36a4cde5ddc0673b02645d7ba4f0a5c3f5782bed",
+      "policySha256": "86f6a9856dcca7bb26597299cbfe997a78de690681b1ca1b3aaad1861962018e",
+      "licenseReviewComplete": false,
+      "embeddedSourceCoverageComplete": false,
+      "systemQtStack": {
+        "format": "augmentor-system-qt-stack-contract/1",
+        "file": "system-qt-inventory.json",
+        "sha256": "485b8dca973e7ca58efd3d2e2d9e416dc4b3f324f5cf1a055ea74475f45ccd56",
+        "bytes": 557497,
+        "qtVersion": "6.9.1",
+        "packageManager": "rpm"
+      }
+    },
+    "package": {
+      "name": "augmentor-agent",
+      "versionRelease": "0.2.13-5.leap16",
+      "architecture": "x86_64"
+    },
+    "artifacts": [
+      {
+        "file": "augmentor-agent-0.2.13-5.leap16.x86_64.rpm",
+        "sha256": "7f5421788ddf093bba86fce1630514f4385cd53e6b8dc781ebb4c419e9f208cd",
+        "bytes": 337433868
+      }
+    ],
+    "preparationSha256": "77df300bc79b8dabfec9c77bdc32896fd22ad6de8fa0e4057d64c43cfee14ab8",
+    "inspectionSha256": "3bb85fbd6cd54efcd359ae587b119f772792ebc186697ea58740494876f75947",
+    "completeNativePayloadVerified": true,
+    "payloadFileLinkMembers": 29267,
+    "regularFileModePolicy": "Remove group/world write; preserve every other mode bit.",
+    "preparedFileModesNormalized": 0,
+    "appInventoryMembers": 29251,
+    "candidateOnly": true,
+    "installedAcceptance": false,
+    "legalAcceptance": false,
+    "publicRelease": false
+  },
+  "browserArchive": {
+    "version": "0.2.13",
+    "channel": "preview",
+    "extensionId": "dgfpmlnbofacjafljfohgmfacobgfjbh",
+    "protocol": "augmentor/1",
+    "companionVersion": "0.2.13",
+    "source": {
+      "commit": "423f0714d1782ef105a5906b3fe6c6efb4573fe0",
+      "dirty": false
+    },
+    "artifact": "augmentor-browser-0.2.13.zip",
+    "bytes": 218668,
+    "sha256": "0fbfdc193b44bdb2f37e19b63337d9321cdc59eb413ff543915a3b67415365ec",
+    "files": {
+      "action-design.mjs": {
+        "bytes": 2177,
+        "sha256": "6c60cd89b3b4d0d46adb6d8fe4acceae77420dc1010eb95a03c3c847df8899e3"
+      },
+      "actions.mjs": {
+        "bytes": 10244,
+        "sha256": "3f7467484e4753a92feda7bfce639eec061e7af5316165700e0c5a3c8d057db3"
+      },
+      "appearance.mjs": {
+        "bytes": 4226,
+        "sha256": "e440ea8ad88db36efc6df76deac3148fb304dc032921eaaa8f2eadb99d859da0"
+      },
+      "approval-presenters.mjs": {
+        "bytes": 1522,
+        "sha256": "844d5682fbf6d91cbd61cf8c4a9d3bd6b60dcab70471524b5ee0156ea5b75718"
+      },
+      "branch-request.mjs": {
+        "bytes": 1162,
+        "sha256": "165acdcb85212a97747c28d0c3092888509435a02e30b8f50ef3a958b83fcc7b"
+      },
+      "chat-components.css": {
+        "bytes": 19548,
+        "sha256": "74fb4115306e32e84660a1db85ca383a49ccb4c653566b5b4ab4e56ecd93f5aa"
+      },
+      "chat-render.js": {
+        "bytes": 28015,
+        "sha256": "4504a23b4adb76ec7fa5f20ca4236ef3046b8432678b491005264f3855de16b1"
+      },
+      "clipboard.mjs": {
+        "bytes": 766,
+        "sha256": "59a4872767a5af7b4914ca153b690be86dfeef79886f2b371071ba10d389695a"
+      },
+      "codex-questions.mjs": {
+        "bytes": 2673,
+        "sha256": "91f6f2fac033a17db190c6f46df527d320e56b9f4e8086eeb2d256ac5c7ea075"
+      },
+      "codex-setup.mjs": {
+        "bytes": 11833,
+        "sha256": "87b7fb519b92dc10bb59ac49234c3d5f5bdca2f74fb3f42b402e0f4824a31ae7"
+      },
+      "diagnostics.mjs": {
+        "bytes": 1095,
+        "sha256": "4062eb8e6cc62e14955c4097ef9685a37101d1962fd941b19b1c78c5337dea5b"
+      },
+      "dictation-settings.mjs": {
+        "bytes": 6865,
+        "sha256": "defd5bcad2d828341a2914d130e39f3533c90e13e03297088c4c080419812a29"
+      },
+      "dom-actions.js": {
+        "bytes": 3406,
+        "sha256": "e363bdc48a32b3be55a6c5ddd1579a426d25b613d12fa05cb7bd2bbc374da415"
+      },
+      "dsh-setup.mjs": {
+        "bytes": 3564,
+        "sha256": "9a1fe1cf322f81dd6229bd042e8770c2fd3378a6fdab14955e12f9ff80b8afa3"
+      },
+      "favicon.svg": {
+        "bytes": 938,
+        "sha256": "ea2f960644adfe28091021fd73c9bd5c252eec689d172c9ab0546968699fbda4"
+      },
+      "home.mjs": {
+        "bytes": 2274,
+        "sha256": "136fbd9c93de9a2876ec6e4c50e00f367e539d8c1b9ec3d69db99ea69feac36d"
+      },
+      "icons/icon128.png": {
+        "bytes": 4429,
+        "sha256": "82a53ca4d06879982f52786fece9db2144178767ccb9bd4657d19ef814c0408b"
+      },
+      "icons/icon16.png": {
+        "bytes": 508,
+        "sha256": "c709ed667583996ef20a26c993206829eb05b84687f5d9b945e1dd3d66cc7874"
+      },
+      "icons/icon32.png": {
+        "bytes": 1020,
+        "sha256": "f3497a1ab7e1cab105d07cb987d88c85ebff24973d828da05472f0bd7490d07e"
+      },
+      "icons/icon48.png": {
+        "bytes": 1515,
+        "sha256": "635a85b2737af3c557843e3b4ea1991ad05ab5cc07deafe5e241fa636b7e8431"
+      },
+      "maintenance-page.mjs": {
+        "bytes": 6200,
+        "sha256": "65d44f6b4c19eaadd2572d3475dbe69083a5de4ebf5a6e42b57d153d9b29d9e7"
+      },
+      "maintenance-worker.mjs": {
+        "bytes": 8312,
+        "sha256": "06611c36dddb86bbc3fe092ff89c0680f2648d0ec55062df3cf99c2bb600a14d"
+      },
+      "manifest.json": {
+        "bytes": 1401,
+        "sha256": "0f146a8f09c22d66d9a7993fe9aea92121685158e5f3103b1e0059d45e4cd0a7"
+      },
+      "markdown.css": {
+        "bytes": 3015,
+        "sha256": "02d2fc3d4a4d64655d641c7b4baabb74c1576e5b05f7f667a59b6afc140d3f5d"
+      },
+      "memory.mjs": {
+        "bytes": 10465,
+        "sha256": "8c60202c19fdec6c111ca6253035a87b3e470c0df7efd77879b1bccce390a056"
+      },
+      "observation.mjs": {
+        "bytes": 8938,
+        "sha256": "f6cd613d15255778e101e4028d7c759b71fe511661d0ee3b9571c6d119d4c9c7"
+      },
+      "overlay.mjs": {
+        "bytes": 7716,
+        "sha256": "0e8cc246c6b7d9aa656815d5d9b08e5ef032b63669d33c1dfcf3fda57d0bad02"
+      },
+      "panel-api.mjs": {
+        "bytes": 39350,
+        "sha256": "b04a8614283dd2cc3143a4dabc478973003df8e5d22b48887d75cd7592644271"
+      },
+      "port.mjs": {
+        "bytes": 18058,
+        "sha256": "819ccf1d7c783172434160164d3a5408074b9d74cd566f436df694b2786b0c7c"
+      },
+      "prompt-animation.mjs": {
+        "bytes": 3336,
+        "sha256": "1ee707efa4618991d8e7b0019cd3122b27a4313d52512e18d2da6a794c00d5b0"
+      },
+      "prompt-editor.mjs": {
+        "bytes": 5817,
+        "sha256": "2469437925e1b96067402c17464c7032b9f37b5b1c9fa0cc2ba97f8a846134c2"
+      },
+      "prompt-library.css": {
+        "bytes": 2627,
+        "sha256": "97af9eb56a7d73e0e13cfec768515e4d649402a0239d85053652afd00c4d0aee"
+      },
+      "prompt-library.mjs": {
+        "bytes": 6023,
+        "sha256": "574d7ef0dc37d2c0bdb43c65aa1fed68621af16ba58e7e4db81ca9b3a130433d"
+      },
+      "prompt-send.mjs": {
+        "bytes": 1538,
+        "sha256": "e7de0ae4c3b05609b03312c4a7d406f23070d963dd211be5ecdf681c3d17640a"
+      },
+      "queue.mjs": {
+        "bytes": 5524,
+        "sha256": "f22b9030da3ff88d899ee5ec2391ee9a79b3c9dfbbc33e7430f1aec62732a024"
+      },
+      "settings-form.mjs": {
+        "bytes": 810,
+        "sha256": "43f65abefaacb047cad7448ff4e40155c706f5eafc70ff12dd13c2957f94dee5"
+      },
+      "settings-tab.mjs": {
+        "bytes": 1123,
+        "sha256": "774ec14ff70fa4fb5559dcc408a7c338bac2ba8294f8739ea2b567fd4ebd3bc2"
+      },
+      "settings.css": {
+        "bytes": 7236,
+        "sha256": "643d663442c09f661c54b93970c3816847781e891dc2d7982fa9cb6189a2838a"
+      },
+      "settings.html": {
+        "bytes": 1333,
+        "sha256": "d559b0b24d0edfacbfed35dfa066f045c6f953bca299af7a79adbc458c92a2dc"
+      },
+      "settings.mjs": {
+        "bytes": 16245,
+        "sha256": "aa53c03023e23cd18ca25bd2b6d5ef423e35f0edd0927b32bb69c524d4a3227e"
+      },
+      "setup.mjs": {
+        "bytes": 5433,
+        "sha256": "f131ae6991a362d302182159ad686d4b26308b845a7c215433e7cae5020b572a"
+      },
+      "sidepanel.css": {
+        "bytes": 1477,
+        "sha256": "c95196e09524b18b3590c9f2ddaf070934139070ba9fa4a2c6c552080dfb2fec"
+      },
+      "sidepanel.html": {
+        "bytes": 5969,
+        "sha256": "52e9ccc8a13ca5438e4e36eb83ff9d1e2dc25f3dc22da2358ac0fb3e389a5982"
+      },
+      "sidepanel.js": {
+        "bytes": 43202,
+        "sha256": "d487e6be2d3284b26d10437c807748ae58cba893dd6ccaf97cc1b73c39d9309f"
+      },
+      "state.mjs": {
+        "bytes": 8781,
+        "sha256": "8a1cbab6f96ca07b5398e14b11036c1ff2e7d469a0e303b73567a5cab1404e53"
+      },
+      "support.mjs": {
+        "bytes": 1950,
+        "sha256": "bdc72e7b8c09e7d0f1214f4c462ff4f7f2427d85a0b0a8c87146bec0fe0c3b22"
+      },
+      "surface-design.mjs": {
+        "bytes": 894,
+        "sha256": "a93906ebe93d1dd2e8e6ebaaf242a37edc9c71d19945b78a7e67299db6d5b6ca"
+      },
+      "surface-layout.css": {
+        "bytes": 7136,
+        "sha256": "7285f57068704251ef4d8722853f5e9d1b952a3ddc7872a7366fde5fe51efc16"
+      },
+      "surface-tokens.css": {
+        "bytes": 476,
+        "sha256": "49f3c6ca5a5abfaa0624a023ee2489922a810a85d3475b4f7592b6f3649206a7"
+      },
+      "surface.mjs": {
+        "bytes": 6117,
+        "sha256": "f6709ed8d59070cbf1941eea32af71b80c71af30e3fde113088dcb4dd4c259b2"
+      },
+      "sw.js": {
+        "bytes": 2653,
+        "sha256": "2105d32703d41ee5a43a96fa9b567716a05f9e60d7bcf345648c775069c33726"
+      },
+      "theme-base.css": {
+        "bytes": 1777,
+        "sha256": "aaed79a56d8cb7808eb9c1d766652ddb7efb2d1e023157f9e92dcf095d6e3fed"
+      },
+      "theme-boot.js": {
+        "bytes": 2051,
+        "sha256": "69717a1c91369188a63dc75f2b3af26cff36b08d4c4e1637022a4d46347edf73"
+      },
+      "theme-tokens.js": {
+        "bytes": 10716,
+        "sha256": "6edafa527df6bad8759717044e5f28421056d87d473cf79e7da1863c58102fa4"
+      },
+      "veil.js": {
+        "bytes": 35488,
+        "sha256": "1f97311b9032839e8a2b85107c33679b99c2398f052042bcc1364895ecc9e1f5"
+      },
+      "vendor/LICENSE.highlight.txt": {
+        "bytes": 1514,
+        "sha256": "6c081431591d9df696c82dc598fe1423765b8a299b200ed00b281afd0f64c490"
+      },
+      "vendor/highlight.mjs": {
+        "bytes": 127661,
+        "sha256": "0317b7f3151f08712a2e009d5a5ef255efd95732dd75a353c90a88d5e73056da"
+      },
+      "vendor/marked.min.js": {
+        "bytes": 35479,
+        "sha256": "15fabce5b65898b32b03f5ed25e9f891a729ad4c0d6d877110a7744aa847a894"
+      },
+      "voice-icon.mjs": {
+        "bytes": 3334,
+        "sha256": "7a4734c9f89c671aa893e57f68fac1b0d951a0d76715c0dde0973cb455206f39"
+      },
+      "voice-orb.svg": {
+        "bytes": 790,
+        "sha256": "eb45920277e2c1664d6269fd395d7fe34a999815aea2ccf9b243091f494456ea"
+      },
+      "voice.mjs": {
+        "bytes": 7500,
+        "sha256": "8675b26ab34225e4bb53aef590f40bef22d4e1cdd0e9873146f00292343c9416"
+      },
+      "wire.mjs": {
+        "bytes": 4135,
+        "sha256": "c60f98f3e8d04bc7492f378108de6726983e33adec494537caa0667ab0ecf3b3"
+      },
+      "worktab.mjs": {
+        "bytes": 9328,
+        "sha256": "51fb1fcee5df176e08eb53afb5168724507a21db32676f5d4068936d0540a27c"
+      },
+      "LICENSE.txt": {
+        "bytes": 2907,
+        "sha256": "957e710bdd438f5e9c825fc610b8efc4f10e173f05a2c8ae99aae46b78e22cfe"
+      },
+      "vendor/LICENSE.marked.txt": {
+        "bytes": 2942,
+        "sha256": "8e3a3f82f59a60958f56ca08f445647c32a4733dc7ca6c2c46f6eb898471ab9c"
+      }
+    }
+  },
+  "initialFailures": {
+    "immutable8adCanonicalHost": "Refused Chromium wrapper inherited LD_LIBRARY_PATH before Python/Node",
+    "externalDiagnosticHost": "Explicit loader-clearing diagnostic admitted host, but stock GNOME new-keyring modal blocked first navigation",
+    "normalKeyringInput": "Initial guarded input refused after dialog closed; first submitted fixture-password confirmation mismatched; all failures retained"
+  },
+  "keyring": {
+    "normalEncryptedPromptCompleted": true,
+    "syntheticFixturePasswordOnly": true,
+    "passwordExposed": false,
+    "weakeningFlagsUsed": false,
+    "nativeHttpGetVerified": true,
+    "secretContentsRead": false,
+    "metadata": {
+      "keyringBytes": 428,
+      "keyringMode": "0600"
+    },
+    "httpResult": {
+      "sha256": "9ee6ec884bfc93e9ec462d32c8f608170366e476199390ec4620112c08bfebfc",
+      "bytes": 428
+    },
+    "inputReceipt": {
+      "sha256": "facfe4b2a59f1388618406bc34d8a6650224871e9b6e0e67c8d258ed0589ec33",
+      "bytes": 283
+    }
+  },
+  "nativeUpgrade": {
+    "from": "0.2.13-3.leap16",
+    "to": "0.2.13-5.leap16",
+    "sourceCommit": "423f0714d1782ef105a5906b3fe6c6efb4573fe0",
+    "normalManagerTransactionPassed": true,
+    "planOnlyApplicationUpgrade": true,
+    "nativeFileAuditPassed": true,
+    "syntheticSettingsRuntimeSelectionAndHistoriesUnchanged": true,
+    "canonicalInstalledHostClearsLoaderBeforePython": true,
+    "result": {
+      "sha256": "dd4e82c7214b2159a1a22e098c3d1e163a3fcc8b3f0b6bf6e79bf0b980114805",
+      "bytes": 2553
+    },
+    "initialPrivateRootWrapperParseRefusalRetained": true,
+    "initialRefusalBeforePackageManagerExecution": true
+  },
+  "frozenSystemStack": {
+    "packages": 23,
+    "members": 2468,
+    "packageRegistrationsAndEveryMemberExact": true,
+    "selinuxEnforcing": true,
+    "result": {
+      "sha256": "3245a0582bab994577c94ff53fd3f8301da04727d44a96c575bd21ecf35e572a",
+      "bytes": 5058
+    }
+  },
+  "headedCanonicalBrowser105": {
+    "exitCode": 1,
+    "fullAcceptance": false,
+    "actualPageAndClipboardBranchEditAssertionsPassedBeforeFailure": true,
+    "reconnectAfterRuntimeShutdownReadinessTimedOutSeconds": 30,
+    "causeEstablished": false,
+    "extensionAll65MembersMatchFresh423Archive": true,
+    "installedPayloadOverlayUsed": false,
+    "probeDigests": {
+      "browser-composable-proof105.py": "3d5d30b1e362884ca32ed7d11f637484c4cd77c927c4de4a1c7c4ed02e754edb",
+      "proof_browser_sandbox.py": "cdedafb597e04ed86a2307c93e7109019df62dd040693aab8542121817bdc24e"
+    },
+    "commandReceipt": {
+      "sha256": "54269ab17d040fe560fb46cd7250767c72226824d5c86461bdef9fc6411aa3a1",
+      "bytes": 398
+    },
+    "stderr": {
+      "sha256": "fe421930523a216441c284e64f7ac0cd9a33cf1ce0472b9fc3505d5df11c63f0",
+      "bytes": 949
+    }
+  },
+  "proofChanges": {
+    "normalNativeWaylandModeAdded": true,
+    "nativeWaylandAcceptance": false,
+    "ownedCompositorSocketRequired": true,
+    "xDisplayRemovedInWaylandMode": true,
+    "fixtureRuntimeStillPrivate": true,
+    "clipboardUsesExplicitBackend": true,
+    "observedFixtureMemoryProcessesGracefullyStopped": 4,
+    "cleanupIncludesMemoryService": true,
+    "sandboxAndDisplayTestsPassed": 8,
+    "clipboardProviderDetachedFromSshChannel": true,
+    "ownedClipboardProviderCleanup": true,
+    "defaultReconnectBudgetSeconds": 30,
+    "explicitEmulatedVmReconnectBudgetSeconds": 90,
+    "productTimeoutsChanged": false
+  },
+  "sourceLicense": {
+    "rootLicenseUnchanged": true,
+    "proposed22FileLicenseScopeUnchanged": true,
+    "licenseReviewComplete": false,
+    "embeddedSourceCoverageComplete": false
+  },
+  "allFiveRolloutPointsComplete": false,
+  "candidateOnly": true,
+  "publicRelease": false,
+  "remaining": [
+    "Current matching Ubuntu/Fedora actual two-instance Settings, cold launch, password lock and reboot",
+    "GNOME/KDE fresh consent, target selection, Stop and input acceptance",
+    "Mint matching artifacts and installed acceptance; Arch/Leap dependency maintenance",
+    "Full graphical Browser reconnect and native Wayland; physical audio; product-version/managed DSH history upgrade and rollback",
+    "Complete source/rebuild/replacement and approved license obligations"
+  ],
+  "extendedReconnectDiagnostic108": {
+    "original30SecondFailuresRetained": true,
+    "readyAfterSeconds": 55.508994864998385,
+    "restoredEditedSession": true,
+    "fixtureModelRequestsUnchanged": 8,
+    "remainingAssertionsCompleted": true,
+    "overallHostCommandTimedOutSeconds": 360,
+    "fixtureClipboardProviderHeldSshStdout": true,
+    "fixtureClipboardProcessStoppedNormally": true,
+    "fullAcceptance": false,
+    "resultSha256": "2eeee0f7656f75b16a5b0f0c00dc53705b9823886ccde914de8ad4c1b60a6968"
+  }
+}

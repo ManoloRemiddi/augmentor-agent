@@ -1,0 +1,35 @@
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+# Candidate guard: install in its own transaction before augmentor-agent.
+pkgname=augmentor-package-guard
+pkgver=0.2.13
+pkgrel=2
+pkgdesc='Durable Augmentor package transaction guard (Arch candidate)'
+arch=('any')
+url='https://github.com/ManoloRemiddi/augmentor-agent'
+license=('custom:Augmentor-MIT-Resale-1.0')
+depends=('python>=3.14' 'pacman' 'systemd')
+source=(
+  'lifecycle.py::https://raw.githubusercontent.com/ManoloRemiddi/augmentor-agent/daf35a3994193b9bc9d4f1aefe74bb7268eb2201/release/linux-package-guard.py'
+  'LICENSE::https://raw.githubusercontent.com/ManoloRemiddi/augmentor-agent/daf35a3994193b9bc9d4f1aefe74bb7268eb2201/LICENSE'
+  'can-remove.py'
+  'augmentor-agent-pre.hook'
+  'augmentor-agent-post.hook'
+  'augmentor-guard-remove.hook'
+)
+sha256sums=(
+  '4bb8a18a41e68a98c5f7816940f8e55bfa2f1a66e5d34ca42cfcb4155c7a9947'
+  '957e710bdd438f5e9c825fc610b8efc4f10e173f05a2c8ae99aae46b78e22cfe'
+  '286559616f9b794573964b8125d85c8c8aaf6050d2459e3c6a635b69009911ab'
+  'c1de487776ee57f6d748a9c73286dccfe1cc835ce5d6dbb08bdfe11a3b6f5831'
+  '32d4f0bc7e35326f4f607ee2945026bfa92c69ca4d0d76cc6030419fbf2e9492'
+  '2e33a6a9eef250a485fba920dd77791c1cc5fa593f4ffcc19a8f64d2217f81bb'
+)
+
+package() {
+  install -Dm644 lifecycle.py "$pkgdir/usr/lib/augmentor-package-guard/lifecycle.py"
+  install -Dm644 can-remove.py "$pkgdir/usr/lib/augmentor-package-guard/can-remove.py"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/augmentor-package-guard/LICENSE"
+  for hook in augmentor-agent-pre.hook augmentor-agent-post.hook augmentor-guard-remove.hook; do
+    install -Dm644 "$hook" "$pkgdir/usr/share/libalpm/hooks/$hook"
+  done
+}

@@ -1,0 +1,78 @@
+{
+  "format": "augmentor-noble-gnome-shortcut-checkpoint/1",
+  "source": {
+    "commit": "a7ee9c55586b6a131524a8c53489463e45f6d515",
+    "dirty": false
+  },
+  "checkpointDate": "2026-10-02",
+  "proofSha256": "75360ee2dc33ec63bbbe7ab97479fed01d66bf33e05c6516f45103e272ec7085",
+  "guestProofSha256": "4b945f846bd32cb668cea0f5a23eb7b34d7df68feb99f0e91401c85f996569c6",
+  "rawReportSha256": "f0381d8910b88808c4eff569582d81faa79c768bf6d4f598769da685834a5c06",
+  "qtSaveComponent": {
+    "qtSaveMouseClicks": 2,
+    "qtConflictMouseClicks": 2,
+    "realNativeSettingsReadback": true,
+    "foreignConflictRefusedWithoutWrites": true,
+    "instanceConflictRefused": true,
+    "fields": [
+      "name",
+      "binding",
+      "command"
+    ],
+    "functionalTested": false,
+    "main": {
+      "schema": 1,
+      "configured": true,
+      "key": {
+        "symbol": "F9",
+        "character": null,
+        "modifiers": [
+          "Shift",
+          "Control",
+          "Alt"
+        ],
+        "binding": "<Shift><Control><Alt>F9"
+      },
+      "functionalTested": false
+    },
+    "secondary": {
+      "schema": 1,
+      "configured": true,
+      "key": {
+        "symbol": "F10",
+        "character": null,
+        "modifiers": [
+          "Shift",
+          "Control",
+          "Alt"
+        ],
+        "binding": "<Shift><Control><Alt>F10"
+      },
+      "functionalTested": false
+    }
+  },
+  "fullDeliveryProofPassed": false,
+  "failure": "The real Desktop Icons focus is absent from the actor inventory; strict observation refuses the inconsistent scene after the first QMP shortcut.",
+  "rawObservation": {
+    "application": "com.rastersoft.ding",
+    "title": "Desktop Icons 1",
+    "windows": [],
+    "blockedReasons": [
+      "no-visible-live-focus"
+    ]
+  },
+  "settingsRestoredBySeparateGuardedAction": true,
+  "canonicalAppShownAndIdleAfterCleanup": true,
+  "installedPackagePatched": false,
+  "sourceFixQualifiedInGuest": false,
+  "gnomeInputToolsEnabled": false,
+  "workingProofChanges": [
+    "release/prove-noble-gnome-shortcuts.py",
+    "release/noble-gnome-shortcut-session.py"
+  ],
+  "limits": [
+    "Qt Save uses the exact installed component in a separate rendered test window, not the running application Settings dialog.",
+    "No shortcut delivery, two-instance, reboot, password unlock, connected-task or portal-input pass is inferred from this failed complete proof.",
+    "The extension source fix requires a separately built/staged artifact before its actual-session acceptance."
+  ]
+}

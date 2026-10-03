@@ -1,0 +1,562 @@
+{
+  "format": "augmentor-arch-clean-complete-installer-checkpoint/1",
+  "date": "2026-10-03",
+  "applicationSource": {
+    "commit": "f85e3760f66f34724663c12f65cd8fe09f2e38c7",
+    "dirty": false
+  },
+  "nativeManifest": {
+    "format": "augmentor-system-qt-native-artifacts/1",
+    "version": "0.2.13",
+    "source": {
+      "commit": "f85e3760f66f34724663c12f65cd8fe09f2e38c7",
+      "dirty": false
+    },
+    "target": "arch20261001-x86_64",
+    "pythonRuntime": {
+      "format": "augmentor-linux-python-runtime-contract/1",
+      "target": "arch20261001-x86_64",
+      "profile": "arch20261001-cp314-x86_64-voice",
+      "pythonAbi": [
+        3,
+        14
+      ],
+      "architecture": "x86_64",
+      "lockIdentity": "3f7167c59f5eed9fe7d24b51cc807219d57c85414bd8a1ca545d2860e94d6659",
+      "policySha256": "b62239f134f08ae2952141587c98f5912a29e1d3c887219e1929f0e23a549780",
+      "licenseReviewComplete": false,
+      "embeddedSourceCoverageComplete": false,
+      "systemQtStack": {
+        "format": "augmentor-system-qt-stack-contract/1",
+        "file": "system-qt-inventory.json",
+        "sha256": "05d28a3a15c20ce8fb4734f204f01414c19f28b52bbf7951a54056f6c417a007",
+        "bytes": 1584771,
+        "qtVersion": "6.11.2",
+        "packageManager": "pacman"
+      }
+    },
+    "package": {
+      "name": "augmentor-agent",
+      "versionRelease": "0.2.13-4",
+      "architecture": "x86_64"
+    },
+    "artifacts": [
+      {
+        "file": "augmentor-agent-0.2.13-4-x86_64.pkg.tar.zst",
+        "sha256": "fc9f2b5396c85af74eff331cd9984d942fdef7976eed849e916efe2940583378",
+        "bytes": 368657893
+      }
+    ],
+    "preparationSha256": "26e75185c1cc88e8be9e988c01acd23da8eb1d7365a78f638c5c13127f68b595",
+    "inspectionSha256": "3bb85fbd6cd54efcd359ae587b119f772792ebc186697ea58740494876f75947",
+    "completeNativePayloadVerified": true,
+    "payloadFileLinkMembers": 29263,
+    "regularFileModePolicy": "Remove group/world write; preserve every other mode bit.",
+    "preparedFileModesNormalized": 0,
+    "appInventoryMembers": 29248,
+    "candidateOnly": true,
+    "installedAcceptance": false,
+    "legalAcceptance": false,
+    "publicRelease": false
+  },
+  "nativeManifestSha256": "ae7874ed287b1b5e23a3b017feb6b86c4bda3542d543bfcf7492e44b24ae7262",
+  "nativeBuildExitCode": 0,
+  "completeStreamingInspectionExitCode": 0,
+  "bundle": {
+    "artifactId": "0.2.13-arch20261001-x86_64-complete-preview.1-f85e3760f66f",
+    "manifestSha256": "f9d706aa023e10e23401c3c9d1ad025cd9845f1b37563d3142127d8a3749bd16",
+    "archiveSha256": "b03a2a7c4e7f54ce3bf5c65bc2ea76d3bfc1aa28770525164f65062a340c20ac",
+    "archiveBytes": 386152705,
+    "sourceRefs": {
+      "augmentor": "f85e3760f66f34724663c12f65cd8fe09f2e38c7",
+      "voice": "7d0fd6d677ea4bbbca0183a6bb3a3d3f24a8147a",
+      "adaptive": "64a1ef82e3d69f57a69809d530c1b9ed0bc67480"
+    },
+    "dependencySourceArchives": {
+      "voice": {
+        "kind": "npm-distributed-source",
+        "file": "dsh-resonant-voice-0.1.19-distributed-source.tgz",
+        "sha256": "793730ae6da8addd05fa70d82a2fe7341c1d469dc9ff415be2879d165022d36e",
+        "provenanceFile": "voice-distributed-source.json",
+        "provenanceSha256": "34a9ecb31357fb94821bf69cd441e85d827c2bca53272c7a5311c44a19e5a40c",
+        "fullRepositorySnapshot": false,
+        "upstreamRefBinding": "Declared by publicly tracked release/dsh/plugins/README.md; not independently verified against private repository commit contents."
+      },
+      "adaptive": {
+        "kind": "published-repository-source-snapshot",
+        "file": "adaptive-reasoning-0.2.3-source.tar.gz",
+        "sha256": "45f0c4ec98099c384eb6c6556806acdbda560799e90a1192990dadd1355a2ea8"
+      }
+    }
+  },
+  "freshFixture": {
+    "container": "augmentor-arch-complete-20261003-80",
+    "id": "8abec041ee6ceee585f33bd49192bb31ac7279a2e8337d75867ae65368f8667f",
+    "image": "sha256:31986996e159cc8d10eb32000196ce468ba5b961253e8df14037483a9c8bdca1",
+    "marker": "Owned Augmentor arch complete setup fixture; synthetic users only; no host devices or mounts\n",
+    "mounts": [],
+    "devices": [],
+    "privileged": false,
+    "applicationInitiallyAbsent": true,
+    "network": [
+      "bridge"
+    ],
+    "fixtureDocumentationExclusionCorrected": true,
+    "realDesktopOrAudio": false,
+    "ownerStateChanged": false
+  },
+  "fullRootAndUserProof": {
+    "target": "arch20261001-x86_64",
+    "sourceCommit": "f85e3760f66f34724663c12f65cd8fe09f2e38c7",
+    "bundle": "0.2.13-arch20261001-x86_64-complete-preview.1-f85e3760f66f",
+    "proofScriptSha256": "7327e2e6cb8b6f81e3782297998218f0afa8803b7cf88b4af75bb26e14b84fcf",
+    "setupScriptSha256": "f70373f9669b81dcf081d1237704803e45278ca4633155b629d9a6012712a51c",
+    "bundleSetupScriptSha256": "f70373f9669b81dcf081d1237704803e45278ca4633155b629d9a6012712a51c",
+    "setupScriptMatchesBundle": true,
+    "installerOverlayUsed": false,
+    "ordinaryUserSetup": true,
+    "realInstalledDshAndPlugins": true,
+    "offscreenNativeRender": true,
+    "secondWindowEntry": true,
+    "nativeHostRegistered": true,
+    "repeatPreservesSettings": true,
+    "linuxAndBrowserRoleFixtureTurns": true,
+    "restartPreservesHistoryWithoutReplay": true,
+    "modelRequests": 4,
+    "realDesktopSessionTested": false,
+    "graphicalBrowserTested": false,
+    "physicalVoiceTested": false,
+    "memoryEngineTested": false,
+    "pythonRuntime": {
+      "format": "augmentor-linux-python-runtime-contract/1",
+      "target": "arch20261001-x86_64",
+      "profile": "arch20261001-cp314-x86_64-voice",
+      "pythonAbi": [
+        3,
+        14
+      ],
+      "architecture": "x86_64",
+      "lockIdentity": "3f7167c59f5eed9fe7d24b51cc807219d57c85414bd8a1ca545d2860e94d6659",
+      "policySha256": "b62239f134f08ae2952141587c98f5912a29e1d3c887219e1929f0e23a549780",
+      "licenseReviewComplete": false,
+      "embeddedSourceCoverageComplete": false,
+      "systemQtStack": {
+        "format": "augmentor-system-qt-stack-contract/1",
+        "file": "system-qt-inventory.json",
+        "sha256": "05d28a3a15c20ce8fb4734f204f01414c19f28b52bbf7951a54056f6c417a007",
+        "bytes": 1584771,
+        "qtVersion": "6.11.2",
+        "packageManager": "pacman"
+      }
+    },
+    "selectedPython": "/home/augmentor-complete-proof/.local/share/augmentor/python-runtimes/arch20261001-cp314-x86_64-voice-3f7167c59f5eed9f/bin/python3",
+    "licenseReviewComplete": false,
+    "embeddedSourceCoverageComplete": false,
+    "systemPlan": {
+      "target": "arch20261001-x86_64",
+      "packageManager": "pacman",
+      "packages": [
+        "augmentor-agent-0.2.13-4-x86_64.pkg.tar.zst"
+      ],
+      "pythonRuntime": {
+        "format": "augmentor-linux-python-runtime-contract/1",
+        "target": "arch20261001-x86_64",
+        "profile": "arch20261001-cp314-x86_64-voice",
+        "pythonAbi": [
+          3,
+          14
+        ],
+        "architecture": "x86_64",
+        "lockIdentity": "3f7167c59f5eed9fe7d24b51cc807219d57c85414bd8a1ca545d2860e94d6659",
+        "policySha256": "b62239f134f08ae2952141587c98f5912a29e1d3c887219e1929f0e23a549780",
+        "licenseReviewComplete": false,
+        "embeddedSourceCoverageComplete": false,
+        "systemQtStack": {
+          "format": "augmentor-system-qt-stack-contract/1",
+          "file": "system-qt-inventory.json",
+          "sha256": "05d28a3a15c20ce8fb4734f204f01414c19f28b52bbf7951a54056f6c417a007",
+          "bytes": 1584771,
+          "qtVersion": "6.11.2",
+          "packageManager": "pacman"
+        }
+      },
+      "dependencies": [
+        "ca-certificates",
+        "python-pip",
+        "npm",
+        "portaudio",
+        "alsa-lib",
+        "alsa-plugins",
+        "libpulse"
+      ],
+      "command": [
+        "sudo",
+        "pacman",
+        "-U",
+        "--noconfirm",
+        "/tmp/complete-bundle80/augmentor-agent-0.2.13-4-x86_64.pkg.tar.zst"
+      ],
+      "commands": [
+        [
+          "sudo",
+          "pacman",
+          "-S",
+          "--needed",
+          "--noconfirm",
+          "ca-certificates",
+          "python-pip",
+          "npm",
+          "portaudio",
+          "alsa-lib",
+          "alsa-plugins",
+          "libpulse"
+        ],
+        [
+          "sudo",
+          "pacman",
+          "-U",
+          "--noconfirm",
+          "/tmp/complete-bundle80/augmentor-package-guard-0.2.13-2-any.pkg.tar.zst"
+        ],
+        [
+          "sudo",
+          "pacman",
+          "-U",
+          "--noconfirm",
+          "/tmp/complete-bundle80/augmentor-agent-0.2.13-4-x86_64.pkg.tar.zst"
+        ]
+      ],
+      "bootstrapPython": "/usr/bin/python3",
+      "guardVerificationBeforeApplication": true,
+      "installedOutcomeVerificationRequired": true,
+      "memoryEngine": "deferred",
+      "installMemoryEngine": false,
+      "qualification": "Package adapter; real desktop/browser/voice acceptance is separate."
+    }
+  },
+  "fullProofSha256": "384c5bfe4605a126d2b3b1fb722e171ede9fa427f544163e3473d5b13b7da3a2",
+  "matchingBundleInstallerPassed": true,
+  "externalInstallerOverlayUsed": false,
+  "nativeNpmReceipt": {
+    "npm": "12.2.0",
+    "node": "24.19.0",
+    "engines": "^22.22.2 || ^24.15.0 || >=26.0.0",
+    "cli": "/usr/lib/node_modules/npm/bin/npm-cli.js"
+  },
+  "surfaceFontProof": {
+    "format": "augmentor-linux-surface-font-proof/1",
+    "uid": 1000,
+    "qtVersion": "6.11.2",
+    "designSha256": "084a183cca4d930343120031a0eedae14926e39391ea3f4b0037973b400b4afe",
+    "probeSha256": "ac06d6f818f37904618ca6d2a4bb768f49153770ab609e0f27b9d147508334bd",
+    "primaryFamily": "DejaVu Sans",
+    "primaryStyle": "Book",
+    "pixelSize": 15,
+    "glyphs": {
+      "newchat": {
+        "text": "\uff0b",
+        "codepoints": [
+          "U+FF0B"
+        ],
+        "primaryIndexes": [
+          0
+        ],
+        "runs": [
+          {
+            "family": "Noto Sans CJK KR",
+            "style": "Regular",
+            "indexes": [
+              59057
+            ]
+          }
+        ],
+        "present": true,
+        "advance": 15.0,
+        "iconWidth": 24
+      },
+      "save": {
+        "text": "\u2606",
+        "codepoints": [
+          "U+2606"
+        ],
+        "primaryIndexes": [
+          3806
+        ],
+        "runs": [
+          {
+            "family": "DejaVu Sans",
+            "style": "Book",
+            "indexes": [
+              3806
+            ]
+          }
+        ],
+        "present": true,
+        "advance": 13.4375,
+        "iconWidth": 24
+      },
+      "saved": {
+        "text": "\u2605",
+        "codepoints": [
+          "U+2605"
+        ],
+        "primaryIndexes": [
+          3805
+        ],
+        "runs": [
+          {
+            "family": "DejaVu Sans",
+            "style": "Book",
+            "indexes": [
+              3805
+            ]
+          }
+        ],
+        "present": true,
+        "advance": 13.4375,
+        "iconWidth": 24
+      },
+      "sessions": {
+        "text": "\u2630",
+        "codepoints": [
+          "U+2630"
+        ],
+        "primaryIndexes": [
+          3848
+        ],
+        "runs": [
+          {
+            "family": "DejaVu Sans",
+            "style": "Book",
+            "indexes": [
+              3848
+            ]
+          }
+        ],
+        "present": true,
+        "advance": 13.4375,
+        "iconWidth": 24
+      },
+      "pin": {
+        "text": "\u2316",
+        "codepoints": [
+          "U+2316"
+        ],
+        "primaryIndexes": [
+          0
+        ],
+        "runs": [
+          {
+            "family": "Noto Sans Symbols 2",
+            "style": "Regular",
+            "indexes": [
+              1481
+            ]
+          }
+        ],
+        "present": true,
+        "advance": 11.25,
+        "iconWidth": 24
+      },
+      "compact": {
+        "text": "\u25cc",
+        "codepoints": [
+          "U+25CC"
+        ],
+        "primaryIndexes": [
+          3748
+        ],
+        "runs": [
+          {
+            "family": "DejaVu Sans",
+            "style": "Book",
+            "indexes": [
+              3748
+            ]
+          }
+        ],
+        "present": true,
+        "advance": 13.078125,
+        "iconWidth": 24
+      },
+      "more": {
+        "text": "\u22ef",
+        "codepoints": [
+          "U+22EF"
+        ],
+        "primaryIndexes": [
+          3450
+        ],
+        "runs": [
+          {
+            "family": "DejaVu Sans",
+            "style": "Book",
+            "indexes": [
+              3450
+            ]
+          }
+        ],
+        "present": true,
+        "advance": 15.0,
+        "iconWidth": 24
+      },
+      "hide": {
+        "text": "\u00d7",
+        "codepoints": [
+          "U+00D7"
+        ],
+        "primaryIndexes": [
+          153
+        ],
+        "runs": [
+          {
+            "family": "DejaVu Sans",
+            "style": "Book",
+            "indexes": [
+              153
+            ]
+          }
+        ],
+        "present": true,
+        "advance": 12.5625,
+        "iconWidth": 24
+      },
+      "latest": {
+        "text": "\u2193",
+        "codepoints": [
+          "U+2193"
+        ],
+        "primaryIndexes": [
+          3102
+        ],
+        "runs": [
+          {
+            "family": "DejaVu Sans",
+            "style": "Book",
+            "indexes": [
+              3102
+            ]
+          }
+        ],
+        "present": true,
+        "advance": 12.5625,
+        "iconWidth": 24
+      },
+      "send": {
+        "text": "\u2191",
+        "codepoints": [
+          "U+2191"
+        ],
+        "primaryIndexes": [
+          3100
+        ],
+        "runs": [
+          {
+            "family": "DejaVu Sans",
+            "style": "Book",
+            "indexes": [
+              3100
+            ]
+          }
+        ],
+        "present": true,
+        "advance": 12.5625,
+        "iconWidth": 24
+      },
+      "stop": {
+        "text": "\u25a0",
+        "codepoints": [
+          "U+25A0"
+        ],
+        "primaryIndexes": [
+          3704
+        ],
+        "runs": [
+          {
+            "family": "DejaVu Sans",
+            "style": "Book",
+            "indexes": [
+              3704
+            ]
+          }
+        ],
+        "present": true,
+        "advance": 14.171875,
+        "iconWidth": 24
+      },
+      "improve": {
+        "text": "\u2726",
+        "codepoints": [
+          "U+2726"
+        ],
+        "primaryIndexes": [
+          4023
+        ],
+        "runs": [
+          {
+            "family": "DejaVu Sans",
+            "style": "Book",
+            "indexes": [
+              4023
+            ]
+          }
+        ],
+        "present": true,
+        "advance": 12.5625,
+        "iconWidth": 24
+      }
+    },
+    "passed": true,
+    "realDesktopTested": false,
+    "ownerStateChanged": false
+  },
+  "screenshotSha256": "bffba1403d275e3a2a4193a829dea4b5e2c61697b2dff4e005e400e98ffe95cb",
+  "nativeAuditExitCode": 0,
+  "finalOfflineFixture": {
+    "containerId": "8abec041ee6ceee585f33bd49192bb31ac7279a2e8337d75867ae65368f8667f",
+    "image": "sha256:31986996e159cc8d10eb32000196ce468ba5b961253e8df14037483a9c8bdca1",
+    "networks": [],
+    "nativeAuditExitCode": 0,
+    "ordinaryUserFontProbeExitCode": 0,
+    "ownerStateChanged": false
+  },
+  "logs": {
+    "arch-plan.stdout": "5d9e8d2d4b28aaffa521ac6a1cadeadb7c09f559b51162cbb34df5936d22337c",
+    "arch-dependency-solver.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "arch-plan.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "arch-font-probe.stdout": "b041f1cde6bd9438f5b6d3d214fdcc5672d308ab75ea25364f7b27ef17a75a14",
+    "arch-complete-proof.stderr": "5a7b117553c066b8af32e867ae5f43ffdebb5c02c2e255e6ed077f7659120df4",
+    "arch-complete-proof.stdout": "4413725c4b513207cc52bc640a7ff4e998d60e76365eb1ad146e5c6618005deb",
+    "arch-dependency-solver.stdout": "74917e5dbfd8fadd66e30de9b3a36af40ef0dde120ba71105d50a9fd5398e67d",
+    "arch-final-native-audit.stdout": "b8a59c52734ae1d9c27040dc59f5dd2c8fd1d782962e25b19c579b341ff177d9",
+    "arch-final-native-audit.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "arch-assemble.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "arch-font-probe.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "arch-assemble.stdout": "fece0f5c31a88cc85b25498465bc8d87e4efc6802b6c9247cd79bb4570812035"
+  },
+  "nativeCacheReuse": {
+    "manifestSha256": "1bc43659a19f7e418afce614190c9ad48ccb6641e229c447d8bf5ace4079e83b",
+    "regularArchiveAndSignatureFiles": 548,
+    "bytes": 593645665,
+    "normalManagerReverifiedSignatures": true,
+    "signaturePolicyUnchanged": true,
+    "onlyArchivesCopiedNoUserStateOrKeys": true,
+    "downloadScratchDirectoriesExcluded": true,
+    "initialBroadCacheTransferRefused": true
+  },
+  "nonBootedFixtureLimit": "Native kmod/systemd hooks report no booted system bus/kernel-module activation. Application-specific guard and file audit pass; real dictation permission/boot behavior is not qualified.",
+  "earlierFailurePreserved": "Exact clean8ad Arch bundle fails at nested semver; external corrected78 resume remains separately identified. This fresh cleanf85 release4 run replaces that pending matching-bundle gate only for these exact bytes.",
+  "regressionMethodsPassed": 7,
+  "regressionCopyFixturePortable": true,
+  "ownerStateChanged": false,
+  "recipientLicenseFilesUnchanged": true,
+  "licenseReviewComplete": false,
+  "embeddedSourceCoverageComplete": false,
+  "publicReleaseQualified": false,
+  "remaining": [
+    "Both exact Archf85 and Leap8ad container installers now pass; later artifacts need their own source-bound checks.",
+    "Coherent native dependency updates and interrupted/resumed native transactions, boot/service recovery.",
+    "Current Ubuntu/Fedora/Mint graphical sessions, GNOME/KDE consent/Stop/input, normal sandboxed graphical Browser and physical audio.",
+    "Product-version and managed DSH/history update/rollback; source/legal/rebuild/replacement acceptance and owner license decision."
+  ]
+}

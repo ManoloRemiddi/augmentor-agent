@@ -1,0 +1,59 @@
+{
+  "format": "augmentor-source-qt-recipient-execution-proof/1",
+  "results": [
+    {
+      "qt": "6.8.2",
+      "isValid": true,
+      "svgLibrary": "/work/qt/lib/libQt6Svg.so.6.8.2",
+      "svgSha256": "8d3aa8b980b270037f20735eb15d53a465bdd27959b390bb4bae2da876777a49",
+      "qtMappedFiles": [
+        "/work/qt/lib/libQt6Core.so.6.8.2",
+        "/work/qt/lib/libQt6DBus.so.6.8.2",
+        "/work/qt/lib/libQt6Gui.so.6.8.2",
+        "/work/qt/lib/libQt6Svg.so.6.8.2",
+        "/work/qt/lib/libQt6Widgets.so.6.8.2"
+      ]
+    },
+    {
+      "qt": "6.8.2",
+      "isValid": false,
+      "svgLibrary": "/work/qt-recipient-candidate/lib/libQt6Svg.so.6.8.2",
+      "svgSha256": "a985e33587010af0fc4a7dbea3b3f36082b6f04488f37255da36e3fd4218047f",
+      "qtMappedFiles": [
+        "/work/qt-recipient-candidate/lib/libQt6Core.so.6.8.2",
+        "/work/qt-recipient-candidate/lib/libQt6DBus.so.6.8.2",
+        "/work/qt-recipient-candidate/lib/libQt6Gui.so.6.8.2",
+        "/work/qt-recipient-candidate/lib/libQt6Svg.so.6.8.2",
+        "/work/qt-recipient-candidate/lib/libQt6Widgets.so.6.8.2"
+      ]
+    }
+  ],
+  "originalRuntimePreserved": true,
+  "actualModifiedSvgBehaviorExecuted": true,
+  "explicitRuntimeEnvironmentRequired": true,
+  "producerTreeAbsent": true,
+  "selectedApplicationChanged": false,
+  "ownerStateChanged": false,
+  "fullProductReplacementQualified": false,
+  "sourceBase": "000c10e5139d76bc625965c7cdeb1cab1ddf6362",
+  "build": {
+    "format": "augmentor-qt-recipient-modified-library-build/1",
+    "archiveSha256": "aa2579f21ca66d19cbcf31d87e9067e07932635d36869c8239d4decd0a9dc1fa",
+    "toolSha256": "440b4cfe57a516d519d75585365f109b2842e6ffb182b96fc7a3819c2d970591",
+    "sourceFile": "src/svg/qsvgrenderer.cpp",
+    "sourceBeforeSha256": "40f5a00d34126d1b9781896370da2225565581acf5912e093a346d8e973626a9",
+    "sourceAfterSha256": "301548f4a5537ac2c78cadcea03cdced56bad8f959ef3a5f3ce6b732e5ae72c7",
+    "patchSha256": "cd5ed96fd32588530943814f0f8b0d288b4ec178e02d1ed20054a6bb902b8d2d",
+    "changedLibrarySha256": "a985e33587010af0fc4a7dbea3b3f36082b6f04488f37255da36e3fd4218047f",
+    "change": "QSvgRenderer.isValid deliberately returns false for the synthetic replacement proof",
+    "freshSvgSourceAndBuild": true,
+    "matchingSourceBuiltQtSdkReusedAsDependency": true,
+    "producerSdkChanged": false,
+    "completedCommands": 3,
+    "actualRecipientExecutionQualified": true,
+    "fullProductQualified": false,
+    "licenseReviewComplete": false
+  },
+  "executionScriptSha256": "c7fa3c00ed82dd7218f2ba459c913072c2a488c2c5f6bccd00ab3ba38a8b2c9a",
+  "initialNestedSdkCopyCorrectedBeforeBuild": true
+}

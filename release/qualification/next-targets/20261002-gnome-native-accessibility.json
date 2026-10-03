@@ -1,0 +1,208 @@
+{
+  "format": "augmentor-gnome-native-read-only-accessibility/1",
+  "date": "2026-10-02",
+  "environment": {
+    "distribution": "Fedora44",
+    "desktop": "GNOME50.5",
+    "sessionType": "wayland",
+    "uid": 1000,
+    "user": "augmentor-proof",
+    "hypervisor": "ownedQemu",
+    "selinux": "Enforcing",
+    "atspiPackage": "at-spi2-core-2.60.7-1.fc44",
+    "gtkPackage": "gtk4-4.22.5-2.fc44"
+  },
+  "sourceSha256": {
+    "a11y_helper.py": "4b6fc94396ca3f3282d1fd59d0484e8680d5e548584e08fb4084892d4841e788",
+    "a11y_service.py": "e6547181f01f44b67f0468fda001a50df0c619f71324282009b2a1b38de423ba",
+    "probe-gnome-accessibility.py": "ff26bd857c54fc08b89acab2678cdc67b365089438296c8a872cd73de5326f4b",
+    "probe-gnome-target.py": "bfff827b888abb56275d54e24a5b9acfbc1eab458d20f50740ada944a32d4fc2"
+  },
+  "selectedSource": "aef93bb04520a003c5c48536aa6d4210105fc8ad",
+  "nativeTargetCases": [
+    {
+      "probeVersion": 5,
+      "reportSha256": "e5a87ab23c2f2c66f986b775f9d4ef1a863115530696e1f79496d41e78669156",
+      "targetStateSha256": "d8fd4d7a11d3de7cce297a257a5100d0bbf694a230c899cdd0fa6682e24dbd99",
+      "targetPid": 9535,
+      "displayType": "GdkWaylandDisplay",
+      "discoveredApplicationAfterHelperStarted": true,
+      "beforePresentationComplete": false,
+      "focusSequence": [
+        "entryA",
+        "entryB",
+        "entryA",
+        "password"
+      ],
+      "recordIndices": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "eventSerials": [
+        1,
+        3,
+        5,
+        7
+      ],
+      "focusReadDurationsSeconds": [
+        0.5561629980002181,
+        0.5887287320001633,
+        0.5879523920011707,
+        0.5994834500015713
+      ],
+      "passwordRole": 40,
+      "callbackOnOwningThread": true,
+      "freshEpochRequiredAfterTargetExit": true,
+      "targetExitRefusal": {
+        "kind": "FileNotFoundError",
+        "durationSeconds": 0.022483936001663096
+      },
+      "targetTextEmpty": true,
+      "targetButtonClicks": {
+        "center": 0,
+        "edge": 0
+      }
+    },
+    {
+      "probeVersion": 8,
+      "reportSha256": "bc8ef4790c79256b94fa429322e82ed64ceff6946c4df61f12a588a448f6f1b8",
+      "targetStateSha256": "1d91a4a10a117085f34e350624cc81995cf9bf62843410426a236e18c97f7257",
+      "targetPid": 10091,
+      "displayType": "GdkX11Display",
+      "discoveredApplicationAfterHelperStarted": true,
+      "beforePresentationComplete": false,
+      "focusSequence": [
+        "entryA",
+        "entryB",
+        "entryA",
+        "password"
+      ],
+      "recordIndices": [
+        3,
+        5,
+        6,
+        7
+      ],
+      "eventSerials": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "focusReadDurationsSeconds": [
+        0.3314645080026821,
+        0.37147170800017193,
+        0.3691190110039315,
+        0.3576362319945474
+      ],
+      "passwordRole": 40,
+      "callbackOnOwningThread": true,
+      "freshEpochRequiredAfterTargetExit": true,
+      "targetExitRefusal": {
+        "kind": "FileNotFoundError",
+        "durationSeconds": 0.022650453000096604
+      },
+      "targetTextEmpty": true,
+      "targetButtonClicks": {
+        "center": 0,
+        "edge": 0
+      }
+    }
+  ],
+  "stalledChildCases": [
+    {
+      "probeVersion": 6,
+      "reportSha256": "d1dda07f94c07f7dc75db8ecd2ff445233eca32e63a15d756101d2b776483763",
+      "ownedChildDeliberatelyPaused": true,
+      "operation": "cancel",
+      "durationSecondsIncludingChildDisposal": 0.2889804070000537,
+      "error": "Accessibility read cancelled.",
+      "helperPermanentlyClosed": true
+    },
+    {
+      "probeVersion": 7,
+      "reportSha256": "12d791765f95211628d829c8574512330702019b8841fa3cc9c2ca5e2cb6b1e6",
+      "ownedChildDeliberatelyPaused": true,
+      "operation": "deadline",
+      "durationSecondsIncludingChildDisposal": 0.5162317579961382,
+      "error": "Accessibility read deadline exceeded.",
+      "helperPermanentlyClosed": true
+    }
+  ],
+  "nativeIncompleteHistory": [
+    {
+      "probeVersion": 1,
+      "causeEstablished": false,
+      "description": "First read returned incomplete; later successes do not diagnose it."
+    },
+    {
+      "probeVersion": 8,
+      "recordIndex": 2,
+      "phase": "accessible-tree",
+      "kind": "Error",
+      "description": "First post-presentation tree query refused incomplete; a later complete read is retained separately."
+    }
+  ],
+  "priorSourceCases": [
+    {
+      "probeVersion": 3,
+      "sourceSha256": {
+        "a11y_helper.py": "8fddc7e411b9259ed095fe2e1d811d5a905adf37a8e1a27fbd3fe0a43776db2c",
+        "a11y_service.py": "e6547181f01f44b67f0468fda001a50df0c619f71324282009b2a1b38de423ba",
+        "probe-gnome-accessibility.py": "ff26bd857c54fc08b89acab2678cdc67b365089438296c8a872cd73de5326f4b",
+        "probe-gnome-target.py": "aba8786b436db6fb031f7d62478cecd18da8bee1d954ec86fbd48991a3bf60b9"
+      },
+      "reportSha256": "a3d214df7774ad77c88f9e7ae7867f4f3540c1d39cd215c687f01d193feeb8fa",
+      "gtkBackendExplicitlyVerified": false
+    },
+    {
+      "probeVersion": 4,
+      "sourceSha256": {
+        "a11y_helper.py": "8fddc7e411b9259ed095fe2e1d811d5a905adf37a8e1a27fbd3fe0a43776db2c",
+        "a11y_service.py": "e6547181f01f44b67f0468fda001a50df0c619f71324282009b2a1b38de423ba",
+        "probe-gnome-accessibility.py": "ff26bd857c54fc08b89acab2678cdc67b365089438296c8a872cd73de5326f4b",
+        "probe-gnome-target.py": "aba8786b436db6fb031f7d62478cecd18da8bee1d954ec86fbd48991a3bf60b9"
+      },
+      "reportSha256": "bad5286163cf912ef8239a4cff8c55a4271ecf20ec7dfff2835347d0a3c121a8",
+      "gtkBackendExplicitlyVerified": false
+    }
+  ],
+  "gtkStateFacts": {
+    "ordinaryEntryEditable": true,
+    "ordinaryEntrySensitive": true,
+    "ordinaryEntryEnabled": false,
+    "sourceExplanation": "GTK4.22.5 collect_states sets SENSITIVE from disabled state and does not set ENABLED. Raw fields remain distinct.",
+    "primarySource": "https://github.com/GNOME/gtk/blob/4.22.5/gtk/a11y/gtkatspicontext.c",
+    "showingAndFocusedAloneAuthorizeInput": false
+  },
+  "verification": {
+    "nativeSuiteRun": 756,
+    "nativeSuitePassed": 754,
+    "platformSkips": 2,
+    "logSha256": "614c3d55a47c6761b356f28aac0113b064e04932f27d18d6130627914d61d8a3",
+    "parentProtocolTests": 14,
+    "actualNativeCasesAreSeparateFromSyntheticProtocolTests": true
+  },
+  "scope": {
+    "parentImportsAtspi": false,
+    "accessibleNamesDescriptionsTextOrValuesReadByHelper": false,
+    "inputSentByCandidate": false,
+    "portalInputSent": false,
+    "operatorQmpOnlyFocusedSyntheticWidgets": true,
+    "productionGnomeFocusDiscoveryEnabled": false,
+    "productionGnomeKeyboardEnabled": false,
+    "productionGnomePointerEnabled": false,
+    "ownerStateChanged": false,
+    "selectedApplicationChanged": false,
+    "publicReleaseQualified": false
+  },
+  "remaining": [
+    "Integrate only after independent shell-window identity and helper epoch/serial checks bind the same selected target.",
+    "Prove real registry/launcher/a11y-bus owner replacement with target alive; target exit is process disappearance here.",
+    "Prove inaccessible/ambiguous/defunct/bounded trees and events during native walks.",
+    "Prove lock/unlock, Stop and stale-token/per-character refusal on supported GNOME profiles.",
+    "Qualify real pointer/keyboard widget outcomes and KDE threading regressions before enabling production input."
+  ]
+}

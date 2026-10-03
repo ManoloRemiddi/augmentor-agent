@@ -1,0 +1,60 @@
+{
+  "format": "augmentor-gnome-existing-native-ui-proof/1",
+  "shellVersion": "50.5",
+  "platform": "wayland",
+  "privateCompositorOwnerMatches": true,
+  "syntheticInput": true,
+  "hostInputDevicesMounted": false,
+  "canonicalProductionLauncherTested": true,
+  "initialPreviewProcesses": true,
+  "nodeVersion": "v24.19.0",
+  "pythonVersion": "3.14.7",
+  "packages": [
+    "gnome-shell-50.5-1.fc44.x86_64",
+    "mutter-50.5-1.fc44.x86_64",
+    "gnome-settings-daemon-50.1-1.fc44.x86_64",
+    "python3-pyside6-6.11.2-1.fc44.x86_64",
+    "qt6-qtbase-6.11.2-2.fc44.x86_64",
+    "python3-gobject-3.56.3-1.fc44.x86_64",
+    "gtk4-4.22.5-2.fc44.x86_64"
+  ],
+  "serviceStartupTested": false,
+  "closedAppLaunchTested": false,
+  "actualLoginRebootTested": false,
+  "modelRequestsTested": false,
+  "inputQualified": false,
+  "checks": {
+    "independentExistingProcesses": true,
+    "bothHideRestoreDelivered": true,
+    "mainRestoreFocus": true,
+    "secondaryRestoreFocus": true,
+    "mainComposerReceivesKey": true,
+    "secondaryComposerReceivesKey": true
+  },
+  "sourceSha256": {
+    "release/prove-gnome-native-ui.py": "682388ffe2c58ce96c2fc4ca3e6269eaa30f50399875308454d117f97cdf3765",
+    "release/prove-gnome-discovery.py": "8fcddd93c0748d4dc709dc45dd19cded9b1106300b79c4421bb24bd426ae94ef",
+    "scripts/install-desktop-startup.py": "de5a4db4722db48bb2f18c549f5fb9e8b145214de93b09db795edc89c9ff6204",
+    "scripts/desktop-launch.py": "6a628bd50fec2039ef3c21ea9494adf83899560e539be88ea61a05303583efb8",
+    "apps/native/augmentor_linux/window.py": "ae755a18e130749d50e0013e27500bbc3e89b2935e3794c6d360f2d27d45d221",
+    "apps/native/augmentor_linux/ui_testing.py": "b169d37937779e057a20c7e2dbab5c1a7bed892b24ead24f1a504d386fcbcf69",
+    "services/desktop/gnome_shortcuts.py": "e889864eab0a15ac53b17af73b457bc634ffc7911f2f8fb6623bbd3e0cf1e332",
+    "services/desktop/gnome.py": "2b46eadc83614e73eacf18a9422bb78bdb1e1557f07de13c84e696576133130d",
+    "services/desktop/gnome-extension/observer@augmentoragent.com/extension.js": "48897dc5a9ce5be70f1a2affdfb686309e7b8f0b15d6e0692380f5c00100f6a2",
+    "services/desktop/gnome-extension/observer@augmentoragent.com/metadata.json": "a7efef723de923d96cd0039c21513251e09a847d4ae52b790355fc023a19511e",
+    "release/gnome-native-ui.Dockerfile": "0b036792e96cc2aee9b8374818a365434b11157e556adcf5177dfb9334dc743b"
+  },
+  "checkpointDate": "2026-10-02",
+  "baseSource": "837bef172c3ec6fe8df86cf4331c3a035088394b",
+  "workingSourceChanges": [
+    "apps/native/augmentor_linux/window.py"
+  ],
+  "baseImage": "docker.io/library/fedora@sha256:43b29f65a41eb9c35e1cd5323e3bdf3b655c2357a9f4f1ff2f9c2798e5045d80",
+  "imageId": "sha256:7d65830759a6f81f3fbc09c825f2b2a73b1016fed7f6543a59456dbf018f0ffe",
+  "privateDummyLoginManager": true,
+  "networkEnabled": false,
+  "observerAutoInstalledInProduct": false,
+  "gnomeInputToolsEnabled": false,
+  "currentSourceNativePackageTested": false,
+  "rawReportSha256": "bb792965347a425a49e90e26b42dbb6465c7e826e9d81019421995480840c9e7"
+}

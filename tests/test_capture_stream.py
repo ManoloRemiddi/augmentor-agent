@@ -7,7 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'services/desktop'))
 try:
-    from capture_stream import Gst, receive_frame, rgb_frame_layout
+    from capture_stream import GLib,Gst, receive_frame, rgb_frame_layout
 except (ImportError, ValueError) as error:
     raise unittest.SkipTest('GStreamer introspection is unavailable: '+str(error))
 
@@ -27,6 +27,29 @@ class CaptureStreamTests(unittest.TestCase):
     def test_frame(self):
         pipeline = self.pipeline('videotestsrc num-buffers=1 ! appsink name=capture')
         self.assertIsNotNone(receive_frame(pipeline, threading.Event()).get_buffer())
+
+    def test_private_context_delivers_cancellation_without_default_dispatch(self):
+        pipeline=self.pipeline('appsrc is-live=true ! appsink name=capture')
+        context=GLib.MainContext.new();cancel=threading.Event();delivered=[];default_delivered=[]
+        source=GLib.idle_source_new()
+        def stop(*_):delivered.append(threading.get_ident());cancel.set();return GLib.SOURCE_REMOVE
+        source.set_callback(stop);source.attach(context);self.addCleanup(source.destroy)
+        default_source=GLib.idle_source_new()
+        def default_callback(*_):default_delivered.append(threading.get_ident());return GLib.SOURCE_REMOVE
+        default_source.set_callback(default_callback);default_source.attach(GLib.MainContext.default())
+        self.addCleanup(default_source.destroy)
+        with self.assertRaisesRegex(RuntimeError,'stopped'):receive_frame(pipeline,cancel,context=context)
+        self.assertEqual(delivered,[threading.get_ident()])
+        self.assertEqual(default_delivered,[])
+
+    def test_checkpoint_can_invalidate_arriving_frame(self):
+        pipeline=self.pipeline('videotestsrc num-buffers=1 ! appsink name=capture')
+        calls=[]
+        def checkpoint():
+            calls.append(True)
+            if len(calls)==2:raise RuntimeError('Session revoked')
+        with self.assertRaisesRegex(RuntimeError,'Session revoked'):
+            receive_frame(pipeline,threading.Event(),checkpoint=checkpoint)
 
     def test_eos_without_frame(self):
         pipeline = self.pipeline('videotestsrc num-buffers=0 ! appsink name=capture')
@@ -67,7 +90,9 @@ class CaptureStreamTests(unittest.TestCase):
     def test_invalid_rgb_layout(self):
         for caps in (None, Gst.Caps.from_string('video/x-raw,format=I420,width=2,height=2'),
                      Gst.Caps.from_string('video/x-raw,format=RGB,width=0,height=2'),
-                     Gst.Caps.from_string('video/x-raw,format=RGB,width=2')):
+                     Gst.Caps.from_string('video/x-raw,format=RGB,width=2'),
+                     Gst.Caps.from_string('video/x-raw,format=RGB,width=(string)2,height=2'),
+                     Gst.Caps.from_string('video/x-raw,format=RGB,width=2,height=(boolean)true')):
             with self.subTest(caps=caps), self.assertRaisesRegex(RuntimeError, 'invalid dimensions'):
                 rgb_frame_layout(caps, 1024)
 

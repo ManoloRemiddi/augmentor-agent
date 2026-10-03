@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-"""Guided fresh-user setup for the complete, checksummed Debian preview bundle."""
+"""Guided fresh-user setup for a complete, checksummed Linux preview bundle."""
 import argparse
 import getpass
 import hashlib
 import importlib.util
 import json
 import os
-import platform
 from pathlib import Path
 import re
 import secrets
+import shlex
 import shutil
 import signal
 import socket
@@ -21,6 +21,15 @@ from urllib.parse import urlsplit
 import zipfile
 
 ROOT=Path(__file__).resolve().parents[1]
+# Source-hashed native runtimes can take nearly a minute to start under TCG.
+# Keep first boot and the integration restart bounded, with room for that work.
+PRODUCT_STARTUP_SECONDS=120
+NPM_ENGINE_PROBE="""const root=process.argv[1];
+const fromNpm=require('node:module').createRequire(root+'/package.json');
+const p=fromNpm('./package.json');const semver=fromNpm('semver');
+if(!p.engines||!semver.satisfies(process.versions.node,p.engines.node))
+  throw new Error('The distro npm CLI does not support this bundled Node version.');
+console.log(JSON.stringify({npm:p.version,node:process.versions.node,engines:p.engines.node,cli:root+'/bin/npm-cli.js'}));"""
 
 
 def run(*args, **kwargs):return subprocess.run([str(a) for a in args],check=True,**kwargs)
@@ -29,6 +38,9 @@ def run(*args, **kwargs):return subprocess.run([str(a) for a in args],check=True
 def load(path):
     spec=importlib.util.spec_from_file_location(path.stem.replace('-','_'),path)
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
+
+
+distribution=load(Path(__file__).with_name('linux_distribution.py'))
 
 
 def write(path, text, mode=0o600):
@@ -59,17 +71,93 @@ def model_settings(url, model, context):
              'agent-default-model':{'provider':'augmentor-model','model':model}}
 
 
+def settings_yaml(settings):
+    """Match DSH's indented block sequences without changing model values."""
+    import yaml
+
+    class SettingsDumper(yaml.SafeDumper):
+        def increase_indent(self, flow=False, indentless=False):
+            return super().increase_indent(flow, indentless=False)
+
+    return yaml.dump(settings, Dumper=SettingsDumper)
+
+
+def verify_installed_payload(app, manifest, bundle=None):
+    """Package managers may retain an older payload with the same version."""
+    try:
+        release=json.loads((app/'release.json').read_text())
+    except (OSError, ValueError):
+        raise ValueError('The installed Augmentor release identity is missing or invalid. Install the matching bundle package before continuing.') from None
+    if not isinstance(release,dict) or release.get('version')!=manifest['version'] or release.get('source')!={'commit':manifest['sourceCommit'],'dirty':False}:
+        raise ValueError('The installed Augmentor package does not match this bundle source and version. Use the documented package/update workflow to install its matching payload before continuing; a same-version package may have been retained.')
+    target=manifest.get('target')
+    if target in distribution.MANAGED_TARGETS:
+        distribution.python_runtime_contract(manifest,target)
+        if release.get('target')!=target or release.get('pythonRuntime')!=manifest.get('pythonRuntime'):
+            raise ValueError('The installed package differs from this complete bundle runtime contract.')
+    if target in (distribution.ARCH,distribution.LEAP):
+        distribution.native_package_contract(manifest,target)
+        if target==distribution.ARCH:distribution.arch_guard_package(manifest)
+        verifier=load(Path(__file__).with_name('linux-package-verification.py'))
+        verifier.verify_payload(manifest,app,bundle)
+
+
 def environment_value(value):
     if any(c in value for c in '\r\n\0'):raise ValueError('API key must be a single line.')
     return '"'+value.replace('\\','\\\\').replace('"','\\"')+'"'
 
 
-def service(command, home, credentials):
+def service(command, home, credentials, python=None):
     def field(value):return '"'+str(value).replace('\\','\\\\').replace('"','\\"').replace('%','%%')+'"'
     return ('[Unit]\nDescription=Augmentor DSH runtime\nAfter=network-online.target\n\n[Service]\nType=exec\n'+
             'Environment='+field('DSH_HOME='+str(home))+'\nEnvironment=DSH_TELEMETRY_MODE=DISABLED\n'+
+            ('Environment='+field('AUGMENTOR_PYTHON='+str(python))+'\n' if python else '')+
             'EnvironmentFile='+field(credentials)+'\nExecStart='+' '.join(field(v) for v in command)+
             '\nRestart=on-failure\nRestartSec=5\nUMask=0077\n\n[Install]\nWantedBy=default.target\n')
+
+
+def prepare_python(app, data, target, runtime_contract=None):
+    marker=app/'linux-python-runtime.json'
+    if marker.exists() or marker.is_symlink():
+        if marker.is_symlink():raise ValueError('Linux Python policy must be a regular artifact file.')
+        runtime=load(app/'scripts/linux-python-runtime.py')
+        value=runtime.policy(marker)
+        if value['target']!=target:raise ValueError('The Python runtime policy differs from the bundle target.')
+        if target in distribution.MANAGED_TARGETS:
+            distribution.python_runtime_contract({'pythonRuntime':runtime_contract},target)
+            if runtime_contract!=runtime.contract(value,runtime.digest(marker)):
+                raise ValueError('The installed Python runtime policy differs from the complete bundle contract.')
+        receipt=runtime.prepare(value,app/'python-wheels',runtime.runtime_store())
+        return Path(receipt['python'])
+    if target in distribution.MANAGED_TARGETS:raise ValueError('This target lacks its required Python runtime policy.')
+    python=data/'python/bin/python'
+    if not python.exists():run(distribution.bootstrap_python(target),'-m','venv','--system-site-packages',data/'python')
+    run(python,'-m','pip','install','--disable-pip-version-check','sounddevice==0.5.2')
+    return python
+
+
+def npm_environment(target, app, data, env):
+    """Keep bundled Node authoritative even for versioned distro npm commands."""
+    paths={distribution.ARCH:'/usr/lib/node_modules/npm/bin/npm-cli.js',
+           distribution.LEAP:'/usr/lib64/node_modules/npm24/bin/npm-cli.js'}
+    if target not in paths:return env,['npm']
+    cli=Path(paths[target])
+    info=cli.stat()
+    if not cli.is_file() or info.st_uid!=0 or info.st_mode & 0o022:
+        raise ValueError('Install the matching checked distro npm CLI before setup.')
+    node=app/'node/bin/node'
+    command=[str(node),str(cli)]
+    # DSH plugin installation may itself spawn generic npm. Scope this wrapper
+    # to the fresh private install; never write a system npm or alter a user PATH.
+    directory=data/'installer-bin';path=directory/'npm'
+    content='#!/bin/sh\nexec '+' '.join(shlex.quote(value) for value in command)+' "$@"\n'
+    if path.is_symlink() or (path.exists() and path.read_text()!=content):
+        raise ValueError('The private installer npm command differs; review the partial installation.')
+    result=run(node,'-e',NPM_ENGINE_PROBE,cli.parent.parent,env=env,capture_output=True,text=True)
+    info=json.loads(result.stdout)
+    if not path.exists():write(path,content,0o700)
+    write(directory/'npm-runtime.json',json.dumps(info,indent=2)+'\n')
+    return {**env,'PATH':str(directory)+os.pathsep+env['PATH']},command
 
 
 def configure_product(app, cli, home, endpoint, env, state, *, save=True):
@@ -98,7 +186,7 @@ def configure_product(app, cli, home, endpoint, env, state, *, save=True):
             command=([str(app/'node/node.exe'),str(cli)] if sys.platform=='win32' else [str(cli)])
             process=OwnedProcess([*command,'web','--no-open','--host','127.0.0.1','--port',str(urlsplit(endpoint).port)],
                                  env=env,stdout=log,stderr=log)
-        deadline=time.monotonic()+60
+        deadline=time.monotonic()+PRODUCT_STARTUP_SECONDS
         while time.monotonic()<deadline:
             if process.poll() is not None:raise RuntimeError('The new DSH runtime stopped (exit '+str(process.poll())+'). Private diagnostic: '+str(log_path))
             matches=re.findall(r'token=([A-Za-z0-9_-]+)',log_path.read_text(errors='replace'))
@@ -119,23 +207,33 @@ def configure_product(app, cli, home, endpoint, env, state, *, save=True):
 
 def install(args):
     os.umask(0o077)
-    if os.geteuid()==0:raise ValueError('Run this installer as your normal desktop user. It requests sudo only for system packages.')
     bundle=args.bundle.resolve();manifest=verify_bundle(bundle)
+    package_plan=None
+    if not args.skip_packages:
+        package_plan=distribution.install_plan(manifest,bundle,voice=args.voice,gpu=bool(args.gpu),memory=args.memory,memory_engine_present=shutil.which('docker') is not None)
+    if args.plan:
+        return {'bundle':manifest['version'],'components':manifest['components'],'system':package_plan,
+                'changes':'Fresh private DSH home, desktop/browser, plugins, login recovery and optional local voice/memory.'}
+    if os.geteuid()==0:raise ValueError('Run this installer as your normal desktop user. It requests sudo only for system packages.')
     data=Path(os.environ.get('XDG_DATA_HOME',Path.home()/'.local/share'))/'augmentor'
     config=Path(os.environ.get('XDG_CONFIG_HOME',Path.home()/'.config'))
     state=Path(os.environ.get('XDG_STATE_HOME',Path.home()/'.local/state'))/'augmentor-install'
     stamp=state/'installation.json'
     record=json.loads(stamp.read_text()) if stamp.exists() else {}
     resumable=record.get('bundle')==manifest['artifactId'] and record.get('status')=='preparing'
-    if record.get('bundle')==manifest['artifactId'] and record.get('status')=='installed':return record
+    if record.get('bundle')==manifest['artifactId'] and record.get('status')=='installed':
+        app=args.app_root.resolve()
+        verify_installed_payload(app,manifest,bundle)
+        if manifest.get('target') in distribution.MANAGED_TARGETS:
+            runtime=load(app/'scripts/linux-python-runtime.py')
+            marker=app/'linux-python-runtime.json';value=runtime.policy(marker)
+            if manifest.get('pythonRuntime')!=runtime.contract(value,runtime.digest(marker)):
+                raise ValueError('The installed Python runtime policy differs from the complete bundle contract.')
+            runtime.resolve(app)
+        return record
     if (data/'desktop.json').exists() and not resumable:raise ValueError('An Augmentor desktop is already installed. Use its documented update/migration workflow; this wizard is for fresh users.')
     if (Path.home()/'.dsh').exists() and any((Path.home()/'.dsh').iterdir()):
         raise ValueError('An existing DSH installation was found. Follow the existing-installation migration guide; no profile or model was changed.')
-    if not args.skip_packages:
-        info=dict(line.split('=',1) for line in Path('/etc/os-release').read_text().splitlines() if '=' in line)
-        if info.get('ID','').strip('"')!='debian' or info.get('VERSION_ID','').strip('"')!='13' or platform.machine() not in ('x86_64','amd64'):
-            raise ValueError('This complete installer is qualified for Debian 13 amd64. Other distributions require separate qualification.')
-    if args.plan:return {'bundle':manifest['version'],'components':manifest['components'],'changes':'Fresh private DSH home, desktop/browser, plugins, login recovery and optional local voice/memory.'}
     if not args.model_url:args.model_url=input('Your OpenAI-compatible model API URL (including /v1): ').strip()
     if not args.model:args.model=input('Model ID: ').strip()
     settings=model_settings(args.model_url,args.model,args.context)
@@ -148,6 +246,10 @@ def install(args):
         if not args.memory:args.memory=input('Set up dual memory with Docker and this local model? [y/N] ').strip().lower()=='y'
     if args.memory and urlsplit(args.model_url).hostname not in ('127.0.0.1','::1'):
         raise ValueError('The bundled memory setup currently requires a local numeric-loopback model API. Omit memory for a cloud-only setup.')
+    # Interactive feature choices change the system dependency plan. Validate it
+    # again before writing the install receipt or requesting administrator access.
+    if not args.skip_packages:
+        package_plan=distribution.install_plan(manifest,bundle,voice=args.voice,gpu=bool(args.gpu),memory=args.memory,memory_engine_present=shutil.which('docker') is not None)
     secret=os.environ.get(args.api_key_env) if args.api_key_env else getpass.getpass('Model API key (Enter for a local model without authentication): ')
     if args.api_key_env and secret is None:raise ValueError('The requested API-key environment variable is not set.')
     secret=secret or 'local'
@@ -161,36 +263,54 @@ def install(args):
     state.mkdir(parents=True,exist_ok=True,mode=0o700)
     write(stamp,json.dumps({'bundle':manifest['artifactId'],'status':'preparing'})+'\n')
     if not args.skip_packages:
-        packages=[bundle/name for name in manifest['sha256'] if name.endswith('.deb')]
-        run('sudo','apt','install','-y',*packages,'python3-venv','npm','libportaudio2','git','cmake','g++','pkg-config')
+        for index,command in enumerate(package_plan['commands']):
+            # The app must not share the guard's first installation transaction.
+            # Read-only verification after that transaction precedes app hooks.
+            if package_plan['guardVerificationBeforeApplication'] and index==len(package_plan['commands'])-1:
+                verifier=load(Path(__file__).with_name('linux-package-verification.py'))
+                verifier.verify_guard(manifest,bundle)
+            run(*command)
     app=args.app_root.resolve();node=app/'node/bin/node'
+    verify_installed_payload(app,manifest,bundle)
+    python=prepare_python(app,data,manifest.get('target'),manifest.get('pythonRuntime'))
     runtime=data/'dsh-runtime';runtime.mkdir(parents=True,exist_ok=True)
-    env={**os.environ,'PATH':str(node.parent)+':'+os.environ.get('PATH','')}
+    env={**os.environ,'AUGMENTOR_PYTHON':str(python),
+         'PATH':str(node.parent)+':'+str(python.parent)+':'+os.environ.get('PATH','')}
+    if (app/'linux-python-runtime.json').exists() or (app/'linux-python-runtime.json').is_symlink():
+        python_runtime=load(app/'scripts/linux-python-runtime.py')
+        env=python_runtime.environment(app,str(python),env)
     for name in ('package.json','package-lock.json'):shutil.copy2(bundle/'dsh'/name,runtime/name)
     # New bundles carry the exact unpublished plugin tarballs referenced by the
     # shared lock. Older published bundles retain their registry-only graph.
     if (bundle/'dsh/plugins').is_dir():
         shutil.copytree(bundle/'dsh/plugins',runtime/'plugins',dirs_exist_ok=True)
-    run('npm','ci','--prefix',runtime,'--ignore-scripts','--omit=dev','--no-audit','--no-fund',env=env)
+    env,npm=npm_environment(manifest.get('target'),app,data,env)
+    run(*npm,'ci','--prefix',runtime,'--ignore-scripts','--omit=dev','--no-audit','--no-fund',env=env)
     cli=runtime/'node_modules/.bin/dsh';home=data/'dsh-home';home.mkdir(parents=True,exist_ok=True,mode=0o700)
     env.update(DSH_HOME=str(home),DSH_TELEMETRY_MODE='DISABLED',AUGMENTOR_MODEL_API_KEY=secret)
     env['PATH']=str(cli.parent)+':'+env['PATH']
     # Setup's supported-CLI discovery must use this exact freshly installed DSH.
     os.environ['PATH']=env['PATH']
+    os.environ['AUGMENTOR_PYTHON']=str(python)
+    # Product setup also spawns Python children from this process. Give them
+    # the same verified native paths as its explicit subprocess environment.
+    if (app/'linux-python-runtime.json').exists() and python_runtime.policy(app/'linux-python-runtime.json')['profile'] in python_runtime.SOURCE_PROFILES:
+        for key in ('LD_LIBRARY_PATH','QT_PLUGIN_PATH','QT_QPA_PLATFORM_PLUGIN_PATH','QML_IMPORT_PATH','QML2_IMPORT_PATH'):
+            os.environ[key]=env[key]
+        for key in ('QT_QPA_PLATFORMTHEME','QT_QPA_GENERIC_PLUGINS'):
+            os.environ.pop(key,None)
     config_home=Path(os.environ.get('AUGMENTOR_SHARED_CONFIG',config/'augmentor'))
     if (config_home/'harnesses.json').exists():
         saved=json.loads((config_home/'harnesses.json').read_text()).get('dsh',{})
         if not resumable or saved.get('home')!=str(home):raise ValueError('Existing harness settings need a reviewed migration.')
-    import yaml
-    write(home/'settings.yaml',yaml.safe_dump(settings))
+    write(home/'settings.yaml',settings_yaml(settings))
     write(state/'model.env','AUGMENTOR_MODEL_API_KEY='+environment_value(secret)+'\n')
     for name in manifest['plugins']:
         run(cli,'plugin','--profile','web','add',bundle/name,'--ignore-scripts','--config.auto-install-peers=false',env=env,stdout=subprocess.DEVNULL)
     voice=home/'profiles/web/node_modules/dsh-resonant-voice'
     if args.voice:
-        command=['/usr/bin/python3',voice/'bin/setup-linux.py','--node',node,'--accept-model-license']
+        command=[distribution.bootstrap_python(manifest['target']),voice/'bin/setup-linux.py','--node',node,'--accept-model-license']
         if args.gpu:
-            if not args.skip_packages:run('sudo','apt','install','-y','libvulkan-dev','glslc','spirv-headers')
             command+=['--gpu',args.gpu]
         else:command+=['--cpu']
         if args.no_services:command+=['--no-start']
@@ -198,18 +318,20 @@ def install(args):
     run(node,voice/'bin/resonant-voice.js','init',env=env)
     endpoint='http://127.0.0.1:'+str(args.port)
     configure_product(app,cli,home,endpoint,env,state)
-    python=data/'python/bin/python'
-    if not python.exists():run('/usr/bin/python3','-m','venv','--system-site-packages',data/'python')
-    run(python,'-m','pip','install','--disable-pip-version-check','sounddevice==0.5.2')
     units=config/'systemd/user';units.mkdir(parents=True,exist_ok=True)
     unit=units/'augmentor-dsh.service'
-    content=service([node,cli.resolve(),'web','--no-open','--host','127.0.0.1','--port',str(args.port)],home,state/'model.env')
+    command=[node,cli.resolve(),'web','--no-open','--host','127.0.0.1','--port',str(args.port)]
+    if (app/'linux-python-runtime.json').exists():
+        # System Python validates the immutable runtime before Node and its
+        # speech children start; also hold the package lifetime lease.
+        command=[distribution.bootstrap_python(manifest['target']),app/'scripts/run-component.py','runtime',*command]
+    content=service(command,home,state/'model.env',python)
     if unit.exists() and unit.read_text()!=content:raise ValueError('Existing Augmentor DSH service differs.')
     write(unit,content)
     startup=load(app/'scripts/install-desktop-startup.py')
     startup.install(app,python,node,'augmentor-dsh.service',enable=not args.no_services)
     if not args.no_services:
-        run(python,app/'scripts/setup-default-shortcuts.py')
+        run(python,app/'scripts/setup-default-shortcuts.py',env=env)
     extension=data/'browser'/manifest['version']
     if extension.exists():shutil.rmtree(extension)
     extension.mkdir(parents=True)
@@ -222,8 +344,11 @@ def install(args):
     for browser in ('chromium','google-chrome','BraveSoftware/Brave-Browser'):
         write(config/browser/'NativeMessagingHosts/com.augmentor.agent.json',json.dumps(native,indent=2)+'\n')
     if args.memory:
-        if not args.skip_packages:run('sudo','apt','install','-y','docker.io')
         docker_ok=subprocess.run(['docker','info'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL).returncode==0
+        if not docker_ok and package_plan and package_plan['installMemoryEngine']:
+            # Provision only the explicitly requested engine; never remove or
+            # replace a user's existing Docker/Podman packages or services.
+            run('sudo','systemctl','enable','--now','docker.service')
         command=[python,app/'scripts/setup-hindsight.py','--model-url',args.model_url,'--model',args.model,'--api-key-env','AUGMENTOR_MODEL_API_KEY']
         if not docker_ok:command+=['--sudo-docker']
         run(*command,env=env)
@@ -241,6 +366,7 @@ def install(args):
                     time.sleep(1)
         run('systemctl','--user','start','augmentor-desktop.service')
     result={'bundle':manifest['artifactId'],'status':'installed','desktop':True,'browserExtension':str(extension),
+            'target':manifest.get('target'),'system':package_plan,
             'browserAction':'Load this folder once in chrome://extensions (Developer mode).',
             'voice':'configured' if args.voice else 'plugin installed; speech engine setup deferred',
             'memory':'configured' if args.memory else 'adapter installed; memory engine setup deferred',

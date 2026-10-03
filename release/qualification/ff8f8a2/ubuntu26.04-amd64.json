@@ -1,0 +1,44 @@
+{
+  "target": "ubuntu26.04-amd64",
+  "imageDigest": "docker.io/library/ubuntu@sha256:da6fc2be547864451aa253836dd926da33623312df4a9a243e35dc877c378a78",
+  "source": {
+    "commit": "ff8f8a29c9bd4c763e60cf39001568f78b254d61",
+    "dirty": false
+  },
+  "artifacts": {
+    "augmentor-runtime_0.2.13_amd64.deb": "27ab7033e014818652eddf45e4109837071a376a75547caf573f2de67fab0d93",
+    "augmentor-desktop_0.2.13_amd64.deb": "f644c83a659506d11bcb895278b80e0909dda5e9e410222edde8ddca6acd8b1f"
+  },
+  "proofScriptSha256": "5e331726dd8f5d683715700741de6ddb4d8767b267f144b0323f62a2c7e57c8b",
+  "versions": {
+    "python": "3.14.4",
+    "pyside": "6.10.2",
+    "qt": "6.10.2",
+    "node": "v24.19.0"
+  },
+  "gtk4Version": "4.22.4",
+  "gtk4ShortcutApiImportTested": true,
+  "freshInstall": true,
+  "nonRootRuntimeLease": true,
+  "nonRootQtRender": true,
+  "activeRuntimeAndDesktopReinstallBlocked": true,
+  "activeComponentRemovalBlocked": true,
+  "idleReinstall": true,
+  "removePreservesPrivateFiles": true,
+  "reinstallAfterRemove": true,
+  "realDesktopSessionTested": false,
+  "physicalAudioTested": false,
+  "selinuxEnforcingTested": false,
+  "dshModelTurnTested": false,
+  "hostedQualification": {
+    "run": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36942865107",
+    "branchHead": "6108a640c5590d4feb13e453ce529d466a56fe2c",
+    "mergedSource": "ff8f8a29c9bd4c763e60cf39001568f78b254d61",
+    "verifiedBranchAndMergeTree": "6aad74fa6846db8ea62b09e9d94c4801b9783950",
+    "nativeTests": 626,
+    "nativePassed": 624,
+    "nativeSkipped": 2,
+    "completeInstallerTested": false,
+    "gnomeDesktopSessionTested": false
+  }
+}

@@ -1,0 +1,170 @@
+{
+  "format": "augmentor-linux-qualification-checkpoint/1",
+  "date": "2026-10-03",
+  "scope": "Fresh owned Fedora44 GNOME clone v2 corrected-probe actual consent and first capture refusal; no owner installation or product enablement",
+  "candidate": {
+    "probeSource": "4abe16a2f57736eced1077ed3a89e739654db8be",
+    "probeSha256": "2d7bdc2005517af8ac8f2638b2337778d5d89c91a89dcc359cf4435ef4dc83f4",
+    "remainingTenFilesSource": "0ab022a6a26ae0165b57e1662203e71f544aab9a",
+    "controllerSha256": "1be68fc8758850bbb57e05bf04f8f8bcd8b3101a01d651a89899cf8f353c6ea0",
+    "stagedFiles": 11,
+    "stagedHashesRechecked": true,
+    "freshPrivateDirectory": true,
+    "oldPreconsentKwinFailureRetained": true
+  },
+  "selected": {
+    "source": "2035af99b46bb013e81de9766216da820ab4a325",
+    "artifactSha256": "538136182ad7f7886b064b553d1154cb99b53c634da7e478d01f8bbaf4e4d639",
+    "target": "fedora44-x86_64",
+    "python": "/usr/bin/python3",
+    "nativeSource": "2035af99b46bb013e81de9766216da820ab4a325",
+    "nativeRpmAuditClean": true,
+    "managedInventoryAndExactDeploymentVerified": true,
+    "inheritedOverridesRefused": true,
+    "bytesSha256": "2286b529b497c4991be7646f8fb94fc922b2a16e8f4f61ee0189b9c4b0a624ee",
+    "unchangedDuringCandidate": true
+  },
+  "environment": {
+    "uid": 1000,
+    "virtualization": "QEMU TCG",
+    "desktop": "GNOME Wayland",
+    "shellVersion": "50.5",
+    "gtkTargetBackend": "GdkWaylandDisplay",
+    "qtBannerBackend": "xcb",
+    "selinux": "Enforcing",
+    "monitorScale": 1,
+    "monitorCount": 1
+  },
+  "consent": {
+    "result": "PASS",
+    "observedNativePortalOwnerAndForegroundGeometryBeforeActions": true,
+    "requests": [
+      "CreateSession",
+      "SelectDevices",
+      "SelectSources",
+      "Start"
+    ],
+    "connectReportedSharing": true,
+    "existingKeyboardPointerAndSingleMonitorContractPassed": true,
+    "connectSeconds": 142.82941275199983,
+    "nativeConsentActionsReplayed": false
+  },
+  "capture": {
+    "result": "FAIL",
+    "attempts": 1,
+    "seconds": 2.224360535999949,
+    "error": {
+      "kind": "RuntimeError",
+      "message": "Desktop control stopped. No action is replayed."
+    },
+    "firstFailure": {
+      "phase": "idle-watch",
+      "kind": "Error",
+      "message": "g-io-error-quark: Timeout was reached (24)"
+    },
+    "failingSynchronousRpcIdentified": false,
+    "freshPostfailureOwnersAndSceneValid": true,
+    "pipewireMessages": "target-not-found and Broken-pipe at 06:57:51.723/734 UTC overlap teardown; not established as initial cause"
+  },
+  "input": {
+    "actionsAttempted": 0,
+    "textA": "",
+    "textB": "",
+    "clicks": {
+      "center": 0,
+      "edge": 0
+    },
+    "saveChordCount": 0,
+    "savedFileExists": false,
+    "pointerChordAsciiSaveAcceptance": "not executed",
+    "visibleStopAcceptance": "not executed",
+    "stopClicked": false,
+    "noReplay": true
+  },
+  "cleanup": {
+    "closed": true,
+    "stopReason": "requested",
+    "stopGuiTick": 4601,
+    "finalGuiTicks": 4612,
+    "seconds": 0.5435008230001586,
+    "probeAbsent": true,
+    "targetAbsent": true,
+    "independentCandidateHelpersAbsent": true,
+    "recordedHelperPids": [],
+    "helperWasCreated": false,
+    "postTargetExitScannerErrorRetained": "NotADirectoryError /proc/dma; independent numeric process scan passed; no kill replay"
+  },
+  "originalPreservation": {
+    "originalOff": true,
+    "bothBackingFdsReadOnly": true,
+    "fullFrozenBaseHashesUnchanged": true,
+    "previousAdoptionCheckpoint": "20261003-fedora-gnome-clone141-adoption-input-import-refusal.json",
+    "hostDiskFloorBytes": 4294967296,
+    "lastMeasuredHostFreeBytes": 10571382784,
+    "originalBootForbiddenWhileDependentOverlayReusable": true
+  },
+  "privateEvidenceDigests": [
+    {
+      "label": "approved-fresh-v2",
+      "sha256": "b4377ce1d0b87d9e1d463329214f93498250f047514b51d58798ba919f1f4747",
+      "bytes": 4073
+    },
+    {
+      "label": "fresh-v2-admission-readonly",
+      "sha256": "f5c3f0e48e95b95eda176a55241a8c701df4f0c919bb601c2343d538dfdf3726",
+      "bytes": 1376
+    },
+    {
+      "label": "observed-ui-portal-allow-interaction",
+      "sha256": "b49df957dd8edb3f5c96004cf303f9724b18e2a44ab7bf450d5bf3080f8bea98",
+      "bytes": 4988
+    },
+    {
+      "label": "observed-ui-portal-share",
+      "sha256": "edaff00494d9dc05c950751bd0dcbce1cb0c0fd408991047a10daace51e85359",
+      "bytes": 5009
+    },
+    {
+      "label": "finite-dispatch-capture",
+      "sha256": "c0666d2646a066abb8718cd214dec61febe98797e62185a9ff6c9374d2689a96",
+      "bytes": 900
+    },
+    {
+      "label": "capture-idle-watch-timeout-diagnosis-readonly",
+      "sha256": "8cbcc06bfd58ccfba163d9b31ed005396616ddd6853953a82e031f2abcb5d59d",
+      "bytes": 22836
+    },
+    {
+      "label": "cleanup-target",
+      "sha256": "5e648b90e6edb2c66ab9241c3842e1133f1fb7bd736e169d4243b1e8f888cdce",
+      "bytes": 626
+    },
+    {
+      "label": "capture-failure-cleanup-independent-readonly",
+      "sha256": "276386e09b9841c2c628176ce5480211706cd546d51cc5e6c7d7b9198d5722af",
+      "bytes": 917
+    },
+    {
+      "label": "frozen-bases-after-v2",
+      "sha256": "2eca3891aebb73a4b18662722b0a39ac59b7043498d2c0f05423d2226952c3be",
+      "bytes": 704
+    }
+  ],
+  "privateFinalEvidenceManifestSha256": "df13b61102ef85872b6f6a74876fc3777fcbb42b3b0313a92af238d416a1589b",
+  "nextDiagnosticSource": {
+    "status": "source-only awaiting parent review/publication; not executed in VM",
+    "probeSha256": "f268afe05110d151fd4ef2f7ea2e1c58abd1b4d131d1c4c73b6987e4850b61f8",
+    "optionalArgument": "--trace-idle-watch",
+    "scope": "Delegate unchanged idle watcher and trace existing verify/read method, original bound/elapsed and first error",
+    "historyLimit": 128,
+    "firstErrorRetainedSeparately": true,
+    "defaultTracingEnabled": false,
+    "controllerObserverSessionHelperGuardTimeoutChanges": false,
+    "focusedPythonCasesPassed": 94,
+    "probeCasesPassed": 22,
+    "observerNodeCasesPassed": 5
+  },
+  "productionGnomeInputQualified": false,
+  "productionGnomeInputEnabled": false,
+  "remaining": "Identify actual failing native RPC in a separately reviewed fresh diagnostic run; pointer/chord/ASCII/save/visibleStop and other documented profile/failure/KDE integration gates remain open"
+}

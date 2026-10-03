@@ -1,0 +1,54 @@
+{
+  "version": "0.2.13",
+  "source": {
+    "commit": "1c670c0694254bf401099b5365157a01c6e7943f",
+    "dirty": false
+  },
+  "artifactHashesMatch": true,
+  "extensionInventoryAndNoticesMatch": true,
+  "privateStateFilesAbsent": true,
+  "packages": [
+    {
+      "file": "augmentor-runtime_0.2.13_amd64.deb",
+      "members": 29661,
+      "nativeComponents": [
+        {
+          "name": "node",
+          "version": "24.19.0",
+          "binaryHashMatches": true,
+          "noticesPresent": true
+        },
+        {
+          "name": "esbuild",
+          "version": "0.28.1",
+          "binaryHashMatches": true,
+          "noticesPresent": true
+        },
+        {
+          "name": "photon",
+          "version": "0.3.4",
+          "binaryHashMatches": true,
+          "noticesPresent": true
+        },
+        {
+          "name": "esbuild",
+          "version": "0.28.1",
+          "binaryHashMatches": true,
+          "noticesPresent": true
+        }
+      ],
+      "verifiedWheelArchives": 7,
+      "verifiedWheelElfMembers": 266,
+      "originalWheelNoticeBytesMatch": true,
+      "supplementaryNoticeCollectionsMatch": true,
+      "licenseReviewComplete": false,
+      "embeddedSourceCoverageComplete": false
+    },
+    {
+      "file": "augmentor-desktop_0.2.13_amd64.deb",
+      "members": 17
+    }
+  ],
+  "scope": "Artifact and notice engineering checks; not independent security or legal certification.",
+  "candidateOnly": true
+}

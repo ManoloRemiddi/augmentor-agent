@@ -79,7 +79,11 @@ def check(config, connected=False):
         raise ValueError('This build lacks the supervised startup protocol.')
     env = {**os.environ, 'PYTHONPATH':str(root/'apps/native'),
            'PYTHONDONTWRITEBYTECODE':'1', 'QT_QPA_PLATFORM':'offscreen',
-           'AUGMENTOR_PI_NODE':config['node']}
+           'AUGMENTOR_PI_NODE':config['node'], 'AUGMENTOR_PYTHON':config['python']}
+    if (root/'linux-python-runtime.json').exists() or (root/'linux-python-runtime.json').is_symlink():
+        spec = importlib.util.spec_from_file_location('candidate_linux_python', root/'scripts/linux-python-runtime.py')
+        runtime = importlib.util.module_from_spec(spec); spec.loader.exec_module(runtime)
+        env = runtime.environment(root, config['python'], env)
     code = 'from augmentor_linux import window, controller\n'
     if connected and config.get('dshService'):
         # This reads the matching product identity and model catalog. No prompts,
@@ -109,16 +113,24 @@ def stage(source, source_ref, python=None, node=None):
     temporary.mkdir(mode=0o700)
     try:
         # Copy the runnable artifact, never an entire checkout or user data.
-        for part in ('apps', 'services', 'adapters', 'components', 'dist', 'config', 'licenses', 'scripts', 'node', 'node_modules', 'release', 'docs'):
+        for part in ('apps', 'services', 'adapters', 'components', 'dist', 'config', 'licenses', 'scripts', 'node', 'node_modules', 'release', 'docs', 'python-wheels'):
             if (source/part).is_dir():
                 shutil.copytree(source/part, temporary/part, symlinks=True,
                                 ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '.git', '.env', 'outputs'))
-        for part in ('package.json', 'package-lock.json', 'release.json', 'LICENSE', 'README.md', 'distribution-exclusions.json', 'distribution-overrides.json'):
+        for part in ('package.json', 'package-lock.json', 'release.json', 'fedora-package.json', 'linux-package.json', 'linux-python-runtime.json', 'LICENSE', 'README.md', 'distribution-exclusions.json', 'distribution-overrides.json'):
             if (source/part).is_file():
                 target = temporary/part; target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(source/part, target)
         config = dict(current, root=str(temporary), python=str(Path(python or current['python']).absolute()),
                       node=str(Path(node or current['node']).absolute()))
+        if (source/'linux-python-runtime.json').exists() or (source/'linux-python-runtime.json').is_symlink():
+            spec = importlib.util.spec_from_file_location('staged_linux_python', source/'scripts/linux-python-runtime.py')
+            runtime = importlib.util.module_from_spec(spec); spec.loader.exec_module(runtime)
+            config['python'] = runtime.resolve(source, python)
+            value = runtime.policy(source/'linux-python-runtime.json')
+            if value['profile'] in runtime.SOURCE_PROFILES:
+                runtime.verify_wheels(value, temporary/'python-wheels')
+                runtime.source_qt().inputs(value, temporary/'python-wheels')
         # A bundled interpreter follows the copy; venv symlinks must not resolve.
         for key in ('python', 'node'):
             path = Path(config[key])

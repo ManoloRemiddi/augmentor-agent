@@ -1,0 +1,90 @@
+{
+  "format": "augmentor-gnome-qt-portal-identity/1",
+  "proofSha256": "c7d2ec01781a8af03291c54fe09da80567c369a554a078ef18d87c308dcf0e98",
+  "qtVersion": "6.11.2",
+  "results": [
+    {
+      "platform": "xcb",
+      "order": "late",
+      "lateRegistrationWarningCount": 0,
+      "portalRegistrationFailureCount": 0,
+      "registerCallObserved": true,
+      "registerSuccessfulReplies": 0,
+      "registerErrorReplies": 1,
+      "registerCachedIdentityErrors": 1,
+      "registerBeforeFirstSettingsCall": false,
+      "qtLogSha256": "10dc724cd99a53b5dffb9d1235d584068bd130388e5b2014c3a006e45be83e4e",
+      "busLogSha256": "5ff5619a84a0ffb3cdd1b5a328b42d0299b680cb8b7980cda222fa8319de7d0d",
+      "qtSenderCallsSha256": "cc8456a356e4b84a5fcf52764194eb9672b45fa3809004d0d3b042e0a45fde02"
+    },
+    {
+      "platform": "xcb",
+      "order": "early",
+      "lateRegistrationWarningCount": 0,
+      "portalRegistrationFailureCount": 0,
+      "registerCallObserved": true,
+      "registerSuccessfulReplies": 1,
+      "registerErrorReplies": 0,
+      "registerCachedIdentityErrors": 0,
+      "registerBeforeFirstSettingsCall": true,
+      "qtLogSha256": "f92d087e2ed13038d6d9d486d084eb17ec3086bd17bf3e24f11fe255b3000272",
+      "busLogSha256": "336ba576d6cb6e5dfd4bc78f84f18d25772affa95fa29a00e1a9598648a85bf6",
+      "qtSenderCallsSha256": "b0ea6891be7bdbb0868a6e230626c86c77064e807c13edd4798b90e33a991f0c"
+    },
+    {
+      "platform": "wayland",
+      "order": "late",
+      "lateRegistrationWarningCount": 0,
+      "portalRegistrationFailureCount": 0,
+      "registerCallObserved": true,
+      "registerSuccessfulReplies": 0,
+      "registerErrorReplies": 1,
+      "registerCachedIdentityErrors": 1,
+      "registerBeforeFirstSettingsCall": false,
+      "qtLogSha256": "9f8f9cfd372dc695b9f28cc0d774a052c377e9d87db23d05615ab85e7ea195c7",
+      "busLogSha256": "8a48e5e856e5f48a5dd16bf3e0637d6d65b73c1d0f5afdcb1dced54ecf2c1cca",
+      "qtSenderCallsSha256": "fb7bcb38896fa7d07a0132a9208a6c88318c85bc98cc53ed9f5d7df11c28170c"
+    },
+    {
+      "platform": "wayland",
+      "order": "early",
+      "lateRegistrationWarningCount": 0,
+      "portalRegistrationFailureCount": 0,
+      "registerCallObserved": true,
+      "registerSuccessfulReplies": 1,
+      "registerErrorReplies": 0,
+      "registerCachedIdentityErrors": 0,
+      "registerBeforeFirstSettingsCall": true,
+      "qtLogSha256": "913ad58763f47122235f7c885d85d8175adf40872ea4698dfeb39ae1446953db",
+      "busLogSha256": "20ceff193017f350be22e5987fb19e85be139c94fe66e75ed09ae0331d008b1c",
+      "qtSenderCallsSha256": "c9d1639f4e2ad5d1af6a87229231c72087767f480705c03bbc737594e2d71008"
+    }
+  ],
+  "actualAugmentorLaunchTested": false,
+  "controlHelperConsentIdentityTested": false,
+  "portalRestartReregistrationTested": false,
+  "modelTurnTested": false,
+  "checkpointDate": "2026-10-02",
+  "testedBase": "837bef172c3ec6fe8df86cf4331c3a035088394b",
+  "workingSourceChanges": [
+    "apps/native/augmentor_linux/window.py"
+  ],
+  "windowSourceSha256": "ae755a18e130749d50e0013e27500bbc3e89b2935e3794c6d360f2d27d45d221",
+  "fixture": "Fedora Cloud 44-1.7 plus gnome-desktop; actual GDM Wayland fixture autologin, standalone Qt fixture windows",
+  "installedProductSource": "f7d75859f5bd88fd99bec2b4904aae5fd3423ed7",
+  "installedProductPatched": false,
+  "rawReportSha256": "1ebff112ea565fee74b37de1b5a9a356048978433e644a1899e11bd2c9041102",
+  "nativeSourceCases": 643,
+  "nativeSourcePassed": 641,
+  "nativeSourceMacOnlySkipped": 2,
+  "nativeSourceLogSha256": "dd17191b4daa4fc23c7899b6240033e9d593864de2c234b36895cd97bbf629f3",
+  "currentSourceNativePackageTested": false,
+  "gnomeInputToolsEnabled": false,
+  "limits": [
+    "Exact standalone Qt sender and corresponding portal replies are correlated. Late identity produces a cached-identity registration error; early identity succeeds in both xcb and wayland.",
+    "The fixture Qt stderr does not emit the registration warning seen in the installed product journal. Error reproduction is established by the actual D-Bus error reply, not by stderr text.",
+    "The installed product remains the earlier clean f7d7585 payload. No claim that its warning is fixed, or that the working source is installed, follows from this fixture.",
+    "The Qt UI connection is separate from the Python/GIO desktop-control connection. Control-helper identity, consent, portal restart registration and GNOME input remain unqualified.",
+    "Actual working-source shortcut/focus/typing checks pass separately in private preview-process compositor fixtures; xcb also passes the first-use three-workspace checks. Full normal startup of the changed product remains open."
+  ]
+}
