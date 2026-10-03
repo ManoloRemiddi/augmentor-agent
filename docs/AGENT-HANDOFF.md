@@ -6,8 +6,15 @@
 
 
 
-
-
+October 4 producer checkpoint adds complete native Linux x64/ARM64 candidate
+assembly with hash-pinned standalone Python/Node, locked Linux wheels, production
+JS, matching Handy and prepared DSH/speech. It runs actual offline Qt health and
+exports a parser-verified deterministic ZIP without local selection files.
+Eight synthetic boundary/real consumer roundtrip cases pass. A reusable two-CPU
+workflow and `managed_linux_only` dispatch scope are added; native full-bundle
+execution is pending. All automatic/public/distribution qualification flags stay
+false. ARM64 Qt requires glibc 2.39, so older Pi OS is not implied compatible.
+See [producer scope](UPDATE-SYSTEM.md#complete-managed-linux-candidate-producer--october-4).
 
 Native Linux desktop/service qualification passes at `d1ec492` in
 [37160517109](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37160517109),

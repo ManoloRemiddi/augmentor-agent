@@ -1304,3 +1304,46 @@ at that source. This qualifies only the observed OS lifecycle composition,
 not a signed forward update, normal desktop acceptance or full release. Broad
 and Mac jobs at older `10fdece` are separate scoped evidence. Public eligibility
 and feed remain disabled pending full producer/platform/recovery qualification.
+
+
+### Complete managed Linux candidate producer — October 4
+
+`scripts/package-linux-managed.py` adds the missing native x64/ARM64 producer for
+the exact bundle consumed by the updater. It requires a clean reviewed checkout,
+preserves the private-source boundary, stages the locked production JavaScript,
+matching native Handy component and complete prepared DSH/speech graph, and
+bundles hash-pinned standalone CPython 3.12.13 and Node 24.19.0. Linux Python wheels
+are version/hash locked for both CPUs, including Linux Secret Service dependencies.
+The installed graph must match exactly, satisfy dependency checks and import its
+required GUI/audio/runtime modules. Python/npm notices remain inside the bundle.
+Source/license review is still an explicit open release gate.
+
+The producer runs the actual fixed offline Qt health action against that complete
+bundle, requires unchanged immutable bytes, then exports a deterministic ZIP with
+file modes and relative links. The actual download parser verifies the resulting
+archive. Machine-specific selection files cannot enter the export. Every receipt
+and artifact report keeps `automaticInstallQualified=false`,
+`distributionsQualified=false` and `publicReleaseReady=false`; a preview build
+number in CI is test evidence, not a published monotonic release. There is no
+consumer-machine package install and no selected/running deployment change.
+
+The pinned PySide6 ARM64 wheel requires glibc 2.39; its x64 counterpart requires
+2.28. The provisional test targets are Ubuntu 24.04 and Debian 13, not a claim for
+older Raspberry Pi OS or all Linux distributions. These boundaries come from the
+[pinned wheel filenames](https://pypi.org/project/PySide6-Essentials/6.8.2.1/#files).
+Standalone Python includes its interpreter/stdlib but still has declared C-runtime
+requirements ([upstream distribution format](https://gregoryszorc.com/docs/python-build-standalone/main/distributions.html)).
+Host desktop/audio libraries, normal GUI, real DSH, full sources/notices and
+signed forward installation remain release qualification work.
+
+Eight local boundary cases pass: actual safe interpreter-link extraction, unsafe
+paths/types/duplicates/external-link refusal, exact ZIP roundtrip through the real
+Linux consumer, repeatable bytes, rejected local selection/external product links
+and locked graph/CPU qualification invariants. These are small synthetic trees;
+they do not prove a complete runtime build. The new reusable native workflow builds
+both CPUs, using matching Handy artifacts, then runs the real full ZIP consumer,
+relocated interpreters and fixed offline Qt health in a temporary private profile.
+Only scoped JSON reports are uploaded; no bundle is publicly released.
+`managed_linux_only` dispatches this scope through `validate.yml`; native-service,
+managed-bundle and full scopes have separate parent concurrency groups. Full
+validation includes both native bundles. Native producer execution is pending.

@@ -1,0 +1,70 @@
+{
+  "schema": "augmentor-linux-managed-build/1",
+  "qualificationStatus": "development-only",
+  "pythonVersion": "3.12.13",
+  "qtVersion": "6.8.2",
+  "pythonPackages": {
+    "PySide6_Essentials": "6.8.2.1",
+    "shiboken6": "6.8.2.1",
+    "PyYAML": "6.0.2",
+    "Pygments": "2.18.0",
+    "numpy": "2.5.1",
+    "websocket-client": "1.8.0",
+    "sounddevice": "0.5.2",
+    "onnxruntime": "1.28.0",
+    "cffi": "2.1.0",
+    "pycparser": "3.0",
+    "flatbuffers": "25.12.19",
+    "protobuf": "7.35.1",
+    "packaging": "25.0",
+    "pip": "26.1.1",
+    "keyring": "25.6.0",
+    "jaraco.classes": "3.4.0",
+    "jaraco.context": "6.0.1",
+    "jaraco.functools": "4.1.0",
+    "more-itertools": "10.7.0",
+    "SecretStorage": "3.3.3",
+    "jeepney": "0.9.0",
+    "cryptography": "45.0.6"
+  },
+  "targets": {
+    "x64": {
+      "target": "linux-x64",
+      "python": {
+        "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20260320/cpython-3.12.13%2B20260320-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz",
+        "sha256": "bdabcacc426ab3f04dc65ff26dffb4abaddd16ae8797f8aa50479de0c566245e",
+        "bytes": 33861127
+      },
+      "node": {
+        "version": "24.19.0",
+        "url": "https://nodejs.org/dist/v24.19.0/node-v24.19.0-linux-x64.tar.xz",
+        "sha256": "14b342e71204f811bde6153be8e04b62aef63c236fef92b55f9c83154b409647"
+      },
+      "wheelGlibcFloor": "2.28",
+      "candidateDistributions": {
+        "ubuntu": "24.04",
+        "debian": "13"
+      },
+      "distributionsQualified": false
+    },
+    "arm64": {
+      "target": "linux-arm64",
+      "python": {
+        "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20260320/cpython-3.12.13%2B20260320-aarch64-unknown-linux-gnu-install_only_stripped.tar.gz",
+        "sha256": "36ddba171f170664c0b8f254be9c60a10d6319d922f115cf6b913e8d4cdfc200",
+        "bytes": 29575140
+      },
+      "node": {
+        "version": "24.19.0",
+        "url": "https://nodejs.org/dist/v24.19.0/node-v24.19.0-linux-arm64.tar.xz",
+        "sha256": "01443c1e1a29e531ccad5a46fefa6df490d2189c49f7955904aecdbb0fe86fdc"
+      },
+      "wheelGlibcFloor": "2.39",
+      "candidateDistributions": {
+        "ubuntu": "24.04",
+        "debian": "13"
+      },
+      "distributionsQualified": false
+    }
+  }
+}

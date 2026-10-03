@@ -396,3 +396,17 @@ change the release, and refuses damaged retained speech before activation. The
 public managed download path requires bundled DSH/speech entrypoints and payload
 metadata before imports; a qualification flag alone cannot compensate for a
 missing dependency tree. Twelve deployment cases and nine archive cases pass.
+
+
+## Managed bundle production — October 4
+
+The complete native Linux candidate builder is
+`scripts/package-linux-managed.py --out <new-directory>`. It bundles pinned
+Python/Node, locked Linux GUI/runtime wheels, production JS, matching Handy and
+prepared DSH/speech, then requires actual immutable offline Qt health and exports
+an exact ZIP. A preview also requires `--channel preview --update-build <reviewed-positive-build>
+--source-commit <exact-clean-commit>`; CI's build 1 is an unpublished test candidate.
+It does not install or select a deployment. Qualification flags remain disabled.
+Native x64/ARM64 workflow execution, signed forward installation, real desktop/DSH,
+distribution and sources/notices qualification remain necessary. See
+[the full scope and evidence](UPDATE-SYSTEM.md#complete-managed-linux-candidate-producer--october-4).

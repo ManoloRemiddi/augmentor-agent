@@ -1,0 +1,60 @@
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+name: Linux managed bundle
+on:
+  workflow_call:
+permissions:
+  contents: read
+jobs:
+  bundle:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            target: linux-x86_64
+          - os: ubuntu-24.04-arm
+            target: linux-aarch64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - name: Reject private source
+        run: python3 scripts/check-private-source-boundary.py
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.19.0'
+      - name: Install declared build and runtime host libraries
+        run: |
+          sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=30 update
+          sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=30 install -y --no-install-recommends python3-pip libportaudio2 libxcb-cursor0 libxkbcommon-x11-0 libegl1 libopengl0 libgl1 fonts-dejavu-core
+      - name: Build reviewed application inputs
+        run: |
+          npm ci --ignore-scripts
+          npm ci --prefix apps/browser --ignore-scripts
+          npm ci --prefix release/dsh --ignore-scripts
+          release/dsh/node_modules/.bin/pnpm --dir apps/browser/plugin install --frozen-lockfile --ignore-scripts
+          npm run check
+          npm run build
+          npm --prefix apps/browser run build
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: handy-${{ matrix.target }}
+          path: components/handy/runtime
+      - name: Restore and verify reviewed component modes
+        run: |
+          chmod +x components/handy/runtime/bin/*
+          python3 -c "import importlib.util; s=importlib.util.spec_from_file_location('stage','scripts/stage-handy.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.validate()"
+      - name: Build complete unqualified preview bundle
+        run: python3 -B scripts/package-linux-managed.py --out outputs/linux-managed --channel preview --update-build 1 --source-commit "$GITHUB_SHA"
+      - name: Exercise actual ZIP staging and relocated offline Qt health
+        run: python3 -B scripts/proof-linux-managed-bundle.py outputs/linux-managed --out outputs/linux-managed/proof.json
+      - name: Retain scoped qualification reports
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: managed-linux-${{ matrix.target }}
+          path: outputs/linux-managed/*.json
+          retention-days: 7
+          if-no-files-found: warn
