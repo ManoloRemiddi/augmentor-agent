@@ -132,6 +132,11 @@ jobs:
         if: ${{ !cancelled() && steps.dsh.outcome == 'success' }}
         run: |
           & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-windows-application.py --root outputs/payload --arch ${{ matrix.arch }}
+      - name: Verify bounded source-recovery observation
+        if: ${{ !cancelled() && steps.application.outcome == 'success' }}
+        run: |
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_recovery_observer.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Exercise the actual bundled dictation broker and private state
         if: ${{ !cancelled() && steps.application.outcome == 'success' }}
         env:

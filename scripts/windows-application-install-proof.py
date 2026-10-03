@@ -338,7 +338,7 @@ def main():
         prior_backups=set((data/'payload-backups').iterdir())
         recovery_log=out/'independent-source-recovery.log'
         try:
-            run([cached_installer,*flags,'/LOG='+str(recovery_log),'/augmentorrecover=previous'],success=False,timeout=660)
+            run([cached_installer,*flags,'/LOG='+str(recovery_log),'/augmentorrecover=previous'],success=False,timeout=1200)
         finally:
             for inner_log in transaction.glob('recovery-*.log'):shutil.copy2(inner_log,out/inner_log.name)
         marker='Augmentor recovery result: '

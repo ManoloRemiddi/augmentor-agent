@@ -706,3 +706,15 @@ strict inventory assertions remain unchanged. Product startup already received
 `-B` in `547a9f0`; this correction changes only test execution. All matched native
 and package gates must pass again before publication. The owner's installed
 release and saved dictation preferences are untouched.
+
+### October 3 larger ARM64 recovery deadline
+
+All matching customer packages and source/desktop/Mac/Linux gates pass at
+`9661eef`; x64 full installation passes too. ARM64 full installation reaches
+source restoration, where the old five-minute observer expires roughly 26
+seconds before its independent Setup successfully finishes. Required health and
+journal completion are therefore absent. [The owning recovery record](WINDOWS-INSTALLER-DECISION.md#october-3-complete-payload-recovery-observation)
+describes the bounded ten-minute inner/fifteen-minute outer observation and
+regression cases. Inventory, source identity and durable completion gates remain
+strict; all matched candidates must be rebuilt and qualified after this product
+correction. Three private preview-2 drafts exist; no new download is public.

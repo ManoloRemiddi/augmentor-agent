@@ -1189,3 +1189,26 @@ different target. The remaining sequence is:
 This is unfinished implementation work, not a completed rollback contract. Reuse
 shared lifecycle classes and the retained installer's runtime; do not introduce
 another conversational core or a force flag that bypasses the unresolved record.
+
+## October 3 complete-payload recovery observation
+
+At source `9661eef`, [native run 37123469484](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37123469484)
+passes all x64 installation/repair/removal scenarios. ARM64 passes initial install,
+strict inventory, draft refusal, repair, coordinated same-build replacement and
+independent health, then fails at the source-restoration observer's five-minute
+installer deadline. Its retained inner Setup log proves installation succeeded
+about 26 seconds after observation expired; this is a timeout policy mismatch for
+the larger bundled payload, rather than evidence of failed file installation.
+The original recovery remains unresolved because its required verification and
+journal completion did not run. Those gates must still succeed.
+
+Source installation now has a bounded ten-minute observation. The native outer
+observer permits fifteen minutes, including admission and independent verification/
+health; the full proof allows twenty minutes for outer extraction and observation.
+Both architectures share these bounds. Expiry preserves independent Setup and
+recovery records; no replay, process termination, success-on-timeout or relaxed
+inventory/health assertion is introduced. Three clock-driven tests cover actual
+completion after the former limit, bounded unknown outcome and terminal failure.
+All thirteen existing source-restoration durability cases still pass locally.
+Native whole-application proofs and matched customer downloads must rerun before
+publication. The owner's installed Linux application is untouched.

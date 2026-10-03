@@ -1792,3 +1792,13 @@ now identifies only extra standard-library bytecode from the incomplete-checkout
 fixture's direct interpreter launch. That fixture now uses `-B`; product startup
 and strict package inventory checks remain intact. Matched gates rerun; customer
 publication is still pending and the owner's selected release is unchanged.
+
+## October 3 complete ARM64 payload recovery wait
+
+[Windows recovery evidence](WINDOWS-INSTALLER-DECISION.md#october-3-complete-payload-recovery-observation)
+identifies the final `9661eef` ARM64 failure: source Setup succeeded about 26
+seconds after the five-minute observer expired, leaving verification/completion
+unresolved. Observation is now bounded at ten minutes within a fifteen-minute
+native envelope. Three timing cases and thirteen durability cases pass locally;
+all matched source/native/package gates rerun. Preview-2 drafts remain private,
+public downloads/website remain unchanged, and the owner's installation is untouched.
