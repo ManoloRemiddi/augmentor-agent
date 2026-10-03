@@ -414,6 +414,178 @@
     "outputs/linux-rollout/mint-fresh-account2035/post-run-evidence/dsh.log": {
       "sha256": "f535dfccfed360504c9f34a1f98239d8376f0ee2498ece69a2103f1032dac68d",
       "bytes": 94
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-old-account-finally.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-run-host.json": {
+      "sha256": "3cb4751625e1703c21188fc813b4f95c5f05bdf8fae13ac06ffd9cdae6576f4b",
+      "bytes": 735
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-external-stage.stdout": {
+      "sha256": "5fa1da6836c717255e67bfc1c976cec9b93f55f70b4be9eea6b6c2a220dd07ea",
+      "bytes": 542
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-readback-cwd-v2-authorized.py": {
+      "sha256": "02ea77d51ee869cc124c2c6b957ba9f00da8fb2341282de4d5b232ad2332a77e",
+      "bytes": 2822
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-readback.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-readback-guest.py": {
+      "sha256": "dec9f48dee09ccfa8b7eca1ebff1a11f38932333ecb339cea997c8eebb3bee10",
+      "bytes": 10623
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-live-readonly.jsonl": {
+      "sha256": "d9c5bbec09596774da57ace8c8923a2bcd62c5e46ba293db41922bbbd51617fc",
+      "bytes": 1787
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-run-cwd-v2-authorized.py": {
+      "sha256": "9e39fa514a406c3886200a30171dcf278b14469b274162cb818ac4066d9d139b",
+      "bytes": 6394
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-actual.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-old-account-finally.stdout": {
+      "sha256": "5db1cf506ea3ca75b806bcb210b4a794c6c8ea6ebb669cea3d498ac0515aeb91",
+      "bytes": 1921
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-live-readonly.py": {
+      "sha256": "db5b6e70bb9392e5fe86617f844a1a325f881ba9000a8302099f58b24580f764",
+      "bytes": 2050
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-current-preflight-guest.py": {
+      "sha256": "44444bad5afbc048d51233da85c74b19731c9041a8bbc3349d7211b5f473c141",
+      "bytes": 10730
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-current-preflight.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-readback.json": {
+      "sha256": "11d035750911cad3c1f8556b382e4f37dfb1244c2251a8f00996f3ef80c74cd1",
+      "bytes": 611
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-external-stage.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-actual.stderr": {
+      "sha256": "5f2aceb8be3aea03f9626e63ae56575547f0d60f6f45163e946ce96875cb1054",
+      "bytes": 916
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-readback-raw.stdout": {
+      "sha256": "a31ad06ae00e9bfde9071805134c73f4fafc9d6f4965080b14d659694ca896e1",
+      "bytes": 27625
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-current-preflight.stdout": {
+      "sha256": "a5c15813bc9a20fc35bd632e0cf957c5b6ef3db928f8a3ede106d4b34a3b1cf9",
+      "bytes": 301
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-live-initial-refusal.json": {
+      "sha256": "f0f587385908168b641057de3e3f36f5d581e35bce44a6b4ac324fabff0c1546",
+      "bytes": 125
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-run-evidence/run.json": {
+      "sha256": "72531cd9a3276236d4374d48f6a9785e93d2fcb0d068f914e9812efef8b3c441",
+      "bytes": 681
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-run-evidence/desktop.png": {
+      "sha256": "5347e6f84bb89cf7b0c9dfe952316bafb51e2faa8f6af04147203efdb1140fd2",
+      "bytes": 19796
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v2-run-evidence/dsh.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-old-account-finally.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-host-result.json": {
+      "sha256": "e063dcb6b3d1e38daff9f801cbc0935f0a961f1fb5c2a7121b47b10b2090468b",
+      "bytes": 602
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-current-preflight.stdout": {
+      "sha256": "151a3ff21d4605545d204b658a185e29f942197359e4b27f987c0ac90c435321",
+      "bytes": 238
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-stage.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness-only-180-host.py": {
+      "sha256": "f4de2cdca1909dbf49b6e41060eb9db09d79cb0d3957e89bd4f0a703168c0b76",
+      "bytes": 5088
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-old-account-finally.stdout": {
+      "sha256": "f4995aedc2ad3126678bbe72f97d8461e0fc67cb71d8f9a8f72fd07d62488626",
+      "bytes": 51
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-readback-authorized.py": {
+      "sha256": "87343d321fa0e545519d95c85f39dc0651fe40ada63c9c9370f1ff111677f24a",
+      "bytes": 3407
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-readback-guest.py": {
+      "sha256": "b92b3c8da31bfcc135293e60b49ed2c9811ff34edea17eae9feada814c5ebe29",
+      "bytes": 11183
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-actual.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-current-preflight.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-readback-raw.stdout": {
+      "sha256": "a0a3d265b868655a9d83faa5d706e970d6ca451be376dfce782410d067954f5a",
+      "bytes": 29418
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-dsh-log-redacted.txt": {
+      "sha256": "c1b2e6809c379b6a28b662ec3aa69a929703719954d4ac89d858cb893cdc2116",
+      "bytes": 359
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness-only-180-guest.py": {
+      "sha256": "b6b592df6d7554dfdd967b47de5c2ab1fb254e6f07f24dbc64ae1305503ce99f",
+      "bytes": 7517
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-stage.stdout": {
+      "sha256": "3ec720351196cb4a2f8e6b59942906aba560b0454b414aa0df4e0fc1623b4b79",
+      "bytes": 349
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-live.json": {
+      "sha256": "e2121404aef6c69dca1973232ab0e6be9ebea0396bfa5e3cd456a40db4c99cb0",
+      "bytes": 1178
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-readback.json": {
+      "sha256": "09fc9c888baddd72c6fd1356da882104d42b9ed941601993c247c52a860c7313",
+      "bytes": 683
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-actual.stderr": {
+      "sha256": "3c65b869b9296088ee1eead8af1161076889fab861f190284f7f325b03cfcafe",
+      "bytes": 849
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-readback.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-run-evidence/observations.json": {
+      "sha256": "badfd6c569f9fbfc9adc3394e1c99a4535cc3df1b50b6cf5bdb3e639024eb83e",
+      "bytes": 20347
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-run-evidence/run.json": {
+      "sha256": "a31419c04e561ccbd677be72114332fd224947c9578faff37952f4d4f242ef2e",
+      "bytes": 1038
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/readiness180-run-evidence/dsh.log": {
+      "sha256": "4321b5b9a9d5f9f9a105287c116525596b0130677f36eb81d36985cb893605ea",
+      "bytes": 387
     }
   },
   "maintainedPostInstallEntry": {
@@ -474,13 +646,102 @@
   },
   "cwdCorrection": {
     "implemented": true,
-    "executedInVM": false,
+    "executedInVM": true,
     "previewAndOwnedProcessCwd": "verified POST_HOME",
     "public60SecondBoundsUnchanged": true,
     "explicitNextRunDirectory": "post-install-proof-cwd-v2",
     "priorFailureSha256": "cd7f502ff3d868257f81c9a248aa9f11223925dd91af57da37f12e23407418f2",
     "preservesInitialJournal": true,
     "refusesPriorPendingOrUnknownOutcome": true,
-    "reviewRequiredBeforeVM": true
+    "reviewRequiredBeforeVM": false,
+    "executionStatus": "fail"
+  },
+  "maintainedPostInstallCwdV2Execution": {
+    "status": "fail",
+    "externalProofSource": "b12af5e57462ac7d059bb82386e34d8d1d2b4df6",
+    "proofScriptSha256": "36cdc46d6eb910b113ed9acb86fd0c68b84e350dbedcfe3b6139d0438dea7545",
+    "run": "65e1c45704d9ac16775b98e55d3f7dd0",
+    "runJournalSha256": "72531cd9a3276236d4374d48f6a9785e93d2fcb0d068f914e9812efef8b3c441",
+    "phase": "starting",
+    "pendingRequest": null,
+    "unknownRequestOutcome": false,
+    "SDKMutationsSent": false,
+    "modelTurnsReached": false,
+    "modelRequests": null,
+    "observedSessionHistories": false,
+    "offscreenPreviewPass": true,
+    "originalFailureJournalPreserved": true,
+    "fiveSettingsPreserved": true,
+    "oldUid1000TenHashesPreserved": true,
+    "workspaceUnchangedEmpty": true,
+    "nativeAuditClean": true,
+    "ownedApplicationSetupProcessesIdle": true,
+    "explicitNodeCwd": "/home/augmentor-complete-proof",
+    "childLogBytes": 0,
+    "publicReadinessBudgetSeconds": 60,
+    "totalProofElapsedSeconds": 102.5082437992096,
+    "startupObservation": [
+      {
+        "nodeElapsedSeconds": 38.91,
+        "nodeCpuSeconds": 37.79,
+        "guestMemAvailableKiB": 2356300,
+        "guestSwapFreeKiB": 3997180
+      },
+      {
+        "nodeElapsedSeconds": 63.51,
+        "nodeCpuSeconds": 61.56,
+        "guestMemAvailableKiB": 2377196,
+        "guestSwapFreeKiB": 3997180
+      }
+    ],
+    "timingCaveat": "Configured startup budget checked between bounded adapter reads; total proof includes validation/render. No full startup completion observed.",
+    "timeoutCauseEstablished": false,
+    "setupReplay": false,
+    "retryExecuted": false,
+    "modelRequestCountRetained": false
+  },
+  "readinessOnlyDiagnostic": {
+    "executed": true,
+    "diagnosticScriptSha256": "b6b592df6d7554dfdd967b47de5c2ab1fb254e6f07f24dbc64ae1305503ce99f",
+    "installedSource": "2035af99b46bb013e81de9766216da820ab4a325",
+    "maintainedPublicProofSource": "b12af5e57462ac7d059bb82386e34d8d1d2b4df6",
+    "maintainedExecutableChanged": false,
+    "status": "fail",
+    "phase": "observed",
+    "journalSha256": "a31419c04e561ccbd677be72114332fd224947c9578faff37952f4d4f242ef2e",
+    "matchingProductHttpIdentityObserved": true,
+    "firstMatchingHttpSeconds": 56.4262504119979,
+    "diagnosticBudgetSeconds": 180,
+    "public60SecondProofPass": false,
+    "fullAdapterHostDescribeTested": false,
+    "presetAuthSDKReadinessEstablished": false,
+    "actualModelRequests": 0,
+    "actualProviderHttpRequests": [],
+    "SDKCalls": false,
+    "SDKMutations": false,
+    "historyOrSessionMutations": false,
+    "setupOrSettingsReplayed": false,
+    "sampleCount": 51,
+    "lastSample": {
+      "nodeElapsedSeconds": 56.328321840999706,
+      "cpuSeconds": 59.09,
+      "guestMemAvailableKiB": 2357200,
+      "guestSwapFreeKiB": 3997180
+    },
+    "childLogBytes": 387,
+    "failure": "Immediate post-cleanup port bind raised EADDRINUSE after process/server closure.",
+    "immediateBindRefusalCauseEstablished": false,
+    "subsequentReadOnlyCleanup": {
+      "bothJournalsPreserved": true,
+      "noTargetPortListener": true,
+      "settingsPreserved": true,
+      "oldAccountPreserved": true,
+      "nativeAuditClean": true,
+      "ownedApplicationSetupProcessesIdle": true,
+      "workspaceUnchangedEmpty": true
+    },
+    "subsequentTargetPortsKernelEntries": [],
+    "retryExecuted": false,
+    "originalFullProofAndBothPostInstallFailuresPreserved": true
   }
 }

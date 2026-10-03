@@ -119,7 +119,11 @@ explicit working directory. The narrowly defined `post-install-proof-cwd-v2`
 fixture requires the exact initial failed journal hash, its pre-request failure
 state, current idle guards and unchanged empty workspace. It preserves the old
 journal and refuses any uncertain request or preexisting second-run journal.
-This correction remains unexecuted in the VM pending source review.
+The published `b12af5e` correction has now run once. Its preview succeeds,
+but DSH again misses readiness before SDK mutations/model turns. Correct cwd,
+an empty child log, CPU activity during startup and complete cleanup are
+recorded separately from a successful connected-product proof. Both failed
+journals remain preserved; no timeout widening or replay establishes a pass.
 
 The clean7b6df59 source-runtime runtime/desktop packages now have actual
 [ordinary-user offline installed startup evidence](LINUX-SOURCE-RUNTIME-ENTRYPOINTS.md#installed-ordinary-user-acceptance-of-clean7b6df59),
@@ -280,3 +284,11 @@ Public snapshots exclude repository histories, local outputs,
 configuration, credentials, conversations, memory databases, model weights and
 microphone recordings. Downloadable synthetic voice references have the separate
 speech-model terms described above.
+
+The isolated Mint readiness-only diagnostic later observes matching product HTTP
+identity at 56.43 seconds and counts zero model/provider requests, using unchanged
+installed bytes and GET only. Full adapter authentication/preset/SDK readiness is
+not tested. The diagnostic retains its own failure because immediate cleanup
+port binding is refused; later read-only native/settings/journal/workspace/idle
+checks pass with no remaining listener. The two 60-second post-install failures
+and original full-proof loader failure remain distinct and unchanged.

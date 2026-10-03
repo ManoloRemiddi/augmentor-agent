@@ -1,5 +1,23 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 Mint readiness observations and Ubuntu runner timeout
+
+The [Mint checkpoint](../release/qualification/next-targets/20261003-mint2035-installed-setup-proof-loader.json)
+retains the corrected-cwd60-second failure with unchanged settings, native audit,
+empty workspace and both accounts' protected state. A separate read-only
+diagnostic observes matching product HTTP identity at56.43seconds and counts
+zero provider/model requests; it does not test full preset/authenticated adapter
+readiness. Its immediate cleanup port-bind refusal remains a failed diagnostic;
+later checks find no listener or owned process. No failed result is relabelled.
+
+The ordinary Ubuntu shortcut run reaches an outer host runner timeout before
+its final report. It cannot establish native shortcut acceptance. Independent
+readback finds its journal absent, no helper/secondary process and a normal
+idle main on the same immutable selection. Its original private receipt and
+logs are preserved; no uncertain Save/input is replayed. Actual Settings PASS
+remains separate. Current selected-artifact reboot proof is running.
+
+
 ## October 3 Fedora GNOME historical payload metadata refusal
 
 [The initial candidate admission](../release/qualification/next-targets/20261003-fedora-gnome-old-payload-target-refusal.json)

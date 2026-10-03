@@ -127,5 +127,24 @@ the verified synthetic home. Two additional cases check real child cwd and
 parent preservation, and the narrow proposed `post-install-proof-cwd-v2` route
 with the exact preserved initial failed journal hash. It refuses prior pending
 requests, unknown outcomes, altered records or a preexisting second-run journal.
-The correction has not run in the VM; source review and separate authorization
-precede any second run. Neither journal is deleted or adopted.
+The exact published `b12af5e` correction has now run once against installed
+clean2035. Preview succeeds; DSH again misses the unchanged readiness budget
+before SDK mutations or model turns. The child cwd is correct and its log is
+empty, so the denied `.env` warning has been removed. Read-only samples show
+37.79 CPU seconds at 38.91 seconds elapsed, and 61.56 CPU seconds at 63.51
+seconds elapsed. These samples establish activity during startup, not its
+loading stage or ultimate cause. Both journals remain preserved; cleanup,
+native audits, both accounts' settings and empty workspace pass. No connected
+product/history/model proof is claimed, and no second-run replay is allowed.
+
+A separate authorized readiness-only diagnostic observes matching product HTTP
+version/home identity at 56.43 seconds with zero counted model/provider requests.
+It uses unchanged installed clean2035 bytes, one owned Node process and HTTP GET
+only. This is narrower than the full adapter's authentication/preset/SDK
+readiness checks and does not turn either retained 60-second failure into a pass.
+Its own result remains failed: the immediate final port-bind check reports
+`EADDRINUSE` after owned process/server closure. Subsequent read-only checks find
+no target-port listener or kernel socket entry, idle owned processes, clean native
+audits, unchanged five settings and old-account hashes, unchanged empty workspace
+and both preserved journals. The immediate bind-refusal cause was not captured.
+No diagnostic or failed proof is replayed; the maintained executable is unchanged.
