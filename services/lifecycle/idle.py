@@ -2,6 +2,7 @@
 """Bound detached companions without tying a shared service to its first parent."""
 import os
 from pathlib import Path
+import stat
 import threading
 import time
 
@@ -16,7 +17,13 @@ class Lifetime:
         self.files = [(Path(lock.name), self.identity(os.fstat(lock.fileno())))]
         if endpoint is not None and os.name != 'nt':
             path = Path(endpoint)
-            self.files.append((path, self.identity(path.stat())))
+            try:
+                info = path.stat()
+                identity = self.identity(info) if stat.S_ISSOCK(info.st_mode) else None
+            except FileNotFoundError:
+                identity = None
+            # Never adopt a file substituted during startup as our endpoint.
+            self.files.append((path, identity))
 
     @staticmethod
     def identity(info):

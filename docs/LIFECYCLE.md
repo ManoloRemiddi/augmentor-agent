@@ -90,9 +90,14 @@ some previously cold pages back into memory). Production app services, enabled
 global dictation, container-managed proofs and other unqualified namespaces were
 preserved. Private test data and logs were not deleted.
 
-Source checks cover real subprocess retirement, accepted long watches, preserved
+Thirteen lifetime/watchdog checks cover real subprocess retirement, accepted long watches, preserved
 SQLite data/restart, live disabled microphone ownership, replaced endpoints,
 maintenance/background work and old-watchdog observation/PID-reuse behavior.
+A production-limit proof separately observed all three isolated services exit
+cleanly after 300.2 seconds; both memory/prompt databases remained present.
+Replacement testing exposed and corrected a startup race: prompt SQLite setup
+now finishes before publishing its endpoint, and retirement never adopts a
+replacement regular file as its socket.
 Related checks: 29 Node runtime/prompt/native-host/cancellation cases, 24 Qt
 prompt cases, 26 dictation cases (one portal-environment skip), 35 memory cases,
 six lifecycle and four admission cases; TypeScript check/build pass. The host's

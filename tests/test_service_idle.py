@@ -52,6 +52,14 @@ class LifetimeTests(unittest.TestCase):
         self.path.unlink()
         self.assertTrue(self.life.retire())
 
+    @unittest.skipIf(os.name == 'nt', 'Windows pipes have no filesystem endpoint')
+    def test_startup_never_adopts_a_replacement_regular_file_as_its_socket(self):
+        endpoint=self.path.with_suffix('.sock');endpoint.write_text('replacement fixture')
+        life=Lifetime(self.file,endpoint)
+        self.assertTrue(life.retire())
+        life.cleanup(endpoint)
+        self.assertEqual(endpoint.read_text(),'replacement fixture')
+
     @unittest.skipIf(os.name == 'nt', 'Windows prevents replacing open locks')
     def test_recreated_tree_cannot_keep_old_service_or_remove_new_socket(self):
         endpoint = self.path.with_suffix('.sock')

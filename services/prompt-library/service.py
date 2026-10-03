@@ -195,7 +195,8 @@ if __name__=='__main__':
     except BlockingIOError:raise SystemExit(0)
     endpoint=state/'prompts.sock'
     prepare_endpoint(endpoint)
-    server=Server(str(endpoint),Handler);server.library=Library(data/'prompts.sqlite3')
+    library=Library(data/'prompts.sqlite3')
+    server=Server(str(endpoint),Handler);server.library=library
     def stop(*_):threading.Thread(target=server.shutdown,daemon=True).start()
     server.watch_idle(lock,endpoint,stop,server.admission.retire_idle)
     signal.signal(signal.SIGTERM,stop);signal.signal(signal.SIGINT,stop)
