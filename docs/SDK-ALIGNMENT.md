@@ -138,6 +138,13 @@ closes the provider server even if host cleanup rejects. This preserves the
 original engine assertions and makes failure details observable; the cancelled
 run is not passing Mac evidence. Fresh hosted engine/bundle checks remain required.
 
+[Product contracts 37111509392](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37111509392)
+pass Linux, Mac and Windows at `898d193`; the paired
+[SDK matrix 37111618792](https://github.com/ManoloRemiddi/augmentor-app-sdk/actions/runs/37111618792)
+passes all six source/packed/native jobs against that source. This later Mac
+pass precedes the teardown follow-up and does not establish the earlier failed
+case's cause. Packaged bundle/lifecycle runs retain their independent gates.
+
 `scripts/app-sdk-bundle-proof.mjs` checks the actual packaged Mac/Windows bootstrap, private token,
 transactional DSH workspace registration/role composition, native frame
 description, shared-administration denial, explicit harness and natural owned
