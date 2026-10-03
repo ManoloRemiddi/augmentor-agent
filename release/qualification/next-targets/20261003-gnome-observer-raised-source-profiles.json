@@ -1,0 +1,249 @@
+{
+  "schema": 1,
+  "kind": "pinned-primary-source-review",
+  "date": "2026-10-03",
+  "runtimeQualification": false,
+  "representativeTags": [
+    "46.0",
+    "48.0",
+    "49.0",
+    "50.5"
+  ],
+  "syntheticPolicyVersions": [
+    "46.0",
+    "48.4",
+    "49.5",
+    "50.5"
+  ],
+  "originalPrivateDownloadManifestSha256": "8c47fee38570673eaa070dbc859ab1109112a2586d4f62684ea113e88d952eaa",
+  "sources": [
+    {
+      "tag": "46.0",
+      "path": "src/core/window.c",
+      "url": "https://raw.githubusercontent.com/GNOME/mutter/46.0/src/core/window.c",
+      "bytes": 238088,
+      "sha256": "1168eb62c196794ff1901ac199036a4ead60655b9abebd4e562d9b10c9ad80b3",
+      "functionLines": {
+        "meta_window_raise": 4982,
+        "meta_window_handle_ungrabbed_event": 7351
+      },
+      "reviewedFacts": [
+        "raiseOnClickCallsWindowRaise",
+        "windowRaiseEmitsRaisedAfterStackRaisesIncludingNoOp"
+      ]
+    },
+    {
+      "tag": "46.0",
+      "path": "src/core/stack.c",
+      "url": "https://raw.githubusercontent.com/GNOME/mutter/46.0/src/core/stack.c",
+      "bytes": 25606,
+      "sha256": "ed025f12cefc3e123c2a43d1e38ac8f1805556f63d3d44ee01682787e45920ed",
+      "functionLines": {
+        "meta_stack_changed": 176,
+        "meta_stack_raise": 272,
+        "meta_stack_thaw": 336
+      },
+      "reviewedFacts": [
+        "maximalStackRaiseReturnsBeforeStackChanged",
+        "stackChangedSortsBeforeSignalUnlessFrozen",
+        "stackThawCallsStackChanged"
+      ]
+    },
+    {
+      "tag": "46.0",
+      "path": "clutter/clutter/clutter-actor.c",
+      "url": "https://raw.githubusercontent.com/GNOME/mutter/46.0/clutter/clutter/clutter-actor.c",
+      "bytes": 569707,
+      "sha256": "e5326fae89bbc20d565d4f8eefbf754febacc167ec7e208472b9093ba6e7ef69",
+      "functionLines": {
+        "clutter_actor_get_translation": 4277,
+        "clutter_actor_get_scale": 10012,
+        "clutter_actor_get_allocation_box": 8398,
+        "clutter_actor_get_opacity": 10167
+      },
+      "reviewedFacts": [
+        "translationHasThreeOutFloats",
+        "scaleHasTwoOutDoubles",
+        "allocationHasBoxFields",
+        "opacityIsUint8",
+        "allocationMetadataCanBeOutdatedOutsidePaint"
+      ]
+    },
+    {
+      "tag": "48.0",
+      "path": "src/core/window.c",
+      "url": "https://raw.githubusercontent.com/GNOME/mutter/48.0/src/core/window.c",
+      "bytes": 259374,
+      "sha256": "4e1d8bd6eb73a61be78ada169af8d3e460c4fc9f2e22fa4622630f0e378a6e8f",
+      "functionLines": {
+        "meta_window_raise": 5178,
+        "meta_window_handle_ungrabbed_event": 7443
+      },
+      "reviewedFacts": [
+        "raiseOnClickCallsWindowRaise",
+        "windowRaiseEmitsRaisedAfterStackRaisesIncludingNoOp"
+      ]
+    },
+    {
+      "tag": "48.0",
+      "path": "src/core/stack.c",
+      "url": "https://raw.githubusercontent.com/GNOME/mutter/48.0/src/core/stack.c",
+      "bytes": 24792,
+      "sha256": "616ad9a2757b2db7f18e99f26ffdbdd8d0d4f1aef0a2bc1e2e5baa0768470933",
+      "functionLines": {
+        "meta_stack_changed": 173,
+        "meta_stack_raise": 267,
+        "meta_stack_thaw": 331
+      },
+      "reviewedFacts": [
+        "maximalStackRaiseReturnsBeforeStackChanged",
+        "stackChangedSortsBeforeSignalUnlessFrozen",
+        "stackThawCallsStackChanged"
+      ]
+    },
+    {
+      "tag": "48.0",
+      "path": "clutter/clutter/clutter-actor.c",
+      "url": "https://raw.githubusercontent.com/GNOME/mutter/48.0/clutter/clutter/clutter-actor.c",
+      "bytes": 582326,
+      "sha256": "d6ad1f339d1656eb834faa4e58fca71af65db6a45cd7b42e2754d23845376853",
+      "functionLines": {
+        "clutter_actor_get_translation": 4359,
+        "clutter_actor_get_scale": 10183,
+        "clutter_actor_get_allocation_box": 8569,
+        "clutter_actor_get_opacity": 10338
+      },
+      "reviewedFacts": [
+        "translationHasThreeOutFloats",
+        "scaleHasTwoOutDoubles",
+        "allocationHasBoxFields",
+        "opacityIsUint8",
+        "allocationMetadataCanBeOutdatedOutsidePaint"
+      ]
+    },
+    {
+      "tag": "49.0",
+      "path": "src/core/window.c",
+      "url": "https://raw.githubusercontent.com/GNOME/mutter/49.0/src/core/window.c",
+      "bytes": 269192,
+      "sha256": "b05aa85246e2fe9469918b1cb3689a9de018e7029b05307842d80f2218186b02",
+      "functionLines": {
+        "meta_window_raise": 5409,
+        "meta_window_handle_ungrabbed_event": 7684
+      },
+      "reviewedFacts": [
+        "raiseOnClickCallsWindowRaise",
+        "windowRaiseEmitsRaisedAfterStackRaisesIncludingNoOp"
+      ]
+    },
+    {
+      "tag": "49.0",
+      "path": "src/core/stack.c",
+      "url": "https://raw.githubusercontent.com/GNOME/mutter/49.0/src/core/stack.c",
+      "bytes": 24800,
+      "sha256": "54c58cca611af98f0e3912fcc9db9c28862e33eb0d0e3b01b18e0e1187b74c98",
+      "functionLines": {
+        "meta_stack_changed": 173,
+        "meta_stack_raise": 267,
+        "meta_stack_thaw": 331
+      },
+      "reviewedFacts": [
+        "maximalStackRaiseReturnsBeforeStackChanged",
+        "stackChangedSortsBeforeSignalUnlessFrozen",
+        "stackThawCallsStackChanged"
+      ]
+    },
+    {
+      "tag": "49.0",
+      "path": "clutter/clutter/clutter-actor.c",
+      "url": "https://raw.githubusercontent.com/GNOME/mutter/49.0/clutter/clutter/clutter-actor.c",
+      "bytes": 584099,
+      "sha256": "483d6089f6434f61b501023d695119743cee9582f3f7a05060bdddfb0c799c60",
+      "functionLines": {
+        "clutter_actor_get_translation": 4359,
+        "clutter_actor_get_scale": 10188,
+        "clutter_actor_get_allocation_box": 8569,
+        "clutter_actor_get_opacity": 10343
+      },
+      "reviewedFacts": [
+        "translationHasThreeOutFloats",
+        "scaleHasTwoOutDoubles",
+        "allocationHasBoxFields",
+        "opacityIsUint8",
+        "allocationMetadataCanBeOutdatedOutsidePaint"
+      ]
+    },
+    {
+      "tag": "50.5",
+      "path": "src/core/window.c",
+      "url": "https://raw.githubusercontent.com/GNOME/mutter/50.5/src/core/window.c",
+      "bytes": 278569,
+      "sha256": "2a7a90aab55b318a35d211cfecca752a39b23b8862b6d35eaa127166bebedc9a",
+      "functionLines": {
+        "meta_window_raise": 5405,
+        "meta_window_handle_ungrabbed_event": 7690
+      },
+      "reviewedFacts": [
+        "raiseOnClickCallsWindowRaise",
+        "windowRaiseEmitsRaisedAfterStackRaisesIncludingNoOp"
+      ]
+    },
+    {
+      "tag": "50.5",
+      "path": "src/core/stack.c",
+      "url": "https://raw.githubusercontent.com/GNOME/mutter/50.5/src/core/stack.c",
+      "bytes": 24796,
+      "sha256": "65525a6c1491a0b69ba17ad43437f731cd014178ad1f412b2c77d894e290c743",
+      "functionLines": {
+        "meta_stack_changed": 173,
+        "meta_stack_raise": 267,
+        "meta_stack_thaw": 331
+      },
+      "reviewedFacts": [
+        "maximalStackRaiseReturnsBeforeStackChanged",
+        "stackChangedSortsBeforeSignalUnlessFrozen",
+        "stackThawCallsStackChanged"
+      ]
+    },
+    {
+      "tag": "50.5",
+      "path": "clutter/clutter/clutter-actor.c",
+      "url": "https://raw.githubusercontent.com/GNOME/mutter/50.5/clutter/clutter/clutter-actor.c",
+      "bytes": 588011,
+      "sha256": "7e79c147deb933fce8caddc8a8ae87941d1121b75bdf97718a26a14ad0beb89a",
+      "functionLines": {
+        "clutter_actor_get_translation": 4365,
+        "clutter_actor_get_scale": 10259,
+        "clutter_actor_get_allocation_box": 8642,
+        "clutter_actor_get_opacity": 10414
+      },
+      "reviewedFacts": [
+        "translationHasThreeOutFloats",
+        "scaleHasTwoOutDoubles",
+        "allocationHasBoxFields",
+        "opacityIsUint8",
+        "allocationMetadataCanBeOutdatedOutsidePaint"
+      ]
+    }
+  ],
+  "additionalOfficialReferences": [
+    {
+      "url": "https://docs.gtk.org/gobject/func.signal_emit.html",
+      "supports": "synchronous signal emission; not atomic native input"
+    },
+    {
+      "url": "https://github.com/GNOME/gjs/blob/master/doc/Mapping.md#return-values-and-caller-allocates",
+      "supports": "multiple GI out parameters map to JavaScript arrays; documentation reference, not pinned native GJS qualification"
+    },
+    {
+      "url": "https://mutter.gnome.org/clutter/method.Actor.get_allocation_box.html",
+      "supports": "allocation can be outdated outside paint"
+    }
+  ],
+  "limitations": [
+    "Representative upstream tags do not qualify every distro patch or Shell minor.",
+    "Synthetic objects execute actual extension policy; no native GJS or Shell was run.",
+    "Later handlers/frozen stack callbacks can still invalidate; no compositor atomicity.",
+    "No native v5 signal origin was recorded; raised remains a supported inference."
+  ]
+}

@@ -915,3 +915,86 @@ suppression. Review each pinned46/48/49/50 profile before supporting it, or keep
 unreviewed profiles on their existing unconditional raised bump behavior. No
 observer implementation, installed extension replacement/restart, serial
 relaxation or native action is authorized by this design section.
+
+### Redundant-raised observer candidate; SOURCE ONLY, 2026-10-03
+
+The separate observer candidate now implements the contract proposed above.
+It has not been installed or executed in a native Shell. The published v5
+partial-delivery failure and its older enabled observer remain unchanged; the
+held-input ledger checkpoint018ab50 is also a separate source result.
+See `release/qualification/next-targets/20261003-gnome-observer-raised-source-only.json`
+and its pinned profile manifest `20261003-gnome-observer-raised-source-profiles.json`.
+
+The reviewed representative upstream tags46.0,48.0,49.0 and50.5 have the same
+relevant order: `meta_stack_raise` first sorts and returns for an already maximal
+window; actual stack mutation calls `meta_stack_changed`. That method sorts
+before emitting changed unless the stack is frozen. `meta_window_raise` emits
+raised after its ancestor/child stack raises even if those raises were no-ops.
+The manifest pins all12 original upstream files by URL, length and SHA256, with
+function line anchors. For example, [Mutter50.5 stack raise](https://github.com/GNOME/mutter/blob/50.5/src/core/stack.c#L267)
+and [Window.raise](https://github.com/GNOME/mutter/blob/50.5/src/core/window.c#L5405)
+establish this ordering. A frozen/deferred stack change and a later handler are
+not assumed harmless: any observed restack still invalidates. [GObject emission](https://docs.gtk.org/gobject/func.signal_emit.html)
+is synchronous, which supports surrounding the synchronous getters with event
+barrier checks; it does not make compositor input atomic.
+
+A successful unblocked Read caches epoch/serial, the non-raised event barrier,
+exact tracked live focused window/actor identities and a canonical fingerprint.
+The fingerprint includes **every emitted scene field except top-level serial**,
+including titles, application and unknown future fields privately. It also
+includes every bounded native window actor, including hidden actors: native
+window ID/PID/frame/minimized, actor/parent identity, visibility/mapping,
+opacity, allocation, three translation values and two scale values. Duplicate,
+untracked, dying or destroyed inventory cannot qualify. The pinned Clutter
+sources provide those getter signatures; [GJS return mapping](https://github.com/GNOME/gjs/blob/master/doc/Mapping.md#return-values-and-caller-allocates)
+explains multiple output values. Getter errors, missing/wrong shapes and
+nonfinite values refuse caching/suppression. Canonical comparison is bounded to
+200 actors, depth12,20000 values and262144 JavaScript string characters.
+
+Only raised from the same cached already-focused live tracked window can avoid
+a serial increment. The handler recollects the scene and entire inventory,
+rechecks native focus/actor, epoch/serial/barrier and normal guards, and requires
+exact fingerprint equality. Reentrancy, new tracking or any changing getter
+fails the check. Every existing non-raised callback remains an unconditional
+serial/barrier increment and cache invalidation. Focus/lock/geometry/stage
+away-and-back and delayed restack therefore never restore a consumed serial.
+The controller's full serial predicate, portal, helper, consent, timeouts and
+production discovery/input flags are unchanged by this observer candidate.
+
+`SignalDiagnostics` is a separate read-only D-Bus method, so Read's existing
+schema receives no clock/random/diagnostic fields. It retains latest128 fixed
+sanitized reasons, sequence/serial/barrier, optional native window ID, the first
+invalidating record, dropped-history and counter-overflow flags. It emits no
+fingerprints, titles, application names, accessibility text or input payload.
+Suppression requires a covered interval of fewer than128 prior signal records
+**since the cached Read**. An interval exceeding that bound invalidates. A new
+Read can establish a fresh interval at the new serial even when older historical
+records have been dropped; the global dropped-history marker remains true.
+Counter overflow prevents all further suppression. This does not reconstruct
+history outside subscribed signals or prove every native property transition.
+
+The actual extension source passes24 Node cases, including the five existing
+profile/refusal cases and19 new classification/lifetime/bounds cases. Ordering,
+away-back, deferred restack, all registered non-raised callbacks, final native
+binding changes and lifetime refusal run against synthetic46/48/49/50 profiles.
+The138 focused Python cases pass, including observer parsing and worker/portal/
+helper/candidate failure disposal. These are source tests, not native input
+acceptance or qualification of every patch version in those generations.
+
+Allocation metadata can be [out of date outside paint](https://mutter.gnome.org/clutter/method.Actor.get_allocation_box.html).
+Neither the additional inventory nor the signal barrier establishes complete
+painted composition or captures arbitrary unobserved property changes; Status
+still reports completeActorCompositionTracking=false and inputQualified=false.
+The exact v5 signal origin remains an inference until a fresh approved native
+run records it. Parent source review/publication and a new exact-artifact native
+fixture plan are required before any extension/session or candidate input work.
+
+The shared actor/workspace identity counter now checks nonnegative safe-integer
+state and MAX_SAFE_INTEGER before each new assignment. Existing cached IDs are
+preserved at exhaustion; a refused assignment clears the classification cache
+and throws before storing an ID. Read cannot cache that unknown inventory, and
+a raised collection takes its ordinary invalidating path. Two additional actual
+handler cases cover new focused/hidden actor parent IDs, a new hidden actor and
+workspace, invalid/nonfinite counter state, and assigning the last safe identity
+from either namespace without permitting a duplicate next assignment. No guest
+execution accompanies this source review tightening.

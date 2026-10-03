@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 GNOME redundant-raised observer source review
+
+[The observer source checkpoint](../release/qualification/next-targets/20261003-gnome-observer-raised-source-only.json)
+passes independent24 actual-handler Node cases and138 focused Python cases.
+Pinned Mutter46/48/49/50 primary sources support the reviewed ordering. Only a
+redundant raised pulse on the same cached live focused window may preserve serial,
+requiring all scene fields and bounded hidden actor inventory to match. Every
+other watched signal invalidates, including away/back transitions. Bounded event
+reason diagnostics are separate from Read. No installed extension or native input
+changes; v5 remains partial delivery/FAIL and production input remains disabled.
+A fresh artifact/fixture plan is required before native acceptance.
+
 ## October 3 GNOME held-input cleanup source review
 
 [The held-input ledger checkpoint](../release/qualification/next-targets/20261003-fedora-gnome-held-input-ledger-source-only.json)

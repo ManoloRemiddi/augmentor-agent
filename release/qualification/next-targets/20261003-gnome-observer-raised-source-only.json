@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "kind": "gnome-observer-redundant-raised-source-only",
+  "date": "2026-10-03",
+  "reviewStatus": "parent-reviewed-source-only; publication before native staging",
+  "ledgerPublishedSeparately": "018ab50",
+  "inputAccepted": false,
+  "productionGnomeInputEnabled": false,
+  "nativeExecution": false,
+  "files": [
+    {
+      "path": "services/desktop/gnome-extension/observer@augmentoragent.com/extension.js",
+      "sha256": "d5fbf1c257f0cf2467d5fec92e8b586d042b9cfe62d18f0a97f7eb021bc30968",
+      "bytes": 21829
+    },
+    {
+      "path": "tests/gnome-observer-extension.test.mjs",
+      "sha256": "80cd805628358503f954bf04d68201689e2b1c5e50e27062aae71a31568d405a",
+      "bytes": 25545
+    },
+    {
+      "path": "docs/LINUX-GNOME-CONTROL-PLAN.md",
+      "sha256": "26ac3a93126abeb8c38cc79c976ac5ceec81f981e9221951faa561b9d59ac61d",
+      "bytes": 69738
+    },
+    {
+      "path": "release/qualification/next-targets/20261003-gnome-observer-raised-source-profiles.json",
+      "sha256": "252af4ada7120f9e0ee89367b8b468cf568dc18243f621733529efcb6d583368",
+      "bytes": 8640
+    }
+  ],
+  "contract": {
+    "classifiableSignal": "raised only, from exact cached already-focused tracked live window and actor",
+    "fingerprint": "all emitted Read scene fields except top-level serial, plus complete bounded window-actor inventory including hidden actors",
+    "barrier": "all existing non-raised signals unconditionally increment serial/non-raised barrier and invalidate cache, including away-back",
+    "binding": "epoch/serial/barrier and native focus/actor checked around synchronous getters and tracking",
+    "refusal": "missing/stale cache, unknown/dead/untracked inventory, changed guards/fields, getter failure, reentrancy, bounds, interval history gap, counter exhaustion",
+    "diagnostics": "separate SignalDiagnostics method; latest128 sanitized records plus first invalidation, dropped marker and overflow; no private field contents",
+    "historyCoverage": "fewer than128 prior records since cached Read; a new Read may start fresh covered interval at current serial despite older dropped history",
+    "bounds": {
+      "actors": 200,
+      "canonicalDepth": 12,
+      "canonicalValues": 20000,
+      "fingerprintJsStringCharacters": 262144,
+      "diagnosticRecords": 128
+    },
+    "identityAllocation": "Shared nextId must be a nonnegative safe integer below MAX_SAFE_INTEGER before any new actor/workspace ID assignment; cache cleared and assignment refused before storing unknown identity; existing IDs preserved."
+  },
+  "validation": {
+    "nodeCommand": "node --test tests/gnome-observer-extension.test.mjs",
+    "nodeCases": 24,
+    "nodeResult": "PASS",
+    "newNodeCases": 19,
+    "pythonModules": [
+      "test_gnome_control",
+      "test_gnome_input_probe",
+      "test_a11y_helper",
+      "test_desktop_consent_session",
+      "test_gnome_observer",
+      "test_desktop_worker",
+      "test_capture_stream",
+      "test_desktop_scene",
+      "test_gnome_selected_reboot"
+    ],
+    "pythonCases": 138,
+    "pythonResult": "PASS",
+    "parentNodeCasesPassed": 24,
+    "parentFocusedPythonCasesPassed": 138
+  },
+  "unchanged": [
+    "controller full serial comparison",
+    "held-input ledger published018ab50",
+    "Portal/KDE",
+    "candidate probe/target",
+    "consent/helper/timeouts",
+    "production service/discovery/input flags",
+    "installed/enabled extension/native/selected payloads",
+    "VM/session/settings",
+    "v5 evidence/artifact identities",
+    "frozen22/licensing"
+  ],
+  "limitations": [
+    "Source tests only; no native input acceptance.",
+    "No complete painted composition or native event history outside subscribed signals.",
+    "Clutter allocation can be out of date outside paint.",
+    "No compositor-atomic check-and-dispatch guarantee.",
+    "V5 raised origin remains unproved."
+  ],
+  "nextGate": "Review a fresh exact-artifact native fixture plan before extension/session changes or input; production input remains disabled."
+}
