@@ -80,6 +80,27 @@ arguments, and requires a whitespace-free fixture profile.
 This proof remains separate from manual Load unpacked, branded Chrome,
 Snap/Flatpak native messaging, audio and desktop consent/input acceptance.
 
+### October 3 installed XWayland command acceptance
+
+[The current checkpoint](../release/qualification/next-targets/20261003-installed-browser-xwayland-and-clean-artifacts.json)
+records clean423 installed Leap release5 with clean368 proof scripts: normal
+headed XWayland command exit0, all Pi page/clipboard/branch/edit/prompt/report
+assertions and reconnect without replay, exactly8 fixture model requests,
+59.00seconds under the explicit90-second VM budget. Six actual renderers retain
+seccomp/no-new-privileges/distinct PID/network namespace isolation. Earlier
+30-second failures and the completed-but-hung diagnostic remain historical.
+The extension matches all65 archive members; no installed payload overlay is used.
+DSH Browser, fresh shared onboarding and physical hardware remain separate.
+
+Native Wayland's CDP clipboard assertion fails despite sandbox/page success.
+An observed Copy button click through the owned virtual tablet writes the
+correct OS clipboard; its diagnostic later misses the short confirmation tick.
+This is partial evidence, not full native Wayland acceptance. The exact Chromium
+[Wayland clipboard implementation](https://raw.githubusercontent.com/chromium/chromium/154.0.8037.57/ui/ozone/platform/wayland/host/wayland_clipboard.cc)
+uses compositor input serials when setting a selection; whether that explains
+all behavior remains under investigation. Public qualification scripts never
+infer a passing clipboard result from a UI tick alone.
+
 ### Explicit native Wayland qualification
 
 `AUGMENTOR_PROOF_OZONE_PLATFORM=wayland` requires a headed ordinary-user normal

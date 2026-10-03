@@ -1,0 +1,167 @@
+{
+  "format": "augmentor-linux-rollout-checkpoint/1",
+  "date": "2026-10-03",
+  "target": "opensuse-leap16.0-x86_64",
+  "scope": "Owned booted GNOME Wayland VM; headed sandboxed Chromium154 on XWayland; real Pi SDK with deterministic localhost fixture",
+  "installedArtifactSource": "423f0714d1782ef105a5906b3fe6c6efb4573fe0",
+  "proofSource": "3688a095ffa4221e8ea919c331e6eff6d35cb25d",
+  "immutableInstalledPayloadPatched": false,
+  "headedXWayland117": {
+    "exitCode": 0,
+    "assertions": {
+      "navigateSnapshotTypeClick": true,
+      "actualPageResultVerified": true,
+      "copyClipboardAndScroll": true,
+      "reconnectWithoutReplay": true,
+      "branchToolContext": true,
+      "editResubmitsOnce": true,
+      "sharedPromptsConflictAndClipboard": true,
+      "supportReportDownloadedAndPrivate": true
+    },
+    "modelRequests": 8,
+    "reconnectBudgetSeconds": 90,
+    "reconnectElapsedSeconds": 59.00059722700098,
+    "rendererCount": 6,
+    "allRenderersSeccomp2NoNewPrivs1DistinctPidNetNamespaces": true,
+    "chromiumExpectedSandboxGood": true,
+    "disabledSandboxFlags": false,
+    "commandReceipt": {
+      "bytes": 202,
+      "sha256": "357c38a394b35a6ba0ac1a7170038249bdc9d4f443d2e8d8e8aca9d17c0a7ff6"
+    },
+    "resultReceipt": {
+      "bytes": 6039,
+      "sha256": "843fbcec013fea0debd88522334d1531261fa28d013ded73e01540846b2a0491"
+    },
+    "visuallyInspectedSyntheticUi": true,
+    "scopeExcludes": [
+      "DSH Browser",
+      "shared onboarding",
+      "memory",
+      "physical hardware"
+    ]
+  },
+  "nativeWayland114": {
+    "exitCode": 1,
+    "xDisplayRemoved": true,
+    "sandboxPreflightPassed": true,
+    "actualPageActionsPassedBeforeFailure": true,
+    "osClipboardAssertionPassed": false,
+    "oldCopiedReportFilesNotUsedAsCurrentEvidence": true,
+    "commandReceipt": {
+      "bytes": 405,
+      "sha256": "0ebc1c0b5daa02556613e62b4503620b9c42afe329514461a664834e4c2a8e73"
+    },
+    "stderrReceipt": {
+      "bytes": 318,
+      "sha256": "07a1acdd30b9b81b97914654578b4f2a63e50b2700227b77a9a3546fa00a150a"
+    }
+  },
+  "realVirtualTabletCopyDiagnostic122": {
+    "observedCopyButtonClicked": true,
+    "actualNativeWaylandClipboardMatchesSyntheticMessage": true,
+    "fullProofPassed": false,
+    "laterFailure": "Transient copied-button confirmation not observed after host handshake",
+    "inputReceipt": {
+      "bytes": 248,
+      "sha256": "8352e7c4ecb60016c03a01221fe81a2b30433048e518e7a52b9494a5ae9e7764"
+    },
+    "commandReceipt": {
+      "bytes": 225,
+      "sha256": "726d188231ab780f9ef838ee80b8191afc60c3746667d63d3c59250c07dda2a0"
+    },
+    "productCauseNotYetEstablished": true
+  },
+  "historicalFailuresRetained": [
+    "30-second reconnect timeout105/107",
+    "90-second diagnostic108 completed assertions but SSH timed out",
+    "native Wayland CDP clipboard114",
+    "physical Copy transient-confirmation diagnostic122"
+  ],
+  "clean368Artifacts": {
+    "linuxmint22.3-amd64": {
+      "source": {
+        "commit": "3688a095ffa4221e8ea919c331e6eff6d35cb25d",
+        "dirty": false
+      },
+      "artifacts": [
+        {
+          "file": "augmentor-runtime_0.2.13_amd64.deb",
+          "sha256": "0c9532c00ce9b65a95ef35574c5adf73330ed2514326f3df00800e999d807bef",
+          "bytes": 352935760
+        },
+        {
+          "file": "augmentor-desktop_0.2.13_amd64.deb",
+          "sha256": "44d75ca890412dc343c89a10da552d8c786380ab307d0830d9221b120e8d7232",
+          "bytes": 5396
+        }
+      ],
+      "installedAcceptanceSeparate": true
+    },
+    "fedora44-x86_64": {
+      "source": {
+        "commit": "3688a095ffa4221e8ea919c331e6eff6d35cb25d",
+        "dirty": false
+      },
+      "artifacts": [
+        {
+          "file": "augmentor-agent-0.2.13-1.fc44.x86_64.rpm",
+          "sha256": "9c48de57f1d79cb75f880234cbd489e926fd8cf4773c3f8a92d250ef4d09add3",
+          "bytes": 371299914
+        }
+      ],
+      "installedAcceptanceSeparate": true
+    },
+    "ubuntu24.04-amd64": {
+      "source": {
+        "commit": "3688a095ffa4221e8ea919c331e6eff6d35cb25d",
+        "dirty": false
+      },
+      "artifacts": [
+        {
+          "file": "augmentor-runtime_0.2.13_amd64.deb",
+          "sha256": "9ac43ecde677e0e548912441e857f62fac05332a858d9d42549d379ecfcd537e",
+          "bytes": 352935260
+        },
+        {
+          "file": "augmentor-desktop_0.2.13_amd64.deb",
+          "sha256": "c33664cb77bf62c5b9ed9cdbf05583ef7e6060824eb0d0dbf5fca75f51ee361a",
+          "bytes": 5396
+        }
+      ],
+      "installedAcceptanceSeparate": true
+    },
+    "mint-complete115.tar.gz": {
+      "bytes": 371538145,
+      "sha256": "34439283116e9cdd04b39cd1056dd77ee508e82ee360ae19f68b60b119835507"
+    },
+    "fedora-complete368-120.tar.gz": {
+      "bytes": 385834379,
+      "sha256": "5a62f85daf62f1cdc8d6bb93e6a0b2cb6132650dbaedef875f7f984fa3256cf9"
+    },
+    "noble-complete368-121.tar.gz": {
+      "bytes": 371537316,
+      "sha256": "d9c8840e09ed94589246624c906b63ffd2bb6578e31989f57b3aa916377fa2eb"
+    }
+  },
+  "hosted368": {
+    "linuxRun": 37093285541,
+    "linuxConclusion": "failure",
+    "failures": [
+      "Browser package staging omitted proof_browser_sandbox.py",
+      "Ubuntu26 qualification was supplied explicit Debian13 target artifact"
+    ],
+    "correctiveWorkflow": "Stage sibling proof helper; build and transfer independent Ubuntu26 artifacts without relaxing exact target guard",
+    "macRun": 37093285583,
+    "macConclusion": "success",
+    "windowsDesktopRun": 37093285310,
+    "windowsDesktopConclusion": "success",
+    "fullWindowsRun": 37093285321,
+    "fullWindowsConclusion": "in_progress at observation",
+    "correctedHostedAcceptancePending": true
+  },
+  "candidateOnly": true,
+  "publicRelease": false,
+  "allFiveRolloutPointsComplete": false,
+  "sourceLicenseReviewComplete": false
+}

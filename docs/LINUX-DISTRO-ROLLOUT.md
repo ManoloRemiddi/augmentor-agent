@@ -1,5 +1,35 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+
+## October 3 installed XWayland Browser and matching clean artifacts
+
+[The current checkpoint](../release/qualification/next-targets/20261003-installed-browser-xwayland-and-clean-artifacts.json)
+records a successful normal command exit through the installed clean423 Leap
+release5 Browser host, with clean368 qualification scripts. Headed Chromium154
+on XWayland passes actual page actions, OS clipboard/scroll, branch/edit,
+shared prompt conflicts/clipboard expansion, private support-report download and
+reconnection without replay. Recovery takes59.00seconds under an explicit90-second
+emulated-VM proof budget, with exactly8 fixture model requests. Six actual
+renderers pass seccomp2, no-new-privileges and distinct PID/network namespace
+checks. Product timeouts stay unchanged; earlier30-second failures and the
+clipboard-provider SSH hang remain historical evidence. This scope covers Pi
+with a deterministic localhost model, not DSH Browser/onboarding or hardware.
+
+Native Wayland with X fallback removed passes sandbox and page actions but its
+CDP-driven OS clipboard assertion fails. An observed Copy button click through
+the owned VM tablet writes the correct native clipboard; that diagnostic later
+misses the transient confirmation tick and is not full acceptance. A real-input
+priming diagnostic is continuing. Native Wayland remains an open gate.
+
+Matching clean368 Mint, Ubuntu24 and Fedora44 runtime/Desktop packages and
+complete bundles now build successfully. Installed acceptance remains separate.
+Mint normal signed APT and fresh Fedora KDE signed native installation are in
+progress in dedicated VMs. Hosted368 Linux fails because the packaged Browser
+proof omitted its sibling helper and Ubuntu26 received an explicit Debian13
+artifact. The workflow now stages the helper and builds/transfers a distinct
+Ubuntu26 artifact, retaining the exact target guard; corrected hosted acceptance
+is pending. No binary publication, owner deployment or completed rollout is claimed.
+
 # Linux distribution rollout
 
 The [current-selection/Settings harness checkpoint](../release/qualification/next-targets/20261003-gnome-selection-settings-harness.json)
