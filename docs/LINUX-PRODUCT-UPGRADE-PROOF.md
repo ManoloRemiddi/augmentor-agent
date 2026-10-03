@@ -35,7 +35,21 @@ It journals intent before the unchanged published installer, uses a numeric
 loopback synthetic provider that refuses model turns, and disables only package
 reinstallation and login-service starts because those are externally provisioned
 fixture prerequisites. No failed/preparing account is resumed. Four synthetic
-admission/durability tests pass; actual ordinary-user preparation is pending.
+admission/durability tests pass. One actual ordinary-user run of reviewed4e090
+passes in28.28seconds: unchanged published installer exit0, matching installed
+receipt/selection/harness, and zero model requests. No SDK turn has run.
+
+Strict independent process-absence postflight refuses two UID1000 defunct Node
+entries (StateZ, PPid1, empty argv). Native package and product identity checks
+pass; the preparation result remains PASS while complete postflight remains FAIL.
+Both fixture ports are bindable and no live user process remains. One normal
+TERM request to the exact fixture returns0 but PID1 sleep stays running; no
+repeat, forced stop or restart follows. The historical process evidence remains.
+A subsequent normal signed installation of tini0.19.0 verifies both registered
+executables and root metadata. Two absent changelog files in the slim image
+prevent a full tini package-audit claim. Future descendant reaping or a separately
+admitted init namespace must be established before SDK execution; this does not
+remove or relabel the old defunct entries.
 
 The remaining execution must establish both synthetic role histories on0.2.12,
 stage immutable old/new roots through the canonical updater, install the new

@@ -47,8 +47,12 @@ verifies both published0.2.12/0.2.13 complete manifests and native source/target
 identities. A separate rootless, mount/device-free Debian fixture on secondary
 storage passes one signed normal0.2.12 native install and both package file audits.
 The maintained one-shot ordinary-user baseline preparer passes four synthetic
-admission/durability cases. Actual user setup, role histories, different-version
-managed DSH/selection upgrade and coordinated rollback remain pending. This older
+admission/durability cases. Actual ordinary-user unchanged012 setup passes in
+28.28seconds with zero model requests. Strict process-absence postflight refuses
+two defunct Node entries; no live user process remains, and one normal namespace
+TERM request leaves PID1 sleep running. No repeat or forced stop follows.
+Role histories, different-version managed DSH/selection upgrade and coordinated
+rollback remain pending. This older
 Debian/Voice0.1.16 pair does not qualify current source-Qt/Voice0.1.19 artifacts.
 [The owning guide](LINUX-PRODUCT-UPGRADE-PROOF.md) records the execution boundaries.
 

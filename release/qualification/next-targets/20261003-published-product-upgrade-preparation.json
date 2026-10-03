@@ -1,7 +1,7 @@
 {
   "format": "augmentor-published-product-version-upgrade-preparation/1",
   "date": "2026-10-03",
-  "status": "published-inputs-and-native-baseline-pass-user-preparation-upgrade-rollback-pending",
+  "status": "published-inputs-native-baseline-and-ordinary012-setup-pass; strict-process-postflight-refused; histories-upgrade-rollback-pending",
   "sourceBase": "175fe994680638a3ae4aad18410e97955788336a",
   "artifacts": [
     {
@@ -79,17 +79,50 @@
     "sha256": "0b26c7db48c3d6e5ab1274a5112ce78d15cc201ecd62db29922021e13ab4ac95",
     "syntheticAdmissionTests": 4,
     "testStatus": "PASS",
-    "actualExecution": "PENDING",
+    "actualExecution": "PASS",
     "publishedInstallerOverlay": false,
-    "noResumeNoModelTurnsNoSpeechMemoryProvisioning": true
+    "noResumeNoModelTurnsNoSpeechMemoryProvisioning": true,
+    "actualElapsedSeconds": 28.279397,
+    "installerExitCode": 0,
+    "sourceCommit": "4e090101b7a800acecc9b01ab3bb0f31387c1f0d",
+    "actualJournalPhase": "prepared-published012-baseline",
+    "modelRequests": 0
   },
   "gates": {
-    "ordinaryUserPreparation": "PENDING",
+    "ordinaryUserPreparation": "PASS",
     "bothRoleHistories": "PENDING",
     "coordinatedDifferentProductVersionUpgrade": "PENDING",
     "managedDSHHistoryRollback": "PENDING",
     "currentSourceQtRolloutQualified": false,
     "graphicalSessionBrowserPhysicalAudioQualified": false,
     "legalReleaseAcceptance": false
+  },
+  "independentPostflight": {
+    "status": "FAIL process absence",
+    "nativePackageAudit": "PASS",
+    "selectionAndHarnessIdentity": "PASS",
+    "remainingEntries": 2,
+    "processState": "Z; PPid1; UID1000; empty argv",
+    "liveUserProcesses": 0,
+    "fixturePortsBindable": true,
+    "fullProcessAbsenceClaimed": false,
+    "sdkOrModelTurnExecuted": false
+  },
+  "fixtureCleanup": {
+    "oneNormalTermRequestExitCode": 0,
+    "containerRemainedRunning": true,
+    "forcedStop": false,
+    "repeatedStopOrRestart": false,
+    "historicalFailureRetained": true
+  },
+  "futureReapingInfrastructure": {
+    "normalSignedAPT": "PASS",
+    "package": "tini",
+    "version": "0.19.0-3+b8",
+    "nativeExecutableChecksumsRootMetadata": "PASS",
+    "absentDocumentationFiles": 2,
+    "fullPackageAuditClaimed": false,
+    "oldDefunctEntriesAdopted": false,
+    "productionProductChanged": false
   }
 }
