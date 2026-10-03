@@ -292,3 +292,12 @@ not tested. The diagnostic retains its own failure because immediate cleanup
 port binding is refused; later read-only native/settings/journal/workspace/idle
 checks pass with no remaining listener. The two 60-second post-install failures
 and original full-proof loader failure remain distinct and unchanged.
+
+A subsequent one-call installed-adapter diagnostic succeeds with HTTP identity
+at 60.41 seconds and authenticated full readiness at 62.94 seconds. Both product
+presets are available; normal authentication and preset/catalog reads complete
+in 0.81 seconds. It counts zero model/provider requests and preserves native
+audits, settings, empty workspace and all three earlier journals, with idle
+owned processes and no remaining listener. This establishes a startup-budget
+shortfall in this run, not a public 60-second proof pass, model/history acceptance
+or the cause of every earlier failure. Maintained executable bytes are unchanged.

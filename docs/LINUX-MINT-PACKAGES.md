@@ -148,3 +148,17 @@ no target-port listener or kernel socket entry, idle owned processes, clean nati
 audits, unchanged five settings and old-account hashes, unchanged empty workspace
 and both preserved journals. The immediate bind-refusal cause was not captured.
 No diagnostic or failed proof is replayed; the maintained executable is unchanged.
+
+The next separate read-only diagnostic instantiates the actual installed
+`DshAdapter` once and calls `host.describe` once after HTTP identity matches.
+HTTP appears at 60.41 seconds; full adapter readiness is observed at 62.94
+seconds. Normal authentication succeeds, both product presets are available
+and unbroken, and authenticated preset/catalog reads finish in 0.81 seconds.
+The last Node sample records 62.89 CPU seconds at 62.67 seconds elapsed. This
+run demonstrates startup beyond the public 60-second budget before a healthy
+adapter read; it does not identify the bootstrap loading stage or establish
+every earlier run's cause. Zero model/provider requests are counted. Native
+audits, five settings, old-account hashes, empty workspace, all three prior
+journals and owned-process/no-listener cleanup pass. No public executable or
+timeout changes, model turns, session/history operations or installer replay
+are made. Connected-product/history and graphical/physical gates remain open.

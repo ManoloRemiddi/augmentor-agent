@@ -586,6 +586,102 @@
     "outputs/linux-rollout/mint-fresh-account2035/readiness180-run-evidence/dsh.log": {
       "sha256": "4321b5b9a9d5f9f9a105287c116525596b0130677f36eb81d36985cb893605ea",
       "bytes": 387
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-old-account-finally.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-actual.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-readback-guest.py": {
+      "sha256": "03ec50d97b424401031f5fa4e703d42fc21b179558b42641d0b0faf3e689e032",
+      "bytes": 11358
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-live.json": {
+      "sha256": "e624a49b9750d56698a25ed77e0031b77c0f168b9a4a2b66154b10b2ecec1965",
+      "bytes": 5344
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-readback.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-readiness-host.py": {
+      "sha256": "e47f8853e7ee16c66546b6de3df0b6c0af7a8f0ee73a84b5d75e7da162830521",
+      "bytes": 5397
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-current-preflight.stdout": {
+      "sha256": "151a3ff21d4605545d204b658a185e29f942197359e4b27f987c0ac90c435321",
+      "bytes": 238
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-stage.stdout": {
+      "sha256": "76a14d6eef1b9c415d0d53ff9e2161c580b3739a535abb54f46e4990baf2855f",
+      "bytes": 349
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-host-result.json": {
+      "sha256": "27b946521ae8eff6e3121f8ecb65ffafce761e6248e382f85968b355e56df855",
+      "bytes": 602
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-stage.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-worker.py": {
+      "sha256": "43d10d2ab6fe94ee60c09b20193a69ffffcbbfbe69b933acb27d4392099a7518",
+      "bytes": 2430
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-actual.stdout": {
+      "sha256": "618ddad1b05a70e626b28dacd2d033ea1267180373abb54039a29d6da2377767",
+      "bytes": 3153
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-old-account-finally.stdout": {
+      "sha256": "f4995aedc2ad3126678bbe72f97d8461e0fc67cb71d8f9a8f72fd07d62488626",
+      "bytes": 51
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-readback-authorized.py": {
+      "sha256": "5fffeb263b0549a220d92d2706d18213a95125cddb6d59db73db8b7a4eed6945",
+      "bytes": 3582
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-current-preflight.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-readback-raw.stdout": {
+      "sha256": "d42804fa709ae96b9ad0ba528f92d995557d8097f58cbe52b665e2b79e386dd9",
+      "bytes": 47888
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-readiness-guest.py": {
+      "sha256": "7b472e628bf22da43c8f2be9162eb5d9b2f178b553b6bf7e37f78436b4cb188d",
+      "bytes": 12222
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-readback.json": {
+      "sha256": "2eb95a51b54c098de736fff36691e4fd56504ce80d910846f305c9eb5bf0e2db",
+      "bytes": 1101
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-run-evidence/observations.json": {
+      "sha256": "b826cccc72bf1d81df2b99ee953464424dc809b2236dcc944714c89b2cbfe1cd",
+      "bytes": 25251
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-run-evidence/run.json": {
+      "sha256": "bbd56ffb699752d1f774a5353065dad0315070e1b3b7d6530d9bced6c611c8ab",
+      "bytes": 4593
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-run-evidence/adapter-worker.py": {
+      "sha256": "43d10d2ab6fe94ee60c09b20193a69ffffcbbfbe69b933acb27d4392099a7518",
+      "bytes": 2430
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-run-evidence/adapter-worker.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-run-evidence/dsh.log": {
+      "sha256": "5b1f72a3ee4837c8b52d7a6196aea1254aa2bbe3f2f2e6bccd6700926c33a44c",
+      "bytes": 387
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/full-adapter-run-evidence/adapter-result.json": {
+      "sha256": "92b922af4d2515d50c30cfd6712efc7bf98de2705b74d140609dd5611b5be7db",
+      "bytes": 2904
     }
   },
   "maintainedPostInstallEntry": {
@@ -743,5 +839,56 @@
     "subsequentTargetPortsKernelEntries": [],
     "retryExecuted": false,
     "originalFullProofAndBothPostInstallFailuresPreserved": true
+  },
+  "fullAdapterReadinessDiagnostic": {
+    "executed": true,
+    "status": "pass-read-only-diagnostic",
+    "installedSource": "2035af99b46bb013e81de9766216da820ab4a325",
+    "publicProofSource": "b12af5e57462ac7d059bb82386e34d8d1d2b4df6",
+    "publicProofSha256": "36cdc46d6eb910b113ed9acb86fd0c68b84e350dbedcfe3b6139d0438dea7545",
+    "diagnosticScriptSha256": "7b472e628bf22da43c8f2be9162eb5d9b2f178b553b6bf7e37f78436b4cb188d",
+    "journalSha256": "bbd56ffb699752d1f774a5353065dad0315070e1b3b7d6530d9bced6c611c8ab",
+    "budgetSeconds": 180,
+    "firstMatchingHttpSeconds": 60.406709116003185,
+    "fullAdapterReadySeconds": 62.94251394900493,
+    "actualHostDescribeSeconds": 0.8107880140014458,
+    "workerElapsedSeconds": 1.918399286994827,
+    "adapterInstantiations": 1,
+    "hostDescribeCalls": 1,
+    "normalAuthenticationObserved": true,
+    "authenticationOverridden": false,
+    "rpcReadMethods": [
+      "agentPresets/list",
+      "session/modelCatalog"
+    ],
+    "product": true,
+    "productPreset": "augmentor-linux-product",
+    "bothProductPresetsAvailableUnbroken": true,
+    "actualModelRequests": 0,
+    "providerHttpRequests": [],
+    "SDKMutations": false,
+    "sessionHistoryReads": false,
+    "modelTurnsOrSessionMutations": false,
+    "setupOrSettingsReplayed": false,
+    "sampleCount": 64,
+    "lastNodeSample": {
+      "elapsedSeconds": 62.665260002999275,
+      "cpuSeconds": 62.89,
+      "guestMemAvailableKiB": 2336948,
+      "guestSwapFreeKiB": 3997180
+    },
+    "observedLimit": "This run reaches HTTP after60seconds; authenticated presets/catalog then succeed in under1second. Exact prior-run cause and bootstrap loading stage are not established.",
+    "public60SecondProofPass": false,
+    "fullConnectedProductOrHistoryProof": false,
+    "nativeAuditClean": true,
+    "allThreePriorJournalsPreserved": true,
+    "fiveSettingsPreserved": true,
+    "oldUid1000TenHashesPreserved": true,
+    "workspaceUnchangedEmpty": true,
+    "ownedApplicationSetupProcessesIdle": true,
+    "noTargetPortListener": true,
+    "kernelTargetPortEntries": [],
+    "maintainedExecutableChanged": false,
+    "retryExecuted": false
   }
 }
