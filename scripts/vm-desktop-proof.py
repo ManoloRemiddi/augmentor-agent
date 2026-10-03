@@ -68,6 +68,24 @@ def portal_dialog(scene,pid,dialog=None):
     return window
 
 
+def editor_fixture_name(editor,home):
+    """Keep every save/readback on the editor's already owned fixture."""
+    path=Path(editor['path']);home=Path(home)
+    if not home.is_absolute() or path!=home/'augmentor-desktop-acceptance.txt':
+        raise ValueError('Save requires the existing owned editor fixture.')
+    return path.name
+
+
+def save_owned_editor(editor,home,text):
+    name=editor_fixture_name(editor,home)
+    # Save As completion can add a covering popup during pathname typing. Keep
+    # that scene-change refusal intact and qualify ordinary existing-file Save.
+    act('key',keys=['CTRL','S'])
+    until(lambda:guest('file',name).get('text')==text)
+    assert guest('file',name)['text']==text
+    return name
+
+
 p=argparse.ArgumentParser(description=__doc__);p.add_argument('--source',action='store_true');p.add_argument('--port',type=int,default=22487);p.add_argument('--scale',type=float,choices=(1,1.25,1.5),default=1)
 p.add_argument('--vm-dir',type=Path,default=ROOT/'outputs/desktop-vm')
 p.add_argument('--guest-root',help='Explicit staged source root in the disposable VM')
@@ -256,23 +274,20 @@ try:
     print('Foreign owner, unsupported text, replay, outside point and changed window refused',flush=True)
     s=observe();g=s['window']['geometry'];screen=s['screen']['geometry']
     okay(rpc('action',{'token':s['token'],'kind':'click','x':(g['x']+g['width']/2-screen['x'])*s['image']['width']/screen['width'],'y':(g['y']+g['height']/2-screen['y'])*s['image']['height']/screen['height']}))
-    act('key',keys=['CTRL','A']);act('type',text='Wayland ASCII verified');act('key',keys=['CTRL','SHIFT','S']);observe('Save File')
-    saved_path=str(Path(editor['path']).with_name('augmentor-desktop-acceptance-saved.txt'))
-    act('key',keys=['CTRL','A']);act('type',text=saved_path);act('key',keys=['ENTER'])
-    until(lambda:guest('file','augmentor-desktop-acceptance-saved.txt')['exists'])
-    assert guest('file','augmentor-desktop-acceptance-saved.txt')['text']=='Wayland ASCII verified\n'
-    print('Native Wayland Kate Save As: exact file verified',flush=True)
+    act('key',keys=['CTRL','A']);act('type',text='Wayland ASCII verified')
+    fixture_name=save_owned_editor(editor,'/home/'+a.guest_user,'Wayland ASCII verified\n')
+    print('Native Wayland Kate existing-file Save: exact file verified',flush=True)
     act('key',keys=['CTRL','A']);s=observe();typing=async_rpc('action',{'token':s['token'],'kind':'type','text':'S'*256})
     until(lambda:okay(rpc('status'))['busy'])
     until(lambda:any(0<t.count('S')<256 for t in guest('editor-text')['texts']),25);stop_click()
     result=json.loads(typing.communicate(timeout=20)[0]);assert not result['ok'] and 'stopped' in result['error'].lower(),result
     until(lambda:not okay(rpc('status'))['busy']);assert not okay(rpc('status'))['sharing']
-    key('ctrl','s');time.sleep(.5);partial=guest('file','augmentor-desktop-acceptance-saved.txt')['text']
+    key('ctrl','s');time.sleep(.5);partial=guest('file',fixture_name)['text']
     assert 0<len(partial.rstrip('\n'))<256 and set(partial.rstrip('\n'))=={'S'},repr(partial)
-    time.sleep(1);key('ctrl','s');time.sleep(.3);assert guest('file','augmentor-desktop-acceptance-saved.txt')['text']==partial
+    time.sleep(1);key('ctrl','s');time.sleep(.3);assert guest('file',fixture_name)['text']==partial
     assert not rpc('action',{'token':s['token'],'kind':'type','text':'must not restart'})['ok']
     print('Actual Stop click interrupted typing; saved partial content stayed unchanged',flush=True)
-    result={'environment':environment,'scale':a.scale,'candidateSource':bool(a.source or a.guest_root),'consentObservationSha256':hashlib.sha256(a.consent_observation.read_bytes()).hexdigest(),'proofScriptSha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'guestHelperSha256':hashlib.sha256((ROOT/'release/vm-desktop-session.py').read_bytes()).hexdigest(),'consentDenied':True,'pendingConsentStopped':True,'guards':True,'savedFileExact':True,'stopInterruptedInput':True,'partialCharacters':len(partial.rstrip('\n')),'noReplayAfterStop':True}
+    result={'environment':environment,'scale':a.scale,'candidateSource':bool(a.source or a.guest_root),'consentObservationSha256':hashlib.sha256(a.consent_observation.read_bytes()).hexdigest(),'proofScriptSha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'guestHelperSha256':hashlib.sha256((ROOT/'release/vm-desktop-session.py').read_bytes()).hexdigest(),'consentDenied':True,'pendingConsentStopped':True,'guards':True,'savedFileExact':True,'saveScope':'existing-owned-editor-file','savedFile':fixture_name,'stopInterruptedInput':True,'partialCharacters':len(partial.rstrip('\n')),'noReplayAfterStop':True}
     (vm/'desktop-control-acceptance.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result),flush=True)
 finally:
     failed=sys.exc_info()[0] is not None

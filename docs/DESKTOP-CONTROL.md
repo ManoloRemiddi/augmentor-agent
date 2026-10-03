@@ -1,5 +1,29 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 Fedora KDE permission proof and existing-file Save candidate
+
+The Fedora44 Cloud-derived Plasma6.7.5 Wayland guest retains the clean
+`2035af99b46bb013e81de9766216da820ab4a325` native package and managed selection.
+Published proof `9ec506bb827229874bb285588d9249ff55c201d8` passes an unobstructed
+native consent observation after the ordinary installed Desktop toggle hides
+its window. The screenshot-bound full run passes native Deny, visible Stop
+during pending consent, approval/capture and owner/unsupported-text/replay/
+outside-point/changed-window refusals. It fails after320.31seconds while typing
+the Save As pathname: the Name field contains only `/h` and a separate Kate
+completion popup appears above the dialog. The executor refuses the changed
+scene; the exact in-flight comparison was not retained. No saved output exists,
+the original fixture remains `Fixture ready`, and the failed input is not retried.
+SELinux remains Enforcing and the protected prior account state is preserved.
+
+The maintained proof candidate now uses ordinary Ctrl+S on its already owned
+`augmentor-desktop-acceptance.txt`, verifies exact saved bytes, and uses the same
+file for partial-input and no-replay readbacks. It retains the Save As
+changed-window stale-token refusal and the production scene guards. Its result
+records `saveScope: existing-owned-editor-file`; this does not qualify Save As
+pathname completion. Source checks are separate from a newly published installed
+rerun:22 proof guard cases, six compositor-scene cases and three portal-target
+cases pass; saved-file and typing-interruption acceptance remain open.
+
 ## October 3 current KDE proof guards
 
 [The proof guard checkpoint](../release/qualification/next-targets/20261003-kde-native-consent-proof-guards.json)
@@ -99,7 +123,7 @@ tools. The native executor and its platform limitations remain the same.
 
 `scripts/vm-desktop-proof.py` drives a disposable full Plasma Wayland VM. It
 checks declined consent, Stop during consent, target/owner/replay refusals, actual
-Kate Save As contents, and interruption of a long write through the independent
+Kate existing-file Save contents, and interruption of a long write through the independent
 Stop button. `--scale` selects 1, 1.25 or 1.5. By default it runs the installed
 executor; `--source` explicitly records candidate source staging instead.
 
@@ -133,4 +157,5 @@ child uses the actual Wayland session. Its own20-second timeout reaps that
 child. Native portal matching reads full compositor PID/application/id/title/
 geometry through KWin.execute; the product controller is unchanged. Eighteen
 focused proof guards pass. Earlier pre-consent timeout remains recorded and
-actual consent/input/visible Stop acceptance remains pending.
+the current installed permission milestones and remaining input acceptance are
+recorded above. The earlier pre-consent failure remains historical evidence.

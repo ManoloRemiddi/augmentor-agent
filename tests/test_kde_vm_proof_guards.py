@@ -206,4 +206,52 @@ vm.runInNewContext(SOURCE,context);console.log(JSON.stringify(result));'''.repla
         finally:self.code['configure_scale'].__globals__['subprocess']=subprocess
 
 
+class ExistingEditorSave(unittest.TestCase):
+    def setUp(self):
+        self.code=functions(ROOT/'scripts/vm-desktop-proof.py',('editor_fixture_name','save_owned_editor'))
+        self.home='/home/augmentor-complete-proof'
+        self.editor={'path':self.home+'/augmentor-desktop-acceptance.txt'}
+
+    def test_existing_fixture_path_is_bound_to_dedicated_home(self):
+        self.assertEqual(self.code['editor_fixture_name'](self.editor,self.home),'augmentor-desktop-acceptance.txt')
+        for path in ('augmentor-desktop-acceptance.txt',self.home+'/../augmentor-desktop-acceptance.txt',
+                     '/home/beta/augmentor-desktop-acceptance.txt',self.home+'/augmentor-desktop-acceptance-saved.txt'):
+            with self.subTest(path=path),self.assertRaisesRegex(ValueError,'existing owned'):
+                self.code['editor_fixture_name']({'path':path},self.home)
+
+    def test_existing_save_waits_for_exact_readback_without_pathname_input(self):
+        reads=[];pending=iter(({'exists':True,'text':'Fixture ready\n'},
+                               {'exists':True,'text':'Wayland ASCII verified\n'},
+                               {'exists':True,'text':'Wayland ASCII verified\n'}))
+        def guest(action,name):
+            reads.append((action,name));return next(pending)
+        def until(check):
+            self.assertFalse(check(),'An old saved file must not satisfy the save check.')
+            self.assertTrue(check())
+        action=Mock()
+        self.code.update(act=action,guest=guest,until=until)
+        name=self.code['save_owned_editor'](self.editor,self.home,'Wayland ASCII verified\n')
+        action.assert_called_once_with('key',keys=['CTRL','S'])
+        self.assertEqual(name,'augmentor-desktop-acceptance.txt')
+        self.assertEqual(reads,[('file',name)]*3)
+
+    def test_save_refusal_never_falls_back_to_save_as_or_replays_input(self):
+        failure=RuntimeError('Target changed before the key. No input was sent.')
+        action=Mock(side_effect=failure);read=Mock();wait=Mock()
+        self.code.update(act=action,guest=read,until=wait)
+        with self.assertRaisesRegex(RuntimeError,'Target changed'):
+            self.code['save_owned_editor'](self.editor,self.home,'Wayland ASCII verified\n')
+        action.assert_called_once_with('key',keys=['CTRL','S'])
+        read.assert_not_called();wait.assert_not_called()
+
+    def test_same_process_save_as_completion_keeps_scene_change_refusal(self):
+        compare=functions(ROOT/'services/desktop/scene.py',('same_scene',))['same_scene']
+        before={'window':{'id':'save-dialog','pid':4321,'application':'org.kde.kate','title':'Save File — Kate',
+                          'geometry':{'x':100,'y':100,'width':800,'height':600}},'above':[]}
+        after=copy.deepcopy(before)
+        after['above'].append({'id':'name-completion','pid':4321,
+                               'geometry':{'x':300,'y':500,'width':400,'height':30}})
+        self.assertFalse(compare(before,after),'A covering completion popup remains a scene change even with the same PID.')
+
+
 if __name__=='__main__':unittest.main()
