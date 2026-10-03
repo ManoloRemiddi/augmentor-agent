@@ -1275,3 +1275,14 @@ persistent `state/augmentor/updates` directory is absent. The fixture now create
 it privately before use. Its normal startup/lease and coordinator use the same
 persistent directory. No shipped guard is weakened. New native qualification is
 required; broad/Mac jobs still running are preserved.
+
+
+Focused native `134d561` run 37160387066 passes DSH and reaches actual desktop
+completion; its assertion wrongly assumes main-before-secondary discovery.
+Socket sorting legitimately returns secondary first. The fixture now checks
+membership without replacing the original captured order. Reopening was not yet
+executed. The normal installed launcher now invokes Python with `-B` and explicit
+`PYTHONDONTWRITEBYTECODE=1`, including subsequent child environments. This keeps
+normal imports from mutating a verified immutable release after environment
+sanitization; the startup regression checks both. Native reopening and updated
+local checks remain to be recorded at their exact source.

@@ -276,7 +276,8 @@ class NativeServiceTests(unittest.TestCase):
                 plan.services=service;plan.desktop=desktop
                 coordinator=LinuxCoordinator(plan,f.runtime,f.runtime/'shared',f.transactions)
                 result=coordinator.run(lambda stage:True)
-                self.assertEqual(coordinator.reopen_plan,{'instances':['main','secondary'],'hadBrowser':False})
+                self.assertCountEqual(coordinator.reopen_plan['instances'],['main','secondary'])
+                self.assertFalse(coordinator.reopen_plan['hadBrowser'])
                 self.assertTrue(desktop.bound);self.assertTrue(desktop.drained);self.assertTrue(desktop.verify_applied())
                 self.assertEqual(launcher.read_bytes(),(f.target/'scripts/desktop-launch.py').read_bytes())
                 self.assertEqual(secondary.wait(timeout=10),0)

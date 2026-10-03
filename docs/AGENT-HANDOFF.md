@@ -7,6 +7,15 @@
 
 
 
+
+At `134d561`, focused 37160387066 passes DSH and reaches actual desktop update
+completion; its assertion incorrectly requires main-before-secondary, whereas
+actual socket discovery sorts secondary first. The fixture now compares captured
+membership, preserving the original order used for authority. Normal launcher
+exec now passes `-B` and forces no-bytecode writes, preventing Python import caches
+from changing a verified immutable target when reopening. Existing startup tests
+cover that invocation. New focused/native qualification is required for reopening.
+
 Native job 111311878502 at `10fdece` in 37160189535 passes the original DSH
 service proof, but the added desktop test stops before coordinator preparation:
 its fresh persistent transaction directory was not created. The fixture now
