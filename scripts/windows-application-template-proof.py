@@ -151,6 +151,12 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         assert repair_command == '"'+str(cached)+'"', repair_command
         repair = command_executable(repair_command)
         assert removal.is_relative_to(install)
+        observer_spec=importlib.util.spec_from_file_location('observer_runtime_proof',ROOT/'scripts/windows-observer-runtime-proof.py')
+        observer_proof=importlib.util.module_from_spec(observer_spec);observer_spec.loader.exec_module(observer_proof)
+        staged_observer,observer_result=observer_proof.prove(install/'current',Path(report['qualificationBase']),
+            (payload/'release.json').read_bytes(),(payload/'payload-integrity.json').read_bytes())
+        assert observer_result['verified'] and staged_observer.is_dir()
+        stages.append('exact-private-external-observer-runtime-and-native-identity-import')
         # Both kinds of damaged retained bytes refuse BEFORE file replacement;
         # preserve the damaged cache for inspection, then restore this fixture.
         for path in (cached,receipt,selection):

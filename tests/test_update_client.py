@@ -35,10 +35,13 @@ class UpdateClientTests(unittest.TestCase):
             ("print('x'*2100000)",{},ValueError),
             ("import sys;sys.stderr.write('x'*1000000)",{},ValueError),
             ("import time;time.sleep(10)",{'timeout':.05},TimeoutError),
-            ("import time;time.sleep(10)",{'cancelled':self.cancelled()},InterruptedError)]:
+            ("import time;time.sleep(10)",{'cancelled':threading.Event()},InterruptedError)]:
             with self.subTest(error=error):
                 self.script.write_text(script);processes=[]
-                with self.assertRaises(error):self.call(observed=processes.append,**options)
+                def observed(process):
+                    processes.append(process)
+                    if process is not None and 'cancelled' in options:options['cancelled'].set()
+                with self.assertRaises(error):self.call(observed=observed,**options)
                 self.assertIsNotNone(processes[0].poll());self.assertIsNone(processes[-1])
 
     @staticmethod
@@ -57,6 +60,28 @@ class UpdateClientTests(unittest.TestCase):
         with patch.dict(os.environ,{'AUGMENTOR_PI_NODE':sys.executable}):
             self.assertEqual(node_executable(self.root),Path(sys.executable))
             with self.assertRaisesRegex(ValueError,'bundled'):node_executable(self.root,require_bundled=True)
+
+    def test_shared_cache_wait_is_bounded_and_cancellation_never_spawns_a_second_helper(self):
+        self.script.write_text("import time,json,sys\njson.load(sys.stdin)\ntime.sleep(.3)\nprint('{}')")
+        started=threading.Event();errors=[];first=[]
+        def observed(process):
+            first.append(process)
+            if process is not None:started.set()
+        def request():
+            try:self.call(observed=observed)
+            except Exception as error:errors.append(error)
+        worker=threading.Thread(target=request);worker.start()
+        try:
+            self.assertTrue(started.wait(3));second=[]
+            with self.assertRaisesRegex(TimeoutError,'cache is busy'):
+                self.call(timeout=.05,observed=second.append)
+            with self.assertRaises(InterruptedError):
+                self.call(cancelled=self.cancelled(),observed=second.append)
+            self.assertEqual(second,[])
+        finally:worker.join(timeout=5)
+        self.assertFalse(worker.is_alive());self.assertEqual(errors,[])
+        self.assertIsNotNone(first[0].poll());self.assertIsNone(first[-1])
+        self.assertEqual(self.call(),{})
 
 
 if __name__=='__main__':unittest.main()

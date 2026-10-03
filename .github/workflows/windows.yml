@@ -30,7 +30,7 @@ jobs:
           - os: windows-11-arm
             arch: arm64
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 50
+    timeout-minutes: 65
     defaults:
       run:
         shell: pwsh

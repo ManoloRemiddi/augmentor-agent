@@ -169,9 +169,42 @@ native writer/record pins, complete inventory and fixed isolated native health.
 It cannot turn target metadata into previous-source recovery authority or archive
 the journal. Actual installer-exit observation, installed selection verification
 and external completion remain required. Eight portable source/target assessment
-tests pass; the new native template/full-application target-health checks are
-pending. The template uses a different synthetic previous-source identity for
+tests pass; native template target-health checks pass both CPUs at `1882338` in
+[37115087292](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37115087292).
+Downloaded reports include the target/source-separation stage. Full-application
+target-health checks remain pending. The template uses a different synthetic previous-source identity for
 read-only binding, and does not establish an actual cross-version application.
+
+`services/lifecycle/observer_runtime.py` now stages a private external Windows
+observer runtime. The caller first identifies source metadata/inventory and holds
+startup/installation read admission. The entire source payload must match that
+inventory; selected Python, service and fixed Python-script files are copied and
+hashed against it into a fresh private directory outside the app. No user-data
+tree is copied. A final receipt binds both source metadata digests, and verification
+requires the exact copied subset without missing or extra entries. Partial attempts
+remain private and cannot be launched through verification. Five inert portable
+tests include actual source-directory displacement, corruption and partial writes.
+Native template/full-runtime relocation and identity-import proofs are added but
+still pending. Staging itself executes no code and grants no install authority;
+the live coordinator/observer handle transfer and completion path remain to compose.
+
+Shared repository-helper operations now hold one private kernel cache-writer lock
+across the entire child operation. This prevents service/coordinator concurrency
+from overwriting a newer observed TUF rollback floor with older metadata. Waiting
+for that same lock counts against the operation's deadline and supports cancellation;
+a cancelled/timed-out waiter launches no helper and never stops the current owner.
+The focused updater set passes 104 Python cases (103 passed, one OS skip), including
+actual competing child requests and preservation of the original live helper.
+
+Full Windows qualification at `97837de` passes x64 but ARM64 recovery reaches its
+old five-minute observer deadline in
+[37112769947](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37112769947).
+Downloaded inner Setup logs show successful installation just beyond that limit;
+the observer correctly preserves the active recovery and does not replay Setup.
+The actual-Setup observation limit is now ten minutes, with a twenty-minute native
+outer-observer limit to leave time for inventory/health. The fixture's outer bounds
+and CI allowance are increased separately. Fresh native recovery qualification is
+required; a completed Setup log alone does not prove health or journal completion.
 
 A private exclusive publisher lock and durable pending claim prevent simultaneous
 or uncertain publication from reusing a role version. A permanent private artifact

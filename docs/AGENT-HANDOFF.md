@@ -30,9 +30,18 @@ apply/target-observer composition and fresh native qualification of these additi
 remain required. Mac companion
 selection cannot receive a desktop bundle. Windows independent inspection now
 has exact proposed-target assessment and isolated target health, kept separate
-from source restoration. Eight portable assessment tests pass; new native
-template/full-application target-health checks still need CI. These read-only
-actions preserve the active journal and grant no apply/completion authority. Root
+from source restoration. Eight portable assessment tests and native template
+target-health checks on both CPUs pass at `1882338` (37115087292); full-application
+target health remains pending. These read-only actions preserve the active journal
+and grant no apply/completion authority. External observer-runtime staging now
+copies/rechecks exact source Python/services/scripts into private nonreplacement
+directories (five inert tests); native relocation/identity-import proofs are added
+and pending. Repository helpers now serialize the shared TUF cache through a
+bounded cancellable kernel writer; focused updater tests pass 104 cases (one OS
+skip). `97837de` full Windows qualification passes x64, but ARM64 recovery exceeded
+its five-minute observer limit despite Setup finishing immediately afterward.
+Inner/outer observation bounds are corrected; fresh native recovery is required.
+Root
 rotation/CI custody, public feed provisioning, external installation adapters,
 final consent/revocation and N-to-N+1 health/recovery remain open. Do not narrow the goal to
 notification/downloads or mark it complete based on this checkpoint. Nothing

@@ -85,8 +85,10 @@ __declspec(dllexport) BOOL WINAPI AugmentorRecoveryObserve(const wchar_t *instal
     if (ResumeThread(process.hThread) != 1) goto done;
     started = TRUE;
     inspection_stage = 26;
-    ULONGLONG deadline = GetTickCount64() + 600000;
-    if (WaitForSingleObject(process.hProcess, 600000) != WAIT_OBJECT_0) goto done;
+    /* The observer has a ten-minute actual-Setup bound plus inventory/health.
+     * This outer bound must not terminate it at its inner observation limit. */
+    ULONGLONG deadline = GetTickCount64() + 1200000;
+    if (WaitForSingleObject(process.hProcess, 1200000) != WAIT_OBJECT_0) goto done;
     inspection_stage = 27;
     if (!GetExitCodeProcess(process.hProcess, &code)) goto done;
     if (code) { inspection_detail = code; goto done; }

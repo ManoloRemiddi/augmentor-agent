@@ -1,6 +1,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Bounded fixed-helper transport shared by the service and install coordinator."""
 import json
+from contextlib import contextmanager
 import os
 from pathlib import Path
 import shutil
@@ -10,7 +11,8 @@ import threading
 import time
 
 from platform_adapters.paths import private_directory
-from platform_adapters.private_files import require_directory
+from platform_adapters.private_files import require_directory, descriptor
+from platform_adapters import locks
 from .policy import MAX_ARTIFACT
 
 
@@ -41,12 +43,33 @@ def repository_request(root, cache, request, *, node=None, timeout=None, cancell
     timeout=timeout if timeout is not None else (1800 if request['operation']=='download' else 120)
     if type(timeout) not in (int,float) or not 0<timeout<=1800:raise ValueError('Use a bounded update-helper deadline.')
     cancelled=cancelled or threading.Event()
+    deadline=time.monotonic()+timeout
+    # Independent service/coordinator helpers share the rollback floor. Atomic
+    # individual files alone cannot prevent concurrent refreshes from writing
+    # older trusted metadata after a newer helper has advanced that floor.
+    with cache_writer(cache,deadline,cancelled):
+        return invoke(root,body,node,deadline,cancelled,progress,observed)
+
+
+@contextmanager
+def cache_writer(cache, deadline, cancelled):
+    fd=descriptor(cache/'client.lock',writable=True,create=True)
+    try:
+        while True:
+            if cancelled.is_set():raise InterruptedError('Update operation cancelled.')
+            if time.monotonic()>=deadline:raise TimeoutError('The update cache is busy. Try again later.')
+            try:locks.flock(fd,locks.LOCK_EX|locks.LOCK_NB);break
+            except BlockingIOError:cancelled.wait(.05)
+        yield
+    finally:os.close(fd)
+
+
+def invoke(root, body, node, deadline, cancelled, progress, observed):
     environment={key:value for key,value in os.environ.items() if not key.upper().startswith('NODE_')}
     flags={'creationflags':subprocess.CREATE_NO_WINDOW} if sys.platform=='win32' else {}
     process=subprocess.Popen([str(node or node_executable(root,require_bundled=True)),str(Path(root)/'services/updates/repository.mjs')],
         stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=environment,**flags)
     reply=bytearray();oversized=threading.Event();write_errors=[]
-    deadline=time.monotonic()+timeout
     def write_request():
         try:
             process.stdin.write(body);process.stdin.close()

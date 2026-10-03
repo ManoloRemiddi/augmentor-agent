@@ -627,9 +627,26 @@ the complete embedded inventory and runs only the isolated native health action
 under read admission. It preserves the journal and cannot grant apply, become
 source-recovery authority or complete a transaction by itself. The external
 observer still must observe actual Setup exit and verify selected target before
-archival. The portable assessment suite passes eight cases; new native template
-and full-application target-health checks are pending and remain distinct from
-N-to-N+1 or physical-device acceptance.
+archival. The portable assessment suite passes eight cases; native template checks
+pass both CPUs at `1882338` in
+[37115087292](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37115087292).
+Full-application target-health checks remain pending and separate from N-to-N+1
+or physical-device acceptance.
+
+The external observer can now stage its exact source Python/services/scripts through
+`observer_runtime.py`, under caller-held source read admission, into a fresh private
+directory outside the replacement tree. Independently supplied metadata binds the
+whole source inventory and the exact staged subset. Verification after source
+displacement, partial-write refusal and tampered-runtime refusal pass five inert
+tests; new native relocation/identity-import proofs remain pending. No copied code
+is executed by staging, and neither a staging receipt nor saved process identifiers
+authorize apply or completion. Live process-handle transfer remains to compose.
+
+An actual ARM64 full-application recovery at `97837de` crossed its former five-minute
+Setup observation deadline; its inner log records successful installation afterward.
+The observer preserves the recovery and never restarts that Setup. It now observes
+the same Job for at most ten minutes; native outer observation allows twenty minutes
+including independent inventory/health. Fresh native recovery evidence is required.
 
 Update journals now support independent completion after the caller has observed
 installer exit, reverified the release pair/installed selection and passed a local

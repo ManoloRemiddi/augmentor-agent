@@ -42,7 +42,7 @@ def main():
     registry = 'Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\'+report['applicationId']+'_is1'
     flags = ['/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-']
     child = None; removal = None; stages = []
-    def run(command, *, success=True, timeout=300):
+    def run(command, *, success=True, timeout=900):
         argv = list(map(str,command))
         process = OwnedProcess(argv, stdin=subprocess.DEVNULL)
         try:
@@ -107,6 +107,12 @@ def main():
             source_identity=source.identity
         selection_bytes=(data/'recovery/selected-installer').read_bytes()
         stages.append('original-full-installer-retained')
+        observer_spec=importlib.util.spec_from_file_location('observer_runtime_proof',ROOT/'scripts/windows-observer-runtime-proof.py')
+        observer_proof=importlib.util.module_from_spec(observer_spec);observer_spec.loader.exec_module(observer_proof)
+        staged_observer,observer_result=observer_proof.prove(install/'current',data,
+            (args.root/'release.json').read_bytes(),(args.root/'payload-integrity.json').read_bytes())
+        report['observerRuntime']=observer_result
+        stages.append('full-private-external-observer-runtime-and-native-identity-import')
         assert (install/'current/release.json').read_bytes() == (args.root/'release.json').read_bytes()
         assert not any((install/'current').glob('*.lib')) and not any((install/'current').glob('*.exp'))
         assert not (install/'current/launcher.obj').exists()
@@ -232,7 +238,7 @@ def main():
             assert win32event.WaitForSingleObject(setup_process,0)==win32event.WAIT_TIMEOUT
             (transaction/'observer-ready').touch()
             assert coordinator.wait(timeout=30)==0
-            assert win32event.WaitForSingleObject(setup_process,300000)==win32event.WAIT_OBJECT_0
+            assert win32event.WaitForSingleObject(setup_process,900000)==win32event.WAIT_OBJECT_0
             assert win32process.GetExitCodeProcess(setup_process)==0
         finally:setup_process.Close()
         assert (install/'current/release.json').read_bytes()==(args.root/'release.json').read_bytes()
@@ -334,7 +340,7 @@ def main():
         prior_backups=set((data/'payload-backups').iterdir())
         recovery_log=out/'independent-source-recovery.log'
         try:
-            run([cached_installer,*flags,'/LOG='+str(recovery_log),'/augmentorrecover=previous'],success=False,timeout=660)
+            run([cached_installer,*flags,'/LOG='+str(recovery_log),'/augmentorrecover=previous'],success=False,timeout=1260)
         finally:
             for inner_log in transaction.glob('recovery-*.log'):shutil.copy2(inner_log,out/inner_log.name)
         marker='Augmentor recovery result: '

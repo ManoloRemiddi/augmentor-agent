@@ -14,6 +14,8 @@ on:
       - 'scripts/windows-template-update-proof.py'
       - 'scripts/windows-inspect-payload.py'
       - 'scripts/windows-recover-source.py'
+      - 'scripts/windows-observer-runtime-proof.py'
+      - 'services/lifecycle/observer_runtime.py'
       - 'services/lifecycle/source_restoration.py'
       - 'scripts/package-windows.py'
       - 'scripts/build-windows-launcher.py'
