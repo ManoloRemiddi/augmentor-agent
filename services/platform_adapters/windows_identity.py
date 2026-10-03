@@ -118,6 +118,50 @@ def private_lock_descriptor(path):
     return private_file_descriptor(path, writable=True, create=True)
 
 
+def require_payload_grants(descriptor):
+    """Public installed code may be readable broadly, but never writable broadly.
+
+    Inno's per-user payload can inherit the token's Administrators owner and
+    ordinary read grants. This is deliberately separate from private state and
+    download validation; it never changes an ACL or creates a file.
+    """
+    trusted={sid_string(),'S-1-5-18','S-1-5-32-544'}
+    if win32security.ConvertSidToStringSid(descriptor.GetSecurityDescriptorOwner()) not in trusted:
+        raise PermissionError('The installed payload belongs to an unexpected Windows identity.')
+    acl=descriptor.GetSecurityDescriptorDacl()
+    if acl is None:raise PermissionError('The installed payload has unrestricted access.')
+    write=(ntsecuritycon.FILE_WRITE_DATA|ntsecuritycon.FILE_APPEND_DATA|ntsecuritycon.FILE_WRITE_EA|
+           ntsecuritycon.FILE_WRITE_ATTRIBUTES|ntsecuritycon.FILE_DELETE_CHILD|ntsecuritycon.DELETE|
+           ntsecuritycon.WRITE_DAC|ntsecuritycon.WRITE_OWNER|win32con.GENERIC_WRITE|win32con.GENERIC_ALL)
+    for index in range(acl.GetAceCount()):
+        (kind,flags),mask,sid=acl.GetAce(index)
+        if flags & win32security.INHERIT_ONLY_ACE:continue
+        if kind!=win32security.ACCESS_ALLOWED_ACE_TYPE:
+            raise PermissionError('The installed payload has unsupported access rules.')
+        if mask & write and win32security.ConvertSidToStringSid(sid) not in trusted:
+            raise PermissionError('The installed payload is writable by another Windows identity.')
+
+
+def payload_file_descriptor(path):
+    """Pin existing installed code read-only; retain normal installation ACLs."""
+    import msvcrt
+    path=reject_reparse_ancestors(path)
+    security=win32security.OWNER_SECURITY_INFORMATION|win32security.DACL_SECURITY_INFORMATION
+    require_payload_grants(win32security.GetFileSecurity(str(path.parent),security))
+    try:
+        handle=win32file.CreateFile(str(path),win32con.GENERIC_READ,win32con.FILE_SHARE_READ,None,
+            win32con.OPEN_EXISTING,win32file.FILE_FLAG_OPEN_REPARSE_POINT,None)
+    except pywintypes.error as error:raise ctypes.WinError(error.winerror) from None
+    try:
+        info=win32file.GetFileInformationByHandle(handle)
+        if info[0] & (stat.FILE_ATTRIBUTE_REPARSE_POINT|stat.FILE_ATTRIBUTE_DIRECTORY) or info[7]!=1:
+            raise PermissionError('The installed executable must be an ordinary single-link file.')
+        require_payload_grants(win32security.GetSecurityInfo(handle,win32security.SE_FILE_OBJECT,security))
+        return msvcrt.open_osfhandle(handle.Detach(),os.O_RDONLY|os.O_BINARY)
+    except pywintypes.error as error:raise ctypes.WinError(error.winerror) from None
+    finally:handle.Close()
+
+
 def private_file_descriptor(path, *, writable=False, create=False, exclusive=False, private_parent=True, share_write=True):
     """Read or create a protected ordinary file; validate the opened object."""
     import msvcrt

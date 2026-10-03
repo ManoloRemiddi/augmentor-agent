@@ -137,6 +137,19 @@ off, including after restart.
 
 ### Live installation controller, deferral and reopening
 
+The native `5891eef` revision passes Mac 14/26, shared validation, SDK platform
+contracts and installer feasibility. Windows Desktop fails only the new runtime
+lease fixture's nonprivate temporary parent; the fixture now creates its parent
+through the actual private-directory API. Full x64 installation passes busy-draft
+deferral and independent completion, then refuses reopening because installed code
+has ordinary Inno ownership/read grants rather than a private-data ACL. The source
+correction introduces a separate read-only installed-payload descriptor: expected
+user/SYSTEM/Administrators ownership and write access, ordinary read grants,
+single-link/no-reparse bytes, no ACL mutation. Cache/observer state remains private.
+The source bootstrap uses this same explicit installed-code boundary. A new native
+ACL test accepts public read access and refuses public write access. Fresh hosted
+qualification is required; the initial x64 run is a failure, not a reopening pass.
+
 The Windows controller now connects the shared download service to the fixed
 supervisor launch. It dispatches only after leaving its own maintenance work
 admission, with both download/install consent, a fully downloaded authenticated
@@ -192,11 +205,43 @@ including nonzero refusal. Full installation remains an unpublished same-build
 fixture; these passes do not qualify signed N-to-N+1 or the newer controller.
 
 Linux/Mac automatic installation adapters, signed N-to-N+1 health/recovery,
-signing-key custody/root rotation and public feed provisioning remain open.
+signing-key custody/online-key migration and public feed provisioning remain open.
 Same-build source restoration also needs a verified controller recovery/reset
 path; a saved receipt alone must never restart installation. The subsequent
 subsections retain earlier implementation checkpoints and pending evidence as
 history; this subsection is the current controller status.
+
+### Offline root replacement
+
+The publisher now supports `prepare-root` and `activate-root`. Preparation runs
+with two distinct existing offline keys, generates three replacement offline
+keys outside Git/public output, and cross-signs the immediate next root with both
+old and new thresholds. It does not touch the online publisher or issue releases.
+Activation needs the exact current root hash, an unexpired next root, both verified
+thresholds and no pending publication. Existing online role keys are retained;
+online key replacement requires its separate migration/recovery implementation.
+This follows [TUF root update verification](https://theupdateframework.github.io/specification/v1.0.36/),
+including sequential versions and both authorities.
+
+Private root bytes are immutable numbered files. The publisher state selects the
+new file through one atomic commit, preserving the old selection if that commit
+fails. A retry can reuse only the identical prepared bytes. Every later publication
+contains the entire versioned root chain. Historical abandonment audits remain
+valid only against that retained verified history; signing sequences and immutable
+asset identities survive rotation. Neither a root update nor its local preparation
+uploads metadata or enables client installation.
+Keep exactly one prepared candidate for each next root version. Publish root
+files only from a publication produced after successful activation; standalone
+preparation output is for review. Recover an interrupted activation with the same
+candidate bytes, rather than generating another authority for that version.
+
+Twenty-three real Node producer/client tests pass. The new proof moves an actual
+HTTP TUF client from root 1 through roots 2 and 3 and downloads unchanged inert
+artifact bytes. It also covers distinct-key refusal, missing signatures, skipped
+versions, stale root pins, interrupted activation, pending-publication refusal,
+abandoned sequences and edited root history. Only temporary fixture authorities
+are generated. Production root custody, online-key migration, CI provisioning and
+public root/feed publication remain open.
 
 The shared coordinator now accepts an explicit `revalidate(stage)` guard before
 preparation, before any reserved peer drains, and after independent installer

@@ -18,7 +18,7 @@ import sys
 
 
 class InstallerProcess:
-    def __init__(self,artifact,sha256,arguments,*,environment=None,qualification_outer_job=False,allow_child_breakaway=False):
+    def __init__(self,artifact,sha256,arguments,*,environment=None,qualification_outer_job=False,allow_child_breakaway=False,installed_payload=False):
         if sys.platform!='win32':raise RuntimeError('Installer process ownership requires Windows.')
         if not isinstance(sha256,str) or not re.fullmatch('[a-f0-9]{64}',sha256):
             raise ValueError('A verified installer digest is required.')
@@ -26,13 +26,14 @@ class InstallerProcess:
             raise ValueError('Use explicit installer arguments without a command shell.')
         if type(qualification_outer_job) is not bool:raise ValueError('Invalid qualification process boundary.')
         if type(allow_child_breakaway) is not bool:raise ValueError('Invalid independent coordinator process boundary.')
+        if type(installed_payload) is not bool:raise ValueError('Invalid installed executable boundary.')
         import pywintypes,win32api,win32con,win32job,win32process,win32security
-        from platform_adapters.windows_identity import private_file_descriptor,sid_string
+        from platform_adapters.windows_identity import private_file_descriptor,payload_file_descriptor,sid_string
         self.artifact=Path(artifact).absolute()
         self.file=None;self.job=None;self.process=None;self.pid=None
         thread=None;started=False
         try:
-            self.file=private_file_descriptor(self.artifact,share_write=False)
+            self.file=payload_file_descriptor(self.artifact) if installed_payload else private_file_descriptor(self.artifact,share_write=False)
             with os.fdopen(os.dup(self.file),'rb') as content:
                 if hashlib.file_digest(content,'sha256').hexdigest()!=sha256:
                     raise ValueError('The installer bytes changed after verification. Nothing was launched.')

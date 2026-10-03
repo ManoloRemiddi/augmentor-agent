@@ -15,6 +15,32 @@ class WindowsIdentityTests(unittest.TestCase):
         from platform_adapters.windows_identity import current_sid, process_sid
         self.assertEqual(process_sid(os.getpid()), current_sid())
 
+    def test_installed_payload_can_be_readable_publicly_but_never_writable_publicly(self):
+        import win32security
+        from platform_adapters.windows_identity import private_directory,payload_file_descriptor,private_file_descriptor,sid_string
+        with tempfile.TemporaryDirectory() as temporary:
+            root=private_directory(Path(temporary)/'installed')
+            file=root/'public-code.fixture';file.write_bytes(b'Public executable fixture bytes.')
+            user=sid_string()
+            def grants(access):
+                sd=win32security.ConvertStringSecurityDescriptorToSecurityDescriptor(
+                    f'D:P(A;;FA;;;{user})(A;;FA;;;SY)(A;;{access};;;WD)',win32security.SDDL_REVISION_1)
+                win32security.SetFileSecurity(str(file),win32security.DACL_SECURITY_INFORMATION,sd)
+            grants('FR')
+            before=win32security.GetFileSecurity(str(file),win32security.DACL_SECURITY_INFORMATION)
+            fd=payload_file_descriptor(file)
+            try:self.assertEqual(os.read(fd,1024),b'Public executable fixture bytes.')
+            finally:os.close(fd)
+            with self.assertRaises(PermissionError):private_file_descriptor(file,share_write=False)
+            after=win32security.GetFileSecurity(str(file),win32security.DACL_SECURITY_INFORMATION)
+            def encoded(sd):
+                return win32security.ConvertSecurityDescriptorToStringSecurityDescriptor(
+                    sd,win32security.SDDL_REVISION_1,win32security.DACL_SECURITY_INFORMATION)
+            self.assertEqual(encoded(before),encoded(after))
+            grants('FA')
+            with self.assertRaises(PermissionError):payload_file_descriptor(file)
+            self.assertEqual(file.read_bytes(),b'Public executable fixture bytes.')
+
     def test_private_lease_refuses_hard_link_and_reopens_without_truncating(self):
         from platform_adapters.windows_identity import private_directory, private_lock_descriptor
         with tempfile.TemporaryDirectory() as temporary:

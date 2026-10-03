@@ -4,6 +4,21 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+The signing tool now prepares offline root replacement with both old/new
+two-of-three signatures, then activates an exact pinned next root through one
+atomic publisher-state selection. It retains immutable root history and burned
+metadata/artifact identities. Real producer/client tests pass 23 cases, including
+an actual HTTP client advancing roots 1→2→3 and downloading inert bytes. Online
+key migration/custody/public provisioning remain unfinished; see
+[offline root replacement](UPDATE-SYSTEM.md#offline-root-replacement).
+At `5891eef`, Mac 14/26, shared validation, SDK platform contracts and installer
+feasibility pass. Windows Desktop fails the new lease fixture's temporary-parent
+ACL. Full x64 completes busy-draft deferral and target health, then fails reopen
+on normal installed-code ownership/read grants. The source now separates public
+installed-code read-only validation from private cache validation and corrects
+the fixture parent; new native ACL/reopen qualification is required. Do not treat
+the failed x64 run as a successful reopening proof.
+
 Latest controller integration connects qualified Windows downloads to the fixed
 supervisor/bootstrap, outside the shared service's work admission. Fresh launch
 identifiers/results report status only; actual cancelled preparation can defer

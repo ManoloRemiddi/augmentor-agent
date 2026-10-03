@@ -16,7 +16,7 @@ from lifecycle.admission import MaintenanceBusy
 class RuntimeLeaseTests(unittest.TestCase):
     def setUp(self):
         temporary=tempfile.TemporaryDirectory();self.addCleanup(temporary.cleanup)
-        self.base=Path(temporary.name).resolve()
+        self.base=private_directory(Path(temporary.name).resolve()/'private')
         self.runtime=private_directory(self.base/('observer-'+'a'*48))
         (self.runtime/'inert-code.fixture').write_bytes(b'Public temporary code fixture.')
 

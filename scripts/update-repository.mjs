@@ -97,8 +97,8 @@ export async function initializeRepository({keys,output,now=Date.now()}){
 async function owner(keys,{allowPending=false}={}){
  const folder=await keysFolder(keys)
  for(const name of ['root.json','publisher.json',...ROLES.map(role=>role+'.pem')])await ordinary(path.join(folder,name),{privateFile:true,maximum:name==='publisher.json'?STATE_LIMIT:LIMIT})
- const rootBytes=await fs.readFile(path.join(folder,'root.json'))
  const state=JSON.parse(await fs.readFile(path.join(folder,'publisher.json'),'utf8'))
+ const history=await trustedRoots(folder,state),{bytes:rootBytes,metadata:root}=history.at(-1)
  if(state.schema!==STATE||!Number.isSafeInteger(state.sequence)||state.sequence<0||state.rootSha256!==digest(rootBytes)||(!allowPending&&state.pending))throw Error('Publisher state needs explicit recovery; never repeat an uncertain publication.')
  if(state.pending&&(!Number.isSafeInteger(state.pending.sequence)||state.pending.sequence!==state.sequence+1||typeof state.pending.directory!=='string'||!path.isAbsolute(state.pending.directory)))throw Error('Invalid pending publisher claim.')
  if(!state.artifactIdentities||typeof state.artifactIdentities!=='object'||Array.isArray(state.artifactIdentities))throw Error('The permanent artifact identity ledger is missing.')
@@ -106,7 +106,6 @@ async function owner(keys,{allowPending=false}={}){
   if(!identity||Object.keys(identity).sort().join(',')!=='bytes,sha256')throw Error('Invalid permanent artifact identity ledger.')
   validateArtifact({targetPath,...identity})
  }
- const root=Metadata.fromJSON('root',JSON.parse(rootBytes));root.verifyDelegate('root',root)
  const selected={}
  for(const role of ROLES){
   const privateKey=createPrivateKey(await fs.readFile(path.join(folder,role+'.pem')))
@@ -115,7 +114,94 @@ async function owner(keys,{allowPending=false}={}){
   if(ids.length!==1||root.signed.roles[role].threshold!==1||root.signed.keys[ids[0]].keyVal.public!==publicBytes)throw Error('The online key differs from the trusted publisher root.')
   selected[role]={privateKey,key:root.signed.keys[ids[0]]}
  }
- return {folder,rootBytes,root,state,selected}
+ return {folder,rootBytes,root,state,selected,history}
+}
+
+async function trustedRoots(folder,state){
+ const entries=state.rootHistory??[{file:'root.json',sha256:state.rootSha256}]
+ if(!Array.isArray(entries)||!entries.length||entries.length>256)throw Error('Invalid retained publisher root history.')
+ const history=[]
+ for(const entry of entries){
+  if(!entry||Object.keys(entry).sort().join(',')!=='file,sha256'||
+   !/^(?:root\.json|root-[1-9][0-9]*\.json)$/.test(entry.file)||!/^[a-f0-9]{64}$/.test(entry.sha256))throw Error('Invalid retained publisher root identity.')
+  const file=path.join(folder,entry.file);await ordinary(file,{privateFile:true})
+  const bytes=await fs.readFile(file),metadata=Metadata.fromJSON('root',JSON.parse(bytes))
+  metadata.verifyDelegate('root',metadata)
+  if(digest(bytes)!==entry.sha256||metadata.signed.version!==history.length+1)throw Error('Publisher root history changed or skipped a version.')
+  if(history.length)history.at(-1).metadata.verifyDelegate('root',metadata)
+  history.push({file:entry.file,sha256:entry.sha256,bytes,metadata})
+ }
+ if(history.at(-1).file!==(state.rootFile??'root.json')||history.at(-1).sha256!==state.rootSha256)throw Error('The publisher root selection differs from its history.')
+ return history
+}
+
+function rootPolicy(root){
+ const roles=root.signed.roles
+ if(Object.keys(roles).sort().join(',')!=='root,snapshot,targets,timestamp'||
+  roles.root.threshold!==2||roles.root.keyIDs.length!==3||new Set(roles.root.keyIDs).size!==3||
+  !root.signed.consistentSnapshot)throw Error('Retain the two-of-three root and consistent-snapshot policy.')
+ for(const role of ROLES)if(roles[role].threshold!==1||roles[role].keyIDs.length!==1)throw Error('Retain the declared online signing roles.')
+}
+
+export async function prepareRootRotation({root,oldKeys,newKeys,output,now=Date.now()}){
+ // Offline-only preparation. It never accesses or changes the online owner.
+ if(!Array.isArray(oldKeys)||oldKeys.length!==2)throw Error('Provide two independently held current root keys.')
+ await ordinary(root);const priorBytes=await fs.readFile(root),prior=Metadata.fromJSON('root',JSON.parse(priorBytes))
+ prior.verifyDelegate('root',prior);rootPolicy(prior)
+ const old=[]
+ for(const file of oldKeys){
+  await keysFolder(path.dirname(path.resolve(file)));await ordinary(file,{privateFile:true})
+  const privateKey=createPrivateKey(await fs.readFile(file)),publicBytes=Buffer.from(createPublicKey(privateKey).export({format:'jwk'}).x,'base64url').toString('hex')
+  const id=prior.signed.roles.root.keyIDs.find(id=>prior.signed.keys[id].keyVal.public===publicBytes)
+  if(!id||old.some(item=>item.key.keyID===id))throw Error('Use two distinct keys authorized by the current root.')
+  old.push({key:prior.signed.keys[id],privateKey})
+ }
+ const folder=path.resolve(newKeys),destination=path.resolve(output)
+ if(folder===destination||folder.startsWith(destination+path.sep)||destination.startsWith(folder+path.sep))throw Error('Keep new offline secrets separate from public rotation output.')
+ if(prior.signed.version>=256)throw Error('The retained root history limit requires a reviewed bridge migration.')
+ await fs.mkdir(folder,{mode:0o700});await keysFolder(folder)
+ await fs.mkdir(destination,{mode:0o755})
+ const next=new Root({version:prior.signed.version+1,expires:expiration(now,730),consistentSnapshot:true})
+ next.roles.root.threshold=2
+ for(const role of ROLES)next.addKey(prior.signed.keys[prior.signed.roles[role].keyIDs[0]],role)
+ const replacement=[]
+ for(let i=1;i<=3;i++){
+  const key=generatedKey();replacement.push(key);next.addKey(key.key,'root')
+  await write(path.join(folder,`root-${i}.pem`),key.privateKey.export({format:'pem',type:'pkcs8'}),{privateFile:true,exclusive:true})
+ }
+ const metadata=signed(next,[...old,...replacement.slice(0,2)])
+ prior.verifyDelegate('root',metadata);metadata.verifyDelegate('root',metadata)
+ const bytes=serialize(metadata),file=path.join(destination,`${next.version}.root.json`)
+ await write(file,bytes,{exclusive:true});await write(path.join(folder,'root.json'),bytes,{privateFile:true,exclusive:true})
+ return {root:file,version:next.version,rootSha256:digest(bytes),previousRootSha256:digest(priorBytes)}
+}
+
+export async function activateRootRotation({keys,root,previousRootSha256,now=Date.now()}){
+ return exclusivePublisher(keys,async()=>{
+  const publisher=await owner(keys),{state,folder}=publisher
+  if(publisher.history.length>=256)throw Error('The retained root history limit requires a reviewed bridge migration.')
+  if(state.rootSha256!==previousRootSha256)throw Error('Pin the exact current publisher root before activation.')
+  await previousPublication(publisher)
+  await ordinary(root);const bytes=await fs.readFile(root),next=Metadata.fromJSON('root',JSON.parse(bytes))
+  rootPolicy(next)
+  if(next.signed.version!==publisher.root.signed.version+1||!Number.isFinite(Date.parse(next.signed.expires))||Date.parse(next.signed.expires)<=now)throw Error('Activate an unexpired immediate next root version.')
+  publisher.root.verifyDelegate('root',next);next.verifyDelegate('root',next)
+  for(const role of ROLES){
+   const before=publisher.root.signed.roles[role],after=next.signed.roles[role]
+   if(after.keyIDs[0]!==before.keyIDs[0]||canonicalize(next.signed.keys[after.keyIDs[0]].toJSON())!==canonicalize(publisher.root.signed.keys[before.keyIDs[0]].toJSON()))throw Error('Online key migration needs its separate publication/recovery plan.')
+  }
+  const name=`root-${next.signed.version}.json`,file=path.join(folder,name)
+  try{
+   await ordinary(file,{privateFile:true})
+   if(!(await fs.readFile(file)).equals(bytes))throw Error('An earlier prepared root differs. Preserve both candidates.')
+  }catch(error){if(error.code!=='ENOENT')throw error;await write(file,bytes,{privateFile:true,exclusive:true})}
+  state.rootHistory??=[{file:'root.json',sha256:state.rootSha256}]
+  state.rootHistory.push({file:name,sha256:digest(bytes)});state.rootFile=name;state.rootSha256=digest(bytes)
+  // The state file is the single commit point. Earlier root bytes remain
+  // immutable; interruption before this rename leaves the old root selected.
+  await write(path.join(folder,'publisher.json'),JSON.stringify(state),{privateFile:true,maximum:STATE_LIMIT})
+  return {version:next.signed.version,rootSha256:state.rootSha256,sequence:state.sequence}
+ })
 }
 
 function validateCatalogs(catalogs){
@@ -170,7 +256,7 @@ async function previousPublication(publisher){
  if((state.publication?.sequence||0)<state.sequence){
   const file=path.join(publisher.folder,`recovery-${state.sequence}.json`);await ordinary(file,{privateFile:true})
   const audit=JSON.parse(await fs.readFile(file,'utf8'))
-  if(audit.schema!=='augmentor-update-publisher-recovery/1'||audit.sequence!==state.sequence||audit.decision!=='abandon'||audit.rootSha256!==state.rootSha256)throw Error('The skipped publisher sequence lacks a matching recovery record.')
+  if(audit.schema!=='augmentor-update-publisher-recovery/1'||audit.sequence!==state.sequence||audit.decision!=='abandon'||!publisher.history.some(root=>root.sha256===audit.rootSha256))throw Error('The skipped publisher sequence lacks a matching recovery record.')
  }
  if(!state.publication)return null
  if(state.publication.sequence>state.sequence)throw Error('Invalid publisher history sequence.')
@@ -230,7 +316,7 @@ async function buildPublication({keys,output,catalogs,artifacts,refresh=false,no
  }
  await directory(path.join(destination,'metadata'),{create:true})
  await write(path.join(destination,'metadata/root.json'),rootBytes,{exclusive:true})
- await write(path.join(destination,`metadata/${root.signed.version}.root.json`),rootBytes,{exclusive:true})
+ for(const retained of publisher.history)await write(path.join(destination,`metadata/${retained.metadata.signed.version}.root.json`),retained.bytes,{exclusive:true})
  const manifest={schema:'augmentor-update-publication/1',sequence,rootSha256:state.rootSha256,files:hashes,createdAt:new Date(now).toISOString()}
  await write(path.join(destination,'publication.json'),JSON.stringify(manifest,null,2),{exclusive:true})
  state.sequence=sequence;state.publication={directory:destination,sequence,files:hashes};state.pending=null
@@ -265,9 +351,9 @@ export async function recoverRepository({keys,output,sequence,decision}){
    await ordinary(manifestFile)
    const manifest=JSON.parse(await fs.readFile(manifestFile,'utf8'))
    if(manifest.schema!=='augmentor-update-publication/1'||manifest.sequence!==sequence||manifest.rootSha256!==state.rootSha256)throw Error('Recovery manifest differs from the pending publisher claim.')
-   for(const name of ['root.json',`${publisher.root.signed.version}.root.json`]){
+   for(const [name,expected] of [['root.json',rootBytes],...publisher.history.map(root=>[`${root.metadata.signed.version}.root.json`,root.bytes])]){
     const file=path.join(pending.directory,'metadata',name);await ordinary(file)
-    if(!(await fs.readFile(file)).equals(rootBytes))throw Error('Recovery root differs from the private publisher trust anchor.')
+    if(!(await fs.readFile(file)).equals(expected))throw Error('Recovery root differs from the private publisher trust anchor.')
    }
    publication={directory:pending.directory,sequence,files:manifest.files}
    const recovered=await verifiedPublication(publisher,publication),previous=await previousPublication(publisher)
@@ -295,11 +381,13 @@ export async function recoverRepository({keys,output,sequence,decision}){
 
 async function main(){
  const [operation,...arguments_]=process.argv.slice(2),options={}
- for(let i=0;i<arguments_.length;i+=2){const name=arguments_[i],value=arguments_[i+1];if(!['--keys','--out','--catalogs','--artifacts','--sequence','--decision'].includes(name)||!value||options[name])throw Error('Use explicit keys/output/catalog/artifact/recovery options.');options[name]=value}
+ for(let i=0;i<arguments_.length;i+=2){const name=arguments_[i],value=arguments_[i+1];if(!['--keys','--out','--catalogs','--artifacts','--sequence','--decision','--root','--old-key-1','--old-key-2','--new-keys','--previous-root-sha256'].includes(name)||!value||options[name])throw Error('Use explicit keys/output/catalog/artifact/recovery options.');options[name]=value}
+ if(operation==='prepare-root')return prepareRootRotation({root:options['--root'],oldKeys:[options['--old-key-1'],options['--old-key-2']],newKeys:options['--new-keys'],output:options['--out']})
+ if(operation==='activate-root')return activateRootRotation({keys:options['--keys'],root:options['--root'],previousRootSha256:options['--previous-root-sha256']})
  if(!options['--keys']||!options['--out'])throw Error('Provide --keys outside Git and a new --out directory.')
  if(operation==='init')return initializeRepository({keys:options['--keys'],output:options['--out']})
  if(operation==='recover')return recoverRepository({keys:options['--keys'],output:options['--out'],sequence:/^[1-9][0-9]*$/.test(options['--sequence']||'')?Number(options['--sequence']):NaN,decision:options['--decision']})
- if(!['publish','refresh'].includes(operation))throw Error('Choose init, publish, refresh or recover.')
+ if(!['publish','refresh'].includes(operation))throw Error('Choose init, publish, refresh, recover, prepare-root or activate-root.')
  let catalogs
  if(operation==='publish'){
   if(!options['--catalogs'])throw Error('Provide both reviewed catalogs.')

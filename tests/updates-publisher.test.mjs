@@ -8,7 +8,7 @@ import path from 'node:path'
 import http from 'node:http'
 import {createHash} from 'node:crypto'
 import {Metadata} from '@tufjs/models'
-import {initializeRepository,publishRepository,recoverRepository} from '../scripts/update-repository.mjs'
+import {initializeRepository,publishRepository,recoverRepository,prepareRootRotation,activateRootRotation} from '../scripts/update-repository.mjs'
 import {UpdateRepository,BoundedFetcher} from '../services/updates/repository.mjs'
 
 const digest=bytes=>createHash('sha256').update(bytes).digest('hex')
@@ -165,4 +165,98 @@ test('withdrawing a release never frees its immutable URL for different bytes',a
  f.release.artifacts[0]={...f.release.artifacts[0],bytes:replacement.length,sha256:digest(replacement)}
  await assert.rejects(publishRepository({keys:f.keys,output:f.stage(3),catalogs:f.catalogs,artifacts:f.artifacts}),/relabeled/)
  assert.equal(JSON.parse(await fs.readFile(path.join(f.keys,'publisher.json'),'utf8')).sequence,2)
+})
+
+async function rotation(f){
+ return prepareRootRotation({root:f.initialized.root,oldKeys:[1,2].map(n=>path.join(f.keys,`root-${n}.pem`)),
+  newKeys:path.join(f.base,'next-offline-keys'),output:path.join(f.base,'rotation')})
+}
+
+test('offline root replacement cross-signs both thresholds and the real client advances from its original trust root',async t=>{
+ const f=await fixture(t)
+ await publishRepository({keys:f.keys,output:f.stage(1),catalogs:f.catalogs,artifacts:f.artifacts})
+ const rotated=await rotation(f),bytes=await fs.readFile(rotated.root),next=Metadata.fromJSON('root',JSON.parse(bytes)),old=Metadata.fromJSON('root',JSON.parse(f.rootBytes))
+ old.verifyDelegate('root',next);next.verifyDelegate('root',next)
+ assert.equal(next.signed.version,2);assert.equal(next.toJSON().signatures.length,4)
+ assert.equal(next.signed.roles.root.keyIDs.some(id=>old.signed.roles.root.keyIDs.includes(id)),false)
+ for(const role of ['targets','snapshot','timestamp'])assert.deepEqual(next.signed.roles[role],old.signed.roles[role])
+ assert.deepEqual(await fs.readdir(path.dirname(rotated.root)),['2.root.json'])
+ for(const n of [1,2,3])await fs.unlink(path.join(f.keys,`root-${n}.pem`))
+ assert.equal((await activateRootRotation({keys:f.keys,root:rotated.root,previousRootSha256:rotated.previousRootSha256})).sequence,1)
+ assert.deepEqual(await fs.readFile(path.join(f.keys,'root.json')),f.rootBytes)
+ await publishRepository({keys:f.keys,output:f.stage(2),refresh:true})
+ assert.deepEqual(await fs.readFile(path.join(f.stage(2),'metadata/1.root.json')),f.rootBytes)
+ assert.deepEqual(await fs.readFile(path.join(f.stage(2),'metadata/2.root.json')),bytes)
+ const third=await prepareRootRotation({root:rotated.root,
+  oldKeys:[1,2].map(n=>path.join(f.base,'next-offline-keys',`root-${n}.pem`)),
+  newKeys:path.join(f.base,'third-offline-keys'),output:path.join(f.base,'third-rotation')})
+ await activateRootRotation({keys:f.keys,root:third.root,previousRootSha256:third.previousRootSha256})
+ await publishRepository({keys:f.keys,output:f.stage(3),refresh:true})
+ const requests=[]
+ const server=http.createServer(async(req,res)=>{
+  const relative=decodeURIComponent(req.url.slice(1))
+  requests.push(relative)
+  if(relative.includes('..')){res.writeHead(400);res.end();return}
+  try{res.end(await fs.readFile(path.join(relative.startsWith('releases/')?f.artifacts:f.stage(3),relative)))}catch{res.writeHead(404);res.end()}
+ })
+ await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));t.after(()=>new Promise(resolve=>server.close(resolve)))
+ const url=`http://127.0.0.1:${server.address().port}/`
+ const client=new UpdateRepository({cache:path.join(f.base,'rotated-cache'),config:{root:f.rootBytes,
+  metadataBaseUrl:url+'metadata/',catalogBaseUrl:url+'targets/',artifactBaseUrl:url},fetcher:new BoundedFetcher({allowLocalhost:true})})
+ assert.deepEqual(await client.catalog('preview'),f.catalogs.preview)
+ assert.deepEqual(await fs.readFile(await client.download(f.release.artifacts[0])),f.payload)
+ assert.ok(requests.includes('metadata/2.root.json'));assert.ok(requests.includes('metadata/3.root.json'))
+})
+
+test('root preparation refuses duplicate authorities and activation refuses changed pins, skipped versions and missing signatures',async t=>{
+ const f=await fixture(t),options={root:f.initialized.root,oldKeys:[path.join(f.keys,'root-1.pem'),path.join(f.keys,'root-1.pem')],
+  newKeys:path.join(f.base,'duplicate-keys'),output:path.join(f.base,'duplicate-output')}
+ await assert.rejects(prepareRootRotation(options),/two distinct/)
+ await assert.rejects(fs.stat(options.newKeys),/ENOENT/)
+ const rotated=await rotation(f),activate={keys:f.keys,root:rotated.root,previousRootSha256:rotated.previousRootSha256}
+ await assert.rejects(activateRootRotation({...activate,previousRootSha256:'0'.repeat(64)}),/exact current/)
+ const raw=await fs.readFile(rotated.root),altered=JSON.parse(raw)
+ altered.signed.version=3;await fs.writeFile(rotated.root,JSON.stringify(altered))
+ await assert.rejects(activateRootRotation(activate),/immediate next/)
+ altered.signed.version=2;altered.signatures=altered.signatures.slice(0,2);await fs.writeFile(rotated.root,JSON.stringify(altered))
+ await assert.rejects(activateRootRotation(activate),/signature|threshold|signed by 0/i)
+ await fs.writeFile(rotated.root,raw)
+ await activateRootRotation(activate)
+ await assert.rejects(activateRootRotation(activate),/exact current/)
+})
+
+test('interrupted root activation leaves the original selected and only the same prepared candidate can finish',async t=>{
+ const f=await fixture(t),rotated=await rotation(f),stateFile=path.join(f.keys,'publisher.json')
+ const activate={keys:f.keys,root:rotated.root,previousRootSha256:rotated.previousRootSha256},before=await fs.readFile(stateFile)
+ const rename=fs.rename,failure=t.mock.method(fs,'rename',async(source,target)=>{
+  if(target===stateFile)throw Error('synthetic interrupted root commit')
+  return rename(source,target)
+ })
+ await assert.rejects(activateRootRotation(activate),/interrupted root commit/);failure.mock.restore()
+ assert.deepEqual(await fs.readFile(stateFile),before)
+ assert.deepEqual(await fs.readFile(path.join(f.keys,'root-2.json')),await fs.readFile(rotated.root))
+ await publishRepository({keys:f.keys,output:f.stage(1),catalogs:f.catalogs,artifacts:f.artifacts})
+ assert.equal(JSON.parse(await fs.readFile(path.join(f.stage(1),'metadata/root.json'))).signed.version,1)
+ await activateRootRotation(activate)
+ const state=JSON.parse(await fs.readFile(stateFile));assert.equal(state.rootHistory.length,2);assert.equal(state.rootFile,'root-2.json')
+ await publishRepository({keys:f.keys,output:f.stage(2),refresh:true})
+})
+
+test('root replacement preserves abandoned signing sequences and rejects edited root history',async t=>{
+ const f=await fixture(t),stateFile=path.join(f.keys,'publisher.json')
+ await publishRepository({keys:f.keys,output:f.stage(1),catalogs:f.catalogs,artifacts:f.artifacts})
+ const link=fs.link,failure=t.mock.method(fs,'link',async(source,target)=>{
+  if(target===path.join(f.stage(2),'metadata/timestamp.json'))throw Error('synthetic pending publication')
+  return link(source,target)
+ })
+ await assert.rejects(publishRepository({keys:f.keys,output:f.stage(2),refresh:true}),/pending publication/);failure.mock.restore()
+ const rotated=await rotation(f),activate={keys:f.keys,root:rotated.root,previousRootSha256:rotated.previousRootSha256}
+ await assert.rejects(activateRootRotation(activate),/explicit recovery/)
+ await recoverRepository({keys:f.keys,output:f.stage(2),sequence:2,decision:'abandon'})
+ await activateRootRotation(activate)
+ assert.equal((await publishRepository({keys:f.keys,output:f.stage(3),refresh:true})).sequence,3)
+ const state=JSON.parse(await fs.readFile(stateFile));assert.equal(state.artifactIdentities[f.targetPath].sha256,digest(f.payload))
+ await fs.writeFile(path.join(f.keys,'root.json'),'edited retained root')
+ await assert.rejects(publishRepository({keys:f.keys,output:f.stage(4),refresh:true}))
+ assert.equal(JSON.parse(await fs.readFile(stateFile)).sequence,3)
 })

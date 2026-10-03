@@ -39,7 +39,7 @@ def launch(root):
         # replacement runs. Closing a non-killing Job observation leaves the
         # bootstrap alive; the parent retains its own live exit observation.
         with InstallerProcess(root/'python/python.exe',row['sha256'],['-I','-Xutf8','-B',
-                str(script),'--attempt',attempt],allow_child_breakaway=True):
+                str(script),'--attempt',attempt],allow_child_breakaway=True,installed_payload=True):
             return {'started':True,'attempt':attempt}
 
 

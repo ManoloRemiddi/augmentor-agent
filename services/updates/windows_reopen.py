@@ -65,7 +65,7 @@ def reopen_windows(observer, root, base, candidate, completion, *, qualification
         preview=['--preview','--ui-test-control'] if qualification else []
         for argv in ([*prefix,'--background'],*([*prefix,'--instance',name,*preview] for name in plan['instances'])):
             with InstallerProcess(root/'Augmentor.exe',row['sha256'],argv,
-                    qualification_outer_job=qualification,allow_child_breakaway=True):pass
+                    qualification_outer_job=qualification,allow_child_breakaway=True,installed_payload=True):pass
             # Close observation only: normal user apps/background descendants
             # survive. Their Job must allow a later updater's own breakaway.
     return {'instances':plan['instances'],'browserReloadRequired':plan['hadBrowser']}
