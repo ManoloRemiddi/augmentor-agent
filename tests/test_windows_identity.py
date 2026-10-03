@@ -75,6 +75,39 @@ class WindowsIdentityTests(unittest.TestCase):
             finally:
                 os.rmdir(link)
 
+    def test_node_download_inherits_only_private_grants_then_receives_protected_acl(self):
+        from platform_adapters.windows_identity import private_directory,protect_inherited_download,private_file_descriptor
+        import shutil
+        root=Path(__file__).resolve().parents[1]
+        candidate=root/'outputs/payload/node/node.exe'
+        node=str(candidate) if candidate.is_file() else shutil.which('node')
+        if not node:self.skipTest('The qualified Node runtime is required for the download ACL proof.')
+        with tempfile.TemporaryDirectory() as temporary:
+            folder=private_directory(Path(temporary)/'private');file=folder/'download'
+            subprocess.run([node,'-e',"require('node:fs').writeFileSync(process.argv[1],'fixture')",str(file)],check=True)
+            protect_inherited_download(file)
+            fd=private_file_descriptor(file)
+            try:self.assertEqual(os.read(fd,7),b'fixture')
+            finally:os.close(fd)
+            os.link(file,folder/'alias')
+            with self.assertRaises(PermissionError):protect_inherited_download(file)
+
+    def test_download_sealing_refuses_public_grants_without_repairing_them(self):
+        from platform_adapters.windows_identity import private_directory,protect_inherited_download
+        import win32security
+        with tempfile.TemporaryDirectory() as temporary:
+            folder=private_directory(Path(temporary)/'private');file=folder/'public-download'
+            file.write_bytes(b'preserved')
+            descriptor=win32security.ConvertStringSecurityDescriptorToSecurityDescriptor(
+                'D:P(A;;FA;;;WD)',win32security.SDDL_REVISION_1)
+            win32security.SetFileSecurity(str(file),win32security.DACL_SECURITY_INFORMATION,descriptor)
+            stringify=lambda:win32security.ConvertSecurityDescriptorToStringSecurityDescriptor(
+                win32security.GetFileSecurity(str(file),win32security.DACL_SECURITY_INFORMATION),
+                win32security.SDDL_REVISION_1,win32security.DACL_SECURITY_INFORMATION)
+            before=stringify()
+            with self.assertRaises(PermissionError):protect_inherited_download(file)
+            self.assertEqual(stringify(),before);self.assertEqual(file.read_bytes(),b'preserved')
+
 
 if __name__ == '__main__':
     unittest.main()

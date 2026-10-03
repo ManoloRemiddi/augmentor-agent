@@ -12,7 +12,9 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'services'))
 from updates.manager import UpdateManager
 from lifecycle.admission import Admission, MaintenanceBusy
-from platform_adapters.private_files import atomic_json
+from platform_adapters.private_files import atomic_json, descriptor
+from platform_adapters.paths import private_directory
+import os
 
 
 class UpdateManagerTests(unittest.TestCase):
@@ -35,8 +37,9 @@ class UpdateManagerTests(unittest.TestCase):
     def helper(self, request):
         self.calls.append(request)
         if request['operation'] == 'discover': return {'authenticated': False, 'releases': [deepcopy(self.release)]}
-        folder=self.manager.base/'repository';folder.mkdir(mode=0o700,exist_ok=True)
-        file=folder/(request['artifact']['sha256']+'.download');file.write_bytes(b'x'*100);file.chmod(0o600)
+        folder=private_directory(self.manager.base/'repository')
+        file=folder/(request['artifact']['sha256']+'.download')
+        with os.fdopen(descriptor(file,writable=True,create=True),'wb') as output:output.write(b'x'*100)
         return {'authenticated': False, 'file': str(file)}
 
     def wait(self):
@@ -52,7 +55,7 @@ class UpdateManagerTests(unittest.TestCase):
         self.assertEqual(self.manager.call('updates.notification', {})['build'], 2)
         self.assertIsNone(self.manager.call('updates.notification', {}))
         self.manager.call('updates.download', {}); value = self.wait()
-        self.assertEqual(value['phase'], 'ready')
+        self.assertEqual(value['phase'], 'ready',value.get('error'))
         self.assertNotIn('file', value['downloads'][0])
         folder=Path(self.manager.call('updates.reveal', {})['folder'])
         self.assertEqual((folder/'app.tar.gz').read_bytes(), b'x'*100)
@@ -99,7 +102,7 @@ class UpdateManagerTests(unittest.TestCase):
         value = self.manager.snapshot(); preferences = {**value['preferences'], 'automaticDownload': True}
         self.manager.configure({'revision': value['revision'], 'preferences': preferences})
         self.manager.call('updates.check', {}); value = self.wait()
-        self.assertEqual(value['phase'], 'ready')
+        self.assertEqual(value['phase'], 'ready',value.get('error'))
         with self.assertRaises(ValueError):
             self.manager.configure({'revision': value['revision'], 'preferences': {**preferences, 'automaticInstall': True}})
         for method, params in [('updates.install', {}), ('updates.download', {'url': 'https://evil.invalid'}),

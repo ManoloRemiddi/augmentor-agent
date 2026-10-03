@@ -74,14 +74,19 @@ def require_private_directory(path):
 
 
 def require_private_descriptor(descriptor):
+    require_private_grants(descriptor)
+    control, _revision = descriptor.GetSecurityDescriptorControl()
+    if not control & win32security.SE_DACL_PROTECTED:
+        raise PermissionError('The Augmentor directory must not inherit broader access from its parent.')
+
+
+def require_private_grants(descriptor):
+    """Validate the exact owner/user/SYSTEM allow-list without changing an ACL."""
     if descriptor.GetSecurityDescriptorOwner() != current_sid():
         raise PermissionError('The Augmentor directory belongs to another Windows identity.')
     acl = descriptor.GetSecurityDescriptorDacl()
     if acl is None:
         raise PermissionError('The Augmentor directory has no access restrictions.')
-    control, _revision = descriptor.GetSecurityDescriptorControl()
-    if not control & win32security.SE_DACL_PROTECTED:
-        raise PermissionError('The Augmentor directory must not inherit broader access from its parent.')
     allowed = {sid_string(), 'S-1-5-18'}
     user_access = False
     for index in range(acl.GetAceCount()):
@@ -145,6 +150,41 @@ def private_directory(path):
         if getattr(error, 'winerror', None) != 183:
             raise
     return require_private_directory(path)
+
+
+def protect_inherited_download(path):
+    """Protect a Node-produced file that already has the exact private allow-list.
+
+    The known private download parent and opened single-link file are verified
+    first. This cannot repair a public/foreign ACL or follow a reparse object.
+    Windows Node inherits safe grants but does not set SE_DACL_PROTECTED on files.
+    """
+    path=reject_reparse_ancestors(path)
+    require_private_directory(path.parent)
+    try:
+        handle=win32file.CreateFile(str(path),win32con.GENERIC_READ|win32con.READ_CONTROL|win32con.WRITE_DAC,
+            win32con.FILE_SHARE_READ,None,win32con.OPEN_EXISTING,win32file.FILE_FLAG_OPEN_REPARSE_POINT,None)
+    except pywintypes.error as error:
+        raise ctypes.WinError(error.winerror) from None
+    try:
+        info=win32file.GetFileInformationByHandle(handle)
+        if info[0] & (stat.FILE_ATTRIBUTE_REPARSE_POINT|stat.FILE_ATTRIBUTE_DIRECTORY) or info[7]!=1:
+            raise PermissionError('The download must be an ordinary single-link file.')
+        observed=win32security.GetSecurityInfo(handle,win32security.SE_FILE_OBJECT,
+            win32security.OWNER_SECURITY_INFORMATION|win32security.DACL_SECURITY_INFORMATION)
+        require_private_grants(observed)
+        control,_=observed.GetSecurityDescriptorControl()
+        if not control & win32security.SE_DACL_PROTECTED:
+            selected=security_attributes().SECURITY_DESCRIPTOR
+            win32security.SetSecurityInfo(handle,win32security.SE_FILE_OBJECT,
+                win32security.DACL_SECURITY_INFORMATION|win32security.PROTECTED_DACL_SECURITY_INFORMATION,
+                None,None,selected.GetSecurityDescriptorDacl(),None)
+        require_private_descriptor(win32security.GetSecurityInfo(handle,win32security.SE_FILE_OBJECT,
+            win32security.OWNER_SECURITY_INFORMATION|win32security.DACL_SECURITY_INFORMATION))
+    except pywintypes.error as error:
+        raise ctypes.WinError(error.winerror) from None
+    finally:
+        handle.Close()
 
 
 def process_sid(pid):

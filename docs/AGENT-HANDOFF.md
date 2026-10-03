@@ -10,7 +10,10 @@ Linux/source and synthetic suites. The owner authorizes autonomous implementatio
 including optional automatic installation. [The owning guide](UPDATE-SYSTEM.md)
 records the shared scheduler, exact identity/compatibility policy, Desktop/Browser
 controls, manual downloads and TUF client integration. Automatic installation
-and public signed-feed provisioning are unfinished. Do not narrow the goal to
+and public signed-feed provisioning are unfinished. The publisher now has
+two-of-three root initialization, online-only refresh and a real producer/client
+transfer proof. Initial Mac bundled-runtime checks pass; Windows desktop CI found
+a download fixture/ACL boundary issue being corrected and requalified. Do not narrow the goal to
 notification/downloads or mark it complete based on this checkpoint. Nothing
 has been deployed into existing installed apps. Preserve the canonical checkout’s
 existing dirty work; implementation is in a separate feature checkout.

@@ -42,6 +42,12 @@ the whole background discovery/download operation. Busy downloads refuse graph
 maintenance; cancellation terminates only the updater's own transfer child.
 An updater initialization/recovery error cannot disable conversations or prompts.
 
+Windows transfers create new cache bytes instead of preserving public temporary
+file ACLs. The Python owner verifies the file’s existing user/SYSTEM allow-list
+through an opened kernel handle before setting its protected flag. Foreign/public
+grants and linked files are refused without changing their permissions. Hosted
+Windows tests must verify this producer boundary on both CPUs.
+
 Private data lives under `<AUGMENTOR_SHARED_DATA>/updates` (or the existing shared
 data default): atomically written `state.json`, verified repository metadata,
 digest-named cache files and `ready/<channel>-<target>-<version>-<build>/` downloads
@@ -63,6 +69,35 @@ download folder to support repair; it does not permit preferences or installatio
 The existing embedded application SDK administration guard still blocks this
 shared surface entirely. Update actions reject caller-provided URLs, commands,
 release objects and download destinations.
+
+## Publisher tooling checkpoint
+
+[`scripts/update-repository.mjs`](../scripts/update-repository.mjs) creates a
+two-of-three Ed25519 root and separate targets/snapshot/timestamp keys. Secret
+material must live outside any Git checkout and outside public output. Routine
+`publish` and `refresh` do not load offline root private keys. Both channel
+catalogs pass the same Python schema used by installed clients; new artifact
+entries require actual size/hash-verified bytes. Existing public target names
+cannot be relabeled with another digest. Refresh verifies retained signed
+publication history and re-signs unchanged content with a higher sequence.
+
+A publication uses consistent versioned snapshot/targets metadata and hash-prefixed
+catalog files. Timestamp expires in seven days, snapshot in thirty, targets in
+ninety and the initial root in two years. The output is a new immutable local
+publication directory; upload remains a separate release-owner action. Publish
+versioned files/catalogs first and timestamp last, retaining prior versioned files
+and root history. The installed TUF client verifies catalog-prefixed paths; GitHub
+installer filenames retain their public names and pass the maintained model’s
+exact target verification.
+
+A private exclusive publisher lock and durable pending claim prevent simultaneous
+or uncertain publication from reusing a role version. Interrupted initialization
+or publication fails closed for explicit owner recovery; root rotation/recovery
+commands and portable CI provisioning are still in progress. No real publisher
+keys have been generated or public feed uploaded by this checkpoint. Synthetic
+publisher tests exercise the complete producer → HTTP → installed TUF-client
+path, independent root custody, online-only refresh, immutable asset refusal,
+tampered history, private permissions and concurrent-writer exclusion.
 
 ## Discovery and signed delivery
 

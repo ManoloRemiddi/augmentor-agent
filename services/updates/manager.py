@@ -314,6 +314,9 @@ class UpdateManager:
             expected = self.base / 'repository' / (artifact['sha256'] + '.download')
             if file != expected:
                 raise ValueError('The download helper returned an unexpected cache path.')
+            if sys.platform=='win32':
+                from platform_adapters.windows_identity import protect_inherited_download
+                protect_inherited_download(file)
             self.publish_download(candidate, artifact, file)
             downloads.append({**artifact, 'file': str(file)})
         with self.lock:

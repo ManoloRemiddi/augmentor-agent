@@ -77,6 +77,22 @@ async function privateFile(file,{missing=false,maximum=MAX_METADATA}={}){
     (process.platform!=='win32'&&(stat.uid!==process.getuid()||(stat.mode&0o077))))throw Error('The update cache contains an unsafe file.')
 }
 
+async function copyBytes(source,target,maximum){
+  // CopyFile on Windows can preserve a public temporary file's security
+  // descriptor. Create a new file under the verified private cache instead.
+  const output=await fs.open(target,'wx',0o600)
+  let count=0
+  try{
+    for await(const chunk of syncFS.createReadStream(source)){
+      count+=chunk.length;if(count>maximum)throw Error('The verified transfer size changed during staging.')
+      await output.writeFile(chunk)
+    }
+    if(count!==maximum)throw Error('The verified transfer size changed during staging.')
+    await output.sync()
+  }
+  finally{await output.close()}
+}
+
 class DurableUpdater extends Updater {
   persistMetadata(name,bytes){
     // TUF performs trust checks. This override only makes its accepted local
@@ -143,7 +159,7 @@ export class UpdateRepository {
       targetBaseUrl: this.config.catalogBaseUrl, fetcher: this.fetcher,
       config: {fetchRetries: 0, fetchTimeout: 30000, rootMaxLength: MAX_METADATA,
         targetsMaxLength: MAX_METADATA, snapshotMaxLength: MAX_METADATA,
-        timestampMaxLength: 65536, maxRootRotations: 32, maxDelegations: 8, prefixTargetsWithHash: false}})
+        timestampMaxLength: 65536, maxRootRotations: 32, maxDelegations: 8, prefixTargetsWithHash: true}})
     await updater.refresh()
     this.updater=updater // A failed refresh never leaves a usable client behind.
   }
@@ -151,7 +167,14 @@ export class UpdateRepository {
     await privateFile(output,{missing:true,maximum:MAX_ARTIFACT})
     const stage=output+'.'+randomUUID()+'.tmp'
     try{
-      await this.updater.downloadTarget(target,stage,base)
+      if(base){
+        // GitHub assets retain their reviewed public names. Their exact signed
+        // target identity is verified by the maintained TUF model before copy.
+        await this.fetcher.downloadFile(base+target.path,target.length,async temporary=>{
+          await target.verify(syncFS.createReadStream(temporary))
+          await copyBytes(temporary,stage,target.length)
+        })
+      }else await this.updater.downloadTarget(target,stage)
       const handle=await fs.open(stage,syncFS.constants.O_RDWR|(syncFS.constants.O_NOFOLLOW||0))
       try{await handle.chmod(0o600);await handle.sync()}finally{await handle.close()}
       await fs.rename(stage,output)
@@ -233,7 +256,7 @@ export async function downloadPublicArtifact(item, cache, fetcher = new BoundedF
     finally {await handle.close()}
     if (count !== item.bytes || hash.digest('hex') !== item.sha256) throw Error('The download does not match the published digest.')
     const stage = output + '.' + randomUUID() + '.tmp'
-    await fs.copyFile(temporary, stage, 1)
+    await copyBytes(temporary, stage, item.bytes)
     try {
       await fs.chmod(stage, 0o600)
       const fd = await fs.open(stage, 'r+'); try {await fd.sync()} finally {await fd.close()}
