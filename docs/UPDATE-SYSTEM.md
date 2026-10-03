@@ -1388,3 +1388,12 @@ proofs. Bundle jobs 111319334939/111319334927 fail before assembly on an invalid
 `dist/index.js` is tracked, as in the established packagers. The invalid step is
 removed. Complete native bundle qualification remains pending a corrected run;
 the successful component results do not establish bundle/update qualification.
+
+Managed run [37163111736](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37163111736)
+at `2799ef3` passes both Handy lifecycle jobs. Complete bundle jobs on ARM64
+(111320650528) and x64 (111320650556) assemble the locked runtimes, application,
+Handy and DSH/speech, then pass immutable offline Qt health. Both fail at the
+final ZIP path expression before export; local x64 reproduces the same failure.
+The path construction is corrected. Archive staging/relocation remains pending;
+these assembly results do not qualify installation, signed updates or a public
+release. All automatic/public/distribution flags remain false.

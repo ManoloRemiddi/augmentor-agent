@@ -193,7 +193,7 @@ def build(out,*,channel='development',build=0,declared=None):
             or snapshot(project)!=before):raise ValueError('The exact bundled target failed immutable offline UI health.')
     if source_revision(ROOT,build=build,declared=source['commit'])!=source:
         raise ValueError('The reviewed checkout changed during candidate assembly.')
-    result=export(project,out/'augmentor-desktop-'+pins['target']+'.zip')
+    result=export(project,out/('augmentor-desktop-'+pins['target']+'.zip'))
     manifest={'schema':'augmentor-linux-managed-artifact/1','source':source,'target':pins['target'],
         'version':product['version'],'build':build,'channel':channel,'artifact':result,'offlineHealth':report,
         'publicReleaseReady':False,'openGates':['normal desktop acceptance','real DSH integration','signed forward update',
