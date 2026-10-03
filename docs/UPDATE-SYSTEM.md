@@ -748,6 +748,8 @@ package/managed-deployment controller remain qualification requirements.
 
 `MacInstallerBackend` requires its original live journal at this persistent
 location before applying, and runs from code outside both replaceable bundles.
+Public apply requires the exact transaction directory ordinary startup checks;
+custom fixture directories are accepted only for explicit development inspection.
 Only a successful native replacement return can establish its live `applied`
 observation. The original caller seals the exact apply-acknowledged record before
 closing its journal. `updates.macos_completion.complete_observed` reacquires
@@ -789,3 +791,11 @@ This is part of the authorized complete Linux adapter work, not its completion.
 Independent signed-bundle staging/controller, complete runtime/voice ownership,
 target health and reopening still require implementation/qualification. Legacy
 overlays and unqualified source receipts cannot opt into automatic installation.
+
+
+Native health checkpoint: `faca8b5` passes the complete package/whole-bundle
+retention/same-build apply/offline target-health step on Mac 14 and Mac 26 in
+[37141250126](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37141250126).
+Mac 14's complete workflow job passes; remaining Mac 26 distribution checks are
+running. This precedes the persistent startup barrier/completion and managed
+Linux additions, which require their own newer native qualification.

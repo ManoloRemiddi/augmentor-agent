@@ -4,6 +4,15 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+Packaged offline target health at `faca8b5` now passes on both Mac 14/26 in
+37141250126: the package/retention/apply/health step succeeds on both, Mac 14's
+complete job succeeds, and Mac 26's remaining distribution checks are running.
+The newer persistent barrier/completion and managed Linux changes require their
+own native checks. Public Mac apply additionally requires the exact persistent
+transaction directory used by ordinary startup; fixture/custom directories cannot
+bypass that barrier. Focused updater qualification still passes 155 cases.
+
+
 Managed Linux staging now copies an included Python runtime and retains its
 immutable path/inventory. Installed managed receipts use private lifetime locks
 and the persistent pending barrier, with moved-root refusal, instead of OS package

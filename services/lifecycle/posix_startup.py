@@ -21,6 +21,7 @@ class Startup:
         if type(maintenance) is not bool:raise ValueError('Choose startup or maintenance exclusion.')
         self.fd=None;self.maintenance=maintenance
         self.transactions=Path(transactions) if transactions is not None else transaction_directory()
+        if not self.transactions.is_absolute():raise ValueError('Use an absolute persistent transaction directory.')
         directory=require_directory(private_directory(runtime if runtime is not None else runtime_directory()))
         self.path=Path(directory)/'startup.lock'
         fd=descriptor(self.path,writable=True,create=True)

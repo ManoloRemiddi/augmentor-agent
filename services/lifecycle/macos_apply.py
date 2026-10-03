@@ -29,6 +29,10 @@ class MacInstallerBackend:
         if self.destination==self.staged or self.staged.is_relative_to(self.destination):raise ValueError('Stage outside the source bundle.')
         if not development and self.destination.parent not in (Path('/Applications'),Path.home()/'Applications'):
             raise ValueError('Use the existing canonical Applications installation.')
+        if not development:
+            from .posix_pending import transaction_directory
+            if gate.transactions!=transaction_directory():
+                raise ValueError('Public apply must use the same persistent barrier as ordinary application startup.')
 
     def validate(self):
         if self.closed or self.gate.fd is None:raise ValueError('Mac installation admission is closed.')
