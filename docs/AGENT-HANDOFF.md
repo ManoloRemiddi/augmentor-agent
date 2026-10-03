@@ -1759,3 +1759,11 @@ now waits for the durable completion receipt after PCM before closing its privat
 browser fixture. This fixes the ordering failure in run 37119919501 without
 changing product behavior or weakening identity/playback/completion assertions.
 Matched Handy candidates are rerun from the resulting source; publication is pending.
+
+## October 3 Windows broker fixture intake
+
+The [Handy qualification record](HANDY-INTEGRATION.md#october-3-alignment-and-matched-downloads)
+records passed x64 full install/repair/removal and a separate missing test import
+path at `da70616`. Broker tests now retain actual Windows identity adapters in
+their incomplete checkout and include the services path, preserving authentication
+and missing-component assertions. Product code is unchanged; native gates rerun.

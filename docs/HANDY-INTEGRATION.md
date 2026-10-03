@@ -155,6 +155,14 @@ down. Provider count, request identity, PCM and terminal assertions are preserve
 installed dictation/runtime behavior is unchanged. Matching candidates and source
 gates are rerun after this test-only synchronization correction.
 
+Native x64's full installation/repair/removal proof passed at `da70616`, but its
+separate broker regression runner lacked the services import path for Windows
+identity adapters. That test now includes the path. Its deliberately incomplete
+checkout also retains those adapters, so enabled-session refusal reaches the
+missing compiled binary rather than failing earlier on a missing Python module.
+Authentication/ACL assertions remain enabled; product code and payload are unchanged.
+Both native lanes and matching packages are rerun from the corrected test source.
+
 Implementation branch: `feat/handy-integration`, based on public main
 `d91c52037d7bc26c82c702c25e1a779b0fca1f39`. This guide owns the implemented
 contract; [the approved plan](HANDY-INTEGRATION-PLAN.md) retains its rationale.

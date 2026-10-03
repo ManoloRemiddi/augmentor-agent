@@ -12,6 +12,7 @@ from unittest.mock import patch
 from augmentor_linux import dictation
 
 ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT/'services'))
 spec=importlib.util.spec_from_file_location('dictation_broker',ROOT/'services/dictation/server.py')
 broker=importlib.util.module_from_spec(spec);spec.loader.exec_module(broker)
 
@@ -132,6 +133,11 @@ class DictationTests(unittest.TestCase):
         for relative in ('services/dictation/server.py','services/dictation/portal.py','apps/native/augmentor_linux/dictation.py'):
             target=checkout/relative;target.parent.mkdir(parents=True,exist_ok=True)
             shutil.copy2(ROOT/relative,target)
+        if os.name=='nt':
+            # Preserve native private-path/authentication adapters while leaving
+            # the compiled component absent. Refusal must reach binary intake.
+            shutil.copytree(ROOT/'services/platform_adapters',checkout/'services/platform_adapters',
+                            ignore=shutil.ignore_patterns('__pycache__','*.pyc'))
         state=self.base/'state'
         if os.name=='nt':
             from platform_adapters.windows_identity import private_directory
