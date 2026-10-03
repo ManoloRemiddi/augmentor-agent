@@ -20,6 +20,14 @@ component or merging a source PR does not replace those assets. Native Windows
 ARM64, complete per-user payload/prerequisites and matched customer installer
 qualification remain part of that preparation.
 
+PR #35 prepares complete Windows x64/ARM64 Handy payloads and a matched Linux/
+Mac build workflow. App-local Microsoft browser/CRT, exact supplier notices and
+fresh-user/component proofs are required. Initial Windows CI caught native ARM
+compiler selection and inherited PowerShell module-path issues; follow-up
+source corrects both without relaxing supplier checks. These new packages are
+not yet public. [The Handy guide](HANDY-INTEGRATION.md) owns exact evidence and
+remaining physical microphone/permission acceptance limits.
+
 
 
 ## Windows 0.2.13 public preview — release record, October 2

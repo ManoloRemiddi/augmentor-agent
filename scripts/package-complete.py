@@ -35,7 +35,9 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     for name in ('debian','browser','voice','adaptive','model-picker','voice-source','adaptive-source','out'):
         p.add_argument('--'+name,type=Path,required=True)
+    p.add_argument('--preview-number',type=int,default=1)
     a=p.parse_args();out=a.out.resolve()
+    if a.preview_number<1:p.error('The preview number must be positive.')
     if out.exists() and any(out.iterdir()):raise ValueError('Use an empty output directory.')
     out.mkdir(parents=True)
     product=json.loads((ROOT/'release/product.json').read_text());version=product['version']
@@ -71,7 +73,7 @@ def main():
     script='#!/bin/sh\n# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0\nset -eu\ncd -- "$(dirname -- "$0")"\nsha256sum -c SHA256SUMS\nexec /usr/bin/python3 ./setup.py --bundle "$PWD" "$@"\n'
     (out/'install.sh').write_text(script);(out/'install.sh').chmod(0o755)
     hashes={str(f.relative_to(out)):sha(f) for f in sorted(out.rglob('*')) if f.is_file()}
-    manifest={'format':'augmentor-complete/1','artifactId':version+'-complete-preview.1-'+ref[:12],
+    manifest={'format':'augmentor-complete/1','artifactId':version+'-complete-preview.'+str(a.preview_number)+'-'+ref[:12],
               'version':version,'sourceCommit':ref,'sourceRefs':refs,'target':'debian13-amd64','components':components,
               'plugins':plugins,'browser':browser['artifact'],'extensionId':browser['extensionId'],'sha256':hashes}
     (out/'bundle.json').write_text(json.dumps(manifest,indent=2)+'\n');hashes['bundle.json']=sha(out/'bundle.json')

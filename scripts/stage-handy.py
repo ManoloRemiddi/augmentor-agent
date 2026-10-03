@@ -34,6 +34,9 @@ def validate():
         arch={'AMD64':'x64','ARM64':'arm64'}[platform.machine()]
         expected={'version':supplier['version'],'arch':arch,**supplier['targets'][arch],
                   'licenseUrl':supplier['licenseUrl'],'licenseSha256':supplier['licenseSha256'],'publisherVerified':True}
+        vc=json.loads((ROOT/'components/handy/visual-c-runtime.json').read_text(encoding='utf-8'))
+        expected['visualC']={'version':vc['version'],'arch':arch,**vc['targets'][arch],
+                            'licenseUrl':vc['licenseUrl'],'licenseSha256':vc['licenseSha256']}
         if record.get('windowsRuntime')!=expected:raise ValueError('Rebuild the complete Windows browser and CRT prerequisite.')
     return source,record
 

@@ -56,6 +56,7 @@ def main():
     terms=(ROOT/'LICENSE').read_text(encoding='utf-8')
     terms+='\n\nHandy dictation code\n\n'+(ROOT/'components/handy/LICENSE.upstream').read_text(encoding='utf-8')
     terms+='\n\nBundled Microsoft browser runtime\n\n'+(ROOT/'components/handy/licenses/WebView2-fixed.txt').read_text(encoding='utf-8')
+    terms+='\n\nBundled Microsoft Visual C++ runtime\n\n'+(ROOT/'components/handy/licenses/Visual-C-runtime.txt').read_text(encoding='utf-8')
     (target/'licenses/Windows-installation-terms.txt').write_text(terms,encoding='utf-8-sig')
     product = json.loads((ROOT/'release/product.json').read_text(encoding='utf-8'))
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()

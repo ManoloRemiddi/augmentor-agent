@@ -1,0 +1,76 @@
+{
+  "version": "14.51.36247.0",
+  "source": "https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist",
+  "licenseUrl": "https://visualstudio.microsoft.com/wp-content/uploads/2025/10/Visual-C-V14-License-Redistributable_and_Runtime_ENU.docx",
+  "licenseSha256": "441867162c8327509a08a9c626a5d1c2df2544a7859df0aeb94cd22229208869",
+  "targets": {
+    "x64": {
+      "url": "https://download.visualstudio.microsoft.com/download/pr/ebdab8e5-1d7b-4d9f-a11b-cbb1720c3b12/843068991DAAA1F73AD9F6239BCE4D0F6A07A51F18C37EA2A867E9BECA71295C/VC_redist.x64.exe",
+      "sha256": "843068991daaa1f73ad9f6239bce4d0f6a07a51f18c37ea2a867e9beca71295c",
+      "bytes": 18731856,
+      "cabinetOffset": 630000,
+      "cabinetBytes": 18091661,
+      "payloadCab": "a4",
+      "libraries": {
+        "concrt140.dll": {
+          "member": "concrt140.dll_amd64",
+          "sha256": "54716f0738af891f283d213b5c8d11b25896bb8ee3097d301eae718560cf974e"
+        },
+        "msvcp140.dll": {
+          "member": "msvcp140.dll_amd64",
+          "sha256": "7c26614e1d733892c2deac7e245ce115504b1d80592dd0a01b08e3e5a55f89ca"
+        },
+        "msvcp140_1.dll": {
+          "member": "msvcp140_1.dll_amd64",
+          "sha256": "206c931bf90fdad8816de3b5e2ef80b2bcaa9406c89ecc05fe6fddffe251e982"
+        },
+        "msvcp140_codecvt_ids.dll": {
+          "member": "msvcp140_codecvt_ids.dll_amd64",
+          "sha256": "8a65c7596ef2e6938731f5a1058e7e40145b6d97967cc649231a076b9a608d78"
+        },
+        "vcruntime140.dll": {
+          "member": "vcruntime140.dll_amd64",
+          "sha256": "d1f4225df2cd877dbf130d5668a021dce3f94118455ff5ec952061c30afc9ce7"
+        },
+        "vcruntime140_1.dll": {
+          "member": "vcruntime140_1.dll_amd64",
+          "sha256": "a7146c08f89fe5b04541ab507cdb59ff7b44534d4ba3c668a426c6450a03434e"
+        }
+      }
+    },
+    "arm64": {
+      "url": "https://download.visualstudio.microsoft.com/download/pr/ece44298-3977-4f73-ab91-c13fe79cfea8/B70EF586669A620A0A30A1156969C05C6A3831DC8F8BC992DA75779D2A92F944/VC_redist.arm64.exe",
+      "sha256": "b70ef586669a620a0a30a1156969c05c6a3831dc8f8bc992da75779d2a92f944",
+      "bytes": 11870816,
+      "cabinetOffset": 684112,
+      "cabinetBytes": 11176508,
+      "payloadCab": "a1",
+      "libraries": {
+        "concrt140.dll": {
+          "member": "concrt140.dll_arm64",
+          "sha256": "f5b1c14533bcf14b944a9921602328cee1696c0b2c27487ad2769942c82b8986"
+        },
+        "msvcp140.dll": {
+          "member": "msvcp140.dll_arm64",
+          "sha256": "167ceac85c2d726c4cd9e39b8881fafdc6de1520c0e67c4f6b271235f9d2a6c5"
+        },
+        "msvcp140_1.dll": {
+          "member": "msvcp140_1.dll_arm64",
+          "sha256": "c7713c2061b29d24de4874923522ada0815cfca80d09265c181e81d16c7c42d6"
+        },
+        "msvcp140_codecvt_ids.dll": {
+          "member": "msvcp140_codecvt_ids.dll_arm64",
+          "sha256": "8f22df17f40742b41caf2288a7b32f86623e840772e8c4ff60019045b89659e2"
+        },
+        "vcruntime140.dll": {
+          "member": "vcruntime140.dll_arm64",
+          "sha256": "3c56f4167e2b3d8e6338497731e6aae8cd7ec46bd6789f9423a8d9cf9a630310"
+        },
+        "vcruntime140_1.dll": {
+          "member": "vcruntime140_1.dll_arm64",
+          "sha256": "60c70e34e2e156f8bd214b92c2125c252e17d86ac8a25799ea1a4ecabde1d97c"
+        }
+      }
+    }
+  }
+}

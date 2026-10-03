@@ -67,6 +67,12 @@ and the reviewed supplier record in `components/handy/webview2.json`.
 The component selects that exact browser even when the parent inherits a stale
 global WebView2 path. Windows broker authentication state uses protected private
 user paths and files; enabled components hold the installation lifecycle lease.
+The native PE import audit found ONNX Runtime's additional `msvcp140_1.dll`
+dependency. The reviewed Microsoft VC supplier provides that exact library for
+each CPU; its installer is read/extracted without execution. Original consumer
+terms and supplier hashes are retained. Redistribution follows the separately
+licensed compiler's [Microsoft distributable-code requirements](https://learn.microsoft.com/en-us/cpp/windows/redistributing-visual-cpp-files),
+not the application's MIT-style code license or the runtime consumer-use terms.
 
 The Windows preview workflow builds both native components and creates complete
 customer installers from one source revision. Its copied-payload broker proof
@@ -76,6 +82,27 @@ The full Windows qualification continues to check actual Setup/repair/removal.
 These new Windows gates are pending native CI; they are not evidence that the
 existing public Windows preview has dictation or that physical transcription has
 been tested on either Windows CPU. No download has been published by this work.
+
+The matched Linux/Mac workflow now prepares a Debian complete preview and a Mac
+ad-hoc app/DMG from the same revision as Windows. Linux qualification installs
+the exact complete archive as a fresh ordinary user and exercises the installed
+Handy component on a virtual display without a microphone/model download.
+Mac qualification preserves all existing hash-locked corresponding sources and
+notices, verifies the sealed archive and signature, and exercises its packaged
+component and managed first-run service. Preparation gates remain pending;
+physical microphone/OS-permission acceptance is separate from these proofs.
+
+The first native ARM64 build exposed ggml's requirement for Clang. The Windows
+ARM lane now uses Visual Studio's ARM SDK with Clang/Ninja and the native Rust
+MSVC target. The publisher check clears inherited PowerShell 7 module paths
+before loading Windows PowerShell's own security module. Neither fix weakens
+supplier signature/checksum checks. Exact current-source caches are validated.
+
+The older local development clients also received the narrow offscreen-state
+guard, preserving their unrelated changes. After another observed stopped
+broker, the selected installed broker was restarted with a private startup log
+and again reported ready/unchanged Ctrl+Space. The precise cause of that latest
+exit was not captured; the earlier incomplete/offscreen takeover was confirmed.
 
 Implementation branch: `feat/handy-integration`, based on public main
 `d91c52037d7bc26c82c702c25e1a779b0fca1f39`. This guide owns the implemented

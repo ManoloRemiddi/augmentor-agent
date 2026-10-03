@@ -5,6 +5,7 @@ on:
   pull_request:
     paths:
       - '.github/workflows/windows-preview.yml'
+      - '.github/workflows/handy-matched-preview.yml'
       - 'components/handy/**'
       - 'services/dictation/**'
       - 'scripts/stage-handy*'
