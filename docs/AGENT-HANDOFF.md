@@ -4,6 +4,14 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+Mac shortcut admission and kernel-bound Unix peer observation are now added;
+Linux real-peer checks pass three cases and focused Mac shortcut checks pass eleven.
+Native Mac qualification and the complete Unix installation adapter remain open.
+At `d34b60d`, Windows Desktop native ACL checks pass both CPUs. Full x64 reaches
+target reopening but fails its later fixture checkpoint in a nonprivate evidence
+folder; the source corrects the checkpoint to the private runtime. Fresh full
+qualification is required. See [Unix checkpoint](UPDATE-SYSTEM.md#unix-coordination-checkpoint).
+
 The signing tool now prepares offline root replacement with both old/new
 two-of-three signatures, then activates an exact pinned next root through one
 atomic publisher-state selection. It retains immutable root history and burned

@@ -140,6 +140,39 @@ class MacShortcutServiceTests(unittest.TestCase):
         self.assertIs(self.service.manager.process, child)
         self.assertTrue(request({'operation':'status'})['active'])
 
+    def test_live_update_reservation_defers_busy_work_and_fences_saves_and_activation(self):
+        self.service.start()
+        token='a'*32
+        def control(action):
+            return request({'operation':'maintenance','method':'host.maintenance.'+action,
+                            'params':{} if action=='status' else {'token':token}})['maintenance']
+        original=(self.root/'config/augmentor/shortcut.json').read_bytes()
+        child=self.service.manager.process
+        with self.service.admission.work():
+            with self.assertRaises(RuntimeError):control('prepare')
+            self.assertEqual(control('status')['active'],1)
+        self.assertEqual(control('prepare')['phase'],'prepared')
+        with self.assertRaises(RuntimeError):request({'operation':'save','sequence':'Ctrl+Alt+J'})
+        with patch.object(self.service.activations['main'],'activate') as launch:
+            self.service.activate('main');launch.assert_not_called()
+            self.assertEqual(control('cancel')['phase'],'ready')
+            self.service.activate('main');launch.assert_called_once()
+        self.assertEqual((self.root/'config/augmentor/shortcut.json').read_bytes(),original)
+        self.assertIs(self.service.manager.process,child);self.assertIsNone(child.poll())
+
+    def test_observed_commit_acknowledges_before_normal_shortcut_service_cleanup(self):
+        self.service.start()
+        token='b'*32
+        def control(action):
+            return request({'operation':'maintenance','method':'host.maintenance.'+action,'params':{'token':token}})
+        prepared=control('prepare');self.assertEqual(prepared['maintenance']['phase'],'prepared')
+        self.assertEqual(prepared['pid'],os.getpid());self.assertEqual(prepared['maintenanceAdmission'],1)
+        child=self.service.manager.process
+        self.assertEqual(control('commit')['maintenance']['phase'],'closing')
+        self.assertTrue(self.service.stopping.wait(2))
+        self.assertIsNone(child.poll())
+        self.service.close();self.assertIsNotNone(child.poll())
+
     def test_uncertain_service_probe_does_not_take_local_ownership(self):
         for error in (TimeoutError('uncertain'), PermissionError(errno.EACCES, 'denied')):
             with patch('augmentor_linux.macos_shortcut_service.request', side_effect=error):

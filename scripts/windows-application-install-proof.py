@@ -360,7 +360,7 @@ def main():
                 time.sleep(.1)
             else:break
         try:
-            reopened_graph.drain(checkpoint=lambda phase,participant:atomic_json(out/'reopened-drain.json',
+            reopened_graph.drain(checkpoint=lambda phase,participant:atomic_json(data/'run/reopened-drain.json',
                 {'phase':phase,'kind':type(participant).__name__}))
         finally:reopened_graph.close()
         live_observer.close();coordinator.close()

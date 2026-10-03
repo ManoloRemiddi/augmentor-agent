@@ -36,6 +36,33 @@ Failure retains the previous successful-check time and candidate instead of
 claiming the application is current. An unknown legacy build cannot be declared
 older than another build of the same product version without a bridge receipt.
 
+## Unix coordination checkpoint
+
+The Mac login shortcut service participates in the shared reversible reservation
+protocol. Accepted activation/save work refuses preparation. A prepared service
+rejects new activations/saves without changing saved bindings, cancellation
+restores admission, and committed shutdown replies before normal helper cleanup.
+Authenticated local sockets, actual build root and kernel peer observation keep
+maintenance separate from ordinary shortcut status. Eleven focused shortcut
+cases pass locally; combined shortcut discovery passes 41 with one OS skip.
+
+`platform_adapters.peer_process.PeerProcess` retains a Linux socket-supplied
+pidfd or Mac process event tied to the peer's kernel audit token. Every subsequent
+connection must belong to that original live process. It validates the independently
+selected executable, grants observation only, and never signals an application.
+Three tests observe real inert Unix peers, exit and wrong-executable refusal on
+Linux. Mac 14/26 native qualification remains required. Linux kernels lacking
+SO_PEERPIDFD cannot use this adapter and must retain manual installation.
+This observation primitive and shortcut admission are not a complete Unix installer;
+startup exclusion, launchd ownership, graph drain, independent apply/health and
+reopening remain required before automatic platform flags can be enabled.
+
+At `d34b60d`, Windows Desktop passes native x64/ARM64 ACL checks. Full x64 reaches
+actual completed-target reopening, then fails the fixture's subsequent drain
+checkpoint because its public evidence folder is not private. The fixture now
+writes that checkpoint in its existing private runtime folder. A fresh full run
+must qualify all later stages; the failed run is not an overall passing proof.
+
 ## Ownership and data
 
 `services/updates/manager.py` belongs to the per-user shared prompt service, rather

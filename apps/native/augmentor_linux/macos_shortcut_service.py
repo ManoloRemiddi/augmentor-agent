@@ -15,9 +15,12 @@ from PySide6.QtGui import QKeySequence
 from .macos_shortcuts import ShortcutManager,FN_SPACE
 from .shortcut_activation import DesktopActivation
 from .instances import SHORTCUT_INSTANCES
+from .platform_runtime import LocalSocket
+from .maintenance import Admission
 
 
 LIMIT = 4096
+ROOT=Path(__file__).resolve().parents[3]
 
 
 def runtime_directory():
@@ -49,7 +52,7 @@ def receive(connection):
 
 def request(message):
     """One attempt only: a lost save response must not trigger another owner."""
-    with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as connection:
+    with LocalSocket() as connection:
         connection.settimeout(15)
         connection.connect(str(runtime_directory()/'shortcut-control.sock'))
         connection.sendall(json.dumps(message).encode() + b'\n')
@@ -67,6 +70,7 @@ class ShortcutService:
         self.manager = self.managers['main']  # Compatibility for main-only clients.
         self.activation = self.activations['main']
         self.stopping = threading.Event()
+        self.admission = Admission()
         for name, manager in self.managers.items():
             manager.problem.connect(lambda message, n=name: self.report_problem(message, n))
             manager.pressed.connect(lambda n=name: self.activate(n))
@@ -79,7 +83,7 @@ class ShortcutService:
 
     def activate(self, instance='main'):
         try:
-            self.activations[instance].activate()
+            with self.admission.work():self.activations[instance].activate()
         except Exception as error:
             self.report_problem(error, instance)
 
@@ -122,6 +126,11 @@ class ShortcutService:
 
     def dispatch(self, message):
         operation = message.get('operation')
+        if operation=='maintenance':
+            if set(message)!={'operation','method','params'}:raise ValueError('Unsupported shortcut maintenance fields.')
+            result=self.admission.control(message['method'],message['params'])
+            return {'ok':True,'protocol':2,'pid':os.getpid(),'buildRoot':str(ROOT),
+                    'maintenanceAdmission':1,'maintenance':result}
         instance = message.get('instance', 'main')
         if not isinstance(instance, str) or instance not in self.managers:
             raise ValueError('Unknown shortcut window.')
@@ -131,22 +140,27 @@ class ShortcutService:
             with manager.lock:
                 active = manager.process is not None and manager.process.poll() is None
                 return {'ok': True, 'protocol': 2, 'pid': os.getpid(), 'instance': instance,
-                        'active': active, 'key': manager.key, 'error': self.errors[instance]}
+                        'active': active, 'key': manager.key, 'error': self.errors[instance],
+                        'buildRoot':str(ROOT),'maintenanceAdmission':1,
+                        'maintenance':self.admission.control('host.maintenance.status',{})}
         if operation == 'save' and fields == {'operation', 'sequence'}:
-            sequence = message['sequence']
-            if not isinstance(sequence, str) or len(sequence) > 256:
-                raise ValueError('Invalid shortcut sequence.')
-            parsed = FN_SPACE if sequence == FN_SPACE else QKeySequence(sequence, QKeySequence.SequenceFormat.PortableText)
-            binding = manager.command(parsed)
-            # Refuse a collision even if a test or unusual backend permits duplicate
-            # registration. Keep both existing bindings and saved files intact.
-            for name, other in self.managers.items():
-                if name != instance and other.binding == binding:
-                    raise ValueError('That shortcut is already assigned to the other agent.')
-            key = manager.save(parsed)
-            self.errors[instance] = None
-            return {'ok': True, 'key': key, 'instance': instance}
+            with self.admission.work():return self.save(instance,message['sequence'])
         raise ValueError('Unsupported shortcut request.')
+
+    def save(self, instance, sequence):
+        manager=self.managers[instance]
+        if not isinstance(sequence, str) or len(sequence) > 256:
+            raise ValueError('Invalid shortcut sequence.')
+        parsed = FN_SPACE if sequence == FN_SPACE else QKeySequence(sequence, QKeySequence.SequenceFormat.PortableText)
+        binding = manager.command(parsed)
+        # Refuse a collision even if a test or unusual backend permits duplicate
+        # registration. Keep both existing bindings and saved files intact.
+        for name, other in self.managers.items():
+            if name != instance and other.binding == binding:
+                raise ValueError('That shortcut is already assigned to the other agent.')
+        key = manager.save(parsed)
+        self.errors[instance] = None
+        return {'ok': True, 'key': key, 'instance': instance}
 
     def serve(self):
         while not self.stopping.is_set():
@@ -159,6 +173,8 @@ class ShortcutService:
             with connection:
                 connection.settimeout(2)
                 try:
+                    from platform_support import require_same_user
+                    require_same_user(connection)
                     response = self.dispatch(receive(connection))
                 except Exception as error:
                     response = {'ok': False, 'error': str(error)}
@@ -166,6 +182,7 @@ class ShortcutService:
                     connection.sendall(json.dumps(response).encode() + b'\n')
                 except OSError:
                     pass  # Never replay a save after an acknowledgement is lost.
+                if self.admission.closing:self.stopping.set()
 
     def close(self):
         self.stopping.set()
@@ -194,7 +211,7 @@ def main():
     for number in (signal.SIGINT, signal.SIGTERM):
         signal.signal(number, lambda *_: stopping.set())
     timer = QTimer()
-    timer.timeout.connect(lambda: app.quit() if stopping.is_set() else None)
+    timer.timeout.connect(lambda: app.quit() if stopping.is_set() or service.stopping.is_set() else None)
     timer.start(200)
     try:
         return app.exec()
