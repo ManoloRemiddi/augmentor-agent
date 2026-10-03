@@ -87,7 +87,7 @@ def copy(source,target):
     target.parent.mkdir(parents=True,exist_ok=True)
     if source.is_dir():
         shutil.copytree(source,target,dirs_exist_ok=True,symlinks=True,
-            ignore=shutil.ignore_patterns('__pycache__','*.pyc','.git','node_modules','test','tests'))
+            ignore=shutil.ignore_patterns('__pycache__','*.pyc','.git','.env','.env.*','outputs','trace','node_modules','test','tests'))
     else:shutil.copy2(source,target)
 
 

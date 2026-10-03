@@ -6,6 +6,19 @@
 
 
 
+
+At `10fdece`, both complete Mac 14/26 jobs pass in 37160188044. All broad jobs
+(Debian source/build/tests, installed packages, Browser package, Home, Handy
+Linux/Mac/Windows and privacy) pass in 37160189535; its overall failure is only
+the earlier missing-directory native fixture, corrected/passed at `d1ec492`.
+At `2bd7759`, the actual pinned Linux x64 interpreter and all 22 locked packages
+install in an isolated directory, pass dependency checks and imports, and render
+the fixed offline Qt health action with unchanged bytes (424 × 484, fonts pass).
+This is runtime/UI input evidence, not a complete bundle/installation/provider
+qualification. Managed-bundle run 37161745635 is live: x64 Handy passes; first
+ARM64 Handy build is running. Full native bundles wait for that workflow dependency.
+Source copying additionally excludes local dotenv/output/trace material.
+
 October 4 producer checkpoint adds complete native Linux x64/ARM64 candidate
 assembly with hash-pinned standalone Python/Node, locked Linux wheels, production
 JS, matching Handy and prepared DSH/speech. It runs actual offline Qt health and

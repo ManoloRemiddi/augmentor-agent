@@ -1347,3 +1347,25 @@ Only scoped JSON reports are uploaded; no bundle is publicly released.
 `managed_linux_only` dispatches this scope through `validate.yml`; native-service,
 managed-bundle and full scopes have separate parent concurrency groups. Full
 validation includes both native bundles. Native producer execution is pending.
+
+
+At `10fdece`, both full Mac 14/26 jobs pass in
+[37160188044](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37160188044).
+All non-native broad jobs pass in
+[37160189535](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37160189535):
+Debian source/build/tests, installed packages, Browser package, Home, Handy all
+three existing platforms and privacy. Overall failure is only the older native
+fixture's missing persistent directory; corrected native source `d1ec492` passes
+separately. This establishes the shared captured-name validator on both Macs,
+with the existing signed-forward/normal-GUI limitations unchanged.
+
+At `2bd7759`, actual Linux x64 runtime input preparation downloads/verifies the
+pinned Python archive and installs exactly 22 locked packages in an isolated
+staging directory. Dependency checks, required imports and notice inventory pass.
+The actual fixed offline Qt health action renders the shared preview at 424 × 484
+with fonts and immutable files verified. No model/provider or normal desktop
+controller runs; DSH/Node/Handy are absent from this input-only fixture. This does
+not qualify the full bundle. Native managed run 37161745635 remains live: x64
+Handy passes, while ARM64 Handy is building before the full bundle jobs can start.
+The source copier excludes local dotenv files, outputs and traces as well as
+bytecode and dependency/test trees; these are never candidate inputs.
