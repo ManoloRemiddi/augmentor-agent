@@ -14,6 +14,10 @@ completion additions still need their own native qualification.
 
 Focused updater qualification passes 152 cases (151 passed, one OS skip) with
 isolated Qt state. Native Mac compilation/completion remains pending.
+The broad Python checkpoint passes 929 cases (889 passed, 40 explicit skips)
+using an isolated dictation state directory. Completion also validates the
+actual source/target build receipts; public qualification is read from the
+checked nested update receipt, rather than an unbound version label.
 
 Unix normal startup now refuses any persistent active transaction outside the
 socket runtime, including malformed records and after runtime recreation. The

@@ -752,8 +752,8 @@ Only a successful native replacement return can establish its live `applied`
 observation. The original caller seals the exact apply-acknowledged record before
 closing its journal. `updates.macos_completion.complete_observed` reacquires
 startup and installation writers, compares the original acknowledgement, checks
-the retained recovery bundle and executes the exact target's isolated offline
-UI health probe. It archives completion only after these checks succeed. A
+the retained recovery bundle, validates both actual build receipts and executes
+the exact target's isolated offline UI health probe. It archives completion only after these checks succeed. A
 changed target, unknown apply, missing live backend, failed health or changed
 journal stays pending; completion cannot replay replacement or infer success
 from saved PIDs. Reopening and interrupted-attempt recovery require separate

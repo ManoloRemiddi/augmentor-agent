@@ -17,6 +17,7 @@ from lifecycle.posix_startup import Startup
 from lifecycle.update_journal import UpdateJournal,artifact,validate
 from platform_adapters import locks
 from platform_adapters.private_files import descriptor,require_directory
+from .policy import installed_identity
 
 
 def complete_observed(backend,source,target):
@@ -33,8 +34,6 @@ def complete_observed(backend,source,target):
         release=_json(raw,65536)
         if any(identity[key]!=release.get(key) for key in ('version','sourceCommit','target','channel','dataSchema','readableDataSchemas')):
             raise ValueError('The retained release bytes differ from the transaction identity.')
-        if not backend.development and release.get('automaticInstallQualified') is not True:
-            raise ValueError('This public release has not qualified automatic installation.')
     transactions=require_directory(backend.journal.directory)
     with ExitStack() as held:
         gate=held.enter_context(Startup(backend.gate.path.parent,maintenance=True,transactions=transactions))
@@ -48,6 +47,13 @@ def complete_observed(backend,source,target):
                 raise ValueError('The acknowledged transaction changed before independent completion.')
             if verify_bundle(backend.backup,backend.source_release,development=backend.development)!=backend.source_payload:
                 raise ValueError('The retained source recovery differs from the original verified bundle.')
+            for identity,bundle in ((source,backend.backup),(target,backend.destination)):
+                current=installed_identity(bundle/'Contents/Resources/app',target=identity['target'])
+                if (any(current[key]!=identity[key] for key in ('version','sourceCommit','target','channel','dataSchema','readableDataSchemas'))
+                        or current['component']!=backend.target_payload['component'] or current['installType']!='macos-app'):
+                    raise ValueError('The installed release receipt differs from this exact Mac transaction.')
+                if not backend.development and (not current['automaticInstallQualified'] or not current['buildKnown']):
+                    raise ValueError('This public release has not qualified automatic installation.')
             report=verify_local_health(backend.destination,backend.target_release,backend.target_payload,
                 development=backend.development)
             if report['payloadSHA256']!=backend.target_payload['sha256']:
