@@ -71,7 +71,7 @@ This is a **locally patched release candidate**, not an unmodified official DSH
 build. [The installer](../scripts/apply-dsh-02-compat.py) refuses any other package
 version or source hash and verifies the output hash. Apply it to every resolved
 copy of dsh-session-format-v3-to-v4 after installation; retain it as a pnpm patched
- dependency when rebuilding profiles. Do not automatically apply it to future DSH.
+dependency when rebuilding profiles. Do not automatically apply it to future DSH.
 A future upstream correction must be requalified before removing this bridge.
 
 ## Evidence and scope
@@ -96,6 +96,49 @@ voice/Handy/settings changes. Existing private checkouts are untouched.
   and one browser image-input failure; those are not DSH qualification evidence.
   Real microphone/listening and macOS/Windows installed acceptance remain separate.
 
-Installed promotion and exact mixed-artifact identity are recorded below after
-live verification. npm registry publication requires owner credentials; local
-file artifacts and reviewed GitHub source do not depend on publishing credentials.
+## Installed Linux evidence — October 3
+
+Behavioral source: `41962b0`; Reasoning `490f6fc`, Voice `964d5c0`, Model Picker
+`48aad20` plus its dependency-lock follow-up. Source changes are published in
+[Augmentor PR 37](https://github.com/ManoloRemiddi/augmentor-agent/pull/37),
+[Reasoning PR 1](https://github.com/ManoloRemiddi/dsh-adaptive-reasoning/pull/1),
+[Voice PR 4](https://github.com/ManoloRemiddi/resonant-voice/pull/4) and
+[Model Picker PR 1](https://github.com/ManoloRemiddi/dsh-model-picker-augmented/pull/1).
+
+Selected/running immutable release: `20261003-144055-0fa10098`, product 0.2.11,
+artifact `ea4204f8d4f746e270df7c64b86ca486a9f814b41bd40eee22da541b2d4b330f`.
+It overlays the previous artifact
+`d611b2d48525d4405104ae426112d38362f3dae55a2d46f6c53064a488578d97`;
+existing speech-provider, Handy and settings changes are preserved. Promotion
+passed authenticated identity/model checks. All three native windows closed
+through the guarded idle/no-draft protocol and reopened through managed launchers.
+They report online, model-ready, voice available, no pending update or restoration
+error. The selected primary history is readable on the patched runtime.
+
+Global DSH is 0.2.0-rc.2 with the hash-verified history bridge. Active product and
+Browser mounts retain the installed 0.2.11 contract. Active speech retains the
+installed 0.1.17 companion with only producer/peer compatibility edits; its service
+and device/model configuration were not replaced with an older source checkout.
+The profile contains the qualified file packages; disabled legacy mount choices
+remain disabled. A separate live Qwen text chat completed without tools.
+Old-runtime final checks: 78 pass, two 0.2-specific migration cases skip.
+
+Doctor 0.3.24 is armed with the preserved fullProtection/autoRepair=false policy;
+explicit profile diagnostics return success with no findings. A Node
+`--preserve-symlinks-main` systemd override fixes Doctor's CLI main-entry check
+under pnpm symlinks. The stale shared fallback directory was retained in the
+rollback backup and regenerated; its real-directory/dangling-link anomalies are
+cleared. The original direct DSH launcher and disabled Doctor plugin are preserved:
+this does not claim automatic supervised-launch rescue coverage.
+
+Private rollback includes the old complete runtime/profile, original configuration
+and a consistent pre-upgrade session checkpoint. The local version/selection-gated
+rollback script preserves post-upgrade conversations in a separate archive before
+restoring that checkpoint; it was syntax checked, not exercised destructively on
+the live installation. Preserve both history generations for any later recovery.
+
+npm publication is blocked by absent publishing authentication; no credentials
+were requested or changed. Source PRs and local deployment are complete; package
+registry publication, review/merge and customer installer qualification remain
+separate. In particular, do not install an unrelated publisher's higher version
+of the unscoped adaptive-reasoning package as an upgrade to the owner's file build.

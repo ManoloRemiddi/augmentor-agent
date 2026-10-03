@@ -2,6 +2,17 @@
 
 # Consistent installed desktop releases
 
+## October 3: DSH 0.2 compatibility
+
+[DSH compatibility](DSH-0.2-COMPATIBILITY.md#installed-linux-evidence--october-3)
+records selected/running release `20261003-144055-0fa10098`, artifact
+`ea4204f8d4f746e270df7c64b86ca486a9f814b41bd40eee22da541b2d4b330f`,
+and the local patched 0.2.0-rc.2 runtime. All three windows adopted it through
+safe close/reopen and report online/model-ready with voice available. Provider,
+curation, history and existing speech/Handy/settings contracts are preserved.
+Private rollback retains both runtime and session generations.
+
+
 ## October 1: browser evidence recovery
 
 [Browser observation repair](BROWSER-OBSERVATION-REPAIR.md#installed-linux-evidence--1-october-2026)

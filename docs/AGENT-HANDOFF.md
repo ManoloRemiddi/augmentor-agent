@@ -4,7 +4,7 @@
 
 ## October 3 DSH 0.2 compatibility
 
-[Compatibility and migration](DSH-0.2-COMPATIBILITY.md) records the dual-version plugin contracts, local history bridge, provider/preset migration and Linux deployment scope. Customer installer locks remain separately qualified.
+[Compatibility and migration](DSH-0.2-COMPATIBILITY.md) records the dual-version plugin contracts, local history bridge, provider/preset migration and Linux deployment scope. All three installed Linux windows now run the recorded compatible artifact; Doctor diagnostics are clean. npm publication lacks authentication; customer installer locks remain separately qualified.
 
 
 ## October 3 Handy alignment, test separation and download preparation
