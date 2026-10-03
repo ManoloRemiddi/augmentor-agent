@@ -7,6 +7,8 @@ import os
 import shutil
 import subprocess
 import sys
+import threading
+from types import SimpleNamespace
 from pathlib import Path
 import tempfile
 import unittest
@@ -21,9 +23,133 @@ try:
 except (ImportError,ValueError):Gst=None
 
 
+class NativeTimeout(RuntimeError):
+    domain='g-io-error-quark';code=24
+
+
+class GnomeInputIdleWatchTraceTests(unittest.TestCase):
+    def rpc(self,proxy,method='GetNameOwner',bound=1000):
+        parameters=Mock();parameters.unpack.return_value=('org.gnome.Shell',)
+        arguments=('org.freedesktop.DBus','/org/freedesktop/DBus','org.freedesktop.DBus',method,
+            parameters,object(),object(),bound,object())
+        return arguments,proxy.call_sync(*arguments)
+
+    def test_owner_rpc_arguments_return_and_bound_forward_once_with_elapsed(self):
+        bus=Mock();trace=module.IdleWatchTrace();proxy=module.IdleWatchBus(bus,'verify',trace)
+        with patch.object(module.time,'monotonic',side_effect=(5.0,5.125)):
+            arguments,result=self.rpc(proxy)
+        self.assertIs(result,bus.call_sync.return_value);bus.call_sync.assert_called_once_with(*arguments)
+        row=trace.snapshot()['calls'][0]
+        self.assertEqual((row['stage'],row['method'],row['lookupName'],row['timeoutMs'],row['elapsedSeconds']),
+            ('verify','GetNameOwner','org.gnome.Shell',1000,.125))
+        self.assertNotIn('parameters',row);self.assertNotIn('reply',row);self.assertIsNone(trace.snapshot()['firstError'])
+
+    def test_native_timeout_object_and_original_call_survive_trace(self):
+        error=NativeTimeout('Timeout was reached');bus=Mock();bus.call_sync.side_effect=error
+        trace=module.IdleWatchTrace();proxy=module.IdleWatchBus(bus,'read',trace)
+        arguments=(':1.7','/com/augmentor/GnomeObserver','com.augmentor.GnomeObserver','Read',None,None,4,1000,None)
+        with patch.object(module.time,'monotonic',side_effect=(5.0,6.01)):
+            with self.assertRaises(NativeTimeout) as caught:proxy.call_sync(*arguments)
+        self.assertIs(caught.exception,error);bus.call_sync.assert_called_once_with(*arguments)
+        first=trace.snapshot()['firstError'];self.assertEqual(first['error']['code'],24)
+        self.assertEqual(first['error']['domain'],'g-io-error-quark');self.assertAlmostEqual(first['elapsedSeconds'],1.01)
+
+    def test_public_alias_is_read_before_native_call_consumes_parameters(self):
+        class Parameters:
+            consumed=False
+            def unpack(self):
+                if self.consumed:raise RuntimeError('Native call consumed the parameters.')
+                return ('org.gnome.Shell',)
+        parameters=Parameters();bus=Mock();reply=object()
+        def called(*args):self.assertIs(args[4],parameters);parameters.consumed=True;return reply
+        bus.call_sync.side_effect=called;trace=module.IdleWatchTrace();proxy=module.IdleWatchBus(bus,'read',trace)
+        self.assertIs(proxy.call_sync('org.freedesktop.DBus','/org/freedesktop/DBus','org.freedesktop.DBus',
+            'GetNameOwner',parameters,None,4,500,None),reply)
+        self.assertEqual(trace.snapshot()['calls'][0]['lookupName'],'org.gnome.Shell')
+        self.assertEqual(trace.snapshot()['recordingFailures'],0);bus.call_sync.assert_called_once()
+
+    def test_first_error_is_retained_after_bounded_rollover_and_snapshot_is_detached(self):
+        trace=module.IdleWatchTrace(limit=2)
+        trace.record({'outcome':'error','error':{'code':24},'method':'Read'})
+        for _ in range(3):trace.record({'outcome':'reply','method':'GetNameOwner'})
+        trace.record({'outcome':'error','error':{'code':19},'method':'GetNameOwner'})
+        snapshot=trace.snapshot();self.assertEqual(len(snapshot['calls']),2);self.assertEqual(snapshot['droppedCalls'],3)
+        self.assertEqual(snapshot['firstError']['sequence'],1);self.assertEqual(snapshot['firstError']['error']['code'],24)
+        snapshot['firstError']['error']['code']=0;self.assertEqual(trace.snapshot()['firstError']['error']['code'],24)
+
+    def test_cleanup_and_other_connection_methods_delegate_without_tracing(self):
+        bus=Mock();trace=module.IdleWatchTrace();proxy=module.IdleWatchBus(bus,'verify',trace)
+        arguments=(':1.54','/owned/session','org.freedesktop.portal.Session','Close',None,None,4,1000,None)
+        self.assertIs(proxy.call_sync(*arguments),bus.call_sync.return_value)
+        bus.call_sync.assert_called_once_with(*arguments);proxy.close_sync(None);bus.close_sync.assert_called_once_with(None)
+        self.assertEqual(trace.snapshot()['totalCalls'],0)
+
+    def test_recording_failure_never_masks_reply_or_native_error_or_retries(self):
+        for native_error in (None,NativeTimeout('Timeout was reached')):
+            bus=Mock();bus.call_sync.side_effect=native_error;trace=Mock();trace.record.side_effect=RuntimeError('diagnostic sink failed')
+            proxy=module.IdleWatchBus(bus,'verify',trace)
+            if native_error is None:self.assertIs(self.rpc(proxy)[1],bus.call_sync.return_value)
+            else:
+                with self.assertRaises(NativeTimeout) as caught:self.rpc(proxy)
+                self.assertIs(caught.exception,native_error)
+            self.assertEqual(bus.call_sync.call_count,1);trace.lost.assert_called_once()
+
+    def test_delegate_terminal_result_restores_connections_without_reattaching_disposed_objects(self):
+        consent=SimpleNamespace(bus=Mock());native=SimpleNamespace(bus=Mock());original=(consent.bus,native.bus)
+        cancelled=threading.Event();terminal=object();argument=object()
+        class Base:
+            def watch_session(self,*args):
+                self.received=args
+                if not isinstance(consent.bus,module.IdleWatchBus) or not isinstance(native.bus,module.IdleWatchBus):raise AssertionError('Trace not scoped to delegate.')
+                cancelled.set();self.consent=None;self.kwin=None;return terminal
+        value=module.traced_controller(Base,module.IdleWatchTrace())();value.consent=consent;value.kwin=SimpleNamespace(native=native)
+        self.assertIs(value.watch_session(argument),terminal);self.assertEqual(value.received,(argument,))
+        self.assertTrue(cancelled.is_set());self.assertIsNone(value.consent);self.assertIsNone(value.kwin)
+        self.assertIs(consent.bus,original[0]);self.assertIs(native.bus,original[1])
+
+
 @unittest.skipUnless(sys.platform.startswith('linux') and Gst is not None,
     'Candidate import regression requires Linux GStreamer introspection.')
 class GnomeInputCandidateImportTests(unittest.TestCase):
+    def test_real_idle_watch_keeps_verify_and_read_timeouts_terminal_at_existing_bounds(self):
+        from gi.repository import Gio,GLib
+        desktop=Path(__file__).resolve().parents[1]/'services/desktop'
+        sys.path.insert(0,str(desktop))
+        try:
+            from gnome_control import GnomeControl
+            from gnome import GnomeObserver
+            from portal_session import ConsentSession,OWNERS
+        finally:sys.path.pop(0)
+        for phase in ('verify','read'):
+            with self.subTest(phase=phase):
+                trace=module.IdleWatchTrace();Control=module.traced_controller(GnomeControl,trace);value=Control.__new__(Control)
+                session=ConsentSession.__new__(ConsentSession);session.thread=threading.get_ident()
+                session.cancel=threading.Event();session.mutex=threading.Lock();session.generation=0;session.closed=False
+                session.rpc_cancel=Gio.Cancellable();session.stop_reason=None;session.on_stopped=None
+                session.owners=dict(zip(OWNERS,(':1.54',':1.63',':1.7')));session.bus=Mock()
+                error=NativeTimeout('Timeout was reached')
+                if phase=='verify':session.bus.call_sync.side_effect=error
+                else:session.bus.call_sync.side_effect=lambda *args:GLib.Variant('(s)',(session.owners[args[4].unpack()[0]],))
+                observer=GnomeObserver.__new__(GnomeObserver);observer.bus=Mock();observer.Gio=Gio;observer.GLib=GLib
+                observer.owner=':1.7';observer.epoch='01234567-89ab-cdef-0123-456789abcdef'
+                def observed(*args):
+                    if args[3]=='Read':raise error
+                    return GLib.Variant('(s)',(':1.7',))
+                observer.bus.call_sync.side_effect=observed;original=(session.bus,observer.bus)
+                value.consent=session;value.cancel=session.cancel;value.kwin=SimpleNamespace(native=observer);value.last_failure=None
+                def stopped():session.request_stop();value.consent=None;value.kwin=None
+                value.stop=Mock(side_effect=stopped)
+                self.assertEqual(value.watch_session(),GLib.SOURCE_REMOVE);value.stop.assert_called_once()
+                self.assertTrue(session.cancel.is_set());self.assertTrue(session.rpc_cancel.is_cancelled())
+                self.assertEqual(value.last_failure['phase'],'idle-watch');self.assertEqual(value.last_failure['message'],'Timeout was reached')
+                first=trace.snapshot()['firstError'];self.assertEqual(first['stage'],phase);self.assertEqual(first['timeoutMs'],1000)
+                self.assertEqual(first['method'],'GetNameOwner' if phase=='verify' else 'Read')
+                self.assertEqual(first['error']['code'],24);self.assertIs(session.bus,original[0]);self.assertIs(observer.bus,original[1])
+                if phase=='verify':observer.bus.call_sync.assert_not_called();self.assertEqual(session.bus.call_sync.call_count,1)
+                else:
+                    self.assertEqual([row['timeoutMs'] for row in trace.snapshot()['calls']],[1000,1000,1000,500,1000])
+                    self.assertEqual(observer.bus.call_sync.call_count,2)
+
     def test_eleven_file_candidate_resolves_real_installed_dependency_before_controller_import(self):
         repo=Path(__file__).resolve().parents[1]
         with tempfile.TemporaryDirectory() as temporary:

@@ -87,7 +87,7 @@ the external owned-VM driver must independently check for helpers after failed
 reads and retain process/start identities. Visible Stop remains the banner's
 actual button; a finish trigger is cleanup, not visible Stop evidence.
 
-Eighty-six focused source cases pass: GNOME guards/keyboard, helper protocol,
+Ninety-four focused source cases pass: GNOME guards/keyboard, helper protocol,
 worker/consent cancellation, portal targets, scene/capture and private-trigger
 and selected-artifact refusals. The latter exercise the normal maintained
 inventory verifier against synthetic managed releases, including changed or
@@ -462,3 +462,54 @@ fix and import regression are review evidence, not a corrected native pass.
 A fresh candidate directory and explicit reviewed probe revision/hash are
 required for the next run; controller/helper bytes remain the reviewed0ab
 candidate. Production GNOME discovery and input remain disabled.
+
+## Corrected-probe consent pass and first capture timeout
+
+The [fresh v2 checkpoint](../release/qualification/next-targets/20261003-fedora-gnome-v2-consent-pass-capture-timeout.json)
+stages only probe4abe16a with the other ten files still exact0ab. Strict native
+and selected source2035/Fedora44 admission passes against managed inventory
+SHA53813618. The corrected import reaches the installed xcb banner and actual
+Remote Desktop dialog. Its native portal PID/owner and foreground geometry are
+checked before the observed interaction and Share actions. Connect reports
+sharing=true after the existing keyboard/pointer/single-monitor checks; GUI
+ticks continue during consent. This is real consent evidence, not widget input.
+
+The first explicit capture fails after2.224seconds and closes sharing. Its
+retained first failure is idle-watch / Error / g-io-error-quark timeout24;
+cleanup completes in0.544seconds, with stopClicked=false. Both buffers remain
+empty, center/edge/save counters stay zero and no saved file exists. Independent
+checks find probe, target and candidate helpers absent; selected bytes and both
+frozen original backing hashes are unchanged. A post-target-exit cleanup scanner
+error on nonprocess /proc/dma is retained separately, followed by an independent
+numeric-process scan; no SIGTERM or failed capture is replayed.
+
+Fresh owner/scene readback remains valid. PipeWire logs target-not-found and
+Broken-pipe messages overlapping teardown; they do not identify the first
+failure's cause. Existing idle-watch reporting cannot distinguish its session
+verification from the observer's owner/read calls. The failed operation remains
+failed; pointer/chord/ASCII/save/visibleStop acceptance is still open.
+
+The maintained probe adds optional `--trace-idle-watch` for the next reviewed
+fresh diagnostic run. A probe-only subclass delegates the unchanged idle watcher
+and temporarily wraps only its existing session/observer connections. It records
+each synchronous GetNameOwner and observer Read method, verification/read stage,
+public lookup alias, configured timeout and elapsed time, plus native error
+kind/domain/code. It forwards the exact flags, parameters, cancellation object,
+reply and exception without another RPC. Cleanup methods delegate normally;
+captured connections are restored even after Stop detaches/disposes the objects,
+without restoring sharing. No controller, observer, session, helper, production
+guard or timeout is changed.
+
+The current [session owner check](../services/desktop/portal_session.py) uses
+1000ms; the [observer](../services/desktop/gnome.py) uses500ms for Shell owner
+checks and1000ms for Read. The [GIO API reference](https://docs.gtk.org/gio/method.DBusConnection.call_sync.html)
+documents milliseconds and synchronous blocking; the trace records the bounds
+actually passed by these staged modules. It keeps the latest128 calls plus the
+first error independently, recording rollover and diagnostic-sink failures.
+It exports no RPC reply/parameter payload, accessible text or screenshot bytes.
+Tracing defaults off. Synthetic tests exercise the actual maintained watcher,
+session verification and observer read, preserving terminal timeout cancellation,
+the original error, bounded history, detached cleanup and no retry. Those tests
+do not diagnose the v2 timeout or qualify native input. The diagnostic probe
+requires parent review/publication and a new private candidate before execution;
+it has not run in the VM.

@@ -6,6 +6,8 @@ private trigger.input.json explicitly requests capture/action/inspect/finish.
 No input is inferred from readiness, dispatched automatically or replayed.
 """
 import argparse
+from collections import deque
+from copy import deepcopy
 import hashlib
 import importlib.util
 import json
@@ -14,6 +16,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import threading
 import time
 
 
@@ -98,11 +101,90 @@ def candidate_controller(candidate,installed):
     return Worker,GnomeControl
 
 
+class IdleWatchTrace:
+    """Bounded private RPC history; first error survives rollover and cleanup."""
+    def __init__(self,limit=128):
+        self.limit=limit;self.calls=deque(maxlen=limit);self.total=0
+        self.first_error=None;self.recording_failures=0;self.mutex=threading.Lock()
+
+    def record(self,value):
+        with self.mutex:
+            self.total+=1;value={**value,'sequence':self.total};self.calls.append(value)
+            if value['outcome']=='error' and self.first_error is None:self.first_error=value
+
+    def lost(self):
+        with self.mutex:self.recording_failures+=1
+
+    def snapshot(self):
+        with self.mutex:
+            return deepcopy({'limit':self.limit,'totalCalls':self.total,'droppedCalls':self.total-len(self.calls),
+                'recordingFailures':self.recording_failures,'calls':list(self.calls),'firstError':self.first_error})
+
+
+class IdleWatchBus:
+    """Delegate unchanged RPCs; record only existing owner checks and Read."""
+    def __init__(self,bus,stage,trace):self.bus=bus;self.stage=stage;self.trace=trace
+
+    def __getattr__(self,name):return getattr(self.bus,name)
+
+    def call_sync(self,name,path,interface,method,parameters,reply_type,flags,timeout_msec,cancellable):
+        traced=(interface=='org.freedesktop.DBus' and method=='GetNameOwner'
+            or interface=='com.augmentor.GnomeObserver' and method=='Read')
+        lookup_name=None
+        if traced and interface=='org.freedesktop.DBus':
+            # Read only the public alias before GIO can consume a floating
+            # parameters Variant. Forward that original object unchanged.
+            try:
+                lookup=parameters.unpack()
+                if lookup in (('org.freedesktop.portal.Desktop',),('org.freedesktop.impl.portal.desktop.gnome',),('org.gnome.Shell',)):
+                    lookup_name=lookup[0]
+            except Exception:pass
+        started=time.monotonic() if traced else None;error=None
+        try:return self.bus.call_sync(name,path,interface,method,parameters,reply_type,flags,timeout_msec,cancellable)
+        except BaseException as failure:error=failure;raise
+        finally:
+            if traced:
+                try:
+                    elapsed=time.monotonic()-started
+                    value={'stage':self.stage,'destination':name,'path':path,'interface':interface,'method':method,
+                        'timeoutMs':timeout_msec,'elapsedSeconds':elapsed,'outcome':'error' if error is not None else 'reply'}
+                    if lookup_name is not None:value['lookupName']=lookup_name
+                    if error is not None:
+                        value['error']={'kind':type(error).__name__,'message':str(error)[:512]}
+                        domain=getattr(error,'domain',None);code=getattr(error,'code',None)
+                        if isinstance(domain,str):value['error']['domain']=domain
+                        if type(code) is int:value['error']['code']=code
+                    self.trace.record(value)
+                except Exception:
+                    # A diagnostic sink failure must not mask native outcome,
+                    # skip cancellation, or introduce another RPC/retry.
+                    try:self.trace.lost()
+                    except Exception:pass
+
+
+def traced_controller(base,trace):
+    class TracedControl(base):
+        def watch_session(self,*args):
+            consent=self.consent;native=getattr(self.kwin,'native',None)
+            if consent is None or native is None:return super().watch_session(*args)
+            consent_bus,native_bus=consent.bus,native.bus
+            consent.bus=IdleWatchBus(consent_bus,'verify',trace)
+            native.bus=IdleWatchBus(native_bus,'read',trace)
+            try:return super().watch_session(*args)
+            finally:
+                # Stop may detach/dispose these objects. Restore the captured
+                # objects without reattaching them or reopening any connection.
+                consent.bus=consent_bus;native.bus=native_bus
+    return TracedControl
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--candidate',required=True);parser.add_argument('--source',required=True)
     parser.add_argument('--selected-artifact',required=True);parser.add_argument('--native-source',required=True)
-    parser.add_argument('--target-pid',type=int,required=True);args=parser.parse_args()
+    parser.add_argument('--target-pid',type=int,required=True)
+    parser.add_argument('--trace-idle-watch',action='store_true',help='Record bounded private method/bound/elapsed diagnostics; guards stay unchanged.')
+    args=parser.parse_args()
     if (os.getuid()!=1000 or os.environ.get('USER')!='augmentor-proof'
             or Path('/etc/augmentor-test-vm').read_text()!='Isolated Augmentor Fedora GNOME qualification VM\n'
             or subprocess.check_output(['systemd-detect-virt'],text=True).strip()!='qemu'
@@ -153,16 +235,19 @@ def main():
     app=QApplication([]);app.setQuitOnLastWindowClosed(False);banner=service.Banner()
     class Delivery(QObject):notice=Signal(bool,str);result=Signal(str,object);closed=Signal();request=Signal(str)
     delivery=Delivery();delivery.notice.connect(banner.update.emit)
-    worker=Worker(lambda context:GnomeControl(context,delivery.notice.emit,request_timeout=180,on_request=delivery.request.emit))
+    trace=IdleWatchTrace() if args.trace_idle_watch else None
+    Control=traced_controller(GnomeControl,trace) if trace is not None else GnomeControl
+    worker=Worker(lambda context:Control(context,delivery.notice.emit,request_timeout=180,on_request=delivery.request.emit))
     controller=worker.backend;owner='codex:owned-gnome-input-fixture'
     report={'format':'augmentor-owned-gnome-input-probe/1','selectedSource':args.source,'targetPid':args.target_pid,
         'selectedArtifactAdmission':admission,
         'targetStartTime':start,'qtPlatform':app.platformName(),'inputQualified':False,'productionInputEnabled':False,
         'probeConsentTimeoutSeconds':180,'guiTimerTicks':0,'records':[],'closed':False,'stopClicked':False,
         'sourceSha256':{name:hashlib.sha256((candidate/name).read_bytes()).hexdigest() for name in sources},
-        'initialTarget':target_receipt(),'helperPids':[],'selectedApplicationChanged':False}
+        'initialTarget':target_receipt(),'helperPids':[],'selectedApplicationChanged':False,'idleWatchTraceEnabled':trace is not None}
     def save():
         if selection.read_bytes()!=original:raise RuntimeError('Selected application bytes changed during the candidate proof.')
+        if trace is not None:report['idleWatchRpcTrace']=trace.snapshot()
         temporary=report_path.with_suffix('.json.tmp');temporary.write_text(json.dumps(report,indent=2)+'\n');temporary.replace(report_path)
     pending=False;stopping=False
     def execute(operation,function):
