@@ -1267,3 +1267,11 @@ ref-only concurrency group when broad validation started. Its canceled job is
 not a qualification result. The reusable group now includes run ID, allowing
 separate focused/full parent runs on independently isolated runners to coexist.
 No live broad run was manually canceled; native/broad outcomes remain pending.
+
+
+Native job 111311878502 at `10fdece` in broad 37160189535 passes the existing DSH
+proof, then fails the added desktop fixture before preparation: the fresh actual
+persistent `state/augmentor/updates` directory is absent. The fixture now creates
+it privately before use. Its normal startup/lease and coordinator use the same
+persistent directory. No shipped guard is weakened. New native qualification is
+required; broad/Mac jobs still running are preserved.

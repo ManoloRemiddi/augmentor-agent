@@ -227,6 +227,8 @@ class NativeServiceTests(unittest.TestCase):
         self.data=data;self.tool.DATA=data
         from lifecycle.posix_pending import transaction_directory
         f.transactions=transaction_directory()
+        f.transactions.parent.mkdir(mode=0o700,exist_ok=True)
+        f.transactions.mkdir(mode=0o700)
         environment=patch.dict(os.environ,{'XDG_DATA_HOME':str(data.parent),'PYTHONDONTWRITEBYTECODE':'1'})
         environment.start();self.addCleanup(environment.stop)
         self.systemctl('import-environment','XDG_DATA_HOME','PYTHONDONTWRITEBYTECODE')

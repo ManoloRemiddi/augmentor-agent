@@ -6,6 +6,14 @@
 
 
 
+
+Native job 111311878502 at `10fdece` in 37160189535 passes the original DSH
+service proof, but the added desktop test stops before coordinator preparation:
+its fresh persistent transaction directory was not created. The fixture now
+creates that actual private directory before use, matching normal startup/lease
+checks. Source guards are unchanged. Re-run focused native qualification; preserve
+the live broad/Mac jobs. The desktop native path is still unqualified.
+
 Source `10fdece` passes full local Python: 1007 total, 965 passed, 42 skips,
 in 65.802 seconds, including focused updater 228/225/three. Broad validation
 37160189535 and Mac 14/26 validation 37160188044 are running at this exact source.
