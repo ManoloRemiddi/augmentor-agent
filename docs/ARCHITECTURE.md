@@ -56,15 +56,17 @@ flowchart TD
     Pi --> Memory
     Memory --> Relationship[Hindsight relationship bank / person]
     Memory --> Project[Hindsight work bank / person and project]
-    Native --> Voice[Resonant Voice companion / ASR and TTS]
+    Native --> Voice[Shared local or GPT-Live speech adapter]
     Bridge --> Voice
-    Voice --> DSH
+    Voice --> Adapters
     Adapters --> Desktop[Consented desktop executor]
     Browser --> Executor[Browser action executor]
 ```
 
 The diagram shows logical ownership, not every transport call. Voice uses the
-existing authenticated DSH session and generation protocol. Desktop authority
+selected Augmentor session and model. Local speech retains the Resonant companion
+protocol; GPT-Live uses client delegation through the same controller/bridge.
+See [provider ownership and setup](VOICE-PROVIDERS.md). Desktop authority
 is not granted to a browser session by sharing a host or memory bank.
 
 The [Home development preview](HOME.md) adds a headless host of the same DSH
@@ -85,6 +87,7 @@ code is in this repository and its deployment companion holds private home state
 | Automatic memory | `services/memory/{service,hindsight,dual}.py`, `packages/memory/src/dual.ts`, `adapters/dsh-memory/automatic.mjs` | [Architecture](DUAL-MEMORY.md), [operations and RPC](MEMORY-OPERATIONS.md) |
 | Optional manual memory | `services/memory/provider.py`, prompt-service routing, `packages/memory/src/index.ts` | [Manual memory](MEMORY.md); separate 0.9.2 connection |
 | Speech engine and plugin | Separate [Resonant Voice repository](https://github.com/ManoloRemiddi/resonant-voice) | [Voice handoff](https://github.com/ManoloRemiddi/resonant-voice/blob/main/docs/AGENT-HANDOFF.md); protocol `resonant-voice/1` |
+| Cloud speech and provider configuration | `voice_provider.py`, `voice_live.py`, `live_dialogue.py`; OS credential vault | [Local/cloud specification](VOICE-PROVIDERS.md); no independent reasoning model |
 | Audio controls and capture | Shared native `VoiceSession`; browser `voice.mjs` via private stdio worker | [Controls](VOICE-SINGLE-BUTTON.md), [hands-free](HANDS-FREE-IMPLEMENTATION.md) |
 | Desktop tools / specialist | `services/desktop`, `packages/desktop`, `packages/computer-use`, `adapters/dsh-desktop` | [Desktop control](DESKTOP-CONTROL.md), [specialist](DESKTOP-SPECIALIST.md) |
 | Recovery, maintenance and support | `services/recovery`, `services/lifecycle`, `services/support`, `scripts/maintenance.py` | [Recovery](DESKTOP-OFFLINE-RECOVERY.md), [lifecycle](LIFECYCLE.md), [data](DATA-AND-SUPPORT.md) |
@@ -115,8 +118,9 @@ contribute to both banks. See [dual memory](DUAL-MEMORY.md) for boundaries.
 Pi persists its own conversation state; DSH persists its own. Shared memory does
 not merge or convert conversations. Prompt records are independently stored in
 `prompts.sqlite3`; automatic transcript memory uses `dual-memory.sqlite3`.
-Speech configuration belongs to Resonant Voice. UI preferences belong to the
-surface. [Data and support](DATA-AND-SUPPORT.md) explains data flow and retention.
+Local engine configuration belongs to Resonant Voice. Provider selection is scoped
+in `voice-providers.json`; cloud secrets live in the OS credential vault. Primary
+Desktop/Browser share Voice On/Off and conversation preferences. [Data and support](DATA-AND-SUPPORT.md) explains data flow and retention.
 
 Preserve selected models, explicit surface authority, Stop, pending interactions,
 and original history. A reconnect or unknown acknowledgment must not replay a

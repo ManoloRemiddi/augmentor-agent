@@ -60,7 +60,18 @@ independent profiles. The shared response_metrics tool retains up to 20 timing
 records per conversation locally, including a short identifying response excerpt;
 see [shared surfaces](SHARED-SURFACES-2026-09-24.md).
 
-The speech companion processes microphone audio through configured ASR and sends
+[Voice settings](VOICE-PROVIDERS.md) select local Resonant Voice or cloud OpenAI
+GPT-Live. Cloud sends microphone audio and completed public results to OpenAI,
+with `store: false`, under the API’s data controls; this does not imply zero
+provider retention. Recognized text is submitted to the app’s selected local or
+cloud model and follows ordinary conversation/memory retention. Private reasoning
+and raw tool output are excluded from voice context. API keys stay in Secret
+Service, Keychain or Windows Credential Manager; each named window owns its key.
+The latest `voice-usage.json` receipt contains only duration and whether final
+usage was confirmed. Voice charges include silence and backend waiting; selected
+model charges remain separate. The UI clears entered keys on submission/closing.
+
+The local speech companion processes microphone audio through configured ASR and sends
 reply text to configured TTS. The automatic memory journal stores the resulting
 text, not the microphone stream. Speech-engine configuration, transient buffering
 and audio asset licensing are described in the

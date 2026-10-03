@@ -4,7 +4,8 @@ import assert from 'node:assert/strict'
 import {mkdtempSync,writeFileSync,rmSync,mkdirSync,copyFileSync} from 'node:fs'
 import {tmpdir} from 'node:os'
 import {join} from 'node:path'
-import {once} from 'node:events'
+import {once,EventEmitter} from 'node:events'
+import {PassThrough} from 'node:stream'
 import {WebSocket} from 'ws'
 import {createEmbedServer,nativeConnection} from '../apps/browser/embed/server.mjs'
 import {spawn} from 'node:child_process'
@@ -43,5 +44,16 @@ test('official service authenticates proxies, serves the same UI and handles >1M
  const ws=new WebSocket(base.replace('http:','ws:')+'native',{headers});await once(ws,'open');ws.send(JSON.stringify({id:1,method:'session.history'}));const [raw]=await once(ws,'message');assert.equal(JSON.parse(raw).result.length,1200000);ws.close();await once(ws,'close')
  const next=new WebSocket(base.replace('http:','ws:')+'native',{headers});await once(next,'open');next.send(JSON.stringify({type:'embed/ping'}));const [pong]=await once(next,'message');assert.equal(JSON.parse(pong).type,'embed/pong');assert.equal(starts,2);next.close();await once(next,'close')
  }finally{await new Promise(resolve=>server.close(resolve))}
+})
+test('page closure gives the native host EOF and waits for actual voice resource closure',async()=>{
+ const ws=new EventEmitter();ws.terminate=()=>ws.emit('close');ws.ping=()=>{}
+ const child=new EventEmitter();child.stdout=new PassThrough();child.stdin=new PassThrough()
+ child.kill=()=>assert.fail('Ordinary page closure must allow billed voice cleanup')
+ const end=nativeConnection(ws,profile,{start:()=>child});let finished=false
+ void end.closed.then(()=>{finished=true})
+ ws.emit('close');assert.equal(child.stdin.writableEnded,true)
+ child.emit('exit',0);await Promise.resolve();assert.equal(finished,false,'Exit is not confirmation of resource closure')
+ child.stdout.write(Buffer.from('late closing output'));end()
+ child.emit('close',0);await end.closed;assert.equal(finished,true)
 })
 test.after(()=>rmSync(dir,{recursive:true,force:true}))

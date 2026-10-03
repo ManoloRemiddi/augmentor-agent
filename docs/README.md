@@ -4,6 +4,8 @@
 - [Immediate composer feedback and regression evidence](COMPOSER-SEND-FEEDBACK.md)
 # Documentation index
 
+- [Voice providers: approved specification, local/cloud setup and validation](VOICE-PROVIDERS.md)
+
 - [Embedded Handy dictation](HANDY-INTEGRATION.md): implementation, themed recording pill, settings, OS adapters, licensing, build and qualification boundaries.
 - [Approved Handy integration plan](HANDY-INTEGRATION-PLAN.md).
 

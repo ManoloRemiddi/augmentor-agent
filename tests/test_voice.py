@@ -35,6 +35,21 @@ class VoiceTests(unittest.TestCase):
             self.assertEqual(result['sessionId'], controller.session)
             self.assertFalse(controller.navigating)
 
+    def test_cloud_prepares_the_selected_model_without_a_local_companion(self):
+        calls=[]
+        with tempfile.TemporaryDirectory() as directory:
+            client=SimpleNamespace(harness='pi',preset='augmentor-linux-pi',workspace=lambda:Path(directory),
+                validate_model=lambda selection:calls.append(('validate',selection)),
+                call=lambda method,payload:calls.append((method,payload)) or {})
+            controller=Controller(client=client,harness='pi');controller.online=True
+            controller.subscribe=lambda sid:calls.append(('subscribe',sid))
+            selected={'provider':'local','model':'selected-local-model'}
+            with patch('augmentor_linux.voice_provider.cloud_ticket',side_effect=lambda sid:{'sessionId':sid,'protocol':'augmentor-live/1'}):
+                result=controller.prepare_voice(selected,provider='openai-live')
+            self.assertEqual(controller.selection,selected)
+            self.assertEqual(result['sessionId'],controller.session)
+            self.assertEqual([call[0] for call in calls],['validate','session.create','session.selectModel','subscribe'])
+
     def test_unknown_creation_failure_never_submits_or_requests_ticket(self):
         calls = []
         with tempfile.TemporaryDirectory() as directory:
@@ -82,7 +97,7 @@ class VoiceTests(unittest.TestCase):
         self.assertEqual(calls,['saved','closed','controls'])
         fake.set_status=lambda message:calls.append(message)
         Window.open_voice(fake)
-        self.assertIn('Enable Resonant Voice',calls[-1])
+        self.assertIn('Enable Voice',calls[-1])
 
     def test_voice_toggle_controls_robot_visibility(self):
         from augmentor_linux.window import Window

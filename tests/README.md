@@ -773,3 +773,21 @@ Task reliability: `tests/dsh-context-budget.test.mjs`, `tests/dsh-execution.test
 `tests/test_reply_completion.py` and `tests/test_desktop_profile.py` exercise
 deterministic evidence/recovery, UI and Linux capability-discovery contracts. The opt-in `scripts/task-reliability-proof.mjs` checks a real local
 model with restricted read-only tools; see [scope and limits](../docs/TASK-RELIABILITY.md).
+
+
+## October 3 local/cloud voice providers
+
+`test_voice_providers.py` verifies scoped provider settings, consent, credential
+failure/rollback, transcript deduplication and completed backend result binding.
+`test_voice_live.py` uses scripted WebSocket events and synthetic PCM with the
+actual Qt session adapter, including acknowledgment/audio ordering, idle closure,
+resource release and final duration. `browser-shared-voice.test.mjs` proves cloud
+startup without a local ticket, cancelled readiness and unchanged submission
+identity. Browser `voice-settings.test.mjs` and `voice.test.mjs` prove setup without
+local models, key clearing, On/Off and the actionable red orb.
+
+These tests never contact OpenAI or qualify microphone/listening quality. Existing
+Codex voice tests use the pinned real runtime with independently authored speech
+transcripts/PCM and scripted health endpoints. See [specification and delivery
+evidence](../docs/VOICE-PROVIDERS.md). Standalone Mac browser-companion audio and
+physical Mac/Windows acoustics remain separately unqualified.

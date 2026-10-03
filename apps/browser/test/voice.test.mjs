@@ -1,17 +1,21 @@
-// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+// Augmentor — dsh-augmentor plugin, pipe, and Chromium extension
+// Copyright © 2026 Manolo Remiddi
+// SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+// License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
+
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {JSDOM} from 'jsdom'
 import {setTimeout as delay} from 'node:timers/promises'
 import {attachVoice} from '../extension/voice.mjs'
 
-function setup(t){
+function setup(t,configuration={enabled:true,mode:'manual'}){
  const dom=new JSDOM('<button id="send"></button><button id="stop"></button>'),originals=new Map(),sent=[],listeners=[]
  for(const [name,value] of Object.entries({document:dom.window.document,window:dom.window,chrome:{runtime:{getURL:s=>s,onMessage:{addListener:f=>listeners.push(f)}}}})){
   originals.set(name,Object.getOwnPropertyDescriptor(globalThis,name));Object.defineProperty(globalThis,name,{value,configurable:true,writable:true})
  }
  const voice=attachVoice({isHistory:()=>false,onError:message=>assert.fail(message),send:async(type,payload)=>{
-  if(type==='voice/preferences')return {ok:true,result:{enabled:true,mode:'manual'}}
+  if(type==='voice/preferences')return {ok:true,result:configuration}
   sent.push({type,...payload});return type==='voice/start'?{ok:true,voice:{id:payload.id,sessionId:'one'}}:{ok:true}
  }})
  const button=dom.window.document.querySelector('.voice-orb')
@@ -68,4 +72,19 @@ test('Codex voice uses the shared gesture controls only when its capability is a
  button.onpointerup();assert.equal(sent.at(-1).action,'end')
  voice.update({harness:'codex',capabilities:{voice:true},phase:'disconnected',sessionId:'one'},false)
  assert.equal(sent.at(-1).action,'close');assert.equal(button.disabled,true)
+})
+
+
+test('unconfigured Voice is a red actionable setup control without opening audio',async t=>{
+ const {button,sent,down}=setup(t,{enabled:true,configured:false,provider:'openai-live'})
+ await delay(0);assert.equal(button.dataset.state,'needs-setup');assert.equal(button.disabled,false)
+ down();await delay(0);assert.deepEqual(sent,[{type:'settings/open',section:'voice'}])
+ assert.match(button.title,/needs setup/)
+})
+test('cloud voice uses the selected Pi conversation when local voice is unavailable',async t=>{
+ const {voice,button,sent,down}=setup(t,{enabled:true,configured:true,provider:'openai-live'})
+ voice.update({harness:'pi',phase:'ready',sessionId:'one',capabilities:{voice:false}},false)
+ await delay(0);assert.equal(button.disabled,false)
+ down();await delay(250);button.onpointerup()
+ assert.equal(sent[0].type,'voice/start');assert.equal(sent.at(-1).action,'end')
 })

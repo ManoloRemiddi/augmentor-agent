@@ -86,8 +86,7 @@ function dispatchPanelMessage(msg, sender, sendResponse) {
     return true
   }
   if(msg?.type==='voice/preferences'){
-    if(state.harness!=='dsh'&&state.capabilities.voice!==true){sendResponse({ok:false,error:'Voice is unavailable with this harness.'});return}
-    request('augmentor/voice/preferences',{action:msg.action??'get',settings:msg.settings})
+    request('augmentor/voice/preferences',{action:msg.action??'get',settings:msg.settings,provider:msg.provider,apiKey:msg.apiKey,voice:msg.voice,consent:msg.consent})
       .then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}))
     return true
   }

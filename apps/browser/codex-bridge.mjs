@@ -51,18 +51,18 @@ async function client() {
     else if (frame.method === 'question/requested') send({id: frame.rpcId, method: 'question.requested', params: frame.payload});
     else if (frame.method === 'interaction/resolved') send({method: 'interaction.resolved', params: frame.payload});
     else if (frame.method === 'session/attention') send({method: 'session.attention', params: frame.payload});
-  }, () => {voice.close(); setImmediate(() => process.exit(1));}, 'codex').then(value => {connection = value; return value;}).finally(() => {opening = undefined;});
+  }, () => {void cleanup(1);}, 'codex').then(value => {connection = value; return value;}).finally(() => {opening = undefined;});
   return opening;
 }
 async function attach(sessionId) {
-  if (currentSession !== sessionId) voice.close();
+  if (currentSession !== sessionId) await voice.close();
   const c = await client(); await c.call('events.subscribe', {sessionId});
   const meta = await c.call('session.describe', {sessionId});
   if (meta.browserTools === 1) await c.call('browser.attach', {sessionId});
   currentSession = sessionId;
 }
 async function request(method, params = {}, id) {
-  if (method === 'augmentor/voice/preferences') {if (params.action === 'save') voice.close(); return voicePreferences(params);}
+  if (method === 'augmentor/voice/preferences') {if (!['get','status',undefined].includes(params.action)) await voice.close(); return voicePreferences(params);}
   if (method === 'augmentor/voice/start') {if (params.sessionId !== currentSession) throw new Error('Open the current Codex conversation first.'); return voice.start(params);}
   if (method === 'augmentor/voice/control') return voice.control(params);
   if (method === 'augmentor/home') return homeConnection(params);
@@ -124,7 +124,7 @@ async function request(method, params = {}, id) {
   }
   if (['augmentor/save', 'augmentor/unsave', 'augmentor/state'].includes(method)) return {ok: true, ...await c.call('chats.saved', {action: method.split('/')[1], sessionId: params.sessionId})};
   if (['session.branchStatus', 'session.queue', 'session.updateQueue', 'session.cancel', 'session.rename', 'session.models', 'session.history', 'settings.describe'].includes(method)) return c.call(method, params);
-  if (method === 'shutdown') {voice.close(); connection?.close(); setTimeout(() => process.exit(0), 30); return {ok: true};}
+  if (method === 'shutdown') {setImmediate(()=>void cleanup());return {ok: true};}
   throw new Error('This Codex browser capability is not yet available: ' + method);
 }
 let buffer = Buffer.alloc(0); const pending = new Set();
@@ -149,5 +149,13 @@ process.stdin.on('data', chunk => {
     void request(frame.method, frame.params, frame.id).then(result => send({id: frame.id, result}), error => send({id: frame.id, error: {message: error.message}})).finally(() => pending.delete(frame.id));
   }
 });
-process.stdin.on('end', () => {voice.close(); connection?.close(); process.exit(0);});
-process.on('SIGTERM', () => {voice.close(); connection?.close(); process.exit(0);});
+let closing;
+function cleanup(code=0) {
+  if (code) process.exitCode=code;
+  if (closing) return closing;
+  process.stdin.destroy();voice.close();
+  closing=(async()=>{await voice.settled();connection?.close();for(const timer of browserCalls.values())clearTimeout(timer);browserCalls.clear();})();
+  return closing;
+}
+process.stdin.on('end',()=>void cleanup());
+process.on('SIGTERM',()=>void cleanup());

@@ -1,4 +1,8 @@
-// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+// Augmentor — dsh-augmentor plugin, pipe, and Chromium extension
+// Copyright © 2026 Manolo Remiddi
+// SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+// License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
+
 // Audio stays in the common native engine. This transport owns one expiring UI lease.
 import {spawn} from 'node:child_process'
 import {readFileSync} from 'node:fs'
@@ -15,11 +19,11 @@ export function voicePython(root, env=process.env){
   return 'python3'
 }
 export class BrowserVoice {
-  constructor({ticket,submit,notify,spawnWorker=spawn,root=fileURLToPath(new URL('../../../',import.meta.url))}){
-    Object.assign(this,{ticket,submit,notify,spawnWorker,root});this.active=null
+  constructor({ticket,submit,notify,spawnWorker=spawn,settings=voicePreferences,root=fileURLToPath(new URL('../../../',import.meta.url))}){
+    Object.assign(this,{ticket,submit,notify,spawnWorker,settings,root});this.active=null;this.preparing=false;this.epoch=0
     this.workers=new Set();this.operations=new Set()
   }
-  get busy(){return Boolean(this.active||this.workers.size||this.operations.size)}
+  get busy(){return Boolean(this.preparing||this.active||this.workers.size||this.operations.size)}
   track(operation){
     const pending=Promise.resolve(operation).finally(()=>this.operations.delete(pending))
     this.operations.add(pending);return pending
@@ -28,6 +32,14 @@ export class BrowserVoice {
   async start({sessionId,id,handsFree=false}){
     if(!/^[a-f0-9-]{36}$/.test(id??'')||typeof sessionId!=='string')throw Error('Invalid voice identity')
     if(this.busy)throw Error('Voice is open or still finishing. Wait for it to close before opening another voice session.')
+    this.preparing=true
+    const epoch=this.epoch
+    let configuration
+    try{configuration=await this.track(this.settings({action:'status'},this.root))}finally{this.preparing=false}
+    if(epoch!==this.epoch)throw Error('Voice preparation was cancelled.')
+    if(configuration.enabled!==true)throw Error('Enable Voice in Settings first.')
+    if(configuration.configured!==true)throw Error('Voice needs setup. Configure local or OpenAI GPT-Live voice in Settings.')
+    const cloud=configuration.provider==='openai-live'
     const worker=this.spawnWorker(voicePython(this.root),['-u',path.join(this.root,'services/voice/browser-client.py')],{
       stdio:['pipe','pipe','ignore'],env:{...process.env,AUGMENTOR_WINDOW_ID:'main'},
     })
@@ -50,11 +62,11 @@ export class BrowserVoice {
         }catch{emit({type:'error',message:'Invalid voice response'});this.close(active)}
       }
     })
-    this.write(active,{action:'prepare',handsFree})
+    this.write(active,{action:'prepare',handsFree,...(cloud?{provider:'openai-live'}:{})})
     // Return the lease immediately, so release/cancel/heartbeats work during preparation.
-    void this.track(Promise.resolve().then(()=>this.ticket(sessionId))).then(ticket=>{
+    void this.track(Promise.resolve().then(()=>cloud?{protocol:'augmentor-live/1',provider:'openai-live',sessionId}:this.ticket(sessionId))).then(ticket=>{
       if(this.active!==active)return
-      if(ticket.protocol!=='resonant-voice/1'||ticket.sessionId!==sessionId||!/^ws:\/\/127\.0\.0\.1:\d+\/voice$/.test(ticket.url))throw Error('Invalid voice endpoint')
+      if(ticket.sessionId!==sessionId||(!cloud&&(ticket.protocol!=='resonant-voice/1'||!/^ws:\/\/127\.0\.0\.1:\d+\/voice$/.test(ticket.url))))throw Error('Invalid voice endpoint')
       this.write(active,{action:'start',ticket})
     }).catch(error=>{emit({type:'error',message:error.message});this.close(active)})
     return {id,sessionId}
@@ -73,13 +85,14 @@ export class BrowserVoice {
     if(this.active!==active||event.sessionId!==active.sessionId||!/^[-a-f0-9]{36}$/.test(event.requestId??'')||active.submitted.has(event.requestId))return
     if(typeof event.text!=='string'||!event.text.trim()||event.text.length>8192){this.close(active);return}
     active.submitted.add(event.requestId)
-    const id='resonant-voice:'+event.requestId
+    const id=(event.prefix==='augmentor-voice:'?'augmentor-voice:':'resonant-voice:')+event.requestId
     let result
     try{result=await this.submit(active.sessionId,id,event.text)}
     catch(error){result={accepted:false,error:'Submission outcome is unknown. Check the conversation before retrying. '+error.message}}
     this.write(active,{action:'submission',result:{...result,id}})
   }
   close(active=this.active){
+    this.epoch++
     if(!active||this.active!==active)return active?.closed
     this.write(active,{action:'close'});this.active=null
     active.worker.stdin.end()

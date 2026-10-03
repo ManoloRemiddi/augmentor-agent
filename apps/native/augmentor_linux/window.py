@@ -49,6 +49,8 @@ class Window(QWidget):
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         scaled(self).setMinimumSize(364,364);self.resize(424,484)
         self.preferences=Preferences(not preview)
+        self.voice_configuration=None
+        self.voice_status_check=False
         if preview:self.preferences.values['ui_scale']=self.ui_scale.base
         initialize_voice_profile = None
         if not preview and current_name()!='main':
@@ -175,6 +177,10 @@ class Window(QWidget):
         self.sync_orb()
         self.resize_borders=ResizeBorders(self)
         self.restore_placement()
+        self.voice_status_timer=QTimer(self);self.voice_status_timer.setInterval(15000)
+        self.voice_status_timer.timeout.connect(self.check_voice_configuration)
+        if not preview:
+            self.voice_status_timer.start();QTimer.singleShot(0,self.check_voice_configuration)
         self.touch_layout=None
         if os.environ.get('AUGMENTOR_TOUCH_MODE')=='1':
             from .touch import TouchLayout
@@ -318,6 +324,20 @@ class Window(QWidget):
     def voice_is_hands_free(self):
         return (self.voice_gesture_mode or self.preferences.values.get('voice_mode','manual'))=='hands-free'
 
+    def check_voice_configuration(self):
+        if self.voice_status_check or self.voice_dialog or self.voice_opening or getattr(self,'voice_settings_jobs',0):return
+        from .voice_provider import snapshot
+        self.voice_status_check=True
+        def ready(result):
+            self.voice_status_check=False
+            data,error=result
+            if data and not getattr(self,'voice_settings_jobs',0) and not any(d.isVisible() for d in self.findChildren(QDialog)):self.voice_configuration=data
+            self.update_controls()
+        self.call_in_background(lambda:(snapshot(),None),ready)
+
+    def voice_needs_setup(self):
+        return bool(self.preferences.persistent and (not self.voice_configuration or not self.voice_configuration.get('configured')))
+
     def start_gesture_hands_free(self):
         # A mode gesture cancels an unfinished manual hold; releasing the same
         # pointer must neither submit that hold nor stop the new conversation.
@@ -349,6 +369,9 @@ class Window(QWidget):
 
     def voice_pressed(self):
         self.refresh_voice_preferences()
+        if self.voice_needs_setup():
+            from .voice_settings import VoiceSettingsDialog
+            self.voice_button.disarm();VoiceSettingsDialog(self).exec();return
         voice=self.voice_dialog
         if self.voice_is_hands_free():
             if voice or self.voice_opening:self.close_voice_panel()
@@ -395,7 +418,7 @@ class Window(QWidget):
             voice.panel_closed.disconnect(self.close_voice_panel)
             voice.changed.disconnect(self.voice_state_changed)
             voice.recording_progress.disconnect(self.voice_button.set_recording_progress)
-            if self.controller:
+            if self.controller and getattr(voice,'submission_connected',False):
                 try:self.controller.queue_result.disconnect(voice.submission_result)
                 except (RuntimeError,TypeError):pass
             voice.close()
@@ -406,17 +429,21 @@ class Window(QWidget):
     def open_voice(self):
         if getattr(getattr(self,'preferences',None),'persistent',False):self.refresh_voice_preferences()
         if not self.preferences.values.get('resonant_voice',True):
-            self.set_status('Enable Resonant Voice in Settings to use the microphone.');return
+            self.set_status('Enable Voice in Settings to use the microphone.');return
         if self.editing:
             self.set_status('Finish or cancel the message edit before opening Voice.');return
         if self.voice_dialog or not self.controller:return
-        if self.voice_is_hands_free():self.prepare_voice_input()
+        if self.voice_needs_setup():
+            from .voice_settings import VoiceSettingsDialog
+            VoiceSettingsDialog(self).exec();return
+        provider=(self.voice_configuration or {}).get('provider','local')
+        if provider=='local' and self.voice_is_hands_free():self.prepare_voice_input()
         if self.voice_opening:return
         controller=self.controller;selection=self.model_picker.currentData()
         self.voice_opening=True;self.voice_epoch+=1;epoch=self.voice_epoch
         self.voice_button.set_state('connecting')
         def work():
-            try:return controller.prepare_voice(selection),None
+            try:return (controller.prepare_voice(selection,provider=provider) if provider=='openai-live' else controller.prepare_voice(selection)),None
             except Exception as error:return None,str(error)
         def ready(result):
             # prepare_voice has released its navigation lock. Refresh every control,
@@ -430,10 +457,11 @@ class Window(QWidget):
                 self.set_status('Voice unavailable. '+error);return
             if not self.preferences.values.get('resonant_voice',True) or controller is not self.controller or controller.closed or controller.session!=ticket['sessionId']:
                 self.close_voice_panel();return
-            from .voice import VoiceSession
-            voice=VoiceSession(self,ticket,hands_free=self.voice_is_hands_free(),early_input=self.voice_input);self.voice_dialog=voice
+            from .voice_live import voice_session
+            voice=voice_session(self,ticket,hands_free=self.voice_is_hands_free(),early_input=self.voice_input);self.voice_dialog=voice
             voice.transcript.connect(self.voice_transcript)
             controller.queue_result.connect(voice.submission_result)
+            voice.submission_connected=True
             voice.panel_closed.connect(self.close_voice_panel)
             voice.changed.connect(self.voice_state_changed)
             voice.recording_progress.connect(self.voice_button.set_recording_progress)
@@ -443,10 +471,11 @@ class Window(QWidget):
     def voice_transcript(self,event):
         controller=self.controller
         if not self.voice_dialog or self.voice_dialog.closed or not controller or controller.session!=event['sessionId'] or controller.read_only:return
+        request_id=('augmentor-voice:' if event.get('prefix')=='augmentor-voice:' else 'resonant-voice:')+event['requestId']
         if controller.running:
-            accepted=controller.queue_prompt(event['text'],'resonant-voice:'+event['requestId'],mode='steer')
+            accepted=controller.queue_prompt(event['text'],request_id,mode='steer')
         else:
-            accepted=controller.send(event['text'],self.model_picker.currentData(),request_id='resonant-voice:'+event['requestId'])
+            accepted=controller.send(event['text'],self.model_picker.currentData(),request_id=request_id)
         if not accepted and self.voice_dialog:
             self.voice_dialog.set_status('Message was not submitted. '+event['text'])
             if getattr(self.voice_dialog,'hands_free',False):self.voice_dialog.shutdown()
@@ -474,7 +503,10 @@ class Window(QWidget):
         self.voice_button.hands_free=self.voice_is_hands_free()
         self.voice_button.refresh_tip()
         self.voice_button.setVisible(self.preferences.values.get('resonant_voice',True))
-        self.voice_button.setEnabled(bool(self.controller and (getattr(self.controller,'harness',None)=='dsh' or getattr(self.controller,'capabilities',{}).get('voice')) and getattr(self.controller,'online',False) and not getattr(self.controller,'read_only',False) and (not getattr(self.controller,'navigating',False) or self.voice_opening)))
+        if not self.voice_dialog and not self.voice_opening and self.voice_needs_setup():self.voice_button.set_state('needs-setup')
+        elif self.voice_button.state=='needs-setup':self.voice_button.set_state('off')
+        cloud=(self.voice_configuration or {}).get('provider')=='openai-live'
+        self.voice_button.setEnabled(self.voice_needs_setup() or bool(self.controller and (cloud or getattr(self.controller,'harness',None)=='dsh' or getattr(self.controller,'capabilities',{}).get('voice')) and getattr(self.controller,'online',False) and not getattr(self.controller,'read_only',False) and (not getattr(self.controller,'navigating',False) or self.voice_opening)))
         running=bool(self.controller and (self.controller.running or getattr(self.controller,'navigating',False)))
         can_queue=bool(self.controller and getattr(getattr(self.controller,'client',None),'supports_queue',False))
         self.send_button.setEnabled(bool(self.controller and self.model_picker.currentData()) and (not running or can_queue) and not getattr(self.controller,'navigating',False) and not self.read_only and getattr(self.controller,'online',True))
@@ -1339,6 +1371,7 @@ class Window(QWidget):
                 or bool(self.controller and (any(getattr(self.controller,name,False)
                     for name in ('navigating','preparing','repairing','loading_page'))
                     or bool(getattr(self.controller,'recovery_lock',None) and self.controller.recovery_lock.locked())))
+                or getattr(self,'voice_settings_jobs',0)>0
                 or any(dialog.isVisible() for dialog in self.findChildren(QDialog)))
         if admission['active'] or include_reservation and admission['phase']!='ready':busy=True
         return {'running': running, 'busy': busy, 'draftPresent': draft, 'accepted': not busy}

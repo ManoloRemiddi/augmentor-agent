@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import patch
 from PySide6.QtWidgets import QApplication,QPushButton
 from augmentor_linux.window import Window
-from augmentor_linux.voice_settings import VoiceSettingsDialog
+from augmentor_linux.voice_settings import LocalVoiceSettingsDialog as VoiceSettingsDialog
 
 
 class VoiceSettingsTests(unittest.TestCase):
@@ -39,7 +39,7 @@ class VoiceSettingsTests(unittest.TestCase):
         from augmentor_linux.panels import SettingsDialog
         window=Window(preview=True);dialog=SettingsDialog(window)
         buttons=dialog.findChildren(QPushButton)
-        labelled=[b for b in buttons if b.text() in ('Resonant Voice','Connect DSH','Recover connection','Save','Colours && visual effects','Prompt library','Memory','Support report','Done')]
+        labelled=[b for b in buttons if b.text() in ('Voice','Connect DSH','Recover connection','Save','Colours && visual effects','Prompt library','Memory','Support report','Done')]
         self.assertEqual(len(labelled),10)
         self.assertTrue(all(not b.icon().isNull() for b in labelled))
         dialog.close();window.close()

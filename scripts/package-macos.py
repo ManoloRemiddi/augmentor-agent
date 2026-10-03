@@ -211,7 +211,7 @@ def main():
         shutil.rmtree(project/'apps/native')
         # Pure socket clients also serve CLI integrations and acceptance tools;
         # retain them without any Qt presentation modules or desktop entrypoint.
-        for name in ('__init__.py','pi_client.py','prompt_client.py','runtime_start.py','preferences.py','dictation.py'):
+        for name in ('__init__.py','pi_client.py','prompt_client.py','runtime_start.py','preferences.py','dictation.py','instances.py','ui_scale.py','skins.py','voice_provider.py'):
             relative=Path('apps/native/augmentor_linux')/name
             copy(ROOT/relative,project/relative)
         shutil.rmtree(project/'services/desktop')
