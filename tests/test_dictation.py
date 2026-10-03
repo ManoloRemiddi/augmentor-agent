@@ -3,6 +3,9 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import shutil
+import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -116,6 +119,21 @@ class DictationTests(unittest.TestCase):
                 lease=dictation.MicrophoneLease();lease.acquire();self.assertIsNotNone(lease.token);lease.release();self.assertIsNone(lease.token)
                 self.assertEqual((self.base/'auth.key').stat().st_mode&0o777,0o600)
             finally:dictation.request('shutdown',start=False)
+
+    def test_incomplete_checkout_cannot_own_an_enabled_session(self):
+        checkout=self.base/'checkout'
+        for relative in ('services/dictation/server.py','services/dictation/portal.py','apps/native/augmentor_linux/dictation.py'):
+            target=checkout/relative;target.parent.mkdir(parents=True,exist_ok=True)
+            shutil.copy2(ROOT/relative,target)
+        state=self.base/'state';state.mkdir(mode=0o700)
+        original=b'{"enabled": true}\n';(state/'preferences.json').write_bytes(original)
+        env={**os.environ,'AUGMENTOR_DICTATION_STATE':str(state),'PYTHONPATH':str(checkout/'apps/native')}
+        result=subprocess.run([sys.executable,str(checkout/'services/dictation/server.py')],env=env,capture_output=True,timeout=8)
+        self.assertNotEqual(result.returncode,0)
+        self.assertIn(b'bundled Handy component is unavailable',result.stderr)
+        self.assertEqual((state/'preferences.json').read_bytes(),original)
+        with patch.dict(os.environ,{'AUGMENTOR_DICTATION_STATE':str(state)}):
+            with self.assertRaisesRegex(RuntimeError,'not running'):dictation.request('status',start=False)
 
     @unittest.skipIf(os.name=='nt','Unix socket path limit')
     def test_long_state_path_uses_private_short_socket_and_preserves_capture_ownership(self):

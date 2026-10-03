@@ -2,6 +2,32 @@
 
 # Embedded Handy dictation
 
+## October 3 alignment and matched downloads
+
+The owner requested a small leftward correction of the recording icon. The
+28-pixel orb is translated four CSS pixels left; waveform, cancel button, orb
+size, animation and appearance synchronization retain their existing geometry.
+An enabled broker now checks for its bundled executable before accepting any
+session connections. An incomplete development checkout cannot take ownership
+of an enabled installed session and serve only component-unavailable errors.
+Disabled isolated test brokers continue to coordinate conversation capture.
+The regression starts an actual incomplete checkout against private synthetic
+enabled state, verifies refusal to listen, and preserves that state unchanged.
+
+The owner confirmed restored physical Linux dictation on October 3. Its outage
+was traced to an incomplete development broker owning the graphical-session
+endpoint; graceful idle shutdown and startup from the complete selected installed
+release restored readiness without restarting a chat or changing settings.
+
+Publication direction: prepare Linux, macOS and Windows downloads before
+publishing. Existing Linux/Mac 0.2.13 preview downloads predate Handy; the Windows
+0.2.13 preview explicitly excludes it. Merging source does not update those
+assets. Required work: shared alignment/recovery checks, actual rebuilt
+component proofs, Windows payload/prerequisite integration on both advertised
+CPUs, matched complete installers, fresh-user dictation lifecycle acceptance,
+source/notices review, and exact anonymous-download checks after publication.
+This preparation is ongoing; do not claim the existing downloads include Handy.
+
 Implementation branch: `feat/handy-integration`, based on public main
 `d91c52037d7bc26c82c702c25e1a779b0fca1f39`. This guide owns the implemented
 contract; [the approved plan](HANDY-INTEGRATION-PLAN.md) retains its rationale.
