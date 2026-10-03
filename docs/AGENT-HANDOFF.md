@@ -2,6 +2,49 @@
 
 # Start here: agent handoff
 
+## Application SDK alignment source — October 3
+
+The owner-authorized source integration is complete: product PR #34 merged on
+main at `602669a`, then SDK PR #2 merged at `3797777`. Both merge trees match
+the reviewed candidates. The developer maintenance guide now defines how future
+product updates reach the SDK. Fresh packed/runtime, Browser and platform checks pass; see
+[the source update record](SDK-ALIGNMENT.md). No release or installed app update
+is performed by source integration. Preserve the separate unfinished canonical
+settings work and the owner's live applications.
+Merged-source validation is complete: six SDK jobs pass at `3797777` and eight
+product jobs pass at `602669a` on attempt 2. The initial loaded-Chromium queue
+timeout, four passing local runs and remaining experimental acceptance gate are
+retained in the alignment guide; the retry does not establish its cause.
+
+[SDK alignment](SDK-ALIGNMENT.md) owns the paired preview 4 candidate, feature
+states, shared-settings boundaries, Codex role/tools/session/memory isolation,
+platform bootstrap/private files and per-OS startup adapters. Source and fixture
+qualification do not deploy the live YouTube/Sponsor apps or certify a fresh
+Mac/Windows SDK install. Hosted platform/paired-package checks and installed
+acceptance remain distinct. Preserve the owner's dirty canonical checkout and
+independent third-app test.
+
+The selection follow-up binds Codex app context to durable operations, enforces
+the 16 KB UTF-8 boundary and scopes branch-status recovery to its parent.
+DSH retains latest-session context; the capability snapshot reports this
+difference. See the alignment guide's exact tests, initial failures and remaining
+customer acceptance gates before claiming release readiness.
+
+The workspace settings follow-up integrates the approved thinking-display choice
+with profile-specific persistence/cache keys, including same-origin app isolation.
+Its 88 Browser and 11 workspace contracts pass locally; hosted package validation
+remains separate. The canonical owner's settings/dictation edits are preserved.
+Direct Codex profile registration now enforces the same 128-character connection
+identifier contract as SDK planning and the pinned host, before registry writes.
+
+Current functional pair: product `8a085be` / SDK `925b72e`. All six SDK jobs,
+all three platform contracts, Mac 14/26 bundles and Windows x64/ARM64 desktop
+checks pass. Full Linux/package/Browser validation and Windows x64/ARM64
+packaged installation also pass. Source/package qualification is complete for
+this pair. The alignment guide records exact run URLs, the requirement audit
+and four inspected Chromium component
+renders. These source checks do not promote a release or migrate an app.
+
 ## October 3 Handy alignment, test separation and download preparation
 
 PR #30 is merged; PR #33 is merged as `f738a73f6f2d44fde111108df72dbf1cd94b562b`
@@ -1802,3 +1845,14 @@ unresolved. Observation is now bounded at ten minutes within a fifteen-minute
 native envelope. Three timing cases and thirteen durability cases pass locally;
 all matched source/native/package gates rerun. Preview-2 drafts remain private,
 public downloads/website remain unchanged, and the owner's installation is untouched.
+
+## October 3 Handy and current SDK source reconciliation
+
+The Handy branch incorporates approved public main `550e274`, including PR #34's
+SDK alignment. The Windows workflow retains both packaged SDK qualification and
+the Handy/recovery checks; neither is dropped during conflict resolution. Both
+voice-fixture completion observations are retained. Automatic PR qualification
+was blocked by that merge conflict; provisional manual `c9f0363` runs are obsolete.
+The reconciled source must rebuild/qualify all matching downloads before
+publication. Private preview-2 drafts stay withheld; the owner's selected Linux
+release and running dictation are unchanged.

@@ -3,11 +3,13 @@ import {EventEmitter} from 'node:events';
 import {existsSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {durableJson, readPrivateJson} from './storage.js';
+import {serializeWorkspaceContext} from './workspace-context.js';
 
 export type OperationStatus = 'queued' | 'unconfirmed' | 'accepted' | 'completed' | 'failed' | 'interrupted' | 'cancelled';
 export interface Operation {
   id: string;
   input: string;
+  workspaceContext?: string;
   fingerprint: string;
   status: OperationStatus;
   createdAt: number;
@@ -27,7 +29,7 @@ export const queueOperations = (operations: Operation[]): Operation[] => operati
   operation.status === 'failed' && Boolean(operation.wasQueued || operation.steerTurnId) ||
   Boolean(operation.steerTurnId) && operation.status === 'accepted' && !operation.delivered
 ));
-const fingerprint = (input: string) => createHash('sha256').update(input).digest('hex');
+const fingerprint = (input: string, context?: string) => createHash('sha256').update(context === undefined ? input : JSON.stringify([input, context])).digest('hex');
 
 /** Per-thread durable admission ledger. Upstream acknowledgment is never assumed idempotent. */
 export class OperationLedger extends EventEmitter {
@@ -41,7 +43,8 @@ export class OperationLedger extends EventEmitter {
       const ids = new Set<string>();
       for (const operation of data.operations) {
         if (!validId(operation.id) || ids.has(operation.id) || typeof operation.input !== 'string' ||
-          operation.fingerprint !== fingerprint(operation.input) || !['queued', 'unconfirmed', 'accepted', ...TERMINAL].includes(operation.status) ||
+          (operation.workspaceContext !== undefined && (typeof operation.workspaceContext !== 'string' || serializeWorkspaceContext(JSON.parse(operation.workspaceContext)) !== operation.workspaceContext)) ||
+          operation.fingerprint !== fingerprint(operation.input, operation.workspaceContext) || !['queued', 'unconfirmed', 'accepted', ...TERMINAL].includes(operation.status) ||
           (operation.wasQueued !== undefined && typeof operation.wasQueued !== 'boolean') ||
           (operation.delivered !== undefined && typeof operation.delivered !== 'boolean') ||
           (operation.dismissed !== undefined && typeof operation.dismissed !== 'boolean') ||
@@ -70,10 +73,10 @@ export class OperationLedger extends EventEmitter {
     if (!value) throw new Error('Unknown Codex operation.');
     return structuredClone(value);
   }
-  enqueue(id: string, input: string, steerTurnId?: string): {operation: Operation; created: boolean} {
+  enqueue(id: string, input: string, steerTurnId?: string, context?: unknown): {operation: Operation; created: boolean} {
     if (steerTurnId !== undefined && !validId(steerTurnId)) throw new Error('Invalid steering turn identity.');
     if (!validId(id) || typeof input !== 'string' || !input.trim() || input.length > 65536) throw new Error('Invalid Codex submission.');
-    const digest = fingerprint(input);
+    const workspaceContext = serializeWorkspaceContext(context), digest = fingerprint(input, workspaceContext);
     const existing = this.data.operations.find(operation => operation.id === id);
     if (existing) {
       if (existing.fingerprint !== digest || existing.steerTurnId !== steerTurnId) throw new Error('Submission identity was reused for different input.');
@@ -82,7 +85,7 @@ export class OperationLedger extends EventEmitter {
     if (this.data.operations.filter(operation => operation.status === 'queued').length >= 100) throw new Error('Codex input queue is full.');
     const now = Date.now();
     const wasQueued = this.paused || this.data.operations.some(value => ['queued', 'accepted', 'unconfirmed'].includes(value.status));
-    const operation: Operation = {id, input, fingerprint: digest, ...(wasQueued ? {wasQueued: true} : {}), status: steerTurnId ? 'unconfirmed' : 'queued', ...(steerTurnId ? {steerTurnId} : {}), createdAt: now, updatedAt: now};
+    const operation: Operation = {id, input, fingerprint: digest, ...(workspaceContext !== undefined ? {workspaceContext} : {}), ...(wasQueued ? {wasQueued: true} : {}), status: steerTurnId ? 'unconfirmed' : 'queued', ...(steerTurnId ? {steerTurnId} : {}), createdAt: now, updatedAt: now};
     const queue = queueOperations([...this.data.operations, operation]);
     if (queue.length > 100 || Buffer.byteLength(JSON.stringify(queue)) > 512 * 1024) throw new Error('Codex input queue is full. Remove waiting or rejected prompts before adding more.');
     this.commit([...this.data.operations, operation]);

@@ -14,6 +14,7 @@ import {promptEditor} from './prompt-editor.mjs'
 import {supportDialog} from './support.mjs'
 import {attachPageMaintenance, registerMaintenanceState} from './maintenance-page.mjs'
 import {dictationSettings} from './dictation-settings.mjs'
+import {settingsSections} from './workspace-settings.mjs'
 
 const maintenance=attachPageMaintenance({document,runtime:chrome.runtime,busy:()=>checking||mounting>0})
 const send=(type,payload={})=>maintenance.work(()=>chrome.runtime.sendMessage({type,...payload}))
@@ -24,6 +25,9 @@ const button=(parent,label,fn)=>{const b=make('button',label);b.type='button';b.
 let state={},checking=false,closed=false,mounting=0
 const sections=new Map()
 const definitions=[
+  ...(chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol?[
+    ['conversation','Conversation','Choose how responses appear.','M4 4h16v12H9l-5 4z'],
+  ]:[]),
   ['dictation','System dictation','Powered by Handy · Available in every application.','M9 3h6v10H9zM5 10v3a7 7 0 0 0 14 0v-3M12 20v3'],
   ['voice','Voice',chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol?'Optional experimental speech for this application.':'Shared with the floating Augmentor window.','M9 3h6v10H9zM5 10v3a7 7 0 0 0 14 0v-3M12 20v3'],
   ['appearance','Colours','Changes apply immediately.','M12 3a9 9 0 1 0 0 18h1a2 2 0 0 0 1-4 2 2 0 0 1 1-4h2a4 4 0 0 0 4-4c0-3-4-6-9-6ZM7 10h.01M10 6h.01M15 6h.01'],
@@ -34,7 +38,7 @@ const definitions=[
   ['memory','Memories',chrome.runtime.getManifest().augmentorWorkspace?'Dedicated to '+chrome.runtime.getManifest().augmentorWorkspace.name+'.':'Shared across your browser and Linux agents.','M4 5c0-4 16-4 16 0s-16 4-16 0v14c0 4 16 4 16 0V5M4 12c0 4 16 4 16 0'],
   ['support','Support','Version information and a report you can review before sharing.','M12 11v6m0-10v1M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0'],
 ]
-for(const [id,label,description,path] of definitions){
+for(const [id,label,description,path] of settingsSections(definitions,chrome.runtime.getManifest().augmentorWorkspace)){
   const link=make('a');link.href='#'+id;link.id='nav-'+id
   const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');svg.setAttribute('stroke-width','1.6');svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round');svg.setAttribute('aria-hidden','true')
   const shape=document.createElementNS(svg.namespaceURI,'path');shape.setAttribute('d',path);svg.append(shape);link.append(svg,document.createTextNode(label));document.querySelector('nav').append(link)
@@ -44,6 +48,21 @@ for(const [id,label,description,path] of definitions){
   sections.set(id,{section,body,link,mounted:false})
 }
 document.querySelector('#version').textContent='Version '+chrome.runtime.getManifest().version
+function showConversation(container){
+  const card=make('div');card.className='card'
+  card.append(make('h2','Thinking display'),make('p','Choose what you see while the agent is thinking. Thinking always collapses when finished, and you can still expand or collapse it manually.'))
+  const label=make('label','While thinking'),select=make('select');select.setAttribute('aria-label','While thinking')
+  for(const [value,text] of [['open','Open — show live thinking'],['collapsed','Collapsed']]){const option=make('option',text);option.value=value;select.append(option)}
+  const sync=()=>{select.value=readAppearance().expandThinking===false?'collapsed':'open'};sync()
+  const note=make('p','Saves immediately for this application workspace.');note.className='help';note.setAttribute('role','status')
+  select.onchange=async()=>{
+    select.disabled=true
+    try{await saveAppearance({...readAppearance(),expandThinking:select.value==='open'});note.textContent='Saved for this application workspace.'}
+    catch(error){sync();fail(error)}
+    finally{select.disabled=false}
+  }
+  label.append(select);card.append(label,note);container.append(card);watchAppearance(sync)
+}
 async function appearance(container){
   await refreshDesktopAppearance()
   const theme=make('div');theme.className='card';theme.append(make('h2','Theme'));const choices=make('div');choices.className='theme-choices';theme.append(choices)
@@ -64,7 +83,7 @@ async function appearance(container){
   }
   const preview=make('div');preview.className='card';preview.append(make('h2','Preview'));const sample=make('div');sample.className='preview'
   const user=make('p','Help me make this clearer.');user.className='sample-user';const reply=make('div');reply.className='sample-agent';reply.append(make('strong','Augmentor'),make('p','A little less clutter. More room for your ideas.'));sample.append(user,reply);preview.append(sample)
-  const note=make('p','Shared with the floating window. The accent also colours browser actions.');note.className='help';colours.append(note)
+  const note=make('p',chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol?'Saved for this application workspace.':'Shared with the floating window. The accent also colours browser actions.');note.className='help';colours.append(note)
   container.append(theme,colours,format,preview);button(container,'Reset colours',async()=>{await saveAppearance(resetAppearance());sync()})
   function sync(){const values=readAppearance();for(const [key,input] of formatControls)input.value=values.formatColours[key]||formattingDefaults(values.theme)[key];for(const [key,{input,out}] of controls){input.value=values[key];out.value=String(values[key])}for(const [id,b] of Object.entries(themeButtons))b.setAttribute('aria-pressed',String(values.theme===id))}
   watchAppearance(sync)
@@ -72,6 +91,10 @@ async function appearance(container){
 function advanced(parent,label){const detail=make('details');detail.className='advanced';detail.append(make('summary',label));const body=make('div');body.className='advanced-body';detail.append(body);parent.append(detail);return body}
 function showModels(container){
   const active=make('p');active.id='active-model';container.append(active)
+  if(chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol){
+    container.append(make('p','Choose an available model from the chat model picker. Manage model connections in standalone Augmentor.'))
+    container.update=()=>{active.textContent='Current model: '+(state.model?.model||'Not connected')};container.update();return
+  }
   const pi=make('div');pi.id='pi-model-settings';const dsh=make('div');dsh.id='dsh-model-settings';dsh.className='card';dsh.append(make('h2','DeepSeek Harness models'),make('p','DSH manages its model providers. Add or edit them in DSH, then refresh the model picker in Augmentor.'))
   button(dsh,'Open DSH model settings',async()=>{const r=await send('promptSettings');if(!r.ok)throw Error(r.error)})
   const codex=make('div');codex.id='codex-model-settings'
@@ -94,6 +117,16 @@ function showHarnesses(container){
   container.update=()=>{select.value=state.harness||'';select.disabled=!!state.running};container.update()
 }
 function showMemory(container){
+  if(chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol){
+    container.append(make('p','Memory belongs to this application workspace. Configure the shared memory service in standalone Augmentor.'))
+    const context=make('pre');context.style.whiteSpace='pre-wrap';container.append(context)
+    if(!state.sessionId){context.textContent='Open an application conversation to inspect its remembered context.';return}
+    void send('memory',{request:{action:'dual.recall',session:state.harness+':'+state.sessionId}}).then(reply=>{
+      if(!reply?.ok)throw Error(reply?.error||'Remembered context is unavailable')
+      context.textContent=['relationship','work'].map(kind=>kind+': '+(reply.result?.[kind]?.summary||'No distilled picture yet.')).join('\n\n')
+    }).catch(error=>{context.textContent=error.message})
+    return
+  }
   if(chrome.runtime.getManifest().augmentorWorkspace){memoryDialog(document,send,()=>({surface:'browser',harness:state.harness,...(state.sessionId?{sessionId:state.sessionId}:{})}),container);return}
 
   const card=make('div');card.className='card onboarding-card';card.append(make('h2','Let Augmentor set up memory'),make('p','Start a guided conversation. Augmentor checks your computer and handles the setup, asking only for missing choices or credentials.'))
@@ -143,14 +176,17 @@ function mount(id){
   }
   row.body.replaceChildren();row.mounted=true
   const mountAsync=async fn=>{mounting++;try{await fn()}catch(e){fail(e)}finally{mounting--}}
+  if(id==='conversation')showConversation(row.body)
   if(id==='appearance')void mountAsync(()=>appearance(row.body))
   if(id==='models')showModels(row.body)
   if(id==='harnesses')showHarnesses(row.body)
-  if(id==='prompts')promptEditor(document,async request=>{const r=await send('prompts',{request});if(!r?.ok)throw Error(r?.error||'Prompt library unavailable');return r.library},()=>{},row.body)
+  if(id==='prompts'){
+    if(chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol)row.body.append(make('p','Use saved prompts through / in the chat. Manage the shared prompt library in standalone Augmentor.'))
+    else promptEditor(document,async request=>{const r=await send('prompts',{request});if(!r?.ok)throw Error(r?.error||'Prompt library unavailable');return r.library},()=>{},row.body)
+  }
   if(id==='home')homeSettings(document,send,row.body)
   if(id==='memory')showMemory(row.body)
   if(id==='voice')void mountAsync(()=>showVoice(row.body))
-  if(id==='voice')void showVoice(row.body).catch(fail)
   if(id==='dictation')void dictationSettings(row.body,send).catch(fail)
   if(id==='support'){
     const version=make('div');version.className='card';version.append(make('h2','Augmentor '+chrome.runtime.getManifest().version),make('p','This preview is updated with the Augmentor installer. The companion and extension must use matching versions.'));row.body.append(version)
@@ -158,7 +194,7 @@ function mount(id){
   }
 }
 function navigate(){
-  const id=sections.has(location.hash.slice(1))?location.hash.slice(1):'appearance'
+  const id=sections.has(location.hash.slice(1))?location.hash.slice(1):sections.has('conversation')?'conversation':'appearance'
   for(const [key,row] of sections){row.section.hidden=key!==id;if(key===id)row.link.setAttribute('aria-current','page');else row.link.removeAttribute('aria-current')}
   mount(id)
 }

@@ -69,7 +69,7 @@ const queue=createQueue({container:document.getElementById('prompt-queue'),input
 const voice=attachVoice({send,onError:message=>ui.sendFail(message),isHistory:()=>!!viewSessionId})
 attachPromptLibrary({input:document.getElementById('input'),send})
 import {watchAppearance,refreshDesktopAppearance} from './appearance.mjs'
-watchAppearance()
+watchAppearance(value=>{if(chrome.runtime.getManifest?.().augmentorWorkspace?.sdkProtocol)ui.setThinkingPreference(value.expandThinking)})
 void refreshDesktopAppearance().catch(()=>{})
 const appearanceTimer=setInterval(()=>{if(!maintenance.paused)void refreshDesktopAppearance().catch(()=>{})},15000)
 window.addEventListener('pagehide',()=>clearInterval(appearanceTimer),{once:true})

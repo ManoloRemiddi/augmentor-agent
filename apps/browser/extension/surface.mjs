@@ -4,6 +4,11 @@ import {startLetterRoll} from './prompt-animation.mjs'
 // Window controls and the composer use the floating window's positions and glyphs.
 export function attachSurface({send,openSettings,onError,approval,state}){
   const $=id=>document.getElementById(id),input=$('input'),improve=$('improve'),menu=$('more-menu'),more=$('more')
+  const appWorkspace=chrome.runtime.getManifest?.().augmentorWorkspace?.sdkProtocol
+  if(appWorkspace){
+    improve.hidden=true
+    menu.querySelectorAll('[data-section]').forEach(button=>{if(['dictation','harnesses','home','support'].includes(button.dataset.section))button.hidden=true})
+  }
   for(const [key,glyph] of Object.entries(SURFACE.glyphs)){const id=key==='latest'?'top':key;if($(id))$(id).textContent=glyph}
   // The native plus glyph depends on OS font fallback; use a matching vector.
   for(const [id,path] of [['newchat','M8 3v10M3 8h10']]){
@@ -47,6 +52,7 @@ export function attachSurface({send,openSettings,onError,approval,state}){
   input.addEventListener('input',()=>{cancelImprovement();undo=null;fit();controls()})
   new MutationObserver(fit).observe(input,{attributes:true,attributeFilter:['disabled']})
   improve.onclick=async()=>{
+    if(appWorkspace)return
     if(improving){cancelImprovement();controls();return}
     if(undo!==null){input.value=undo;undo=null;void remember();fit();controls();return}
     const original=input.value,id=++epoch;improving=true;roll=startLetterRoll(input);controls();announce('Improving prompt…')

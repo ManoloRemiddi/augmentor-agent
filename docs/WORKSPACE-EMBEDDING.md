@@ -92,3 +92,10 @@ host, interaction, branching, execution recovery and memory lifecycle tests are
 retained. Tests use fixture models unless explicitly identified as live.
 Deployment and actual conversation evidence is recorded below after cutover;
 source tests alone do not claim an installed update or a physical sleep trial.
+
+## October SDK alignment source
+
+See [SDK alignment](SDK-ALIGNMENT.md) for the newer negotiated feature contract,
+experimental Codex workspaces, platform startup/private credentials and
+shared-settings restrictions. Earlier DSH/Linux qualification remains historical
+evidence for the deployed baseline; it does not qualify these source extensions.

@@ -5,14 +5,19 @@
 // Web host for the one Browser surface. All chat/voice/branch/settings behavior
 // stays in extension modules; this module supplies the host's platform APIs.
 const base=new URL('./',location.href)
+import {snapshotWorkspaceContext} from './workspace-context.mjs'
+import {restoreWorkspaceAppearance} from './workspace-settings.mjs'
 async function api(path,value){const res=await fetch(new URL(path,base),{method:value?'POST':'GET',headers:value?{'Content-Type':'application/json'}:{},body:value?JSON.stringify(value):undefined,signal:AbortSignal.timeout(8000)});const data=await res.json();if(!res.ok)throw Error(data.error||'Augmentor unavailable');return data}
 const profile=await api('config.json')
+if(profile.sdkProtocol){
+ restoreWorkspaceAppearance(localStorage,profile,await api('preferences'))
+}
 const eventSet=()=>{const listeners=new Set();return {addListener:f=>listeners.add(f),removeListener:f=>listeners.delete(f),emit:(...args)=>{for(const f of listeners)f(...args)}}}
 const runtimeEvents=eventSet(),storageEvents=eventSet();let handler,closed=false,workspaceContext=null
 const tell=value=>parent.postMessage(value,profile.parentOrigin)
-window.addEventListener('message',event=>{if(event.origin!==profile.parentOrigin||event.source!==parent||event.data?.type!=='augmentor-context')return;const value=event.data.context;if(value&&typeof value==='object'&&JSON.stringify(value).length<=16000)workspaceContext=value})
+window.addEventListener('message',event=>{if(event.origin!==profile.parentOrigin||event.source!==parent||event.data?.type!=='augmentor-context')return;try{workspaceContext=snapshotWorkspaceContext(event.data.context)}catch{workspaceContext=null}})
 function storageArea(session=false){
- const key='augmentor-embed:'+profile.id,read=()=>session?Promise.resolve(JSON.parse(sessionStorage.getItem(key)||'{}')):api('preferences')
+ const key='augmentor-embed:'+profile.id,read=async()=>{const value=session?JSON.parse(sessionStorage.getItem(key)||'{}'):await api('preferences');return session?value:{...value,'augmentor-harness':profile.harness}}
  let writes=Promise.resolve()
  const write=update=>writes=writes.catch(()=>{}).then(async()=>{const before=await read();let after;if(session){after={...before,...update.set};for(const k of update.remove||[])delete after[k];sessionStorage.setItem(key,JSON.stringify(after))}else after=await api('preferences',update);const changes={};for(const k of new Set([...Object.keys(before),...Object.keys(after)]))if(JSON.stringify(before[k])!==JSON.stringify(after[k]))changes[k]={oldValue:before[k],newValue:after[k]};storageEvents.emit(changes,session?'session':'local')})
  return {get(keys,callback){const p=read().then(value=>keys==null?value:Object.fromEntries((typeof keys==='string'?[keys]:Array.isArray(keys)?keys:Object.keys(keys)).map(k=>[k,value[k]??(typeof keys==='object'&&!Array.isArray(keys)?keys[k]:undefined)])));if(callback)p.then(callback).catch(()=>callback({}));return p},set(value,callback){const p=write({set:value});if(callback)p.then(callback);return p},remove(keys,callback){const p=write({remove:Array.isArray(keys)?keys:[keys]});if(callback)p.then(callback);return p}}
@@ -29,8 +34,8 @@ function connectNative(){
  return {onMessage,onDisconnect,disconnect,postMessage(frame){if(frame.method==='session.prompt'&&workspaceContext)frame={...frame,params:{...frame.params,workspaceContext}};const data=JSON.stringify(frame);if(socket.readyState===WebSocket.OPEN)socket.send(data);else if(socket.readyState===WebSocket.CONNECTING&&frame.method==='augmentor/handshake')queue.push(data);else throw Error('Augmentor connection interrupted; prompt was not replayed')}}
 }
 function openTab({url}){const target=new URL(url,base);if(target.origin===base.origin&&target.pathname===base.pathname+'settings.html'){tell({type:'augmentor-settings',url:target.href});return Promise.resolve({id:1,windowId:1,url})}window.open(target.href,'_blank','noopener');return Promise.resolve({id:2,windowId:1,url})}
-globalThis.chrome={runtime:{id:'augmentor-embedded',getURL:path=>new URL(path,base).href,getManifest:()=>({version:profile.version,augmentorWorkspace:{id:profile.id,name:profile.name,sdkProtocol:profile.sdkProtocol}}),connectNative,onMessage:runtimeEvents,sendMessage(message){
- if(message.type==='harness/select'&&message.harness!==profile.harness)return Promise.resolve({ok:false,error:'This workspace uses its configured DSH specialist.'})
+globalThis.chrome={runtime:{id:'augmentor-embedded',getURL:path=>new URL(path,base).href,getManifest:()=>({version:profile.version,augmentorWorkspace:{id:profile.id,name:profile.name,sdkProtocol:profile.sdkProtocol,capabilities:profile.capabilities}}),connectNative,onMessage:runtimeEvents,sendMessage(message){
+ if(message.type==='harness/select'&&message.harness!==profile.harness)return Promise.resolve({ok:false,error:'This workspace uses its registered harness.'})
  if(profile.sdkProtocol&&message.type==='voice/preferences'&&!profile.voice.enabled)return Promise.resolve({ok:true,result:{enabled:false,mode:'push-to-talk'}})
  if(profile.sdkProtocol&&message.type==='voice/start'&&!profile.voice.enabled)return Promise.resolve({ok:false,error:'Experimental voice is disabled for this workspace.'})
  if(['evt','voice/event'].includes(message.type)){runtimeEvents.emit(message);if(message.type==='evt')tell({type:'augmentor-status',online:message.phase==='ready',busy:message.running});return Promise.resolve()}
