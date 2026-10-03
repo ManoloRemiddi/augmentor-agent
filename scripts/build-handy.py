@@ -23,6 +23,40 @@ import zipfile
 
 ROOT=Path(__file__).resolve().parents[1]
 
+def native_build_environment():
+    env=dict(os.environ)
+    if sys.platform!='win32' or platform.machine()!='ARM64':return env
+    # ggml's ARM core requires Clang. Keep the MSVC ABI/Rust target, but build
+    # its C/C++ library with the installed Visual Studio Clang and ARM SDK.
+    vswhere=Path(os.environ['ProgramFiles(x86)'])/'Microsoft Visual Studio/Installer/vswhere.exe'
+    installation=subprocess.check_output([str(vswhere),'-latest','-products','*','-property','installationPath'],text=True).strip()
+    if not installation:raise ValueError('The ARM64 builder needs Visual Studio C++ tools.')
+    vendor=Path(installation)
+    command='call "'+str(vendor/'Common7/Tools/VsDevCmd.bat')+'" -arch=arm64 -host_arch=arm64 >nul && set'
+    # Pass cmd's exact quoting rather than list2cmdline's C-runtime quote escapes;
+    # VsDevCmd lives under Program Files and cmd does not interpret \" that way.
+    setup=subprocess.run('cmd.exe /d /s /c "'+command+'"',text=True,env=env,
+                         stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+    if setup.returncode:
+        messages=[line for line in setup.stdout.splitlines() if '[ERROR' in line or 'not recognized' in line]
+        raise ValueError('Native ARM SDK setup failed: '+'; '.join(messages)[-1000:])
+    variables=setup.stdout
+    for line in variables.splitlines():
+        name,separator,value=line.partition('=')
+        if separator and name.upper() in ('PATH','LIB','LIBPATH','INCLUDE'):
+            env[name.upper()]=value
+    clang=next((path for path in [Path(os.environ['ProgramFiles'])/'LLVM/bin/clang-cl.exe',
+                  vendor/'VC/Tools/Llvm/ARM64/bin/clang-cl.exe',vendor/'VC/Tools/Llvm/x64/bin/clang-cl.exe',
+                  vendor/'VC/Tools/Llvm/bin/clang-cl.exe'] if path.is_file()),None)
+    ninja=shutil.which('ninja',path=env.get('PATH'))
+    if not ninja:
+        candidate=vendor/'Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe'
+        if candidate.is_file():ninja=str(candidate)
+    if clang is None or not ninja:raise ValueError('The ARM64 builder needs installed Clang and Ninja.')
+    env['PATH']=str(clang.parent)+os.pathsep+str(Path(ninja).parent)+os.pathsep+env['PATH']
+    env.update(CC=str(clang),CXX=str(clang),CMAKE_GENERATOR='Ninja')
+    return env
+
 def sha(file):
     with file.open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
 
@@ -184,9 +218,17 @@ def stage(source,output,metadata,cargo_home=None):
             if file.suffix=='.dylib':run(['install_name_tool','-id','@rpath/'+file.name,str(file)],output)
     notices(source,metadata,output,cargo_home)
     if sys.platform.startswith('linux'):helper(output)
+    windows_runtime=None
+    if sys.platform=='win32':
+        spec=importlib.util.spec_from_file_location('windows_supplier',ROOT/'scripts/stage-handy-windows-runtime.py')
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        windows_runtime=module.stage(output)
     record={'schema':'augmentor-handy-build/1','target':sys.platform+'-'+platform.machine(),'upstream':json.loads((ROOT/'components/handy/upstream.json').read_text(encoding='utf-8')),
         'patchSha256':sha(ROOT/'components/handy/augmentor.patch'),'embeddedSources':{name:sha(ROOT/'components/handy'/name) for name in ('embedding.rs','AugmentorOverlay.tsx')},
         'onnxruntime':item,'buildInputs':{name:sha(ROOT/name) for name in ('scripts/build-handy.py','scripts/prepare-handy.py','components/handy/onnxruntime.json','components/handy/ydotool.json','components/handy/silero.json','components/handy/notice-supplements.json')},'files':{file.relative_to(output).as_posix():sha(file) for file in sorted(output.rglob('*')) if file.is_file()},'modelsBundled':False}
+    if windows_runtime:
+        record['windowsRuntime']=windows_runtime
+        record['buildInputs'].update({name:sha(ROOT/name) for name in ('scripts/stage-handy-windows-runtime.py','components/handy/webview2.json','components/handy/licenses/WebView2-fixed.txt','components/handy/visual-c-runtime.json','components/handy/licenses/Visual-C-runtime.txt')})
     (output/'BUILD.json').write_text(json.dumps(record,indent=2)+'\n')
     print(output)
 
@@ -203,7 +245,11 @@ if __name__=='__main__':
         cmake_args='-DGGML_NATIVE=OFF'+(' -DTRANSCRIBE_VULKAN=OFF -DGGML_VULKAN=OFF' if os.name=='nt' else '')
         if os.environ.get('GITHUB_ENV'):
             with open(os.environ['GITHUB_ENV'],'a') as ci:ci.write('ORT_LIB_LOCATION='+str(ort/'lib')+'\nORT_PREFER_DYNAMIC_LINK=1\nTRANSCRIBE_CMAKE_ARGS='+cmake_args+'\n')
-        env={**os.environ,'ORT_LIB_LOCATION':str(ort/'lib'),'ORT_PREFER_DYNAMIC_LINK':'1','CARGO_BUILD_JOBS':'2','TRANSCRIBE_CMAKE_ARGS':cmake_args}
+        env={**native_build_environment(),'ORT_LIB_LOCATION':str(ort/'lib'),'ORT_PREFER_DYNAMIC_LINK':'1','CARGO_BUILD_JOBS':'2','TRANSCRIBE_CMAKE_ARGS':cmake_args}
+        if os.environ.get('GITHUB_ENV') and sys.platform=='win32' and platform.machine()=='ARM64':
+            with open(os.environ['GITHUB_ENV'],'a') as ci:
+                for name in ('PATH','LIB','LIBPATH','INCLUDE','CC','CXX','CMAKE_GENERATOR'):
+                    if name in env:ci.write(name+'='+env[name]+'\n')
         subprocess.run(['cargo','build','--release','--locked','--features','tauri/custom-protocol'],cwd=source/'src-tauri',env=env,check=True)
     metadata=json.loads(args.metadata.read_text(encoding='utf-8')) if args.metadata else json.loads(subprocess.check_output(['cargo','metadata','--locked','--features','tauri/custom-protocol','--format-version','1','--filter-platform',subprocess.check_output(['rustc','-vV'],text=True).split('host: ')[1].splitlines()[0]],cwd=source/'src-tauri'))
     stage(source,args.out.resolve(),metadata,args.cargo_home)

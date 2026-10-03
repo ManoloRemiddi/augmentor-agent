@@ -1189,3 +1189,62 @@ different target. The remaining sequence is:
 This is unfinished implementation work, not a completed rollback contract. Reuse
 shared lifecycle classes and the retained installer's runtime; do not introduce
 another conversational core or a force flag that bypasses the unresolved record.
+
+## October 3 complete-payload recovery observation
+
+At source `9661eef`, [native run 37123469484](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37123469484)
+passes all x64 installation/repair/removal scenarios. ARM64 passes initial install,
+strict inventory, draft refusal, repair, coordinated same-build replacement and
+independent health, then fails at the source-restoration observer's five-minute
+installer deadline. Its retained inner Setup log proves installation succeeded
+about 26 seconds after observation expired; this is a timeout policy mismatch for
+the larger bundled payload, rather than evidence of failed file installation.
+The original recovery remains unresolved because its required verification and
+journal completion did not run. Those gates must still succeed.
+
+Source installation now has a bounded ten-minute observation. The native outer
+observer permits fifteen minutes, including admission and independent verification/
+health; the full proof allows twenty minutes for outer extraction and observation.
+Both architectures share these bounds. Expiry preserves independent Setup and
+recovery records; no replay, process termination, success-on-timeout or relaxed
+inventory/health assertion is introduced. Three clock-driven tests cover actual
+completion after the former limit, bounded unknown outcome and terminal failure.
+All thirteen existing source-restoration durability cases still pass locally.
+Native whole-application proofs and matched customer downloads must rerun before
+publication. The owner's installed Linux application is untouched.
+
+## October 3 native rejected-update dialog cleanup
+
+The x64 installer fixture fails twice (`c9f0363` and `901fab9`) after rejecting
+signed metadata for the wrong CPU. Its closed progress report confirms
+`callbackFailed: true`, `downloadHandled: false`; no completion result is
+published because native cleanup hangs. ARM64 passes. The pinned
+[WinSparkle 0.9.4 UI source](https://github.com/vslavik/winsparkle/blob/v0.9.4/src/ui.cpp#L645)
+shows that a rejected installer callback opens an OK-only modal warning. The
+fixture previously sent WM_CLOSE to all its windows before cleanup, including
+the parent behind that warning.
+
+The disposable fixture now acknowledges its own enabled, visible native modal
+dialog with IDOK before closing its parent, and keeps a bounded observer active
+while native cleanup joins the UI thread. It retains class/action observations;
+it never targets other processes or changes product update behavior. Rejection,
+private-cache integrity, native cleanup and process-exit assertions remain
+mandatory in the next x64/ARM64 run. Publication remains pending.
+
+The first native follow-up (`6b82cdf`) hangs earlier, on x64 busy-work refusal;
+its closed progress confirms `canShutdown: false`, `downloadHandled: false`.
+Direct IDOK messaging is insufficient for that native warning too. [wxWidgets' native task-dialog implementation](https://github.com/wxWidgets/wxWidgets/blob/v3.2.6/src/msw/msgdlg.cpp#L677)
+can present an OK-only warning with a button internally identified as IDCANCEL.
+The fixture now finds and clicks its actual OK/Cancel button using BM_CLICK,
+retaining class/action observations before cleanup completes as well as after.
+This is an upstream-grounded correction, pending real x64/ARM64 confirmation;
+it does not relabel the earlier rejection-only observation as a completed test.
+
+At `d82a721`, actual-button clicking completes the busy-work warning on x64:
+its final progress records `button-2`. The later wrong-CPU rejection still hangs,
+with 190 retained observations of a native `#32770` warning exposing neither
+IDOK nor IDCANCEL through GetDlgItem. The fixture now uses the documented
+[TDM_CLICK_BUTTON API](https://learn.microsoft.com/en-us/windows/win32/controls/tdm-click-button)
+with wxWidgets' logical IDCANCEL identifier when that native task dialog has no
+ordinary button handle. Ordinary warnings retain the proved actual-button path.
+Rejection and full native cleanup still require fresh hosted confirmation.

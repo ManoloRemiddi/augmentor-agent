@@ -24,6 +24,8 @@ class PackageTests(unittest.TestCase):
                      'scripts/windows-recover-source.py','services/lifecycle/source_restoration.py',
                      'services/lifecycle/payload_integrity.py','services/lifecycle/recovery_source.py',
                      'services/lifecycle/health_report.py',
+                     'components/handy/runtime/bin/handy.exe','components/handy/runtime/BUILD.json',
+                     'licenses/Windows-installation-terms.txt',
                      'services/lifecycle/update_journal.py','services/platform_adapters/private_files.py',
                      'services/platform_adapters/locks.py'):
             path=self.root/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_text('fixture')
@@ -52,6 +54,10 @@ class PackageTests(unittest.TestCase):
     def test_partial_payload_refuses_before_build(self):
         (self.root/'node/node.exe').unlink()
         with self.assertRaisesRegex(ValueError,'Incomplete'):package.candidate(self.root,'arm64')
+
+    def test_dictation_is_a_required_part_of_complete_windows_payload(self):
+        (self.root/'components/handy/runtime/bin/handy.exe').unlink()
+        with self.assertRaisesRegex(ValueError,'Incomplete.*handy.exe'):package.candidate(self.root,'arm64')
 
     def test_changed_or_extra_build_files_cannot_silently_reseal(self):
         (self.root/'node/node.exe').write_text('changed')

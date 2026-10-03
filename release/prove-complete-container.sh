@@ -3,9 +3,15 @@
 set -euo pipefail
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
-apt-get install -y --no-install-recommends ca-certificates npm python3-venv libportaudio2 /bundle/augmentor-runtime_*_amd64.deb /bundle/augmentor-desktop_*_amd64.deb
+apt-get install -y --no-install-recommends ca-certificates npm python3-venv libportaudio2 xvfb xauth dbus /bundle/augmentor-runtime_*_amd64.deb /bundle/augmentor-desktop_*_amd64.deb
 useradd -m -s /bin/bash reviewer
 install -d -m 700 -o reviewer -g reviewer /tmp/augmentor-reviewer-runtime
+# Exercise the actual installed native component as this fresh user. The
+# virtual display and component proof use temporary settings, no microphone,
+# no transcription model and no pre-existing Handy installation.
+runuser -u reviewer -- env -u WAYLAND_DISPLAY XDG_RUNTIME_DIR=/tmp/augmentor-reviewer-runtime XDG_SESSION_TYPE=x11 \
+  dbus-run-session -- xvfb-run -a /usr/bin/python3 /usr/lib/augmentor/scripts/proof-handy-component.py \
+  --runtime /usr/lib/augmentor/components/handy/runtime
 runuser -u reviewer -- env XDG_RUNTIME_DIR=/tmp/augmentor-reviewer-runtime QT_QPA_PLATFORM=offscreen AUGMENTOR_FIXTURE_KEY=fixture \
   /usr/bin/python3 /bundle/setup.py --bundle /bundle --skip-packages --no-services --non-interactive \
   --model-url http://127.0.0.1:9/v1 --model fixture --api-key-env AUGMENTOR_FIXTURE_KEY

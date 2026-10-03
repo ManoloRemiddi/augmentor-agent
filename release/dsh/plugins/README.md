@@ -23,7 +23,9 @@ Adaptive Reasoning source is `64a1ef82e3d69f57a69809d530c1b9ed0bc67480` in
 Voice 0.1.19 is an unmodified `npm pack --ignore-scripts` candidate from source
 `7d0fd6d677ea4bbbca0183a6bb3a3d3f24a8147a` (branch `feat/windows-config`, PR #2) in
 [its own repository](https://github.com/ManoloRemiddi/resonant-voice).
-The complete release retains corresponding source archives. Model Picker ships
+The complete release retains the distributed plugins' corresponding source
+archives and labels their scope/digest; external service repositories are separate.
+No CI job fetches private dependency repositories. Model Picker ships
 its JavaScript and MIT notice. Continue maintaining these dependencies in their
 own repositories; update the archives and shared lock deliberately together.
 

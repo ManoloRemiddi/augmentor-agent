@@ -1731,3 +1731,12 @@ The owner authorized removing the private speech-source test archive while
 preserving Augmentor and Codex work. See [cleanup and current test boundaries](CODEX-SOURCE-CLEANUP.md). The adapter remains intact; the current public
 voice tests use an independently authored scripted protocol peer. Earlier
 service-source tests above are historical evidence, not current CI coverage.
+
+## October 3 browser voice fixture synchronization
+
+The actual pinned browser voice fixture can receive PCM before the model turn
+and durable operation queue finish. It now waits for the one operation's terminal
+completed receipt before closing voice and shutting down the fixture. Exact
+request identity, one provider request, PCM delivery and completed status assertions
+remain unchanged. This corrects test ordering only; it changes no installed voice
+or runtime behavior. The failure is recorded in hosted run 37119919501.

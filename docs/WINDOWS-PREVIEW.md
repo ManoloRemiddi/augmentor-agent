@@ -2,7 +2,12 @@
 
 # Augmentor Agent for Windows — 0.2.13 preview
 
-First public Windows preview. Windows 11 **25H2 or later**, build 26200 or later.
+The Handy preview 2 candidate includes native x64/ARM64 dictation and its bundled
+browser/runtime. It is being qualified before publication; preview 1 downloads
+remain historical and do not include Handy. See [the preparation and exact
+evidence](HANDY-INTEGRATION.md#october-3-alignment-and-matched-downloads).
+
+Windows preview 2. Windows 11 **25H2 or later**, build 26200 or later.
 Choose **x64** for Intel/AMD PCs or **ARM64** for Windows on ARM.
 Find your processor type in Settings → System → About → System type.
 Windows 10 and Windows 11 24H2 are not supported by this installer.
@@ -13,7 +18,7 @@ RTX Spark hardware has not been tested; ARM64 compatibility is not hardware cert
 This preview is **unsigned**. Windows may warn about an unknown publisher or block
 it under Smart App Control or your organisation's security policy. Only download
 from [augmentoragent.com](https://augmentoragent.com/#windows-download) or the
-[official release](https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/v0.2.13-windows-preview.1).
+[official release](https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/v0.2.13-windows-preview.2).
 If SmartScreen offers **More info → Run anyway**, proceeding is your decision after
 checking the source and checksum. If Windows policy blocks it, wait for a signed
 release. Do not turn off Defender, Smart App Control or organisational protections.
@@ -44,6 +49,20 @@ release. Do not turn off Defender, Smart App Control or organisational protectio
    shortcut is **Ctrl + Alt + Shift + Space**. Change shortcuts in settings if
    another application uses them. Appearance → App size adjusts the entire UI.
 
+## Dictate into other applications
+
+Open Settings → **System dictation · Powered by Handy**. Turn on system dictation,
+choose a transcription model, review its linked terms and download it. Model files
+are separate downloads stored on your computer. Choose the microphone if needed.
+Hold **Ctrl + Space** while speaking; release to transcribe into the focused
+application. Escape or **×** cancels. You can change the shortcut or choose
+press-to-start/stop in the same settings. You can turn dictation off at any time.
+
+The recording pill uses Augmentor's colours and animated circle. No separate
+Handy installation or Handy tray is needed. Physical microphone and typing into
+other Windows applications still need acceptance on your machine. Administrator
+applications may restrict input from an ordinary-user application.
+
 ## Preview limits and updates
 
 The preview focuses on the shared desktop, DSH setup/chat and Chromium companion.
@@ -52,21 +71,22 @@ Windows runner evidence. **Physical PC acceptance starts with this public downlo
 we do not claim RTX Spark testing, every browser/provider, or complete OS parity.
 
 Automatic update notifications and one-click updates are **not enabled**. Do not
-install a different version over this one: cross-version manual upgrades are not
-implemented. Future releases must supply a supported upgrade procedure. To repair
-this exact build, first finish active tasks and close all Augmentor windows/browser
-work, then use Installed apps → Augmentor Agent → Modify or rerun this same installer.
+install a different build over this one, including preview 2 over preview 1:
+manual upgrades are not implemented. Future releases must supply a supported upgrade procedure. To repair
+this exact build, first finish active tasks, turn off System dictation in Settings,
+and close all Augmentor windows/browser work, then use Installed apps → Augmentor Agent → Modify or rerun this same installer.
 Do not delete conversations or settings to bypass a refused repair.
 
 Local voice and memory engine provisioning, desktop automation, Pi and Codex
-integration are not qualified for Windows. Handy dictation is not bundled in this preview. The source contains shared controls and
-adapters; their presence does not establish that those features are ready here.
+integration are not qualified for Windows. Handy dictation is bundled with its native runtime; physical transcription
+acceptance is separate from the automated lifecycle checks. The source contains
+other shared controls and adapters whose presence does not establish readiness.
 No account from the developer's machines is included.
 
 ## Remove or report a problem
 
 Use Settings → Apps → Installed apps → Augmentor Agent → Uninstall. Finish active
-work and close Augmentor first. App removal retains conversations and settings.
+work, turn off System dictation in Settings, and close Augmentor first. App removal retains conversations and settings.
 Personal data is stored under `%LOCALAPPDATA%\Augmentor`; installed program files
 are under `%LOCALAPPDATA%\Programs\Augmentor Agent`. Do not manually remove data
 unless you intend to erase it. Repair/recovery copies also consume disk space.

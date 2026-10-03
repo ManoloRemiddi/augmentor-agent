@@ -3,16 +3,17 @@
 # Install Desktop, Browser and their shared components
 
 This complete preview targets **Debian 13, x86-64**. Desktop-control acceptance
-is scoped to KDE Plasma Wayland. macOS is the next compatibility phase; this
-Linux installer does not establish macOS or Fedora feature parity.
+is scoped to KDE Plasma Wayland. Mac and Windows use their own
+platform installers; this Linux installer does not establish Fedora feature parity.
 
 The active project is [augmentor-agent](https://github.com/ManoloRemiddi/augmentor-agent).
-The current downloadable preview is the **0.2.13 browser reliability preview**:
-[download the archive](https://github.com/ManoloRemiddi/augmentor-agent/releases/download/v0.2.13-complete-preview.1/augmentor-0.2.13-complete-preview.1.tar.gz),
-[verify SHA256SUMS](https://github.com/ManoloRemiddi/augmentor-agent/releases/download/v0.2.13-complete-preview.1/SHA256SUMS),
-and read its [release record](https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/v0.2.13-complete-preview.1).
+This guide describes the **0.2.13 Handy preview 2** candidate being qualified.
+After publication, use these matching assets:
+[download the archive](https://github.com/ManoloRemiddi/augmentor-agent/releases/download/v0.2.13-complete-preview.2/augmentor-0.2.13-complete-preview.2.tar.gz),
+[verify SHA256SUMS](https://github.com/ManoloRemiddi/augmentor-agent/releases/download/v0.2.13-complete-preview.2/SHA256SUMS),
+and read its [release record](https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/v0.2.13-complete-preview.2).
 This release fixes the WebSocket receiver vulnerability. See the
-[flare correction and upgrade guidance](RELEASE-0.2.13.md).
+[browser reliability and upgrade guidance](RELEASE-0.2.13.md).
 Extract the verified archive and open a terminal in its folder:
 
 ```sh
@@ -35,12 +36,14 @@ and Python packages. Do not run the whole script as root.
 ## Included and configured
 
 - Matching Augmentor Desktop and Chromium Browser 0.2.13 surfaces and companion.
+- System dictation powered by Handy, with its bundled runtime and no separate
+  Handy installation or tray. Transcription models download separately.
 - Pinned DSH 0.1.5-rc.1, with its own fresh data directory and a managed user service.
 - Product, desktop-tools, browser-tools, prompt-library, dual-memory, context-budget and execution-recovery adapters.
   Execution recovery is enabled once in both Augmentor presets; no separate plugin installation is needed.
   It bounds empty/truncated-response recovery, preserves Stop and user handoffs, and prevents
   exact duplicate changes during recovery. It does not certify that a model answer is correct.
-- Model Picker Augmented 1.1.2, Adaptive Reasoning 0.2.3 and Resonant Voice 0.1.16.
+- Model Picker Augmented 1.1.2, Adaptive Reasoning 0.2.3 and Resonant Voice 0.1.19.
 - Desktop login startup, connection recovery, consistent release selection and
   a separate second-window menu entry. On KDE, available defaults are
   **Super+Alt+Space** for the main window and **Super+Alt+Shift+Space** for the
@@ -57,6 +60,17 @@ The standalone Prompt Library plugin is not duplicated: the matching product
 prompt adapter supplies the shared library. Wiki, Metafolder, external MCP
 servers and unrelated developer utilities are optional additions, not required
 for Augmentor desktop/browser/voice/memory to function.
+
+## Dictate into other applications
+
+Open Settings → **System dictation · Powered by Handy**, turn it on, choose a
+transcription model and review its terms before downloading it. Hold **Ctrl +
+Space** while speaking and release to insert text into the focused application.
+Escape or **×** cancels. Change the shortcut, microphone or activation mode in
+these settings, or turn dictation off. The recording pill follows your Augmentor
+colours and animated circle. On Wayland, approve the shortcut/input permissions
+requested by your desktop. Physical microphone, compositor and typing acceptance
+remain specific to the target machine.
 
 ## Finish the browser step
 
@@ -134,3 +148,9 @@ source snapshots. Public snapshots exclude repository histories, local outputs,
 configuration, credentials, conversations, memory databases, model weights and
 microphone recordings. Downloadable synthetic voice references have the separate
 speech-model terms described above.
+
+The Handy preview being prepared includes exact source copies of the distributed
+Voice and Adaptive Reasoning plugins, identified by package SHA-256 and explicit
+source scope in `bundle.json`. External service source repositories are separate.
+It requires no separately installed Handy application. This preparation has not
+yet replaced the public download linked above.

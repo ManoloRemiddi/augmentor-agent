@@ -50,6 +50,10 @@ def main():
             if bundled.is_file():binary=bundled
         (binary.parent/'portable').write_text('Handy Portable Mode\n')
         environment={**os.environ,'AUGMENTOR_HANDY_EMBEDDED':'1','HANDY_DISABLE_UPDATER':'1','WEBKIT_DISABLE_DMABUF_RENDERER':'1','WEBKIT_DISABLE_COMPOSITING_MODE':'1','RUST_BACKTRACE':'1'}
+        if sys.platform=='win32':
+            sys.path.insert(0,str(ROOT))
+            from services.dictation.windows_runtime import environment as windows_environment
+            environment=windows_environment(runtime,environment)
         if sys.platform.startswith('linux'):
             environment.update(GDK_BACKEND='x11',LIBGL_ALWAYS_SOFTWARE='1',NO_AT_BRIDGE='1')
             environment.pop('WAYLAND_DISPLAY',None)
