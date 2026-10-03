@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 separate published product-version preparation
+
+[The product-version preparation checkpoint](../release/qualification/next-targets/20261003-published-product-upgrade-preparation.json)
+verifies both published0.2.12/0.2.13 complete manifests and native source/target
+identities. A separate rootless, mount/device-free Debian fixture on secondary
+storage passes one signed normal0.2.12 native install and both package file audits.
+The maintained one-shot ordinary-user baseline preparer passes four synthetic
+admission/durability cases. Actual user setup, role histories, different-version
+managed DSH/selection upgrade and coordinated rollback remain pending. This older
+Debian/Voice0.1.16 pair does not qualify current source-Qt/Voice0.1.19 artifacts.
+[The owning guide](LINUX-PRODUCT-UPGRADE-PROOF.md) records the execution boundaries.
+
 ## October 3 Fedora GNOME visual capture and partial click failure
 
 [The exact v4 checkpoint](../release/qualification/next-targets/20261003-fedora-gnome-v4-visual-capture-center-partial-failure.json)

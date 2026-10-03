@@ -117,6 +117,7 @@ Windows mechanisms: [desktop and background shortcut ownership](WINDOWS-SHELL.md
 - [0.2.10 artifact identity and completed qualification](RELEASE-QUALIFICATION-0.2.10.md)
 
 - [Complete guided Desktop + Browser installation](COMPLETE-INSTALL.md)
+- [Published Linux product-version upgrade qualification](LINUX-PRODUCT-UPGRADE-PROOF.md)
 - [Installed/GitHub/distribution audit — 20 September 2026](DISTRIBUTION-AUDIT-2026-09-20.md)
 
 - [Consistent desktop releases and update workflow](DESKTOP-DEPLOYMENTS.md)
