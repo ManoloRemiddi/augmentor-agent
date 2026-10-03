@@ -15,6 +15,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
+#include <pwd.h>
 
 #ifndef AUGMENTOR_COMPONENT
 #error "Build with an explicit Augmentor component"
@@ -33,6 +34,33 @@ static char *join(const char *root, const char *suffix) {
 
 static int startup_descriptor = -1;
 static int installation_descriptor = -1;
+
+/* The socket runtime is temporary; update intent survives reboot in state. */
+static void require_updates_clear(void) {
+    const char *state = getenv("XDG_STATE_HOME");
+    char *default_state = NULL;
+    if (!state || !*state) {
+        struct passwd *user = getpwuid(getuid());
+        if (!user || !user->pw_dir ||
+            asprintf(&default_state, "%s/Library/Application Support/Augmentor/state", user->pw_dir) < 0)
+            fail("cannot locate persistent update state");
+        state = default_state;
+    }
+    if (*state != '/') fail("state directory must be absolute");
+    char *directory = join(state, "augmentor/updates");
+    struct stat info;
+    if (lstat(directory, &info) != 0) {
+        if (errno != ENOENT) fail("cannot inspect persistent update state");
+    } else {
+        if (!S_ISDIR(info.st_mode) || info.st_uid != getuid() || (info.st_mode & 0077))
+            fail("update state must be private and owned by this user");
+        char *record = join(directory, "active.json");
+        if (lstat(record, &info) == 0 || errno != ENOENT)
+            fail("an unfinished update needs verification before reopening");
+        free(record);
+    }
+    free(directory); free(default_state);
+}
 
 /* Called by the embedded desktop after its control endpoint is discoverable. */
 int AugmentorStartupReady(void) {
@@ -73,6 +101,7 @@ static void retain_launch_leases(void) {
         fail("runtime directory must be private and owned by this user");
     if (strcmp(AUGMENTOR_COMPONENT, "desktop") == 0)
         startup_descriptor = read_lease(runtime, "startup.lock");
+    require_updates_clear();
     /* Hold before resolving resources or initializing Python. No child inherits
      * through subprocess; the fixed browser exec retains this lifetime lease. */
     installation_descriptor = read_lease(runtime, "installation.lock");

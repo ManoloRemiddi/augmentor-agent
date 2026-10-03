@@ -12,17 +12,21 @@ import sys
 from platform_adapters import locks
 from platform_adapters.paths import private_directory, runtime_directory
 from platform_adapters.private_files import descriptor, require_directory
+from lifecycle.posix_pending import transaction_directory,require_clear
 
 
 class Startup:
-    def __init__(self, runtime=None, *, maintenance=False):
+    def __init__(self, runtime=None, *, maintenance=False, transactions=None):
         if sys.platform not in ('linux','darwin'):raise RuntimeError('Unix startup requires Linux or macOS.')
         if type(maintenance) is not bool:raise ValueError('Choose startup or maintenance exclusion.')
         self.fd=None;self.maintenance=maintenance
+        self.transactions=Path(transactions) if transactions is not None else transaction_directory()
         directory=require_directory(private_directory(runtime if runtime is not None else runtime_directory()))
         self.path=Path(directory)/'startup.lock'
         fd=descriptor(self.path,writable=True,create=True)
-        try:locks.flock(fd,(locks.LOCK_EX if maintenance else locks.LOCK_SH)|locks.LOCK_NB)
+        try:
+            locks.flock(fd,(locks.LOCK_EX if maintenance else locks.LOCK_SH)|locks.LOCK_NB)
+            if not maintenance:require_clear(self.transactions)
         except BaseException:os.close(fd);raise
         self.fd=fd
 

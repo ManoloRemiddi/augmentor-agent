@@ -4,6 +4,29 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+Current native checkpoint `641d4ed` passes Mac 14/26 whole-bundle retention and
+same-build atomic apply (37138674288), all shared/Linux packaging validation
+(37138676353), SDK platform contracts (37138678547), and Windows Desktop both
+CPUs (37138680350). Full Windows at `9bce979` passes both CPUs including busy
+deferral, target health, reopening and repair/remove (37134219949). Earlier
+failure/pending observations below are historical; the current Mac health and
+completion additions still need their own native qualification.
+
+Focused updater qualification passes 152 cases (151 passed, one OS skip) with
+isolated Qt state. Native Mac compilation/completion remains pending.
+
+Unix normal startup now refuses any persistent active transaction outside the
+socket runtime, including malformed records and after runtime recreation. The
+Mac native launcher refuses it before Python initialization. A successful live
+Mac backend can bind its exact acknowledged journal and complete it only after
+fresh exclusive admission, exact retained-source inspection and offline target
+health. The disposable same-build native proof now exercises pending restart
+refusal, wrong-identity preservation, archival and replay refusal. This is not
+signed N-to-N+1 qualification or a complete Mac controller: independent bootstrap,
+owned launchd pause/reopen and publisher provisioning remain open. No customer
+flag/feed or installed owner application is changed. Read
+[Unix persistent barrier and Mac completion](UPDATE-SYSTEM.md#unix-persistent-barrier-and-mac-completion).
+
 Windows full at `9bce979` now passes both CPUs, including busy deferral, target
 health, reopen and later repair/remove (37134219949); all six workflows pass that
 head. Newer Unix source is separate. A fixed offline Mac target render/identity

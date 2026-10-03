@@ -502,3 +502,12 @@ Work still required before public release:
 
 The build and runtime proofs reduce uncertainty without changing those release
 requirements. A screenshot or an ad-hoc signed ZIP is not a completed installer.
+
+
+The updater's persistent startup barrier and live target-completion path are
+specified in [the update guide](UPDATE-SYSTEM.md#unix-persistent-barrier-and-mac-completion).
+Native startup refuses an unfinished transaction before initializing Python;
+normal bundled launch paths also refuse it. Only independently verified completion
+archives the active record. This source addition is behind the existing disabled
+automatic qualification gates; native completion, signed forward upgrades and
+owned launchd/reopening remain separately required.

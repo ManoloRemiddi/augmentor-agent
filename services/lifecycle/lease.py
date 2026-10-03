@@ -47,6 +47,8 @@ def hold(component):
         _leases.append(descriptor)
         return
     if sys.platform == 'darwin' and release.get('target','').startswith('macos-'):
+        from lifecycle.posix_pending import require_clear,transaction_directory
+        require_clear(transaction_directory())
         runtime = Path(os.environ.get('XDG_RUNTIME_DIR', f'/tmp/augmentor-{os.getuid()}'))
         runtime.mkdir(parents=True, exist_ok=True, mode=0o700)
         if runtime.is_symlink() or runtime.stat().st_uid != os.getuid() or runtime.stat().st_mode & 0o077:

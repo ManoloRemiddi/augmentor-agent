@@ -17,8 +17,9 @@ from .sdk_launch_lease import require_closed
 
 
 class PosixPreparation:
-    def __init__(self,root,runtime,shared):
+    def __init__(self,root,runtime,shared,*,transactions=None):
         self.root,self.runtime,self.shared=Path(root).resolve(),Path(runtime),Path(shared)
+        self.transactions=transactions
         self.gate=None;self.observations=[];self.reservations=Reservations()
         self.windows=[];self.browsers=[];self.dsh=[];self.companions=[];self.shortcuts=[]
         self.entered=False;self.closed=False;self.cleanup_thread=None
@@ -32,7 +33,7 @@ class PosixPreparation:
         if self.entered or self.closed:raise ValueError('Use a fresh preparation; never replay saved shutdown steps.')
         self.entered=True
         try:
-            self.gate=Startup(self.runtime,maintenance=True)
+            self.gate=Startup(self.runtime,maintenance=True,transactions=self.transactions)
             require_closed(self.runtime)
             python=self.root/'python/bin/python3'
             if not python.is_file():python=Path(sys.executable)

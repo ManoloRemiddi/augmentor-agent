@@ -808,3 +808,12 @@ and parent-scoped branch status through the packed SDK/native host. Browser
 limits. Full local source qualification uses
 `AUGMENTOR_PYTHON=/absolute/isolated/Qt/python node --test --test-concurrency=4 tests/*.test.mjs`;
 hosted default-concurrency checks remain an independent gate.
+
+
+`test_update_posix_startup.py` checks that a persistent active record blocks normal
+startup after runtime recreation, preserves malformed/linked records, and allows
+only maintenance inspection. `test_macos_native_launcher.py` checks real native
+refusal before Python output. The hosted `macos-update-payload-proof.py` exercises
+live same-build completion, wrong-target preservation, exact offline health,
+archival and replay refusal in disposable bundles. It does not qualify a public
+signed forward update or launchd/reopening.

@@ -25,6 +25,7 @@ from lifecycle.update_journal import UpdateJournal
 from platform_adapters import locks
 from platform_adapters.paths import private_directory
 from platform_adapters.private_files import atomic_json,require_directory,descriptor
+from updates.macos_completion import complete_observed
 
 
 def main():
@@ -77,12 +78,13 @@ def main():
         transaction=require_directory(private_directory(out/'transaction'))
         created=[]
         def installer(gate):
-            backend=MacInstallerBackend(gate,retained,candidate,release,release,copy,target,development=True)
+            backend=MacInstallerBackend(gate,retained,candidate,release,release,copy,target,development=True,journal=journal)
             created.append(backend);return backend
         with UpdateJournal(transaction,identity,identity) as journal:
-            result=authorize_update(journal,lambda:PosixPreparation(retained/'Contents/Resources/app',runtime,runtime/'shared'),installer)
+            result=authorize_update(journal,lambda:PosixPreparation(retained/'Contents/Resources/app',runtime,runtime/'shared',transactions=transaction),installer)
             if journal.record['phase']!='apply-acknowledged' or result['installationComplete'] is not False:
                 raise AssertionError('The fixture confused apply with completed installation.')
+            created[0].observe_acknowledgement()
         backup=created[0].backup
         if not backup or verify_bundle(backup,release,development=True)!=copy or verify_bundle(retained,release,development=True)!=target:
             raise ValueError('Atomic replacement did not retain the source and exact target.')
@@ -93,13 +95,30 @@ def main():
         health=verify_local_health(retained,release,target,development=True)
         if health['rendered'] is not True or health['payloadSHA256']!=target['sha256']:
             raise ValueError('The fixed target health probe did not identify this bundle.')
+        try:
+            with Startup(runtime,transactions=transaction):pass
+        except RuntimeError:pass
+        else:raise AssertionError('The pending durable record did not refuse a normal restart.')
+        changed={**identity,'sourceCommit':'0'*40}
+        try:complete_observed(created[0],identity,changed)
+        except ValueError:pass
+        else:raise AssertionError('Completion adopted a different target identity.')
+        if not (transaction/'active.json').is_file():raise AssertionError('Rejected completion removed the pending record.')
+        completion=complete_observed(created[0],identity,identity)
+        if not completion['installationComplete'] or (transaction/'active.json').exists():
+            raise AssertionError('Verified completion failed to archive the exact attempt.')
+        with Startup(runtime,transactions=transaction):pass
+        try:complete_observed(created[0],identity,identity)
+        except (ValueError,FileNotFoundError):pass
+        else:raise AssertionError('The completed attempt was replayed.')
     report={'passed':True,'schema':'augmentor-macos-source-proof/1','payloadSHA256':source['sha256'],
         'releaseSHA256':source['releaseSHA256'],'entries':len(source['entries']),'bytes':source['bytes'],
         'relocatedWholeBundle':True,'nativeSignatureDamageRefused':True,'originalPreserved':True,
         'installationReaderRefusesReady':True,'atomicSameBuildFixtureApply':True,'sourceBackupRetained':True,
-        'pendingRecordRetained':True,'syntheticUserStatePreserved':True,
+        'pendingLaunchRefused':True,'wrongCompletionRetainsPending':True,'completionArchived':True,
+        'completionNotReplayed':True,'syntheticUserStatePreserved':True,
         'offlineTargetHealth':health,
-        'scope':'Development whole-bundle retention, same-build isolated apply and offline UI health; no signed forward update, transaction completion/reopen, login/user install or automatic publisher authority.'}
+        'scope':'Development whole-bundle retention, same-build isolated apply, durable launch barrier and verified completion; no signed forward update, reopen, login/user install or automatic publisher authority.'}
     atomic_json(out/'report.json',report)
     print(json.dumps(report))
 

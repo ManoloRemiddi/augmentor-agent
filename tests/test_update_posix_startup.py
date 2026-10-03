@@ -73,5 +73,44 @@ os.execv(sys.executable,[sys.executable,'-I','-B','-c',sys.argv[3],str(root)])
         with self.assertRaises(OSError):Startup(self.root)
         self.assertEqual(original.read_bytes(),b'Keep this fixture.')
 
+    def test_persistent_record_blocks_restart_after_runtime_is_recreated(self):
+        transactions=private_directory(self.root/'transactions')
+        pending=transactions/'active.json';pending.write_bytes(b'Malformed records must also block launch.');pending.chmod(0o600)
+        runtime=private_directory(self.root/'old-runtime')
+        with self.assertRaisesRegex(RuntimeError,'unfinished'):Startup(runtime,transactions=transactions)
+        # Simulate loss of the temporary socket directory across a reboot.
+        (runtime/'startup.lock').unlink();runtime.rmdir()
+        runtime=private_directory(self.root/'new-runtime')
+        with self.assertRaisesRegex(RuntimeError,'unfinished'):Startup(runtime,transactions=transactions)
+        with Startup(runtime,maintenance=True,transactions=transactions):pass
+        self.assertEqual(pending.read_bytes(),b'Malformed records must also block launch.')
+
+    def test_pending_link_and_nonprivate_directory_refuse_launch(self):
+        transactions=private_directory(self.root/'transactions')
+        (transactions/'active.json').symlink_to(self.root/'missing')
+        with self.assertRaisesRegex(RuntimeError,'unfinished'):Startup(self.root,transactions=transactions)
+        transactions.chmod(0o755)
+        with self.assertRaises(ValueError):Startup(self.root,transactions=transactions)
+        transactions.chmod(0o700)
+
+    def test_fixed_service_top_level_entrypoint_checks_the_same_persistent_barrier(self):
+        transactions=private_directory(self.root/'transactions')
+        pending=transactions/'active.json';pending.write_bytes(b'Preserve the interrupted service attempt.');pending.chmod(0o600)
+        code="""import sys
+from pathlib import Path
+sys.path.insert(0,sys.argv[1]);sys.path.insert(0,sys.argv[2])
+from posix_startup import Startup
+try:Startup(Path(sys.argv[3]),transactions=Path(sys.argv[4]))
+except RuntimeError as error:
+ assert 'unfinished' in str(error)
+ print('Service startup refused before accepting work.')
+else:raise AssertionError('The fixed service entrypoint ignored the persistent record.')
+"""
+        result=subprocess.run([sys.executable,'-I','-B','-c',code,str(ROOT/'services'),str(ROOT/'services/lifecycle'),
+            str(self.root),str(transactions)],capture_output=True,text=True,timeout=10)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertIn('Service startup refused',result.stdout)
+        self.assertEqual(pending.read_bytes(),b'Preserve the interrupted service attempt.')
+
 
 if __name__=='__main__':unittest.main()

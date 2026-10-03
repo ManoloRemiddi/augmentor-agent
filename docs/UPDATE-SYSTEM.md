@@ -730,3 +730,39 @@ Existing mechanisms: [immutable Linux selection](DESKTOP-DEPLOYMENTS.md),
 [Windows installer decision](WINDOWS-INSTALLER-DECISION.md), and
 [platform parity](PLATFORM-PARITY-AUDIT.md). These are reusable mechanisms with
 their own evidence limits, not proof that the new customer update flow is complete.
+
+
+## Unix persistent barrier and Mac completion
+
+Unix startup readers check the persistent `XDG_STATE_HOME/augmentor/updates`
+transaction directory under startup admission. The defaults are
+`~/Library/Application Support/Augmentor/state` on Mac and `~/.local/state` on
+Linux. Any `active.json` entry blocks normal startup, including malformed or
+linked entries; no saved record authorizes commands or automatic deletion. This
+check survives loss of the temporary socket directory. Maintenance writers can
+inspect a pending installation without permitting normal app work. The native
+Mac launcher checks the same directory before initializing Python; bundled
+Python launch paths also check it. Legacy builds lacking the barrier remain
+ineligible for automatic installation. Linux entrypoint completeness and the
+package/managed-deployment controller remain qualification requirements.
+
+`MacInstallerBackend` requires its original live journal at this persistent
+location before applying, and runs from code outside both replaceable bundles.
+Only a successful native replacement return can establish its live `applied`
+observation. The original caller seals the exact apply-acknowledged record before
+closing its journal. `updates.macos_completion.complete_observed` reacquires
+startup and installation writers, compares the original acknowledgement, checks
+the retained recovery bundle and executes the exact target's isolated offline
+UI health probe. It archives completion only after these checks succeed. A
+changed target, unknown apply, missing live backend, failed health or changed
+journal stays pending; completion cannot replay replacement or infer success
+from saved PIDs. Reopening and interrupted-attempt recovery require separate
+verified coordination.
+
+The hosted disposable same-build proof additionally checks normal launch refusal
+while pending, preserves the pending record after wrong-target completion, then
+runs real native health and archives the attempt. A second completion is refused.
+It preserves the original artifact and synthetic user state. This development
+fixture is not signed forward qualification, publisher authorization, an owned
+launchd/reopen controller or an installed customer update. Public automatic flags
+remain false until those release gates are met.

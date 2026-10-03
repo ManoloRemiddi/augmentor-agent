@@ -67,8 +67,10 @@ raise SystemExit(23)
             (malicious/'sitecustomize.py').write_text('raise RuntimeError("environment injection")')
             args = ['a b', 'quote"', 'dollar$()', '日本語', '-c', 'raise SystemExit(99)']
             runtime=root/'runtime';runtime.mkdir(mode=0o700)
+            state=root/'state';state.mkdir(mode=0o700)
+            environment_fixture={**os.environ,'XDG_RUNTIME_DIR':str(runtime),'XDG_STATE_HOME':str(state)}
             result = subprocess.run([str(launcher), *args], cwd='/', text=True, capture_output=True,
-                env={**os.environ, 'PYTHONHOME':'/does-not-exist', 'PYTHONPATH':str(malicious),'XDG_RUNTIME_DIR':str(runtime)}, timeout=30)
+                env={**environment_fixture, 'PYTHONHOME':'/does-not-exist', 'PYTHONPATH':str(malicious)}, timeout=30)
             self.assertEqual(result.returncode, 23, result.stderr)
             report = json.loads(result.stdout)
             self.assertEqual(report['argv'], ['desktop', *args])
@@ -83,10 +85,16 @@ raise SystemExit(23)
                 with (runtime/name).open('r+') as gate:
                     fcntl.flock(gate,fcntl.LOCK_EX|fcntl.LOCK_NB)
                     refused=subprocess.run([str(launcher)],capture_output=True,text=True,timeout=30,
-                        env={**os.environ,'XDG_RUNTIME_DIR':str(runtime)})
+                        env=environment_fixture)
                     self.assertNotEqual(refused.returncode,0)
                     self.assertIn('installation maintenance',refused.stderr)
                     self.assertFalse(refused.stdout)
+            updates=state/'augmentor/updates';updates.mkdir(parents=True,mode=0o700)
+            (updates/'active.json').write_bytes(b'Unknown interruption; preserve this record.')
+            refused=subprocess.run([str(launcher)],capture_output=True,text=True,timeout=30,env=environment_fixture)
+            self.assertNotEqual(refused.returncode,0)
+            self.assertIn('unfinished update',refused.stderr);self.assertFalse(refused.stdout)
+            self.assertEqual((updates/'active.json').read_bytes(),b'Unknown interruption; preserve this record.')
 
 
 if __name__ == '__main__':
