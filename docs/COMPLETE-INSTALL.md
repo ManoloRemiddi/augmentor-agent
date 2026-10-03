@@ -72,6 +72,55 @@ Its system recipe supplies ICU74. Declared-runtime DSH services now enter throug
 the verified component wrapper before Node/speech children start. Neither this
 source candidate nor its entrypoint fixture is a public compatibility release.
 
+The complete qualification proof uses the installed runtime's verified
+`environment(app, selected_python, inherited)` contract before its offscreen
+preview and subsequent Node/Python workers. Source-Qt library, plugin and QML
+paths come from that contract; system-Qt and legacy runtime loader behavior is
+preserved. A changed runtime inventory or linked policy is refused without
+falling back. The proof's separate 60-second readiness limits are unchanged.
+
+The [Mint clean2035 checkpoint](../release/qualification/next-targets/20261003-mint2035-installed-setup-proof-loader.json)
+records successful ordinary-user complete setup in a separate locked synthetic
+account, with exact native packages and an installed receipt. Its unchanged
+full proof then fails at direct preview launch because it omitted the source-Qt
+environment. A read-only selected-runtime import using the production contract
+passes. This establishes the proof correction, not a full connected-product or
+desktop pass. The original account's older partial install remains preserved.
+Repeating the same installed setup verifies identity without rewriting settings;
+rerunning the fresh-user proof allocates new ports and cannot reuse those saved
+fixture endpoints. Further acceptance requires an explicit post-install proof
+using the existing synthetic endpoints, with no setup or model-setting replay.
+
+The maintained `--owned-vm-post-install-fixture PATH` entry is restricted to the
+explicit clean2035 Mint VM and ordinary UID1001 account. Its private fixture
+record binds the original bundle manifest, installed receipt/source, five saved
+settings hashes, initially empty workspace-store hash, and existing model/DSH
+ports. Root-owned marker, exact VM/distro/root identity, private home, native
+audit, immutable selected runtime and idle service/process checks precede any
+model-server binding. The actual saved `dshService` remains
+`augmentor-dsh.service`; writing that selection with `--no-services` does not
+enable it. No configuration or installer step is replayed.
+
+This is a one-shot qualification entry. A private exclusive run directory
+records each mutating SDK request before dispatch; an existing run is preserved
+and refused. Missing responses are never retried. Offscreen preview, two
+run-owned fixture turns and a restart use the unchanged 60-second readiness/turn
+checks. Settings and observed prior histories must be preserved, restart cannot
+replay model requests, and cleanup covers only the owned test process/server.
+Host-side VM identity and the older account's hashes must also be checked by the
+explicit adapter. The reviewed external proof renders the installed source-Qt
+preview, but its actual DSH startup misses the unchanged 60-second limit before
+any SDK mutation. Native audits, five saved settings, old-account hashes, empty
+workspace and owned-process cleanup all pass. This failure is retained beside
+the original full-proof failure; neither establishes desktop/audio acceptance.
+
+Preview and owned DSH children now use the verified synthetic home as their
+explicit working directory. The narrowly defined `post-install-proof-cwd-v2`
+fixture requires the exact initial failed journal hash, its pre-request failure
+state, current idle guards and unchanged empty workspace. It preserves the old
+journal and refuses any uncertain request or preexisting second-run journal.
+This correction remains unexecuted in the VM pending source review.
+
 The clean7b6df59 source-runtime runtime/desktop packages now have actual
 [ordinary-user offline installed startup evidence](LINUX-SOURCE-RUNTIME-ENTRYPOINTS.md#installed-ordinary-user-acceptance-of-clean7b6df59),
 including cold Browser selection, offscreen Desktop, synthetic Qt and CPU VAD.

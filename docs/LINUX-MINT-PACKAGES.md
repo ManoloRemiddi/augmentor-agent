@@ -74,3 +74,58 @@ complete cases pass. New matching artifacts and safe explicit partial recovery
 remain required. The exact Fedora clean368 bundle also uses60seconds; the earlier separate120-second
 interpretation was incorrect. New Fedora artifact acceptance and Cinnamon
 input/shortcuts/audio remain open.
+
+## Clean2035 setup and separate proof-loader failure
+
+[The clean2035 checkpoint](../release/qualification/next-targets/20261003-mint2035-installed-setup-proof-loader.json)
+records the same owned ISO-installed VM with a fresh locked synthetic UID1001,
+private home and no administrator groups. UID1000's preparing receipt, model
+settings, product token, integration ownership and presets retain their hashes.
+Signed Mint/Ubuntu repository checks pass; normal APT reinstalls only the exact
+matching runtime/Desktop packages, with idle component leases and native audits.
+Cinnamon, Muffin, screensaver, libc and PipeWire versions remain unchanged.
+
+The unmodified clean2035 complete installer succeeds and selects its verified
+Mint source-Qt runtime. The full public proof subsequently fails when its direct
+preview Python invocation cannot load `libQt6Core.so.6`; it has not reached the
+separate 60-second connected-runtime checks. A read-only audit verifies the
+selected immutable runtime and imports QtCore/Gui/Widgets with Qt6.8.2 using
+the production runtime environment. Owned setup/runtime processes have exited.
+
+The maintained proof now delegates loader paths to that verified environment
+for the preview and inherited Node/Python workers. Six focused cases include an
+actual child ELF-loader regression, source/native environment behavior and
+inventory/preload/linked-policy refusal. They do not replace the retained failed
+VM proof. Its installed setup must not be replayed with new synthetic ports or
+silently adopted as another bundle. Full proof, graphical Cinnamon/Browser,
+shortcuts/lock/reboot, physical audio and public licensing gates remain open.
+
+The maintained post-install entry is now implemented for only this existing
+clean2035 fixture. It binds the saved loopback ports and all five settings
+hashes, checks the exact native installation/immutable selected runtime, and
+refuses enabled/active/uncertain login services. It reads and preserves the
+actual `dshService: augmentor-dsh.service` field. Before starting anything, it
+requires the hash-bound initially empty workspace store; persisted or extra
+session data is preserved and refused to prevent accidental startup recovery.
+Its exclusive one-run journal prevents adoption of interrupted/uncertain runs.
+Nine added protocol cases cover state/history preservation, stale run refusal,
+single-dispatch unknown outcomes, 60-second failure cleanup, changed restart
+history, occupied ports and source/account/target refusal.
+
+The reviewed external post-install proof now runs against unchanged installed
+clean2035 bytes. Its native offscreen preview succeeds, then DSH misses the
+unchanged 60-second readiness limit before any SDK mutation or model turn.
+Cleanup verifies idle owned processes, clean native audits, all five settings,
+the original account's ten hashes and the unchanged empty workspace. The
+94-byte child log records a denied `.env` read in the inherited SSH account
+working directory. Installed DSH catches that read failure and returns; the
+warning does not establish the timeout cause. The original full proof remains
+failed and the successful installer remains distinct.
+
+The maintained proof now explicitly places preview and owned DSH children in
+the verified synthetic home. Two additional cases check real child cwd and
+parent preservation, and the narrow proposed `post-install-proof-cwd-v2` route
+with the exact preserved initial failed journal hash. It refuses prior pending
+requests, unknown outcomes, altered records or a preexisting second-run journal.
+The correction has not run in the VM; source review and separate authorization
+precede any second run. Neither journal is deleted or adopted.

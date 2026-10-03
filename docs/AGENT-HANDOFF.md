@@ -1,5 +1,26 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 Mint installed setup and post-install proof
+
+[The exact Mint checkpoint](../release/qualification/next-targets/20261003-mint2035-installed-setup-proof-loader.json)
+records normal signed native2035 reinstall/audit and exact unchanged complete
+installer setup PASS in a fresh ordinary account. Its original full proof fails
+before rendering because the proof omitted the verified source-Qt environment.
+The maintained environment correction renders successfully in a separate
+post-install run, which then fails the unchanged60-second DSH readiness bound
+before any SDK mutation. Both accounts' settings, empty workspace, native audit
+and owned cleanup pass. A logged inherited-cwd dotenv permission warning is
+nonfatal in the shipped DSH source; the readiness cause remains unresolved.
+
+The external proof now sets each child's cwd to the dedicated fixture home.
+A narrow second-run entry requires the exact retained failed journal hash/run,
+failed starting phase, no pending/unknown request, preserved settings and the
+initial empty workspace before binding ports. It preserves the original journal
+and refuses a pre-existing second run. Seventeen focused proof cases, sixteen
+setup and seven native cases pass; actual second-run acceptance remains pending.
+No installer, selected payload, saved port or production timeout is changed.
+
+
 ## October 3 selected GNOME reboot instrumentation
 
 [The selected-artifact reboot proof](LINUX-GNOME-SHORTCUT-PROOF.md#selected-gnome-artifact-reboot-proof)

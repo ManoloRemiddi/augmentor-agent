@@ -1,0 +1,486 @@
+{
+  "schema": "augmentor-mint-installed-setup-proof-checkpoint/1",
+  "date": "2026-10-03",
+  "candidateOnly": true,
+  "customerDistribution": false,
+  "source": {
+    "commit": "2035af99b46bb013e81de9766216da820ab4a325",
+    "dirty": false
+  },
+  "artifactId": "0.2.13-linuxmint22.3-amd64-complete-preview.1-2035af99b46b",
+  "bundleManifestSha256": "99db0336c2b266b502ed58d6ee5a87fcbd7a4b55b3e87a0f6931c691660ce13e",
+  "setupScriptSha256": "d3c2a93b344115a9859edb9855c0b137c9602b9471831d39a4e966d9bcc784f2",
+  "originalPublicProofSha256": "7327e2e6cb8b6f81e3782297998218f0afa8803b7cf88b4af75bb26e14b84fcf",
+  "ownedFixture": {
+    "name": "augmentor-mint223-cinnamon-iso",
+    "qemuPid": 2494740,
+    "sshPort": 22493,
+    "hostname": "augmentor-mint223-iso",
+    "marker": "Isolated Augmentor Linux Mint 22.3 Cinnamon ISO qualification VM\n",
+    "root": "/dev/vda2 ext4",
+    "ISOdetached": true,
+    "noHostDevicesOrMounts": true,
+    "freshUser": "augmentor-complete-proof",
+    "uid": 1001,
+    "privateHome": true,
+    "passwordLocked": true,
+    "adminGroups": false
+  },
+  "native": {
+    "signedRepositoriesVerified": true,
+    "gpgvStatusZeroCount": 5,
+    "reinstalledPackages": 2,
+    "dependencyUpgrades": 0,
+    "removedPackages": 0,
+    "nativeSourceMatchesBundle": true,
+    "dpkgAuditVerifyClean": true,
+    "runtimeContract": {
+      "format": "augmentor-linux-python-runtime-contract/1",
+      "target": "linuxmint22.3-amd64",
+      "profile": "mint223-cp312-x86_64-source-qt-voice",
+      "pythonAbi": [
+        3,
+        12
+      ],
+      "architecture": "x86_64",
+      "lockIdentity": "1288cb482b8db727b8cdf349a97cbcd4473a44fe6945862a1ac141d4a8b86c9a",
+      "policySha256": "2dc64e6d1c02579970a61cb0b200c79c8a36d84aa54e021dcb1cfafa9b3f2f16",
+      "licenseReviewComplete": false,
+      "embeddedSourceCoverageComplete": false,
+      "sourceQt": {
+        "format": "augmentor-source-qt-runtime-input/1",
+        "directory": "source-qt",
+        "qtVersion": "6.8.2",
+        "manifestSha256": "c49faf50a992daca825c51929715c6114017e6b29ac54af17f9656db41e73364",
+        "derivationReceipt": {
+          "file": "source-pyside-derivation.json",
+          "sha256": "de6edc207b0ce7279de6972b5694d3063161f4fd9c46b865245ca0c471d2990c",
+          "bytes": 1063
+        }
+      }
+    },
+    "unchangedPackages": {
+      "cinnamon": "6.6.4+zena",
+      "muffin": "6.6.1+zena",
+      "screensaver": "6.6.1+zena",
+      "libc": "2.39-0ubuntu8.6",
+      "pipewire": "1.0.5-1ubuntu3.2"
+    },
+    "python312Package": "3.12.3-1ubuntu0.17"
+  },
+  "originalExecution": {
+    "setup": "pass",
+    "installedReceipt": {
+      "bundle": "0.2.13-linuxmint22.3-amd64-complete-preview.1-2035af99b46b",
+      "status": "installed",
+      "desktop": true,
+      "browserExtension": "/home/augmentor-complete-proof/.local/share/augmentor/browser/0.2.13",
+      "target": "linuxmint22.3-amd64",
+      "system": null,
+      "browserAction": "Load this folder once in chrome://extensions (Developer mode).",
+      "voice": "plugin installed; speech engine setup deferred",
+      "memory": "adapter installed; memory engine setup deferred",
+      "model": "configured; verify a reply before relying on this setup"
+    },
+    "selectedPython": "/home/augmentor-complete-proof/.local/share/augmentor/python-runtimes/mint223-cp312-x86_64-source-qt-voice-1288cb482b8db727/bin/python3",
+    "fullProof": "fail",
+    "failurePhase": "direct offscreen preview invocation after completed installer",
+    "failure": "ImportError: libQt6Core.so.6: cannot open shared object file: No such file or directory",
+    "connectedRuntime60SecondChecksReached": false,
+    "installerOverlayUsed": false,
+    "setupTimeoutOverrideUsed": false,
+    "noServicesEnabled": true,
+    "noPhysicalModelsDevicesInput": true
+  },
+  "readOnlyAudit": {
+    "ownedSetupRuntimeProcessesIdle": true,
+    "runtimeResolveSeconds": 12.373354557996208,
+    "immutableSelectedRuntimeVerified": true,
+    "productionEnvironmentImports": {
+      "Qt": "6.8.2",
+      "PySide6": "6.8.2.1",
+      "mappedQtLibraryCount": 4
+    },
+    "nativeAuditClean": true,
+    "setupReplayed": false,
+    "oldUid1000TenFileHashesPreserved": true,
+    "privateDiagnosticTypeErrorCorrected": true,
+    "selectedDesktopDshService": "augmentor-dsh.service"
+  },
+  "maintainedCorrection": {
+    "implemented": true,
+    "executedInVM": true,
+    "path": "release/prove-complete-linux.py",
+    "sha256": "a1342ea000108c40c8138ca3439fb4eb6c2302c266af503401e500e2c250b766",
+    "delegatesToVerifiedInstalledRuntimeEnvironment": true,
+    "workerEnvironmentInherited": true,
+    "defaultNativeLoaderPreserved": true,
+    "public60SecondBoundsUnchanged": true,
+    "focusedTests": {
+      "cases": 6,
+      "pass": true,
+      "realChildElfLoader": true
+    },
+    "executedSha256": "a1342ea000108c40c8138ca3439fb4eb6c2302c266af503401e500e2c250b766",
+    "currentSha256": "36cdc46d6eb910b113ed9acb86fd0c68b84e350dbedcfe3b6139d0438dea7545"
+  },
+  "repeatRoute": {
+    "sameArtifactSetupIdempotent": true,
+    "fullFreshProofRepeatSafeForSavedEndpoints": false,
+    "reason": "A fresh proof allocates new model/DSH ports while completed setup preserves the old saved settings.",
+    "next": "Explicit bounded maintained post-install proof bound to existing synthetic endpoints; no setup replay or artifact adoption."
+  },
+  "releaseGates": {
+    "fullConnectedProduct": false,
+    "graphicalDesktopBrowser": false,
+    "CinnamonShortcutsLockReboot": false,
+    "physicalAudio": false,
+    "licenseReviewComplete": false,
+    "embeddedSourceCoverageComplete": false
+  },
+  "privateEvidence": {
+    "outputs/linux-rollout/mint-fresh-account2035/account-created-after-idle-refusal.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/account-created-after-idle-refusal.stdout": {
+      "sha256": "88bce0bb446e8182d81294593080544ee7cc1eaac585875e3fa25570b9b537bf",
+      "bytes": 4996
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/account-created.stderr": {
+      "sha256": "b01e93eed37164a7fa81dff68fb8fc1ef31c27f211dd405db32c91c4536a0bba",
+      "bytes": 507
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/account-created.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/account-creation-probe-root-process-read.py": {
+      "sha256": "f5eea6808150abeee20b7a8107a366cd48eaa47c1d4a0b0fdaecd840991ca2d1",
+      "bytes": 6369
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/account-creation-probe.py": {
+      "sha256": "8b08443067d5099acff07f001c0f448f7b470edd1f73b36eb007725117db706b",
+      "bytes": 6295
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/artifact-user-binding.json": {
+      "sha256": "236cb44c974aa5293927f8248750ebb9740b423a31de4b2e7017fd2c2751c2fa",
+      "bytes": 1678
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/artifact-user-proof-wrapper.py": {
+      "sha256": "79e864ff74829af3ebed2e8c85607854bf6f60bc168733827703a5edf0eccd5c",
+      "bytes": 13170
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/bound-user-proof.py": {
+      "sha256": "0d6c73fb668e558153daebb7796b7bb273b58e648e7c0e8dcfb802d13e88be89",
+      "bytes": 3289
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/live-progress.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/live-progress.stdout": {
+      "sha256": "87a14c520ecc941cbaf1289b426a5a1fdd8c7445bd527d2a0d72971c5b245a0e",
+      "bytes": 593
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/native-apt-plan-guest.py": {
+      "sha256": "44461841ab988f7a59115711cb6ad9cd6b6e82641e79af806c333d2c5cad4c75",
+      "bytes": 8202
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/native-apt-plan.stderr": {
+      "sha256": "570a29c0683d090e0bb15eda7fd8aa4a230739ae93902cc35dec508a94d279b5",
+      "bytes": 5113
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/native-apt-plan.stdout": {
+      "sha256": "2a94d2d2b3739c5f9febcbdb5a8180bc104c6ace2e64666d2a9693b0143d4b89",
+      "bytes": 819
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/native-apt-reinstall-guest.py": {
+      "sha256": "7759cf9acb5a78fa79115d2ead3cff8c8d2d749a4c5865f46818a3e9a5d93160",
+      "bytes": 8797
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/native-apt-reinstall.stderr": {
+      "sha256": "138c614516af04ea74c90a832bb74a29436139717a6e2869c8eb242a89bbbb9a",
+      "bytes": 401
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/native-apt-reinstall.stdout": {
+      "sha256": "a0b4c52b524a42a2700feacc1ea6d434490cbe8838e9935ccd7c3a0eb41af37b",
+      "bytes": 3641
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/old-state-after-public-proof.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/old-state-after-public-proof.stdout": {
+      "sha256": "26df5dba7508edf8da34ca7baa2ea52b330478ccf2b30171194ee9bc8a65b710",
+      "bytes": 49
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/old-state-before-public-proof.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/old-state-before-public-proof.stdout": {
+      "sha256": "26df5dba7508edf8da34ca7baa2ea52b330478ccf2b30171194ee9bc8a65b710",
+      "bytes": 49
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/ordinary-account-readback.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/ordinary-account-readback.stdout": {
+      "sha256": "37a40a22b5f27c7a4b5d712d6accd519182da0aaf016e58a44831df6ce77e3da",
+      "bytes": 235
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/owned-process-idle.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/owned-process-idle.stdout": {
+      "sha256": "a44d353190a835e8568387a7346fc0de8bd531a96da7e0066676649094cf4eba",
+      "bytes": 66
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-install-audit-corrected-guest.py": {
+      "sha256": "4a0e9e569666656f068c8ac5674a3888523bc20c070acdc7ef82f1f03e1a2b27",
+      "bytes": 3901
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-install-audit-corrected.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-install-audit-corrected.stdout": {
+      "sha256": "05a8f73869e62bce19c61a998550bbc7681abc87d81b339d47a139d58d102a2c",
+      "bytes": 3052
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-install-audit-guest.py": {
+      "sha256": "98d07f86c1003526dd3d6e728a118f871a9de84dfc9721999b9457001c12407a",
+      "bytes": 3754
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-install-audit.stderr": {
+      "sha256": "4eb5d4c476c731c5d077d1c3f5d9be30a8e1bc8609bd610a2109aac460ce8aec",
+      "bytes": 218
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-install-audit.stdout": {
+      "sha256": "a44d353190a835e8568387a7346fc0de8bd531a96da7e0066676649094cf4eba",
+      "bytes": 66
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/public-proof-exact-source.py": {
+      "sha256": "7327e2e6cb8b6f81e3782297998218f0afa8803b7cf88b4af75bb26e14b84fcf",
+      "bytes": 13625
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/report.json": {
+      "sha256": "e69be7c5a5cce40425c81a7d5ffdf0570f1dbebd7d5ea04544d94d6c09423d88",
+      "bytes": 1641
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/stage-and-native.py": {
+      "sha256": "a3b458c1516aed1fea44d3c35ead1094ad4ad894611a3fa5c06bab4182d6f0f7",
+      "bytes": 8564
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/stage-guest.py": {
+      "sha256": "14c2965ebf6a2fb39d901350aa003bffa17eae00551290da42e2376c9d625741",
+      "bytes": 16179
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/stage.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/stage.stdout": {
+      "sha256": "899f21047163b2d15773c01bee19643f62d8d139004245634a98635f716bae5c",
+      "bytes": 672
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/user-proof.stderr": {
+      "sha256": "1befbb09635bcabf17779e0778744de451133705002b1ff90b49791ae964197a",
+      "bytes": 2012
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/user-proof.stdout": {
+      "sha256": "ce7354e2bd15680b0fc8af9901332be6145cb8a49bbf8c27630068ee368a8102",
+      "bytes": 3232
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-run-host.json": {
+      "sha256": "88eb8736851bc78e6235d334b1a9a8560c82b1f51ca7b5c417aff422d4f265ad",
+      "bytes": 606
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-install-fixture-planned.json": {
+      "sha256": "e0eeee708ef6fd48472b32244c68847138036bc0a0245275a365720cc53669b8",
+      "bytes": 1508
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-readback-raw.stdout": {
+      "sha256": "3f89e45cfa71e55260a6914868a1443ebc9c602829d2907d3d5f22671b1d6ac6",
+      "bytes": 27719
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-old-account-finally.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-install-endpoint-research.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-current-preflight.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-readback.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-readback-initial-parser-refusal.json": {
+      "sha256": "2f82f6083e32f54f68ea190b13f3c723c92a2110fc46c8034ceeb5cff1b72481",
+      "bytes": 160
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-run-authorized.py": {
+      "sha256": "7bdbeebb164eecc56dd00e82cf773f52037d9eba8f6065f765401517160f3388",
+      "bytes": 5860
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-layered-env-source-research.json": {
+      "sha256": "bc685d4b6c953eea370e6bd525f2f107bcdc02e57290c91e69ef4c4438e360c2",
+      "bytes": 10228
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-cli-source-research.json": {
+      "sha256": "ab40f0c66ffcfd83677bb8274738c815216a9a737aac9a619300dfbf1aaf25af",
+      "bytes": 3944
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-install-endpoint-research.stdout": {
+      "sha256": "986a8b8b46a7a80480119ff7c23b1b0e2ffabb148b27bf9a1236c6982640d75c",
+      "bytes": 1134
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-live-progress.json": {
+      "sha256": "2e4f1d62fc4c0e033a75f8efe042f9a68742a4938c51cf3b8665d78c3bf29efe",
+      "bytes": 569
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-actual.stderr": {
+      "sha256": "3e187c7032184f3ea7aac185563780a1248e86b49fa8138f91b896c409dcd76f",
+      "bytes": 888
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-install-fixture-cwd-v2-planned.json": {
+      "sha256": "3b7d29ad3f7a89b11986f06c4636da262a3b834ebc88840af02a1a71e85aa12a",
+      "bytes": 1661
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-startup-source-research.json": {
+      "sha256": "7f3761da502404db9bfdec39339180951d02c917e60e2389e69a56f3134b10d3",
+      "bytes": 343
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-external-stage.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-readback-authorized.py": {
+      "sha256": "f2d35d16ea51df5df88e5dd0fcb190bf903b52b4e2101ff9a1b28bd8d269183e",
+      "bytes": 2604
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-install-design.json": {
+      "sha256": "32582ee02e356fdd1dc33629d394ec26cf7c448d656e9a758405b68880ce9200",
+      "bytes": 2953
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-readback-guest.py": {
+      "sha256": "6c585baa11703e9c61e536d755daf4ac6980404fe76edc8ac82be417956a6998",
+      "bytes": 10286
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-current-preflight-guest.py": {
+      "sha256": "9991b987edc9f4ec4de306fb23c49ea880040627e3321638ed22d60c3f7f2ac9",
+      "bytes": 10411
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-actual.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-current-preflight.stdout": {
+      "sha256": "a5c15813bc9a20fc35bd632e0cf957c5b6ef3db928f8a3ede106d4b34a3b1cf9",
+      "bytes": 301
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-external-stage.stdout": {
+      "sha256": "28492ac077bcad6fbf4d03c63a981af8d27924a48cb2f59ffcaa18b1908e5bc7",
+      "bytes": 542
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-readback.json": {
+      "sha256": "d4c2b8cb08a116e574f9444978bb3cde0a265eb1b50505d938a5d30ac4a79faf",
+      "bytes": 576
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-old-account-finally.stdout": {
+      "sha256": "5db1cf506ea3ca75b806bcb210b4a794c6c8ea6ebb669cea3d498ac0515aeb91",
+      "bytes": 1921
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-dotenv-source-research.json": {
+      "sha256": "1e554736e53760ad0eac38a7f52fa92e7557f8949561e4da40fa9d5838a30962",
+      "bytes": 61
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-run-evidence/run.json": {
+      "sha256": "cd7f502ff3d868257f81c9a248aa9f11223925dd91af57da37f12e23407418f2",
+      "bytes": 681
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-run-evidence/desktop.png": {
+      "sha256": "5347e6f84bb89cf7b0c9dfe952316bafb51e2faa8f6af04147203efdb1140fd2",
+      "bytes": 19796
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-run-evidence/dsh.log": {
+      "sha256": "f535dfccfed360504c9f34a1f98239d8376f0ee2498ece69a2103f1032dac68d",
+      "bytes": 94
+    }
+  },
+  "maintainedPostInstallEntry": {
+    "implemented": true,
+    "executedInVM": true,
+    "CLI": "--owned-vm-post-install-fixture PATH",
+    "target": "explicit owned clean2035 Mint VM UID1001 only",
+    "dshServiceActual": "augmentor-dsh.service",
+    "serviceEnabledByOriginalSetup": false,
+    "fiveSettingsHashesBound": true,
+    "workspaceStorageInitiallyEmptyAndHashBound": true,
+    "savedPortsBound": true,
+    "oneShotJournalNoAdoption": true,
+    "mutatingRequestsSingleDispatch": true,
+    "unknownOutcomeNoReplay": true,
+    "public60SecondBoundsUnchanged": true,
+    "setupOrModelSettingsReplayed": false,
+    "tests": {
+      "postInstallCases": 11,
+      "environmentCases": 6,
+      "allPass": true,
+      "VMQualification": false
+    }
+  },
+  "maintainedPostInstallExecution": {
+    "status": "fail",
+    "externalProofReviewedBase": "0ab022a6a26ae0165b57e1662203e71f544aab9a",
+    "externalProofCheckoutHead": "9ec506bb827229874bb285588d9249ff55c201d8",
+    "proofScriptSha256": "a1342ea000108c40c8138ca3439fb4eb6c2302c266af503401e500e2c250b766",
+    "phase": "starting",
+    "reason": "Owned DSH did not become ready within unchanged60seconds.",
+    "offscreenNativeRender": true,
+    "screenshotBytes": 19796,
+    "SDKMutationsSent": false,
+    "modelTurnsReached": false,
+    "setupReplayed": false,
+    "pendingRequest": null,
+    "unknownRequestOutcome": false,
+    "runJournalSha256": "cd7f502ff3d868257f81c9a248aa9f11223925dd91af57da37f12e23407418f2",
+    "fiveSettingsPreserved": true,
+    "oldUid1000TenHashesPreserved": true,
+    "workspaceUnchangedEmpty": true,
+    "nativeAuditClean": true,
+    "ownedApplicationSetupProcessesIdle": true,
+    "childLogBytes": 94,
+    "childLog": "dsh: failed to load .env: Error: EACCES: permission denied, open /home/augmentor-proof/.env",
+    "dotenvReadWarningFatal": false,
+    "timeoutCauseEstablished": false,
+    "dotenvEvidence": {
+      "package": "@deepseek-ai/dsh-app-boot",
+      "version": "0.1.5-rc.1",
+      "file": "lib/index.js",
+      "sha256": "d8fdfe41996a4fefcff63af4982787924b0ae651f24bb1402f775b70202529bb",
+      "warningThenReturnLine": 1047,
+      "defaultProcessCwdLine": 1074
+    },
+    "retryExecuted": false
+  },
+  "cwdCorrection": {
+    "implemented": true,
+    "executedInVM": false,
+    "previewAndOwnedProcessCwd": "verified POST_HOME",
+    "public60SecondBoundsUnchanged": true,
+    "explicitNextRunDirectory": "post-install-proof-cwd-v2",
+    "priorFailureSha256": "cd7f502ff3d868257f81c9a248aa9f11223925dd91af57da37f12e23407418f2",
+    "preservesInitialJournal": true,
+    "refusesPriorPendingOrUnknownOutcome": true,
+    "reviewRequiredBeforeVM": true
+  }
+}

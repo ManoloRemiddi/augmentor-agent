@@ -6,6 +6,7 @@ Uses a deterministic localhost model with real installed DSH/plugins/adapters.
 Offscreen rendering and adapter turns do not qualify a graphical browser/session.
 """
 import argparse
+import copy
 import hashlib
 import http.server
 import importlib.util
@@ -13,12 +14,15 @@ import json
 import os
 from pathlib import Path
 import signal
+import secrets
+import stat
 import shutil
 import socket
 import subprocess
 import sys
 import threading
 import time
+from urllib.parse import urlsplit
 
 PROOF_SHA256 = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 
@@ -27,9 +31,24 @@ def run(command, **kwargs):
     return subprocess.run([str(v) for v in command], check=True, text=True, **kwargs)
 
 
-def user_proof(bundle, setup_script=None):
-    assert os.geteuid() != 0
-    requests = []
+def selected_python_environment(app, python):
+    """Use the installed runtime's verified pre-exec contract for proof children."""
+    env = {**os.environ, 'AUGMENTOR_PYTHON': str(python)}
+    marker = app/'linux-python-runtime.json'
+    if marker.exists() or marker.is_symlink():
+        path = app/'scripts/linux-python-runtime.py'
+        spec = importlib.util.spec_from_file_location('complete_proof_runtime', path)
+        runtime = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(runtime)
+        env = runtime.environment(app, str(python), env)
+    # Adapter workers inherit this process environment. Replace it completely so
+    # alternate Qt module sources removed by the contract cannot survive.
+    os.environ.clear()
+    os.environ.update(env)
+    return env
+
+
+def fixture_model_server(requests, port):
     class Model(http.server.BaseHTTPRequestHandler):
         def log_message(self, *_):
             pass
@@ -43,7 +62,13 @@ def user_proof(bundle, setup_script=None):
                          'choices': [{'index': 0, 'delta': delta, 'finish_reason': reason}]}
                 self.wfile.write(('data: '+json.dumps(value)+'\n\n').encode())
             self.wfile.write(b'data: [DONE]\n\n')
-    server = http.server.ThreadingHTTPServer(('127.0.0.1', 0), Model)
+    return http.server.ThreadingHTTPServer(('127.0.0.1', port), Model)
+
+
+def user_proof(bundle, setup_script=None):
+    assert os.geteuid() != 0
+    requests = []
+    server = fixture_model_server(requests, 0)
     threading.Thread(target=server.serve_forever, daemon=True).start()
     with socket.socket() as available:
         available.bind(('127.0.0.1', 0))
@@ -85,9 +110,9 @@ def user_proof(bundle, setup_script=None):
             assert (dsh_home/'profiles/web/node_modules'/plugin/'package.json').is_file()
         desktop = json.loads((data/'desktop.json').read_text())
         python = Path(desktop['python'])
-        os.environ['AUGMENTOR_PYTHON'] = str(python)
+        selected_env = selected_python_environment(app, python)
         run([python, '-m', 'augmentor_linux', '--preview', '--screenshot', home/'desktop.png'],
-            env={**os.environ, 'PYTHONPATH': str(app/'apps/native')})
+            env={**selected_env, 'PYTHONPATH': str(app/'apps/native')})
         assert (home/'desktop.png').stat().st_size > 10000
         first = saved.read_bytes()
         run(command)
@@ -178,6 +203,384 @@ def user_proof(bundle, setup_script=None):
         log.close()
 
 
+# This entry is deliberately scoped to one explicitly owned installed Mint VM.
+POST_SOURCE = '2035af99b46bb013e81de9766216da820ab4a325'
+POST_HOME = Path('/home/augmentor-complete-proof')
+POST_APP = Path('/usr/lib/augmentor')
+POST_MARKER = Path('/etc/augmentor-test-vm')
+POST_MARKER_TEXT = 'Isolated Augmentor Linux Mint 22.3 Cinnamon ISO qualification VM\n'
+POST_SETTINGS = frozenset(('.local/state/augmentor-install/installation.json',
+    '.local/state/augmentor-install/model.env', '.config/augmentor/harnesses.json',
+    '.local/share/augmentor/desktop.json', '.local/share/augmentor/dsh-home/settings.yaml'))
+
+
+def proof_module(path):
+    spec = importlib.util.spec_from_file_location('complete_post_'+path.stem.replace('-', '_'), path)
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    return module
+
+
+def settings_snapshot(home, expected):
+    from platform_adapters.private_files import descriptor
+    if set(expected) != POST_SETTINGS:
+        raise ValueError('The post-install proof needs all five explicit settings hashes.')
+    result = {}
+    for name, identity in expected.items():
+        with os.fdopen(descriptor(home/name), 'rb') as stream:
+            raw = stream.read(1024*1024+1)
+        if len(raw) > 1024*1024:
+            raise ValueError('Fixture settings exceed the bounded proof size.')
+        actual = {'sha256': hashlib.sha256(raw).hexdigest(), 'bytes': len(raw)}
+        if actual != identity:
+            raise ValueError('Saved fixture settings changed; no setup or configuration was replayed.')
+        result[name] = actual
+    return result
+
+
+def post_account_idle(home, service):
+    """Refuse owned application/setup activity; never stop or adopt a service."""
+    if service != 'augmentor-dsh.service':
+        raise ValueError('The recorded fixture DSH service differs.')
+    for proc in Path('/proc').iterdir():
+        if not proc.name.isdigit() or int(proc.name) == os.getpid():
+            continue
+        try:
+            if proc.stat().st_uid != os.getuid():
+                continue
+            args = (proc/'cmdline').read_bytes(); environment = (proc/'environ').read_bytes()
+            fragments = (str(POST_APP).encode()+b'/', str(home/'.local/share/augmentor').encode()+b'/',
+                         b'/setup.py', b'--owned-vm-post-install-fixture')
+            if any(part in args for part in fragments) or (b'DSH_HOME='+str(home/'.local/share/augmentor/dsh-home').encode()+b'\0') in environment:
+                raise ValueError('An owned product/setup process is active; it was preserved.')
+        except FileNotFoundError:
+            continue
+    units = home/'.config/systemd/user'
+    for name in (service, 'augmentor-desktop.service'):
+        if any(units.glob('*.wants/'+name)):
+            raise ValueError('A fixture login service is enabled; it was preserved.')
+    runtime_dir = Path('/run/user')/str(os.getuid())
+    if runtime_dir.exists():
+        bus = runtime_dir/'bus'
+        if not bus.exists():
+            raise ValueError('The fixture user service owner is uncertain.')
+        env = {**os.environ, 'XDG_RUNTIME_DIR': str(runtime_dir), 'DBUS_SESSION_BUS_ADDRESS': 'unix:path='+str(bus)}
+        for name in (service, 'augmentor-desktop.service'):
+            result = subprocess.run(['systemctl', '--user', 'show', name, '--property=ActiveState', '--value'],
+                                    env=env, capture_output=True, text=True, timeout=15)
+            if result.returncode or result.stdout.strip() not in ('inactive', 'failed'):
+                raise ValueError('The fixture login service is active or uncertain; it was preserved.')
+
+
+def empty_workspace_guard(home, expected_digest):
+    """This first fixture must have no persisted work that startup could resume."""
+    directory = home/'storages'; path = directory/'workspace.json'
+    if directory.is_symlink() or not directory.is_dir() or set(directory.iterdir()) != {path}:
+        raise ValueError('Unexpected prior session storage was preserved; no runtime was started.')
+    info = path.lstat()
+    if (not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid() or
+        info.st_nlink != 1 or info.st_mode & 0o022 or info.st_size > 1024*1024):
+        raise ValueError('The fixture workspace storage identity differs.')
+    raw = path.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != expected_digest:
+        raise ValueError('The bound initial workspace changed; no work was resumed.')
+    storage = json.loads(raw)
+    if storage.get('tables') != {'workspaces': {}}:
+        raise ValueError('Prior session/workspace data was preserved; this fixture does not adopt it.')
+
+
+def require_ports_idle(ports):
+    for number in ports:
+        with socket.socket() as probe:
+            probe.bind(('127.0.0.1', number))
+
+
+def validate_post_fixture(bundle, fixture):
+    import pwd
+    if (fixture.get('format') != 'augmentor-owned-mint-post-install/1' or
+        fixture.get('sourceCommit') != POST_SOURCE or fixture.get('uid') != 1001 or
+        fixture.get('user') != 'augmentor-complete-proof' or fixture.get('home') != str(POST_HOME) or
+        fixture.get('target') != 'linuxmint22.3-amd64' or
+        fixture.get('markerSha256') != hashlib.sha256(POST_MARKER_TEXT.encode()).hexdigest()):
+        raise ValueError('This post-install entry requires the explicit owned clean2035 Mint fixture.')
+    if os.getuid() != 1001 or os.geteuid() != 1001 or Path.home() != POST_HOME or os.environ.get('HOME') != str(POST_HOME):
+        raise ValueError('Run only as the dedicated ordinary fixture account.')
+    entry = pwd.getpwuid(1001)
+    if entry.pw_name != fixture['user'] or entry.pw_dir != fixture['home']:
+        raise ValueError('The fixture account identity changed.')
+    info = POST_MARKER.lstat()
+    if (not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or info.st_mode & 0o022 or
+        info.st_nlink != 1 or POST_MARKER.read_text() != POST_MARKER_TEXT):
+        raise ValueError('The root-owned fixture marker is missing or changed.')
+    fields = dict(row.split('=', 1) for row in Path('/etc/os-release').read_text().splitlines() if '=' in row)
+    if fields['ID'].strip('"') != 'linuxmint' or fields['VERSION_ID'].strip('"') != '22.3':
+        raise ValueError('The post-install fixture distro differs.')
+    for command, expected in ((['hostname'], 'augmentor-mint223-iso'), (['systemd-detect-virt'], 'qemu'),
+                              (['findmnt', '--target', '/', '--noheadings', '--output', 'SOURCE,FSTYPE'], '/dev/vda2 ext4')):
+        if subprocess.check_output(command, text=True).strip() != expected:
+            raise ValueError('The owned VM/root identity differs.')
+    if ('boot=casper' in Path('/proc/cmdline').read_text() or
+        any(word in Path('/proc/mounts').read_text() for word in ('iso9660', 'squashfs')) or
+        Path('/sys/module/apparmor/parameters/enabled').read_text().strip() != 'Y'):
+        raise ValueError('The installed isolated fixture security/root state differs.')
+    if any(key.startswith(('AUGMENTOR_', 'DSH_', 'XDG_', 'LD_', 'QT_', 'QML_', 'NODE_', 'RESONANT_')) for key in os.environ):
+        raise ValueError('Use an explicit clean fixture environment; no inherited runtime overrides.')
+    sys.path.insert(0, str(POST_APP/'services'))
+    from platform_adapters.private_files import require_directory, read_json
+    require_directory(POST_HOME)
+    raw = (bundle/'bundle.json').read_bytes()
+    if hashlib.sha256(raw).hexdigest() != fixture.get('bundleManifestSha256'):
+        raise ValueError('The explicitly bound complete manifest differs.')
+    manifest = json.loads(raw)
+    if manifest['sourceCommit'] != POST_SOURCE or manifest['target'] != fixture['target'] or manifest['artifactId'] != fixture.get('artifactId'):
+        raise ValueError('The installed proof cannot adopt another source/target/artifact.')
+    for name, expected in manifest['sha256'].items():
+        path = Path(name)
+        if path.is_absolute() or '..' in path.parts or hashlib.sha256((bundle/path).read_bytes()).hexdigest() != expected:
+            raise ValueError('The bound complete bundle checksum differs.')
+    info = (POST_APP/'release.json').lstat()
+    if not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or info.st_mode & 0o022:
+        raise ValueError('The installed release is not an immutable root-owned artifact.')
+    setup = proof_module(bundle/'setup.py')
+    setup.verify_installed_payload(POST_APP, manifest, bundle)
+    for command in (['dpkg', '--audit'], ['dpkg', '--verify', 'augmentor-runtime', 'augmentor-desktop']):
+        if subprocess.check_output(command, text=True):
+            raise ValueError('The installed native package audit differs.')
+    settings_snapshot(POST_HOME, fixture['settings'])
+    receipt = read_json(POST_HOME/'.local/state/augmentor-install/installation.json')
+    if receipt.get('status') != 'installed' or receipt.get('bundle') != manifest['artifactId'] or receipt.get('target') != manifest['target']:
+        raise ValueError('This proof needs the exact already installed receipt; no setup is replayed.')
+    desktop = read_json(POST_HOME/'.local/share/augmentor/desktop.json')
+    if desktop.get('root') != str(POST_APP) or desktop.get('node') != str(POST_APP/'node/bin/node') or desktop.get('dshService') != fixture.get('dshService'):
+        raise ValueError('The actual saved startup selection differs; it was preserved.')
+    for name, digest in desktop.get('files', {}).items():
+        path = Path(name)
+        if path.is_absolute() or '..' in path.parts or hashlib.sha256((POST_APP/path).read_bytes()).hexdigest() != digest:
+            raise ValueError('The selected desktop inventory differs.')
+    saved = read_json(POST_HOME/'.config/augmentor/harnesses.json')['dsh']
+    home = POST_HOME/'.local/share/augmentor/dsh-home'
+    if saved.get('home') != str(home) or saved.get('version') != manifest['version'] or desktop.get('dshHome') != str(home) or desktop.get('dshEndpoint') != saved.get('endpoint'):
+        raise ValueError('The saved DSH connection differs.')
+    import yaml
+    model = yaml.safe_load((home/'settings.yaml').read_text())
+    provider = model['llm-pi-ai']['providers']['augmentor-model']
+    if (provider.get('api') != 'openai-completions' or provider.get('apiKeyEnv') != 'AUGMENTOR_MODEL_API_KEY' or
+        len(provider.get('models', [])) != 1 or provider['models'][0]['id'] != 'fixture' or
+        model.get('agent-default-model') != {'provider': 'augmentor-model', 'model': 'fixture'} or
+        (POST_HOME/'.local/state/augmentor-install/model.env').read_text() != 'AUGMENTOR_MODEL_API_KEY="qualification-fixture"\n'):
+        raise ValueError('This entry can use only the existing deterministic synthetic fixture model.')
+    api = urlsplit(provider['baseURL']); endpoint = urlsplit(saved['endpoint'])
+    for url in (api, endpoint):
+        if url.scheme != 'http' or url.hostname != '127.0.0.1' or not url.port or url.username or url.password or url.query or url.fragment:
+            raise ValueError('The saved fixture endpoint is not plain IPv4 loopback.')
+    if (api.path != '/v1' or endpoint.path not in ('', '/') or api.port != fixture.get('modelApiPort') or
+        endpoint.port != fixture.get('dshPort') or api.port == endpoint.port):
+        raise ValueError('The explicitly bound saved ports differ; no settings were rewritten.')
+    post_account_idle(POST_HOME, desktop['dshService'])
+    empty_workspace_guard(home, fixture.get('workspaceStorageSha256'))
+    post_run_name(POST_HOME/'.local/state/augmentor-install', fixture)
+    require_ports_idle((api.port, endpoint.port))  # Never stop an occupied port's owner.
+    from lifecycle.lease import hold
+    hold('runtime')
+    env = selected_python_environment(POST_APP, Path(desktop['python']))
+    return manifest, desktop, env
+
+
+POST_PRIOR_FAILURE_SHA = 'cd7f502ff3d868257f81c9a248aa9f11223925dd91af57da37f12e23407418f2'
+POST_PRIOR_PROOF_SHA = 'a1342ea000108c40c8138ca3439fb4eb6c2302c266af503401e500e2c250b766'
+
+
+def post_run_name(state, fixture):
+    """Allow only the explicitly recorded no-request failure's cwd correction."""
+    name = fixture.get('runDirectory', 'post-install-proof')
+    if name == 'post-install-proof' and 'priorFailure' not in fixture:
+        return name
+    if (name != 'post-install-proof-cwd-v2' or
+        fixture.get('priorFailure') != {'sha256': POST_PRIOR_FAILURE_SHA}):
+        raise ValueError('The explicit cwd-v2 prior failure binding differs; no run is adopted.')
+    from platform_adapters.private_files import descriptor, require_directory
+    prior = state/'post-install-proof'
+    require_directory(prior)
+    with os.fdopen(descriptor(prior/'run.json'), 'rb') as stream:
+        raw = stream.read(4097)
+    if len(raw) > 4096 or hashlib.sha256(raw).hexdigest() != POST_PRIOR_FAILURE_SHA:
+        raise ValueError('The preserved initial failure record differs.')
+    record = json.loads(raw)
+    required = {'format': 'augmentor-owned-post-install-run/1',
+                'run': '1b8cb2ae536d0e6d979e89d15acf5cb1',
+                'artifactId': fixture['artifactId'], 'sourceCommit': POST_SOURCE,
+                'bundleManifestSha256': fixture['bundleManifestSha256'],
+                'proofScriptSha256': POST_PRIOR_PROOF_SHA,
+                'status': 'failed', 'phase': 'starting', 'pendingRequest': None,
+                'unknownRequestOutcome': False, 'settingsPreserved': True}
+    if any(record.get(key) != value for key, value in required.items()):
+        raise ValueError('The prior run is not the bound pre-request failure.')
+    return name
+
+
+def begin_post_run(state, fixture):
+    from platform_adapters.private_files import require_directory, atomic_json
+    require_directory(state)
+    root = state/post_run_name(state, fixture)
+    try:
+        root.mkdir(mode=0o700)
+    except FileExistsError:
+        raise ValueError('A previous post-install proof exists. Its outcome/state was preserved; no run or request is replayed.') from None
+    require_directory(root)
+    record = {'format': 'augmentor-owned-post-install-run/1', 'run': secrets.token_hex(16),
+              'artifactId': fixture['artifactId'], 'sourceCommit': fixture['sourceCommit'],
+              'bundleManifestSha256': fixture['bundleManifestSha256'], 'proofScriptSha256': PROOF_SHA256,
+              'fixtureSha256': hashlib.sha256(json.dumps(fixture, sort_keys=True).encode()).hexdigest(),
+              'phase': 'prepared', 'pendingRequest': None, 'status': 'running'}
+    atomic_json(root/'run.json', record)
+    return root, record
+
+
+def journal_mutation(root, record, adapter, method, payload):
+    from platform_adapters.private_files import atomic_json
+    record['pendingRequest'] = {'method': method, 'sessionId': payload.get('sessionId')}
+    atomic_json(root/'run.json', record)
+    # There is exactly one dispatch. A missing response leaves pendingRequest;
+    # neither this entry nor a later invocation retries or adopts that outcome.
+    result = adapter.call(method, payload)
+    record['pendingRequest'] = None
+    atomic_json(root/'run.json', record)
+    return result
+
+
+def normalized_histories(histories):
+    result = copy.deepcopy(histories)
+    for snapshot in result.values():
+        snapshot['header'].setdefault('delegationDepth', 0)
+    return result
+
+
+def post_install_proof(bundle, fixture):
+    """One-shot post-install acceptance for the explicit existing synthetic VM."""
+    manifest, desktop, env = validate_post_fixture(bundle, fixture)
+    from platform_adapters.private_files import atomic_json, require_directory
+    from platform_adapters.processes import OwnedProcess
+    root, record = begin_post_run(POST_HOME/'.local/state/augmentor-install', fixture)
+    requests = []; process = None; server = None; thread = None; log = None
+    baseline = None; history_preserved = False
+    home = POST_HOME/'.local/share/augmentor/dsh-home'
+    cli = POST_HOME/'.local/share/augmentor/dsh-runtime/node_modules/.bin/dsh'
+    runtime_dir = POST_HOME/'runtime'
+    if not runtime_dir.exists():
+        runtime_dir.mkdir(mode=0o700)
+    require_directory(runtime_dir)
+    env['PATH'] = str(POST_APP/'node/bin')+':'+str(Path(desktop['python']).parent)+':'+str(cli.parent)+':'+env['PATH']
+    env.update(QT_QPA_PLATFORM='offscreen', XDG_RUNTIME_DIR=str(runtime_dir),
+               DSH_HOME=str(home), DSH_TELEMETRY_MODE='DISABLED', AUGMENTOR_MODEL_API_KEY='qualification-fixture')
+    # The selected immutable loader environment must also reach adapter workers.
+    os.environ.clear(); os.environ.update(env)
+    sys.path.insert(0, str(POST_APP/'apps/native'))
+    from augmentor_linux.adapters.dsh import DshAdapter
+
+    def stop():
+        nonlocal process
+        if process is not None:
+            try:
+                if process.poll() is None:
+                    process.terminate()
+                    try: process.wait(timeout=15)
+                    except subprocess.TimeoutExpired: process.kill(); process.wait(timeout=15)
+            finally:
+                process.close(); process = None
+
+    def start():
+        nonlocal process
+        process = OwnedProcess([str(POST_APP/'node/bin/node'), str(cli.resolve()), 'web', '--no-open',
+                                '--host', '127.0.0.1', '--port', str(fixture['dshPort'])],
+                               env=env, cwd=str(POST_HOME), stdout=log, stderr=log)
+        deadline = time.monotonic()+60
+        while time.monotonic() < deadline:
+            if process.poll() is not None:
+                raise RuntimeError('The owned post-install DSH process exited; no startup was retried.')
+            try:
+                adapter = DshAdapter(); adapter.call('host.describe')
+                if not adapter.product: raise ValueError('The saved product connection differs.')
+                return adapter
+            except (OSError, ValueError, RuntimeError):
+                time.sleep(.2)
+        raise RuntimeError('The owned post-install DSH did not become ready within60seconds.')
+
+    def snapshot(adapter, sessions):
+        return {session: adapter.call('session.history', {'sessionId': session}) for session in sessions}
+
+    try:
+        server = fixture_model_server(requests, fixture['modelApiPort'])
+        thread = threading.Thread(target=server.serve_forever, daemon=True); thread.start()
+        log = (root/'dsh.log').open('x'); (root/'dsh.log').chmod(0o600)
+        record['phase'] = 'preview'; atomic_json(root/'run.json', record)
+        run([desktop['python'], '-m', 'augmentor_linux', '--preview', '--screenshot', root/'desktop.png'],
+            env={**env, 'PYTHONPATH': str(POST_APP/'apps/native')}, cwd=str(POST_HOME), timeout=120)
+        if (root/'desktop.png').stat().st_size <= 10000: raise ValueError('The installed preview is incomplete.')
+        record['phase'] = 'starting'; atomic_json(root/'run.json', record)
+        adapter = start()
+        rows = adapter.call('session.list')['items']
+        if any(row.get('running') for row in rows): raise ValueError('Existing DSH work is active; no task was adopted or cancelled.')
+        prior = [row['sessionId'] for row in rows]; baseline = snapshot(adapter, prior)
+        atomic_json(root/'history-prior.json', baseline)
+        sessions = []
+        for role in ('linux', 'browser'):
+            settings_snapshot(POST_HOME, fixture['settings'])
+            session = 'qualification-post-'+record['run']+'-'+role; sessions.append(session)
+            for method, payload in (
+                ('session.create', {'sessionId': session, 'agentPreset': 'augmentor-'+role+'-product', 'cwd': str(POST_HOME)}),
+                ('session.selectModel', {'sessionId': session, 'provider': 'augmentor-model', 'model': 'fixture'}),
+                ('session.prompt', {'sessionId': session, 'mode': 'queue', 'content': [{'type': 'text', 'text': 'Reply to the '+role+' qualification fixture.'}]})):
+                journal_mutation(root, record, adapter, method, payload)
+            deadline = time.monotonic()+60
+            while time.monotonic() < deadline:
+                history = adapter.call('session.history', {'sessionId': session})
+                row = next(row for row in adapter.call('session.list')['items'] if row['sessionId'] == session)
+                if not row['running'] and 'LINUX DISTRO FIXTURE VERIFIED' in json.dumps(history): break
+                time.sleep(.1)
+            else: raise RuntimeError('The owned '+role+' fixture turn did not finish within60seconds.')
+        before = snapshot(adapter, prior+sessions); atomic_json(root/'history-before.json', before)
+        if normalized_histories({key: before[key] for key in prior}) != normalized_histories(baseline):
+            raise ValueError('A preexisting history changed during the fixture turns.')
+        count = len(requests)
+        if count < 2: raise ValueError('Both role turns must reach the deterministic fixture model.')
+        stop()
+        record['phase'] = 'restart'; atomic_json(root/'run.json', record)
+        adapter = start(); after = snapshot(adapter, prior+sessions); atomic_json(root/'history-after.json', after)
+        if normalized_histories(after) != normalized_histories(before): raise ValueError('Restart changed a preserved history.')
+        if len(requests) != count: raise ValueError('Restart replayed a model request.')
+        history_preserved = True; stop()
+        settings_snapshot(POST_HOME, fixture['settings'])
+        report = {'format': 'augmentor-owned-post-install-proof/1', 'status': 'pass', 'sourceCommit': POST_SOURCE,
+                  'artifactId': manifest['artifactId'], 'proofScriptSha256': PROOF_SHA256,
+                  'selectedPython': desktop['python'], 'dshService': desktop['dshService'],
+                  'setupReplayed': False, 'savedSettingsPreserved': True, 'preexistingHistoriesPreserved': True,
+                  'offscreenNativeRender': True, 'linuxAndBrowserRoleFixtureTurns': True,
+                  'restartPreservesHistoryWithoutReplay': True, 'modelRequests': count,
+                  'originalFreshFullProofPass': False, 'realDesktopSessionTested': False,
+                  'graphicalBrowserTested': False, 'physicalVoiceTested': False,
+                  'licenseReviewComplete': False, 'embeddedSourceCoverageComplete': False}
+        atomic_json(root/'report.json', report); record.update(status='complete', phase='complete')
+        return report
+    except BaseException:
+        record['status'] = 'failed'; record['unknownRequestOutcome'] = record['pendingRequest'] is not None
+        raise
+    finally:
+        try:
+            stop()
+        finally:
+            if server is not None:
+                if thread is not None: server.shutdown(); thread.join(timeout=5)
+                server.server_close()
+            if log is not None: log.close()
+            try:
+                settings_snapshot(POST_HOME, fixture['settings']); record['settingsPreserved'] = True
+            except BaseException:
+                record['status'] = 'failed'; record['settingsPreserved'] = False
+                raise
+            finally:
+                record['historyPreservedVerified'] = history_preserved
+                atomic_json(root/'run.json', record)
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--bundle', type=Path, required=True)
@@ -185,7 +588,17 @@ def main():
     p.add_argument('--user-phase', action='store_true', help=argparse.SUPPRESS)
     p.add_argument('--setup-script', type=Path,
                    help='Explicit diagnostic installer override; records its hash and cannot count as matching-bundle acceptance.')
+    p.add_argument('--owned-vm-post-install-fixture', type=Path,
+                   help='Explicit one-shot clean2035 Mint fixture; verifies saved state and never invokes setup.')
     a = p.parse_args()
+    if a.owned_vm_post_install_fixture:
+        if a.user_phase or a.setup_script:
+            p.error('Post-install fixture cannot use user-phase or an installer override.')
+        sys.path.insert(0, str(POST_APP/'services'))
+        from platform_adapters.private_files import read_json
+        report = post_install_proof(a.bundle.resolve(), read_json(a.owned_vm_post_install_fixture))
+        print(json.dumps(report))
+        return
     if not any(Path(marker).exists() for marker in ('/.dockerenv', '/run/.containerenv')):
         raise SystemExit('This proof requires a disposable Docker/Podman container.')
     bundle = a.bundle.resolve()
