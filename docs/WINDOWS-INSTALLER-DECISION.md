@@ -1239,3 +1239,12 @@ The fixture now finds and clicks its actual OK/Cancel button using BM_CLICK,
 retaining class/action observations before cleanup completes as well as after.
 This is an upstream-grounded correction, pending real x64/ARM64 confirmation;
 it does not relabel the earlier rejection-only observation as a completed test.
+
+At `d82a721`, actual-button clicking completes the busy-work warning on x64:
+its final progress records `button-2`. The later wrong-CPU rejection still hangs,
+with 190 retained observations of a native `#32770` warning exposing neither
+IDOK nor IDCANCEL through GetDlgItem. The fixture now uses the documented
+[TDM_CLICK_BUTTON API](https://learn.microsoft.com/en-us/windows/win32/controls/tdm-click-button)
+with wxWidgets' logical IDCANCEL identifier when that native task dialog has no
+ordinary button handle. Ordinary warnings retain the proved actual-button path.
+Rejection and full native cleanup still require fresh hosted confirmation.

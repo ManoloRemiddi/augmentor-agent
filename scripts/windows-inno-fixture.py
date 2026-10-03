@@ -61,8 +61,15 @@ def dismiss_fixture_windows(stop, observations, destination):
                 # Click the real OK/Cancel button instead of guessing its ID.
                 button_id = next((ident for ident in (1,2) if user.GetDlgItem(window,ident)),None)
                 button = user.GetDlgItem(window,button_id) if button_id else None
-                accepted = bool(button and user.PostMessageW(button,0x00f5,0,0))  # BM_CLICK
-                action = 'button-'+str(button_id) if accepted else 'no-button'
+                if button:
+                    accepted = bool(user.PostMessageW(button,0x00f5,0,0))  # BM_CLICK
+                    action = 'button-'+str(button_id) if accepted else 'button-failed'
+                else:
+                    # TaskDialog controls need not expose their logical IDs
+                    # through GetDlgItem. Its public API uses IDCANCEL for the
+                    # wxWidgets OK-only warning (WM_USER + 102).
+                    accepted = bool(user.PostMessageW(window,0x0466,2,0))  # TDM_CLICK_BUTTON
+                    action = 'task-dialog-button-2' if accepted else 'task-dialog-failed'
             else:
                 accepted = bool(user.PostMessageW(window,0x0010,0,0))  # WM_CLOSE
                 action = 'close' if accepted else 'close-failed'

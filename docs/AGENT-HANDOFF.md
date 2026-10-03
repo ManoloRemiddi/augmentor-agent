@@ -1887,3 +1887,19 @@ This confirms the bounded ARM source-restoration correction, including mandatory
 health/completion and installed inventory checks. That run is a checkpoint, not
 final-source qualification: newer packaged-startup and native-dialog fixture
 changes require matching candidates to pass again before publication.
+
+## October 3 off-state settings and installed lease proof
+
+[The Handy lifecycle record](HANDY-INTEGRATION.md#october-3-explicit-off-state-refresh-and-maintenance)
+fixes disabled settings refresh restarting the native component for model lists.
+Three GUI-free cases pass for disabled refresh, disable without restart and
+enabled setup reads. Windows disposable packaged proof now retains the actual
+release identity and uses private runtime paths, requiring a real installation
+lease while enabled and its release after disabling. The customer Windows guide
+requires turning dictation off before maintenance. All matching candidates need
+fresh qualification; the selected/running owner installation remains untouched.
+
+The native `d82a721` dialog diagnostics prove busy-warning cleanup passes, then
+identify the rejected-update warning as a task dialog without ordinary button
+handles. The fixture now uses its documented logical-button message in that
+case; actual x64/ARM64 completion remains a required gate.

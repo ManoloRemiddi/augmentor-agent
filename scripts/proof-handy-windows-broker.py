@@ -32,9 +32,13 @@ def main():
         target=fixture/'apps/native/augmentor_linux/dictation.py';target.parent.mkdir(parents=True)
         shutil.copy2(project/'apps/native/augmentor_linux/dictation.py',target)
         (fixture/'components/handy/runtime/bin/portable').write_text('Private proof profile\n')
+        shutil.copy2(project/'release.json',fixture/'release.json')
+        assert json.loads((fixture/'release.json').read_text())['target'].startswith('windows-')
+        runtime=private_directory(base/'run')
         state=private_directory(base/'state')
         environment={**os.environ,'AUGMENTOR_DICTATION_STATE':str(state),
                      'PYTHONPATH':str(fixture/'apps/native'),'QT_QPA_PLATFORM':'offscreen',
+                     'XDG_RUNTIME_DIR':str(runtime),
                      # A stale inherited supplier path must not override the
                      # component's exact bundled browser selection.
                      'WEBVIEW2_BROWSER_EXECUTABLE_FOLDER':str(base/'missing-global-browser')}
@@ -65,6 +69,14 @@ def main():
             startup_seconds=round(time.monotonic()-started,3)
             enabled=request('status',start=False)
             assert enabled['enabled'] and enabled['phase']=='setup-needed' and enabled['tray'] is False
+            from platform_adapters.windows_identity import private_lock_descriptor
+            from platform_adapters import locks
+            descriptor=private_lock_descriptor(runtime/'installation.lock')
+            try:
+                try:locks.flock(descriptor,locks.LOCK_EX|locks.LOCK_NB)
+                except BlockingIOError:pass
+                else:raise AssertionError('Enabled Handy failed to hold its installation lease.')
+            finally:os.close(descriptor)
             assert enabled['theme']==palette and enabled['settings']['shortcut']=='ctrl+space'
             request('settings',{'revision':enabled['revision'],'values':{'shortcut':'ctrl+shift+space'}},start=False)
             assert request('status',start=False)['settings']['shortcut']=='ctrl+shift+space'
@@ -76,10 +88,13 @@ def main():
             request('conversation.release',{'token':token},start=False)
             request('enable',{'enabled':False},start=False)
             assert request('status',start=False)['phase']=='disabled'
+            descriptor=private_lock_descriptor(runtime/'installation.lock')
+            try:locks.flock(descriptor,locks.LOCK_EX|locks.LOCK_NB)
+            finally:os.close(descriptor)
             request('shutdown',start=False);assert child.wait(timeout=10)==0
             report={'passed':True,'nativeWindows':True,'bundledBrowser':True,'globalBrowserRequired':False,
                     'defaultCtrlSpace':True,'customShortcut':True,'theme':True,'microphoneExclusion':True,
-                    'disable':True,'brokerShutdown':True,'tray':False,'physicalMicrophoneUsed':False,
+                    'disable':True,'enabledInstallationLease':True,'disabledInstallationLeaseReleased':True,'brokerShutdown':True,'tray':False,'physicalMicrophoneUsed':False,
                     'modelDownloaded':False,'startupSeconds':startup_seconds,
                     'scope':'Copied packaged bytes; setup, IPC and lifecycle. Physical transcription remains separate.'}
             args.out.parent.mkdir(parents=True,exist_ok=True)

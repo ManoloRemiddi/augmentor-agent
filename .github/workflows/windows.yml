@@ -145,6 +145,8 @@ jobs:
         run: |
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_dictation.py -v
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_dictation_settings_data.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -I -Xutf8 -B scripts/proof-handy-windows-broker.py --project outputs/payload --out outputs/evidence/dictation.json
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Qualify packaged SDK registration and owned native bridge

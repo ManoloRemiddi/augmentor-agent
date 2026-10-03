@@ -4,6 +4,7 @@ import threading
 from PySide6.QtCore import Signal, QTimer
 from PySide6.QtWidgets import QDialog,QVBoxLayout,QHBoxLayout,QLabel,QPushButton,QCheckBox,QComboBox,QLineEdit,QSpinBox,QScrollArea,QWidget,QMessageBox
 from . import dictation
+from .dictation_settings_data import snapshot as settings_snapshot
 from .voice_button import VoiceButton
 
 
@@ -86,12 +87,7 @@ class DictationSettingsDialog(QDialog):
             for item in (self.shortcut,self.activation,self.microphone,self.language,self.translate,self.paste,self.clipboard,self.history,self.models):item.setEnabled(False)
         def work():
             try:
-                result=dictation.request(method,params,timeout=75)
-                if method!='status':result=dictation.request('status')
-                models=dictation.request('models',timeout=75) if result.get('installed',True) else []
-                if models:result=dictation.request('status')
-                devices=dictation.request('devices',timeout=75) if models else []
-                value={'status':result,'models':models,'devices':devices};error=None
+                value=settings_snapshot(method,params);error=None
             except Exception as problem:value=None;error=str(problem)
             if not self.closed:self.completed.emit(value,error)
         threading.Thread(target=work,daemon=True).start()
@@ -128,3 +124,4 @@ class DictationSettingsDialog(QDialog):
             self.clipboard.setChecked(s.get('clipboard','copy_to_clipboard')=='copy_to_clipboard');self.history.setValue(s.get('history_limit',5))
             self.dirty=False
         self.show_terms()
+        for item in (self.save,self.download,self.select,self.cancel,self.cancel_download,self.shortcut,self.activation,self.microphone,self.language,self.translate,self.paste,self.clipboard,self.history,self.models):item.setEnabled(self.snapshot['enabled'])

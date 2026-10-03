@@ -735,3 +735,20 @@ parameters, downloads no model and uses no physical microphone. This improves
 diagnosis without adding product logging or touching the owner's installation.
 Sixteen broker cases pass locally, including separate startup/warm bounds; all
 matching downloads require fresh qualification after this change.
+
+### October 3 explicit off-state refresh and maintenance
+
+Settings previously requested the native model list even after disabling
+dictation, restarting the component and reacquiring its installation lease.
+Disabled settings refresh now reads only broker status; model/device queries and
+editing controls become available when enabled. Preferences remain stored. Three
+GUI-free cases cover disabled refresh, disable without restart, and the enabled
+model/device/current-revision flow. No layout or recording graphic changes.
+
+The Windows packaged proof now copies the actual release identity into its
+disposable fixture and assigns a private runtime directory. Real kernel lock
+checks must show installation maintenance refused while Handy is enabled and
+admitted after disabling it. Prior proofs covered native IPC/component behavior
+but omitted that release identity, so did not exercise its installation lease.
+The Windows guide explicitly requires turning dictation off before repair or
+removal. All final native/package gates rerun; no owner installation is modified.

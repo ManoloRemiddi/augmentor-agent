@@ -73,8 +73,8 @@ we do not claim RTX Spark testing, every browser/provider, or complete OS parity
 Automatic update notifications and one-click updates are **not enabled**. Do not
 install a different build over this one, including preview 2 over preview 1:
 manual upgrades are not implemented. Future releases must supply a supported upgrade procedure. To repair
-this exact build, first finish active tasks and close all Augmentor windows/browser
-work, then use Installed apps → Augmentor Agent → Modify or rerun this same installer.
+this exact build, first finish active tasks, turn off System dictation in Settings,
+and close all Augmentor windows/browser work, then use Installed apps → Augmentor Agent → Modify or rerun this same installer.
 Do not delete conversations or settings to bypass a refused repair.
 
 Local voice and memory engine provisioning, desktop automation, Pi and Codex
@@ -86,7 +86,7 @@ No account from the developer's machines is included.
 ## Remove or report a problem
 
 Use Settings → Apps → Installed apps → Augmentor Agent → Uninstall. Finish active
-work and close Augmentor first. App removal retains conversations and settings.
+work, turn off System dictation in Settings, and close Augmentor first. App removal retains conversations and settings.
 Personal data is stored under `%LOCALAPPDATA%\Augmentor`; installed program files
 are under `%LOCALAPPDATA%\Programs\Augmentor Agent`. Do not manually remove data
 unless you intend to erase it. Repair/recovery copies also consume disk space.
