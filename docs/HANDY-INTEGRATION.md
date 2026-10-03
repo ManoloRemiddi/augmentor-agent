@@ -11,6 +11,11 @@ An enabled broker now checks for its bundled executable before accepting any
 session connections. An incomplete development checkout cannot take ownership
 of an enabled installed session and serve only component-unavailable errors.
 Disabled isolated test brokers continue to coordinate conversation capture.
+Offscreen Qt clients without an explicit dictation state now create and propagate
+a private temporary test state. They cannot connect to, change, or shut down the
+actual login-session broker even when tests inherit the real HOME and display.
+Explicit fixture state is preserved. The isolated actual IPC regression exercises
+conversation admission/release and broker shutdown without creating home state.
 The regression starts an actual incomplete checkout against private synthetic
 enabled state, verifies refusal to listen, and preserves that state unchanged.
 

@@ -135,6 +135,24 @@ class DictationTests(unittest.TestCase):
         with patch.dict(os.environ,{'AUGMENTOR_DICTATION_STATE':str(state)}):
             with self.assertRaisesRegex(RuntimeError,'not running'):dictation.request('status',start=False)
 
+    def test_offscreen_ui_cannot_share_the_login_session_broker(self):
+        home=self.base/'home';home.mkdir()
+        with patch.dict(os.environ,{'HOME':str(home),'QT_QPA_PLATFORM':'offscreen'}):
+            os.environ.pop('AUGMENTOR_DICTATION_STATE',None)
+            state,address,key=dictation.location()
+            try:
+                self.assertNotEqual(state,home/'.local/share/augmentor/dictation')
+                self.assertEqual(os.environ['AUGMENTOR_DICTATION_STATE'],str(state))
+                self.assertEqual(state.stat().st_mode&0o777,0o700)
+                self.assertFalse((home/'.local/share/augmentor/dictation').exists())
+                self.assertEqual(dictation.location(),(state,address,key))
+                lease=dictation.MicrophoneLease();lease.acquire();lease.release()
+                self.assertFalse(dictation.request('status',start=False)['enabled'])
+                self.assertFalse((home/'.local/share/augmentor/dictation').exists())
+            finally:
+                dictation.request('shutdown',start=False)
+                shutil.rmtree(state)
+
     @unittest.skipIf(os.name=='nt','Unix socket path limit')
     def test_long_state_path_uses_private_short_socket_and_preserves_capture_ownership(self):
         long_base=self.base/('long-home-'+'a'*110)
