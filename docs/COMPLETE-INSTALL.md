@@ -1,8 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
 Arch/Leap remain runtime candidates, with a new [pinned system Python/Qt inventory](LINUX-SYSTEM-QT-STACK.md).
-Their full application packages and complete installer/Node admission are not yet
-implemented. Historical synthetic package-guard proofs do not enable installation.
+Their [full native application packages and installed lifecycle](LINUX-SYSTEM-QT-PACKAGES.md)
+now have private container acceptance, including cold Node admission. Complete
+target installers and real desktop acceptance remain open; these candidates are
+not downloadable compatibility releases.
 
 # Install Desktop, Browser and their shared components
 

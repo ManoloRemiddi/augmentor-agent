@@ -122,6 +122,36 @@ status alone is insufficient. The
 [transaction guide](LINUX-PACKAGE-TRANSACTIONS.md) owns previous synthetic failure,
 recovery and active-lease evidence, which is not full application acceptance.
 
+## Streaming native artifact verification
+
+The [independent streaming inspector](../scripts/inspect-system-qt-package.py)
+now produces artifacts.json only after native package identity, every prepared
+file/link, byte hash, executable/mode bit, link target and application/runtime
+receipt pass. Arch tar and RPM newc payloads are read without extraction or
+application/scriptlet execution. Missing/extra/changed members refuse; changed
+artifact bytes/inode identity during inspection also refuse. Prior results stay
+preserved. [The exact inspection checkpoint](../release/qualification/next-targets/20261003-system-qt-streaming-inspection.json)
+rechecks the previously installed release1 artifacts:29,259 Arch and29,262 Leap
+regular-file/link members across the entire native payload, including wrappers
+and permission files outside the application root.
+
+The first strict comparison refuses Debian-derived checkout group-write bits.
+Both native artifacts already remove those bits while preserving the same bytes.
+The inspector admits only that explicit regular-file permission reduction;
+it still rejects changes to executable or other permission bits. Future preparation
+removes group/world-write bits from regular files and directories before archiving.
+Historical preparation bytes are retained. Four meaningful corruption/path/
+duplicate/hard-link cases and the three existing preparation cases pass. Directory
+ownership/maintenance, full native dependency closure and new artifact production
+remain separate gates.
+
+After a normal native build, create a new checked manifest beside that artifact:
+
+```sh
+python3 scripts/inspect-system-qt-package.py --prepared PREPARED_DIRECTORY \
+  --artifact PREPARED_DIRECTORY/NATIVE_PACKAGE --out PREPARED_DIRECTORY/artifacts.json
+```
+
 ## Native providers and build repetition
 
 Dependency names were checked against the dated official

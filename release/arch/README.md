@@ -5,15 +5,16 @@
 `guard/PKGBUILD` builds the independently owned guard from a fixed public source
 commit and SHA256-checked files. Build normally as an ordinary user with
 `makepkg`; install the guard in its own completed pacman transaction **before**
-installing any future `augmentor-agent` package. A simultaneous dependency
+installing an `augmentor-agent` candidate package. A simultaneous dependency
 transaction does not establish the pre-hook boundary. Keep the guard installed
 through application removal and unresolved recovery; remove it afterward in a
 separate completed transaction.
 
 The [full application preparer](../../scripts/package-system-qt.py) now generates
 an independent PKGBUILD and checksum-checked complete payload. Its ordinary-user
-native build and complete application inventory inspection pass; see
-[exact scope and remaining installation/installer gates](../../docs/LINUX-SYSTEM-QT-PACKAGES.md).
+native build, complete streaming payload inspection and fresh installed busy/idle
+lifecycle pass; see
+[exact scope and remaining installer/session gates](../../docs/LINUX-SYSTEM-QT-PACKAGES.md).
 Neither these private candidates, the guard nor the synthetic proof payload is a
 public application release. The
 reviewed target is the coherent Arch snapshot dated 2026-10-01, x86_64; rolling

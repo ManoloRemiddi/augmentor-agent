@@ -2,6 +2,23 @@
 
 # Linux distribution rollout
 
+## October 3 complete native artifact inspection
+
+[The streaming inspection checkpoint](../release/qualification/next-targets/20261003-system-qt-streaming-inspection.json)
+adds an independently authored native manifest producer. It reads Arch tar/RPM
+newc without extraction or product/scriptlet execution, verifies package identity
+and every prepared file/link byte/mode plus matching runtime/source receipts,
+then checks the artifact stayed unchanged. Exact prior release1 candidates pass
+29,259 Arch/29,262 Leap complete payload members. The initial permission refusal
+is retained: native packages remove Debian-derived group-write bits. That is now
+the sole admitted mode reduction; future preparation canonicalizes permissions
+before archiving. Four corruption/path/duplicate/hard-link cases plus three
+existing preparation cases pass. [The owning guide](LINUX-SYSTEM-QT-PACKAGES.md)
+records commands and limits. This creates checked native inputs for subsequent
+bundle work; it does not establish full installers, new font-dependent builds,
+dependency closure/maintenance, real sessions/audio/Browser/upgrades or release.
+All five rollout points remain active; owner state and22 licensing files unchanged.
+
 ## October 3 installed Arch/Leap lifecycle and native font correction
 
 [Fresh installed package evidence](../release/qualification/next-targets/20261003-system-qt-installed-packages.json)

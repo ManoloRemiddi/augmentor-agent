@@ -7,9 +7,11 @@
 `release/linux-package-guard.py` is the standalone root guard foundation for
 explicit Leap 16.0/RPM and dated Arch/ALPM candidates. It imports no application
 code and reads no user homes. Existing Debian and Fedora packages keep their
-current hooks. Full product builders, installer guard bootstrap, actual product
-transactions and interrupted-reboot recovery remain required before either adapter is admitted
-to the complete installer matrix.
+current hooks. [Full native application candidates and installed lifecycle](LINUX-SYSTEM-QT-PACKAGES.md)
+now pass in fresh disposable fixtures, including actual Desktop/runtime leases,
+reinstall/removal and complete inventory checks. Installer guard bootstrap,
+coherent dependency maintenance and interrupted real-reboot recovery remain
+required before either adapter enters the complete installer matrix.
 
 The [checked source proof](../release/qualification/next-targets/20261002-joint-package-guard-source.json)
 records exact working files and actual Arch/Leap native suites: **699 tests,

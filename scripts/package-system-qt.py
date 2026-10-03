@@ -14,6 +14,7 @@ from pathlib import Path
 import re
 import shlex
 import shutil
+import stat
 import subprocess
 import tarfile
 import tempfile
@@ -270,6 +271,11 @@ def prepare(debian, wheelhouse, out, target, release=1):
                    'manager': manager, 'version': version, 'source': source, 'package': package,
                    'completeInventory': True, 'files': inventory(app)}
         write(app/'linux-package.json', json.dumps(receipt, indent=2)+'\n')
+        # The checked native payload is root-owned after installation. Do not
+        # inherit group/world-writable checkout modes from Debian source bytes.
+        for path in payload.rglob('*'):
+            if not path.is_symlink():
+                path.chmod(stat.S_IMODE(path.stat().st_mode) & ~0o022)
         with tarfile.open(stage/'payload.tar', 'w') as archive:
             archive.add(payload, arcname='payload')
         payload_hash = digest(stage/'payload.tar')
