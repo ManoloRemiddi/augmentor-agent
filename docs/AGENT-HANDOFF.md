@@ -4,6 +4,13 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+Focused native `dc0c634` fails 37157951783 before socket registration. Its diagnostic
+proves the process UID is the disposable user 1002 while inherited runtime is
+`/run/user/1001`, owned by the runner. The workflow now explicitly imports the
+fresh user's runtime into its own user manager, and the fixture uses that actual
+private runtime for graph discovery. Source privacy/focused-mode skips work; the
+private-directory guard is unchanged. New native qualification is required.
+
 Corrected isolated-source execution at `bc8b256` reaches the actual Node unit, but
 native job 111302228170 in 37156960807 fails its strict runtime ownership/mode
 check before socket registration. The fixture now emits only synthetic runtime

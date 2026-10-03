@@ -1180,3 +1180,9 @@ all existing checks. The focused mode runs privacy and the native service job;
 skipped build/package jobs do not qualify broad release validation.
 Focused mode uses a separate concurrency group so it does not cancel a live broad
 validation of the same branch.
+
+Focused `dc0c634` qualification 37157951783 identifies the native refusal: process
+UID 1002 inherited `/run/user/1001` (directory UID 1001, mode 0700). The workflow
+imports the fresh account's explicit runtime into its own user manager, and the
+fixture verifies and uses `/run/user/<its UID>` for actual graph observation. No
+control-server ownership guard is relaxed. New native execution is required.

@@ -61,6 +61,11 @@ class NativeServiceTests(unittest.TestCase):
         if os.environ.get('CI')!='true' or pwd.getpwuid(os.getuid()).pw_name!='augupdatefixture':
             self.fail('Native service qualification requires its dedicated disposable CI account.')
         f=fixtures.RegistrationTests('runTest');f.setUp();self.f=f;self.addCleanup(f.doCleanups)
+        f.runtime=Path(os.environ['XDG_RUNTIME_DIR'])
+        runtime=f.runtime.lstat()
+        if (f.runtime!=Path('/run/user/'+str(os.getuid())) or f.runtime.resolve()!=f.runtime
+                or runtime.st_uid!=os.getuid() or runtime.st_mode&0o077):
+            self.fail('Use only this disposable account\'s actual private systemd runtime.')
         config=Path.home()/'.config';state=Path.home()/'.local/state'
         for path in (config/'systemd/user',config/'augmentor',state/'augmentor-install'):
             path.mkdir(parents=True,mode=0o700,exist_ok=True)
