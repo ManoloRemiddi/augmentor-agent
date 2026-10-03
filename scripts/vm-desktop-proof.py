@@ -86,6 +86,25 @@ def save_owned_editor(editor,home,text):
     return name
 
 
+def require_unlocked_session(record,uid,expected_session=None):
+    """Reject a stale, locked, or switched session before virtual input."""
+    if record.get('admitted') is not True:
+        raise ValueError('Actual session-state admission refused: '+str(record.get('error','unverified state')))
+    session=record.get('session',{});screensaver=record.get('screensaver',{})
+    expected={'User':str(uid),'Type':'wayland','Class':'user','Seat':'seat0',
+              'Remote':'no','Active':'yes','State':'active','LockedHint':'no'}
+    name=session.get('Id')
+    if (not isinstance(name,str) or not name or not name.isalnum() or
+            any(session.get(key)!=value for key,value in expected.items()) or
+            (expected_session is not None and name!=expected_session)):
+        raise ValueError('Virtual input requires the same ordinary active unlocked seat0 Wayland session.')
+    if (screensaver.get('active') is not False or screensaver.get('uid')!=uid or
+            not isinstance(screensaver.get('owner'),str) or not screensaver['owner'].startswith(':') or
+            type(screensaver.get('pid')) is not int or screensaver['pid']<=0):
+        raise ValueError('Virtual input requires a verified inactive session ScreenSaver.')
+    return name
+
+
 p=argparse.ArgumentParser(description=__doc__);p.add_argument('--source',action='store_true');p.add_argument('--port',type=int,default=22487);p.add_argument('--scale',type=float,choices=(1,1.25,1.5),default=1)
 p.add_argument('--vm-dir',type=Path,default=ROOT/'outputs/desktop-vm')
 p.add_argument('--guest-root',help='Explicit staged source root in the disposable VM')
@@ -117,7 +136,7 @@ def helper_command(action,*rest):
     if not (a.source or a.guest_root):
         # Verify metadata/inventories before executing the selected runner. Its
         # normal lease/runtime selector then supplies the loader environment.
-        if action!='versions':
+        if action not in ('versions','session-state'):
             command=['python3','-B',str(Path(root)/'scripts/run-component.py'),'desktop',*command]
         command=['env','AUGMENTOR_PYTHON='+guest_python,*command]
         command=['env','AUGMENTOR_PROOF_SOURCE='+a.expected_source,'AUGMENTOR_PROOF_TARGET='+a.expected_target,*command]
@@ -125,6 +144,7 @@ def helper_command(action,*rest):
     return command
 def guest(action,*rest):return json.loads(remote(helper_command(action,*rest)))
 def rpc(method,params=None,owner='pi:acceptance'):
+    if method in ('connect','action'):require_current_session('rpc:'+method)
     return json.loads(remote(helper_command('rpc'),json.dumps({'method':method,'owner':owner,'params':params or {}})))
 def okay(response):assert response['ok'],response;return response['result']
 def until(check,seconds=30):
@@ -134,11 +154,33 @@ def until(check,seconds=30):
         if value:return value
         time.sleep(.2)
     raise AssertionError('Desktop acceptance condition timed out')
+session_id=None
+session_guard_path=vm/('session-guard-'+str(time.time_ns())+'.jsonl')
+def require_current_session(operation):
+    global session_id
+    started=time.monotonic()
+    receipt={'operation':operation}
+    try:
+        record=json.loads(remote(helper_command('session-state'),timeout=15))
+        receipt['sessionState']=record
+        session_id=require_unlocked_session(record,a.guest_uid,session_id)
+        receipt['admitted']=True
+        return record
+    except Exception as error:
+        receipt.update(admitted=False,errorType=type(error).__name__,error=str(error))
+        raise
+    finally:
+        receipt['transportSeconds']=round(time.monotonic()-started,6)
+        with session_guard_path.open('a') as stream:stream.write(json.dumps(receipt)+'\n')
 def qmp(name,args):
     with socket.socket(socket.AF_UNIX) as s:
         s.settimeout(10);s.connect(os.path.relpath(vm/'qmp.sock'))
         f=s.makefile('rwb',buffering=0);assert 'QMP' in json.loads(f.readline())
         for method,params in [('qmp_capabilities',{}),('query-name',{}),(name,args)]:
+            if method in ('input-send-event','send-key'):
+                # Compositor focus can still name a window behind an idle lock.
+                # Refresh both actual lock authorities after all prior work.
+                require_current_session(method)
             f.write((json.dumps({'execute':method,'arguments':params,'id':method})+'\n').encode())
             while True:
                 response=json.loads(f.readline())
@@ -161,6 +203,7 @@ def stop_click():
     pid=okay(rpc('status'))['pid'];scene=guest('scene');banner=next(w for w in scene['above'] if w['pid']==pid)['geometry']
     logical_click(banner['x']+banner['width']-90,banner['y']+banner['height']/2)
 def async_rpc(method,params=None):
+    if method in ('connect','action'):require_current_session('async-rpc:'+method)
     child=subprocess.Popen([*ssh,shlex.join(helper_command('rpc'))],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
     child.stdin.write(json.dumps({'method':method,'owner':'pi:acceptance','params':params or {}}));child.stdin.close();child.stdin=None;return child
 
@@ -201,6 +244,7 @@ if not (a.source or a.guest_root):
 remote(['python3','-c','import sys;from pathlib import Path;Path("vm-desktop-session.py").write_text(sys.stdin.read())'],(ROOT/'release/vm-desktop-session.py').read_text())
 service=None;log=None
 try:
+    require_current_session('entry')
     if a.source:
         archive=io.BytesIO()
         with tarfile.open(fileobj=archive,mode='w') as tar:
@@ -287,7 +331,7 @@ try:
     time.sleep(1);key('ctrl','s');time.sleep(.3);assert guest('file',fixture_name)['text']==partial
     assert not rpc('action',{'token':s['token'],'kind':'type','text':'must not restart'})['ok']
     print('Actual Stop click interrupted typing; saved partial content stayed unchanged',flush=True)
-    result={'environment':environment,'scale':a.scale,'candidateSource':bool(a.source or a.guest_root),'consentObservationSha256':hashlib.sha256(a.consent_observation.read_bytes()).hexdigest(),'proofScriptSha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'guestHelperSha256':hashlib.sha256((ROOT/'release/vm-desktop-session.py').read_bytes()).hexdigest(),'consentDenied':True,'pendingConsentStopped':True,'guards':True,'savedFileExact':True,'saveScope':'existing-owned-editor-file','savedFile':fixture_name,'stopInterruptedInput':True,'partialCharacters':len(partial.rstrip('\n')),'noReplayAfterStop':True}
+    result={'environment':environment,'scale':a.scale,'candidateSource':bool(a.source or a.guest_root),'consentObservationSha256':hashlib.sha256(a.consent_observation.read_bytes()).hexdigest(),'proofScriptSha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'guestHelperSha256':hashlib.sha256((ROOT/'release/vm-desktop-session.py').read_bytes()).hexdigest(),'sessionGuardReceipts':str(session_guard_path),'consentDenied':True,'pendingConsentStopped':True,'guards':True,'savedFileExact':True,'saveScope':'existing-owned-editor-file','savedFile':fixture_name,'stopInterruptedInput':True,'partialCharacters':len(partial.rstrip('\n')),'noReplayAfterStop':True}
     (vm/'desktop-control-acceptance.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result),flush=True)
 finally:
     failed=sys.exc_info()[0] is not None

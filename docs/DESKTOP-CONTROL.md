@@ -1,5 +1,45 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 KDE idle-lock refusal candidate
+
+The published existing-file Save proof
+`51a6cb84332673e1abb73ec5d6bc31ed0f3bf269` fails after197.891seconds at the
+first consent RPC's unchanged20-second response bound. It records no completed
+Deny, typing, save or partial-input Stop result. The retained compositor
+processes are still running, but the ordinary lock-screen process started seven
+seconds before the driver began. A subsequent native receipt reports
+`LockedHint=yes`; the actual same-user ScreenSaver owner is KWin with
+`GetActive=true` (a read-only D-Bus identity/state query takes0.020866seconds).
+The screenshot says `Display output is not active`. The
+fixture still contains `Fixture ready\n`. The driver reached the Deny QMP click,
+but its native response is unknown; no click or RPC is retried. A separate
+read-only full provenance/package audit takes71.100seconds. This does not
+establish the20-second transport timeout's cause.
+
+The proof-only candidate adds a fast `session-state` operation. It requires one
+local ordinary active seat0 Wayland session for the exact account, verifies the
+exported session identity, checks login1's unlocked hint, and asks the actual
+same-user session ScreenSaver owner for `GetActive`. Missing, changed or active
+lock authorities refuse input. The driver pins this session at entry and checks
+it again immediately before every QMP mouse event and key chord, including each
+mouse button press/release, and before portal requests or product input RPCs.
+Separate immutable source/package checks remain;
+the fast lock operation does not repeat the whole payload audit. Each admission
+or refusal retains timing and available owner/state evidence in a fresh receipt
+file. A session that locks between input events causes refusal, including a
+possible partial chord/button sequence; the proof does not unlock or replay it.
+These checks are observations before input, not an atomic lock with the
+compositor. Ordinary session recovery must repeat its final unlocked check after
+the expensive provenance and hide steps. Thirty-two focused source guard
+tests pass; this candidate has not been run as a new full installed proof.
+
+The queried primary contracts are
+[systemd login1 session properties](https://github.com/systemd/systemd/blob/v258/man/org.freedesktop.login1.xml)
+and [KDE6.7.5 ScreenSaver GetActive](https://github.com/KDE/kscreenlocker/blob/v6.7.5/dbus/org.freedesktop.ScreenSaver.xml).
+The earlier differently cased unsaved Kate buffer remains a separate unresolved
+failure; this run never reaches its exact-byte typing check. No lock preference,
+password, product permission path or keyboard state is changed.
+
 ## October 3 Fedora KDE permission proof and existing-file Save candidate
 
 The Fedora44 Cloud-derived Plasma6.7.5 Wayland guest retains the clean

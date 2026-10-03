@@ -67,6 +67,73 @@ def configure_scale(name,scale,environment):
                    env=kscreen_environment(environment),check=True,timeout=20,stdout=subprocess.DEVNULL)
 
 
+def admit_session_state(sessions,uid,session_id,screensaver):
+    """Admit one actual local user session, with both lock authorities clear."""
+    candidates=[row for row in sessions if row.get('User')==str(uid) and
+                row.get('Type')=='wayland' and row.get('Class')=='user' and
+                row.get('Seat')=='seat0' and row.get('Remote')=='no' and
+                row.get('Active')=='yes' and row.get('State')=='active']
+    if len(candidates)!=1 or candidates[0].get('Id')!=session_id:
+        raise ValueError('The ordinary active seat0 Wayland session is absent, changed, or ambiguous.')
+    session=candidates[0]
+    if session.get('LockedHint')!='no':
+        raise ValueError('The actual Wayland session is locked or its lock state is unknown.')
+    if (screensaver.get('active') is not False or screensaver.get('uid')!=uid or
+            not isinstance(screensaver.get('owner'),str) or not screensaver['owner'].startswith(':') or
+            type(screensaver.get('pid')) is not int or screensaver['pid']<=0):
+        raise ValueError('The actual session ScreenSaver is active or its owner/state is unverified.')
+    return {'admitted':True,'session':session,'screensaver':screensaver}
+
+
+def session_state(uid,environment):
+    """Read lock/session state without executing a payload or changing settings."""
+    from gi.repository import Gio,GLib
+    started=time.monotonic()
+    if (os.getuid()!=uid or environment.get('XDG_SESSION_TYPE')!='wayland' or
+            not environment.get('WAYLAND_DISPLAY') or not environment.get('DISPLAY')):
+        raise ValueError('The actual ordinary Wayland session environment is absent.')
+    def properties(command):
+        text=subprocess.check_output(command,text=True,timeout=5)
+        return dict(line.split('=',1) for line in text.splitlines() if '=' in line)
+    ids=properties(['loginctl','show-user',str(uid),'-p','Sessions']).get('Sessions','').split()
+    if not ids or len(ids)>32:
+        raise ValueError('The owned user session list is absent or exceeds its bound.')
+    sessions=[properties(['loginctl','show-session',name,'-p','Id','-p','User','-p','Type',
+                          '-p','Class','-p','Seat','-p','Remote','-p','Active','-p','State','-p','LockedHint'])
+              for name in ids]
+    bus=Gio.bus_get_sync(Gio.BusType.SESSION,None)
+    def call(destination,path,interface,method,parameters=None):
+        return bus.call_sync(destination,path,interface,method,parameters,None,0,3000,None).unpack()[0]
+    def bus_identity(method,value):
+        return call('org.freedesktop.DBus','/org/freedesktop/DBus','org.freedesktop.DBus',
+                    method,GLib.Variant('(s)',(value,)))
+    owner=bus_identity('GetNameOwner','org.freedesktop.ScreenSaver')
+    pid=bus_identity('GetConnectionUnixProcessID',owner)
+    owner_uid=bus_identity('GetConnectionUnixUser',owner)
+    process=Path('/proc')/str(pid)
+    start=(process/'stat').read_text().split(') ',1)[1].split()[19]
+    active=call(owner,'/org/freedesktop/ScreenSaver','org.freedesktop.ScreenSaver','GetActive')
+    if (bus_identity('GetNameOwner','org.freedesktop.ScreenSaver')!=owner or
+            (process/'stat').read_text().split(') ',1)[1].split()[19]!=start or process.stat().st_uid!=uid):
+        raise ValueError('The session ScreenSaver owner changed during its lock check.')
+    screensaver={'owner':owner,'pid':pid,'uid':owner_uid,'startTicks':start,'active':active}
+    latest_sessions=sessions
+    try:
+        result=admit_session_state(sessions,uid,environment.get('XDG_SESSION_ID'),screensaver)
+        # Check login1 again after the session-bus request; no stale unlocked hint.
+        current=properties(['loginctl','show-session',result['session']['Id'],'-p','Id','-p','User','-p','Type',
+                            '-p','Class','-p','Seat','-p','Remote','-p','Active','-p','State','-p','LockedHint'])
+        latest_sessions=[current]
+        screensaver['active']=call(owner,'/org/freedesktop/ScreenSaver','org.freedesktop.ScreenSaver','GetActive')
+        if (bus_identity('GetNameOwner','org.freedesktop.ScreenSaver')!=owner or
+                (process/'stat').read_text().split(') ',1)[1].split()[19]!=start):
+            raise ValueError('The session ScreenSaver owner changed during its final lock check.')
+        result=admit_session_state([current],uid,environment.get('XDG_SESSION_ID'),screensaver)
+    except ValueError as error:
+        result={'admitted':False,'sessions':latest_sessions,'screensaver':screensaver,'error':str(error)}
+    return {**result,'checkedAt':time.time(),'elapsedSeconds':round(time.monotonic()-started,6)}
+
+
 assert Path('/etc/augmentor-test-vm').read_text().startswith('Isolated Augmentor')
 if os.environ.get('AUGMENTOR_PROOF_UID') or os.environ.get('AUGMENTOR_PROOF_USER'):
     assert os.getuid()==int(os.environ['AUGMENTOR_PROOF_UID']) and os.environ.get('USER')==os.environ['AUGMENTOR_PROOF_USER']
@@ -87,7 +154,9 @@ for line in subprocess.check_output(['systemctl','--user','show-environment'],te
     key,_,value=line.partition('=');os.environ[key]=value
 os.environ['QT_QPA_PLATFORM']='xcb'
 sys.path.insert(0,str(root/'services/desktop'))
-if action=='serve':
+if action=='session-state':
+    print(json.dumps(session_state(int(os.environ['AUGMENTOR_PROOF_UID']),os.environ)))
+elif action=='serve':
     if os.environ.get('AUGMENTOR_VM_FOCUS_DEBUG')=='1':
         from portal import Portal
         original_focus=Portal.focus_info
