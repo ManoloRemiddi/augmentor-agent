@@ -64,12 +64,11 @@ def run(observer,source_root,release_digest,payload_digest,attempt,bootstrap_fd)
             plan=held.enter_context(ManagedPlan(data,source,target))
             coordinator=LinuxCoordinator(plan,runtime_directory(),shared_state_directory(),transactions)
             result=coordinator.run(authority.check)
-            from .linux_reopen import reopen_dsh_observed
+            from .linux_reopen import reopen_dsh_observed,reopen_desktop_observed
             reopen_dsh_observed(coordinator.backend,result)
-            # Captured desktop/background ownership still requires its own
-            # reopening; manager eligibility remains gated until qualification.
+            reopened=reopen_desktop_observed(coordinator.backend,coordinator.reopen_plan,result)
             return write_result(transactions,attempt,'target-healthy',candidate=candidate,
-                transaction=result['transactionId'],reopened=False)
+                transaction=result['transactionId'],reopened=reopened)
     except Exception as error:
         if coordinator is not None and coordinator.completion is not None:
             return write_result(transactions,attempt,'target-healthy',candidate=candidate,

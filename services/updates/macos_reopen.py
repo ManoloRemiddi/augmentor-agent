@@ -6,9 +6,7 @@ startup guard prevents work until archival; the updater never creates/enables a
 service, changes its plist, force-stops it or replays a saved command.
 """
 from contextlib import ExitStack
-from copy import deepcopy
 import os
-import re
 import subprocess
 import sys
 
@@ -20,13 +18,7 @@ from platform_adapters import locks
 from platform_adapters.private_files import descriptor,read_json
 
 
-def validate_plan(plan):
-    if (not isinstance(plan,dict) or set(plan)!={'instances','hadBrowser'} or type(plan['hadBrowser']) is not bool
-            or not isinstance(plan['instances'],list) or len(plan['instances'])>64
-            or any(not isinstance(name,str) or not re.fullmatch('[a-z][a-z0-9-]{0,31}',name) for name in plan['instances'])
-            or len(set(plan['instances']))!=len(plan['instances'])):
-        raise ValueError('Use only the instance names captured from the original live graph.')
-    return deepcopy(plan)
+from .posix_reopen import validate_plan
 
 
 def reopen_observed(backend,plan,completion):

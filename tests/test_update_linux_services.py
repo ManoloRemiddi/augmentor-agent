@@ -1,6 +1,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Actual owned unit/harness files; explicit simulated systemd/peer observations."""
 import json
+from contextlib import nullcontext
 import hashlib
 import importlib.util
 import os
@@ -12,6 +13,7 @@ from unittest.mock import Mock,patch
 
 import test_update_linux_registration as fixtures
 from updates.linux_services import OwnedServicePlan,render,UNIT,PROPERTIES
+from updates.linux_desktop import OwnedDesktopPlan,render as desktop_unit
 from updates.linux_managed import ManagedPlan,load_deployment
 from updates.linux_coordinator import LinuxCoordinator
 from lifecycle.posix_startup import Startup
@@ -155,8 +157,11 @@ class ServiceTests(unittest.TestCase):
     def test_service_migration_composes_with_original_managed_pointer_and_completion(self):
         self.completed_scene()
 
-    def completed_scene(self,exercise=None):
-        f=self.fixture;data=f.base/'data';data.mkdir(mode=0o700);tool=load_deployment(data);tool.check=Mock()
+    def completed_scene(self,exercise=None,*,desktop=False):
+        f=self.fixture;data=f.base/'data/augmentor';data.mkdir(parents=True,mode=0o700);data.parent.chmod(0o700)
+        self.env_data=patch.dict(os.environ,{'XDG_DATA_HOME':str(data.parent)})
+        self.env_data.start();self.addCleanup(self.env_data.stop)
+        tool=load_deployment(data);tool.check=Mock()
         configs=[]
         for root,config,version,commit in ((f.source,self.previous,'1.0.0','a'*40),
                 (f.target,self.proposed,'2.0.0','c'*40)):
@@ -168,36 +173,62 @@ class ServiceTests(unittest.TestCase):
             (root/'release/product.json').write_text(json.dumps(product))
             (root/'release.json').write_text(json.dumps({**product,'target':'linux-x64','sourceCommit':commit,
                 'component':'desktop','update':{'build':1,'automaticInstallQualified':False}}))
+            if desktop:
+                (root/'scripts').mkdir()
+                (root/'scripts/desktop-launch.py').write_bytes((fixtures.ROOT/'scripts/desktop-launch.py').read_bytes()+
+                    (b'\n# Synthetic target release.\n' if root==f.target else b''))
             files=tool.inventory(root);digest=hashlib.sha256(json.dumps(files,sort_keys=True).encode()).hexdigest()
             config={**config,'python':sys.executable,'releaseId':'fixture-'+version,'sourceRef':commit,'artifactSha256':digest}
             tool.atomic(root/'desktop-release.json',{'deployment':config,'files':files,'artifactSha256':digest})
             configs.append(config)
         atomic_json(data/'desktop.json',configs[0]);registration,service=self.plan(bind=False)
-        state=self.report.copy();test=self
+        state=self.report.copy();test=self;desktop_plan=None;desktop_state=None
+        if desktop:
+            launcher=data/'desktop-launch.py';launcher.write_bytes((f.source/'scripts/desktop-launch.py').read_bytes());launcher.chmod(0o600)
+            unit=self.config/'systemd/user/augmentor-desktop.service';unit.write_bytes(desktop_unit(launcher));unit.chmod(0o600)
+            desktop_state={**state,'Id':'augmentor-desktop.service','FragmentPath':str(unit),'MainPID':'234','UnitFileState':'disabled'}
+            with patch.object(OwnedDesktopPlan,'query',return_value=desktop_state.copy()):
+                desktop_plan=OwnedDesktopPlan(registration,data)
         # Explicitly simulated graph/process/systemd actions; selection, barriers,
         # journal, registration backups and completion archive are actual files.
         class Graph:
-            def __init__(self,root,runtime,shared,*,transactions,captured,services):
+            def __init__(self,root,runtime,shared,*,transactions,captured,services,desktop=None):
                 self.root=root;self.runtime=runtime;self.transactions=transactions;self.captured=captured
                 process=Mock(pid=123,closed=False);process.exited.return_value=False
                 self.dsh=[SimpleNamespace(process=process,pid=123)]
+                self.windows=[]
+                if desktop is not None:
+                    for name,pid in (('',234),('-secondary',235)):
+                        peer=Mock(pid=pid,closed=False);peer.exited.return_value=False
+                        self.windows.append(SimpleNamespace(process=peer,pid=pid,endpoint=runtime/('augmentor-linux-pi'+name+'.sock')))
+                self.desktop=desktop
             def __enter__(self):
                 self.gate=Startup(self.runtime,maintenance=True,transactions=self.transactions)
-                service.bind(self);self.captured({'instances':[],'hadBrowser':False});return self
+                service.bind(self)
+                if self.desktop is not None:self.desktop.bind(self)
+                self.captured(self.reopen_plan());return self
+            def reopen_plan(self):
+                return {'instances':['main','secondary'] if self.desktop is not None else [],'hadBrowser':False}
             def check(self):test.assertIsNotNone(self.gate.fd)
             def drain(self,*,checkpoint):
+                for window in self.windows:
+                    checkpoint('commit-intent',window);checkpoint('commit-acknowledged',window)
+                    window.process.exited.return_value=True;checkpoint('exited',window)
+                if desktop_state is not None:desktop_state.update(ActiveState='inactive',SubState='dead',MainPID='0')
                 participant=self.dsh[0]
                 checkpoint('commit-intent',participant);checkpoint('commit-acknowledged',participant)
                 participant.process.exited.return_value=True
                 state.update(test.inactive());checkpoint('exited',participant)
             def __exit__(self,*args):
+                for window in self.windows:window.process.closed=True
                 self.dsh[0].process.closed=True;self.gate.close()
         with patch('updates.linux_managed.load_deployment',return_value=tool),patch(
                 'updates.linux_completion.verify_health',return_value=True),patch(
                 'updates.linux_coordinator.CapturedPreparation',Graph),patch.object(
-                service,'query',side_effect=lambda:state.copy()),patch('updates.linux_services.subprocess.run') as run:
+                service,'query',side_effect=lambda:state.copy()),(patch.object(desktop_plan,'query',side_effect=lambda:desktop_state.copy())
+                    if desktop_plan is not None else nullcontext()),patch('updates.linux_services.subprocess.run') as run:
             with ManagedPlan(data,f.source,f.target,development=True,registration=registration) as plan:
-                plan.services=service
+                plan.services=service;plan.desktop=desktop_plan
                 coordinator=LinuxCoordinator(plan,f.runtime,f.runtime/'shared',f.transactions)
                 result=coordinator.run(lambda stage:True)
                 self.assertTrue(result['installationComplete']);self.assertTrue(service.verify_applied())
@@ -206,4 +237,7 @@ class ServiceTests(unittest.TestCase):
                 self.assertEqual(read_json(Path(result['archive']))['phase'],'complete')
                 self.assertFalse((f.transactions/'active.json').exists());self.assertEqual(run.call_count,1)
                 if exercise is not None:exercise(coordinator,result,state,run)
+                if desktop_plan is not None:
+                    self.assertEqual(desktop_state['UnitFileState'],'disabled')
+                    self.assertEqual(desktop_plan.launcher.read_bytes(),(f.target/'scripts/desktop-launch.py').read_bytes())
         f.sentinels_preserved();self.assertEqual(self.credentials.read_bytes(),b'FIXTURE_SECRET=preserve-exactly\n')

@@ -1209,3 +1209,51 @@ fixture, separately corrected/passed at `0ed4a1b` above. The `76462aa` broader j
 also all pass in 37155477755 except its native checkout-access fixture. These
 newer source checks supersede the earlier transient dual-memory startup failure;
 memory code was not altered. Different refs/scopes remain explicit.
+
+
+### Owned desktop migration and observed reopening — October 4
+
+`linux_desktop.OwnedDesktopPlan` checks the canonical installed data directory,
+exact source launcher and fixed `augmentor-desktop.service` unit before binding
+the registration pair. Both files join the original private backup/migration.
+The target launcher comes from the inspected immutable target; customized files,
+service drop-ins, stale loaded definitions and changed enablement refuse before
+writes. The actual reserved main-window socket peer must match the original live
+service MainPID. An inactive owner cannot adopt an externally owned main window.
+Only original observed normal exit permits migration. Completion checks the
+unchanged inactive owner before and after offline target health.
+
+The retained coordinator stores the bounded captured instance names on the live
+backend. Linux and Mac share only their name validator; their launch mechanisms
+remain separate. After verified DSH reopening, `reopen_desktop_observed` holds
+startup/installation readers and verifies the exact original completed archive,
+selection, both artifacts and registration backups. It starts the fixed desktop
+unit once for a captured main window and launches captured secondary names through
+the migrated fixed launcher. Fresh actual target socket peers must match the live
+service MainPID or original newly launched child. Target windows must report
+connection and successful conversation restoration; immutable files and kernel
+observations are rechecked. No saved command/PID reconstructs authority, no new
+instance is invented, and a failed or uncertain launch cannot replay. The target
+stays installed when reopening fails; the driver reports manual reopening.
+Enablement, model choices, credentials and conversations remain user-owned.
+
+Local evidence on this checkpoint: ten new desktop cases and the sixteen existing
+service/reopening cases pass using real registration, selection, journal and
+backup files, with explicit graph/systemd/process/health mocks. Focused updater
+checks pass 228 total (225 passed, three OS/CI skips). These cover original peer
+binding and normal exit, inactive/external owner refusal, service changes,
+customized launcher, changed capture, missing DSH completion, uncertain start,
+wrong target window peer and failed conversation restoration. Source/target
+launcher bytes differ in the migration fixture. Full Python/native results must
+be recorded at their exact tested revision.
+
+The isolated native Linux job adds a second inert fixture using the actual
+installed launcher, copied Python executable, user desktop service, named
+secondary process, shipped startup/lifetime/admission primitives, control sockets,
+pidfds and real managed coordinator. It exercises normal original window exits,
+launcher migration, completion and fresh target main/secondary reopening. The
+fixture remains independent public synthetic source: it runs no Qt window,
+provider or real conversation, and connected/import/offline UI health are mocked.
+Native execution is pending. Public Linux eligibility stays disabled; normal GUI,
+real DSH, signed forward releases and remaining platform/package paths still need
+qualification.

@@ -44,6 +44,19 @@ def render(node,cli,home,credentials,port):
         '\nRestart=on-failure\nRestartSec=5\nUMask=0077\n\n[Install]\nWantedBy=default.target\n').encode()
 
 
+def query_unit(unit):
+    result=subprocess.run(['/usr/bin/systemctl','--user','show','--all','--no-pager',
+        '--property='+','.join(PROPERTIES),unit],stdin=subprocess.DEVNULL,capture_output=True,timeout=10)
+    if result.returncode or len(result.stdout)>65536:raise RuntimeError('The owned user service could not be inspected.')
+    fields={}
+    for line in result.stdout.decode('utf-8').splitlines():
+        key,separator,value=line.partition('=')
+        if not separator or key not in PROPERTIES or key in fields:raise ValueError('Unexpected owned service report.')
+        fields[key]=value
+    if set(fields)!=set(PROPERTIES):raise ValueError('Incomplete owned service report.')
+    return fields
+
+
 class OwnedServicePlan:
     def __init__(self,registration,previous,proposed):
         if not isinstance(registration,RegistrationPlan) or registration.pair is not None:
@@ -87,16 +100,7 @@ class OwnedServicePlan:
         registration.add_external_file('shared-config',shared,self.harnesses,before,(json.dumps(after,indent=2)+'\n').encode())
 
     def query(self):
-        result=subprocess.run(['/usr/bin/systemctl','--user','show','--all','--no-pager',
-            '--property='+','.join(PROPERTIES),UNIT],stdin=subprocess.DEVNULL,capture_output=True,timeout=10)
-        if result.returncode or len(result.stdout)>65536:raise RuntimeError('The owned user service could not be inspected.')
-        fields={}
-        for line in result.stdout.decode('utf-8').splitlines():
-            key,separator,value=line.partition('=')
-            if not separator or key not in PROPERTIES or key in fields:raise ValueError('Unexpected owned service report.')
-            fields[key]=value
-        if set(fields)!=set(PROPERTIES):raise ValueError('Incomplete owned service report.')
-        return fields
+        return query_unit(UNIT)
 
     def verify_state(self,state,*,running,reloaded=True):
         if (state['Id']!=UNIT or state['LoadState']!='loaded' or state['FragmentPath']!=str(self.unit)

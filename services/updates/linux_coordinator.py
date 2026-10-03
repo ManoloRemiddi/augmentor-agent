@@ -13,13 +13,14 @@ from .linux_completion import complete_observed
 
 
 class CapturedPreparation(PosixPreparation):
-    def __init__(self,*args,captured,services=None,**kwargs):
-        super().__init__(*args,**kwargs);self.captured=captured;self.services=services
+    def __init__(self,*args,captured,services=None,desktop=None,**kwargs):
+        super().__init__(*args,**kwargs);self.captured=captured;self.services=services;self.desktop=desktop
 
     def __enter__(self):
         result=super().__enter__()
         try:
             if self.services is not None:self.services.bind(self)
+            if self.desktop is not None:self.desktop.bind(self)
             self.captured(self.reopen_plan())
         except BaseException as error:
             self.__exit__(type(error),error,error.__traceback__);raise
@@ -51,10 +52,12 @@ class LinuxCoordinator:
             return result
         def installer(gate):
             self.backend=ManagedBackend(self.plan,gate,journal)
+            from .posix_reopen import validate_plan
+            self.backend.reopen_plan=validate_plan(self.reopen_plan)
             return self.backend
         with UpdateJournal(self.transactions,*self.plan.pair()) as journal:
             authorize_update(journal,lambda:CapturedPreparation(self.plan.source,self.runtime,self.shared,
-                transactions=self.transactions,captured=self.capture,services=self.plan.services),installer,revalidate=authority)
+                transactions=self.transactions,captured=self.capture,services=self.plan.services,desktop=self.plan.desktop),installer,revalidate=authority)
             self.backend.observe_acknowledgement()
         self.completion=complete_observed(self.backend)
         return self.completion

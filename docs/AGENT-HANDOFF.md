@@ -4,6 +4,20 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+
+October 4 checkpoint adds exact installed Linux desktop launcher/unit ownership,
+original reserved main-window process binding, normal-exit migration and one-shot
+captured main/secondary reopening after healthy completion and DSH reopening.
+The target socket peers must match their actual new owners and report connection
+and successful restoration. Ten new portable cases pass; focused updater checks
+pass 228 (225 passed, three skips). Actual files/archives/backups are exercised;
+systemd/window/graph/health are explicit mocks in local tests. The isolated native
+fixture now also uses the actual launcher/user desktop service/copied Python and
+inert named windows. Native/full-suite execution remains pending. No production
+eligibility, feed, owner deployment or GUI/provider claim is enabled. Continue the
+cross-platform goal and record native evidence at the exact tested source. See
+[desktop reopening](UPDATE-SYSTEM.md#owned-desktop-migration-and-observed-reopening--october-4).
+
 Broader source/build/package checks at `bc8b256` pass all their jobs in 37156960807:
 Debian, installed packages, Browser package, Home, Handy all platforms and privacy.
 The workflow's overall failure is only the older native runtime fixture, now

@@ -46,7 +46,7 @@ class ManagedPlan:
         self.development=development;self.fd=None;self.entered=False;self.closed=False
         self.applied=False;self.started=False;self.backend=None
         self.registration=registration
-        self.services=None
+        self.services=None;self.desktop=None
 
     def __enter__(self):
         if self.entered or self.closed:raise ValueError('Use a fresh managed selection plan.')
@@ -114,6 +114,8 @@ class ManagedPlan:
                 if not self.development and self.previous.get('dshService'):
                     from .linux_services import OwnedServicePlan
                     self.services=OwnedServicePlan(self.registration,self.previous,self.proposed)
+                    from .linux_desktop import OwnedDesktopPlan
+                    self.desktop=OwnedDesktopPlan(self.registration,self.data)
                 self.registration.bind_artifacts(*self.pair())
             # Crucially this check precedes preparation/shutdown. Existing
             # DshAdapter enforces exact product identity against the live server.
@@ -136,6 +138,7 @@ class ManagedPlan:
             raise ValueError('The original selected bytes changed before promotion.')
         if self.registration is not None:self.registration.validate()
         if self.services is not None:self.services.validate_preparation()
+        if self.desktop is not None:self.desktop.validate_preparation()
         for root,expected,manifest in ((self.source,self.source_payload,self.source_manifest),
                 (self.target,self.target_payload,self.target_manifest)):
             if self.tool.verify(root)!=manifest or snapshot(root)!=expected:
@@ -184,6 +187,7 @@ class ManagedBackend:
             raise ValueError('The live apply intent differs from the original managed pair.')
         self.plan.validate()
         if self.plan.services is not None:self.plan.services.require_drained()
+        if self.plan.desktop is not None:self.plan.desktop.require_drained()
         self.plan.started=True  # A failed namespace flush must never permit retry.
         if self.plan.registration is not None:self.plan.registration.apply(self.gate,journal)
         atomic_json(self.plan.data/'desktop.previous.json',self.plan.previous)

@@ -56,10 +56,12 @@ def complete_observed(backend):
             immutable()
             if plan.registration is not None:plan.registration.verify_applied()
             if plan.services is not None:plan.services.verify_applied()
+            if plan.desktop is not None:plan.desktop.verify_applied()
             if verify_health(plan) is not True:raise ValueError('Offline managed target health was not verified.')
             immutable()
             if plan.registration is not None:plan.registration.verify_applied()
             if plan.services is not None:plan.services.verify_applied()
+            if plan.desktop is not None:plan.desktop.verify_applied()
             return True
         archive=UpdateJournal.complete_verified(journal.directory,source,target,health)
     return {'transactionId':record['id'],'archive':str(archive),'installationComplete':True,

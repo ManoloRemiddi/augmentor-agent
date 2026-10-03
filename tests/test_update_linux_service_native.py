@@ -22,6 +22,8 @@ from updates.linux_services import OwnedServicePlan,render,UNIT
 from updates.linux_managed import ManagedPlan,load_deployment
 from updates.linux_coordinator import LinuxCoordinator
 from updates.linux_reopen import reopen_dsh_observed
+from updates.linux_reopen import reopen_desktop_observed
+from updates.linux_desktop import OwnedDesktopPlan,render as desktop_unit,UNIT as DESKTOP_UNIT
 from platform_adapters.private_files import atomic_json,read_json
 
 CONTROL="""// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
@@ -47,6 +49,38 @@ const service=await unixControl({runtime,root,component:'dsh',control:(method,pa
   active:existsSync(runtime+'/busy')?1:0,expiresInSeconds:token&&!closing?30:null};
 },onCommitted:()=>{void service.close()}});
 """
+
+# Independently authored inert window participant. No Qt, provider or real
+# conversation is claimed; startup/lease/admission are the shipped primitives.
+WINDOW='''# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import json,os,socket,sys
+from pathlib import Path
+root=Path(__file__).resolve().parents[3]
+sys.path.insert(0,str(root/'services'))
+from lifecycle.posix_startup import Startup
+from lifecycle.admission import Admission
+from lifecycle.lease import hold
+name=sys.argv[sys.argv.index('--instance')+1] if '--instance' in sys.argv else 'main'
+endpoint=Path(os.environ['XDG_RUNTIME_DIR'])/('augmentor-linux-pi'+('' if name=='main' else '-'+name)+'.sock')
+admission=Admission();startup=Startup();hold('desktop')
+server=socket.socket(socket.AF_UNIX);server.bind(str(endpoint));endpoint.chmod(0o600);server.listen()
+startup.ready()
+try:
+ while not admission.closing:
+  with server.accept()[0] as peer:
+   with peer.makefile('rb') as stream:command=stream.readline(65536).decode().strip()
+   identity={'pid':os.getpid(),'buildRoot':str(root),'maintenanceAdmission':1,
+     'online':True,'repairing':False,'sessionRestoreError':''}
+   try:
+    if command=='maintenance.status':result=identity
+    else:
+     request=json.loads(command.removeprefix('maintenance:'))
+     result={**identity,'result':admission.control(request['method'],request['params'])}
+   except Exception as error:result={'error':str(error)}
+   peer.sendall((json.dumps(result)+'\\n').encode())
+finally:
+ server.close();endpoint.unlink()
+'''
 
 
 @unittest.skipUnless(sys.platform=='linux' and os.environ.get('AUGMENTOR_SYSTEMD_QUALIFICATION')=='1',
@@ -184,6 +218,90 @@ class NativeServiceTests(unittest.TestCase):
                     'selectionCompleted':True,'credentialsPreserved':True,'enablementPreserved':True,
                     'providerAndUiMocked':True,'serviceReopened':True,'windowsReopened':False}))
             finally:plan.close()
+
+
+    def test_actual_owned_desktop_and_named_window_normal_exit_and_reopening(self):
+        f=self.f
+        # The disposable manager uses exactly this fixture's installed data.
+        data=f.base/'desktop-data/augmentor';data.mkdir(parents=True,mode=0o700);data.parent.chmod(0o700)
+        self.data=data;self.tool.DATA=data
+        from lifecycle.posix_pending import transaction_directory
+        f.transactions=transaction_directory()
+        environment=patch.dict(os.environ,{'XDG_DATA_HOME':str(data.parent),'PYTHONDONTWRITEBYTECODE':'1'})
+        environment.start();self.addCleanup(environment.stop)
+        self.systemctl('import-environment','XDG_DATA_HOME','PYTHONDONTWRITEBYTECODE')
+        for root,selected in zip((f.source,f.target),self.configs):
+            (root/'python/bin').mkdir(parents=True);shutil.copy2(Path(sys.executable).resolve(),root/'python/bin/python3')
+            for name in ('lifecycle','platform_adapters'):
+                shutil.copytree(fixtures.ROOT/'services'/name,root/'services'/name,dirs_exist_ok=True,
+                    ignore=shutil.ignore_patterns('__pycache__','*.pyc'))
+            (root/'apps/native/augmentor_linux/__main__.py').write_text(WINDOW)
+            (root/'apps/native/augmentor_linux/__init__.py').write_text('')
+            (root/'scripts').mkdir()
+            shutil.copy2(fixtures.ROOT/'scripts/desktop-launch.py',root/'scripts/desktop-launch.py')
+            if root==f.target:
+                with (root/'scripts/desktop-launch.py').open('a') as stream:stream.write('\n# Synthetic native target release.\n')
+            selected['python']=str(root/'python/bin/python3')
+            files=self.tool.inventory(root);digest=hashlib.sha256(json.dumps(files,sort_keys=True).encode()).hexdigest()
+            selected['artifactSha256']=digest
+            self.tool.atomic(root/'desktop-release.json',{'deployment':selected,'files':files,'artifactSha256':digest})
+        atomic_json(data/'desktop.json',self.configs[0])
+        launcher=data/'desktop-launch.py';shutil.copy2(f.source/'scripts/desktop-launch.py',launcher);launcher.chmod(0o600)
+        unit=self.unit.parent/DESKTOP_UNIT
+        if unit.exists() or unit.is_symlink():self.fail('Never overwrite an existing desktop during qualification.')
+        unit.write_bytes(desktop_unit(launcher));unit.chmod(0o600)
+        def close_desktop():
+            self.systemctl('stop',DESKTOP_UNIT);unit.unlink();self.systemctl('daemon-reload')
+        self.addCleanup(close_desktop)
+        self.systemctl('daemon-reload');self.systemctl('start',DESKTOP_UNIT)
+        secondary=subprocess.Popen(['/usr/bin/python3','-I','-B',str(launcher),'--ensure-running','--instance','secondary'],
+            stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+        # Fixture-owned cleanup only; never an owner process or runtime.
+        def close_secondary():
+            if secondary.poll() is None:secondary.terminate()
+            secondary.wait(timeout=10)
+        self.addCleanup(close_secondary)
+        deadline=time.monotonic()+15
+        expected=[f.runtime/'augmentor-linux-pi.sock',f.runtime/'augmentor-linux-pi-secondary.sock']
+        while not all(path.exists() for path in expected):
+            if time.monotonic()>=deadline:self.fail('Inert desktop owner did not register its captured windows.')
+            time.sleep(.05)
+        with patch('updates.linux_managed.load_deployment',return_value=self.tool),patch(
+                'updates.linux_completion.verify_health',return_value=True):
+            registration=RegistrationPlan(f.home,f.source,f.target,'1.0.0','2.0.0')
+            service=OwnedServicePlan(registration,*self.configs);desktop=OwnedDesktopPlan(registration,data)
+            with ManagedPlan(data,f.source,f.target,development=True,registration=registration) as plan:
+                plan.services=service;plan.desktop=desktop
+                coordinator=LinuxCoordinator(plan,f.runtime,f.runtime/'shared',f.transactions)
+                result=coordinator.run(lambda stage:True)
+                self.assertEqual(coordinator.reopen_plan,{'instances':['main','secondary'],'hadBrowser':False})
+                self.assertTrue(desktop.bound);self.assertTrue(desktop.drained);self.assertTrue(desktop.verify_applied())
+                self.assertEqual(launcher.read_bytes(),(f.target/'scripts/desktop-launch.py').read_bytes())
+                self.assertEqual(secondary.wait(timeout=10),0)
+                self.assertTrue(reopen_dsh_observed(coordinator.backend,result))
+                self.assertTrue(reopen_desktop_observed(coordinator.backend,coordinator.reopen_plan,result))
+                state=desktop.query();desktop.verify_state(state,running=True)
+                self.assertEqual(state['UnitFileState'],'disabled')
+                with self.assertRaisesRegex(ValueError,'one-shot'):
+                    reopen_desktop_observed(coordinator.backend,coordinator.reopen_plan,result)
+                # Observe then normally close only the fresh inert target secondary
+                # through the original socket protocol; main is owned by cleanup.
+                from lifecycle.posix_components import discover_sockets,window_executable
+                import secrets
+                peers=discover_sockets(f.runtime,r'augmentor-linux-pi-secondary\.sock',f.target,
+                    window_executable(f.target),kind='window')
+                try:
+                    self.assertEqual(len(peers),1);token=secrets.token_hex(24)
+                    peers[0].control('prepare',token);peers[0].control('commit',token)
+                    self.assertTrue(peers[0].exited(timeout=10))
+                finally:
+                    for peer in peers:peer.close()
+                self.assertEqual(self.credentials.read_bytes(),self.secret);f.sentinels_preserved()
+                print(json.dumps({'schema':'augmentor-native-linux-desktop-proof/1',
+                    'originalOwnerPeerBound':True,'capturedInstances':['main','secondary'],
+                    'normalOriginalExits':True,'launcherMigrated':True,'selectionCompleted':True,
+                    'desktopServiceReopened':True,'namedWindowReopened':True,'enablementPreserved':True,
+                    'windowParticipantsInert':True,'providerAndUiMocked':True}))
 
 
 if __name__=='__main__':unittest.main()
