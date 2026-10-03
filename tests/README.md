@@ -93,6 +93,12 @@ separates these from the physical capture/speaker probe and deployment scope.
 
 ## Restart reliability
 
+`test_gnome_selected_reboot.py` checks exclusive reboot receipts and a real
+transport timeout without a second request. `test_gnome_input_probe.py` checks
+private triggers and exact selected/native artifact admission. Both are Linux
+instrumentation and skip on other platforms; passing these checks does not
+establish native consent, input delivery or password authentication.
+
 `test_recovery.py` and `test_desktop_startup.py` cover saved-chat refusal, explicit
 managed-runtime startup, multi-frame legacy-history repair and canonical launchers.
 `scripts/proof-recovery.py` uses disposable real runtimes.

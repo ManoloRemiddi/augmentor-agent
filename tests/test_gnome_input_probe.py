@@ -4,6 +4,7 @@ import importlib.util
 import hashlib
 import json
 import os
+import sys
 from pathlib import Path
 import tempfile
 import unittest
@@ -13,6 +14,7 @@ spec=importlib.util.spec_from_file_location('owned_gnome_input_probe',Path(__fil
 module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
 
 
+@unittest.skipUnless(sys.platform.startswith('linux'), 'Owned GNOME input proof requires Linux file ownership and native runtime paths.')
 class GnomeInputTriggerTests(unittest.TestCase):
     def setUp(self):
         self.temporary=tempfile.TemporaryDirectory();self.addCleanup(self.temporary.cleanup)
@@ -39,6 +41,7 @@ class GnomeInputTriggerTests(unittest.TestCase):
             with self.subTest(text=text),self.assertRaises((RuntimeError,ValueError)):module.private_json(self.path)
 
 
+@unittest.skipUnless(sys.platform.startswith('linux'), 'Owned GNOME input proof requires Linux file ownership and native runtime paths.')
 class GnomeInputSelectedArtifactTests(unittest.TestCase):
     def setUp(self):
         self.temporary=tempfile.TemporaryDirectory();self.addCleanup(self.temporary.cleanup)

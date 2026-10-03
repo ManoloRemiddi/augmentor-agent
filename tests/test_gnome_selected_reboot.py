@@ -4,6 +4,7 @@ import importlib.util
 import json
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -13,6 +14,7 @@ spec = importlib.util.spec_from_file_location('selected_reboot',
 proof = importlib.util.module_from_spec(spec); spec.loader.exec_module(proof)
 
 
+@unittest.skipUnless(sys.platform.startswith('linux'), 'Owned GNOME reboot proof uses Linux file ownership and no-follow guards.')
 class RebootOwnershipTests(unittest.TestCase):
     def test_interrupted_receipt_and_symlink_cannot_be_adopted(self):
         with tempfile.TemporaryDirectory() as directory:
