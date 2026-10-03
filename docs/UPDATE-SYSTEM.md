@@ -1062,3 +1062,41 @@ and Windows Desktop both CPUs in
 [37151931306](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37151931306).
 It qualifies the shared ZIP/discovery/authority changes preceding the newer Linux
 dependency-retention and owned-registration work, which require fresh validation.
+
+## Managed Linux owned user-service migration
+
+Public managed preflight now attaches `OwnedServicePlan` to its fresh registration
+plan. Only the exact complete-installer `augmentor-dsh.service`, using the source's
+bundled Node/DSH, unchanged loopback endpoint and private model credential path,
+is accepted. Canonical user configuration directories, the loaded fragment path,
+absence of drop-ins and the user's enabled/disabled state are checked. Customized
+units, external runtimes, stale loaded definitions and unfamiliar shared DSH
+registrations require explicit migration. The credential file is validated without
+reading or changing its contents.
+
+The original startup writer reserves the actual DSH socket peer. Its retained
+kernel observation must match the service's original live MainPID; a numeric PID
+report alone grants no shutdown or migration authority. Ownership is rechecked
+around publisher refreshes. Apply requires normal original process exit and an
+inactive, successful service with no replacement PID. The known unit's bundled
+runtime paths and the matching shared DSH version are included in the same exact
+before-file backups as the presets. Other harness fields and selections survive.
+After selection, a one-shot daemon reload must acknowledge the changed files while
+the startup/pending barriers remain held. Offline completion checks the migrated
+files, backups, loaded definition and continued inactive service before and after
+the target render. A reload failure preserves the unresolved transaction and
+cannot be retried from its saved phase. No stop, enable or start command is issued.
+
+Ten isolated service cases use actual unit/shared configuration/backups/journal/
+selection/archive files and explicitly simulated systemd and peer observations.
+They cover complete-installer field grammar, customized units/drop-ins, mismatched
+runtime/home/service PID, changed enablement, unsuccessful/restarted exits, malformed
+reports, changed live service during revalidation and failed daemon reload without
+replay. The combined version-changing controller case mocks graph shutdown,
+imports/connection and target health. Actual user-systemd/managed artifact and target
+live health/reopening qualification remain required. Public eligibility stays off.
+Focused updater checks pass 210 cases (209 passed, one OS skip); full Python passes
+989 cases (949 passed, 40 explicit skips) with isolated dictation/Qt state. The
+final external file-mode guard also passes the ten focused service cases.
+The preceding `f89b6fc` registration checkpoint has fresh Linux/shared validation
+running in [37153955607](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37153955607).

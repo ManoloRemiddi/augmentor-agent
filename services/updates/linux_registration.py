@@ -64,6 +64,7 @@ class RegistrationPlan:
         if self.home.resolve()!=self.home:raise ValueError('Use the original canonical private DSH home.')
         self.files=[];self.links=[];self.begun=False;self.applied=False;self.backup=None;self.journal=None
         self.pair=None
+        self.anchors={'dsh-home':self.home}
         self.source_version,self.target_version=source_version,target_version
         profile=self.directory(self.home/'profiles/web')
         owned=self.directory(profile/'augmentor-product')
@@ -136,12 +137,30 @@ class RegistrationPlan:
         self.validate()
 
     def directory(self,path):
+        anchor=next((root for root in self.anchors.values() if path.is_relative_to(root)),None)
+        if anchor is None:raise ValueError('The registration directory has no inspected ownership anchor.')
         for parent in (path,*path.parents):
-            if not parent.is_relative_to(self.home):break
+            if not parent.is_relative_to(anchor):break
             info=parent.lstat()
-            if not stat.S_ISDIR(info.st_mode) or info.st_uid!=os.getuid():
+            if (not stat.S_ISDIR(info.st_mode) or info.st_uid!=os.getuid()
+                    or anchor!=self.home and info.st_mode&0o022):
                 raise ValueError('An owned registration directory changed or was redirected.')
         return path
+
+    def add_external_file(self,name,anchor,path,before,after):
+        """Attach an independently checked fixed user registration before binding."""
+        anchor,path=Path(anchor),Path(path)
+        if (self.pair is not None or self.begun or name in self.anchors or not anchor.is_absolute()
+                or anchor.resolve()!=anchor or not path.is_relative_to(anchor)
+                or any(row['path']==path for row in self.files) or ordinary(path).st_mode&0o022):
+            raise ValueError('Attach only a fresh canonical owned registration.')
+        self.anchors[name]=anchor
+        self.directory(path.parent);self.add_file(path,before,after)
+
+    def record_name(self,path):
+        for name,root in self.anchors.items():
+            if path.is_relative_to(root):return name+'/'+path.relative_to(root).as_posix()
+        raise ValueError('The owned registration lost its original anchor.')
 
     def add_file(self,path,before,after):
         if len(after)>1024**2:raise ValueError('The generated registration exceeds its supported size.')
@@ -201,11 +220,12 @@ class RegistrationPlan:
             backup=self.backup/(str(index)+'.before')
             with backup.open('xb') as stream:
                 os.chmod(backup,0o600);stream.write(row['before']);stream.flush();os.fsync(stream.fileno())
-            records.append({'name':row['path'].relative_to(self.home).as_posix(),'beforeSHA256':hashlib.sha256(row['before']).hexdigest(),
+            records.append({'name':self.record_name(row['path']),'beforeSHA256':hashlib.sha256(row['before']).hexdigest(),
                 'afterSHA256':hashlib.sha256(row['after']).hexdigest(),'backup':backup.name,'mode':row['mode']})
         self.backup_record={'schema':'augmentor-linux-registration/1','transactionId':journal.record['id'],
             'sourceRoot':str(self.source),'targetRoot':str(self.target),'files':records,
-            'links':[{'name':row['path'].relative_to(self.home).as_posix(),'before':row['before'],'after':row['after']} for row in self.links]}
+            'anchors':{name:str(root) for name,root in self.anchors.items()},
+            'links':[{'name':self.record_name(row['path']),'before':row['before'],'after':row['after']} for row in self.links]}
         atomic_json(self.backup/'manifest.json',self.backup_record)
         self.validate()
         for row in self.files:self.write_file(row)

@@ -853,6 +853,14 @@ migration or reopening. Run with `python3 -B -m unittest discover -s tests -p
 test_update_linux_registration.py`. Nine cases pass; the complete focused updater
 set passes 200 cases (199 passed, one OS skip).
 
+`test_update_linux_services.py` adds ten actual-file/journal unit/shared-registration
+cases with explicitly simulated systemd and retained peer observations. They cover
+complete-installer grammar, customized/drop-in/stale ownership refusal, preserved
+credentials/enablement/other harnesses, normal-exit requirements, unknown daemon
+reload refusal and a version-changing controller composition. Graph drain, imports
+and offline health are mocked in that composition. This is not an installed
+user-systemd or reopening proof.
+
 Managed Linux updates: `test_update_linux_managed.py` covers real isolated locks,
 journals and immutable selections, compatibility before drain, changed content/
 modes/selection, live authority revocation, lifetime contention, failed health and

@@ -1,7 +1,8 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Live managed-Linux graph, selection and offline-health composition.
 
-The external driver owns authentic download staging and OS service ownership.
+The external driver owns authentic download staging; the managed plan binds the
+exact owned user service to the prepared original socket process.
 No saved plan or journal can reconstruct this controller after interruption.
 """
 from lifecycle.posix_preparation import PosixPreparation
@@ -12,12 +13,14 @@ from .linux_completion import complete_observed
 
 
 class CapturedPreparation(PosixPreparation):
-    def __init__(self,*args,captured,**kwargs):
-        super().__init__(*args,**kwargs);self.captured=captured
+    def __init__(self,*args,captured,services=None,**kwargs):
+        super().__init__(*args,**kwargs);self.captured=captured;self.services=services
 
     def __enter__(self):
         result=super().__enter__()
-        try:self.captured(self.reopen_plan())
+        try:
+            if self.services is not None:self.services.bind(self)
+            self.captured(self.reopen_plan())
         except BaseException as error:
             self.__exit__(type(error),error,error.__traceback__);raise
         return result
@@ -51,7 +54,7 @@ class LinuxCoordinator:
             return self.backend
         with UpdateJournal(self.transactions,*self.plan.pair()) as journal:
             authorize_update(journal,lambda:CapturedPreparation(self.plan.source,self.runtime,self.shared,
-                transactions=self.transactions,captured=self.capture),installer,revalidate=authority)
+                transactions=self.transactions,captured=self.capture,services=self.plan.services),installer,revalidate=authority)
             self.backend.observe_acknowledgement()
         self.completion=complete_observed(self.backend)
         return self.completion

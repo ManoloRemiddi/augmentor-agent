@@ -3,8 +3,8 @@
 
 Compatibility is checked while the original DSH integration is still running.
 After drain only exact immutable artifacts, selection and offline imports are
-checked. Owned presets are migrated through their separately bound backup plan;
-package-manager trees and service definitions remain outside this controller.
+checked. Owned presets and the exact private user service migrate through a bound
+backup plan; package-manager trees remain outside this controller.
 """
 from copy import deepcopy
 import hashlib
@@ -46,6 +46,7 @@ class ManagedPlan:
         self.development=development;self.fd=None;self.entered=False;self.closed=False
         self.applied=False;self.started=False;self.backend=None
         self.registration=registration
+        self.services=None
 
     def __enter__(self):
         if self.entered or self.closed:raise ValueError('Use a fresh managed selection plan.')
@@ -110,6 +111,9 @@ class ManagedPlan:
                         or self.registration.target_version!=self.identities[1]['version']):
                     raise ValueError('Use the original registration plan for this exact managed release pair.')
                 self.registration.validate()
+                if not self.development and self.previous.get('dshService'):
+                    from .linux_services import OwnedServicePlan
+                    self.services=OwnedServicePlan(self.registration,self.previous,self.proposed)
                 self.registration.bind_artifacts(*self.pair())
             # Crucially this check precedes preparation/shutdown. Existing
             # DshAdapter enforces exact product identity against the live server.
@@ -131,6 +135,7 @@ class ManagedPlan:
         if selection_bytes(self.data/'desktop.json')[0]!=self.raw:
             raise ValueError('The original selected bytes changed before promotion.')
         if self.registration is not None:self.registration.validate()
+        if self.services is not None:self.services.validate_preparation()
         for root,expected,manifest in ((self.source,self.source_payload,self.source_manifest),
                 (self.target,self.target_payload,self.target_manifest)):
             if self.tool.verify(root)!=manifest or snapshot(root)!=expected:
@@ -178,10 +183,12 @@ class ManagedBackend:
                 or (journal.record['source'],journal.record['target'])!=self.plan.pair()):
             raise ValueError('The live apply intent differs from the original managed pair.')
         self.plan.validate()
+        if self.plan.services is not None:self.plan.services.require_drained()
         self.plan.started=True  # A failed namespace flush must never permit retry.
         if self.plan.registration is not None:self.plan.registration.apply(self.gate,journal)
         atomic_json(self.plan.data/'desktop.previous.json',self.plan.previous)
         atomic_json(self.plan.data/'desktop.json',self.plan.proposed)
+        if self.plan.services is not None:self.plan.services.reload(self.gate,journal)
         self.plan.applied=True
 
     def observe_acknowledgement(self):

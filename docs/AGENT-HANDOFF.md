@@ -4,6 +4,18 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+Managed Linux now attaches the exact `augmentor-dsh.service` and shared
+`harnesses.json` to the same flushed registration backups. Source service ownership
+must agree with the live reserved socket peer; only original normal exit allows
+migration and one-shot daemon reload. Credentials, other harnesses, model/voice
+settings and user enablement are preserved. Ten explicit simulated-systemd/peer
+cases pass with actual files/journals. Focused updater checks pass 210 cases
+(209 passed, one OS skip); full Python passes 989 cases (949 passed, 40 explicit
+skips) with isolated dictation/Qt state. Actual user-systemd and target live health/
+reopen qualification remain open. The controller does not start or enable services
+yet. Public flags remain disabled. See [service migration](UPDATE-SYSTEM.md#managed-linux-owned-user-service-migration).
+Fresh `f89b6fc` validation is running in 37153955607; its results are pending.
+
 Owned Linux DSH preset/browser/host registration migration now composes with the
 original managed selection and offline completion. Nine isolated migration cases
 pass, including a 1.0.0→2.0.0 registration/selection transaction and preserved
