@@ -42,6 +42,13 @@ preserved. Native execution is pending. This backend does not supply automatic
 publisher authority, target health/reopen or launchd recovery. Read the
 [Mac checkpoint](UPDATE-SYSTEM.md#mac-retained-bundle-and-native-apply-checkpoint).
 
+The target's fixed offline health action now renders the shared preview in an
+isolated temporary profile, observes actual successful probe exit, binds metadata
+identity and rechecks full bundle/signature integrity. Two portable report and two
+shared-render tests pass. Native execution is pending. It starts no user/model
+services and does not establish Cocoa permissions, provider readiness or normal
+reopening; see [health contract](UPDATE-SYSTEM.md#mac-offline-target-health).
+
 ## Delivery contract and sequencing
 
 ### September 26 publication audit

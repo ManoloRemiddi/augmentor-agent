@@ -146,6 +146,30 @@ N-to-N+1, independent target UI health/reopen or any installed user application.
 The source has 147 focused updater cases (one OS skip); production flags remain
 false until the complete observer/controller and distribution gates pass.
 
+## Mac offline target health
+
+The fixed target `macos-local-health.py` action renders the existing shared preview
+UI using offscreen Qt inside a new private temporary profile. It clears inherited
+app/speech/model/profile variables, starts no controller or companion and checks
+text/font/render availability. The external `macos_health` observer first verifies
+the complete exact bundle/signature, launches only that target's fixed Python
+script, observes successful actual exit, validates bounded metadata/render evidence,
+and verifies the whole bundle again. This is offline local renderability, not
+provider connectivity, Cocoa/TCC permission acceptance or ordinary app reopening.
+
+Two typed Mac-report tests and the existing two real shared-render tests pass on
+Linux. The hosted retained-copy apply proof now also probes the actual copied
+target's sealed runtime. Native qualification is pending for the new action.
+The shared transaction deliberately remains pending in that fixture: health alone
+does not supply a live production observer's completion/publisher authority.
+
+Full Windows qualification at `9bce979` now passes both x64 and ARM64 in
+[37134219949](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37134219949),
+including actual busy-draft deferral, independent target health, captured-window
+reopen and the later repair/remove stages. Its other five workflows also pass.
+This remains a same-build development fixture, not signed N-to-N+1. The newer Unix
+source is qualified separately and has not been deployed to installed apps.
+
 ## Ownership and data
 
 `services/updates/manager.py` belongs to the per-user shared prompt service, rather

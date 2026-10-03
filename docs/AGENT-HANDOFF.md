@@ -4,6 +4,14 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+Windows full at `9bce979` now passes both CPUs, including busy deferral, target
+health, reopen and later repair/remove (37134219949); all six workflows pass that
+head. Newer Unix source is separate. A fixed offline Mac target render/identity
+observer is added and hooked into the retained-copy proof. Two report and two
+shared render cases pass locally; native action execution is pending. The fixture
+keeps its shared transaction pending and supplies no production completion/reopen
+or signed forward authority. Read [offline health](UPDATE-SYSTEM.md#mac-offline-target-health).
+
 Whole Mac bundle inspection and one-shot final-lease native replacement are now
 added. Two inert whole-bundle/link cases pass; 147 focused updater cases pass
 with one OS skip. A new hosted same-build retained-copy/journal/graph apply proof

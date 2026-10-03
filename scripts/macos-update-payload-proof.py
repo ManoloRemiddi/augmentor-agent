@@ -17,6 +17,7 @@ import plistlib
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'services'))
 from lifecycle.macos_payload import verify_bundle
 from lifecycle.macos_apply import MacInstallerBackend
+from lifecycle.macos_health import verify_local_health
 from lifecycle.posix_preparation import PosixPreparation
 from lifecycle.posix_startup import Startup
 from lifecycle.update import authorize_update
@@ -87,12 +88,18 @@ def main():
             raise ValueError('Atomic replacement did not retain the source and exact target.')
         if verify_bundle(original,release,development=True)!=source or sentinel.read_bytes()!=b'Preserve fixture settings and history.':
             raise ValueError('The original bundle or synthetic user state changed.')
+        # The retained target is a disposable copy. Its fixed probe uses a new
+        # private profile and renders the shared UI without services/providers.
+        health=verify_local_health(retained,release,target,development=True)
+        if health['rendered'] is not True or health['payloadSHA256']!=target['sha256']:
+            raise ValueError('The fixed target health probe did not identify this bundle.')
     report={'passed':True,'schema':'augmentor-macos-source-proof/1','payloadSHA256':source['sha256'],
         'releaseSHA256':source['releaseSHA256'],'entries':len(source['entries']),'bytes':source['bytes'],
         'relocatedWholeBundle':True,'nativeSignatureDamageRefused':True,'originalPreserved':True,
         'installationReaderRefusesReady':True,'atomicSameBuildFixtureApply':True,'sourceBackupRetained':True,
         'pendingRecordRetained':True,'syntheticUserStatePreserved':True,
-        'scope':'Development whole-bundle retention and same-build isolated apply only; no signed forward update, target health/reopen, login/user install or automatic publisher authority.'}
+        'offlineTargetHealth':health,
+        'scope':'Development whole-bundle retention, same-build isolated apply and offline UI health; no signed forward update, transaction completion/reopen, login/user install or automatic publisher authority.'}
     atomic_json(out/'report.json',report)
     print(json.dumps(report))
 
