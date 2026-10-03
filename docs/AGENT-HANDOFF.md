@@ -1,5 +1,20 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 Fedora GNOME visual capture and partial click failure
+
+[The exact v4 checkpoint](../release/qualification/next-targets/20261003-fedora-gnome-v4-visual-capture-center-partial-failure.json)
+passes actual observed consent and two distinct retained original JPEG captures.
+Both images are visually reviewed before the single authorized center click.
+That click delivers one native callback, then the API refuses changed scene
+before dispatch. This is partial delivery with failure: no edge, typing or save
+follows. Automatic control cleanup and independent helper/probe/target absence
+pass, as do both full frozen backing hashes and unchanged selection/settings.
+The enabled observer retains an older exact GNOME50-only extension; it differs
+from the selected2035 expanded-profile bytes and is not established as cause.
+The changing field/Notify phase is unknown; the original dispatch guard does not
+record that exception. Probe-only bounded diagnostics are being developed without
+extra RPC, replay, timeout or scene-fence changes. Production input stays disabled.
+
 ## October 3 clean Mint correction and fresh proof
 
 [The clean Mint checkpoint](../release/qualification/next-targets/20261003-mint16bcb-fresh-emulated-proof.json)

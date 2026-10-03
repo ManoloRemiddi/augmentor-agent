@@ -550,6 +550,79 @@ The31 probe cases include nine actual image-retention/failure cases. The112
 focused Python cases and five observer Node cases pass; those totals are source
 checks, not another native run. The focused Python command is
 `PYTHONPATH=tests python3 -m unittest test_gnome_control test_gnome_input_probe test_a11y_helper test_desktop_worker test_desktop_consent_session test_desktop_scene test_capture_stream test_gnome_observer test_linux_portal_targets`.
-Image-retention source remains unexecuted pending parent review/publication and
-a distinct fresh candidate. Actual retained image inspection must precede any
-newly authorized input phase.
+Image-retention source was then reviewed/published for the distinct v4 candidate
+below. Actual retained image inspection preceded its newly authorized input
+phase.
+
+The October 3 [v4 visual capture and partial-delivery checkpoint](../release/qualification/next-targets/20261003-fedora-gnome-v4-visual-capture-center-partial-failure.json)
+records probe8cb438a with ten unchanged0ab files and unchanged exact2035
+selected/native Fedora artifacts. Actual observed consent passed in67.162s.
+The first explicit capture passed in2.382s and retained the original53998-byte
+1280x800 JPEG privately at0600. Parent and child visually inspected that image:
+the empty GTK fixture, active-control banner and visible Stop were unobscured.
+A separate fresh capture for the approved center click passed in1.444s; its
+original53936-byte JPEG was inspected before the action. The API accepts image
+pixels and scales to compositor logical monitor dimensions; both were1280x800
+at scale1/origin0,0 here, so the observed point640,557 mapped directly.
+
+The single center action failed after0.960s with `GNOME target changed before
+dispatch. No action is replayed.` The actual GTK center callback count became1.
+Both observations are retained: this is partial native delivery with an API
+refusal, not successful action acceptance. No edge click, TextA focus, ASCII,
+Ctrl+S, password/focus/refusal or visible Stop phase followed. Buffers stayed
+empty, edge/save counters stayed zero, and no saved file appeared.
+
+Capture-pre and action-pre compositor serial were both3281, with identical
+target PID/start/window ID/geometry. After automatic Stop, serial was3295 and
+windows/above no longer contained the closed banner; other scene fields agreed.
+These post-Stop changes cannot identify the initial changing field. Final idle
+trace16218 calls has no first error and no recording failure, but it traces
+idle verify/read RPCs, not dispatch scene replies or Notify phases. The exact
+failing Notify method remains unrecorded. `GnomeControl.send()` checks
+`same_scene` before each Notify, including releases, and this refusal raises
+outside its Notify exception recorder. Consequently the action row has the
+error while controller `failure` is null. A separate read-only helper focus
+inspection failed at its unchanged3s constructor/status deadline and was not
+retried; current raw AT-SPI focus is unavailable.
+
+The enabled observer is the earlier GNOME50-only aef93bb extension,
+SHA48897dc5a9ce5be70f1a2affdfb686309e7b8f0b15d6e0692380f5c00100f6a2;
+the selected2035 package contains the expanded-profile extension,
+SHAec8543ab1ed23d04e5efc3d7485256ca8907d81252250d074e464cc843ca4db8.
+The enabled source was matched by exact bytes; portal/Shell owner identities
+remained unchanged. This enabled-versus-packaged boundary is concrete provenance
+and does not establish the action failure's cause. Neither extension was
+changed/restarted during the candidate.
+
+Automatic candidate cleanup took0.136s. Independent reads found the original
+helper and probe absent, then normal exact-owned target termination ran once.
+The separate failed read-only diagnostic child was also absent; no cleanup was
+replayed. Final full frozen backing hashes, read-only FDs, original-off state,
+unchanged selection/appearance/previous selection and4GiB floor passed.
+
+A first read-only JPEG export had refused a complete stat comparison before any
+host image write. Supported inference is ordinary first-read atime drift;
+original before-atime was not retained. A separately reviewed read-only export
+compared device/inode/UID/GID/mode/link-count/size/mtime/ctime plus exact retained
+SHA/bytes/signatures, excluding atime, and copied the same original bytes to an
+exclusive host0600 file. Both receipts remain preserved; there was no recapture
+or input retry to repair an evidence failure.
+
+The next proposed source-only diagnostic must observe the actual existing
+`same_scene` comparisons inside each Notify phase, without extra RPCs or
+changing their outcomes. An opt-in probe subclass can wrap the candidate
+module comparisons only during the owned action, retain bounded changed-field
+names and sanitized before/current serial, owner/PID/window/monitor/workspace/
+guard identities, and record click/key/type phase, Notify method, press/release
+state and tracked held-button/key state. Keyboard guard observations must report
+complete/sensitive/editable/nonpassword outcome from existing queries, without
+accessible text or another helper request. The guard exception must be recorded
+before it unwinds to existing held-input cleanup, preserving the original error
+and first failure. Normal Stop's actual pinned-owner release/Session.Close RPCs
+need bounded method/bound/outcome tracing through the original calls; no new
+release, retry, connection or consent is allowed. Tests must exercise the actual
+maintained sender, a serial-only change before release, blocked scene/owner and
+keyboard refusal, first-error retention, sink failure, scope restoration and
+the existing1000ms pinned cleanup once. Source review/publication precedes any
+new action run. No serial/scene fence or timeout relaxation is justified by the
+current evidence.
