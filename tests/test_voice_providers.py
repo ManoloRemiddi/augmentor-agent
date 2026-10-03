@@ -15,6 +15,8 @@ class ProviderTests(unittest.TestCase):
         self.directory=tempfile.TemporaryDirectory();self.addCleanup(self.directory.cleanup)
         self.env=patch.dict(os.environ,{'AUGMENTOR_PI_CONFIG':self.directory.name,'RESONANT_VOICE_HOME':self.directory.name+'/local','AUGMENTOR_WINDOW_ID':'main'})
         self.env.start();self.addCleanup(self.env.stop)
+        audio=patch.object(provider,'audio_available',return_value=True)
+        audio.start();self.addCleanup(audio.stop)
 
     def test_settings_work_without_any_local_speech_installation(self):
         preferences=SimpleNamespace(values={'resonant_voice':True,'voice_mode':'manual','voice_pause_ms':800},save=Mock())
