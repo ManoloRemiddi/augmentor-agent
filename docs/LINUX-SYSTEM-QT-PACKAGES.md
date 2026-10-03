@@ -339,3 +339,13 @@ path refusal and real DEB member metadata. All12 Debian tests pass. Corrected
 large application artifacts and native installation have not been executed;
 new builds and fresh installed acceptance remain required. Existing Arch/Leap
 artifact qualifications remain bound to their earlier exact input bytes.
+
+The subsequent clean365 Mint build now verifies the corrected metadata in the
+actual runtime and desktop DEBs: every directory0755 and ordinary file0644/0755,
+root ownership, retained symlink targets, all source-Qt/wheel/Handy input members
+and complete archive hashes. This supersedes the preceding pending-build
+statement; native adoption remains false. The
+[365 artifact/source-profile checkpoint](../release/qualification/next-targets/20261003-mint365-permission-fresh-proof.json)
+keeps source/build evidence separate from the failed installed16b proof and
+pending fresh UID1003 execution. The Linux filesystem permission tests explicitly
+skip other platforms; the Debian producer and its targets are unchanged.

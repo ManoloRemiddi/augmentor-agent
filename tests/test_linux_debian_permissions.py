@@ -6,6 +6,7 @@ from pathlib import Path
 import shutil
 import stat
 import subprocess
+import sys
 import tarfile
 import tempfile
 import unittest
@@ -15,6 +16,7 @@ spec = importlib.util.spec_from_file_location('debian_permission_test', ROOT/'sc
 debian = importlib.util.module_from_spec(spec); spec.loader.exec_module(debian)
 
 
+@unittest.skipUnless(sys.platform.startswith('linux'), 'Linux staged package metadata')
 class DebianPermissionTests(unittest.TestCase):
     def test_copied_checkout_permissions_do_not_become_package_permissions(self):
         with tempfile.TemporaryDirectory() as directory:

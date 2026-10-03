@@ -7,6 +7,7 @@ Offscreen rendering and adapter turns do not qualify a graphical browser/session
 """
 import argparse
 import copy
+from collections import namedtuple
 import hashlib
 import http.server
 import importlib.util
@@ -697,19 +698,54 @@ FRESH_RUN_DIRECTORY = 'fresh-emulated-proof16bcb'
 FRESH_BOOT_ARGV_SHA = '6f74a927368ad3f9ba3ff9f29ab1f44416e8e7b2036afe18b6fb9c9aadbc1a9e'
 
 
-def fresh_binding(fixture):
+# Only these two separately reviewed identities are available to fresh proofs.
+_FreshScope = namedtuple('FreshScope', 'source artifact manifest_sha setup_sha home run_directory uid user format protected_sha')
+MINT_PERMISSION_SCOPE = _FreshScope(
+    '3651e17a0c34154eb4454e80e136ee11e764aa00',
+    '0.2.13-linuxmint22.3-amd64-complete-preview.1-3651e17a0c34',
+    'e51a3e119850ba6448b8f8dbb2ff5b0736d49524ecaa4ec4ee013a31d300e18b',
+    'd19ae1ecc900f5f3f29610c99b417474ef9e776043e99cabc5c3978dfaf76b52',
+    Path('/home/augmentor-permission-proof'), 'fresh-permission-proof365', 1003,
+    'augmentor-permission-proof', 'augmentor-owned-mint-permission-emulated/1',
+    '58ab52cdc27b2274ff355ce4086b26c115c385fb76c6e75a11fa0338a8d8fbdc')
+MINT_PERMISSION_STAGE = Path('/var/tmp/augmentor-mint-permission365')
+MINT_PROTECTED_HOMES = {1000: Path('/home/augmentor-proof'),
+                        1001: Path('/home/augmentor-complete-proof'),
+                        1002: Path('/home/augmentor-corrected-proof')}
+MINT_PERMISSION_FAILED_EVIDENCE = {
+    'fresh-emulated-proof16bcb/run.json': '0de0f8e8407dec01cedf433bc51849d51e055cc75582b9392ef0af7cabbf76fe',
+    'fresh-emulated-proof16bcb/dsh.log': 'ff9d62fe01824c4862153cadb082eca916c93931968d0435010595e327551a45'}
+
+
+def fresh_scope(scope=None):
+    historical = _FreshScope(FRESH_SOURCE, FRESH_ARTIFACT, FRESH_MANIFEST_SHA,
+        FRESH_SETUP_SHA, FRESH_HOME, FRESH_RUN_DIRECTORY, 1002,
+        'augmentor-corrected-proof', 'augmentor-owned-mint-fresh-emulated/1', None)
+    if scope is None:
+        return historical
+    if scope is not MINT_PERMISSION_SCOPE and scope != historical:
+        raise ValueError('Only the explicit reviewed Mint permission profile is admitted.')
+    return scope
+
+
+def fresh_binding(fixture, *, scope=None):
+    scope = fresh_scope(scope)
     import re
-    expected = {'format': 'augmentor-owned-mint-fresh-emulated/1', 'sourceCommit': FRESH_SOURCE,
-                'artifactId': FRESH_ARTIFACT, 'bundleManifestSha256': FRESH_MANIFEST_SHA,
-                'setupSha256': FRESH_SETUP_SHA, 'target': 'linuxmint22.3-amd64',
-                'uid': 1002, 'gid': 1002, 'user': 'augmentor-corrected-proof', 'home': str(FRESH_HOME),
+    expected = {'format': scope.format, 'sourceCommit': scope.source,
+                'artifactId': scope.artifact, 'bundleManifestSha256': scope.manifest_sha,
+                'setupSha256': scope.setup_sha, 'target': 'linuxmint22.3-amd64',
+                'uid': scope.uid, 'gid': scope.uid, 'user': scope.user, 'home': str(scope.home),
                 'markerSha256': hashlib.sha256(POST_MARKER_TEXT.encode()).hexdigest(),
                 'proofScriptSha256': PROOF_SHA256,
                 'bootArgvSha256': FRESH_BOOT_ARGV_SHA,
                 'startupBudgetSeconds': 120, 'turnBudgetSeconds': 60,
                 'qemuName': 'augmentor-mint223-cinnamon-iso', 'qemuPid': 2494740}
+    if scope.protected_sha:
+        expected.update(protectedAccountsSha256=scope.protected_sha,
+            protectedAccountsPath=str(MINT_PERMISSION_STAGE/'protected-accounts.json'),
+            protectedPreflightPath=str(MINT_PERMISSION_STAGE/'protected-preflight.json'))
     if any(type(fixture.get(key)) is not type(value) or fixture.get(key) != value for key, value in expected.items()):
-        raise ValueError('Only the exact clean16bcb fresh ordinary Mint fixture is admitted.')
+        raise ValueError('Only the exact '+scope.source[:7]+' fresh ordinary Mint fixture is admitted.')
     if not re.fullmatch('[a-f0-9]{32}', fixture.get('runToken', '')):
         raise ValueError('The fresh proof needs one explicit shared run token.')
     startup = fixture.get('startupDirectory')
@@ -720,6 +756,88 @@ def fresh_binding(fixture):
         raise ValueError('The fresh fixture needs distinct ordinary loopback ports.')
     if any(key in fixture for key in ('priorFailure', 'priorFailures', 'settings', 'runDirectory')):
         raise ValueError('A fresh fixture cannot adopt prior settings, journals or retries.')
+
+
+def permission_root_json(path, digest, limit):
+    path = Path(path)
+    if (not path.is_absolute() or '..' in path.parts or path.parent != MINT_PERMISSION_STAGE or
+        path.name not in ('protected-accounts.json', 'protected-preflight.json')):
+        raise ValueError('The permission root metadata must use its exact fixed stage path.')
+    # The ordinary proof cannot trust a root-owned leaf in a replaceable directory.
+    # Only the standard sticky /var/tmp parent may be writable by other users.
+    for directory in (*reversed(MINT_PERMISSION_STAGE.parents), MINT_PERMISSION_STAGE):
+        info = directory.lstat()
+        sticky_parent = directory == Path('/var/tmp') and bool(info.st_mode & stat.S_ISVTX)
+        if (not stat.S_ISDIR(info.st_mode) or info.st_uid != 0 or
+            (info.st_mode & 0o022 and not sticky_parent)):
+            raise ValueError('The permission metadata stage and ancestors must be immutable root directories.')
+    info = path.lstat()
+    if (not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or info.st_nlink != 1 or
+        info.st_mode & 0o022 or info.st_size > limit):
+        raise ValueError('The permission fixture needs bounded immutable root metadata.')
+    raw = path.read_bytes()
+    if len(raw) > limit or hashlib.sha256(raw).hexdigest() != digest:
+        raise ValueError('The exact permission fixture metadata hash differs.')
+    return json.loads(raw)
+
+
+def permission_protected_files(fixture, *, read_files=False):
+    """Read private old homes only as root, against one exact retained snapshot."""
+    scope = MINT_PERMISSION_SCOPE
+    snapshot = permission_root_json(fixture['protectedAccountsPath'], scope.protected_sha, 16384)
+    if {key: len(value) for key, value in snapshot.items()} != {'1000': 10, '1001': 30, '1002': 5}:
+        raise ValueError('The permission fixture needs all45 exact protected files.')
+    if read_files:
+        if os.geteuid() != 0:
+            raise ValueError('Only the external root wrapper may reread protected private homes.')
+        for uid, values in snapshot.items():
+            for name, expected in values.items():
+                relative = Path(name)
+                if relative.is_absolute() or '..' in relative.parts:
+                    raise ValueError('Unsafe protected snapshot path.')
+                path = MINT_PROTECTED_HOMES[int(uid)]/relative; info = path.lstat()
+                if not stat.S_ISREG(info.st_mode) or info.st_uid != int(uid) or info.st_nlink != 1:
+                    raise ValueError('A protected earlier-account file identity changed.')
+                if info.st_size != expected['bytes']:
+                    raise ValueError('A protected earlier-account file size changed.')
+                raw = path.read_bytes()
+                actual = {'sha256': hashlib.sha256(raw).hexdigest(), 'bytes': len(raw), 'uid': info.st_uid}
+                if 'mode' in expected: actual['mode'] = oct(stat.S_IMODE(info.st_mode))
+                if actual != expected:
+                    raise ValueError('A protected earlier-account file changed; no restoration is attempted.')
+        for name, digest in MINT_PERMISSION_FAILED_EVIDENCE.items():
+            path = MINT_PROTECTED_HOMES[1002]/name; info = path.lstat()
+            if (not stat.S_ISREG(info.st_mode) or info.st_uid != 1002 or info.st_nlink != 1 or
+                info.st_mode & 0o077 or info.st_size > 1024*1024 or hashlib.sha256(path.read_bytes()).hexdigest() != digest):
+                raise ValueError('The retained failed16b journal/log changed; no old run is resumed.')
+    return {'protectedAccountsSha256': scope.protected_sha,
+            'protectedCounts': {'1000': 10, '1001': 30, '1002': 5}, 'oldFilesVerified': bool(read_files),
+            'retainedFailedEvidence': dict(MINT_PERMISSION_FAILED_EVIDENCE),
+            'retainedFailedEvidenceVerified': bool(read_files)}
+
+
+def mint_permission_protected_preflight(fixture):
+    """Root read-only attestation for an ordinary account that cannot read old homes."""
+    fresh_vm_identity(fixture, ordinary=False, scope=MINT_PERMISSION_SCOPE)
+    verified = permission_protected_files(fixture, read_files=True)
+    return {'format': 'augmentor-mint-permission-protected-preflight/1',
+        'runToken': fixture['runToken'], 'sourceCommit': MINT_PERMISSION_SCOPE.source,
+        'proofScriptSha256': PROOF_SHA256, 'guestBootId': fixture['guestBootId'],
+        'observedUnix': time.time(), **verified}
+
+
+def permission_protected_attestation(fixture):
+    permission_protected_files(fixture)
+    observed = permission_root_json(fixture['protectedPreflightPath'], fixture.get('protectedPreflightSha256'), 8192)
+    required = {'format': 'augmentor-mint-permission-protected-preflight/1',
+        'runToken': fixture['runToken'], 'sourceCommit': MINT_PERMISSION_SCOPE.source,
+        'proofScriptSha256': PROOF_SHA256, 'guestBootId': fixture['guestBootId'],
+        'protectedAccountsSha256': MINT_PERMISSION_SCOPE.protected_sha,
+        'protectedCounts': {'1000': 10, '1001': 30, '1002': 5}, 'oldFilesVerified': True,
+        'retainedFailedEvidence': dict(MINT_PERMISSION_FAILED_EVIDENCE), 'retainedFailedEvidenceVerified': True}
+    if (any(type(observed.get(k)) is not type(v) or observed.get(k) != v for k, v in required.items()) or
+        not 0 <= time.time()-observed.get('observedUnix', 0) <= 300):
+        raise ValueError('Protected root attestation is stale or belongs to another run/source/proof/boot.')
 
 
 def fresh_qemu_paths(args, fixture):
@@ -811,9 +929,10 @@ def fresh_qmp_peer(qmp, expected_pid):
             if directory is not None: os.close(directory)
 
 
-def fresh_host_preflight(fixture):
+def fresh_host_preflight(fixture, *, scope=None):
     """Read-only host wrapper admission; stage this result root-owned in the guest."""
-    fresh_binding(fixture)
+    scope = fresh_scope(scope)
+    fresh_binding(fixture, scope=scope)
     proc = Path('/proc')/str(fixture['qemuPid'])
     if proc.stat().st_uid != os.getuid():
         raise ValueError('The QEMU process has a foreign host owner.')
@@ -850,7 +969,7 @@ def fresh_host_preflight(fixture):
     if proc.stat().st_uid != os.getuid() or (proc/'stat').read_text().rsplit(')', 1)[1].split()[19] != start:
         raise ValueError('The owned QEMU start/owner changed after peer attribution.')
     return {'format': 'augmentor-mint-fresh-host-preflight/1', 'runToken': fixture['runToken'],
-            'sourceCommit': FRESH_SOURCE, 'proofScriptSha256': PROOF_SHA256,
+            'sourceCommit': scope.source, 'proofScriptSha256': PROOF_SHA256,
             'qemuPid': fixture['qemuPid'], 'qemuName': fixture['qemuName'],
             'qemuStart': start, 'argvSha256': hashlib.sha256(b'\0'.join(args)+b'\0').hexdigest(),
             'bootArgvSha256': fixture['bootArgvSha256'], 'startupDirectory': fixture['startupDirectory'],
@@ -858,15 +977,16 @@ def fresh_host_preflight(fixture):
             'noHostDevicesOrMounts': True, 'guestBootId': fixture['guestBootId'], 'observedUnix': time.time()}
 
 
-def fresh_vm_identity(fixture, *, ordinary=True):
+def fresh_vm_identity(fixture, *, ordinary=True, scope=None):
+    scope = fresh_scope(scope)
     import pwd
-    fresh_binding(fixture)
+    fresh_binding(fixture, scope=scope)
     if ordinary:
-        if (os.getuid() != 1002 or os.geteuid() != 1002 or os.getgid() != 1002 or
-            os.getgroups() != [1002] or Path.home() != FRESH_HOME or os.environ.get('HOME') != str(FRESH_HOME)):
+        if (os.getuid() != scope.uid or os.geteuid() != scope.uid or os.getgid() != scope.uid or
+            os.getgroups() != [scope.uid] or Path.home() != scope.home or os.environ.get('HOME') != str(scope.home)):
             raise ValueError('Use only the locked dedicated ordinary fresh Mint account.')
-        entry = pwd.getpwuid(1002)
-        if entry.pw_name != fixture['user'] or entry.pw_dir != str(FRESH_HOME) or entry.pw_uid != 1002 or entry.pw_gid != 1002:
+        entry = pwd.getpwuid(scope.uid)
+        if entry.pw_name != fixture['user'] or entry.pw_dir != str(scope.home) or entry.pw_uid != scope.uid or entry.pw_gid != scope.uid:
             raise ValueError('The fresh account identity differs.')
     elif os.geteuid() != 0:
         raise ValueError('The external native lease audit requires root after the proof exits.')
@@ -895,21 +1015,24 @@ def fresh_vm_identity(fixture, *, ordinary=True):
             raise ValueError('The root-staged host preflight receipt differs.')
         observed = json.loads(raw)
         required = {'format': 'augmentor-mint-fresh-host-preflight/1', 'runToken': fixture['runToken'],
-                    'sourceCommit': FRESH_SOURCE, 'proofScriptSha256': PROOF_SHA256,
+                    'sourceCommit': scope.source, 'proofScriptSha256': PROOF_SHA256,
                     'bootArgvSha256': fixture['bootArgvSha256'], 'startupDirectory': fixture['startupDirectory'],
                     'qemuPid': 2494740, 'qemuName': fixture['qemuName'],
                     'noHostDevicesOrMounts': True, 'guestBootId': fixture['guestBootId']}
         if any(observed.get(k) != v for k, v in required.items()) or not 0 <= time.time()-observed.get('observedUnix', 0) <= 300:
             raise ValueError('The host preflight is stale or belongs to another run/VM.')
+        if scope.protected_sha:
+            permission_protected_attestation(fixture)
 
 
-def fresh_native_bundle(bundle, fixture):
+def fresh_native_bundle(bundle, fixture, *, scope=None):
+    scope = fresh_scope(scope)
     raw = (bundle/'bundle.json').read_bytes()
-    if hashlib.sha256(raw).hexdigest() != FRESH_MANIFEST_SHA:
+    if hashlib.sha256(raw).hexdigest() != scope.manifest_sha:
         raise ValueError('The exact fresh complete manifest differs.')
     manifest = json.loads(raw)
-    if (manifest['sourceCommit'] != FRESH_SOURCE or manifest['artifactId'] != FRESH_ARTIFACT or
-        manifest['target'] != fixture['target'] or hashlib.sha256((bundle/'setup.py').read_bytes()).hexdigest() != FRESH_SETUP_SHA):
+    if (manifest['sourceCommit'] != scope.source or manifest['artifactId'] != scope.artifact or
+        manifest['target'] != fixture['target'] or hashlib.sha256((bundle/'setup.py').read_bytes()).hexdigest() != scope.setup_sha):
         raise ValueError('The exact fresh source/artifact/installer differs.')
     setup = proof_module(bundle/'setup.py'); setup.verify_bundle(bundle)
     info = (POST_APP/'release.json').lstat()
@@ -928,37 +1051,41 @@ def fresh_native_bundle(bundle, fixture):
     return manifest
 
 
-def validate_fresh_fixture(bundle, fixture):
-    fresh_vm_identity(fixture)
+def validate_fresh_fixture(bundle, fixture, *, scope=None):
+    scope = fresh_scope(scope)
+    fresh_vm_identity(fixture, scope=scope)
     sys.path.insert(0, str(POST_APP/'services'))
     from platform_adapters.private_files import require_directory
-    require_directory(FRESH_HOME)
+    require_directory(scope.home)
     # The proof journal is outside installer state. Nothing in a prior account is adopted.
     for name in ('.local/share/augmentor', '.config/augmentor', '.local/state/augmentor-install',
-                 '.local/state/augmentor', '.dsh', FRESH_RUN_DIRECTORY):
-        path = FRESH_HOME/name
+                 '.local/state/augmentor', '.dsh', scope.run_directory):
+        path = scope.home/name
         if path.exists() or path.is_symlink():
             raise ValueError('The fresh proof needs absent application/settings/workspace/journal state.')
-    post_account_idle(FRESH_HOME, 'augmentor-dsh.service')
+    post_account_idle(scope.home, 'augmentor-dsh.service')
     require_ports_idle((fixture['modelApiPort'], fixture['dshPort']))
-    return fresh_native_bundle(bundle, fixture)
+    return fresh_native_bundle(bundle, fixture, scope=scope)
 
 
-def begin_fresh_run(fixture):
+def begin_fresh_run(fixture, *, scope=None):
+    scope = fresh_scope(scope)
     from platform_adapters.private_files import require_directory, atomic_json
-    root = FRESH_HOME/FRESH_RUN_DIRECTORY
+    root = scope.home/scope.run_directory
     try: root.mkdir(mode=0o700)
     except FileExistsError: raise ValueError('The fresh one-shot journal exists; no run or action is adopted.') from None
     require_directory(root)
-    fd = os.open(FRESH_HOME, os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
+    fd = os.open(scope.home, os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
     try: os.fsync(fd)
     finally: os.close(fd)
     record = {'format': 'augmentor-owned-fresh-emulated-run/1', 'run': fixture['runToken'],
-              'sourceCommit': FRESH_SOURCE, 'artifactId': FRESH_ARTIFACT, 'bundleManifestSha256': FRESH_MANIFEST_SHA,
+              'sourceCommit': scope.source, 'artifactId': scope.artifact, 'bundleManifestSha256': scope.manifest_sha,
               'proofScriptSha256': PROOF_SHA256, 'fixtureSha256': hashlib.sha256(json.dumps(fixture, sort_keys=True).encode()).hexdigest(),
               'phase': 'admitted', 'status': 'running', 'pendingRequest': None, 'unknownRequestOutcome': False,
               'completedActions': [], 'startupBudgetSeconds': 120, 'turnBudgetSeconds': 60,
               'originalPublic60FullProofPass': False}
+    if scope.protected_sha:
+        record['protectedAccountsSha256'] = scope.protected_sha
     atomic_json(root/'run.json', record)
     return root, record
 
@@ -973,24 +1100,26 @@ def fresh_once(root, record, action, function):
     return result
 
 
-def capture_fresh_settings():
+def capture_fresh_settings(*, scope=None):
+    scope = fresh_scope(scope)
     from platform_adapters.private_files import descriptor
     result = {}
     for name in POST_SETTINGS:
-        with os.fdopen(descriptor(FRESH_HOME/name), 'rb') as stream: raw = stream.read(1024*1024+1)
+        with os.fdopen(descriptor(scope.home/name), 'rb') as stream: raw = stream.read(1024*1024+1)
         if len(raw) > 1024*1024: raise ValueError('Fresh settings exceed the bounded size.')
         result[name] = {'sha256': hashlib.sha256(raw).hexdigest(), 'bytes': len(raw)}
     return result
 
 
-def fresh_installed_selection(manifest, fixture):
+def fresh_installed_selection(manifest, fixture, *, scope=None):
+    scope = fresh_scope(scope)
     from platform_adapters.private_files import read_json
-    receipt = read_json(FRESH_HOME/'.local/state/augmentor-install/installation.json')
-    if any(receipt.get(k) != v for k, v in {'status': 'installed', 'bundle': FRESH_ARTIFACT, 'target': manifest['target']}.items()):
+    receipt = read_json(scope.home/'.local/state/augmentor-install/installation.json')
+    if any(receipt.get(k) != v for k, v in {'status': 'installed', 'bundle': scope.artifact, 'target': manifest['target']}.items()):
         raise ValueError('A known successful exact receipt is required; setup is not retried.')
-    desktop = read_json(FRESH_HOME/'.local/share/augmentor/desktop.json')
-    dsh = read_json(FRESH_HOME/'.config/augmentor/harnesses.json')['dsh']
-    home = FRESH_HOME/'.local/share/augmentor/dsh-home'
+    desktop = read_json(scope.home/'.local/share/augmentor/desktop.json')
+    dsh = read_json(scope.home/'.config/augmentor/harnesses.json')['dsh']
+    home = scope.home/'.local/share/augmentor/dsh-home'
     if (desktop.get('root') != str(POST_APP) or desktop.get('node') != str(POST_APP/'node/bin/node') or
         desktop.get('dshService') != 'augmentor-dsh.service' or desktop.get('dshHome') != str(home) or
         dsh.get('home') != str(home) or dsh.get('version') != manifest['version'] or
@@ -1006,9 +1135,9 @@ def fresh_installed_selection(manifest, fixture):
         provider.get('api') != 'openai-completions' or provider.get('apiKeyEnv') != 'AUGMENTOR_MODEL_API_KEY' or
         len(provider.get('models', [])) != 1 or provider['models'][0]['id'] != 'fixture' or
         model.get('agent-default-model') != {'provider': 'augmentor-model', 'model': 'fixture'} or
-        (FRESH_HOME/'.local/state/augmentor-install/model.env').read_text() != 'AUGMENTOR_MODEL_API_KEY="qualification-fixture"\n'):
+        (scope.home/'.local/state/augmentor-install/model.env').read_text() != 'AUGMENTOR_MODEL_API_KEY="qualification-fixture"\n'):
         raise ValueError('The fresh selection is not the dedicated deterministic localhost model.')
-    post_account_idle(FRESH_HOME, desktop['dshService'])
+    post_account_idle(scope.home, desktop['dshService'])
     from lifecycle.lease import hold
     hold('runtime')
     return desktop, selected_python_environment(POST_APP, Path(desktop['python']))
@@ -1049,16 +1178,17 @@ def fresh_stop(process):
         finally: process.close()
 
 
-def fresh_emulated_proof(bundle, fixture):
+def fresh_emulated_proof(bundle, fixture, *, scope=None):
     """New ordinary account; unchanged installer, explicit emulated startup only."""
-    manifest = validate_fresh_fixture(bundle, fixture)
+    scope = fresh_scope(scope)
+    manifest = validate_fresh_fixture(bundle, fixture, scope=scope)
     from platform_adapters.private_files import atomic_json, require_directory
     from platform_adapters.processes import OwnedProcess
-    root, record = begin_fresh_run(fixture)
+    root, record = begin_fresh_run(fixture, scope=scope)
     settings = None; server = None; thread = None; thread_started = False; process = None; companion = None; log = None
     requests = []; observations = []; turn_observations = []; history_preserved = False; report = None
     try:
-        runtime_dir = FRESH_HOME/'runtime'
+        runtime_dir = scope.home/'runtime'
         if not runtime_dir.exists(): runtime_dir.mkdir(mode=0o700)
         require_directory(runtime_dir)
         env = {**os.environ, 'AUGMENTOR_FIXTURE_KEY': 'qualification-fixture', 'QT_QPA_PLATFORM': 'offscreen',
@@ -1070,16 +1200,16 @@ def fresh_emulated_proof(bundle, fixture):
                    '--non-interactive', '--model-url', 'http://127.0.0.1:'+str(fixture['modelApiPort'])+'/v1',
                    '--model', 'fixture', '--api-key-env', 'AUGMENTOR_FIXTURE_KEY', '--port', str(fixture['dshPort'])]
         record['phase'] = 'setup'; atomic_json(root/'run.json', record)
-        fresh_once(root, record, 'setup.initial', lambda: run(command, env=env, cwd=str(FRESH_HOME), stdout=log, stderr=log))
-        desktop, selected = fresh_installed_selection(manifest, fixture)
-        settings = capture_fresh_settings(); record['settings'] = settings; atomic_json(root/'run.json', record)
+        fresh_once(root, record, 'setup.initial', lambda: run(command, env=env, cwd=str(scope.home), stdout=log, stderr=log))
+        desktop, selected = fresh_installed_selection(manifest, fixture, scope=scope)
+        settings = capture_fresh_settings(scope=scope); record['settings'] = settings; atomic_json(root/'run.json', record)
         # Only a verified installed receipt permits the documented idempotent call.
-        fresh_once(root, record, 'setup.installed-idempotence', lambda: run(command, env=env, cwd=str(FRESH_HOME), stdout=log, stderr=log))
-        settings_snapshot(FRESH_HOME, settings)
-        data = FRESH_HOME/'.local/share/augmentor'; home = data/'dsh-home'
-        for path in (FRESH_HOME/'.config/autostart/com.augmentor.Agent.desktop',
-                     FRESH_HOME/'.local/share/applications/com.augmentor.Agent.secondary.desktop',
-                     FRESH_HOME/'.config/chromium/NativeMessagingHosts/com.augmentor.agent.json',
+        fresh_once(root, record, 'setup.installed-idempotence', lambda: run(command, env=env, cwd=str(scope.home), stdout=log, stderr=log))
+        settings_snapshot(scope.home, settings)
+        data = scope.home/'.local/share/augmentor'; home = data/'dsh-home'
+        for path in (scope.home/'.config/autostart/com.augmentor.Agent.desktop',
+                     scope.home/'.local/share/applications/com.augmentor.Agent.secondary.desktop',
+                     scope.home/'.config/chromium/NativeMessagingHosts/com.augmentor.agent.json',
                      data/'browser'/manifest['version']/'voice.mjs'):
             if not path.is_file(): raise ValueError('The fresh desktop/Browser setup is incomplete.')
         for plugin in ('dsh-resonant-voice', 'dsh-adaptive-reasoning', 'dsh-model-picker-augmented'):
@@ -1089,27 +1219,27 @@ def fresh_emulated_proof(bundle, fixture):
         env = {**selected, 'DSH_HOME': str(home), 'DSH_TELEMETRY_MODE': 'DISABLED',
                'AUGMENTOR_MODEL_API_KEY': 'qualification-fixture', 'QT_QPA_PLATFORM': 'offscreen', 'XDG_RUNTIME_DIR': str(runtime_dir)}
         os.environ.clear(); os.environ.update(env)
-        companion = memory_companion(POST_APP, desktop['python'], FRESH_HOME, home, env, root)
+        companion = memory_companion(POST_APP, desktop['python'], scope.home, home, env, root)
         record['phase'] = 'preview'; atomic_json(root/'run.json', record)
         run([desktop['python'], '-m', 'augmentor_linux', '--preview', '--screenshot', root/'desktop.png'],
-            env={**env, 'PYTHONPATH': str(POST_APP/'apps/native')}, cwd=str(FRESH_HOME), timeout=120)
+            env={**env, 'PYTHONPATH': str(POST_APP/'apps/native')}, cwd=str(scope.home), timeout=120)
         if (root/'desktop.png').stat().st_size <= 10000: raise ValueError('The fresh preview is incomplete.')
         sys.path.insert(0, str(POST_APP/'apps/native'))
         from augmentor_linux.adapters.dsh import DshAdapter
         cli = data/'dsh-runtime/node_modules/.bin/dsh'
         def start():
             return fresh_start(lambda: OwnedProcess([str(POST_APP/'node/bin/node'), str(cli.resolve()), 'web', '--no-open',
-                '--host', '127.0.0.1', '--port', str(fixture['dshPort'])], env=env, cwd=str(FRESH_HOME), stdout=log, stderr=log), DshAdapter, observations)
+                '--host', '127.0.0.1', '--port', str(fixture['dshPort'])], env=env, cwd=str(scope.home), stdout=log, stderr=log), DshAdapter, observations)
         record['phase'] = 'starting'; atomic_json(root/'run.json', record)
         process, adapter = start()
         if adapter.call('session.list')['items']: raise ValueError('The fresh runtime has prior sessions; none are adopted.')
         sessions = []
         for role in ('linux', 'browser'):
             record['phase'] = role+'-role'; atomic_json(root/'run.json', record)
-            settings_snapshot(FRESH_HOME, settings)
+            settings_snapshot(scope.home, settings)
             session = 'qualification-fresh-'+record['run']+'-'+role; sessions.append(session)
             for method, payload in (
-                ('session.create', {'sessionId': session, 'agentPreset': 'augmentor-'+role+'-product', 'cwd': str(FRESH_HOME)}),
+                ('session.create', {'sessionId': session, 'agentPreset': 'augmentor-'+role+'-product', 'cwd': str(scope.home)}),
                 ('session.selectModel', {'sessionId': session, 'provider': 'augmentor-model', 'model': 'fixture'}),
                 ('session.prompt', {'sessionId': session, 'mode': 'queue', 'content': [{'type': 'text', 'text': 'Reply to the '+role+' qualification fixture.'}]})):
                 fresh_once(root, record, session+':'+method, lambda m=method, p=payload: adapter.call(m, p))
@@ -1128,7 +1258,7 @@ def fresh_emulated_proof(bundle, fixture):
                 if completed: break
                 time.sleep(.1)
             else: raise RuntimeError('The fresh '+role+' fixture turn did not finish within60seconds.')
-            settings_snapshot(FRESH_HOME, settings)
+            settings_snapshot(scope.home, settings)
         before = {sid: adapter.call('session.history', {'sessionId': sid}) for sid in sessions}
         atomic_json(root/'history-before.json', before); count = len(requests)
         if count < 2: raise ValueError('Both fresh roles must reach the counted model fixture.')
@@ -1140,9 +1270,9 @@ def fresh_emulated_proof(bundle, fixture):
         if normalized_histories(after) != normalized_histories(before): raise ValueError('Fresh restart changed history.')
         if len(requests) != count: raise ValueError('Fresh restart replayed a model request.')
         history_preserved = True; fresh_stop(process); process = None
-        cleanup = companion.finish(); settings_snapshot(FRESH_HOME, settings)
-        report = {'format': 'augmentor-owned-fresh-emulated-proof/1', 'status': 'pass', 'sourceCommit': FRESH_SOURCE,
-                  'artifactId': FRESH_ARTIFACT, 'proofScriptSha256': PROOF_SHA256, 'setupScriptSha256': FRESH_SETUP_SHA,
+        cleanup = companion.finish(); settings_snapshot(scope.home, settings)
+        report = {'format': 'augmentor-owned-fresh-emulated-proof/1', 'status': 'pass', 'sourceCommit': scope.source,
+                  'artifactId': scope.artifact, 'proofScriptSha256': PROOF_SHA256, 'setupScriptSha256': scope.setup_sha,
                   'installerOverlayUsed': False, 'ordinaryUserSetup': True, 'repeatPreservesSettings': True,
                   'savedSettingsPreserved': True, 'offscreenNativeRender': True, 'secondWindowEntry': True,
                   'nativeHostRegistered': True, 'linuxAndBrowserRoleFixtureTurns': True,
@@ -1155,6 +1285,9 @@ def fresh_emulated_proof(bundle, fixture):
                   'licenseReviewComplete': False, 'embeddedSourceCoverageComplete': False,
                   'externalLeaseAuditRequired': True, 'companionProofSha256': COMPANION_PROOF_SHA256,
                   'companionCleanup': cleanup}
+        if scope.protected_sha:
+            report.update(fixtureProfile=scope.format, ordinaryUid=scope.uid,
+                          protectedAccountsPreflightVerified=45, protectedAccountsSha256=scope.protected_sha)
         record.update(status='complete', phase='complete')
         return report
     except BaseException:
@@ -1181,7 +1314,7 @@ def fresh_emulated_proof(bundle, fixture):
             finally:
                 if log is not None: log.close()
                 try:
-                    if settings is not None: settings_snapshot(FRESH_HOME, settings); record['settingsPreserved'] = True
+                    if settings is not None: settings_snapshot(scope.home, settings); record['settingsPreserved'] = True
                 except BaseException:
                     record['status'] = 'failed'; record['settingsPreserved'] = False; raise
                 finally:
@@ -1192,32 +1325,36 @@ def fresh_emulated_proof(bundle, fixture):
                         atomic_json(root/'report.json', report)
 
 
-def fresh_audit_record(record, fixture):
-    if (record.get('run') != fixture['runToken'] or record.get('sourceCommit') != FRESH_SOURCE or
-        record.get('artifactId') != FRESH_ARTIFACT or record.get('bundleManifestSha256') != FRESH_MANIFEST_SHA or
+def fresh_audit_record(record, fixture, *, scope=None):
+    scope = fresh_scope(scope)
+    if (record.get('run') != fixture['runToken'] or record.get('sourceCommit') != scope.source or
+        record.get('artifactId') != scope.artifact or record.get('bundleManifestSha256') != scope.manifest_sha or
         record.get('proofScriptSha256') != fixture['proofScriptSha256'] or
         record.get('fixtureSha256') != hashlib.sha256(json.dumps(fixture, sort_keys=True).encode()).hexdigest()):
         raise ValueError('The external audit cannot adopt another journal/tool/fixture.')
+    if scope.protected_sha and record.get('protectedAccountsSha256') != scope.protected_sha:
+        raise ValueError('The external audit needs the exact retained45-file snapshot binding.')
 
 
-def fresh_external_audit(bundle, fixture):
+def _fresh_external_audit(bundle, fixture, *, scope=None):
     """Root wrapper readback after the proof exits; never stop any process."""
-    fresh_vm_identity(fixture, ordinary=False); fresh_native_bundle(bundle, fixture)
+    scope = fresh_scope(scope)
+    fresh_vm_identity(fixture, ordinary=False, scope=scope); fresh_native_bundle(bundle, fixture, scope=scope)
     import fcntl
-    root = FRESH_HOME/FRESH_RUN_DIRECTORY; info = root.lstat()
-    if not stat.S_ISDIR(info.st_mode) or info.st_uid != 1002 or info.st_mode & 0o077:
+    root = scope.home/scope.run_directory; info = root.lstat()
+    if not stat.S_ISDIR(info.st_mode) or info.st_uid != scope.uid or info.st_mode & 0o077:
         raise ValueError('The fresh audit journal root differs.')
     path = root/'run.json'; info = path.lstat()
-    if not stat.S_ISREG(info.st_mode) or info.st_uid != 1002 or info.st_mode & 0o077 or info.st_nlink != 1:
+    if not stat.S_ISREG(info.st_mode) or info.st_uid != scope.uid or info.st_mode & 0o077 or info.st_nlink != 1:
         raise ValueError('The fresh audit journal file differs.')
     record = json.loads(path.read_bytes())
-    fresh_audit_record(record, fixture)
+    fresh_audit_record(record, fixture, scope=scope)
     for proc in Path('/proc').iterdir():
         if not proc.name.isdigit() or int(proc.name) == os.getpid(): continue
         try:
-            if proc.stat().st_uid != 1002: continue
+            if proc.stat().st_uid != scope.uid: continue
             args = (proc/'cmdline').read_bytes(); env = (proc/'environ').read_bytes()
-            if any(v in args for v in (str(POST_APP).encode(), b'/setup.py', b'--owned-vm-fresh-emulated-fixture')) or str(FRESH_HOME/'.local/share/augmentor').encode() in env:
+            if any(v in args for v in (str(POST_APP).encode(), b'/setup.py', b'--owned-vm-fresh-emulated-fixture', b'--owned-vm-mint-permission-fixture')) or str(scope.home/'.local/share/augmentor').encode() in env:
                 raise ValueError('The fresh proof/product child is still active; it is preserved.')
         except FileNotFoundError: continue
     for path in (Path('/var/lib/augmentor-package-maintenance/pending.json'),
@@ -1232,25 +1369,44 @@ def fresh_external_audit(bundle, fixture):
                 raise ValueError('The native external lease identity differs.')
             fcntl.flock(fd, fcntl.LOCK_EX|fcntl.LOCK_NB)
         require_ports_idle((fixture['modelApiPort'], fixture['dshPort']))
-        memory = FRESH_HOME/'.local/state/augmentor/dual-memory.sock'
+        memory = scope.home/'.local/state/augmentor/dual-memory.sock'
         if memory.exists() or memory.is_symlink():
             raise ValueError('A fresh memory socket remains; no daemon is adopted or stopped.')
         if record.get('settings'):
             if set(record['settings']) != POST_SETTINGS:
                 raise ValueError('The external settings audit needs all five original hashes.')
             for name, expected in record['settings'].items():
-                path = FRESH_HOME/name; info = path.lstat(); raw = path.read_bytes()
-                if (not stat.S_ISREG(info.st_mode) or info.st_uid != 1002 or info.st_nlink != 1 or info.st_mode & 0o077 or
+                path = scope.home/name; info = path.lstat(); raw = path.read_bytes()
+                if (not stat.S_ISREG(info.st_mode) or info.st_uid != scope.uid or info.st_nlink != 1 or info.st_mode & 0o077 or
                     {'sha256': hashlib.sha256(raw).hexdigest(), 'bytes': len(raw)} != expected):
                     raise ValueError('The fresh external settings preservation audit differs.')
     finally:
         for fd in reversed(leases): os.close(fd)
-    return {'format': 'augmentor-owned-fresh-emulated-external-audit/1', 'sourceCommit': FRESH_SOURCE,
+    return {'format': 'augmentor-owned-fresh-emulated-external-audit/1', 'sourceCommit': scope.source,
             'run': fixture['runToken'], 'proofOutcome': record['status'], 'runSha256': hashlib.sha256((root/'run.json').read_bytes()).hexdigest(),
             'proofScriptSha256': record['proofScriptSha256'], 'fixtureSha256': record['fixtureSha256'],
             'nativeAudit': True, 'exclusiveLeasesIdle': True, 'noOwnedProcessOrListener': True,
             'settingsPreserved': bool(record.get('settings')), 'SDKPending': record['pendingRequest'],
-            'protectedEarlierAccountsAuditRequired': True}
+            'protectedEarlierAccountsAuditRequired': True,
+            **({'protectedEarlierAccountsVerified': 45, 'protectedAccountsSha256': scope.protected_sha}
+               if scope.protected_sha else {})}
+
+
+def fresh_external_audit(bundle, fixture, *, scope=None):
+    scope = fresh_scope(scope)
+    if not scope.protected_sha:
+        return _fresh_external_audit(bundle, fixture, scope=scope)
+    fresh_vm_identity(fixture, ordinary=False, scope=scope)
+    permission_protected_files(fixture, read_files=True)
+    try:
+        return _fresh_external_audit(bundle, fixture, scope=scope)
+    finally:
+        permission_protected_files(fixture, read_files=True)
+
+
+def mint_permission_emulated_proof(bundle, fixture):
+    """One new365 artifact/account; historical16b admission remains distinct."""
+    return fresh_emulated_proof(bundle, fixture, scope=MINT_PERMISSION_SCOPE)
 
 
 def main():
@@ -1264,9 +1420,26 @@ def main():
                    help='Explicit one-shot clean2035 Mint fixture; verifies saved state and never invokes setup.')
     p.add_argument('--owned-vm-fresh-emulated-fixture', type=Path,
                    help='One-shot pristine clean16bcb Mint account; separately labelled120-second emulated startup.')
+    p.add_argument('--owned-vm-mint-permission-fixture', type=Path,
+                   help='Separate one-shot clean365 Mint UID1003 permission-corrected artifact.')
     p.add_argument('--fresh-emulated-external-audit', action='store_true',
                    help='Read-only root audit after the fresh proof exits; requires its exact fixture.')
     a = p.parse_args()
+    if a.owned_vm_mint_permission_fixture:
+        if a.user_phase or a.setup_script or a.owned_vm_post_install_fixture or a.owned_vm_fresh_emulated_fixture:
+            p.error('Mint permission fixture cannot adopt another phase/profile or installer override.')
+        sys.path.insert(0, str(POST_APP/'services'))
+        path = a.owned_vm_mint_permission_fixture; info = path.lstat()
+        if not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or info.st_nlink != 1 or info.st_mode & 0o022 or info.st_size > 16384:
+            p.error('The permission fixture must be bounded immutable root-staged metadata.')
+        raw = path.read_bytes()
+        if len(raw) > 16384:
+            p.error('The permission fixture changed beyond its bounded metadata size.')
+        fixture = json.loads(raw)
+        report = (fresh_external_audit(a.bundle.resolve(), fixture, scope=MINT_PERMISSION_SCOPE)
+                  if a.fresh_emulated_external_audit else mint_permission_emulated_proof(a.bundle.resolve(), fixture))
+        print(json.dumps(report))
+        return
     if a.owned_vm_fresh_emulated_fixture:
         if a.user_phase or a.setup_script or a.owned_vm_post_install_fixture:
             p.error('Fresh emulated fixture cannot use another proof phase or installer override.')

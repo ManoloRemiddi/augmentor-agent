@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 clean Mint permission fixture source review
+
+[The Mint365 checkpoint](../release/qualification/next-targets/20261003-mint365-permission-fresh-proof.json)
+records clean permission-corrected native/Browser/complete artifact inspection
+PASS and91 independently repeated source tests. A separate explicit UID1003
+profile binds exact365 bytes without changing the historical16b defaults. An
+immutable root snapshot and fresh run/source/proof/boot attestation cover all45
+previous-account files; the external root wrapper rereads them before and finally.
+Fixed stage/ancestor topology refuses caller-writable or linked metadata before
+reading. No new guest install/account/setup/SDK transaction has occurred.
+The earlier16b setup PASS and full permission refusal remain preserved.
+
 ## October 3 GNOME redundant-raised observer source review
 
 [The observer source checkpoint](../release/qualification/next-targets/20261003-gnome-observer-raised-source-only.json)

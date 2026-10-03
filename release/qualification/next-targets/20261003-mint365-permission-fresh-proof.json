@@ -1,0 +1,482 @@
+{
+  "format": "augmentor-mint365-permission-fresh-proof-source-checkpoint/1",
+  "date": "2026-10-03",
+  "status": "clean-artifact-metadata-pass-separate-UID1003-profile-source-tests-pass-awaiting-review-publication",
+  "artifactSource": {
+    "commit": "3651e17a0c34154eb4454e80e136ee11e764aa00",
+    "dirty": false
+  },
+  "target": "linuxmint22.3-amd64",
+  "nativeArtifacts": [
+    {
+      "file": "augmentor-runtime_0.2.13_amd64.deb",
+      "sha256": "0b8b5312d8036ebc5dc07c55f265300e3da7c9808524ecf8a6aecf9bb3126648",
+      "bytes": 352942888
+    },
+    {
+      "file": "augmentor-desktop_0.2.13_amd64.deb",
+      "sha256": "1f915d27df38f49a1bd8f7e46c4cd0f7456297ab9070b5d1cc54ee44c15ef8a4",
+      "bytes": 5392
+    }
+  ],
+  "nativeMetadata": {
+    "augmentor-runtime_0.2.13_amd64.deb": {
+      "members": 32340,
+      "modeCounts": {
+        "directory:0o755": 2986,
+        "file:0o644": 29281,
+        "file:0o755": 42,
+        "symlink:0o777": 31
+      },
+      "owners": "0:0",
+      "allRegularAndDirectoryModesVerified": true
+    },
+    "augmentor-desktop_0.2.13_amd64.deb": {
+      "members": 17,
+      "modeCounts": {
+        "directory:0o755": 12,
+        "file:0o755": 1,
+        "file:0o644": 4
+      },
+      "owners": "0:0",
+      "allRegularAndDirectoryModesVerified": true
+    }
+  },
+  "capturedPublicMetadata": {
+    "usr/lib/augmentor/components/handy/runtime/BUILD.json": {
+      "sha256": "ea1a5a3defdb8d60c8a0d442dbd9f2169f6a110d291f390438e3624c92f031c2",
+      "bytes": 159229,
+      "mode": "0o644"
+    },
+    "usr/lib/augmentor/linux-python-runtime.json": {
+      "sha256": "2dc64e6d1c02579970a61cb0b200c79c8a36d84aa54e021dcb1cfafa9b3f2f16",
+      "bytes": 6151,
+      "mode": "0o644"
+    },
+    "usr/lib/augmentor/python-wheels/source-pyside-derivation.json": {
+      "sha256": "de6edc207b0ce7279de6972b5694d3063161f4fd9c46b865245ca0c471d2990c",
+      "bytes": 1063,
+      "mode": "0o644"
+    },
+    "usr/lib/augmentor/python-wheels/source-qt/stage-inventory.json": {
+      "sha256": "c49faf50a992daca825c51929715c6114017e6b29ac54af17f9656db41e73364",
+      "bytes": 34507,
+      "mode": "0o644"
+    },
+    "usr/lib/augmentor/release.json": {
+      "sha256": "31a81fffb93e814427faed026cd06009f7cf86ff35e1a3f48593387e823fe3df",
+      "bytes": 1607,
+      "mode": "0o644"
+    },
+    "usr/lib/augmentor/scripts/setup-complete.py": {
+      "sha256": "d19ae1ecc900f5f3f29610c99b417474ef9e776043e99cabc5c3978dfaf76b52",
+      "bytes": 24852,
+      "mode": "0o644"
+    },
+    "usr/lib/augmentor/services/memory/service.py": {
+      "sha256": "aa857ac80b8441de0aa09797178562f7dedc1530c2f6844e8419cc4f923453d2",
+      "bytes": 5580,
+      "mode": "0o644"
+    }
+  },
+  "browser": {
+    "version": "0.2.13",
+    "channel": "preview",
+    "extensionId": "dgfpmlnbofacjafljfohgmfacobgfjbh",
+    "protocol": "augmentor/1",
+    "companionVersion": "0.2.13",
+    "source": {
+      "commit": "3651e17a0c34154eb4454e80e136ee11e764aa00",
+      "dirty": false
+    },
+    "artifact": "augmentor-browser-0.2.13.zip",
+    "bytes": 218668,
+    "sha256": "0fbfdc193b44bdb2f37e19b63337d9321cdc59eb413ff543915a3b67415365ec",
+    "files": {
+      "action-design.mjs": {
+        "bytes": 2177,
+        "sha256": "6c60cd89b3b4d0d46adb6d8fe4acceae77420dc1010eb95a03c3c847df8899e3"
+      },
+      "actions.mjs": {
+        "bytes": 10244,
+        "sha256": "3f7467484e4753a92feda7bfce639eec061e7af5316165700e0c5a3c8d057db3"
+      },
+      "appearance.mjs": {
+        "bytes": 4226,
+        "sha256": "e440ea8ad88db36efc6df76deac3148fb304dc032921eaaa8f2eadb99d859da0"
+      },
+      "approval-presenters.mjs": {
+        "bytes": 1522,
+        "sha256": "844d5682fbf6d91cbd61cf8c4a9d3bd6b60dcab70471524b5ee0156ea5b75718"
+      },
+      "branch-request.mjs": {
+        "bytes": 1162,
+        "sha256": "165acdcb85212a97747c28d0c3092888509435a02e30b8f50ef3a958b83fcc7b"
+      },
+      "chat-components.css": {
+        "bytes": 19548,
+        "sha256": "74fb4115306e32e84660a1db85ca383a49ccb4c653566b5b4ab4e56ecd93f5aa"
+      },
+      "chat-render.js": {
+        "bytes": 28015,
+        "sha256": "4504a23b4adb76ec7fa5f20ca4236ef3046b8432678b491005264f3855de16b1"
+      },
+      "clipboard.mjs": {
+        "bytes": 766,
+        "sha256": "59a4872767a5af7b4914ca153b690be86dfeef79886f2b371071ba10d389695a"
+      },
+      "codex-questions.mjs": {
+        "bytes": 2673,
+        "sha256": "91f6f2fac033a17db190c6f46df527d320e56b9f4e8086eeb2d256ac5c7ea075"
+      },
+      "codex-setup.mjs": {
+        "bytes": 11833,
+        "sha256": "87b7fb519b92dc10bb59ac49234c3d5f5bdca2f74fb3f42b402e0f4824a31ae7"
+      },
+      "diagnostics.mjs": {
+        "bytes": 1095,
+        "sha256": "4062eb8e6cc62e14955c4097ef9685a37101d1962fd941b19b1c78c5337dea5b"
+      },
+      "dictation-settings.mjs": {
+        "bytes": 6865,
+        "sha256": "defd5bcad2d828341a2914d130e39f3533c90e13e03297088c4c080419812a29"
+      },
+      "dom-actions.js": {
+        "bytes": 3406,
+        "sha256": "e363bdc48a32b3be55a6c5ddd1579a426d25b613d12fa05cb7bd2bbc374da415"
+      },
+      "dsh-setup.mjs": {
+        "bytes": 3564,
+        "sha256": "9a1fe1cf322f81dd6229bd042e8770c2fd3378a6fdab14955e12f9ff80b8afa3"
+      },
+      "favicon.svg": {
+        "bytes": 938,
+        "sha256": "ea2f960644adfe28091021fd73c9bd5c252eec689d172c9ab0546968699fbda4"
+      },
+      "home.mjs": {
+        "bytes": 2274,
+        "sha256": "136fbd9c93de9a2876ec6e4c50e00f367e539d8c1b9ec3d69db99ea69feac36d"
+      },
+      "icons/icon128.png": {
+        "bytes": 4429,
+        "sha256": "82a53ca4d06879982f52786fece9db2144178767ccb9bd4657d19ef814c0408b"
+      },
+      "icons/icon16.png": {
+        "bytes": 508,
+        "sha256": "c709ed667583996ef20a26c993206829eb05b84687f5d9b945e1dd3d66cc7874"
+      },
+      "icons/icon32.png": {
+        "bytes": 1020,
+        "sha256": "f3497a1ab7e1cab105d07cb987d88c85ebff24973d828da05472f0bd7490d07e"
+      },
+      "icons/icon48.png": {
+        "bytes": 1515,
+        "sha256": "635a85b2737af3c557843e3b4ea1991ad05ab5cc07deafe5e241fa636b7e8431"
+      },
+      "maintenance-page.mjs": {
+        "bytes": 6200,
+        "sha256": "65d44f6b4c19eaadd2572d3475dbe69083a5de4ebf5a6e42b57d153d9b29d9e7"
+      },
+      "maintenance-worker.mjs": {
+        "bytes": 8312,
+        "sha256": "06611c36dddb86bbc3fe092ff89c0680f2648d0ec55062df3cf99c2bb600a14d"
+      },
+      "manifest.json": {
+        "bytes": 1401,
+        "sha256": "0f146a8f09c22d66d9a7993fe9aea92121685158e5f3103b1e0059d45e4cd0a7"
+      },
+      "markdown.css": {
+        "bytes": 3015,
+        "sha256": "02d2fc3d4a4d64655d641c7b4baabb74c1576e5b05f7f667a59b6afc140d3f5d"
+      },
+      "memory.mjs": {
+        "bytes": 10465,
+        "sha256": "8c60202c19fdec6c111ca6253035a87b3e470c0df7efd77879b1bccce390a056"
+      },
+      "observation.mjs": {
+        "bytes": 8938,
+        "sha256": "f6cd613d15255778e101e4028d7c759b71fe511661d0ee3b9571c6d119d4c9c7"
+      },
+      "overlay.mjs": {
+        "bytes": 7716,
+        "sha256": "0e8cc246c6b7d9aa656815d5d9b08e5ef032b63669d33c1dfcf3fda57d0bad02"
+      },
+      "panel-api.mjs": {
+        "bytes": 39350,
+        "sha256": "b04a8614283dd2cc3143a4dabc478973003df8e5d22b48887d75cd7592644271"
+      },
+      "port.mjs": {
+        "bytes": 18058,
+        "sha256": "819ccf1d7c783172434160164d3a5408074b9d74cd566f436df694b2786b0c7c"
+      },
+      "prompt-animation.mjs": {
+        "bytes": 3336,
+        "sha256": "1ee707efa4618991d8e7b0019cd3122b27a4313d52512e18d2da6a794c00d5b0"
+      },
+      "prompt-editor.mjs": {
+        "bytes": 5817,
+        "sha256": "2469437925e1b96067402c17464c7032b9f37b5b1c9fa0cc2ba97f8a846134c2"
+      },
+      "prompt-library.css": {
+        "bytes": 2627,
+        "sha256": "97af9eb56a7d73e0e13cfec768515e4d649402a0239d85053652afd00c4d0aee"
+      },
+      "prompt-library.mjs": {
+        "bytes": 6023,
+        "sha256": "574d7ef0dc37d2c0bdb43c65aa1fed68621af16ba58e7e4db81ca9b3a130433d"
+      },
+      "prompt-send.mjs": {
+        "bytes": 1538,
+        "sha256": "e7de0ae4c3b05609b03312c4a7d406f23070d963dd211be5ecdf681c3d17640a"
+      },
+      "queue.mjs": {
+        "bytes": 5524,
+        "sha256": "f22b9030da3ff88d899ee5ec2391ee9a79b3c9dfbbc33e7430f1aec62732a024"
+      },
+      "settings-form.mjs": {
+        "bytes": 810,
+        "sha256": "43f65abefaacb047cad7448ff4e40155c706f5eafc70ff12dd13c2957f94dee5"
+      },
+      "settings-tab.mjs": {
+        "bytes": 1123,
+        "sha256": "774ec14ff70fa4fb5559dcc408a7c338bac2ba8294f8739ea2b567fd4ebd3bc2"
+      },
+      "settings.css": {
+        "bytes": 7236,
+        "sha256": "643d663442c09f661c54b93970c3816847781e891dc2d7982fa9cb6189a2838a"
+      },
+      "settings.html": {
+        "bytes": 1333,
+        "sha256": "d559b0b24d0edfacbfed35dfa066f045c6f953bca299af7a79adbc458c92a2dc"
+      },
+      "settings.mjs": {
+        "bytes": 16245,
+        "sha256": "aa53c03023e23cd18ca25bd2b6d5ef423e35f0edd0927b32bb69c524d4a3227e"
+      },
+      "setup.mjs": {
+        "bytes": 5433,
+        "sha256": "f131ae6991a362d302182159ad686d4b26308b845a7c215433e7cae5020b572a"
+      },
+      "sidepanel.css": {
+        "bytes": 1477,
+        "sha256": "c95196e09524b18b3590c9f2ddaf070934139070ba9fa4a2c6c552080dfb2fec"
+      },
+      "sidepanel.html": {
+        "bytes": 5969,
+        "sha256": "52e9ccc8a13ca5438e4e36eb83ff9d1e2dc25f3dc22da2358ac0fb3e389a5982"
+      },
+      "sidepanel.js": {
+        "bytes": 43202,
+        "sha256": "d487e6be2d3284b26d10437c807748ae58cba893dd6ccaf97cc1b73c39d9309f"
+      },
+      "state.mjs": {
+        "bytes": 8781,
+        "sha256": "8a1cbab6f96ca07b5398e14b11036c1ff2e7d469a0e303b73567a5cab1404e53"
+      },
+      "support.mjs": {
+        "bytes": 1950,
+        "sha256": "bdc72e7b8c09e7d0f1214f4c462ff4f7f2427d85a0b0a8c87146bec0fe0c3b22"
+      },
+      "surface-design.mjs": {
+        "bytes": 894,
+        "sha256": "a93906ebe93d1dd2e8e6ebaaf242a37edc9c71d19945b78a7e67299db6d5b6ca"
+      },
+      "surface-layout.css": {
+        "bytes": 7136,
+        "sha256": "7285f57068704251ef4d8722853f5e9d1b952a3ddc7872a7366fde5fe51efc16"
+      },
+      "surface-tokens.css": {
+        "bytes": 476,
+        "sha256": "49f3c6ca5a5abfaa0624a023ee2489922a810a85d3475b4f7592b6f3649206a7"
+      },
+      "surface.mjs": {
+        "bytes": 6117,
+        "sha256": "f6709ed8d59070cbf1941eea32af71b80c71af30e3fde113088dcb4dd4c259b2"
+      },
+      "sw.js": {
+        "bytes": 2653,
+        "sha256": "2105d32703d41ee5a43a96fa9b567716a05f9e60d7bcf345648c775069c33726"
+      },
+      "theme-base.css": {
+        "bytes": 1777,
+        "sha256": "aaed79a56d8cb7808eb9c1d766652ddb7efb2d1e023157f9e92dcf095d6e3fed"
+      },
+      "theme-boot.js": {
+        "bytes": 2051,
+        "sha256": "69717a1c91369188a63dc75f2b3af26cff36b08d4c4e1637022a4d46347edf73"
+      },
+      "theme-tokens.js": {
+        "bytes": 10716,
+        "sha256": "6edafa527df6bad8759717044e5f28421056d87d473cf79e7da1863c58102fa4"
+      },
+      "veil.js": {
+        "bytes": 35488,
+        "sha256": "1f97311b9032839e8a2b85107c33679b99c2398f052042bcc1364895ecc9e1f5"
+      },
+      "vendor/LICENSE.highlight.txt": {
+        "bytes": 1514,
+        "sha256": "6c081431591d9df696c82dc598fe1423765b8a299b200ed00b281afd0f64c490"
+      },
+      "vendor/highlight.mjs": {
+        "bytes": 127661,
+        "sha256": "0317b7f3151f08712a2e009d5a5ef255efd95732dd75a353c90a88d5e73056da"
+      },
+      "vendor/marked.min.js": {
+        "bytes": 35479,
+        "sha256": "15fabce5b65898b32b03f5ed25e9f891a729ad4c0d6d877110a7744aa847a894"
+      },
+      "voice-icon.mjs": {
+        "bytes": 3334,
+        "sha256": "7a4734c9f89c671aa893e57f68fac1b0d951a0d76715c0dde0973cb455206f39"
+      },
+      "voice-orb.svg": {
+        "bytes": 790,
+        "sha256": "eb45920277e2c1664d6269fd395d7fe34a999815aea2ccf9b243091f494456ea"
+      },
+      "voice.mjs": {
+        "bytes": 7500,
+        "sha256": "8675b26ab34225e4bb53aef590f40bef22d4e1cdd0e9873146f00292343c9416"
+      },
+      "wire.mjs": {
+        "bytes": 4135,
+        "sha256": "c60f98f3e8d04bc7492f378108de6726983e33adec494537caa0667ab0ecf3b3"
+      },
+      "worktab.mjs": {
+        "bytes": 9328,
+        "sha256": "51fb1fcee5df176e08eb53afb5168724507a21db32676f5d4068936d0540a27c"
+      },
+      "LICENSE.txt": {
+        "bytes": 2907,
+        "sha256": "957e710bdd438f5e9c825fc610b8efc4f10e173f05a2c8ae99aae46b78e22cfe"
+      },
+      "vendor/LICENSE.marked.txt": {
+        "bytes": 2942,
+        "sha256": "8e3a3f82f59a60958f56ca08f445647c32a4733dc7ca6c2c46f6eb898471ab9c"
+      }
+    }
+  },
+  "bundle": {
+    "artifactId": "0.2.13-linuxmint22.3-amd64-complete-preview.1-3651e17a0c34",
+    "manifestSha256": "e51a3e119850ba6448b8f8dbb2ff5b0736d49524ecaa4ec4ee013a31d300e18b",
+    "setupSha256": "d19ae1ecc900f5f3f29610c99b417474ef9e776043e99cabc5c3978dfaf76b52",
+    "tarBytes": 371733877,
+    "tarSha256": "124be2f1fce4f8b7b651e3cfdca580f02a3b31e13a1d65997c0721f818dae41a",
+    "allExpandedAndArchiveMemberHashesVerified": true,
+    "sourceRefs": {
+      "augmentor": "3651e17a0c34154eb4454e80e136ee11e764aa00",
+      "voice": "7d0fd6d677ea4bbbca0183a6bb3a3d3f24a8147a",
+      "adaptive": "64a1ef82e3d69f57a69809d530c1b9ed0bc67480"
+    }
+  },
+  "exactInputMembers": {
+    "sourceQtFiles": 67,
+    "sourceQtSymlinks": 18,
+    "wheels": 7,
+    "originalHandyFiles": 1182
+  },
+  "sameSourceQtRuntimeAndOriginalHandy": true,
+  "newHandyBuild": false,
+  "privateSourceExport": false,
+  "rootAndSecondaryFloorGiB": 4,
+  "outputOnSecondaryDisk": true,
+  "inputOrBuilderRuntimePathsChanged": false,
+  "nativeAdoptionExecuted": false,
+  "newAccountCreated": false,
+  "newInstallerOrSDKExecuted": false,
+  "proofSource": {
+    "file": "release/prove-complete-linux.py",
+    "sha256": "20a71863805b320df74cbfd9bd44f48a72d36f4ffd1c7da52a47e2afffb020f9",
+    "uncommittedImplementation": true,
+    "profileSource": "3651e17a0c34154eb4454e80e136ee11e764aa00",
+    "uid": 1003,
+    "gid": 1003,
+    "user": "augmentor-permission-proof",
+    "home": "/home/augmentor-permission-proof",
+    "CLI": "--owned-vm-mint-permission-fixture",
+    "fixedSeparateScope": true,
+    "historical16bUID1002And2035DefaultsChanged": false,
+    "globalIdentitySwapping": false
+  },
+  "protectedState": {
+    "counts": {
+      "1000": 10,
+      "1001": 30,
+      "1002": 5
+    },
+    "snapshotSha256": "58ab52cdc27b2274ff355ce4086b26c115c385fb76c6e75a11fa0338a8d8fbdc",
+    "all45ReadOnlyVerified": true,
+    "newUIDNameGroupHomeUnused": true,
+    "rootOwnedImmutableSnapshotAndAttestationRequired": true,
+    "attestationBindings": [
+      "run",
+      "source",
+      "proofSHA",
+      "boot",
+      "snapshotSHA"
+    ],
+    "attestationMaxAgeSeconds": 300,
+    "ordinaryCanReadPrivateOldHomes": false,
+    "rootBeforeAndFinallyAfterRereadRequired": true,
+    "retained16bFailureJournalSha256": "0de0f8e8407dec01cedf433bc51849d51e055cc75582b9392ef0af7cabbf76fe",
+    "retained16bFailureLogSha256": "ff9d62fe01824c4862153cadb082eca916c93931968d0435010595e327551a45",
+    "failureEvidenceAdoptedOrResumed": false,
+    "exactFixedStageMetadataPathsRequired": true,
+    "rootOwnedImmutableNonlinkedStageAndAncestorsRequired": true,
+    "onlyWritableAncestorException": "/var/tmp: root-owned ordinary sticky directory",
+    "topologyCheckedBeforeMetadataRead": true
+  },
+  "proofContract": {
+    "unchangedMatchingInstaller": true,
+    "noSetupOverlay": true,
+    "knownInstalledReceiptBeforeIdempotence": true,
+    "startupBudgetSeconds": 120,
+    "turnBudgetSeconds": 60,
+    "bothSuccessfulReadEndTimesChecked": true,
+    "publicDefault60Changed": false,
+    "fiveSettingsByteHashesRequired": true,
+    "singlePendingSDKMutation": true,
+    "unknownOutcomeRetryOrReplay": false,
+    "strictRestartHistoryAndCountedProvider": true,
+    "onceOnlyOwnedCompanionCleanup": true,
+    "externalSameProofFullFixtureNativeBothLeasesAudit": true
+  },
+  "sourceTests": {
+    "newPermissionProfile": 18,
+    "historicalFreshAndComplete": 52,
+    "realUnixCompanion": 9,
+    "debian": 12,
+    "total": 91,
+    "status": "pass",
+    "actualNewVMProductEvidence": false
+  },
+  "historical16b": {
+    "nativeInstall": "pass",
+    "unchangedInstallerAndIdempotence": "pass",
+    "fullProof": "fail",
+    "elapsedSeconds": 390.54148765500577,
+    "failure": "original DEB and installed source mode0664 refused before preview/SDK",
+    "modelRequests": 0,
+    "SDKPending": null,
+    "unknownRequestOutcome": false,
+    "allFiveSettingsPreserved": true,
+    "allPrior40Preserved": true,
+    "externalAudit": "pass",
+    "noOwnedProcessesSocketsListeners": true,
+    "accountNotResumed": true
+  },
+  "qualification": {
+    "fullNewFreshProductPass": false,
+    "originalPublic60FullProofPass": false,
+    "graphicalDesktopBrowser": false,
+    "physicalAudio": false,
+    "legalReviewComplete": false,
+    "embeddedSourceCoverageComplete": false
+  },
+  "rootLicenseFrozen22Unchanged": true,
+  "next": "Review and publish source-only immutable profile. Then separately authorize unused-account/native/source/protected/budget guards and one new UID1003 transaction; do not adopt old16b account or journals.",
+  "parentReview": {
+    "focusedCasesPassed": 91,
+    "exactSevenFileHashesChecked": true,
+    "status": "reviewed-source-only; publication before guest transaction"
+  }
+}

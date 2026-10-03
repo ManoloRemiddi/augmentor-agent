@@ -463,3 +463,46 @@ verifies matching/foreign peers, zero protocol bytes, no cwd change and closure
 of both descriptors. Directory, socket and mode replacement remain terminal.
 Native staging/account/runtime allocations must preserve the4GiB free floor;
 no retained build inputs or earlier evidence are deleted to make room.
+
+## Permission-corrected Mint fresh proof
+
+The separate `--owned-vm-mint-permission-fixture PATH` entry binds only the exact
+clean365 native/complete artifact and locked ordinary UID/GID1003,
+`augmentor-permission-proof`, with private home and a new exclusive journal.
+The [build and profile checkpoint](../release/qualification/next-targets/20261003-mint365-permission-fresh-proof.json)
+records artifact/manifest/setup hashes, actual native member permissions and the
+source-only profile tests. The historical clean16b/UID1002 admission and the
+clean2035 post-install entry retain their original identities and journals.
+There is no global identity substitution, account resume or old outcome adoption.
+
+Admission requires the same exact QEMU/boot/marker/no-host-device/root/source/
+target/full-runtime checks, bounded root-owned fixture and a fresh host receipt.
+A fixed root-owned snapshot hashes all45 protected earlier-account settings
+files (10+30+5). The ordinary account validates that exact metadata and a fresh
+root attestation bound to its run, source, proof hash and guest boot; it cannot
+reread the private earlier homes. Both root metadata files must be regular,
+single-link, root-owned and have no group/world write bits. Both files are
+read only after checking their exact direct paths under the fixed
+`/var/tmp/augmentor-mint-permission365` stage. The stage and every ancestor must
+be ordinary root-owned directories without links or group/world write bits;
+only the exact root-owned sticky `/var/tmp` parent may be writable. A foreign,
+linked or writable stage/ancestor refuses before reading either metadata file.
+The attestation is
+at most300seconds old. Root rereads actual file hashes/owners/modes before
+attesting and again before and in `finally` after the external audit, including
+an audit failure. The failed16b journal and log also remain hash-pinned and are
+verified without resuming the old run. The host transaction wrapper must still
+retain its own before/finally protected-state checks and fresh allocation budget.
+
+The shared finite execution keeps the exact unchanged installer, known installed
+receipt before idempotence, selected-runtime environment/lease, byte-stable five
+settings files, two measured120-second authenticated starts and60-second turns.
+Successful bounded reads returning past their budget refuse before the next SDK
+mutation. Each new role/session/prompt is journalled once; unknown outcomes are
+terminal, with no retry or replay. Strict restart histories/model counts, normal
+once-only owned idle companion cleanup and the same-proof/full-fixture external
+native/exclusive-lease/process/socket/listener audit remain required. This is a
+separate emulated startup qualification; default/public60 behavior is unchanged.
+Source tests and built artifacts do not authorize a guest transaction: reviewed
+publication, new unused-account guards and explicit execution authorization are
+required. Graphical desktop/Browser, physical audio and legal gates remain open.

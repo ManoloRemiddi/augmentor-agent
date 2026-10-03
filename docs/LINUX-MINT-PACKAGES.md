@@ -319,3 +319,39 @@ executable flags and symlink target preservation; all12 Debian cases pass.
 New clean artifact builds and a separately reviewed fresh account are required
 before another full proof. The failed installed16bcb account remains untouched;
 desktop/input, graphical Browser, physical audio and legal gates remain open.
+
+## Clean365 artifacts and separate UID1003 source profile
+
+The permission correction is published as clean365. Its native, Browser and
+complete builds reuse the same verified public dependency bytes, source-Qt/wheel
+inputs and original Handy receipt, with no Handy rebuild or private export.
+Generated output and temporary package staging use the owned secondary disk;
+existing builder/input/runtime paths are preserved, and the4GiB root floor is
+checked before every allocation. All archive/expanded hashes pass. Streamed
+native inspection verifies every regular member is0644/0755, every directory
+0755 and every owner0:0; the memory service is0644. All67 source-Qt files,
+18 symlinks, seven wheels and1,182 original Handy members match their retained
+input hashes. See the [new checkpoint](../release/qualification/next-targets/20261003-mint365-permission-fresh-proof.json)
+for exact native, Browser, complete and installer identities.
+
+Read-only Mint inspection confirms `augmentor-permission-proof` UID/GID1003,
+group and home unused, with all45 earlier protected files unchanged. The guest
+still contains installed16b; its390.54-second failed full proof, successful
+installer/idempotence, settings and journals remain intact. No new native
+adoption, account creation, setup or SDK execution has occurred.
+
+A separate immutable365 profile and CLI reuse the maintained finite fresh-proof
+logic with an explicit scope. The historical16b/UID1002 defaults stay fixed. A
+hash-pinned root snapshot and fresh source/proof/run/boot attestation protect all
+45 old settings files, and the old failed16b journal/log remain hash-pinned;
+ordinary UID1003 cannot read private old homes. External root verification
+rereads them before and in `finally` after the same-fixture audit, without any
+restoration or run adoption. Both metadata files are admitted only at their exact
+fixed stage paths, after checking root-owned nonlinked immutable stage/ancestors;
+the exact root-owned sticky `/var/tmp` parent is the sole writable exception.
+Eighteen new finite tests cover profile separation,
+root metadata/stage/ancestor ownership and age, old-file/failure-evidence changes,
+exclusive journals, late reads, unknown outcomes and shared two-role restart/
+cleanup behavior. Existing52 proof cases, nine real Unix-companion cases and
+12 Debian cases also pass (91 total). A new clean artifact/fresh-account VM
+transaction remains gated on source review, publication and explicit approval.
