@@ -1,5 +1,25 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 Ubuntu registered shortcuts and password-lock recovery
+
+[The registered lock checkpoint](../release/qualification/next-targets/20261003-noble-registered-password-lock-pass.json)
+passes on unchanged selected368 source-Qt Ubuntu24.04/GNOME46 with nativec4b.
+Both exact registered F9/F10 chords are sent once while locked; main5599 and
+secondary8492 stay mapped, accepted offline idle and draft-free. The observer
+refuses while locked. One normal correct-password entry unlocks; the same
+retained observer rejects its stale epoch, and a fresh observer admits the new
+epoch under the same Shell owner. Both processes/windows and selection survive.
+Full native/managed/runtime audits pass before and after (67.94/70.62seconds).
+The complete original account database/age and PAM/GDM configuration are verified
+restored/preserved, temporary credentials removed, secondary closed normally,
+and the owned shortcut journal restores original bindings and foreign entries.
+
+Earlier preparatory refusals and wrong-password partial evidence remain intact.
+No administrative unlock, input replay, installed payload patch or production
+GNOME input enablement occurs. This closes the exact Ubuntu offline two-window
+registered-lock/password-recovery case alongside current Settings, shortcuts and
+reboot evidence; connected control, Fedora/KDE/Mint and hardware remain separate.
+
 ## October 3 current Ubuntu selected reboot acceptance
 
 [The current reboot checkpoint](../release/qualification/next-targets/20261003-noble-selected-reboot-pass-shortcut-runner-timeout.json)

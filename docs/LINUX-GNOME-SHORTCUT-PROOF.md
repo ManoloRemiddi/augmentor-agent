@@ -37,8 +37,8 @@ the helper never repeats an uncertain operation. Foreign account changes refuse
 restoration, and the full original shadow image must match before restoration
 is reported. Seven focused Linux tests cover account preservation, invalid
 requests, concurrent changes, interrupted restoration and a real child timeout.
-These are source checks. The helper has not changed a guest credential or
-established password authentication, locked shortcut behavior or recovery.
+These are source checks; actual guest authentication and restoration are
+recorded separately below.
 An actual run also needs the full VM/native/managed-artifact admission and
 observed normal GNOME password entry; administrative unlock is separate cleanup.
 
@@ -52,7 +52,7 @@ Full native/managed/runtime checks pass before and after. The complete original
 account database and password age are independently verified restored, both
 temporary readable credentials removed, and PAM/GDM configuration preserved.
 
-This is partial qualification: the first F9/F10 lock sequence has no registered
+That earlier run is partial qualification: its first F9/F10 lock sequence has no registered
 custom shortcuts because the previous proof restored its original empty registry.
 Its unchanged app state does not qualify shortcut suppression. F10 opens the
 native password context menu, dismissed once without entering a credential.
@@ -60,6 +60,19 @@ The retained observer worker exits normally before password entry, so its stale
 instance is not read after unlock. A fresh run needs verified registrations,
 both running windows and the retained stale-instance check. No installed payload
 is patched, key/password action replayed or production input enabled.
+
+The [subsequent registered-lock checkpoint](../release/qualification/next-targets/20261003-noble-registered-password-lock-pass.json)
+passes on the same immutable source368/nativec4b Ubuntu selection. Actual F9/F10
+bindings are read back before and after each locked chord. Both main5599 and
+secondary8492 remain mapped and idle; one normal correct-password entry unlocks
+both unchanged windows. This time the genuine observer instance is retained
+through authentication: it refuses its old epoch after unlock, while a fresh
+observer admits the new epoch under the same Shell owner. Native/runtime/managed
+inventories pass before and after. Original whole account/age, PAM/GDM settings
+and native shortcuts are restored; the secondary closes normally. The earlier
+wrong-password evidence remains separate. This closes this exact offline Ubuntu
+registered-lock/two-window recovery case; other distros and connected desktop
+control remain separate qualification gates.
 
 ## Actual Settings controls
 
