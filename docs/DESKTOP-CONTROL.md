@@ -1,5 +1,38 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 Fedora KDE activity admission refusal
+
+[The activity admission checkpoint](../release/qualification/next-targets/20261003-kde-activity-idle-lock-refusal.json)
+records a partial failed attempt in the owned Fedora44 Cloud-derived
+Plasma6.7.5 Wayland VM. Native and managed payload source remains
+`2035af99b46bb013e81de9766216da820ab4a325`; the public proof/helper remains
+`9d9cf06b67d83ce7b624a4d5b8ea1a284706ec54`. The private fixture adapter waits
+up to ten seconds for actual same-peer maintenance idle while preserving
+source, owner, session, scene, lock and protected-state checks. Its 32 host
+synthetic checks pass separately from this installed attempt.
+
+Normal session recovery passes in12.099seconds, ordinary startup/readiness
+takes74.205seconds, and a fresh unlocked wallpaper capture takes23.513seconds.
+The next activity phase begins368.271seconds after capture completion. No proof
+stage is recorded during that host interval; the exact image-view timestamp and
+internal pause breakdown were not retained. This interval is not a measured
+native audit cost or evidence about the earlier20-second transport failure.
+The first live admission observes the same native owner with
+`LockedHint=yes` and ScreenSaver `GetActive=true`, and refuses before the first
+pointer packet. No pointer, button, key, portal connection, editor close or full
+input proof is performed in this attempt. There is no replay or recovery after
+that refusal.
+
+Independent end native/selected verification and both synthetic-account
+preservation audits pass. The owned file remains exactly `Fixture ready\n`,
+the existing memory service and protected configuration hashes are preserved,
+and SELinux remains Enforcing. This qualifies the refusal and preservation;
+fresh consent, saved exact ASCII bytes, partial-input visible Stop and no replay
+remain open. A separate source-only proposal would refuse screenshots older
+than60seconds before activity while retaining every live guard; it has not been
+implemented or executed. The default lock settings and keyboard state are
+unchanged.
+
 ## October 3 KDE idle-lock refusal candidate
 
 The published existing-file Save proof

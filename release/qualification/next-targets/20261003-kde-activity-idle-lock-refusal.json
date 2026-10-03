@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "status": "PARTIAL_FAIL_BEFORE_FIRST_INPUT",
+  "scope": "Owned Fedora44 Cloud-derived KDE6.7.5 single-monitor Wayland VM; ordinary synthetic UID1001 account. Not a standard KDE ISO, hardware, public release or full input qualification.",
+  "productSource": "2035af99b46bb013e81de9766216da820ab4a325",
+  "selectedArtifactSha256": "74b1dd63f4be9c2df88c764bca4dabcd7aebfcd31967c69f13f59607c274eeaf",
+  "proofSource": "9d9cf06b67d83ce7b624a4d5b8ea1a284706ec54",
+  "driverSha256": "88ba587da737eb22c33ddf0f17be88499d55dc522b40eae324f9dd030429113c",
+  "helperSha256": "6afda6e52e3d9c53445f4a9271ad49438613ef9655425ce728dd65d71fbffe49",
+  "privateIntegrationSha256": "cbd84ccf2fccf66be50a48c809d7bf5bc51c7fed8664236ce3096846a3959b42",
+  "sourceChecks": {
+    "hostSyntheticCases": 32,
+    "independentParentRepeat": "PASS",
+    "receiptSha256": "81bc85298309362667276980a02e46cc5d9d0268206bb46d5c905c5f85bd1e74",
+    "scope": "Source-only predicates, deadline, identity, peer and file/socket closure fixtures; not guest input."
+  },
+  "actualTimeline": {
+    "normalRecoverySeconds": 12.098850873,
+    "displayManagerRestartStartEpoch": 1791022154.8320622,
+    "displayManagerRestartSeconds": 0.762273152,
+    "ordinaryStartupReadinessStartEpoch": 1791022155.7341278,
+    "ordinaryStartupReadinessSeconds": 74.205457528,
+    "freshUnlockedCaptureStartEpoch": 1791022229.9399998,
+    "freshUnlockedCaptureSeconds": 23.51261649,
+    "capturePhaseCompleteEpoch": 1791022253.4527783,
+    "firstActivityPhaseStartEpoch": 1791022621.7241023,
+    "interPhaseHostGapSeconds": 368.271324,
+    "actualImageViewed": true,
+    "exactImageViewTimestampRetained": false,
+    "gapAttribution": "No running proof stage is recorded in this interval. The internal host-pause breakdown is not established; no parent screenshot-review wait was required. Do not attribute the gap to measured native audits or the earlier20-second RPC timeout."
+  },
+  "terminalAdmission": {
+    "phase": "A-before-packet-1",
+    "admissionSeconds": 6.789046527,
+    "sessionId": "452",
+    "uid": 1001,
+    "lockedHint": true,
+    "screenSaverActive": true,
+    "nativeOwner": ":1.784",
+    "nativePid": 30645,
+    "nativeStartTicks": "2475770",
+    "desktopPid": 31002,
+    "desktopStartTicks": "2478662",
+    "actualBusy": false,
+    "actualRunning": false,
+    "checkedAt": 1791022628.115988,
+    "inputPackets": 0,
+    "portalConnectionAttempts": 0,
+    "editorCloseAttempts": 0,
+    "fullProofAttempts": 0,
+    "noDependentReplay": true
+  },
+  "preservation": {
+    "independentNativeSelectedAudit": "PASS",
+    "independentNativeSelectedAuditSeconds": 78.953821411,
+    "freshProtectedHashesUnchanged": true,
+    "betaProtectedFilesUnchanged": true,
+    "existingMemoryProcessPreserved": true,
+    "ownedFile": "Fixture ready\n",
+    "selinux": "Enforcing",
+    "lockPreferencesUnchanged": true,
+    "keyboardStateUnchanged": true
+  },
+  "evidence": {
+    "privateReport": "outputs/linux-rollout/fedora44-kde-vm89/activityidle9d-terminal-report.json",
+    "privateReportSha256": "9cc2cc7773cca013ef2129eaa49ac92f1f72bf996da65e3d4f8eab3a7be56cf2",
+    "rawTimeline": "outputs/linux-rollout/fedora44-kde-vm89/activityidle9d-timeline.jsonl",
+    "rawRefusal": "outputs/linux-rollout/fedora44-kde-vm89/activityidle9d-motion-A-before-packet-1.log",
+    "rawEndAudit": "outputs/linux-rollout/fedora44-kde-vm89/activityidle9d-terminal-end-audit.log",
+    "rawBetaEndAudit": "outputs/linux-rollout/fedora44-kde-vm89/activityidle9d-terminal-beta-end.log",
+    "unlockedScreenshotSha256": "ba70a99f361c6ecd84b3517d85f0b02e695704b38a3cbc09bc8474708430700e"
+  },
+  "remaining": [
+    "A separate source-only new-namespace proposal adds a60-second screenshot age refusal; not implemented or run.",
+    "Fresh native consent and full exact saved ASCII/partial-input visible Stop/no-replay acceptance remain open.",
+    "Earlier casing failure and20-second transport failure remain unresolved.",
+    "No product permission path, timeout, lease, password, lock preference or keyboard setting changes.",
+    "Source/license/public-release gates remain false."
+  ]
+}

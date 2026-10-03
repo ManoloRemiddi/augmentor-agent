@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 KDE live lock refusal before input
+
+[The KDE idle admission checkpoint](../release/qualification/next-targets/20261003-kde-activity-idle-lock-refusal.json)
+retains a measured368.27-second gap after a fresh capture. Its first live check
+finds the session locked and refuses before any pointer packet, portal grant,
+editor close or full proof. Native/selected and protected-account end audits pass.
+The private idle observer's32 source checks pass independently. A separate fresh
+namespace adds60-second boot/monotonic/screenshot-hash admission at entry, after
+live guards and immediately before packet dispatch;50 source cases pass. Full
+KDE consent, saved exact bytes, visible Stop and no replay remain unqualified.
+No lock preferences, keyboard state, product predicate or timeout is changed.
+
 ## October 3 clean Mint permission fixture source review
 
 [The Mint365 checkpoint](../release/qualification/next-targets/20261003-mint365-permission-fresh-proof.json)
