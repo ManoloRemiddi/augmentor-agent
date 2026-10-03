@@ -9,7 +9,7 @@ test('actual embedded settings preserve local appearance and omit shared adminis
  const dom=new JSDOM(html,{url:'https://fixture.test/augmentor/settings.html#voice'}),requests=[],stored={}
  const original=new Map()
  const chrome={runtime:{getManifest:()=>({version:'fixture',augmentorWorkspace:{id:'fixture',name:'Fixture',sdkProtocol:'augmentor-app/1'}}),
-   sendMessage:async message=>{requests.push(message);if(message.type==='connect')return {phase:'ready',harness:'dsh'};throw Error('Unexpected shared request: '+message.type)}},
+   sendMessage:async message=>{requests.push(message);if(message.type==='connect')return {phase:'ready',harness:'codex',model:{model:'fixture-model'}};throw Error('Unexpected shared request: '+message.type)}},
    storage:{local:{set:async value=>Object.assign(stored,value)}}}
  for(const [key,value] of Object.entries({window:dom.window,document:dom.window.document,localStorage:dom.window.localStorage,location:dom.window.location,chrome,
    __dshAugTheme:{DEFAULTS:{neutHue:180,neutBright:0,accentHue:220,accentBright:0},applyPanelTheme:()=>{}}})){
@@ -31,4 +31,9 @@ test('actual embedded settings preserve local appearance and omit shared adminis
  location.hash='#memory';dom.window.dispatchEvent(new dom.window.Event('hashchange'));await new Promise(resolve=>setTimeout(resolve,10))
  assert.match(document.querySelector('#section-memory').textContent,/this application workspace/)
  assert.equal(document.querySelector('#section-memory').querySelector('input,button'),null)
+ location.hash='#models';dom.window.dispatchEvent(new dom.window.Event('hashchange'));await new Promise(resolve=>setTimeout(resolve,10))
+ assert.match(document.querySelector('#section-models').textContent,/fixture-model/)
+ assert.match(document.querySelector('#section-models').textContent,/Manage model connections in standalone/)
+ assert.equal(document.querySelector('#section-models').querySelector('input,button,dialog'),null)
+ assert.equal(requests.some(row=>['codex','promptSettings','onboarding/start'].includes(row.type)),false)
 })

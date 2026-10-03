@@ -65,7 +65,7 @@ async function appearance(container){
   }
   const preview=make('div');preview.className='card';preview.append(make('h2','Preview'));const sample=make('div');sample.className='preview'
   const user=make('p','Help me make this clearer.');user.className='sample-user';const reply=make('div');reply.className='sample-agent';reply.append(make('strong','Augmentor'),make('p','A little less clutter. More room for your ideas.'));sample.append(user,reply);preview.append(sample)
-  const note=make('p','Shared with the floating window. The accent also colours browser actions.');note.className='help';colours.append(note)
+  const note=make('p',chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol?'Saved for this application workspace.':'Shared with the floating window. The accent also colours browser actions.');note.className='help';colours.append(note)
   container.append(theme,colours,format,preview);button(container,'Reset colours',async()=>{await saveAppearance(resetAppearance());sync()})
   function sync(){const values=readAppearance();for(const [key,input] of formatControls)input.value=values.formatColours[key]||formattingDefaults(values.theme)[key];for(const [key,{input,out}] of controls){input.value=values[key];out.value=String(values[key])}for(const [id,b] of Object.entries(themeButtons))b.setAttribute('aria-pressed',String(values.theme===id))}
   watchAppearance(sync)
@@ -73,6 +73,10 @@ async function appearance(container){
 function advanced(parent,label){const detail=make('details');detail.className='advanced';detail.append(make('summary',label));const body=make('div');body.className='advanced-body';detail.append(body);parent.append(detail);return body}
 function showModels(container){
   const active=make('p');active.id='active-model';container.append(active)
+  if(chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol){
+    container.append(make('p','Choose an available model from the chat model picker. Manage model connections in standalone Augmentor.'))
+    container.update=()=>{active.textContent='Current model: '+(state.model?.model||'Not connected')};container.update();return
+  }
   const pi=make('div');pi.id='pi-model-settings';const dsh=make('div');dsh.id='dsh-model-settings';dsh.className='card';dsh.append(make('h2','DeepSeek Harness models'),make('p','DSH manages its model providers. Add or edit them in DSH, then refresh the model picker in Augmentor.'))
   button(dsh,'Open DSH model settings',async()=>{const r=await send('promptSettings');if(!r.ok)throw Error(r.error)})
   const codex=make('div');codex.id='codex-model-settings'

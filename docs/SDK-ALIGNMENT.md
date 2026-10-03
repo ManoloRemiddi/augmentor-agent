@@ -28,6 +28,9 @@ The maintained Browser settings hide shared installation sections for SDK
 workspaces, retain workspace appearance and voice opt-in, expose read-only
 workspace memory context, and direct prompt administration to standalone
 Augmentor. The shared prompt-improvement action is unavailable in app workspaces.
+Model settings show the current model and refer to the chat picker; shared
+connection editors and provider checks remain in standalone Augmentor. Appearance
+help reflects workspace-local storage rather than promising a desktop-wide change.
 Standalone settings behavior and the developing native settings redesign are
 separate. New shared management routes must be assessed against the workspace
 policy before exposing them through the embed.
