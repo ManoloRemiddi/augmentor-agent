@@ -29,7 +29,7 @@ def scene():
 def controller():
     value=module.GnomeControl.__new__(module.GnomeControl)
     value.last_failure=None;value.last_stop_reason=None;value.generation=3
-    value.a11y=None;value.dispatch_snapshot=None;value.focus_serial=0;value.focus_listener=None
+    value.a11y=None;value.dispatch_snapshot=None;value.focus_serial=0;value.focus_listener=None;value.held_inputs={}
     value.snapshot=None;value.watch_source=None;value.keys=[];value.button=None;value.symbol=None
     value.session='/session';value.node=7;value.notify=Mock()
     value.checkpoint=Mock()
@@ -230,7 +230,7 @@ class GnomeKeyboardCandidateTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError,'Text may be partial'):
             value.action(value.owner,{'token':'one','kind':'type','text':'ABC'})
         self.assertEqual([call.args[3][-2:] for call in consent.call.call_args_list],[(65,1),(65,0)])
-        self.assertEqual(consent.bus.call_sync.call_count,1)  # B release cleanup, never B press.
+        consent.bus.call_sync.assert_not_called()  # B never reached a native press.
         self.assertIsNone(value.snapshot);self.assertIsNone(value.a11y);helper.close.assert_called_once()
 
     def test_cancellation_during_child_read_retires_helper_and_releases_pinned_session(self):
@@ -242,9 +242,7 @@ class GnomeKeyboardCandidateTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError,'read cancelled'):
             value.action(value.owner,{'token':'one','kind':'key','keys':['CTRL','A']})
         consent.call.assert_not_called();helper.close.assert_called_once()
-        self.assertEqual(consent.bus.call_sync.call_args.args[:4],(':1.20',module.PATH,module.RD,'NotifyKeyboardKeycode'))
-        self.assertEqual(consent.bus.call_sync.call_args.args[4].unpack(),('/session',{},29,0))
-        self.assertEqual(consent.bus.call_sync.call_args.args[7],1000)
+        consent.bus.call_sync.assert_not_called()  # Cancellation refused CTRL before its native press.
         consent.dispose.assert_called_once();self.assertIsNone(value.session)
 
     def test_incomplete_capture_focus_cannot_be_rearmed_by_old_keyboard_token(self):
@@ -279,6 +277,9 @@ class GnomeKeyboardCandidateTests(unittest.TestCase):
 
     def test_stop_keeps_native_first_cause_and_helper_failure_cannot_skip_input_cleanup(self):
         value,helper,snapshot=self.prepared();consent=value.consent
+        value.keyboard_target=Mock();value.pointer_args=('/session',{},7,100.,50.)
+        for method,code in (('NotifyKeyboardKeycode',29),('NotifyKeyboardKeycode',42),('NotifyPointerButton',272),('NotifyKeyboardKeysym',65)):
+            value.send(method,'(oa{sv}iu)',('/session',{},code,1))
         consent.stop_reason='native-session-closed';value.keys=[29,42];value.button=272;value.symbol=65
         helper.close.side_effect=RuntimeError('Owned helper disposal failed')
         value.stop();value.stop()
@@ -294,3 +295,108 @@ class GnomeKeyboardCandidateTests(unittest.TestCase):
             value.action('codex:foreign',{'token':'one','kind':'type','text':'A'})
         self.assertIs(value.snapshot,snapshot);self.assertEqual(helper.request.call_count,reads)
         consent.call.assert_not_called()
+
+
+@unittest.skipIf(Gst is None,'Linux GStreamer runtime required.')
+class GnomeHeldInputLedgerTests(unittest.TestCase):
+    prepared=GnomeKeyboardCandidateTests.prepared
+
+    def test_press_and_release_intent_precede_native_call_and_verified_reply_retires_hold(self):
+        value,helper,snapshot=self.prepared();consent=value.consent;seen=[]
+        def native(*args):
+            entry=value.held_inputs[('NotifyKeyboardKeysym',65)]
+            seen.append((args[3][-1],entry['pressStarted'],entry['pressReplied'],entry['releaseStarted'],entry['releaseReplied']))
+            self.assertIs(entry['consent'],consent);self.assertEqual(entry['owners'],{module.NAME:':1.20'})
+            self.assertEqual((entry['session'],entry['owner'],entry['generation'],entry['consentGeneration']),('/session',value.owner,3,3))
+            return 'native reply'
+        consent.call.side_effect=native
+        self.assertEqual(value.send('NotifyKeyboardKeysym','(oa{sv}iu)',('/session',{},65,1)),'native reply')
+        self.assertEqual(value.send('NotifyKeyboardKeysym','(oa{sv}iu)',('/session',{},65,0)),'native reply')
+        self.assertEqual(seen,[(1,True,False,False,False),(0,True,True,True,False)])
+        self.assertEqual(value.held_inputs,{})
+        value.stop();consent.bus.call_sync.assert_not_called();consent.dispose.assert_called_once()
+
+    def test_unstarted_legacy_fields_never_authorize_cleanup_release(self):
+        value=controller();consent=value.consent;value.keys=[29];value.button=272;value.symbol=65
+        value.stop();value.stop()
+        consent.bus.call_sync.assert_not_called();consent.dispose.assert_called_once()
+        self.assertEqual((value.keys,value.button,value.symbol,value.held_inputs),([],None,None,{}))
+
+    def test_duplicate_press_and_unowned_release_refuse_without_native_call(self):
+        value,helper,snapshot=self.prepared();consent=value.consent
+        with self.assertRaisesRegex(RuntimeError,'original held input'):value.send('NotifyKeyboardKeysym','(oa{sv}iu)',('/session',{},65,0))
+        consent.call.assert_not_called();value.last_failure=None
+        value.send('NotifyKeyboardKeysym','(oa{sv}iu)',('/session',{},65,1))
+        with self.assertRaisesRegex(RuntimeError,'already held'):value.send('NotifyKeyboardKeysym','(oa{sv}iu)',('/session',{},65,1))
+        self.assertEqual(consent.call.call_count,1);value.stop()
+        self.assertEqual(consent.bus.call_sync.call_count,1)
+        self.assertEqual(consent.bus.call_sync.call_args.args[4].unpack(),('/session',{},65,0))
+
+    def test_unknown_normal_release_closes_without_another_release_or_next_character(self):
+        value,helper,snapshot=self.prepared();consent=value.consent
+        consent.call.side_effect=['press reply',RuntimeError('Lost release reply')]
+        with self.assertRaisesRegex(RuntimeError,'outcome is unknown'):value.action(value.owner,{'token':'one','kind':'type','text':'AB'})
+        self.assertEqual([call.args[3][-2:] for call in consent.call.call_args_list],[(65,1),(65,0)])
+        consent.bus.call_sync.assert_not_called();consent.dispose.assert_called_once();helper.close.assert_called_once()
+        self.assertEqual(value.last_failure,{'phase':'dispatch','kind':'RuntimeError','message':'Lost release reply'})
+        self.assertEqual(value.held_inputs,{});value.stop();consent.dispose.assert_called_once()
+
+    def test_unknown_chord_release_closes_without_any_other_notify(self):
+        value,helper,snapshot=self.prepared();consent=value.consent
+        consent.call.side_effect=['CTRL press','SHIFT press','A press','A release',RuntimeError('Lost SHIFT release reply')]
+        with self.assertRaisesRegex(RuntimeError,'outcome is unknown'):
+            value.action(value.owner,{'token':'one','kind':'key','keys':['CTRL','SHIFT','A']})
+        self.assertEqual([call.args[3][-2:] for call in consent.call.call_args_list],[(29,1),(42,1),(30,1),(30,0),(42,0)])
+        consent.bus.call_sync.assert_not_called()
+        consent.dispose.assert_called_once();self.assertEqual(value.held_inputs,{})
+
+    def test_serial_release_refusal_records_first_guard_and_balances_original_session(self):
+        value,helper,snapshot=self.prepared();consent=value.consent
+        def press(*args):value.kwin.read.return_value={**scene(),'serial':9};return 'press reply'
+        consent.call.side_effect=press
+        with self.assertRaisesRegex(RuntimeError,'GNOME target changed before dispatch'):
+            value.action(value.owner,{'token':'one','kind':'type','text':'AB'})
+        consent.call.assert_called_once();self.assertEqual(value.last_failure['phase'],'dispatch-guard')
+        self.assertEqual(consent.bus.call_sync.call_args.args[4].unpack(),('/session',{},65,0))
+        self.assertEqual((consent.bus.call_sync.call_args.args[0],consent.bus.call_sync.call_args.args[7],consent.bus.call_sync.call_args.args[8]),(':1.20',1000,None))
+        consent.dispose.assert_called_once();self.assertEqual(value.held_inputs,{})
+
+    def test_releases_never_reattach_to_changed_controller_session_owner_or_generation(self):
+        for field,new in (('session','/foreign'),('owner','codex:foreign'),('generation',4)):
+            value,helper,snapshot=self.prepared();consent=value.consent
+            value.send('NotifyKeyboardKeysym','(oa{sv}iu)',('/session',{},65,1))
+            setattr(value,field,new)
+            with self.subTest(field=field),self.assertRaises(RuntimeError):
+                value.send('NotifyKeyboardKeysym','(oa{sv}iu)',(value.session,{},65,0))
+            self.assertEqual(consent.call.call_count,1);value.stop();consent.dispose.assert_called_once()
+            for call in consent.bus.call_sync.call_args_list:
+                self.assertEqual((call.args[0],call.args[4].unpack()[0]),(':1.20','/session'))
+
+    def test_owner_pin_mutation_cannot_redirect_cleanup_notify(self):
+        value,helper,snapshot=self.prepared();consent=value.consent
+        value.send('NotifyKeyboardKeysym','(oa{sv}iu)',('/session',{},65,1));consent.owners[module.NAME]=':1.99'
+        with self.assertRaisesRegex(RuntimeError,'original held input'):value.send('NotifyKeyboardKeysym','(oa{sv}iu)',('/session',{},65,0))
+        value.stop();consent.bus.call_sync.assert_not_called();consent.dispose.assert_called_once()
+
+    def test_actual_post_release_owner_loss_is_close_only_and_keeps_native_stop_cause(self):
+        value,helper,snapshot=self.prepared();bus=Mock();consent=module.ConsentSession.__new__(module.ConsentSession)
+        consent.thread=threading.get_ident();consent.bus=bus;consent.cancel=value.cancel;consent.rpc_cancel=module.Gio.Cancellable()
+        consent.mutex=threading.Lock();consent.generation=3;consent.closed=False;consent.stop_reason=None;consent.on_stopped=None
+        consent.owners={module.NAME:':1.20','org.freedesktop.impl.portal.desktop.gnome':':1.21','org.gnome.Shell':':1.7'}
+        consent.session='/session';consent.request_path=None;consent.fd=None;consent.subscriptions=[];consent.closed_signal=1
+        value.consent=consent;released=False
+        def native(*args):
+            nonlocal released
+            if args[3]=='GetNameOwner':
+                name=args[4].unpack()[0];owner=':1.99' if released and name==module.NAME else consent.owners[name]
+                return module.GLib.Variant('(s)',(owner,))
+            if args[3]=='NotifyKeyboardKeysym' and args[4].unpack()[-1]==0:released=True
+            return module.GLib.Variant('()',())
+        bus.call_sync.side_effect=native
+        with self.assertRaisesRegex(RuntimeError,'outcome is unknown'):value.action(value.owner,{'token':'one','kind':'type','text':'AB'})
+        native_calls=[call for call in bus.call_sync.call_args_list if call.args[3]!='GetNameOwner']
+        self.assertEqual([call.args[3] for call in native_calls],['NotifyKeyboardKeysym','NotifyKeyboardKeysym','Close'])
+        self.assertEqual([call.args[4].unpack()[-2:] for call in native_calls[:-1]],[(65,1),(65,0)])
+        self.assertEqual((native_calls[-1].args[0],native_calls[-1].args[7],native_calls[-1].args[8]),(':1.20',1000,None))
+        self.assertEqual(value.last_stop_reason,'owner-check-changed');self.assertEqual(value.last_failure['phase'],'dispatch')
+        self.assertTrue(consent.closed);self.assertTrue(consent.rpc_cancel.is_cancelled());bus.close_sync.assert_called_once()

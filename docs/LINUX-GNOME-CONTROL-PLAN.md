@@ -796,3 +796,122 @@ owner/generation loss, press/release reply loss, release intent once, first-caus
 retention and original helper/session disposal. Source review precedes controller
 implementation; publication and a fresh owned-run authorization precede another
 action. Production GNOME input remains disabled and unqualified.
+
+## October 3 reviewed held-input ledger; source only
+
+The [held-input source checkpoint](../release/qualification/next-targets/20261003-fedora-gnome-held-input-ledger-source-only.json)
+is a separate source change after the observed v5 failure. It does not change
+v5's staged0ab controller or claim a fresh native run. Only candidate
+`GnomeControl.__init__/send/stop` and focused controller/probe tests changed;
+shared Portal/KDE, consent session, helper/observer, production service/discovery
+and the published input probe remain unchanged.
+
+The candidate now keeps a private ledger for admitted button/keycode/keysym
+presses. Each entry pins its original consent object, native session, chat
+owner, unique native owners and both controller/consent generations. Entry and
+press-start intent are retained before the original `Consent.call`; it includes
+existing pre/post owner checks, so an exception remains conservatively unknown.
+A normal release requires that exact entry and binding, and records release-start
+intent before the call. A verified return retires the hold. Duplicate presses,
+unowned releases, changed bindings and malformed input state never authorize a
+Notify. The existing complete helper/per-character/press checks and full
+scene/serial/point checks, including releases, are preserved.
+
+A guard exception now enters the maintained first-failure recorder before being
+re-thrown unchanged. Earlier native/observer/keyboard failures still win. The
+sender adds no guard Stop: the original action or existing helper/observer
+failure owns terminal cleanup. Source outcomes remain partial/unknown and
+non-retryable, and successful dispatch remains verified=false.
+
+Stop detaches the ledger along with the legacy action fields. Those legacy
+fields can include a key whose helper guard refused before RPC; they cannot
+authorize a cleanup release. Only a started press on the original still-pinned
+session whose release has never started can receive one bounded balancing
+release. Intent is set before that original1000ms/NO_AUTO_START/no-cancellable
+call, followed by original session disposal. A failed/unknown normal release
+makes the entire session **Close-only**, including any remaining chord modifiers:
+no other cleanup Notify is sent. This avoids duplicate release after reply loss;
+native device destruction handles outstanding input under the source contract
+cited above. Disposal is not proof of a target's native outcome. Stop never
+reattaches or targets a replacement owner/session. Repeated Stop sees detached
+state and cannot replay cleanup.
+
+The34 controller cases and48 probe cases pass; the combined focused suite has
+138 Python cases, independently repeated by the parent. The parent also repeats
+the five original observer Node cases from a separate clean365 source copy,
+excluding the concurrent observer candidate. Nine new
+controller cases exercise pre-call intent/pins, known reply retirement,
+unstarted legacy fields, duplicate/unowned input refusal, unknown ASCII release,
+unknown chord release, serial-only release refusal with one original balancing
+release, session/owner/generation mismatch, unique-owner mutation and actual
+native owner loss after the release RPC replies. The last case uses the real
+`ConsentSession.call` and verifies exactly one press, one release and one1000ms
+Close while preserving owner-check-changed as the Stop cause. Existing unknown
+press, helper cancellation/password/focus, first-error, cleanup order and GUI
+worker tests remain checked. Two probe cleanup fixtures now establish actual
+ledger-backed presses before asserting release tracing; an unrelated numeric
+substring privacy assertion was replaced with structured absence of input-code
+fields, avoiding elapsed-time digits causing a false failure.
+
+No VM/installed/selected/native payload, extension, session, timeout, consent,
+production flag or product UI was changed by this source check. Source review passes; publication still precedes any new candidate staging/execution. This ledger makes
+terminal cleanup explicit; it does not accept v5's serial-only release refusal.
+
+### Proposed redundant-raised observer contract; design only
+
+A fix must classify a redundant `raised` pulse inside the observer; the
+controller must continue comparing its full serial-bearing scene. Pinned
+[Mutter50.5 stack raise](https://github.com/GNOME/mutter/blob/50.5/src/core/stack.c#L247)
+returns without emitting stack changed when already at the maximum position;
+a real raise canonicalizes stacking before the changed signal. Window.raise
+then emits raised even for the no-op case. [GObject signal emission](https://docs.gtk.org/gobject/func.signal_emit.html)
+is synchronous. These establish a concrete ordering to inspect, not native proof
+that v5's event was redundant or that every supported profile has the same
+ordering.
+
+Proposed minimum internal contract: a successful unblocked Read retains epoch,
+serial, a monotonic non-raised-event barrier, exact focused tracked native
+window/actor identity and a canonical fingerprint of every current scene safety
+field except serial. Keep titles/application/field contents private; fingerprint
+comparison must not silently omit unknown fields. Also bind the bounded window
+actor inventory and tracking completeness for that read. The raised handler can
+consider only that same alive already-focused native window. It must build the
+same fingerprint synchronously and refuse suppression if any epoch/serial/
+barrier, guard, native identity, topology/workspace/monitor/order/geometry or
+tracked inventory changed, or if collection/tracking increments the serial.
+Absent/stale cache, unknown profile/state, bounds, reentrancy, read failure or
+counter overflow takes the ordinary invalidating bump path. It must never
+reset/decrement a serial or replace an observation in the controller.
+
+Every non-raised callback remains an unconditional serial/barrier increment and
+cache invalidation, even if its final fields happen to agree. Raised pulses that
+change any fingerprint field also invalidate. Thus a watched focus, lock,
+geometry, workspace or stage transition away and back cannot regain an old
+observation's serial. A later Read may cache the new serial, but the old consumed
+scene still fails. An actual or deferred restack callback invalidates regardless
+of the raised classification. Getter-triggered new tracking or nested callbacks
+must be detected by before/after serial/barrier checks; no main-context pumping,
+permission, portal RPC or native input belongs in that handler.
+
+A bounded event-origin record (latest128 plus overflow/gap marker and first
+invalidating event) should retain reason, object identity, serial/barrier and
+classification without titles/text. It enables the next owned run to establish
+whether the failure was `raised`, `restacked` or another event. Missing/gapped
+history cannot prove suppression. Source tests must execute actual extension
+handlers: redundant same-window raised, actual stack/geometry/guard/inventory
+change, nonfocused/dead/untracked window, focus/lock/geometry away-back, new
+tracking/reentrancy, delayed restack, missing baseline, overflow/gap, collection
+failure and profile refusal. Preserve signal registration/disposal and all
+ordinary non-raised event increments.
+
+This is proposed classification within the existing approved check-then-dispatch
+coverage. It must not claim complete painted actor composition, native event
+history beyond subscribed signals, or compositor-atomic input; keep
+completeActorCompositionTracking=false. The current snapshot omits hidden actors
+from the visible window list, so a fingerprint of only that list is insufficient
+for the proposed inventory guarantee. Exact private inventory fields and their
+profile APIs/order still need source review; unknown collection must refuse
+suppression. Review each pinned46/48/49/50 profile before supporting it, or keep
+unreviewed profiles on their existing unconditional raised bump behavior. No
+observer implementation, installed extension replacement/restart, serial
+relaxation or native action is authorized by this design section.

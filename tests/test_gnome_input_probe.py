@@ -230,7 +230,7 @@ class GnomeInputDispatchTraceTests(unittest.TestCase):
         self.assertIs(caught.exception,error);bus.call_sync.assert_called_once_with(*arguments)
         row=trace.snapshot()['firstError'];self.assertEqual((row['timeoutMs'],row['flags'],row['dispatchState']),(5000,4,'press'))
         self.assertTrue(row['cancellablePresent']);self.assertNotIn('PRIVATE',json.dumps(row));self.assertNotIn('parameters',row)
-        self.assertNotIn('path',row);self.assertNotIn('65',json.dumps(row))
+        self.assertNotIn('path',row);self.assertNotIn('code',row);self.assertNotIn('keysym',row)
 
 
     def test_rpc_sink_failure_and_consumed_variant_never_mask_native_result_or_error(self):
@@ -330,6 +330,9 @@ class GnomeInputActualDispatchTraceTests(unittest.TestCase):
         self.restored()
 
     def test_actual_scene_guard_difference_and_owner_refusal_remain_pre_dispatch(self):
+        self.value.pointer_args=('/session',{},7,100.,50.)
+        self.value.send('NotifyPointerButton','(oa{sv}iu)',('/session',{},272,1))
+        self.consent.call.reset_mock()
         current={**self.fixture.scene(),'guards':{'stageKeyFocus':2,'locked':True}}
         self.value.dispatch_scene={**self.fixture.scene(),'guards':{'stageKeyFocus':1,'locked':False}}
         self.observer.read.return_value=current
@@ -447,7 +450,13 @@ class GnomeInputActualDispatchTraceTests(unittest.TestCase):
         session.generation=3;session.closed=False;session.stop_reason=None;session.on_stopped=Mock()
         session.owners={self.native.NAME:':1.20'};session.session='/session';session.request_path=None;session.fd=None
         session.subscriptions=[];session.closed_signal=17
-        self.value.consent=session;self.consent=session;self.value.keys=[29,31];self.value.button=272;self.value.symbol=65
+        self.value.consent=session;self.consent=session
+        self.value.keyboard_target=Mock();self.value.pointer_args=('/session',{},7,100.,50.)
+        self.bus.call_sync.side_effect=lambda *args:GLib.Variant('(s)',(':1.20',)) if args[3]=='GetNameOwner' else GLib.Variant('()',())
+        for method,code in (('NotifyKeyboardKeycode',29),('NotifyKeyboardKeycode',31),('NotifyPointerButton',272),('NotifyKeyboardKeysym',65)):
+            self.value.send(method,'(oa{sv}iu)',('/session',{},code,1))
+        self.bus.reset_mock();self.trace.__dict__.update(module.DispatchTrace().__dict__)
+        self.value.keys=[29,31];self.value.button=272;self.value.symbol=65
         session.request_stop('native-session-closed')
         result=self.value.stop();self.assertTrue(result['stopped']);self.assertEqual(self.value.last_stop_reason,'native-session-closed')
         calls=self.bus.call_sync.call_args_list

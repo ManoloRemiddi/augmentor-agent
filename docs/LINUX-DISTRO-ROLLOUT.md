@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 GNOME held-input cleanup source review
+
+[The held-input ledger checkpoint](../release/qualification/next-targets/20261003-fedora-gnome-held-input-ledger-source-only.json)
+passes independent138 Python checks plus five original observer Node checks from
+clean365 source. Each admitted press pins its original consent/session/owners and
+generations; releases record intent before RPC. An unknown normal release makes
+cleanup Close-only, and a press refused before RPC authorizes no cleanup release.
+Full scene/serial and per-character guards remain unchanged. No installed payload
+or input is updated; v5 remains partial delivery/FAIL. The separate observer
+candidate needs its own source/profile review and fresh artifact admission.
+Production GNOME input remains disabled.
+
 ## October 3 Mint installed setup passes; native permission metadata fails
 
 [The Mint16bcb checkpoint](../release/qualification/next-targets/20261003-mint16bcb-fresh-emulated-proof.json)

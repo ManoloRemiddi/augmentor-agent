@@ -64,7 +64,7 @@ class GnomeControl(Portal):
         self.owner=None;self.session=None;self.fd=None;self.node=None;self.stream=None;self.snapshot=None
         self.cancel=threading.Event();self.keys=[];self.button=None;self.symbol=None;self.focus_serial=0
         self.focus_listener=None;self.generation=0;self.busy=threading.Lock();self.last_used=time.monotonic();self.dispatch_scene=None;self.pointer_args=None
-        self.a11y=None;self.dispatch_snapshot=None
+        self.a11y=None;self.dispatch_snapshot=None;self.held_inputs={}
         self.watch_source=None
 
     def request_stop(self):
@@ -202,22 +202,54 @@ class GnomeControl(Portal):
             raise RuntimeError('GNOME pointer target is covered or changed. No button was pressed.')
 
     def send(self,method,signature,args):
-        self.checkpoint()
-        self.verify(self.owner)
-        # Recheck topology/guards on every dispatch, including each character.
-        current=self.kwin.read(self.cancel)
-        if not self.dispatch_scene or not same_scene(current,self.dispatch_scene):
-            raise RuntimeError('GNOME target changed before dispatch. No action is replayed.')
-        if method in ('NotifyKeyboardKeycode','NotifyKeyboardKeysym') and args[-1]==1:
-            # Every press, including each ASCII character and chord modifier,
-            # gets a fresh child query. Merely comparing a cached serial would
-            # miss events delivered only in the child's default context.
-            self.keyboard_target(self.dispatch_snapshot or {})
-        if method=='NotifyPointerMotionAbsolute':self.point_guard(args);self.pointer_args=args
-        elif method=='NotifyPointerButton' and args[-1]==1:
-            if self.pointer_args is None:raise RuntimeError('A guarded pointer movement is required before pressing a button.')
-            self.point_guard(self.pointer_args)
-        try:return self.consent.call(RD,method,signature,args,self.consent.generation)
+        entry=None;held_method=method in ('NotifyKeyboardKeycode','NotifyKeyboardKeysym','NotifyPointerButton')
+        try:
+            self.checkpoint()
+            self.verify(self.owner)
+            if held_method:
+                if (signature!='(oa{sv}iu)' or len(args)!=4 or args[0]!=self.session
+                        or type(args[-2]) is not int or not 0<=args[-2]<2**31
+                        or type(args[-1]) is not int or args[-1] not in (0,1)):
+                    raise RuntimeError('Invalid session-bound held input. No action is replayed.')
+                key=(method,args[-2]);entry=self.held_inputs.get(key)
+                if args[-1]==1:
+                    if entry is not None:raise RuntimeError('Input is already held. No press is replayed.')
+                elif (entry is None or not entry['pressStarted'] or entry['releaseStarted']
+                        or entry['consent'] is not self.consent or entry['session']!=self.session
+                        or entry['owner']!=self.owner or entry['owners']!=self.consent.owners
+                        or entry['generation']!=self.generation or entry['consentGeneration']!=self.consent.generation):
+                    raise RuntimeError('A release requires its original held input session. No release is replayed.')
+            # Recheck topology/serial/guards on every dispatch, including releases.
+            current=self.kwin.read(self.cancel)
+            if not self.dispatch_scene or not same_scene(current,self.dispatch_scene):
+                raise RuntimeError('GNOME target changed before dispatch. No action is replayed.')
+            if method in ('NotifyKeyboardKeycode','NotifyKeyboardKeysym') and args[-1]==1:
+                # Every press gets the existing fresh child query; no cached
+                # event serial can replace the child's focus event delivery.
+                self.keyboard_target(self.dispatch_snapshot or {})
+            if method=='NotifyPointerMotionAbsolute':self.point_guard(args);self.pointer_args=args
+            elif method=='NotifyPointerButton' and args[-1]==1:
+                if self.pointer_args is None:raise RuntimeError('A guarded pointer movement is required before pressing a button.')
+                self.point_guard(self.pointer_args)
+        except Exception as error:
+            self.record_failure('dispatch-guard',error);raise
+        if held_method:
+            if args[-1]==1:
+                entry={'method':method,'code':args[-2],'consent':self.consent,'session':self.session,
+                    'owner':self.owner,'owners':dict(self.consent.owners),'generation':self.generation,
+                    'consentGeneration':self.consent.generation,'pressStarted':False,'pressReplied':False,
+                    'releaseStarted':False,'releaseReplied':False}
+                self.held_inputs[key]=entry
+                entry['pressStarted']=True
+            else:entry['releaseStarted']=True
+        try:
+            # Intent/start is retained before Consent.call, which includes both
+            # pre/post native-owner checks. Any exception is conservatively unknown.
+            result=self.consent.call(RD,method,signature,args,self.consent.generation)
+            if entry is not None:
+                if args[-1]==1:entry['pressReplied']=True
+                else:entry['releaseReplied']=True;self.held_inputs.pop(key,None)
+            return result
         except Exception as error:
             self.record_failure('dispatch',error);self.stop()
             raise RuntimeError('Desktop dispatch failed or was cancelled. Its outcome is unknown; inspect the target before continuing. No action is replayed.') from None
@@ -236,19 +268,26 @@ class GnomeControl(Portal):
         source,self.watch_source=self.watch_source,None
         if source is not None:source.destroy()
         consent,self.consent=self.consent,None;session,self.session=self.session,None
-        keys,self.keys=self.keys,[];button,self.button=self.button,None;symbol,self.symbol=self.symbol,None
+        self.keys=[];self.button=None;self.symbol=None
+        held,self.held_inputs=self.held_inputs,{}
         self.fd=None;self.node=None;self.stream=None;self.owner=None
         if consent:
             if self.last_stop_reason is None:self.last_stop_reason=consent.stop_reason
             # Release only this session's held input on the pinned unique owner.
             # Canceled RPCs cannot perform cleanup, so use separate bounded calls.
-            releases=[('NotifyKeyboardKeycode',code) for code in reversed(keys)]
-            if button is not None:releases.append(('NotifyPointerButton',button))
-            if symbol is not None:releases.append(('NotifyKeyboardKeysym',symbol))
+            # Portal's fields also include presses refused before RPC. Only
+            # admitted ledger entries can own a balancing release. A started
+            # normal release with a lost reply must never be dispatched again.
+            unknown_release=any(entry['releaseStarted'] and not entry['releaseReplied'] for entry in held.values())
+            releases=[] if unknown_release else [entry for method in ('NotifyKeyboardKeycode','NotifyPointerButton','NotifyKeyboardKeysym')
+                for entry in reversed(list(held.values())) if entry['method']==method and entry['pressStarted']
+                and not entry['releaseStarted'] and entry['consent'] is consent
+                and entry['session']==session and entry['owners']==consent.owners]
             if session and consent.owners.get(NAME):
-                for method,code in releases:
-                    try:consent.bus.call_sync(consent.owners[NAME],PATH,RD,method,
-                        GLib.Variant('(oa{sv}iu)',(session,{},code,0)),None,Gio.DBusCallFlags.NO_AUTO_START,1000,None)
+                for entry in releases:
+                    entry['releaseStarted']=True
+                    try:consent.bus.call_sync(entry['owners'][NAME],PATH,RD,entry['method'],
+                        GLib.Variant('(oa{sv}iu)',(session,{},entry['code'],0)),None,Gio.DBusCallFlags.NO_AUTO_START,1000,None)
                     except GLib.Error:pass
             consent.dispose()
         if self.focus_listener:

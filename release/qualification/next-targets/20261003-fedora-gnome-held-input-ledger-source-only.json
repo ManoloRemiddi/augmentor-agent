@@ -1,0 +1,71 @@
+{
+  "format": "augmentor-linux-qualification-checkpoint/1",
+  "date": "2026-10-03",
+  "target": "fedora44-gnome-wayland-owned-candidate",
+  "status": "parent-reviewed-source-only-held-input-ledger; fresh guest execution pending",
+  "sourceBase": "3651e17a0c34154eb4454e80e136ee11e764aa00",
+  "priorObservedEvidence": "release/qualification/next-targets/20261003-fedora-gnome-v5-release-serial-partial-failure.json",
+  "priorObservedEvidenceSha256": "dd2ad9d4c26fefd7af4f5ab0642c60db620db007aafe2e75085f0b1f80eb70cc",
+  "candidate": {
+    "path": "services/desktop/gnome_control.py",
+    "sha256": "15c8d20a46d5931e033c3a9173002757576b7266fb61d3b62d2ed69e81163d2c",
+    "heldInputLedger": true,
+    "originalConsentSessionOwnerAndGenerationsPinned": true,
+    "pressReleaseIntentBeforeOriginalConsentCall": true,
+    "knownReplyRetiresHoldAfterPostCallChecks": true,
+    "unownedReleaseAndDuplicatePressRefused": true,
+    "unknownPressMayReceiveOneOriginalBoundedBalancingRelease": true,
+    "preCallGuardRefusedPressDoesNotAuthorizeCleanupRelease": true,
+    "unknownNormalReleaseEntireSessionCloseOnly": true,
+    "releasesUnderChangedFullSceneStillRefused": true,
+    "guardExceptionFirstFailureRecordedRethrownUnchanged": true,
+    "fullSceneSerialPointPerPressAndPerCharacterHelperGatesPreserved": true,
+    "nativeNotifyTimeoutMs": 5000,
+    "cleanupTimeoutMs": 1000,
+    "verified": false,
+    "noReattachOrReplay": true
+  },
+  "unchanged": {
+    "sharedPortalKde": true,
+    "consentSession": true,
+    "helperObserverWorkerCaptureScene": true,
+    "productionServiceDiscovery": true,
+    "probePath": "release/probe-gnome-input.py",
+    "probeSha256": "3d719011e0ef50e90ad63278fdd5ce4dd55e58d168d4e6d24f9a4cad1a7f8351",
+    "oldV5StagedControllerSource": "0ab022a6a26ae0165b57e1662203e71f544aab9a",
+    "oldV5StagedControllerSha256": "1be68fc8758850bbb57e05bf04f8f8bcd8b3101a01d651a89899cf8f353c6ea0",
+    "oldV5SelectedNativeSource": "2035af99b46bb013e81de9766216da820ab4a325",
+    "oldV5SelectedArtifactSha256": "538136182ad7f7886b064b553d1154cb99b53c634da7e478d01f8bbaf4e4d639",
+    "oldV5EnabledObserverSource": "aef93bb04520a003c5c48536aa6d4210105fc8ad"
+  },
+  "validation": {
+    "controllerCasesPassed": 34,
+    "newHeldLedgerCasesPassed": 9,
+    "probeCasesPassed": 48,
+    "focusedPythonCasesPassed": 138,
+    "observerNodeCasesPassed": 5,
+    "filesSha256": {
+      "tests/test_gnome_control.py": "b8017501b3f5164524b36f11eb5d8a42f877a036e97eefb53a46097688c68403",
+      "tests/test_gnome_input_probe.py": "ce9bf97a9c0bfb327ed46a13004d91bdfbdfd2f58ccd36a6bba6940c78534678"
+    },
+    "nativeGuiConsentCaptureOrInputExercised": false,
+    "parentFocusedPythonCasesPassed": 138,
+    "parentOriginalObserverNodeCasesPassed": 5,
+    "nodeObserverSource": "3651e17a0c34154eb4454e80e136ee11e764aa00; separate clean private source copy, excluding observer work in progress"
+  },
+  "observerDesign": {
+    "implemented": false,
+    "controllerSerialNormalizationProposed": false,
+    "classifyOnlyInsideExactRaisedHandler": true,
+    "completeCurrentSafetyFingerprintAndTrackedInventoryPlusNonRaisedBarrierRequired": true,
+    "allNonRaisedSignalsUnconditionallyInvalidate": true,
+    "awayBackCannotRestoreOldSerial": true,
+    "boundsMissingHistoryUnknownProfileReadErrorOrReentrancyRefuseSuppression": true,
+    "profileSpecificSourceReviewPending": true,
+    "completeActorCompositionTracking": false
+  },
+  "vmPackageExtensionEnvironmentOrSelectedNativePayloadChanges": false,
+  "productionGnomeInputQualified": false,
+  "productionGnomeInputEnabled": false,
+  "next": "Separate observer source/tests/profile ordering review and publication; fresh exact artifact/fixture admission before candidate staging or input. Production input stays disabled."
+}
