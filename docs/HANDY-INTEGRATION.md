@@ -44,8 +44,11 @@ component jobs pass at `e28dc90`; its installed Debian shortcut fixture exposed
 an existing race after restoring the parent before the first-run dialog mapped.
 The follow-up waits for both windows before indexing the dialog, preserving all
 real key-event/maintenance/removal assertions. The X11 proof wrapper now explicitly
-isolates dictation state and clears inherited Wayland state. Await final hosted
-checks before merging PR #33; matched public download preparation stays separate.
+isolates dictation state and clears inherited Wayland state. All final source,
+installed-package, component and Windows x64/ARM64 installation/repair/removal
+checks passed at `8ceef2b`. PR #33 is merged as
+`f738a73f6f2d44fde111108df72dbf1cd94b562b`; matched public download preparation
+stays separate.
 
 Publication direction: prepare Linux, macOS and Windows downloads before
 publishing. Existing Linux/Mac 0.2.13 preview downloads predate Handy; the Windows

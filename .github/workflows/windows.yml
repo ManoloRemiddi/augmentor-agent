@@ -35,7 +35,9 @@ jobs:
           - os: windows-11-arm
             arch: arm64
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 50
+    # ARM64's complete install/repair/removal proof took 41 minutes before the
+    # app-local browser was added. Allow its larger verified payload to finish.
+    timeout-minutes: 75
     defaults:
       run:
         shell: pwsh

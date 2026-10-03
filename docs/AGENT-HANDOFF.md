@@ -4,7 +4,8 @@
 
 ## October 3 Handy alignment, test separation and download preparation
 
-PR #30 is merged; PR #33 adds the four-pixel leftward orb adjustment and protects
+PR #30 is merged; PR #33 is merged as `f738a73f6f2d44fde111108df72dbf1cd94b562b`
+after all gates passed. It adds the four-pixel leftward orb adjustment and protects
 the live dictation session from incomplete/offscreen development brokers. The
 owner's dictation broker now runs separately staged compatible release
 `20261003-105718-c8fb185f`, artifact
