@@ -32,14 +32,22 @@ def native_build_environment():
     installation=subprocess.check_output([str(vswhere),'-latest','-products','*','-property','installationPath'],text=True).strip()
     if not installation:raise ValueError('The ARM64 builder needs Visual Studio C++ tools.')
     vendor=Path(installation)
-    command='call "'+str(vendor/'Common7/Tools/VsDevCmd.bat')+'" -arch=arm64 -host_arch=x64 >nul && set'
-    variables=subprocess.check_output(['cmd.exe','/d','/s','/c',command],text=True,env=env)
+    command='call "'+str(vendor/'Common7/Tools/VsDevCmd.bat')+'" -arch=arm64 -host_arch=arm64 >nul && set'
+    # Pass cmd's exact quoting rather than list2cmdline's C-runtime quote escapes;
+    # VsDevCmd lives under Program Files and cmd does not interpret \" that way.
+    setup=subprocess.run('cmd.exe /d /s /c "'+command+'"',text=True,env=env,
+                         stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+    if setup.returncode:
+        messages=[line for line in setup.stdout.splitlines() if '[ERROR' in line or 'not recognized' in line]
+        raise ValueError('Native ARM SDK setup failed: '+'; '.join(messages)[-1000:])
+    variables=setup.stdout
     for line in variables.splitlines():
         name,separator,value=line.partition('=')
         if separator and name.upper() in ('PATH','LIB','LIBPATH','INCLUDE'):
             env[name.upper()]=value
     clang=next((path for path in [Path(os.environ['ProgramFiles'])/'LLVM/bin/clang-cl.exe',
-                  vendor/'VC/Tools/Llvm/x64/bin/clang-cl.exe',vendor/'VC/Tools/Llvm/bin/clang-cl.exe'] if path.is_file()),None)
+                  vendor/'VC/Tools/Llvm/ARM64/bin/clang-cl.exe',vendor/'VC/Tools/Llvm/x64/bin/clang-cl.exe',
+                  vendor/'VC/Tools/Llvm/bin/clang-cl.exe'] if path.is_file()),None)
     ninja=shutil.which('ninja',path=env.get('PATH'))
     if not ninja:
         candidate=vendor/'Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe'

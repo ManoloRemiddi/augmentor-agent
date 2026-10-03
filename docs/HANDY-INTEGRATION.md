@@ -94,7 +94,8 @@ physical microphone/OS-permission acceptance is separate from these proofs.
 
 The first native ARM64 build exposed ggml's requirement for Clang. The Windows
 ARM lane now uses Visual Studio's ARM SDK with Clang/Ninja and the native Rust
-MSVC target. The publisher check clears inherited PowerShell 7 module paths
+MSVC target. Native ARM SDK setup uses the ARM host tools and cmd-compatible
+quoting for the installed Program Files path. The publisher check clears inherited PowerShell 7 module paths
 before loading Windows PowerShell's own security module. Neither fix weakens
 supplier signature/checksum checks. Exact current-source caches are validated.
 
