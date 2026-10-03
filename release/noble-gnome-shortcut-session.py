@@ -44,6 +44,36 @@ def idle(status):
     return status and status['accepted'] and not any(status[k] for k in ('busy','running','draftPresent','online'))
 
 
+def qt_operation(root, python, operation):
+    """A guarded parent supplies verified native paths before its Qt child exec."""
+    if operation not in ('qt-save','app-settings-save'):
+        raise ValueError('Unsupported bounded Qt proof operation.')
+    env=dict(os.environ)
+    marker=root/'linux-python-runtime.json'
+    if marker.exists() or marker.is_symlink():
+        spec=importlib.util.spec_from_file_location('owned_qt_proof_runtime',root/'scripts/linux-python-runtime.py')
+        runtime=importlib.util.module_from_spec(spec);spec.loader.exec_module(runtime)
+        env=runtime.environment(root,python,env)
+    # The parent already checked the exact guest, security mode, selected source,
+    # inventory and interpreter. Run only these two bounded operations; do not
+    # relax verified_profile's refusal of inherited loader overrides.
+    code='''import importlib.util,json,sys
+from pathlib import Path
+spec=importlib.util.spec_from_file_location('owned_qt_operation',sys.argv[1])
+module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+module.ROOT=Path(sys.argv[2])
+sys.path.insert(0,str(module.ROOT/'services/desktop'))
+sys.path.insert(0,str(module.ROOT/'apps/native'))
+operation=sys.argv[3]
+if operation not in ('qt-save','app-settings-save'):raise ValueError('Unsupported Qt operation')
+print(json.dumps(module.qt_save() if operation=='qt-save' else module.app_settings_save()))
+'''
+    result=subprocess.run([python,'-B','-c',code,str(Path(__file__).resolve()),str(root),operation],
+                          env=env,capture_output=True,text=True,timeout=120)
+    if result.returncode:raise RuntimeError('Bounded Qt proof child failed: '+result.stderr)
+    return json.loads(result.stdout)
+
+
 def records(backend, paths):
     return {p:{k:backend.custom(p).get_value(k).print_(True) for k in backend.fields} for p in paths}
 
@@ -206,8 +236,8 @@ def main():
         result=exchange(args.instance,'maintenance.close');assert result['accepted']
         return {'closeAccepted':True,'before':before}
     # Qt and GTK live in separate processes, matching the production adapter.
-    if args.action=='qt-save':return qt_save()
-    if args.action=='app-settings-save':return app_settings_save()
+    if args.action in ('qt-save','app-settings-save'):
+        return qt_operation(ROOT,contract['python'],args.action)
     from gnome_shortcuts import NativeShortcuts,PREFIX
     backend=NativeShortcuts()
     own=[PREFIX+name+'/' for name in ('main','secondary')]
@@ -253,11 +283,7 @@ def main():
     foreign.apply();backend.parent.set_strv('custom-keybindings',paths+[FOREIGN]);backend.Gio.Settings.sync()
     saved['registeredAfter']=paths+[FOREIGN];qualification.write_journal(STATE,saved,args.source,args.proof_token)
     try:
-        result=subprocess.run([sys.executable,'-B',str(Path(__file__).resolve()),'app-settings-save' if actual else 'qt-save',
-                              '--target',args.target,'--source',args.source,'--proof-token',args.proof_token],
-                              capture_output=True,text=True,timeout=120)
-        assert result.returncode==0,result.stderr
-        reply=json.loads(result.stdout)
+        reply=qt_operation(ROOT,contract['python'],'app-settings-save' if actual else 'qt-save')
         unrelated=[p for p in paths if p not in own]
         assert records(backend,unrelated)=={p:v for p,v in saved['foreignBefore'].items() if p not in own}
         assert backend.custom(FOREIGN).get_string('command')=='/usr/bin/true'

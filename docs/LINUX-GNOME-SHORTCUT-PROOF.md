@@ -99,3 +99,18 @@ performed for this source change. The matching Ubuntu/Fedora artifact runs,
 reboot, real password lock/unlock and locked shortcut non-delivery remain open.
 GNOME desktop input stays disabled; these proofs do not qualify model, portal
 input, physical audio or owner hardware.
+
+## Source-Qt proof child contract
+
+[The installed failure/correction checkpoint](../release/qualification/next-targets/20261003-noble-settings-source-qt-proof-child.json)
+records both actual clean368 app processes on the verified Noble source-Qt
+selection. The original Settings helper failed importing its Qt key codec before
+any Save; its run-owned journal and foreign bindings restored successfully.
+The helper now starts only its two bounded Qt operations in a separate child,
+using the selected runtime's verified pre-exec environment. The parent still
+checks guest/source/target/security/inventory/interpreter and journal ownership;
+entry continues refusing inherited loader overrides. The120-second child limit
+and no-retry behavior remain unchanged. Six focused cases include a real ELF
+loader regression and failed/uncertain child handling; eleven existing selection
+and journal cases pass. Actual installed rerun and ordinary shortcut delivery
+remain separate gates. Neither selected payload nor visible UI is changed.

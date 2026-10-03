@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 Ubuntu Settings helper loader correction
+
+[The exact installed checkpoint](../release/qualification/next-targets/20261003-noble-settings-source-qt-proof-child.json)
+records a failed actual Settings run on selected clean368 before any Save:
+its helper omitted the source-Qt pre-exec environment. Its own journal restored
+settings and foreign bindings. The maintained helper now delegates its two
+bounded Qt operations to the verified selected runtime environment, retaining
+strict entry, source/security/inventory/interpreter and per-run journal guards.
+Six child cases and eleven qualification cases pass. Installed rerun, normal
+shortcut delivery and lock/reboot remain open; no selected root is patched.
+
+
 ## October 3 clean2035 builds and Ubuntu managed adoption
 
 [The artifact/adoption checkpoint](../release/qualification/next-targets/20261003-clean2035-artifacts-noble-managed-adoption.json)

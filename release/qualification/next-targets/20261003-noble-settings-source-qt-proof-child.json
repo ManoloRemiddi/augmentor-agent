@@ -1,0 +1,40 @@
+{
+  "format": "augmentor-linux-rollout-checkpoint/1",
+  "date": "2026-10-03",
+  "scope": "Owned Ubuntu24 GNOME46 Wayland comparison guest; selected immutable clean368 source-Qt release; both actual processes explicitly Settings-test opted in",
+  "artifactSource": {
+    "commit": "3688a095ffa4221e8ea919c331e6eff6d35cb25d",
+    "dirty": false
+  },
+  "selectedArtifactSha256": "161ce1e7395f6018b049011c0ae6d57f908a7fd2000e351a885a672c44609fac",
+  "actualInstalledProof": {
+    "passed": false,
+    "failurePhase": "app-settings-save helper imports Qt key codec before any UI Save",
+    "failure": "ImportError libQt6Core.so.6: source Qt pre-exec paths missing from proof helper",
+    "actualApplicationSettingsCompleted": false,
+    "nativeGlobalInputSent": false,
+    "settingsRestored": true,
+    "foreignEntriesPreserved": true,
+    "proofScriptSha256": "860ac07abad0f31599e161478a86abedf3d8c6cea1c37c15a99595ed1341f2df",
+    "guestHelperSha256": "c5a4395b8fa606437176641e43fceb6c44995a36130d9b4382c33339fe37e553"
+  },
+  "maintainedCorrection": {
+    "script": "release/noble-gnome-shortcut-session.py",
+    "sha256": "dad63ec88502eb7c24d5b84ddfe6a311a6fd8e4f7504a45609d39a42246527d8",
+    "boundedOperations": [
+      "qt-save",
+      "app-settings-save"
+    ],
+    "usesVerifiedRuntimePreExecEnvironment": true,
+    "guestSourceTargetSecuritySelectedInventoryInterpreterAndJournalGuardsUnchanged": true,
+    "inheritedLoaderOverridesStillRefusedAtEntry": true,
+    "noInstalledPayloadPatch": true,
+    "childBoundSeconds": 120,
+    "noAutomaticChildRetry": true,
+    "focusedChildCasesPassed": 6,
+    "existingQualificationCasesPassed": 11,
+    "actualInstalledRerunPending": true
+  },
+  "publicRelease": false,
+  "allFiveRolloutPointsComplete": false
+}
