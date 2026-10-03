@@ -1125,3 +1125,12 @@ enablement. Connected/import checks and offline UI health remain explicitly
 mocked. This is a native OS/service composition fixture, not a real DSH/provider,
 signed published forward update, normal GUI or reopening proof. Native execution
 is pending; the local case skips because its disposable CI account is absent.
+
+The first hosted native job at `76462aa` fails before test import because the
+runner's checkout is inaccessible to the disposable user (111297907075 in
+37155477755). The workflow now copies a `git archive` of the privacy-checked tracked
+tree and the pinned Node executable into the account's private home, then runs
+there. It copies no Git metadata or credentials. New native qualification is
+required. The separate `8bc5bfb` broad validation 37154936597 fails an unchanged
+dual-memory prompt-service startup after its simulated restart, before Python
+updater checks; that failure remains unqualified pending a fresh complete run.

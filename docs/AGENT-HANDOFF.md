@@ -4,6 +4,15 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+The first native user-service job at `76462aa` (111297907075 in 37155477755)
+fails before test import: the disposable account cannot access the runner's
+checkout. The workflow now archives only privacy-checked tracked source and copies
+the pinned Node binary into that account's private home; no checkout Git metadata
+or credentials are copied. Native retry is required. The earlier `8bc5bfb` full
+validation 37154936597 fails an unchanged dual-memory prompt-service restart test
+before Python updater checks; newer validation is still running. Do not count
+either failed checkpoint as updater/service qualification.
+
 Native Linux user-service qualification is now authored in
 `test_update_linux_service_native.py` and the reusable `linux-update-service.yml`
 workflow, called from validation. It creates only a disposable CI account, runs

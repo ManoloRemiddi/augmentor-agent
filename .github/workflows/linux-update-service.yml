@@ -30,10 +30,13 @@ jobs:
           sudo loginctl enable-linger augupdatefixture
           task_uid=$(id -u augupdatefixture)
           sudo systemctl start "user@$task_uid.service"
+          sudo install -d -m 0700 -o augupdatefixture -g augupdatefixture /home/augupdatefixture/source
+          git archive --format=tar HEAD | sudo runuser -u augupdatefixture -- tar -x -C /home/augupdatefixture/source
+          sudo install -m 0755 -o augupdatefixture -g augupdatefixture "$(command -v node)" /home/augupdatefixture/qualification-node
           sudo runuser -u augupdatefixture -- env CI=true HOME=/home/augupdatefixture \
             XDG_RUNTIME_DIR="/run/user/$task_uid" DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$task_uid/bus" \
-            AUGMENTOR_SYSTEMD_QUALIFICATION=1 AUGMENTOR_QUALIFICATION_NODE="$(command -v node)" \
-            /usr/bin/python3 -B -m unittest discover -s tests -p test_update_linux_service_native.py -v
+            AUGMENTOR_SYSTEMD_QUALIFICATION=1 AUGMENTOR_QUALIFICATION_NODE=/home/augupdatefixture/qualification-node \
+            /bin/sh -c 'cd /home/augupdatefixture/source && exec /usr/bin/python3 -B -m unittest discover -s tests -p test_update_linux_service_native.py -v'
       - name: Remove only the dedicated fixture account
         if: always()
         shell: bash
