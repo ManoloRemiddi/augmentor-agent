@@ -2,6 +2,30 @@
 
 # Start here: agent handoff
 
+## October 3 fresh matching corrected Arch complete installer
+
+[Cleanf85 qualification](../release/qualification/next-targets/20261003-arch-clean-complete-installer.json)
+now replaces the corrected Arch overlay's pending matching-bundle gate for its
+exact new release4 bytes. Desktop/Browser/native package and full bundle build
+from cleanf85e376. A fresh owned fixture executes normal signed native dependency
+admission, separate verified guard installation, application transaction and
+ordinary-user setup. Actual DSH/plugins, both fixture model roles, offscreen
+native rendering, repeat settings and restart history without replay pass.
+The report has setupScriptMatchesBundle:true and installerOverlayUsed:false.
+Arch npm12.2 runs under bundled Node24.19 with native flattened semver resolution.
+Final native audit, frozen runtime and every approved font glyph pass; the new
+complete fixture is now offline. Only public native archive/signature cache files
+are reused, with normal signature re-verification; no user state or keys are copied.
+
+The exact Archf85 and earlier Leap8ad complete container installers now pass.
+Their source identities remain separate, and the failed8ad Arch run/diagnostic
+resume remain intact. Non-booted kmod/systemd hook limits remain explicit; actual
+boot/input/audio is not inferred. The Node regression uses portable copied public
+dependency fixtures. All five rollout points, current graphical sessions/Browser,
+physical audio, coherent native maintenance, product/DSH-history updates and
+source/legal/release acceptance remain active. Owner state and22 license files
+remain unchanged.
+
 ## October 3 complete Leap installer, Arch correction and release rollback
 
 [Actual qualification](../release/qualification/next-targets/20261003-system-qt-complete-and-release-upgrade.json)

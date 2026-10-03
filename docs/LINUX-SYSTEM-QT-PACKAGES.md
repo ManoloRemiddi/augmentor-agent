@@ -194,6 +194,23 @@ inspection as qualification of new bytes.
 
 ## Complete installer adapters and recorded execution
 
+[Fresh corrected Arch qualification](../release/qualification/next-targets/20261003-arch-clean-complete-installer.json)
+now passes the complete matching cleanf85e376 release4 bundle in a new owned
+fixture. Normal native dependency/signature admission, the separate guard,
+application transaction, ordinary-user setup and repeat, real DSH/plugins, both
+fixture model roles, rendering and restart history without replay pass. Its
+report explicitly records matching bundled setup and no external overlay.
+Native npm12.2 uses bundled Node24.19 with flattened semver. Final native audit,
+frozen runtime and approved font shaping pass. The fixture is now offline. Only
+regular public native archive/signature cache files were reused and reverified;
+no application/user runtime state or keys were transferred. Non-booted upstream
+kmod/systemd hooks cannot establish real boot/dictation permissions.
+
+The earlier exact Leap8ad complete installer also passes. These identities are
+separate; later source/archives do not inherit either acceptance. The retained
+failed Arch8ad bundle and diagnostic helper resume below are historical context
+for the module-resolution correction, not current matching-bundle evidence.
+
 [The complete/install/rollback checkpoint](../release/qualification/next-targets/20261003-system-qt-complete-and-release-upgrade.json)
 supersedes the pending-execution scope below for its exact clean8adb633 release3
 bytes. Both new native packages and full bundles build/inspect/assemble. Leap's
@@ -281,17 +298,17 @@ actual assembly/execution with new matching clean artifacts remains pending.
 
 Arch/Leap source adapters now provide target/runtime contracts, checked guard
 ordering, explicit bootstrap and native npm selection. Matching new clean bundle
-assembly and actual installed/resumed complete setup checks remain required for
-the corrected Arch helper. Leap's exact clean8ad bundle has passed those recorded
-container checks; no later source inherits that artifact acceptance.
+assembly and actual installed/resumed complete setup checks now pass for the
+exact corrected Archf85 and earlier Leap8ad bundles. Later artifacts and actual
+interrupted native package/service/boot recovery need their own checks.
 Inspect native dependency solver plans before
 changing owned fixtures; preserve frozen Qt/Python manifests and runtime receipts.
 Any drift needs a new candidate rather than refreshing old inventory.
 
 Fresh native installation, cold ordinary-user runtime/rendering and busy/idle
 replacement/removal now pass within their recorded container scope. New font
-artifacts and the exact Leap full installer now pass; Arch's corrected helper
-passes diagnostic resume, pending a matching clean bundle. Real GNOME/KDE/Mint
+artifacts and exact Archf85/Leap8ad full installers now pass. The earlier Arch
+diagnostic resume stays separately labeled. Real GNOME/KDE/Mint
 sessions, consent/input/lock/reboot, graphical Browser, physical audio, version
 upgrades/rollback and source/legal/release acceptance stay open. All five rollout
 points remain active. Owner installations, services, models, audio devices and the

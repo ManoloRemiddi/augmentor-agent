@@ -219,7 +219,12 @@ See [the exact coverage](../release/dsh/voice-distributed-source.json).
 The [Arch/Leap execution checkpoint](../release/qualification/next-targets/20261003-system-qt-complete-and-release-upgrade.json)
 records full native and ordinary-user success for the exact clean8ad Leap bundle.
 Arch's initial bundle stops at native npm's flattened semver layout. The corrected
-helper passes explicit diagnostic resume, pending a fresh matching fixed bundle.
+helper first passes explicit diagnostic resume. A subsequent
+[fresh cleanf85 Arch release4 bundle](../release/qualification/next-targets/20261003-arch-clean-complete-installer.json)
+passes normal root native admission and complete ordinary-user setup/repeat,
+actual DSH/plugins, fixture model roles and restart history without replay, with
+matching bundled setup and no overlay. That container result does not qualify
+graphical browser/session, boot or physical audio.
 The qualification driver's `--setup-script` option records any external installer
 override and its hash; that result cannot establish matching-bundle acceptance.
 Public snapshots exclude repository histories, local outputs,

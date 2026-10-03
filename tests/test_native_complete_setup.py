@@ -42,7 +42,7 @@ class NativeCompleteSetup(unittest.TestCase):
                 modules=root/layout/'node_modules';npm=modules/'npm';npm.mkdir(parents=True)
                 (npm/'package.json').write_text(json.dumps({'name':'independent-npm-layout-fixture','version':'1.0.0','engines':{'node':engine}}))
                 dependency=(npm/'node_modules/semver' if layout=='nested' else modules/'semver')
-                dependency.parent.mkdir(parents=True,exist_ok=True);dependency.symlink_to(SEMVER,target_is_directory=True)
+                dependency.parent.mkdir(parents=True,exist_ok=True);shutil.copytree(SEMVER,dependency)
                 result=subprocess.run([shutil.which('node'),'-e',setup.NPM_ENGINE_PROBE,str(npm)],capture_output=True,text=True)
                 with self.subTest(layout=layout):
                     self.assertEqual(result.returncode==0,accepted,result.stderr)

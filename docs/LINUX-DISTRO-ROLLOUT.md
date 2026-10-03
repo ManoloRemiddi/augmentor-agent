@@ -2665,3 +2665,26 @@ GNOME/KDE consent/Stop/input, graphical Browser, physical audio, coherent native
 dependency updates and source/legal/public release gates remain open. No owner
 installation/model/service/device, root license or22 proposed-license source
 files changed. Candidate archives stay private; no binary release or PR merge.
+
+## October 3 fresh matching corrected Arch complete bundle
+
+[Fresh cleanf85 release4 execution](../release/qualification/next-targets/20261003-arch-clean-complete-installer.json)
+now passes native dependency/signature admission, a separate verified guard, the
+application transaction and complete ordinary-user setup in a new owned fixture.
+Actual DSH/plugins, both fixture model roles, offscreen rendering, repeat settings
+and restart history without replay pass. Matching helper hashes and no installer
+overlay are explicit. Native npm12.2 uses bundled Node24.19 with its actual
+flattened dependency. Native audit, frozen runtime and every approved font glyph
+pass; the fixture is now offline. Only public native archive/signature cache bytes
+were reused and checked normally; no user state or keys were copied. A temporary
+cache download directory caused the first broad transfer to refuse; only regular
+archive/signature files were subsequently admitted. Non-booted upstream kmod/
+systemd hook limitations stay separate from actual boot and input acceptance.
+
+The exact Archf85 and earlier Leap8ad complete container installers now pass.
+Failed8ad Arch and the explicit diagnostic resume remain separate historical
+evidence. Normal sandboxed graphical Browser, current Ubuntu/Fedora/Mint sessions,
+GNOME/KDE consent/Stop/input, physical audio, coherent native maintenance, product
+version/managed DSH-history updates and source/legal/rebuild/release gates remain
+open. All five rollout points remain active; owner state, root license and22
+proposed-license source hashes are unchanged. No binary publication or PR merge.
