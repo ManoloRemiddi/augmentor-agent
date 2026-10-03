@@ -174,3 +174,37 @@ contract (`resonant-voice/1`, with no capabilities advertisement) plus healthy
 harness-specific scope checks remain in the existing `voice.ticket` operation.
 Two added fixtures prove legacy readiness and refusal of unrelated protocols.
 This preserves working local installations without upgrading their speech models.
+
+## Installed Linux candidate — October 3
+
+The owner-requested compatible build is selected as `20261003-124651-d2cd7a23`.
+Artifact SHA-256:
+`d611b2d48525d4405104ae426112d38362f3dae55a2d46f6c53064a488578d97`.
+Voice source: `c1b2279a2267850e6c52be72e632479ac916a031`, ported over
+the immutable 0.2.11 base artifact
+`7296f4917721c601e0949588a97053c947db8eeda62ab0fd3f7dea66cb7f2d9a`.
+The compatible build retains that product's compiled runtime, DSH integration,
+embedded settings and Handy fixes. Its scoped changes and qualification are
+recorded in the staged artifact's `docs/VOICE-BUILD-PROVENANCE.md`.
+
+Staging/activation used `augmentor-update`; windows accepted idle-only closure
+and reopened through the canonical launcher. Primary, mobile-named and secondary
+desktop windows report this same build, online/model-ready, with no restore errors
+and no pending desktop update. The installed Python imports the voice audio
+libraries. Read-only real local checks confirm protocol-compatible Resonant Voice
+and healthy 24 kHz TTS; local Voice remains enabled/configured. No microphone,
+TTS inference, OpenAI billing test, model provisioning or reasoning-runtime
+restart was performed. Model/credential and speech connection files are unchanged;
+the mobile appearance file was resaved during normal idle window closure.
+
+Two existing browser embedding connections remain on their earlier runtime; their
+service and current pages were not interrupted. Browser UI/host changes are in the
+review source and staged artifact, but adoption of those live browser sessions is
+pending a safe embedding-service/browser reload. The separate unpacked browser
+extension registration was not changed. Public cross-platform package CI is
+separate from this local candidate qualification. No public release was published.
+
+Cloud still needs the owner's project API key and explicit setup acknowledgement.
+Actual cloud audio/acoustics and physical Mac/Windows/standalone companion audio
+remain unqualified. The original pre-build immutable artifact remains available;
+rollback can select that recorded base again through `augmentor-update activate`.

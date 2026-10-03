@@ -4,6 +4,23 @@
 
 
 
+## October 3 installed voice candidate
+
+The owner-requested compatible Linux voice candidate is now installed. Selected
+and primary/mobile-named/secondary desktop builds are `20261003-124651-d2cd7a23`,
+artifact `d611b2d48525d4405104ae426112d38362f3dae55a2d46f6c53064a488578d97`,
+from voice source `c1b2279a2267850e6c52be72e632479ac916a031` over the recorded
+0.2.11 base. All three desktop windows are online/model-ready without restore
+errors; existing local speech readiness is confirmed by read-only real health
+checks. Cloud remains unconfigured until the owner supplies a project key and
+accepts the setup disclosure. Active browser embedding clients retain their older
+build; no browser service or page was interrupted.
+
+[Exact deployment provenance, tests and limitations](VOICE-PROVIDERS.md#installed-linux-candidate--october-3)
+own this evidence. Public package CI and real cloud/physical platform audio are
+separate qualifications. Local models, speech configuration and DSH runtime were
+preserved; no public release was published.
+
 ## October 3 voice build compatibility
 
 The Voice provider hub now keeps local/cloud configuration inside an existing
