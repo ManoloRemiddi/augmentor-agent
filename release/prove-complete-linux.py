@@ -389,9 +389,58 @@ POST_PRIOR_FAILURE_SHA = 'cd7f502ff3d868257f81c9a248aa9f11223925dd91af57da37f12e
 POST_PRIOR_PROOF_SHA = 'a1342ea000108c40c8138ca3439fb4eb6c2302c266af503401e500e2c250b766'
 
 
+POST_V3_RUN = 'post-install-proof-emulated-startup-v3'
+POST_V3_PRIOR_SHA = {
+    'post-install-proof': POST_PRIOR_FAILURE_SHA,
+    'post-install-proof-cwd-v2': '72531cd9a3276236d4374d48f6a9785e93d2fcb0d068f914e9812efef8b3c441',
+    'post-install-readiness-only-180-v1': 'a31419c04e561ccbd677be72114332fd224947c9578faff37952f4d4f242ef2e',
+    'post-install-full-adapter-readiness-v1': 'bbd56ffb699752d1f774a5353065dad0315070e1b3b7d6530d9bced6c611c8ab',
+}
+
+
+def post_startup_budget(fixture):
+    expected = 120 if fixture.get('runDirectory') == POST_V3_RUN else 60
+    value = fixture.get('startupBudgetSeconds', 60)
+    if type(value) is not int or value != expected:
+        raise ValueError('Only the explicit emulated Mint v3 fixture may use120second startup; default/turn budgets remain60.')
+    return value
+
+
+def v3_prior_guard(state, fixture):
+    from platform_adapters.private_files import descriptor, require_directory
+    if fixture.get('priorFailures') != POST_V3_PRIOR_SHA or 'priorFailure' in fixture:
+        raise ValueError('The emulated v3 fixture requires all four exact immutable prior records.')
+    for name, digest in POST_V3_PRIOR_SHA.items():
+        root = state/name; require_directory(root)
+        with os.fdopen(descriptor(root/'run.json'), 'rb') as stream:
+            raw = stream.read(16385)
+        if len(raw) > 16384 or hashlib.sha256(raw).hexdigest() != digest:
+            raise ValueError('A preserved prior qualification record changed; no v3 run is adopted.')
+        record = json.loads(raw)
+        if name in ('post-install-proof', 'post-install-proof-cwd-v2'):
+            required = {'format': 'augmentor-owned-post-install-run/1', 'sourceCommit': POST_SOURCE,
+                        'artifactId': fixture['artifactId'], 'bundleManifestSha256': fixture['bundleManifestSha256'],
+                        'status': 'failed', 'phase': 'starting', 'pendingRequest': None,
+                        'unknownRequestOutcome': False, 'settingsPreserved': True}
+        else:
+            required = {'installedSource': POST_SOURCE, 'SDKMutations': False,
+                        'phase': 'observed', 'modelRequests': 0, 'providerHttpRequests': []}
+            required['status'] = 'failed' if name == 'post-install-readiness-only-180-v1' else 'full-adapter-read-observed'
+            if record.get('pendingRequest') is not None or record.get('unknownRequestOutcome', False):
+                raise ValueError('An uncertain prior request was preserved; no v3 run is adopted.')
+        if any(record.get(key) != value for key, value in required.items()):
+            raise ValueError('A prior record has an unqualified or uncertain outcome; no v3 run is adopted.')
+
+
 def post_run_name(state, fixture):
     """Allow only the explicitly recorded no-request failure's cwd correction."""
     name = fixture.get('runDirectory', 'post-install-proof')
+    post_startup_budget(fixture)
+    if name == POST_V3_RUN:
+        v3_prior_guard(state, fixture)
+        return name
+    if 'priorFailures' in fixture:
+        raise ValueError('Prior-record bindings are restricted to the exact emulated v3 fixture.')
     if name == 'post-install-proof' and 'priorFailure' not in fixture:
         return name
     if (name != 'post-install-proof-cwd-v2' or
@@ -430,7 +479,11 @@ def begin_post_run(state, fixture):
               'artifactId': fixture['artifactId'], 'sourceCommit': fixture['sourceCommit'],
               'bundleManifestSha256': fixture['bundleManifestSha256'], 'proofScriptSha256': PROOF_SHA256,
               'fixtureSha256': hashlib.sha256(json.dumps(fixture, sort_keys=True).encode()).hexdigest(),
-              'phase': 'prepared', 'pendingRequest': None, 'status': 'running'}
+              'phase': 'prepared', 'pendingRequest': None, 'status': 'running',
+              'startupBudgetSeconds': post_startup_budget(fixture), 'turnBudgetSeconds': 60,
+              'emulatedStartupQualification': fixture.get('runDirectory') == POST_V3_RUN,
+              'public60SecondStartupProofPass': False,
+              'priorRecordHashes': fixture.get('priorFailures', {})}
     atomic_json(root/'run.json', record)
     return root, record
 
@@ -461,6 +514,7 @@ def post_install_proof(bundle, fixture):
     from platform_adapters.processes import OwnedProcess
     root, record = begin_post_run(POST_HOME/'.local/state/augmentor-install', fixture)
     requests = []; process = None; server = None; thread = None; log = None
+    startup_budget = post_startup_budget(fixture); startup_observations = []
     baseline = None; history_preserved = False
     home = POST_HOME/'.local/share/augmentor/dsh-home'
     cli = POST_HOME/'.local/share/augmentor/dsh-runtime/node_modules/.bin/dsh'
@@ -492,17 +546,30 @@ def post_install_proof(bundle, fixture):
         process = OwnedProcess([str(POST_APP/'node/bin/node'), str(cli.resolve()), 'web', '--no-open',
                                 '--host', '127.0.0.1', '--port', str(fixture['dshPort'])],
                                env=env, cwd=str(POST_HOME), stdout=log, stderr=log)
-        deadline = time.monotonic()+60
+        began = time.monotonic(); deadline = began+startup_budget
         while time.monotonic() < deadline:
             if process.poll() is not None:
+                startup_observations.append({'ready': False, 'elapsedSeconds': time.monotonic()-began})
                 raise RuntimeError('The owned post-install DSH process exited; no startup was retried.')
             try:
                 adapter = DshAdapter(); adapter.call('host.describe')
                 if not adapter.product: raise ValueError('The saved product connection differs.')
-                return adapter
             except (OSError, ValueError, RuntimeError):
                 time.sleep(.2)
-        raise RuntimeError('The owned post-install DSH did not become ready within60seconds.')
+                continue
+            elapsed = time.monotonic()-began
+            if fixture.get('runDirectory') == POST_V3_RUN and elapsed > startup_budget:
+                startup_observations.append({'ready': False, 'elapsedSeconds': elapsed,
+                                             'readinessObserved': True, 'withinBudget': False})
+                # Outside the polling catch: a successful late read is terminal,
+                # before session/model mutations, and is never polled again.
+                raise RuntimeError('Emulated v3 readiness was observed after120seconds; no new role request was dispatched.')
+            startup_observations.append({'ready': True, 'elapsedSeconds': elapsed,
+                                         'withinBudget': elapsed <= startup_budget})
+            record['startupObservations'] = startup_observations; atomic_json(root/'run.json', record)
+            return adapter
+        startup_observations.append({'ready': False, 'elapsedSeconds': time.monotonic()-began})
+        raise RuntimeError(f'The owned post-install DSH did not become ready within{startup_budget}seconds.')
 
     def snapshot(adapter, sessions):
         return {session: adapter.call('session.history', {'sessionId': session}) for session in sessions}
@@ -556,9 +623,15 @@ def post_install_proof(bundle, fixture):
                   'offscreenNativeRender': True, 'linuxAndBrowserRoleFixtureTurns': True,
                   'restartPreservesHistoryWithoutReplay': True, 'modelRequests': count,
                   'originalFreshFullProofPass': False, 'realDesktopSessionTested': False,
+                  'startupBudgetSeconds': startup_budget, 'turnBudgetSeconds': 60,
+                  'emulatedStartupQualification': fixture.get('runDirectory') == POST_V3_RUN,
+                  'public60SecondStartupProofPass': startup_budget == 60 and len(startup_observations) == 2 and
+                      all(row['ready'] and row['elapsedSeconds'] <= 60 for row in startup_observations),
+                  'priorRecordHashes': fixture.get('priorFailures', {}), 'startupObservations': startup_observations,
                   'graphicalBrowserTested': False, 'physicalVoiceTested': False,
                   'licenseReviewComplete': False, 'embeddedSourceCoverageComplete': False}
-        atomic_json(root/'report.json', report); record.update(status='complete', phase='complete')
+        atomic_json(root/'report.json', report); record.update(status='complete', phase='complete',
+            public60SecondStartupProofPass=report['public60SecondStartupProofPass'])
         return report
     except BaseException:
         record['status'] = 'failed'; record['unknownRequestOutcome'] = record['pendingRequest'] is not None
@@ -578,6 +651,8 @@ def post_install_proof(bundle, fixture):
                 raise
             finally:
                 record['historyPreservedVerified'] = history_preserved
+                record['modelRequests'] = len(requests)
+                record['startupObservations'] = startup_observations
                 atomic_json(root/'run.json', record)
 
 

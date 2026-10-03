@@ -682,6 +682,14 @@
     "outputs/linux-rollout/mint-fresh-account2035/full-adapter-run-evidence/adapter-result.json": {
       "sha256": "92b922af4d2515d50c30cfd6712efc7bf98de2705b74d140609dd5611b5be7db",
       "bytes": 2904
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-v3-source-plan.json": {
+      "sha256": "515da90dd004428f34c4c5472b78918d33886e087f4fd90a302d799427116717",
+      "bytes": 2457
+    },
+    "outputs/linux-rollout/mint-fresh-account2035/post-install-fixture-v3-planned.json": {
+      "sha256": "77a67f5b0f50309ac411156ed7b254ced925dca8cae038337040c73655ffd2b9",
+      "bytes": 2043
     }
   },
   "maintainedPostInstallEntry": {
@@ -890,5 +898,33 @@
     "kernelTargetPortEntries": [],
     "maintainedExecutableChanged": false,
     "retryExecuted": false
+  },
+  "emulatedStartupV3Source": {
+    "implemented": true,
+    "executedInVM": false,
+    "runDirectory": "post-install-proof-emulated-startup-v3",
+    "startupBudgetSeconds": 120,
+    "defaultStartupSeconds": 60,
+    "turnBudgetSeconds": 60,
+    "priorRecordHashes": {
+      "post-install-proof": "cd7f502ff3d868257f81c9a248aa9f11223925dd91af57da37f12e23407418f2",
+      "post-install-proof-cwd-v2": "72531cd9a3276236d4374d48f6a9785e93d2fcb0d068f914e9812efef8b3c441",
+      "post-install-readiness-only-180-v1": "a31419c04e561ccbd677be72114332fd224947c9578faff37952f4d4f242ef2e",
+      "post-install-full-adapter-readiness-v1": "bbd56ffb699752d1f774a5353065dad0315070e1b3b7d6530d9bced6c611c8ab"
+    },
+    "proofScriptSha256": "b3251d48d21f93255a36bd2e4d0e4ae5bf3535327ab46a3ea15c5706bea43aa3",
+    "originalFreshFullProofPass": false,
+    "public60SecondStartupProofPass": false,
+    "setupOrSettingsReplayed": false,
+    "modelRuntimeInstallerFilesChanged": false,
+    "newRunRequestsSingleDispatch": true,
+    "strictRestartHistoryAndNoReplay": true,
+    "failureModelRequestCountsRetained": true,
+    "proofCases": 24,
+    "sourceTestsPass": true,
+    "reviewAndPublishedSourceRequiredBeforeVM": true,
+    "successfulLateV3ReadinessRefusedBeforeFurtherRoleMutation": true,
+    "default60PassRequiresBothMeasuredStartsWithin60": true,
+    "pollingReadsRemainBounded": true
   }
 }

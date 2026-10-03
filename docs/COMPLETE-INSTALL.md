@@ -301,3 +301,19 @@ audits, settings, empty workspace and all three earlier journals, with idle
 owned processes and no remaining listener. This establishes a startup-budget
 shortfall in this run, not a public 60-second proof pass, model/history acceptance
 or the cause of every earlier failure. Maintained executable bytes are unchanged.
+
+A separate explicit `post-install-proof-emulated-startup-v3` qualification is
+implemented for only the owned installed clean2035 Mint fixture. It requires
+all four exact prior record hashes and unchanged settings/empty workspace,
+then creates its own immutable one-run journal. Startup uses a recorded
+120-second budget because measured emulated readiness exceeds 60 seconds;
+default/public startup and every role turn remain 60 seconds. New run-owned
+role turns and strict restart/history/no-replay checks retain single-dispatch
+request fencing. The report labels emulated qualification and keeps the
+original/full and public60 proof flags false. Polling checks between bounded
+reads may observe readiness after a budget; v3 then rejects it outside the
+retry catch before further role mutation. Default behavior is retained, but
+its 60-second pass label requires both measured starts to finish within 60
+seconds. It is not yet executed in the VM;
+review and published source precede execution. No setup or configuration is
+replayed, and no prior journal is deleted/adopted.

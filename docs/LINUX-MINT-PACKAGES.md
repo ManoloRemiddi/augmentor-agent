@@ -162,3 +162,22 @@ audits, five settings, old-account hashes, empty workspace, all three prior
 journals and owned-process/no-listener cleanup pass. No public executable or
 timeout changes, model turns, session/history operations or installer replay
 are made. Connected-product/history and graphical/physical gates remain open.
+
+The maintained proof adds an explicit, separate emulated-VM v3 qualification
+for this exact owned installed clean2035 fixture. Its only longer bound is
+120-second startup; default/public startup and each role turn remain 60
+seconds. The fixed new journal binds the source, artifact, selected runtime,
+five settings, unchanged empty workspace and all four preserved qualification
+records. Altered hashes, pending/unknown outcomes, model traffic in read-only
+diagnostics or a preexisting v3 journal refuse before model-server binding.
+New run-owned Linux/Browser sessions each receive one journaled prompt; strict
+restart/history and no-replay checks remain. Reports explicitly record both
+budgets and emulated qualification, keeping original/full and public60 proof
+flags false. Polling checks occur between bounded reads; v3 rejects a successful
+read observed after 120 seconds before any further role mutation. Default
+behavior is retained, but a 60-second pass label requires both actual measured
+starts to be ready within 60 seconds. Seven added cases cover the v3 bounds,
+late successful reads, preservation, single-dispatch unknown outcomes and
+prior-record refusal; all 24 proof cases pass. This source
+change has not run in the VM and requires review/publication first. No selected
+installer/configuration/model/runtime files are changed.
