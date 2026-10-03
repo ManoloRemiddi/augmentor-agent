@@ -9,7 +9,7 @@ from pathlib import Path
 import tempfile
 import unittest
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import Mock,patch
 import sys
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -17,6 +17,83 @@ spec=importlib.util.spec_from_file_location('complete_setup',ROOT/'scripts/setup
 setup=importlib.util.module_from_spec(spec);spec.loader.exec_module(setup)
 
 class CompleteSetupTests(unittest.TestCase):
+    def startup_fixture(self, directory, *, ready_at=None, exit_code=None):
+        sys.path.insert(0,str(ROOT/'services'))
+        from platform_adapters.paths import private_directory
+        home=private_directory(Path(directory)/'home');state=private_directory(Path(directory)/'state')
+        clock=SimpleNamespace(now=0.)
+        def sleep(seconds):clock.now+=seconds
+        process=SimpleNamespace(terminate=Mock(),kill=Mock(),wait=Mock(return_value=0),close=Mock())
+        def poll():
+            if ready_at is not None and clock.now>=ready_at:
+                (state/'setup-dsh.log').write_text('Listening: http://127.0.0.1:3080/?token=fixture-native-token\n')
+            return exit_code
+        process.poll=Mock(side_effect=poll)
+        integration=Mock();integration.check.return_value={'installed':True,'token':'checked-integration'}
+        remote=Mock()
+        return home,state,clock,sleep,process,integration,remote
+
+    def test_bounded_start_accepts_verified_late_readiness_and_closes_its_owned_range(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home,state,clock,sleep,process,integration,remote=self.startup_fixture(directory,ready_at=85)
+            with patch('platform_adapters.processes.OwnedProcess',return_value=process) as launch,\
+                 patch('dsh.setup.Setup',return_value=integration),patch('dsh.remote.client',return_value=remote),\
+                 patch.object(setup.time,'monotonic',side_effect=lambda:clock.now),\
+                 patch.object(setup.time,'sleep',side_effect=sleep):
+                setup.configure_product(ROOT,ROOT/'fixture-cli',home,'http://127.0.0.1:3080',{},state)
+            self.assertGreater(clock.now,60);self.assertLess(clock.now,120)
+            remote.call.assert_called_once_with('host.describe')
+            integration.check.assert_called_once_with({'endpoint':'http://127.0.0.1:3080/?token=fixture-native-token','home':str(home)})
+            integration.install.assert_not_called();integration.save.assert_called_once_with('checked-integration')
+            launch.assert_called_once();process.terminate.assert_called_once();process.wait.assert_called_once_with(timeout=15);process.close.assert_called_once()
+
+    def test_startup_deadline_stops_the_owned_range_without_retry_or_integration_save(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home,state,clock,sleep,process,integration,remote=self.startup_fixture(directory)
+            with patch('platform_adapters.processes.OwnedProcess',return_value=process) as launch,\
+                 patch('dsh.setup.Setup',return_value=integration),patch('dsh.remote.client',return_value=remote),\
+                 patch.object(setup.time,'monotonic',side_effect=lambda:clock.now),\
+                 patch.object(setup.time,'sleep',side_effect=sleep):
+                with self.assertRaisesRegex(RuntimeError,'did not become ready'):
+                    setup.configure_product(ROOT,ROOT/'fixture-cli',home,'http://127.0.0.1:3080',{},state)
+            self.assertEqual(clock.now,120);launch.assert_called_once();remote.call.assert_not_called()
+            integration.check.assert_not_called();integration.install.assert_not_called();integration.save.assert_not_called()
+            process.terminate.assert_called_once();process.wait.assert_called_once_with(timeout=15);process.close.assert_called_once()
+
+    def test_integration_restart_accepts_late_readiness_without_replaying_install(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home,state,clock,sleep,first,integration,remote=self.startup_fixture(directory,ready_at=0)
+            second=SimpleNamespace(terminate=Mock(),kill=Mock(),wait=Mock(return_value=0),close=Mock())
+            def poll():
+                if clock.now>=85:(state/'setup-dsh.log').write_text('Ready: ?token=second-native-token\n')
+                return None
+            second.poll=Mock(side_effect=poll)
+            integration.check.side_effect=[{'installed':False,'token':'first-checked'},
+                                           {'installed':True,'token':'second-checked'}]
+            with patch('platform_adapters.processes.OwnedProcess',side_effect=[first,second]) as launch,\
+                 patch('dsh.setup.Setup',return_value=integration),patch('dsh.remote.client',return_value=remote),\
+                 patch.object(setup.time,'monotonic',side_effect=lambda:clock.now),\
+                 patch.object(setup.time,'sleep',side_effect=sleep):
+                setup.configure_product(ROOT,ROOT/'fixture-cli',home,'http://127.0.0.1:3080',{},state)
+            self.assertEqual(clock.now,85);self.assertEqual(launch.call_count,2)
+            self.assertEqual(remote.call.call_count,2)
+            integration.install.assert_called_once_with('first-checked')
+            integration.save.assert_called_once_with('second-checked')
+            for process in (first,second):
+                process.terminate.assert_called_once();process.wait.assert_called_once_with(timeout=15);process.close.assert_called_once()
+
+    def test_startup_process_exit_refuses_immediately_and_never_saves_integration(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home,state,clock,sleep,process,integration,remote=self.startup_fixture(directory,exit_code=17)
+            with patch('platform_adapters.processes.OwnedProcess',return_value=process),\
+                 patch('dsh.setup.Setup',return_value=integration),patch('dsh.remote.client',return_value=remote),\
+                 patch.object(setup.time,'monotonic',side_effect=lambda:clock.now),\
+                 patch.object(setup.time,'sleep',side_effect=sleep):
+                with self.assertRaisesRegex(RuntimeError,'stopped \\(exit 17\\)'):
+                    setup.configure_product(ROOT,ROOT/'fixture-cli',home,'http://127.0.0.1:3080',{},state)
+            self.assertEqual(clock.now,0);process.terminate.assert_not_called();process.close.assert_called_once()
+            remote.call.assert_not_called();integration.check.assert_not_called();integration.save.assert_not_called()
+
     def test_bootstrap_token_is_private_and_reused_after_failed_start(self):
         sys.path.insert(0,str(ROOT/'services'))
         from dsh.setup import product_token

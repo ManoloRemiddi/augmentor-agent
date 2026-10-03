@@ -54,3 +54,22 @@ licensing obligations remain open; no source-builder, recipient-control or licen
 files are changed by this adapter. See the [rollout ledger](LINUX-DISTRO-ROLLOUT.md),
 [source runtime entrypoints](LINUX-SOURCE-RUNTIME-ENTRYPOINTS.md) and
 [Cinnamon adapter contract](LINUX-CINNAMON-ADAPTER.md).
+
+## October 3 installed qualification and startup bound
+
+[The installed checkpoint](../release/qualification/next-targets/20261003-mint-native-install-runtime-startup-bound.json)
+records exact clean368 native packages and bundle in the dedicated persistent
+Mint22.3 VM. Authenticated APT install/audits and all seven managed wheels,
+Qt6.8.2/PySide6.8.2.1, QML and23-library/plugin closure pass. Cinnamon, Muffin,
+screensaver, kernel, Mesa, PipeWire and libc are preserved by the transaction.
+The prepared runtime is verified; no Desktop selection exists yet.
+
+Complete setup fails on its second DSH startup after integration installation,
+with an empty startup log and retained preparing receipt. An independent
+unchanged launch becomes ready in55.86seconds; this explains the tight margin
+but does not establish the exact earlier cause. The maintained setup deadline
+now allows120seconds for each owned start. Early exit, token/host verification,
+identity/integrity, cleanup and no replay remain intact;16 setup and7 native
+complete cases pass. New matching artifacts and safe explicit partial recovery
+remain required. This does not fix Fedora native setup's separate120-second
+readiness failure or qualify Cinnamon input/shortcuts/audio.

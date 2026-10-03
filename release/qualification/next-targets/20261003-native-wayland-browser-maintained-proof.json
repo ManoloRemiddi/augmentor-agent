@@ -1,0 +1,78 @@
+{
+  "format": "augmentor-linux-rollout-checkpoint/1",
+  "date": "2026-10-03",
+  "target": "opensuse-leap16.0-x86_64",
+  "scope": "Owned booted GNOME Wayland VM, headed native Wayland Chromium154, real Pi SDK with deterministic local model",
+  "installedArtifactSource": "423f0714d1782ef105a5906b3fe6c6efb4573fe0",
+  "publicProofSource": "bf939afca34b1dbed5d8d45193f52a8d3b439ed2",
+  "publicProofSha256": "07549687c93fd50dde8159c81fba449235ab1230c7208938721ba77879489c44",
+  "guestProofBytesMatchPublicSource": true,
+  "qualificationHelperSha256": "cdedafb597e04ed86a2307c93e7109019df62dd040693aab8542121817bdc24e",
+  "installedPayloadOverlayUsed": false,
+  "commandExitCode": 0,
+  "normalBrowserSandbox": true,
+  "xDisplayRemoved": true,
+  "nativeCompositorOwnedSocketVerified": true,
+  "observedInput": {
+    "publicObservationPauseSeconds": 60,
+    "privateDriverOverlayUsed": false,
+    "pauseAloneUsedAsEvidence": false,
+    "actualObservedCopyTooltipAndButton": true,
+    "guardedOwnedVirtualTabletInput": true,
+    "matchingBrowserPidFixtureAndProofHash": true,
+    "inputReceipt": {
+      "bytes": 411,
+      "sha256": "c49296dfd276c700f85fee89178be0ceda1aea6b5eb64d83b87ea8008a177f3f"
+    },
+    "readinessReceipt": {
+      "bytes": 257,
+      "sha256": "6ef2f2587ebf53e214a1d9e836121adcbc3b77d6deec09b33c5ce9629b2005a9"
+    },
+    "ownerDevicesUsed": false
+  },
+  "assertions": {
+    "navigateSnapshotTypeClick": true,
+    "actualPageResultVerified": true,
+    "copyClipboardAndScroll": true,
+    "reconnectWithoutReplay": true,
+    "branchToolContext": true,
+    "editResubmitsOnce": true,
+    "sharedPromptsConflictAndClipboard": true,
+    "supportReportDownloadedAndPrivate": true
+  },
+  "actualRendererCount": 6,
+  "allRenderersSeccomp2NoNewPrivs1DistinctPidNetNamespaces": true,
+  "fixtureModelRequests": 8,
+  "reconnectBudgetSeconds": 90,
+  "reconnectElapsedSeconds": 57.666993979000836,
+  "commandElapsedSeconds": 245.05563673000142,
+  "productTimeoutsChanged": false,
+  "commandReceipt": {
+    "bytes": 228,
+    "sha256": "46b787b24d82c9a42061b4aa9214e663da0d64da2daf05874c05e054bde81bb8"
+  },
+  "resultReceipt": {
+    "bytes": 6187,
+    "sha256": "cb1812a2b4445736bd2080f7d8095d6ee5d2237b8ebf799de1aa2de77c2caecd"
+  },
+  "finalSyntheticUiVisuallyInspected": true,
+  "historicalFailuresRetained": [
+    "CDP-only114 clipboard",
+    "diagnostic122 transient copied tick",
+    "30-second recovery105/107",
+    "diagnostic108 completed assertions with SSH hang"
+  ],
+  "remaining": [
+    "DSH Browser, fresh shared onboarding and ordinary manual extension setup",
+    "Other distro Browser and desktop permission acceptance",
+    "Current matching two-instance Settings/shortcuts/reboot/password lock",
+    "Mint complete setup and Cinnamon full acceptance",
+    "Coherent native dependency maintenance",
+    "Physical audio",
+    "Product-version/managed history upgrade and rollback",
+    "Complete source/rebuild/replacement/license obligations"
+  ],
+  "candidateOnly": true,
+  "publicRelease": false,
+  "allFiveRolloutPointsComplete": false
+}

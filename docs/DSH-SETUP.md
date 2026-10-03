@@ -66,6 +66,27 @@ the same protected-token helper. A bootstrap startup-failure/retry test checks
 the token is readable through the strict validator and never rotates. New native
 execution is pending; no existing user's token or directory ACL was migrated.
 
+Complete setup bounds each owned runtime startup, including its restart after
+integration installation, at 120 seconds. A process that exits is refused
+immediately. Readiness still requires the actual launch token and authenticated
+`host.describe`; product checks, source/runtime verification and owned-process
+cleanup continue through the normal path. Timeout does not retry integration
+installation or any model/input action.
+
+The margin follows software-emulated VM evidence from 3 October 2026. The
+unchanged clean `3688a095` Mint 22.3 installer reached integration installation
+but failed its second startup at the previous 60-second bound, leaving its
+owned receipt `preparing` and no desktop selection. An independent run of that
+exact installed DSH entrypoint became ready at 55.86 seconds; immutable runtime
+resolution measured 13.01 seconds separately. These timings show a narrow
+startup margin and do not establish the exact cause of the earlier failure.
+The original artifact is still unqualified for complete installation. The new
+bound needs a matching clean rebuilt artifact/bundle and safe idle recovery of
+the original owned partial installation before repeat execution. It has no
+private timeout environment option or installer overlay. Source tests cover
+late first/second startup, early process exit, bounded timeout cleanup, token
+preservation and unchanged payload/runtime mismatch refusal.
+
 The native and browser transports use authenticated Typert RPC and scoped session
 streams. Model Picker Augmented **1.1.2** is the compatible optional DSH plugin;
 its pins and visibility are shared by both DSH surfaces. It does not curate Pi or

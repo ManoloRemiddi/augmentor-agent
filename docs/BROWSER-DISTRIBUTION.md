@@ -101,6 +101,20 @@ uses compositor input serials when setting a selection; whether that explains
 all behavior remains under investigation. Public qualification scripts never
 infer a passing clipboard result from a UI tick alone.
 
+### Maintained native Wayland acceptance
+
+[The maintained checkpoint](../release/qualification/next-targets/20261003-native-wayland-browser-maintained-proof.json)
+passes the exact publicbf939af driver through installed clean423 Leap release5:
+normal headed native Wayland command exit0, all Pi fixture assertions, six
+sandboxed renderers, X fallback removed and57.67-second recovery without replay
+under an explicit90-second VM budget, with exactly8 fixture model requests.
+The60-second observation pause is paired with an actual observed Copy button,
+guarded owned-tablet input and matching browser/fixture/proof receipts. No
+private driver or installed payload overlay is used. Historical114/122 failures
+remain. This certifies only the recorded Leap/Pi/local-fixture case; DSH Browser,
+fresh shared onboarding/manual extension loading, other distros and physical
+hardware remain separate. The earlier diagnostic is retained below.
+
 ### Native Wayland observed input
 
 [The real-input diagnostic](../release/qualification/next-targets/20261003-native-wayland-browser-real-input-diagnostic.json)

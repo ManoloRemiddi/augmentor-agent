@@ -1,0 +1,132 @@
+{
+  "format": "augmentor-linux-rollout-checkpoint/1",
+  "date": "2026-10-03",
+  "target": "linuxmint22.3-amd64",
+  "artifactSource": {
+    "commit": "3688a095ffa4221e8ea919c331e6eff6d35cb25d",
+    "dirty": false
+  },
+  "scope": "Owned persistent Mint22.3 Cinnamon ISO VM, normal signed native APT and ordinary user exact complete setup, no installed payload or installer overlay",
+  "nativePackageInstallation": {
+    "passed": true,
+    "authenticatedAptRefresh": {
+      "passed": true,
+      "gpgvStatus0Count": 5,
+      "fingerprints": [
+        "302F0738F465C1535761F965A6616109451BBBF2",
+        "F6ECB3762474EDA9D21B7022871920D1991BC93C"
+      ],
+      "stdoutSha256": "37428b23339a89b983d9281c9b815c50298a68ba65174c94d0f0a80a1f9c136a",
+      "stderrSha256": "447fb218c0a54f8ba5b9733bae0d6311d2f25bcea1e7be9275a2b3a0d642b40a"
+    },
+    "dryRunSummary": "10 upgraded, 386 newly installed, 0 to remove and 502 not upgraded.",
+    "packageAuditClean": true,
+    "nativeAuditClean": true,
+    "cinnamonMuffinScreensaverKernelMesaPipewireLibcNotChangedByTransaction": true,
+    "pythonPatchAfter": "3.12.3-1ubuntu0.17"
+  },
+  "preparedRuntime": {
+    "passed": true,
+    "selectedDesktop": false,
+    "resolveSeconds": 13.167852450998907,
+    "profile": "mint223-cp312-x86_64-source-qt-voice",
+    "contract": {
+      "format": "augmentor-linux-python-runtime-contract/1",
+      "target": "linuxmint22.3-amd64",
+      "profile": "mint223-cp312-x86_64-source-qt-voice",
+      "pythonAbi": [
+        3,
+        12
+      ],
+      "architecture": "x86_64",
+      "lockIdentity": "1288cb482b8db727b8cdf349a97cbcd4473a44fe6945862a1ac141d4a8b86c9a",
+      "policySha256": "2dc64e6d1c02579970a61cb0b200c79c8a36d84aa54e021dcb1cfafa9b3f2f16",
+      "licenseReviewComplete": false,
+      "embeddedSourceCoverageComplete": false,
+      "sourceQt": {
+        "format": "augmentor-source-qt-runtime-input/1",
+        "directory": "source-qt",
+        "qtVersion": "6.8.2",
+        "manifestSha256": "c49faf50a992daca825c51929715c6114017e6b29ac54af17f9656db41e73364",
+        "derivationReceipt": {
+          "file": "source-pyside-derivation.json",
+          "sha256": "de6edc207b0ce7279de6972b5694d3063161f4fd9c46b865245ca0c471d2990c",
+          "bytes": 1063
+        }
+      }
+    },
+    "qtVersion": "6.8.2",
+    "pysideVersion": "6.8.2.1",
+    "exactSevenWheels": true,
+    "qmlComponentCreated": true,
+    "mappedNativeQtLibraries": 15,
+    "lddClosureCount": 23,
+    "qtSonameCount": 18,
+    "platformPluginCount": 5,
+    "allLddDependenciesFound": true,
+    "receiptSha256": "1b87635d49e5bcf18281cdf7a40bf416b90f768f4babcdf51d31554b1ac45fc4"
+  },
+  "completeInstaller": {
+    "passed": false,
+    "setupOverlayUsed": false,
+    "failure": "The new DSH runtime did not become ready within the original60s bound",
+    "failedStart": "second startup after integration installation; retained ownership and presets establish completed Setup.install",
+    "exactOriginalCauseEstablished": false,
+    "originalSetupLogBytes": 0,
+    "preparingReceipt": {
+      "bundle": "0.2.13-linuxmint22.3-amd64-complete-preview.1-3688a095ffa4",
+      "status": "preparing"
+    },
+    "desktopSelectionExists": false,
+    "modelTurnsReached": false,
+    "offscreenRenderReached": false,
+    "retryPerformed": false
+  },
+  "independentReadiness": {
+    "readyAfterSeconds": 55.8611,
+    "firstLogAfterSeconds": 54.3572,
+    "tokenAfterSeconds": 55.364,
+    "exactOriginalCauseEstablished": false,
+    "sameUnchangedEntry": true,
+    "noModelOrInputRequests": true,
+    "originalPreparingReceiptPreserved": true,
+    "originalIndependentChildrenReaped": true,
+    "nodeMainThreadCommFilterCorrected": true
+  },
+  "maintainedSetupChange": {
+    "ownedStartupDeadlineFromSeconds": 60,
+    "ownedStartupDeadlineToSeconds": 120,
+    "changedFiles": [
+      "scripts/setup-complete.py",
+      "tests/test_complete_setup.py",
+      "docs/DSH-SETUP.md"
+    ],
+    "setupSha256": "d3c2a93b344115a9859edb9855c0b137c9602b9471831d39a4e966d9bcc784f2",
+    "earlyProcessExitTokenHostDescribeIntegrityProductIdentityCleanupAndNoReplayUnchanged": true,
+    "completeSetupCasesPassed": 16,
+    "nativeCompleteCasesPassed": 7,
+    "newMatchingArtifactsAndSafePartialRecoveryAcceptancePending": true,
+    "notAFedoraNativeSetup120TimeoutFix": true
+  },
+  "privateReportReceipt": {
+    "bytes": 18037,
+    "sha256": "024e0aac676585e6c4828e23dfe13b2f94cc884bf67ab7be0b5a3ae94349abed"
+  },
+  "nobleCandidatePreparation": {
+    "artifactSource": "3688a095ffa4221e8ea919c331e6eff6d35cb25d",
+    "candidateSeparateFromSelectedRoot": true,
+    "preparedRuntimePassed": false,
+    "refusal": "libdouble-conversion.so.3 absent from older vendor-runtime fixture baseline",
+    "selectionUnchanged": true,
+    "runtimeGuardNotRelaxed": true,
+    "normalSourceQtNativeDependencyAdmissionPending": true,
+    "receipt": {
+      "bytes": 4140,
+      "sha256": "9eeb53ffa1cc5d2784bdbbb496ac0ffb8aebc11d78f15d19004c9d6c60fce10f"
+    }
+  },
+  "sourceLicenseReviewComplete": false,
+  "candidateOnly": true,
+  "publicRelease": false,
+  "allFiveRolloutPointsComplete": false
+}

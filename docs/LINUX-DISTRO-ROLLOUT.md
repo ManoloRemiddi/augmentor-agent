@@ -1,6 +1,33 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
 
+## October 3 maintained native Wayland Browser acceptance
+
+[The maintained proof checkpoint](../release/qualification/next-targets/20261003-native-wayland-browser-maintained-proof.json)
+passes headed Chromium154 native Wayland through the installed clean423 Leap
+release5 host with exact publicbf939af proof bytes and its explicit60-second
+observation pause. An actual observed Copy button/tooltip and guarded owned-VM
+tablet input are retained separately, matched to browser PID, private fixture
+and proof hash. All real page/OS clipboard/branch/edit/prompt/report assertions
+pass with normal command exit0. Six renderers retain sandbox isolation, X
+fallback is removed and recovery takes57.67seconds under the90-second VM budget,
+with exactly8 fixture model requests and no replay. No private driver or installed
+payload overlay is used. Earlier failures remain retained. This closes this
+exact Leap/Pi/local-fixture native Wayland Browser case; DSH Browser, fresh shared
+onboarding/manual extension setup, other distros and hardware remain separate.
+
+Mint's failed complete setup is identified as the second DSH restart after its
+integration presets/ownership were written. An unchanged independent startup
+measures55.86seconds, making the60-second deadline tight under TCG; it does not
+prove the exact original timeout cause. The [maintained bounded120-second startup fix](../release/qualification/next-targets/20261003-mint-native-install-runtime-startup-bound.json)
+passes16 setup and7 native complete cases; fresh matching installation acceptance
+and explicit partial recovery remain required. Ubuntu's dedicated
+comparison guest remains on its oldc4b selection; its observed Connect DSH
+modal was dismissed with Later, without saving connection. A separately hashed
+clean368 candidate is extracted and its new source runtime is being prepared;
+no activation/restart or current shortcut acceptance is yet claimed.
+
+
 ## October 3 native Wayland real-input Browser diagnostic
 
 [The real-input checkpoint](../release/qualification/next-targets/20261003-native-wayland-browser-real-input-diagnostic.json)

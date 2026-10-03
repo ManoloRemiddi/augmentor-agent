@@ -21,6 +21,9 @@ from urllib.parse import urlsplit
 import zipfile
 
 ROOT=Path(__file__).resolve().parents[1]
+# Source-hashed native runtimes can take nearly a minute to start under TCG.
+# Keep first boot and the integration restart bounded, with room for that work.
+PRODUCT_STARTUP_SECONDS=120
 NPM_ENGINE_PROBE="""const root=process.argv[1];
 const fromNpm=require('node:module').createRequire(root+'/package.json');
 const p=fromNpm('./package.json');const semver=fromNpm('semver');
@@ -172,7 +175,7 @@ def configure_product(app, cli, home, endpoint, env, state, *, save=True):
             command=([str(app/'node/node.exe'),str(cli)] if sys.platform=='win32' else [str(cli)])
             process=OwnedProcess([*command,'web','--no-open','--host','127.0.0.1','--port',str(urlsplit(endpoint).port)],
                                  env=env,stdout=log,stderr=log)
-        deadline=time.monotonic()+60
+        deadline=time.monotonic()+PRODUCT_STARTUP_SECONDS
         while time.monotonic()<deadline:
             if process.poll() is not None:raise RuntimeError('The new DSH runtime stopped (exit '+str(process.poll())+'). Private diagnostic: '+str(log_path))
             matches=re.findall(r'token=([A-Za-z0-9_-]+)',log_path.read_text(errors='replace'))
