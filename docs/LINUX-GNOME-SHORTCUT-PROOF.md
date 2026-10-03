@@ -42,6 +42,25 @@ established password authentication, locked shortcut behavior or recovery.
 An actual run also needs the full VM/native/managed-artifact admission and
 observed normal GNOME password entry; administrative unlock is separate cleanup.
 
+The [October3 actual password checkpoint](../release/qualification/next-targets/20261003-noble-real-password-authentication-partial-pass.json)
+records the subsequent owned Ubuntu GNOME46 run. One wrong password produces the
+native failure screen and PAM failure record; one correct password unlocks
+normally. No administrative unlock is used. The same accepted idle main PID5599,
+mapped native window, source368 selection and Shell owner survive. The observer
+refuses while locked; a fresh unblocked observer has a new epoch after unlock.
+Full native/managed/runtime checks pass before and after. The complete original
+account database and password age are independently verified restored, both
+temporary readable credentials removed, and PAM/GDM configuration preserved.
+
+This is partial qualification: the first F9/F10 lock sequence has no registered
+custom shortcuts because the previous proof restored its original empty registry.
+Its unchanged app state does not qualify shortcut suppression. F10 opens the
+native password context menu, dismissed once without entering a credential.
+The retained observer worker exits normally before password entry, so its stale
+instance is not read after unlock. A fresh run needs verified registrations,
+both running windows and the retained stale-instance check. No installed payload
+is patched, key/password action replayed or production input enabled.
+
 ## Actual Settings controls
 
 Normal app launches reject every UI test request. The existing hidden
