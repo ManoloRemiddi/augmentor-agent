@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 Fedora GNOME exact release-phase refusal
+
+[The v5 checkpoint](../release/qualification/next-targets/20261003-fedora-gnome-v5-release-serial-partial-failure.json)
+passes actual observed consent and two retained original visual captures on the
+unchanged clone/native2035 selection. One diagnostic center click delivers one
+callback, then refuses the normal button release: serial3405→3406 is the only
+changed compared field. Motion and press RPCs replied; original cleanup balances
+the held button and closes the pinned session. This remains partial delivery/FAIL,
+with no later input. Independent probe/helper/target absence, complete native/
+managed inventories, protected20 and full frozen backing hashes pass. A Mutter
+raise-on-click/observer-raised pulse is supported by pinned source and settings;
+its exact signal origin is unrecorded. Production input remains disabled.
+
 ## October 3 separate published product-version preparation
 
 [The product-version preparation checkpoint](../release/qualification/next-targets/20261003-published-product-upgrade-preparation.json)

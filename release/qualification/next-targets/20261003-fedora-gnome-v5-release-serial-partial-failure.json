@@ -1,0 +1,315 @@
+{
+  "format": "augmentor-linux-qualification-checkpoint/1",
+  "date": "2026-10-03",
+  "scope": "Owned Fedora44 GNOME clone v5 original JPEG/visual capture PASS; first diagnostic center action partial delivery/API FAIL with exact serial-only release refusal; no further input",
+  "candidate": {
+    "probeSource": "7d4afe5164afa44bae98eea360822c638c4d7973",
+    "probeSha256": "3d719011e0ef50e90ad63278fdd5ce4dd55e58d168d4e6d24f9a4cad1a7f8351",
+    "remainingTenFilesSource": "0ab022a6a26ae0165b57e1662203e71f544aab9a",
+    "controllerSha256": "1be68fc8758850bbb57e05bf04f8f8bcd8b3101a01d651a89899cf8f353c6ea0",
+    "stagedFiles": 11,
+    "freshPrivateDirectory": true,
+    "traceIdleWatch": true,
+    "retainOriginalCaptureImage": true,
+    "oldFailuresRetained": true,
+    "traceDispatch": true
+  },
+  "selected": {
+    "source": "2035af99b46bb013e81de9766216da820ab4a325",
+    "artifactSha256": "538136182ad7f7886b064b553d1154cb99b53c634da7e478d01f8bbaf4e4d639",
+    "target": "fedora44-x86_64",
+    "python": "/usr/bin/python3",
+    "nativeSource": "2035af99b46bb013e81de9766216da820ab4a325",
+    "nativeRpmAuditClean": true,
+    "managedInventoryAndExactDeploymentVerified": true,
+    "inheritedOverridesRefused": true,
+    "bytesSha256": "2286b529b497c4991be7646f8fb94fc922b2a16e8f4f61ee0189b9c4b0a624ee",
+    "unchangedDuringCandidate": true
+  },
+  "environment": {
+    "uid": 1000,
+    "virtualization": "QEMU TCG",
+    "desktop": "GNOME Wayland",
+    "shellVersion": "50.5",
+    "gtkTargetBackend": "GdkWaylandDisplay",
+    "qtBannerBackend": "xcb",
+    "selinux": "Enforcing",
+    "monitorScale": 1,
+    "monitorCount": 1
+  },
+  "consent": {
+    "result": "PASS",
+    "observedNativePortalOwnerAndForegroundGeometryBeforeActions": true,
+    "requests": [
+      "CreateSession",
+      "SelectDevices",
+      "SelectSources",
+      "Start"
+    ],
+    "connectReportedSharing": true,
+    "existingKeyboardPointerAndSingleMonitorContractPassed": true,
+    "connectSeconds": 174.1232127050007,
+    "nativeConsentActionsReplayed": false
+  },
+  "capture": {
+    "result": "PASS",
+    "visualReview": "PASS: original retained JPEG observed by child and parent before authorizing input",
+    "explicitCaptures": 2,
+    "capturesAreDistinctAuthorizedObservations": true,
+    "captureReplay": false,
+    "initialCaptureSeconds": 2.4198331700008566,
+    "freshCenterObservationSeconds": 1.1948739170002227,
+    "imageSize": {
+      "width": 1280,
+      "height": 800
+    },
+    "rawOriginalJpegs": [
+      {
+        "label": "initial parent visual review",
+        "mimeType": "image/jpeg",
+        "bytes": 53884,
+        "sha256": "7cdf03e82352bd3f6864e23ad214c61a2121197e1defb34dd3ce8d1cb6f7b3b5",
+        "width": 1280,
+        "height": 800,
+        "mode": "0600"
+      },
+      {
+        "label": "fresh matching center observation",
+        "mimeType": "image/jpeg",
+        "bytes": 54019,
+        "sha256": "8817234ced3f34c6fcc23076ad34475643fd487f5ed38abdc8152a1e1d66e92d",
+        "width": 1280,
+        "height": 800,
+        "mode": "0600"
+      }
+    ],
+    "sourceTargetOwnerGeometryAndHelperMatchedBeforeAction": true,
+    "freshCaptureDifference": "Only visible desktop clock changed; target fixture/layout/source/owner/geometry matched approved initial image"
+  },
+  "input": {
+    "result": "FAIL / partial delivery",
+    "actionsAttempted": 1,
+    "firstAction": {
+      "kind": "click",
+      "imagePixelPoint": {
+        "x": 640,
+        "y": 557
+      },
+      "screenPixelDimensions": {
+        "width": 1280,
+        "height": 800
+      },
+      "actualLogicalMonitorDimensions": {
+        "width": 1280,
+        "height": 800
+      },
+      "monitorScale": 1,
+      "coordinateMapping": "API accepts image pixels and scales to logical monitor size; actual dimensions/origin agree",
+      "seconds": 1.020361803999549,
+      "apiError": {
+        "kind": "RuntimeError",
+        "message": "GNOME target changed before dispatch. No action is replayed."
+      },
+      "nativeCenterCallbackCount": 1,
+      "apiRefusalAndCallbackBothRetained": true,
+      "exactFailingNotifyMethodEstablished": true,
+      "exactChangedSceneFieldAtRefusalEstablished": true
+    },
+    "textA": "",
+    "textB": "",
+    "clicks": {
+      "center": 1,
+      "edge": 0
+    },
+    "saveChordCount": 0,
+    "savedFileExists": false,
+    "edgeTextFocusAsciiCtrlS": "not executed after first failure",
+    "passwordFocusRefusalVisibleStop": "not executed",
+    "noReplay": true
+  },
+  "diagnosis": {
+    "refusedSequence": 60,
+    "method": "NotifyPointerButton",
+    "dispatchState": "release",
+    "heldButton": true,
+    "cancelled": false,
+    "changedFields": [
+      "serial"
+    ],
+    "recordedSerial": 3405,
+    "currentSerial": 3406,
+    "allOtherActualComparedFieldsEqual": true,
+    "firstErrorSequence": 61,
+    "controllerFailureRecord": {
+      "phase": "dispatch-guard",
+      "kind": "RuntimeError",
+      "message": "GNOME target changed before dispatch. No action is replayed."
+    },
+    "normalReleaseNotifyNotDispatched": true,
+    "nativeRpcSequence": [
+      {
+        "sequence": 21,
+        "phase": "send",
+        "method": "NotifyPointerMotionAbsolute",
+        "dispatchState": "motion",
+        "timeoutMs": 5000,
+        "flags": 1,
+        "cancellablePresent": true,
+        "elapsedSeconds": 0.007961989998875652,
+        "outcome": "reply"
+      },
+      {
+        "sequence": 43,
+        "phase": "send",
+        "method": "NotifyPointerButton",
+        "dispatchState": "press",
+        "timeoutMs": 5000,
+        "flags": 1,
+        "cancellablePresent": true,
+        "elapsedSeconds": 0.004129953998926794,
+        "outcome": "reply"
+      },
+      {
+        "sequence": 62,
+        "phase": "cleanup",
+        "method": "NotifyPointerButton",
+        "dispatchState": "release",
+        "timeoutMs": 1000,
+        "flags": 1,
+        "cancellablePresent": false,
+        "elapsedSeconds": 0.005872498999451636,
+        "outcome": "reply"
+      },
+      {
+        "sequence": 63,
+        "phase": "cleanup",
+        "method": "Close",
+        "dispatchState": "close",
+        "timeoutMs": 1000,
+        "flags": 1,
+        "cancellablePresent": false,
+        "elapsedSeconds": 0.25897431199882703,
+        "outcome": "reply"
+      }
+    ],
+    "nativeCallbackCountAfterFailure": 1,
+    "callbackAttribution": "Original normal release was refused before RPC; original cleanup release replied then Session.Close replied. Native callback1 is retained, without claiming compositor/GTK delivery acknowledgement from portal replies.",
+    "observerSignalOriginEstablished": false,
+    "raiseOnClickReadOnlySetting": true,
+    "raiseSignalExplanation": "Supported inference: pinned Mutter50.5 unmodified button press with raise-on-click calls meta_window_raise; that emits raised unconditionally, even without a final stack change. Exact enabled observer connects raised to bump. V5 did not retain signal origin.",
+    "enabledVersusPackagedExplanation": "GNOME50 watched bump signal sets are unchanged by profile expansion; source difference is not established as the failure cause. No extension/session change occurred.",
+    "v4ExactRefusalField": "not established by this separate v5 run",
+    "v2NativeTimeout": "still unexplained"
+  },
+  "enabledObserverBoundary": {
+    "enabledSource": "aef93bb04520a003c5c48536aa6d4210105fc8ad",
+    "enabledSha256": "48897dc5a9ce5be70f1a2affdfb686309e7b8f0b15d6e0692380f5c00100f6a2",
+    "enabledBytes": 12078,
+    "enabledMetadataSha256": "a7efef723de923d96cd0039c21513251e09a847d4ae52b790355fc023a19511e",
+    "enabledProfile": "GNOME50-only",
+    "packagedSelectedSource": "2035af99b46bb013e81de9766216da820ab4a325",
+    "packagedSelectedSha256": "ec8543ab1ed23d04e5efc3d7485256ca8907d81252250d074e464cc843ca4db8",
+    "packagedSelectedBytes": 12917,
+    "nativePortalAndShellOwnersUnchanged": true,
+    "extensionWasNotChangedOrRestarted": true,
+    "differenceEstablishedAsFailureCause": false
+  },
+  "idleWatch": {
+    "limit": 128,
+    "totalCalls": 13368,
+    "droppedCalls": 13240,
+    "recordingFailures": 0,
+    "firstError": null,
+    "retainedCalls": 128,
+    "boundsUnchanged": true
+  },
+  "dispatchTrace": {
+    "limit": 128,
+    "totalCalls": 63,
+    "droppedCalls": 0,
+    "recordingFailures": 0
+  },
+  "cleanup": {
+    "closed": true,
+    "stopReason": "requested",
+    "stopClicked": false,
+    "automaticAfterActionError": true,
+    "seconds": 0.3197464779987058,
+    "stopGuiTick": 14674,
+    "finalGuiTicks": 14681,
+    "probeAbsent": true,
+    "targetAbsent": true,
+    "candidateAndSeparateDiagnosticHelpersAbsentIndependent": true,
+    "normalExactOwnedTargetSigtermOnce": true,
+    "noKillReplay": true
+  },
+  "originalPreservation": {
+    "originalOff": true,
+    "bothBackingFdsReadOnly": true,
+    "fullFrozenBaseHashesUnchanged": true,
+    "previousAdoptionCheckpoint": "20261003-fedora-gnome-clone141-adoption-input-import-refusal.json",
+    "hostDiskFloorBytes": 4294967296,
+    "lastMeasuredHostFreeBytes": 8797278208,
+    "originalBootForbiddenWhileDependentOverlayReusable": true,
+    "frozenLayers": [
+      {
+        "sha256": "288f211693355adb382714211a1be6c53bfdd214d186855a26c4cddb2c905817",
+        "bytes": 5527961600,
+        "mode": "0o400"
+      },
+      {
+        "sha256": "28680fe5b371a5a82ebf43a31926e086a168e59949d03969c5093e7071f90b7f",
+        "bytes": 583729152,
+        "mode": "0o444"
+      }
+    ]
+  },
+  "preStageRefusals": {
+    "allRetained": true,
+    "oldV1MissingReport": "Exact known pre-Qt kwin import failure hash/PID absence admitted separately; no old retry",
+    "scene": "Empty ordinary idle desktop with sole no-visible-live-focus admitted only for one target start after actual image/native owner review; input guards remained unchanged",
+    "hostFloor": "Earlier below-floor refusal retained; no allocation or guest action from that refusal"
+  },
+  "privateEvidenceDigests": [
+    {
+      "label": "final-private-report",
+      "sha256": "1739de6df7613b3c8745156069cba396716a4aa024af5e2c65f8a9505faf9828",
+      "bytes": 129704
+    },
+    {
+      "label": "full-dispatch-trace",
+      "sha256": "4efa150038e498fbe84828147967f7ea7f912f200fd33f42c4a74686e4888a8e",
+      "bytes": 67255
+    },
+    {
+      "label": "final-idle-trace",
+      "sha256": "4092eea250f9f9e4598df8e24d22de648da44d751ccbf318109b326dba744340",
+      "bytes": 45507
+    },
+    {
+      "label": "final-full-closure-guards",
+      "sha256": "af2a2ea8098932432d40f20ecc75c2793e665a139a4a5a69419488ab29965a59",
+      "bytes": 4472
+    },
+    {
+      "label": "single-center-action",
+      "sha256": "af189ea13a8d19c61282d62b9af82f9771e9f2b30bc9005ffc094567a9331b3e",
+      "bytes": 102518
+    },
+    {
+      "label": "normal-target-cleanup",
+      "sha256": "cadf3fb0a73f3f40c47188486d4c0cad2b194778582232bd0b9913ecaf36bf8b",
+      "bytes": 176
+    },
+    {
+      "label": "readonly-raise-setting",
+      "sha256": "08b120309c0ac7b229535bf510466e3196fc3db1be8462471ba6a6b778ec2679",
+      "bytes": 183
+    }
+  ],
+  "privateFinalEvidenceManifestSha256": "8a60f944ce7de86e5b26205d8306fc0db68730c472e61dc23469bd208665b3b1",
+  "productionGnomeInputQualified": false,
+  "productionGnomeInputEnabled": false,
+  "remaining": "Review held-input release lifecycle proposal and missing signal-origin contract before any controller change or fresh action; serial-only equality is insufficient to ignore scene history or qualify input",
+  "status": "partial-pass-consent-visual-capture-input-fail"
+}

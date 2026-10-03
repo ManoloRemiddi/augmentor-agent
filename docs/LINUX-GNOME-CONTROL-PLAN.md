@@ -678,3 +678,121 @@ and restoration after refusal/disposal. These are source checks with synthetic
 native endpoints, not a new guest execution or input acceptance. A distinct
 fresh11-file candidate with the reviewed probe and ten exact0ab files must be
 published and explicitly authorized before another owned VM run.
+
+## October 3 v5 diagnostic center release refusal; cleanup verified
+
+The [v5 checkpoint](../release/qualification/next-targets/20261003-fedora-gnome-v5-release-serial-partial-failure.json)
+retains a separate fresh run with probe7d4afe5/SHA3d719011 and the same ten
+0ab runtime/target files. Strict native/selected2035, artifact538136, managed
+inventory/deployment receipt, clean native RPM, normal environment and unchanged
+protected settings passed before execution and again after cleanup. The enabled
+observer remained the earlier aef93bb GNOME50-only extension; the expanded2035
+extension stayed packaged and was not enabled or restarted.
+
+Observed portal consent passed in174.123s within the unchanged180s probe bound.
+The initial explicit capture passed in2.420s. Its original53884-byte JPEG,
+SHA7cdf03e82352bd3f6864e23ad214c61a2121197e1defb34dd3ce8d1cb6f7b3b5,
+was exported without conversion under the approved stable inode/device/owner/
+mode/link-count/size/mtime/ctime and hash check, excluding ordinary atime. Child
+and parent actually viewed the empty native target, both text buffers, synthetic
+password control, center/far-edge buttons, active visible Stop, and unobstructed
+1280×800 desktop. A distinct authorized fresh observation passed in1.195s before
+the one approved center click. Its original54019-byte JPEG,
+SHA8817234ced3f34c6fcc23076ad34475643fd487f5ed38abdc8152a1e1d66e92d,
+was actually viewed by the child; layout/target/source/owner/geometry matched,
+with only the visible desktop clock changed. The old token was not reused.
+
+The click at image pixel640,557 failed in1.020s. The actual API mapping was
+1280×800 image to1280×800 logical monitor, scale1/origin0. Motion RPC sequence21
+and press RPC43 replied. At sequence60, immediately before the normal
+`NotifyPointerButton` release, the original `same_scene` predicate refused:
+**serial3405→3406 was the only changed field in the actual compared objects**.
+Target/window identity, geometry, windows/above, workspace/monitor, guards,
+compositor owner and all other compared fields stayed equal. The button was
+tracked as held and cancellation was false. No normal release RPC was sent.
+Sequence61 retains the original guard RuntimeError as the first
+`dispatch-guard` failure; neither the error nor its outcome was retried.
+
+Original automatic cleanup then sent one release at sequence62 and one
+Session.Close at63 to the pinned frontend owner. Both replied under the existing
+1000ms/NO_AUTO_START/no-cancellable bounds. Actual GTK center callback count was1;
+edge0, both text buffers empty, save count0 and saved file absent. This is partial
+delivery with an API refusal, not accepted input. Portal replies alone are not
+widget-delivery acknowledgements. No edge, focus, ASCII, chord, password or
+visible Stop phase ran. Idle trace recorded13368 calls without first error;
+dispatch trace retained all63 records with zero dropped records or sink failures.
+The unexplained v2 native timeout and uninstrumented v4 refusal remain separate
+failures; v5 does not retrospectively establish either cause.
+
+Automatic cleanup completed in0.320s, with GUI ticks continuing14674→14681.
+Independent process reads found the probe/helper absent, followed by one normal
+exact-owned target SIGTERM and independent target/helper/probe absence. Final
+source11/native/selected/full inventory, protected20/selection/appearance/
+previous selection, portal/Shell owners, both full frozen backing hashes,
+read-only backing FDs, original-off condition and4GiB floor passed. Host free
+space was8,797,278,208 bytes. Original VM boot remains forbidden while the
+reusable clone overlay depends on its frozen guest/cloud backing files.
+
+### Serial rationale and release lifecycle proposal; no controller change
+
+`scene.same_scene` deliberately includes the observer serial; its only exception
+is the focused window's title. This guards against transient events whose final
+snapshots happen to agree. The exact enabled observer increments one shared
+counter for display focus/restack/grab/visibility/workarea/monitor events,
+workspace/session/overview/stage/shield events, tracked window lifecycle/
+geometry/property/raised events, actor properties and new tracking. It retains
+no event name or object attribution. Consequently v5 establishes the changed
+field and release phase, but does not establish the signal that changed it.
+
+Pinned [Mutter50.5 button handling](https://github.com/GNOME/mutter/blob/50.5/src/core/window.c#L7155)
+provides a concrete supported inference: an unmodified button press can raise its
+window when raise-on-click is enabled, and `meta_window_raise` emits `raised`
+unconditionally after the raise attempt. A read-only guest settings query found
+raise-on-click true; the enabled observer connects `raised` to `bump`. This can
+produce a serial change even when the final stacking/focus/geometry is equal.
+V5 did not record the signal origin, so this is not a proven native cause.
+The enabled-versus-packaged diff adds profiles, GNOME46 compatibility, parent
+session mode and unlisted-focus handling; on GNOME50 it leaves the watched bump
+signals unchanged. That packaging difference does not explain this failure.
+
+A proposed maintained candidate change must distinguish admission of new input
+from balancing input already owned by the pinned session. Keep fresh consumed
+scene/serial/point guards for motion and every press; keep complete nonpassword
+helper identity/focus/serial gates for each key press and character. Explicitly
+track per-session press intent, native-call-started, reply/unknown outcome and
+release-attempted state. Record release intent before its one RPC. Never clear a
+held record merely because a frontend reply arrived without the existing
+post-call owner/generation checks. Never replay a press, a release whose outcome
+is already unknown, or a Close on an uncertain previous dispatch.
+
+A release admitted under an unchanged scene remains ordinary dispatch. If
+serial, actual window/focus/geometry/covering topology/workspace/monitor, any
+lock/modal/overview/stage guard, native owner, cancellation or generation
+invalidates the action, preserve that first cause and stop all new presses.
+Balancing a held input must use only the original pinned session/unique owner,
+never a newly focused window or reattached connection. A bounded cleanup release
+is damage limitation and may itself trigger a click; it must never convert the
+failed action into success or authorize further characters. Retire helper/token,
+then dispose the original session. Owner loss, cancellation and an unknown
+release require closure of that original session, without a normal-input retry.
+
+The current code already takes the conservative terminal cleanup route here;
+the proposed accounting makes its outcome explicit rather than accepting a
+serial-only release. Pinned [Mutter50.5 session closure](https://github.com/GNOME/mutter/blob/50.5/src/backends/meta-remote-desktop-session.c#L453)
+drops the virtual devices, and its [native device destruction](https://github.com/GNOME/mutter/blob/50.5/src/backends/native/meta-virtual-input-device-native.c#L147)
+releases outstanding keys/buttons before removing the device. This supports
+original-session disposal after uncertain Notify; it is source evidence, not a
+tested target-specific cancellation guarantee. The frontend's asynchronous
+backend call still requires real buffer/callback/save checks.
+
+If allowing successful completion after a benign self-induced serial event is
+later proposed, equal current fields alone are insufficient: focus or lock can
+change away and back between reads. A reviewed bounded observer event-origin/
+serial-history contract must establish complete coverage without gaps, attribute
+the event to the owned operation/window and exclude those transitions. Until
+then preserve serial refusals. Future tests must cover serial-only release,
+focus away/back, window destruction/movement/coverage, lock/overview/workspace,
+owner/generation loss, press/release reply loss, release intent once, first-cause
+retention and original helper/session disposal. Source review precedes controller
+implementation; publication and a fresh owned-run authorization precede another
+action. Production GNOME input remains disabled and unqualified.
