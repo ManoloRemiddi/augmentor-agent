@@ -142,8 +142,8 @@ The retained import report distinguishes x64's additional runtime from ARM's
 dependency set. The parser was checked against all existing x64 inference DLLs;
 final ARM intake and startup gates remain pending.
 
-Preview 2's bundled Mac and Windows guides now explain first-time model setup,
-the shared recording shortcut/appearance and remaining physical acceptance. The
+Preview 2's bundled Linux, Mac and Windows guides now explain first-time model setup,
+the shared recording shortcut/appearance and remaining physical acceptance. The Linux guide records the actual 0.1.19 speech package. The
 Windows guide explicitly forbids replacing preview 1 with a different build;
 manual repair is for the exact recorded installer. Package workflows also track
 those embedded guide inputs, so a guide correction produces matching candidates.
