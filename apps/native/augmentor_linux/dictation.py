@@ -15,9 +15,17 @@ import tempfile
 from multiprocessing.connection import Client
 
 ROOT = Path(__file__).resolve().parents[3]
+_offscreen_lock = threading.Lock()
 
 
 def location():
+    # Native UI tests often inherit the real login session and HOME. They must
+    # never stop or replace that session's broker. An explicit isolated state
+    # still wins; otherwise propagate one private test state to child brokers.
+    if os.environ.get('QT_QPA_PLATFORM')=='offscreen' and not os.environ.get('AUGMENTOR_DICTATION_STATE'):
+        with _offscreen_lock:
+            if not os.environ.get('AUGMENTOR_DICTATION_STATE'):
+                os.environ['AUGMENTOR_DICTATION_STATE']=tempfile.mkdtemp(prefix='augmentor-offscreen-dictation-')
     base = Path(os.environ.get('AUGMENTOR_DICTATION_STATE', str(Path.home()/'.local/share/augmentor/dictation')))
     base.mkdir(parents=True, exist_ok=True, mode=0o700)
     info = base.lstat()
