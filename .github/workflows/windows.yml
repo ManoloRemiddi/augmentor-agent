@@ -126,6 +126,12 @@ jobs:
           # Sequence 1 belongs only to this unpublished development fixture.
           # Customer distribution/automatic qualification remain false; never publish it.
           & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-windows-application.py --root outputs/payload --arch ${{ matrix.arch }} --update-build 1
+      - name: Qualify packaged SDK registration and owned native bridge
+        if: ${{ !cancelled() && steps.application.outcome == 'success' }}
+        env:
+          AUGMENTOR_EPHEMERAL_WINDOWS_RUNNER: '1'
+        run: |
+          & outputs/payload/node/node.exe scripts/app-sdk-bundle-proof.mjs outputs/payload
       - name: Exercise managed Windows DSH setup and conversation restart
         if: ${{ !cancelled() && steps.application.outcome == 'success' }}
         run: |

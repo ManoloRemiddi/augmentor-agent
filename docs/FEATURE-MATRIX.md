@@ -11,6 +11,10 @@ The earlier Windows ACL fix passes both native CPU desktop workflows at `632c2f3
 
 Windows public preview scope: [installation and explicit parity limits](WINDOWS-PREVIEW.md). Physical acceptance is pending; shared source does not imply complete Windows feature qualification.
 
+The [SDK source candidate](SDK-ALIGNMENT.md) scopes Conversation/Thinking and
+appearance preferences per application, including apps sharing a website origin;
+it does not deploy the developing standalone settings redesign.
+
 Current OS parity direction and verified gaps: [one-product architecture audit](PLATFORM-PARITY-AUDIT.md).
 
 The [embedded Handy candidate](HANDY-INTEGRATION.md) adds harness-independent
@@ -42,6 +46,12 @@ complete feature parity are not yet qualified.
 # Feature ownership and compatibility · Augmentor 0.2.9 development
 
 See [embedded Browser and specialist workspaces](WORKSPACE-EMBEDDING.md) for the product-owned iframe host, dedicated role/tool composition, scoped memory and release lifecycle.
+
+[SDK alignment source](SDK-ALIGNMENT.md) adds negotiated capabilities and an
+experimental scoped Codex app adapter alongside platform bootstrap/private-file
+adapters. Codex selection is bound per operation; DSH preserves latest-session
+selection. Shared installation settings stay outside app authority. This source
+candidate does not extend the published SDK or qualify every installed platform.
 
 DSH personal surfaces now share the agent, tools and speech engine; see [shared surfaces and evidence](SHARED-SURFACES-2026-09-24.md).
 

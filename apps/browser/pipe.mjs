@@ -80,6 +80,10 @@ import {startOnboarding} from './shared/onboarding.mjs'
 import {memoryRequest} from './shared/memory.mjs'
 import {bindProfileMemory} from '../../services/workspaces/memory.mjs'
 import {preferences} from '../../services/workspaces/profiles.mjs'
+import {snapshotWorkspaceContext} from './extension/workspace-context.mjs'
+import {loadProfile} from '../../services/workspaces/profiles.mjs'
+import {describeWorkspace} from '../../services/workspaces/capabilities.mjs'
+import {SDK_PROTOCOL} from '../../services/workspaces/policy.mjs'
 import {MetadataLog,diagnosticCategory} from './shared/diagnostics.mjs'
 import { dshBranch } from './shared/branch.mjs'
 import {DshBoundary,BROWSER_PRESET,PERSONAL_PRESETS,loopbackEndpoint,boundedJson,workspaceProfile,visibleSession} from './shared/dsh-boundary.mjs'
@@ -548,6 +552,10 @@ const voice=new BrowserVoice({
   notify:sendToExt,
 })
 const localMethods = {
+  'workspace.describe':params=>{
+    if(!workspaceProfile?.sdkProtocol||params.protocol!==SDK_PROTOCOL)throw Error('Register an SDK v1 workspace before describing capabilities')
+    return describeWorkspace(loadProfile())
+  },
   'augmentor/surface':params=>surfaceRequest(params),
   'augmentor/voice/preferences':async params=>{if(params.action==='save')voice.close();return voicePreferences(params)},
   'augmentor/voice/start':async params=>{await interactions.claim(params.sessionId);return voice.start(params)},
@@ -887,7 +895,7 @@ async function handleExtMessage(msg) {
     if(UNIFIED&&msg.method==='session.prompt')await interactions.claim(msg.params.sessionId)
     if(workspaceProfile&&msg.method==='session.prompt'){
       const context=msg.params.workspaceContext;delete msg.params.workspaceContext
-      if(context&&typeof context==='object'&&JSON.stringify(context).length<=16000)preferences(workspaceProfile,{set:{['context:'+msg.params.sessionId]:{id:randomUUID(),at:Date.now(),value:context}}})
+      if(context!==undefined)preferences(workspaceProfile,{set:{['context:'+msg.params.sessionId]:{id:randomUUID(),at:Date.now(),value:snapshotWorkspaceContext(context)}}})
     }
     if(workspaceProfile&&['session.create','session.prompt'].includes(msg.method))await bindProfileMemory(workspaceProfile,'dsh:'+msg.params.sessionId)
     if(workspaceProfile&&['augmentor/save','augmentor/unsave','augmentor/state'].includes(msg.method)){

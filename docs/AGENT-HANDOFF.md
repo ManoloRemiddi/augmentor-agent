@@ -5,8 +5,8 @@
 ## Automatic updates implementation — October 3, in progress
 
 `feat/automatic-updates` starts from main `c7f895d416e6b94ca601b66a09caf4846a64b907`.
-The branch now incorporates main `f738a73f6f2d44fde111108df72dbf1cd94b562b`
-(dictation isolation/readiness and approved Handy alignment). Both owning records
+The branch now incorporates main `550e274d9f0c01f35c0e3b4d7d3743fed4899971`
+(dictation isolation/readiness, approved Handy and SDK alignment). All owning records
 are retained below; new combined native checks are required. A preexisting local
 dictation variant is preserved in Git stash `99373c252a1dcd0588c57c63e8477ac5fa2c95bc`;
 main already includes equivalent offscreen isolation with fuller explanation.
@@ -95,12 +95,61 @@ tests pass 19. The manager's installation scheduling, result/deferral reporting,
 reopen/retention and other platform adapters remain open; no customer flag/feed
 is enabled. Read [the latest launch/completion record](UPDATE-SYSTEM.md#source-launch-handoff-and-completion-log-correction)
 before interpreting earlier pending evidence.
+The main `550e274` integration preserves SDK source qualification and excludes
+shared Updates administration from SDK settings. Combined build/type/privacy,
+527 Node tests/two skips, 92 Browser cases and 855 Python/Qt tests/39 skips pass
+with locked test dependencies and isolated dictation state; new native checks
+remain required on this combined source. The initial broad Node invocation with
+missing qualification dependencies was stopped and is not passing evidence.
 Root
 rotation/CI custody, public feed provisioning, external installation adapters,
 final consent/revocation and N-to-N+1 health/recovery remain open. Do not narrow the goal to
 notification/downloads or mark it complete based on this checkpoint. Nothing
 has been deployed into existing installed apps. Preserve the canonical checkout’s
 existing dirty work; implementation is in a separate feature checkout.
+
+## Application SDK alignment source — October 3
+
+The owner-authorized source integration is complete: product PR #34 merged on
+main at `602669a`, then SDK PR #2 merged at `3797777`. Both merge trees match
+the reviewed candidates. The developer maintenance guide now defines how future
+product updates reach the SDK. Fresh packed/runtime, Browser and platform checks pass; see
+[the source update record](SDK-ALIGNMENT.md). No release or installed app update
+is performed by source integration. Preserve the separate unfinished canonical
+settings work and the owner's live applications.
+Merged-source validation is complete: six SDK jobs pass at `3797777` and eight
+product jobs pass at `602669a` on attempt 2. The initial loaded-Chromium queue
+timeout, four passing local runs and remaining experimental acceptance gate are
+retained in the alignment guide; the retry does not establish its cause.
+
+[SDK alignment](SDK-ALIGNMENT.md) owns the paired preview 4 candidate, feature
+states, shared-settings boundaries, Codex role/tools/session/memory isolation,
+platform bootstrap/private files and per-OS startup adapters. Source and fixture
+qualification do not deploy the live YouTube/Sponsor apps or certify a fresh
+Mac/Windows SDK install. Hosted platform/paired-package checks and installed
+acceptance remain distinct. Preserve the owner's dirty canonical checkout and
+independent third-app test.
+
+The selection follow-up binds Codex app context to durable operations, enforces
+the 16 KB UTF-8 boundary and scopes branch-status recovery to its parent.
+DSH retains latest-session context; the capability snapshot reports this
+difference. See the alignment guide's exact tests, initial failures and remaining
+customer acceptance gates before claiming release readiness.
+
+The workspace settings follow-up integrates the approved thinking-display choice
+with profile-specific persistence/cache keys, including same-origin app isolation.
+Its 88 Browser and 11 workspace contracts pass locally; hosted package validation
+remains separate. The canonical owner's settings/dictation edits are preserved.
+Direct Codex profile registration now enforces the same 128-character connection
+identifier contract as SDK planning and the pinned host, before registry writes.
+
+Current functional pair: product `8a085be` / SDK `925b72e`. All six SDK jobs,
+all three platform contracts, Mac 14/26 bundles and Windows x64/ARM64 desktop
+checks pass. Full Linux/package/Browser validation and Windows x64/ARM64
+packaged installation also pass. Source/package qualification is complete for
+this pair. The alignment guide records exact run URLs, the requirement audit
+and four inspected Chromium component
+renders. These source checks do not promote a release or migrate an app.
 
 ## October 3 Handy alignment, test separation and download preparation
 

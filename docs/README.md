@@ -179,3 +179,5 @@ files available only in a developer's working directory.
 - [Task reliability](TASK-RELIABILITY.md): binary evidence protection, failed-approach checkpoints and effective reasoning visibility.
 
 - [0.2.13 browser reliability release](RELEASE-0.2.13.md): general browser evidence recovery and matched public artifacts.
+
+- [Application SDK alignment](SDK-ALIGNMENT.md): capability/permission states, experimental Codex application isolation and platform bootstrap/startup qualification.

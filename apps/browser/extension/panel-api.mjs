@@ -167,7 +167,7 @@ function dispatchPanelMessage(msg, sender, sendResponse) {
       for(const item of history.events??[])log('event',{sessionId:row.sessionId,event:item.event})
       broadcast();sendResponse({ok:true,sessionId:row.sessionId})
     })().catch(async error=>{
-      if(codex)try{if((await request('session.branchStatus',{newSessionId:intent.newSessionId})).status==='absent')await finishBranch(chrome.storage.local,intent)}catch{}
+      if(codex)try{if((await request('session.branchStatus',{sessionId:intent.sessionId,newSessionId:intent.newSessionId})).status==='absent')await finishBranch(chrome.storage.local,intent)}catch{}
       sendResponse({ok:false,error:error.message})
     }).finally(()=>state.mutating=false);return true
   }

@@ -14,6 +14,7 @@ import {memoryRequest} from './shared/memory.mjs'
 import {spawn} from 'node:child_process'
 import {loadProfile} from '../../services/workspaces/profiles.mjs'
 const workspaceProfile=loadProfile()
+import {describeWorkspace} from '../../services/workspaces/capabilities.mjs'
 import {guardWorkspaceMethod,voiceEnabled,SDK_PROTOCOL} from '../../services/workspaces/policy.mjs'
 import {fileURLToPath} from 'node:url'
 import {NativeBrowserMaintenance,connectBrowserOwner} from './shared/native-maintenance.mjs'
@@ -77,7 +78,7 @@ readFrames(process.stdin,first=>{
     }
     if(first.method==='workspace.describe'){
       if(!workspaceProfile?.sdkProtocol||first.params?.protocol!==SDK_PROTOCOL){reply({id:first.id,error:{code:'INCOMPATIBLE_RUNTIME',message:'Register an SDK v1 workspace profile before connecting'}});return}
-      reply({id:first.id,result:{protocol:SDK_PROTOCOL,profile:workspaceProfile.id,harness:'dsh',productProtocol:PRODUCT_PROTOCOL,productVersion:RELEASE.version,tools:workspaceProfile.policy.tools,voice:{experimental:true,enabled:voiceEnabled(workspaceProfile)}}});return
+      reply({id:first.id,result:describeWorkspace(loadProfile())});return
     }
     if(first.method==='augmentor/handshake'){
       compatible=first.params?.protocol===PRODUCT_PROTOCOL&&first.params?.version===RELEASE.version
@@ -98,7 +99,7 @@ readFrames(process.stdin,first=>{
     if(first.method==='augmentor/prompts'){
       shared(first.id,()=>promptLibrary(first.params??{}));return
     }
-    if(workspaceProfile&&first.method==='harness.select'&&first.params?.harness!=='dsh'){reply({id:first.id,error:{message:'This workspace uses its configured DSH specialist.'}});return}
+    if(workspaceProfile&&first.method==='harness.select'&&first.params?.harness!==(workspaceProfile.harness??'dsh')){reply({id:first.id,error:{code:'PERMISSION_DENIED',message:'This workspace uses its registered harness.'}});return}
     if(first.method!=='harness.select'||!['pi','dsh','codex'].includes(first.params?.harness)){reply({id:first.id,error:{message:'Choose DSH, Pi or Codex. Other harnesses are no longer supported; saved data is retained.'}});return}
     const bridge={dsh:'./pipe.mjs',pi:'./pi-bridge.mjs',codex:'./codex-bridge.mjs'}[first.params.harness]
     child=spawn(process.execPath,[fileURLToPath(new URL(bridge,import.meta.url))],{stdio:['pipe','pipe','inherit'],windowsHide:true,env:{...process.env,AUGMENTOR_UNIFIED:'1',AUGMENTOR_BROWSER_HARNESS:first.params.harness}})

@@ -6,7 +6,8 @@
 
 This feature is under implementation on `feat/automatic-updates`, based on
 `c7f895d416e6b94ca601b66a09caf4846a64b907`, now integrated with main
-`f738a73f6f2d44fde111108df72dbf1cd94b562b`. It has not replaced an installed
+`550e274d9f0c01f35c0e3b4d7d3743fed4899971` (Handy and SDK source alignment).
+It has not replaced an installed
 application, published a signed repository, or qualified automatic installation.
 The complete intended scope includes optional automatic installation, independent
 health observation and recovery across supported installation methods. The
@@ -74,6 +75,8 @@ download folder to support repair; it does not permit preferences or installatio
 The existing embedded application SDK administration guard still blocks this
 shared surface entirely. Update actions reject caller-provided URLs, commands,
 release objects and download destinations.
+The SDK settings filter also hides the shared Updates section. Embedded workspace
+controls cannot change the host installation's update consent or start updates.
 
 ## Publisher tooling checkpoint
 
@@ -300,6 +303,16 @@ publisher/client cases. Automatic scheduling of installation, result/deferred
 reporting, appropriate instance reopen, cache retention, signed N-to-N+1 and the
 other installation adapters remain unfinished. The manager still offers manual
 downloads only. The complete authorized implementation goal remains active.
+
+The branch now merges public main `550e274`, retaining paired SDK alignment,
+workspace settings isolation and native SDK package qualification. The settings
+merge adds Updates to the SDK administration exclusion; standalone update controls
+are retained. Combined source build/type/privacy checks, 529 Node cases (527
+passed, two skips), all 92 Browser cases, and 894 Python/Qt cases (855 passed,
+39 explicit OS/integration skips) pass. Tests use locked DSH and isolated
+offscreen Qt/dictation state. The first broad Node invocation omitted those test
+dependencies and was stopped after fixture failures; it is not counted as a pass.
+Native package qualification must rerun on the combined merge.
 
 Shared repository-helper operations now hold one private kernel cache-writer lock
 across the entire child operation. This prevents service/coordinator concurrency
