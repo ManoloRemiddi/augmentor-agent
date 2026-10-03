@@ -119,6 +119,15 @@ source revision for the native integration proof. Pending hosted results are
 not claimed as passed. Full product package/Browser/native workflows retain
 their separate gates and artifact provenance.
 
+The first hosted candidate `c583475` passed Linux contracts but failed the Mac
+workspace-list fixture and the Windows startup-plan assertion. The Mac fixture
+now uses its canonical temporary directory, matching installed profile loading;
+the Windows check now parses the quoted command and compares its arguments,
+rather than expecting unescaped Windows backslashes in a Linux systemd unit.
+The assertions remain enabled on every platform. Passing local reruns do not
+replace fresh hosted qualification. The SDK's Windows database cleanup ordering
+is corrected separately in its owning repository.
+
 Customer Mac/Windows SDK installation, actual login/background-service behavior,
 OS consent, physical voice, Codex account/provider acceptance and installed
 upgrade/rollback remain qualification gates. The current public Windows preview

@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import plistlib
+import shlex
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -55,7 +56,8 @@ class AppSdkPlatform(unittest.TestCase):
             module = load('install-embedding')
             with patch.dict(os.environ, {'XDG_DATA_HOME':str(home/'data'),'XDG_CONFIG_HOME':str(home/'config')}):
                 linux = module.startup_plan(runtime, platform='linux', home=home)
-            self.assertIn(('ExecStart="'+runtime['python']+'"').encode(), linux['bytes'])
+            command = next(line.removeprefix('ExecStart=') for line in linux['bytes'].decode().splitlines() if line.startswith('ExecStart='))
+            self.assertEqual(shlex.split(command), [runtime['python'], str(linux['launcher'])])
             mac = module.startup_plan(runtime, platform='darwin', home=home)
             plist = plistlib.loads(mac['bytes'])
             self.assertEqual(plist['ProgramArguments'], [runtime['python'],'-I','-B',str(root/'scripts/app-sdk-launch.py'),'embed'])

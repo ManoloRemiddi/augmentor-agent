@@ -1,7 +1,7 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,rmSync,existsSync} from 'node:fs'
+import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,rmSync,existsSync,realpathSync} from 'node:fs'
 import {tmpdir} from 'node:os'
 import {join} from 'node:path'
 import {createServer} from 'node:http'
@@ -14,7 +14,7 @@ import {CodexWorkspaceBoundary} from '../apps/browser/shared/codex-workspace.mjs
 import {installProfile} from '../services/workspaces/install.mjs'
 
 function fixture(t){
- const root=mkdtempSync(join(tmpdir(),'codex-sdk-')),profilesDir=join(root,'profiles'),prior=process.env.AUGMENTOR_WORKSPACE_PROFILES
+ const root=realpathSync(mkdtempSync(join(tmpdir(),'codex-sdk-'))),profilesDir=join(root,'profiles'),prior=process.env.AUGMENTOR_WORKSPACE_PROFILES
  mkdirSync(profilesDir,{mode:0o700});process.env.AUGMENTOR_WORKSPACE_PROFILES=profilesDir
  t.after(()=>{if(prior===undefined)delete process.env.AUGMENTOR_WORKSPACE_PROFILES;else process.env.AUGMENTOR_WORKSPACE_PROFILES=prior;rmSync(root,{recursive:true,force:true})})
  const module=join(root,'tools.mjs');writeFileSync(module,process.env.AUGMENTOR_SDK_TOOLS_ENTRY?
