@@ -2,6 +2,11 @@
 
 # Start here: agent handoff
 
+## October 3 DSH 0.2 compatibility
+
+[Compatibility and migration](DSH-0.2-COMPATIBILITY.md) records the dual-version plugin contracts, local history bridge, provider/preset migration and Linux deployment scope. Customer installer locks remain separately qualified.
+
+
 ## October 3 Handy alignment, test separation and download preparation
 
 PR #30 is merged; PR #33 adds the four-pixel leftward orb adjustment and protects

@@ -72,7 +72,7 @@ export class DshMaintenance {
  }
  busyCount(){
   const agents=this.ctx.agents.list(),jobs=new Map()
-  for(const owner of [undefined,...agents])for(const job of this.ctx.jobs.list(owner))jobs.set(job.id,job)
+  for(const owner of [undefined,...agents,...agents.map(agent=>agent.id)])for(const job of this.ctx.jobs.list(owner))jobs.set(job.id,job)
   return this.active+agents.filter(agent=>agent.status!=='idle'||agent.inbox.hasPending).length+
    [...jobs.values()].filter(job=>!terminalJobs.has(job.status)).length
  }

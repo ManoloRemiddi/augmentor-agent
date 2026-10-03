@@ -753,7 +753,7 @@ class Window(QWidget):
         if kind=='tool/result':
             reply=data.get('meta',{}).get('resonantVoice') if isinstance(data.get('meta'),dict) else None
             blocks=data.get('message',{}).get('content',[])
-            failed=any(b.get('isError') for b in blocks if isinstance(b,dict))
+            failed=data.get('message',{}).get('isError') is True or any(b.get('isError') for b in blocks if isinstance(b,dict))
             if isinstance(reply,dict) and reply.get('version')==1 and isinstance(reply.get('text'),str) and not failed:
                 self.reasoning_index=None;self.partial=''
                 self.messages.append(('Augmentor',reply['text']))
@@ -768,6 +768,7 @@ class Window(QWidget):
                 self.messages.append(('You',text))
             return bool(text)
         if kind=='command/run':
+            if data.get('source',{}).get('kind')=='plugin:augmentor-execution':return False
             text='/'+data.get('name','')+data.get('args','')
             if text==self.pending_prompt:self.pending_prompt=None
             self.messages.append(('You',text));return True

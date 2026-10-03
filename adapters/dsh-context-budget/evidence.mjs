@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {toolContent, withToolContent} from '../dsh-compat/messages.mjs';
 
 // Diagnose text representation, never tool authority, side effects or task success.
 export function binaryLike(text) {
@@ -18,18 +19,16 @@ export function sanitizeSession(session, tokenMeter) {
     const event = session.eventAt(seq);
     if (event?.type !== 'tool/result') continue;
     let changed = false;
-    const content = event.data.message.content.map(result => result.type !== 'tool-result' ? result : {
-      ...result, content: result.content.map(block => {
-        if (block.type !== 'text' || !binaryLike(block.text)) return block;
-        changed = true;
-        return {...block, text: binaryNotice(seq)};
-      }),
+    const content = toolContent(event.data.message).map(block => {
+      if (block.type !== 'text' || !binaryLike(block.text)) return block;
+      changed = true;
+      return {...block, text: binaryNotice(seq)};
     });
     if (!changed) continue;
     // Use the same replayable surface replacement contract as DSH's pruner.
     session.append('compaction/prune', {shadowedRange: {start: seq, end: seq}, shadowedSeqs: [seq],
       shadowedTokenCount: tokenMeter.estimateMessage(event.data.message)});
-    session.append('tool/result', {...event.data, message: {...event.data.message, content}}, {
+    session.append('tool/result', {...event.data, message: withToolContent(event.data.message, content)}, {
       surfaceOp: {op: 'replace', startSeq: seq, endSeq: seq}, sourceEventSeqs: [seq],
     });
     replaced++;

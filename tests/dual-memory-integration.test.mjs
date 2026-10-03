@@ -87,7 +87,7 @@ test('spoken DSH memory survives restart and enters fresh DSH/Pi sessions', {tim
     await say(second,'Give Mira a written Atlas SQLite project update.','typed-third');assert.match(JSON.stringify(chatCalls().at(-1).messages),/Typed interaction/);assert.match(JSON.stringify(chatCalls().at(-1).messages.at(-1)),/Give Mira a written Atlas SQLite project update/,'the actual human request remains the latest message');
     const continuity=chatCalls().at(-1).messages.filter(m=>JSON.stringify(m).includes('Augmentor continuity.'));
     assert.equal(continuity.length,1,'only one effective continuity snapshot survives');
-    const originalBlocks=second.agent.session.snapshotEvents().filter(e=>e.type==='user/message'&&e.data.source?.plugin==='augmentor-memory');
+    const originalBlocks=second.agent.session.snapshotEvents().filter(e=>e.type==='user/message'&&e.data.source?.kind==='plugin:augmentor-memory');
     assert.ok(originalBlocks.length>=2,'replacement preserves the original audit log');
     await second.dispose();handles.splice(handles.indexOf(second),1);
     mkdirSync(join(dir,'pi-config/agent'),{recursive:true});

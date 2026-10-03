@@ -181,3 +181,16 @@ test('mixed prose and voice call uses the structured result only',async t=>{
   assert.equal(log.querySelectorAll('.assistant .md').length,1)
   assert.equal(log.querySelector('.assistant .md').textContent.trim(),'Here are the five samples.')
 })
+
+
+test('v4 failed voice output never becomes an assistant reply',async t=>{
+  const dom=new JSDOM('<div id="log"></div>',{pretendToBeVisual:true})
+  globalThis.window=dom.window;globalThis.document=dom.window.document
+  globalThis.requestAnimationFrame=dom.window.requestAnimationFrame.bind(dom.window)
+  globalThis.cancelAnimationFrame=dom.window.cancelAnimationFrame.bind(dom.window);window.marked=marked
+  const {log:record,state}=await import('../extension/state.mjs');state.log=[]
+  const log=document.querySelector('#log'),ui=createChatUI({log})
+  t.after(()=>{ui.clear();dom.window.close();state.log=[]})
+  ui.applyLog([record('event',{event:{seq:25,type:'tool/result',data:{meta:{resonantVoice:{version:1,text:'Must not appear.'}},message:{role:'tool',isError:true,content:[{type:'text',text:'failed'}]}}}})])
+  assert.equal(log.querySelectorAll('.assistant .md').length,0)
+})

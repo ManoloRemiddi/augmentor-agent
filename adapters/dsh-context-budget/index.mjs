@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {toolContent, toolFailed} from '../dsh-compat/messages.mjs';
 import {createHash, randomUUID} from 'node:crypto';
 import {binaryLike, binaryNotice, sanitizeSession, failureSignature, reassess} from './evidence.mjs';
 import {pruneToolContext} from './pruning.mjs';
@@ -9,7 +10,7 @@ export const inject = ['toolResultPruner', 'tokenMeter', 'tools', 'commands', 's
 const owned = agent => ['augmentor-linux-product', 'augmentor-browser-product'].includes(agent.session.header.agentPreset)
   && agent.session.header.origin !== 'subagent';
 const originalResult = e => e.type === 'tool/result' && e.surfaceOp?.op !== 'replace';
-const blocks = e => e.data.message.content.flatMap(b => b.type === 'tool-result' ? b.content : []);
+const blocks = e => toolContent(e.data.message);
 const text = e => blocks(e).filter(b => b.type === 'text').map(b => b.text).join('\n');
 const hash = value => createHash('sha256').update(value).digest('hex');
 function canonical(value) {
@@ -96,7 +97,7 @@ export function apply(ctx) {
         state.results.set(key, {digest, count});
         if (count >= 3 && !state.warned.has(key)) { state.warned.add(key); repeated = true; }
         state.resultCount++;
-        const signature = failureSignature(text(e), e.data.message.content.some(b => b.type === 'tool-result' && b.isError));
+        const signature = failureSignature(text(e), toolFailed(e.data.message));
         state.failures.push(signature);
         state.failures = state.failures.slice(-8);
         if (signature && state.failures.filter(x => x === signature).length >= 3 && !state.warned.has('error:' + signature)) {
@@ -122,7 +123,7 @@ export function apply(ctx) {
       longRun ? 'Progress checkpoint: eight tool calls have returned in this turn. Check whether the investigation is still necessary for the requested outcome; this count alone does not imply failure.' : '',
       sanitized ? 'Evidence checkpoint: binary-like text was withheld from tool context. Use decoded text or metadata instead.' : '',
     ].filter(Boolean).join(' ');
-    const checkpoint = {id: randomUUID(), role: 'user', source: {kind: 'plugin', plugin: name}, content: [{type: 'text', text:
+    const checkpoint = {id: randomUUID(), role: 'user', source: {kind: `plugin:${name}`} , content: [{type: 'text', text:
       reasons + ' ' + reassess}]};
     return {...decision, messages: [...decision.messages, checkpoint]};
   }, {prepend: true});
