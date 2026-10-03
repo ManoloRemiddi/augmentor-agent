@@ -377,3 +377,13 @@ The [shared updater guide](UPDATE-SYSTEM.md#managed-linux-live-selection-control
 records 12 isolated fixtures and remaining integration. This has not enabled
 customer automatic installation or changed the owner's selection. DSH/preset or
 service migrations remain explicit; Debian/RPM follow their package manager.
+
+
+The retained Linux observer now stages an exact publisher-held fixed-name ZIP,
+rejects any downloaded local selection records and creates the target through the
+existing staging tool with the current private deployment configuration. Source,
+selection and model/profile/service choices survive staging. Actual copied ELF
+exec and inherited-lock refusal fixtures pass. Manager eligibility stays disabled
+until producer, owned service/preset/reopening, retention and signed forward
+qualification are complete; the [shared guide](UPDATE-SYSTEM.md#managed-linux-exact-bundle-and-retained-handoff--october-3)
+records exact scope and evidence.

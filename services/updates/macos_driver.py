@@ -14,6 +14,7 @@ from platform_adapters.private_files import descriptor,require_directory
 from platform_adapters.peer_process import _executable
 from lifecycle.macos_payload import verify_bundle
 from lifecycle.posix_startup import Startup
+from lifecycle.posix_paths import shared_state_directory
 from lifecycle.update_journal import artifact
 from lifecycle.payload_integrity import _read
 from .macos_bootstrap import locations
@@ -67,7 +68,7 @@ def run(observer,source_bundle,release_digest,payload_digest,attempt,bootstrap_f
             item=next(row for row in candidate['artifacts'] if row['role']=='bundle')
             target={key:candidate[key] for key in ('version','sourceCommit','target','channel','dataSchema','readableDataSchemas')}
             target['sha256']=item['sha256']
-            shared=Path(os.environ.get('AUGMENTOR_SHARED_STATE',runtime_directory()/'shared'))
+            shared=shared_state_directory()
             coordinator=MacCoordinator(bundle,target_bundle,runtime_directory(),shared,transactions,release,target_release,
                 payload,target_payload,artifact(source),artifact(target))
             result=coordinator.run(authority.check)

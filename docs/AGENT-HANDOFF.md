@@ -4,6 +4,25 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+Linux now has authentic one-bundle ZIP staging and retained bootstrap/observer
+exec composed with its live selection controller. Eight archive/selection/space
+cases and two actual location/ELF exec cases pass; the negative production
+handoff refuses unqualified source before network/drain/apply. Public eligibility
+remains gated for service/preset/reopen/retention/producer/forward qualification.
+Mac driver discovery now uses the actual shared prompt/memory state directory.
+Fresh authority pins bundled Node. Focused updater checks pass 190 (189 passed,
+one skip); full Python before the final two cases passes 966 (926 passed, 40 skips).
+See [the exact staging/handoff contract](UPDATE-SYSTEM.md#managed-linux-exact-bundle-and-retained-handoff--october-3).
+
+Both complete Mac 14/26 workflows pass at `cde75ee` in
+[37149226481](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37149226481).
+Actual ZIP: 66,643 records, EOCD 1,107, no ZIP64, exact 16-bit wrap. Native retained
+exec/lock/refusal, same-build coordinator/completion and offline health pass.
+The full retried Linux/shared validation at `882dd23` passes 37147851279. These
+newer results supersede the pending/failure status below while preserving history.
+The newer shared ZIP/Mac discovery/controller changes require fresh native runs.
+No customer flag/feed or owner installed application is changed.
+
 Managed Linux now has a live preflight/graph/selection/offline-completion controller,
 with 12 isolated cases including real Qt target subprocess rendering and unknown
 post-replace flush preservation. Focused updater checks pass 177 (176 passed, one

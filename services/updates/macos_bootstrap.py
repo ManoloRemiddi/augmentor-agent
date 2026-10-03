@@ -5,6 +5,7 @@ import hashlib
 import os
 from pathlib import Path
 import secrets
+import shutil
 import stat
 import subprocess
 import sys
@@ -83,6 +84,8 @@ def bootstrap(root,attempt):
                 from .installation import AutomaticInstallAuthority
                 import platform
                 with AutomaticInstallAuthority(root,updates,os_version=platform.mac_ver()[0]):pass
+                if shutil.disk_usage(directory).free<payload['bytes']+64*1024**2:
+                    raise OSError('Insufficient room for the complete retained observer.')
                 subprocess.run(['/usr/bin/ditto',str(bundle),str(retained)],check=True,
                     stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.PIPE,timeout=180)
                 if verify_bundle(retained,release)!=payload or verify_bundle(bundle,release)!=payload:

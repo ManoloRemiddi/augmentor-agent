@@ -941,3 +941,66 @@ reopening remain required. Debian/RPM need package-manager authorization and
 installation plans rather than this per-user selection adapter. The complete
 cross-platform goal, signed forward-update qualification, interrupted recovery,
 legacy bridge and production feed/signing remain open.
+
+
+## Managed Linux exact bundle and retained handoff — October 3
+
+`linux_staging` accepts one publisher-held managed Desktop ZIP with fixed top-level
+`Augmentor Agent Desktop`. Shared `zip_staging` first bounds/counts the central
+directory, verifies local names, and rejects collisions, traversal, privileged or
+special files, external links and writes beneath links. Linux refuses Mac resource
+sidecars. Exclusive ordinary-file writes precede symlink creation; there is no
+`extractall` or archive-selected command. The complete archive length/hash is
+checked against the retained signed row before extraction. Whole-tree inspection
+then checks links, modes and bytes before any target import.
+
+A downloaded tree cannot contain local deployment/selection records. Its exact
+version/build/source/target/channel/protocol/schema receipt must match the original
+publisher candidate. The retained existing `desktop-deployment.stage` constructs
+configuration from the current private selection, retains bundled Python/Node,
+creates a separate immutable target and leaves selection unchanged. Space checks
+cover both extraction and its additional immutable copy. Changed bytes, bad
+receipts, unavailable space or imports fail before selection/drain.
+
+`linux_bootstrap` and fixed scripts now retain a whole exact source copy in a
+fresh private observer directory, close original startup/lifetime/deployment
+readers, and exec its copied interpreter with the original inheritable bootstrap
+lock. The observer verifies the actual kernel executable, its imported code root,
+exact source digests and the original lock inode before fresh TUF/consent authority.
+It composes authentic stage, live managed preflight, graph/drain, pointer commit
+and original offline completion. Local attempt results are status only. Production
+entrypoints expose no development or arbitrary-command switch. Manager eligibility
+remains disabled pending owned service/preset coordination, reopening, retention,
+public producer/bridge and signed forward-update qualification.
+
+Seven initial archive/selection cases plus additional duplicate-space refusal
+pass. Two Linux handoff cases include actual copied ELF exec and inherited flock;
+the production entrypoint refuses an unqualified source before any network,
+drain or apply. The source, observer and private selection remain byte-identical.
+These are synthetic local fixtures, not signed N-to-N+1 customer acceptance.
+The source-copy and immutable-copy space checks prevent accepted work being
+closed merely to discover those known disk requirements.
+
+Fresh automatic installation verification now always uses the bundled Node rather
+than an unrelated environment override; a focused authority test checks this
+boundary. Ordinary developer helper selection is unchanged. Shared Unix service
+discovery now matches prompt/memory's actual `AUGMENTOR_SHARED_STATE` / XDG state
+location, including the installed Mac environment; it no longer guesses
+`socket-runtime/shared`. Absolute-path cases qualify the correction.
+
+At the prior native correction `cde75ee`, both complete Mac 14/26 jobs pass
+[37149226481](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37149226481).
+The actual ditto ZIP has 66,643 directory entries and an end counter of 1,107,
+with no ZIP64: an exact 16-bit wrap. The fixed bounded parser agrees. Native proof
+also passes actual retained observer exec/inherited lock and production development
+refusal, same-build coordinator apply, whole backup retention, malformed/pending
+startup refusal, exact offline target health and completed archival. It opens no
+normal user app and proves no signed forward update or captured-window reopening.
+The retried full validation at `882dd23` passes all Linux/shared packaging jobs in
+[37147851279](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37147851279).
+
+New local updater checks pass 190 cases (189 passed, one OS skip), over `cec9767`.
+The earlier broad Python run passes 966 cases (926 passed, 40 skips), before the
+final Node/space cases, which pass focused checks. The common ZIP extraction,
+Mac discovery correction and newer controller sources need their fresh native
+qualification. All public feed and automatic-install defaults remain disabled.

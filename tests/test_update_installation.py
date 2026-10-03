@@ -61,6 +61,17 @@ class InstallationAuthorityTests(unittest.TestCase):
         with self.assertRaises(ValueError):guard.check('verified')
         with self.assertRaises(ValueError):guard.__enter__()
 
+    def test_fresh_publisher_verification_uses_the_exact_bundled_node(self):
+        node=self.root/'node/bin/node';node.parent.mkdir(parents=True)
+        node.write_text('Inert bundled runtime; transport is mocked.')
+        override=self.base/'unrelated-node';override.write_text('Inert environment override.')
+        with self.authority() as guard:
+            with patch.dict(os.environ,{'AUGMENTOR_PI_NODE':str(override)}),patch(
+                    'updates.installation.repository_request',return_value={'fixture':True}) as request:
+                self.assertEqual(guard.refresh(),{'fixture':True})
+                self.assertEqual(request.call_args.kwargs['node'],node)
+                self.assertEqual(request.call_args.kwargs['timeout'],30)
+
     def test_unqualified_target_cannot_inherit_source_installation_authority(self):
         for value in (None,False,'true'):
             with self.subTest(value=value):

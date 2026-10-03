@@ -849,3 +849,11 @@ modes/selection, live authority revocation, lifetime contention, failed health a
 unknown post-replace namespace flush. Its separate subprocess case renders the
 actual copied shared Qt UI with a disposable profile. Import/health mocks in the
 selection fixtures are explicit; this is not installed signed forward qualification.
+
+`test_update_linux_staging.py` checks real fixed-name ZIP bytes, paths/links/modes,
+identity/public qualification, publisher selection refusal, private configuration
+and interpreter relocation, import failure and separate extraction/immutable-copy
+space requirements. `test_update_linux_handoff.py` execs an actual copied ELF
+runtime with a real inherited flock and verifies fixed production refusal before
+network/drain/apply. `test_update_posix_paths.py` checks actual prompt/memory state
+location conventions. These do not qualify public automatic installation.

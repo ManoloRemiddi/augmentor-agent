@@ -13,7 +13,7 @@ from pathlib import Path
 import time
 
 from platform_adapters.private_files import descriptor, read_json, require_directory
-from .client import repository_request
+from .client import repository_request,node_executable
 from .policy import installed_identity, validate_catalog, validate_release, eligibility
 
 
@@ -26,7 +26,8 @@ class AutomaticInstallAuthority:
 
     def refresh(self):
         return repository_request(self.root,self.base/'repository',{'operation':'discover',
-            'channel':self.selected['channel'],'target':self.current['target'],'component':self.current['component']},timeout=30)
+            'channel':self.selected['channel'],'target':self.current['target'],'component':self.current['component']},
+            node=node_executable(self.root,require_bundled=True),timeout=30)
 
     def state(self):
         from .manager import SCHEMA, UpdateManager
