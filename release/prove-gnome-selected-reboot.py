@@ -60,7 +60,7 @@ def request_once(ssh, code, receipt):
     # identity, not SSH's exit status, is the later outcome evidence.
     try:
         result = subprocess.run(ssh+['/usr/bin/python3 -I -B -'], input=code,
-                                text=True, capture_output=True, timeout=30)
+                                text=True, capture_output=True, timeout=180)
         receipt['requestExitCode'] = result.returncode
         receipt['requestStdout'] = result.stdout
         receipt['requestStderr'] = result.stderr

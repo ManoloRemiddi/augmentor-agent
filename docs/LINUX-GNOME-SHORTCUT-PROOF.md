@@ -131,7 +131,8 @@ adds a separate Ubuntu24/Fedora44 owned-VM reboot entry. It requires explicit
 source and artifact digests, the private host/QEMU/key/disk contract, verified
 guest security/native package/runtime/inventory, a normal idle service-owned
 main window and no secondary window or pending Settings journal. It records an
-exclusive private receipt before one reboot request. A timeout or lost SSH
+exclusive private receipt before one reboot request. The request transport allows180 seconds for the full pre-mutation immutable
+runtime verification and the bounded15-second reboot child. A timeout or lost SSH
 reply never repeats that request. Recovery requires a changed kernel boot ID,
 the identical selected contract and an actual service-owned Wayland app with
 the GNOME observer available. Three focused cases cover retained pending
