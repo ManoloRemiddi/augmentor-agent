@@ -1,7 +1,7 @@
 {
   "format": "augmentor-published-legacy-companion-checkpoint/1",
   "date": "2026-10-03",
-  "status": "source-only reviewed; native smoke pending",
+  "status": "actual published012 owned start/read/normal-stop PASS; SDK baseline pending",
   "sourceBase": "e178cfb",
   "namespace": {
     "actualInit": "tini0.19.0",
@@ -29,8 +29,24 @@
     "unknownRetryOrEscalation": false
   },
   "syntheticTestsPassed": 8,
-  "nativeStartReadStopExecuted": false,
+  "nativeStartReadStopExecuted": true,
   "sdkRoleHistoriesOrUpgradeRollbackExecuted": false,
   "physicalSpeechOrMemoryEngineProvisioned": false,
-  "publicReleaseQualified": false
+  "publicReleaseQualified": false,
+  "nativeAcceptance": {
+    "sourceCommit": "04f824b7b296afa08d074a51c4ab87ce9fe6a83b",
+    "ordinaryUid": 1000,
+    "nativeVersion": "0.2.12",
+    "elapsedSeconds": 2.1141707240021788,
+    "readOnlyEngineUnconfiguredInactive": true,
+    "oneOriginalChildTermExit0EndpointRemoved": true,
+    "independentNativeAudit": "PASS",
+    "independentExclusiveNativeLeasesIdle": true,
+    "independentOrdinaryProcessEntriesAbsent": true,
+    "independentBothPortsBindable": true,
+    "pending": null,
+    "unknownOutcome": false,
+    "installerReplayed": false,
+    "sdkOrModelTurns": false
+  }
 }

@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 published baseline companion acceptance and history source
+
+[Published product-version qualification](LINUX-PRODUCT-UPGRADE-PROOF.md)
+now passes actual owned legacy companion start/read/normal-stop in2.11seconds,
+with independent native/lease/process/socket/port end audits. The original failed
+namespace is preserved; no installer or SDK turn is replayed. A separate exact
+published0.2.12 baseline worker journals each SDK mutation, preserves all settings
+and compares every saved event across normal DSH restart. Eight new synthetic
+cases pass,20 with helper/preparer checks. Actual role/history execution and
+coordinated product-version upgrade/rollback remain pending.
+
 ## October 3 KDE live lock refusal before input
 
 [The KDE idle admission checkpoint](../release/qualification/next-targets/20261003-kde-activity-idle-lock-refusal.json)

@@ -91,6 +91,29 @@ and active processing refuse. After the fixture DSH Node host is absent, normal
 cleanup journals one SIGTERM to that exact direct child and waits for its normal
 exit/endpoint removal. Unknown signal/wait never retries or escalates. State,
 logs and journals remain private; eight synthetic ownership and failure cases
-pass. This source helper still needs actual start/read/normal-stop acceptance
-before different-version SDK execution. No physical speech or memory engine is
+pass. One actual run of reviewed04f824b passes in2.11seconds: unconfigured/inactive
+read-only status, one original-child TERM, exit0 and endpoint removal. Independent
+root native audits, both exclusive idle leases, ordinary-process/socket absence
+and both bindable ports pass. No SDK or model turn occurs in this smoke proof. No physical speech or memory engine is
 provisioned, and this is not a production lifecycle adapter.
+
+
+## October 3 baseline SDK history worker — source qualification
+
+[The baseline history worker](../release/prove-published-linux-baseline-history.py)
+accepts only the prepared published0.2.12 native identity in the admitted init154
+namespace. It verifies the saved numeric loopback provider/ports, uses the exact
+reviewed legacy companion helper and retains all five original settings hashes.
+It never runs setup, an integration update or a package operation. Each SDK
+mutation has durable intent before dispatch; an unknown outcome remains pending
+and cannot be replayed. Two real SDK role sessions use a deterministic local SSE
+provider. A normal owned DSH restart must preserve every history event and request
+count. Only the documented omitted header delegationDepth default0 is normalized;
+extra resume events remain failures. Cleanup sends one normal TERM to each exact
+new child/process group and never escalates or retries an unknown result.
+
+Eight new synthetic cases pass, covering strict event comparison, durable unknown
+SDK outcomes, one-shot owned shutdown and foreign model/product refusal. Together
+with the existing helper/preparer cases,20 focused tests pass. Actual SDK history
+acceptance is pending. Graphical desktop, real providers, physical speech, memory
+engines and product-version upgrade/rollback are not qualified by source tests.
