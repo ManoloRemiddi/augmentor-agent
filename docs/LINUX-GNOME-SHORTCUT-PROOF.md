@@ -160,3 +160,21 @@ an actual service-owned Wayland app/observer. The fixture uses automatic login
 and remains offline with its normal Connect DSH modal. Password authentication
 and locked shortcut delivery are not tested. The interrupted outer-bounded
 shortcut run is retained separately and cannot establish native key acceptance.
+
+
+## Current Ubuntu native shortcut acceptance
+
+[The maintained native shortcut command](../release/qualification/next-targets/20261003-noble-native-shortcuts-pass.json)
+passes with normal exit0 on the same immutable clean368 selection. QMP input
+through the owned VM keyboard hides/shows main and secondary independently,
+cold-launches secondary, accepts an idle main close and launches a new
+service-owned main through the canonical shortcut. Main PID1435 becomes5599;
+secondary3610 remains independent and then closes normally. The run-owned
+settings journal restores and foreign entries are preserved. Independent final
+readback confirms the same main idle, no secondary and no pending journal.
+Standalone Qt form Save is recorded separately from the earlier passing actual
+application Settings phase. The previous overall-runner timeout remains failed.
+This establishes native VM shortcut delivery, not physical host keyboard,
+password authentication, locked shortcut behavior, connected harness/model or
+production GNOME input acceptance. The selected-artifact reboot pass remains a
+separate command and checkpoint.
