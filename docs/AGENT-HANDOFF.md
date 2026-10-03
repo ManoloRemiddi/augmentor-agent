@@ -1743,3 +1743,11 @@ Preserve dated evidence rather than relabelling old tests as new qualification.
 Publish a reviewed commit and update the PR with scope and validation. A local-only
 note or an unpublished branch is not a completed handoff. Merge/release status
 must remain explicit; documentation publication does not itself merge a draft PR.
+
+## October 3 matched Handy customer guides
+
+The [Handy preparation](HANDY-INTEGRATION.md#october-3-alignment-and-matched-downloads)
+now includes preview 2 Mac/Windows first-time dictation instructions and an explicit
+Windows prohibition on replacing preview 1 with another build. Embedded guide
+changes trigger the matching package workflows. Qualification/publication are
+pending; physical microphone acceptance remains separate.

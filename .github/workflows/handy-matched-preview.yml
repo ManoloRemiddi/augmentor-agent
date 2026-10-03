@@ -4,6 +4,8 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
+      - 'docs/MACOS-PREVIEW.html'
+      - 'docs/COMPLETE-INSTALL.md'
       - '.github/workflows/handy-matched-preview.yml'
       - 'scripts/fetch-macos-release-sources.py'
       - 'scripts/package-complete.py'
