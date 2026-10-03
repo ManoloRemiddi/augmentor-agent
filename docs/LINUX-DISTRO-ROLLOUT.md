@@ -2,6 +2,36 @@
 
 # Linux distribution rollout
 
+## October 3 booted Leap setup and normal Browser sandbox
+
+[The new checkpoint](../release/qualification/next-targets/20261003-leap-gui-browser-sandbox.json)
+passes the exact clean8ad Leap release3 installer user phase in an owned booted
+GNOME VM after normal signed native dependency admission. All2468 frozen Qt/Python
+members and package registrations remain exact; native audit passes and SELinux
+remains enforcing. Ordinary-user setup/repeat, real DSH/plugins and both fixture
+model roles, offscreen native rendering and restart history without replay pass.
+The public container proof's user function is reused under an explicit owned-VM
+marker wrapper; its container main is not run. No model/service/audio deployment
+on the owner's machine occurs.
+
+Headed Chromium154 on XWayland passes expected renderer sandbox diagnostics plus
+five actual renderer seccomp/no-new-privileges/distinct PID/network namespace
+checks. Initial probe refusals retain their identities; exact Chromium source
+confirms that it rewrites process titles. This does not qualify native Wayland,
+manual Load unpacked or full Browser behavior.
+
+The actual canonical host initially refuses Chromium's inherited private library
+path. The [Browser launch boundary](BROWSER-DISTRIBUTION.md#normal-linux-sandbox-qualification)
+now clears inherited loader variables only for Browser hosts before Python/Node;
+direct runtime/desktop verification still rejects overrides. Twenty-one focused
+sandbox/package/system-Qt cases pass. An explicit external diagnostic wrapper
+admits the host, but navigation times out with unknown outcome and observed-page
+guards correctly refuse subsequent actions. That run remains failed and cannot
+promote the immutable package. Cause investigation and matching clean corrected
+package/Browser acceptance remain open, along with all other rollout gates.
+All five points remain active; root license and22 proposed-license file hashes
+are unchanged. Candidate binaries remain private and the PR remains a draft.
+
 ## October 3 Arch/Leap complete installer source adapters
 
 [The adapter checkpoint](../release/qualification/next-targets/20261003-system-qt-installer-adapters.json)

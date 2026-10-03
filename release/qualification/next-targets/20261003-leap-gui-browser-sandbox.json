@@ -1,0 +1,331 @@
+{
+  "format": "augmentor-linux-qualification-checkpoint/1",
+  "date": "2026-10-03",
+  "target": "opensuse-leap16.0-x86_64",
+  "scope": "Owned booted GNOME Wayland QEMU fixture, ordinary UID1000; Chromium currently uses XWayland; original immutable application/source remain8ad.",
+  "application": {
+    "source": {
+      "commit": "8adb633727f97eb808834394974a76a2886ea89c",
+      "dirty": false
+    },
+    "version": "0.2.13",
+    "package": "augmentor-agent-0.2.13-3.leap16.x86_64.rpm",
+    "sha256": "2cfb6e4fea9099fdc66e29135ae42fd7c1a66d4e88193bfe5300dbf50f2fe634",
+    "bytes": 337429355,
+    "bundle": "0.2.13-opensuse-leap16.0-x86_64-complete-preview.1-8adb633727f9"
+  },
+  "nativeAdmissions": {
+    "browserNewPackages": [
+      "chromium",
+      "libc++1",
+      "libc++abi1",
+      "which",
+      "xclip",
+      "xdg-utils"
+    ],
+    "applicationAndDependencyNewPackages": [
+      "alsa-plugins-pulse",
+      "augmentor-agent",
+      "dejavu-fonts",
+      "enchant-2-backend-hunspell",
+      "enchant-data",
+      "gcr3-ssh-askpass",
+      "gnome-keyring",
+      "google-noto-sans-jp-fonts",
+      "google-noto-sans-symbols2-fonts",
+      "libappindicator3-1",
+      "libatomic1",
+      "libavif16",
+      "libdbusmenu-glib4",
+      "libdbusmenu-gtk3-4",
+      "libenchant-2-2",
+      "libgck-modules-gnome-keyring",
+      "libgstfft-1_0-0",
+      "libgtk-layer-shell0",
+      "libharfbuzz-icu0",
+      "libhunspell-1_7-0",
+      "libhyphen0",
+      "libjavascriptcoregtk-4_1-0",
+      "libmanette-0_2-0",
+      "libopenblas_serial0",
+      "libspeech-provider-1_0",
+      "libspiel-1_0",
+      "libwebkit2gtk-4_1-0",
+      "libwireplumber-0_5-0",
+      "libyuv0",
+      "nodejs-common",
+      "nodejs24",
+      "npm24",
+      "pipewire",
+      "pipewire-pulseaudio",
+      "pipewire-spa-tools",
+      "pipewire-tools",
+      "pulseaudio-setup",
+      "pulseaudio-utils",
+      "rtkit",
+      "typelib-1_0-GstApp-1_0",
+      "webkit2gtk-4_1-injected-bundles",
+      "wireplumber",
+      "wl-clipboard",
+      "xdg-dbus-proxy",
+      "xdotool"
+    ],
+    "upgrades": 0,
+    "removals": 0,
+    "candidateUnsignedAdmission": "Own SHA-verified local RPM only; upstream signed repository policy retained.",
+    "installedNativeAuditExit": 0,
+    "frozenPythonQtRegisteredPackages": 23,
+    "requiredMembersExact": 2468,
+    "selinuxEnforcing": true,
+    "allDependencyClosureQualified": false
+  },
+  "ordinaryUserSetup": {
+    "target": "opensuse-leap16.0-x86_64",
+    "sourceCommit": "8adb633727f97eb808834394974a76a2886ea89c",
+    "bundle": "0.2.13-opensuse-leap16.0-x86_64-complete-preview.1-8adb633727f9",
+    "proofScriptSha256": "7327e2e6cb8b6f81e3782297998218f0afa8803b7cf88b4af75bb26e14b84fcf",
+    "setupScriptSha256": "c1ef496960376dce87aa67431879d835bcdc271f5ff709d2e25347a2efb32abf",
+    "bundleSetupScriptSha256": "c1ef496960376dce87aa67431879d835bcdc271f5ff709d2e25347a2efb32abf",
+    "setupScriptMatchesBundle": true,
+    "installerOverlayUsed": false,
+    "ordinaryUserSetup": true,
+    "realInstalledDshAndPlugins": true,
+    "offscreenNativeRender": true,
+    "secondWindowEntry": true,
+    "nativeHostRegistered": true,
+    "repeatPreservesSettings": true,
+    "linuxAndBrowserRoleFixtureTurns": true,
+    "restartPreservesHistoryWithoutReplay": true,
+    "modelRequests": 4,
+    "realDesktopSessionTested": false,
+    "graphicalBrowserTested": false,
+    "physicalVoiceTested": false,
+    "memoryEngineTested": false,
+    "pythonRuntime": {
+      "format": "augmentor-linux-python-runtime-contract/1",
+      "target": "opensuse-leap16.0-x86_64",
+      "profile": "leap16-cp313-x86_64-voice",
+      "pythonAbi": [
+        3,
+        13
+      ],
+      "architecture": "x86_64",
+      "lockIdentity": "7991a5ef322dfa02aa228bbb36a4cde5ddc0673b02645d7ba4f0a5c3f5782bed",
+      "policySha256": "86f6a9856dcca7bb26597299cbfe997a78de690681b1ca1b3aaad1861962018e",
+      "licenseReviewComplete": false,
+      "embeddedSourceCoverageComplete": false,
+      "systemQtStack": {
+        "format": "augmentor-system-qt-stack-contract/1",
+        "file": "system-qt-inventory.json",
+        "sha256": "485b8dca973e7ca58efd3d2e2d9e416dc4b3f324f5cf1a055ea74475f45ccd56",
+        "bytes": 557497,
+        "qtVersion": "6.9.1",
+        "packageManager": "rpm"
+      }
+    },
+    "selectedPython": "/home/augmentor-proof/.local/share/augmentor/python-runtimes/leap16-cp313-x86_64-voice-7991a5ef322dfa02/bin/python3",
+    "licenseReviewComplete": false,
+    "embeddedSourceCoverageComplete": false
+  },
+  "graphicalBrowserSandbox": {
+    "browser": "Chrome/154.0.8037.57",
+    "headed": true,
+    "ozonePlatform": "x11",
+    "expectedRendererStatus": {
+      "suid": false,
+      "userNs": true,
+      "pidNs": true,
+      "netNs": true,
+      "seccompBpf": true,
+      "seccompTsync": true,
+      "sandboxGood": true
+    },
+    "actualRendererCount": 5,
+    "allActualRendererSeccompMode2": true,
+    "allActualRendererNoNewPrivileges": true,
+    "allActualRendererPidAndNetNamespacesDistinctFromBrowser": true,
+    "collector": "Explicit owned-VM sudo read-only proc collector; launcher/user/profile/ancestry checks; no kernel sandbox changes.",
+    "probeIdentities": {
+      "proof_browser_sandbox.py": "529e54ae7031c9579a62a5358f1570afe89bd015bcd6567e6cf9adf161a902bf",
+      "proof_browser_sandbox82.py": "033138c859a28ef109f7324ffde3063f7536fa17fbe530a32ca331a1e679af0a",
+      "sandbox-preflight.py": "b88e716841588cf224c091f60bf9fa737ff9c7bd22a5a9b0eacb4313924f5ecc",
+      "sandbox-preflight83.py": "59b1f3306ab22fbed90c41db42ce5940cc9746b71be58ae2f1756efb30554ccb",
+      "browser-composable-proof.py": "a2176090d093d91887e459665541e564b414bd06db20ca290cbb5d10f148e0b1",
+      "prove-complete-linux.py": "7327e2e6cb8b6f81e3782297998218f0afa8803b7cf88b4af75bb26e14b84fcf"
+    },
+    "fullInstalledExtensionProofPassed": false
+  },
+  "retainedBrowserFailures": [
+    {
+      "run": "headed-browser85",
+      "returncode": 1,
+      "canonicalInstalledHost": true,
+      "reason": "Chromium distro wrapper exports LD_LIBRARY_PATH=/usr/lib64/chromium; runtime guard correctly refuses inherited unreviewed loader override."
+    },
+    {
+      "run": "headed-browser86",
+      "returncode": 1,
+      "canonicalInstalledHost": false,
+      "diagnosticExternalHostBoundary": true,
+      "reason": "Explicit external loader-boundary wrapper admits host and real Pi; browser_navigate times out with unknown outcome, later snapshot unavailable and observed-page guards refuse type/click. Full actual-page assertion fails; cause still under investigation."
+    }
+  ],
+  "implementation": {
+    "browserHostLoaderBoundary": "Clear inherited LD_LIBRARY_PATH/LD_PRELOAD/LD_AUDIT before Python/Node only in Browser host wrappers; direct runtime/desktop rejection intact.",
+    "packageRecipes": [
+      "scripts/package-debian.py",
+      "scripts/package-system-qt.py",
+      "scripts/install-browser-host.py"
+    ],
+    "matchingRebuiltInstalledPackageTested": false,
+    "normalSandboxProof": "scripts/proof_browser_sandbox.py and opt-in AUGMENTOR_PROOF_NORMAL_SANDBOX=1; requires actual renderer evidence.",
+    "focusedTests": {
+      "sandboxFailureBoundaries": 6,
+      "nativePackagePreparationIncludingExecutedHostBoundary": 4,
+      "systemQtDriftAndLoaderRefusal": 11
+    }
+  },
+  "primarySources": {
+    "chromiumSandboxInternals": {
+      "url": "https://raw.githubusercontent.com/chromium/chromium/154.0.8037.57/chrome/browser/ui/webui/sandbox/sandbox_internals_ui.cc",
+      "file": "chrome154.57-sandbox-internals.cc",
+      "sha256": "5bdd5cdff362b0e93df475ccbaaad6b5e71a4e4851fc3c5fb7d029b86358c4d3",
+      "bytes": 4236
+    },
+    "chromiumProcessTitle": {
+      "url": "https://raw.githubusercontent.com/chromium/chromium/154.0.8037.57/base/process/set_process_title.cc",
+      "file": "base_process_set_process_title.cc",
+      "sha256": "0ee3b7e26195659bb33bf6a9a4321866b226d2931f872617675f3c4d3f8bb80d",
+      "bytes": 4222
+    },
+    "chromiumLinuxProcessTitle": {
+      "url": "https://raw.githubusercontent.com/chromium/chromium/154.0.8037.57/base/process/set_process_title_linux.cc",
+      "file": "base_process_set_process_title_linux.cc",
+      "sha256": "a7253fa543c26eea53d7065f52778eeabe69d05c14248f86cb928f6821a33daf",
+      "bytes": 7368
+    }
+  },
+  "evidence": [
+    {
+      "file": "browser-install-result.json",
+      "sha256": "3856f4f22bcca7fceefdb60c327109b14bcdbc3e01365c258a128bada7ec2637",
+      "bytes": 206
+    },
+    {
+      "file": "application-install-result.json",
+      "sha256": "4a18b3f1fd16e6fce07a06ae3e5cd2d288fd01090509bc48ef09079cffe94f5e",
+      "bytes": 1322
+    },
+    {
+      "file": "after-browser-inventory.json",
+      "sha256": "aa9773a12fb042b9773fb20931632a3c8f8b5cb4fc952c61334c67ecf2939c59",
+      "bytes": 4921
+    },
+    {
+      "file": "after-application-inventory.json",
+      "sha256": "e28e965d7098700601018e0ecc3cc4fec2532cc6baad0e72402e3b61124b3074",
+      "bytes": 5058
+    },
+    {
+      "file": "native-audit84.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "file": "native-audit84.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "file": "vm-complete-proof.json",
+      "sha256": "a4793ec76bf29414d35a837aa802f97758df386a77a86266c3f679dc7f8cb972",
+      "bytes": 1986
+    },
+    {
+      "file": "vm-user-proof-wrapper.py",
+      "sha256": "aa49330945ddf9dbed068b9aa35cd31176bb70e8502188d20195d851b1644c69",
+      "bytes": 645
+    },
+    {
+      "file": "vm-offscreen-native.png",
+      "sha256": "bd78b99b091aac6ef3e8c11601e86241493d98ee34487486f07a910c52a3dd0d",
+      "bytes": 18871
+    },
+    {
+      "file": "sandbox-preflight.stderr",
+      "sha256": "288263e9fc2e1658977ef3e62d30845d43d8d480a016e37a08ea54c7ab5583b0",
+      "bytes": 2030
+    },
+    {
+      "file": "sandbox-preflight83.stderr",
+      "sha256": "c4421ff18becff4cace1c09fa9dd04b592ff5d0ab6e7c80e709b53669673836a",
+      "bytes": 2032
+    },
+    {
+      "file": "sandbox-process-debug83.json",
+      "sha256": "dfd937b78445539284856c9b08e9924b93a5c561c2333c8aa98db1f1e85cb17d",
+      "bytes": 1205
+    },
+    {
+      "file": "sandbox-preflight84-result.json",
+      "sha256": "b75b7f3c30da0f73d7e398c3f5a5b60f92dab909dd34dfa7f9ec7239f516b76f",
+      "bytes": 4289
+    },
+    {
+      "file": "guest-probe-shas84.json",
+      "sha256": "d079f013f77fa45de2c2d6217bb4addafb9d3de51a9c8e39ffc5cbe9a32aae15",
+      "bytes": 589
+    },
+    {
+      "file": "headed-browser85-result.json",
+      "sha256": "b94ef31c1690f2ad5ffea5f92ce7b930ab51ab950b967497bfc639d48b305443",
+      "bytes": 484
+    },
+    {
+      "file": "headed-browser85.stderr",
+      "sha256": "31f5865598ca369111d651952f602c72f56e38a3e50481450b747a9d3524019b",
+      "bytes": 1668
+    },
+    {
+      "file": "headed-browser85-debug.json",
+      "sha256": "6614a457f4d9c4aecb08cd712a673a7d317c1825f4026d385fc1d26ea295992f",
+      "bytes": 2415
+    },
+    {
+      "file": "headed-browser86-result.json",
+      "sha256": "deec6b9cd058217cc9b9d7129965238978e4a60f2b84a3b4f9584f309f8be69f",
+      "bytes": 525
+    },
+    {
+      "file": "headed-browser86.stderr",
+      "sha256": "44c3d7e526ae063fe0124ad455beaeef79de71a9cff137b470173da6fc1c005e",
+      "bytes": 945
+    },
+    {
+      "file": "headed-browser86-session-events.json",
+      "sha256": "953dba82e1256f921defcca08ca307f3780a312f9414f3ec5b0b67ef46aa66c8",
+      "bytes": 11404
+    },
+    {
+      "file": "native-host-loader-boundary86.sh",
+      "sha256": "22ab0aa72ba72e7cbab6f5be2fa5498509ba3cfb7c8bd86327ed424459d38046",
+      "bytes": 163
+    }
+  ],
+  "remaining": [
+    "Matching clean corrected host artifacts and installed Browser proof",
+    "Native Wayland Browser and manual Load unpacked",
+    "Current Ubuntu/Fedora/Mint two-window Settings shortcuts and password-lock/reboot",
+    "Fresh KDE/GNOME consent, target selection, visible Stop and input acceptance",
+    "Physical audio and human listening",
+    "Coherent dependency maintenance, product-version/managed history upgrades",
+    "Recipient source/rebuild/replacement and license acceptance"
+  ],
+  "ownerStateChanged": false,
+  "frozen22RecipientLicenseFilesChanged": false,
+  "licenseReviewComplete": false,
+  "publicReleaseQualified": false,
+  "binaryPublished": false,
+  "prMerged": false,
+  "allFiveRolloutPointsComplete": false
+}

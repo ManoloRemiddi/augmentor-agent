@@ -79,7 +79,11 @@ key=json.loads((extension/'manifest.json').read_text())['key']
 import hashlib
 ext_id=''.join(chr(ord('a')+int(n,16)) for n in hashlib.sha256(base64.b64decode(key)).hexdigest()[:32])
 manifest.write_text(json.dumps({'name':'com.augmentor.agent','description':'Augmentor proof','path':str(launcher),'type':'stdio','allowed_origins':['chrome-extension://'+ext_id+'/']}))
-log=(temp/'chrome.log').open('w');chrome=subprocess.Popen([os.environ.get('AUGMENTOR_PROOF_BROWSER_BINARY','chromium'),*([] if os.environ.get('AUGMENTOR_PROOF_HEADED') else ['--headless=new']),*(['--no-sandbox','--disable-gpu','--ozone-platform=x11'] if sys.platform=='linux' else []),'--no-first-run','--remote-allow-origins=*','--remote-debugging-port=0','--enable-unsafe-extension-debugging','--user-data-dir='+str(temp/'profile'),'about:blank'],env=env,stdout=log,stderr=log)
+normal_sandbox=os.environ.get('AUGMENTOR_PROOF_NORMAL_SANDBOX')=='1'
+if normal_sandbox:assert sys.platform=='linux' and os.geteuid()!=0,'Normal Linux sandbox qualification requires an ordinary user.'
+linux_flags=([] if normal_sandbox else ['--no-sandbox'])+['--disable-gpu','--ozone-platform=x11'] if sys.platform=='linux' else []
+chrome_command=[os.environ.get('AUGMENTOR_PROOF_BROWSER_BINARY','chromium'),*([] if os.environ.get('AUGMENTOR_PROOF_HEADED') else ['--headless=new']),*linux_flags,'--no-first-run','--remote-allow-origins=*','--remote-debugging-port=0','--enable-unsafe-extension-debugging','--user-data-dir='+str(temp/'profile'),'about:blank']
+log=(temp/'chrome.log').open('w');chrome=subprocess.Popen(chrome_command,env=env,stdout=log,stderr=log)
 ws=None;seq=0
 try:
     portfile=temp/'profile/DevToolsActivePort'
@@ -107,6 +111,16 @@ try:
             if reply.get('id')==identity:
                 if 'error' in reply:raise AssertionError(reply['error'])
                 return reply.get('result',{})
+    sandbox_evidence=None
+    if normal_sandbox:
+        from proof_browser_sandbox import prove as prove_sandbox
+        def sandbox_evaluate(expression,session):
+            r=cdp('Runtime.evaluate',{'expression':expression,'awaitPromise':True,'returnByValue':True},session)
+            if 'exceptionDetails' in r:raise AssertionError(r['exceptionDetails'])
+            return r.get('result',{}).get('value')
+        sandbox_evidence=prove_sandbox(cdp,sandbox_evaluate,chrome.pid,temp/'profile',os.environ.get('AUGMENTOR_PROOF_SANDBOX_SUDO_PROC')=='1')
+        (root/'outputs').mkdir(exist_ok=True)
+        (root/'outputs/browser-sandbox-proof.json').write_text(json.dumps(sandbox_evidence,indent=2)+'\n')
     result=cdp('Extensions.loadUnpacked',{'path':str(extension)});assert result['id']==ext_id
     def worker():
         for _ in range(100):
@@ -371,8 +385,11 @@ try:
         assert evaluate('document.querySelector("#log").textContent.includes("DSH EDIT VERIFIED")',panel)
         assert prompts.call('prompts.list')['prompts'][0]['name']=='proof-renamed'
         dsh_verified=True
+    if normal_sandbox:
+        sandbox_evidence=prove_sandbox(cdp,sandbox_evaluate,chrome.pid,temp/'profile',os.environ.get('AUGMENTOR_PROOF_SANDBOX_SUDO_PROC')=='1')
     shot=cdp('Page.captureScreenshot' ,{},panel)['data'];(root/'outputs').mkdir(exist_ok=True);(root/'outputs/browser-composable.png').write_bytes(base64.b64decode(shot))
     proof={'engine':'real Pi SDK','model':'deterministic local fixture','browser':info['Browser'],'navigateSnapshotTypeClick':True,'actualPageResultVerified':True,'dshRealLocalModelBrowser':dsh_verified,'copyClipboardAndScroll':True,'reconnectWithoutReplay':True,'branchToolContext':True,'editResubmitsOnce':True,'sharedPromptsConflictAndClipboard':True,'memory':memory_verified,'appRoot':str(app_root),'extensionRoot':str(extension),'supportReportDownloadedAndPrivate':True,'promptRefreshDuringClick':bool(os.environ.get('AUGMENTOR_PROOF_PROMPT_REFRESH')),'freshBrowserSetup':bool(os.environ.get('AUGMENTOR_PROOF_FRESH')),'setupRequests':len(setup_requests),'modelRequests':len(requests),'isolatedState':str(temp)}
+    proof.update(normalLinuxSandboxRequested=normal_sandbox,linuxBrowserFlags=linux_flags,rendererSandbox=sandbox_evidence)
     (root/'outputs/browser-composable-proof.json').write_text(json.dumps(proof,indent=2));print(json.dumps(proof),flush=True)
 finally:
     if os.environ.get('AUGMENTOR_PROOF_ONBOARDING'):

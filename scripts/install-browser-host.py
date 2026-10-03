@@ -9,7 +9,7 @@ p=argparse.ArgumentParser(description=__doc__);p.add_argument('--config-root',ty
 root=Path(__file__).resolve().parents[1];node=shutil.which('node')
 if not node:raise SystemExit('Node >=22.19 is required')
 key=json.loads((root/'apps/browser/extension/manifest.json').read_text())['key'];identity=''.join(chr(ord('a')+int(n,16)) for n in hashlib.sha256(base64.b64decode(key)).hexdigest()[:32])
-launcher=root/'scripts/augmentor-browser-host';launcher.write_text('#!/bin/sh\n# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0\nexec '+shlex.quote(node)+' '+shlex.quote(str(root/'apps/browser/native-host.mjs'))+' "$@"\n');launcher.chmod(0o700)
+launcher=root/'scripts/augmentor-browser-host';launcher.write_text('#!/bin/sh\n# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0\nunset LD_LIBRARY_PATH LD_PRELOAD LD_AUDIT\nexec '+shlex.quote(node)+' '+shlex.quote(str(root/'apps/browser/native-host.mjs'))+' "$@"\n');launcher.chmod(0o700)
 manifest={'name':'com.augmentor.agent','description':'Augmentor · Pi and DSH','path':str(launcher),'type':'stdio','allowed_origins':['chrome-extension://'+identity+'/']}
 for browser in ('chromium','google-chrome','google-chrome-beta','BraveSoftware/Brave-Browser'):
     directory=args.config_root/browser/'NativeMessagingHosts';directory.mkdir(parents=True,exist_ok=True)

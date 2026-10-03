@@ -2,7 +2,10 @@
 """Wrong input identities must refuse before a prepared package is exposed."""
 import importlib.util
 import json
+import os
 from pathlib import Path
+import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -14,6 +17,27 @@ spec.loader.exec_module(packaging)
 
 
 class SystemQtPackages(unittest.TestCase):
+    def test_browser_wrapper_drops_browser_loader_paths_before_python_but_runtime_preserves_refusal_inputs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            stub = root/'python-stub'
+            stub.write_text('#!'+sys.executable+'\nimport os,json,sys\nprint(json.dumps({"loader":{k:os.environ.get(k) for k in ["LD_LIBRARY_PATH","LD_PRELOAD","LD_AUDIT"]},"args":sys.argv[1:]}))\n')
+            stub.chmod(0o700)
+            packaging.wrappers(root, str(stub))
+            env = {**os.environ, 'LD_LIBRARY_PATH': directory,
+                   'LD_PRELOAD': 'augmentor-nonexistent-test-library.so',
+                   'LD_AUDIT': 'augmentor-nonexistent-test-audit.so'}
+            results = {}
+            for name in ('augmentor-browser-host','augmentor-runtime'):
+                result = subprocess.run([str(root/'usr/bin'/name), 'chrome-extension://fixture/'],
+                                        env=env, capture_output=True, text=True, check=True)
+                results[name] = json.loads(result.stdout)
+            self.assertEqual(results['augmentor-browser-host']['loader'],
+                             dict.fromkeys(('LD_LIBRARY_PATH','LD_PRELOAD','LD_AUDIT')))
+            self.assertEqual(results['augmentor-runtime']['loader'], {k:env[k] for k in ('LD_LIBRARY_PATH','LD_PRELOAD','LD_AUDIT')})
+            self.assertEqual(results['augmentor-browser-host']['args'][-1], 'chrome-extension://fixture/')
+            self.assertEqual(results['augmentor-browser-host']['args'][1], 'runtime')
+
     def test_foreign_runtime_dirty_source_or_wrong_package_pair_refuses_before_extraction(self):
         source = {'commit': 'a'*40, 'dirty': False}
         original = {'version': '0.2.13', 'target': 'debian13-amd64', 'source': source,

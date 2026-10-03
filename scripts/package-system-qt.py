@@ -66,7 +66,8 @@ def wrappers(payload, python):
     lease = 'exec '+python+' '+app+'/scripts/run-component.py runtime "$AUGMENTOR_PI_NODE" '
     for name, command in [('augmentor-runtime', '/dist/runtime/src/main.js'),
                           ('augmentor-browser-host', '/apps/browser/native-host.mjs')]:
-        write(payload/'usr/bin'/name, prefix+lease+app+command+' "$@"\n', 0o755)
+        boundary='unset LD_LIBRARY_PATH LD_PRELOAD LD_AUDIT\n' if name=='augmentor-browser-host' else ''
+        write(payload/'usr/bin'/name, prefix+boundary+lease+app+command+' "$@"\n', 0o755)
     write(payload/'usr/bin/augmentor-maintenance', '#!/bin/sh\n'+HEADER+'exec '+python+' '+app+'/scripts/maintenance.py "$@"\n', 0o755)
     desktop = prefix+'export PYTHONPATH='+app+'/apps/native\n'
     desktop += 'augmentor_python="$('+python+' '+app+'/scripts/linux-python-runtime.py resolve --app-root '+app+')"\n'

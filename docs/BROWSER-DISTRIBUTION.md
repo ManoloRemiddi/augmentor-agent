@@ -38,3 +38,44 @@ this repository does not imply store publication. See Google's
 [publishing process](https://developer.chrome.com/docs/webstore/publish) and
 [native messaging registration](https://developer.chrome.com/docs/extensions/develop/concepts/native-messaging).
 Confirm the final store identity and companion allowlist together before release.
+
+## Normal Linux sandbox qualification
+
+Linux native-host launchers clear inherited `LD_LIBRARY_PATH`, `LD_PRELOAD` and
+`LD_AUDIT` before starting their Python/Node runtime. Chromium's distro wrapper
+can export its own private library directory; it must not become Augmentor's
+loader path. Debian/Fedora and Arch/Leap package recipes and the source registrar
+apply this boundary only to the browser host. Direct runtime/desktop verification
+still rejects unreviewed loader overrides; source-Qt controls generate their own
+verified Qt paths afterwards. Browser/host manifests and identities are unchanged.
+
+Set `AUGMENTOR_PROOF_NORMAL_SANDBOX=1` for the isolated
+`scripts/browser-composable-proof.py` run as an ordinary user, with
+`AUGMENTOR_PROOF_HEADED=1` for a graphical session. Set
+`AUGMENTOR_PROOF_BROWSER_BINARY`, `AUGMENTOR_PROOF_APP_ROOT`,
+`AUGMENTOR_PROOF_EXTENSION` and `AUGMENTOR_PROOF_NATIVE_HOST` to the exact native
+browser, installed application, matching unpacked extension and canonical
+installed host launcher. Use a writable fixture copy of the test scripts for
+their outputs; keep the installed payload unchanged.
+
+This mode removes the test's historical `--no-sandbox` flag and refuses root.
+It also checks `chrome://sandbox` and actual CDP-reported renderer processes:
+seccomp filter mode2, no-new-privileges, fixture browser ancestry and distinct
+PID/network namespaces. The diagnostic page describes expected renderer status;
+it cannot substitute for process evidence. Missing renderers, unreadable
+namespaces or inherited namespaces fail acceptance. The normal mode records
+`browser-sandbox-proof.json` and attaches renderer evidence to the completed
+composable Browser report. Legacy container runs retain their explicit disabled
+sandbox flags and do not qualify this requirement.
+
+For owned QEMU qualification VMs where the ordinary user cannot read renderer
+namespace links, `AUGMENTOR_PROOF_SANDBOX_SUDO_PROC=1` enables a narrowly scoped
+read-only collector. It verifies the VM marker, calling UID, private fixture
+profile and process ancestry before accepting namespace evidence from `/proc`; it changes no browser,
+kernel or desktop settings. Production installation does not invoke this test
+collector. Chromium rewrites Linux process titles into one space-joined string;
+the collector labels those flag tokens separately from original NUL-separated
+arguments, and requires a whitespace-free fixture profile.
+
+This proof remains separate from manual Load unpacked, branded Chrome,
+Snap/Flatpak native messaging, audio and desktop consent/input acceptance.

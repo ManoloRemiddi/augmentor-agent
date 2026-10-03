@@ -2,6 +2,33 @@
 
 # Start here: agent handoff
 
+## October 3 Leap graphical sandbox and Browser loader boundary
+
+[The booted VM checkpoint](../release/qualification/next-targets/20261003-leap-gui-browser-sandbox.json)
+records actual signed Chromium/dependency admission and the immutable clean8ad
+Leap release3 package. All2468 frozen Python/Qt members remain exact, native
+audit passes and SELinux stays enforcing. The matching complete installer passes
+ordinary-user setup/repeat, native offscreen render, both real DSH/plugin fixture
+roles and restart history without replay. The reused container proof's user phase
+is invoked with an explicit owned-VM marker wrapper; its container main is not run.
+
+Headed Chromium154 on XWayland passes real sandbox diagnostics and five renderer
+seccomp/no-new-privileges/distinct PID/network namespace checks. Initial argument
+parsing refusals remain retained; Chromium's actual process-title rewriting is
+verified against its exact upstream source. The canonical host then exposes a
+real launcher defect: Chromium exports its private library path, which the runtime
+correctly refuses. Browser-host generators now clear inherited loader variables
+before Python/Node; direct runtime/desktop refusal stays intact. Twenty-one focused
+cases pass, including executing the generated Browser/runtime wrappers.
+
+An explicit diagnostic boundary admits the native host, but full actual Browser
+navigation/page acceptance still fails and is being investigated. Matching clean
+rebuilt/installed corrected launchers, native Wayland/manual extension setup and
+other rollout gates remain open. [Browser qualification](BROWSER-DISTRIBUTION.md)
+owns the opt-in normal-sandbox proof and scope. Owner installation/services/models/
+devices, root license and22 proposed-license file hashes stay unchanged. No binary
+publication, PR merge or completed five-point rollout is claimed.
+
 ## October 3 fresh matching corrected Arch complete installer
 
 [Cleanf85 qualification](../release/qualification/next-targets/20261003-arch-clean-complete-installer.json)

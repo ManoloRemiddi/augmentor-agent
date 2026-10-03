@@ -194,7 +194,9 @@ def build(output,target='debian13-amd64',wheelhouse=None,*,source_qt=False):
                                                **({'pythonRuntime':python_runtime,'candidateOnly':True} if python_runtime else {})}, indent=2) + '\n')
         launcher = '#!/bin/sh\n' + HEADER + 'export AUGMENTOR_PI_NODE=/usr/lib/augmentor/node/bin/node\nexport PI_TELEMETRY=0 PI_SKIP_VERSION_CHECK=1\n'
         lease='exec /usr/bin/python3 /usr/lib/augmentor/scripts/run-component.py runtime "$AUGMENTOR_PI_NODE" '
-        write(runtime / 'usr/bin/augmentor-browser-host', launcher + lease + '/usr/lib/augmentor/apps/browser/native-host.mjs "$@"\n', True)
+        # Browser wrappers export private loader paths for their own libraries.
+        # The host starts its separately verified runtime, never those paths.
+        write(runtime / 'usr/bin/augmentor-browser-host', launcher + 'unset LD_LIBRARY_PATH LD_PRELOAD LD_AUDIT\n' + lease + '/usr/lib/augmentor/apps/browser/native-host.mjs "$@"\n', True)
         write(runtime / 'usr/bin/augmentor-runtime', launcher + lease + '/usr/lib/augmentor/dist/runtime/src/main.js "$@"\n', True)
         write(runtime / 'usr/bin/augmentor-maintenance', '#!/bin/sh\n'+HEADER+'exec /usr/bin/python3 /usr/lib/augmentor/scripts/maintenance.py "$@"\n',True)
         write(runtime/'usr/lib/udev/rules.d/70-augmentor-dictation.rules',HEADER+'KERNEL=="uinput", SUBSYSTEM=="misc", TAG+="uaccess", OPTIONS+="static_node=uinput"\n')
