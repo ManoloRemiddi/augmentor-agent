@@ -33,7 +33,20 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     spec = importlib.util.spec_from_file_location('windows_package', ROOT/'scripts/package-windows.py')
     package = importlib.util.module_from_spec(spec); spec.loader.exec_module(package)
-    report = package.build(args.root, args.arch, out/'package', qualification=out/'qualification')
+    try:
+        report = package.build(args.root, args.arch, out/'package', qualification=out/'qualification')
+    except ValueError:
+        # Keep the actual staged-file differences when intake refuses. These are
+        # disposable package files, never an installed user's data or credentials.
+        from lifecycle.payload_integrity import inspect_payload
+        root=args.root.resolve()
+        try:
+            diagnosis=inspect_payload(root,(root/'release.json').read_bytes(),
+                                      (root/'payload-integrity.json').read_bytes())
+        except (OSError,ValueError):
+            diagnosis={'scope':'Staged payload could not be safely inspected.'}
+        (out/'payload-intake.json').write_text(json.dumps(diagnosis,indent=2)+'\n',encoding='utf-8')
+        raise
     data = Path(report['qualificationBase']); install = Path(report['installationDirectory'])
     executable = install/'current/Augmentor.exe'
     sentinel = private_directory(data/'data')/'retained-settings.json'

@@ -1775,3 +1775,12 @@ now waits for both the authenticated peer and its distinct native wrapper after
 a deliberate test supervisor kill, preserving kernel exit assertions and strict
 folder cleanup. The product supervisor is unchanged. This follows ARM cleanup
 ordering failure 37121482753; matched Handy checks rerun.
+
+## October 3 broker exit and sealed interpreter
+
+[Handy qualification](HANDY-INTEGRATION.md#october-3-alignment-and-matched-downloads)
+records passed Windows IPC/ACL assertions and a fixture cleanup race after the
+shutdown reply. Tests now wait for actual broker process exit. Broker startup
+passes `-B` to preserve the native launcher's no-bytecode policy in a sealed
+installation. The exact entries behind the subsequent intake mismatch were not
+captured; inventory checks remain strict and native/package gates rerun.

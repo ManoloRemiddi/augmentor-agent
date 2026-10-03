@@ -1,5 +1,6 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import importlib.util
+from contextlib import contextmanager
 import json
 import os
 from pathlib import Path
@@ -25,6 +26,19 @@ class DictationTests(unittest.TestCase):
             from platform_adapters.windows_identity import private_directory
             self.base=private_directory(self.base/'private')
         self.backend=broker.Backend(self.base)
+
+    @contextmanager
+    def owned_brokers(self):
+        # Shutdown acknowledges its reply before the broker's native process
+        # has exited. Keep the actual Popen handles and wait before fixture
+        # cleanup, including the Windows lock file held until process exit.
+        original=subprocess.Popen;children=[]
+        def launch(*args,**options):
+            child=original(*args,**options);children.append(child);return child
+        with patch.object(subprocess,'Popen',side_effect=launch):
+            try:yield
+            finally:
+                for child in children:self.assertEqual(child.wait(timeout=10),0)
 
     def test_theme_round_trip_while_disabled_never_starts_microphone(self):
         value=dictation.theme({'theme':'light','accent_hue':32,'opacity':70,'animation':False})
@@ -111,7 +125,7 @@ class DictationTests(unittest.TestCase):
             self.assertEqual(native.call_args.args[1]['token'],value['token']);self.assertIsNone(self.backend.owner)
 
     def test_private_authenticated_ipc_and_single_owner(self):
-        with patch.dict(os.environ,{'AUGMENTOR_DICTATION_STATE':str(self.base)}):
+        with patch.dict(os.environ,{'AUGMENTOR_DICTATION_STATE':str(self.base)}),self.owned_brokers():
             state=dictation.request('status');self.assertFalse(state['enabled']);self.assertFalse(state['tray'])
             try:
                 _,address,key=dictation.location()
@@ -154,9 +168,10 @@ class DictationTests(unittest.TestCase):
 
     def test_offscreen_ui_cannot_share_the_login_session_broker(self):
         home=self.base/'home';home.mkdir()
-        with patch.dict(os.environ,{'HOME':str(home),'QT_QPA_PLATFORM':'offscreen'}):
+        with patch.dict(os.environ,{'HOME':str(home),'QT_QPA_PLATFORM':'offscreen'}),self.owned_brokers():
             os.environ.pop('AUGMENTOR_DICTATION_STATE',None)
             state,address,key=dictation.location()
+            self.addCleanup(shutil.rmtree,state)
             try:
                 self.assertNotEqual(state,home/'.local/share/augmentor/dictation')
                 self.assertEqual(os.environ['AUGMENTOR_DICTATION_STATE'],str(state))
@@ -171,7 +186,6 @@ class DictationTests(unittest.TestCase):
                 self.assertFalse((home/'.local/share/augmentor/dictation').exists())
             finally:
                 dictation.request('shutdown',start=False)
-                shutil.rmtree(state)
 
     @unittest.skipIf(os.name=='nt','Unix socket path limit')
     def test_long_state_path_uses_private_short_socket_and_preserves_capture_ownership(self):

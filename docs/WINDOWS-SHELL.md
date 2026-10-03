@@ -423,8 +423,9 @@ separate full-package/physical check. New native execution is pending.
 ## October 3 companion fault-fixture cleanup
 
 The native ARM fixture observed its authenticated Python peers exit after an
-intentional supervisor kill, then attempted folder cleanup while a companion's
-separate native wrapper still held its log. The fixture now retains Windows
+intentional supervisor kill, then encountered a locked log during folder cleanup. It had not waited for the
+separate native wrapper, which can retain that log after its Python peer exits.
+The exact holder of the failing file was not captured. The fixture now retains Windows
 process handles for both peer and wrapper and requires all of them to signal
 exit before closing the handles and removing the temporary folder. The Job
 termination assertions remain mandatory; no deletion error is ignored and no

@@ -171,6 +171,17 @@ assertions rather than ignoring deletion failures. Product supervisor behavior
 is unchanged. This follow-up is documented in the Windows shell guide and native
 checks are rerun from the resulting source.
 
+Windows broker IPC/ACL assertions passed after the test-path fix, but immediate
+fixture deletion raced the shutdown reply versus native process exit. Those IPC
+fixtures now retain and wait for their actual broker Popen handles before cleanup.
+The same lane subsequently detected a changed sealed payload; its exact changed
+entries were not captured. Broker startup now explicitly carries `-B`, matching
+the native launcher's no-bytecode policy so a child interpreter cannot create
+cache files in the sealed installation. This runtime preservation is included
+in the next native/full-package qualification, without weakening inventory checks. The disposable installation proof now retains
+actual staged-file differences if intake refuses, rather than only the generic
+exception. No installed user data is copied.
+
 Implementation branch: `feat/handy-integration`, based on public main
 `d91c52037d7bc26c82c702c25e1a779b0fca1f39`. This guide owns the implemented
 contract; [the approved plan](HANDY-INTEGRATION-PLAN.md) retains its rationale.

@@ -83,7 +83,7 @@ def request(method='status', params=None, *, start=True, timeout=20):
         except (ConnectionRefusedError, FileNotFoundError, OSError):
             if not start: raise RuntimeError('System dictation is not running.')
             if attempt == 0:
-                process=subprocess.Popen([sys.executable, str(ROOT/'services/dictation/server.py')], stdin=subprocess.DEVNULL,
+                process=subprocess.Popen([sys.executable, '-B', str(ROOT/'services/dictation/server.py')], stdin=subprocess.DEVNULL,
                                  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True, **({'creationflags':0x08000000} if os.name=='nt' else {}))
                 threading.Thread(target=process.wait,daemon=True).start()
             time.sleep(.05)
