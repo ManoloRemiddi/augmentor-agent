@@ -1903,3 +1903,13 @@ The native `d82a721` dialog diagnostics prove busy-warning cleanup passes, then
 identify the rejected-update warning as a task dialog without ordinary button
 handles. The fixture now uses its documented logical-button message in that
 case; actual x64/ARM64 completion remains a required gate.
+
+## October 3 enabled editing and disabled Qt fixture coverage
+
+[Handy qualification](HANDY-INTEGRATION.md#october-3-explicit-off-state-refresh-and-maintenance)
+records both Windows installer gates and x64 customer lease/startup passing at
+`048954d`. Linux's 841-case suite finds an old stale-save fixture typing while
+disabled. It now exercises enabled editing without dropping any draft/revision
+assertion; a separate actual Qt case checks disabled controls and status-only
+refresh. The local production runtime omits QtTest; hosted Qt completion remains
+required. Private draft downloads remain withheld and the owner is untouched.

@@ -752,3 +752,13 @@ admitted after disabling it. Prior proofs covered native IPC/component behavior
 but omitted that release identity, so did not exercise its installation lease.
 The Windows guide explicitly requires turning dictation off before repair or
 removal. All final native/package gates rerun; no owner installation is modified.
+
+The `048954d` native Windows installer gates pass on both CPUs, including
+rejected-update task-dialog cleanup. Its x64 customer dictation proof also passes
+with the real installed lease checks. Linux's broader suite reaches 841 cases
+and catches one outdated fixture: the stale-save/draft test types into a disabled
+shortcut field. That test now models enabled dictation and retains every draft,
+revision-conflict and explicit-reload assertion; a separate Qt case verifies
+disabled editing and status-only refresh. The local production interpreter omits
+QtTest, so these actual Qt cases require the full hosted test runtime. Final
+matching package/source qualification remains required after this fixture change.
