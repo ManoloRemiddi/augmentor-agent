@@ -16,7 +16,7 @@ The selection follow-up binds Codex app context to durable operations, enforces
 the 16 KB UTF-8 boundary and scopes branch-status recovery to its parent.
 DSH retains latest-session context; the capability snapshot reports this
 difference. See the alignment guide's exact tests, initial failures and remaining
-hosted/package gates before claiming release readiness.
+customer acceptance gates before claiming release readiness.
 
 The workspace settings follow-up integrates the approved thinking-display choice
 with profile-specific persistence/cache keys, including same-origin app isolation.
@@ -27,9 +27,10 @@ identifier contract as SDK planning and the pinned host, before registry writes.
 
 Current functional pair: product `8a085be` / SDK `925b72e`. All six SDK jobs,
 all three platform contracts, Mac 14/26 bundles and Windows x64/ARM64 desktop
-checks pass. Full Linux/package/Browser validation also passes; Windows packaged
-installation remains a live running gate. The alignment guide records their
-exact run URLs, the requirement audit and four inspected Chromium component
+checks pass. Full Linux/package/Browser validation and Windows x64/ARM64
+packaged installation also pass. Source/package qualification is complete for
+this pair. The alignment guide records exact run URLs, the requirement audit
+and four inspected Chromium component
 renders. These source checks do not promote a release or migrate an app.
 
 ## October 3 Handy alignment, test separation and download preparation

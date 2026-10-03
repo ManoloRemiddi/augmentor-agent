@@ -159,7 +159,16 @@ commits do not change the functional source under qualification.
 | macOS 14/26 bundled runtime and shipped SDK-helper proof | Pass in [37116596912](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37116596912) |
 | Windows x64/ARM64 desktop | Pass in [37116596991](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37116596991) |
 | Full Linux/source/native/package/Browser regression | All jobs pass in [37116596924](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37116596924) |
-| Windows x64/ARM64 bundled runtime and install/repair/removal | Running in [37116596824](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37116596824) |
+| Windows x64/ARM64 bundled runtime and install/repair/removal | All jobs pass in [37116596824](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37116596824) |
+
+All required source/package gates above completed successfully on October 3.
+Both Windows architectures report actual packaged SDK registration, role
+composition, preserved private token, shared-administration denial and natural
+bridge exit. Their installed payload proofs preserve a busy draft, exercise
+same-build repair and coordinated replacement/source restoration, refuse
+redirected paths, and retain persistent data on removal. The SDK bundle proof
+makes no provider request; the separate managed DSH proof uses a deterministic
+provider and isolated state.
 
 The exact Linux run passes 522 root cases (520 passing/two opt-in skips), all
 88 Browser cases, the real DSH tool guard, and 830 native cases (36
@@ -188,11 +197,16 @@ separate from installed app, model or provider acceptance.
 | Developer handoff, support limits and license | Paired SDK manifests/scaffold/API/agent/acceptance guides; explicit platform matrix and unreleased status; original license retained in both repositories |
 | Preserve live apps and independent adoption | Candidate work stays in development branches; no app/database/profile/model/deployment changes; owner's third application is neither built nor inspected |
 
-This audit does not claim completion while either required workflow above is
-pending/running. Customer SDK install/login-service, OS consent, physical audio,
-real Codex account/provider and installed upgrade/rollback acceptance remain
-separate release gates even after the source/package workflows pass. Windows
-Codex, Pi, cloud voice and multi-tenant/untrusted-plugin hosting are not added.
+The requirement audit and every required source/package workflow are complete
+for this exact functional pair. This completes the development source candidate;
+[product PR #34](https://github.com/ManoloRemiddi/augmentor-agent/pull/34) and
+[SDK PR #2](https://github.com/ManoloRemiddi/augmentor-app-sdk/pull/2) remain open
+drafts. No merge, release archive or live app migration is included.
+Customer SDK install/login-service, OS consent, physical audio, real Codex
+account/provider and installed SDK upgrade/rollback acceptance remain separate
+release gates. Windows Codex, Pi, cloud voice and multi-tenant/untrusted-plugin
+hosting are not added. The installed product lifecycle fixtures above do not
+certify those customer SDK app gates or the owner's independent third app.
 
 ### Earlier qualification checkpoints
 
