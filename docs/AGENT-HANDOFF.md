@@ -2,6 +2,26 @@
 
 # Start here: agent handoff
 
+## October 3 clean release2 native builds and explicit Voice source coverage
+
+[This checkpoint](../release/qualification/next-targets/20261003-system-qt-release2-and-source-scope.json)
+records fresh clean f1c3975 Desktop/Browser bytes and actual ordinary-user Arch/
+Leap release2 native builds. Both complete streaming inspections pass with no
+prepared mode reductions, including new font dependencies. Arch verifies29,263
+native members/29,248 app members; Leap29,266/29,250. These bytes have not yet
+passed an installed complete setup or release/version upgrade/rollback.
+
+Public research finds no full Voice0.1.19 repository snapshot. The exact public
+npm archive contains shipped runtime source and MIT notice. The assembler's
+explicit `--voice-distribution-source` mode retains those original bytes and
+[records coverage and omitted files](../release/dsh/voice-distributed-source.json),
+while separately reusing checked public Adaptive0.2.3 source. It never exports a
+private repository tree or calls the package a full repository snapshot; its
+upstream ref is declared public provenance, not independent private-tree proof.
+Twenty-one focused source/setup cases pass. Fresh matching artifacts with this
+assembler mode, full root/user setup/npm acceptance and all five rollout gates
+remain open. Owner state, root license and22 proposed-license files are unchanged.
+
 ## October 3 Arch/Leap complete installer source adapters
 
 [The adapter checkpoint](../release/qualification/next-targets/20261003-system-qt-installer-adapters.json)

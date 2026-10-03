@@ -235,6 +235,21 @@ Their installation, compiler/model/service/device acceptance is separate.
 
 ## Remaining acceptance
 
+[Fresh release2 builds and source scope](../release/qualification/next-targets/20261003-system-qt-release2-and-source-scope.json)
+now record actual clean f1c3975 Desktop/Browser and native Arch/Leap builds with
+the font dependencies. Complete streaming inspection passes every29,263 Arch/
+29,266 Leap native file/link member, with zero prepared mode reductions. Their
+application inventories contain29,248/29,250 members. Installation and complete
+setup are still separate gates for these exact new bytes.
+
+Voice0.1.19 has an exact public npm archive containing shipped runtime source,
+but no full public repository snapshot was found. Complete assembly now offers
+the explicit [package-source mode](COMPLETE-INSTALL.md) with checked Adaptive
+source reuse. Archive/provenance hashes, coverage exclusions and the declared
+upstream-ref limit remain in the bundle; it does not export private source or
+complete legal/source-kit acceptance. Twenty-one source/setup cases pass, while
+actual assembly/execution with new matching clean artifacts remains pending.
+
 Arch/Leap source adapters now provide target/runtime contracts, checked guard
 ordering, explicit bootstrap and native npm selection. Matching new clean bundle
 assembly and actual installed/resumed complete setup checks remain required.

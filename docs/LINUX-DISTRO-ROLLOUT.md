@@ -2615,3 +2615,23 @@ preserved. [The GNOME plan](LINUX-GNOME-CONTROL-PLAN.md#isolated-native-launcher
 keeps real GNOME restart, compositor/widget/controller/lock/Stop and supported-
 profile repetition open. Both3f52af2 hosted checks pass; this checkpoint needs its
 own checks. All five rollout points remain active; license/owner state is unchanged.
+
+## October 3 clean release2 builds and dependency source coverage
+
+[The build/source checkpoint](../release/qualification/next-targets/20261003-system-qt-release2-and-source-scope.json)
+records fresh clean f1c3975 Desktop/Browser and actual Arch/Leap release2 native
+builds. Complete streaming inspection verifies all29,263/29,266 native members
+and29,248/29,250 app members; prepared modes need no reduction. New font providers
+are declared. These exact bytes still require installed complete setup and real
+upgrade/rollback acceptance. Earlier release1 evidence keeps its original source.
+
+No full public Voice0.1.19 repository snapshot was found. The assembler now offers
+explicit package-source reuse from the exact already public npm archive, with
+checked Adaptive0.2.3 repository source reuse.
+[Its scope receipt](../release/dsh/voice-distributed-source.json) retains MIT,
+archive/member hashes, shipped runtime source, omitted repository files and the
+limit of the publicly declared upstream ref. No private tree is exported and no
+full repository-source claim is made. Twenty-one focused source/setup cases pass.
+Matching clean new artifacts, actual assembler/root/user/npm/repeat execution and
+all five rollout acceptance points remain open. Owner state, root license and all
+22 proposed-license file hashes are unchanged. No candidate binary is published.

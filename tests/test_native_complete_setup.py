@@ -28,6 +28,32 @@ verifier=module('linux-package-verification')
 
 
 class NativeCompleteSetup(unittest.TestCase):
+    def test_public_voice_package_source_keeps_bytes_and_truthful_coverage(self):
+        package=ROOT/'release/dsh/plugins/dsh-resonant-voice-0.1.19.tgz'
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);published=root/'published';published.mkdir();sources=root/'sources';sources.mkdir()
+            key='sources/adaptive-reasoning-0.2.3-source.tar.gz'
+            (published/'sources').mkdir();(published/key).write_bytes(b'independent synthetic published-source fixture')
+            manifest={'format':'augmentor-complete/1','artifactId':'synthetic-old-source-bundle',
+                      'sourceRefs':{'adaptive':'a'*40,'voice':'b'*40},'sha256':{key:builder.sha(published/key)}}
+            (published/'bundle.json').write_text(json.dumps(manifest))
+            refs,reuse,coverage=builder.reuse_sources(published,sources,package)
+            self.assertEqual(refs['adaptive'],'a'*40)
+            self.assertEqual(reuse['rolesReused'],['adaptive'])
+            self.assertEqual(coverage['voice']['kind'],'npm-distributed-source')
+            self.assertFalse(coverage['voice']['fullRepositorySnapshot'])
+            self.assertEqual((sources/coverage['voice']['file']).read_bytes(),package.read_bytes())
+            self.assertEqual(builder.sha(sources/'voice-distributed-source.json'),coverage['voice']['provenanceSha256'])
+            self.assertEqual((sources/coverage['adaptive']['file']).read_bytes(),(published/key).read_bytes())
+
+    def test_changed_voice_package_source_refuses_before_copying(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);package=root/'changed.tgz';package.write_bytes(b'Changed or private bytes must never be exported.')
+            destination=root/'sources';destination.mkdir()
+            with self.assertRaisesRegex(ValueError,'exact already published Voice'):
+                builder.distributed_voice_source(package,destination)
+            self.assertEqual(list(destination.iterdir()),[])
+
     @unittest.skipUnless(sys.platform.startswith('linux'), 'Linux native installed-package adapter')
     def test_completed_native_stamp_cannot_skip_pending_or_changed_registered_package(self):
         runtime=module('linux-python-runtime')

@@ -33,10 +33,12 @@ class PublishedSourceReuse(unittest.TestCase):
             bundle=Path(folder)/'bundle';bundle.mkdir();out=Path(folder)/'out';out.mkdir()
             manifest=self.fixture(bundle)
             with patch.object(package.subprocess,'check_output',side_effect=AssertionError('Repository access')),patch.object(package.subprocess,'run',side_effect=AssertionError('Repository access')):
-                refs,origin=package.reuse_sources(bundle,out)
+                refs,origin,coverage=package.reuse_sources(bundle,out)
             self.assertEqual(refs,manifest['sourceRefs'])
             self.assertEqual(origin['artifactId'],manifest['artifactId'])
             self.assertEqual(origin['manifestSha256'],package.sha(bundle/'bundle.json'))
+            self.assertEqual(origin['rolesReused'],['voice','adaptive'])
+            self.assertEqual({row['kind'] for row in coverage.values()},{'published-repository-source-snapshot'})
             for key in manifest['sha256']:
                 self.assertEqual((out/Path(key).name).read_bytes(),(bundle/key).read_bytes())
 

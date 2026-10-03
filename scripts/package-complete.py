@@ -34,12 +34,41 @@ def source_archive(repository, target):
     return ref
 
 
-def reuse_sources(bundle, destination):
+def distributed_voice_source(package, destination):
+    """Preserve already public package bytes; never claim a full private tree."""
+    provenance_path=ROOT/'release/dsh/voice-distributed-source.json'
+    provenance=json.loads(provenance_path.read_text())
+    expected=provenance['archive']
+    if package.is_symlink() or package.stat().st_size!=expected['bytes'] or sha(package)!=expected['sha256']:
+        raise ValueError('Use the exact already published Voice package-source archive.')
+    plugin(package,'dsh-resonant-voice','0.1.19')
+    with tarfile.open(package) as archive:
+        names=set()
+        for member in archive:
+            if (not member.isfile() or member.name in names or
+                    not member.name.startswith('package/') or '..' in Path(member.name).parts):
+                raise ValueError('Unsafe or duplicate distributed-source member.')
+            names.add(member.name)
+        if len(names)!=provenance['packageMemberCount'] or not {'package/LICENSE','package/src/plugin.js','package/package.json'}<=names:
+            raise ValueError('The published package-source inventory differs.')
+    target=destination/expected['file']
+    shutil.copy2(package,target)
+    shutil.copy2(provenance_path,destination/'voice-distributed-source.json')
+    return provenance['declaredUpstreamRef'],{'kind':'npm-distributed-source','file':target.name,
+        'sha256':expected['sha256'],'provenanceFile':'voice-distributed-source.json',
+        'provenanceSha256':sha(provenance_path),'fullRepositorySnapshot':False,
+        'upstreamRefBinding':provenance['upstreamRefBinding']}
+
+
+def reuse_sources(bundle, destination, voice_distribution=None):
     """Reuse exact checked archives; do not regenerate private repository files."""
     manifest=json.loads((bundle/'bundle.json').read_text())
     if manifest.get('format')!='augmentor-complete/1':raise ValueError('Unknown source bundle format.')
-    refs={}
+    refs={};coverage={}
     for role,name,version in [('voice','resonant-voice','0.1.19'),('adaptive','adaptive-reasoning','0.2.3')]:
+        if role=='voice' and voice_distribution is not None:
+            refs[role],coverage[role]=distributed_voice_source(voice_distribution,destination)
+            continue
         key='sources/'+name+'-'+version+'-source.tar.gz'
         path=bundle/key
         if sha(path)!=manifest['sha256'].get(key):raise ValueError('Source archive checksum differs: '+key)
@@ -47,7 +76,9 @@ def reuse_sources(bundle, destination):
         if not isinstance(ref,str) or len(ref)!=40 or any(c not in '0123456789abcdef' for c in ref):raise ValueError('Invalid source reference.')
         shutil.copy2(path,destination/path.name)
         refs[role]=ref
-    return refs,{'artifactId':manifest['artifactId'],'manifestSha256':sha(bundle/'bundle.json')}
+        coverage[role]={'kind':'published-repository-source-snapshot','file':path.name,'sha256':sha(path)}
+    return refs,{'artifactId':manifest['artifactId'],'manifestSha256':sha(bundle/'bundle.json'),'rolesReused':
+                 [role for role in refs if role!='voice' or voice_distribution is None]},coverage
 
 
 def load(path):
@@ -112,10 +143,13 @@ def main():
     for name in ('browser','voice','adaptive','model-picker','out'):
         p.add_argument('--'+name,type=Path,required=True)
     p.add_argument('--source-bundle',type=Path,help='Reuse checked source archives from an already published complete bundle.')
+    p.add_argument('--voice-distribution-source',action='store_true',
+                   help='With --source-bundle, use the exact public Voice package as shipped runtime source; no full repository snapshot.')
     p.add_argument('--voice-source',type=Path,help='Explicitly approved source repository; use --source-bundle for published private-dependency snapshots.')
     p.add_argument('--adaptive-source',type=Path)
     a=p.parse_args();out=a.out.resolve()
     if a.source_bundle and (a.voice_source or a.adaptive_source):raise ValueError('Choose published source reuse or reviewed repository snapshots.')
+    if a.voice_distribution_source and not a.source_bundle:raise ValueError('Package-source mode requires checked published Adaptive source reuse.')
     if not a.source_bundle and not (a.voice_source and a.adaptive_source):raise ValueError('Supply --source-bundle or both approved source repositories.')
     if out.exists() and any(out.iterdir()):raise ValueError('Use an empty output directory.')
     out.mkdir(parents=True)
@@ -175,8 +209,10 @@ def main():
     sources=out/'sources';sources.mkdir()
     refs={'augmentor':source_archive(ROOT,sources/('augmentor-'+version+'-source.tar.gz'))}
     source_bundle=None
+    source_archives={}
     if a.source_bundle:
-        shared_refs,source_bundle=reuse_sources(a.source_bundle,sources);refs.update(shared_refs)
+        shared_refs,source_bundle,source_archives=reuse_sources(a.source_bundle,sources,
+            a.voice if a.voice_distribution_source else None);refs.update(shared_refs)
     else:
         refs.update(voice=source_archive(a.voice_source,sources/'resonant-voice-0.1.19-source.tar.gz'),
                     adaptive=source_archive(a.adaptive_source,sources/'adaptive-reasoning-0.2.3-source.tar.gz'))
@@ -193,6 +229,7 @@ def main():
         manifest['guardPackage']=guard
         arch_guard_package(manifest)
     if source_bundle is not None:manifest['sourceSnapshotBundle']=source_bundle
+    if source_archives:manifest['dependencySourceArchives']=source_archives
     (out/'bundle.json').write_text(json.dumps(manifest,indent=2)+'\n');hashes['bundle.json']=sha(out/'bundle.json')
     (out/'SHA256SUMS').write_text(''.join(value+'  '+name+'\n' for name,value in sorted(hashes.items())))
     archive=Path(str(out)+'.tar.gz')

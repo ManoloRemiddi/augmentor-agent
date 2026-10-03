@@ -205,7 +205,18 @@ an existing Augmentor/DSH setup rather than replacing its profiles. Existing use
 need the reviewed migration/update path; do not delete their data to bypass this.
 
 The archive carries exact component/source references, SHA-256 checksums and
-source snapshots. Public snapshots exclude repository histories, local outputs,
+source snapshots with explicit coverage. For the current Voice 0.1.19 candidate,
+`--source-bundle … --voice-distribution-source` reuses checked public Adaptive
+0.2.3 source and preserves the exact already published Voice npm archive as
+`sources/dsh-resonant-voice-0.1.19-distributed-source.tgz`. Its MIT notice and
+shipped JavaScript, Python and C++ source remain intact. The manifest records
+`npm-distributed-source`, archive/provenance hashes and
+`fullRepositorySnapshot: false`; this package omits repository tests, lockfile,
+workflows and history. The declared upstream Voice commit comes from public
+release provenance and is not independently bound to the private repository
+tree. This mode does not complete legal/source-kit or public-release acceptance.
+See [the exact coverage](../release/dsh/voice-distributed-source.json).
+Public snapshots exclude repository histories, local outputs,
 configuration, credentials, conversations, memory databases, model weights and
 microphone recordings. Downloadable synthetic voice references have the separate
 speech-model terms described above.
