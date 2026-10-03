@@ -506,3 +506,25 @@ separate emulated startup qualification; default/public60 behavior is unchanged.
 Source tests and built artifacts do not authorize a guest transaction: reviewed
 publication, new unused-account guards and explicit execution authorization are
 required. Graphical desktop/Browser, physical audio and legal gates remain open.
+
+## Actual clean365 Mint emulated acceptance
+
+The [clean365 acceptance checkpoint](../release/qualification/next-targets/20261003-mint365-fresh-emulated-acceptance.json)
+records one fresh locked UID 1003 run of the unchanged complete installer and
+published permission profile. Normal signed APT allowed only the two same-version
+Augmentor reinstalls; the OS package inventory stayed unchanged. Installer and
+known-installed idempotence, offscreen render, generated desktop/Browser entries,
+Linux and Browser SDK roles, all five byte-stable settings files and restart
+history equality pass. The existing history comparison only defaults an absent
+`delegationDepth` to zero. Four fixture model requests complete with no restart
+replay or pending/unknown SDK outcome.
+
+The run takes 554.29 seconds. Authenticated startups take 62.82 and 61.39 seconds
+under the explicit 120-second emulated profile; Linux/Browser turns take 5.07 and
+1.61 seconds under unchanged 60-second limits. This does not pass the public
+default 60-second startup command. Normal once-only owned companion cleanup and the
+independent same-proof/full-fixture root audit pass, including installed native
+bytes, both idle exclusive leases, absence of owned processes/listeners and
+45-file protected-state plus old failed-journal/log checks before and in `finally`.
+The original failures and both allocation refusals stay retained. Real two-window
+shortcut settings, graphical Browser, physical audio and legal gates remain open.

@@ -1,5 +1,22 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 Mint fresh acceptance and published cold history
+
+[Clean365 Mint acceptance](../release/qualification/next-targets/20261003-mint365-fresh-emulated-acceptance.json)
+passes fresh unchanged setup, both SDK roles, byte-stable settings, strict
+restart history and independent native/lease/protected-state audits. Startups
+of62.82/61.39seconds use the explicit120-second VM profile; the public60-second
+startup remains unqualified. All45 earlier settings and failed journals persist.
+Graphical Browser, real two-window shortcuts, physical audio and legal gates remain.
+
+[Published cold-history acceptance](LINUX-PRODUCT-UPGRADE-PROOF.md) passes actual
+8.20-second execution, two normal DSH starts and exact events/compressed bytes
+and metadata, with all five settings unchanged and zero model requests. Separate
+complete independent ending audits pass. Earlier formatting/Follow failures and
+one immediate TCP rebind refusal remain retained; no worker replay occurred.
+Coordinated product-version upgrade/integration/rollback is still pending.
+These actual records supersede the corresponding pending statements below.
+
 ## October 3 researched cold-history acceptance source
 
 [Published history qualification](LINUX-PRODUCT-UPGRADE-PROOF.md)

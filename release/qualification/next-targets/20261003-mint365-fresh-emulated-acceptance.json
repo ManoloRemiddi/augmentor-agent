@@ -1,0 +1,147 @@
+{
+  "format": "augmentor-mint365-fresh-emulated-acceptance/1",
+  "date": "2026-10-03",
+  "status": "pass-explicit-emulated-profile-external-audit-pass",
+  "artifactSource": {
+    "commit": "3651e17a0c34154eb4454e80e136ee11e764aa00",
+    "dirty": false
+  },
+  "target": "linuxmint22.3-amd64",
+  "artifactId": "0.2.13-linuxmint22.3-amd64-complete-preview.1-3651e17a0c34",
+  "nativeArtifacts": [
+    {
+      "file": "augmentor-runtime_0.2.13_amd64.deb",
+      "sha256": "0b8b5312d8036ebc5dc07c55f265300e3da7c9808524ecf8a6aecf9bb3126648",
+      "bytes": 352942888
+    },
+    {
+      "file": "augmentor-desktop_0.2.13_amd64.deb",
+      "sha256": "1f915d27df38f49a1bd8f7e46c4cd0f7456297ab9070b5d1cc54ee44c15ef8a4",
+      "bytes": 5392
+    }
+  ],
+  "bundleManifestSha256": "e51a3e119850ba6448b8f8dbb2ff5b0736d49524ecaa4ec4ee013a31d300e18b",
+  "bundleArchive": {
+    "bytes": 371733877,
+    "sha256": "124be2f1fce4f8b7b651e3cfdca580f02a3b31e13a1d65997c0721f818dae41a"
+  },
+  "unchangedSetupSha256": "d19ae1ecc900f5f3f29610c99b417474ef9e776043e99cabc5c3978dfaf76b52",
+  "proof": {
+    "publishedCommit": "c9865bee9e81c6b70b5cee3b58a9c152259ce150",
+    "sha256": "20a71863805b320df74cbfd9bd44f48a72d36f4ffd1c7da52a47e2afffb020f9",
+    "companionSha256": "70543782f9d26bae72bf0a4396e649c646017de7ee55a7f9af84075daf29368b",
+    "profile": "augmentor-owned-mint-permission-emulated/1",
+    "ordinaryUid": 1003,
+    "installerOverlay": false,
+    "installedPermissionPatch": false,
+    "rootFixtureFileSha256": "84feb9191306a1b709324b9b2e86514389615f6fc88c158873a385b95dadf45f",
+    "completeFixtureCanonicalSha256": "4c5dd198f1d5b81affaff74ad2431e58b21f59d4d4676cfe934fdfdf8eb22b0a",
+    "runFileSha256": "a421a165bddaf5c09ba310d94ae16e030f4e0575976ea2131327f9bc5a1b8441",
+    "reportFileSha256": "7040640a59e77c6c30f98aa230efd697055fb89687576704e2df12ae5b7fc3b3",
+    "completionReceiptSha256": "68023b640ffe9a601a0c876270a30e35bd33cf4ec76c20eb01b8199ac3aafd47",
+    "externalAuditFileSha256": "b6f748bb5c42c7a39a55cb90c5e72ff7940ce0d558072827c1eaef1fd4b47c65"
+  },
+  "system": {
+    "normalSignedAptMetadata": true,
+    "dryRunOnlyTwoSameVersionAugmentorReinstalls": true,
+    "installedOSPackageVersionInventoryUnchanged": true,
+    "python": "3.12.3-1ubuntu0.17",
+    "libc": "2.39-0ubuntu8.6",
+    "pipewire": "1.0.5-1ubuntu3.2",
+    "cinnamon": "6.6.4+zena",
+    "muffin": "6.6.1+zena",
+    "screensaver": "6.6.1+zena",
+    "qt": "6.8.2",
+    "pyside": "6.8.2.1",
+    "runtimeProfile": "mint223-cp312-x86_64-source-qt-voice"
+  },
+  "actual": {
+    "elapsedSeconds": 554.289523067011,
+    "unchangedInstallerAndKnownInstalledIdempotence": true,
+    "offscreenNativeRender": true,
+    "secondaryDesktopEntryAndNativeHostFilesGenerated": true,
+    "linuxAndBrowserSDKRoles": true,
+    "fixtureModelRequests": 4,
+    "startupBudgetSeconds": 120,
+    "startupObservations": [
+      {
+        "ready": true,
+        "readinessObserved": true,
+        "elapsedSeconds": 62.821558472001925,
+        "withinBudget": true
+      },
+      {
+        "ready": true,
+        "readinessObserved": true,
+        "elapsedSeconds": 61.389720641993335,
+        "withinBudget": true
+      }
+    ],
+    "turnBudgetSeconds": 60,
+    "turnObservations": [
+      {
+        "role": "linux",
+        "elapsedSeconds": 5.07124511100119,
+        "completionObserved": true,
+        "withinBudget": true
+      },
+      {
+        "role": "browser",
+        "elapsedSeconds": 1.608131189001142,
+        "completionObserved": true,
+        "withinBudget": true
+      }
+    ],
+    "allFiveSettingsByteStable": true,
+    "historyEqualityAfterDefaultDelegationDepthNormalization": true,
+    "restartModelRequestReplay": false,
+    "SDKPending": null,
+    "unknownRequestOutcome": false,
+    "companionNormalOnceOnlyPrepareCommitExit": true,
+    "companionSignalSent": false
+  },
+  "externalRootAudit": {
+    "sameProofAndCompleteFixtureVerified": true,
+    "nativeAuditClean": true,
+    "bothExclusiveLeasesIdle": true,
+    "noOwnedProductOrListener": true,
+    "allFiveSettingsPreserved": true,
+    "protectedCounts": {
+      "1000": 10,
+      "1001": 30,
+      "1002": 5
+    },
+    "protectedSnapshotSha256": "58ab52cdc27b2274ff355ce4086b26c115c385fb76c6e75a11fa0338a8d8fbdc",
+    "beforeAndFinallyAfterProtected45Readback": true,
+    "priorFailed16bJournalAndLogRetained": true,
+    "earlierAccountsOrOutcomesAdopted": false
+  },
+  "allocation": {
+    "hostFloorBytes": 4294967296,
+    "guestFloorBytes": 4294967296,
+    "admittedConservativePeakBytes": 2535686897,
+    "admittedPredictedHostRemainingBytes": 6301699343,
+    "minimumRecordedHostAvailableBytes": 6817411072,
+    "finalAuditedGuestAvailableBytes": 29461467136,
+    "rawHostSpaceObservationsSha256": "8cca4ca83364723d0a4b1d0e077f9ff4cdf04f50779aeb9cbd4e47c6e4a542ac"
+  },
+  "historicalEvidence": {
+    "original16bFullProofFailureRetained": true,
+    "twoPriorHostAllocationRefusalsRetained": true,
+    "priorAdmissionLoss842199040BytesCauseEstablished": false
+  },
+  "scope": {
+    "explicitEmulated120StartupQualification": true,
+    "publicDefault60FullProofPass": false,
+    "publicDefault60Changed": false,
+    "turn60Changed": false,
+    "realTwoWindowSettingsShortcutProof": false,
+    "graphicalBrowser": false,
+    "physicalAudio": false,
+    "legalReviewComplete": false,
+    "embeddedSourceCoverageComplete": false,
+    "completeAllFiveRolloutQualification": false
+  },
+  "rootLicenseFrozen22Unchanged": true,
+  "sourceProfileCheckpoint": "20261003-mint365-permission-fresh-proof.json"
+}

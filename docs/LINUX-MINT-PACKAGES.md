@@ -355,3 +355,19 @@ exclusive journals, late reads, unknown outcomes and shared two-role restart/
 cleanup behavior. Existing52 proof cases, nine real Unix-companion cases and
 12 Debian cases also pass (91 total). A new clean artifact/fresh-account VM
 transaction remains gated on source review, publication and explicit approval.
+
+## Actual clean365 fresh installed acceptance
+
+The [clean365 fresh acceptance](../release/qualification/next-targets/20261003-mint365-fresh-emulated-acceptance.json)
+supersedes the preceding pending-transaction statement for the explicit UID 1003
+emulated profile. Corrected DEB metadata passes normal signed same-version APT
+reinstallation without OS package changes or installed permission patches. The
+unchanged installer and its verified installed-receipt idempotence pass; native
+rendering, both SDK roles, strict settings/history and no replay pass in 554.29 seconds.
+Readiness is 62.82/61.39 seconds under an explicit 120-second startup qualification, with unchanged
+60-second turns and public default 60-second startup still unqualified. Four model requests use only
+the deterministic loopback fixture. Normal companion cleanup and independent
+root native/lease/process/listener/protected-state audits pass. All 45 earlier
+settings files, the failed16b journal/log and both host allocation refusals remain
+unchanged. No graphical Browser, real two-window settings/shortcuts, physical
+audio or legal qualification is inferred.

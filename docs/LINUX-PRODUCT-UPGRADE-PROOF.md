@@ -172,3 +172,20 @@ settings guards remain. Four source cases reject missing/reordered/extra/changed
 or partial events and unknown replay, passing27 with the related checks. Actual
 cold-history execution is pending. This separate scope cannot relabel either
 historical failure or establish product-version upgrade/rollback by itself.
+
+
+## October 3 actual published cold-history acceptance
+
+The exact674221b cold Page worker passes in8.20seconds. Both normal DSH starts
+take3.20/3.11seconds. All three synthetic histories match every retained event;
+all compressed persistence bytes and metadata and all five settings remain
+identical. No model request, new session, Follow activation or replay occurs.
+Normal once-only owned DSH/companion cleanup passes. The initial independent
+plain TCP rebind refuses immediately after shutdown; read-only kernel tables
+show only TIME_WAIT, with no listener. A separate complete independent audit
+checks both TCP tables before a SO_REUSEADDR bind, native package bytes, both
+exclusive idle leases, process/socket absence and every earlier failed-journal
+file/metadata. It passes without another worker run or cleanup action. Both
+historical worker failures and the immediate rebind refusal remain retained.
+This establishes the cold observation baseline, not native0.2.13 upgrade, managed
+DSH integration migration, rollback, graphical Browser or physical audio.

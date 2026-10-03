@@ -1,7 +1,7 @@
 {
   "format": "augmentor-published-cold-history-source/1",
   "date": "2026-10-03",
-  "status": "source-only reviewed; actual cold-history pending",
+  "status": "actual-cold-history-PASS; independent-complete-preservation-PASS; upgrade pending",
   "sourceBase": "1168937",
   "workerSha256": "c3ce83bf4cb3b77eb21fb1306e0c11535d3e7e74f2b2049587bacb985d64484d",
   "baseWorkerSha256": "119be053b8af0d6923276e570254f3a24ed8d30fedb64081f9c0928bd3988f86",
@@ -15,7 +15,7 @@
   "historicalFailureRelabelled": false,
   "newSyntheticPassed": 4,
   "focusedSyntheticPassed": 27,
-  "actualColdHistoryExecuted": false,
+  "actualColdHistoryExecuted": true,
   "upgradeRollbackQualified": false,
   "sources": [
     {
@@ -29,5 +29,15 @@
       "shippedControllerJsSha256": "16ecb48f33996efe72868f1603223214430634c5ac4c3e8fe9060bf240e990ff"
     }
   ],
-  "publicReleaseQualified": false
+  "publicReleaseQualified": false,
+  "actualSource": "674221b",
+  "actualSeconds": 8.199405885010492,
+  "actualStartupSeconds": [
+    3.1978733940050006,
+    3.114594243001193
+  ],
+  "actualModelRequests": 0,
+  "independentNativeLeasesProcessesSocketPreservationPass": true,
+  "immediatePlainRebindRefusalRetained": true,
+  "laterBothTcpTablesNoListenerAndReuseaddrBindPass": true
 }

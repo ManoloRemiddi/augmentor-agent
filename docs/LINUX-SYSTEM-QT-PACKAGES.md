@@ -349,3 +349,16 @@ statement; native adoption remains false. The
 keeps source/build evidence separate from the failed installed16b proof and
 pending fresh UID1003 execution. The Linux filesystem permission tests explicitly
 skip other platforms; the Debian producer and its targets are unchanged.
+
+## Clean365 Mint installed source-Qt acceptance
+
+The [actual clean365 Mint acceptance](../release/qualification/next-targets/20261003-mint365-fresh-emulated-acceptance.json)
+now verifies the permission-corrected native packages in the ISO-installed Mint
+fixture with the same source Qt 6.8.2/PySide6 6.8.2.1 runtime contract. Normal signed
+APT replaces only the two same-version Augmentor packages; the OS inventory is
+unchanged. The unchanged complete installer, runtime selection, offscreen Qt
+render and full two-role/restart proof pass with normal companion cleanup and
+independent native/lease/protected-state readback. Startups of 62.82/61.39 seconds use the
+explicit 120-second emulated profile; the public 60-second command remains unqualified.
+Artifact input/source notices and legal gates are unchanged. This supersedes
+the preceding pending-native-adoption statement for this exact clean365 run.
