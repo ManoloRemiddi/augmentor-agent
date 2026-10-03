@@ -66,6 +66,34 @@ provider test, subscription eligibility or a Windows Codex implementation.
 Codex's upstream experimental dynamic-tool contract is described in the
 [official app-server guide](https://developers.openai.com/codex/app-server).
 
+## Application selection and branch recovery
+
+The `application-context` feature reports a 16,000 UTF-8 byte limit and its
+binding: `operation` for Codex, `session-selection` for the existing DSH adapter.
+The SDK, maintained embed receiver and native boundaries accept JSON objects,
+reject arrays/oversize input and limit nesting to 64 levels. Invalid direct embed
+messages clear the retained selection; malformed native prompts fail before
+model dispatch. DSH keeps its existing latest-selection/ten-minute expiry; an
+app needing an exact queued target must preserve it in its request/backend
+operation and resolve current records with tools.
+
+Codex canonicalizes selection before durable admission, includes it in the
+operation fingerprint and retains it through queues, steering, promotion and
+restart. Changing text or selection under an admitted identity is a conflict.
+Transport loss never causes replay. Existing ledgers without context remain
+readable; adding context to an old admitted identity is a conflict, not migration.
+Bounded native additionalContext fragments carry the selection as untrusted
+reference data, separately from the user's prompt. A request-specific manifest
+supersedes older selections; omitted selection sends `{}`. Native history can
+retain older fragments, so this is not a historical-data deletion guarantee.
+Neither context nor its manifest grants tools or replaces the registered role.
+
+Embedded Codex branch recovery sends both owning parent `sessionId` and intended
+child `newSessionId`. The boundary verifies the parent and forces workspace ID;
+the host refuses a child/pending branch belonging to another parent/workspace.
+Authoritative `absent` remains available for a genuinely undispatched child.
+No transport error or failed history lookup is converted into absence.
+
 ## Platform bootstrap and service lifecycle
 
 The SDK uses the selected managed descriptor on Linux. Mac/Windows installed
@@ -160,3 +188,31 @@ upgrade/rollback remain qualification gates. The current public Windows preview
 does not contain these new helpers and does not bundle Handy. Existing release
 archives/tags are immutable. The owner's independent third app is untouched.
 Pi and cloud voice remain outside this SDK extension.
+
+## Selection follow-up qualification
+
+The local SDK passes 29 source tests, syntax checks, clean packed-consumer checks
+and 27 paired cases including the actual Codex engine/native host. The paired
+proof verifies multilingual selection enters untrusted provider input, remains
+outside developer instructions, rejects changed operation context, clears an
+omitted selection, and preserves branch-status ownership. Ledger/session cases
+verify corruption refusal, queue snapshots after restart, steering/promotion and
+lost-acknowledgment no replay. Browser context boundaries pass alongside all
+86 Browser cases.
+
+The complete application suite passes 509 cases (507 passing, two opt-in skips)
+with the isolated Qt interpreter and four test processes. A subsequent added
+lost-context-acknowledgment case passes in the paired proof. The first unrestricted
+parallel run exposed a voice fixture observing PCM before the durable terminal
+event and a shared-memory fixture startup timeout. The voice fixture now waits
+for the actual terminal ledger outcome without weakening audio assertions.
+Memory passed separately and in the bounded full suite; the original timeout's
+cause is not established. Default-concurrency hosted checks remain required.
+
+Earlier source `629eaa6` passes both Mac 14/26 packaged workflows in
+[37111918486](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37111918486),
+including shipped SDK helper/registration/native-exit proofs. Windows x64 also
+passes its packaged workflow; ARM64 is still running in
+[37111918324](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37111918324).
+These runs do not qualify the later selection changes or a customer app
+conversation. Fresh paired/platform/package checks are required for this follow-up.

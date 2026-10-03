@@ -13,6 +13,7 @@ import {nativeHistory} from './history.js';
 import {NativeActivity, nativeIdle} from './idle.js';
 import {branchBoundary, verifyBranchHistory, type BranchBoundary} from './branch.js';
 import {OperationLedger, queueOperations} from './operations.js';
+import {serializeWorkspaceContext} from './workspace-context.js';
 import {DisplayJournal} from './journal.js';
 import {durableJson, readPrivateJson, privateDirectory} from './storage.js';
 import {chatEvents, type ChatEvent} from './events.js';
@@ -666,6 +667,12 @@ export class CodexHost extends EventEmitter {
       case 'session.branch': return this.branch(params);
       case 'session.branchStatus': {
         const id = identifier(params.newSessionId), meta = this.metadata.get(id);
+        if (params.workspaceId !== undefined) {
+          const source = this.meta(params.sessionId), pending = this.branches.get(id);
+          if (source.workspace?.id !== identifier(params.workspaceId) ||
+              meta && (meta.workspace?.id !== source.workspace.id || meta.cwd !== source.cwd || meta.profileId !== source.profileId || meta.fork?.sessionId !== source.id) ||
+              pending && JSON.parse(pending.key)[0] !== source.id) throw new Error('This branch belongs to another application conversation.');
+        }
         return {status: this.branches.has(id) ? 'creating' : meta?.status ?? 'absent'};
       }
       case 'session.list': {const items = [...this.metadata.values()].filter(meta => meta.status === 'ready').map(meta => this.row(meta)); return {items, total: items.length};}
@@ -689,11 +696,14 @@ export class CodexHost extends EventEmitter {
         if (params.mode && !['queue', 'steer'].includes(params.mode)) throw new Error('Unsupported Codex submission mode.');
         const meta = this.meta(params.sessionId);
         if (!Array.isArray(params.content) || params.content.some((part: Data) => part.type !== 'text')) throw new Error('This Codex integration currently accepts text input.');
+        if (params.workspaceContext !== undefined && !meta.workspace) throw new Error('Application context requires a registered workspace.');
+        const context = meta.workspace ? params.workspaceContext === undefined ? {} : params.workspaceContext : undefined;
+        serializeWorkspaceContext(context); // Reject invalid context before opening a worker.
         const input = text(params.content.map((part: Data) => text(part.text)).join('\n'));
         const worker = await this.worker(meta.id);
         const operation = params.mode === 'steer'
-          ? await worker.session.steer(requestIdentifier(params.requestId), input, identifier(params.expectedTurnId))
-          : await worker.session.submit(requestIdentifier(params.requestId), input, params.resumeQueue === true);
+          ? await worker.session.steer(requestIdentifier(params.requestId), input, identifier(params.expectedTurnId), context)
+          : await worker.session.submit(requestIdentifier(params.requestId), input, params.resumeQueue === true, context);
         return {...operation, accepted: Boolean(operation.turnId) || operation.status === 'queued'};
       }
       case 'session.cancel': {

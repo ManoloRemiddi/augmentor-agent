@@ -21,6 +21,7 @@ export class CodexWorkspaceBoundary {
   const p=this.profile();guardWorkspaceMethod(p,method,params)
   if(method==='workspace.describe'){if(params.protocol!==SDK_PROTOCOL)throw Error('Incompatible application SDK protocol');return}
   if(method==='session.create')return {...params,cwd:p.cwd,workspaceId:p.id,profileId:p.connection,selection:await this.selection()}
+  if(method==='session.branchStatus'){await this.owns(params.sessionId);return {...params,workspaceId:p.id}}
   if((method.startsWith('session.')&&!['session.list'].includes(method))||['augmentor/interaction','augmentor/voice/start','augmentor/save','augmentor/unsave'].includes(method))await this.owns(params.sessionId)
   if(method==='session.selectModel'&&params.provider!==p.connection)throw Error('This workspace uses its registered Codex connection')
   if(method==='augmentor/memory'){

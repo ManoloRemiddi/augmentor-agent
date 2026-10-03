@@ -80,6 +80,7 @@ import {startOnboarding} from './shared/onboarding.mjs'
 import {memoryRequest} from './shared/memory.mjs'
 import {bindProfileMemory} from '../../services/workspaces/memory.mjs'
 import {preferences} from '../../services/workspaces/profiles.mjs'
+import {snapshotWorkspaceContext} from './extension/workspace-context.mjs'
 import {loadProfile} from '../../services/workspaces/profiles.mjs'
 import {describeWorkspace} from '../../services/workspaces/capabilities.mjs'
 import {SDK_PROTOCOL} from '../../services/workspaces/policy.mjs'
@@ -894,7 +895,7 @@ async function handleExtMessage(msg) {
     if(UNIFIED&&msg.method==='session.prompt')await interactions.claim(msg.params.sessionId)
     if(workspaceProfile&&msg.method==='session.prompt'){
       const context=msg.params.workspaceContext;delete msg.params.workspaceContext
-      if(context&&typeof context==='object'&&JSON.stringify(context).length<=16000)preferences(workspaceProfile,{set:{['context:'+msg.params.sessionId]:{id:randomUUID(),at:Date.now(),value:context}}})
+      if(context!==undefined)preferences(workspaceProfile,{set:{['context:'+msg.params.sessionId]:{id:randomUUID(),at:Date.now(),value:snapshotWorkspaceContext(context)}}})
     }
     if(workspaceProfile&&['session.create','session.prompt'].includes(msg.method))await bindProfileMemory(workspaceProfile,'dsh:'+msg.params.sessionId)
     if(workspaceProfile&&['augmentor/save','augmentor/unsave','augmentor/state'].includes(msg.method)){

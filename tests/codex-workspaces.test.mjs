@@ -52,6 +52,9 @@ test('Codex boundary filters history and rejects other app operations and shared
  const before=lookups;await assert.rejects(boundary.guard('augmentor/codex',{action:'configure'}),/cannot administer/);assert.equal(lookups,before)
  const row={sessionId:'owned',workspaceId:'fixture',agentPreset:f.profile.preset,cwd:f.root,selection:{provider:'local'}}
  assert.deepEqual(boundary.filter([row,{...row,workspaceId:'other'},{...row,cwd:'/foreign'},{...row,selection:{provider:'other'}}]),[row])
+ const status=await boundary.guard('session.branchStatus',{sessionId:'owned',newSessionId:'missing',workspaceId:'other'});
+ assert.equal(status.workspaceId,'fixture');assert.equal(status.newSessionId,'missing');
+ await assert.rejects(boundary.guard('session.branchStatus',{sessionId:'foreign',newSessionId:'missing'}),/another application/);
 })
 test('real pinned Codex app workspace advertises granted tools and native denial prevents shell execution',{timeout:30000},async t=>{
  let host,ipc,client,server,phase='granted'
@@ -76,8 +79,8 @@ test('real pinned Codex app workspace advertises granted tools and native denial
  const options={root:join(f.root,'host'),profiles,workspaces:new CodexWorkspaces(),resolveProfile:id=>profiles.resolve(id)}
  host=new CodexHost(options);await host.create({sessionId:'owned',profileId:'local',workspaceId:'fixture',cwd:f.root})
  assert.equal(requests.length,0,'thread creation does not call the provider')
- const prompt=async id=>{
-  await host.dispatch('session.prompt',{sessionId:'owned',requestId:id,content:[{type:'text',text:'Read the synthetic record'}]})
+ const prompt=async (id,workspaceContext)=>{
+  await host.dispatch('session.prompt',{sessionId:'owned',requestId:id,content:[{type:'text',text:'Read the synthetic record'}],...(workspaceContext!==undefined?{workspaceContext}:{})})
   for(let n=0;n<400;n++){
    const queue=await host.dispatch('session.queue',{sessionId:'owned'})
    if(queue.operations.some(op=>op.id===id&&['completed','failed'].includes(op.status)))return
@@ -85,9 +88,16 @@ test('real pinned Codex app workspace advertises granted tools and native denial
   }
   throw Error('Synthetic Codex workspace turn did not settle')
  }
- await prompt('first')
+ const selected={record:{id:'SDK_SELECTED_RECORD',revision:7},label:'多言語😀'.repeat(650)};
+ await prompt('first',selected)
  assert.deepEqual(requests[0].tools.map(tool=>tool.name).sort(),['fixture_read','request_user_input'])
  assert.match(JSON.stringify(requests[0].input),/SDK_APPLICATION_ROLE_FIXTURE/)
+ assert.match(JSON.stringify(requests[0].input),/SDK_SELECTED_RECORD/);
+ assert.ok(requests[0].input.some(item=>item.role==='user'&&JSON.stringify(item).includes('<external_augmentor_workspace_data_')),'selection enters untrusted context');
+ assert.ok(!requests[0].input.some(item=>item.role==='developer'&&JSON.stringify(item).includes('SDK_SELECTED_RECORD')),'selection data cannot become developer instructions');
+ const beforeInvalid=requests.length;
+ await assert.rejects(prompt('invalid',{text:'😀'.repeat(4000)}),/context/);assert.equal(requests.length,beforeInvalid);
+ await assert.rejects(prompt('first',{record:{id:'different'}}),/different input/);assert.equal(requests.length,beforeInvalid);
  assert.deepEqual(executions,['fixture-native-call'])
  if(process.env.AUGMENTOR_SDK_CLIENT_ENTRY){
   const {AugmentorClient}=await import(pathToFileURL(process.env.AUGMENTOR_SDK_CLIENT_ENTRY).href)
@@ -101,7 +111,8 @@ test('real pinned Codex app workspace advertises granted tools and native denial
   client=new AugmentorClient({profile:'fixture',descriptor,harness:'codex',requiredCapabilities:['tool-policy','scoped-sessions']})
   await client.connect();assert.equal(client.capabilities.harness,'codex')
   await client.createSession('sdk-client');assert.equal((await client.listSessions()).items.length,2)
-  await client.prompt({sessionId:'sdk-client',operationId:'packed-sdk-read',text:'Read a synthetic record'})
+  const context={record:{id:'PACKED_SELECTED_RECORD',revision:8}};
+  await client.prompt({sessionId:'sdk-client',operationId:'packed-sdk-read',text:'Read a synthetic record',context})
   let completed=false
   for(let n=0;n<300;n++){
    const queue=await client.call('session.queue',{sessionId:'sdk-client'})
@@ -109,12 +120,16 @@ test('real pinned Codex app workspace advertises granted tools and native denial
    await new Promise(resolve=>setTimeout(resolve,15))
   }
   assert.equal(completed,true,'packed client turn must complete through the actual native host')
+  assert.match(JSON.stringify(requests.at(-1).input),/PACKED_SELECTED_RECORD/);
   assert.equal(executions.length,2)
   const beforeReplay=executions.length
-  await client.prompt({sessionId:'sdk-client',operationId:'packed-sdk-read',text:'Read a synthetic record'})
+  await client.prompt({sessionId:'sdk-client',operationId:'packed-sdk-read',text:'Read a synthetic record',context})
   assert.equal(executions.length,beforeReplay,'a completed operation is not replayed')
   await assert.rejects(client.call('augmentor/codex',{action:'profiles'}),/cannot administer/)
   await assert.rejects(client.call('session.history',{sessionId:'foreign'}))
+  assert.equal((await client.call('session.branchStatus',{sessionId:'sdk-client',newSessionId:'missing-child'})).status,'absent');
+  await assert.rejects(client.call('session.branchStatus',{sessionId:'sdk-client',newSessionId:'owned'}),/another application conversation/);
+  await assert.rejects(client.call('session.branchStatus',{sessionId:'foreign',newSessionId:'missing-child'}));
   assert.equal((await client.refreshCapabilities()).features['dictation-settings'].state,'denied')
   client.close();client=null;await ipc.close();ipc=null
   // Closing an IPC server closes its host. Restore the durable host before the remaining policy checks.
@@ -123,6 +138,9 @@ test('real pinned Codex app workspace advertises granted tools and native denial
  const baseline=executions.length
  const rows=await host.dispatch('session.list',{});assert.equal(rows.items[0].agentPreset,f.profile.preset)
  phase='revoked';writeFileSync(join(f.profilesDir,'fixture.json'),JSON.stringify({...f.profile,policy:{...f.profile.policy,tools:[]}}));await prompt('second');assert.equal(executions.length,baseline)
+ assert.equal((await host.dispatch('session.queue',{sessionId:'owned'})).operations.find(op=>op.id==='second').workspaceContext,'{}','an omitted selection explicitly supersedes earlier context');
+ const developer=requests.at(-1).input.filter(item=>item.role==='developer').flatMap(item=>item.content??[]).map(part=>part.text??'').join('\n');
+ assert.match(developer,/"requestId":"second"/);
  phase='shell';await prompt('third');assert.equal(existsSync(join(f.root,'sdk-forbidden.txt')),false)
  await host.close();host=new CodexHost(options)
  await assert.rejects(host.create({sessionId:'owned',profileId:'local',cwd:f.root}),/another Augmentor application/)

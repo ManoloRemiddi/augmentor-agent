@@ -5,12 +5,13 @@
 // Web host for the one Browser surface. All chat/voice/branch/settings behavior
 // stays in extension modules; this module supplies the host's platform APIs.
 const base=new URL('./',location.href)
+import {snapshotWorkspaceContext} from './workspace-context.mjs'
 async function api(path,value){const res=await fetch(new URL(path,base),{method:value?'POST':'GET',headers:value?{'Content-Type':'application/json'}:{},body:value?JSON.stringify(value):undefined,signal:AbortSignal.timeout(8000)});const data=await res.json();if(!res.ok)throw Error(data.error||'Augmentor unavailable');return data}
 const profile=await api('config.json')
 const eventSet=()=>{const listeners=new Set();return {addListener:f=>listeners.add(f),removeListener:f=>listeners.delete(f),emit:(...args)=>{for(const f of listeners)f(...args)}}}
 const runtimeEvents=eventSet(),storageEvents=eventSet();let handler,closed=false,workspaceContext=null
 const tell=value=>parent.postMessage(value,profile.parentOrigin)
-window.addEventListener('message',event=>{if(event.origin!==profile.parentOrigin||event.source!==parent||event.data?.type!=='augmentor-context')return;const value=event.data.context;if(value&&typeof value==='object'&&JSON.stringify(value).length<=16000)workspaceContext=value})
+window.addEventListener('message',event=>{if(event.origin!==profile.parentOrigin||event.source!==parent||event.data?.type!=='augmentor-context')return;try{workspaceContext=snapshotWorkspaceContext(event.data.context)}catch{workspaceContext=null}})
 function storageArea(session=false){
  const key='augmentor-embed:'+profile.id,read=async()=>{const value=session?JSON.parse(sessionStorage.getItem(key)||'{}'):await api('preferences');return session?value:{...value,'augmentor-harness':profile.harness}}
  let writes=Promise.resolve()

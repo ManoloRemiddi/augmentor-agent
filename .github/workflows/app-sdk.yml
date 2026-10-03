@@ -35,10 +35,10 @@ jobs:
       - name: Verify OS private files and startup contracts
         run: node -e "const cp=require('child_process'); const r=cp.spawnSync(process.env.AUGMENTOR_PYTHON,['-m','unittest','discover','-s','tests','-p','test_app_sdk_platform.py','-v'],{stdio:'inherit'});process.exit(r.status??1);"
       - name: Verify workspace capability contract
-        run: node --test tests/workspace-capabilities.test.mjs
+        run: node --test tests/workspace-capabilities.test.mjs apps/browser/test/workspace-context.test.mjs
       - name: Verify actual pinned Codex workspace engine
         if: runner.os != 'Windows'
-        run: node --test tests/codex-workspaces.test.mjs
+        run: node --test tests/codex-operations.test.mjs tests/codex-session.test.mjs tests/codex-workspaces.test.mjs
       - name: Verify source registration and native frame boundary
         if: runner.os == 'Linux'
         run: node scripts/app-sdk-bundle-proof.mjs .

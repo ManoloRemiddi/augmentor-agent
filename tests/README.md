@@ -788,3 +788,12 @@ bundle workflows run it with their managed binaries; Windows requires
 `AUGMENTOR_EPHEMERAL_WINDOWS_RUNNER=1` on a disposable runner. Linux source can
 run `node scripts/app-sdk-bundle-proof.mjs .`. These checks do not establish
 independent app adoption or installed customer qualification.
+
+Context/branch follow-up: ledger and session cases cover immutable selection,
+restart, steering, promotion, conflicting inputs and unknown outcomes. The real
+`codex-workspaces.test.mjs` provider fixture verifies untrusted selection input
+and parent-scoped branch status through the packed SDK/native host. Browser
+`workspace-context.test.mjs` checks agreement with the native UTF-8/shape/depth
+limits. Full local source qualification uses
+`AUGMENTOR_PYTHON=/absolute/isolated/Qt/python node --test --test-concurrency=4 tests/*.test.mjs`;
+hosted default-concurrency checks remain an independent gate.

@@ -12,6 +12,12 @@ Mac/Windows SDK install. Hosted platform/paired-package checks and installed
 acceptance remain distinct. Preserve the owner's dirty canonical checkout and
 independent third-app test.
 
+The selection follow-up binds Codex app context to durable operations, enforces
+the 16 KB UTF-8 boundary and scopes branch-status recovery to its parent.
+DSH retains latest-session context; the capability snapshot reports this
+difference. See the alignment guide's exact tests, initial failures and remaining
+hosted/package gates before claiming release readiness.
+
 
 
 

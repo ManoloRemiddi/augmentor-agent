@@ -16,6 +16,8 @@ test('workspace capabilities separate platform support, app grants and voice opt
  const profile={id:'fixture',sdkProtocol:'augmentor-app/1',policy:{tools:[],voice:false,sharedSettings:false}}
  let description=describeWorkspace(profile,{platform:'win32',desktop:{available:false}})
  assert.equal(description.platform,'win32');assert.equal(description.readinessVerified,false)
+ assert.equal(description.features['application-context'].binding,'session-selection');
+ assert.equal(describeWorkspace({...profile,harness:'codex'}).features['application-context'].binding,'operation');
  assert.equal(description.features['computer-use'].state,'unsupported')
  assert.equal(description.features['dictation-settings'].state,'denied')
  assert.throws(()=>guardWorkspaceMethod(profile,'augmentor/surface',{action:'dictation',method:'enable'}),/cannot administer/)

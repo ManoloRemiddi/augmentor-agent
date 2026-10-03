@@ -18,6 +18,7 @@ export function describeWorkspace(profile,{platform=process.platform,desktop=des
   features:{
    embed:{...supported},'scoped-sessions':{...supported},'tool-policy':{...supported},
    'workspace-memory':{...supported},'background-client':{...supported},
+   'application-context':{...supported,maxBytes:16000,binding:profile.harness==='codex'?'operation':'session-selection'},
    voice:{state:enabled?'supported':'disabled',scope:'workspace',experimental:true,providers:['resonant-voice']},
    'dictation-settings':{state:'denied',scope:'installation',managedIn:'standalone'},
    'shared-settings':{state:'denied',scope:'installation'},
