@@ -1,5 +1,9 @@
+// Augmentor — dsh-augmentor plugin, pipe, and Chromium extension
+// Copyright © 2026 Manolo Remiddi
+// SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+// License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
+
 import {attachVoiceIcon} from './voice-icon.mjs'
-// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // The sidebar presents the native VoiceSession; it has no separate ASR/audio loop.
 export function attachVoice({send,onError,isHistory}){
   const button=document.createElement('button'),icon=document.createElement('span'),status=document.createElement('span')
@@ -10,7 +14,7 @@ export function attachVoice({send,onError,isHistory}){
   const seat=document.getElementById('voice-seat');if(seat)seat.append(button,status);else document.getElementById('send').before(button,status)
   const drawing=typeof MutationObserver==='function'?attachVoiceIcon(button):null
   let lease=null,opening=null,epoch=0,held=false,locked=false,handsFree=false,timer=null,startX=0,heartbeat=null,voiceState='closed'
-  let maxSeconds=600,elapsed=0,defaultHandsFree=false,voiceEnabled=true,nextPreferences=0
+  let maxSeconds=600,elapsed=0,defaultHandsFree=false,voiceEnabled=true,nextPreferences=0,configured=true,provider='local',latestState=null,latestHistory=false
   const label=text=>{status.textContent=text;button.title=text;button.setAttribute('aria-description',text)}
   label('Hold to talk · Slide left to lock · Slide right for hands-free')
   async function control(action,current=lease){
@@ -30,7 +34,7 @@ export function attachVoice({send,onError,isHistory}){
     if(isHistory())throw Error('Open the current conversation to use Voice.')
     if(lease)return lease
     if(opening)return opening
-    const ownEpoch=epoch,id=crypto.randomUUID();handsFree=free;label('Preparing speech models…')
+    const ownEpoch=epoch,id=crypto.randomUUID();handsFree=free;label(provider==='openai-live'?'Connecting OpenAI Voice…':'Preparing speech models…')
     opening=(async()=>{
       const result=await send('voice/start',{id,handsFree:free})
       if(!result?.ok)throw Error(result?.error??'Voice could not start')
@@ -47,6 +51,7 @@ export function attachVoice({send,onError,isHistory}){
   function down(event){
     if(button.disabled||event.button>0)return
     event.preventDefault()
+    if(!configured){void send('settings/open',{section:'voice'});return}
     if(handsFree){close();return}
     if(defaultHandsFree&&!lease){void open(true);return}
     if(locked){locked=false;void control('end');return}
@@ -70,13 +75,13 @@ export function attachVoice({send,onError,isHistory}){
     else if(delta>=24){const closing=close(),ownEpoch=epoch;handsFree=true;button.dataset.mode='hands-free';void closing.then(()=>{if(epoch===ownEpoch)return open(true)})}
   }
   button.oncontextmenu=event=>{event.preventDefault();void send('settings/open',{section:'voice'})}
-  button.onclick=event=>{if(event.detail===0&&!button.disabled){if(handsFree)close();else if(locked){locked=false;void control('end')}else if(lease)void control('interrupt');else void open(defaultHandsFree)}}
+  button.onclick=event=>{if(event.detail===0&&!button.disabled){if(!configured){void send('settings/open',{section:'voice'});return}if(handsFree)close();else if(locked){locked=false;void control('end')}else if(lease)void control('interrupt');else void open(defaultHandsFree)}}
   button.onpointerup=release
   button.onpointercancel=()=>{if(!locked&&!handsFree)close()}
   button.onkeydown=event=>{
     if(event.key==='Escape'){event.preventDefault();close()}
     else if(event.key===' '&&!event.repeat)down(event)
-    else if(event.key==='Enter'&&!event.repeat){event.preventDefault();if(handsFree)close();else if(locked){locked=false;void control('end')}else if(defaultHandsFree)void open(true);else void open().then(current=>control('interrupt',current))}
+    else if(event.key==='Enter'&&!event.repeat){event.preventDefault();if(!configured){void send('settings/open',{section:'voice'});return}if(handsFree)close();else if(locked){locked=false;void control('end')}else if(defaultHandsFree)void open(true);else void open().then(current=>control('interrupt',current))}
     else if(event.key.toLowerCase()==='l'&&held){clearTimeout(timer);timer=null;locked=true;button.dataset.mode='locked';void begin()}
   }
   button.onkeyup=event=>{if(event.key===' '){event.preventDefault();release()}}
@@ -103,11 +108,12 @@ export function attachVoice({send,onError,isHistory}){
   document.addEventListener('visibilitychange',()=>{if(document.hidden)close()})
   document.getElementById('stop')?.addEventListener('click',close)
   return {get busy(){return !!(lease||opening||held||locked||handsFree||timer)},update(state,history){
-    if((state.harness==='dsh'||state.capabilities?.voice===true)&&state.phase==='ready'&&!lease&&!opening&&Date.now()>nextPreferences){
+    latestState=state;latestHistory=history
+    if(!lease&&!opening&&Date.now()>nextPreferences){
       nextPreferences=Date.now()+15000
-      void send('voice/preferences').then(result=>{if(result?.ok&&result.result){defaultHandsFree=result.result.mode==='hands-free';voiceEnabled=result.result.enabled;button.hidden=!voiceEnabled;status.hidden=!voiceEnabled}}).catch(()=>{})
+      void send('voice/preferences',{action:'status'}).then(result=>{if(result?.ok&&result.result){const data=result.result;defaultHandsFree=data.mode==='hands-free';voiceEnabled=data.enabled;provider=data.provider??'local';configured=data.configured!==false;button.hidden=!voiceEnabled;status.hidden=!voiceEnabled;if(!configured){button.dataset.state='needs-setup';label('Voice needs setup · Configure local or OpenAI GPT-Live voice')}else if(button.dataset.state==='needs-setup'){button.dataset.state='closed';label('Hold to talk · Slide right for hands-free')}button.disabled=!voiceEnabled||(configured&&((provider!=='openai-live'&&latestState.harness!=='dsh'&&latestState.capabilities?.voice!==true)||latestState.phase!=='ready'||latestHistory))}}).catch(()=>{})
     }
-    button.disabled=(state.harness!=='dsh'&&state.capabilities?.voice!==true)||state.phase!=='ready'||history||!voiceEnabled
+    button.disabled=!voiceEnabled||(configured&&((provider!=='openai-live'&&latestState.harness!=='dsh'&&latestState.capabilities?.voice!==true)||latestState.phase!=='ready'||latestHistory))
     if((lease||opening)&&(button.disabled||lease&&state.sessionId&&lease.sessionId!==state.sessionId))close()
     if(button.disabled&&state.harness==='pi')button.title='Voice uses the shared DSH harness. Select DSH in Settings → Harnesses.'
   }}

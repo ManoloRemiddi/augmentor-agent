@@ -7,9 +7,9 @@ import {setTimeout as delay} from 'node:timers/promises'
 import {BrowserVoice} from '../apps/browser/shared/voice-client.mjs'
 import {BrowserInteractions} from '../apps/browser/shared/interactions.mjs'
 const id='11111111-1111-4111-8111-111111111111'
-function fixture(t,{submit=async()=>({accepted:true}),closeOnEnd=true,ticket=async sessionId=>({protocol:'resonant-voice/1',url:'ws://127.0.0.1:9999/voice',sessionId,ticket:'private'})}={}){
+function fixture(t,{submit=async()=>({accepted:true}),closeOnEnd=true,settings=async()=>({enabled:true,configured:true,provider:'local'}),ticket=async sessionId=>({protocol:'resonant-voice/1',url:'ws://127.0.0.1:9999/voice',sessionId,ticket:'private'})}={}){
  const commands=[],events=[];let worker
- const voice=new BrowserVoice({ticket,submit,notify:e=>events.push(e),spawnWorker:()=>{
+ const voice=new BrowserVoice({settings,ticket,submit,notify:e=>events.push(e),spawnWorker:()=>{
   worker=new EventEmitter();worker.stdout=new PassThrough();worker.stdin=new PassThrough();worker.kill=()=>assert.fail('Ordinary voice close must not kill a worker');
   worker.stdin.on('data',data=>commands.push(JSON.parse(data)));worker.stdin.on('end',()=>{if(closeOnEnd){worker.emit('exit');worker.emit('close')}});return worker
  }})
@@ -69,4 +69,28 @@ test('browser interaction client never retries a lost decision acknowledgement',
  await assert.rejects(client.answer(id,{outcome:'allowed-once'}))
  assert.equal(calls.filter(c=>c.operation==='answer').length,1)
  assert.equal(events.filter(e=>e.method==='approval.requested').length,1)
+})
+
+
+test('cloud voice needs no local ticket and submits through the same application callback',async t=>{
+ const calls=[];const f=fixture(t,{settings:async()=>({enabled:true,configured:true,provider:'openai-live'}),ticket:()=>assert.fail('Cloud must not request a local speech ticket'),submit:async(...args)=>{calls.push(args);return {accepted:true,turnId:'selected-model-turn'}}})
+ await f.voice.start({id,sessionId:'existing-chat',handsFree:true});await delay(0)
+ assert.deepEqual(f.commands[0],{action:'prepare',handsFree:true,provider:'openai-live'})
+ assert.deepEqual(f.commands[1],{action:'start',ticket:{protocol:'augmentor-live/1',provider:'openai-live',sessionId:'existing-chat'}})
+ const event={type:'transcript',sessionId:'existing-chat',requestId:id,text:'Use my selected model',prefix:'augmentor-voice:'}
+ f.event(event);f.event(event);await delay(0)
+ assert.deepEqual(calls,[['existing-chat','augmentor-voice:'+id,'Use my selected model']])
+ assert.equal(f.commands.at(-1).result.turnId,'selected-model-turn')
+})
+test('unconfigured or disabled providers never spawn a microphone worker',async t=>{
+ for(const configuration of [{enabled:true,configured:false},{enabled:false,configured:true}]){
+  const f=fixture(t,{settings:async()=>configuration});await assert.rejects(f.voice.start({id,sessionId:'existing'}))
+  assert.deepEqual(f.commands,[]);assert.equal(f.voice.busy,false)
+ }
+})
+test('closing during cloud readiness cannot open a late audio worker',async t=>{
+ let release;const f=fixture(t,{settings:()=>new Promise(resolve=>release=resolve)})
+ const starting=f.voice.start({id,sessionId:'existing'});f.voice.close()
+ release({enabled:true,configured:true,provider:'openai-live'})
+ await assert.rejects(starting,/cancelled/);assert.deepEqual(f.commands,[]);await f.voice.settled()
 })

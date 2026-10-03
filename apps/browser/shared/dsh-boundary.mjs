@@ -2,6 +2,7 @@
 // Copyright © 2026 Manolo Remiddi
 // SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
+
 import {isIP} from 'node:net'
 import {loadProfile,visibleInProfile} from '../../../services/workspaces/profiles.mjs'
 export const workspaceProfile=loadProfile()
@@ -23,7 +24,7 @@ export async function boundedJson(url,options={},limit=16*1024*1024){
 }
 // Voice controls can only address the bridge's existing nonce-bound lease; they
 // do not acquire a session or submit text. Avoid fetching all histories per heartbeat.
-const independent=new Set(['augmentor/surface','augmentor/home','augmentor/voice/control','augmentor/dsh','augmentor/prompts','augmentor/memory','augmentor/diagnostics','updates/check','shutdown'])
+const independent=new Set(['augmentor/voice/preferences','augmentor/surface','augmentor/home','augmentor/voice/control','augmentor/dsh','augmentor/prompts','augmentor/memory','augmentor/diagnostics','updates/check','shutdown'])
 const methods=new Set(['augmentor/voice/preferences','augmentor/interaction','augmentor/voice','augmentor/voice/start','augmentor/voice/control','augmentor/models','initialize','augmentor/state','augmentor/save','augmentor/unsave','session.list','session.resume','session.create','session.selectModel','session.models','session.history','session.prompt','session.cancel','session.rename','session.branch','settings.describe','settings.mutate'])
 const settings=new Set(['permission','model-picker-augmented'])
 export class DshBoundary{

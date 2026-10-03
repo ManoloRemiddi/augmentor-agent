@@ -474,17 +474,19 @@ class Controller(QObject):
             self.recovery_lock.release()
 
     @admitted
-    def prepare_voice(self, selection):
+    def prepare_voice(self, selection, provider='local'):
         with self.lock:
             if self.running or self.navigating or self.repairing or self.closed or self.read_only or not self.online:
                 raise ContractError('Open an idle, connected conversation first.')
-            if not hasattr(self.client,'voice_ticket'):raise ContractError('Voice is unavailable with this harness.')
+            if provider not in ('local','openai-live'):raise ContractError('Choose a voice provider.')
+            if provider=='local' and not hasattr(self.client,'voice_ticket'):raise ContractError('Local Voice is unavailable with this harness. Choose OpenAI GPT-Live.')
             self.navigating=True
         try:
             self.client.validate_model(selection)
             if not self.session:
                 session=self.preset+'-'+uuid.uuid4().hex
-                cwd=self.client.workspace();cwd.mkdir(mode=0o700,exist_ok=True)
+                cwd=self.client.workspace() if hasattr(self.client,'workspace') else Path(os.environ.get('AUGMENTOR_PI_WORKSPACE',Path.home() / 'Augmentor Linux Pi'))
+                cwd.mkdir(mode=0o700,exist_ok=True)
                 self.client.call('session.create',{'sessionId':session,'cwd':str(cwd),'agentPreset':self.preset,'selection':selection})
                 self.session=session
                 self.save_session()
@@ -492,6 +494,9 @@ class Controller(QObject):
             self.client.call('session.selectModel',{'sessionId':self.session,**selection})
             self.selection=selection;self.save_session()
             if not self.connected or not self.stream or self.stream.session!=self.session:self.subscribe(self.session)
+            if provider=='openai-live':
+                from .voice_provider import cloud_ticket
+                return cloud_ticket(self.session)
             return self.client.voice_ticket(self.session)
         finally:self.navigating=False
 
@@ -537,6 +542,8 @@ class Controller(QObject):
                 if response.get('accepted') is not True:
                     raise ContractError('The harness did not accept the message.')
                 accepted = True
+                if request_id and request_id.startswith('augmentor-voice:'):
+                    self.queue_result.emit({**response,'id':request_id})
                 self.sent.emit(text)
                 if response.get('command'):
                     with self.events_lock:
@@ -548,6 +555,8 @@ class Controller(QObject):
                 raise
             finally:
                 if not accepted and not self.closed:
+                    if request_id and request_id.startswith('augmentor-voice:'):
+                        self.queue_result.emit({'id':request_id,'accepted':False})
                     self.submission_failed.emit(text)
                 if self.generation is generation:
                     self.preparing = False

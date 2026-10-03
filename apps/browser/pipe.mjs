@@ -1,10 +1,11 @@
 #!/usr/bin/env node
-import {surfaceRequest} from './shared/surface.mjs'
-
 // Augmentor — dsh-augmentor plugin, pipe, and Chromium extension
 // Copyright © 2026 Manolo Remiddi
 // SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
+
+import {surfaceRequest} from './shared/surface.mjs'
+
 
 /**
  * pipe.mjs — Augmentor native messaging host (M1).
@@ -549,7 +550,7 @@ const voice=new BrowserVoice({
 })
 const localMethods = {
   'augmentor/surface':params=>surfaceRequest(params),
-  'augmentor/voice/preferences':async params=>{if(params.action==='save')voice.close();return voicePreferences(params)},
+  'augmentor/voice/preferences':async params=>{if(!['get','status',undefined].includes(params.action))await voice.close();return voicePreferences(params)},
   'augmentor/voice/start':async params=>{await interactions.claim(params.sessionId);return voice.start(params)},
   'augmentor/interaction':params=>interactions.answer(params.id,params.value),
   'augmentor/voice/control':params=>voice.control(params),

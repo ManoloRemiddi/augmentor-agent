@@ -88,6 +88,7 @@ Additional current native/browser capabilities:
 
 | Capability | Desktop | Browser |
 | --- | --- | --- |
+| Local or OpenAI GPT-Live Voice | Provider setup, On/Off, red actionable unconfigured orb; selected app model owns requests | Same provider configuration and native audio engine; [fixture evidence and live/platform limits](VOICE-PROVIDERS.md) |
 | Resonant Voice on DSH | Hold/release, slide-lock, voice selection; optional hands-free preview | Same shared engine: hold/release, lock, hands-free and primary voice settings |
 | Independent second conversation | Named second window, separate chat/settings/voice profile; KDE and Mac shortcuts | Separate sidebar/session workflow |
 | Skins and activity animation | Futuristic plasma; Blossom lake/butterflies; validated import/export | Native skins are not applied to Chromium |

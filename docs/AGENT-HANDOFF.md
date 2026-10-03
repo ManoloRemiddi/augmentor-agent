@@ -4,6 +4,21 @@
 
 
 
+## Voice provider implementation — October 3
+
+The owner requested Voice On/Off with local Resonant Voice and OpenAI GPT-Live
+setup paths, a red actionable unconfigured orb, and mandatory delegation to the
+model selected in Augmentor. [Specification and implementation evidence](VOICE-PROVIDERS.md)
+own the source change on `feat/voice-providers`, based on `c7f895d`. Primary
+Desktop/Browser share settings and the audio adapter; cloud uses client delegation
+through existing DSH/Pi/Codex submission paths and an OS-vault key. Private
+reasoning/raw tool output are excluded. Source work preserves local speech/GPU
+placement and installed release artifacts.
+
+API/microphone, physical Mac/Windows and standalone Mac browser-companion audio
+remain unqualified. Pi requires an idle task; DSH/Codex retain steering/queue
+semantics. No installed application has been updated by this source work.
+
 ## Windows 0.2.13 public preview — release record, October 2
 
 Windows support is merged in [PR 20](https://github.com/ManoloRemiddi/augmentor-agent/pull/20),

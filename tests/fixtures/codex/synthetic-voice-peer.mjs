@@ -31,7 +31,7 @@ export function createSyntheticVoicePeer({render} = {}) {
   const server = createServer(async (request, response) => {
     const reply = (status, body) => {response.writeHead(status, {'content-type': 'application/json'}); response.end(JSON.stringify(body));};
     if (request.method === 'GET' && request.url === '/health') {
-      reply(200, {protocol: 'resonant-voice/1', capabilities: {scopedHarnessBridge: 1}}); return;
+      reply(200, {status: 'ok', sample_rate: 24000, protocol: 'resonant-voice/1', capabilities: {scopedHarnessBridge: 1}}); return;
     }
     if (request.method !== 'POST' || request.headers['x-resonant-token'] !== token) {reply(403, {error: 'Synthetic peer requires its test token.'}); return;}
     let body;

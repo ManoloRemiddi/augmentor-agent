@@ -115,6 +115,17 @@ Add `--voice` to accept the speech terms and provision CPU voice, or
 local dual memory. Supply secrets using an environment variable or the private
 prompt, never a command-line value or a shared installation transcript.
 
+## Cloud voice alternative
+
+With the Desktop audio runtime installed, Settings → Voice → On offers local
+Resonant Voice and OpenAI GPT-Live. Cloud speech requires no local ASR/TTS model
+or GPU. Configure a project API key, choose a speaking voice, acknowledge cloud
+processing and click Test and save. The key goes to the OS credential vault.
+GPT-Live listens/speaks while the model selected in Augmentor still owns the task.
+Voice duration costs $0.05/minute, including silence and waiting, plus the selected
+model’s charges. The test opens a short billed session without recording.
+See [provider specification and qualification limits](VOICE-PROVIDERS.md).
+
 ## Verify, recover and update
 
 1. Open Desktop, select your model and verify one harmless response.

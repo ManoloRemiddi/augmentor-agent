@@ -11,7 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'apps/native'))
 from PySide6.QtCore import QCoreApplication, QObject, QTimer, Signal
 from augmentor_linux.voice import VoiceSession
 from augmentor_linux.voice_input import EarlyVoiceInput
-from augmentor_linux.preferences import Preferences
+from augmentor_linux.voice_provider import VoicePreferences as Preferences
 
 
 class Client(QObject):
@@ -25,6 +25,7 @@ class Client(QObject):
         self.intent = False
         self.prepared = False
         self.hands_free = False
+        self.cloud = False
         self.last_heartbeat = time.monotonic()
         self.command.connect(self.receive)
         self.watchdog = QTimer(self)
@@ -73,14 +74,21 @@ class Client(QObject):
                 if not self.preferences.values['resonant_voice']:raise ValueError('Enable Voice in Settings first.')
                 self.prepared = True
                 self.hands_free = value.get('handsFree') is True
-                if self.hands_free:
+                self.cloud = value.get('provider') == 'openai-live'
+                if self.hands_free and not self.cloud:
                     self.early = self.input_type(self)
                     self.early.changed.connect(self.state)
                     self.early.failed.connect(self.fail)
                 self.state()
             elif action == 'start' and self.prepared and not self.voice:
                 ticket = value['ticket']
-                self.voice = self.session_type(self, ticket, hands_free=self.hands_free, early_input=self.early)
+                implementation = self.session_type
+                if self.cloud:
+                    from augmentor_linux.voice_live import LiveVoiceSession
+                    from augmentor_linux.voice_provider import cloud_ticket
+                    if ticket != cloud_ticket(ticket['sessionId']):raise ValueError('Voice configuration changed. Reopen Voice.')
+                    implementation = LiveVoiceSession
+                self.voice = implementation(self, ticket, hands_free=self.hands_free, early_input=self.early)
                 self.voice.changed.connect(self.state)
                 self.voice.transcript.connect(lambda event: self.publish({'type': 'transcript', **event}))
                 self.voice.recording_progress.connect(lambda elapsed, maximum, levels: self.publish(

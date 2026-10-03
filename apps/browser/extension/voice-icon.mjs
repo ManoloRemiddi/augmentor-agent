@@ -1,4 +1,8 @@
-// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+// Augmentor — dsh-augmentor plugin, pipe, and Chromium extension
+// Copyright © 2026 Manolo Remiddi
+// SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+// License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
+
 // Same 97-point contour and state marks as native VoiceButton.paintEvent.
 export function attachVoiceIcon(button){
  const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','-14 -14 28 28');svg.setAttribute('aria-hidden','true');svg.classList.add('voice-drawing')
@@ -18,7 +22,7 @@ export function attachVoiceIcon(button){
    if(button.dataset.mode==='locked'){make('rect',{x:6,y:6,width:5,height:4,rx:1},marks);make('path',{d:'M7 6V5a1.5 1.5 0 0 1 3 0v1',fill:'none'},marks)}
   }else if(state==='speaking')make('rect',{x:-2.5,y:-2.5,width:5,height:5,rx:1},marks)
   else if(['connecting','recognizing','thinking'].includes(state))for(const x of [-3.5,0,3.5])make('circle',{cx:x,cy:0,r:.9,stroke:'none'},marks)
-  else if(['error','disconnected'].includes(state)){make('rect',{x:-.7,y:-4,width:1.4,height:5,rx:.5},marks);make('circle',{cx:0,cy:3,r:.9},marks)}
+  else if(['error','disconnected','needs-setup'].includes(state)){make('rect',{x:-.7,y:-4,width:1.4,height:5,rx:.5},marks);make('circle',{cx:0,cy:3,r:.9},marks)}
   if(button.dataset.mode==='hands-free')make('circle',{r:11,fill:'none','stroke-dasharray':'21 13.55','stroke-width':1.2,transform:'rotate(-20)'},marks)
  }
  const sync=()=>{const active=(hover||['listening','speaking','connecting','recognizing','thinking'].includes(button.dataset.state))&&document.documentElement.dataset.animation!=='false'&&!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches

@@ -2,6 +2,7 @@
 // Copyright © 2026 Manolo Remiddi
 // SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
+
 import {refreshDesktopAppearance} from './appearance.mjs'
 import {codexSetupDialog} from './codex-setup.mjs'
 import {homeSettings} from './home.mjs'
@@ -14,6 +15,7 @@ import {promptEditor} from './prompt-editor.mjs'
 import {supportDialog} from './support.mjs'
 import {attachPageMaintenance, registerMaintenanceState} from './maintenance-page.mjs'
 import {dictationSettings} from './dictation-settings.mjs'
+import {voiceSettings} from './voice-settings.mjs'
 
 const maintenance=attachPageMaintenance({document,runtime:chrome.runtime,busy:()=>checking||mounting>0})
 const send=(type,payload={})=>maintenance.work(()=>chrome.runtime.sendMessage({type,...payload}))
@@ -110,30 +112,7 @@ function showMemory(container){
   manual.parentElement.addEventListener('toggle',()=>{if(manual.parentElement.open&&!manual.querySelector('dialog'))memoryDialog(document,send,()=>({surface:'browser',harness:state.harness,...(state.sessionId?{sessionId:state.sessionId}:{})}),manual)})
 }
 async function showVoice(container){
-  if(chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol){
-    container.append(make('p','Experimental voice uses the Augmentor host audio hardware. Choose voices and audio settings in standalone Augmentor. Cloud voice providers will be added later.'));return
-  }
-  const response=await send('voice/preferences');if(!response?.ok)throw Error(response?.error||'Voice is unavailable')
-  const data=response.result,fields={}
-  const add=(key,label,input)=>{const row=make('label',label);row.append(input);container.append(row);fields[key]=input;return input}
-  const enabled=add('enabled','Enable Voice',make('input'));enabled.type='checkbox';enabled.checked=data.enabled
-  const voices=add('voiceId','Speaking voice',make('select'))
-  for(const row of data.voices){const option=make('option',row.name);option.value=row.id;voices.append(option)}voices.value=data.values.voiceId
-  for(const [key,label,min,max,step,value] of [['speed','Speaking speed',.75,1.5,.05,data.values.speed],['volume','Output volume',0,1,.05,data.values.volume],['pauseMs','Pause before sending (milliseconds)',400,2000,50,data.pauseMs]]){
-    const input=add(key,label,make('input'));input.type='number';input.min=min;input.max=max;input.step=step;input.value=value
-  }
-  const mode=add('mode','Conversation mode',make('select'))
-  for(const [value,label] of [['manual','Hold or slide to lock'],['hands-free','Hands-free conversation']]){const option=make('option',label);option.value=value;mode.append(option)}mode.value=data.mode
-  const note=make('p','Hold to record · Slide left to lock · Slide right for hands-free · Escape cancels. Changes apply when Voice next opens.');container.append(note)
-  const values=()=>({voiceId:voices.value,enabled:enabled.checked,mode:mode.value,speed:Number(fields.speed.value),volume:Number(fields.volume.value),pauseMs:Number(fields.pauseMs.value)})
-  let baseline=JSON.stringify(values())
-  registerMaintenanceState(container,()=>JSON.stringify(values())!==baseline)
-  button(container,'Save',async()=>{
-    const settings=values()
-    const reply=await send('voice/preferences',{action:'save',settings});if(!reply?.ok)throw Error(reply?.error||'Could not save voice settings')
-    baseline=JSON.stringify(settings)
-    note.textContent='Saved for both interfaces. Changes apply when Voice next opens.'
-  })
+  return voiceSettings(container,send,registerMaintenanceState)
 }
 function mount(id){
   const row=sections.get(id);if(row.mounted)return
@@ -150,7 +129,6 @@ function mount(id){
   if(id==='home')homeSettings(document,send,row.body)
   if(id==='memory')showMemory(row.body)
   if(id==='voice')void mountAsync(()=>showVoice(row.body))
-  if(id==='voice')void showVoice(row.body).catch(fail)
   if(id==='dictation')void dictationSettings(row.body,send).catch(fail)
   if(id==='support'){
     const version=make('div');version.className='card';version.append(make('h2','Augmentor '+chrome.runtime.getManifest().version),make('p','This preview is updated with the Augmentor installer. The companion and extension must use matching versions.'));row.body.append(version)

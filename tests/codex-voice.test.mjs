@@ -109,6 +109,9 @@ for(const surface of ['host','native','browser']) test(`actual pinned Codex ${su
       AUGMENTOR_CODEX_STATE:root,AUGMENTOR_CODEX_SOCKET:ipc.socketPath,AUGMENTOR_CODEX_NO_AUTOSTART:'1',AUGMENTOR_CODEX_WORKSPACE:join(root,'workspace'),
       AUGMENTOR_CODEX_BROWSER_WORKSPACE:join(root,'browser'),AUGMENTOR_WINDOW_ID:'main',AUGMENTOR_WORKSPACE_PROFILE:'',
       AUGMENTOR_VOICE_TEST_AUDIO_LOG:audioLog,PYTHONPATH:resolve('apps/native'),QT_QPA_PLATFORM:'offscreen'};
+    const speech=join(env.XDG_CONFIG_HOME,'resonant-voice');mkdirSync(speech,{recursive:true});
+    writeFileSync(join(speech,'config.json'),JSON.stringify({port:Number(new URL(f.connection.base).port),tts:{url:f.connection.base}}));
+    writeFileSync(join(speech,'token'),f.connection.token);
     if(surface==='native') {
       const result=await promisify(execFile)(process.env.AUGMENTOR_PYTHON??'python3',['tests/fixtures/codex/native_voice.py'],{env,timeout:12000});
       assert.equal(JSON.parse(result.stdout).nativeVoice,'passed');

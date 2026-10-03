@@ -156,7 +156,7 @@ class SettingsDialog(QDialog):
         self.resize(px(self,460),min(820,self.screen().availableGeometry().height()-80))
         from .settings_icons import settings_icon,settings_label
         from .voice_settings import VoiceSettingsDialog
-        voice=QPushButton('Resonant Voice')
+        voice=QPushButton('Voice')
         voice.clicked.connect(lambda:VoiceSettingsDialog(window).exec())
         layout.addWidget(voice)
         from .dictation_settings import DictationSettingsDialog
