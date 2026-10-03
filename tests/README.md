@@ -857,3 +857,8 @@ space requirements. `test_update_linux_handoff.py` execs an actual copied ELF
 runtime with a real inherited flock and verifies fixed production refusal before
 network/drain/apply. `test_update_posix_paths.py` checks actual prompt/memory state
 location conventions. These do not qualify public automatic installation.
+
+Managed staging additionally retains the complete packaged DSH/speech directory:
+`test_desktop_deployment.py` checks unchanged source isolation and retained speech
+damage refusal. Public bundle staging refuses missing DSH/speech even when its
+synthetic receipt claims qualification, before importing candidate code.

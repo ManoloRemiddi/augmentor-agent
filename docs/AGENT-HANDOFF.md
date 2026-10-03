@@ -4,6 +4,14 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+The latest Linux correction preserves the complete `dsh/` and speech payload in
+immutable staging, and requires those public dependency entrypoints before
+candidate imports. Twelve deployment and nine archive cases pass. DSH profile/
+service migration and observed reopening remain required; no manager flag is
+enabled. Fresh `3374580` native workflows are live: Mac 37151926643, Linux/shared
+37151929120 and Windows Desktop 37151931306. Their results are not yet known.
+The newer Linux allowlist/completeness correction requires its own qualification.
+
 Linux now has authentic one-bundle ZIP staging and retained bootstrap/observer
 exec composed with its live selection controller. Eight archive/selection/space
 cases and two actual location/ELF exec cases pass; the negative production

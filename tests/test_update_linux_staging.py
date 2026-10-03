@@ -145,3 +145,14 @@ class LinuxStagingTests(unittest.TestCase):
                 stage_download(held,self.stage,self.candidate,self.data,development=True)
         self.assertEqual(read_json(self.data/'desktop.json'),self.previous)
         self.tool.check.assert_not_called()
+
+    def test_qualification_flag_cannot_replace_a_complete_dsh_and_speech_payload(self):
+        rows=list(self.rows)
+        name,raw,mode=rows[0];receipt=json.loads(raw)
+        receipt['update']['automaticInstallQualified']=True
+        rows[0]=(name,json.dumps(receipt).encode(),mode)
+        held=self.held(rows);self.candidate['automaticInstallQualified']=True
+        with self.assertRaisesRegex(ValueError,'complete bundled DSH/speech'):
+            stage_download(held,self.stage,self.candidate,self.data)
+        self.assertEqual(read_json(self.data/'desktop.json'),self.previous)
+        self.tool.check.assert_not_called()

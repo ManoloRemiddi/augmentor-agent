@@ -105,6 +105,10 @@ def stage_download(held,directory,candidate,data,*,development=False):
         raise ValueError('The bundled build differs from the publisher-verified candidate.')
     if not development and (not current['automaticInstallQualified'] or not current['buildKnown']):
         raise ValueError('The downloaded build has not qualified automatic managed installation.')
+    if not development:
+        for part in ('dsh/payload.json','dsh/node_modules/@deepseek-ai/dsh/lib/bin.js',
+                'dsh/node_modules/dsh-resonant-voice/bin/resonant-voice.js'):
+            if not (root/part).is_file():raise ValueError('The public bundle lacks its complete bundled DSH/speech runtime.')
     for part in ('python/bin/python3','node/bin/node','scripts/linux-local-health.py','scripts/desktop-deployment.py'):
         if not (root/part).is_file():raise ValueError('The bundle lacks its fixed runtime or update entrypoints.')
     if shutil.disk_usage(data).free<payload['bytes']+64*1024**2:

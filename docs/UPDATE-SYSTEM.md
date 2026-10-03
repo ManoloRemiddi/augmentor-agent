@@ -1004,3 +1004,20 @@ The earlier broad Python run passes 966 cases (926 passed, 40 skips), before the
 final Node/space cases, which pass focused checks. The common ZIP extraction,
 Mac discovery correction and newer controller sources need their fresh native
 qualification. All public feed and automatic-install defaults remain disabled.
+
+
+The managed staging allowlist now preserves the full `dsh/` runtime, including
+matching speech, instead of dropping that packaged directory. Public extraction
+requires DSH payload metadata and fixed CLI/speech entrypoints before imports.
+One real filesystem fixture detects retained dependency damage; one public-flag
+fixture refuses an incomplete bundle without importing its candidate. This does
+not yet migrate existing DSH preset/host paths or restart registrations.
+
+Fresh qualification of `3374580` is running in Mac
+[37151926643](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37151926643),
+Linux/shared
+[37151929120](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37151929120)
+and Windows Desktop
+[37151931306](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37151931306).
+The subsequent Linux DSH allowlist/completeness correction passes twelve focused
+deployment and nine archive cases and needs its newer Linux qualification.

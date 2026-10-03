@@ -387,3 +387,12 @@ exec and inherited-lock refusal fixtures pass. Manager eligibility stays disable
 until producer, owned service/preset/reopening, retention and signed forward
 qualification are complete; the [shared guide](UPDATE-SYSTEM.md#managed-linux-exact-bundle-and-retained-handoff--october-3)
 records exact scope and evidence.
+
+
+The immutable staging allowlist now also includes the complete `dsh/` payload,
+not just the root Node executable and development `release/dsh` inputs. A fixture
+retains inert DSH and matching speech bytes, confirms later source edits do not
+change the release, and refuses damaged retained speech before activation. The
+public managed download path requires bundled DSH/speech entrypoints and payload
+metadata before imports; a qualification flag alone cannot compensate for a
+missing dependency tree. Twelve deployment cases and nine archive cases pass.

@@ -100,6 +100,23 @@ class DeploymentTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'changed after staging'):self.tool.activate(release)
         self.assertEqual(self.tool.read(self.tool.DATA/'desktop.json'),self.selected)
 
+    def test_bundled_dsh_and_speech_payload_follow_the_immutable_release(self):
+        (self.source/'dsh/node_modules/@deepseek-ai/dsh/lib').mkdir(parents=True)
+        (self.source/'dsh/node_modules/dsh-resonant-voice/bin').mkdir(parents=True)
+        cli=self.source/'dsh/node_modules/@deepseek-ai/dsh/lib/bin.js'
+        voice=self.source/'dsh/node_modules/dsh-resonant-voice/bin/resonant-voice.js'
+        cli.write_bytes(b'Inert locked DSH CLI.');voice.write_bytes(b'Inert matching speech package.')
+        (self.source/'dsh/payload.json').write_text('{"fixture":"complete dependency identity"}')
+        release=self.stage()
+        self.assertEqual((release/cli.relative_to(self.source)).read_bytes(),b'Inert locked DSH CLI.')
+        self.assertEqual((release/voice.relative_to(self.source)).read_bytes(),b'Inert matching speech package.')
+        self.assertIn('dsh/payload.json',self.tool.verify(release)['files'])
+        cli.write_bytes(b'Later source edit.')
+        self.assertEqual((release/cli.relative_to(self.source)).read_bytes(),b'Inert locked DSH CLI.')
+        (release/voice.relative_to(self.source)).write_bytes(b'Damaged dependency.')
+        with self.assertRaisesRegex(ValueError,'changed after staging'):self.tool.activate(release)
+        self.assertEqual(self.tool.read(self.tool.DATA/'desktop.json'),self.selected)
+
     def test_failed_import_discards_staging_only(self):
         self.mock_check.side_effect=RuntimeError('missing PySide6')
         with self.assertRaises(RuntimeError):self.stage()
