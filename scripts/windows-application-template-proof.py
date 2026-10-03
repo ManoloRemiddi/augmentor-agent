@@ -58,7 +58,8 @@ def prove(out, arch, compiler, fixture_executable, runtime):
             target=payload/'python/Lib/site-packages'/entry
             target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source,target)
     for name in ('scripts/windows-inspect-payload.py','scripts/windows-recover-source.py',
-                 'scripts/windows-template-update-proof.py','scripts/windows-update-coordinator.py'):
+                 'scripts/windows-template-update-proof.py','scripts/windows-update-coordinator.py',
+                 'scripts/windows-update-observer.py','scripts/windows-update-bootstrap.py'):
         target=payload/name;target.parent.mkdir(parents=True,exist_ok=True)
         shutil.copy2(ROOT/name,target)
     for folder in ('services/lifecycle','services/platform_adapters','services/updates'):
@@ -162,6 +163,11 @@ def prove(out, arch, compiler, fixture_executable, runtime):
             (payload/'release.json').read_bytes(),(payload/'payload-integrity.json').read_bytes())
         assert observer_result['verified'] and staged_observer.is_dir()
         stages.append('exact-private-external-observer-runtime-and-native-identity-import')
+        fence_spec=importlib.util.spec_from_file_location('bootstrap_exit_proof',ROOT/'scripts/windows-bootstrap-exit-proof.py')
+        fence_proof=importlib.util.module_from_spec(fence_spec);fence_spec.loader.exec_module(fence_proof)
+        fence_result=fence_proof.prove(staged_observer,out/'bootstrap-exit-proof')
+        assert len(fence_result['results'])==2
+        stages.append('native-source-launcher-exit-fence-and-nonzero-exit-refusal')
         # Both kinds of damaged retained bytes refuse BEFORE file replacement;
         # preserve the damaged cache for inspection, then restore this fixture.
         for path in (cached,receipt,selection):

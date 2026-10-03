@@ -442,6 +442,10 @@ def main():
                 close_preview()
             except Exception: pass
         report.setdefault('passed',False);report['stages']=stages
+        # Preserve this disposable fixture's independent inspector evidence,
+        # including failures before completion; these are not customer logs.
+        for path in (data/'updates').glob('target-health-*.log'):
+            shutil.copy2(path,out/path.name)
         if not report['passed']:
             # Only logs from this compiled-in, disposable preview. Preserve a
             # bounded stack/error sample when its process fails to exit.

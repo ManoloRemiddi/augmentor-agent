@@ -39,6 +39,8 @@ class AutomaticInstallAuthority:
         if not prefs['automaticInstall'] or not prefs['automaticDownload']:
             raise ValueError('Automatic installation consent was revoked.')
         selected=state.get('candidate');validate_release(selected)
+        if selected.get('automaticInstallQualified') is not True:
+            raise ValueError('The publisher offers this release for manual installation only.')
         if self.selected is not None and selected!=self.selected:
             raise ValueError('The selected update changed during authorization.')
         if selected['channel']!=prefs['channel'] or state.get('phase') not in ('ready','installing'):

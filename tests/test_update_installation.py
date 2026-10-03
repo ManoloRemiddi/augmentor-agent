@@ -37,7 +37,7 @@ class InstallationAuthorityTests(unittest.TestCase):
         with os.fdopen(descriptor(self.file,writable=True,create=True),'wb') as stream:stream.write(payload)
         self.release={**self.product,'version':'1.1.0','build':1,'sourceCommit':'b'*40,'target':'windows-x64',
             'installType':'windows-inno','minimumOS':'26200','releaseUrl':'https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/v1.1.0-windows-preview.1',
-            'artifacts':[artifact]}
+            'artifacts':[artifact],'automaticInstallQualified':True}
         self.state={'schema':'augmentor-update-state/1','authenticated':True,'phase':'ready','candidate':self.release,
             'preferences':{'automaticChecks':True,'automaticDownload':True,'automaticInstall':True,'channel':'preview','intervalHours':24},
             'postponedUntil':0,'skippedRelease':None,'downloads':[{**artifact,'file':str(self.file)}]}
@@ -60,6 +60,15 @@ class InstallationAuthorityTests(unittest.TestCase):
         self.assertEqual(guard.files,[])
         with self.assertRaises(ValueError):guard.check('verified')
         with self.assertRaises(ValueError):guard.__enter__()
+
+    def test_unqualified_target_cannot_inherit_source_installation_authority(self):
+        for value in (None,False,'true'):
+            with self.subTest(value=value):
+                if value is None:self.release.pop('automaticInstallQualified',None)
+                else:self.release['automaticInstallQualified']=value
+                self.save()
+                with self.assertRaises(ValueError):self.authority().__enter__()
+                self.assertEqual(self.calls,0)
 
     def test_unqualified_source_unsigned_selection_incomplete_or_corrupt_download_cannot_enter(self):
         self.receipt['update']['automaticInstallQualified']=False;self.write_receipt()

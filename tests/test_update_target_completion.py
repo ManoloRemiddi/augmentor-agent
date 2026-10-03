@@ -3,17 +3,42 @@
 from copy import deepcopy
 import hashlib
 import json
+import io
 from pathlib import Path
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'services'))
 from lifecycle.payload_integrity import seal_payload
 from lifecycle.recovery_source import assess_target
 from lifecycle.update_journal import UpdateJournal,artifact
 from platform_adapters.paths import private_directory
-from updates.windows_completion import validate_target_report
+from updates.windows_completion import validate_target_report,read_health_report,MARKER
+
+
+class HealthLogTests(unittest.TestCase):
+    def test_full_bundle_diagnostics_do_not_expand_the_report_memory_or_schema(self):
+        report=b'{"schema":"inert-streaming-fixture"}'
+        diagnostics=b'Inert extracted file diagnostic.\r\n'*40000
+        self.assertGreater(len(diagnostics),1024**2)
+        log=io.BytesIO(diagnostics+b'2026-10-03 '+MARKER.encode()+report+b'\r\n'+diagnostics)
+        self.assertEqual(read_health_report(log),report)
+
+    def test_duplicate_missing_and_oversized_reports_refuse(self):
+        marker=MARKER.encode()
+        for raw in (b'No result.\n',marker+b'{}\n'+marker+b'{}\n',
+                    marker+b'{"large":"'+b'x'*65536+b'"}\n'):
+            with self.subTest(length=len(raw)),self.assertRaises(ValueError):read_health_report(io.BytesIO(raw))
+
+    def test_total_and_line_limits_still_bound_damaged_diagnostics(self):
+        with patch('updates.windows_completion.MAX_LOG',20):
+            with self.assertRaisesRegex(ValueError,'bounded size'):
+                read_health_report(io.BytesIO(b'Inert line.\n'*3))
+        with patch('updates.windows_completion.MAX_LINE',10):
+            with self.assertRaisesRegex(ValueError,'oversized line'):
+                read_health_report(io.BytesIO(b'x'*11+b'\n'))
 
 
 class TargetCompletionTests(unittest.TestCase):

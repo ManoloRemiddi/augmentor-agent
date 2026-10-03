@@ -305,7 +305,10 @@ class Supervisor:
             if set(message) != {'action'}: raise ValueError('Unsupported background request fields.')
             if action=='status':return self.status()
             with self.admission.work():
-                if action == 'start-dsh': self.start_dsh()
+                if action == 'start-update':
+                    from updates.windows_bootstrap import launch
+                    return {'update':launch(self.root)}
+                elif action == 'start-dsh': self.start_dsh()
                 elif action == 'start-voice': self.start_voice()
                 elif action in ('start-prompts', 'start-memory'): self.start_companion(action.removeprefix('start-'))
                 elif action == 'stop-failed-setup':

@@ -22,7 +22,29 @@ from lifecycle.health_report import validate_health_report
 
 MARKER='Augmentor independent health result: '
 DIFFERENCES={'missing','changed','unexpected','missingDirectories','unexpectedDirectories'}
-MAX_LOG=1024**2
+MAX_LOG=128*1024**2
+MAX_LINE=128*1024
+
+
+def read_health_report(stream):
+    """Stream extraction diagnostics; only the exact small report is parsed.
+
+    Full bundles contain thousands of files and Inno logs their extraction.
+    Keep a bounded total/line size without loading that diagnostic log into RAM
+    or weakening the report's separate 64 KiB schema/identity boundary.
+    """
+    total=0;report=None;marker=MARKER.encode('ascii')
+    while raw:=stream.readline(min(MAX_LINE+1,MAX_LOG-total+1)):
+        total+=len(raw)
+        if total>MAX_LOG:raise ValueError('The independent target health log exceeds its bounded size.')
+        if len(raw)>MAX_LINE:raise ValueError('The independent target health log contains an oversized line.')
+        if marker in raw:
+            if report is not None or raw.count(marker)!=1:
+                raise ValueError('Independent target health did not produce one exact report.')
+            report=raw.split(marker,1)[1].rstrip(b'\r\n')
+            _json(report,65536)
+    if report is None:raise ValueError('Independent target health did not produce one exact report.')
+    return report
 
 
 def target_identity(candidate):
@@ -89,12 +111,7 @@ def complete_observed(observer, root, base, source, candidate, *, qualification=
             except TimeoutError:continue
         if code==0:raise ValueError('The read-only target inspector unexpectedly reported installation success.')
     with os.fdopen(private_file_descriptor(log,share_write=False),'rb') as stream:
-        raw=stream.read(MAX_LOG+1)
-    if len(raw)>MAX_LOG:raise ValueError('The independent target health log exceeds its bounded size.')
-    text=raw.decode('utf-8-sig')
-    outputs=[line.split(MARKER,1)[1] for line in text.splitlines() if MARKER in line]
-    if len(outputs)!=1:raise ValueError('Independent target health did not produce one exact report.')
-    raw_report=outputs[0].encode('utf-8')
+        raw_report=read_health_report(stream)
     report=_json(raw_report,65536)
     with ExitStack() as held:
         held.enter_context(Startup(base/'run'))

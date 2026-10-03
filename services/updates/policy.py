@@ -59,7 +59,7 @@ def _schemas(value):
 def validate_release(value):
     _keys(value, ('version', 'build', 'sourceCommit', 'channel', 'target', 'installType', 'releaseUrl',
                   'protocols', 'dataSchema', 'readableDataSchemas', 'minimumOS', 'artifacts'),
-          ('revoked', 'notes', 'minimumUpdater', 'distributions', 'component'))
+          ('revoked', 'notes', 'minimumUpdater', 'distributions', 'component', 'automaticInstallQualified'))
     version(value['version'])
     if type(value['build']) is not int or not 1 <= value['build'] <= 2**31 - 1:
         raise ValueError('Invalid release build sequence.')
@@ -97,6 +97,8 @@ def validate_release(value):
         raise ValueError('Invalid minimum operating system.')
     if 'revoked' in value and type(value['revoked']) is not bool:
         raise ValueError('Invalid release revocation.')
+    if 'automaticInstallQualified' in value and type(value['automaticInstallQualified']) is not bool:
+        raise ValueError('Invalid release installation qualification.')
     if 'notes' in value and (not isinstance(value['notes'], str) or len(value['notes']) > 4000):
         raise ValueError('Invalid release notes.')
     if 'minimumUpdater' in value and (type(value['minimumUpdater']) is not int or not 1 <= value['minimumUpdater'] <= 1000):

@@ -28,6 +28,7 @@ ACTIVE=b'ACTIVE\0\0'
 ACKED=b'ACKED\0\0\0'
 WRITTEN=b'WRITTEN\0'
 PINNED=b'PINNED\0\0'
+RELEASED=b'RELEASED'
 TRANSFER=struct.Struct('<4sQQQ')
 RECORD=struct.Struct('<8s24s32s')
 
@@ -70,11 +71,11 @@ class ObservationServer:
         _alive(worker.process)
         self.worker=worker
 
-    def receive(self, timeout=600):
+    def accept(self, timeout=600):
+        """Authenticate the actual launched primary process before any message."""
         if self.closed or self.worker is None or self.claimed:
             raise ValueError('The observation channel is unbound or already consumed.')
         if not math.isfinite(timeout) or not 0<timeout<=900:raise ValueError('Use a bounded observation transfer.')
-        from .windows_installer_process import InstallerObservation
         deadline=time.monotonic()+timeout
         while self.connection is None:
             _alive(self.worker.process)
@@ -97,6 +98,16 @@ class ObservationServer:
             except BaseException:
                 connection.close()
                 raise  # Refuse substitution; never adopt a later client.
+        return deadline
+
+    def release_bootstrap(self, timeout=15):
+        """Release one external parent; it must still observe our actual exit."""
+        self.accept(timeout)
+        self.connection.sendall(RELEASED)
+
+    def receive(self, timeout=600):
+        deadline=self.accept(timeout)
+        from .windows_installer_process import InstallerObservation
         # The coordinator must qualify consent/publisher and reversibly prepare
         # the graph before Setup even launches. This wait is separate from the
         # subsequent short native READY/APPLY lifetime and remains bounded.
@@ -168,21 +179,24 @@ class ObservationServer:
 
 class CoordinatorObserver:
     """Coordinator half; parent identity comes only from the fresh launch."""
-    def __init__(self, endpoint, parent, nonce):
+    def __init__(self, endpoint, parent, nonce, *, allow_transfer=True):
         _windows()
         if (type(parent) is not int or not 0<parent<=0xffffffff or parent==os.getpid() or
-                not isinstance(nonce,str) or not re.fullmatch('[a-f0-9]{64}',nonce)):
+                not isinstance(nonce,str) or not re.fullmatch('[a-f0-9]{64}',nonce) or
+                type(allow_transfer) is not bool):
             raise ValueError('Use the actual independent observer launch, never a durable record.')
         import win32api,win32con
         from platform_adapters.windows_pipe import PipeSocket
         self.parent=None;self.connection=PipeSocket()
         self.offered=self.retained=self.checked=self.acknowledged=self.closed=False
         self.finished=False
+        self.allow_transfer=allow_transfer
         try:
             self.connection.settimeout(5);self.connection.connect(endpoint)
             if self.connection.verify_peer()!=parent:raise PermissionError('The live observer belongs to a different process.')
-            self.parent=win32api.OpenProcess(win32con.SYNCHRONIZE|win32con.PROCESS_QUERY_INFORMATION|
-                win32con.PROCESS_DUP_HANDLE,False,parent)
+            rights=win32con.SYNCHRONIZE|win32con.PROCESS_QUERY_INFORMATION
+            if allow_transfer:rights|=win32con.PROCESS_DUP_HANDLE
+            self.parent=win32api.OpenProcess(rights,False,parent)
             _alive(self.parent)
             if self.connection.verify_peer()!=parent:raise PermissionError('The observer pipe changed during binding.')
             self.connection.sendall(HELLO+nonce.encode('ascii'))
@@ -190,7 +204,8 @@ class CoordinatorObserver:
         except BaseException:self.close();raise
 
     def transfer(self, installer):
-        if self.closed or self.offered:raise ValueError('Never replay an installer observation transfer.')
+        if self.closed or self.offered or not self.allow_transfer:
+            raise ValueError('Never replay or exceed this observation transfer permission.')
         self.offered=True
         _alive(self.parent)
         packet=installer.transfer_observation(self.parent)
@@ -200,6 +215,23 @@ class CoordinatorObserver:
             raise ValueError('Independent Setup observation was not confirmed. No APPLY was authorized.')
         self.retained=True
         self.connection.settimeout(5)
+
+    def wait_bootstrap(self, timeout=30):
+        """Wait on the retained launcher's kernel process, never a saved PID."""
+        if self.closed or self.allow_transfer or self.finished:
+            raise ValueError('Use a fresh read-only bootstrap observation.')
+        if not math.isfinite(timeout) or not 0<timeout<=60:
+            raise ValueError('Use a bounded bootstrap exit observation.')
+        import win32event,win32process
+        self.connection.settimeout(timeout)
+        if read_exact(self.connection,len(RELEASED))!=RELEASED:
+            raise ValueError('The source launcher did not release this exact external updater.')
+        if win32event.WaitForSingleObject(self.parent,int(timeout*1000))!=win32event.WAIT_OBJECT_0:
+            raise TimeoutError('The source launcher is still running. No installation was started.')
+        if win32process.GetExitCodeProcess(self.parent)!=0:
+            raise ValueError('The source launcher failed. No installation was started.')
+        self.finished=True
+        return True
 
     def live(self):
         if self.closed:raise ConnectionError('The live update observer is closed.')

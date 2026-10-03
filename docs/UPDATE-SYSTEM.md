@@ -256,6 +256,51 @@ false). It needs fresh native qualification and is never a public build sequence
 or signed feed input. Full forward signed N-to-N+1, supervisor launch and appropriate
 instance reopen remain unfinished; the manager still cannot offer installation.
 
+### Source launch handoff and completion-log correction
+
+The next source checkpoint adds a fixed `start-update` supervisor action. It
+accepts no installer, URL, command or PID. Short source startup admission checks
+the shipped bootstrap script and private Python against the complete inventory;
+the external bootstrap then checks the whole payload and live automatic authority
+before staging exact code outside the installation. Source readers end before the
+external parent starts. The supervisor drops its source-Python file observation
+after launch, so it cannot accidentally prevent replacement while being drained.
+
+`windows-update-observer.py` authenticates its actual source bootstrap through a
+fresh private pipe/nonce, retains a read-only kernel process handle, and requires
+that process to exit successfully before inspecting source or launching the
+coordinator. A release message or recorded PID alone is insufficient. The
+external parent holds a kernel lock through signed selection, coordinator/Setup
+exit and exact target completion; closing a Job observation never kills an
+installer. The new native inert proof delays the real launcher's exit and checks
+both successful exit and nonzero refusal. It exercises this kernel fence only,
+with no installation/publisher authority; native results are pending.
+
+Signed target catalog entries now accept the strict optional boolean
+`automaticInstallQualified`. Automatic authority requires exactly `true` for the
+selected target as well as qualification of the source. Missing/false entries
+remain valid manual downloads. Neither a numbered build nor a signed manual
+download inherits automatic-install permission. Existing public catalog/tooling
+uses the same schema; no current build/feed is enabled by this addition.
+
+At `2ac4f16`, Windows Desktop, Windows installer feasibility, macOS 14/26 and shared
+validation pass (37122108435, 37122108457, 37122108698, 37122108647). Full Windows
+qualification 37122108472 fails x64 at the new completion reader's 1 MiB log limit:
+Inno extraction diagnostics for the full bundle exceed that size before the small
+health JSON is read. The new reader streams diagnostics with a separate 128 MiB
+total/128 KiB line bound, retaining the original 64 KiB typed report and exact
+identity checks. Duplicate, missing and oversized reports still refuse; three
+portable tests cover large diagnostics and those bounds. The full fixture now
+preserves its independent inspector logs on failure. Fresh native completion
+qualification is required; no passing health is inferred from installer exit.
+
+This source checkpoint passes 120 focused updater cases (119 passed, one OS skip),
+seven portable supervisor cases (two native skips), and all 19 real Node
+publisher/client cases. Automatic scheduling of installation, result/deferred
+reporting, appropriate instance reopen, cache retention, signed N-to-N+1 and the
+other installation adapters remain unfinished. The manager still offers manual
+downloads only. The complete authorized implementation goal remains active.
+
 Shared repository-helper operations now hold one private kernel cache-writer lock
 across the entire child operation. This prevents service/coordinator concurrency
 from overwriting a newer observed TUF rollback floor with older metadata. Waiting

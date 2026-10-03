@@ -21,6 +21,8 @@ SCHEMA='augmentor-update-observer-runtime/1'
 REQUIRED={'python/python.exe','services/lifecycle/windows_installer_process.py',
           'services/lifecycle/windows_apply.py','services/lifecycle/update_journal.py',
           'services/lifecycle/windows_update_observer.py','scripts/windows-update-coordinator.py',
+          'scripts/windows-update-observer.py','services/updates/windows_driver.py',
+          'scripts/windows-update-bootstrap.py','services/updates/windows_bootstrap.py',
           'services/updates/windows_coordinator.py','services/updates/installation.py'}
 
 

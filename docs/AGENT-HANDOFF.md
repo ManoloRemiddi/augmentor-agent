@@ -79,6 +79,22 @@ now uses this path with sequence 1 only for an unpublished development artifact;
 customer distribution/automatic qualification stay false. Do not publish its
 number or treat it as signed N-to-N+1. Fresh native completion qualification,
 supervisor/service launch, appropriate reopen and the other platforms remain open.
+The next source checkpoint adds the fixed supervisor/bootstrap/external-parent
+launch handoff. The external parent authenticates and observes the actual source
+bootstrap's successful kernel exit before coordination; source readers and the
+supervisor's source executable pin end before replacement. Signed target catalogs
+must also explicitly qualify automatic installation; signed manual downloads
+cannot inherit that authority. The new inert native exit-fence proof is pending.
+`2ac4f16` passes Windows Desktop/installer feasibility, Mac 14/26 and shared
+validation. Its full x64 completion found the reader's 1 MiB extraction-log bound
+too small. Streaming diagnostics now have independent total/line bounds while the
+typed health report retains its 64 KiB and exact-identity checks. Fresh native
+completion is required. Focused updater tests pass 120 cases (one OS skip),
+portable supervisor tests pass seven (two native skips), and Node publisher/client
+tests pass 19. The manager's installation scheduling, result/deferral reporting,
+reopen/retention and other platform adapters remain open; no customer flag/feed
+is enabled. Read [the latest launch/completion record](UPDATE-SYSTEM.md#source-launch-handoff-and-completion-log-correction)
+before interpreting earlier pending evidence.
 Root
 rotation/CI custody, public feed provisioning, external installation adapters,
 final consent/revocation and N-to-N+1 health/recovery remain open. Do not narrow the goal to
