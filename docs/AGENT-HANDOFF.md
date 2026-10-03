@@ -14,7 +14,8 @@ cases pass with actual files/journals. Focused updater checks pass 210 cases
 skips) with isolated dictation/Qt state. Actual user-systemd and target live health/
 reopen qualification remain open. The controller does not start or enable services
 yet. Public flags remain disabled. See [service migration](UPDATE-SYSTEM.md#managed-linux-owned-user-service-migration).
-Fresh `f89b6fc` validation is running in 37153955607; its results are pending.
+All Linux/shared validation jobs at `f89b6fc` pass 37153955607. Fresh service-source
+checkpoint `8bc5bfb` validation is running in 37154936597; results are pending.
 
 Owned Linux DSH preset/browser/host registration migration now composes with the
 original managed selection and offline completion. Nine isolated migration cases

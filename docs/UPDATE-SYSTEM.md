@@ -1098,5 +1098,9 @@ live health/reopening qualification remain required. Public eligibility stays of
 Focused updater checks pass 210 cases (209 passed, one OS skip); full Python passes
 989 cases (949 passed, 40 explicit skips) with isolated dictation/Qt state. The
 final external file-mode guard also passes the ten focused service cases.
-The preceding `f89b6fc` registration checkpoint has fresh Linux/shared validation
-running in [37153955607](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37153955607).
+The preceding `f89b6fc` registration checkpoint passes all Linux/shared validation
+jobs in [37153955607](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37153955607).
+Fresh service-source checkpoint `8bc5bfb` is running in
+[37154936597](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37154936597);
+its results are pending. Neither workflow constitutes actual user-systemd or
+signed forward qualification of this service controller.
