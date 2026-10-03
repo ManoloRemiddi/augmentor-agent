@@ -39,6 +39,8 @@ class WindowsPreparation:
         self.entered=True
         try:
             self.gate=Startup(self.runtime,maintenance=True)
+            from .sdk_launch_lease import require_closed
+            require_closed(self.runtime)
             self.owner=discover_owner(self.root,self.runtime)
             if self.owner is None:raise MaintenanceBusy('The owned background service is not running. No component was changed.')
             self.reserve([self.owner])
@@ -61,6 +63,19 @@ class WindowsPreparation:
         self.reservations.check()
         if not self.entered or self.gate is None or self.gate.fd is None:
             raise MaintenanceBusy('Startup exclusion is no longer held.')
+
+    def reopen_plan(self):
+        """Names only, derived from this actual reserved kernel-bound graph."""
+        self.check()
+        from .windows_update_observer import validate_reopen_plan
+        prefix='augmentor-linux-pi'
+        names=[]
+        for window in self.windows:
+            name=window.endpoint.stem
+            if name==prefix:names.append('main')
+            elif name.startswith(prefix+'-'):names.append(name[len(prefix)+1:])
+            else:raise ValueError('The observed window has an unsupported instance endpoint.')
+        return validate_reopen_plan({'instances':names,'hadBrowser':bool(self.browsers)})
 
     def drain(self,*,checkpoint):
         """Close idle surfaces first and their background owner last.

@@ -14,6 +14,26 @@ The owner authorized implementation and isolated testing on the network Macs on
 product foundation. This work supersedes the old Mac packaging baseline for the
 files it changes; historical acceptance records remain evidence of their own builds.
 
+## Update coordination under implementation — October 3
+
+The per-user shortcut service now supports reversible maintenance reservations
+without changing saved keys or the LaunchAgent registration. Accepted saves and
+activations refuse preparation; a prepared service refuses new work, cancellation
+restores it, and acknowledged commit exits through normal helper cleanup. Eleven
+focused fixture tests pass; native Mac and complete update qualification remain
+required. Kernel peer/process observation is added separately. Read the
+[shared update checkpoint](UPDATE-SYSTEM.md#unix-coordination-checkpoint) before
+enabling any automatic installation flag. No installed Mac app is changed.
+
+New source adds startup exclusion to Desktop/helpers/SDK launches and holds native
+Mach-O installation/startup leases before Python initialization. Installed DSH and
+Browser expose private Unix control for the existing graceful maintenance protocol;
+Python discovers and reserves only exact-root/kernel-executable peers. Eight real
+Node graph/startup/exec cases pass locally. Mac 14/26 qualifies the preceding
+`9bce979` peer/shortcut checkpoint, not this newer native launcher. launchd pause,
+independent bundle replacement/health and reopen still need complete qualification.
+See [the current graph contract](UPDATE-SYSTEM.md#unix-startup-and-graph-preparation).
+
 ## Delivery contract and sequencing
 
 ### September 26 publication audit

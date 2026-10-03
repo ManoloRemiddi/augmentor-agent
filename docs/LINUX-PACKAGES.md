@@ -58,6 +58,11 @@ require review before accepting changed dependencies, notices or binary hashes.
 Artifacts and SHA-256 records are written under `outputs/debian/`. These checksums
 detect corruption; an authenticated public update channel remains separate work.
 Root CI retains its private package artifacts for 14 days.
+Release builds pass `--update-build N` with the reviewed positive per-version
+sequence. The default zero identifies an unnumbered test candidate. The runtime
+package now includes the [shared updater receipt and public trust inputs](UPDATE-SYSTEM.md#release-build-receipts-and-packaging);
+an enabled feed cannot be packaged without its verified public root. No installed
+package or automatic installation qualification is implied by this source change.
 
 The package proof uses Podman, or Docker with `AUGMENTOR_CONTAINER_ENGINE=docker`.
 It starts a clean Debian userland, installs the runtime using its declared

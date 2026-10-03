@@ -1,4 +1,8 @@
-/* Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 */
+/* Augmentor — dsh-augmentor plugin, pipe, and Chromium extension
+ * Copyright © 2026 Manolo Remiddi
+ * SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+ * License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
+ */
 
   html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
     font: 13px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
@@ -287,4 +291,4 @@
 
   /* 0.1.30 (Phase 1): the Updates popover — installed vs latest per
      component, one action per row. Rows are rendered by sidepanel.js. */
-#setup-notice { margin:8px; padding:10px; border:1px solid var(--border2); border-radius:8px; color:var(--text); background:var(--layer1); cursor:pointer; }
+#setup-notice, .update-notice { margin:8px; padding:10px; border:1px solid var(--border2); border-radius:8px; color:var(--text); background:var(--layer1); cursor:pointer; }

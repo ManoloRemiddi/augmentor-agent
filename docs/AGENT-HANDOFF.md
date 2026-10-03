@@ -2,6 +2,162 @@
 
 # Start here: agent handoff
 
+## Automatic updates implementation — October 3, in progress
+
+Unix source now has startup exclusion, SDK registration surviving exec, and
+private installed DSH/Browser endpoints bound to their original kernel-observed
+Node processes. `PosixPreparation` reserves and normally drains exact-source
+components with durable checkpoints; five real Node/graph and three startup/exec
+fixtures pass. Broad source checks pass 922 Python/40 skips, 531 Node/two skips,
+92 Browser, type/build. Mac 14/26 passes earlier `9bce979` peer/shortcut changes;
+new compiled-launcher leases and combined graph code require native CI. Complete
+Unix external apply/health/reopen and registration coordination remain open.
+Read [Unix graph contract](UPDATE-SYSTEM.md#unix-startup-and-graph-preparation).
+
+Mac shortcut admission and kernel-bound Unix peer observation are now added;
+Linux real-peer checks pass three cases and focused Mac shortcut checks pass eleven.
+Native Mac qualification and the complete Unix installation adapter remain open.
+At `d34b60d`, Windows Desktop native ACL checks pass both CPUs. Full x64 reaches
+target reopening but fails its later fixture checkpoint in a nonprivate evidence
+folder; the source corrects the checkpoint to the private runtime. Fresh full
+qualification is required. See [Unix checkpoint](UPDATE-SYSTEM.md#unix-coordination-checkpoint).
+
+The signing tool now prepares offline root replacement with both old/new
+two-of-three signatures, then activates an exact pinned next root through one
+atomic publisher-state selection. It retains immutable root history and burned
+metadata/artifact identities. Real producer/client tests pass 23 cases, including
+an actual HTTP client advancing roots 1→2→3 and downloading inert bytes. Online
+key migration/custody/public provisioning remain unfinished; see
+[offline root replacement](UPDATE-SYSTEM.md#offline-root-replacement).
+At `5891eef`, Mac 14/26, shared validation, SDK platform contracts and installer
+feasibility pass. Windows Desktop fails the new lease fixture's temporary-parent
+ACL. Full x64 completes busy-draft deferral and target health, then fails reopen
+on normal installed-code ownership/read grants. The source now separates public
+installed-code read-only validation from private cache validation and corrects
+the fixture parent; new native ACL/reopen qualification is required. Do not treat
+the failed x64 run as a successful reopening proof.
+
+Latest controller integration connects qualified Windows downloads to the fixed
+supervisor/bootstrap, outside the shared service's work admission. Fresh launch
+identifiers/results report status only; actual cancelled preparation can defer
+five minutes, while uncertain outcomes block replay. The original live observer
+captures instance names and reopens the health-verified target/background owner.
+SDK server kernel leases defer preparation before desktop shutdown. Completed
+temporary runtimes are cleaned only after actual holders exit; unknown attempts
+are preserved. Focused updater checks pass 134 cases (one OS skip). New full
+Windows fixtures cover busy-draft deferral and reopening and await native CI.
+Read [current controller evidence and remaining work](UPDATE-SYSTEM.md#live-installation-controller-deferral-and-reopening).
+The prior combined source `4327ffd` passes all six hosted workflows, including
+full Windows installation on both CPUs and Mac 14/26. Those passes qualify the
+earlier completion/log/exit-fence changes, not this newer controller or signed
+N-to-N+1. Automatic flags/public feed remain disabled; Linux/Mac adapters, SDK
+graceful maintenance, verified controller recovery reset and signing/publication
+remain unfinished. Nothing has been deployed to installed apps.
+
+`feat/automatic-updates` starts from main `c7f895d416e6b94ca601b66a09caf4846a64b907`.
+The branch now incorporates main `550e274d9f0c01f35c0e3b4d7d3743fed4899971`
+(dictation isolation/readiness, approved Handy and SDK alignment). All owning records
+are retained below; new combined native checks are required. A preexisting local
+dictation variant is preserved in Git stash `99373c252a1dcd0588c57c63e8477ac5fa2c95bc`;
+main already includes equivalent offscreen isolation with fuller explanation.
+Code checkpoint `dc814c224c8d37e740d2806372bfb9ee61fb49b0` passes the documented
+Linux/source and synthetic suites. The owner authorizes autonomous implementation of the complete update system,
+including optional automatic installation. [The owning guide](UPDATE-SYSTEM.md)
+records the shared scheduler, exact identity/compatibility policy, Desktop/Browser
+controls, manual downloads and TUF client integration. Automatic installation
+and public signed-feed provisioning are unfinished. The publisher now has
+two-of-three root initialization, online-only refresh and a real producer/client
+transfer proof. Initial Mac bundled-runtime checks pass; Windows desktop CI found
+a download fixture/ACL boundary issue now corrected and passing native x64/ARM64
+desktop CI at `632c2f3` (shared validation also passes; existing full Windows
+same-build installer fixtures pass earlier `ae8595f`). New producer recovery
+preserves partial attempts, burns uncertain versions and retains withdrawn asset
+identities. Debian/Mac/Windows builders now stamp reviewed build/component
+identities and public trust inputs; these newer packaging changes require fresh
+native CI. Native Windows desktop checks also pass `8d7f500`; Mac native updater
+tests pass, but packaging at that head caught a source-record variable collision
+corrected in both Mac/Windows builders at `97837de`; macOS 14/26 bundled-runtime,
+Windows Desktop x64/ARM64 and shared validation pass that head. The shared
+coordinator has explicit final-authority hooks. Its independent live guard now
+requires qualified source, fresh publisher verification, live consent/selection
+and retained exact downloads, with bounded shared helper transport. External
+apply/target-observer composition and fresh native qualification of these additions
+remain required. Mac companion
+selection cannot receive a desktop bundle. Windows independent inspection now
+has exact proposed-target assessment and isolated target health, kept separate
+from source restoration. Eight portable assessment tests and native template
+target-health checks on both CPUs pass at `1882338` (37115087292); full-application
+target health remains pending. These read-only actions preserve the active journal
+and grant no apply/completion authority. External observer-runtime staging now
+copies/rechecks exact source Python/services/scripts into private nonreplacement
+directories (five inert tests); native relocation/identity-import proofs are added
+and pending. Repository helpers now serialize the shared TUF cache through a
+bounded cancellable kernel writer; focused updater tests pass 104 cases (one OS
+skip). `97837de` full Windows qualification passes x64, but ARM64 recovery exceeded
+its five-minute observer limit despite Setup finishing immediately afterward.
+Inner/outer observation bounds are corrected; fresh native recovery is required.
+Read-only actual installer process/Job/artifact transfer and receiver validation
+now support an external observer. Native template relocation and same-process
+sender-close proofs pass both CPUs at `536e875` (37118685817); Windows Desktop also
+passes both CPUs (37118685782). Combined Linux/source checks at that head pass
+519 JavaScript tests/2 skips and 834 Python/Qt tests/39 skips, plus build/type checks.
+Mac checks failed only the new observer fixture's unnormalized `/var` alias;
+that fixture is corrected without relaxing production ancestor validation.
+The newer private live observer channel binds the actual separately launched
+coordinator process/Job, transfers read-only Setup observations, requires parent
+retention/liveness before APPLY, and observes complete actual Jobs after child
+exit. Both template/full-application fixtures now use this real separate-process
+channel; those newer native checks remain pending. A fixed external production
+coordinator composes fresh TUF/consent authority, exact current source/recovery,
+journal, graph drain and observed native APPLY with no arbitrary installer/command.
+Its worker Job permits separately observed Setup breakaway without kill-on-close.
+Five portable fault cases and the focused updater set pass (109 tests, one skip).
+The service/supervisor still must launch the independent parent and complete target
+health/restart; the fixed worker is not a complete production update controller.
+At `5d9c0ef`, separate-process template observation passes both CPUs (sixteen
+recorded stages in 37119738791); the overall x64 workflow fails later in a separate
+negative WinSparkle callback's modal cleanup. Recorded progress confirms refusal;
+continuous own-process-only dismissal now addresses that fixture race. macOS 14/26
+and Windows Desktop both CPUs pass that head (37119738882/37119738796).
+The newer target completion composes actual live Setup/coordinator exit with
+independent exact-target inventory/Qt health, current candidate build/selection and
+fresh admission/writer. Native reports now bind inventory digest, and the live
+coordinator forwards its acknowledged journal ID/hash to prevent completing a
+replacement same-pair record. Focused updater tests pass 116 cases (one skip),
+including four target report and three snapshot failures. The full native fixture
+now uses this path with sequence 1 only for an unpublished development artifact;
+customer distribution/automatic qualification stay false. Do not publish its
+number or treat it as signed N-to-N+1. Fresh native completion qualification,
+supervisor/service launch, appropriate reopen and the other platforms remain open.
+The next source checkpoint adds the fixed supervisor/bootstrap/external-parent
+launch handoff. The external parent authenticates and observes the actual source
+bootstrap's successful kernel exit before coordination; source readers and the
+supervisor's source executable pin end before replacement. Signed target catalogs
+must also explicitly qualify automatic installation; signed manual downloads
+cannot inherit that authority. The new inert native exit-fence proof is pending.
+`2ac4f16` passes Windows Desktop/installer feasibility, Mac 14/26 and shared
+validation. Its full x64 completion found the reader's 1 MiB extraction-log bound
+too small. Streaming diagnostics now have independent total/line bounds while the
+typed health report retains its 64 KiB and exact-identity checks. Fresh native
+completion is required. Focused updater tests pass 120 cases (one OS skip),
+portable supervisor tests pass seven (two native skips), and Node publisher/client
+tests pass 19. The manager's installation scheduling, result/deferral reporting,
+reopen/retention and other platform adapters remain open; no customer flag/feed
+is enabled. Read [the latest launch/completion record](UPDATE-SYSTEM.md#source-launch-handoff-and-completion-log-correction)
+before interpreting earlier pending evidence.
+The main `550e274` integration preserves SDK source qualification and excludes
+shared Updates administration from SDK settings. Combined build/type/privacy,
+527 Node tests/two skips, 92 Browser cases and 855 Python/Qt tests/39 skips pass
+with locked test dependencies and isolated dictation state; new native checks
+remain required on this combined source. The initial broad Node invocation with
+missing qualification dependencies was stopped and is not passing evidence.
+Root
+rotation/CI custody, public feed provisioning, external installation adapters,
+final consent/revocation and N-to-N+1 health/recovery remain open. Do not narrow the goal to
+notification/downloads or mark it complete based on this checkpoint. Nothing
+has been deployed into existing installed apps. Preserve the canonical checkout’s
+existing dirty work; implementation is in a separate feature checkout.
+
 ## Application SDK alignment source — October 3
 
 The owner-authorized source integration is complete: product PR #34 merged on

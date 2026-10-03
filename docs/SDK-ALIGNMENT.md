@@ -159,6 +159,16 @@ not stop the service used by other apps. App grants and model/voice settings
 are not widened by bootstrap. A future native-runtime selector must update this
 adapter in the same change; do not infer distro qualification from generic paths.
 
+### Update registration under implementation
+
+SDK launches now register a kernel-held busy lease while holding startup exclusion
+on Linux/Mac as well as Windows. Unix registrations survive exec into the actual
+Node app server. A live registration defers automatic update preparation before
+Desktop shutdown; exited stale records grant no shutdown/restart authority.
+Three actual startup/exec fixtures pass on Linux. Native Mac and complete updater
+qualification remain required. Existing SDK apps are not migrated or restarted.
+See [the shared update contract](UPDATE-SYSTEM.md#unix-startup-and-graph-preparation).
+
 ## Evidence and release gates
 
 ### Supplemental post-merge browser observation — October 3

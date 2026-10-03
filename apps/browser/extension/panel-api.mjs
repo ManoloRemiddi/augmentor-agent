@@ -33,6 +33,7 @@ import {approvalPresenters} from './approval-presenters.mjs'
 import { overlayFade } from './overlay.mjs'
 import { browserMaintenance } from './maintenance-worker.mjs'
 import {prepareBranch,finishBranch} from './branch-request.mjs'
+import {updateRequest} from './update-client.mjs'
 
 // The DSH picker's curation rides every catalog reply: the panel's picker
 // shows the same Pinned top section as the DSH app (empty lists when the
@@ -66,6 +67,9 @@ function dispatchPanelMessage(msg, sender, sendResponse) {
   if (!sender.url || !sender.url.startsWith('chrome-extension://' + chrome.runtime.id)) return
   if(msg?.type==='surface/dictation'){
     request('augmentor/surface',{action:'dictation',method:msg.method,params:msg.params}).then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}));return true
+  }
+  if(msg?.type==='surface/updates'){
+    updateRequest({method:msg.method,params:msg.params}).then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}));return true
   }
   if(msg?.type==='surface/appearance'||msg?.type==='prompt/improve'){
     if(msg.type==='prompt/improve'&&(!['dsh','codex'].includes(state.harness)||state.phase!=='ready'||state.running||state.panelViewSession)){sendResponse({ok:false,error:'Open an idle DSH or Codex conversation first.'});return}

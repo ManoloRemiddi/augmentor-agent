@@ -124,7 +124,10 @@ def run_service(state):
     hold('runtime')
     node = ROOT/'node/bin/node'
     cli = (ROOT/'dsh/node_modules/.bin/dsh').resolve(strict=True)
-    os.execve(node, [str(node), str(cli), 'web', '--no-open', '--host', '127.0.0.1', '--port', str(config['port'])], env)
+    from posix_startup import Startup
+    with Startup() as startup:
+        env['AUGMENTOR_UNIX_STARTUP_FD']=str(startup.handoff())
+        os.execve(node, [str(node), str(cli), 'web', '--no-open', '--host', '127.0.0.1', '--port', str(config['port'])], env)
 
 
 def start_saved(saved):

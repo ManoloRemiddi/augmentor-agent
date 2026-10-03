@@ -2,6 +2,22 @@
 
 # Source baselines and migration inventory
 
+## Update repository client — October 3
+
+[`tuf-js`](https://github.com/theupdateframework/tuf-js) **6.0.0** and
+`@tufjs/models` **5.0.0** are pinned and locked. Both declare MIT; transitive
+`@tufjs/canonical-json` 2.0.0, `@gar/promise-retry` 1.0.3, minimatch 10.2.6
+and their dependencies retain their upstream licenses (including BlueOak-1.0.0
+for minimatch). The existing release notice inventory collects original texts.
+Node 24.19.0 exercises real Ed25519/TUF verification and bounded transfer on Linux.
+The engines range now follows the actual TUF dependency requirement: Node
+22.22.2+, supported 24.15.0+ or 26+. Existing release runtimes pin 24.19.0.
+The cache adapter overrides the pinned client’s metadata persistence method
+without changing verification, and preserves its internal `DownloadHTTPError`
+class for missing-next-root handling. Upgrade these together and rerun trust,
+rotation, cache and transfer tests. No published feed or installed automatic
+update is claimed; see [update implementation](UPDATE-SYSTEM.md).
+
 ## Embedded Handy — 2 October 2026
 
 [Handy v0.9.7](https://github.com/cjpais/Handy/tree/05e0aedd2906f0d82722735f930465950c476b90)

@@ -603,6 +603,103 @@ remains in qualification; these results do not establish public N-to-N+1 updates
 
 ### Independently verified completion
 
+Current customer-updater integration adds explicit authority revalidation to
+`authorize_update`: before preparation, before any shutdown, and after installer
+readiness before APPLY intent. A false or failed customer authority check cannot
+grant apply. Existing fixed-artifact qualification callers omit the optional
+hook; that does not authenticate downloaded releases. Post-drain failure preserves
+the journal for independent inspection without command replay. See
+[shared updater integration](UPDATE-SYSTEM.md#installation-authority-integration-in-progress)
+for implementation scope. Its live `AutomaticInstallAuthority` guard now refreshes
+publisher verification, rereads current consent/source and retains/rechecks exact
+downloads. Production OS entrypoints and independent target completion still need
+to compose that guard with the existing preparation/apply adapters; no current
+installed receipt qualifies automatic installation.
+
+Independent Windows inspection now separates recorded source and recorded target.
+The exact retained target installer accepts read-only `/augmentorinspect=target`
+and `target-health` actions. Its extracted metadata/worker/runtime operate outside
+the replaceable app, under native maintenance admission, a live journal writer
+and a pinned private active record. Target assessment binds version, source,
+OS/CPU, channel, data compatibility and installer digest to the exact proposed
+target, and requires an apply-authorized phase. Target health additionally checks
+the complete embedded inventory and runs only the isolated native health action
+under read admission. It preserves the journal and cannot grant apply, become
+source-recovery authority or complete a transaction by itself. The external
+observer still must observe actual Setup exit and verify selected target before
+archival. The portable assessment suite passes eight cases; native template checks
+pass both CPUs at `1882338` in
+[37115087292](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37115087292).
+Full-application target-health checks remain pending and separate from N-to-N+1
+or physical-device acceptance.
+
+The external observer can now stage its exact source Python/services/scripts through
+`observer_runtime.py`, under caller-held source read admission, into a fresh private
+directory outside the replacement tree. Independently supplied metadata binds the
+whole source inventory and the exact staged subset. Verification after source
+displacement, partial-write refusal and tampered-runtime refusal pass five inert
+tests; native template relocation/identity-import checks pass both CPUs at
+`536e875` (run 37118685817), while full-runtime checks remain pending. No copied code
+is executed by staging, and neither a staging receipt nor saved process identifiers
+authorize apply or completion. Live observer IPC is now composed below; completion
+and product launch integration remain pending.
+
+`InstallerProcess.transfer_observation` now duplicates query/synchronize-only
+process/Job handles and the retained read-only artifact into a caller-bound live
+same-user observer. The numbers belong to that other process and must be delivered
+once over its authenticated live IPC; they are never journal fields or a saved-PID
+recovery instruction. `InstallerObservation` checks private artifact identity/hash,
+the actual primary image's kernel file identity, same-user process membership and
+the non-killing Job, then observes full Job exit without a terminate/authorize API.
+Closing either observation scope preserves Setup. Native template qualification
+at `536e875` passes same-process adoption/sender-close on both CPUs. The subsequent
+`windows_update_observer.py` uses a live private pipe, fresh launch nonce and exact
+kernel primary-process/Job binding to transfer observations to the separate parent.
+The child requires confirmed retention and parent liveness before native APPLY;
+no saved PID/handle/nonce authorizes any operation. The observer awaits complete
+coordinator and Setup Job exit, preserving either on timeout. Native exact-template
+and full-application fixtures now exercise this separate-process channel; those
+newer checks remain pending and the full fixture still applies identical artifacts.
+
+The fixed external `windows-update-coordinator.py` now composes the qualified
+current source, complete payload integrity, exact retained recovery selection,
+fresh TUF/consent authority and shared durable coordinator with graph preparation
+and `ObservedWindowsApply`. Only fixed OS-derived production paths are accepted;
+the production entrypoint has no fixture/trust fallback or arbitrary command.
+Source startup read admission ends before requesting the graph writer; installation
+read admission stays until this actual coordinator exits. External coordinator Jobs
+explicitly permit the independently observed Setup's breakaway without enabling
+kill-on-close. Five portable refusal/unknown-acknowledgment wrapper cases pass.
+The owning service/supervisor launch, target-health completion, restart and signed
+cross-version qualification remain pending; no qualified automatic flag is set.
+
+Separate-process template observation now passes both CPUs at PR head `5d9c0ef`
+(37119738791, sixteen template stages), with inert app components. The overall x64
+workflow fails in a separate rejected-metadata WinSparkle fixture's modal cleanup;
+its progress confirms refusal and the own-process dismissal race is corrected.
+Mac 14/26 and Windows Desktop checks pass that head. Full installed-app observation
+requires fresh qualification and is still distinct from a signed forward update.
+
+`updates/windows_completion.py` now composes the original live Setup/coordinator
+exit observations with a separate exact-target installer's read-only target health.
+The native report binds release and inventory digests; fresh parent read/writer
+admission compares the full installed inventory, selection and original candidate
+build/protocol/component before archival. The coordinator forwards its exact
+acknowledged transaction ID/snapshot digest over live IPC; a replacement journal,
+even with the same release pair, cannot be completed by this observer. Failed
+or unknown health preserves the active record. A deny-delete journal pin is closed
+before durable archival while writer/startup/installation admission remains held.
+Four portable report and three snapshot fault tests pass (focused updater total
+116, one OS skip). The full native same-build fixture uses this path with an
+explicitly unpublished numbered development artifact; new native qualification,
+product launch/reopen and signed N-to-N+1 remain required.
+
+An actual ARM64 full-application recovery at `97837de` crossed its former five-minute
+Setup observation deadline; its inner log records successful installation afterward.
+The observer preserves the recovery and never restarts that Setup. It now observes
+the same Job for at most ten minutes; native outer observation allows twenty minutes
+including independent inventory/health. Fresh native recovery evidence is required.
+
 Update journals now support independent completion after the caller has observed
 installer exit, reverified the release pair/installed selection and passed a local
 health callback. Completed records are durably archived; failed health, an

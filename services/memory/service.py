@@ -40,6 +40,8 @@ class Handler(socketserver.StreamRequestHandler):
                 with self.server.admission.work():
                     result = self.server.memory.call(method, request.get('params', {}))
             response = {'id': identity, 'result': result}
+            if method in MAINTENANCE_METHODS:
+                response.update({'pid':os.getpid(),'buildRoot':str(Path(__file__).resolve().parents[2]),'maintenanceAdmission':1})
         except Exception as error:
             response = {'id': identity, 'error': {'code': 'memory', 'message': str(error)}}
         encoded = (json.dumps(response, ensure_ascii=False) + '\n').encode()
@@ -63,6 +65,10 @@ class Server(ThreadingLocalServer):
 
 
 if __name__ == '__main__':
+    startup=None
+    if sys.platform in ('linux','darwin'):
+        from lifecycle.posix_startup import Startup
+        startup=Startup()
     sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'lifecycle'))
     from lease import hold
     hold('runtime')
@@ -83,6 +89,7 @@ if __name__ == '__main__':
     memory = HindsightMemory(data / 'dual-memory.sqlite3')
     server = Server(str(endpoint), Handler)
     server.memory = memory
+    if startup is not None:startup.ready()
     gateway = None
     configuration = server.memory.processing.configuration
     if configuration.get('processingProtocol') == 'augmentor-memory-processing/1':

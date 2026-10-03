@@ -1,0 +1,8 @@
+{
+  "schema": "augmentor-update-repository/1",
+  "enabled": false,
+  "metadataBaseUrl": "https://augmentoragent.com/updates/v1/metadata/",
+  "catalogBaseUrl": "https://augmentoragent.com/updates/v1/targets/",
+  "artifactBaseUrl": "https://github.com/ManoloRemiddi/augmentor-agent/",
+  "rootFile": "updates/root.json"
+}

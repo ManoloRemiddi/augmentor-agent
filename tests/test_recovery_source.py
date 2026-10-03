@@ -9,7 +9,7 @@ import unittest
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'services'))
-from lifecycle.recovery_source import assess_source
+from lifecycle.recovery_source import assess_source, assess_target
 
 
 def raw(value):return json.dumps(value).encode('utf-8')
@@ -71,6 +71,27 @@ class RecoverySourceTests(unittest.TestCase):
                        raw({**self.record,'phase':'force-rollback'})):
             with self.subTest(record=record[:80]),self.assertRaises(ValueError):
                 assess_source(record,raw(self.release),self.source['sha256'])
+
+    def test_target_assessment_identifies_new_release_without_replaying_or_completing(self):
+        release={key:value for key,value in self.record['target'].items() if key!='sha256'}
+        before=raw(self.record)
+        result=assess_target(before,raw(release),self.record['target']['sha256'])
+        self.assertTrue(result['recordedTargetMatches']);self.assertFalse(result['applyAuthorized'])
+        self.assertEqual(result['recordSHA256'],hashlib.sha256(before).hexdigest())
+        self.assertEqual(result['installerSHA256'],'f'*64)
+        self.assertEqual(raw(self.record),before)
+        # Even healthy prior-version metadata cannot become the new target.
+        with self.assertRaisesRegex(ValueError,'exact recorded update target'):
+            assess_target(before,raw(self.release),self.source['sha256'])
+        for key,value in [('version','1.2.5'),('sourceCommit','1'*40),('target','windows-x64')]:
+            with self.subTest(field=key),self.assertRaises(ValueError):
+                assess_target(before,raw({**release,key:value}),self.record['target']['sha256'])
+
+    def test_target_health_refuses_a_record_that_never_authorized_apply(self):
+        release={key:value for key,value in self.record['target'].items() if key!='sha256'}
+        for phase in ('verified','preparing','prepared','drained','installer-ready','cancelled'):
+            with self.subTest(phase=phase),self.assertRaisesRegex(ValueError,'authorized installation'):
+                assess_target(raw({**self.record,'phase':phase}),raw(release),self.record['target']['sha256'])
 
 
 if __name__=='__main__':unittest.main()

@@ -31,3 +31,27 @@ def assess_source(record_bytes, release_bytes, installer_digest):
         'releaseSHA256':hashlib.sha256(release_bytes).hexdigest(),
         'phase':record['phase'],'requiredObservation':recovery_action(record),
         'recordedSourceMatches':True,'applyAuthorized':False}
+
+
+def assess_target(record_bytes, release_bytes, installer_digest):
+    """Identify the exact proposed target for independent post-install health.
+
+    The external observer must still observe the actual installer exit, verify
+    complete payload/selection and perform local health before completion. This
+    assessment cannot install, archive, roll back or replay a recorded command.
+    Native callers retain the same private writer/record scope as source checks.
+    """
+    record=validate(_json(record_bytes,MAX_RECORD))
+    release=_json(release_bytes,65536)
+    if not isinstance(release,dict):raise ValueError('Independent release metadata is invalid.')
+    target=artifact({key:release.get(key) for key in (
+        'version','sourceCommit','target','channel','dataSchema','readableDataSchemas')} |
+        {'sha256':installer_digest})
+    if target!=record['target']:
+        raise ValueError('This installer is not the exact recorded update target.')
+    if record['phase'] not in ('apply-intent','apply-acknowledged','installed','healthy','complete'):
+        raise ValueError('Target health requires an update that authorized installation.')
+    return {'schema':'augmentor-update-target-assessment/1','transactionId':record['id'],
+        'recordSHA256':hashlib.sha256(record_bytes).hexdigest(),
+        'installerSHA256':target['sha256'],'releaseSHA256':hashlib.sha256(release_bytes).hexdigest(),
+        'phase':record['phase'],'recordedTargetMatches':True,'applyAuthorized':False}

@@ -35,6 +35,11 @@ coverage gaps and shared-interface boundaries. This direction extends the existi
 architecture; the audit itself does not implement the pending changes or update
 installed apps. The owner's approved UI remains the design baseline.
 
+The [shared update service](UPDATE-SYSTEM.md) runs under prompt-service ownership,
+independent of model availability. Both surfaces share schedules, consent and
+notification state. Signed delivery and manual downloads do not authorize file
+replacement; qualified installation must compose the maintenance/recovery graph.
+
 ## Product and runtime ownership
 
 The [Codex integration build plan](CODEX-INTEGRATION-PLAN.md) defines the third

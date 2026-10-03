@@ -57,10 +57,12 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         if source.is_file():
             target=payload/'python/Lib/site-packages'/entry
             target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source,target)
-    for name in ('scripts/windows-inspect-payload.py','scripts/windows-recover-source.py'):
+    for name in ('scripts/windows-inspect-payload.py','scripts/windows-recover-source.py',
+                 'scripts/windows-template-update-proof.py','scripts/windows-update-coordinator.py',
+                 'scripts/windows-update-observer.py','scripts/windows-update-bootstrap.py'):
         target=payload/name;target.parent.mkdir(parents=True,exist_ok=True)
         shutil.copy2(ROOT/name,target)
-    for folder in ('services/lifecycle','services/platform_adapters'):
+    for folder in ('services/lifecycle','services/platform_adapters','services/updates'):
         shutil.copytree(ROOT/folder,payload/folder,ignore=shutil.ignore_patterns('__pycache__','*.pyc'))
     build_spec = importlib.util.spec_from_file_location('template_launcher', ROOT/'scripts/build-windows-launcher.py')
     builder = importlib.util.module_from_spec(build_spec); build_spec.loader.exec_module(builder)
@@ -88,10 +90,11 @@ def prove(out, arch, compiler, fixture_executable, runtime):
                 child.kill(); child.wait(timeout=10)  # Failed fixture cleanup only.
         assert (code == 0) == success, (label,code)
         assert not launch_record.exists(), 'Silent maintenance launched the application.'
-    def inspect(executable,label,*,source=False,health=False):
+    def inspect(executable,label,*,source=False,health=False,target=False):
         # InitializeSetup deliberately refuses installation after inspection.
         # A nonzero Setup exit alone is not an inspection-success assertion.
-        run(executable,label,success=False,arguments=['/augmentorinspect='+('health' if health else 'source' if source else '1')])
+        mode=('target-health' if health else 'target') if target else ('health' if health else 'source' if source else '1')
+        run(executable,label,success=False,arguments=['/augmentorinspect='+mode])
         log=(out/('application-template-'+label+'.log')).read_text(encoding='utf-8-sig')
         marker='Augmentor independent health result: ' if health else 'Augmentor independent inspection result: '
         rows=[line.split(marker,1)[1] for line in log.splitlines() if marker in line]
@@ -101,32 +104,36 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         return result
     def coordinated(label, *, success=True):
         """Actual READY/APPLY and Setup exit; no running product graph in this fixture."""
-        import sys,win32api,win32con,win32event,win32process
+        import win32event
+        from lifecycle.observer_runtime import verify_observer_runtime
+        from lifecycle.windows_installer_process import InstallerProcess
+        from lifecycle.windows_update_observer import ObservationServer
         from platform_adapters.private_files import read_json
         observation=private_directory(Path(report['qualificationBase'])/'placement-proofs'/label)
-        setup=None
-        with (out/('application-template-'+label+'-coordinator.log')).open('wb') as log:
-            child=subprocess.Popen([sys.executable,'-I','-Xutf8','-B',str(ROOT/'scripts/windows-template-update-proof.py'),
-                '--data',report['qualificationBase'],'--release',str(payload/'release.json'),
-                '--observation',str(observation)],stdin=subprocess.DEVNULL,stdout=log,stderr=subprocess.STDOUT)
+        metadata=(payload/'release.json').read_bytes();inventory=(payload/'payload-integrity.json').read_bytes()
+        verify_observer_runtime(staged_observer,metadata,inventory)
+        python_digest=json.loads(inventory)['files']['python/python.exe']['sha256']
+        with ObservationServer(observation,report['sha256'],cached.stat().st_size) as observer:
+            child=InstallerProcess(staged_observer/'python/python.exe',python_digest,
+                ['-I','-Xutf8','-B',str(staged_observer/'scripts/windows-template-update-proof.py'),
+                 '--data',report['qualificationBase'],'--release',str(payload/'release.json'),
+                 '--observation',str(observation),*observer.arguments()],qualification_outer_job=True,
+                allow_child_breakaway=True)
             try:
-                deadline=time.monotonic()+40
-                while not (observation/'ready.json').exists():
-                    assert child.poll() is None, 'The disposable placement coordinator failed; inspect its log.'
-                    if time.monotonic()>=deadline:raise TimeoutError('The placement coordinator did not authorize Setup.')
-                    time.sleep(.05)
+                observer.bind(child)
+                setup=observer.receive(timeout=40)
+                assert win32event.WaitForSingleObject(setup.process,0)==win32event.WAIT_TIMEOUT
+                try:setup.wait(timeout=.01)
+                except TimeoutError:pass
+                else:raise AssertionError('The waiting Setup was declared complete before APPLY.')
+                observer.receive_apply()
+                code=observer.wait_installer(timeout=90)
                 ready=read_json(observation/'ready.json');assert ready['coordinatorPid']==child.pid
-                setup=win32api.OpenProcess(win32con.SYNCHRONIZE|win32con.PROCESS_QUERY_INFORMATION,False,ready['setupPid'])
-                assert win32event.WaitForSingleObject(setup,0)==win32event.WAIT_TIMEOUT
-                atomic_json(observation/'observed',{'observed':True})
-                assert child.wait(timeout=30)==0
-                assert win32event.WaitForSingleObject(setup,90000)==win32event.WAIT_OBJECT_0
-                code=win32process.GetExitCodeProcess(setup)
+                assert ready['independentObservationTransfer'] is True
+                assert child.poll()==0
                 assert (code==0)==success, (label,code)
             finally:
-                if setup is not None:setup.Close()
-                if child.poll() is None:
-                    child.terminate();child.wait(timeout=10)  # Only this disposable qualification coordinator.
+                child.close()  # Observation close cannot kill either real Job.
                 if (observation/'setup.log').exists():
                     shutil.copy2(observation/'setup.log',out/('application-template-'+label+'.log'))
     try:
@@ -150,6 +157,17 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         assert repair_command == '"'+str(cached)+'"', repair_command
         repair = command_executable(repair_command)
         assert removal.is_relative_to(install)
+        observer_spec=importlib.util.spec_from_file_location('observer_runtime_proof',ROOT/'scripts/windows-observer-runtime-proof.py')
+        observer_proof=importlib.util.module_from_spec(observer_spec);observer_spec.loader.exec_module(observer_proof)
+        staged_observer,observer_result=observer_proof.prove(install/'current',Path(report['qualificationBase']),
+            (payload/'release.json').read_bytes(),(payload/'payload-integrity.json').read_bytes())
+        assert observer_result['verified'] and staged_observer.is_dir()
+        stages.append('exact-private-external-observer-runtime-and-native-identity-import')
+        fence_spec=importlib.util.spec_from_file_location('bootstrap_exit_proof',ROOT/'scripts/windows-bootstrap-exit-proof.py')
+        fence_proof=importlib.util.module_from_spec(fence_spec);fence_spec.loader.exec_module(fence_proof)
+        fence_result=fence_proof.prove(staged_observer,out/'bootstrap-exit-proof')
+        assert len(fence_result['results'])==2
+        stages.append('native-source-launcher-exit-fence-and-nonzero-exit-refusal')
         # Both kinds of damaged retained bytes refuse BEFORE file replacement;
         # preserve the damaged cache for inspection, then restore this fixture.
         for path in (cached,receipt,selection):
@@ -312,6 +330,34 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         assert all(observed[key] for key in ('writerHeld','recordPinned','installationHeld','ordinaryStartupRefused'))
         pending.unlink();admission.unlink()  # Only this disposable proof's state.
         stages.append('independent-synthetic-health-with-live-record-and-installation-admission')
+        # Read-only target binding uses the actual embedded target metadata and
+        # complete installed payload, with a different synthetic previous source.
+        # No N-to-N+1 application claim follows from this inspection fixture.
+        previous={**source_identity,'version':'0.0.0','sourceCommit':'a'*40,'sha256':'b'*64}
+        with UpdateJournal(updates,previous,source_identity) as journal:
+            for phase in ('preparing','prepared','drained','installer-ready'):journal.advance(phase)
+        before_target=pending.read_bytes()
+        run(cached,'target-before-apply-refusal',success=False,arguments=['/augmentorinspect=target'])
+        refused=(out/'application-template-target-before-apply-refusal.log').read_text(encoding='utf-8-sig')
+        assert 'Augmentor independent inspection result:' not in refused
+        assert pending.read_bytes()==before_target
+        value=json.loads(before_target);value['phase']='apply-intent';value['revision']+=1
+        atomic_json(pending,value);before_target=pending.read_bytes()
+        target_health=inspect(cached,'independent-target-health',health=True,target=True)
+        assert target_health['complete'] and target_health['updateTarget']['recordedTargetMatches']
+        assert target_health['updateTarget']['applyAuthorized'] is False
+        assert target_health['updateTarget']['installerSHA256']==report['sha256']
+        assert target_health['updateTarget']['recordSHA256']==hashlib.sha256(before_target).hexdigest()
+        assert target_health['localHealth']['releaseSHA256']==release_digest.decode('ascii')
+        assert pending.read_bytes()==before_target and sentinel.read_bytes()==sentinel_bytes
+        target_admission=json.loads(admission.read_text())
+        assert all(target_admission[key] for key in ('writerHeld','recordPinned','installationHeld','ordinaryStartupRefused'))
+        run(cached,'target-cannot-become-source',success=False,arguments=['/augmentorinspect=source'])
+        refused=(out/'application-template-target-cannot-become-source.log').read_text(encoding='utf-8-sig')
+        assert 'Augmentor independent inspection result:' not in refused
+        assert pending.read_bytes()==before_target
+        pending.unlink();admission.unlink()  # Dispose only this synthetic assessment.
+        stages.append('independent-target-health-and-source-separation-with-pinned-journal')
         # A coordinated update must move the old tree before copying, preserving
         # unknown old files outside the newly selected executable search path.
         # A handle that prevents directory rename must refuse without deletion.
@@ -336,6 +382,7 @@ def prove(out, arch, compiler, fixture_executable, runtime):
         assert sentinel.read_bytes()==sentinel_bytes
         pending.unlink()  # Only this test's deliberately failed synthetic update.
         coordinated('clean-payload-placement')
+        stages.append('separate-live-observer-retains-setup-through-coordinator-exit')
         succeeded=[p for p in backups.iterdir() if p!=failed[0]];assert len(succeeded)==1
         retained=succeeded[0];intent=json.loads((retained/'intent.json').read_text())
         assert json.loads((retained/'prepared.json').read_text())==intent

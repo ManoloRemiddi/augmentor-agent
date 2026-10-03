@@ -15,6 +15,32 @@ class WindowsIdentityTests(unittest.TestCase):
         from platform_adapters.windows_identity import current_sid, process_sid
         self.assertEqual(process_sid(os.getpid()), current_sid())
 
+    def test_installed_payload_can_be_readable_publicly_but_never_writable_publicly(self):
+        import win32security
+        from platform_adapters.windows_identity import private_directory,payload_file_descriptor,private_file_descriptor,sid_string
+        with tempfile.TemporaryDirectory() as temporary:
+            root=private_directory(Path(temporary)/'installed')
+            file=root/'public-code.fixture';file.write_bytes(b'Public executable fixture bytes.')
+            user=sid_string()
+            def grants(access):
+                sd=win32security.ConvertStringSecurityDescriptorToSecurityDescriptor(
+                    f'D:P(A;;FA;;;{user})(A;;FA;;;SY)(A;;{access};;;WD)',win32security.SDDL_REVISION_1)
+                win32security.SetFileSecurity(str(file),win32security.DACL_SECURITY_INFORMATION,sd)
+            grants('FR')
+            before=win32security.GetFileSecurity(str(file),win32security.DACL_SECURITY_INFORMATION)
+            fd=payload_file_descriptor(file)
+            try:self.assertEqual(os.read(fd,1024),b'Public executable fixture bytes.')
+            finally:os.close(fd)
+            with self.assertRaises(PermissionError):private_file_descriptor(file,share_write=False)
+            after=win32security.GetFileSecurity(str(file),win32security.DACL_SECURITY_INFORMATION)
+            def encoded(sd):
+                return win32security.ConvertSecurityDescriptorToStringSecurityDescriptor(
+                    sd,win32security.SDDL_REVISION_1,win32security.DACL_SECURITY_INFORMATION)
+            self.assertEqual(encoded(before),encoded(after))
+            grants('FA')
+            with self.assertRaises(PermissionError):payload_file_descriptor(file)
+            self.assertEqual(file.read_bytes(),b'Public executable fixture bytes.')
+
     def test_private_lease_refuses_hard_link_and_reopens_without_truncating(self):
         from platform_adapters.windows_identity import private_directory, private_lock_descriptor
         with tempfile.TemporaryDirectory() as temporary:
@@ -74,6 +100,53 @@ class WindowsIdentityTests(unittest.TestCase):
                 self.assertFalse((target/'private').exists())
             finally:
                 os.rmdir(link)
+
+    def test_node_download_inherits_only_private_grants_then_receives_protected_acl(self):
+        from platform_adapters.windows_identity import private_directory,protect_inherited_download,private_file_descriptor,current_sid,default_owner_sid
+        import shutil
+        import win32security
+        root=Path(__file__).resolve().parents[1]
+        candidate=root/'outputs/payload/node/node.exe'
+        node=str(candidate) if candidate.is_file() else shutil.which('node')
+        if not node:self.skipTest('The qualified Node runtime is required for the download ACL proof.')
+        with tempfile.TemporaryDirectory() as temporary:
+            folder=private_directory(Path(temporary)/'private');file=folder/'download'
+            subprocess.run([node,'-e',"require('node:fs').writeFileSync(process.argv[1],'fixture')",str(file)],check=True)
+            observed=win32security.GetFileSecurity(str(file),win32security.OWNER_SECURITY_INFORMATION)
+            self.assertEqual(observed.GetSecurityDescriptorOwner(),default_owner_sid())
+            protect_inherited_download(file)
+            observed=win32security.GetFileSecurity(str(file),win32security.OWNER_SECURITY_INFORMATION)
+            self.assertEqual(observed.GetSecurityDescriptorOwner(),current_sid())
+            fd=private_file_descriptor(file)
+            try:self.assertEqual(os.read(fd,7),b'fixture')
+            finally:os.close(fd)
+            os.link(file,folder/'alias')
+            with self.assertRaises(PermissionError):protect_inherited_download(file)
+
+    def test_download_sealing_refuses_public_grants_without_repairing_them(self):
+        from platform_adapters.windows_identity import private_directory,protect_inherited_download
+        import win32security
+        with tempfile.TemporaryDirectory() as temporary:
+            folder=private_directory(Path(temporary)/'private');file=folder/'public-download'
+            file.write_bytes(b'preserved')
+            descriptor=win32security.ConvertStringSecurityDescriptorToSecurityDescriptor(
+                'D:P(A;;FA;;;WD)',win32security.SDDL_REVISION_1)
+            win32security.SetFileSecurity(str(file),win32security.DACL_SECURITY_INFORMATION,descriptor)
+            stringify=lambda:win32security.ConvertSecurityDescriptorToStringSecurityDescriptor(
+                win32security.GetFileSecurity(str(file),win32security.DACL_SECURITY_INFORMATION),
+                win32security.SDDL_REVISION_1,win32security.DACL_SECURITY_INFORMATION)
+            before=stringify()
+            with self.assertRaises(PermissionError):protect_inherited_download(file)
+            self.assertEqual(stringify(),before);self.assertEqual(file.read_bytes(),b'preserved')
+
+    def test_download_sealing_refuses_an_unrelated_owner_even_with_private_grants(self):
+        from platform_adapters.windows_identity import security_attributes,require_private_grants
+        import win32security
+        descriptor=security_attributes().SECURITY_DESCRIPTOR
+        foreign=win32security.ConvertStringSidToSid('S-1-5-21-987654321-123456789-135792468-1001')
+        descriptor.SetSecurityDescriptorOwner(foreign,False)
+        with self.assertRaises(PermissionError):
+            require_private_grants(descriptor,download_default_owner=True)
 
 
 if __name__ == '__main__':

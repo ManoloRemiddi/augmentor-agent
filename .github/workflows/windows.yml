@@ -30,7 +30,7 @@ jobs:
           - os: windows-11-arm
             arch: arm64
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 50
+    timeout-minutes: 65
     defaults:
       run:
         shell: pwsh
@@ -92,6 +92,10 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           npm run build
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/node/node.exe --test tests/updates-repository.test.mjs
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_update_packaging.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Exercise Python and Node shared prompt clients and durable restart
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         env:
@@ -115,11 +119,13 @@ jobs:
         run: |
           $env:AUGMENTOR_PWSH = "$PWD/outputs/payload/powershell/pwsh.exe"
           & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-dsh.py --out outputs/payload/dsh --node "$PWD/outputs/payload/node/node.exe"
-      - name: Assemble shared Windows application and native launcher
+      - name: Assemble numbered disposable Windows application and native launcher
         id: application
         if: ${{ !cancelled() && steps.dsh.outcome == 'success' }}
         run: |
-          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-windows-application.py --root outputs/payload --arch ${{ matrix.arch }}
+          # Sequence 1 belongs only to this unpublished development fixture.
+          # Customer distribution/automatic qualification remain false; never publish it.
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-windows-application.py --root outputs/payload --arch ${{ matrix.arch }} --update-build 1
       - name: Qualify packaged SDK registration and owned native bridge
         if: ${{ !cancelled() && steps.application.outcome == 'success' }}
         env:

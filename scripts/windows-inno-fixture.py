@@ -24,7 +24,7 @@ def publish_result(destination, result):
     os.replace(pending, destination)
 
 
-def dismiss_fixture_windows():
+def dismiss_fixture_windows(stop=None):
     """Dismiss this test process's updater UI, including its busy-work warning.
 
     WinSparkle correctly shows a modal warning when can_shutdown refuses. Its
@@ -44,8 +44,12 @@ def dismiss_fixture_windows():
         if pid.value == os.getpid(): user.PostMessageW(window,0x0010,0,0)  # WM_CLOSE
         return True
     callback = callback_type(close)
-    for _ in range(10):
-        user.EnumWindows(callback,0); time.sleep(.1)
+    deadline=time.monotonic()+(60 if stop is not None else 1)
+    while time.monotonic()<deadline:
+        user.EnumWindows(callback,0)
+        if stop is not None:
+            if stop.wait(.1):break
+        else:time.sleep(.1)
 
 
 def shared_gate(config):
@@ -109,8 +113,15 @@ def sparkle(settings):
         time.sleep(.3)  # Let the native callback return before cleanup joins its UI thread.
     finally:
         publish_result(settings['progress'], result)
-        dismiss_fixture_windows()
-        function('cleanup')()
+        # A rejected signature/metadata callback can create its modal error UI
+        # after an earlier one-second sweep. Continue dismissing only this
+        # fixture process's windows while native cleanup joins its UI thread.
+        # The parent still bounds the whole disposable proof at 120 seconds.
+        stop=threading.Event()
+        dismissal=threading.Thread(target=dismiss_fixture_windows,args=(stop,),daemon=True)
+        dismissal.start()
+        try:function('cleanup')()
+        finally:stop.set();dismissal.join(timeout=2)
     return result
 
 

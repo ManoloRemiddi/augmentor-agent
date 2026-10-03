@@ -111,7 +111,10 @@ def main():
         installer = resources.enter_context(InstallerProcess(source.installer, installer_digest,
             ['/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-',
              '/augmentorrecover=source', '/LOG=' + str(log)]))
-        deadline = time.monotonic() + 300
+        # Native ARM64 evidence includes a successful full-payload Setup just
+        # beyond five minutes. Keep observing this same Job; never restart it
+        # because the faster CPU's former deadline elapsed.
+        deadline = time.monotonic() + 600
         while True:
             remaining = deadline - time.monotonic()
             if remaining <= 0:

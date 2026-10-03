@@ -85,26 +85,7 @@ class AccessDialog(QDialog):
         self.owner.call_in_background(lambda:self.owner.controller.client.call('settings.mutate',payload),lambda _:(self.owner.set_status('Approval mode updated for new chats'),self.accept()))
 
 
-class UpdatesDialog(QDialog):
-    def __init__(self,window):
-        super().__init__(window);self.owner=window;self.setWindowTitle('Versions & updates');self.resize(px(self,410),px(self,250))
-        layout=QVBoxLayout(self)
-        self.info=QLabel();self.info.setWordWrap(True);self.info.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse);layout.addWidget(self.info)
-        check=QPushButton('Check installed versions');check.clicked.connect(self.check);layout.addWidget(check)
-        close=QPushButton('Done');close.clicked.connect(self.accept);layout.addWidget(close);self.check()
-
-    def check(self):
-        if sys.platform == 'darwin':
-            self.info.setText(f'Augmentor Agent {__version__} · macOS preview\n\nAutomatic updates are not available yet. Do not replace the app while Augmentor or its browser companion is working. Read the Mac guide at https://augmentoragent.com/macos.html for the current release and update instructions.')
-            return
-        self.info.setText('Checking the selected harness…')
-        def read():
-            client=self.owner.controller.client
-            host=client.call('host.describe')
-            return host
-        def show(host):
-            self.info.setText(f"Native app: {__version__}\nHarness: {self.owner.controller.harness}\nPi: {host.get('piVersion','unknown')}\nRuntime: {host.get('version','unknown')}\nProtocol: {host.get('protocol','unknown')}\n\nUse the installer to update this application. Your settings and conversations are preserved.")
-        self.owner.call_in_background(read,show)
+from .update_settings import UpdatesDialog
 
 
 class LicensesDialog(QDialog):
@@ -188,6 +169,7 @@ class SettingsDialog(QDialog):
         memory=QPushButton('Memory');memory.clicked.connect(lambda:MemoryDialog(window).exec());layout.addWidget(memory)
         from .support import SupportDialog
         support=QPushButton('Support report');support.clicked.connect(lambda:SupportDialog(window).exec());layout.addWidget(support)
+        updates=QPushButton('Versions && updates');updates.clicked.connect(window.open_updates);layout.addWidget(updates)
         done=QPushButton('Done');done.clicked.connect(self.accept);outer.addWidget(done)
         for button,name in [(voice,'voice'),(dsh,'connect'),(recovery,'recover'),(appearance,'appearance'),(prompts,'prompts'),(memory,'memory'),(support,'support'),(done,'done')]:
             button.setIcon(settings_icon(name,window.accent))

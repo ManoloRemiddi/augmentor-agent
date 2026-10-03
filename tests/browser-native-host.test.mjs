@@ -13,9 +13,12 @@ test('native host serves shared prompts before harness selection, with both engi
  const mismatch=await call('augmentor/handshake',{protocol:'augmentor/1',version:'0.0.0'});assert(mismatch.error);
  const blocked=await call('harness.select',{harness:'pi'});assert(blocked.error);
  assert.equal(existsSync(env.AUGMENTOR_SHARED_DATA),false,'Incompatible clients must not start the service or write data');
+ const update=await call('augmentor/surface',{action:'updates',method:'status'});assert.equal(update.result.installed.version,RELEASE.version);assert.equal(update.result.busy,false);
+ const preferences=await call('augmentor/surface',{action:'updates',method:'configure',params:{revision:update.result.revision,preferences:update.result.preferences}});assert.match(preferences.error.message,/matching/);
  const hello=await call('augmentor/handshake',{protocol:'augmentor/1',version:RELEASE.version});assert.equal(hello.result.version,RELEASE.version);
  const saved=await call('augmentor/prompts',{action:'save',name:'independent',content:'[clipboard]'});assert.equal(saved.result.library.prompts[0].name,'independent');assert.equal(existsSync(join(directory,'pi/host.sock')),false);
  const selected=await call('harness.select',{harness:'pi'});assert.equal(selected.result.protocol,'augmentor/1');
+ const updatesAfterSelection=await call('augmentor/surface',{action:'updates',method:'status'});assert.equal(updatesAfterSelection.result.installed.version,RELEASE.version);
  const read=await call('augmentor/prompts',{action:'list'});assert.deepEqual(read.result.library,saved.result.library);assert.equal(existsSync(join(directory,'pi/host.sock')),false);
  Object.assign(process.env,{AUGMENTOR_SHARED_STATE:env.AUGMENTOR_SHARED_STATE,AUGMENTOR_SHARED_DATA:env.AUGMENTOR_SHARED_DATA});const pid=(await promptCall('host.describe')).pid;t.after(()=>process.kill(pid));
 });

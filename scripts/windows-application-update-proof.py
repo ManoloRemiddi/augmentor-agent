@@ -12,7 +12,6 @@ import json
 import os
 from pathlib import Path
 import sys
-import time
 
 
 def main():
@@ -21,6 +20,10 @@ def main():
     parser.add_argument('--data',type=Path,required=True)
     parser.add_argument('--installer',type=Path,required=True)
     parser.add_argument('--sha256',required=True)
+    parser.add_argument('--observer-endpoint',type=Path,required=True)
+    parser.add_argument('--observer-parent',type=int,required=True)
+    parser.add_argument('--observer-nonce',required=True)
+    parser.add_argument('--expect-deferred',action='store_true')
     args=parser.parse_args()
     if sys.platform!='win32':parser.error('Requires the native Windows kernel.')
     root=args.root.resolve();data=args.data.resolve()
@@ -39,9 +42,11 @@ def main():
     from lifecycle.installed_source import open_installed_source
     from lifecycle.windows_apply import WindowsApply
     from lifecycle.windows_preparation import WindowsPreparation
+    from lifecycle.windows_update_observer import CoordinatorObserver,ObservedWindowsApply
     import windows_supervisor as owner
     transaction=private_directory(data/'updates')
     with ExitStack() as stack:
+        peer=stack.enter_context(CoordinatorObserver(args.observer_endpoint,args.observer_parent,args.observer_nonce))
         lifetime=private_lock_descriptor(data/'run/installation.lock')
         stack.callback(os.close,lifetime)
         locks.flock(lifetime,locks.LOCK_SH|locks.LOCK_NB)
@@ -50,20 +55,26 @@ def main():
         assert source.installer.resolve()==args.installer.resolve() and source.identity['sha256']==args.sha256
         identity=source.identity
         journal=stack.enter_context(UpdateJournal(transaction,identity,identity))
-        backends=[]
         def backend(gate):
             selected=WindowsApply(gate,args.installer,args.sha256,transaction/'setup.log',qualification_outer_job=True)
-            backends.append(selected)
-            return selected
-        result=authorize_update(journal,
-            lambda:WindowsPreparation(root,data/'run',data/'run/shared',owner.managed_directory()),
-            backend)
-        result['setupPid']=backends[0].handoff.pid
+            return ObservedWindowsApply(selected,peer)
+        graph=WindowsPreparation(root,data/'run',data/'run/shared',owner.managed_directory())
+        plan=None
+        def checked(stage):
+            nonlocal plan
+            peer.live()
+            if stage=='prepared':plan=graph.reopen_plan()
+            return True
+        try:result=authorize_update(journal,lambda:graph,backend,revalidate=checked)
+        except Exception as error:
+            if not args.expect_deferred or not getattr(error,'augmentor_preparation_cancelled',None):raise
+            peer.deferred(journal,error)
+            atomic_json(transaction/'coordinator-result.json',{'deferred':True})
+            return
+        assert not args.expect_deferred, 'Busy preparation unexpectedly authorized installation.'
+        peer.finish(journal,reopen_plan=plan)
+        result['independentObservationTransfer']=True
         atomic_json(transaction/'coordinator-result.json',result)
-        deadline=time.monotonic()+20
-        while not (transaction/'observer-ready').exists():
-            if time.monotonic()>=deadline:raise TimeoutError('Fixture did not retain the live Setup process.')
-            time.sleep(.02)
     # Return normally. Extracted Setup waits on this actual process before
     # exclusive installation access; no private-runtime code runs after apply.
 
