@@ -6,6 +6,8 @@ private trigger.input.json explicitly requests capture/action/inspect/finish.
 No input is inferred from readiness, dispatched automatically or replayed.
 """
 import argparse
+import base64
+import binascii
 from collections import deque
 from copy import deepcopy
 import hashlib
@@ -15,9 +17,11 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import stat
 import sys
 import threading
 import time
+import uuid
 
 
 def private_json(path,limit=8192):
@@ -99,6 +103,54 @@ def candidate_controller(candidate,installed):
     from worker import Worker
     from gnome_control import GnomeControl
     return Worker,GnomeControl
+
+
+def retain_capture_image(candidate,image,expected_size):
+    """Opt-in proof artifact only: validate and retain the original JPEG bytes."""
+    if not isinstance(image,dict) or image.get('mimeType')!='image/jpeg':
+        raise RuntimeError('The actual capture must contain a JPEG image.')
+    width,height=image.get('width'),image.get('height')
+    if (type(width) is not int or type(height) is not int or not 1<=width<=1600 or not 1<=height<=1200
+            or not isinstance(expected_size,dict) or any(type(expected_size.get(key)) is not int for key in ('width','height'))
+            or expected_size!={'width':width,'height':height}):
+        raise RuntimeError('The capture image dimensions differ from its bounded API receipt.')
+    encoded=image.get('data');maximum=900000
+    if not isinstance(encoded,str) or not encoded or len(encoded)>4*((maximum+2)//3):
+        raise RuntimeError('The encoded capture image exceeds the bounded JPEG contract.')
+    try:raw=base64.b64decode(encoded,validate=True)
+    except (ValueError,binascii.Error):raise RuntimeError('The capture image requires strict base64.') from None
+    if (not raw or len(raw)>maximum or base64.b64encode(raw).decode()!=encoded
+            or not raw.startswith(b'\xff\xd8\xff') or not raw.endswith(b'\xff\xd9')):
+        raise RuntimeError('The capture bytes are not a bounded canonical JPEG.')
+    # Use the already admitted native Qt decoder, without conversion/re-encoding.
+    # Both header dimensions and a complete decode must agree with the API.
+    from PySide6.QtCore import QByteArray,QBuffer,QIODevice
+    from PySide6.QtGui import QImageReader
+    buffer=QBuffer();buffer.setData(QByteArray(raw));buffer.open(QIODevice.OpenModeFlag.ReadOnly)
+    reader=QImageReader(buffer);size=reader.size()
+    if bytes(reader.format())!=b'jpeg' or (size.width(),size.height())!=(width,height):
+        raise RuntimeError('The actual JPEG format or decoded dimensions differ from capture.')
+    decoded=reader.read()
+    if decoded.isNull() or (decoded.width(),decoded.height())!=(width,height):
+        raise RuntimeError('The actual JPEG could not be decoded completely.')
+    candidate=Path(candidate)
+    if not candidate.is_absolute() or candidate.resolve()!=candidate or candidate.is_symlink():
+        raise RuntimeError('Retain capture only inside the fresh private candidate directory.')
+    directory=os.open(candidate,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
+    try:
+        st=os.fstat(directory)
+        if not stat.S_ISDIR(st.st_mode) or st.st_uid!=os.getuid() or st.st_mode&0o077:
+            raise RuntimeError('Retain capture only inside the fresh private candidate directory.')
+        filename='capture-'+uuid.uuid4().hex+'.jpg'
+        try:fd=os.open(filename,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600,dir_fd=directory)
+        except FileExistsError:raise RuntimeError('The unique capture path already exists; no overwrite or replay.') from None
+        with os.fdopen(fd,'wb') as destination:
+            os.fchmod(destination.fileno(),0o600);destination.write(raw);destination.flush();os.fsync(destination.fileno())
+        if candidate.is_symlink() or candidate.resolve()!=candidate or candidate.stat().st_ino!=st.st_ino or candidate.stat().st_dev!=st.st_dev:
+            raise RuntimeError('The private candidate directory changed during retention; no replay.')
+    finally:os.close(directory)
+    return {'path':str(candidate/filename),'mimeType':'image/jpeg','bytes':len(raw),
+        'sha256':hashlib.sha256(raw).hexdigest(),'width':width,'height':height,'mode':'0600'}
 
 
 class IdleWatchTrace:
@@ -184,6 +236,7 @@ def main():
     parser.add_argument('--selected-artifact',required=True);parser.add_argument('--native-source',required=True)
     parser.add_argument('--target-pid',type=int,required=True)
     parser.add_argument('--trace-idle-watch',action='store_true',help='Record bounded private method/bound/elapsed diagnostics; guards stay unchanged.')
+    parser.add_argument('--retain-capture-image',action='store_true',help='Retain original validated JPEG bytes privately after an explicit capture; never capture automatically.')
     args=parser.parse_args()
     if (os.getuid()!=1000 or os.environ.get('USER')!='augmentor-proof'
             or Path('/etc/augmentor-test-vm').read_text()!='Isolated Augmentor Fedora GNOME qualification VM\n'
@@ -244,7 +297,8 @@ def main():
         'targetStartTime':start,'qtPlatform':app.platformName(),'inputQualified':False,'productionInputEnabled':False,
         'probeConsentTimeoutSeconds':180,'guiTimerTicks':0,'records':[],'closed':False,'stopClicked':False,
         'sourceSha256':{name:hashlib.sha256((candidate/name).read_bytes()).hexdigest() for name in sources},
-        'initialTarget':target_receipt(),'helperPids':[],'selectedApplicationChanged':False,'idleWatchTraceEnabled':trace is not None}
+        'initialTarget':target_receipt(),'helperPids':[],'selectedApplicationChanged':False,'idleWatchTraceEnabled':trace is not None,
+        'captureImageRetentionEnabled':args.retain_capture_image}
     def save():
         if selection.read_bytes()!=original:raise RuntimeError('Selected application bytes changed during the candidate proof.')
         if trace is not None:report['idleWatchRpcTrace']=trace.snapshot()
@@ -266,6 +320,7 @@ def main():
         foreground();value=controller.capture(owner)
         if value['window']['pid']!=args.target_pid:raise RuntimeError('The captured target changed.')
         image=value.pop('image');value['encodedImageSha256']=hashlib.sha256(image['data'].encode()).hexdigest()
+        if args.retain_capture_image:value['privateImageReceipt']=retain_capture_image(candidate,image,value['imageSize'])
         value['targetReceipt']=target_receipt();return value
     def action(params):
         foreground();result=controller.action(owner,params)

@@ -81,13 +81,15 @@ button callbacks write private receipts; an actual Ctrl+S callback writes
 input-target-saved.json from current widget buffers. It is a fixture save action,
 not an assertion that another application supports that shortcut. Inspect the
 receipt and fresh capture after dispatch; an immediate receipt may precede
-asynchronous native delivery. The probe keeps capture dimensions/digests rather
-than image bytes. Its recorded-helper absence check covers only recorded PIDs;
+asynchronous native delivery. By default the probe keeps capture dimensions and
+digests. The optional proof-only `--retain-capture-image` also retains original
+validated JPEG bytes privately after an explicitly requested capture. Its
+recorded-helper absence check covers only recorded PIDs;
 the external owned-VM driver must independently check for helpers after failed
 reads and retain process/start identities. Visible Stop remains the banner's
 actual button; a finish trigger is cleanup, not visible Stop evidence.
 
-Ninety-four focused source cases pass: GNOME guards/keyboard, helper protocol,
+One hundred twelve focused source cases pass: GNOME guards/keyboard, helper protocol,
 worker/consent cancellation, portal targets, scene/capture and private-trigger
 and selected-artifact refusals. The latter exercise the normal maintained
 inventory verifier against synthetic managed releases, including changed or
@@ -96,7 +98,7 @@ managed policy and inherited loader/native-audit refusals. An isolated import
 regression copies the real eleven staged files, resolves the real installed
 kwin.py dependency, and rejects installed controller replacements without
 constructing GUI or opening consent. These are synthetic contracts, actual
-module imports and real isolated GLib scheduling, not
+module imports, native Qt image decoding and real isolated GLib scheduling, not
 native pointer/chord/typing qualification. No VM input has been sent by this new
 candidate. Fresh Fedora50 native widget/file outcomes, per-character focus and
 password/Stop/lock/restart cases, terminal capture loss, other GNOME profiles and
@@ -511,5 +513,43 @@ Tracing defaults off. Synthetic tests exercise the actual maintained watcher,
 session verification and observer read, preserving terminal timeout cancellation,
 the original error, bounded history, detached cleanup and no retry. Those tests
 do not diagnose the v2 timeout or qualify native input. The diagnostic probe
-requires parent review/publication and a new private candidate before execution;
-it has not run in the VM.
+ran in a fresh private candidate only after parent review/publication; its actual
+result follows. This run changes no production capability qualification.
+
+The October 3 [v3 diagnostic checkpoint](../release/qualification/next-targets/20261003-fedora-gnome-v3-consent-capture-diagnostic.json)
+records probe2b2081f with ten unchanged0ab files, exact selected/native2035
+Fedora artifacts and complete managed inventory admission. Actual observed
+portal consent passed in65.715s. One explicitly requested capture passed in
+2.863s for the owned foreground GTK target, with a1280x800 image receipt and an
+isolated helper independently observed alive. The final watcher trace has1278
+RPCs, latest128 retained, no first error and no diagnostic recording failure.
+The original1000/500/1000ms bounds stayed unchanged. Normal finish cleanup took
+0.068s; helper, probe and target absence were checked independently. Both text
+buffers, both click counters and save count remained zero. Full frozen backing
+hashes, read-only FDs, original-off state and the4GiB floor passed again.
+
+This separate healthy run does not explain the v2 timeout. The exact executed
+probe discarded image bytes and retained only their encoded digest; visual
+capture acceptance and pointer/chord/ASCII/save/visibleStop remain open.
+No old image can be reconstructed from that digest and no new capture was
+attempted to fill the evidence gap.
+
+The next source-only optional `--retain-capture-image` validates the actual
+controller's `image/jpeg` contract; [portal capture](../services/desktop/portal.py)
+encodes JPEG, not PNG. It requires canonical strict base64 within900000 decoded
+bytes and1600x1200 bounds, JPEG signatures, and native Qt header/full decoding
+whose dimensions match the actual capture API imageSize receipt. It preserves
+the original decoded bytes without conversion or re-encoding. An exclusive,
+unique run-local .jpg file is written through a pinned private directory FD at
+0600, with raw-byte SHA/bytes/path/MIME/dimensions recorded privately. Existing
+files and symlinks refuse without overwrite; substituted directories refuse
+without writing their replacements. Retention defaults off and never requests
+a capture or another operation. There is no API/controller/timeout/guard change.
+
+The31 probe cases include nine actual image-retention/failure cases. The112
+focused Python cases and five observer Node cases pass; those totals are source
+checks, not another native run. The focused Python command is
+`PYTHONPATH=tests python3 -m unittest test_gnome_control test_gnome_input_probe test_a11y_helper test_desktop_worker test_desktop_consent_session test_desktop_scene test_capture_stream test_gnome_observer test_linux_portal_targets`.
+Image-retention source remains unexecuted pending parent review/publication and
+a distinct fresh candidate. Actual retained image inspection must precede any
+newly authorized input phase.

@@ -1,6 +1,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Owned proof trigger boundary; no native GUI, consent or input is exercised."""
 import importlib.util
+import base64
 import hashlib
 import json
 import os
@@ -21,6 +22,90 @@ try:
     gi.require_version('Gst','1.0')
     from gi.repository import Gst
 except (ImportError,ValueError):Gst=None
+try:
+    from PySide6.QtCore import QByteArray,QBuffer,QIODevice
+    from PySide6.QtGui import QImage
+except ImportError:QImage=None
+
+
+@unittest.skipUnless(sys.platform.startswith('linux') and QImage is not None,
+    'Private image receipt requires Linux ownership and the native Qt decoder.')
+class GnomeInputCaptureRetentionTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary=tempfile.TemporaryDirectory();self.addCleanup(self.temporary.cleanup)
+        self.root=Path(self.temporary.name);self.candidate=self.root/'candidate';self.candidate.mkdir(mode=0o700)
+        image=QImage(8,6,QImage.Format.Format_RGB888);image.fill(0xff123456)
+        self.raw=self.encode(image,'JPEG');self.size={'width':8,'height':6}
+        self.image={**self.size,'mimeType':'image/jpeg','data':base64.b64encode(self.raw).decode()}
+
+    def encode(self,image,kind):
+        encoded=QByteArray();buffer=QBuffer(encoded);buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+        self.assertTrue(image.save(buffer,kind,80));return bytes(encoded)
+
+    def retain(self,image=None,size=None):
+        return module.retain_capture_image(self.candidate,self.image if image is None else image,self.size if size is None else size)
+
+    def test_actual_jpeg_bytes_are_retained_once_with_private_mode_and_exact_receipt(self):
+        receipt=self.retain();path=Path(receipt['path'])
+        self.assertEqual(path.parent,self.candidate);self.assertTrue(path.name.startswith('capture-'));self.assertEqual(path.suffix,'.jpg')
+        self.assertEqual(path.read_bytes(),self.raw);self.assertEqual(path.stat().st_mode&0o777,0o600)
+        self.assertEqual(receipt['sha256'],hashlib.sha256(self.raw).hexdigest());self.assertEqual(receipt['bytes'],len(self.raw))
+        self.assertEqual((receipt['mimeType'],receipt['width'],receipt['height']),('image/jpeg',8,6))
+        another=self.retain();self.assertNotEqual(another['path'],receipt['path']);self.assertEqual(len(list(self.candidate.iterdir())),2)
+
+    def test_malformed_noncanonical_and_nonstring_base64_refuse_without_artifact(self):
+        for encoded in ('%%%','é',self.image['data']+'\n',self.image['data']+'=',None):
+            with self.subTest(encoded=repr(encoded)[:30]),self.assertRaises(RuntimeError):self.retain({**self.image,'data':encoded})
+        self.assertEqual(list(self.candidate.iterdir()),[])
+
+    def test_oversized_encoded_and_decoded_contract_refuse_without_artifact(self):
+        for encoded in ('A'*1200004,base64.b64encode(b'\xff\xd8\xff'+b'x'*900000+b'\xff\xd9').decode()):
+            with self.subTest(length=len(encoded)),self.assertRaisesRegex(RuntimeError,'bounded'):self.retain({**self.image,'data':encoded})
+        self.assertEqual(list(self.candidate.iterdir()),[])
+
+    def test_wrong_mime_png_or_unreadable_jpeg_refuse_without_artifact(self):
+        png=self.encode(QImage(8,6,QImage.Format.Format_RGB888),'PNG')
+        for image in ({**self.image,'mimeType':'image/png'},
+                {**self.image,'data':base64.b64encode(png).decode()},
+                {**self.image,'data':base64.b64encode(b'\xff\xd8\xffinvalid\xff\xd9').decode()}):
+            with self.subTest(image=image['mimeType']),self.assertRaises(RuntimeError):self.retain(image)
+        self.assertEqual(list(self.candidate.iterdir()),[])
+
+    def test_api_receipt_header_or_unbounded_dimensions_refuse_without_artifact(self):
+        cases=((self.image,{'width':9,'height':6}),({**self.image,'width':7},{'width':7,'height':6}),
+            ({**self.image,'width':True},{'width':True,'height':6}),({**self.image,'height':1201},{'width':8,'height':1201}),
+            ({**self.image,'width':0},{'width':0,'height':6}))
+        for image,size in cases:
+            with self.subTest(size=size),self.assertRaisesRegex(RuntimeError,'dimensions'):self.retain(image,size)
+        self.assertEqual(list(self.candidate.iterdir()),[])
+
+    def test_existing_foreign_regular_file_is_preserved_without_overwrite(self):
+        path=self.candidate/('capture-'+'a'*32+'.jpg');path.write_bytes(b'foreign existing bytes');path.chmod(0o644);before=path.stat()
+        with patch.object(module.uuid,'uuid4',return_value=SimpleNamespace(hex='a'*32)):
+            with self.assertRaisesRegex(RuntimeError,'already exists'):self.retain()
+        self.assertEqual(path.read_bytes(),b'foreign existing bytes');self.assertEqual(path.stat(),before)
+
+    def test_existing_symlink_never_writes_its_foreign_target(self):
+        foreign=self.root/'foreign.jpg';foreign.write_bytes(b'foreign bytes');link=self.candidate/('capture-'+'b'*32+'.jpg');link.symlink_to(foreign)
+        with patch.object(module.uuid,'uuid4',return_value=SimpleNamespace(hex='b'*32)):
+            with self.assertRaisesRegex(RuntimeError,'already exists'):self.retain()
+        self.assertTrue(link.is_symlink());self.assertEqual(foreign.read_bytes(),b'foreign bytes')
+
+    def test_shared_or_symlink_candidate_directory_refuses(self):
+        self.candidate.chmod(0o755)
+        with self.assertRaisesRegex(RuntimeError,'fresh private'):self.retain()
+        self.candidate.chmod(0o700);link=self.root/'candidate-link';link.symlink_to(self.candidate)
+        with self.assertRaisesRegex(RuntimeError,'fresh private'):module.retain_capture_image(link,self.image,self.size)
+        self.assertEqual(list(self.candidate.iterdir()),[])
+
+    def test_directory_substitution_is_detected_and_replacement_is_not_written(self):
+        moved=self.root/'original-candidate'
+        def substituted():
+            self.candidate.rename(moved);self.candidate.mkdir(mode=0o700);return SimpleNamespace(hex='c'*32)
+        with patch.object(module.uuid,'uuid4',side_effect=substituted):
+            with self.assertRaisesRegex(RuntimeError,'directory changed'):self.retain()
+        self.assertEqual(list(self.candidate.iterdir()),[])
+        self.assertEqual((moved/('capture-'+'c'*32+'.jpg')).read_bytes(),self.raw)
 
 
 class NativeTimeout(RuntimeError):

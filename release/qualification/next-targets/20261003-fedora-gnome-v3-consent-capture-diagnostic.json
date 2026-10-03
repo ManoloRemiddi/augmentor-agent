@@ -1,0 +1,208 @@
+{
+  "format": "augmentor-linux-qualification-checkpoint/1",
+  "date": "2026-10-03",
+  "scope": "Fresh owned Fedora44 GNOME clone v3 tracing-only candidate: observed consent and one capture PASS; no visual capture or input acceptance",
+  "candidate": {
+    "probeSource": "2b2081f28f914dab9279f4d2cdbd357189c93601",
+    "probeSha256": "f268afe05110d151fd4ef2f7ea2e1c58abd1b4d131d1c4c73b6987e4850b61f8",
+    "remainingTenFilesSource": "0ab022a6a26ae0165b57e1662203e71f544aab9a",
+    "controllerSha256": "1be68fc8758850bbb57e05bf04f8f8bcd8b3101a01d651a89899cf8f353c6ea0",
+    "stagedFiles": 11,
+    "freshPrivateDirectory": true,
+    "traceIdleWatch": true,
+    "previousTwoFailuresRetained": true
+  },
+  "selected": {
+    "source": "2035af99b46bb013e81de9766216da820ab4a325",
+    "artifactSha256": "538136182ad7f7886b064b553d1154cb99b53c634da7e478d01f8bbaf4e4d639",
+    "target": "fedora44-x86_64",
+    "python": "/usr/bin/python3",
+    "nativeSource": "2035af99b46bb013e81de9766216da820ab4a325",
+    "nativeRpmAuditClean": true,
+    "managedInventoryAndExactDeploymentVerified": true,
+    "inheritedOverridesRefused": true,
+    "bytesSha256": "2286b529b497c4991be7646f8fb94fc922b2a16e8f4f61ee0189b9c4b0a624ee",
+    "unchangedDuringCandidate": true
+  },
+  "environment": {
+    "uid": 1000,
+    "virtualization": "QEMU TCG",
+    "desktop": "GNOME Wayland",
+    "shellVersion": "50.5",
+    "gtkTargetBackend": "GdkWaylandDisplay",
+    "qtBannerBackend": "xcb",
+    "selinux": "Enforcing",
+    "monitorScale": 1,
+    "monitorCount": 1
+  },
+  "consent": {
+    "result": "PASS",
+    "observedNativePortalOwnerAndForegroundGeometryBeforeActions": true,
+    "requests": [
+      "CreateSession",
+      "SelectDevices",
+      "SelectSources",
+      "Start"
+    ],
+    "connectReportedSharing": true,
+    "existingKeyboardPointerAndSingleMonitorContractPassed": true,
+    "connectSeconds": 65.71518419299991,
+    "nativeConsentActionsReplayed": false
+  },
+  "capture": {
+    "result": "PASS",
+    "attempts": 1,
+    "seconds": 2.862668773000223,
+    "imageSize": {
+      "width": 1280,
+      "height": 800
+    },
+    "encodedImageSha256": "1e78f9cbad0f6208c3cf7fa0461d82702099152b16222d1ff3f86e49e1d39591",
+    "ownedTargetForegroundPidStartAndGeometryVerified": true,
+    "isolatedHelperCreatedAndIndependentlyObserved": true,
+    "actualImageBytesRetained": false,
+    "visualImageAcceptance": "not executed: exact probe discarded bytes and retained only encoded digest",
+    "targetGeometry": {
+      "x": 240,
+      "y": 141,
+      "width": 800,
+      "height": 550
+    }
+  },
+  "idleWatch": {
+    "totalCalls": 1278,
+    "historyLimit": 128,
+    "retainedCalls": 128,
+    "droppedCalls": 1150,
+    "recordingFailures": 0,
+    "firstError": null,
+    "boundsUnchanged": {
+      "sessionOwnerMs": 1000,
+      "shellOwnerMs": 500,
+      "observerReadMs": 1000
+    },
+    "v2TimeoutReproduced": false,
+    "v2TimeoutCause": "unexplained; this separate healthy run does not diagnose or relabel the failed v2 capture"
+  },
+  "input": {
+    "actionsAttempted": 0,
+    "textA": "",
+    "textB": "",
+    "clicks": {
+      "center": 0,
+      "edge": 0
+    },
+    "saveChordCount": 0,
+    "savedFileExists": false,
+    "pointerChordAsciiSaveAcceptance": "not executed",
+    "visibleStopAcceptance": "not executed",
+    "stopClicked": false,
+    "noReplay": true
+  },
+  "cleanup": {
+    "closed": true,
+    "failure": null,
+    "stopReason": "requested",
+    "stopGuiTick": 2401,
+    "finalGuiTicks": 2402,
+    "seconds": 0.06778727700020681,
+    "normalFinishTriggerUsed": true,
+    "visibleStopButtonUsed": false,
+    "probeAbsent": true,
+    "targetAbsent": true,
+    "independentCandidateHelpersAbsent": true,
+    "recordedHelperCount": 1,
+    "noKillReplay": true
+  },
+  "originalPreservation": {
+    "originalOff": true,
+    "bothBackingFdsReadOnly": true,
+    "fullFrozenBaseHashesUnchanged": true,
+    "previousAdoptionCheckpoint": "20261003-fedora-gnome-clone141-adoption-input-import-refusal.json",
+    "hostDiskFloorBytes": 4294967296,
+    "lastMeasuredHostFreeBytes": 7152386048,
+    "originalBootForbiddenWhileDependentOverlayReusable": true
+  },
+  "privateEvidenceDigests": [
+    {
+      "label": "approved-fresh-v3",
+      "sha256": "61c6054543f6f4ca0833fe0b9c2a90780661ff16ca9c67265b993dbfeff1ef52",
+      "bytes": 4285
+    },
+    {
+      "label": "fresh-v3-admission-readonly",
+      "sha256": "ba6bec6c3dc6e290535d71a5a5d7555981414ad79351223511d4933b5072537d",
+      "bytes": 1612
+    },
+    {
+      "label": "observed-ui-portal-allow-interaction",
+      "sha256": "c063efef9fcadf4d8752c36e3bd1707555bb3a2f58b35742a412d6b12477c8f5",
+      "bytes": 5003
+    },
+    {
+      "label": "observed-ui-portal-share",
+      "sha256": "c8ede0bb511127b33288a335bded880485bfc6a8baa03a81b1c865bb9b57382c",
+      "bytes": 4991
+    },
+    {
+      "label": "single-capture",
+      "sha256": "04af14d9bc69d42f21209fc5f7887638b26af43185a5a3e67cce017f1acacadb",
+      "bytes": 2044
+    },
+    {
+      "label": "normal-finish",
+      "sha256": "6642c2fc95292506ddfddb039522c5d69cd9f1082eca8a3674824f28c15ae217",
+      "bytes": 727
+    },
+    {
+      "label": "owned-target-cleanup",
+      "sha256": "a6a49ad2083b82a8b6a0bc21200743fc7ab94e70e14ad3724ba9bcb6182dc47a",
+      "bytes": 175
+    },
+    {
+      "label": "final-independent-readback",
+      "sha256": "987e849d52c1e2616008d851f1a458f30a54b69ae36951a1eaf228dd9e4eb48f",
+      "bytes": 61234
+    },
+    {
+      "label": "final-input-result",
+      "sha256": "cba775428ed793af630395580859ac53d48541a800e04e97e94a3b9eae4d0332",
+      "bytes": 54003
+    },
+    {
+      "label": "idle-watch-rpc-trace",
+      "sha256": "25dd80f25b6800704ee66be2572af99d52bdc15a099011c5dfa71d32b1fe8d5f",
+      "bytes": 45374
+    },
+    {
+      "label": "full-frozen-bases-after-v3",
+      "sha256": "6c2a133e44883236893c10509937596422e5a3780726a3018bba9c58bf985eb1",
+      "bytes": 3709
+    }
+  ],
+  "privateFinalEvidenceManifestSha256": "1c00848efc697fa720fe7b347c0a352beddc1efd97685836c78805aeb014c213",
+  "nextImageRetentionSource": {
+    "status": "source-only awaiting parent review/publication; not executed in VM",
+    "optionalArgument": "--retain-capture-image",
+    "defaultEnabled": false,
+    "rawFormat": "image/jpeg",
+    "conversionOrReencoding": false,
+    "strictBoundedBase64AndNativeQtDecode": true,
+    "maxDecodedBytes": 900000,
+    "maxDimensions": {
+      "width": 1600,
+      "height": 1200
+    },
+    "dimensionsMustMatchActualCaptureApiReceipt": true,
+    "runLocalExclusiveFileMode": "0600",
+    "automaticCaptureOrOldImageReconstruction": false,
+    "controllerObserverSessionHelperGuardTimeoutChanges": false,
+    "probeCasesPassed": 31,
+    "focusedPythonCasesPassed": 112,
+    "observerNodeCasesPassed": 5,
+    "probeSha256": "7a5fae6672aab93d3d2dc7237c7f9b753189b3a9a7042dd6c82f569006583c1e"
+  },
+  "productionGnomeInputQualified": false,
+  "productionGnomeInputEnabled": false,
+  "remaining": "A distinct reviewed candidate must retain and visually inspect actual capture bytes before pointer/chord/ASCII/save/visibleStop input acceptance; v2 native timeout remains unexplained and other documented profile/failure/KDE integration gates remain open"
+}
