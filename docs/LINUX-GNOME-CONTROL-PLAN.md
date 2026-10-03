@@ -421,3 +421,12 @@ after Start; Notify methods are then forbidden. Use a pinned native libei sender
 shim, actual device/seat capabilities and keymap/frame/region handling rather
 than inferred GI APIs. Pause/removal/disconnect cancels old actions. Neither EIS
 framing nor Mutter's accumulation code creates atomic target compare-and-dispatch.
+
+## Existing Fedora artifact admission
+
+[The first input-candidate admission](../release/qualification/next-targets/20261003-fedora-gnome-old-payload-target-refusal.json)
+refuses the preserved old native/selected payload metadata before any staging or
+input. Both old release records still declare Debian13 although Fedora package
+records declare Fedora44. Current packaging rewrites that target. The guard is
+retained; a matching native/managed update and exact dependency/pending-transaction
+review must complete before this candidate runs. No selected payload is patched.

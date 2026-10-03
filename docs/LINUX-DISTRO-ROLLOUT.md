@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 Fedora GNOME historical payload metadata refusal
+
+[The initial candidate admission](../release/qualification/next-targets/20261003-fedora-gnome-old-payload-target-refusal.json)
+refuses before staging, closure, consent or input. The existing exact native
+f7d7585 and selectedaef93bb artifacts both identify their release payload as
+Debian13, although their Fedora package records declare Fedora44. Historical
+packaging reused that payload without rewriting the target; the current packager
+corrects it. Native audit and existing inventory pass, but the strict target
+guard remains unchanged. Matching2035 native/managed adoption is being reviewed,
+including eleven missing declared dependencies and an existing pending offline
+transaction. The normal app and production input state remain unchanged.
+
+
 ## October 3 Mint installed setup and post-install proof
 
 [The exact Mint checkpoint](../release/qualification/next-targets/20261003-mint2035-installed-setup-proof-loader.json)
