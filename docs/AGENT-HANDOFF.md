@@ -4,6 +4,15 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+Broader source/build/package checks at `bc8b256` pass all their jobs in 37156960807:
+Debian, installed packages, Browser package, Home, Handy all platforms and privacy.
+The workflow's overall failure is only the older native runtime fixture, now
+corrected and passed at `0ed4a1b` in focused 37158631483. The preceding `76462aa`
+broad jobs likewise all pass except its checkout-access native fixture. This
+supersedes the transient dual-memory startup failure at `8bc5bfb`; no unrelated
+memory code was changed. Focused native green plus older broad green is scoped
+evidence, not signed forward or whole installed-product qualification.
+
 Native Linux user-service qualification passes at `0ed4a1b` in
 [37158631483](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37158631483).
 The actual disposable systemd/Node/pidfd/graph proof passes busy deferral,

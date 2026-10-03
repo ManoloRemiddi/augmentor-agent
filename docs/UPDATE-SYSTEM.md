@@ -1200,3 +1200,12 @@ desktop window or background owner is reopened. Broader jobs are explicitly
 skipped in focused mode and receive no qualification claim from this result.
 The runtime-isolation correction is qualified for this fixture; production managed
 Linux eligibility, signed forward and full release qualification remain pending.
+
+The complete broader jobs at `bc8b256` pass in
+[37156960807](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37156960807):
+Debian source/build/tests, installed packages, Browser package, Home, all Handy
+platforms and privacy. That workflow's overall failure is the older native runtime
+fixture, separately corrected/passed at `0ed4a1b` above. The `76462aa` broader jobs
+also all pass in 37155477755 except its native checkout-access fixture. These
+newer source checks supersede the earlier transient dual-memory startup failure;
+memory code was not altered. Different refs/scopes remain explicit.
