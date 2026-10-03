@@ -1,5 +1,43 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 Fedora KDE pointer freshness refusal
+
+[The recovery and freshness checkpoint](../release/qualification/next-targets/20261003-kde-activity-recovery-freshness-refusal.json)
+records a later partial failed attempt in the same owned Fedora 44 Cloud-derived
+Plasma 6.7.5 Wayland VM. Native and managed payload source remains
+`2035af99b46bb013e81de9766216da820ab4a325`; the unchanged public proof/helper
+remains `9d9cf06b67d83ce7b624a4d5b8ea1a284706ec54`. The bounded same-peer
+idle observer and unchanged strict preclose checks pass before normal session
+recovery. No lock preference, keyboard state, product permission path, timeout
+or component lease changes.
+
+The unchanged observe-only proof passes in 164.341 seconds. Its fresh screenshot
+shows the native Remote Control dialog with unobstructed Approve and Deny
+labels; the observation is bound to its current portal owner and image hash.
+Pending consent is cancelled through RPC. This is neither a portal grant nor
+visible Stop acceptance. Five ordinary absolute pointer packets, A1/A2, B1/B2
+and C1, have known acknowledgements and native cursor readbacks. These packets
+contain no button or keyboard input.
+
+The C phase begins 42.175 seconds after capture. Its before-C1, after-C1 and
+before-C2 read-only admission stages take 6.691, 6.689 and 6.690 seconds.
+Before C2, the retained screenshot is 62.284 seconds old; the unchanged
+60-second freshness guard refuses before a pending packet or send. Source,
+owner, session, scene, actual idle and unlocked checks pass at that admission.
+There is no capture refresh, input replay, editor close, consent grant or full
+input proof after refusal. The exact image-tool invocation time and internal
+host pause breakdown were not retained; the independent view attestation is
+recorded at phase entry. These timings do not explain the earlier 20-second
+RPC timeout.
+
+Independent end native/selected, protected-file, prior-account, memory,
+current-process and component-lease checks pass. The owned Kate file remains
+exactly `Fixture ready\n`; Kate and its crash-recovery banner are preserved
+without Restore Data or Discard actions. SELinux remains Enforcing. Exact
+saved ASCII, partial-input visible Stop and no replay remain unqualified.
+Source, licensing and public-release gates remain open. A separate source-only
+pipeline proposal is pending review; no new installed attempt is implied.
+
 ## October 3 Fedora KDE activity admission refusal
 
 [The activity admission checkpoint](../release/qualification/next-targets/20261003-kde-activity-idle-lock-refusal.json)

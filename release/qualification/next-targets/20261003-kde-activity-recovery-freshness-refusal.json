@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "status": "PARTIAL_FAIL_C2_SCREENSHOT_FRESHNESS",
+  "scope": "Owned Fedora 44 Cloud-derived Plasma 6.7.5 single-monitor Wayland VM; ordinary synthetic UID1001. Not standard KDE ISO, physical hardware, full input or public release qualification.",
+  "productSource": "2035af99b46bb013e81de9766216da820ab4a325",
+  "selectedArtifactSha256": "74b1dd63f4be9c2df88c764bca4dabcd7aebfcd31967c69f13f59607c274eeaf",
+  "proofSource": "9d9cf06b67d83ce7b624a4d5b8ea1a284706ec54",
+  "driverSha256": "88ba587da737eb22c33ddf0f17be88499d55dc522b40eae324f9dd030429113c",
+  "helperSha256": "6afda6e52e3d9c53445f4a9271ad49438613ef9655425ce728dd65d71fbffe49",
+  "privateIntegrationSha256": "69620ead6d0fff50ab636320deb1ed22b40e8c925ddb09f7faca23f3b124b711",
+  "all38BoundInputsUnchanged": true,
+  "sourceChecks": {
+    "hostSyntheticCases": 93,
+    "independentParentRepeat": "PASS",
+    "scope": "50 input/freshness/closure, 39 recovery predicates and 4 composition/floor cases; distinct from guest execution."
+  },
+  "actualTimeline": {
+    "preNativeSelectedAuditSeconds": 66.074910044,
+    "normalRecoverySeconds": 21.862574382,
+    "ordinaryStartupReadinessSeconds": 73.737236155,
+    "publishedObserveOnlySeconds": 164.341407204,
+    "cCaptureSeconds": 9.477308283,
+    "cViewAttestationAgeSeconds": 42.17479142,
+    "cBeforePacket1Seconds": 6.690716,
+    "cAfterPacket1Seconds": 6.688752,
+    "cBeforePacket2Seconds": 6.690303,
+    "cTerminalScreenshotAgeSeconds": 62.283722956,
+    "maximumScreenshotAgeSeconds": 60.0,
+    "independentEndAuditSeconds": 78.141777327,
+    "betaEndAuditSeconds": 5.137213344,
+    "exactImageToolInvocationTimestampRetained": false,
+    "attribution": "File-backed independent-view attestation occurs at phase entry. The exact image-tool invocation time and internal host pause breakdown were not retained. Timings do not establish the earlier 20-second RPC timeout cause."
+  },
+  "observeOnly": {
+    "status": "PASS",
+    "portalPid": 32922,
+    "dialog": {
+      "application": "org.freedesktop.impl.portal.desktop.kde",
+      "title": "Remote Control",
+      "origin": [
+        431,
+        259
+      ],
+      "size": [
+        415,
+        235
+      ],
+      "observedLabels": [
+        "Approve",
+        "Deny"
+      ],
+      "relativeObservedCenters": [
+        [
+          266,
+          202
+        ],
+        [
+          358,
+          202
+        ]
+      ]
+    },
+    "screenshotPpmSha256": "948c7ca7921f109d42ffbf17c7d71dbd055ba3335d5b2e0555597991053ce6c4",
+    "cancellation": "RPC cancellation of pending consent; no native button/grant or visible Stop acceptance."
+  },
+  "terminalAdmission": {
+    "phase": "C-before-packet-2",
+    "cScreenshotPngSha256": "b710efc86e771a246ce7df9201698ad62b8fa55133e6976f65b5f32cbfc1d9fb",
+    "ageSeconds": 62.283722956,
+    "maximumAgeSeconds": 60.0,
+    "sourceOwnerSessionSceneIdleUnlockedChecks": "PASS",
+    "refusedBeforePendingOrSend": true,
+    "noDependentReplay": true
+  },
+  "inputCounts": {
+    "absolutePointerPackets": 5,
+    "consentQmpButtonPackets": 0,
+    "keyboardPackets": 0,
+    "ctrlQAttempts": 0,
+    "fullProofAttempts": 0,
+    "portalGrant": 0
+  },
+  "knownAcknowledgedAndReadBackPackets": [
+    "A1",
+    "A2",
+    "B1",
+    "B2",
+    "C1"
+  ],
+  "preservation": {
+    "independentEndingChecks": "PASS",
+    "ownedFile": "Fixture ready\n",
+    "betaProtectedFilesUnchanged": true,
+    "freshProtectedFilesUnchanged": true,
+    "existingMemoryProcessPreserved": true,
+    "katePreservedWithoutCloseOrCrashBannerAction": true,
+    "noPackageMaintenancePending": true,
+    "selinux": "Enforcing",
+    "lockPreferencesUnchanged": true,
+    "keyboardStateUnchanged": true,
+    "productTimeoutLeasePermissionPathsUnchanged": true
+  },
+  "evidence": {
+    "privateReport": "outputs/linux-rollout/fedora44-kde-vm89/activityrecovery9d-terminal-report.json",
+    "privateReportSha256": "ac45cd85d9815cf670aa4b1f54b8d1c9118f4c3d8c4c8c50f3b79c41a5195169",
+    "rawTimeline": "outputs/linux-rollout/fedora44-kde-vm89/activityrecovery9d-timeline.jsonl",
+    "rawRefusal": "outputs/linux-rollout/fedora44-kde-vm89/activityrecovery9d-motion-C-before-packet-2.log",
+    "rawEndAudit": "outputs/linux-rollout/fedora44-kde-vm89/activityrecovery9d-terminal-end-audit.log",
+    "rawBetaEndAudit": "outputs/linux-rollout/fedora44-kde-vm89/activityrecovery9d-terminal-beta-end.log"
+  },
+  "remaining": [
+    "Fresh full proof with exact saved ASCII, partial-input visible Stop and no replay remains open.",
+    "Earlier casing failure and 20-second transport failure remain unresolved.",
+    "Any future pipeline change needs separate source review and a new unused execution namespace; this terminal attempt is not replayed.",
+    "Source, licensing and public-release gates remain false."
+  ]
+}
