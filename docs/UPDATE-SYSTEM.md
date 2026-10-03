@@ -875,3 +875,17 @@ actual captured-window/background-owner acceptance, interrupted recovery/reset,
 bounded observer/stage/backup retention, Linux controllers, approved signing
 custody, public feed/bridge and signed forward qualification. Pending and unknown
 runtime/stage evidence is retained until independently safe cleanup is available.
+
+
+Mac controller qualification at `882dd23` fails the new produced-ZIP count check
+on both Mac versions in 37147847618; Windows Desktop both CPUs and SDK pass that
+source (37147849267, 37147853195). The end record's count differs from the parsed
+directory. The corrected boundary walks actual central records before standard
+parser allocation, validates each record length/volume and actual entry/byte
+limits, and requires exact counts or an exact 16-bit wrap without ZIP64. It also
+handles a valid exactly-65,535 entry archive without requiring a ZIP64 locator.
+A real 65,536-entry fixture validates the wrapped representation and refuses a
+changed counter; seven real ZIP cases and the 165-case focused set pass. The
+native report now includes actual/end counts, ZIP64 and wrapping diagnostics.
+Native rerun is required before claiming produced-archive compatibility or later
+controller/exec acceptance. Paths/local headers/links retain their separate checks.

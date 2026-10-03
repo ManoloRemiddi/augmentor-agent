@@ -834,3 +834,10 @@ proof uses the actual coordinator and produced ZIP; its handoff helper execs the
 retained interpreter with the original lock and requires production refusal of an
 unqualified development bundle before source work. These fixtures do not claim
 signed forward or normal captured-window/login-service acceptance.
+
+
+The Mac ZIP fixture also constructs a real 65,536-entry directory and checks its
+exact native-style 16-bit end-count representation, plus malformed-counter
+refusal. Entry limits are enforced by walking central records before the standard
+parser allocates them. Hosted output reports the actual/end counts and ZIP64
+format; fixture compatibility is not native produced-archive qualification.

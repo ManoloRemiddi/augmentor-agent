@@ -1,6 +1,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Actual ZIP boundaries and paths are checked before native extraction."""
 from pathlib import Path
+import os
 import stat
 import struct
 import sys
@@ -68,6 +69,22 @@ class MacStagingTests(unittest.TestCase):
         end=struct.pack('<4s4H2IH',tag,0,0,65535,65535,0xffffffff,0xffffffff,0)
         stream.seek(0);stream.write(raw[:-22]+zip64+locator+end);stream.seek(0)
         self.assertEqual(validate_zip(stream,NAME)['entries'],1)
+
+    def test_wrapped_native_small_file_counter_requires_exact_actual_directory_count(self):
+        stream=self.archive([(NAME+'/Contents/file-'+str(index),b'',stat.S_IFREG) for index in range(65536)])
+        raw=stream.read()
+        # Preserve the actual full directory but use the native wrapped EOCD
+        # representation, without ZIP64. Both counters wrap to zero.
+        locator=raw[-42:-22]
+        marker,disk,position,disks=struct.unpack('<4sIQI',locator)
+        self.assertEqual(marker,b'PK\x06\x07')
+        fields=struct.unpack('<4sQ2H2I4Q',raw[position:position+56])
+        end=struct.pack('<4s4H2IH',b'PK\x05\x06',0,0,0,0,fields[-2],fields[-1],0)
+        stream.seek(0);stream.write(raw[:position]+end);stream.truncate();stream.seek(0)
+        self.assertEqual(validate_zip(stream,NAME)['entries'],65536)
+        stream.seek(-14,os.SEEK_END)
+        stream.write(struct.pack('<2H',1,1));stream.seek(0)
+        with self.assertRaises(ValueError):validate_zip(stream,NAME)
 
     def test_reopening_names_cannot_be_commands_paths_or_mutated_aliases(self):
         original={'instances':['main','mobile'],'hadBrowser':False};captured=validate_plan(original)

@@ -28,10 +28,11 @@ def bounded_zip(stream):
     end=length-len(tail)+index
     if disk or start_disk or comment or len(tail)-index!=22 or on_disk!=count:
         raise ValueError('Use a single-volume release ZIP without trailing data.')
-    boundary=end
-    if count==65535 or size==0xffffffff or offset==0xffffffff:
-        if end<20:raise ValueError('Invalid ZIP64 end locator.')
+    boundary=end;zip64=False
+    locator=b''
+    if end>=20:
         stream.seek(end-20);locator=stream.read(20)
+    if locator.startswith(b'PK\x06\x07'):
         marker,number,position,disks=struct.unpack('<4sIQI',locator)
         if marker!=b'PK\x06\x07' or number or disks!=1 or not 0<=position<=end-76:
             raise ValueError('Unsupported ZIP64 volume locator.')
@@ -40,11 +41,33 @@ def bounded_zip(stream):
         if (marker!=b'PK\x06\x06' or record_size!=44 or position+56!=end-20
                 or disk or start_disk or on_disk!=count):raise ValueError('Unsupported ZIP64 end record.')
         boundary=position
-    if not 1<=count<=MAX_ENTRIES or not 0<size<=MAX_INVENTORY or offset+size!=boundary:
+        zip64=True
+    elif size==0xffffffff or offset==0xffffffff:
+        raise ValueError('A ZIP64 directory requires its complete locator.')
+    if not 0<=count<=MAX_ENTRIES or not 0<size<=MAX_INVENTORY or offset+size!=boundary:
         raise ValueError('The Mac release ZIP directory exceeds its supported boundary.')
+    # Some native writers wrap the 16-bit entry counter instead of supplying
+    # ZIP64 for a large number of small files. Count actual central records
+    # before ZipFile allocates them; size alone is an insufficient entry bound.
+    stream.seek(offset);actual=0
+    while stream.tell()<boundary:
+        raw=stream.read(46)
+        if len(raw)!=46:raise ValueError('Truncated ZIP central header.')
+        fields=struct.unpack('<4s6H3I5H2I',raw)
+        if fields[0]!=b'PK\x01\x02' or fields[13] or not 0<fields[10]<=32768:
+            raise ValueError('Unsupported ZIP central record.')
+        following=stream.tell()+sum(fields[10:13])
+        if following>boundary:raise ValueError('The ZIP central record exceeds its directory.')
+        stream.seek(following);actual+=1
+        if actual>MAX_ENTRIES:raise ValueError('The ZIP contains too many entries before parsing.')
+    if (not actual or stream.tell()!=boundary or
+            count!=actual and not (not zip64 and actual>65535 and count==(actual&65535))):
+        raise ValueError('The actual ZIP record count differs from its bounded end record ('+str(actual)+' versus '+str(count)+').')
     stream.seek(0)
     bundle=zipfile.ZipFile(stream)
-    if len(bundle.infolist())!=count:bundle.close();raise ValueError('The release ZIP entry count differs from its end record.')
+    if len(bundle.infolist())!=actual:bundle.close();raise ValueError('The release ZIP parser differs from its verified central records.')
+    bundle.augmentor_directory={'entries':actual,'endCounter':count,'zip64':zip64,
+        'wrapped16':not zip64 and count!=actual}
     return bundle
 
 
@@ -53,6 +76,7 @@ def validate_zip(stream,bundle_name):
         raise ValueError('Use a fixed product bundle name.')
     seen=set();links=set();paths=[];total=0;payload=False
     with bounded_zip(stream) as bundle:
+        directory=dict(bundle.augmentor_directory)
         for entry in bundle.infolist():
             if entry.orig_filename!=entry.filename:raise ValueError('The ZIP path contains a truncated character.')
             # ditto may use local names. Verify them against the bounded central
@@ -93,7 +117,7 @@ def validate_zip(stream,bundle_name):
         for folded,parts in paths:
             if any(unicodedata.normalize('NFC','/'.join(parts[:index])).casefold() in links for index in range(1,len(parts))):
                 raise ValueError('The ZIP writes through a symbolic link.')
-    return {'entries':len(seen),'bytes':total,'bundle':bundle_name}
+    return {'entries':len(seen),'bytes':total,'bundle':bundle_name,'directory':directory}
 
 
 def stage_download(held,directory,candidate,*,team,development=False):

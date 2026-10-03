@@ -4,6 +4,17 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+At controller checkpoint `882dd23`, Windows Desktop both CPUs passes
+37147849267 and SDK contracts pass 37147853195. Mac 14/26 fails the new produced
+ZIP boundary: the end counter differs from the actual parsed directory
+(37147847618). The parser now walks/counts bounded central records before
+allocation, independently limits actual count and accepts only an exact 16-bit
+wrap when ZIP64 is absent. A real 65,536-entry fixture passes; wrong counters are
+refused. Native rerun must confirm the produced format and later coordinator/exec
+steps. Focused checks pass 165 cases (164 passed, one OS skip). Earlier broad 942
+cases pass at the controller checkpoint. No customer flag/feed is enabled.
+
+
 New Mac controller source now connects the manager to fixed bootstrap/retained
 observer entrypoints, actual exec/code/lock checks, exact one-bundle ZIP staging,
 live reservation/apply/completion and captured-name reopening. It currently
