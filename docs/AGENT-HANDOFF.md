@@ -1767,3 +1767,11 @@ records passed x64 full install/repair/removal and a separate missing test impor
 path at `da70616`. Broker tests now retain actual Windows identity adapters in
 their incomplete checkout and include the services path, preserving authentication
 and missing-component assertions. Product code is unchanged; native gates rerun.
+
+## October 3 companion fixture wrapper exit
+
+[Windows shell evidence](WINDOWS-SHELL.md#october-3-companion-fault-fixture-cleanup)
+now waits for both the authenticated peer and its distinct native wrapper after
+a deliberate test supervisor kill, preserving kernel exit assertions and strict
+folder cleanup. The product supervisor is unchanged. This follows ARM cleanup
+ordering failure 37121482753; matched Handy checks rerun.

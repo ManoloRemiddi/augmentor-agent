@@ -163,6 +163,14 @@ missing compiled binary rather than failing earlier on a missing Python module.
 Authentication/ACL assertions remain enabled; product code and payload are unchanged.
 Both native lanes and matching packages are rerun from the corrected test source.
 
+The native ARM desktop fault fixture also exposed cleanup ordering: it waited
+for authenticated Python peers but not their distinct native wrappers, which
+could still hold a log briefly after the deliberate supervisor kill. It now
+retains and waits for both kernel process handles, preserving strict termination
+assertions rather than ignoring deletion failures. Product supervisor behavior
+is unchanged. This follow-up is documented in the Windows shell guide and native
+checks are rerun from the resulting source.
+
 Implementation branch: `feat/handy-integration`, based on public main
 `d91c52037d7bc26c82c702c25e1a779b0fca1f39`. This guide owns the implemented
 contract; [the approved plan](HANDY-INTEGRATION-PLAN.md) retains its rationale.
