@@ -5,6 +5,12 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      native_service_only:
+        description: Run only privacy and native Linux service qualification
+        type: boolean
+        required: false
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -20,12 +26,14 @@ jobs:
           fetch-depth: 0
       - run: python3 scripts/check-private-source-boundary.py
   handy:
+    if: ${{ inputs.native_service_only != true }}
     needs: source-boundary
     uses: ./.github/workflows/handy.yml
   linux-owned-service:
     needs: source-boundary
     uses: ./.github/workflows/linux-update-service.yml
   home-runtime:
+    if: ${{ inputs.native_service_only != true }}
     needs: source-boundary
     runs-on: ubuntu-24.04
     timeout-minutes: 10
@@ -44,6 +52,7 @@ jobs:
           -e AUGMENTOR_SHARED_DATA=/tmp/data augmentor-home:ci
           node --input-type=module -e 'import {promptCall} from "../../dist/prompt-library/src/client.js"; const r=await promptCall("prompts.list"); if(!Array.isArray(r.prompts))process.exit(1);'
   debian:
+    if: ${{ inputs.native_service_only != true }}
     needs: [source-boundary, handy]
     runs-on: ubuntu-24.04
     container: debian@sha256:abc9cb88a5587630d7f915f47b23b0668fe250fbfc6457aa4d52b534c1bbf73f

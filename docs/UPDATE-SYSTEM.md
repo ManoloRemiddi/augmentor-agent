@@ -1173,3 +1173,8 @@ actual Node unit but refuses its runtime directory ownership/mode before socket
 registration. The fixture adds bounded synthetic path/UID/mode diagnostics on
 that failure; the shipped control server's private-directory guard is retained.
 Actual migration/reopening remains unqualified pending a diagnosed native rerun.
+
+Validation has an explicit `native_service_only` manual input for fast isolated
+OS-service qualification. Its default is false: ordinary validation still runs
+all existing checks. The focused mode runs privacy and the native service job;
+skipped build/package jobs do not qualify broad release validation.
