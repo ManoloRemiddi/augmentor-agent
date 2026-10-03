@@ -1178,3 +1178,5 @@ Validation has an explicit `native_service_only` manual input for fast isolated
 OS-service qualification. Its default is false: ordinary validation still runs
 all existing checks. The focused mode runs privacy and the native service job;
 skipped build/package jobs do not qualify broad release validation.
+Focused mode uses a separate concurrency group so it does not cancel a live broad
+validation of the same branch.

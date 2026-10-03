@@ -14,7 +14,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: validation-${{ github.ref }}
+  group: validation-${{ github.ref }}${{ inputs.native_service_only && '-native-service' || '' }}
   cancel-in-progress: true
 jobs:
   source-boundary:
