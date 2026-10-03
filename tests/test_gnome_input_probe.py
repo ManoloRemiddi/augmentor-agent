@@ -4,6 +4,8 @@ import importlib.util
 import hashlib
 import json
 import os
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 import tempfile
@@ -12,6 +14,49 @@ from unittest.mock import Mock,patch
 
 spec=importlib.util.spec_from_file_location('owned_gnome_input_probe',Path(__file__).resolve().parents[1]/'release/probe-gnome-input.py')
 module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+try:
+    import gi
+    gi.require_version('Gst','1.0')
+    from gi.repository import Gst
+except (ImportError,ValueError):Gst=None
+
+
+@unittest.skipUnless(sys.platform.startswith('linux') and Gst is not None,
+    'Candidate import regression requires Linux GStreamer introspection.')
+class GnomeInputCandidateImportTests(unittest.TestCase):
+    def test_eleven_file_candidate_resolves_real_installed_dependency_before_controller_import(self):
+        repo=Path(__file__).resolve().parents[1]
+        with tempfile.TemporaryDirectory() as temporary:
+            candidate=Path(temporary)/'candidate';candidate.mkdir()
+            installed=Path(temporary)/'installed';desktop=installed/'services/desktop';desktop.mkdir(parents=True)
+            # Use actual maintained modules in the same eleven-file staging
+            # shape. KWin is deliberately installed only; no GUI is created.
+            for name in ('worker','gnome_control','gnome','portal','portal_session',
+                    'capture_stream','scene','a11y_helper','a11y_service'):
+                shutil.copy2(repo/'services/desktop'/(name+'.py'),candidate)
+            for name in ('probe-gnome-input.py','probe-gnome-input-target.py'):
+                shutil.copy2(repo/'release'/name,candidate)
+            shutil.copy2(repo/'services/desktop/kwin.py',desktop)
+            for name in ('worker','gnome_control','portal'):
+                (desktop/(name+'.py')).write_text('raise RuntimeError("Installed controller must not replace the candidate")\n')
+            code='''
+import importlib.util,json,sys
+from pathlib import Path
+candidate=Path(sys.argv[1]);installed=Path(sys.argv[2])
+spec=importlib.util.spec_from_file_location('import_only_probe',candidate/'probe-gnome-input.py')
+probe=importlib.util.module_from_spec(spec);spec.loader.exec_module(probe)
+Worker,GnomeControl=probe.candidate_controller(candidate,installed)
+import worker,gnome_control,portal,kwin
+assert Worker is worker.Worker and GnomeControl is gnome_control.GnomeControl
+assert Path(worker.__file__).parent==candidate and Path(gnome_control.__file__).parent==candidate
+assert Path(portal.__file__).parent==candidate and Path(kwin.__file__).parent==installed/'services/desktop'
+assert portal.KWin is kwin.KWin
+print(json.dumps({'realCandidateModules':True,'installedDependencyResolved':True}))
+'''
+            result=subprocess.run([sys.executable,'-I','-B','-c',code,str(candidate),str(installed)],
+                capture_output=True,text=True,timeout=20)
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertEqual(json.loads(result.stdout),{'realCandidateModules':True,'installedDependencyResolved':True})
 
 
 @unittest.skipUnless(sys.platform.startswith('linux'), 'Owned GNOME input proof requires Linux file ownership and native runtime paths.')

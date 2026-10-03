@@ -63,6 +63,11 @@ reviewed selected/native sources are recorded separately. The selected and
 executing interpreter must be /usr/bin/python3 with no virtual environment or
 managed/source-Qt Python policy. Inherited loader/Qt/Python overrides are refused
 and the native augmentor-agent RPM must pass a clean read-only rpm -V audit.
+After this admission, candidate modules take precedence and the verified
+installed services/desktop directory supplies unchanged dependencies before
+Worker/GnomeControl import. In particular, candidate portal.py imports KWin even
+though GnomeControl never constructs it. The eleven-file candidate does not add
+a KWin source overlay or alter the selected payload.
 The Qt banner retains the previously observed
 xcb route. Consent and target activation must be actual inspected operations;
 the probe never forces focus or infers input permission from readiness.
@@ -82,13 +87,16 @@ the external owned-VM driver must independently check for helpers after failed
 reads and retain process/start identities. Visible Stop remains the banner's
 actual button; a finish trigger is cleanup, not visible Stop evidence.
 
-Eighty-five focused source cases pass: GNOME guards/keyboard, helper protocol,
+Eighty-six focused source cases pass: GNOME guards/keyboard, helper protocol,
 worker/consent cancellation, portal targets, scene/capture and private-trigger
 and selected-artifact refusals. The latter exercise the normal maintained
 inventory verifier against synthetic managed releases, including changed or
 added payload, stale receipt, wrong source/target/hash/version/interpreter,
-managed policy and inherited loader/native-audit refusals. These are synthetic
-contracts and real isolated GLib scheduling, not
+managed policy and inherited loader/native-audit refusals. An isolated import
+regression copies the real eleven staged files, resolves the real installed
+kwin.py dependency, and rejects installed controller replacements without
+constructing GUI or opening consent. These are synthetic contracts, actual
+module imports and real isolated GLib scheduling, not
 native pointer/chord/typing qualification. No VM input has been sent by this new
 candidate. Fresh Fedora50 native widget/file outcomes, per-character focus and
 password/Stop/lock/restart cases, terminal capture loss, other GNOME profiles and
@@ -430,3 +438,27 @@ input. Both old release records still declare Debian13 although Fedora package
 records declare Fedora44. Current packaging rewrites that target. The guard is
 retained; a matching native/managed update and exact dependency/pending-transaction
 review must complete before this candidate runs. No selected payload is patched.
+
+The [owned clone adoption and first import refusal](../release/qualification/next-targets/20261003-fedora-gnome-clone141-adoption-input-import-refusal.json)
+preserves the original VM's daemon-prepared offline update by normally powering
+it off and using a separate thin clone. Both original backing disks remain
+read-only with unchanged full SHA256; the original must stay off while any
+dependent overlay is reusable. The clone installs the exact clean2035 Fedora
+RPM through normal DNF, with eleven reviewed required dependencies and their
+verified Fedora signatures. Only the clone's copied pending transaction is
+invalidated. Native audit, protected settings and canonical managed
+stage/activate/cold launch pass. Both new release records declare Fedora44;
+the old selection is retained as previous, and strict candidate admission passes
+without changing any guard.
+
+The first exact0ab eleven-file candidate then fails before Qt/banner/portal
+creation: portal.py cannot import kwin because the probe appends the verified
+installed dependency path after GnomeControl import. The native GTK Wayland
+target remains empty, both click counts and its save count remain zero, no
+trigger or saved file exists, and independent cleanup confirms probe/target and
+candidate helpers are absent. No consent or input was sent. The maintained
+probe now resolves that dependency before controller import; its source-only
+fix and import regression are review evidence, not a corrected native pass.
+A fresh candidate directory and explicit reviewed probe revision/hash are
+required for the next run; controller/helper bytes remain the reviewed0ab
+candidate. Production GNOME discovery and input remain disabled.

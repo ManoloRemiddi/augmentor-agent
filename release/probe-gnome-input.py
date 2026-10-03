@@ -86,6 +86,18 @@ def selected_artifact(source,artifact_sha256,native_source):
         'deploymentVerifierSha256':hashlib.sha256(verifier.read_bytes()).hexdigest()}
 
 
+def candidate_controller(candidate,installed):
+    """Resolve candidate modules and verified installed dependencies, after admission."""
+    sys.path.insert(0,str(candidate))
+    # portal imports KWin even though GnomeControl never constructs it. The
+    # reviewed eleven-file fixture owns changed modules; its other dependencies
+    # come from the already verified selected artifact, without extra overlays.
+    sys.path.append(str(installed/'services/desktop'))
+    from worker import Worker
+    from gnome_control import GnomeControl
+    return Worker,GnomeControl
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--candidate',required=True);parser.add_argument('--source',required=True)
@@ -132,11 +144,10 @@ def main():
         'portal.py','portal_session.py','capture_stream.py','scene.py','a11y_helper.py','a11y_service.py')
     if any((candidate/name).is_symlink() or not (candidate/name).is_file() or (candidate/name).stat().st_uid!=os.getuid() for name in sources):
         raise RuntimeError('Stage ordinary-user owned regular candidate modules.')
-    os.environ['QT_QPA_PLATFORM']='xcb';os.umask(0o077);sys.path.insert(0,str(candidate))
-    from worker import Worker
-    from gnome_control import GnomeControl
+    os.environ['QT_QPA_PLATFORM']='xcb';os.umask(0o077)
+    Worker,GnomeControl=candidate_controller(candidate,installed)
     spec=importlib.util.spec_from_file_location('owned_installed_banner',installed/'services/desktop/service.py')
-    service=importlib.util.module_from_spec(spec);sys.path.append(str(installed/'services/desktop'));spec.loader.exec_module(service)
+    service=importlib.util.module_from_spec(spec);spec.loader.exec_module(service)
     from PySide6.QtCore import QObject,Signal,QTimer
     from PySide6.QtWidgets import QApplication
     app=QApplication([]);app.setQuitOnLastWindowClosed(False);banner=service.Banner()
