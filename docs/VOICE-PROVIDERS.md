@@ -145,6 +145,25 @@ commit records this identity. Validation on the review source:
 
 No OpenAI project key was supplied for a real GPT-Live trial. Actual account
 availability, microphone quality, latency, interruption acoustics and platform
-bundles must be qualified before promoting an installed release. This source
-change does not claim a better acoustic experience than Resonant Voice, merge a
-release or replace an installed build.
+bundles remain requirements for public release qualification. The initial source
+qualification did not replace an installed build or claim a better acoustic
+experience than Resonant Voice. The subsequent owner-requested compatible Linux
+build is recorded below.
+
+## Owner-requested build qualification — October 3
+
+The owner subsequently authorized an autonomous build. Provider forms now reuse
+an existing embedded settings frame; ordinary dialog-based builds retain their
+existing lifecycle. Browser embedding allows its native host to finish accepted
+work and billed-session closure on EOF, instead of terminating it early.
+
+Validation after these compatibility corrections: 858 native cases (36 platform
+skips), 506 Node cases (504 pass, 2 platform skips), 103 focused voice cases.
+The separate compatible 0.2.11 candidate preserves the installed app's chat
+runtime, model integration, settings and Handy fixes: 103 focused candidate
+cases pass, including its actual settings frame; 89 pass under the installed
+Python and the 14 QtTest gesture cases pass under the isolated test interpreter.
+Candidate browser voice cases: 20 pass; native-host/embedding cases: 5 pass.
+The new form screenshots were inspected. These remain synthetic audio/socket
+proofs; a real OpenAI trial requires the owner's project key and setup consent.
+Selected versus running deployment identity is recorded after guarded activation.

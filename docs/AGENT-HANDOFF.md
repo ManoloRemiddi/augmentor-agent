@@ -13,7 +13,10 @@ the active app model unchanged. Focused voice qualification: 103 native cases
 passed, including an embedded configuration proof. The Linux package CI now
 installs sounddevice/PortAudio before audio-readiness tests; pure configuration
 unit cases mock device readiness explicitly. See [Voice providers](VOICE-PROVIDERS.md)
-for deployment evidence and live API limitations.
+for deployment evidence and live API limitations. Browser embedding now drains
+accepted native-host work on page/service closure, allowing the billed voice
+session to finalize normally; no ordinary force-kill timer is used. Full current
+validation: 858 native cases (36 skipped), 506 Node cases (504 pass, 2 skipped).
 
 ## Voice provider implementation — October 3
 

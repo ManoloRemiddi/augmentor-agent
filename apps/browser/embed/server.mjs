@@ -20,13 +20,15 @@ const digest=v=>createHash('sha256').update(String(v)).digest()
 export function nativeConnection(ws,profile,{start=spawn}={}){
  const child=start(process.execPath,[fileURLToPath(new URL('../native-host.mjs',import.meta.url))],{stdio:['pipe','pipe','ignore'],env:{...process.env,AUGMENTOR_WORKSPACE_PROFILE:profile.id}})
  let buffer=Buffer.alloc(0),alive=true,closed=false
- const end=()=>{if(closed)return;closed=true;clearInterval(timer);child.stdin.end();child.kill();setTimeout(()=>child.kill('SIGKILL'),2000).unref();ws.terminate()}
+ const end=()=>{if(closed)return;closed=true;clearInterval(timer);child.stdin.end();ws.terminate()}
+ end.closed=new Promise(resolve=>child.once('close',resolve))
  const timer=setInterval(()=>{if(!alive)return end();alive=false;ws.ping()},15000);timer.unref()
  ws.on('pong',()=>{alive=true})
  child.stdout.on('data',chunk=>{
+  if(closed)return
   buffer=Buffer.concat([buffer,chunk]);while(buffer.length>=4){const n=buffer.readUInt32LE(0);if(n>MAX_FRAME)return end();if(buffer.length<n+4)break;const frame=buffer.subarray(4,4+n);buffer=buffer.subarray(4+n);if(ws.readyState!==WebSocket.OPEN||ws.bufferedAmount>MAX_FRAME*2)return end();ws.send(frame.toString())}
  })
- ws.on('message',(raw,binary)=>{if(binary||raw.length>1024*1024)return end();let frame;try{frame=JSON.parse(String(raw))}catch{return end()}
+ ws.on('message',(raw,binary)=>{if(closed)return;if(binary||raw.length>1024*1024)return end();let frame;try{frame=JSON.parse(String(raw))}catch{return end()}
   if(frame.type==='embed/ping'){ws.send(JSON.stringify({type:'embed/pong'}));return}
   // No queue or replay: native messaging dispatch belongs to this live socket only.
   const body=Buffer.from(JSON.stringify(frame)),size=Buffer.alloc(4);size.writeUInt32LE(body.length)
@@ -36,6 +38,7 @@ export function nativeConnection(ws,profile,{start=spawn}={}){
  return end
 }
 export function createEmbedServer({profileLoader=loadProfile,startNative=nativeConnection,assetRoot=root}={}){
+ const connections=new Set()
  const wss=new WebSocketServer({noServer:true,maxPayload:1024*1024,perMessageDeflate:false})
  async function authorize(req){
   const url=new URL(req.url,'http://127.0.0.1'),match=/^\/embed\/([a-z][a-z0-9-]*)\/(.*)$/.exec(url.pathname)
@@ -67,11 +70,13 @@ export function createEmbedServer({profileLoader=loadProfile,startNative=nativeC
    res.writeHead(200,{'Content-Type':types[extname(path)]});res.end(req.method==='HEAD'?undefined:content)
   }catch(error){json(error.code==='ENOENT'?404:403,{error:'Augmentor workspace is unavailable or the proxy is not authorized.'})}
  })
- server.on('upgrade',async(req,socket,head)=>{try{const {p,file}=await authorize(req);if(file!=='native'||req.headers.origin!==p.parentOrigin)throw Error('Invalid socket');wss.handleUpgrade(req,socket,head,ws=>startNative(ws,p))}catch{socket.end('HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n')}})
+ server.on('upgrade',async(req,socket,head)=>{try{const {p,file}=await authorize(req);if(file!=='native'||req.headers.origin!==p.parentOrigin)throw Error('Invalid socket');wss.handleUpgrade(req,socket,head,ws=>{const end=startNative(ws,p);if(end?.closed){connections.add(end);void end.closed.finally(()=>connections.delete(end))}})}catch{socket.end('HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n')}})
  server.on('close',()=>{for(const c of wss.clients)c.terminate();wss.close()})
+ server.closeNativeConnections=async()=>{for(const ws of wss.clients)ws.terminate();for(const end of connections)end();await Promise.allSettled([...connections].map(end=>end.closed))}
  return server
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  const server=createEmbedServer();server.listen(Number(process.env.AUGMENTOR_EMBED_PORT||8872),'127.0.0.1',()=>console.log('Augmentor embedding service ready (loopback only)'))
- const stop=()=>{server.close();setTimeout(()=>process.exit(0),1000).unref()};process.on('SIGTERM',stop);process.on('SIGINT',stop)
+ let stopping=false
+ const stop=()=>{if(stopping)return;stopping=true;void (async()=>{const closed=new Promise(resolve=>server.close(resolve));await server.closeNativeConnections();await closed})().catch(()=>{process.exitCode=1})};process.on('SIGTERM',stop);process.on('SIGINT',stop)
 }
