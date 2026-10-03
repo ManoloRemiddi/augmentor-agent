@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 selected GNOME reboot instrumentation
+
+[The selected-artifact reboot proof](LINUX-GNOME-SHORTCUT-PROOF.md#selected-gnome-artifact-reboot-proof)
+adds explicit Ubuntu24/Fedora44 source/artifact and owned-host/guest admission.
+An exclusive private pending receipt precedes exactly one reboot request;
+transport timeout or loss never retries it. Read-only recovery needs a new
+kernel boot ID, identical selection/runtime/inventory and actual Wayland
+service-owned app/observer. Three source cases pass, including real child
+transport timeout. Current installed reboot acceptance is pending and password
+authentication remains separate.
+
+
 ## October 3 Fedora KDE proof child correction
 
 [The helper correction checkpoint](../release/qualification/next-targets/20261003-kde-wayland-proof-helper-correction.json)

@@ -123,3 +123,29 @@ four Save clicks, four collision clicks, native readback and conflict refusals.
 Settings and foreign bindings restore successfully. No selected payload is
 patched. Normal global shortcut delivery and authenticated password-lock/reboot
 acceptance remain separate; the original pre-Save loader failure is preserved.
+
+## Selected GNOME artifact reboot proof
+
+[`prove-gnome-selected-reboot.py`](../release/prove-gnome-selected-reboot.py)
+adds a separate Ubuntu24/Fedora44 owned-VM reboot entry. It requires explicit
+source and artifact digests, the private host/QEMU/key/disk contract, verified
+guest security/native package/runtime/inventory, a normal idle service-owned
+main window and no secondary window or pending Settings journal. It records an
+exclusive private receipt before one reboot request. A timeout or lost SSH
+reply never repeats that request. Recovery requires a changed kernel boot ID,
+the identical selected contract and an actual service-owned Wayland app with
+the GNOME observer available. Three focused cases cover retained pending
+evidence and real transport timeout/lost reply without redispatch. Installed
+current-artifact reboot acceptance is pending. This proof does not test password
+authentication, locked shortcuts, a connected harness or desktop input.
+
+Example, from the canonical checkout, with a fresh private output:
+
+```sh
+python3 release/prove-gnome-selected-reboot.py \
+  --target ubuntu24 \
+  --directory outputs/linux-rollout/ubuntu24-gnome-mesa2-vm \
+  --identity outputs/linux-rollout/ubuntu24-gnome-vm/id_ed25519 \
+  --source <exact-selected-source> --artifact <exact-selected-inventory-sha256> \
+  --output outputs/linux-rollout/<fresh-run>/reboot.json
+```
