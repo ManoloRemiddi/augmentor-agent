@@ -99,6 +99,12 @@ private triggers and exact selected/native artifact admission. Both are Linux
 instrumentation and skip on other platforms; passing these checks does not
 establish native consent, input delivery or password authentication.
 
+`test_gnome_password_fixture.py` checks private synthetic account preparation
+and restoration, including concurrent account refusal and a real child timeout
+with one retained dispatch. It skips outside Linux. The seven source cases do
+not authenticate a desktop; the [GNOME proof guide](../docs/LINUX-GNOME-SHORTCUT-PROOF.md)
+owns the actual guest/password qualification boundary.
+
 `test_recovery.py` and `test_desktop_startup.py` cover saved-chat refusal, explicit
 managed-runtime startup, multi-frame legacy-history repair and canonical launchers.
 `scripts/proof-recovery.py` uses disposable real runtimes.

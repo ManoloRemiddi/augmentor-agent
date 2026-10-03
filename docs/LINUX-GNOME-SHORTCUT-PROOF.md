@@ -19,6 +19,29 @@ proof. Its lock test uses administrative `loginctl` lock/unlock; it explicitly
 does not qualify password authentication, shortcut delivery while locked or a
 reboot. Those remain separate real-session cases.
 
+## Temporary password fixture preparation
+
+`release/gnome-password-fixture.py` is root-only test instrumentation restricted
+to the marked Ubuntu24.04 QEMU comparison guest and its dedicated UID1000
+account. An explicit clean source and selected artifact hash must match the
+private selection. The original randomly generated Cloud account password is
+unavailable; a temporary synthetic credential is needed for a real password
+test. The helper requires the original Cloud password hash to match before any
+dispatch, and retains the complete original shadow image and account age in a
+root-only private journal. Credentials and shadow contents are never returned.
+
+Preparation uses native `openssl` and one `chpasswd` invocation. Restoration
+uses the original hash and, if needed, a separate native `chage` operation. Each
+command has a pending receipt before dispatch. A lost reply requires inspection;
+the helper never repeats an uncertain operation. Foreign account changes refuse
+restoration, and the full original shadow image must match before restoration
+is reported. Seven focused Linux tests cover account preservation, invalid
+requests, concurrent changes, interrupted restoration and a real child timeout.
+These are source checks. The helper has not changed a guest credential or
+established password authentication, locked shortcut behavior or recovery.
+An actual run also needs the full VM/native/managed-artifact admission and
+observed normal GNOME password entry; administrative unlock is separate cleanup.
+
 ## Actual Settings controls
 
 Normal app launches reject every UI test request. The existing hidden
