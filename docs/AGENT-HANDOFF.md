@@ -1869,3 +1869,12 @@ Sixteen local broker cases pass; all matching candidates must qualify again.
 also acknowledges only its own native modal dialog before its parent while
 joining cleanup. The prior x64 progress proves rejection but not fixture exit;
 fresh native qualification remains required. Preview-2 drafts stay private.
+
+## October 3 native task-dialog button mapping
+
+The x64 public packaged dictation probe passes at `6b82cdf`. Its separate updater
+fixture still hangs after rejecting the wrong CPU; direct IDOK messaging did not
+complete native cleanup. [The owning record](WINDOWS-INSTALLER-DECISION.md#october-3-native-rejected-update-dialog-cleanup)
+now records the wxWidgets task-dialog OK/IDCANCEL mapping and actual-button click,
+with diagnostics retained before cleanup returns. This changes only the private
+fixture; all final matched gates remain required and drafts remain unpublished.

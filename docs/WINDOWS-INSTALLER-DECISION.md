@@ -1230,3 +1230,11 @@ while native cleanup joins the UI thread. It retains class/action observations;
 it never targets other processes or changes product update behavior. Rejection,
 private-cache integrity, native cleanup and process-exit assertions remain
 mandatory in the next x64/ARM64 run. Publication remains pending.
+
+The first native follow-up (`6b82cdf`) still hangs on x64; direct IDOK messaging
+is insufficient. [wxWidgets' native task-dialog implementation](https://github.com/wxWidgets/wxWidgets/blob/v3.2.6/src/msw/msgdlg.cpp#L677)
+can present an OK-only warning with a button internally identified as IDCANCEL.
+The fixture now finds and clicks its actual OK/Cancel button using BM_CLICK,
+retaining class/action observations before cleanup completes as well as after.
+This is an upstream-grounded correction, pending real x64/ARM64 confirmation;
+it does not relabel the earlier rejection-only observation as a completed test.

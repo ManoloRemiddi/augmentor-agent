@@ -24,7 +24,7 @@ def publish_result(destination, result):
     os.replace(pending, destination)
 
 
-def dismiss_fixture_windows(stop, observations):
+def dismiss_fixture_windows(stop, observations, destination):
     """Acknowledge only this disposable process's updater dialogs during cleanup.
 
     WinSparkle can show an OK-only modal warning after a rejected callback.
@@ -40,6 +40,7 @@ def dismiss_fixture_windows(stop, observations):
     user.IsWindowEnabled.argtypes = [wintypes.HWND]; user.IsWindowEnabled.restype = wintypes.BOOL
     user.GetClassNameW.argtypes = [wintypes.HWND,wintypes.LPWSTR,ctypes.c_int]
     user.GetClassNameW.restype = ctypes.c_int
+    user.GetDlgItem.argtypes = [wintypes.HWND,ctypes.c_int]; user.GetDlgItem.restype = wintypes.HWND
     user.PostMessageW.argtypes = [wintypes.HWND,wintypes.UINT,wintypes.WPARAM,wintypes.LPARAM]
     user.PostMessageW.restype = wintypes.BOOL
     owned = []
@@ -55,11 +56,18 @@ def dismiss_fixture_windows(stop, observations):
         owned.clear(); user.EnumWindows(callback,0)
         modal = [(window,name) for window,name in owned if name == '#32770']
         for window,name in modal or owned:
-            # OK-only native dialogs may ignore WM_CLOSE. WM_COMMAND/IDOK
-            # acknowledges them exactly as the fixture user would.
-            message, command = (0x0111,1) if name == '#32770' else (0x0010,0)
-            if user.PostMessageW(window,message,command,0):
-                observations.append({'class':name,'action':'accept' if modal else 'close'})
+            if name == '#32770':
+                # wxWidgets may expose an OK-only task dialog using IDCANCEL.
+                # Click the real OK/Cancel button instead of guessing its ID.
+                button_id = next((ident for ident in (1,2) if user.GetDlgItem(window,ident)),None)
+                button = user.GetDlgItem(window,button_id) if button_id else None
+                accepted = bool(button and user.PostMessageW(button,0x00f5,0,0))  # BM_CLICK
+                action = 'button-'+str(button_id) if accepted else 'no-button'
+            else:
+                accepted = bool(user.PostMessageW(window,0x0010,0,0))  # WM_CLOSE
+                action = 'close' if accepted else 'close-failed'
+            observations.append({'class':name,'action':action})
+        if owned: publish_result(destination,observations)
         stop.wait(.1)
 
 
@@ -125,7 +133,7 @@ def sparkle(settings):
     finally:
         publish_result(settings['progress'], result)
         stop = threading.Event(); dismissals = []
-        worker = threading.Thread(target=dismiss_fixture_windows,args=(stop,dismissals),daemon=True)
+        worker = threading.Thread(target=dismiss_fixture_windows,args=(stop,dismissals,settings['progress']+'.dialogs.json'),daemon=True)
         worker.start()
         try: function('cleanup')()
         finally:
