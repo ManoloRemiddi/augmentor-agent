@@ -1186,3 +1186,17 @@ UID 1002 inherited `/run/user/1001` (directory UID 1001, mode 0700). The workflo
 imports the fresh account's explicit runtime into its own user manager, and the
 fixture verifies and uses `/run/user/<its UID>` for actual graph observation. No
 control-server ownership guard is relaxed. New native execution is required.
+
+At `0ed4a1b`, focused native qualification passes
+[37158631483](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37158631483).
+Actual test time: 10.061 seconds. Its report confirms busy deferral, original
+socket process binding and normal exit, owned unit/registration migration,
+daemon reload, selection completion, preserved credentials/enablement and target
+service reopening. Wrong completion and changed target refuse before start;
+one-shot replay refuses afterward. Actual systemd, Node executable, socket pidfd,
+graph, files, journal and archive are exercised. The inert Node participant is
+not a real DSH/provider; connected/import/UI health remain mocked. No normal
+desktop window or background owner is reopened. Broader jobs are explicitly
+skipped in focused mode and receive no qualification claim from this result.
+The runtime-isolation correction is qualified for this fixture; production managed
+Linux eligibility, signed forward and full release qualification remain pending.

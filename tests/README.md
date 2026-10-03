@@ -878,6 +878,12 @@ explicitly simulated; actual files/journal/completion are composed. The native
 fixture is separately extended to target-service reopening with real OS/kernel
 observations, pending execution. Neither set qualifies desktop/window reopening.
 
+Native fixture at `0ed4a1b` passes focused workflow 37158631483: actual systemd/Node/
+pidfd/graph, busy deferral, normal exit, owned migration/reload/selection/archive and
+target-service reopening, with preserved synthetic credentials and enablement.
+Connected/provider/import/UI actions remain mocked. Focused mode skips broad
+build/package jobs; it does not qualify desktop windows or a signed forward update.
+
 Managed Linux updates: `test_update_linux_managed.py` covers real isolated locks,
 journals and immutable selections, compatibility before drain, changed content/
 modes/selection, live authority revocation, lifetime contention, failed health and

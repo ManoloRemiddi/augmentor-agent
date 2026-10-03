@@ -4,6 +4,18 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+Native Linux user-service qualification passes at `0ed4a1b` in
+[37158631483](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37158631483).
+The actual disposable systemd/Node/pidfd/graph proof passes busy deferral,
+original normal exit, owned registration/unit migration, daemon reload,
+selection/archival, preserved credentials/enablement and actual target-service
+reopening. Its connected/provider/import and offline UI actions remain mocked;
+desktop/background-owner/windows, signed producer/forward and real DSH health are
+not qualified. The runtime isolation fix supersedes the failures below. Focused
+mode skips broader builds/packages by design; this is not full validation. Public
+Linux eligibility stays disabled. Continue desktop ownership/reopening and full
+release qualification; keep the original cross-platform goal active.
+
 Focused native `dc0c634` fails 37157951783 before socket registration. Its diagnostic
 proves the process UID is the disposable user 1002 while inherited runtime is
 `/run/user/1001`, owned by the runner. The workflow now explicitly imports the
