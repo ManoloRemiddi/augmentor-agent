@@ -124,3 +124,13 @@ Independent hardware/users and model quality remain beta gates. The VM uses a
 consistent Nehalem CPU model: `release/vm-avx-mask-proof.c` reproduces a masked
 AVX2 load fault in QEMU 10.0.11 TCG that also crashed Qt/Breeze. The test avoids
 that emulator defect without changing Qt or the user's system.
+
+### Fedora KDE Wayland proof children
+
+[The current helper checkpoint](../release/qualification/next-targets/20261003-kde-wayland-proof-helper-correction.json)
+keeps the executor'sxcb banner environment, while the boundedkscreen-doctor
+child uses the actual Wayland session. Its own20-second timeout reaps that
+child. Native portal matching reads full compositor PID/application/id/title/
+geometry through KWin.execute; the product controller is unchanged. Eighteen
+focused proof guards pass. Earlier pre-consent timeout remains recorded and
+actual consent/input/visible Stop acceptance remains pending.

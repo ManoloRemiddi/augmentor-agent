@@ -44,6 +44,29 @@ def selected_identity(root, selected, release, installed, deployment, source, ta
     return {'root':str(root),'source':source,'target':target,'artifactSha256':selected['artifactSha256']}
 
 
+def window_observation_source():
+    """Complete compositor identities for the proof's native portal owner guard."""
+    return '''function rect(r){return {x:r.x,y:r.y,width:r.width,height:r.height}};
+function identity(w){return {id:String(w.internalId),pid:w.pid,application:w.resourceClass,title:w.caption,geometry:rect(w.frameGeometry)}};
+var w=workspace.activeWindow;var order=workspace.stackingOrder;
+callDBus(SERVICE,'/com/augmentor/Desktop','com.augmentor.Desktop','Report',TOKEN,JSON.stringify({window:w?identity(w):null,windows:order.map(identity),screens:workspace.screens.map(s=>({name:s.name,geometry:rect(s.geometry)}))}));
+'''
+
+
+def kscreen_environment(environment):
+    """The display-settings client needs the actual Wayland backend."""
+    display=environment.get('WAYLAND_DISPLAY')
+    if environment.get('XDG_SESSION_TYPE')!='wayland' or not isinstance(display,str) or not display:
+        raise ValueError('Display configuration requires a normal Wayland session/display.')
+    return {**environment,'QT_QPA_PLATFORM':'wayland'}
+
+
+def configure_scale(name,scale,environment):
+    # Bound the owned child too: an outer SSH timeout cannot reap that child.
+    subprocess.run(['kscreen-doctor','output.'+name+'.scale.'+str(scale)],
+                   env=kscreen_environment(environment),check=True,timeout=20,stdout=subprocess.DEVNULL)
+
+
 assert Path('/etc/augmentor-test-vm').read_text().startswith('Isolated Augmentor')
 if os.environ.get('AUGMENTOR_PROOF_UID') or os.environ.get('AUGMENTOR_PROOF_USER'):
     assert os.getuid()==int(os.environ['AUGMENTOR_PROOF_UID']) and os.environ.get('USER')==os.environ['AUGMENTOR_PROOF_USER']
@@ -94,7 +117,8 @@ elif action=='rpc':
 elif action in ('scene','windows'):
     from gi.repository import Gio
     from kwin import KWin
-    print(json.dumps(KWin(Gio.bus_get_sync(Gio.BusType.SESSION,None)).read(windows=action=='windows')))
+    kwin=KWin(Gio.bus_get_sync(Gio.BusType.SESSION,None))
+    print(json.dumps(kwin.execute(window_observation_source()) if action=='windows' else kwin.read()))
 elif action=='portal-owner':
     from gi.repository import Gio,GLib
     bus=Gio.bus_get_sync(Gio.BusType.SESSION,None)
@@ -176,6 +200,6 @@ elif action=='scale':
     from gi.repository import Gio
     from kwin import KWin
     scene=KWin(Gio.bus_get_sync(Gio.BusType.SESSION,None)).read();assert len(scene['screens'])==1
-    subprocess.run(['kscreen-doctor','output.'+scene['screens'][0]['name']+'.scale.'+str(scale)],check=True,stdout=subprocess.DEVNULL)
+    configure_scale(scene['screens'][0]['name'],scale,os.environ)
     print(json.dumps({'scale':scale}))
 else:raise RuntimeError('Unknown VM proof operation')

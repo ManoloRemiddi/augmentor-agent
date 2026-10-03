@@ -9,6 +9,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import Mock
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -19,7 +20,7 @@ def functions(path,names):
     tree=ast.parse(path.read_text())
     selected=[node for node in tree.body if isinstance(node,ast.FunctionDef) and node.name in names]
     assert {node.name for node in selected}==set(names)
-    namespace={'Path':Path,'json':json,'hashlib':hashlib}
+    namespace={'Path':Path,'json':json,'hashlib':hashlib,'subprocess':subprocess}
     exec(compile(ast.Module(body=selected,type_ignores=[]),str(path),'exec'),namespace)
     return namespace
 
@@ -159,6 +160,50 @@ class ObservedConsent(unittest.TestCase):
         self.assertEqual(result.returncode,2);self.assertIn('screenshot-bound',result.stderr)
         result=subprocess.run([*command,'--observe-consent','--guest-user','augmentor-complete-proof','--guest-uid','1000'],text=True,capture_output=True,timeout=10)
         self.assertEqual(result.returncode,2);self.assertIn('account/UID pair',result.stderr)
+
+
+class NativeProofHelpers(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.code=functions(ROOT/'release/vm-desktop-session.py',('window_observation_source','kscreen_environment','configure_scale'))
+
+    def test_compositor_projection_preserves_owner_and_focused_identity(self):
+        source=self.code['window_observation_source']()
+        driver='''const vm=require('node:vm');let result;
+const portal={internalId:'portal-id',pid:4321,resourceClass:'native-portal',caption:'Actual consent',frameGeometry:{x:5,y:10,width:390,height:240}};
+const other={...portal,internalId:'editor-id',pid:5678,resourceClass:'editor'};
+const context={SERVICE:'synthetic-proof',TOKEN:'synthetic-token',workspace:{activeWindow:portal,stackingOrder:[other,portal],screens:[{name:'Virtual-1',geometry:{x:0,y:0,width:1280,height:800}}]},callDBus:(...args)=>{if(args[0]!=='synthetic-proof'||args[4]!=='synthetic-token')throw Error('report identity differs');result=JSON.parse(args[5]);}};
+vm.runInNewContext(SOURCE,context);console.log(JSON.stringify(result));'''.replace('SOURCE',json.dumps(source))
+        result=subprocess.run(['node','-e',driver],capture_output=True,text=True,check=True,timeout=10)
+        projection=json.loads(result.stdout)
+        self.assertEqual(projection['window'],projection['windows'][1])
+        self.assertEqual([(w['id'],w['pid'],w['application']) for w in projection['windows']],
+                         [('editor-id',5678,'editor'),('portal-id',4321,'native-portal')])
+        select=functions(ROOT/'scripts/vm-desktop-proof.py',('portal_dialog',))['portal_dialog']
+        self.assertEqual(select(projection,4321),projection['window'])
+        self.assertIsNone(select(projection,5678))
+
+    def test_wayland_display_child_changes_only_its_backend(self):
+        original={'XDG_SESSION_TYPE':'wayland','WAYLAND_DISPLAY':'wayland-0','QT_QPA_PLATFORM':'xcb','DISPLAY':':1'}
+        child=self.code['kscreen_environment'](original)
+        self.assertEqual(original['QT_QPA_PLATFORM'],'xcb')
+        self.assertEqual(child,{**original,'QT_QPA_PLATFORM':'wayland'})
+        for values in ({},dict(original,XDG_SESSION_TYPE='x11'),dict(original,WAYLAND_DISPLAY='')):
+            with self.assertRaisesRegex(ValueError,'Wayland session/display'):self.code['kscreen_environment'](values)
+
+    def test_scale_child_has_its_own_bound_and_preserves_timeout(self):
+        class DisplayChild:
+            DEVNULL=subprocess.DEVNULL
+            run=Mock(side_effect=subprocess.TimeoutExpired(['kscreen-doctor'],20))
+        self.code['configure_scale'].__globals__['subprocess']=DisplayChild
+        try:
+            with self.assertRaises(subprocess.TimeoutExpired):
+                self.code['configure_scale']('Virtual-1',1.0,{'XDG_SESSION_TYPE':'wayland','WAYLAND_DISPLAY':'wayland-0'})
+            args,kwargs=DisplayChild.run.call_args
+            self.assertEqual(args[0],['kscreen-doctor','output.Virtual-1.scale.1.0'])
+            self.assertEqual(kwargs['timeout'],20);self.assertTrue(kwargs['check'])
+            self.assertEqual(kwargs['env']['QT_QPA_PLATFORM'],'wayland')
+        finally:self.code['configure_scale'].__globals__['subprocess']=subprocess
 
 
 if __name__=='__main__':unittest.main()

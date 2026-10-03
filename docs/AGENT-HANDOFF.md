@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 Fedora KDE proof child correction
+
+[The helper correction checkpoint](../release/qualification/next-targets/20261003-kde-wayland-proof-helper-correction.json)
+retains the current2035 selected/native Fedora KDE observe-only failure before
+consent: its display child inheritedxcb and exceeded the120-second SSH bound.
+The normal Wayland query returns in0.276seconds. Only the display-settings child
+now uses Wayland with its own20-second bound; the executor remainsxcb. Proof
+window observations include compositor-authenticated PID/application metadata
+needed for the native portal owner/focus guard. Eighteen focused cases pass.
+Exact owned orphan cleanup is verified separately; consent/input/Stop remain
+open. Product controller and selected payload are unchanged.
+
+
 ## October 3 actual Ubuntu Settings acceptance and disabled GNOME candidate
 
 [The actual Settings checkpoint](../release/qualification/next-targets/20261003-noble-actual-settings-pass.json)

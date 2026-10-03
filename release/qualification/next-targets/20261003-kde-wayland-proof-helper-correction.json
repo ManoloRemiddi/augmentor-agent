@@ -1,0 +1,44 @@
+{
+  "format": "augmentor-linux-qualification-checkpoint/1",
+  "date": "2026-10-03",
+  "scope": "Owned Fedora44 KDE6.7.5 Wayland fresh account; proof-helper correction before consent",
+  "productSource": "2035af99b46bb013e81de9766216da820ab4a325",
+  "selectedArtifactSha256": "74b1dd63f4be9c2df88c764bca4dabcd7aebfcd31967c69f13f59607c274eeaf",
+  "security": "SELinux Enforcing",
+  "historicalFailure": {
+    "proofSource": "1c8410c1be1f1e884a3bfef8634bdf01f155a4d8",
+    "exitCode": 1,
+    "operation": "scale 1",
+    "sshTimeoutSeconds": 120,
+    "consentReached": false,
+    "portalGrantPerformed": false,
+    "cause": "Helper globally selected xcb; kscreen-doctor with xcb blocked while normal Wayland -j returned successfully",
+    "nativeWaylandQuerySeconds": 0.276,
+    "nativeDefaultQuerySeconds": 0.327,
+    "x11DiagnosticTimeoutSeconds": 15,
+    "orphanCleanup": "Exact owned kscreen-doctor PID/start/UID/executable/argv verified and SIGTERM only; before/after retained"
+  },
+  "correction": {
+    "kscreenChildBackend": "wayland",
+    "childTimeoutSeconds": 20,
+    "executorBackend": "xcb",
+    "windowObservation": "Complete compositor-authenticated PID/application/id/title/geometry through unmodified KWin.execute",
+    "productControllerChanged": false,
+    "files": {
+      "release/vm-desktop-session.py": "442be4dae0e8dd506e06f987636863c6015fd59ebc859e72d52e39fac4d1997f",
+      "tests/test_kde_vm_proof_guards.py": "af95ded33af9779556e8cd27a8b271d3f34b7274583fee06ca346995e63b3ca4"
+    }
+  },
+  "validation": {
+    "focusedGuardCases": 18,
+    "rootIndependentlyRepeated": true,
+    "includesRealNodeSyntheticProjection": true
+  },
+  "limits": {
+    "actualConsentTested": false,
+    "actualInputTested": false,
+    "visibleStopTested": false,
+    "selectedPayloadModified": false,
+    "binaryRelease": false
+  }
+}
