@@ -21,9 +21,13 @@ identities. Debian/Mac/Windows builders now stamp reviewed build/component
 identities and public trust inputs; these newer packaging changes require fresh
 native CI. Native Windows desktop checks also pass `8d7f500`; Mac native updater
 tests pass, but packaging at that head caught a source-record variable collision
-being corrected in both Mac/Windows builders. The shared coordinator now has
-explicit final-authority hooks (89 focused Python cases, one OS skip), still
-requiring the production guard and external apply composition. Mac companion
+corrected in both Mac/Windows builders at `97837de`; macOS 14/26 bundled-runtime,
+Windows Desktop x64/ARM64 and shared validation pass that head. The shared
+coordinator has explicit final-authority hooks. Its independent live guard now
+requires qualified source, fresh publisher verification, live consent/selection
+and retained exact downloads, with bounded shared helper transport. External
+apply/target-observer composition and fresh native qualification of these additions
+remain required. Mac companion
 selection cannot receive a desktop bundle. Root
 rotation/CI custody, public feed provisioning, external installation adapters,
 final consent/revocation and N-to-N+1 health/recovery remain open. Do not narrow the goal to

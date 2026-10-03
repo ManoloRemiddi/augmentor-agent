@@ -9,7 +9,6 @@ from pathlib import Path
 import random
 import shutil
 import secrets
-import subprocess
 import sys
 import threading
 import time
@@ -353,67 +352,17 @@ class UpdateManager:
             temporary.unlink(missing_ok=True)
 
     def run_helper(self, request):
-        cache = require_directory(private_directory(self.base / 'repository'))
-        node = self.node_executable()
-        environment = {k: v for k, v in os.environ.items() if not k.upper().startswith('NODE_')}
-        flags = {'creationflags': subprocess.CREATE_NO_WINDOW} if sys.platform == 'win32' else {}
-        process = subprocess.Popen([str(node), str(self.root / 'services/updates/repository.mjs')],
-            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=environment, **flags)
-        with self.lock:
-            self.process = process
-        def progress():
-            for line in iter(process.stderr.readline, b''):
-                if len(line) > 256: continue
-                try: data = json.loads(line)
-                except ValueError: continue
-                if type(data.get('bytes')) is int and 0 <= data['bytes'] <= MAX_ARTIFACT:
-                    with self.lock: self.state['bytesDownloaded'] = data['bytes']
-        observer = threading.Thread(target=progress, name='augmentor-update-progress', daemon=True); observer.start()
-        reply = bytearray()
-        oversized = threading.Event()
-        def read_reply():
-            while chunk := process.stdout.read(8192):
-                if len(reply) + len(chunk) > 2 * 1024**2:
-                    oversized.set(); process.terminate(); return
-                reply.extend(chunk)
-        reader = threading.Thread(target=read_reply, name='augmentor-update-reply', daemon=True); reader.start()
-        try:
-            process.stdin.write(json.dumps({**request, 'cache': str(cache)}).encode()); process.stdin.close()
-            deadline = time.monotonic() + (1800 if request['operation'] == 'download' else 120)
-            while process.poll() is None:
-                if self.cancelled.wait(.05) or self.stopping.is_set():
-                    process.terminate(); raise InterruptedError('Update operation cancelled.')
-                if time.monotonic() >= deadline:
-                    process.terminate(); raise TimeoutError('The update server did not respond in time.')
-            reader.join(timeout=3)
-            if reader.is_alive() or oversized.is_set(): raise ValueError('Update reply exceeds its supported size.')
-            result = json.loads(reply)
-            if process.returncode or result.get('error'):
-                raise ValueError(result.get('error', 'The update helper failed.'))
-            return result
-        finally:
-            if process.poll() is None:
-                process.terminate()
-            try: process.wait(timeout=3)
-            except subprocess.TimeoutExpired:
-                process.kill(); process.wait(timeout=3)
-            observer.join(timeout=3)
-            reader.join(timeout=3)
-            for stream in (process.stdout, process.stderr): stream.close()
+        from .client import repository_request
+        def observed(process):
+            with self.lock:self.process=process
+        def progress(bytes_):
+            with self.lock:self.state['bytesDownloaded']=bytes_
+        return repository_request(self.root,self.base/'repository',request,node=self.node_executable(),
+            cancelled=self.cancelled,progress=progress,observed=observed)
 
     def node_executable(self):
-        selected = os.environ.get('AUGMENTOR_PI_NODE')
-        if selected:
-            candidate = Path(selected)
-            if not candidate.is_absolute() or not candidate.is_file():
-                raise ValueError('The selected update runtime is unavailable.')
-            return candidate
-        for candidate in (self.root / 'node/bin/node', self.root / 'node/node.exe'):
-            if candidate.is_file(): return candidate
-        if self.current['installType'] in ('development', 'managed-linux'):
-            candidate = shutil.which('node')
-            if candidate: return Path(candidate).resolve()
-        raise ValueError('The bundled update runtime is unavailable. Repair the installed application.')
+        from .client import node_executable
+        return node_executable(self.root,development=self.current['installType'] in ('development','managed-linux'))
 
     def start_scheduler(self):
         if self.scheduler: return

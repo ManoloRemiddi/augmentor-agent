@@ -139,12 +139,28 @@ authority or an exception cannot send APPLY. Before shutdown, live reservation
 cleanup preserves work. After shutdown, the original drained record remains for
 independent source inspection/recovery and cannot be replayed. Fixed-artifact
 legacy qualification callers can omit this hook; omission does not establish
-publisher authority for a downloaded artifact. The production guard and external
-installer entrypoints remain to be composed; this hook alone enables no installation.
-The updated focused Python suite passes 89 cases (88 passed, one explicit OS skip),
-including changed pre-drain consent, failed final freshness after installer
-readiness, no APPLY/intent on refusal, preserved work/journals and strict guard
-results. This is source fault-ordering evidence, not an installed upgrade proof.
+publisher authority for a downloaded artifact.
+
+`AutomaticInstallAuthority` is now the independent coordinator's live guard.
+It requires a qualified installed receipt, current download/install consent,
+the exact selected release and complete verified downloads. Each apply boundary
+refreshes the authenticated catalog through the installed bundled Node runtime
+with a 30-second deadline, sharing the service's retained TUF cache/rollback floor.
+It rereads consent and installed identity after the refresh. Removed, withdrawn,
+changed or unavailable publisher authority refuses apply. Artifact descriptors
+remain held: Windows denies writers/deletion; POSIX additionally rehashes the exact
+signed length at each boundary because file timestamps alone cannot prove unchanged
+bytes. A closed guard cannot be replayed.
+
+The service and guard share `services/updates/client.py`: fixed helper location,
+bounded request/reply/progress and deadline (including blocked request writes),
+removed Node preload environment and cancellation of only the owned child.
+The installation guard ignores runtime environment overrides. External installer
+entrypoints still need to compose this guard with independently verified source,
+admission/drain, actual apply and independent health/recovery. No current receipt
+enables automatic installation. Synthetic catalog-reader tests establish guard
+ordering/refusal, not public-feed or installed upgrade acceptance; the separate
+Node suite exercises real publisher/client cryptography and transfers.
 
 A private exclusive publisher lock and durable pending claim prevent simultaneous
 or uncertain publication from reusing a role version. A permanent private artifact
@@ -241,6 +257,19 @@ Mac updater/publisher tests pass that head, but its bundle staging caught a
 source-record variable overwritten by an existing archive stream. Both Mac and
 Windows stage builders now use a distinct receipt-source name; native packaging
 is being rerun. No successful bundle is inferred from the passing source tests.
+The corrected builders at `97837de` pass both macOS 14/26 bundled-runtime jobs in
+[37112770195](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37112770195)
+and both native Windows Desktop CPU jobs in
+[37112769924](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37112769924).
+[Shared validation](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37112770204)
+also passes that head. These results precede the independent client/guard additions;
+fresh native checks remain required for those additions.
+The client/guard source checkpoint passes 98 focused Python cases (97 passed,
+one OS skip), full Python/Qt 863 cases (824 passed, 39 explicit OS/integration
+skips), full JavaScript 521 cases (519 passed, two explicit skips), and build/type
+checks. Tests use explicitly isolated dictation state. The 19 real Node
+publisher/client cases are included in the full JavaScript result. Native checks
+for this new source checkpoint remain pending.
 The later Linux source verification snapshot passes 521 JavaScript cases
 (519 passed, two explicit skips) and 850 Python/Qt cases (811 passed, 39 explicit
 OS/integration skips), plus source build/type checks. Subsequent isolated packaging

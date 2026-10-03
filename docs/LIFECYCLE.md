@@ -610,7 +610,11 @@ grant apply. Existing fixed-artifact qualification callers omit the optional
 hook; that does not authenticate downloaded releases. Post-drain failure preserves
 the journal for independent inspection without command replay. See
 [shared updater integration](UPDATE-SYSTEM.md#installation-authority-integration-in-progress)
-for implementation scope and the still-unwired production guard/adapters.
+for implementation scope. Its live `AutomaticInstallAuthority` guard now refreshes
+publisher verification, rereads current consent/source and retains/rechecks exact
+downloads. Production OS entrypoints and independent target completion still need
+to compose that guard with the existing preparation/apply adapters; no current
+installed receipt qualifies automatic installation.
 
 Update journals now support independent completion after the caller has observed
 installer exit, reverified the release pair/installed selection and passed a local
