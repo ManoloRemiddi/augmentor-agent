@@ -1,0 +1,79 @@
+{
+  "format": "augmentor-linux-rollout-checkpoint/1",
+  "date": "2026-10-03",
+  "target": "opensuse-leap16.0-x86_64",
+  "scope": "Owned booted GNOME Wayland VM; actual Chromium154 native Wayland; deterministic local Pi fixture",
+  "installedArtifactSource": "423f0714d1782ef105a5906b3fe6c6efb4573fe0",
+  "baseProofSource": "3688a095ffa4221e8ea919c331e6eff6d35cb25d",
+  "installedPayloadOverlayUsed": false,
+  "privateDiagnostic123": {
+    "exitCode": 0,
+    "difference": "One observed owned virtual-tablet Copy click before all unchanged public CDP actions and assertions; bounded private pause only",
+    "proofSha256": "30a66b10033585b277dcb86f8662596f6e00d7a7993077dd9d11309e844658bf",
+    "commandReceipt": {
+      "bytes": 228,
+      "sha256": "8943255f8c33abcd563d697fb12c3c973b27c81352b5fcbe00ab7c0b4eb44492"
+    },
+    "inputReceipt": {
+      "bytes": 221,
+      "sha256": "ca5ae8b78382c7725a8c6132f2f9da7ab4ebfb7b1a328f6bafd7d66c4695c9ea"
+    },
+    "resultReceipt": {
+      "bytes": 6141,
+      "sha256": "0f4941a8343f77208f2fdd510cfa494ba04827f262c683eb85e83774782ba1fc"
+    },
+    "actualUiVisuallyInspected": true,
+    "assertions": {
+      "navigateSnapshotTypeClick": true,
+      "actualPageResultVerified": true,
+      "copyClipboardAndScroll": true,
+      "reconnectWithoutReplay": true,
+      "branchToolContext": true,
+      "editResubmitsOnce": true,
+      "sharedPromptsConflictAndClipboard": true,
+      "supportReportDownloadedAndPrivate": true
+    },
+    "xDisplayRemoved": true,
+    "nativeCompositorSocketVerified": true,
+    "normalBrowserSandbox": true,
+    "actualRendererCount": 6,
+    "allRenderersSeccomp2NoNewPrivs1DistinctPidNetNamespaces": true,
+    "modelRequests": 8,
+    "reconnectBudgetSeconds": 90,
+    "reconnectElapsedSeconds": 57.09563322000031
+  },
+  "upstreamEvidence": {
+    "chromiumExactSource": "https://raw.githubusercontent.com/chromium/chromium/154.0.8037.57/ui/ozone/platform/wayland/host/wayland_clipboard.cc",
+    "protocol": "https://wayland.freedesktop.org/docs/html/apa.html",
+    "interpretation": "Selection publication requires a compositor input serial; observed physical input resolves this fixture failure, but diagnostic evidence does not certify all desktops or permissions"
+  },
+  "maintainedProofChange": {
+    "optionalBoundedObservationPauseSeconds": [
+      0,
+      30,
+      60
+    ],
+    "allowedOnlyHeadedNormalSandboxWayland": true,
+    "assertionsUnchanged": true,
+    "pauseAloneClaimsPhysicalInput": false,
+    "freshSourceBoundMaintainedRunPending": true
+  },
+  "historicalFailuresRetained": [
+    "CDP-only native Wayland clipboard114",
+    "physical Copy confirmation tick diagnostic122",
+    "30-second reconnect105/107",
+    "diagnostic108 SSH stdout hang"
+  ],
+  "remaining": [
+    "Fresh maintained public driver plus external input receipt",
+    "DSH Browser and fresh shared onboarding",
+    "Other distro graphical acceptance",
+    "Physical audio",
+    "Product-version/managed history upgrades and rollback",
+    "Coherent native dependency maintenance",
+    "Source/rebuild/replacement/license obligations"
+  ],
+  "candidateOnly": true,
+  "publicRelease": false,
+  "allFiveRolloutPointsComplete": false
+}

@@ -1,6 +1,29 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
 
+## October 3 native Wayland real-input Browser diagnostic
+
+[The real-input checkpoint](../release/qualification/next-targets/20261003-native-wayland-browser-real-input-diagnostic.json)
+records an observed Copy button click through the owned VM tablet before the
+unchanged public Browser actions/assertions. Native Wayland then passes the full
+Pi fixture with command exit0: OS clipboard/scroll, page actions, branch/edit,
+prompt conflicts/clipboard expansion, private report and recovery without replay.
+X fallback stays removed, six renderers retain sandbox isolation, exactly8 fixture
+model requests occur and recovery takes57.10seconds under the90-second VM budget.
+The installed artifact remains clean423; the private diagnostic is based on
+clean368 and changes only a bounded input pause. This is diagnostic scope; fresh
+maintained proof acceptance is still required. Earlier114/122 failures are retained.
+
+The maintained Browser proof now offers an explicit30/60-second native Wayland
+observation pause, restricted to headed normal-sandbox runs. It records its exact
+run/source and never treats the pause as evidence of physical input. External
+observed input must be retained separately; all real OS clipboard assertions stay
+unchanged. No product permission/input path changes. Mint native install/audit
+passes but complete setup currently fails its60-second DSH readiness bound;
+independent prepared source-Qt inventory/import/QML/23-library closure passes,
+without adopting a Desktop selection or retrying uncertain setup.
+
+
 ## October 3 installed XWayland Browser and matching clean artifacts
 
 [The current checkpoint](../release/qualification/next-targets/20261003-installed-browser-xwayland-and-clean-artifacts.json)

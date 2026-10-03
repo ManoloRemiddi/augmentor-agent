@@ -52,6 +52,10 @@ class Model(http.server.BaseHTTPRequestHandler):
 server=http.server.ThreadingHTTPServer(('127.0.0.1',0),Model);threading.Thread(target=server.serve_forever,daemon=True).start()
 env={**os.environ,'XDG_CONFIG_HOME':str(temp/'xdg'),'AUGMENTOR_PI_CONFIG':str(temp/'pi-config'),'AUGMENTOR_PI_STATE':str(temp/'pi-state'),'AUGMENTOR_SHARED_DATA':str(temp/'shared-data'),'AUGMENTOR_SHARED_STATE':str(temp/'shared-state')}
 ozone_platform=os.environ.get('AUGMENTOR_PROOF_OZONE_PLATFORM','x11')
+wayland_input_wait=os.environ.get('AUGMENTOR_PROOF_WAYLAND_INPUT_SECONDS','0')
+assert wayland_input_wait in ('0','30','60'), 'Use only the bounded Wayland input observation pause.'
+if wayland_input_wait!='0':
+    assert ozone_platform=='wayland' and os.environ.get('AUGMENTOR_PROOF_NORMAL_SANDBOX')=='1' and os.environ.get('AUGMENTOR_PROOF_HEADED')
 display_evidence=None
 if sys.platform=='linux':
     from proof_browser_sandbox import display_environment
@@ -262,6 +266,18 @@ try:
             selector='.msgaction' if expected.startswith('Test') else '.msgactions:last-child button[aria-label="Copy"]'
         evaluate('document.querySelector('+json.dumps(selector)+').scrollIntoView({block:"center"})',panel)
         before=evaluate('document.querySelector("#log").scrollTop',panel)
+        if expected.startswith('Test') and wayland_input_wait!='0':
+            # CDP mouse events may not establish the compositor's physical input
+            # serial. Allow observed ordinary desktop/owned-VM input before the
+            # same Copy actions and real OS assertions. A pause is not evidence
+            # that input occurred; retain the external observation separately.
+            (root/'outputs').mkdir(exist_ok=True)
+            (root/'outputs/browser-wayland-input-ready.json').write_text(json.dumps({
+                'chromePid':chrome.pid,'isolatedState':str(temp),'selector':selector,
+                'waitSeconds':int(wayland_input_wait),
+                'proofSha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+                'viewport':evaluate('({width:innerWidth,height:innerHeight})',panel)},indent=2)+'\n')
+            time.sleep(int(wayland_input_wait))
         click(selector,False)
         until(lambda:evaluate('!!document.querySelector("button.copied")',panel))
         if os.environ.get('AUGMENTOR_PROOF_HEADED'):
@@ -407,7 +423,7 @@ try:
         sandbox_evidence=prove_sandbox(cdp,sandbox_evaluate,chrome.pid,temp/'profile',os.environ.get('AUGMENTOR_PROOF_SANDBOX_SUDO_PROC')=='1')
     shot=cdp('Page.captureScreenshot' ,{},panel)['data'];(root/'outputs').mkdir(exist_ok=True);(root/'outputs/browser-composable.png').write_bytes(base64.b64decode(shot))
     proof={'engine':'real Pi SDK','model':'deterministic local fixture','browser':info['Browser'],'navigateSnapshotTypeClick':True,'actualPageResultVerified':True,'dshRealLocalModelBrowser':dsh_verified,'copyClipboardAndScroll':True,'reconnectWithoutReplay':True,'branchToolContext':True,'editResubmitsOnce':True,'sharedPromptsConflictAndClipboard':True,'memory':memory_verified,'appRoot':str(app_root),'extensionRoot':str(extension),'supportReportDownloadedAndPrivate':True,'promptRefreshDuringClick':bool(os.environ.get('AUGMENTOR_PROOF_PROMPT_REFRESH')),'freshBrowserSetup':bool(os.environ.get('AUGMENTOR_PROOF_FRESH')),'setupRequests':len(setup_requests),'modelRequests':len(requests),'isolatedState':str(temp)}
-    proof.update(normalLinuxSandboxRequested=normal_sandbox,linuxBrowserFlags=linux_flags,rendererSandbox=sandbox_evidence,displayBackend=display_evidence,reconnectBudgetSeconds=reconnect_budget,reconnectElapsedSeconds=reconnect_elapsed)
+    proof.update(normalLinuxSandboxRequested=normal_sandbox,linuxBrowserFlags=linux_flags,rendererSandbox=sandbox_evidence,displayBackend=display_evidence,reconnectBudgetSeconds=reconnect_budget,reconnectElapsedSeconds=reconnect_elapsed,waylandInputObservationPauseSeconds=int(wayland_input_wait))
     (root/'outputs/browser-composable-proof.json').write_text(json.dumps(proof,indent=2));print(json.dumps(proof),flush=True)
 finally:
     if os.environ.get('AUGMENTOR_PROOF_ONBOARDING'):

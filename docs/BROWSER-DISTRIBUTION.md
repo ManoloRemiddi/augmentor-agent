@@ -101,6 +101,25 @@ uses compositor input serials when setting a selection; whether that explains
 all behavior remains under investigation. Public qualification scripts never
 infer a passing clipboard result from a UI tick alone.
 
+### Native Wayland observed input
+
+[The real-input diagnostic](../release/qualification/next-targets/20261003-native-wayland-browser-real-input-diagnostic.json)
+passes the unchanged public assertions after one observed virtual-tablet Copy
+click: normal native Wayland command exit0, six sandboxed renderers, exactly8
+fixture model requests and57.10-second recovery without replay. This private
+pause diagnostic does not replace fresh source-bound maintained qualification.
+
+`AUGMENTOR_PROOF_WAYLAND_INPUT_SECONDS=30` or `60` requests a bounded pause before
+the first Copy action, only in headed normal-sandbox Wayland mode. The proof
+writes `outputs/browser-wayland-input-ready.json` with the exact proof hash,
+fixture identity, browser PID and viewport. An external observer can verify the
+current UI and use ordinary input or the dedicated VM's guarded virtual tablet.
+Retain that screenshot/input receipt separately; the pause itself does not
+prove input occurred. All subsequent real clipboard and behavior assertions
+remain unchanged. Default0 is unchanged. Never use owner hardware or assume a
+stale ready file belongs to the current run: match PID, fixture and proof hash.
+The explicit pause is test instrumentation, not a product permission setting.
+
 ### Explicit native Wayland qualification
 
 `AUGMENTOR_PROOF_OZONE_PLATFORM=wayland` requires a headed ordinary-user normal
