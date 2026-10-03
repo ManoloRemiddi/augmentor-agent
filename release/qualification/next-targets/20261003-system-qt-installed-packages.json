@@ -1,0 +1,957 @@
+{
+  "format": "augmentor-system-qt-installed-package-qualification/1",
+  "date": "2026-10-03",
+  "inputApplicationSource": "536fc7561a7b81ab90e806925652e446f438050a",
+  "packagingSource": "4012ee65039155c29ddd8acedcbd5da5f97279a9",
+  "proofSource": "Working independently authored public probes; their exact hashes are in each report.",
+  "targets": {
+    "arch": {
+      "format": "augmentor-system-qt-installed-package-proof/1",
+      "target": "arch20261001-x86_64",
+      "package": {
+        "name": "augmentor-agent",
+        "versionRelease": "0.2.13-1",
+        "architecture": "x86_64"
+      },
+      "source": {
+        "commit": "536fc7561a7b81ab90e806925652e446f438050a",
+        "dirty": false
+      },
+      "artifactSha256": "0ebabc58503b650a84b8791c0957dd4e25e7d01e1fae57670d365c5bd8a63abb",
+      "artifactBytes": 368599211,
+      "receiptSha256": "44d5f5fa5b9cf173e24160fcf47ea62f5e8da9f19d449128211932032761b9d9",
+      "appInventoryMembers": 29244,
+      "runtimeReceiptSha256": "d5b2f6248fae075056b12f5aac026c850e7013af5dc854ee1c86a08e25f3abc1",
+      "runtimeArtifactSha256": "cb9a60f8846b6f4bce51dc1135662d29494a522692d15b2cb1c2cf8c88a747e8",
+      "systemQtStack": {
+        "format": "augmentor-system-qt-stack-contract/1",
+        "file": "system-qt-inventory.json",
+        "sha256": "05d28a3a15c20ce8fb4734f204f01414c19f28b52bbf7951a54056f6c417a007",
+        "bytes": 1584771,
+        "qtVersion": "6.11.2",
+        "packageManager": "pacman"
+      },
+      "proofSha256": "478ca82d031c03d4456ba1fa71a7c33f5acde79850a292ae90984eb2e7dcf455",
+      "independentGuardSha256": "4bb8a18a41e68a98c5f7816940f8e55bfa2f1a66e5d34ca42cfcb4155c7a9947",
+      "outcomes": {
+        "runtimeBusyReplace": {
+          "exitCode": 1,
+          "stdoutSha256": "ed544facc40a4701d38237ef26ad1568e882b88c93bb82d44746b1ecdaf3475c",
+          "stderrSha256": "a7b0824bd41928b93cc21787bf228e39ce50ab0cc9a46e3b2c44b246a20bc87d"
+        },
+        "runtimeBusyRemove": {
+          "exitCode": 1,
+          "stdoutSha256": "eed481eddb86907aa4f28881719d341aa08226f3fd698fa7f23180c094c7bc3d",
+          "stderrSha256": "b40dbecd927c360a86bd10296318d0db2aae91551790556624a17bfae7ece954"
+        },
+        "desktopBusyReplace": {
+          "exitCode": 1,
+          "stdoutSha256": "ed544facc40a4701d38237ef26ad1568e882b88c93bb82d44746b1ecdaf3475c",
+          "stderrSha256": "a7b0824bd41928b93cc21787bf228e39ce50ab0cc9a46e3b2c44b246a20bc87d"
+        },
+        "desktopBusyRemove": {
+          "exitCode": 1,
+          "stdoutSha256": "eed481eddb86907aa4f28881719d341aa08226f3fd698fa7f23180c094c7bc3d",
+          "stderrSha256": "b40dbecd927c360a86bd10296318d0db2aae91551790556624a17bfae7ece954"
+        },
+        "idleSameArtifactReinstall": {
+          "exitCode": 0,
+          "stdoutSha256": "e7ddf695c753cdeb14839f7791202f6184e7d4f76148dceb77d1e8db9cc7d3f2",
+          "stderrSha256": "d94095526235b31a36be9d9c4f209e9221420349230fa3ca13e10cb8ce6614f2"
+        },
+        "nativeAuditAfterReinstall": {
+          "exitCode": 0,
+          "stdoutSha256": "b0ffae6b44b230c8d422b27bd1946ce0b5ecb338ad55d8e3910dee21112f7e1a",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "idleRemove": {
+          "exitCode": 0,
+          "stdoutSha256": "29177e441593673c3027a1342ee4f1777ee782e8511f13a78a781e54e62f3451",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "reinstallAfterRemoval": {
+          "exitCode": 0,
+          "stdoutSha256": "677cee3f6e1b6b2421e1a7cac1c924a94105aa58472b2459a30c0032084867c2",
+          "stderrSha256": "710e617dd522bb657fb2d3c36001db3cdf394bcabfbc5899a2961cfafb8e60a5"
+        },
+        "finalNativeAudit": {
+          "exitCode": 0,
+          "stdoutSha256": "b0ffae6b44b230c8d422b27bd1946ce0b5ecb338ad55d8e3910dee21112f7e1a",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "coldNativeRender": {
+          "exitCode": 0,
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "offline": true,
+      "realNativePreviewLease": true,
+      "realBundledNodeLease": true,
+      "pendingAbsent": true,
+      "completeApplicationInventoryPassed": true,
+      "nativePackageAuditPassed": true,
+      "syntheticUserSentinelPreserved": true,
+      "immutableRuntimeReceiptPreserved": true,
+      "versionUpgradeTested": false,
+      "rollbackTested": false,
+      "completeInstallerTested": false,
+      "realDesktopSessionTested": false,
+      "graphicalBrowserTested": false,
+      "physicalAudioTested": false,
+      "liveInputPermissionTested": false,
+      "licenseReviewComplete": false,
+      "embeddedSourceCoverageComplete": false,
+      "publicReleaseQualified": false,
+      "ownerStateChanged": false,
+      "fixture": {
+        "containerId": "034565e3788413c88edb501e967e0fcdf3c2502a944d3ff90bba977e9037e89d",
+        "image": "sha256:31986996e159cc8d10eb32000196ce468ba5b961253e8df14037483a9c8bdca1",
+        "networks": {},
+        "mounts": [],
+        "devices": [],
+        "privileged": false
+      },
+      "fontProof": {
+        "format": "augmentor-linux-surface-font-proof/1",
+        "uid": 1002,
+        "qtVersion": "6.11.2",
+        "designSha256": "084a183cca4d930343120031a0eedae14926e39391ea3f4b0037973b400b4afe",
+        "probeSha256": "ac06d6f818f37904618ca6d2a4bb768f49153770ab609e0f27b9d147508334bd",
+        "primaryFamily": "DejaVu Sans",
+        "primaryStyle": "Book",
+        "pixelSize": 15,
+        "glyphs": {
+          "newchat": {
+            "text": "\uff0b",
+            "codepoints": [
+              "U+FF0B"
+            ],
+            "primaryIndexes": [
+              0
+            ],
+            "runs": [
+              {
+                "family": "Noto Sans CJK KR",
+                "style": "Regular",
+                "indexes": [
+                  59057
+                ]
+              }
+            ],
+            "present": true,
+            "advance": 15.0,
+            "iconWidth": 24
+          },
+          "save": {
+            "text": "\u2606",
+            "codepoints": [
+              "U+2606"
+            ],
+            "primaryIndexes": [
+              3806
+            ],
+            "runs": [
+              {
+                "family": "DejaVu Sans",
+                "style": "Book",
+                "indexes": [
+                  3806
+                ]
+              }
+            ],
+            "present": true,
+            "advance": 13.4375,
+            "iconWidth": 24
+          },
+          "saved": {
+            "text": "\u2605",
+            "codepoints": [
+              "U+2605"
+            ],
+            "primaryIndexes": [
+              3805
+            ],
+            "runs": [
+              {
+                "family": "DejaVu Sans",
+                "style": "Book",
+                "indexes": [
+                  3805
+                ]
+              }
+            ],
+            "present": true,
+            "advance": 13.4375,
+            "iconWidth": 24
+          },
+          "sessions": {
+            "text": "\u2630",
+            "codepoints": [
+              "U+2630"
+            ],
+            "primaryIndexes": [
+              3848
+            ],
+            "runs": [
+              {
+                "family": "DejaVu Sans",
+                "style": "Book",
+                "indexes": [
+                  3848
+                ]
+              }
+            ],
+            "present": true,
+            "advance": 13.4375,
+            "iconWidth": 24
+          },
+          "pin": {
+            "text": "\u2316",
+            "codepoints": [
+              "U+2316"
+            ],
+            "primaryIndexes": [
+              0
+            ],
+            "runs": [
+              {
+                "family": "Noto Sans Symbols 2",
+                "style": "Regular",
+                "indexes": [
+                  1481
+                ]
+              }
+            ],
+            "present": true,
+            "advance": 11.25,
+            "iconWidth": 24
+          },
+          "compact": {
+            "text": "\u25cc",
+            "codepoints": [
+              "U+25CC"
+            ],
+            "primaryIndexes": [
+              3748
+            ],
+            "runs": [
+              {
+                "family": "DejaVu Sans",
+                "style": "Book",
+                "indexes": [
+                  3748
+                ]
+              }
+            ],
+            "present": true,
+            "advance": 13.078125,
+            "iconWidth": 24
+          },
+          "more": {
+            "text": "\u22ef",
+            "codepoints": [
+              "U+22EF"
+            ],
+            "primaryIndexes": [
+              3450
+            ],
+            "runs": [
+              {
+                "family": "DejaVu Sans",
+                "style": "Book",
+                "indexes": [
+                  3450
+                ]
+              }
+            ],
+            "present": true,
+            "advance": 15.0,
+            "iconWidth": 24
+          },
+          "hide": {
+            "text": "\u00d7",
+            "codepoints": [
+              "U+00D7"
+            ],
+            "primaryIndexes": [
+              153
+            ],
+            "runs": [
+              {
+                "family": "DejaVu Sans",
+                "style": "Book",
+                "indexes": [
+                  153
+                ]
+              }
+            ],
+            "present": true,
+            "advance": 12.5625,
+            "iconWidth": 24
+          },
+          "latest": {
+            "text": "\u2193",
+            "codepoints": [
+              "U+2193"
+            ],
+            "primaryIndexes": [
+              3102
+            ],
+            "runs": [
+              {
+                "family": "DejaVu Sans",
+                "style": "Book",
+                "indexes": [
+                  3102
+                ]
+              }
+            ],
+            "present": true,
+            "advance": 12.5625,
+            "iconWidth": 24
+          },
+          "send": {
+            "text": "\u2191",
+            "codepoints": [
+              "U+2191"
+            ],
+            "primaryIndexes": [
+              3100
+            ],
+            "runs": [
+              {
+                "family": "DejaVu Sans",
+                "style": "Book",
+                "indexes": [
+                  3100
+                ]
+              }
+            ],
+            "present": true,
+            "advance": 12.5625,
+            "iconWidth": 24
+          },
+          "stop": {
+            "text": "\u25a0",
+            "codepoints": [
+              "U+25A0"
+            ],
+            "primaryIndexes": [
+              3704
+            ],
+            "runs": [
+              {
+                "family": "DejaVu Sans",
+                "style": "Book",
+                "indexes": [
+                  3704
+                ]
+              }
+            ],
+            "present": true,
+            "advance": 14.171875,
+            "iconWidth": 24
+          },
+          "improve": {
+            "text": "\u2726",
+            "codepoints": [
+              "U+2726"
+            ],
+            "primaryIndexes": [
+              4023
+            ],
+            "runs": [
+              {
+                "family": "DejaVu Sans",
+                "style": "Book",
+                "indexes": [
+                  4023
+                ]
+              }
+            ],
+            "present": true,
+            "advance": 12.5625,
+            "iconWidth": 24
+          }
+        },
+        "passed": true,
+        "realDesktopTested": false,
+        "ownerStateChanged": false
+      },
+      "installedFontPackages": [
+        "noto-fonts 1:2026.10.01-1",
+        "noto-fonts-cjk 20240730-1"
+      ],
+      "installedFontHashes": {
+        "/usr/share/fonts/noto/NotoSansSymbols2-Regular.ttf": "c4a0a80f0041ce4be81e2478faad22776d23edb98ae3f0d19bd37044820ecf9d",
+        "/usr/share/fonts/noto-cjk/NotoSansCJK-Regular.ttc": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a"
+      },
+      "privateLogHashes": {
+        "arch-application-install.stderr": "710e617dd522bb657fb2d3c36001db3cdf394bcabfbc5899a2961cfafb8e60a5",
+        "arch-application-install.stdout": "a0d555a9b7ead6f7e63921ff425e5382f0ddac4a02cb7d6a3d790911e86ec1ec",
+        "arch-application-plan.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-application-plan.stdout": "dc516ad23e1eb0040a98f7f3b4c94650abeef03d44f7c17ad17180f8f61e27a8",
+        "arch-build-dependency-install.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-build-dependency-install.stdout": "c074a2a97cafb53ab65430b82ef8f757aaca111c7e67a7decae318fc452c9fae",
+        "arch-build-dependency-plan.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-build-dependency-plan.stdout": "849ed5f5bb1c1731cbdc5e2cc7d81ac120c39c9935921d3869893d1b7cb20dbe",
+        "arch-documentation-fixture-correction.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-documentation-fixture-correction.stdout": "30c58ddb7c1695799552c7d1bcfed84f2be5a0f8254ad0b0446b782354597bfc",
+        "arch-documentation-reinstall.stderr": "d94095526235b31a36be9d9c4f209e9221420349230fa3ca13e10cb8ce6614f2",
+        "arch-documentation-reinstall.stdout": "a00a03e97d4bb70917e58b6524b921b65719e1fc99e47840a29eb69a42e544c7",
+        "arch-font-install.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-font-install.stdout": "dcbc2b2c5e6ebea6937eaaaa59cd9c82d0143fec00f66d6f7312f3be6ef2ff0d",
+        "arch-font-plan.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-font-plan.stdout": "46ed39782c67396ce46a6f45f5ce15c5342ee3883ac46dd0872b296828d36fdf",
+        "arch-font-probe.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-font-probe.stdout": "987bbe02ae36edccf2358445b50b5b22c4d1b474e28f43d41d49086bdb53ba2f",
+        "arch-frozen-baseline.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-frozen-baseline.stdout": "3a811c822d498d91f928805c3b9dda4d9a43018c255acc4814baacf988604d45",
+        "arch-guard-build-repeat.stderr": "a31ec4ba02bc4f3b4e8d3edc5af476242627c0505debb5a488858b4b0c3857c1",
+        "arch-guard-build-repeat.stdout": "0bdf54a28f43092d60bd46820bf11814063c97c5030419faf56f6760f806cbce",
+        "arch-guard-build.stderr": "016f4402feb300aee0e96471a8492b75e18958c7f1ac067cc0f36e27328f1f7a",
+        "arch-guard-build.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-guard-install.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-guard-install.stdout": "af28e1df07213c80e6ee92e74f6ac155e76767909e75e943e9da0a78ca1629a5",
+        "arch-guard-package-audit.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-guard-package-audit.stdout": "28ba5c88de76b1361dc175a6652c2535185d07563349d18e80153af78d50bbab",
+        "arch-guard-plan.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-guard-plan.stdout": "649943085c86ddd5ebf15452ed7ba10e36c95687ae2efeb7544a9b3734b11051",
+        "arch-installed-guard-verification.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-installed-guard-verification.stdout": "d3824b1705eb54db3b42ab47fe41ba8f4e602e4e5cf171f91a82ac9e18fd0665",
+        "arch-installed-verification.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-installed-verification.stdout": "c6c4e788e0b93a7d52e76979dcac9413668f8aee00d84b5975b51774b31238bf",
+        "arch-lifecycle/after-removal-reinstall.stderr": "710e617dd522bb657fb2d3c36001db3cdf394bcabfbc5899a2961cfafb8e60a5",
+        "arch-lifecycle/after-removal-reinstall.stdout": "677cee3f6e1b6b2421e1a7cac1c924a94105aa58472b2459a30c0032084867c2",
+        "arch-lifecycle/desktop-busy-remove.stderr": "b40dbecd927c360a86bd10296318d0db2aae91551790556624a17bfae7ece954",
+        "arch-lifecycle/desktop-busy-remove.stdout": "eed481eddb86907aa4f28881719d341aa08226f3fd698fa7f23180c094c7bc3d",
+        "arch-lifecycle/desktop-busy-replace.stderr": "a7b0824bd41928b93cc21787bf228e39ce50ab0cc9a46e3b2c44b246a20bc87d",
+        "arch-lifecycle/desktop-busy-replace.stdout": "ed544facc40a4701d38237ef26ad1568e882b88c93bb82d44746b1ecdaf3475c",
+        "arch-lifecycle/desktop-live.stderr": "c8f8384f4851336ddaaa421c1c26e256531fa82f451f6ed3bec2038ee3c03edb",
+        "arch-lifecycle/desktop-live.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-lifecycle/final-native-audit.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-lifecycle/final-native-audit.stdout": "b0ffae6b44b230c8d422b27bd1946ce0b5ecb338ad55d8e3910dee21112f7e1a",
+        "arch-lifecycle/final-render.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-lifecycle/final-render.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-lifecycle/idle-reinstall.stderr": "d94095526235b31a36be9d9c4f209e9221420349230fa3ca13e10cb8ce6614f2",
+        "arch-lifecycle/idle-reinstall.stdout": "e7ddf695c753cdeb14839f7791202f6184e7d4f76148dceb77d1e8db9cc7d3f2",
+        "arch-lifecycle/idle-remove.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-lifecycle/idle-remove.stdout": "29177e441593673c3027a1342ee4f1777ee782e8511f13a78a781e54e62f3451",
+        "arch-lifecycle/reinstall-native-audit.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-lifecycle/reinstall-native-audit.stdout": "b0ffae6b44b230c8d422b27bd1946ce0b5ecb338ad55d8e3910dee21112f7e1a",
+        "arch-lifecycle/runtime-busy-remove.stderr": "b40dbecd927c360a86bd10296318d0db2aae91551790556624a17bfae7ece954",
+        "arch-lifecycle/runtime-busy-remove.stdout": "eed481eddb86907aa4f28881719d341aa08226f3fd698fa7f23180c094c7bc3d",
+        "arch-lifecycle/runtime-busy-replace.stderr": "a7b0824bd41928b93cc21787bf228e39ce50ab0cc9a46e3b2c44b246a20bc87d",
+        "arch-lifecycle/runtime-busy-replace.stdout": "ed544facc40a4701d38237ef26ad1568e882b88c93bb82d44746b1ecdaf3475c",
+        "arch-lifecycle/runtime-live.stderr": "c8f8384f4851336ddaaa421c1c26e256531fa82f451f6ed3bec2038ee3c03edb",
+        "arch-lifecycle/runtime-live.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-lifecycle.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-lifecycle.stdout": "4049cb35f77d82eb168a75a27f85b8de35ecc308c75569b5723664843b6eba77",
+        "arch-node-lease.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-node-lease.stdout": "b7677d3ec37ee1897ba07dc2cfe8292fe421c9ac93396cca5bbece486d1a2a41",
+        "arch-ordinary-runtime.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-ordinary-runtime.stdout": "9b45d0ebd44d82f6a71471dffbc461c42258f0fad1351546b6d49b8a85221a09",
+        "arch-package-audit-repeat.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-package-audit-repeat.stdout": "b0ffae6b44b230c8d422b27bd1946ce0b5ecb338ad55d8e3910dee21112f7e1a",
+        "arch-package-audit.stderr": "ac1869b5d93b96d5661f32e41d7b997f5315dda320200034b0ec819d2f5c5edd",
+        "arch-package-audit.stdout": "b2cfba80dcf529dbbc1ad9f6c8de359b002368d309dcc3806a1202329a1a75a4",
+        "arch-render.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "arch-render.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "screenshot": {
+        "sha256": "bffba1403d275e3a2a4193a829dea4b5e2c61697b2dff4e005e400e98ffe95cb",
+        "bytes": 18852,
+        "visuallyInspected": true
+      }
+    },
+    "leap": {
+      "format": "augmentor-system-qt-installed-package-proof/1",
+      "target": "opensuse-leap16.0-x86_64",
+      "package": {
+        "name": "augmentor-agent",
+        "versionRelease": "0.2.13-1.leap16",
+        "architecture": "x86_64"
+      },
+      "source": {
+        "commit": "536fc7561a7b81ab90e806925652e446f438050a",
+        "dirty": false
+      },
+      "artifactSha256": "bc4d9d2ad4901120e9883e819f7b513ccbfbbd25311a0ab5988bd5030ac628d6",
+      "artifactBytes": 337424942,
+      "receiptSha256": "1c7f327f34ecae5039fd3dccc309eb1c98d4fc00d5ac67a9f73ee7ebf8fc1438",
+      "appInventoryMembers": 29246,
+      "runtimeReceiptSha256": "53b3c74d7573abaf24f901a43888cc34ea7124ef49050c9d60d67cab8c48af4c",
+      "runtimeArtifactSha256": "78652bc867e9ca9de00e70755eb76511e30398d00ee0da3756e55059de31e108",
+      "systemQtStack": {
+        "format": "augmentor-system-qt-stack-contract/1",
+        "file": "system-qt-inventory.json",
+        "sha256": "485b8dca973e7ca58efd3d2e2d9e416dc4b3f324f5cf1a055ea74475f45ccd56",
+        "bytes": 557497,
+        "qtVersion": "6.9.1",
+        "packageManager": "rpm"
+      },
+      "proofSha256": "478ca82d031c03d4456ba1fa71a7c33f5acde79850a292ae90984eb2e7dcf455",
+      "independentGuardSha256": "4bb8a18a41e68a98c5f7816940f8e55bfa2f1a66e5d34ca42cfcb4155c7a9947",
+      "outcomes": {
+        "runtimeBusyReplace": {
+          "exitCode": 1,
+          "stdoutSha256": "416a216d15e775861d1854fadb6ebb68943d1c9aee631d8e855e7ff7321dbbd3",
+          "stderrSha256": "fea8654e3cb0d9e1b5e6255a62b3f124bb7618a76db6f9a3ebb70d8c0bdc160f"
+        },
+        "runtimeBusyRemove": {
+          "exitCode": 1,
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "f3a10ec238973f33b13ee2012b22cae588eb71e35b1100f6442dd05105603d82"
+        },
+        "desktopBusyReplace": {
+          "exitCode": 1,
+          "stdoutSha256": "416a216d15e775861d1854fadb6ebb68943d1c9aee631d8e855e7ff7321dbbd3",
+          "stderrSha256": "93972c9d7a0f85cd378a49235c7d76d733c79df6907b186c18cab3a4b9c90dad"
+        },
+        "desktopBusyRemove": {
+          "exitCode": 1,
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "a8b94f9504e1e349323e778ea3e8e4031f4d497cebe645c7d49c00451d7187fc"
+        },
+        "idleSameArtifactReinstall": {
+          "exitCode": 0,
+          "stdoutSha256": "f5298b4a2cac39e3adabbbcbccbf5cfec652984f3bbcef30556b214f170e653a",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "nativeAuditAfterReinstall": {
+          "exitCode": 0,
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "idleRemove": {
+          "exitCode": 0,
+          "stdoutSha256": "531ea77a5c36be1296d1bf3721d689aaf8ddbfa9a6ee6df7aa099528eb65f300",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "reinstallAfterRemoval": {
+          "exitCode": 0,
+          "stdoutSha256": "302d610305465d1650586e6f01a1d33988816088563bfa8c2e74a10710efe1f7",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "finalNativeAudit": {
+          "exitCode": 0,
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "coldNativeRender": {
+          "exitCode": 0,
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "offline": true,
+      "realNativePreviewLease": true,
+      "realBundledNodeLease": true,
+      "pendingAbsent": true,
+      "completeApplicationInventoryPassed": true,
+      "nativePackageAuditPassed": true,
+      "syntheticUserSentinelPreserved": true,
+      "immutableRuntimeReceiptPreserved": true,
+      "versionUpgradeTested": false,
+      "rollbackTested": false,
+      "completeInstallerTested": false,
+      "realDesktopSessionTested": false,
+      "graphicalBrowserTested": false,
+      "physicalAudioTested": false,
+      "liveInputPermissionTested": false,
+      "licenseReviewComplete": false,
+      "embeddedSourceCoverageComplete": false,
+      "publicReleaseQualified": false,
+      "ownerStateChanged": false,
+      "fixture": {
+        "containerId": "70999fc46fa994a437b721bb49f0290ed0d46d0b350b36b6b523ad75a1ec2cf1",
+        "image": "sha256:36530140be46c1d70bf7ea248778b238d53bb32ec05b24ec996f9c77ef4070a2",
+        "networks": {},
+        "mounts": [],
+        "devices": [],
+        "privileged": false
+      },
+      "fontProof": {
+        "format": "augmentor-linux-surface-font-proof/1",
+        "uid": 1002,
+        "qtVersion": "6.9.1",
+        "designSha256": "084a183cca4d930343120031a0eedae14926e39391ea3f4b0037973b400b4afe",
+        "probeSha256": "ac06d6f818f37904618ca6d2a4bb768f49153770ab609e0f27b9d147508334bd",
+        "primaryFamily": "DejaVu Sans",
+        "primaryStyle": "Book",
+        "pixelSize": 15,
+        "glyphs": {
+          "newchat": {
+            "text": "\uff0b",
+            "codepoints": [
+              "U+FF0B"
+            ],
+            "primaryIndexes": [
+              0
+            ],
+            "runs": [
+              {
+                "family": "Noto Sans CJK JP",
+                "style": "Regular",
+                "indexes": [
+                  59057
+                ]
+              }
+            ],
+            "present": true,
+            "advance": 15.0,
+            "iconWidth": 24
+          },
+          "save": {
+            "text": "\u2606",
+            "codepoints": [
+              "U+2606"
+            ],
+            "primaryIndexes": [
+              3806
+            ],
+            "runs": [
+              {
+                "family": "DejaVu Sans",
+                "style": "Book",
+                "indexes": [
+                  3806
+                ]
+              }
+            ],
+            "present": true,
+            "advance": 13.4375,
+            "iconWidth": 24
+          },
+          "saved": {
+            "text": "\u2605",
+            "codepoints": [
+              "U+2605"
+            ],
+            "primaryIndexes": [
+              3805
+            ],
+            "runs": [
+              {
+                "family": "DejaVu Sans",
+                "style": "Book",
+                "indexes": [
+                  3805
+                ]
+              }
+            ],
+            "present": true,
+            "advance": 13.4375,
+            "iconWidth": 24
+          },
+          "sessions": {
+            "text": "\u2630",
+            "codepoints": [
+              "U+2630"
+            ],
+            "primaryIndexes": [
+              3848
+            ],
+            "runs": [
+              {
+                "family": "DejaVu Sans",
+                "style": "Book",
+                "indexes": [
+                  3848
+                ]
+              }
+            ],
+            "present": true,
+            "advance": 13.4375,
+            "iconWidth": 24
+          },
+          "pin": {
+            "text": "\u2316",
+            "codepoints": [
+              "U+2316"
+            ],
+            "primaryIndexes": [
+              0
+            ],
+            "runs": [
+              {
+                "family": "Noto Sans Symbols 2",
+                "style": "Regular",
+                "indexes": [
+                  1481
+                ]
+              }
+            ],
+            "present": true,
+            "advance": 11.25,
+            "iconWidth": 24
+          },
+          "compact": {
+            "text": "\u25cc",
+            "codepoints": [
+              "U+25CC"
+            ],
+            "primaryIndexes": [
+              3748
+            ],
+            "runs": [
+              {
+                "family": "DejaVu Sans",
+                "style": "Book",
+                "indexes": [
+                  3748
+                ]
+              }
+            ],
+            "present": true,
+            "advance": 13.078125,
+            "iconWidth": 24
+          },
+          "more": {
+            "text": "\u22ef",
+            "codepoints": [
+              "U+22EF"
+            ],
+            "primaryIndexes": [
+              3450
+            ],
+            "runs": [
+              {
+                "family": "DejaVu Sans",
+                "style": "Book",
+                "indexes": [
+                  3450
+                ]
+              }
+            ],
+            "present": true,
+            "advance": 15.0,
+            "iconWidth": 24
+          },
+          "hide": {
+            "text": "\u00d7",
+            "codepoints": [
+              "U+00D7"
+            ],
+            "primaryIndexes": [
+              153
+            ],
+            "runs": [
+              {
+                "family": "DejaVu Sans",
+                "style": "Book",
+                "indexes": [
+                  153
+                ]
+              }
+            ],
+            "present": true,
+            "advance": 12.5625,
+            "iconWidth": 24
+          },
+          "latest": {
+            "text": "\u2193",
+            "codepoints": [
+              "U+2193"
+            ],
+            "primaryIndexes": [
+              3102
+            ],
+            "runs": [
+              {
+                "family": "DejaVu Sans",
+                "style": "Book",
+                "indexes": [
+                  3102
+                ]
+              }
+            ],
+            "present": true,
+            "advance": 12.5625,
+            "iconWidth": 24
+          },
+          "send": {
+            "text": "\u2191",
+            "codepoints": [
+              "U+2191"
+            ],
+            "primaryIndexes": [
+              3100
+            ],
+            "runs": [
+              {
+                "family": "DejaVu Sans",
+                "style": "Book",
+                "indexes": [
+                  3100
+                ]
+              }
+            ],
+            "present": true,
+            "advance": 12.5625,
+            "iconWidth": 24
+          },
+          "stop": {
+            "text": "\u25a0",
+            "codepoints": [
+              "U+25A0"
+            ],
+            "primaryIndexes": [
+              3704
+            ],
+            "runs": [
+              {
+                "family": "DejaVu Sans",
+                "style": "Book",
+                "indexes": [
+                  3704
+                ]
+              }
+            ],
+            "present": true,
+            "advance": 14.171875,
+            "iconWidth": 24
+          },
+          "improve": {
+            "text": "\u2726",
+            "codepoints": [
+              "U+2726"
+            ],
+            "primaryIndexes": [
+              4023
+            ],
+            "runs": [
+              {
+                "family": "DejaVu Sans",
+                "style": "Book",
+                "indexes": [
+                  4023
+                ]
+              }
+            ],
+            "present": true,
+            "advance": 12.5625,
+            "iconWidth": 24
+          }
+        },
+        "passed": true,
+        "realDesktopTested": false,
+        "ownerStateChanged": false
+      },
+      "installedFontPackages": [
+        "google-noto-sans-symbols2-fonts-20240901-160000.2.2.noarch",
+        "google-noto-sans-jp-fonts-2.004-160000.3.2.noarch"
+      ],
+      "installedFontHashes": {
+        "/usr/share/fonts/truetype/NotoSansSymbols2-Regular.ttf": "c4a0a80f0041ce4be81e2478faad22776d23edb98ae3f0d19bd37044820ecf9d",
+        "/usr/share/fonts/truetype/NotoSansCJKjp-VF.otf": "ab2728702f90d2ae900309f299dc3c2b075010888a1a8a67fbd5b4c6aff713a0"
+      },
+      "privateLogHashes": {
+        "leap-font-install.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-font-install.stdout": "2f302cbe21044f300cec0975fc8ddf815f8e172520404c5142670923062d5a06",
+        "leap-font-plan.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-font-plan.stdout": "b8e4d06f98c3c202c347d4a510c1664f6211be9be9928896f58d39b408377ce3",
+        "leap-font-probe.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-font-probe.stdout": "708510e4d0f90d2001ee9cfadad7d96f991d295bf31026afee42807504216afe",
+        "leap-font-render.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-font-render.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-frozen-baseline.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-frozen-baseline.stdout": "3a811c822d498d91f928805c3b9dda4d9a43018c255acc4814baacf988604d45",
+        "leap-install.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-install.stdout": "27ee40e6ad11cfe511de8b977b1266e5cb1bffbce44ab63ffa6460f026c7c303",
+        "leap-installed-verification.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-installed-verification.stdout": "4f46e913d8416e2f557a8c51f50feee2edb12f2a9daec459991e5f613b47d393",
+        "leap-lifecycle/after-removal-reinstall.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-lifecycle/after-removal-reinstall.stdout": "302d610305465d1650586e6f01a1d33988816088563bfa8c2e74a10710efe1f7",
+        "leap-lifecycle/desktop-busy-remove.stderr": "a8b94f9504e1e349323e778ea3e8e4031f4d497cebe645c7d49c00451d7187fc",
+        "leap-lifecycle/desktop-busy-remove.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-lifecycle/desktop-busy-replace.stderr": "93972c9d7a0f85cd378a49235c7d76d733c79df6907b186c18cab3a4b9c90dad",
+        "leap-lifecycle/desktop-busy-replace.stdout": "416a216d15e775861d1854fadb6ebb68943d1c9aee631d8e855e7ff7321dbbd3",
+        "leap-lifecycle/desktop-live.stderr": "c8f8384f4851336ddaaa421c1c26e256531fa82f451f6ed3bec2038ee3c03edb",
+        "leap-lifecycle/desktop-live.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-lifecycle/final-native-audit.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-lifecycle/final-native-audit.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-lifecycle/final-render.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-lifecycle/final-render.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-lifecycle/idle-reinstall.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-lifecycle/idle-reinstall.stdout": "f5298b4a2cac39e3adabbbcbccbf5cfec652984f3bbcef30556b214f170e653a",
+        "leap-lifecycle/idle-remove.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-lifecycle/idle-remove.stdout": "531ea77a5c36be1296d1bf3721d689aaf8ddbfa9a6ee6df7aa099528eb65f300",
+        "leap-lifecycle/reinstall-native-audit.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-lifecycle/reinstall-native-audit.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-lifecycle/runtime-busy-remove.stderr": "f3a10ec238973f33b13ee2012b22cae588eb71e35b1100f6442dd05105603d82",
+        "leap-lifecycle/runtime-busy-remove.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-lifecycle/runtime-busy-replace.stderr": "fea8654e3cb0d9e1b5e6255a62b3f124bb7618a76db6f9a3ebb70d8c0bdc160f",
+        "leap-lifecycle/runtime-busy-replace.stdout": "416a216d15e775861d1854fadb6ebb68943d1c9aee631d8e855e7ff7321dbbd3",
+        "leap-lifecycle/runtime-live.stderr": "c8f8384f4851336ddaaa421c1c26e256531fa82f451f6ed3bec2038ee3c03edb",
+        "leap-lifecycle/runtime-live.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-lifecycle.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-lifecycle.stdout": "db8a5d7043a508c3310407c0fe22fc5e3f0b2b946517c99c67163df4d4b2b7b2",
+        "leap-node-lease.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-node-lease.stdout": "b7677d3ec37ee1897ba07dc2cfe8292fe421c9ac93396cca5bbece486d1a2a41",
+        "leap-ordinary-runtime.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-ordinary-runtime.stdout": "78ea3e13aa2f367241a6b3f468feefa6e3ce197bf1f45eeb9bb8d42ed2c01985",
+        "leap-render.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-render.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-rpm-verification.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-rpm-verification.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-solver.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "leap-solver.stdout": "116c94b2c1a6d659a546bb42b1525c6611297327822af5e26bd67577c803bde5"
+      },
+      "screenshot": {
+        "sha256": "cf3f6dcd82768c6941b2989207d412501c213e84e3c9d146cc88cb976bb8ffe1",
+        "bytes": 18891,
+        "visuallyInspected": true
+      }
+    }
+  },
+  "archGuard": {
+    "artifact": {
+      "file": "augmentor-package-guard-0.2.13-2-any.pkg.tar.zst",
+      "sha256": "8ab66df2b830c40c51b588cd5ecec403bfefd59b687016c5ab743f639dc24016",
+      "bytes": 12082
+    },
+    "installedInSeparatePriorTransaction": true,
+    "normalMakepkgSourceChecksPassed": true,
+    "installedAuditPassed": true,
+    "verification": {
+      "installedGuardFiles": {
+        "/usr/lib/augmentor-package-guard/lifecycle.py": "4bb8a18a41e68a98c5f7816940f8e55bfa2f1a66e5d34ca42cfcb4155c7a9947",
+        "/usr/lib/augmentor-package-guard/can-remove.py": "286559616f9b794573964b8125d85c8c8aaf6050d2459e3c6a635b69009911ab",
+        "/usr/share/libalpm/hooks/augmentor-agent-post.hook": "32d4f0bc7e35326f4f607ee2945026bfa92c69ca4d0d76cc6030419fbf2e9492",
+        "/usr/share/libalpm/hooks/augmentor-agent-pre.hook": "c1de487776ee57f6d748a9c73286dccfe1cc835ce5d6dbb08bdfe11a3b6f5831",
+        "/usr/share/libalpm/hooks/augmentor-guard-remove.hook": "2e33a6a9eef250a485fba920dd77791c1cc5fa593f4ffcc19a8f64d2217f81bb"
+      },
+      "defaultHookOverrideDirectoryEmpty": true
+    }
+  },
+  "retainedFailures": [
+    {
+      "target": "arch",
+      "stage": "first guard build",
+      "exitCode": 15,
+      "reason": "Minimal fixture lacks fakeroot/debugedit. Signed dated dependency plan and normal install preceded successful retry."
+    },
+    {
+      "target": "arch",
+      "stage": "first application file audit",
+      "exitCode": 1,
+      "reason": "Minimal image NoExtract excludes usr/share/doc/*, leaving package-owned /usr/share/doc absent. The complete application-root inventory already passed.",
+      "fixtureOnlyCorrection": "Remove only exact usr/share/doc/* exclusion; preserve other exclusion tokens and signature policy; actual idle reinstall before repeated passing Qkk.",
+      "configurationBeforeSha256": "1b1c6195b21865a660480f41a29a172f103b1aa3e846d1db877e04cd6220e454",
+      "configurationAfterSha256": "cba1a481d40a6f68cd36fad0d9731aa78063a595691a2469a4611f7ddd47004f"
+    }
+  ],
+  "limits": [
+    "Fonts were added in separate signed native transactions to already built release1 candidates. New recipe dependencies require separately built/inspected artifacts.",
+    "Application source536 and separately hashed packaging/probes are not a complete clean current-source product qualification.",
+    "Containers are not booted systemd sessions; input permission provisioning, SELinux, GNOME/KDE/lock/reboot, graphical Browser and physical audio remain unqualified.",
+    "Same-artifact reinstall/removal is not a version-to-version upgrade or rollback.",
+    "Complete target installers, coherent native dependency maintenance, full source/license/rebuild/replacement and public release remain open."
+  ],
+  "licenseProposal22FilesUnchanged": true,
+  "allFiveRolloutPointsRemainActive": true,
+  "ownerStateChanged": false,
+  "publicReleaseQualified": false
+}

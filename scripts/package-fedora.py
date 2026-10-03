@@ -118,7 +118,7 @@ Requires: python3-pyyaml, python3-websocket-client, python3-pygments >= 2.18, py
 Requires: python3-gobject, gtk4, qt6-qtsvg, at-spi2-core, gstreamer1, pipewire-gstreamer, gstreamer1-plugins-base
 Requires: qt6-qtdeclarative
 Requires: wmctrl
-Requires: dejavu-sans-fonts, glib2, glibc >= 2.39, libstdc++
+Requires: dejavu-sans-fonts, google-noto-sans-symbols-2-fonts, google-noto-sans-cjk-fonts, glib2, glibc >= 2.39, libstdc++
 Requires: libstdc++.so.6(GLIBCXX_3.4.32)(64bit)
 Requires: gtk3, webkit2gtk4.1, javascriptcoregtk4.1, gtk-layer-shell, libappindicator-gtk3
 Requires: openblas-serial, vulkan-loader, alsa-lib, alsa-plugins-pulseaudio

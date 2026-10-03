@@ -2,7 +2,36 @@
 
 # Linux distribution rollout
 
-## October 3 complete Arch/Leap native package builds
+## October 3 installed Arch/Leap lifecycle and native font correction
+
+[Fresh installed package evidence](../release/qualification/next-targets/20261003-system-qt-installed-packages.json)
+now passes on exact full Arch/Leap candidates with clean536 application bytes and
+separately hashed packaging/probes. Arch's verified independent guard is installed
+in its own prior transaction; Leap executes isolated Python3.13 scriptlets.
+Ordinary-user offline runtime, real native preview and bundled Node launch pass.
+After network disconnection, both targets refuse replacement/removal under actual
+Desktop/runtime leases, then pass idle same-artifact reinstall, removal and
+reinstall after removal. Complete application inventories, native package file
+audits, frozen Python/Qt identities and synthetic user/runtime receipts pass.
+Retained Arch missing-build-tool and documentation-exclusion failures have exact
+fixture-only corrections; neither becomes a product change or initial pass.
+
+A real missing-glyph defect is also corrected through native font dependencies,
+with the approved design unchanged. Official package/font inspection establishes
+separate Symbols2/CJK providers; actual fresh Qt fallback and unchanged screenshots
+pass on Arch/Leap. [Font research and Qt results](../release/qualification/next-targets/20261003-linux-surface-fonts.json)
+cover every approved glyph. New recipes declare those dependencies on all explicit
+Linux targets; matching rebuilt artifacts and Debian/Ubuntu/Fedora installed
+fallback acceptance remain required. [The owning guide](LINUX-SYSTEM-QT-PACKAGES.md)
+distinguishes the installed release1 packages from future recipe artifacts.
+
+Full Arch/Leap installers/resume, coherent native dependency maintenance, real
+GNOME/KDE/Mint sessions and consent/input/lock/reboot, graphical Browser, physical
+audio, version upgrades/rollback and source/legal/public release remain open.
+All five rollout points stay active. Owner installations/services/models/devices,
+root license and all22 proposed-license file hashes remain unchanged.
+
+## Historical October 3 Arch/Leap build checkpoint; installed evidence above
 
 The [new native package guide](LINUX-SYSTEM-QT-PACKAGES.md) and
 [artifact/inspection checkpoint](../release/qualification/next-targets/20261003-system-qt-native-packages.json)

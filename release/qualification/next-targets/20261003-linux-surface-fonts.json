@@ -1,0 +1,2629 @@
+{
+  "format": "augmentor-linux-surface-font-qualification/1",
+  "date": "2026-10-03",
+  "unchangedDesignSha256": "084a183cca4d930343120031a0eedae14926e39391ea3f4b0037973b400b4afe",
+  "missingGlyphs": [
+    "U+FF0B",
+    "U+2316"
+  ],
+  "actualLeapBaseline": {
+    "uid": 1002,
+    "marker": "Owned Augmentor leap complete package fixture; synthetic users only; no host devices or mounts\n",
+    "qt_version": "6.9.1",
+    "source": "/usr/lib/augmentor/apps/native/augmentor_linux/surface_design.py",
+    "requested_family": "DejaVu Sans",
+    "pixel_size": 15,
+    "resolved_family": "DejaVu Sans",
+    "raw_family": "DejaVu Sans",
+    "raw_style": "Book",
+    "glyphs": {
+      "newchat": {
+        "text": "\uff0b",
+        "codepoint": "U+FF0B",
+        "requested_font_supports": false,
+        "requested_font_glyph_indexes": [
+          0
+        ],
+        "layout_natural_width": 9.0,
+        "layout_runs": [
+          {
+            "family": "DejaVu Sans",
+            "style": "Book",
+            "raw_valid": true,
+            "glyph_indexes": [
+              0
+            ]
+          }
+        ]
+      },
+      "save": {
+        "text": "\u2606",
+        "codepoint": "U+2606",
+        "requested_font_supports": true,
+        "requested_font_glyph_indexes": [
+          3806
+        ],
+        "layout_natural_width": 13.4375,
+        "layout_runs": [
+          {
+            "family": "DejaVu Sans",
+            "style": "Book",
+            "raw_valid": true,
+            "glyph_indexes": [
+              3806
+            ]
+          }
+        ]
+      },
+      "saved": {
+        "text": "\u2605",
+        "codepoint": "U+2605",
+        "requested_font_supports": true,
+        "requested_font_glyph_indexes": [
+          3805
+        ],
+        "layout_natural_width": 13.4375,
+        "layout_runs": [
+          {
+            "family": "DejaVu Sans",
+            "style": "Book",
+            "raw_valid": true,
+            "glyph_indexes": [
+              3805
+            ]
+          }
+        ]
+      },
+      "sessions": {
+        "text": "\u2630",
+        "codepoint": "U+2630",
+        "requested_font_supports": true,
+        "requested_font_glyph_indexes": [
+          3848
+        ],
+        "layout_natural_width": 13.4375,
+        "layout_runs": [
+          {
+            "family": "DejaVu Sans",
+            "style": "Book",
+            "raw_valid": true,
+            "glyph_indexes": [
+              3848
+            ]
+          }
+        ]
+      },
+      "pin": {
+        "text": "\u2316",
+        "codepoint": "U+2316",
+        "requested_font_supports": false,
+        "requested_font_glyph_indexes": [
+          0
+        ],
+        "layout_natural_width": 9.0,
+        "layout_runs": [
+          {
+            "family": "DejaVu Sans",
+            "style": "Book",
+            "raw_valid": true,
+            "glyph_indexes": [
+              0
+            ]
+          }
+        ]
+      },
+      "compact": {
+        "text": "\u25cc",
+        "codepoint": "U+25CC",
+        "requested_font_supports": true,
+        "requested_font_glyph_indexes": [
+          3748
+        ],
+        "layout_natural_width": 13.078125,
+        "layout_runs": [
+          {
+            "family": "DejaVu Sans",
+            "style": "Book",
+            "raw_valid": true,
+            "glyph_indexes": [
+              3748
+            ]
+          }
+        ]
+      },
+      "more": {
+        "text": "\u22ef",
+        "codepoint": "U+22EF",
+        "requested_font_supports": true,
+        "requested_font_glyph_indexes": [
+          3450
+        ],
+        "layout_natural_width": 15.0,
+        "layout_runs": [
+          {
+            "family": "DejaVu Sans",
+            "style": "Book",
+            "raw_valid": true,
+            "glyph_indexes": [
+              3450
+            ]
+          }
+        ]
+      },
+      "hide": {
+        "text": "\u00d7",
+        "codepoint": "U+00D7",
+        "requested_font_supports": true,
+        "requested_font_glyph_indexes": [
+          153
+        ],
+        "layout_natural_width": 12.5625,
+        "layout_runs": [
+          {
+            "family": "DejaVu Sans",
+            "style": "Book",
+            "raw_valid": true,
+            "glyph_indexes": [
+              153
+            ]
+          }
+        ]
+      },
+      "latest": {
+        "text": "\u2193",
+        "codepoint": "U+2193",
+        "requested_font_supports": true,
+        "requested_font_glyph_indexes": [
+          3102
+        ],
+        "layout_natural_width": 12.5625,
+        "layout_runs": [
+          {
+            "family": "DejaVu Sans",
+            "style": "Book",
+            "raw_valid": true,
+            "glyph_indexes": [
+              3102
+            ]
+          }
+        ]
+      },
+      "send": {
+        "text": "\u2191",
+        "codepoint": "U+2191",
+        "requested_font_supports": true,
+        "requested_font_glyph_indexes": [
+          3100
+        ],
+        "layout_natural_width": 12.5625,
+        "layout_runs": [
+          {
+            "family": "DejaVu Sans",
+            "style": "Book",
+            "raw_valid": true,
+            "glyph_indexes": [
+              3100
+            ]
+          }
+        ]
+      },
+      "stop": {
+        "text": "\u25a0",
+        "codepoint": "U+25A0",
+        "requested_font_supports": true,
+        "requested_font_glyph_indexes": [
+          3704
+        ],
+        "layout_natural_width": 14.171875,
+        "layout_runs": [
+          {
+            "family": "DejaVu Sans",
+            "style": "Book",
+            "raw_valid": true,
+            "glyph_indexes": [
+              3704
+            ]
+          }
+        ]
+      },
+      "improve": {
+        "text": "\u2726",
+        "codepoint": "U+2726",
+        "requested_font_supports": true,
+        "requested_font_glyph_indexes": [
+          4023
+        ],
+        "layout_natural_width": 12.5625,
+        "layout_runs": [
+          {
+            "family": "DejaVu Sans",
+            "style": "Book",
+            "raw_valid": true,
+            "glyph_indexes": [
+              4023
+            ]
+          }
+        ]
+      }
+    },
+    "available_families": [
+      "DejaVu Math TeX Gyre",
+      "DejaVu Sans",
+      "DejaVu Sans Condensed",
+      "DejaVu Sans Mono",
+      "DejaVu Serif",
+      "DejaVu Serif Condensed",
+      "Monospace",
+      "Sans Serif",
+      "Serif"
+    ],
+    "fontconfig_files": [
+      "/usr/share/fonts/truetype/DejaVuSans-BoldOblique.ttf: DejaVu Sans",
+      "/usr/share/fonts/truetype/DejaVuSerif-BoldItalic.ttf: DejaVu Serif",
+      "/usr/share/fonts/truetype/DejaVuSerif.ttf: DejaVu Serif",
+      "/usr/share/fonts/truetype/DejaVuSansMono-Bold.ttf: DejaVu Sans Mono",
+      "/usr/share/fonts/truetype/DejaVuSerif-Italic.ttf: DejaVu Serif",
+      "/usr/share/fonts/truetype/DejaVuSans.ttf: DejaVu Sans",
+      "/usr/share/fonts/truetype/DejaVuSansCondensed-Oblique.ttf: DejaVu Sans,DejaVu Sans Condensed",
+      "/usr/share/fonts/truetype/DejaVuSansCondensed-BoldOblique.ttf: DejaVu Sans,DejaVu Sans Condensed",
+      "/usr/share/fonts/truetype/DejaVuSans-ExtraLight.ttf: DejaVu Sans,DejaVu Sans Light",
+      "/usr/share/fonts/truetype/DejaVuSerifCondensed-Italic.ttf: DejaVu Serif,DejaVu Serif Condensed",
+      "/usr/share/fonts/truetype/DejaVuSerif-Bold.ttf: DejaVu Serif",
+      "/usr/share/fonts/truetype/DejaVuSans-Oblique.ttf: DejaVu Sans",
+      "/usr/share/fonts/truetype/DejaVuSansCondensed.ttf: DejaVu Sans,DejaVu Sans Condensed",
+      "/usr/share/fonts/truetype/DejaVuMathTeXGyre.ttf: DejaVu Math TeX Gyre",
+      "/usr/share/fonts/truetype/DejaVuSansMono-Oblique.ttf: DejaVu Sans Mono",
+      "/usr/share/fonts/truetype/DejaVuSans-Bold.ttf: DejaVu Sans",
+      "/usr/share/fonts/truetype/DejaVuSerifCondensed.ttf: DejaVu Serif,DejaVu Serif Condensed",
+      "/usr/share/fonts/truetype/DejaVuSerifCondensed-Bold.ttf: DejaVu Serif,DejaVu Serif Condensed",
+      "/usr/share/fonts/truetype/DejaVuSansMono.ttf: DejaVu Sans Mono",
+      "/usr/share/fonts/truetype/DejaVuSansMono-BoldOblique.ttf: DejaVu Sans Mono",
+      "/usr/share/fonts/truetype/DejaVuSansCondensed-Bold.ttf: DejaVu Sans,DejaVu Sans Condensed",
+      "/usr/share/fonts/truetype/DejaVuSerifCondensed-BoldItalic.ttf: DejaVu Serif,DejaVu Serif Condensed"
+    ],
+    "font_packages": [
+      "libfontenc1-1.1.8-160000.3.2.x86_64",
+      "libkfont0-2.7.1-160000.3.1.x86_64",
+      "libfontconfig1-2.16.0-160000.2.2.x86_64",
+      "fontconfig-2.16.0-160000.2.2.x86_64",
+      "libXfont2-2-2.0.7-160000.5.1.x86_64",
+      "dejavu-fonts-2.37-160000.3.1.noarch"
+    ],
+    "scope": "Independent read-only offscreen diagnostic; no product execution; no installed changes.",
+    "fixture": {
+      "container": "augmentor-leap-package-20261003-67",
+      "image": "sha256:36530140be46c1d70bf7ea248778b238d53bb32ec05b24ec996f9c77ef4070a2",
+      "mounts": []
+    },
+    "probe_code_sha256": "c8075ee7d244e1dd55ee8efc41b672ba239e439a0c0fb4a2b26eee6ee0c81dd8",
+    "installed_public_surface_source_sha256": "084a183cca4d930343120031a0eedae14926e39391ea3f4b0037973b400b4afe",
+    "managed_runtime_receipt": {
+      "path": "outputs/linux-rollout/full-system-qt-install66/leap-runtime-receipt.json",
+      "sha256": "53b3c74d7573abaf24f901a43888cc34ea7124ef49050c9d60d67cab8c48af4c"
+    }
+  },
+  "providerMatrix": [
+    {
+      "target": "Leap16",
+      "pin_provider": "google-noto-sans-symbols2-fonts",
+      "plus_provider": "google-noto-sans-jp-fonts",
+      "pin_file": "/usr/share/fonts/truetype/NotoSansSymbols2-Regular.ttf",
+      "plus_file": "/usr/share/fonts/truetype/NotoSansCJKjp-VF.otf"
+    },
+    {
+      "target": "Arch20261001",
+      "pin_provider": "noto-fonts",
+      "plus_provider": "noto-fonts-cjk",
+      "pin_file": "/usr/share/fonts/noto/NotoSansSymbols2-Regular.ttf",
+      "plus_file": "/usr/share/fonts/noto-cjk/NotoSansCJK-Regular.ttc"
+    },
+    {
+      "target": "Fedora43",
+      "pin_provider": "google-noto-sans-symbols-2-fonts",
+      "plus_provider": "google-noto-sans-cjk-fonts",
+      "pin_file": "/usr/share/fonts/google-noto/NotoSansSymbols2-Regular.ttf",
+      "plus_file": "/usr/share/fonts/google-noto-sans-cjk-fonts/NotoSansCJK-Regular.ttc"
+    },
+    {
+      "target": "Fedora44",
+      "pin_provider": "google-noto-sans-symbols-2-fonts",
+      "plus_provider": "google-noto-sans-cjk-fonts",
+      "pin_file": "/usr/share/fonts/google-noto/NotoSansSymbols2-Regular.ttf",
+      "plus_file": "/usr/share/fonts/google-noto-sans-cjk-fonts/NotoSansCJK-Regular.ttc"
+    },
+    {
+      "target": "Debian13",
+      "pin_provider": "fonts-noto-core",
+      "plus_provider": "fonts-noto-cjk",
+      "pin_file": "/usr/share/fonts/truetype/noto/NotoSansSymbols2-Regular.ttf",
+      "plus_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
+    },
+    {
+      "target": "Ubuntu24",
+      "pin_provider": "fonts-noto-core",
+      "plus_provider": "fonts-noto-cjk",
+      "pin_file": "/usr/share/fonts/truetype/noto/NotoSansSymbols2-Regular.ttf",
+      "plus_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
+    },
+    {
+      "target": "Ubuntu26",
+      "pin_provider": "fonts-noto-core",
+      "plus_provider": "fonts-noto-cjk",
+      "pin_file": "/usr/share/fonts/truetype/noto/NotoSansSymbols2-Regular.ttf",
+      "plus_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
+    }
+  ],
+  "officialProviderResearch": {
+    "leap16-providers": {
+      "fixture": "augmentor-leap-package-20261003-67",
+      "metadata": {
+        "cached_repomd": "/var/cache/zypp/raw/augmentor-oss-proof/repodata/repomd.xml",
+        "url": "https://cdn.opensuse.org/distribution/leap/16.0/repo/oss/x86_64/repodata/repomd.xml",
+        "bytes": 14412,
+        "sha256": "4ba9e9a0a1928c8bc042c171c8e4c91765e20de38654b7eceae054631768fa95",
+        "sha512": "0268b74906ae5171adca77aa3731d95e7c30f60794fd3241ada6c79622b5afb37434494d03ec53ff858e8e4504e0d6807f89cd80e54611a849a59860f95c9b18",
+        "primary": {
+          "cached_path": "/var/cache/zypp/raw/augmentor-oss-proof/repodata/d3031d1930528f7130c38ab77e63bd0a5ea1ef2d97e37b2255be4b21c1bea00dcf08721b8bb534f33d6d2a6f91e5d395bea7c1a885a958d3d3d895fa3ff4805b-primary.xml.zst",
+          "url": "https://cdn.opensuse.org/distribution/leap/16.0/repo/oss/x86_64/repodata/d3031d1930528f7130c38ab77e63bd0a5ea1ef2d97e37b2255be4b21c1bea00dcf08721b8bb534f33d6d2a6f91e5d395bea7c1a885a958d3d3d895fa3ff4805b-primary.xml.zst",
+          "bytes": 17569143,
+          "sha256": "693c8d0d21ba1de760f41e93d5ea6dbe11ab2abac9bb101d8841ac04f7488120",
+          "sha512": "d3031d1930528f7130c38ab77e63bd0a5ea1ef2d97e37b2255be4b21c1bea00dcf08721b8bb534f33d6d2a6f91e5d395bea7c1a885a958d3d3d895fa3ff4805b",
+          "matches_cached_repomd_checksum": true
+        }
+      },
+      "rpms": [
+        {
+          "url": "https://cdn.opensuse.org/distribution/leap/16.0/repo/oss/noarch/google-noto-sans-symbols2-fonts-20240901-160000.2.2.noarch.rpm",
+          "bytes": 296717,
+          "sha256": "76261b9011bf50c53e2c50abed1805718e5a7267c249519a5edcfcc0dc8d6039",
+          "sha512": "3f6fa4a5b4149c51e5bb8e9ad9a8b0b9250e5936601d6f9dcff3697e3751bff83e39795f90c655520a42478aa74243ac3a4a918a4844e09b15af95ea1fda94bc",
+          "name": [
+            "google-noto-sans-symbols2-fonts"
+          ],
+          "version": [
+            "20240901"
+          ],
+          "release": [
+            "160000.2.2"
+          ],
+          "source": [
+            "google-noto-fonts-20240901-160000.2.2.src.rpm"
+          ],
+          "requires": [
+            "/bin/sh",
+            "/bin/sh",
+            "/bin/sh",
+            "aaa_base",
+            "coreutils",
+            "coreutils",
+            "coreutils",
+            "perl",
+            "rpmlib(CompressedFileNames)",
+            "rpmlib(FileDigests)",
+            "rpmlib(PayloadFilesHavePrefix)",
+            "rpmlib(PayloadIsZstd)"
+          ],
+          "fonts": [
+            {
+              "file": "./usr/share/fonts/truetype/NotoSansSymbols2-Regular.ttf",
+              "bytes": 671568,
+              "sha256": "c4a0a80f0041ce4be81e2478faad22776d23edb98ae3f0d19bd37044820ecf9d",
+              "faces": [
+                {
+                  "family": "Noto Sans Symbols 2",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": null,
+                      "index": 0
+                    },
+                    "U+2316": {
+                      "name": "uni2316",
+                      "index": 1481
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "rpm_signature_verification": "not performed; official-host bytes and metadata hashes recorded",
+          "sha512_matches_cached_primary": true
+        },
+        {
+          "url": "https://cdn.opensuse.org/distribution/leap/16.0/repo/oss/noarch/google-noto-sans-jp-fonts-2.004-160000.3.2.noarch.rpm",
+          "bytes": 14194937,
+          "sha256": "ad35ef2e216d02010e818035c1fd856f33448218133815014c5291ab2a9d8321",
+          "sha512": "957938cffa5ad1385bfc6a866581cdfa13e70e19a7e8e8716bf1ff0824d1ecbbb153658e44aa03b03d65e48bc007e710c2b6ca80420f0a2350b198e4341c0a7a",
+          "name": [
+            "google-noto-sans-jp-fonts"
+          ],
+          "version": [
+            "2.004"
+          ],
+          "release": [
+            "160000.3.2"
+          ],
+          "source": [
+            "google-noto-sans-cjk-fonts-2.004-160000.3.2.src.rpm"
+          ],
+          "requires": [
+            "/bin/sh",
+            "/bin/sh",
+            "/bin/sh",
+            "aaa_base",
+            "coreutils",
+            "coreutils",
+            "coreutils",
+            "perl",
+            "rpmlib(CompressedFileNames)",
+            "rpmlib(FileDigests)",
+            "rpmlib(PayloadFilesHavePrefix)",
+            "rpmlib(PayloadIsZstd)"
+          ],
+          "fonts": [
+            {
+              "file": "./usr/share/fonts/truetype/NotoSansCJKjp-VF.otf",
+              "bytes": 30766960,
+              "sha256": "ab2728702f90d2ae900309f299dc3c2b075010888a1a8a67fbd5b4c6aff713a0",
+              "faces": [
+                {
+                  "family": "Noto Sans CJK JP",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "uniFF0B",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "rpm_signature_verification": "not performed; official-host bytes and metadata hashes recorded",
+          "sha512_matches_cached_primary": true
+        },
+        {
+          "url": "https://cdn.opensuse.org/distribution/leap/16.0/repo/oss/noarch/google-noto-sans-cjk-fonts-2.004-160000.3.2.noarch.rpm",
+          "bytes": 15250,
+          "sha256": "3c83b9f148a8d7e76ba9327f36340c0b26b567e6d766b4637792712367b2de14",
+          "sha512": "f6e87a4dda63bc9d1d95cd0cf813fe353bda5ec96e1799fe94b27c47ba97da41f2e3b4655f123b895500cec7523e1f62dc30a412276b2909330a69148a0152b8",
+          "name": [
+            "google-noto-sans-cjk-fonts"
+          ],
+          "version": [
+            "2.004"
+          ],
+          "release": [
+            "160000.3.2"
+          ],
+          "source": [
+            "google-noto-sans-cjk-fonts-2.004-160000.3.2.src.rpm"
+          ],
+          "requires": [
+            "google-noto-sans-jp-fonts",
+            "google-noto-sans-kr-fonts",
+            "google-noto-sans-sc-fonts",
+            "google-noto-sans-tc-fonts",
+            "rpmlib(CompressedFileNames)",
+            "rpmlib(FileDigests)",
+            "rpmlib(PayloadFilesHavePrefix)",
+            "rpmlib(PayloadIsZstd)"
+          ],
+          "fonts": [],
+          "rpm_signature_verification": "not performed; official-host bytes and metadata hashes recorded",
+          "sha512_matches_cached_primary": true
+        }
+      ],
+      "minimal_candidates": [
+        "google-noto-sans-symbols2-fonts",
+        "google-noto-sans-jp-fonts"
+      ],
+      "scope": "Official binaries inspected in host memory; no installation or fixture changes; cache/metadata checks are not an independent RPM signature verification."
+    },
+    "arch-20261001": {
+      "db": {
+        "url": "https://archive.archlinux.org/repos/2026/10/01/extra/os/x86_64/extra.db",
+        "bytes": 8875065,
+        "sha256": "b2c0d01420d9bc1da17589c622fbf12c49af15d60e54f46cad8f6c307b5497ba",
+        "sha512": "46d72f9505f866b00dd48a0a4d566a3ee8bbeb7fa07b802ca2d709317ae36b05c1da1961d44ce9b2bfdfaf49cfc9971316837ab0e64641108d7223539eeaff96"
+      },
+      "files_db": {
+        "url": "https://archive.archlinux.org/repos/2026/10/01/extra/os/x86_64/extra.files",
+        "bytes": 51190721,
+        "sha256": "efb2b35884936fea654fb5e3dd04128db13ac4a5a4b08f9b6a5969ee6a642b59",
+        "sha512": "998fc6b19b63fe4a80b6ce99c41f057758ab86b4af7bdc8871b2f88f5102f2f6ff55a3c785f9fc13dc75449417223f1604e60f17fdc0d8841123362cc5ef9b02"
+      },
+      "packages": [
+        {
+          "FILENAME": [
+            "noto-fonts-1:2026.10.01-1-any.pkg.tar.zst"
+          ],
+          "NAME": [
+            "noto-fonts"
+          ],
+          "BASE": [
+            "noto-fonts"
+          ],
+          "VERSION": [
+            "1:2026.10.01-1"
+          ],
+          "DESC": [
+            "Google Noto TTF fonts"
+          ],
+          "CSIZE": [
+            "29214572"
+          ],
+          "ISIZE": [
+            "111994197"
+          ],
+          "SHA256SUM": [
+            "3cf6de13b1f3600ed782ff5e22eb6b3827fcc0ab5ee407bc0b121239fe19d949"
+          ],
+          "PGPSIG": [
+            "iQEzBAABCgAdFiEEFRnVq6Zb9vwrc8dWek52CV2KUuQFAmq999QACgkQek52CV2KUuSq0Qf+Mvo93v1NFGQW8bw4mUr2H6GpFioXWK1WY9mAiMMuy5Lt5ecm0mS0j4I2Hn3RKMpySFYAhu+H08KeFMDfaFzHMCbsdNUd/1Fx10VH5egunbvr2QyV9MO0XTW2m0wFP4UPjyHI77679BQfc4ip63AMNXqrVA2zaaLAX5A7x3KeNfMCTA0wqY/vzKlOtcVW3aHJ6jV8MjZMwfKY2XDIkZInVr7Mui2qgR+XxP0VQTyXuioeb+UEUww+eRzEGtjgpdbc67wXTQnKy+w4HNO4VpBORG4y31iQrrgoIBKo5+el6pWQiT74FMiAQqpcagPLV3eorQhB8BlMyug/YYv2JMGwZQ=="
+          ],
+          "URL": [
+            "https://fonts.google.com/noto"
+          ],
+          "LICENSE": [
+            "OFL-1.1-no-RFN"
+          ],
+          "ARCH": [
+            "any"
+          ],
+          "BUILDDATE": [
+            "1790834509"
+          ],
+          "PACKAGER": [
+            "Antonio Rojas <arojas@archlinux.org>"
+          ],
+          "PROVIDES": [
+            "ttf-font"
+          ],
+          "OPTDEPENDS": [
+            "noto-fonts-cjk: CJK characters",
+            "noto-fonts-emoji: Emoji characters",
+            "noto-fonts-extra: additional variants (condensed, semi-bold, extra-light)"
+          ],
+          "MAKEDEPENDS": [
+            "git"
+          ]
+        },
+        {
+          "FILENAME": [
+            "noto-fonts-cjk-20240730-1-any.pkg.tar.zst"
+          ],
+          "NAME": [
+            "noto-fonts-cjk"
+          ],
+          "BASE": [
+            "noto-fonts-cjk"
+          ],
+          "VERSION": [
+            "20240730-1"
+          ],
+          "DESC": [
+            "Google Noto CJK fonts"
+          ],
+          "CSIZE": [
+            "197917504"
+          ],
+          "ISIZE": [
+            "313299069"
+          ],
+          "SHA256SUM": [
+            "bab25db69704a9055a7b5f608a6ec921ea0b15aa54e1e35ae4d83aa1c0970662"
+          ],
+          "PGPSIG": [
+            "iQEzBAABCAAdFiEEFRnVq6Zb9vwrc8dWek52CV2KUuQFAmef6CgACgkQek52CV2KUuR84Qf/YrJIvyv5XiXM8hPWDIEtCh1Zo5cc+gktvOeMbGXddFHtiDsmIlm6uNh1iT/2LhIYf8aMfsNdthL+qpmXDTdmP/6BOyb3+f7gSoj90TzAyRL0Wuuua6yJhjqLK8KcdlOEh77521Vh3DzV0sO/ytijZ3jAs2tLb3uiNPQSx/PqJJSVycEvjgdEgaVM6AmThrnfFXCcw5342DkAN4B+OoeqkhkiUcxPm+cSD8PvtnnxMdQSWfKhy/sCw3Ibgnsldfg2I/rf2FSK6ZdsjEBz4HTzaByN2FfJCJtH9/Sn/5avo8s70fwKB/dqga+41VGLVJIUqJfxPB7caYw0ytzXkZYELQ=="
+          ],
+          "URL": [
+            "https://www.google.com/get/noto/"
+          ],
+          "LICENSE": [
+            "OFL-1.1"
+          ],
+          "ARCH": [
+            "any"
+          ],
+          "BUILDDATE": [
+            "1738532732"
+          ],
+          "PACKAGER": [
+            "Antonio Rojas <arojas@archlinux.org>"
+          ],
+          "MAKEDEPENDS": [
+            "git"
+          ]
+        }
+      ],
+      "selected_filelists": {
+        "noto-fonts-1:2026.10.01-1/files": [
+          "usr/share/fonts/noto/NotoSansSymbols2-Regular.ttf"
+        ],
+        "noto-fonts-cjk-20240730-1/files": [
+          "usr/share/fonts/noto-cjk/NotoSansCJK-Regular.ttc"
+        ]
+      },
+      "signature_verification": "not performed; dated official archive metadata including package PGP signatures retained"
+    },
+    "arch-20261001-symbols2-binary": {
+      "url": "https://archive.archlinux.org/repos/2026/10/01/extra/os/x86_64/noto-fonts-1:2026.10.01-1-any.pkg.tar.zst",
+      "bytes": 29214572,
+      "sha256": "3cf6de13b1f3600ed782ff5e22eb6b3827fcc0ab5ee407bc0b121239fe19d949",
+      "sha512": "8942dc61a77e912d3f3a529095a881cca4c49fa72fd05b702bc19f7383a99af9afd6697f04f3240c0fbd06471afe773aaadac768e29c1e09394df9abe5ac34bb",
+      "sha256_matches_dated_db": true,
+      "fonts": [
+        {
+          "file": "usr/share/fonts/noto/NotoSansSymbols2-Regular.ttf",
+          "bytes": 671568,
+          "sha256": "c4a0a80f0041ce4be81e2478faad22776d23edb98ae3f0d19bd37044820ecf9d",
+          "faces": [
+            {
+              "family": "Noto Sans Symbols 2",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": null,
+                  "index": 0
+                },
+                "U+2316": {
+                  "name": "uni2316",
+                  "index": 1481
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "signature_verification": "not performed; package hash matched exact official dated DB; no installation."
+    },
+    "fedora43": {
+      "release": 43,
+      "official_package_pages": [
+        {
+          "url": "https://packages.fedoraproject.org/pkgs/google-noto-fonts/google-noto-sans-symbols-2-fonts/fedora-43.html",
+          "bytes": 5957,
+          "sha256": "5a622f6acaab1838047bdea3ed675d12a9402374453c157bf09664272def08f7",
+          "sha512": "4b0493dd4f24750c8b7ce35a20dbc501a554335558d87f3b6b5d612fb501f9cea503ecaa267d6be9602e488c401cc03ad88ac264e0f857341f43c7291ce60341",
+          "title": "google-noto-sans-symbols-2-fonts-20250901-1.fc43 in Fedora 43",
+          "font_files": [
+            "NotoSansSymbols2-Regular.ttf"
+          ]
+        },
+        {
+          "url": "https://packages.fedoraproject.org/pkgs/google-noto-sans-cjk-fonts/google-noto-sans-cjk-fonts/fedora-43.html",
+          "bytes": 6896,
+          "sha256": "3f721f6b412c501bedd71c45d12fc55cdbae1bbf5f5a9de7669ae8f86cbcd01f",
+          "sha512": "498504a78122fbb6351777dd25e9a56f9fdcbb33e42f3dab9da0dff980dd74c8e2f617a274208e186bacab607df7c3d86c8abff5bb250028f27ed4f7d956e07a",
+          "title": "google-noto-sans-cjk-fonts-2.004-10.fc43 in Fedora 43",
+          "font_files": [
+            "NotoSansCJK-Regular.ttc"
+          ]
+        }
+      ],
+      "symbols2_binary": {
+        "url": "https://kojipkgs.fedoraproject.org/packages/google-noto-fonts/20250901/1.fc43/noarch/google-noto-sans-symbols-2-fonts-20250901-1.fc43.noarch.rpm",
+        "bytes": 289978,
+        "sha256": "80ec2d61fdcf5b53f4891ccedf62aead9cb72e728ba6ff995d86566850652c12",
+        "sha512": "807988c120d19fc14f60a0f0dbc7c310c80fd65f9cbee2c6e18e040d259ec5434e1f0fac73e2f053a6b6a11e16972f3749a4e67c2cdef80404bae04a7b4b0ee3",
+        "name": [
+          "google-noto-sans-symbols-2-fonts"
+        ],
+        "version": [
+          "20250901"
+        ],
+        "release": [
+          "1.fc43"
+        ],
+        "source": [
+          "google-noto-fonts-20250901-1.fc43.src.rpm"
+        ],
+        "requires": [
+          "config(google-noto-sans-symbols-2-fonts)",
+          "fontpackages-filesystem",
+          "google-noto-fonts-common",
+          "rpmlib(CompressedFileNames)",
+          "rpmlib(FileDigests)",
+          "rpmlib(PayloadFilesHavePrefix)",
+          "rpmlib(PayloadIsZstd)"
+        ],
+        "fonts": [
+          {
+            "file": "./usr/share/fonts/google-noto/NotoSansSymbols2-Regular.ttf",
+            "bytes": 671568,
+            "sha256": "c4a0a80f0041ce4be81e2478faad22776d23edb98ae3f0d19bd37044820ecf9d",
+            "faces": [
+              {
+                "family": "Noto Sans Symbols 2",
+                "glyphs": {
+                  "U+FF0B": {
+                    "name": null,
+                    "index": 0
+                  },
+                  "U+2316": {
+                    "name": "uni2316",
+                    "index": 1481
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "rpm_signature_verification": "not performed; official-host bytes and metadata hashes recorded"
+      },
+      "scope": "Exact published package pages and one official producer RPM; no installed Qt qualification and no claim these pages select newest updates."
+    },
+    "fedora44": {
+      "release": 44,
+      "official_package_pages": [
+        {
+          "url": "https://packages.fedoraproject.org/pkgs/google-noto-fonts/google-noto-sans-symbols-2-fonts/fedora-44.html",
+          "bytes": 5901,
+          "sha256": "9e565f26f4ce6b81a85e4894dcfaff7a66dc93e5478ac1c1c0819bc9a5be6ac5",
+          "sha512": "22e1cfb7f301fc34aa68e6525f434cef3c13eb421c517ec6409e25f749be587eb01ab430920b523665be2c77ba432aed9f79d03642e156289bea53a3790581d9",
+          "title": "google-noto-sans-symbols-2-fonts-20251201-2.fc44 in Fedora 44",
+          "font_files": [
+            "NotoSansSymbols2-Regular.ttf"
+          ]
+        },
+        {
+          "url": "https://packages.fedoraproject.org/pkgs/google-noto-sans-cjk-fonts/google-noto-sans-cjk-fonts/fedora-44.html",
+          "bytes": 6698,
+          "sha256": "424736aa59dfd0dc2ab2a070e929a9747febfd6fa766e7be16b1c2faecb9375b",
+          "sha512": "281e0b651ad6048bca9f8bd27143bbb2193d228804ab326b5d9a38803a1f1b75a66f6262b6da2c6880ec765b0467beef993678bb67b2c7800a04f68889aa8ec5",
+          "title": "google-noto-sans-cjk-fonts-2.004-11.fc44 in Fedora 44",
+          "font_files": [
+            "NotoSansCJK-Regular.ttc"
+          ]
+        }
+      ],
+      "symbols2_binary": {
+        "url": "https://kojipkgs.fedoraproject.org/packages/google-noto-fonts/20251201/2.fc44/noarch/google-noto-sans-symbols-2-fonts-20251201-2.fc44.noarch.rpm",
+        "bytes": 290537,
+        "sha256": "e6f37f8eeaf87ca2af02e929396c25ede09a94650685d30b1d8b334bf5a520b2",
+        "sha512": "2fa9b22aaa8a831b72ff45cbbedd320b095f6a5ec6b9602a5aee50f9ed7c379ccdee03df55b5d63301f6e3b0b9fded1c0abef33d466e034028e42601ac1512e9",
+        "name": [
+          "google-noto-sans-symbols-2-fonts"
+        ],
+        "version": [
+          "20251201"
+        ],
+        "release": [
+          "2.fc44"
+        ],
+        "source": [
+          "google-noto-fonts-20251201-2.fc44.src.rpm"
+        ],
+        "requires": [
+          "config(google-noto-sans-symbols-2-fonts)",
+          "fontpackages-filesystem",
+          "google-noto-fonts-common",
+          "rpmlib(CompressedFileNames)",
+          "rpmlib(FileDigests)",
+          "rpmlib(PayloadFilesHavePrefix)",
+          "rpmlib(PayloadIsZstd)"
+        ],
+        "fonts": [
+          {
+            "file": "./usr/share/fonts/google-noto/NotoSansSymbols2-Regular.ttf",
+            "bytes": 671568,
+            "sha256": "c4a0a80f0041ce4be81e2478faad22776d23edb98ae3f0d19bd37044820ecf9d",
+            "faces": [
+              {
+                "family": "Noto Sans Symbols 2",
+                "glyphs": {
+                  "U+FF0B": {
+                    "name": null,
+                    "index": 0
+                  },
+                  "U+2316": {
+                    "name": "uni2316",
+                    "index": 1481
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "rpm_signature_verification": "not performed; official-host bytes and metadata hashes recorded"
+      },
+      "scope": "Exact published package pages and one official producer RPM; no installed Qt qualification and no claim these pages select newest updates."
+    },
+    "fedora43-cjk-binary": {
+      "url": "https://kojipkgs.fedoraproject.org/packages/google-noto-sans-cjk-fonts/2.004/10.fc43/noarch/google-noto-sans-cjk-fonts-2.004-10.fc43.noarch.rpm",
+      "bytes": 84390053,
+      "sha256": "99b01240c106eb173bff7c4b741f91ce8e582a4a8bf2d269caf947986212bd20",
+      "sha512": "4b0e5b9978f0a32c33cbd0089628007427aa6390bab438a06db32d5cbd73409d7a9e96b02db9b715f6217e6e1abf062af8e9cb76df61a4989ce5d1c13641437a",
+      "name": [
+        "google-noto-sans-cjk-fonts"
+      ],
+      "version": [
+        "2.004"
+      ],
+      "release": [
+        "10.fc43"
+      ],
+      "source": [
+        "google-noto-sans-cjk-fonts-2.004-10.fc43.src.rpm"
+      ],
+      "requires": [
+        "config(google-noto-sans-cjk-fonts)",
+        "fontpackages-filesystem",
+        "rpmlib(CompressedFileNames)",
+        "rpmlib(FileDigests)",
+        "rpmlib(PayloadFilesHavePrefix)",
+        "rpmlib(PayloadIsZstd)"
+      ],
+      "fonts": [
+        {
+          "file": "./usr/share/fonts/google-noto-sans-cjk-fonts/NotoSansCJK-Regular.ttc",
+          "bytes": 19484784,
+          "sha256": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a",
+          "faces": [
+            {
+              "family": "Noto Sans CJK JP",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans CJK KR",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans CJK SC",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans CJK TC",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans CJK HK",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans Mono CJK JP",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans Mono CJK KR",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans Mono CJK SC",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans Mono CJK TC",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans Mono CJK HK",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "rpm_signature_verification": "not performed; official-host bytes and metadata hashes recorded"
+    },
+    "debian13": {
+      "target": "debian13",
+      "metadata": [
+        {
+          "url": "https://deb.debian.org/debian/dists/trixie/main/binary-amd64/Packages.xz",
+          "bytes": 9678380,
+          "sha256": "7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498",
+          "sha512": "d0cccb1fb06e4cf27a1ec53f5aa1b311cc9d75510a4ceeca9d4776cca84f18bd1c963b7da1f8c324663aa34f72c13a31688ddcf37315210c430cf2f930e3f1aa"
+        }
+      ],
+      "packages": [
+        {
+          "Package": "fonts-noto-core",
+          "Source": "fonts-noto",
+          "Version": "20201225-2",
+          "Installed-Size": "42551",
+          "Maintainer": "Debian Fonts Task Force <pkg-fonts-devel@lists.alioth.debian.org>",
+          "Architecture": "all",
+          "Replaces": "fonts-noto (<< 2015-05-11+cjk-1~), fonts-noto-hinted (<< 20181130-2~), fonts-noto-unhinted (<< 20201027-1~)",
+          "Depends": "fonts-noto-mono",
+          "Breaks": "fonts-noto (<< 2015-05-11+cjk-1~), fonts-noto-hinted (<< 20181130-2~), fonts-noto-unhinted (<< 20201027-1~)",
+          "Description": "\"No Tofu\" font families with large Unicode coverage (core)",
+          "Multi-Arch": "foreign",
+          "Homepage": "https://www.google.com/get/noto/",
+          "Description-md5": "90f2920d03e003f323ce36ac9c12994f",
+          "Section": "fonts",
+          "Priority": "optional",
+          "Filename": "pool/main/f/fonts-noto/fonts-noto-core_20201225-2_all.deb",
+          "Size": "12188336",
+          "MD5sum": "c9ca96a444a0b2994483afef8305c19c",
+          "SHA256": "97978d09b68445fcf85342b106cd2e812d7813e3d5626f9884a5f344c3a55973",
+          "component": "main",
+          "metadata_url": "https://deb.debian.org/debian/dists/trixie/main/binary-amd64/Packages.xz"
+        },
+        {
+          "Package": "fonts-noto-cjk",
+          "Version": "1:20240730+repack1-1",
+          "Installed-Size": "91217",
+          "Maintainer": "Debian Fonts Team <debian-fonts@lists.debian.org>",
+          "Architecture": "all",
+          "Suggests": "fonts-noto-cjk-extra",
+          "Description": "\"No Tofu\" font families with large Unicode coverage (CJK regular and bold)",
+          "Multi-Arch": "foreign",
+          "Homepage": "https://github.com/notofonts/noto-cjk",
+          "Description-md5": "0ca861bf5dc90003c5a480427ee7d985",
+          "Section": "fonts",
+          "Priority": "optional",
+          "Filename": "pool/main/f/fonts-noto-cjk/fonts-noto-cjk_20240730+repack1-1_all.deb",
+          "Size": "56674044",
+          "MD5sum": "976b4a468e7945cbc023d64e7f3c06dd",
+          "SHA256": "f5dc28a754e17327d99f0a612134d92c8dd6187314ae967cb77f25df60860139",
+          "component": "main",
+          "metadata_url": "https://deb.debian.org/debian/dists/trixie/main/binary-amd64/Packages.xz"
+        }
+      ],
+      "binary_inspection": [
+        {
+          "url": "https://deb.debian.org/debian/pool/main/f/fonts-noto/fonts-noto-core_20201225-2_all.deb",
+          "bytes": 12188336,
+          "sha256": "97978d09b68445fcf85342b106cd2e812d7813e3d5626f9884a5f344c3a55973",
+          "sha512": "53cc6315e526c8485514594429cf92655409a363041bac803995d0ce417f1109e8072286dd48ba0bec3384ac29f770e587848cdedaa7145f9e9dadf884e9edef",
+          "package": "fonts-noto-core",
+          "version": "20201225-2",
+          "sha256_matches_packages": true,
+          "fonts": [
+            {
+              "file": "./usr/share/fonts/truetype/noto/NotoSansSymbols2-Regular.ttf",
+              "bytes": 656852,
+              "sha256": "876598db5f1e3bef2bc77c4d94c5b0d5d2c1620be4878a06f18fb5434e331688",
+              "faces": [
+                {
+                  "family": "Noto Sans Symbols2",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": null,
+                      "index": 0
+                    },
+                    "U+2316": {
+                      "name": "uni2316",
+                      "index": 1481
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "url": "https://deb.debian.org/debian/pool/main/f/fonts-noto-cjk/fonts-noto-cjk_20240730+repack1-1_all.deb",
+          "bytes": 56674044,
+          "sha256": "f5dc28a754e17327d99f0a612134d92c8dd6187314ae967cb77f25df60860139",
+          "sha512": "dac93f2d7f896ad0fd16d474096f26905876b7150512460cf60e216a810bf05bb9b908d65b5e5ef1894874f54384334875d82f4878a7e7625a4637c170205f02",
+          "package": "fonts-noto-cjk",
+          "version": "1:20240730+repack1-1",
+          "sha256_matches_packages": true,
+          "fonts": [
+            {
+              "file": "./usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+              "bytes": 19484784,
+              "sha256": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a",
+              "faces": [
+                {
+                  "family": "Noto Sans CJK JP",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans CJK KR",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans CJK SC",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans CJK TC",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans CJK HK",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans Mono CJK JP",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans Mono CJK KR",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans Mono CJK SC",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans Mono CJK TC",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans Mono CJK HK",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "errors": [],
+      "scope": "Official metadata and extracted font cmap only; no installation or Qt fallback qualification; apt signatures not independently verified in this researcher."
+    },
+    "ubuntu24": {
+      "target": "ubuntu24",
+      "metadata": [
+        {
+          "url": "https://archive.ubuntu.com/ubuntu/dists/noble/main/binary-amd64/Packages.xz",
+          "bytes": 1401160,
+          "sha256": "2a6a199e1031a5c279cb346646d594993f35b1c03dd4a82aaa0323980dd92451",
+          "sha512": "397d38732b71e6e84745ef38a86eb277fe3a84bc4897dc5275daf1099a3bc8db64e3f46a931ed3fa545d3ed1fcceec8999c52f28597c8a31c1a75322c2d3db7b"
+        },
+        {
+          "url": "https://archive.ubuntu.com/ubuntu/dists/noble/universe/binary-amd64/Packages.xz",
+          "bytes": 15037908,
+          "sha256": "ba9057fa1b91438cc8a1d26808d00c85389fe101d0c1496254df97236405599a",
+          "sha512": "38ca34d00c763b41e7060f8d1a863b6ccd1d7e3fd357f3cc4a462f744282004945dbde0d9792732e4a6b51cf9583f1a6181b7e5160730a99dfa09e95feb59ba5"
+        }
+      ],
+      "packages": [
+        {
+          "Package": "fonts-noto-cjk",
+          "Architecture": "all",
+          "Version": "1:20230817+repack1-3",
+          "Multi-Arch": "foreign",
+          "Priority": "optional",
+          "Section": "fonts",
+          "Origin": "Ubuntu",
+          "Maintainer": "Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>",
+          "Original-Maintainer": "Debian Fonts Team <debian-fonts@lists.debian.org>",
+          "Bugs": "https://bugs.launchpad.net/ubuntu/+filebug",
+          "Installed-Size": "90994",
+          "Suggests": "fonts-noto-cjk-extra",
+          "Filename": "pool/main/f/fonts-noto-cjk/fonts-noto-cjk_20230817+repack1-3_all.deb",
+          "Size": "61229778",
+          "MD5sum": "6d2b2c3dc717b8f8a1db0df79b34e628",
+          "SHA1": "8bdbac876dd4314c90f1e2dcf92b299a0318ada4",
+          "SHA256": "7d64b985f6fe128c99eae5610d5c047338e572bdcfb2bb09736be01b824a7f6c",
+          "SHA512": "5c9e5d817477e8f858bfd06469e2eb86c5c62a562a9593732bd8578378720cd1b0cd4146333a21aa86546a374660e88276420e1f8ba965f33dd6dd5d6bda0941",
+          "Homepage": "https://github.com/notofonts/noto-cjk",
+          "Description": "\"No Tofu\" font families with large Unicode coverage (CJK regular and bold)",
+          "Task": "ubuntu-desktop-minimal, ubuntu-desktop, ubuntu-desktop-raspi, kubuntu-desktop, xubuntu-minimal, xubuntu-desktop, lubuntu-desktop, ubuntustudio-desktop-core, ubuntustudio-desktop, ubuntukylin-desktop, ubuntukylin-desktop-minimal, ubuntu-mate-core, ubuntu-mate-desktop, ubuntu-budgie-desktop-minimal, ubuntu-budgie-desktop, ubuntu-budgie-desktop-raspi, ubuntu-unity-desktop, edubuntu-desktop-gnome-minimal, edubuntu-desktop-gnome-raspi, ubuntucinnamon-desktop-minimal, ubuntucinnamon-desktop-raspi",
+          "Description-md5": "0ca861bf5dc90003c5a480427ee7d985",
+          "component": "main",
+          "metadata_url": "https://archive.ubuntu.com/ubuntu/dists/noble/main/binary-amd64/Packages.xz"
+        },
+        {
+          "Package": "fonts-noto-core",
+          "Architecture": "all",
+          "Version": "20201225-2",
+          "Multi-Arch": "foreign",
+          "Priority": "optional",
+          "Section": "fonts",
+          "Source": "fonts-noto",
+          "Origin": "Ubuntu",
+          "Maintainer": "Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>",
+          "Original-Maintainer": "Debian Fonts Task Force <pkg-fonts-devel@lists.alioth.debian.org>",
+          "Bugs": "https://bugs.launchpad.net/ubuntu/+filebug",
+          "Installed-Size": "42551",
+          "Depends": "fonts-noto-mono",
+          "Breaks": "fonts-noto (<< 2015-05-11+cjk-1~), fonts-noto-hinted (<< 20181130-2~), fonts-noto-unhinted (<< 20201027-1~)",
+          "Replaces": "fonts-noto (<< 2015-05-11+cjk-1~), fonts-noto-hinted (<< 20181130-2~), fonts-noto-unhinted (<< 20201027-1~)",
+          "Filename": "pool/main/f/fonts-noto/fonts-noto-core_20201225-2_all.deb",
+          "Size": "13291094",
+          "MD5sum": "2bbbdc0c9fdbc5b76bf23aac529b328a",
+          "SHA1": "7a2ebe0cbc95a687cba6365714d6920eb2b6dcb6",
+          "SHA256": "4fee136cb12fc197703a340e010478f780a41044339fcefbd78ed9aa96c8b617",
+          "SHA512": "dd8187da0b4903d2ccd445518094e92c4a6285a886b7091b7ce8151dea358eba36ba41cd215d349c2b9953ad5d2fbeacfcee117327340f59e62af75ca0dba2ee",
+          "Homepage": "https://www.google.com/get/noto/",
+          "Description": "\"No Tofu\" font families with large Unicode coverage (core)",
+          "Task": "ubuntu-desktop-minimal, ubuntu-desktop, ubuntu-desktop-raspi, kubuntu-desktop, xubuntu-minimal, xubuntu-desktop, lubuntu-desktop, ubuntustudio-desktop-core, ubuntustudio-desktop, ubuntukylin-desktop, ubuntukylin-desktop-minimal, ubuntu-mate-core, ubuntu-mate-desktop, ubuntu-budgie-desktop-minimal, ubuntu-budgie-desktop, ubuntu-budgie-desktop-raspi, ubuntu-unity-desktop, edubuntu-desktop-gnome-minimal, edubuntu-desktop-gnome-raspi, ubuntucinnamon-desktop-minimal, ubuntucinnamon-desktop-raspi",
+          "Description-md5": "90f2920d03e003f323ce36ac9c12994f",
+          "component": "main",
+          "metadata_url": "https://archive.ubuntu.com/ubuntu/dists/noble/main/binary-amd64/Packages.xz"
+        }
+      ],
+      "binary_inspection": [
+        {
+          "url": "https://archive.ubuntu.com/ubuntu/pool/main/f/fonts-noto-cjk/fonts-noto-cjk_20230817+repack1-3_all.deb",
+          "bytes": 61229778,
+          "sha256": "7d64b985f6fe128c99eae5610d5c047338e572bdcfb2bb09736be01b824a7f6c",
+          "sha512": "5c9e5d817477e8f858bfd06469e2eb86c5c62a562a9593732bd8578378720cd1b0cd4146333a21aa86546a374660e88276420e1f8ba965f33dd6dd5d6bda0941",
+          "package": "fonts-noto-cjk",
+          "version": "1:20230817+repack1-3",
+          "sha256_matches_packages": true,
+          "fonts": [
+            {
+              "file": "./usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+              "bytes": 19484784,
+              "sha256": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a",
+              "faces": [
+                {
+                  "family": "Noto Sans CJK JP",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans CJK KR",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans CJK SC",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans CJK TC",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans CJK HK",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans Mono CJK JP",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans Mono CJK KR",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans Mono CJK SC",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans Mono CJK TC",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans Mono CJK HK",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "url": "https://archive.ubuntu.com/ubuntu/pool/main/f/fonts-noto/fonts-noto-core_20201225-2_all.deb",
+          "bytes": 13291094,
+          "sha256": "4fee136cb12fc197703a340e010478f780a41044339fcefbd78ed9aa96c8b617",
+          "sha512": "dd8187da0b4903d2ccd445518094e92c4a6285a886b7091b7ce8151dea358eba36ba41cd215d349c2b9953ad5d2fbeacfcee117327340f59e62af75ca0dba2ee",
+          "package": "fonts-noto-core",
+          "version": "20201225-2",
+          "sha256_matches_packages": true,
+          "fonts": [
+            {
+              "file": "./usr/share/fonts/truetype/noto/NotoSansSymbols2-Regular.ttf",
+              "bytes": 656852,
+              "sha256": "876598db5f1e3bef2bc77c4d94c5b0d5d2c1620be4878a06f18fb5434e331688",
+              "faces": [
+                {
+                  "family": "Noto Sans Symbols2",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": null,
+                      "index": 0
+                    },
+                    "U+2316": {
+                      "name": "uni2316",
+                      "index": 1481
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "errors": [],
+      "scope": "Official metadata and extracted font cmap only; no installation or Qt fallback qualification; apt signatures not independently verified in this researcher."
+    },
+    "ubuntu26": {
+      "target": "ubuntu26",
+      "metadata": [
+        {
+          "url": "https://archive.ubuntu.com/ubuntu/dists/resolute/main/binary-amd64/Packages.xz",
+          "bytes": 1480032,
+          "sha256": "ed9ac41cb263efaecc5a06a0742dc56570e2fb5ff94c4f2e4b2fbdcddd73cf24",
+          "sha512": "2a6fbbd695609102b07cddbf85026f7d6b61a3897128e4c9ec6f18f032b8b7c9253f5191b93fc762d0345c1b30d59c2143bba70345f7981d021b431df0e7ecb1"
+        },
+        {
+          "url": "https://archive.ubuntu.com/ubuntu/dists/resolute/universe/binary-amd64/Packages.xz",
+          "bytes": 15960824,
+          "sha256": "1587be86d66d38542325215e0e109f75bd695c8f24d793ace2762038a6ad581e",
+          "sha512": "3aecf8840737130fea184eac0aa47a60d2dd9f28d4673ce596a9c6171c07176f307d10430794ff12d8269d12893faa336d0ba1e8b7f5f652d2ba9e868bb7f875"
+        }
+      ],
+      "packages": [
+        {
+          "Package": "fonts-noto-cjk",
+          "Priority": "optional",
+          "Section": "fonts",
+          "Installed-Size": "91218",
+          "Maintainer": "Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>",
+          "Architecture": "all",
+          "Version": "1:20240730+repack1-1build1",
+          "Suggests": "fonts-noto-cjk-extra",
+          "Filename": "pool/main/f/fonts-noto-cjk/fonts-noto-cjk_20240730+repack1-1build1_all.deb",
+          "Size": "61175182",
+          "MD5sum": "4daa7d236123f1bd9ec9aeabc49265af",
+          "SHA1": "7a61ac754c591164970e0d52b3bbe9501c3aa2dd",
+          "SHA256": "be378a571b8f49b4b9146f7d13b31990950d35ee3e0bf1999f554c3ed5670dc0",
+          "SHA512": "4d028e6d6fd7ab17052960ad6284bca77f17f7d442fa72e692e0a6b035d50916b91f5386ad88290c0e3414315c87a3352e9bca76247be6f9f5b21ecb0357fa9b",
+          "Homepage": "https://github.com/notofonts/noto-cjk",
+          "Description": "\"No Tofu\" font families with large Unicode coverage (CJK regular and bold)",
+          "Description-md5": "fa0170658106177117b2cd44529a49b3",
+          "Original-Maintainer": "Debian Fonts Team <debian-fonts@lists.debian.org>",
+          "Multi-Arch": "foreign",
+          "Origin": "Ubuntu",
+          "Bugs": "https://bugs.launchpad.net/ubuntu/+filebug",
+          "Task": "ubuntu-desktop-minimal, ubuntu-desktop, ubuntu-desktop-raspi, kubuntu-desktop, xubuntu-minimal, xubuntu-desktop, lubuntu-desktop-minimal, lubuntu-desktop, lubuntu-desktop, ubuntustudio-desktop, ubuntustudio-desktop-core, ubuntukylin-desktop, ubuntukylin-desktop-minimal, ubuntu-mate-core, ubuntu-mate-desktop, ubuntu-budgie-desktop-minimal, ubuntu-budgie-desktop, ubuntu-budgie-desktop-raspi, ubuntu-unity-desktop, edubuntu-desktop-gnome-minimal, edubuntu-desktop-gnome-raspi, ubuntucinnamon-desktop-minimal, ubuntucinnamon-desktop-raspi",
+          "component": "main",
+          "metadata_url": "https://archive.ubuntu.com/ubuntu/dists/resolute/main/binary-amd64/Packages.xz"
+        },
+        {
+          "Package": "fonts-noto-core",
+          "Source": "fonts-noto",
+          "Priority": "optional",
+          "Section": "fonts",
+          "Installed-Size": "42551",
+          "Maintainer": "Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>",
+          "Architecture": "all",
+          "Version": "20201225-2build1",
+          "Replaces": "fonts-noto (<< 2015-05-11+cjk-1~), fonts-noto-hinted (<< 20181130-2~), fonts-noto-unhinted (<< 20201027-1~)",
+          "Depends": "fonts-noto-mono",
+          "Breaks": "fonts-noto (<< 2015-05-11+cjk-1~), fonts-noto-hinted (<< 20181130-2~), fonts-noto-unhinted (<< 20201027-1~)",
+          "Filename": "pool/main/f/fonts-noto/fonts-noto-core_20201225-2build1_all.deb",
+          "Size": "13277790",
+          "MD5sum": "3c2dd16ac9aaa4279cc2db724eee8409",
+          "SHA1": "d96cf7fa0b14c55507959bb95337a559c7d1116a",
+          "SHA256": "25999af6e6665266b1f055d351fc5008534e65c9f7bdda1e7fb5a7574c42372f",
+          "SHA512": "1d04c344f85702ac9f37c8e1cd9d1c1c9845819afa759ca5ee5c460c295af875254a5cbeee54b44ad438b58cf05f7430f932465669f1bc579428d8e02708f6b0",
+          "Homepage": "https://www.google.com/get/noto/",
+          "Description": "\"No Tofu\" font families with large Unicode coverage (core)",
+          "Description-md5": "fd8136da609c5d7affdfc1988a1b9d23",
+          "Original-Maintainer": "Debian Fonts Task Force <pkg-fonts-devel@lists.alioth.debian.org>",
+          "Multi-Arch": "foreign",
+          "Origin": "Ubuntu",
+          "Bugs": "https://bugs.launchpad.net/ubuntu/+filebug",
+          "Task": "ubuntu-desktop-minimal, ubuntu-desktop, ubuntu-desktop-raspi, kubuntu-desktop, xubuntu-minimal, xubuntu-desktop, lubuntu-desktop-minimal, lubuntu-desktop, lubuntu-desktop, ubuntustudio-desktop, ubuntustudio-desktop-core, ubuntukylin-desktop, ubuntukylin-desktop-minimal, ubuntu-mate-core, ubuntu-mate-desktop, ubuntu-budgie-desktop-minimal, ubuntu-budgie-desktop, ubuntu-budgie-desktop-raspi, ubuntu-unity-desktop, edubuntu-desktop-gnome-minimal, edubuntu-desktop-gnome-raspi, ubuntucinnamon-desktop-minimal, ubuntucinnamon-desktop-raspi",
+          "component": "main",
+          "metadata_url": "https://archive.ubuntu.com/ubuntu/dists/resolute/main/binary-amd64/Packages.xz"
+        }
+      ],
+      "binary_inspection": [
+        {
+          "url": "https://archive.ubuntu.com/ubuntu/pool/main/f/fonts-noto-cjk/fonts-noto-cjk_20240730+repack1-1build1_all.deb",
+          "bytes": 61175182,
+          "sha256": "be378a571b8f49b4b9146f7d13b31990950d35ee3e0bf1999f554c3ed5670dc0",
+          "sha512": "4d028e6d6fd7ab17052960ad6284bca77f17f7d442fa72e692e0a6b035d50916b91f5386ad88290c0e3414315c87a3352e9bca76247be6f9f5b21ecb0357fa9b",
+          "package": "fonts-noto-cjk",
+          "version": "1:20240730+repack1-1build1",
+          "sha256_matches_packages": true,
+          "fonts": [
+            {
+              "file": "./usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+              "bytes": 19484784,
+              "sha256": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a",
+              "faces": [
+                {
+                  "family": "Noto Sans CJK JP",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans CJK KR",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans CJK SC",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans CJK TC",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans CJK HK",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans Mono CJK JP",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans Mono CJK KR",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans Mono CJK SC",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans Mono CJK TC",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                },
+                {
+                  "family": "Noto Sans Mono CJK HK",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": "cid59057",
+                      "index": 59057
+                    },
+                    "U+2316": {
+                      "name": null,
+                      "index": 0
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "url": "https://archive.ubuntu.com/ubuntu/pool/main/f/fonts-noto/fonts-noto-core_20201225-2build1_all.deb",
+          "bytes": 13277790,
+          "sha256": "25999af6e6665266b1f055d351fc5008534e65c9f7bdda1e7fb5a7574c42372f",
+          "sha512": "1d04c344f85702ac9f37c8e1cd9d1c1c9845819afa759ca5ee5c460c295af875254a5cbeee54b44ad438b58cf05f7430f932465669f1bc579428d8e02708f6b0",
+          "package": "fonts-noto-core",
+          "version": "20201225-2build1",
+          "sha256_matches_packages": true,
+          "fonts": [
+            {
+              "file": "./usr/share/fonts/truetype/noto/NotoSansSymbols2-Regular.ttf",
+              "bytes": 656852,
+              "sha256": "876598db5f1e3bef2bc77c4d94c5b0d5d2c1620be4878a06f18fb5434e331688",
+              "faces": [
+                {
+                  "family": "Noto Sans Symbols2",
+                  "glyphs": {
+                    "U+FF0B": {
+                      "name": null,
+                      "index": 0
+                    },
+                    "U+2316": {
+                      "name": "uni2316",
+                      "index": 1481
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "errors": [],
+      "scope": "Official metadata and extracted font cmap only; no installation or Qt fallback qualification; apt signatures not independently verified in this researcher."
+    },
+    "arch-20261001-cjk-binary": {
+      "url": "https://archive.archlinux.org/repos/2026/10/01/extra/os/x86_64/noto-fonts-cjk-20240730-1-any.pkg.tar.zst",
+      "bytes": 197917504,
+      "sha256": "bab25db69704a9055a7b5f608a6ec921ea0b15aa54e1e35ae4d83aa1c0970662",
+      "sha512": "df36d0a35d3cfe0242347810db4021f68715d5cc1f8d6f437f26a2ed9fe54f1a936cde2a302f904022cb9273019cb809464474b55651b19ffdc745a25052d348",
+      "sha256_matches_dated_db": true,
+      "fonts": [
+        {
+          "file": "usr/share/fonts/noto-cjk/NotoSansCJK-Regular.ttc",
+          "bytes": 19484784,
+          "sha256": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a",
+          "faces": [
+            {
+              "family": "Noto Sans CJK JP",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans CJK KR",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans CJK SC",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans CJK TC",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans CJK HK",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans Mono CJK JP",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans Mono CJK KR",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans Mono CJK SC",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans Mono CJK TC",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans Mono CJK HK",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "signature_verification": "not performed; package hash matched exact official dated DB; no installation."
+    },
+    "fedora44-cjk-binary": {
+      "url": "https://kojipkgs.fedoraproject.org/packages/google-noto-sans-cjk-fonts/2.004/11.fc44/noarch/google-noto-sans-cjk-fonts-2.004-11.fc44.noarch.rpm",
+      "bytes": 84383338,
+      "sha256": "66363ca9066241592b173a3d7f67f0007438cec5fb2c089f133aba4a267eb75f",
+      "sha512": "17a28d39f83e5bf22363ae5ee74e407a072f47a6cbb600d81c027ed46758bf724083029d1a5838a61fdc5436b5261c6050389c62ad7b6168b85bb38f8d372c37",
+      "name": [
+        "google-noto-sans-cjk-fonts"
+      ],
+      "version": [
+        "2.004"
+      ],
+      "release": [
+        "11.fc44"
+      ],
+      "source": [
+        "google-noto-sans-cjk-fonts-2.004-11.fc44.src.rpm"
+      ],
+      "requires": [
+        "config(google-noto-sans-cjk-fonts)",
+        "fontpackages-filesystem",
+        "rpmlib(CompressedFileNames)",
+        "rpmlib(FileDigests)",
+        "rpmlib(PayloadFilesHavePrefix)",
+        "rpmlib(PayloadIsZstd)"
+      ],
+      "fonts": [
+        {
+          "file": "./usr/share/fonts/google-noto-sans-cjk-fonts/NotoSansCJK-Regular.ttc",
+          "bytes": 19484784,
+          "sha256": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a",
+          "faces": [
+            {
+              "family": "Noto Sans CJK JP",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans CJK KR",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans CJK SC",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans CJK TC",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans CJK HK",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans Mono CJK JP",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans Mono CJK KR",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans Mono CJK SC",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans Mono CJK TC",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            },
+            {
+              "family": "Noto Sans Mono CJK HK",
+              "glyphs": {
+                "U+FF0B": {
+                  "name": "cid59057",
+                  "index": 59057
+                },
+                "U+2316": {
+                  "name": null,
+                  "index": 0
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "rpm_signature_verification": "not performed; official-host bytes and metadata hashes recorded"
+    }
+  },
+  "actualInstalledQtProofs": {
+    "arch": {
+      "format": "augmentor-linux-surface-font-proof/1",
+      "uid": 1002,
+      "qtVersion": "6.11.2",
+      "designSha256": "084a183cca4d930343120031a0eedae14926e39391ea3f4b0037973b400b4afe",
+      "probeSha256": "ac06d6f818f37904618ca6d2a4bb768f49153770ab609e0f27b9d147508334bd",
+      "primaryFamily": "DejaVu Sans",
+      "primaryStyle": "Book",
+      "pixelSize": 15,
+      "glyphs": {
+        "newchat": {
+          "text": "\uff0b",
+          "codepoints": [
+            "U+FF0B"
+          ],
+          "primaryIndexes": [
+            0
+          ],
+          "runs": [
+            {
+              "family": "Noto Sans CJK KR",
+              "style": "Regular",
+              "indexes": [
+                59057
+              ]
+            }
+          ],
+          "present": true,
+          "advance": 15.0,
+          "iconWidth": 24
+        },
+        "save": {
+          "text": "\u2606",
+          "codepoints": [
+            "U+2606"
+          ],
+          "primaryIndexes": [
+            3806
+          ],
+          "runs": [
+            {
+              "family": "DejaVu Sans",
+              "style": "Book",
+              "indexes": [
+                3806
+              ]
+            }
+          ],
+          "present": true,
+          "advance": 13.4375,
+          "iconWidth": 24
+        },
+        "saved": {
+          "text": "\u2605",
+          "codepoints": [
+            "U+2605"
+          ],
+          "primaryIndexes": [
+            3805
+          ],
+          "runs": [
+            {
+              "family": "DejaVu Sans",
+              "style": "Book",
+              "indexes": [
+                3805
+              ]
+            }
+          ],
+          "present": true,
+          "advance": 13.4375,
+          "iconWidth": 24
+        },
+        "sessions": {
+          "text": "\u2630",
+          "codepoints": [
+            "U+2630"
+          ],
+          "primaryIndexes": [
+            3848
+          ],
+          "runs": [
+            {
+              "family": "DejaVu Sans",
+              "style": "Book",
+              "indexes": [
+                3848
+              ]
+            }
+          ],
+          "present": true,
+          "advance": 13.4375,
+          "iconWidth": 24
+        },
+        "pin": {
+          "text": "\u2316",
+          "codepoints": [
+            "U+2316"
+          ],
+          "primaryIndexes": [
+            0
+          ],
+          "runs": [
+            {
+              "family": "Noto Sans Symbols 2",
+              "style": "Regular",
+              "indexes": [
+                1481
+              ]
+            }
+          ],
+          "present": true,
+          "advance": 11.25,
+          "iconWidth": 24
+        },
+        "compact": {
+          "text": "\u25cc",
+          "codepoints": [
+            "U+25CC"
+          ],
+          "primaryIndexes": [
+            3748
+          ],
+          "runs": [
+            {
+              "family": "DejaVu Sans",
+              "style": "Book",
+              "indexes": [
+                3748
+              ]
+            }
+          ],
+          "present": true,
+          "advance": 13.078125,
+          "iconWidth": 24
+        },
+        "more": {
+          "text": "\u22ef",
+          "codepoints": [
+            "U+22EF"
+          ],
+          "primaryIndexes": [
+            3450
+          ],
+          "runs": [
+            {
+              "family": "DejaVu Sans",
+              "style": "Book",
+              "indexes": [
+                3450
+              ]
+            }
+          ],
+          "present": true,
+          "advance": 15.0,
+          "iconWidth": 24
+        },
+        "hide": {
+          "text": "\u00d7",
+          "codepoints": [
+            "U+00D7"
+          ],
+          "primaryIndexes": [
+            153
+          ],
+          "runs": [
+            {
+              "family": "DejaVu Sans",
+              "style": "Book",
+              "indexes": [
+                153
+              ]
+            }
+          ],
+          "present": true,
+          "advance": 12.5625,
+          "iconWidth": 24
+        },
+        "latest": {
+          "text": "\u2193",
+          "codepoints": [
+            "U+2193"
+          ],
+          "primaryIndexes": [
+            3102
+          ],
+          "runs": [
+            {
+              "family": "DejaVu Sans",
+              "style": "Book",
+              "indexes": [
+                3102
+              ]
+            }
+          ],
+          "present": true,
+          "advance": 12.5625,
+          "iconWidth": 24
+        },
+        "send": {
+          "text": "\u2191",
+          "codepoints": [
+            "U+2191"
+          ],
+          "primaryIndexes": [
+            3100
+          ],
+          "runs": [
+            {
+              "family": "DejaVu Sans",
+              "style": "Book",
+              "indexes": [
+                3100
+              ]
+            }
+          ],
+          "present": true,
+          "advance": 12.5625,
+          "iconWidth": 24
+        },
+        "stop": {
+          "text": "\u25a0",
+          "codepoints": [
+            "U+25A0"
+          ],
+          "primaryIndexes": [
+            3704
+          ],
+          "runs": [
+            {
+              "family": "DejaVu Sans",
+              "style": "Book",
+              "indexes": [
+                3704
+              ]
+            }
+          ],
+          "present": true,
+          "advance": 14.171875,
+          "iconWidth": 24
+        },
+        "improve": {
+          "text": "\u2726",
+          "codepoints": [
+            "U+2726"
+          ],
+          "primaryIndexes": [
+            4023
+          ],
+          "runs": [
+            {
+              "family": "DejaVu Sans",
+              "style": "Book",
+              "indexes": [
+                4023
+              ]
+            }
+          ],
+          "present": true,
+          "advance": 12.5625,
+          "iconWidth": 24
+        }
+      },
+      "passed": true,
+      "realDesktopTested": false,
+      "ownerStateChanged": false
+    },
+    "leap": {
+      "format": "augmentor-linux-surface-font-proof/1",
+      "uid": 1002,
+      "qtVersion": "6.9.1",
+      "designSha256": "084a183cca4d930343120031a0eedae14926e39391ea3f4b0037973b400b4afe",
+      "probeSha256": "ac06d6f818f37904618ca6d2a4bb768f49153770ab609e0f27b9d147508334bd",
+      "primaryFamily": "DejaVu Sans",
+      "primaryStyle": "Book",
+      "pixelSize": 15,
+      "glyphs": {
+        "newchat": {
+          "text": "\uff0b",
+          "codepoints": [
+            "U+FF0B"
+          ],
+          "primaryIndexes": [
+            0
+          ],
+          "runs": [
+            {
+              "family": "Noto Sans CJK JP",
+              "style": "Regular",
+              "indexes": [
+                59057
+              ]
+            }
+          ],
+          "present": true,
+          "advance": 15.0,
+          "iconWidth": 24
+        },
+        "save": {
+          "text": "\u2606",
+          "codepoints": [
+            "U+2606"
+          ],
+          "primaryIndexes": [
+            3806
+          ],
+          "runs": [
+            {
+              "family": "DejaVu Sans",
+              "style": "Book",
+              "indexes": [
+                3806
+              ]
+            }
+          ],
+          "present": true,
+          "advance": 13.4375,
+          "iconWidth": 24
+        },
+        "saved": {
+          "text": "\u2605",
+          "codepoints": [
+            "U+2605"
+          ],
+          "primaryIndexes": [
+            3805
+          ],
+          "runs": [
+            {
+              "family": "DejaVu Sans",
+              "style": "Book",
+              "indexes": [
+                3805
+              ]
+            }
+          ],
+          "present": true,
+          "advance": 13.4375,
+          "iconWidth": 24
+        },
+        "sessions": {
+          "text": "\u2630",
+          "codepoints": [
+            "U+2630"
+          ],
+          "primaryIndexes": [
+            3848
+          ],
+          "runs": [
+            {
+              "family": "DejaVu Sans",
+              "style": "Book",
+              "indexes": [
+                3848
+              ]
+            }
+          ],
+          "present": true,
+          "advance": 13.4375,
+          "iconWidth": 24
+        },
+        "pin": {
+          "text": "\u2316",
+          "codepoints": [
+            "U+2316"
+          ],
+          "primaryIndexes": [
+            0
+          ],
+          "runs": [
+            {
+              "family": "Noto Sans Symbols 2",
+              "style": "Regular",
+              "indexes": [
+                1481
+              ]
+            }
+          ],
+          "present": true,
+          "advance": 11.25,
+          "iconWidth": 24
+        },
+        "compact": {
+          "text": "\u25cc",
+          "codepoints": [
+            "U+25CC"
+          ],
+          "primaryIndexes": [
+            3748
+          ],
+          "runs": [
+            {
+              "family": "DejaVu Sans",
+              "style": "Book",
+              "indexes": [
+                3748
+              ]
+            }
+          ],
+          "present": true,
+          "advance": 13.078125,
+          "iconWidth": 24
+        },
+        "more": {
+          "text": "\u22ef",
+          "codepoints": [
+            "U+22EF"
+          ],
+          "primaryIndexes": [
+            3450
+          ],
+          "runs": [
+            {
+              "family": "DejaVu Sans",
+              "style": "Book",
+              "indexes": [
+                3450
+              ]
+            }
+          ],
+          "present": true,
+          "advance": 15.0,
+          "iconWidth": 24
+        },
+        "hide": {
+          "text": "\u00d7",
+          "codepoints": [
+            "U+00D7"
+          ],
+          "primaryIndexes": [
+            153
+          ],
+          "runs": [
+            {
+              "family": "DejaVu Sans",
+              "style": "Book",
+              "indexes": [
+                153
+              ]
+            }
+          ],
+          "present": true,
+          "advance": 12.5625,
+          "iconWidth": 24
+        },
+        "latest": {
+          "text": "\u2193",
+          "codepoints": [
+            "U+2193"
+          ],
+          "primaryIndexes": [
+            3102
+          ],
+          "runs": [
+            {
+              "family": "DejaVu Sans",
+              "style": "Book",
+              "indexes": [
+                3102
+              ]
+            }
+          ],
+          "present": true,
+          "advance": 12.5625,
+          "iconWidth": 24
+        },
+        "send": {
+          "text": "\u2191",
+          "codepoints": [
+            "U+2191"
+          ],
+          "primaryIndexes": [
+            3100
+          ],
+          "runs": [
+            {
+              "family": "DejaVu Sans",
+              "style": "Book",
+              "indexes": [
+                3100
+              ]
+            }
+          ],
+          "present": true,
+          "advance": 12.5625,
+          "iconWidth": 24
+        },
+        "stop": {
+          "text": "\u25a0",
+          "codepoints": [
+            "U+25A0"
+          ],
+          "primaryIndexes": [
+            3704
+          ],
+          "runs": [
+            {
+              "family": "DejaVu Sans",
+              "style": "Book",
+              "indexes": [
+                3704
+              ]
+            }
+          ],
+          "present": true,
+          "advance": 14.171875,
+          "iconWidth": 24
+        },
+        "improve": {
+          "text": "\u2726",
+          "codepoints": [
+            "U+2726"
+          ],
+          "primaryIndexes": [
+            4023
+          ],
+          "runs": [
+            {
+              "family": "DejaVu Sans",
+              "style": "Book",
+              "indexes": [
+                4023
+              ]
+            }
+          ],
+          "present": true,
+          "advance": 12.5625,
+          "iconWidth": 24
+        }
+      },
+      "passed": true,
+      "realDesktopTested": false,
+      "ownerStateChanged": false
+    }
+  },
+  "recipeChanges": {
+    "debian13/ubuntu24/ubuntu26": [
+      "fonts-noto-core",
+      "fonts-noto-cjk"
+    ],
+    "fedora43/44": [
+      "google-noto-sans-symbols-2-fonts",
+      "google-noto-sans-cjk-fonts"
+    ],
+    "arch20261001": [
+      "noto-fonts",
+      "noto-fonts-cjk"
+    ],
+    "opensuse-leap16.0": [
+      "google-noto-sans-symbols2-fonts",
+      "google-noto-sans-jp-fonts"
+    ]
+  },
+  "limits": [
+    "Provider archive/font inspection is distinct from signed native installation and Qt fallback qualification.",
+    "Installed Qt fallback/render repeats pass on Arch/Leap only. Debian/Ubuntu/Fedora require matching new package/install/render checks.",
+    "The approved glyphs, layout and primary DejaVu Sans family are unchanged.",
+    "All current release1 artifact identities remain historical; no older artifact is relabelled with new dependencies."
+  ],
+  "ownerStateChanged": false,
+  "publicReleaseQualified": false
+}
