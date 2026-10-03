@@ -379,10 +379,18 @@ clean16bcb native/bundle bytes, the installed Mint22.3 QEMU fixture and fresh
 ordinary file. It binds the exact external proof SHA, shared32-hex run token,
 source/artifact/setup/manifest identities, ordinary account, distinct localhost
 provider/DSH ports, boot identity and a checksum-bound root-staged host receipt.
-The host wrapper first calls `fresh_host_preflight(fixture)`: the exact existing
-QEMU PID/name, open owned disk, QMP socket and absence of host devices/mounts are
-read, without connecting QMP or sending input. Guest admission verifies the
-receipt's same proof/run/boot identity and its age of at most300seconds. The guest
+The host wrapper first calls `fresh_host_preflight(fixture)`: it binds the exact
+retained boot-argv SHA and explicit observed startup directory, existing QEMU
+PID/name/start, open owned disk and absence of host devices/mounts. Only the plain
+`guest.qcow2`/`qmp.sock` basenames or exact absolute same-directory paths are
+accepted; duplicate fields, ambiguous drives/addresses and traversal refuse.
+QEMU is daemonized and its current cwd is `/`, so that cwd cannot resolve its
+original relative launch arguments. The socket must have a listening kernel
+inode held by that PID. One Unix connect with a3-second bound reads only kernel
+`SO_PEERCRED`, requiring the host UID and QEMU PID with unchanged start identity
+before/after. It immediately closes in finally, without reading a greeting or
+sending QMP JSON, capabilities, commands or input. Guest admission verifies the
+receipt's same proof/run/boot/startup-directory/boot-argv identity and its age of at most300seconds. The guest
 cannot inspect the host's QEMU descriptors itself.
 
 Before allocating the exclusive `fresh-emulated-proof16bcb` home journal or
@@ -431,3 +439,12 @@ UID1001's thirty protected settings/journal/history files before and finally
 after every native/account/proof transaction. These private hashes and fixture
 connection data are not published. Source review/publication precede any fresh
 account creation, native adoption or product run.
+
+The first real host admission using published911e6779 refused before SSH because
+it looked for absolute disk/QMP substrings in the QEMU command line. Actual
+retained boot arguments match the daemon's relative paths, while the open disk
+FD matches the absolute owned fixture file. That refusal and topology are
+preserved; it did not reach APT, account creation, setup or SDK calls. The narrow
+path/peer correction has source tests, including a real private Unix listener
+that receives zero protocol bytes on both matching and foreign-PID refusal.
+The corrected proof still requires review/publication before any VM transaction.

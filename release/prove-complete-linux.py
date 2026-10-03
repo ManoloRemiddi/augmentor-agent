@@ -694,6 +694,7 @@ FRESH_MANIFEST_SHA = '9d2bd9d5e1b4c6cd4aadbc0fca7689562ebac33d995f7dd93ebc379e60
 FRESH_SETUP_SHA = 'd19ae1ecc900f5f3f29610c99b417474ef9e776043e99cabc5c3978dfaf76b52'
 FRESH_HOME = Path('/home/augmentor-corrected-proof')
 FRESH_RUN_DIRECTORY = 'fresh-emulated-proof16bcb'
+FRESH_BOOT_ARGV_SHA = '6f74a927368ad3f9ba3ff9f29ab1f44416e8e7b2036afe18b6fb9c9aadbc1a9e'
 
 
 def fresh_binding(fixture):
@@ -704,12 +705,16 @@ def fresh_binding(fixture):
                 'uid': 1002, 'gid': 1002, 'user': 'augmentor-corrected-proof', 'home': str(FRESH_HOME),
                 'markerSha256': hashlib.sha256(POST_MARKER_TEXT.encode()).hexdigest(),
                 'proofScriptSha256': PROOF_SHA256,
+                'bootArgvSha256': FRESH_BOOT_ARGV_SHA,
                 'startupBudgetSeconds': 120, 'turnBudgetSeconds': 60,
                 'qemuName': 'augmentor-mint223-cinnamon-iso', 'qemuPid': 2494740}
     if any(type(fixture.get(key)) is not type(value) or fixture.get(key) != value for key, value in expected.items()):
         raise ValueError('Only the exact clean16bcb fresh ordinary Mint fixture is admitted.')
     if not re.fullmatch('[a-f0-9]{32}', fixture.get('runToken', '')):
         raise ValueError('The fresh proof needs one explicit shared run token.')
+    startup = fixture.get('startupDirectory')
+    if not isinstance(startup, str) or not Path(startup).is_absolute() or '..' in Path(startup).parts:
+        raise ValueError('The fresh proof needs its explicit observed absolute startup directory.')
     ports = [fixture.get(key) for key in ('modelApiPort', 'dshPort')]
     if any(type(v) is not int or not 1024 <= v <= 65535 for v in ports) or len(set(ports)) != 2:
         raise ValueError('The fresh fixture needs distinct ordinary loopback ports.')
@@ -717,10 +722,70 @@ def fresh_binding(fixture):
         raise ValueError('A fresh fixture cannot adopt prior settings, journals or retries.')
 
 
+def fresh_qemu_paths(args, fixture):
+    """Resolve the reviewed launch paths, never a daemon's later current cwd."""
+    startup = Path(fixture['startupDirectory']); disk = Path(fixture['qemuDisk']); qmp = Path(fixture['qmpSocket'])
+    if (not startup.is_absolute() or startup.is_symlink() or not startup.is_dir() or
+        startup.stat().st_uid != os.getuid() or startup.stat().st_mode & 0o022 or
+        disk.parent != startup or qmp.parent != startup or disk.name != 'guest.qcow2' or qmp.name != 'qmp.sock'):
+        raise ValueError('The explicit owned QEMU startup directory/path identity differs.')
+    def options(flag):
+        values = []
+        for index, arg in enumerate(args):
+            if arg == flag:
+                if index+1 == len(args): raise ValueError('Missing QEMU path option value.')
+                values.append(os.fsdecode(args[index+1]))
+        return values
+    def resolve(value, expected):
+        if value not in (expected.name, str(expected)):
+            raise ValueError('QEMU permits only the exact same-dir absolute path or plain owned basename.')
+        return expected
+    def fields(value):
+        parts = value.split(','); result = {}
+        for part in parts:
+            if '=' not in part: raise ValueError('Ambiguous QEMU drive/QMP option.')
+            key, item = part.split('=', 1)
+            if key in result: raise ValueError('Duplicate QEMU drive/QMP option field.')
+            result[key] = item
+        return result
+    drives = [fields(value) for value in options(b'-drive')]
+    candidates = [row for row in drives if row.get('if') == 'virtio']
+    if (len(candidates) != 1 or candidates[0].get('format') != 'qcow2' or
+        set(candidates[0]) != {'file', 'format', 'if'}):
+        raise ValueError('The owned QEMU disk drive is missing or ambiguous.')
+    resolve(candidates[0]['file'], disk)
+    addresses = options(b'-qmp')
+    if len(addresses) != 1 or not addresses[0].startswith('unix:'):
+        raise ValueError('The owned QEMU unix QMP address is missing or ambiguous.')
+    parts = addresses[0][5:].split(',', 1); resolve(parts[0], qmp)
+    if len(parts) != 2 or fields(parts[1]) != {'server': 'on', 'wait': 'off'}:
+        raise ValueError('The owned QMP listening options differ.')
+    if (disk.is_symlink() or not disk.is_file() or disk.stat().st_uid != os.getuid() or
+        qmp.is_symlink() or not stat.S_ISSOCK(qmp.stat().st_mode) or qmp.stat().st_uid != os.getuid()):
+        raise ValueError('The owned QEMU disk/QMP paths differ.')
+    return disk, qmp, parts[0]
+
+
+def fresh_qmp_peer(qmp, expected_pid):
+    """Kernel peer attribution only: no greeting read, QMP writes or commands."""
+    import struct
+    peer = socket.socket(socket.AF_UNIX)
+    try:
+        peer.settimeout(3); peer.connect(str(qmp))
+        pid, uid, gid = struct.unpack('3i', peer.getsockopt(socket.SOL_SOCKET, socket.SO_PEERCRED, 12))
+        if pid != expected_pid or uid != os.getuid():
+            raise ValueError('The QMP filesystem endpoint has a foreign peer.')
+        return {'pid': pid, 'uid': uid, 'gid': gid, 'protocolBytesSent': 0}
+    finally:
+        peer.close()
+
+
 def fresh_host_preflight(fixture):
     """Read-only host wrapper admission; stage this result root-owned in the guest."""
     fresh_binding(fixture)
     proc = Path('/proc')/str(fixture['qemuPid'])
+    if proc.stat().st_uid != os.getuid():
+        raise ValueError('The QEMU process has a foreign host owner.')
     args = (proc/'cmdline').read_bytes().split(b'\0')[:-1]
     start = (proc/'stat').read_text().rsplit(')', 1)[1].split()[19]
     forbidden = (b'vfio', b'virtfs', b'virtiofs', b'fsdev', b'usb-host', b'/dev/', b'-cdrom', b'hostpci')
@@ -728,18 +793,37 @@ def fresh_host_preflight(fixture):
         any(part in arg for arg in args for part in forbidden) or
         b'-name' not in args or args[args.index(b'-name')+1] != fixture['qemuName'].encode()):
         raise ValueError('The exact owned QEMU/no-host-device identity differs.')
-    disk = Path(fixture['qemuDisk']); qmp = Path(fixture['qmpSocket'])
-    if (not disk.is_absolute() or disk.is_symlink() or not disk.is_file() or disk.stat().st_uid != os.getuid() or
-        not qmp.is_absolute() or qmp.is_symlink() or not stat.S_ISSOCK(qmp.stat().st_mode) or qmp.stat().st_uid != os.getuid() or
-        not any(str(disk).encode() in arg for arg in args) or not any(str(qmp).encode() in arg for arg in args)):
-        raise ValueError('The owned QEMU disk/QMP paths differ.')
-    opened = [os.readlink(p) for p in (proc/'fd').iterdir()]
-    if str(disk) not in opened or (proc/'stat').read_text().rsplit(')', 1)[1].split()[19] != start:
+    normalized = [os.fsdecode(value) for value in args]; normalized[0] = Path(normalized[0]).name
+    if hashlib.sha256(json.dumps(normalized, separators=(',', ':')).encode()).hexdigest() != fixture['bootArgvSha256']:
+        raise ValueError('The retained exact QEMU boot arguments differ.')
+    disk, qmp, address = fresh_qemu_paths(args, fixture)
+    opened = {}
+    for path in (proc/'fd').iterdir():
+        try: opened[os.readlink(path)] = path.stat()
+        except FileNotFoundError: continue
+    actual = disk.stat(); held = opened.get(str(disk))
+    if (held is None or not stat.S_ISREG(held.st_mode) or held.st_uid != os.getuid() or
+        (held.st_dev, held.st_ino) != (actual.st_dev, actual.st_ino)):
         raise ValueError('The owned QEMU process/disk changed during preflight.')
+    listeners = []
+    for line in (proc/'net/unix').read_text().splitlines()[1:]:
+        row = line.split(maxsplit=7)
+        if (len(row) == 8 and row[7] in (address, str(qmp)) and int(row[3], 16) & 0x10000 and
+            row[4] == '0001' and row[5] == '01' and 'socket:['+row[6]+']' in opened):
+            listeners.append(row[6])
+    if len(listeners) != 1:
+        raise ValueError('The QMP listening kernel socket is not uniquely owned by QEMU.')
+    if (proc/'stat').read_text().rsplit(')', 1)[1].split()[19] != start:
+        raise ValueError('The owned QEMU start identity changed before peer attribution.')
+    peer = fresh_qmp_peer(qmp, fixture['qemuPid'])
+    if proc.stat().st_uid != os.getuid() or (proc/'stat').read_text().rsplit(')', 1)[1].split()[19] != start:
+        raise ValueError('The owned QEMU start/owner changed after peer attribution.')
     return {'format': 'augmentor-mint-fresh-host-preflight/1', 'runToken': fixture['runToken'],
             'sourceCommit': FRESH_SOURCE, 'proofScriptSha256': PROOF_SHA256,
             'qemuPid': fixture['qemuPid'], 'qemuName': fixture['qemuName'],
             'qemuStart': start, 'argvSha256': hashlib.sha256(b'\0'.join(args)+b'\0').hexdigest(),
+            'bootArgvSha256': fixture['bootArgvSha256'], 'startupDirectory': fixture['startupDirectory'],
+            'qmpListeningInode': listeners[0], 'qmpPeer': peer,
             'noHostDevicesOrMounts': True, 'guestBootId': fixture['guestBootId'], 'observedUnix': time.time()}
 
 
@@ -781,6 +865,7 @@ def fresh_vm_identity(fixture, *, ordinary=True):
         observed = json.loads(raw)
         required = {'format': 'augmentor-mint-fresh-host-preflight/1', 'runToken': fixture['runToken'],
                     'sourceCommit': FRESH_SOURCE, 'proofScriptSha256': PROOF_SHA256,
+                    'bootArgvSha256': fixture['bootArgvSha256'], 'startupDirectory': fixture['startupDirectory'],
                     'qemuPid': 2494740, 'qemuName': fixture['qemuName'],
                     'noHostDevicesOrMounts': True, 'guestBootId': fixture['guestBootId']}
         if any(observed.get(k) != v for k, v in required.items()) or not 0 <= time.time()-observed.get('observedUnix', 0) <= 300:

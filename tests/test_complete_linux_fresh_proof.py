@@ -27,7 +27,8 @@ def binding():
             'setupSha256': proof.FRESH_SETUP_SHA, 'target': 'linuxmint22.3-amd64',
             'uid': 1002, 'gid': 1002, 'user': 'augmentor-corrected-proof', 'home': str(proof.FRESH_HOME),
             'markerSha256': hashlib.sha256(proof.POST_MARKER_TEXT.encode()).hexdigest(),
-            'proofScriptSha256': proof.PROOF_SHA256,
+            'proofScriptSha256': proof.PROOF_SHA256, 'bootArgvSha256': proof.FRESH_BOOT_ARGV_SHA,
+            'startupDirectory': '/owned/recorded/startup',
             'startupBudgetSeconds': 120, 'turnBudgetSeconds': 60, 'qemuName': 'augmentor-mint223-cinnamon-iso',
             'qemuPid': 2494740, 'runToken': 'ab'*16, 'modelApiPort': 36187, 'dshPort': 41603}
 
@@ -82,26 +83,72 @@ class FreshAdmission(unittest.TestCase):
             installer.assert_called_once(); self.assertEqual(record['pendingRequest'], {'action': 'setup.initial'})
             self.assertEqual(record['completedActions'], [])
 
-    def test_actual_owned_qmp_socket_and_disk_admission_refuses_host_device_or_replaced_process(self):
+    def test_daemon_relative_launch_uses_bound_startup_and_open_fd_not_current_cwd(self):
         with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory); proc = root/'2494740'; (proc/'fd').mkdir(parents=True)
+            root = Path(directory); proc = root/'2494740'; (proc/'fd').mkdir(parents=True); (proc/'net').mkdir()
             disk = root/'guest.qcow2'; disk.write_bytes(b'owned synthetic disk'); (proc/'fd/4').symlink_to(disk)
-            endpoint = root/'qmp.sock'
+            endpoint = root/'qmp.sock'; stat_text = '1 (qemu fixture) '+' '.join(['0']*19+['73'])
+            (proc/'cwd').symlink_to('/')
             with socket.socket(socket.AF_UNIX) as qmp:
-                qmp.bind(str(endpoint)); args = [b'/usr/bin/qemu-system-x86_64', b'-name', b'augmentor-mint223-cinnamon-iso',
-                    b'-drive', ('file='+str(disk)).encode(), b'-qmp', ('unix:'+str(endpoint)).encode()]
-                (proc/'cmdline').write_bytes(b'\0'.join(args)+b'\0'); (proc/'stat').write_text('1 (qemu fixture) '+' '.join(['0']*19+['73']))
-                real_path = Path
+                qmp.bind(str(endpoint)); qmp.listen(2)
+                args = [b'/usr/bin/qemu-system-x86_64', b'-name', b'augmentor-mint223-cinnamon-iso',
+                        b'-drive', b'file=guest.qcow2,format=qcow2,if=virtio', b'-qmp', b'unix:qmp.sock,server=on,wait=off', b'-daemonize']
+                (proc/'cmdline').write_bytes(b'\0'.join(args)+b'\0'); (proc/'stat').write_text(stat_text)
+                (proc/'fd/7').symlink_to('/proc/self/fd/'+str(qmp.fileno()))
+                (proc/'net/unix').write_text(Path('/proc/net/unix').read_text())
+                normalized = [os.fsdecode(v) for v in args]; normalized[0] = Path(normalized[0]).name
+                digest = hashlib.sha256(json.dumps(normalized,separators=(',',':')).encode()).hexdigest()
+                fixture = {**binding(), 'startupDirectory': str(root), 'qemuDisk': str(disk), 'qmpSocket': str(endpoint),
+                           'guestBootId': 'owned-boot', 'bootArgvSha256': digest}
+                real_path = Path; real_readlink = os.readlink
+                sock_link = real_readlink('/proc/self/fd/'+str(qmp.fileno()))
                 def paths(value): return root if str(value) == '/proc' else real_path(value)
-                fixture = {**binding(), 'qemuDisk': str(disk), 'qmpSocket': str(endpoint), 'guestBootId': 'owned-boot'}
-                with patch.object(proof, 'Path', side_effect=paths):
+                def links(value): return sock_link if Path(value) == proc/'fd/7' else real_readlink(value)
+                with patch.object(proof, 'Path', side_effect=paths), patch.object(proof, 'FRESH_BOOT_ARGV_SHA', digest), \
+                     patch.object(proof.os, 'readlink', side_effect=links), patch.object(proof, 'fresh_qmp_peer') as peer:
+                    peer.return_value = {'pid': 2494740, 'uid': os.getuid(), 'gid': os.getgid(), 'protocolBytesSent': 0}
                     result = proof.fresh_host_preflight(fixture)
                     self.assertTrue(result['noHostDevicesOrMounts']); self.assertEqual(result['qemuStart'], '73')
+                    self.assertEqual(result['startupDirectory'], str(root)); peer.assert_called_once_with(endpoint,2494740)
                     (proc/'cmdline').write_bytes(b'\0'.join(args+[b'-device', b'vfio-pci,host=00:01.0'])+b'\0')
                     with self.assertRaisesRegex(ValueError, 'no-host-device'): proof.fresh_host_preflight(fixture)
-                (proc/'cmdline').write_bytes(b'\0'.join(args)+b'\0')
-                with patch.object(proof, 'Path', side_effect=paths), patch.object(proof.os, 'readlink', return_value='other.qcow2'):
+                    (proc/'cmdline').write_bytes(b'\0'.join(args)+b'\0')
+                    (proc/'fd/4').unlink()
                     with self.assertRaisesRegex(ValueError, 'process/disk changed'): proof.fresh_host_preflight(fixture)
+                    (proc/'fd/4').symlink_to(disk)
+                    def replacement(*args):
+                        (proc/'stat').write_text(stat_text[:-2]+'74'); return peer.return_value
+                    peer.side_effect = replacement
+                    with self.assertRaisesRegex(ValueError, 'start/owner changed after'): proof.fresh_host_preflight(fixture)
+
+    def test_parser_accepts_same_dir_absolute_paths_but_rejects_wrong_parent_traversal_and_ambiguity(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); disk = root/'guest.qcow2'; disk.write_bytes(b'owned disk'); endpoint = root/'qmp.sock'
+            with socket.socket(socket.AF_UNIX) as qmp:
+                qmp.bind(str(endpoint)); fixture = {'startupDirectory': str(root), 'qemuDisk': str(disk), 'qmpSocket': str(endpoint)}
+                def args(drive, address): return [b'qemu-system-x86_64', b'-drive', drive.encode(), b'-qmp', address.encode()]
+                correct = args('file='+str(disk)+',format=qcow2,if=virtio', 'unix:'+str(endpoint)+',server=on,wait=off')
+                self.assertEqual(proof.fresh_qemu_paths(correct,fixture), (disk,endpoint,str(endpoint)))
+                for drive in ('file=../guest.qcow2,format=qcow2,if=virtio', 'file=/wrong/guest.qcow2,format=qcow2,if=virtio',
+                              'file=guest.qcow2,file=guest.qcow2,format=qcow2,if=virtio'):
+                    with self.assertRaises(ValueError): proof.fresh_qemu_paths(args(drive,'unix:qmp.sock,server=on,wait=off'),fixture)
+                for address in ('unix:../qmp.sock,server=on,wait=off','unix:/wrong/qmp.sock,server=on,wait=off',
+                                'unix:qmp.sock,server=on,server=on,wait=off'):
+                    with self.assertRaises(ValueError): proof.fresh_qemu_paths(args('file=guest.qcow2,format=qcow2,if=virtio',address),fixture)
+                for extra in ([b'-drive', b'file=guest.qcow2,format=qcow2,if=virtio'], [b'-qmp', b'unix:qmp.sock,server=on,wait=off']):
+                    with self.assertRaisesRegex(ValueError, 'ambiguous'): proof.fresh_qemu_paths(correct+extra,fixture)
+                with self.assertRaises(ValueError): proof.fresh_qemu_paths(correct,{**fixture,'startupDirectory': str(root.parent)})
+
+    def test_real_unix_peer_attribution_sends_zero_protocol_bytes_and_closes_even_for_foreign_pid(self):
+        with tempfile.TemporaryDirectory() as directory, socket.socket(socket.AF_UNIX) as server:
+            endpoint = Path(directory)/'qmp.sock'; server.bind(str(endpoint)); server.listen(2); server.settimeout(2)
+            result = proof.fresh_qmp_peer(endpoint, os.getpid())
+            self.assertEqual(result['protocolBytesSent'], 0); self.assertEqual(result['uid'], os.getuid())
+            peer, _ = server.accept()
+            with peer: peer.settimeout(2); self.assertEqual(peer.recv(1), b'')
+            with self.assertRaisesRegex(ValueError, 'foreign peer'): proof.fresh_qmp_peer(endpoint, os.getpid()+1)
+            peer, _ = server.accept()
+            with peer: peer.settimeout(2); self.assertEqual(peer.recv(1), b'')
 
     def test_native_manifest_substitution_refuses_before_import_or_package_audit(self):
         with tempfile.TemporaryDirectory() as directory:

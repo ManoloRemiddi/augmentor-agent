@@ -19,8 +19,8 @@ extra RPC, replay, timeout or scene-fence changes. Production input stays disabl
 
 [The clean Mint checkpoint](../release/qualification/next-targets/20261003-mint16bcb-fresh-emulated-proof.json)
 records exact clean16bcb native/Browser/complete builds and streamed inspection
-PASS. The maintained fresh proof passes57 focused checks independently reviewed:
-22 fresh admission/execution,26 existing complete-proof and9 real Unix-companion
+PASS. The maintained fresh proof passes59 focused checks independently reviewed:
+24 fresh admission/execution,26 existing complete-proof and9 real Unix-companion
 cases. Its exact new ordinary Mint account and native adoption remain unexecuted.
 The unchanged installer, byte-identical settings, both roles, strict restart
 history/no replay and one-shot normal companion cleanup are required. Only this
@@ -30,6 +30,13 @@ and the old2035 proof remain unchanged. A separate root readback checks exact
 proof/fixture/run, native inventory, both exclusive leases and absence of owned
 processes/listeners/socket. The two earlier accounts and failures are preserved.
 Fresh installed acceptance and graphical/hardware/legal gates remain open.
+
+The first published host admission refuses before SSH: QEMU retains relative
+disk/socket arguments while its daemon current cwd is `/`. The reviewed parser
+binds the observed startup directory and exact retained boot argv, disk FD/inode,
+listening kernel socket and bounded zero-message Unix peer attribution. Duplicate
+fields, traversal and foreign/start-replaced peers refuse. The initial receipt
+is preserved; this source correction has not yet executed guest setup or SDK.
 
 ## October 3 Ubuntu registered shortcuts and password-lock recovery
 

@@ -256,3 +256,15 @@ listener readback and both earlier-account hashes are required afterwards.
 Focused synthetic tests verify these fences; no fresh VM product run, account
 creation or native adoption has occurred. Desktop/browser/lock/audio/legal gates
 remain open.
+
+The first fresh transaction attempt stops at host admission before SSH: the
+published guard expected absolute disk/QMP strings, but the exact retained QEMU
+boot record uses `file=guest.qcow2,format=qcow2,if=virtio` and
+`unix:qmp.sock,server=on,wait=off`. Its daemonized cwd is `/`; an absolute disk FD
+proves the owned fixture file. The maintained correction pins the retained boot
+argv and explicit startup directory, parses only the two permitted same-directory
+path forms and checks kernel listener ownership plus one bounded Unix peer read.
+It sends zero QMP protocol bytes and requires unchanged PID/start. Original
+pre-SSH refusal stays recorded.24 fresh source tests,26 existing proof tests and
+9 real Unix-companion tests pass; corrected publication and the actual native/
+account/installer/connected-product run remain pending.

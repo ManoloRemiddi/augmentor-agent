@@ -1,7 +1,7 @@
 {
   "format": "augmentor-mint-fresh-emulated-proof-source-checkpoint/1",
   "date": "2026-10-03",
-  "status": "reviewed-source-tests-pass-awaiting-owned-fixture-transaction",
+  "status": "reviewed-source-tests-pass-host-path-correction-awaiting-owned-fixture-transaction",
   "artifactSource": {
     "commit": "16bcb797cc5e84b6a4807d1b88229afebed2c5bf",
     "dirty": false
@@ -39,18 +39,18 @@
     "privateSourceExport": false
   },
   "proofSource": {
-    "baseCommit": "6432f979482ad387fb7330666e2d2ca71eeb45d0",
+    "baseCommit": "7f65e9d5d74c8ada422e1a870c281c1cb7ee6c21",
     "uncommittedImplementation": false,
     "file": "release/prove-complete-linux.py",
-    "sha256": "911e677947e25f566b05c6720eda4da6b9be27fc8c498971397236e6f9a362d6",
+    "sha256": "26860df4408780e87ad1a203f042e0a333e4cf052ac45f7eeedd6d4e00ef8f29",
     "companionHelperSha256": "70543782f9d26bae72bf0a4396e649c646017de7ee55a7f9af84075daf29368b",
     "publishedWithCheckpoint": true
   },
   "syntheticSourceTests": {
-    "freshProof": 22,
+    "freshProof": 24,
     "existingCompleteProof": 26,
     "realUnixCompanion": 9,
-    "total": 57,
+    "total": 59,
     "status": "pass",
     "VMProductEvidence": false
   },
@@ -111,5 +111,33 @@
     "embeddedSourceCoverageComplete": false
   },
   "next": "Reviewed proof and source checkpoint are published together; repeat exact native/account guards before the newly authorized one-shot fresh account run.",
-  "rootLicenseAndFrozen22Unchanged": true
+  "rootLicenseAndFrozen22Unchanged": true,
+  "initialPublishedHostAdmission": {
+    "proofCommit": "9f43b4e80bb6b7ab15532e83b167a585fce14748",
+    "proofSha256": "911e677947e25f566b05c6720eda4da6b9be27fc8c498971397236e6f9a362d6",
+    "status": "refused-before-SSH",
+    "reason": "Absolute path substring guard disagreed with retained relative daemon launch arguments.",
+    "guestSSHDispatched": false,
+    "APTAccountSetupSDKMutations": false,
+    "originalRefusalRetained": true
+  },
+  "hostPathCorrection": {
+    "sourceOnly": true,
+    "actualOwnedQemuArgvAndOpenFdInspected": true,
+    "retainedBootArgvMatchesRunning": true,
+    "bootArgvSha256": "6f74a927368ad3f9ba3ff9f29ab1f44416e8e7b2036afe18b6fb9c9aadbc1a9e",
+    "observedDaemonCurrentCwd": "/",
+    "explicitObservedStartupDirectoryRequired": true,
+    "allowedPaths": "Only plain guest.qcow2/qmp.sock basenames or exact same-directory absolute paths.",
+    "duplicatesTraversalAmbiguousDriveOrQmpRefused": true,
+    "ownedOpenDiskInodeAndPidStartRequired": true,
+    "ownedListeningKernelSocketRequired": true,
+    "unixPeerConnectTimeoutSeconds": 3,
+    "peerHostUidAndQemuPidRequired": true,
+    "qmpProtocolBytesSent": 0,
+    "qmpCommandsCapabilitiesGreetingReadsInput": false,
+    "socketAlwaysClosed": true,
+    "pidStartBeforeAndAfterRequired": true,
+    "actualVmPeerAttributionExecuted": false
+  }
 }
