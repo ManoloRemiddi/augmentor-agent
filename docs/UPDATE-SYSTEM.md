@@ -1167,3 +1167,9 @@ background owner. Those steps, real DSH/target health, signed forward producer,
 retention/recovery and public feed/bridge qualification remain required. Linux
 automatic eligibility remains disabled. Status observation of the remaining
 37155477755 jobs timed out; a timeout is not a terminal result or restart authority.
+
+At corrected source `bc8b256`, native job 111302228170 in 37156960807 reaches the
+actual Node unit but refuses its runtime directory ownership/mode before socket
+registration. The fixture adds bounded synthetic path/UID/mode diagnostics on
+that failure; the shipped control server's private-directory guard is retained.
+Actual migration/reopening remains unqualified pending a diagnosed native rerun.

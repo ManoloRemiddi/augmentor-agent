@@ -27,8 +27,12 @@ from platform_adapters.private_files import atomic_json,read_json
 CONTROL="""// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {unixControl} from '../../../../../services/lifecycle/unix-control.mjs';
 import {fileURLToPath} from 'node:url';
-import {existsSync} from 'node:fs';
+import {existsSync,lstatSync} from 'node:fs';
 const runtime=process.env.XDG_RUNTIME_DIR,root=fileURLToPath(new URL('../../../../../',import.meta.url));
+const folder=lstatSync(runtime);
+if(!folder.isDirectory()||folder.uid!==process.getuid()||(folder.mode&0o077))
+ console.error(JSON.stringify({schema:'augmentor-fixture-runtime-diagnostic/1',runtime,uid:process.getuid(),
+  directoryUID:folder.uid,mode:folder.mode&0o777,directory:folder.isDirectory()}));
 let token=null,closing=false;
 const service=await unixControl({runtime,root,component:'dsh',control:(method,params)=>{
  const action=method.replace('host.maintenance.','');

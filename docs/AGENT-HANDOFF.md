@@ -4,6 +4,13 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+Corrected isolated-source execution at `bc8b256` reaches the actual Node unit, but
+native job 111302228170 in 37156960807 fails its strict runtime ownership/mode
+check before socket registration. The fixture now emits only synthetic runtime
+path/UID/mode diagnostics on that refusal; do not relax the control-server guard.
+Remaining broad jobs in that run were live at the last successful observation.
+Native migration/reopening is still unqualified, and production eligibility is off.
+
 Linux DSH reopening now requires the original live healthy backend/completed
 archive, unchanged selection/artifacts/registrations and inactive migrated unit.
 It starts that fixed unit once, binds the fresh actual target socket peer to its
