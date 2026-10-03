@@ -693,3 +693,16 @@ windows are online with voice available; embedded Ctrl+Space is enabled/ready,
 CPU, current animated palette, no tray and no standalone autostart. Source
 qualification, this installed composition and customer-release gates remain
 explicitly distinct. Documentation-only follow-ups retain tested source `81a2bba`.
+
+### October 3 exact Windows intake diagnosis
+
+The x64 intake report from [run 37122854272](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37122854272)
+identifies seven unexpected Python standard-library bytecode files (`secrets` and
+`multiprocessing`) and their cache directory; no sealed file was changed or missing.
+The incomplete-checkout broker fixture directly invoked the bundled interpreter
+without `-B`, unlike the product broker and all workflow entrypoints. That fixture
+now preserves the no-bytecode policy too. Missing-component refusal, IPC/ACL and
+strict inventory assertions remain unchanged. Product startup already received
+`-B` in `547a9f0`; this correction changes only test execution. All matched native
+and package gates must pass again before publication. The owner's installed
+release and saved dictation preferences are untouched.

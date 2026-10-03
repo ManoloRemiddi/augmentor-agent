@@ -1784,3 +1784,11 @@ shutdown reply. Tests now wait for actual broker process exit. Broker startup
 passes `-B` to preserve the native launcher's no-bytecode policy in a sealed
 installation. The exact entries behind the subsequent intake mismatch were not
 captured; inventory checks remain strict and native/package gates rerun.
+
+## October 3 exact sealed Windows cache diagnosis
+
+[Handy intake evidence](HANDY-INTEGRATION.md#october-3-exact-windows-intake-diagnosis)
+now identifies only extra standard-library bytecode from the incomplete-checkout
+fixture's direct interpreter launch. That fixture now uses `-B`; product startup
+and strict package inventory checks remain intact. Matched gates rerun; customer
+publication is still pending and the owner's selected release is unchanged.

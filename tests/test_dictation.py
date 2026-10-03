@@ -159,7 +159,7 @@ class DictationTests(unittest.TestCase):
         else:state.mkdir(mode=0o700)
         original=b'{"enabled": true}\n';(state/'preferences.json').write_bytes(original)
         env={**os.environ,'AUGMENTOR_DICTATION_STATE':str(state),'PYTHONPATH':str(checkout/'apps/native')}
-        result=subprocess.run([sys.executable,str(checkout/'services/dictation/server.py')],env=env,capture_output=True,timeout=8)
+        result=subprocess.run([sys.executable,'-B',str(checkout/'services/dictation/server.py')],env=env,capture_output=True,timeout=8)
         self.assertNotEqual(result.returncode,0)
         self.assertIn(b'bundled Handy component is unavailable',result.stderr)
         self.assertEqual((state/'preferences.json').read_bytes(),original)
