@@ -8,6 +8,23 @@
 
 
 
+
+Native Linux desktop/service qualification passes at `d1ec492` in
+[37160517109](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37160517109),
+job 111312847964: both actual CI cases pass in 25.028 seconds. The original DSH
+busy/normal-exit/migration/reopen proof still passes. The added actual installed
+launcher, copied Python, user desktop service, named secondary process, shipped
+startup/lifetime/admission, sockets and pidfds prove original owner binding,
+normal window exits, launcher migration, selection/archival, target main/secondary
+reopening and preserved enablement. Reopening replay refuses. Source/target
+artifacts stay unchanged, including no-bytecode startup. Both window participants
+are inert; real GUI/provider/conversation and connected/import/offline health
+remain mocked. Focused updater 228/225/three and 31 startup/service/desktop tests
+pass at this source. Public eligibility stays disabled. Continue full release
+producer/real DSH/GUI/signed-forward qualification and remaining platforms/package
+controllers; keep the original cross-platform goal active. This supersedes the
+fixture failures below for this scoped native path only.
+
 At `134d561`, focused 37160387066 passes DSH and reaches actual desktop update
 completion; its assertion incorrectly requires main-before-secondary, whereas
 actual socket discovery sorts secondary first. The fixture now compares captured

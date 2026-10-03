@@ -1286,3 +1286,21 @@ executed. The normal installed launcher now invokes Python with `-B` and explici
 normal imports from mutating a verified immutable release after environment
 sanitization; the startup regression checks both. Native reopening and updated
 local checks remain to be recorded at their exact source.
+
+
+At `d1ec492`, focused Linux native qualification passes
+[37160517109](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37160517109),
+job 111312847964. Both tests pass in 25.028 seconds. The existing original DSH
+proof remains green. The new proof confirms actual original desktop service/socket
+process binding, normal main and secondary exits, migrated target launcher,
+completed selection/archive and fresh target main-service plus named-window
+reopening. Actual copied Python, installed launcher, user systemd, shipped startup,
+lifetime/admission and socket pidfds are exercised. Enablement and credential
+bytes remain unchanged; replay refuses and both immutable artifacts remain exact.
+The proof's windows are inert participants, with no real Qt/provider/conversation;
+connected/import and offline UI health are still mocked. Focused updater 228
+(225 passed, three skips) and 31 startup/service/desktop cases also pass locally
+at that source. This qualifies only the observed OS lifecycle composition,
+not a signed forward update, normal desktop acceptance or full release. Broad
+and Mac jobs at older `10fdece` are separate scoped evidence. Public eligibility
+and feed remain disabled pending full producer/platform/recovery qualification.
