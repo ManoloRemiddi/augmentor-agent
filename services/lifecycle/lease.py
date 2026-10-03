@@ -30,6 +30,22 @@ def hold(component):
     if not (ROOT / 'release.json').is_file():
         return  # Source/developer installations have their own lifecycle.
     release = json.loads((ROOT/'release.json').read_text())
+    if sys.platform=='linux' and (ROOT/'desktop-release.json').is_file():
+        # Managed releases are immutable user artifacts, not dpkg/rpm trees.
+        managed=json.loads((ROOT/'desktop-release.json').read_text())
+        if managed.get('deployment',{}).get('root')!=str(ROOT):
+            raise RuntimeError('The managed artifact moved after staging. Restage it before launching.')
+        from platform_adapters.paths import private_directory,runtime_directory
+        from platform_adapters.private_files import descriptor as private_descriptor,require_directory
+        from lifecycle.posix_pending import require_clear,transaction_directory
+        runtime=require_directory(private_directory(runtime_directory()))
+        fd=private_descriptor(runtime/'installation.lock',writable=True,create=True)
+        try:
+            fcntl.flock(fd,fcntl.LOCK_SH|fcntl.LOCK_NB)
+            require_clear(transaction_directory())
+        except BaseException:os.close(fd);raise
+        os.set_inheritable(fd,True);_leases.append(fd)
+        return
     if sys.platform == 'win32' and release.get('target','').startswith('windows-'):
         from platform_adapters.paths import runtime_directory
         from platform_adapters.windows_identity import private_lock_descriptor

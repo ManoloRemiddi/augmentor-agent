@@ -766,3 +766,26 @@ It preserves the original artifact and synthetic user state. This development
 fixture is not signed forward qualification, publisher authorization, an owned
 launchd/reopen controller or an installed customer update. Public automatic flags
 remain false until those release gates are met.
+
+## Managed Linux artifact retention and lifetime
+
+The existing immutable deployment tool copies a bundled `python/` directory and
+rewrites a source-relative interpreter path into the staged release. Its full
+inventory covers those bytes and blocks selection if they subsequently change.
+Existing external interpreters retain their explicit paths; the updater does
+not change a user's Python installation or infer bundled-runtime qualification.
+
+Managed Linux code with a reviewed `release.json` and its exact fixed-root
+`desktop-release.json` uses the private per-user installation lease, plus the
+persistent pending-transaction launch check. It does not query dpkg/rpm or take
+system package locks. A moved managed artifact is refused before obtaining the
+lease. OS package paths retain their existing package-owned admission/configuration
+checks. The three isolated Linux fixtures exercise actual kernel contention,
+pending-record preservation and moved-artifact refusal; eleven deployment fixtures
+cover immutable interpreter retention and damaged-candidate refusal. The focused
+updater set passes 155 cases (154 passed, one OS skip).
+
+This is part of the authorized complete Linux adapter work, not its completion.
+Independent signed-bundle staging/controller, complete runtime/voice ownership,
+target health and reopening still require implementation/qualification. Legacy
+overlays and unqualified source receipts cannot opt into automatic installation.

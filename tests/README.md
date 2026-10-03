@@ -817,3 +817,9 @@ refusal before Python output. The hosted `macos-update-payload-proof.py` exercis
 live same-build completion, wrong-target preservation, exact offline health,
 archival and replay refusal in disposable bundles. It does not qualify a public
 signed forward update or launchd/reopening.
+
+`test_update_managed_lease.py` uses actual Linux private kernel leases and
+isolated state to check installed managed lifetime, persistent pending refusal
+and moved-root refusal without OS package operations. The bundled-interpreter
+case in `test_desktop_deployment.py` verifies retained bytes, fixed immutable
+paths and damaged-artifact refusal without changing the selected build.

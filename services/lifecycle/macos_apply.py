@@ -81,7 +81,7 @@ class MacInstallerBackend:
         """Original caller seals the exact durable acknowledgement after apply."""
         import hashlib
         from platform_adapters.private_files import descriptor,read_json
-        if (not self.applied or self.record_sha256 is not None or self.journal is None
+        if (not self.applied or self.record_sha256 is not None or self.journal is None or self.journal.fd is None
                 or self.journal.uncertain or self.journal.record['phase']!='apply-acknowledged'
                 or read_json(self.journal.path)!=self.journal.record):
             raise ValueError('Only this successfully applied attempt can retain its acknowledgement.')

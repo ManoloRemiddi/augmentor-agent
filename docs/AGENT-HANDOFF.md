@@ -4,6 +4,14 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+Managed Linux staging now copies an included Python runtime and retains its
+immutable path/inventory. Installed managed receipts use private lifetime locks
+and the persistent pending barrier, with moved-root refusal, instead of OS package
+queries. Three actual Linux lease cases and all eleven deployment cases pass;
+the focused updater set passes 155 cases (154 passed, one OS skip). The full Linux
+controller remains open; no installed selection has changed. See
+[managed artifact evidence](UPDATE-SYSTEM.md#managed-linux-artifact-retention-and-lifetime).
+
 Current native checkpoint `641d4ed` passes Mac 14/26 whole-bundle retention and
 same-build atomic apply (37138674288), all shared/Linux packaging validation
 (37138676353), SDK platform contracts (37138678547), and Windows Desktop both

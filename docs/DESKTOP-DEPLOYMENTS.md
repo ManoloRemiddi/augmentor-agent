@@ -2,6 +2,26 @@
 
 # Consistent installed desktop releases
 
+## Managed update source checkpoint — October 3
+
+Staging now retains an included `python/` runtime alongside the existing Node,
+application and dependency trees. A candidate interpreter path inside the source
+follows the new immutable release path and is included in the full inventory;
+later source edits cannot alter it. Eleven deployment fixtures pass, including
+damaged retained-interpreter refusal before selection changes.
+
+An installed managed Linux artifact with both `release.json` and its bound
+`desktop-release.json` takes the private per-user installation lifetime lease.
+It uses the persistent unfinished-update barrier and refuses a moved artifact;
+it is not treated as an OS package. Three real Linux lock/pending fixtures pass.
+Debian/RPM installations continue their package-owned checks and locks. Legacy
+managed overlays without a reviewed release receipt remain unqualified for
+automatic installation. The independent automatic controller, matching DSH and
+voice coordination, target health and verified reopening remain required; this
+source checkpoint does not select a release or update the owner's installation.
+
+See [the shared update guide](UPDATE-SYSTEM.md#managed-linux-artifact-retention-and-lifetime).
+
 ## October 1: browser evidence recovery
 
 [Browser observation repair](BROWSER-OBSERVATION-REPAIR.md#installed-linux-evidence--1-october-2026)
