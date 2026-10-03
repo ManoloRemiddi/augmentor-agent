@@ -221,3 +221,38 @@ include live owner/inode replacement after status, busy/preexisting peers, lost
 commit replies, source/start mismatches and refusal before model binding or SDK
 dispatch. This is source/protocol qualification, with fresh installed acceptance
 pending. No new bundle, installation, VM run or settings normalization is made.
+
+## Clean16bcb build and fresh-account proof scope
+
+The [fresh candidate checkpoint](../release/qualification/next-targets/20261003-mint16bcb-fresh-emulated-proof.json)
+records exact clean16bcb native, Browser and complete builds with streamed payload
+inspection PASS. The detached builder preserves the finite reviewed public
+wheel/source-Qt cache and original Handy BUILD receipt; no Handy rebuild or
+private source export is introduced. At least4GiB free space was retained before
+each allocation. Artifact hashes and manifest/setup identities are recorded.
+This is build evidence; native adoption and fresh connected-product acceptance
+remain false.
+
+Read-only inspection finds `augmentor-corrected-proof` UID/GID1002 and its home
+unused. Both existing accounts, UID1000's ten protected files and failed
+UID1001's thirty settings/journal/history/memory files, remain unchanged. The VM
+still has clean2035 native packages and an idle verified runtime. A future
+approved transaction must repeat host/QEMU/marker/root/idle and protected-hash
+guards, preserve signed APT metadata and an actual dry-run, then use normal
+same-version APT `--reinstall` for exact16bcb bytes. Repeat unused name/UID/group/
+GID/home checks before creating a locked ordinary account with home0700 and no
+admin membership. Do not rename stamps, alter old settings or adopt receipts.
+
+The [fresh emulated proof contract](COMPLETE-INSTALL.md#fresh-mint-emulated-proof-admission)
+adds a separate fixed16bcb/UID1002 entry and exclusive one-run journal. It uses
+the unchanged complete installer and verified source-Qt environment, two measured
+120-second authenticated startups and60-second turns, refusing successful reads
+crossing either respective bound before another mutation. Default public60
+behavior and the old clean2035/UID1001 post-install admission remain unchanged.
+Unknown installer/SDK/companion outcomes are preserved without replay. Exact
+settings bytes, both new role histories, no restart model replay and normal
+owned idle companion cleanup must pass; external native lease/process/socket/
+listener readback and both earlier-account hashes are required afterwards.
+Focused synthetic tests verify these fences; no fresh VM product run, account
+creation or native adoption has occurred. Desktop/browser/lock/audio/legal gates
+remain open.

@@ -361,3 +361,73 @@ cleanup protocol and source integration. The combined correction has not been
 executed against a fresh installed artifact; review/publication precede a new
 clean bundle and fresh-account qualification. Existing2035 settings and failed
 journals remain untouched, and all public/default60-second bounds remain.
+
+## Fresh Mint emulated proof admission
+
+The clean16bcb Mint candidate is built and checksum-inspected; its fresh ordinary
+account and connected-product run remain unexecuted. The
+[fresh checkpoint](../release/qualification/next-targets/20261003-mint16bcb-fresh-emulated-proof.json)
+keeps this distinct from clean2035's actual setup PASS, original full-proof FAIL,
+two60-second failures and v3 settings-byte FAIL. None of those accounts, journals,
+prompts or settings is reused or normalized.
+
+The maintained `fresh_emulated_proof(bundle, fixture)` entry in
+[the complete proof](../release/prove-complete-linux.py) is restricted to exact
+clean16bcb native/bundle bytes, the installed Mint22.3 QEMU fixture and fresh
+`augmentor-corrected-proof` UID/GID1002 with its private home. Its CLI is
+`--owned-vm-fresh-emulated-fixture PATH`. The fixture is a bounded root-staged
+ordinary file. It binds the exact external proof SHA, shared32-hex run token,
+source/artifact/setup/manifest identities, ordinary account, distinct localhost
+provider/DSH ports, boot identity and a checksum-bound root-staged host receipt.
+The host wrapper first calls `fresh_host_preflight(fixture)`: the exact existing
+QEMU PID/name, open owned disk, QMP socket and absence of host devices/mounts are
+read, without connecting QMP or sending input. Guest admission verifies the
+receipt's same proof/run/boot identity and its age of at most300seconds. The guest
+cannot inspect the host's QEMU descriptors itself.
+
+Before allocating the exclusive `fresh-emulated-proof16bcb` home journal or
+binding a model server, admission checks marker, installed ext4 root, detached
+ISO, AppArmor, Mint identity, no admin groups or inherited runtime overrides,
+absent application/settings/workspace/companion state, idle services/ports and
+the exact complete/native payload, package audit, full runtime policy, all seven
+wheels and source-Qt inputs. A fresh account has no prepared selection yet:
+the exact unchanged bundle installer prepares it, and the complete production
+runtime `resolve`/environment and desktop inventory must pass before rendering
+or SDK operations. Native adoption remains a separate normal authenticated APT
+transaction; this entry never installs packages or changes the selected payload.
+
+Only this explicit entry has a separately labelled120-second authenticated
+startup budget on both initial start and restart. After each bounded
+`host.describe` read, it records elapsed time and refuses readiness observed
+after120seconds before any next SDK mutation. Each turn retains60seconds and
+also refuses a completed history/list read arriving after60seconds. The normal
+public `user_proof` startup behavior remains unchanged, including its deadline
+checks between reads. A fresh emulated result always records
+`originalPublic60FullProofPass=false` and
+`public60SecondStartupProofPass=false`. It does not relabel the earlier failures
+or qualify graphical sessions, browser interaction, physical audio or licensing.
+
+The new journal records each installer or SDK operation as pending before its
+single dispatch. Initial setup uses the actual bundle `setup.py`, explicit home
+cwd and `--skip-packages --no-services`; its normal internal startup bound stays
+unchanged. Only a verified successful installed receipt for this same artifact
+permits the one idempotence call. Lost/failed outcomes remain terminal; no setup,
+select-model or prompt is replayed. New Linux/Browser session IDs include the run
+token. Five settings hashes are captured after installation and remain byte
+identical through repeat setup, actual DSH Save and both turns. Restart compares
+all saved events/header fields except the established omitted `delegationDepth=0`
+default, and must send no new model request. The hash-pinned memory-companion
+helper arms only when absent, closes only a newly owned idle daemon, and preserves
+unknown/busy/foreign outcomes without signals or retries.
+
+After the proof process exits, root invokes the same fixture with
+`--fresh-emulated-external-audit`. This read-only audit requires the journal's
+same run, full fixture SHA, proof SHA, source/artifact/manifest, native audit,
+exclusive runtime+desktop leases held together, no pending maintenance, no owned
+process/socket/listener and unchanged five settings. Its result reports the
+actual proof outcome; clean closure cannot convert a failed proof into a pass.
+The owned host wrapper must additionally preserve/check UID1000's ten and
+UID1001's thirty protected settings/journal/history files before and finally
+after every native/account/proof transaction. These private hashes and fixture
+connection data are not published. Source review/publication precede any fresh
+account creation, native adoption or product run.

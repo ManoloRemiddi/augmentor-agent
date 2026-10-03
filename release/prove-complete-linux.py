@@ -687,6 +687,456 @@ def post_install_proof(bundle, fixture):
                 atomic_json(root/'run.json', record)
 
 
+# This admission is intentionally fixed to the reviewed pristine Mint candidate.
+FRESH_SOURCE = '16bcb797cc5e84b6a4807d1b88229afebed2c5bf'
+FRESH_ARTIFACT = '0.2.13-linuxmint22.3-amd64-complete-preview.1-16bcb797cc5e'
+FRESH_MANIFEST_SHA = '9d2bd9d5e1b4c6cd4aadbc0fca7689562ebac33d995f7dd93ebc379e609c59d9'
+FRESH_SETUP_SHA = 'd19ae1ecc900f5f3f29610c99b417474ef9e776043e99cabc5c3978dfaf76b52'
+FRESH_HOME = Path('/home/augmentor-corrected-proof')
+FRESH_RUN_DIRECTORY = 'fresh-emulated-proof16bcb'
+
+
+def fresh_binding(fixture):
+    import re
+    expected = {'format': 'augmentor-owned-mint-fresh-emulated/1', 'sourceCommit': FRESH_SOURCE,
+                'artifactId': FRESH_ARTIFACT, 'bundleManifestSha256': FRESH_MANIFEST_SHA,
+                'setupSha256': FRESH_SETUP_SHA, 'target': 'linuxmint22.3-amd64',
+                'uid': 1002, 'gid': 1002, 'user': 'augmentor-corrected-proof', 'home': str(FRESH_HOME),
+                'markerSha256': hashlib.sha256(POST_MARKER_TEXT.encode()).hexdigest(),
+                'proofScriptSha256': PROOF_SHA256,
+                'startupBudgetSeconds': 120, 'turnBudgetSeconds': 60,
+                'qemuName': 'augmentor-mint223-cinnamon-iso', 'qemuPid': 2494740}
+    if any(type(fixture.get(key)) is not type(value) or fixture.get(key) != value for key, value in expected.items()):
+        raise ValueError('Only the exact clean16bcb fresh ordinary Mint fixture is admitted.')
+    if not re.fullmatch('[a-f0-9]{32}', fixture.get('runToken', '')):
+        raise ValueError('The fresh proof needs one explicit shared run token.')
+    ports = [fixture.get(key) for key in ('modelApiPort', 'dshPort')]
+    if any(type(v) is not int or not 1024 <= v <= 65535 for v in ports) or len(set(ports)) != 2:
+        raise ValueError('The fresh fixture needs distinct ordinary loopback ports.')
+    if any(key in fixture for key in ('priorFailure', 'priorFailures', 'settings', 'runDirectory')):
+        raise ValueError('A fresh fixture cannot adopt prior settings, journals or retries.')
+
+
+def fresh_host_preflight(fixture):
+    """Read-only host wrapper admission; stage this result root-owned in the guest."""
+    fresh_binding(fixture)
+    proc = Path('/proc')/str(fixture['qemuPid'])
+    args = (proc/'cmdline').read_bytes().split(b'\0')[:-1]
+    start = (proc/'stat').read_text().rsplit(')', 1)[1].split()[19]
+    forbidden = (b'vfio', b'virtfs', b'virtiofs', b'fsdev', b'usb-host', b'/dev/', b'-cdrom', b'hostpci')
+    if (not args or not Path(os.fsdecode(args[0])).name.startswith('qemu-system-') or
+        any(part in arg for arg in args for part in forbidden) or
+        b'-name' not in args or args[args.index(b'-name')+1] != fixture['qemuName'].encode()):
+        raise ValueError('The exact owned QEMU/no-host-device identity differs.')
+    disk = Path(fixture['qemuDisk']); qmp = Path(fixture['qmpSocket'])
+    if (not disk.is_absolute() or disk.is_symlink() or not disk.is_file() or disk.stat().st_uid != os.getuid() or
+        not qmp.is_absolute() or qmp.is_symlink() or not stat.S_ISSOCK(qmp.stat().st_mode) or qmp.stat().st_uid != os.getuid() or
+        not any(str(disk).encode() in arg for arg in args) or not any(str(qmp).encode() in arg for arg in args)):
+        raise ValueError('The owned QEMU disk/QMP paths differ.')
+    opened = [os.readlink(p) for p in (proc/'fd').iterdir()]
+    if str(disk) not in opened or (proc/'stat').read_text().rsplit(')', 1)[1].split()[19] != start:
+        raise ValueError('The owned QEMU process/disk changed during preflight.')
+    return {'format': 'augmentor-mint-fresh-host-preflight/1', 'runToken': fixture['runToken'],
+            'sourceCommit': FRESH_SOURCE, 'proofScriptSha256': PROOF_SHA256,
+            'qemuPid': fixture['qemuPid'], 'qemuName': fixture['qemuName'],
+            'qemuStart': start, 'argvSha256': hashlib.sha256(b'\0'.join(args)+b'\0').hexdigest(),
+            'noHostDevicesOrMounts': True, 'guestBootId': fixture['guestBootId'], 'observedUnix': time.time()}
+
+
+def fresh_vm_identity(fixture, *, ordinary=True):
+    import pwd
+    fresh_binding(fixture)
+    if ordinary:
+        if (os.getuid() != 1002 or os.geteuid() != 1002 or os.getgid() != 1002 or
+            os.getgroups() != [1002] or Path.home() != FRESH_HOME or os.environ.get('HOME') != str(FRESH_HOME)):
+            raise ValueError('Use only the locked dedicated ordinary fresh Mint account.')
+        entry = pwd.getpwuid(1002)
+        if entry.pw_name != fixture['user'] or entry.pw_dir != str(FRESH_HOME) or entry.pw_uid != 1002 or entry.pw_gid != 1002:
+            raise ValueError('The fresh account identity differs.')
+    elif os.geteuid() != 0:
+        raise ValueError('The external native lease audit requires root after the proof exits.')
+    info = POST_MARKER.lstat()
+    if (not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or info.st_nlink != 1 or info.st_mode & 0o022 or
+        POST_MARKER.read_text() != POST_MARKER_TEXT):
+        raise ValueError('The owned installed Mint marker differs.')
+    fields = dict(row.split('=', 1) for row in Path('/etc/os-release').read_text().splitlines() if '=' in row)
+    if fields.get('ID', '').strip('"') != 'linuxmint' or fields.get('VERSION_ID', '').strip('"') != '22.3':
+        raise ValueError('The fresh fixture is not Linux Mint22.3.')
+    for command, expected in ((['hostname'], 'augmentor-mint223-iso'), (['systemd-detect-virt'], 'qemu'),
+                              (['findmnt', '--target', '/', '--noheadings', '--output', 'SOURCE,FSTYPE'], '/dev/vda2 ext4')):
+        if subprocess.check_output(command, text=True, timeout=15).strip() != expected:
+            raise ValueError('The fresh VM/root identity differs.')
+    if ('boot=casper' in Path('/proc/cmdline').read_text() or
+        any(v in Path('/proc/mounts').read_text() for v in ('iso9660', 'squashfs', 'virtiofs', '9p')) or
+        Path('/sys/module/apparmor/parameters/enabled').read_text().strip() != 'Y' or
+        Path('/proc/sys/kernel/random/boot_id').read_text().strip() != fixture.get('guestBootId')):
+        raise ValueError('The fresh installed root/security/boot identity differs.')
+    if ordinary:
+        if any(key.startswith(('AUGMENTOR_', 'DSH_', 'XDG_', 'LD_', 'QT_', 'QML_', 'NODE_', 'RESONANT_')) for key in os.environ):
+            raise ValueError('The fresh fixture requires a clean environment.')
+        receipt = Path(fixture['hostPreflightPath']); info = receipt.lstat(); raw = receipt.read_bytes()
+        if (not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or info.st_nlink != 1 or info.st_mode & 0o022 or
+            len(raw) > 8192 or hashlib.sha256(raw).hexdigest() != fixture.get('hostPreflightSha256')):
+            raise ValueError('The root-staged host preflight receipt differs.')
+        observed = json.loads(raw)
+        required = {'format': 'augmentor-mint-fresh-host-preflight/1', 'runToken': fixture['runToken'],
+                    'sourceCommit': FRESH_SOURCE, 'proofScriptSha256': PROOF_SHA256,
+                    'qemuPid': 2494740, 'qemuName': fixture['qemuName'],
+                    'noHostDevicesOrMounts': True, 'guestBootId': fixture['guestBootId']}
+        if any(observed.get(k) != v for k, v in required.items()) or not 0 <= time.time()-observed.get('observedUnix', 0) <= 300:
+            raise ValueError('The host preflight is stale or belongs to another run/VM.')
+
+
+def fresh_native_bundle(bundle, fixture):
+    raw = (bundle/'bundle.json').read_bytes()
+    if hashlib.sha256(raw).hexdigest() != FRESH_MANIFEST_SHA:
+        raise ValueError('The exact fresh complete manifest differs.')
+    manifest = json.loads(raw)
+    if (manifest['sourceCommit'] != FRESH_SOURCE or manifest['artifactId'] != FRESH_ARTIFACT or
+        manifest['target'] != fixture['target'] or hashlib.sha256((bundle/'setup.py').read_bytes()).hexdigest() != FRESH_SETUP_SHA):
+        raise ValueError('The exact fresh source/artifact/installer differs.')
+    setup = proof_module(bundle/'setup.py'); setup.verify_bundle(bundle)
+    info = (POST_APP/'release.json').lstat()
+    if not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or info.st_nlink != 1 or info.st_mode & 0o022:
+        raise ValueError('The native fresh release is not immutable/root-owned.')
+    setup.verify_installed_payload(POST_APP, manifest, bundle)
+    for command in (['dpkg', '--audit'], ['dpkg', '--verify', 'augmentor-runtime', 'augmentor-desktop']):
+        if subprocess.check_output(command, text=True, timeout=60):
+            raise ValueError('The native fresh package audit differs.')
+    runtime = proof_module(POST_APP/'scripts/linux-python-runtime.py')
+    marker = POST_APP/'linux-python-runtime.json'; value = runtime.policy(marker)
+    if runtime.contract(value, runtime.digest(marker)) != manifest['pythonRuntime']:
+        raise ValueError('The fresh full runtime policy differs.')
+    runtime.host(value); runtime.verify_wheels(value, POST_APP/'python-wheels')
+    runtime.source_qt().inputs(value, POST_APP/'python-wheels')
+    return manifest
+
+
+def validate_fresh_fixture(bundle, fixture):
+    fresh_vm_identity(fixture)
+    sys.path.insert(0, str(POST_APP/'services'))
+    from platform_adapters.private_files import require_directory
+    require_directory(FRESH_HOME)
+    # The proof journal is outside installer state. Nothing in a prior account is adopted.
+    for name in ('.local/share/augmentor', '.config/augmentor', '.local/state/augmentor-install',
+                 '.local/state/augmentor', '.dsh', FRESH_RUN_DIRECTORY):
+        path = FRESH_HOME/name
+        if path.exists() or path.is_symlink():
+            raise ValueError('The fresh proof needs absent application/settings/workspace/journal state.')
+    post_account_idle(FRESH_HOME, 'augmentor-dsh.service')
+    require_ports_idle((fixture['modelApiPort'], fixture['dshPort']))
+    return fresh_native_bundle(bundle, fixture)
+
+
+def begin_fresh_run(fixture):
+    from platform_adapters.private_files import require_directory, atomic_json
+    root = FRESH_HOME/FRESH_RUN_DIRECTORY
+    try: root.mkdir(mode=0o700)
+    except FileExistsError: raise ValueError('The fresh one-shot journal exists; no run or action is adopted.') from None
+    require_directory(root)
+    fd = os.open(FRESH_HOME, os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
+    try: os.fsync(fd)
+    finally: os.close(fd)
+    record = {'format': 'augmentor-owned-fresh-emulated-run/1', 'run': fixture['runToken'],
+              'sourceCommit': FRESH_SOURCE, 'artifactId': FRESH_ARTIFACT, 'bundleManifestSha256': FRESH_MANIFEST_SHA,
+              'proofScriptSha256': PROOF_SHA256, 'fixtureSha256': hashlib.sha256(json.dumps(fixture, sort_keys=True).encode()).hexdigest(),
+              'phase': 'admitted', 'status': 'running', 'pendingRequest': None, 'unknownRequestOutcome': False,
+              'completedActions': [], 'startupBudgetSeconds': 120, 'turnBudgetSeconds': 60,
+              'originalPublic60FullProofPass': False}
+    atomic_json(root/'run.json', record)
+    return root, record
+
+
+def fresh_once(root, record, action, function):
+    from platform_adapters.private_files import atomic_json
+    if record['pendingRequest'] is not None or action in record['completedActions']:
+        raise ValueError('A pending/uncertain/completed fresh action is never retried.')
+    record['pendingRequest'] = {'action': action}; atomic_json(root/'run.json', record)
+    result = function()  # Exactly one call. Exceptions retain the pending fence.
+    record['pendingRequest'] = None; record['completedActions'].append(action); atomic_json(root/'run.json', record)
+    return result
+
+
+def capture_fresh_settings():
+    from platform_adapters.private_files import descriptor
+    result = {}
+    for name in POST_SETTINGS:
+        with os.fdopen(descriptor(FRESH_HOME/name), 'rb') as stream: raw = stream.read(1024*1024+1)
+        if len(raw) > 1024*1024: raise ValueError('Fresh settings exceed the bounded size.')
+        result[name] = {'sha256': hashlib.sha256(raw).hexdigest(), 'bytes': len(raw)}
+    return result
+
+
+def fresh_installed_selection(manifest, fixture):
+    from platform_adapters.private_files import read_json
+    receipt = read_json(FRESH_HOME/'.local/state/augmentor-install/installation.json')
+    if any(receipt.get(k) != v for k, v in {'status': 'installed', 'bundle': FRESH_ARTIFACT, 'target': manifest['target']}.items()):
+        raise ValueError('A known successful exact receipt is required; setup is not retried.')
+    desktop = read_json(FRESH_HOME/'.local/share/augmentor/desktop.json')
+    dsh = read_json(FRESH_HOME/'.config/augmentor/harnesses.json')['dsh']
+    home = FRESH_HOME/'.local/share/augmentor/dsh-home'
+    if (desktop.get('root') != str(POST_APP) or desktop.get('node') != str(POST_APP/'node/bin/node') or
+        desktop.get('dshService') != 'augmentor-dsh.service' or desktop.get('dshHome') != str(home) or
+        dsh.get('home') != str(home) or dsh.get('version') != manifest['version'] or
+        dsh.get('endpoint') != 'http://127.0.0.1:'+str(fixture['dshPort']) or desktop.get('dshEndpoint') != dsh.get('endpoint')):
+        raise ValueError('The fresh installed selection/saved endpoint differs.')
+    for name, digest in desktop.get('files', {}).items():
+        path = Path(name)
+        if path.is_absolute() or '..' in path.parts or hashlib.sha256((POST_APP/path).read_bytes()).hexdigest() != digest:
+            raise ValueError('The fresh selected desktop inventory differs.')
+    import yaml
+    model = yaml.safe_load((home/'settings.yaml').read_text()); provider = model['llm-pi-ai']['providers']['augmentor-model']
+    if (provider.get('baseURL') != 'http://127.0.0.1:'+str(fixture['modelApiPort'])+'/v1' or
+        provider.get('api') != 'openai-completions' or provider.get('apiKeyEnv') != 'AUGMENTOR_MODEL_API_KEY' or
+        len(provider.get('models', [])) != 1 or provider['models'][0]['id'] != 'fixture' or
+        model.get('agent-default-model') != {'provider': 'augmentor-model', 'model': 'fixture'} or
+        (FRESH_HOME/'.local/state/augmentor-install/model.env').read_text() != 'AUGMENTOR_MODEL_API_KEY="qualification-fixture"\n'):
+        raise ValueError('The fresh selection is not the dedicated deterministic localhost model.')
+    post_account_idle(FRESH_HOME, desktop['dshService'])
+    from lifecycle.lease import hold
+    hold('runtime')
+    return desktop, selected_python_environment(POST_APP, Path(desktop['python']))
+
+
+def fresh_start(process_factory, adapter_factory, observations):
+    process = process_factory(); began = time.monotonic()
+    try:
+        while time.monotonic()-began < 120:
+            exit_code = process.poll()
+            if exit_code is not None:
+                observations.append({'ready': False, 'elapsedSeconds': time.monotonic()-began, 'processExit': exit_code})
+                raise RuntimeError('The fresh owned DSH exited; no startup is retried.')
+            try:
+                adapter = adapter_factory(); adapter.call('host.describe')
+                if not adapter.product: raise ValueError('The fresh product connection differs.')
+            except (OSError, ValueError, RuntimeError):
+                time.sleep(.2); continue
+            elapsed = time.monotonic()-began
+            observations.append({'ready': elapsed <= 120, 'readinessObserved': True, 'elapsedSeconds': elapsed, 'withinBudget': elapsed <= 120})
+            if elapsed > 120: raise RuntimeError('Fresh authenticated readiness exceeded120seconds; no next SDK mutation is dispatched.')
+            return process, adapter
+        observations.append({'ready': False, 'elapsedSeconds': time.monotonic()-began})
+        raise RuntimeError('Fresh authenticated readiness was not observed within120seconds.')
+    except BaseException:
+        # Caller must own this child even when startup refuses.
+        fresh_stop(process)
+        raise
+
+
+def fresh_stop(process):
+    if process is not None:
+        try:
+            if process.poll() is None:
+                process.terminate()
+                try: process.wait(timeout=15)
+                except subprocess.TimeoutExpired: process.kill(); process.wait(timeout=15)
+        finally: process.close()
+
+
+def fresh_emulated_proof(bundle, fixture):
+    """New ordinary account; unchanged installer, explicit emulated startup only."""
+    manifest = validate_fresh_fixture(bundle, fixture)
+    from platform_adapters.private_files import atomic_json, require_directory
+    from platform_adapters.processes import OwnedProcess
+    root, record = begin_fresh_run(fixture)
+    settings = None; server = None; thread = None; thread_started = False; process = None; companion = None; log = None
+    requests = []; observations = []; turn_observations = []; history_preserved = False; report = None
+    try:
+        runtime_dir = FRESH_HOME/'runtime'
+        if not runtime_dir.exists(): runtime_dir.mkdir(mode=0o700)
+        require_directory(runtime_dir)
+        env = {**os.environ, 'AUGMENTOR_FIXTURE_KEY': 'qualification-fixture', 'QT_QPA_PLATFORM': 'offscreen',
+               'XDG_RUNTIME_DIR': str(runtime_dir), 'PATH': str(POST_APP/'node/bin')+':'+os.environ['PATH']}
+        server = fixture_model_server(requests, fixture['modelApiPort'])
+        thread = threading.Thread(target=server.serve_forever, daemon=True); thread.start(); thread_started = True
+        log = (root/'dsh.log').open('x'); (root/'dsh.log').chmod(0o600)
+        command = ['/usr/bin/python3', '-B', bundle/'setup.py', '--bundle', bundle, '--skip-packages', '--no-services',
+                   '--non-interactive', '--model-url', 'http://127.0.0.1:'+str(fixture['modelApiPort'])+'/v1',
+                   '--model', 'fixture', '--api-key-env', 'AUGMENTOR_FIXTURE_KEY', '--port', str(fixture['dshPort'])]
+        record['phase'] = 'setup'; atomic_json(root/'run.json', record)
+        fresh_once(root, record, 'setup.initial', lambda: run(command, env=env, cwd=str(FRESH_HOME), stdout=log, stderr=log))
+        desktop, selected = fresh_installed_selection(manifest, fixture)
+        settings = capture_fresh_settings(); record['settings'] = settings; atomic_json(root/'run.json', record)
+        # Only a verified installed receipt permits the documented idempotent call.
+        fresh_once(root, record, 'setup.installed-idempotence', lambda: run(command, env=env, cwd=str(FRESH_HOME), stdout=log, stderr=log))
+        settings_snapshot(FRESH_HOME, settings)
+        data = FRESH_HOME/'.local/share/augmentor'; home = data/'dsh-home'
+        for path in (FRESH_HOME/'.config/autostart/com.augmentor.Agent.desktop',
+                     FRESH_HOME/'.local/share/applications/com.augmentor.Agent.secondary.desktop',
+                     FRESH_HOME/'.config/chromium/NativeMessagingHosts/com.augmentor.agent.json',
+                     data/'browser'/manifest['version']/'voice.mjs'):
+            if not path.is_file(): raise ValueError('The fresh desktop/Browser setup is incomplete.')
+        for plugin in ('dsh-resonant-voice', 'dsh-adaptive-reasoning', 'dsh-model-picker-augmented'):
+            if not (home/'profiles/web/node_modules'/plugin/'package.json').is_file(): raise ValueError('The fresh installed plugin is absent.')
+        workspace = home/'storages/workspace.json'
+        empty_workspace_guard(home, hashlib.sha256(workspace.read_bytes()).hexdigest())
+        env = {**selected, 'DSH_HOME': str(home), 'DSH_TELEMETRY_MODE': 'DISABLED',
+               'AUGMENTOR_MODEL_API_KEY': 'qualification-fixture', 'QT_QPA_PLATFORM': 'offscreen', 'XDG_RUNTIME_DIR': str(runtime_dir)}
+        os.environ.clear(); os.environ.update(env)
+        companion = memory_companion(POST_APP, desktop['python'], FRESH_HOME, home, env, root)
+        record['phase'] = 'preview'; atomic_json(root/'run.json', record)
+        run([desktop['python'], '-m', 'augmentor_linux', '--preview', '--screenshot', root/'desktop.png'],
+            env={**env, 'PYTHONPATH': str(POST_APP/'apps/native')}, cwd=str(FRESH_HOME), timeout=120)
+        if (root/'desktop.png').stat().st_size <= 10000: raise ValueError('The fresh preview is incomplete.')
+        sys.path.insert(0, str(POST_APP/'apps/native'))
+        from augmentor_linux.adapters.dsh import DshAdapter
+        cli = data/'dsh-runtime/node_modules/.bin/dsh'
+        def start():
+            return fresh_start(lambda: OwnedProcess([str(POST_APP/'node/bin/node'), str(cli.resolve()), 'web', '--no-open',
+                '--host', '127.0.0.1', '--port', str(fixture['dshPort'])], env=env, cwd=str(FRESH_HOME), stdout=log, stderr=log), DshAdapter, observations)
+        record['phase'] = 'starting'; atomic_json(root/'run.json', record)
+        process, adapter = start()
+        if adapter.call('session.list')['items']: raise ValueError('The fresh runtime has prior sessions; none are adopted.')
+        sessions = []
+        for role in ('linux', 'browser'):
+            record['phase'] = role+'-role'; atomic_json(root/'run.json', record)
+            settings_snapshot(FRESH_HOME, settings)
+            session = 'qualification-fresh-'+record['run']+'-'+role; sessions.append(session)
+            for method, payload in (
+                ('session.create', {'sessionId': session, 'agentPreset': 'augmentor-'+role+'-product', 'cwd': str(FRESH_HOME)}),
+                ('session.selectModel', {'sessionId': session, 'provider': 'augmentor-model', 'model': 'fixture'}),
+                ('session.prompt', {'sessionId': session, 'mode': 'queue', 'content': [{'type': 'text', 'text': 'Reply to the '+role+' qualification fixture.'}]})):
+                fresh_once(root, record, session+':'+method, lambda m=method, p=payload: adapter.call(m, p))
+            began = time.monotonic()
+            while time.monotonic()-began < 60:
+                history = adapter.call('session.history', {'sessionId': session})
+                row = next(v for v in adapter.call('session.list')['items'] if v['sessionId'] == session)
+                elapsed = time.monotonic()-began
+                completed = not row['running'] and 'LINUX DISTRO FIXTURE VERIFIED' in json.dumps(history)
+                if completed or elapsed > 60:
+                    turn_observations.append({'role': role, 'elapsedSeconds': elapsed,
+                        'completionObserved': completed, 'withinBudget': elapsed <= 60})
+                    record['turnObservations'] = turn_observations; atomic_json(root/'run.json', record)
+                if elapsed > 60:
+                    raise RuntimeError('The fresh '+role+' turn reads exceeded60seconds; no next SDK mutation is dispatched.')
+                if completed: break
+                time.sleep(.1)
+            else: raise RuntimeError('The fresh '+role+' fixture turn did not finish within60seconds.')
+            settings_snapshot(FRESH_HOME, settings)
+        before = {sid: adapter.call('session.history', {'sessionId': sid}) for sid in sessions}
+        atomic_json(root/'history-before.json', before); count = len(requests)
+        if count < 2: raise ValueError('Both fresh roles must reach the counted model fixture.')
+        fresh_stop(process); process = None
+        record['phase'] = 'restart'; atomic_json(root/'run.json', record)
+        process, adapter = start()
+        after = {sid: adapter.call('session.history', {'sessionId': sid}) for sid in sessions}
+        atomic_json(root/'history-after.json', after)
+        if normalized_histories(after) != normalized_histories(before): raise ValueError('Fresh restart changed history.')
+        if len(requests) != count: raise ValueError('Fresh restart replayed a model request.')
+        history_preserved = True; fresh_stop(process); process = None
+        cleanup = companion.finish(); settings_snapshot(FRESH_HOME, settings)
+        report = {'format': 'augmentor-owned-fresh-emulated-proof/1', 'status': 'pass', 'sourceCommit': FRESH_SOURCE,
+                  'artifactId': FRESH_ARTIFACT, 'proofScriptSha256': PROOF_SHA256, 'setupScriptSha256': FRESH_SETUP_SHA,
+                  'installerOverlayUsed': False, 'ordinaryUserSetup': True, 'repeatPreservesSettings': True,
+                  'savedSettingsPreserved': True, 'offscreenNativeRender': True, 'secondWindowEntry': True,
+                  'nativeHostRegistered': True, 'linuxAndBrowserRoleFixtureTurns': True,
+                  'restartPreservesHistoryWithoutReplay': True, 'selectedPython': desktop['python'],
+                  'dshService': desktop['dshService'], 'modelRequests': count, 'startupObservations': observations,
+                  'turnObservations': turn_observations,
+                  'startupBudgetSeconds': 120, 'turnBudgetSeconds': 60, 'emulatedStartupQualification': True,
+                  'originalPublic60FullProofPass': False, 'public60SecondStartupProofPass': False,
+                  'realDesktopSessionTested': False, 'graphicalBrowserTested': False, 'physicalVoiceTested': False,
+                  'licenseReviewComplete': False, 'embeddedSourceCoverageComplete': False,
+                  'externalLeaseAuditRequired': True, 'companionProofSha256': COMPANION_PROOF_SHA256,
+                  'companionCleanup': cleanup}
+        record.update(status='complete', phase='complete')
+        return report
+    except BaseException:
+        record['status'] = 'failed'; record['unknownRequestOutcome'] = record['pendingRequest'] is not None
+        raise
+    finally:
+        try:
+            fresh_stop(process)
+            if companion is not None:
+                if not companion.attempted: companion.finish()
+                record['companionCleanup'] = dict(companion.record)
+        except BaseException:
+            record['status'] = 'failed'
+            if companion is not None: record['companionCleanup'] = dict(companion.record)
+            raise
+        finally:
+            try:
+                if server is not None:
+                    try:
+                        if thread_started: server.shutdown(); thread.join(timeout=5)
+                    finally: server.server_close()
+            except BaseException:
+                record['status'] = 'failed'; raise
+            finally:
+                if log is not None: log.close()
+                try:
+                    if settings is not None: settings_snapshot(FRESH_HOME, settings); record['settingsPreserved'] = True
+                except BaseException:
+                    record['status'] = 'failed'; record['settingsPreserved'] = False; raise
+                finally:
+                    record.update(modelRequests=len(requests), startupObservations=observations,
+                                  turnObservations=turn_observations, historyPreservedVerified=history_preserved)
+                    atomic_json(root/'run.json', record)
+                    if report is not None and record['status'] == 'complete':
+                        atomic_json(root/'report.json', report)
+
+
+def fresh_audit_record(record, fixture):
+    if (record.get('run') != fixture['runToken'] or record.get('sourceCommit') != FRESH_SOURCE or
+        record.get('artifactId') != FRESH_ARTIFACT or record.get('bundleManifestSha256') != FRESH_MANIFEST_SHA or
+        record.get('proofScriptSha256') != fixture['proofScriptSha256'] or
+        record.get('fixtureSha256') != hashlib.sha256(json.dumps(fixture, sort_keys=True).encode()).hexdigest()):
+        raise ValueError('The external audit cannot adopt another journal/tool/fixture.')
+
+
+def fresh_external_audit(bundle, fixture):
+    """Root wrapper readback after the proof exits; never stop any process."""
+    fresh_vm_identity(fixture, ordinary=False); fresh_native_bundle(bundle, fixture)
+    import fcntl
+    root = FRESH_HOME/FRESH_RUN_DIRECTORY; info = root.lstat()
+    if not stat.S_ISDIR(info.st_mode) or info.st_uid != 1002 or info.st_mode & 0o077:
+        raise ValueError('The fresh audit journal root differs.')
+    path = root/'run.json'; info = path.lstat()
+    if not stat.S_ISREG(info.st_mode) or info.st_uid != 1002 or info.st_mode & 0o077 or info.st_nlink != 1:
+        raise ValueError('The fresh audit journal file differs.')
+    record = json.loads(path.read_bytes())
+    fresh_audit_record(record, fixture)
+    for proc in Path('/proc').iterdir():
+        if not proc.name.isdigit() or int(proc.name) == os.getpid(): continue
+        try:
+            if proc.stat().st_uid != 1002: continue
+            args = (proc/'cmdline').read_bytes(); env = (proc/'environ').read_bytes()
+            if any(v in args for v in (str(POST_APP).encode(), b'/setup.py', b'--owned-vm-fresh-emulated-fixture')) or str(FRESH_HOME/'.local/share/augmentor').encode() in env:
+                raise ValueError('The fresh proof/product child is still active; it is preserved.')
+        except FileNotFoundError: continue
+    for path in (Path('/var/lib/augmentor-package-maintenance/pending.json'),
+                 Path('/run/augmentor/augmentor-runtime.pending'), Path('/run/augmentor/augmentor-desktop.pending')):
+        if path.exists() or path.is_symlink(): raise ValueError('Native package maintenance is pending; it is preserved.')
+    leases = []
+    try:
+        for component in ('runtime', 'desktop'):
+            fd = os.open('/run/augmentor/augmentor-'+component+'.lock', os.O_RDONLY|os.O_NOFOLLOW)
+            leases.append(fd); info = os.fstat(fd)
+            if not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or info.st_nlink != 1 or info.st_mode & 0o022:
+                raise ValueError('The native external lease identity differs.')
+            fcntl.flock(fd, fcntl.LOCK_EX|fcntl.LOCK_NB)
+        require_ports_idle((fixture['modelApiPort'], fixture['dshPort']))
+        memory = FRESH_HOME/'.local/state/augmentor/dual-memory.sock'
+        if memory.exists() or memory.is_symlink():
+            raise ValueError('A fresh memory socket remains; no daemon is adopted or stopped.')
+        if record.get('settings'):
+            if set(record['settings']) != POST_SETTINGS:
+                raise ValueError('The external settings audit needs all five original hashes.')
+            for name, expected in record['settings'].items():
+                path = FRESH_HOME/name; info = path.lstat(); raw = path.read_bytes()
+                if (not stat.S_ISREG(info.st_mode) or info.st_uid != 1002 or info.st_nlink != 1 or info.st_mode & 0o077 or
+                    {'sha256': hashlib.sha256(raw).hexdigest(), 'bytes': len(raw)} != expected):
+                    raise ValueError('The fresh external settings preservation audit differs.')
+    finally:
+        for fd in reversed(leases): os.close(fd)
+    return {'format': 'augmentor-owned-fresh-emulated-external-audit/1', 'sourceCommit': FRESH_SOURCE,
+            'run': fixture['runToken'], 'proofOutcome': record['status'], 'runSha256': hashlib.sha256((root/'run.json').read_bytes()).hexdigest(),
+            'proofScriptSha256': record['proofScriptSha256'], 'fixtureSha256': record['fixtureSha256'],
+            'nativeAudit': True, 'exclusiveLeasesIdle': True, 'noOwnedProcessOrListener': True,
+            'settingsPreserved': bool(record.get('settings')), 'SDKPending': record['pendingRequest'],
+            'protectedEarlierAccountsAuditRequired': True}
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--bundle', type=Path, required=True)
@@ -696,7 +1146,25 @@ def main():
                    help='Explicit diagnostic installer override; records its hash and cannot count as matching-bundle acceptance.')
     p.add_argument('--owned-vm-post-install-fixture', type=Path,
                    help='Explicit one-shot clean2035 Mint fixture; verifies saved state and never invokes setup.')
+    p.add_argument('--owned-vm-fresh-emulated-fixture', type=Path,
+                   help='One-shot pristine clean16bcb Mint account; separately labelled120-second emulated startup.')
+    p.add_argument('--fresh-emulated-external-audit', action='store_true',
+                   help='Read-only root audit after the fresh proof exits; requires its exact fixture.')
     a = p.parse_args()
+    if a.owned_vm_fresh_emulated_fixture:
+        if a.user_phase or a.setup_script or a.owned_vm_post_install_fixture:
+            p.error('Fresh emulated fixture cannot use another proof phase or installer override.')
+        sys.path.insert(0, str(POST_APP/'services'))
+        raw = a.owned_vm_fresh_emulated_fixture.read_bytes()
+        info = a.owned_vm_fresh_emulated_fixture.lstat()
+        if not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or info.st_nlink != 1 or info.st_mode & 0o022 or len(raw) > 16384:
+            p.error('The fresh fixture must be a bounded immutable root-staged ordinary file.')
+        fixture = json.loads(raw)
+        report = (fresh_external_audit if a.fresh_emulated_external_audit else fresh_emulated_proof)(a.bundle.resolve(), fixture)
+        print(json.dumps(report))
+        return
+    if a.fresh_emulated_external_audit:
+        p.error('External fresh audit requires its exact fresh fixture.')
     if a.owned_vm_post_install_fixture:
         if a.user_phase or a.setup_script:
             p.error('Post-install fixture cannot use user-phase or an installer override.')

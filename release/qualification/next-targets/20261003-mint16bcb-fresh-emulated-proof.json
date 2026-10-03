@@ -1,0 +1,115 @@
+{
+  "format": "augmentor-mint-fresh-emulated-proof-source-checkpoint/1",
+  "date": "2026-10-03",
+  "status": "reviewed-source-tests-pass-awaiting-owned-fixture-transaction",
+  "artifactSource": {
+    "commit": "16bcb797cc5e84b6a4807d1b88229afebed2c5bf",
+    "dirty": false
+  },
+  "artifactId": "0.2.13-linuxmint22.3-amd64-complete-preview.1-16bcb797cc5e",
+  "target": "linuxmint22.3-amd64",
+  "bundleManifestSha256": "9d2bd9d5e1b4c6cd4aadbc0fca7689562ebac33d995f7dd93ebc379e609c59d9",
+  "bundleSetupSha256": "d19ae1ecc900f5f3f29610c99b417474ef9e776043e99cabc5c3978dfaf76b52",
+  "buildEvidence": {
+    "executed": true,
+    "nativeBuild": "pass",
+    "browserBuild": "pass",
+    "completeAssembly": "pass",
+    "streamedNativeAndCompleteInspection": "pass",
+    "minimumFreeGiB": 4,
+    "runtimeDeb": {
+      "bytes": 352939564,
+      "sha256": "4364e3ceb21d9e1b4465a9c597e77f5fa91b18da807661499f60b52003af9039"
+    },
+    "desktopDeb": {
+      "bytes": 5400,
+      "sha256": "9c4139b73989d90ee9d2a0803a6c6833a0b079fd769f2d44d013c13c28c6b4ce"
+    },
+    "browserZip": {
+      "bytes": 218668,
+      "sha256": "0fbfdc193b44bdb2f37e19b63337d9321cdc59eb413ff543915a3b67415365ec"
+    },
+    "completeArchive": {
+      "bytes": 371651259,
+      "sha256": "1046b2070df75d21c2f843d78bf29c5d9e90e14d88a8bcb52a85460d53af29b0"
+    },
+    "finitePublicDependenciesReused": true,
+    "originalHandyReceiptPreserved": true,
+    "newHandyBuild": false,
+    "privateSourceExport": false
+  },
+  "proofSource": {
+    "baseCommit": "6432f979482ad387fb7330666e2d2ca71eeb45d0",
+    "uncommittedImplementation": false,
+    "file": "release/prove-complete-linux.py",
+    "sha256": "911e677947e25f566b05c6720eda4da6b9be27fc8c498971397236e6f9a362d6",
+    "companionHelperSha256": "70543782f9d26bae72bf0a4396e649c646017de7ee55a7f9af84075daf29368b",
+    "publishedWithCheckpoint": true
+  },
+  "syntheticSourceTests": {
+    "freshProof": 22,
+    "existingCompleteProof": 26,
+    "realUnixCompanion": 9,
+    "total": 57,
+    "status": "pass",
+    "VMProductEvidence": false
+  },
+  "admission": {
+    "scope": "Exact installed isolated Mint22.3 QEMU fixture and fresh locked ordinary account UID/GID1002",
+    "unusedAccountReadOnlyVerified": true,
+    "freshAccountCreated": false,
+    "nativeAdoptionExecuted": false,
+    "existingNativeSource": "2035af99b46bb013e81de9766216da820ab4a325",
+    "oldUid1000TenProtectedFilesPreserved": true,
+    "oldUid1001ThirtyProtectedFilesPreserved": true,
+    "noPriorSettingsJournalSessionReceiptAdoption": true,
+    "noOwnerServicesModelsHardwareInput": true
+  },
+  "proofContract": {
+    "entry": "fresh_emulated_proof(bundle, fixture)",
+    "CLI": "--owned-vm-fresh-emulated-fixture PATH",
+    "ordinaryUserUnchangedInstaller": true,
+    "installerOverlay": false,
+    "setupSourceOrArtifactModification": false,
+    "exclusiveJournalAndSharedToken": true,
+    "pendingBeforeSingleSetupOrSdkDispatch": true,
+    "unknownOutcomeRetry": false,
+    "idempotenceRequiresKnownExactInstalledReceipt": true,
+    "earlyFullNativeRuntimeInputVerification": true,
+    "preparedProductionRuntimeVerifiedBeforePreviewAndSdk": true,
+    "explicitChildHomeCwd": true,
+    "authenticatedStartupBudgetSeconds": 120,
+    "bothStartsMeasured": true,
+    "successfulReadPast120Refused": true,
+    "turnBudgetSeconds": 60,
+    "successfulTurnReadPast60Refused": true,
+    "defaultPublicStartupBehaviorChanged": false,
+    "old2035PostInstallAdmissionChanged": false,
+    "fiveSettingsBytesPreservedRequired": true,
+    "strictRestartHistoryAndNoModelReplayRequired": true,
+    "hashPinnedOnceOnlyIdleOwnedCompanionCleanup": true,
+    "externalRootAuditSameRunFullFixtureAndProofSha": true,
+    "externalExclusiveBothNativeLeasesRequired": true,
+    "externalProtectedPriorAccountsAuditRequired": true,
+    "originalPublic60FullProofPass": false
+  },
+  "historicalResultsPreserved": {
+    "clean2035InstalledSetup": "pass",
+    "originalFullProof": "fail",
+    "postInstall60": "fail",
+    "cwdCorrected60": "fail",
+    "v3SettingsBytePreservation": "fail",
+    "noResultRelabelled": true
+  },
+  "qualification": {
+    "freshConnectedProductExecuted": false,
+    "freshConnectedProductPass": false,
+    "realGraphicalDesktopBrowser": false,
+    "shortcutLockReboot": false,
+    "physicalAudio": false,
+    "licenseReviewComplete": false,
+    "embeddedSourceCoverageComplete": false
+  },
+  "next": "Reviewed proof and source checkpoint are published together; repeat exact native/account guards before the newly authorized one-shot fresh account run.",
+  "rootLicenseAndFrozen22Unchanged": true
+}

@@ -1,5 +1,21 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 clean Mint correction and fresh proof
+
+[The clean Mint checkpoint](../release/qualification/next-targets/20261003-mint16bcb-fresh-emulated-proof.json)
+records exact clean16bcb native/Browser/complete builds and streamed inspection
+PASS. The maintained fresh proof passes57 focused checks independently reviewed:
+22 fresh admission/execution,26 existing complete-proof and9 real Unix-companion
+cases. Its exact new ordinary Mint account and native adoption remain unexecuted.
+The unchanged installer, byte-identical settings, both roles, strict restart
+history/no replay and one-shot normal companion cleanup are required. Only this
+explicit emulated entry measures startup120seconds; turns stay60seconds, and
+successful reads after either deadline refuse before further mutation. Defaults
+and the old2035 proof remain unchanged. A separate root readback checks exact
+proof/fixture/run, native inventory, both exclusive leases and absence of owned
+processes/listeners/socket. The two earlier accounts and failures are preserved.
+Fresh installed acceptance and graphical/hardware/legal gates remain open.
+
 ## October 3 Ubuntu registered shortcuts and password-lock recovery
 
 [The registered lock checkpoint](../release/qualification/next-targets/20261003-noble-registered-password-lock-pass.json)
