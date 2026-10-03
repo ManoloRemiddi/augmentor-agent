@@ -1212,3 +1212,21 @@ completion after the former limit, bounded unknown outcome and terminal failure.
 All thirteen existing source-restoration durability cases still pass locally.
 Native whole-application proofs and matched customer downloads must rerun before
 publication. The owner's installed Linux application is untouched.
+
+## October 3 native rejected-update dialog cleanup
+
+The x64 installer fixture fails twice (`c9f0363` and `901fab9`) after rejecting
+signed metadata for the wrong CPU. Its closed progress report confirms
+`callbackFailed: true`, `downloadHandled: false`; no completion result is
+published because native cleanup hangs. ARM64 passes. The pinned
+[WinSparkle 0.9.4 UI source](https://github.com/vslavik/winsparkle/blob/v0.9.4/src/ui.cpp#L645)
+shows that a rejected installer callback opens an OK-only modal warning. The
+fixture previously sent WM_CLOSE to all its windows before cleanup, including
+the parent behind that warning.
+
+The disposable fixture now acknowledges its own enabled, visible native modal
+dialog with IDOK before closing its parent, and keeps a bounded observer active
+while native cleanup joins the UI thread. It retains class/action observations;
+it never targets other processes or changes product update behavior. Rejection,
+private-cache integrity, native cleanup and process-exit assertions remain
+mandatory in the next x64/ARM64 run. Publication remains pending.

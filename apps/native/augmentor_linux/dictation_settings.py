@@ -88,9 +88,9 @@ class DictationSettingsDialog(QDialog):
             try:
                 result=dictation.request(method,params,timeout=75)
                 if method!='status':result=dictation.request('status')
-                models=dictation.request('models') if result.get('installed',True) else []
+                models=dictation.request('models',timeout=75) if result.get('installed',True) else []
                 if models:result=dictation.request('status')
-                devices=dictation.request('devices') if models else []
+                devices=dictation.request('devices',timeout=75) if models else []
                 value={'status':result,'models':models,'devices':devices};error=None
             except Exception as problem:value=None;error=str(problem)
             if not self.closed:self.completed.emit(value,error)

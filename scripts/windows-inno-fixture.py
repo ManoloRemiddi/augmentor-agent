@@ -24,28 +24,43 @@ def publish_result(destination, result):
     os.replace(pending, destination)
 
 
-def dismiss_fixture_windows():
-    """Dismiss this test process's updater UI, including its busy-work warning.
+def dismiss_fixture_windows(stop, observations):
+    """Acknowledge only this disposable process's updater dialogs during cleanup.
 
-    WinSparkle correctly shows a modal warning when can_shutdown refuses. Its
-    cleanup waits for that dialog; hosted tests must exercise the dismissal.
-    Never enumerate/close windows belonging to another process.
+    WinSparkle can show an OK-only modal warning after a rejected callback.
+    Close that dialog before its parent; keep observing while native cleanup
+    joins the UI thread. Never touch another process's windows.
     """
-    import os
     user = ctypes.WinDLL('user32', use_last_error=True)
     callback_type = ctypes.WINFUNCTYPE(wintypes.BOOL,wintypes.HWND,wintypes.LPARAM)
     user.EnumWindows.argtypes = [callback_type,wintypes.LPARAM]; user.EnumWindows.restype = wintypes.BOOL
     user.GetWindowThreadProcessId.argtypes = [wintypes.HWND,ctypes.POINTER(wintypes.DWORD)]
     user.GetWindowThreadProcessId.restype = wintypes.DWORD
+    user.IsWindowVisible.argtypes = [wintypes.HWND]; user.IsWindowVisible.restype = wintypes.BOOL
+    user.IsWindowEnabled.argtypes = [wintypes.HWND]; user.IsWindowEnabled.restype = wintypes.BOOL
+    user.GetClassNameW.argtypes = [wintypes.HWND,wintypes.LPWSTR,ctypes.c_int]
+    user.GetClassNameW.restype = ctypes.c_int
     user.PostMessageW.argtypes = [wintypes.HWND,wintypes.UINT,wintypes.WPARAM,wintypes.LPARAM]
     user.PostMessageW.restype = wintypes.BOOL
-    def close(window,_context):
+    owned = []
+    def collect(window,_context):
         pid = wintypes.DWORD(); user.GetWindowThreadProcessId(window,ctypes.byref(pid))
-        if pid.value == os.getpid(): user.PostMessageW(window,0x0010,0,0)  # WM_CLOSE
+        if pid.value == os.getpid() and user.IsWindowVisible(window) and user.IsWindowEnabled(window):
+            name = ctypes.create_unicode_buffer(256); user.GetClassNameW(window,name,len(name))
+            owned.append((window,name.value))
         return True
-    callback = callback_type(close)
-    for _ in range(10):
-        user.EnumWindows(callback,0); time.sleep(.1)
+    callback = callback_type(collect)
+    deadline = time.monotonic()+20
+    while not stop.is_set() and time.monotonic() < deadline:
+        owned.clear(); user.EnumWindows(callback,0)
+        modal = [(window,name) for window,name in owned if name == '#32770']
+        for window,name in modal or owned:
+            # OK-only native dialogs may ignore WM_CLOSE. WM_COMMAND/IDOK
+            # acknowledges them exactly as the fixture user would.
+            message, command = (0x0111,1) if name == '#32770' else (0x0010,0)
+            if user.PostMessageW(window,message,command,0):
+                observations.append({'class':name,'action':'accept' if modal else 'close'})
+        stop.wait(.1)
 
 
 def shared_gate(config):
@@ -109,8 +124,14 @@ def sparkle(settings):
         time.sleep(.3)  # Let the native callback return before cleanup joins its UI thread.
     finally:
         publish_result(settings['progress'], result)
-        dismiss_fixture_windows()
-        function('cleanup')()
+        stop = threading.Event(); dismissals = []
+        worker = threading.Thread(target=dismiss_fixture_windows,args=(stop,dismissals),daemon=True)
+        worker.start()
+        try: function('cleanup')()
+        finally:
+            stop.set(); worker.join(timeout=2)
+            result['fixtureDialogDismissals'] = dismissals
+            publish_result(settings['progress'], result)
     return result
 
 

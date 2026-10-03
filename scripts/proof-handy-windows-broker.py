@@ -38,15 +38,20 @@ def main():
                      # A stale inherited supplier path must not override the
                      # component's exact bundled browser selection.
                      'WEBVIEW2_BROWSER_EXECUTABLE_FOLDER':str(base/'missing-global-browser')}
-        child=subprocess.Popen([sys.executable,'-Xutf8','-B',str(fixture/'services/dictation/server.py')],
-            env=environment,stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.PIPE,
-            creationflags=subprocess.CREATE_NO_WINDOW)
+        driver=fixture/'broker-driver.py'
+        shutil.copy2(Path(__file__).resolve().parents[1]/'tests/fixtures/handy-broker-driver.py',driver)
+        args.out.parent.mkdir(parents=True,exist_ok=True)
+        diagnostic_path=args.out.with_name('dictation-startup.log')
+        with diagnostic_path.open('wb') as diagnostic:
+            child=subprocess.Popen([sys.executable,'-Xutf8','-B',str(driver),str(fixture/'services/dictation/server.py')],
+                env=environment,stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=diagnostic,
+                creationflags=subprocess.CREATE_NO_WINDOW)
         os.environ['AUGMENTOR_DICTATION_STATE']=str(state)
         from augmentor_linux.dictation import request
         try:
             deadline=time.monotonic()+20
             while True:
-                if child.poll() is not None:raise RuntimeError(child.stderr.read().decode(errors='replace'))
+                if child.poll() is not None:raise RuntimeError('The private broker exited; inspect dictation-startup.log.')
                 try:initial=request('status',start=False,timeout=5);break
                 except RuntimeError:
                     if time.monotonic()>=deadline:raise
@@ -55,7 +60,9 @@ def main():
             palette={'background':'#162027','foreground':'#edf3f3','accent':'#dbaf99',
                      'border':'#dbaf99','opacity':1,'animated':True,'mode':'dark'}
             request('theme',palette,start=False)
-            request('enable',{'enabled':True},start=False)
+            started=time.monotonic()
+            request('enable',{'enabled':True},start=False,timeout=75)
+            startup_seconds=round(time.monotonic()-started,3)
             enabled=request('status',start=False)
             assert enabled['enabled'] and enabled['phase']=='setup-needed' and enabled['tray'] is False
             assert enabled['theme']==palette and enabled['settings']['shortcut']=='ctrl+space'
@@ -73,7 +80,8 @@ def main():
             report={'passed':True,'nativeWindows':True,'bundledBrowser':True,'globalBrowserRequired':False,
                     'defaultCtrlSpace':True,'customShortcut':True,'theme':True,'microphoneExclusion':True,
                     'disable':True,'brokerShutdown':True,'tray':False,'physicalMicrophoneUsed':False,
-                    'modelDownloaded':False,'scope':'Copied packaged bytes; setup, IPC and lifecycle. Physical transcription remains separate.'}
+                    'modelDownloaded':False,'startupSeconds':startup_seconds,
+                    'scope':'Copied packaged bytes; setup, IPC and lifecycle. Physical transcription remains separate.'}
             args.out.parent.mkdir(parents=True,exist_ok=True)
             args.out.write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
             print(json.dumps(report))

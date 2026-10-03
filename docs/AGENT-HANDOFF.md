@@ -1856,3 +1856,16 @@ was blocked by that merge conflict; provisional manual `c9f0363` runs are obsole
 The reconciled source must rebuild/qualify all matching downloads before
 publication. Private preview-2 drafts stay withheld; the owner's selected Linux
 release and running dictation are unchanged.
+
+## October 3 startup and rejected-update observations
+
+[Handy startup](HANDY-INTEGRATION.md#october-3-first-response-observation-and-windows-diagnostics)
+now separates the initial 60-second component response from ordinary 15-second
+RPCs; settings/proof startup queries allow 75 seconds. The failed x64 `901fab9`
+operation was not recorded, so disposable-only timing/stderr diagnostics now
+identify it without exposing parameters or touching the installed owner profile.
+Sixteen local broker cases pass; all matching candidates must qualify again.
+[Rejected-update fixture cleanup](WINDOWS-INSTALLER-DECISION.md#october-3-native-rejected-update-dialog-cleanup)
+also acknowledges only its own native modal dialog before its parent while
+joining cleanup. The prior x64 progress proves rejection but not fixture exit;
+fresh native qualification remains required. Preview-2 drafts stay private.

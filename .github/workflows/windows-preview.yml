@@ -111,5 +111,6 @@ jobs:
           path: |
             outputs/installer/compile.log
             outputs/package/health.json
+            outputs/package/dictation-startup.log
           retention-days: 7
           if-no-files-found: warn

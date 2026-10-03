@@ -718,3 +718,20 @@ describes the bounded ten-minute inner/fifteen-minute outer observation and
 regression cases. Inventory, source identity and durable completion gates remain
 strict; all matched candidates must be rebuilt and qualified after this product
 correction. Three private preview-2 drafts exist; no new download is public.
+
+### October 3 first-response observation and Windows diagnostics
+
+At reconciled source `901fab9`, Linux/Mac matched packages, validation, Mac product
+and Windows desktop checks pass. The x64 public package's no-model enable probe
+times out waiting for a native RPC; the old generic error does not identify
+which operation failed. Its separate full native broker proof passes. Initial
+component status now has a bounded 60-second startup window; warm operations
+retain 15 seconds and model selection retains 60. Settings model/device queries
+and the package's enable probe allow 75 seconds to encompass startup.
+
+Only the disposable Windows proof records method names, elapsed time and outcome
+class, plus native startup stderr, in a retained failure log. It records no RPC
+parameters, downloads no model and uses no physical microphone. This improves
+diagnosis without adding product logging or touching the owner's installation.
+Sixteen broker cases pass locally, including separate startup/warm bounds; all
+matching downloads require fresh qualification after this change.

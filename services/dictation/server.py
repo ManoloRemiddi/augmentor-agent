@@ -79,7 +79,7 @@ class Backend:
         self.generation=time.monotonic_ns()
         self.child=subprocess.Popen([str(self.binary())],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,env=env,**({'umask':0o077} if os.name!='nt' else {'creationflags':0x08000000}))
         threading.Thread(target=self.read,args=(self.child,),daemon=True).start()
-        try:self.call('status',{})
+        try:self.call('status',{},timeout=60)
         except Exception:
             self.stop();raise
         if 'theme' in self.preferences:self.call('theme',self.preferences['theme'])
@@ -140,11 +140,11 @@ class Backend:
             for owner,waiter in list(self.pending.values()):
                 if owner is child:waiter.put({'error':'Handy stopped. Refresh system dictation settings.'})
 
-    def call(self, method, params):
+    def call(self, method, params, *, timeout=None):
         self.sequence+=1;ident=self.sequence;waiter=queue.Queue();self.pending[ident]=(self.child,waiter)
         try:
             self.child.stdin.write((json.dumps({'id':ident,'method':method,'params':params})+'\n').encode());self.child.stdin.flush()
-            reply=waiter.get(timeout=60 if method=='model.select' else 15)
+            reply=waiter.get(timeout=timeout if timeout is not None else 60 if method=='model.select' else 15)
             if 'error' in reply:raise RuntimeError(reply['error'])
             return reply['result']
         except queue.Empty: raise TimeoutError('Handy did not respond. Refresh system dictation settings.')

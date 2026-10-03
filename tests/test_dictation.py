@@ -51,6 +51,19 @@ class DictationTests(unittest.TestCase):
             with self.assertRaises(ValueError):self.backend.request('theme',invalid)
         self.assertEqual(json.loads((self.base/'preferences.json').read_text())['theme'],value)
 
+    def test_first_component_response_has_a_distinct_bounded_startup_window(self):
+        from unittest.mock import Mock
+        with patch.object(broker.sys,'platform','fixture'),patch.object(self.backend,'binary',return_value=self.base/'handy'),patch.object(broker.subprocess,'Popen',return_value=Mock()),patch.object(broker.threading.Thread,'start'),patch.object(self.backend,'call',return_value={}) as call:
+            self.backend.start()
+            call.assert_called_once_with('status',{},timeout=60)
+
+    def test_warm_status_keeps_its_short_response_deadline(self):
+        from unittest.mock import Mock
+        self.backend.child=Mock();waiter=Mock();waiter.get.return_value={'result':{'phase':'setup-needed'}}
+        with patch.object(broker.queue,'Queue',return_value=waiter):
+            self.assertEqual(self.backend.call('status',{}),{'phase':'setup-needed'})
+        waiter.get.assert_called_once_with(timeout=15)
+
     def test_only_matching_conversation_owner_can_release_capture(self):
         first={'token':'a'*32,'pid':os.getpid()};second={'token':'b'*32,'pid':os.getpid()}
         self.backend.request('conversation.acquire',first)
