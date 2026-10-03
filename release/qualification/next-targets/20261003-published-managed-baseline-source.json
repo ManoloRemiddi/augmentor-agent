@@ -1,0 +1,32 @@
+{
+  "format": "augmentor-published-managed-baseline-source/1",
+  "date": "2026-10-03",
+  "status": "source-only; actual normal012 adoption pending",
+  "sourceBase": "6ca8b3c",
+  "workerSha256": "6b91fbf0c2406923d8d634e90a0dc0badeebd540f24890ad4c447fee9973ba3a",
+  "nativeVersion": "0.2.12",
+  "nativeSource": "e02731023153e3b2e1440e50b8c14b64ad0a82e5",
+  "coldHistoryBaselineRunSha256": "6ef8c759e6769f0bcc5a97bbbe4cafd0daf71c41625ef46d873d71c412fcb69f",
+  "coldPersistenceReceiptSha256": "a999f72d4791610f535541695592e14ccdcbe806f3e426936e31717037054a8d",
+  "exactHistorySnapshotSha256": "25666a93f06d81ba3d0824069208d717dc469e82b88122e70988756866a1d12e",
+  "canonicalUpdaterSha256": "3bf6f45d51f2e8d23b61db40dc8d952668c48e990c7d8cfb8fe91bfed9914001",
+  "persistedVerifierSha256": "bac64490fbb570e3d55171b7cd99e663b3c3ab0eecbc929976a23c2d1baebd35",
+  "newFocusedSyntheticPassed": 7,
+  "relatedPublishedSyntheticPassed": 34,
+  "normalActions": [
+    "stage exact012 native payload into separate managed release",
+    "activate verified012 while normal ownedDSH012 agrees"
+  ],
+  "onlyIntendedSavedSettingChange": "desktop.json; predecessor archives original legacy native selection",
+  "packageOperations": false,
+  "integrationMutation": false,
+  "sessionOrModelMutation": false,
+  "installerReplay": false,
+  "historyRoute": "cold session/page; no Follow",
+  "unknownOrRefusedNeverReplayed": true,
+  "actualExecution": false,
+  "upgradeRollbackQualified": false,
+  "publicReleaseQualified": false,
+  "releaseStoreAndEmittedRootPrivateAncestorsRequired": true,
+  "danglingPreviousPointerRefused": true
+}

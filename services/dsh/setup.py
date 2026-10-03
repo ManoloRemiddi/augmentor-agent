@@ -45,6 +45,42 @@ def personal_agent_entries():
         {'id':'augmentor-desktop','name':str(ROOT/'adapters/dsh-desktop/index.mjs')},
     ]+capabilities
 
+def preset_documents(surface):
+    """Use the same source-bound documents for installation and read-only checks."""
+    return {
+        'preset.yml':HEADER+json.dumps({'name':'Augmentor '+surface.title(),'description':'Augmentor product integration '+VERSION})+'\n',
+        'agent.cordis.yml':HEADER+json.dumps(personal_agent_entries(),indent=2)+'\n',
+    }
+
+def current_owned_integration(home):
+    """A live matching endpoint alone does not prove its copied integration is current."""
+    profile=home/'profiles/web';target=profile/'augmentor-product';presets=home/'.agent-presets'
+    ownership_path=target/'ownership.json';patch=profile/'cordis.patch.yml'
+    try:
+        if any(p.is_symlink() for p in (profile,target,target/'browser',target/'browser/dist',presets,ownership_path,patch)):return False
+        owned=json.loads(ownership_path.read_text())
+        if not isinstance(owned,dict) or owned.get('version')!=VERSION:return False
+        files=owned.get('files');records=owned.get('presets');entry=owned.get('patchEntry')
+        if not isinstance(files,dict) or set(files)!={'browser/dist/index.js','browser/package.json'}:return False
+        if not isinstance(records,dict) or set(records)!=set(PRESETS.values()):return False
+        if not isinstance(entry,str) or not entry or patch.read_text().count(entry)!=1:return False
+        for name,checksum in files.items():
+            path=target/name
+            if not isinstance(checksum,str) or not re.fullmatch('[a-f0-9]{64}',checksum):return False
+            if path.is_symlink() or digest(path)!=checksum:return False
+            if checksum!=digest(ROOT/'apps/browser/plugin'/Path(name).relative_to('browser')):return False
+        for surface,name in PRESETS.items():
+            directory=presets/name;record=records[name];documents=preset_documents(surface)
+            if directory.is_symlink() or not isinstance(record,dict) or set(record)!=set(documents):return False
+            for filename,text in documents.items():
+                path=directory/filename
+                # atomic() writes text with the platform's normal newline conversion.
+                expected=hashlib.sha256(text.replace('\n',os.linesep).encode()).hexdigest()
+                if path.is_symlink() or record[filename]!=expected or digest(path)!=expected:return False
+        return True
+    except (OSError,ValueError,KeyError):
+        return False
+
 def configuration():
     return Path(os.environ.get('AUGMENTOR_SHARED_CONFIG',Path(os.environ.get('XDG_CONFIG_HOME',Path.home()/'.config'))/'augmentor'))/'harnesses.json'
 def current():
@@ -188,7 +224,7 @@ class Setup:
             product=http(base,'/api/augmentor-product');token=(home/'augmentor-product-token').read_text().strip()
             installed=product.get('protocol')=='augmentor-dsh/1' and product.get('version')==VERSION and product.get('homeId')==hashlib.sha256(token.encode()).hexdigest()
             available={r['id'] for r in remote.call('agentPresets.list')['presets'] if not r.get('broken')}
-            installed=installed and all(v in available for v in PRESETS.values())
+            installed=installed and all(v in available for v in PRESETS.values()) and current_owned_integration(home)
         except (OSError,ValueError,KeyError):pass
         path=configuration();token=uuid.uuid4().hex
         self.pending={'token':token,'expires':time.monotonic()+600,'endpoint':base,'home':str(home),'modules':str(modules),'configurationHash':digest(path),'patchHash':digest(profile/'cordis.patch.yml'),'installed':installed,'existingPromptPlugin':prompt_plugin}
@@ -250,11 +286,9 @@ class Setup:
             for surface,name in PRESETS.items():
                 directory=presets/name;directory.mkdir(parents=True,mode=0o700,exist_ok=bool(previous))
                 if not previous:made.append(directory)
-                entries=personal_agent_entries()
                 # JSON is a YAML subset and preserves arbitrary paths without
                 # shell expansion, YAML tags or manual quoting.
-                atomic(directory/'preset.yml',HEADER+json.dumps({'name':'Augmentor '+surface.title(),'description':'Augmentor product integration '+VERSION})+'\n')
-                atomic(directory/'agent.cordis.yml',HEADER+json.dumps(entries,indent=2)+'\n')
+                for filename,text in preset_documents(surface).items():atomic(directory/filename,text)
             secret=home/'augmentor-product-token'
             if secret.exists() or secret.is_symlink():product_token(secret)
             else:product_token(secret,create=True);made.append(secret)

@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 3 source checks for coherent product updates
+
+[DSH setup](DSH-SETUP.md) now refuses a matching live endpoint with stale copied
+integration or generated presets, without writing during check.19 focused cases
+pass. Historical published013 is preserved; its update needs an explicit normal
+integration installation and restart before selecting a matching managed desktop.
+[The managed012 baseline worker](LINUX-PRODUCT-UPGRADE-PROOF.md) pins exact completed
+histories/settings and uses normal staging/activation to preserve a separate012
+artifact before native replacement. Seven source cases pass,34 with related
+proofs. Actual adoption, native013 upgrade and coordinated rollback are pending.
+
 ## October 3 Mint fresh acceptance and published cold history
 
 [Clean365 Mint acceptance](../release/qualification/next-targets/20261003-mint365-fresh-emulated-acceptance.json)

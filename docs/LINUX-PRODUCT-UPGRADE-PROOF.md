@@ -189,3 +189,35 @@ file/metadata. It passes without another worker run or cleanup action. Both
 historical worker failures and the immediate rebind refusal remain retained.
 This establishes the cold observation baseline, not native0.2.13 upgrade, managed
 DSH integration migration, rollback, graphical Browser or physical audio.
+
+
+## Published legacy selection and managed012 adoption source
+
+The actual published012 installer selects `/usr/lib/augmentor` with legacy
+partial file hashes; it has no managed release ID or previous pointer. A native
+package upgrade would replace that source directory. The preserved updater
+supports normal stage and activation into a separate fully inventoried release.
+[The managed-baseline worker](../release/prove-published-linux-managed-baseline.py)
+therefore adopts exact012 before a future native upgrade. It pins the successful
+cold baseline, complete expected histories and persistence receipt, original
+canonical launcher/verifier and all five saved settings. Native shared lifetime
+leases precede a fresh identity check and remain through the entire phase.
+
+One normal stage and connected activation select managed012; only desktop.json
+may migrate, while the previous pointer retains the original legacy selection.
+All other settings and every cold event/compressed byte/metadata remain exact.
+No installer, package transaction, integration update, new session, model turn or
+UI launch occurs. Unexpected model POSTs receive503 and force failure. Each
+deployment command has a durable pending intent; unknown outcomes never replay.
+Normal owned DSH/companion cleanup is separate. Seven focused source tests pass,
+34 with related published proofs. Actual adoption and coordinated013 upgrade/
+rollback remain pending. This cannot relabel earlier failed profiles.
+
+Read-only normal APT simulation for the exact published013 packages permits two
+Augmentor upgrades and nine additional declared QtQuick/QML/OpenGL packages, with
+zero removals or upgrades of existing OS packages. It executes no installation.
+The historical013 connection check can accept copied012 integration when the
+live native endpoint reports013. Its explicit normal Setup.install/restart/check/
+save is required. The maintained source now verifies owned copied/generated
+content as documented in [DSH setup](DSH-SETUP.md);19 focused cases pass. The
+historical published payload remains untouched.
