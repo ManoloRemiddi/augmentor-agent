@@ -30,10 +30,11 @@ def source_archive(repository, target, published_package=None):
         # Reuse those exact sources, without reading private service repositories.
         shutil.copy2(repository,target)
         return 'package-sha256:'+sha(repository)
-    if subprocess.check_output(['git','status','--porcelain'],cwd=repository,text=True).strip():
+    git=['git','-c','safe.directory='+str(repository.resolve())]
+    if subprocess.check_output([*git,'status','--porcelain'],cwd=repository,text=True).strip():
         raise ValueError('Commit and review source before creating a public source snapshot: '+str(repository))
-    ref=subprocess.check_output(['git','rev-parse','HEAD'],cwd=repository,text=True).strip()
-    subprocess.run(['git','archive','--format=tar.gz','--prefix='+target.name.removesuffix('.tar.gz')+'/',
+    ref=subprocess.check_output([*git,'rev-parse','HEAD'],cwd=repository,text=True).strip()
+    subprocess.run([*git,'archive','--format=tar.gz','--prefix='+target.name.removesuffix('.tar.gz')+'/',
                     '--output='+str(target),'HEAD'],cwd=repository,check=True)
     return ref
 
@@ -49,7 +50,7 @@ def main():
     out.mkdir(parents=True)
     product=json.loads((ROOT/'release/product.json').read_text());version=product['version']
     deb=json.loads((a.debian/'artifacts.json').read_text());browser=json.loads((a.browser/'artifacts.json').read_text())
-    ref=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
+    ref=subprocess.check_output(['git','-c','safe.directory='+str(ROOT),'rev-parse','HEAD'],cwd=ROOT,text=True).strip()
     if any(m['source']['dirty'] or m['source']['commit']!=ref or m['version']!=version for m in (deb,browser)):
         raise ValueError('Desktop and browser artifacts must come from this clean source commit.')
     for item in deb['artifacts']:

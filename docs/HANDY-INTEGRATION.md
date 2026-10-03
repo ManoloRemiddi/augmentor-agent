@@ -127,6 +127,13 @@ corresponding-source links. The previous application is mounted read-only and
 never executed. This avoids removed upstream archive URLs without substituting
 unverified notices or introducing private source.
 
+The new consent page is preserved in Windows Setup. Its disposable wizard proof
+now explicitly accepts its inert fixture terms before clicking Next and records
+that page; customer/vendor terms are not removed or bypassed. The complete Linux
+assembler uses the same narrowly scoped Git safe-directory setting as its Debian
+packager, supporting the hosted container's checkout ownership while retaining
+clean-source and exact-commit checks. Both follow-ups await hosted qualification.
+
 Implementation branch: `feat/handy-integration`, based on public main
 `d91c52037d7bc26c82c702c25e1a779b0fca1f39`. This guide owns the implemented
 contract; [the approved plan](HANDY-INTEGRATION-PLAN.md) retains its rationale.

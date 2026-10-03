@@ -525,7 +525,7 @@ def interactive_finish(installer, log):
     child = OwnedProcess([str(installer), '/SP-', '/NORESTART', '/LANG=english', '/LOG='+str(log)],
         stdin=subprocess.DEVNULL)
     deadline = time.monotonic()+120
-    clicked = set(); finished = False
+    clicked = set(); finished = False; license_accepted = False
     observations = []; last_state = None
     try:
         while not child.drained():
@@ -566,6 +566,18 @@ def interactive_finish(installer, log):
                 # Different pages can reuse the same Next button. Retain visible
                 # text to avoid clicking twice while the previous event is queued.
                 page = tuple(sorted((kind, text) for _handle, kind, text in controls if text))
+                # This template carries inert fixture license text. Exercise its
+                # visible consent page instead of skipping it or weakening the
+                # real customer installer's separately licensed supplier terms.
+                acceptance=[handle for handle,kind,text in controls
+                    if kind in ('TNewRadioButton','TRadioButton','Button') and text
+                    and text.replace('&','').strip()=='I accept the agreement'
+                    and win32gui.IsWindowEnabled(handle)]
+                if len(acceptance)==1 and (page,'accept-fixture-license') not in clicked:
+                    clicked.add((page,'accept-fixture-license'))
+                    win32gui.PostMessage(acceptance[0],win32con.BM_CLICK,0,0)
+                    license_accepted=True
+                    observations.append({'clicked':'Accept fixture license'})
                 # The pinned modern wizard renders Next without the legacy >.
                 for caption in ('Finish', 'Install', 'Next', 'Next >'):
                     buttons = [handle for handle, kind, text in controls
@@ -581,9 +593,10 @@ def interactive_finish(installer, log):
                 observations.append({'windows':state}); last_state = state
                 observations = observations[-40:]
             time.sleep(.05)
-        assert child.wait_graceful(timeout=5) == 0 and finished
+        assert child.wait_graceful(timeout=5) == 0 and finished and license_accepted
     finally:
         Path(log).with_suffix('.json').write_text(json.dumps({
-            'finished':finished, 'observations':observations}, indent=2)+'\n', encoding='utf-8')
+            'finished':finished, 'fixtureLicenseAccepted':license_accepted,
+            'observations':observations}, indent=2)+'\n', encoding='utf-8')
         if child.job is not None:
             child.kill(); child.wait(timeout=10)  # Failed disposable wizard only.
