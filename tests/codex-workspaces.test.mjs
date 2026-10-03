@@ -31,6 +31,11 @@ test('Codex registration needs no DSH preset and refuses a silent harness or con
  const f=fixture(t);assert.equal(existsSync(join(f.root,'unused-dsh')),false)
  assert.equal(JSON.parse(readFileSync(join(f.profilesDir,'fixture.json'))).harness,'codex')
  for(const patch of [{connection:'different'},{harness:'dsh'}])assert.throws(()=>installProfile({...f.profile,...patch},{root:f.root,home:join(f.root,'unused-dsh'),profilesDir:f.profilesDir}),/migration/)
+ for(const connection of ['provider:invalid','provider.invalid','p'.repeat(129)]){
+  const profilesDir=join(f.root,'unregistered')
+  assert.throws(()=>installProfile({...f.profile,connection},{root:f.root,home:join(f.root,'unused-dsh'),profilesDir}),/explicit connection profile/)
+  assert.equal(existsSync(profilesDir),false,'invalid connection must fail before a registry lock, backup or profile is created')
+ }
 })
 test('Codex workspace memory identity cannot be supplied by an app/model or rebound to personal memory',async t=>{
  const f=fixture(t),binding=await new CodexWorkspaces().load('fixture');let received

@@ -47,6 +47,9 @@ policy before exposing them through the embed.
 
 A Codex profile requires an explicit existing connection ID, role files,
 registered application directory, declared tool names and stable memory identity.
+SDK planning and direct product registration both enforce the pinned host's
+connection-ID pattern: 1–128 letters, digits, underscores or hyphens. Invalid IDs
+fail before creating registry locks, backups or profiles.
 Installation writes the workspace registry transactionally and does not compose
 or require a DSH preset. Silent harness/connection/role-directory and memory
 identity migration is rejected; switching requires an explicit migration design.

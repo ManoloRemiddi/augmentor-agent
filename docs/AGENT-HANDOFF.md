@@ -22,6 +22,8 @@ The workspace settings follow-up integrates the approved thinking-display choice
 with profile-specific persistence/cache keys, including same-origin app isolation.
 Its 88 Browser and 11 workspace contracts pass locally; hosted package validation
 remains separate. The canonical owner's settings/dictation edits are preserved.
+Direct Codex profile registration now enforces the same 128-character connection
+identifier contract as SDK planning and the pinned host, before registry writes.
 
 ## October 3 Handy alignment, test separation and download preparation
 

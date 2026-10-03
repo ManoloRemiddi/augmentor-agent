@@ -11,7 +11,7 @@ export function canonical(value){try{return realpathSync(value)}catch{return res
 export function validateProfile(p,id=p?.id){
  if(!p||!/^[a-z][a-z0-9-]{0,63}$/.test(id)||p.id!==id||!/^augmentor-[a-z0-9-]+$/.test(p.preset)||typeof p.cwd!=='string'||!isAbsolute(p.cwd)||!p.memory?.person||!p.memory?.project)throw Error('Invalid Augmentor workspace profile')
  if(p.harness!==undefined&&!['dsh','codex'].includes(p.harness))throw Error('Unsupported application workspace harness')
- if(p.harness==='codex'&&(!p.sdkProtocol||typeof p.connection!=='string'||!/^[A-Za-z0-9_.:-]{1,160}$/.test(p.connection)))throw Error('Codex workspaces require an explicit connection profile')
+ if(p.harness==='codex'&&(!p.sdkProtocol||typeof p.connection!=='string'||!/^[A-Za-z0-9_-]{1,128}$/.test(p.connection)))throw Error('Codex workspaces require an explicit connection profile using at most 128 letters, digits, underscores or hyphens')
  if(p.harness==='codex'&&process.platform==='win32')throw Error('This release has no Windows Codex application adapter')
  if(p.sdkProtocol && (p.sdkProtocol!=='augmentor-app/1'||p.schemaVersion!==1||!p.policy||!Array.isArray(p.policy.tools)||p.policy.tools.some(n=>typeof n!=='string'||!/^[A-Za-z][A-Za-z0-9_]{0,127}$/.test(n))||typeof p.policy.voice!=='boolean'||p.policy.sharedSettings!==false))throw Error('Invalid SDK workspace policy')
  const parent=new URL(p.parentOrigin)
