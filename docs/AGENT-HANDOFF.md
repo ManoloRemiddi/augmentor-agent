@@ -4,9 +4,10 @@
 
 ## Application SDK alignment source — October 3
 
-The owner has authorized source integration of the qualified SDK/product pair.
-The developer maintenance guide now defines how future product updates reach
-the SDK. Fresh packed/runtime, Browser and platform checks pass; see
+The owner-authorized source integration is complete: product PR #34 merged on
+main at `602669a`, then SDK PR #2 merged at `3797777`. Both merge trees match
+the reviewed candidates. The developer maintenance guide now defines how future
+product updates reach the SDK. Fresh packed/runtime, Browser and platform checks pass; see
 [the source update record](SDK-ALIGNMENT.md). No release or installed app update
 is performed by source integration. Preserve the separate unfinished canonical
 settings work and the owner's live applications.

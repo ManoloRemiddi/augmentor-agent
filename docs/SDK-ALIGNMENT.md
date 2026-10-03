@@ -7,12 +7,20 @@ contract. It pairs with SDK `0.1.0-preview.4` source in the separate public
 source publication nor a passing fixture deploys a customer installation.
 The two recorded live apps retain their reviewed preview 2 package and runtime.
 
-The owner has authorized integrating this already-qualified product/SDK source
-update. The paired SDK's [compatibility maintenance guide](https://github.com/ManoloRemiddi/augmentor-app-sdk/blob/main/docs/MAINTENANCE.md)
+The owner-authorized source update is integrated through
+[product PR #34](https://github.com/ManoloRemiddi/augmentor-agent/pull/34), main merge
+[`602669a`](https://github.com/ManoloRemiddi/augmentor-agent/commit/602669aa6ac741f2ccd8633692630b12578ec741),
+then [SDK PR #2](https://github.com/ManoloRemiddi/augmentor-app-sdk/pull/2), main merge
+[`3797777`](https://github.com/ManoloRemiddi/augmentor-app-sdk/commit/3797777ee6634c1c0918a147563d5552f20fbd27).
+Each merge retains exactly its reviewed PR tree. The qualified functional pair
+below is unchanged; subsequent updates are documentation only. The paired SDK's
+[compatibility maintenance guide](https://github.com/ManoloRemiddi/augmentor-app-sdk/blob/main/docs/MAINTENANCE.md)
 defines future harness, OS, UI and settings impact reviews. Fresh local product
 check/build/privacy, all 88 Browser cases, four platform contracts and the 27-case
 packed SDK/runtime proof pass. Source integration does not publish a package,
 replace installed artifacts or migrate the live apps.
+The merged SDK source also passes all six Linux/macOS/Windows source, packed and
+paired jobs in [37123748023](https://github.com/ManoloRemiddi/augmentor-app-sdk/actions/runs/37123748023).
 
 ## Capability and settings ownership
 
