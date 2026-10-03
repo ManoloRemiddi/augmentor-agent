@@ -1873,8 +1873,17 @@ fresh native qualification remains required. Preview-2 drafts stay private.
 ## October 3 native task-dialog button mapping
 
 The x64 public packaged dictation probe passes at `6b82cdf`. Its separate updater
-fixture still hangs after rejecting the wrong CPU; direct IDOK messaging did not
-complete native cleanup. [The owning record](WINDOWS-INSTALLER-DECISION.md#october-3-native-rejected-update-dialog-cleanup)
+fixture hangs earlier, after the busy-work veto; the progress report confirms
+`canShutdown: false`. Direct IDOK messaging did not complete native cleanup. [The owning record](WINDOWS-INSTALLER-DECISION.md#october-3-native-rejected-update-dialog-cleanup)
 now records the wxWidgets task-dialog OK/IDCANCEL mapping and actual-button click,
 with diagnostics retained before cleanup returns. This changes only the private
 fixture; all final matched gates remain required and drafts remain unpublished.
+
+## October 3 complete recovery confirmation
+
+The full native x64 and ARM64 application qualification at `901fab9` completes
+successfully in [run 37127526723](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37127526723).
+This confirms the bounded ARM source-restoration correction, including mandatory
+health/completion and installed inventory checks. That run is a checkpoint, not
+final-source qualification: newer packaged-startup and native-dialog fixture
+changes require matching candidates to pass again before publication.

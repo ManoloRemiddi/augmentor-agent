@@ -1231,8 +1231,9 @@ it never targets other processes or changes product update behavior. Rejection,
 private-cache integrity, native cleanup and process-exit assertions remain
 mandatory in the next x64/ARM64 run. Publication remains pending.
 
-The first native follow-up (`6b82cdf`) still hangs on x64; direct IDOK messaging
-is insufficient. [wxWidgets' native task-dialog implementation](https://github.com/wxWidgets/wxWidgets/blob/v3.2.6/src/msw/msgdlg.cpp#L677)
+The first native follow-up (`6b82cdf`) hangs earlier, on x64 busy-work refusal;
+its closed progress confirms `canShutdown: false`, `downloadHandled: false`.
+Direct IDOK messaging is insufficient for that native warning too. [wxWidgets' native task-dialog implementation](https://github.com/wxWidgets/wxWidgets/blob/v3.2.6/src/msw/msgdlg.cpp#L677)
 can present an OK-only warning with a button internally identified as IDCANCEL.
 The fixture now finds and clicks its actual OK/Cancel button using BM_CLICK,
 retaining class/action observations before cleanup completes as well as after.
