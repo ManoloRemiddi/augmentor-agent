@@ -1379,3 +1379,12 @@ A ninth boundary case uses a real synthetic Git repository to prove an ignored
 private-state file and Git metadata are excluded while tracked code is preserved.
 These checks do not establish complete clean-build or upstream-binary provenance;
 those review gates remain explicit.
+
+
+Managed run 37161745635 at `2bd7759` finishes both Handy CPU jobs successfully:
+x64 111316467327 and ARM64 111316467332, including actual component lifecycle
+proofs. Bundle jobs 111319334939/111319334927 fail before assembly on an invalid
+`apps/browser` npm build command. That package has no build script; its plugin
+`dist/index.js` is tracked, as in the established packagers. The invalid step is
+removed. Complete native bundle qualification remains pending a corrected run;
+the successful component results do not establish bundle/update qualification.

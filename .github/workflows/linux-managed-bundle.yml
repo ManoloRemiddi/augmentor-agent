@@ -37,7 +37,6 @@ jobs:
           release/dsh/node_modules/.bin/pnpm --dir apps/browser/plugin install --frozen-lockfile --ignore-scripts
           npm run check
           npm run build
-          npm --prefix apps/browser run build
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: handy-${{ matrix.target }}

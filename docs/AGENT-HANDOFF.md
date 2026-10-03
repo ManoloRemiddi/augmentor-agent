@@ -8,6 +8,14 @@
 
 
 
+
+Managed run 37161745635 at `2bd7759` completes both Handy CPU builds successfully
+(x64 job 111316467327, ARM64 111316467332). Both bundle jobs then fail before
+assembly on a nonexistent `apps/browser` build script. The browser plugin's
+compiled dist is tracked; the workflow now follows existing packaging inputs and
+omits that invalid command. No complete bundle is qualified yet. Dispatch the
+corrected managed scope; both component caches are now available and verified.
+
 Producer source privacy now freezes only exact tracked Git application files;
 ignored state with arbitrary names cannot enter the application snapshot. Native
 and generated JS inputs remain separate. A real synthetic Git boundary test passes,
