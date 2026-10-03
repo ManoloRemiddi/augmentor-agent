@@ -11,6 +11,10 @@ product updates reach the SDK. Fresh packed/runtime, Browser and platform checks
 [the source update record](SDK-ALIGNMENT.md). No release or installed app update
 is performed by source integration. Preserve the separate unfinished canonical
 settings work and the owner's live applications.
+Merged-source validation is complete: six SDK jobs pass at `3797777` and eight
+product jobs pass at `602669a` on attempt 2. The initial loaded-Chromium queue
+timeout, four passing local runs and remaining experimental acceptance gate are
+retained in the alignment guide; the retry does not establish its cause.
 
 [SDK alignment](SDK-ALIGNMENT.md) owns the paired preview 4 candidate, feature
 states, shared-settings boundaries, Codex role/tools/session/memory isolation,

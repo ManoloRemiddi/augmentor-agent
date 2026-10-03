@@ -21,6 +21,10 @@ packed SDK/runtime proof pass. Source integration does not publish a package,
 replace installed artifacts or migrate the live apps.
 The merged SDK source also passes all six Linux/macOS/Windows source, packed and
 paired jobs in [37123748023](https://github.com/ManoloRemiddi/augmentor-app-sdk/actions/runs/37123748023).
+All eight product main validation jobs pass at merge `602669a` in
+[37123715286 attempt 2](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37123715286/attempts/2),
+including packaged Browser and installed upgrade/rollback/removal. The initial
+browser timeout and limits of the successful retry are retained below.
 
 ## Capability and settings ownership
 
@@ -156,6 +160,25 @@ are not widened by bootstrap. A future native-runtime selector must update this
 adapter in the same change; do not infer distro qualification from generic paths.
 
 ## Evidence and release gates
+
+### Supplemental post-merge browser observation — October 3
+
+The first main validation attempt at merge `602669a`,
+[37123715286 attempt 1](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37123715286/attempts/1),
+timed out in the isolated loaded-Chromium Codex fixture while waiting for the
+queue composer to become ready. The root suite reported 519 passing cases,
+one failure and two opt-in skips; dependent installed/package jobs did not run
+in that attempt. The earlier complete qualification below remains evidence for
+its exact source and is not relabelled as this attempt's result.
+
+The unchanged focused fixture passes four local runs with actual headless
+Chromium and the pinned Codex engine using synthetic page/provider/memory
+services. The failed hosted job and its dependent jobs pass in
+[attempt 2](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37123715286/attempts/2)
+on the same immutable merge revision; all eight jobs are successful. Keep the first
+failure in the record: an isolated pass or successful retry does not establish
+the timeout's cause. Repeated loaded-browser queue acceptance remains part of
+the experimental Codex release gate; no timing-only production fix is inferred.
 
 ### Current functional pair — October 3
 
