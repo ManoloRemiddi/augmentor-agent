@@ -5,7 +5,8 @@
 ## Automatic updates implementation — October 3, in progress
 
 `feat/automatic-updates` starts from main `c7f895d416e6b94ca601b66a09caf4846a64b907`.
-The owner authorizes autonomous implementation of the complete update system,
+Code checkpoint `dc814c224c8d37e740d2806372bfb9ee61fb49b0` passes the documented
+Linux/source and synthetic suites. The owner authorizes autonomous implementation of the complete update system,
 including optional automatic installation. [The owning guide](UPDATE-SYSTEM.md)
 records the shared scheduler, exact identity/compatibility policy, Desktop/Browser
 controls, manual downloads and TUF client integration. Automatic installation

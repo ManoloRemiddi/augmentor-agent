@@ -101,6 +101,20 @@ distribution qualification before automatic installation can be enabled.
 
 ## Verification and remaining integration
 
+Code checkpoint: `dc814c224c8d37e740d2806372bfb9ee61fb49b0` on
+`feat/automatic-updates`. Linux source verification passed build/type checks,
+version synchronization and the private-source boundary. Full Node suite: 513
+cases, 511 passed and 2 explicit skips. Full offscreen Python/Qt suite: 839 cases,
+803 passed and 36 explicit platform/integration skips. Browser suite: 87 passed.
+The update-focused Python set passed 77 cases (one existing OS-specific skip);
+real TUF/transfer set passed 11. Production dependency staging collected original
+notices for 236 package instances including the new TUF dependencies. The host
+QtTest binding was extracted from Debian’s matching 6.8.2.1-4 package into a
+temporary test fixture; system/application installations were not changed to
+provide that dependency. Native control layout was checked in a 480×500 offscreen
+render without clipping. These are Linux/synthetic source checks, not installed
+Mac/Windows or cross-version package acceptance.
+
 Focused tests use temporary private state and independently authored inert payloads.
 Repository tests use real Ed25519 metadata and local HTTP transfer through the
 maintained client: valid catalog/payload, corrupt cache, altered catalog/payload,
