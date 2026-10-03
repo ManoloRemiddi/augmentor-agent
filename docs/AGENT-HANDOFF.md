@@ -4,6 +4,22 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+Managed Linux now has a live preflight/graph/selection/offline-completion controller,
+with 12 isolated cases including real Qt target subprocess rendering and unknown
+post-replace flush preservation. Focused updater checks pass 177 (176 passed, one
+OS skip), over `cde75ee`. Full Python passes 954 (914 passed, 40 skips) before the final
+added real same-build/empty-graph controller case, which also passes separately.
+Public eligibility remains disabled pending authentic
+bundle/retained exec/service ownership/reopen integration. Debian/RPM controllers,
+coordinated DSH migrations and production signing/feed remain open. See
+[the controller contract](UPDATE-SYSTEM.md#managed-linux-live-selection-controller--october-3).
+
+Mac correction `cde75ee` is running in
+[37149226481](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37149226481).
+The broader `882dd23` validation failed on Mac Handy dependency tarball integrity;
+its dependent Linux packaging jobs did not execute. The failed job is rerunning;
+do not count this as updater or packaging qualification.
+
 At controller checkpoint `882dd23`, Windows Desktop both CPUs passes
 37147849267 and SDK contracts pass 37147853195. Mac 14/26 fails the new produced
 ZIP boundary: the end counter differs from the actual parsed directory

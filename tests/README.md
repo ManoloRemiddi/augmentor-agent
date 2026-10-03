@@ -841,3 +841,11 @@ exact native-style 16-bit end-count representation, plus malformed-counter
 refusal. Entry limits are enforced by walking central records before the standard
 parser allocates them. Hosted output reports the actual/end counts and ZIP64
 format; fixture compatibility is not native produced-archive qualification.
+
+
+Managed Linux updates: `test_update_linux_managed.py` covers real isolated locks,
+journals and immutable selections, compatibility before drain, changed content/
+modes/selection, live authority revocation, lifetime contention, failed health and
+unknown post-replace namespace flush. Its separate subprocess case renders the
+actual copied shared Qt UI with a disposable profile. Import/health mocks in the
+selection fixtures are explicit; this is not installed signed forward qualification.

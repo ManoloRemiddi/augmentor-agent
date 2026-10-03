@@ -889,3 +889,55 @@ changed counter; seven real ZIP cases and the 165-case focused set pass. The
 native report now includes actual/end counts, ZIP64 and wrapping diagnostics.
 Native rerun is required before claiming produced-archive compatibility or later
 controller/exec acceptance. Paths/local headers/links retain their separate checks.
+
+
+## Managed Linux live selection controller — October 3
+
+The managed adapter now composes retained preflight, Unix reservation/drain,
+one-shot immutable selection and independently observed offline completion.
+`updates.linux_managed.ManagedPlan` holds the existing deployment writer before
+reading the exact selected bytes. It bounds release descriptors, verifies the
+original deployment inventories, and records whole-tree content/mode/directory
+snapshots of both releases. Public use requires qualified receipts, bundled
+interpreters and the canonical immutable release store. Downloaded descriptors
+cannot change existing profile, endpoint or service ownership fields.
+
+The candidate's authenticated DSH product/catalog check runs **before** graph
+preparation, while the existing integration is available. A mismatch refuses the
+plan before any shutdown. Subsequent checks surround each fresh authority refresh
+and repeat offline imports/integrity. They do not waive the original exact product
+version check or invent compatibility from a stopped server. Upgrades needing a
+new DSH integration/preset require an explicit coordinated migration plan.
+
+`LinuxCoordinator` uses the existing live Unix preparation/journal protocol and
+captures only observed instance names. `ManagedBackend` takes the final exclusive
+installation lease and requires this journal's exact live apply intent. It writes
+`desktop.previous.json`, then atomically fsyncs `desktop.json`; immutable source
+and target survive. A namespace flush failure after replacement stays unknown,
+cannot retry, and preserves the persistent startup barrier. The original returned
+apply seals the acknowledged record; completion verifies that exact record, both
+selections and both immutable trees around the fixed isolated target Qt render.
+Only then is the shared completed journal archived. Failed health preserves the
+applied selection, source recovery and pending record; no automatic rollback or
+replay occurs.
+
+Twelve isolated Linux cases pass: the full real selection/lock/journal sequence,
+live compatibility refusal, changed selection/modes, unobserved lifetime holder,
+revoked pre-drain consent, failed health, publisher-owned profile refusal,
+public development-receipt refusal, unknown post-replace namespace flush and an
+actual target subprocess rendering the shared Qt window with a disposable
+profile. A further empty-graph same-build proof stages the actual copied shared
+UI/services, runs real imports, performs selection, renders target health and
+archives completion without import/health mocks or service owners. Selection
+failure cases use inert imports/health; the separate Qt case uses the
+real copied native surface and fixed `-I -B` action. These are fixture/source
+checks, not installed public N-to-N+1 acceptance. Focused updater checks pass 177
+cases (176 passed, one OS skip) over `cde75ee`. The preceding full Python check passes 954 cases (914 passed,
+40 skips); the subsequent added real end-to-end case passes separately.
+
+This controller has not enabled manager eligibility. Authentic bundle staging,
+retained executable handoff, existing systemd/service/preset ownership and observed
+reopening remain required. Debian/RPM need package-manager authorization and
+installation plans rather than this per-user selection adapter. The complete
+cross-platform goal, signed forward-update qualification, interrupted recovery,
+legacy bridge and production feed/signing remain open.

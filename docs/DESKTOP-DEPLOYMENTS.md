@@ -360,3 +360,20 @@ source `85034ac`. Both windows closed only while idle; the primary launcher was
 invoked after its old service had exited. Desktop/Mobile report online and no
 pending update. This supersedes the preceding installed root without altering
 its preserved product, DSH or speech contract.
+
+
+## Automatic managed selection controller — October 3
+
+The update branch now has an independent live managed transaction using this same
+immutable selection contract. It retains the deployment lock, exact source/target
+inventories plus modes, and checks the candidate against the live DSH integration
+before reserving or closing work. After observed drain it checks offline imports,
+takes the final installation writer, preserves the previous selection and atomically
+selects the target. Fixed isolated Qt health completes only the original successful
+transaction. Unknown replacement/flush or failed health retains the persistent
+startup barrier and both releases. There is no automatic rollback/replay.
+
+The [shared updater guide](UPDATE-SYSTEM.md#managed-linux-live-selection-controller--october-3)
+records 12 isolated fixtures and remaining integration. This has not enabled
+customer automatic installation or changed the owner's selection. DSH/preset or
+service migrations remain explicit; Debian/RPM follow their package manager.
