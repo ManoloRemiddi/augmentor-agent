@@ -823,3 +823,14 @@ isolated state to check installed managed lifetime, persistent pending refusal
 and moved-root refusal without OS package operations. The bundled-interpreter
 case in `test_desktop_deployment.py` verifies retained bytes, fixed immutable
 paths and damaged-artifact refusal without changing the selected build.
+
+
+`test_update_macos_staging.py` exercises actual ZIP/ZIP64 directories, internal
+framework links/resource sidecars, local-versus-central path mismatch, traversal,
+link writes, collisions and opening-plan names. `test_update_macos_locations.py`
+checks actual POSIX private-home modes, per-user versus shared locations and
+explicit profile/runtime boundaries (skipped on Windows). The native Mac payload
+proof uses the actual coordinator and produced ZIP; its handoff helper execs the
+retained interpreter with the original lock and requires production refusal of an
+unqualified development bundle before source work. These fixtures do not claim
+signed forward or normal captured-window/login-service acceptance.

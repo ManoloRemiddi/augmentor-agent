@@ -511,3 +511,14 @@ normal bundled launch paths also refuse it. Only independently verified completi
 archives the active record. This source addition is behind the existing disabled
 automatic qualification gates; native completion, signed forward upgrades and
 owned launchd/reopening remain separately required.
+
+
+The [retained update controller](UPDATE-SYSTEM.md#mac-retained-controller-checkpoint)
+now connects the shared controls to exact-source exec, bounded ZIP staging,
+normal graph shutdown, atomic replacement, offline health and observed captured
+instance reopening. Automatic eligibility currently requires a private per-user
+Applications/profile location. Shared/system and companion installations remain
+manual until their ownership/coordination is qualified. Existing login registrations
+and user profiles are preserved; no model/GPU setting is changed. Native controller
+acceptance, signed forward release, retention/recovery and publisher provisioning
+remain open; customer automatic flags/feed are disabled.

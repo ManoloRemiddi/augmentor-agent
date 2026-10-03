@@ -13,31 +13,35 @@ import subprocess
 import sys
 import tempfile
 import plistlib
+import importlib.util
 
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'services'))
 from lifecycle.macos_payload import verify_bundle
 from lifecycle.macos_apply import MacInstallerBackend
 from lifecycle.macos_health import verify_local_health
-from lifecycle.posix_preparation import PosixPreparation
 from lifecycle.posix_startup import Startup
-from lifecycle.update import authorize_update
 from lifecycle.update_journal import UpdateJournal
 from platform_adapters import locks
 from platform_adapters.paths import private_directory
 from platform_adapters.private_files import atomic_json,require_directory,descriptor
 from updates.macos_completion import complete_observed
+from updates.macos_coordinator import MacCoordinator
+from updates.macos_reopen import reopen_observed
+from updates.macos_staging import validate_zip
 
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--app',type=Path,required=True)
     parser.add_argument('--out',type=Path,required=True)
+    parser.add_argument('--artifact',type=Path,required=True)
     args=parser.parse_args()
     if sys.platform!='darwin':parser.error('This proof requires native macOS signatures.')
     if args.app.is_symlink():raise ValueError('Use the original ordinary bundle directory.')
     original=args.app.resolve(strict=True)
     if args.out.is_symlink() or args.out.exists() and any(args.out.iterdir()):raise ValueError('Use a new empty evidence directory.')
     out=require_directory(private_directory(args.out.resolve()))
+    with args.artifact.open('rb') as stream:zip_report=validate_zip(stream,'Augmentor Agent Desktop.app')
     release=(original/'Contents/Resources/app/release.json').read_bytes()
     source=verify_bundle(original,release,development=True)
     retained=out/'Retained source.app'
@@ -76,16 +80,13 @@ def main():
         identity={key:metadata[key] for key in ('version','sourceCommit','target','channel','dataSchema','readableDataSchemas')}
         identity['sha256']=source['sha256']  # Whole retained-bundle fixture identity; never published.
         transaction=require_directory(private_directory(out/'transaction'))
-        created=[]
-        def installer(gate):
-            backend=MacInstallerBackend(gate,retained,candidate,release,release,copy,target,development=True,journal=journal)
-            created.append(backend);return backend
+        coordinator=MacCoordinator(retained,candidate,runtime,runtime/'shared',transaction,
+            release,release,copy,target,identity,identity,development=True)
         with UpdateJournal(transaction,identity,identity) as journal:
-            result=authorize_update(journal,lambda:PosixPreparation(retained/'Contents/Resources/app',runtime,runtime/'shared',transactions=transaction),installer)
+            result=coordinator.prepare_and_apply(journal,lambda _stage:True)
             if journal.record['phase']!='apply-acknowledged' or result['installationComplete'] is not False:
                 raise AssertionError('The fixture confused apply with completed installation.')
-            created[0].observe_acknowledgement()
-        backup=created[0].backup
+        backend=coordinator.backend;backup=backend.backup
         if not backup or verify_bundle(backup,release,development=True)!=copy or verify_bundle(retained,release,development=True)!=target:
             raise ValueError('Atomic replacement did not retain the source and exact target.')
         if verify_bundle(original,release,development=True)!=source or sentinel.read_bytes()!=b'Preserve fixture settings and history.':
@@ -100,23 +101,36 @@ def main():
         except RuntimeError:pass
         else:raise AssertionError('The pending durable record did not refuse a normal restart.')
         changed={**identity,'sourceCommit':'0'*40}
-        try:complete_observed(created[0],identity,changed)
+        try:complete_observed(backend,identity,changed)
         except ValueError:pass
         else:raise AssertionError('Completion adopted a different target identity.')
         if not (transaction/'active.json').is_file():raise AssertionError('Rejected completion removed the pending record.')
-        completion=complete_observed(created[0],identity,identity)
+        completion=coordinator.complete()
         if not completion['installationComplete'] or (transaction/'active.json').exists():
             raise AssertionError('Verified completion failed to archive the exact attempt.')
         with Startup(runtime,transactions=transaction):pass
-        try:complete_observed(created[0],identity,identity)
+        try:coordinator.complete()
         except (ValueError,FileNotFoundError):pass
         else:raise AssertionError('The completed attempt was replayed.')
+        if coordinator.plan!={'instances':[],'hadBrowser':False}:
+            raise AssertionError('The empty live graph acquired an unobserved reopening target.')
+        if reopen_observed(backend,coordinator.plan,completion) is not False:
+            raise AssertionError('An empty reopening plan launched a normal application.')
+        try:reopen_observed(backend,{'instances':['unobserved'],'hadBrowser':False},completion)
+        except ValueError:pass
+        else:raise AssertionError('The live coordinator adopted an unobserved instance name.')
+    spec=importlib.util.spec_from_file_location('macos_observer_fixture',ROOT/'scripts/macos-observer-handoff-proof.py')
+    handoff=importlib.util.module_from_spec(spec);spec.loader.exec_module(handoff)
+    handoff_report=handoff.proof(original,retained,out/'isolated-handoff-home')
     report={'passed':True,'schema':'augmentor-macos-source-proof/1','payloadSHA256':source['sha256'],
         'releaseSHA256':source['releaseSHA256'],'entries':len(source['entries']),'bytes':source['bytes'],
         'relocatedWholeBundle':True,'nativeSignatureDamageRefused':True,'originalPreserved':True,
         'installationReaderRefusesReady':True,'atomicSameBuildFixtureApply':True,'sourceBackupRetained':True,
         'pendingLaunchRefused':True,'wrongCompletionRetainsPending':True,'completionArchived':True,
         'completionNotReplayed':True,'syntheticUserStatePreserved':True,
+        'coordinatorCapturesEmptyPlan':True,'unobservedReopenRefused':True,
+        'packagedZIPBoundary':zip_report,
+        'nativeObserverHandoff':handoff_report,
         'offlineTargetHealth':health,
         'scope':'Development whole-bundle retention, same-build isolated apply, durable launch barrier and verified completion; no signed forward update, reopen, login/user install or automatic publisher authority.'}
     atomic_json(out/'report.json',report)

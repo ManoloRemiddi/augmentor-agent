@@ -810,3 +810,68 @@ SDK contracts at `56a8f17` pass
 shared/Linux packaging remains running in
 [37142662036](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37142662036).
 No owner application or public automatic-install flag is changed.
+
+
+## Mac retained controller checkpoint
+
+The shared manager now has a fixed Mac bootstrap/observer adapter for a private
+per-user `~/Applications/Augmentor Agent Desktop.app` installation with the
+canonical profile/runtime paths and a writable destination volume. The home
+must exclude other users; shared `/Applications`, custom profiles and companion
+installations retain manual downloads while their installation coordination is
+unfinished. This avoids treating a per-user process lock as proof that another
+user has closed a shared application. No installation or home permission is
+changed to make it eligible.
+
+The source launch verifies the complete distribution bundle before starting only
+its fixed bundled bootstrap. That fresh child waits for its attempt identifier
+to be saved by the manager, verifies fresh TUF/consent/download authority, retains
+an exact complete source copy and checks the copy/original again. It then execs
+the retained interpreter outside replacement, keeping its original private
+bootstrap lock through exec. The observer checks its actual kernel executable,
+its imported code location and the inherited lock's actual inode. Neither saved
+PIDs nor a status receipt can grant apply authority.
+
+The retained observer validates the source/copy and independently retained
+candidate. Mac automatic composition accepts exactly one bundle artifact;
+additional components require an explicit plan. It copies the exact signed ZIP
+bytes into a private destination-volume stage, bounds ZIP/ZIP64 directory
+allocation and expanded size, rejects unsafe paths/collisions/external links and
+writes through links, and verifies local headers against central names before
+native extraction. It checks available space, the real signature/team, exact
+packaged target and full candidate receipt. Metadata reads are bounded ordinary
+files. Legitimate framework links and product resource sidecars remain supported.
+
+`MacCoordinator` composes renewable reservation, captured instance names, normal
+kernel-observed drain, fresh publisher/consent checks, one-shot atomic replacement
+and exact acknowledgement. Independent offline target health then archives the
+transaction. Reopening requires that original live backend, its actual captured
+plan, the exact completed archive and the still-verified target. Only the fixed
+native launcher and captured names are used; no saved commands or actions are
+replayed. Existing launchd registrations remain untouched. Their persistent
+pending guard prevents normal work before completion; removing/disabling a
+registration during the update remains the user's choice. Unpacked Browser
+extensions still need normal explicit reload.
+
+Known reversible pre-drain cancellation reports deferral; uncertain drain/apply
+or completion remains blocked and preserved. A reopening error retains observed
+target success and asks for a normal reopen. The public entrypoints expose no
+development switch. Producer/consumer release qualification and feed remain
+disabled, so this checkpoint does not install a customer update.
+
+Verification: 164 focused updater cases pass (163 passed, one OS skip); the broad
+Python checkpoint passes 942 cases (902 passed, 40 explicit skips), using isolated
+Qt/dictation state. Six real ZIP/path cases and three location/profile cases are
+included. The native fixture now runs the actual coordinator/completion, checks
+the produced ZIP, refuses unobserved reopening, then execs its disposable retained
+runtime with the original lock. The production observer must refuse its explicit
+development bundle before source inspection/drain/apply. This native checkpoint
+is pending; it is not signed N-to-N+1, captured normal-window reopening or real
+launchd acceptance. The earlier `b285823` persistent barrier/completion passes
+Mac 14/26 in 37143117713; `56a8f17` shared/Linux packaging passes in 37142662036.
+
+Remaining full-scope work includes shared-system/companion Mac coordination,
+actual captured-window/background-owner acceptance, interrupted recovery/reset,
+bounded observer/stage/backup retention, Linux controllers, approved signing
+custody, public feed/bridge and signed forward qualification. Pending and unknown
+runtime/stage evidence is retained until independently safe cleanup is available.

@@ -101,7 +101,7 @@ jobs:
           codesign --verify --deep --strict "$app"
           "$project/python/bin/python3" -I -B scripts/proof-handy-component.py --runtime "$project/components/handy/runtime"
           "$project/node/bin/node" scripts/app-sdk-bundle-proof.mjs "$project"
-          "$project/python/bin/python3" -I -B scripts/macos-update-payload-proof.py --app "$app" --out outputs/macos-update-source
+          "$project/python/bin/python3" -I -B scripts/macos-update-payload-proof.py --app "$app" --out outputs/macos-update-source --artifact outputs/macos/augmentor-desktop-*-macos-arm64-development.zip
           codesign --verify --deep --strict "$app"
       - name: Exercise bundled DSH and Qt with an isolated model fixture
         env:

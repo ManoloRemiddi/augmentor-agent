@@ -4,6 +4,19 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+New Mac controller source now connects the manager to fixed bootstrap/retained
+observer entrypoints, actual exec/code/lock checks, exact one-bundle ZIP staging,
+live reservation/apply/completion and captured-name reopening. It currently
+supports only private per-user Desktop installs; shared/system/companion paths
+remain manual pending their coordination. Public flags/feed are disabled. Native
+coordinator/ZIP/exec refusal qualification is added and pending; the native fixture
+never opens a normal user app or touches an installed profile. Local focused tests
+pass 164 cases (163 passed, one skip); full Python passes 942 (902 passed, 40 skips).
+The earlier `b285823` barrier/completion passes both Mac versions (37143117713),
+and `56a8f17` shared/Linux packaging passes (37142662036). Read
+[the controller contract and remaining full scope](UPDATE-SYSTEM.md#mac-retained-controller-checkpoint).
+
+
 Latest qualification record: `faca8b5` passes the entire Mac 14/26 workflow,
 including packaged offline target health, in 37141250126. Newer persistent Unix
 barrier, live Mac completion and managed Linux changes are pushed through code

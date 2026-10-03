@@ -92,6 +92,13 @@ class UpdateManager:
                 and not self.state.get('installationBlocked',False))
 
     def installer_available(self):
+        if sys.platform=='darwin' and self.current['installType']=='macos-app' and self.current['component']=='desktop':
+            from .macos_bootstrap import locations
+            try:
+                bundle,base,transactions=locations(self.root)
+                return (self.base==base/'data/augmentor/updates' and os.access(bundle.parent,os.W_OK|os.X_OK)
+                    and all((self.root/name).is_file() for name in ('scripts/macos-update-bootstrap.py','scripts/macos-update-observer.py')))
+            except (OSError,ValueError):return False
         if sys.platform!='win32' or self.current['installType']!='windows-inno':return False
         from platform_adapters.windows_identity import local_app_data
         base=local_app_data()/'Augmentor'
@@ -103,12 +110,18 @@ class UpdateManager:
                     'scripts/windows-update-observer.py','scripts/windows-update-coordinator.py')))
 
     def installation_directory(self):
+        if sys.platform=='darwin':
+            from lifecycle.posix_pending import transaction_directory
+            return transaction_directory()
         if sys.platform!='win32':return None
         from platform_adapters.windows_identity import local_app_data
         return local_app_data()/'Augmentor/updates'
 
     def launch_installer(self):
         if not self.installer_available():raise ValueError('No qualified installer adapter is available.')
+        if sys.platform=='darwin':
+            from .macos_bootstrap import launch
+            return launch(self.root)
         import windows_supervisor
         return windows_supervisor.request('start-update',root=self.root)['update']
 

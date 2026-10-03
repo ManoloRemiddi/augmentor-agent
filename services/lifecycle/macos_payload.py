@@ -14,7 +14,7 @@ import stat
 import subprocess
 import sys
 
-from .payload_integrity import MAX_ENTRIES,MAX_PAYLOAD,_json
+from .payload_integrity import MAX_ENTRIES,MAX_PAYLOAD,_json,_read
 
 
 def fingerprint(info):
@@ -67,8 +67,8 @@ def verify_bundle(bundle,release_bytes,*,development=False,team=None):
     if not isinstance(release,dict) or release.get('target') not in ('macos-arm64','macos-x64'):
         raise ValueError('The independently identified Mac release is required.')
     bundle=Path(bundle).absolute();project=bundle/'Contents/Resources/app'
-    if (project/'release.json').read_bytes()!=release_bytes:raise ValueError('The bundle release differs from the verified artifact.')
-    info=plistlib.loads((bundle/'Contents/Info.plist').read_bytes())
+    if _read(project/'release.json',65536)!=release_bytes:raise ValueError('The bundle release differs from the verified artifact.')
+    info=plistlib.loads(_read(bundle/'Contents/Info.plist',1024**2))
     identities={'desktop':'com.augmentor.Agent','companion':'com.augmentor.Agent.Companion'}
     if (release.get('component') not in identities or info.get('CFBundleIdentifier')!=identities[release['component']]
             or info.get('CFBundleShortVersionString')!=release.get('version')):
