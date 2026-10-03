@@ -142,6 +142,57 @@ adapter in the same change; do not infer distro qualification from generic paths
 
 ## Evidence and release gates
 
+### Current functional pair — October 3
+
+Product
+[`8a085be`](https://github.com/ManoloRemiddi/augmentor-agent/commit/8a085be67f50d7b39e5639cdb1916e09517de805)
+is paired with SDK
+[`925b72e`](https://github.com/ManoloRemiddi/augmentor-app-sdk/commit/925b72eeaa651fc254f46b30d3dbbcc7b596d3a8),
+unreleased preview 4. This includes the public main Handy corrections and the
+workspace settings/direct-registration follow-ups. Later documentation-only
+commits do not change the functional source under qualification.
+
+| Required source/package gate | Current result at this pair |
+| --- | --- |
+| Packed SDK and paired runtime, Linux/macOS/Windows | All six jobs pass in [37116697011](https://github.com/ManoloRemiddi/augmentor-app-sdk/actions/runs/37116697011) |
+| Product platform contracts | All three platforms pass in [37116596807](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37116596807) |
+| macOS 14/26 bundled runtime and shipped SDK-helper proof | Pass in [37116596912](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37116596912) |
+| Windows x64/ARM64 desktop | Pass in [37116596991](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37116596991) |
+| Full Linux/source/native/package/Browser regression | Running in [37116596924](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37116596924) |
+| Windows x64/ARM64 bundled runtime and install/repair/removal | Pending in [37116596824](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37116596824) |
+
+Four actual isolated Chromium renders of this Settings source were inspected:
+light/dark at 1100×760 and 400×780. The scoped navigation, thinking preference
+and help text fit without visible errors. Disposable browser profiles and
+synthetic workspace/runtime responses keep this component presentation evidence
+separate from installed app, model or provider acceptance.
+
+### Requirement audit
+
+| Alignment requirement | Implementation and verifying boundary |
+| --- | --- |
+| Retain one product UI and agent lifecycle | Maintained embed/native host; harness workers remain product-owned; SDK contains client/proxy/tools, not a copied UI or agent loop |
+| Preserve released DSH default and exact grants | `augmentor-app/1`, DSH default and legacy launch fallback; full product validation retains real DSH tool-guard proof and workspace regressions |
+| Negotiate feature support without granting authority | `describeWorkspace`, five-state SDK helpers, pre-initialization requirements and fresh dispatch checks; workspace capability/transport tests |
+| Explicit experimental Codex app support | Transactional registry, bound connection/role/directory/memory, filtered sessions and native-tool denial; actual pinned engine and packed client proof on Linux/macOS |
+| Context, recovery and ownership | Bounded untrusted operation snapshots, changed-input conflict, queue/steering/restart preservation and parent-scoped branch status; ledger/session/packed tests |
+| Platform bootstrap, privacy and owned process lifecycle | Read-only bootstrap, OS private-file adapters, managed launch leases, Windows Job and per-OS startup plan; platform matrix and actual Mac/Windows packaged-helper proof |
+| Workspace settings and optional voice | Scoped preferences/cache keys, acknowledged persistence, thinking/manual-history behavior, shared administration denied and voice off by default; actual Settings/renderer/workspace tests and Chromium component renders |
+| Developer handoff, support limits and license | Paired SDK manifests/scaffold/API/agent/acceptance guides; explicit platform matrix and unreleased status; original license retained in both repositories |
+| Preserve live apps and independent adoption | Candidate work stays in development branches; no app/database/profile/model/deployment changes; owner's third application is neither built nor inspected |
+
+This audit does not claim completion while either required workflow above is
+pending/running. Customer SDK install/login-service, OS consent, physical audio,
+real Codex account/provider and installed upgrade/rollback acceptance remain
+separate release gates even after the source/package workflows pass. Windows
+Codex, Pi, cloud voice and multi-tenant/untrusted-plugin hosting are not added.
+
+### Earlier qualification checkpoints
+
+The following dated results are historical and apply only to their stated
+source. The current pair table supersedes earlier pending/running statuses;
+earlier passes do not qualify subsequent functional changes.
+
 Local Linux source evidence: TypeScript check/build, 507 root Node cases
 (505 pass/two opt-in skips), 85 Browser cases, 828 native/Python cases
 (36 platform/optional skips), four focused Python platform contracts,

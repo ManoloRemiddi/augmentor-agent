@@ -14,7 +14,8 @@ multi-tenant hosting and cloud voice remain excluded.
 
 An installed SDK profile declares `schemaVersion: 1`, `sdkProtocol:
 "augmentor-app/1"` and an explicit policy. `workspace.describe` negotiates
-the protocol, workspace and DSH before the existing product handshake. The
+the protocol, workspace and explicitly selected harness before the existing
+product handshake. DSH remains the released default. The
 product manifest `services/workspaces/sdk.json` is the discovery boundary;
 clients must reject older runtimes instead of importing their internal code.
 

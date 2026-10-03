@@ -25,6 +25,13 @@ remains separate. The canonical owner's settings/dictation edits are preserved.
 Direct Codex profile registration now enforces the same 128-character connection
 identifier contract as SDK planning and the pinned host, before registry writes.
 
+Current functional pair: product `8a085be` / SDK `925b72e`. All six SDK jobs,
+all three platform contracts, Mac 14/26 bundles and Windows x64/ARM64 desktop
+checks pass. Full Linux/package/Browser and Windows packaged installation
+workflows remain live pending/running gates. The alignment guide records their
+exact run URLs, the requirement audit and four inspected Chromium component
+renders. These source checks do not promote a release or migrate an app.
+
 ## October 3 Handy alignment, test separation and download preparation
 
 PR #30 is merged; PR #33 adds the four-pixel leftward orb adjustment and protects
