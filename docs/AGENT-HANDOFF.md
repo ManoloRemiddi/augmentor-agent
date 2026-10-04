@@ -2,6 +2,14 @@
 
 # Start here: agent handoff
 
+Mac retention run 37174398113 at `b438ad8` fails on both Mac 14/26 solely in the
+new fixture's aliased temporary ancestor (`/var` to `/private/var`). The fixture
+factory now selects its actual temporary root; production input validation remains
+strict. A fifth case explicitly refuses a redirected collector parent without
+following/deleting its code. The real signed-authority cases pass on both Macs in
+that failed run, but overall/native retention qualification remains pending after
+this fixture correction. Preserve this failed evidence and require a fresh run.
+
 Full Unix observer retention now covers the complete copied Linux runtime and
 Mac bundle. A shared kernel lease remains open until actual process exit; only
 verified deferred or completed outcomes publish cleanup hints. A later bootstrap,

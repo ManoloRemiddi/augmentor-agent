@@ -20,7 +20,9 @@ class FullObserverRetentionTests(unittest.TestCase):
     def setUp(self):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
-        self.parent = Path(temporary.name)/'observers'
+        # Resolve only the fixture factory's macOS /var -> /private/var alias.
+        # Collector input itself must remain unredirected and is tested below.
+        self.parent = Path(temporary.name).resolve()/'observers'
         self.parent.mkdir(mode=0o700)
         self.directory = self.parent/('linux-'+'a'*48)
         self.directory.mkdir(mode=0o700)
@@ -88,6 +90,16 @@ while not (control/'exit').exists():
             'outcome':'target-healthy', 'payloadSHA256':snapshot(self.child)['sha256']})
         self.assertEqual(retention.collect(self.parent), 0)
         self.assertTrue(self.child.is_dir())
+
+    def test_redirected_collector_parent_is_refused_without_following_it(self):
+        self.lease_file();self.mark()
+        alias=self.parent.parent/'redirected-observers'
+        alias.symlink_to(self.parent, target_is_directory=True)
+        with self.assertRaises(ValueError):
+            retention.collect(alias)
+        self.assertTrue(self.child.is_dir())
+        self.assertEqual((self.child/'public-code.fixture').read_bytes(),
+            b'Inert public copied code; never executed.')
 
     def test_changed_hardlinked_external_link_or_extra_contents_are_preserved(self):
         self.lease_file()

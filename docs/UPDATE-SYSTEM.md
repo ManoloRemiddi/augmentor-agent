@@ -2014,3 +2014,15 @@ framework-link tree is exercised on Linux; native Mac locks/bundle integration
 still require fresh hosted qualification. This does not qualify signed forward
 installation, actual active user profiles or public automatic eligibility. No
 owner installation/profile/model/GPU or signing/feed configuration changed.
+
+Mac follow-up 37174398113 at `b438ad8` is terminal failure on both Mac 14/26. The
+new retention fixture passes a factory-created `/var/...` temporary path to the
+strict unredirected-hierarchy guard; macOS aliases that ancestor to `/private/var`,
+so all four retention cases refuse before exercising their intended boundary.
+The fixture factory now resolves its own temporary root before constructing the
+private tree, matching the ordinary production `~/Library` hierarchy. Production
+collector inputs are still validated as supplied. A fifth actual-file case passes
+a redirected parent and requires refusal with unchanged code. Both real TUF/signed
+authority bridge tests already pass on each Mac in the failed run; that is limited
+evidence and does not turn the overall run green. Fresh full Mac qualification is
+required after the fixture correction. No release/feed/eligibility changed.
