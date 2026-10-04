@@ -4,6 +4,17 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+Real Linux desktop acceptance also needs the Wayland portal dependency closure:
+`services/dictation/portal.py` imports `gi`/Gio/GLib, while the actual `42e2e05`
+pinned standalone runtime reports `giAvailable: false`. The unchanged Linux
+wheel lock does not include PyGObject. Native CAS/offline Qt/X11 proofs do not
+cover GNOME portal operation; keep distribution eligibility false and resolve/
+qualify this before a normal Wayland target is offered. Separately audit broker
+spawn bytecode: `dictation.request` currently launches `sys.executable` without
+explicit no-bytecode flags; the installed desktop launcher propagates its guard,
+but Browser/other caller paths still need direct immutable-artifact evidence.
+Preserve live broad 37165487146 and Mac 37165488998 while progressing these gates.
+
 Corrected native source `69477f8` passes Handy lifecycle plus actual broker/CAS
 maintenance on Mac 14 (111327429133), Windows (111327429134), Linux ARM64
 (111327429137) and Linux x64 (111327429183), and actual owned Linux service plus

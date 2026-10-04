@@ -1534,3 +1534,14 @@ This supersedes the cold-handshake failure for native broker/CAS proof only.
 Debian/shared tests and complete Linux x64/ARM64 bundles remain live, as do full
 Mac 14/26 jobs 111327575462/111327575502. Do not restart or cancel those handles.
 Public flags/feed stay disabled and the complete cross-platform goal stays active.
+
+Real Linux desktop acceptance also needs the Wayland portal dependency closure:
+`services/dictation/portal.py` imports `gi`/Gio/GLib, while the actual `42e2e05`
+pinned standalone runtime reports `giAvailable: false`. The unchanged Linux
+wheel lock does not include PyGObject. Native CAS/offline Qt/X11 proofs do not
+cover GNOME portal operation; keep distribution eligibility false and resolve/
+qualify this before a normal Wayland target is offered. Separately audit broker
+spawn bytecode: `dictation.request` currently launches `sys.executable` without
+explicit no-bytecode flags; the installed desktop launcher propagates its guard,
+but Browser/other caller paths still need direct immutable-artifact evidence.
+Preserve live broad 37165487146 and Mac 37165488998 while progressing these gates.
