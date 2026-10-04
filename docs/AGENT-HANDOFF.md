@@ -50,6 +50,13 @@ waiting for the complete old/native outcomes, inspect actual failed-job evidence
 and qualify completion/reopening/recovery before calling the Windows broker
 installer integration complete. All production and full-goal boundaries remain.
 
+The old run is now terminal failure on both CPUs with the same pending-health
+regression; corrected full run 37170465430 has started x64/ARM64 jobs
+111344879337/111344879344. A read-only GitHub metadata audit finds no repository
+Actions secrets, variables or environments. This does not establish credential
+availability elsewhere; owner custody/platform-signing answers remain pending.
+No credential contents were read and no signing/feed configuration was changed.
+
 ## Corrected native Linux checkpoint — October 4, full goal still active
 
 Source `0bc9639` is committed/pushed. Focused native

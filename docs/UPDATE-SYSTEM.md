@@ -1845,6 +1845,21 @@ is queued behind the earlier ARM64 job, which remains live; no obsolete job was
 cancelled and no later completion/reopen result is inferred. Public eligibility
 and feed remain disabled.
 
+The older run 37169658310 is now terminal failure on both CPUs. ARM64 job
+111339839655 reproduces the same read-only health refusal at the exact negative
+mismatched-health boundary as x64; this supports the diagnosis without qualifying
+later stages. Corrected full run 37170465430 is now executing both native jobs
+(x64 111344879337, ARM64 111344879344), after successful shared Qt preparation.
+
+Read-only release-configuration audit on October 4: the canonical GitHub
+repository returns no repository-level Actions secrets, variables or environments.
+No credential contents were requested or read. `release/updates.json` remains
+disabled. This confirms that a GitHub-based signing/deployment path has not been
+provisioned in those locations; it does not establish whether the owner has keys,
+certificates or service access elsewhere. The earlier online-custody and platform
+signing questions remain unanswered and are not replaced by this audit. No key,
+certificate, account, environment, secret or public feed was created or changed.
+
 All public signing/feed/automatic-install/distribution flags remain false. The
 remaining package/global-user, shared Mac/Companion, SDK owner teardown,
 interrupted recovery/retention, actual desktop/DSH, signed forward and legacy bridge
