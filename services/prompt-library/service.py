@@ -22,8 +22,9 @@ from platform_support import require_same_user
 from home.client import call as home_connection_call
 from platform_adapters import locks as fcntl
 from platform_adapters.paths import private_directory
-from platform_adapters.transport import ThreadingLocalServer, prepare_endpoint, cleanup_endpoint
+from platform_adapters.transport import ThreadingLocalServer, prepare_endpoint
 from lifecycle.admission import Admission, MaintenanceBusy, METHODS as MAINTENANCE_METHODS
+from lifecycle.idle import IdleServerMixin
 
 PROTOCOL='augmentor-prompts/1'
 LIMIT=1024*1024
@@ -176,7 +177,7 @@ class Handler(socketserver.StreamRequestHandler):
         finally:
             if shutdown:threading.Thread(target=self.server.shutdown,daemon=True).start()
 
-class Server(ThreadingLocalServer):
+class Server(IdleServerMixin, ThreadingLocalServer):
     daemon_threads=False  # Graceful shutdown finishes accepted requests.
 
     def __init__(self,*args,**kwargs):
@@ -194,8 +195,10 @@ if __name__=='__main__':
     except BlockingIOError:raise SystemExit(0)
     endpoint=state/'prompts.sock'
     prepare_endpoint(endpoint)
-    server=Server(str(endpoint),Handler);server.library=Library(data/'prompts.sqlite3')
+    library=Library(data/'prompts.sqlite3')
+    server=Server(str(endpoint),Handler);server.library=library
     def stop(*_):threading.Thread(target=server.shutdown,daemon=True).start()
+    server.watch_idle(lock,endpoint,stop,server.admission.retire_idle)
     signal.signal(signal.SIGTERM,stop);signal.signal(signal.SIGINT,stop)
     try:server.serve_forever(poll_interval=.2)
-    finally:server.server_close();cleanup_endpoint(endpoint)
+    finally:server.idle_stopped.set();server.server_close();server.lifetime.cleanup(endpoint)

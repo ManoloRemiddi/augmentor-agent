@@ -18,6 +18,97 @@ and DSH as the first-release target. Packages retain user data outside
 `/usr/lib/augmentor`. Historical upgrade/rollback evidence below is scoped to
 its exact version pair; it does not certify every downgrade.
 
+## Detached companion retirement — October 3
+
+Memory and prompt services remain singletons **per private state directory**.
+A separate source tree does not by itself create another service; a separate test
+state directory does. Do not replace this with a global per-user singleton that
+lets tests read or modify the owner's production data.
+
+The services now stop after five minutes without accepted client requests, or
+when their lock/socket path disappears or changes identity. Retirement closes
+admission before stopping and waits for accepted requests, controlled memory
+work and maintenance reservations. Periodic memory housekeeping does not count
+as client activity. SQLite journals and preferences stay on disk, and the normal
+client startup path reopens them on the next call. No unknown-outcome mutation is
+replayed. An old service cannot unlink a replacement service's socket.
+
+Disabled dictation brokers use the same bound. Enabled global dictation, live
+conversation microphone ownership, native capture and model downloads preserve
+the broker. A disabled native component must explicitly report idle and no
+active downloads before retirement. Listener shutdown now completes through the
+normal cleanup path rather than abruptly exiting from a request thread.
+
+The Pi runtime contract fixture previously retained its temporary state tree and
+detached companions after each test run. Its teardown now waits for its runtime
+and removes the isolated tree. The services also enforce retirement themselves
+when a fixture crashes or leaves its tree behind.
+
+### Compatibility with old local test checkouts
+
+`scripts/retire-test-companions.py` is a narrowly scoped Linux fallback for older
+source checkouts that lack self-retirement. It only considers known disposable
+`/tmp/augmentor-pi-contract-*`, `augmentor-offscreen-dictation-*`,
+`augmentor-update-*` and `codex-voice-*` namespaces. It excludes other mount
+namespaces, enabled dictation, configured memory engines, children, connected
+socket work and observed non-service clients sharing the private namespace.
+Two observations at least ten minutes apart are required; activity clears that
+record. Process identity is checked again and a pidfd binds SIGTERM to that
+process. No files are deleted and no process trees are terminated. This fallback
+is intentionally conservative and does not claim to discover every orphan.
+
+Inspect once, or install the user-local compatibility timer:
+
+```sh
+python3 scripts/retire-test-companions.py
+python3 scripts/install-test-companion-watchdog.py
+```
+
+The timer checks every five minutes, so old abandoned fixtures can remain for
+roughly fifteen minutes after first observation. The main service fix works on
+Linux, macOS and Windows through the existing transport/locking adapters; the
+compatibility timer is Linux only. Remove the fallback with:
+
+```sh
+systemctl --user disable --now augmentor-test-companion-watchdog.timer
+rm ~/.config/systemd/user/augmentor-test-companion-watchdog.{timer,service}
+systemctl --user daemon-reload
+```
+
+### Qualification and installed scope
+
+The October 3 live audit counted 154 prompt/memory/dictation processes, using
+about 1.9 GiB RSS initially. There were 103 prompt/memory companions and 51
+brokers, rather than the earlier report's unexplained 190+ pairs. RSS is a sum of
+resident sets, not unique physical memory. Inspection confirmed per-test state
+namespaces, orphaned parents and deleted fixture files; the state-directory locks
+already prevented duplicates within a single namespace.
+
+139 verified abandoned host-test processes exited after SIGTERM. Their summed
+RSS was approximately 2.1 GiB immediately before cleanup (inspection faulted
+some previously cold pages back into memory). Production app services, enabled
+global dictation, container-managed proofs and other unqualified namespaces were
+preserved. Private test data and logs were not deleted.
+
+Thirteen lifetime/watchdog checks cover real subprocess retirement, accepted long watches, preserved
+SQLite data/restart, live disabled microphone ownership, replaced endpoints,
+maintenance/background work and old-watchdog observation/PID-reuse behavior.
+A production-limit proof separately observed all three isolated services exit
+cleanly after 300.2 seconds; both memory/prompt databases remained present.
+Replacement testing exposed and corrected a startup race: prompt SQLite setup
+now finishes before publishing its endpoint, and retirement never adopts a
+replacement regular file as its socket.
+Related checks: 29 Node runtime/prompt/native-host/cancellation cases, 24 Qt
+prompt cases, 26 dictation cases (one portal-environment skip), 35 memory cases,
+six lifecycle and four admission cases; TypeScript check/build pass. The host's
+system Qt lacks QtTest; the Qt tests passed in the existing dedicated test venv.
+Native Mac/Windows execution and the complete product suites remain separate CI
+gates; Linux fixtures do not establish installed cross-platform adoption.
+
+The compatible installed overlay preserves the selected product and external
+DSH/speech dependencies. Exact source/ref, artifact identity and activation
+status are recorded in [desktop deployments](DESKTOP-DEPLOYMENTS.md).
+
 ## Upgrade
 
 Finish or Stop running chats, disconnect Augmentor in the extension, and close

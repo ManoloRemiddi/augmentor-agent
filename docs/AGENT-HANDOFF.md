@@ -1914,3 +1914,16 @@ disabled. It now exercises enabled editing without dropping any draft/revision
 assertion; a separate actual Qt case checks disabled controls and status-only
 refresh. The local production runtime omits QtTest; hosted Qt completion remains
 required. Private draft downloads remain withheld and the owner is untouched.
+
+## October 3 detached test-service accumulation
+
+[Companion lifecycle](LIFECYCLE.md#detached-companion-retirement--october-3)
+corrects the earlier global-singleton diagnosis: locks already isolate each
+state directory, while completed fixtures retained detached prompt, memory and
+dictation services. The fix bounds unused services, preserves accepted work and
+enabled dictation, and prevents retiring processes from unlinking replacement
+endpoints. The Pi fixture now removes its test state. 139 verified abandoned
+host-test services were stopped; production and container proofs were retained.
+A conservative Linux compatibility timer protects older local test checkouts.
+Consult the lifecycle evidence and [installed selection](DESKTOP-DEPLOYMENTS.md)
+for validation and adoption boundaries.
