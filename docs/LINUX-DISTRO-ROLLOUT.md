@@ -47,10 +47,22 @@ six-primitive preview selects only 19 additions, including the default npm
 command, with no upgrade/removal. All 19 archives pass actual Fedora signature,
 hash/size/identity checks. The final fixed preview passes with 19 local additions
 and zero downloads. One installation exits zero and reports all 19 installed,
-but its original ending check refuses. The signed jack package reports creating
-its declared system group. Exact group changes and the full
-installed inventory are under separate read-only verification; no package
-reinstallation or SDK resume has followed. Managed activation remains open.
+but its original ending check refuses. A separate read now verifies the exact
+1375-package inventory, all caches/signatures, application bytes and account/lock
+state. Only the signed JACK package's declared system group records changed;
+removing those exact added records recovers both original file hashes. A separate
+offline acceptance preserves the raw reader refusal on its own volatile process
+status text while retaining all other before/end comparisons and the original
+owner/context validation. The ordinary continuation then refuses its own full
+file-stat equality after reading the preparing receipt, before product setup or
+SDK entry. Complete ending preservation passes. A narrow owned no-atime
+descriptor-read correction now passes the unchanged normal setup and proof:
+installation reaches installed, both SDK fixture roles, three plugins, native
+host, repeated settings and history checks pass. The ordinary child completes
+in 418.67 seconds with four fixture model requests. Its full ending passes; the
+independent ending precedes managed activation. The generated DSH service is
+retained as configured. Original refusals remain intact, and no native package
+reinstall occurred. Graphical/password acceptance remains open.
 GUI input acceptance still requires a genuine unlocked session; no lock-policy
 change, forced daemon stop or package replay occurred.
 
@@ -95,8 +107,8 @@ Noble diagnostic candidate now passes all five dependency,
 source-check, build, package and artifact-review commands. A separate read-only
 completion audit binds the actual outputs after the runner's receipt filename
 collisions. The original failures remain intact; no completed command was
-repeated. This candidate uses the existing official Qt runtime and has not been
-installed; marked-runtime replacement remains open. A fresh offline APT
+repeated. This candidate uses the existing official Qt runtime; marked-runtime replacement
+remains open. A fresh offline APT
 admission now passes against authenticated retained metadata: 611 repository
 additions plus two application packages, zero upgrades/removals, all original
 410 compiler package versions preserved. The exact six complete-setup primitives
@@ -108,8 +120,16 @@ refusal. The original failed run and independent ending stay intact; a separate
 naming-only installation reuses the same signed bytes. It resolves the cache
 problem and begins native installation, then exits100 on a relative pathname for
 one local Augmentor package. Its failed container and logs remain retained; no
-installed image or qualified runtime resulted. The local-package path is under
-separate diagnosis. Normal replacement entrypoints remain open.
+installed image or qualified runtime resulted from that attempt. A separate
+correction adds only the two exact application DEBs to the absolute APT cache.
+The corrected offline build now exits zero and produces an installed image;
+the independent reader exceeds its startup bound while the native storage
+backend copies its filesystem. The already-dispatched reader later exits zero
+and confirms all 1023 installed rows, the original 410 versions and every one
+of 32319 application members against the actual DEBs. Its CLI timeout stays
+intact. Missing doc/man paths and an inherited HOME warning require separate
+exact image-policy verification; full dependency qualification is still open.
+Normal replacement entrypoints remain open.
 [Hosted validation37219196306](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37219196306)
 passes all11 jobs atd6c2d3c. Physical audio, licensing and the unwaived GitGuardian
 gate remain open. No public release is qualified.
