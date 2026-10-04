@@ -472,7 +472,30 @@
       "newCompilationExecuted": false,
       "licenseTermsChanged": false,
       "sourcePermissionsAccepted": false,
-      "publicReleaseQualified": false
+      "publicReleaseQualified": false,
+      "hostedValidation": {
+        "sourceRevision": "039b0415ec8326846121069f7a623844e4e8cc94",
+        "runId": 37234399205,
+        "url": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37234399205",
+        "status": "IN_PROGRESS"
+      }
+    },
+    "finiteLicenseReview": {
+      "status": "PASS_AUTHENTICATED_EXPRESSION_CLASSIFICATION_RECOMMENDATIONS_ONLY",
+      "receiptSha256": "9d4e59bffc2a53e5df94db33ff4d1599476682d4c04acba87223f20a6f5a5c55",
+      "distinctActualCppInputs": 2700,
+      "observedSpdxInputs": 2450,
+      "offeredLgplAlternative": 2439,
+      "offeredBsdAlternative": 10,
+      "generatedQmlExceptionCase": 1,
+      "withoutDirectSpdx": 250,
+      "generatedWithoutDirectSpdx": 223,
+      "legacyWithoutDirectSpdx": 27,
+      "allIncludedHeaderLicensesReviewed": false,
+      "finalNoticeApplicabilityApproved": false,
+      "ownerPermissionGranted": false,
+      "releaseQualified": false,
+      "newCompilationOrGuestMutation": false
     }
   },
   "hostedValidation": {

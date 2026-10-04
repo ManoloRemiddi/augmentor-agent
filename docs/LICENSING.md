@@ -35,6 +35,49 @@ licenses and notices.
 
 ## Native UI
 
+### October 4 current source-runtime review scope
+
+The [current checkpoint](../release/qualification/next-targets/20261004-native-upgrade-desktop-ending-checkpoint.json)
+supersedes the earlier entrypoint gap below: all four replacement variants pass
+Desktop and both Browser preference-child paths, with official-runtime restoration
+and normal closure. Graphical Browser acceptance and final distribution review
+remain separate.
+
+Read-only classification of the authenticated correspondence records accounts for
+all 2700 distinct direct and Unity-included CPP inputs to the 72 marked ELF members.
+Of these, 2450 carry one observed SPDX expression:
+
+| Actual source count | Offered alternatives | Recommended review choice |
+| --- | --- | --- |
+| 2439 | Qt commercial, LGPL-3.0-only, GPL-2.0-only or GPL-3.0-only | The offered LGPL-3.0-only alternative |
+| 10 | Qt commercial or BSD-3-Clause | The offered BSD-3-Clause alternative |
+| 1 | Qt commercial or GPL-3.0-only WITH Qt-GPL-exception-1.0 | Review the exact generator-output exception conditions |
+
+The remaining 250 have no direct SPDX expression: 223 generated inputs with
+retained generator/module routes, and 27 legacy inputs. The latter comprise
+one MD4C file, one Chromium-derived libpsl file, 21 MASM files, one generated XCB
+file and three retained hand-edited IBus proxies. Their original headers and
+candidate directory notices remain available. Missing SPDX alone does not choose
+a license or establish a missing source artifact. Headers included by these CPPs
+are outside this finite classification.
+
+These are review recommendations, not changed upstream permissions or final
+artifact approval. The exact retained
+[Qt 6.8.2 LGPL text](https://github.com/qt/qtbase/blob/v6.8.2/LICENSES/LGPL-3.0-only.txt)
+requires notices and license copies, permits a suitable shared-library mechanism,
+and preserves modification and debugging rights. Its installation-information
+requirement is conditional. [Qt's published guidance](https://www.qt.io/development/open-source-lgpl-obligations)
+also covers corresponding-source delivery when its binaries are redistributed.
+The generated Qml grammar needs review against
+[Exception 1](https://github.com/qt/qtbase/blob/v6.8.2/LICENSES/Qt-GPL-exception-1.0.txt).
+The next distribution review must confirm applicable notices, the concrete source
+delivery method and recipient permissions; another compiler run is not required
+to classify these already retained records. The separate
+[22-path recipient-control proposal](RECIPIENT-SOURCE-CONTROLS-LICENSE-PROPOSAL.md)
+still awaits the owner. Application and upstream license terms remain unchanged.
+
+### Earlier source-runtime evidence
+
 The [Linux source-runtime work](LINUX-LGPL-SOURCE-RUNTIME.md) now completes two
 independent source builds and a separately identified runtime candidate. Exact
 source review excludes the unused PySide QtExampleIcons extension and Qt's

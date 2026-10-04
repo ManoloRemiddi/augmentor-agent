@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Current acceptance summary — October 4
+
+Use the [five-point status table](LINUX-DISTRO-ROLLOUT.md#current-five-point-acceptance-status--october-4)
+for completed versus remaining acceptance, and the [finite source-license review](LICENSING.md#october-4-current-source-runtime-review-scope)
+for the actual2700-CPP scope and recommended alternatives. The three active
+graphical fixtures and pending owner/audio decisions remain distinct from the
+completed twelve Noble replacement paths. No additional compiler run or replay
+of a successful installation/close is required by those recorded results.
+
 ## October 4 maintained source evidence tools
 
 The notice collector now includes SPDX-named LICENSES/*.txt files. Its actual
