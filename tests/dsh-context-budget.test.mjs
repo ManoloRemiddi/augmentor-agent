@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {toolContent} from '../adapters/dsh-compat/messages.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
@@ -76,7 +77,7 @@ test('three identical outputs trigger one reassessment without denying authorize
   await h.say();assert.deepEqual(h.errors,[]);assert.equal(h.requests.length,5);
   assert.doesNotMatch(JSON.stringify(h.requests[2].messages),/Repeated-tool checkpoint/);
   assert.match(JSON.stringify(h.requests[3].messages),/Repeated-tool checkpoint/);
-  const notices=h.events().filter(e=>e.type==='user/message'&&e.data.source?.plugin==='augmentor-context-budget');
+  const notices=h.events().filter(e=>e.type==='user/message'&&e.data.source?.kind==='plugin:augmentor-context-budget');
   assert.equal(notices.length,1);assert.match(JSON.stringify(notices),/explicitly requested polling/);
 });
 test('non-Augmentor sessions retain upstream pressure behavior',async t=>{
@@ -97,6 +98,18 @@ test('manual trim repairs existing oversized context without model work or repla
   assert.equal(h.requests.length,2,'manual trimming makes no model request');
   assert.equal(h.events().filter(e=>e.type==='tool/call').length,1,'no tool replay');
   assert.equal(h.events().filter(e=>e.type==='turn/start').length,1,'no follow-up turn');
+  await h.dispose();
+  const f=await h.ctx.sessionPersistence.open('fixture','read');
+  try {
+    const cold=await f.read();assert.ok(cold.events.some(e=>e.type==='tool/result'&&e.surfaceOp?.op==='replace'));
+    if(require('./package.json').version==='0.2.0-rc.2'){
+      const {restoreReleasedV4Artifact}=await load('dsh-session-format-v3-to-v4');
+      const forged={...structuredClone(cold),header:{version:4,id:'fixture',createdAt:1,isSeeded:false,delegationDepth:0},inheritedEventCount:0}, edit=forged.events.find(e=>e.type==='tool/result'&&e.surfaceOp?.op==='replace');
+      edit.data.message.isError=true;
+      assert.throws(()=>restoreReleasedV4Artifact(forged,new Set(forged.events.map(e=>e.type))),/outside an open turn/);
+    }
+  }
+  finally {await f.close();}
 });
 
 
@@ -108,7 +121,7 @@ test('different commands reporting the same error trigger reassessment without d
   assert.match(JSON.stringify(h.requests[3].messages),/Failed-approach checkpoint/);
   assert.match(JSON.stringify(h.requests[3].messages),/incorrect syntax/);
   assert.equal(h.events().filter(e=>e.type==='tool/call').length,4);
-  assert.equal(h.events().filter(e=>e.type==='user/message'&&e.data.source?.plugin==='augmentor-context-budget').length,1);
+  assert.equal(h.events().filter(e=>e.type==='user/message'&&e.data.source?.kind==='plugin:augmentor-context-budget').length,1);
 });
 
 test('many different successful inspections get one advisory progress checkpoint and continue',async t=>{
@@ -118,7 +131,7 @@ test('many different successful inspections get one advisory progress checkpoint
   assert.doesNotMatch(JSON.stringify(h.requests[7].messages),/Progress checkpoint/);
   assert.match(JSON.stringify(h.requests[8].messages),/Progress checkpoint/);
   assert.match(JSON.stringify(h.requests[12].messages),/count alone does not imply failure/);
-  assert.equal(h.events().filter(e=>e.type==='user/message'&&e.data.source?.plugin==='augmentor-context-budget').length,1);
+  assert.equal(h.events().filter(e=>e.type==='user/message'&&e.data.source?.kind==='plugin:augmentor-context-budget').length,1);
 });
 
 test('binary text is withheld before model input, originals retained, excerpts cannot reintroduce it',async t=>{
@@ -128,7 +141,7 @@ test('binary text is withheld before model input, originals retained, excerpts c
   const result=h.requests[1].messages.find(m=>m.role==='tool');
   assert.match(result.content,/Binary-like tool text withheld/);assert.doesNotMatch(result.content,/compressed/);
   const original=h.events().find(e=>e.type==='tool/result'&&e.surfaceOp?.op!=='replace');
-  assert.equal(original.data.message.content[0].content[0].text,binary);
+  assert.equal(toolContent(original.data.message)[0].text,binary);
   assert.equal(excerpt(h.agent.session).results[0].binaryLike,true);
   assert.equal(excerpt(h.agent.session,{seq:original.seq,offset:12,limit:1}).withheld,true);
   const count=h.events().filter(e=>e.type==='compaction/prune').length;

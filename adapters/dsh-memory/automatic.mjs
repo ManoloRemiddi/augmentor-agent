@@ -1,6 +1,7 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {ownsProductSession,profileForSession,profiles} from '../../services/workspaces/profiles.mjs'
 import {profileMemoryCall} from '../../services/workspaces/memory.mjs';
+import {toolContent, toolFailed, fromProducer} from '../dsh-compat/messages.mjs';
 import {randomUUID} from 'node:crypto';
 import {DualMemoryClient} from '../../dist/memory/src/dual.js';
 const allowed=new Set(['augmentor-linux-product','augmentor-browser-product',...profiles().map(p=>p.preset)]);
@@ -37,9 +38,8 @@ export function applyAutomaticMemory(ctx,{createClient=(session,cwd,profile)=>ne
       if(e.type==='tool/call'&&d.name==='resonant_voice_reply')s.voiceCalls.add(d.callId);
       if(e.type==='tool/result'&&s.voiceCalls.has(d.message?.source?.callId)){
         s.voiceCalls.delete(d.message.source.callId);
-        const result=d.message.content?.find(p=>p.type==='tool-result');
-        const content=text(result?.content);
-        if(result&&!result.isError&&content.trim())events.push({id:String(e.seq),role:'assistant',mode:'voice',content,live});
+        const content=text(toolContent(d.message));
+        if(!toolFailed(d.message)&&content.trim())events.push({id:String(e.seq),role:'assistant',mode:'voice',content,live});
       }
     }
     if(events.length)void s.client.append(events);
@@ -64,8 +64,8 @@ export function applyAutomaticMemory(ctx,{createClient=(session,cwd,profile)=>ne
     // log while removing earlier memory payloads from effective model input.
     const session=agent.session;
     const previous=[...session.surface.nodes].map(seq=>session.eventAt(seq)).filter(e=>
-      e?.type==='user/message'&&e.data.source?.kind==='plugin'&&e.data.source.plugin==='augmentor-memory');
-    const message=content=>({id:randomUUID(),role:'user',content:[{type:'text',text:content}],source:{kind:'plugin',plugin:'augmentor-memory'}});
+      e?.type==='user/message'&&fromProducer(e.data.source,'augmentor-memory'));
+    const message=content=>({id:randomUUID(),role:'user',content:[{type:'text',text:content}],source:{kind:'plugin:augmentor-memory'}});
     const active=previous.filter(event=>text(event.data.content)!=='Earlier continuity superseded.');
     if(active.length===1&&text(active[0].data.content)===context)return decision;
     for(const event of active){

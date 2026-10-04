@@ -9,6 +9,7 @@ import {DshMaintenance} from '../adapters/dsh-product/maintenance.mjs'
 
 const require=createRequire(join(process.env.DSH_INSTALL_ROOT||join(homedir(),'.local/node/lib/node_modules/@deepseek-ai/dsh'),'package.json'))
 const load=async name=>import(pathToFileURL(require.resolve('@deepseek-ai/'+name)).href)
+const jobOwner=agent=>require('./package.json').version==='0.2.0-rc.2'?agent.id:agent
 const token='a'.repeat(32),other='b'.repeat(32)
 const flush=()=>new Promise(resolve=>setImmediate(resolve))
 
@@ -60,13 +61,13 @@ test('real DSH existing maintenance and live jobs refuse preparation without can
  assert.throws(()=>control('prepare'),/active work/);assert.equal(aborted,false)
  held.resolve();await task
  const done=Promise.withResolvers();let cancelled=false,started=0
- const id=ctx.jobs.start({kind:'bash',label:'isolated fixture job',owner:agent,
+ const id=ctx.jobs.start({kind:'bash',label:'isolated fixture job',owner:jobOwner(agent),
   run(){started++;return {done:done.promise,cancel(){cancelled=true}}}})
  assert.throws(()=>control('prepare'),/active work/);assert.equal(cancelled,false)
  done.resolve({status:'completed',output:'finished'});await flush()
- assert.equal(ctx.jobs.get(id,agent).status,'completed')
+ assert.equal(ctx.jobs.get(id,jobOwner(agent)).status,'completed')
  control('prepare')
- assert.throws(()=>ctx.jobs.start({kind:'bash',label:'not started',owner:agent,run(){started++}}),/not started/)
+ assert.throws(()=>ctx.jobs.start({kind:'bash',label:'not started',owner:jobOwner(agent),run(){started++}}),/not started/)
  assert.equal(started,1)
 })
 

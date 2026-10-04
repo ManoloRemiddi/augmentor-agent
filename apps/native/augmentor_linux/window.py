@@ -58,7 +58,7 @@ class Window(QWidget):
             def initialize_voice_profile():
                 try:voice_request('preferences')
                 except Exception:pass  # Optional offline voice must not prevent chat.
-        if harness in ('pi','dsh'):
+        if harness in ('pi','dsh','codex'):
             self.preferences.values['harness']=harness;self.preferences.save()
         self.controller=None if preview else Controller(self,harness=self.preferences.values['harness'])
         self.maintenance = WindowMaintenance(self)
@@ -753,7 +753,7 @@ class Window(QWidget):
         if kind=='tool/result':
             reply=data.get('meta',{}).get('resonantVoice') if isinstance(data.get('meta'),dict) else None
             blocks=data.get('message',{}).get('content',[])
-            failed=any(b.get('isError') for b in blocks if isinstance(b,dict))
+            failed=data.get('message',{}).get('isError') is True or any(b.get('isError') for b in blocks if isinstance(b,dict))
             if isinstance(reply,dict) and reply.get('version')==1 and isinstance(reply.get('text'),str) and not failed:
                 self.reasoning_index=None;self.partial=''
                 self.messages.append(('Augmentor',reply['text']))
@@ -768,6 +768,7 @@ class Window(QWidget):
                 self.messages.append(('You',text))
             return bool(text)
         if kind=='command/run':
+            if data.get('source',{}).get('kind')=='plugin:augmentor-execution':return False
             text='/'+data.get('name','')+data.get('args','')
             if text==self.pending_prompt:self.pending_prompt=None
             self.messages.append(('You',text));return True
@@ -1385,7 +1386,7 @@ def _main(startup=None):
     parser.add_argument('--preview', action='store_true', help='Open without connecting to a harness.')
     parser.add_argument('--onboarding-host', action='store_true', help=argparse.SUPPRESS)
     parser.add_argument('--ui-test-control', action='store_true', help=argparse.SUPPRESS)
-    parser.add_argument('--harness', choices=['pi','dsh'], help='Open the shared UI with this harness.')
+    parser.add_argument('--harness', choices=['pi','dsh','codex'], help='Open the shared UI with this harness.')
     parser.add_argument('--instance', type=validate_name, default=current_name(), help='Named independent window (for example secondary); repeated launches toggle that window.')
     args = parser.parse_args()
     configure(args.instance)

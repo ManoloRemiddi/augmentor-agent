@@ -2,6 +2,30 @@
 
 # Start here: agent handoff
 
+## October 4 Codex native launch merge candidate
+
+PR #28 integrates current main and browser/prompt/DSH candidates while preserving
+new platform and admission logic. Its 14 launch/deployment cases and seven voice
+cases pass with type/build checks. [Codex packaging](CODEX-PACKAGING.md#october-4-native-launch-and-deployment-merge-qualification)
+records the corrected test fixture and source boundary. Hosted platform/package
+checks remain the merge gate; installed applications are unchanged.
+
+## October 4 DSH compatibility merge candidate
+
+PR #37 combines current main with the browser-typing and saved-prompt fixes.
+All 80 DSH 0.2 contracts, 96 Browser and 28 focused native cases pass, as do
+type/build checks. [DSH compatibility](DSH-0.2-COMPATIBILITY.md#october-4-integrated-source-merge-qualification)
+records scope; hosted platform/package checks remain the merge gate. Public
+installer pins and installed applications are unchanged.
+The first hosted Linux run found a stale Browser-plugin pnpm lock. Its exact-version
+correction, passing frozen install, 516-case locked-DSH Node suite and real SDK
+proof are recorded in the compatibility guide; fresh hosted validation is required.
+
+## October 3 DSH 0.2 compatibility
+
+[Compatibility and migration](DSH-0.2-COMPATIBILITY.md) records the dual-version plugin contracts, local history bridge, provider/preset migration and Linux deployment scope. All three installed Linux windows now run the recorded compatible artifact; Doctor diagnostics are clean. npm publication lacks authentication; customer installer locks remain separately qualified.
+
+
 ## October 4 saved-prompt Enter merge candidate
 
 PR #11 integrates the current main and browser-typing candidate without code
@@ -408,6 +432,74 @@ Implementation `dffa45c` is pushed in PR #31; the compatible installed Linux
 release is selected and DSH guidance reloaded with idle/readiness checks.
 Primary retains its draft and original UI process; extension file replacement
 is complete but loaded-worker reload remains pending. See the installed checkpoint.
+
+
+
+## October 2: installed Codex development option
+
+The owner-authorized Linux update is selected and running in the primary and
+mobile surfaces: release `20261002-004606-8f44c801`, compatible product 0.2.11,
+artifact SHA-256 `3e89dedc3d701fe66a41bfd0b7ff2558d0aaeb70b76750a9409eac7b0fbf30be`. Both report online/model-ready, voice
+controls available, no session restoration error and no pending update. Secondary
+is absent. Six saved native settings/conversation-selection files remain byte
+identical to their protected rollback copies. No DSH, memory, speech or model
+service was restarted; Qwen/Breeze placement and model settings remain unchanged.
+
+This is an incremental private desktop candidate over artifact
+`9a68b2442a998e0d0bffafc4c37ec8c1a54aa7b712c53c15dfabf664d4157d08`,
+with the reviewed Codex integration through `8796d2b` and deployment corrections
+`aa63d5b`, `d800690` and `dfa0922`. It preserves organized native Settings,
+submission progress, matching DSH integration and existing speech dependencies.
+It is not the complete public 0.2.13 artifact or a new public binary release.
+The prior selection remains available through `augmentor-update rollback`.
+
+Codex CLI 0.159.2 is installed in the documented per-user prerequisite location.
+A separate desktop Python environment supplies keyring 25.6.0 and retains access
+to existing native dependencies; the speech service environment is unchanged.
+Detached Codex receives this interpreter. Candidate checks pass: 265 Codex cases
+(two opt-in real-engine cases skipped), 53 focused native cases and 14 deployment/
+startup cases, plus a real external-CLI synthetic response/reopen proof, actual
+native entrypoint rendering and an isolated native Codex setup using the selected
+interpreter. Browser bridge/loaded Chromium fixture checks pass; the owner's
+installed Browser extension has not been reloaded or qualified by this update.
+
+The first candidate activation failed because a synthetic proof metadata file
+incorrectly marked this developer artifact as a fully installed distro package.
+The package-version guard refused startup; the working selection was restored
+before correction. The replacement preserves the original developer-artifact
+lifecycle and now checks the real native lifecycle during promotion. No guard is
+disabled and neither immutable artifact was edited in place.
+
+To use the development option, open Settings → Connections → Agent engine →
+Codex, then configure a compatible model. The existing DSH selection is retained.
+No owner model request was made for qualification. ChatGPT subscription login is
+still disabled. The owner's session has no active Secret Service and their wallet
+is disabled, so saving API credentials requires an explicitly chosen secure-store
+setup. The local Qwen formatter fix and idle model-service restart also remain
+separate pending choices. This update qualifies the installed harness option,
+not a live owner-provider conversation or physical Codex speech acceptance.
+
+## October 2: Codex Linux deployment preparation
+
+The merged Codex integration requires an external, version-checked Codex CLI
+0.159.2 and an interpreter with the protected OS credential-store dependency.
+Detached native Codex startup now passes the running native interpreter to its
+credential helper, rather than falling back to system Python. Desktop staging
+retains and inventories `distribution-prerequisites.json`.
+
+Explicit native `--harness codex` selection now reaches the selected engine,
+and future maintenance refuses unsent drafts. Focused startup and promotion tests
+pass (14 cases). Preflight now takes the same package lifecycle lease as the native entrypoint.
+The first local candidate was rolled back after a proof-only packaging marker
+triggered the installed package version guard. The corrected candidate retains
+the existing developer-artifact lifecycle; no package guard is disabled. Real
+entrypoint, isolated Codex setup and subsequent activation evidence are recorded
+separately below.
+The owner's compatible 0.2.11 installation requires an incremental candidate that
+preserves its DSH product identity and existing native improvements; replacing it
+with the complete public 0.2.13 artifact is not a compatible update. ChatGPT plan
+login remains disabled, and the local Qwen template change is a separate pending
+model-service operation. No model-service restart is part of this desktop update.
 
 ## October 1 merge blockers: current main and separate Codex prerequisite
 

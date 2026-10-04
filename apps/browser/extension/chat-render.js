@@ -478,6 +478,7 @@ export function createChatUI(els) {
     switch (ev.type) {
       case 'command/run':
       case 'command/done': {
+        if(ev.type==='command/run'&&data.source?.kind==='plugin:augmentor-execution')break
         const text=ev.type==='command/run'?'/'+data.name+(data.args??''):
           (data.text??(data.kind==='success'?'Command completed.':'Command failed.'))
         if(ev.type==='command/run')confirmPrompt(text)
@@ -630,7 +631,7 @@ export function createChatUI(els) {
       }
       case 'tool/result': {
         const reply=data.meta?.resonantVoice
-        const failed=(data.message?.content??[]).some(b=>b?.isError)
+        const failed=data.message?.isError===true||(data.message?.content??[]).some(b=>b?.isError)
         if(reply?.version===1&&typeof reply.text==='string'&&!failed){
           assistantRaw=reply.text
           ensureTextEl()

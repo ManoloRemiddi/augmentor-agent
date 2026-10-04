@@ -32,7 +32,9 @@ def ensure_running(harness='pi'):
         script=project/('dist/codex-runtime/src/main.js' if harness == 'codex' else 'dist/runtime/src/main.js')
         if not node or not script.exists():raise RuntimeError(harness+' runtime is not built. Run npm ci --ignore-scripts and npm run build in the app installation.')
         log=os.open(state/'runtime.log',os.O_WRONLY|os.O_CREAT|os.O_APPEND,0o600)
-        try:child=subprocess.Popen([sys.executable,str(project/'scripts/run-component.py'),'runtime',node,str(script)],cwd=project,stdin=subprocess.DEVNULL,stdout=log,stderr=log,start_new_session=True,env={**os.environ,'PI_TELEMETRY':'0','PI_SKIP_VERSION_CHECK':'1'})
+        env={**os.environ,'PI_TELEMETRY':'0','PI_SKIP_VERSION_CHECK':'1'}
+        if harness == 'codex':env['AUGMENTOR_PYTHON']=sys.executable
+        try:child=subprocess.Popen([sys.executable,str(project/'scripts/run-component.py'),'runtime',node,str(script)],cwd=project,stdin=subprocess.DEVNULL,stdout=log,stderr=log,start_new_session=True,env=env)
         finally:os.close(log)
         until=time.monotonic()+60
         while time.monotonic()<until:

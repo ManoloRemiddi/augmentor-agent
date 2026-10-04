@@ -2,6 +2,7 @@
 import importlib.util
 import json
 import os
+import sys
 from pathlib import Path
 import tempfile
 import unittest
@@ -29,6 +30,26 @@ class DeploymentTests(unittest.TestCase):
         self.check=patch.object(self.tool,'check');self.mock_check=self.check.start();self.addCleanup(self.check.stop)
 
     def stage(self):return self.tool.stage(self.source,'tested-fixture')
+
+    def test_real_preflight_checks_the_same_package_lease_as_native_startup(self):
+        (self.source/'apps/native/augmentor_linux/window.py').write_text('# --ensure-running\n')
+        (self.source/'apps/native/augmentor_linux/controller.py').write_text('# fixture\n')
+        lifecycle=self.source/'services/lifecycle';lifecycle.mkdir(parents=True)
+        (lifecycle/'lease.py').write_text('def hold(component):\n    assert component == "desktop"\n    raise RuntimeError("Fixture package version mismatch")\n')
+        config=dict(self.selected,python=sys.executable)
+        self.check.stop()
+        try:
+            with self.assertRaisesRegex(RuntimeError,'Fixture package version mismatch'):self.tool.check(config)
+        finally:self.check.start()
+
+    def test_staging_retains_and_verifies_external_runtime_prerequisites(self):
+        prerequisite=self.source/'distribution-prerequisites.json'
+        prerequisite.write_text('[{"name":"@openai/codex","version":"0.159.2","bundled":false}]')
+        release=self.stage()
+        self.assertEqual((release/prerequisite.name).read_bytes(),prerequisite.read_bytes())
+        self.assertIn(prerequisite.name,self.tool.verify(release)['files'])
+        (release/prerequisite.name).write_text('[]')
+        with self.assertRaisesRegex(ValueError,'changed after staging'):self.tool.activate(release)
 
     def test_staging_is_separate_and_preserves_selection(self):
         (self.source/'apps/browser/plugin/dist').mkdir(parents=True)

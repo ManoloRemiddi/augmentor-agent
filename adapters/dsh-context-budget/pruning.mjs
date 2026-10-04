@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {toolContent, withToolContent} from '../dsh-compat/messages.mjs';
 
 const browserReads = new Set(['browser_snapshot', 'browser_tabs_list']);
 
@@ -16,7 +17,7 @@ export function pruneToolContext(session, pruner, tokenMeter, {preserveFreshBrow
   for (const seq of [...session.surface.nodes]) {
     const event = session.eventAt(seq);
     if (event?.type !== 'tool/result') continue;
-    const result = event.data.message.content[0];
+    const result = {content: toolContent(event.data.message)};
     const before = pruner.measureContent(result.content);
     const tool = calls.get(event.data.message.source.callId);
     if (preserveFreshBrowser && event.surfaceOp?.op !== 'replace' && seq > requestSeq &&
@@ -32,7 +33,7 @@ export function pruneToolContext(session, pruner, tokenMeter, {preserveFreshBrow
     // Keep the configured budget even if an installation chooses tiny limits.
     const room = Math.max(0, pruner.config.thresholdChars - pruner.measureContent(content));
     content = [{type: 'text', text: Array.from(notice).slice(0, room).join('')}, ...content];
-    const message = {...event.data.message, content: [{...result, content}]};
+    const message = withToolContent(event.data.message, content);
     session.append('compaction/prune', {shadowedRange: {start: seq, end: seq}, shadowedSeqs: [seq],
       shadowedTokenCount: tokenMeter.estimateMessage(event.data.message)});
     const replacement = session.append('tool/result', {...event.data, message}, {

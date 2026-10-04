@@ -2,6 +2,9 @@
 
 # Source baselines and migration inventory
 
+See [DSH 0.2 compatibility](DSH-0.2-COMPATIBILITY.md) for the separately qualified Linux upgrade and temporary history bridge.
+
+
 ## Embedded Handy — 2 October 2026
 
 [Handy v0.9.7](https://github.com/cjpais/Handy/tree/05e0aedd2906f0d82722735f930465950c476b90)

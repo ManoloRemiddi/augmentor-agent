@@ -243,3 +243,21 @@ migration/rollback remain open. `2641227` passed both Mac jobs and Debian applic
 credential/Home checks; Debian packaging still stops at the same unreviewed Codex
 executable notice gate. The installed app, private Resonant Voice source and live
 Qwen/Breeze services are unchanged.
+
+## October 4 native launch and deployment merge qualification
+
+PR #28 incorporates canonical main `d93eb49` and the qualified-source candidates
+for browser typing, saved-prompt Enter and DSH compatibility (`00069dd`, `3148760`,
+`99fe90c`). The native launch argument retains Codex selection and the detached
+credential helper uses the selected native interpreter. Linux staging now retains
+external prerequisite metadata and preflight exercises the same package lease
+as native startup. These changes preserve current platform adapters, tracked
+voice initialization and admission/lifetime fixes.
+
+The old socket test patched `socket.socket`, which no longer substitutes the
+shared `LocalSocket` class. Its fixture now supplies that abstraction and a
+running child explicitly; interpreter/command/environment assertions are retained.
+All 14 native launch/deployment cases, all seven Codex voice cases, and type/build
+checks pass. Hosted platform/package validation remains the merge gate. The
+earlier voice assertion failure is historical, not waived by this local result.
+No installed selection, runtime configuration or public download changes here.

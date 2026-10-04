@@ -14,6 +14,13 @@ class VoiceDeliveryTests(unittest.TestCase):
         event['seq']=902;event['data']['message']['content'][0]['isError']=True
         self.assertFalse(w.fold_event(event));w.close()
 
+    def test_v4_failed_voice_result_is_not_an_assistant_reply(self):
+        w=Window(preview=True)
+        event={'seq':903,'type':'tool/result','data':{'meta':{'resonantVoice':{'version':1,'text':'Must not appear.'}},'message':{'role':'tool','isError':True,'content':[{'type':'text','text':'failed'}]}}}
+        self.assertFalse(w.fold_event(event))
+        self.assertNotIn(('Augmentor','Must not appear.'),w.messages)
+        w.close()
+
     def test_mixed_prose_and_voice_tool_has_one_authoritative_reply(self):
         for tool in ['resonant_voice_reply','resonant_voice_demo']:
             w=Window(preview=True)
