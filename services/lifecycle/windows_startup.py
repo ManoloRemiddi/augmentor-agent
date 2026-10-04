@@ -47,11 +47,6 @@ class Startup:
         self.maintenance = maintenance
         self.path = Path(runtime if runtime is not None else runtime_directory())/'startup.lock'
         self.fd = private_file_descriptor(self.path, writable=maintenance, create=True, share_write=False)
-        if not maintenance:
-            try:
-                from .windows_pending import require_clear
-                require_clear(self.path.parent)
-            except BaseException:self.close();raise
 
     def ready(self):
         if self.maintenance: raise RuntimeError('A maintenance gate cannot become an application startup.')

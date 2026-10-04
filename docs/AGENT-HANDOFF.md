@@ -33,6 +33,14 @@ deferral, drain, pending-start refusal and verified reopening; full results rema
 pending in [37169658310](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37169658310)
 at `c8b73e3`, and its same-build synthetic catalog does not prove signed forward updates.
 
+The full x64 job now fails after actual broker capture deferral, normal drain,
+replacement and pending-target refusal: the blanket startup pending check also
+blocked read-only target-health observation. The correction restores the kernel
+startup primitive to exclusion only, while normal installed lifetime admission
+retains persistent refusal. ARM64 is still live at this record; fresh full/native
+qualification is required after the correction. See the owning failed/corrected
+scope in UPDATE-SYSTEM.md. No production flag or owner state was changed.
+
 ## Corrected native Linux checkpoint — October 4, full goal still active
 
 Source `0bc9639` is committed/pushed. Focused native

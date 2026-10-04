@@ -154,7 +154,11 @@ class WindowsBrokerTests(unittest.TestCase):
         child=self.start();_out,error=child.communicate(timeout=10)
         self.assertNotEqual(child.returncode,0);self.assertIn(b'unfinished Augmentor update',error)
         self.assertEqual(pending.read_bytes(),b'');self.assertFalse(discover_dictation(self.project,self.runtime))
-        with self.assertRaisesRegex(RuntimeError,'unfinished'):Startup(self.runtime)
+        # Read-only health retains startup exclusion while inspecting pending
+        # bytes. Normal installed admission separately checks its lifetime lease.
+        from lifecycle.windows_pending import require_clear
+        with Startup(self.runtime):
+            with self.assertRaisesRegex(RuntimeError,'unfinished'):require_clear(self.runtime)
         with Startup(self.runtime,maintenance=True):pass  # Recovery can observe while work remains fenced.
         self.immutable()
 

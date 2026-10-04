@@ -1728,10 +1728,16 @@ cross-platform goal remains active; this passing checkpoint is not completion.
 The persistent broker now takes the Windows startup reader through publication of
 both authenticated ordinary RPC and maintenance readiness, and holds the shared
 installation lease until normal process exit, including when capture is disabled.
-All Python Windows startups refuse any entry at the private persistent
+Normal installed Python Windows admission refuses any entry at the private persistent
 `updates/active.json` before ordinary admission; malformed/empty entries remain
 untouched. Maintenance writers may still observe recovery. The old runtime
 maintenance marker remains a separate refusal.
+
+The kernel startup reader itself only supplies exclusion; fixed read-only health
+actions can retain it while inspecting a pending update. Normal installed
+components check persistent refusal when acquiring their lifetime lease under
+startup admission. This avoids a general pending-update bypass option and keeps
+offline target-health/recovery inspection possible.
 
 Windows session names now use the process's actual login/RDS session through
 [Microsoft's ProcessIdToSessionId](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-processidtosessionid).
@@ -1812,6 +1818,20 @@ The extended full Inno fixture at `c8b73e3` is running separately in
 Only that completed result can qualify its real installer interaction; the desktop
 run does not qualify replacement, completed-target health, signed forward updates
 or user-profile deployments. No production flag or owner installation changed.
+
+### Full Windows health-boundary correction after c8b73e3
+
+The extended full x64 fixture in run 37169658310 reaches actual installed broker
+observation, busy microphone-owner deferral, graph drain/normal exit, replacement
+and target-broker pending refusal. It then fails because the new blanket check in
+`windows_startup.Startup` also refuses the existing read-only pending-target health
+observer. This is an implementation regression, not production qualification.
+The correction keeps persistent refusal in normal installed lifetime admission,
+and restores the startup primitive's exclusion-only contract. The native broker
+test now explicitly confirms read-only admission can observe pending bytes while
+normal installed broker startup remains blocked. A new full two-CPU run must
+qualify all completion/reopening/recovery stages after this correction. ARM64 is
+still running at this record; do not infer its result from x64.
 
 All public signing/feed/automatic-install/distribution flags remain false. The
 remaining package/global-user, shared Mac/Companion, SDK owner teardown,
