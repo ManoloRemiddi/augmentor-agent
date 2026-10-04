@@ -1864,3 +1864,16 @@ All public signing/feed/automatic-install/distribution flags remain false. The
 remaining package/global-user, shared Mac/Companion, SDK owner teardown,
 interrupted recovery/retention, actual desktop/DSH, signed forward and legacy bridge
 gates remain. No owner installation, private profile, model or GPU was changed.
+
+### Generic Windows login-session admission
+
+Generic Windows participants now also compare the pipe peer's actual process login
+session with the coordinator's session before sending any request. A different
+session of the same SID defers, including idle windows/background components;
+captured windows are never silently closed in one login and reopened in another.
+The native retained-broker case simulates a different kernel session result,
+requires prepare to refuse, then checks the real broker stayed ready without a
+reservation. This tests the pre-send boundary with an actual process/pipe, not a
+second real RDS login. A fresh native/full run must qualify this follow-up; the
+currently running `c40926b` installer run predates this added guard. Production
+flags and owner installations remain unchanged.

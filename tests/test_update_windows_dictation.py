@@ -114,6 +114,13 @@ class WindowsBrokerTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError,'busy'):
                 dictation.request('conversation.acquire',{'token':'c'*32,'pid':os.getpid()},start=False)
             dictation.request('conversation.release',{'token':'b'*32},start=False)
+            # Real pipe/process, synthetic alternate kernel session. Refuse
+            # before prepare, even when ordinary replies omit login identity.
+            with patch('platform_adapters.windows_identity.process_session_id',
+                    side_effect=lambda pid=None:100 if pid is None else 101):
+                with self.assertRaisesRegex(ValueError,'another Windows login session'):
+                    peer.control('prepare','a'*48)
+            self.assertEqual(peer.control('status')['phase'],'ready')
             with Reservations(keepalive=False) as group:
                 group.prepare(peer)
                 with self.assertRaises(RuntimeError):dictation.request('enable',{'enabled':True},start=False)

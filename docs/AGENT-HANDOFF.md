@@ -2,6 +2,13 @@
 
 # Start here: agent handoff
 
+Generic Windows maintenance now additionally defers another login session of the
+same user before sending any request, so captured windows cannot reopen into the
+wrong login. The actual retained-broker case checks synthetic alternate-session
+refusal leaves real admission ready. Native/full qualification is pending for
+this follow-up; the running `c40926b` full run predates this guard. See the owning
+UPDATE-SYSTEM.md section; no production flag or owner state changed.
+
 ## Windows persistent dictation coordination — October 4, candidate
 
 The updater now discovers the persistent Windows broker through its private
