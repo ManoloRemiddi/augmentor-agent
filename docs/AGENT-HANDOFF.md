@@ -42,8 +42,11 @@ preservation and the independent ending pass. A separate read-only inspection
 confirms the fixture skipped declared complete-setup dependencies: npm,
 python3-pip and portaudio are absent. A matching preparing receipt and staged
 DSH lock/plugins remain, with no settings/selector/history. The supported normal
-resume is held for an authenticated dependency transaction; managed stage and
-activation have not run.
+resume is held for an authenticated dependency transaction. A separate normal
+six-primitive preview selects only 19 additions, including the default npm
+command, with no upgrade/removal. All 19 archives pass actual Fedora signature,
+hash/size/identity checks. Installation, managed stage and activation have not
+run.
 GUI input acceptance still requires a genuine unlocked session; no lock-policy
 change, forced daemon stop or package replay occurred.
 
@@ -71,14 +74,22 @@ continuation now passes: every timestamp equals exact source time truncated to
 seconds, every other portable field matches, both source trees stay byte-exact,
 and all 72 native members authenticate from the two archives. The first archive
 was reused; one second-tree copy exits0. Original nanosecond metadata is retained
-separately; restoration and normal replacement remain open. The original failed
+separately. A host-only derivation now verifies all 602 extracted post-build
+entries, restores their nanosecond mtimes and explicitly maps fixture ownership
+to the private host workspace. All 72 donor ELFs and the three intended marker
+strings authenticate; this does not establish actual loaded replacements. The
+original failed
 export record stays intact and no process interruption occurred. A clean d6
 Noble diagnostic candidate now passes all five dependency,
 source-check, build, package and artifact-review commands. A separate read-only
 completion audit binds the actual outputs after the runner's receipt filename
 collisions. The original failures remain intact; no completed command was
 repeated. This candidate uses the existing official Qt runtime and has not been
-installed; marked-runtime replacement remains open.
+installed; marked-runtime replacement remains open. A fresh offline APT
+admission now passes against authenticated retained metadata: 611 repository
+additions plus two application packages, zero upgrades/removals, all original
+410 compiler package versions preserved. The exact six complete-setup primitives
+are included. Signed dependency acquisition precedes native installation.
 [Hosted validation37219196306](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37219196306)
 passes all11 jobs atd6c2d3c. Physical audio, licensing and the unwaived GitGuardian
 gate remain open. No public release is qualified.

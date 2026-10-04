@@ -122,7 +122,14 @@
     "completeInstallerDependencyDiagnosisReceiptSha256": "6ecb1db9c3ff43da9803c17cb42ac9c5f8734a0bd6475000e82bbf13d74a07f6",
     "partialSetupState": "MATCHING_PREPARING_NORMAL_RESUME_SUPPORTED",
     "partialSetupReceiptSha256": "92495c75857f76821fb054fc6f150cc51384fb846df1b41684132beaae81731d",
-    "completeSetupDependenciesInstalled": false
+    "completeSetupDependenciesInstalled": false,
+    "completeSetupDependencyPreview": "PASS_NORMAL_SIX_PRIMITIVE_PLAN",
+    "proposedCompleteSetupDependencyAdditions": 19,
+    "proposedCompleteSetupDependencyRemovals": 0,
+    "proposedCompleteSetupDependencyUpgrades": 0,
+    "authenticatedCompleteSetupDependencyArchives": 19,
+    "authenticatedCompleteSetupDependencyArchiveBytes": 42663494,
+    "completeSetupDependencyAuthenticationReceiptSha256": "93c5f73b6289757bb70baee7ecacaf888cf596f660a201c1ffc3feff4250106b"
   },
   "gnome50": {
     "nativeProtectedCacheExtensionAndPointersAudit": "PASS",
@@ -241,7 +248,23 @@
     "secondRawArchiveMembers": 602,
     "secondRawArchiveSubsecondMtimeTransportChanges": 602,
     "nativeMembersAuthenticatedFromArchives": 72,
-    "sourceBuildTreesBeforeAndAfter": "BYTE_EXACT"
+    "sourceBuildTreesBeforeAndAfter": "BYTE_EXACT",
+    "hostNativeDonorDerivation": "PASS",
+    "hostNativeDonorDerivationReceiptSha256": "67e4c975ba403dcacd15d82aa9de11b5dd528c36ee8a648b24b97e76c73e8162",
+    "hostNativeDonorDerivationSourceSha256": "1f39e5b910bc1199edd4376feb470f87c6f87fe493d17650d15225a8c657b24b",
+    "hostNativeDonorFocusedTestsPass": 10,
+    "hostNativeDonors": 72,
+    "builtMarkerBytesAuthenticated": 3,
+    "hostDerivedNanosecondMtimeRestored": true,
+    "hostDerivedOwnershipMapping": {
+      "sourceUid": 1001,
+      "sourceGid": 1001,
+      "hostUid": 1000,
+      "hostGid": 1000
+    },
+    "hostDerivedSourceIdentityRestored": false,
+    "recipientPrefixesCreated": false,
+    "secondRawArchiveBytes": 192485888
   },
   "hostedValidation": {
     "sourceRevision": "d6c2d3ca64e3d3950a05386d12e5a3fb95f764b6",
@@ -266,6 +289,17 @@
     "desktopDebSha256": "28b54e3c49c6d54cbbbcf0ce84a5a16eeb0b179452c94d1fe182998d48bcffd9",
     "originalRunnerFileNamingFailuresPreserved": true,
     "completedCommandsReplayed": false,
-    "markedExportUsed": false
+    "markedExportUsed": false,
+    "offlineActualAptAdmission": "PASS",
+    "offlineActualAptAdmissionReceiptSha256": "04b6b3b57cb05f84edeeab213ffa006275279cce9b8cce345843e4dca214a22e",
+    "offlineActualAptAdmissionImage": "sha256:78d4632a044332d902458674e481e8e2a482f9f5fb4699389573dbc0631c4b95",
+    "existingCompilerPackages": 410,
+    "existingCompilerPackageVersionsChanged": 0,
+    "proposedRepositoryDependencyAdditions": 611,
+    "proposedApplicationPackageAdditions": 2,
+    "proposedRemovals": 0,
+    "proposedUpgrades": 0,
+    "completeSetupDependenciesIncluded": true,
+    "repositoryDependenciesInstalled": false
   }
 }
