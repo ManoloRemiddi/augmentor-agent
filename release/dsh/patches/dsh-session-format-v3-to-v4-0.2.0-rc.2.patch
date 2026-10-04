@@ -1,0 +1,54 @@
+--- a/lib/index.js
++++ b/lib/index.js
+@@ -617,7 +617,23 @@
+ 	}
+ 	tool(event, data) {
+ 		if (event.type === "tool/result" && event["surfaceOp"] !== "append") {
+-			this.requireTurn(event.type);
++			// Augmentor's idle /trim-tools replaces one saved result without executing
++			// a tool or opening a model turn. Admit only that provenance-checked edit.
++			if (this.turn === null) {
++				const op = event["surfaceOp"];
++				const prior = this.artifact.events[op?.startSeq];
++				const prune = this.artifact.events[event.seq - 1];
++				const message = data["message"];
++				const before = prior?.data?.message;
++				const metadata = value => Object.fromEntries(Object.entries(value ?? {}).filter(([key]) => key !== "content"));
++				const idleEdit = op?.op === "replace" && op.startSeq === op.endSeq && prior?.type === "tool/result" &&
++					isDeepStrictEqual(event["sourceEventSeqs"], [prior.seq]) && prune?.type === "compaction/prune" &&
++					isDeepStrictEqual(prune.data["shadowedSeqs"], [prior.seq]) &&
++					isDeepStrictEqual(prune.data["shadowedRange"], {start: prior.seq, end: prior.seq}) &&
++					data["turn"] === prior.data.turn && data["step"] === prior.data.step &&
++					isDeepStrictEqual(metadata(message), metadata(before));
++				if (!idleEdit) this.requireTurn(event.type);
++			}
+ 			return;
+ 		}
+ 		this.requireStep(event, data);
+@@ -1441,6 +1457,7 @@
+ 	nextSeq = 0;
+ 	time;
+ 	foreignDeliverySeq;
++	augmentorCommandRuns = new Set();
+ 	constructor(input, children) {
+ 		this.input = input;
+ 		this.candidates = children.map(childCatalogSource).sort((left, right) => left["childCreatedAt"] - right["childCreatedAt"] || (left["childId"] === right["childId"] ? 0 : left["childId"] < right["childId"] ? -1 : 1));
+@@ -1451,6 +1468,18 @@
+ 	}
+ 	transformEvent(event, context) {
+ 		if (event.seq !== this.mapping.length) throw new SessionFormatError("V3 source events must be dense");
++		// Compatibility for the legacy Augmentor UI status producer. Retain the
++		// original completion and use this stage's reference remapping for the
++		// missing lifecycle opener; no tool, user or model message is fabricated.
++		if (event.type === "command/run") this.augmentorCommandRuns.add(event.data.commandId);
++		if (event.type === "command/done" && !this.augmentorCommandRuns.has(event.data.commandId) &&
++			Object.keys(event.data).every(key => ["commandId", "kind", "text"].includes(key)) &&
++			/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(event.data.commandId) &&
++			["success", "error"].includes(event.data.kind) && typeof event.data.text === "string" && event.data.text.startsWith("Harness: ")) {
++			this.augmentorCommandRuns.add(event.data.commandId);
++			context.emitEvent({type: "command/run", seq: this.nextSeq++, time: event.time,
++				data: {commandId: event.data.commandId, name: "augmentor-harness-notice", source: {kind: "plugin:augmentor-execution"}}});
++		}
+ 		const interrupted = this.observeRestart(event);
+ 		if (interrupted !== void 0) context.emitEvent({
+ 			type: "turn/end",

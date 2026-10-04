@@ -10,7 +10,7 @@ export const name = 'augmentor-execution';
 export const inject = ['tools'];
 const presets = new Set(['augmentor-linux-product', 'augmentor-browser-product']);
 const owned = agent => ownsProductSession(agent.session.header);
-const source = {kind:'plugin', plugin:name};
+const source = {kind:`plugin:${name}`} ;
 const message = text => ({id:randomUUID(), role:'user', source, content:[{type:'text', text}]});
 
 export function policy(raw = {}) {
@@ -58,7 +58,9 @@ export function install(ctx, c, {now=Date.now, persist=save} = {}) {
   const notice=(agent,s,text) => {
     // Standard UI-only status record: no invented model response, no extra
     // model context and no ingestion into long-term conversational memory.
-    agent.session.append('command/done',{commandId:randomUUID(),
+    const commandId=randomUUID();
+    agent.session.append('command/run',{commandId,name:'augmentor-harness-notice',source:{kind:'plugin:augmentor-execution'}});
+    agent.session.append('command/done',{commandId,
       kind:s.outcome==='incomplete'?'error':'success',text:'Harness: '+text});
   };
   const exhausted=s => s.recoveryAt && (now()-s.recoveryAt>=c.recoveryMaxMs || s.recoverySteps>=c.recoveryMaxSteps);
@@ -212,5 +214,5 @@ export function install(ctx, c, {now=Date.now, persist=save} = {}) {
   });
   ctx.on('agent/status',({agent,status})=>{const s=states.get(agent.id);if(s&&status==='idle'){clearTimeout(s.timer);s.timer=undefined;}});
   ctx.on('agent/disposed',({agent})=>{const s=states.get(agent.id);clearTimeout(s?.timer);s?.removeAbort?.();states.delete(agent.id);});
-  ctx.on('dispose',()=>{for(const s of states.values()){clearTimeout(s.timer);s.removeAbort?.();}states.clear();});
+  ctx.effect(()=>()=>{for(const s of states.values()){clearTimeout(s.timer);s.removeAbort?.();}states.clear();},'augmentor-execution: timers');
 }

@@ -1,0 +1,15 @@
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+# Source and provenance hashes must not depend on the checkout's operating system.
+* text=auto eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.qsb -text
+*.tgz -text
+*.wasm -text
+*.png -text
+*.jpg -text
+*.ico -text
+*.icns -text
+# Preserve reviewed supplier bytes and checksum-pinned notices on every OS.
+components/handy/** -text
+LICENSE -text

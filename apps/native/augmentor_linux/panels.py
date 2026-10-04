@@ -126,6 +126,10 @@ class LicensesDialog(QDialog):
                      ('GPL version 3 (incorporated by LGPL)', root / 'licenses/GPL-3.0.txt')]
         for file in sorted((root / 'licenses/upstream').glob('*.txt')):
             documents.append((file.stem, file))
+        handy=root/'licenses/handy'
+        if not handy.exists():handy=root/'components/handy/runtime/notices'
+        for label,name in [('Handy · MIT','Handy-MIT.txt'),('Silero VAD · MIT','Silero-v4-MIT.txt'),('ONNX Runtime · MIT','onnxruntime/LICENSE'),('ONNX Runtime third-party notices','onnxruntime/ThirdPartyNotices.txt'),('Linux input helper · AGPLv3','ydotool/LICENSE')]:
+            if (handy/name).is_file():documents.append((label,handy/name))
         for label, _ in documents: choices.addItem(label)
         def select(index):
             file = documents[index][1]
@@ -155,6 +159,10 @@ class SettingsDialog(QDialog):
         voice=QPushButton('Resonant Voice')
         voice.clicked.connect(lambda:VoiceSettingsDialog(window).exec())
         layout.addWidget(voice)
+        from .dictation_settings import DictationSettingsDialog
+        dictation=QPushButton('System dictation · Handy')
+        dictation.clicked.connect(lambda:DictationSettingsDialog(window).exec())
+        layout.addWidget(dictation)
         layout.addWidget(settings_label('Harness','harness',window.accent))
         engine=QComboBox();engine.addItem('Pi','pi');engine.addItem('DSH','dsh');engine.addItem('Codex (development)','codex')
         engine.setCurrentIndex(engine.findData(getattr(window.controller,'harness','pi')))

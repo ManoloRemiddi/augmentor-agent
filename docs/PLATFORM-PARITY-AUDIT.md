@@ -2,6 +2,13 @@
 
 # One Augmentor product across operating systems
 
+The October 2 [embedded Handy integration](HANDY-INTEGRATION.md) implements one
+dictation UI/behavior contract with native keyboard/input adapters, Linux portal
+consent and per-platform component packaging. Native component CI is distinct
+from physical OS acceptance. Complete Windows installer convergence remains
+tracked in the public Windows application work; Linux compositor and Mac
+permissions qualification must not be inferred from virtual audio/consent tests.
+
 ## Decision — 26 September 2026
 
 Augmentor is one product. Linux and macOS must implement the same applicable

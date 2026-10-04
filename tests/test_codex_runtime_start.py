@@ -24,8 +24,9 @@ class CodexRuntimeStartTests(unittest.TestCase):
             probe=Mock();probe.__enter__=Mock(return_value=probe);probe.__exit__=Mock(return_value=False)
             probe.connect.side_effect=[FileNotFoundError(),FileNotFoundError(),None]
             with patch.dict(os.environ,{'AUGMENTOR_CODEX_STATE':str(state),'AUGMENTOR_CODEX_NODE':'/selected/node','AUGMENTOR_PYTHON':'/obsolete/python'}), \
-                 patch.object(runtime_start.socket,'socket',return_value=probe), \
+                 patch.object(runtime_start,'LocalSocket',return_value=probe), \
                  patch.object(runtime_start.subprocess,'Popen') as spawn:
+                spawn.return_value.poll.return_value=None
                 runtime_start.ensure_running('codex')
             env=spawn.call_args.kwargs['env']
             self.assertEqual(env['AUGMENTOR_PYTHON'],runtime_start.sys.executable)

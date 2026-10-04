@@ -253,6 +253,9 @@ export function createChatUI(els) {
   let assistantTimer = null // frameOr() handle
   let reasoningEl = null
   let reasoningRaw = ''
+  let reasoningActive = false
+  // Standalone behavior remains unchanged until its own settings update lands.
+  let expandThinking = null
   let reasoningTimer = null // frameOr() handle
   let maxSeq = -1
   const pendingPrompts = new Set()
@@ -392,7 +395,15 @@ export function createChatUI(els) {
     })
   }
 
+  function finishThinking() {
+    if (!reasoningActive) return
+    renderReasoningNow()
+    if (expandThinking !== null && reasoningEl) reasoningEl.open = false
+    reasoningActive = false
+  }
+
   function flushAssistant() {
+    finishThinking()
     cancelFrame(assistantTimer)
     cancelFrame(reasoningTimer)
     assistantTimer = null
@@ -467,6 +478,7 @@ export function createChatUI(els) {
     switch (ev.type) {
       case 'command/run':
       case 'command/done': {
+        if(ev.type==='command/run'&&data.source?.kind==='plugin:augmentor-execution')break
         const text=ev.type==='command/run'?'/'+data.name+(data.args??''):
           (data.text??(data.kind==='success'?'Command completed.':'Command failed.'))
         if(ev.type==='command/run')confirmPrompt(text)
@@ -532,13 +544,18 @@ export function createChatUI(els) {
       case 'assistant/chunk': {
         const c = data.chunk
         if (c.type === 'text-delta') {
+          finishThinking()
           ensureTextEl()
           assistantRaw += c.text
           renderAssistant()
         } else if (c.type === 'reasoning-delta') {
           makeThinkBlock()
+          if (!reasoningActive && expandThinking !== null) reasoningEl.open = expandThinking
+          reasoningActive = true
           reasoningRaw += c.text
           renderReasoning()
+        } else if (['reasoning-end', 'tool-call-start', 'tool-call-delta'].includes(c.type)) {
+          finishThinking()
         } else if (c.type === 'usage' && c.usage) {
           // mid-stream usage (some providers); final assistant/message wins
         }
@@ -614,7 +631,7 @@ export function createChatUI(els) {
       }
       case 'tool/result': {
         const reply=data.meta?.resonantVoice
-        const failed=(data.message?.content??[]).some(b=>b?.isError)
+        const failed=data.message?.isError===true||(data.message?.content??[]).some(b=>b?.isError)
         if(reply?.version===1&&typeof reply.text==='string'&&!failed){
           assistantRaw=reply.text
           ensureTextEl()
@@ -650,6 +667,7 @@ export function createChatUI(els) {
         break
       }
       case 'turn/end': {
+        finishThinking()
         break
       }
       default:
@@ -740,10 +758,16 @@ export function createChatUI(els) {
       return maxSeq
     },
     setState(state) {
+      if (state.running === false) finishThinking()
       ui.state = { ...ui.state, ...state }
       updateChrome()
     },
     applyLog,
+    setThinkingPreference(expanded) {
+      const next = expanded !== false
+      if (next !== expandThinking && reasoningActive && reasoningEl) reasoningEl.open = next
+      expandThinking = next
+    },
     pendingPrompt(text) {
       const node = el('div', 'msg user pending')
       node.append(el('span', 'who', 'You · Sending…'), el('div', 'userbody', text))

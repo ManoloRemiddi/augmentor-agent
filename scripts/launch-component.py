@@ -10,13 +10,18 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def configure():
+def configure(*, windows_paths=None):
     sys.dont_write_bytecode = True
     os.environ['PYTHONDONTWRITEBYTECODE'] = '1'
-    python = ROOT/'python/bin/python3'
-    node = ROOT/'node/bin/node'
-    os.environ.setdefault('AUGMENTOR_PYTHON', str(python) if python.exists() else sys.executable)
-    if node.exists():os.environ.setdefault('AUGMENTOR_PI_NODE', str(node))
+    os.environ['PYTHONUTF8'] = '1'
+    python = ROOT/('python/python.exe' if sys.platform=='win32' else 'python/bin/python3')
+    node = ROOT/('node/node.exe' if sys.platform=='win32' else 'node/bin/node')
+    if sys.platform == 'win32':
+        os.environ['AUGMENTOR_PYTHON'] = str(python)
+        os.environ['AUGMENTOR_PI_NODE'] = str(node)
+    else:
+        os.environ.setdefault('AUGMENTOR_PYTHON', str(python) if python.exists() else sys.executable)
+        if node.exists():os.environ.setdefault('AUGMENTOR_PI_NODE', str(node))
     bins = [str(Path(os.environ['AUGMENTOR_PYTHON']).parent)]
     if node.exists():bins.insert(0, str(node.parent))
     dsh = ROOT/'dsh/node_modules/.bin'
@@ -24,6 +29,20 @@ def configure():
     os.environ['PATH'] = os.pathsep.join([*bins, os.environ.get('PATH', os.defpath)])
     os.environ.setdefault('PI_TELEMETRY', '0')
     os.environ.setdefault('PI_SKIP_VERSION_CHECK', '1')
+    if sys.platform == 'win32':
+        sys.path.insert(0, str(ROOT/'services'))
+        from platform_adapters.paths import windows_environment
+        # Product entrypoints use OS-verified paths. Tests of services can still
+        # use explicit private fixture roots without running this entrypoint.
+        os.environ.update(windows_environment() if windows_paths is None else windows_paths)
+        os.environ['RESONANT_VOICE_HOME'] = str(Path(os.environ['XDG_CONFIG_HOME'])/'resonant-voice')
+        os.environ['AUGMENTOR_PI_SOCKET'] = str(Path(os.environ['XDG_RUNTIME_DIR'])/'pi.sock')
+        powershell = ROOT/'powershell/pwsh.exe'
+        if powershell.exists():
+            os.environ['AUGMENTOR_PWSH'] = str(powershell)
+            os.environ['PATH'] = str(powershell.parent)+os.pathsep+os.environ['PATH']
+        cli = ROOT/'dsh/node_modules/@deepseek-ai/dsh/lib/bin.js'
+        if cli.exists():os.environ['AUGMENTOR_DSH_CLI'] = str(cli)
     if sys.platform == 'darwin':
         base = Path.home()/'Library/Application Support/Augmentor'
         for key, child in [('XDG_CONFIG_HOME','config'),('XDG_DATA_HOME','data'),('XDG_STATE_HOME','state')]:

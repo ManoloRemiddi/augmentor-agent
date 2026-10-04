@@ -48,6 +48,14 @@ The browser orb's context menu opens that section. Playback and capture use the
 companion's operating-system audio devices; there is no second browser microphone
 permission path. Explicit voice gestures remain the capture boundary.
 
+September 28 source correction: browser voice now retains busy state through
+actual worker closure and accepted ticket/submission settlement. Ordinary close
+no longer force-kills the worker after two seconds; reopening waits for retiring
+work. The visible closed state does not claim completed process cleanup. Read
+[transport drain and its qualification limits](LIFECYCLE.md#browser-transport-drain).
+Controlled-worker tests pass; installed browsers and physical audio remain
+unchanged by this source work.
+
 ## Stopped tasks
 
 DSH can become idle without writing `turn/end` (observed after a cancelled tool).

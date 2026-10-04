@@ -1,13 +1,12 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Activate the desktop from a shortcut owner outside the app process."""
 import errno
-import os
 from pathlib import Path
-import socket
 import subprocess
 import sys
 import threading
 from .instances import validate_name, ipc_basename
+from .platform_runtime import LocalSocket, runtime_directory
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -18,37 +17,40 @@ class DesktopActivation:
 
     def __init__(self, runtime=None, command=None, instance='main'):
         self.instance = validate_name(instance)
-        self.runtime = Path(runtime or os.environ.get(
-            'XDG_RUNTIME_DIR', f'/tmp/augmentor-{os.getuid()}'))
+        self.runtime = Path(runtime) if runtime is not None else runtime_directory()
         native=ROOT.parents[1]/'MacOS/Augmentor Agent Desktop'
-        self.command = command or ([str(native)] if sys.platform=='darwin' and native.is_file() else
+        self.command = command or ([str(ROOT/'Augmentor.exe')] if sys.platform=='win32' and (ROOT/'Augmentor.exe').is_file() else
+                                  [str(native)] if sys.platform=='darwin' and native.is_file() else
                                   [sys.executable, '-B', str(ROOT/'scripts/launch-component.py'), 'desktop'])
-        if self.instance != 'main':
+        if self.instance != 'main' or sys.platform == 'win32':
             self.command = [*self.command, '--instance', self.instance]
         self.child = None
         self.lock = threading.Lock()
 
     def activate(self):
         with self.lock:
-            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as connection:
+            with LocalSocket() as connection:
                 connection.settimeout(1)
                 try:
                     connection.connect(str(self.runtime/(ipc_basename(self.instance)+'.sock')))
                 except OSError as error:
                     # Only an absent listener proves that launch is appropriate.
                     # Permission errors, timeouts and resource exhaustion do not.
-                    if error.errno not in (errno.ENOENT, errno.ECONNREFUSED):
+                    if not isinstance(error, FileNotFoundError) and error.errno not in (errno.ENOENT, errno.ECONNREFUSED):
                         raise
                 else:
+                    if sys.platform == 'win32':
+                        from .windows_focus import allow_foreground
+                        allow_foreground(connection)
                     # Once connected, a failed send has an unknown outcome.
                     # Launching the app again could toggle the window twice.
-                    connection.sendall(b'toggle')
+                    connection.sendall(b'toggle\n' if sys.platform=='win32' else b'toggle')
                     return 'delivered'
             if self.child is not None and self.child.poll() is None:
                 return 'starting'
             self.child = subprocess.Popen(
                 self.command, stdin=subprocess.DEVNULL,
                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                start_new_session=True,
+                **({'creationflags': subprocess.CREATE_NO_WINDOW} if sys.platform=='win32' else {'start_new_session':True}),
             )
             return 'launched'

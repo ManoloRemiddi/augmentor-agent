@@ -17,6 +17,7 @@ import {createQueue} from './queue.mjs'
 import { submitDraft } from './prompt-send.mjs'
 import { attachVoice } from './voice.mjs'
 import { attachPromptLibrary } from './prompt-library.mjs'
+import { attachPageMaintenance } from './maintenance-page.mjs'
 
 let surfaceCapabilities={branch:false,edit:false},editingMessage=null
 const answeredInteractions=new Set()
@@ -58,16 +59,19 @@ const modelObs = new MutationObserver(showModel)
 modelObs.observe(document.getElementById('model-label'), { childList: true, characterData: true })
 
 function send(type, payload) {
-  return chrome.runtime.sendMessage({ type, ...payload })
+  return maintenance.work(() => chrome.runtime.sendMessage({ type, ...payload }))
 }
 
+const maintenance=attachPageMaintenance({document,runtime:chrome.runtime,busy:() =>
+  !!document.getElementById('input').value || !!editingMessage || !!document.getElementById('title-edit') ||
+  ui.state.running || ui.state.submitting || voice.busy || surface.improving || surface.loadingDraft || !!lpTimer})
 const queue=createQueue({container:document.getElementById('prompt-queue'),input:document.getElementById('input'),send})
 const voice=attachVoice({send,onError:message=>ui.sendFail(message),isHistory:()=>!!viewSessionId})
 attachPromptLibrary({input:document.getElementById('input'),send})
 import {watchAppearance,refreshDesktopAppearance} from './appearance.mjs'
-watchAppearance()
+watchAppearance(value=>{if(chrome.runtime.getManifest?.().augmentorWorkspace?.sdkProtocol)ui.setThinkingPreference(value.expandThinking)})
 void refreshDesktopAppearance().catch(()=>{})
-const appearanceTimer=setInterval(()=>{void refreshDesktopAppearance().catch(()=>{})},15000)
+const appearanceTimer=setInterval(()=>{if(!maintenance.paused)void refreshDesktopAppearance().catch(()=>{})},15000)
 window.addEventListener('pagehide',()=>clearInterval(appearanceTimer),{once:true})
 const openSettings=async(section)=>{
   try { const r=await send('settings/open',{section});if(!r?.ok)throw Error(r?.error||'Could not open Settings') }
@@ -429,6 +433,7 @@ let viewSessionId = null
 let viewSessionTitle = null
 
 async function refresh() {
+  if (maintenance.paused) return
   const serial=++refreshSerial
   try {
     // sinceSeq: the panel already rendered up to this event seq, so the SW

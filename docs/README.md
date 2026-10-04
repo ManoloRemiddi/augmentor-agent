@@ -4,6 +4,14 @@
 - [Immediate composer feedback and regression evidence](COMPOSER-SEND-FEEDBACK.md)
 # Documentation index
 
+- [Published Handy downloads — October 3](HANDY-DOWNLOADS-2026-10-03.md): matched Linux/Mac/Windows preview 2, verified public bytes, qualification and physical acceptance boundaries.
+
+See [DSH 0.2 compatibility](DSH-0.2-COMPATIBILITY.md) for the separately qualified Linux upgrade and temporary history bridge.
+
+
+- [Embedded Handy dictation](HANDY-INTEGRATION.md): implementation, themed recording pill, settings, OS adapters, licensing, build and qualification boundaries.
+- [Approved Handy integration plan](HANDY-INTEGRATION-PLAN.md).
+
 - [Application SDK foundation](APP-SDK.md): DSH integration protocol, tool grants, recoverable installation and experimental voice.
 
 See [embedded Browser and specialist workspaces](WORKSPACE-EMBEDDING.md) for the product-owned iframe host, dedicated role/tool composition, scoped memory and release lifecycle.
@@ -24,6 +32,13 @@ state must remain distinct. Private logs, credentials and conversations stay out
 of this repository; include reproducible commands and sanitized evidence summaries.
 
 Current cross-platform direction: [one product, Linux/Mac parity audit and correction sequence](PLATFORM-PARITY-AUDIT.md).
+
+Windows: [detailed x64/ARM64 implementation plan, including RTX Spark](WINDOWS-IMPLEMENTATION-PLAN.md), [corrected research](WINDOWS-RTX-SPARK-RESEARCH.md) and [active implementation evidence](WINDOWS-IMPLEMENTATION-STATUS.md). See [Windows preview installation and delivery limits](WINDOWS-PREVIEW.md); physical acceptance and signed/stable delivery remain pending.
+
+Windows mechanisms: [desktop and background shortcut ownership](WINDOWS-SHELL.md),
+[native browser companion and remaining integration](WINDOWS-BROWSER.md),
+[installer safety findings and replacement qualification](WINDOWS-INSTALLER-DECISION.md),
+[signed Windows update delivery](WINDOWS-UPDATE-DELIVERY.md).
 
 ## Start and understand the product
 
@@ -167,3 +182,5 @@ files available only in a developer's working directory.
 - [Task reliability](TASK-RELIABILITY.md): binary evidence protection, failed-approach checkpoints and effective reasoning visibility.
 
 - [0.2.13 browser reliability release](RELEASE-0.2.13.md): general browser evidence recovery and matched public artifacts.
+
+- [Application SDK alignment](SDK-ALIGNMENT.md): capability/permission states, experimental Codex application isolation and platform bootstrap/startup qualification.

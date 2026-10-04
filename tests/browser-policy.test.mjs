@@ -4,7 +4,7 @@ import assert from 'node:assert/strict'
 import {applyBrowserPolicy} from '../adapters/dsh-desktop/browser-policy.mjs'
 function fixture(){
   const events={};let guard
-  applyBrowserPolicy({tools:{guard:fn=>{guard=fn}},on:(name,fn)=>{events[name]=fn}})
+  applyBrowserPolicy({tools:{guard:fn=>{guard=fn}},on:(name,fn)=>{events[name]=fn},effect:setup=>{events.dispose=setup()}})
   return {events,guard,exec:(name,id='a')=>({name,agent:{id}})}
 }
 const accept=async()=>({kind:'accept'})

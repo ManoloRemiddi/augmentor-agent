@@ -9,4 +9,8 @@ config=json.loads(selected.read_text())
 entry=Path(config['root'])/'apps/browser/embed/server.mjs'
 if not entry.is_file(): raise SystemExit('Selected Augmentor release does not support embedding. Install a compatible release.')
 os.environ['AUGMENTOR_PYTHON']=config['python']
+os.environ['AUGMENTOR_PI_NODE']=config['node']
+adapter=Path(config['root'])/'scripts/app-sdk-launch.py'
+if adapter.is_file():
+    os.execv(config['python'],[config['python'],'-I','-B',str(adapter),'embed'])
 os.execv(config['node'],[config['node'],str(entry)])

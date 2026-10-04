@@ -154,11 +154,18 @@ export async function handleBrowserAction(id, params) {
             if (!el) return { ok: false, error: `no element matches selector: ${selector}; read a fresh snapshot before choosing another target` }
             if (el === document.body || el === document.documentElement) return {ok: false, error: 'Page-root actions are not an observation method. Use browser_snapshot or browser_screenshot.'}
             const dom = globalThis.__dshAugDom
+            if (el.disabled || el.readOnly) return {ok: false, error: 'Target is disabled or read-only.'}
+            if (!(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement || el.isContentEditable)) return {ok: false, error: 'Target is not an editable text control. Read a fresh snapshot.'}
             if (dom) dom.act(el, pulse) // so the user sees where the text lands
             el.focus()
-            if ('value' in el) el.value = text
-            else el.textContent = text
-            el.dispatchEvent(new Event('input', { bubbles: true }))
+            if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
+              // Use the native setter: framework-owned instance setters may
+              // update their value tracker before the input event reaches it.
+              const prototype = el instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype
+              Object.getOwnPropertyDescriptor(prototype, 'value').set.call(el, text)
+            } else if (el.isContentEditable) el.textContent = text
+            else return {ok: false, error: 'Target is not an editable text control. Read a fresh snapshot.'}
+            el.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true, inputType: 'insertText', data: text }))
             el.dispatchEvent(new Event('change', { bubbles: true }))
             return {
               ok: true,

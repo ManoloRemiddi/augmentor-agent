@@ -189,3 +189,38 @@ test('spoken steering and typed queue promotion carry their own input mode witho
   assert.match(calls[1].params.additionalContext.augmentor_input_mode.value, /The user spoke/);
   assert.match(calls[2].params.additionalContext.augmentor_input_mode.value, /The user typed/);
 });
+test('queued selection survives restart and promotion carries the original evidence without replay', async t => {
+  const calls = [], {rpc, ledger, session} = fixture(t, async (method, params) => {
+    calls.push({method, params}); return method === 'turn/start' ? {turn: {id: 'turn-1'}} : {turnId: 'turn-1'};
+  });
+  ledger.pause(true);
+  const context = {record: 'first', text: '選択😀'.repeat(700)};
+  await session.submit('waiting', 'Read the selection', false, context); context.record = 'later';
+  session.close();
+  const restored = new OperationLedger(ledger.path, ledger.threadId), resumed = new CodexSession(rpc, restored); t.after(() => resumed.close());
+  await resumed.continueQueue();
+  const additional = calls[0].params.additionalContext;
+  assert.equal(calls[0].params.input[0].text, 'Read the selection');
+  const parts = Object.entries(additional).filter(([key]) => key.startsWith('augmentor_workspace_data_'));
+  assert.ok(parts.length > 1); assert.ok(parts.every(([, entry]) => entry.kind === 'untrusted' && Buffer.byteLength(entry.value) <= 900));
+  assert.equal(parts.map(([, entry]) => entry.value.slice(entry.value.indexOf('\n') + 1)).join(''), restored.get('waiting').workspaceContext);
+  assert.match(additional.augmentor_workspace_manifest.value, /supersedes earlier/);
+  await resumed.submit('promoted', 'Review next', false, {record: 'second'}); await resumed.promote('promoted', 'turn-1');
+  const promoted = calls[1].params.additionalContext;
+  assert.match(promoted.augmentor_workspace_manifest.value, /"requestId":"promoted"/);
+  assert.equal(JSON.parse(promoted.augmentor_workspace_data_01.value.split('\n')[1]).record, 'second');
+  await resumed.steer('steered', 'Correction', 'turn-1', {record: 'third'});
+  assert.match(JSON.stringify(calls[2].params.additionalContext), /third/);
+  await resumed.steer('steered', 'Correction', 'turn-1', {record: 'third'}); assert.equal(calls.length, 3);
+  await assert.rejects(resumed.steer('steered', 'Correction', 'turn-1', {record: 'changed'}), /different input/);
+});
+test('an unconfirmed contextual prompt stays bound across restart and is never resent', async t => {
+  let calls = 0;
+  const {rpc, ledger, session} = fixture(t, async () => {calls++; throw new CodexTransportError('lost context acknowledgment', true);});
+  await assert.rejects(session.submit('uncertain', 'Read', false, {record: 'first'}), /lost context acknowledgment/);
+  session.close();
+  const restored = new OperationLedger(ledger.path, ledger.threadId), resumed = new CodexSession(rpc, restored); t.after(() => resumed.close());
+  assert.equal((await resumed.submit('uncertain', 'Read', false, {record: 'first'})).status, 'unconfirmed');
+  await assert.rejects(resumed.submit('uncertain', 'Read', false, {record: 'later'}), /different input/);
+  assert.equal(calls, 1); assert.equal(JSON.parse(restored.get('uncertain').workspaceContext).record, 'first');
+});

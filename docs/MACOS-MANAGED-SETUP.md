@@ -46,6 +46,15 @@ checked integration bootstrap. That bootstrap gained `save=False`, allowing
 the Mac to prepare integration without selecting a stopped temporary host.
 Linux keeps its existing default behavior.
 
+The Windows implementation branch extracts that resumable transaction into
+`services/dsh/managed.py`. Mac keeps its existing entrypoint, LaunchAgent and
+recovery ownership; Windows supplies its own process owner. Model validation,
+engine-only setup, configuration-change detection, integration checks and retry
+journals remain shared. Private record access now validates the opened file and
+single-link ownership before reading. Windows uses protected ACLs; Unix retains
+mode-0600 records. This is a source refactor, not an installed Mac update; the
+Windows evidence ledger records its regression and native qualification results.
+
 Default data lives under
 `~/Library/Application Support/Augmentor/data/augmentor/managed-dsh`:
 
@@ -164,3 +173,11 @@ only missing private configuration; speech models are separate. The browser setu
 menu prepares a stable external extension folder and native-host registration,
 then leaves final Load unpacked approval to Chrome/Chromium. See the
 [preview release record](MACOS-PREVIEW-RELEASE.md) for distribution scope.
+
+### Shared Windows/Mac first-run interface
+
+The interface now lives in `apps/native/augmentor_linux/managed_setup.py`.
+Mac keeps its LaunchAgent entrypoint, payload paths and existing setup flow;
+Windows selects its own payload and supervisor behind the same dialog. Shared
+native and Mac artifact checks must pass before promotion. This source change
+does not update an installed Mac or alter its configuration.

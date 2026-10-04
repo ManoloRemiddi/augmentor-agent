@@ -2,6 +2,18 @@
 
 # Augmentor 0.2.13: general browser reliability
 
+## Current preview 2 with embedded Handy — October 3
+
+[Matched Handy download publication](HANDY-DOWNLOADS-2026-10-03.md) supersedes
+the preview-1 delivery record below. Linux, Mac and Windows x64/ARM64 packages
+include native system dictation with model/shortcut/off controls, themed recording
+and the four-pixel circle correction. All eight final-source workflows pass;
+public bytes and source identities are recorded in the ledger. Physical Mac/
+Windows microphone, permission and input acceptance remain pending.
+
+## Historical preview-1 browser reliability release
+
+
 This matched Desktop/Browser preview preserves fresh page observations before
 first model use, exposes bounded continuation for long pages, and lets the agent
 recover omitted evidence from its own saved tool results. Explicit reads of other

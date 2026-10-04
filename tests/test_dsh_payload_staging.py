@@ -10,9 +10,26 @@ ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('stage_dsh', ROOT/'scripts/stage-dsh.py')
 stager = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(stager)
+patch_spec = importlib.util.spec_from_file_location('windows_dsh_preparation', ROOT/'scripts/prepare-windows-dsh.py')
+preparation = importlib.util.module_from_spec(patch_spec); patch_spec.loader.exec_module(preparation)
 
 
 class DshPayloadStagingTests(unittest.TestCase):
+    def test_windows_dependency_drift_leaves_every_source_untouched(self):
+        import hashlib
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary)
+            first = target/'first.js'; first.write_bytes(b'original')
+            second = target/'second.js'; second.write_bytes(b'changed upstream')
+            patches = [dict(path='first.js', sha256=hashlib.sha256(b'original').hexdigest(), old='original', new='fixed'),
+                       dict(path='second.js', sha256='0'*64, old='old', new='new')]
+            with patch.object(preparation, 'PATCHES', patches):
+                with self.assertRaisesRegex(ValueError, 'changed Windows terminal source'):
+                    preparation.prepare(target, platform='win32')
+            self.assertEqual(first.read_bytes(), b'original')
+            self.assertEqual(second.read_bytes(), b'changed upstream')
+            self.assertEqual(preparation.prepare(target, platform='darwin'), [])
+
     def test_changed_preparation_never_executes(self):
         with tempfile.TemporaryDirectory() as temporary:
             target = Path(temporary)

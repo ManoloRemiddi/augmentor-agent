@@ -20,7 +20,7 @@ export function attachPromptLibrary({input, send, settingsButton}) {
   const menu=doc.createElement('div');menu.id='prompt-completions';menu.hidden=true
   menu.setAttribute('role','listbox');menu.setAttribute('aria-label','Saved prompts');doc.body.append(menu)
   let library={revision:0,prompts:[]}, loaded=false, pending=null, errorText=''
-  let choices=[], selected=0, dismissed=null, lastRead=0, rendered=null
+  let choices=[], selected=0, dismissed=null, lastRead=0, rendered=null, inserting=false
   const hide=()=>{menu.hidden=true;input.removeAttribute('aria-activedescendant');input.setAttribute('aria-expanded','false')}
   input.setAttribute('aria-controls',menu.id);input.setAttribute('aria-autocomplete','list')
   const request=async payload=>{
@@ -49,25 +49,28 @@ export function attachPromptLibrary({input, send, settingsButton}) {
     if(!choices.length){const note=doc.createElement('p');note.textContent=errorText || (loaded ? (library.prompts.length ? 'No matching prompts' : 'Add prompts in the Prompt library') : 'Loading prompts…');menu.append(note)}
     choices.forEach((p,index)=>{
       const row=doc.createElement('button');row.type='button';row.id='saved-prompt-'+index;row.setAttribute('role','option');row.setAttribute('aria-selected',String(index===selected))
-      row.textContent='/'+p.name+'  ·  Tab to insert\n'+p.content.replace(/\s+/g,' ').slice(0,75)
+      row.textContent='/'+p.name+'  ·  Enter or Tab to insert\n'+p.content.replace(/\s+/g,' ').slice(0,75)
       row.addEventListener('mousedown',event=>event.preventDefault());row.addEventListener('click',()=>choose(index));menu.append(row)
     })
     if(choices.length){input.setAttribute('aria-activedescendant','saved-prompt-'+selected);menu.children[selected]?.scrollIntoView?.({block:'nearest'})}
     positionMenu()
   }
   const choose=async index=>{
-    const item=choices[index];if(!item||slashQuery(input.value,input.selectionStart)===null)return
-    let end=input.selectionStart;while(/[a-zA-Z0-9_-]/.test(input.value[end]??'')&&end<input.value.length)end++
-    const before=input.value,position=input.selectionStart
-    let content=item.content
-    if(content.includes('[clipboard]')) {
-      try {
-        const copied=await win.navigator.clipboard.readText()
-        content=expandClipboard(content,copied)
-      }catch(error){errorText=error.message||'Clipboard is unavailable. Paste your text into the draft.';paint();return}
-    }
-    if(input.value!==before||input.selectionStart!==position)return
-    input.setRangeText(content,0,end,'end');hide();input.dispatchEvent(new win.Event('input',{bubbles:true}));input.focus()
+    const item=choices[index];if(inserting||!item||slashQuery(input.value,input.selectionStart)===null)return
+    inserting=true
+    try {
+      let end=input.selectionStart;while(/[a-zA-Z0-9_-]/.test(input.value[end]??'')&&end<input.value.length)end++
+      const before=input.value,position=input.selectionStart
+      let content=item.content
+      if(content.includes('[clipboard]')) {
+        try {
+          const copied=await win.navigator.clipboard.readText()
+          content=expandClipboard(content,copied)
+        }catch(error){errorText=error.message||'Clipboard is unavailable. Paste your text into the draft.';paint();return}
+      }
+      if(input.value!==before||input.selectionStart!==position)return
+      input.setRangeText(content,0,end,'end');hide();input.dispatchEvent(new win.Event('input',{bubbles:true}));input.focus()
+    } finally {inserting=false}
   }
   const refresh=()=>{
     if(slashQuery(input.value,input.selectionStart)===null){hide();return}
@@ -80,12 +83,16 @@ export function attachPromptLibrary({input, send, settingsButton}) {
   input.addEventListener('click',refresh);input.addEventListener('focus',refresh)
   input.addEventListener('keydown',event=>{
     if(event.isComposing||event.shiftKey||event.ctrlKey||event.metaKey||event.altKey)return
+    // Clipboard reads are asynchronous; another Enter must not submit the alias.
+    if(event.key==='Enter'&&(inserting||event.repeat||(!menu.hidden&&pending&&!loaded))){
+      event.preventDefault();event.stopImmediatePropagation();return
+    }
     if(menu.hidden)return
-    if(event.key==='Enter'){hide();return}
-    if(['ArrowUp','ArrowDown','Tab','Escape'].includes(event.key)){
+    if(event.key==='Enter'&&!choices.length){hide();return}
+    if(['ArrowUp','ArrowDown','Enter','Tab','Escape'].includes(event.key)){
       event.preventDefault();event.stopImmediatePropagation()
       if(event.key==='Escape'){dismissed=input.value;hide()}
-      else if(event.key==='Tab'){if(!event.repeat)choose(selected)}
+      else if(event.key==='Tab'||event.key==='Enter'){if(!event.repeat)choose(selected)}
       else if(choices.length){selected=(selected+(event.key==='ArrowDown'?1:-1)+choices.length)%choices.length;paint()}
     }
   },true)
