@@ -65,7 +65,8 @@ def location():
 
 def windows_location(base):
     from platform_adapters.windows_identity import private_directory,private_file_descriptor,dictation_session_key
-    base=private_directory(Path(base).resolve())
+    # Validate the supplied hierarchy before any resolution can hide a junction.
+    base=private_directory(Path(base))
     keyfile=base/'auth.key'
     if not keyfile.exists():
         temporary=base/('.dictation-key-'+secrets.token_hex(24))

@@ -1877,3 +1877,14 @@ reservation. This tests the pre-send boundary with an actual process/pipe, not a
 second real RDS login. A fresh native/full run must qualify this follow-up; the
 currently running `c40926b` installer run predates this added guard. Production
 flags and owner installations remain unchanged.
+
+### Windows dictation reparse admission
+
+Windows state validation now checks the originally supplied hierarchy before any
+resolution can hide a junction. The maintenance scope performs the same read-only
+reparse check before hashing the selected path; it creates no state or key.
+The native fixed-client case creates an actual private fixture junction, requires
+both authentication access and maintenance scope to refuse it, and verifies the
+original 32-byte key is unchanged. Normal existing private paths keep the same
+identity; Unix resolution/identity behavior stays unchanged. Fresh qualification
+must include this follow-up before any public eligibility is enabled.

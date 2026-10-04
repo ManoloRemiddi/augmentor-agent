@@ -2,6 +2,12 @@
 
 # Start here: agent handoff
 
+Windows dictation now validates the supplied state hierarchy before path resolution
+could hide a junction. Native qualification adds an actual redirected-path refusal
+with unchanged authentication bytes; maintenance scope creates no state/key.
+This and the generic login-session guard require fresh native qualification; all
+production/full-goal boundaries remain active.
+
 Generic Windows maintenance now additionally defers another login session of the
 same user before sending any request, so captured windows cannot reopen into the
 wrong login. The actual retained-broker case checks synthetic alternate-session

@@ -19,12 +19,14 @@ PROTOCOL='augmentor-dictation-maintenance/1' if sys.platform=='win32' else 'augm
 
 def scope():
     """Current session/state identity only; no directory creation or key reads."""
-    base=Path(os.environ.get('AUGMENTOR_DICTATION_STATE',str(Path.home()/'.local/share/augmentor/dictation'))).resolve()
+    base=Path(os.environ.get('AUGMENTOR_DICTATION_STATE',str(Path.home()/'.local/share/augmentor/dictation')))
     if sys.platform=='win32':
-        from platform_adapters.windows_identity import dictation_session_key
+        from platform_adapters.windows_identity import dictation_session_key,reject_reparse_ancestors
         session=dictation_session_key()
+        base=reject_reparse_ancestors(base)
         base=Path(os.path.normcase(str(base)))
     else:
+        base=base.resolve()
         identity='|'.join(os.environ.get(key,'') for key in ('XDG_SESSION_ID','DISPLAY','WAYLAND_DISPLAY'))
         session=hashlib.sha256(identity.encode()).hexdigest()[:12]
     return {'session':session,

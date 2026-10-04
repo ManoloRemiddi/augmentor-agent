@@ -189,6 +189,15 @@ print(json.dumps(dictation.request('status')))
         _base,address,key=dictation.location();self.assertEqual(len(key),32)
         self.assertTrue(address.endswith(dictation_session_key()))
         with os.fdopen(private_file_descriptor(self.state/'auth.key'),'rb') as source:self.assertEqual(source.read(),key)
+        import _winapi
+        from lifecycle.dictation_control import scope
+        link=self.base/'redirected-state';_winapi.CreateJunction(str(self.state),str(link))
+        try:
+            with self.assertRaises(PermissionError):dictation.windows_location(link)
+            with patch.dict(os.environ,{'AUGMENTOR_DICTATION_STATE':str(link)}):
+                with self.assertRaises(PermissionError):scope()
+            self.assertEqual((self.state/'auth.key').read_bytes(),key)
+        finally:os.rmdir(link)
         foreign=self.base/'inherited-key';foreign.mkdir()
         (foreign/'auth.key').write_bytes(b'x'*32)
         with self.assertRaises(PermissionError):dictation.windows_location(foreign)
