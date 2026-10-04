@@ -1833,6 +1833,18 @@ normal installed broker startup remains blocked. A new full two-CPU run must
 qualify all completion/reopening/recovery stages after this correction. ARM64 is
 still running at this record; do not infer its result from x64.
 
+At correction `c40926b`, the complete native Windows desktop run
+[37170463612](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37170463612)
+passes both x64 (111342219515) and ARM64 (111342219640). The actual pending-broker
+case still refuses installed normal startup and preserves pending bytes, while
+the startup reader permits read-only inspection. The original capture/cancel,
+lease, fixed-client spawn, private authentication, normal exit, immutable payload
+and one-shot restart cases also pass. The corrected full installer run
+[37170465430](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37170465430)
+is queued behind the earlier ARM64 job, which remains live; no obsolete job was
+cancelled and no later completion/reopen result is inferred. Public eligibility
+and feed remain disabled.
+
 All public signing/feed/automatic-install/distribution flags remain false. The
 remaining package/global-user, shared Mac/Companion, SDK owner teardown,
 interrupted recovery/retention, actual desktop/DSH, signed forward and legacy bridge

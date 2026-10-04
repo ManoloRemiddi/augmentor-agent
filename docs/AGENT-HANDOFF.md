@@ -41,6 +41,15 @@ retains persistent refusal. ARM64 is still live at this record; fresh full/nativ
 qualification is required after the correction. See the owning failed/corrected
 scope in UPDATE-SYSTEM.md. No production flag or owner state was changed.
 
+Correction `c40926b` is pushed; full native desktop run
+[37170463612](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37170463612)
+passes x64/ARM64 including the revised real pending/health-admission boundary.
+Corrected full installer [37170465430](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37170465430)
+is queued behind the older still-live ARM64 job; no live job was cancelled. Continue
+waiting for the complete old/native outcomes, inspect actual failed-job evidence,
+and qualify completion/reopening/recovery before calling the Windows broker
+installer integration complete. All production and full-goal boundaries remain.
+
 ## Corrected native Linux checkpoint — October 4, full goal still active
 
 Source `0bc9639` is committed/pushed. Focused native
