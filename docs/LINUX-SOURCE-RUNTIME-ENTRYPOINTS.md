@@ -273,6 +273,61 @@ are source tests, not modified-library or installed-product qualification. The
 [frozen 22-file license proposal](RECIPIENT-SOURCE-CONTROLS-LICENSE-PROPOSAL.md)
 and root LICENSE remain unchanged; no permission or legal acceptance is inferred.
 
+## Opt-in recipient process diagnostics: source candidate
+
+The shared [marker collector](../services/platform_adapters/recipient_runtime_markers.py)
+observes the calling ordinary Linux process. It reports PID/start/UID, Python
+prefix, module origins and versions, the three known Core/PySide/shiboken markers,
+and SHA256/bytes/device/inode for the Qt and binding ELF files actually mapped
+there. Reads are bounded; changed maps, replaced files, unknown marker values or
+unsupported/deleted paths refuse. It hashes the Qt build string instead of
+returning that text. It reads no settings, conversation, token or model files.
+Launch receipt/selection hashes are explicitly labelled declarations, not fresh
+authorization. This diagnostic does not select a runtime or prove that all72
+native files loaded, that bytes are ABI compatible, or that compiled source and
+notice mapping is complete. It is a bounded observation, not an atomic snapshot.
+
+The real Desktop's existing `--ui-test-control` channel accepts exactly
+`{"action":"runtime-markers"}`. Normal launches deny it. This operation neither
+reads the window's text nor invokes its controller, UI actions or maintenance.
+
+For the actual Browser preference Python child, normal launches retain the
+existing response and never collect diagnostics. An owned proof may pass both
+`AUGMENTOR_RECIPIENT_PROOF_DIRECTORY` (absolute, private, user-owned, with no
+symlink ancestors) and `AUGMENTOR_RECIPIENT_PROOF_TOKEN` (64 lowercase hex digits)
+to the normal Browser host. Its child already inherits these variables. Before
+dispatching the exact `{"action":"get"}` preference request, create a private
+single-link `scope.json` with exactly these fields:
+
+```json
+{"format":"augmentor-recipient-preferences-proof/1","token":"<same proof token>","appRoot":"<actual application root>","parentPid":1234,"parentStartTicks":5678}
+```
+
+The two numbers must be the independently observed current Node parent's PID
+and start ticks; these example numbers are not fixture identities. The child
+verifies same-user parent identity and exact application path. Scope/parent
+replacement, save, extra request fields, partial opt-in, unsafe metadata and an
+existing `preferences-markers.json` refuse before the normal preference RPC.
+After one successful normal read, it collects the child process and publishes
+only the diagnostic JSON to that exclusive0600 file, flushing file and directory.
+Scope/parent/directory changes before publication refuse; publication failures
+retain their output and are never cleaned or replayed. The Browser response
+retains its existing shape and carries no diagnostic fields or proof token.
+
+The normal read still sends its existing authenticated loopback preference POST;
+a qualification fixture must supply its reviewed synthetic responder and count
+that read explicitly. This hook does not start voice, microphone, audio or models,
+and must not be used as a substitute for actual normal Browser/child provenance.
+Focused19 collector/Browser-hook and9 Desktop-channel tests pass with Python
+providing PySide6 and QtTest. They mock that transport and preferences globally,
+exercise real local Qt imports/maps/hashes and Desktop opt-in routing, and cover malformed scopes,
+substitution, no-replay and durable-write failures. No marked196 build/export,
+replacement entrypoint, full source graph or licensing acceptance is claimed by
+these source tests. Root LICENSE and the frozen23 files remain unchanged.
+The Linux `/proc` diagnostic is explicitly unsupported on macOS and Windows;
+this proof interface does not change their normal runtime selection or product
+features. Opted-in callers on those systems receive a refusal.
+
 ## October 4 recipient validation correction
 
 [Hosted run 37199257072](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37199257072)

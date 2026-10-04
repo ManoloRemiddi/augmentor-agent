@@ -16,19 +16,27 @@ the exact published save API before any SDK/install action, and rejects every012
 managed key. All27 fresh plus27 unchanged historical checks pass; future authority
 scope195 preserves the sealed184 inputs.
 
-KDE has a verified active Wayland session, currently locked. The supported fixture
+KDE has a verified active Wayland session; its earlier locked state is preserved in the recorded preflight.  The supported fixture
 unlock preflight refused a native ScreenSaver owner's executable permission before
 sending an unlock request. A separate privileged diagnosis verifies the exact
 native KWin/Plasma owners and executable package checks. A supported fixture
 unlock using those verified owners passes, with both lock states inactive and
 account/lock settings preserved. This is administrative fixture restoration;
-application/input and password acceptance remain open. The isolated source build kit prepares correctly,
-and private Docker/containerd now pass independent admission. The exact base
-image imports and verifies, but classic Docker loading loses its registry digest
-reference. A supported containerd storage plan is under review; compilation has
-not begun.
-[Hosted validation37212960848](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37212960848)
-passes all11 jobs at8528697. Source rebuild, physical audio, licensing and the
+application/input and password acceptance remain open. Candidate staging passes; its installation preview requires24 additional
+native dependencies and one related harfbuzz upgrade. The strict single-package
+expectation refuses before installation; native/HOME/cache/config ending
+passes. A finite authenticated dependency transaction is being prepared. The isolated source build kit prepares correctly,
+and private Docker/containerd now pass independent admission. Classic Docker loading loses the exact base registry digest reference. The
+separate supported containerd backend now preserves it and passes the unchanged
+offline recipe, including all authenticated toolchain package versions. The
+ordinary build container starts inert; admission then refuses because Docker
+reports its daemon-namespace UID while the check expected the host-mapped UID.
+Both actual identities are verified. The separately reviewed continuation
+passes the exact idle/isolation admission and now runs Qt source compilation,
+with two compiler jobs,8GiB memory and a six-hour limit. Original failures
+remain intact. Compilation completion and recipient replacement remain open.
+[Hosted validation37216503583](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37216503583)
+passes all11 jobs atbe75a6c. Source rebuild, physical audio, licensing and the
 unwaived GitGuardian gate remain open. No public release is qualified.
 
 ## October 4 earlier native upgrade and desktop ending checkpoint

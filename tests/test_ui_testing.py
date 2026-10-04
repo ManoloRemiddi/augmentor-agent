@@ -14,9 +14,19 @@ class UiTestingTests(unittest.TestCase):
     def setUpClass(cls):cls.app=QApplication.instance() or QApplication([])
 
     def test_disabled_launch_rejects_every_operation_without_touching_window(self):
-        for action in ['inspect','send','capture','draft','zoom','pin','shortcut-settings']:
+        for action in ['inspect','send','capture','draft','zoom','pin','shortcut-settings','runtime-markers']:
             with self.assertRaisesRegex(ValueError,'disabled'):
                 dispatch(None,{'action':action})
+
+    def test_runtime_markers_need_optin_and_exact_fields_and_do_not_inspect_window(self):
+        from augmentor_linux import platform_runtime
+        from platform_adapters import recipient_runtime_markers
+        with patch.object(recipient_runtime_markers, 'collect', return_value={'markers':'synthetic'}) as collect:
+            with self.assertRaisesRegex(ValueError,'additional'):
+                dispatch(None,{'action':'runtime-markers','path':'foreign'},enabled=True)
+            collect.assert_not_called()
+            self.assertEqual(dispatch(None,{'action':'runtime-markers'},enabled=True),{'markers':'synthetic'})
+            collect.assert_called_once_with()
 
     def test_draft_control_requires_exact_expected_input(self):
         window=Window(preview=True)

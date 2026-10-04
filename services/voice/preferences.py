@@ -10,6 +10,22 @@ from augmentor_linux.preferences import Preferences
 def request(value):
     action=value.get('action','get')
     if action not in ('get','save'):raise ValueError('Unsupported voice settings action')
+    # Normal launches do not import or run diagnostics. The normal get remains
+    # the only RPC; the opt-in report contains no preference or credential data.
+    import os
+    if any(key in os.environ for key in ('AUGMENTOR_RECIPIENT_PROOF_DIRECTORY', 'AUGMENTOR_RECIPIENT_PROOF_TOKEN')):
+        if set(value) != {'action'} or action != 'get':
+            raise ValueError('Recipient diagnostics require only the explicit get action.')
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+        from platform_adapters.recipient_runtime_markers import preference_proof
+        with preference_proof(Path(__file__).resolve().parents[2], action) as emit:
+            result = _request(value, action)
+            emit()
+            return result
+    return _request(value, action)
+
+
+def _request(value, action):
     preferences=Preferences()
     if action=='save':
         settings=value['settings']

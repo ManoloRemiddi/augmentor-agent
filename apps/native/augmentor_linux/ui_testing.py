@@ -98,6 +98,12 @@ def shortcut_settings(window, request):
 def dispatch(window, request, *, enabled=False):
     if not enabled:raise ValueError('UI test control is disabled for this launch.')
     if not isinstance(request, dict):raise ValueError('Use a UI test request object.')
+    if request.get('action') == 'runtime-markers':
+        if set(request) != {'action'}:
+            raise ValueError('Runtime markers accept no additional fields.')
+        from . import platform_runtime  # Shared services path, no OS/UI action.
+        from platform_adapters.recipient_runtime_markers import collect
+        return collect()
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QDialog
     controller=window.controller
