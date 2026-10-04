@@ -80,10 +80,48 @@ def save_owned_editor(editor,home,text):
     name=editor_fixture_name(editor,home)
     # Save As completion can add a covering popup during pathname typing. Keep
     # that scene-change refusal intact and qualify ordinary existing-file Save.
-    act('key',keys=['CTRL','S'])
+    editor_action(editor,home,'key',keys=['CTRL','S'])
     until(lambda:guest('file',name).get('text')==text)
     assert guest('file',name)['text']==text
     return name
+
+
+def admit_editor_observation(editor,record,snapshot=None):
+    if record.get('process')!=editor['process'] or record.get('complete') is not True:
+        raise ValueError('Fresh owned editor process or complete focus differs.')
+    window=record.get('window',{});focus=record.get('focus',{})
+    if (window.get('pid')!=editor['process']['pid'] or window.get('id')!=editor['windowId'] or
+            window.get('application')!='org.kde.kate' or Path(editor['path']).name not in window.get('title','')):
+        raise ValueError('The original owned editor window is not foreground.')
+    if (any(focus.get(key) is not True for key in ('focused','showing','editable','textInterface')) or
+            focus.get('password') is not False or focus.get('defunct') is not False or
+            not isinstance(focus.get('path'),list) or not isinstance(focus.get('text'),str)):
+        raise ValueError('The owned editor needs one actual editable nonpassword text focus.')
+    if editor.get('focusPath') is not None and focus['path']!=editor['focusPath']:
+        raise ValueError('The original editor text focus changed.')
+    if snapshot is not None and snapshot.get('window')!=window:
+        raise ValueError('The editor window changed before the fresh action capture.')
+    return record
+
+
+def owned_editor_focus(editor,home):
+    editor_fixture_name(editor,home)
+    record=guest('editor-focus',json.dumps(editor))
+    admit_editor_observation(editor,record)
+    editor.setdefault('focusPath',record['focus']['path'])
+    return record
+
+
+def owned_editor_snapshot(editor,home):
+    record=owned_editor_focus(editor,home);snapshot=observe()
+    admit_editor_observation(editor,record,snapshot)
+    return snapshot
+
+
+def editor_action(editor,home,kind,**params):
+    snapshot=owned_editor_snapshot(editor,home)
+    okay(rpc('action',{'token':snapshot['token'],'kind':kind,**params}))
+    return snapshot
 
 
 def require_unlocked_session(record,uid,expected_session=None):
@@ -261,7 +299,8 @@ try:
     until(lambda:rpc('status')['ok'])
     guest('scale',str(a.scale));time.sleep(2)
     remote(helper_command('remove-output'))
-    editor=guest('editor');until(lambda:(w:=guest('scene')['window'])['application']=='org.kde.kate' and w['pid'] not in editor['previousPids'] and 'Not Responding' not in w['title'])
+    editor=guest('editor');editor_window=until(lambda:(w:=guest('scene')['window']) and w['application']=='org.kde.kate' and w['pid']==editor['process']['pid'] and 'Not Responding' not in w['title'] and w)
+    editor['windowId']=editor_window['id']
     if a.observe_consent:
         child=async_rpc('connect')
         try:
@@ -317,18 +356,21 @@ try:
     key('esc');until(lambda:'Save File' not in guest('scene')['window']['title'])
     print('Foreign owner, unsupported text, replay, outside point and changed window refused',flush=True)
     s=observe();g=s['window']['geometry'];screen=s['screen']['geometry']
+    assert s['window']['id']==editor['windowId'] and s['window']['pid']==editor['process']['pid']
     okay(rpc('action',{'token':s['token'],'kind':'click','x':(g['x']+g['width']/2-screen['x'])*s['image']['width']/screen['width'],'y':(g['y']+g['height']/2-screen['y'])*s['image']['height']/screen['height']}))
-    act('key',keys=['CTRL','A']);act('type',text='Wayland ASCII verified')
+    home='/home/'+a.guest_user
+    assert owned_editor_focus(editor,home)['focus']['text']=='Fixture ready\n'
+    editor_action(editor,home,'key',keys=['CTRL','A']);editor_action(editor,home,'type',text='Wayland ASCII verified')
     fixture_name=save_owned_editor(editor,'/home/'+a.guest_user,'Wayland ASCII verified\n')
     print('Native Wayland Kate existing-file Save: exact file verified',flush=True)
-    act('key',keys=['CTRL','A']);s=observe();typing=async_rpc('action',{'token':s['token'],'kind':'type','text':'S'*256})
+    editor_action(editor,home,'key',keys=['CTRL','A']);s=owned_editor_snapshot(editor,home);typing=async_rpc('action',{'token':s['token'],'kind':'type','text':'S'*256})
     until(lambda:okay(rpc('status'))['busy'])
-    until(lambda:any(0<t.count('S')<256 for t in guest('editor-text')['texts']),25);stop_click()
+    until(lambda:any(0<t.count('S')<256 for t in guest('editor-text',json.dumps(editor))['texts']),25);stop_click()
     result=json.loads(typing.communicate(timeout=20)[0]);assert not result['ok'] and 'stopped' in result['error'].lower(),result
     until(lambda:not okay(rpc('status'))['busy']);assert not okay(rpc('status'))['sharing']
-    key('ctrl','s');time.sleep(.5);partial=guest('file',fixture_name)['text']
+    owned_editor_focus(editor,home);key('ctrl','s');time.sleep(.5);partial=guest('file',fixture_name)['text']
     assert 0<len(partial.rstrip('\n'))<256 and set(partial.rstrip('\n'))=={'S'},repr(partial)
-    time.sleep(1);key('ctrl','s');time.sleep(.3);assert guest('file',fixture_name)['text']==partial
+    time.sleep(1);owned_editor_focus(editor,home);key('ctrl','s');time.sleep(.3);assert guest('file',fixture_name)['text']==partial
     assert not rpc('action',{'token':s['token'],'kind':'type','text':'must not restart'})['ok']
     print('Actual Stop click interrupted typing; saved partial content stayed unchanged',flush=True)
     result={'environment':environment,'scale':a.scale,'candidateSource':bool(a.source or a.guest_root),'consentObservationSha256':hashlib.sha256(a.consent_observation.read_bytes()).hexdigest(),'proofScriptSha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'guestHelperSha256':hashlib.sha256((ROOT/'release/vm-desktop-session.py').read_bytes()).hexdigest(),'sessionGuardReceipts':str(session_guard_path),'consentDenied':True,'pendingConsentStopped':True,'guards':True,'savedFileExact':True,'saveScope':'existing-owned-editor-file','savedFile':fixture_name,'stopInterruptedInput':True,'partialCharacters':len(partial.rstrip('\n')),'noReplayAfterStop':True}

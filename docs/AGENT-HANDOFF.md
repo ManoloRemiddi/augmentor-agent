@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 4 owned-editor proof correction
+
+The maintained KDE VM proof now binds the new Kate process owner, birth time,
+executable, arguments, original window and editable text-control path. A bounded
+read refuses noneditable/password controls, ambiguous or incomplete traversal,
+and process, focus or scene changes before typing and Save. The helper waits up
+to five seconds for that exact new child to exec Kate. A prior Kate causes refusal
+before writing or launch; force-closing old windows has been removed. All 49
+focused proof checks pass independently. This is source evidence: the earlier
+actual Save failure remains retained, and a fresh matching installed artifact and
+isolated acceptance run are still required for saved text, active-input Stop and
+no replay.
+
 ## October 4 verified GNOME activation and build validation
 
 [Fresh GNOME activation](../release/qualification/next-targets/20261004-gnome562-fresh-activation-acceptance.json)

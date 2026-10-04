@@ -5,10 +5,121 @@ import json
 import importlib.util
 import os
 from pathlib import Path
-import signal
 import subprocess
 import sys
 import time
+
+
+def require_editor_absent(pids):
+    if pids:raise ValueError('A prior Kate remains; no editor was closed or replaced.')
+
+
+def editor_process(pid,path):
+    path=Path(path)
+    if path!=Path.home()/'augmentor-desktop-acceptance.txt' or path.is_symlink():
+        raise ValueError('Editor requires the existing owned fixture path.')
+    proc=Path('/proc')/str(pid)
+    identity={'pid':pid,'uid':proc.stat().st_uid,
+              'startTicks':(proc/'stat').read_text().split(') ',1)[1].split()[19],
+              'exe':os.readlink(proc/'exe'),
+              'argv':(proc/'cmdline').read_bytes().rstrip(b'\0').decode().split('\0')}
+    if (identity['uid']!=os.getuid() or identity['exe']!='/usr/bin/kate' or
+            identity['argv']!=['kate','--startanon',str(path)]):
+        raise ValueError('The fresh owned Kate process identity differs.')
+    return identity
+
+
+def editor_process_birth(pid):
+    proc=Path('/proc')/str(pid)
+    return proc.stat().st_uid,(proc/'stat').read_text().split(') ',1)[1].split()[19]
+
+
+def wait_editor_process(pid,path):
+    """Wait only for this new child to exec; never adopt a replacement PID."""
+    birth=editor_process_birth(pid)
+    if birth[0]!=os.getuid():raise ValueError('The fresh editor child owner differs.')
+    end=time.monotonic()+5
+    while True:
+        if editor_process_birth(pid)!=birth:raise ValueError('The fresh editor child owner or start changed.')
+        try:identity=editor_process(pid,path)
+        except ValueError as error:
+            if time.monotonic()>=end:raise ValueError('The fresh editor did not reach its exact Kate identity within five seconds.') from error
+            time.sleep(.05);continue
+        if (editor_process_birth(pid)!=birth or (identity['uid'],identity['startTicks'])!=birth):
+            raise ValueError('The fresh editor child owner or start changed.')
+        if time.monotonic()>=end:raise ValueError('The fresh editor identity deadline expired.')
+        return identity
+
+
+def admit_editor_focus(editor,process,window,focused,complete):
+    """Admit the original editor window and one actual editable text control."""
+    if process!=editor['process']:
+        raise ValueError('The fresh owned editor process changed.')
+    if (not window or window.get('pid')!=process['pid'] or window.get('id')!=editor['windowId'] or
+            window.get('application')!='org.kde.kate' or Path(editor['path']).name not in window.get('title','')):
+        raise ValueError('The original owned Kate window is not foreground.')
+    if not complete or len(focused)!=1:
+        raise ValueError('Editor focus is incomplete or ambiguous.')
+    focus=focused[0]
+    if (focus.get('focused') is not True or focus.get('showing') is not True or
+            focus.get('editable') is not True or focus.get('password') is not False or
+            focus.get('textInterface') is not True or focus.get('defunct') is not False):
+        raise ValueError('Editor input requires one showing editable nonpassword text control.')
+    if editor.get('focusPath') is not None and focus.get('path')!=editor['focusPath']:
+        raise ValueError('The owned editor text focus changed.')
+    return {'process':process,'window':window,'focus':focus,'complete':True}
+
+
+def read_editor_focus(editor):
+    """Bounded read-only inspection; never selects, closes or types into a widget."""
+    import gi
+    gi.require_version('Atspi','2.0')
+    from gi.repository import Atspi,Gio
+    from kwin import KWin
+    process=editor_process(editor['process']['pid'],editor['path'])
+    kwin=KWin(Gio.bus_get_sync(Gio.BusType.SESSION,None));before=kwin.read()
+    # Refuse a foreign foreground before reading any accessible text.
+    window=before['window']
+    if (process!=editor['process'] or not window or window.get('id')!=editor['windowId'] or
+            window.get('pid')!=process['pid'] or window.get('application')!='org.kde.kate'):
+        raise ValueError('The original owned Kate window is not foreground.')
+    end=time.monotonic()+6
+    Atspi.set_timeout(500,1000);desktop=Atspi.get_desktop(0);apps=[]
+    if desktop.get_child_count()>200:raise ValueError('Accessibility application bound exceeded.')
+    for index in range(desktop.get_child_count()):
+        if time.monotonic()>=end:raise ValueError('Editor accessibility traversal time bound exceeded.')
+        app=desktop.get_child_at_index(index)
+        if app is not None and app.get_process_id()==process['pid']:apps.append(app)
+    if len(apps)!=1:raise ValueError('The owned editor accessibility application is ambiguous.')
+    stack=[(apps[0],[])];focused=[];focus_nodes=[];count=0
+    while stack and count<1500 and time.monotonic()<end:
+        node,path=stack.pop();count+=1
+        if node is None:raise ValueError('Editor accessibility traversal is incomplete.')
+        state=node.get_state_set()
+        if state.contains(Atspi.StateType.FOCUSED) and state.contains(Atspi.StateType.SHOWING):
+            password=node.get_role()==Atspi.Role.PASSWORD_TEXT
+            editable=state.contains(Atspi.StateType.EDITABLE);text=node.get_text_iface() if not password else None
+            focus={'path':path,'role':node.get_role_name(),'password':password,'editable':editable,'focused':True,'showing':True,
+                   'defunct':state.contains(Atspi.StateType.DEFUNCT),'textInterface':text is not None}
+            if text is not None and editable and not password:
+                size=Atspi.Text.get_character_count(node)
+                if not 0<=size<=4096:raise ValueError('Owned editor text exceeds its diagnostic bound.')
+                focus['text']=Atspi.Text.get_text(node,0,-1)
+            focused.append(focus)
+            focus_nodes.append(node)
+        if len(path)<2 or state.contains(Atspi.StateType.SHOWING):
+            children=node.get_child_count()
+            if children>100 or (len(path)>=16 and children):raise ValueError('Editor accessibility traversal bound exceeded.')
+            stack.extend((node.get_child_at_index(index),path+[index]) for index in range(children))
+    result=admit_editor_focus(editor,process,window,focused,not stack and time.monotonic()<end)
+    state=focus_nodes[0].get_state_set()
+    if (not all(state.contains(flag) for flag in (Atspi.StateType.FOCUSED,Atspi.StateType.SHOWING,Atspi.StateType.EDITABLE)) or
+            state.contains(Atspi.StateType.DEFUNCT) or focus_nodes[0].get_role()==Atspi.Role.PASSWORD_TEXT):
+        raise ValueError('The owned editor text focus changed during inspection.')
+    if editor_process(process['pid'],editor['path'])!=process or kwin.read()!=before:
+        raise ValueError('Owned editor process or scene changed during focus inspection.')
+    if time.monotonic()>=end:raise ValueError('Editor accessibility traversal time bound exceeded.')
+    return result
 
 
 def package_query(target):
@@ -197,48 +308,24 @@ elif action=='portal-owner':
 elif action=='editor':
     os.environ['QT_QPA_PLATFORM']='wayland';os.environ['QT_LINUX_ACCESSIBILITY_ALWAYS_ON']='1'
     output=Path.home()/'augmentor-desktop-acceptance.txt'
-    # Every editor this fixture opens is owned by the disposable test. Avoid
-    # accumulating windows and stale file-reload dialogs across proof runs.
+    # Prior windows and buffers belong to their original run. Refuse them;
+    # never force cleanup or silently adopt a replacement editor.
     owned=[]
     for proc in Path('/proc').iterdir():
         if not proc.name.isdigit():continue
         try:
-            args=(proc/'cmdline').read_bytes().split(b'\0')
-            if (proc/'comm').read_text().strip()=='kate' and str(output).encode() in args:
-                os.kill(int(proc.name),signal.SIGTERM);owned.append(proc)
-        except (OSError,ProcessLookupError):pass
-    end=time.monotonic()+5
-    while any(p.exists() for p in owned) and time.monotonic()<end:time.sleep(.1)
-    for proc in owned:
-        if proc.exists():
-            try:os.kill(int(proc.name),signal.SIGKILL)
-            except ProcessLookupError:pass
+            if proc.stat().st_uid!=os.getuid():continue
+            if (proc/'comm').read_text().strip()=='kate':owned.append(int(proc.name))
+        except (FileNotFoundError,ProcessLookupError):pass
+    require_editor_absent(owned)
+    if output.is_symlink():raise ValueError('Owned editor fixture must not be a symlink.')
     output.write_text('Fixture ready\n')
     editor=subprocess.Popen(['kate','--startanon',str(output)],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
-    print(json.dumps({'path':str(output),'launcherPid':editor.pid,'previousPids':[int(p.name) for p in owned]}))
-elif action=='editor-text':
-    # Read the actual focused widget independently of the executor/model. Used
-    # to press Stop only after at least one character was visibly inserted.
-    import gi
-    gi.require_version('Atspi','2.0')
-    from gi.repository import Atspi,Gio
-    from kwin import KWin
-    window=KWin(Gio.bus_get_sync(Gio.BusType.SESSION,None)).read()['window']
-    assert window and 'augmentor-desktop-acceptance' in window['title']
-    Atspi.set_timeout(500,1000);desktop=Atspi.get_desktop(0);texts=[]
-    for i in range(desktop.get_child_count()):
-        app=desktop.get_child_at_index(i)
-        if app is None or app.get_process_id()!=window['pid']:continue
-        stack=[app];count=0
-        while stack and count<1500:
-            node=stack.pop();count+=1
-            try:
-                state=node.get_state_set()
-                if state.contains(Atspi.StateType.FOCUSED) and node.get_text_iface():texts.append(Atspi.Text.get_text(node,0,-1))
-                if node is app or state.contains(Atspi.StateType.SHOWING):
-                    stack.extend(node.get_child_at_index(j) for j in range(min(node.get_child_count(),100)))
-            except Exception:pass
-    print(json.dumps({'texts':texts}))
+    print(json.dumps({'path':str(output),'launcherPid':editor.pid,'previousPids':[],
+                      'process':wait_editor_process(editor.pid,output)}))
+elif action in ('editor-focus','editor-text'):
+    result=read_editor_focus(json.loads(sys.argv[3]))
+    print(json.dumps(result if action=='editor-focus' else {'texts':[result['focus']['text']]}))
 elif action=='file':
     name=sys.argv[3]
     assert name in ('augmentor-desktop-acceptance.txt','augmentor-desktop-acceptance-saved.txt')

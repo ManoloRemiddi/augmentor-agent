@@ -11,7 +11,7 @@ import sys
 import tempfile
 import time
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock,patch
 from types import SimpleNamespace
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -232,19 +232,19 @@ class ExistingEditorSave(unittest.TestCase):
             self.assertFalse(check(),'An old saved file must not satisfy the save check.')
             self.assertTrue(check())
         action=Mock()
-        self.code.update(act=action,guest=guest,until=until)
+        self.code.update(editor_action=action,guest=guest,until=until)
         name=self.code['save_owned_editor'](self.editor,self.home,'Wayland ASCII verified\n')
-        action.assert_called_once_with('key',keys=['CTRL','S'])
+        action.assert_called_once_with(self.editor,self.home,'key',keys=['CTRL','S'])
         self.assertEqual(name,'augmentor-desktop-acceptance.txt')
         self.assertEqual(reads,[('file',name)]*3)
 
     def test_save_refusal_never_falls_back_to_save_as_or_replays_input(self):
         failure=RuntimeError('Target changed before the key. No input was sent.')
         action=Mock(side_effect=failure);read=Mock();wait=Mock()
-        self.code.update(act=action,guest=read,until=wait)
+        self.code.update(editor_action=action,guest=read,until=wait)
         with self.assertRaisesRegex(RuntimeError,'Target changed'):
             self.code['save_owned_editor'](self.editor,self.home,'Wayland ASCII verified\n')
-        action.assert_called_once_with('key',keys=['CTRL','S'])
+        action.assert_called_once_with(self.editor,self.home,'key',keys=['CTRL','S'])
         read.assert_not_called();wait.assert_not_called()
 
     def test_same_process_save_as_completion_keeps_scene_change_refusal(self):
@@ -255,6 +255,192 @@ class ExistingEditorSave(unittest.TestCase):
         after['above'].append({'id':'name-completion','pid':4321,
                                'geometry':{'x':300,'y':500,'width':400,'height':30}})
         self.assertFalse(compare(before,after),'A covering completion popup remains a scene change even with the same PID.')
+
+
+class FreshOwnedEditableEditor(unittest.TestCase):
+    def setUp(self):
+        self.helper=functions(ROOT/'release/vm-desktop-session.py',('admit_editor_focus','require_editor_absent'))
+        self.driver=functions(ROOT/'scripts/vm-desktop-proof.py',('editor_fixture_name','admit_editor_observation',
+                            'owned_editor_focus','owned_editor_snapshot','editor_action'))
+        self.home='/home/augmentor-complete-proof'
+        self.process={'pid':4321,'uid':1001,'startTicks':'987654','exe':'/usr/bin/kate',
+                      'argv':['kate','--startanon',self.home+'/augmentor-desktop-acceptance.txt']}
+        self.editor={'path':self.process['argv'][-1],'process':copy.deepcopy(self.process),'windowId':'fresh-editor'}
+        self.window={'id':'fresh-editor','pid':4321,'application':'org.kde.kate','title':'augmentor-desktop-acceptance.txt — Kate',
+                     'geometry':{'x':50,'y':40,'width':900,'height':700}}
+        self.focus={'path':[0,2,1],'role':'text','focused':True,'showing':True,'editable':True,'password':False,
+                    'defunct':False,'textInterface':True,'text':'Fixture ready\n'}
+
+    def record(self):
+        return self.helper['admit_editor_focus'](self.editor,self.process,self.window,[self.focus],True)
+
+    def test_fresh_exact_owned_single_editable_text_target_admits(self):
+        record=self.record()
+        self.assertEqual(self.driver['admit_editor_observation'](self.editor,record,{'window':self.window}),record)
+
+    def test_prior_editor_refuses_without_closing_or_replacing_it(self):
+        self.helper['require_editor_absent']([])
+        with self.assertRaisesRegex(ValueError,'no editor was closed or replaced'):
+            self.helper['require_editor_absent']([4321])
+        source=(ROOT/'release/vm-desktop-session.py').read_text()
+        branch=source.split("elif action=='editor':",1)[1].split("elif action in ('editor-focus'",1)[0]
+        self.assertNotIn('os.kill',branch);self.assertNotIn('SIGKILL',branch)
+        self.assertLess(branch.index('require_editor_absent(owned)'),branch.index('output.write_text'))
+
+    def test_changed_pid_start_owner_executable_or_argv_refuses(self):
+        for key,value in [('pid',4322),('startTicks','987655'),('uid',1000),('exe','/usr/bin/other'),('argv',['kate','different.txt'])]:
+            with self.subTest(key=key):
+                process=copy.deepcopy(self.process);process[key]=value
+                with self.assertRaisesRegex(ValueError,'process changed'):
+                    self.helper['admit_editor_focus'](self.editor,process,self.window,[self.focus],True)
+
+    def test_foreign_native_window_dialog_or_file_refuses(self):
+        for key,value in [('id','save-dialog'),('pid',4322),('application','other'),('title','Save File — Kate')]:
+            with self.subTest(key=key):
+                window=copy.deepcopy(self.window);window[key]=value
+                with self.assertRaisesRegex(ValueError,'not foreground'):
+                    self.helper['admit_editor_focus'](self.editor,self.process,window,[self.focus],True)
+
+    def test_file_list_page_tab_password_hidden_or_defunct_refuses(self):
+        cases=[dict(self.focus,role=role,editable=False,textInterface=False) for role in ('table cell','list item','page tab')]
+        cases += [dict(self.focus,**change) for change in ({'password':True},{'focused':False},{'showing':False},
+                                                        {'defunct':True},{'textInterface':False},{'editable':None})]
+        for focus in cases:
+            with self.subTest(focus=focus),self.assertRaisesRegex(ValueError,'editable nonpassword'):
+                self.helper['admit_editor_focus'](self.editor,self.process,self.window,[focus],True)
+
+    def test_missing_ambiguous_or_incomplete_focus_refuses(self):
+        for focused,complete in [([],True),([self.focus,self.focus],True),([self.focus],False)]:
+            with self.subTest(focused=focused,complete=complete),self.assertRaisesRegex(ValueError,'incomplete or ambiguous'):
+                self.helper['admit_editor_focus'](self.editor,self.process,self.window,focused,complete)
+
+    def test_original_focus_path_and_fresh_capture_window_are_bound(self):
+        self.editor['focusPath']=[0,2,1]
+        self.focus['path']=[0,3,1]
+        with self.assertRaisesRegex(ValueError,'focus changed'):self.record()
+        record={'process':self.process,'window':self.window,'focus':self.focus,'complete':True}
+        with self.assertRaisesRegex(ValueError,'focus changed'):
+            self.driver['admit_editor_observation'](self.editor,record)
+        self.focus['path']=[0,2,1];record=self.record()
+        for change in ({'pid':4322},{'id':'save-dialog'},{'geometry':{'x':1}}, {'title':'Save File — Kate'}):
+            with self.subTest(change=change),self.assertRaisesRegex(ValueError,'changed before'):
+                self.driver['admit_editor_observation'](self.editor,record,{'window':dict(self.window,**change)})
+
+    def test_focus_capture_and_single_dispatch_order_is_preserved(self):
+        events=[];record=self.record();snapshot={'window':self.window,'token':'fresh-once'}
+        def guest(action,raw):
+            events.append('focus');self.assertEqual(action,'editor-focus');self.assertEqual(json.loads(raw),self.editor)
+            return copy.deepcopy(record)
+        def observe():events.append('capture');return snapshot
+        def rpc(method,params):events.append('dispatch');self.assertEqual(method,'action');return {'ok':True,'result':params}
+        self.driver.update(guest=guest,observe=observe,rpc=rpc,okay=lambda response:response['result'])
+        result=self.driver['editor_action'](self.editor,self.home,'type',text='Exact case')
+        self.assertEqual(events,['focus','capture','dispatch']);self.assertEqual(result,snapshot)
+        self.assertEqual(self.editor['focusPath'],self.focus['path'])
+
+    def test_changed_focus_or_capture_refuses_without_dispatch_or_retry(self):
+        for stage in ('focus','capture'):
+            with self.subTest(stage=stage):
+                record=self.record();snapshot={'window':copy.deepcopy(self.window),'token':'fresh-once'}
+                if stage=='focus':record['focus']=dict(self.focus,editable=False)
+                else:snapshot['window']['id']='dialog'
+                guest=Mock(return_value=record);observe=Mock(return_value=snapshot);dispatch=Mock()
+                self.driver.update(guest=guest,observe=observe,rpc=dispatch)
+                with self.assertRaises(ValueError):self.driver['editor_action'](self.editor,self.home,'type',text='refuse')
+                dispatch.assert_not_called();guest.assert_called_once()
+                self.assertEqual(observe.call_count,0 if stage=='focus' else 1)
+
+    def read_synthetic_focus(self,change=None):
+        import gi
+        gi.require_version('Atspi','2.0')
+        from gi.repository import Atspi,Gio
+        code=functions(ROOT/'release/vm-desktop-session.py',('admit_editor_focus','read_editor_focus'))
+        code.update(time=time,editor_process=Mock(return_value=self.process))
+        node=Mock();node.get_role.return_value=Atspi.Role.TEXT;node.get_role_name.return_value='text'
+        node.get_child_count.return_value=0;node.get_text_iface.return_value=object()
+        flags={Atspi.StateType.FOCUSED,Atspi.StateType.SHOWING,Atspi.StateType.EDITABLE}
+        state=Mock();state.contains.side_effect=lambda flag:flag in flags;node.get_state_set.return_value=state
+        app=Mock();app.get_process_id.return_value=4321;app.get_child_count.return_value=1
+        app.get_child_at_index.return_value=node
+        app.get_state_set.return_value.contains.side_effect=lambda flag:flag==Atspi.StateType.SHOWING
+        desktop=Mock();desktop.get_child_count.return_value=1;desktop.get_child_at_index.return_value=app
+        kwin=Mock();kwin.read.return_value={'window':self.window,'above':[],'screens':[]}
+        if change:change(code,node,app,kwin,state)
+        with patch.dict(sys.modules,{'kwin':SimpleNamespace(KWin=Mock(return_value=kwin))}),\
+                patch.object(Gio,'bus_get_sync'),patch.object(Atspi,'set_timeout'),\
+                patch.object(Atspi,'get_desktop',return_value=desktop),\
+                patch.object(Atspi.Text,'get_character_count',return_value=14),\
+                patch.object(Atspi.Text,'get_text',return_value='Fixture ready\n'):
+            return code['read_editor_focus'](self.editor)
+
+    def test_actual_bounded_read_returns_fresh_owned_editor_text(self):
+        record=self.read_synthetic_focus()
+        self.assertEqual(record['focus']['text'],'Fixture ready\n');self.assertEqual(record['focus']['path'],[0])
+        self.assertTrue(record['complete']);self.assertEqual(record['process'],self.process)
+
+    def test_actual_traversal_missing_node_ambiguous_focus_or_child_bound_refuses(self):
+        changes=[lambda c,n,a,k,s:a.get_child_at_index.configure_mock(return_value=None),
+                 lambda c,n,a,k,s:a.get_child_count.configure_mock(return_value=2),
+                 lambda c,n,a,k,s:n.get_child_count.configure_mock(return_value=101)]
+        for change in changes:
+            with self.subTest(change=change),self.assertRaises(ValueError):self.read_synthetic_focus(change)
+
+    def test_actual_late_focus_or_process_or_window_change_refuses(self):
+        def changed_focus(code,node,app,kwin,state):
+            unfocused=Mock();unfocused.contains.return_value=False
+            node.get_state_set.side_effect=[state,unfocused]
+        def changed_process(code,node,app,kwin,state):
+            code['editor_process'].side_effect=[self.process,dict(self.process,startTicks='new')]
+        def changed_window(code,node,app,kwin,state):
+            kwin.read.side_effect=[{'window':self.window,'above':[],'screens':[]},
+                                  {'window':dict(self.window,id='dialog'),'above':[],'screens':[]}]
+        for change in (changed_focus,changed_process,changed_window):
+            with self.subTest(change=change),self.assertRaisesRegex(ValueError,'changed'):
+                self.read_synthetic_focus(change)
+
+    def test_actual_readonly_time_bound_refuses_before_traversal(self):
+        def expired(code,node,app,kwin,state):
+            code['time']=SimpleNamespace(monotonic=Mock(side_effect=[0,7]))
+        with self.assertRaisesRegex(ValueError,'time bound'):self.read_synthetic_focus(expired)
+
+
+class FreshKateExecWait(unittest.TestCase):
+    def setUp(self):
+        self.code=functions(ROOT/'release/vm-desktop-session.py',('wait_editor_process',))
+        self.identity={'pid':4321,'uid':1001,'startTicks':'987654','exe':'/usr/bin/kate',
+                       'argv':['kate','--startanon','/home/augmentor-complete-proof/augmentor-desktop-acceptance.txt']}
+        self.birth=Mock(return_value=(1001,'987654'));self.inspect=Mock(return_value=self.identity)
+        self.clock=Mock(return_value=0);self.sleep=Mock()
+        self.code.update(os=SimpleNamespace(getuid=lambda:1001),editor_process_birth=self.birth,
+                         editor_process=self.inspect,time=SimpleNamespace(monotonic=self.clock,sleep=self.sleep))
+
+    def wait(self):return self.code['wait_editor_process'](4321,self.identity['argv'][-1])
+
+    def test_transient_pre_exec_waits_only_for_the_same_exact_child(self):
+        self.inspect.side_effect=[ValueError('Still the forked interpreter'),self.identity]
+        self.assertEqual(self.wait(),self.identity);self.sleep.assert_called_once_with(.05)
+        self.assertEqual(self.inspect.call_count,2)
+        for call in self.inspect.call_args_list:self.assertEqual(call.args,(4321,self.identity['argv'][-1]))
+
+    def test_persistent_wrong_executable_or_arguments_hits_deadline_without_adoption(self):
+        self.inspect.side_effect=ValueError('Exact Kate executable/argv differs')
+        self.clock.side_effect=[0,0,5]
+        with self.assertRaisesRegex(ValueError,'exact Kate identity within five seconds'):self.wait()
+        self.assertEqual(self.inspect.call_count,2);self.sleep.assert_called_once_with(.05)
+
+    def test_changed_start_or_owner_refuses_before_another_identity_probe(self):
+        for changed in ((1001,'new-start'),(1000,'987654')):
+            with self.subTest(changed=changed):
+                self.setUp();self.birth.side_effect=[(1001,'987654'),changed]
+                with self.assertRaisesRegex(ValueError,'owner or start changed'):self.wait()
+                self.inspect.assert_not_called();self.sleep.assert_not_called()
+
+    def test_exit_or_late_identity_change_is_terminal_without_retry(self):
+        for changed in (FileNotFoundError('Child exited'),(1001,'new-start')):
+            with self.subTest(changed=changed):
+                self.setUp();self.birth.side_effect=[(1001,'987654'),(1001,'987654'),changed]
+                with self.assertRaises((FileNotFoundError,ValueError)):self.wait()
+                self.inspect.assert_called_once();self.sleep.assert_not_called()
 
 
 class UnlockedSessionInput(unittest.TestCase):
