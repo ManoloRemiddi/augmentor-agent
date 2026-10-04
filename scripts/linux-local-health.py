@@ -29,9 +29,29 @@ def main():
             os.environ[key]=str(directory)
         os.environ['QT_QPA_PLATFORM']='offscreen'
         sys.path[:0]=[str(ROOT/'services'),str(ROOT/'apps/native')]
+        portal={}
+        if 'portalSystemMinimum' in release:
+            pins=json.loads((ROOT/'release/linux-managed.json').read_text())['portal']
+            if release['portalSystemMinimum']!=pins['systemMinimum']:
+                raise ValueError('The portal receipt differs from the bundled dependency pins.')
+            import gi
+            import cairo
+            from importlib.metadata import version
+            gi.require_version('Gio','2.0')
+            from gi.repository import Gio,GLib
+            minimum=tuple(int(part) for part in pins['systemMinimum']['glib'].split('.'))
+            if ((GLib.MAJOR_VERSION,GLib.MINOR_VERSION)<minimum or Gio.DBusConnection is None
+                    or gi.__version__!=pins['runtimePackages']['PyGObject']
+                    or version('pycairo')!=pins['runtimePackages']['pycairo']
+                    or cairo.cairo_version()<11510):
+                raise ValueError('The required managed Linux portal libraries are unavailable.')
+            portal={'portalBindings':True,'pygobjectVersion':gi.__version__,
+                'glibVersion':[GLib.MAJOR_VERSION,GLib.MINOR_VERSION,GLib.MICRO_VERSION]}
         from augmentor_linux.local_health import render_preview
-        report={'schema':'augmentor-linux-health/1','releaseSHA256':hashlib.sha256(raw).hexdigest(),
-            **{key:release[key] for key in ('version','sourceCommit','target')},**render_preview(platform='offscreen')}
+        report={'schema':'augmentor-linux-health/2' if portal else 'augmentor-linux-health/1',
+            'releaseSHA256':hashlib.sha256(raw).hexdigest(),
+            **{key:release[key] for key in ('version','sourceCommit','target')},**render_preview(platform='offscreen'),
+            **portal}
     os.write(1,(json.dumps(report,separators=(',',':'))+'\n').encode())
 
 

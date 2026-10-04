@@ -1545,3 +1545,50 @@ spawn bytecode: `dictation.request` currently launches `sys.executable` without
 explicit no-bytecode flags; the installed desktop launcher propagates its guard,
 but Browser/other caller paths still need direct immutable-artifact evidence.
 Preserve live broad 37165487146 and Mac 37165488998 while progressing these gates.
+
+## Linux portal dependency closure — October 4, candidate
+
+This follow-up to `62c15cd` adds PyGObject **3.52.4** and Pycairo **1.28.0**
+to the exact standalone Python 3.12.13 runtime graph (24 packages). Official
+source archives and six isolated build tools are pinned by SHA-256. Native
+wheels are built outside the product runtime; their source/wheel identities,
+build-tool versions, build-lock digest and native library versions are retained
+in `licenses/linux-portal-build.json`. Build tools do not enter runtime inventory.
+The existing portal protocol is retained. Both CPU candidates now declare glibc
+2.39 and GLib/GIRepository 2.80; Ubuntu 24.04 and Debian 13 remain candidates,
+with distribution qualification and automatic installation explicitly false.
+
+The fixed offline health action emits schema `/2` only for receipts declaring
+portal requirements. It imports the bundled bindings and checks their pinned
+version/GLib floor. The retained consumer requires those exact fields, a real
+boolean and integer version components, and agreement with bundled pins. Legacy
+receipts retain their exact `/1` report. New targets run this private-profile
+health action before maintenance and during immutable preflight, so unavailable
+libraries refuse before stopping the current app. Ordinary dictation-client
+startup now explicitly passes `-B`; an actual copied-interpreter/broker test
+removes inherited bytecode guards and verifies unchanged release bytes.
+
+Actual local native compilation/installation passed in isolated Ubuntu image
+`ubuntu@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3`.
+The staged interpreter imported PyGObject 3.52.4 with GLib 2.80.0. Its real
+isolated D-Bus fixture passed both cases, exercising early Response, shortcut
+press/release and denied rebinding without compositor consent or audio capture.
+This local build preceded the added interpreter/provenance assertions; final
+producer qualification is assigned to native x64/ARM64 CI. The complete archive
+proof now runs that same two-case fixture through the relocated bundled Python,
+requiring no skips and checking source/target immutability afterwards.
+Original source notices are inventoried; the build proof deliberately retains
+`sourceLicenseReviewComplete: false`. No distribution, physical compositor,
+production signing/feed or signed forward installation is qualified here.
+
+The preceding source `69477f8` has now completed the entire broad/shared/Linux
+workflow successfully in
+[37165487146](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37165487146),
+including complete x64/ARM64 bundles and installed packages. Those artifacts
+precede this portal closure. Full Mac 14 job 111327575462 succeeds in
+[37165488998](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37165488998);
+Mac 26 job 111327575502 remains live at the latest observation. These results
+supersede the earlier live statuses without implying final cross-platform
+qualification. The original Mac run is retained; no customer install changed.
+
+Local follow-up checks pass: 15 managed-selection/health cases (including dependency refusal before maintenance), 11 producer/archive cases, 11 broker-maintenance cases and 14 existing dictation cases. The two-case actual bundled-interpreter D-Bus fixture also passes. These are source/private fixture checks, with the native complete two-CPU build still pending.

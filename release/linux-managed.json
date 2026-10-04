@@ -25,7 +25,9 @@
     "more-itertools": "10.7.0",
     "SecretStorage": "3.3.3",
     "jeepney": "0.9.0",
-    "cryptography": "45.0.6"
+    "cryptography": "45.0.6",
+    "PyGObject": "3.52.4",
+    "pycairo": "1.28.0"
   },
   "targets": {
     "x64": {
@@ -40,7 +42,7 @@
         "url": "https://nodejs.org/dist/v24.19.0/node-v24.19.0-linux-x64.tar.xz",
         "sha256": "14b342e71204f811bde6153be8e04b62aef63c236fef92b55f9c83154b409647"
       },
-      "wheelGlibcFloor": "2.28",
+      "wheelGlibcFloor": "2.39",
       "candidateDistributions": {
         "ubuntu": "24.04",
         "debian": "13"
@@ -66,5 +68,37 @@
       },
       "distributionsQualified": false
     }
+  },
+  "portal": {
+    "schema": "augmentor-linux-portal-build/1",
+    "sources": [
+      {
+        "package": "pycairo",
+        "version": "1.28.0",
+        "file": "pycairo-1.28.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/40/d9/412da520de9052b7e80bfc810ec10f5cb3dbfa4aa3e23c2820dc61cdb3d0/pycairo-1.28.0.tar.gz",
+        "sha256": "26ec5c6126781eb167089a123919f87baa2740da2cca9098be8b3a6b91cc5fbc",
+        "bytes": 662477
+      },
+      {
+        "package": "PyGObject",
+        "version": "3.52.4",
+        "file": "pygobject-3.52.4.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/0d/7f/e577ca065a83c626127e3180f12c32c4d85b9b17cebcfbe8303a67f5e4a1/pygobject-3.52.4.tar.gz",
+        "sha256": "5947250b27d8e5f4797e8e0ed801dcd1512a9433d5637a0b36065a850b3a5c5c",
+        "bytes": 1247281
+      }
+    ],
+    "buildRequirements": "release/linux-portal-build.txt",
+    "systemMinimum": {
+      "glib": "2.80",
+      "girepository": "2.80",
+      "cairo": "1.15.10"
+    },
+    "runtimePackages": {
+      "PyGObject": "3.52.4",
+      "pycairo": "1.28.0"
+    },
+    "automaticInstallQualified": false
   }
 }

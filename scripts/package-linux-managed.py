@@ -110,6 +110,8 @@ def python_packages(project,configuration):
     subprocess.run([sys.executable,'-m','pip','--python',str(interpreter),'install',
         '--require-hashes','--only-binary=:all:','--no-deps','--no-compile',
         '-r',str(ROOT/'release/linux-managed-requirements.txt')],check=True,timeout=600)
+    subprocess.run([sys.executable,str(ROOT/'scripts/stage-linux-portal.py'),'--project',str(project),
+        '--inputs',str(project.parent/'inputs/portal')],check=True,timeout=1200)
     code=('import json,platform;from importlib.metadata import distributions;'
         'print(json.dumps({"python":platform.python_version(),'
         '"packages":{d.metadata["Name"].lower().replace("_","-").replace(".","-"):d.version for d in distributions()}}))')
@@ -119,7 +121,8 @@ def python_packages(project,configuration):
         raise ValueError('The staged Python graph differs from its reviewed lock.')
     subprocess.run([str(interpreter),'-I','-B','-m','pip','check'],check=True,timeout=30)
     subprocess.run([str(interpreter),'-I','-B','-c',
-        'import PySide6,numpy,websocket,yaml,sounddevice,onnxruntime;from keyring.backends.SecretService import Keyring'],check=True,timeout=30)
+        'import PySide6,numpy,websocket,yaml,sounddevice,onnxruntime,gi;from keyring.backends.SecretService import Keyring;'
+        'gi.require_version("Gio","2.0");from gi.repository import Gio,GLib'],check=True,timeout=30)
     subprocess.run([str(interpreter),'-I','-B',str(ROOT/'scripts/python-license-inventory.py'),
         '--out',str(project/'licenses/python-inventory.json')],check=True,timeout=30)
 
@@ -182,13 +185,16 @@ def build(out,*,channel='development',build=0,declared=None):
     (project/'release.json').write_text(json.dumps({**product,'target':pins['target'],'channel':channel,
         'sourceCommit':source['commit'],'component':'desktop','qualificationStatus':'development-only',
         'python':configuration['pythonVersion'],'node':pins['node']['version'],'qt':configuration['qtVersion'],
+        'portalSystemMinimum':configuration['portal']['systemMinimum'],
         'wheelGlibcFloor':pins['wheelGlibcFloor'],'candidateDistributions':pins['candidateDistributions'],
         'distributionsQualified':False,'update':receipt},indent=2)+'\n')
     before=snapshot(project)
     health=subprocess.check_output([str(project/'python/bin/python3'),'-I','-B',str(project/'scripts/linux-local-health.py')],timeout=60)
     report=json.loads(health)
-    if (report.get('schema')!='augmentor-linux-health/1' or report.get('rendered') is not True
-            or report.get('fontCoverage') is not True or report.get('releaseSHA256')!=sha(project/'release.json')
+    if (report.get('schema')!='augmentor-linux-health/2' or report.get('rendered') is not True
+            or report.get('fontCoverage') is not True or report.get('portalBindings') is not True
+            or report.get('pygobjectVersion')!=configuration['portal']['runtimePackages']['PyGObject']
+            or report.get('releaseSHA256')!=sha(project/'release.json')
             or any(report.get(key)!=value for key,value in (('version',product['version']),('sourceCommit',source['commit']),('target',pins['target'])))
             or snapshot(project)!=before):raise ValueError('The exact bundled target failed immutable offline UI health.')
     if source_revision(ROOT,build=build,declared=source['commit'])!=source:

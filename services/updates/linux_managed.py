@@ -123,6 +123,7 @@ class ManagedPlan:
                 self.tool.check(self.previous,connected=True)
                 self.tool.check(self.proposed,connected=False)
             else:self.tool.check(self.proposed,connected=True)
+            self.validate_portal()
             self.validate(offline=False)
             return self
         except BaseException:self.close();raise
@@ -130,6 +131,15 @@ class ManagedPlan:
     def pair(self):
         return tuple(artifact({**{k:identity[k] for k in ('version','sourceCommit','target','channel','dataSchema','readableDataSchemas')},
             'sha256':payload['sha256']}) for identity,payload in zip(self.identities,(self.source_payload,self.target_payload)))
+
+    def validate_portal(self):
+        release=_json(_read(self.target/'release.json',65536),65536)
+        if 'portalSystemMinimum' in release:
+            from .linux_completion import verify_health
+            if verify_health(self) is not True:
+                raise ValueError('The managed target portal dependencies failed preflight.')
+            if snapshot(self.target)!=self.target_payload:
+                raise ValueError('The offline portal preflight changed the target.')
 
     def validate(self,*,offline=True):
         if self.fd is None or self.closed or self.started:
@@ -145,6 +155,7 @@ class ManagedPlan:
                 raise ValueError('An immutable managed artifact changed after preflight.')
         if offline:
             self.tool.check(self.proposed,connected=False)
+            self.validate_portal()
             if snapshot(self.target)!=self.target_payload:raise ValueError('The offline import changed the target.')
 
     def close(self):

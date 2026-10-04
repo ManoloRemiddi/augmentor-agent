@@ -2,6 +2,21 @@
 
 # Source baselines and migration inventory
 
+## Managed Linux portal bindings — October 4 candidate
+
+[PyGObject 3.52.4](https://pypi.org/project/PyGObject/3.52.4/) and
+[Pycairo 1.28.0](https://pypi.org/project/pycairo/1.28.0/) official source
+archives are SHA-256/length pinned in `release/linux-managed.json`. Their native
+build tools are separately hash locked in `release/linux-portal-build.txt`.
+[GNOME packaging requirements](https://pygobject.gnome.org/devguide/packagingguide.html)
+require GLib/GIRepository 2.80 for this binding generation. The builder records
+source/wheel hashes and actual native/build-tool versions, and the runtime notice
+inventory retains original license texts (PyGObject LGPL-2.1-or-later; Pycairo
+LGPL-2.1-only OR MPL-1.1). Redistribution review stays unqualified. Actual
+isolated x64 native compilation, imports and portal D-Bus fixture pass; final
+native two-CPU bundles and real compositor acceptance remain separate. See
+[scope and evidence](UPDATE-SYSTEM.md#linux-portal-dependency-closure--october-4-candidate).
+
 ## Update repository client — October 3
 
 [`tuf-js`](https://github.com/theupdateframework/tuf-js) **6.0.0** and

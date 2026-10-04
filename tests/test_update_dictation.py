@@ -114,6 +114,29 @@ class BrokerAdmissionTests(unittest.TestCase):
 
 @unittest.skipUnless(sys.platform=='linux','Actual Linux socket pidfd and copied system interpreter.')
 class NativeBrokerTests(unittest.TestCase):
+    def test_ordinary_client_spawn_preserves_release_without_inherited_bytecode_guard(self):
+        with tempfile.TemporaryDirectory(prefix='agdb-client-') as folder:
+            base=Path(folder);project=base/'project';project.mkdir(mode=0o700)
+            for path in (ROOT/'services').rglob('*.py'):
+                target=project/path.relative_to(ROOT);target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(path,target)
+            client=project/'apps/native/augmentor_linux/dictation.py';client.parent.mkdir(parents=True)
+            shutil.copy2(ROOT/'apps/native/augmentor_linux/dictation.py',client)
+            python=project/'python/bin/python3';python.parent.mkdir(parents=True);shutil.copy2(Path(sys.executable).resolve(),python)
+            runtime=base/'run';runtime.mkdir(mode=0o700)
+            environment={**os.environ,'AUGMENTOR_DICTATION_STATE':str(base/'dictation'),
+                'XDG_RUNTIME_DIR':str(runtime),'XDG_STATE_HOME':str(base/'state'),
+                'XDG_SESSION_ID':'private-client-proof','DISPLAY':'','WAYLAND_DISPLAY':''}
+            for key in ('PYTHONDONTWRITEBYTECODE','PYTHONPYCACHEPREFIX'):environment.pop(key,None)
+            code=('import sys;sys.path.insert(0,'+repr(str(project/'apps/native'))+');'
+                'from augmentor_linux import dictation;'
+                'assert not dictation.request("status")["enabled"];'
+                'dictation.request("shutdown",start=False)')
+            original=snapshot(project)
+            subprocess.run([str(python),'-I','-B','-c',code],env=environment,
+                stdin=subprocess.DEVNULL,capture_output=True,check=True,timeout=20)
+            self.assertEqual(snapshot(project),original)
+            self.assertFalse(list(project.rglob('__pycache__')))
+
     def test_actual_graph_preserves_voice_then_drains_and_reopens_original_session_once(self):
         with tempfile.TemporaryDirectory(prefix='agdb-') as folder:
             base=Path(folder);runtime=base/'run';runtime.mkdir(mode=0o700)

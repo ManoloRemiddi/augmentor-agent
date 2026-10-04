@@ -2,6 +2,24 @@
 
 # Start here: agent handoff
 
+## Linux portal updater follow-up — October 4, in progress
+
+The candidate following `62c15cd` bundles pinned PyGObject/Pycairo, uses a private
+native build environment and declares GLib/GIRepository 2.80 plus glibc 2.39.
+Actual standalone Python 3.12.13 compilation/import and the two-case isolated
+portal D-Bus fixture pass on x64 Ubuntu. New-receipt `/2` health checks run before
+maintenance; legacy `/1` reports remain supported. Normal broker startup now
+explicitly suppresses bytecode, with actual immutable copied-release evidence.
+See [the scoped record](UPDATE-SYSTEM.md#linux-portal-dependency-closure--october-4-candidate)
+for pins, provenance, checks and remaining distribution/physical acceptance.
+
+Broad source `69477f8` run 37165487146 is entirely successful, including both
+complete Linux bundles (before portal closure). Full Mac 14 job 111327575462
+also succeeds; Mac 26 job 111327575502 in 37165488998 is still live at the latest
+observation. Preserve that original run. The dated live-status paragraphs below
+are superseded by these results. Public feed/automatic eligibility remain false;
+this checkpoint does not complete the full cross-platform goal.
+
 ## Automatic updates implementation — October 3, in progress
 
 Real Linux desktop acceptance also needs the Wayland portal dependency closure:

@@ -28,7 +28,7 @@ jobs:
       - name: Install declared build and runtime host libraries
         run: |
           sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=30 update
-          sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=30 install -y --no-install-recommends python3-pip libportaudio2 libxcb-cursor0 libxkbcommon-x11-0 libegl1 libopengl0 libgl1 fonts-dejavu-core
+          sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=30 install -y --no-install-recommends python3-pip build-essential pkg-config libgirepository-2.0-dev libcairo2-dev gir1.2-glib-2.0 dbus libportaudio2 libxcb-cursor0 libxkbcommon-x11-0 libegl1 libopengl0 libgl1 fonts-dejavu-core
       - name: Build reviewed application inputs
         run: |
           npm ci --ignore-scripts
@@ -47,7 +47,7 @@ jobs:
           python3 -c "import importlib.util; s=importlib.util.spec_from_file_location('stage','scripts/stage-handy.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.validate()"
       - name: Build complete unqualified preview bundle
         run: python3 -B scripts/package-linux-managed.py --out outputs/linux-managed --channel preview --update-build 1 --source-commit "$GITHUB_SHA"
-      - name: Exercise actual ZIP staging and relocated offline Qt health
+      - name: Exercise actual ZIP staging, relocated Qt health and bundled portal D-Bus
         run: python3 -B scripts/proof-linux-managed-bundle.py outputs/linux-managed --out outputs/linux-managed/proof.json
       - name: Retain scoped qualification reports
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

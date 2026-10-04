@@ -57,6 +57,13 @@ def prove(directory):
                 raise ValueError('Bundled runtimes did not follow the final immutable release.')
             health=json.loads(subprocess.check_output([configuration['python'],'-I','-B',
                 str(target/'scripts/linux-local-health.py')],timeout=60))
+            portal_code=('import sys,unittest;sys.path.insert(0,'+repr(str(target))+');'
+                'suite=unittest.defaultTestLoader.discover('+repr(str(ROOT/'tests'))+
+                ',pattern="test_dictation_portal.py");'
+                'result=unittest.TextTestRunner(verbosity=2).run(suite);'
+                'sys.exit(0 if result.wasSuccessful() and result.testsRun==2 and not result.skipped else 1)')
+            subprocess.run(['dbus-run-session','--',configuration['python'],'-I','-B','-c',portal_code],
+                env={**os.environ,'AUGMENTOR_PORTAL_PROOF':'1'},check=True,timeout=60)
             if (health!=report['offlineHealth'] or snapshot(target)!=payload or snapshot(project)!=original
                     or read_json(data/'desktop.json')!=previous):
                 raise ValueError('The staged target or source changed during actual offline health.')
@@ -64,6 +71,7 @@ def prove(directory):
                 'sourceCommit':receipt['sourceCommit'],'artifactSHA256':item['sha256'],
                 'actualArchiveConsumer':True,'bundledInterpretersRelocated':True,'selectionUnchanged':True,
                 'actualOfflineQtHealth':True,'immutableTarget':True,'liveProviderExercised':False,
+                'actualPortalDBusFixture':True,'compositorPermissionExercised':False,
                 'installationExercised':False,'automaticInstallQualified':False}
         finally:os.environ.clear();os.environ.update(environment)
 

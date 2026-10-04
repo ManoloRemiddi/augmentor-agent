@@ -21,8 +21,23 @@ def verify_health(plan):
         stdin=subprocess.DEVNULL,capture_output=True,timeout=45)
     if result.returncode:raise RuntimeError('The fixed offline Linux UI health action failed.')
     report=_json(result.stdout,4096)
-    if (not isinstance(report,dict) or set(report)!={'schema','releaseSHA256','version','sourceCommit','target',
-            'qtPlatform','rendered','width','height','fontCoverage'} or report['schema']!='augmentor-linux-health/1'
+    fields={'schema','releaseSHA256','version','sourceCommit','target',
+        'qtPlatform','rendered','width','height','fontCoverage'}
+    schema='augmentor-linux-health/1'
+    if 'portalSystemMinimum' in release:
+        pins=_json(_read(plan.target/'release/linux-managed.json',65536),65536)['portal']
+        fields|={'portalBindings','pygobjectVersion','glibVersion'}
+        schema='augmentor-linux-health/2'
+        glib=report.get('glibVersion') if isinstance(report,dict) else None
+        minimum=tuple(int(part) for part in pins['systemMinimum']['glib'].split('.'))
+        if (release['portalSystemMinimum']!=pins['systemMinimum'] or not isinstance(report,dict)
+                or report.get('portalBindings') is not True
+                or report.get('pygobjectVersion')!=pins['runtimePackages']['PyGObject']
+                or not isinstance(glib,list) or len(glib)!=3
+                or any(type(part) is not int or not 0<=part<=65535 for part in glib)
+                or tuple(glib[:2])<minimum):
+            raise ValueError('The offline portal report differs from the managed target requirements.')
+    if (not isinstance(report,dict) or set(report)!=fields or report['schema']!=schema
             or report['releaseSHA256']!=hashlib.sha256(raw).hexdigest()
             or any(report[key]!=release.get(key) for key in ('version','sourceCommit','target'))
             or report['qtPlatform']!='offscreen' or report['rendered'] is not True or report['fontCoverage'] is not True

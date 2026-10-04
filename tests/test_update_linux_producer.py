@@ -124,7 +124,10 @@ class ProducerTests(unittest.TestCase):
         config=json.loads((ROOT/'release/linux-managed.json').read_text())
         lines=(ROOT/'release/linux-managed-requirements.txt').read_text().splitlines()
         locked={line.split()[0].partition('==')[0]:line.partition('==')[2].split()[0] for line in lines if line and not line.startswith('#')}
-        self.assertEqual(locked,config['pythonPackages']);self.assertEqual(config['qualificationStatus'],'development-only')
+        self.assertEqual({**locked,**config['portal']['runtimePackages']},config['pythonPackages'])
+        self.assertFalse(config['portal']['automaticInstallQualified'])
+        self.assertEqual({row['package']:row['version'] for row in config['portal']['sources']},config['portal']['runtimePackages'])
+        self.assertEqual(config['qualificationStatus'],'development-only')
         self.assertEqual(set(config['targets']),{'x64','arm64'})
         for arch,pins in config['targets'].items():
             self.assertFalse(pins['distributionsQualified']);self.assertEqual(pins['target'],'linux-'+arch)

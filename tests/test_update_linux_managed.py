@@ -18,6 +18,7 @@ from platform_adapters.private_files import descriptor,atomic_json,read_json
 from updates.linux_managed import ManagedPlan,load_deployment
 from updates.linux_coordinator import LinuxCoordinator
 from updates.linux_completion import verify_health
+import hashlib
 
 
 @unittest.skipUnless(sys.platform=='linux','Actual Linux managed selection and flock checks.')
@@ -73,6 +74,20 @@ class LinuxManagedTests(unittest.TestCase):
         self.tool.check.side_effect=RuntimeError('Exact DSH product version mismatch.')
         with self.assertRaisesRegex(RuntimeError,'version mismatch'):
             with self.plan():pass
+        self.assertEqual(read_json(self.data/'desktop.json'),self.selected)
+        self.assertFalse((self.transactions/'active.json').exists())
+
+    def test_missing_portal_dependencies_refuse_before_maintenance_or_selection_change(self):
+        candidate=self.base/'portal-target';shutil.copytree(self.source,candidate)
+        (candidate/'desktop-release.json').unlink()
+        release=json.loads((candidate/'release.json').read_text())
+        release['portalSystemMinimum']={'glib':'2.80','girepository':'2.80','cairo':'1.15.10'}
+        (candidate/'release.json').write_text(json.dumps(release))
+        self.target=self.tool.stage(candidate,'portal-dependency-fixture')
+        self.mock_health.side_effect=RuntimeError('Native GLib dependency unavailable.')
+        with self.assertRaisesRegex(RuntimeError,'GLib dependency'):
+            with self.plan():pass
+        self.mock_health.assert_called_once()
         self.assertEqual(read_json(self.data/'desktop.json'),self.selected)
         self.assertFalse((self.transactions/'active.json').exists())
 
@@ -146,6 +161,41 @@ class LinuxManagedTests(unittest.TestCase):
             self.assertEqual(read_json(self.transactions/'active.json')['phase'],'apply-intent')
             with self.assertRaisesRegex(ValueError,'already attempted'):coordinator.backend.authorize()
             self.mock_health.assert_not_called()
+
+
+class LinuxPortalReportTests(unittest.TestCase):
+    def setUp(self):
+        temporary=tempfile.TemporaryDirectory(prefix='augmentor-portal-report-');self.addCleanup(temporary.cleanup)
+        self.root=Path(temporary.name);(self.root/'release').mkdir()
+        pins=json.loads((ROOT/'release/linux-managed.json').read_text())
+        (self.root/'release/linux-managed.json').write_text(json.dumps(pins))
+        self.release={'version':'0.2.13','sourceCommit':'a'*40,'target':'linux-x64',
+            'portalSystemMinimum':pins['portal']['systemMinimum']}
+        raw=json.dumps(self.release).encode();(self.root/'release.json').write_bytes(raw)
+        self.plan=SimpleNamespace(target=self.root,proposed={'python':sys.executable})
+        self.report={'schema':'augmentor-linux-health/2','releaseSHA256':hashlib.sha256(raw).hexdigest(),
+            **{key:self.release[key] for key in ('version','sourceCommit','target')},
+            'qtPlatform':'offscreen','rendered':True,'width':424,'height':484,'fontCoverage':True,
+            'portalBindings':True,'pygobjectVersion':'3.52.4','glibVersion':[2,80,0]}
+
+    def check(self,report):
+        with patch('updates.linux_completion.subprocess.run',return_value=SimpleNamespace(
+                returncode=0,stdout=json.dumps(report).encode())):
+            return verify_health(self.plan)
+
+    def test_exact_report_accepts_and_rejects_missing_old_or_malformed_dependencies(self):
+        self.assertTrue(self.check(self.report))
+        for change in ({'schema':'augmentor-linux-health/1'},{'portalBindings':False},
+                {'pygobjectVersion':'3.50.0'},{'glibVersion':[2,78,0]},{'glibVersion':[2,True,0]},
+                {'glibVersion':[2,80]},{'glibVersion':[2,80,-1]},{'extra':True}):
+            with self.subTest(change=change),self.assertRaises(ValueError):self.check({**self.report,**change})
+        report=self.report.copy();del report['portalBindings']
+        with self.assertRaises(ValueError):self.check(report)
+
+    def test_receipt_cannot_lower_the_bundled_requirement(self):
+        self.release['portalSystemMinimum']={**self.release['portalSystemMinimum'],'glib':'2.78'}
+        (self.root/'release.json').write_text(json.dumps(self.release))
+        with self.assertRaises(ValueError):self.check(self.report)
 
 
 @unittest.skipUnless(sys.platform=='linux','Actual isolated Linux Qt health action.')
