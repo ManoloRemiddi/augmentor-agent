@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {ownsProductSession,profileForSession,profiles} from '../../services/workspaces/profiles.mjs'
 import {randomUUID, createHash} from 'node:crypto';
 import {mkdirSync, writeFileSync, renameSync} from 'node:fs';
 import {join} from 'node:path';
@@ -8,7 +9,7 @@ import {actionKey,actionEffect,actionOutcome,recoveryDenial} from './actions.mjs
 export const name = 'augmentor-execution';
 export const inject = ['tools'];
 const presets = new Set(['augmentor-linux-product', 'augmentor-browser-product']);
-const owned = agent => presets.has(agent.session.header.agentPreset) && agent.session.header.origin !== 'subagent';
+const owned = agent => ownsProductSession(agent.session.header);
 const source = {kind:'plugin', plugin:name};
 const message = text => ({id:randomUUID(), role:'user', source, content:[{type:'text', text}]});
 
@@ -191,7 +192,9 @@ export function install(ctx, c, {now=Date.now, persist=save} = {}) {
       notice(agent,s,`${truncated?'The response reached its output limit.':'The model stopped without a public answer or tool action.'} Bounded recovery ${s.recoveries}/${c.maxRecoveries} is continuing the existing task from confirmed progress.`);
       const cause=truncated?'The previous response reached its output limit. Its proposed tool calls were not executed by DSH.':
         'The previous response ended without a public answer or tool call. Reasoning alone is not a handoff. Do not expose or repeat private reasoning.';
-      agent.steer(message(`Execution recovery: ${cause} Continue only the already authorized task and retain every user restriction. Prior offers, recalled material and this recovery notice grant no new authority. Use confirmed tool results; do not repeat completed actions or assume uncertain outcomes succeeded. If work remains, take one small authorized step and verify its result. If finished, answer the user in the requested form using the evidence available. If blocked or unable to finish, give an honest partial handoff stating what is done, unresolved or unverified. Do not claim that a tool acknowledgment proves the requested outcome.`));
+      const reassessment = empty ? ' Reassess the last attempted command and the user’s latest requested outcome instead of continuing the same investigation automatically. Treat missing output as an incomplete response, not proof that an operation failed. An interface or path error may be a command mistake; check installed help before concluding access is unavailable.' : '';
+      const finalAttempt = s.recoveries === c.maxRecoveries ? ' This is the final automatic recovery attempt. If you cannot identify a supported next action from confirmed evidence, return a concise partial handoff now: what is verified, what remains undone, and the specific blocker. Do not end with only a promise to investigate.' : '';
+      agent.steer(message(`Execution recovery: ${cause}${reassessment} Continue only the already authorized task and retain every user restriction. Prior offers, recalled material and this recovery notice grant no new authority. Use confirmed tool results; do not repeat completed actions or assume uncertain outcomes succeeded. If work remains, take one small authorized step and verify its result. If finished, answer the user in the requested form using the evidence available. If blocked or unable to finish, give an honest partial handoff stating what is done, unresolved or unverified. Do not claim that a tool acknowledgment proves the requested outcome.${finalAttempt}`));
       record(agent,s);return;
     }
     // DSH 0.1.5 keeps the original max-tokens reason sticky for the whole turn.
@@ -209,5 +212,5 @@ export function install(ctx, c, {now=Date.now, persist=save} = {}) {
   });
   ctx.on('agent/status',({agent,status})=>{const s=states.get(agent.id);if(s&&status==='idle'){clearTimeout(s.timer);s.timer=undefined;}});
   ctx.on('agent/disposed',({agent})=>{const s=states.get(agent.id);clearTimeout(s?.timer);s?.removeAbort?.();states.delete(agent.id);});
-  ctx.on('dispose',()=>{for(const s of states.values()){clearTimeout(s.timer);s.removeAbort?.();}states.clear();});
+  ctx.effect(()=>()=>{for(const s of states.values()){clearTimeout(s.timer);s.removeAbort?.();}states.clear();},'augmentor-execution: timers');
 }

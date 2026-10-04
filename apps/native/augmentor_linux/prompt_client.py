@@ -10,6 +10,7 @@ import time
 import threading
 import uuid
 from .pi_client import ContractError
+from .platform_runtime import LocalSocket
 
 PROTOCOL='augmentor-prompts/1'
 
@@ -20,14 +21,21 @@ class PromptClient:
     def call(self,method,payload=None,request_id=None):
         automatic=method.startswith('memory.dual.')
         endpoint=str(Path(self.base).with_name('dual-memory.sock')) if automatic else self.base
-        connection=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM);connection.settimeout(20)
+        connection=LocalSocket();connection.settimeout(20)
         try:
             try:connection.connect(endpoint)
             except (FileNotFoundError,ConnectionRefusedError):
                 service=Path(__file__).resolve().parents[3]/('services/memory/service.py' if automatic else 'services/prompt-library/service.py')
                 if not service.is_file():raise ContractError('Shared prompt service is not installed.')
-                child=subprocess.Popen([sys.executable,str(service)],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
-                threading.Thread(target=child.wait,daemon=True).start()
+                # This client is also used outside the app launcher. Never rely
+                # on inherited environment flags to preserve a sealed bundle.
+                if sys.platform=='win32':
+                    from windows_supervisor import ensure_companion
+                    ensure_companion('memory' if automatic else 'prompts')
+                else:
+                    child=subprocess.Popen([sys.executable,'-Xutf8','-B',str(service)],stdin=subprocess.DEVNULL,
+                        stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
+                    threading.Thread(target=child.wait,daemon=True).start()
                 deadline=time.monotonic()+5
                 while True:
                     try:connection.connect(endpoint);break

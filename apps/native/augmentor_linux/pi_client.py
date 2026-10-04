@@ -1,11 +1,12 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-"""Private Unix-socket client for Augmentor's Pi host. No harness HTTP API."""
+"""Private local client for Augmentor's Pi host. No harness HTTP API."""
 import json
 import os
 import socket
 import threading
 import uuid
 from pathlib import Path
+from .platform_runtime import LocalSocket
 
 PROTOCOL = 'augmentor-pi/1'
 MAX_FRAME = 1024 * 1024
@@ -21,7 +22,7 @@ def socket_path():
 
 class Connection:
     def __init__(self, path, protocol=PROTOCOL):
-        self.socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        self.socket = LocalSocket()
         self.socket.settimeout(20)
         try:
             self.socket.connect(path)

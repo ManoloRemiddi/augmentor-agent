@@ -9,6 +9,7 @@ import re
 from pathlib import Path
 import signal
 import socket
+import struct
 import subprocess
 import sys
 import tempfile
@@ -17,6 +18,7 @@ import time
 import yaml
 
 ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT/'scripts'))  # Explicit fixture imports also work with bundled Python -I.
 (ROOT/'outputs').mkdir(parents=True,exist_ok=True)
 APP=Path(os.environ.get('AUGMENTOR_PROOF_APP_ROOT',ROOT)).resolve()
 BROWSER_ONLY=os.environ.get('AUGMENTOR_PROOF_COMPANION_DSH')=='1'
@@ -106,6 +108,9 @@ modules=Path(os.environ['DSH_TEST_MODULES']).resolve();assert modules.is_dir()
 home=work/'dsh';profile=home/'profiles/web';profile.mkdir(parents=True);(profile/'node_modules').symlink_to(modules,target_is_directory=True)
 (profile/'package.json').write_text(json.dumps({'name':'augmentor-setup-proof','private':True,'type':'module','dsh':{'profile':{'bundles':['@deepseek-ai/dsh-base','@deepseek-ai/dsh-web-app']}}}))
 (profile/'cordis.yml').write_text('[]\n');original='# Existing user customization\n- id: session-title-llm\n  disabled: true\n'
+exit_marker=work/'natural-dsh-exit.json'
+original+=yaml.safe_dump([{'insert':[{'id':'shutdown-observer-proof',
+    'name':str(ROOT/'tests/fixtures/dsh-shutdown-observer.mjs'),'config':{'path':str(exit_marker)}}]}])
 if os.environ.get('AUGMENTOR_PROOF_EXISTING_PROMPTS'):
     original+=yaml.safe_dump([{'insert':[{'id':'existing-prompts','name':str(APP/'adapters/dsh-prompt-library/lib/index.js')}]}])
 web_provider=os.environ.get('AUGMENTOR_PROOF_WEB_PROVIDER')
@@ -170,15 +175,18 @@ def start():
         hits=re.findall(r'token=([A-Za-z0-9_-]+)',current_log)
         if not hits:return False
         os.environ['AUGMENTOR_DSH_AUTH_TOKEN']=hits[-1]
-        return DshAdapter(base=base,home=home).call('host.describe')
+        # This phase precedes preset installation: test host availability, not
+        # the desktop adapter's stronger agent-readiness contract.
+        from dsh.remote import client
+        return client(base,home).call('host.describe')
     until(authenticated)
 def stop():
     global process
-    if process:
+    if process and process.poll() is None:
         os.killpg(process.pid,signal.SIGTERM)
         try:process.wait(timeout=10)
         except subprocess.TimeoutExpired:os.killpg(process.pid,signal.SIGKILL);process.wait()
-        process=None
+    process=None
 
 def click(button):assert button.isEnabled();QTest.mouseClick(button,Qt.MouseButton.LeftButton);until(lambda:not dialog.busy)
 try:
@@ -477,9 +485,37 @@ try:
             subprocess.run([sys.executable,str(ROOT/'scripts/dsh-reply-proof.py')],env=reply_env,stdout=reply_log,stderr=reply_log,check=True,timeout=200)
         print('Native Qt saved/final reply recovery verified without a login URL; inspect streamObserved separately',flush=True)
     evidence={'fixture':str(work),'appRoot':str(APP),'adapterFile':loaded_adapter.__file__,'platform':sys.platform,'model':'deterministic local fixture','qtInstall':True,'modelPickerAdapter':bool(picker),'modelPickerUi':bool(picker and os.environ.get('AUGMENTOR_PROOF_PICKER_UI')),'checkedSave':True,'profilePreserved':True,'linuxSavedChats':True,'sharedPersonalAgent':True,'modelRequests':len(received),'wikiToolAndSkillWorkflow':bool(wiki_modules),'contextAndAdaptiveWorkflow':bool(host_plugins),'freeWebSearchWorkflow':bool(web_provider)}
+    # Only this freshly created host is shut down; existing user's DSH is never
+    # selected. Preserve the process handle and require its normal exit status.
+    from dsh_maintenance_proof import prove as maintenance_proof
+    evidence['maintenance']=maintenance_proof(adapter,base,home,'setup-linux',lambda:process.wait(timeout=15),exit_marker)
+    process=None
     (ROOT/'outputs/dsh-setup-proof.json').write_text(json.dumps(evidence,indent=2)+'\n');print(json.dumps(evidence),flush=True)
 finally:
     stop();log.close();server.shutdown();server.server_close()
-    try:
-        descriptor=prompts.call('host.describe');os.kill(descriptor['pid'],signal.SIGTERM)
-    except Exception:pass
+    # Both services may have been started by the fixture. Query the kernel for
+    # the peer of our private fixture socket; never search/kill by process name,
+    # or call PromptClient here (which could start a missing service to stop it).
+    from platform_support import require_same_user
+    for name in ('prompts.sock','dual-memory.sock'):
+        path=work/'shared-state'/name
+        with socket.socket(socket.AF_UNIX,socket.SOCK_STREAM) as peer:
+            peer.settimeout(2)
+            try:peer.connect(str(path))
+            except (FileNotFoundError,ConnectionRefusedError):continue
+            require_same_user(peer)
+            if sys.platform=='darwin':
+                pid=struct.unpack('i',peer.getsockopt(0,2,4))[0]  # SOL_LOCAL / LOCAL_PEERPID
+            else:
+                pid=struct.unpack('3i',peer.getsockopt(socket.SOL_SOCKET,socket.SO_PEERCRED,12))[0]
+        assert pid>1 and pid!=os.getpid()
+        try:os.kill(pid,signal.SIGTERM)
+        except ProcessLookupError:continue
+        until_shutdown=time.monotonic()+5
+        while True:
+            with socket.socket(socket.AF_UNIX,socket.SOCK_STREAM) as check:
+                check.settimeout(.2)
+                try:check.connect(str(path))
+                except (FileNotFoundError,ConnectionRefusedError):break
+            if time.monotonic()>until_shutdown:raise RuntimeError('Fixture service did not shut down: '+name)
+            time.sleep(.1)

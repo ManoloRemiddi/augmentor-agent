@@ -7,6 +7,7 @@ import threading
 import urllib.request
 import urllib.error
 from pathlib import Path
+from .ui_scale import scaled
 from PySide6.QtCore import Signal, Qt
 from PySide6.QtWidgets import QDialog,QVBoxLayout,QHBoxLayout,QLabel,QPushButton,QComboBox,QCheckBox,QSlider,QGroupBox
 
@@ -37,9 +38,9 @@ class VoiceSettingsDialog(QDialog):
         self.owner=window;self.closing=False;self.voices=[];self.previewing=False
         self.preview_stop=threading.Event();self.saved=None
         self.completed.connect(lambda callback,result:callback(result) if not self.closing else None)
-        self.setWindowTitle('Resonant Voice — '+('First agent' if current_name()=='main' else 'Second agent'));self.setMinimumWidth(410)
+        self.setWindowTitle('Resonant Voice — '+('First agent' if current_name()=='main' else 'Second agent'));scaled(self).setMinimumWidth(410)
         from .settings_icons import settings_icon,settings_label
-        layout=QVBoxLayout(self);layout.setSpacing(12)
+        layout=QVBoxLayout(self);scaled(layout).setSpacing(12)
         self.enabled=QCheckBox('Enable Resonant Voice');self.enabled.setChecked(window.preferences.values.get('resonant_voice',True))
         self.enabled.toggled.connect(window.set_voice_enabled);layout.addWidget(self.enabled)
         group=QGroupBox();form=QVBoxLayout(group);form.addWidget(settings_label('Voice','voice',window.accent))

@@ -71,3 +71,13 @@ On this machine, `~/.dsh/cordis.patch.yml` now overrides `command-goal` with `di
 Validation on 2026-09-16: 17 Node tests (browser picker, renderer, command transport), 12 Qt prompt/history tests, 7 Python transport tests, 6 queue tests, and 4 setup tests passed. Live verification exercised goal inspection, not autonomous model-driven goal completion.
 
 The installed application hotfix is staged under `outputs/goal-hotfix-20260916`. Its installer verifies the original hashes of all ten files, preserves a rollback copy at `/usr/lib/augmentor.before-goal-20260916`, and applies only this fix. It does not deploy unrelated working-tree UI changes. The loaded Chromium extension uses the legacy checkout under `~/Desktop/Deepseek harnes test/augmentor/extension`; its three affected files were patched in place with a backup at `extension.before-goal-20260916`, preserving other local changes. Reload that extension after installing the host update, and reopen Augmentor Desktop to load updated Python modules.
+
+## October 4 integrated-source qualification
+
+PR #11 incorporates main `d93eb49` and the browser-typing candidate `00069dd`.
+The two conflicts were documentation only; both handoff and deployment histories
+were retained. Current type/build checks, all 95 Browser cases and 25 native
+prompt/improvement/startup/shared-prompt cases pass. Command routing is checked
+separately, including preservation of literal DSH commands after Escape. Hosted
+platform/package checks remain the merge gate. Historical installed adoption
+above is not a new deployment; existing windows and extension profiles are unchanged.

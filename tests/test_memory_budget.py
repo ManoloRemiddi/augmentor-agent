@@ -15,6 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'services'))
 from memory.dual import DualMemory
 from memory.budget import InferenceBudget, BudgetDenied, JOB_SECONDS, JOB_TOKENS
 from memory.gateway import Gateway, completion
+from lifecycle.admission import Admission, MaintenanceBusy
 
 
 class BudgetTests(unittest.TestCase):
@@ -109,8 +110,9 @@ class BudgetTests(unittest.TestCase):
         model.daemon_threads = True
         threading.Thread(target=model.serve_forever, daemon=True).start()
         self.addCleanup(model.server_close); self.addCleanup(model.shutdown)
+        admission = Admission(); token = {'token':'f'*32}
         gate = Gateway(('127.0.0.1', 0), self.budget, {
-            'modelUrl': f'http://127.0.0.1:{model.server_port}/v1', 'gatewayKey': 'x'*32})
+            'modelUrl': f'http://127.0.0.1:{model.server_port}/v1', 'gatewayKey': 'x'*32}, admission=admission)
         threading.Thread(target=gate.serve_forever, daemon=True).start()
         self.addCleanup(gate.server_close); self.addCleanup(gate.shutdown)
         def send():
@@ -125,8 +127,14 @@ class BudgetTests(unittest.TestCase):
         self.assertEqual(calls, [])
         self.budget.activity('one', 'dsh', 'tools')
         self.budget.open('job', 'one')
+        admission.control('host.maintenance.prepare',token)
+        self.assertEqual(send(),503)
+        self.assertEqual(calls,[])
+        self.assertFalse(self.budget.paused)
+        admission.control('host.maintenance.cancel',token)
         request = threading.Thread(target=send); request.start()
         self.assertTrue(received.wait(2))
+        with self.assertRaises(MaintenanceBusy):admission.control('host.maintenance.prepare',token)
         started = time.monotonic()
         self.budget.activity('one', 'dsh', 'stop')
         self.assertTrue(disconnected.wait(1), 'Stop must close the model socket promptly')
@@ -135,6 +143,13 @@ class BudgetTests(unittest.TestCase):
         self.assertFalse(request.is_alive())
         self.assertEqual(calls[0]['max_tokens'], 4096)
         self.assertTrue(calls[0]['stream'])
+        # Receiving HTTP bytes precedes the gateway's final durable budget
+        # settlement. Admission must remain busy until that cleanup finishes.
+        deadline=time.monotonic()+2
+        while admission.control('host.maintenance.status',{})['active']:
+            self.assertLess(time.monotonic(),deadline)
+            time.sleep(.01)
+        self.assertEqual(admission.control('host.maintenance.prepare',token)['phase'],'prepared')
 
     def test_streamed_tool_fragments_usage_and_incomplete_outcome(self):
         class Response(io.BytesIO):

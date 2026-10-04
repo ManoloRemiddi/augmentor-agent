@@ -1,0 +1,18 @@
+{
+  "schema": "augmentor-windows-preview/1",
+  "qualificationStatus": "public-preview",
+  "customerDistribution": true,
+  "automaticUpdates": false,
+  "publisherSigned": false,
+  "minimumWindowsBuild": 26200,
+  "physicalAcceptance": "pending",
+  "supportedHarness": "dsh",
+  "limitations": [
+    "Unsigned preview: Windows security policy may block installation.",
+    "No automatic updates or cross-version manual upgrades.",
+    "Local voice and memory engines, desktop automation, Pi and Codex integration are not qualified on Windows.",
+    "Browser extension requires manual Load unpacked.",
+    "RTX Spark hardware has not been tested.",
+    "Handy dictation is bundled; physical microphone and cross-application typing acceptance is pending."
+  ]
+}

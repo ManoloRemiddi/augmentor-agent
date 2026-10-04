@@ -78,14 +78,21 @@ import {homeConnection} from './shared/home.mjs'
 import {supportReport} from './shared/support.mjs'
 import {startOnboarding} from './shared/onboarding.mjs'
 import {memoryRequest} from './shared/memory.mjs'
+import {bindProfileMemory} from '../../services/workspaces/memory.mjs'
+import {preferences} from '../../services/workspaces/profiles.mjs'
+import {snapshotWorkspaceContext} from './extension/workspace-context.mjs'
+import {loadProfile} from '../../services/workspaces/profiles.mjs'
+import {describeWorkspace} from '../../services/workspaces/capabilities.mjs'
+import {SDK_PROTOCOL} from '../../services/workspaces/policy.mjs'
 import {MetadataLog,diagnosticCategory} from './shared/diagnostics.mjs'
 import { dshBranch } from './shared/branch.mjs'
-import {DshBoundary,BROWSER_PRESET,PERSONAL_PRESETS,loopbackEndpoint,boundedJson} from './shared/dsh-boundary.mjs'
-import {createHash} from 'node:crypto'
+import {DshBoundary,BROWSER_PRESET,PERSONAL_PRESETS,loopbackEndpoint,boundedJson,workspaceProfile,visibleSession} from './shared/dsh-boundary.mjs'
+import {createHash,randomUUID} from 'node:crypto'
 import {createDshClient} from './shared/dsh-auth.mjs'
 import {createRemoteAdapter} from './shared/dsh-remote.mjs'
 import {BrowserVoice,voicePreferences} from './shared/voice-client.mjs'
 import {BrowserInteractions} from './shared/interactions.mjs'
+import {AcceptedWork} from './shared/accepted-work.mjs'
 
 const AUGMENTOR_DIR = path.dirname(fileURLToPath(import.meta.url))
 
@@ -212,6 +219,8 @@ async function dshRespond() {throw Error('Complete DSH approvals and questions i
 // flushes on 'drain' and never loses one.
 let outQueue = []
 let outPumping = false
+let outputClosed = false
+const outputWaiters = []
 // 0.1.21: Chrome's native-messaging channel caps host→extension messages at
 // 1 MiB. A bigger frame doesn't error — Chrome KILLS the connection and the
 // extension only sees "Error when communicating with the native messaging
@@ -228,6 +237,7 @@ function pushFrame(obj) {
   pumpOut()
 }
 function sendToExt(obj) {
+  if(outputClosed||process.stdout.destroyed)return
   const json = Buffer.from(wireEncode(obj), 'utf8')
   if (json.length + 4 > NMH_FRAME_MAX) {
     log('oversized frame suppressed', obj.id ?? obj.method ?? '?', `${json.length} bytes (>1 MiB)`)
@@ -250,6 +260,7 @@ function pumpOut() {
       }
     }
     outPumping = false
+    for(const resolve of outputWaiters.splice(0))resolve()
   }
   step()
 }
@@ -306,7 +317,7 @@ async function productHandshake(){
     if(product.protocol!=='augmentor-dsh/1'||product.version!==VERSION||product.homeId!==createHash('sha256').update(token).digest('hex'))throw Error('Reconnect the matching DSH integration from Settings.')
     const info=await boundedJson(`${DSH_BASE}/api/augmentor`,{signal:AbortSignal.timeout(3000)})
     if(info.protocol!==PROTOCOL_EXPECTED||info.version!==VERSION||info.agentPreset!==BROWSER_PRESET||typeof info.chatCwd!=='string'||!path.isAbsolute(info.chatCwd)||typeof info.wsPath!=='string'||!/^\/api\/[a-zA-Z0-9/_-]+$/.test(info.wsPath))throw Error('DSH browser integration is incompatible. Check it in Settings.')
-    return info
+    return workspaceProfile?{...info,chatCwd:workspaceProfile.cwd,agentPreset:workspaceProfile.preset,saved:preferences(workspaceProfile)['saved-sessions']||[]}:info
   })()
   try{return await integrationCheck}finally{integrationCheck=null}
 }
@@ -333,8 +344,9 @@ async function fetchPluginHandshake() {
 }
 
 async function openPluginWs() {
-  if (pluginWs) return
+  if (pluginWs||shuttingDown) return
   const info = await fetchPluginHandshake()
+  if(shuttingDown)return
   if(UNIFIED&&!info){scheduleReconnect(openPluginWs,'plugin');return}
   if (info?.protocol && info.protocol !== PROTOCOL_EXPECTED) {
     log(`PROTOCOL MISMATCH: pipe expects ${PROTOCOL_EXPECTED}, plugin reports ${info.protocol} — frames may not interoperate`)
@@ -374,6 +386,7 @@ async function openPluginWs() {
       return
     }
     if (frame.type !== 'request' || frame.id === undefined) return
+    if(shuttingDown){pluginSend({type:'reply',id:frame.id,error:{message:'The browser connection is closing; the action was not started.'}});return}
     if (frame.method !== 'browser/execute') {
       pluginSend({ type: 'reply', id: frame.id, error: { message: `unsupported method: ${frame.method}` } })
       return
@@ -458,7 +471,7 @@ async function onDownlinkFrame(stream, frame) {
 }
 
 function openDownlink(stream) {
-  if (downlinks.get(stream)?.open) return
+  if (shuttingDown||downlinks.get(stream)?.open) return
   const ws = new WebSocket(`${DSH_BASE.replace(/^http/, 'ws')}${DOWNLINK_PATHS[stream]}`)
   downlinks.set(stream, { ws, open: true })
   ws.on('open', () => log('downlink open', stream))
@@ -478,10 +491,11 @@ function openDownlink(stream) {
 // ------------------------------------------------------------- reconnect
 const retryTimers = new Map()
 function scheduleReconnect(open, key) {
-  if (retryTimers.has(key)) return
+  if (shuttingDown||retryTimers.has(key)) return
   const delay = Math.min(10000, 1000 * 2 ** (retryTimers.size % 4))
   const timer = setTimeout(() => {
     retryTimers.delete(key)
+    if(shuttingDown)return
     try {
       const r = open()
       // F5 (audit): retry targets may be async (openPluginWs, boot) — a
@@ -538,6 +552,10 @@ const voice=new BrowserVoice({
   notify:sendToExt,
 })
 const localMethods = {
+  'workspace.describe':params=>{
+    if(!workspaceProfile?.sdkProtocol||params.protocol!==SDK_PROTOCOL)throw Error('Register an SDK v1 workspace before describing capabilities')
+    return describeWorkspace(loadProfile())
+  },
   'augmentor/surface':params=>surfaceRequest(params),
   'augmentor/voice/preferences':async params=>{if(params.action==='save')voice.close();return voicePreferences(params)},
   'augmentor/voice/start':async params=>{await interactions.claim(params.sessionId);return voice.start(params)},
@@ -559,7 +577,8 @@ const localMethods = {
   'augmentor/onboarding': startOnboarding,
   'augmentor/home': homeConnection,
   'augmentor/memory': memoryRequest,
-  'session.branch': dshBranch,
+  'session.resume':async()=>({ok:true}), // Boundary checks persisted role/cwd; no model action.
+  'session.branch':async params=>{const result=await dshBranch(params);if(workspaceProfile)await bindProfileMemory(workspaceProfile,'dsh:'+result.sessionId);return result},
   'augmentor/prompts': (request) => promptLibrary(request),
   // Check npm (plugin) + GitHub releases (pipe/extension artifact) + the
   // live plugin handshake (installed plugin version) in parallel; each
@@ -755,13 +774,15 @@ const localMethods = {
   },
   shutdown() {
     log('shutdown requested by extension')
-    setTimeout(() => cleanup(0), 50)
+    queueMicrotask(() => void cleanup(0))
     return { ok: true }
   },
 }
 
 // --------------------------------------------------------- dispatch (ext)
 let shuttingDown = false
+const acceptedWork = new AcceptedWork()
+let closing
 // --------------------------------------------------- history byte shaping
 // Chrome's native messaging limit is **1 MiB per host->extension message**
 // (developer.chrome.com, native-messaging: "The maximum size of a single
@@ -828,6 +849,7 @@ function shapeSessionList(value) {
     sessionId: i.sessionId,
     cwd: i.cwd ?? null,
     running: !!i.running,
+    resumable:UNIFIED&&(!workspaceProfile||i.agentPreset===workspaceProfile.preset),
     updatedAt: i.updatedAt ?? null,
     ...(i.projections?.values?.title ? { projections: { values: { title: i.projections.values.title } } } : {}),
   })
@@ -871,7 +893,16 @@ async function handleExtMessage(msg) {
     let value
     if(UNIFIED)msg.params=await boundary.guard(msg.method,msg.params??{})
     if(UNIFIED&&msg.method==='session.prompt')await interactions.claim(msg.params.sessionId)
-    if (PLUGIN_METHODS.has(msg.method)) {
+    if(workspaceProfile&&msg.method==='session.prompt'){
+      const context=msg.params.workspaceContext;delete msg.params.workspaceContext
+      if(context!==undefined)preferences(workspaceProfile,{set:{['context:'+msg.params.sessionId]:{id:randomUUID(),at:Date.now(),value:snapshotWorkspaceContext(context)}}})
+    }
+    if(workspaceProfile&&['session.create','session.prompt'].includes(msg.method))await bindProfileMemory(workspaceProfile,'dsh:'+msg.params.sessionId)
+    if(workspaceProfile&&['augmentor/save','augmentor/unsave','augmentor/state'].includes(msg.method)){
+      const saved=new Set(preferences(workspaceProfile)['saved-sessions']||[])
+      if(msg.method!=='augmentor/state'){msg.method==='augmentor/save'?saved.add(msg.params.sessionId):saved.delete(msg.params.sessionId);preferences(workspaceProfile,{set:{'saved-sessions':[...saved]}})}
+      value={...await productHandshake(),saved:[...saved]}
+    } else if (PLUGIN_METHODS.has(msg.method)) {
       if (!pluginWs || pluginWs.readyState !== WebSocket.OPEN) {
         throw new Error('plugin channel not connected — the DSH app or the Augmentor plugin is not up')
       }
@@ -892,7 +923,7 @@ async function handleExtMessage(msg) {
       if (value.truncatedEarlier) log('history shaped', { truncatedEarlier: value.truncatedEarlier })
     }
     if (msg.method === 'session.list') {
-      if(UNIFIED){value={...value,items:value.items.filter(row=>PERSONAL_PRESETS.has(row.agentPreset) && row.origin!=='subagent')};boundary.known=new Set(value.items.map(row=>row.sessionId))}
+      if(UNIFIED){value={...value,items:value.items.filter(row=>visibleSession(row))};boundary.known=new Set(value.items.map(row=>row.sessionId))}
       value = shapeSessionList(value)
       if (value.truncatedEarlier) log('list shaped', { truncatedEarlier: value.truncatedEarlier })
     }
@@ -913,16 +944,19 @@ async function boot() {
     scheduleReconnect(boot, 'boot')
     return
   }
+  if(shuttingDown)return
   remoteDsh.start()
   log('action-channel token source:', WS_TOKEN.source)
-  void openPluginWs()
+  if(!workspaceProfile)void openPluginWs() // Embedded panels do not take the extension browser executor.
 }
 
 // --------------------------------------------------------------- lifecycle
 process.stdin.on('data', (chunk) => {
+  if(shuttingDown)return
   stdinBuf = Buffer.concat([stdinBuf, chunk])
   while (stdinBuf.length >= 4) {
     const len = stdinBuf.readUInt32LE(0)
+    if(len>1024*1024){void cleanup(1);return}
     if (stdinBuf.length < 4 + len) break
     const raw = stdinBuf.subarray(4, 4 + len)
     stdinBuf = stdinBuf.subarray(4 + len)
@@ -931,21 +965,33 @@ process.stdin.on('data', (chunk) => {
       log('bad frame from extension')
       continue
     }
-    void handleExtMessage(msg)
+    void acceptedWork.run(()=>handleExtMessage(msg)).catch(()=>void cleanup(1))
   }
 })
 
 function cleanup(code) {
-  if (shuttingDown) return
+  if(code)process.exitCode=code
+  else process.exitCode??=0
+  if (shuttingDown) return closing
   shuttingDown = true
+  acceptedWork.close();process.stdin.destroy()
+  clearInterval(pluginHb)
+  for(const timer of retryTimers.values())clearTimeout(timer)
+  retryTimers.clear()
   voice.close()
-  interactions.close()
-  remoteDsh.close()
-  for (const d of downlinks.values()) {
-    try { d.ws.terminate() } catch { /* already dead */ }
-  }
-  try { pluginWs?.terminate() } catch { /* already dead */ }
-  process.exit(code)
+  closing=(async()=>{
+    await acceptedWork.drained()
+    // A start accepted immediately before EOF may finish during draining.
+    voice.close();await voice.settled()
+    await interactions.close()
+    remoteDsh.close()
+    for(const d of downlinks.values()){try{d.ws.terminate()}catch{/* already dead */}}
+    try{pluginWs?.terminate()}catch{/* already dead */}
+    await downlinkQueue.catch(()=>{})
+    if(outPumping||outQueue.length)await new Promise(resolve=>outputWaiters.push(resolve))
+    outputClosed=true;process.stdout.end()
+  })()
+  return closing
 }
 
 process.stdin.on('end', () => {
@@ -955,6 +1001,11 @@ process.stdin.on('end', () => {
 process.stdin.resume()
 process.on('SIGTERM', () => cleanup(0))
 process.on('SIGINT', () => cleanup(130))
+process.stdout.on('error',()=>{
+  outputClosed=true;outQueue=[];outPumping=false
+  for(const resolve of outputWaiters.splice(0))resolve()
+  void cleanup(1)
+})
 
 log(`pipe ${VERSION} starting; DSH base ${DSH_BASE}`)
 void boot()

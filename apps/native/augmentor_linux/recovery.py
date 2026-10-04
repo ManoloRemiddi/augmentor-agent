@@ -1,5 +1,6 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """One-click recovery with worker-thread progress and a durable visible outcome."""
+from .ui_scale import scaled
 from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QPlainTextEdit, QPushButton
 
@@ -10,7 +11,7 @@ class RecoveryDialog(QDialog):
         self.controller = owner.controller
         self.active = False
         self.setWindowTitle('Recover connection')
-        self.setMinimumSize(500, 340)
+        scaled(self).setMinimumSize(500, 340)
         layout = QVBoxLayout(self)
         note = QLabel('Checks your connection, starts a stopped runtime, and repairs verified history conflicts with a backup. Your messages will not be resent.')
         note.setWordWrap(True); layout.addWidget(note)

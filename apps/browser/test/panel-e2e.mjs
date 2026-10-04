@@ -101,7 +101,8 @@ const swChrome = {
     // SW -> panel: in Chrome this reaches the panel's runtime.onMessage
     sendMessage: (msg) => { panelEvtListener?.(msg, {}); return Promise.resolve() },
   },
-  sidePanel: { setPanelBehavior: () => {}, setOptions: () => {} },
+  action: { onClicked: { addListener: () => {} } },
+  sidePanel: { open: async () => {}, setPanelBehavior: () => {}, setOptions: () => {} },
   storage: storageShim,
   tabs: {
     query: (_q, cb) => cb([]), get: (_i, cb) => cb(undefined), create: (_p, cb) => cb({ id: 999 }),

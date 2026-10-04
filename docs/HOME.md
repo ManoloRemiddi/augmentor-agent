@@ -93,6 +93,17 @@ dispatch leaves an unknown outcome. Client disconnection does not cancel an
 admitted turn; retrieve its result with the original request ID. At most 16 DSH
 session handles are retained in memory; durable sessions resume on demand.
 
+The deadline regression test uses actual DSH and a local MCP fixture, waits until
+the fixture has received the mutation, then advances Node's test clock. This
+exercises cancellation after dispatch and verifies that a subsequent request
+cannot repeat the uncertain action, with an explicit denied-tool trace for the
+model's retry. Previously a 100 ms wall-clock deadline could
+expire before dispatch on a loaded runner: [CI at 3edb570](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36406785088)
+correctly performed zero mutations but failed the test's expectation of one.
+The corrected test and all 29 Home tests pass locally on Node 24.19.0. Production
+deadlines, dispatch and cancellation behavior are unchanged; this is deterministic
+fixture evidence, not a live household/device test.
+
 ## Build and configuration
 
 ```sh
@@ -376,3 +387,40 @@ Validation: 29 Home tests, including replaced-identity controls, discovery field
 filtering/size limits and owner-only inventory. In-app browser fixture verified
 On/Off, disabled offline/setup devices and reload without duplicate dispatch: exactly
 two actions for one On and one Off. Deployment identity is recorded separately.
+
+
+### Deadline regression fixture
+
+The cancellation-after-dispatch test synchronizes on the synthetic MCP write
+before invoking the actual request-deadline callback. It holds the remote reply,
+checks the durable unknown outcome, and verifies that a later model-requested
+mutation cannot dispatch again. This removes a 100 ms scheduling race seen in
+CI run 36742665709 without changing the production deadline or cancellation
+policy. All 29 Home tests pass locally after the fixture correction.
+
+
+### Codex client and request-specific cancellation
+
+New Codex Desktop/Browser chats use the same shared Home client and pairing as
+DSH/Pi. Direct device actions stay on the NAS's model-free action endpoint;
+delegated requests retain the NAS's existing DSH model and permissions. The NAS
+application itself is not replaced by Codex. See
+[Codex qualification](CODEX-INTEGRATION.md#paired-home-tools) for fixture evidence
+and remaining deployment/device acceptance.
+
+`GET /capabilities` advertises `requests.cancelById: true` in this source.
+`POST /requests/<request_id>/cancel` with an empty JSON object cancels only when
+that exact request is currently admitted for the authenticating client. Mismatch
+returns 409 without signaling; this includes a stale cancellation after a newer
+request starts. Owner status does not override ownership on this scoped route.
+Legacy `/cancel` behavior is unchanged. The shared client checks capability
+support before scoped cancellation and never falls back to the broad route.
+
+The local `receipt_owners` table records hashed ownership alongside newly
+created receipts in one transaction. The original four-column receipts table
+stays unchanged, so older installed clients can continue writing to it. Existing
+request identities/statuses are preserved and old rows get no inferred owner.
+Codex receipt lookup/cancellation requires its conversation's recorded ownership
+under the current pairing. Unknown outcomes still block new dispatches. Stopping
+Codex's wait does not guarantee that an admitted NAS task stopped; inspect the
+saved result, and use explicit cancellation where supported.

@@ -2,6 +2,11 @@
 
 # Optional DSH connection
 
+This guide describes an **external** DSH connection. Fresh bundled Mac desktops
+have a separate [managed first-run path](MACOS-MANAGED-SETUP.md) in current
+source; it provisions the bundled runtime automatically. Public signed-install
+qualification remains open.
+
 Install and start the supported Node DSH CLI **0.1.5-rc.1** separately. Its `dsh`
 command must be on the application's PATH. Configure your model in DSH. Augmentor
 checks the CLI's first-party packages, the host API, its integration version, and
@@ -45,6 +50,21 @@ deterministic fixtures; this is SDK/integration evidence, not model-quality
 certification.
 
 ## Current DSH 0.1.5 limitations
+
+Windows integration token creation now supplies an explicit user owner and
+protected user/SYSTEM DACL; `chmod(0600)` alone cannot do this on Windows. The
+token reader validates the opened ordinary single-link file before reading.
+Setup never changes the ACL of a selected external DSH home, and exclusive token
+creation preserves an existing connection. Managed homes retain their additional
+private-directory requirement. Native `795a72b` qualification exposed the earlier
+elevated-runner ownership defect on both CPUs; the correction is awaiting native
+execution. Local creation/read/preservation and hard-link refusal tests pass.
+
+The first correction's full x64 run (`187bee6`) found a second token creator in
+`setup-complete.py`, used before the integration's first bootstrap. It now calls
+the same protected-token helper. A bootstrap startup-failure/retry test checks
+the token is readable through the strict validator and never rotates. New native
+execution is pending; no existing user's token or directory ACL was migrated.
 
 The native and browser transports use authenticated Typert RPC and scoped session
 streams. Model Picker Augmented **1.1.2** is the compatible optional DSH plugin;

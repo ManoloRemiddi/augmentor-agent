@@ -12,29 +12,36 @@ import sys
 import time
 from PySide6.QtCore import QObject,Signal,Qt
 from PySide6.QtGui import QKeySequence
+from .instances import current_name, validate_name, SHORTCUT_INSTANCES
 
 ROOT=Path(__file__).resolve().parents[3]
 manager=None
+FN_SPACE='Fn+Space'
 
-def configuration():
+def configuration(instance='main'):
+    instance=validate_name(instance)
     base=Path(os.environ.get('XDG_CONFIG_HOME',Path.home()/'Library/Application Support/Augmentor/config'))
-    return base/'augmentor/shortcut.json'
+    return base/'augmentor'/('shortcut.json' if instance=='main' else 'shortcut.'+instance+'.json')
 
-def current_keys():
-    path=configuration()
-    if not path.exists():return []
-    sequence=QKeySequence(json.loads(path.read_text())['sequence'],QKeySequence.SequenceFormat.PortableText)
+def current_keys(instance='main'):
+    path=configuration(instance)
+    if not path.exists():return [FN_SPACE] if instance=='main' else []
+    saved=json.loads(path.read_text())['sequence']
+    if saved==FN_SPACE:return [FN_SPACE]
+    sequence=QKeySequence(saved,QKeySequence.SequenceFormat.PortableText)
     if sequence.isEmpty() or sequence.count()!=1:raise ValueError('The saved shortcut is invalid.')
     return [sequence[0].toCombined()]
 
 class ShortcutManager(QObject):
     pressed=Signal()
     problem=Signal(str)
-    def __init__(self,parent=None):
+    def __init__(self,parent=None,instance='main'):
+        self.instance=validate_name(instance)
         super().__init__(parent);self.process=None;self.key=None;self.binding=None;self.lock=threading.RLock();self.closed=False
         self.helper=Path(os.environ.get('AUGMENTOR_MACOS_HOTKEY',str(ROOT/'native/augmentor-hotkey')))
 
     def command(self,sequence):
+        if sequence==FN_SPACE:return [str(self.helper),'49','131072']
         if sequence.isEmpty() or sequence.count()!=1:raise ValueError('Choose one key combination.')
         combination=sequence[0];key=int(combination.key());modifiers=combination.keyboardModifiers()
         # Qt intentionally maps ControlModifier to Command and MetaModifier to
@@ -65,7 +72,7 @@ class ShortcutManager(QObject):
     def save(self,sequence,persist=True):
         with self.lock:
             if self.closed:raise RuntimeError('The shortcut owner has closed.')
-            command=self.command(sequence);key=sequence[0].toCombined()
+            command=self.command(sequence);key=FN_SPACE if sequence==FN_SPACE else sequence[0].toCombined()
             if self.key==key and self.binding==command and self.process and self.process.poll() is None:return key
             child=subprocess.Popen(command,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
             try:
@@ -75,11 +82,11 @@ class ShortcutManager(QObject):
                     ready=json.loads(child.stdout.readline())
                 if ready.get('event')!='ready':raise ValueError(ready.get('error','Shortcut registration failed.'))
                 if persist:
-                    path=configuration();path.parent.mkdir(parents=True,exist_ok=True,mode=0o700)
+                    path=configuration(self.instance);path.parent.mkdir(parents=True,exist_ok=True,mode=0o700)
                     fd,temporary=tempfile.mkstemp(prefix='.shortcut-',dir=path.parent)
                     try:
                         with os.fdopen(fd,'w') as stream:
-                            json.dump({'sequence':sequence.toString(QKeySequence.SequenceFormat.PortableText)},stream)
+                            json.dump({'sequence':FN_SPACE if sequence==FN_SPACE else sequence.toString(QKeySequence.SequenceFormat.PortableText)},stream)
                             stream.flush();os.fsync(stream.fileno())
                         os.replace(temporary,path)
                     finally:Path(temporary).unlink(missing_ok=True)
@@ -96,7 +103,7 @@ class ShortcutManager(QObject):
             except ValueError:continue
             if child is self.process and event.get('event')=='pressed':self.pressed.emit()
             if child is self.process and event.get('event')=='layoutChanged':
-                try:self.save(QKeySequence(self.key),persist=False)
+                try:self.save(FN_SPACE if self.key==FN_SPACE else QKeySequence(self.key),persist=False)
                 except Exception as error:
                     # A stale physical binding could activate on the wrong key.
                     # Release it if the new layout cannot resolve/register it.
@@ -108,8 +115,8 @@ class ShortcutManager(QObject):
         if child is self.process and not self.closed:self.problem.emit('The macOS shortcut stopped. Save it again in Settings.')
 
     def restore(self):
-        keys=current_keys()
-        if keys:self.save(QKeySequence(keys[0]),persist=False)
+        keys=current_keys(self.instance)
+        if keys:self.save(FN_SPACE if keys[0]==FN_SPACE else QKeySequence(keys[0]),persist=not configuration(self.instance).exists())
 
     def close(self):
         with self.lock:
@@ -124,13 +131,22 @@ class RemoteShortcutManager(QObject):
     pressed=Signal()
     problem=Signal(str)
 
-    def save(self,sequence):
+    def __init__(self,parent=None,instance='main'):
+        super().__init__(parent);self.instance=validate_name(instance)
+
+    def message(self,operation,instance=None,**values):
+        name=validate_name(instance or self.instance)
+        message={'operation':operation,**values}
+        if name!='main':message['instance']=name
+        return message
+
+    def save(self,sequence,instance=None):
         from .macos_shortcut_service import request
-        return request({'operation':'save','sequence':sequence.toString(QKeySequence.SequenceFormat.PortableText)})['key']
+        return request(self.message('save',instance,sequence=FN_SPACE if sequence==FN_SPACE else sequence.toString(QKeySequence.SequenceFormat.PortableText)))['key']
 
     def restore(self):
         from .macos_shortcut_service import request
-        status=request({'operation':'status'})
+        status=request(self.message('status'))
         if status.get('error'):self.problem.emit(status['error'])
 
     def close(self):
@@ -139,9 +155,9 @@ class RemoteShortcutManager(QObject):
 
 class ManagedShortcutManager(RemoteShortcutManager):
     """Enable login ownership when a packaged app saves its shortcut."""
-    def __init__(self,parent=None):
-        super().__init__(parent)
-        self.local=ShortcutManager(self)
+    def __init__(self,parent=None,instance='main'):
+        super().__init__(parent,instance)
+        self.local=ShortcutManager(self,instance)
         self.local.pressed.connect(self.pressed)
         self.local.problem.connect(self.problem)
         self.lock=threading.RLock()
@@ -153,9 +169,11 @@ class ManagedShortcutManager(RemoteShortcutManager):
         except OSError as error:
             if error.errno not in (errno.ENOENT,errno.ECONNREFUSED):raise
         else:
-            if status.get('protocol')!=1:raise RuntimeError('Unsupported shortcut service version.')
+            if status.get('protocol') not in (1,2):raise RuntimeError('Unsupported shortcut service version.')
             return
         application=ROOT.parents[2]
+        if application.parent not in (Path('/Applications'),Path.home()/'Applications'):
+            raise RuntimeError('Drag Augmentor into Applications before enabling its login shortcut.')
         result=subprocess.run([sys.executable,'-I','-B',str(ROOT/'scripts/register-macos-shortcut.py'),
                                str(application),'install'],capture_output=True,text=True,timeout=45)
         if result.returncode:
@@ -164,14 +182,14 @@ class ManagedShortcutManager(RemoteShortcutManager):
         while True:
             try:
                 status=request({'operation':'status'})
-                if status.get('protocol')!=1:raise RuntimeError('Unsupported shortcut service version.')
+                if status.get('protocol') not in (1,2):raise RuntimeError('Unsupported shortcut service version.')
                 return
             except OSError as error:
                 if error.errno not in (errno.ENOENT,errno.ECONNREFUSED):raise
                 if time.monotonic()>=deadline:raise RuntimeError('The login shortcut service did not become ready. Try saving again.') from error
                 time.sleep(0.1)
 
-    def save(self,sequence):
+    def save(self,sequence,instance=None):
         with self.lock:
             # Reject unsupported combinations before releasing an existing key.
             self.local.command(sequence)
@@ -179,12 +197,15 @@ class ManagedShortcutManager(RemoteShortcutManager):
             self.ensure_service()
             # One save attempt only. An uncertain acknowledgement never causes
             # local re-registration or replay of the settings operation.
-            return super().save(sequence)
+            return super().save(sequence,instance)
 
     def restore(self):
         with self.lock:
             registration=Path.home()/'Library/LaunchAgents/com.augmentor.Agent.shortcut.plist'
             if registration.exists() or registration.is_symlink():
+                return super().restore()
+            if not configuration(self.instance).exists():
+                self.ensure_service()
                 return super().restore()
             # Preserve existing in-app shortcuts until the user saves settings.
             # Removing login registration must not silently re-enable it.
@@ -195,7 +216,8 @@ class ManagedShortcutManager(RemoteShortcutManager):
 
 
 def select_manager(parent=None):
-    if (ROOT/'release.json').is_file():return ManagedShortcutManager(parent)
+    instance=current_name() if current_name() in dict(SHORTCUT_INSTANCES) else 'main'
+    if (ROOT/'release.json').is_file():return ManagedShortcutManager(parent,instance)
     from .macos_shortcut_service import request
     try:
         status=request({'operation':'status'})
@@ -204,9 +226,9 @@ def select_manager(parent=None):
         registration=Path.home()/'Library/LaunchAgents/com.augmentor.Agent.shortcut.plist'
         if registration.exists() or registration.is_symlink():
             raise RuntimeError('The login shortcut service is not ready. Start it before saving a shortcut.')
-        return ShortcutManager(parent)
-    if status.get('protocol')!=1:raise RuntimeError('Unsupported shortcut service version.')
-    return RemoteShortcutManager(parent)
+        return ShortcutManager(parent,instance)
+    if status.get('protocol') not in (1,2):raise RuntimeError('Unsupported shortcut service version.')
+    return RemoteShortcutManager(parent,instance)
 
 
 def initialize(window):
@@ -219,11 +241,17 @@ def initialize(window):
     manager.problem.connect(window.set_status)
     from PySide6.QtWidgets import QApplication
     QApplication.instance().aboutToQuit.connect(manager.close)
+    # Additional named windows may edit the two global shortcuts but do not
+    # register another copy or claim that they own either shortcut themselves.
+    if current_name() not in dict(SHORTCUT_INSTANCES):return
     def restore():
         try:manager.restore()
         except Exception as error:manager.problem.emit(str(error))
     threading.Thread(target=restore,daemon=True).start()
 
-def save_shortcut(sequence):
+def save_shortcut(sequence,instance=None):
     if manager is None:raise RuntimeError('Open the desktop app before saving its shortcut.')
+    instance=validate_name(instance or current_name())
+    if isinstance(manager,RemoteShortcutManager):return manager.save(sequence,instance)
+    if instance!=manager.instance:raise RuntimeError('Install Augmentor in Applications to enable both window shortcuts.')
     return manager.save(sequence)

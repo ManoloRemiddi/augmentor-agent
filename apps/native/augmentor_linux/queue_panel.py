@@ -1,5 +1,6 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Pending prompts, separate from delivered conversation messages."""
+from .ui_scale import scaled
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QScrollArea, QWidget, QApplication, QSizePolicy
 
@@ -9,7 +10,7 @@ class PromptPreview(QLabel):
         super().__init__(parent)
         self.full_text=' '.join(text.split())
         self.setTextFormat(Qt.TextFormat.PlainText)
-        self.setMinimumWidth(0)
+        scaled(self).setMinimumWidth(0)
         self.setSizePolicy(QSizePolicy.Policy.Ignored,QSizePolicy.Policy.Preferred)
         self.setAccessibleName(self.full_text)
 
@@ -26,11 +27,11 @@ class QueuePanel(QScrollArea):
         self.setWidgetResizable(True)
         self.setFrameShape(QFrame.Shape.NoFrame)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.setMaximumHeight(100)
+        scaled(self).setMaximumHeight(100)
         self.content=QWidget();self.rows=QVBoxLayout(self.content)
-        self.rows.setContentsMargins(12,0,12,0);self.rows.setSpacing(2)
+        scaled(self.rows).setContentsMargins(12,0,12,0);scaled(self.rows).setSpacing(2)
         self.setWidget(self.content)
-        self.setStyleSheet('QScrollArea {background:transparent;border:0;}')
+        scaled(self).setStyleSheet('QScrollArea {background:transparent;border:0;}')
         self.content.setAutoFillBackground(False);self.viewport().setAutoFillBackground(False)
         self.pending={};self.items=[];self.changing=set();self.errors={};self.delivered=set();self.online=True;self.running=False
         self.hide()
@@ -78,31 +79,31 @@ class QueuePanel(QScrollArea):
         while self.rows.count():
             widget=self.rows.takeAt(0).widget()
             if widget:widget.hide();widget.setParent(None);widget.deleteLater()
-        entries=[(row['id'],'Steering…' if row['placement']=='steering' else 'Queued',
+        entries=[(row['id'],row.get('stateLabel') or ('Steering…' if row['placement']=='steering' else 'Queued'),
                   '\n'.join(p.get('text','') for p in row['message']['content'] if p.get('type')=='text'),row) for row in self.items]
         entries += [(key,row['state'],row['text'],None) for key,row in self.pending.items()]
         for key,state,text,item in entries:
             if key in self.errors:state+=' — '+self.errors[key][:120]
             frame=QFrame();frame.setObjectName('queuedPrompt')
-            frame.setStyleSheet('QFrame#queuedPrompt {background:rgba(127,150,150,12);border:1px solid rgba(127,160,155,55);border-bottom:0;border-top-left-radius:8px;border-top-right-radius:8px;} QPushButton {background:transparent;border:0;padding:2px 3px;font-size:11px;border-radius:4px;} QPushButton:hover {background:rgba(127,150,150,45);}')
-            frame.setFixedHeight(32)
-            layout=QHBoxLayout(frame);layout.setContentsMargins(9,3,5,3);layout.setSpacing(5)
+            scaled(frame).setStyleSheet('QFrame#queuedPrompt {background:rgba(127,150,150,12);border:1px solid rgba(127,160,155,55);border-bottom:0;border-top-left-radius:8px;border-top-right-radius:8px;} QPushButton {background:transparent;border:0;padding:2px 3px;font-size:11px;border-radius:4px;} QPushButton:hover {background:rgba(127,150,150,45);}')
+            scaled(frame).setFixedHeight(32)
+            layout=QHBoxLayout(frame);scaled(layout).setContentsMargins(9,3,5,3);scaled(layout).setSpacing(5)
             prefix='' if state=='Queued' else state+' · '
             label=PromptPreview(prefix+text);label.setToolTip(state+'\n'+text)
-            label.setStyleSheet('font-size:12px;')
+            scaled(label).setStyleSheet('font-size:12px;')
             label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
             layout.addWidget(label,1)
             if item:
                 steer=QPushButton('Steer');steer.setAccessibleName('Steer queued prompt')
                 steer.setToolTip('Use this prompt at the next step of the current response')
-                steer.setEnabled(self.online and self.running and item['placement']=='queued' and key not in self.changing)
+                steer.setEnabled(self.online and self.running and item['placement']=='queued' and key not in self.changing and item.get('canSteer',True))
                 steer.clicked.connect(lambda checked=False,k=key:self.act(k,'steer'));layout.addWidget(steer)
-                remove=QPushButton('×');remove.setAccessibleName('Remove queued prompt');remove.setFixedWidth(18);remove.setStyleSheet('padding:0;')
-                remove.setEnabled(self.online and key not in self.changing)
+                remove=QPushButton('×');remove.setAccessibleName('Remove queued prompt');scaled(remove).setFixedWidth(18);scaled(remove).setStyleSheet('padding:0;')
+                remove.setEnabled(self.online and key not in self.changing and item.get('canRemove',True))
                 remove.clicked.connect(lambda checked=False,k=key:self.act(k,'remove'));layout.addWidget(remove)
             elif self.pending[key].get('failed'):
                 copy=QPushButton('Copy');copy.clicked.connect(lambda checked=False,t=text:QApplication.clipboard().setText(t));layout.addWidget(copy)
-                remove=QPushButton('×');remove.setFixedWidth(18);remove.setStyleSheet('padding:0;')
+                remove=QPushButton('×');scaled(remove).setFixedWidth(18);scaled(remove).setStyleSheet('padding:0;')
                 remove.clicked.connect(lambda checked=False,k=key:self.consumed(k));layout.addWidget(remove)
             self.rows.addWidget(frame)
-        self.setVisible(bool(entries));self.setFixedHeight(min(100, max(0,len(entries)*34-2)))
+        self.setVisible(bool(entries));scaled(self).setFixedHeight(min(100, max(0,len(entries)*34-2)))

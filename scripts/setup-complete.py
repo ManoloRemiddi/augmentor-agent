@@ -72,32 +72,35 @@ def service(command, home, credentials):
             '\nRestart=on-failure\nRestartSec=5\nUMask=0077\n\n[Install]\nWantedBy=default.target\n')
 
 
-def configure_product(app, cli, home, endpoint, env, state):
+def configure_product(app, cli, home, endpoint, env, state, *, save=True):
     """Compose the product against a temporary owned host; never touch another DSH."""
     sys.path.insert(0,str(app/'services'))
-    from dsh.setup import Setup
+    from dsh.setup import Setup, product_token
     from dsh.remote import client
+    from platform_adapters.processes import OwnedProcess
     # The voice bundle needs this fresh secret during its first boot. The
     # checked product installer subsequently validates and reuses it.
-    if not (home/'augmentor-product-token').exists():
-        write(home/'augmentor-product-token',secrets.token_hex(32)+'\n')
+    secret=home/'augmentor-product-token'
+    product_token(secret,create=not (secret.exists() or secret.is_symlink()))
     log_path=state/'setup-dsh.log';process=None
     def stop():
         nonlocal process
         if process and process.poll() is None:
-            os.killpg(process.pid,signal.SIGTERM)
+            process.terminate()
             try:process.wait(timeout=15)
-            except subprocess.TimeoutExpired:os.killpg(process.pid,signal.SIGKILL);process.wait()
+            except subprocess.TimeoutExpired:process.kill();process.wait()
+        if process:process.close()
         process=None
     def start():
         nonlocal process
         # Truncate only this fresh install's temporary bootstrap log.
         with log_path.open('w') as log:
-            process=subprocess.Popen([str(cli),'web','--no-open','--host','127.0.0.1','--port',str(urlsplit(endpoint).port)],
-                                     env=env,stdout=log,stderr=log,start_new_session=True)
+            command=([str(app/'node/node.exe'),str(cli)] if sys.platform=='win32' else [str(cli)])
+            process=OwnedProcess([*command,'web','--no-open','--host','127.0.0.1','--port',str(urlsplit(endpoint).port)],
+                                 env=env,stdout=log,stderr=log)
         deadline=time.monotonic()+60
         while time.monotonic()<deadline:
-            if process.poll() is not None:raise RuntimeError('The new DSH runtime stopped. Private diagnostic: '+str(log_path))
+            if process.poll() is not None:raise RuntimeError('The new DSH runtime stopped (exit '+str(process.poll())+'). Private diagnostic: '+str(log_path))
             matches=re.findall(r'token=([A-Za-z0-9_-]+)',log_path.read_text(errors='replace'))
             if matches:
                 try:
@@ -110,7 +113,7 @@ def configure_product(app, cli, home, endpoint, env, state):
         if not checked['installed']:
             setup.install(checked['token']);stop();token=start()
             checked=setup.check({'endpoint':endpoint+'/?token='+token,'home':str(home)})
-        setup.save(checked['token'])
+        if save:setup.save(checked['token'])
     finally:stop()
 
 
@@ -164,6 +167,10 @@ def install(args):
     runtime=data/'dsh-runtime';runtime.mkdir(parents=True,exist_ok=True)
     env={**os.environ,'PATH':str(node.parent)+':'+os.environ.get('PATH','')}
     for name in ('package.json','package-lock.json'):shutil.copy2(bundle/'dsh'/name,runtime/name)
+    # New bundles carry the exact unpublished plugin tarballs referenced by the
+    # shared lock. Older published bundles retain their registry-only graph.
+    if (bundle/'dsh/plugins').is_dir():
+        shutil.copytree(bundle/'dsh/plugins',runtime/'plugins',dirs_exist_ok=True)
     run('npm','ci','--prefix',runtime,'--ignore-scripts','--omit=dev','--no-audit','--no-fund',env=env)
     cli=runtime/'node_modules/.bin/dsh';home=data/'dsh-home';home.mkdir(parents=True,exist_ok=True,mode=0o700)
     env.update(DSH_HOME=str(home),DSH_TELEMETRY_MODE='DISABLED',AUGMENTOR_MODEL_API_KEY=secret)

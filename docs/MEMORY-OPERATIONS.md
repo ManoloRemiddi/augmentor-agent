@@ -17,6 +17,15 @@ The installer needs Docker and an existing local compatible model endpoint.
 It does not install or reconfigure the model server. Use `augmentor-update` for installed artifacts; preserve matching DSH integration.
 Fresh package/source sessions can journal text before the engine is configured.
 
+The companion initializes its journal, schema and processing configuration before
+publishing its local endpoint. A client must not connect to an uninitialized
+service and spend its response timeout waiting for durable startup I/O. A gated
+constructor regression exercises this ordering through an actual child process;
+the same service order applies to Unix sockets and Windows named pipes. Test-only
+stack diagnostics are retained on failure without changing request timeouts or
+replaying writes. This correction addresses a reproduced startup race; the earlier
+Windows x64 timeout still requires native rerun evidence.
+
 The companion starts on first use and journals committed text immediately.
 Automatic inference requires a trusted activity lease, an open bounded window
 and remaining batch budget. Hindsight remains a separate persistent service,

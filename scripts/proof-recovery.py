@@ -42,6 +42,11 @@ with tempfile.TemporaryDirectory(prefix='augmentor-recovery-proof-') as folder:
     (profile/'cordis.yml').write_text('[]\n')
     (profile/'cordis.patch.yml').write_text('- id: session-title-llm\n  disabled: true\n')
     (home/'settings.yaml').write_text('llm-pi-ai:\n  providers: {}\n')
+    # Recovery must restore a usable agent, not just an HTTP listener. Keep this
+    # credential-free fixture's explicit legacy role consistent with readiness.
+    preset=home/'.agent-presets/augmentor-linux';preset.mkdir(parents=True)
+    (preset/'preset.yml').write_text('name: Recovery fixture\n')
+    (preset/'agent.cordis.yml').write_text('[]\n')
     with socket.socket() as probe:
         probe.bind(('127.0.0.1',0)); port = probe.getsockname()[1]
     base = f'http://127.0.0.1:{port}'
@@ -57,6 +62,7 @@ with tempfile.TemporaryDirectory(prefix='augmentor-recovery-proof-') as folder:
             return super().call(method, payload)
     client = FixtureAdapter(base=base, home=home)
     client.product = False  # The isolated base profile deliberately has no product plugin.
+    client.preset = 'augmentor-linux'
     children = []
     original = subprocess.Popen
     def launch(*args, **kwargs):

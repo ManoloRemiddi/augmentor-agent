@@ -4,6 +4,14 @@
 - [Immediate composer feedback and regression evidence](COMPOSER-SEND-FEEDBACK.md)
 # Documentation index
 
+- [Published Handy downloads — October 3](HANDY-DOWNLOADS-2026-10-03.md): matched Linux/Mac/Windows preview 2, verified public bytes, qualification and physical acceptance boundaries.
+- [Embedded Handy dictation](HANDY-INTEGRATION.md): implementation, themed recording pill, settings, OS adapters, licensing, build and qualification boundaries.
+- [Approved Handy integration plan](HANDY-INTEGRATION-PLAN.md).
+
+- [Application SDK foundation](APP-SDK.md): DSH integration protocol, tool grants, recoverable installation and experimental voice.
+
+See [embedded Browser and specialist workspaces](WORKSPACE-EMBEDDING.md) for the product-owned iframe host, dedicated role/tool composition, scoped memory and release lifecycle.
+
 Licensing and publication: [combined Augmentor license](LICENSING.md),
 [public source and privacy review](PUBLIC-SOURCE.md),
 [canonical repository, archives and preserved work](REPOSITORIES.md).
@@ -19,8 +27,24 @@ matrix and relevant setup/data/test instructions together. Source and installed
 state must remain distinct. Private logs, credentials and conversations stay out
 of this repository; include reproducible commands and sanitized evidence summaries.
 
+Current cross-platform direction: [one product, Linux/Mac parity audit and correction sequence](PLATFORM-PARITY-AUDIT.md).
+
+Windows: [detailed x64/ARM64 implementation plan, including RTX Spark](WINDOWS-IMPLEMENTATION-PLAN.md), [corrected research](WINDOWS-RTX-SPARK-RESEARCH.md) and [active implementation evidence](WINDOWS-IMPLEMENTATION-STATUS.md). See [Windows preview installation and delivery limits](WINDOWS-PREVIEW.md); physical acceptance and signed/stable delivery remain pending.
+
+Windows mechanisms: [desktop and background shortcut ownership](WINDOWS-SHELL.md),
+[native browser companion and remaining integration](WINDOWS-BROWSER.md),
+[installer safety findings and replacement qualification](WINDOWS-INSTALLER-DECISION.md),
+[signed Windows update delivery](WINDOWS-UPDATE-DELIVERY.md).
+
 ## Start and understand the product
 
+- [Codex integration build plan: Desktop, Browser and connection profiles](CODEX-INTEGRATION-PLAN.md) — full C0–C9 scope and acceptance gates.
+- [Codex implementation and evidence](CODEX-INTEGRATION.md) — runtime foundation, reproducible proofs and remaining integration work.
+- [Codex packaging inventory and release gates](CODEX-PACKAGING.md)
+- [Local Qwen compatibility, candidate and activation boundary](CODEX-LOCAL-QWEN.md)
+- [Codex secure credentials, release dependencies and native-store proofs](CODEX-CREDENTIALS.md)
+- [Codex ChatGPT accounts, shared Desktop/Browser login controls and remaining inference integration](CODEX-ACCOUNTS.md)
+- [Private speech-source cleanup and current synthetic voice test boundaries](CODEX-SOURCE-CLEANUP.md)
 - [Start here: agent handoff](AGENT-HANDOFF.md)
 - [Current architecture](ARCHITECTURE.md)
 - [One personal agent, two presentations](SHARED-SURFACES-2026-09-24.md)
@@ -38,7 +62,7 @@ of this repository; include reproducible commands and sanitized evidence summari
 - [Optional manual memory library](MEMORY.md)
 - [Improve a draft](PROMPT-IMPROVEMENT.md)
 - [Saved prompts and DSH commands](SLASH-COMMANDS.md)
-- [Native DSH queue and steering](QUEUE-AND-STEERING.md)
+- [Queued prompts and steering (DSH native and Codex Desktop/Browser)](QUEUE-AND-STEERING.md)
 - [Linux reply completion](REPLY-COMPLETION.md)
 - [Bounded DSH execution recovery and response validity](BOUNDED-EXECUTION-RECOVERY.md)
 - [Augmentor Pi client protocol v1](PROTOCOL.md)
@@ -50,7 +74,7 @@ of this repository; include reproducible commands and sanitized evidence summari
 - [Hands-free native implementation](HANDS-FREE-IMPLEMENTATION.md)
 - [Desktop colors and skins](SKINS.md)
 - [Independent second window](SECOND-WINDOW.md)
-- [Linux window resizing](WINDOW-RESIZING.md)
+- [Desktop window resizing (Linux and macOS)](WINDOW-RESIZING.md)
 - [Linux desktop control preview](DESKTOP-CONTROL.md)
 - [Bounded desktop specialist](DESKTOP-SPECIALIST.md)
 - [Browser Settings](BROWSER-SETTINGS.md)
@@ -59,6 +83,13 @@ of this repository; include reproducible commands and sanitized evidence summari
 - [Restart reliability incident and verified corrections — 20 September 2026](RESTART-RELIABILITY-2026-09-20.md)
 
 ## Setup, operations and distribution
+
+- [Current Mac recovery and shared renderer qualification](MACOS-RECOVERY-2026-09-26.md)
+- [Mac effect transparency and shared App size slider](MACOS-APPEARANCE-2026-09-27.md)
+
+- [macOS signing, publication gates and website cutover](MACOS-RELEASE.md)
+- [Managed Mac first-run model and runtime setup](MACOS-MANAGED-SETUP.md)
+- [Guided DSH installation and first-run correction](MACOS-GUIDED-DSH-SETUP.md)
 
 [0.2.12 desktop flare correction](RELEASE-0.2.12.md).
 [0.2.11 security release and upgrade guidance](RELEASE-0.2.11.md).
@@ -78,6 +109,7 @@ of this repository; include reproducible commands and sanitized evidence summari
 - [Data, permissions and support](DATA-AND-SUPPORT.md)
 - [Browser private-preview distribution](BROWSER-DISTRIBUTION.md)
 - [macOS development installation](MACOS-INSTALLATION.md)
+- [macOS distribution implementation and current qualification](MACOS-DISTRIBUTION.md)
 - [Fedora 44 installation preview](FEDORA-PREVIEW.md)
 - [Licensing and distribution decision](LICENSING.md)
 - [Cross-platform implementation status](CROSS-PLATFORM-RELEASE-STATUS.md)
@@ -129,3 +161,22 @@ files available only in a developer's working directory.
 - [Controlled memory and selected context](CONTROLLED-MEMORY.md): current bounded inference, provenance, tests and operating limits.
 
 - [Home desktop tray launcher](HOME-LAUNCHER.md): shared NAS dashboard access, remembered address and login startup.
+
+- [Current Mac preview 3](MACOS-PREVIEW-3-RELEASE.md) — installed browser choice and Comet qualification.
+- [Historical Mac preview 2](MACOS-PREVIEW-2-RELEASE.md) — accepted live zoom/flare build, packaging and publication.
+- [Historical macOS preview 1](MACOS-PREVIEW-RELEASE.md) — original Apple-independent preview qualification.
+- [Mac customer guide](MACOS-PREVIEW.html) — install, model connection and browser extension.
+- [Mac browser choice](MACOS-BROWSER-CHOICE.md) — installed Chromium apps, Comet, native registration and qualification.
+- [Mac library replacement](MACOS-LIBRARY-REPLACEMENT.md) — LGPL source and installation material.
+
+- [Shared desktop flare fidelity](FLARE-FIDELITY.md): sampling correction, bounded fluid transport and Mac/Linux validation.
+
+- [Live app zoom correction and qualification](MACOS-LIVE-ZOOM-2026-09-27.md)
+- [Tool context budget](CONTEXT-BUDGET.md): early pruning, original-result excerpts and deterministic repair of existing conversations.
+- [Browser observation repair](BROWSER-OBSERVATION-REPAIR.md): preserve fresh evidence, recover omitted text, page long observations and retain the work target.
+
+- [Task reliability](TASK-RELIABILITY.md): binary evidence protection, failed-approach checkpoints and effective reasoning visibility.
+
+- [0.2.13 browser reliability release](RELEASE-0.2.13.md): general browser evidence recovery and matched public artifacts.
+
+- [Application SDK alignment](SDK-ALIGNMENT.md): capability/permission states, experimental Codex application isolation and platform bootstrap/startup qualification.

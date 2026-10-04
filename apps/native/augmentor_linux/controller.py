@@ -12,6 +12,7 @@ from pathlib import Path
 
 from PySide6.QtCore import QObject, Signal
 from .pi_client import PiClient, EventStream, ContractError
+from .maintenance import Admission, MaintenanceBusy, admitted
 
 
 class Controller(QObject):
@@ -38,11 +39,14 @@ class Controller(QObject):
 
     def __init__(self, parent=None, client=None, harness="pi"):
         super().__init__(parent)
-        if harness not in ('pi','dsh'):
-            raise ValueError('Choose DSH or Pi. OpenCode support has been retired; its saved data is retained.')
+        if harness not in ('pi','dsh','codex'):
+            raise ValueError('Choose DSH, Pi or Codex. OpenCode support has been retired; its saved data is retained.')
         if client is None and harness=='dsh':
             from .adapters.dsh import DshAdapter
             self.client=DshAdapter()
+        elif client is None and harness=='codex':
+            from .adapters.codex import CodexAdapter
+            self.client=CodexAdapter()
         else:self.client=client or PiClient()
         self.harness=getattr(self.client,'harness',harness)
         self.preset=getattr(self.client,'preset','augmentor-linux-pi')
@@ -50,6 +54,7 @@ class Controller(QObject):
         self.session = None
         self.stream = None
         self.running = False
+        self.admission = Admission()
         self.lock = threading.Lock()
         self.cancel_requested = threading.Event()
         self.closed = False
@@ -69,6 +74,7 @@ class Controller(QObject):
         self.preparing = False
         self.generation = None
         self.selection = None
+        self.pending_branch = None
         self.read_only = False
         self.saved_ids = set()
         self.loaded_events = []
@@ -84,6 +90,7 @@ class Controller(QObject):
                 if state.get('endpoint') == self.client.base and (state.get('session') is None or isinstance(state.get('session'),str) and re.fullmatch(r'[a-zA-Z0-9_-]{1,128}', state['session'])):
                     self.session = state['session']
                     self.selection = state.get('selection')
+                    if self.harness=='codex':self.pending_branch=state.get('pendingBranch')
             except (OSError, ValueError, TypeError):
                 pass
 
@@ -92,10 +99,16 @@ class Controller(QObject):
             return
         self.state_file.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
         with tempfile.NamedTemporaryFile(mode='w', dir=self.state_file.parent, delete=False) as file:
-            json.dump({'endpoint': self.client.base, 'session': self.session, 'selection':self.selection}, file)
+            json.dump({'endpoint': self.client.base, 'session': self.session, 'selection':self.selection, **({'pendingBranch':self.pending_branch} if self.harness=='codex' else {})}, file)
+            file.flush();os.fsync(file.fileno())
             temporary = file.name
         os.replace(temporary, self.state_file)
+        if self.harness=='codex':
+            directory=os.open(self.state_file.parent,os.O_RDONLY)
+            try:os.fsync(directory)
+            finally:os.close(directory)
 
+    @admitted
     def new_chat(self):
         if self.running or self.navigating or self.repairing or self.recovery_lock.locked():
             return False
@@ -111,17 +124,20 @@ class Controller(QObject):
         self.session_info.emit({'sessionId':None,'title':'Augmentor Agent','saved':False,'readOnly':False})
         return True
 
+    @admitted
     def refresh_models(self):
         def work():
             self.models.emit(self.client.refresh_catalog() if hasattr(self.client,'refresh_catalog') else self.client.model_catalog())
             if self.selection:self.selection_changed.emit(self.selection)
         self.task(work)
 
+    @admitted
     def choose_model(self, selection):
         if self.running or self.read_only:return
         self.selection = selection
         self.save_session()
 
+    @admitted
     def list_sessions(self):
         self.task(lambda:self.sessions.emit(self.client.session_rows()))
 
@@ -138,6 +154,7 @@ class Controller(QObject):
             self.has_more=result.get('hasMore',False)
             self.page.emit(list(self.loaded_events), self.has_more, older)
 
+    @admitted
     def load_older(self):
         if not self.has_more or self.loading_page:return
         self.loading_page=True
@@ -146,6 +163,7 @@ class Controller(QObject):
             finally:self.loading_page=False
         self.task(work)
 
+    @admitted
     def open_session(self, row):
         if self.running:return
         def work():
@@ -175,20 +193,41 @@ class Controller(QObject):
         self.stream=None;self.connected=False
         self.session=row['sessionId'];self.read_only=False
         self.loaded_events=[];self.has_more=False
-        self.selection=row['selection'];self.save_session()
+        self.selection=row['selection'];self.pending_branch=None;self.save_session()
         self.session_info.emit(dict(row,readOnly=False))
         self.selection_changed.emit(self.selection)
         self.load_page();self.subscribe(self.session)
 
+    def request_branch(self,source,seq,mode):
+        request={'sessionId':source,'newSessionId':self.preset+'-'+uuid.uuid4().hex,'messageSeq':seq,'mode':mode}
+        if self.harness=='codex':
+            if self.pending_branch:
+                if any(self.pending_branch.get(key)!=request[key] for key in ('sessionId','messageSeq','mode')):
+                    raise ContractError('A previous branch is not confirmed. Retry its original message action before creating another branch.')
+                request=dict(self.pending_branch)
+            else:
+                self.pending_branch=request
+            self.save_session()
+        try:return self.client.call('session.branch',request)
+        except Exception:
+            if self.harness=='codex':
+                try:
+                    if self.client.call('session.branchStatus',{'newSessionId':request['newSessionId']}).get('status')=='absent':
+                        self.pending_branch=None;self.save_session()
+                except Exception:pass  # No authoritative absence: preserve the original identity.
+            raise
+
+    @admitted
     def branch(self,seq):
         if not self.session or self.read_only or not self.online:return
-        source=self.session;target='augmentor-linux-pi-'+uuid.uuid4().hex
+        source=self.session
         def work():
-            row=self.client.call('session.branch',{'sessionId':source,'newSessionId':target,'messageSeq':seq,'mode':'reply'})
+            row=self.request_branch(source,seq,'reply')
             self.attach_branch(row)
             self.status.emit('Branched into a new chat')
         self.navigate(work)
 
+    @admitted
     def toggle_saved(self):
         sid=self.session
         if not sid or self.read_only:return
@@ -198,6 +237,7 @@ class Controller(QObject):
             if sid==self.session:self.session_info.emit({'sessionId':sid,'saved':sid in self.saved_ids})
         self.task(work)
 
+    @admitted
     def rename(self, title):
         sid=self.session
         if not sid:return
@@ -206,6 +246,7 @@ class Controller(QObject):
             if sid==self.session:self.session_info.emit({'sessionId':sid,'title':result['title']})
         self.task(work)
 
+    @admitted
     def navigate(self, fn):
         if self.navigating or self.running or self.repairing or self.recovery_lock.locked():return
         self.navigating=True
@@ -217,14 +258,25 @@ class Controller(QObject):
                 if not self.closed:self.busy.emit(self.running)
         self.task(work)
 
-    def task(self, fn):
+    def task(self, fn, *, executor=None):
+        lease = self.admission.work()
+        lease.__enter__()  # Count queued work before its thread can begin.
         def run():
             try:
                 fn()
             except Exception as exc:
                 if not self.closed:
                     self.problem.emit(str(exc))
-        threading.Thread(target=run, daemon=True).start()
+            finally:lease.__exit__(None,None,None)
+        try:
+            if executor is None:
+                threading.Thread(target=run, daemon=True).start()
+            else:
+                future = executor.submit(run)
+                future.add_done_callback(lambda result:lease.__exit__(None,None,None) if result.cancelled() else None)
+        except BaseException:
+            lease.__exit__(None,None,None)
+            raise
 
     @staticmethod
     def merge_events(*groups):
@@ -252,7 +304,8 @@ class Controller(QObject):
     def start_monitor(self):
         if self.monitor_started:return
         self.monitor_started=True
-        self.task(self.monitor)
+        # Count each finite health/recovery pass, not the sleeping monitor.
+        threading.Thread(target=self.monitor, daemon=True).start()
 
     def monitor(self):
         delay=1
@@ -260,11 +313,14 @@ class Controller(QObject):
             if self.navigating or self.preparing or self.repairing:
                 self.shutdown.wait(.25);continue
             try:
-                if not self.connected:
-                    self.recover_connection()
-                else:self.client.call('host.describe')
+                with self.admission.work():
+                    if not self.connected:
+                        self.recover_connection()
+                    else:self.client.call('host.describe')
                 delay=1
                 self.shutdown.wait(3)
+            except MaintenanceBusy:
+                self.shutdown.wait(.25)
             except Exception as exc:
                 self.online=False;self.connected=False
                 if self.closed:return
@@ -274,6 +330,7 @@ class Controller(QObject):
                 self.shutdown.wait(delay)
                 delay=min(15,delay*2)
 
+    @admitted
     def repair_connection(self):
         with self.lock:
             if self.repairing or self.navigating or self.preparing or (self.running and self.online) or self.closed:
@@ -325,6 +382,7 @@ class Controller(QObject):
         self.task(work)
         return True
 
+    @admitted
     def recover_connection(self, manual=False):
         try:
             self._recover_connection(manual)
@@ -415,18 +473,19 @@ class Controller(QObject):
             with self.events_lock:self.recover_buffer=None
             self.recovery_lock.release()
 
+    @admitted
     def prepare_voice(self, selection):
         with self.lock:
             if self.running or self.navigating or self.repairing or self.closed or self.read_only or not self.online:
-                raise ContractError('Open an idle, connected DSH conversation first.')
-            if not hasattr(self.client,'voice_ticket'):raise ContractError('Voice requires the DSH integration.')
+                raise ContractError('Open an idle, connected conversation first.')
+            if not hasattr(self.client,'voice_ticket'):raise ContractError('Voice is unavailable with this harness.')
             self.navigating=True
         try:
             self.client.validate_model(selection)
             if not self.session:
                 session=self.preset+'-'+uuid.uuid4().hex
                 cwd=self.client.workspace();cwd.mkdir(mode=0o700,exist_ok=True)
-                self.client.call('session.create',{'sessionId':session,'cwd':str(cwd),'agentPreset':self.preset})
+                self.client.call('session.create',{'sessionId':session,'cwd':str(cwd),'agentPreset':self.preset,'selection':selection})
                 self.session=session
                 self.save_session()
                 self.session_info.emit({'sessionId':session,'saved':False,'readOnly':False})
@@ -436,6 +495,7 @@ class Controller(QObject):
             return self.client.voice_ticket(self.session)
         finally:self.navigating=False
 
+    @admitted
     def send(self, text, selection, edit_from=None, request_id=None):
         with self.lock:
             if self.running or self.navigating or self.repairing or self.recovery_lock.locked() or self.closed or self.read_only:
@@ -455,7 +515,7 @@ class Controller(QObject):
                     return
                 if edit_from:
                     if edit_from['sessionId']!=self.session:raise ContractError('The conversation changed. Choose Edit again.')
-                    row=self.client.call('session.branch',{'sessionId':self.session,'newSessionId':self.preset+'-'+uuid.uuid4().hex,'messageSeq':edit_from['seq'],'mode':'edit'})
+                    row=self.request_branch(self.session,edit_from['seq'],'edit')
                     self.attach_branch(row)
                     if cancelled.is_set():return
                 if not self.session:
@@ -473,7 +533,7 @@ class Controller(QObject):
                 if not self.connected or not self.stream or self.stream.session!=self.session:self.subscribe(self.session)
                 if cancelled.is_set():
                     return
-                response = self.client.call('session.prompt', {'sessionId': self.session, 'mode': 'queue', 'requestId': request_id or str(uuid.uuid4()), 'content': [{'type': 'text', 'text': text}]})
+                response = self.client.call('session.prompt', {'sessionId': self.session, 'mode': 'queue', **({'resumeQueue':True} if self.harness=='codex' else {}), 'requestId': request_id or str(uuid.uuid4()), 'content': [{'type': 'text', 'text': text}]})
                 if response.get('accepted') is not True:
                     raise ContractError('The harness did not accept the message.')
                 accepted = True
@@ -496,9 +556,10 @@ class Controller(QObject):
         self.task(work)
         return True
 
+    @admitted
     def queue_prompt(self, text, request_id, mode='queue'):
         if not getattr(self.client,'supports_queue',False) or not self.running or self.navigating or self.read_only or not self.online:return False
-        generation=self.generation;sid=self.session
+        generation=self.generation;sid=self.session;turn_id=getattr(self,'queue_turn_id',None)
         def work():
             try:
                 # Preserve order behind the first prompt while a new chat is being prepared.
@@ -507,18 +568,20 @@ class Controller(QObject):
                     time.sleep(.03)
                 target=sid or self.session
                 if self.closed or self.generation is not generation or target!=self.session or not target or self.cancel_requested.is_set():raise ContractError('Prompt was not queued; the active response stopped or changed.')
-                result=self.client.call('session.prompt',{'sessionId':target,'requestId':request_id,'mode':mode,'content':[{'type':'text','text':text}]})
+                result=self.client.call('session.prompt',{'sessionId':target,'requestId':request_id,'mode':mode,'content':[{'type':'text','text':text}],**({'expectedTurnId':turn_id} if self.harness=='codex' and mode=='steer' else {})})
                 self.queue_result.emit({'id':request_id,'accepted':result.get('accepted') is True,'command':bool(result.get('command'))})
             except Exception as exc:
                 self.queue_result.emit({'id':request_id,'accepted':False,'error':str(exc)})
-        self.queue_executor.submit(work);return True
+        self.task(work, executor=self.queue_executor);return True
 
+    @admitted
     def update_queue(self, item_id, action):
         sid=self.session
         if not sid or self.read_only or not self.online or action not in ('steer','remove'):return
+        turn_id=getattr(self,'queue_turn_id',None)
         def work():
             try:
-                result=self.client.call('session.updateQueue',{'sessionId':sid,'itemId':item_id,'action':{'kind':action}})
+                result=self.client.call('session.updateQueue',{'sessionId':sid,'itemId':item_id,'action':{'kind':action},**({'expectedTurnId':turn_id} if self.harness=='codex' and action=='steer' else {})})
                 self.queue_action_result.emit({'id':item_id,'accepted':result.get('accepted') is True})
             except Exception as exc:
                 self.queue_action_result.emit({'id':item_id,'error':str(exc)})
@@ -567,7 +630,9 @@ class Controller(QObject):
                         sid,generation=self.session,self.stream_generation
                         self.task(lambda:self.reconcile_turn(sid,generation))
             elif method == 'session/queue':
-                if payload.get('sessionId')==self.session:self.queue_changed.emit(payload.get('items',[]))
+                if payload.get('sessionId')==self.session:
+                    self.queue_turn_id=payload.get('activeTurnId')
+                    self.queue_changed.emit(payload.get('items',[]))
             elif method == 'session/event':
                 event = payload.get('event', {})
                 self.loaded_events=self.merge_events(self.loaded_events,[event])
@@ -603,6 +668,7 @@ class Controller(QObject):
             if not self.preparing:
                 self.set_idle()
 
+    @admitted
     def answer(self, frame, value):
         self.task(lambda: self.client.respond(frame['rpcId'], value))
 

@@ -4,6 +4,7 @@
 // License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
 
 import {presentSettingsForm} from './settings-form.mjs'
+import {registerMaintenanceState, isPageMaintenancePaused} from './maintenance-page.mjs'
 export function promptEditor(doc,request,onSaved,container){
   const dialog=doc.createElement('dialog');dialog.className='shared-prompt-editor';
   const make=(tag,text)=>{const e=doc.createElement(tag);if(text)e.textContent=text;return e}
@@ -49,7 +50,8 @@ export function promptEditor(doc,request,onSaved,container){
   button('Reload selected',()=>load().then(select).catch(error))
   button('Done',()=>dialog.close())
   saved.append(list,name,body,actions,note);dialog.append(title,sections,saved,improvement);const done=make('button','Done');done.type='button';done.onclick=()=>dialog.close();improvement.append(done);doc.body.append(dialog)
-  const poll=doc.defaultView.setInterval(()=>{if(!busy)load().catch(error)},1500)
+  registerMaintenanceState(dialog,()=>busy||improvementBusy||name.value!==(selected?.name??'')||body.value!==(selected?.content??'')||instructions.value!==(current?.content??''))
+  const poll=doc.defaultView.setInterval(()=>{if(!busy&&!isPageMaintenancePaused(doc))load().catch(error)},1500)
   dialog.addEventListener('close',()=>{doc.defaultView.clearInterval(poll);dialog.remove()});presentSettingsForm(dialog,container);load().catch(error)
   return dialog
 }

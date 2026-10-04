@@ -2,10 +2,38 @@
 
 # Desktop colors and skins
 
+The [embedded Handy recording pill](HANDY-INTEGRATION.md) uses the same explicit
+skin/colour choices immediately, including during recording. Its left mark is
+the animated Augmentor circle; waveform and close button retain Handy's geometry.
+Opacity and the animation preference also apply. Merely opening another window
+does not replace the current dictation palette; the latest explicit edit wins.
+
 Open **⋯ → Colors & skins**, also available from the compact-view menu.
 The picker contains **Custom**, **Futuristic**, **Blossom lake**, and your saved
 skins. Woodland and Moonlit Garden have been retired from the built-in list.
 Existing user-created skin records remain available.
+
+## App size
+
+The **App size** slider scales the entire desktop window from **75% to 150%**
+in 5% steps: text, icons, controls, dialogs and effects. **100%** resets its size.
+Moving the slider applies the size immediately, including to the open conversation.
+Replies continue and unsent drafts, selections and undo remain intact. The setting
+is saved automatically and restored on reopening. Appearance stays anchored while
+dragging, with scrolling for controls that no longer fit. The size is independent
+for each agent window and stays unchanged when selecting, importing or resetting
+a skin. New secondary windows inherit the primary preference once.
+
+The shared startup path multiplies Qt's application scale by the saved percentage,
+preserving OS per-monitor scale and a caller-provided Qt factor, then restores the
+environment for helpers. Live changes use public widget/layout metrics relative to
+that startup baseline; they do not change private Qt DPI state, restart the process,
+or enlarge widget screenshots. New controls inherit their owning window's scale.
+`ui_scale.scaled(...)` registers original design sizes/styles; `px(...)` handles
+custom geometry. Do not register sizes already measured from a viewport or screen.
+Rich text is reflowed with selection and reading position retained. Persisted
+window dimensions are normalized so restarting does not compound the enlargement.
+See [live zoom qualification](MACOS-LIVE-ZOOM-2026-09-27.md).
 
 ## Create a skin from an image
 

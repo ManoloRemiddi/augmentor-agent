@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
 import {presentSettingsForm} from './settings-form.mjs'
+import {registerMaintenanceState} from './maintenance-page.mjs'
 export function modelSetupDialog(doc,send,container){
   if(doc.querySelector('.model-setup'))return
   const make=(tag,text)=>{const e=doc.createElement(tag);if(text)e.textContent=text;return e}
@@ -23,6 +24,9 @@ export function modelSetupDialog(doc,send,container){
   mode.onchange=()=>{explanation.textContent={ 'workspace-write':'Routine observations run directly. Actions that can change files or applications require approval.', 'read-only':'Tools that can change state are blocked. This is a tool policy, not an operating-system sandbox.', 'danger-full-access':'Tools act within their environment without further approval. Stop remains available.'}[mode.value]};mode.onchange()
   const note=make('p','Enter the limits published by your provider. Select image input for desktop screenshots. This checks accepted formats; visual reasoning needs separate testing.'),actions=make('div')
   let token=null,busy=false,saving=false,closed=false
+  const values=()=>JSON.stringify([...Object.values(fields).map(e=>e.type==='checkbox'?e.checked:e.value),mode.value])
+  const baseline=values()
+  registerMaintenanceState(dialog,()=>busy||saving||!!token||values()!==baseline)
   const button=(label,fn)=>{const b=make('button',label);b.type='button';b.onclick=fn;actions.append(b);return b}
   const request=async(action,params={})=>{const r=await send('modelSetup',{action,params});if(!r.ok)throw Error(r.error);return r.result}
   const controls=()=>{form.disabled=busy;check.disabled=busy;save.disabled=busy||!token;later.disabled=saving}

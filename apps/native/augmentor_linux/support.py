@@ -4,11 +4,12 @@ import json
 import os
 from pathlib import Path
 import tempfile
+from .ui_scale import scaled
 from PySide6.QtWidgets import QDialog,QVBoxLayout,QLabel,QPlainTextEdit,QPushButton,QFileDialog
 from .prompt_client import PromptClient
 class SupportDialog(QDialog):
     def __init__(self,window):
-        super().__init__(window);self.setWindowTitle('Support report');self.setMinimumSize(520,440);self.content=None
+        super().__init__(window);self.setWindowTitle('Support report');scaled(self).setMinimumSize(520,440);self.content=None
         layout=QVBoxLayout(self);note=QLabel('Review the report before saving or sharing it. It contains versions and component status.');note.setWordWrap(True);layout.addWidget(note)
         self.preview=QPlainTextEdit();self.preview.setReadOnly(True);self.preview.setAccessibleName('Support report preview');layout.addWidget(self.preview)
         self.save=QPushButton('Save report');self.save.setEnabled(False);self.save.clicked.connect(self.export);layout.addWidget(self.save)

@@ -2,6 +2,8 @@
 from datetime import datetime
 import json
 from pathlib import Path
+import sys
+from .ui_scale import scaled, px
 from PySide6.QtCore import Qt,QTimer
 from PySide6.QtWidgets import (QDialog,QVBoxLayout,QHBoxLayout,QLabel,QLineEdit,
     QListWidget,QListWidgetItem,QPushButton,QCheckBox,QComboBox,QMessageBox,QTextEdit,QWidget,QTabWidget,QTextBrowser,QScrollArea)
@@ -12,7 +14,7 @@ class HistoryDialog(QDialog):
     def __init__(self, window):
         super().__init__(window)
         self.owner=window;self.rows=[]
-        self.setWindowTitle('Conversation history');self.resize(500,520)
+        self.setWindowTitle('Conversation history');self.resize(px(self,500),px(self,520))
         layout=QVBoxLayout(self)
         self.search=QLineEdit();self.search.setPlaceholderText('Search titles…');self.search.setClearButtonEnabled(True);layout.addWidget(self.search)
         filters=QHBoxLayout()
@@ -59,7 +61,7 @@ class HistoryDialog(QDialog):
 class AccessDialog(QDialog):
     def __init__(self,window):
         super().__init__(window);self.owner=window;self.descriptor=None
-        self.setWindowTitle('Approval mode · new chats');self.resize(380,220)
+        self.setWindowTitle('Approval mode · new chats');self.resize(px(self,380),px(self,220))
         layout=QVBoxLayout(self)
         note=QLabel('Choose whether tools may change files or run actions. Existing chats keep their policy. These controls are tool permissions, not an OS sandbox.');note.setWordWrap(True);layout.addWidget(note)
         self.mode=QComboBox()
@@ -85,13 +87,16 @@ class AccessDialog(QDialog):
 
 class UpdatesDialog(QDialog):
     def __init__(self,window):
-        super().__init__(window);self.owner=window;self.setWindowTitle('Versions & updates');self.resize(410,250)
+        super().__init__(window);self.owner=window;self.setWindowTitle('Versions & updates');self.resize(px(self,410),px(self,250))
         layout=QVBoxLayout(self)
         self.info=QLabel();self.info.setWordWrap(True);self.info.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse);layout.addWidget(self.info)
         check=QPushButton('Check installed versions');check.clicked.connect(self.check);layout.addWidget(check)
         close=QPushButton('Done');close.clicked.connect(self.accept);layout.addWidget(close);self.check()
 
     def check(self):
+        if sys.platform == 'darwin':
+            self.info.setText(f'Augmentor Agent {__version__} · macOS preview\n\nAutomatic updates are not available yet. Do not replace the app while Augmentor or its browser companion is working. Read the Mac guide at https://augmentoragent.com/macos.html for the current release and update instructions.')
+            return
         self.info.setText('Checking the selected harness…')
         def read():
             client=self.owner.controller.client
@@ -105,7 +110,7 @@ class UpdatesDialog(QDialog):
 class LicensesDialog(QDialog):
     def __init__(self, window):
         super().__init__(window)
-        self.setWindowTitle('About & licenses'); self.resize(620, 500)
+        self.setWindowTitle('About & licenses'); self.resize(px(self,620), px(self,500))
         layout = QVBoxLayout(self)
         title = QLabel(f'Augmentor Agent {__version__}\nCopyright © 2026 Manolo Remiddi · MIT with Augmentor Resale Restriction')
         title.setWordWrap(True); layout.addWidget(title)
@@ -116,10 +121,15 @@ class LicensesDialog(QDialog):
         text = QTextEdit(); text.setReadOnly(True); layout.addWidget(text)
         documents = [('Augmentor · MIT with Augmentor Resale Restriction', root / 'LICENSE'),
                      ('Distribution and library replacement', root / 'docs/LICENSING.md'),
+                     ('Mac library sources and replacement', root / 'docs/MACOS-LIBRARY-REPLACEMENT.md'),
                      ('LGPL version 3', root / 'licenses/LGPL-3.0.txt'),
                      ('GPL version 3 (incorporated by LGPL)', root / 'licenses/GPL-3.0.txt')]
         for file in sorted((root / 'licenses/upstream').glob('*.txt')):
             documents.append((file.stem, file))
+        handy=root/'licenses/handy'
+        if not handy.exists():handy=root/'components/handy/runtime/notices'
+        for label,name in [('Handy · MIT','Handy-MIT.txt'),('Silero VAD · MIT','Silero-v4-MIT.txt'),('ONNX Runtime · MIT','onnxruntime/LICENSE'),('ONNX Runtime third-party notices','onnxruntime/ThirdPartyNotices.txt'),('Linux input helper · AGPLv3','ydotool/LICENSE')]:
+            if (handy/name).is_file():documents.append((label,handy/name))
         for label, _ in documents: choices.addItem(label)
         def select(index):
             file = documents[index][1]
@@ -140,23 +150,30 @@ class SettingsDialog(QDialog):
     def __init__(self,window):
         from .instances import current_name
         super().__init__(window);self.owner=window
-        self.setWindowTitle('Settings · '+('First agent' if current_name()=='main' else 'Second agent'));self.setMinimumWidth(400)
+        self.setWindowTitle('Settings · '+('First agent' if current_name()=='main' else 'Second agent'));scaled(self).setMinimumWidth(400)
         outer=QVBoxLayout(self);scroll=QScrollArea();scroll.setWidgetResizable(True);scroll.setFrameShape(QScrollArea.Shape.NoFrame)
         content=QWidget();layout=QVBoxLayout(content);scroll.setWidget(content);content.setAutoFillBackground(False);outer.addWidget(scroll)
-        self.resize(460,min(820,self.screen().availableGeometry().height()-80))
+        self.resize(px(self,460),min(820,self.screen().availableGeometry().height()-80))
         from .settings_icons import settings_icon,settings_label
         from .voice_settings import VoiceSettingsDialog
         voice=QPushButton('Resonant Voice')
         voice.clicked.connect(lambda:VoiceSettingsDialog(window).exec())
         layout.addWidget(voice)
+        from .dictation_settings import DictationSettingsDialog
+        dictation=QPushButton('System dictation · Handy')
+        dictation.clicked.connect(lambda:DictationSettingsDialog(window).exec())
+        layout.addWidget(dictation)
         layout.addWidget(settings_label('Harness','harness',window.accent))
-        engine=QComboBox();engine.addItem('Pi','pi');engine.addItem('DSH','dsh')
+        engine=QComboBox();engine.addItem('Pi','pi');engine.addItem('DSH','dsh');engine.addItem('Codex (development)','codex')
         engine.setCurrentIndex(engine.findData(getattr(window.controller,'harness','pi')))
         engine.setAccessibleName('Harness')
         engine.activated.connect(lambda _:window.switch_harness(engine.currentData()))
         layout.addWidget(engine)
-        from .dsh_setup import DshSetupDialog
-        dsh=QPushButton('Connect DSH');dsh.clicked.connect(lambda:DshSetupDialog(window).exec());layout.addWidget(dsh)
+        dsh=QPushButton('Connect Codex model' if getattr(window.controller,'harness',None)=='codex' else 'Connect DSH')
+        def connect_dsh():
+            self.accept()
+            window.open_setup()
+        dsh.clicked.connect(connect_dsh);layout.addWidget(dsh)
         from .home_settings import HomeDialog
         home=QPushButton('Connect Home');home.clicked.connect(lambda:HomeDialog(window).exec());layout.addWidget(home)
         from .recovery import RecoveryDialog
@@ -183,7 +200,7 @@ class PromptLibraryDialog(QDialog):
     def __init__(self,window):
         super().__init__(window);self.owner=window;self.original=None;self.prompt_id=None;self.revision=None;self.rows=[]
         self.client=window.composer.prompt_menu.catalog.client;self.loading=False;self.saving=False
-        self.setWindowTitle('Prompt library');self.resize(560,500)
+        self.setWindowTitle('Prompt library');self.resize(px(self,560),px(self,500))
         outer=QVBoxLayout(self);self.tabs=QTabWidget();outer.addWidget(self.tabs)
         saved=QWidget();layout=QVBoxLayout(saved);self.tabs.addTab(saved,'Saved prompts')
         from .improvement_settings import ImprovementSettings
@@ -275,7 +292,7 @@ class PromptLibraryDialog(QDialog):
 
 class ModelsDialog(QDialog):
     def __init__(self,window):
-        super().__init__(window);self.owner=window;self.setWindowTitle('Models & providers');self.resize(520,420)
+        super().__init__(window);self.owner=window;self.setWindowTitle('Models & providers');self.resize(px(self,520),px(self,420))
         layout=QVBoxLayout(self)
         note=QLabel('Model providers use Pi’s models.json format. API keys can reference environment variables. Save a configuration, then select its model in the conversation.');note.setWordWrap(True);layout.addWidget(note)
         self.editor=QTextEdit();self.editor.setAcceptRichText(False);layout.addWidget(self.editor)

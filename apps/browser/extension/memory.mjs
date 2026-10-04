@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
 import {presentSettingsForm} from './settings-form.mjs'
+import {registerMaintenanceState} from './maintenance-page.mjs'
 export function memoryDialog(doc,send,provenance,container){
   const dialog=doc.createElement('dialog');dialog.className='shared-prompt-editor memory-dialog'
   const make=(tag,text)=>{const e=doc.createElement(tag);if(text)e.textContent=text;return e}
@@ -24,11 +25,15 @@ export function memoryDialog(doc,send,provenance,container){
   const note=make('p','Loading memory settings…'),actions=make('div')
   dialog.append(make('h3','Memory'),intro,automatic,connection,data,note,actions);doc.body.append(dialog)
   let config={},token=null,busy=false,closed=false,rows=[],offset=0,total=0
+  const values=()=>JSON.stringify([...Object.values(fields).map(e=>e.value),scope.value])
+  let baseline=values()
+  registerMaintenanceState(dialog,()=>busy||!!token||!!text.value||values()!==baseline)
   const button=(parent,label,fn)=>{const b=make('button',label);b.type='button';b.onclick=fn;parent.append(b);return b}
   const request=async(action,params={})=>{const r=await send('memory',{request:{action,...params}});if(!r.ok)throw Error(r.error);return r.result}
   let autoEnabled=true
   const loadAutomatic=async()=>{
     const value=await request('dual.describe');autoEnabled=!!value.enabled;autoToggle.textContent=autoEnabled?'Pause automatic memory':'Resume automatic memory';autoNote.textContent=(autoEnabled?'Automatic memory is on. ':'Automatic memory is paused. ')+`${value.events} transcript records; ${value.pending} memory scopes pending. ${value.message||''}`
+    if(value.scoped){autoToggle.hidden=true;connection.hidden=true;data.hidden=true;autoNote.textContent='Automatic continuity is scoped to '+value.workspace+'. Personal memory and other workspaces are excluded.'}
     const source=provenance();if(source.sessionId){try{const context=await request('dual.recall',{session:source.harness+':'+source.sessionId});autoContext.textContent=['relationship','work'].map(kind=>kind+': '+(context[kind]?.summary||'No distilled picture yet.')).join('\n\n')}catch{autoContext.textContent='Remembered context appears after this conversation uses automatic memory.'}}
   }
   const autoToggle=button(automatic,'Pause automatic memory',async()=>{autoToggle.disabled=true;try{await request('dual.configure',{enabled:!autoEnabled});await loadAutomatic()}catch(e){autoNote.textContent=e.message}finally{autoToggle.disabled=false}})
@@ -39,10 +44,12 @@ export function memoryDialog(doc,send,provenance,container){
   const invalidate=()=>{token=null;controls()};for(const e of [...Object.values(fields),scope])e.addEventListener('input',invalidate)
   const loadConfig=async()=>{
     config=await request('describe');token=null
+    if(config.scoped){connection.hidden=true;data.hidden=true;note.textContent='This workspace uses its own memory identity.';return}
     for(const id of ['endpoint','projectBank'])fields[id].value=config[id]??''
     fields.userBank.value=config.userBank??'augmentor-user-'+crypto.randomUUID().slice(0,12)
     fields.apiKey.value='';fields.apiKey.placeholder=config.apiKeySet?'Stored key kept if left blank':'Required for a remote service'
     scope.value=config.activeScope??'user';dataScope.value=scope.value
+    baseline=values()
     note.textContent=config.enabled?'Hindsight memory enabled.':'Hindsight memory disabled.'
   }
   const operations=async()=>{

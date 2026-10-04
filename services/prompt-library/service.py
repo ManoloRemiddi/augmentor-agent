@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Harness-independent, per-user prompt service. Single daemon, transactional SQLite."""
-import fcntl
 import hashlib
 from contextlib import contextmanager
 import json
@@ -21,6 +20,11 @@ from support.report import report as support_report
 from dsh.setup import Setup as DshSetup
 from platform_support import require_same_user
 from home.client import call as home_connection_call
+from platform_adapters import locks as fcntl
+from platform_adapters.paths import private_directory
+from platform_adapters.transport import ThreadingLocalServer, prepare_endpoint
+from lifecycle.admission import Admission, MaintenanceBusy, METHODS as MAINTENANCE_METHODS
+from lifecycle.idle import IdleServerMixin
 
 PROTOCOL='augmentor-prompts/1'
 LIMIT=1024*1024
@@ -146,7 +150,7 @@ class Library:
 
 class Handler(socketserver.StreamRequestHandler):
     def handle(self):
-        self.connection.settimeout(20);identity=None
+        self.connection.settimeout(20);identity=None;shutdown=False
         try:
             require_same_user(self.connection)
             raw=self.rfile.readline(LIMIT+1)
@@ -156,31 +160,45 @@ class Handler(socketserver.StreamRequestHandler):
             if not isinstance(identity,str) or not re.fullmatch(r'[a-zA-Z0-9_.-]{1,128}',identity):raise ValueError('Invalid request ID')
             params=request.get('params',{})
             if not isinstance(params,dict):raise ValueError('Invalid parameters')
-            result=self.server.library.call(request.get('method'),params,identity)
+            method=request.get('method')
+            if isinstance(method,str) and method in MAINTENANCE_METHODS:
+                result=self.server.admission.control(method,params)
+                shutdown=result['phase']=='closing'
+            else:
+                with self.server.admission.work():
+                    result=self.server.library.call(method,params,identity)
             response={'id':identity,'result':result}
         except Exception as error:
-            response={'id':identity,'error':{'code':'conflict' if isinstance(error,Conflict) else 'invalid','message':str(error)}}
+            response={'id':identity,'error':{'code':'maintenance' if isinstance(error,MaintenanceBusy) else 'conflict' if isinstance(error,Conflict) else 'invalid','message':str(error)}}
         raw=(json.dumps(response,ensure_ascii=False)+'\n').encode()
         if len(raw)>LIMIT:raw=(json.dumps({'id':identity,'error':{'code':'too-large','message':'This record exceeds the supported response size. View it directly in the configured service.'}})+'\n').encode()
-        try:self.wfile.write(raw)
+        try:self.wfile.write(raw);self.wfile.flush()
         except (BrokenPipeError,ConnectionResetError):pass
+        finally:
+            if shutdown:threading.Thread(target=self.server.shutdown,daemon=True).start()
 
-class Server(socketserver.ThreadingUnixStreamServer):
+class Server(IdleServerMixin, ThreadingLocalServer):
     daemon_threads=False  # Graceful shutdown finishes accepted requests.
+
+    def __init__(self,*args,**kwargs):
+        self.admission=Admission()
+        super().__init__(*args,**kwargs)
 
 if __name__=='__main__':
     sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'lifecycle'))
     from lease import hold
     hold('runtime')
     os.umask(0o077);state,data=paths()
-    for directory in (state,data):directory.mkdir(parents=True,exist_ok=True,mode=0o700)
+    for directory in (state,data):private_directory(directory)
     lock=(state/'prompts.lock').open('a')
     try:fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
     except BlockingIOError:raise SystemExit(0)
     endpoint=state/'prompts.sock'
-    if endpoint.exists():endpoint.unlink()
-    server=Server(str(endpoint),Handler);server.library=Library(data/'prompts.sqlite3')
+    prepare_endpoint(endpoint)
+    library=Library(data/'prompts.sqlite3')
+    server=Server(str(endpoint),Handler);server.library=library
     def stop(*_):threading.Thread(target=server.shutdown,daemon=True).start()
+    server.watch_idle(lock,endpoint,stop,server.admission.retire_idle)
     signal.signal(signal.SIGTERM,stop);signal.signal(signal.SIGINT,stop)
     try:server.serve_forever(poll_interval=.2)
-    finally:server.server_close();endpoint.unlink(missing_ok=True)
+    finally:server.idle_stopped.set();server.server_close();server.lifetime.cleanup(endpoint)

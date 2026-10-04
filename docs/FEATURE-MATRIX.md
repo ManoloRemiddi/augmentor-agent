@@ -1,14 +1,79 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
+
+Windows public preview scope: [installation and explicit parity limits](WINDOWS-PREVIEW.md). Physical acceptance is pending; shared source does not imply complete Windows feature qualification.
+
+The [SDK source candidate](SDK-ALIGNMENT.md) scopes Conversation/Thinking and
+appearance preferences per application, including apps sharing a website origin;
+it does not deploy the developing standalone settings redesign.
+
+Current OS parity direction and verified gaps: [one-product architecture audit](PLATFORM-PARITY-AUDIT.md).
+
+The [embedded Handy candidate](HANDY-INTEGRATION.md) adds harness-independent
+global dictation, shared Desktop/Browser controls, model/shortcut selection and
+the owner-approved themed recording pill with Augmentor's animated circle.
+Linux virtual-microphone/separate-app acceptance is recorded separately from
+Mac/Windows component CI and complete installer/compositor qualification.
+The tables below compare harnesses and presentation surfaces; they do not establish
+Linux/macOS parity. The [Mac recovery record](MACOS-RECOVERY-2026-09-26.md) now
+qualifies both Mac shortcuts and the shared Metal/OpenGL renderer, with explicit
+installed and public-release boundaries.
+
+Shared desktop Appearance now includes [75–150% proportional app sizing](SKINS.md#app-size),
+applied immediately while dragging, with saved per-window preferences. The [Mac transparency correction](MACOS-APPEARANCE-2026-09-27.md)
+disables native shadows on the animated effect layer; Linux uses the same flag.
+
+Mac setup correction (26 September, current source): install/start DSH before
+model setup, Agent setup/Open DSH actions in the three-dot menu, authenticated browser
+handoff, native DSH provider settings. See [qualification and deployment](MACOS-GUIDED-DSH-SETUP.md).
+
+Mac frameless-window resizing now falls back to pointer geometry when Cocoa
+declines native resize; see [behavior and evidence](WINDOW-RESIZING.md).
+
+Earlier Mac setup update (26 September): source added a separate
+[managed runtime/model form](MACOS-MANAGED-SETUP.md) for fresh bundled desktops.
+External DSH setup below remains available. Basic setup, chat and restart passed
+an isolated real Mac/DSH fixture; the public signed app, additional plugins and
+complete feature parity are not yet qualified.
 # Feature ownership and compatibility · Augmentor 0.2.9 development
+
+See [embedded Browser and specialist workspaces](WORKSPACE-EMBEDDING.md) for the product-owned iframe host, dedicated role/tool composition, scoped memory and release lifecycle.
+
+[SDK alignment source](SDK-ALIGNMENT.md) adds negotiated capabilities and an
+experimental scoped Codex app adapter alongside platform bootstrap/private-file
+adapters. Codex selection is bound per operation; DSH preserves latest-session
+selection. Shared installation settings stay outside app authority. This source
+candidate does not extend the published SDK or qualify every installed platform.
 
 DSH personal surfaces now share the agent, tools and speech engine; see [shared surfaces and evidence](SHARED-SURFACES-2026-09-24.md).
 
 Current source/ref and qualification: [agent handoff](AGENT-HANDOFF.md).
 Dated candidate sections below retain their original version-specific evidence.
 
+Codex is an opt-in development engine with a [separately installed pinned CLI](CODEX-PACKAGING.md#separately-installed-runtime--october-1);
+the Linux/Mac installers exclude its supplier binaries. [Native credential packaging and isolated
+Linux storage](CODEX-CREDENTIALS.md) and actual Mac 14/26 Keychain storage now
+have positive isolated proof, including packaged Desktop/Browser companion
+interpreters. [OAuth/account lifecycle primitives](CODEX-ACCOUNTS.md) now have
+synthetic transaction and real Linux account-store evidence. Installed owner-wallet
+recovery, login UI/worker wiring and real subscription acceptance remain open.
+The existing local Qwen endpoint remains
+[unqualified pending a reviewed formatting change and live tool tests](CODEX-LOCAL-QWEN.md). Its [current evidence](CODEX-INTEGRATION.md)
+covers API/local profile forms, shared chat/Stop/history, approvals/questions,
+scoped Browser tools/screenshots and consented desktop tools with real Chromium
+and Plasma VM proofs against a synthetic provider. API/local prompt improvement,
+paired Home tools and [Desktop/Browser queue/steering](QUEUE-AND-STEERING.md#codex-development-integration)
+and [exact Branch/Edit controls](CODEX-INTEGRATION.md#desktop-and-browser-exact-branchedit-controls)
+also have source qualification. [Codex memory source activation and existing controls](CODEX-INTEGRATION.md#codex-memory-launcher-and-existing-interface-controls)
+now have actual isolated Qt/Chromium and controlled-engine cancellation evidence.
+Shared voice transport is also qualified with synthetic boundaries. The tables
+below retain the DSH/Pi comparison; they do not certify Codex parity. Subscription
+login, generic MCP, full memory/voice acceptance, unconfirmed creation reconciliation
+and complete release qualification remain open.
+
 Release scope: DSH is the full-featured target; Pi is a supported subset.
-Additional Pi extensions and Windows are deferred. The Linux evidence below does
-not establish macOS feature qualification. See the cross-platform release ledger.
+Additional Pi extensions remain deferred. Windows implementation is active on
+`feat/windows`; its evidence and open gates are recorded below. The Linux evidence
+does not establish macOS or Windows feature qualification.
 
 This maintained checkout is the development source for both surfaces. The legacy repository paths and launcher IDs remain compatibility locations. Do not develop another UI fork there.
 
@@ -35,7 +100,7 @@ Additional current native/browser capabilities:
 | Capability | Desktop | Browser |
 | --- | --- | --- |
 | Resonant Voice on DSH | Hold/release, slide-lock, voice selection; optional hands-free preview | Same shared engine: hold/release, lock, hands-free and primary voice settings |
-| Independent second conversation | Named second window, separate chat/settings/voice profile; KDE shortcut | Separate sidebar/session workflow |
+| Independent second conversation | Named second window, separate chat/settings/voice profile; KDE and Mac shortcuts | Separate sidebar/session workflow |
 | Skins and activity animation | Futuristic plasma; Blossom lake/butterflies; validated import/export | Native skins are not applied to Chromium |
 | Startup and recovery | Shared selected release, supervised login, guarded recovery | Matching companion and explicit extension load/reload |
 | Complete fresh-user installation | Guided Debian 13 amd64 bundle with pinned DSH/plugins | Matching extension and native host in the same bundle |
@@ -46,6 +111,30 @@ for the distinction between installed artifacts and source. Voice, acoustic
 quality and memory quality remain separate from installer success.
 
 DSH uses `services/dsh/branch.py` from both surfaces. Branch selects a final reply in a closed turn; Edit retains preceding turns, and editing the first input starts a clean child. Mid-turn replies and steered inputs that cannot be isolated are refused. Durable operation records prevent unknown fork outcomes from being replayed. Original chats and model selection are preserved.
+
+## Windows development target — September 28
+
+Windows uses the shared desktop, browser and dependency graph. This is an
+unmerged development candidate; there is no Windows customer release. Read the
+[implementation ledger](WINDOWS-IMPLEMENTATION-STATUS.md) for exact revisions and
+the [full plan](WINDOWS-IMPLEMENTATION-PLAN.md) for required completion gates.
+
+| Area | Native x64/ARM64 evidence | Remaining qualification/work |
+| --- | --- | --- |
+| Private runtime and native desktop | Compiled launchers, Qt windows, proportional sizing, process identity and private IPC pass | Ordinary-user/physical display, keyboard and current Home/Pro builds |
+| Managed DSH and chat | Actual bundled DSH with deterministic model; Send/Enter, saved history and restart pass | Real-provider and complete feature acceptance |
+| Browser companion | Compiled native-host ownership, reservation, idle commit and restart pass; installed anchor/removal pass both CPUs at `8a3ff05` | Selected real Chromium, store delivery and N/N+1 compatibility |
+| Voice bridge | Shared 0.1.19, private preference saves, owned service, busy-ticket refusal and natural drain pass | Windows ASR/TTS provisioning and physical audio |
+| Prompt/memory services | Shared private clients, ownership/drain and journal-before-listener startup pass | Windows memory engine provisioning and full memory quality/features |
+| Coordinated shutdown | Actual window/DSH/voice/companions/owner graph drain and restart pass at `f950a45` | Product apply/recovery integration and user-facing update flow |
+| Installer | Full install/repair/apply/removal and independent UI health pass both CPUs; full clean placement passes at `e98a142`; exact-source application passes native templates at `04f3317` | Independent recovery observer/full restoration qualification, signing and N-to-N+1 remain |
+| Update delivery | Signed delivery, retained recovery verification and selected-source integration pass both CPUs; held-DSH-turn cancellation passes; full inventory/health/clean placement pass at `e98a142`; thirteen restoration journal cases pass fast Windows at `5277087` | Extracted product observer and health-time record pinning are implemented; native execution, crash-resume, cross-version upgrades, disk/retention policy, trust provisioning and customer update/recovery UI remain open |
+| Desktop actions, Home and Pi | Shared interfaces retained | Required Windows adapters and full end-to-end parity remain open |
+| RTX Spark N1X | Native ARM64 dependency preparation | Target hardware/driver/graphics/inference evidence |
+
+[Full native run 36389905723](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36389905723)
+passes both architectures. These hosted checks do not establish physical input,
+audio, live-model quality or a customer-installed build.
 
 ## Home development preview
 
@@ -173,3 +262,17 @@ See [contract and qualification](BOUNDED-EXECUTION-RECOVERY.md).
 ## 0.2.10 recovery scope
 
 Both DSH Augmentor presets include [action-aware recovery](BOUNDED-EXECUTION-RECOVERY.md#action-aware-recovery--0210-preview). Exact duplicate changes and uncertain/background outcomes are guarded during automatic recovery; normal explicit tasks retain their behavior. Pi and delegated agents are outside this adapter. This is execution protection, not semantic task verification.
+
+
+Codex development source also supports the shared Improve prompt controls for
+API/local profiles on both surfaces, using an isolated tool-free request and no
+chat history. Subscription usage remains unavailable. See
+[draft improvement evidence](CODEX-INTEGRATION.md#apilocal-draft-improvement) for
+fixture coverage, cancellation semantics and remaining live/UI qualification.
+
+
+New Codex development chats also expose paired Home tools through the existing
+NAS client. Shared pairing works on both surfaces; request receipt access is
+conversation-scoped, and cancellation requires the newer NAS request-specific
+endpoint. The NAS stays DSH-owned. Existing chats/deployments do not gain these
+capabilities implicitly. [Evidence and limits](CODEX-INTEGRATION.md#paired-home-tools).

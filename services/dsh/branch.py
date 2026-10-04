@@ -4,7 +4,7 @@
 Only closed turn boundaries are supported by DSH's public fork API. The journal
 is written before mutation: an acknowledgement lost in transit is never retried.
 """
-import fcntl
+from platform_adapters import locks as fcntl
 import hashlib
 import ipaddress
 import json
@@ -114,6 +114,13 @@ def branch(call, params, *, surface, endpoint, state=None, exact_fork=None):
         else:
             row = next((r for r in call('session.list', {})['items'] if r['sessionId'] == source), None)
             allowed = ('augmentor-linux-product','augmentor-browser-product', 'augmentor-linux' if surface == 'linux' else 'augmentor')
+            profile_id = os.environ.get('AUGMENTOR_WORKSPACE_PROFILE')
+            if profile_id:
+                profile_directory = Path(os.environ.get('AUGMENTOR_WORKSPACE_PROFILES', Path(os.environ.get('XDG_CONFIG_HOME', Path.home()/'.config'))/'augmentor/workspaces'))
+                profile = json.loads((profile_directory/(profile_id+'.json')).read_text())
+                allowed = (profile['preset'],)
+                if row is None or Path(row.get('cwd','')).resolve() != Path(profile['cwd']).resolve():
+                    raise BranchError('This chat belongs to another workspace.')
             if row is None or row.get('agentPreset') not in allowed:
                 raise BranchError('This chat belongs to another Augmentor role.')
             preset=row['agentPreset']

@@ -2,6 +2,30 @@
 
 # Cross-platform implementation status
 
+## October 3 matched Handy previews
+
+[The published download ledger](HANDY-DOWNLOADS-2026-10-03.md) records Linux,
+Apple-silicon Mac and native Windows x64/ARM64 preview 2 from one qualified
+source, with all eight final-source workflows passing. All packages include
+Handy without a separate tray. Exact bytes, source/merge identities, native
+lifecycle evidence and anonymous public-download checks are recorded there.
+Physical microphone/input acceptance on Mac and Windows, signing/notarization
+and coordinated automatic updates remain separate pending gates.
+
+## Historical cross-platform checkpoints
+
+Earlier dates and platform/deferred statements below describe their own stage.
+They do not supersede the current published preview scope above.
+
+
+The [September 26 product parity audit](PLATFORM-PARITY-AUDIT.md) records the
+current architecture direction, installed-artifact differences and pending
+shared-feature work. Historical qualification entries below do not supersede it.
+
+For current Mac installation evidence, use the
+[September 26 clean installation checkpoint](MACOS-DISTRIBUTION.md#september-26-clean-installation-and-default-shortcut).
+The earlier candidates below retain their original qualification boundaries.
+
 Updated 2026-09-20. **The complete Debian preview is separately qualified; current macOS parity remains unfinished.**
 See [the September 20 distribution audit](DISTRIBUTION-AUDIT-2026-09-20.md) for the current Linux release and next macOS gates. The evidence below records the earlier cross-platform candidates.
 The approved scope remains [the release plan](CROSS-PLATFORM-RELEASE-PLAN.md):

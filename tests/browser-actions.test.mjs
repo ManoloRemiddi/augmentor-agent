@@ -15,17 +15,19 @@ globalThis.chrome={runtime:{id:'test'},storage:{local:{get:async()=>({})},onChan
 const {handleBrowserAction}=await import('../apps/browser/extension/actions.mjs')
 const {state}=await import('../apps/browser/extension/state.mjs')
 state.turnActive=true;state.endpoint='http://127.0.0.1:3080'
-test('explicit observation target replaces stale work tab without navigation',async()=>{
+test('explicit observation reads another tab without changing subsequent work',async()=>{
  state.workTabId=1
  const result=await handleBrowserAction('read',{action:'snapshot',tabId:7})
- assert.equal(result.url,'https://nas.test/');assert.equal(state.workTabId,7);assert.ok(injected.includes(7))
+ assert.equal(result.url,'https://nas.test/');assert.equal(state.workTabId,1);assert.ok(injected.includes(7))
+ const next=await handleBrowserAction('read',{action:'snapshot'})
+ assert.equal(next.url,'https://old.test/');assert.equal(state.workTabId,1)
  const listing=await handleBrowserAction('list',{action:'tabs_list'})
- assert.equal(listing.tabs.find(x=>x.id===7).workTab,true)
+ assert.equal(listing.tabs.find(x=>x.id===1).workTab,true)
 })
 test('explicit targeting refuses DSH session and invalid IDs',async()=>{
  assert.equal((await handleBrowserAction('read',{action:'snapshot',tabId:9})).ok,false)
  assert.equal((await handleBrowserAction('read',{action:'snapshot',tabId:'7'})).ok,false)
- assert.equal(state.workTabId,7)
+ assert.equal(state.workTabId,1)
 })
 test('page-root clicks do not dispatch and missing acknowledgements never succeed',async()=>{
  const result=await handleBrowserAction('click',{action:'click',selector:'body'})
@@ -36,4 +38,14 @@ test('page-root clicks do not dispatch and missing acknowledgements never succee
  const snapshot=await handleBrowserAction('read',{action:'snapshot'})
  assert.equal(snapshot.ok,false);assert.match(snapshot.error,/No document observation/)
  missing=false
+})
+test('Codex action targets refuse changed tabs and changed documents before a click',async()=>{
+ state.workTabId=7
+ globalThis.location={href:'https://nas.test/'}
+ const before=clicked
+ let result=await handleBrowserAction('guard',{action:'click',selector:'#button',target:{tabId:1,url:'https://old.test/',documentEpoch:performance.timeOrigin}})
+ assert.equal(result.ok,false);assert.match(result.error,/work tab changed/)
+ result=await handleBrowserAction('guard',{action:'click',selector:'#button',target:{tabId:7,url:'https://nas.test/',documentEpoch:performance.timeOrigin-1}})
+ assert.equal(result.ok,false);assert.match(result.error,/document changed/)
+ assert.equal(clicked,before)
 })

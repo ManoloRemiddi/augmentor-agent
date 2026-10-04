@@ -211,7 +211,7 @@ test('provider no-content error remains explicit and is not mislabeled as succes
 });
 test('tracker ignores replacement notifications (isolated hook fixture)',async()=>{
   const hooks={},steered=[];
-  install({on:(event,handler)=>{hooks[event]=handler;}},policy(),{persist:()=>{}});
+  install({on:(event,handler)=>{hooks[event]=handler;},effect:setup=>{hooks.dispose=setup();}},policy(),{persist:()=>{}});
   const session={id:'replaced',header:{agentPreset:'augmentor-linux-product'},snapshotEvents:()=>[],append:()=>{}};
   const agent={id:session.id,session,steer:x=>steered.push(x)};
   const signal=new AbortController().signal;
@@ -313,4 +313,15 @@ test('real DSH delegates a paired Home request and receives its durable result',
   await h.say('Read the fixture lamp through Home.');
   assert.deepEqual(h.errors,[]);assert.equal(dispatches,1);
   assert.match(JSON.stringify(h.requests.at(-1).messages),/Fixture lamp is off/);
+});
+
+
+test('empty-response recovery reassesses and requests a partial handoff on its last attempt',async t=>{
+  const h=await harness(t,n=>n<3?empty:done);
+  await h.say('Inspect the display controls; do not switch off the screens.');
+  assert.deepEqual(h.errors,[]);assert.equal(h.requests.length,3);
+  assert.match(JSON.stringify(h.requests[1].messages),/Reassess the last attempted command/);
+  assert.match(JSON.stringify(h.requests[2].messages),/final automatic recovery attempt/);
+  assert.match(JSON.stringify(h.requests[2].messages),/do not switch off the screens/);
+  assert.equal(h.records.at(-1).outcome,'response-produced');
 });

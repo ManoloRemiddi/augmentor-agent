@@ -72,6 +72,12 @@ def native_notices(app, configuration):
         if magic not in (b'\x7fELF', b'\x00asm', b'\xcf\xfa\xed\xfe', b'\xfe\xed\xfa\xcf') and not magic.startswith(b'MZ'):
             continue
         relative = path.relative_to(app).as_posix()
+        if relative.startswith('components/handy/runtime/'):
+            record=json.loads((app/'components/handy/runtime/BUILD.json').read_text())
+            item=relative.removeprefix('components/handy/runtime/')
+            if hashlib.sha256(path.read_bytes()).hexdigest()!=record['files'].get(item):raise ValueError('Unverified dictation binary: '+relative)
+            components.append({'component':'Handy','version':record['upstream']['version'],'path':relative,'sha256':record['files'][item],'notices':['handy/components.json','handy/Handy-MIT.txt','handy/ydotool/LICENSE','handy/ydotool/source.tar.gz']})
+            continue
         if relative not in expected:
             raise ValueError('Unreviewed native executable in distribution: ' + relative)
         component = expected[relative]
@@ -95,7 +101,7 @@ def native_notices(app, configuration):
             notices = ['node.txt']
         components.append({'component': component, 'version': version, 'path': relative,
                            'sha256': hashlib.sha256(content).hexdigest(), 'notices': notices})
-    if {item['path'] for item in components} != set(expected):
+    if {item['path'] for item in components if item['component']!='Handy'} != set(expected):
         raise ValueError('Expected packaged native executables are missing')
     write(app / 'licenses/native-components.json', json.dumps(components, indent=2) + '\n')
 
@@ -140,6 +146,7 @@ def build(output):
             copy(ROOT / name, app / name)
         for name in ('desktop-capabilities.json', 'desktop-capabilities.LICENSE'):
             copy(ROOT / 'release/dsh' / name, app / 'release/dsh' / name)
+        subprocess.run([sys.executable,str(ROOT/'scripts/stage-handy.py'),str(app)],check=True)
         node_runtime(app, configuration, cache)
         native_notices(app, configuration)
         write(app / 'release.json', json.dumps({**product,'source':source,'target': configuration['target'],
@@ -149,6 +156,8 @@ def build(output):
         write(runtime / 'usr/bin/augmentor-browser-host', launcher + lease + '/usr/lib/augmentor/apps/browser/native-host.mjs "$@"\n', True)
         write(runtime / 'usr/bin/augmentor-runtime', launcher + lease + '/usr/lib/augmentor/dist/runtime/src/main.js "$@"\n', True)
         write(runtime / 'usr/bin/augmentor-maintenance', '#!/bin/sh\n'+HEADER+'exec /usr/bin/python3 /usr/lib/augmentor/scripts/maintenance.py "$@"\n',True)
+        write(runtime/'usr/lib/udev/rules.d/70-augmentor-dictation.rules',HEADER+'KERNEL=="uinput", SUBSYSTEM=="misc", TAG+="uaccess", OPTIONS+="static_node=uinput"\n')
+        write(runtime/'usr/lib/modules-load.d/augmentor-dictation.conf',HEADER+'uinput\n')
         write(runtime/'usr/lib/tmpfiles.d/augmentor.conf',HEADER+'d /run/augmentor 0755 root root -\nf /run/augmentor/augmentor-runtime.lock 0644 root root -\nf /run/augmentor/augmentor-desktop.lock 0644 root root -\n')
         key = json.loads((app / 'apps/browser/extension/manifest.json').read_text())['key']
         identity = ''.join(chr(ord('a') + int(n, 16)) for n in hashlib.sha256(base64.b64decode(key)).hexdigest()[:32])
@@ -156,10 +165,10 @@ def build(output):
                     'type': 'stdio', 'allowed_origins': ['chrome-extension://' + identity + '/']}
         for directory in ('etc/chromium/native-messaging-hosts', 'etc/opt/chrome/native-messaging-hosts'):
             write(runtime / directory / 'com.augmentor.agent.json', json.dumps(manifest, indent=2) + '\n')
-        control(runtime, 'augmentor-runtime', version, 'python3 (>= 3.11), python3-yaml, python3-websocket, libc6 (>= 2.36), libstdc++6', 'Augmentor runtime and Chromium companion')
+        control(runtime, 'augmentor-runtime', version, 'python3 (>= 3.11), python3-gi, udev, kmod, python3-yaml, python3-websocket, python3-keyring (>= 25.6), python3-secretstorage, gnome-keyring, libc6 (>= 2.36), libstdc++6, libgtk-3-0t64, libwebkit2gtk-4.1-0, libayatana-appindicator3-1, libgtk-layer-shell0, libopenblas0, libvulkan1, libasound2t64, libasound2-plugins, libxdo3, wl-clipboard, xdotool, xwayland', 'Augmentor runtime and Chromium companion')
         write(desktop / 'usr/bin/augmentor-agent', launcher + 'exec /usr/lib/augmentor/scripts/augmentor-linux "$@"\n', True)
         write(desktop / 'usr/share/augmentor/desktop-version',version+'\n')
-        control(desktop, 'augmentor-desktop', version, f'augmentor-runtime (= {version}), python3-pyside6.qtcore (>= 6.8.2.1), python3-pyside6.qtgui, python3-pyside6.qtwidgets, python3-pyside6.qtnetwork, python3-pyside6.qtdbus, libqt6svg6, qt6-svg-plugins, python3-gi, gir1.2-atspi-2.0, at-spi2-core, gir1.2-gstreamer-1.0, gstreamer1.0-pipewire, gstreamer1.0-plugins-base, python3-yaml, python3-websocket, python3-pygments (>= 2.18), python3-numpy (>= 1.24), fonts-dejavu-core, libglib2.0-bin', 'Augmentor Agent Desktop application')
+        control(desktop, 'augmentor-desktop', version, f'augmentor-runtime (= {version}), python3-pyside6.qtcore (>= 6.8.2.1), python3-pyside6.qtgui, python3-pyside6.qtwidgets, python3-pyside6.qtnetwork, python3-pyside6.qtdbus, python3-pyside6.qtquick, python3-pyside6.qtquickwidgets, qml6-module-qtquick, qml6-module-qtqml, qml6-module-qtqml-models, qml6-module-qtqml-workerscript, libqt6svg6, qt6-svg-plugins, python3-gi, gir1.2-atspi-2.0, at-spi2-core, gir1.2-gstreamer-1.0, gstreamer1.0-pipewire, gstreamer1.0-plugins-base, python3-yaml, python3-websocket, python3-pygments (>= 2.18), python3-numpy (>= 1.24), fonts-dejavu-core, libglib2.0-bin', 'Augmentor Agent Desktop application')
         write(desktop / 'usr/share/applications/com.augmentor.Agent.desktop', HEADER + '''[Desktop Entry]
 Type=Application
 Name=Augmentor Agent

@@ -1,6 +1,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Guided connection to an existing local DSH installation."""
 import threading
+from .ui_scale import scaled
 from PySide6.QtCore import Signal, QTimer
 from PySide6.QtWidgets import QDialog,QVBoxLayout,QFormLayout,QHBoxLayout,QLabel,QLineEdit,QPushButton
 from .prompt_client import PromptClient
@@ -13,7 +14,7 @@ class DshSetupDialog(QDialog):
         super().__init__(owner);self.owner=owner;self.client=PromptClient()
         self.token=None;self.installed=False;self.busy=False;self.dismissed=False;self.changing=False
         self.completed.connect(lambda callback,value:callback(value) if not self.dismissed else None)
-        self.setWindowTitle('Connect DSH');self.setModal(True);self.setMinimumWidth(460)
+        self.setWindowTitle('Connect DSH');self.setModal(True);scaled(self).setMinimumWidth(460)
         layout=QVBoxLayout(self)
         intro=QLabel('Connect a running local DSH 0.1.5-rc.1 web profile. Augmentor adds its Linux and browser roles, shared prompts and memory. Model providers remain managed in DSH. This connection is shared by both Augmentor interfaces.');intro.setWordWrap(True);layout.addWidget(intro)
         form=QFormLayout();layout.addLayout(form)

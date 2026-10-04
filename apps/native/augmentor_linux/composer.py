@@ -2,6 +2,7 @@
 """A wrapped, scrollable draft that grows from one to five visual lines."""
 import math
 import uuid
+from .ui_scale import scaled, px
 from PySide6.QtCore import Qt, QTimer, QEvent, Signal, QPoint
 from PySide6.QtWidgets import QTextEdit, QPushButton, QToolTip
 from PySide6.QtGui import QTextCursor, QColor
@@ -26,10 +27,10 @@ class Composer(QTextEdit):
         self.preedit_active=False
         self.improving=False;self.improvement_available=False;self.improvement_id=None;self.improvement_original='';self.roll=None;self.improvement_undo=None
         self.roll_colours=(QColor('#1e3033'),QColor('#edf3f3'),QColor('#a6d6c8'))
-        self.setViewportMargins(0,0,47,0)
-        self.improve_button=QPushButton('✦',self);self.improve_button.setFixedSize(24,24)
+        scaled(self).setViewportMargins(0,0,47,0)
+        self.improve_button=QPushButton('✦',self);scaled(self.improve_button).setFixedSize(24,24)
         self.improve_button.setAccessibleName('Improve prompt');self.improve_button.setToolTip('Improve prompt')
-        self.improve_button.setStyleSheet('QPushButton {padding:0;border:0;background:transparent;border-radius:5px;font-size:16px;} QPushButton:hover {background:rgba(127,150,150,45);}')
+        scaled(self.improve_button).setStyleSheet('QPushButton {padding:0;border:0;background:transparent;border-radius:5px;font-size:16px;} QPushButton:hover {background:rgba(127,150,150,45);}')
         self.improve_button.clicked.connect(self.improve_clicked)
         self.textChanged.connect(self.draft_changed)
         self.improvement_result.connect(self.receive_improvement)
@@ -100,13 +101,13 @@ class Composer(QTextEdit):
             content=self.document().size().height()
             minimum=line+2*self.document().documentMargin()
             maximum=5*line+2*self.document().documentMargin()
-            self.setFixedHeight(max(58 if getattr(self,'touch_mode',False) else 0,math.ceil(max(minimum,min(maximum,content))+chrome)))
+            self.setFixedHeight(max(px(self,58) if getattr(self,'touch_mode',False) else 0,math.ceil(max(minimum,min(maximum,content))+chrome)))
         finally:self.fitting=False
 
     def resizeEvent(self,event):
         super().resizeEvent(event)
         if hasattr(self,"improve_button"):
-            self.improve_button.move(self.width()-self.improve_button.width()-22,5);self.improve_button.raise_()
+            self.improve_button.move(self.width()-self.improve_button.width()-px(self,22),px(self,5));self.improve_button.raise_()
         if getattr(self,"roll",None):self.roll.resize(self.viewport().size())
         QTimer.singleShot(0,self.fit)
 

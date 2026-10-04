@@ -2,7 +2,17 @@
 
 # Current architecture
 
-Current development source: Augmentor 0.2.9 preview. Start with the
+See [embedded Browser and specialist workspaces](WORKSPACE-EMBEDDING.md) for product-owned embedding, scoped tools and memory.
+
+The [SDK alignment candidate](SDK-ALIGNMENT.md) defines capability negotiation,
+experimental Codex application workers and product-owned platform launch adapters.
+Application selection is untrusted evidence; Codex persists it with its operation
+identity, while DSH retains the existing session-selection contract. Application
+records, authorization and receipts remain owned by the application's backend.
+Embedded appearance/thinking preferences use the authenticated profile store
+and profile-specific browser caches; shared desktop settings remain standalone.
+
+Product version is defined by [the shared manifest](../release/product.json). Start with the
 [agent handoff](AGENT-HANDOFF.md) for the authoritative Git ref and evidence.
 The [documentation index](README.md) maps every subsystem to its detailed guide.
 The [original 0.1 design](HISTORICAL-ARCHITECTURE-0.1.md) is historical.
@@ -11,7 +21,30 @@ Installed Linux desktop selection follows [desktop deployments](DESKTOP-DEPLOYME
 one atomic descriptor selects a separately staged release for login, launchers,
 recovery and mobile. Working source trees are not the installed release.
 
+## One product across operating systems
+
+Linux and macOS must use the same product features, desktop UI and behavioral
+contracts. OS-specific adapters provide shortcuts, window integration, permissions,
+service ownership and packaging. A feature or fix on either OS requires an impact
+assessment and applicable implementation/tests on the other. A missing adapter
+remains a parity gap; it does not authorize a reduced feature specification.
+
+Read the [September 26 architecture audit and correction sequence](PLATFORM-PARITY-AUDIT.md)
+for the verified two-instance shortcut gap, divergent installed artifacts, test
+coverage gaps and shared-interface boundaries. This direction extends the existing
+architecture; the audit itself does not implement the pending changes or update
+installed apps. The owner's approved UI remains the design baseline.
+
 ## Product and runtime ownership
+
+The [Codex integration build plan](CODEX-INTEGRATION-PLAN.md) defines the third
+harness for both surfaces. Its [development implementation](CODEX-INTEGRATION.md)
+uses the pinned native app-server as the agent engine and the same presentation,
+memory and tool companions. API/local setup and internal
+[OAuth/account lifecycle primitives](CODEX-ACCOUNTS.md) are implemented; subscription login wiring
+and full acceptance remain open. [Shared memory source activation](CODEX-INTEGRATION.md#codex-memory-launcher-and-existing-interface-controls)
+is qualified through isolated Qt/Chromium interfaces. This development source
+has not replaced the installed DSH/Pi applications or completed release gates.
 
 Augmentor is one product with native PySide6/Qt and Chromium surfaces in this
 repository. Both DSH presentations use [one personal-agent composition and voice engine](SHARED-SURFACES-2026-09-24.md); preset IDs are historical aliases. DSH is the full-featured conversational harness; Pi is a supported

@@ -22,11 +22,19 @@ def plugin(path, name, version):
         if (value['name'],value['version'])!=(name,version):raise ValueError('Unexpected plugin artifact: '+str(path))
 
 
-def source_archive(repository, target):
-    if subprocess.check_output(['git','status','--porcelain'],cwd=repository,text=True).strip():
+def source_archive(repository, target, published_package=None):
+    if repository.is_file():
+        if published_package is None or sha(repository)!=sha(published_package):
+            raise ValueError('Plugin source must be the exact reviewed distributed package.')
+        # The published plugins contain their authored JavaScript and notices.
+        # Reuse those exact sources, without reading private service repositories.
+        shutil.copy2(repository,target)
+        return 'package-sha256:'+sha(repository)
+    git=['git','-c','safe.directory='+str(repository.resolve())]
+    if subprocess.check_output([*git,'status','--porcelain'],cwd=repository,text=True).strip():
         raise ValueError('Commit and review source before creating a public source snapshot: '+str(repository))
-    ref=subprocess.check_output(['git','rev-parse','HEAD'],cwd=repository,text=True).strip()
-    subprocess.run(['git','archive','--format=tar.gz','--prefix='+target.name.removesuffix('.tar.gz')+'/',
+    ref=subprocess.check_output([*git,'rev-parse','HEAD'],cwd=repository,text=True).strip()
+    subprocess.run([*git,'archive','--format=tar.gz','--prefix='+target.name.removesuffix('.tar.gz')+'/',
                     '--output='+str(target),'HEAD'],cwd=repository,check=True)
     return ref
 
@@ -35,12 +43,14 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     for name in ('debian','browser','voice','adaptive','model-picker','voice-source','adaptive-source','out'):
         p.add_argument('--'+name,type=Path,required=True)
+    p.add_argument('--preview-number',type=int,default=1)
     a=p.parse_args();out=a.out.resolve()
+    if a.preview_number<1:p.error('The preview number must be positive.')
     if out.exists() and any(out.iterdir()):raise ValueError('Use an empty output directory.')
     out.mkdir(parents=True)
     product=json.loads((ROOT/'release/product.json').read_text());version=product['version']
     deb=json.loads((a.debian/'artifacts.json').read_text());browser=json.loads((a.browser/'artifacts.json').read_text())
-    ref=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
+    ref=subprocess.check_output(['git','-c','safe.directory='+str(ROOT),'rev-parse','HEAD'],cwd=ROOT,text=True).strip()
     if any(m['source']['dirty'] or m['source']['commit']!=ref or m['version']!=version for m in (deb,browser)):
         raise ValueError('Desktop and browser artifacts must come from this clean source commit.')
     for item in deb['artifacts']:
@@ -51,27 +61,30 @@ def main():
     if sha(path)!=browser['sha256']:raise ValueError('Browser artifact hash differs.')
     shutil.copy2(path,out/path.name)
     plugins=[]
-    components={'dsh':'0.1.5-rc.1','modelPicker':'1.1.2','adaptiveReasoning':'0.2.3','resonantVoice':'0.1.16',
+    components={'dsh':'0.1.5-rc.1','modelPicker':'1.1.2','adaptiveReasoning':'0.2.3','resonantVoice':'0.1.19',
                 'executionRecovery':'bundled action-aware DSH adapter',
                 'automaticMemory':'Hindsight 0.10.0 (explicit optional provisioning)'}
-    for source,name,ver in [(a.voice,'dsh-resonant-voice','0.1.16'),(a.adaptive,'dsh-adaptive-reasoning','0.2.3'),
+    for source,name,ver in [(a.voice,'dsh-resonant-voice','0.1.19'),(a.adaptive,'dsh-adaptive-reasoning','0.2.3'),
                             (a.model_picker,'dsh-model-picker-augmented','1.1.2')]:
         plugin(source,name,ver);target=out/'plugins'/source.name;target.parent.mkdir(exist_ok=True)
         shutil.copy2(source,target);plugins.append(str(target.relative_to(out)))
     (out/'dsh').mkdir()
     for name in ('package.json','package-lock.json'):shutil.copy2(ROOT/'release/dsh'/name,out/'dsh'/name)
+    shutil.copytree(ROOT/'release/dsh/plugins',out/'dsh/plugins')
     shutil.copy2(ROOT/'scripts/setup-complete.py',out/'setup.py')
     shutil.copy2(ROOT/'docs/COMPLETE-INSTALL.md',out/'INSTALL.md')
     shutil.copy2(ROOT/'LICENSE',out/'LICENSE')
     sources=out/'sources';sources.mkdir()
     refs={'augmentor':source_archive(ROOT,sources/('augmentor-'+version+'-source.tar.gz')),
-          'voice':source_archive(a.voice_source,sources/'resonant-voice-0.1.16-source.tar.gz'),
-          'adaptive':source_archive(a.adaptive_source,sources/'adaptive-reasoning-0.2.3-source.tar.gz')}
+          'voice':source_archive(a.voice_source,sources/'resonant-voice-0.1.19-source.tar.gz',a.voice),
+          'adaptive':source_archive(a.adaptive_source,sources/'adaptive-reasoning-0.2.3-source.tar.gz',a.adaptive)}
     script='#!/bin/sh\n# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0\nset -eu\ncd -- "$(dirname -- "$0")"\nsha256sum -c SHA256SUMS\nexec /usr/bin/python3 ./setup.py --bundle "$PWD" "$@"\n'
     (out/'install.sh').write_text(script);(out/'install.sh').chmod(0o755)
     hashes={str(f.relative_to(out)):sha(f) for f in sorted(out.rglob('*')) if f.is_file()}
-    manifest={'format':'augmentor-complete/1','artifactId':version+'-complete-preview.1-'+ref[:12],
-              'version':version,'sourceCommit':ref,'sourceRefs':refs,'target':'debian13-amd64','components':components,
+    manifest={'format':'augmentor-complete/1','artifactId':version+'-complete-preview.'+str(a.preview_number)+'-'+ref[:12],
+              'version':version,'sourceCommit':ref,'sourceRefs':refs,
+              'sourceScopes':{name:'Distributed plugin source only; external services are separate.' if path.is_file() else 'Reviewed repository snapshot.' for name,path in [('voice',a.voice_source),('adaptive',a.adaptive_source)]},
+              'target':'debian13-amd64','components':components,
               'plugins':plugins,'browser':browser['artifact'],'extensionId':browser['extensionId'],'sha256':hashes}
     (out/'bundle.json').write_text(json.dumps(manifest,indent=2)+'\n');hashes['bundle.json']=sha(out/'bundle.json')
     (out/'SHA256SUMS').write_text(''.join(value+'  '+name+'\n' for name,value in sorted(hashes.items())))

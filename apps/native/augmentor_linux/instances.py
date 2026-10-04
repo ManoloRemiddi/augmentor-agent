@@ -12,6 +12,9 @@ def validate_name(value):
     return value
 
 
+SHORTCUT_INSTANCES = (('main', 'First agent'), ('secondary', 'Second agent'))
+
+
 def current_name():
     return validate_name(os.environ.get('AUGMENTOR_WINDOW_ID', 'main'))
 
@@ -25,8 +28,9 @@ def scoped_path(path):
     return path if current_name() == 'main' else path.with_name(f'{path.stem}.{current_name()}{path.suffix}')
 
 
-def ipc_basename():
-    return 'augmentor-linux-pi' + ('' if current_name() == 'main' else '-' + current_name())
+def ipc_basename(name=None):
+    name = current_name() if name is None else validate_name(name)
+    return 'augmentor-linux-pi' + ('' if name == 'main' else '-' + name)
 
 
 def desktop_component(base):

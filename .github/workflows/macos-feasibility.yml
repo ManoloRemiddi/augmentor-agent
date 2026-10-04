@@ -1,0 +1,149 @@
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+name: macOS feasibility
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/macos-feasibility.yml'
+      - 'apps/native/**'
+      - 'apps/browser/**'
+      - 'services/**'
+      - 'adapters/**'
+      - 'packages/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'release/**'
+      - 'package*.json'
+      - 'vendor/**'
+      - 'components/**'
+      - '.github/workflows/handy.yml'
+permissions:
+  contents: read
+concurrency:
+  group: macos-feasibility-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  handy:
+    uses: ./.github/workflows/handy.yml
+    with:
+      platforms: '["macos-14"]'
+  bundled-runtime:
+    needs: handy
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, macos-26]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - name: Reject private source in the tree or branch history
+        run: python3 scripts/check-private-source-boundary.py
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.19.0'
+      - uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9
+        with:
+          version: '0.11.16'
+          enable-cache: false
+      - name: Prepare pinned standalone Python and hashed wheels
+        run: |
+          test "$(uname -m)" = arm64
+          uv python install 3.12.13
+          uv venv --python 3.12.13 .macos-build-env
+          uv pip install --python .macos-build-env/bin/python3 --require-hashes --only-binary :all: --no-deps -r release/macos-requirements.txt
+      - name: Build shared application and native contracts
+        env:
+          QT_QPA_PLATFORM: offscreen
+          PYTHONPATH: apps/native
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run check
+          npm run build
+          AUGMENTOR_PYTHON="$PWD/.macos-build-env/bin/python3" node --test tests/codex-*.test.mjs
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_codex_credentials.py -v
+          AUGMENTOR_PYTHON="$PWD/.macos-build-env/bin/python3" node scripts/proof-codex-credentials.mjs
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_codex_desktop.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_codex_setup.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p 'test_macos*.py' -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p '*shortcut*.py' -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_instances.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_dsh_payload_staging.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_prompt_client_startup.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_managed_dsh.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_private_files.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_dsh_session_lease.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_browser_voice.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_recovery.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_activity.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_ui_scale.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_fluid.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_window.py -v
+          .macos-build-env/bin/python3 -m unittest discover -s tests -p test_local_health.py -v
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: handy-darwin-arm64
+          path: components/handy/runtime
+      - name: Restore component executable mode
+        run: chmod +x components/handy/runtime/bin/handy
+      - name: Package and verify development bundle
+        run: |
+          .macos-build-env/bin/python3 scripts/package-macos.py --out outputs/macos
+          .macos-build-env/bin/python3 scripts/verify-macos-application-inventory.py outputs/macos
+          app="$PWD/outputs/macos/Augmentor Agent Desktop.app"
+          project="$app/Contents/Resources/app"
+          "$project/node/bin/node" scripts/proof-codex-prerequisite.mjs "$project" node_modules/@openai/codex
+          "$project/node/bin/node" scripts/dsh-payload-proof.mjs "$project/dsh"
+          codesign --verify --deep --strict "$app"
+          "$project/python/bin/python3" -I -B scripts/proof-handy-component.py --runtime "$project/components/handy/runtime"
+          "$project/node/bin/node" scripts/app-sdk-bundle-proof.mjs "$project"
+          codesign --verify --deep --strict "$app"
+      - name: Exercise bundled DSH and Qt with an isolated model fixture
+        env:
+          AUGMENTOR_PROOF_QT_PLATFORM: offscreen
+          AUGMENTOR_PROOF_APPROVALS: '1'
+          AUGMENTOR_PROOF_INTERACTIONS: '1'
+          AUGMENTOR_PROOF_EXACT_FORK: '1'
+          AUGMENTOR_PROOF_EXISTING_PROMPTS: '1'
+        run: |
+          app="$PWD/outputs/macos/Augmentor Agent Desktop.app"
+          project="$app/Contents/Resources/app"
+          export AUGMENTOR_PROOF_APP_ROOT="$project"
+          export AUGMENTOR_PYTHON="$project/python/bin/python3"
+          export AUGMENTOR_PI_NODE="$project/node/bin/node"
+          export DSH_TEST_MODULES="$project/dsh/node_modules"
+          export PATH="$project/dsh/node_modules/.bin:$project/node/bin:$PATH"
+          AUGMENTOR_PYTHON="$project/python/bin/python3" "$project/node/bin/node" "$project/scripts/proof-codex-credentials.mjs"
+          "$project/python/bin/python3" -I -B scripts/dsh-setup-proof.py
+          codesign --verify --deep --strict "$app"
+      - name: Verify managed first run and service restart with an isolated model
+        run: |
+          app="$PWD/outputs/macos/Augmentor Agent Desktop.app"
+          project="$app/Contents/Resources/app"
+          "$project/python/bin/python3" -I -B scripts/macos-managed-setup-proof.py --app-root "$project" --out outputs/macos-managed
+          "$project/python/bin/python3" -I -B scripts/macos-managed-setup-proof.py --app-root "$project" --out outputs/macos-engine-first --engine-first
+          codesign --verify --deep --strict "$app"
+      - name: Verify Browser companion credentials with its isolated packaged interpreter
+        run: |
+          .macos-build-env/bin/python3 scripts/package-macos.py --component companion --out outputs/macos-companion
+          .macos-build-env/bin/python3 scripts/verify-macos-application-inventory.py outputs/macos-companion
+          app="$PWD/outputs/macos-companion/Augmentor Agent Browser Companion.app"
+          project="$app/Contents/Resources/app"
+          "$project/node/bin/node" scripts/proof-codex-prerequisite.mjs "$project" node_modules/@openai/codex
+          AUGMENTOR_PYTHON="$project/python/bin/python3" "$project/node/bin/node" "$project/scripts/proof-codex-credentials.mjs"
+          codesign --verify --deep --strict "$app"
+          "$project/python/bin/python3" -I -B scripts/proof-handy-component.py --runtime "$project/components/handy/runtime"
+          codesign --verify --deep --strict "$app"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: macos-feasibility-${{ matrix.os }}
+          path: |
+            outputs/macos/*.json
+            outputs/macos-companion/*.json
+            outputs/macos-managed/report.json
+            outputs/macos-engine-first/report.json
+          retention-days: 7
+          if-no-files-found: warn

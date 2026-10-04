@@ -42,6 +42,43 @@ def validate(app, development=False, verify=True):
     return release
 
 
+# The runtime a candidate must carry inside its own bundle. A build that
+# predates the bundled runtime (the 0.2.8 Mac previews) passes identity and
+# signature checks, installs cleanly, and then fails at first run with nothing
+# to tell the user why. Refusing it here — while the download is still in front
+# of them — is the difference between a dead end and an instruction.
+#
+# Kept deliberately separate from managed_setup.py's RUNTIME_PAYLOAD so
+# this check still works when the file it would import is itself the missing
+# one. A test asserts the two lists stay identical.
+RUNTIME_PAYLOAD = (
+    ('node/bin/node', 'the bundled Node runtime'),
+    ('python/bin/python3', 'the bundled Python runtime'),
+    ('dsh/node_modules/@deepseek-ai/dsh/lib/bin.js', 'the bundled DSH runtime'),
+    ('dsh/node_modules/.bin/dsh', 'the DSH launcher'),
+    ('dsh/node_modules/dsh-resonant-voice/bin/resonant-voice.js', 'the bundled voice plugin'),
+    ('scripts/setup-macos.py', 'the macOS first-run setup'),
+)
+GUIDE_URL = 'https://augmentoragent.com/macos.html'
+
+
+def validate_runtime(app):
+    """Refuse a candidate that cannot run its own agent.
+
+    Applied only to the candidate and its staged copy. An existing installation
+    is allowed to be an older, incomplete build — otherwise the upgrade that
+    fixes it could never run.
+    """
+    resources = app/'Contents/Resources/app'
+    missing = [label for path, label in RUNTIME_PAYLOAD
+               if not (resources/path).is_file()]
+    if missing:
+        raise ValueError(
+            'This Augmentor build is incomplete: it does not contain its own '
+            'runtime — ' + ', '.join(missing) + '. Nothing was installed. '
+            'Download and install the current Augmentor build instead: ' + GUIDE_URL)
+
+
 def installation_lock(name='installation.lock'):
     runtime = Path(os.environ.get('XDG_RUNTIME_DIR', f'/tmp/augmentor-{os.getuid()}'))
     runtime.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -175,7 +212,9 @@ def recover(destination):
         raise ValueError('Invalid installation journal.')
     record = json.loads(journal.read_text())
     name = record['backup']
-    if Path(name).name != name or not name.startswith(destination.stem+'.before-') or not name.endswith('.app'):
+    legacy=name.startswith(destination.stem+'.before-') and name.endswith('.app')
+    hidden=name.startswith('.'+destination.stem+'.before-') and name.endswith('.backup.noindex')
+    if Path(name).name != name or not (legacy or hidden):
         raise ValueError('Invalid recovery backup name.')
     backup = destination.parent/name
     if destination.exists() or destination.is_symlink():
@@ -193,7 +232,7 @@ def recover(destination):
 
 def replace(staged, destination):
     """Keep the old bundle alongside the destination; restore on rename failure."""
-    backup = destination.with_name(destination.stem+'.before-'+uuid.uuid4().hex+'.app')
+    backup = destination.with_name('.'+destination.stem+'.before-'+uuid.uuid4().hex+'.backup.noindex')
     existed = destination.exists()
     if destination.is_symlink():
         raise ValueError('Refusing to replace a symbolic link.')
@@ -226,6 +265,26 @@ def replace(staged, destination):
     return backup if existed else None
 
 
+def default_destination(name):
+    system=Path('/Applications')
+    existing=[p/name for p in (system,Path.home()/'Applications') if (p/name).exists() or (p/name).is_symlink()]
+    if len(existing)>1:
+        raise ValueError('More than one installation exists. Choose the installation to update explicitly.')
+    # An update must not silently create a second installation or move the
+    # runtime out from under existing DSH and login registrations.
+    if existing:return existing[0]
+    return (system if os.access(system,os.W_OK) else Path.home()/'Applications')/name
+
+
+def validate_parent(parent):
+    info=parent.lstat()
+    if not stat.S_ISDIR(info.st_mode) or info.st_mode & 0o002:
+        raise ValueError('Choose a real installation directory without public write access.')
+    shared=parent==Path('/Applications') and info.st_uid==0 and os.access(parent,os.W_OK)
+    if info.st_uid!=os.getuid() and not shared:
+        raise ValueError('The destination must belong to this user or be writable /Applications.')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('candidate', type=Path)
@@ -236,21 +295,28 @@ def main():
         parser.error('Run as the ordinary logged-in macOS user.')
     source = args.candidate.expanduser()
     source_release=validate(source, args.development)
+    # Fail before touching anything: an incomplete candidate must never reach
+    # the staging directory, and must never replace a working installation.
+    try:validate_runtime(source)
+    except ValueError as error:parser.error(str(error))
     name='Augmentor Agent Browser Companion.app' if source_release.get('component')=='companion' else 'Augmentor Agent Desktop.app'
-    destination = (args.destination or Path.home()/'Applications'/name).expanduser().absolute()
+    try:destination = (args.destination or default_destination(name)).expanduser().absolute()
+    except ValueError as error:parser.error(str(error))
     if destination.suffix != '.app' or destination.is_symlink():
         parser.error('Choose a real .app destination.')
     if source.resolve() == destination.resolve():
         parser.error('Run installation from a separate candidate bundle.')
     destination.parent.mkdir(parents=True, exist_ok=True)
-    if destination.parent.stat().st_uid != os.getuid():
-        parser.error('The destination directory must belong to this user.')
+    try:validate_parent(destination.parent)
+    except ValueError as error:parser.error(str(error))
     # Staging on the destination filesystem makes the final renames atomic.
-    stage = Path(tempfile.mkdtemp(prefix='.augmentor-install-', dir=destination.parent))
+    stage = Path(tempfile.mkdtemp(prefix='.augmentor-install-', suffix='.noindex', dir=destination.parent))
     try:
         staged = stage/'Augmentor Agent Desktop.app'
         subprocess.run(['ditto', str(source), str(staged)], check=True)
         release = validate(staged, args.development)
+        try:validate_runtime(staged)
+        except ValueError as error:parser.error(str(error))
         try:
             with installation_transaction(destination, staged):
                 recovered = recover(destination)

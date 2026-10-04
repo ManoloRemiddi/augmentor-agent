@@ -12,12 +12,14 @@ import subprocess
 import uuid
 import threading
 from pathlib import Path
+from .ui_scale import scaled, LiveScale, px, normalize
 from PySide6.QtCore import Qt, QTimer, QLockFile, QUrl, Signal, QSize, QPoint, QRect, QVariantAnimation, QEasingCurve
 from PySide6.QtNetwork import QLocalServer, QLocalSocket
 from PySide6.QtGui import QColor, QPainter, QKeySequence, QShortcut, QRegion, QDesktopServices, QPalette, QIcon
 from PySide6.QtWidgets import (QApplication,QWidget,QFrame,QLabel,QPushButton,QVBoxLayout,QHBoxLayout,
-    QStackedLayout,QTextEdit,QTextBrowser,QMessageBox,QInputDialog,QMenu,QSizePolicy,QLayout,QDialog)
+    QStackedLayout,QTextEdit,QTextBrowser,QMessageBox,QInputDialog,QMenu,QSizePolicy,QLayout,QDialog,QSystemTrayIcon)
 from .controller import Controller
+from .maintenance import WindowMaintenance
 from .voice_button import VoiceButton
 from .design import COPY_FEEDBACK_MS
 from .queue_panel import QueuePanel
@@ -35,15 +37,20 @@ from .panels import HistoryDialog, AccessDialog, UpdatesDialog, SettingsDialog, 
 
 class Window(QWidget):
     completed = Signal(object, object)
+    dictation_stopped = Signal(object)
 
     def __init__(self, preview=True, harness=None):
         super().__init__()
+        self.dictation_stopped.connect(self.finish_dictation_quit)
+        self.ui_scale=LiveScale(self, QApplication.instance().property('augmentorUiBaseScale') or 100)
         self.setWindowTitle(window_label())
         self.setWindowIcon(QIcon(str(Path(__file__).parent/'assets/augmentor.svg')))
         self.setWindowFlags(Qt.WindowType.Window | Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
-        self.setMinimumSize(364,364);self.resize(424,484)
+        scaled(self).setMinimumSize(364,364);self.resize(424,484)
         self.preferences=Preferences(not preview)
+        if preview:self.preferences.values['ui_scale']=self.ui_scale.base
+        initialize_voice_profile = None
         if not preview and current_name()!='main':
             # Materialize the independent voice profile at first open, not
             # when the user eventually visits Voice settings. No microphone.
@@ -51,10 +58,11 @@ class Window(QWidget):
             def initialize_voice_profile():
                 try:voice_request('preferences')
                 except Exception:pass  # Optional offline voice must not prevent chat.
-            threading.Thread(target=initialize_voice_profile,daemon=True).start()
         if harness in ('pi','dsh'):
             self.preferences.values['harness']=harness;self.preferences.save()
         self.controller=None if preview else Controller(self,harness=self.preferences.values['harness'])
+        self.maintenance = WindowMaintenance(self)
+        if initialize_voice_profile:self.controller.task(initialize_voice_profile)
         self.setup_dialog=None;self.appearance_dialog=None;self.setup_offered=False
         self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.expanded_thinking=set();self.editing=None
         self.rendered_messages=None;self.rendered_partial=''
@@ -69,26 +77,26 @@ class Window(QWidget):
         self.copy_feedback_timer.timeout.connect(self.clear_copy_feedback)
         self.preferences_timer=QTimer(self);self.preferences_timer.setSingleShot(True);self.preferences_timer.setInterval(200);self.preferences_timer.timeout.connect(self.preferences.save)
         self.activity=ActivityHalo(self)
-        self.outer=QVBoxLayout(self);self.outer.setContentsMargins(*([self.activity.margin]*4));self.outer.setSpacing(0)
+        self.outer=QVBoxLayout(self);scaled(self.outer).setContentsMargins(*([self.activity.margin]*4));scaled(self.outer).setSpacing(0)
         self.stack=QStackedLayout();self.outer.addLayout(self.stack)
         self.outer.setSizeConstraint(QLayout.SizeConstraint.SetNoConstraint)
         self.stack.setSizeConstraint(QLayout.SizeConstraint.SetNoConstraint)
         self.expanded=QFrame();self.stack.addWidget(self.expanded)
-        layout=QVBoxLayout(self.expanded);layout.setContentsMargins(*([SURFACE['inset']]*4));layout.setSpacing(SURFACE['gap'])
-        header=QHBoxLayout();header.setSpacing(SURFACE['headerGap'])
+        layout=QVBoxLayout(self.expanded);scaled(layout).setContentsMargins(*([SURFACE['inset']]*4));scaled(layout).setSpacing(SURFACE['gap'])
+        header=QHBoxLayout();scaled(header).setSpacing(SURFACE['headerGap'])
         self.title=QLabel('New conversation');self.title.setTextFormat(Qt.TextFormat.PlainText)
         self.title.setSizePolicy(QSizePolicy.Policy.Ignored,QSizePolicy.Policy.Preferred)
-        self.title.setStyleSheet('font-size:11px;font-weight:400;padding-left:8px;')
+        scaled(self.title).setStyleSheet('font-size:11px;font-weight:400;padding-left:8px;')
         self.title.setToolTip('Double-click to rename this conversation')
         self.title.mouseDoubleClickEvent=lambda _:self.rename_chat()
-        identity=QVBoxLayout();identity.setSpacing(2);identity.setContentsMargins(0,0,0,0)
-        self.brand=QLabel(window_label());self.brand.setStyleSheet('font-size:13px;font-weight:600;padding-left:8px;')
+        identity=QVBoxLayout();scaled(identity).setSpacing(2);scaled(identity).setContentsMargins(0,0,0,0)
+        self.brand=QLabel(window_label());scaled(self.brand).setStyleSheet('font-size:13px;font-weight:600;padding-left:8px;')
         identity.addWidget(self.brand)
-        self.title_stack=QStackedLayout();self.title_stack.setContentsMargins(0,0,0,0)
+        self.title_stack=QStackedLayout();scaled(self.title_stack).setContentsMargins(0,0,0,0)
         self.title_stack.addWidget(self.title)
         self.title_editor=TitleEditor();self.title_editor.setAccessibleName('Session title')
-        self.title_editor.setFixedHeight(18)
-        self.title_editor.setStyleSheet('QLineEdit {font-size:11px;padding:0 0 0 8px;border:0;border-radius:0;background:transparent;}')
+        scaled(self.title_editor).setFixedHeight(18)
+        scaled(self.title_editor).setStyleSheet('QLineEdit {font-size:11px;padding:0 0 0 8px;border:0;border-radius:0;background:transparent;}')
         self.title_editor.returnPressed.connect(self.save_inline_title)
         self.title_editor.cancelled.connect(self.cancel_inline_title)
         self.title_stack.addWidget(self.title_editor);self.title_stack.setCurrentWidget(self.title)
@@ -105,36 +113,37 @@ class Window(QWidget):
         self.hide_button=self.icon_button(SURFACE['glyphs']['hide'],'Hide Augmentor',self.hide)
         for button in (self.new_button,self.save_button,self.history_button,self.pin_button,self.compact_button,self.more_button,self.hide_button):header.addWidget(button,0,Qt.AlignmentFlag.AlignVCenter)
         layout.addLayout(header)
+        self.opening_dsh=False
         self.status=QLabel('UI preview' if preview else 'Connecting…');self.status.hide()
         self.model_picker=ModelPicker();self.model_picker.selected.connect(self.model_selected)
         self.model_picker.pin_requested.connect(self.pin_model)
         self.model_picker.refresh_requested.connect(lambda:self.controller.refresh_models() if self.controller else None)
         self.model_picker.setSizePolicy(QSizePolicy.Policy.Ignored,QSizePolicy.Policy.Fixed)
-        self.model_picker.setMinimumWidth(0);self.model_picker.setFixedHeight(24)
-        self.model_picker.setStyleSheet('text-align:left;border:0;background:transparent;padding:0;font-size:11px;')
-        self.body=QFrame();body=QVBoxLayout(self.body);body.setContentsMargins(0,0,0,0);body.setSpacing(0)
+        scaled(self.model_picker).setMinimumWidth(0);scaled(self.model_picker).setFixedHeight(24)
+        scaled(self.model_picker).setStyleSheet('text-align:left;border:0;background:transparent;padding:0;font-size:11px;')
+        self.body=QFrame();body=QVBoxLayout(self.body);scaled(body).setContentsMargins(0,0,0,0);scaled(body).setSpacing(0)
         self.transcript=Transcript();self.transcript.setOpenExternalLinks(False);self.transcript.setOpenLinks(False)
-        self.transcript.setAccessibleName('Conversation');self.transcript.setStyleSheet('QTextBrowser {background:transparent;border:0;padding:2px;}')
+        self.transcript.setAccessibleName('Conversation');scaled(self.transcript).setStyleSheet('QTextBrowser {background:transparent;border:0;padding:2px;}')
         self.transcript.verticalScrollBar().valueChanged.connect(self.scrolled)
         self.transcript.anchorClicked.connect(self.message_action)
         body.addWidget(self.transcript,1);layout.addWidget(self.body,1)
         self.input_stack=QFrame();input_layout=QVBoxLayout(self.input_stack)
-        input_layout.setContentsMargins(0,0,0,0);input_layout.setSpacing(0);layout.addWidget(self.input_stack)
+        scaled(input_layout).setContentsMargins(0,0,0,0);scaled(input_layout).setSpacing(0);layout.addWidget(self.input_stack)
         self.queue_panel=QueuePanel();input_layout.addWidget(self.queue_panel)
         self.queue_session=None
         self.queue_panel.action_requested.connect(lambda item,action:self.controller.update_queue(item,action) if self.controller else None)
         self.composer=Composer()
         self.composer.improve_requested.connect(self.improve_prompt)
         self.composer.improvement_changed.connect(self.update_controls)
-        self.edit_bar=QFrame();edit_layout=QHBoxLayout(self.edit_bar);edit_layout.setContentsMargins(2,0,2,0)
+        self.edit_bar=QFrame();edit_layout=QHBoxLayout(self.edit_bar);scaled(edit_layout).setContentsMargins(2,0,2,0)
         edit_label=QLabel('Editing latest message');edit_layout.addWidget(edit_label,1)
         self.cancel_edit_button=QPushButton('Cancel');self.cancel_edit_button.clicked.connect(self.cancel_edit);edit_layout.addWidget(self.cancel_edit_button)
         self.edit_bar.setToolTip('Resubmit from before this message. The previous conversation stays in History.')
         self.edit_bar.hide();input_layout.addWidget(self.edit_bar)
         self.composer.submit_requested.connect(self.send);input_layout.addWidget(self.composer)
         self.voice_opening=False;self.voice_epoch=0;self.voice_gesture_mode=None;self.voice_input=None
-        footer=QHBoxLayout();footer.setSpacing(SURFACE['footerGap']);footer.addWidget(self.model_picker,1)
-        self.connection_dot=QLabel('●');self.connection_dot.setToolTip('Connecting to the harness');self.connection_dot.setFixedWidth(12);footer.addWidget(self.connection_dot)
+        footer=QHBoxLayout();scaled(footer).setSpacing(SURFACE['footerGap']);footer.addWidget(self.model_picker,1)
+        self.connection_dot=QLabel('●');self.connection_dot.setToolTip('Connecting to the harness');scaled(self.connection_dot).setFixedWidth(12);footer.addWidget(self.connection_dot)
         self.voice_dialog=None
         self.voice_button=VoiceButton(self)
         self.voice_button.pressed.connect(self.voice_pressed)
@@ -177,8 +186,9 @@ class Window(QWidget):
                 'No OpenCode conversation has been transferred or replayed.'))
 
     def switch_harness(self,harness,reconnect=False):
+        if self.maintenance.phase()!='ready':return
         if self.voice_dialog or self.voice_input or self.voice_opening:self.close_voice_panel()
-        if harness not in ('pi','dsh') or not self.controller:return
+        if harness not in ('pi','dsh','codex') or not self.controller:return
         if self.controller.harness==harness and not reconnect:return
         if self.controller.running or self.controller.navigating or self.editing or getattr(self.controller,'repairing',False):
             self.set_status('Finish the current action before switching harness.');return
@@ -206,28 +216,53 @@ class Window(QWidget):
         self.controller.page.connect(self.restore_page)
         self.controller.recovered.connect(self.restore_recovery)
         self.controller.connection.connect(self.connection_changed)
-        self.controller.start_monitor()
+        self.start_connection()
+
+    def start_connection(self):
+        from .managed_setup import needed as managed_setup_needed
+        if self.controller.harness=='dsh' and not self.controller.session and managed_setup_needed():
+            self.setup_offered=True
+            self.set_status('Set up DSH from the three-dot menu → Agent setup')
+            QTimer.singleShot(0,self.open_setup)
+        else:self.controller.start_monitor()
 
     def connection_changed(self,online):
         self.update_controls()
         if not self.setup_offered and self.controller and self.controller.harness=='dsh' and not self.controller.session and not getattr(self.controller.client,'product',False):
             self.setup_offered=True
             QTimer.singleShot(0,self.open_setup)
-        if online and not self.setup_offered and self.controller and self.controller.harness=='pi':
+        if online and not self.setup_offered and self.controller and self.controller.harness in ('pi','codex'):
             self.setup_offered=True
             available=any(model.get('available') for group in self.model_picker.catalog.get('groups',[]) for model in group.get('models',[]))
             if not available and not self.controller.session:QTimer.singleShot(0,self.open_setup)
 
     def open_setup(self):
+        if getattr(self,'maintenance',None) and self.maintenance.phase()!='ready':return
         if not self.controller:return
         if self.controller.running or self.controller.navigating:
             self.set_status('Finish the current action before configuring a model.');return
         if self.setup_dialog and self.setup_dialog.isVisible():self.setup_dialog.raise_();return
         from .setup import SetupDialog
         from .dsh_setup import DshSetupDialog
-        self.setup_dialog=(SetupDialog if self.controller.harness=='pi' else DshSetupDialog)(self);self.setup_dialog.show()
+        from .managed_setup import (RuntimeIncompleteDialog, ManagedSetupDialog,
+                                  needed as managed_setup_needed,
+                                  available as managed_setup_available,
+                                  runtime_problem)
+        # Order matters. An incomplete app copy is told about itself; otherwise
+        # it would silently fall through to the external-DSH form and read as a
+        # demand for a DSH the user does not have.
+        problem=runtime_problem() if managed_setup_needed() else ''
+        if self.controller.harness=='pi':self.setup_dialog=SetupDialog(self)
+        elif self.controller.harness=='codex':
+            from .codex_setup import CodexSetupDialog
+            self.setup_dialog=CodexSetupDialog(self)
+        elif problem:self.setup_dialog=RuntimeIncompleteDialog(self,problem)
+        elif managed_setup_available():self.setup_dialog=ManagedSetupDialog(self)
+        else:self.setup_dialog=DshSetupDialog(self)
+        self.setup_dialog.show()
+
     def icon_button(self,text,tooltip,callback,checkable=False):
-        button=QPushButton(text);button.setFixedSize(SURFACE['iconSize'],SURFACE['iconSize']);button.setStyleSheet('QPushButton {padding:0;font-size:15px;border:0;background:transparent;} QPushButton:hover {background:rgba(127,150,150,55);color:palette(window-text);}')
+        button=QPushButton(text);scaled(button).setFixedSize(SURFACE['iconSize'],SURFACE['iconSize']);scaled(button).setStyleSheet('QPushButton {padding:0;font-size:15px;border:0;background:transparent;} QPushButton:hover {background:rgba(127,150,150,55);color:palette(window-text);}')
         button.setToolTip(tooltip);button.setAccessibleName(tooltip);button.setCheckable(checkable);button.clicked.connect(callback);return button
 
     def call_in_background(self,fn,callback):
@@ -277,7 +312,7 @@ class Window(QWidget):
                 self.open_voice();return
             remaining[0]-=1
             if remaining[0]>0:QTimer.singleShot(500,ready)
-            else:self.set_status('Voice could not connect. Check the DSH connection and try the voice button again.')
+            else:self.set_status('Voice could not connect. Check the conversation connection and try the voice button again.')
         ready()
 
     def voice_is_hands_free(self):
@@ -439,7 +474,7 @@ class Window(QWidget):
         self.voice_button.hands_free=self.voice_is_hands_free()
         self.voice_button.refresh_tip()
         self.voice_button.setVisible(self.preferences.values.get('resonant_voice',True))
-        self.voice_button.setEnabled(bool(self.controller and getattr(self.controller,'harness',None)=='dsh' and getattr(self.controller,'online',False) and not getattr(self.controller,'read_only',False) and (not getattr(self.controller,'navigating',False) or self.voice_opening)))
+        self.voice_button.setEnabled(bool(self.controller and (getattr(self.controller,'harness',None)=='dsh' or getattr(self.controller,'capabilities',{}).get('voice')) and getattr(self.controller,'online',False) and not getattr(self.controller,'read_only',False) and (not getattr(self.controller,'navigating',False) or self.voice_opening)))
         running=bool(self.controller and (self.controller.running or getattr(self.controller,'navigating',False)))
         can_queue=bool(self.controller and getattr(getattr(self.controller,'client',None),'supports_queue',False))
         self.send_button.setEnabled(bool(self.controller and self.model_picker.currentData()) and (not running or can_queue) and not getattr(self.controller,'navigating',False) and not self.read_only and getattr(self.controller,'online',True))
@@ -454,7 +489,7 @@ class Window(QWidget):
         self.stop_button.setVisible(working);self.stop_button.setEnabled(working);self.send_button.setVisible(not working or can_queue)
         self.send_button.setToolTip('Queue prompt · Enter' if working and can_queue else 'Send · Enter (Shift+Enter for a new line)')
         self.queue_panel.online=bool(self.controller and getattr(self.controller,'online',False));self.queue_panel.running=working;self.queue_panel.render()
-        self.connection_dot.setStyleSheet('color:'+('#a6d6c8' if not self.controller or getattr(self.controller,'online',False) else '#d8ae70')+';font-size:8px;')
+        scaled(self.connection_dot).setStyleSheet('color:'+('#a6d6c8' if not self.controller or getattr(self.controller,'online',False) else '#d8ae70')+';font-size:8px;')
         self.sync_orb()
 
     def set_busy(self,busy):
@@ -485,7 +520,7 @@ class Window(QWidget):
             except Exception as exc:error=str(exc)
             try:self.composer.improvement_result.emit(identity,result,error)
             except RuntimeError:pass
-        threading.Thread(target=work,daemon=True,name='augmentor-improve-prompt').start()
+        self.controller.task(work)
 
     def send(self):
         if self.composer.improving:return
@@ -649,9 +684,9 @@ class Window(QWidget):
             tail.movePosition(QTextCursor.MoveOperation.End,QTextCursor.MoveMode.KeepAnchor)
             tail.removeSelectedText()
         if self.pending_prompt:
-            tail.insertHtml(f'<table width="86%" align="right" border="0" cellspacing="0" cellpadding="10"><tr><td><p align="right" style="color:{accent}"><b>You</b> · Sending…</p><p>'+html.escape(self.pending_prompt).replace('\n','<br>')+'</p></td></tr></table>')
+            tail.insertHtml(self.transcript.scale_html(f'<table width="86%" align="right" border="0" cellspacing="0" cellpadding="10"><tr><td><p align="right" style="color:{accent}"><b>You</b> · Sending…</p><p>'+html.escape(self.pending_prompt).replace('\n','<br>')+'</p></td></tr></table>'))
         if self.partial:
-            tail.insertHtml(f'<p style="color:{accent}"><b>Augmentor</b></p>'+render_markdown(self.partial,self.preferences.values['theme'],accent,tuple(sorted(self.preferences.values.get('format_colours',{}).items())),str(len(self.messages)),self.copied_code[1] if self.copied_code and self.copied_code[0]==self.message_key(len(self.messages)) else None))
+            tail.insertHtml(self.transcript.scale_html(f'<p style="color:{accent}"><b>Augmentor</b></p>'+render_markdown(self.partial,self.preferences.values['theme'],accent,tuple(sorted(self.preferences.values.get('format_colours',{}).items())),str(len(self.messages)),self.copied_code[1] if self.copied_code and self.copied_code[0]==self.message_key(len(self.messages)) else None)))
         self.rendered_messages=list(self.messages);self.rendered_partial=self.partial
         if anchor!=selection:
             from PySide6.QtGui import QTextCursor
@@ -737,12 +772,8 @@ class Window(QWidget):
             if text==self.pending_prompt:self.pending_prompt=None
             self.messages.append(('You',text));return True
         if kind=='command/done':
-            # Hide only the routine opening policy notice, including history
-            # replay. Keep the DSH event and all other command/recovery notices.
-            if data.get('kind')=='success' and data.get('text')==(
-                'Harness: Saved reasoning: minimal; requested reasoning: xhigh '
-                '(request policy). Backend enforcement is provider-dependent.'
-            ):return False
+            # Effective policy may differ from the saved picker value. Keep its
+            # notice visible, including history replay, on every native platform.
             self.messages.append(('DSH',data.get('text') or ('Command completed.' if data.get('kind')=='success' else 'Command failed.')))
             return True
         if kind=='assistant/chunk':
@@ -793,7 +824,25 @@ class Window(QWidget):
 
     def open_pi(self):
         if self.controller and getattr(self.controller,'harness','pi')=='dsh':
-            QDesktopServices.openUrl(QUrl(self.controller.client.base));return
+            from .managed_setup import needed, available, runtime_state
+            if needed():self.open_setup();return
+            if self.opening_dsh:return
+            self.opening_dsh=True
+            client=self.controller.client
+            managed=available()
+            def launch_url():
+                if managed:return runtime_state(start=True,browser=True)
+                try:return {'ok':True,'browserUrl':client.remote.browser_url()}
+                except Exception:return {'ok':False}
+            def opened(result):
+                self.opening_dsh=False
+                if result.get('ok') and result.get('browserUrl'):
+                    if not QDesktopServices.openUrl(QUrl(result['browserUrl'])):
+                        self.set_status('The default browser could not open. Check your default browser settings.')
+                else:
+                    self.set_status('DSH could not connect. Open Agent setup to start it.')
+                    self.open_setup()
+            self.call_in_background(launch_url,opened);return
         if self.controller:ModelsDialog(self).exec()
 
     def rename_chat(self):
@@ -826,12 +875,19 @@ class Window(QWidget):
         menu.addAction('Settings',self.open_settings).setEnabled(bool(self.controller))
         menu.addAction('Colors & skins',self.open_appearance)
         menu.addAction('Prompt library',self.open_prompt_library).setEnabled(bool(self.controller))
-        menu.addAction('Connect a model',self.open_setup).setEnabled(bool(self.controller))
-        menu.addAction('Models & providers',self.open_pi).setEnabled(bool(self.controller))
+        is_dsh=bool(self.controller and self.controller.harness=='dsh')
+        menu.addAction('Agent setup' if is_dsh else 'Connect a model',self.open_setup).setEnabled(bool(self.controller))
+        menu.addAction('Open DSH in browser' if is_dsh else 'Models & providers',self.open_pi).setEnabled(bool(self.controller))
+        if sys.platform == 'win32':
+            from .windows_browser_setup import available, WindowsBrowserSetupDialog as BrowserSetupDialog
+        else:
+            from .macos_browser_setup import available, MacBrowserSetupDialog as BrowserSetupDialog
+        if available():
+            menu.addAction('Set up browser extension',lambda:BrowserSetupDialog(self).exec())
         menu.addAction('Versions & updates',self.open_updates).setEnabled(bool(self.controller))
         menu.addAction('Approval mode',self.open_access).setEnabled(bool(self.controller))
         menu.addAction('About & licenses',lambda:LicensesDialog(self).exec())
-        menu.addSeparator();menu.addAction('Quit Augmentor',self.close)
+        menu.addSeparator();menu.addAction('Quit Augmentor',self.quit_augmentor)
         menu.exec(self.more_button.mapToGlobal(self.more_button.rect().bottomLeft()))
 
     def open_updates(self):
@@ -846,8 +902,11 @@ class Window(QWidget):
         dialog.setWindowModality(Qt.WindowModality.NonModal)
         dialog.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         dialog.changed.connect(self.apply_appearance)
+        dialog.changed.connect(self.publish_dictation_appearance)
         dialog.finished.connect(lambda _:setattr(self,'appearance_dialog',None))
         self.appearance_dialog=dialog
+        area=self.screen().availableGeometry()
+        dialog.resize(min(dialog.width(),area.width()),min(dialog.height(),area.height()))
         dialog.show();dialog.raise_();dialog.activateWindow()
 
     def open_prompt_library(self):
@@ -861,8 +920,29 @@ class Window(QWidget):
         changed={key:latest[key] for key in keys if latest[key]!=self.preferences.values[key]}
         if changed:self.apply_appearance(changed)
 
+    def publish_dictation_appearance(self,_):
+        # Only explicit edits publish; opening another window never wins the theme.
+        from . import dictation
+        value=dictation.theme(self.preferences.values)
+        import time
+        value["edited_at"]=time.time_ns()
+        if not hasattr(self,'dictation_theme_timer'):
+            self.dictation_theme_timer=QTimer(self);self.dictation_theme_timer.setSingleShot(True)
+            self.dictation_theme_timer.timeout.connect(self.flush_dictation_appearance)
+        self.dictation_theme_pending=value;self.dictation_theme_timer.start(60)
+
+    def flush_dictation_appearance(self):
+        value=self.dictation_theme_pending
+        def work():
+            try:dictation_request('theme',value)
+            except Exception:pass  # Colour edits must remain usable if dictation is off.
+        from .dictation import request as dictation_request
+        threading.Thread(target=work,daemon=True).start()
+
     def apply_appearance(self,values):
         self.preferences.values.update(values);v=self.preferences.values
+        if 'ui_scale' in values:self.apply_ui_scale(values['ui_scale'])
+        if set(values)=={'ui_scale'}:return
         dark=v['theme']=='dark'
         light=(.12 if dark else .92)+v['brightness']/150
         self.background=QColor.fromHslF(v['hue']/360,v.get('saturation',48)/100*.5625,max(.025,min(.99,light)))
@@ -874,13 +954,13 @@ class Window(QWidget):
         scenic=v.get('background') in ('blossom-lake','uploaded')
         text=('#fff0e3' if dark else '#243840') if scenic else ('#edf3f3' if dark else '#152b2c')
         reading=f'rgba({self.background.red()},{self.background.green()},{self.background.blue()},{155 if dark else 205})' if scenic else 'transparent'
-        self.transcript.setStyleSheet(f'QTextBrowser {{background:{reading};border:0;border-radius:12px;padding:8px;}}' if scenic else 'QTextBrowser {background:transparent;border:0;padding:2px;}')
+        scaled(self.transcript).setStyleSheet(f'QTextBrowser {{background:{reading};border:0;border-radius:12px;padding:8px;}}' if scenic else 'QTextBrowser {background:transparent;border:0;padding:2px;}')
         solid=QColor(self.background);solid.setAlpha(255)
         field=solid.lighter(125) if dark else solid.darker(105)
         self.composer.roll_colours=(QColor(field),QColor(text),QColor(self.accent))
         self.transcript.menu_style=f'QMenu {{background:{solid.name()};color:{text};border:1px solid {self.accent.name()};padding:4px;}} QMenu::item {{padding:6px 18px;background:transparent;}} QMenu::item:selected {{background:{self.accent.name()};color:{solid.name()};}} QMenu::item:disabled {{color:#879493;}}'
 
-        self.setStyleSheet(f"""
+        scaled(self).setStyleSheet(f"""
           QWidget {{ color:{text};font-family:'DejaVu Sans';font-size:13px; }}
           QDialog,QMenu,QScrollArea,QWidget#appearanceControls {{ background:{solid.name()}; }}
           QLabel,QFrame {{ background:transparent; }}
@@ -901,14 +981,14 @@ class Window(QWidget):
           QScrollBar::add-line:vertical,QScrollBar::sub-line:vertical {{ height:0; }}
         """)
         for button in (self.new_button,self.save_button,self.history_button,self.compact_button,self.more_button,self.hide_button):
-            button.setStyleSheet(f'QPushButton {{padding:0;font-size:15px;border:0;background:transparent;color:{text};}} QPushButton:hover {{background:rgba(127,150,150,55);color:{text};}} QPushButton:disabled {{color:#879493;}}')
-        self.pin_button.setStyleSheet(f'QPushButton {{padding:0;border:0;font-size:15px;}} QPushButton:checked {{background:{self.accent.name()};color:{solid.name()};border-radius:6px;}}')
-        self.model_picker.setStyleSheet(f'QPushButton {{text-align:left;border:0;background:transparent;padding:0;font-size:11px;color:{text};}} QPushButton:hover,QPushButton:pressed,QPushButton:focus {{background:transparent;color:{text};}} QPushButton:disabled {{color:rgba(127,150,150,150);}}')
-        self.composer.prompt_menu.setStyleSheet(f'QListWidget {{background:{solid.name()};color:{text};border:1px solid {self.accent.name()};border-radius:10px;padding:4px;}} QListWidget::item {{padding:7px;}} QListWidget::item:selected {{background:{self.accent.name()};color:{solid.name()};border-radius:6px;}}')
+            scaled(button).setStyleSheet(f'QPushButton {{padding:0;font-size:15px;border:0;background:transparent;color:{text};}} QPushButton:hover {{background:rgba(127,150,150,55);color:{text};}} QPushButton:disabled {{color:#879493;}}')
+        scaled(self.pin_button).setStyleSheet(f'QPushButton {{padding:0;border:0;font-size:15px;}} QPushButton:checked {{background:{self.accent.name()};color:{solid.name()};border-radius:6px;}}')
+        scaled(self.model_picker).setStyleSheet(f'QPushButton {{text-align:left;border:0;background:transparent;padding:0;font-size:11px;color:{text};}} QPushButton:hover,QPushButton:pressed,QPushButton:focus {{background:transparent;color:{text};}} QPushButton:disabled {{color:rgba(127,150,150,150);}}')
+        scaled(self.composer.prompt_menu).setStyleSheet(f'QListWidget {{background:{solid.name()};color:{text};border:1px solid {self.accent.name()};border-radius:10px;padding:4px;}} QListWidget::item {{padding:7px;}} QListWidget::item:selected {{background:{self.accent.name()};color:{solid.name()};border-radius:6px;}}')
         self.composer.fit()
         self.rendered_messages=None
-        self.brand.setStyleSheet('font-size:13px;font-weight:600;padding-left:8px;color:'+self.accent.name())
-        self.status.setStyleSheet('font-size:11px;color:'+self.accent.name())
+        scaled(self.brand).setStyleSheet('font-size:13px;font-weight:600;padding-left:8px;color:'+self.accent.name())
+        scaled(self.status).setStyleSheet('font-size:11px;color:'+self.accent.name())
         if v.get('background')=='uploaded':
             from .backgrounds import uploaded_butterfly_colours
             butterfly_palette=uploaded_butterfly_colours(v['background_image'])
@@ -924,6 +1004,44 @@ class Window(QWidget):
         if getattr(self,'touch_layout',None):self.touch_layout.style()
         self.preferences_timer.start();self.update()
         if self.messages or self.partial:self.render_messages()
+
+    def apply_ui_scale(self, percent):
+        percent=normalize(percent)
+        self.preferences.values['ui_scale']=percent
+        if percent==self.ui_scale.percent:return
+        # Keep live widgets, document cursors, undo, controller and response intact.
+        ratio=percent/self.ui_scale.percent
+        if self.morphing:self.morph_animation.stop();self.morph_animation.finished.emit()
+        size=self.size();expanded=self.expanded_size
+        if size!=getattr(self,'last_scaled_size',None):
+            self.design_size=(size.width()/self.ui_scale.factor,size.height()/self.ui_scale.factor)
+        bar=self.transcript.verticalScrollBar();follow=self.follow_tail
+        reading_cursor=self.transcript.cursorForPosition(QPoint(0,0));reading_y=self.transcript.cursorRect(reading_cursor).top();reading_position=reading_cursor.position()
+        self.rendering=True
+        self.ui_scale.set_percent(percent)
+        self.expanded_size=QSize(round(expanded.width()*ratio),round(expanded.height()*ratio))
+        if hasattr(self,'compact_anchor_offset'):
+            self.compact_anchor_offset=QPoint(round(self.compact_anchor_offset.x()*ratio),round(self.compact_anchor_offset.y()*ratio))
+        area=self.screen().availableGeometry()
+        self.resize(min(round(self.design_size[0]*self.ui_scale.factor),area.width()),min(round(self.design_size[1]*self.ui_scale.factor),area.height()))
+        self.last_scaled_size=self.size()
+        if self.compact:self.setMask(QRegion(px(self,1),px(self,1),px(self,102),px(self,102),QRegion.RegionType.Ellipse))
+        self.composer.fit()
+        if hasattr(self,'resize_borders'):self.resize_borders.update()
+        self.activity.sync();self.update()
+        # Appearance stays anchored while dragging, so the slider never moves
+        # away from the pointer. Its scroll area accommodates the larger controls.
+        self.rendered_messages=None
+        if self.messages or self.partial:self.render_messages()
+        else:self.transcript.setHtml(getattr(self.transcript,'raw_html',''))
+        reading_cursor=self.transcript.textCursor()
+        reading_cursor.setPosition(min(reading_position,self.transcript.document().characterCount()-1))
+        self.follow_tail=follow
+        self.rendering=True
+        bar.setValue(bar.maximum() if follow else bar.value()+self.transcript.cursorRect(reading_cursor).top()-reading_y)
+        self.rendering=False
+        self.hidden_geometry=None
+        self.preferences_timer.start()
 
     def set_background_opacity(self,value):
         self.apply_appearance({'opacity':value})
@@ -970,29 +1088,29 @@ class Window(QWidget):
         if self.compact:
             anchor=self.compact_button.mapToGlobal(self.compact_button.rect().center())
             self.compact_anchor_offset=anchor-start.topLeft()
-            origin=anchor-QPoint(51,51)
+            origin=anchor-QPoint(px(self,51),px(self,51))
         else:
             origin=start.center()-getattr(self,'compact_anchor_offset',QPoint(self.expanded_size.width()-116,56))
-        target=QRect(origin,QSize(104,104) if self.compact else self.expanded_size)
-        self.clearMask();self.setMinimumSize(0,0);self.setMaximumSize(16777215,16777215)
-        self.outer.setContentsMargins(*([0 if self.compact else self.activity.margin]*4))
+        target=QRect(origin,QSize(px(self,104),px(self,104)) if self.compact else self.expanded_size)
+        self.clearMask();scaled(self).setMinimumSize(0,0);scaled(self).setMaximumSize(16777215,16777215)
+        scaled(self.outer).setContentsMargins(*([0 if self.compact else self.activity.margin]*4))
         self.stack.setCurrentWidget(self.orb if self.compact else self.expanded)
         def finish():
             self.morphing=False;self.setGeometry(target)
             self.stack.currentWidget().show()
             if self.compact:
-                self.setMaximumSize(104,104);self.setMask(QRegion(1,1,102,102,QRegion.RegionType.Ellipse))
-            else:self.setMinimumSize(364,364);QTimer.singleShot(0,self.focus_composer)
+                scaled(self).setMaximumSize(104,104);self.setMask(QRegion(px(self,1),px(self,1),px(self,102),px(self,102),QRegion.RegionType.Ellipse))
+            else:scaled(self).setMinimumSize(364,364);QTimer.singleShot(0,self.focus_composer)
             if getattr(self,'morph_surface',None):self.morph_surface.deleteLater();self.morph_surface=None
             self.resize_borders.update();self.sync_orb();self.activity.sync();self.apply_pin();self.update()
         if snapshot is None:finish();return
         from .surfaces import MorphSurface
         self.morphing=True;self.activity.sync()
-        source_anchor=self.compact_anchor_offset if self.compact else QPoint(51,51)
+        source_anchor=self.compact_anchor_offset if self.compact else QPoint(px(self,51),px(self,51))
         fixed_anchor=anchor if self.compact else start.center()
         orb_snapshot=None
         if self.compact:
-            self.orb.resize(104,104);orb_snapshot=self.orb.grab();self.orb.hide()
+            self.orb.resize(px(self,104),px(self,104));orb_snapshot=self.orb.grab();self.orb.hide()
         self.morph_surface=MorphSurface(self,snapshot,source_anchor,fixed_anchor,orb_snapshot);self.morph_surface.show();self.morph_surface.raise_()
         self.morph_animation=QVariantAnimation(self);self.morph_animation.setDuration(240)
         self.morph_animation.setStartValue(0.);self.morph_animation.setEndValue(1.)
@@ -1010,7 +1128,7 @@ class Window(QWidget):
         menu.exec(self.orb.mapToGlobal(point))
 
     def surface_rect(self):
-        margin=8 if self.compact else self.activity.margin
+        margin=px(self,8 if self.compact else self.activity.margin)
         return self.rect().adjusted(margin,margin,-margin,-margin)
 
     def paintEvent(self,event):
@@ -1018,7 +1136,7 @@ class Window(QWidget):
         painter=QPainter(self);painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         self.activity.paint_backdrop(painter,self.surface_rect().adjusted(1,1,-1,-1),self.accent)
         painter.setBrush(self.background);edge=QColor(self.accent);edge.setAlpha(75);painter.setPen(edge)
-        painter.drawRoundedRect(self.surface_rect().adjusted(1,1,-1,-1),20,20)
+        painter.drawRoundedRect(self.surface_rect().adjusted(1,1,-1,-1),px(self,20),px(self,20))
         if self.preferences.values.get('background') in ('blossom-lake','uploaded'):
             from .scenery import paint_landscape
             paint_landscape(painter,self.surface_rect().adjusted(1,1,-1,-1),
@@ -1083,7 +1201,59 @@ class Window(QWidget):
         else:
             self.close()
 
+    def setup_dictation_tray(self):
+        if current_name()!='main' or not self.controller:return
+        # A development tree may lack its compiled component. Complete Windows
+        # packages must include it; avoid starting an unavailable test companion.
+        if sys.platform=='win32' and not (Path(__file__).resolve().parents[3]/'components/handy/runtime/bin/handy.exe').is_file():return
+        from .dictation import request,theme
+        value=theme(self.preferences.values)
+        def boot():
+            try:request('initialize',{'theme':value})
+            except Exception:pass
+        threading.Thread(target=boot,daemon=True).start()
+        if not QSystemTrayIcon.isSystemTrayAvailable():return
+        self.app_tray=QSystemTrayIcon(self.windowIcon(),self)
+        self.app_tray.setToolTip('Augmentor Agent')
+        menu=QMenu(self)
+        menu.addAction('Open Augmentor',self.bring_forward)
+        from .dictation_settings import DictationSettingsDialog
+        menu.addAction('System dictation · Handy',lambda:DictationSettingsDialog(self).exec())
+        menu.addAction('Settings',self.open_settings)
+        menu.addSeparator();menu.addAction('Quit Augmentor',self.quit_augmentor)
+        self.app_tray.setContextMenu(menu)
+        self.app_tray.activated.connect(lambda reason:self.bring_forward() if reason==QSystemTrayIcon.ActivationReason.Trigger else None)
+        self.app_tray.show()
+
+    def quit_augmentor(self):
+        if getattr(self,'quitting_dictation',False):return
+        if self.voice_dialog or self.voice_input or self.voice_opening:self.close_voice_panel()
+        if current_name()=='main':
+            from .dictation import request
+            self.quitting_dictation=True
+            def stop():
+                error=None
+                try:
+                    request('cancel',start=False,timeout=3)
+                    request('shutdown',start=False,timeout=8)
+                except Exception as problem:
+                    if 'not running' not in str(problem):error=str(problem)
+                self.dictation_stopped.emit(error)
+            threading.Thread(target=stop,daemon=True).start()
+        else:self.quit_requested=True;self.close()
+
+    def finish_dictation_quit(self,error):
+        self.quitting_dictation=False
+        if error:self.set_status('System dictation could not stop: '+error);return
+        self.quit_requested=True;self.close()
+
     def closeEvent(self, event):
+        phase = self.maintenance.phase()
+        if phase=='prepared' or phase=='closing' and self.maintenance_state(include_reservation=False)['busy']:
+            event.ignore();return
+        if hasattr(self,'app_tray') and not getattr(self,'quit_requested',False):
+            if self.voice_dialog or self.voice_input or self.voice_opening:self.close_voice_panel()
+            self.remember_placement();self.hide();event.ignore();return
         if self.voice_dialog or self.voice_input or self.voice_opening:self.close_voice_panel()
         if self.controller and getattr(self.controller,'repairing',False):
             event.ignore();return
@@ -1110,6 +1280,8 @@ class Window(QWidget):
         rect=self.hidden_geometry
         expanded=self.expanded_size if self.compact else self.size()
         self.preferences.values['placement']={'x':rect.x(),'y':rect.y(),'width':rect.width(),'height':rect.height(),'compact':self.compact,'expanded_width':expanded.width(),'expanded_height':expanded.height(),'screen_layout':self.hidden_layout,'halo_margin':self.activity.margin}
+        for key in ('width','height','expanded_width','expanded_height'):
+            self.preferences.values['placement'][key]=round(self.preferences.values['placement'][key]/self.ui_scale.factor)
         self.preferences.save()
 
     def restore_placement(self):
@@ -1158,6 +1330,19 @@ class Window(QWidget):
         if self.isVisible() and not self.isMinimized():self.hide()
         else:self.bring_forward()
 
+    def maintenance_state(self, include_reservation=True):
+        admission = self.maintenance.gate.control('host.maintenance.status', {})
+        running = bool(self.controller and self.controller.running)
+        draft = bool(self.composer.toPlainText() or self.submitted_draft or self.editing)
+        busy = (running or draft or self.composer.improving or self.voice_opening
+                or self.voice_input is not None or self.voice_dialog is not None
+                or bool(self.controller and (any(getattr(self.controller,name,False)
+                    for name in ('navigating','preparing','repairing','loading_page'))
+                    or bool(getattr(self.controller,'recovery_lock',None) and self.controller.recovery_lock.locked())))
+                or any(dialog.isVisible() for dialog in self.findChildren(QDialog)))
+        if admission['active'] or include_reservation and admission['phase']!='ready':busy=True
+        return {'running': running, 'busy': busy, 'draftPresent': draft, 'accepted': not busy}
+
     def focus_composer(self):
         if not self.isVisible() or self.compact:return
         if QApplication.activeModalWidget() or QApplication.activePopupWidget():return
@@ -1180,6 +1365,15 @@ class Window(QWidget):
 
 
 def main():
+    if sys.platform=='win32':
+        sys.path.insert(0,str(Path(__file__).resolve().parents[3]/'services'))
+        from lifecycle.windows_startup import Startup
+        with Startup() as startup:
+            return _main(startup)
+    return _main()
+
+
+def _main(startup=None):
     sys.path.insert(0,str(Path(__file__).resolve().parents[3]/'services/lifecycle'))
     from lease import hold
     hold('desktop')
@@ -1190,62 +1384,108 @@ def main():
     parser.add_argument('--compact', action='store_true', help='Open the circular activity view.')
     parser.add_argument('--preview', action='store_true', help='Open without connecting to a harness.')
     parser.add_argument('--onboarding-host', action='store_true', help=argparse.SUPPRESS)
+    parser.add_argument('--ui-test-control', action='store_true', help=argparse.SUPPRESS)
     parser.add_argument('--harness', choices=['pi','dsh'], help='Open the shared UI with this harness.')
     parser.add_argument('--instance', type=validate_name, default=current_name(), help='Named independent window (for example secondary); repeated launches toggle that window.')
     args = parser.parse_args()
     configure(args.instance)
     from .browser import refresh_accessibility_bus
     refresh_accessibility_bus()
-    app = QApplication(sys.argv[:1])
+    from .ui_scale import startup_scale
+    ui_scale = Preferences(not args.preview and not args.screenshot).values['ui_scale']
+    with startup_scale(ui_scale):
+        app = QApplication(sys.argv[:1])
+    app.setProperty('augmentorUiScale', ui_scale)
+    app.setProperty('augmentorUiBaseScale', ui_scale)
     app.setQuitOnLastWindowClosed(False)
     app.setApplicationName('Augmentor Agent')
     app.setWindowIcon(QIcon(str(Path(__file__).parent/'assets/augmentor.svg')))
     from .shortcuts import COMPONENT
     app.setDesktopFileName(COMPONENT.removesuffix('.desktop'))
-    if not args.preview and not args.screenshot:
-        runtime = Path(os.environ.get('XDG_RUNTIME_DIR', f'/tmp/augmentor-linux-pi-{os.getuid()}'))
+    if (not args.preview or args.ui_test_control) and not args.screenshot:
+        if sys.platform == 'win32':
+            from .windows_instance import Client, Lock, Server
+            from .platform_runtime import runtime_directory
+            runtime = runtime_directory()
+        else:
+            Client, Lock, Server = QLocalSocket, QLockFile, QLocalServer
+            runtime = Path(os.environ.get('XDG_RUNTIME_DIR', f'/tmp/augmentor-linux-pi-{os.getuid()}'))
         runtime.mkdir(mode=0o700, exist_ok=True)
         socket_name = str(runtime / (ipc_basename()+'.sock'))
-        client = QLocalSocket()
+        client = Client()
         client.connectToServer(socket_name)
         if client.waitForConnected(300):
-            client.write(b'maintenance.status' if args.onboarding_host or args.ensure_running else b'voice' if args.voice else ('harness:'+args.harness).encode() if args.harness else b'toggle')
+            client.write(b'maintenance.status' if args.onboarding_host or args.ensure_running else b'voice' if args.voice else ('harness:'+args.harness).encode() if args.harness else b'show' if sys.platform in ('darwin','win32') else b'toggle')
             client.waitForBytesWritten(500)
+            if sys.platform == 'win32': client.close()
             return 0
-        app.instance_lock = QLockFile(str(runtime / (ipc_basename()+'.lock')))
+        app.instance_lock = Lock(str(runtime / (ipc_basename()+'.lock')))
         if not app.instance_lock.tryLock(200):
             return 1
-        QLocalServer.removeServer(socket_name)
-        app.instance_server = QLocalServer()
-        app.instance_server.setSocketOptions(QLocalServer.SocketOption.UserAccessOption)
+        if sys.platform != 'win32': QLocalServer.removeServer(socket_name)
+        app.instance_server = Server()
+        if sys.platform != 'win32': app.instance_server.setSocketOptions(QLocalServer.SocketOption.UserAccessOption)
         if not app.instance_server.listen(socket_name):
             return 1
+        if sys.platform == 'win32':
+            app.aboutToQuit.connect(app.instance_server.close)
+            app.aboutToQuit.connect(app.instance_lock.close)
     window = Window(preview=args.preview or bool(args.screenshot),harness=args.harness)
+    if not args.preview and not args.screenshot:window.setup_dictation_tray()
     if hasattr(app, 'instance_server'):
+        def finish_maintenance():
+            # Reply/disconnect first, then recheck work before closing. Preview
+            # has no controller, and last-window-close intentionally does not
+            # quit this app (shortcut hiding must keep a conversation alive).
+            if not window.maintenance_state(include_reservation=False)['busy']:
+                # A tray-enabled window otherwise hides instead of exiting.
+                window.quit_requested=True
+                if window.close():app.quit()
+                else:window.quit_requested=False
         def activate():
             client = app.instance_server.nextPendingConnection()
             if client:
                 if not client.bytesAvailable():client.waitForReadyRead(200)
                 command=bytes(client.readAll()).decode()
-                if command in ('maintenance.status','maintenance.close','maintenance.recover'):
-                    running=bool(window.controller and window.controller.running)
-                    busy=running or window.composer.improving or window.voice_opening or window.voice_input is not None or bool(window.voice_dialog and window.voice_dialog.capture) or any(dialog.isVisible() for dialog in window.findChildren(QDialog))
+                if command.startswith('ui-test:'):
+                    try:
+                        from .ui_testing import dispatch
+                        result=dispatch(window,json.loads(command[len('ui-test:'):]),enabled=args.ui_test_control)
+                        response={'ok':True,'result':result}
+                    except Exception as error:response={'ok':False,'error':str(error)}
+                    client.write(json.dumps(response).encode()+b'\n');client.waitForBytesWritten(500)
+                elif command.startswith('maintenance:'):
+                    try:
+                        request=json.loads(command[len('maintenance:'):])
+                        if not isinstance(request,dict) or set(request)!={'method','params'}:raise ValueError('Unsupported maintenance request fields.')
+                        result=window.maintenance.control(request['method'],request['params'])
+                        response={'ok':True,'result':result,'pid':os.getpid(),'buildRoot':str(Path(__file__).resolve().parents[3])}
+                    except Exception as error:response={'ok':False,'error':str(error)}
+                    client.write(json.dumps(response).encode()+b'\n');client.waitForBytesWritten(500)
+                    if response.get('ok') and result['phase']=='closing':
+                        QTimer.singleShot(0,finish_maintenance)
+                elif command in ('maintenance.status','maintenance.close','maintenance.recover'):
+                    state=window.maintenance_state()
+                    busy=state['busy']
                     controller = window.controller
-                    accepted = not busy
                     if command == 'maintenance.recover':
-                        accepted = bool(controller and controller.repair_connection())
-                    client.write(json.dumps({'pid':os.getpid(),'running':running,'busy':busy,'accepted':accepted,'onboardingProtocol':1,'modelReady':bool(window.model_picker.currentData()),
+                        state['accepted'] = bool(controller and controller.repair_connection())
+                    client.write(json.dumps({'pid':os.getpid(),**state,'onboardingProtocol':1,'maintenanceAdmission':1,'modelReady':bool(window.model_picker.currentData()),
                         'online':bool(controller and controller.online), 'repairing':bool(controller and controller.repairing),
                         'lastError':controller.last_connection_error if controller else '',
                         'sessionRestoreError':controller.session_restore_error if controller else '',
                         'buildRoot':str(Path(__file__).resolve().parents[3]),
+                        'uiScale':window.ui_scale.percent, 'uiMetricFactor':window.ui_scale.factor, 'devicePixelRatio':window.devicePixelRatioF(),
                         'voiceAvailable':hasattr(window, 'voice_button'),
                         'voiceTiming':dict(window.voice_dialog.timings) if window.voice_dialog else None,
                         'voiceBufferStarvations':window.voice_dialog.playback_buffer.starvations if window.voice_dialog else 0,
                         'voiceOutputUnderflows':window.voice_dialog.output_underflows if window.voice_dialog else 0}).encode()+b'\n')
                     client.waitForBytesWritten(500)
                     if command=='maintenance.close' and not busy:
-                        window.close()
+                        QTimer.singleShot(0,finish_maintenance)
+                elif window.maintenance.phase()!='ready':
+                    client.write(json.dumps({'ok':False,'error':'Augmentor maintenance is in progress. This request was not started.'}).encode()+b'\n')
+                    client.waitForBytesWritten(500)
                 elif command.startswith('onboarding:'):
                     try:
                         from .onboarding import start
@@ -1253,6 +1493,7 @@ def main():
                         response={'ok':True,'result':result}
                     except Exception as error:response={'ok':False,'error':str(error)}
                     client.write(json.dumps(response).encode()+b'\n');client.waitForBytesWritten(500)
+                elif command=='show':window.bring_forward()
                 elif command=='voice':window.request_voice()
                 elif command.startswith('harness:'):
                     window.switch_harness(command.split(':',1)[1])
@@ -1261,8 +1502,16 @@ def main():
                 else:window.toggle_visibility()
                 client.disconnectFromServer()
                 client.deleteLater()
+                QTimer.singleShot(0,activate)
         app.instance_server.newConnection.connect(activate)
+        # The server listens before Window construction. Qt may process an
+        # arrival during initialization, before this callback exists. Drain any
+        # already queued connection as soon as the window is ready.
+        QTimer.singleShot(0,activate)
     window.bring_forward()
+    if sys.platform=='darwin':
+        # Finder/Dock reopen an existing application without another main().
+        app.applicationStateChanged.connect(lambda state:window.bring_forward() if state==Qt.ApplicationState.ApplicationActive and not window.isVisible() else None)
     if args.voice:QTimer.singleShot(0,window.request_voice)
     if sys.platform=='darwin' and not args.preview and not args.screenshot:
         from .macos_shortcuts import initialize
@@ -1274,4 +1523,6 @@ def main():
             ok = window.grab().save(str(args.screenshot))
             app.exit(0 if ok else 1)
         QTimer.singleShot(200, capture)
+    if startup is not None and hasattr(app,'instance_server'):
+        startup.ready()
     return app.exec()

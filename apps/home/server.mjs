@@ -36,7 +36,7 @@ export function httpService(config,ledger,runtime,{readiness=async()=>{
 }}={}) {
   const identities=new Identity(ledger.db),attempts=new Map();
   const scoped=(client,id)=>client.id==='operator'?id:digest(client.id+':'+id);
-  let draining=false,admitted=false,activeClient=null,directAbort=null;
+  let draining=false,admitted=false,activeClient=null,activeRequest=null,directAbort=null;
   async function json(req){
     if(!req.headers['content-type']?.startsWith('application/json'))throw Error('Use application/json');
     const size=Number(req.headers['content-length']);
@@ -78,7 +78,7 @@ export function httpService(config,ledger,runtime,{readiness=async()=>{
         if(req.headers.origin&&req.headers.origin!==origin||req.method!=='GET'&&(req.headers.origin!==origin||!safeEqual(String(req.headers['x-home-csrf']??''),client.csrf))){reply(403,{error:'Origin or session verification failed'});return;}
       }else if(req.headers.origin){reply(403,{error:'Browser-origin bearer requests are not enabled'});return;}
       if(req.method==='GET'&&req.url==='/identity'){reply(200,client);return;}
-      if(req.method==='GET'&&req.url==='/capabilities'){reply(200,{protocol:'augmentor-home/1',role:client.role,requests:{persistent:true,async:true,scoped:true},model:config.model,capabilities:client.role==='viewer'?['home.read','home.result']:['home.read','home.request','home.result','home.cancel'],devices:runtime.devices?'Owner-selected registered entities':'Assist preview: exposed named lights, switches and helpers'});return;}
+      if(req.method==='GET'&&req.url==='/capabilities'){reply(200,{protocol:'augmentor-home/1',role:client.role,requests:{persistent:true,async:true,scoped:true,cancelById:true},model:config.model,capabilities:client.role==='viewer'?['home.read','home.result']:['home.read','home.request','home.result','home.cancel'],devices:runtime.devices?'Owner-selected registered entities':'Assist preview: exposed named lights, switches and helpers'});return;}
       if(req.method==='GET'&&req.url==='/clients'){if(client.role!=='owner'){reply(403,{error:'Owner access required'});return;}reply(200,{clients:identities.list()});return;}
       if(req.method==='POST'&&['/clients/invite','/clients/revoke','/logout'].includes(req.url)){
         const body=await json(req);
@@ -132,7 +132,8 @@ export function httpService(config,ledger,runtime,{readiness=async()=>{
         const {promptCall}=await import('../../dist/prompt-library/src/client.js');
         reply(200,await promptCall('prompts.list'));return;
       }
-      if(req.method!=='POST'||!['/ask','/device-actions','/cancel','/actions/acknowledge'].includes(req.url)){reply(404,{error:'Unknown endpoint'});return;}
+      const cancelRequest=/^\/requests\/([a-zA-Z0-9_-]{1,100})\/cancel$/.exec(req.url);
+      if(req.method!=='POST'||(!cancelRequest&&!['/ask','/device-actions','/cancel','/actions/acknowledge'].includes(req.url))){reply(404,{error:'Unknown endpoint'});return;}
       if(!req.headers['content-type']?.startsWith('application/json')){reply(415,{error:'Use application/json'});return;}
       if(req.headers['transfer-encoding']){reply(400,{error:'Content-Length required'});return;}
       const size=Number(req.headers['content-length']);
@@ -140,6 +141,12 @@ export function httpService(config,ledger,runtime,{readiness=async()=>{
       let bytes=0,chunks=[];for await(const chunk of req){bytes+=chunk.length;if(bytes>16384)throw Error('Body too large');chunks.push(chunk);}
       let body;try{body=JSON.parse(Buffer.concat(chunks));}catch{reply(400,{error:'Invalid JSON'});return;}
       if(!body||Array.isArray(body)||typeof body!=='object'){reply(400,{error:'Expected a JSON object'});return;}
+      if(cancelRequest){
+        // Match both identities atomically before signalling. A delayed cancel
+        // must not interrupt a newer request, even from the same paired client.
+        if(activeClient!==client.id||activeRequest!==cancelRequest[1]){reply(409,{error:'That request is not active for this client; nothing was cancelled'});return;}
+        directAbort?.abort();runtime.cancel();reply(200,{status:'cancellation requested; inspect action outcomes',request_id:cancelRequest[1]});return;
+      }
       if(req.url==='/cancel'){if(activeClient&&activeClient!==client.id&&client.role!=='owner'){reply(403,{error:'This request belongs to another client'});return;}directAbort?.abort();runtime.cancel();reply(200,{status:'cancellation requested; inspect action outcomes'});return;}
       if(req.url==='/actions/acknowledge'){
         if(client.role!=='owner'){reply(403,{error:'Owner access required'});return;}
@@ -156,7 +163,7 @@ export function httpService(config,ledger,runtime,{readiness=async()=>{
       }
       if(!identity(body.request_id)||!identity(body.session_id)||typeof body.prompt!=='string'||!body.prompt.trim()||body.prompt.length>4000){reply(400,{error:'Supply request_id, session_id and a non-empty prompt up to 4000 characters'});return;}
       if(draining||admitted){reply(409,{error:'Home is busy; do not submit a new ID to repeat an uncertain request'});return;}
-      admitted=true;activeClient=client.id;directAbort=new AbortController();
+      admitted=true;activeClient=client.id;activeRequest=body.request_id;directAbort=new AbortController();
       try {
         let prompt=body.prompt;
         if(body.prompt_id!==undefined){
@@ -184,7 +191,7 @@ export function httpService(config,ledger,runtime,{readiness=async()=>{
         }catch{result={request_id:body.request_id,session_id:body.session_id,status:'incomplete',reply:'Request interrupted. Inspect saved session and action outcomes before another action.'};}
         result={...result,request_id:body.request_id,session_id:body.session_id};
         ledger.finish(requestId,result);if(!asynchronous)reply(200,result);
-      } finally {admitted=false;activeClient=null;directAbort=null;}
+      } finally {admitted=false;activeClient=null;activeRequest=null;directAbort=null;}
     } catch(error){reply(error instanceof Conflict?409:400,{error:error instanceof Conflict?error.message:'Invalid request'});}
   });
   server.requestTimeout=10000;server.headersTimeout=10000;server.timeout=10000;server.maxConnections=16;

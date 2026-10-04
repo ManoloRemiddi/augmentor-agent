@@ -11,6 +11,51 @@ class WindowTests(unittest.TestCase):
     def setUpClass(cls):
         cls.app = QApplication.instance() or QApplication([])
 
+    def test_windows_preview_without_handy_starts_no_dictation_or_tray(self):
+        from unittest.mock import Mock, patch
+        owner=SimpleNamespace(controller=object())
+        with patch('augmentor_linux.window.sys.platform','win32'), \
+             patch('augmentor_linux.window.current_name',return_value='main'), \
+             patch('pathlib.Path.is_file',return_value=False), \
+             patch('augmentor_linux.window.threading.Thread') as thread:
+            Window.setup_dictation_tray(owner)
+        thread.assert_not_called()
+        self.assertFalse(hasattr(owner,'app_tray'))
+
+    def test_mac_first_run_offers_installation_without_starting_recovery(self):
+        from unittest.mock import Mock, patch
+        owner=SimpleNamespace(controller=SimpleNamespace(harness='dsh',session=None,start_monitor=Mock()),
+            open_setup=Mock(),setup_offered=False,set_status=Mock())
+        with patch('augmentor_linux.managed_setup.needed',return_value=True):
+            Window.start_connection(owner); self.app.processEvents()
+        owner.open_setup.assert_called_once(); owner.controller.start_monitor.assert_not_called()
+        self.assertTrue(owner.setup_offered)
+        self.assertIn('Agent setup',owner.set_status.call_args.args[0])
+
+    def test_maintenance_preserves_unsent_and_unacknowledged_drafts(self):
+        window = Window(preview=True)
+        try:
+            self.assertTrue(window.maintenance_state()['accepted'])
+            window.composer.setPlainText('unsent work')
+            state = window.maintenance_state()
+            self.assertTrue(state['draftPresent']); self.assertTrue(state['busy'])
+            self.assertFalse(state['accepted']); self.assertNotIn('unsent work', str(state))
+            window.composer.clear(); window.submitted_draft = 'pending acknowledgement'
+            self.assertFalse(window.maintenance_state()['accepted'])
+            window.submitted_draft = None
+            self.assertTrue(window.maintenance_state()['accepted'])
+        finally:
+            window.close()
+
+    def test_existing_connections_and_saved_chats_keep_their_recovery(self):
+        from unittest.mock import Mock, patch
+        for harness,session,needed in [('dsh',None,False),('dsh','saved',True),('pi',None,True)]:
+            owner=SimpleNamespace(controller=SimpleNamespace(harness=harness,session=session,start_monitor=Mock()),
+                open_setup=Mock(),setup_offered=False,set_status=Mock())
+            with patch('augmentor_linux.managed_setup.needed',return_value=needed):
+                Window.start_connection(owner); self.app.processEvents()
+            owner.controller.start_monitor.assert_called_once(); owner.open_setup.assert_not_called()
+
     def test_unconfigured_dsh_offers_setup_once_without_waiting_for_connection(self):
         from unittest.mock import Mock
         owner=SimpleNamespace(update_controls=Mock(),open_setup=Mock(),setup_offered=False,
@@ -290,6 +335,12 @@ class WindowTests(unittest.TestCase):
 
     def test_activity_lifecycle_and_outside_pixels(self):
         from PySide6.QtTest import QTest
+        import time
+        def finish_morph():
+            deadline=time.monotonic()+1.5
+            while window.morphing and time.monotonic()<deadline:QTest.qWait(10)
+            self.assertFalse(window.morphing, 'compact transition finishes within the bounded wait')
+            self.assertTrue(window.activity.timer.isActive())
         window=Window();window.show();QTest.qWait(20)
         idle=window.activity.canvas.grab().toImage()
         window.set_busy(True);QTest.qWait(180)
@@ -301,8 +352,8 @@ class WindowTests(unittest.TestCase):
                             for x in range(working.width()) for y in range(window.activity.extent)))
         window.hide();self.assertFalse(window.activity.timer.isActive())
         window.bring_forward();QTest.qWait(20);self.assertTrue(window.activity.timer.isActive())
-        window.toggle_compact();QTest.qWait(350);self.assertTrue(window.activity.timer.isActive())
-        window.toggle_compact();QTest.qWait(350);self.assertTrue(window.activity.timer.isActive())
+        window.toggle_compact();finish_morph()
+        window.toggle_compact();finish_morph()
         window.apply_appearance({'animation':False})
         self.assertFalse(window.activity.timer.isActive())
         self.assertEqual(window.activity.strength,1)

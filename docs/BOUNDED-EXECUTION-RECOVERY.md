@@ -46,7 +46,8 @@ the installed Qwen mapping uses xhigh. The picker shows saved selection, while
 request/header shows the request policy. The adapter displays both and any
 recovery override; backend enforcement remains provider-dependent.
 
-The native transcript hides only the exact successful opening notice
+Historical September 22 behavior (superseded by [task reliability](TASK-RELIABILITY.md)):
+the native transcript hid only the exact successful opening notice
 `Harness: Saved reasoning: minimal; requested reasoning: xhigh (request policy). Backend enforcement is provider-dependent.`
 This presentation filter applies to live events and history replay. DSH retains
 the event and request diagnostics; reasoning policy is unchanged. Errors, bounded

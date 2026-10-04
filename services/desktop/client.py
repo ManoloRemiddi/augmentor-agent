@@ -8,16 +8,20 @@ import socket
 import subprocess
 import sys
 import time
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from platform_adapters.paths import runtime_directory
+from platform_adapters.transport import LocalSocket
 
 
 def call(request,start=True):
-    path=Path(os.environ.get('XDG_RUNTIME_DIR',f'/tmp/augmentor-{os.getuid()}' if sys.platform=='darwin' else f'/run/user/{os.getuid()}'))/'augmentor-desktop.sock'
-    client=socket.socket(socket.AF_UNIX);client.settimeout(115)
+    path=runtime_directory()/'augmentor-desktop.sock'
+    client=LocalSocket();client.settimeout(115)
     try:
         try:client.connect(str(path))
         except (FileNotFoundError,ConnectionRefusedError):
             if not start or os.environ.get('AUGMENTOR_DESKTOP_NO_AUTOSTART')=='1' or request.get('method')!='connect':
                 if request.get('method')=='stop':return {'ok':True,'result':{'stopped':True}}
+                if request.get('method')=='status' and request.get('params',{}).get('allowAbsent') is True:return {'ok':True,'result':{'active':False,'sharing':False,'owner':None,'available':False}}
                 raise RuntimeError('Desktop control is not connected. Use linux_desktop_connect first.')
             # Retrieve only graphical session variables from the user's own manager.
             env=dict(os.environ)

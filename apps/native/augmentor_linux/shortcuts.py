@@ -35,16 +35,18 @@ def target(instance=None):
 
 
 def current_keys(instance=None):
+    if sys.platform=='win32':
+        from .windows_shortcuts import current_keys as read
+        return read(instance or current_name())
     if sys.platform=='darwin':
         from .macos_shortcuts import current_keys as read
-        if instance not in (None,'main'):raise RuntimeError('Second-window shortcuts are currently supported on KDE.')
-        return read()
+        return read(instance or current_name())
     return [int(value) for value in re.findall(r'-?\d+',call('shortcut',target(instance)[1])) if int(value)>0]
 
 
 def display_key(key):
     # Verified by a focused key test on this machine's MX Keys Mini.
-    return 'Fn+Space' if key==int(Qt.Key.Key_Hangul) else QKeySequence(key).toString(QKeySequence.SequenceFormat.NativeText)
+    return 'Fn+Space' if key=='Fn+Space' or key==int(Qt.Key.Key_Hangul) else QKeySequence(key).toString(QKeySequence.SequenceFormat.NativeText)
 
 
 def shortcut_key(sequence):
@@ -68,10 +70,12 @@ def write_atomic(path,text):
 
 
 def save_shortcut(sequence,instance=None):
+    if sys.platform=='win32':
+        from .windows_shortcuts import save_shortcut as save
+        return save(sequence,instance or current_name())
     if sys.platform=='darwin':
         from .macos_shortcuts import save_shortcut as save
-        if instance not in (None,'main'):raise RuntimeError('Second-window shortcuts are currently supported on KDE.')
-        return save(sequence)
+        return save(sequence,instance or current_name())
     component,action=target(instance)
     key=shortcut_key(sequence);previous=current_keys(instance)
     if key not in previous and 'true' not in call('isGlobalShortcutAvailable',str(key),component):

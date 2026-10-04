@@ -13,15 +13,77 @@ import os
 from pathlib import Path
 import platform
 import plistlib
+import re
 import shutil
 import subprocess
 import sys
 import sysconfig
 import tarfile
+import tempfile
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
 HEADER = '# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0\n'
+COMPANION_PYTHON_PACKAGES = ('PyYAML', 'websocket-client', 'keyring',
+                            'jaraco.classes', 'jaraco.context', 'jaraco.functools', 'more-itertools')
+
+
+def bundle_dictation(project, minimum_macos):
+    """Give the hidden microphone helper its own stable macOS bundle identity."""
+    runtime=project/'components/handy/runtime'
+    app=runtime/'Augmentor Dictation.app';contents=app/'Contents'
+    contents.mkdir(parents=True)
+    # Preserve the executable's existing ../Resources and ../lib/Handy lookups.
+    shutil.move(str(runtime/'bin'),contents/'MacOS')
+    shutil.move(str(runtime/'Resources'),contents/'Resources')
+    shutil.move(str(runtime/'lib'),contents/'lib')
+    info={'CFBundleIdentifier':'com.augmentor.agent.dictation',
+          'CFBundleName':'Augmentor Dictation','CFBundleDisplayName':'Augmentor Dictation — Handy',
+          'CFBundleExecutable':'handy','CFBundlePackageType':'APPL',
+          'CFBundleVersion':json.loads((runtime/'BUILD.json').read_text())['upstream']['version'].lstrip('v'),
+          'LSUIElement':True,'LSMinimumSystemVersion':minimum_macos,'NSHighResolutionCapable':True,
+          'NSMicrophoneUsageDescription':'Augmentor uses Handy to transcribe your voice when you activate dictation.',
+          'NSAppleEventsUsageDescription':'Insert your transcribed text into the application you selected.'}
+    (contents/'Info.plist').write_bytes(plistlib.dumps(info))
+    (runtime/'bin').mkdir()
+    launcher=runtime/'bin/handy'
+    launcher.write_text('#!/bin/sh\n'+HEADER+'exec "$(dirname "$0")/../Augmentor Dictation.app/Contents/MacOS/handy" "$@"\n')
+    launcher.chmod(0o755)
+    return app
+
+
+def build_launcher(destination, component, minimum_macos):
+    """Embed the pinned Python without changing the native desktop process identity."""
+    if component not in ('desktop', 'browser', 'runtime'):
+        raise ValueError('Unknown bundled component')
+    library = Path(sys.base_prefix)/'lib'/sysconfig.get_config_var('LDLIBRARY')
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    subprocess.run(['xcrun', 'clang', '-O2', '-Wall', '-Wextra', '-Werror',
+        '-target', 'arm64-apple-macos'+minimum_macos,
+        '-I'+sysconfig.get_path('include'), '-DAUGMENTOR_COMPONENT="'+component+'"',
+        str(ROOT/'services/platform/macos-launcher.c'), str(library),
+        '-Wl,-headerpad_max_install_names',
+        '-Wl,-rpath,@executable_path/../Resources/app/python/lib',
+        '-o', str(destination)], check=True)
+    # Standalone distributions may use the builder's absolute dylib install ID.
+    # Rewrite that reference before signing; never depend on the build machine.
+    install_id = subprocess.check_output(['otool', '-D', str(library)], text=True).splitlines()[1].strip()
+    subprocess.run(['install_name_tool', '-change', install_id,
+        '@rpath/'+library.name, str(destination)], check=True)
+
+
+def disk_image(app, destination):
+    """Read-only drag-install image; development status is explicit in its name."""
+    with tempfile.TemporaryDirectory(prefix='augmentor-dmg-', dir=destination.parent) as temporary:
+        stage = Path(temporary)
+        subprocess.run(['ditto', str(app), str(stage/app.name)], check=True)
+        (stage/'Applications').symlink_to('/Applications', target_is_directory=True)
+        shutil.copy2(ROOT/'docs/MACOS-PREVIEW.html', stage/'Start here.html')
+        subprocess.run(['hdiutil', 'create', '-quiet', '-volname', 'Augmentor Agent Preview',
+            '-srcfolder', str(stage), '-format', 'UDZO', str(destination)], check=True)
+    subprocess.run(['hdiutil', 'verify', '-quiet', str(destination)], check=True)
+    return {'artifact':destination.name, 'sha256':hashlib.sha256(destination.read_bytes()).hexdigest(),
+        'bytes':destination.stat().st_size, 'signedForDistribution':False, 'notarized':False}
 
 
 def copy(source, destination):
@@ -30,6 +92,25 @@ def copy(source, destination):
         shutil.copytree(source, destination, dirs_exist_ok=True, symlinks=True,
             ignore=shutil.ignore_patterns('__pycache__','*.pyc','.git','node_modules','test','tests'))
     else:shutil.copy2(source, destination)
+
+
+def build_icon(resources):
+    """Render the shared product artwork at every standard macOS icon scale."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QGuiApplication,QImage,QPainter
+    from PySide6.QtSvg import QSvgRenderer
+    application=QGuiApplication.instance() or QGuiApplication([])
+    renderer=QSvgRenderer(str(ROOT/'apps/native/augmentor_linux/assets/augmentor.svg'))
+    if not renderer.isValid():raise ValueError('Invalid application icon artwork.')
+    with tempfile.TemporaryDirectory(suffix='.iconset') as temporary:
+        for size in (16,32,128,256,512):
+            for scale in (1,2):
+                image=QImage(size*scale,size*scale,QImage.Format.Format_ARGB32)
+                image.fill(Qt.GlobalColor.transparent)
+                painter=QPainter(image);renderer.render(painter);painter.end()
+                name=f'icon_{size}x{size}'+('@2x' if scale==2 else '')+'.png'
+                if not image.save(str(Path(temporary)/name)):raise RuntimeError('Could not render app icon.')
+        subprocess.run(['iconutil','-c','icns',temporary,'-o',str(resources/'Augmentor.icns')],check=True)
 
 
 def application_inventory(project):
@@ -53,7 +134,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--out', type=Path, required=True, help='New, empty output directory')
     parser.add_argument('--component', choices=('desktop','companion'), default='desktop')
+    parser.add_argument('--dmg', action='store_true', help='Also create a development drag-install disk image')
+    parser.add_argument('--preview', action='store_true', help='Label an ad-hoc public preview candidate accurately')
+    parser.add_argument('--source-commit', help='Exact canonical source commit used for this candidate')
+    parser.add_argument('--source-notices', type=Path, help='Verified output of prepare-macos-sources.py')
     args = parser.parse_args()
+    if args.preview and (not args.source_commit or not re.fullmatch('[0-9a-f]{40}', args.source_commit) or not args.source_notices):
+        parser.error('A preview requires an exact source commit and prepared source notices.')
+    channel = 'preview' if args.preview else 'development'
     desktop = args.component == 'desktop'
     if sys.platform!='darwin' or platform.machine()!='arm64':
         parser.error('Build this target on an ARM64 Mac.')
@@ -82,13 +170,26 @@ def main():
     # Stage production JS with platform-specific dependencies and notices.
     subprocess.run([sys.executable,str(ROOT/'scripts/stage-production.py'),'--out',str(resources/'app')],check=True)
     project = resources/'app'
-    for name in ('dist','apps/native','apps/browser','scripts','services','adapters','config','docs','licenses','LICENSE','README.md','release/product.json','release/macos.json'):
+    for name in ('dist','apps/native','apps/browser','scripts','services','adapters','config','docs','licenses','LICENSE','README.md','release/product.json','release/macos.json','release/macos-requirements.txt','release/dsh'):
         copy(ROOT/name, project/name)
+    subprocess.run([sys.executable,str(ROOT/'scripts/stage-handy.py'),str(project)],check=True)
+    if args.source_notices:
+        source_report = json.loads((args.source_notices/'manifest.json').read_text())
+        for name, sha in source_report['notices'].items():
+            path = args.source_notices/name
+            if path.is_symlink() or not path.resolve().is_relative_to(args.source_notices.resolve()) or hashlib.sha256(path.read_bytes()).hexdigest()!=sha:
+                raise ValueError('Source notice differs from its inventory: '+name)
+        # Preserve the complete verified notice inventory, including upstream
+        # test/README notices excluded by the application source copier.
+        shutil.copytree(args.source_notices, project/'licenses/macos-sources')
     # python-build-standalone (used by uv) supplies a relocatable interpreter.
     # Copy its stdlib as well as this build environment's locked GUI dependencies.
     python = project/'python'
     copy(Path(sys.base_prefix), python)
     site = python/'lib'/f'python{sys.version_info.major}.{sys.version_info.minor}'/'site-packages'
+    # Do not merge a standalone interpreter's old pip metadata with the locked
+    # environment. Every shipped third-party package comes from this environment.
+    if site.exists():shutil.rmtree(site)
     copy(Path(sysconfig.get_path('purelib')), site)
     if desktop:
         subprocess.run([sys.executable,str(ROOT/'scripts/stage-macos-qt.py'),str(site/'PySide6'),
@@ -100,7 +201,7 @@ def main():
         shutil.rmtree(site)
         site.mkdir(parents=True)
         from importlib.metadata import distribution
-        for name in ('PyYAML','websocket-client'):
+        for name in COMPANION_PYTHON_PACKAGES:
             package=distribution(name)
             for entry in package.files or ():
                 relative=Path(str(entry))
@@ -110,7 +211,7 @@ def main():
         shutil.rmtree(project/'apps/native')
         # Pure socket clients also serve CLI integrations and acceptance tools;
         # retain them without any Qt presentation modules or desktop entrypoint.
-        for name in ('__init__.py','pi_client.py','prompt_client.py','runtime_start.py','preferences.py'):
+        for name in ('__init__.py','pi_client.py','prompt_client.py','runtime_start.py','preferences.py','dictation.py'):
             relative=Path('apps/native/augmentor_linux')/name
             copy(ROOT/relative,project/relative)
         shutil.rmtree(project/'services/desktop')
@@ -118,8 +219,8 @@ def main():
         if path.is_symlink() and os.path.isabs(os.readlink(path)):
             raise RuntimeError('The Python distribution contains a non-relocatable symlink: '+str(path.relative_to(python)))
     subprocess.run([str(python/'bin/python3'),'-I','-c',
-        ('import sys,PySide6,numpy,websocket,yaml; from PySide6.QtWidgets import QApplication; print(sys.prefix)' if desktop else
-         'import sys,websocket,yaml,importlib.util; assert importlib.util.find_spec("PySide6") is None; print(sys.prefix)')],check=True)
+        ('import sys,PySide6,numpy,websocket,yaml,sounddevice,onnxruntime; from keyring.backends.macOS import Keyring; from PySide6.QtWidgets import QApplication; print(sys.prefix)' if desktop else
+         'import sys,websocket,yaml,importlib.util; from keyring.backends.macOS import Keyring; assert importlib.util.find_spec("PySide6") is None; print(sys.prefix)')],check=True)
     subprocess.run([str(python/'bin/python3'),'-I','-B',str(ROOT/'scripts/python-license-inventory.py'),
         '--out',str(project/'licenses/python-inventory.json')],check=True)
     item = config['node']
@@ -138,12 +239,19 @@ def main():
             target.chmod(0o755 if member=='bin/node' else 0o644)
     archive.unlink()
     subprocess.run([str(project/'node/bin/node'),'--version'],check=True)
+    subprocess.run([sys.executable, str(ROOT/'scripts/stage-dsh.py'),
+        '--out', str(project/'dsh'), '--node', str(project/'node/bin/node')], check=True)
     product = json.loads((ROOT/'release/product.json').read_text())
     packaged_config=dict(config)
+    dsh_payload = json.loads((project/'dsh/payload.json').read_text())
+    packaged_config['dsh'] = {
+        'version':json.loads((ROOT/'release/dsh/package.json').read_text())['dependencies']['@deepseek-ai/dsh'],
+        'lockSha256':dsh_payload['lockSha256'], 'packages':len(dsh_payload['packages']),
+        'licenseReviewComplete':dsh_payload['licenseReviewComplete']}
     if not desktop:
         packaged_config.pop('qt',None);packaged_config.pop('pythonBindings',None)
-        packaged_config['pythonPackages']={name:config['pythonPackages'][name] for name in ('PyYAML','websocket-client')}
-    (project/'release.json').write_text(json.dumps({**product,**packaged_config,'channel':'development','component':args.component,'signedForDistribution':False},indent=2)+'\n')
+        packaged_config['pythonPackages']={name:config['pythonPackages'][name] for name in COMPANION_PYTHON_PACKAGES}
+    (project/'release.json').write_text(json.dumps({**product,**packaged_config,'channel':channel,'component':args.component,'sourceCommit':args.source_commit,'signedForDistribution':False,'notarized':False},indent=2)+'\n')
     if desktop:
         native=project/'native';native.mkdir(exist_ok=True)
         helper_info=native/'helper-info.plist'
@@ -161,38 +269,57 @@ def main():
     if desktop:launchers.insert(0,(app_name,'desktop'))
     for name, component in launchers:
         launcher = contents/'MacOS'/name
-        launcher.write_text('#!/bin/sh\n'+HEADER+
-            'app_root="$(CDPATH= cd -- "$(dirname -- "$0")/../Resources/app" && pwd)"\n'+
-            'exec "$app_root/python/bin/python3" -I -B "$app_root/scripts/launch-component.py" '+component+' "$@"\n')
-        launcher.chmod(0o755)
+        build_launcher(launcher, component, config['minimumMacOS'])
+    build_icon(resources)
     info = {
         'CFBundleName':'Augmentor Agent' if desktop else app_name,'CFBundleDisplayName':'Augmentor Agent' if desktop else app_name,
         'CFBundleIdentifier':'com.augmentor.Agent' if desktop else 'com.augmentor.Agent.Companion',
         'CFBundleExecutable':app_name if desktop else 'augmentor-runtime',
         'CFBundlePackageType':'APPL','CFBundleShortVersionString':product['version'],
         'CFBundleVersion':product['version'],'LSMinimumSystemVersion':config['minimumMacOS'],
-        'NSHighResolutionCapable':True,
+        'NSHighResolutionCapable':True,'CFBundleIconFile':'Augmentor.icns',
+        'NSMicrophoneUsageDescription':'Augmentor uses the microphone when you enable voice input.',
         'NSScreenCaptureUsageDescription':'Augmentor observes the desktop when you request computer control.',
         'NSAppleEventsUsageDescription':'Augmentor interacts with applications when you request computer control.'}
     (contents/'Info.plist').write_bytes(plistlib.dumps(info))
+    dictation_app=bundle_dictation(project,config['minimumMacOS'])
     inventory=json.dumps(application_inventory(project),sort_keys=True,indent=2)+'\n'
     (project/'application-inventory.json').write_text(inventory)
     inventory_hash=hashlib.sha256(inventory.encode()).hexdigest()
-    # Development signature only. A Developer ID signature and notarization are
-    # required before this target can be marked ready for public distribution.
+    # These executables live in the owned component, outside conventional nested
+    # .app/Frameworks locations. Sign every Mach-O explicitly before sealing the app.
+    handy=project/'components/handy/runtime'
+    macho_magic={b'\xcf\xfa\xed\xfe',b'\xce\xfa\xed\xfe',b'\xfe\xed\xfa\xcf',b'\xfe\xed\xfa\xce',b'\xca\xfe\xba\xbe',b'\xbe\xba\xfe\xca'}
+    for file in sorted(handy.rglob('*')):
+        if not file.is_file():continue
+        with file.open('rb') as source:magic=source.read(4)
+        if magic in macho_magic:
+            subprocess.run(['codesign','--force','--sign','-',str(file)],check=True)
+            subprocess.run(['codesign','--verify','--strict',str(file)],check=True)
+    subprocess.run(['codesign','--force','--sign','-',str(dictation_app)],check=True)
+    subprocess.run(['codesign','--verify','--deep','--strict',str(dictation_app)],check=True)
+    # Ad-hoc integrity signature. Preview users must explicitly approve this app
+    # in macOS; no Apple distribution identity or notarization is claimed.
     subprocess.run(['codesign','--force','--deep','--sign','-',str(app)],check=True)
     subprocess.run(['codesign','--verify','--deep','--strict',str(app)],check=True)
+    handy_inventory={file.relative_to(handy).as_posix():hashlib.sha256(file.read_bytes()).hexdigest() for file in sorted(handy.rglob('*')) if file.is_file()}
+    (out/'handy-signed-inventory.json').write_text(json.dumps({'schema':'augmentor-handy-signed/1','files':handy_inventory,'sourceCommit':args.source_commit},indent=2)+'\n')
     # Keep binary hashes outside the sealed bundle: code signing changes Mach-O bytes.
     if desktop:
         subprocess.run([str(python/'bin/python3'),'-I','-B',str(ROOT/'scripts/qt-library-inventory.py'),
             '--qt-version',config['qt'],'--out',str(out/'qt-library-inventory.json')],check=True)
-    artifact = out/f'augmentor-{args.component}-{product["version"]}-macos-arm64-development.zip'
+    artifact = out/f'augmentor-{args.component}-{product["version"]}-macos-arm64-{channel}.zip'
     subprocess.run(['ditto','-c','-k','--sequesterRsrc','--keepParent',str(app),str(artifact)],check=True)
-    report = {'component':args.component,'version':product['version'],'target':config['target'],'channel':'development',
+    report = {'component':args.component,'version':product['version'],'target':config['target'],'channel':channel,'sourceCommit':args.source_commit,
         'artifact':artifact.name,'sha256':hashlib.sha256(artifact.read_bytes()).hexdigest(),
         'bytes':artifact.stat().st_size,'signature':'ad-hoc','notarized':False,
         'publicReleaseReady':False,'applicationInventorySha256':inventory_hash,'python':config['python'],'node':item['version'],
-        'openGates':['installed acceptance','DSH feature qualification',*(['desktop control'] if desktop else []),'license review','Developer ID signing and notarization']}
+        'dsh':packaged_config['dsh'],
+        'openGates':['store migration','coordinated auto-update','final candidate acceptance','DSH feature qualification',
+            *(['desktop control','permission attribution'] if desktop else []),
+            'release source/notice verification','Developer ID signing and notarization (stable release)']}
+    if args.dmg:
+        report['diskImage'] = disk_image(app, artifact.with_suffix('.dmg'))
     (out/'artifacts.json').write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(report))
 

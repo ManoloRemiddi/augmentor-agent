@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 import tempfile
 
-DEFAULTS = {'resonant_voice': True, 'voice_mode': 'manual', 'voice_pause_ms': 800, 'theme': 'dark', 'hue': 190, 'brightness': 0, 'accent_hue': 160,
+DEFAULTS = {'ui_scale': 100, 'resonant_voice': True, 'voice_mode': 'manual', 'voice_pause_ms': 800, 'theme': 'dark', 'hue': 190, 'brightness': 0, 'accent_hue': 160,
             'accent_brightness': 0, 'saturation': 48, 'opacity': 85, 'animation': True, 'effect': 'plasma', 'background': 'none', 'background_image': '', 'skin_name': 'Custom', 'custom_skins': [], 'flares': True, 'pinned': True, 'placement': {}, 'harness':'dsh','format_colours':{}}
 
 
@@ -30,6 +30,8 @@ class Preferences:
                 pass
         if fresh_secondary:
             self.values["placement"] = {}
+        from .ui_scale import normalize
+        self.values['ui_scale'] = normalize(self.values['ui_scale'])
         for key, lo, hi in [('hue',0,359),('accent_hue',0,359),('brightness',-15,15),('accent_brightness',-15,15),('saturation',0,100),('opacity',35,100)]:
             self.values[key] = max(lo, min(hi, self.values[key]))
         self.values['format_colours']={k:v for k,v in self.values['format_colours'].items() if isinstance(v,str) and re.fullmatch(r'#[0-9a-fA-F]{6}',v)}
@@ -49,7 +51,7 @@ class Preferences:
         if self.values['voice_mode'] not in ('manual','hands-free'):self.values['voice_mode']='manual'
         self.values['voice_pause_ms']=max(400,min(2000,self.values['voice_pause_ms']))
         self.retired_harness = self.values['harness'] == 'opencode'
-        if self.values['harness'] not in ('pi','dsh'):self.values['harness']='dsh'
+        if self.values['harness'] not in ('pi','dsh','codex'):self.values['harness']='dsh'
         if self.values['theme'] not in ('light', 'dark'):
             self.values['theme'] = 'dark'
         # Persist the first clone now, even if the user never opens Settings.

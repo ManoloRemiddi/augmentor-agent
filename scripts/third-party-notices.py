@@ -12,7 +12,7 @@ from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
-PERMISSIVE = {'MIT', 'Apache-2.0', 'BSD-3-Clause', 'ISC', '0BSD', 'BlueOak-1.0.0', 'Unlicense'}
+PERMISSIVE = {'MIT', 'Apache-2.0', 'BSD-2-Clause', 'BSD-3-Clause', 'ISC', '0BSD', 'BlueOak-1.0.0', 'Unlicense', 'Python-2.0'}
 LICENSE_NAME = re.compile(r'^(licen[sc]e|copying)(\.|$|-)', re.I)
 NOTICE_NAME = re.compile(r'^(notice|copyright)(\.|$|-)', re.I)
 
@@ -35,15 +35,15 @@ def package_dirs(modules):
 
 
 def inventory(tree, catalog_root):
-    lock = json.loads((tree / 'package-lock.json').read_text())['packages']
-    catalog = json.loads((catalog_root / 'catalog.json').read_text())
+    lock = json.loads((tree / 'package-lock.json').read_text(encoding="utf-8"))['packages']
+    catalog = json.loads((catalog_root / 'catalog.json').read_text(encoding="utf-8"))
     for name, source in catalog['sources'].items():
         if digest((catalog_root / source['file']).read_bytes()) != source['sha256']:
             raise ValueError(f'{name}: reviewed license hash changed')
     components, texts, errors = [], {}, []
     for package in package_dirs(tree / 'node_modules'):
         relative = package.relative_to(tree).as_posix()
-        meta = json.loads((package / 'package.json').read_text())
+        meta = json.loads((package / 'package.json').read_text(encoding="utf-8"))
         key = meta['name'] + '@' + meta['version']
         locked = lock.get(relative)
         if locked is None:
@@ -55,7 +55,7 @@ def inventory(tree, catalog_root):
         effective_license=meta.get('license')
         choice=catalog.get('choices',{}).get(key)
         if choice and choice.get('expression')==effective_license:effective_license=choice.get('selected')
-        if effective_license not in PERMISSIVE:
+        if effective_license not in PERMISSIVE and catalog.get('additionalLicenses',{}).get(key) != effective_license:
             errors.append(f'{key}: unreviewed license {meta.get("license")}'); continue
         files = [p for p in sorted(package.iterdir()) if p.is_file() and LICENSE_NAME.match(p.name)]
         sources = []
@@ -84,6 +84,21 @@ def inventory(tree, catalog_root):
             if file.is_file() and NOTICE_NAME.match(file.name):
                 content = file.read_bytes(); sha = digest(content); texts[sha] = content
                 sources.append({'path': file.relative_to(tree).as_posix(), 'sha256': sha})
+        # Some upstream npm wrappers omit their repository NOTICE as well as LICENSE.
+        # Keep additional texts bound to the reviewed exact package version.
+        for notice in catalog.get('additionalNotices', {}).get(key, []):
+            entry = catalog['sources'][notice]
+            content = (catalog_root / entry['file']).read_bytes(); sha = digest(content)
+            if sha != entry['sha256']:
+                errors.append(f'{key}: reviewed notice hash changed'); continue
+            texts[sha] = content
+            sources.append({'path': 'licenses/' + entry['file'], 'url': entry['url'], 'sha256': sha})
+        for name in catalog.get('packageNotices', {}).get(key, []):
+            file = package / name
+            if Path(name).name != name or not file.is_file():
+                errors.append(f'{key}: missing reviewed package notice {name}'); continue
+            content = file.read_bytes(); sha = digest(content); texts[sha] = content
+            sources.append({'path': file.relative_to(tree).as_posix(), 'sha256': sha})
         components.append({'name': meta['name'], 'version': meta['version'], 'path': relative,
                            'license': effective_license, 'declaredLicense':meta['license'], 'integrity': locked.get('integrity'), 'notices': sources})
     if errors:
@@ -106,7 +121,7 @@ def main():
     text_dir = args.out / 'texts'; text_dir.mkdir(exist_ok=True)
     for sha, content in texts.items():
         (text_dir / (sha + '.txt')).write_bytes(content)
-    (args.out / 'npm-components.json').write_text(json.dumps(report, indent=2) + '\n')
+    (args.out / 'npm-components.json').write_text(json.dumps(report, indent=2) + '\n', encoding="utf-8", newline="\n")
     print(f'Collected notices for {len(report["components"])} production package instances.')
 
 

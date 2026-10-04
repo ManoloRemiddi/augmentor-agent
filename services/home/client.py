@@ -1,7 +1,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Shared local pairing configuration. Never returns the NAS bearer to a UI."""
 import json
-import fcntl
+from platform_adapters import locks as fcntl
 import os
 from pathlib import Path
 import tempfile
