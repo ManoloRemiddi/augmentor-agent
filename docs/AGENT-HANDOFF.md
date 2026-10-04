@@ -2,6 +2,21 @@
 
 # Start here: agent handoff
 
+## October 4 saved-prompt Enter merge candidate
+
+PR #11 integrates the current main and browser-typing candidate without code
+conflicts. All 95 Browser and 25 focused native tests pass, with type/build
+checks. See [saved prompts](SLASH-COMMANDS.md#october-4-integrated-source-qualification)
+for scope; hosted platform/package validation remains the merge gate. This is
+source integration and does not change installed selections or running windows.
+
+## October 4 browser typing merge candidate
+
+PR #31 integrates main `d93eb49` while preserving both handoff histories.
+Current type/build and all 93 Browser tests pass; hosted package/platform checks
+remain the merge gate. See [Desktop control](DESKTOP-CONTROL.md#october-4-source-merge-qualification)
+for scope. Installed selections and running applications are unchanged.
+
 ## Application SDK alignment source — October 3
 
 The owner-authorized source integration is complete: product PR #34 merged on
@@ -377,6 +392,22 @@ preserves the original missing clipboard dependency license and passes the full
 target-filtered notice audit. Final hosted results are recorded in the guide.
 Do not claim a qualified Windows installer or physical microphone acceptance
 solely from a native build or successful component enable.
+
+## October 2 browser and computer capability correction
+
+[Desktop control](DESKTOP-CONTROL.md#october-2-browser-capability-discovery-and-input-dispatch)
+records task ownership/capability discovery guidance and framework-managed browser
+input dispatch. Five input regressions, all 70 Browser cases, nine related
+capability/policy cases, six DSH composition checks, all 480 root cases (478 passed, two opt-in skips), and type/build checks pass.
+Real-browser React input/textarea saved-state verification passed. This does not
+establish every application's GUI support or live Google Forms acceptance.
+Existing desktop consent, Stop, platform limits and document-target checks remain.
+Installed adoption must preserve compatible artifact versions and saved identity
+snapshots; the guide distinguishes extension reload from source publication.
+Implementation `dffa45c` is pushed in PR #31; the compatible installed Linux
+release is selected and DSH guidance reloaded with idle/readiness checks.
+Primary retains its draft and original UI process; extension file replacement
+is complete but loaded-worker reload remains pending. See the installed checkpoint.
 
 ## October 1 merge blockers: current main and separate Codex prerequisite
 
@@ -1435,6 +1466,14 @@ store migration, coordinated updating, production signing and permission accepta
 remain open. The build Mac has no valid Developer ID signing identity.
 Linux installed selections, live model/speech settings and Mac registrations were
 not changed. Do not present this source branch as a published Mac release.
+
+## September 26 saved-prompt Enter restoration
+
+[Saved prompts](SLASH-COMMANDS.md) again expand into the draft on the first Enter;
+the second Enter sends. Desktop and Browser have separate keyboard handlers and
+both are corrected. Tab/click still expand; Escape followed by Enter preserves
+literal DSH command access when names overlap. See the guide for qualification
+and installed adoption, which is distinct from source publication.
 
 ## September 25 source integration
 

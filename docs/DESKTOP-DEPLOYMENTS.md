@@ -52,6 +52,15 @@ three windows are online/model-ready with voice available and no pending update.
 Settings and saved conversation selections were preserved. Rollback includes the
 backed-up preset files as well as the previous desktop selection.
 
+## September 26: Enter expands saved prompts before sending
+
+[Saved prompt correction and evidence](SLASH-COMMANDS.md#installed-adoption--september-26)
+records implementation `206c594`, selected in managed release
+`20260926-083736-5d6b65f6`. The secondary instance has adopted it, online with
+voice available and its draft/conversation/model preserved. Main/mobile retain
+their previous running build until reopened. The prepared Browser extension is
+also patched; sidebar reopening or extension reload is its separate adoption step.
+
 ## September 25: immediate composer feedback
 
 [Composer correction and installed evidence](COMPOSER-SEND-FEEDBACK.md) records
