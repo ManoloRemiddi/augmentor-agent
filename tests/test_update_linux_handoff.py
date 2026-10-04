@@ -80,7 +80,8 @@ class LinuxHandoffTests(unittest.TestCase):
             transactions=state/'augmentor/updates';transactions.mkdir(parents=True,mode=0o700)
             attempt='d'*48
             observer=data/'updates/observers'/('linux-'+attempt)/'Observer'
-            observer.parent.mkdir(parents=True,mode=0o700)
+            observer.parent.parent.mkdir(mode=0o700)
+            observer.parent.mkdir(mode=0o700)
             shutil.copytree(source,observer,symlinks=True)
             payload=snapshot(source)
             self.assertEqual(snapshot(observer),payload)
@@ -108,6 +109,14 @@ os.execv(args[0],args)
             self.assertIsNone(report['transactionId'])
             self.assertFalse((transactions/'active.json').exists())
             self.assertEqual(snapshot(source),payload);self.assertEqual(snapshot(observer),payload)
+            self.assertEqual(read_json(data/'desktop.json')['root'],str(source))
+            from lifecycle.posix_observer_retention import collect,SCHEMA
+            marker=observer.parent.parent/(observer.parent.name+'.completed.json')
+            self.assertEqual(read_json(marker),{'schema':SCHEMA,'runtime':observer.parent.name,
+                'outcome':'deferred','payloadSHA256':payload['sha256']})
+            self.assertEqual(collect(observer.parent.parent),1)
+            self.assertFalse(observer.parent.exists())
+            self.assertEqual(snapshot(source),payload)
             self.assertEqual(read_json(data/'desktop.json')['root'],str(source))
 
     def test_custom_selected_source_or_external_interpreter_is_not_adopted(self):

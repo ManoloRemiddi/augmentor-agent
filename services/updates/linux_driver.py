@@ -22,6 +22,7 @@ from .linux_coordinator import LinuxCoordinator
 from .installation import AutomaticInstallAuthority
 from .manager import UpdateManager
 from .attempt import attempt_id,write_result
+from lifecycle.posix_observer_retention import retain, eligible
 
 
 def run(observer,source_root,release_digest,payload_digest,attempt,bootstrap_fd):
@@ -29,6 +30,11 @@ def run(observer,source_root,release_digest,payload_digest,attempt,bootstrap_fd)
     attempt_id(attempt);observer=Path(observer).resolve();source=Path(source_root).absolute()
     data,transactions=locations(source);transactions=require_directory(transactions)
     updates=require_directory(data/'updates');coordinator=None;candidate=None
+    retained=False;verified=False
+    def retire(outcome):
+        if retained and verified and outcome in ('deferred','target-healthy'):
+            try:eligible(observer.parent,outcome,payload_digest)
+            except (OSError,ValueError):pass  # Cleanup cannot change the installation outcome.
     try:
         if (any(not isinstance(value,str) or not re.fullmatch('[a-f0-9]{64}',value) for value in (release_digest,payload_digest))
                 or type(bootstrap_fd) is not int or bootstrap_fd<3):raise ValueError('Use exact source digests and the original inherited launch descriptor.')
@@ -37,6 +43,7 @@ def run(observer,source_root,release_digest,payload_digest,attempt,bootstrap_fd)
                 or _executable(os.getpid()).resolve()!=(observer/'python/bin/python3').resolve()):
             raise ValueError('The actual updater executable and code must belong to the retained observer.')
         with ExitStack() as held:
+            retain(observer.parent);retained=True
             held.callback(os.close,bootstrap_fd)
             fresh=descriptor(transactions/'bootstrap.lock',writable=True)
             try:
@@ -49,6 +56,7 @@ def run(observer,source_root,release_digest,payload_digest,attempt,bootstrap_fd)
             release=_read(observer/'release.json',65536)
             if hashlib.sha256(release).hexdigest()!=release_digest or snapshot(observer)['sha256']!=payload_digest:
                 raise ValueError('The retained source changed across exec.')
+            verified=True
             with ExitStack() as admission:
                 admission.enter_context(Startup())
                 lifetime=descriptor(runtime_directory()/'installation.lock',writable=True,create=True)
@@ -67,13 +75,16 @@ def run(observer,source_root,release_digest,payload_digest,attempt,bootstrap_fd)
             from .linux_reopen import reopen_dsh_observed,reopen_desktop_observed
             reopen_dsh_observed(coordinator.backend,result)
             reopened=reopen_desktop_observed(coordinator.backend,coordinator.reopen_plan,result)
+            retire('target-healthy')
             return write_result(transactions,attempt,'target-healthy',candidate=candidate,
                 transaction=result['transactionId'],reopened=reopened)
     except Exception as error:
         if coordinator is not None and coordinator.completion is not None:
+            retire('target-healthy')
             return write_result(transactions,attempt,'target-healthy',candidate=candidate,
                 transaction=coordinator.completion['transactionId'],error='The update is installed. Reopen Augmentor normally. '+str(error))
         pending=transactions/'active.json';cancelled=getattr(error,'augmentor_preparation_cancelled',None)
         outcome='deferred' if cancelled or coordinator is None and not pending.exists() and not pending.is_symlink() else 'failed'
+        retire(outcome)
         write_result(transactions,attempt,outcome,candidate=candidate,error=error)
         raise

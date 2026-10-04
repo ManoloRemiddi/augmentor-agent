@@ -915,3 +915,14 @@ unittest discover -s tests -p test_update_signed_authority.py -v`; absence of th
 locked dependencies is an explicit skip. Full Windows builds invoke it after
 dependency installation. This is authorization evidence, not OS forward-update
 qualification or production signing/feed provisioning.
+
+`test_update_posix_observer_retention.py` uses actual Unix file locks and a normally
+exiting inert child to ensure complete retained update runtimes survive until
+process exit. Four cases cover unchanged completed collection, unknown/unleased
+and foreign hints, changed/hardlinked/external-link/extra contents preservation,
+and a Mac-shaped internal framework link with an untouched selected release.
+This runs on Linux/macOS and explicitly skips Windows. The existing copied Linux
+ELF handoff test also verifies production observer refusal before network/apply,
+then collection after actual exit without changing the selected source. No model,
+installer or private user profile is exercised; Mac bundle signing/forward
+integration is a separate native qualification gate.

@@ -2,6 +2,18 @@
 
 # Start here: agent handoff
 
+Full Unix observer retention now covers the complete copied Linux runtime and
+Mac bundle. A shared kernel lease remains open until actual process exit; only
+verified deferred or completed outcomes publish cleanup hints. A later bootstrap,
+under its original exclusion and with no pending transaction, can collect exact
+unchanged code. Unknown/old unleased observers, changed files, foreign links and
+extra contents survive. Source releases, stages, backups and private data are
+outside this collector. Four actual Unix lock/file cases and the copied Linux
+ELF refusal/exit/collection case pass; broad host updater tests pass 264 with six
+explicit platform/context skips. Mac native qualification is pending for this
+follow-up. No source/customer eligibility, trust configuration or owner install
+was changed. See UPDATE-SYSTEM.md for the exact limited retention scope.
+
 Current October 4 evidence: corrected full Windows run
 [37170465430](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37170465430)
 at `c40926b` is terminal success on x64/ARM64. Both downloaded installed reports

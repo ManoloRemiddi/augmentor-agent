@@ -1951,3 +1951,43 @@ Public feed and eligibility remain false. Native signed-forward, full desktop/DS
 package/shared-user, Mac shared/Companion, SDK owner teardown, legacy bridge,
 interrupted recovery/retention and production signing gates remain open. Owner
 installation/profile/model/GPU settings have not changed.
+
+### Full Unix observer retention
+
+Linux and Mac previously retained a complete isolated source runtime/bundle on
+every attempt without retiring those copies. Daily updates could therefore
+accumulate gigabytes of temporary code. `posix_observer_retention` now retains a
+separate shared kernel lease for each exact private `linux-<attempt>/Observer` or
+`mac-<attempt>/Observer.app` directory. The original observer acquires it during
+inherited bootstrap exclusion and keeps its descriptor through Python teardown
+until OS process exit. After independently validating its complete source payload,
+only a confirmed deferred attempt or actual completed installation can publish a
+cleanup hint containing the original verified payload digest. Unknown post-drain
+outcomes remain unmarked. A reopening failure after durable completion can retire
+the observer without changing the successful installation result.
+
+A later bootstrap collects under the existing exclusive bootstrap lock, after
+unfinished-transaction refusal and before creating a new observer. Collection
+requires the original lease file to exist and an exclusive kernel acquisition,
+an exact sidecar schema/name/outcome, a private unredirected hierarchy with exactly
+one expected child, unchanged complete payload identity, and the platform's
+descriptor-based symlink-safe recursive deletion. Legitimate internal Mac
+framework links are checked without following them during removal. Changed code,
+hard links, external/invalid links, extra files, malformed hints, old directories
+without lease files and live holders all survive. Small reusable lock files remain
+to prevent namespace races. These hints grant no install, recovery or replay
+authority. Selected artifacts, downloaded candidates, stages, recovery backups,
+settings and conversations are never collection targets; their retention gates
+remain separate required work. Cleanup failure does not alter an install outcome.
+
+Four host Unix cases use actual private files and, for lifetime admission, an
+actual normally exiting inert subprocess. The copied Linux ELF observer case also
+executes the production observer, verifies its unqualified-source refusal before
+network/drain/apply, then collects only its completed temporary copy after exit;
+the original selected artifact and manifest remain unchanged. The fixture's cache
+directory now matches production private permissions. Broad host updater tests
+pass 264 cases with six explicit platform/context skips. A Mac-shaped internal
+framework-link tree is exercised on Linux; native Mac locks/bundle integration
+still require fresh hosted qualification. This does not qualify signed forward
+installation, actual active user profiles or public automatic eligibility. No
+owner installation/profile/model/GPU or signing/feed configuration changed.

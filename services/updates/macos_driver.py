@@ -22,6 +22,7 @@ from .macos_coordinator import MacCoordinator
 from .macos_staging import stage_download
 from .installation import AutomaticInstallAuthority
 from .attempt import attempt_id,write_result
+from lifecycle.posix_observer_retention import retain, eligible
 
 
 def run(observer,source_bundle,release_digest,payload_digest,attempt,bootstrap_fd):
@@ -30,6 +31,11 @@ def run(observer,source_bundle,release_digest,payload_digest,attempt,bootstrap_f
     root=source_bundle/'Contents/Resources/app';bundle,base,transactions=locations(root)
     transactions=require_directory(transactions);updates=require_directory(base/'data/augmentor/updates')
     coordinator=None;candidate=None
+    retained=False;verified=False
+    def retire(outcome):
+        if retained and verified and outcome in ('deferred','target-healthy'):
+            try:eligible(observer.parent,outcome,payload_digest)
+            except (OSError,ValueError):pass  # Preserve the confirmed installation result.
     try:
         if (any(not isinstance(value,str) or not re.fullmatch('[a-f0-9]{64}',value) for value in (release_digest,payload_digest))
                 or type(bootstrap_fd) is not int or bootstrap_fd<3):raise ValueError('Use exact source digests and the inherited original launch descriptor.')
@@ -38,6 +44,7 @@ def run(observer,source_bundle,release_digest,payload_digest,attempt,bootstrap_f
                 or Path(__file__).resolve().parents[2]!=observer/'Contents/Resources/app'):
             raise ValueError('The actual updater executable and code must be outside the replaceable source.')
         with ExitStack() as held:
+            retain(observer.parent);retained=True
             held.callback(os.close,bootstrap_fd)
             fresh=descriptor(transactions/'bootstrap.lock',writable=True)
             try:
@@ -51,6 +58,7 @@ def run(observer,source_bundle,release_digest,payload_digest,attempt,bootstrap_f
             if hashlib.sha256(release).hexdigest()!=release_digest:raise ValueError('The retained release changed across exec.')
             payload=verify_bundle(observer,release)
             if payload['sha256']!=payload_digest:raise ValueError('The retained payload changed across exec.')
+            verified=True
             with ExitStack() as admission:
                 admission.enter_context(Startup())
                 lifetime=descriptor(runtime_directory()/'installation.lock',writable=True,create=True)
@@ -72,14 +80,17 @@ def run(observer,source_bundle,release_digest,payload_digest,attempt,bootstrap_f
             coordinator=MacCoordinator(bundle,target_bundle,runtime_directory(),shared,transactions,release,target_release,
                 payload,target_payload,artifact(source),artifact(target))
             result=coordinator.run(authority.check)
+            retire('target-healthy')
             return write_result(transactions,attempt,'target-healthy',candidate=candidate,
                 transaction=result['transactionId'],reopened=result['reopened'])
     except Exception as error:
         if coordinator is not None and coordinator.completion is not None:
+            retire('target-healthy')
             return write_result(transactions,attempt,'target-healthy',candidate=candidate,
                 transaction=coordinator.completion['transactionId'],error='The update is installed. Reopen Augmentor normally. '+str(error))
         cancelled=getattr(error,'augmentor_preparation_cancelled',None)
         pending=transactions/'active.json'
         outcome='deferred' if cancelled or coordinator is None and not pending.exists() and not pending.is_symlink() else 'failed'
+        retire(outcome)
         write_result(transactions,attempt,outcome,candidate=candidate,error=error)
         raise

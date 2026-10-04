@@ -80,6 +80,8 @@ def bootstrap(root,attempt):
             held.callback(os.close,fd);locks.flock(fd,locks.LOCK_EX|locks.LOCK_NB)
             require_clear(transactions)
             observers=require_directory(private_directory(data/'updates/observers'))
+            from lifecycle.posix_observer_retention import collect
+            collect(observers)
             directory=observers/('linux-'+attempt);directory.mkdir(mode=0o700)
             retained=directory/'Observer'
             with ExitStack() as source:
