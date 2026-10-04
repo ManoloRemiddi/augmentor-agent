@@ -39,7 +39,7 @@ jobs:
           sudo runuser -u augupdatefixture -- env CI=true HOME=/home/augupdatefixture \
             XDG_RUNTIME_DIR="/run/user/$task_uid" DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$task_uid/bus" \
             AUGMENTOR_SYSTEMD_QUALIFICATION=1 AUGMENTOR_QUALIFICATION_NODE=/home/augupdatefixture/qualification-node \
-            /bin/sh -c 'cd /home/augupdatefixture/source && exec /usr/bin/python3 -B -m unittest discover -s tests -p test_update_linux_service_native.py -v'
+            /bin/sh -c 'cd /home/augupdatefixture/source && /usr/bin/python3 -B -m unittest discover -s tests -p test_update_linux_service_native.py -v && exec /usr/bin/python3 -B -m unittest discover -s tests -p test_update_dictation.py -v'
       - name: Remove only the dedicated fixture account
         if: always()
         shell: bash

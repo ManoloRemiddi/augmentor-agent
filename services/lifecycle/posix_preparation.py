@@ -21,7 +21,7 @@ class PosixPreparation:
         self.root,self.runtime,self.shared=Path(root).resolve(),Path(runtime),Path(shared)
         self.transactions=transactions
         self.gate=None;self.observations=[];self.reservations=Reservations()
-        self.windows=[];self.browsers=[];self.dsh=[];self.companions=[];self.shortcuts=[]
+        self.windows=[];self.browsers=[];self.dsh=[];self.companions=[];self.shortcuts=[];self.dictation=[]
         self.entered=False;self.closed=False;self.cleanup_thread=None
 
     def reserve(self,items):
@@ -48,6 +48,7 @@ class PosixPreparation:
             self.windows=self.reserve(discover_sockets(self.runtime,
                 r'augmentor-linux-pi(?:-[a-z][a-z0-9-]{0,31})?\.sock',self.root,window_executable(self.root),kind='window'))
             self.browsers=self.reserve(discover_sockets(self.runtime,r'augmentor-browser-[1-9][0-9]{0,19}\.sock',self.root,node,kind='browser'))
+            self.dictation=self.reserve(discover_sockets(self.runtime,r'augmentor-dictation-[1-9][0-9]{0,19}\.sock',self.root,python,kind='dictation'))
             self.dsh=self.reserve(discover_sockets(self.runtime,r'augmentor-dsh-[1-9][0-9]{0,19}\.sock',self.root,node,kind='dsh'))
             if self.shared.exists():
                 self.companions=self.reserve(discover_sockets(self.shared,r'(?:prompts|dual-memory)\.sock',self.root,python,kind='companion'))
@@ -66,11 +67,13 @@ class PosixPreparation:
         for window in self.windows:
             name=window.endpoint.stem
             names.append('main' if name==prefix else name[len(prefix)+1:])
-        return {'instances':names,'hadBrowser':bool(self.browsers)}
+        result={'instances':names,'hadBrowser':bool(self.browsers)}
+        if self.dictation:result['hadDictation']=True
+        return result
 
     def drain(self,*,checkpoint):
         self.check()
-        for item in (*self.windows,*self.browsers,*self.dsh,*self.companions,*self.shortcuts):
+        for item in (*self.windows,*self.browsers,*self.dictation,*self.dsh,*self.companions,*self.shortcuts):
             self.check();self.reservations.commit(item,checkpoint=checkpoint)
         self.check()
 

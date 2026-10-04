@@ -19,14 +19,18 @@ ACTIONS=('status','prepare','renew','cancel','commit')
 
 class UnixParticipant:
     def __init__(self,endpoint,root,executable,*,kind):
-        if kind not in ('window','shortcut','companion','dsh','browser'):raise ValueError('Unsupported Unix component.')
+        if kind not in ('window','shortcut','companion','dsh','browser','dictation'):raise ValueError('Unsupported Unix component.')
         self.endpoint,self.root,self.executable=Path(endpoint),Path(root).resolve(),Path(executable)
         self.kind=kind;self.process=None;self.pid=None;self.closed=False
         try:
-            self.initial=self.exchange(self.command('describe' if kind in ('dsh','browser') else 'status'))
+            self.initial=self.exchange(self.command('describe' if kind in ('dsh','browser','dictation') else 'status'))
             if kind=='window':
                 if self.initial.get('maintenanceAdmission')!=1:raise ValueError('The window cannot reserve maintenance.')
             elif kind in ('shortcut','companion'):component_state(self.initial[self.result_key],'status')
+            if kind=='dictation':
+                from .dictation_control import scope
+                if any(self.initial.get(key)!=value for key,value in scope().items()):
+                    raise ValueError('The dictation broker belongs to another session or state. Its work was preserved.')
         except BaseException:self.close();raise
 
     @property
@@ -61,7 +65,7 @@ class UnixParticipant:
         if (result.get('pid')!=self.pid or not isinstance(result.get('buildRoot'),str)
                 or Path(result['buildRoot']).resolve()!=self.root):
             raise ValueError('The component belongs to another build; its work was preserved.')
-        if self.kind in ('dsh','browser') and (result.get('protocol')!=PROTOCOL or result.get('component')!=self.kind
+        if self.kind in ('dsh','browser','dictation') and (result.get('protocol')!=PROTOCOL or result.get('component')!=self.kind
                 or result.get('maintenanceAdmission')!=1):raise ValueError('Unsupported Unix component identity.')
         if self.kind=='companion' and result.get('id')!=json.loads(command)['id']:
             raise ValueError('The companion reply does not match this request.')
@@ -96,7 +100,7 @@ def discover_sockets(directory,pattern,root,executable,*,kind):
             try:item=UnixParticipant(endpoint,root,executable,kind=kind)
             except (FileNotFoundError,ConnectionRefusedError):continue
             result.append(item)
-            if kind in ('dsh','browser') and item.pid!=int(endpoint.stem.rsplit('-',1)[1]):
+            if kind in ('dsh','browser','dictation') and item.pid!=int(endpoint.stem.rsplit('-',1)[1]):
                 raise ValueError('The endpoint registration and actual process differ.')
         return result
     except BaseException:

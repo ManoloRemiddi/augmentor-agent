@@ -40,9 +40,13 @@ def reopen_observed(backend,plan,completion):
         if (record['phase']!='complete' or record['revision']!=original['revision']+3
                 or any(record[key]!=original[key] for key in ('schema','id','source','target','steps'))):
             raise ValueError('The exact observed attempt was not completed; preserve it for inspection.')
-        if verify_bundle(backend.destination,backend.target_release,development=backend.development)!=backend.target_payload:
-            raise ValueError('The installed target changed after independent health.')
-        if not plan['instances']:return False
+        def immutable():
+            if verify_bundle(backend.destination,backend.target_release,development=backend.development)!=backend.target_payload:
+                raise ValueError('The installed target changed after independent health.')
+        immutable()
+        from .posix_dictation_reopen import reopen
+        dictation_reopened=reopen(backend,plan,backend.destination/'Contents/Resources/app',backend.gate.path.parent,immutable)
+        if not plan['instances']:return dictation_reopened
         if backend.target_payload['component']!='desktop':raise ValueError('A companion bundle cannot reopen desktop windows.')
         launcher=backend.destination/'Contents/MacOS/Augmentor Agent Desktop'
         if not launcher.is_file():raise ValueError('The verified desktop launcher is unavailable.')

@@ -19,7 +19,11 @@ broker=importlib.util.module_from_spec(spec);spec.loader.exec_module(broker)
 class DictationTests(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory(prefix='augmentor-dictation-test-');self.addCleanup(self.temp.cleanup)
-        self.base=Path(self.temp.name);self.backend=broker.Backend(self.base)
+        self.base=Path(self.temp.name)
+        environment=patch.dict(os.environ,{'XDG_RUNTIME_DIR':str(self.base/'run'),
+            'XDG_STATE_HOME':str(self.base/'state')})
+        environment.start();self.addCleanup(environment.stop)
+        self.backend=broker.Backend(self.base)
 
     def test_theme_round_trip_while_disabled_never_starts_microphone(self):
         value=dictation.theme({'theme':'light','accent_hue':32,'opacity':70,'animation':False})
@@ -122,7 +126,8 @@ class DictationTests(unittest.TestCase):
 
     def test_incomplete_checkout_cannot_own_an_enabled_session(self):
         checkout=self.base/'checkout'
-        for relative in ('services/dictation/server.py','services/dictation/portal.py','apps/native/augmentor_linux/dictation.py'):
+        for relative in ('services/dictation/server.py','services/dictation/portal.py',
+                'services/dictation/maintenance.py','services/lifecycle/admission.py','apps/native/augmentor_linux/dictation.py'):
             target=checkout/relative;target.parent.mkdir(parents=True,exist_ok=True)
             shutil.copy2(ROOT/relative,target)
         state=self.base/'state';state.mkdir(mode=0o700)

@@ -11,9 +11,10 @@ import time
 from multiprocessing.connection import Listener
 
 ROOT=Path(__file__).resolve().parents[2]
-sys.path.insert(0,str(ROOT/'apps/native'));sys.path.insert(0,str(ROOT))
+sys.path[:0]=[str(ROOT/'services'),str(ROOT/'apps/native'),str(ROOT)]
 from augmentor_linux.dictation import location
 from services.dictation import portal
+from services.dictation.maintenance import DictationMaintenance
 
 
 def process_alive(pid):
@@ -45,6 +46,7 @@ class Backend:
         self.inputdir=base/session;self.inputdir.mkdir(exist_ok=True,mode=0o700)
         self.statefile=base/'preferences.json'
         self.preferences=json.loads(self.statefile.read_text()) if self.statefile.exists() else {'enabled':False}
+        self.maintenance=DictationMaintenance(self)
 
     def save(self):
         temporary=self.statefile.with_suffix('.tmp')
@@ -70,10 +72,6 @@ class Backend:
             env['GDK_BACKEND']='x11'
         env['PATH']=str(self.binary().parent)+os.pathsep+env.get('PATH','')
         env['YDOTOOL_SOCKET']=str(self.inputdir/'input.sock')
-        sys.path.insert(0,str(ROOT/'services/lifecycle'))
-        if os.name!='nt':
-            from lease import hold
-            hold('runtime')
         self.generation=time.monotonic_ns()
         self.child=subprocess.Popen([str(self.binary())],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,env=env,**({'umask':0o077} if os.name!='nt' else {'creationflags':0x08000000}))
         threading.Thread(target=self.read,args=(self.child,),daemon=True).start()
@@ -91,8 +89,9 @@ class Backend:
             owner,session,pressed=self.key_events.get()
             with self.lock:
                 if owner is not self.portal or owner.session!=session or not self.child or self.child.poll() is not None:continue
-                try:self.call('shortcut.event',{'pressed':pressed})
-                except (OSError,RuntimeError,TimeoutError):pass
+                try:
+                    with self.maintenance.work():self.call('shortcut.event',{'pressed':pressed})
+                except (OSError,RuntimeError,TimeoutError,ValueError):pass
 
     def activate(self):
         self.start_input()
@@ -160,12 +159,34 @@ class Backend:
                 child.terminate()
                 try:child.wait(timeout=2)
                 except subprocess.TimeoutExpired:child.kill();child.wait()
-        module=sys.modules.get('lease')
-        if module:
-            for descriptor in module._leases:os.close(descriptor)
-            module._leases.clear()
+
+    def normal_stop(self):
+        """Only a committed idle reservation may use non-escalating shutdown."""
+        with self.lock:
+            if not self.maintenance.gate.closing:
+                raise RuntimeError('Reserve and commit dictation before update shutdown.')
+            instance,self.portal=self.portal,None
+            if instance:instance.close()
+            if self.input_daemon is not None:
+                if self.input_daemon.poll() is None:
+                    self.input_daemon.terminate()
+                    self.input_daemon.wait(timeout=5)
+                self.input_daemon=None
+            if self.child is not None:
+                if not self.child.stdin.closed:self.child.stdin.close()
+                if self.child.wait(timeout=10)!=0:
+                    raise RuntimeError('The native dictation child did not exit normally. Preserve maintenance for inspection.')
+                self.child=None
+            (self.inputdir/'input.sock').unlink(missing_ok=True)
+            self.shutting_down=True
 
     def request(self, method, params):
+        with self.lock:
+            if method.startswith('host.maintenance.'):
+                return self.maintenance.control(method,params)
+            with self.maintenance.work():return self.ordinary_request(method,params)
+
+    def ordinary_request(self, method, params):
         with self.lock:
             if self.owner:
                 if not process_alive(self.owner['pid']):
@@ -234,6 +255,7 @@ class Backend:
                         except Exception:self.stop();self.preferences['enabled']=False;self.save()
                         raise
                     portal_changed=True
+            if method=='model.download':self.maintenance.download_started(params.get('id'))
             try:result=self.call(method,params)
             except Exception:
                 if portal_changed:
@@ -241,10 +263,12 @@ class Backend:
                     # Release both owners rather than leave two different bindings.
                     self.stop();self.preferences['enabled']=False;self.save()
                 raise
+            if method=='model.cancel':self.maintenance.downloads.pop(params.get('id'),None)
             if method=='status':
                 result['revision']=str(self.generation)+'/'+str(result['revision'])
                 result['shortcut_description']=self.portal.description if self.portal else result['settings']['shortcut']
             if method=='models':
+                self.maintenance.models_observed(result)
                 catalog=ROOT/'components/handy/runtime/notices/ModelCatalog.json'
                 entries={m['id']:m for m in json.loads(catalog.read_text())['models']} if catalog.exists() else {}
                 for row in result:
@@ -275,10 +299,22 @@ def main():
     # and leave the installed app talking to a broker without its component.
     # Disabled private test brokers can still coordinate conversation capture.
     if backend.preferences.get('enabled'):backend.binary()
+    startup=None;control=None
+    if sys.platform in ('linux','darwin'):
+        from lifecycle.posix_startup import Startup
+        from lifecycle.lease import hold
+        from lifecycle.dictation_control import DictationControl
+        startup=Startup()
+        # The broker itself imports this installation even while Handy is off.
+        hold('runtime')
+        control=DictationControl(ROOT,backend)
+        control.__enter__()
     def reap():
         while not getattr(backend,'shutting_down',False):
             time.sleep(1)
             with backend.lock:
+                try:backend.maintenance.expire()
+                except (OSError,RuntimeError,TimeoutError,ValueError):continue
                 if not backend.owner:continue
                 alive=process_alive(backend.owner['pid'])
                 if not alive:
@@ -289,6 +325,8 @@ def main():
     threading.Thread(target=reap,daemon=True).start()
     with Listener(address,family='AF_PIPE' if os.name=='nt' else 'AF_UNIX',authkey=key) as listener:
         if os.name!='nt':os.chmod(address,0o600)
+        if control is not None:control.ready=True
+        if startup is not None:startup.ready()
         def serve(connection):
             with connection:
                 try:
@@ -304,6 +342,9 @@ def main():
                 try:connection=listener.accept()
                 except (AuthenticationError,EOFError):continue
                 threading.Thread(target=serve,args=(connection,),daemon=True).start()
-        finally:backend.stop()
+        finally:
+            backend.stop()
+            if control is not None:control.close()
+            if startup is not None:startup.close()
 
 if __name__=='__main__':main()

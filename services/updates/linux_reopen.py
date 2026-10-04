@@ -101,7 +101,9 @@ def reopen_desktop_observed(backend,captured,completion):
         if plan.services is not None and not getattr(backend,'service_reopened',False):
             raise ValueError('Observe target DSH reopening before reopening the desktop.')
         desktop.verify_applied()
-        if not captured['instances']:return False
+        from .posix_dictation_reopen import reopen
+        dictation_reopened=reopen(backend,captured,plan.target,backend.gate.path.parent,immutable)
+        if not captured['instances']:return dictation_reopened
         # Normal launch commands only; no command, environment or PID is loaded
         # from an archive. The stable launcher has migrated with exact backups.
         environment={key:value for key,value in os.environ.items()

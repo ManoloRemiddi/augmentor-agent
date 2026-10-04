@@ -567,3 +567,47 @@ windows are online with voice available; embedded Ctrl+Space is enabled/ready,
 CPU, current animated palette, no tray and no standalone autostart. Source
 qualification, this installed composition and customer-release gates remain
 explicitly distinct. Documentation-only follow-ups retain tested source `81a2bba`.
+
+## Dictation participation in automatic updates — October 4, in progress
+
+The persistent broker now exposes a private same-user Unix maintenance endpoint
+bound to its actual interpreter/PID, installation root and current login/state
+scope. Startup exclusion covers publication of both control endpoints. Its
+installation lease lasts for the broker process, including disabled Handy.
+Unix preparation captures/reserves it after surface admission closes and drains
+it before downstream services. Another session/state/root is refused, preserving
+its work. Original captured broker presence is an optional boolean reopening
+field; no saved command, environment, path or PID can grant restart authority.
+
+Broker admission fences ordinary requests and external shortcut callbacks. Idle
+preparation acquires Handy's existing atomic microphone CAS without changing
+enablement, shortcut, model or palette. A live voice owner, recording,
+transcription, model operation/download or unknown model outcome defers. Download
+admission is tracked across the native asynchronous reply gap. Cancellation/expiry
+releases only the matching native token before restoring normal admission.
+An unknown native acquire/release retains closed admission and original evidence;
+late acquire requests carry a two-second native admission deadline. Commit is
+one-shot; owned native stdin closes only after idle reservation, child exit is
+observed without termination/kill escalation. A child shutdown timeout keeps the
+broker alive/closing and prevents apply.
+
+Linux/Mac reopening within the original verified completion starts only the fixed
+target broker once, checks the new actual socket process/readiness and unchanged
+target, then allows normal captured-window startup. This also restores an
+original broker without reopening an uncaptured window. A failed start is not
+retried or stopped; the installed target remains selected for manual reopening.
+Windows shares broker admission but still needs its broker discovery/startup/
+lifetime/reopening adapter before full parity. Old uncoordinated broker builds
+require manual bridge delivery; public automatic eligibility/feed remain false.
+
+Local evidence: ten broker cases pass, including an actual disabled broker,
+authenticated voice owner, kernel socket pidfd, busy cancellation, complete real
+graph drain and one-shot target process reopening in isolated state. Native
+recording/download/unknown cases use declared backend mocks. Existing fourteen
+dictation cases pass; combined host updater/dictation checks pass 261 total,
+258 passed/three OS skips in 8.044 seconds. Settings Qt cases are outside this
+host run. An actual copied Handy executable separately proves native-owner
+exclusion, CAS reservation, broker fencing, reversible cancellation, settings
+preservation and ordinary native child exit without audio capture/model download.
+Native CI and shipped-bundle/signed-forward acceptance remain pending; this is
+not qualification of an installed customer update.
