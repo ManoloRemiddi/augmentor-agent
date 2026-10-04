@@ -1408,3 +1408,51 @@ bytes with ZIP64 after this correction, but its producer run did not complete a
 manifest and no staging/installation qualification is claimed. Eleven Linux
 producer cases and seven existing Mac archive cases pass. The corrected full
 producer/consumer qualification remains pending.
+
+At `42e2e05`, complete local Linux x64 production assembly/export and the real
+`stage_download` consumer pass. The ZIP is 648,425,856 bytes, expands to
+1,491,989,961 bytes, and has SHA256
+`d4ae8da4ed0b64379d5b2f75a9bca804f91f5ae9f70635cc8cdf21ac60071628`.
+Bundled Python/Node paths relocate; fixed offscreen Qt renders at 424 × 484 with
+fonts; original/final payloads remain immutable; the isolated existing selection
+is unchanged. No installed controller, live provider, normal GUI, or signed
+forward update is exercised. Native both-CPU run 37163782548 remains pending.
+Eleven Linux producer and seven Mac archive cases pass. Host core updater checks
+pass 237 total/234 passed/three OS skips in 7.114 seconds; the two Qt settings
+cases pass separately on pinned bundled Python/Qt. Host full discovery initially
+fails because system PySide lacks QtTest; bundled-Python full discovery instead
+fails the host-only copied-ELF fixture, which copies an interpreter without its
+standalone libraries. These environment-specific runs are not recorded as full
+suite passes. Final core/settings checks use their appropriate interpreters.
+
+A concrete remaining real-desktop gate is the persistent dictation broker:
+`services/dictation/server.py` holds the Unix runtime installation lease after
+starting Handy. `PosixPreparation` discovers windows, shortcuts, Browser, DSH and
+companions, but not this authenticated broker. Window maintenance closes directly
+without the interactive Quit path's broker shutdown. Real broker reservation,
+active dictation/model-work deferral, observed normal exit, startup exclusion and
+safe reopening need qualification before automatic eligibility. Preserve the
+owner's active broker; inert window/service fixtures do not cover this gap.
+
+Native complete managed Linux producer/consumer qualification **passes on both
+CPUs** at `42e2e05` in
+[37163782548](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37163782548):
+x64 job 111322629852 and ARM64 job 111322629828. Both real pinned application,
+Python/Qt/Node, Handy and DSH/speech assemblies pass fixed offline UI health;
+complete exported ZIPs pass the bounded parser and actual archive consumer.
+Bundled runtimes relocate, original selection stays unchanged, and original/final
+payloads stay immutable. Downloaded CI reports independently match exact artifact
+hashes and source revision, with all public/automatic eligibility flags false.
+This supersedes the export failures/pending statements above for this producer
+and staging scope only. It does not exercise live providers, normal windows,
+an installed update, signing trust, N-to-N+1, other distributions or older Pi OS.
+Only JSON reports are retained publicly; no product archive is released.
+
+CI x64 archive: 648,682,096 bytes, SHA256 `1c9e7084f0dd0a7dec4f8c9fb430a2dfa6436977335901f140084aa5b1b4778a`.
+CI ARM64 archive: 614,281,445 bytes, SHA256 `0290f4712b394f4d06019155905cdac1c87f0da81cb907f78509ebd6d1492750`.
+Local and CI artifact bytes differ; deterministic export is asserted only for
+identical input trees, not complete reproducible upstream builds. The native
+producer receipts retain distribution/source-license/production/feed/bridge
+and installed acceptance gates. Continue dictation-broker coordination and real
+DSH/desktop/signed-forward qualification, plus the remaining cross-platform work;
+the complete updater goal remains active.
