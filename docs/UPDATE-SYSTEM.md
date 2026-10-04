@@ -1522,3 +1522,15 @@ ordinary 15-second RPC deadline. The existing component proof passes with its
 90-second allowance only for its first status; subsequent RPC limits/replay
 policy are unchanged. Both runs are terminal. Native Mac proof and skipped
 broader bundle jobs need qualification at corrected source.
+
+Corrected native source `69477f8` passes Handy lifecycle plus actual broker/CAS
+maintenance on Mac 14 (111327429133), Windows (111327429134), Linux ARM64
+(111327429137) and Linux x64 (111327429183), and actual owned Linux service plus
+broker graph checks (111327429178), in
+[37165487146](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37165487146).
+Separate Mac Handy job 111327415330 also passes in
+[37165488998](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37165488998).
+This supersedes the cold-handshake failure for native broker/CAS proof only.
+Debian/shared tests and complete Linux x64/ARM64 bundles remain live, as do full
+Mac 14/26 jobs 111327575462/111327575502. Do not restart or cancel those handles.
+Public flags/feed stay disabled and the complete cross-platform goal stays active.
