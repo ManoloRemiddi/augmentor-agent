@@ -1,0 +1,227 @@
+{
+  "format": "augmentor-linux-kde-partial-qualification/1",
+  "date": "2026-10-04",
+  "status": "PARTIAL_FAIL_FULL_KDE_ACCEPTANCE_OPEN",
+  "fixtureScope": "Isolated official Fedora44 Cloud-derived minimal KDE virtual machine; software emulation, not hardware or standard KDE ISO acceptance.",
+  "system": {
+    "distribution": "Fedora44",
+    "architecture": "x86_64",
+    "desktop": "Plasma/KWin6.7.5",
+    "kernel": "6.19.10-300.fc44.x86_64",
+    "SELinux": "Enforcing"
+  },
+  "productSource": "2035af99b46bb013e81de9766216da820ab4a325",
+  "selectedArtifactSha256": "74b1dd63f4be9c2df88c764bca4dabcd7aebfcd31967c69f13f59607c274eeaf",
+  "publicProofSource": "9d9cf06b67d83ce7b624a4d5b8ea1a284706ec54",
+  "externalFixtureProfile": "activitydistinct9d",
+  "externalProfileRegistrySha256": "006dda1be499a71a9e3ecd59e2420fab6a9ac2bd7abb61c6636a40df83b10a0c",
+  "evidence": {
+    "preflight": "PASS",
+    "normalSessionRecovery": "PASS",
+    "initialReadOnlyTabletState": "PASS",
+    "fixedPointerPackets": [
+      {
+        "phase": "A",
+        "index": 1,
+        "point": [
+          50,
+          100
+        ],
+        "raw": [
+          1280,
+          4096
+        ],
+        "nativeCursor": {
+          "x": 50,
+          "y": 100
+        },
+        "status": "PASS"
+      },
+      {
+        "phase": "A",
+        "index": 2,
+        "point": [
+          48,
+          98
+        ],
+        "raw": [
+          1229,
+          4014
+        ],
+        "nativeCursor": {
+          "x": 48,
+          "y": 98
+        },
+        "status": "PASS"
+      },
+      {
+        "phase": "B",
+        "index": 1,
+        "point": [
+          50,
+          100
+        ],
+        "raw": [
+          1280,
+          4096
+        ],
+        "nativeCursor": {
+          "x": 50,
+          "y": 100
+        },
+        "status": "PASS"
+      },
+      {
+        "phase": "B",
+        "index": 2,
+        "point": [
+          48,
+          98
+        ],
+        "raw": [
+          1229,
+          4014
+        ],
+        "nativeCursor": {
+          "x": 48,
+          "y": 98
+        },
+        "status": "PASS"
+      },
+      {
+        "phase": "C",
+        "index": 1,
+        "point": [
+          50,
+          100
+        ],
+        "raw": [
+          1280,
+          4096
+        ],
+        "nativeCursor": {
+          "x": 50,
+          "y": 100
+        },
+        "status": "PASS"
+      },
+      {
+        "phase": "C",
+        "index": 2,
+        "point": [
+          48,
+          98
+        ],
+        "raw": [
+          1229,
+          4014
+        ],
+        "nativeCursor": {
+          "x": 48,
+          "y": 98
+        },
+        "status": "PASS"
+      },
+      {
+        "phase": "D",
+        "index": 1,
+        "point": [
+          50,
+          100
+        ],
+        "raw": [
+          1280,
+          4096
+        ],
+        "nativeCursor": {
+          "x": 50,
+          "y": 100
+        },
+        "status": "PASS"
+      },
+      {
+        "phase": "D",
+        "index": 2,
+        "point": [
+          48,
+          98
+        ],
+        "raw": [
+          1229,
+          4014
+        ],
+        "nativeCursor": {
+          "x": 48,
+          "y": 98
+        },
+        "status": "PASS"
+      }
+    ],
+    "observeOnly": {
+      "status": "PASS",
+      "seconds": 141.77218631099095,
+      "cancellation": "pending RPC cancellation; consent not granted in this observe-only phase"
+    },
+    "exactOrdinaryKateClose": "PASS; current unmodified owned editor exited normally before full proof; no forced fallback",
+    "fullProof": {
+      "status": "FAIL",
+      "seconds": 389.6607741379994,
+      "knownChecks": [
+        "native Deny refused sharing",
+        "visible Stop closed pending consent",
+        "foreign owner/unsupported text/replay/outside point/changed window refused"
+      ],
+      "failure": "Existing owned-file Save wait did not yield exact Wayland ASCII verified newline bytes.",
+      "savedFileBeforeAndAfterEndingAudit": "Fixture ready\n",
+      "liveBufferCase": "UNKNOWN; no text buffer returned by the separately successful bounded current-state read.",
+      "activeInputStopExactTextAndNoReplay": "NOT_REACHED"
+    },
+    "ending": {
+      "nativeSelectedPackageRuntime": "PASS",
+      "nativeAuditSeconds": 74.44482373599021,
+      "protectedEightHashes": "PASS",
+      "memoryProcessPreserved": "PASS",
+      "BetaPreserved": "PASS",
+      "all105RegistryInputHashes": "PASS"
+    },
+    "postFailureReadOnly": {
+      "status": "PASS",
+      "seconds": 5.938495,
+      "selectedAndProtectedState": "UNCHANGED",
+      "fileBytes": "Fixture ready\n",
+      "completeAccessibleNodesRead": 314,
+      "focusedControls": [
+        {
+          "role": "file-name table cell",
+          "showing": true,
+          "editable": false,
+          "password": false
+        },
+        {
+          "role": "Home list item",
+          "showing": true,
+          "editable": false,
+          "password": false
+        },
+        {
+          "role": "main document page tab",
+          "showing": true,
+          "editable": false,
+          "password": false
+        }
+      ],
+      "textBufferReturned": false,
+      "currentNativeForeground": "KWin fullscreen window; no current lock-authority query in this snapshot",
+      "ownedEditorIsNativeForeground": false,
+      "nativeBusPeerIdentityBeforeEnd": "MATCH",
+      "limitation": "Current post-failure snapshot cannot establish the input-time focus, dialog, modifier state or save-failure cause."
+    }
+  },
+  "limits": [
+    "No full KDE consent/input/Stop/noReplay acceptance is claimed.",
+    "The save failure is not established as wrongcase because the saved file stayed unchanged and the buffer was not read.",
+    "All historical refusal/failure receipts remain retained; no action retried in this namespace.",
+    "Native/SDK/package qualification and distribution licensing/source/public-release gates retain their separate recorded scope.",
+    "Initial ordinary-user process-read refusal remains retained; one separately reviewed read-only correction passed without input, capture, grant, recovery or settings changes."
+  ]
+}

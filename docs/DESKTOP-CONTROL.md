@@ -1,5 +1,21 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 4 KDE pointer and partial consent results
+
+[The actual Fedora 44 KDE checkpoint](../release/qualification/next-targets/20261004-kde-pointer-consent-partial-save-failure.json)
+passes all eight pointer packets with native cursor readback, consent observation
+in 141.77 seconds, ordinary owned-editor closure, Deny, and visible Stop while
+consent is pending. Full acceptance failed at exact existing-file Save after
+389.66 seconds; the file remains `Fixture ready\n`. Independent ending native,
+selected, eight protected files, memory and prior-account audits pass. A separate
+bounded read-only observation passes in 5.94 seconds: its three focused controls
+are noneditable, no text buffer is returned, and the current foreground is a KWin
+fullscreen window. That later snapshot does not establish input-time focus, casing or
+the failure cause. Full saved text, Stop during active input and no replay remain
+open. Text typing needs a separately reviewed editable-target guard; key chords
+retain their distinct policy. No input, grant, recovery or settings change followed
+the terminal save failure.
+
 ## October 3 Fedora KDE pointer freshness refusal
 
 [The recovery and freshness checkpoint](../release/qualification/next-targets/20261003-kde-activity-recovery-freshness-refusal.json)

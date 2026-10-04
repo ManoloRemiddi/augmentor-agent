@@ -1,0 +1,58 @@
+{
+  "format": "augmentor-published-staged-integration-qualification/1",
+  "date": "2026-10-04",
+  "status": "FAIL_INSTALL_PENDING_UNKNOWN_NO_REPLAY",
+  "scope": "Isolated Debian13 x86_64 rootless container; published0.2.13 native packages and previously verified managed stage, not graphical or hardware qualification.",
+  "nativeVersion": "0.2.13",
+  "nativeSource": "0eb2ec112afa52b886b63606f80967198a7feb0c",
+  "coordinatorSha256": "dfe89a104202b5a493a39af181b56c6853300852378d4d190011b7037247ac76",
+  "proofSha256": "383f7489aeaabc29e1ead9456df973b4ce5227e292d57805f83ce95eedca19cf",
+  "evidence": {
+    "installedDshCommandDiscovery": "PASS",
+    "existingStageFullInventoryVerification": "PASS",
+    "updaterStageDispatch": false,
+    "nativePackageOperation": false,
+    "workerExitCode": 1,
+    "workerSeconds": 9.426677663985174,
+    "failedOperation": "normal-setup-install",
+    "firstFailure": "OSError EXDEV while renaming the existing owned integration directory to a sibling backup.",
+    "secondaryFailure": "Exception restoration attempted to rename the nonexistent backup and raised FileNotFoundError.",
+    "pendingAction": "normal-setup-install",
+    "unknownOutcome": true,
+    "connectionSave": "NOT_REACHED",
+    "managedActivation": "NOT_REACHED",
+    "modelRequests": 0,
+    "normalOwnedDshCleanupExitCode": 0,
+    "normalCompanionCleanup": "PASS",
+    "independentEndingNativeIdleAudit": "PASS",
+    "unchangedBeforeEndMaps": {
+      "settings": true,
+      "persistence": true,
+      "protected": true,
+      "managed": true,
+      "packages": true,
+      "packageMetadata": true,
+      "signedMetadata": true,
+      "archiveKeys": true,
+      "token": true,
+      "dshCli": true,
+      "selected": true,
+      "previous": true,
+      "currentSelectorSha256": true,
+      "previousSelectorSha256": true
+    },
+    "profilePreservation": {
+      "allPreviousFileContentsPreserved": true,
+      "noPreviousMembersRemoved": true,
+      "fullMetadataEquality": false,
+      "temporaryStageMembersAdded": 10,
+      "existingCompositionFile": "Content unchanged; modification time changed."
+    }
+  },
+  "limits": [
+    "The failed namespace and pending installation must not be replayed or automatically rolled back.",
+    "Existing native and selected managed state remains0.2.13 and0.2.12 respectively; product upgrade and rollback remain unqualified.",
+    "The container filesystem cause requires primary-source investigation; the observed EXDEV alone does not establish failures on ordinary installed filesystems.",
+    "Historical published packages are unchanged; a maintained installer correction requires separate source review and a fresh qualification scope."
+  ]
+}

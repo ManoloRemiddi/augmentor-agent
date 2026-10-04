@@ -1,5 +1,21 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 4 staged integration filesystem failure
+
+[The fresh integration-only run](../release/qualification/next-targets/20261004-published-staged-integration-filesystem-failure.json)
+found the exact installed DSH command and reverified the existing staged013
+inventory, then failed during normal integration installation in 9.43 seconds.
+Renaming the existing profile to its sibling backup raised EXDEV; restoration
+then attempted the nonexistent backup and raised FileNotFoundError. The install
+intent remains pending/unknown. Save and managed activation did not run; no
+package operation, staging replay, model request or retry occurred. Normal owned
+cleanup and an independent native/idle audit passed. Settings, histories, prior
+journals, managed inventories, selectors, native maps and token match their
+before-state. Profile content remains preserved, but a temporary stage persists
+and the composition file modification time changed. Full integration and rollback
+remain open; investigate the maintained installer's filesystem/error handling
+before a fresh qualification scope. Historical published payloads remain unchanged.
+
 # Published Linux product upgrade and rollback qualification
 
 The [actual baseline160 checkpoint](../release/qualification/next-targets/20261004-published-managed-baseline-acceptance.json)
@@ -135,7 +151,7 @@ listeners, exact current and previous managed inventories, profile backup and
 foreign-content preservation, settings and all histories. This container proof
 is separate from graphical, audio, hardware and broad distribution acceptance.
 
-## Fresh integration163 source candidate
+## Fresh integration163 worker and actual failure
 
 The maintained coordinator now admits only the existing checked npm DSH shim
 under the synthetic account's `dsh-runtime/node_modules/.bin`, then adds that
@@ -145,8 +161,9 @@ supported package content are checked through bounded stable reads; caller paths
 different link text, foreign owners, hardlinks and changed contents refuse. No
 command or runtime is installed to correct the proof's PATH omission.
 
-`release/prove-published-linux-staged-integration.py` is a **source-only** fresh
-integration candidate. It pins the reviewed coordinator and selects a finite
+`release/prove-published-linux-staged-integration.py` is the separately reviewed
+fresh integration worker executed in the failed checkpoint above. It pins the
+reviewed coordinator and selects a finite
 integration-only branch. It requires a new immutable root binding at
 `/opt/augmentor-version-proof150/integration163/binding.json` and exclusively
 creates `published-product-staged-integration163`; failed161 is never resumed.
@@ -185,6 +202,6 @@ owned restart, check/save, and activation of the existing stage. Durable pending
 intents, no unknown-action replay,60-second authenticated starts, Page-only dense
 history equality, provider/token/foreign-content preservation and normal cleanup
 remain unchanged. Historical161 files are included in ending preservation checks.
-An independent full root ending audit remains mandatory. This candidate has not
-run and does not qualify upgrade or rollback; a later rollback needs its own
+An independent full root ending audit remains mandatory. The actual run failed at installation
+and does not qualify upgrade or rollback; a later rollback needs its own
 reviewed binding to an actually successful new integration outcome.
