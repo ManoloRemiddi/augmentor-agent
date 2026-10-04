@@ -42,6 +42,8 @@ def candidate(root, arch, *, public_preview=False):
                  'node/node.exe', 'powershell/pwsh.exe', 'updater/WinSparkle.dll',
                  'dsh/payload.json', 'scripts/launch-windows.py', 'scripts/windows-local-health.py',
                  'scripts/windows-inspect-payload.py', 'scripts/windows-recover-source.py',
+                 'scripts/verify-windows-publisher.ps1', 'release/windows/signing.json',
+                 'services/updates/windows_signing.py',
                  'services/lifecycle/source_restoration.py', 'services/lifecycle/payload_integrity.py',
                  'services/lifecycle/recovery_source.py', 'services/lifecycle/health_report.py',
                  'services/lifecycle/update_journal.py',

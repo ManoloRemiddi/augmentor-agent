@@ -2187,3 +2187,13 @@ No failed overall workflow is presented as successful.
 Merged Mac run 37175652699 at `0cb79e0` has completed macOS 14 successfully;
 macOS 26 remains live. Corrected Linux run 37176868726 at `f061593` is dispatched.
 These pending outcomes do not inherit earlier source qualification.
+
+Windows package intake now requires `release/windows/signing.json`,
+`scripts/verify-windows-publisher.ps1` and `services/updates/windows_signing.py`.
+Whole-source staging already copies/seals these paths. A valid inventory alone
+must not admit a freshly built payload whose producer omitted required trust
+components. Seven package cases pass; the new omission case confirms inventory
+verification succeeds on each disposable incomplete build while package intake
+refuses. Policy enablement/pins remain separately required for automatic
+installation. The live `0cb79e0` full Windows run predates this addition and the
+publisher gate, so cannot qualify their combined installed execution.

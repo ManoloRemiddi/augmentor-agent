@@ -941,3 +941,9 @@ matching/wrong qualification pins and damaged copied bytes. It never executes
 Node as a target, creates a certificate or changes the disabled Augmentor policy.
 Without that dedicated Windows root the native case explicitly skips. This is
 OS verification evidence, not signed Augmentor installer/forward qualification.
+
+Windows package intake also requires the disabled source publisher policy,
+fixed PowerShell verifier and Python verifier module. Seven package cases include
+fresh producer omissions: each incomplete disposable build has a consistent
+sealed inventory but is still refused before installer construction. No installed
+payload is resealed and no production publisher is provisioned by these tests.

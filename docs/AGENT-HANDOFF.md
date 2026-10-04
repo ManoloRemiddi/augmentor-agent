@@ -2,6 +2,14 @@
 
 # Start here: agent handoff
 
+Windows package intake now requires the source publisher policy, fixed verifier
+script and verifier module even when a producer seals an otherwise consistent
+fresh inventory. Seven package cases pass, including valid-inventory omission
+refusal. Existing staging already copies these paths and seals their bytes;
+policy enablement remains a separate owner-controlled production gate. The live
+merged full Windows run predates this intake/signing addition.
+
+
 Native publisher run 37176579974 at `79c5e58` passes the actual timestamped
 Node/wrong-pin/damaged-copy checks on Windows x64 and ARM64. Its overall jobs fail
 later because staging the verifier creates `scripts/` before the early-launcher
