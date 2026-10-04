@@ -2,6 +2,22 @@
 
 # Start here: agent handoff
 
+## Portal bundle and Mac completion — October 4, in progress
+
+Complete portal-enabled Linux x64/ARM64 candidates at `799f7f7` pass actual archive
+staging, relocated `/2` UI/portal health, real D-Bus fixture and immutable selection
+in [37166969159](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37166969159).
+[Scoped artifact identities](UPDATE-SYSTEM.md#complete-portal-bundles-at-799f7f7-and-retained-mac-results)
+retain exact SHA-256/bytes and native build provenance. The original full Mac
+14/26 run 37165488998 at `69477f8` also finished entirely successfully.
+
+The newer full host-package and staged Handy/broker proof source `a285350` is
+committed/pushed and live in
+[37167426017](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37167426017).
+Preserve it and do not inherit older artifact qualification. Actual isolated
+Ubuntu source/runtime/Handy dependencies pass locally; production feed/flags,
+normal installed/signed forward acceptance and the full goal remain unfinished.
+
 ## Fresh-host Linux updater qualification — October 4, in progress
 
 Source `799f7f7` is committed/pushed. Native x64/ARM64 bundle qualification is live

@@ -1625,3 +1625,33 @@ This verifies the declared host dependencies and real native protocol, but does
 not stand in for the exact newer CI-produced archive or physical input acceptance.
 The isolated container installs only declared runtime packages plus Xvfb/xauth
 fixture tools; no owner host packages, application/profile or model are changed.
+
+### Complete portal bundles at 799f7f7 and retained Mac results
+
+[Native Linux run 37166969159](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37166969159)
+is entirely successful at `799f7f718b91409292c0f9f8534331e995b85039`:
+x64 job 111331994133 and ARM64 job 111331994069 each build the complete
+24-package runtime and exercise the actual ZIP consumer, interpreter relocation,
+`/2` Qt/font/portal health, real private D-Bus fixture, unchanged selection and
+immutable payload. Both report PyGObject 3.52.4 and GLib 2.80.0. Hosted x64
+build provenance confirms all six pinned tools, build-lock SHA-256
+`fd809128ba91e5ee22ec074b6cdce2b0ea7903e1c2fc671b2c8686db63a11dba`,
+GLib/GIRepository 2.80.0 and Cairo 1.18.0. Native wheel hashes differ from the
+local build; pinned source/tool inputs and each output's recorded inventory do
+not imply bit-identical native compilation across builders.
+
+| Target | ZIP bytes | ZIP SHA-256 |
+| --- | ---: | --- |
+| linux-x64 | 649138497 | `7e9c7250370f2d22da7fce13999ceab510a36b9a8ed9e231b307057f68be7c91` |
+| linux-arm64 | 614736381 | `82508fd753bfbcc8b30b280d67088099983b066f782330751604496dd91851a4` |
+
+These artifacts precede the declared full host-package/native-Handy follow-up
+`a285350762b2ebdf181b67b737eb597411df77cb`, now qualifying in
+[37167426017](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37167426017).
+Preserve that run; no passing exact newer archive is inferred from the older one.
+The original [Mac run 37165488998](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37165488998)
+also finished entirely successfully at `69477f8`, including full Mac 14 and 26
+jobs 111327575462/111327575502. It supersedes the earlier live Mac statuses and
+qualifies that earlier source only. None of these runs are physical compositor,
+real customer DSH/provider, signed forward installation or production feed proof.
+The full cross-platform goal remains active and public eligibility stays false.
