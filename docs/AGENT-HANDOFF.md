@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 4 actual managed baseline and coordinated source candidate
+
+[Actual baseline160](../release/qualification/next-targets/20261004-published-managed-baseline-acceptance.json)
+passes normal published 0.2.12 stage/activation in 11.186 seconds, zero model
+requests, exact histories/compressed metadata, four unrelated settings and an
+independent native/exclusive-idle/process/socket ending audit. The verified
+managed predecessor now exists; this supersedes earlier adoption-pending text.
+[The coordinated guide](PUBLISHED-LINUX-COORDINATED-UPGRADE.md) describes the
+new two-mode worker and separate root native transactions.21 focused source
+checks pass,47 with related published Linux checks. Upgrade and rollback have
+not run. Historical published payloads, failures and fixed proof helpers remain
+unchanged; source review/publication and fresh root bindings precede execution.
+
 ## October 3 source checks for coherent product updates
 
 [DSH setup](DSH-SETUP.md) now refuses a matching live endpoint with stale copied

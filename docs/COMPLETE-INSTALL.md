@@ -528,3 +528,9 @@ bytes, both idle exclusive leases, absence of owned processes/listeners and
 45-file protected-state plus old failed-journal/log checks before and in `finally`.
 The original failures and both allocation refusals stay retained. Real two-window
 shortcut settings, graphical Browser, physical audio and legal gates remain open.
+
+The [published product coordination guide](PUBLISHED-LINUX-COORDINATED-UPGRADE.md)
+records actual managed 0.2.12 baseline acceptance and the source-only candidate
+for separate native upgrade, normal DSH integration update, selection and
+coordinated rollback. The candidate has not run; fresh complete installation is
+not an upgrade or rollback procedure.

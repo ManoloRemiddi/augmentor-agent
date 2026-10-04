@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "date": "2026-10-04",
+  "scope": "Isolated published Debian13 product-version fixture; normal managed012 baseline adoption only",
+  "status": "PASS",
+  "nativeProductVersion": "0.2.12",
+  "nativeSource": "e02731023153e3b2e1440e50b8c14b64ad0a82e5",
+  "proofSha256": "6b91fbf0c2406923d8d634e90a0dc0badeebd540f24890ad4c447fee9973ba3a",
+  "actualRunSha256": "3ddeb2d07cf6ee04f1062c20c01489098e657311a8686bdb4daf36f3a90f3e0c",
+  "seconds": 11.186194504989544,
+  "operations": [
+    "normal augmentor-update stage",
+    "normal augmentor-update activate"
+  ],
+  "selectedManagedArtifactSha256": "9cda9c487524c472576be2fb86d70cfea8e370ecbe54ad9694e848d406a8c816",
+  "workerExitCode": 0,
+  "independentEndingAudit": "PASS",
+  "preserved": {
+    "threeExistingHistoriesAllEvents": true,
+    "allCompressedPersistenceBytesAndMetadata": true,
+    "fourUnrelatedSettingsBytes": true,
+    "allHistoricalProofFilesAndMetadata": true,
+    "originalNativeSelectionAsPredecessor": true,
+    "nativePackageInventory": true
+  },
+  "modelRequests": 0,
+  "pendingOutcome": null,
+  "unknownOutcome": false,
+  "ownedNodeAndCompanionNormalExit": true,
+  "nativePackageUpgradeExecuted": false,
+  "integrationMigrationExecuted": false,
+  "upgradeRollbackQualified": false,
+  "remaining": [
+    "normal native013 package transaction",
+    "explicit owned013 integration refresh and restart",
+    "matching managed013 activation",
+    "coordinated native/integration/managed012 rollback"
+  ],
+  "guide": "docs/LINUX-PRODUCT-UPGRADE-PROOF.md"
+}
