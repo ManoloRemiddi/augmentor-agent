@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "date": "2026-10-04",
+  "scope": "Isolated Fedora44 GNOME50 observer562 managed deployment; activation state unknown",
+  "status": "INCOMPLETE_UNKNOWN_ACTIVATION",
+  "source": "56251697f2d2f87c3c1be04130751426940df198",
+  "managedArtifactSha256": "9dc380d3d579ee66b1c3fe6caf2f15df351c015ebfc7942181e1cc66de00f606",
+  "actualTerminalReceiptSha256": "7ccf304fae205fe8c74e54c6a2325d168ec29ade576fa8a48dbcc14b312e5a37",
+  "completedPhases": [
+    "prepare",
+    "archive",
+    "extract",
+    "stage"
+  ],
+  "activation": {
+    "dispatchedOnce": true,
+    "timeoutSeconds": 60,
+    "selectionKnown": false,
+    "retryExecuted": false
+  },
+  "extensionReplacementExecuted": false,
+  "rebootExecuted": false,
+  "captureInputExecuted": false,
+  "productionGnomeInputQualified": false,
+  "remaining": [
+    "read-only diagnosis of current selection and surviving exact activation processes",
+    "separately reviewed next deployment phase only after actual state is known",
+    "real GNOME consent/input/Stop acceptance"
+  ],
+  "guide": "docs/LINUX-GNOME-CONTROL-PLAN.md"
+}

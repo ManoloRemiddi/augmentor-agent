@@ -10,6 +10,17 @@ portal.py constructs KWin and rejects non-KDE sessions; service.py runs backend
 calls on the GUI GLib loop. Both still need integration and KDE regression before
 enabling GNOME input.
 
+## October 4 observer562 deployment stopped at activation
+
+[The actual checkpoint](../release/qualification/next-targets/20261004-gnome562-activation-unknown.json)
+records one isolated Fedora44 GNOME50 deployment of source56251697. Preparation,
+archive verification, extraction and normal staging passed. The normal updater
+activation exceeded its 60-second outer bound; current selection is unconfirmed.
+The wrapper terminated and retained the unknown outcome. No activation retry,
+extension replacement, reboot, capture or input followed. Read-only diagnosis of
+selection, logs and exact surviving processes is the next step; source tests do
+not establish activation or authorize replay. Production GNOME input remains false.
+
 ## October 3 isolated-helper input candidate; native acceptance pending
 
 [GnomeControl](../services/desktop/gnome_control.py) now binds a separately owned

@@ -530,7 +530,8 @@ The original failures and both allocation refusals stay retained. Real two-windo
 shortcut settings, graphical Browser, physical audio and legal gates remain open.
 
 The [published product coordination guide](PUBLISHED-LINUX-COORDINATED-UPGRADE.md)
-records actual managed 0.2.12 baseline acceptance and the source-only candidate
-for separate native upgrade, normal DSH integration update, selection and
-coordinated rollback. The candidate has not run; fresh complete installation is
-not an upgrade or rollback procedure.
+records actual managed 0.2.12 baseline acceptance and a successful native013
+upgrade. The ordinary integration worker staged013, then stopped cleanly because
+its PATH omitted the installed DSH command. Matching integration/selection and
+coordinated rollback remain unqualified; fresh complete installation does not
+establish upgrade or rollback acceptance.

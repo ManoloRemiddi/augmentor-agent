@@ -1,5 +1,31 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 4 observer562 deployment stopped at activation
+
+[The actual checkpoint](../release/qualification/next-targets/20261004-gnome562-activation-unknown.json)
+records one isolated Fedora44 GNOME50 deployment of source56251697. Preparation,
+archive verification, extraction and normal staging passed. The normal updater
+activation exceeded its 60-second outer bound; current selection is unconfirmed.
+The wrapper terminated and retained the unknown outcome. No activation retry,
+extension replacement, reboot, capture or input followed. Read-only diagnosis of
+selection, logs and exact surviving processes is the next step; source tests do
+not establish activation or authorize replay. Production GNOME input remains false.
+
+## October 4 actual native upgrade and terminal integration failure
+
+[The actual checkpoint](../release/qualification/next-targets/20261004-published-native-upgrade-integration-failure.json)
+records one normal native012→013 upgrade in 24.42 seconds, exactly two Augmentor
+packages plus nine declared dependencies, no unrelated/removal changes and
+preserved ordinary state. A valid Debian Multi-Arch:no verification omission
+was corrected without replaying APT. The ordinary worker staged/verified013,
+then Setup.check refused its incomplete DSH command PATH before installation,
+save or activation. Actual worker pending fields are all null/unknownOutcome:false;
+settings, histories, journals and normal cleanup pass. Independent ending audit
+passes native013 and idle/process/socket/state checks. The conservative parent
+unknown flag stays retained separately. No rollback has run. A fresh integration-only
+scope must consume the known verified stage; do not replay the failed161 namespace.
+See [the owning guide](PUBLISHED-LINUX-COORDINATED-UPGRADE.md).
+
 ## October 4 actual managed baseline and coordinated source candidate
 
 [Actual baseline160](../release/qualification/next-targets/20261004-published-managed-baseline-acceptance.json)
@@ -8,9 +34,9 @@ requests, exact histories/compressed metadata, four unrelated settings and an
 independent native/exclusive-idle/process/socket ending audit. The verified
 managed predecessor now exists; this supersedes earlier adoption-pending text.
 [The coordinated guide](PUBLISHED-LINUX-COORDINATED-UPGRADE.md) describes the
-new two-mode worker and separate root native transactions.21 focused source
-checks pass,47 with related published Linux checks. Upgrade and rollback have
-not run. Historical published payloads, failures and fixed proof helpers remain
+new two-mode worker and separate root native transactions. 21 focused source
+checks pass, 47 with related published Linux checks. The actual upgrade result
+above supersedes this source-only checkpoint. Rollback has not run. Historical published payloads, failures and fixed proof helpers remain
 unchanged; source review/publication and fresh root bindings precede execution.
 
 ## October 3 source checks for coherent product updates

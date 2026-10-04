@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "date": "2026-10-04",
+  "scope": "Isolated published Debian13 product-version fixture; native013 success and terminal ordinary integration failure",
+  "status": "INCOMPLETE",
+  "nativeProductVersion": "0.2.13",
+  "nativeSource": "0eb2ec112afa52b886b63606f80967198a7feb0c",
+  "workerSha256": "75abecb7cb97ad87200d0c0c3bfdbe262ffce64d59dd7905a391955ad61e3c78",
+  "nativeTransaction": {
+    "exitCode": 0,
+    "seconds": 24.420968719990924,
+    "appPackagesChanged": 2,
+    "declaredDependenciesAdded": 9,
+    "removedPackages": 0,
+    "unrelatedPackageChanges": false,
+    "actualResultSha256": "b4f5f4b81074feef61ba1434ac90f568533ec380910d83b0f86201b466204ab2"
+  },
+  "ordinaryWorker": {
+    "exitCode": 1,
+    "seconds": 11.06085983599769,
+    "completedDeployments": [
+      {
+        "label": "stage",
+        "exitCode": 0
+      }
+    ],
+    "failure": "Setup.check refused because the proof PATH omitted the installed DSH command",
+    "pendingOutcome": null,
+    "unknownOutcome": false,
+    "integrationInstallationExecuted": false,
+    "managedActivationExecuted": false,
+    "modelRequests": 0,
+    "settingsUnchanged": true,
+    "persistencePreserved": true,
+    "historicalJournalsPreserved": true,
+    "actualResultSha256": "1471e83b3a3122307e38580df475bdccdcac2c32fddc9cf02ae51e50eaef0d18"
+  },
+  "independentEndingAudit": "PASS",
+  "independentEndingAuditSha256": "d27391c0a439927dab599d07be379ae55d0b6b9ee4cb2e392fdf4111dc37feb3",
+  "coordinatorConservativeUnknownRetained": true,
+  "upgradeRollbackQualified": false,
+  "retryExecuted": false,
+  "remaining": [
+    "fresh integration-only proof after exact staged-candidate and command admission",
+    "matching managed013 activation",
+    "coordinated native/integration/managed012 rollback"
+  ],
+  "guide": "docs/PUBLISHED-LINUX-COORDINATED-UPGRADE.md"
+}

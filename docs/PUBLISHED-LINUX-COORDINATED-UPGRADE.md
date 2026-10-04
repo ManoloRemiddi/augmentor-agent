@@ -11,9 +11,27 @@ unrelated settings. No model requests ran. This preserves a managed 0.2.12
 predecessor before a native package upgrade replaces `/usr/lib/augmentor`.
 It does not qualify a product upgrade or rollback.
 
-`release/prove-published-linux-coordinated-version.py upgrade|rollback` is a
-source-only candidate. Neither mode has executed. It uses the reviewed cold
-Page, baseline lifecycle and published legacy-companion helpers. It does not
+The [actual native-upgrade checkpoint](../release/qualification/next-targets/20261004-published-native-upgrade-integration-failure.json)
+records one successful normal native 0.2.12→0.2.13 transaction in 24.42 seconds:
+the two Augmentor packages and exactly nine declared dependencies changed. Signed
+metadata and ordinary-user state remain unchanged. A verification omission of
+Debian’s valid `Multi-Arch: no` value stopped the coordinator after that known
+transaction; it was corrected without repeating APT.
+
+The ordinary upgrade worker then staged and verified 0.2.13, but `Setup.check`
+refused because its restricted PATH omitted the installed DSH command. Installation,
+connection save and managed activation did not run. The worker exited in 11.06
+seconds with all four pending fields null, `unknownOutcome: false`, unchanged
+settings, preserved histories and historical journals, and normal owned cleanup.
+The independent ending audit passed native013, idle leases, process/socket/port
+absence and state preservation. The root coordinator’s conservative unknown flag
+remains in its original failure receipt; the actual worker establishes this known
+pre-installation failure separately. No rollback has run. The failed namespace
+must not be replayed: continuing requires a fresh integration-only scope bound to
+the existing verified stage and exact installed command.
+
+`release/prove-published-linux-coordinated-version.py upgrade|rollback` uses the
+reviewed cold Page, baseline lifecycle and published legacy-companion helpers. It does not
 run package operations, reinstall the DSH runtime, create chats or send prompts.
 The historical published 0.2.12 and 0.2.13 payloads remain unchanged.
 
@@ -59,8 +77,8 @@ metadata-only inspection found 128 regular files: 126 with two links and two
 with three links, all UID/GID 1000, with mode 0600 except one mode 0755 program.
 They belong to seven foreign dependency roots: `ws`, `schemastery`, `cosmokit`,
 `@standard-schema/spec`, `dsh-resonant-voice`, `dsh-adaptive-reasoning` and
-`dsh-model-picker-augmented`. That refusal remains retained; neither coordinated
-mode has executed.
+`dsh-model-picker-augmented`. That refusal remains retained. The separately
+reviewed exact hardlink admission preceded the actual native transaction and failed ordinary upgrade above.
 
 The candidate can read hardlinks only under those exact foreign dependency
 prefixes, with the observed owner, group, link-count and mode constraints. It
@@ -109,7 +127,7 @@ backups must contain the old owned target, presets and patch; unexpected backup
 members or edited owned content refuse. No private installed overlay or settings
 normalization is allowed.
 
-Before either actual mode, review and publish the candidate, derive its exact
+Before any new actual scope, review and publish the candidate, derive its exact
 root binding, repeat host/container identity and storage floors, and retain the
 normal signed APT dry-run and transaction receipts. After each mode, independently
 audit native versions/bytes, idle exclusive leases, no owned descendants/socket/
