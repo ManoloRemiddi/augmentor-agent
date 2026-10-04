@@ -25,16 +25,28 @@ def location():
     if os.environ.get('QT_QPA_PLATFORM')=='offscreen' and not os.environ.get('AUGMENTOR_DICTATION_STATE'):
         with _offscreen_lock:
             if not os.environ.get('AUGMENTOR_DICTATION_STATE'):
-                os.environ['AUGMENTOR_DICTATION_STATE']=tempfile.mkdtemp(prefix='augmentor-offscreen-dictation-')
-    base = Path(os.environ.get('AUGMENTOR_DICTATION_STATE', str(Path.home()/'.local/share/augmentor/dictation')))
-    base.mkdir(parents=True, exist_ok=True, mode=0o700)
+                temporary=Path(tempfile.mkdtemp(prefix='augmentor-offscreen-dictation-'))
+                os.environ['AUGMENTOR_DICTATION_STATE']=str(temporary/'private' if os.name=='nt' else temporary)
+    default = Path.home()/'.local/share/augmentor/dictation'
+    if os.name=='nt':
+        sys.path.insert(0,str(ROOT/'services'))
+        from platform_adapters.paths import windows_environment
+        from platform_adapters.windows_identity import private_directory,private_file_descriptor
+        if not os.environ.get('AUGMENTOR_DICTATION_STATE'):
+            default=Path(os.environ.get('XDG_DATA_HOME') or windows_environment()['XDG_DATA_HOME'])/'augmentor/dictation'
+    base = Path(os.environ.get('AUGMENTOR_DICTATION_STATE', str(default)))
+    if os.name=='nt':private_directory(base)
+    else:base.mkdir(parents=True, exist_ok=True, mode=0o700)
     info = base.lstat()
     if stat.S_ISLNK(info.st_mode) or (os.name!='nt' and info.st_mode & 0o077) or (hasattr(os, 'getuid') and info.st_uid != os.getuid()):
         raise RuntimeError('Dictation state directory must be private and owned by this user.')
     session = hashlib.sha256((os.environ.get('XDG_SESSION_ID','')+'|'+os.environ.get('DISPLAY','')+'|'+os.environ.get('WAYLAND_DISPLAY','')).encode()).hexdigest()[:12]
     keyfile = base/'auth.key'
     if not keyfile.exists():
-        fd,temporary=tempfile.mkstemp(prefix='.dictation-key-',dir=base)
+        if os.name=='nt':
+            temporary=base/('.dictation-key-'+secrets.token_hex(16))
+            fd=private_file_descriptor(temporary,writable=True,exclusive=True)
+        else:fd,temporary=tempfile.mkstemp(prefix='.dictation-key-',dir=base)
         try:
             with os.fdopen(fd,'wb') as output:output.write(secrets.token_bytes(32));output.flush();os.fsync(output.fileno())
             try:os.link(temporary,keyfile)
@@ -43,7 +55,9 @@ def location():
     info = keyfile.lstat()
     if not stat.S_ISREG(info.st_mode) or (os.name!='nt' and info.st_mode & 0o077) or (hasattr(os,'getuid') and info.st_uid != os.getuid()):
         raise RuntimeError('Invalid dictation authentication file.')
-    key = keyfile.read_bytes()
+    if os.name=='nt':
+        with os.fdopen(private_file_descriptor(keyfile),'rb') as stream:key=stream.read(33)
+    else:key = keyfile.read_bytes()
     if len(key) != 32: raise RuntimeError('Invalid dictation authentication key.')
     if os.name!='nt':
         socket_base=base
@@ -69,7 +83,7 @@ def request(method='status', params=None, *, start=True, timeout=20):
         except (ConnectionRefusedError, FileNotFoundError, OSError):
             if not start: raise RuntimeError('System dictation is not running.')
             if attempt == 0:
-                process=subprocess.Popen([sys.executable, str(ROOT/'services/dictation/server.py')], stdin=subprocess.DEVNULL,
+                process=subprocess.Popen([sys.executable, '-B', str(ROOT/'services/dictation/server.py')], stdin=subprocess.DEVNULL,
                                  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True, **({'creationflags':0x08000000} if os.name=='nt' else {}))
                 threading.Thread(target=process.wait,daemon=True).start()
             time.sleep(.05)

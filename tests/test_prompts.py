@@ -65,6 +65,9 @@ class PromptTests(unittest.TestCase):
         started=time.monotonic();QTest.keyClicks(self.editor,'/summary')
         self.assertLess(time.monotonic()-started,.3)
         self.assertTrue(self.catalog.pending)
+        sent=[];self.editor.submit_requested.connect(lambda:sent.append(True))
+        QTest.keyClick(self.editor,Qt.Key.Key_Return)
+        self.assertEqual(sent,[]);self.assertEqual(self.editor.toPlainText(),'/summary')
         gate.set();self.wait_loaded()
 
     def test_clipboard_expands_when_chosen_without_sending_or_changing_template(self):
@@ -75,7 +78,7 @@ class PromptTests(unittest.TestCase):
         QTest.keyClicks(self.editor,'/rewrite');self.wait_loaded()
         self.app.clipboard().setText(copied)
         sent=[];self.editor.submit_requested.connect(lambda:sent.append(self.editor.toPlainText()))
-        QTest.keyClick(self.editor,Qt.Key.Key_Tab)
+        QTest.keyClick(self.editor,Qt.Key.Key_Return)
         expected=template.replace('[clipboard]',copied)
         self.assertEqual(self.editor.toPlainText(),expected)
         self.assertEqual(self.rows[0]['content'],template)
@@ -104,7 +107,7 @@ class PromptTests(unittest.TestCase):
                 mime=QMimeData();mime.setData('image/png',b'not text');self.app.clipboard().setMimeData(mime)
             else:self.app.clipboard().setText(clipboard)
             self.editor.clear();QTest.keyClicks(self.editor,'/rewrite');self.wait_loaded()
-            QTest.keyClick(self.editor,Qt.Key.Key_Tab)
+            QTest.keyClick(self.editor,Qt.Key.Key_Return)
             self.assertEqual(self.editor.toPlainText(),'/rewrite')
             self.assertIn('Clipboard has no text',self.window.status.text())
             self.assertEqual(sent,[])
@@ -157,16 +160,25 @@ class PromptTests(unittest.TestCase):
         self.catalog.receive([], '', old_generation)
         self.assertEqual(self.catalog.prompts,saved)
 
-    def test_enter_submits_command_even_with_matching_prompt(self):
-        self.rows[:]=[{'id':'goal','name':'goal','content':'This is a saved prompt.'}]
+    def test_enter_expands_selected_prompt_then_second_enter_sends(self):
+        self.rows[:]=[{'id':name,'name':name,'content':f'Expanded {name} prompt.'} for name in ('news','crit','goal')]
         sent=[];self.editor.submit_requested.connect(lambda:sent.append(self.editor.toPlainText()))
-        QTest.keyClicks(self.editor,'/goal');self.wait_loaded()
-        QTest.keyClick(self.editor,Qt.Key.Key_Return)
-        self.assertEqual(sent,['/goal'])
-        self.assertEqual(self.editor.toPlainText(),'/goal')
-        self.editor.prompt_menu.refresh()
-        QTest.keyClick(self.editor,Qt.Key.Key_Tab)
-        self.assertEqual(self.editor.toPlainText(),'This is a saved prompt.')
+        for name in ('news','crit','goal'):
+            sent.clear();self.editor.clear();QTest.keyClicks(self.editor,'/'+name);self.wait_loaded()
+            QTest.keyClick(self.editor,Qt.Key.Key_Return)
+            self.assertEqual(sent,[])
+            self.assertEqual(self.editor.toPlainText(),f'Expanded {name} prompt.')
+            QTest.keyClick(self.editor,Qt.Key.Key_Return)
+            self.assertEqual(sent,[f'Expanded {name} prompt.'])
+
+    def test_enter_uses_highlighted_choice_and_escape_allows_command(self):
+        sent=[];self.editor.submit_requested.connect(lambda:sent.append(self.editor.toPlainText()))
+        QTest.keyClicks(self.editor,'/sum');self.wait_loaded()
+        QTest.keyClick(self.editor,Qt.Key.Key_Down);QTest.keyClick(self.editor,Qt.Key.Key_Enter)
+        self.assertEqual(self.editor.toPlainText(),self.rows[0]['content']);self.assertEqual(sent,[])
+        self.editor.clear();QTest.keyClicks(self.editor,'/summary');self.wait_loaded()
+        QTest.keyClick(self.editor,Qt.Key.Key_Escape);QTest.keyClick(self.editor,Qt.Key.Key_Return)
+        self.assertEqual(sent,['/summary'])
 
     def test_enter_submits_when_picker_has_no_match(self):
         sent=[];self.editor.submit_requested.connect(lambda:sent.append(self.editor.toPlainText()))

@@ -1,14 +1,18 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // Owner-installed profiles specialize the existing product; they never own an agent loop.
-import {readFileSync,realpathSync,mkdirSync,writeFileSync,renameSync,existsSync} from 'node:fs'
-import {join,resolve} from 'node:path'
+import {readFileSync,realpathSync,writeFileSync,renameSync,existsSync} from 'node:fs'
+import {join,resolve,isAbsolute} from 'node:path'
 import {DatabaseSync} from 'node:sqlite'
 import {randomUUID} from 'node:crypto'
 import {homedir} from 'node:os'
+import {privateDirectory} from './private.mjs'
 export const profileDirectory=()=>process.env.AUGMENTOR_WORKSPACE_PROFILES||join(process.env.XDG_CONFIG_HOME||join(homedir(),'.config'),'augmentor','workspaces')
 export function canonical(value){try{return realpathSync(value)}catch{return resolve(value)}}
 export function validateProfile(p,id=p?.id){
- if(!p||!/^[a-z][a-z0-9-]{0,63}$/.test(id)||p.id!==id||!/^augmentor-[a-z0-9-]+$/.test(p.preset)||!p.cwd?.startsWith('/')||!p.memory?.person||!p.memory?.project)throw Error('Invalid Augmentor workspace profile')
+ if(!p||!/^[a-z][a-z0-9-]{0,63}$/.test(id)||p.id!==id||!/^augmentor-[a-z0-9-]+$/.test(p.preset)||typeof p.cwd!=='string'||!isAbsolute(p.cwd)||!p.memory?.person||!p.memory?.project)throw Error('Invalid Augmentor workspace profile')
+ if(p.harness!==undefined&&!['dsh','codex'].includes(p.harness))throw Error('Unsupported application workspace harness')
+ if(p.harness==='codex'&&(!p.sdkProtocol||typeof p.connection!=='string'||!/^[A-Za-z0-9_-]{1,128}$/.test(p.connection)))throw Error('Codex workspaces require an explicit connection profile using at most 128 letters, digits, underscores or hyphens')
+ if(p.harness==='codex'&&process.platform==='win32')throw Error('This release has no Windows Codex application adapter')
  if(p.sdkProtocol && (p.sdkProtocol!=='augmentor-app/1'||p.schemaVersion!==1||!p.policy||!Array.isArray(p.policy.tools)||p.policy.tools.some(n=>typeof n!=='string'||!/^[A-Za-z][A-Za-z0-9_]{0,127}$/.test(n))||typeof p.policy.voice!=='boolean'||p.policy.sharedSettings!==false))throw Error('Invalid SDK workspace policy')
  const parent=new URL(p.parentOrigin)
  if(parent.origin!==p.parentOrigin||!['http:','https:'].includes(parent.protocol))throw Error('Invalid workspace parent origin')
@@ -30,7 +34,7 @@ export function profiles(){
 export const profileForSession=row=>profiles().find(p=>row?.agentPreset===p.preset&&typeof row.cwd==='string'&&canonical(row.cwd)===p.cwd)
 export const ownsProductSession=row=>row?.origin!=='subagent'&&(['augmentor-browser-product','augmentor-linux-product'].includes(row?.agentPreset)||!!profileForSession(row))
 export const visibleInProfile=(p,row)=>row.origin!=='subagent'&&typeof row.cwd==='string'&&canonical(row.cwd)===p.cwd&&[p.preset,...p.legacyPresets].includes(row.agentPreset)
-export function profileStatePath(p){const dir=join(process.env.XDG_STATE_HOME||join(homedir(),'.local/state'),'augmentor','workspaces',p.id);mkdirSync(dir,{recursive:true,mode:0o700});return join(dir,'preferences.json')}
+export function profileStatePath(p){const dir=join(process.env.XDG_STATE_HOME||join(homedir(),'.local/state'),'augmentor','workspaces',p.id);privateDirectory(dir);return join(dir,'preferences.json')}
 export function preferences(p,update){
  const file=profileStatePath(p);let lock;
  // SQLite supplies a process-owned lock that the OS releases after a crash.

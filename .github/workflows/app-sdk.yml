@@ -1,0 +1,44 @@
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+name: Application SDK platform contracts
+on:
+  pull_request:
+    paths: ['services/workspaces/**', 'apps/browser/**', 'packages/codex-runtime/**', 'scripts/app-sdk-*', 'scripts/install-embedding.py', 'scripts/embed-launch.py', 'tests/*workspace*', 'tests/test_app_sdk_platform.py', '.github/workflows/app-sdk.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contracts:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-14, windows-2025]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.19.0'
+      - uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9
+        with:
+          version: '0.11.16'
+          enable-cache: false
+      - run: uv python install 3.13.5
+      - run: uv venv --python 3.13.5 .sdk-test-python
+      - name: Select isolated qualification interpreter
+        run: node -e "const fs=require('fs'),p=require('path'); const py=p.resolve('.sdk-test-python',process.platform==='win32'?'Scripts/python.exe':'bin/python');fs.appendFileSync(process.env.GITHUB_ENV,'AUGMENTOR_PYTHON='+py+'\nPYTHONDONTWRITEBYTECODE=1\n');"
+      - if: runner.os == 'Windows'
+        run: uv pip install --python .sdk-test-python/Scripts/python.exe pywin32==312
+      - run: npm ci --ignore-scripts
+      - run: npm run check
+      - run: npm run build
+      - name: Verify OS private files and startup contracts
+        run: node -e "const cp=require('child_process'); const r=cp.spawnSync(process.env.AUGMENTOR_PYTHON,['-m','unittest','discover','-s','tests','-p','test_app_sdk_platform.py','-v'],{stdio:'inherit'});process.exit(r.status??1);"
+      - name: Verify workspace capability contract
+        run: node --test tests/workspace-capabilities.test.mjs apps/browser/test/workspace-context.test.mjs
+      - name: Verify actual pinned Codex workspace engine
+        if: runner.os != 'Windows'
+        run: node --test tests/codex-operations.test.mjs tests/codex-session.test.mjs tests/codex-workspaces.test.mjs
+      - name: Verify source registration and native frame boundary
+        if: runner.os == 'Linux'
+        run: node scripts/app-sdk-bundle-proof.mjs .

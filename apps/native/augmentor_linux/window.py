@@ -1204,8 +1204,8 @@ class Window(QWidget):
 
     def setup_dictation_tray(self):
         if current_name()!='main' or not self.controller:return
-        # The Windows preview does not yet bundle the native dictation component.
-        # Avoid starting an unavailable companion or creating a second tray owner.
+        # A development tree may lack its compiled component. Complete Windows
+        # packages must include it; avoid starting an unavailable test companion.
         if sys.platform=='win32' and not (Path(__file__).resolve().parents[3]/'components/handy/runtime/bin/handy.exe').is_file():return
         from .dictation import request,theme
         value=theme(self.preferences.values)

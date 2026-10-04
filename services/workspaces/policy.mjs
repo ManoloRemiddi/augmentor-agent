@@ -11,8 +11,9 @@ export function voiceEnabled(profile){return profile?.sdkProtocol===SDK_PROTOCOL
 export function guardWorkspaceMethod(profile,method,params={}){
  if(profile?.sdkProtocol!==SDK_PROTOCOL)return
  validatePolicy(profile)
- if(['augmentor/dsh','augmentor/onboarding','augmentor/diagnostics','augmentor/home','augmentor/surface','updates/check','settings.mutate'].includes(method))throw Error('This application cannot administer the shared Augmentor installation')
+ if(['augmentor/dsh','augmentor/codex','augmentor/onboarding','augmentor/diagnostics','augmentor/home','augmentor/surface','updates/check','settings.mutate'].includes(method))throw Error('This application cannot administer the shared Augmentor installation')
  if(method==='augmentor/prompts'&&!['list','get','describe'].includes(params.action||'list'))throw Error('Shared prompt changes are unavailable in application workspaces')
+ if(method==='augmentor/memory'&&params.action!=='dual.recall')throw Error('Shared memory administration is unavailable in application workspaces')
  if(method.startsWith('augmentor/voice')&&!['augmentor/voice/preferences','augmentor/voice/control'].includes(method)&&!voiceEnabled(profile))throw Error('Experimental voice is disabled for this workspace')
  if(method==='augmentor/voice/preferences'&&params.action&&params.action!=='get')throw Error('Shared voice configuration is managed in standalone Augmentor')
 }

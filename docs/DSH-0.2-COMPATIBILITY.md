@@ -142,3 +142,14 @@ were requested or changed. Source PRs and local deployment are complete; package
 registry publication, review/merge and customer installer qualification remain
 separate. In particular, do not install an unrelated publisher's higher version
 of the unscoped adaptive-reasoning package as an upgrade to the owner's file build.
+
+## October 4 integrated-source merge qualification
+
+PR #37 now integrates main `d93eb49`, browser typing `00069dd` and saved-prompt
+Enter `3148760`. Code merged cleanly; handoff/deployment/index conflicts retained
+the DSH evidence and newer product records. All 80 DSH contracts pass against the
+existing hash-qualified 0.2.0-rc.2 runtime, all 96 Browser cases pass, and all 28
+focused native voice/prompt/improvement/startup/shared-prompt cases pass. TypeScript
+check/build passes. Hosted platform/package validation remains the merge gate
+and tests the locked 0.1.5 installer contract separately. This does not upgrade
+customer installer pins, alter installed runtime/configuration, or restart apps.

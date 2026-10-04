@@ -2,7 +2,25 @@
 
 # Embedded Handy dictation
 
-## October 3 alignment and matched downloads
+## Current matched download publication — October 3
+
+[The preview-2 release ledger](HANDY-DOWNLOADS-2026-10-03.md) records the
+published Linux, Mac and Windows x64/ARM64 downloads, exact source/checksums,
+eight passing qualification workflows and anonymous full-download verification.
+PR #35 is merged as `5d4ab848e2d8e1e49a030fa2c139e6b7d65ce009`; customer
+source and tags retain `6f001fd395a4575ea58d1899f7b68aa1d5283004`.
+All four customer packages bundle native Handy without its separate tray.
+Settings remain off after refresh and release the installation lease when disabled.
+The four-pixel recording-icon correction is merged in PR #33 and included.
+
+Preview-1 assets remain historical and omit Handy. The preparation statements
+below retain their dated evidence; their pending source/package gates are
+superseded by the ledger. Physical microphone/input/permission acceptance on
+Mac and Windows remains pending. The owner's compatible 0.2.11 installation
+is separate and was not replaced by the 0.2.13 release tests. Selected and
+running artifacts can differ; inspect each before any installed update.
+
+## Historical October 3 alignment and matched download preparation
 
 The owner requested a small leftward correction of the recording icon. The
 28-pixel orb is translated four CSS pixels left; waveform, cancel button, orb
@@ -44,8 +62,11 @@ component jobs pass at `e28dc90`; its installed Debian shortcut fixture exposed
 an existing race after restoring the parent before the first-run dialog mapped.
 The follow-up waits for both windows before indexing the dialog, preserving all
 real key-event/maintenance/removal assertions. The X11 proof wrapper now explicitly
-isolates dictation state and clears inherited Wayland state. Await final hosted
-checks before merging PR #33; matched public download preparation stays separate.
+isolates dictation state and clears inherited Wayland state. All final source,
+installed-package, component and Windows x64/ARM64 installation/repair/removal
+checks passed at `8ceef2b`. PR #33 is merged as
+`f738a73f6f2d44fde111108df72dbf1cd94b562b`; matched public download preparation
+stays separate.
 
 Publication direction: prepare Linux, macOS and Windows downloads before
 publishing. Existing Linux/Mac 0.2.13 preview downloads predate Handy; the Windows
@@ -55,6 +76,129 @@ component proofs, Windows payload/prerequisite integration on both advertised
 CPUs, matched complete installers, fresh-user dictation lifecycle acceptance,
 source/notices review, and exact anonymous-download checks after publication.
 This preparation is ongoing; do not claim the existing downloads include Handy.
+
+Matched-download preparation now wires the complete Windows component into both
+native x64/ARM64 payloads before sealing. Its fixed Microsoft WebView2 runtime
+and matching CRT are app-local; no browser/Handy/global runtime installer runs.
+Supplier archives are downloaded directly from Microsoft, pinned by bytes and
+SHA-256, checked for the target PE architecture and native publisher signature,
+and kept complete with their original terms/notices. The normal per-user Setup
+shows the separately licensed vendor terms. See [Microsoft's distribution guide](https://learn.microsoft.com/en-us/microsoft-edge/webview2/concepts/distribution)
+and the reviewed supplier record in `components/handy/webview2.json`.
+The component selects that exact browser even when the parent inherits a stale
+global WebView2 path. Windows broker authentication state uses protected private
+user paths and files; enabled components hold the installation lifecycle lease.
+The native PE import audit found ONNX Runtime's additional `msvcp140_1.dll`
+dependency. The reviewed Microsoft VC supplier provides that exact library for
+each CPU; its installer is read/extracted without execution. Original consumer
+terms and supplier hashes are retained. Redistribution follows the separately
+licensed compiler's [Microsoft distributable-code requirements](https://learn.microsoft.com/en-us/cpp/windows/redistributing-visual-cpp-files),
+not the application's MIT-style code license or the runtime consumer-use terms.
+
+The Windows preview workflow builds both native components and creates complete
+customer installers from one source revision. Its copied-payload broker proof
+checks startup, shortcut defaults/editing, appearance, microphone exclusion,
+disable and shutdown without downloading a model or recording a microphone.
+The full Windows qualification continues to check actual Setup/repair/removal.
+These new Windows gates are pending native CI; they are not evidence that the
+existing public Windows preview has dictation or that physical transcription has
+been tested on either Windows CPU. No download has been published by this work.
+
+The matched Linux/Mac workflow now prepares a Debian complete preview and a Mac
+ad-hoc app/DMG from the same revision as Windows. Linux qualification installs
+the exact complete archive as a fresh ordinary user and exercises the installed
+Handy component on a virtual display without a microphone/model download.
+Mac qualification preserves all existing hash-locked corresponding sources and
+notices, verifies the sealed archive and signature, and exercises its packaged
+component and managed first-run service. Preparation gates remain pending;
+physical microphone/OS-permission acceptance is separate from these proofs.
+Candidate workflows explicitly check out the reviewed pull-request head, so all
+three artifacts record the same durable source commit rather than a temporary
+GitHub test merge. No publication step is included in these preparation jobs.
+
+The first native ARM64 build exposed ggml's requirement for Clang. The Windows
+ARM lane now uses Visual Studio's ARM SDK with Clang/Ninja and the native Rust
+MSVC target. Native ARM SDK setup uses the ARM host tools and cmd-compatible
+quoting for the installed Program Files path. The publisher check clears inherited PowerShell 7 module paths
+before loading Windows PowerShell's own security module. Neither fix weakens
+supplier signature/checksum checks. Exact current-source caches are validated.
+
+The older local development clients also received the narrow offscreen-state
+guard, preserving their unrelated changes. After another observed stopped
+broker, the selected installed broker was restarted with a private startup log
+and again reported ready/unchanged Ctrl+Space. The precise cause of that latest
+exit was not captured; the earlier incomplete/offscreen takeover was confirmed.
+
+The native ARM compiler now succeeds. Packaging found that Microsoft's ARM
+browser CAB omits a CRT file present in its x64 browser CAB; retain the complete
+verified vendor tree and validate its native entry point. Inference uses its
+own separately pinned native VC libraries. Supplier hashes/signatures remain
+mandatory. Hosted startup checks are still required before distribution.
+
+Complete-bundle source inputs now reuse the already published plugin packages,
+with byte-for-byte source copies and package-digest references. Their manifest
+explicitly scopes these archives to distributed plugin source; external service
+repositories are separate and are never fetched by CI. Mac preparation reuses
+all native notices from the immutable public 0.2.13 licensing snapshot, validates
+every notice and the unchanged source graph, and retains the existing public
+corresponding-source links. The previous application is mounted read-only and
+never executed. This avoids removed upstream archive URLs without substituting
+unverified notices or introducing private source.
+
+The new consent page is preserved in Windows Setup. Its disposable wizard proof
+now explicitly accepts its inert fixture terms before clicking Next and records
+that page; customer/vendor terms are not removed or bypassed. The complete Linux
+assembler uses the same narrowly scoped Git safe-directory setting as its Debian
+packager, supporting the hosted container's checkout ownership while retaining
+clean-source and exact-commit checks. Both follow-ups await hosted qualification.
+
+Inspection of the exact Microsoft ARM VC payload found its `vcruntime140_1`
+support member has an x64 PE header. Native ARM inference now receives the native
+CRT members; staging reads each actual inference executable/DLL's PE imports and
+rejects missing C++ dependencies or wrong native architectures before packaging.
+The retained import report distinguishes x64's additional runtime from ARM's
+dependency set. The parser was checked against all existing x64 inference DLLs;
+final ARM intake and startup gates remain pending.
+
+Preview 2's bundled Linux, Mac and Windows guides now explain first-time model setup,
+the shared recording shortcut/appearance and remaining physical acceptance. The Linux guide records the actual 0.1.19 speech package. The
+Windows guide explicitly forbids replacing preview 1 with a different build;
+manual repair is for the exact recorded installer. Package workflows also track
+those embedded guide inputs, so a guide correction produces matching candidates.
+
+The final-source validation found a separate Codex browser voice fixture ordering
+race: audio arrived before the model's durable completion receipt. The fixture
+now waits for the exact completed operation before closing voice and shutting
+down. Provider count, request identity, PCM and terminal assertions are preserved;
+installed dictation/runtime behavior is unchanged. Matching candidates and source
+gates are rerun after this test-only synchronization correction.
+
+Native x64's full installation/repair/removal proof passed at `da70616`, but its
+separate broker regression runner lacked the services import path for Windows
+identity adapters. That test now includes the path. Its deliberately incomplete
+checkout also retains those adapters, so enabled-session refusal reaches the
+missing compiled binary rather than failing earlier on a missing Python module.
+Authentication/ACL assertions remain enabled; product code and payload are unchanged.
+Both native lanes and matching packages are rerun from the corrected test source.
+
+The native ARM desktop fault fixture also exposed cleanup ordering: it waited
+for authenticated Python peers but not their distinct native wrappers, which
+could still hold a log briefly after the deliberate supervisor kill. It now
+retains and waits for both kernel process handles, preserving strict termination
+assertions rather than ignoring deletion failures. Product supervisor behavior
+is unchanged. This follow-up is documented in the Windows shell guide and native
+checks are rerun from the resulting source.
+
+Windows broker IPC/ACL assertions passed after the test-path fix, but immediate
+fixture deletion raced the shutdown reply versus native process exit. Those IPC
+fixtures now retain and wait for their actual broker Popen handles before cleanup.
+The same lane subsequently detected a changed sealed payload; its exact changed
+entries were not captured. Broker startup now explicitly carries `-B`, matching
+the native launcher's no-bytecode policy so a child interpreter cannot create
+cache files in the sealed installation. This runtime preservation is included
+in the next native/full-package qualification, without weakening inventory checks. The disposable installation proof now retains
+actual staged-file differences if intake refuses, rather than only the generic
+exception. No installed user data is copied.
 
 Implementation branch: `feat/handy-integration`, based on public main
 `d91c52037d7bc26c82c702c25e1a779b0fca1f39`. This guide owns the implemented
@@ -567,3 +711,72 @@ windows are online with voice available; embedded Ctrl+Space is enabled/ready,
 CPU, current animated palette, no tray and no standalone autostart. Source
 qualification, this installed composition and customer-release gates remain
 explicitly distinct. Documentation-only follow-ups retain tested source `81a2bba`.
+
+### October 3 exact Windows intake diagnosis
+
+The x64 intake report from [run 37122854272](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37122854272)
+identifies seven unexpected Python standard-library bytecode files (`secrets` and
+`multiprocessing`) and their cache directory; no sealed file was changed or missing.
+The incomplete-checkout broker fixture directly invoked the bundled interpreter
+without `-B`, unlike the product broker and all workflow entrypoints. That fixture
+now preserves the no-bytecode policy too. Missing-component refusal, IPC/ACL and
+strict inventory assertions remain unchanged. Product startup already received
+`-B` in `547a9f0`; this correction changes only test execution. All matched native
+and package gates must pass again before publication. The owner's installed
+release and saved dictation preferences are untouched.
+
+### October 3 larger ARM64 recovery deadline
+
+All matching customer packages and source/desktop/Mac/Linux gates pass at
+`9661eef`; x64 full installation passes too. ARM64 full installation reaches
+source restoration, where the old five-minute observer expires roughly 26
+seconds before its independent Setup successfully finishes. Required health and
+journal completion are therefore absent. [The owning recovery record](WINDOWS-INSTALLER-DECISION.md#october-3-complete-payload-recovery-observation)
+describes the bounded ten-minute inner/fifteen-minute outer observation and
+regression cases. Inventory, source identity and durable completion gates remain
+strict; all matched candidates must be rebuilt and qualified after this product
+correction. Three private preview-2 drafts exist; no new download is public.
+
+### October 3 first-response observation and Windows diagnostics
+
+At reconciled source `901fab9`, Linux/Mac matched packages, validation, Mac product
+and Windows desktop checks pass. The x64 public package's no-model enable probe
+times out waiting for a native RPC; the old generic error does not identify
+which operation failed. Its separate full native broker proof passes. Initial
+component status now has a bounded 60-second startup window; warm operations
+retain 15 seconds and model selection retains 60. Settings model/device queries
+and the package's enable probe allow 75 seconds to encompass startup.
+
+Only the disposable Windows proof records method names, elapsed time and outcome
+class, plus native startup stderr, in a retained failure log. It records no RPC
+parameters, downloads no model and uses no physical microphone. This improves
+diagnosis without adding product logging or touching the owner's installation.
+Sixteen broker cases pass locally, including separate startup/warm bounds; all
+matching downloads require fresh qualification after this change.
+
+### October 3 explicit off-state refresh and maintenance
+
+Settings previously requested the native model list even after disabling
+dictation, restarting the component and reacquiring its installation lease.
+Disabled settings refresh now reads only broker status; model/device queries and
+editing controls become available when enabled. Preferences remain stored. Three
+GUI-free cases cover disabled refresh, disable without restart, and the enabled
+model/device/current-revision flow. No layout or recording graphic changes.
+
+The Windows packaged proof now copies the actual release identity into its
+disposable fixture and assigns a private runtime directory. Real kernel lock
+checks must show installation maintenance refused while Handy is enabled and
+admitted after disabling it. Prior proofs covered native IPC/component behavior
+but omitted that release identity, so did not exercise its installation lease.
+The Windows guide explicitly requires turning dictation off before repair or
+removal. All final native/package gates rerun; no owner installation is modified.
+
+The `048954d` native Windows installer gates pass on both CPUs, including
+rejected-update task-dialog cleanup. Its x64 customer dictation proof also passes
+with the real installed lease checks. Linux's broader suite reaches 841 cases
+and catches one outdated fixture: the stale-save/draft test types into a disabled
+shortcut field. That test now models enabled dictation and retains every draft,
+revision-conflict and explicit-reload assertion; a separate Qt case verifies
+disabled editing and status-only refresh. The local production interpreter omits
+QtTest, so these actual Qt cases require the full hosted test runtime. Final
+matching package/source qualification remains required after this fixture change.

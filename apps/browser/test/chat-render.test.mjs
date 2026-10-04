@@ -9,6 +9,30 @@ import {JSDOM} from 'jsdom'
 import {marked} from 'marked'
 import {createChatUI} from '../extension/chat-render.js'
 
+test('workspace thinking preference applies to live reasoning, preserves manual choices and leaves history collapsed',t=>{
+ const dom=new JSDOM('<div id="log"></div>',{pretendToBeVisual:true})
+ globalThis.window=dom.window;globalThis.document=dom.window.document
+ globalThis.requestAnimationFrame=window.requestAnimationFrame.bind(window)
+ globalThis.cancelAnimationFrame=window.cancelAnimationFrame.bind(window);window.marked=marked
+ const log=document.querySelector('#log'),ui=createChatUI({log});t.after(()=>{ui.clear();dom.window.close()})
+ let seq=0
+ const event=(type,data={})=>ui.applyLog([{kind:'event',event:{seq:seq++,type,data}}])
+ const think=()=>event('assistant/chunk',{chunk:{type:'reasoning-delta',text:'Thought'}})
+ ui.setThinkingPreference(false);think()
+ const first=log.querySelector('.think');assert.equal(first.open,false)
+ first.open=true;ui.setThinkingPreference(false);think();assert.equal(first.open,true,'unchanged preference preserves manual expansion')
+ ui.setThinkingPreference(true);ui.setThinkingPreference(false);assert.equal(first.open,false)
+ first.open=true;event('assistant/chunk',{chunk:{type:'text-delta',text:'Answer'}});assert.equal(first.open,false)
+ event('assistant/message',{message:{content:[{type:'reasoning',text:'ThoughtThought'},{type:'text',text:'Answer'}]}})
+ first.open=true;ui.setThinkingPreference(true);assert.equal(first.open,true,'finished history remains manually controlled')
+ think();const second=log.querySelectorAll('.think')[1];assert.equal(second.open,true)
+ second.open=false;think();assert.equal(second.open,false,'new chunks preserve manual collapse')
+ second.open=true;ui.setState({running:false});assert.equal(second.open,false)
+ ui.clear();event('assistant/message',{message:{content:[{type:'reasoning',text:'Saved thought'},{type:'text',text:'Saved answer'}]}})
+ assert.equal(log.querySelector('.think').open,false)
+ assert.equal(log.querySelector('.md').textContent.trim(),'Saved answer')
+})
+
 for (const delivery of ['live', 'reopen']) {
   test(`${delivery}: unsequenced DSH chunks paint before completion and replay once`, async t => {
     const dom = new JSDOM('<div id="log"></div>', {pretendToBeVisual:true})
