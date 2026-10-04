@@ -6,15 +6,27 @@
 records successful native and ordinary published0.2.12→0.2.13 upgrade. Native
 rollback also passes. Ordinary rollback refused before the older save method
 entered: published0.2.12 accepts a token alone, while the proof supplied a managed
-argument. Its original unknown record stays intact. The fixture currently has
-native/integration012 and selected013; complete rollback remains unqualified.
-A separate continuation is being reviewed without repeating installation.
+argument. Its original unknown record stays intact. A separately reviewed
+continuation passes one token-only save and normal managed rollback without
+repeating installation. Native/integration/saved settings/selected are now012,
+with013 retained as previous. Histories and all foreign aliases remain preserved;
+zero model requests occurred. This is a qualified fixture round trip with the
+recorded continuation, rather than an uninterrupted first attempt. The maintained proof now chooses
+the exact published save API before any SDK/install action, and rejects every012
+managed key. All27 fresh plus27 unchanged historical checks pass; future authority
+scope195 preserves the sealed184 inputs.
 
 KDE has a verified active Wayland session, currently locked. The supported fixture
 unlock preflight refused a native ScreenSaver owner's executable permission before
-sending an unlock request. Full ending preservation passes; application/input and
-password acceptance remain open. The isolated source build kit prepares correctly,
-but its launcher exited before Docker startup; actual compilation has not begun.
+sending an unlock request. A separate privileged diagnosis verifies the exact
+native KWin/Plasma owners and executable package checks. A supported fixture
+unlock using those verified owners passes, with both lock states inactive and
+account/lock settings preserved. This is administrative fixture restoration;
+application/input and password acceptance remain open. The isolated source build kit prepares correctly,
+and private Docker/containerd now pass independent admission. The exact base
+image imports and verifies, but classic Docker loading loses its registry digest
+reference. A supported containerd storage plan is under review; compilation has
+not begun.
 [Hosted validation37212960848](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37212960848)
 passes all11 jobs at8528697. Source rebuild, physical audio, licensing and the
 unwaived GitGuardian gate remain open. No public release is qualified.

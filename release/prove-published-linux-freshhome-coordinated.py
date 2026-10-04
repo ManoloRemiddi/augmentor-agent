@@ -31,9 +31,9 @@ CONTAINER = '400a7c83dd588c57b8fe59594b9683725c49eaac14e14532140b7fc03631ca7b'
 IMAGE = '049bbe119edbe568a0575ce7516cc22ae4699fc71eb6c96540a2ec6dc9de438d'
 VOLUME = 'augmentor-versioned-home-20261004'
 HOME = Path('/home/augmentor-version-proof')
-ROOT = Path('/opt/augmentor-freshhome-coordinated184')
+ROOT = Path('/opt/augmentor-freshhome-coordinated195')
 MARKER = Path('/etc/augmentor-upgrade-fresh-home-fixture')
-JOURNALS = {m: 'published-product-freshhome-coordinated-'+m+'184' for m in ('upgrade', 'rollback')}
+JOURNALS = {m: 'published-product-freshhome-coordinated-'+m+'195' for m in ('upgrade', 'rollback')}
 SELECTOR = '.local/share/augmentor/desktop.json'
 HARNESS = '.config/augmentor/harnesses.json'
 SOURCES = {'0.2.12': 'e02731023153e3b2e1440e50b8c14b64ad0a82e5',
@@ -279,6 +279,20 @@ def fresh_integration_preserved(before, after, cordis_before, cordis_after, coor
     coordinator.integration_preserved(before, normalized)
 
 
+def save_arguments(version, saved):
+    """Choose the hash-qualified published API before recording an action."""
+    dsh = saved.get('dsh')
+    if not isinstance(dsh, dict) or set(dsh) - {'endpoint', 'home', 'version', 'managed'}:
+        raise ValueError('Normal historical save cannot preserve unknown DSH connection fields.')
+    if version == '0.2.12':
+        if 'managed' in dsh:
+            raise ValueError('Published012 save cannot preserve a managed connection key.')
+        return {}
+    if version == '0.2.13':
+        return {'managed': dsh.get('managed')}
+    raise ValueError('The published save API version is not qualified.')
+
+
 def prove(mode):
     os.umask(0o077); sys.dont_write_bytecode = True
     here = Path(__file__).parent
@@ -360,9 +374,8 @@ def prove(mode):
         raise ValueError('The original legacy predecessor differs from actual baseline160.')
     prior_version = '0.2.12' if mode == 'upgrade' else '0.2.13'
     saved_before = json.loads((base.HOME/HARNESS).read_text())
+    save_kwargs = save_arguments(version, saved_before)
     expected_saved_bytes = coordinator.saved_bytes((base.HOME/HARNESS).read_bytes(), version)
-    if set(saved_before.get('dsh', {})) - {'endpoint', 'home', 'version', 'managed'}:
-        raise ValueError('Normal historical save cannot preserve unknown DSH connection fields.')
     saved = current()
     if saved.get('version') != prior_version or saved.get('endpoint') != env['DSH_AUGMENTOR_URL'] or saved.get('home') != str(home):
         raise ValueError('The saved prior product connection differs.')
@@ -439,7 +452,7 @@ def prove(mode):
         if checked.get('installed') is not True:
             raise ValueError('The restarted matching integration is unavailable.')
         result = coordinator.action(base, folder, record, 'normal-setup-save',
-                        lambda: setup.save(checked['token'], managed=saved_before['dsh'].get('managed')))
+                        lambda: setup.save(checked['token'], **save_kwargs))
         if result.get('saved') is not True:
             raise ValueError('Normal product save refused.')
         coordinator.saved_transition(saved_before, json.loads((base.HOME/HARNESS).read_text()), version)

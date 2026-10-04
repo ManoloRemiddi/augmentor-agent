@@ -283,6 +283,81 @@ class FileAndPreservationTests(unittest.TestCase):
         with self.assertRaises(ValueError):m.fresh_integration_preserved(left,bad,before,after,coordinator)
 
 
+class SaveCompatibilityTests(unittest.TestCase):
+    def invoke(self, version, saved, setup, record, token='fresh-token'):
+        kwargs = m.save_arguments(version, saved)
+        base = SimpleNamespace(atomic=lambda _path, value: None)
+        return c.action(base, Path('/synthetic'), record, 'normal-setup-save',
+                        lambda: setup.save(token, **kwargs))
+
+    def test_published012_signature_receives_only_token_after_intent(self):
+        record = {'pendingAction': None}; calls = []
+        class Legacy:
+            def save(self, token):
+                self_pending = record['pendingAction']
+                calls.append((token, self_pending))
+                return {'saved': True, 'reconnect': True}
+        result = self.invoke('0.2.12', {'dsh': {}}, Legacy(), record)
+        self.assertEqual(result, {'saved': True, 'reconnect': True})
+        self.assertEqual(calls, [('fresh-token', 'normal-setup-save')])
+        self.assertIsNone(record['pendingAction'])
+        self.assertEqual(record['completedActions'], ['normal-setup-save'])
+
+    def test_published013_signature_receives_managed_keyword_and_saved_input_unchanged(self):
+        saved = {'provider': {'preserved': True}, 'dsh': {'managed': {'owned': True}}}
+        before = copy.deepcopy(saved); calls = []
+        class Current:
+            def save(self, token, *, managed):
+                calls.append((token, managed)); return {'saved': True}
+        self.invoke('0.2.13', saved, Current(), {'pendingAction': None})
+        self.assertEqual(calls, [('fresh-token', saved['dsh']['managed'])])
+        self.assertEqual(saved, before)
+        self.assertEqual(m.save_arguments('0.2.13', {'dsh': {}}), {'managed': None})
+
+    def test_published012_any_managed_key_refuses_before_intent_or_save(self):
+        for value in (None, {}, False, {'owned': True}):
+            record = {'pendingAction': None}; setup = SimpleNamespace(save=Mock())
+            with self.subTest(value=value), patch.object(c, 'action') as action, self.assertRaises(ValueError):
+                self.invoke('0.2.12', {'dsh': {'managed': value}}, setup, record)
+            action.assert_not_called(); setup.save.assert_not_called()
+            self.assertEqual(record, {'pendingAction': None})
+
+    def test_unknown_version_refuses_before_intent_or_save(self):
+        record = {'pendingAction': None}; setup = SimpleNamespace(save=Mock())
+        with patch.object(c, 'action') as action, self.assertRaises(ValueError):
+            self.invoke('0.2.14', {'dsh': {}}, setup, record)
+        action.assert_not_called(); setup.save.assert_not_called()
+        self.assertEqual(record, {'pendingAction': None})
+
+    def test_unknown_or_malformed_saved_dsh_refuses_before_intent(self):
+        for saved in ({}, {'dsh': None}, {'dsh': []}, {'dsh': {'unknown': True}}):
+            with self.subTest(saved=saved), patch.object(c, 'action') as action, self.assertRaises(ValueError):
+                self.invoke('0.2.13', saved, SimpleNamespace(save=Mock()), {'pendingAction': None})
+            action.assert_not_called()
+
+    def test_body_typeerror_remains_pending_and_is_never_retried(self):
+        calls = []; record = {'pendingAction': None}
+        class Legacy:
+            def save(self, token):
+                calls.append(token); raise TypeError('body failure after entry')
+        with self.assertRaisesRegex(TypeError, 'body failure'):
+            self.invoke('0.2.12', {'dsh': {}}, Legacy(), record)
+        self.assertEqual(calls, ['fresh-token'])
+        self.assertEqual(record['pendingAction'], 'normal-setup-save')
+        self.assertNotIn('completedActions', record)
+        with self.assertRaises(ValueError):self.invoke('0.2.12', {'dsh': {}}, Legacy(), record)
+        self.assertEqual(calls, ['fresh-token'])
+
+    def test_early_api_qualification_and_new_namespaces_preserve_sealed184(self):
+        source = Path(m.__file__).read_text(); body = source[source.index('def prove(mode):'):]
+        self.assertLess(body.index('save_kwargs = save_arguments('), body.index('folder.mkdir('))
+        self.assertLess(body.index('save_kwargs = save_arguments('), body.index('node.start('))
+        self.assertLess(body.index('save_kwargs = save_arguments('), body.index("'normal-setup-install'"))
+        self.assertEqual(m.ROOT, Path('/opt/augmentor-freshhome-coordinated195'))
+        self.assertEqual(m.JOURNALS, {mode: 'published-product-freshhome-coordinated-'+mode+'195'
+                                    for mode in ('upgrade', 'rollback')})
+
+
 class SourceScopeTests(unittest.TestCase):
     def test_historical_worker_is_byte_identical_and_no_runtime_relabel(self):
         self.assertEqual(hashlib.sha256((ROOT/'release/prove-published-linux-coordinated-version.py').read_bytes()).hexdigest(),m.COORDINATOR_SHA)

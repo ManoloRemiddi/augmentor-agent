@@ -1,6 +1,31 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-## October 4 fresh native upgrade and executable cache correction
+## October 4 coherent rollback and published save compatibility
+
+[The current fixture checkpoint](../release/qualification/next-targets/20261004-native-upgrade-desktop-ending-checkpoint.json)
+records successful native and ordinary 0.2.12→0.2.13 upgrade and native rollback.
+The first ordinary rollback installed matching 0.2.12 integration, then refused
+before entering `Setup.save`: published 0.2.12 accepts a token alone. The failed
+record remains unchanged. A separately reviewed continuation used one fresh
+checked token, one token-only save and normal `augmentor-update rollback`, with
+no repeated integration install, staging or native transaction. Independent
+ending checks pass native/integration/settings/selected 0.2.12 and previous
+0.2.13, complete managed inventories, all three histories and foreign aliases.
+Zero model requests occurred. The historical SDK restart changed only the
+measured composition-file modification time; continuation checks preserved its
+bytes and stable identity, and every other integration field.
+
+The maintained fresh-HOME proof now selects the hash-qualified save arguments
+before allocating its worker journal, starting the SDK or installing integration:
+0.2.12 receives only the token; 0.2.13 receives the managed keyword. A 0.2.12
+connection containing any `managed` key, including null, refuses because that
+published save method would drop it. Unknown versions and connection fields also
+refuse. There is no TypeError fallback or retry. Future immutable authority and
+journals use scope195, preserving sealed184. All27 fresh and27 unchanged
+historical coordinator tests pass. Scope195 itself has not run; the current
+fixture round trip includes the separately recorded continuation.
+
+## October 4 earlier native upgrade and executable cache correction
 
 The fresh ext4 HOME fixture completed one normal native 0.2.12→0.2.13
 transaction in 32.03 seconds: exactly two Augmentor packages and the nine
