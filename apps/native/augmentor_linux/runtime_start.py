@@ -1,6 +1,5 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Start one detached socket harness host. Only safe health probes trigger recovery."""
-import fcntl
 import os
 import shutil
 import socket
@@ -8,6 +7,9 @@ import subprocess
 import time
 import sys
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]/'services'))
+from platform_adapters import locks as fcntl
+from .platform_runtime import LocalSocket, private_directory
 
 
 def ensure_running(harness='pi'):
@@ -15,12 +17,10 @@ def ensure_running(harness='pi'):
     prefix='AUGMENTOR_'+harness.upper()
     project=Path(__file__).resolve().parents[3]
     state=Path(os.environ.get(prefix+'_STATE',Path(os.environ.get('XDG_STATE_HOME',Path.home()/'.local/state'))/('augmentor-'+harness)))
-    state.mkdir(mode=0o700,parents=True,exist_ok=True)
-    if harness == 'codex' and (state.is_symlink() or state.stat().st_uid != os.getuid() or state.stat().st_mode & 0o077):
-        raise RuntimeError('Codex state must be private and owned by this user.')
+    private_directory(state)
     endpoint=os.environ.get(prefix+'_SOCKET',str(state/'runtime.sock'))
     def alive():
-        with socket.socket(socket.AF_UNIX,socket.SOCK_STREAM) as probe:
+        with LocalSocket() as probe:
             probe.settimeout(1)
             try:probe.connect(endpoint);return True
             except (FileNotFoundError,ConnectionRefusedError):return False

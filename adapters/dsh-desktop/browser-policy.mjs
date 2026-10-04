@@ -35,5 +35,5 @@ export function applyBrowserPolicy(ctx) {
     return decision
   })
   ctx.on('agent/status', ({agent, status}) => { if (status === 'idle') { failed.delete(agent.id); unreadable.delete(agent.id) } })
-  ctx.on('dispose', () => { failed.clear(); unreadable.clear() })
+  ctx.effect(() => () => { failed.clear(); unreadable.clear() }, 'augmentor-desktop: browser policy')
 }

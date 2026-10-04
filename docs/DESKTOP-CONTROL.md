@@ -152,3 +152,14 @@ extension identity and all other files match the previous install. Its loaded
 service worker still requires Reload in `chrome://extensions`: this Codex chat
 has in-app browser access but no connection to the user's installed Chromium.
 Mac installed adoption and live Google Forms verification remain untested.
+
+### October 4 source merge qualification
+
+PR #31 now incorporates canonical main `d93eb49`, including the shared SDK,
+Handy packaging and companion-service lifetime fixes. Its only merge conflict
+was the handoff document; both dated records were retained. The final change
+keeps document-epoch checks and uses the native value setter for framework-owned
+inputs. TypeScript check/build and all 93 Browser cases pass on the integrated
+source. Current hosted platform/package validation is the merge gate; historical
+installed and real React evidence above retains its original scope. This source
+integration does not select a release or reload a running Browser extension.

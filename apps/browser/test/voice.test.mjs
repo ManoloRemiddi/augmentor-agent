@@ -44,6 +44,12 @@ test('hands-free uses native engine, survives blur, and stops on Escape',async t
  dom.window.dispatchEvent(new dom.window.Event('blur'));assert.equal(sent.length,1)
  button.onkeydown({key:'Escape',preventDefault(){}});assert.equal(sent.at(-1).action,'close')
 })
+test('maintenance sees the initial hold gesture before the speech worker opens',async t=>{
+ const {voice,button,down,sent}=setup(t)
+ assert.equal(voice.busy,false);down();assert.equal(voice.busy,true);assert.equal(sent.length,0)
+ button.onpointercancel();assert.equal(voice.busy,false)
+ await delay(240);assert.equal(sent.length,0)
+})
 test('release during preparation never starts a delayed recording',async t=>{
  const {button,sent,down}=setup(t)
  down();await delay(230);button.onpointerup();await delay(10)

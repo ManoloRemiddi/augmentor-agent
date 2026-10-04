@@ -212,5 +212,5 @@ export function install(ctx, c, {now=Date.now, persist=save} = {}) {
   });
   ctx.on('agent/status',({agent,status})=>{const s=states.get(agent.id);if(s&&status==='idle'){clearTimeout(s.timer);s.timer=undefined;}});
   ctx.on('agent/disposed',({agent})=>{const s=states.get(agent.id);clearTimeout(s?.timer);s?.removeAbort?.();states.delete(agent.id);});
-  ctx.on('dispose',()=>{for(const s of states.values()){clearTimeout(s.timer);s.removeAbort?.();}states.clear();});
+  ctx.effect(()=>()=>{for(const s of states.values()){clearTimeout(s.timer);s.removeAbort?.();}states.clear();},'augmentor-execution: timers');
 }

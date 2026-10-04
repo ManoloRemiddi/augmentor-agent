@@ -2,6 +2,38 @@
 
 # Consistent installed desktop releases
 
+## October 3: bounded companion lifetimes
+
+[Companion retirement and cleanup](LIFECYCLE.md#detached-companion-retirement--october-3)
+records source implementation `441009b`, initialization correction `8d148d5`,
+source qualification and the 139-process abandoned-fixture cleanup.
+
+A separate candidate copied immutable product 0.2.11 artifact
+`ea4204f8d4f746e270df7c64b86ca486a9f814b41bd40eee22da541b2d4b330f` and backported
+only shared lifetime/admission helpers, memory/prompt retirement, dictation
+retirement/cleanup and optional compatibility-watchdog scripts. It preserves the
+older component call contract, DSH integration, speech/Handy dependencies,
+preferences and native UI; it does not replace them with source product 0.2.13.
+Prompt and memory SQLite setup finish before publishing their socket. Five real
+candidate process cases pass, including preserved journals, long watches,
+replacement endpoints and live microphone ownership. The earlier unselected
+startup-race candidate was discarded before activation.
+
+Installed staging, full inventory verification and authenticated product/catalog
+promotion passed. Selected release `20261003-215828-45a8a2d4`, artifact SHA-256:
+`ee648609533909b614be9345f2efb78eeb87f7fe9124a0e990e1ba383dfc9d7a`.
+The previous selection remains available for rollback.
+
+Primary, secondary and mobile retain running release
+`20261003-144055-0fa10098`; all reported online with voice available and
+`updatePending: true` after activation. No windows, backend tasks or enabled
+system dictation were restarted. They adopt the new code when naturally reopened.
+The Linux test-only compatibility timer is already enabled and active, checking
+older disposable test namespaces without touching production components.
+
+Source is published in [draft PR #38](https://github.com/ManoloRemiddi/augmentor-agent/pull/38).
+Merge, public downloads and installed Mac/Windows adoption remain separate.
+
 ## October 1: browser evidence recovery
 
 [Browser observation repair](BROWSER-OBSERVATION-REPAIR.md#installed-linux-evidence--1-october-2026)
@@ -84,6 +116,16 @@ refuses to replace it with another root or interpreter: use the update command.
 Installer and updater share a kernel lock so simultaneous promotions cannot race.
 
 ## Required development and update workflow
+
+The October 2 [embedded Handy adoption](HANDY-INTEGRATION.md#owners-installed-adoption--2-october-2026)
+uses this workflow: public feature source `c8f67a3` was composed with the existing
+0.2.11 artifact using narrow patches so the newer settings frame, DSH integration
+and speech dependencies remain intact. Selected/running build
+`20261002-141437-663e6383` is inventoried as
+`a47433db434bf446d8001c18182d85b8318c0e78f92fd72f14f8131f75cfd308`.
+Both Desktop and Mobile adopted it before the owner-authorized standalone Handy
+cutover. Startup backup and enable/status checks are recorded in the owning guide;
+broader cross-platform installer acceptance remains separate.
 
 1. Implement and test the change in source. Build a complete runnable candidate
    separate from the selected release. For an incremental preview patch, first
@@ -311,3 +353,22 @@ native canvas correction over the prior selected build. Running main/mobile and
 secondary windows remain on their earlier artifacts until reopened; active work
 and drafts were preserved. The staged candidate passed isolated two-process
 X11/KWin workspace and stacking checks plus authenticated activation preflight.
+
+## October 2 dictation admission follow-up
+
+The [Handy adoption follow-up](HANDY-INTEGRATION.md#verified-source-and-installed-follow-up)
+records `f60148b` composed over the preceding immutable artifact. Current selected
+and running Desktop/Mobile build is `20261002-154843-0eedcd1a`, artifact
+`eee72c10f9ad9268dc66c69de819536f033e3b6edd30b27366880526f8f5a478`.
+The compatible installed 0.2.11 UI/DSH/speech contracts are preserved. Both idle
+windows closed through acknowledged maintenance and reopened through the selected
+launcher. The owned broker also restarted from that root. Dictation remains ready
+on Ctrl+Space with the owner's palette and no Handy tray/startup owner.
+
+The later native-admission build in the same [adoption guide](HANDY-INTEGRATION.md#current-installed-admission-build)
+is now selected and running: `20261002-160803-407ce464`, artifact
+`ac681aadeea466f7ce280f5641e8c89ba01e216a299702de3f1de134886240b9`,
+source `85034ac`. Both windows closed only while idle; the primary launcher was
+invoked after its old service had exited. Desktop/Mobile report online and no
+pending update. This supersedes the preceding installed root without altering
+its preserved product, DSH or speech contract.

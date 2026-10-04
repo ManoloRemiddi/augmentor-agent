@@ -62,3 +62,15 @@ test('queue revision advances on pause and mutation and survives ledger restart'
   assert.equal(resumed.revision, store.revision);
   resumed.cancelQueued('waiting'); assert.ok(resumed.revision > store.revision);
 });
+test('selection evidence is immutable, canonical and durable, and changes conflict with the admitted identity', t => {
+  const store = ledger(t), context = {record: {id: 'selected', revision: 7}, label: '選択😀'};
+  store.enqueue('selected', 'Read', undefined, context); context.record.id = 'changed';
+  const reopened = new OperationLedger(store.path, store.threadId);
+  assert.deepEqual(JSON.parse(reopened.get('selected').workspaceContext), {record: {id: 'selected', revision: 7}, label: '選択😀'});
+  assert.equal(reopened.enqueue('selected', 'Read', undefined, {label: '選択😀', record: {revision: 7, id: 'selected'}}).created, false);
+  for (const changed of [context, {}, undefined]) assert.throws(() => reopened.enqueue('selected', 'Read', undefined, changed), /different input/);
+  for (const invalid of [null, [], {label: '😀'.repeat(4000)}]) assert.throws(() => reopened.enqueue('invalid', 'Read', undefined, invalid), /context/);
+  const saved = JSON.parse(readFileSync(store.path, 'utf8')); saved.operations[0].workspaceContext = '{"record":"tampered"}';
+  writeFileSync(store.path, JSON.stringify(saved));
+  assert.throws(() => new OperationLedger(store.path, store.threadId), /Corrupt/);
+});

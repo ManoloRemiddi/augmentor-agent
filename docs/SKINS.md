@@ -2,6 +2,12 @@
 
 # Desktop colors and skins
 
+The [embedded Handy recording pill](HANDY-INTEGRATION.md) uses the same explicit
+skin/colour choices immediately, including during recording. Its left mark is
+the animated Augmentor circle; waveform and close button retain Handy's geometry.
+Opacity and the animation preference also apply. Merely opening another window
+does not replace the current dictation palette; the latest explicit edit wins.
+
 Open **⋯ → Colors & skins**, also available from the compact-view menu.
 The picker contains **Custom**, **Futuristic**, **Blossom lake**, and your saved
 skins. Woodland and Moonlit Garden have been retired from the built-in list.

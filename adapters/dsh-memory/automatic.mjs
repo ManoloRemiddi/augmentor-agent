@@ -79,5 +79,5 @@ export function applyAutomaticMemory(ctx,{createClient=(session,cwd,profile)=>ne
     const s=capture(agent.session);void s.client.activity(status==='running'?'foreground':'stop');
   }});
   ctx.on('agent/disposed',({agent})=>{states.get(agent.id)?.client.close();states.delete(agent.id);});
-  ctx.on('dispose',()=>{for(const s of states.values())s.client.close();states.clear();});
+  ctx.effect(()=>()=>{for(const s of states.values())s.client.close();states.clear();},'augmentor-memory: clients');
 }

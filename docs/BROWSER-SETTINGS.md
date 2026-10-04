@@ -2,6 +2,22 @@
 
 # Browser Settings
 
+SDK workspaces use the [scoped settings contract](SDK-ALIGNMENT.md#capability-and-settings-ownership).
+Their Conversation page offers the approved Open/Collapsed thinking preference,
+saved per workspace; appearance and experimental voice opt-in are also scoped.
+The embed restores preferences from its authenticated store before rendering,
+with profile-specific browser cache keys even on a shared website origin.
+Shared installation, model/provider, Handy and memory administration stays in
+standalone Augmentor. The standalone settings redesign has a separate lifecycle;
+the SDK candidate does not deploy or overwrite that work.
+
+**Voice dictation — Powered by Handy** configures the same bundled service as
+Desktop, through the existing authenticated native bridge. It is available
+before connecting an agent harness. Enable/disable, editable shortcut/activation,
+model selection/download/cancellation, publisher terms, devices and retention
+controls are shared. Polling keeps unfinished edits; a stale saved revision
+requires Reload. See [the implementation and OS boundaries](HANDY-INTEGRATION.md).
+
 The browser toolbar keeps New chat, Save, History and Settings, with harness selection available only in Settings. The quick model picker remains below the composer. Colour sliders show their full hue or brightness gradients.
 Settings opens an extension-owned browser tab with Colours, Models, Harnesses,
 Prompt library, Memories and Support. Repeated and concurrent requests reuse

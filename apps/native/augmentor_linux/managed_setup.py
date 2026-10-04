@@ -1,5 +1,5 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-"""Visible lifecycle and browser access for the bundled, per-user Mac runtime."""
+"""One first-run interface for bundled per-user runtimes and their OS owners."""
 import json
 import importlib.util
 import time
@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[3]
 # Contents/Resources/app. scripts/install-macos.py keeps the same list so it can
 # refuse an incomplete download before installing it; a test asserts the two
 # never drift apart.
-RUNTIME_PAYLOAD = (
+MAC_RUNTIME_PAYLOAD = (
     ('node/bin/node', 'the bundled Node runtime'),
     ('python/bin/python3', 'the bundled Python runtime'),
     ('dsh/node_modules/@deepseek-ai/dsh/lib/bin.js', 'the bundled DSH runtime'),
@@ -26,12 +26,36 @@ RUNTIME_PAYLOAD = (
     ('dsh/node_modules/dsh-resonant-voice/bin/resonant-voice.js', 'the bundled voice plugin'),
     ('scripts/setup-macos.py', 'the macOS first-run setup'),
 )
-GUIDE_URL = 'https://augmentoragent.com/macos.html'
+WINDOWS_RUNTIME_PAYLOAD = (
+    ('node/node.exe', 'the bundled Node runtime'),
+    ('python/python.exe', 'the bundled Python runtime'),
+    ('powershell/pwsh.exe', 'the bundled PowerShell runtime'),
+    ('dsh/node_modules/@deepseek-ai/dsh/lib/bin.js', 'the bundled DSH runtime'),
+    ('dsh/node_modules/dsh-resonant-voice/bin/resonant-voice.js', 'the bundled voice plugin'),
+    ('scripts/setup-windows.py', 'the Windows first-run setup'),
+    ('services/windows_supervisor.py', 'the background runtime owner'),
+)
 
 
-def missing_runtime(resources=ROOT):
+def runtime_payload(platform=None):
+    return WINDOWS_RUNTIME_PAYLOAD if (platform or sys.platform) == 'win32' else MAC_RUNTIME_PAYLOAD
+
+
+def guide_url():
+    return 'https://augmentoragent.com/' if sys.platform == 'win32' else 'https://augmentoragent.com/macos.html'
+
+
+def owner_type():
+    return 'windows-supervisor' if sys.platform == 'win32' else 'launchd'
+
+
+def setup_script():
+    return ROOT/('scripts/setup-windows.py' if sys.platform == 'win32' else 'scripts/setup-macos.py')
+
+
+def missing_runtime(resources=ROOT, *, platform=None):
     """Labels of the runtime payload absent from `resources`, in order."""
-    return [label for path, label in RUNTIME_PAYLOAD
+    return [label for path, label in runtime_payload(platform)
             if not (resources/path).is_file()]
 
 
@@ -42,7 +66,7 @@ def runtime_problem(resources=ROOT):
     without its bundled runtime used to fall through to the external-DSH form
     silently, which reads as a demand the user cannot meet.
     """
-    if sys.platform != 'darwin':
+    if sys.platform not in ('darwin', 'win32'):
         return ''
     missing = missing_runtime(resources)
     if not missing:
@@ -53,7 +77,7 @@ def runtime_problem(resources=ROOT):
 
 def needed():
     """First run is setup, not a failed connection to recover repeatedly."""
-    if sys.platform != 'darwin':
+    if sys.platform not in ('darwin', 'win32'):
         return False
     from .adapters.dsh import current
     return not current()
@@ -62,12 +86,12 @@ def needed():
 def available():
     from .adapters.dsh import current
     saved = current()
-    return sys.platform == 'darwin' and not missing_runtime() and (not saved or saved.get('managed', {}).get('type') == 'launchd')
+    return sys.platform in ('darwin', 'win32') and not missing_runtime() and (not saved or saved.get('managed', {}).get('type') == owner_type())
 
 
 STEPS = {
     'model': 'Checking your model',
-    'runtime': 'Installing DSH for this Mac',
+    'runtime': 'Installing DSH for this computer',
     'integration': 'Adding Augmentor capabilities',
     'service': 'Starting the background service',
     'ready': 'Checking that your agent is ready',
@@ -77,9 +101,10 @@ STEPS = {
 def run_setup(request, progress):
     """Stream only the worker's fixed phase IDs; credentials stay on stdin."""
     unknown = {'ok': False, 'error': 'Setup stopped before confirming the result. Your data is preserved. Check the settings and retry to check or finish the same installation.'}
-    with subprocess.Popen([sys.executable, '-I', '-B', str(ROOT/'scripts/setup-macos.py'), '--progress'],
+    options = {'creationflags': subprocess.CREATE_NO_WINDOW} if sys.platform == 'win32' else {}
+    with subprocess.Popen([sys.executable, '-I', '-Xutf8', '-B', str(setup_script()), '--progress'],
                           stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                          stderr=subprocess.DEVNULL, text=True) as process:
+                          stderr=subprocess.DEVNULL, text=True, encoding='utf-8', **options) as process:
         process.stdin.write(json.dumps(request)); process.stdin.close()
         result = None
         for line in process.stdout:
@@ -93,7 +118,7 @@ def run_setup(request, progress):
     return result
 
 
-class MacRuntimeIncompleteDialog(QDialog):
+class RuntimeIncompleteDialog(QDialog):
     """Explain an incomplete copy, and offer the one action that fixes it.
 
     Shown instead of the external-DSH form when the bundled runtime is absent,
@@ -109,7 +134,7 @@ class MacRuntimeIncompleteDialog(QDialog):
         layout = QVBoxLayout(self)
         note = QLabel(problem + ' Augmentor runs its agent from that runtime, so no model can be connected until this copy is replaced.')
         note.setWordWrap(True); layout.addWidget(note)
-        guide = QLabel('Download the current Augmentor build. Quit Augmentor before replacing this copy. Your saved conversations and settings stay in your account. <a href="' + GUIDE_URL + '">' + GUIDE_URL + '</a>')
+        guide = QLabel('Download the current Augmentor build. Quit Augmentor before replacing this copy. Your saved conversations and settings stay in your account. <a href="' + guide_url() + '">' + guide_url() + '</a>')
         guide.setWordWrap(True); guide.setOpenExternalLinks(True); layout.addWidget(guide)
         actions = QHBoxLayout(); layout.addLayout(actions)
         self.close_button = QPushButton('Close'); self.close_button.clicked.connect(self.reject); actions.addWidget(self.close_button)
@@ -117,7 +142,7 @@ class MacRuntimeIncompleteDialog(QDialog):
         self.guide_button = QPushButton('Open download page'); self.guide_button.clicked.connect(self.open_guide); actions.addWidget(self.guide_button)
 
     def open_guide(self):
-        QDesktopServices.openUrl(QUrl(GUIDE_URL))
+        QDesktopServices.openUrl(QUrl(guide_url()))
 
     def use_external(self):
         from .dsh_setup import DshSetupDialog
@@ -132,8 +157,8 @@ def runtime_state(*, start=False, browser=False):
     if not saved:
         return {'ok': True, 'installed': False, 'online': False, 'modelCount': 0}
     try:
-        if start and saved.get('managed', {}).get('type') == 'launchd':
-            spec = importlib.util.spec_from_file_location('mac_runtime_owner', ROOT/'scripts/setup-macos.py')
+        if start and saved.get('managed', {}).get('type') == owner_type():
+            spec = importlib.util.spec_from_file_location('managed_runtime_owner', setup_script())
             module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
             module.start_saved(saved)
         adapter = DshAdapter(base=saved['endpoint'], home=saved['home'])
@@ -158,7 +183,7 @@ def runtime_state(*, start=False, browser=False):
                 'error': 'DSH is not responding. Click Start DSH to reconnect its background service. Your conversations and settings are preserved.'}
 
 
-class MacSetupDialog(QDialog):
+class ManagedSetupDialog(QDialog):
     completed = Signal(object)
     progress = Signal(str)
 
@@ -176,7 +201,9 @@ class MacSetupDialog(QDialog):
         intro.setWordWrap(True); layout.addWidget(intro)
         self.runtime_status = QLabel('1  DSH · Checking…' if self.installed else '1  DSH · Not set up yet')
         scaled(self.runtime_status).setStyleSheet('font-size:15px;font-weight:600;'); layout.addWidget(self.runtime_status)
-        runtime_note = QLabel('Runs in the background and starts when you sign in to this Mac. You can open its browser interface here at any time.')
+        runtime_note = QLabel(('Runs in the background.' if sys.platform == 'win32' else
+                              'Runs in the background and starts when you sign in to this Mac.') +
+                             ' You can open its browser interface here at any time.')
         runtime_note.setWordWrap(True); layout.addWidget(runtime_note)
         runtime_actions = QHBoxLayout(); layout.addLayout(runtime_actions)
         self.connect_button = QPushButton('Start DSH' if self.installed else 'Install and start DSH')

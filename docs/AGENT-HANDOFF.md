@@ -2,6 +2,389 @@
 
 # Start here: agent handoff
 
+## October 4 browser typing merge candidate
+
+PR #31 integrates main `d93eb49` while preserving both handoff histories.
+Current type/build and all 93 Browser tests pass; hosted package/platform checks
+remain the merge gate. See [Desktop control](DESKTOP-CONTROL.md#october-4-source-merge-qualification)
+for scope. Installed selections and running applications are unchanged.
+
+## Application SDK alignment source — October 3
+
+The owner-authorized source integration is complete: product PR #34 merged on
+main at `602669a`, then SDK PR #2 merged at `3797777`. Both merge trees match
+the reviewed candidates. The developer maintenance guide now defines how future
+product updates reach the SDK. Fresh packed/runtime, Browser and platform checks pass; see
+[the source update record](SDK-ALIGNMENT.md). No release or installed app update
+is performed by source integration. Preserve the separate unfinished canonical
+settings work and the owner's live applications.
+Merged-source validation is complete: six SDK jobs pass at `3797777` and eight
+product jobs pass at `602669a` on attempt 2. The initial loaded-Chromium queue
+timeout, four passing local runs and remaining experimental acceptance gate are
+retained in the alignment guide; the retry does not establish its cause.
+
+[SDK alignment](SDK-ALIGNMENT.md) owns the paired preview 4 candidate, feature
+states, shared-settings boundaries, Codex role/tools/session/memory isolation,
+platform bootstrap/private files and per-OS startup adapters. Source and fixture
+qualification do not deploy the live YouTube/Sponsor apps or certify a fresh
+Mac/Windows SDK install. Hosted platform/paired-package checks and installed
+acceptance remain distinct. Preserve the owner's dirty canonical checkout and
+independent third-app test.
+
+The selection follow-up binds Codex app context to durable operations, enforces
+the 16 KB UTF-8 boundary and scopes branch-status recovery to its parent.
+DSH retains latest-session context; the capability snapshot reports this
+difference. See the alignment guide's exact tests, initial failures and remaining
+customer acceptance gates before claiming release readiness.
+
+The workspace settings follow-up integrates the approved thinking-display choice
+with profile-specific persistence/cache keys, including same-origin app isolation.
+Its 88 Browser and 11 workspace contracts pass locally; hosted package validation
+remains separate. The canonical owner's settings/dictation edits are preserved.
+Direct Codex profile registration now enforces the same 128-character connection
+identifier contract as SDK planning and the pinned host, before registry writes.
+
+Current functional pair: product `8a085be` / SDK `925b72e`. All six SDK jobs,
+all three platform contracts, Mac 14/26 bundles and Windows x64/ARM64 desktop
+checks pass. Full Linux/package/Browser validation and Windows x64/ARM64
+packaged installation also pass. Source/package qualification is complete for
+this pair. The alignment guide records exact run URLs, the requirement audit
+and four inspected Chromium component
+renders. These source checks do not promote a release or migrate an app.
+
+## October 3 Handy publication — current
+
+PR #30, icon/session-isolation PR #33 and matched packaging/lifecycle PR #35
+are merged. PR #35 squash is `5d4ab848e2d8e1e49a030fa2c139e6b7d65ce009`;
+all customer preview-2 packages and tags use exact qualified source
+`6f001fd395a4575ea58d1899f7b68aa1d5283004`. Linux, Apple-silicon Mac and
+Windows x64/ARM64 releases include native Handy, the themed recording pill
+and requested four-pixel orb correction. No separate Handy tray is needed.
+All eight final-source workflows pass, including both Windows CPUs' fourteen
+installation/repair/restoration/removal stages and strict inventories.
+
+[The published download ledger](HANDY-DOWNLOADS-2026-10-03.md) owns exact
+public URLs, checksums, anonymous full-byte verification, source/merge scope,
+supplier notices and remaining physical microphone/permission/input acceptance.
+[The integration guide](HANDY-INTEGRATION.md) retains historical failures and
+fixes. Disabled settings refresh preserves off-state and releases maintenance
+leases. Preview-1 assets stay immutable and do not include Handy.
+
+The owner's compatible 0.2.11 installation is separate from these customer
+previews. It was not replaced or restarted during publication. The selected
+build changed independently during qualification, while the dictation broker
+was observed ready from its earlier compatible staged build. Inspect selected
+and running identities before any future update, preserve matching DSH/speech
+and active conversations, and keep tests off the owner's display/audio session.
+Do not infer physical acceptance on every PC from hosted package proofs.
+
+The October 2 Windows preview-1 record below is historical; preview 2 and its
+bundled guide supersede the no-Handy delivery scope. Repair only the exact build;
+do not overlay preview 2 onto preview 1 or a different product contract.
+
+## Windows 0.2.13 public preview — release record, October 2
+
+Windows support is merged in [PR 20](https://github.com/ManoloRemiddi/augmentor-agent/pull/20),
+main merge `9baf711440c104d645494b07758c7c1e8ef125a2`.
+[The public preview](https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/v0.2.13-windows-preview.1)
+contains native x64/ARM64 installers, SHA256SUMS, a simple guide and per-architecture
+package/health reports. Both architectures pass the [public build](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37064707283)
+at exact source `f8afb844e8073e2f36674e8684094d95155a14e2` (the reviewed PR head).
+Each complete payload is verified before and after actual public-launcher rendering
+with native Windows Qt, readable fonts and 424×484 UI output. Installer packages
+use ordinary per-user folders and no compiled development qualification switches.
+The public x64 Setup is not installed on the hosted Server build runner, whose
+OS is below the advertised Windows 11 25H2 minimum. Earlier development-candidate
+installation/recovery evidence remains separately scoped below.
+
+
+Installer digests verified locally and against GitHub's stored-asset digest:
+
+- x64: 363,568,540 bytes, SHA256 `fef5902c5fd7222fe4f59c2777e5b8ae7bb0cab80d2e5edf736bf75e83d3e7cd`.
+- ARM64: 331,549,976 bytes, SHA256 `b5b2c8a79987c44bc4da10b1893bc9459af5797d96deef18fa0e2f7d20867e5d`.
+
+The owner explicitly chooses first physical installation through this public
+download and subsequent feedback. No physical Windows, RTX Spark or every-provider
+acceptance is claimed. This is unsigned preview delivery, not signed/stable
+qualification. Automatic updates, cross-version upgrades, full local voice/memory,
+desktop automation and Windows Pi/Codex remain pending; Handy is not bundled.
+[The preview guide](WINDOWS-PREVIEW.md) is the current installation/update/removal
+contract. Linux/Mac installed applications and their existing release assets have
+not been replaced by this Windows publication.
+
+
+## Windows public preview — October 2, current direction
+
+The owner explicitly authorizes merging and publishing the Windows preview now,
+then installing the public download on a physical PC to provide feedback. They do
+not have a remotely accessible Windows test machine and waive that prerequisite.
+This supersedes the September 28 draft-only/publication restriction below.
+[Public installation guide and limits](WINDOWS-PREVIEW.md) own the current delivery
+scope. Windows 11 25H2+, native x64/ARM64, unsigned preview, DSH setup/chat and manual
+Chromium extension installation. Automatic updates, cross-version manual upgrades,
+local voice/memory engines, desktop automation and Windows Pi/Codex are unqualified.
+No physical Windows or RTX Spark acceptance is claimed.
+
+Latest completed development evidence at `14f7e57`, merge checkout
+`cede6c752b2aed964bf93136e655ea78adee266c`:
+[full Windows application](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36438724509)
+and [native installer](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36438724443)
+pass both native CPUs; shared Mac Qt also passes. Downloaded full reports confirm
+independent source restoration/completion and actual native UI reopening, with no
+inventory differences (x64 65,946 files; ARM64 65,930). These reports concern 0.2.12
+development candidates, deterministic provider chat and same-build updates, not
+this new public distribution profile, real-provider acceptance or N-to-N+1 updates.
+The public build integrates current 0.2.13 main including the Handy shared controls;
+the Windows preview does not bundle Handy and avoids starting its unavailable companion.
+Delivery uses the reviewed merged source and records fresh native
+rendering, sealed inventory and installer digests separately.
+
+### Historical September 28 implementation record
+
+
+## Windows implementation — active, September 28
+
+The owner authorizes autonomous implementation through the complete Windows app;
+physical testing follows when a Windows machine is connected. Work on
+`feat/windows` in [draft PR 20](https://github.com/ManoloRemiddi/augmentor-agent/pull/20).
+Do not merge, publish customer downloads or deploy personal installations.
+Keep one shared product, approved UI and existing model/voice settings. Native
+Windows x64 and ARM64 are targets, including NVIDIA RTX Spark N1X; no RTX hardware
+qualification is claimed. The app is not complete or ready for customers.
+
+### Current evidence
+
+- [Full e98a142 qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36432080543)
+  passes both CPUs and shared Mac Qt at merge checkout
+  `521151e33204421421981be0f1f35742bb1c688b`. Downloaded installed reports confirm
+  actual full-payload displacement before authenticated replacement, independent
+  installer health rendering the real Windows UI with the pending record preserved,
+  installation/browser/login identity, busy-draft refusal, damaged-runtime repair,
+  coordinated same-build apply, verified reopening and removal with data retained.
+  Inventories have zero differences: x64 65,943 files / 1,266,306,830 bytes; ARM64
+  65,927 files / 1,245,008,845 bytes. DSH chat/history uses a deterministic provider.
+  This predates source restoration/completion and is not N-to-N+1 or physical acceptance.
+- [Fast Windows at 5277087](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36434815432)
+  passes both CPUs, including native UI health, compiled guards and all 62 update
+  cases with thirteen distinct-restoration cases. Current active-record pinning
+  during completion and the independent observer below postdate this evidence.
+- [Inno at 04f3317](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36433486621)
+  passes both CPUs at merge checkout `abf36a2cf01fb7c71b2604ae3e72a53c1d64f617`.
+  Downloaded reports confirm standalone exact-source application without installed
+  launcher/Python/metadata, source lookup despite changed selection, busy/wrong-source
+  refusals, old payload preservation, restored repair metadata and synthetic health
+  with the original update unchanged. These exact-template tests use real private
+  Python/native bootstrap and inert other components; they do not render Qt.
+  [Inno at 5277087](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36434815332)
+  also passes both CPUs. New extracted observer execution remains pending.
+
+- Full `5277087` x64 source restoration/completion now passes in
+  [36434815454](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36434815454),
+  merge checkout `c57a5c7492cf0f338e8e59df7f11a07b9e0fdb9e`. Downloaded evidence confirms
+  actual standalone source installation, exact original archival, distinct outcome,
+  real Windows UI health and reopening. ARM64 is still running. This revision uses
+  fixture orchestration and predates the extracted product observer at `9005784`.
+- [Fast Windows at 9005784](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36437964535)
+  passes both CPUs, including health-time active-record pinning. Its native installer
+  observer and full application workflows are running/pending; no observer pass is claimed.
+
+### Implemented contracts and current work
+
+The retained original installer and its durable private selection identify the
+exact source bytes. Registered repair needs no installed executable/runtime and
+refuses unresolved updates or a foreign source. These raw receipts are not
+publisher trust or proof of health. Separate signed-bundle verification supports
+an exact recorded recovery artifact after delivery expiry; no customer key/feed
+or updater UI is enabled.
+
+Ordinary native desktop/browser startup blocks an unresolved journal before Python
+loads. A fixed health action renders the shared UI in a temporary private profile
+without conversations or companion startup; an independent observer checks its
+release identity and owned process exit. Full payload verification and health are
+required before journal completion. Confirmed live reversible preparation can
+archive cancellation before any shutdown; uncertain cleanup/write/APPLY retains
+its unresolved record. See [lifecycle](LIFECYCLE.md#confirmed-cancellation-before-shutdown).
+
+Windows staging seals every packaged file/directory into an inventory bound by
+release metadata. Intake refuses changed stages rather than resealing. The shared
+inspector accepts independently supplied metadata, allowing missing/corrupt installed
+metadata to be detected. Windows uses full no-follow stat and explicit birth time
+across path/handle APIs; handle-to-handle change time remains checked. See
+[payload inspection](WINDOWS-UPDATE-DELIVERY.md#exact-installed-payload-inspection).
+
+The [independent installer inspector](WINDOWS-INSTALLER-DECISION.md#independent-installer-inspection-before-recovery)
+extracts its own Python/shared inspector into fresh protected scratch, checks its
+compiled release digest and runs a bounded read-only worker under native exclusive
+maintenance admission. It reports counts without clearing a journal, applying,
+selecting or repairing a build. Recovery files are packed first in extraction
+order. The full app proof additionally checks inspection refusal while a real
+window holds an unsent draft; that assertion passes both CPUs at `4412deb`.
+
+New source adds [independent recorded-source assessment](WINDOWS-INSTALLER-DECISION.md#independent-recorded-source-assessment).
+The native helper holds a live journal-writer lock and pins the private active
+record; its extracted worker matches actual installer bytes and embedded metadata
+to the exact recorded source. It reports identity/remaining observation only,
+never apply authority. Both native CPUs now pass source assessment and absent-root
+inspection/repair at `3b3f89f`; the preceding corruption-fixture failure is corrected.
+
+Exact recorded-source cache lookup now passes both native CPUs at `68062de`,
+including a replaced selection naming a synthetic future target. It pins only the
+journal's previous installer and still requires independent embedded-metadata
+comparison; lookup is neither publisher trust nor recovery apply.
+
+New source adds `/augmentorinspect=health`: the standalone installer retains the
+journal writer and active-record pin while exchanging exclusive admission for
+read admission. Its independent worker requires a complete source inventory,
+launches only the fixed isolated health action, validates exact metadata/native
+UI evidence and observes the entire owned Job. Normal startup remains blocked
+and no journal is cleared. Five portable health-report cases, 49 update cases
+(one local Windows skip), six source-assessment cases, four package cases and
+Inno script compilation pass. Native template tests now require damaged-source
+refusal, preserved state after failed synthetic health, held kernel admission
+and ordinary-startup refusal. Both native templates now pass these cases at
+`b6b2313`. Full independent UI health now passes both CPUs at `c530fda`;
+synthetic template health remains separate from that actual rendering evidence.
+
+Current work adds [clean authenticated payload placement](WINDOWS-INSTALLER-DECISION.md#clean-payload-placement-before-authenticated-apply).
+After actual coordinator exit and final installation admission, Setup pins the
+original journal, saves its exact bytes and a fresh placement intent, then moves
+any old `current` tree into an owned recovery attempt before copying new files.
+A locked tree refuses without deleting files or terminating processes. Unknown
+old files remain in the displaced tree rather than the new executable search
+path. Missing `current` is permitted only for the registered owned installation.
+A prepared receipt follows the move; the original journal remains unresolved.
+Manual exact-build repair is unchanged. Local package/update checks and Inno
+script compilation pass. Both native templates now pass at `e98a142` in
+[36432080462](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36432080462),
+merge checkout `521151e33204421421981be0f1f35742bb1c688b`; downloaded reports
+confirm locked-tree preservation, clean replacement and missing-payload cases.
+Full placement now passes both CPUs in `36432080543`, with each real displaced
+payload preserved and complete inventory/independent UI health verified.
+
+New source adds [independent previous-source application](WINDOWS-INSTALLER-DECISION.md#independent-previous-source-application).
+The standalone installer explicitly verifies its exact recorded source under fresh
+exclusive maintenance, keeps the same writer/record pins, and performs clean
+source installation while preserving the unresolved original journal. It restores
+its installer/repair metadata and source selection as well as the app payload.
+Ordinary launch remains blocked. Native template/full tests now exercise missing
+installed launcher/runtime, changed selection, refusal and independent health;
+both native templates pass at `04f3317` in
+[36433486621](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36433486621),
+merge checkout `abf36a2cf01fb7c71b2604ae3e72a53c1d64f617`. Downloaded evidence from both CPUs
+confirms the source-application stage, followed by independent synthetic health.
+Full source application and actual cross-version qualification remain pending.
+
+New source adds the [distinct durable restoration outcome](WINDOWS-INSTALLER-DECISION.md#distinct-durable-restoration-outcome).
+A separate live attempt records fresh apply intent and observed installer exit,
+then requires source registration/selection, full inventory and local health under
+read admission before writing `source-restored` and archiving the original bytes
+unchanged. Thirteen new portable fault/storage tests and all 62 update cases pass
+locally (one Windows-only skip). The full proof now composes this shared journal
+with actual source installation and native health, then reopens; native execution
+is pending. Its proposed target is synthetic, not a second packaged version.
+The new [independent recovery observer](WINDOWS-INSTALLER-DECISION.md#independent-recovery-observer)
+now composes source restoration and completion through the retained installer's
+private runtime, including when installed Python is missing. It creates a fresh
+attempt, launches a separately owned source installer, observes its actual exit,
+then verifies source registrations, selection, helper hash, full inventory and UI
+health before unchanged archival. The active record stays pinned during health.
+The exact-template and full-app proofs now invoke this product action directly;
+template health is synthetic, while the full proof requires actual rendering and
+reopening. Local update/package checks and Inno script compilation pass. Fast Windows at
+`9005784` passes both CPUs with health-time record pinning. Native observer and
+crash-resume qualification remain pending. Additional Inno fault cases now require
+real Setup to escape an explicit observer Job and survive its normal exit/crash,
+while an ordinary observer child terminates. These cases use production breakaway
+without the hosted fallback; Python compilation passes and native execution is pending.
+
+Next: qualify independent observer/source completion, then finish crash-resume
+outcome inspection, bounded disk/retention policy, actual N-to-N+1
+and customer notification/update wiring. Preserving a displaced tree alone is not
+power-loss recovery. Cache artifacts and displaced payloads still survive ordinary
+removal. Never infer a healthy rollback source from the selection pointer or clear
+a pending journal manually to bypass recovery.
+
+Continue the [feature ledger](FEATURE-MATRIX.md#windows-development-target--september-28):
+Windows desktop control, speech/memory provisioning, Home/Pi parity, real selected
+Chromium/extension compatibility, ordinary-user Windows and physical input/audio/
+graphics/live-provider acceptance remain required. Shared Resonant Voice is 0.1.19
+from qualified source `7d0fd6d`, in separate [draft PR 2](https://github.com/ManoloRemiddi/resonant-voice/pull/2).
+Personal models, voice placement and installations remain untouched.
+
+Read [implementation status](WINDOWS-IMPLEMENTATION-STATUS.md),
+[installer decision](WINDOWS-INSTALLER-DECISION.md), [delivery](WINDOWS-UPDATE-DELIVERY.md)
+and [the plan](WINDOWS-IMPLEMENTATION-PLAN.md). Superseded evidence and failure
+checkpoints remain in the [historical archive](WINDOWS-IMPLEMENTATION-CHECKPOINTS-2026-09-28.md).
+
+## September 27 Windows implementation plan — historical planning checkpoint
+
+The owner requested a detailed plan before coding. Read the
+[Windows implementation plan](WINDOWS-IMPLEMENTATION-PLAN.md) and its
+[corrected research](WINDOWS-RTX-SPARK-RESEARCH.md). The targets are Windows x64
+and native ARM64, explicitly including **NVIDIA RTX Spark N1X on Windows**.
+Retain one shared Augmentor product across Linux, macOS and Windows. The plan
+specifies work packages W0–W10, installer/runtime proof, platform adapters,
+browser setup, safe coordinated updates and evidence gates. No product code,
+Windows build, CI configuration, installation or release changed in this planning
+work. Implementation awaits the next instruction to build; start with W0 and W1,
+then follow their exit criteria. The existing Mac activation checkpoint below
+remains separate and unchanged.
+## October 2 embedded Handy candidate
+
+The owner has now accepted the installed Linux dictation through real use and
+authorized PR #30's merge after successful checks. The merge review fixes an
+existing Codex cancellation fixture to wait for actual provider request receipt
+within a bounded deadline, preserving all cancellation/fencing/no-replay
+assertions. Await that follow-up's hosted checks before merging; no new installed
+cutover is needed. See [the owning guide](HANDY-INTEGRATION.md).
+
+Current implementation qualification: source `81a2bba` passes all hosted native
+component jobs (Linux x64, Mac ARM64, Windows x64), shared SDK/application checks,
+Debian build and clean installation/update/rollback/removal, actual packaged
+Chromium acceptance, and both macOS 14/26 signed development product jobs.
+[Validation](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37036303734)
+and [Mac product qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37036303739)
+record the exact completed runs. The owner's Linux installation is enabled and
+ready, with Desktop/Mobile online and the standalone tray/startup retired.
+Full Windows installer convergence with PR #20, Developer ID/notarization and
+physical OS/microphone/compositor acceptance remain customer-release gates.
+
+
+`feat/handy-integration` starts from public main `d91c520` and implements the
+owner-approved system-wide dictation and themed Handy overlay. Read
+[the implementation guide](HANDY-INTEGRATION.md) for supplier pins, settings,
+microphone ownership, OS adapters, packaging, reproducible proofs and explicit
+qualification boundaries. The canonical dirty checkout and existing installed
+settings work are preserved. Feature source `c8f67a3` now has an installed Linux
+adoption: selected/running build `20261002-141437-663e6383`, artifact
+`a47433db434bf446d8001c18182d85b8318c0e78f92fd72f14f8131f75cfd308`, compatible
+installed 0.2.11 contracts retained. Standalone Handy startup/process ownership
+was reversibly retired and embedded Ctrl+Space dictation enabled on CPU with the
+owner's actual palette. [The adoption record](HANDY-INTEGRATION.md#owners-installed-adoption--2-october-2026)
+separates that Linux evidence from open hosted lifecycle/platform package gates.
+Follow-up source `f60148b` verifies patch application in a separate build Git root
+and fences delayed microphone admission. Current selected/running adoption is
+`20261002-160803-407ce464`, artifact
+`ac681aadeea466f7ce280f5641e8c89ba01e216a299702de3f1de134886240b9`;
+both idle windows adopted through acknowledged maintenance. The original cutover
+above remains historical evidence. Source `85034ac` includes native admission
+expiry and the short Unix socket path. All 615 native cases pass (3 expected skips),
+both clean-source Debian packages build and their extracted component passes
+actual lifecycle/theme/ownership/EOF proof. Hosted platform results are recorded
+in the owning guide as they qualify.
+Final feature source `c40e53b` passes 617 shared native cases (3 expected skips)
+and a fresh-user clean Debian install/component/shortcut/uninstall proof.
+CI follow-up `0e7a19a` prepares reviewed source before restoring compiler files;
+Windows checksum-pinned notices retain exact bytes under automatic conversion.
+The current installed Linux root above stays enabled and ready; Mac-only
+permission/package refinements do not require another Linux cutover.
+At `0e7a19a`, macOS 14/26 signed Desktop/Browser development product jobs
+pass, including actual copied-helper proofs. The Windows notice-only follow-up
+preserves the original missing clipboard dependency license and passes the full
+target-filtered notice audit. Final hosted results are recorded in the guide.
+Do not claim a qualified Windows installer or physical microphone acceptance
+solely from a native build or successful component enable.
+
 ## October 2 browser and computer capability correction
 
 [Desktop control](DESKTOP-CONTROL.md#october-2-browser-capability-discovery-and-input-dispatch)
@@ -1427,3 +1810,143 @@ Preserve dated evidence rather than relabelling old tests as new qualification.
 Publish a reviewed commit and update the PR with scope and validation. A local-only
 note or an unpublished branch is not a completed handoff. Merge/release status
 must remain explicit; documentation publication does not itself merge a draft PR.
+
+## October 3 matched Handy customer guides
+
+The [Handy preparation](HANDY-INTEGRATION.md#october-3-alignment-and-matched-downloads)
+now includes preview 2 Linux/Mac/Windows first-time dictation instructions and an explicit
+Windows prohibition on replacing preview 1 with another build. Embedded guide
+changes trigger the matching package workflows. Qualification/publication are
+pending; physical microphone acceptance remains separate.
+
+## October 3 voice fixture completion ordering
+
+[Codex voice qualification](CODEX-INTEGRATION.md#october-3-browser-voice-fixture-synchronization)
+now waits for the durable completion receipt after PCM before closing its private
+browser fixture. This fixes the ordering failure in run 37119919501 without
+changing product behavior or weakening identity/playback/completion assertions.
+Matched Handy candidates are rerun from the resulting source; publication is pending.
+
+## October 3 Windows broker fixture intake
+
+The [Handy qualification record](HANDY-INTEGRATION.md#october-3-alignment-and-matched-downloads)
+records passed x64 full install/repair/removal and a separate missing test import
+path at `da70616`. Broker tests now retain actual Windows identity adapters in
+their incomplete checkout and include the services path, preserving authentication
+and missing-component assertions. Product code is unchanged; native gates rerun.
+
+## October 3 companion fixture wrapper exit
+
+[Windows shell evidence](WINDOWS-SHELL.md#october-3-companion-fault-fixture-cleanup)
+now waits for both the authenticated peer and its distinct native wrapper after
+a deliberate test supervisor kill, preserving kernel exit assertions and strict
+folder cleanup. The product supervisor is unchanged. This follows ARM cleanup
+ordering failure 37121482753; matched Handy checks rerun.
+
+## October 3 broker exit and sealed interpreter
+
+[Handy qualification](HANDY-INTEGRATION.md#october-3-alignment-and-matched-downloads)
+records passed Windows IPC/ACL assertions and a fixture cleanup race after the
+shutdown reply. Tests now wait for actual broker process exit. Broker startup
+passes `-B` to preserve the native launcher's no-bytecode policy in a sealed
+installation. The exact entries behind the subsequent intake mismatch were not
+captured; inventory checks remain strict and native/package gates rerun.
+
+## October 3 exact sealed Windows cache diagnosis
+
+[Handy intake evidence](HANDY-INTEGRATION.md#october-3-exact-windows-intake-diagnosis)
+now identifies only extra standard-library bytecode from the incomplete-checkout
+fixture's direct interpreter launch. That fixture now uses `-B`; product startup
+and strict package inventory checks remain intact. Matched gates rerun; customer
+publication is still pending and the owner's selected release is unchanged.
+
+## October 3 complete ARM64 payload recovery wait
+
+[Windows recovery evidence](WINDOWS-INSTALLER-DECISION.md#october-3-complete-payload-recovery-observation)
+identifies the final `9661eef` ARM64 failure: source Setup succeeded about 26
+seconds after the five-minute observer expired, leaving verification/completion
+unresolved. Observation is now bounded at ten minutes within a fifteen-minute
+native envelope. Three timing cases and thirteen durability cases pass locally;
+all matched source/native/package gates rerun. Preview-2 drafts remain private,
+public downloads/website remain unchanged, and the owner's installation is untouched.
+
+## October 3 Handy and current SDK source reconciliation
+
+The Handy branch incorporates approved public main `550e274`, including PR #34's
+SDK alignment. The Windows workflow retains both packaged SDK qualification and
+the Handy/recovery checks; neither is dropped during conflict resolution. Both
+voice-fixture completion observations are retained. Automatic PR qualification
+was blocked by that merge conflict; provisional manual `c9f0363` runs are obsolete.
+The reconciled source must rebuild/qualify all matching downloads before
+publication. Private preview-2 drafts stay withheld; the owner's selected Linux
+release and running dictation are unchanged.
+
+## October 3 startup and rejected-update observations
+
+[Handy startup](HANDY-INTEGRATION.md#october-3-first-response-observation-and-windows-diagnostics)
+now separates the initial 60-second component response from ordinary 15-second
+RPCs; settings/proof startup queries allow 75 seconds. The failed x64 `901fab9`
+operation was not recorded, so disposable-only timing/stderr diagnostics now
+identify it without exposing parameters or touching the installed owner profile.
+Sixteen local broker cases pass; all matching candidates must qualify again.
+[Rejected-update fixture cleanup](WINDOWS-INSTALLER-DECISION.md#october-3-native-rejected-update-dialog-cleanup)
+also acknowledges only its own native modal dialog before its parent while
+joining cleanup. The prior x64 progress proves rejection but not fixture exit;
+fresh native qualification remains required. Preview-2 drafts stay private.
+
+## October 3 native task-dialog button mapping
+
+The x64 public packaged dictation probe passes at `6b82cdf`. Its separate updater
+fixture hangs earlier, after the busy-work veto; the progress report confirms
+`canShutdown: false`. Direct IDOK messaging did not complete native cleanup. [The owning record](WINDOWS-INSTALLER-DECISION.md#october-3-native-rejected-update-dialog-cleanup)
+now records the wxWidgets task-dialog OK/IDCANCEL mapping and actual-button click,
+with diagnostics retained before cleanup returns. This changes only the private
+fixture; all final matched gates remain required and drafts remain unpublished.
+
+## October 3 complete recovery confirmation
+
+The full native x64 and ARM64 application qualification at `901fab9` completes
+successfully in [run 37127526723](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37127526723).
+This confirms the bounded ARM source-restoration correction, including mandatory
+health/completion and installed inventory checks. That run is a checkpoint, not
+final-source qualification: newer packaged-startup and native-dialog fixture
+changes require matching candidates to pass again before publication.
+
+## October 3 off-state settings and installed lease proof
+
+[The Handy lifecycle record](HANDY-INTEGRATION.md#october-3-explicit-off-state-refresh-and-maintenance)
+fixes disabled settings refresh restarting the native component for model lists.
+Three GUI-free cases pass for disabled refresh, disable without restart and
+enabled setup reads. Windows disposable packaged proof now retains the actual
+release identity and uses private runtime paths, requiring a real installation
+lease while enabled and its release after disabling. The customer Windows guide
+requires turning dictation off before maintenance. All matching candidates need
+fresh qualification; the selected/running owner installation remains untouched.
+
+The native `d82a721` dialog diagnostics prove busy-warning cleanup passes, then
+identify the rejected-update warning as a task dialog without ordinary button
+handles. The fixture now uses its documented logical-button message in that
+case; actual x64/ARM64 completion remains a required gate.
+
+## October 3 enabled editing and disabled Qt fixture coverage
+
+[Handy qualification](HANDY-INTEGRATION.md#october-3-explicit-off-state-refresh-and-maintenance)
+records both Windows installer gates and x64 customer lease/startup passing at
+`048954d`. Linux's 841-case suite finds an old stale-save fixture typing while
+disabled. It now exercises enabled editing without dropping any draft/revision
+assertion; a separate actual Qt case checks disabled controls and status-only
+refresh. The local production runtime omits QtTest; hosted Qt completion remains
+required. Private draft downloads remain withheld and the owner is untouched.
+
+## October 3 detached test-service accumulation
+
+[Companion lifecycle](LIFECYCLE.md#detached-companion-retirement--october-3)
+corrects the earlier global-singleton diagnosis: locks already isolate each
+state directory, while completed fixtures retained detached prompt, memory and
+dictation services. The fix bounds unused services, preserves accepted work and
+enabled dictation, and prevents retiring processes from unlinking replacement
+endpoints. The Pi fixture now removes its test state. 139 verified abandoned
+host-test services were stopped; production and container proofs were retained.
+A conservative Linux compatibility timer protects older local test checkouts.
+Consult the lifecycle evidence and [installed selection](DESKTOP-DEPLOYMENTS.md)
+for validation and adoption boundaries.

@@ -24,7 +24,7 @@ with tempfile.TemporaryDirectory(prefix='augmentor-complete-proof-') as director
     cli=Path(shutil.which('dsh'));env={**os.environ,'DSH_HOME':str(home),'DSH_TELEMETRY_MODE':'DISABLED','AUGMENTOR_MODEL_API_KEY':'fixture'}
     import yaml
     (home/'settings.yaml').write_text(yaml.safe_dump(setup.model_settings('http://127.0.0.1:9/v1','fixture',32768)))
-    for name in ('dsh-model-picker-augmented-1.1.2.tgz','dsh-adaptive-reasoning-0.2.3.tgz','dsh-resonant-voice-0.1.16.tgz'):
+    for name in ('dsh-model-picker-augmented-1.1.2.tgz','dsh-adaptive-reasoning-0.2.3.tgz','dsh-resonant-voice-0.1.19.tgz'):
         subprocess.run([str(cli),'plugin','--profile','web','add',str((a.plugins/name).resolve()),'--ignore-scripts','--config.auto-install-peers=false'],
                        env=env,check=True,stdout=subprocess.DEVNULL)
     voice=home/'profiles/web/node_modules/dsh-resonant-voice'

@@ -1,0 +1,1250 @@
+<!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
+
+# Windows installer qualification: active-work removal
+
+**October 2 delivery update:** the owner authorizes the [unsigned public preview](WINDOWS-PREVIEW.md) before physical PC acceptance. Its native builds/rendering are qualified separately from signed/stable delivery; automatic updates are disabled. The record below preserves historical backend decisions and their evidence.
+
+September 28, 2026. **The stock Velopack EXE is not selected for production.**
+Its successful disposable install/update fixture did not test the ordinary
+Windows Settings uninstall path while work was active. W1 is reopened for that
+requirement; no customer installer has been published. The private runtime,
+native launchers, shared application and Windows adapters do not depend on this
+packaging choice.
+
+**Implementation decision after native feasibility:** use Inno Setup 7.1.0 and
+WinSparkle 0.9.4 for the Windows integration. The complete bounded alternative
+probe passes both x64 and ARM64 in [run 36367881230](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36367881230),
+branch head `85cfbd7`, actual GitHub merge checkout
+`c8c01d3a00e2267b342f408ade15d7152cfc0a2e`. This replaces the rejected Velopack
+default. It does not waive full app coordination, rollback/health, signing or
+ordinary-user/interactive installer qualification. Only this selected backend
+will be wired into the customer package; the Velopack fixture is historical
+failure characterization.
+
+## Observed upstream behavior
+
+The inspected Velopack 1.2.158 source is pinned at
+`3c7f52c1bf17d10ad21b794b006d5ebd1a879a3b`.
+Its [EXE uninstall](https://github.com/velopack/velopack/blob/3c7f52c1bf17d10ad21b794b006d5ebd1a879a3b/src/bins/src/commands/uninstall.rs)
+calls `force_stop_package` before the application hook. The
+[documented hook](https://docs.velopack.io/integrating/uninstalling) cannot cancel
+removal. Returning a busy error from that hook is therefore insufficient.
+This violates Augmentor's requirement that normal maintenance preserve active
+work and refuse/defer before terminating components.
+
+Changing `UninstallString` inside the install hook is also insufficient: the
+[install routine](https://github.com/velopack/velopack/blob/3c7f52c1bf17d10ad21b794b006d5ebd1a879a3b/src/bins/src/commands/install.rs)
+writes its registry entry afterward, and updates write it again. A later registry
+wrapper would still leave setup/repair and interruption cases to solve.
+
+Velopack's MSI mode preserves its updater, but the generated
+[MSI actions](https://github.com/velopack/velopack/blob/3c7f52c1bf17d10ad21b794b006d5ebd1a879a3b/src/wix-dll/src/lib.rs)
+always report success after hooks, including nonzero exit and timeout.
+The [template](https://github.com/velopack/velopack/blob/3c7f52c1bf17d10ad21b794b006d5ebd1a879a3b/src/vpk/Velopack.Packaging.Windows/Msi/Templates/MsiTemplate.hbs)
+has no application veto before removal. Switching the output extension to MSI
+does not itself meet the requirement. A custom MSI transformation/upstream fork
+would introduce a separate maintenance and qualification obligation.
+
+## Alternatives assessed against this failure
+
+| Option | Relevant behavior | Conclusion |
+| --- | --- | --- |
+| Stock Velopack EXE | Stops package processes before non-vetoing uninstall hook | Fails normal busy-uninstall requirement |
+| Stock Velopack MSI | Hook errors do not abort; no product admission guard supplied | Not a proven fix; would need custom packaging work |
+| MSIX / App Installer | Can defer updates while in use; removal normally has force semantics, unless its caller explicitly requests deferred removal | Does not establish safe ordinary Settings removal; also requires external-browser registration and full-trust child qualification |
+| Inno Setup plus WinSparkle | Native proof passes veto, lifetime admission, retry, signed-download rejection and target filtering | Selected for implementation; full product integration and release qualification pending |
+
+Microsoft documents both [deferred updates and forced default removal](https://devblogs.microsoft.com/insidemsix/msix-servicing-while-in-use/).
+The latter is why a format change alone is not the resolution.
+Inno's [event functions](https://jrsoftware.org/ishelp/topic_scriptevents.htm)
+allow preparation failure and uninstall refusal. WinSparkle's
+[API](https://github.com/vslavik/winsparkle/blob/master/include/winsparkle.h)
+allows refusing installer launch while busy, and its
+[distribution](https://github.com/vslavik/winsparkle) includes ARM64.
+These are research findings, not executed Augmentor integration.
+The bounded native fixture result above adds execution evidence; it still does
+not establish that Augmentor's actual component graph drains safely.
+
+## Required proof before selecting a replacement
+
+1. Pin/hash the build tools and updater binaries; preserve ordinary-user install,
+   native x64/ARM64 payloads, a single app identity and the shared UI.
+2. Use two disposable versions and a uniquely named fixture. Exercise normal and
+   silent install, reinstall/repair, update and Windows-registered uninstall.
+3. While active, refuse **before** file replacement or process termination.
+   Hold an admission reservation throughout maintenance; a status snapshot is
+   insufficient because new work can start after it.
+4. After an idle drain, remove only owned software/registrations, preserving data.
+   Test cancellation, a failed helper, stale state, installer crash, retry and
+   restoration of admission without silently replaying actions.
+5. Prove signed update integrity, wrong-CPU/channel rejection, retained recovery
+   payload, failed-health rollback and successful next-version restart. Signature
+   and clean ordinary-user proofs remain separate from hosted unsigned fixtures.
+
+There will be one selected installer/updater backend, not two customer channels
+using competing maintenance rules. The shared release manifest/coordinator still
+owns product/dependency compatibility on Linux, Mac and Windows.
+
+## Reproducible failed-requirement probe
+
+`scripts/windows-installer-proof.py` now extends the existing two-version fixture
+with a live holder and the actual stock uninstall command. It records termination,
+the leftover active marker and the hook's view of that marker. The expected
+upstream failure is explicit as `productionInstallerQualified: false`; a green
+workflow means the characterization ran, not that the installer meets W1.
+Native execution of this additional probe is pending. Previous busy-update
+refusal remains valid only for the fixture's app-initiated update entrypoint.
+
+The next independent `Windows installer feasibility` workflow pins Inno Setup
+7.1.0 and WinSparkle 0.9.4 by upstream release SHA-256. Its disposable package
+tests two simultaneous active processes against repair, update and the registered
+uninstaller, then an injected preparation failure, retry and idle removal. The
+installer owns an exclusive file-sharing handle for the complete operation;
+fixture workers share that same admission file. This qualifies the mechanism,
+not the full product's still-pending drain and admission integration.
+
+The native x64/ARM64 WinSparkle DLL separately checks an ephemeral-key signed
+download, an invalid signature, a busy callback and a wrong-architecture feed.
+Its test callback inspects the verified bytes without executing them. The Inno
+lifecycle and updater verification are deliberately separate evidence, not a
+claim of a complete consumer update transaction. The compiler and installer
+bootstrap are x64 tools (emulated on ARM); app, Python and updater are native.
+This new workflow has not executed yet. Publisher identity and Authenticode
+remain separate from the disposable EdDSA key used for test downloads.
+
+The first native run at `762f7c6` builds both CPU fixtures and installs/opens them
+successfully, then fails a test assumption: Inno shortens long AppIds in its
+uninstall registry key. The fixture now uses a shorter unique ID; it still reads
+the registered uninstall command rather than guessing its executable. No busy
+maintenance or native updater result is claimed from that first run.
+
+The second alternative run, `36367490603` at `e18fbb0`, passes the installer
+busy repair/update/removal, two-holder preservation, failed preparation/retry and
+idle lifecycle sequence on both CPUs. Native valid-download handling and invalid
+signature rejection also pass. The busy updater test then times out because its
+modal refusal dialog was not dismissed before the fixture called cleanup. The
+fixture now closes only its own updater windows and retains callback progress
+before cleanup; the complete updater result still requires rerunning.
+
+The first stock-EXE busy-uninstall probe reaches forced holder exit and the
+active-marker assertion on x64, then fails redundant cleanup: `Update.exe`
+survives briefly for self-removal and a second uninstall cannot find the removed
+application. Cleanup now checks the application still exists before retrying.
+The rejected product requirement has not changed.
+
+The corrected alternative run passes all four native updater cases on both
+CPUs: matching signed bytes reach the handling callback; a bad signature does
+not; busy work returns false and never hands off the download; a feed for the
+other CPU reports no applicable update. Both reports record the same merge
+checkout above. The installer refuses while either live holder is present,
+releases admission after injected failure, and completes idle repair/update/
+removal with persistent settings unchanged. Physical installer interaction,
+full-app process coordination and failed-health rollback remain open.
+
+## Independent Setup handoff qualification
+
+The startup writer now has separate native sharing/inheritance evidence on both
+CPUs at `e4593b1`. Current source extends the Inno fixture to the actual extracted
+Setup process: it explicitly duplicates the disposable coordinator's handle in
+`InitializeSetup`, then acknowledges before the coordinator exits normally or is
+deliberately crashed. The test observes that exact Setup process, verifies new
+startup readers and competing writers remain refused, releases the fixture to
+complete repair, and checks the gate is released after normal Setup exit. An
+invalid transfer must abort before changing the installed fixture version.
+
+This qualification intentionally does not rely on the bootstrap executable
+inheriting a handle into its extracted child. It follows Inno's documented
+[initialization/finalization events](https://jrsoftware.org/ishelp/topic_scriptevents.htm)
+and Windows [DuplicateHandle](https://learn.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-duplicatehandle).
+Native execution is pending. Its raw PID/handle arguments and compiled fixture
+acknowledgment paths are **not a production handoff protocol**. Customer integration
+still requires authenticated coordinator/installer identity, verified artifact
+binding, complete app drain, durable transaction/health recovery and rollback.
+No customer installer or updater callback is enabled by this fixture.
+
+
+## Independent installer process ownership
+
+The extracted-Setup transfer fixture at `0ca8348` passes both CPUs in
+[36380756992](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36380756992).
+The next source step adds `windows_installer_process.py`: it holds a protected
+private artifact open without write/delete sharing, compares its SHA-256 against
+the caller's previously verified digest, creates it suspended and assigns an
+unnamed Job before the first instruction executes. This Job has no kill-on-close
+limit. The installer requests breakaway from any enclosing app Job; refusal
+aborts before execution rather than silently accepting a crash-coupled updater.
+Closing the observation or losing the coordinator cannot terminate the installer.
+
+The retained Job permits same-user live descendant observations, including
+Inno's extracted Setup process, while refusing unrelated PIDs. Production must
+obtain the PID from authenticated IPC and the digest from release verification;
+a file containing a PID and a self-computed download hash are not those trust
+boundaries. The current fixture explicitly uses test-only file acknowledgments.
+It now checks wrong-digest refusal, artifact write exclusion, actual Setup Job
+membership, unrelated-PID refusal and exit/crash survival through the new adapter.
+Native execution of this addition is pending. Authenticated handoff, signing,
+complete graph commit, durable recovery and rollback remain open.
+
+The launch ordering follows Microsoft's [suspended process creation flags](https://learn.microsoft.com/en-us/windows/win32/procthread/process-creation-flags),
+[assignment before running a process in a Job](https://learn.microsoft.com/en-us/windows/win32/api/jobapi2/nf-jobapi2-assignprocesstojobobject)
+and [Job lifetime and breakaway rules](https://learn.microsoft.com/en-us/windows/win32/procthread/job-objects).
+
+The first independent-process run at `3748282` fails before Setup readiness on
+both CPUs. The pinned pywin32 312 `win32con` does not export
+`CREATE_BREAKAWAY_FROM_JOB`; source now uses its documented Win32 flag value.
+The fixture also reports an early coordinator error immediately instead of only
+a missing readiness file. Native independent-process success remains pending;
+the earlier extracted-Setup handle-transfer proof remains separately qualified.
+
+
+## Authenticated handoff source
+
+The next source adds a one-shot private pipe from the coordinating process to
+Inno's actual Setup process. The coordinator verifies the kernel client PID
+against the exact installer Job before duplicating the startup writer into it.
+The x64 helper inside Inno verifies the pipe server's PID/current user and the
+received handle's private owner, regular single-link file identity, exact runtime
+path and active startup exclusion. Customer helper builds reject alternate
+runtime roots; the development helper permits the explicit disposable test root.
+The helper loads from Inno's embedded files, outside application replacement.
+
+`READY` only confirms retained startup exclusion. The caller must separately
+send `APPLY`, after global drain and durable recovery are established. Cancellation,
+coordinator loss or timeout before `APPLY` aborts Setup without authorizing file
+changes. Lost application acknowledgment is an unknown outcome, never a reason
+to replay the action. The separate final installation lease is still required.
+This interface is not yet wired into a customer updater or global commit.
+
+The Inno fixture now compiles the helper and tests authenticated normal handoff,
+coordinator loss after authorization, cancellation and loss before authorization.
+It retains the actual Setup process before deliberately crashing the coordinator.
+Native execution is pending; only syntax checks have run locally.
+
+The `bacf148` attempt reports CreateProcess access denied on both hosted CPUs.
+Source review also found that file-specific access bits had been reused for
+process/thread security: the new code uses each object's GENERIC_ALL mapping
+for the private current-user/SYSTEM descriptor. Hosted qualification explicitly
+allows its enclosing runner Job and records kernel Job membership; it never
+silently falls back after a refused independent product launch. Production still
+requires breakaway and refuses if that environment prevents independence. The
+new native run must distinguish these boundaries before claiming success.
+
+The helper uses Inno's documented [embedded DLL loading and setup-only calls](https://jrsoftware.org/ishelp/topic_scriptdll.htm).
+
+At `066320c`, the x64 helper compiles and the first independent Setup launch
+reaches verified Job membership. Its artifact-write probe is correctly refused,
+but the Python CRT maps the error to errno 13 rather than preserving Win32 code
+32, so the test assertion fails. The probe now uses the native private-file
+adapter for an exact kernel sharing result. Authenticated handoff, cancellation
+and crash cases still require execution. The next fixture also explicitly checks
+an unrelated pipe client and a wrong coordinator PID. These are test corrections
+and additional assertions, not waived qualification.
+
+
+At `261d3c4`, [the full Inno/WinSparkle fixture passes both CPUs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36383382819).
+This includes independent Setup ownership, immutable artifact binding, private
+pipe authentication, wrong coordinator/unrelated client refusal, explicit APPLY,
+cancel/loss before authorization and retained exclusion across exit/crash after
+it. The x64 report confirms its outer hosted-runner Job was present in all four
+handoff cases. Production breakaway and ordinary-user installation remain
+separate acceptance; the fixture does not bypass or qualify those constraints.
+Complete product commit, recovery, rollback, signing and publication remain open.
+
+The current authenticated fixture also uses the [durable update record](LIFECYCLE.md#durable-update-record).
+It records a repair of the selected fixture with the same 0.0.2 artifact, writes
+apply intent before authorization, and checks retained records after normal
+coordinator exit, crash and before-apply abort. Seven local journal tests pass;
+actual Inno execution of this addition is pending. The record is an inspection
+input and never authorization to repeat an uncertain install.
+
+## Final installation access after coordinator exit
+
+The embedded helper now exposes a bounded final-access operation, available only
+after authenticated APPLY. It waits on the retained coordinator process handle
+for actual exit, opens the existing private `installation.lock` without sharing,
+validates its owner/ACL and ordinary single-link identity, and takes the exclusive
+byte-zero lease. It holds that handle and the transferred startup writer through
+Setup completion. Missing/foreign files, a coordinator that remains alive, or any
+other application lifetime handle refuse replacement. It loads no application
+Python/Qt DLL from the directory being replaced and never terminates a process.
+
+The Inno fixture calls this before file installation. Its coordinator now retains
+a real shared lifetime lease, which the controller independently observes before
+exit. Authenticated cases test normal exit, crash, and an extra holder that must
+make Setup refuse final access. Source/syntax checks pass; these new C/Inno cases
+await native compilation/execution. Initial installation, real product data,
+recovery/health/rollback, signing and ordinary-user acceptance remain separate.
+
+At `3394145`, the helper compiles on both CPUs, then Inno compilation rejects the
+combined Boolean/Windows BOOL expression. The fixture now assigns the result to
+a Pascal Boolean before branching and uses an explicit Cardinal timeout. Native
+execution of final access remains pending. The preceding `1872e19` Inno journal
+qualification passes both CPUs in [36388207448](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36388207448).
+
+## Actual application installer candidate
+
+Current source builds an unsigned installer candidate from the actual staged
+shared app with `scripts/package-windows.py`. It uses one app identity, stable
+`current/Augmentor.exe`, bundled runtimes and a Start-menu shortcut. Native
+startup/lifetime exclusion now supports fresh installation, identical-build
+repair and removal. The remover copies its exact hash-bound helper to a temporary
+location, retaining both gates while deleting installed binaries. Existing
+redirected/hard-linked trees are refused; persistent data stays outside the
+installer tree. Manual cross-build replacement is intentionally unavailable until
+the coordinated update/recovery path is connected.
+
+Three portable build-intake checks cover wrong CPU/public metadata, incomplete
+payloads and source-link refusal. New full-payload installation, native Qt preview,
+live-draft maintenance refusal, repair/relaunch, path refusal and uninstall/data
+preservation assertions are scheduled on both native CPUs; execution is pending.
+Qualification has compiled-in disposable paths and uses Server build 26100 only
+for the hosted x64 runner; the normal candidate minimum remains Windows 11 25H2
+build 26200. This is not signed/public delivery or ordinary-user/physical testing.
+Login integration, browser-registration removal, product N-to-N+1, recovery and
+rollback remain open alongside the feature ledger.
+
+The shared native launcher now takes startup exclusion before its lifetime lease;
+manual maintenance uses the same order with exclusive handles and byte locking.
+No process is killed or adopted. The application payload is checked for source
+links before compilation, and the existing installation tree is checked for
+redirects/hard links before replacement/removal. These checks do not claim to
+protect against a malicious process already running as the same Windows user.
+
+The Inno template uses the documented [setup/uninstall event boundaries](https://jrsoftware.org/ishelp/topic_scriptevents.htm)
+and [temporary DLL unloading](https://jrsoftware.org/ishelp/topic_isxfunc_unloaddll.htm).
+Its helper is compiled for the x64 Setup/uninstaller process on both CPUs; the
+application and all its runtime DLLs retain the native selected architecture.
+
+## Shared coordinator Windows backend
+
+The actual installed-app qualification now composes the shared coordinator with
+`WindowsApply`: an independent Inno process, private authenticated handoff and
+one-shot durable APPLY. The fixture starts an installed window and background
+owner, drains their observed graph, retains the extracted Setup process across
+coordinator exit, waits for its completion and relaunches installed binaries.
+It repairs the identical retained artifact, so it does not establish N-to-N+1,
+publisher trust, health-driven recovery or rollback. New native execution is
+pending. Existing Inno handoff/final-access fixtures at `b006ebb` pass both CPUs
+in [36390819194](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36390819194);
+that result compiles the updated helper but does not execute the new app installer.
+
+`WindowsApply` accepts only the startup gate and caller-verified artifact digest,
+uses fixed Inno flags and a fresh private log, and closes the handoff before its
+process observations. Unknown apply acknowledgments cannot be replayed. The
+installer remains independent after coordinator exit; a digest still does not
+establish publisher trust. Its explicit outer-runner Job option is fixture-only.
+The installed integration script is a development proof, not a public updater or
+a production trust boundary. Product update metadata/UI/recovery remain open.
+
+The full Windows workflow now runs the selected Inno application installer instead
+of reinstalling the rejected Velopack feasibility pair on every change. The
+original proof scripts and dated failure evidence remain available for reference;
+removing that redundant CI step does not waive any Inno/product release gate.
+
+Windows staging now places its temporary production dependency graph on the same
+volume and moves disjoint top-level directories into the payload, avoiding a
+second recursive copy of node_modules. Overlapping runtime/license directories
+retain their previous merge behavior. Native output qualification remains required;
+no measured speedup is claimed. Package evidence records installer byte size.
+
+The installed proof reads the Start-menu shortcut target/arguments, observes the
+real Setup exit, compares every installed payload file to the known-built fixture
+and opens/closes installed Qt before completing and archiving the durable update
+record. This is local health for identical-build qualification, not live provider,
+Windows speech engine or production recovery evidence. Native execution is pending.
+
+At `3c6d78b` the actual x64 full-payload installer compiles and installs, then the
+qualification stops because Inno's default AppVerName adds the version to the
+registered display name. The template now explicitly uses `Augmentor Agent`;
+DisplayVersion continues to identify the release separately. Repair, coordinated
+apply and removal still await execution after this correction.
+
+## Actual shortcut readback correction
+
+Full x64 `805664f` installs and verifies the shared payload and stable registration,
+then fails the actual IShellLink argument comparison. The earlier compiler-command
+quote escaping crossed both command-line and Inno section parsing. Current source
+constructs the qualification command in a Pascal code constant after those parsing
+layers. It records actual shortcut arguments on any future comparison failure.
+Three portable package intake tests pass; native readback and later installed
+repair/coordinator/removal stages remain pending. Normal customer launch has no
+qualification arguments. No personal shortcut or public installer changed.
+
+## Signed download integration
+
+The [release delivery boundary](WINDOWS-UPDATE-DELIVERY.md) now authenticates signed
+metadata and retained installer bytes independently of feed labels. New native
+WinSparkle ZIP callback fixtures are scheduled on both CPUs. Local real-signature
+and storage tests pass; native execution, product UI wiring, N-to-N+1 and recovery
+remain pending. WinSparkle never receives default installer-execution authority.
+
+## First installed preview and busy-maintenance evidence
+
+Full x64 `594b56d` now passes actual payload integrity, stable application name,
+shortcut target/arguments and native installed preview launch. Repair and removal
+both refuse while its draft is present, preserving the process, draft and data.
+The next assertion exposes a shared controller-free preview close timeout, before
+repair or coordinated apply. It is reproduced and corrected in the shared UI;
+portable real-process checks pass, and native rerun is pending. Failed installed
+proofs now retain bounded logs from only their disposable preview directory.
+
+## Owned installer registrations
+
+The candidate now records the stable browser-setup installation anchor and offers
+background login startup on fresh install. It uses a native, typed exact-value
+HKCU operation under the held installation gate, preserving matching/foreign
+values as appropriate and never loading application Python during replacement.
+Repair/update preserve removed login startup. Removal compares before deleting
+only owned values; unrelated values and StartupApproved are untouched. The
+[Windows shell guide](WINDOWS-SHELL.md#installer-owned-login-and-browser-anchor)
+records paths, behavior and remaining native/physical qualification. New native
+Inno registry fixtures and full installed readback are scheduled, not yet passed.
+
+## Native long paths and browser cleanup
+
+Full x64 `ead355c` passes installed preview exit after the shared fix, then refuses
+same-build repair in native tree validation. The actual initial-install log has
+65,933 file entries, including 205 paths over 260 characters (maximum 283). The
+native walk used unprefixed Win32 paths, independently of the app launcher's
+longPathAware manifest. Current source uses explicit extended local paths for
+ancestor checks, enumeration and file inspection. Attribute inspection also allows
+delete sharing, so Setup's own uninstall-log handles do not cause a false refusal.
+Hard-link/reparse/depth/count checks remain. New Inno qualification includes an
+ordinary payload over 500 characters; full installed repair must still pass.
+
+The actual native registry fixture at `2f17cb0` passes both CPUs. Current source
+adds [browser ownership receipts and removal](WINDOWS-BROWSER.md#installed-ownership-receipt-and-removal),
+plus real native held-file write/delete refusal. The full installed proof prepares
+an extension using synthetic Chromium resources and isolated registration keys,
+checks manifest-edit removal refusal, then checks normal pointer cleanup with
+persistent data retained. New execution is pending; actual browser UI/store
+acceptance and complete installed update/recovery remain open.
+
+## Closed fixture readiness publication
+
+At `6890375`, the [native fixture run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36398267565)
+passes completely on x64. ARM64 passes the new typed registry, long-path traversal
+and private manifest pinning cases, then encounters a sharing violation in the
+older observation file: `ready.json` exists while Inno still holds its writing
+handle. Fixture readiness now publishes by rename after the write closes. Python
+observations likewise publish complete JSON. No timeout is enlarged and no
+authority/installer assertion is removed. The actual authenticated pipe remains
+the handoff contract. Native rerun of this test correction is pending.
+
+## Full installed repair and isolated removal diagnosis
+
+At `6890375`, [full x64 qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36398267417)
+now passes actual initial installation/browser/login identity, live-draft refusal,
+repair and normal Qt relaunch, installed graph drain and same-build coordinated
+application, complete file-digest/local Qt health and journal archival. Removed
+login startup stays removed. Final uninstall incorrectly refuses, even after the
+fixture's edited browser manifest is restored. The existing log does not identify
+which preflight refused, so current code logs admission, tree, manifest retention
+and receipt failures separately. No refusal is bypassed.
+
+`scripts/windows-application-template-proof.py` uses the exact application Inno
+script and packaging definitions with small inert component markers. It does not
+launch or qualify those markers as an app. It first requires repair/removal with
+no browser entry, then edited-manifest refusal and exact-owned removal. This
+qualifies real installer event integration separately from the full product, and
+makes removal regressions diagnosable without rebuilding all app dependencies.
+New native execution is pending. The preceding [67eebe3 native fixtures](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36399077539)
+pass completely on both CPUs, at merge checkout `85522a92c8cad9d45bf22bd1395c5607d5bd8e46`.
+
+The smaller exact-template test at `77731b9` reproduces the failure before any
+browser is configured: default registry-value inspection returns an error. The
+helper rejected a NULL value-name pointer. Pascal Script uses this representation
+for an empty String; [Windows defines NULL and empty names as the default value](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regqueryvalueexw).
+The helper now normalizes the representation without relaxing gating, type checks,
+exact expected content or foreign preservation. The actual Inno registry fixture
+adds default-value read/create/remove and foreign refusal. Both the small exact
+application-template test and full installed removal must pass before this is
+considered qualified.
+
+At `df44e1c`, the x64 native default-value checks pass and the exact application
+template successfully repairs and removes its inert payload without a browser.
+Immediate reinstall then encounters the still-running copied Uninstall process: the
+original EXE exits first so Inno can delete it. The next test starts before the
+remover releases maintenance (the logs show a 0.5-second overlap). This refusal
+is correct, not permission to weaken the maintenance gate.
+
+Both template and full installed proofs now use the existing `OwnedProcess`
+range and `wait_graceful` to observe all installer/remover descendants exiting
+normally before further actions or inspection. Their existing bounds remain; no
+setup/removal command is replayed. Forced cleanup is restricted to failed disposable
+tests. Native rerun of the complete sequence is pending.
+
+## Interactive completion and startup handoff
+
+The installer offers the standard checked **Open Augmentor** option on its final
+page. Inno's [postinstall run entry](https://jrsoftware.org/ishelp/topic_runsection.htm)
+runs after successful installation. Its callback requires completed installation
+and held maintenance, then releases the gate before the installed native executable
+acquires startup/lifetime handles. Leaving the option unchecked retains normal
+end-of-installer cleanup. Silent installs do not launch. Authenticated coordinated
+updates suppress this option because independent health owns reopening.
+
+The small application-template test now drives the actual visible wizard buttons
+inside its own retained Windows Job. The finish action must start the real
+lease-holding launcher and private Python, which write a fixture observation and
+exit normally. DSH/Node/PowerShell markers remain inert and no shared desktop or
+actual-browser launch is claimed. Silent maintenance must never produce that
+observation. Native execution of this new addition is pending; preceding template
+repair/removal and signed-update qualification [pass both CPUs at 8a3ff05](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36400951199).
+
+At `8ecd4c0`, both native interactive tests time out before wizard advancement;
+this is not a passing Finish check. The driver used GetWindowText on another
+process's controls, which [Windows does not support](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getwindowtextw).
+It now reads captions through bounded WM_GETTEXT, retaining the exact Job ownership
+and button criteria, and writes bounded owned-window diagnostics on failure.
+The 120-second overall bound and required native launch observation remain.
+The full `8a3ff05` x64 installed proof separately passes normal removal and
+persistent-data retention; that workflow still has a memory startup-test failure.
+
+The `5bd0e45` native diagnostics identify the visible enabled control as
+`TNewButton` with caption `&Next`; the modern wizard omits the legacy arrow.
+The fixture now accepts that exact caption as well as `Next >`. No application
+or installer admission behavior changes. Finish/native-launch qualification
+remains pending until this corrected driver reaches and verifies it.
+
+## Retain original installer bytes before replacement
+
+Current source preserves the original `{srcexe}` before copying any application
+files. The native maintenance helper derives `recovery/` from its already validated
+private data handle, verifies the source SHA-256 with Windows CNG, streams a private
+copy, flushes it and publishes it by a non-replacing rename. It then pins and hashes
+the retained copy again. The filename is the installer SHA-256; its `.release`
+receipt contains the compiled payload `release.json` SHA-256. Receipts are also
+flushed and published without replacement. Existing matching artifacts are reused;
+corrupt bytes, mismatched receipts, redirected paths or invalid permissions refuse
+installation before application replacement. Disk/copy failures remove only the
+call's unpublished temporary file. Earlier retained installers are preserved.
+
+This cache is byte retention, not Authenticode/publisher verification, selection
+of a known healthy build or authorization to roll back. Artifacts from a failed
+installation can also be present; never choose recovery by newest filename or
+mtime. The separate signed-bundle reader does not interpret these raw first-install
+receipts. Initial source selection, publisher trust, independent recovery execution,
+health decisions and bounded pruning/removal of software caches remain open work.
+Until that retention policy is implemented, normal software removal preserves
+recovery artifacts alongside persistent data. Customer publication stays disabled.
+
+The exact-template proof now checks private source bytes/receipt, refuses a changed
+installer and changed receipt without modifying the application, and verifies that
+repair reuses the retained file. The full installed proof checks complete installer
+retention through coordinated reapplication and removal. Native execution of this
+new cache is pending; Python compile and whitespace checks pass locally.
+
+At `59dbbf4`, [native Inno x64](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36404083419)
+passes the actual interactive Finish/native startup test and all prior cases. ARM64
+reaches Finish and the log records application launch and successful Setup exit,
+then the driver reads the destroyed wizard handle (1400). The driver now observes
+only process exit after Finish and tolerates vanished controls during inspection.
+This is a fixture correction; ARM64 Finish qualification still requires a clean run.
+
+At `ba0b68c`, [all Inno/WinSparkle cases pass both CPUs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36404979491)
+at actual merge checkout `612ce6050b6ab3a80478609a7a8514913df1b467`. Downloaded
+reports confirm original-installer retention, both corrupt-cache refusals,
+repair/removal, exact browser cleanup, interactive native startup and silent
+no-launch. This is exact-template/bootstrap evidence; the full payload cache
+integration remains under qualification.
+
+## Exact selected-installer receipt
+
+Current source writes `recovery/selected-installer` only after successful payload
+installation and registration. Its strict ASCII record is the line
+`augmentor-installer-selection/1`, the 64-character installer SHA-256 and the
+64-character payload-metadata SHA-256, each followed by LF. Preflight pins and
+validates any existing record before application replacement. An invalid/private-
+ownership mismatch refuses without changing application files. The post-install
+write flushes a new private sibling and atomically replaces only the previously
+validated record. An unchanged repair performs no write. Failed/unknown publication
+is reported, not retried inside the same attempt.
+
+`services/lifecycle/installed_source.py` reads this exact record under the caller's
+installation observation/admission, matches the actual identified `release.json`
+bytes, validates target/schema/source identity and the immutable `.release`
+receipt, then hashes and pins the selected installer. Missing or damaged records
+never select another file by age or filename. The installed coordinator proof
+now takes its source identity from this native receipt and executes the actual
+retained installer, replacing its previous separately copied fixture source.
+
+Selection is not a health receipt or publisher trust. Interrupted apply still
+requires independent inspection and the journal's previous source; do not infer
+success or rollback permission from this pointer. Six private-storage reader tests
+pass locally (38 update tests total). Exact-template and full installed proofs
+exercise native publication/readback, preserved selection on repair and malformed
+selection refusal; native execution of this addition is pending.
+
+At `bdba572`, [native Inno/WinSparkle](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36405973067)
+passes both CPUs at merge checkout `7fb0927db3e8e75e03a8bae7d31c104649f2a992`,
+including selected-source publication/readback and malformed-selection refusal.
+The [complete 6c1e7cf workflow](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36403736092)
+also passes both CPUs at `0053027cbeb1feee4365ebedd589381fbe431fdb`, through
+installed removal and journal archival. That full run predates source caching;
+[full bdba572](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36405973046)
+is still executing and is the required cached-source integration proof.
+
+## Independent repair from Windows installed-app controls
+
+The candidate registers Inno's [AppModifyPath](https://jrsoftware.org/ishelp/topic_setup_appmodifypath.htm)
+as the quoted, privately retained original installer. Windows' installed-program
+Modify action can therefore invoke repair without loading the installed launcher,
+Python, Qt or application scripts. There is no second Start menu application or
+system-wide runtime. The retained installer contains its own maintenance helper.
+Client Settings/Control Panel presentation remains a physical acceptance check.
+
+Manual repair can restore missing or damaged `current/release.json` only when
+both installed Root/AppId registrations match and the independently held selection
+receipt matches this exact installer's digest and compiled payload digest. The
+native helper also rehashes/pins the retained executable and checks its private
+receipt. Missing/foreign registration, malformed selection or another installer
+refuses before app-file replacement. A rejected attempt can retain verified source
+bytes; bounded cache cleanup remains a separate unfinished requirement. Removing
+the entire payload no longer turns an owned repair into a fresh install or resets
+the user's login-startup choice. This is exact-build repair, not rollback.
+
+Manual install/repair and removal refuse any `updates/active.json` under the
+private Augmentor data base, regardless of its contents. An inaccessible or
+redirected updates directory also refuses. The native check holds the ordinary
+private directory and existing exclusive startup/lifetime gates; it never parses
+a saved PID, replays an operation, clears the journal or guesses which release
+survived. The installed coordinator proof now uses this same canonical `updates`
+directory. Cross-version interrupted-update recovery still requires its separate
+executor, compatibility/health decision and real failure qualification.
+
+The exact-template proof reads the real ModifyPath, removes the installed native
+EXE, Python runtime DLLs and version metadata, checks pending-update/foreign-source/
+missing-registration refusal, then runs registered repair from the cached installer.
+It verifies restored bytes, unchanged persistent data and source-cache reuse, and
+also repairs damaged metadata. The full-payload proof removes the same critical
+files, repairs through ModifyPath and reopens the actual installed Qt application.
+New native execution is pending; local update tests and script compilation do not
+establish these native repair cases passed. Publisher trust, independent rollback,
+obsolete-file cleanup and bounded cache policy remain open.
+
+The first native run at `74ec319` fails while compiling the new script, before
+installation: combining the DLL's Win32 `BOOL` return directly with Pascal
+`Boolean` operands is rejected. The same pinned Inno 7.1.0 compiler reproduces
+the line-205 type mismatch in an isolated Wine compile-only fixture. Assigning
+the DLL result to the existing Boolean variable before the condition compiles
+successfully. No installer was executed under Wine; this is compiler evidence
+only. Package failures now include a bounded compiler diagnostic, and CI retains
+the template compiler log. Corrected native repair execution remains pending.
+
+At `a0d2530`, both native template installs complete, then the exact ModifyPath
+assertion detects that Inno stripped the directive's surrounding quotes. This
+would break an executable path containing spaces. Command quoting now happens
+inside the code-constant function, after directive parsing; the native assertion
+is retained. The older full run at `74ec319` was cancelled because its script had
+the already reproduced compile error, not because it was slow or passed.
+
+The downloaded full baseline also exposed unnecessary launcher `.lib`/`.exp`
+linker output at the installed payload root. Native builds now direct object and
+import/export-library output to their disposable compiler workspace. Template
+and full installed assertions require those byproducts absent; runtime libraries
+inside the pinned dependencies are unchanged. Native execution is pending.
+
+At `f61d32f`, [all native Inno/WinSparkle cases pass both CPUs](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36409313595)
+at merge checkout `b05a0c9a9747d9e52cdbdb905bc1a992a8ad782c`. Downloaded reports
+confirm `registered-independent-repair-and-unresolved-update-refusal`, including
+missing/damaged metadata and runtime, missing whole payload, preserved disabled
+startup and persistent data, wrong selected source/registration and pending-record
+refusal, plus all earlier repair/removal/Finish/handoff/signature cases. This is
+the exact template with native bootstrap/private Python and inert other components.
+The [full f61d32f application run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36409313612)
+is still executing. Compiler-byproduct cleanup was added afterward at `6f4c291`.
+
+Historical gap before the next change: ordinary native startup checks maintenance
+leases, not the unresolved update journal. Before enabling customer auto-update,
+add recovery-aware startup plus an explicitly authorized independent local-health
+probe; do not let ordinary startup load a potentially partial replacement after
+maintenance exits. The manual repair/removal guard does not close this separate
+gap. Cross-version recovery must use the journal's recorded source and compatible
+persistent-data schemas, never infer a healthy source from `selected-installer`.
+
+## Recovery-aware startup and isolated local health
+
+Normal desktop and browser native entrypoints now inspect the fixed private
+`updates/active.json` while retaining startup and installation leases, before
+loading Python or any app profile. Any existing record, including malformed JSON
+or a directory, refuses with exit 74. A redirected or permissive journal directory
+also refuses. Manual repair/removal reuse the same native directory check. Saved
+phases, PIDs and commands never grant permission to start a partial replacement.
+
+The desktop executable's exact `--local-health` action selects a separate fixed
+script. It retains maintenance exclusion, cannot accept other desktop arguments
+and is unavailable through the browser host. It creates a private random temporary
+profile, clears inherited app/profile configuration, runs runtime preflight and
+renders the actual shared Qt window with no controller or persistent preferences.
+It checks native Windows Qt, text coverage and a nonempty render, removes only its
+temporary profile, and reports the exact payload-metadata hash and identity. It
+does not start the supervisor, connect a provider, register ordinary desktop IPC,
+change conversations or clear a journal. This is local UI readiness, not complete
+feature acceptance or publisher trust.
+
+`services/lifecycle/windows_health.py` runs that action in an owned Windows Job
+under read leases and a bounded deadline. It independently compares the report
+to the caller-verified release and observes the whole process range exit. Only
+that disposable probe range can be stopped on failure. The caller must separately
+verify full payload bytes, schemas, artifact trust and installer exit before
+requesting journal completion. Health refusal leaves the unresolved record intact.
+
+The installed proof now requires desktop/browser refusal while apply is unresolved,
+failed health with a missing helper or mismatched release, unchanged persistent
+sentinels/journal, successful isolated native health and profile cleanup. Ordinary
+Qt startup is tested only after verified durable archival. The fast native proof
+checks pre-Python refusal, unsafe journal directories, fixed action routing and
+binary stdout using an explicitly inert recording action; it is not installed UI
+health evidence. Two portable real-Qt checks pass and prove no controller/process
+startup or preference writes. Fresh x64/ARM64 execution remains pending.
+
+The previous [full f61d32f run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36409313612)
+passes x64 independent registered repair and actual Qt reopening; ARM64 is still
+running. [Inno 6f4c291](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36409755006)
+passes both CPUs at `cbbaa57cf262d4ceb46536a0566ba126a2943381`, including the
+compiler-byproduct cleanup assertion. These runs precede the new health action.
+Recovery from interrupted apply, actual cross-version rollback, safe cancellation
+before apply, obsolete payload removal and bounded cache retention remain required
+before enabling customer updates. An unresolved journal must lead to the future
+independent recovery flow, not an instruction to delete its record manually.
+
+The complete `f61d32f` run now passes both CPUs and shared Mac Qt at merge
+checkout `b05a0c9a9747d9e52cdbdb905bc1a992a8ad782c`. Both downloaded reports
+include registered repair without installed runtime/metadata and actual reopening.
+This predates the new isolated health action.
+
+At `3674b4a`, [the fast Windows workflow](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36411857137)
+records passing compiled entry/guard/routing checks on both CPUs. The overall
+workflow fails the new font-health test because it forces offscreen QPA; the
+same run's actual Windows-QPA rendering has valid fonts. The corrected test runs
+in the existing native-QPA step without overriding that backend. The product
+health script already requires Windows QPA, and the font-coverage requirement
+is retained. Corrected GUI execution and full installed health remain pending.
+
+[Corrected fast Windows at 8997b4e](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36412274580)
+passes both CPUs, including actual Windows-QPA source health, all update tests
+and compiled startup/health entry routing. Full installed isolated health remains
+pending. A separate [live preparation-cancellation path](LIFECYCLE.md#confirmed-cancellation-before-shutdown)
+now archives known reversible refusal before any shutdown; uncertain cleanup,
+record writes or APPLY still require independent recovery. Its local fault and
+platform/coordinator tests pass; actual native DSH integration is pending.
+
+## Complete payload identity for recovery
+
+The [sealed payload inventory](WINDOWS-UPDATE-DELIVERY.md#exact-installed-payload-inspection)
+now binds all packaged files and directories to the release metadata already
+bound by the retained original installer. Staging seals after native compilation;
+package intake rejects later changes instead of recalculating a new baseline.
+The full installed proof uses the shared inspector, with metadata from the
+independently identified artifact, before UI health/completion. It can classify
+missing or corrupt installed metadata and detects extra old-version files.
+Native execution is pending; this is preparation for recovery, not a rollback
+executor or automatic authority to remove unexpected files.
+
+The independent recovery runtime can reuse the retained original installer's
+bundled runtime, rather than depend on `current/python`. Inno's documented
+[ExtractTemporaryFiles](https://jrsoftware.org/ishelp/topic_isxfunc_extracttemporaryfiles.htm)
+preserves unexpanded destination names beneath its temporary folder and removes
+the extracted files on Setup exit. Extraction placement, private ownership,
+bounded worker lifetime, authenticated apply and failure cleanup still require
+implementation/native qualification. This inspected vendor capability is not an
+implemented recovery path. It avoids adding a separately maintained agent core.
+
+
+## Independent installer inspection before recovery
+
+The development installer now accepts the fixed `/augmentorinspect=1` diagnostic
+action. It acquires native exclusive startup/installation admission and verifies
+the compiled destination's existing Root/AppId registration. Active app processes,
+unknown ownership or redirected trees refuse. The action deliberately permits an
+unresolved journal for read-only observation; it never reads saved commands,
+clears the journal, selects a build, repairs files or opens the ordinary app.
+
+The helper anchors a fresh protected scratch directory to its own Inno temporary
+module location, then Inno extracts its bundled Python and the shared payload
+inspector into it. No installed runtime or installed metadata is required. The
+native helper verifies extracted release bytes against the compiled digest before
+running one fixed `-I -B` script in a suspended-then-assigned Windows Job. A two-minute
+worker deadline and kill-on-close affect only that disposable inspection range.
+The report contains the release hash and difference counts, never arbitrary
+filenames or private configuration. Inno releases handles and removes its own
+scratch tree on exit. SHA binding is not publisher trust or rollback authority.
+
+The action returns False from [InitializeSetup](https://jrsoftware.org/ishelp/topic_scriptevents.htm)
+so no installation section can run. Consequently Setup exits nonzero even for a
+successful inspection; qualification requires exactly one valid report in the
+installer log, not merely an exit status. This is an internal diagnostic primitive,
+not the customer recovery UI. It follows Inno's supported
+[temporary extraction](https://jrsoftware.org/ishelp/topic_isxfunc_extracttemporaryfiles.htm)
+and Microsoft's [owned Job lifetime](https://learn.microsoft.com/en-us/windows/win32/procthread/job-objects).
+
+The exact-template proof compares intact files, then removes the launcher, Python
+DLLs and release metadata and requires a damaged report with every remaining file
+unchanged. It repeats inspection with an unresolved record and confirms that record
+and private sentinels remain unchanged. The full application proof adds equivalent
+missing-runtime inspection and complete-byte inspection while apply is unresolved.
+Local checks: actual Inno 7.1.0 script compiles in an inert compile-only fixture;
+Python compilation and four package-intake tests pass. New native helper/worker
+execution remains pending. Cross-version recovery, apply authorization, health and
+obsolete-file cleanup still require their separate implementation and evidence.
+
+
+At `cca5907`, all fast native checks (including 12 payload cases) pass both CPUs.
+The exact-template independent action passes x64, including damaged-runtime and
+pending-journal observation. ARM64 extracts the worker but returns no report;
+its cause is unresolved. Follow-up source adds numeric native stage/error and
+worker phase diagnostics, with no private path/exception text. It also waits for
+the entire owned Job within the original deadline instead of requiring immediate
+zero-process accounting when the primary process signals. This is not a claim
+that Job accounting caused the ARM64 failure.
+
+The existing recovery metadata/code/Python files are now listed first in the
+installer and extracted in that same order. The remaining wildcard excludes
+those exact root-relative paths, so they are installed once; no second Python
+copy is maintained. This follows Inno's solid-compression extraction guidance and
+[anchored exclusion syntax](https://jrsoftware.org/ishelp/topic_filessection.htm).
+The exact script compiles locally; corrected native and full-payload execution
+remain required.
+
+
+[The 11c1706 native rerun](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36416227313)
+now passes both CPUs at merge checkout `9e126b38d98961ecc5e9fbaff3b2a30c5d1f891a`.
+Both downloaded reports confirm complete, damaged-runtime and pending-journal
+independent inspection, preserved files/data and subsequent registered repair.
+The exact cause of the preceding uninstrumented ARM64 failure is not claimed.
+All fast desktop checks also pass both CPUs. The full installed proof now adds
+an explicit refusal assertion while a real window holds an unsent draft; complete
+application integration, including that assertion, remains pending.
+
+
+## Independent recorded-source assessment
+
+The fixed `/augmentorinspect=source` action extends independent inspection with
+an exact source identity check. It still returns before all installation sections
+and cannot apply, restore, select a build, clear a journal or reopen the app.
+The native helper first retains exclusive startup/installation admission, opens
+the canonical protected updates directory, obtains the live byte-zero writer lock
+without waiting, and pins the ordinary private active record against writes or
+deletion. It creates neither a missing writer file nor a new transaction. Only
+that bounded record is copied to fresh private scratch; all handles remain held
+through the worker's complete exit.
+
+The shared `recovery_source.py` validates the full journal and checks the
+independent installer's actual SHA-256 and embedded release identity against the
+recorded **source**, including CPU, channel and data compatibility. A version or
+`selected-installer` pointer alone cannot choose recovery bytes. Duplicate JSON,
+malformed/oversized records, another build with the same version, another installer
+or incompatible schemas refuse. The result binds the exact record, installer and
+release digests and gives the remaining observation category. Recorded PIDs stay
+history; every result has `applyAuthorized: false`. Publisher trust, observed
+health and a fresh recovery apply authorization remain separate requirements.
+
+Six portable source-assessment cases and all 43 update tests pass; four package
+checks and Python compilation pass. The actual Inno script compiles in the inert
+local fixture. Native template cases now require source matching with missing
+installed runtime/metadata, live-writer refusal, hard-linked-record refusal,
+wrong-source/malformed-record refusal and unchanged persistent data. The template
+uses the real cached source with a synthetic future target; it is not N-to-N+1.
+The full app proof assesses its real unresolved same-build update record before
+health. New native execution is pending.
+
+
+Native `4b2bfaa` reaches successful recorded-source assessment plus busy-writer
+and linked-record refusal on both CPUs, then fails the malformed-source fixture's
+byte-preservation assertion. The fixture wrapped an existing descriptor in `wb`
+without truncating it, leaving trailing bytes when writing shorter JSON. It now
+explicitly truncates and asserts the exact corruption bytes before starting Setup;
+post-inspection record/data assertions remain mandatory. No product guard is
+weakened. Corrected native execution is pending.
+
+Independent inspection now also classifies a genuinely absent final `current`
+directory as an entirely missing payload, without creating it. Missing/redirected
+ancestors, wrong object types, aliases and denied access still refuse. Package
+intake continues to require an existing complete root. Two new portable cases
+pass (14 inventory cases total, two native skips locally). The exact-template
+missing-payload repair test now first requires an all-missing inspection, then a
+complete inspection after registered repair, with the user's disabled-startup
+choice and private data preserved. New native execution remains pending.
+
+At `3b3f89f`, [native Inno qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36418939338)
+passes both CPUs at actual merge checkout `88327d3b9cc52dfa728133b6e7596d5be7e830d8`.
+Both downloaded reports confirm source assessment, writer/alias/foreign/malformed
+record refusal, the corrected corruption fixture and absent-root inspection/repair.
+The template uses real private Python and inert other components. Full x64 at
+`4412deb` also passes busy-draft inspection refusal, complete installed inventory,
+isolated health and reopening; its ARM64 job is still running. That full run
+predates the source-assessment additions.
+
+### Locate the recorded source after selection changes
+
+`installed_source.open_recorded_source` resolves exactly the active journal's
+source SHA-256 in the private recovery cache. It does not read `selected-installer`,
+enumerate versions, use timestamps or fall back to another cached executable.
+The caller must retain fresh maintenance/writer admission and supply the pinned
+record. The helper validates the full bounded record and CPU, opens an ordinary
+single-link private receipt, hashes the exact retained executable and holds its
+Windows handle against writes/removal. Missing or damaged bytes refuse unchanged.
+It returns the record hash/transaction identity alongside the installer identity.
+
+The receipt is not independent embedded metadata or publisher trust. Before any
+recovery decision, the standalone source assessment must match that same record
+and installer, and its compiled metadata digest must equal the returned receipt.
+This API performs no launch, restoration, selection or journal archival. The
+independent recovery bootstrap and restoration executor remain unfinished.
+
+The native template now changes only its disposable selection to a synthetic
+future target, resolves/pins the real previous installer under the journal writer,
+then asks that installer to independently reacquire admission and assess the
+unchanged record. It checks record, transaction and metadata digests and preserves
+the changed selection until fixture cleanup. This is an actual source lookup and
+inspection test, not a cross-version installation. Six new lookup cases cover
+selection loss/change, absent source without fallback, corruption, CPU/record
+refusal, aliases and native pinning. Local update suite: 49 cases, 48 pass and one
+Windows-only skip; source-assessment suite: six pass. Native execution is pending.
+
+At `68062de`, [native Inno qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36420534854)
+passes both CPUs at merge checkout `dea8a18b3625025aee41fc688dc3232c6f7b1e69`.
+Downloaded reports confirm the changed-selection lookup and independent assessment
+along with earlier refusal/repair checks. Fast Windows passes all 49 update cases
+on both CPUs. Separately, full `4412deb` now passes both CPUs and Mac Qt at
+`82a92eaa3c9598e2dccd329dc853cc839ca7cefb`; both installed inventories and isolated
+UI-health reports are verified. It predates source lookup and the following work.
+
+## Independent source health before restoration completion
+
+The standalone installer now accepts `/augmentorinspect=health` for observation
+only. It first performs exact independent source assessment, then retains the
+journal writer lock and active-record pin while exchanging its exclusive native
+startup/installation handles for shared read admission. It keeps directory handles
+through that exchange. A competing maintenance attempt in the exchange gap causes
+refusal; there is no wait, retry or process termination. The pending journal still
+blocks ordinary native startup, and held read admission excludes installation,
+repair and removal while the probe runs.
+
+The extracted worker rechecks every installed file against the independent source
+inventory under that read admission. An incomplete source refuses before executing
+any installed code. A complete source can run only `Augmentor.exe --local-health`,
+with the compiled private qualification root permitted only for development builds.
+The actual health script renders the shared preview in its disposable profile,
+without conversation or companion startup. Its child has a 30-second deadline
+inside the independent worker's existing 120-second owned Job. The parent observes
+the entire range's exit before accepting a bounded health report.
+
+Both installed and independent observers use `health_report.py` to verify the exact
+metadata digest, source/version/CPU, Windows QPA, rendering/fonts and integer
+dimensions. Duplicate/malformed/oversized or foreign reports refuse. The new health
+result retains `applyAuthorized: false`, the original journal hash and source
+identity; it does not alter selection, archive a record, restore files or reopen
+the desktop. Actual restoration and durable recovery completion remain to build.
+
+Five portable report cases, all 49 update cases (one Windows-only skip locally),
+six source-assessment cases, four package cases and actual Inno script compilation
+pass. Native template qualification now uses a clearly synthetic health response
+through the actual launcher/private Python. It asserts held writer/record/install
+admission, refused ordinary startup, damaged-source refusal before launch, and
+preserved record/data after a failed health child. Synthetic UI fields are not Qt
+qualification. The full app proof separately requires the real independent native
+UI health result while preserving its actual pending record. Both new native
+executions are pending.
+
+At `b6b2313`, [native Inno qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36421972168)
+passes both CPUs at merge checkout `74bda13605c23702802ac0ab1071a2675069b759`.
+Both downloaded reports include the independent synthetic-health/admission stage;
+the preceding damaged-source and failed-health preservation assertions also pass.
+Fast Windows passes all five shared report cases on both CPUs. Full independent
+UI-health integration is queued behind the preceding full run; the template's
+synthetic UI fields are not relabelled as actual rendering evidence.
+
+At `c530fda`, [full application qualification](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36423029869)
+passes x64, ARM64 and shared Mac Qt at merge checkout
+`ad703348d4faa61cff8a11d44c996fd653510995`. Downloaded Windows reports confirm
+the independent installer observes real Windows-QPA rendering, text coverage and
+the exact source identity while preserving the pending record. The separate full
+inventory has no differences on either CPU. This closes the full independent-health
+execution gap; it does not establish previous-source restoration or N-to-N+1.
+
+## Clean payload placement before authenticated apply
+
+Coordinated replacement now requires the registered Root/AppId pair and the actual
+authenticated handoff, coordinator exit and exclusive installation/startup handles.
+The native helper derives all recovery paths from its already validated runtime
+handle. It takes the existing journal writer lock and pins the active record against
+write/delete. The original record remains unchanged and continues to block ordinary
+startup through failed or incomplete installation.
+
+Before changing `current`, Setup creates a fresh random attempt below the private
+`payload-backups` directory. It flushes an exact `update.json` snapshot plus an
+`intent.json` receipt binding its hash, the actual retained target installer and
+release metadata hashes, attempt identity and whether a payload existed. It then
+moves the entire old `current` directory to that attempt's `payload` and writes
+`prepared.json`. New files therefore populate a clean `current`; obsolete or unknown
+old files stay preserved outside the new executable search path. Missing `current`
+is accepted only after owned-registration and ordinary-ancestor checks. Manual
+same-build repair retains its existing in-place behavior.
+
+The move uses the documented [MoveFileExW directory operation](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-movefileexw)
+on the same volume, with write-through and no copy/delete fallback, replacement,
+reboot scheduling or automatic retry. A locked directory refuses. Setup retains
+all acquired handles until exit, including on failure; it neither deletes an old
+tree nor terminates its users. A failed receipt write after a successful move leaves
+the attempt and original journal for independent inspection. Descendants retain
+their existing ACLs; the private parent does not imply rewritten file permissions.
+The move plus receipt are separate operations, not one atomic transaction.
+
+The native exact-template proof now exercises actual authenticated READY/APPLY,
+coordinator exit and Setup completion for a locked tree, a clean replacement with
+an unknown old file, and an absent payload. It checks exact saved journal/receipts,
+complete replacement inventory and unchanged private data. Its disposal of synthetic
+pending records is fixture cleanup, never a production recovery operation. The full
+app proof separately requires displacement of its real packaged tree before update,
+preserved unknown bytes, complete inventory and actual independent UI health.
+Local package/update checks and actual Inno script compilation pass; new native
+execution is pending. This change does not implement restoration completion, space
+budgeting, backup pruning or N-to-N+1 qualification.
+
+## Independent previous-source application
+
+The new fixed `/augmentorrecover=source` action restores files through the retained
+source installer itself, outside the damaged application. It refuses combinations
+with inspection or coordinated-update switches. Before Inno can apply any files,
+it obtains fresh exclusive native maintenance admission and performs independent
+source assessment against its actual installer bytes and embedded metadata. A busy
+writer, invalid record, unknown registration or a different source refuses.
+
+The successful assessment retains the same live journal writer and pinned original
+record through application. Native placement checks that the retained installer
+and metadata match that assessment, saves a separate `source-restoration` intent
+and exact record snapshot, and preserves the damaged tree before fresh installation.
+The normal Inno file/registration stages restore the source's maintenance helper,
+uninstaller/repair metadata and selected installer as well as `current`. An already
+changed but valid selected pointer does not determine which version is restored.
+Malformed selection/cache state still refuses; repairing that state needs a separate
+preservation policy. Existing browser pointers and private data remain untouched.
+
+This action never rewrites the original source/target/history or clears its active
+record, and never offers ordinary launch at Finish. A successful installer exit
+means source files were applied; it is not recovery completion. A later independent
+observer must check full inventory, source selection, registrations and native UI
+health, then durably record the distinct restoration outcome before reopening.
+
+The previous proposal introduced a second READY/APPLY coordinator for restoration.
+That extra process is unnecessary for this standalone source action: Setup already
+runs independently and directly acquires the same exclusive maintenance gates.
+Normal forward updates retain their authenticated READY/APPLY protocol. The outer
+recovery observer must launch this fresh fixed action in an independent installer
+Job and observe its exit; saved PIDs/commands never become execution authority.
+Inno's [PrepareToInstall event](https://jrsoftware.org/ishelp/topic_scriptevents.htm)
+provides the refusal boundary before installation. No journal is finalized from
+`ssPostInstall` or an unobserved previous installer process.
+
+New native template cases require busy-writer and wrong-source refusal, then actual
+source installation with missing launcher/runtime/metadata and selection naming a
+synthetic target. They verify old-file preservation, restored repair registration,
+unchanged record/data, blocked ordinary startup and independent synthetic health.
+The full app proof separately repeats damaged-runtime restoration and real native
+UI health. Local package/source-assessment tests and Inno script compilation pass;
+new native restoration execution is pending. This does not prove actual N-to-N+1,
+restoration completion, publisher trust or physical Windows acceptance.
+
+At `04f3317`, [both native templates pass](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36433486621)
+at merge checkout `abf36a2cf01fb7c71b2604ae3e72a53c1d64f617`. Downloaded results from both CPUs
+confirm the actual source-application stage and the following independent
+synthetic health. Full native application/restoration completion remains separate.
+The prior full x64 `e98a142` run passes clean payload displacement plus complete
+inventory and real UI health; its ARM64 full job remains running.
+
+## Distinct durable restoration outcome
+
+`services/lifecycle/source_restoration.py` supplies the shared live-attempt journal
+for the independent recovery observer. It verifies the exact original record/source
+metadata and publishes a separate random restoration attempt under the existing
+journal writer lock. Its durable apply intent precedes launching the source
+installer; it releases the writer so that installer can obtain fresh admission.
+It never executes a saved PID, command or attempt.
+
+After the caller observes the actual fresh installer complete, the attempt can
+record `installed`. Finalization requires externally held installation/read
+admission plus a callback verifying source selection, owned registration, complete
+inventory and isolated native UI health against independent source bytes. The
+writer excludes other journal writers, and the original record is checked again
+after verification. The callback must not launch another installer requiring the
+same writer lock.
+
+A separate `source-restored` receipt is flushed before the unchanged original
+active record is durably moved to its uniquely named restoration archive. The
+original target, phase, shutdown history and exact bytes remain intact. Unknown
+intent/receipt/archive writes are never retried by the same attempt. A lost archive
+acknowledgment can leave either the active original or its exact archive; the
+verified restoration receipt exists before normal startup can become available.
+
+Thirteen portable tests use real private files, live writer exclusion, a child
+process crash, changed records, failed exit/health observations and injected write
+or namespace failures. All 62 update cases pass locally (one existing Windows-only
+skip). Their callbacks are fixtures, not native installer evidence. The full app
+proof now uses this completion path after actual standalone source install, source
+registration/inventory verification and Windows UI health under read leases, then
+reopens normally. Its interrupted target is synthetic; actual N-to-N+1 still needs
+two distinct packages. Native execution of completion is pending. The product's
+independent outer observer and crash-resume inspection of archived-versus-active
+outcomes remain to implement.
+
+## Independent recovery observer
+
+The new fixed `/augmentorrecover=previous` action composes source restoration and
+completion through code extracted from the retained installer. It first acquires
+native maintenance, performs independent source assessment and retains the source
+installer. It then extracts `windows-recover-source.py`, the shared lifecycle and
+platform adapters and private Python. This code runs outside `current`, including
+when installed Python, the launcher and release metadata are missing.
+
+The native helper creates the observer suspended in its own Job, assigns it before
+execution, then releases its maintenance/writer/record and selected-pointer pins.
+It retains source artifact and scratch ownership. The observer obtains fresh
+exclusive startup/lifetime admission, pins and compares the original record under
+the journal writer, resolves only its exact cached source and persists a new
+`SourceRestoration` intent. It releases admission before launching the actual source
+installer, which reacquires native maintenance and independently checks the same
+source again. Recorded PIDs and commands do not supply execution authority.
+
+The observer Job uses kill-on-close for its observer/health range and explicitly
+allows breakaway. `InstallerProcess` always requests breakaway, creates its own
+non-kill-on-close Job before running Setup, and has no qualification fallback here.
+This follows Microsoft's [nested Job breakaway rules](https://learn.microsoft.com/en-us/windows/win32/procthread/nested-jobs).
+The worker observes the same installer Job for up to five minutes without retrying
+launch; the native parent gives the complete worker ten minutes. Failure or timeout
+closes observations without terminating independent Setup. Native crash/breakaway
+qualification is still required before relying on this behavior for customers.
+
+The Inno process proof now adds normal-exit and crash cases with a disposable
+observer in an explicit kill-on-close/allow-breakaway Job. It launches the real
+Inno loader and extracted Setup through `InstallerProcess` without the hosted
+fallback, verifies both are outside the observer Job, and keeps an ordinary child
+inside that Job as a control. After observer exit/crash, the ordinary child must
+end while the same observed Setup stays alive, keeps startup exclusion and
+completes naturally. This checks actual kernel lifetimes; it does not claim a
+complete power-loss recovery. Python compilation passes; native execution of
+these additional fault cases is pending.
+
+After actual installer completion, the worker retains read admission and requires
+source selection, Root/AppId and repair registration, the exact maintenance-helper
+hash, complete payload inventory and isolated native UI health. The shared journal
+now also pins the original active file against Windows write/delete during that
+health callback. It then writes the distinct restoration receipt and archives the
+original bytes unchanged. A bounded result links those durable records and exact
+source/UI identity. The diagnostic action stops outer Setup before any ordinary
+installation sections, so its nonzero exit is not a success assertion; callers
+must inspect the bound result and durable outcome. It does not reopen the desktop.
+Customer recovery UI/entrypoint routing remains separate work.
+
+Failure diagnostics contain only phase, exception class and numeric code. The
+inner installer log is private and retained with the attempt. Disposable native
+tests copy those logs into their qualification artifacts on failure. Source/cache
+corruption, unavailable admission and unknown installation outcomes remain refused
+or unresolved; no archive is removed or action replayed to bypass them.
+
+The exact-template proof now copies only the pinned pywin32 distribution needed
+by the actual extracted observer; other component markers remain inert and its UI
+health response remains synthetic. It exercises the complete fixed recovery action
+and checks original archival, distinct receipt and complete source inventory.
+The full app proof invokes the same action and requires actual Windows UI health
+and ordinary reopening; it no longer implements recovery orchestration itself.
+Local update/package tests, Python compilation and actual Inno script compilation
+pass. New native observer execution is pending. The proposed target is synthetic;
+two distinct packages, crash-resume inspection, disk/retention policy and customer
+integration are still required.
+
+### Remaining restoration executor
+
+Source application, shared durable completion and the independent outer observer
+are implemented above; their integration still requires native execution. Recovery must keep the original transaction
+unchanged; restoring the previous source must never masquerade as installing its
+different target. The remaining sequence is:
+
+1. Obtain fresh maintenance/writer admission, verify the original record/source and
+   retain the exact source artifact. Persist a separate restoration intent before
+   any replacement. Saved PIDs, commands and the selected-version pointer grant
+   no execution authority.
+2. Keep an observer outside the replaceable payload. Launch the independently
+   verified source installer with the fixed restoration action using an independent
+   Job and fresh live process observations. Let that installer obtain its own
+   maintenance/writer admission and revalidate the original source. Preserve its
+   independent lifetime if the observer crashes. Do not reuse the forward-update
+   coordinator's requirement to exit before APPLY for this standalone path.
+3. Give installation a fresh payload destination, preserving the displaced tree
+   under an owned recovery location. Replacing over mixed source/target files
+   cannot establish a clean rollback. Restore source-owned installer/repair/browser
+   registrations as well as executable files; UI health alone does not verify
+   the metadata outside `current`. Preserve all private application data.
+4. After observing the actual installer exit, require complete source inventory,
+   correct selection/registrations and independent local health. Persist a distinct
+   source-restored receipt, then archive the original record without rewriting its
+   target/history. A failure or unknown outcome keeps recovery unresolved; a new
+   attempt must observe current state before choosing further work.
+5. Reopen only after completion and release of admission. Qualify crashes at each
+   durable boundary, actual N-to-N+1/previous-source restoration, obsolete-file
+   handling and bounded retention. Unknown files in displaced trees require
+   preservation; their location alone is not ownership evidence for deletion.
+
+This is unfinished implementation work, not a completed rollback contract. Reuse
+shared lifecycle classes and the retained installer's runtime; do not introduce
+another conversational core or a force flag that bypasses the unresolved record.
+
+## October 3 complete-payload recovery observation
+
+At source `9661eef`, [native run 37123469484](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37123469484)
+passes all x64 installation/repair/removal scenarios. ARM64 passes initial install,
+strict inventory, draft refusal, repair, coordinated same-build replacement and
+independent health, then fails at the source-restoration observer's five-minute
+installer deadline. Its retained inner Setup log proves installation succeeded
+about 26 seconds after observation expired; this is a timeout policy mismatch for
+the larger bundled payload, rather than evidence of failed file installation.
+The original recovery remains unresolved because its required verification and
+journal completion did not run. Those gates must still succeed.
+
+Source installation now has a bounded ten-minute observation. The native outer
+observer permits fifteen minutes, including admission and independent verification/
+health; the full proof allows twenty minutes for outer extraction and observation.
+Both architectures share these bounds. Expiry preserves independent Setup and
+recovery records; no replay, process termination, success-on-timeout or relaxed
+inventory/health assertion is introduced. Three clock-driven tests cover actual
+completion after the former limit, bounded unknown outcome and terminal failure.
+All thirteen existing source-restoration durability cases still pass locally.
+Native whole-application proofs and matched customer downloads must rerun before
+publication. The owner's installed Linux application is untouched.
+
+## October 3 native rejected-update dialog cleanup
+
+The x64 installer fixture fails twice (`c9f0363` and `901fab9`) after rejecting
+signed metadata for the wrong CPU. Its closed progress report confirms
+`callbackFailed: true`, `downloadHandled: false`; no completion result is
+published because native cleanup hangs. ARM64 passes. The pinned
+[WinSparkle 0.9.4 UI source](https://github.com/vslavik/winsparkle/blob/v0.9.4/src/ui.cpp#L645)
+shows that a rejected installer callback opens an OK-only modal warning. The
+fixture previously sent WM_CLOSE to all its windows before cleanup, including
+the parent behind that warning.
+
+The disposable fixture now acknowledges its own enabled, visible native modal
+dialog with IDOK before closing its parent, and keeps a bounded observer active
+while native cleanup joins the UI thread. It retains class/action observations;
+it never targets other processes or changes product update behavior. Rejection,
+private-cache integrity, native cleanup and process-exit assertions remain
+mandatory in the next x64/ARM64 run. Publication remains pending.
+
+The first native follow-up (`6b82cdf`) hangs earlier, on x64 busy-work refusal;
+its closed progress confirms `canShutdown: false`, `downloadHandled: false`.
+Direct IDOK messaging is insufficient for that native warning too. [wxWidgets' native task-dialog implementation](https://github.com/wxWidgets/wxWidgets/blob/v3.2.6/src/msw/msgdlg.cpp#L677)
+can present an OK-only warning with a button internally identified as IDCANCEL.
+The fixture now finds and clicks its actual OK/Cancel button using BM_CLICK,
+retaining class/action observations before cleanup completes as well as after.
+This is an upstream-grounded correction, pending real x64/ARM64 confirmation;
+it does not relabel the earlier rejection-only observation as a completed test.
+
+At `d82a721`, actual-button clicking completes the busy-work warning on x64:
+its final progress records `button-2`. The later wrong-CPU rejection still hangs,
+with 190 retained observations of a native `#32770` warning exposing neither
+IDOK nor IDCANCEL through GetDlgItem. The fixture now uses the documented
+[TDM_CLICK_BUTTON API](https://learn.microsoft.com/en-us/windows/win32/controls/tdm-click-button)
+with wxWidgets' logical IDCANCEL identifier when that native task dialog has no
+ordinary button handle. Ordinary warnings retain the proved actual-button path.
+Rejection and full native cleanup still require fresh hosted confirmation.

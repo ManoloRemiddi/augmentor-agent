@@ -41,7 +41,9 @@ try:
     before=controller.client.call('session.history',{'sessionId':controller.session,'maxMessages':100})
     first=next(i for i,(role,_) in enumerate(window.messages) if role=='Augmentor')
     activate('branch',first)
-    until(lambda:controller.session!='native-fork-source' and not controller.navigating and controller.connected and window.send_button.isEnabled())
+    # Worker navigation completes before the queued child transcript renders.
+    # Wait for the actual child page; the source page has two assistant replies.
+    until(lambda:controller.session!='native-fork-source' and not controller.navigating and controller.connected and window.send_button.isEnabled() and len([r for r in window.messages if r[0]=='Augmentor'])==1)
     branch=controller.session
     assert branch.startswith('augmentor-linux-codex-')
     assert not any('NATIVE_SOURCE_SECOND' in text for _,text in window.messages)
@@ -54,7 +56,7 @@ try:
     until(lambda:window.send_button.isEnabled())
     QTest.keyClick(window.composer,Qt.Key.Key_Return)
     until(lambda:controller.session!=branch and not controller.running and not window.editing)
-    until(lambda:any(role=='Augmentor' for role,_ in window.messages))
+    until(lambda:any(role=='Augmentor' for role,_ in window.messages) and [text for role,text in window.messages if role=='You']==['NATIVE_EDITED_FIRST'])
     edited=controller.session
     assert window.composer.toPlainText()=='RESTORED_DRAFT'
     assert [text for role,text in window.messages if role=='You']==['NATIVE_EDITED_FIRST']

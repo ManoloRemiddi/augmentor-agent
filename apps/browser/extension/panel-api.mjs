@@ -31,6 +31,7 @@ import {
 import { openSettingsTab } from './settings-tab.mjs'
 import {approvalPresenters} from './approval-presenters.mjs'
 import { overlayFade } from './overlay.mjs'
+import { browserMaintenance } from './maintenance-worker.mjs'
 import {prepareBranch,finishBranch} from './branch-request.mjs'
 
 // The DSH picker's curation rides every catalog reply: the panel's picker
@@ -42,6 +43,19 @@ const curationOf = (c) => ({
 })
 
 export function handlePanelMessage(msg, sender, sendResponse) {
+  if (sender?.id !== chrome.runtime.id || !sender.url?.startsWith(`chrome-extension://${chrome.runtime.id}/`)) return
+  let finish
+  try { finish=browserMaintenance.begin() }
+  catch (error) { sendResponse({ok:false,error:error.message}); return }
+  const respond = result => { try { sendResponse(result) } finally { finish() } }
+  try {
+    const asynchronous=dispatchPanelMessage(msg, sender, respond)
+    if (asynchronous !== true) finish()
+    return asynchronous
+  } catch (error) { finish(); throw error }
+}
+
+function dispatchPanelMessage(msg, sender, sendResponse) {
   // S5 (audit): accept messages only from this extension's own pages.
   // chrome.runtime.onMessage is unreachable from other extensions or the
   // web, but the panel renders content from OTHER DSH sessions — a hostile
@@ -50,6 +64,9 @@ export function handlePanelMessage(msg, sender, sendResponse) {
   // the sender is one of our own chrome-extension:// pages.
   if (!sender || sender.id !== chrome.runtime.id) return
   if (!sender.url || !sender.url.startsWith('chrome-extension://' + chrome.runtime.id)) return
+  if(msg?.type==='surface/dictation'){
+    request('augmentor/surface',{action:'dictation',method:msg.method,params:msg.params}).then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}));return true
+  }
   if(msg?.type==='surface/appearance'||msg?.type==='prompt/improve'){
     if(msg.type==='prompt/improve'&&(!['dsh','codex'].includes(state.harness)||state.phase!=='ready'||state.running||state.panelViewSession)){sendResponse({ok:false,error:'Open an idle DSH or Codex conversation first.'});return}
     request('augmentor/surface',msg.type==='surface/appearance'?{action:'appearance',settings:msg.settings}:{action:'improve',text:msg.text,selection:state.selection})
@@ -146,7 +163,7 @@ export function handlePanelMessage(msg, sender, sendResponse) {
       for(const item of history.events??[])log('event',{sessionId:row.sessionId,event:item.event})
       broadcast();sendResponse({ok:true,sessionId:row.sessionId})
     })().catch(async error=>{
-      if(codex)try{if((await request('session.branchStatus',{newSessionId:intent.newSessionId})).status==='absent')await finishBranch(chrome.storage.local,intent)}catch{}
+      if(codex)try{if((await request('session.branchStatus',{sessionId:intent.sessionId,newSessionId:intent.newSessionId})).status==='absent')await finishBranch(chrome.storage.local,intent)}catch{}
       sendResponse({ok:false,error:error.message})
     }).finally(()=>state.mutating=false);return true
   }

@@ -48,7 +48,7 @@ def validate(app, development=False, verify=True):
 # to tell the user why. Refusing it here — while the download is still in front
 # of them — is the difference between a dead end and an instruction.
 #
-# Kept deliberately separate from macos_setup.py's RUNTIME_PAYLOAD so
+# Kept deliberately separate from managed_setup.py's RUNTIME_PAYLOAD so
 # this check still works when the file it would import is itself the missing
 # one. A test asserts the two lists stay identical.
 RUNTIME_PAYLOAD = (

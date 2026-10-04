@@ -1,0 +1,116 @@
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+name: Bundled Handy component
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      platforms:
+        type: string
+        default: '["ubuntu-24.04", "macos-14", "windows-2022"]'
+permissions:
+  contents: read
+jobs:
+  component:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJSON(inputs.platforms || '["ubuntu-24.04", "macos-14", "windows-2022"]') }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.19.0'
+      - name: Restore an exact component build
+        id: component-cache
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
+        with:
+          path: components/handy/runtime
+          key: handy-1.97.1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('components/handy/**', 'scripts/build-handy.py', 'scripts/prepare-handy.py', 'scripts/stage-handy.py', 'scripts/stage-handy-windows-runtime.py') }}
+      - name: Verify cached component inventory against current source
+        if: steps.component-cache.outputs.cache-hit == 'true'
+        run: python -c "import importlib.util; s=importlib.util.spec_from_file_location('stage','scripts/stage-handy.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.validate()"
+      - name: Install Linux native build libraries
+        if: runner.os == 'Linux' && steps.component-cache.outputs.cache-hit != 'true'
+        timeout-minutes: 15
+        run: |
+          sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 update
+          sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 install -y --no-install-recommends build-essential pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libasound2-dev libgtk-layer-shell-dev libopenblas-dev cmake clang libclang-dev libevdev-dev libvulkan-dev glslc spirv-headers glslang-tools libssl-dev xvfb xauth
+      - name: Install Linux runtime libraries for a verified cached component
+        if: runner.os == 'Linux' && steps.component-cache.outputs.cache-hit == 'true'
+        timeout-minutes: 10
+        run: |
+          sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 update
+          sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 install -y --no-install-recommends libgtk-3-0t64 libwebkit2gtk-4.1-0 libayatana-appindicator3-1 librsvg2-2 libgtk-layer-shell0 libopenblas0 libasound2t64 libasound2-plugins libevdev2 libvulkan1 libxdo3 xvfb xauth
+      - name: Install the tested Rust toolchain
+        if: steps.component-cache.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          host=$(python -c "import platform,sys; print({'linux-x86_64':'x86_64-unknown-linux-gnu','darwin-arm64':'aarch64-apple-darwin','win32-AMD64':'x86_64-pc-windows-msvc','win32-ARM64':'aarch64-pc-windows-msvc'}[sys.platform+'-'+platform.machine()])")
+          rustup set default-host "$host"
+          rustup toolchain install "1.97.1-$host" --profile minimal --component rustfmt,clippy,rust-docs
+          rustup default "1.97.1-$host"
+      - name: Materialize reviewed source before restoring compiler intermediates
+        if: steps.component-cache.outputs.cache-hit != 'true'
+        run: python scripts/prepare-handy.py
+      - name: Restore compiler intermediates
+        if: steps.component-cache.outputs.cache-hit != 'true'
+        id: compiler-cache
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
+        with:
+          path: |
+            build/handy/src-tauri/target
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: handy-compiler-1.97.1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('components/handy/upstream.json') }}-${{ hashFiles('components/handy/**', 'scripts/build-handy.py', 'scripts/prepare-handy.py') }}
+          restore-keys: |
+            handy-compiler-1.97.1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('components/handy/upstream.json') }}-
+            handy-compiler-1.97.1-${{ runner.os }}-${{ runner.arch }}-
+      - name: Build the private component and complete source notices
+        if: steps.component-cache.outputs.cache-hit != 'true'
+        run: python scripts/build-handy.py
+      - name: Check formatting and lint the component
+        if: steps.component-cache.outputs.cache-hit != 'true'
+        shell: bash
+        env:
+          ORT_PREFER_DYNAMIC_LINK: '1'
+        run: |
+          cd build/handy/src-tauri
+          cargo fmt --all -- --check
+          cargo clippy --release --locked --features tauri/custom-protocol
+      - name: Retain compiler intermediates for source fixes
+        if: always() && steps.compiler-cache.outputs.cache-hit != 'true' && steps.component-cache.outputs.cache-hit != 'true' && hashFiles('build/handy/src-tauri/target/release/handy*') != ''
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830
+        with:
+          path: |
+            build/handy/src-tauri/target
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ steps.compiler-cache.outputs.cache-primary-key }}
+      - name: Retain the checked build for repeat lifecycle qualification
+        if: steps.component-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830
+        with:
+          path: components/handy/runtime
+          key: ${{ steps.component-cache.outputs.cache-primary-key }}
+      - name: Verify the embedded lifecycle (Linux)
+        if: runner.os == 'Linux'
+        run: dbus-run-session -- xvfb-run -a python3 scripts/proof-handy-component.py
+      - name: Verify the embedded lifecycle (Mac and Windows)
+        if: runner.os != 'Linux'
+        run: python scripts/proof-handy-component.py
+      - name: Name the platform artifact
+        if: always()
+        id: target
+        shell: bash
+        run: python -c "import os,platform,sys;open(os.environ['GITHUB_OUTPUT'],'a').write('target='+sys.platform+'-'+platform.machine()+'\n')"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always() && hashFiles('components/handy/runtime/BUILD.json') != ''
+        with:
+          name: handy-${{ steps.target.outputs.target }}
+          path: components/handy/runtime/**
+          retention-days: 14
+          if-no-files-found: error

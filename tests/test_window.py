@@ -11,11 +11,22 @@ class WindowTests(unittest.TestCase):
     def setUpClass(cls):
         cls.app = QApplication.instance() or QApplication([])
 
+    def test_windows_preview_without_handy_starts_no_dictation_or_tray(self):
+        from unittest.mock import Mock, patch
+        owner=SimpleNamespace(controller=object())
+        with patch('augmentor_linux.window.sys.platform','win32'), \
+             patch('augmentor_linux.window.current_name',return_value='main'), \
+             patch('pathlib.Path.is_file',return_value=False), \
+             patch('augmentor_linux.window.threading.Thread') as thread:
+            Window.setup_dictation_tray(owner)
+        thread.assert_not_called()
+        self.assertFalse(hasattr(owner,'app_tray'))
+
     def test_mac_first_run_offers_installation_without_starting_recovery(self):
         from unittest.mock import Mock, patch
         owner=SimpleNamespace(controller=SimpleNamespace(harness='dsh',session=None,start_monitor=Mock()),
             open_setup=Mock(),setup_offered=False,set_status=Mock())
-        with patch('augmentor_linux.macos_setup.needed',return_value=True):
+        with patch('augmentor_linux.managed_setup.needed',return_value=True):
             Window.start_connection(owner); self.app.processEvents()
         owner.open_setup.assert_called_once(); owner.controller.start_monitor.assert_not_called()
         self.assertTrue(owner.setup_offered)
@@ -41,7 +52,7 @@ class WindowTests(unittest.TestCase):
         for harness,session,needed in [('dsh',None,False),('dsh','saved',True),('pi',None,True)]:
             owner=SimpleNamespace(controller=SimpleNamespace(harness=harness,session=session,start_monitor=Mock()),
                 open_setup=Mock(),setup_offered=False,set_status=Mock())
-            with patch('augmentor_linux.macos_setup.needed',return_value=needed):
+            with patch('augmentor_linux.managed_setup.needed',return_value=needed):
                 Window.start_connection(owner); self.app.processEvents()
             owner.controller.start_monitor.assert_called_once(); owner.open_setup.assert_not_called()
 
