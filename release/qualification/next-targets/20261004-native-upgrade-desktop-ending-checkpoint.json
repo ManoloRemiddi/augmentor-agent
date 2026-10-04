@@ -197,7 +197,23 @@
     "processCwdPermissionErrors": 2,
     "nativeAuditReceiptSha256": "26d5b8487bb2b2617fe2b7b0186495721bc9b3c12a18fdd48b720d16b8a391b6",
     "inputQualified": false,
-    "controlAcceptance": "OPEN"
+    "controlAcceptance": "OPEN",
+    "resumedFixtureNormalClose": {
+      "status": "PASS_AFTER_SEPARATE_READ_ONLY_FEDORA_ENDING",
+      "sourceRevision": "56251697f2d2f87c3c1be04130751426940df198",
+      "endingReceiptSha256": "e1edfbd5fab92027af689c53a2715da03602fd13ee68621e67ac5c588329ad6c",
+      "endingRawSha256": "e5436a8088b7dce775a213db88c28a8e69b760fa0a071b0922a6667c2c6ce2aa",
+      "originalAcceptedResponseSha256": "7dbdce11c7892e4bc78462d7cfc5cd8b19e452d541e5dc13ddcbe2807fc7875f",
+      "originalIncorrectPackageAuditPreserved": true,
+      "closeRepeated": false,
+      "normalAppAndBothChildrenAbsent": true,
+      "unitInactiveAndSocketAbsent": true,
+      "nativeRpmAuditClean": true,
+      "selectedArtifactProtectedAndPointersUnchanged": true,
+      "wholeCacheUnchanged": true,
+      "inputQualified": false,
+      "productionInputEnabled": false
+    }
   },
   "ubuntu24": {
     "normalMaintenanceClose": "PASS",
@@ -477,7 +493,9 @@
         "sourceRevision": "039b0415ec8326846121069f7a623844e4e8cc94",
         "runId": 37234399205,
         "url": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37234399205",
-        "status": "IN_PROGRESS"
+        "status": "PASS",
+        "successfulJobs": 11,
+        "remainingGitGuardianUnwaived": true
       }
     },
     "finiteLicenseReview": {

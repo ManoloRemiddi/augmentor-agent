@@ -11,18 +11,22 @@ the dated records that follow retain their original outcomes and tested revision
 | GNOME/KDE consent, owned selection, visible Stop and input | Fedora GNOME activation and read-only observer pass; KDE has native session/owner evidence and the maintained owned-target adapter. | Actual consent/input/Stop and preserved target text in both current sessions. GNOME production input remains disabled. |
 | Mint complete and matching SUSE/Arch dependencies | Mint22.3 complete setup and SDKs pass under its declared emulated120-second profile. Arch/Leap matching native/complete installers and SDKs pass at their recorded revisions. | Mint public60-second graphical profile and current desktop acceptance; retain matching package/dependency maintenance. |
 | Graphical Browser, physical audio, upgrade/rollback | Published0.2.12→0.2.13→0.2.12 passes with the separately recorded legacy save continuation. Earlier graphical Browser evidence keeps its own tested scope. | Current Mint graphical Browser/reconnect/Stop; physical microphone/speaker acceptance. Browser preference-child runtime checks do not qualify its graphical surface. |
-| Source, notices, rebuild, replacement and qualified release | Retained independent builds, authenticated kit preparation, exact72-member correspondence and all12 current Noble replacement paths pass; maintained notice/build fixes pass focused and actual-input checks. | Concrete source/notice delivery and license review, owner22-path control-permission decision, physical/desktop gates and unwaived GitGuardian before release. |
+| Source, notices, rebuild, replacement and qualified release | Retained independent builds, authenticated kit preparation, exact72-member correspondence and all12 current Noble replacement paths pass; maintained notice/build fixes pass focused and actual-input checks. | Matching source-runtime ABIs on other release targets; concrete source/notice delivery and license review, owner22-path control-permission decision, physical/desktop gates and unwaived GitGuardian before release. |
 
 The active graphical cases use separate owned Fedora KDE, Fedora GNOME and Mint
 fixtures. Mint's first browser-package download timed out before installation;
 a separate authenticated acquisition is in progress. GNOME's observed connection
 dialog was dismissed normally, and its supported close was acknowledged with all
-three processes absent; the final read-only Fedora package audit is being corrected
-without repeating the close. These intermediate observations are not graphical
+three processes absent. A separate corrected read-only Fedora package audit now
+passes, preserving selected/protected/cache state without repeating the close. These intermediate observations are not graphical
 acceptance. The finite source-license review is recorded in
 [licensing](LICENSING.md#october-4-current-source-runtime-review-scope) and the
 [current checkpoint](../release/qualification/next-targets/20261004-native-upgrade-desktop-ending-checkpoint.json).
 The draft PR remains unmerged and no candidate binary has been released.
+[Hosted validation37234399205](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37234399205)
+passes all11 jobs at039b041 for the maintained source-tool fixes, including Fedora43/44,
+Ubuntu26.04, Debian installed/Browser packages, Home and Handy across three platforms.
+Later documentation does not relabel that tested source revision.
 
 ## October 4 maintained source evidence tools
 
