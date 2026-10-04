@@ -1792,6 +1792,27 @@ dictation preferences. Its final graph drain includes that reopened broker. This
 remains same-build repair with a synthetic unsigned catalog, not signed forward
 acceptance. The two-CPU full installation run is pending for this extension.
 
+### Native Windows broker results at eddaf37
+
+[Windows desktop run 37169461358](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37169461358)
+is entirely successful at `eddaf37cdc8fe94e31570b2f3ffd8a7334f0a017`: x64 job
+111339262443 and ARM64 job 111339262532. Both execute the three new actual private
+installed-broker cases successfully, including retained pipe/session/executable
+identity, disabled installation exclusion, occupied owner refusal/cancel,
+startup-writer exclusion, normal broker exit, fixed one-shot reopen, private key
+and GUI-client interpreter choice, unchanged payload/preferences and empty pending
+record refusal. Their updater suite passes 258 cases (158 passed, 100 explicit
+Linux/Mac/other-context skips). The rest of the native desktop workflow, including
+Qt rendering, native ownership and compiled startup/lifetime launcher proofs,
+passes on both CPUs. These are disposable kernel/process proofs without capture,
+model download or real Handy startup.
+
+The extended full Inno fixture at `c8b73e3` is running separately in
+[37169658310](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37169658310).
+Only that completed result can qualify its real installer interaction; the desktop
+run does not qualify replacement, completed-target health, signed forward updates
+or user-profile deployments. No production flag or owner installation changed.
+
 All public signing/feed/automatic-install/distribution flags remain false. The
 remaining package/global-user, shared Mac/Companion, SDK owner teardown,
 interrupted recovery/retention, actual desktop/DSH, signed forward and legacy bridge

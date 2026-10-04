@@ -15,7 +15,8 @@ actual readiness and unchanged payload. Old reopen plans retain their shape.
 
 [The owning update record](UPDATE-SYSTEM.md#windows-persistent-dictation-coordination--october-4-candidate)
 distinguishes portable tests from the newly added actual Windows x64/ARM64 private
-broker qualification. Native results are pending for this checkpoint. No signing,
+broker qualification. Both native desktop CPUs pass at `eddaf37`; full Inno results
+remain pending. No signing,
 feed or automatic-install flag was enabled, and no owner install/profile/model/GPU
 was changed. The complete cross-platform goal remains active; this is one remaining
 runtime participant, not production automatic-update qualification.
@@ -25,10 +26,12 @@ platform skips), existing dictation fourteen and Windows preparation seven; the
 system QtTest import gap was repaired only in the isolated test environment.
 Native desktop run
 [37169461358](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37169461358)
-is in progress; x64 has passed, ARM64 is qualifying the final native launcher.
+is entirely successful on x64 and ARM64, including all three actual broker cases
+and final compiled-launcher qualification.
 The follow-up full Inno fixture now keeps a real installed broker across busy
 deferral, drain, pending-start refusal and verified reopening; full results remain
-pending, and its same-build synthetic catalog does not prove signed forward updates.
+pending in [37169658310](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37169658310)
+at `c8b73e3`, and its same-build synthetic catalog does not prove signed forward updates.
 
 ## Corrected native Linux checkpoint — October 4, full goal still active
 
