@@ -2,6 +2,25 @@
 
 # Start here: agent handoff
 
+Current October 4 evidence: corrected full Windows run
+[37170465430](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37170465430)
+at `c40926b` is terminal success on x64/ARM64. Both downloaded installed reports
+pass all 24 stages, including actual installed broker capture deferral, ordinary
+exit, replacement, pending-start refusal, target completion/reopening and source
+restoration/removal. This is same-build repair with a synthetic unsigned catalog;
+it does not qualify signed forward updates. Later desktop run 37172698677 at
+`07c05af` passes both CPUs for actual junction refusal and login admission.
+Full login-guard run 37172411318 at `40af948` is now executing, not queued.
+
+New `test_update_signed_authority.py` joins real ephemeral Ed25519 metadata,
+loopback HTTP/catalog verification and actual inert download bytes to the existing
+Python installation authority. Two host cases pass: fresh signed withdrawal and
+damaged timestamp signature refuse authorization after download. No installer is
+executed; source identity and qualification flags remain synthetic. Full Windows
+builds run these cases after locked Node dependencies are installed. Public feed,
+signing and eligibility flags remain false; full-goal gaps and owner signing
+questions remain. The following older entries retain their dated evidence.
+
 Latest native checkpoint: `07c05af` desktop run 37172698677 passes both Windows
 CPUs, including actual junction/key preservation and login-session admission.
 Eleven Linux broker regressions pass. Corrected full x64 installer job 111344879337

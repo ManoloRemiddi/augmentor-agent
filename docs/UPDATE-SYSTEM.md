@@ -1916,3 +1916,38 @@ remains live at this record. Full follow-up 37172411318 at `40af948` is queued; 
 must qualify generic login-guard integration separately. The junction fix is
 covered by the later actual desktop broker cases, not inferred from the earlier
 full installer source. All production eligibility/feed flags remain false.
+
+### Completed Windows broker installer qualification and signed authority bridge
+
+Corrected full run
+[37170465430](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37170465430)
+at `c40926b` is terminal success, including x64 job 111344879337 and ARM64 job
+111344879344. Both downloaded `installed-application.json` reports have `passed:
+true` and all 24 stages. ARM64 independently reaches actual broker capture
+deferral/drain, pending target refusal, complete target health/completion, observed
+reopening, source restoration, repair/removal and persistent data retention.
+The same-build synthetic unsigned catalog and no-model/physical-input/signed-
+forward/data-rollback limits still apply. Full login-guard run 37172411318 at
+`40af948` is now executing; the later junction fix is qualified by the actual
+desktop run at `07c05af`, not inferred from this earlier full source.
+
+`tests/test_update_signed_authority.py` and its private Node fixture additionally
+join the shipped TUF repository library to `AutomaticInstallAuthority`: generate
+temporary in-memory Ed25519 role keys, serve real signed metadata and an inert
+payload on an explicit loopback-only fixture, verify/download through the actual
+client, then reverify fresh signed metadata at live authorization boundaries.
+Two host cases pass: a higher-sequence signed withdrawal refuses installation at
+`installer-ready`, and a damaged publisher timestamp signature refuses at
+`prepared` despite a valid cached selection. The requested artifact is downloaded
+once; fresh timestamp requests are observed. No pending application journal is
+created and the inert installer is never executed. Only the machine/source
+identity and qualification flags are synthetic, using the existing private
+installation fixture. The Windows full workflow invokes this test after locked
+dependencies are installed; desktop-only workflows explicitly skip it when those
+dependencies are absent. This does not grant production HTTPS exceptions, create
+publisher keys/configuration or qualify an actual OS N-to-N+1 installation.
+
+Public feed and eligibility remain false. Native signed-forward, full desktop/DSH,
+package/shared-user, Mac shared/Companion, SDK owner teardown, legacy bridge,
+interrupted recovery/retention and production signing gates remain open. Owner
+installation/profile/model/GPU settings have not changed.

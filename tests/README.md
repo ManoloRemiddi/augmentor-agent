@@ -903,3 +903,15 @@ Managed staging additionally retains the complete packaged DSH/speech directory:
 `test_desktop_deployment.py` checks unchanged source isolation and retained speech
 damage refusal. Public bundle staging refuses missing DSH/speech even when its
 synthetic receipt claims qualification, before importing candidate code.
+
+`test_update_signed_authority.py` requires locked Node/TUF dependencies (`npm ci`)
+and exercises real ephemeral Ed25519 signatures, loopback HTTP and an actual inert
+download together with Python's live installation authority. Fresh signed release
+withdrawal and a damaged timestamp signature refuse authorization after download.
+The artifact is never executed; machine/source identity and qualification flags
+are synthetic. Windows uses the bundled Node/Python and seals the downloaded
+fixture's ACL before binding its retained descriptor. Run with `python3 -B -m
+unittest discover -s tests -p test_update_signed_authority.py -v`; absence of the
+locked dependencies is an explicit skip. Full Windows builds invoke it after
+dependency installation. This is authorization evidence, not OS forward-update
+qualification or production signing/feed provisioning.
