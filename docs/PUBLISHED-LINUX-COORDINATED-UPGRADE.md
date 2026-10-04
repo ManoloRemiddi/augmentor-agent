@@ -134,3 +134,53 @@ audit native versions/bytes, idle exclusive leases, no owned descendants/socket/
 listeners, exact current and previous managed inventories, profile backup and
 foreign-content preservation, settings and all histories. This container proof
 is separate from graphical, audio, hardware and broad distribution acceptance.
+
+## Fresh integration163 source candidate
+
+The maintained coordinator now admits only the existing checked npm DSH shim
+under the synthetic account's `dsh-runtime/node_modules/.bin`, then adds that
+directory to its clean PATH ahead of native Node and the system commands. The
+observed `.local/bin/dsh` is absent. The exact npm link, executable target and
+supported package content are checked through bounded stable reads; caller paths,
+different link text, foreign owners, hardlinks and changed contents refuse. No
+command or runtime is installed to correct the proof's PATH omission.
+
+`release/prove-published-linux-staged-integration.py` is a **source-only** fresh
+integration candidate. It pins the reviewed coordinator and selects a finite
+integration-only branch. It requires a new immutable root binding at
+`/opt/augmentor-version-proof150/integration163/binding.json` and exclusively
+creates `published-product-staged-integration163`; failed161 is never resumed.
+No APT or updater-stage dispatch occurs in this branch. The pinned normal verifier
+must return the complete retained staged013 deployment, file inventory and
+artifact identity before any owned process starts, and again before installation.
+
+The format is `augmentor-published-staged-integration-binding/1`, mode
+`upgrade-after-known-stage`. Alongside the unchanged baseline/native/settings/
+foreign-hardlink fields, root binds `proofSha256`, `coordinatorSha256`, a unique
+64-hex `runToken`, `createdAt` within300seconds, `priorFailedRunSha256`,
+`priorRootBindingSha256`, `stageVerifiedSha256`, `readOnly162bSha256`,
+`originalHostFailureSha256`, `priorIndependentEndingAuditSha256`,
+`stagedDeployment`, `expectedCurrentSelectorSha256`,
+`expectedPreviousSelectorSha256` and `dshCli`. The last object contains exact
+`shim`, `target` and `package` rows from `verified_dsh_path`: path, owner/group,
+mode, device/inode, link count, size, modification/change times, target/package
+hashes and the shim's literal link text. The package transaction identifies the
+original known successful APT result; a fresh full root native/ordinary-state
+audit is required, without repeating that transaction.
+
+Admission separately checks the exact guest failed161 receipt: only successful
+stage occurred, all four pending fields are null, no integration action completed,
+settings/history are unchanged, requests are zero and both owned children exited
+normally. The conservative original host unknown flag remains preserved; it is
+not rewritten or treated as the guest's known pending state. The first read-only
+inventory's metadata comparison refusal also remains separate from the successful
+second bounded read-only inventory.
+
+The new branch uses normal `Setup.check`, one explicit `Setup.install`, normal
+owned restart, check/save, and activation of the existing stage. Durable pending
+intents, no unknown-action replay,60-second authenticated starts, Page-only dense
+history equality, provider/token/foreign-content preservation and normal cleanup
+remain unchanged. Historical161 files are included in ending preservation checks.
+An independent full root ending audit remains mandatory. This candidate has not
+run and does not qualify upgrade or rollback; a later rollback needs its own
+reviewed binding to an actually successful new integration outcome.

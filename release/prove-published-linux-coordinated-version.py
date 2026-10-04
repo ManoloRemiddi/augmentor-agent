@@ -13,6 +13,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import stat
 import subprocess
 import sys
@@ -34,6 +35,119 @@ SELECTOR = '.local/share/augmentor/desktop.json'
 HARNESS = '.config/augmentor/harnesses.json'
 FOREIGN_NODE_ROOTS = ('ws', 'schemastery', 'cosmokit', '@standard-schema/spec',
                       'dsh-resonant-voice', 'dsh-adaptive-reasoning', 'dsh-model-picker-augmented')
+EXECUTED_161_SHA = '75abecb7cb97ad87200d0c0c3bfdbe262ffce64d59dd7905a391955ad61e3c78'
+FAILED_161_SHA = '5687a06d774861343cc6a728c459a1dcf3c815130a9f2d7b382c133761fe1e70'
+STAGE_161_SHA = '78b90a68cada95b43d16b0ed77802011d0a0a66d3f425b0a49219228875fb271'
+STAGE_161_ROOT = '20261004-100439-2c7a1562'
+STAGE_161_ARTIFACT = '93fea0548f044762c168523b2405f9a2c884d975888239bff8fe66b5307bd3f3'
+PRIOR_BINDING_SHA = '63e8a983b24fd63c0a7eea848d6d67e5192a26fbd8e4f588adcfd3a5cc1995af'
+READONLY_162B_SHA = 'e7187744a4e2fc08365a21724dd7349c12076c952cb5c36d2c5cb2c2c5877140'
+HOST_FAILURE_161_SHA = 'f96f1ae8fd38ab95992510d50d1d08da85346a18d2b2d3a347c02d1230ecde64'
+ENDING_161_SHA = 'd27391c0a439927dab599d07be379ae55d0b6b9ee4cb2e392fdf4111dc37feb3'
+APT_161_SHA = 'b4f5f4b81074feef61ba1434ac90f568533ec380910d83b0f86201b466204ab2'
+DSH_CLI_SHA = '0ff7f1d72c4e0cbe14001709c81e20a04b70464118a7f78568952988e28f2ac5'
+DSH_PACKAGE_SHA = '8da881a5aa7d371dc1244ebb7acb8dfa9ac5fafce50404b31185d89cf152763a'
+
+
+def file_identity(info):
+    # Reading can change atime; all content/topology metadata stays fenced.
+    return (info.st_dev, info.st_ino, info.st_mode, info.st_uid, info.st_gid,
+            info.st_nlink, info.st_size, info.st_mtime_ns, info.st_ctime_ns)
+
+
+def stable_owned_read(path, limit=1048576):
+    info = path.lstat()
+    if (not stat.S_ISREG(info.st_mode) or info.st_uid != 1000 or info.st_gid != 1000
+            or info.st_nlink != 1 or info.st_mode & 0o022 or info.st_size > limit):
+        raise ValueError('An admitted ordinary input is linked, foreign or unsafe.')
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC | os.O_NONBLOCK)
+    try:
+        if file_identity(os.fstat(fd)) != file_identity(info):
+            raise ValueError('An admitted ordinary input changed before reading.')
+        chunks = []; count = 0
+        while count <= limit:
+            chunk = os.read(fd, min(65536, limit+1-count))
+            if not chunk: break
+            chunks.append(chunk); count += len(chunk)
+        if (count != info.st_size or count > limit or file_identity(os.fstat(fd)) != file_identity(info)
+                or file_identity(path.lstat()) != file_identity(info)):
+            raise ValueError('An admitted ordinary input changed during reading.')
+        raw = b''.join(chunks)
+        row = {'path': str(path), 'sha256': hashlib.sha256(raw).hexdigest(), 'bytes': count,
+               'uid': info.st_uid, 'gid': info.st_gid, 'mode': stat.S_IMODE(info.st_mode),
+               'mtimeNs': info.st_mtime_ns, 'ctimeNs': info.st_ctime_ns,
+               'device': info.st_dev, 'inode': info.st_ino, 'nlink': info.st_nlink}
+        return raw, row
+    finally:
+        os.close(fd)
+
+
+def verified_dsh_path(home, app, private_parents, bound=None):
+    """Expose only the existing pinned npm command to historical Setup.check."""
+    runtime = home/'.local/share/augmentor/dsh-runtime/node_modules'
+    shim = runtime/'.bin/dsh'; target = runtime/'@deepseek-ai/dsh/lib/bin.js'
+    package = target.parent.parent/'package.json'
+    for parent in (shim.parent, target.parent, package.parent): private_parents(parent)
+    info = shim.lstat()
+    if (not stat.S_ISLNK(info.st_mode) or info.st_uid != 1000 or info.st_gid != 1000
+            or info.st_nlink != 1 or os.readlink(shim) != '../@deepseek-ai/dsh/lib/bin.js'
+            or shim.resolve(strict=True) != target):
+        raise ValueError('The installed npm DSH command has foreign topology.')
+    cli_raw, cli_row = stable_owned_read(target)
+    package_raw, package_row = stable_owned_read(package)
+    metadata = json.loads(package_raw)
+    if (cli_row['sha256'] != DSH_CLI_SHA or package_row['sha256'] != DSH_PACKAGE_SHA
+            or not cli_row['mode'] & 0o100 or metadata.get('name') != '@deepseek-ai/dsh'
+            or metadata.get('version') != '0.1.5-rc.1' or file_identity(shim.lstat()) != file_identity(info)
+            or os.readlink(shim) != '../@deepseek-ai/dsh/lib/bin.js'):
+        raise ValueError('The pinned installed DSH command changed.')
+    observed = {'shim': {'path': str(shim), 'link': os.readlink(shim), 'uid': info.st_uid,
+                        'gid': info.st_gid, 'mode': stat.S_IMODE(info.st_mode), 'device': info.st_dev,
+                        'inode': info.st_ino, 'nlink': info.st_nlink, 'bytes': info.st_size,
+                        'mtimeNs': info.st_mtime_ns, 'ctimeNs': info.st_ctime_ns},
+                'target': cli_row, 'package': package_row}
+    if bound is not None and observed != bound:
+        raise ValueError('The exact root-admitted DSH command identity differs.')
+    path = str(shim.parent)+':'+str(app/'node/bin')+':/usr/bin:/bin'
+    if shutil.which('dsh', path=path) != str(shim):
+        raise ValueError('The admitted clean PATH cannot find exactly the installed DSH command.')
+    return path, observed
+
+
+def staged_binding_identity(binding, proof_sha, coordinator_sha, now):
+    pins = {'priorFailedRunSha256': FAILED_161_SHA, 'priorRootBindingSha256': PRIOR_BINDING_SHA,
+            'stageVerifiedSha256': STAGE_161_SHA, 'readOnly162bSha256': READONLY_162B_SHA,
+            'originalHostFailureSha256': HOST_FAILURE_161_SHA, 'priorIndependentEndingAuditSha256': ENDING_161_SHA}
+    if (binding.get('format') != 'augmentor-published-staged-integration-binding/1'
+            or binding.get('mode') != 'upgrade-after-known-stage'
+            or binding.get('coordinatorSha256') != coordinator_sha
+            or not re.fullmatch('[0-9a-f]{64}', binding.get('runToken', ''))
+            or any(binding.get(k) != v for k, v in pins.items())
+            or binding.get('packageTransaction', {}).get('receiptSha256') != APT_161_SHA
+            or not isinstance(binding.get('dshCli'), dict)):
+        raise ValueError('Only the exact known staged161 failure may admit integration163.')
+    normalized = {**binding, 'format': 'augmentor-published-coordinated-binding/1', 'mode': 'upgrade'}
+    return binding_identity(normalized, 'upgrade', proof_sha, now)
+
+
+def known_staged_failure(record, settings):
+    cleanup = record.get('companionCleanup', {})
+    if (record.get('format') != 'augmentor-published-coordinated/1' or record.get('mode') != 'upgrade'
+            or record.get('phase') != 'failed-do-not-resume' or record.get('proofSha256') != EXECUTED_161_SHA
+            or record.get('rootBindingSha256') != PRIOR_BINDING_SHA
+            or record.get('nativeVersion') != '0.2.13' or record.get('nativeSource') != SOURCES['0.2.13']
+            or record.get('baselineRunSha256') != BASELINE_RUN_SHA
+            or record.get('error') != 'ValueError: Make the installed DSH command available on PATH before connecting it.'
+            or record.get('unknownOutcome') is not False
+            or any(record.get(k, 'missing') is not None for k in ('pendingRequest', 'pendingLifecycle', 'pendingDeployment', 'pendingAction'))
+            or record.get('completedActions', []) != [] or record.get('completedDeployments') != [{'label': 'stage', 'exitCode': 0}]
+            or record.get('integrationAndSelectionVerified', False) is not False or 'selected' in record
+            or record.get('settingsBefore') != settings or record.get('settingsAfter') != settings
+            or record.get('ownedDshExitCode') != 0 or record.get('modelRequests') != 0
+            or record.get('persistencePreserved') is not True or record.get('baselineJournalPreserved') is not True
+            or cleanup.get('phase') != 'pass' or cleanup.get('pending', 'missing') is not None
+            or cleanup.get('unknownOutcome') is not False or cleanup.get('exitCode') != 0 or cleanup.get('normalExit') is not True):
+        raise ValueError('The prior failure has an action, uncertainty or changed state; no continuation is allowed.')
 
 
 def known_pass(record):
@@ -248,13 +362,41 @@ def native_audit(version, invoke=subprocess.run):
             raise ValueError('The registered native cohort or package byte audit differs.')
 
 
-def prove(mode):
+def verified_existing_stage(deployment, home, helper, binding, settings):
+    """Read the exact old outcome; verify existing files without dispatching stage."""
+    prior = home/'.local/state/published-product-coordinated-upgrade161'
+    helper.private_parents(prior)
+    raw, row = stable_owned_read(prior/'run.json')
+    if row['sha256'] != FAILED_161_SHA or row['mode'] & 0o077:
+        raise ValueError('The exact known pre-installation failure changed.')
+    known_staged_failure(json.loads(raw), settings)
+    raw, row = stable_owned_read(prior/'stage-verified.json', 8*1024*1024)
+    if row['sha256'] != STAGE_161_SHA or row['mode'] & 0o077:
+        raise ValueError('The retained stage verification changed.')
+    retained = json.loads(raw)
+    root = home/'.local/share/augmentor/releases'/STAGE_161_ROOT
+    helper.private_parents(root)
+    verified = deployment.verify(root)
+    if (verified != retained or verified['deployment'] != binding.get('stagedDeployment')
+            or verified['deployment'].get('root') != str(root)
+            or verified.get('artifactSha256') != STAGE_161_ARTIFACT
+            or verified['deployment'].get('artifactSha256') != STAGE_161_ARTIFACT):
+        raise ValueError('The full existing staged013 inventory differs.')
+    return verified
+
+
+def prove(mode, *, integration_after_stage=False, proof_path=None):
     sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
     os.umask(0o077); sys.dont_write_bytecode = True
     here = Path(__file__).parent
+    proof_path = Path(__file__) if proof_path is None else Path(proof_path)
+    if integration_after_stage and (mode != 'upgrade' or proof_path != here/'prove-published-linux-staged-integration.py'):
+        raise ValueError('Only the fixed fresh163 integration entrypoint is supported.')
+    if not integration_after_stage and proof_path != Path(__file__):
+        raise ValueError('Default phases cannot override their reviewed proof identity.')
     # Root topology is checked before importing any proof helper.
     spec = importlib.util.spec_from_file_location('managed', here/'prove-published-linux-managed-baseline.py')
-    for path in (Path(__file__), Path(spec.origin)):
+    for path in (proof_path, Path(__file__), Path(spec.origin)):
         info = path.lstat()
         if not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or info.st_nlink != 1 or info.st_mode & 0o022:
             raise ValueError('Reviewed worker sources must be immutable root-owned files.')
@@ -274,14 +416,20 @@ def prove(mode):
     helper = cold.load(here/'published-linux-legacy-companion.py', 'published_companion', cold.HELPER_SHA, sha)
     if os.getuid() != 1000 or Path.home() != base.HOME:
         raise ValueError('Only the dedicated ordinary init154 fixture account is supported.')
-    binding_path = Path('/opt/augmentor-version-proof150/coordinated161')/(mode+'-binding.json')
+    binding_path = (Path('/opt/augmentor-version-proof150/integration163/binding.json') if integration_after_stage
+                    else Path('/opt/augmentor-version-proof150/coordinated161')/(mode+'-binding.json'))
     managed.immutable_source(binding_path)
-    binding = json.loads(binding_path.read_text()); version = binding_identity(binding, mode, sha(Path(__file__)), time.time())
+    binding = json.loads(binding_path.read_text())
+    proof_sha = sha(proof_path)
+    version = (staged_binding_identity(binding, proof_sha, sha(Path(__file__)), time.time()) if integration_after_stage
+               else binding_identity(binding, mode, proof_sha, time.time()))
     helper.root_input(Path('/etc/augmentor-upgrade-init-fixture'))
     if Path('/etc/augmentor-upgrade-init-fixture').read_text() != helper.MARKER or Path('/proc/1/cmdline').read_bytes() != b'/usr/bin/tini\0--\0sleep\0infinity\0':
         raise ValueError('The owned init154 namespace differs.')
+    dsh_path, dsh_cli = verified_dsh_path(base.HOME, base.APP, helper.private_parents,
+                                        binding['dshCli'] if integration_after_stage else None)
     env = {'HOME': str(base.HOME), 'USER': 'augmentor-version-proof', 'LOGNAME': 'augmentor-version-proof',
-           'PATH': str(base.APP/'node/bin')+':/usr/bin:/bin', 'LANG': 'C.UTF-8',
+           'PATH': dsh_path, 'LANG': 'C.UTF-8',
            'DSH_HOME': str(base.HOME/'.local/share/augmentor/dsh-home'), 'DSH_AUGMENTOR_URL': 'http://127.0.0.1:35599',
            'DSH_TELEMETRY_MODE': 'DISABLED', 'QT_QPA_PLATFORM': 'offscreen', 'PYTHONNOUSERSITE': '1',
            'PYTHONDONTWRITEBYTECODE': '1', 'AUGMENTOR_MODEL_API_KEY': 'published-upgrade-synthetic-fixture'}
@@ -335,6 +483,14 @@ def prove(mode):
         raise ValueError('Normal rollback does not point at the exact managed012 predecessor.')
     if mode == 'upgrade' and original_previous != managed.retained_json(baseline_folder/'original-desktop.json', baseline['settingsBefore'][SELECTOR], helper, sha):
         raise ValueError('The original legacy predecessor differs from actual baseline160.')
+    staged_existing = None
+    if integration_after_stage:
+        if (sha(data/'desktop.json') != binding.get('expectedCurrentSelectorSha256')
+                or sha(data/'desktop.previous.json') != binding.get('expectedPreviousSelectorSha256')):
+            raise ValueError('The exact incoming selector bytes differ.')
+        staged_existing = verified_existing_stage(deployment, base.HOME, helper, binding, settings)
+        candidate_identity(staged_existing['deployment'], selected_before,
+                           Path(staged_existing['deployment']['root']), version)
     prior_version = '0.2.12' if mode == 'upgrade' else '0.2.13'
     saved_before = json.loads((base.HOME/HARNESS).read_text())
     expected_saved_bytes = saved_bytes((base.HOME/HARNESS).read_bytes(), version)
@@ -358,15 +514,23 @@ def prove(mode):
     protected_folders = ['published-product-baseline-history154', 'published-product-first-use-history157',
                          'published-product-cold-history158', 'published-product-managed-baseline160']
     if mode == 'rollback': protected_folders.append('published-product-coordinated-upgrade161')
+    if integration_after_stage: protected_folders.append('published-product-coordinated-upgrade161')
     protected_before = {n: tree(base.HOME/'.local/state'/n) for n in protected_folders}
-    folder = base.HOME/'.local/state'/('published-product-coordinated-'+mode+'161')
+    folder = base.HOME/'.local/state'/('published-product-staged-integration163' if integration_after_stage
+                                      else 'published-product-coordinated-'+mode+'161')
     helper.private_parents(folder.parent); folder.mkdir(mode=0o700, exist_ok=False)
     record = {'format': 'augmentor-published-coordinated/1', 'mode': mode, 'phase': 'admitted',
-              'proofSha256': sha(Path(__file__)), 'rootBindingSha256': sha(binding_path), 'nativeVersion': version,
+              'proofSha256': proof_sha, 'rootBindingSha256': sha(binding_path), 'nativeVersion': version,
               'nativeSource': SOURCES[version], 'baselineRunSha256': binding['baselineRunSha256'],
               'pendingRequest': None, 'pendingLifecycle': None, 'pendingDeployment': None, 'pendingAction': None,
               'settingsBefore': settings, 'nativePackageOperation': False, 'historyApi': 'session/page; no Follow',
               'upgradeRollbackQualified': False}
+    if integration_after_stage:
+        record.update(format='augmentor-published-staged-integration/1', mode='upgrade-after-known-stage',
+                      coordinatorSha256=sha(Path(__file__)), runToken=binding['runToken'],
+                      priorFailedRunSha256=FAILED_161_SHA, stageVerifiedSha256=STAGE_161_SHA,
+                      readOnly162bSha256=READONLY_162B_SHA, originalHostFailureSha256=HOST_FAILURE_161_SHA,
+                      priorIndependentEndingAuditSha256=ENDING_161_SHA, reusedVerifiedStage=True, dshCli=dsh_cli)
     base.atomic(folder/'run.json', record); base.atomic(folder/'integration-before.json', profile_before)
     companion = node = server = thread = log = None; requests = []; failure = None
     try:
@@ -379,7 +543,14 @@ def prove(mode):
             raise ValueError('The three known sessions differ.')
         base.atomic(folder/'history-before.json', {s: cold.page(adapter.remote, s, expected[s]) for s in sorted(cold.SESSIONS)})
         updater = str(base.HOME/'.local/bin/augmentor-update')
-        if mode == 'upgrade':
+        if integration_after_stage:
+            chosen = staged_existing['deployment']; staged_root = Path(chosen['root'])
+            # The prior inventory was verified before lifecycle dispatch; check it
+            # again immediately before installation without invoking stage.
+            if deployment.verify(staged_root) != staged_existing:
+                raise ValueError('The existing stage changed before integration.')
+            base.atomic(folder/'reused-stage-verified.json', staged_existing)
+        elif mode == 'upgrade':
             managed.transaction(base, folder, record, 'stage', [updater, 'stage', str(base.APP), '--source-ref', SOURCES[version],
                                 '--python', selected_before['python'], '--node', str(base.APP/'node/bin/node')], env)
             staged_root = Path((folder/'stage.stdout').read_text().strip()); helper.private_parents(staged_root)
@@ -390,6 +561,7 @@ def prove(mode):
             base.atomic(folder/'stage-verified.json', staged)
         else:
             chosen = baseline_manifest['deployment']; staged_root = Path(chosen['root'])
+        verified_dsh_path(base.HOME, base.APP, helper.private_parents, dsh_cli)
         setup = Setup(); checked = setup.check({'endpoint': env['DSH_AUGMENTOR_URL'], 'home': str(home)})
         record['historicalCheckReportedInstalled'] = checked['installed']; base.atomic(folder/'run.json', record)
         # Historical013 checks live identity, not copied ownership; always install.
@@ -399,6 +571,7 @@ def prove(mode):
         profile_after = integration_snapshot(home, version, base.APP, foreign_hardlinks); integration_preserved(profile_before, profile_after)
         base.atomic(folder/'integration-after.json', profile_after)
         node.stop(); node = base.OwnedNode(folder, record, env); adapter = node.start(DshAdapter, log)
+        verified_dsh_path(base.HOME, base.APP, helper.private_parents, dsh_cli)
         checked = setup.check({'endpoint': env['DSH_AUGMENTOR_URL'], 'home': str(home)})
         if checked.get('installed') is not True:
             raise ValueError('The restarted matching integration is unavailable.')
