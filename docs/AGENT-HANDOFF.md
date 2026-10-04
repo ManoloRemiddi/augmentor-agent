@@ -2,6 +2,14 @@
 
 # Start here: agent handoff
 
+Latest native checkpoint: `07c05af` desktop run 37172698677 passes both Windows
+CPUs, including actual junction/key preservation and login-session admission.
+Eleven Linux broker regressions pass. Corrected full x64 installer job 111344879337
+at `c40926b` passes all 24 stages, including actual broker completion/reopening,
+source restoration and removal; ARM64 111344879344 remains live. Full guard
+follow-up 37172411318 at `40af948` is queued. Preserve these exact source/scope
+limits; production flags and the complete goal remain unfinished.
+
 Windows dictation now validates the supplied state hierarchy before path resolution
 could hide a junction. Native qualification adds an actual redirected-path refusal
 with unchanged authentication bytes; maintenance scope creates no state/key.

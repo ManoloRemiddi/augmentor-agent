@@ -1888,3 +1888,31 @@ both authentication access and maintenance scope to refuse it, and verifies the
 original 32-byte key is unchanged. Normal existing private paths keep the same
 identity; Unix resolution/identity behavior stays unchanged. Fresh qualification
 must include this follow-up before any public eligibility is enabled.
+
+### Latest native Windows admission qualification
+
+At `40af948`, complete desktop run
+[37172409931](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37172409931)
+passes both CPUs (x64 111347893591, ARM64 111347893695), including the real retained
+peer with synthetic alternate-login pre-send refusal and unchanged ready admission.
+At `07c05af`, complete desktop run
+[37172698677](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37172698677)
+passes both CPUs (x64 111348760292, ARM64 111348760163), including the actual junction
+rejection for key access and maintenance scope, unchanged original key, normal
+fixed GUI-client spawn, broker/lease/owner preservation and one-shot reopening.
+All eleven Linux broker cases pass after the scope/path follow-up, including actual
+copied-client immutability and observed Linux graph drain/reopen. No Unix identity
+or wire behavior was changed.
+
+The corrected full x64 job 111344879337 at `c40926b` in run 37170465430 now passes
+all 24 installed fixture stages: actual broker capture deferral, graph drain and
+normal exit, whole Inno apply/observed Setup exit, pending target-broker refusal,
+independent target payload/health completion, new ready broker/settings preservation,
+captured window/background reopening, source restoration, repair/removal and
+persistent-data retention. The downloaded installed-application report has
+`passed: true`. This remains same-build repair with a synthetic unsigned catalog,
+no model/physical input/signed forward or data-rollback claim. ARM64 111344879344
+remains live at this record. Full follow-up 37172411318 at `40af948` is queued; it
+must qualify generic login-guard integration separately. The junction fix is
+covered by the later actual desktop broker cases, not inferred from the earlier
+full installer source. All production eligibility/feed flags remain false.
