@@ -31,9 +31,9 @@ CONTAINER = '400a7c83dd588c57b8fe59594b9683725c49eaac14e14532140b7fc03631ca7b'
 IMAGE = '049bbe119edbe568a0575ce7516cc22ae4699fc71eb6c96540a2ec6dc9de438d'
 VOLUME = 'augmentor-versioned-home-20261004'
 HOME = Path('/home/augmentor-version-proof')
-ROOT = Path('/opt/augmentor-freshhome-coordinated174')
+ROOT = Path('/opt/augmentor-freshhome-coordinated184')
 MARKER = Path('/etc/augmentor-upgrade-fresh-home-fixture')
-JOURNALS = {m: 'published-product-freshhome-coordinated-'+m+'174' for m in ('upgrade', 'rollback')}
+JOURNALS = {m: 'published-product-freshhome-coordinated-'+m+'184' for m in ('upgrade', 'rollback')}
 SELECTOR = '.local/share/augmentor/desktop.json'
 HARNESS = '.config/augmentor/harnesses.json'
 SOURCES = {'0.2.12': 'e02731023153e3b2e1440e50b8c14b64ad0a82e5',
@@ -215,9 +215,11 @@ def aliases_snapshot(home, admission, coordinator, private_parents):
             profile = '.local/share/augmentor/dsh-home/profiles/web/'
             if (path.is_absolute() or '..' in path.parts or str(path) != name
                     or not (name.startswith(profile) and coordinator.foreign_node_path(name[len(profile):])
-                            or re.fullmatch(r'\.local/share/pnpm/store/v11/files/[0-9a-f]{2}/[0-9a-f]+', name))):
+                            or re.fullmatch(r'\.local/share/pnpm/store/v11/files/[0-9a-f]{2}/[0-9a-f]+(?:-exec)?', name))):
                 raise ValueError('An alias path escaped the retained foreign dependency/cache scope.')
             file = home/name; private_parents(file.parent); info = file.lstat()
+            if name.startswith('.local/share/pnpm/') and name.endswith('-exec') and not info.st_mode & 0o111:
+                raise ValueError('A pnpm executable cache alias lacks executable permission.')
             if (not stat.S_ISREG(info.st_mode) or (info.st_dev, info.st_ino, info.st_nlink) != (device, inode, len(names))
                     or info.st_size > 4194304):
                 raise ValueError('An actual foreign alias was replaced, opened or oversized.')

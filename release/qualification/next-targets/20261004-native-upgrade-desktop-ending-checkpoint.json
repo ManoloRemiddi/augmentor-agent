@@ -1,0 +1,62 @@
+{
+  "format": "augmentor-linux-qualification-checkpoint/1",
+  "date": "2026-10-04",
+  "scope": "isolated owned test fixtures; no hardware or public release qualification",
+  "freshPublishedNativeUpgrade": {
+    "status": "PASS",
+    "versions": [
+      "0.2.12",
+      "0.2.13"
+    ],
+    "nativeReceiptSha256": "bd1dd4ade49b3e9e1763d4c495b1857e1b0a142d27f12e6985b3f3405c70f0d4",
+    "changedApplicationPackages": 2,
+    "addedAuthenticatedDependencies": 9,
+    "removedPackages": 0,
+    "unrelatedUpdates": false,
+    "independentNativeAndHomeEnding": "PASS",
+    "fullIntegrationAndRollback": "INTEGRATION_PASS_ROLLBACK_OPEN",
+    "earlierPreSdkAliasRefusalPreserved": true,
+    "newExecutableAliasScope": 184,
+    "fullIntegration": "PASS",
+    "integrationReceiptSha256": "e0ef79e63375b8f7421dbe65fffa0485f7643b52d3e0751c6accaf2b6e0ee47d",
+    "integrationSeconds": 15.826541938004084,
+    "rollbackPreflightRefusalPreserved": true
+  },
+  "fedora44Kde": {
+    "nativeDependencyInstallExitCode": 0,
+    "endingNativePackageCount": 1331,
+    "independentSignedCacheNativeHomeConfigAndFloorRead": "PASS",
+    "readReceiptSha256": "4ab80cef198d7f84c6df407fc6ea688760d4673d5beea707e8ae47ecc128229c",
+    "originalConfigClassificationRefusalPreserved": true,
+    "normalGraphicalStartExitCode": 0,
+    "ordinaryWaylandSessionReady": "READ_ONLY_VERIFICATION_OPEN",
+    "readinessReceiptSha256": "e1c5117ddb34aea8e2320e3c471d68ec30767409f346df65f931a43784517068",
+    "endingPreservationErrors": [],
+    "applicationAndControlAcceptance": "OPEN",
+    "actualUid1001Seat0SessionListed": true,
+    "originalCommaPropertyReaderRefusalPreserved": true
+  },
+  "gnome50": {
+    "nativeProtectedCacheExtensionAndPointersAudit": "PASS",
+    "overallProcessAdmission": "REFUSED",
+    "processCwdPermissionErrors": 2,
+    "nativeAuditReceiptSha256": "26d5b8487bb2b2617fe2b7b0186495721bc9b3c12a18fdd48b720d16b8a391b6",
+    "inputQualified": false,
+    "controlAcceptance": "OPEN"
+  },
+  "ubuntu24": {
+    "normalMaintenanceClose": "PASS",
+    "applicationAndBothChildrenAbsent": true,
+    "savedStateAndOriginalAccountPreserved": true,
+    "normalPoweroffRequestExitCode": 0,
+    "independentOriginalQemuAndListenerAbsence": "PASS",
+    "originalExitRaceTerminalPreserved": true,
+    "poweroffReceiptSha256": "06d6f929cfa160668c4d049d493f893da087287daefa36c6ea3bb471bbad6572"
+  },
+  "limitations": [
+    "Desktop/control acceptance remains open for current Fedora fixtures.",
+    "Integration passes; complete product rollback is still open.",
+    "Recipient source rebuild, physical audio and owner license decision remain open.",
+    "GitGuardian is unwaived; draft PR is not a release."
+  ]
+}

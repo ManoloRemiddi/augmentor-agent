@@ -1,5 +1,26 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 4 fresh native upgrade and executable cache correction
+
+The fresh ext4 HOME fixture completed one normal native 0.2.12→0.2.13
+transaction in 32.03 seconds: exactly two Augmentor packages and the nine
+authenticated dependencies, with no removals or unrelated updates. Native and
+managed inventories, settings, histories and all 255 foreign alias rows passed
+the independent ending audit. Ordinary integration then passed in15.83seconds:
+matching013 installation and selection, preserved histories/settings/cache aliases
+and zero model requests. Complete rollback remains open.
+
+The ordinary integration attempt then refused a legitimate pnpm executable
+cache alias before allocating its worker journal or starting the SDK. Its
+original conservative unknown outcome remains retained; the independent ending
+audit passed. [pnpm's upstream path implementation](https://github.com/pnpm/pnpm/blob/bac8077715ac5af3857b1df970a014875d89b86c/pnpm11/store/cafs/src/getFilePathInCafs.ts)
+adds `-exec` when a file has executable permission. The new entry accepts only
+that optional exact suffix and requires executable permission, while preserving
+every pinned byte, timestamp and closed hardlink-group check. A new immutable
+root authority and new journals use scope184; old174 inputs and failed receipts
+remain untouched. Disposable real-hardlink tests cover valid executable aliases,
+nonexecutable suffix rejection and invalid suffix rejection.
+
 ## October 4 staged integration filesystem failure
 
 [The fresh integration-only run](../release/qualification/next-targets/20261004-published-staged-integration-filesystem-failure.json)
@@ -219,15 +240,16 @@ inventories, idle processes/sockets/ports/leases, the retained journals and all
 actual run `d8819753…`, managed artifact `9cda9c48…` and ending receipt
 `cc83cccd…`. This qualifies the fresh baseline, not an upgrade or rollback.
 
-The new **source-only** entrypoint is
+The current entrypoint is
 [`release/prove-published-linux-freshhome-coordinated.py`](../release/prove-published-linux-freshhome-coordinated.py),
 with explicit `upgrade` and `rollback` modes. It leaves the executed historical
 coordinator byte-identical and imports only its hash-pinned preservation and
 normal action helpers. It never calls the historical default or staged-failure
 entrypoints, substitutes their constants, or adopts the old container's pending
-integration. No new native transaction or integration has executed for this entry.
+integration. The native transaction described above passed independently;
+integration passed as described above; complete rollback remains open.
 
-Root authority is separate under `/opt/augmentor-freshhome-coordinated174/`:
+Root authority is separate under `/opt/augmentor-freshhome-coordinated184/`:
 `admission.json`, the exact genuine `baseline-ending.json`, and a fresh
 `upgrade-binding.json` or `rollback-binding.json`. Every file and ancestor must
 be root-owned, nonlinked and unwritable by the ordinary user. Input reads are
@@ -255,7 +277,7 @@ APT transaction predicates, exact five `settingsBefore` hashes, profile
 `foreignHardlinks` rows and `dshCli` topology. Rollback additionally binds an
 actually successful upgrade run produced by this same new entry and admission,
 with a different token. The two new journals are
-`published-product-freshhome-coordinated-{upgrade,rollback}174`; preexisting
+`published-product-freshhome-coordinated-{upgrade,rollback}184`; preexisting
 folders refuse. Normal stage/install/restart/check/save/activate or rollback is
 still once-only and durably journalled; an unknown outcome is terminal.
 
@@ -269,7 +291,7 @@ normal verifier result's hash and deployment identity; it avoids duplicating a
 large inventory inside the new journal. Full managed inventory verification
 still uses the unchanged normal verifier.
 
-The 19 new source/disposable-file tests and 27 existing coordinator tests pass.
+The 20 current source/disposable-file tests and 27 existing coordinator tests pass.
 They cover foreign/stale/unknown authority, separate native cohorts, actual
 namespace/mount predicates, exact closed alias reads, immutable source topology,
 rollback admission, compact inventory receipts and refusal of every material

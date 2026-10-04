@@ -239,6 +239,25 @@ class FileAndPreservationTests(unittest.TestCase):
                 second.unlink();second.write_bytes(b'unchanged')
                 with self.assertRaises(ValueError):m.aliases_snapshot(h,a,c,lambda _:None)
 
+    def test_real_pnpm_executable_alias_requires_executable_mode_and_exact_suffix(self):
+        with tempfile.TemporaryDirectory() as name:
+            h=Path(name); first=h/'.local/share/augmentor/dsh-home/profiles/web/node_modules/ws/index.js'
+            second=h/'.local/share/pnpm/store/v11/files/ab/abcdef-exec'
+            first.parent.mkdir(parents=True);second.parent.mkdir(parents=True)
+            first.write_bytes(b'unchanged executable');first.chmod(0o755);os.link(first,second)
+            lstat=Path.lstat;fstat=os.fstat
+            with patch.object(Path,'lstat',lambda p:self.root_owner(lstat(p),1000)),patch.object(c.os,'fstat',lambda fd:self.root_owner(fstat(fd),1000)):
+                def admission():
+                    i=first.lstat();row=c.hardlink_row(first,i)
+                    row.update(uid=1000,gid=1000,mode=stat.S_IMODE(i.st_mode),mtimeNs=i.st_mtime_ns,ctimeNs=i.st_ctime_ns)
+                    names=[str(first.relative_to(h)),str(second.relative_to(h))]
+                    return {'foreignHomeAliasGroups':{f'{i.st_dev}:{i.st_ino}':names},'foreignHomeAliasRows':{n:row for n in names}}
+                a=admission();self.assertEqual(m.aliases_snapshot(h,a,c,lambda _:None),a['foreignHomeAliasRows'])
+                first.chmod(0o600)
+                with self.assertRaisesRegex(ValueError,'lacks executable permission'):m.aliases_snapshot(h,admission(),c,lambda _:None)
+                first.chmod(0o755);renamed=second.with_name('abcdef-executable');second.rename(renamed);second=renamed
+                with self.assertRaisesRegex(ValueError,'escaped'):m.aliases_snapshot(h,admission(),c,lambda _:None)
+
     def test_compact_inventory_receipt_preserves_full_verified_identity(self):
         verified={'deployment':{'root':'/synthetic/new'},'artifactSha256':'artifact','files':{'big':'x'*4300000}}
         receipt=m.compact_stage(verified)

@@ -1,5 +1,23 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 4 native upgrade and desktop ending checkpoint
+
+[The latest actual fixture checkpoint](../release/qualification/next-targets/20261004-native-upgrade-desktop-ending-checkpoint.json)
+records the successful fresh native012→013 transaction, exactly two application
+packages and nine authenticated dependencies. Ordinary integration passed in
+15.83seconds with zero model requests; complete rollback remains open. The fresh coordinator now accepts pnpm's actual executable-cache
+suffix while preserving all pinned alias metadata; old receipts remain intact.
+
+Fedora KDE's native dependency transaction and independent full ending read pass.
+Normal graphical startup returned zero, but an ordinary Wayland session did not
+become verified by the reader within120seconds. Its empty session-property
+records need an independent corrected read. GNOME's native/protected/cache/extension/pointer
+audit passes; two process cwd permission errors still refuse overall admission.
+Desktop control stays unqualified. Ubuntu's normal application close, saved-state
+preservation and separately observed normal machine exit pass. No force or replay
+was used. Source rebuild, hardware audio and owner licensing remain open.
+
+
 ## October 4 current filesystem and dependency checkpoint
 
 [The post-reboot filesystem read](../release/qualification/next-targets/20261004-gnome562-filesystem-pass-scene-refusal.json)
