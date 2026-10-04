@@ -1,5 +1,30 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 4 actual upgrade and GNOME deployment status
+
+[Published managed baseline160](../release/qualification/next-targets/20261004-published-managed-baseline-acceptance.json)
+passed before the [normal native012→013 transaction](../release/qualification/next-targets/20261004-published-native-upgrade-integration-failure.json).
+The native transaction passed in 24.42 seconds with exactly two Augmentor packages
+and nine declared dependencies changed. Ordinary013 staging passed, then the
+proof’s incomplete PATH caused Setup.check to refuse before integration install,
+save or activation. All pending fields are null, cleanup and independent ending
+state audit pass. Fresh integration-only continuation and rollback remain open;
+see [the current coordination guide](PUBLISHED-LINUX-COORDINATED-UPGRADE.md).
+
+[GNOME observer562 deployment](../release/qualification/next-targets/20261004-gnome562-activation-unknown.json)
+passed preparation, verified archive transfer, extraction and staging, then normal
+activation exceeded its 60-second outer bound. Selection remains unconfirmed;
+there was no replay, extension replacement, reboot or input. Read-only diagnosis
+is pending. Production GNOME input remains disabled.
+
+[Validate run37190365346](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37190365346)
+passed all 11 jobs at b8da5df, including Debian, installed/Browser packages,
+Fedora43/44, Ubuntu26.04, Home, source boundary and Handy on Linux/macOS/Windows.
+Later proof/documentation changes require their own result. Exact inspection of
+13 GitGuardian flagged historical lines identifies 12 digest metadata fields and
+one existing source commit reference. The external check remains failed and
+unwaived; incident review currently requires sign-in.
+
 ## October 3 source checks for coherent product updates
 
 [DSH setup](DSH-SETUP.md) now refuses a matching live endpoint with stale copied
