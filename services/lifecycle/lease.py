@@ -53,7 +53,9 @@ def hold(component):
         descriptor = private_lock_descriptor(runtime/'installation.lock')
         try:
             fcntl.flock(descriptor, fcntl.LOCK_SH | fcntl.LOCK_NB)
-            if (runtime/'maintenance.json').exists():
+            from lifecycle.windows_pending import require_clear
+            require_clear(runtime)
+            if (runtime/'maintenance.json').exists() or (runtime/'maintenance.json').is_symlink():
                 raise RuntimeError('Augmentor is being updated. Finish the update before reopening it.')
         except (OSError, RuntimeError) as error:
             os.close(descriptor)

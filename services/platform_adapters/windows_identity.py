@@ -41,6 +41,22 @@ def identity_key():
     return hashlib.sha256(sid_string().encode('ascii')).hexdigest()[:24]
 
 
+def process_session_id(pid=None):
+    """Use the process's actual login/RDS session, including non-console users."""
+    pid=os.getpid() if pid is None else pid
+    if type(pid) is not int or not 0<pid<=0xffffffff:raise ValueError('Invalid Windows process identity.')
+    function=ctypes.WinDLL('kernel32',use_last_error=True).ProcessIdToSessionId
+    function.argtypes=[ctypes.c_uint32,ctypes.POINTER(ctypes.c_uint32)]
+    function.restype=ctypes.c_int
+    session=ctypes.c_uint32()
+    if not function(pid,ctypes.byref(session)):raise ctypes.WinError(ctypes.get_last_error())
+    return session.value
+
+
+def dictation_session_key(pid=None):
+    return hashlib.sha256(('windows:'+str(process_session_id(pid))).encode('ascii')).hexdigest()[:12]
+
+
 def local_app_data():
     # Read the OS known-folder value, not an inherited environment variable that
     # may belong to another user or point inside the replaceable installation.

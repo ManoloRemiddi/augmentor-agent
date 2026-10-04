@@ -2,6 +2,12 @@
 
 # Windows signed update delivery
 
+The shared updater now includes persistent dictation in the Windows maintenance
+graph. [Broker coordination and its exact qualification boundary](UPDATE-SYSTEM.md#windows-persistent-dictation-coordination--october-4-candidate)
+cover private session/state identity, busy preservation, startup/lifetime exclusion
+and one-shot completed-target reopening. Old Windows dictation state with inherited
+authentication grants needs manual migration; this source refuses to rewrite it.
+
 Development implementation; no customer updater or signing identity is enabled.
 Inno remains the installer and WinSparkle 0.9.4 remains the downloader and update
 notification framework. See [installer ownership](WINDOWS-INSTALLER-DECISION.md)

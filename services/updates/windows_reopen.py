@@ -58,6 +58,13 @@ def reopen_windows(observer, root, base, candidate, completion, *, qualification
             raise ValueError('The completed target changed before normal reopening.')
         if not inspect_payload(root,release,inventory)['complete']:
             raise ValueError('The completed payload changed before normal reopening.')
+        def immutable():
+            if not inspect_payload(root,release,inventory)['complete']:
+                raise ValueError('The completed payload changed during normal reopening.')
+        if plan.get('hadDictation',False):
+            from .windows_dictation_reopen import reopen
+            python=validate_inventory(release,inventory)['files']['python/python.exe']
+            reopen(observer,plan,root,base/'run',python['sha256'],immutable,qualification=qualification)
         row=validate_inventory(release,inventory)['files']['Augmentor.exe']
         prefix=['--qualification-root',str(base)] if qualification else []
         # Always restore the background owner, including browser-only use.
@@ -68,4 +75,6 @@ def reopen_windows(observer, root, base, candidate, completion, *, qualification
                     qualification_outer_job=qualification,allow_child_breakaway=True,installed_payload=True):pass
             # Close observation only: normal user apps/background descendants
             # survive. Their Job must allow a later updater's own breakaway.
-    return {'instances':plan['instances'],'browserReloadRequired':plan['hadBrowser']}
+    result={'instances':plan['instances'],'browserReloadRequired':plan['hadBrowser']}
+    if plan.get('hadDictation',False):result['dictationReopened']=True
+    return result

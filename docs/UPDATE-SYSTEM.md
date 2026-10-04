@@ -1712,7 +1712,7 @@ pass 103 cases (two explicit native-service skips). Current broad/Mac evidence
 remains source `69477f8`; Windows native full acceptance retains its own earlier
 record. Every public automatic-install/distribution/feed flag remains false.
 
-Next required work remains Windows persistent-broker discovery/startup/lifetime/
+Historical next work at this Linux checkpoint remains Windows persistent-broker discovery/startup/lifetime/
 reopening (the current actual Handy/CAS Windows proof calls Backend directly),
 normal desktop/DSH and signed forward acceptance, privileged package-managed Linux,
 shared/system/companion Mac coordination, SDK owner teardown, verified interrupted
@@ -1722,3 +1722,62 @@ maintenance only on Linux/Mac, and `WindowsPreparation` has no dictation discove
 Do not infer Windows broker participation from its passing native component proof.
 No owner install, account/profile, live model or GPU settings changed. The complete
 cross-platform goal remains active; this passing checkpoint is not completion.
+
+## Windows persistent dictation coordination — October 4, candidate
+
+The persistent broker now takes the Windows startup reader through publication of
+both authenticated ordinary RPC and maintenance readiness, and holds the shared
+installation lease until normal process exit, including when capture is disabled.
+All Python Windows startups refuse any entry at the private persistent
+`updates/active.json` before ordinary admission; malformed/empty entries remain
+untouched. Maintenance writers may still observe recovery. The old runtime
+maintenance marker remains a separate refusal.
+
+Windows session names now use the process's actual login/RDS session through
+[Microsoft's ProcessIdToSessionId](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-processidtosessionid).
+An update observes held broker registrations without starting one, verifies the
+named pipe's current-user PID, retains a read-only process handle, and requires
+the fixed `python/python.exe`, selected build root, actual session and state hash.
+Another state/login/build or an unsupported response defers without adopting it.
+The Windows maintenance protocol is `augmentor-dictation-maintenance/1`; the
+existing Unix wire protocol and Unix state/session naming remain unchanged.
+
+An installed GUI/native-host client now starts the fixed shipped interpreter with
+isolated imports and bytecode disabled, rather than treating its native launcher
+as Python. The state directory and 32-byte authentication file are protected
+current-user/SYSTEM objects. An existing broad/inherited directory or key is
+refused without changing its grants or rotating the key. This requires manual
+bridge/migration treatment for legacy Windows state with incompatible permissions;
+it is not a transparent legacy migration. The existing default dictation-state
+location and preferences remain in place.
+
+Preparation reserves surfaces, then dictation, before downstream DSH/voice/shared
+services. Capture or model-work refusal preserves work and cancels prior reversible
+reservations. Idle drain records normal broker commit and actual process exit
+before downstream shutdown. The live observer's reopen plan carries only optional
+`hadDictation: true`, with strict Boolean validation and no command/path/environment.
+Verified completed-target reopening launches fixed `python/python.exe` and
+`services/dictation/server.py` once in an independently observed Job, requires the
+actual new peer PID and normal admission, and rechecks the immutable whole payload.
+Unknown or failed launch is not replayed or force-terminated. Only a broker observed
+before preparation is reopened; user preferences and login registration are not
+rewritten. The caller's original exited coordinator/Setup observations, exact
+completion archive, independent health and qualification/publisher gates still apply.
+
+Portable preparation checks pass seven cases (including busy capture and drain
+ordering), observer checks pass eleven including old-plan compatibility. Linux
+broker/update checks pass eleven, retaining actual Unix process/graph coverage.
+New native `test_update_windows_dictation.py` runs on both Windows desktop CPUs:
+it copies the standalone runtime and public broker into a disposable explicitly
+unqualified installation, and exercises actual pipes/processes/ACLs, disabled
+lifetime exclusion, busy owner preservation, cancel, startup-writer exclusion,
+empty pending-record refusal, normal exit, fixed GUI-client spawn, immutable
+payload and one-shot reopening. The alternate-scope refusal uses a synthetic
+scope against a real retained peer; it does not launch a second Windows login.
+No microphone, model download, actual Handy component or signed forward N→N+1
+installation is exercised by these new cases. Native results are pending here.
+
+All public signing/feed/automatic-install/distribution flags remain false. The
+remaining package/global-user, shared Mac/Companion, SDK owner teardown,
+interrupted recovery/retention, actual desktop/DSH, signed forward and legacy bridge
+gates remain. No owner installation, private profile, model or GPU was changed.

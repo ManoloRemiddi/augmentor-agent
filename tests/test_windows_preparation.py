@@ -38,7 +38,7 @@ class PreparationTests(unittest.TestCase):
         base='lifecycle.windows_preparation.'
         gate=Gate()
         for name,result in [('Startup',gate),('discover_owner',owner),
-                ('discover_windows',[window]),('discover_browsers',[]),
+                ('discover_windows',[window]),('discover_browsers',[]),('discover_dictation',[]),
                 ('discover_dsh',None),('discover_voice',None),('discover_companions',[companion])]:
             stack.enter_context(patch(base+name,return_value=result))
         return gate
@@ -129,6 +129,31 @@ class PreparationTests(unittest.TestCase):
             self.assertTrue(all(peer.closed for peer in order))
             self.assertTrue(all('cancel' not in peer.calls for peer in order))
             self.assertFalse(preparation.preparation_released)
+
+    def test_busy_dictation_preserves_capture_and_cancels_prior_reservations(self):
+        owner,window,companion,broker=Observation(),Observation(),Observation(),Observation()
+        with ExitStack() as stack:
+            gate=self.fixture(stack,owner,window,companion)
+            stack.enter_context(patch('lifecycle.windows_preparation.discover_dictation',return_value=[broker]))
+            with broker.admission.work():
+                with self.assertRaises(MaintenanceBusy):
+                    with WindowsPreparation(ROOT,'run','shared','state'):self.fail('Capture was accepted.')
+                self.assertEqual(broker.admission.active,1)
+                self.assertIsNone(gate.fd)
+                with owner.admission.work(),window.admission.work():pass
+        self.assertTrue(broker.closed);self.assertNotIn('commit',broker.calls)
+        self.assertEqual(companion.calls,[])
+
+    def test_dictation_drains_before_services_and_captures_only_a_boolean(self):
+        owner,window,companion,broker=Observation(),Observation(),Observation(),Observation();order=[]
+        window.endpoint=Path('augmentor-linux-pi.sock')
+        with ExitStack() as stack:
+            self.fixture(stack,owner,window,companion)
+            stack.enter_context(patch('lifecycle.windows_preparation.discover_dictation',return_value=[broker]))
+            with WindowsPreparation(ROOT,'run','shared','state') as graph:
+                self.assertEqual(graph.reopen_plan(),{'instances':['main'],'hadBrowser':False,'hadDictation':True})
+                graph.drain(checkpoint=lambda stage,peer:order.append(peer) if stage=='commit-intent' else None)
+                self.assertEqual(order,[window,broker,companion,owner])
 
 
 if __name__=='__main__':unittest.main()

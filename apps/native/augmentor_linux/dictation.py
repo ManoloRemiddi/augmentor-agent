@@ -25,8 +25,12 @@ def location():
     if os.environ.get('QT_QPA_PLATFORM')=='offscreen' and not os.environ.get('AUGMENTOR_DICTATION_STATE'):
         with _offscreen_lock:
             if not os.environ.get('AUGMENTOR_DICTATION_STATE'):
-                os.environ['AUGMENTOR_DICTATION_STATE']=tempfile.mkdtemp(prefix='augmentor-offscreen-dictation-')
+                temporary=Path(tempfile.mkdtemp(prefix='augmentor-offscreen-dictation-'))
+                # Windows's temporary parent inherits the user's ordinary ACL;
+                # create a protected child rather than adopting that directory.
+                os.environ['AUGMENTOR_DICTATION_STATE']=str(temporary/'private' if os.name=='nt' else temporary)
     base = Path(os.environ.get('AUGMENTOR_DICTATION_STATE', str(Path.home()/'.local/share/augmentor/dictation')))
+    if os.name=='nt':return windows_location(base)
     base.mkdir(parents=True, exist_ok=True, mode=0o700)
     info = base.lstat()
     if stat.S_ISLNK(info.st_mode) or (os.name!='nt' and info.st_mode & 0o077) or (hasattr(os, 'getuid') and info.st_uid != os.getuid()):
@@ -59,6 +63,34 @@ def location():
     return base, address, key
 
 
+def windows_location(base):
+    from platform_adapters.windows_identity import private_directory,private_file_descriptor,dictation_session_key
+    base=private_directory(Path(base).resolve())
+    keyfile=base/'auth.key'
+    if not keyfile.exists():
+        temporary=base/('.dictation-key-'+secrets.token_hex(24))
+        fd=private_file_descriptor(temporary,writable=True,exclusive=True)
+        try:
+            with os.fdopen(fd,'wb') as output:
+                output.write(secrets.token_bytes(32));output.flush();os.fsync(output.fileno())
+            try:os.link(temporary,keyfile)
+            except FileExistsError:pass
+        finally:temporary.unlink(missing_ok=True)
+    with os.fdopen(private_file_descriptor(keyfile),'rb') as source:key=source.read(33)
+    if len(key)!=32:raise RuntimeError('Invalid dictation authentication key.')
+    session=dictation_session_key()
+    address=r'\\.\pipe\augmentor-dictation-'+hashlib.sha256(os.path.normcase(str(base)).encode()).hexdigest()[:12]+'-'+session
+    return base,address,key
+
+
+def broker_command():
+    if sys.platform=='win32' and (ROOT/'release.json').is_file():
+        python=ROOT/'python/python.exe'
+        if not python.is_file():raise RuntimeError('The installed dictation interpreter is unavailable.')
+        return [str(python),'-I','-Xutf8','-B',str(ROOT/'services/dictation/server.py')]
+    return [sys.executable,'-B',str(ROOT/'services/dictation/server.py')]
+
+
 def request(method='status', params=None, *, start=True, timeout=20):
     _, address, key = location()
     connection = None
@@ -69,7 +101,7 @@ def request(method='status', params=None, *, start=True, timeout=20):
         except (ConnectionRefusedError, FileNotFoundError, OSError):
             if not start: raise RuntimeError('System dictation is not running.')
             if attempt == 0:
-                process=subprocess.Popen([sys.executable, '-B', str(ROOT/'services/dictation/server.py')], stdin=subprocess.DEVNULL,
+                process=subprocess.Popen(broker_command(), stdin=subprocess.DEVNULL,
                                  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True, **({'creationflags':0x08000000} if os.name=='nt' else {}))
                 threading.Thread(target=process.wait,daemon=True).start()
             time.sleep(.05)

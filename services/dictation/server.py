@@ -286,12 +286,14 @@ class Backend:
 
 def main():
     base,address,key=location()
-    lock=open(base/(Path(address).name+'.lock'),'a')
     if os.name=='nt':
-        import msvcrt
-        try:msvcrt.locking(lock.fileno(),msvcrt.LK_NBLCK,1)
-        except OSError:return
+        from platform_adapters.windows_identity import private_file_descriptor
+        from platform_adapters import locks
+        lock=os.fdopen(private_file_descriptor(base/(Path(address).name+'.lock'),writable=True,create=True),'r+b')
+        try:locks.flock(lock,locks.LOCK_EX|locks.LOCK_NB)
+        except BlockingIOError:return
     else:
+        lock=open(base/(Path(address).name+'.lock'),'a')
         import fcntl
         try:fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
         except BlockingIOError:return
@@ -303,8 +305,9 @@ def main():
     # Disabled private test brokers can still coordinate conversation capture.
     if backend.preferences.get('enabled'):backend.binary()
     startup=None;control=None
-    if sys.platform in ('linux','darwin'):
-        from lifecycle.posix_startup import Startup
+    if sys.platform in ('linux','darwin','win32'):
+        if sys.platform=='win32':from lifecycle.windows_startup import Startup
+        else:from lifecycle.posix_startup import Startup
         from lifecycle.lease import hold
         from lifecycle.dictation_control import DictationControl
         startup=Startup()

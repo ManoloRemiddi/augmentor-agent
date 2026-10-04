@@ -1,5 +1,5 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-"""Private Unix broker observation and bounded maintenance, no ordinary commands."""
+"""Private broker observation and bounded maintenance, no ordinary commands."""
 import json
 import hashlib
 import os
@@ -14,20 +14,26 @@ from platform_adapters.private_files import descriptor,require_directory
 from platform_adapters.transport import ThreadingLocalServer,prepare_endpoint,cleanup_endpoint
 from platform_support import require_same_user
 from .admission import METHODS
-PROTOCOL='augmentor-unix-maintenance/1'
+PROTOCOL='augmentor-dictation-maintenance/1' if sys.platform=='win32' else 'augmentor-unix-maintenance/1'
 
 
 def scope():
     """Current session/state identity only; no directory creation or key reads."""
     base=Path(os.environ.get('AUGMENTOR_DICTATION_STATE',str(Path.home()/'.local/share/augmentor/dictation'))).resolve()
-    session='|'.join(os.environ.get(key,'') for key in ('XDG_SESSION_ID','DISPLAY','WAYLAND_DISPLAY'))
-    return {'session':hashlib.sha256(session.encode()).hexdigest()[:12],
+    if sys.platform=='win32':
+        from platform_adapters.windows_identity import dictation_session_key
+        session=dictation_session_key()
+        base=Path(os.path.normcase(str(base)))
+    else:
+        identity='|'.join(os.environ.get(key,'') for key in ('XDG_SESSION_ID','DISPLAY','WAYLAND_DISPLAY'))
+        session=hashlib.sha256(identity.encode()).hexdigest()[:12]
+    return {'session':session,
         'stateSHA256':hashlib.sha256(os.fsencode(base)).hexdigest()}
 
 
 class DictationControl:
     def __init__(self,root,backend):
-        if sys.platform not in ('linux','darwin'):raise RuntimeError('Use the Unix dictation control adapter.')
+        if sys.platform not in ('linux','darwin','win32'):raise RuntimeError('This platform has no dictation control adapter.')
         self.root=Path(root).resolve();self.backend=backend
         self.runtime=require_directory(private_directory(runtime_directory()))
         self.endpoint=self.runtime/f'augmentor-dictation-{os.getpid()}.sock'

@@ -38,13 +38,16 @@ PLAN=struct.Struct('<4sH')
 
 
 def validate_reopen_plan(plan):
-    if (not isinstance(plan,dict) or set(plan)!={'instances','hadBrowser'} or
+    if (not isinstance(plan,dict) or not {'instances','hadBrowser'}<=set(plan)<= {'instances','hadBrowser','hadDictation'} or
+            ('hadDictation' in plan and type(plan['hadDictation']) is not bool) or
             type(plan['hadBrowser']) is not bool or not isinstance(plan['instances'],list) or
             len(plan['instances'])>64 or
             any(not isinstance(name,str) or not re.fullmatch('[a-z][a-z0-9-]{0,31}',name) for name in plan['instances']) or
             len(set(plan['instances']))!=len(plan['instances'])):
         raise ValueError('Reopen only the bounded names of actually observed instances.')
-    return {'instances':list(plan['instances']),'hadBrowser':plan['hadBrowser']}
+    result={'instances':list(plan['instances']),'hadBrowser':plan['hadBrowser']}
+    if 'hadDictation' in plan:result['hadDictation']=plan['hadDictation']
+    return result
 
 
 def _windows():

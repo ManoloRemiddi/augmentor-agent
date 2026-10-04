@@ -2,6 +2,24 @@
 
 # Start here: agent handoff
 
+## Windows persistent dictation coordination — October 4, candidate
+
+The updater now discovers the persistent Windows broker through its private
+named-pipe peer, retained process handle, fixed installed Python, actual login
+session and independently selected state identity. Capture defers before any
+drain; an idle broker reserves/cancels/commits through the existing admission
+contract. Startup now refuses any persistent unfinished update and the broker
+holds an installation lease even when disabled. Verified live completion captures
+only an optional Boolean and starts the fixed target broker once, checking its
+actual readiness and unchanged payload. Old reopen plans retain their shape.
+
+[The owning update record](UPDATE-SYSTEM.md#windows-persistent-dictation-coordination--october-4-candidate)
+distinguishes portable tests from the newly added actual Windows x64/ARM64 private
+broker qualification. Native results are pending for this checkpoint. No signing,
+feed or automatic-install flag was enabled, and no owner install/profile/model/GPU
+was changed. The complete cross-platform goal remains active; this is one remaining
+runtime participant, not production automatic-update qualification.
+
 ## Corrected native Linux checkpoint — October 4, full goal still active
 
 Source `0bc9639` is committed/pushed. Focused native
@@ -13,7 +31,7 @@ selection/payload. Host related checks pass 103 (two explicit native-service ski
 record that no real provider, physical input, signed forward or installation was
 exercised. The prior ARM stdout-parser failure is superseded for this fixture.
 
-Continue the full cross-platform implementation. Windows broker participation
+Historical next work at this Linux checkpoint: Windows broker participation
 still needs its native adapter: `server.main` control/startup registration is
 Linux/Mac only, and Windows graph discovery has no dictation participant. Other
 required platform/package/SDK/recovery/retention/forward/bridge and production

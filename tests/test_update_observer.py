@@ -117,5 +117,12 @@ class ObserverJournalBindingTests(unittest.TestCase):
                         {'instances':['main --command']},{'hadBrowser':1},{'command':'shell'}):
             with self.subTest(changes=changes),self.assertRaises(ValueError):validate_reopen_plan({**valid,**changes})
 
+    def test_optional_dictation_capture_is_a_strict_boolean_without_breaking_old_plans(self):
+        old={'instances':[],'hadBrowser':False}
+        self.assertEqual(validate_reopen_plan(old),old)
+        for value in (True,False):self.assertEqual(validate_reopen_plan({**old,'hadDictation':value}),{**old,'hadDictation':value})
+        for value in (1,0,'true',None,{},[]):
+            with self.subTest(value=value),self.assertRaises(ValueError):validate_reopen_plan({**old,'hadDictation':value})
+
 
 if __name__=='__main__':unittest.main()
