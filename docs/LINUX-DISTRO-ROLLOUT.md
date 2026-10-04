@@ -1,5 +1,35 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 4 installed runtime and managed staging progress
+
+The [current checkpoint](../release/qualification/next-targets/20261004-native-upgrade-desktop-ending-checkpoint.json)
+now records actual Ubuntu Noble Core replacement through all three normal
+entrypoints: Desktop, native Browser preferences and embedded Browser preferences.
+Each starts a new process with the marked Core library, then restores the official
+runtime and starts another process with the marker absent. All six closures pass;
+no model or voice starts occur. All four replacement variants now pass native
+ABI, full inventory and official-runtime preservation. The other nine application
+slots are running; graphical Browser and full release qualification remain open.
+A separate exact PySide RECORD continuation preserves two historical duplicate
+cache rows and every unrelated raw line; changed native rows remain unique.
+Original derivation failures and partial outputs remain separate.
+
+Fedora KDE passes the generated DSH service's normal readiness check without
+enabling the unit, then normal managed staging in 316.79 seconds. Settings,
+history, native/cache/account state and the original selector stay preserved.
+The first activation runner refuses an oversized command argument before calling
+the product; a separate bounded transport correction is underway. Graphical
+control, saved text, visible Stop and password authentication remain open.
+
+Source correspondence now includes 68 real Unity units and their 932 additional
+CPP inputs, 2700 distinct actual CPP paths overall, exact reconstruction of three
+configured QtQml plugin sources, six indirect generated-source routes, and
+retained legacy IBus CPP/XML/control inputs. The 96 source license texts are
+hash-authenticated separately from the original 146 notices. File-level license
+applicability, exception conditions and system-provider scope remain open. The
+22-file licensing proposal is still awaiting the owner; no license changed.
+All five rollout points remain active. No binary publication or PR merge.
+
 ## October 4 rollback compatibility and current execution checkpoint
 
 [The current fixture checkpoint](../release/qualification/next-targets/20261004-native-upgrade-desktop-ending-checkpoint.json)
@@ -60,8 +90,9 @@ descriptor-read correction now passes the unchanged normal setup and proof:
 installation reaches installed, both SDK fixture roles, three plugins, native
 host, repeated settings and history checks pass. The ordinary child completes
 in 418.67 seconds with four fixture model requests. Its full ending passes; the
-independent ending precedes managed activation. The generated DSH service is
-retained as configured. Original refusals remain intact, and no native package
+independent ending now also passes all native/cache/account/locked-context and
+actual installed-descriptor checks. Normal service readiness and managed staging now pass as recorded above;
+activation is underway. The generated DSH service is retained as configured. Original refusals remain intact, and no native package
 reinstall occurred. Graphical/password acceptance remains open.
 GUI input acceptance still requires a genuine unlocked session; no lock-policy
 change, forced daemon stop or package replay occurred.
@@ -85,9 +116,9 @@ occurrences, including 235 generated translation units. It authenticates all
 146 notices. A separate finite comparison now reproduces all 72 installed
 ELFs byte-for-byte from the linker artifacts using only each authenticated CMake
 install script's recorded RPATH change. The [pinned CMake source](https://github.com/Kitware/CMake/blob/v3.28.3/Source/cmSystemTools.cxx#L2703-L2716)
-uses the observed null-padded replacement. Generated inputs, transitive
-dependencies and file-level notice attribution remain open, as does actual
-recipient replacement.
+uses the observed null-padded replacement. The subsequent generated-source and Core-entrypoint results above extend this
+direct comparison. System dependencies and file-level notice applicability
+remain open.
 The first raw export exits0 and produces a12.16GB archive. A separate linear
 read verifies all130422 entries, content hashes, ownership, permissions, links
 and hardlink classes; scalar verification refuses fractional-second timestamp
@@ -127,9 +158,21 @@ the independent reader exceeds its startup bound while the native storage
 backend copies its filesystem. The already-dispatched reader later exits zero
 and confirms all 1023 installed rows, the original 410 versions and every one
 of 32319 application members against the actual DEBs. Its CLI timeout stays
-intact. Missing doc/man paths and an inherited HOME warning require separate
-exact image-policy verification; full dependency qualification is still open.
-Normal replacement entrypoints remain open.
+intact. Separate exact image-policy verification now passes: all three dpkg
+configuration files match the authenticated original OCI image; all 3033 missing
+paths match its man/doc/locale exclusions and there are zero byte mismatches.
+A root-owned HOME audit is clean. Normal runtime preparation and startup
+configuration complete; strict recipient inventory then refuses newly generated
+bytecode before any binding. A separate continuation now authenticates and
+retains/retires all 1372 fresh owned cache entries, preserves the official receipt
+and every noncache file, and passes normal official resolution plus strict
+recipient inventory. Preparation/startup were not repeated. A narrow separately
+identified binding-mode correction makes the root-owned public binding readable
+to the ordinary fixture user, with ownership/hash/nonwritable ancestry unchanged.
+The normal caller also separately corrects its Git-commit check to 40 characters
+while leaving all SHA256 checks unchanged. Original sources/refusals remain
+intact. The subsequent Core results above now pass all three normal entrypoints;
+the other replacement variants are running.
 [Hosted validation37219196306](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37219196306)
 passes all11 jobs atd6c2d3c. Physical audio, licensing and the unwaived GitGuardian
 gate remain open. No public release is qualified.
