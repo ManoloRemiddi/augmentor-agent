@@ -1,5 +1,28 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[The corrected bounded GNOME read](../release/qualification/next-targets/20261004-gnome562-postboot-session-child-observation.json)
+now records the active unlocked Wayland session and attributes the extra runtime
+READ lock to Augmentor's prompt-library child. Only that child and the dictation
+server were observed beneath the unchanged idle app; enumeration had no unknown
+or exited entries. A saved-endpoint refusal string matches the selected recovery
+source literal. These observations do not establish unknown RPC memory absence
+or authorize child exemptions. Normal closure and the unchanged full ending
+audit still precede GNOME control acceptance. The initial empty session records
+and review-only assembly-copy mistake remain preserved with their corrections.
+
+## October 4 postboot observation; full audit remains open
+
+[The bounded postboot app observation](../release/qualification/next-targets/20261004-gnome562-postboot-app-observation.json)
+confirms a new boot, exact selected pointers/source subset and an active
+read-only observer with input disabled. Augmentor reports accepted idle, with
+no running turn, draft or active maintenance operation. The original full
+reader refused application presence and remains unchanged. Session properties
+returned empty and a second runtime READ-lock holder is not yet attributed;
+full native/managed/protected/cache/session/process ending audit remains open.
+Unknown RPC memory, pending branch memory and literal Stop visibility are
+unestablished. No normal closure, forced signal, service stop, grant or input
+followed. GNOME consent/control acceptance remains open.
+
 ## October 4 observer replacement and reboot transport
 
 [Fresh observer replacement](../release/qualification/next-targets/20261004-gnome562-observer-replacement-reboot-transport.json)

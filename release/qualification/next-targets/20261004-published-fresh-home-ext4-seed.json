@@ -1,0 +1,37 @@
+{
+  "format": "augmentor-published-fresh-home-seed/1",
+  "date": "2026-10-04",
+  "status": "PASS_FIXTURE_FOUNDATION_ONLY",
+  "scope": "One fresh inert Debian13 namespace from pristine published0.2.12 image, full HOME on separate named ext4 volume, before late history export or product transactions.",
+  "evidence": {
+    "imageSha256": "049bbe119edbe568a0575ce7516cc22ae4699fc71eb6c96540a2ec6dc9de438d",
+    "ordinaryUidGid": [
+      1000,
+      1000
+    ],
+    "privateHomeMode": "0700",
+    "filesystem": "ext4",
+    "soleNamedHomeMount": true,
+    "ownerMountsOrDevices": false,
+    "network": "none",
+    "init": "tini",
+    "regularFiles": 28695,
+    "symlinks": 507,
+    "directories": 5499,
+    "regularBytes": 388233366,
+    "contentUidGidModeRegularLinkCountAndMtimeExact": true,
+    "closedHardlinkAliasGroups": 127,
+    "metadataDriftCount": 0,
+    "receiptSha256": {
+      "pristineMap": "95c41ab53cf65324b5b35919defb7f6dc6851a8a481e9438274689ee7a5883ae",
+      "freshSeedMap": "6bc718f01ba65a06a69c10d5e2531c205f8fe69b7072c68aebdf2ebddc2152a7",
+      "admission": "57cbfb3ae647a0de944d471a39fc298d4cea20e16290ad5e3f6421efb36fa191"
+    }
+  },
+  "limits": [
+    "Original failed integration163 and pending unknown install remain untouched and are not replayed.",
+    "First empty map collection is retained; corrected map is separately recorded.",
+    "No late history clone, new managed baseline, SDK, native package, Setup integration, upgrade or rollback has run in this new namespace.",
+    "The old coordinator still requires a separately reviewed genuine fresh-baseline admission; old baseline/cold hashes cannot substitute for new completion."
+  ]
+}

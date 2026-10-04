@@ -1,0 +1,34 @@
+{
+  "format": "augmentor-gnome-postboot-session-child-observation/1",
+  "date": "2026-10-04",
+  "status": "PASS_BOUNDED_SESSION_CHILD_OBSERVATION_FULL_AUDIT_OPEN",
+  "source": "56251697f2d2f87c3c1be04130751426940df198",
+  "scope": "One new independent read fixing empty loginctl property records and observing the actual extra runtime-lock holder and app descendants; original v1 observations/refusal untouched.",
+  "evidence": {
+    "sameNewBootAndSelectedAppIdentity": "PASS",
+    "activeUnlockedSeat0WaylandSession": true,
+    "existingApiIdle": true,
+    "maintenanceReadyActiveZero": true,
+    "nativePromptLibraryRuntimeReadHolderIsAppChild": true,
+    "appDescendantsOnlyObserved": [
+      "services/dictation/server.py",
+      "services/prompt-library/service.py"
+    ],
+    "descendantEnumerationComplete": true,
+    "descendantUnknownOrExitedDuringEnumeration": [],
+    "sourceLiteralMatchesCurrentErrorHash": {
+      "path": "services/recovery/__init__.py",
+      "line": 240,
+      "liveStackObserved": false
+    },
+    "guestWritesClosureModelCaptureInput": false,
+    "readerAcquiredLocks": false,
+    "receiptSha256": "59258f49b6faea13f9135d80ad0a8f272a1a0a7f65dccd7619f4dafe28a6a82c"
+  },
+  "limits": [
+    "Path/process lineage observations do not exempt either child or establish source/in-memory work absence.",
+    "Unknown RPC memory and pending branch memory are still not exposed by these existing read APIs.",
+    "The earlier review-only assembled source copy was misgenerated; it is preserved and a corrected real-module comparison matches the actual v1 remote intent source hash exactly. Actual v1 host and outcomes remain unchanged.",
+    "No normal closure or force/service/input action occurred; full original native/managed/protected/cache/app-absence ending audit and GNOME input acceptance remain open."
+  ]
+}

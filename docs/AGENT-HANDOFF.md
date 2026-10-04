@@ -1,5 +1,46 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[The corrected bounded GNOME read](../release/qualification/next-targets/20261004-gnome562-postboot-session-child-observation.json)
+now records the active unlocked Wayland session and attributes the extra runtime
+READ lock to Augmentor's prompt-library child. Only that child and the dictation
+server were observed beneath the unchanged idle app; enumeration had no unknown
+or exited entries. A saved-endpoint refusal string matches the selected recovery
+source literal. These observations do not establish unknown RPC memory absence
+or authorize child exemptions. Normal closure and the unchanged full ending
+audit still precede GNOME control acceptance. The initial empty session records
+and review-only assembly-copy mistake remain preserved with their corrections.
+
+## October 4 fresh fixtures and corrected hosted validation
+
+[Validate run 37200185215](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37200185215)
+passes all 11 jobs at e9d2e9b, including Debian, installed/Browser packages,
+Ubuntu 26.04, Fedora 43/44, Home, source boundary and Handy on
+Linux/macOS/Windows. The earlier four fixture failures remain retained. This
+qualifies that source run; later source and installed desktop acceptance are
+separate.
+
+[The fresh product HOME seed](../release/qualification/next-targets/20261004-published-fresh-home-ext4-seed.json)
+passes actual ext4, all 28,695 regular files, 507 links, 5,499 directories,
+permissions/timestamps and 127 closed hardlink groups against the pristine
+image. This inert fixture has no owner mounts or devices. Late history transfer,
+a genuine managed baseline and coordinated product upgrade/rollback remain
+open; original integration163 unknown outcome is untouched.
+
+[One bounded GNOME postboot observation](../release/qualification/next-targets/20261004-gnome562-postboot-app-observation.json)
+confirms a new boot, expected selection, a stable idle app API and the active
+read-only observer with input disabled. The unchanged full reader first refused
+because the canonical application was present. Empty session-property records
+and an unidentified extra shared runtime-lock holder prevent full ending-audit
+acceptance. No close or input followed; GNOME control remains open.
+
+A fresh cloud-derived KDE fixture has passed normal preparation and boot on the
+secondary disk. Initial resource and occupied-port refusals are retained; the
+new VM uses a separate free loopback port. The completed Mint fixture passed
+current native/idle, 45 earlier files and 12 current proof/settings checks before
+one normal poweroff; normal QEMU exit was observed without force or replay.
+KDE provisioning, matching artifacts and saved-text/active-Stop acceptance have
+not passed. These VM facts do not qualify a stock KDE ISO or hardware.
+
 ## October 4 recipient validation correction
 
 [Hosted run 37199257072](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37199257072)

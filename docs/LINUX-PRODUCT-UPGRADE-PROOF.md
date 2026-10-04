@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 4 fresh full-HOME filesystem foundation
+
+[The actual fresh ext4 HOME seed](../release/qualification/next-targets/20261004-published-fresh-home-ext4-seed.json)
+passes content, UID/GID, permissions, regular-file link counts and timestamps
+against the pristine published0.2.12 image, including all127 closed hardlink
+groups. The new inert init namespace uses one private named full-HOME volume
+and no owner mounts, devices or network. No late history transfer, SDK, Setup
+install, native package upgrade or managed activation has run there. Original
+integration163 unknown outcome is retained untouched. Fixed late-file transfer,
+a genuine new managed baseline and separately reviewed fresh admission to the
+unchanged default coordinator still precede upgrade/integration/rollback.
+
 # Published Linux product-version upgrade qualification
 
 The existing Arch/Leap package-release upgrade and rollback keeps product0.2.13.

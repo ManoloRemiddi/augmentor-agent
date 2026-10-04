@@ -1,0 +1,50 @@
+{
+  "format": "augmentor-gnome-postboot-app-observation/1",
+  "date": "2026-10-04",
+  "status": "PASS_BOUNDED_OBSERVATION_FULL_AUDIT_OPEN",
+  "source": "56251697f2d2f87c3c1be04130751426940df198",
+  "scope": "One independent app/boot/observer/pointer/source-subset observational read after the unchanged full reader refused because the canonical application was present.",
+  "evidence": {
+    "firstFullPostbootReader": "REFUSED_CANONICAL_APP_PRESENT",
+    "nativeRebootRequestOutcomeBeforeThatAudit": 0,
+    "normalRebootRequests": 1,
+    "newBootIndependentlyObserved": true,
+    "selectedPointersAndSourceSubset": "PASS",
+    "existingApiIdle": true,
+    "busy": false,
+    "running": false,
+    "draftPresent": false,
+    "repairing": false,
+    "online": false,
+    "modelReady": false,
+    "admissionPhase": "ready",
+    "admissionActive": 0,
+    "appStatusStableAcrossThreeReadCalls": true,
+    "activeObserverReadOnly": true,
+    "activeObserverInputQualified": false,
+    "newObserverEpochObserved": true,
+    "sceneInputBlocked": true,
+    "blockReasons": [
+      "shell-mode-or-modal",
+      "input-grab",
+      "no-visible-live-focus"
+    ],
+    "appSharedNativeLocks": 2,
+    "additionalRuntimeReadHolderObserved": true,
+    "packagePendingMarkers": [],
+    "readerAcquiredLocks": false,
+    "guestWritesCaptureInputOrClosure": false,
+    "receiptSha256": {
+      "firstRefusalOutcome": "2cb293c3e2eaa4d3a0e941694e0a9da81a178ee050c99cf3faf8311fa35dd92e",
+      "firstRefusalStderr": "1ce74d23d126b9e1dcaa2a0ff1f7b8a39ba1a0e00ce9c2a24095dddee4715ece",
+      "boundedObservation": "ea2ec06d60c0232c995f38328c921ef5b022cd7acacfee5e8f476913e444454f"
+    }
+  },
+  "limits": [
+    "This confirms a new boot and live read-only observer subset, not complete native/managed/protected/cache/session ending audit.",
+    "Session property records returned empty; session identity remains unestablished by this read.",
+    "Additional runtime-lock holder remains unidentified; unknown RPC and pending branch memory and literal Stop visibility are not exposed by these APIs.",
+    "No normal close, force signal, unit stop, input, grant, replay or rollback followed.",
+    "Original reboot SSH255 terminal and unchanged full absent-application reader remain retained; GNOME control acceptance stays open."
+  ]
+}

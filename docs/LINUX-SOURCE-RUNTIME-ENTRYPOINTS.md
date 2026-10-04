@@ -285,3 +285,80 @@ unchanged-environment assertions. All 85 related source checks pass locally.
 Dependent package jobs were skipped in the failed run; fresh hosted validation
 is required. Source tests do not qualify installed recipient replacements.
 
+## Marked Core and binding build controls: source only
+
+The separate [finite build wrapper](../release/probe-recipient-core-bindings-build.py)
+prepares controls for the retained seven-archive Qt6.8.2/PySide6.8.2.1 source kit.
+Its `prepare` command authenticates the exact original kit manifest, archive
+checksums, signed410-package compiler lock and all565 source objects covering
+180 builder/base source versions. It reads the three reviewed source members
+from their archives without extracting them. The two reviewed patches bind
+every original and resulting SHA256. It creates only a new control directory
+and command plan, refusing a previous preparation. It does not provision a
+daemon, import a base, extract sources or execute a build.
+
+The frozen acquisition, builder recipe, staging, wheel derivation and notice
+tools remain byte-identical. A separately identified control derived from the
+exact original builder adds the three marked edits before configuration and
+`CMAKE_EXPORT_COMPILE_COMMANDS=ON` to the environment inherited by both Qt and
+PySide. The Core build string, `PySide6.QtCore` and `shiboken6.Shiboken` markers
+retain their reviewed error handling. The new producer wheel receives its own
+hash and derivation receipt; the original CLI's two-producer allowlist remains
+unchanged.
+
+The command plan requires a fresh Docker daemon, data/exec directories and
+container on the secondary filesystem, in a separate network namespace with
+only its loopback interface. The read-only daemon fence binds its executable,
+exact arguments, PID/start, storage/socket metadata and socket peer without
+sending API messages. A subsequent, separately reviewed host controller must
+pin that provisioning record and control plan; a caller-supplied daemon record
+alone is not authority. No provisioning or command execution has occurred.
+Root must retain4GiB available space and secondary must retain a conservative
+25GiB build allowance plus4GiB before each allocation. Actual host
+`MemAvailable` must cover the8GiB builder limit plus2GiB headroom. The actual
+full build peak remains unmeasured.
+
+The base archive verifier checks retained OCI descriptors, hashes and rootfs
+diff IDs. That is not an empty-daemon import test. The proposed next test must
+load the actual retained export, then build the unchanged recipe at its original
+digest with network disabled and pulls disabled. If digest resolution or the
+offline build fails, stop and preserve that refusal; do not retag, change the
+recipe, pull another base or infer fresh reconstruction from an existing daemon.
+The original builder requires Docker's `/.dockerenv`; Podman compatibility is
+not assumed. Docker documents the distinct storage/socket settings needed for
+[multiple daemons](https://docs.docker.com/reference/cli/dockerd/#run-multiple-daemons).
+
+After a future successful build, the wrapper requires compiler-command export
+in every relevant Qt/PySide/shiboken Ninja cache and retains command databases,
+Ninja targets/commands/deps/graphs and candidate-target queries, `.ninja_log`, `.ninja_deps`, complete sources,
+objects and generated inputs. This follows the
+[CMake3.28 export contract](https://cmake.org/cmake/help/v3.28/variable/CMAKE_EXPORT_COMPILE_COMMANDS.html)
+and the tools present in
+[Ninja1.11.1](https://github.com/ninja-build/ninja/blob/v1.11.1/src/ninja.cc).
+Unity translation units still require their actual generated source/input
+records. Every evidence tool uses `-n`: Ninja1.11 otherwise opens logs for
+writing before its `AFTER_LOGS` tools. Original Ninja input/log hashes must remain
+unchanged. The plan retains its inert running container; it contains no
+automatic `docker stop`, timeout kill or deletion. Full-tree export requires
+known successful build completion, exact ordinary PID1 `sleep infinity`, no
+remaining build children and a stable complete-tree snapshot before/after the
+copy. An unknown export or failed idle fence retains that container and all
+partial evidence. Normal teardown needs separate review.
+
+The staged runtime and verified derived wheels produce exactly57 Qt,13 PySide
+and2 shiboken ELF review rows. Those72 rows initially mark object/link/source,
+generated-input and applicable-original-notice attribution unresolved. The
+original notice collector is reused conservatively; its output is not proof
+that every compiled member has complete attribution. Missing compiler evidence
+or a different native scope refuses. Engineering source-map completeness,
+license approval and product qualification remain false until the finite map
+and later normal Desktop/native Browser/embedded Browser replacement proofs
+are separately completed. These source controls do not change the UI or run
+models, audio, desktop input or selected applications.
+
+The focused source tests currently pass29 cases, including changed
+source/patch refusal before edits, the frozen build and derivation identities,
+separate daemon lifetime/peer/network/storage admission, reserve/floor refusal,
+compiler-export checks and exclusive records. The root LICENSE and all22
+pending license-proposal files remain unchanged. No recipient runtime has been
+built or selected by this wrapper.
