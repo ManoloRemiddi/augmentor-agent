@@ -692,3 +692,36 @@ supersede the earlier live statuses without implying final cross-platform
 qualification. The original Mac run is retained; no customer install changed.
 
 Local follow-up checks pass: 15 managed-selection/health cases (including dependency refusal before maintenance), 11 producer/archive cases, 11 broker-maintenance cases and 14 existing dictation cases. The two-case actual bundled-interpreter D-Bus fixture also passes. These are source/private fixture checks, with the native complete two-CPU build still pending.
+
+### Fresh-host Qt and native component requirements
+
+The actual `/2` health consumer at `799f7f7` passed against the newly built
+standalone runtime in the minimal pinned Ubuntu container after installing
+`libgssapi-krb5-2`. Its first minimal-host attempt failed at the actual QtNetwork
+import because that library was absent; hosted build runners had masked this
+host dependency. The successful isolated check rendered 424×484 with font coverage,
+verified portal bindings and retained identical payload bytes. No app/service or
+provider was started. This is an actual consumer check with a synthetic receipt,
+not a complete produced archive or an installed customer update.
+
+The follow-up records `requiredSystemPackages` in the build configuration and
+receipt, including Qt networking and the existing Handy GTK/WebKit/ASR dependencies.
+Native bundle CI installs that same declared list, with build/fixture tools kept
+separate. The relocated archive proof additionally starts the exact staged Handy
+component through the bundled Python broker in a disposable copy/profile/display
+and bus, exercising microphone reservation, busy-owner preservation, cancellation,
+settings preservation and ordinary child exit without capture or model download.
+The source/target snapshots still must remain unchanged afterwards. Native
+qualification of this newer follow-up remains pending; preserve the original
+`799f7f7` run 37166969159 rather than cancelling it. Distribution eligibility stays
+false, and this user-local updater does not run a privileged package installer.
+
+The declared-package follow-up also passes actual native Handy/broker maintenance
+inside the same minimal Ubuntu container through the staged Python 3.12.13:
+native owner preservation, CAS reservation, admission fencing, cancellation,
+settings preservation and ordinary child exit all pass. The component is the
+locally validated public Linux x64 build copied into this isolated fixture.
+This verifies the declared host dependencies and real native protocol, but does
+not stand in for the exact newer CI-produced archive or physical input acceptance.
+The isolated container installs only declared runtime packages plus Xvfb/xauth
+fixture tools; no owner host packages, application/profile or model are changed.

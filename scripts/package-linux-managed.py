@@ -186,6 +186,7 @@ def build(out,*,channel='development',build=0,declared=None):
         'sourceCommit':source['commit'],'component':'desktop','qualificationStatus':'development-only',
         'python':configuration['pythonVersion'],'node':pins['node']['version'],'qt':configuration['qtVersion'],
         'portalSystemMinimum':configuration['portal']['systemMinimum'],
+        'requiredSystemPackages':configuration['requiredSystemPackages'],
         'wheelGlibcFloor':pins['wheelGlibcFloor'],'candidateDistributions':pins['candidateDistributions'],
         'distributionsQualified':False,'update':receipt},indent=2)+'\n')
     before=snapshot(project)

@@ -2,6 +2,18 @@
 
 # Start here: agent handoff
 
+## Fresh-host Linux updater qualification — October 4, in progress
+
+Source `799f7f7` is committed/pushed. Native x64/ARM64 bundle qualification is live
+in [37166969159](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37166969159);
+preserve that original run. Its isolated bundled-interpreter `/2` health consumer
+passes after a minimal-host check identified missing Qt Kerberos libraries.
+The follow-up declares the full Qt/Handy host package list and extends relocated
+archive proof to actual bundled Handy/broker maintenance without audio/model work.
+Seventy-four related host Linux updater cases pass (two explicit skips).
+See [the scoped evidence](UPDATE-SYSTEM.md#fresh-host-qt-and-native-component-requirements).
+New follow-up native qualification remains pending. Customer feed/flags stay false.
+
 ## Linux portal updater follow-up — October 4, in progress
 
 The candidate following `62c15cd` bundles pinned PyGObject/Pycairo, uses a private
