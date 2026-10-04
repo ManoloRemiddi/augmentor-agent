@@ -21,7 +21,9 @@ def scope():
     """Current session/state identity only; no directory creation or key reads."""
     base=Path(os.environ.get('AUGMENTOR_DICTATION_STATE',str(Path.home()/'.local/share/augmentor/dictation')))
     if sys.platform=='win32':
+        from platform_adapters.paths import windows_dictation_state
         from platform_adapters.windows_identity import dictation_session_key,reject_reparse_ancestors
+        base=windows_dictation_state()
         session=dictation_session_key()
         base=reject_reparse_ancestors(base)
         base=Path(os.path.normcase(str(base)))

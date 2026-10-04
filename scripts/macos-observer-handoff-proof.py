@@ -26,7 +26,8 @@ def proof(original,retained,home):
     updates=require_directory(private_directory(base/'data/augmentor/updates'))
     transactions=require_directory(private_directory(base/'state/augmentor/updates'))
     attempt=secrets.token_hex(24)
-    directory=require_directory(private_directory(base/'cache/update-observers'/('mac-'+attempt)))
+    observers=require_directory(private_directory(base/'cache/update-observers'))
+    directory=require_directory(private_directory(observers/('mac-'+attempt)))
     observer=directory/'Observer.app'
     release=(retained/'Contents/Resources/app/release.json').read_bytes()
     payload=verify_bundle(retained,release,development=True)
@@ -56,7 +57,8 @@ os.execv(args[0],args)
     if (result.returncode==0 or record['outcome']!='deferred'
             or record['error']!='Public update inspection requires a signed, notarized release.'
             or record['transactionId'] is not None or (transactions/'active.json').exists() or source.exists()):
-        raise ValueError('The actual retained observer did not refuse the development fixture before source work.')
+        raise ValueError('The actual retained observer did not refuse the development fixture before source work: '+
+            str(record.get('error','Unknown fixture result.'))[:512])
     if verify_bundle(observer,release,development=True)!=payload:raise ValueError('The retained exec changed the immutable bundle.')
     return {'actualRetainedExec':True,'inheritedBootstrapLockBound':True,'developmentProductionRefused':True,
         'noSourceDrainOrApply':True,'retainedPayloadPreserved':True,

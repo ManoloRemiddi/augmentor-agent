@@ -14,6 +14,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', required=True, type=Path)
     parser.add_argument('--out', required=True, type=Path)
+    parser.add_argument('--development', action='store_true', help='Inspect an unpublished CI candidate; never grant installation authority')
     args = parser.parse_args()
     from platform_adapters.windows_identity import local_app_data, private_directory
     from lifecycle.payload_integrity import verify_payload
@@ -22,6 +23,8 @@ def main():
     metadata = (payload/'release.json').read_bytes()
     release = json.loads(metadata)
     profile = json.loads((ROOT/'release/windows/public-preview.json').read_text())
+    if args.development:
+        profile = {'qualificationStatus':'development-candidate','customerDistribution':False}
     if any(release.get(key) != value for key, value in profile.items()):
         raise ValueError('Use the explicit public preview payload.')
     base = private_directory(local_app_data()/'Augmentor')

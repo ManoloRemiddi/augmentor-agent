@@ -15,7 +15,7 @@ import {createSyntheticVoicePeer} from './fixtures/codex/synthetic-voice-peer.mj
 import {CodexVoice} from '../dist/codex-runtime/src/voice.js';
 import {CodexHost} from '../dist/codex-runtime/src/host.js';
 
-async function until(fn) {for (let i=0;i<400;i++) {const value=fn();if(value)return value;await delay(10);}throw Error('Voice fixture timed out');}
+async function until(fn) {for (let i=0;i<400;i++) {const value=await fn();if(value)return value;await delay(10);}throw Error('Voice fixture timed out');}
 async function fixture(t, speak) {
   // Scripted protocol peer; this never executes the private speech service.
   const service=createSyntheticVoicePeer({render:speak});
@@ -131,6 +131,13 @@ for(const surface of ['host','native','browser']) test(`actual pinned Codex ${su
       await call('augmentor/voice/control',{...lease,action:'begin'});await delay(100);
       await call('augmentor/voice/control',{...lease,action:'end'});
       await until(()=>existsSync(audioLog));
+      // PCM follows completed text items; the model turn/queue can still be
+      // finishing. Preserve the active voice request until its terminal receipt
+      // arrives before asking the fixture to close and shut down.
+      await until(async()=>{
+        const queue=await host.dispatch('session.queue',{sessionId:'browser-chat'});
+        return queue.operations.length===1&&queue.operations[0].status==='completed';
+      });
       await call('augmentor/voice/control',{...lease,action:'close'});
       clearInterval(heartbeat);await call('shutdown');
     }

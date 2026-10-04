@@ -19,6 +19,8 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '24.19.0'
@@ -27,7 +29,7 @@ jobs:
         uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: components/handy/runtime
-          key: handy-1.97.1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('components/handy/**', 'scripts/build-handy.py', 'scripts/prepare-handy.py', 'scripts/stage-handy.py') }}
+          key: handy-1.97.1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('components/handy/**', 'scripts/build-handy.py', 'scripts/prepare-handy.py', 'scripts/stage-handy.py', 'scripts/stage-handy-windows-runtime.py') }}
       - name: Verify cached component inventory against current source
         if: steps.component-cache.outputs.cache-hit == 'true'
         run: python -c "import importlib.util; s=importlib.util.spec_from_file_location('stage','scripts/stage-handy.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.validate()"
@@ -47,8 +49,10 @@ jobs:
         if: steps.component-cache.outputs.cache-hit != 'true'
         shell: bash
         run: |
-          rustup toolchain install 1.97.1 --profile minimal --component rustfmt,clippy,rust-docs
-          rustup default 1.97.1
+          host=$(python -c "import platform,sys; print({'linux-x86_64':'x86_64-unknown-linux-gnu','darwin-arm64':'aarch64-apple-darwin','win32-AMD64':'x86_64-pc-windows-msvc','win32-ARM64':'aarch64-pc-windows-msvc'}[sys.platform+'-'+platform.machine()])")
+          rustup set default-host "$host"
+          rustup toolchain install "1.97.1-$host" --profile minimal --component rustfmt,clippy,rust-docs
+          rustup default "1.97.1-$host"
       - name: Materialize reviewed source before restoring compiler intermediates
         if: steps.component-cache.outputs.cache-hit != 'true'
         run: python scripts/prepare-handy.py

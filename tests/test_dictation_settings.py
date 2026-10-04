@@ -20,7 +20,7 @@ class DictationSettingsTests(unittest.TestCase):
         self.assertFalse(dialog.busy)
 
     def test_polling_preserves_draft_and_stale_save_requires_explicit_reload(self):
-        state={'enabled':False,'phase':'disabled','revision':'42/0','settings':{'shortcut':'ctrl+space','activation':'push_to_talk','model':'fixture','history_limit':5}}
+        state={'enabled':True,'phase':'setup-needed','revision':'42/0','settings':{'shortcut':'ctrl+space','activation':'push_to_talk','model':'fixture','history_limit':5}}
         calls=[]
         def request(method,params=None,**kwargs):
             calls.append((method,params))
@@ -42,6 +42,23 @@ class DictationSettingsTests(unittest.TestCase):
                 self.assertIn('refresh',dialog.note.text());self.assertEqual(dialog.shortcut.text(),'ctrl+alt+F10')
                 QTest.mouseClick(dialog.reload,Qt.MouseButton.LeftButton);self.wait(dialog)
                 self.assertEqual(dialog.shortcut.text(),'ctrl+shift+space');self.assertEqual(dialog.saved_revision,'42/1')
+            finally:dialog.close();parent.close()
+
+    def test_disabled_dialog_never_restarts_handy_and_keeps_editing_inactive(self):
+        calls=[]
+        def request(method,params=None,**kwargs):
+            calls.append(method)
+            self.assertEqual(method,'status')
+            return {'enabled':False,'phase':'disabled','installed':True}
+        parent=QWidget();parent.accent=QColor('#a8dfce');parent.preferences=SimpleNamespace(values={'animation':True})
+        with patch('augmentor_linux.dictation_settings.dictation.request',side_effect=request):
+            dialog=DictationSettingsDialog(parent);self.wait(dialog)
+            try:
+                dialog.timer.stop();dialog.refresh();self.wait(dialog)
+                self.assertEqual(calls,['status','status'])
+                self.assertTrue(dialog.enabled.isEnabled());self.assertTrue(dialog.reload.isEnabled())
+                for control in (dialog.shortcut,dialog.models,dialog.download,dialog.save):
+                    self.assertFalse(control.isEnabled())
             finally:dialog.close();parent.close()
 
     def test_quit_waits_for_broker_shutdown_before_closing_the_window(self):

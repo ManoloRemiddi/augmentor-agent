@@ -29,6 +29,15 @@ def validate():
         if hashlib.sha256((ROOT/'components/handy'/name).read_bytes()).hexdigest()!=digest:raise ValueError('Rebuild dictation after changing '+name)
     for name,digest in record['buildInputs'].items():
         if hashlib.sha256((ROOT/name).read_bytes()).hexdigest()!=digest:raise ValueError('Rebuild dictation after changing '+name)
+    if sys.platform=='win32':
+        supplier=json.loads((ROOT/'components/handy/webview2.json').read_text(encoding='utf-8'))
+        arch={'AMD64':'x64','ARM64':'arm64'}[platform.machine()]
+        expected={'version':supplier['version'],'arch':arch,**supplier['targets'][arch],
+                  'licenseUrl':supplier['licenseUrl'],'licenseSha256':supplier['licenseSha256'],'publisherVerified':True}
+        vc=json.loads((ROOT/'components/handy/visual-c-runtime.json').read_text(encoding='utf-8'))
+        expected['visualC']={'version':vc['version'],'arch':arch,**vc['targets'][arch],
+                            'licenseUrl':vc['licenseUrl'],'licenseSha256':vc['licenseSha256']}
+        if record.get('windowsRuntime')!=expected:raise ValueError('Rebuild the complete Windows browser and CRT prerequisite.')
     return source,record
 
 def stage(project):

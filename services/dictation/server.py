@@ -64,6 +64,9 @@ class Backend:
     def start(self):
         if self.child and self.child.poll() is None:return
         env=os.environ.copy();env.update(AUGMENTOR_HANDY_EMBEDDED='1',HANDY_DISABLE_UPDATER='1')
+        if sys.platform=='win32':
+            from services.dictation.windows_runtime import environment
+            env=environment(ROOT/'components/handy/runtime',env)
         if sys.platform.startswith('linux') and portal.required():
             env['AUGMENTOR_HANDY_EXTERNAL_SHORTCUT']='1'
             # GNOME has no layer-shell protocol for a bottom-edge overlay.

@@ -7,13 +7,41 @@ on:
         description: 'Reviewed positive build sequence for this product version (shared by both CPUs)'
         required: true
         type: string
+  pull_request:
+    paths:
+      - 'docs/WINDOWS-PREVIEW.md'
+      - '.github/workflows/windows-preview.yml'
+      - '.github/workflows/handy-matched-preview.yml'
+      - 'components/handy/**'
+      - 'services/dictation/**'
+      - 'scripts/stage-handy*'
+      - 'scripts/build-handy.py'
+      - 'scripts/proof-handy*'
+      - 'scripts/stage-windows-application.py'
+      - 'scripts/package-windows.py'
+      - 'scripts/windows-application.iss'
+      - 'release/windows/public-preview.json'
+  push:
+    branches: [feat/windows]
+    paths:
+      - '.github/workflows/windows-preview.yml'
+      - 'release/windows/public-preview.json'
+      - 'scripts/windows-preview-health.py'
+      - 'scripts/stage-windows-application.py'
+      - 'scripts/package-windows.py'
+      - 'scripts/windows-application.iss'
 permissions:
   contents: read
 concurrency:
   group: windows-preview-${{ github.ref }}
   cancel-in-progress: false
 jobs:
+  handy:
+    uses: ./.github/workflows/handy.yml
+    with:
+      platforms: '["windows-2022", "windows-11-arm"]'
   package:
+    needs: handy
     strategy:
       fail-fast: false
       matrix:
@@ -23,15 +51,18 @@ jobs:
           - os: windows-11-arm
             arch: arm64
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 35
+    timeout-minutes: 50
     defaults:
       run:
         shell: pwsh
     env:
-      AUGMENTOR_RELEASE_BUILD: ${{ inputs.update_build }}
+      AUGMENTOR_RELEASE_BUILD: ${{ inputs.update_build || '0' }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-      - name: Require an explicit reviewed release build
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Require an explicit reviewed public release build
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
           if ($env:AUGMENTOR_RELEASE_BUILD -notmatch '^[1-9][0-9]*$' -or [long]$env:AUGMENTOR_RELEASE_BUILD -gt 2147483647) {
             throw 'Choose a reviewed positive build sequence; do not reuse a published version/build for different bytes.'
@@ -42,6 +73,10 @@ jobs:
           architecture: ${{ matrix.arch }}
       - name: Stage hash-locked private runtimes
         run: python -Xutf8 scripts/bootstrap-windows.py --arch ${{ matrix.arch }} --out outputs/payload
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: handy-win32-${{ matrix.arch == 'x64' && 'AMD64' || 'ARM64' }}
+          path: components/handy/runtime
       - name: Build the shared application
         run: |
           npm ci --ignore-scripts --no-audit --no-fund
@@ -55,15 +90,25 @@ jobs:
           $env:AUGMENTOR_PWSH = "$PWD/outputs/payload/powershell/pwsh.exe"
           & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-dsh.py --out outputs/payload/dsh --node "$PWD/outputs/payload/node/node.exe"
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-windows-application.py --root outputs/payload --arch ${{ matrix.arch }} --public-preview --update-build $env:AUGMENTOR_RELEASE_BUILD
+          $previewArgs = @()
+          if ('${{ github.event_name }}' -eq 'workflow_dispatch') { $previewArgs = @('--public-preview') }
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-windows-application.py --root outputs/payload --arch ${{ matrix.arch }} @previewArgs --update-build $env:AUGMENTOR_RELEASE_BUILD
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Verify complete sealed files and native public launcher rendering
         run: |
-          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/windows-preview-health.py --root outputs/payload --out outputs/package/health.json
+          $healthArgs = @()
+          if ('${{ github.event_name }}' -ne 'workflow_dispatch') { $healthArgs = @('--development') }
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/windows-preview-health.py --root outputs/payload --out outputs/package/health.json @healthArgs
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Verify packaged Windows dictation without a global browser or Handy installation
+        run: |
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/proof-handy-windows-broker.py --project outputs/payload --out outputs/package/dictation.json
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Package normal customer folders without development switches
         run: |
-          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/package-windows.py --root outputs/payload --arch ${{ matrix.arch }} --out outputs/installer --public-preview
+          $packageArgs = @('--qualification-root', "$PWD/outputs/qualification")
+          if ('${{ github.event_name }}' -eq 'workflow_dispatch') { $packageArgs = @('--public-preview') }
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/package-windows.py --root outputs/payload --arch ${{ matrix.arch }} --out outputs/installer @packageArgs
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           Copy-Item outputs/installer/Augmentor-*.exe outputs/package/
           Copy-Item outputs/installer/package.json outputs/package/
@@ -74,7 +119,7 @@ jobs:
           }
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: windows-public-preview-${{ matrix.arch }}
+          name: ${{ github.event_name == 'workflow_dispatch' && 'windows-public-preview' || 'windows-development-candidate' }}-${{ matrix.arch }}
           path: outputs/package/**
           retention-days: 14
           if-no-files-found: error
@@ -85,5 +130,6 @@ jobs:
           path: |
             outputs/installer/compile.log
             outputs/package/health.json
+            outputs/package/dictation-startup.log
           retention-days: 7
           if-no-files-found: warn

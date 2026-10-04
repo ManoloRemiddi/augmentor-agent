@@ -2,6 +2,36 @@
 
 # Start here: agent handoff
 
+Before merged native qualification: full Mac correction run 37174632213 at
+`54a988d` is terminal failure on both versions after passing all 265 updater cases,
+including five actual native retention cases and real signed authority. Full
+bundle/atomic apply/health progresses to retained-exec negative acceptance, where
+the handoff fixture recursively created an intermediate observer cache with broad
+permissions. It now creates the cache explicitly private, matching bootstrap;
+production admission remains strict. Fixture failures now include bounded actual
+error text. Linux native run 37174794763 at `d8de284` is entirely successful on both
+CPUs, including all ten new native retention/handoff/signed-authority cases and
+complete archive/relocation/portal/Handy proof. Earlier b438ad8 Linux run also passes
+its narrower scope. All results precede the new main integration.
+
+Current source alignment: main advanced to `b3c5aca` with public Handy preview-2
+downloads, app-local Windows WebView/VC runtime and voice/colour fixes. This updater
+branch integrates that public history, preserving exact previous CI scopes.
+Windows client and maintenance scope now share the incoming standard-data default
+through a read-only selector, with explicit state overrides and raw junction
+refusal intact. Broker lifetime admission already covers disabled/native work;
+the tested 90-second cold-start allowance is retained. Main's bounded recovery
+helper is retained, with this branch's 20-minute outer observer/21-minute fixture
+bounds, and its more precise private modal cleanup keeps a 60-second fixture bound.
+Public preview dispatch requires a reviewed positive build. Automatic PR builds
+remain unnumbered development candidates in disposable Windows locations; they
+cannot silently assign public version/build identities. Matched manual Linux/Mac
+previews also require/propagate a reviewed build; Browser extension ordering remains
+its existing browser-managed product-version contract. No release/tag is published.
+Host combined-source updater 265 (six skips), dictation sixteen and recovery three
+pass; native Windows default-path/source composition and complete merged bundles
+require fresh qualification. No owner install/profile/model/GPU was changed.
+
 Mac retention run 37174398113 at `b438ad8` fails on both Mac 14/26 solely in the
 new fixture's aliased temporary ancestor (`/var` to `/private/var`). The fixture
 factory now selects its actual temporary root; production input validation remains
@@ -888,25 +918,35 @@ this pair. The alignment guide records exact run URLs, the requirement audit
 and four inspected Chromium component
 renders. These source checks do not promote a release or migrate an app.
 
-## October 3 Handy alignment, test separation and download preparation
+## October 3 Handy publication — current
 
-PR #30 is merged; PR #33 adds the four-pixel leftward orb adjustment and protects
-the live dictation session from incomplete/offscreen development brokers. The
-owner's dictation broker now runs separately staged compatible release
-`20261003-105718-c8fb185f`, artifact
-`7296f4917721c601e0949588a97053c947db8eeda62ab0fd3f7dea66cb7f2d9a`,
-enabled/ready on Ctrl+Space with no error and unchanged saved broker preferences.
-Existing conversation windows were preserved. Read [the owning evidence](HANDY-INTEGRATION.md#october-3-alignment-and-matched-downloads)
-for isolated CPU recognition, deployment scope, the shortcut fixture race and
-pending final source checks. Do not run UI proofs on the owner's real display.
+PR #30, icon/session-isolation PR #33 and matched packaging/lifecycle PR #35
+are merged. PR #35 squash is `5d4ab848e2d8e1e49a030fa2c139e6b7d65ce009`;
+all customer preview-2 packages and tags use exact qualified source
+`6f001fd395a4575ea58d1899f7b68aa1d5283004`. Linux, Apple-silicon Mac and
+Windows x64/ARM64 releases include native Handy, the themed recording pill
+and requested four-pixel orb correction. No separate Handy tray is needed.
+All eight final-source workflows pass, including both Windows CPUs' fourteen
+installation/repair/restoration/removal stages and strict inventories.
 
-The owner directs preparation of **Linux, macOS and Windows before publishing**.
-Existing public 0.2.13 downloads predate or explicitly exclude Handy. Preparing a
-component or merging a source PR does not replace those assets. Native Windows
-ARM64, complete per-user payload/prerequisites and matched customer installer
-qualification remain part of that preparation.
+[The published download ledger](HANDY-DOWNLOADS-2026-10-03.md) owns exact
+public URLs, checksums, anonymous full-byte verification, source/merge scope,
+supplier notices and remaining physical microphone/permission/input acceptance.
+[The integration guide](HANDY-INTEGRATION.md) retains historical failures and
+fixes. Disabled settings refresh preserves off-state and releases maintenance
+leases. Preview-1 assets stay immutable and do not include Handy.
 
+The owner's compatible 0.2.11 installation is separate from these customer
+previews. It was not replaced or restarted during publication. The selected
+build changed independently during qualification, while the dictation broker
+was observed ready from its earlier compatible staged build. Inspect selected
+and running identities before any future update, preserve matching DSH/speech
+and active conversations, and keep tests off the owner's display/audio session.
+Do not infer physical acceptance on every PC from hosted package proofs.
 
+The October 2 Windows preview-1 record below is historical; preview 2 and its
+bundled guide supersede the no-Handy delivery scope. Repair only the exact build;
+do not overlay preview 2 onto preview 1 or a different product contract.
 
 ## Windows 0.2.13 public preview — release record, October 2
 
@@ -2620,3 +2660,130 @@ Preserve dated evidence rather than relabelling old tests as new qualification.
 Publish a reviewed commit and update the PR with scope and validation. A local-only
 note or an unpublished branch is not a completed handoff. Merge/release status
 must remain explicit; documentation publication does not itself merge a draft PR.
+
+## October 3 matched Handy customer guides
+
+The [Handy preparation](HANDY-INTEGRATION.md#october-3-alignment-and-matched-downloads)
+now includes preview 2 Linux/Mac/Windows first-time dictation instructions and an explicit
+Windows prohibition on replacing preview 1 with another build. Embedded guide
+changes trigger the matching package workflows. Qualification/publication are
+pending; physical microphone acceptance remains separate.
+
+## October 3 voice fixture completion ordering
+
+[Codex voice qualification](CODEX-INTEGRATION.md#october-3-browser-voice-fixture-synchronization)
+now waits for the durable completion receipt after PCM before closing its private
+browser fixture. This fixes the ordering failure in run 37119919501 without
+changing product behavior or weakening identity/playback/completion assertions.
+Matched Handy candidates are rerun from the resulting source; publication is pending.
+
+## October 3 Windows broker fixture intake
+
+The [Handy qualification record](HANDY-INTEGRATION.md#october-3-alignment-and-matched-downloads)
+records passed x64 full install/repair/removal and a separate missing test import
+path at `da70616`. Broker tests now retain actual Windows identity adapters in
+their incomplete checkout and include the services path, preserving authentication
+and missing-component assertions. Product code is unchanged; native gates rerun.
+
+## October 3 companion fixture wrapper exit
+
+[Windows shell evidence](WINDOWS-SHELL.md#october-3-companion-fault-fixture-cleanup)
+now waits for both the authenticated peer and its distinct native wrapper after
+a deliberate test supervisor kill, preserving kernel exit assertions and strict
+folder cleanup. The product supervisor is unchanged. This follows ARM cleanup
+ordering failure 37121482753; matched Handy checks rerun.
+
+## October 3 broker exit and sealed interpreter
+
+[Handy qualification](HANDY-INTEGRATION.md#october-3-alignment-and-matched-downloads)
+records passed Windows IPC/ACL assertions and a fixture cleanup race after the
+shutdown reply. Tests now wait for actual broker process exit. Broker startup
+passes `-B` to preserve the native launcher's no-bytecode policy in a sealed
+installation. The exact entries behind the subsequent intake mismatch were not
+captured; inventory checks remain strict and native/package gates rerun.
+
+## October 3 exact sealed Windows cache diagnosis
+
+[Handy intake evidence](HANDY-INTEGRATION.md#october-3-exact-windows-intake-diagnosis)
+now identifies only extra standard-library bytecode from the incomplete-checkout
+fixture's direct interpreter launch. That fixture now uses `-B`; product startup
+and strict package inventory checks remain intact. Matched gates rerun; customer
+publication is still pending and the owner's selected release is unchanged.
+
+## October 3 complete ARM64 payload recovery wait
+
+[Windows recovery evidence](WINDOWS-INSTALLER-DECISION.md#october-3-complete-payload-recovery-observation)
+identifies the final `9661eef` ARM64 failure: source Setup succeeded about 26
+seconds after the five-minute observer expired, leaving verification/completion
+unresolved. Observation is now bounded at ten minutes within a fifteen-minute
+native envelope. Three timing cases and thirteen durability cases pass locally;
+all matched source/native/package gates rerun. Preview-2 drafts remain private,
+public downloads/website remain unchanged, and the owner's installation is untouched.
+
+## October 3 Handy and current SDK source reconciliation
+
+The Handy branch incorporates approved public main `550e274`, including PR #34's
+SDK alignment. The Windows workflow retains both packaged SDK qualification and
+the Handy/recovery checks; neither is dropped during conflict resolution. Both
+voice-fixture completion observations are retained. Automatic PR qualification
+was blocked by that merge conflict; provisional manual `c9f0363` runs are obsolete.
+The reconciled source must rebuild/qualify all matching downloads before
+publication. Private preview-2 drafts stay withheld; the owner's selected Linux
+release and running dictation are unchanged.
+
+## October 3 startup and rejected-update observations
+
+[Handy startup](HANDY-INTEGRATION.md#october-3-first-response-observation-and-windows-diagnostics)
+now separates the initial 60-second component response from ordinary 15-second
+RPCs; settings/proof startup queries allow 75 seconds. The failed x64 `901fab9`
+operation was not recorded, so disposable-only timing/stderr diagnostics now
+identify it without exposing parameters or touching the installed owner profile.
+Sixteen local broker cases pass; all matching candidates must qualify again.
+[Rejected-update fixture cleanup](WINDOWS-INSTALLER-DECISION.md#october-3-native-rejected-update-dialog-cleanup)
+also acknowledges only its own native modal dialog before its parent while
+joining cleanup. The prior x64 progress proves rejection but not fixture exit;
+fresh native qualification remains required. Preview-2 drafts stay private.
+
+## October 3 native task-dialog button mapping
+
+The x64 public packaged dictation probe passes at `6b82cdf`. Its separate updater
+fixture hangs earlier, after the busy-work veto; the progress report confirms
+`canShutdown: false`. Direct IDOK messaging did not complete native cleanup. [The owning record](WINDOWS-INSTALLER-DECISION.md#october-3-native-rejected-update-dialog-cleanup)
+now records the wxWidgets task-dialog OK/IDCANCEL mapping and actual-button click,
+with diagnostics retained before cleanup returns. This changes only the private
+fixture; all final matched gates remain required and drafts remain unpublished.
+
+## October 3 complete recovery confirmation
+
+The full native x64 and ARM64 application qualification at `901fab9` completes
+successfully in [run 37127526723](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37127526723).
+This confirms the bounded ARM source-restoration correction, including mandatory
+health/completion and installed inventory checks. That run is a checkpoint, not
+final-source qualification: newer packaged-startup and native-dialog fixture
+changes require matching candidates to pass again before publication.
+
+## October 3 off-state settings and installed lease proof
+
+[The Handy lifecycle record](HANDY-INTEGRATION.md#october-3-explicit-off-state-refresh-and-maintenance)
+fixes disabled settings refresh restarting the native component for model lists.
+Three GUI-free cases pass for disabled refresh, disable without restart and
+enabled setup reads. Windows disposable packaged proof now retains the actual
+release identity and uses private runtime paths, requiring a real installation
+lease while enabled and its release after disabling. The customer Windows guide
+requires turning dictation off before maintenance. All matching candidates need
+fresh qualification; the selected/running owner installation remains untouched.
+
+The native `d82a721` dialog diagnostics prove busy-warning cleanup passes, then
+identify the rejected-update warning as a task dialog without ordinary button
+handles. The fixture now uses its documented logical-button message in that
+case; actual x64/ARM64 completion remains a required gate.
+
+## October 3 enabled editing and disabled Qt fixture coverage
+
+[Handy qualification](HANDY-INTEGRATION.md#october-3-explicit-off-state-refresh-and-maintenance)
+records both Windows installer gates and x64 customer lease/startup passing at
+`048954d`. Linux's 841-case suite finds an old stale-save fixture typing while
+disabled. It now exercises enabled editing without dropping any draft/revision
+assertion; a separate actual Qt case checks disabled controls and status-only
+refresh. The local production runtime omits QtTest; hosted Qt completion remains
+required. Private draft downloads remain withheld and the owner is untouched.

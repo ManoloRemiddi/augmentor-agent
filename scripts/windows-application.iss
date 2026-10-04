@@ -17,6 +17,7 @@ DisableProgramGroupPage=yes
 OutputDir={#OutputDirectory}
 OutputBaseFilename=Augmentor-{#ProductVersion}-windows-{#TargetArchitecture}-{#PackageSuffix}
 PrivilegesRequired=lowest
+LicenseFile={#PayloadDirectory}\licenses\Windows-installation-terms.txt
 SetupArchitecture=x64
 ArchitecturesAllowed={#AllowedArchitecture}
 ArchitecturesInstallIn64BitMode={#AllowedArchitecture}

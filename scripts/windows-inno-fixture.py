@@ -24,32 +24,58 @@ def publish_result(destination, result):
     os.replace(pending, destination)
 
 
-def dismiss_fixture_windows(stop=None):
-    """Dismiss this test process's updater UI, including its busy-work warning.
+def dismiss_fixture_windows(stop, observations, destination):
+    """Acknowledge only this disposable process's updater dialogs during cleanup.
 
-    WinSparkle correctly shows a modal warning when can_shutdown refuses. Its
-    cleanup waits for that dialog; hosted tests must exercise the dismissal.
-    Never enumerate/close windows belonging to another process.
+    WinSparkle can show an OK-only modal warning after a rejected callback.
+    Close that dialog before its parent; keep observing while native cleanup
+    joins the UI thread. Never touch another process's windows.
     """
-    import os
     user = ctypes.WinDLL('user32', use_last_error=True)
     callback_type = ctypes.WINFUNCTYPE(wintypes.BOOL,wintypes.HWND,wintypes.LPARAM)
     user.EnumWindows.argtypes = [callback_type,wintypes.LPARAM]; user.EnumWindows.restype = wintypes.BOOL
     user.GetWindowThreadProcessId.argtypes = [wintypes.HWND,ctypes.POINTER(wintypes.DWORD)]
     user.GetWindowThreadProcessId.restype = wintypes.DWORD
+    user.IsWindowVisible.argtypes = [wintypes.HWND]; user.IsWindowVisible.restype = wintypes.BOOL
+    user.IsWindowEnabled.argtypes = [wintypes.HWND]; user.IsWindowEnabled.restype = wintypes.BOOL
+    user.GetClassNameW.argtypes = [wintypes.HWND,wintypes.LPWSTR,ctypes.c_int]
+    user.GetClassNameW.restype = ctypes.c_int
+    user.GetDlgItem.argtypes = [wintypes.HWND,ctypes.c_int]; user.GetDlgItem.restype = wintypes.HWND
     user.PostMessageW.argtypes = [wintypes.HWND,wintypes.UINT,wintypes.WPARAM,wintypes.LPARAM]
     user.PostMessageW.restype = wintypes.BOOL
-    def close(window,_context):
+    owned = []
+    def collect(window,_context):
         pid = wintypes.DWORD(); user.GetWindowThreadProcessId(window,ctypes.byref(pid))
-        if pid.value == os.getpid(): user.PostMessageW(window,0x0010,0,0)  # WM_CLOSE
+        if pid.value == os.getpid() and user.IsWindowVisible(window) and user.IsWindowEnabled(window):
+            name = ctypes.create_unicode_buffer(256); user.GetClassNameW(window,name,len(name))
+            owned.append((window,name.value))
         return True
-    callback = callback_type(close)
-    deadline=time.monotonic()+(60 if stop is not None else 1)
-    while time.monotonic()<deadline:
-        user.EnumWindows(callback,0)
-        if stop is not None:
-            if stop.wait(.1):break
-        else:time.sleep(.1)
+    callback = callback_type(collect)
+    deadline = time.monotonic()+60
+    while not stop.is_set() and time.monotonic() < deadline:
+        owned.clear(); user.EnumWindows(callback,0)
+        modal = [(window,name) for window,name in owned if name == '#32770']
+        for window,name in modal or owned:
+            if name == '#32770':
+                # wxWidgets may expose an OK-only task dialog using IDCANCEL.
+                # Click the real OK/Cancel button instead of guessing its ID.
+                button_id = next((ident for ident in (1,2) if user.GetDlgItem(window,ident)),None)
+                button = user.GetDlgItem(window,button_id) if button_id else None
+                if button:
+                    accepted = bool(user.PostMessageW(button,0x00f5,0,0))  # BM_CLICK
+                    action = 'button-'+str(button_id) if accepted else 'button-failed'
+                else:
+                    # TaskDialog controls need not expose their logical IDs
+                    # through GetDlgItem. Its public API uses IDCANCEL for the
+                    # wxWidgets OK-only warning (WM_USER + 102).
+                    accepted = bool(user.PostMessageW(window,0x0466,2,0))  # TDM_CLICK_BUTTON
+                    action = 'task-dialog-button-2' if accepted else 'task-dialog-failed'
+            else:
+                accepted = bool(user.PostMessageW(window,0x0010,0,0))  # WM_CLOSE
+                action = 'close' if accepted else 'close-failed'
+            observations.append({'class':name,'action':action})
+        if owned: publish_result(destination,observations)
+        stop.wait(.1)
 
 
 def shared_gate(config):
@@ -113,15 +139,14 @@ def sparkle(settings):
         time.sleep(.3)  # Let the native callback return before cleanup joins its UI thread.
     finally:
         publish_result(settings['progress'], result)
-        # A rejected signature/metadata callback can create its modal error UI
-        # after an earlier one-second sweep. Continue dismissing only this
-        # fixture process's windows while native cleanup joins its UI thread.
-        # The parent still bounds the whole disposable proof at 120 seconds.
-        stop=threading.Event()
-        dismissal=threading.Thread(target=dismiss_fixture_windows,args=(stop,),daemon=True)
-        dismissal.start()
-        try:function('cleanup')()
-        finally:stop.set();dismissal.join(timeout=2)
+        stop = threading.Event(); dismissals = []
+        worker = threading.Thread(target=dismiss_fixture_windows,args=(stop,dismissals,settings['progress']+'.dialogs.json'),daemon=True)
+        worker.start()
+        try: function('cleanup')()
+        finally:
+            stop.set(); worker.join(timeout=2)
+            result['fixtureDialogDismissals'] = dismissals
+            publish_result(settings['progress'], result)
     return result
 
 

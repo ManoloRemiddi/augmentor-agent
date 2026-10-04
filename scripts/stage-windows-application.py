@@ -52,6 +52,18 @@ def main():
             shutil.copytree(source, destination, dirs_exist_ok=True,
                 ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '.git', 'node_modules', 'test', 'tests'))
         else: shutil.copy2(source, destination)
+    import importlib.util
+    spec=importlib.util.spec_from_file_location('handy_stage',ROOT/'scripts/stage-handy.py')
+    handy=importlib.util.module_from_spec(spec);spec.loader.exec_module(handy)
+    handy.stage(target)
+    # Installer acceptance covers the independently licensed Microsoft runtime;
+    # preserve its original terms and notices rather than applying our code
+    # license to vendor binaries.
+    terms=(ROOT/'LICENSE').read_text(encoding='utf-8')
+    terms+='\n\nHandy dictation code\n\n'+(ROOT/'components/handy/LICENSE.upstream').read_text(encoding='utf-8')
+    terms+='\n\nBundled Microsoft browser runtime\n\n'+(ROOT/'components/handy/licenses/WebView2-fixed.txt').read_text(encoding='utf-8')
+    terms+='\n\nBundled Microsoft Visual C++ runtime\n\n'+(ROOT/'components/handy/licenses/Visual-C-runtime.txt').read_text(encoding='utf-8')
+    (target/'licenses/Windows-installation-terms.txt').write_text(terms,encoding='utf-8-sig')
     product = json.loads((ROOT/'release/product.json').read_text(encoding='utf-8'))
     revision = release_source['commit']
     profile = json.loads((ROOT/'release/windows/public-preview.json').read_text(encoding='utf-8')) if args.public_preview else {

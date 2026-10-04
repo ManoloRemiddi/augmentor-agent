@@ -1,0 +1,154 @@
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+name: Matched Handy Linux and macOS previews
+on:
+  workflow_dispatch:
+    inputs:
+      update_build:
+        description: Reviewed positive per-version build shared by all published platform artifacts
+        required: true
+        type: string
+  pull_request:
+    paths:
+      - 'docs/MACOS-PREVIEW.html'
+      - 'docs/COMPLETE-INSTALL.md'
+      - '.github/workflows/handy-matched-preview.yml'
+      - 'scripts/fetch-macos-release-sources.py'
+      - 'scripts/package-complete.py'
+      - 'release/prove-complete-container.sh'
+      - 'components/handy/**'
+      - 'scripts/*handy*.py'
+permissions:
+  contents: read
+env:
+  AUGMENTOR_RELEASE_BUILD: ${{ inputs.update_build || '0' }}
+concurrency:
+  group: handy-matched-preview-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  handy:
+    uses: ./.github/workflows/handy.yml
+    with:
+      platforms: '["ubuntu-24.04", "macos-14"]'
+  linux:
+    needs: handy
+    runs-on: ubuntu-24.04
+    container: debian@sha256:abc9cb88a5587630d7f915f47b23b0668fe250fbfc6457aa4d52b534c1bbf73f
+    timeout-minutes: 35
+    steps:
+      - name: Install declared packaging dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends ca-certificates git python3 python3-pygments python3-yaml python3-numpy python3-websocket python3-keyring python3-pyside6.qtcore python3-pyside6.qtgui python3-pyside6.qtwidgets python3-pyside6.qtnetwork python3-pyside6.qtdbus python3-pyside6.qtquick python3-pyside6.qtquickwidgets libqt6svg6 fonts-dejavu-core
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.19.0'
+      - name: Require reviewed public release numbering
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: python3 -c 'import os; from pathlib import Path; import sys; sys.path.insert(0,str(Path.cwd()/"services")); from updates.packaging import source_revision; source_revision(Path.cwd(),build=int(os.environ["AUGMENTOR_RELEASE_BUILD"])); assert 1<=int(os.environ["AUGMENTOR_RELEASE_BUILD"])<=2147483647'
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: handy-linux-x86_64
+          path: components/handy/runtime
+      - name: Build and review matching Desktop and Browser packages
+        run: |
+          chmod +x components/handy/runtime/bin/*
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run check
+          npm run build
+          python3 -m unittest discover -s tests -p test_complete_sources.py -v
+          python3 scripts/package-browser.py
+          python3 scripts/package-debian.py --update-build "$AUGMENTOR_RELEASE_BUILD"
+          python3 scripts/review-artifacts.py --debian outputs/debian --browser outputs/browser --output outputs/debian/review.json
+      - name: Assemble the complete fresh-user bundle
+        run: |
+          python3 scripts/package-complete.py --preview-number 2 --debian outputs/debian --browser outputs/browser --voice release/dsh/plugins/dsh-resonant-voice-0.1.19.tgz --adaptive release/dsh/plugins/dsh-adaptive-reasoning-0.2.3.tgz --model-picker release/dsh/plugins/dsh-model-picker-augmented-1.1.2.tgz --voice-source release/dsh/plugins/dsh-resonant-voice-0.1.19.tgz --adaptive-source release/dsh/plugins/dsh-adaptive-reasoning-0.2.3.tgz --out outputs/augmentor-0.2.13-complete-preview.2
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: handy-linux-complete-preview
+          path: |
+            outputs/augmentor-0.2.13-complete-preview.2.tar.gz
+            outputs/debian/artifacts.json
+            outputs/debian/review.json
+            outputs/browser/artifacts.json
+          retention-days: 14
+          if-no-files-found: error
+  linux-install:
+    needs: linux
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: handy-linux-complete-preview
+          path: outputs/complete
+      - name: Verify the exact complete archive as a fresh ordinary user
+        run: |
+          mkdir outputs/complete/unpacked
+          tar --extract --gzip --file outputs/complete/augmentor-0.2.13-complete-preview.2.tar.gz --directory outputs/complete/unpacked
+          bundle="$PWD/outputs/complete/unpacked/augmentor-0.2.13-complete-preview.2"
+          (cd "$bundle" && sha256sum -c SHA256SUMS)
+          image=$(python3 -c 'import json; print(json.load(open("release/runtime.json"))["debianImage"])')
+          docker run --rm -v "$bundle:/bundle:ro" -v "$PWD/release/prove-complete-container.sh:/proof.sh:ro" "$image" bash /proof.sh
+  macos:
+    needs: handy
+    runs-on: macos-14
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.19.0'
+      - uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9
+        with:
+          version: '0.11.16'
+          enable-cache: false
+      - name: Prepare pinned Python, wheels and application
+        run: |
+          uv python install 3.12.13
+          uv venv --python 3.12.13 .macos-build-env
+          uv pip install --python .macos-build-env/bin/python3 --require-hashes --only-binary :all: --no-deps -r release/macos-requirements.txt
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run check
+          npm run build
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: handy-darwin-arm64
+          path: components/handy/runtime
+      - name: Prepare and verify the existing corresponding sources and notices
+        run: |
+          chmod +x components/handy/runtime/bin/handy
+          python3 scripts/fetch-macos-release-sources.py --out outputs/macos-sources
+      - name: Build the exact ad-hoc preview app and DMG
+        run: |
+          ref=$(git rev-parse HEAD)
+          preview_args=()
+          if [ "${{ github.event_name }}" = workflow_dispatch ]; then
+            [[ "$AUGMENTOR_RELEASE_BUILD" =~ ^[1-9][0-9]*$ ]] && [ "$AUGMENTOR_RELEASE_BUILD" -le 2147483647 ]
+            preview_args=(--preview)
+          fi
+          .macos-build-env/bin/python3 scripts/package-macos.py --out outputs/macos-preview "${preview_args[@]}" --dmg --update-build "$AUGMENTOR_RELEASE_BUILD" --source-commit "$ref" --source-notices outputs/macos-sources/notices
+          .macos-build-env/bin/python3 scripts/verify-macos-application-inventory.py outputs/macos-preview
+          app="$PWD/outputs/macos-preview/Augmentor Agent Desktop.app"
+          project="$app/Contents/Resources/app"
+          "$project/python/bin/python3" -I -B scripts/proof-handy-component.py --runtime "$project/components/handy/runtime"
+          "$project/python/bin/python3" -I -B scripts/macos-managed-setup-proof.py --app-root "$project" --out outputs/macos-preview-acceptance
+          codesign --verify --deep --strict "$app"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: handy-macos-complete-preview
+          path: |
+            outputs/macos-preview/*.dmg
+            outputs/macos-preview/*.zip
+            outputs/macos-preview/*.json
+            outputs/macos-preview-acceptance/report.json
+            outputs/macos-sources/published-sources.json
+          retention-days: 14
+          if-no-files-found: error

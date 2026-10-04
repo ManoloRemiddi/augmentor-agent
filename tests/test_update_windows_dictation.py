@@ -191,6 +191,14 @@ print(json.dumps(dictation.request('status')))
         with os.fdopen(private_file_descriptor(self.state/'auth.key'),'rb') as source:self.assertEqual(source.read(),key)
         import _winapi
         from lifecycle.dictation_control import scope
+        from platform_adapters.paths import windows_dictation_state
+        with patch.dict(os.environ,{'XDG_DATA_HOME':str(self.base/'standard-data')}):
+            os.environ.pop('AUGMENTOR_DICTATION_STATE',None)
+            expected=self.base/'standard-data/augmentor/dictation'
+            self.assertEqual(windows_dictation_state(),expected)
+            self.assertEqual(scope()['stateSHA256'],hashlib.sha256(os.fsencode(
+                Path(os.path.normcase(str(expected))))).hexdigest())
+            self.assertFalse(expected.exists(),'Read-only scope must not create default state or authentication.')
         link=self.base/'redirected-state';_winapi.CreateJunction(str(self.state),str(link))
         try:
             with self.assertRaises(PermissionError):dictation.windows_location(link)

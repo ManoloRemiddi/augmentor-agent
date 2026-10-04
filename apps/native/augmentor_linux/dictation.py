@@ -30,7 +30,10 @@ def location():
                 # create a protected child rather than adopting that directory.
                 os.environ['AUGMENTOR_DICTATION_STATE']=str(temporary/'private' if os.name=='nt' else temporary)
     base = Path(os.environ.get('AUGMENTOR_DICTATION_STATE', str(Path.home()/'.local/share/augmentor/dictation')))
-    if os.name=='nt':return windows_location(base)
+    if os.name=='nt':
+        sys.path.insert(0,str(ROOT/'services'))
+        from platform_adapters.paths import windows_dictation_state
+        return windows_location(windows_dictation_state())
     base.mkdir(parents=True, exist_ok=True, mode=0o700)
     info = base.lstat()
     if stat.S_ISLNK(info.st_mode) or (os.name!='nt' and info.st_mode & 0o077) or (hasattr(os, 'getuid') and info.st_uid != os.getuid()):
@@ -38,7 +41,10 @@ def location():
     session = hashlib.sha256((os.environ.get('XDG_SESSION_ID','')+'|'+os.environ.get('DISPLAY','')+'|'+os.environ.get('WAYLAND_DISPLAY','')).encode()).hexdigest()[:12]
     keyfile = base/'auth.key'
     if not keyfile.exists():
-        fd,temporary=tempfile.mkstemp(prefix='.dictation-key-',dir=base)
+        if os.name=='nt':
+            temporary=base/('.dictation-key-'+secrets.token_hex(16))
+            fd=private_file_descriptor(temporary,writable=True,exclusive=True)
+        else:fd,temporary=tempfile.mkstemp(prefix='.dictation-key-',dir=base)
         try:
             with os.fdopen(fd,'wb') as output:output.write(secrets.token_bytes(32));output.flush();os.fsync(output.fileno())
             try:os.link(temporary,keyfile)
@@ -47,7 +53,9 @@ def location():
     info = keyfile.lstat()
     if not stat.S_ISREG(info.st_mode) or (os.name!='nt' and info.st_mode & 0o077) or (hasattr(os,'getuid') and info.st_uid != os.getuid()):
         raise RuntimeError('Invalid dictation authentication file.')
-    key = keyfile.read_bytes()
+    if os.name=='nt':
+        with os.fdopen(private_file_descriptor(keyfile),'rb') as stream:key=stream.read(33)
+    else:key = keyfile.read_bytes()
     if len(key) != 32: raise RuntimeError('Invalid dictation authentication key.')
     if os.name!='nt':
         socket_base=base

@@ -2034,3 +2034,73 @@ Both x64 and ARM64 use their native runner kernel/interpreter. The copied code i
 an isolated test fixture, not an actual automatic upgrade, and the signed payload
 is inert. This new pipeline step requires fresh execution; earlier bundle runs
 cannot be cited as evidence for these added native cases.
+
+### Main Handy preview alignment
+
+The canonical main branch advanced from `550e274` to `b3c5aca`, including the
+published Handy preview-2 source, Windows app-local WebView/VC dependencies and
+voice/colour fixes. The updater branch integrates these public commits without
+changing the owner's checkout or importing historical private code. The Windows
+client adopts main's standard `XDG_DATA_HOME/augmentor/dictation` default (otherwise
+the verified LocalAppData Augmentor data folder); maintenance scope uses that same
+read-only selector. Explicit state overrides, protected authentication, actual
+login identity, fixed bundled interpreter and pre-resolution junction checks stay
+in place. The native client case additionally checks default scope hashes the
+expected absent directory without creating any state/key. This requires fresh
+Windows native qualification after source integration.
+
+The broker's admission already holds its installation lease for its entire
+lifetime, including disabled Handy, so main's redundant acquisition on each native
+start is covered there. Its precise model/colour changes and owned fixture child
+observations are retained. The previously tested 90-second cold-start allowance
+is kept rather than main's 60-second value; warm calls retain their existing
+15-second deadline. Source recovery uses main's extracted, tested 600-second
+same-Job observation helper and preserves this branch's 20-minute outer native
+observer and 1,260-second fixture allowance. The private WinSparkle fixture uses
+main's actual modal-button observations, retaining the 60-second cleanup window.
+
+Automatic Windows preview PR builds still compile/check/package the full payload,
+but produce explicit unnumbered development candidates in disposable compiled
+locations; a read-only health flag accepts only that candidate profile. Manual
+public-preview dispatch requires a reviewed positive per-version build. The new
+matched Linux/Mac preview workflow propagates that reviewed number for manual
+installed packages, while automatic PR builds remain unnumbered development
+candidates. Browser extension version ordering remains managed by the browser;
+its bytes remain part of the signed platform artifact set. CI cannot silently
+assign a production version/build or reinterpret a previous published preview.
+Main's pre-existing customer preview profile is preserved; no new release, tag,
+installer/feed signing key or automatic-install flag is published/enabled here.
+
+Host combined-source tests pass: updater 265 with six explicit skips, existing
+dictation sixteen and extracted recovery helper three. Full native results cited
+above remain tied to their older exact sources; new merged-source qualification
+must pass before any distribution promotion. First-release installation scope
+and the earlier signing-custody/account questions remain pending. Production
+automatic eligibility and feed stay disabled; legacy bridge, distinct signed
+forward, platform/package/shared-user/SDK, recovery and other retention gates
+remain open. No owner installation/profile/model/GPU settings changed.
+
+Native retention correction run 37174632213 at `54a988d` is terminal failure on
+both Mac versions. The full shared contract stage passes all 265 updater cases,
+including the five actual native retention and two real signed-authority cases.
+Later whole-bundle qualification reaches the actual retained-observer exec
+negative fixture and fails its expected production-signing refusal. Inspection
+finds that fixture created only the final `mac-<attempt>` directory explicitly
+private; recursive intermediate `update-observers` was broad and the new kernel
+retention guard refused it first. The fixture now creates that parent explicitly
+private, matching production bootstrap, and includes bounded actual error text on
+future refusal mismatches. Production admission is unchanged. A fresh complete
+Mac run must qualify this correction and merged main; early passed stages do not
+make the overall run successful.
+
+Linux run
+[37174794763](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37174794763)
+at `d8de284` is entirely successful on both native CPUs, including the new five
+retention, three handoff and two signed-authority cases, followed by complete
+archives and actual relocation/Qt/portal/Handy verification. Earlier narrower
+`b438ad8` run 37174399503 also passes both bundles, with SHA-256
+`b44d34609bd2c0d3d24be102d699352a1aef390bda9680addfe77ae2a8ba8306`
+(x64) and `0564f21a1856337311f4a01d7d54a36a9ab801125f3cb7872369463e03ecb40d`
+(ARM64). Those two reports independently mark `installationExercised: false` and
+`automaticInstallQualified: false`. Neither source includes the latest main
+integration; no owner installation or signing/feed configuration changed.

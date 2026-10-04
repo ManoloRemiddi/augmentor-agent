@@ -18,6 +18,20 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'services'))
 PHASE = 0
+SOURCE_INSTALLATION_TIMEOUT_SECONDS = 600
+
+
+def wait_for_source_installer(installer, *, clock=time.monotonic):
+    """Observe the same independent Job, preserving work on bounded expiry."""
+    deadline = clock() + SOURCE_INSTALLATION_TIMEOUT_SECONDS
+    while True:
+        remaining = deadline - clock()
+        if remaining <= 0:
+            raise TimeoutError('Source installation is still running. It was preserved.')
+        try:
+            return installer.wait(timeout=min(5, remaining))
+        except TimeoutError:
+            continue  # Observe the same actual Job; never launch again.
 
 
 @contextmanager
@@ -111,19 +125,7 @@ def main():
         installer = resources.enter_context(InstallerProcess(source.installer, installer_digest,
             ['/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-',
              '/augmentorrecover=source', '/LOG=' + str(log)]))
-        # Native ARM64 evidence includes a successful full-payload Setup just
-        # beyond five minutes. Keep observing this same Job; never restart it
-        # because the faster CPU's former deadline elapsed.
-        deadline = time.monotonic() + 600
-        while True:
-            remaining = deadline - time.monotonic()
-            if remaining <= 0:
-                raise TimeoutError('Source installation is still running. It was preserved.')
-            try:
-                code = installer.wait(timeout=min(5, remaining))
-                break
-            except TimeoutError:
-                continue  # Observe the same actual Job; never launch again.
+        code = wait_for_source_installer(installer)
         if code:
             raise RuntimeError('The independently observed source installer refused or failed.')
         PHASE = 4

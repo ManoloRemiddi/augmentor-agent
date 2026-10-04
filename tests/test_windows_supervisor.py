@@ -135,6 +135,10 @@ class WindowsSupervisorTests(unittest.TestCase):
                     ('memory', 'dual-memory.sock', 'memory.dual.describe')):
                     first = owner.request('start-'+name, owner=endpoint)['companions'][name]
                     self.assertTrue(first['running'])
+                    # The authenticated Python peer and its owned native wrapper
+                    # are distinct processes. Wait for both after Job teardown;
+                    # the wrapper can still hold prompts.log after the peer exits.
+                    handles.append(win32api.OpenProcess(win32con.SYNCHRONIZE, False, first['ownerProcessPid']))
                     details = ready(lambda: call(Path(env['AUGMENTOR_SHARED_STATE'])/filename, method))
                     self.assertIsInstance(details['pid'], int)
                     self.assertNotEqual(details['pid'], first['ownerProcessPid'])
