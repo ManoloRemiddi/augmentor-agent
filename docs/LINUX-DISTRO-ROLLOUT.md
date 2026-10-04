@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 4 observer replacement and reboot transport
+
+[Fresh observer replacement](../release/qualification/next-targets/20261004-gnome562-observer-replacement-reboot-transport.json)
+passes preparation and replacement, with three guards per phase and complete
+ending selection/native/protected/cache/process/lock checks before reboot. One
+normal reboot request passed its admission check and returned a guest result
+after the unchanged helper checked native exit zero. SSH then exited 255 as the
+remote host closed the connection; the terminal unknown outcome remains
+retained. The boot transition and new active observer are unconfirmed. A separate
+read-only audit is required; no reboot replay, rollback, GUI, capture or input
+followed. GNOME control acceptance remains open.
+
 ## October 4 owned-editor proof correction
 
 The maintained KDE VM proof now binds the new Kate process owner, birth time,

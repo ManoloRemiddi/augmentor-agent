@@ -1,0 +1,36 @@
+{
+  "format": "augmentor-gnome-observer-replacement-reboot/1",
+  "date": "2026-10-04",
+  "status": "REPLACEMENT_PASS_REBOOT_TRANSITION_UNCONFIRMED",
+  "scope": "One fresh isolated Fedora44 GNOME50 observer preparation/replacement and one normal reboot request. Original deployment namespace not resumed.",
+  "source": "56251697f2d2f87c3c1be04130751426940df198",
+  "evidence": {
+    "prepare": "PASS",
+    "prepareGuardCount": 3,
+    "replace": "PASS",
+    "replaceGuardCount": 3,
+    "protectedNativeSelectionCacheObserverProcessLockEndingBeforeReboot": "PASS",
+    "normalRebootGuard": "PASS",
+    "normalRebootRequests": 1,
+    "guestReturnedRebootRequestResult": true,
+    "nativeRequestReturnCodeCheckedByUnchangedHelper": 0,
+    "sshExitCode": 255,
+    "sshStderr": "Connection closed by remote host.",
+    "rebootTransitionIndependentlyObserved": false,
+    "noReplay": true,
+    "captureInputDispatched": false,
+    "productionGnomeInputAndDiscoveryDisabledBeforeReboot": true,
+    "receiptSha256": {
+      "extension-prepare-outcome.json": "60ebada1707d6d4b9b1ee41fb1e3d2617e4652f0a43c58dfc646305f9d092c78",
+      "extension-replace-outcome.json": "19af66e96663a62c11f52f27d20ec3ae50f682060e684532f8d01e623a1b4e80",
+      "reboot-outcome.json": "f83cf3e39335a17f446800c101cb95e9ed3341a62d09f5c723d920ec9212dc20",
+      "reboot-terminal.json": "7f0203a0f8ae3deedea6aa4eb8382e603915da8375db98596c83d3d41f5ff52b"
+    }
+  },
+  "limits": [
+    "The host transport ended with255 after receiving the request result; the original terminal unknown outcome stays retained.",
+    "Independent read-only boot/session/active-extension/selection/native/protected/cache/process and lock audit is still required.",
+    "No reboot replay, automatic rollback, GUI launch, capture or input followed.",
+    "Observer replacement does not qualify GNOME desktop input or public support."
+  ]
+}
