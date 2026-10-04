@@ -16,28 +16,45 @@ the exact published save API before any SDK/install action, and rejects every012
 managed key. All27 fresh plus27 unchanged historical checks pass; future authority
 scope195 preserves the sealed184 inputs.
 
-KDE has a verified active Wayland session; its earlier locked state is preserved in the recorded preflight.  The supported fixture
-unlock preflight refused a native ScreenSaver owner's executable permission before
-sending an unlock request. A separate privileged diagnosis verifies the exact
-native KWin/Plasma owners and executable package checks. A supported fixture
-unlock using those verified owners passes, with both lock states inactive and
-account/lock settings preserved. This is administrative fixture restoration;
-application/input and password acceptance remain open. Candidate staging passes; its installation preview requires24 additional
-native dependencies and one related harfbuzz upgrade. The strict single-package
-expectation refuses before installation; native/HOME/cache/config ending
-passes. A finite authenticated dependency transaction is being prepared. The isolated source build kit prepares correctly,
-and private Docker/containerd now pass independent admission. Classic Docker loading loses the exact base registry digest reference. The
-separate supported containerd backend now preserves it and passes the unchanged
-offline recipe, including all authenticated toolchain package versions. The
-ordinary build container starts inert; admission then refuses because Docker
-reports its daemon-namespace UID while the check expected the host-mapped UID.
-Both actual identities are verified. The separately reviewed continuation
-passes the exact idle/isolation admission and now runs Qt source compilation,
-with two compiler jobs,8GiB memory and a six-hour limit. Original failures
-remain intact. Compilation completion and recipient replacement remain open.
-[Hosted validation37216503583](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37216503583)
-passes all11 jobs atbe75a6c. Source rebuild, physical audio, licensing and the
-unwaived GitGuardian gate remain open. No public release is qualified.
+Fedora44 KDE has a verified active Wayland session; its normal idle lock is now
+active. The supported fixture
+unlock preserves account and lock settings; password authentication and input
+acceptance remain open. Candidate staging and a fresh exact offline transaction
+preview pass. All25 incoming Fedora RPMs pass checksum, package-identity and
+trusted-signature checks. The preview selects Augmentor plus24 additional native
+packages and one required harfbuzz upgrade, with zero downloads and no unrelated
+updates. The original strict single-package refusal remains intact. One normal
+installation exits0 and the exact1356-row installed inventory passes. The strict
+ending check refuses a newly started root PackageKit daemon, while cached RPMs,
+metadata, official signatures and account state pass. The original failed terminal
+stays intact. The next read refuses its unlocked-state expectation after normal
+idle locking. Source review confirms the ordinary proof uses offscreen Qt and
+skips desktop startup, shortcuts and services. A separate headless read now
+passes exact native1356, HOME, cache, metadata, account, owners/runtime and
+empty peer checks before and after, preserving the actual locked state. Its
+independent ending also passes. The unchanged ordinary-user proof is running.
+GUI input acceptance still requires a genuine unlocked session; no lock-policy
+change, forced daemon stop or package replay occurred.
+
+The supported private containerd backend preserves the exact base image reference
+and passes the unchanged offline recipe and authenticated toolchain inventory.
+The corrected namespace admission passes, and all19 Qt/PySide build commands
+finish. The wrapper then exits1 while collecting evidence because it expects
+pyside-tools/compile_commands.json. A separate read-only observation confirms
+the producer reports runtimeBuilt,24 Ninja directories exist, and exactly that
+Python/install-tools project lacks a compiler database and has no C/C++ compile
+rules. Upstream-source review confirms CMake emits the database when compilation
+commands exist ([CMake source](https://github.com/Kitware/CMake/blob/v3.28.3/Source/cmGlobalNinjaGenerator.cxx#L1124-L1141),
+[PySide tools source](https://github.com/pyside/pyside-setup/blob/v6.8.2.1/sources/pyside-tools/CMakeLists.txt)).
+A narrow separate post-build continuation passes12 focused checks and actual
+admission/collection. It stages all72 expected native members, retains24 Ninja
+build directories and146 original notice files. The original full build tree
+stays byte-exact; no compiler rerun or original-record rewrite occurred. Full
+object/source/notice attribution, raw export and recipient replacement remain
+open.
+[Hosted validation37219196306](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37219196306)
+passes all11 jobs atd6c2d3c. Physical audio, licensing and the unwaived GitGuardian
+gate remain open. No public release is qualified.
 
 ## October 4 earlier native upgrade and desktop ending checkpoint
 
